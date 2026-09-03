@@ -1,0 +1,5 @@
+# Verified working on Python 3.12.3, 2026-09-03.
+# Lower bounds, not exact pins — nothing here depends on a specific patch release.
+numpy>=1.24
+scipy>=1.10
+openpyxl>=3.1

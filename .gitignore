@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Ablation caches — regenerable, and large. The finished .txt tables ARE tracked.
+ablation_cache_*.json
+
+# Spreadsheet lock/temp files
+~$*.xlsx
+.~lock.*
+
+# OS
+.DS_Store
+Thumbs.db
