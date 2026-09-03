@@ -1,0 +1,88 @@
+
+Horizons: (20,).  All figures are paired differences with 95% CIs.
+
+  signal = both : the card beats its error bars on damage AND win rate
+           dmg  : significant on damage only
+           win  : significant on win rate only
+           --   : INSIDE its own error bars - indistinguishable from a blank.
+                  Not a weak card, an unmeasured one. Do not rank these.
+
+Win rate is the objective; damage is a proxy. Where they disagree, follow win
+rate. And before cutting anything, check whether another card does the same job
+- leave-one-out understates every member of an interchangeable group. Pass a
+list of names to ablate() to score a package together.
+
+====================================================================================
+MODEL-EVALUATED — a low score is evidence about the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Storm Herd                            +9.84+-1.50        +0.0660+-0.0115      both
+Rise of the Eldrazi                   +4.55+-1.36        +0.0312+-0.0088      both
+Guttersnipe                           +2.75+-1.01        +0.0200+-0.0073      both
+Apex of Power                         +2.64+-1.63        +0.0196+-0.0078      both
+Thrill of Possibility                 +2.58+-1.99        +0.0124+-0.0085      both
+Big Score                             +2.39+-1.18        +0.0100+-0.0081      both
+Borrowed Knowledge                    +2.32+-1.32        +0.0100+-0.0084      both
+Unexpected Windfall                   +2.31+-1.88        +0.0068+-0.0080       dmg
+Emeria's Call                         +2.29+-0.97        +0.0148+-0.0088      both
+Faithless Looting                     +2.26+-1.36        +0.0108+-0.0086      both
+Reforge the Soul                      +2.18+-1.65        +0.0248+-0.0094      both
+Talisman of Conviction                +1.19+-0.77        +0.0048+-0.0081       dmg
+Library of Leng                       +1.18+-1.97        +0.0036+-0.0078        --
+Storm-Kiln Artist                     +1.18+-1.17        +0.0016+-0.0063       dmg
+Soulfire Eruption                     +1.00+-1.24        +0.0080+-0.0076       win
+Sensei's Divining Top                 +0.87+-0.89        +0.0040+-0.0087        --
+Verge Rangers                         +0.79+-0.62        +0.0052+-0.0062       dmg
+Sol Ring                              +0.77+-1.48        +0.0136+-0.0078       win
+Mother of Runes                       +0.76+-1.36        +0.0024+-0.0055        --
+Boros Signet                          +0.48+-0.95        -0.0076+-0.0079        --
+Bender's Waterskin                    +0.44+-0.71        -0.0020+-0.0082        --
+Hit the Mother Lode                   +0.32+-0.78        +0.0076+-0.0054       win
+Boros Charm                           +0.27+-1.30        +0.0048+-0.0043       win
+Lightning Greaves                     +0.27+-1.04        -0.0020+-0.0062        --
+Blasphemous Act                       +0.09+-0.36        -0.0008+-0.0040        --
+Approach of the Second Sun            -0.17+-0.25        -0.0036+-0.0028       win
+Artist's Talent                       -0.21+-0.87        -0.0028+-0.0071        --
+Arcane Signet                         -0.25+-2.05        -0.0040+-0.0081        --
+Ruby Medallion                        -0.28+-2.58        -0.0028+-0.0071        --
+The Dawning Archaic                   -0.96+-1.97        +0.0028+-0.0045        --
+Victory Chimes                        -1.07+-2.51        +0.0000+-0.0082        --
+Scroll Rack                           -1.67+-1.37        -0.0072+-0.0080       dmg
+Hidden Retreat                        -1.72+-1.42        -0.0032+-0.0091       dmg
+Smothering Tithe                      -2.36+-3.26        -0.0060+-0.0094        --
+Penance                               -2.45+-1.34        -0.0092+-0.0085      both
+
+====================================================================================
+MODEL-BLIND — a low score is evidence about the MODEL, not the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Monastery Mentor                      +6.33+-2.07        +0.0216+-0.0094      both
+Arcane Bombardment                    +3.77+-2.17        +0.0096+-0.0089      both
+Monument to Endurance                 +3.70+-1.48        +0.0212+-0.0095      both
+Land Tax                              +2.83+-1.56        +0.0104+-0.0078      both
+Mizzix's Mastery                      +2.72+-1.48        +0.0164+-0.0082      both
+Sejiri Shelter                        +1.21+-1.59        +0.0048+-0.0067        --
+Dragon's Rage Channeler               +1.16+-1.47        +0.0012+-0.0056        --
+Goliath Daydreamer                    +0.32+-0.22        +0.0016+-0.0044       dmg
+Farewell                              +0.18+-0.55        +0.0008+-0.0022        --
+Hexing Squelcher                      +0.14+-0.31        +0.0016+-0.0041        --
+Dawn's Truce                          +0.11+-0.16        +0.0016+-0.0022        --
+Generous Gift                         +0.05+-0.06        +0.0008+-0.0011        --
+Invoke Calamity                       +0.03+-0.24        +0.0000+-0.0019        --
+Longshot Rebel Bowman                 +0.02+-0.43        +0.0012+-0.0046        --
+Chaos Warp                            +0.02+-0.05        +0.0004+-0.0008        --
+Path to Exile                         +0.01+-0.06        +0.0000+-0.0000        --
+Pinnacle Monk                         +0.00+-2.03        -0.0004+-0.0046        --
+Restoration Seminar                   +0.00+-0.15        +0.0000+-0.0027        --
+Bolt Bend                             +0.00+-0.00        +0.0000+-0.0000        --
+Swords to Plowshares                  -0.00+-0.00        +0.0000+-0.0000        --
+Ultima                                -0.02+-0.22        -0.0004+-0.0028        --
+Orlorin's Searing Light               -0.04+-0.09        +0.0000+-0.0016        --
+Volcanic Vision                       -0.05+-0.15        +0.0004+-0.0026        --
+Improvisation Capstone                -0.06+-0.17        -0.0004+-0.0026        --
+Gamble                                -0.07+-0.26        -0.0008+-0.0016        --
+Promise of Loyalty                    -0.12+-0.27        -0.0004+-0.0014        --
+Perch Protection                      -0.28+-1.74        +0.0012+-0.0044        --
+Ondu Inversion                        -0.33+-1.92        +0.0008+-0.0054        --
+Call Forth the Tempest                -0.37+-0.89        +0.0008+-0.0011        --
+Enlightened Tutor                     -1.37+-1.62        -0.0028+-0.0076        --

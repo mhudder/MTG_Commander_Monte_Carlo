@@ -1,0 +1,86 @@
+
+Horizons: (20,).  All figures are paired differences with 95% CIs.
+
+  signal = both : the card beats its error bars on damage AND win rate
+           dmg  : significant on damage only
+           win  : significant on win rate only
+           --   : INSIDE its own error bars - indistinguishable from a blank.
+                  Not a weak card, an unmeasured one. Do not rank these.
+
+Win rate is the objective; damage is a proxy. Where they disagree, follow win
+rate. And before cutting anything, check whether another card does the same job
+- leave-one-out understates every member of an interchangeable group. Pass a
+list of names to ablate() to score a package together.
+
+====================================================================================
+MODEL-EVALUATED — a low score is evidence about the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Beastmaster Ascension                 +5.14+-0.86        +0.0136+-0.0078      both
+Ohran Frostfang                       +3.62+-0.98        +0.0060+-0.0069       dmg
+Sol Ring                              +3.16+-0.78        +0.0088+-0.0071      both
+March of the World Ooze               +3.13+-0.79        +0.0088+-0.0084      both
+Bitterblossom                         +2.36+-0.66        +0.0048+-0.0074       dmg
+Golgari Signet                        +1.89+-0.75        +0.0004+-0.0070       dmg
+Arcane Signet                         +1.56+-0.70        +0.0032+-0.0076       dmg
+Solemn Simulacrum                     +1.48+-0.52        +0.0064+-0.0065       dmg
+Steel Overseer                        +1.28+-0.45        +0.0060+-0.0059      both
+Overlord of the Hauntwoods            +1.17+-0.45        +0.0076+-0.0060      both
+Arasta of the Endless Web             +1.12+-0.39        +0.0036+-0.0055       dmg
+The Great Henge                       +1.12+-0.64        +0.0052+-0.0055       dmg
+Grist, the Hunger Tide                +1.10+-0.71        -0.0032+-0.0064       dmg
+Erebos, Bleak-Hearted                 +1.03+-0.48        +0.0040+-0.0054       dmg
+Foundry Inspector                     +0.99+-0.49        +0.0004+-0.0057       dmg
+Grave Titan                           +0.92+-0.42        +0.0048+-0.0061       dmg
+Verdurous Gearhulk                    +0.89+-0.57        +0.0048+-0.0073       dmg
+Coat of Arms                          +0.88+-0.69        +0.0024+-0.0068       dmg
+Heroic Intervention                   +0.83+-0.37        +0.0004+-0.0038       dmg
+Palladium Myr                         +0.76+-0.49        +0.0008+-0.0054       dmg
+Metallic Mimic                        +0.74+-0.46        -0.0008+-0.0054       dmg
+Dryad of the Ilysian Grove            +0.73+-0.49        -0.0016+-0.0059       dmg
+The Meathook Massacre                 +0.72+-0.27        +0.0076+-0.0046      both
+Roaming Throne                        +0.71+-0.45        +0.0016+-0.0053       dmg
+Copper Myr                            +0.67+-0.38        +0.0024+-0.0050       dmg
+Dockside Chef                         +0.60+-0.47        +0.0060+-0.0058      both
+Ophiomancer                           +0.53+-0.50        -0.0004+-0.0060       dmg
+Woe Strider                           +0.50+-0.36        +0.0032+-0.0052       dmg
+Enduring Vitality                     +0.47+-0.59        -0.0004+-0.0055        --
+Primal Vigor                          +0.44+-0.52        -0.0016+-0.0058        --
+Twitching Doll                        +0.32+-0.37        -0.0040+-0.0047        --
+Tendershoot Dryad                     +0.25+-0.34        +0.0004+-0.0046        --
+Idol of Oblivion                      +0.17+-0.55        -0.0012+-0.0058        --
+Blood Artist                          +0.12+-0.31        +0.0028+-0.0048        --
+Leaden Myr                            +0.12+-0.45        -0.0004+-0.0049        --
+Ornithopter of Paradise               +0.07+-0.42        -0.0008+-0.0058        --
+
+====================================================================================
+MODEL-BLIND — a low score is evidence about the MODEL, not the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Overwhelming Stampede                 +1.27+-0.57        -0.0008+-0.0066       dmg
+Gloomshrieker                         +0.78+-0.29        +0.0000+-0.0046       dmg
+Shigeki, Jukai Visionary              +0.77+-0.26        +0.0032+-0.0040       dmg
+Village Rites                         +0.69+-0.48        +0.0008+-0.0051       dmg
+Scrap Trawler                         +0.60+-0.31        +0.0048+-0.0047      both
+Burnished Hart                        +0.52+-0.38        +0.0000+-0.0053       dmg
+Junk Diver                            +0.52+-0.20        +0.0016+-0.0035       dmg
+Filigree Familiar                     +0.48+-0.33        +0.0032+-0.0043       dmg
+Myr Retriever                         +0.44+-0.21        +0.0032+-0.0037       dmg
+Midnight Reaper                       +0.42+-0.35        +0.0012+-0.0045       dmg
+Massacre Wurm                         +0.41+-0.17        +0.0040+-0.0033      both
+Pygmy Kavu                            +0.31+-0.20        +0.0016+-0.0029       dmg
+Lignify                               +0.25+-0.19        +0.0008+-0.0029       dmg
+Nameless Inversion                    +0.25+-0.18        +0.0016+-0.0029       dmg
+Whip of Erebos                        +0.12+-0.15        -0.0004+-0.0028        --
+Bow of Nylea                          +0.10+-0.21        -0.0016+-0.0033        --
+Beast Within                          +0.03+-0.12        -0.0008+-0.0016        --
+Reap                                  +0.02+-0.02        +0.0004+-0.0008        --
+Assassin's Trophy                     +0.01+-0.02        +0.0004+-0.0008        --
+Culling Ritual                        +0.00+-0.01        +0.0000+-0.0000        --
+Eyeblight's Ending                    +0.00+-0.05        +0.0000+-0.0011        --
+Toxic Deluge                          +0.00+-0.00        +0.0000+-0.0000        --
+Sakura-Tribe Elder                    -0.08+-0.22        +0.0000+-0.0038        --
+Haywire Mite                          -0.10+-0.26        +0.0008+-0.0048        --
+Deathreap Ritual                      -0.26+-0.31        -0.0020+-0.0039        --
+Ashnod's Altar                        -0.33+-0.33        -0.0012+-0.0034       dmg
+Biotransference                       -0.72+-0.42        -0.0044+-0.0042      both

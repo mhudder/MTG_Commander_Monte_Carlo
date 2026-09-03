@@ -1,0 +1,85 @@
+
+Horizons: (20,).  All figures are paired differences with 95% CIs.
+
+  signal = both : the card beats its error bars on damage AND win rate
+           dmg  : significant on damage only
+           win  : significant on win rate only
+           --   : INSIDE its own error bars - indistinguishable from a blank.
+                  Not a weak card, an unmeasured one. Do not rank these.
+
+Win rate is the objective; damage is a proxy. Where they disagree, follow win
+rate. And before cutting anything, check whether another card does the same job
+- leave-one-out understates every member of an interchangeable group. Pass a
+list of names to ablate() to score a package together.
+
+====================================================================================
+MODEL-EVALUATED — a low score is evidence about the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Archangel of Thune                    +5.73+-1.55        +0.0064+-0.0082       dmg
+Marauding Blight-Priest               +3.71+-0.96        +0.0104+-0.0071      both
+Kambal, Consul of Allocation          +3.67+-0.82        +0.0148+-0.0077      both
+Cliffhaven Vampire                    +3.39+-1.03        +0.0128+-0.0081      both
+Daxos, Blessed by the Sun             +3.25+-0.97        +0.0088+-0.0073      both
+Aetherflux Reservoir                  +2.90+-0.79        +0.0032+-0.0067       dmg
+Suture Priest                         +2.45+-1.28        +0.0040+-0.0077       dmg
+Soul's Attendant                      +2.36+-1.29        +0.0044+-0.0073       dmg
+Well of Lost Dreams                   +2.30+-1.39        +0.0176+-0.0081      both
+Soul Warden                           +2.24+-1.20        +0.0132+-0.0069      both
+Auriok Champion                       +2.04+-1.18        +0.0056+-0.0065       dmg
+Debt to the Deathless                 +1.92+-0.79        +0.0080+-0.0071      both
+Voice of the Blessed                  +1.74+-0.72        +0.0028+-0.0065       dmg
+Sorin, Vengeful Bloodlord             +1.60+-0.82        +0.0068+-0.0071       dmg
+Drana's Emissary                      +1.44+-0.52        +0.0036+-0.0053       dmg
+Dawn of Hope                          +1.38+-1.16        +0.0120+-0.0070      both
+Blind Obedience                       +1.27+-0.70        +0.0044+-0.0068       dmg
+Mother of Runes                       +1.26+-1.16        -0.0020+-0.0066       dmg
+Ranger of Eos                         +1.25+-0.61        +0.0068+-0.0054      both
+Land Tax                              +1.23+-0.89        +0.0068+-0.0064      both
+Sorin, Solemn Visitor                 +1.23+-0.50        +0.0088+-0.0060      both
+Sunscorch Regent                      +1.21+-0.54        +0.0068+-0.0059      both
+Fountain of Renewal                   +1.11+-0.62        +0.0032+-0.0057       dmg
+Authority of the Consuls              +1.09+-0.97        +0.0048+-0.0067       dmg
+Phyrexian Arena                       +0.90+-0.73        +0.0080+-0.0073      both
+Elas il-Kor, Sadistic Pilgrim         +0.89+-1.30        +0.0088+-0.0066       win
+Syr Konrad, the Grim                  +0.83+-0.37        +0.0028+-0.0050       dmg
+Vito, Thorn of the Dusk Rose          +0.61+-1.20        +0.0220+-0.0081       win
+Ajani's Mantra                        +0.58+-0.60        +0.0004+-0.0051        --
+Cosmos Elixir                         +0.47+-0.50        +0.0056+-0.0057        --
+Pristine Talisman                     +0.47+-0.68        +0.0000+-0.0051        --
+Swiftfoot Boots                       +0.39+-0.51        +0.0016+-0.0052        --
+Sol Ring                              +0.37+-1.12        +0.0096+-0.0066       win
+Kalitas, Traitor of Ghet              +0.23+-0.58        +0.0004+-0.0060        --
+Serra Ascendant                       +0.21+-0.87        +0.0000+-0.0054        --
+Whispersilk Cloak                     +0.16+-0.33        +0.0016+-0.0044        --
+Benevolent Offering                   +0.08+-0.30        +0.0020+-0.0032        --
+Necropotence                          -0.14+-1.01        -0.0028+-0.0069        --
+Lightning Greaves                     -0.19+-0.48        +0.0028+-0.0046        --
+Blood Artist                          -0.62+-0.83        -0.0056+-0.0051       win
+Orzhov Signet                         -0.62+-0.96        +0.0072+-0.0069       win
+Sanguine Bond                         -0.87+-1.24        +0.0116+-0.0082       win
+Vizkopa Guildmage                     -1.33+-1.65        +0.0016+-0.0067        --
+Felidar Sovereign                     -6.06+-1.31        +0.0412+-0.0084      both
+Exquisite Blood                       -7.17+-1.95        +0.0180+-0.0085      both
+
+====================================================================================
+MODEL-BLIND — a low score is evidence about the MODEL, not the card
+====================================================================================
+card                                    damage T20             win rate    signal
+Lurrus of the Dream-Den               +0.35+-0.38        +0.0008+-0.0041        --
+Sun Titan                             +0.30+-0.26        +0.0008+-0.0033       dmg
+Austere Command                       +0.10+-0.18        +0.0000+-0.0000        --
+Damn                                  +0.00+-0.00        +0.0004+-0.0008        --
+Swords to Plowshares                  +0.00+-0.00        +0.0000+-0.0000        --
+Path to Exile                         +0.00+-0.00        +0.0000+-0.0000        --
+Anguished Unmaking                    +0.00+-0.00        +0.0000+-0.0000        --
+Fracture                              +0.00+-0.00        +0.0000+-0.0000        --
+Toxic Deluge                          +0.00+-0.00        +0.0000+-0.0000        --
+Damnation                             +0.00+-0.00        +0.0000+-0.0000        --
+Farewell                              -0.00+-0.00        +0.0000+-0.0000        --
+Return to Dust                        -0.01+-0.01        +0.0000+-0.0000        --
+Enlightened Tutor                     -0.07+-0.16        +0.0000+-0.0011        --
+Soulmender                            -0.08+-0.21        -0.0032+-0.0025       win
+Phyrexian Reclamation                 -0.36+-0.25        -0.0036+-0.0028      both
+Sensei's Divining Top                 -0.42+-0.31        +0.0000+-0.0029       dmg
+Umezawa's Jitte                       -0.57+-0.45        +0.0000+-0.0033       dmg

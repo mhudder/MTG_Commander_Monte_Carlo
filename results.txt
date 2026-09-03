@@ -1,0 +1,67 @@
+====================================================================================================
+A = Skullclamp   vs   B = March of the World Ooze
+n = 20,000 paired games (common random numbers) | 10 turns | block_rate=0.3
+====================================================================================================
+metric                       A         B       B-A      rel       95% CI of diff           
+----------------------------------------------------------------------------------------------------
+damage                   25.45     28.30     +2.85   +11.2%  [  +2.64,   +3.06] p=3.983e-144  *
+cards_drawn              12.37     11.36     -1.01    -8.2%  [  -1.06,   -0.96] p=0        *
+rendmaw_triggers          5.92      5.75     -0.17    -2.8%  [  -0.18,   -0.16] p=5.968e-191  *
+tokens_made               4.61      4.37     -0.23    -5.1%  [  -0.25,   -0.22] p=3.34e-157  *
+mana_spent               34.50     33.73     -0.78    -2.3%  [  -0.82,   -0.73] p=5.937e-249  *
+spells_cast               9.86      9.55     -0.31    -3.1%  [  -0.32,   -0.30] p=0        *
+final_board_power        15.63     16.66     +1.03    +6.6%  [  +0.90,   +1.16] p=4.144e-54  *
+mana_floated              8.32      8.53     +0.21    +2.5%  [  +0.18,   +0.23] p=3.732e-66  *
+removal_eaten             1.08      1.08     +0.01    +0.5%  [  +0.00,   +0.01] p=0.0002154  *
+ae_removal_eaten          0.56      0.56     -0.00    -0.7%  [  -0.01,   -0.00] p=0.03383  *
+wipes_suffered            0.53      0.53     +0.00    +0.7%  [  +0.00,   +0.00] p=4.812e-08  *
+countered                 0.67      0.66     -0.00    -0.5%  [  -0.01,   -0.00] p=0.03764  *
+----------------------------------------------------------------------------------------------------
+* = 95% CI excludes zero
+
+P(cumulative damage >= 120) by turn
+turn     A: Skullclamp    B: March      diff
+7                0.000       0.000    +0.000
+8                0.001       0.001    +0.000
+9                0.006       0.009    +0.003
+10               0.017       0.024    +0.007
+
+Diagnostics
+  P(test card actually resolves by T10):  Skullclamp 0.182   March 0.096
+  Mean turn it resolves:  Skullclamp 4.31   March 7.83
+  Mean Skullclamp activations per game: 0.47
+  Mean turns with >=1 one-toughness creature available: 0.35 / 10
+
+  Of the games where you tried to deploy the card, the pod answered it:
+    Skullclamp  countered 0.000   destroyed 0.147
+    March       countered 0.205   destroyed 0.367
+
+Conditional on drawing the swapped card (n=3,661, 18.3% of games)
+====================================================================================================
+A = Skullclamp   vs   B = March of the World Ooze
+n = 3,661 paired games (common random numbers) | 10 turns | block_rate=0.3
+====================================================================================================
+metric                       A         B       B-A      rel       95% CI of diff           
+----------------------------------------------------------------------------------------------------
+damage                   21.45     37.00    +15.55   +72.5%  [ +14.46,  +16.63] p=1.061e-155  *
+cards_drawn              17.07     11.56     -5.52   -32.3%  [  -5.71,   -5.32] p=0        *
+rendmaw_triggers          6.27      5.35     -0.91   -14.6%  [  -0.97,   -0.86] p=2.467e-212  *
+tokens_made               5.17      3.89     -1.28   -24.8%  [  -1.37,   -1.20] p=2.857e-171  *
+mana_spent               37.91     33.67     -4.24   -11.2%  [  -4.45,   -4.03] p=2.645e-287  *
+spells_cast              10.89      9.20     -1.69   -15.6%  [  -1.74,   -1.64] p=0        *
+final_board_power        15.97     21.57     +5.60   +35.1%  [  +4.90,   +6.28] p=1.56e-55  *
+mana_floated              6.72      7.86     +1.14   +17.0%  [  +1.01,   +1.27] p=4.236e-68  *
+removal_eaten             1.07      1.10     +0.03    +2.8%  [  +0.01,   +0.05] p=0.0002136  *
+ae_removal_eaten          0.61      0.59     -0.02    -3.6%  [  -0.04,   -0.00] p=0.03382  *
+wipes_suffered            0.49      0.51     +0.02    +4.0%  [  +0.01,   +0.03] p=4.595e-08  *
+countered                 0.72      0.70     -0.02    -2.7%  [  -0.04,   -0.00] p=0.03763  *
+----------------------------------------------------------------------------------------------------
+* = 95% CI excludes zero
+
+Sensitivity: does the verdict survive a different pod?
+  pod                                 damage B-A     cards drawn B-A
+  no interaction (old model)      +6.41 [+5.7,+7.1]      -1.57 [-1.7,-1.4]
+  all bracket 2                   +5.86 [+5.2,+6.5]      -1.32 [-1.4,-1.2]
+  mixed (2,3,4)                   +3.09 [+2.7,+3.5]      -1.00 [-1.1,-0.9]
+  all bracket 3                   +3.16 [+2.7,+3.6]      -1.08 [-1.2,-1.0]
+  all bracket 4                   +1.09 [+0.9,+1.3]      -0.84 [-0.9,-0.8]
