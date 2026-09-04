@@ -8,7 +8,7 @@ Usage:
 import sys
 import statistics as st
 
-from edhmc.decks.rendmaw_v11 import build, MARCH_OF_THE_WORLD_OOZE
+from edhmc.decks.rendmaw_v12 import build, MARCH_OF_THE_WORLD_OOZE
 from edhmc.experiment import (run_ab, analyse, analyse_conditional,
                               report, lethal_curve)
 

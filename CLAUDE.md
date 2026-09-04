@@ -20,7 +20,7 @@ result yet.
       experiment.py    paired A/B harness
       pending.py       staged-change ledger
       decks/
-        rendmaw_v11.py  lorehold_v16.py  karlov_v1.py
+        rendmaw_v12.py  lorehold_v16.py  karlov_v1.py
 
 Entry points live at the repo root and import `edhmc.*`. Run them from the
 repo root.
@@ -57,9 +57,13 @@ Verified 2026-09-03 after the oracle-text audit.
 
 | deck | module | spreadsheet | status |
 |---|---|---|---|
-| Rendmaw, Creaking Nest | `rendmaw_v11.py` | v12 `.xlsx` | one staged change |
+| Rendmaw, Creaking Nest | `rendmaw_v12.py` | v12 `.xlsx` | agrees |
 | Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
 | Karlov of the Ghost Council | `karlov_v1.py` | v1 `.xlsx` | agrees |
+
+**All three legs agree on all three decks, and `CHANGES` is empty** — every
+decided change is applied to the module, the `.xlsx` and the ledger. This is
+the first time that has been true; `python -m edhmc.pending` is the check.
 
 `validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8929`.
 
@@ -90,16 +94,24 @@ Consequences worth carrying forward:
   Fracture to MV 3") documented their own errors as deliberate. The first was
   wrong for 20 cards; the second was wrong in both directions.
 
-### The four Lorehold changes are committed
+### All five changes are committed
 
 `pending.py` previously described the five 2026-09-02 changes as staged and
 "not yet written to the .xlsx files", which was backwards — the spreadsheets
-carried them and the modules did not. The four Lorehold changes are now
-applied to the module (hence `lorehold_v16.py`) and recorded in `COMMITTED`.
+carried them and the modules did not. All five are now applied to the modules
+(hence `lorehold_v16.py` and `rendmaw_v12.py`) and recorded in `COMMITTED`.
 
-**Rendmaw's Skullclamp → March of the World Ooze is still genuinely staged**:
-the v12 sheet has March, the module still has Skullclamp. That is the one
-remaining leg mismatch and it is the real kind.
+Rendmaw's Skullclamp → March of the World Ooze was **re-measured on the
+corrected engine before committing**, since its original evidence predated the
+oracle audit and both cards were touched by it: 6,000 paired games, damage
++3.02 [+2.57, +3.48] and win rate +0.0077 [+0.0053, +0.0101] at 10 turns;
++2.79 and +0.0018 (inside its bar) at 20. Sign and rank survive the horizon
+range and the numbers land within a rounding error of the original. The
+`Change` dataclass now has a `reverified` field carrying that.
+
+Note that `validate.py`'s "real comparison" now runs in the other direction —
+March is in the deck, so it swaps out to the cut `SKULLCLAMP` constant kept in
+`rendmaw_v12.py`. The A/A control moved to March for the same reason.
 
 Lost work from the 2026-09-03 session that still does not exist in any commit:
 
@@ -216,9 +228,8 @@ fixed grid so it cannot break CRN.
    Rendmaw's Birds fly and `goad_block_share` is standing in for it.
 4. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
-5. Reconcile Rendmaw's staged Skullclamp → March of the World Ooze.
-6. Lorehold: cut Penance, add Galvanoth — decided, not staged.
-7. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
+5. Lorehold: cut Penance, add Galvanoth — decided, not staged.
+6. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
    unmodelled, so its committed numbers are a floor.
-8. Remaining per-deck gaps are listed in the STATUS block of each
+7. Remaining per-deck gaps are listed in the STATUS block of each
    `ORACLE_AUDIT_*.md`.

@@ -1,7 +1,10 @@
-# Oracle-text audit — Rendmaw v11
+# Oracle-text audit — Rendmaw v12
 
-> **STATUS 2026-09-03 — tiers 1–3 FIXED**, in `rendmaw_v11.py`, `engine.py`,
-> `opponents.py` and the `.xlsx`.
+> **STATUS 2026-09-03 — tiers 1–3 FIXED**, in `rendmaw_v12.py`, `engine.py`,
+> `opponents.py` and the `.xlsx`. The module is now v12 and carries the
+> Skullclamp → March of the World Ooze swap, re-measured on the corrected
+> engine before committing (damage +3.02 ±0.45 at 10 turns, +2.79 ±0.61 at
+> 20). All three legs agree and `CHANGES` is empty.
 >
 > The commander now gives a Bird to **each player** and those Birds are
 > **goaded**: `Opponent.goaded_birds` tracks them, they add to the blocker

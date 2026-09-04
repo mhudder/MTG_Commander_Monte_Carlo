@@ -21,7 +21,7 @@ import sys
 
 import numpy as np
 
-from edhmc.decks.rendmaw_v11 import build as rendmaw_build
+from edhmc.decks.rendmaw_v12 import build as rendmaw_build
 from edhmc.decks.lorehold_v16 import build as lorehold_build, C
 from edhmc.engine import simulate as rendmaw_sim
 from edhmc.lorehold import simulate as lorehold_sim

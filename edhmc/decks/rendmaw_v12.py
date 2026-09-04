@@ -1,5 +1,5 @@
 """
-Rendmaw, Creaking Nest v11 — deck definition.
+Rendmaw, Creaking Nest v12 — deck definition.
 
 Costs are hand-authored (the spreadsheet only stores mana *value*, which cannot
 express colour screw — and colour screw is exactly the kind of thing a Monte
@@ -84,7 +84,11 @@ NONLANDS = [
     C("Dockside Chef", "Enchantment/Creature", {"B": 1}, 1, 2, priority=5),
 
     # --- token payoffs / anthems ---
-    C("Skullclamp", "Artifact", {"gen": 1}, priority=9, threat=2.5),
+    # Creatures you control have base P/T 6/6 and are Oozes. The Elephant
+    # trigger ("whenever an opponent casts a spell, if it's not their turn")
+    # is still unmodelled — KNOWN_ISSUES 1a — so its numbers are a floor.
+    C("March of the World Ooze", "Enchantment", {"gen": 3, "G": 3},
+      priority=8, tags=("pump",), threat=9.0),
     C("Metallic Mimic", "Artifact/Creature", {"gen": 2}, 2, 1, priority=7, threat=5.0),
     C("Idol of Oblivion", "Artifact", {"gen": 2}, priority=7, threat=5.0),
     C("Primal Vigor", "Enchantment", {"gen": 4, "G": 1}, priority=7, threat=8.5),
@@ -197,3 +201,8 @@ EZURIS_PREDATION = C("Ezuri's Predation", "Sorcery", {"gen": 5, "G": 3},
 
 MARCH_OF_THE_WORLD_OOZE = C("March of the World Ooze", "Enchantment",
                             {"gen": 3, "G": 3}, priority=8, tags=("pump",), threat=9.0)
+# In the deck as of v12. Kept here so run_swap.py still resolves.
+
+# Cut in v12, kept so validate.py can still measure CRN on the same real
+# comparison it always has (now run in the other direction: March -> Clamp).
+SKULLCLAMP = C("Skullclamp", "Artifact", {"gen": 1}, priority=9, threat=2.5)

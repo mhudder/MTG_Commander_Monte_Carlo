@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Harness validation: A/A control + measurement of the CRN variance reduction."""
 import numpy as np
-from edhmc.decks.rendmaw_v11 import build, MARCH_OF_THE_WORLD_OOZE
+from edhmc.decks.rendmaw_v12 import build, SKULLCLAMP
 from edhmc.experiment import run_ab, analyse
 
 deck, cmd = build()
 
 print("A/A control — identical decks under common random numbers.")
 print("Any nonzero difference here means the harness is leaking randomness.")
-same = [c for c in deck if c.name == "Skullclamp"][0]
-ra, rb, _ = run_ab(deck, cmd, "Skullclamp", same, n=5000)
+same = [c for c in deck if c.name == "March of the World Ooze"][0]
+ra, rb, _ = run_ab(deck, cmd, "March of the World Ooze", same, n=5000)
 for r in analyse(ra, rb, metrics=("damage", "cards_drawn", "tokens_made")):
     print("  ", r.line("A", "A"))
 
@@ -23,8 +23,10 @@ la, lb, _ = run_ab(ld, lc, "Verge Rangers", same, n=3000,
 for r in analyse(la, lb, metrics=("mv_cheated", "miracles_cast", "damage")):
     print("  ", r.line("A", "A"))
 
+# The same real comparison as always, now run in the other direction: March
+# is in the deck as of v12, so this swaps it back out for the cut Skullclamp.
 print("\nCRN variance reduction on the real comparison:")
-ra, rb, _ = run_ab(deck, cmd, "Skullclamp", MARCH_OF_THE_WORLD_OOZE, n=8000)
+ra, rb, _ = run_ab(deck, cmd, "March of the World Ooze", SKULLCLAMP, n=8000)
 a = np.array([r["damage"] for r in ra]); b = np.array([r["damage"] for r in rb])
 se_p = (b - a).std(ddof=1) / np.sqrt(len(a))
 se_i = np.sqrt(a.var(ddof=1) + b.var(ddof=1)) / np.sqrt(len(a))

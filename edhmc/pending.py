@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import rendmaw_v11, lorehold_v16, karlov_v1
+from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v1
 from edhmc.experiment import _swap_many
 
 
@@ -37,6 +37,7 @@ class Change:
     rationale: str
     evidence: str = ""
     notes: str = ""
+    reverified: str = ""        # re-measured after an engine change
 
 
 # ---------------------------------------------------------------------------
@@ -149,12 +150,6 @@ COMMITTED: list[Change] = [
             "contribution does not clear its error bar."
         ),
     ),
-]
-
-# ---------------------------------------------------------------------------
-# Staged — decided, not yet in the spreadsheets
-# ---------------------------------------------------------------------------
-CHANGES: list[Change] = [
     Change(
         deck="rendmaw",
         remove="Skullclamp",
@@ -177,13 +172,30 @@ CHANGES: list[Change] = [
             "times you deploy it, against ~15% for Skullclamp. Worth "
             "revisiting if the regular pod is high-powered."
         ),
+        reverified=(
+            "RE-VERIFIED 2026-09-03 on the oracle-corrected engine, because "
+            "the original evidence predates that audit and both cards were "
+            "touched by it. 6,000 paired games, mixed pod: at 10 turns damage "
+            "+3.02 [+2.57, +3.48] and win rate +0.0077 [+0.0053, +0.0101]; at "
+            "20 turns damage +2.79 [+2.17, +3.40] and win rate +0.0018 "
+            "[-0.0041, +0.0077], i.e. inside its bar at the long horizon. "
+            "Sign and rank survive the whole horizon range, and damage and "
+            "cards drawn both land within a rounding error of the original "
+            "(+2.85 and -1.01). The decision stands."
+        ),
     ),
 ]
 
+# ---------------------------------------------------------------------------
+# Staged — decided, not yet in the spreadsheets
+# ---------------------------------------------------------------------------
+CHANGES: list[Change] = []
+
 
 DECKS = {
-    "rendmaw": (rendmaw_v11, {"March of the World Ooze":
-                              rendmaw_v11.MARCH_OF_THE_WORLD_OOZE}),
+    # March of the World Ooze is COMMITTED as of v12, so it is in the deck
+    # list itself and no longer a swap-in candidate.
+    "rendmaw": (rendmaw_v12, {}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
@@ -246,7 +258,11 @@ def ledger(verbose: bool = True) -> None:
     print("PENDING DECK CHANGES — not yet written to the .xlsx files")
     print("=" * 78)
     if not CHANGES:
-        print("  (none)")
+        print("  (none — every decided change is applied on all three legs)")
+        for deck_name in sorted(DECKS):
+            deck, cmd = build_pending(deck_name)
+            print(f"  {deck_name:<10} -> {len(deck) + 1} cards, "
+                  f"singleton-legal, commander distinct")
     for deck_name in sorted({c.deck for c in CHANGES}):
         rows = pending_for(deck_name)
         print(f"\n{deck_name.upper()}  ({len(rows)} change"
@@ -263,9 +279,11 @@ def ledger(verbose: bool = True) -> None:
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
     if COMMITTED:
-        print("\nCOMMITTED (already in the spreadsheets)")
+        print("\nCOMMITTED (in the deck module AND the .xlsx)")
         for c in COMMITTED:
             print(f"  {c.deck}: -{c.remove} +{c.add} ({c.staged})")
+            if verbose and c.reverified:
+                print(f"    recheck {c.reverified}")
 
 
 if __name__ == "__main__":
