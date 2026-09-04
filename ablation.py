@@ -34,6 +34,13 @@ from multiprocessing import Pool
 
 import numpy as np
 
+# Card names carry non-ASCII (Olórin's Searing Light). On Windows a redirected
+# stdout defaults to the console codepage and writes cp1252, which makes the
+# saved table invalid UTF-8. Force it.
+for _s in (sys.stdout, sys.stderr):
+    if hasattr(_s, "reconfigure"):
+        _s.reconfigure(encoding="utf-8")
+
 from edhmc.engine import Card, simulate as rendmaw_sim
 from edhmc.pending import build_pending
 from edhmc.lorehold import simulate as lh_sim
@@ -70,8 +77,8 @@ SCRIPTED_RENDMAW = {
     "Bitterblossom", "Ophiomancer", "Tendershoot Dryad", "Grist, the Hunger Tide",
     "Grave Titan", "Woe Strider", "Arasta of the Endless Web",
     "Primal Vigor", "Metallic Mimic",
-    # payoffs / draw / sac
-    "Skullclamp", "Idol of Oblivion", "Steel Overseer", "Ohran Frostfang",
+    # payoffs / draw / sac  (Skullclamp left the deck in v12)
+    "Idol of Oblivion", "Steel Overseer", "Ohran Frostfang",
     "Coat of Arms", "Beastmaster Ascension", "Verdurous Gearhulk",
     "Roaming Throne", "Erebos, Bleak-Hearted", "Dockside Chef",
     "Solemn Simulacrum",
@@ -83,36 +90,51 @@ SCRIPTED_RENDMAW = {
     "March of the World Ooze",
 }
 
+# Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
+# Saint Katherine left the deck in v16 and are gone from this list with them.
 SCRIPTED_LOREHOLD = {
     # mana
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
     # top-of-library manipulation
     "Sensei's Divining Top", "Scroll Rack", "Library of Leng",
-    "Hidden Retreat", "Penance", "Verge Rangers",
+    "Penance", "Verge Rangers",
     # card flow
     "Thrill of Possibility", "Faithless Looting", "Big Score",
     "Unexpected Windfall", "Borrowed Knowledge", "Reforge the Soul",
     "Apex of Power",
     # treasures / cost
-    "Storm-Kiln Artist", "Smothering Tithe", "Monologue Tax",
-    "Artist's Talent", "Hit the Mother Lode",
+    "Storm-Kiln Artist", "Smothering Tithe", "Hit the Mother Lode",
     # damage / win conditions
-    "Guttersnipe", "Soulfire Eruption", "Storm Herd", "Boros Charm",
-    "Emeria's Call", "Approach of the Second Sun", "Rise of the Eldrazi",
+    "Guttersnipe", "Longshot, Rebel Bowman", "Soulfire Eruption",
+    "Boros Charm", "Olórin's Searing Light", "Emeria's Call",
+    "Rise of the Eldrazi",
+    # copy engines
+    "Double Vision", "Arcane Bombardment", "Mizzix's Mastery",
+    "Monastery Mentor", "Monument to Endurance",
     # protection the opponent model respects
     "Lightning Greaves", "Mother of Runes",
     # cost reduction that scales with the graveyard / board
     "The Dawning Archaic", "Blasphemous Act",
+    # BLIND, despite having engine code — the implementation is not the card:
+    #   Artist's Talent - Level 2 granted free and instantly; Levels 1 and 3
+    #                     do not exist, and Level 3 is a damage doubler
+    #   Storm Herd      - X is cfg["storm_herd_x"]=40, not your life total
+    #   Approach of the Second Sun - never gets its second cast, because the
+    #                     card is not put seventh from the top
 }
 
+# Reviewed 2026-09-03 against the oracle audit. Membership here is a claim
+# that the ENGINE implements the card's text, so a low score is evidence about
+# the card. Cards whose text is still approximated belong in the blind group
+# even when they are not literally absent from the engine.
 SCRIPTED_KARLOV = {
     # lifegain engines
     "Soul Warden", "Soul's Attendant", "Suture Priest", "Auriok Champion",
     "Daxos, Blessed by the Sun", "Authority of the Consuls",
     "Ajani's Mantra", "Fountain of Renewal", "Drana's Emissary",
     "Blind Obedience", "Kambal, Consul of Allocation", "Sunscorch Regent",
-    "Elas il-Kor, Sadistic Pilgrim", "Benevolent Offering", "Radiant Fountain",
+    "Elas il-Kor, Sadistic Pilgrim", "Radiant Fountain",
     # lifegain payoffs
     "Voice of the Blessed", "Archangel of Thune", "Cliffhaven Vampire",
     "Marauding Blight-Priest", "Sanguine Bond", "Vito, Thorn of the Dusk Rose",
@@ -122,9 +144,13 @@ SCRIPTED_KARLOV = {
     "Debt to the Deathless", "Serra Ascendant",
     # other
     "Sol Ring", "Orzhov Signet", "Pristine Talisman", "Land Tax",
-    "Phyrexian Arena", "Necropotence", "Mother of Runes", "Lightning Greaves",
+    "Phyrexian Arena", "Mother of Runes", "Lightning Greaves",
     "Swiftfoot Boots", "Whispersilk Cloak", "Sorin, Vengeful Bloodlord",
-    "Sorin, Solemn Visitor", "Ranger of Eos", "Kalitas, Traitor of Ghet",
+    "Sorin, Solemn Visitor", "Kalitas, Traitor of Ghet",
+    # MOVED OUT to the blind group 2026-09-03, still approximated:
+    #   Necropotence      - modelled as "draw 2", not skip-draw-step + pay life
+    #   Benevolent Offering - flat 4 life, no per-creature scaling, no tokens
+    #   Ranger of Eos     - "draw 2", not a tutor for two specific one-drops
 }
 
 SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
@@ -184,7 +210,10 @@ def ablate(deck, commander, card_name):
     return out
 
 
-CACHE = (f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}"
+# The key MUST include N. It used to key on deck and horizons only, so
+# resuming a run at a different sample size silently merged two sample sizes
+# into one table.
+CACHE = (f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
          f"{'_sametype' if BLANK_KEEPS_TYPES else ''}.json")
 
 

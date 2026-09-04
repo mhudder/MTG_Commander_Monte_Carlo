@@ -130,11 +130,32 @@ work now.)
 it quotes. `PROJECT_CONTEXT.md` and `PENDING_CHANGES.md` predate all of this
 and still name `lorehold_v15.py`.
 
-### Live hazard: ablation cache key
+### Ablation tables are regenerated at two horizons
 
-`ablation.py` keys its cache on deck and horizons but **not on sample size N**.
-Resuming a run at a different N silently merges two sample sizes into one table.
-Either fix the key to include `_n{N}` or delete the cache when changing N.
+As of 2026-09-03 all three tables are run at `10,20` rather than a single
+`20`. The pod's clock ends games around turn 12, so those two bracket it, and
+a second horizon is what turns on the `FLIP` signal — a card whose sign does
+not survive the range is flagged rather than ranked. Regenerate with:
+
+```bash
+python ablation.py karlov   6000 10,20
+python ablation.py rendmaw  6000 10,20
+python ablation.py lorehold 6000 10,20
+```
+
+`ABLATE_BUDGET` (seconds, default 240) caps one invocation; the run caches
+after every card and resumes, so a small budget just means more invocations.
+
+### Fixed hazard: ablation cache key
+
+`ablation.py` used to key its cache on deck and horizons but **not on sample
+size N**, so resuming a run at a different N silently merged two sample sizes
+into one table. Fixed 2026-09-03 — the key now carries `_n{N}`, e.g.
+`ablation_cache_karlov_10-20_n6000.json`.
+
+The caches are gitignored and regenerable. Still delete them after any
+engine or deck change: the key covers the parameters of the run, not the
+version of the code that produced it.
 
 ---
 
@@ -213,23 +234,13 @@ fixed grid so it cannot break CRN.
 
 ## Queued work
 
-1. **Regenerate all three ablation tables.** This is now the top item: every
-   existing table was measured against the pre-audit engine and none of them
-   mean anything. Delete the caches first — `ablation.py` keys on deck and
-   horizons but not on N (see the hazard above).
-2. **Fix `SCRIPTED_KARLOV` in `ablation.py`.** It lists Serra Ascendant,
-   Aetherflux Reservoir, Pristine Talisman, Necropotence, Benevolent Offering,
-   Ranger of Eos and Land Tax as model-evaluated. Several now genuinely are,
-   after this round of fixes — but Necropotence, Benevolent Offering and
-   Ranger of Eos are still blind and must move, or their low scores will read
-   as evidence about the cards.
-3. **Flying/reach evasion in `opponents.damage_through`.** There is still no
+1. **Flying/reach evasion in `opponents.damage_through`.** There is still no
    evasion term of any kind. It is now doing more damage than before, because
    Rendmaw's Birds fly and `goad_block_share` is standing in for it.
-4. Artist's Talent's three Class levels — currently Level 2 is granted free
+2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
-5. Lorehold: cut Penance, add Galvanoth — decided, not staged.
-6. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
+3. Lorehold: cut Penance, add Galvanoth — decided, not staged.
+4. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
    unmodelled, so its committed numbers are a floor.
-7. Remaining per-deck gaps are listed in the STATUS block of each
+5. Remaining per-deck gaps are listed in the STATUS block of each
    `ORACLE_AUDIT_*.md`.
