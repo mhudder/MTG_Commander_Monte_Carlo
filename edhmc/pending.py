@@ -1,8 +1,9 @@
 """
 edhmc.pending — staged deck changes, not yet written to the spreadsheets.
 
-The .xlsx files remain the system of record and are untouched. This module
-holds changes that have been decided but not committed, so that:
+The .xlsx files remain the system of record. This module holds changes that
+have been decided but not yet applied to all three legs (deck module, .xlsx,
+this ledger), so that:
 
   1. further A/B tests run against the CURRENT intended list rather than a
      stale baseline, and
@@ -23,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import rendmaw_v11, lorehold_v15, karlov_v1
+from edhmc.decks import rendmaw_v11, lorehold_v16, karlov_v1
 from edhmc.experiment import _swap_many
 
 
@@ -39,9 +40,9 @@ class Change:
 
 
 # ---------------------------------------------------------------------------
-# Staged — decided, not yet in the spreadsheets
+# Committed — reflected in BOTH the deck module and the .xlsx
 # ---------------------------------------------------------------------------
-CHANGES: list[Change] = [
+COMMITTED: list[Change] = [
     Change(
         deck="lorehold",
         remove="Triumph of Saint Katherine",
@@ -148,6 +149,12 @@ CHANGES: list[Change] = [
             "contribution does not clear its error bar."
         ),
     ),
+]
+
+# ---------------------------------------------------------------------------
+# Staged — decided, not yet in the spreadsheets
+# ---------------------------------------------------------------------------
+CHANGES: list[Change] = [
     Change(
         deck="rendmaw",
         remove="Skullclamp",
@@ -173,22 +180,15 @@ CHANGES: list[Change] = [
     ),
 ]
 
-# ---------------------------------------------------------------------------
-# Committed — already reflected in the spreadsheets
-# ---------------------------------------------------------------------------
-COMMITTED: list[Change] = []
-
 
 DECKS = {
     "rendmaw": (rendmaw_v11, {"March of the World Ooze":
                               rendmaw_v11.MARCH_OF_THE_WORLD_OOZE}),
-    "lorehold": (lorehold_v15, {
-        "The Dawning Archaic": lorehold_v15.THE_DAWNING_ARCHAIC,
-        "Molecule Man": lorehold_v15.MOLECULE_MAN,
-        "Monastery Mentor": lorehold_v15.MONASTERY_MENTOR,
-        "Arcane Bombardment": lorehold_v15.ARCANE_BOMBARDMENT,
-        "Double Vision": lorehold_v15.DOUBLE_VISION,
-        "Galvanoth": lorehold_v15.GALVANOTH}),
+    # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
+    # they are in the deck list itself and no longer swap-in candidates.
+    "lorehold": (lorehold_v16, {
+        "Molecule Man": lorehold_v16.MOLECULE_MAN,
+        "Galvanoth": lorehold_v16.GALVANOTH}),
     "karlov": (karlov_v1, {}),
 }
 

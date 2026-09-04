@@ -5,8 +5,13 @@ Karlov of the Ghost Council v1 — deck definition.
       Whenever you gain life, put two +1/+1 counters on Karlov.
       Remove six +1/+1 counters from Karlov: exile target creature.
 
-Costs are hand-authored. The spreadsheet's own notes already corrected Damn to
-MV 3 and Fracture to MV 3, and those corrections are carried here.
+Costs are hand-authored and were verified against Scryfall oracle text on
+2026-09-03; see ORACLE_AUDIT_KARLOV.md.
+
+NOTE: the spreadsheet previously "corrected" Damn and Fracture to MV 3. Both
+are MV 2 ({B}{B} and {W}{B}); the correction was the error and has been undone
+on both legs. Damn's wrath mode is its overload cost {2}{W}{W}, MV 4 — which is
+neither 2 nor 3, and is why it is modelled as the removal spell it is cast as.
 """
 
 from edhmc.engine import Card
@@ -27,7 +32,7 @@ def L(name, produces, tapped=False, types="Land", lifegain=0.0):
 
 
 COMMANDER = C("Karlov of the Ghost Council", "Creature",
-              {"gen": 1, "W": 1, "B": 1}, 2, 2, priority=10, threat=9.0)
+              {"W": 1, "B": 1}, 2, 2, priority=10, threat=9.0)
 
 CREATURES = [
     C("Soul Warden", "Creature", {"W": 1}, 1, 1, priority=9.5, threat=6.5),
@@ -43,16 +48,19 @@ CREATURES = [
     C("Blood Artist", "Creature", {"gen": 1, "B": 1}, 0, 1, priority=8, threat=7.0),
     C("Suture Priest", "Creature", {"gen": 1, "W": 1}, 1, 1, priority=8.5, threat=6.5),
     C("Auriok Champion", "Creature", {"W": 2}, 1, 1, priority=9, threat=7.0),
-    C("Daxos, Blessed by the Sun", "Creature", {"W": 2}, 2, 1, priority=8, threat=6.0),
-    C("Voice of the Blessed", "Creature", {"gen": 1, "W": 1}, 2, 2, priority=7,
+    # Daxos's toughness is his devotion to white, not a fixed 1. 4 is this
+    # list's typical white devotion once the early drops are down.
+    C("Daxos, Blessed by the Sun", "Enchantment/Creature", {"W": 2}, 2, 4,
+      priority=8, threat=6.0),
+    C("Voice of the Blessed", "Creature", {"W": 2}, 2, 2, priority=7,
       threat=7.0),
-    C("Cliffhaven Vampire", "Creature", {"gen": 2, "W": 1, "B": 1}, 2, 3,
+    C("Cliffhaven Vampire", "Creature", {"gen": 2, "W": 1, "B": 1}, 2, 4,
       priority=7.5, threat=7.5),
     C("Drana's Emissary", "Creature", {"gen": 1, "W": 1, "B": 1}, 2, 2,
       priority=7, threat=6.5),
     C("Marauding Blight-Priest", "Creature", {"gen": 2, "B": 1}, 3, 2,
       priority=7.5, threat=7.5),
-    C("Kambal, Consul of Allocation", "Creature", {"gen": 2, "W": 1}, 2, 3,
+    C("Kambal, Consul of Allocation", "Creature", {"gen": 1, "W": 1, "B": 1}, 2, 3,
       priority=7.5, threat=7.0),
     C("Lurrus of the Dream-Den", "Creature", {"gen": 1, "W": 1, "B": 1}, 3, 2,
       priority=6, threat=6.0, lifelink=True),
@@ -62,7 +70,7 @@ CREATURES = [
       threat=5.5, script="draw2"),
     C("Kalitas, Traitor of Ghet", "Creature", {"gen": 2, "B": 2}, 3, 4,
       priority=7, threat=7.5, lifelink=True),
-    C("Sunscorch Regent", "Creature", {"gen": 4, "W": 1}, 4, 4, priority=6,
+    C("Sunscorch Regent", "Creature", {"gen": 3, "W": 2}, 4, 3, priority=6,
       threat=7.0),
     C("Archangel of Thune", "Creature", {"gen": 3, "W": 2}, 3, 4, priority=8.5,
       threat=8.5, lifelink=True),
@@ -105,7 +113,7 @@ ENCHANTMENTS = [
     C("Blind Obedience", "Enchantment", {"gen": 1, "W": 1}, priority=7.5, threat=6.0),
     C("Necropotence", "Enchantment", {"B": 3}, priority=8, threat=8.0,
       script="draw2"),
-    C("Phyrexian Arena", "Enchantment", {"gen": 2, "B": 1}, priority=7, threat=6.5),
+    C("Phyrexian Arena", "Enchantment", {"gen": 1, "B": 2}, priority=7, threat=6.5),
     C("Exquisite Blood", "Enchantment", {"gen": 4, "B": 1}, priority=9.5, threat=9.0),
     C("Sanguine Bond", "Enchantment", {"gen": 3, "B": 2}, priority=9.5, threat=9.0),
 ]
@@ -117,12 +125,14 @@ SPELLS = [
     C("Anguished Unmaking", "Instant", {"gen": 1, "W": 1, "B": 1}, priority=3),
     C("Benevolent Offering", "Instant", {"gen": 3, "W": 1}, priority=4,
       lifegain=4),
-    C("Fracture", "Instant", {"gen": 1, "W": 1, "B": 1}, priority=3),
+    C("Fracture", "Instant", {"W": 1, "B": 1}, priority=3),
     C("Return to Dust", "Instant", {"gen": 2, "W": 2}, priority=3),
-    C("Damn", "Sorcery", {"gen": 1, "B": 2}, priority=3, tags=("wipe",)),
+    # {B}{B} as cast; the wrath is its overload cost {2}{W}{W}, not modelled.
+    C("Damn", "Sorcery", {"B": 2}, priority=3, tags=("wipe",)),
     C("Toxic Deluge", "Sorcery", {"gen": 2, "B": 1}, priority=3, tags=("wipe",)),
-    C("Debt to the Deathless", "Sorcery", {"gen": 2, "W": 2, "B": 2},
-      priority=7, threat=8.0, script="debt", x_pips=2),
+    # {X}{W}{W}{B}{B} with X=3, so gen:3 IS the X and each opponent loses 2X=6.
+    C("Debt to the Deathless", "Sorcery", {"gen": 3, "W": 2, "B": 2},
+      priority=7, threat=8.0, script="debt", x_pips=3),
     C("Austere Command", "Sorcery", {"gen": 4, "W": 2}, priority=3, tags=("wipe",)),
     C("Farewell", "Sorcery", {"gen": 4, "W": 2}, priority=3, tags=("wipe",)),
     C("Damnation", "Sorcery", {"gen": 2, "B": 2}, priority=3, tags=("wipe",)),

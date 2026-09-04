@@ -1,9 +1,9 @@
 """
 edhmc.karlov — a lifegain/drain engine for Karlov of the Ghost Council.
 
-    Karlov of the Ghost Council  {1}{W}{B}  2/2
+    Karlov of the Ghost Council  {W}{B}  2/2
       Whenever you gain life, put two +1/+1 counters on Karlov.
-      Remove six +1/+1 counters: exile target creature.
+      {W}{B}, Remove six +1/+1 counters: exile target creature.  [NOT MODELLED]
 
 THE CENTRAL MODELLING FACT
 --------------------------
@@ -15,9 +15,11 @@ tracks `gain_life()` calls as first-class and routes every one through a single
 
 WHY THE OPPONENT MODEL MATTERS MORE HERE
 ----------------------------------------
-The soul sisters (Soul Warden, Soul's Attendant, Suture Priest, Auriok Champion,
-Daxos) trigger on EVERY creature entering, including opponents'. Authority of
-the Consuls, Kambal and Sunscorch Regent trigger on opponents' actions outright.
+The true soul sisters — Soul Warden, Soul's Attendant and Auriok Champion —
+trigger on EVERY creature entering, including opponents'. Daxos and Elas il-Kor
+read "another creature YOU CONTROL", so they see only your side; Suture Priest
+sees both but gains life only off yours. Authority of the Consuls, Kambal and
+Sunscorch Regent trigger on opponents' actions outright.
 So a large share of this deck's engine is driven by the opponents' board and
 spell development, which `opponents.py` already models — opponent creature
 growth per turn becomes a direct input rather than background detail.
@@ -98,13 +100,27 @@ class KarlovGame:
         base = perm.card.power + perm.counters
         if perm.card is self.commander:
             base += self.karlov_counters
+        # "As long as you have 30 or more life, this creature gets +5/+5 and
+        # has flying." A 1/1 for {W} is a 6/6 for most of a game this deck wins.
+        if perm.card.name == "Serra Ascendant" and self.your_life >= 30:
+            base += 5
         return base
 
     def toughness_of(self, perm):
-        return perm.card.toughness + perm.counters
+        base = perm.card.toughness + perm.counters
+        if perm.card.name == "Serra Ascendant" and self.your_life >= 30:
+            base += 5
+        return base
 
     def play_card_trigger(self, card):
-        return
+        """Lands with an ETB lifegain clause — Radiant Fountain's 2 life.
+
+        `engine.play_land` routes lands through `run_etb`, which dispatches on
+        `card.script` only and never reads `card.lifegain`, so without this
+        hook the field is silently dropped and Radiant Fountain gains nothing.
+        """
+        if card.is_land and card.lifegain:
+            gain_life(self, card.lifegain)
 
     def make_tokens(self, n, p, t, subtype="", tapped=False):
         for _ in range(int(n)):
@@ -123,10 +139,15 @@ class KarlovGame:
     def on_creature_death(self, n=1):
         self.creature_died_this_turn = True
         for _ in range(n):
+            # "target player loses 1 life and you gain 1 life" — a real drain.
             if self.has("Blood Artist"):
                 drain(self, 1)
+            # "each opponent loses 1 life" — and you gain NOTHING, so this is
+            # not a drain() and must not manufacture a Karlov trigger.
             if self.has("Elas il-Kor, Sadistic Pilgrim"):
-                drain(self, 1)
+                OPP.damage_each(self, 1)
+                self.m["damage"] += len(OPP.living(self))
+                self.m["drain_damage"] += len(OPP.living(self))
             if self.has("Daxos, Blessed by the Sun"):
                 gain_life(self, 1)
             if self.has("Syr Konrad, the Grim"):
@@ -162,6 +183,45 @@ class KarlovGame:
 # The lifegain trigger — the heart of the deck
 # ---------------------------------------------------------------------------
 
+def spend_lg(g, pay_idx, units):
+    """`engine.spend`, plus the lifegain that tapping a mana rock can cause.
+
+    Pristine Talisman is "{T}: Add {C}. You gain 1 life" — the life comes off
+    the mana ability, not off resolution, so `Card.lifegain` (applied once in
+    resolve()) cannot express it and the field sat at 0. Anything else in this
+    deck with lifegain on its mana ability goes here too.
+    """
+    before = {id(p) for p in g.board
+              if p.card.name in TAP_LIFEGAIN and not p.tapped}
+    spend(g, pay_idx, units)
+    for p in g.board:
+        if p.card.name in TAP_LIFEGAIN and p.tapped and id(p) in before:
+            gain_life(g, TAP_LIFEGAIN[p.card.name])
+
+
+TAP_LIFEGAIN = {"Pristine Talisman": 1}
+
+
+def pay_generic(g, want):
+    """Pay up to `want` generic mana from whatever is untapped. Returns how
+    much was actually paid.
+
+    Several payoffs in this deck ("you may pay {2}", "you may pay {X}") were
+    modelled as free. They are activated at instant speed off whatever mana is
+    still open, so this spends greedily from the current pool rather than
+    reserving anything.
+    """
+    paid = 0
+    for _ in range(int(want)):
+        units = available_mana(g)
+        idx = can_pay({"gen": 1}, units)
+        if idx is None:
+            break
+        spend_lg(g, idx, units)
+        paid += 1
+    return paid
+
+
 def gain_life(g, amount, _depth=0):
     """One lifegain EVENT. Amount matters for some payoffs, the event itself
     matters for more of them."""
@@ -184,8 +244,11 @@ def gain_life(g, amount, _depth=0):
                 if q.card.is_creature:
                     q.counters += 1
         elif n == "Cliffhaven Vampire":
-            OPP.damage_single(g, amount)
-            g.m["damage"] += amount
+            # "each opponent loses 1 life" — a flat 1 to EACH, not `amount` to
+            # one. The old form understated small triggers 3x and overstated
+            # large ones.
+            OPP.damage_each(g, 1)
+            g.m["damage"] += len(OPP.living(g))
         elif n == "Marauding Blight-Priest":
             OPP.damage_each(g, 1)
             g.m["damage"] += len(OPP.living(g))
@@ -198,10 +261,16 @@ def gain_life(g, amount, _depth=0):
                 g.m["turn_won"] = g.turn
                 g.m["win_route"] = 2
                 return
+    # Both of these are "you MAY PAY" effects. They were free before, which is
+    # why they rank so highly on the ablation table.
     if g.has("Well of Lost Dreams"):
-        g.draw(min(2, int(amount)))
+        # "you may pay {X} ... draw X cards", X <= life gained.
+        n = pay_generic(g, min(2, int(amount)))
+        g.draw(n)
     if g.has("Dawn of Hope"):
-        g.draw(1) if g.rng.random() < 0.5 else None
+        # "you may pay {2}. If you do, draw a card."
+        if pay_generic(g, 2) == 2:
+            g.draw(1)
 
 
 def drain(g, amount):
@@ -213,12 +282,25 @@ def drain(g, amount):
 
 
 def creature_entered(g, mine=True):
-    """Soul sisters see EVERY creature enter, including the opponents'."""
+    """Soul sisters see EVERY creature enter, including the opponents'.
+
+    Daxos does NOT: his trigger reads "whenever another creature YOU CONTROL
+    enters or dies", so he belongs with Elas il-Kor below, not with the sisters.
+    """
     for _ in range(g.count("Soul Warden") + g.count("Soul's Attendant")
-                   + g.count("Auriok Champion") + g.count("Daxos, Blessed by the Sun")):
+                   + g.count("Auriok Champion")):
+        gain_life(g, 1)
+    if mine and g.has("Daxos, Blessed by the Sun"):
         gain_life(g, 1)
     if g.has("Suture Priest"):
-        gain_life(g, 1) if mine else drain(g, 1)
+        if mine:
+            gain_life(g, 1)
+        else:
+            # "you may have that player lose 1 life" — no life gained, so this
+            # is not a drain() and must not create a Karlov trigger.
+            OPP.damage_single(g, 1)
+            g.m["damage"] += 1
+            g.m["drain_damage"] += 1
     if mine and g.has("Elas il-Kor, Sadistic Pilgrim"):
         gain_life(g, 1)
     if not mine and g.has("Authority of the Consuls"):
@@ -237,11 +319,12 @@ def opponent_activity(g):
         if g.has("Kambal, Consul of Allocation") and g.rng.random() < 0.55:
             drain(g, 2)
         if g.has("Sunscorch Regent"):
+            # "put a +1/+1 counter on this creature AND you gain 1 life" — the
+            # counter was missing, so a 4/3 that should grow all game did not.
+            for p in g.board:
+                if p.card.name == "Sunscorch Regent":
+                    p.counters += 1
             gain_life(g, 1)
-        if g.has("Drana's Emissary"):
-            pass
-    if g.has("Blind Obedience"):
-        drain(g, 1)
 
 
 def upkeep(g):
@@ -250,16 +333,32 @@ def upkeep(g):
     if g.has("Fountain of Renewal"):
         gain_life(g, 1)
     if g.has("Drana's Emissary"):
-        drain(g, 1)
+        # "EACH opponent loses 1 life and you gain 1 life" — drain() hit only
+        # one, understating its pod damage 3x.
+        n = len(OPP.living(g))
+        OPP.damage_each(g, 1)
+        g.m["damage"] += n
+        g.m["drain_damage"] += n
+        gain_life(g, 1)
     if g.has("Phyrexian Arena"):
         g.draw(1)
-    if g.has("Cosmos Elixir") and g.m["lifegain_triggers"] > 0:
-        g.draw(1)
     if g.has("Land Tax"):
-        basics = [x for x in g.library if x.name in ("Plains", "Swamp")][:3]
-        for b in basics:
-            g.library.remove(b)
-            g.hand.append(b)
+        # "if an opponent controls more lands than you" — the condition was
+        # missing entirely, so this fetched three basics every upkeep.
+        #
+        # The opponent model tracks creatures and life but NOT lands, so the
+        # best opponent's land count is approximated as one drop per turn,
+        # plateauing once they stop hitting them. That is deliberately
+        # generous to the condition (three opponents, only one needs to be
+        # ahead), which keeps this a modelling assumption rather than a
+        # silent buff. Tune with cfg["opp_land_plateau"].
+        my_lands = sum(1 for p in g.board if p.card.is_land)
+        opp_lands = min(g.turn, g.cfg.get("opp_land_plateau", 8))
+        if opp_lands > my_lands:
+            basics = [x for x in g.library if x.name in ("Plains", "Swamp")][:3]
+            for b in basics:
+                g.library.remove(b)
+                g.hand.append(b)
     # Felidar Sovereign: win at upkeep with 40+ life
     if g.has("Felidar Sovereign") and g.your_life >= 40 and g.result is None:
         g.result = "win"
@@ -274,10 +373,33 @@ def upkeep(g):
             g.m["win_route"] = 4
 
 
+def end_step(g):
+    """Beginning of your end step."""
+    # Cosmos Elixir: "draw a card if your life total is greater than your
+    # starting life total. OTHERWISE, you gain 2 life." Previously this fired
+    # in upkeep, keyed off lifegain_triggers > 0 rather than the life total,
+    # and dropped the gain-2 branch — which is itself a Karlov trigger.
+    if g.has("Cosmos Elixir"):
+        if g.your_life > g.cfg.get("starting_life", 40):
+            g.draw(1)
+        else:
+            gain_life(g, 2)
+
+
 def check_combo(g):
     if g.result is not None:
         return
-    if g.has(COMBO_A) and any(g.has(x) for x in COMBO_B):
+    if not g.has(COMBO_A):
+        return
+    # Sanguine Bond and Vito loop with Exquisite Blood on their own. Vizkopa
+    # Guildmage does NOT: its drain is an activated ability costing {1}{W}{B},
+    # so it only assembles the loop if that mana is actually available.
+    partner = any(g.has(x) for x in COMBO_B[:2])
+    if not partner and g.has("Vizkopa Guildmage"):
+        units = available_mana(g)
+        if can_pay({"gen": 1, "W": 1, "B": 1}, units) is not None:
+            partner = True
+    if partner:
         g.m["combo_assembled"] = 1
         g.result = "win"
         g.m["turn_won"] = g.turn
@@ -301,7 +423,7 @@ def main_phase(g):
             if can_pay(ccost, units) is not None:
                 idx = g.spells_this_turn
                 g.spells_this_turn += 1
-                spend(g, can_pay(ccost, units), units)
+                spend_lg(g, can_pay(ccost, units), units)
                 g.m["mana_spent"] += sum(ccost.values())
                 if OPP.countered(g, g.commander, idx):
                     g.m["countered"] += 1
@@ -325,7 +447,7 @@ def main_phase(g):
         if not options:
             break
         card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
-        spend(g, pay, units)
+        spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
         g.hand.remove(card)
         idx = g.spells_this_turn
@@ -348,6 +470,22 @@ def resolve(g, card):
         g.m["cast_test_card"] = 1
         g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
 
+    # Aetherflux Reservoir: "whenever you cast a spell, you gain 1 life for
+    # each spell you've cast this turn." This is the card's actual engine and
+    # was missing entirely — only the pay-50 kill was modelled.
+    if g.has("Aetherflux Reservoir"):
+        gain_life(g, g.spells_this_turn)
+
+    # Blind Obedience's extort: once per spell YOU cast, for {W/B}. It was a
+    # free drain once per turn, which is both the wrong rate and the wrong
+    # trigger.
+    if g.has("Blind Obedience") and pay_generic(g, 1) == 1:
+        n = len(OPP.living(g))
+        OPP.damage_each(g, 1)
+        g.m["damage"] += n
+        g.m["drain_damage"] += n
+        gain_life(g, n)
+
     if "wipe" in card.tags:
         OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags)
     if card.lifegain:
@@ -355,9 +493,16 @@ def resolve(g, card):
     if card.drain:
         drain(g, card.drain)
     if card.script == "debt":
-        # Debt to the Deathless: X=3 typical -> each opponent loses 2X
-        for _ in range(len(OPP.living(g))):
-            drain(g, 6)
+        # "Each opponent loses two times X life. You gain life equal to the
+        # life lost this way." With X=3 that is 6 per opponent, and the life
+        # gain is ONE event for the total — not one event per opponent. The
+        # old loop created three Karlov triggers where the card makes one.
+        n = len(OPP.living(g))
+        total = 6 * n
+        OPP.damage_each(g, 6)
+        g.m["damage"] += total
+        g.m["drain_damage"] += total
+        gain_life(g, total)
     if card.script == "draw2":
         g.draw(2)
 
@@ -414,6 +559,10 @@ def take_turn(g):
         return
     combat(g)
     main_phase(g)
+    if g.result is not None:
+        return
+
+    end_step(g)
     if g.result is not None:
         return
 

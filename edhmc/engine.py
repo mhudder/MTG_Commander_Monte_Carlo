@@ -309,13 +309,34 @@ class Game:
     # -- Rendmaw -------------------------------------------------------------
 
     def play_card_trigger(self, card: Card):
-        """`Play` = cast a spell or play a land. 2+ card types -> Bird."""
+        """`Play` = cast a spell or play a land. 2+ card types -> Bird.
+
+        "EACH PLAYER creates a tapped 2/2 black Bird with flying. The tokens
+        are goaded for the rest of the game." Both halves matter: the
+        opponents' Birds are extra blockers against you, and because you are
+        the goader they are forced to swing at each other rather than at you
+        (see opponents.goaded_combat).
+
+        Your own Birds are goaded too, but `combat()` already attacks with
+        everything that can, so that half needs no separate handling.
+        """
         if not card.multitype:
             return
         n = 1 + sum(1 for p in self.board if p.card.name == "Roaming Throne")
+        if not self.commander_cast:
+            return                     # no Rendmaw on the battlefield, no trigger
         self.m["rendmaw_triggers"] += n
-        if self.commander_cast:
-            self.make_tokens(n, 2, 2, "Bird", tapped=True)
+        self.make_tokens(n, 2, 2, "Bird", tapped=True)
+        self.give_opponents_birds(n)
+
+    def give_opponents_birds(self, n: int):
+        # Primal Vigor is symmetric — "if one or more tokens WOULD BE CREATED,
+        # twice that many of those tokens are created instead" applies to
+        # every player, not just you. make_tokens() already doubles yours.
+        if self.has("Primal Vigor"):
+            n *= 2
+        for o in OPP.living(self):
+            o.goaded_birds += n
 
 
 # ----------------------------------------------------------------------------
@@ -433,6 +454,7 @@ def main_phase(g: Game, precombat: bool = False):
                 g.commander_cast = True
                 g.m["spells_cast"] += 1
                 g.make_tokens(1, 2, 2, "Bird", tapped=True)   # ETB
+                g.give_opponents_birds(1)                     # each player
                 continue
 
         options = []
@@ -599,7 +621,17 @@ def upkeep(g: Game):
             if not any(x.is_token and x.card.name.startswith("Snake") for x in g.board):
                 g.make_tokens(1, 1, 1, "Snake")
         elif s == "tendershoot":
-            g.make_tokens(2 if len(g.board) >= 10 else 1, 1, 1, "Saproling")
+            # "At the beginning of EACH upkeep, create a 1/1 Saproling." That
+            # is one per player per round, not one per round — this loop runs
+            # only on your turn, so it stands in for the whole round.
+            # Ascend then gives Saprolings +2/+2; it does NOT double the count,
+            # which is what the old `2 if >=10 else 1` was doing.
+            n_upkeeps = 1 + len(OPP.living(g))
+            g.make_tokens(n_upkeeps, 1, 1, "Saproling")
+            if len(g.board) >= 10:            # city's blessing
+                for q in g.board:
+                    if q.is_token and q.card.name.startswith("Saproling"):
+                        q.counters = max(q.counters, 2)
         elif s == "grist":
             g.make_tokens(1, 1, 1, "Insect")
     # Arasta: opponents cast instants/sorceries at some rate
@@ -718,10 +750,15 @@ def combat(g: Game):
 
     dmg = sum(g.power_of(p) for p in attackers)
 
-    # Coat of Arms: +1/+1 per other creature sharing a type (Birds dominate)
+    # Coat of Arms: "+1/+1 for each other creature ON THE BATTLEFIELD that
+    # shares a type" — the opponents' Rendmaw Birds count too, so each of your
+    # Birds is pumped by (your other Birds + every Bird they were handed).
+    # Note this is symmetric: their Birds get the same bonus, which
+    # goaded_combat does not currently price in.
     if g.has("Coat of Arms"):
         birds = sum(1 for p in attackers if "Bird" in p.card.name)
-        dmg += birds * max(0, birds - 1)
+        opp_birds = sum(o.goaded_birds for o in OPP.living(g))
+        dmg += birds * max(0, birds - 1 + opp_birds)
 
     # Ohran Frostfang: draw on connect
     if g.has("Ohran Frostfang"):

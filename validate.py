@@ -14,7 +14,7 @@ for r in analyse(ra, rb, metrics=("damage", "cards_drawn", "tokens_made")):
     print("  ", r.line("A", "A"))
 
 print("\n\nLorehold engine — A/A control")
-from edhmc.decks.lorehold_v15 import build as lh_build
+from edhmc.decks.lorehold_v16 import build as lh_build
 from edhmc.lorehold import simulate as lh_sim
 ld, lc = lh_build()
 same = [x for x in ld if x.name == "Verge Rangers"][0]

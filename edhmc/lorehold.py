@@ -142,7 +142,13 @@ class LoreholdGame:
         return
 
     def power_of(self, perm):
-        return perm.card.power + perm.counters
+        base = perm.card.power + perm.counters
+        # Storm-Kiln Artist: "gets +1/+0 for each artifact you control." It
+        # makes Treasures, so it scales off its own output.
+        if perm.card.name == "Storm-Kiln Artist":
+            base += (sum(1 for p in self.board if "Artifact" in p.card.types)
+                     + self.treasures)
+        return base
 
     def toughness_of(self, perm):
         return perm.card.toughness + perm.counters
@@ -207,6 +213,9 @@ def reduce_cost(g, card, miracle=False):
     if g.has("Ruby Medallion") and card.cost.get("R", 0) > 0:
         red += 1
     if g.has("Artist's Talent"):
+        red += 1
+    # Longshot, Rebel Bowman: "Noncreature spells you cast cost {1} less."
+    if g.has("Longshot, Rebel Bowman") and "Creature" not in card.types:
         red += 1
     if card.name == "The Dawning Archaic":
         red += sum(1 for c in g.graveyard
@@ -458,6 +467,10 @@ def on_cast_triggers(g, card, is_copy=False):
 
     if "Creature" not in card.types:
         g.noncreature_this_turn += 1
+        # Longshot, Rebel Bowman: 2 damage to EACH opponent per noncreature
+        # spell, so 6 a pop — a Guttersnipe on a wider trigger.
+        deal_pod_damage(g, 6.0 * sum(1 for p in g.board
+                                     if p.card.name == "Longshot, Rebel Bowman"))
         # Dragon's Rage Channeler: surveil 1. In a miracle deck the value is
         # binning a land off the top so the next draw is a live target.
         if g.has("Dragon's Rage Channeler") and g.library:
@@ -539,6 +552,20 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         for _ in range(3):
             if g.library:
                 deal_pod_damage(g, float(g.library.pop().mv))
+    elif sc == "searing_light":
+        # "Each opponent exiles a creature with the greatest power among
+        # creatures that player controls." An edict, NOT a board wipe — it was
+        # tagged ("wipe", "onesided") and routed through resolve_own_wipe,
+        # which is a different effect entirely.
+        for o in OPP.living(g):
+            o.creatures = max(0.0, o.creatures - 1)
+        # Spell mastery: with 2+ instants/sorceries in the graveyard it also
+        # deals damage equal to each exiled creature's power. The opponent
+        # model has no per-creature power, so use the pod's average body.
+        if sum(1 for c in g.graveyard
+               if "Instant" in c.types or "Sorcery" in c.types) >= 2:
+            deal_pod_damage(g, g.cfg.get("opp_avg_power", 2.5)
+                            * len(OPP.living(g)))
     elif sc == "storm_herd":
         make_tokens(g, g.cfg.get("storm_herd_x", 40), 1, 1, "Pegasus")
     elif sc == "extra_turn":

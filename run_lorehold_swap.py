@@ -12,7 +12,7 @@ Usage:  python run_lorehold_swap.py [n_games] [turns]
 import sys
 import statistics as st
 
-from edhmc.decks.lorehold_v15 import build, MOLECULE_MAN, THE_DAWNING_ARCHAIC
+from edhmc.decks.lorehold_v16 import build, MOLECULE_MAN, THE_DAWNING_ARCHAIC
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.experiment import run_ab, analyse, report
 

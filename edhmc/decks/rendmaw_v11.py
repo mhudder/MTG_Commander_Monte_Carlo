@@ -55,8 +55,9 @@ NONLANDS = [
     C("Leaden Myr", "Artifact/Creature", {"gen": 2}, 1, 1, priority=7, tags=("ramp",), mana=(1, "B")),
     C("Palladium Myr", "Artifact/Creature", {"gen": 3}, 2, 2, priority=7, tags=("ramp",), mana=(2, "C")),
     C("Ornithopter of Paradise", "Artifact/Creature", {"gen": 2}, 0, 2, priority=7, tags=("ramp",), mana=(1, "BGC")),
-    C("Twitching Doll", "Artifact/Creature", {"gen": 2}, 1, 1, priority=6, tags=("ramp",), mana=(1, "C")),
-    C("Dryad of the Ilysian Grove", "Enchantment/Creature", {"gen": 1, "G": 1}, 2, 4,
+    # Taps for one mana of ANY colour, not just colourless.
+    C("Twitching Doll", "Artifact/Creature", {"gen": 1, "G": 1}, 2, 2, priority=6, tags=("ramp",), mana=(1, "BGC")),
+    C("Dryad of the Ilysian Grove", "Enchantment/Creature", {"gen": 2, "G": 1}, 2, 4,
       priority=9, tags=("ramp",), threat=5.5),
     C("Sakura-Tribe Elder", "Creature", {"gen": 1, "G": 1}, 1, 1, priority=5, tags=("ramp",)),
     C("Burnished Hart", "Artifact/Creature", {"gen": 3}, 2, 2, priority=5, tags=("ramp",)),
@@ -73,14 +74,14 @@ NONLANDS = [
     C("Bitterblossom", "Kindred/Enchantment", {"gen": 1, "B": 1}, script="bitterblossom",
       priority=9, threat=6.5),
     C("Ophiomancer", "Creature", {"gen": 2, "B": 1}, 2, 2, script="ophiomancer", priority=8, threat=5.5),
-    C("Tendershoot Dryad", "Creature", {"gen": 4, "G": 2}, 1, 1, script="tendershoot", priority=6, threat=6.5),
+    C("Tendershoot Dryad", "Creature", {"gen": 4, "G": 1}, 2, 2, script="tendershoot", priority=6, threat=6.5),
     C("Grist, the Hunger Tide", "Planeswalker/Creature", {"gen": 1, "B": 1, "G": 1},
       script="grist", priority=8, threat=6.5),
     C("Grave Titan", "Creature", {"gen": 4, "B": 2}, 6, 6, script="grave_titan", priority=7, threat=8.5),
-    C("Arasta of the Endless Web", "Enchantment/Creature", {"gen": 2, "G": 2}, 1, 5, priority=5, threat=4.0),
+    C("Arasta of the Endless Web", "Enchantment/Creature", {"gen": 2, "G": 2}, 3, 5, priority=5, threat=4.0),
     C("Filigree Familiar", "Artifact/Creature", {"gen": 3}, 2, 2, priority=4),
-    C("Woe Strider", "Creature", {"gen": 1, "B": 2}, 3, 3, script="woe_strider", priority=5),
-    C("Dockside Chef", "Enchantment/Creature", {"gen": 1, "B": 1}, 1, 2, priority=5),
+    C("Woe Strider", "Creature", {"gen": 2, "B": 1}, 3, 2, script="woe_strider", priority=5),
+    C("Dockside Chef", "Enchantment/Creature", {"B": 1}, 1, 2, priority=5),
 
     # --- token payoffs / anthems ---
     C("Skullclamp", "Artifact", {"gen": 1}, priority=9, threat=2.5),
@@ -90,12 +91,12 @@ NONLANDS = [
     C("Ohran Frostfang", "Creature", {"gen": 3, "G": 2}, 2, 6, priority=7, threat=7.0),
     C("Verdurous Gearhulk", "Artifact/Creature", {"gen": 3, "G": 2}, 4, 4,
       script="gearhulk", priority=6, tags=("pump",)),
-    C("Beastmaster Ascension", "Enchantment", {"gen": 1, "G": 1}, priority=4, tags=("pump",), threat=6.0),
+    C("Beastmaster Ascension", "Enchantment", {"gen": 2, "G": 1}, priority=4, tags=("pump",), threat=6.0),
     C("Coat of Arms", "Artifact", {"gen": 5}, priority=5, tags=("pump",), threat=8.0),
     C("Overwhelming Stampede", "Sorcery", {"gen": 3, "G": 2}, priority=6,
       tags=("pump",), script="stampede"),
     C("Steel Overseer", "Artifact/Creature", {"gen": 2}, 1, 1, priority=6, threat=5.5),
-    C("Roaming Throne", "Artifact/Creature", {"gen": 3, "C": 1}, 4, 4, priority=8, threat=6.0),
+    C("Roaming Throne", "Artifact/Creature", {"gen": 4}, 4, 4, priority=8, threat=6.0),
 
     # --- aristocrats / draw ---
     C("Blood Artist", "Creature", {"gen": 1, "B": 1}, 0, 1, priority=6, threat=5.5),
@@ -103,13 +104,13 @@ NONLANDS = [
     C("The Meathook Massacre", "Enchantment", {"gen": 2, "B": 2}, priority=4, threat=6.5,
       x_pips=2),
     C("Midnight Reaper", "Creature", {"gen": 2, "B": 1}, 3, 2, priority=5, threat=4.5),
-    C("Deathreap Ritual", "Enchantment", {"gen": 1, "B": 1, "G": 1}, priority=5, threat=4.5),
+    C("Deathreap Ritual", "Enchantment", {"gen": 2, "B": 1, "G": 1}, priority=5, threat=4.5),
     C("Whip of Erebos", "Artifact/Enchantment", {"gen": 2, "B": 2}, priority=4, threat=5.0),
     C("Village Rites", "Instant", {"B": 1}, priority=1),
     C("Reap", "Instant", {"gen": 1, "G": 1}, priority=1),
-    C("Shigeki, Jukai Visionary", "Enchantment/Creature", {"gen": 1, "G": 1}, 2, 2, priority=5),
+    C("Shigeki, Jukai Visionary", "Enchantment/Creature", {"gen": 1, "G": 1}, 1, 3, priority=5),
     C("Gloomshrieker", "Enchantment/Creature", {"gen": 1, "B": 1, "G": 1}, 2, 1, priority=5),
-    C("Pygmy Kavu", "Creature", {"gen": 3, "G": 1}, 2, 2, priority=2),
+    C("Pygmy Kavu", "Creature", {"gen": 3, "G": 1}, 1, 2, priority=2),
     C("Ashnod's Altar", "Artifact", {"gen": 3}, priority=5, threat=4.5),
 
     # --- artifacts matter ---
@@ -120,20 +121,21 @@ NONLANDS = [
     C("Biotransference", "Enchantment", {"gen": 2, "B": 2}, priority=5, threat=6.0),
 
     # --- interaction (goldfish: bodies + Rendmaw triggers only) ---
-    C("Haywire Mite", "Artifact/Creature", {"gen": 1}, 0, 2, priority=3),
+    C("Haywire Mite", "Artifact/Creature", {"gen": 1}, 1, 1, priority=3),
     C("Massacre Wurm", "Creature", {"gen": 3, "B": 3}, 6, 5, priority=4, threat=6.0, tags=("wipe", "onesided",)),
     C("Bow of Nylea", "Artifact/Enchantment", {"gen": 1, "G": 2}, priority=3),
-    C("Lignify", "Kindred/Enchantment", {"gen": 2, "G": 1}, priority=2),
+    C("Lignify", "Kindred/Enchantment", {"gen": 1, "G": 1}, priority=2),
     C("Nameless Inversion", "Kindred/Instant", {"gen": 1, "B": 1}, priority=2),
     C("Assassin's Trophy", "Instant", {"B": 1, "G": 1}, priority=2),
     C("Beast Within", "Instant", {"gen": 2, "G": 1}, priority=2),
-    C("Eyeblight's Ending", "Instant", {"gen": 2, "B": 1}, priority=2),
+    # Kindred Instant — TWO card types, so it triggers Rendmaw.
+    C("Eyeblight's Ending", "Kindred/Instant", {"gen": 2, "B": 1}, priority=2),
     C("Heroic Intervention", "Instant", {"gen": 1, "G": 1}, priority=2),
     C("Culling Ritual", "Sorcery", {"gen": 2, "B": 1, "G": 1}, priority=1, tags=("wipe",)),
     C("Toxic Deluge", "Sorcery", {"gen": 2, "B": 1}, priority=1, tags=("wipe",)),
-    # MDFC: {2}{B} instant on the front, Hagra Broodpit (tapped, taps for B)
+    # MDFC: {2}{B}{B} instant on the front, Hagra Broodpit (tapped, taps for B)
     # on the back. The engine now plays whichever face it needs.
-    C("Hagra Mauling", "Instant", {"gen": 2, "B": 1}, priority=2,
+    C("Hagra Mauling", "Instant", {"gen": 2, "B": 2}, priority=2,
       land_face=("B", True)),
 ]
 
@@ -190,7 +192,7 @@ BABA_LYSAGA = C("Baba Lysaga, Night Witch", "Creature",
 # {T}, Sac up to three permanents: if 3+ CARD TYPES among them, each opponent
 # loses 3, gain 3, draw 3. This deck is built out of multi-type permanents.
 
-EZURIS_PREDATION = C("Ezuri's Predation", "Sorcery", {"gen": 5, "G": 2},
+EZURIS_PREDATION = C("Ezuri's Predation", "Sorcery", {"gen": 5, "G": 3},
                      priority=6, threat=8.0, script="predation")
 
 MARCH_OF_THE_WORLD_OOZE = C("March of the World Ooze", "Enchantment",

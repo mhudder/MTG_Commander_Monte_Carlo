@@ -10,7 +10,7 @@ not against the stale v15 baseline.
 import sys
 import statistics as st
 
-from edhmc.decks.lorehold_v15 import MONASTERY_MENTOR, ARCANE_BOMBARDMENT
+from edhmc.decks.lorehold_v16 import MONASTERY_MENTOR, ARCANE_BOMBARDMENT
 from edhmc.pending import build_pending
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.experiment import run_ab, analyse, analyse_conditional, report

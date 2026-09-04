@@ -20,7 +20,7 @@ result yet.
       experiment.py    paired A/B harness
       pending.py       staged-change ledger
       decks/
-        rendmaw_v11.py  lorehold_v15.py  karlov_v1.py
+        rendmaw_v11.py  lorehold_v16.py  karlov_v1.py
 
 Entry points live at the repo root and import `edhmc.*`. Run them from the
 repo root.
@@ -53,42 +53,70 @@ and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 ## Current state — READ THIS BEFORE TRUSTING ANY DOC
 
-Verified 2026-09-03 against a clean clone.
+Verified 2026-09-03 after the oracle-text audit.
 
 | deck | module | spreadsheet | status |
 |---|---|---|---|
-| Rendmaw, Creaking Nest | `rendmaw_v11.py` | v12 `.xlsx` | **mismatch** |
-| Lorehold, the Historian | `lorehold_v15.py` | v16 `.xlsx` | **mismatch** |
+| Rendmaw, Creaking Nest | `rendmaw_v11.py` | v12 `.xlsx` | one staged change |
+| Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
 | Karlov of the Ghost Council | `karlov_v1.py` | v1 `.xlsx` | agrees |
 
-`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.9109`.
+`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8929`.
 
-### Open discrepancy: five changes are half-committed
+**The correlation used to be 0.9109.** It fell because Rendmaw's commander now
+hands every opponent a goaded Bird, which changes when games end. Nothing is
+leaking — the A/A control is still exactly `+0.00`. CRN is worth ~9x rather
+than ~11x.
 
-The spreadsheets carry the five 2026-09-02 changes. The deck modules do not.
-`pending.py` reports them as **staged, "not yet written to the .xlsx files"** —
-which is now backwards. The module/spreadsheet diff is exactly those five cards
-and nothing else:
+### Every card has been checked against oracle text
 
-- Lorehold: Triumph of Saint Katherine → The Dawning Archaic; Monologue Tax →
-  Arcane Bombardment; Urabrask // The Great Work → Monastery Mentor;
-  Hidden Retreat → Double Vision
-- Rendmaw: Skullclamp → March of the World Ooze
+2026-09-03: all 207 nonland cards across the three decks were checked against
+Scryfall. **52 had a wrong cost, power, toughness, type line or name**, and
+~22 had behaviour that did not match their text. See `ORACLE_AUDIT_KARLOV.md`,
+`ORACLE_AUDIT_RENDMAW.md` and `ORACLE_AUDIT_LOREHOLD.md` — each carries a
+STATUS block listing what is fixed and what is still open.
 
-Cause: on 2026-09-03 only `HANDOFF.md` was pushed. That session's code never
-left the sandbox. The following do not exist in any commit and must be
-rewritten, not recovered:
+Consequences worth carrying forward:
+
+- **Every ablation table predating this is void.** `ablation_karlov.txt`,
+  `ablation_rendmaw.txt` and `ablation_lorehold.txt` were all measured against
+  the uncorrected engine. Regenerate before reading any of them.
+- **Correcting Karlov made the deck look worse, not better** (win rate
+  −0.0163 ±0.0139). The old numbers were inflated by phantom lifegain triggers
+  and by Well of Lost Dreams / Dawn of Hope drawing cards for free.
+- **A docstring claiming a correction is not evidence of one.** Both
+  `lorehold_v15.py` ("where a card's real cost differs, the real cost is
+  used") and `karlov_v1.py` ("the spreadsheet already corrected Damn and
+  Fracture to MV 3") documented their own errors as deliberate. The first was
+  wrong for 20 cards; the second was wrong in both directions.
+
+### The four Lorehold changes are committed
+
+`pending.py` previously described the five 2026-09-02 changes as staged and
+"not yet written to the .xlsx files", which was backwards — the spreadsheets
+carried them and the modules did not. The four Lorehold changes are now
+applied to the module (hence `lorehold_v16.py`) and recorded in `COMMITTED`.
+
+**Rendmaw's Skullclamp → March of the World Ooze is still genuinely staged**:
+the v12 sheet has March, the module still has Skullclamp. That is the one
+remaining leg mismatch and it is the real kind.
+
+Lost work from the 2026-09-03 session that still does not exist in any commit:
 
 - `engine.choose_mode` and per-card `prefer`/`fallback` alternative-cost modes
-- flying/reach evasion in `opponents.damage_through`
+- flying/reach evasion in `opponents.damage_through` — **still missing**, and
+  now load-bearing, since Rendmaw's Birds and Karlov's fliers both depend on it
 - Storm Herd's X reading the real life total (still `script="storm_herd"`)
-- five inert Karlov card implementations
 - `COMMITTED_CHANGES.md`, `audit_cards.py`, `tag_flying.py`
 - `KNOWN_ISSUES.md` items 1a and 1c
 
+(The "five inert Karlov card implementations" are done: Radiant Fountain,
+Pristine Talisman, Aetherflux Reservoir, Serra Ascendant and Cosmos Elixir all
+work now.)
+
 `README.md` is trustworthy on methodology, stale on file lists and every number
-it quotes (it says corr 0.87; it is 0.91). `PROJECT_CONTEXT.md` and
-`PENDING_CHANGES.md` predate the same session.
+it quotes. `PROJECT_CONTEXT.md` and `PENDING_CHANGES.md` predate all of this
+and still name `lorehold_v15.py`.
 
 ### Live hazard: ablation cache key
 
@@ -173,14 +201,24 @@ fixed grid so it cannot break CRN.
 
 ## Queued work
 
-1. Reconcile the five half-committed changes across all three legs.
-2. Regenerate all three ablation tables — all are stale against the
-   spreadsheets, and Karlov's baseline is contaminated by the still-inert cards.
-3. Numeric-field sweep of all three deck modules against the spreadsheets:
-   `lifegain`, `pod_damage`, `treasures`, `x_pips`, power/toughness. A present
-   field set to a wrong value is invisible to an audit that looks for missing
-   code.
-4. Rewrite the lost engine work listed above.
-5. Lorehold: cut Penance, add Galvanoth — decided, not staged.
-6. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
+1. **Regenerate all three ablation tables.** This is now the top item: every
+   existing table was measured against the pre-audit engine and none of them
+   mean anything. Delete the caches first — `ablation.py` keys on deck and
+   horizons but not on N (see the hazard above).
+2. **Fix `SCRIPTED_KARLOV` in `ablation.py`.** It lists Serra Ascendant,
+   Aetherflux Reservoir, Pristine Talisman, Necropotence, Benevolent Offering,
+   Ranger of Eos and Land Tax as model-evaluated. Several now genuinely are,
+   after this round of fixes — but Necropotence, Benevolent Offering and
+   Ranger of Eos are still blind and must move, or their low scores will read
+   as evidence about the cards.
+3. **Flying/reach evasion in `opponents.damage_through`.** There is still no
+   evasion term of any kind. It is now doing more damage than before, because
+   Rendmaw's Birds fly and `goad_block_share` is standing in for it.
+4. Artist's Talent's three Class levels — currently Level 2 is granted free
+   and instantly, Levels 1 and 3 do not exist.
+5. Reconcile Rendmaw's staged Skullclamp → March of the World Ooze.
+6. Lorehold: cut Penance, add Galvanoth — decided, not staged.
+7. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
    unmodelled, so its committed numbers are a floor.
+8. Remaining per-deck gaps are listed in the STATUS block of each
+   `ORACLE_AUDIT_*.md`.

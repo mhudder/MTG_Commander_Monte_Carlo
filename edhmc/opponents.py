@@ -55,6 +55,10 @@ class Opponent:
     kill_turn: int = 99
     alive: bool = True
     clock_fired: bool = False
+    # Rendmaw gives EVERY player a goaded 2/2 flying Bird on each trigger.
+    # Kept separate from `creatures` so the natural-board cap in
+    # opponents_act() cannot silently clip them away.
+    goaded_birds: float = 0.0
 
     @property
     def p(self) -> dict:
@@ -222,6 +226,7 @@ def board_wipe(g, opp, rolls):
         destroy(g, p)
     for o in g.opponents:
         o.creatures = 0.0
+        o.goaded_birds = 0.0          # a wrath kills the Birds too
     g.m["wipes_suffered"] += 1
 
 
@@ -250,6 +255,35 @@ def opponents_act(g):
         board_wipe(g, opp, r)
         spot_removal(g, opp, others, r)
         ae_removal(g, opp, others, r)
+    goaded_combat(g)
+
+
+def goaded_combat(g):
+    """Rendmaw's Birds are goaded, and YOU are the goader.
+
+    Goad reads "attacks each combat if able and attacks a player other than
+    you if able", where "you" is the player who applied it. So every Bird an
+    opponent controls is forced to swing at one of the OTHER opponents — never
+    at Rendmaw's controller. The pod grinds itself down, which is the half of
+    the card that pays you back for handing out free 2/2s.
+
+    Blocking is deliberately light: the Birds fly, and most of what the
+    opponent model abstracts into `creatures` does not. `goad_block_share`
+    is the fraction of a defender's board assumed able to catch a flier.
+    """
+    birds = [o for o in living(g) if o.goaded_birds > 0]
+    if not birds:
+        return
+    share = g.cfg.get("goad_block_share", 0.30)
+    for att in birds:
+        targets = [o for o in living(g) if o is not att]
+        if not targets:
+            continue
+        victim = min(targets, key=lambda o: o.life)
+        blocked = min(att.goaded_birds, (victim.creatures + victim.goaded_birds) * share)
+        through = max(0.0, att.goaded_birds - blocked)
+        victim.life -= 2.0 * through          # 2/2 bodies
+    _check_eliminations(g)
 
 
 # ---------------------------------------------------------------------------
@@ -299,7 +333,7 @@ def damage_through(g, attackers: list) -> float:
     # stop it, so the relevant blocker count is the *weakest* opponent's board,
     # not the table's total. Some of their creatures are also tapped from
     # attacking someone else.
-    weakest = min(o.creatures for o in g.opponents)
+    weakest = min(o.creatures + o.goaded_birds for o in g.opponents)
     n_block = int(weakest * g.cfg.get("block_share", 0.60))
 
     powers = sorted((g.power_of(p) for p in attackers), reverse=True)
