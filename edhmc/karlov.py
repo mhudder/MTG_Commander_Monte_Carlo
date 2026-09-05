@@ -41,7 +41,13 @@ from edhmc.engine import Card, Permanent, can_pay, available_mana, spend, play_l
 from edhmc import opponents as OPP
 
 COMBO_A = "Exquisite Blood"
-COMBO_B = ("Sanguine Bond", "Vito, Thorn of the Dusk Rose", "Vizkopa Guildmage")
+# Cards that read "whenever you gain life, target opponent loses that much
+# life". Each loops with Exquisite Blood on its own, with no mana required.
+# Enduring Tenacity is word-for-word Sanguine Bond's trigger on a 4/3 body, so
+# it is a fourth combo piece, not merely a drain engine.
+COMBO_LOOP = ("Sanguine Bond", "Vito, Thorn of the Dusk Rose",
+              "Enduring Tenacity")
+COMBO_B = COMBO_LOOP + ("Vizkopa Guildmage",)
 
 
 class KarlovGame:
@@ -66,6 +72,10 @@ class KarlovGame:
         self.stampede_bonus = 0
         self.creature_died_this_turn = False
         self.treasures = 0
+        self.energy = 0                      # Guide of Souls
+        self.life_gained_this_turn = 0.0     # Enlightened Confidant
+        self.exemplar_drew_this_turn = False  # Exemplar of Light, once a turn
+        self.wind_crystal_used = False       # The Wind Crystal taps to activate
 
         cfg.setdefault("shroud_sources",
                        ("Lightning Greaves", "Swiftfoot Boots",
@@ -85,6 +95,14 @@ class KarlovGame:
             "cast_test_card": 0, "test_card_turn": 99,
             "test_card_answered": 0, "test_card_removed": 0,
             "test_card_countered": 0,
+            "heliod_counters": 0, "heliod_animated": 0,
+            "guide_triggers": 0, "guide_pumps": 0,
+            "tenacity_returns": 0, "crystal_activations": 0,
+            "crystal_doubled": 0.0, "offspring_paid": 0,
+            "lifelink_grants": 0,
+            "loss_route": 0,
+            "extort_triggers": 0, "confidant_cards": 0,
+            "confidant_life_lost": 0.0,
         }
         self.damage_by_turn = []
 
@@ -126,9 +144,9 @@ class KarlovGame:
         for _ in range(int(n)):
             tok = Card(name=f"{subtype or 'Token'} token",
                        types=frozenset({"Creature"}), power=p, toughness=t)
-            self.board.append(Permanent(card=tok, tapped=tapped, sick=True,
-                                        is_token=True))
-            creature_entered(self, mine=True)
+            perm = Permanent(card=tok, tapped=tapped, sick=True, is_token=True)
+            self.board.append(perm)
+            creature_entered(self, mine=True, entering=perm)
 
     def draw(self, n=1):
         for _ in range(n):
@@ -136,8 +154,21 @@ class KarlovGame:
                 self.hand.append(self.library.pop())
                 self.m["cards_drawn"] += 1
 
-    def on_creature_death(self, n=1):
+    def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
+        # Enduring Tenacity: "When this dies, IF IT WAS A CREATURE, return it to
+        # the battlefield under its owner's control. It's an enchantment." So it
+        # survives the first wrath, keeps its lifegain trigger, and can never do
+        # it a second time — it is no longer a creature to die as one.
+        if perm is not None and perm.card.name == "Enduring Tenacity" \
+                and perm.card.is_creature:
+            glimmer = Card(name="Enduring Tenacity",
+                           types=frozenset({"Enchantment"}),
+                           cost=dict(perm.card.cost),
+                           priority=perm.card.priority,
+                           threat=perm.card.threat)
+            self.board.append(Permanent(card=glimmer, sick=False))
+            self.m["tenacity_returns"] += 1
         for _ in range(n):
             # "target player loses 1 life and you gain 1 life" — a real drain.
             if self.has("Blood Artist"):
@@ -222,12 +253,37 @@ def pay_generic(g, want):
     return paid
 
 
+def devotion_white(g):
+    """Devotion to white: {W} pips among the mana costs of permanents you
+    control. Karlov himself is {W}{B} and counts for one."""
+    return sum(p.card.cost.get("W", 0) for p in g.board)
+
+
+def is_creature_now(g, card):
+    """Heliod is an Enchantment Creature that is NOT a creature while your
+    devotion to white is less than five. Nothing else in this deck has a
+    type-changing condition."""
+    if not card.is_creature:
+        return False
+    if card.name == "Heliod, Sun-Crowned":
+        return devotion_white(g) >= 5
+    return True
+
+
 def gain_life(g, amount, _depth=0):
     """One lifegain EVENT. Amount matters for some payoffs, the event itself
     matters for more of them."""
     if amount <= 0 or _depth > 3:
         return
+    # The Wind Crystal: "If you would gain life, you gain twice that much life
+    # instead." A replacement effect, so it doubles the AMOUNT and leaves the
+    # number of EVENTS alone — which is the distinction this whole engine is
+    # built around. Karlov still gets two counters, not four.
+    if g.has("The Wind Crystal"):
+        g.m["crystal_doubled"] += amount
+        amount *= 2
     g.your_life += amount
+    g.life_gained_this_turn += amount
     g.m["life_gained"] += amount
     g.m["lifegain_triggers"] += 1
 
@@ -249,10 +305,28 @@ def gain_life(g, amount, _depth=0):
             # large ones.
             OPP.damage_each(g, 1)
             g.m["damage"] += len(OPP.living(g))
-        elif n == "Marauding Blight-Priest":
+        elif n in ("Marauding Blight-Priest", "Starscape Cleric"):
+            # Starscape Cleric: "whenever you gain life, each opponent loses 1
+            # life" — identical wording to Blight-Priest, and its Offspring
+            # token has the same trigger, which is why the token is named the
+            # same and this loop counts both.
             OPP.damage_each(g, 1)
             g.m["damage"] += len(OPP.living(g))
-        elif n in ("Sanguine Bond", "Vito, Thorn of the Dusk Rose"):
+        elif n == "Heliod, Sun-Crowned":
+            # "put a +1/+1 counter on target creature or enchantment you
+            # control." Put it where it converts to damage: the biggest body.
+            bodies = [q for q in g.board if is_creature_now(g, q.card)]
+            if bodies:
+                max(bodies, key=g.power_of).counters += 1
+                g.m["heliod_counters"] += 1
+        elif n == "Exemplar of Light":
+            p.counters += 1
+            # "Whenever you put one or more +1/+1 counters on this creature,
+            # draw a card. This ability triggers only once each turn."
+            if not g.exemplar_drew_this_turn:
+                g.exemplar_drew_this_turn = True
+                g.draw(1)
+        elif n in COMBO_LOOP:
             OPP.damage_single(g, amount)
             g.m["damage"] += amount
             # Exquisite Blood sees that loss of life and gains it back: loop.
@@ -281,12 +355,25 @@ def drain(g, amount):
     gain_life(g, amount)
 
 
-def creature_entered(g, mine=True):
+def creature_entered(g, mine=True, entering=None):
     """Soul sisters see EVERY creature enter, including the opponents'.
 
     Daxos does NOT: his trigger reads "whenever another creature YOU CONTROL
     enters or dies", so he belongs with Elas il-Kor below, not with the sisters.
+
+    `entering` is the permanent that just entered, where the caller knows it.
+    It is used for the "ANOTHER creature you control" clauses, so that a card
+    does not trigger off its own arrival.
     """
+    # Guide of Souls: "Whenever another creature you control enters, you gain 1
+    # life and get {E}." The energy is what pays for the attack trigger.
+    if mine:
+        guides = [q for q in g.board
+                  if q.card.name == "Guide of Souls" and q is not entering]
+        for _ in guides:
+            gain_life(g, 1)
+            g.energy += 1
+            g.m["guide_triggers"] += 1
     for _ in range(g.count("Soul Warden") + g.count("Soul's Attendant")
                    + g.count("Auriok Champion")):
         gain_life(g, 1)
@@ -328,6 +415,20 @@ def opponent_activity(g):
 
 
 def upkeep(g):
+    # Dark Confidant: "reveal the top card of your library and put that card
+    # into your hand. You lose life equal to its mana value." The life is a
+    # real cost here — this engine loses games on `your_life` — and it is NOT
+    # a lifegain event, so it must not touch gain_life().
+    for _ in range(g.count("Dark Confidant")):
+        if not g.library:
+            break
+        top = g.library[-1]
+        g.draw(1)
+        g.your_life -= float(top.mv)
+        g.m["confidant_life_lost"] += float(top.mv)
+        if g.your_life <= 0 and g.result is None:
+            g.result = "loss"
+            return
     if g.has("Ajani's Mantra"):
         gain_life(g, 1)
     if g.has("Fountain of Renewal"):
@@ -385,6 +486,25 @@ def end_step(g):
         else:
             gain_life(g, 2)
 
+    # Enlightened Confidant: "at the beginning of your end step, IF YOU GAINED
+    # LIFE THIS TURN, surveil 1. If you put a card with mana value less than or
+    # equal to the amount of life you gained this turn into your graveyard this
+    # way, put that card into your hand."
+    #
+    # Note what the threshold reads: the TOTAL life gained this turn, not one
+    # trigger's worth. This deck gains in ones but gains often, so the gate is
+    # usually 4-6 and covers most of the curve. Surveilling a card you cannot
+    # pick up is left on top rather than binned — this engine has no top-deck
+    # payoff to bin for, so throwing the card away would be a strictly worse
+    # play than declining.
+    for _ in range(g.count("Enlightened Confidant")):
+        if g.life_gained_this_turn <= 0 or not g.library:
+            break
+        top = g.library[-1]
+        if top.mv <= g.life_gained_this_turn:
+            g.draw(1)
+            g.m["confidant_cards"] += 1
+
 
 def check_combo(g):
     if g.result is not None:
@@ -394,7 +514,7 @@ def check_combo(g):
     # Sanguine Bond and Vito loop with Exquisite Blood on their own. Vizkopa
     # Guildmage does NOT: its drain is an activated ability costing {1}{W}{B},
     # so it only assembles the loop if that mana is actually available.
-    partner = any(g.has(x) for x in COMBO_B[:2])
+    partner = any(g.has(x) for x in COMBO_LOOP)
     if not partner and g.has("Vizkopa Guildmage"):
         units = available_mana(g)
         if can_pay({"gen": 1, "W": 1, "B": 1}, units) is not None:
@@ -411,7 +531,13 @@ def check_combo(g):
 # ---------------------------------------------------------------------------
 
 def reduce_cost(g, card):
-    return dict(card.cost)
+    cost = dict(card.cost)
+    # The Wind Crystal: "White spells you cast cost {1} less to cast." Generic
+    # only — a cost reduction can never pay a coloured pip, so {W}{W} stays
+    # {W}{W} and this deck's one-drops get nothing.
+    if g.has("The Wind Crystal") and card.cost.get("W", 0) > 0:
+        cost["gen"] = max(0, cost.get("gen", 0) - 1)
+    return cost
 
 
 def main_phase(g):
@@ -476,14 +602,17 @@ def resolve(g, card):
     if g.has("Aetherflux Reservoir"):
         gain_life(g, g.spells_this_turn)
 
-    # Blind Obedience's extort: once per spell YOU cast, for {W/B}. It was a
-    # free drain once per turn, which is both the wrong rate and the wrong
-    # trigger.
-    if g.has("Blind Obedience") and pay_generic(g, 1) == 1:
+    # Extort: "whenever you cast a spell, you may pay {W/B}; if you do, each
+    # opponent loses 1 life and you gain that much." Once per SOURCE per spell,
+    # so two extorters on the battlefield is two triggers and two payments.
+    for _ in range(g.count("Blind Obedience") + g.count("Crypt Ghast")):
+        if pay_generic(g, 1) != 1:
+            break
         n = len(OPP.living(g))
         OPP.damage_each(g, 1)
         g.m["damage"] += n
         g.m["drain_damage"] += n
+        g.m["extort_triggers"] += 1
         gain_life(g, n)
 
     if "wipe" in card.tags:
@@ -507,20 +636,77 @@ def resolve(g, card):
         g.draw(2)
 
     if card.is_permanent:
-        g.board.append(Permanent(card=card, sick=True))
-        if card.is_creature:
-            creature_entered(g, mine=True)
+        perm = Permanent(card=card, sick=not card.haste)
+        g.board.append(perm)
+        if is_creature_now(g, card):
+            creature_entered(g, mine=True, entering=perm)
+        # Offspring {2}{B}: an additional cost paid as you cast, which creates a
+        # 1/1 token copy on ETB. The copy has the same lifegain trigger, so it
+        # carries the same name here and gain_life() counts both.
+        if card.name == "Starscape Cleric":
+            units = available_mana(g)
+            idx = can_pay({"gen": 2, "B": 1}, units)
+            if idx is not None:
+                spend_lg(g, idx, units)
+                g.m["mana_spent"] += 3
+                tok = Card(name="Starscape Cleric",
+                           types=frozenset({"Creature"}), power=1, toughness=1)
+                tperm = Permanent(card=tok, sick=True, is_token=True)
+                g.board.append(tperm)
+                creature_entered(g, mine=True, entering=tperm)
+                g.m["offspring_paid"] += 1
         check_combo(g)
     else:
         g.graveyard.append(card)
 
 
 def combat(g):
+    if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
+        g.m["heliod_animated"] += 1
     attackers = [p for p in g.board
-                 if p.card.is_creature and not p.tapped and not p.sick]
+                 if is_creature_now(g, p.card) and not p.tapped and not p.sick]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
+
+    # Guide of Souls: "Whenever you attack, you may pay {E}{E}{E}. When you do,
+    # put two +1/+1 counters and a flying counter on target attacking creature."
+    # The flying counter is not modelled — nothing in damage_through reads
+    # evasion — so this is the counters only, and a floor.
+    if g.has("Guide of Souls") and g.energy >= 3:
+        g.energy -= 3
+        max(attackers, key=g.power_of).counters += 2
+        g.m["guide_pumps"] += 1
+
+    # The Wind Crystal: "{4}{W}{W}, {T}: Creatures you control gain flying and
+    # lifelink until end of turn." Six mana at instant speed after the main
+    # phase has already deployed, so it fires rarely — but when it does, every
+    # attacker becomes a Karlov trigger.
+    granted = set()
+    if g.has("The Wind Crystal") and not g.wind_crystal_used:
+        units = available_mana(g)
+        idx = can_pay({"gen": 4, "W": 2}, units)
+        if idx is not None:
+            spend_lg(g, idx, units)
+            g.m["mana_spent"] += 6
+            g.wind_crystal_used = True
+            g.m["crystal_activations"] += 1
+            granted = {id(p) for p in attackers}
+
+    # Heliod, Sun-Crowned: "{1}{W}: Another target creature gains lifelink until
+    # end of turn." One activation per pass off whatever mana survived the main
+    # phase; "another" excludes Heliod himself.
+    if g.has("Heliod, Sun-Crowned") and not granted:
+        others = [p for p in attackers if p.card.name != "Heliod, Sun-Crowned"]
+        if others:
+            units = available_mana(g)
+            idx = can_pay({"gen": 1, "W": 1}, units)
+            if idx is not None:
+                spend_lg(g, idx, units)
+                g.m["mana_spent"] += 2
+                granted = {id(max(others, key=g.power_of))}
+                g.m["lifelink_grants"] += 1
+
     dmg = OPP.damage_through(g, attackers)
     for p in attackers:
         p.tapped = True
@@ -533,7 +719,7 @@ def combat(g):
                      or g.has("Vault of the Archangel")
                      or g.has("Sorin, Solemn Visitor"))
     for p in attackers:
-        if team_lifelink or p.card.lifelink:
+        if team_lifelink or p.card.lifelink or id(p) in granted:
             gain_life(g, g.power_of(p))
     if g.result is None and g.m["turn_lethal"] == 99 and not OPP.living(g):
         g.m["turn_lethal"] = g.turn
@@ -543,6 +729,9 @@ def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
     g.creature_died_this_turn = False
+    g.exemplar_drew_this_turn = False
+    g.wind_crystal_used = False
+    g.life_gained_this_turn = 0.0
     for p in g.board:
         p.tapped = False
         p.sick = False

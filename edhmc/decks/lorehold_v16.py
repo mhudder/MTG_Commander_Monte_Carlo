@@ -18,7 +18,8 @@ from edhmc.engine import Card
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
       threat=0.0, miracle=None, treasures=0, mana=None,
-      pod_damage=0.0, tokens=(), discards=0, land_face=(), x_pips=0):
+      pod_damage=0.0, tokens=(), discards=0, land_face=(), x_pips=0,
+      haste=False):
     """mana: (amount, "RWC") if the permanent taps for mana.
     pod_damage: direct damage dealt across the three opponents.
     tokens: (count, power, toughness) created on resolution."""
@@ -28,7 +29,7 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 miracle_cost=miracle or {}, treasures=treasures,
                 pod_damage=pod_damage, tokens=tokens, discards=discards,
-                land_face=land_face, x_pips=x_pips)
+                land_face=land_face, x_pips=x_pips, haste=haste)
 
 
 def L(name, produces, tapped=False, types="Land", tags=()):
@@ -227,7 +228,7 @@ RADIANT_SCROLLWIELDER = C("Radiant Scrollwielder", "Creature",
 # Its lifelink clause does nothing here -- life is not tracked.
 
 GOLDSPAN_DRAGON = C("Goldspan Dragon", "Creature", {"gen": 3, "R": 2}, 4, 4,
-                    priority=8, threat=8.5, script="goldspan")
+                    priority=8, threat=8.5, script="goldspan", haste=True)
 # 4/4 flying haste; a Treasure on attack, and YOUR Treasures tap for two mana.
 
 WITCH_ENCHANTER = C("Witch Enchanter // Witch-Blessed Meadow", "Creature",
@@ -247,6 +248,26 @@ THE_DAWNING_ARCHAIC = C("The Dawning Archaic", "Creature", {"gen": 10}, 7, 7,
                         priority=9.0, threat=8.5)
 
 # ---------------------------------------------------------------------------
+# 2026-09-04 candidates
+# ---------------------------------------------------------------------------
+# {5}{R} enchantment. "Whenever you cast a spell from your hand, reveal the top
+# X cards, X = that spell's mana value; you may cast a spell with mana value X
+# or less from among them free." Only spells cast FROM HAND trigger it, which
+# includes miracles (a miracled card is cast from hand) but excludes Galvanoth,
+# Radiant Scrollwielder, The Dawning Archaic, Bombardment and Mastery copies.
+SUNBIRDS_INVOCATION = C("Sunbird's Invocation", "Enchantment",
+                        {"gen": 5, "R": 1}, priority=9.0, threat=8.5)
+
+# {6}{R} sorcery. "For each land you control, create a Treasure token."
+BRASSS_BOUNTY = C("Brass's Bounty", "Sorcery", {"gen": 6, "R": 1},
+                  priority=6, threat=6.0, script="brass_bounty")
+
+# {1}{R} enchantment. Escape for everything in the graveyard at full mana cost
+# plus exiling three other cards, then it sacrifices itself at the end step.
+UNDERWORLD_BREACH = C("Underworld Breach", "Enchantment", {"gen": 1, "R": 1},
+                      priority=6, threat=7.0)
+
+# ---------------------------------------------------------------------------
 # Notes on the spreadsheet
 # ---------------------------------------------------------------------------
 # - Sejiri Shelter, Emeria's Call and Ondu Inversion are modal double-faced
@@ -255,3 +276,23 @@ THE_DAWNING_ARCHAIC = C("The Dawning Archaic", "Creature", {"gen": 10}, 7, 7,
 #   mulligan purposes only; the engine does not yet play their land halves.
 # - Blasphemous Act and The Dawning Archaic both have cost reductions that the
 #   engine applies in `reduce_cost`.
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-04, second batch
+# ---------------------------------------------------------------------------
+# {3}{R}{R} 3/3 flying Dragon. "Whenever you cast an instant or sorcery spell,
+# put a +1/+1 counter on this creature. THEN this creature deals damage equal
+# to its power to target opponent." Counter first, so the first trigger hits
+# for 4. Single target, not each opponent.
+CALDERA_PYREMAW = C("Caldera Pyremaw", "Creature", {"gen": 3, "R": 2}, 3, 3,
+                    priority=8.5, threat=8.5)
+
+# {6}{W}{W} sorcery. "Count the number of cards in your library. Your life
+# total becomes that number." An 8-MV miracle target that sets, not gains.
+INVINCIBLE_HYMN = C("Invincible Hymn", "Sorcery", {"gen": 6, "W": 2},
+                    priority=5, threat=6.0, script="invincible_hymn")
+
+# {6}{W}{W} sorcery. "Redistribute any number of players' life totals."
+REVERSE_THE_SANDS = C("Reverse the Sands", "Sorcery", {"gen": 6, "W": 2},
+                      priority=5, threat=6.5, script="reverse_sands")

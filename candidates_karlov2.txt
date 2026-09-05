@@ -1,0 +1,13 @@
+
+KARLOV candidates — value over a blank of the same cost (10 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Enlightened Confidant          2     +1.69+-0.40     +0.0087+-0.0034      0.154
+  Crypt Ghast                    4     +1.21+-0.33     +0.0040+-0.0030      0.141
+  Dark Confidant                 2     +1.81+-0.44     +0.0073+-0.0035      0.155
+
+KARLOV candidates — value over a blank of the same cost (20 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Enlightened Confidant          2     +1.80+-0.52     +0.0097+-0.0049      0.189
+  Crypt Ghast                    4     +1.39+-0.43     +0.0058+-0.0044      0.176
+  Dark Confidant                 2     +2.26+-0.58     +0.0090+-0.0053      0.187
+DONE

@@ -61,11 +61,13 @@ Verified 2026-09-03 after the oracle-text audit.
 | Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
 | Karlov of the Ghost Council | `karlov_v1.py` | v1 `.xlsx` | agrees |
 
-**All three legs agree on all three decks, and `CHANGES` is empty** — every
-decided change is applied to the module, the `.xlsx` and the ledger. This is
-the first time that has been true; `python -m edhmc.pending` is the check.
+**SUPERSEDED 2026-09-04.** `CHANGES` now holds FIVE staged swaps (see below).
+The deck modules and the `.xlsx` files still agree with each other, but neither
+carries the staged five — the ledger is the only leg that has them. To commit,
+write all five into the modules and the spreadsheets and move them to
+`COMMITTED`. `python -m edhmc.pending` is the check.
 
-`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8929`.
+`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8927` on the pod v3 default (0.8929 on the retired pod v1).
 
 **The correlation used to be 0.9109.** It fell because Rendmaw's commander now
 hands every opponent a goaded Bird, which changes when games end. Nothing is
@@ -145,6 +147,163 @@ python ablation.py lorehold 6000 10,20
 
 `ABLATE_BUDGET` (seconds, default 240) caps one invocation; the run caches
 after every card and resumes, so a small budget just means more invocations.
+
+### 2026-09-04: nineteen candidates measured, and a harness bug
+
+`CANDIDATES_2026-09-04.md` has the full write-up (two batches, nineteen cards).
+Three things from it matter beyond the cards themselves:
+
+- **`candidates.py`'s blank did not match `ablation.py`'s blank**, so the two
+  tables were not on the same scale — which is the only thing that makes
+  "compare the candidate to your weakest card" a valid decision rule.
+  `ablation.py` blanks to a single type line; `candidates.py` copied the whole
+  one, which for Rendmaw cancels the commander trigger. Fixed. Any candidate
+  number produced before 2026-09-04 is on the wrong scale for Rendmaw.
+- **`Card.indestructible` now exists** and is priced by `cfg["destroy_share"]`
+  (default 0.60, the assumed share of pod interaction that is literally
+  "destroy"). It is the first thing in the model that distinguishes kinds of
+  removal. No card in any committed list has it, so it is inert; it exists
+  because Heliod cannot be evaluated without it.
+- Six candidates needed new engine behaviour and the mechanism counters to
+  trace it (`sunbird_casts`, `escape_casts`, `heliod_counters`,
+  `cauldron_reanimations`, `tenacity_returns`, …). `validate.py` is still
+  `+0.00` on all six with `corr = 0.8929`, so the three ablation tables above
+  are still valid despite the engine edits.
+
+**Five swaps are STAGED** in `pending.py` (module leg only — the `.xlsx` files
+do NOT yet carry them, so `CHANGES` is no longer empty and the three legs no
+longer agree):
+
+| deck | out | in | win T10 | win T20 |
+|---|---|---|---|---|
+| karlov | Swamp | Starscape Cleric | +0.0353 | +0.0480 |
+| karlov | Whispersilk Cloak | Enduring Tenacity | (measured as the 2-for-2 above) | |
+| rendmaw | Ornithopter of Paradise | Cauldron of Essence | +0.0025 | +0.0158 |
+| karlov | Lightning Greaves | Exemplar of Light | +0.0397 | +0.0617 |
+| lorehold | Scroll Rack | Sunbird's Invocation | +0.0077 | +0.0215 |
+
+The three Karlov rows were measured together as a 3-for-3. Each was screened against a blank and then re-measured as the REAL swap with
+`run_swaps_0904.py`. The other eight candidates were rejected.
+
+**`build_pending()` now returns different lists than `module.build()`.** Any
+new ablation run picks the staged changes up; delete the caches first.
+
+### The commander bug is now measured and gated
+
+`opponents.resolve_own_wipe` removed your commander without returning it to the
+command zone, so `commander_cast` stayed `True` and it was never recast — every
+self-wipe in every deck is over-penalised by roughly 1 damage, and for Karlov's
+Damn by most of its win-rate penalty. Now gated behind
+`cfg["own_wipe_commander_returns"]`, **defaulting to the old wrong behaviour**
+so the three ablation tables stay valid. Flipping the default is one line and
+invalidates all three. Numbers in `CANDIDATES_2026-09-04.md`.
+
+### 2026-09-04: LIFE DOES NOT DECIDE GAMES — read this before valuing any lifegain
+
+A `loss_route` metric was added to `opponents.py`. Measured over 2,000-2,500
+games per cell:
+
+| deck | loss rate T10 / T20 | ground down on life | opponent's clock |
+|---|---|---|---|
+| rendmaw | 0.260 / 0.703 | 0.00 | **1.00** |
+| lorehold | 0.196 / 0.782 | 0.00 | **1.00** |
+| karlov | 0.228 / 0.602 | 0.00 | **1.00** |
+
+**Every loss in all three decks at both horizons is an opponent's clock**, which
+is threat-weighted and never reads your life total. This is BY DESIGN and not a
+close race: disable the clocks and incidental damage kills you in 0.4%
+(rendmaw) / 0.6% (lorehold) / 0.0% (karlov) of games by turn 20, and 2.9% by
+turn 30. The opponents' board is a float capped at 7 chipping for
+`creatures * 0.45 * your_share`; it was never calibrated to kill anyone, and the
+clock is the abstraction standing in for "an opponent actually wins".
+
+(Do not cite mean final life as evidence here — `resolve_clocks` sets
+`your_life = 0` when it kills you, so the mean is an artifact of the clock, not
+of the grind. An earlier version of this note made that mistake.)
+
+Consequences:
+
+- **Lifelink and lifegain buy nothing defensively.** They are worth something
+  only where a card *reads* the life: Karlov's triggers, Serra Ascendant's 30,
+  Felidar Sovereign's 40, Aetherflux's 50.
+- **Any card whose job is a bigger life total is MODEL-BLIND.** Invincible Hymn
+  measured as an exact blank for this reason.
+- **Any card whose drawback is losing life gets that drawback for free.** Dark
+  Confidant's number is a ceiling, and knowingly so.
+- A `Card.lifelink` comment in `engine.py` claimed the opposite before this was
+  measured. It has been corrected.
+
+### POD_V2 - opt-in pod where life is load-bearing (2026-09-04)
+
+`edhmc.experiment.POD_V2` = `{"combat_targeting": "open",
+"incidental_rate": 1.0, "clock_shift": 2}`. Use as
+`dict(DEFAULT_CFG, **POD_V2)`. **Defaulted OFF** - `validate.py` still prints
+`+0.00` / `corr 0.8929`, and every existing number reproduces untouched.
+
+Two changes, both in `opponents.py`:
+
+1. **`combat_share()` replaces `your_share()` for COMBAT only.** The old code
+   was backwards: combat damage was threat-weighted, so developing a board made
+   you take *more* attacks. Creatures swing at whoever cannot block. Removal
+   stays threat-weighted, which was always right.
+2. **`clock_shift` delays the deus ex machina**, paying back the lethality that
+   combat now supplies. Raising `incidental_rate` alone stacks a second kill
+   mechanism instead of moving kills between them, and craters every win rate.
+
+Fitted with `fit_pod.py` over a 25-point grid. Its mechanical best is (1.2, 4);
+**that was NOT taken** because its target - a 0.65 life-share of losses - is a
+number I invented. No survey data on EDH elimination causes exists that I could
+find. Game length IS anchored: Command Zone, 100+ games, mean turn 10.29, 70%
+between 8 and 12. Both v1 and v2 run ~12-13, a pre-existing gap.
+
+Effect: life-share of losses goes 0.00/0.00/0.00 to 0.31/0.51/0.21
+(rendmaw/lorehold/karlov) at near-identical win rates. **It now varies by
+deck**, which is the point - Lorehold has 11 creatures and gets attacked.
+
+All five staged swaps were re-measured under it and all five hold; see the
+`reverified` fields. One downgrade: Rendmaw's Cauldron swap is now inside its
+error bar at 10 turns and stands on the 20-turn result alone.
+
+Payoff: **Invincible Hymn went from an exact blank (-0.0007 win) to +0.0097
++-0.0041.** Cards whose job is a life total are evaluable for the first time.
+
+### POD v3 is the DEFAULT as of 2026-09-04 - every earlier table is void
+
+`DEFAULT_CFG` now carries `combat_targeting="open"`, `incidental_rate=1.0`,
+`clock_shift=2`, `archetypes=True`. `experiment.POD_V1` restores the old pod
+exactly if you need to reproduce an earlier number.
+
+`validate.py` is still `+0.00` on all six; `corr(A,B)` 0.8929 -> 0.8927, CRN
+still worth ~9x. **All three ablation tables were regenerated against this pod
+and every table dated before 2026-09-04 is void.**
+
+Three changes, all in `opponents.py`:
+
+1. **`combat_share()` replaces `your_share()` for COMBAT only.** The old code
+   was backwards - combat damage was threat-weighted, so developing a board
+   made you take *more* attacks. Creatures swing at whoever cannot block.
+   Removal stays threat-weighted, which was always right.
+2. **`clock_shift`** delays the deus ex machina, paying back the lethality that
+   combat now supplies. Raising `incidental_rate` alone stacks a second kill
+   mechanism instead of moving kills between them, and craters every win rate.
+3. **`ARCHETYPES`** - aggro / midrange / control / combo, one per opponent.
+   **Every multiplier is normalised to a weighted mean of exactly 1**, so the
+   AVERAGE pod is unchanged by construction and archetypes add variance, not
+   difficulty. That is the property that made this adoptable without a second
+   recalibration. The raw numbers are judgement (no data on the EDH archetype
+   mix was found); `cfg["archetype_weights"]` is the knob.
+
+Effect: life-share of losses goes 0.00/0.00/0.00 to 0.32/0.43/0.20 at
+near-identical win rates, and it is now CONDITIONAL - Karlov facing no aggro
+decks has a 0.06 life-share, facing three it is 0.79.
+
+**What this changed, and why it was worth doing:** the correct Rendmaw cut. The
+Cauldron of Essence swap was staged against Ornithopter of Paradise and decayed
+across pod versions (+0.0025 -> +0.0018 -> -0.0015 at ten turns) because
+Ornithopter is a 0/2 BODY and Cauldron is not a creature - and blockers now
+matter. Controlled test at 20 turns, same card in: cutting noncreature Idol of
+Oblivion +0.0135, cutting the 0/2 Ornithopter +0.0088, cutting the 1/2 Dockside
+Chef +0.0048. Monotonic. The staging was changed to cut Idol.
 
 ### Fixed hazard: ablation cache key
 
@@ -244,3 +403,11 @@ fixed grid so it cannot break CRN.
    unmodelled, so its committed numbers are a floor.
 5. Remaining per-deck gaps are listed in the STATUS block of each
    `ORACLE_AUDIT_*.md`.
+6. **`opponents.resolve_own_wipe` removes your commander without returning it
+   to the command zone** — `commander_cast` stays `True`, so after you cast
+   your own sweeper the commander is neither on the battlefield nor
+   recastable. Found 2026-09-04, not fixed, because fixing it moves every
+   committed number.
+7. `Card.indestructible` is priced by a single flat `destroy_share`. A card
+   whose evaluation swings on that knob should be reported with it said out
+   loud.

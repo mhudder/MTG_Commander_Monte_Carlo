@@ -1,0 +1,41 @@
+
+=== lorehold_scrollrack  (10 turns, n=6,000 paired)
+    OUT Scroll Rack
+    IN  Sunbird's Invocation
+      won                   +0.0077  [ +0.0047,  +0.0108] *
+      damage                +2.1449  [ +1.5757,  +2.7378] *
+      mv_cheated            +2.1232  [ +1.6848,  +2.5671] *
+      miracles_cast         +0.1113  [ +0.0835,  +0.1387] *
+      cards_drawn           +0.6763  [ +0.5513,  +0.8062] *
+      stranded_mv           +4.2842  [ +3.8128,  +4.7620] *
+
+=== lorehold_scrollrack  (20 turns, n=6,000 paired)
+    OUT Scroll Rack
+    IN  Sunbird's Invocation
+      won                   +0.0215  [ +0.0142,  +0.0288] *
+      damage                +4.2031  [ +3.2038,  +5.2327] *
+      mv_cheated            +4.9077  [ +3.9051,  +5.9543] *
+      miracles_cast         +0.1072  [ +0.0622,  +0.1527] *
+      cards_drawn           +0.8960  [ +0.6758,  +1.1130] *
+      stranded_mv           +3.3455  [ +2.5627,  +4.1232] *
+
+=== lorehold_capstone  (10 turns, n=6,000 paired)
+    OUT Improvisation Capstone
+    IN  Sunbird's Invocation
+      won                   +0.0045  [ +0.0020,  +0.0070] *
+      damage                +1.3893  [ +0.7765,  +2.1162] *
+      mv_cheated            +1.4553  [ +0.9762,  +1.9674] *
+      miracles_cast         -0.0382  [ -0.0573,  -0.0193] *
+      cards_drawn           +0.3318  [ +0.2303,  +0.4330] *
+      stranded_mv           -0.9770  [ -1.2317,  -0.7382] *
+
+=== lorehold_capstone  (20 turns, n=6,000 paired)
+    OUT Improvisation Capstone
+    IN  Sunbird's Invocation
+      won                   +0.0128  [ +0.0055,  +0.0200] *
+      damage                +1.8740  [ +0.6722,  +2.9663] *
+      mv_cheated            +2.8585  [ +1.8910,  +3.8390] *
+      miracles_cast         -0.1237  [ -0.1598,  -0.0860] *
+      cards_drawn           +0.3688  [ +0.1672,  +0.5754] *
+      stranded_mv           -1.3425  [ -1.8325,  -0.8442] *
+DONE

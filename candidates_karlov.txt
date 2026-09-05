@@ -1,0 +1,19 @@
+
+KARLOV candidates — value over a blank of the same cost (10 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Heliod, Sun-Crowned            3     +0.60+-0.31     +0.0008+-0.0024      0.148
+  Exemplar of Light              4     +1.42+-0.39     +0.0040+-0.0028      0.128
+  Guide of Souls                 1     +0.48+-0.30     +0.0013+-0.0023      0.162
+  Enduring Tenacity              4     +2.74+-0.42     +0.0195+-0.0041      0.138
+  Starscape Cleric               2     +4.13+-0.46     +0.0118+-0.0035      0.158
+  The Wind Crystal               4     +0.18+-0.24     +0.0022+-0.0024      0.129
+
+KARLOV candidates — value over a blank of the same cost (20 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Heliod, Sun-Crowned            3     +1.27+-0.44     +0.0050+-0.0045      0.183
+  Exemplar of Light              4     +2.11+-0.47     +0.0090+-0.0046      0.166
+  Guide of Souls                 1     +0.71+-0.32     +0.0037+-0.0037      0.197
+  Enduring Tenacity              4     +2.48+-0.51     +0.0217+-0.0054      0.175
+  Starscape Cleric               2     +3.91+-0.52     +0.0153+-0.0052      0.193
+  The Wind Crystal               4     +0.47+-0.35     +0.0022+-0.0039      0.167
+DONE

@@ -15,7 +15,8 @@ from edhmc.engine import Card
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
-      threat=0.0, mana=None, pod_damage=0.0, land_face=(), x_pips=0, alt_costs=()):
+      threat=0.0, mana=None, pod_damage=0.0, land_face=(), x_pips=0,
+      alt_costs=(), lifelink=False):
     """mana: (amount, "BGC") if the permanent taps for mana.
     pod_damage: drain/burn dealt across the three opponents.
     threat: how badly opponents want it dead (0 = derive from power/MV).
@@ -31,7 +32,7 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 script=script, priority=priority, mana_ability=ma,
                 threat=threat, tags=frozenset(tags), pod_damage=pod_damage,
                 land_face=land_face, x_pips=x_pips,
-                alt_costs=alt_costs)
+                alt_costs=alt_costs, lifelink=lifelink)
 
 
 def L(name, produces, tapped=False, types="Land", script=None, tags=(), p=0, t=0):
@@ -206,3 +207,32 @@ MARCH_OF_THE_WORLD_OOZE = C("March of the World Ooze", "Enchantment",
 # Cut in v12, kept so validate.py can still measure CRN on the same real
 # comparison it always has (now run in the other direction: March -> Clamp).
 SKULLCLAMP = C("Skullclamp", "Artifact", {"gen": 1}, priority=9, threat=2.5)
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-04 candidates
+# ---------------------------------------------------------------------------
+# "Whenever a creature you control dies, each opponent loses 1 life and you
+# gain 1 life." — a Meathook Massacre drain half on a 3-mana artifact, plus
+# "{1}{B}{G}, {T}, Sacrifice a creature: return target creature card from your
+# graveyard to the battlefield. Activate only as a sorcery."
+# ONE card type, so it does NOT trigger Rendmaw.
+CAULDRON_OF_ESSENCE = C("Cauldron of Essence", "Artifact",
+                        {"gen": 1, "B": 1, "G": 1}, priority=7, threat=6.5)
+
+# MDFC. Front: {B/G} instant, "+1/+1 counter on target creature, it gains
+# indestructible until end of turn". Back: Old-Growth Grove, a tapped BG land.
+# The hybrid pip is expressed as {B} with a {G} alternative cost, which is what
+# hybrid actually is for a payment solver. One card type on the front face, so
+# no Rendmaw trigger.
+REVITALIZING_REPAST = C("Revitalizing Repast", "Instant", {"B": 1},
+                        priority=2, script="repast",
+                        alt_costs=(({"G": 1}, "hybrid"),),
+                        land_face=("BG", True))
+
+# {6} 6/6 deathtouch lifelink; dies -> a 3/3 deathtouch Wurm and a 3/3 lifelink
+# Wurm. Artifact Creature = TWO card types, so it triggers Rendmaw.
+# Deathtouch is not modelled (this engine only prices it for Ohran Frostfang,
+# as a blocker deterrent), so this is a floor.
+WURMCOIL_ENGINE = C("Wurmcoil Engine", "Artifact/Creature", {"gen": 6}, 6, 6,
+                    priority=7, threat=8.0, lifelink=True)

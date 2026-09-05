@@ -1,0 +1,61 @@
+
+=== karlov3  (10 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak, Lightning Greaves
+    IN  Starscape Cleric, Enduring Tenacity, Exemplar of Light
+      won                   +0.0362  [ +0.0300,  +0.0425] *
+      damage                +6.8865  [ +6.0818,  +7.7032] *
+      lifegain_triggers     -0.1372  [ -0.2477,  -0.0222] *
+      final_life            -0.2266  [ -0.7826,  +0.3672]  
+      cards_drawn           +0.0790  [ +0.0380,  +0.1215] *
+      stranded_mv           +5.5263  [ +4.9860,  +6.0557] *
+
+=== karlov3  (20 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak, Lightning Greaves
+    IN  Starscape Cleric, Enduring Tenacity, Exemplar of Light
+      won                   +0.0638  [ +0.0550,  +0.0727] *
+      damage                +7.6815  [ +6.6546,  +8.6630] *
+      lifegain_triggers     -0.4998  [ -0.6703,  -0.3267] *
+      final_life            +2.2843  [ +1.2496,  +3.3103] *
+      cards_drawn           -0.2425  [ -0.3448,  -0.1422] *
+      stranded_mv           +6.3327  [ +5.5618,  +7.0835] *
+
+=== rendmaw  (10 turns, n=6,000 paired)
+    OUT Ornithopter of Paradise
+    IN  Cauldron of Essence
+      won                   -0.0015  [ -0.0037,  +0.0007]  
+      damage                +0.3950  [ +0.1287,  +0.6545] *
+      cards_drawn           -0.0088  [ -0.0273,  +0.0102]  
+      rendmaw_triggers      -0.0702  [ -0.0830,  -0.0580] *
+      tokens_made           -0.0873  [ -0.1107,  -0.0645] *
+      stranded_mv           +1.5773  [ +1.4142,  +1.7418] *
+
+=== rendmaw  (20 turns, n=6,000 paired)
+    OUT Ornithopter of Paradise
+    IN  Cauldron of Essence
+      won                   +0.0088  [ +0.0038,  +0.0138] *
+      damage                +0.5054  [ +0.0611,  +0.9502] *
+      cards_drawn           -0.0832  [ -0.1240,  -0.0422] *
+      rendmaw_triggers      -0.1023  [ -0.1237,  -0.0817] *
+      tokens_made           -0.1528  [ -0.1950,  -0.1112] *
+      stranded_mv           +1.7470  [ +1.4820,  +2.0140] *
+
+=== lorehold_scrollrack  (10 turns, n=6,000 paired)
+    OUT Scroll Rack
+    IN  Sunbird's Invocation
+      won                   +0.0032  [ +0.0005,  +0.0058] *
+      damage                +1.9764  [ +1.0645,  +3.1295] *
+      mv_cheated            +2.3972  [ +1.8927,  +2.8837] *
+      miracles_cast         +0.1132  [ +0.0855,  +0.1412] *
+      cards_drawn           +0.8250  [ +0.6872,  +0.9667] *
+      stranded_mv           +4.6760  [ +4.2193,  +5.1310] *
+
+=== lorehold_scrollrack  (20 turns, n=6,000 paired)
+    OUT Scroll Rack
+    IN  Sunbird's Invocation
+      won                   +0.0167  [ +0.0103,  +0.0228] *
+      damage                +3.0475  [ +1.5127,  +4.4342] *
+      mv_cheated            +4.3973  [ +3.4306,  +5.3980] *
+      miracles_cast         +0.1448  [ +0.1018,  +0.1902] *
+      cards_drawn           +1.1248  [ +0.8963,  +1.3575] *
+      stranded_mv           +5.0705  [ +4.4137,  +5.7275] *
+DONE

@@ -1,0 +1,15 @@
+
+LOREHOLD candidates — value over a blank of the same cost (10 turns)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Caldera Pyremaw                5     +0.82+-0.28     +0.0033+-0.0018     -0.24+-0.14       0.105
+  Goldspan Dragon                5     +0.48+-0.36     +0.0012+-0.0016     +0.05+-0.16       0.105
+  Invincible Hymn                8     +0.02+-0.19     +0.0003+-0.0008     -0.05+-0.06       0.141
+  Reverse the Sands              8     +0.11+-0.20     +0.0017+-0.0013     -0.04+-0.07       0.141
+
+LOREHOLD candidates — value over a blank of the same cost (20 turns)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Caldera Pyremaw                5     +1.21+-0.58     +0.0123+-0.0048     -1.09+-0.48       0.190
+  Goldspan Dragon                5     +0.60+-0.60     +0.0025+-0.0045     -0.36+-0.44       0.190
+  Invincible Hymn                8     -0.02+-0.23     -0.0007+-0.0017     -0.17+-0.16       0.242
+  Reverse the Sands              8     +0.39+-0.31     +0.0130+-0.0041     +0.14+-0.33       0.241
+DONE

@@ -18,17 +18,26 @@ from edhmc.engine import Card
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
-      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0):
+      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0,
+      indestructible=False):
     ma = (mana[0], frozenset(mana[1])) if mana else None
     return Card(name=name, types=frozenset(types.split("/")), cost=cost or {},
                 power=p, toughness=t, script=script, priority=priority,
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
-                lifegain=lifegain, drain=drain, lifelink=lifelink, x_pips=x_pips)
+                lifegain=lifegain, drain=drain, lifelink=lifelink,
+                x_pips=x_pips, indestructible=indestructible)
 
 
-def L(name, produces, tapped=False, types="Land", lifegain=0.0):
+def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):
+    """tags: "swamp" marks a land with the SWAMP SUBTYPE, which is what Crypt
+    Ghast reads — not merely a land that produces black. In this list that is
+    the eleven basics and Godless Shrine, and nothing else: Tainted Field,
+    Caves of Koilos, Concealed Courtyard, Isolated Chapel, Fetid Heath, Temple
+    of Silence, Bojuka Bog, Barren Moor and Shizo all make black without being
+    Swamps."""
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
-                produces=frozenset(produces), tapped=tapped, lifegain=lifegain)
+                produces=frozenset(produces), tapped=tapped, lifegain=lifegain,
+                tags=frozenset(tags))
 
 
 COMMANDER = C("Karlov of the Ghost Council", "Creature",
@@ -139,7 +148,7 @@ SPELLS = [
 ]
 
 LANDS = (
-    [L("Plains", "W")] * 7 + [L("Swamp", "B")] * 11 +
+    [L("Plains", "W")] * 7 + [L("Swamp", "B", tags=("swamp",))] * 11 +
     [
         L("Barren Moor", "B", tapped=True),
         L("Radiant Fountain", "C", lifegain=2),
@@ -159,7 +168,7 @@ LANDS = (
         L("Isolated Chapel", "WB"),
         L("Fetid Heath", "WB"),
         L("Shizo, Death's Storehouse", "B"),
-        L("Godless Shrine", "WB"),
+        L("Godless Shrine", "WB", tags=("swamp",)),
     ]
 )
 
@@ -168,3 +177,65 @@ def build():
     deck = CREATURES + PLANESWALKERS + ARTIFACTS + ENCHANTMENTS + SPELLS + LANDS
     assert len(deck) == 99, f"deck is {len(deck)} cards, expected 99"
     return deck, COMMANDER
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-04 candidates
+# ---------------------------------------------------------------------------
+# {2}{W} 5/5 indestructible God. Not a creature while devotion to white < 5.
+# "Whenever you gain life, put a +1/+1 counter on target creature or
+# enchantment you control." {1}{W}: another target creature gains lifelink.
+HELIOD_SUN_CROWNED = C("Heliod, Sun-Crowned", "Enchantment/Creature",
+                       {"gen": 2, "W": 1}, 5, 5, priority=9, threat=8.0,
+                       indestructible=True)
+
+# {2}{W}{W} 3/3 flier. A +1/+1 counter on itself per lifegain event, and a
+# card the first time each turn it gets one.
+EXEMPLAR_OF_LIGHT = C("Exemplar of Light", "Creature", {"gen": 2, "W": 2}, 3, 3,
+                      priority=8, threat=7.5)
+
+# {W} 1/2. "Whenever another creature you control enters, you gain 1 life and
+# get {E}." Whenever you attack, pay {E}{E}{E} for two +1/+1 counters and a
+# flying counter on an attacking creature.
+GUIDE_OF_SOULS = C("Guide of Souls", "Creature", {"W": 1}, 1, 2,
+                   priority=9.5, threat=6.5)
+
+# {2}{B}{B} 4/3. "Whenever you gain life, target opponent loses that much
+# life" — Sanguine Bond on a body, so it is also an Exquisite Blood combo
+# piece. Returns as a noncreature enchantment when it dies.
+ENDURING_TENACITY = C("Enduring Tenacity", "Enchantment/Creature",
+                      {"gen": 2, "B": 2}, 4, 3, priority=9.5, threat=8.5)
+
+# {1}{B} 2/1 flier that can't block, Offspring {2}{B}. "Whenever you gain life,
+# each opponent loses 1 life" — Marauding Blight-Priest at half the cost.
+STARSCAPE_CLERIC = C("Starscape Cleric", "Creature", {"gen": 1, "B": 1}, 2, 1,
+                     priority=8.5, threat=7.0)
+
+# {2}{W}{W} legendary artifact. White spells cost {1} less; lifegain is
+# doubled; {4}{W}{W}, {T}: creatures gain flying and lifelink.
+THE_WIND_CRYSTAL = C("The Wind Crystal", "Artifact", {"gen": 2, "W": 2},
+                     priority=8, threat=7.0)
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-04, second batch
+# ---------------------------------------------------------------------------
+# {1}{W} 2/1 lifelink. "At the beginning of your end step, IF YOU GAINED LIFE
+# THIS TURN, surveil 1. If you put a card with mana value less than or equal to
+# the amount of life you gained this turn into your graveyard this way, put
+# that card into your hand." The threshold is the turn's TOTAL, not one
+# trigger's worth.
+ENLIGHTENED_CONFIDANT = C("Enlightened Confidant", "Creature",
+                          {"gen": 1, "W": 1}, 2, 1, priority=8, threat=6.5,
+                          lifelink=True)
+
+# {3}{B} 2/2. Extort, plus "whenever you tap a SWAMP for mana, add an
+# additional {B}" — twelve Swamp-typed lands in this list.
+CRYPT_GHAST = C("Crypt Ghast", "Creature", {"gen": 3, "B": 1}, 2, 2,
+                priority=8, threat=7.0, tags=("ramp",))
+
+# {1}{B} 2/1. "At the beginning of your upkeep, reveal the top card of your
+# library and put that card into your hand. You lose life equal to its mana
+# value." The life loss is NOT a lifegain event and must not feed Karlov.
+DARK_CONFIDANT = C("Dark Confidant", "Creature", {"gen": 1, "B": 1}, 2, 1,
+                   priority=8, threat=7.5)

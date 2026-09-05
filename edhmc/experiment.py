@@ -34,6 +34,17 @@ DEFAULT_CFG = {
     "block_rate": 0.30,         # only used when derived_blocking is False
     "block_share": 0.60,
     "first_wipe_turn": 5,
+
+    # --- pod model v3, made the default 2026-09-04 ------------------------
+    # Combat now kills. Before this, 100% of losses in all three decks were an
+    # opponent's clock and your life total was inert, which made lifegain,
+    # lifelink and any life cost unevaluable. See CANDIDATES_2026-09-04.md.
+    # `POD_V1` below restores the previous pod exactly.
+    "combat_targeting": "open",   # creatures hit whoever cannot block
+    "incidental_rate": 1.0,       # was 0.45
+    "clock_shift": 2,             # the deus ex machina arrives later
+    "archetypes": True,           # aggro / midrange / control / combo pods
+
     "hold_up_rate": 0.60,       # P(you held up Heroic Intervention)
     "counter_threshold": 4.0,
     "set_top_gate": 4.0,       # min mana saved before paying to set the top
@@ -42,6 +53,54 @@ DEFAULT_CFG = {
 
     "opp_instant_rate": 0.8,
     "on_the_draw": True,
+}
+
+# ---------------------------------------------------------------------------
+# Pod v2 — combat that actually kills (2026-09-04)
+# ---------------------------------------------------------------------------
+# Opt-in: dict(DEFAULT_CFG, **POD_V2). DEFAULT_CFG is untouched, so every
+# number in the project reproduces exactly until a run asks for this.
+#
+#   combat_targeting="open"  creatures swing at the player who cannot block,
+#                            not at the scariest board (see opponents.combat_share)
+#   incidental_rate=1.0      up from 0.45
+#   clock_shift=2            the deus ex machina arrives two turns later, paying
+#                            back the lethality that combat now supplies
+#
+# Chosen to PRESERVE the existing calibration, not to hit a life-share target.
+# Fitted over a 25-point grid by `fit_pod.py`; that script's mechanical best is
+# (1.2, 4), which reaches a 0.65 life-share but costs Rendmaw and Lorehold
+# ~25% of their win rate. The 0.65 target was invented — no published data on
+# EDH elimination causes was found — so it is not worth re-baselining the whole
+# project against. Game length IS anchored: the Command Zone's 100+ game sample
+# puts the average game at turn 10.29 with 70% between 8 and 12.
+#
+#   metric              baseline (v1)          POD_V2
+#   win r/l/k           0.295/0.220/0.428      0.290/0.188/0.454
+#   turns r/l/k         12.1/13.5/11.7         12.9/13.3/12.6
+#   life-share of losses  0.00/0.00/0.00       0.31/0.51/0.21
+#
+# Note the life-share now VARIES BY DECK, which is the whole point: Lorehold
+# runs 11 creatures and gets attacked, Karlov is creature-dense and gains life
+# and does not. The old model could not express that difference at all.
+POD_V2 = {
+    "combat_targeting": "open",
+    "incidental_rate": 1.0,
+    "clock_shift": 2,
+}
+
+# POD_V3 = POD_V2 plus per-opponent archetypes. The archetype multipliers are
+# normalised to a weighted mean of 1, so this adds VARIANCE between pods, not
+# average difficulty — see opponents.ARCHETYPES.
+POD_V3 = dict(POD_V2, archetypes=True)
+
+# The pod as it stood before 2026-09-04, kept so any earlier number in the
+# project can be reproduced exactly.
+POD_V1 = {
+    "combat_targeting": "threat",
+    "incidental_rate": 0.45,
+    "clock_shift": 0,
+    "archetypes": False,
 }
 
 METRICS = ("won", "damage", "cards_drawn", "rendmaw_triggers", "tokens_made",

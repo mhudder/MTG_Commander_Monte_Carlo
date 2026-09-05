@@ -41,6 +41,70 @@ BRACKETS = {
             counters_held=2, board=1.2, clock=(8, 12)),
 }
 
+# ---------------------------------------------------------------------------
+# Archetypes (2026-09-04) — heterogeneity, NOT a recalibration
+# ---------------------------------------------------------------------------
+# A bracket says how POWERFUL an opponent is. It says nothing about what KIND
+# of deck they are, and that is what decides whether your life total is under
+# pressure. Three bracket-3 control decks and three bracket-3 aggro decks are
+# the same pod to the old model and completely different games to play.
+#
+# THE DISCIPLINE HERE. Every multiplier below is normalised so its WEIGHTED
+# MEAN across archetypes is exactly 1 (and the clock offset exactly 0). The
+# average pod is therefore identical to the no-archetype pod BY CONSTRUCTION,
+# and anything that moves in the results is variance between pods rather than
+# the pod quietly getting harder or easier. That matters: it means archetypes
+# can be adopted without silently re-baselining the calibration the rest of the
+# project rests on.
+#
+# The raw numbers are judgement, not measurement — no survey data on the EDH
+# archetype mix was found. They are knobs: cfg["archetype_weights"] overrides
+# the mix. What is NOT a judgement call is the normalisation, which is what
+# keeps them honest.
+ARCHETYPE_WEIGHTS = {"aggro": 0.25, "midrange": 0.40, "control": 0.25,
+                     "combo": 0.10}
+
+_ARCHETYPES_RAW = {
+    # board  = creature development rate       power = damage per creature
+    # spot/ae/wipe/counter = interaction density    clock = turns of offset
+    "aggro":    dict(board=1.45, power=1.35, spot=0.65, ae=0.60, wipe=0.40,
+                     counter=0.35, clock=+1.0),
+    "midrange": dict(board=1.00, power=1.00, spot=1.00, ae=1.00, wipe=1.00,
+                     counter=1.00, clock=0.0),
+    "control":  dict(board=0.55, power=0.80, spot=1.55, ae=1.60, wipe=1.90,
+                     counter=1.90, clock=+3.0),
+    "combo":    dict(board=0.45, power=0.70, spot=0.75, ae=0.80, wipe=0.70,
+                     counter=1.30, clock=-3.0),
+}
+
+
+def _normalise(raw, weights):
+    """Scale each multiplier so its weighted mean is exactly 1 (clock: 0)."""
+    out = {a: dict(v) for a, v in raw.items()}
+    for k in next(iter(raw.values())):
+        mean = sum(weights[a] * raw[a][k] for a in raw)
+        for a in out:
+            if k == "clock":
+                out[a][k] = raw[a][k] - mean
+            else:
+                out[a][k] = raw[a][k] / mean if mean else 1.0
+    return out
+
+
+ARCHETYPES = _normalise(_ARCHETYPES_RAW, ARCHETYPE_WEIGHTS)
+
+
+def pick_archetype(roll: float, weights=None) -> str:
+    """Choose an archetype from a single pre-rolled uniform, so CRN survives."""
+    w = weights or ARCHETYPE_WEIGHTS
+    acc = 0.0
+    for name, weight in w.items():
+        acc += weight
+        if roll < acc:
+            return name
+    return list(w)[-1]
+
+
 N_SLOTS = 8          # random slots per opponent per turn
 N_COUNTER_SLOTS = 10  # spells we might cast in one turn
 
@@ -49,6 +113,9 @@ N_COUNTER_SLOTS = 10  # spells we might cast in one turn
 class Opponent:
     bracket: int
     has_blue: bool
+    # None = archetypes disabled, and then `p` is the bare bracket dict, byte
+    # for byte what it was before this existed.
+    archetype: object = None
     creatures: float = 0.0
     counters_left: int = 0
     life: float = 40.0
@@ -60,21 +127,48 @@ class Opponent:
     # opponents_act() cannot silently clip them away.
     goaded_birds: float = 0.0
 
+    _pcache: object = None
+
     @property
     def p(self) -> dict:
-        return BRACKETS[self.bracket]
+        """Bracket crossed with archetype. Memoised — this is a hot path."""
+        if self._pcache is None:
+            base = BRACKETS[self.bracket]
+            if self.archetype is None:
+                self._pcache = dict(base, power=1.0)
+            else:
+                mult = ARCHETYPES[self.archetype]
+                d = dict(base)
+                for k in ("spot", "ae", "wipe", "counter", "board"):
+                    d[k] = base[k] * mult[k]
+                d["power"] = mult["power"]
+                self._pcache = d
+        return self._pcache
 
 
 def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
     """Build the pod and pre-roll every random number it will ever need."""
     r = random.Random(seed ^ 0x5EED)          # dedicated stream
     brackets = cfg.get("pod_brackets", (2, 3, 4))
+    # `clock_shift` pushes every opponent's kill turn later. The clock is a
+    # deus ex machina — it eliminates a player regardless of the board — so it
+    # is the thing you give back when you make combat carry real damage.
+    # Raising incidental_rate WITHOUT this just stacks a second kill mechanism
+    # on top of the first and craters every deck's win rate.
+    shift = cfg.get("clock_shift", 0)
+    # Only consume randomness when archetypes are ON, so the disabled path
+    # draws the identical stream it always did and old numbers reproduce.
+    use_arch = cfg.get("archetypes", False)
+    arch_weights = cfg.get("archetype_weights") or ARCHETYPE_WEIGHTS
     opps = []
     for b in brackets:
         blue = r.random() < BRACKETS[b]["blue"]
+        arch = pick_archetype(r.random(), arch_weights) if use_arch else None
         lo, hi = BRACKETS[b]["clock"]
+        off = int(round(ARCHETYPES[arch]["clock"])) if arch else 0
+        lo, hi = lo + shift + off, hi + shift + off
         opps.append(Opponent(
-            bracket=b, has_blue=blue,
+            bracket=b, has_blue=blue, archetype=arch,
             counters_left=BRACKETS[b]["counters_held"] if blue else 0,
             life=float(cfg.get("starting_life", 40)),
             # drawn from the dedicated pre-rolled stream so decks A and B face
@@ -184,8 +278,8 @@ def spot_removal(g, opp, others, rolls):
     if try_protect(g, rolls[5]):
         return
     victim = max(targets, key=lambda p: threat_of(g, p))
-    destroy(g, victim)
-    g.m["removal_eaten"] += 1
+    if destroy(g, victim, rolls[7]):
+        g.m["removal_eaten"] += 1
 
 
 def ae_removal(g, opp, others, rolls):
@@ -204,12 +298,12 @@ def ae_removal(g, opp, others, rolls):
     sweeper = (opp.bracket >= 3 and rolls[4] < 0.20)
     if sweeper:
         for p in list(targets):
-            destroy(g, p)
-        g.m["ae_removal_eaten"] += len(targets)
+            if destroy(g, p, rolls[7]):
+                g.m["ae_removal_eaten"] += 1
     else:
         victim = max(targets, key=lambda p: threat_of(g, p))
-        destroy(g, victim)
-        g.m["ae_removal_eaten"] += 1
+        if destroy(g, victim, rolls[7]):
+            g.m["ae_removal_eaten"] += 1
 
 
 def board_wipe(g, opp, rolls):
@@ -223,24 +317,42 @@ def board_wipe(g, opp, rolls):
     if try_protect(g, rolls[5]):
         return
     for p in [p for p in g.board if p.card.is_creature]:
-        destroy(g, p)
+        destroy(g, p, rolls[7])
     for o in g.opponents:
         o.creatures = 0.0
         o.goaded_birds = 0.0          # a wrath kills the Birds too
     g.m["wipes_suffered"] += 1
 
 
-def destroy(g, perm):
+def destroy(g, perm, roll=None):
+    """Remove a permanent the pod answered.
+
+    `roll` is one of that opponent's pre-rolled numbers, supplied only so that
+    INDESTRUCTIBLE can mean something. The opponent model does not distinguish
+    a Swords to Plowshares from a Doom Blade — everything is a generic "answer"
+    — so indestructible is priced statistically: `destroy_share` is the fraction
+    of an EDH pod's interaction that is literally "destroy target permanent"
+    (Doom Blade, Naturalize, most wraths) as opposed to exile, bounce, -X/-X or
+    an edict, which an indestructible permanent does not survive.
+
+    0.60 is an assumption, not a measurement. It is a knob, and a card whose
+    evaluation swings on it should be reported with that said out loud.
+    Callers that pass no roll destroy unconditionally.
+    """
     if perm not in g.board:
+        return False
+    if perm.card.indestructible and roll is not None \
+            and roll < g.cfg.get("destroy_share", 0.60):
         return
     g.board.remove(perm)
     if perm.card.is_creature and hasattr(g, "on_creature_death"):
-        g.on_creature_death(1)
+        g.on_creature_death(1, perm)
     if perm.card is g.commander:
         g.commander_cast = False          # back to the command zone
         g.commander_tax += 2
     elif not perm.is_token:
         g.graveyard.append(perm.card)
+    return True
 
 
 def opponents_act(g):
@@ -387,6 +499,26 @@ def _check_eliminations(g):
         g.result = "win"
 
 
+def combat_share(g, opp, others) -> float:
+    """P(this opponent's ATTACK comes at you) — the inverse of `your_share`.
+
+    `your_share` is threat-weighted and correct for REMOVAL: the scarier your
+    board, the more of the pod's answers point at you. Combat works the other
+    way round. Creatures swing at the player who cannot block them, and a wide
+    board is a deterrent, not a magnet. Using `your_share` for both meant the
+    model charged you combat damage for developing — exactly backwards.
+
+    Each attacker picks among the three other players, weighted by how open
+    each is: weight = 1 / (1 + blockers). With an empty board against opponents
+    holding five each you eat ~75% of the pod's attacks; with a board of seven
+    you drop to ~27%, just under the neutral 1/3.
+    """
+    mine = sum(1 for p in g.board if p.card.is_creature)
+    w_you = 1.0 / (1.0 + mine)
+    total = w_you + sum(1.0 / (1.0 + o.creatures) for o in others)
+    return w_you / total if total > 0 else 0.0
+
+
 def incidental_damage(g):
     """Opponents chip away at you every turn, not just when a clock resolves.
 
@@ -398,14 +530,18 @@ def incidental_damage(g):
     if g.result is not None or g.turn < g.cfg.get("first_attack_turn", 3):
         return
     rate = g.cfg.get("incidental_rate", 0.45)
+    mode = g.cfg.get("combat_targeting", "threat")
     for i, opp in enumerate(g.opponents):
         if not opp.alive:
             continue
         others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
-        share = your_share(g, opp, others)
-        g.your_life -= opp.creatures * rate * share
+        share = (combat_share(g, opp, others) if mode == "open"
+                 else your_share(g, opp, others))
+        # An aggro deck's creatures hit harder than a control deck's.
+        g.your_life -= opp.creatures * rate * share * opp.p.get("power", 1.0)
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
+        g.m["loss_route"] = 1          # ground down on life
 
 
 def resolve_clocks(g):
@@ -425,6 +561,7 @@ def resolve_clocks(g):
         share = your_share(g, opp, others)
         if rolls_t[i][6] < share:
             g.result = "loss"          # you were the biggest threat
+            g.m["loss_route"] = 2      # an opponent's clock picked YOU
             g.your_life = 0.0
             return
         if others:
@@ -464,6 +601,20 @@ def resolve_own_wipe(g, spare_own=False):
         return
     for p in [p for p in g.board if p.card.is_creature]:
         g.board.remove(p)
+        if p.card is g.commander:
+            # KNOWN BUG, gated so the committed tables stay valid: your own
+            # sweeper removes the commander from the battlefield WITHOUT
+            # returning it to the command zone, so `commander_cast` stays True
+            # and it is never recast. destroy() gets this right; this path
+            # never did. For Lorehold in particular the commander IS the
+            # engine — three of the four miracle windows a round — so this
+            # silently makes every self-wipe far worse than the card is.
+            # Flip `own_wipe_commander_returns` to measure the corrected rules.
+            if g.cfg.get("own_wipe_commander_returns", False):
+                g.commander_cast = False
+                g.commander_tax += 2
+        elif not p.is_token:
+            g.graveyard.append(p.card)
         if hasattr(g, "on_creature_death"):
-            g.on_creature_death(1)
+            g.on_creature_death(1, p)
     g.m["own_wipes_cast"] = g.m.get("own_wipes_cast", 0) + 1

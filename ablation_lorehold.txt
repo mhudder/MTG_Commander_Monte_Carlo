@@ -1,68 +1,3 @@
-  done 1/65: Sol Ring
-  done 2/65: Arcane Signet
-  done 3/65: Boros Signet
-  done 4/65: Talisman of Conviction
-  done 5/65: Ruby Medallion
-  done 6/65: Bender's Waterskin
-  done 7/65: Victory Chimes
-  done 8/65: Sensei's Divining Top
-  done 9/65: Scroll Rack
-  done 10/65: Library of Leng
-  done 11/65: Lightning Greaves
-  done 12/65: Monument to Endurance
-  done 13/65: Mother of Runes
-  done 14/65: Dragon's Rage Channeler
-  done 15/65: Longshot, Rebel Bowman
-  done 16/65: Guttersnipe
-  done 17/65: Pinnacle Monk
-  done 18/65: Verge Rangers
-  done 19/65: Hexing Squelcher
-  done 20/65: Storm-Kiln Artist
-  done 21/65: Monastery Mentor
-  done 22/65: The Dawning Archaic
-  done 23/65: Goliath Daydreamer
-  done 24/65: Land Tax
-  done 25/65: Artist's Talent
-  done 26/65: Double Vision
-  done 27/65: Penance
-  done 28/65: Arcane Bombardment
-  done 29/65: Smothering Tithe
-  done 30/65: Swords to Plowshares
-  done 31/65: Path to Exile
-  done 32/65: Enlightened Tutor
-  done 33/65: Boros Charm
-  done 34/65: Thrill of Possibility
-  done 35/65: Sejiri Shelter
-  done 36/65: Dawn's Truce
-  done 37/65: Chaos Warp
-  done 38/65: Generous Gift
-  done 39/65: Big Score
-  done 40/65: Unexpected Windfall
-  done 41/65: Bolt Bend
-  done 42/65: Invoke Calamity
-  done 43/65: Perch Protection
-  done 44/65: Olórin's Searing Light
-  done 45/65: Faithless Looting
-  done 46/65: Gamble
-  done 47/65: Mizzix's Mastery
-  done 48/65: Borrowed Knowledge
-  done 49/65: Promise of Loyalty
-  done 50/65: Reforge the Soul
-  done 51/65: Ultima
-  done 52/65: Farewell
-  done 53/65: Approach of the Second Sun
-  done 54/65: Emeria's Call
-  done 55/65: Hit the Mother Lode
-  done 56/65: Improvisation Capstone
-  done 57/65: Restoration Seminar
-  done 58/65: Volcanic Vision
-  done 59/65: Ondu Inversion
-  done 60/65: Call Forth the Tempest
-  done 61/65: Blasphemous Act
-  done 62/65: Soulfire Eruption
-  done 63/65: Apex of Power
-  done 64/65: Storm Herd
-  done 65/65: Rise of the Eldrazi
 
 Horizons: (10, 20).  All figures are paired differences with 95% CIs.
 
@@ -81,73 +16,74 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Rise of the Eldrazi                   +3.59+-1.97         +5.40+-1.23        +0.0275+-0.0060      both
-Monument to Endurance                 +1.93+-2.08         +4.51+-1.37        +0.0277+-0.0064      both
-Monastery Mentor                      +2.75+-1.95         +3.59+-1.13        +0.0108+-0.0052      both
-Apex of Power                         +1.13+-0.35         +3.31+-0.97        +0.0180+-0.0056      both
-Reforge the Soul                      +2.02+-1.11         +3.29+-0.77        +0.0198+-0.0064      both
-Big Score                             +2.31+-1.97         +3.15+-1.20        +0.0128+-0.0060      both
-Emeria's Call                         +1.46+-0.26         +3.03+-0.82        +0.0123+-0.0052      both
-Longshot, Rebel Bowman                +2.40+-0.38         +2.99+-0.71        +0.0228+-0.0054      both
-Arcane Bombardment                    +1.97+-1.90         +2.79+-1.30        +0.0140+-0.0067      both
-Faithless Looting                     +1.43+-0.39         +2.68+-0.95        +0.0148+-0.0060      both
-Guttersnipe                           +1.65+-0.41         +2.52+-0.89        +0.0147+-0.0046      both
-Mizzix's Mastery                      +0.92+-0.39         +2.43+-0.92        +0.0133+-0.0061      both
-Double Vision                         +0.55+-0.40         +2.35+-0.99        +0.0052+-0.0055       dmg
-Unexpected Windfall                   +1.18+-0.41         +2.31+-0.91        +0.0113+-0.0057      both
-Thrill of Possibility                 +0.77+-0.45         +2.23+-0.94        +0.0122+-0.0060      both
-Olórin's Searing Light                +1.61+-0.17         +1.95+-0.23        +0.0053+-0.0030      both
-Soulfire Eruption                     +1.26+-0.32         +1.66+-0.62        +0.0037+-0.0054       dmg
-Sol Ring                              +1.67+-0.50         +1.52+-1.05        +0.0002+-0.0058       dmg
-Borrowed Knowledge                    +0.69+-0.38         +1.23+-0.63        +0.0075+-0.0058      both
-Arcane Signet                         +0.67+-0.34         +1.15+-0.94        +0.0008+-0.0052       dmg
-Talisman of Conviction                +0.57+-0.34         +1.14+-0.92        +0.0027+-0.0052       dmg
-Victory Chimes                        +0.79+-0.56         +1.11+-0.72        +0.0040+-0.0054       dmg
-Sensei's Divining Top                 +1.17+-1.93         +0.91+-1.02        +0.0002+-0.0061        --
-Boros Charm                           +0.81+-0.15         +0.90+-0.31        +0.0023+-0.0029       dmg
-Smothering Tithe                      +1.51+-1.94         +0.81+-1.06        +0.0027+-0.0060        --
-Verge Rangers                         +0.28+-0.30         +0.78+-1.13        +0.0010+-0.0045        --
-Storm-Kiln Artist                     +0.67+-0.57         +0.70+-0.42        +0.0018+-0.0045       dmg
-Library of Leng                       +1.19+-1.99         +0.55+-0.96        -0.0013+-0.0058        --
-The Dawning Archaic                   +0.31+-0.19         +0.54+-0.46        +0.0022+-0.0040       dmg
-Boros Signet                          +0.62+-0.35         +0.46+-0.65        +0.0053+-0.0054        --
-Hit the Mother Lode                   +0.28+-0.18         +0.43+-0.53        +0.0020+-0.0039        --
-Bender's Waterskin                    +0.51+-0.34         +0.32+-0.71        -0.0013+-0.0055        --
-Lightning Greaves                     +0.04+-0.31         +0.16+-0.87        -0.0048+-0.0043       win
-Ruby Medallion                        +0.06+-0.31         -0.14+-0.92        +0.0010+-0.0055      FLIP
-Mother of Runes                       +0.23+-0.27         -0.22+-0.38        +0.0000+-0.0032      FLIP
-Scroll Rack                           -0.95+-0.44         -1.78+-0.75        -0.0100+-0.0059      both
-Penance                               -0.13+-1.75         -1.91+-1.11        -0.0117+-0.0064      both
-Blasphemous Act                       -1.86+-0.39         -3.33+-0.59        -0.0180+-0.0054      both
+Rise of the Eldrazi                   +4.03+-1.18         +5.80+-0.84        +0.0302+-0.0058      both
+Monument to Endurance                 +1.76+-0.87         +3.70+-1.08        +0.0297+-0.0064      both
+Monastery Mentor                      +3.24+-1.06         +3.60+-0.77        +0.0092+-0.0052      both
+Reforge the Soul                      +2.49+-0.99         +3.16+-0.89        +0.0158+-0.0064      both
+Emeria's Call                         +1.99+-0.33         +3.13+-0.55        +0.0143+-0.0049      both
+Faithless Looting                     +2.33+-1.00         +3.07+-0.82        +0.0178+-0.0061      both
+Big Score                             +2.08+-0.73         +3.05+-0.71        +0.0180+-0.0059      both
+Longshot, Rebel Bowman                +3.07+-0.43         +2.97+-1.34        +0.0228+-0.0056      both
+Apex of Power                         +1.41+-0.61         +2.87+-0.79        +0.0160+-0.0053      both
+Borrowed Knowledge                    +1.04+-0.40         +2.66+-0.71        +0.0103+-0.0057      both
+Mizzix's Mastery                      +1.77+-0.64         +2.56+-0.90        +0.0127+-0.0063      both
+Arcane Bombardment                    +1.80+-1.12         +2.54+-0.88        +0.0153+-0.0062      both
+Unexpected Windfall                   +2.27+-1.19         +2.39+-0.99        +0.0133+-0.0062      both
+Thrill of Possibility                 +1.74+-0.85         +2.10+-0.79        +0.0138+-0.0060      both
+Olórin's Searing Light                +2.56+-0.99         +2.06+-0.66        +0.0087+-0.0035      both
+Guttersnipe                           +2.29+-0.86         +1.81+-0.72        +0.0077+-0.0045      both
+Soulfire Eruption                     +1.59+-0.62         +1.48+-0.87        +0.0050+-0.0053       dmg
+Sol Ring                              +2.14+-0.66         +1.42+-0.82        +0.0050+-0.0059       dmg
+Arcane Signet                         +1.71+-0.67         +1.38+-0.84        +0.0040+-0.0055       dmg
+Verge Rangers                         +0.59+-0.34         +1.18+-0.58        +0.0062+-0.0048      both
+Double Vision                         +0.69+-0.86         +1.15+-1.09        +0.0052+-0.0057       dmg
+Boros Signet                          +1.35+-0.61         +1.01+-0.62        +0.0030+-0.0052       dmg
+Hit the Mother Lode                   +1.17+-0.62         +0.96+-0.51        +0.0022+-0.0038       dmg
+The Dawning Archaic                   +0.44+-0.18         +0.79+-0.48        +0.0033+-0.0039       dmg
+Victory Chimes                        +1.06+-0.57         +0.77+-0.85        +0.0035+-0.0053        --
+Boros Charm                           +0.81+-0.18         +0.56+-0.62        +0.0043+-0.0027       win
+Bender's Waterskin                    +0.90+-0.59         +0.36+-0.94        +0.0010+-0.0057        --
+Smothering Tithe                      +1.25+-1.00         +0.34+-0.83        -0.0027+-0.0059        --
+Storm-Kiln Artist                     +1.26+-0.56         +0.14+-1.36        +0.0010+-0.0047        --
+Library of Leng                       +1.05+-1.03         +0.05+-0.87        -0.0010+-0.0056        --
+Mother of Runes                       -0.15+-0.32         -0.24+-0.47        -0.0007+-0.0034        --
+Talisman of Conviction                +0.43+-0.86         -0.25+-1.06        -0.0003+-0.0051      FLIP
+Sensei's Divining Top                 +0.43+-0.87         -0.29+-0.87        +0.0002+-0.0060      FLIP
+Lightning Greaves                     +0.35+-0.48         -0.53+-0.64        -0.0007+-0.0044      FLIP
+Ruby Medallion                        +0.55+-0.70         -0.60+-0.92        -0.0032+-0.0052      FLIP
+Blasphemous Act                       -1.96+-0.34         -2.30+-1.12        -0.0067+-0.0055      both
+Penance                               -1.04+-1.22         -2.63+-1.06        -0.0082+-0.0063      both
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Storm Herd                            +7.39+-0.71        +11.76+-1.05        +0.0725+-0.0076      both
-Land Tax                              +1.47+-0.46         +2.33+-0.73        +0.0135+-0.0059      both
-Sejiri Shelter                        +0.48+-0.28         +0.77+-0.44        +0.0023+-0.0040       dmg
-Hexing Squelcher                      +0.20+-0.12         +0.67+-0.60        +0.0007+-0.0025       dmg
-Pinnacle Monk                         +0.33+-0.27         +0.58+-0.87        +0.0042+-0.0042        --
-Dawn's Truce                          +0.02+-0.07         +0.32+-0.66        +0.0003+-0.0017        --
-Dragon's Rage Channeler               +0.02+-0.18         +0.31+-0.42        +0.0032+-0.0039        --
-Goliath Daydreamer                    +1.15+-1.90         +0.27+-0.34        -0.0002+-0.0028        --
-Perch Protection                      +0.18+-0.17         +0.25+-0.25        +0.0010+-0.0028       dmg
-Invoke Calamity                       +0.07+-0.13         +0.24+-0.68        -0.0007+-0.0020        --
-Gamble                                +0.01+-0.07         +0.05+-0.11        -0.0003+-0.0011        --
-Improvisation Capstone                -0.01+-0.05         +0.04+-0.19        -0.0007+-0.0020      FLIP
-Bolt Bend                             +0.00+-0.00         +0.04+-0.03        +0.0003+-0.0005       dmg
-Approach of the Second Sun            -0.11+-0.11         +0.04+-0.76        +0.0002+-0.0020      FLIP
-Chaos Warp                            -0.00+-0.04         +0.01+-0.06        +0.0005+-0.0009      FLIP
-Restoration Seminar                   -0.00+-0.04         +0.01+-0.20        +0.0010+-0.0017      FLIP
-Swords to Plowshares                  -0.01+-0.01         +0.01+-0.01        +0.0000+-0.0000      FLIP
-Path to Exile                         -0.00+-0.00         -0.01+-0.03        -0.0002+-0.0003        --
-Generous Gift                         -0.02+-0.04         -0.02+-0.06        -0.0003+-0.0005        --
-Volcanic Vision                       -0.01+-0.03         -0.09+-0.16        +0.0007+-0.0015        --
-Artist's Talent                       +0.64+-0.50         -0.13+-0.68        +0.0012+-0.0053      FLIP
-Enlightened Tutor                     +0.58+-1.94         -0.15+-0.64        -0.0005+-0.0055      FLIP
-Call Forth the Tempest                -0.02+-0.07         -0.22+-0.35        +0.0002+-0.0014        --
-Ondu Inversion                        -0.50+-0.35         -0.86+-1.15        -0.0122+-0.0059       win
-Ultima                                -0.79+-0.22         -1.86+-0.44        -0.0138+-0.0047      both
-Promise of Loyalty                    -1.13+-0.26         -1.93+-0.86        -0.0155+-0.0045      both
-Farewell                              -1.24+-0.29         -2.16+-0.59        -0.0113+-0.0046      both
+Storm Herd                            +8.00+-0.79        +12.24+-0.89        +0.0750+-0.0073      both
+Land Tax                              +2.45+-1.17         +3.50+-0.87        +0.0170+-0.0058      both
+Sunbird's Invocation                  +1.35+-1.14         +1.76+-1.15        +0.0113+-0.0064      both
+Sejiri Shelter                        +0.69+-0.34         +0.25+-0.51        +0.0028+-0.0040        --
+Hexing Squelcher                      +0.40+-0.15         +0.17+-0.35        +0.0003+-0.0028        --
+Dawn's Truce                          +0.17+-0.16         +0.08+-0.28        -0.0013+-0.0020        --
+Generous Gift                         +0.21+-0.36         +0.04+-0.05        +0.0005+-0.0006        --
+Perch Protection                      +0.22+-0.24         +0.04+-0.29        -0.0007+-0.0027        --
+Path to Exile                         +0.00+-0.02         +0.03+-0.03        +0.0000+-0.0005        --
+Goliath Daydreamer                    +0.25+-0.25         +0.03+-0.36        +0.0003+-0.0027        --
+Artist's Talent                       +0.83+-0.78         +0.03+-0.82        -0.0007+-0.0051        --
+Chaos Warp                            +0.01+-0.02         -0.00+-0.10        -0.0005+-0.0009      FLIP
+Bolt Bend                             -0.00+-0.02         -0.01+-0.03        +0.0000+-0.0000        --
+Gamble                                +0.01+-0.04         -0.02+-0.11        -0.0005+-0.0012      FLIP
+Swords to Plowshares                  +0.01+-0.01         -0.02+-0.03        -0.0003+-0.0005      FLIP
+Call Forth the Tempest                +0.08+-0.07         -0.06+-0.25        -0.0002+-0.0014      FLIP
+Volcanic Vision                       -0.02+-0.07         -0.06+-0.15        +0.0003+-0.0014        --
+Pinnacle Monk                         +0.50+-0.33         -0.08+-0.64        +0.0033+-0.0040      FLIP
+Invoke Calamity                       +0.04+-0.11         -0.09+-0.28        -0.0007+-0.0024      FLIP
+Improvisation Capstone                +0.00+-0.08         -0.10+-0.23        +0.0008+-0.0017      FLIP
+Dragon's Rage Channeler               +0.17+-0.26         -0.13+-0.58        -0.0027+-0.0039      FLIP
+Restoration Seminar                   -0.07+-0.21         -0.17+-0.32        -0.0005+-0.0018        --
+Approach of the Second Sun            +0.21+-0.44         -0.26+-0.34        +0.0017+-0.0027      FLIP
+Enlightened Tutor                     +0.11+-0.72         -0.31+-0.96        +0.0065+-0.0054      FLIP
+Ultima                                -1.55+-0.38         -1.33+-0.75        -0.0040+-0.0048       dmg
+Promise of Loyalty                    -1.81+-0.44         -1.60+-0.66        -0.0040+-0.0046       dmg
+Ondu Inversion                        -0.73+-0.55         -1.71+-0.82        -0.0092+-0.0057      both
+Farewell                              -1.32+-0.74         -1.87+-0.71        -0.0090+-0.0048      both
+DONE

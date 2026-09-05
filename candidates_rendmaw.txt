@@ -1,0 +1,13 @@
+
+RENDMAW candidates — value over a blank of the same cost (10 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Cauldron of Essence            3     +0.96+-0.21     -0.0002+-0.0016      0.150
+  Revitalizing Repast            1     +0.71+-0.21     +0.0012+-0.0012      0.078
+  Wurmcoil Engine                6     +0.33+-0.16     -0.0003+-0.0012      0.101
+
+RENDMAW candidates — value over a blank of the same cost (20 turns)
+  card                          MV          damage          win rate  P(deploy)
+  Cauldron of Essence            3     +1.30+-0.35     +0.0113+-0.0048      0.187
+  Revitalizing Repast            1     +0.65+-0.34     +0.0040+-0.0034      0.086
+  Wurmcoil Engine                6     +0.82+-0.31     +0.0065+-0.0040      0.153
+DONE

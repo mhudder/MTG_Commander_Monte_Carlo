@@ -14,3 +14,6 @@ ablation_cache_*.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Ablation stderr progress logs — noise, the .txt tables are the artefact
+ablation_*.log

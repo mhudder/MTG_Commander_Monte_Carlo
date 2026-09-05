@@ -56,6 +56,8 @@ class Card:
     lifegain: float = 0.0     # life gained on resolution
     drain: float = 0.0        # each opponent loses N and you gain N
     lifelink: bool = False
+    indestructible: bool = False
+    haste: bool = False
     x_pips: int = 0           # generic pips that are actually {X}
     alt_costs: tuple = ()     # ((cost_dict, "tag"), ...) modal / alternative costs
     tokens: tuple = ()        # (count, power, toughness) made on resolution
@@ -198,6 +200,10 @@ class Game:
             "test_card_answered": 0,
             "test_card_removed": 0,
             "test_card_countered": 0,
+            "cauldron_reanimations": 0,
+            "loss_route": 0,
+            "wurmcoil_deaths": 0,
+            "lifelinked": 0.0,
         }
         self.damage_by_turn: list[float] = []
         self.made_token_this_turn = False
@@ -270,8 +276,7 @@ class Game:
         if self.result == "win" and self.m["turn_lethal"] == 99:
             self.m["turn_lethal"] = self.turn
 
-    def on_creature_death(self, n: int = 1):
-        self.creature_died_this_turn = True
+    def on_creature_death(self, n: int = 1, perm: Optional[Permanent] = None):
         """Aristocrats drain. Each Blood Artist effect costs the pod 3 life per
         creature that dies (1 from each of three opponents).
 
@@ -279,13 +284,28 @@ class Game:
         engine: in a deck that makes and loses a dozen tokens, a board wipe with
         Blood Artist out is thirty-plus damage that was going entirely
         uncounted.
+
+        `perm` is the permanent that died, when the caller knows it — needed for
+        leaves-the-battlefield triggers like Wurmcoil Engine's.
         """
-        _ = n
+        self.creature_died_this_turn = True
         drainers = sum(1 for p in self.board
                        if p.card.name in ("Blood Artist",
-                                          "The Meathook Massacre"))
+                                          "The Meathook Massacre",
+                                          "Cauldron of Essence"))
         if drainers:
             self.deal_pod_damage(3.0 * n * drainers)
+        # Cauldron of Essence also gains you 1 life per death per copy, which
+        # deal_pod_damage does not do (it is a symmetric "each opponent loses").
+        self.your_life += 1.0 * n * sum(
+            1 for p in self.board if p.card.name == "Cauldron of Essence")
+
+        # "When this creature dies, create a 3/3 deathtouch Wurm and a 3/3
+        # lifelink Wurm." Only the real card, not its own tokens.
+        if perm is not None and perm.card.name == "Wurmcoil Engine" \
+                and not perm.is_token:
+            self.make_tokens(2, 3, 3, "Wurm")
+            self.m["wurmcoil_deaths"] += 1
 
     # -- P/T resolution ------------------------------------------------------
 
@@ -357,6 +377,14 @@ def available_mana(g: Game) -> list[frozenset]:
             src = any_color if all_lands_any else c.produces
             amt = 2 if "bounce" in c.tags else 1
             units.extend([src] * amt)
+            # Crypt Ghast: "Whenever you tap a SWAMP for mana, add an
+            # additional {B}." Swamp is a land subtype the Card model does not
+            # carry, so the lands that actually have it are tagged "swamp" in
+            # the deck module — for Karlov that is the basics plus Godless
+            # Shrine, and NOT Tainted Field, Caves of Koilos, Fetid Heath or
+            # the rest, which only produce black.
+            if "swamp" in c.tags and g.has("Crypt Ghast"):
+                units.append(frozenset({"B"}))
         elif c.mana_ability:
             if c.is_creature and p.sick:
                 continue
@@ -512,6 +540,15 @@ def main_phase(g: Game, precombat: bool = False):
         if alt_tag == "impending":
             # enters as a noncreature enchantment; the body arrives later
             g.m["impending_casts"] += 1
+        if card.script == "repast":
+            # Revitalizing Repast: "put a +1/+1 counter on target creature. It
+            # gains indestructible until end of turn." The counter is permanent
+            # and is modelled; the indestructible half is not, because this
+            # engine cannot hold an instant up for a removal spell it does not
+            # see coming. Its number is therefore a floor.
+            targets = [p for p in g.board if p.card.is_creature]
+            if targets:
+                max(targets, key=g.power_of).counters += 1
         if card.script == "stampede":
             # +X/+X and trample until end of turn, X = greatest power you
             # control. In a deck that goes this wide it is a finisher, and the
@@ -569,6 +606,8 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
             break
         c = p.card
         amt = 2 if "bounce" in c.tags else (c.mana_ability[0] if c.mana_ability else 1)
+        if c.is_land and "swamp" in c.tags and g.has("Crypt Ghast"):
+            amt += 1              # the Swamp really did produce two mana
         p.tapped = True
         left -= amt
 
@@ -700,6 +739,32 @@ def activations(g: Game):
             g.draw(3)
             g.m["baba_activations"] += 1
 
+    # Cauldron of Essence: "{1}{B}{G}, {T}, Sacrifice a creature: return target
+    # creature card from your graveyard to the battlefield. Sorcery speed."
+    # A repeatable sac outlet *and* recursion, so it feeds its own drain half.
+    # The graveyard here is stocked by opponents' removal and wipes (see
+    # opponents.destroy), which is exactly when you want the ability.
+    if g.has("Cauldron of Essence"):
+        pool = [c for c in g.graveyard if c.is_creature]
+        fodder = [p for p in g.board if p.card.is_creature
+                  and p.card is not g.commander]
+        if pool and fodder:
+            pay = can_pay({"gen": 1, "B": 1, "G": 1}, units)
+            if pay is not None:
+                spend(g, pay, units)
+                for i in sorted(pay, reverse=True):
+                    units.pop(i)
+                victim = min(fodder, key=lambda p: g.power_of(p))
+                g.board.remove(victim)
+                g.on_creature_death(1, victim)
+                best = max(pool, key=lambda c: c.power)
+                g.graveyard.remove(best)
+                perm = Permanent(card=best, sick=True,
+                                 base_p=best.power, base_t=best.toughness)
+                g.board.append(perm)
+                run_etb(g, perm)
+                g.m["cauldron_reanimations"] += 1
+
     # Ashnod's Altar: sacrifice spare tokens for mana. Modelled conservatively
     # (only genuine excess) because the real value here is not the mana but the
     # deaths it manufactures for Blood Artist and The Meathook Massacre.
@@ -770,6 +835,27 @@ def combat(g: Game):
         dmg = OPP.damage_through(g, attackers) * scale
     else:
         dmg *= (1.0 - g.cfg.get("block_rate", 0.30))
+
+    # Lifelink, taken as the attacker's power: it pays out whether the damage
+    # lands on a player or on a blocker.
+    #
+    # DO NOT read this as survivability. Measured 2026-09-04: 100% of losses in
+    # all three decks are opponent CLOCKS (opponents.resolve_clocks), which are
+    # threat-weighted and do not read your life total at all.
+    #
+    # And this is BY DESIGN, not a close race. With the clocks disabled
+    # entirely, incidental_damage kills you in 0.4% of Rendmaw games and 0.6%
+    # of Lorehold games by turn 20 (2.9% by turn 30, 0.0% for Karlov). The
+    # opponents' board is a float capped at 7 that chips for
+    # `creatures * 0.45 * your_share` — it was never calibrated to kill anyone.
+    # The clock IS the abstraction standing in for "an opponent actually wins".
+    #
+    # So a lifelinking body's defensive value here is nil, and any card whose
+    # whole job is a bigger life total is MODEL-BLIND.
+    for p in attackers:
+        if p.card.lifelink:
+            g.your_life += g.power_of(p)
+            g.m["lifelinked"] += g.power_of(p)
 
     for p in attackers:
         p.tapped = True

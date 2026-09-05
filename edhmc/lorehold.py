@@ -104,6 +104,14 @@ class LoreholdGame:
             "extra_turns": 0,
             "turn_won": 99,
             "free_casts": 0,
+            "escape_casts": 0,
+            "loss_route": 0,
+            "sunbird_casts": 0,
+            "pyremaw_damage": 0.0,
+            "hymn_life_delta": 0.0,
+            "sands_life_delta": 0.0,
+            "sunbird_mv": 0.0,
+            "brass_treasures": 0,
             "bombardment_copies": 0,
             "monument_triggers": 0,
             "mastery_copies": 0,
@@ -464,6 +472,17 @@ def on_cast_triggers(g, card, is_copy=False):
         # Urabrask: 1 damage to ONE target opponent per instant/sorcery.
         deal_pod_damage(g, 1.0 * sum(1 for p in g.board
                                      if p.card.name.startswith("Urabrask")))
+        # Caldera Pyremaw: "put a +1/+1 counter on this creature. THEN this
+        # creature deals damage equal to its power to target opponent." The
+        # counter lands first, so the first trigger already hits for 4, and it
+        # is single-target, not each-opponent. It keys off CAST, so Bombardment
+        # and Mastery copies (genuinely cast) set it off and Double Vision
+        # copies (put on the stack) do not.
+        for q in g.board:
+            if q.card.name == "Caldera Pyremaw":
+                q.counters += 1
+                deal_pod_damage(g, float(g.power_of(q)), each=False)
+                g.m["pyremaw_damage"] += g.power_of(q)
 
     if "Creature" not in card.types:
         g.noncreature_this_turn += 1
@@ -544,6 +563,13 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
     if sc in ("treasures", "draw2_treasure"):
         g.treasures += card.treasures
         g.m["treasures_made"] += card.treasures
+    if sc == "brass_bounty":
+        # "For each LAND you control, create a Treasure token." Lands only —
+        # not permanents, and not the Treasures you already have.
+        n = sum(1 for p in g.board if p.card.is_land)
+        g.treasures += n
+        g.m["treasures_made"] += n
+        g.m["brass_treasures"] += n
     if sc in ("draw2", "draw2_treasure"):
         _draw_into_hand(g, 2)
     elif sc == "draw4":
@@ -566,6 +592,28 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
                if "Instant" in c.types or "Sorcery" in c.types) >= 2:
             deal_pod_damage(g, g.cfg.get("opp_avg_power", 2.5)
                             * len(OPP.living(g)))
+    elif sc == "invincible_hymn":
+        # "Count the number of cards in your library. Your life total BECOMES
+        # that number." Not lifegain — a set, and it can go down.
+        g.m["hymn_life_delta"] += len(g.library) - g.your_life
+        g.your_life = float(len(g.library))
+    elif sc == "reverse_sands":
+        # "Redistribute any number of players' life totals." The multiset of
+        # totals is preserved; you just reassign it. A pilot takes the biggest
+        # for themselves and hands the smallest to whoever is most dangerous,
+        # which is what the opponent model's `opponent_threat` ranks.
+        alive = OPP.living(g)
+        if alive:
+            pool = sorted([g.your_life] + [o.life for o in alive], reverse=True)
+            g.m["sands_life_delta"] += pool[0] - g.your_life
+            g.your_life = pool[0]
+            rest = pool[1:]
+            ranked = sorted(alive, key=lambda o: OPP.opponent_threat(o, g.turn),
+                            reverse=True)
+            # biggest threat gets the smallest remaining total
+            for o, life in zip(ranked, reversed(rest)):
+                o.life = life
+            OPP._check_eliminations(g)
     elif sc == "storm_herd":
         make_tokens(g, g.cfg.get("storm_herd_x", 40), 1, 1, "Pegasus")
     elif sc == "extra_turn":
@@ -650,7 +698,38 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         on_cast_triggers(g, card, is_copy=True)
 
 
-def resolve_spell(g, card, paid):
+def sunbird(g, card):
+    """Sunbird's Invocation: "Whenever you cast a spell FROM YOUR HAND, reveal
+    the top X cards of your library, where X is that spell's mana value. You may
+    cast a spell with mana value X or less from among cards revealed this way
+    without paying its mana cost. Put the rest on the bottom in a random order."
+
+    Two clauses do the work in this deck and both are modelled literally. X is
+    the spell's mana value, so a ten-drop digs ten deep; and the free spell must
+    itself be MV <= X, which is why the trigger is worth so much more off the
+    top end of the curve than off a Signet.
+
+    The free cast is NOT from hand, so it cannot re-trigger this.
+    """
+    x = int(card.mv)
+    if x <= 0 or not g.library:
+        return
+    revealed = [g.library.pop() for _ in range(min(x, len(g.library)))]
+    castable = [c for c in revealed if not c.is_land and c.mv <= x]
+    pick = max(castable, key=lambda c: (c.free_mv, c.priority), default=None)
+    if pick is not None:
+        revealed.remove(pick)
+    g.rng.shuffle(revealed)
+    g.library[0:0] = revealed          # index 0 is the bottom of the library
+    if pick is None:
+        return
+    g.m["free_casts"] += 1
+    g.m["sunbird_casts"] += 1
+    g.m["sunbird_mv"] += pick.free_mv
+    resolve_spell(g, pick, 0, from_hand=False)
+
+
+def resolve_spell(g, card, paid, from_hand=True):
     g.last_paid = paid
     g.m["spells_cast"] += 1
     g.m["total_mv_cast"] += card.mv
@@ -664,7 +743,7 @@ def resolve_spell(g, card, paid):
     on_cast_triggers(g, card)
 
     if card.is_permanent:
-        g.board.append(Permanent(card=card, sick=True))
+        g.board.append(Permanent(card=card, sick=not card.haste))
     else:
         g.graveyard.append(card)
 
@@ -673,6 +752,51 @@ def resolve_spell(g, card, paid):
             g.has("Storm-Kiln Artist"):
         g.treasures += 1
         g.m["treasures_made"] += 1
+
+    # Sunbird's Invocation fires on cast, but the reveal is resolved here so
+    # that the triggering spell has already been put onto the battlefield or
+    # into the graveyard — which matters for the free spell it finds.
+    if from_hand and g.has("Sunbird's Invocation") \
+            and card.name != "Sunbird's Invocation":
+        sunbird(g, card)          # it is not on the battlefield for its own cast
+
+
+def underworld_breach(g):
+    """Underworld Breach: "Each nonland card in your graveyard has escape. The
+    escape cost is equal to the card's mana cost plus exile three OTHER cards
+    from your graveyard. At the beginning of the end step, sacrifice this."
+
+    Two clauses decide what this card is worth in a fair deck, and both are
+    modelled. You pay the FULL mana cost — escape cheats cards, not mana, so
+    nothing here lands in `mv_cheated`. And the enchantment is sacrificed at the
+    next end step, so a hardcast Breach is a one-turn effect: whatever leftover
+    mana you have on the turn it resolves, converted into graveyard spells at a
+    rate of three exiled cards each.
+
+    Called after the postcombat main phase, which is where the leftover mana is.
+    """
+    if not g.has("Underworld Breach"):
+        return
+    for _ in range(g.cfg.get("breach_cap", 4)):
+        pool = [c for c in g.graveyard if not c.is_land]
+        if len(pool) < 4:                 # the card itself plus three to exile
+            return
+        units = mana_units(g)
+        options = []
+        for c in pool:
+            cost = reduce_cost(g, c)
+            if can_pay(cost, units) is not None:
+                options.append((c, cost))
+        if not options:
+            return
+        card, cost = max(options, key=lambda it: (it[0].priority, it[0].mv))
+        paid = pay(g, cost, units)
+        g.graveyard.remove(card)
+        g.m["escape_casts"] += 1
+        # exile three OTHER cards from the graveyard
+        for c in [x for x in g.graveyard if not x.is_land][:3]:
+            g.graveyard.remove(c)
+        resolve_spell(g, card, paid, from_hand=False)
 
 
 def hold_for_miracle(g, card):
@@ -907,7 +1031,7 @@ def take_turn(g):
             g.library.pop()
             g.m["upkeep_free_casts"] += 1
             g.m["mv_cheated"] += top.free_mv
-            resolve_spell(g, top, 0)
+            resolve_spell(g, top, 0, from_hand=False)
         else:
             units = mana_units(g)
             cost = reduce_cost(g, top)
@@ -915,7 +1039,7 @@ def take_turn(g):
                 g.library.pop()
                 paid = pay(g, cost, units)
                 g.m["upkeep_free_casts"] += 1
-                resolve_spell(g, top, paid)
+                resolve_spell(g, top, paid, from_hand=False)
 
     set_top(g)
     miracle_window(g)          # your draw step
@@ -923,6 +1047,14 @@ def take_turn(g):
     main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
     combat(g)
     main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
+
+    underworld_breach(g)
+    # "At the beginning of the end step, sacrifice this enchantment." Note this
+    # is EACH end step, so a Breach that resolves on your turn is gone before
+    # the opponents' miracle windows ever open.
+    for p in [p for p in g.board if p.card.name == "Underworld Breach"]:
+        g.board.remove(p)
+        g.graveyard.append(p.card)
 
     g.float_mana = len(mana_units(g))
     g.m["mana_floated"] += g.float_mana

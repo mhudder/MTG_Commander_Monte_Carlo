@@ -1,0 +1,12 @@
+
+LOREHOLD candidates — value over a blank of the same cost (10 turns)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Sunbird's Invocation           6     +0.61+-0.58     +0.0018+-0.0023     +0.84+-0.38       0.098
+  Brass's Bounty                 7     +0.48+-0.28     +0.0003+-0.0015     -0.01+-0.20       0.145
+  Underworld Breach              2     +0.32+-0.26     +0.0015+-0.0019     +0.31+-0.26       0.183
+
+LOREHOLD candidates — value over a blank of the same cost (20 turns)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Sunbird's Invocation           6     +1.46+-0.88     +0.0095+-0.0066     +2.23+-0.96       0.181
+  Brass's Bounty                 7     +0.96+-0.81     -0.0018+-0.0040     +0.38+-0.41       0.233
+  Underworld Breach              2     +1.77+-1.05     +0.0067+-0.0052     +2.03+-0.79       0.257

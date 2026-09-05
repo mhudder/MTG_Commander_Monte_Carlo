@@ -1,0 +1,41 @@
+
+=== karlov2  (10 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak
+    IN  Starscape Cleric, Enduring Tenacity
+      won                   +0.0353  [ +0.0297,  +0.0413] *
+      damage                +6.9402  [ +6.2566,  +7.6282] *
+      lifegain_triggers     -0.2130  [ -0.3148,  -0.1125] *
+      final_life            -0.3266  [ -0.8993,  +0.2362]  
+      cards_drawn           -0.1578  [ -0.1892,  -0.1278] *
+      stranded_mv           +1.8483  [ +1.3765,  +2.3115] *
+
+=== karlov2  (20 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak
+    IN  Starscape Cleric, Enduring Tenacity
+      won                   +0.0480  [ +0.0400,  +0.0558] *
+      damage                +7.0463  [ +6.2913,  +7.8185] *
+      lifegain_triggers     -0.5240  [ -0.6578,  -0.3937] *
+      final_life            +2.5916  [ +1.7470,  +3.4314] *
+      cards_drawn           -0.4572  [ -0.5387,  -0.3792] *
+      stranded_mv           +2.3843  [ +1.7378,  +3.0347] *
+
+=== karlov3  (10 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak, Lightning Greaves
+    IN  Starscape Cleric, Enduring Tenacity, Exemplar of Light
+      won                   +0.0397  [ +0.0335,  +0.0463] *
+      damage                +8.3982  [ +7.6284,  +9.1691] *
+      lifegain_triggers     -0.0953  [ -0.2130,  +0.0217]  
+      final_life            +0.2538  [ -0.4383,  +0.9394]  
+      cards_drawn           +0.0653  [ +0.0230,  +0.1058] *
+      stranded_mv           +5.5560  [ +5.0033,  +6.1040] *
+
+=== karlov3  (20 turns, n=6,000 paired)
+    OUT Swamp, Whispersilk Cloak, Lightning Greaves
+    IN  Starscape Cleric, Enduring Tenacity, Exemplar of Light
+      won                   +0.0617  [ +0.0527,  +0.0707] *
+      damage                +9.2320  [ +8.3060, +10.1812] *
+      lifegain_triggers     -0.3983  [ -0.5550,  -0.2453] *
+      final_life            +4.2371  [ +3.1494,  +5.3833] *
+      cards_drawn           -0.1957  [ -0.2873,  -0.1068] *
+      stranded_mv           +6.9300  [ +6.2014,  +7.6923] *
+DONE

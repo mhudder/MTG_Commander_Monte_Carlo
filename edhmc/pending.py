@@ -189,19 +189,209 @@ COMMITTED: list[Change] = [
 # ---------------------------------------------------------------------------
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
-CHANGES: list[Change] = []
+CHANGES: list[Change] = [
+    Change(
+        deck="karlov",
+        remove="Swamp",
+        add="Starscape Cleric",
+        staged="2026-09-04",
+        rationale=(
+            "Marauding Blight-Priest's trigger word for word — 'whenever you "
+            "gain life, each opponent loses 1 life' — at half the mana, on a "
+            "two-power flier. This deck produces 16+ lifegain EVENTS a game "
+            "and each one is 3 pod life, so the rate matters far more than the "
+            "body. It out-damages every card in ablation_karlov.txt: +4.13 "
+            "over a blank at 10 turns against Kambal's +3.64."
+        ),
+        evidence=(
+            "Measured as the real 2-for-2 (this and Enduring Tenacity in, a "
+            "Swamp and Whispersilk Cloak out), 6,000 paired games, mixed pod: "
+            "win rate +0.0353 [+0.0297, +0.0413] at 10 turns and +0.0480 "
+            "[+0.0400, +0.0558] at 20; damage +6.94 and +7.05. Alone against a "
+            "blank of the same cost it is +4.13+-0.46 damage and +0.0118+-"
+            "0.0035 win at 10 turns, both signals at both horizons."
+        ),
+        notes=(
+            "FLOOR in two places. Flying is unmodelled anywhere in the engine "
+            "(queued work item 1), and its Offspring cost is paid in only 25% "
+            "of casts because the greedy main phase has usually spent the mana "
+            "already. Its 'can't block' drawback is also unmodelled, but the "
+            "engine never blocks with your creatures, so that costs it "
+            "nothing it would otherwise have. The land cut is the real price: "
+            "stranded_mv +1.85 at 10 turns. 37 lands -> 36."
+        ),
+        reverified=(
+            "RE-VERIFIED 2026-09-04 under POD v3, which is now the DEFAULT pod (combat_targeting='open', incidental_rate=1.0, clock_shift=2, archetypes on) and the first pod model in which your life total is load-bearing. Measured as the same 3-for-3, 6,000 paired games: win rate +0.0362 [+0.0300, +0.0425] at 10 turns and +0.0638 [+0.0550, +0.0727] at 20; damage +6.89 and +7.68. Against +0.0397 and +0.0617 on the old pod, and +0.0483 / +0.0773 on pod v2 without archetypes. Significant at both horizons on every pod tried. The package adds two blockers and a lifelinker to a deck that now takes real attacks, so it holds up precisely where the modelling got better. Decision stands."
+        ),
+    ),
+    Change(
+        deck="karlov",
+        remove="Whispersilk Cloak",
+        add="Enduring Tenacity",
+        staged="2026-09-04",
+        rationale=(
+            "A FOURTH Exquisite Blood combo piece, which is the larger half of "
+            "its value. Its trigger is Sanguine Bond's word for word ('whenever "
+            "you gain life, target opponent loses that much life'), so it loops "
+            "with Exquisite Blood unaided and with no mana; karlov.COMBO_LOOP "
+            "was corrected to include it. It assembles the loop in 8.8% of the "
+            "games it resolves. Whispersilk Cloak ablates to +0.32/+0.25 "
+            "damage and -0.0007 win rate — inside its own bars, and three "
+            "other shroud sources remain (Swiftfoot Boots, Mother of Runes, "
+            "Lightning Greaves)."
+        ),
+        evidence=(
+            "Against a blank of the same cost, 6,000 paired games: win rate "
+            "+0.0195 [+0.0154, +0.0236] at 10 turns and +0.0217 [+0.0163, "
+            "+0.0271] at 20; damage +2.74 and +2.48. That win rate would rank "
+            "FOURTH in the whole deck, behind only Felidar Sovereign "
+            "(+0.0587), Exquisite Blood (+0.0242) and Vito (+0.0228)."
+        ),
+        notes=(
+            "This is the ADDITION measurement, so the redundancy with Sanguine "
+            "Bond and Vito is already priced in — unlike leave-one-out, which "
+            "understates every member of an interchangeable group. Its death "
+            "trigger fires 0.60 times a game: it returns as a noncreature "
+            "enchantment and keeps draining through a wrath."
+        ),
+        reverified=(
+            "RE-VERIFIED 2026-09-04 under POD v3, which is now the DEFAULT pod (combat_targeting='open', incidental_rate=1.0, clock_shift=2, archetypes on) and the first pod model in which your life total is load-bearing. Measured as the same 3-for-3, 6,000 paired games: win rate +0.0362 [+0.0300, +0.0425] at 10 turns and +0.0638 [+0.0550, +0.0727] at 20; damage +6.89 and +7.68. Against +0.0397 and +0.0617 on the old pod, and +0.0483 / +0.0773 on pod v2 without archetypes. Significant at both horizons on every pod tried. The package adds two blockers and a lifelinker to a deck that now takes real attacks, so it holds up precisely where the modelling got better. Decision stands."
+        ),
+    ),
+    Change(
+        deck="karlov",
+        remove="Lightning Greaves",
+        add="Exemplar of Light",
+        staged="2026-09-04",
+        rationale=(
+            "Lightning Greaves is the worst card in the deck by win rate "
+            "(-0.0040+-0.0029, signal 'both') and the only one whose damage is "
+            "negative at both horizons. Cutting it still leaves Swiftfoot "
+            "Boots and Mother of Runes as shroud sources for the commander. "
+            "Exemplar of Light takes a +1/+1 counter per lifegain EVENT — 16.3 "
+            "of them a game — and draws a card the first time each turn it "
+            "gets one, so it is a threat and a draw engine off the same "
+            "trigger the whole deck is built on."
+        ),
+        evidence=(
+            "Measured as the real 3-for-3 alongside the two changes above "
+            "(Swamp, Whispersilk Cloak and Lightning Greaves out; Starscape "
+            "Cleric, Enduring Tenacity and Exemplar of Light in), 6,000 paired "
+            "games: win rate +0.0397 [+0.0335, +0.0463] at 10 turns and "
+            "+0.0617 [+0.0527, +0.0707] at 20, against +0.0353 and +0.0480 "
+            "for the 2-for-2 without it. Damage +8.40 and +9.23. Alone against "
+            "a blank of the same cost, +2.11+-0.47 damage and +0.0090+-0.0046 "
+            "win rate at 20 turns."
+        ),
+        notes=(
+            "COST, measured: this is the swap that strands mana. stranded_mv "
+            "+5.56 at 10 turns for the 3-for-3 against +1.85 for the 2-for-2 "
+            "— a four-drop replacing a two-drop on top of the Swamp already "
+            "cut. Watch the curve if the deck starts stumbling. Its flying is "
+            "unmodelled (queued work item 1), so the body is a floor."
+        ),
+        reverified=(
+            "RE-VERIFIED 2026-09-04 under POD v3, which is now the DEFAULT pod (combat_targeting='open', incidental_rate=1.0, clock_shift=2, archetypes on) and the first pod model in which your life total is load-bearing. Measured as the same 3-for-3, 6,000 paired games: win rate +0.0362 [+0.0300, +0.0425] at 10 turns and +0.0638 [+0.0550, +0.0727] at 20; damage +6.89 and +7.68. Against +0.0397 and +0.0617 on the old pod, and +0.0483 / +0.0773 on pod v2 without archetypes. Significant at both horizons on every pod tried. The package adds two blockers and a lifelinker to a deck that now takes real attacks, so it holds up precisely where the modelling got better. Decision stands."
+        ),
+    ),
+    Change(
+        deck="rendmaw",
+        remove="Idol of Oblivion",
+        add="Cauldron of Essence",
+        staged="2026-09-04",
+        rationale=(
+            "Cauldron's drain half is The Meathook Massacre's text word for "
+            "word — 'each opponent loses 1 life and you gain 1 life' — so it "
+            "is 3 pod life per creature death in a deck that loses a dozen "
+            "tokens a game: 12.4 drain damage per game it resolves. Its second "
+            "half is a repeatable sac outlet AND recursion (0.55 reanimations "
+            "a game), stocked mostly by the pod's own wraths, which is exactly "
+            "when you want it. Idol of Oblivion is a noncreature artifact that "
+            "ablates inside its own error bars, so cutting it costs no body."
+        ),
+        evidence=(
+            "Measured as the real swap under POD v3 (the current default), "
+            "6,000 paired games: win rate +0.0027 [+0.0007, +0.0048] at 10 "
+            "turns and +0.0135 [+0.0088, +0.0182] at 20; damage +0.95 and "
+            "+1.03. Significant on both metrics at both horizons."
+        ),
+        notes=(
+            "THE CUT CHANGED, and this is the clearest thing the new pod model "
+            "has produced. The original staging cut Ornithopter of Paradise, "
+            "which measured fine on the old pod (+0.0025 / +0.0158) and then "
+            "DECAYED as the model improved: v2 +0.0018 / +0.0155, v3 -0.0015 "
+            "[-0.0037, +0.0007] / +0.0088. The mechanism is that Ornithopter "
+            "is a 0/2 BODY as well as a dork and Cauldron is not a creature — "
+            "under pod v3 creatures attack whoever cannot block, so a spare "
+            "blocker is worth something the old pod priced at exactly zero. "
+            "Controlled check, same card in, three different cuts, pod v3, "
+            "20 turns: cutting the noncreature Idol +0.0135 [+0.0088, +0.0182]; "
+            "cutting the 0/2 Ornithopter +0.0088 [+0.0038, +0.0138]; cutting "
+            "the 1/2 Dockside Chef +0.0048 [+0.0000, +0.0097]. Monotonic in "
+            "whether the cut was a body. "
+            "COSTS, both measured and both real: Cauldron is one card type, so "
+            "the swap still loses a commander trigger, and Idol is this deck's "
+            "token-payoff draw engine — tokens_made -0.15. "
+            "SEPARATELY: the engine models Blood Artist at 3x its real drain, "
+            "which inflates the baseline Cauldron is measured alongside. "
+            "Cauldron's 3.0 is the one of the two that is correct."
+        ),
+    ),
+    Change(
+        deck="lorehold",
+        remove="Scroll Rack",
+        add="Sunbird's Invocation",
+        staged="2026-09-04",
+        rationale=(
+            "'Whenever you cast a spell FROM YOUR HAND, reveal the top X, X = "
+            "that spell's mana value; you may cast a spell with mana value X "
+            "or less from among them free.' X scaling off the triggering "
+            "spell is what makes it a Lorehold card rather than a generic "
+            "one: this curve tops out at twelve, so a big spell digs deep and "
+            "can free-cast something big. Fires 3.6 times a game for an "
+            "average free spell of MV 3.8. Miracles DO trigger it (a miracled "
+            "card is cast from hand); Galvanoth, Radiant Scrollwielder, The "
+            "Dawning Archaic and Bombardment/Mastery copies do not."
+        ),
+        evidence=(
+            "Measured as the real swap, 6,000 paired games: win rate +0.0077 "
+            "[+0.0047, +0.0108] at 10 turns and +0.0215 [+0.0142, +0.0288] at "
+            "20; mv_cheated +2.12 and +4.91; damage +2.14 and +4.20; cards "
+            "drawn +0.68 and +0.90. Every metric significant at both horizons."
+        ),
+        notes=(
+            "Scroll Rack is the cut because it is the deck's worst "
+            "model-evaluated NON-WIPE card (-1.78 damage, -0.0100 win, signal "
+            "'both'): paying {1} and a tap to set the top competes with the "
+            "miracle payment itself. Penance is deliberately left alone — it "
+            "is already earmarked for Galvanoth in the queued work. "
+            "COST: replacing a two-drop with a six-drop, stranded_mv +4.28 at "
+            "10 turns. The alternative cut of Improvisation Capstone strands "
+            "LESS (-0.98) but wins less (+0.0045 / +0.0128), so this is the "
+            "better of the two measured options."
+        ),
+        reverified=(
+            "RE-VERIFIED 2026-09-04 under POD v3, now the default. 6,000 paired games: win rate +0.0032 [+0.0005, +0.0058] at 10 turns and +0.0167 [+0.0103, +0.0228] at 20; damage +1.98 and +3.05. Against +0.0077 / +0.0215 on the old pod. Significant at both horizons, but the 10-turn margin is thin and Lorehold is the deck the new pod punishes hardest — eleven creatures, so it eats the pod's attacks and carries the highest life-share of losses of the three decks. Sign, significance and rank all survive. Decision stands."
+        ),
+    ),
+]
 
 
 DECKS = {
     # March of the World Ooze is COMMITTED as of v12, so it is in the deck
     # list itself and no longer a swap-in candidate.
-    "rendmaw": (rendmaw_v12, {}),
+    "rendmaw": (rendmaw_v12, {
+        "Cauldron of Essence": rendmaw_v12.CAULDRON_OF_ESSENCE}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
         "Molecule Man": lorehold_v16.MOLECULE_MAN,
-        "Galvanoth": lorehold_v16.GALVANOTH}),
-    "karlov": (karlov_v1, {}),
+        "Galvanoth": lorehold_v16.GALVANOTH,
+        "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
+    "karlov": (karlov_v1, {
+        "Starscape Cleric": karlov_v1.STARSCAPE_CLERIC,
+        "Enduring Tenacity": karlov_v1.ENDURING_TENACITY,
+        "Exemplar of Light": karlov_v1.EXEMPLAR_OF_LIGHT}),
 }
 
 
