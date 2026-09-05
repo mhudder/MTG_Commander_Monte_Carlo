@@ -15,7 +15,7 @@ from edhmc.pending import build_pending
 from edhmc.experiment import run_ab, analyse, POD_V2
 
 from edhmc.decks.rendmaw_v12 import CAULDRON_OF_ESSENCE
-from edhmc.decks.lorehold_v16 import SUNBIRDS_INVOCATION
+from edhmc.decks.lorehold_v16 import SUNBIRDS_INVOCATION, GALVANOTH
 from edhmc.decks.karlov_v2 import (STARSCAPE_CLERIC, ENDURING_TENACITY,
                                    EXEMPLAR_OF_LIGHT)
 
@@ -46,6 +46,9 @@ SWAPS = {
                      ["Idol of Oblivion"], [CAULDRON_OF_ESSENCE]),
     "rendmaw_dockside": ("rendmaw", rendmaw_sim,
                          ["Dockside Chef"], [CAULDRON_OF_ESSENCE]),
+    # Queued work item 3: "cut Penance, add Galvanoth - decided, not staged."
+    "penance_galvanoth": ("lorehold", lorehold_sim,
+                          ["Penance"], [GALVANOTH]),
     "lorehold_scrollrack": ("lorehold", lorehold_sim,
                             ["Scroll Rack"], [SUNBIRDS_INVOCATION]),
     "lorehold_capstone": ("lorehold", lorehold_sim,

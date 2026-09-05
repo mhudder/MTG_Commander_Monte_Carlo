@@ -100,9 +100,13 @@ SCRIPTED_LOREHOLD = {
     # mana
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
-    # top-of-library manipulation
-    "Sensei's Divining Top", "Scroll Rack", "Library of Leng",
-    "Penance", "Verge Rangers",
+    # top-of-library manipulation. Penance and Scroll Rack left the deck in
+    # the 2026-09-05 staging; Galvanoth replaced Penance and IS implemented —
+    # lorehold.take_turn casts the top card free at upkeep if it is an
+    # instant or sorcery, before the draw step, so the miracle window is
+    # still live afterwards.
+    "Sensei's Divining Top", "Library of Leng", "Galvanoth",
+    "Verge Rangers",
     # card flow
     "Thrill of Possibility", "Faithless Looting", "Big Score",
     "Unexpected Windfall", "Borrowed Knowledge", "Reforge the Soul",

@@ -342,6 +342,53 @@ CHANGES: list[Change] = [
     ),
     Change(
         deck="lorehold",
+        remove="Penance",
+        add="Galvanoth",
+        staged="2026-09-05",
+        rationale=(
+            "Closes queued work item 3, which recorded this as decided but "
+            "never staged. It now has evidence, and the evidence got a lot "
+            "stronger once the top-setter loop was instrumented. Penance is a "
+            "FREE top-setter — the card on top IS the cost — and that is "
+            "exactly the problem: it converts a draw step into re-drawing a "
+            "card you already held, and only 26% of the time can you actually "
+            "pay the {2} to miracle what it put there. The other 74% is "
+            "straight card disadvantage. Galvanoth instead casts the top card "
+            "FREE at your upkeep if it is an instant or sorcery, before the "
+            "draw step, so it adds a card rather than recycling one."
+        ),
+        evidence=(
+            "6,000 paired games under the current engine: win rate +0.0028 "
+            "[+0.0008, +0.0050] at 10 turns and +0.0165 [+0.0117, +0.0218] at "
+            "20; damage +1.40 and +3.18; mv_cheated +0.67 and +1.62; miracles "
+            "cast +0.02 and +0.04. Significant on every metric at both "
+            "horizons. Penance is also the worst card in the regenerated "
+            "ablation table on its own: -2.95 damage and -0.0100 win rate."
+        ),
+        notes=(
+            "THE WIDER FINDING, which matters more than this one swap. The "
+            "top-setter package RAISES mv_cheated AND LOSES GAMES — ablating "
+            "Library of Leng, Penance and Sensei's Divining Top together is "
+            "win rate -0.0190 [-0.0276, -0.0104] but mv_cheated +1.43 [+0.76, "
+            "+2.10]. The deck's stated primary metric and its objective point "
+            "in OPPOSITE directions for these cards, and the project's own "
+            "rule is to follow win rate. Library of Leng itself is the least "
+            "guilty of the three (mv_cheated +1.56, win rate inside its bar) "
+            "and is NOT proposed for a cut, but the plan of setting up your "
+            "own draws deserves a harder look than a single swap. "
+            "READ THE SWAP HONESTLY: in the regenerated table Galvanoth itself "
+            "ablates to +0.25/+0.09 damage and +0.0002 win rate — INSIDE its "
+            "bars, i.e. indistinguishable from a blank. Nearly all of the "
+            "+0.0165 is Penance being bad rather than Galvanoth being good, "
+            "the same shape as the committed Hidden Retreat -> Double Vision "
+            "change. The cut is well supported; the REPLACEMENT is not, and a "
+            "better five-drop would probably beat Galvanoth into that slot. "
+            "Sensei's Divining Top is the next candidate on the same logic: "
+            "-0.0075 +-0.0058 win rate, signal 'win', a third top-setter."
+        ),
+    ),
+    Change(
+        deck="lorehold",
         remove="Scroll Rack",
         add="Sunbird's Invocation",
         staged="2026-09-04",
@@ -374,7 +421,7 @@ CHANGES: list[Change] = [
             "better of the two measured options."
         ),
         reverified=(
-            "RE-VERIFIED 2026-09-04 (third time) after flying/evasion and the own-wipe commander fix. 6,000 paired games: win rate +0.0008 [-0.0017, +0.0033] at 10 turns and +0.0173 [+0.0112, +0.0232] at 20; damage +1.84 and +3.02. NOTE THE DOWNGRADE: the 10-turn win rate is now INSIDE its error bar, where before evasion it just cleared (+0.0032 [+0.0005, +0.0058]). The 20-turn result is unchanged and strong. The mechanism for the drop is the own-wipe commander fix, and it is specific to this deck: `commander_cast` used to stay True after your own sweeper, so the miracle engine kept running with Lorehold off the battlefield. Correcting that cut the deck's mv_cheated from 31.0 to 22.6 and compressed the value of every miracle payoff in it, Sunbird included. This is now a long-horizon call. It is still the right cut — Scroll Rack remains the deck's worst model-evaluated non-wipe card — but it should be re-read against the regenerated table before it goes to the .xlsx."
+            "RE-VERIFIED 2026-09-05 after the two Library of Leng loop fixes. 6,000 paired games: win rate +0.0017 [-0.0010, +0.0043] at 10 turns and +0.0182 [+0.0122, +0.0242] at 20; damage +1.95 and +3.27; mv_cheated +1.45 and +3.52. The 10-turn win rate remains INSIDE its bar, as it has been since evasion landed; the 20-turn result is stable and significant across every engine version tried (+0.0215 -> +0.0108 -> +0.0173 -> +0.0182). Scroll Rack is still the right cut and is now better supported: it is a TOP-SETTER, and the package of top-setters was measured to raise mv_cheated while LOSING win rate (-0.0190 for the three together). This swap trades one of them for a payoff. Decision stands, on the long horizon."
         ),
     ),
 ]
@@ -390,6 +437,7 @@ DECKS = {
     "lorehold": (lorehold_v16, {
         "Molecule Man": lorehold_v16.MOLECULE_MAN,
         "Galvanoth": lorehold_v16.GALVANOTH,
+        "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
         "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates.

@@ -106,6 +106,11 @@ class LoreholdGame:
             "free_casts": 0,
             "escape_casts": 0,
             "loss_route": 0,
+            "settop_placed": 0, "settop_drawn": 0, "settop_miracled": 0,
+            "settop_mv": 0.0,
+            "leng_to_top": 0, "leng_buried": 0, "leng_drawn": 0,
+            "leng_miracled": 0, "leng_mv_to_top": 0.0,
+            "leng_mv_miracled": 0.0, "miracle_no_mana": 0,
             "sunbird_casts": 0,
             "pyremaw_damage": 0.0,
             "hymn_life_delta": 0.0,
@@ -267,7 +272,7 @@ def set_top(g):
                 continue
         best = max(g.hand, key=lambda c: miracle_value(g, c), default=None)
         if best is None or miracle_value(g, best) <= 0:
-            return
+            return None
         # Only set the top if we can actually pay for the miracle when we draw
         # it. Without this the engine recycles the same uncastable card onto
         # the library every turn, consuming every draw step and starving itself
@@ -277,7 +282,7 @@ def set_top(g):
         if g.has("Artist's Talent"):
             need = max(0, need - 1)
         if len(units) + g.treasures < need + cost:
-            return
+            return None
         # Only worth doing if the mana saved beats the cost of doing it AND
         # we can still afford the miracle afterwards. Firing these every turn
         # regardless of value is a large hidden tax on a deck that already
@@ -285,15 +290,19 @@ def set_top(g):
         gate = g.cfg.get("set_top_gate", 0.0)
         if cost > 0:
             if gate and miracle_value(g, best) - cost < gate:
-                return
+                return None
             if gate and len(units) < cost + 2:
-                return
+                return None
         if can_pay({"gen": cost}, units) is None:
             continue
         pay(g, {"gen": cost}, units)
         g.hand.remove(best)
         g.library.append(best)
-        return
+        g.m["settop_placed"] += 1
+        g.m[f"settop_by_{name.split()[0].lower()}"] =             g.m.get(f"settop_by_{name.split()[0].lower()}", 0) + 1
+        g.m["settop_mv"] += best.mv
+        return best
+    return None
 
 
 def sort_top_three(g):
@@ -331,19 +340,23 @@ def verge_rangers_filter(g):
 # ---------------------------------------------------------------------------
 
 def miracle_window(g, off_turn=False):
-    """Draw the first card of a turn and try to miracle it."""
+    """Draw the first card of a turn and try to miracle it.
+
+    Returns (card_drawn, was_miracled) so callers can trace whether the card
+    they deliberately put on top is the one that got cast.
+    """
     sort_top_three(g)
     verge_rangers_filter(g)
     card = g.draw_card()
     if card is None:
-        return
+        return None, False
     g.m["miracle_windows"] += 1
 
     val = miracle_value(g, card)
     if val <= 0 or not (g.commander_cast or g.has("Molecule Man")
                         or card.miracle_cost):
         g.hand.append(card)
-        return
+        return card, False
 
     if g.has("Molecule Man"):
         mcost = {}
@@ -354,7 +367,7 @@ def miracle_window(g, off_turn=False):
         mcost = {"gen": 2}
     else:
         g.hand.append(card)
-        return
+        return card, False
 
     mcost = dict(mcost)
     red = 1 if g.has("Artist's Talent") else 0
@@ -365,13 +378,15 @@ def miracle_window(g, off_turn=False):
     if off_turn:
         if need > g.float_mana + g.treasures:
             g.hand.append(card)
-            return
+            g.m["miracle_no_mana"] += 1
+            return card, False
         units = [frozenset({"R", "W", "C"})] * (g.float_mana + g.treasures)
     else:
         units = mana_units(g)
         if can_pay(mcost, units) is None:
             g.hand.append(card)
-            return
+            g.m["miracle_no_mana"] += 1
+            return card, False
 
     idx = g.spells_this_turn
     g.spells_this_turn += 1
@@ -389,11 +404,12 @@ def miracle_window(g, off_turn=False):
         if card.name in g.cfg.get("watch", ()):
             g.m["test_card_countered"] += 1
             g.m["test_card_answered"] += 1
-        return
+        return card, False
 
     g.m["miracles_cast"] += 1
     g.m["miracle_hits"] += 1
     resolve_spell(g, card, paid)
+    return card, True
 
 
 # ---------------------------------------------------------------------------
@@ -960,6 +976,7 @@ def opponent_upkeep_windows(g):
             if nonlands:
                 pool = nonlands
         worst = min(pool, key=lambda c: miracle_value(g, c))
+        leng_card = None
         if g.has("Library of Leng"):
             # discard the BEST miracle target instead: it goes on top, and we
             # immediately draw it. This is the deck's core loop.
@@ -968,6 +985,9 @@ def opponent_upkeep_windows(g):
                 worst = best
                 g.hand.remove(worst)
                 g.library.append(worst)
+                leng_card = worst
+                g.m["leng_to_top"] += 1
+                g.m["leng_mv_to_top"] += worst.mv
             else:
                 g.hand.remove(worst)
                 g.graveyard.append(worst)
@@ -977,15 +997,44 @@ def opponent_upkeep_windows(g):
         # Library of Leng redirects where the card goes, but it is still a
         # discard, so Monument to Endurance still triggers either way.
         g.monument_used = set()          # a new turn = the modes reset
-        discard_triggers(g, 1)
         g.spells_this_turn = 0
         g.noncreature_this_turn = 0
         g.bombardment_fired_this_turn = False   # a new turn = a new trigger
         g.dv_fired_this_turn = False
         # A free top-setter can be used before EACH draw event, and Lorehold's
         # rummage supplies three extra ones per round on opponents' turns.
-        set_top(g)
-        miracle_window(g, off_turn=True)
+        # BUG FIXED 2026-09-05. `set_top` was called unconditionally, and it
+        # appends ANOTHER card from hand on top of the library — burying the
+        # card Library of Leng had just put there and consuming the draw on
+        # the second-best target instead of the best. Measured at 26% of all
+        # Leng placements. Two effects were competing for one slot and the
+        # engine ran both blindly; no pilot would ever bury their own setup.
+        # A top-setter is only wanted when Leng did NOT place something.
+        st_card = set_top(g) if leng_card is None else None
+        if leng_card is not None and (not g.library or g.library[-1] is not leng_card):
+            g.m["leng_buried"] += 1
+        drawn, cast = miracle_window(g, off_turn=True)
+        if st_card is not None:
+            g.m["settop_drawn"] += (drawn is st_card)
+            g.m["settop_miracled"] += (drawn is st_card and cast)
+        # TRIGGER ORDER, FIXED 2026-09-05. Monument to Endurance's discard
+        # trigger used to resolve BEFORE the miracle window, and its "draw"
+        # mode pops the top of the library — which is exactly where Library of
+        # Leng had just put the card you intended to miracle. Measured: with
+        # Monument on the battlefield, 78% of Leng placements were buried and
+        # Leng miracles fell from 1.98 a game to 0.57. The deck was
+        # cannibalising its own core loop.
+        #
+        # Both triggers are yours (Lorehold's "draw a card" and Monument's
+        # "whenever you discard"), so YOU choose the order. A pilot resolves
+        # Lorehold's draw first, takes the miracle, and lets Monument draw the
+        # next card afterwards. That is what this now does.
+        discard_triggers(g, 1)
+        if leng_card is not None and drawn is leng_card:
+            g.m["leng_drawn"] += 1
+            if cast:
+                g.m["leng_miracled"] += 1
+                g.m["leng_mv_miracled"] += leng_card.mv
 
 
 def take_turn(g):
@@ -1043,8 +1092,11 @@ def take_turn(g):
                 g.m["upkeep_free_casts"] += 1
                 resolve_spell(g, top, paid, from_hand=False)
 
-    set_top(g)
-    miracle_window(g)          # your draw step
+    st_card = set_top(g)
+    drawn, cast = miracle_window(g)          # your draw step
+    if st_card is not None:
+        g.m["settop_drawn"] += (drawn is st_card)
+        g.m["settop_miracled"] += (drawn is st_card and cast)
     play_land(g)
     main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
     combat(g)

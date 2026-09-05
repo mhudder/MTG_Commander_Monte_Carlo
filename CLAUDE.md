@@ -366,6 +366,39 @@ Evasion reranks rather than uniformly buffing: Starscape Cleric +0.0108 ->
 +0.0167 win (joint-best in Karlov), Rendmaw's Bitterblossom to +0.0205 because
 its Faeries fly.
 
+### The Library of Leng loop was broken, and two other cards were eating it
+
+Found 2026-09-05 from a question about the deck's actual play pattern. Both
+bugs were in `opponent_upkeep_windows`:
+
+1. `set_top()` was called unconditionally right after Library of Leng put a
+   card on top, appending ANOTHER card over it — 26% of placements buried. It
+   now only fires when Leng placed nothing.
+2. `discard_triggers()` resolved BEFORE the miracle window, and Monument to
+   Endurance's "draw" mode pops the top of the library — exactly where Leng had
+   just put the card. With Monument out, 78% of placements were buried and Leng
+   miracles fell 1.98 -> 0.57 a game. Both triggers are yours, so you order
+   them: Lorehold's draw resolves first, then Monument's. `discard_triggers()`
+   now runs after the miracle window.
+
+Result: burial 26% -> 0%, drawn 73% -> 98%, miracled 31% -> 43% at an average
+7.35 MV cheated. Deck mv_cheated 22.6 -> 28.7. Monument to Endurance itself rose
+to +2.14 damage / +0.0197 win — it had been competing with what it supports.
+
+**PENANCE AND HIDDEN RETREAT DO NOT HAVE THE BURIAL BUG — they have a worse
+one.** 99% of what `set_top` places is drawn, but only 26% can be paid for, so
+three quarters of the time the draw step is spent re-drawing a card already in
+hand. Penance is the worst card in the deck (-2.95 / -0.0100); adding Hidden
+Retreat made the deck worse (win 0.203 -> 0.190). Raising `miracle_reserve`
+above 2 makes it worse still — the default is right.
+
+**THE STANDING FINDING: the top-setter package raises mv_cheated AND LOSES
+GAMES.** Ablating Library of Leng + Penance + Sensei's Divining Top together is
+win rate -0.0190 [-0.0276, -0.0104] with mv_cheated +1.43 [+0.76, +2.10]. This
+deck's primary metric and its objective point in opposite directions for these
+cards. Follow win rate. Library of Leng itself is the least guilty (mv_cheated
++1.56, win inside its bar) and is not proposed for a cut.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample
@@ -460,7 +493,8 @@ fixed grid so it cannot break CRN.
    engine never blocks with your creatures.
 2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
-3. Lorehold: cut Penance, add Galvanoth — decided, not staged.
+3. ~~Lorehold: cut Penance, add Galvanoth.~~ **STAGED 2026-09-05** with
+   evidence: win rate +0.0165 [+0.0117, +0.0218] at 20 turns.
 4. `KNOWN_ISSUES.md` item 1a: March of the World Ooze's Elephant trigger is
    unmodelled, so its committed numbers are a floor.
 5. Remaining per-deck gaps are listed in the STATUS block of each

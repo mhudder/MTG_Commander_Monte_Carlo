@@ -813,3 +813,108 @@ every miracle payoff in that deck — so it is a long-horizon call. Rendmaw's is
 stable, which answers the earlier worry that it decays as the model improves:
 it decayed against Ornithopter because that cut was a BODY, and it is steady
 against Idol, which is not.
+
+
+---
+
+# The Library of Leng loop was broken (2026-09-05)
+
+Prompted by a question from the deck's pilot: *the proper play pattern is to put
+high-costing cards from hand on top with the replacement effect, then
+immediately miracle them off Lorehold's rummage on the next upkeep — does the
+engine do this?* It did, and then it threw the card away again. Two bugs, both
+in `opponent_upkeep_windows`.
+
+## Bug 1: `set_top` buried the card Leng had just placed
+
+`set_top()` appends another card from hand on top of the library. It was called
+unconditionally, immediately after Library of Leng had put the intended miracle
+target there — so the second-best target buried the best one and consumed the
+draw. **26% of all Leng placements.** Two effects competing for one slot with
+the engine running both blindly; no pilot buries their own setup. `set_top` now
+only fires when Leng did not place something.
+
+## Bug 2: Monument to Endurance ate the card off the top
+
+Far worse. `discard_triggers()` resolved BEFORE the miracle window, and
+Monument's "draw a card" mode pops the top of the library — exactly where Leng
+had just put the card. Split by whether Monument was on the battlefield:
+
+| | placements | buried | miracled |
+|---|---|---|---|
+| Monument out | 7.08 | **5.52 (78%)** | **0.57** |
+| Monument absent | 4.76 | 0.00 (0%) | 1.98 |
+
+**The deck was cannibalising its own core loop**, and the better the Monument
+draw looked the more of the loop it ate. Both triggers are yours — Lorehold's
+"draw a card" and Monument's "whenever you discard" — so you choose the order.
+A pilot resolves Lorehold's draw first, takes the miracle, and lets Monument
+draw afterwards. `discard_triggers()` now runs after the miracle window.
+
+## After both fixes
+
+| | before | after |
+|---|---|---|
+| Leng placements buried | 26% (78% with Monument) | **0%** |
+| drawn in that window | 73% | **98%** |
+| miracled | 31% | **43%**, average MV cheated 7.35 |
+| with Monument out, miracled | 0.57 | **3.06** |
+| deck `mv_cheated` | 22.6 | **28.7** |
+
+Monument to Endurance itself rose from +1.60 damage / +0.0152 win to **+2.14 /
++0.0197** — it stopped competing with the thing it was supposed to support.
+
+## Penance and Hidden Retreat: same test, different answer
+
+Asked to check whether the two other free top-setters had the same problem.
+**They do not have the burial problem — 99% of what `set_top` places is drawn.
+They have a worse one.**
+
+| | placed (avg MV) | drawn | **miracled** |
+|---|---|---|---|
+| Library of Leng | 5.34 (7.26) | 98% | **43%** |
+| `set_top` (Penance / Hidden Retreat) | 3.98 (7.93) | 99% | **26%** |
+
+Three quarters of the time `set_top` puts a 7.9-MV card on top, you draw it, and
+you cannot pay the {2} — so the draw step was spent re-drawing a card already in
+hand. That is straight card disadvantage, and it is why **Penance is the worst
+card in the deck** (−2.95 damage, −0.0100 win). Adding Hidden Retreat over
+Improvisation Capstone made the deck worse: win 0.203 → 0.190.
+
+Raising the mana held back does not fix it. Sweeping `miracle_reserve`:
+
+| reserve | mv_cheated | win rate |
+|---|---|---|
+| **2 (default)** | **27.80** | **0.198** |
+| 3 | 27.33 | 0.189 |
+| 4 | 26.85 | 0.182 |
+| 6 | 25.34 | 0.171 |
+
+Holding up six mana across three windows costs more tempo than the extra
+miracles are worth. The default is right.
+
+## The finding that outlasts the bugs
+
+Ablating the top-setters as a package rather than one at a time:
+
+| ablated | win rate | mv_cheated |
+|---|---|---|
+| Library of Leng alone | −0.0033 ±0.0055 | **+1.56 ±0.47** |
+| Penance alone | **−0.0138 ±0.0060** | −1.34 ±0.50 |
+| Sensei's Divining Top alone | −0.0040 ±0.0054 | +0.43 ±0.42 |
+| **all three together** | **−0.0190 ±0.0086** | **+1.43 ±0.67** |
+
+**The top-setter package raises `mv_cheated` and loses games.** It succeeds at
+this deck's stated primary metric while being net negative on the objective, and
+the project's own rule is that where the two disagree you follow win rate.
+
+Library of Leng is the least guilty — its mana cheat is real and significant now
+that the loop works — and it is NOT proposed for a cut. But the plan of setting
+up your own draws is weaker than the deck's construction assumes, and the pilot's
+instinct that Leng was underperforming was right for a reason neither of us
+guessed: it was not the card, it was the two other cards stepping on it.
+
+**Staged as a result:** `-Penance +Galvanoth`, closing queued work item 3. Win
+rate +0.0028 [+0.0008, +0.0050] at 10 turns and +0.0165 [+0.0117, +0.0218] at
+20, significant on every metric at both horizons. Galvanoth casts the top card
+free at upkeep rather than recycling one out of hand.

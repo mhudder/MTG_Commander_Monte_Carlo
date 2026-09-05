@@ -298,3 +298,11 @@ INVINCIBLE_HYMN = C("Invincible Hymn", "Sorcery", {"gen": 6, "W": 2},
 # {6}{W}{W} sorcery. "Redistribute any number of players' life totals."
 REVERSE_THE_SANDS = C("Reverse the Sands", "Sorcery", {"gen": 6, "W": 2},
                       priority=5, threat=6.5, script="reverse_sands")
+
+
+# Cut in v16 for Double Vision. Kept so the top-setter package can still be
+# measured — its ability costs no mana, the card on top IS the cost, but it
+# needs a target instant or sorcery on the stack, so it is gated on the
+# opponents actually casting one.
+HIDDEN_RETREAT = C("Hidden Retreat", "Enchantment", {"gen": 2, "W": 1},
+                   priority=8, threat=6.0)
