@@ -12,6 +12,7 @@ priority: casting preference when several spells are affordable (higher first).
 """
 
 from edhmc.engine import Card
+from edhmc.decks._evasion import FLYING
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -32,7 +33,8 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 script=script, priority=priority, mana_ability=ma,
                 threat=threat, tags=frozenset(tags), pod_damage=pod_damage,
                 land_face=land_face, x_pips=x_pips,
-                alt_costs=alt_costs, lifelink=lifelink)
+                alt_costs=alt_costs, lifelink=lifelink,
+                flying=name in FLYING)
 
 
 def L(name, produces, tapped=False, types="Land", script=None, tags=(), p=0, t=0):

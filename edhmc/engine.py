@@ -25,6 +25,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from edhmc import opponents as OPP
+from edhmc.decks._evasion import FLYING_TOKENS
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -58,6 +59,7 @@ class Card:
     lifelink: bool = False
     indestructible: bool = False
     haste: bool = False
+    flying: bool = False      # set from decks/_evasion.py, never by hand
     x_pips: int = 0           # generic pips that are actually {X}
     alt_costs: tuple = ()     # ((cost_dict, "tag"), ...) modal / alternative costs
     tokens: tuple = ()        # (count, power, toughness) made on resolution
@@ -245,7 +247,8 @@ class Game:
             n *= 2
         for _ in range(n):
             card = Card(name=f"{subtype or 'Token'} token",
-                        types=frozenset({"Creature"}), power=p, toughness=t)
+                        types=frozenset({"Creature"}), power=p, toughness=t,
+                        flying=subtype in FLYING_TOKENS)
             perm = Permanent(card=card, tapped=tapped, sick=True,
                              is_token=True, base_p=p, base_t=t)
             # Metallic Mimic: named Bird
@@ -289,16 +292,29 @@ class Game:
         leaves-the-battlefield triggers like Wurmcoil Engine's.
         """
         self.creature_died_this_turn = True
-        drainers = sum(1 for p in self.board
-                       if p.card.name in ("Blood Artist",
-                                          "The Meathook Massacre",
+
+        # CORRECTED 2026-09-04 against oracle text. These three are not the
+        # same effect and were all being paid 3 pod life per death:
+        #
+        #   Blood Artist          "TARGET PLAYER loses 1 life and you gain 1"
+        #                         -> 1 damage to ONE opponent, +1 life. It was
+        #                            being paid 3x its actual drain.
+        #   The Meathook Massacre "each opponent loses 1 life"  (and the life
+        #                         gain clause is for OPPONENTS' creatures
+        #                         dying, not yours) -> 3 damage, NO life.
+        #   Cauldron of Essence   "each opponent loses 1 life and you gain 1"
+        #                         -> 3 damage AND +1 life.
+        each_opp = sum(1 for p in self.board
+                       if p.card.name in ("The Meathook Massacre",
                                           "Cauldron of Essence"))
-        if drainers:
-            self.deal_pod_damage(3.0 * n * drainers)
-        # Cauldron of Essence also gains you 1 life per death per copy, which
-        # deal_pod_damage does not do (it is a symmetric "each opponent loses").
-        self.your_life += 1.0 * n * sum(
-            1 for p in self.board if p.card.name == "Cauldron of Essence")
+        single = sum(1 for p in self.board if p.card.name == "Blood Artist")
+        if each_opp:
+            self.deal_pod_damage(3.0 * n * each_opp)
+        if single:
+            self.deal_pod_damage(1.0 * n * single, each=False)
+        gainers = single + sum(1 for p in self.board
+                               if p.card.name == "Cauldron of Essence")
+        self.your_life += 1.0 * n * gainers
 
         # "When this creature dies, create a 3/3 deathtouch Wurm and a 3/3
         # lifelink Wurm." Only the real card, not its own tokens.

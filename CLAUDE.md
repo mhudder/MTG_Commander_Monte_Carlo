@@ -74,7 +74,7 @@ formula ranges on insert, so every metric would have silently dropped the last
 card. All 31 affected formulas were rebounded to row 150 — generous on purpose,
 so the next deck change cannot break them either.
 
-`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8927` on the pod v3 default (0.8929 on the retired pod v1).
+`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.9045` (was 0.8927 before evasion, 0.8929 on the retired pod v1).
 
 **The correlation used to be 0.9109.** It fell because Rendmaw's commander now
 hands every opponent a goaded Bird, which changes when games end. Nothing is
@@ -331,6 +331,41 @@ were re-simulated.
 change.** The reverse also applies — Lightning Greaves and Whispersilk Cloak
 were left in `SCRIPTED_KARLOV` after v2 cut them; harmless, but stale.
 
+### Evasion and three correctness fixes (2026-09-05)
+
+`validate.py`: `+0.00` on all six, `corr(A,B)` improved 0.8927 -> 0.9045.
+**All three ablation tables regenerated again; anything earlier is void.**
+
+1. **FLYING is modelled** (queued item 1, now closed). `damage_through` splits
+   attackers into fliers and ground; `flier_block_share` (0.30) is the fraction
+   of an abstract board that can catch a flier, and Rendmaw's goaded Birds
+   count in full because they demonstrably fly. `goad_block_share` no longer
+   has to stand in for evasion.
+   **The tags are GENERATED** — `tag_flying.py` reads Scryfall's `keywords`
+   array and writes `edhmc/decks/_evasion.py`; the deck `C()` helpers set
+   `flying=name in FLYING`, so a card cannot be added untagged. Do NOT match on
+   oracle text: reach's reminder text contains the word "flying", and so does
+   token-making text. That mistake tagged Longshot, Arasta, The Dawning Archaic
+   and Rendmaw itself as fliers. Conditional fliers (Serra Ascendant, Voice of
+   the Blessed, Dragon's Rage Channeler) are in `opponents.flying_of()`.
+2. **Blood Artist was paid 3x its real drain.** It is "TARGET PLAYER loses 1",
+   not "each opponent" — 1 damage and +1 life. The Meathook Massacre gains you
+   NO life off your own creatures (that clause is for opponents' creatures).
+   Cauldron of Essence was already right.
+3. **The own-wipe commander bug is fixed and now default-on.** It was worse
+   than first measured: `commander_cast` stayed True, so Lorehold's MIRACLE
+   ENGINE kept running with the commander off the battlefield. Baseline
+   `mv_cheated` fell 31.0 -> 22.6. `own_wipe_commander_returns=False` restores
+   the old behaviour.
+4. **`ablation.py` asserts its own classification.** `check_scripted_coverage()`
+   raises if a nonland card is in neither `SCRIPTED_*` nor the new explicit
+   `KNOWN_BLIND`, and warns on names a cut left behind. This is the guard
+   against the labelling bug found earlier the same day.
+
+Evasion reranks rather than uniformly buffing: Starscape Cleric +0.0108 ->
++0.0167 win (joint-best in Karlov), Rendmaw's Bitterblossom to +0.0205 because
+its Faeries fly.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample
@@ -419,9 +454,10 @@ fixed grid so it cannot break CRN.
 
 ## Queued work
 
-1. **Flying/reach evasion in `opponents.damage_through`.** There is still no
-   evasion term of any kind. It is now doing more damage than before, because
-   Rendmaw's Birds fly and `goad_block_share` is standing in for it.
+1. ~~Flying/reach evasion in `opponents.damage_through`.~~ **DONE 2026-09-05**
+   — see the evasion section above. Reach on YOUR creatures is still not
+   modelled and does not need to be: reach is a blocking ability and this
+   engine never blocks with your creatures.
 2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
 3. Lorehold: cut Penance, add Galvanoth — decided, not staged.

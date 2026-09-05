@@ -241,9 +241,128 @@ def _job(name):
     return name, ablate(deck, commander, name)
 
 
+# Cards deliberately left out of the SCRIPTED set: the engine does NOT
+# implement their text and a low score is evidence about the model. Listing
+# them explicitly is what lets the assertion below be strict.
+KNOWN_BLIND = {
+    "rendmaw": {
+        "Ashnod's Altar",
+        "Assassin's Trophy",
+        'Beast Within',
+        'Biotransference',
+        'Bow of Nylea',
+        'Burnished Hart',
+        'Culling Ritual',
+        'Deathreap Ritual',
+        "Eyeblight's Ending",
+        'Filigree Familiar',
+        'Gloomshrieker',
+        'Hagra Mauling',
+        'Haywire Mite',
+        'Junk Diver',
+        'Lignify',
+        'Massacre Wurm',
+        'Midnight Reaper',
+        'Myr Retriever',
+        'Nameless Inversion',
+        'Overwhelming Stampede',
+        'Pygmy Kavu',
+        'Reap',
+        'Sakura-Tribe Elder',
+        'Scrap Trawler',
+        'Shigeki, Jukai Visionary',
+        'Toxic Deluge',
+        'Village Rites',
+        'Whip of Erebos',
+    },
+    "lorehold": {
+        'Approach of the Second Sun',
+        "Artist's Talent",
+        'Bolt Bend',
+        'Call Forth the Tempest',
+        'Chaos Warp',
+        "Dawn's Truce",
+        "Dragon's Rage Channeler",
+        'Enlightened Tutor',
+        'Farewell',
+        'Gamble',
+        'Generous Gift',
+        'Goliath Daydreamer',
+        'Hexing Squelcher',
+        'Improvisation Capstone',
+        'Invoke Calamity',
+        'Land Tax',
+        'Ondu Inversion',
+        'Path to Exile',
+        'Perch Protection',
+        'Pinnacle Monk',
+        'Promise of Loyalty',
+        'Restoration Seminar',
+        'Sejiri Shelter',
+        'Storm Herd',
+        'Swords to Plowshares',
+        'Ultima',
+        'Volcanic Vision',
+    },
+    "karlov": {
+        'Anguished Unmaking',
+        'Austere Command',
+        'Benevolent Offering',
+        'Damn',
+        'Damnation',
+        'Enlightened Tutor',
+        'Farewell',
+        'Fracture',
+        'Lurrus of the Dream-Den',
+        'Necropotence',
+        'Path to Exile',
+        'Phyrexian Reclamation',
+        'Ranger of Eos',
+        'Return to Dust',
+        "Sensei's Divining Top",
+        'Soulmender',
+        'Sun Titan',
+        'Swords to Plowshares',
+        'Toxic Deluge',
+        "Umezawa's Jitte",
+    },
+}
+
+
+def check_scripted_coverage(deck):
+    """Every nonland card must be classified ON PURPOSE.
+
+    The SCRIPTED_* sets are hand-maintained name sets and NOTHING used to check
+    them against the deck. On 2026-09-04 five newly added cards were
+    implemented in full and then printed under MODEL-BLIND, because adding a
+    card to a deck is two edits and only one of them got made. The numbers were
+    right; the label was wrong, and the label is the part that tells you whether
+    a low score means anything.
+
+    A name in SCRIPTED that is no longer in the deck is stale rather than
+    dangerous, so it warns. A card in the deck that is in neither SCRIPTED nor
+    KNOWN_BLIND is the failure that actually bit, so it raises.
+    """
+    names = {c.name for c in deck if not c.is_land}
+    stale = SCRIPTED - {c.name for c in deck}   # lands may be scripted too
+    if stale:
+        print(f"  NOTE: {len(stale)} name(s) in SCRIPTED_{DECK.upper()} are no "
+              f"longer in the deck: {', '.join(sorted(stale))}", file=sys.stderr)
+    unclassified = names - SCRIPTED - KNOWN_BLIND[DECK]
+    if unclassified:
+        raise SystemExit(
+            f"\n{len(unclassified)} card(s) in the {DECK} deck are in neither "
+            f"SCRIPTED_{DECK.upper()} nor KNOWN_BLIND:\n"
+            + "".join(f"    {n}\n" for n in sorted(unclassified))
+            + "Add each to SCRIPTED_ if the engine implements its text, or to "
+              "KNOWN_BLIND if it does not. The split between MODEL-EVALUATED "
+              "and MODEL-BLIND is a CLAIM, and it has to be made deliberately.")
+
+
 def main():
     deck, commander = build_pending(DECK)
     nonlands = [c.name for c in deck if not c.is_land]
+    check_scripted_coverage(deck)
 
     results = {}
     if os.path.exists(CACHE):

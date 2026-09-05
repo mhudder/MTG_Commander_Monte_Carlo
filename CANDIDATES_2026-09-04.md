@@ -698,3 +698,118 @@ The other four staged swaps hold under pod v3:
 |---|---|---|
 | karlov 3-for-3 | +0.0362 [+0.0300, +0.0425] | +0.0638 [+0.0550, +0.0727] |
 | lorehold Sunbird | +0.0032 [+0.0005, +0.0058] | +0.0167 [+0.0103, +0.0228] |
+
+
+---
+
+# Evasion, and three correctness fixes (2026-09-05)
+
+Queued work item 1 was "flying/reach evasion in `opponents.damage_through` —
+still missing, and now load-bearing". It was load-bearing twice over by the
+end: Rendmaw's Birds fly, and two of the three cards just committed to Karlov
+(Starscape Cleric, Exemplar of Light) are fliers whose numbers were floors
+because of it.
+
+## 1. Evasion
+
+Until now there was no evasion term of any kind — a 2/2 flier and a 2/2 ground
+creature were identical to the model. `damage_through` now splits attackers and
+blockers:
+
+* `flier_block_share` (0.30) is the fraction of an abstract opponent board
+  assumed able to catch a flier — fliers plus reach.
+* Rendmaw's goaded Birds count in FULL rather than by that share, because they
+  demonstrably fly: the card says "2/2 black Bird creature token with flying".
+  CLAUDE.md noted `goad_block_share` was "standing in for" evasion; it no
+  longer has to.
+* A defender spends flying-capable blockers on the biggest fliers first, then
+  anything spare on the ground. Ground-only blockers can never touch a flier.
+
+Sanity check, six-creature opponent board, four 3/3 attackers of 12 power:
+ground gets 3 through, fliers get 9.
+
+### The tags are generated, not remembered
+
+`tag_flying.py` reads Scryfall and writes `edhmc/decks/_evasion.py`; the deck
+modules set `flying=name in FLYING` in their `C()` helper, so a card cannot be
+added untagged. This matters more than it sounds, because **a first pass that
+matched the word "flying" in oracle text got it wrong in both directions**:
+
+* **Reach's reminder text contains "flying"** — "Reach (This creature can block
+  creatures with flying.)" — so Longshot, Arasta, The Dawning Archaic and
+  Rendmaw itself were all tagged as fliers. None of them fly.
+* **Token-making text contains it too.** Rendmaw makes flying Birds and
+  Bitterblossom makes flying Faeries; neither card flies.
+
+Scryfall's `keywords` array carries only what a card unconditionally has, which
+is exactly the question. Result: **9 unconditional fliers** across the three
+decks, not the 14 the text match claimed.
+
+Three fliers are CONDITIONAL and cannot be a static tag. They live in
+`opponents.flying_of()`: Serra Ascendant (30+ life), Voice of the Blessed (4+
+counters), Dragon's Rage Channeler (delirium — four card types in the yard,
+now computed). Flying tokens are verified the same way: Bird, Faerie, Pegasus
+and Angel fly; Saproling, Zombie, Snake, Monk, Goat, Spider, Plant and Wurm do
+not.
+
+## 2. Blood Artist was being paid 3x its real drain
+
+Checked against oracle text, and all three "aristocrat" effects turned out to
+be different cards:
+
+| card | text | was | now |
+|---|---|---|---|
+| Blood Artist | "**target player** loses 1 life and you gain 1" | 3 pod dmg, no life | **1 dmg to one opponent, +1 life** |
+| The Meathook Massacre | "each opponent loses 1 life" (the life-gain clause is for OPPONENTS' creatures dying) | 3 pod dmg, no life | 3 pod dmg, **still no life** |
+| Cauldron of Essence | "each opponent loses 1 life and you gain 1" | 3 pod dmg, +1 life | unchanged |
+
+This was flagged when Cauldron was first measured and is now fixed. It cuts
+against Cauldron — it deflates the aristocrats baseline that card is measured
+alongside — and Cauldron survived it.
+
+## 3. The own-wipe commander bug is fixed, and it was worse than measured
+
+`resolve_own_wipe` removed your commander without returning it to the command
+zone. It was measured at roughly a point of damage per self-wipe and gated
+behind `own_wipe_commander_returns`, defaulted to the old behaviour. Now
+default-on, and the earlier measurement **understated it for Lorehold**:
+`commander_cast` stayed True, so the MIRACLE ENGINE KEPT RUNNING with Lorehold
+off the battlefield. Correcting it cut the deck's baseline `mv_cheated` from
+31.0 to 22.6.
+
+## 4. `ablation.py` now asserts its own classification
+
+The bug from earlier today — five implemented cards printed as MODEL-BLIND
+because the hand-maintained `SCRIPTED_*` sets were never updated — can no
+longer happen silently. `check_scripted_coverage()` raises if any nonland card
+is in neither `SCRIPTED_*` nor a new explicit `KNOWN_BLIND` set, and warns on
+names left behind by a cut. `KNOWN_BLIND` was populated with exactly the cards
+that were already blind, so no classification changed: "blind by default"
+became "blind by declaration".
+
+## What it did to the tables
+
+`validate.py`: `+0.00` on all six, and `corr(A,B)` **improved 0.8927 → 0.9045**
+(CRN now worth ~10x). All three tables regenerated; every earlier one is void.
+
+Evasion is not a uniform buff — it reranks:
+
+* **Karlov's fliers rose.** Starscape Cleric's win rate went +0.0108 →
+  **+0.0167**, now the joint-best in the deck. Archangel of Thune holds the top
+  damage slot at +4.81. Serra Ascendant leads T10 damage at +3.60, its
+  conditional flying doing real work.
+* **Rendmaw's Bitterblossom rose to +0.0205 win**, the second-best in the deck,
+  because its Faeries fly and nothing in the pod blocks them.
+
+Both staged swaps were re-measured and both hold:
+
+| swap | win T10 | win T20 |
+|---|---|---|
+| rendmaw −Idol +Cauldron | +0.0030 [+0.0008, +0.0053] | +0.0108 [+0.0060, +0.0157] |
+| lorehold −Scroll Rack +Sunbird | +0.0008 [−0.0017, +0.0033] | +0.0173 [+0.0112, +0.0232] |
+
+Lorehold's ten-turn margin is now inside its bar — the own-wipe fix compressed
+every miracle payoff in that deck — so it is a long-horizon call. Rendmaw's is
+stable, which answers the earlier worry that it decays as the model improves:
+it decayed against Ornithopter because that cut was a BODY, and it is steady
+against Idol, which is not.

@@ -408,9 +408,11 @@ def _draw_into_hand(g, n):
 
 
 def make_tokens(g, n, power, toughness, name="token"):
+    from edhmc.decks._evasion import FLYING_TOKENS
     for _ in range(int(n)):
         tok = Card(name=f"{name} token", types=frozenset({"Creature"}),
-                   power=power, toughness=toughness)
+                   power=power, toughness=toughness,
+                   flying=name in FLYING_TOKENS)
         g.board.append(Permanent(card=tok, sick=True, is_token=True))
 
 

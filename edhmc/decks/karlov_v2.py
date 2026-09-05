@@ -28,6 +28,7 @@ neither 2 nor 3, and is why it is modelled as the removal spell it is cast as.
 """
 
 from edhmc.engine import Card
+from edhmc.decks._evasion import FLYING
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -38,7 +39,8 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 power=p, toughness=t, script=script, priority=priority,
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 lifegain=lifegain, drain=drain, lifelink=lifelink,
-                x_pips=x_pips, indestructible=indestructible)
+                x_pips=x_pips, indestructible=indestructible,
+                flying=name in FLYING)
 
 
 def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):

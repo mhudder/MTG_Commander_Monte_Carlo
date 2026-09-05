@@ -650,7 +650,8 @@ def resolve(g, card):
                 spend_lg(g, idx, units)
                 g.m["mana_spent"] += 3
                 tok = Card(name="Starscape Cleric",
-                           types=frozenset({"Creature"}), power=1, toughness=1)
+                           types=frozenset({"Creature"}), power=1, toughness=1,
+                           flying=True)   # a token COPY, so it flies
                 tperm = Permanent(card=tok, sick=True, is_token=True)
                 g.board.append(tperm)
                 creature_entered(g, mine=True, entering=tperm)

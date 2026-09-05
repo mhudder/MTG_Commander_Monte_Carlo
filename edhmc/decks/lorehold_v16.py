@@ -14,6 +14,7 @@ is a regression.
 """
 
 from edhmc.engine import Card
+from edhmc.decks._evasion import FLYING
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -29,7 +30,8 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 miracle_cost=miracle or {}, treasures=treasures,
                 pod_damage=pod_damage, tokens=tokens, discards=discards,
-                land_face=land_face, x_pips=x_pips, haste=haste)
+                land_face=land_face, x_pips=x_pips, haste=haste,
+                flying=name in FLYING)
 
 
 def L(name, produces, tapped=False, types="Land", tags=()):
@@ -144,7 +146,7 @@ SORCERIES = [
     C("Approach of the Second Sun", "Sorcery", {"gen": 6, "W": 1}, priority=6,
       threat=8.0, script="approach"),
     C("Emeria's Call", "Sorcery", {"gen": 4, "W": 3}, priority=5, tags=("mdfc",),
-      tokens=(2, 4, 4), land_face=("W", True)),
+      tokens=(2, 4, 4, "Angel"), land_face=("W", True)),
     C("Hit the Mother Lode", "Sorcery", {"gen": 4, "R": 3}, priority=5,
       script="treasures", treasures=5),
     C("Improvisation Capstone", "Sorcery", {"gen": 5, "R": 2}, priority=5, threat=7.0),

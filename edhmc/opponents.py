@@ -431,13 +431,48 @@ def countered(g, card, spell_index: int) -> bool:
 # Blocking
 # ---------------------------------------------------------------------------
 
-def damage_through(g, attackers: list) -> float:
-    """Opponents chump-block your biggest attackers first.
+def flying_of(g, perm) -> bool:
+    """Does this permanent have flying RIGHT NOW?
 
-    This replaces the old flat 30% haircut and is not neutral between the two
-    cards under test: a small number of very large creatures loses far more to
-    chump blocks than a wide board of small ones does, because a 1/1 blocking a
-    6/6 eats six damage while a 1/1 blocking a 2/2 eats two.
+    Unconditional flying is a static tag generated from Scryfall's keywords
+    array by `tag_flying.py`. The three conditional fliers in the three decks
+    cannot be a tag and live here instead — their flying comes and goes with
+    the game state, which is the whole reason they are worth modelling.
+    """
+    c = perm.card
+    if c.flying:
+        return True
+    n = c.name
+    if n == "Serra Ascendant":
+        # "As long as you have 30 or more life ... has flying." Same threshold
+        # already used for its +5/+5 in KarlovGame.power_of.
+        return getattr(g, "your_life", 0.0) >= 30
+    if n == "Voice of the Blessed":
+        # "As long as this creature has four or more +1/+1 counters on it, it
+        # has flying and vigilance."
+        return perm.counters >= 4
+    if n == "Dragon's Rage Channeler":
+        # "Delirium — ... has flying as long as there are four or more card
+        # types among cards in your graveyard."
+        return len({t for card in g.graveyard for t in card.types}) >= 4
+    return False
+
+
+def damage_through(g, attackers: list) -> float:
+    """Opponents chump-block your biggest attackers first — and CANNOT block
+    your fliers with most of their board.
+
+    Two things make this non-neutral between the cards under test. A small
+    number of very large creatures loses far more to chump blocks than a wide
+    board of small ones, because a 1/1 blocking a 6/6 eats six damage while a
+    1/1 blocking a 2/2 eats two. And evasion sidesteps the whole mechanism:
+    until 2026-09-04 there was no evasion term of any kind, so a 2/2 flier and
+    a 2/2 ground creature were identical to the model.
+
+    `flier_block_share` is the fraction of an abstract board assumed able to
+    catch a flier — fliers plus reach. Rendmaw's goaded Birds are counted in
+    full instead of by that share, because they demonstrably fly: the card
+    says "2/2 black Bird creature token with flying".
     """
     if not attackers:
         return 0.0
@@ -445,14 +480,31 @@ def damage_through(g, attackers: list) -> float:
     # stop it, so the relevant blocker count is the *weakest* opponent's board,
     # not the table's total. Some of their creatures are also tapped from
     # attacking someone else.
-    weakest = min(o.creatures + o.goaded_birds for o in g.opponents)
-    n_block = int(weakest * g.cfg.get("block_share", 0.60))
+    share = g.cfg.get("block_share", 0.60)
+    fshare = g.cfg.get("flier_block_share", 0.30)
+    weakest = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
 
-    powers = sorted((g.power_of(p) for p in attackers), reverse=True)
+    n_block = int((weakest.creatures + weakest.goaded_birds) * share)
+    n_fly = int((weakest.goaded_birds + weakest.creatures * fshare) * share)
     if g.has("Ohran Frostfang"):
         # deathtouch attackers make blocking miserable; fewer opponents do it
         n_block = int(n_block * 0.5)
-    return float(sum(powers[n_block:]))
+        n_fly = int(n_fly * 0.5)
+    n_fly = min(n_fly, n_block)
+
+    fly_p, ground_p = [], []
+    for p in attackers:
+        (fly_p if flying_of(g, p) else ground_p).append(g.power_of(p))
+    fly_p.sort(reverse=True)
+    ground_p.sort(reverse=True)
+
+    # A defender spends its flying-capable blockers on the biggest fliers, then
+    # anything left over on the ground; ground-only blockers can never touch a
+    # flier no matter how big it is.
+    blocked_fly = min(n_fly, len(fly_p))
+    spare = n_fly - blocked_fly
+    blocked_ground = min((n_block - n_fly) + spare, len(ground_p))
+    return float(sum(fly_p[blocked_fly:]) + sum(ground_p[blocked_ground:]))
 
 
 
@@ -602,15 +654,16 @@ def resolve_own_wipe(g, spare_own=False):
     for p in [p for p in g.board if p.card.is_creature]:
         g.board.remove(p)
         if p.card is g.commander:
-            # KNOWN BUG, gated so the committed tables stay valid: your own
-            # sweeper removes the commander from the battlefield WITHOUT
-            # returning it to the command zone, so `commander_cast` stays True
-            # and it is never recast. destroy() gets this right; this path
-            # never did. For Lorehold in particular the commander IS the
-            # engine — three of the four miracle windows a round — so this
-            # silently makes every self-wipe far worse than the card is.
-            # Flip `own_wipe_commander_returns` to measure the corrected rules.
-            if g.cfg.get("own_wipe_commander_returns", False):
+            # FIXED 2026-09-04. Your own sweeper used to remove the commander
+            # from the battlefield WITHOUT returning it to the command zone, so
+            # `commander_cast` stayed True and it was never recast again.
+            # destroy() always got this right; this path never did. Measured
+            # cost of the bug, value of a wrath over a blank at 20 turns:
+            # Farewell -2.05 -> -0.98 damage, Karlov's Damn -0.0107 -> -0.0032
+            # win rate. It was worth about a point of damage on every self-wipe
+            # and it hit Lorehold hardest, where the commander IS the engine.
+            # `own_wipe_commander_returns=False` restores the old behaviour.
+            if g.cfg.get("own_wipe_commander_returns", True):
                 g.commander_cast = False
                 g.commander_tax += 2
         elif not p.is_token:

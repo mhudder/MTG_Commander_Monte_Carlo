@@ -374,7 +374,7 @@ CHANGES: list[Change] = [
             "better of the two measured options."
         ),
         reverified=(
-            "RE-VERIFIED 2026-09-04 under POD v3, now the default. 6,000 paired games: win rate +0.0032 [+0.0005, +0.0058] at 10 turns and +0.0167 [+0.0103, +0.0228] at 20; damage +1.98 and +3.05. Against +0.0077 / +0.0215 on the old pod. Significant at both horizons, but the 10-turn margin is thin and Lorehold is the deck the new pod punishes hardest — eleven creatures, so it eats the pod's attacks and carries the highest life-share of losses of the three decks. Sign, significance and rank all survive. Decision stands."
+            "RE-VERIFIED 2026-09-04 (third time) after flying/evasion and the own-wipe commander fix. 6,000 paired games: win rate +0.0008 [-0.0017, +0.0033] at 10 turns and +0.0173 [+0.0112, +0.0232] at 20; damage +1.84 and +3.02. NOTE THE DOWNGRADE: the 10-turn win rate is now INSIDE its error bar, where before evasion it just cleared (+0.0032 [+0.0005, +0.0058]). The 20-turn result is unchanged and strong. The mechanism for the drop is the own-wipe commander fix, and it is specific to this deck: `commander_cast` used to stay True after your own sweeper, so the miracle engine kept running with Lorehold off the battlefield. Correcting that cut the deck's mv_cheated from 31.0 to 22.6 and compressed the value of every miracle payoff in it, Sunbird included. This is now a long-horizon call. It is still the right cut — Scroll Rack remains the deck's worst model-evaluated non-wipe card — but it should be re-read against the regenerated table before it goes to the .xlsx."
         ),
     ),
 ]
