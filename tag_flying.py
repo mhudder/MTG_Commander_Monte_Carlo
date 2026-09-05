@@ -33,6 +33,7 @@ fliers is the abstract `flier_block_share`. Your creatures' reach is inert.
 """
 import json
 import sys
+import urllib.parse
 import urllib.request
 
 from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2
@@ -72,8 +73,26 @@ def scryfall_collection(names):
         for card in data.get("data", []):
             found[card["name"]] = card
         for miss in data.get("not_found", []):
-            print(f"  NOT FOUND: {miss}", file=sys.stderr)
+            # A double-faced card's COMBINED name ("Witch Enchanter //
+            # Witch-Blessed Meadow") is not a valid `name` identifier. Falling
+            # through silently would leave it untagged, which is the exact
+            # partial-tag bias this script exists to avoid.
+            card = named(miss.get("name"))
+            if card is None:
+                print(f"  NOT FOUND: {miss}", file=sys.stderr)
+            else:
+                found[miss["name"]] = card
     return found
+
+
+def named(name):
+    url = ("https://api.scryfall.com/cards/named?fuzzy="
+           + urllib.parse.quote(name))
+    try:
+        return json.load(urllib.request.urlopen(
+            urllib.request.Request(url, headers=HEADERS)))
+    except Exception:
+        return None
 
 
 def main():
@@ -85,6 +104,19 @@ def main():
         for c in list(deck) + [cmd]:
             if c.is_creature and not c.is_land:
                 creatures[c.name] = c
+        # CANDIDATES TOO. `flying=name in FLYING` is evaluated at import, so a
+        # candidate that is not in this set is constructed as a GROUND
+        # creature and candidates.py measures it as one. Found 2026-09-05:
+        # Goldspan Dragon (4/4 flying haste) and Caldera Pyremaw (3/3 flying)
+        # were both scored with no evasion. Walking only build() is the same
+        # class of bug as the SCRIPTED_* sets — the deck moved and the
+        # generated data did not.
+        for attr in dir(mod):
+            if not attr.isupper():
+                continue
+            v = getattr(mod, attr)
+            if type(v).__name__ == "Card" and v.is_creature and not v.is_land:
+                creatures.setdefault(v.name, v)
 
     cards = scryfall_collection(sorted(creatures))
     flying = {n for n, c in cards.items() if "Flying" in c.get("keywords", [])}

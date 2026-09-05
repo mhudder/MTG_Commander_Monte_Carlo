@@ -8,9 +8,11 @@ NOT here: see opponents.flying_of(). Regenerate with
 
 FLYING = {
     'Archangel of Thune',
+    'Caldera Pyremaw',
     'Cliffhaven Vampire',
     "Drana's Emissary",
     'Exemplar of Light',
+    'Goldspan Dragon',
     'Junk Diver',
     'Lorehold, the Historian',
     'Ornithopter of Paradise',

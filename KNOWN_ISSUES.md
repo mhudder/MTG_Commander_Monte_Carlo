@@ -1,11 +1,189 @@
 # Known issues — deferred, not blocking
 
-Nothing here invalidates the four staged changes in `PENDING_CHANGES.md`. Rendmaw's
-type lines were verified clean against the spreadsheet (1 mismatch in 89, and that
-one is a sheet error), and both Lorehold swaps were measured after the Mizzix fix
-landed.
+> **RE-VERIFIED 2026-09-05.** Every card was re-checked against Scryfall with the
+> rebuilt `audit_cards.py`, and every claim in this file was re-read against the
+> code rather than trusted. See **§0** for what that turned up; items below it
+> carry their original text with a dated verdict where one changed.
+>
+> `PENDING_CHANGES.md` is stale — it predates `lorehold_v16.py` and names four
+> changes that no longer describe the ledger. `python -m edhmc.pending` is the
+> only trustworthy statement of what is staged.
 
 Ordered by how much they could distort a future result.
+
+---
+
+# 0. The 2026-09-05 re-verification
+
+## 0a. Card DATA is clean — 0 errors across 269 distinct names
+
+`audit_cards.py` (rebuilt; CLAUDE.md listed the original as lost) checks name,
+mana cost, mana value, power, toughness, card types, `is_land`, `tapped`,
+`produces` and `flying` for all 289 card slots in the three decks **plus every
+module-level candidate**. It now reports **0 ERR**. The 52 data errors of
+2026-09-03 are genuinely fixed and have not regressed.
+
+    python audit_cards.py          # run it after any deck edit
+
+The nine remaining NOTEs are the single-cost model's known limits, each with the
+reason printed (hybrid pips on Lurrus and Revitalizing Repast, `{X}` baked into
+`gen` on Meathook and Debt, Damn's overload, Daxos's `*` toughness). One WARN:
+Fabled Passage is modelled as a tapped dual, which is a fair reading of "put it
+onto the battlefield tapped, then untap it if you control four or more lands".
+
+**Two of the audit's own first-pass failures were bugs in the audit, not the
+decks**, and are worth remembering because both are easy to repeat:
+
+1. A case-sensitive regex failed to see the shocklands' "**I**f you don't, it
+   enters tapped", so Overgrown Tomb, Godless Shrine, Sacred Foundry and
+   Necroblossom Snarl were all reported as untapped-when-they-should-be-tapped.
+   The tapped clause on those cards is the FALLBACK, not the rule.
+2. `cards/collection` does not accept a double-faced card's COMBINED name as a
+   `{"name": ...}` identifier, so "Witch Enchanter // Witch-Blessed Meadow" came
+   back in `not_found` and read as a nonexistent card. Both scripts now fall
+   back to a fuzzy `cards/named` lookup.
+
+## 0b. FIXED — Grist was a creature on the battlefield
+
+> As long as Grist **isn't on the battlefield**, it's a 1/1 Insect creature in
+> addition to its other types.
+
+So Grist is a Planeswalker Creature *on the stack* — which is what makes it
+trigger Rendmaw's "whenever you play a card with two or more card types" — and a
+bare Planeswalker afterwards. `Card.types` has to say both and cannot.
+
+The engine read the type line everywhere, so Grist attacked, tapped for Enduring
+Vitality, and counted as a body for The Great Henge and Overwhelming Stampede.
+**Under March of the World Ooze it was a 6/6 attacker.**
+
+`engine.is_creature_now(g, perm)` now answers "creature on the battlefield",
+which is the same question `impending` was already asking for Overlord of the
+Hauntwoods, so both go through one function. `STACK_ONLY_CREATURES` carries the
+quoted clause. Gated on `cfg["battlefield_creature_types"]`, default **on**.
+
+Measured, 4,000 paired games, flag off vs on:
+
+| horizon | damage | win rate |
+|---|---|---|
+| T10 | **−0.32** [−0.43, −0.22] | −0.0003 [−0.0008, +0.0000] |
+| T20 | **−0.39** [−0.54, −0.26] | −0.0003 [−0.0015, +0.0010] |
+
+**Win rate does not move at either horizon**, which is why the default was
+flipped rather than deferred: it is a correctness fix that costs a third of a
+point of a proxy and nothing on the objective. `validate.py` is `+0.00` on all
+six, `corr(A,B)` 0.9045 → 0.9057. Only Grist's own row in
+`ablation_rendmaw.txt` (+1.61 damage / +0.0072 win) is now stale.
+
+## 0c. FIXED — candidates were never flying-tagged, so a flier scored as ground
+
+`tag_flying.py` walked `mod.build()` only. Candidates live as module-level
+constants, and `flying=name in FLYING` is evaluated at import, so **every
+candidate was constructed as a ground creature**. Two were fliers:
+
+| card | measured as | actually |
+|---|---|---|
+| Goldspan Dragon | 4/4 ground haste | **4/4 flying** haste |
+| Caldera Pyremaw | 3/3 ground | **3/3 flying** |
+
+This is the same shape as the 2026-09-04 `SCRIPTED_*` labelling bug: a
+hand-maintained or generated set that the deck moved past. `tag_flying.py` now
+walks the candidates too; `_evasion.py` gained both names and **no card in any
+deck changed**, so every table and `validate.py` are untouched.
+
+Both numbers in `CANDIDATES_2026-09-04.md` are understated as a result, and both
+matter — see §0d.
+
+## 0d. Radiant Scrollwielder reads the WRONG ZONE — not fixed
+
+> At the beginning of your upkeep, exile an instant or sorcery card **at random
+> from your graveyard**. You may cast it this turn.
+
+`lorehold.take_turn` reads `g.library[-1]` for it, alongside Galvanoth. For
+Galvanoth ("look at the top card of your library") that is right. For
+Scrollwielder it is the wrong zone, and the two mechanisms are not close:
+
+- **From the library**, it fires only when the top card happens to be an instant
+  or sorcery, and it competes with Galvanoth and the whole top-setter package
+  for that one card.
+- **From the graveyard**, it fires *every upkeep* as long as one instant or
+  sorcery is in the yard — which in a 36-spell Lorehold list is effectively
+  from turn 4 onward. It is a guaranteed extra spell per turn (paid for, not
+  free) and it does **not** interact with the top-setters at all.
+
+The 2026-09-05 "Galvanoth never saw what the top-setters set up" fix was applied
+to both engines. It was right for Galvanoth and irrelevant for Scrollwielder,
+whose whole reading is wrong. Its candidate number is a floor of unknown depth.
+
+**This lands directly on the standing open question.** CLAUDE.md's standing
+recommendation is *"cut Penance, but find a better five-drop than Galvanoth."*
+There are now three five-drops in the running and **none of them has a
+trustworthy number**:
+
+| card | last measured | why the number is wrong |
+|---|---|---|
+| Galvanoth | +0.0128 [+0.0078, +0.0180] win T20 | staged; the most trustworthy of the three |
+| Caldera Pyremaw | +0.0123 ±0.0048 win T20 | measured with **no flying**, and on the pre-2026-09-05 engine |
+| Radiant Scrollwielder | — | measured off the **library** instead of the graveyard |
+
+## 0e. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
+
+Membership in `SCRIPTED_*` is a claim that the engine implements the card. These
+three do not, and `check_scripted_coverage()` cannot catch it — it verifies that
+every card is classified, not that the classification is TRUE.
+
+| card | oracle | engine |
+|---|---|---|
+| Apex of Power | exile top 7 and cast from among them; **"if this spell was cast from your hand, add ten mana of any one color"** | `draw4` |
+| Hit the Mother Lode | **Discover 10** (free-cast a nonland of MV ≤ 10), then tapped Treasures equal to 10 − that MV | flat 5 Treasures |
+| Borrowed Knowledge | **"Discard your hand, then draw cards equal to…"** — a wheel | `draw2` |
+
+Apex's ten mana is the entire card in a deck holding Rise of the Eldrazi and
+Storm Herd, and Discover 10 is a free Rise of the Eldrazi off the top. Borrowed
+Knowledge is a wheel, and the engine already has a `wheel` script for Reforge the
+Soul. All three **understate**, which is the safe direction, but they are
+labelled as if their scores were evidence about the cards.
+
+## 0f. Two "or attacks" triggers are missing, and one token enters untapped
+
+| card | missing clause |
+|---|---|
+| Grave Titan | "Whenever this creature enters **or attacks**, create two 2/2 Zombies" — only the ETB fires |
+| Overlord of the Hauntwoods | "Whenever this permanent enters **or attacks**, create a tapped land token" — only the ETB fires |
+
+Both understate, and both are in `SCRIPTED_*`. Separately, the Everywhere token
+`overlord` creates enters **untapped** in the engine and the oracle says
+**tapped** — a turn of mana early, in the other direction.
+
+## 0g. Life-loss drawbacks are free, and pod v3 made that matter
+
+The 2026-09-04 note "LIFE DOES NOT DECIDE GAMES" was true of pod v1, where 100%
+of losses were an opponent's clock. **Pod v3 is the default now**, and the
+life-share of losses is 0.32 / 0.43 / 0.20 (rendmaw / lorehold / karlov). Every
+card whose drawback is losing life still gets that drawback for free:
+
+| card | uncosted drawback | current score |
+|---|---|---|
+| Bitterblossom | "you lose 1 life" every upkeep | **+0.0205 win — Rendmaw's #5 card** |
+| Phyrexian Arena | "you draw a card and you lose 1 life" | Karlov |
+| Talisman of Conviction | 1 damage to you per coloured tap | Lorehold |
+| Dark Confidant | life equal to the revealed card's MV | candidate |
+
+Bitterblossom is the one that matters: it is a top-five card in its deck, and it
+pays a life every turn from the turn it lands. **Its number is a ceiling, and
+now knowingly so.** The same sentence used to be true of Dark Confidant alone.
+
+Storm Herd's X is still `cfg["storm_herd_x"] = 40` rather than your life total,
+for the same reason and with the same consequence — but it is already in
+`KNOWN_BLIND`, so nothing reads its number.
+
+## 0h. "Another creature you control" — three cards trigger off themselves
+
+Suture Priest, Daxos and Elas il-Kor all read "whenever **another** creature you
+control enters". `creature_entered()` passes `entering` and only Guide of Souls
+uses it, so the other three each gain 1 life off their own arrival. One trigger
+per card per game. Small, but Suture Priest is a top-10 Karlov card.
+
+---
 
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
 
@@ -49,6 +227,10 @@ loop, and nothing uses it for overload, evoke, escape, or kicker. Mizzix's
 Mastery remains a hand-written special case in `lorehold.py` rather than an
 `alt_costs` entry.
 
+> **Re-checked 2026-09-05: accurate.** `grep -rn alt_costs edhmc/` hits
+> `engine.py` and the deck modules and nothing else — neither `lorehold.py` nor
+> `karlov.py` reads it. Overlord of the Hauntwoods is still the only user.
+
 ## 1b. (original entry) Cards can only have one cost — structural
 
 The engine gives every card exactly one mana cost and one mana value. Every error
@@ -84,6 +266,13 @@ trusted. The Altar's mana arrives after the main phase in the engine's turn
 structure, so it cannot be spent — modelling the cost without the benefit. Valuing
 it properly needs sacrifice mana to feed back into casting, which is an engine
 change, not a card script.
+
+> **Re-checked 2026-09-05: still true, numbers refreshed.** On the current table
+> Ashnod's Altar is −0.26/−0.36 damage and −0.0013 win, Deathreap Ritual is
+> −0.40/−0.45 and −0.0008 — both **inside their win-rate bars**, i.e. unmeasured
+> rather than bad. The Altar is now gated to fire only alongside Blood Artist or
+> The Meathook Massacre, so it no longer pays a cost for nothing, but its mana
+> is still unspendable.
 
 ## 4. Opponents' boards are a blocker count
 
@@ -133,6 +322,20 @@ to hand, Apex of Power's "add 10 red mana if cast from hand", Scrap Trawler / My
 Retriever / Junk Diver in Rendmaw. All of these **understate** their cards, which
 is the safer direction to be wrong.
 
+> **Re-checked 2026-09-05: accurate, and one correction.** Apex of Power's clause
+> is "add ten mana of **any one color**", not ten red, and it is the same card
+> §0e flags as mislabelled — Apex is in `SCRIPTED_LOREHOLD` while implemented as
+> `draw4`. Invoke Calamity, Volcanic Vision, Scrap Trawler, Myr Retriever and
+> Junk Diver are all correctly in `KNOWN_BLIND`; Apex is not.
+>
+> Add to the list: **Goliath Daydreamer** is not merely unmodelled, it is
+> anti-synergistic in a way nothing in the engine can see. It exiles your
+> instants and sorceries with dream counters *instead of* putting them in the
+> graveyard — which starves Arcane Bombardment, Mizzix's Mastery, The Dawning
+> Archaic and Radiant Scrollwielder, all of which feed on that graveyard. It is
+> correctly in `KNOWN_BLIND`, but a future measurement of it must not be read as
+> "an unmodelled upside" — the unmodelled part cuts both ways.
+
 ## RESOLVED — opponents now have a win condition
 
 Each opponent draws a kill turn from a bracket-calibrated range, pre-rolled from
@@ -181,6 +384,14 @@ against the current model, single horizon T20.
 unmeasured at this sample size.** Those rows carry a real point estimate and a
 sign, and under the old format they looked rankable. They are not. Raise `N` if
 a specific one matters.
+
+## 6b. Life is tracked — and since pod v3 it DECIDES GAMES
+
+> **Added 2026-09-05.** Item 6 says life totals are tracked. Since pod v3 became
+> the default they are also load-bearing: the life-share of losses is
+> 0.32 / 0.43 / 0.20 rather than 0.00 / 0.00 / 0.00. Any note in this repo that
+> says "life buys nothing" is describing pod v1. See §0g for the four cards
+> whose life-loss drawback is still free.
 
 ## 8. (superseded) Re-run both ablations
 

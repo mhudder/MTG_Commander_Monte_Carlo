@@ -89,6 +89,10 @@ Scryfall. **52 had a wrong cost, power, toughness, type line or name**, and
 `ORACLE_AUDIT_RENDMAW.md` and `ORACLE_AUDIT_LOREHOLD.md` — each carries a
 STATUS block listing what is fixed and what is still open.
 
+> **RE-VERIFIED 2026-09-05 with `audit_cards.py`: 0 data errors across 289 card
+> slots / 269 distinct names.** None of the 52 have regressed. What remains is
+> behavioural — see the 2026-09-05 re-verification section below.
+
 Consequences worth carrying forward:
 
 - **Every ablation table predating this is void.** `ablation_karlov.txt`,
@@ -436,6 +440,73 @@ STANDING RECOMMENDATION: cut Penance (well supported), but find a better
 five-drop than Galvanoth. Note the swap got WEAKER after these fixes
 (+0.0165 -> +0.0128) because they made Penance less bad.
 
+### 2026-09-05 (later): re-verification — the DATA is clean, the LABELS are not
+
+`validate.py`: `+0.00` on all six, `corr(A,B)` 0.8927 → 0.9045 → **0.9057**.
+The three ablation tables are still valid; only Grist's own row moved.
+
+**`audit_cards.py` exists again** (CLAUDE.md listed it as lost). It checks name,
+cost, MV, P/T, card types, `is_land`, `tapped`, `produces` and `flying` for all
+289 card slots plus every module-level candidate, against Scryfall. It reports
+**0 errors**. Run it after any deck edit. The 52 data errors of 2026-09-03 are
+fixed and have not regressed; the nine remaining notes are the single-cost
+model's known limits, each printing its own reason.
+
+**Card DATA is no longer where the bugs are. The remaining errors are all
+CLAIMS ABOUT BEHAVIOUR that nothing checks** — a name in `SCRIPTED_*`, a
+generated tag set, a script that reads the wrong zone. Full write-up in
+`KNOWN_ISSUES.md` §0. The four that change what to do next:
+
+1. **Grist was a creature on the battlefield.** "As long as Grist ISN'T ON THE
+   BATTLEFIELD, it's a 1/1 Insect creature" — so it triggers Rendmaw when
+   played and is a bare Planeswalker after. It was attacking, and under March of
+   the World Ooze it was a **6/6 attacker**. FIXED via
+   `engine.is_creature_now()`, which is the same question `impending` already
+   asks for Overlord. Cost: −0.32/−0.39 damage, **win rate unmoved at both
+   horizons** (−0.0003, inside its bar). Default-on for that reason.
+2. **`tag_flying.py` never tagged candidates.** It walked `build()` only, and
+   `flying=name in FLYING` is evaluated at import — so Goldspan Dragon (4/4
+   flying haste) and Caldera Pyremaw (3/3 flying) were both **measured as ground
+   creatures**. FIXED; no deck card changed, so no table moved. Same shape as the
+   2026-09-04 `SCRIPTED_*` bug: a generated set the deck moved past.
+3. **Radiant Scrollwielder reads the wrong ZONE.** Oracle: "exile an instant or
+   sorcery card at random **from your graveyard**". The engine reads
+   `library[-1]`. From the graveyard it fires every upkeep from ~turn 4 and does
+   not compete with the top-setters at all; from the library it fires ~a third
+   of upkeeps and fights Galvanoth for the same card. Its number is a floor of
+   unknown depth.
+4. **Three cards in `SCRIPTED_LOREHOLD` are not their text**: Apex of Power is
+   `draw4` (no exile-and-cast, no "add ten mana of any one color"), Hit the
+   Mother Lode is a flat 5 Treasures (no Discover 10), Borrowed Knowledge is
+   `draw2` when it is a WHEEL. `check_scripted_coverage()` cannot catch this —
+   it verifies every card is CLASSIFIED, not that the classification is TRUE.
+
+Also open, lower stakes: Grave Titan and Overlord are both missing their "or
+**attacks**" half; Overlord's Everywhere token enters untapped and should enter
+tapped; Suture Priest / Daxos / Elas il-Kor each trigger off their own arrival
+despite reading "ANOTHER creature you control".
+
+**And one that pod v3 promoted from harmless to live:** life-loss drawbacks are
+still free. That was fine when 100% of losses were an opponent's clock. It is
+not fine now that the life-share of losses is 0.32/0.43/0.20. **Bitterblossom
+loses 1 life every upkeep and is Rendmaw's #5 card at +0.0205 win — its number
+is a ceiling.** Same for Phyrexian Arena, Talisman of Conviction, Dark Confidant.
+
+### The five-drop question now has three candidates and no trustworthy number
+
+CLAUDE.md's standing recommendation was "cut Penance, but find a better
+five-drop than Galvanoth." Two of the three contenders were measured wrong:
+
+| card | last number | why it is not usable |
+|---|---|---|
+| Galvanoth | +0.0128 [+0.0078, +0.0180] win T20 | staged; the only one measured on a correct implementation |
+| Caldera Pyremaw | +0.0123 ±0.0048 win T20 | measured with **no flying**, on the pre-2026-09-05 engine |
+| Radiant Scrollwielder | — | measured off the **library** instead of the graveyard |
+
+Caldera Pyremaw was `CANDIDATES_2026-09-04.md`'s "clearest add of the seven" and
+it was understated. Goldspan Dragon was passed at +0.0025 ±0.0045 and was
+understated by the same bug.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample
@@ -524,10 +595,17 @@ fixed grid so it cannot break CRN.
 
 ## Queued work
 
+Re-read against the code 2026-09-05; verdicts inline.
+
 1. ~~Flying/reach evasion in `opponents.damage_through`.~~ **DONE 2026-09-05**
    — see the evasion section above. Reach on YOUR creatures is still not
    modelled and does not need to be: reach is a blocking ability and this
    engine never blocks with your creatures.
+0. **Re-measure the five-drop slot as a three-way, on the corrected engine.**
+   Fix Radiant Scrollwielder's zone first, re-run Caldera Pyremaw now that it
+   flies, and compare both against the staged Galvanoth. This is the highest
+   value work available: the slot is already staged on the weakest of the three
+   numbers. Delete the caches first.
 2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
 3. ~~Lorehold: cut Penance, add Galvanoth.~~ **STAGED 2026-09-05** with
@@ -536,11 +614,22 @@ fixed grid so it cannot break CRN.
    unmodelled, so its committed numbers are a floor.
 5. Remaining per-deck gaps are listed in the STATUS block of each
    `ORACLE_AUDIT_*.md`.
-6. **`opponents.resolve_own_wipe` removes your commander without returning it
-   to the command zone** — `commander_cast` stays `True`, so after you cast
-   your own sweeper the commander is neither on the battlefield nor
-   recastable. Found 2026-09-04, not fixed, because fixing it moves every
-   committed number.
+6. ~~`opponents.resolve_own_wipe` removes your commander without returning it
+   to the command zone.~~ **DONE 2026-09-05** — fixed and default-on; see the
+   evasion section, item 3. This entry was stale.
 7. `Card.indestructible` is priced by a single flat `destroy_share`. A card
    whose evaluation swings on that knob should be reported with it said out
-   loud.
+   loud. **Still true 2026-09-05, and now load-bearing for two cards, not
+   zero:** Heliod, Sun-Crowned and Erebos, Bleak-Hearted both read "as long as
+   your devotion to <colour> is less than five, this isn't a creature", which
+   the engine cannot express — the same gap `is_creature_now` closed for Grist,
+   but conditional on board state rather than static. Erebos is IN the Rendmaw
+   deck and is modelled as a 5/6 that is ALWAYS a creature; it should be one
+   only while black devotion is 5+, which in that list is a mid-game condition,
+   not an early-game one. Under March of the World Ooze the early turns get a
+   6/6 attacker that should not exist yet.
+8. Radiant Scrollwielder's zone, and the three mislabelled Lorehold cards
+   (Apex of Power, Hit the Mother Lode, Borrowed Knowledge). `KNOWN_ISSUES.md`
+   §0d and §0e.
+9. Life-loss drawbacks are free and pod v3 made that matter. `KNOWN_ISSUES.md`
+   §0g. Bitterblossom is the card to start with.

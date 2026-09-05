@@ -114,6 +114,45 @@ class Permanent:
     base_t: int = 1
 
 
+NEVER = 10 ** 9   # an `impending` that never arrives: see is_creature_now
+
+
+def is_creature_now(g, p: Permanent) -> bool:
+    """Creature-ness ON THE BATTLEFIELD, which is not the type line.
+
+    `Card.types` is the type line as PLAYED, because that is what Rendmaw's
+    "whenever you play a card with two or more card types" reads. Two cards in
+    these lists are creatures on the stack and not on the battlefield, and the
+    single `types` field cannot say both:
+
+      Grist, the Hunger Tide  "As long as Grist ISN'T ON THE BATTLEFIELD, it's
+                              a 1/1 Insect creature in addition to its other
+                              types." So it triggers Rendmaw when cast and is a
+                              bare Planeswalker afterwards -- it never attacks,
+                              never taps for Enduring Vitality, and is not a
+                              body for The Great Henge or Overwhelming
+                              Stampede. Under March of the World Ooze the old
+                              reading made it a 6/6 ATTACKER.
+      Impending permanents    Overlord of the Hauntwoods cast for {1}{G}{G}
+                              "isn't a creature until the last time counter is
+                              removed" -- already modelled, and this is the
+                              same question asked once for both.
+
+    The NEVER stamp is applied at ETB and gated on
+    cfg["battlefield_creature_types"], so every table measured before
+    2026-09-05 reproduces with the flag off. See KNOWN_ISSUES.
+    """
+    return p.card.is_creature and not (p.impending and g.turn < p.impending)
+
+
+# Creatures on the stack that are NOT creatures on the battlefield, with the
+# clause that says so. Not a judgement call -- each is quoted oracle text.
+STACK_ONLY_CREATURES = {
+    "Grist, the Hunger Tide":
+        "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature",
+}
+
+
 # ----------------------------------------------------------------------------
 # Mana
 # ----------------------------------------------------------------------------
@@ -412,7 +451,8 @@ def available_mana(g: Game) -> list[frozenset]:
     # Enduring Vitality: creatures tap for mana of any colour
     if g.has("Enduring Vitality"):
         for p in g.board:
-            if p.card.is_creature and not p.tapped and not p.sick and not p.card.mana_ability:
+            if (is_creature_now(g, p) and not p.tapped and not p.sick
+                    and not p.card.mana_ability):
                 units.append(any_color)
     return units
 
@@ -422,7 +462,8 @@ def cost_after_reduction(g: Game, card: Card) -> dict:
     if "Artifact" in card.types and g.has("Foundry Inspector"):
         cost["gen"] = max(0, cost.get("gen", 0) - 1)
     if card.name == "The Great Henge":
-        best = max([g.power_of(p) for p in g.board if p.card.is_creature] or [0])
+        best = max([g.power_of(p) for p in g.board
+                    if is_creature_now(g, p)] or [0])
         cost["gen"] = max(0, cost.get("gen", 0) - best)
     return cost
 
@@ -570,13 +611,16 @@ def main_phase(g: Game, precombat: bool = False):
             # control. In a deck that goes this wide it is a finisher, and the
             # engine was previously casting it for literally no effect.
             g.stampede_bonus += max([g.power_of(p) for p in g.board
-                                     if p.card.is_creature] or [0])
+                                     if is_creature_now(g, p)] or [0])
         if "Creature" in card.types or "Artifact" in card.types or \
            "Enchantment" in card.types or "Planeswalker" in card.types:
             perm = Permanent(card=card, sick=True,
                              base_p=card.power, base_t=card.toughness)
             if alt_tag == "impending":
                 perm.impending = g.turn + 4
+            elif (card.name in STACK_ONLY_CREATURES
+                  and g.cfg.get("battlefield_creature_types", True)):
+                perm.impending = NEVER
             g.board.append(perm)
             run_etb(g, perm)
         else:
@@ -662,7 +706,7 @@ def run_etb(g: Game, perm: Permanent):
         g.draw(1)
     elif s == "draw2":
         g.draw(2)
-    if g.has("The Great Henge") and perm.card.is_creature and not perm.is_token:
+    if g.has("The Great Henge") and is_creature_now(g, perm) and not perm.is_token:
         g.draw(1)
         perm.counters += 1
 
@@ -822,8 +866,7 @@ def activations(g: Game):
 
 def combat(g: Game):
     attackers = [p for p in g.board
-                 if p.card.is_creature and not p.tapped and not p.sick
-                 and not (p.impending and g.turn < p.impending)]
+                 if is_creature_now(g, p) and not p.tapped and not p.sick]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
