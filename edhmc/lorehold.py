@@ -107,6 +107,7 @@ class LoreholdGame:
             "escape_casts": 0,
             "loss_route": 0,
             "settop_placed": 0, "settop_drawn": 0, "settop_miracled": 0,
+            "settop_free_cast": 0,
             "settop_mv": 0.0,
             "leng_to_top": 0, "leng_buried": 0, "leng_drawn": 0,
             "leng_miracled": 0, "leng_mv_to_top": 0.0,
@@ -134,6 +135,7 @@ class LoreholdGame:
             "turn_lethal": 99,
             "cast_test_card": 0,
             "test_card_turn": 99,
+            "test_card_drawn_turn": 99,
             "test_card_answered": 0,
             "test_card_removed": 0,
             "test_card_countered": 0,
@@ -256,13 +258,45 @@ def miracle_value(g, card):
     return -1.0                                    # no miracle available
 
 
-def set_top(g):
+def miracle_need(g) -> int:
+    """Mana required to miracle a card off Lorehold, after cost reduction.
+
+    One number, used by BOTH the decision to put a card on top and the payment
+    when it is drawn. They used to be computed separately from different mana
+    pools, which is how the engine talked itself into placements it could not
+    pay for.
+    """
+    need = 0 if g.has("Molecule Man") else 2
+    if g.has("Artist's Talent"):
+        need = max(0, need - 1)
+    return need
+
+
+def set_top(g, pool=None, upkeep_free=False):
     """Put the best miracle target from hand on top of the library.
+
+    `pool` is the mana that will ACTUALLY be available when the card is drawn.
+    It must be passed in the opponent-upkeep windows, where the miracle is paid
+    out of `float_mana` — a pool that the earlier windows have already spent
+    down. Reading the board instead (`mana_units`) does not decrease as float
+    is consumed, so the second and third window of every round were placing
+    cards against mana that was already gone.
 
     Sensei's Divining Top only reorders the top three, so it is modelled
     separately from the hand-to-top effects.
     """
     units = mana_units(g)
+    if pool is None:
+        pool = len(units) + g.treasures
+    # `upkeep_free`: Galvanoth casts the top card WITHOUT PAYING ITS MANA COST
+    # at your upkeep, if it is an instant or sorcery. That changes both halves
+    # of the decision — the card costs nothing to deploy rather than {2}, and
+    # the mana cheated is its FULL mana value rather than value minus two. It
+    # is the best thing a top-setter can be pointed at in this deck.
+    def value_of(c):
+        if upkeep_free and ("Instant" in c.types or "Sorcery" in c.types):
+            return float(c.mv)
+        return miracle_value(g, c)
     for name, cost in TOP_SETTERS.items():
         if name == "Library of Leng" or not g.has(name):
             continue
@@ -270,32 +304,46 @@ def set_top(g):
             # only live while an opponent's instant or sorcery is on the stack
             if g.rng.random() > g.cfg.get("opp_instant_rate", 0.8):
                 continue
-        best = max(g.hand, key=lambda c: miracle_value(g, c), default=None)
-        if best is None or miracle_value(g, best) <= 0:
+        best = max(g.hand, key=value_of, default=None)
+        if best is None or value_of(best) <= 0:
             return None
         # Only set the top if we can actually pay for the miracle when we draw
         # it. Without this the engine recycles the same uncastable card onto
         # the library every turn, consuming every draw step and starving itself
         # of new cards -- which is why a FREE top-setter was somehow reducing
         # the number of miracles cast.
-        need = 0 if g.has("Molecule Man") else 2
-        if g.has("Artist's Talent"):
-            need = max(0, need - 1)
-        if len(units) + g.treasures < need + cost:
+        free_cast = upkeep_free and ("Instant" in best.types
+                                     or "Sorcery" in best.types)
+        need = 0 if free_cast else miracle_need(g)
+        if pool < need + cost:
             return None
         # Only worth doing if the mana saved beats the cost of doing it AND
         # we can still afford the miracle afterwards. Firing these every turn
         # regardless of value is a large hidden tax on a deck that already
         # floats four mana a turn.
+        # THE VALUE GATE APPLIES TO FREE SETTERS TOO. It used to be `if cost >
+        # 0`, so Penance and Hidden Retreat — whose cost is a card, not mana —
+        # fired for any target at all. On YOUR OWN turn nothing is forcing a
+        # discard, so putting a card on top just spends the draw step
+        # re-drawing something already in hand: you trade a fresh card for
+        # (mana value - miracle cost) mana. Doing that to cheat one mana is a
+        # bad trade, and it is the reason a FREE top-setter could reduce the
+        # number of miracles cast.
         gate = g.cfg.get("set_top_gate", 0.0)
-        if cost > 0:
-            if gate and miracle_value(g, best) - cost < gate:
-                return None
-            if gate and len(units) < cost + 2:
-                return None
-        if can_pay({"gen": cost}, units) is None:
-            continue
-        pay(g, {"gen": cost}, units)
+        if gate and value_of(best) - cost < gate:
+            return None
+        if gate and cost > 0 and pool < cost + 2:
+            return None
+        if cost:
+            # An activated cost comes out of the same pool the miracle will be
+            # paid from, so spend it there rather than double-counting the
+            # board.
+            if g.float_mana >= cost:
+                g.float_mana -= cost
+            elif can_pay({"gen": cost}, units) is not None:
+                pay(g, {"gen": cost}, units)
+            else:
+                continue
         g.hand.remove(best)
         g.library.append(best)
         g.m["settop_placed"] += 1
@@ -978,10 +1026,22 @@ def opponent_upkeep_windows(g):
         worst = min(pool, key=lambda c: miracle_value(g, c))
         leng_card = None
         if g.has("Library of Leng"):
-            # discard the BEST miracle target instead: it goes on top, and we
+            # Discard the BEST miracle target instead: it goes on top and we
             # immediately draw it. This is the deck's core loop.
+            #
+            # BUT ONLY IF THE MIRACLE IS AFFORDABLE. The rummage discards a
+            # card either way, so the choice is between two real plays:
+            #   affordable  -> bin the best card, draw it back, miracle it for
+            #                  {2}. Card-neutral and cheats its full cost.
+            #   not         -> bin the WORST card to the graveyard and draw a
+            #                  fresh one. That is a genuine upgrade.
+            # Redirecting to the top when you cannot pay gets the worst of
+            # both: you keep a card you already had and draw nothing new.
+            # There was no gate here at all, which is most of why placements
+            # were being made that could not be cast.
+            afford = (g.float_mana + g.treasures) >= miracle_need(g)
             best = max(g.hand, key=lambda c: miracle_value(g, c))
-            if miracle_value(g, best) > 0:
+            if afford and miracle_value(g, best) > 0:
                 worst = best
                 g.hand.remove(worst)
                 g.library.append(worst)
@@ -1010,7 +1070,8 @@ def opponent_upkeep_windows(g):
         # Leng placements. Two effects were competing for one slot and the
         # engine ran both blindly; no pilot would ever bury their own setup.
         # A top-setter is only wanted when Leng did NOT place something.
-        st_card = set_top(g) if leng_card is None else None
+        st_card = (set_top(g, pool=g.float_mana + g.treasures)
+                   if leng_card is None else None)
         if leng_card is not None and (not g.library or g.library[-1] is not leng_card):
             g.m["leng_buried"] += 1
         drawn, cast = miracle_window(g, off_turn=True)
@@ -1072,6 +1133,19 @@ def take_turn(g):
         g.treasures += n
         g.m["treasures_made"] += n
 
+    # INSTANT-SPEED SETUP, RESOLVED BEFORE THE UPKEEP TRIGGERS.
+    #
+    # Penance, Hidden Retreat, Scroll Rack and Sensei's Divining Top are all
+    # activated abilities usable at instant speed, so a pilot uses them in the
+    # opponent's end step — before their own upkeep. This block used to run
+    # AFTER Galvanoth and Radiant Scrollwielder had already looked at the top
+    # card, so the card you deliberately set up was never the card they saw;
+    # they fired on whatever happened to be there. Setting up a free cast is
+    # the single best thing a top-setter can do in this deck and the engine
+    # could not express it at all.
+    st_card = set_top(g, upkeep_free=g.has("Galvanoth"))
+    sort_top_three(g)
+
     for engine, free in (("Galvanoth", True), ("Radiant Scrollwielder", False)):
         if not g.has(engine) or not g.library:
             continue
@@ -1092,11 +1166,18 @@ def take_turn(g):
                 g.m["upkeep_free_casts"] += 1
                 resolve_spell(g, top, paid, from_hand=False)
 
-    st_card = set_top(g)
-    drawn, cast = miracle_window(g)          # your draw step
-    if st_card is not None:
-        g.m["settop_drawn"] += (drawn is st_card)
-        g.m["settop_miracled"] += (drawn is st_card and cast)
+    if st_card is not None and st_card not in g.library:
+        _drawn, _cast = miracle_window(g)    # the draw step still happens
+        # Galvanoth or Radiant Scrollwielder cast it off the top — the best
+        # outcome, and better than the miracle it was otherwise set up for.
+        g.m["settop_drawn"] += 1
+        g.m["settop_miracled"] += 1
+        g.m["settop_free_cast"] += 1
+    else:
+        drawn, cast = miracle_window(g)      # your draw step
+        if st_card is not None:
+            g.m["settop_drawn"] += (drawn is st_card)
+            g.m["settop_miracled"] += (drawn is st_card and cast)
     play_land(g)
     main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
     combat(g)
@@ -1109,6 +1190,11 @@ def take_turn(g):
     for p in [p for p in g.board if p.card.name == "Underworld Breach"]:
         g.board.remove(p)
         g.graveyard.append(p.card)
+
+    # purely diagnostic: when did the watched card first reach hand?
+    _w = g.cfg.get("watch", ())
+    if _w and g.m["test_card_drawn_turn"] == 99 and             any(c.name in _w for c in g.hand):
+        g.m["test_card_drawn_turn"] = g.turn
 
     g.float_mana = len(mana_units(g))
     g.m["mana_floated"] += g.float_mana

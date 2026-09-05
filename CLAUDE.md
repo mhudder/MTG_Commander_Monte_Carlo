@@ -399,6 +399,43 @@ deck's primary metric and its objective point in opposite directions for these
 cards. Follow win rate. Library of Leng itself is the least guilty (mv_cheated
 +1.56, win inside its bar) and is not proposed for a cut.
 
+### Top-setter POLICY, not card text, was the problem (2026-09-05, later)
+
+Three more bugs, all in the DECISION to put a card on top rather than in any
+card's text. The pilot's objection was the right one: it should be rare to
+place a card you cannot miracle, and when you cannot, the correct play is to
+not do it and draw normally.
+
+3. **`set_top` gated on the wrong mana pool.** It read the untapped BOARD, but
+   the off-turn miracle pays from `float_mana`, which earlier windows have
+   already spent. The board reading never drops, so windows 2 and 3 placed
+   cards against mana that was gone. `set_top(g, pool=...)` now takes the pool
+   that actually pays; `miracle_need(g)` is shared by decision and payment.
+4. **Library of Leng had NO affordability gate.** It always redirected the best
+   target to the top. The rummage discards either way, so: affordable -> bin
+   the best, draw it back, miracle it; NOT affordable -> bin the WORST and draw
+   fresh. Redirecting when you cannot pay gets the worst of both.
+5. **The value gate skipped free setters.** `set_top_gate` applied only `if
+   cost > 0`, and Penance / Hidden Retreat cost a CARD not mana. On your own
+   turn nothing forces a discard, so an ungated placement spends the draw step
+   re-drawing a card already in hand to cheat as little as one mana.
+
+Library of Leng: miracled 43% -> **80%**, placements 5.34 -> 3.30 (it declines
+the bad ones), deck mv_cheated 28.7 -> **31.1**, win 0.205 -> **0.219**.
+
+6. **Galvanoth never saw what the top-setters set up.** It and Radiant
+   Scrollwielder read `library[-1]` BEFORE `set_top` ran. The setters are all
+   instant-speed, so they now resolve in the opponent's end step, before the
+   upkeep triggers — and `set_top` knows Galvanoth casts FREE, so it needs 0
+   mana rather than {2} and counts the card's FULL mana value.
+   **This did not rescue Galvanoth**: it is cast in only 15.6% of games, on
+   turn 9.8, for 0.51 free casts per game it resolves (0.08 overall). Wrong
+   ordering AND too slow; only one was fixable.
+
+STANDING RECOMMENDATION: cut Penance (well supported), but find a better
+five-drop than Galvanoth. Note the swap got WEAKER after these fixes
+(+0.0165 -> +0.0128) because they made Penance less bad.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample

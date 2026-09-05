@@ -358,12 +358,7 @@ CHANGES: list[Change] = [
             "draw step, so it adds a card rather than recycling one."
         ),
         evidence=(
-            "6,000 paired games under the current engine: win rate +0.0028 "
-            "[+0.0008, +0.0050] at 10 turns and +0.0165 [+0.0117, +0.0218] at "
-            "20; damage +1.40 and +3.18; mv_cheated +0.67 and +1.62; miracles "
-            "cast +0.02 and +0.04. Significant on every metric at both "
-            "horizons. Penance is also the worst card in the regenerated "
-            "ablation table on its own: -2.95 damage and -0.0100 win rate."
+            "RE-MEASURED 2026-09-05 after the top-setter POLICY fixes, and the margin SHRANK: win rate +0.0020 [-0.0002, +0.0043] at 10 turns, now inside its bar, and +0.0128 [+0.0117 -> +0.0078, +0.0180] at 20. Damage +2.49, mv_cheated +1.34. Against +0.0028 / +0.0165 before the fixes. THE REASON IS INSTRUCTIVE: the fixes made PENANCE LESS BAD. It no longer puts cards on top that it cannot pay for, so the card it is being compared against improved and the gain from cutting it fell. The swap is still positive at the long horizon and the cut is still right, but this is now a weaker case than the ledger first recorded. Galvanoth remains a poor replacement and the new instrumentation says exactly why: it is CAST IN ONLY 15.6% OF GAMES, on turn 9.8, leaving 3.5 turns in which it fires on roughly a third of upkeeps — 0.51 free casts per game it resolves, 0.08 per game overall. Ordering it correctly against the top-setters (see below) could not rescue that; the card arrives too late in too few games. RECOMMENDATION UNCHANGED: cut Penance, but find a better five-drop than Galvanoth before writing this to the .xlsx."
         ),
         notes=(
             "THE WIDER FINDING, which matters more than this one swap. The "
@@ -421,7 +416,7 @@ CHANGES: list[Change] = [
             "better of the two measured options."
         ),
         reverified=(
-            "RE-VERIFIED 2026-09-05 after the two Library of Leng loop fixes. 6,000 paired games: win rate +0.0017 [-0.0010, +0.0043] at 10 turns and +0.0182 [+0.0122, +0.0242] at 20; damage +1.95 and +3.27; mv_cheated +1.45 and +3.52. The 10-turn win rate remains INSIDE its bar, as it has been since evasion landed; the 20-turn result is stable and significant across every engine version tried (+0.0215 -> +0.0108 -> +0.0173 -> +0.0182). Scroll Rack is still the right cut and is now better supported: it is a TOP-SETTER, and the package of top-setters was measured to raise mv_cheated while LOSING win rate (-0.0190 for the three together). This swap trades one of them for a payoff. Decision stands, on the long horizon."
+            "RE-VERIFIED 2026-09-05 after the top-setter policy fixes and the Galvanoth ordering fix. 6,000 paired games: win rate +0.0010 [-0.0017, +0.0037] at 10 turns and +0.0193 [+0.0133, +0.0253] at 20; damage +1.17 and +3.02; mv_cheated +1.20 and +3.20. The 20-turn result has been stable and significant across every engine version tried (+0.0215, +0.0108, +0.0173, +0.0182, +0.0193); the 10-turn result has been inside its bar since evasion landed. A long-horizon call, and the best-supported of the three staged changes. Scroll Rack is a TOP-SETTER, and the top-setter plan is the weakest part of this deck's construction."
         ),
     ),
 ]

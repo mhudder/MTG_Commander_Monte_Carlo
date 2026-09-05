@@ -918,3 +918,95 @@ guessed: it was not the card, it was the two other cards stepping on it.
 rate +0.0028 [+0.0008, +0.0050] at 10 turns and +0.0165 [+0.0117, +0.0218] at
 20, significant on every metric at both horizons. Galvanoth casts the top card
 free at upkeep rather than recycling one out of hand.
+
+
+---
+
+# The top-setter POLICY was the real problem (2026-09-05, later)
+
+The pilot pushed back on the 26% figure: *the only time cards should be placed
+on top is when a discard is lining up a guaranteed {2} miracle; it should be
+extremely rare to place a card that cannot be miracled, and in that case the
+right play is to not do it at all and just draw normally.*
+
+That is exactly right, and it found three more bugs. The 26% was not a fact
+about the cards. It was the engine making placements no pilot would make.
+
+## Bug 3: `set_top` gated on a mana pool that was not the one paying
+
+`set_top` checked `len(mana_units(g)) + treasures` — the untapped BOARD. But
+in the opponent-upkeep windows the miracle is paid out of `float_mana`, which
+each earlier window spends down. The board reading does not decrease as float
+is consumed, so after the first window drained the float, the second and third
+still saw a full board and placed cards against mana that was already gone.
+
+`set_top(g, pool=...)` now takes the pool that will actually pay, and
+`miracle_need(g)` is one function used by both the decision and the payment.
+
+## Bug 4: Library of Leng had NO affordability gate at all
+
+Its branch put the best miracle target on top whenever `miracle_value > 0`,
+regardless of whether {2} was available. The rummage discards a card either
+way, so there are two real plays and the engine only knew one:
+
+* **affordable** — bin the best card, draw it back, miracle it. Card-neutral
+  and cheats its full cost.
+* **not affordable** — bin the WORST card and draw a fresh one. A real upgrade.
+
+Redirecting to the top when you cannot pay gets the worst of both: you keep a
+card you already had and draw nothing new.
+
+## Bug 5: the value gate skipped the free top-setters
+
+`set_top_gate` (4.0) was applied `if cost > 0`. Penance and Hidden Retreat cost
+a CARD, not mana, so they were ungated and fired for any target at all. On your
+own turn nothing forces a discard, so putting a card on top just spends the
+draw step re-drawing something already in hand — you trade a fresh card for
+(mana value − miracle cost) mana. Doing that to cheat one mana is a bad trade,
+and it is why a FREE top-setter could reduce the number of miracles cast. The
+gate now applies to every setter.
+
+## Result
+
+| Library of Leng | before | after |
+|---|---|---|
+| placements per game | 5.34 | **3.30** (it now declines the bad ones) |
+| drawn | 98% | 98% |
+| **miracled** | 43% | **80%** |
+| deck `mv_cheated` | 28.7 | **31.1** |
+| deck win rate | 0.205 | **0.219** |
+
+## Bug 6: Galvanoth never saw what the top-setters set up
+
+Raised by the pilot in the same exchange: *Galvanoth should also be set up by
+top/library effects.* It could not be. In `take_turn`, Galvanoth and Radiant
+Scrollwielder read `g.library[-1]` **before** `set_top` ran, so they fired on
+whatever card happened to be there and never on the one deliberately placed.
+
+Penance, Hidden Retreat, Scroll Rack and Sensei's Divining Top are all
+instant-speed, so a pilot activates them in the opponent's end step, before
+their own upkeep. `set_top` and `sort_top_three` now resolve there, and
+`set_top` knows Galvanoth will cast the card FREE — so the affordability gate
+needs 0 rather than {2}, and the value counted is the card's FULL mana value
+rather than value minus two. Setting up a free cast is the best thing a
+top-setter can do in this deck, and the engine could not express it at all.
+
+**It did not rescue Galvanoth, and the instrumentation says why.** Galvanoth is
+cast in only **15.6% of games**, on turn 9.8, leaving 3.5 turns in which it
+fires on roughly a third of upkeeps: **0.51 free casts per game it resolves,
+0.08 per game overall**. The ordering was wrong AND the card is too slow; only
+one of those was fixable.
+
+## What this did to the staged changes
+
+Both Lorehold swaps were re-measured and both still hold at the long horizon:
+
+| swap | win T10 | win T20 |
+|---|---|---|
+| −Penance +Galvanoth | +0.0020 [−0.0002, +0.0043] | +0.0128 [+0.0078, +0.0180] |
+| −Scroll Rack +Sunbird's Invocation | +0.0010 [−0.0017, +0.0037] | +0.0193 [+0.0133, +0.0253] |
+
+**Penance → Galvanoth got WEAKER** (+0.0165 → +0.0128), and the reason is worth
+keeping: the policy fixes made **Penance less bad**. It no longer places cards
+it cannot pay for, so the card being cut improved and the gain from cutting it
+fell. The cut is still right; the replacement is still not.
