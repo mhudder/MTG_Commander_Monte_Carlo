@@ -20,7 +20,9 @@ Archangel of Thune                    +3.77+-0.57         +4.81+-0.69        +0.
 Soul Warden                           +3.19+-0.44         +3.11+-0.50        +0.0173+-0.0049      both
 Kambal, Consul of Allocation          +3.28+-0.41         +3.03+-0.50        +0.0135+-0.0049      both
 Soul's Attendant                      +3.30+-0.43         +2.95+-0.51        +0.0137+-0.0047      both
+Exemplar of Light                     +1.93+-0.41         +2.37+-0.48        +0.0138+-0.0044      both
 Serra Ascendant                       +3.12+-0.42         +2.34+-0.49        +0.0112+-0.0048      both
+Starscape Cleric                      +3.59+-0.44         +2.33+-0.52        +0.0108+-0.0045      both
 Sorin, Vengeful Bloodlord             +1.40+-0.33         +2.26+-0.53        +0.0125+-0.0044      both
 Drana's Emissary                      +1.97+-0.31         +2.25+-0.41        +0.0065+-0.0038      both
 Authority of the Consuls              +2.02+-0.32         +2.24+-0.42        +0.0130+-0.0045      both
@@ -35,6 +37,7 @@ Suture Priest                         +2.10+-0.36         +1.74+-0.49        +0.
 Auriok Champion                       +1.88+-0.35         +1.70+-0.48        +0.0138+-0.0045      both
 Sorin, Solemn Visitor                 +1.38+-0.27         +1.69+-0.35        +0.0138+-0.0040      both
 Phyrexian Arena                       +0.90+-0.29         +1.53+-0.45        +0.0130+-0.0046      both
+Enduring Tenacity                     +2.18+-0.46         +1.46+-0.69        +0.0198+-0.0052      both
 Cosmos Elixir                         +0.87+-0.22         +1.44+-0.37        +0.0082+-0.0040      both
 Fountain of Renewal                   +1.17+-0.29         +1.39+-0.38        +0.0073+-0.0037      both
 Voice of the Blessed                  +1.10+-0.24         +1.38+-0.32        +0.0050+-0.0034      both
@@ -61,10 +64,7 @@ Exquisite Blood                       -2.11+-0.41         -3.54+-0.60        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Exemplar of Light                     +1.93+-0.41         +2.37+-0.48        +0.0138+-0.0044      both
-Starscape Cleric                      +3.59+-0.44         +2.33+-0.52        +0.0108+-0.0045      both
 Ranger of Eos                         +1.10+-0.24         +1.70+-0.41        +0.0117+-0.0041      both
-Enduring Tenacity                     +2.18+-0.46         +1.46+-0.69        +0.0198+-0.0052      both
 Necropotence                          +0.51+-0.26         +1.01+-0.42        +0.0060+-0.0042      both
 Lurrus of the Dream-Den               +1.04+-0.24         +1.00+-0.29        +0.0102+-0.0035      both
 Sun Titan                             +0.43+-0.12         +0.88+-0.28        +0.0047+-0.0028      both
@@ -84,4 +84,3 @@ Austere Command                       -0.67+-0.18         -1.33+-0.28        -0.
 Damnation                             -1.08+-0.24         -1.80+-0.39        -0.0112+-0.0036      both
 Damn                                  -1.86+-0.31         -2.47+-0.45        -0.0125+-0.0044      both
 Toxic Deluge                          -1.99+-0.31         -2.90+-0.51        -0.0172+-0.0046      both
-DONE

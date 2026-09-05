@@ -84,6 +84,10 @@ SCRIPTED_RENDMAW = {
     "Solemn Simulacrum",
     # aristocrats drain
     "Blood Artist", "The Meathook Massacre",
+    # Staged 2026-09-04. Both halves are in engine.py: the "each opponent
+    # loses 1 life and you gain 1" death trigger, and the {1}{B}{G}, {T}, sac
+    # a creature reanimation in activations().
+    "Cauldron of Essence",
     # protection the opponent model respects
     "Heroic Intervention",
     # static P/T setter (implemented in Game.power_of / toughness_of)
@@ -109,6 +113,12 @@ SCRIPTED_LOREHOLD = {
     "Guttersnipe", "Longshot, Rebel Bowman", "Soulfire Eruption",
     "Boros Charm", "Olórin's Searing Light", "Emeria's Call",
     "Rise of the Eldrazi",
+    # Staged 2026-09-04. lorehold.sunbird() implements the whole text: reveal
+    # the top X where X is the triggering spell's mana value, free-cast one
+    # spell of MV <= X from among them, bottom the rest in random order — and
+    # it fires only on casts FROM HAND, so miracles trigger it and Galvanoth,
+    # Scrollwielder, Archaic and the copy engines do not.
+    "Sunbird's Invocation",
     # copy engines
     "Double Vision", "Arcane Bombardment", "Mizzix's Mastery",
     "Monastery Mentor", "Monument to Endurance",
@@ -144,9 +154,18 @@ SCRIPTED_KARLOV = {
     "Debt to the Deathless", "Serra Ascendant",
     # other
     "Sol Ring", "Orzhov Signet", "Pristine Talisman", "Land Tax",
-    "Phyrexian Arena", "Mother of Runes", "Lightning Greaves",
-    "Swiftfoot Boots", "Whispersilk Cloak", "Sorin, Vengeful Bloodlord",
+    "Phyrexian Arena", "Mother of Runes",
+    "Swiftfoot Boots", "Sorin, Vengeful Bloodlord",
     "Sorin, Solemn Visitor", "Kalitas, Traitor of Ghet",
+    # Added to the deck in v2, 2026-09-04. All three have their full text in
+    # karlov.py: Starscape Cleric's "each opponent loses 1" and its Offspring
+    # token copy, Enduring Tenacity's Sanguine Bond trigger AND its
+    # return-as-an-enchantment death trigger (it is also in COMBO_LOOP), and
+    # Exemplar of Light's counter-per-lifegain-event with the once-a-turn
+    # draw. Their FLYING is unmodelled, but flying is unmodelled for every
+    # creature in the engine — a global gap, not a per-card approximation, and
+    # the same one Serra Ascendant already carries in this set.
+    "Starscape Cleric", "Enduring Tenacity", "Exemplar of Light",
     # MOVED OUT to the blind group 2026-09-03, still approximated:
     #   Necropotence      - modelled as "draw 2", not skip-draw-step + pay life
     #   Benevolent Offering - flat 4 life, no per-creature scaling, no tokens

@@ -312,6 +312,25 @@ matter. Controlled test at 20 turns, same card in: cutting noncreature Idol of
 Oblivion +0.0135, cutting the 0/2 Ornithopter +0.0088, cutting the 1/2 Dockside
 Chef +0.0048. Monotonic. The staging was changed to cut Idol.
 
+### Hazard: adding a card to a deck is TWO edits, not one
+
+`ablation.py`'s `SCRIPTED_RENDMAW` / `SCRIPTED_LOREHOLD` / `SCRIPTED_KARLOV`
+are hand-maintained NAME SETS, and membership is a claim that the engine
+implements the card's text. They are what splits the output into
+MODEL-EVALUATED and MODEL-BLIND. Nothing checks them against the engine.
+
+2026-09-04: all five newly added cards (Starscape Cleric, Enduring Tenacity,
+Exemplar of Light, Cauldron of Essence, Sunbird's Invocation) were implemented
+in full and then printed under MODEL-BLIND, because the sets were never
+updated. The numbers were right; the LABEL was wrong, and the label is the
+part that tells you whether a low score means anything. Fixed — but only the
+grouping was affected, so re-printing from the cache was enough and no games
+were re-simulated.
+
+**So: when you add a card to a deck, update the SCRIPTED set in the same
+change.** The reverse also applies — Lightning Greaves and Whispersilk Cloak
+were left in `SCRIPTED_KARLOV` after v2 cut them; harmless, but stale.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample

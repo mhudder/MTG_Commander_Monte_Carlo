@@ -32,6 +32,7 @@ Unexpected Windfall                   +2.27+-1.19         +2.39+-0.99        +0.
 Thrill of Possibility                 +1.74+-0.85         +2.10+-0.79        +0.0138+-0.0060      both
 Olórin's Searing Light                +2.56+-0.99         +2.06+-0.66        +0.0087+-0.0035      both
 Guttersnipe                           +2.29+-0.86         +1.81+-0.72        +0.0077+-0.0045      both
+Sunbird's Invocation                  +1.35+-1.14         +1.76+-1.15        +0.0113+-0.0064      both
 Soulfire Eruption                     +1.59+-0.62         +1.48+-0.87        +0.0050+-0.0053       dmg
 Sol Ring                              +2.14+-0.66         +1.42+-0.82        +0.0050+-0.0059       dmg
 Arcane Signet                         +1.71+-0.67         +1.38+-0.84        +0.0040+-0.0055       dmg
@@ -60,7 +61,6 @@ MODEL-BLIND — a low score is evidence about the MODEL, not the card
 card                                    damage T10          damage T20             win rate    signal
 Storm Herd                            +8.00+-0.79        +12.24+-0.89        +0.0750+-0.0073      both
 Land Tax                              +2.45+-1.17         +3.50+-0.87        +0.0170+-0.0058      both
-Sunbird's Invocation                  +1.35+-1.14         +1.76+-1.15        +0.0113+-0.0064      both
 Sejiri Shelter                        +0.69+-0.34         +0.25+-0.51        +0.0028+-0.0040        --
 Hexing Squelcher                      +0.40+-0.15         +0.17+-0.35        +0.0003+-0.0028        --
 Dawn's Truce                          +0.17+-0.16         +0.08+-0.28        -0.0013+-0.0020        --
@@ -86,4 +86,3 @@ Ultima                                -1.55+-0.38         -1.33+-0.75        -0.
 Promise of Loyalty                    -1.81+-0.44         -1.60+-0.66        -0.0040+-0.0046       dmg
 Ondu Inversion                        -0.73+-0.55         -1.71+-0.82        -0.0092+-0.0057      both
 Farewell                              -1.32+-0.74         -1.87+-0.71        -0.0090+-0.0048      both
-DONE
