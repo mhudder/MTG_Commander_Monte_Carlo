@@ -59,13 +59,20 @@ Verified 2026-09-03 after the oracle-text audit.
 |---|---|---|---|
 | Rendmaw, Creaking Nest | `rendmaw_v12.py` | v12 `.xlsx` | agrees |
 | Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
-| Karlov of the Ghost Council | `karlov_v1.py` | v1 `.xlsx` | agrees |
+| Karlov of the Ghost Council | `karlov_v2.py` | v2 `.xlsx` | agrees |
 
-**SUPERSEDED 2026-09-04.** `CHANGES` now holds FIVE staged swaps (see below).
-The deck modules and the `.xlsx` files still agree with each other, but neither
-carries the staged five — the ledger is the only leg that has them. To commit,
-write all five into the modules and the spreadsheets and move them to
-`COMMITTED`. `python -m edhmc.pending` is the check.
+**UPDATED 2026-09-04.** Karlov's three changes are COMMITTED on all three legs
+— hence `karlov_v2.py` and the v2 `.xlsx`, reconciled card for card. TWO
+changes remain staged and are held back deliberately for review: Rendmaw's
+Idol of Oblivion -> Cauldron of Essence and Lorehold's Scroll Rack ->
+Sunbird's Invocation. For those two the ledger is the only leg that carries
+them. `python -m edhmc.pending` is the check; `DECK_CHANGES.md` is the summary.
+
+Note for the Karlov v2 spreadsheet: the Dashboard's 34 formulas were hard-bounded
+to `Decklist!...87`, and the list is now 88 rows. openpyxl does not rewrite
+formula ranges on insert, so every metric would have silently dropped the last
+card. All 31 affected formulas were rebounded to row 150 — generous on purpose,
+so the next deck change cannot break them either.
 
 `validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.8927` on the pod v3 default (0.8929 on the retired pod v1).
 

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v1
+from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2
 from edhmc.experiment import _swap_many
 
 
@@ -184,12 +184,6 @@ COMMITTED: list[Change] = [
             "(+2.85 and -1.01). The decision stands."
         ),
     ),
-]
-
-# ---------------------------------------------------------------------------
-# Staged — decided, not yet in the spreadsheets
-# ---------------------------------------------------------------------------
-CHANGES: list[Change] = [
     Change(
         deck="karlov",
         remove="Swamp",
@@ -294,6 +288,15 @@ CHANGES: list[Change] = [
             "RE-VERIFIED 2026-09-04 under POD v3, which is now the DEFAULT pod (combat_targeting='open', incidental_rate=1.0, clock_shift=2, archetypes on) and the first pod model in which your life total is load-bearing. Measured as the same 3-for-3, 6,000 paired games: win rate +0.0362 [+0.0300, +0.0425] at 10 turns and +0.0638 [+0.0550, +0.0727] at 20; damage +6.89 and +7.68. Against +0.0397 and +0.0617 on the old pod, and +0.0483 / +0.0773 on pod v2 without archetypes. Significant at both horizons on every pod tried. The package adds two blockers and a lifelinker to a deck that now takes real attacks, so it holds up precisely where the modelling got better. Decision stands."
         ),
     ),
+]
+
+# ---------------------------------------------------------------------------
+# Staged — decided, not yet in the spreadsheets
+# ---------------------------------------------------------------------------
+CHANGES: list[Change] = [
+
+
+
     Change(
         deck="rendmaw",
         remove="Idol of Oblivion",
@@ -388,10 +391,9 @@ DECKS = {
         "Molecule Man": lorehold_v16.MOLECULE_MAN,
         "Galvanoth": lorehold_v16.GALVANOTH,
         "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
-    "karlov": (karlov_v1, {
-        "Starscape Cleric": karlov_v1.STARSCAPE_CLERIC,
-        "Enduring Tenacity": karlov_v1.ENDURING_TENACITY,
-        "Exemplar of Light": karlov_v1.EXEMPLAR_OF_LIGHT}),
+    # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
+    # in the deck list itself and no longer swap-in candidates.
+    "karlov": (karlov_v2, {}),
 }
 
 

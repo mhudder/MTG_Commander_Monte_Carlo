@@ -16,7 +16,7 @@ from edhmc.experiment import run_ab, analyse, POD_V2
 
 from edhmc.decks.rendmaw_v12 import CAULDRON_OF_ESSENCE
 from edhmc.decks.lorehold_v16 import SUNBIRDS_INVOCATION
-from edhmc.decks.karlov_v1 import (STARSCAPE_CLERIC, ENDURING_TENACITY,
+from edhmc.decks.karlov_v2 import (STARSCAPE_CLERIC, ENDURING_TENACITY,
                                    EXEMPLAR_OF_LIGHT)
 
 N = 6000

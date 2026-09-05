@@ -24,13 +24,13 @@ full rationale, evidence and re-verification for each.
 | committed | Hidden Retreat | Double Vision | 2026-09-01 |
 | **staged** | Scroll Rack | Sunbird's Invocation | 2026-09-04 |
 
-## Karlov of the Ghost Council (v1)
+## Karlov of the Ghost Council (v2)
 
 | | out | in | date |
 |---|---|---|---|
-| **staged** | Swamp | Starscape Cleric | 2026-09-04 |
-| **staged** | Whispersilk Cloak | Enduring Tenacity | 2026-09-04 |
-| **staged** | Lightning Greaves | Exemplar of Light | 2026-09-04 |
+| committed | Swamp | Starscape Cleric | 2026-09-04 |
+| committed | Whispersilk Cloak | Enduring Tenacity | 2026-09-04 |
+| committed | Lightning Greaves | Exemplar of Light | 2026-09-04 |
 
-**5 committed, 5 staged.** All five staged changes were measured
-as real swaps under pod v3 and carry a `reverified` note.
+**8 committed, 2 staged.** Every change was measured as a
+real swap under the pod model current at the time and re-verified under pod v3.

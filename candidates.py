@@ -28,7 +28,7 @@ from edhmc.decks.lorehold_v16 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       UNDERWORLD_BREACH,
                                       CALDERA_PYREMAW, INVINCIBLE_HYMN,
                                       REVERSE_THE_SANDS)
-from edhmc.decks.karlov_v1 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
+from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    GUIDE_OF_SOULS, ENDURING_TENACITY,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
