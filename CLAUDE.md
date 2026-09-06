@@ -1,7 +1,7 @@
 # EDH Monte Carlo — project context
 
-Monte Carlo simulator for evaluating Commander decklist changes. Three decks,
-three engines, a shared opponent model, and a paired A/B harness using common
+Monte Carlo simulator for evaluating Commander decklist changes. Four decks,
+four engines, a shared opponent model, and a paired A/B harness using common
 random numbers.
 
 The goal is results that are **mechanically explainable**, not merely
@@ -16,11 +16,13 @@ result yet.
       engine.py        Rendmaw engine + shared Card/Permanent/mana primitives
       lorehold.py      Lorehold engine (miracle / top-deck)
       karlov.py        Karlov engine (lifegain / drain)
+      tivit.py         Tivit engine (votes / artifact tokens / extra turns)
+      voting.py        the council mechanic and the opponent-vote model
       opponents.py     shared opponent model and clock
       experiment.py    paired A/B harness
       pending.py       staged-change ledger
       decks/
-        rendmaw_v12.py  lorehold_v16.py  karlov_v1.py
+        rendmaw_v12.py  lorehold_v16.py  karlov_v2.py  tivit_v1.py
 
 Entry points live at the repo root and import `edhmc.*`. Run them from the
 repo root.
@@ -578,6 +580,99 @@ changes have not been measured together.**
 
 Goldspan Dragon was passed at +0.0025 ±0.0045 and was understated by the same
 flying bug; it has not been re-measured.
+
+### 2026-09-05: a fourth deck — Tivit, Seller of Secrets
+
+`validate.py` now prints `+0.00` on **nine** metrics across three engines. The
+Tivit A/A control is clean on `artifacts_made`, `votes_cast` and `damage`.
+Baseline over 500 games at T20: **win rate 0.360**, between Rendmaw (0.307) and
+Karlov (0.455).
+
+**The vote is the first thing in this project that asks an OPPONENT to decide.**
+Everywhere else the opponent model is a clock, a blocker count and a removal
+rate — it never chooses. `edhmc/voting.py` holds the mechanic and the
+assumption. Read it before trusting any number about a vote card.
+
+Four keywords, and a single "who won the vote" helper would be wrong for most:
+
+| keyword | resolves as |
+|---|---|
+| will of the council | ONE outcome, most votes wins, ties usually **against** you |
+| council's dilemma | PER-VOTE — every vote has its own effect, no winner |
+| tempting offer | not a vote; opponents opt in and you match them |
+| secret council | simultaneous, so vote control applies but information does not |
+
+`cfg["opp_vote_policy"]` defaults to **`"adversarial"`** — every opponent votes
+against you and they agree with each other. That is the pessimistic bound and a
+**judgement call**, not a claim about real pods. Any card whose evaluation
+swings on it must be reported with the knob said out loud, the same rule
+`destroy_share` already carries. `"selfish"` and `"random"` are the
+alternatives.
+
+**Why pessimism is safe for the commander and brutal for the vote cards.**
+Tivit's dilemma is "for each evidence vote, investigate; for each bribery vote,
+create a Treasure" — **both halves make an artifact**. An adversarial pod
+cannot reduce the count, only the mix. So the commander is untouched by the
+assumption while will-of-the-council cards are hit hard: the baseline wins only
+**0.25 of 1.98 councils a game**, because Tivit's own extra vote gives you 2
+against 3, and you need BOTH Ballot Broker and Brago's Representative to reach
+4 and win outright.
+
+**That threshold is a leave-one-out trap.** Cut either extra-vote creature
+alone and the other still ties, so both look weak individually and are worth
+far more as a pair — the same shape as Karlov's three Exquisite Blood partners.
+**Ablate them as a group.**
+
+**The engine loop, and a claim the measurement corrected.** Deadeye Navigator
+soulbound to Tivit is "{1}{U}: dilemma" — two mana in, one dilemma out. Your
+votes buy Treasures, an adversarial pod's buy Clues, so the loop pays for
+itself exactly when
+
+    (your votes) × (token kinds per vote) > 2
+
+I built the engine believing Academy Manufactor was the only way over that
+line, and wrote it into the docstring. **It is not.** Measured directly from a
+ten-Treasure pool with no lands (`test_tivit_combo.py`):
+
+| board | votes × kinds | result |
+|---|---|---|
+| Tivit + Deadeye alone | 2 × 1 = 2 | 1 iteration, 10 → 10. **Exactly break even**, stops |
+| + Academy Manufactor | 2 × 3 = 6 | runs to the cap, 10 → 130 |
+| + Ballot Broker | **3 × 1 = 3** | **runs to the cap**, 10 → 50 |
+| + Ballot Broker + Brago's | 4 × 1 = 4 | 10 → 90 |
+| + Manufactor + Ballot Broker | 3 × 3 = 9 | 10 → 170 |
+
+**A single extra-vote creature tips the loop on its own, with no Manufactor.**
+So Ballot Broker and Brago's Representative are combo pieces, not just
+vote-count cards — worth knowing before cutting either as "just a body", and
+on top of the tie-breaking role that already made them a leave-one-out trap.
+`test_tivit_combo.py` pins the whole table so the docstring cannot drift from
+the behaviour again.
+
+Unconditionally, ablating Academy Manufactor is **−0.0292 [−0.0372, −0.0212]**
+win rate, −10.3 artifacts and −5.3 damage, all significant.
+
+The pile then has to CONVERT, and `convert_the_pile()` checks in the order a
+pilot would: Revel in Riches at ten Treasures, Mechanized Production at eight,
+then the drains, then Time Sieve. `win_route` records HOW the deck won — over
+500 games: combat 76, drain 70, mechanized 15, torment 10, revel 5, sieve 3.
+Extra turns are real turns and still count against the horizon, so this deck
+cannot buy turns the other three engines do not get.
+
+**Classification: 39 SCRIPTED, 25 KNOWN_BLIND**, each with its reason. Half the
+blind group is the project's oldest limitation — opponents' boards are a
+blocker count, so no removal spell can be evaluated. The rest are blind
+*despite* having engine code, which is the distinction this project has got
+wrong twice: Expropriate's extra turns land but stealing a permanent needs
+permanents to steal; Torment of Hailfire's X is fixed and opponents can only
+pay in life, so it is a **ceiling**; Rhystic Study's tax is a social fact the
+model cannot see.
+
+**`audit_cards.py` earned its keep immediately**: it caught SIX untagged
+fliers in the new list, Tivit itself among them. Regenerating `_evasion.py`
+moved the deck's win rate 0.327 → 0.360. That is the "adding a card is TWO
+edits" hazard, caught by a tool this time rather than by a later session. All
+four decks are now 0 ERR over 377 card slots.
 
 ### Fixed hazard: ablation cache key
 

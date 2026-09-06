@@ -17,11 +17,12 @@ WHAT THIS DECK ACTUALLY DOES, and therefore what the engine has to model:
      Treasure token, instead create one of each" -- five votes become FIFTEEN
      artifacts, five of them Treasures.
   3. TREASURES PAY FOR THE BLINK THAT MAKES MORE TREASURES. Deadeye Navigator
-     soulbound to Tivit is "{1}{U}: dilemma". Without Manufactor an
-     adversarial pod votes evidence and you net two Treasures for two mana --
-     break even, and the loop stalls. With Manufactor you net five Treasures
-     for two mana and it does not stop. THAT is the deck's infinite, and the
-     ablation should be able to see the difference between the two.
+     soulbound to Tivit is "{1}{U}: dilemma" -- two mana in, one dilemma out.
+     The loop pays for itself when (your votes) x (token kinds) > 2, and Tivit
+     alone is exactly 2 x 1 = 2: break even, and it stops. Either Academy
+     Manufactor (x3 kinds) OR one extra-vote creature (3 votes) tips it. See
+     deadeye_loop() for the measured numbers -- the two-route finding came out
+     of the ablation and corrected what this file originally claimed.
   4. THE PILE CONVERTS. Time Sieve turns five artifacts into an extra turn;
      Marionette Master and Disciple of the Vault turn them into damage;
      Revel in Riches and Mechanized Production are outright alternate wins.
@@ -395,21 +396,39 @@ def crack_clues(g, want=1) -> int:
 def deadeye_loop(g):
     """"{1}{U}: Exile this creature, then return it." Soulbound to Tivit.
 
-    Each activation costs two mana and yields one dilemma. Whether that is a
-    loop or a treadmill is decided by ACADEMY MANUFACTOR and by nothing else:
+    Each activation costs TWO MANA and yields one dilemma. Your own votes buy
+    Treasures; an adversarial pod's votes buy Clues. So the loop pays for
+    itself exactly when
 
-      without Manufactor  your votes make Treasures, theirs make Clues, so an
-                          adversarial pod holds you to two Treasures for two
-                          mana. Break even -- it converts mana into Clues, not
-                          into more mana.
-      with Manufactor     every vote makes a Treasure AND a Clue AND a Food,
-                          so five votes are five Treasures for two mana. That
-                          is mana-positive and it does not stop.
+        (your votes) x (token kinds per vote) > 2
+
+    and THERE ARE TWO INDEPENDENT ROUTES TO THAT, which is not what this
+    docstring claimed when it was written. Measured directly, starting from a
+    ten-Treasure pool with no lands (diag_tivit_combo.py, and the unit check
+    in test_tivit_combo.py):
+
+        Tivit + Deadeye alone        2 votes x 1 kind  = 2   1 iteration,
+                                     10 Treasures -> 10. EXACTLY break even,
+                                     and the loop stops on its own.
+        + Academy Manufactor         2 votes x 3 kinds = 6   runs to the cap,
+                                     10 -> 130.
+        + Ballot Broker              3 votes x 1 kind  = 3   runs to the cap,
+                                     10 -> 50.
+        + Ballot Broker + Brago's    4 votes x 1 kind  = 4   10 -> 90.
+        + Manufactor + Ballot        3 x 3             = 9   10 -> 170.
+
+    SO THE EXTRA-VOTE CREATURES ARE COMBO PIECES, not merely vote-count cards.
+    One of them alone turns the treadmill into an engine without Manufactor,
+    which is worth knowing before cutting either as "just a body". The
+    original framing here -- Manufactor or nothing -- was wrong, and the
+    ablation is what found it.
 
     The cap is a modelling necessity, not a rules one. `combo_cap` iterations
-    is treated as "arbitrarily large"; the deck then needs a payoff on the
-    battlefield to convert it, and if it has none the pile just sits there --
-    which is the honest outcome and is worth being able to measure.
+    per activation window is treated as "arbitrarily large"; the deck then
+    needs a payoff on the battlefield to convert it, and if it has none the
+    pile just sits there -- which is the honest outcome and is worth being
+    able to measure. Note `combo_iterations` ACCUMULATES ACROSS TURNS, so a
+    value above the cap is several capped windows, not one.
     """
     if not (g.has("Deadeye Navigator") and g.has("Tivit, Seller of Secrets")):
         return
