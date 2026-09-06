@@ -100,6 +100,10 @@ Consequences worth carrying forward:
 - **Every ablation table predating this is void.** `ablation_karlov.txt`,
   `ablation_rendmaw.txt` and `ablation_lorehold.txt` were all measured against
   the uncorrected engine. Regenerate before reading any of them.
+  **All four tables are CURRENT as of 2026-09-05** — lorehold and tivit at the
+  deck changes, rendmaw and karlov at the engine fixes. `ablation_tivit.txt` is
+  the only one at N=2000 rather than 6000, so its noise floor is ~0.015 win
+  rate and it is not comparable to the others row-for-row.
 - **Correcting Karlov made the deck look worse, not better** (win rate
   −0.0163 ±0.0139). The old numbers were inflated by phantom lifegain triggers
   and by Well of Lost Dreams / Dawn of Hope drawing cards for free.
