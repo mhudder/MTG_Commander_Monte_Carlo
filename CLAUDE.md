@@ -461,7 +461,7 @@ generated tag set, a script that reads the wrong zone. Full write-up in
    BATTLEFIELD, it's a 1/1 Insect creature" — so it triggers Rendmaw when
    played and is a bare Planeswalker after. It was attacking, and under March of
    the World Ooze it was a **6/6 attacker**. FIXED via
-   `engine.is_creature_now()`, which is the same question `impending` already
+   `engine.is_battlefield_creature()`, which is the same question `impending` already
    asks for Overlord. Cost: −0.32/−0.39 damage, **win rate unmoved at both
    horizons** (−0.0003, inside its bar). Default-on for that reason.
 2. **`tag_flying.py` never tagged candidates.** It walked `build()` only, and
@@ -481,10 +481,44 @@ generated tag set, a script that reads the wrong zone. Full write-up in
    `draw2` when it is a WHEEL. `check_scripted_coverage()` cannot catch this —
    it verifies every card is CLASSIFIED, not that the classification is TRUE.
 
-Also open, lower stakes: Grave Titan and Overlord are both missing their "or
-**attacks**" half; Overlord's Everywhere token enters untapped and should enter
-tapped; Suture Priest / Daxos / Elas il-Kor each trigger off their own arrival
-despite reading "ANOTHER creature you control".
+### The "lower stakes" fixes — two of the three were not
+
+I filed these as low-stakes. Measured as CFG flips, 6,000 paired games each
+(`run_lowstakes.py`), **two of the three move win rate by about a point**:
+
+| fix | deck | win T10 | win T20 |
+|---|---|---|---|
+| `attack_triggers` | rendmaw | +0.0033 [+0.0018, +0.0050] | **+0.0100 [+0.0067, +0.0135]** |
+| `everywhere_enters_tapped` | rendmaw | −0.0008 [−0.0022, +0.0005] | +0.0002 [−0.0020, +0.0025] |
+| `another_creature_clause` | karlov | −0.0103 [−0.0133, −0.0073] | **−0.0130 [−0.0178, −0.0085]** |
+
+1. **Grave Titan and Overlord both read "enters OR ATTACKS"** and only the ETB
+   half fired. `engine.attack_triggers()` runs in the declare-attackers step.
+   +0.47 triggers a game, +0.55 tokens, +1.53 board power, +1.43 damage — and
+   +0.048 *Rendmaw* triggers, because Overlord's extra land tokens are extra
+   mana and that buys extra spells. **+0.0100 win rate is comparable to the
+   staged Cauldron of Essence swap.**
+2. **Overlord's Everywhere token entered untapped**; the oracle says tapped.
+   This one IS as small as advertised — win rate flat at both horizons, with
+   `mana_floated` −0.32 and `stranded_mv` +0.35. Exactly the right shape: the
+   mechanism moves and the objective does not.
+3. **Suture Priest, Daxos and Elas il-Kor triggered off their own arrival.**
+   All three read "whenever ANOTHER creature you control enters";
+   `creature_entered` took an `entering` argument and only Guide of Souls used
+   it. That is **0.85 phantom lifegain triggers a game**, not the "one per card
+   per game" I guessed, and in a deck where the trigger IS the payoff it
+   compounds through Karlov's counters, Voice of the Blessed, Cliffhaven
+   Vampire, Marauding Blight-Priest and Starscape Cleric.
+   **This is the third time correcting Karlov has made it look worse** — the
+   2026-09-03 audit was −0.0163, same cause: phantom lifegain triggers.
+
+All three gated, all three default on. `validate.py` `+0.00` on all six,
+`corr(A,B)` 0.9057 → 0.9069.
+
+**`ablation_karlov.txt` is therefore void too**, which an earlier version of
+`regen_tables.sh` denied in writing. That argument was correct about the Grist
+change and wrong about this one — the lesson being that "this engine is
+independent" is a claim to check per change, not once.
 
 **And one that pod v3 promoted from harmless to live:** life-loss drawbacks are
 still free. That was fine when 100% of losses were an opponent's clock. It is
@@ -662,17 +696,20 @@ Re-read against the code 2026-09-05; verdicts inline.
    evasion section, item 3. This entry was stale.
 7. `Card.indestructible` is priced by a single flat `destroy_share`. A card
    whose evaluation swings on that knob should be reported with it said out
-   loud. **Still true 2026-09-05, and now load-bearing for two cards, not
-   zero:** Heliod, Sun-Crowned and Erebos, Bleak-Hearted both read "as long as
-   your devotion to <colour> is less than five, this isn't a creature", which
-   the engine cannot express — the same gap `is_creature_now` closed for Grist,
-   but conditional on board state rather than static. Erebos is IN the Rendmaw
-   deck and is modelled as a 5/6 that is ALWAYS a creature; it should be one
-   only while black devotion is 5+, which in that list is a mid-game condition,
-   not an early-game one. Under March of the World Ooze the early turns get a
-   6/6 attacker that should not exist yet.
-8. Radiant Scrollwielder's zone, and the three mislabelled Lorehold cards
-   (Apex of Power, Hit the Mother Lode, Borrowed Knowledge). `KNOWN_ISSUES.md`
-   §0d and §0e.
-9. Life-loss drawbacks are free and pod v3 made that matter. `KNOWN_ISSUES.md`
-   §0g. Bitterblossom is the card to start with.
+   loud. Still true 2026-09-05.
+8. **EREBOS, BLEAK-HEARTED is always a creature and should not be.** "As long
+   as your devotion to black is less than five, Erebos isn't a creature." It is
+   in the Rendmaw deck as a permanent 5/6, so the early turns get a body that
+   should not exist yet — and under March of the World Ooze a 6/6 attacker.
+   This is the same gap `is_battlefield_creature` closed for Grist, but
+   conditional on board state rather than static, so the `impending` sentinel
+   cannot express it.
+   Note the machinery already exists on the other engine: `karlov.is_creature_now`
+   does exactly this for Heliod, Sun-Crowned via `devotion_white()`. Erebos
+   needs the black twin of it in `engine.py`. (Those two functions have
+   deliberately different names — one takes a Permanent, one a Card.)
+9. Radiant Scrollwielder's zone is FIXED, but the three mislabelled Lorehold
+   cards are not: Apex of Power, Hit the Mother Lode, Borrowed Knowledge.
+   `KNOWN_ISSUES.md` §0f.
+10. Life-loss drawbacks are free and pod v3 made that matter.
+    `KNOWN_ISSUES.md` §0i. Bitterblossom is the card to start with.

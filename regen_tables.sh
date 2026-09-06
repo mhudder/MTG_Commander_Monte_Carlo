@@ -8,11 +8,11 @@
 #             of the World Ooze, The Great Henge, Overwhelming Stampede,
 #             Enduring Vitality), moved.
 #
-# KARLOV IS DELIBERATELY NOT REGENERATED. karlov.py imports only Card,
-# Permanent, can_pay, available_mana, spend and play_land from engine.py;
-# is_creature_now() is reached only inside the `if g.has("Enduring Vitality")`
-# branch, which no Karlov list can enter; and no Karlov card is in
-# STACK_ONLY_CREATURES. Its table is untouched.
+#   karlov    the ENGINE changed: Suture Priest, Daxos and Elas il-Kor no
+#             longer trigger off their own arrival. This was added to the list
+#             on 2026-09-05 AFTER an earlier version of this script argued
+#             Karlov was unaffected — which was true of the Grist change and
+#             false of this one. Measured at -0.023 win rate, so not small.
 #
 # THE CACHE IS DELETED FIRST, and that is the whole point. ablation.py keys its
 # cache on deck, horizons and N -- NOT on the version of the code that produced
@@ -26,7 +26,7 @@ set -e
 RESUME=""
 [ "$1" = "--resume" ] && RESUME=1
 
-for deck in lorehold rendmaw; do
+for deck in lorehold rendmaw karlov; do
     cache="ablation_cache_${deck}_10-20_n6000.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "ablation_${deck}.log"

@@ -114,10 +114,10 @@ class Permanent:
     base_t: int = 1
 
 
-NEVER = 10 ** 9   # an `impending` that never arrives: see is_creature_now
+NEVER = 10 ** 9   # an `impending` that never arrives: see is_battlefield_creature
 
 
-def is_creature_now(g, p: Permanent) -> bool:
+def is_battlefield_creature(g, p: Permanent) -> bool:
     """Creature-ness ON THE BATTLEFIELD, which is not the type line.
 
     `Card.types` is the type line as PLAYED, because that is what Rendmaw's
@@ -221,6 +221,7 @@ class Game:
             "mana_floated": 0,
             "mana_spent": 0,
             "rendmaw_triggers": 0,
+            "attack_triggers": 0,      # Grave Titan / Overlord "or attacks"
             "tokens_made": 0,
             "spells_cast": 0,
             "turn_lethal": 99,
@@ -451,7 +452,7 @@ def available_mana(g: Game) -> list[frozenset]:
     # Enduring Vitality: creatures tap for mana of any colour
     if g.has("Enduring Vitality"):
         for p in g.board:
-            if (is_creature_now(g, p) and not p.tapped and not p.sick
+            if (is_battlefield_creature(g, p) and not p.tapped and not p.sick
                     and not p.card.mana_ability):
                 units.append(any_color)
     return units
@@ -463,7 +464,7 @@ def cost_after_reduction(g: Game, card: Card) -> dict:
         cost["gen"] = max(0, cost.get("gen", 0) - 1)
     if card.name == "The Great Henge":
         best = max([g.power_of(p) for p in g.board
-                    if is_creature_now(g, p)] or [0])
+                    if is_battlefield_creature(g, p)] or [0])
         cost["gen"] = max(0, cost.get("gen", 0) - best)
     return cost
 
@@ -611,7 +612,7 @@ def main_phase(g: Game, precombat: bool = False):
             # control. In a deck that goes this wide it is a finisher, and the
             # engine was previously casting it for literally no effect.
             g.stampede_bonus += max([g.power_of(p) for p in g.board
-                                     if is_creature_now(g, p)] or [0])
+                                     if is_battlefield_creature(g, p)] or [0])
         if "Creature" in card.types or "Artifact" in card.types or \
            "Enchantment" in card.types or "Planeswalker" in card.types:
             perm = Permanent(card=card, sick=True,
@@ -685,9 +686,7 @@ def run_etb(g: Game, perm: Permanent):
     elif s == "grave_titan":
         g.make_tokens(2, 2, 2, "Zombie")
     elif s == "overlord":
-        g.board.append(Permanent(card=Card(name="Everywhere token",
-                                           types=frozenset({"Land"}), is_land=False),
-                                 tapped=False, sick=False))
+        make_everywhere(g)
     elif s == "gearhulk":
         for p in g.board:
             if p.card.is_creature:
@@ -706,7 +705,7 @@ def run_etb(g: Game, perm: Permanent):
         g.draw(1)
     elif s == "draw2":
         g.draw(2)
-    if g.has("The Great Henge") and is_creature_now(g, perm) and not perm.is_token:
+    if g.has("The Great Henge") and is_battlefield_creature(g, perm) and not perm.is_token:
         g.draw(1)
         perm.counters += 1
 
@@ -864,13 +863,69 @@ def activations(g: Game):
             g.draw(1)
 
 
+def attack_triggers(g: Game, attackers: list[Permanent]):
+    """"Whenever this ... ENTERS OR ATTACKS" — the half that was missing.
+
+    Two cards in the Rendmaw list read "enters or attacks" and only the ETB
+    was modelled, so both were understated by everything after the turn they
+    landed. Found in the 2026-09-05 oracle re-verification.
+
+    The tokens are created AFTER attackers are chosen and are not themselves
+    attacking, which is correct: an attack trigger resolves in the declare
+    attackers step, long after the game has locked in who is swinging.
+
+    Gated on cfg["attack_triggers"] so the tables measured before 2026-09-05
+    stay reproducible.
+    """
+    if not g.cfg.get("attack_triggers", True):
+        return
+    for p in attackers:
+        n = p.card.script
+        if n == "grave_titan":
+            # "Whenever this creature enters or attacks, create two 2/2 black
+            # Zombie creature tokens."
+            g.make_tokens(2, 2, 2, "Zombie")
+            g.m["attack_triggers"] += 1
+        elif n == "overlord":
+            # "Whenever this permanent enters or attacks, create a tapped
+            # colorless land token named Everywhere that is every basic land
+            # type." An Overlord deployed for its IMPENDING cost is not a
+            # creature yet, so it cannot attack and cannot reach this — which
+            # is_battlefield_creature already enforces in the attacker filter.
+            make_everywhere(g)
+            g.m["attack_triggers"] += 1
+
+
+def make_everywhere(g: Game):
+    """Overlord of the Hauntwoods' land token.
+
+    "Create a TAPPED colorless land token named Everywhere that is every basic
+    land type." Two things were wrong before 2026-09-05: it entered UNTAPPED,
+    handing you the mana a turn early, and only the ETB half ever made one.
+
+    It is deliberately `is_land=False` with a name the mana code special-cases:
+    it taps for any colour this deck needs, but must not count as a land for
+    land-drop or mulligan purposes.
+
+    The tapped half is gated separately from the attack half, because they are
+    two different errors that happen to live on the same card: one gave you the
+    mana a turn early, the other never gave you the second token at all.
+    """
+    g.board.append(Permanent(
+        card=Card(name="Everywhere token", types=frozenset({"Land"}),
+                  is_land=False),
+        tapped=g.cfg.get("everywhere_enters_tapped", True), sick=False))
+
+
 def combat(g: Game):
     attackers = [p for p in g.board
-                 if is_creature_now(g, p) and not p.tapped and not p.sick]
+                 if is_battlefield_creature(g, p) and not p.tapped and not p.sick]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
     g.beast_active = (g.has("Beastmaster Ascension") and len(attackers) >= 7)
+
+    attack_triggers(g, attackers)
 
     dmg = sum(g.power_of(p) for p in attackers)
 

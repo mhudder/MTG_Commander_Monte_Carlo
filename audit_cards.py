@@ -218,7 +218,7 @@ def check(deck, c, sc):
     if c.name in STACK_ONLY_CREATURES:
         # `Card.types` is deliberately the type line ON THE STACK, because that
         # is what Rendmaw's "play a card with two or more card types" reads.
-        # engine.is_creature_now() takes it off the battlefield again.
+        # engine.is_battlefield_creature() takes it off the battlefield again.
         out.append(("NOTE", "stack-only creature, Creature type carried on "
                             "purpose: %s" % STACK_ONLY_CREATURES[c.name]))
         printed = printed | {"Creature"}

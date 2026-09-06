@@ -262,7 +262,15 @@ def devotion_white(g):
 def is_creature_now(g, card):
     """Heliod is an Enchantment Creature that is NOT a creature while your
     devotion to white is less than five. Nothing else in this deck has a
-    type-changing condition."""
+    type-changing condition.
+
+    NOT THE SAME FUNCTION as `engine.is_battlefield_creature`, which takes a
+    PERMANENT and answers the static version of the question (Grist, and
+    Impending). This one takes a CARD and answers the devotion-conditional
+    version. They were briefly both called `is_creature_now`, with incompatible
+    signatures, which is a trap waiting for the first person to add an import.
+    Merging them properly means giving this engine Permanents where it
+    currently passes Cards; until then, keep the names distinct."""
     if not card.is_creature:
         return False
     if card.name == "Heliod, Sun-Crowned":
@@ -364,32 +372,66 @@ def creature_entered(g, mine=True, entering=None):
     `entering` is the permanent that just entered, where the caller knows it.
     It is used for the "ANOTHER creature you control" clauses, so that a card
     does not trigger off its own arrival.
+
+    WHICH CARDS SAY "ANOTHER" MATTERS, and four of the six here differ:
+
+      Soul Warden        "whenever ANOTHER creature enters"        — any player
+      Soul's Attendant   "whenever ANOTHER creature enters"        — any player
+      Auriok Champion    "whenever ANOTHER creature enters"        — any player
+      Guide of Souls     "whenever ANOTHER creature YOU CONTROL"   — yours only
+      Daxos              "whenever ANOTHER creature YOU CONTROL"   — yours only
+      Elas il-Kor        "whenever ANOTHER creature YOU CONTROL"   — yours only
+      Suture Priest      "whenever ANOTHER creature YOU CONTROL enters, you may
+                          gain 1 life" AND "whenever a creature AN OPPONENT
+                          controls enters, you may have that player lose 1" —
+                          the second clause has no "another" because it can
+                          never be Suture Priest itself.
+
+    Every one of them is "another", so none may trigger off its own arrival.
+    Until 2026-09-05 only Guide of Souls checked, and the other five each
+    gained a phantom life once per game. Gated on
+    cfg["another_creature_clause"] so earlier tables reproduce.
     """
+    strict = g.cfg.get("another_creature_clause", True)
+
+    def others(name):
+        """How many permanents named `name` see this ETB as ANOTHER creature.
+
+        Identity, not name equality: Starscape Cleric's Offspring makes a token
+        COPY, so two permanents can share a name and only the one that just
+        entered is excluded.
+        """
+        return sum(1 for q in g.board
+                   if q.card.name == name
+                   and not (strict and q is entering))
+
     # Guide of Souls: "Whenever another creature you control enters, you gain 1
     # life and get {E}." The energy is what pays for the attack trigger.
     if mine:
-        guides = [q for q in g.board
-                  if q.card.name == "Guide of Souls" and q is not entering]
-        for _ in guides:
+        for _ in range(others("Guide of Souls")):
             gain_life(g, 1)
             g.energy += 1
             g.m["guide_triggers"] += 1
-    for _ in range(g.count("Soul Warden") + g.count("Soul's Attendant")
-                   + g.count("Auriok Champion")):
+    for _ in range(others("Soul Warden") + others("Soul's Attendant")
+                   + others("Auriok Champion")):
         gain_life(g, 1)
-    if mine and g.has("Daxos, Blessed by the Sun"):
-        gain_life(g, 1)
+    if mine:
+        for _ in range(others("Daxos, Blessed by the Sun")):
+            gain_life(g, 1)
     if g.has("Suture Priest"):
         if mine:
-            gain_life(g, 1)
+            for _ in range(others("Suture Priest")):
+                gain_life(g, 1)
         else:
             # "you may have that player lose 1 life" — no life gained, so this
-            # is not a drain() and must not create a Karlov trigger.
+            # is not a drain() and must not create a Karlov trigger. No
+            # "another" clause here: it can never be Suture Priest itself.
             OPP.damage_single(g, 1)
             g.m["damage"] += 1
             g.m["drain_damage"] += 1
-    if mine and g.has("Elas il-Kor, Sadistic Pilgrim"):
-        gain_life(g, 1)
+    if mine:
+        for _ in range(others("Elas il-Kor, Sadistic Pilgrim")):
+            gain_life(g, 1)
     if not mine and g.has("Authority of the Consuls"):
         gain_life(g, 1)
 

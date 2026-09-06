@@ -56,7 +56,7 @@ The engine read the type line everywhere, so Grist attacked, tapped for Enduring
 Vitality, and counted as a body for The Great Henge and Overwhelming Stampede.
 **Under March of the World Ooze it was a 6/6 attacker.**
 
-`engine.is_creature_now(g, perm)` now answers "creature on the battlefield",
+`engine.is_battlefield_creature(g, perm)` now answers "creature on the battlefield",
 which is the same question `impending` was already asking for Overlord of the
 Hauntwoods, so both go through one function. `STACK_ONLY_CREATURES` carries the
 quoted clause. Gated on `cfg["battlefield_creature_types"]`, default **on**.
@@ -130,9 +130,9 @@ tracked" was stale and has been corrected.
 
 **The fix tripled its firings and did not make it a better card**: 0.68 → 2.20
 per game it resolves, and win rate essentially unchanged against Galvanoth. See
-§0i.
+§0e.
 
-## 0i. The Penance slot, resolved: Caldera Pyremaw
+## 0e. The Penance slot, resolved: Caldera Pyremaw
 
 With §0c and §0d fixed, all three contenders were measured against the same cut
 with the same seeds (`run_fivedrop.py`, 6,000 paired games each, pod v3):
@@ -176,7 +176,7 @@ measured on, so the comparison is sound — but **the two staged Lorehold change
 have never been measured together**, and that is the next thing to do before
 either is written to the `.xlsx`.
 
-## 0e. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
+## 0f. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
 
 Membership in `SCRIPTED_*` is a claim that the engine implements the card. These
 three do not, and `check_scripted_coverage()` cannot catch it — it verifies that
@@ -194,18 +194,77 @@ Knowledge is a wheel, and the engine already has a `wheel` script for Reforge th
 Soul. All three **understate**, which is the safe direction, but they are
 labelled as if their scores were evidence about the cards.
 
-## 0f. Two "or attacks" triggers are missing, and one token enters untapped
+## 0g. FIXED — two "or attacks" triggers, and one token entering untapped
 
 | card | missing clause |
 |---|---|
-| Grave Titan | "Whenever this creature enters **or attacks**, create two 2/2 Zombies" — only the ETB fires |
-| Overlord of the Hauntwoods | "Whenever this permanent enters **or attacks**, create a tapped land token" — only the ETB fires |
+| Grave Titan | "Whenever this creature enters **or attacks**, create two 2/2 Zombies" |
+| Overlord of the Hauntwoods | "Whenever this permanent enters **or attacks**, create a tapped land token" |
 
-Both understate, and both are in `SCRIPTED_*`. Separately, the Everywhere token
-`overlord` creates enters **untapped** in the engine and the oracle says
-**tapped** — a turn of mana early, in the other direction.
+Only the ETB half fired, so both were understated by everything after the turn
+they landed. `engine.attack_triggers()` now runs in the declare-attackers step,
+after attackers are chosen — the tokens are not themselves attacking, which is
+correct. An Overlord deployed for its Impending cost is not a creature yet and
+so cannot reach it, which the attacker filter already enforces.
 
-## 0g. Life-loss drawbacks are free, and pod v3 made that matter
+Separately, the Everywhere token entered **untapped** where the oracle says
+**tapped** — a turn of mana early, an error in the other direction. Both halves
+of Overlord now go through one `make_everywhere()`.
+
+**I filed these as "lower stakes" and was wrong about the first one.** Measured
+as CFG flips, 6,000 paired games, `run_lowstakes.py`:
+
+| fix | win T10 | win T20 |
+|---|---|---|
+| `attack_triggers` | **+0.0033 [+0.0018, +0.0050]** | **+0.0100 [+0.0067, +0.0135]** |
+| `everywhere_enters_tapped` | −0.0008 [−0.0022, +0.0005] | +0.0002 [−0.0020, +0.0025] |
+
+**+0.0100 win rate is not a rounding error** — it is comparable to the staged
+Cauldron of Essence swap (+0.0135). Mechanism: 0.47 extra attack triggers a
+game, +0.55 tokens, +1.53 final board power, +1.43 damage, and +0.048 *Rendmaw*
+triggers, because Overlord's extra Everywhere tokens are extra mana and that
+buys extra spells.
+
+The Everywhere tapped fix IS as small as advertised: win rate flat at both
+horizons, with `mana_floated` −0.32 and `stranded_mv` +0.35 — exactly the shape
+you want, the mechanism moving and the objective not.
+
+Both gated (`attack_triggers`, `everywhere_enters_tapped`), default on.
+
+## 0h. FIXED — "another creature you control": three cards triggered off
+themselves, and it was NOT small
+
+Suture Priest, Daxos and Elas il-Kor all read "whenever **another** creature you
+control enters". So do Soul Warden, Soul's Attendant and Auriok Champion,
+though theirs is "another creature" with no controller clause. `creature_entered`
+took an `entering` argument and **only Guide of Souls used it**, so the other
+five each gained a phantom life off their own arrival.
+
+I estimated "one trigger per card per game, small". It is **0.85 phantom
+lifegain triggers per game**, and in a deck where the trigger *is* the payoff
+that compounds through Karlov's counters, Voice of the Blessed, Cliffhaven
+Vampire, Marauding Blight-Priest and Starscape Cleric:
+
+| metric | T10 | T20 |
+|---|---|---|
+| **win rate** | **−0.0103 [−0.0133, −0.0073]** | **−0.0130 [−0.0178, −0.0085]** |
+| lifegain triggers | −0.77 | −0.85 |
+| karlov counters | −0.76 | −0.78 |
+| damage | −2.15 | −2.08 |
+
+**This is the third time correcting Karlov has made the deck look worse** — the
+2026-09-03 audit was −0.0163, and both had the same cause: phantom lifegain
+triggers. Gated on `another_creature_clause`, default on.
+
+The identity test matters, not name equality: Starscape Cleric's Offspring makes
+a token *copy*, so two permanents can share a name and only the one that just
+entered is excluded.
+
+**Consequence: `ablation_karlov.txt` is void**, which an earlier version of
+`regen_tables.sh` denied. That reasoning was right about the Grist change and
+wrong about this one.
+
+## 0i. Life-loss drawbacks are free, and pod v3 made that matter
 
 The 2026-09-04 note "LIFE DOES NOT DECIDE GAMES" was true of pod v1, where 100%
 of losses were an opponent's clock. **Pod v3 is the default now**, and the
@@ -226,13 +285,6 @@ now knowingly so.** The same sentence used to be true of Dark Confidant alone.
 Storm Herd's X is still `cfg["storm_herd_x"] = 40` rather than your life total,
 for the same reason and with the same consequence — but it is already in
 `KNOWN_BLIND`, so nothing reads its number.
-
-## 0h. "Another creature you control" — three cards trigger off themselves
-
-Suture Priest, Daxos and Elas il-Kor all read "whenever **another** creature you
-control enters". `creature_entered()` passes `entering` and only Guide of Souls
-uses it, so the other three each gain 1 life off their own arrival. One trigger
-per card per game. Small, but Suture Priest is a top-10 Karlov card.
 
 ---
 
@@ -441,7 +493,7 @@ a specific one matters.
 > **Added 2026-09-05.** Item 6 says life totals are tracked. Since pod v3 became
 > the default they are also load-bearing: the life-share of losses is
 > 0.32 / 0.43 / 0.20 rather than 0.00 / 0.00 / 0.00. Any note in this repo that
-> says "life buys nothing" is describing pod v1. See §0g for the four cards
+> says "life buys nothing" is describing pod v1. See §0i for the four cards
 > whose life-loss drawback is still free.
 
 ## 8. (superseded) Re-run both ablations
