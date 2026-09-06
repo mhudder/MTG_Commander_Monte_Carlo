@@ -73,7 +73,15 @@ def blank_like(card):
 
 def main():
     argv = sys.argv[1:]
-    n = int(argv[argv.index("--n") + 1]) if "--n" in argv else 4000
+    # CONSUME the flag's value. Written as `[a for a in argv if not
+    # a.startswith("--")]` the "4000" of `--n 4000` reads as a group name and
+    # the filter below silently skips every group, printing a header and
+    # nothing else. The same bug shipped once in run_fivedrop.py.
+    n = 4000
+    if "--n" in argv:
+        i = argv.index("--n")
+        n = int(argv[i + 1])
+        del argv[i:i + 2]
     wanted = [a for a in argv if not a.startswith("--")]
     deck, cmd = tivit_v1.build()
     by_name = {c.name: c for c in deck}

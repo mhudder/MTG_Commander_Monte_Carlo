@@ -1,0 +1,74 @@
+n=3,000 paired games, common random numbers, pod v3, opp_vote_policy=adversarial.
+Each group is replaced by blanks of the SAME mana values, all at once.
+
+=== token drains  (3 cards: Mirkwood Bats, Kambal, Profiteering Mayor, Nadier's Nightblade)
+    T10 won                 -0.0793  [ -0.0897,  -0.0690] *
+    T20 won                 -0.0973  [ -0.1093,  -0.0853] *
+    T20 damage              -6.7909  [-10.3364,  -2.2856] *
+    T20 artifacts_made     +10.3643  [ +7.8056, +13.3025] *
+    T20 treasures_made      +4.2727  [ +3.2693,  +5.3834] *
+    T20 tivit_triggers      +1.2377  [ +0.9593,  +1.5400] *
+    T20 combo_iterations    +0.6547  [ +0.3963,  +0.9277] *
+    T20 extra_turns         +0.1763  [ +0.1303,  +0.2247] *
+
+=== artifact drains  (2 cards: Disciple of the Vault, Marionette Master)
+    T10 won                 -0.0140  [ -0.0197,  -0.0090] *
+    T20 won                 -0.0317  [ -0.0397,  -0.0237] *
+    T20 damage              -6.7626  [ -8.2444,  -5.4794] *
+    T20 artifacts_made      +4.0500  [ +2.4249,  +5.9851] *
+    T20 treasures_made      +1.4457  [ +0.8793,  +2.0737] *
+    T20 tivit_triggers      +0.3627  [ +0.2230,  +0.5140] *
+    T20 combo_iterations    +0.2413  [ +0.1163,  +0.3843] *
+    T20 extra_turns         +0.0787  [ +0.0493,  +0.1103] *
+
+=== every drain  (5 cards: Mirkwood Bats, Kambal, Profiteering Mayor, Nadier's Nightblade, Disciple of the Vault, Marionette Master)
+    T10 won                 -0.1000  [ -0.1113,  -0.0890] *
+    T20 won                 -0.1413  [ -0.1553,  -0.1277] *
+    T20 damage             -16.5578  [-19.8231, -11.7798] *
+    T20 artifacts_made     +17.0647  [+13.3572, +21.1144] *
+    T20 treasures_made      +6.6723  [ +5.3243,  +8.1041] *
+    T20 tivit_triggers      +1.7407  [ +1.4067,  +2.0954] *
+    T20 combo_iterations    +0.9930  [ +0.6953,  +1.3247] *
+    T20 extra_turns         +0.2917  [ +0.2323,  +0.3573] *
+
+=== extra votes  (2 cards: Ballot Broker, Brago's Representative)
+    T10 won                 -0.0150  [ -0.0210,  -0.0090] *
+    T20 won                 -0.0253  [ -0.0337,  -0.0173] *
+    T20 damage              -4.7449  [ -9.0768,  -1.9757] *
+    T20 artifacts_made      -6.4247  [ -8.5284,  -4.5763] *
+    T20 treasures_made      -4.1463  [ -5.3527,  -3.1427] *
+    T20 tivit_triggers      -0.9510  [ -1.2837,  -0.6546] *
+    T20 combo_iterations    -0.9770  [ -1.3217,  -0.6873] *
+    T20 extra_turns         -0.0160  [ -0.0507,  +0.0187]  
+
+=== blink package  (6 cards: Ephemerate, Soulherder, Displacer Kitten, Teleportation Circle, Conjurer's Closet, Deadeye Navigator)
+    T10 won                 -0.0450  [ -0.0540,  -0.0363] *
+    T20 won                 -0.0570  [ -0.0687,  -0.0453] *
+    T20 damage              -9.3401  [-15.6549,  -5.3087] *
+    T20 artifacts_made     -20.5787  [-24.7114, -16.8736] *
+    T20 treasures_made      -9.1180  [-10.8614,  -7.5870] *
+    T20 tivit_triggers      -3.1227  [ -3.5703,  -2.7093] *
+    T20 combo_iterations    -1.9030  [ -2.3567,  -1.5103] *
+    T20 extra_turns         -0.0893  [ -0.1373,  -0.0400] *
+
+=== alternate wins  (3 cards: Revel in Riches, Mechanized Production, Time Sieve)
+    T10 won                 -0.0107  [ -0.0170,  -0.0043] *
+    T20 won                 -0.0047  [ -0.0133,  +0.0040]  
+    T20 damage              +5.1555  [ +2.6709,  +8.4595] *
+    T20 artifacts_made      +3.5413  [ +1.5233,  +6.0428] *
+    T20 treasures_made      +1.2253  [ +0.3980,  +2.1384] *
+    T20 tivit_triggers      +0.3940  [ +0.1780,  +0.6370] *
+    T20 combo_iterations    +0.2593  [ +0.0637,  +0.4763] *
+    T20 extra_turns         -0.4797  [ -0.5430,  -0.4183] *
+
+=== the four signets  (4 cards: Arcane Signet, Azorius Signet, Dimir Signet, Orzhov Signet)
+    T10 won                 -0.0323  [ -0.0403,  -0.0240] *
+    T20 won                 -0.0533  [ -0.0643,  -0.0423] *
+    T20 damage             -11.2042  [-17.1430,  -7.4660] *
+    T20 artifacts_made      -7.1050  [ -9.9465,  -4.6490] *
+    T20 treasures_made      -3.0270  [ -4.3422,  -1.9503] *
+    T20 tivit_triggers      -1.0230  [ -1.3594,  -0.7333] *
+    T20 combo_iterations    -0.3607  [ -0.6910,  -0.0840] *
+    T20 extra_turns         -0.1130  [ -0.1533,  -0.0727] *
+
+EXIT=0

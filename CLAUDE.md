@@ -674,6 +674,58 @@ moved the deck's win rate 0.327 → 0.360. That is the "adding a card is TWO
 edits" hazard, caught by a tool this time rather than by a later session. All
 four decks are now 0 ERR over 377 card slots.
 
+### Reading `ablation_tivit.txt` — two things before the rows
+
+`ablation_tivit.txt` is 2,000 paired games at horizons 10 and 20.
+
+1. **The damage column is barely measurable at T20.** Sol Ring is +8.32 ±8.15,
+   Deadeye Navigator +7.50 ±7.90, Cyberdrive +8.76 ±7.82. The combo tail makes
+   this deck's damage distribution far heavier than the other three, so the
+   proxy that works elsewhere mostly does not work here. Win rate is tighter by
+   an order of magnitude. "Follow win rate where they disagree" is usually a
+   judgement call; **for this deck it is a statistical necessity.**
+2. **The noise floor is ~±0.015 win rate at N=2000, and it is visible in the
+   table itself.** The four two-mana signets are functionally interchangeable
+   and scored +0.0080, +0.0050, +0.0100 and +0.0200. Four cards doing the same
+   job spread over 0.015 IS the noise floor. Treat anything inside that as
+   unranked. `run_tivit_groups.py` measures it deliberately rather than leaving
+   it as a coincidence.
+
+### The group ablations, which are the ones to act on
+
+`tivit_groups.txt`, 3,000 paired games. **Sign convention: the figure is what
+CUTTING the group costs you.**
+
+| group | cards | cut costs, win T20 | vs sum of the singles |
+|---|---|---|---|
+| **every drain** | 5 | **0.1413** [0.1277, 0.1553] | — |
+| token drains | 3 | 0.0973 [0.0853, 0.1093] | 0.0835, roughly additive |
+| **the four signets** | 4 | **0.0533** [0.0423, 0.0643] | 0.0430, roughly additive |
+| blink package | 6 | 0.0570 [0.0453, 0.0687] | most were `--` alone |
+| artifact drains | 2 | 0.0317 [0.0237, 0.0397] | — |
+| **extra votes** | 2 | **0.0253** [0.0173, 0.0337] | 0.0115 — **2.2× the sum** |
+| alternate wins | 3 | 0.0047 [−0.0040, 0.0133] | **inside its bar** |
+
+Three findings worth carrying forward:
+
+- **THE DECK WINS BY DRAINING, NOT BY ASSEMBLING AN ALTERNATE WIN.** All five
+  drains together are worth 0.14 win rate. Revel in Riches + Mechanized
+  Production + Time Sieve together are **inside their error bar at 20 turns**,
+  and cutting them *raises* damage by +5.16 and costs 0.48 extra turns. They
+  are three slots buying an outcome the deck reaches more reliably by other
+  means. This is the first real deckbuilding question the deck has raised, and
+  it wants a controlled test before anything is staged.
+- **THE EXTRA-VOTE PAIR IS THE PREDICTED REDUNDANCY TRAP, CONFIRMED.** Ballot
+  Broker and Brago's Representative are +0.0075 and +0.0040 alone — both inside
+  the noise floor, both look cuttable — and **0.0253 together, 2.2× the sum**.
+  The mechanism metrics say why: cutting the pair costs 0.95 Tivit triggers and
+  0.98 combo iterations, because the third vote is what tips the Deadeye loop
+  mana-positive (see `test_tivit_combo.py`) and the fourth is what wins a
+  will-of-the-council vote outright. Never read either row alone.
+- **The blink package is worth 0.057 and almost invisible card-by-card.** Six
+  ways to re-trigger the commander, each covering for the others: cutting all
+  six costs 3.12 Tivit triggers and 20.6 artifacts.
+
 ### Fixed hazard: ablation cache key
 
 `ablation.py` used to key its cache on deck and horizons but **not on sample
