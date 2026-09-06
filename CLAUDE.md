@@ -737,9 +737,16 @@ size N**, so resuming a run at a different N silently merged two sample sizes
 into one table. Fixed 2026-09-03 — the key now carries `_n{N}`, e.g.
 `ablation_cache_karlov_10-20_n6000.json`.
 
-The caches are gitignored and regenerable. Still delete them after any
-engine or deck change: the key covers the parameters of the run, not the
-version of the code that produced it.
+**The caches are TRACKED as of 2026-09-05** (141 KB for all four, against
+about six hours of simulation), so a clone can reproduce or extend the tables
+without the run. Still delete them after any engine or deck change: the key
+covers the parameters of the run, not the version of the code that produced it.
+
+Tracking them removes the safety net that a fresh clone had no cache to go
+stale, so `ABLATION_CACHES.md` records a SOURCE FINGERPRINT per deck — a hash
+of the modules whose behaviour a cached number depends on. Re-run
+`python cache_manifest.py` and compare before resuming; if it differs, delete.
+`./regen_tables.sh` deletes by default, `--resume` does not.
 
 ---
 

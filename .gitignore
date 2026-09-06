@@ -4,8 +4,13 @@ __pycache__/
 .venv/
 venv/
 
-# Ablation caches — regenerable, and large. The finished .txt tables ARE tracked.
-ablation_cache_*.json
+# Ablation caches ARE TRACKED as of 2026-09-05. They were ignored as
+# "regenerable, and large" — the first is true and the second was not: all four
+# together are 141 KB, against roughly six hours of simulation to rebuild them.
+# Tracking them lets a clone reproduce or extend the four tables without that
+# run. The cost is that a stale cache can now arrive with a checkout, so
+# ABLATION_CACHES.md records a source fingerprint per deck; check it before
+# resuming one. See cache_manifest.py.
 
 # Spreadsheet lock/temp files
 ~$*.xlsx
