@@ -37,7 +37,8 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import Card, Permanent, can_pay, available_mana, spend, play_land
+from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
+                          spend, play_land)
 from edhmc import opponents as OPP
 
 COMBO_A = "Exquisite Blood"
@@ -57,7 +58,7 @@ class KarlovGame:
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
-        self.board: list[Permanent] = []
+        self.board: Board = Board()
         self.graveyard: list[Card] = []
         self.commander = commander
         self.commander_cast = False
@@ -109,10 +110,10 @@ class KarlovGame:
     # -- helpers -------------------------------------------------------------
 
     def has(self, name):
-        return any(p.card.name == name for p in self.board)
+        return name in self.board.names
 
     def count(self, name):
-        return sum(1 for p in self.board if p.card.name == name)
+        return self.board.names.get(name, 0)
 
     def power_of(self, perm):
         base = perm.card.power + perm.counters

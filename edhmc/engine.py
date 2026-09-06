@@ -114,6 +114,95 @@ class Permanent:
     base_t: int = 1
 
 
+class Board(list):
+    """The battlefield, with an O(1) index from card name to count.
+
+    PURELY A PERFORMANCE CHANGE. `Game.has(name)` was a linear scan over the
+    board and it is the single hottest call in every one of the four engines —
+    38% of total runtime in a Lorehold profile, 475,000 calls in 400 games,
+    because almost every static ability in the project is expressed as
+    `g.has("Some Card")` inside a loop.
+
+    Safe because the battlefield is only ever `append`ed to and `remove`d from
+    (checked across all four engines and opponents.py), and because a Card's
+    `name` is never reassigned once built — nothing in edhmc mutates any Card
+    field. The other list mutators are overridden anyway so that a future
+    caller cannot silently desynchronise the index.
+
+    `remove` keeps list semantics exactly: it removes the FIRST permanent equal
+    to the argument, which for Permanent (an unhashable-but-eq dataclass) is
+    identity-like in practice but not guaranteed, so the index is updated from
+    the entry actually removed rather than from the argument.
+
+    `names` is the index: {card name: how many are on the battlefield}. It is
+    READ-ONLY to everyone but this class, and the four `Game.has` methods read
+    it directly rather than through an accessor — `has` is called often enough
+    that a second Python-level call is a measurable share of the saving.
+    """
+
+    __slots__ = ("names",)
+
+    def __init__(self, iterable=()):
+        super().__init__(iterable)
+        self.names: dict[str, int] = {}
+        for p in self:
+            self._add(p)
+
+    def _add(self, perm):
+        n = perm.card.name
+        self.names[n] = self.names.get(n, 0) + 1
+
+    def _drop(self, perm):
+        n = perm.card.name
+        c = self.names.get(n, 0) - 1
+        if c > 0:
+            self.names[n] = c
+        else:
+            self.names.pop(n, None)
+
+    # -- mutators ------------------------------------------------------------
+
+    def append(self, perm):
+        super().append(perm)
+        self._add(perm)
+
+    def remove(self, perm):
+        i = super().index(perm)
+        self._drop(super().__getitem__(i))
+        super().__delitem__(i)
+
+    def extend(self, it):
+        for p in it:
+            self.append(p)
+
+    def insert(self, i, perm):
+        super().insert(i, perm)
+        self._add(perm)
+
+    def pop(self, i=-1):
+        p = super().pop(i)
+        self._drop(p)
+        return p
+
+    def clear(self):
+        super().clear()
+        self.names.clear()
+
+    def __setitem__(self, i, v):
+        raise NotImplementedError("Board does not support item assignment")
+
+    def __delitem__(self, i):
+        raise NotImplementedError("Board does not support item deletion")
+
+    def __iadd__(self, other):
+        self.extend(other)
+        return self
+
+    def sort(self, *a, **k):
+        # order-only, so the index is unaffected
+        super().sort(*a, **k)
+
+
 NEVER = 10 ** 9   # an `impending` that never arrives: see is_battlefield_creature
 
 
@@ -200,7 +289,7 @@ class Game:
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
-        self.board: list[Permanent] = []
+        self.board: Board = Board()
         self.graveyard: list[Card] = []
         self.commander = commander
         self.commander_cast = False
@@ -299,7 +388,7 @@ class Game:
         self.made_token_this_turn = True
 
     def has(self, name: str) -> bool:
-        return any(p.card.name == name for p in self.board)
+        return name in self.board.names
 
     # -- non-combat damage ---------------------------------------------------
 

@@ -5,12 +5,18 @@ __pycache__/
 venv/
 
 # Ablation caches ARE TRACKED as of 2026-09-05. They were ignored as
-# "regenerable, and large" — the first is true and the second was not: all four
-# together are 141 KB, against roughly six hours of simulation to rebuild them.
-# Tracking them lets a clone reproduce or extend the four tables without that
-# run. The cost is that a stale cache can now arrive with a checkout, so
-# ABLATION_CACHES.md records a source fingerprint per deck; check it before
-# resuming one. See cache_manifest.py.
+# "regenerable, and large" — the first is true and the second was not: all
+# EIGHT together are 296 KB. Tracking them lets a clone reproduce or extend the
+# tables without the run. The cost is that a stale cache can now arrive with a
+# checkout, so ABLATION_CACHES.md records a source fingerprint per deck; check
+# it before resuming one. See cache_manifest.py.
+#
+# Eight, not four, since 2026-09-06: each deck has the current N=15000 cache and
+# the superseded N=6000 (tivit: N=2000) one, which is kept because it is the
+# provenance for every number quoted in CLAUDE.md above that date. The
+# "roughly six hours to rebuild" that justified tracking them is no longer true
+# either — the whole set is 23 minutes now. They stay tracked for provenance
+# rather than for the compute.
 
 # Spreadsheet lock/temp files
 ~$*.xlsx

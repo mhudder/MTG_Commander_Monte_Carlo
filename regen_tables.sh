@@ -21,17 +21,32 @@
 #
 #     ./regen_tables.sh            # delete caches, regenerate both
 #     ./regen_tables.sh --resume   # continue an interrupted run
+#
+# Since 2026-09-06 a deck takes minutes rather than ninety, so the 1800s budget
+# below never fires and the retry loop runs exactly once. Both are kept because
+# they cost nothing and still cover an interrupted run. Set ABLATE_PROCS to
+# limit the worker count (default: every core).
+#
+# N IS 15000 AND TIVIT IS IN THE LOOP, both since 2026-09-06. The whole run is
+# about 24 minutes. Do not lower N here without lowering it in the tables too:
+# this script OVERWRITES ablation_<deck>.txt, so a stale N in this file silently
+# replaces the committed tables with less precise ones. N is now printed in each
+# table's own header, which is the check on that.
+#
+# Tivit was left out while it was the odd deck at N=2000 and its table was not
+# comparable to the others. At a common N it is, so it regenerates with them.
 
 set -e
 RESUME=""
 [ "$1" = "--resume" ] && RESUME=1
+N=15000
 
-for deck in lorehold rendmaw karlov; do
-    cache="ablation_cache_${deck}_10-20_n6000.json"
+for deck in lorehold rendmaw karlov tivit; do
+    cache="ablation_cache_${deck}_10-20_n${N}.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "ablation_${deck}.log"
     for _ in $(seq 1 400); do
-        ABLATE_BUDGET=1800 python ablation.py "$deck" 6000 10,20 \
+        ABLATE_BUDGET=1800 python ablation.py "$deck" "$N" 10,20 \
             > "ablation_${deck}.txt.new" 2>> "ablation_${deck}.log"
         # ablation.py returns early, printing nothing, while cards remain.
         if grep -q "MODEL-EVALUATED" "ablation_${deck}.txt.new"; then

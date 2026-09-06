@@ -1,5 +1,10 @@
 
-Horizons: (10, 20).  All figures are paired differences with 95% CIs.
+Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
+All figures are paired differences with 95% CIs.
+
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0022.
+Two cards closer together than that are not ranked by this table, however their
+point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
   signal = both : the card beats its error bars on damage AND win rate
            dmg  : significant on damage only
@@ -16,72 +21,72 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Beastmaster Ascension                 +3.18+-0.50         +4.69+-0.66        +0.0163+-0.0052      both
-Ohran Frostfang                       +1.91+-0.37         +3.80+-0.68        +0.0180+-0.0048      both
-March of the World Ooze               +2.86+-0.38         +3.55+-0.50        +0.0143+-0.0048      both
-Tendershoot Dryad                     +2.23+-0.39         +3.53+-0.52        +0.0173+-0.0045      both
-Bitterblossom                         +2.33+-0.37         +3.32+-0.52        +0.0188+-0.0049      both
-Sol Ring                              +3.61+-0.52         +3.06+-0.57        +0.0237+-0.0054      both
-Grave Titan                           +1.61+-0.33         +2.54+-0.46        +0.0120+-0.0044      both
-Coat of Arms                          +0.94+-0.33         +2.20+-0.59        +0.0080+-0.0044      both
-Verdurous Gearhulk                    +1.42+-0.26         +1.79+-0.41        +0.0058+-0.0045      both
-Golgari Signet                        +1.58+-0.36         +1.78+-0.53        +0.0105+-0.0051      both
-Overlord of the Hauntwoods            +1.05+-0.29         +1.62+-0.57        +0.0153+-0.0047      both
-Steel Overseer                        +1.54+-0.24         +1.50+-0.46        +0.0100+-0.0039      both
-Arasta of the Endless Web             +0.98+-0.22         +1.46+-0.35        +0.0093+-0.0036      both
-Arcane Signet                         +1.69+-0.36         +1.41+-0.53        +0.0120+-0.0048      both
-Cauldron of Essence                   +0.89+-0.21         +1.32+-0.40        +0.0133+-0.0047      both
-Grist, the Hunger Tide                +0.68+-0.26         +1.24+-0.45        +0.0053+-0.0041      both
-Woe Strider                           +0.88+-0.15         +1.09+-0.30        +0.0065+-0.0031      both
-Erebos, Bleak-Hearted                 +0.76+-0.19         +0.97+-0.33        +0.0060+-0.0041      both
-Solemn Simulacrum                     +0.71+-0.21         +0.82+-0.36        +0.0030+-0.0040       dmg
-Foundry Inspector                     +1.17+-0.20         +0.81+-0.31        +0.0028+-0.0039       dmg
-The Meathook Massacre                 +0.56+-0.12         +0.76+-0.18        +0.0085+-0.0033      both
-The Great Henge                       +0.01+-0.22         +0.71+-0.37        +0.0040+-0.0039      both
-Ophiomancer                           +0.68+-0.21         +0.71+-0.35        +0.0037+-0.0040       dmg
-Twitching Doll                        +0.68+-0.20         +0.64+-0.29        +0.0038+-0.0038      both
-Roaming Throne                        +0.87+-0.24         +0.63+-0.46        +0.0085+-0.0043      both
-Metallic Mimic                        +0.71+-0.20         +0.63+-0.35        +0.0033+-0.0034       dmg
-Enduring Vitality                     +0.57+-0.22         +0.56+-0.35        +0.0055+-0.0038      both
-Palladium Myr                         +0.61+-0.23         +0.52+-0.36        -0.0017+-0.0038       dmg
-Primal Vigor                          +0.03+-0.15         +0.50+-0.36        +0.0057+-0.0036      both
-Heroic Intervention                   +0.56+-0.14         +0.30+-0.30        +0.0017+-0.0020       dmg
-Leaden Myr                            +0.24+-0.19         +0.29+-0.36        +0.0032+-0.0034        --
-Copper Myr                            +0.18+-0.16         +0.11+-0.34        +0.0007+-0.0033        --
-Dryad of the Ilysian Grove            +0.35+-0.25         +0.10+-0.37        +0.0013+-0.0042        --
-Dockside Chef                         +0.12+-0.20         +0.07+-0.33        +0.0040+-0.0038       win
-Ornithopter of Paradise               -0.21+-0.21         +0.07+-0.38        +0.0028+-0.0035      FLIP
-Blood Artist                          -0.21+-0.11         -0.10+-0.23        -0.0007+-0.0031        --
+Beastmaster Ascension                 +3.08+-0.31         +4.64+-0.41        +0.0144+-0.0031      both
+Ohran Frostfang                       +1.84+-0.24         +4.05+-0.47        +0.0175+-0.0030      both
+March of the World Ooze               +2.79+-0.23         +3.51+-0.32        +0.0149+-0.0031      both
+Bitterblossom                         +2.34+-0.23         +3.48+-0.34        +0.0194+-0.0031      both
+Tendershoot Dryad                     +2.01+-0.23         +3.37+-0.33        +0.0178+-0.0029      both
+Sol Ring                              +3.57+-0.31         +3.00+-0.35        +0.0221+-0.0034      both
+Grave Titan                           +1.51+-0.19         +2.74+-0.29        +0.0146+-0.0028      both
+Coat of Arms                          +1.10+-0.22         +2.57+-0.43        +0.0073+-0.0028      both
+Overlord of the Hauntwoods            +1.17+-0.19         +2.04+-0.36        +0.0145+-0.0029      both
+Golgari Signet                        +1.53+-0.22         +1.64+-0.31        +0.0094+-0.0031      both
+Verdurous Gearhulk                    +1.55+-0.17         +1.55+-0.25        +0.0069+-0.0029      both
+Arasta of the Endless Web             +0.88+-0.11         +1.51+-0.22        +0.0080+-0.0023      both
+Steel Overseer                        +1.40+-0.15         +1.42+-0.26        +0.0083+-0.0026      both
+Grist, the Hunger Tide                +0.86+-0.16         +1.35+-0.29        +0.0066+-0.0026      both
+Cauldron of Essence                   +0.83+-0.13         +1.33+-0.24        +0.0143+-0.0028      both
+Arcane Signet                         +1.47+-0.23         +1.29+-0.30        +0.0091+-0.0029      both
+Foundry Inspector                     +1.26+-0.12         +1.18+-0.23        +0.0039+-0.0025      both
+Solemn Simulacrum                     +0.79+-0.15         +1.16+-0.22        +0.0053+-0.0025      both
+Woe Strider                           +0.90+-0.10         +1.07+-0.29        +0.0072+-0.0021      both
+Roaming Throne                        +0.91+-0.14         +0.95+-0.30        +0.0081+-0.0026      both
+Ophiomancer                           +0.70+-0.13         +0.88+-0.26        +0.0030+-0.0024      both
+The Meathook Massacre                 +0.54+-0.08         +0.82+-0.13        +0.0067+-0.0020      both
+Erebos, Bleak-Hearted                 +0.66+-0.13         +0.80+-0.26        +0.0057+-0.0026      both
+Metallic Mimic                        +0.70+-0.12         +0.66+-0.21        +0.0053+-0.0023      both
+The Great Henge                       -0.03+-0.14         +0.65+-0.24        +0.0043+-0.0024      FLIP
+Twitching Doll                        +0.68+-0.12         +0.59+-0.19        +0.0031+-0.0023      both
+Palladium Myr                         +0.61+-0.14         +0.57+-0.23        +0.0015+-0.0023       dmg
+Primal Vigor                          -0.09+-0.11         +0.57+-0.30        +0.0043+-0.0023      FLIP
+Heroic Intervention                   +0.56+-0.09         +0.47+-0.20        +0.0023+-0.0014      both
+Enduring Vitality                     +0.43+-0.15         +0.46+-0.22        +0.0029+-0.0025      both
+Dryad of the Ilysian Grove            +0.45+-0.15         +0.41+-0.25        +0.0029+-0.0025      both
+Leaden Myr                            +0.31+-0.11         +0.34+-0.21        +0.0030+-0.0020      both
+Copper Myr                            +0.19+-0.11         +0.15+-0.20        +0.0022+-0.0022       win
+Dockside Chef                         +0.13+-0.12         +0.03+-0.22        +0.0039+-0.0024       win
+Ornithopter of Paradise               -0.26+-0.14         -0.10+-0.22        +0.0016+-0.0022        --
+Blood Artist                          -0.21+-0.07         -0.15+-0.15        -0.0007+-0.0020        --
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Hagra Mauling                         +0.83+-0.19         +1.21+-0.32        +0.0072+-0.0039      both
-Scrap Trawler                         +0.77+-0.15         +1.04+-0.22        +0.0072+-0.0032      both
-Massacre Wurm                         +0.37+-0.11         +0.93+-0.22        +0.0063+-0.0029      both
-Overwhelming Stampede                 +0.24+-0.29         +0.71+-0.46        -0.0030+-0.0042       dmg
-Gloomshrieker                         +0.56+-0.11         +0.59+-0.21        +0.0065+-0.0033      both
-Filigree Familiar                     +0.64+-0.15         +0.58+-0.22        +0.0055+-0.0032      both
-Burnished Hart                        +0.53+-0.21         +0.58+-0.29        +0.0055+-0.0034      both
-Junk Diver                            +0.40+-0.13         +0.48+-0.22        +0.0042+-0.0029      both
-Midnight Reaper                       +0.45+-0.11         +0.41+-0.22        -0.0002+-0.0030       dmg
-Haywire Mite                          +0.28+-0.12         +0.38+-0.16        +0.0023+-0.0022      both
-Shigeki, Jukai Visionary              +0.44+-0.12         +0.24+-0.20        +0.0030+-0.0029      both
-Lignify                               +0.27+-0.08         +0.23+-0.15        +0.0025+-0.0024      both
-Eyeblight's Ending                    +0.26+-0.08         +0.22+-0.16        +0.0028+-0.0024      both
-Bow of Nylea                          +0.23+-0.09         +0.22+-0.15        +0.0035+-0.0022      both
-Myr Retriever                         +0.37+-0.11         +0.19+-0.18        +0.0032+-0.0027      both
-Nameless Inversion                    +0.18+-0.14         +0.18+-0.17        +0.0020+-0.0022       dmg
-Village Rites                         +0.10+-0.21         +0.16+-0.32        +0.0015+-0.0032        --
-Pygmy Kavu                            +0.16+-0.07         +0.08+-0.13        -0.0007+-0.0015        --
-Assassin's Trophy                     +0.05+-0.04         +0.04+-0.07        +0.0002+-0.0010        --
-Beast Within                          +0.05+-0.05         +0.01+-0.14        -0.0013+-0.0016        --
-Reap                                  +0.00+-0.00         -0.01+-0.01        +0.0000+-0.0000      FLIP
-Whip of Erebos                        +0.06+-0.06         -0.01+-0.17        +0.0005+-0.0028      FLIP
-Sakura-Tribe Elder                    +0.20+-0.12         -0.04+-0.29        +0.0010+-0.0024      FLIP
-Toxic Deluge                          -0.30+-0.12         -0.19+-0.24        +0.0008+-0.0025        --
-Biotransference                       -0.28+-0.13         -0.36+-0.22        -0.0010+-0.0028       dmg
-Culling Ritual                        -0.24+-0.11         -0.37+-0.21        -0.0002+-0.0023       dmg
-Ashnod's Altar                        -0.27+-0.10         -0.38+-0.20        -0.0017+-0.0029       dmg
-Deathreap Ritual                      -0.41+-0.10         -0.47+-0.22        -0.0002+-0.0028       dmg
+Hagra Mauling                         +0.86+-0.12         +1.25+-0.21        +0.0051+-0.0024      both
+Scrap Trawler                         +0.78+-0.08         +0.99+-0.14        +0.0056+-0.0021      both
+Massacre Wurm                         +0.37+-0.07         +0.90+-0.14        +0.0066+-0.0018      both
+Gloomshrieker                         +0.51+-0.07         +0.71+-0.16        +0.0045+-0.0020      both
+Burnished Hart                        +0.53+-0.11         +0.64+-0.19        +0.0041+-0.0022      both
+Village Rites                         +0.26+-0.13         +0.57+-0.26        +0.0045+-0.0020      both
+Midnight Reaper                       +0.53+-0.08         +0.55+-0.14        +0.0017+-0.0020       dmg
+Filigree Familiar                     +0.64+-0.09         +0.54+-0.31        +0.0044+-0.0020      both
+Overwhelming Stampede                 +0.15+-0.18         +0.53+-0.28        -0.0028+-0.0027      both
+Junk Diver                            +0.40+-0.07         +0.51+-0.13        +0.0030+-0.0017      both
+Shigeki, Jukai Visionary              +0.37+-0.08         +0.34+-0.15        +0.0027+-0.0017      both
+Haywire Mite                          +0.28+-0.07         +0.30+-0.12        +0.0019+-0.0012      both
+Myr Retriever                         +0.42+-0.07         +0.28+-0.12        +0.0034+-0.0017      both
+Lignify                               +0.25+-0.05         +0.24+-0.09        +0.0025+-0.0015      both
+Nameless Inversion                    +0.19+-0.06         +0.23+-0.12        +0.0023+-0.0013      both
+Bow of Nylea                          +0.19+-0.05         +0.21+-0.11        +0.0026+-0.0014      both
+Eyeblight's Ending                    +0.24+-0.05         +0.20+-0.09        +0.0025+-0.0014      both
+Pygmy Kavu                            +0.16+-0.05         +0.18+-0.12        +0.0006+-0.0009       dmg
+Assassin's Trophy                     +0.05+-0.03         +0.05+-0.05        +0.0004+-0.0007       dmg
+Beast Within                          +0.04+-0.02         +0.03+-0.07        -0.0002+-0.0008        --
+Sakura-Tribe Elder                    +0.09+-0.07         +0.03+-0.19        +0.0016+-0.0016       win
+Reap                                  +0.00+-0.01         -0.01+-0.03        +0.0000+-0.0002      FLIP
+Whip of Erebos                        +0.08+-0.04         -0.09+-0.12        +0.0005+-0.0016      FLIP
+Toxic Deluge                          -0.34+-0.07         -0.17+-0.15        +0.0022+-0.0017      both
+Deathreap Ritual                      -0.32+-0.06         -0.20+-0.15        +0.0006+-0.0018       dmg
+Culling Ritual                        -0.20+-0.06         -0.27+-0.11        -0.0001+-0.0013       dmg
+Ashnod's Altar                        -0.24+-0.06         -0.46+-0.13        -0.0025+-0.0017      both
+Biotransference                       -0.29+-0.07         -0.47+-0.14        -0.0019+-0.0018      both

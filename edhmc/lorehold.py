@@ -29,7 +29,8 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import Card, Permanent, can_pay, available_mana, spend, play_land
+from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
+                          spend, play_land)
 from edhmc import opponents as OPP
 
 # Cards that can put a chosen card from hand onto the top of your library.
@@ -58,7 +59,7 @@ class LoreholdGame:
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
-        self.board: list[Permanent] = []
+        self.board: Board = Board()
         self.graveyard: list[Card] = []
         self.commander = commander
         self.commander_cast = False
@@ -152,7 +153,7 @@ class LoreholdGame:
     # -- helpers ------------------------------------------------------------
 
     def has(self, name):
-        return any(p.card.name == name for p in self.board)
+        return name in self.board.names
 
     def play_card_trigger(self, card):
         """Lorehold has no play trigger; the hook exists for engine reuse."""

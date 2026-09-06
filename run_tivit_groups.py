@@ -91,6 +91,12 @@ def main():
     print("Each group is replaced by blanks of the SAME mana values, all at "
           "once.\n")
 
+    # The A leg is the UNTOUCHED deck and does not depend on which group is
+    # under test, so it is simulated once per horizon rather than once per
+    # group -- half the runtime, and the same games either way: `simulate`
+    # copies the deck it is handed and nothing in edhmc mutates a Card.
+    base = {}
+
     for label, names in GROUPS.items():
         if wanted and label not in wanted:
             continue
@@ -101,7 +107,10 @@ def main():
         deck_b = _swap_many(deck, names, blanks)
         for turns in (10, 20):
             cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())
-            a = [simulate(deck, cmd, cfg, 5000 + i) for i in range(n)]
+            if turns not in base:
+                base[turns] = [simulate(deck, cmd, cfg, 5000 + i)
+                               for i in range(n)]
+            a = base[turns]
             b = [simulate(deck_b, cmd, cfg, 5000 + i) for i in range(n)]
             res = analyse(a, b, metrics=METRICS)
             if turns == 10:

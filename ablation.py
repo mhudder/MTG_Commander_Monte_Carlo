@@ -24,13 +24,37 @@ is evidence about the card. In the MODEL-BLIND group a low score is evidence
 about the model, and says nothing at all about the card. Do not read the second
 table as a cut list.
 
-Usage:  python ablation.py [n_games] [turns]
+Usage:  python ablation.py [deck] [n_games] [turns]
+
+RUNTIME
+-------
+Two things make this fast, and NEITHER changes a single simulated game.
+
+1. THE BASELINE IS SIMULATED ONCE, NOT ONCE PER CARD. Every card's paired
+   difference is `metric(real deck) - metric(deck with this slot blanked)`,
+   and the first term does not depend on which card is under test. The old
+   loop re-simulated the untouched deck for all 65 cards, so exactly half of
+   every run was spent recomputing one fixed number. Cards are never mutated
+   anywhere in edhmc and `simulate` copies the deck it is handed, so the
+   baseline really is identical — see the verification note below.
+
+2. CARDS ARE ABLATED IN PARALLEL. Each card is an independent, deterministic
+   function of (deck, seed), so the work splits across cores with no shared
+   state. `ABLATE_PROCS` sets the worker count and defaults to every core;
+   `ABLATE_PROCS=1` forces the old single-process path, which is the one to
+   use when debugging and which writes the identical cache.
+
+VERIFIED OUTPUT-IDENTICAL. Both changes are pure scheduling: the same seeds
+feed the same engines and the arrays are subtracted in the same order, so the
+numbers are bit-for-bit what the serial code produced. The check that matters
+is not this comment — it is that regenerating a cache from empty reproduces
+the committed one to the last digit.
 """
 import json
 import os
 import sys
 import time
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 
 import numpy as np
 
@@ -253,25 +277,47 @@ def blank_like(card):
                 priority=0.5)
 
 
-def ablate(deck, commander, card_name):
-    """Returns {horizon: {metric: (mean_diff, ci)}}."""
-    idx = next(i for i, c in enumerate(deck) if c.name == card_name)
-    deck_b = list(deck)
-    deck_b[idx] = blank_like(deck[idx])
+def columns(deck, commander, turns, lo, hi):
+    """One metric column per METRIC, over seeds [lo, hi).
 
+    The seeds are `5000 + i` and nothing else reads the RNG, so this is a pure
+    function of (deck, commander, turns, lo, hi) — which is what lets the
+    baseline be shared and the cards be split across processes.
+    """
+    cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())
+    rows = [SIM(deck, commander, cfg, 5000 + i) for i in range(lo, hi)]
+    return {m: np.array([r[m] for r in rows], float) for m in METRICS}
+
+
+def paired(keep, drop):
+    """{metric: (mean_diff, 95% CI half-width)} from two metric-column dicts."""
+    cell = {}
+    for m in METRICS:
+        d = keep[m] - drop[m]
+        cell[m] = (d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(len(d)))
+    return cell
+
+
+def blanked(deck, card_name):
+    deck_b = list(deck)
+    idx = next(i for i, c in enumerate(deck) if c.name == card_name)
+    deck_b[idx] = blank_like(deck[idx])
+    return deck_b
+
+
+def ablate(deck, commander, card_name, baseline=None):
+    """Returns {horizon: {metric: (mean_diff, ci)}}.
+
+    `baseline` is {turns: metric columns for the UNMODIFIED deck}. Passing it
+    is what saves half the work; omitting it measures the baseline here, which
+    is what the old code did for every card in turn.
+    """
+    deck_b = blanked(deck, card_name)
     out = {}
     for turns in HORIZONS:
-        cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())
-        keep, drop = [], []
-        for i in range(N):
-            keep.append(SIM(deck, commander, cfg, 5000 + i))
-            drop.append(SIM(deck_b, commander, cfg, 5000 + i))
-        cell = {}
-        for m in METRICS:
-            d = (np.array([k[m] for k in keep], float)
-                 - np.array([x[m] for x in drop], float))
-            cell[m] = (d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(len(d)))
-        out[str(turns)] = cell
+        keep = (baseline[turns] if baseline is not None
+                else columns(deck, commander, turns, 0, N))
+        out[str(turns)] = paired(keep, columns(deck_b, commander, turns, 0, N))
     return out
 
 
@@ -282,9 +328,95 @@ CACHE = (f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
          f"{'_sametype' if BLANK_KEEPS_TYPES else ''}.json")
 
 
-def _job(name):
-    deck, commander = build_pending(DECK)
-    return name, ablate(deck, commander, name)
+# ---------------------------------------------------------------------------
+# Worker processes
+# ---------------------------------------------------------------------------
+# Each worker builds the deck once and keeps the shared baseline, so a task is
+# just a card name. build_pending() is deterministic, so every worker holds an
+# equal deck and a card ablated in worker 7 scores exactly what it would have
+# scored in the parent.
+
+_W = {}
+
+
+def _worker_init(deck_name, n, horizons, baseline):
+    # DECK/N/HORIZONS are derived from sys.argv at import. multiprocessing's
+    # spawn start method does forward sys.argv to the child, but this does not
+    # rely on that: the run's parameters are passed explicitly and the module
+    # globals are re-derived from them, so a worker cannot end up measuring a
+    # different deck or sample size than the parent asked for.
+    global DECK, N, HORIZONS, SIM, SCRIPTED, METRICS
+    DECK, N, HORIZONS = deck_name, n, horizons
+    SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
+           "karlov": karlov_sim, "tivit": tivit_sim}[DECK]
+    SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
+                "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT}[DECK]
+    METRICS = METRIC_SETS[DECK]
+    _W["deck"], _W["commander"] = build_pending(DECK)
+    _W["baseline"] = baseline
+
+
+def _baseline_chunk(args):
+    """A slice of the untouched deck's games, for one horizon."""
+    turns, lo, hi = args
+    return turns, lo, columns(_W["deck"], _W["commander"], turns, lo, hi)
+
+
+def _ablate_card(name):
+    return name, ablate(_W["deck"], _W["commander"], name, _W["baseline"])
+
+
+def _chunks(n, parts):
+    """Split range(n) into `parts` contiguous slices, largest first remainder."""
+    step, extra = divmod(n, parts)
+    lo, out = 0, []
+    for k in range(parts):
+        hi = lo + step + (1 if k < extra else 0)
+        if hi > lo:
+            out.append((lo, hi))
+        lo = hi
+    return out
+
+
+def measure_baseline(pool, procs):
+    """The untouched deck, once per horizon, split over the pool.
+
+    Concatenating the slices reproduces the single-process array exactly —
+    seeds 5000..5000+N-1 in order, one float64 per game — so every downstream
+    mean and standard deviation is bit-identical.
+    """
+    slices = _chunks(N, procs)
+    tasks = [(t, lo, hi) for t in HORIZONS for lo, hi in slices]
+    parts = {t: {} for t in HORIZONS}
+    runner = (pool.imap_unordered(_baseline_chunk, tasks) if pool
+              else map(_baseline_chunk, tasks))
+    for turns, lo, cols in runner:
+        parts[turns][lo] = cols
+    return {t: {m: np.concatenate([parts[t][lo][m] for lo, _ in slices])
+                for m in METRICS}
+            for t in HORIZONS}
+
+
+def ablation_stream(todo, procs):
+    """Yield (card, {horizon: {metric: (diff, ci)}}) in completion order.
+
+    One pool measures the baseline; a second carries it to every worker in an
+    initializer, so it crosses the process boundary once per worker rather than
+    once per card. Breaking out of this generator closes both pools.
+    """
+    if procs == 1:
+        _worker_init(DECK, N, HORIZONS, None)
+        _W["baseline"] = measure_baseline(None, 1)
+        for name in todo:
+            yield _ablate_card(name)
+        return
+
+    with Pool(procs, initializer=_worker_init,
+              initargs=(DECK, N, HORIZONS, None)) as scout:
+        baseline = measure_baseline(scout, procs)
+    with Pool(procs, initializer=_worker_init,
+              initargs=(DECK, N, HORIZONS, baseline)) as work:
+        yield from work.imap_unordered(_ablate_card, todo)
 
 
 # Cards deliberately left out of the SCRIPTED set: the engine does NOT
@@ -449,20 +581,50 @@ def main():
     todo = [n for n in nonlands if n not in results]
     budget = float(os.environ.get("ABLATE_BUDGET", "240"))
     t0 = time.time()
-    for name in todo:
-        results[name] = ablate(deck, commander, name)
-        json.dump(results, open(CACHE, "w"))       # resumable across runs
-        print(f"  done {len(results)}/{len(nonlands)}: {name}", file=sys.stderr)
-        if time.time() - t0 > budget:
-            break
+
+    def save():
+        # Written in DECK ORDER, not completion order, so the file is the same
+        # bytes whichever worker finishes first and whether or not the run was
+        # resumed. Names no longer in the deck are kept, at the end.
+        ordered = {n: results[n] for n in nonlands if n in results}
+        ordered.update({k: v for k, v in results.items() if k not in ordered})
+        json.dump(ordered, open(CACHE, "w"))       # resumable across runs
+
+    if todo:
+        # NOT capped at len(todo): a resume with two cards left still wants
+        # every core for the baseline, which is the same size either way.
+        procs = max(1, int(os.environ.get("ABLATE_PROCS", "0")) or cpu_count() or 1)
+        print(f"  {len(todo)} card(s) to measure on {procs} process(es)",
+              file=sys.stderr)
+        stream = ablation_stream(todo, procs)
+        try:
+            for name, cell in stream:
+                results[name] = cell
+                save()
+                print(f"  done {len(results)}/{len(nonlands)}: {name}",
+                      file=sys.stderr)
+                if time.time() - t0 > budget:
+                    break
+        finally:
+            stream.close()             # shuts the pools down on the way out
     remaining = [n for n in nonlands if n not in results]
     if remaining:
         print(f"\n{len(remaining)} cards still to do — rerun to resume.",
               file=sys.stderr)
         return
 
+    # The table did not used to say what N it was run at, so `ablation_tivit.txt`
+    # at N=2000 looked exactly like the other three at N=6000 and CLAUDE.md had
+    # to carry the warning in prose. A table should describe its own precision.
+    floor = float(np.median([results[n][str(HORIZONS[-1])]["won"][1]
+                             for n in nonlands]))
     print(f"""
-Horizons: {HORIZONS}.  All figures are paired differences with 95% CIs.
+Horizons: {HORIZONS}.  N = {N:,} paired games per card, seeds 5000..{5000 + N - 1}.
+All figures are paired differences with 95% CIs.
+
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-{floor:.4f}.
+Two cards closer together than that are not ranked by this table, however their
+point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
   signal = both : the card beats its error bars on damage AND win rate
            dmg  : significant on damage only

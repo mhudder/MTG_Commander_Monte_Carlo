@@ -100,10 +100,12 @@ Consequences worth carrying forward:
 - **Every ablation table predating this is void.** `ablation_karlov.txt`,
   `ablation_rendmaw.txt` and `ablation_lorehold.txt` were all measured against
   the uncorrected engine. Regenerate before reading any of them.
-  **All four tables are CURRENT as of 2026-09-05** — lorehold and tivit at the
-  deck changes, rendmaw and karlov at the engine fixes. `ablation_tivit.txt` is
-  the only one at N=2000 rather than 6000, so its noise floor is ~0.015 win
-  rate and it is not comparable to the others row-for-row.
+  **All four tables are CURRENT as of 2026-09-06** — lorehold and tivit at the
+  deck changes, rendmaw and karlov at the engine fixes, and all four re-measured
+  at **N=15,000**. The tivit table is no longer the odd one out at N=2000; every
+  deck is now on the same scale and comparable row-for-row. Each table prints
+  its own N and its own measured noise floor in the header, so this paragraph is
+  no longer the only place that fact lives.
 - **Correcting Karlov made the deck look worse, not better** (win rate
   −0.0163 ±0.0139). The old numbers were inflated by phantom lifegain triggers
   and by Well of Lost Dreams / Dawn of Hope drawing cards for free.
@@ -157,13 +159,22 @@ a second horizon is what turns on the `FLIP` signal — a card whose sign does
 not survive the range is flagged rather than ranked. Regenerate with:
 
 ```bash
-python ablation.py karlov   6000 10,20
-python ablation.py rendmaw  6000 10,20
-python ablation.py lorehold 6000 10,20
+./regen_tables.sh                      # all four decks at N=15000, ~23 min
+python ablation.py karlov   15000 10,20   # or one deck at a time
+python ablation.py rendmaw  15000 10,20
+python ablation.py lorehold 15000 10,20
+python ablation.py tivit    15000 10,20
 ```
+
+**N is part of the identity of a table.** It is in the cache key, it is printed
+in the table's header, and `regen_tables.sh` — which overwrites
+`ablation_<deck>.txt` — carries it in one variable. Changing it in one place
+and not the others silently replaces the committed tables with less precise
+ones. See the N=15,000 section below for why that number.
 
 `ABLATE_BUDGET` (seconds, default 240) caps one invocation; the run caches
 after every card and resumes, so a small budget just means more invocations.
+`ABLATE_PROCS` sets the worker count and defaults to every core.
 
 ### 2026-09-04: nineteen candidates measured, and a harness bug
 
@@ -680,20 +691,32 @@ four decks are now 0 ERR over 377 card slots.
 
 ### Reading `ablation_tivit.txt` — two things before the rows
 
-`ablation_tivit.txt` is 2,000 paired games at horizons 10 and 20.
+**UPDATED 2026-09-06: this table is now 15,000 paired games, not 2,000.** Point
+1 still stands. Point 2 was a statement about N=2000 and has been settled by the
+bigger sample — kept below, because how it was settled is the useful part.
 
-1. **The damage column is barely measurable at T20.** Sol Ring is +8.32 ±8.15,
+1. **The damage column is barely measurable at T20.** Sol Ring was +8.32 ±8.15,
    Deadeye Navigator +7.50 ±7.90, Cyberdrive +8.76 ±7.82. The combo tail makes
    this deck's damage distribution far heavier than the other three, so the
    proxy that works elsewhere mostly does not work here. Win rate is tighter by
    an order of magnitude. "Follow win rate where they disagree" is usually a
-   judgement call; **for this deck it is a statistical necessity.**
-2. **The noise floor is ~±0.015 win rate at N=2000, and it is visible in the
-   table itself.** The four two-mana signets are functionally interchangeable
-   and scored +0.0080, +0.0050, +0.0100 and +0.0200. Four cards doing the same
-   job spread over 0.015 IS the noise floor. Treat anything inside that as
-   unranked. `run_tivit_groups.py` measures it deliberately rather than leaving
-   it as a coincidence.
+   judgement call; **for this deck it is a statistical necessity.** More games
+   narrow the bars but do not change the shape: at N=15,000 Sol Ring's damage is
+   +3.52 ±2.08 against a win rate of +0.0299 ±0.0043, still an order of
+   magnitude looser in relative terms.
+2. **The noise floor was ~±0.015 win rate at N=2000, and the four signets
+   proved it — twice.** They are functionally interchangeable two-mana rocks and
+   they scored +0.0080, +0.0050, +0.0100 and +0.0200. Four cards doing one job
+   spread over 0.015 IS the noise floor, and that was the argument for treating
+   anything inside it as unranked.
+   **At N=15,000 the same four score +0.0131, +0.0131, +0.0131 and +0.0120** —
+   a spread of 0.0011 against a noise floor of ±0.0024, and all four now
+   significant. The 0.015 spread was entirely sampling noise, exactly as
+   claimed. This is the cleanest confirmation in the project that the
+   "ignore anything inside its bars" rule is doing real work: four cards that
+   looked like a 2.5x range of quality were always the same card.
+   `run_tivit_groups.py` still measures the floor deliberately rather than
+   leaving it as a coincidence.
 
 ### The group ablations, which are the ones to act on
 
@@ -722,6 +745,13 @@ Three findings worth carrying forward:
 - **THE EXTRA-VOTE PAIR IS THE PREDICTED REDUNDANCY TRAP, CONFIRMED.** Ballot
   Broker and Brago's Representative are +0.0075 and +0.0040 alone — both inside
   the noise floor, both look cuttable — and **0.0253 together, 2.2× the sum**.
+  **The N=15,000 table sharpens this rather than softening it (2026-09-06):**
+  individually they are +0.0050 ±0.0025 and +0.0069 ±0.0025, so both are now
+  *measurably positive* rather than lost in the noise — and their sum, 0.0119,
+  is still only 47% of the pair's 0.0253. The trap was never an artifact of the
+  small sample. Note what changed and what did not: the reason to distrust the
+  single-card rows went from "you cannot see them" to "you can see them and they
+  are still wrong", which is the stronger version of the same warning.
   The mechanism metrics say why: cutting the pair costs 0.95 Tivit triggers and
   0.98 combo iterations, because the third vote is what tips the Deadeye loop
   mana-positive (see `test_tivit_combo.py`) and the fourth is what wins a
@@ -747,6 +777,112 @@ stale, so `ABLATION_CACHES.md` records a SOURCE FINGERPRINT per deck — a hash
 of the modules whose behaviour a cached number depends on. Re-run
 `python cache_manifest.py` and compare before resuming; if it differs, delete.
 `./regen_tables.sh` deletes by default, `--resume` does not.
+
+### 2026-09-06: a full table takes two minutes, not ninety
+
+Three changes, none of which touches a rule of the game. Every one is pure
+scheduling — the same seeds feed the same engines in the same order.
+
+| deck | was | now |
+|---|---|---|
+| karlov (63 cards, n=6000) | ~90 min | **2m10s** |
+| rendmaw (64 cards, n=6000) | ~90 min | **2m01s** |
+| lorehold (65 cards, n=6000) | ~90 min | **2m53s** |
+| tivit (64 cards, n=2000) | — | **55s** |
+
+1. **THE BASELINE WAS SIMULATED ONCE PER CARD AND IT DOES NOT DEPEND ON THE
+   CARD.** `ablate()` measured `metric(real deck) - metric(deck with this slot
+   blanked)` by re-running the untouched deck for all 65 cards. Exactly half of
+   every run was recomputing one fixed number. It is now measured once per
+   horizon and shared. Safe because `simulate` copies the deck it is handed and
+   **nothing in edhmc mutates a Card** — checked by grep across every module,
+   and the reason `blank_like` can hand the same objects to both branches.
+2. **Cards are ablated in parallel.** Each card is a deterministic function of
+   (deck, seed) with no shared state, so `imap_unordered` over 16 cores is a
+   free ~12x. `ABLATE_PROCS=1` forces the old single-process path — use it when
+   debugging; it is verified to produce the identical cache.
+3. **`Game.has(name)` was 38% of runtime.** It was a linear scan over the
+   battlefield, and almost every static ability in the project is written as
+   `g.has("Some Card")` inside a loop — 475,000 calls in 400 Lorehold games.
+   `engine.Board` is a `list` subclass carrying a name→count index, so `has`
+   and `count` are dict lookups. This one speeds up EVERY entry point, not just
+   ablation: 1.5x rendmaw, 1.5x lorehold, 1.4x karlov, 1.2x tivit per game.
+
+**HOW IT WAS VERIFIED, because "it's only a refactor" is exactly the claim this
+project has been burned by.** All four caches were deleted and re-derived from
+empty on the new code. The result reproduces the committed tables **bit for
+bit — 2,560 floating-point values, zero differences, and all four
+`ablation_*.txt` byte-identical**. `validate.py` is `+0.00` on all nine with
+`corr(A,B)` unchanged at 0.9069. The parallel, serial and
+resumed-across-a-budget-cut paths all write byte-identical caches.
+
+The fingerprints in `ABLATION_CACHES.md` MOVED, because `ablation.py` and three
+engines changed. That is the check doing its job and not a stale cache: the
+re-derivation above is why the caches were kept.
+
+One deliberate behaviour change: **the cache is written in DECK ORDER rather
+than completion order**, so the file does not depend on which worker finished
+first or on whether the run was resumed. `run_tivit_groups.py` got the same
+baseline fix (its A leg is the untouched deck for all seven groups); output is
+byte-identical there too. `candidates.py` was left alone — its A leg is a blank
+of the CANDIDATE's cost, so there is no shared baseline to hoist.
+
+### 2026-09-06: all four tables re-measured at N=15,000
+
+The speedup was spent on precision. 23 minutes for all four decks.
+`./regen_tables.sh` now runs N=15000 and includes tivit.
+
+**WHY 15,000 AND NOT MORE.** CI scales as 1/sqrt(N), so every halving of the
+error bar costs FOUR TIMES the games — there is no way to buy out of that.
+Measured over all 256 cards, the cards resolved per extra minute of runtime:
+3.4 going 6000→10000, 2.0 going 10000→15000, then **0.8** going 15000→24000.
+That collapse is the knee. The other half of the argument is the effect size
+this project actually argues about: the contested calls (Cauldron +0.0025,
+Caldera head-to-head +0.0028, Goldspan +0.0025 ±0.0045) all sit at 0.0025-0.003
+win rate, and N=15,000 is the first sample size whose median bar — 0.0026
+karlov, 0.0022 rendmaw, 0.0034 lorehold, 0.0024 tivit — is at that scale.
+N=24,000 would halve the 6000-era bars outright, at 38 minutes a regeneration
+rather than 23; that is the trade to revisit, not a settled question.
+
+| deck | median win CI | unmeasured (`--`) | newly resolved |
+|---|---|---|---|
+| karlov | 0.0042 → **0.0026** | 8 → 7 | 2 |
+| rendmaw | 0.0034 → **0.0022** | 9 → 3 | 7 |
+| lorehold | 0.0054 → **0.0034** | 18 → 14 | 8 |
+| tivit | 0.0062 → **0.0024** | 26 → 9 | 19 |
+
+**THE CHECK THAT MATTERS: NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE
+CHANGED SIGN, in any of the four decks.** Point estimates moved a median of
+0.29 old half-widths (max 1.15). So the N=6000 tables were not reporting noise
+as findings, and every conclusion in this file that rests on them survives —
+each number quoted above was re-checked individually and none moved by more
+than its old bar. The variance is also clean 1/sqrt(N) with no floor
+underneath: predicted CI ratios 0.63/0.63/0.63/0.37, measured
+0.64/0.64/0.63/0.39.
+
+**What DID change is the top-of-table ORDER, and it was never real.** All four
+decks reshuffled their top eight by win rate — and **not one** of the cards that
+entered or left moved by more than its own old error bar. The rank-1 to rank-8
+*gap* is 3-15x the noise floor, so the top eight is a meaningful SET; the order
+within it never was. Read the top of these tables as a group, not a ranking.
+That is the "do not rank inside the bars" rule catching a mistake that is very
+easy to make from a sorted table.
+
+**Nine cards are still `--` in tivit and fourteen in lorehold, and more games
+will not fix most of them.** Four tivit cards have a CI of *exactly zero* — An
+Offer You Can't Refuse, Path to Exile, Swords to Plowshares, Counterspell
+produced bit-identical games to their blanks in all 15,000 pairs. That is not
+noise, it is the model: opponents' boards are a blocker count, so a removal
+spell has nothing to remove. **A card at exactly ±0.0000 is a MODEL-BLIND card
+proved blind, not a card measured as bad** — and it is the sharpest statement of
+that limitation the project has produced.
+
+Both the N=6000/2000 caches and the new N=15000 ones are kept. The old ones are
+the provenance for every number quoted above them in this file, and
+`cache_manifest.py` now keys its notes by CACHE FILE rather than by deck so two
+sample sizes for one deck each carry their own honest history — keying by deck
+printed one note under two headings, which is the same "a label nothing checks
+is just a claim" failure the `SCRIPTED_*` sets have produced twice.
 
 ---
 

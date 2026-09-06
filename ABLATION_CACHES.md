@@ -14,14 +14,18 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `a207dad`.
+Fingerprints recorded at `453043a`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `b3d60033ce6db286` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `20b15ef7261da4f7` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `234d2ae55fc338f0` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `e3f1ee47f1fb9d7a` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `2b73d9ac6300ebc0` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `2b73d9ac6300ebc0` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `f05e6dc4a9fed2ab` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `f05e6dc4a9fed2ab` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `16aeb0ac3a99d3f7` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `16aeb0ac3a99d3f7` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `2e5918c6533610f0` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `2e5918c6533610f0` |
 
 ## What each fingerprint covers
 
@@ -32,18 +36,34 @@ Fingerprints recorded at `a207dad`.
 
 ## How each cache was produced
 
-### karlov
+### `ablation_cache_karlov_10-20_n15000.json`
 
-Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries the 'another creature you control' fix. No resume across a code change.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
 
-### lorehold
+### `ablation_cache_karlov_10-20_n6000.json`
 
-Regenerated 2026-09-05 for the deck change (-Penance +Caldera Pyremaw). RESUMED ACROSS commit 1710205 at 19/65 cards. That commit changed engine.attack_triggers, make_everywhere and karlov.creature_entered -- none of which lorehold.py can reach: it has its own combat() and imports only Card, Permanent, can_pay, available_mana, spend and play_land. Verified empirically at the time: the Lorehold validate.py baseline was unchanged at mv_cheated 23.26 / miracles 3.01 / damage 59.72.
+Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries the 'another creature you control' fix. No resume across a code change. RE-DERIVED FROM AN EMPTY CACHE 2026-09-06 under the runtime work (indexed battlefield, shared baseline, parallel cards) and reproduced this file BIT FOR BIT -- every value, and the printed table byte for byte. The fingerprint below moved because those files changed; the numbers did not. That re-derivation IS the evidence, which is why it was done on all four decks rather than argued from the diff.
 
-### rendmaw
+### `ablation_cache_lorehold_10-20_n15000.json`
 
-Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries the Grist fix, the 'enters or attacks' triggers and Overlord's tapped token. No resume across a code change.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.63, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
 
-### tivit
+### `ablation_cache_lorehold_10-20_n6000.json`
 
-First table for this deck, 2026-09-05, after the Cyberdrive Awakener ETB fix (6d40609). N=2000 rather than 6000 -- noise floor ~0.015 win rate, NOT comparable row-for-row with the other three.
+Regenerated 2026-09-05 for the deck change (-Penance +Caldera Pyremaw). RESUMED ACROSS commit 1710205 at 19/65 cards. That commit changed engine.attack_triggers, make_everywhere and karlov.creature_entered -- none of which lorehold.py can reach: it has its own combat() and imports only Card, Permanent, can_pay, available_mana, spend and play_land. Verified empirically at the time: the Lorehold validate.py baseline was unchanged at mv_cheated 23.26 / miracles 3.01 / damage 59.72. RE-DERIVED FROM AN EMPTY CACHE 2026-09-06 under the runtime work (indexed battlefield, shared baseline, parallel cards) and reproduced this file BIT FOR BIT -- every value, and the printed table byte for byte. The fingerprint below moved because those files changed; the numbers did not. That re-derivation IS the evidence, which is why it was done on all four decks rather than argued from the diff. The resume above is therefore no longer load-bearing: this cache now has a from-empty provenance on one version of the code.
+
+### `ablation_cache_rendmaw_10-20_n15000.json`
+
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+
+### `ablation_cache_rendmaw_10-20_n6000.json`
+
+Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries the Grist fix, the 'enters or attacks' triggers and Overlord's tapped token. No resume across a code change. RE-DERIVED FROM AN EMPTY CACHE 2026-09-06 under the runtime work (indexed battlefield, shared baseline, parallel cards) and reproduced this file BIT FOR BIT -- every value, and the printed table byte for byte. The fingerprint below moved because those files changed; the numbers did not. That re-derivation IS the evidence, which is why it was done on all four decks rather than argued from the diff.
+
+### `ablation_cache_tivit_10-20_n15000.json`
+
+Measured from an EMPTY cache 2026-09-06 on the same code as the n2000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 2000 pairs ARE the previous cache's games and the difference is the 13000 added on the end. The observed CI ratio is 0.39, against 1/sqrt(N) predicting 0.37: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+
+### `ablation_cache_tivit_10-20_n2000.json`
+
+First table for this deck, 2026-09-05, after the Cyberdrive Awakener ETB fix (6d40609). N=2000 rather than 6000 -- noise floor ~0.015 win rate, NOT comparable row-for-row with the other three. RE-DERIVED FROM AN EMPTY CACHE 2026-09-06 under the runtime work (indexed battlefield, shared baseline, parallel cards) and reproduced this file BIT FOR BIT -- every value, and the printed table byte for byte. The fingerprint below moved because those files changed; the numbers did not. That re-derivation IS the evidence, which is why it was done on all four decks rather than argued from the diff. SUPERSEDED 2026-09-06 by the n15000 cache; kept because it is the provenance for every tivit number quoted before that date.
