@@ -16,72 +16,71 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Archangel of Thune                    +2.88+-0.47         +4.81+-0.70        +0.0142+-0.0050      both
-Soul Warden                           +3.38+-0.44         +2.85+-0.52        +0.0157+-0.0050      both
-Soul's Attendant                      +2.70+-0.40         +2.81+-0.52        +0.0167+-0.0050      both
-Authority of the Consuls              +2.20+-0.35         +2.55+-0.44        +0.0167+-0.0049      both
-Auriok Champion                       +2.31+-0.38         +2.49+-0.58        +0.0105+-0.0047      both
-Serra Ascendant                       +3.60+-0.43         +2.47+-0.49        +0.0127+-0.0049      both
-Kambal, Consul of Allocation          +2.66+-0.39         +2.43+-0.47        +0.0132+-0.0050      both
-Exemplar of Light                     +1.96+-0.39         +2.37+-0.54        +0.0125+-0.0048      both
-Aetherflux Reservoir                  +1.41+-0.32         +2.35+-0.51        +0.0110+-0.0044      both
-Starscape Cleric                      +2.79+-0.39         +2.29+-0.44        +0.0167+-0.0048      both
-Suture Priest                         +2.27+-0.33         +2.17+-0.52        +0.0097+-0.0046      both
-Sunscorch Regent                      +1.50+-0.25         +2.12+-0.37        +0.0075+-0.0032      both
-Sorin, Vengeful Bloodlord             +1.30+-0.35         +2.12+-0.48        +0.0147+-0.0044      both
-Debt to the Deathless                 +1.39+-0.23         +1.92+-0.40        +0.0083+-0.0039      both
-Sorin, Solemn Visitor                 +1.31+-0.28         +1.90+-0.43        +0.0160+-0.0043      both
-Blind Obedience                       +1.52+-0.30         +1.85+-0.43        +0.0102+-0.0045      both
-Elas il-Kor, Sadistic Pilgrim         +1.95+-0.31         +1.85+-0.41        +0.0067+-0.0045      both
-Marauding Blight-Priest               +2.40+-0.38         +1.83+-0.45        +0.0095+-0.0042      both
-Drana's Emissary                      +1.58+-0.31         +1.49+-0.43        +0.0065+-0.0039      both
-Daxos, Blessed by the Sun             +1.32+-0.30         +1.45+-0.39        +0.0062+-0.0042      both
-Enduring Tenacity                     +2.24+-0.43         +1.44+-0.57        +0.0197+-0.0053      both
-Phyrexian Arena                       +0.68+-0.32         +1.41+-0.55        +0.0137+-0.0049      both
-Fountain of Renewal                   +0.97+-0.25         +1.26+-0.39        +0.0093+-0.0040      both
-Cosmos Elixir                         +0.65+-0.22         +1.23+-0.39        +0.0120+-0.0040      both
-Cliffhaven Vampire                    +1.88+-0.32         +1.21+-0.45        +0.0050+-0.0044      both
-Orzhov Signet                         +1.31+-0.39         +1.10+-0.55        +0.0113+-0.0047      both
-Land Tax                              +0.88+-0.33         +1.08+-0.45        +0.0095+-0.0043      both
-Ajani's Mantra                        +0.82+-0.21         +1.07+-0.35        +0.0053+-0.0040      both
-Voice of the Blessed                  +1.06+-0.25         +1.07+-0.36        +0.0057+-0.0038      both
-Syr Konrad, the Grim                  +0.77+-0.21         +1.05+-0.29        +0.0043+-0.0034      both
-Well of Lost Dreams                   -0.05+-0.38         +0.97+-0.61        +0.0010+-0.0048      FLIP
-Kalitas, Traitor of Ghet              +0.58+-0.24         +0.87+-0.38        +0.0077+-0.0040      both
-Dawn of Hope                          +0.08+-0.30         +0.83+-0.47        +0.0043+-0.0044       dmg
-Sol Ring                              +0.87+-0.36         +0.66+-0.47        +0.0038+-0.0045       dmg
-Sanguine Bond                         +0.64+-0.36         +0.51+-0.52        +0.0137+-0.0050       win
-Vito, Thorn of the Dusk Rose          +1.34+-0.41         +0.47+-0.56        +0.0142+-0.0053       win
-Pristine Talisman                     +0.26+-0.23         +0.40+-0.39        +0.0060+-0.0040      both
-Mother of Runes                       +0.21+-0.29         +0.36+-0.39        +0.0018+-0.0041        --
-Swiftfoot Boots                       +0.40+-0.24         +0.25+-0.36        -0.0043+-0.0034       win
-Vizkopa Guildmage                     +0.17+-0.29         -0.23+-0.40        +0.0042+-0.0042      FLIP
-Blood Artist                          -0.44+-0.25         -0.38+-0.42        -0.0022+-0.0039        --
-Felidar Sovereign                     -0.77+-0.29         -2.26+-0.47        +0.0210+-0.0045      both
-Exquisite Blood                       -2.28+-0.43         -4.08+-0.66        +0.0233+-0.0056      both
+Archangel of Thune                    +2.90+-0.46         +4.79+-0.69        +0.0142+-0.0048      both
+Soul's Attendant                      +2.58+-0.38         +2.70+-0.52        +0.0122+-0.0048      both
+Kambal, Consul of Allocation          +2.77+-0.38         +2.57+-0.47        +0.0135+-0.0050      both
+Authority of the Consuls              +2.10+-0.32         +2.51+-0.44        +0.0153+-0.0048      both
+Serra Ascendant                       +3.57+-0.43         +2.48+-0.47        +0.0132+-0.0050      both
+Soul Warden                           +3.01+-0.40         +2.48+-0.50        +0.0125+-0.0049      both
+Starscape Cleric                      +2.76+-0.39         +2.40+-0.43        +0.0142+-0.0048      both
+Aetherflux Reservoir                  +1.39+-0.31         +2.29+-0.49        +0.0095+-0.0044      both
+Exemplar of Light                     +1.81+-0.37         +2.23+-0.50        +0.0113+-0.0047      both
+Auriok Champion                       +1.95+-0.35         +2.21+-0.54        +0.0082+-0.0047      both
+Sunscorch Regent                      +1.49+-0.25         +2.14+-0.39        +0.0083+-0.0035      both
+Sorin, Vengeful Bloodlord             +1.28+-0.34         +2.10+-0.48        +0.0132+-0.0043      both
+Sorin, Solemn Visitor                 +1.35+-0.29         +1.96+-0.44        +0.0162+-0.0043      both
+Marauding Blight-Priest               +2.42+-0.38         +1.95+-0.44        +0.0082+-0.0042      both
+Blind Obedience                       +1.46+-0.30         +1.91+-0.42        +0.0112+-0.0047      both
+Suture Priest                         +1.86+-0.30         +1.77+-0.45        +0.0063+-0.0043      both
+Debt to the Deathless                 +1.37+-0.22         +1.74+-0.35        +0.0095+-0.0040      both
+Drana's Emissary                      +1.65+-0.29         +1.69+-0.40        +0.0062+-0.0040      both
+Elas il-Kor, Sadistic Pilgrim         +1.48+-0.29         +1.57+-0.40        +0.0058+-0.0044      both
+Enduring Tenacity                     +2.23+-0.42         +1.49+-0.55        +0.0202+-0.0054      both
+Phyrexian Arena                       +0.67+-0.31         +1.47+-0.52        +0.0133+-0.0048      both
+Cliffhaven Vampire                    +1.94+-0.33         +1.41+-0.46        +0.0038+-0.0044       dmg
+Fountain of Renewal                   +1.05+-0.24         +1.35+-0.36        +0.0093+-0.0040      both
+Orzhov Signet                         +1.18+-0.37         +1.18+-0.53        +0.0117+-0.0047      both
+Cosmos Elixir                         +0.62+-0.22         +1.13+-0.38        +0.0103+-0.0040      both
+Voice of the Blessed                  +1.09+-0.25         +1.12+-0.37        +0.0060+-0.0038      both
+Syr Konrad, the Grim                  +0.79+-0.21         +1.12+-0.30        +0.0058+-0.0034      both
+Ajani's Mantra                        +0.71+-0.19         +1.11+-0.33        +0.0080+-0.0042      both
+Well of Lost Dreams                   -0.13+-0.35         +1.10+-0.56        +0.0010+-0.0047      FLIP
+Land Tax                              +0.85+-0.33         +1.07+-0.43        +0.0113+-0.0043      both
+Daxos, Blessed by the Sun             +0.90+-0.28         +1.03+-0.39        +0.0030+-0.0040       dmg
+Kalitas, Traitor of Ghet              +0.54+-0.21         +0.98+-0.36        +0.0085+-0.0042      both
+Sol Ring                              +0.77+-0.33         +0.82+-0.48        +0.0027+-0.0046       dmg
+Dawn of Hope                          +0.08+-0.30         +0.72+-0.40        +0.0030+-0.0043       dmg
+Sanguine Bond                         +0.73+-0.34         +0.55+-0.51        +0.0148+-0.0051      both
+Pristine Talisman                     +0.32+-0.24         +0.47+-0.38        +0.0028+-0.0040       dmg
+Vito, Thorn of the Dusk Rose          +1.30+-0.40         +0.34+-0.55        +0.0145+-0.0053       win
+Swiftfoot Boots                       +0.34+-0.22         +0.20+-0.36        -0.0033+-0.0036        --
+Mother of Runes                       +0.19+-0.28         +0.16+-0.40        +0.0007+-0.0041        --
+Vizkopa Guildmage                     +0.16+-0.29         -0.22+-0.38        +0.0028+-0.0041      FLIP
+Blood Artist                          -0.45+-0.25         -0.38+-0.39        -0.0043+-0.0041       win
+Felidar Sovereign                     -0.71+-0.28         -2.26+-0.47        +0.0200+-0.0045      both
+Exquisite Blood                       -2.22+-0.40         -4.12+-0.67        +0.0237+-0.0057      both
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Lurrus of the Dream-Den               +0.97+-0.21         +1.14+-0.34        +0.0055+-0.0032      both
-Ranger of Eos                         +0.97+-0.26         +1.05+-0.35        +0.0075+-0.0039      both
-Benevolent Offering                   +0.66+-0.15         +0.86+-0.24        +0.0043+-0.0027      both
-Necropotence                          +0.34+-0.29         +0.70+-0.43        +0.0030+-0.0045       dmg
-Sun Titan                             +0.43+-0.16         +0.69+-0.24        +0.0017+-0.0029       dmg
-Umezawa's Jitte                       +0.21+-0.15         +0.30+-0.22        +0.0003+-0.0027       dmg
-Enlightened Tutor                     +0.08+-0.10         +0.18+-0.14        -0.0007+-0.0013       dmg
-Anguished Unmaking                    +0.06+-0.04         +0.12+-0.23        -0.0002+-0.0011        --
-Return to Dust                        +0.08+-0.05         +0.10+-0.10        -0.0002+-0.0014       dmg
-Fracture                              -0.00+-0.04         +0.00+-0.05        -0.0002+-0.0006      FLIP
+Lurrus of the Dream-Den               +0.91+-0.20         +1.10+-0.34        +0.0048+-0.0034      both
+Ranger of Eos                         +0.96+-0.25         +1.02+-0.33        +0.0077+-0.0039      both
+Benevolent Offering                   +0.58+-0.15         +0.94+-0.25        +0.0053+-0.0026      both
+Sun Titan                             +0.41+-0.13         +0.75+-0.25        +0.0025+-0.0031       dmg
+Necropotence                          +0.25+-0.27         +0.73+-0.42        +0.0022+-0.0045       dmg
+Umezawa's Jitte                       +0.22+-0.16         +0.19+-0.22        +0.0000+-0.0027        --
+Anguished Unmaking                    +0.04+-0.04         +0.13+-0.21        -0.0002+-0.0011        --
+Return to Dust                        +0.09+-0.05         +0.12+-0.10        +0.0002+-0.0015       dmg
+Enlightened Tutor                     +0.11+-0.10         +0.06+-0.10        -0.0007+-0.0011        --
+Fracture                              +0.03+-0.08         +0.03+-0.09        -0.0002+-0.0006        --
 Swords to Plowshares                  +0.00+-0.00         +0.00+-0.00        +0.0000+-0.0000        --
 Path to Exile                         +0.00+-0.00         +0.00+-0.00        +0.0000+-0.0000        --
-Soulmender                            +0.06+-0.17         -0.01+-0.19        -0.0010+-0.0022      FLIP
-Sensei's Divining Top                 -0.01+-0.10         -0.15+-0.17        -0.0017+-0.0021        --
-Phyrexian Reclamation                 +0.08+-0.15         -0.21+-0.16        -0.0023+-0.0019      FLIP
-Farewell                              -0.59+-0.15         -0.88+-0.24        -0.0058+-0.0029      both
-Austere Command                       -0.75+-0.21         -1.01+-0.28        -0.0053+-0.0032      both
-Damnation                             -1.20+-0.25         -1.57+-0.33        -0.0075+-0.0036      both
-Toxic Deluge                          -2.14+-0.38         -1.80+-0.45        -0.0107+-0.0044      both
-Damn                                  -2.16+-0.32         -2.10+-0.44        -0.0098+-0.0047      both
-DONE
+Soulmender                            +0.05+-0.12         -0.06+-0.19        -0.0017+-0.0021      FLIP
+Phyrexian Reclamation                 -0.01+-0.08         -0.17+-0.16        -0.0018+-0.0019       dmg
+Sensei's Divining Top                 -0.01+-0.09         -0.18+-0.18        -0.0010+-0.0022       dmg
+Farewell                              -0.61+-0.15         -0.89+-0.23        -0.0067+-0.0030      both
+Austere Command                       -0.73+-0.21         -0.95+-0.28        -0.0060+-0.0032      both
+Damnation                             -1.23+-0.25         -1.53+-0.32        -0.0070+-0.0037      both
+Toxic Deluge                          -2.14+-0.38         -1.92+-0.44        -0.0108+-0.0043      both
+Damn                                  -2.23+-0.34         -2.20+-0.44        -0.0117+-0.0048      both
