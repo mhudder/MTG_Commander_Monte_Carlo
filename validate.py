@@ -23,6 +23,16 @@ la, lb, _ = run_ab(ld, lc, "Verge Rangers", same, n=3000,
 for r in analyse(la, lb, metrics=("mv_cheated", "miracles_cast", "damage")):
     print("  ", r.line("A", "A"))
 
+print("\nTivit engine — A/A control")
+from edhmc.decks.tivit_v1 import build as tv_build
+from edhmc.tivit import simulate as tv_sim
+td, tc = tv_build()
+same = [x for x in td if x.name == "Academy Manufactor"][0]
+ta, tb, _ = run_ab(td, tc, "Academy Manufactor", same, n=3000,
+                   cfg={"turns": 14}, sim=tv_sim)
+for r in analyse(ta, tb, metrics=("artifacts_made", "votes_cast", "damage")):
+    print("  ", r.line("A", "A"))
+
 # The same real comparison as always, now run in the other direction: March
 # is in the deck as of v12, so this swaps it back out for the cut Skullclamp.
 print("\nCRN variance reduction on the real comparison:")

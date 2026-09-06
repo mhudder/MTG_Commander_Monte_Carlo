@@ -10,14 +10,20 @@ FLYING = {
     'Archangel of Thune',
     'Caldera Pyremaw',
     'Cliffhaven Vampire',
+    'Custodi Squire',
+    'Cyberdrive Awakener',
     "Drana's Emissary",
     'Exemplar of Light',
     'Goldspan Dragon',
     'Junk Diver',
     'Lorehold, the Historian',
+    'Magister of Worth',
+    'Messenger Jays',
+    'Mirkwood Bats',
     'Ornithopter of Paradise',
     'Starscape Cleric',
     'Sunscorch Regent',
+    'Tivit, Seller of Secrets',
 }
 
 # Token subtypes that fly, from the text of the card that makes them.

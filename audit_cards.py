@@ -36,7 +36,7 @@ import urllib.parse
 import urllib.request
 
 from edhmc.engine import STACK_ONLY_CREATURES
-from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12
+from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12, tivit_v1
 from edhmc.decks._evasion import FLYING
 
 UA = {"User-Agent": "EDHMC/1.0", "Accept": "application/json"}
@@ -59,7 +59,11 @@ KNOWN_MODEL_LIMITS = {
 # colour in your commander's colour identity" (or names a creature type).
 # Restricting them to the deck's two colours is CORRECT, not a data error.
 IDENTITY_LANDS = {"Command Tower", "Cavern of Souls", "Plaza of Heroes",
-                  "Opal Palace"}
+                  "Opal Palace",
+                  # "any color that a land an OPPONENT controls could
+                  # produce" -- Scryfall lists all five; restricting it to the
+                  # deck's own colours is the conservative reading.
+                  "Exotic Orchard"}
 
 
 # ---------------------------------------------------------------------------
@@ -71,7 +75,8 @@ def collect():
     out = []
     for deck, mod in (("rendmaw", rendmaw_v12),
                       ("lorehold", lorehold_v16),
-                      ("karlov", karlov_v2)):
+                      ("karlov", karlov_v2),
+                      ("tivit", tivit_v1)):
         cards, commander = mod.build()
         seen = set()
         for c in [commander] + cards:

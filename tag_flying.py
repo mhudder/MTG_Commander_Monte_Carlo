@@ -36,7 +36,7 @@ import sys
 import urllib.parse
 import urllib.request
 
-from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2
+from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1
 
 HEADERS = {"User-Agent": "EDHMC/1.0", "Accept": "application/json",
            "Content-Type": "application/json"}
@@ -50,6 +50,11 @@ CONDITIONAL = {
     "Voice of the Blessed": "flies only with 4+ counters",
     "Dragon's Rage Channeler": "flies only with delirium (4+ card types in yard)",
 }
+
+# Token subtypes made by the Tivit list that do NOT fly, listed so the absence
+# is deliberate rather than forgotten: Soldier (Lieutenants, Vault 11), Rabbit
+# (Tempt with Bunnies), Citizen (Master of Ceremonies), Servo (Marionette
+# Master). Its Clue, Food and Treasure tokens are not creatures at all.
 
 # Tokens that fly, verified against the text of the card that makes them.
 # Kept here rather than at the make_tokens call sites so every evasion claim
@@ -97,7 +102,7 @@ def named(name):
 
 def main():
     decks = {"rendmaw": rendmaw_v12, "lorehold": lorehold_v16,
-             "karlov": karlov_v2}
+             "karlov": karlov_v2, "tivit": tivit_v1}
     creatures = {}
     for mod in decks.values():
         deck, cmd = mod.build()

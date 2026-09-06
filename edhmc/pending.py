@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2
+from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1
 from edhmc.experiment import _swap_many
 
 
@@ -487,6 +487,10 @@ DECKS = {
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates.
     "karlov": (karlov_v2, {}),
+    # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
+    # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
+    "tivit": (tivit_v1, {
+        "Anointed Procession": tivit_v1.ANOINTED_PROCESSION}),
 }
 
 

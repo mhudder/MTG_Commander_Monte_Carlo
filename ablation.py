@@ -45,6 +45,7 @@ from edhmc.engine import Card, simulate as rendmaw_sim
 from edhmc.pending import build_pending
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.karlov import simulate as karlov_sim
+from edhmc.tivit import simulate as tivit_sim
 from edhmc.experiment import DEFAULT_CFG
 
 DECK = sys.argv[1] if len(sys.argv) > 1 else "lorehold"
@@ -59,11 +60,14 @@ HORIZONS = tuple(int(x) for x in sys.argv[3].split(",")) if len(sys.argv) > 3 \
 BLANK_KEEPS_TYPES = os.environ.get("BLANK_KEEPS_TYPES", "0") == "1"
 
 SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-       "karlov": karlov_sim}[DECK]
+       "karlov": karlov_sim, "tivit": tivit_sim}[DECK]
 METRIC_SETS = {
     "lorehold": ("mv_cheated", "damage", "miracles_cast", "total_mv_cast", "won"),
     "rendmaw": ("damage", "cards_drawn", "tokens_made", "rendmaw_triggers", "won"),
     "karlov": ("damage", "lifegain_triggers", "final_life", "cards_drawn", "won"),
+    # artifacts_made is this deck's mv_cheated: the proxy the engine is built
+    # around. It is NOT the objective -- follow win rate where they disagree.
+    "tivit": ("damage", "artifacts_made", "tivit_triggers", "votes_cast", "won"),
 }
 
 # Cards whose actual text the engine implements. Everything else is a body.
@@ -182,8 +186,40 @@ SCRIPTED_KARLOV = {
     #   Ranger of Eos     - "draw 2", not a tutor for two specific one-drops
 }
 
+# Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
+# IMPLEMENTS THE CARD'S TEXT, so a low score is evidence about the card. A card
+# whose text is only approximated belongs in KNOWN_BLIND even when it has
+# engine code -- that distinction is the one this project has got wrong twice.
+SCRIPTED_TIVIT = {
+    # --- the artifact engine ---
+    # Every one of these is fully implemented in tivit.make_token /
+    # sacrifice_tokens / deadeye_loop.
+    "Academy Manufactor",          # the Clue/Food/Treasure replacement
+    "Time Sieve", "Mechanized Production", "Revel in Riches",
+    "Disciple of the Vault", "Marionette Master", "Mirkwood Bats",
+    "Nadier's Nightblade", "Kambal, Profiteering Mayor",
+    "Cyberdrive Awakener",
+    # --- blink: each is a fresh Tivit ETB, which is a fresh dilemma ---
+    "Ephemerate", "Soulherder", "Displacer Kitten", "Teleportation Circle",
+    "Conjurer's Closet", "Deadeye Navigator",
+    # --- the vote ---
+    # Extra votes are the whole mechanic and are read by voting.my_votes().
+    "Ballot Broker", "Brago's Representative",
+    "Illusion of Choice",          # voting.vote_control
+    "Grudge Keeper",               # voting._vote_payoffs
+    "Master of Ceremonies", "Tempting Contract", "Tempt with Bunnies",
+    "Coercive Portal", "Plea for Power", "Lieutenants of the Guard",
+    "Messenger Jays", "Tyrant's Choice", "Custodi Squire",
+    # --- mana and draw ---
+    "Sol Ring", "Arcane Signet", "Azorius Signet", "Dimir Signet",
+    "Orzhov Signet", "Model of Unity", "Monologue Tax",
+    "Tamiyo's Journal", "Demonic Tutor", "Idyllic Tutor",
+    # --- protection the opponent model respects ---
+    "Lightning Greaves",
+}
+
 SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
-            "karlov": SCRIPTED_KARLOV}[DECK]
+            "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT}[DECK]
 METRICS = METRIC_SETS[DECK]
 
 
@@ -335,6 +371,39 @@ KNOWN_BLIND = {
         'Swords to Plowshares',
         'Toxic Deluge',
         "Umezawa's Jitte",
+    },
+    # Explicitly blind, with the reason. check_scripted_coverage() raises if a
+    # nonland card is in neither set, which is the guard against the 2026-09-04
+    # labelling bug -- but nothing can CHECK that a classification is TRUE, so
+    # these reasons are the record.
+    "tivit": {
+        # Opponents' boards are a blocker count, so nothing that removes a
+        # permanent can be evaluated at all. This is the deepest limitation in the
+        # project and it puts a third of this list here.
+        "An Offer You Can't Refuse", "Path to Exile", "Swords to Plowshares",
+        "Counterspell", "Dovin's Veto", "Muddle the Mixture", "Void Rend",
+        "Damn", "Farewell", "Promise of Loyalty", "Sadistic Shell Game",
+        "Trap the Trespassers", "Council's Judgment", "Magister of Worth",
+        # Ward {3}, and an attack tax, cannot be expressed against an opponent
+        # model whose combat is a damage share rather than declared attackers.
+        "Ghostly Prison", "Propaganda",
+        # BLIND DESPITE HAVING ENGINE CODE -- the implementation is not the card:
+        #   Expropriate      the extra turns land, but "gain control of a
+        #                    permanent owned by the voter" needs opposing
+        #                    permanents to steal. UNDERSTATES, badly.
+        #   Torment of Hailfire  X is fixed at 6 and every opponent takes the life
+        #                    branch, because they have neither a hand nor
+        #                    permanents to give up. A CEILING, not an estimate.
+        #   Rhystic Study    "unless that player pays {1}" is a social fact this
+        #                    model cannot see; it is a flat draw rate.
+        #   Capital Punishment / Bite of the Black Rose / Split Decision /
+        #   Trial of a Time Lord / Vault 11  cast the vote correctly, so Grudge
+        #                    Keeper and Model of Unity see them -- but their
+        #                    EFFECTS (sacrifice, discard, counter, exile) all need
+        #                    opposing permanents or hands.
+        "Expropriate", "Torment of Hailfire", "Rhystic Study",
+        "Capital Punishment", "Bite of the Black Rose", "Split Decision",
+        "Trial of a Time Lord", "Vault 11: Voter's Dilemma",
     },
 }
 
