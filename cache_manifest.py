@@ -69,12 +69,25 @@ NOTES = {
 
 
 def fingerprint(deck: str) -> tuple[str, list[str]]:
+    """Hash the deck's source, NORMALISED FOR LINE ENDINGS.
+
+    The first version hashed raw bytes, and on Windows `git checkout` rewrites
+    the working tree to CRLF under core.autocrlf -- so merging a branch changed
+    the fingerprint of files whose CONTENT had not changed at all
+    (`git diff HEAD` was empty). It fired the moment it was first exercised,
+    and it would fire on every fresh clone.
+
+    A check that cries wolf is worse than no check, because it teaches you to
+    ignore it -- and this one exists precisely to be believed when it says a
+    cache is stale. Normalising newlines makes it depend on content only.
+    """
     files = SHARED + PER_DECK[deck]
     h = hashlib.sha256()
     for path in sorted(files):
         with open(path, "rb") as fh:
-            h.update(path.encode())
-            h.update(hashlib.sha256(fh.read()).digest())
+            body = fh.read().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        h.update(path.encode())
+        h.update(hashlib.sha256(body).digest())
     return h.hexdigest()[:16], sorted(files)
 
 

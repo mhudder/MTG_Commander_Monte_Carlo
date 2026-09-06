@@ -14,14 +14,14 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `f833e80`.
+Fingerprints recorded at `a207dad`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `5bb9cd303343c6dd` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `ff35c5c4958b6d54` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `df1780aac9718e29` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `039e8c1745424990` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `b3d60033ce6db286` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `20b15ef7261da4f7` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `234d2ae55fc338f0` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `e3f1ee47f1fb9d7a` |
 
 ## What each fingerprint covers
 
