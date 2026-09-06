@@ -74,6 +74,7 @@ class TivitGame:
         self.illusion_active = False
         self.ephemerate_rebound = 0     # turn on which the rebound copy casts
         self.deadeye_paired = False
+        self.cyberdrive_turn = -1       # turn Cyberdrive Awakener entered
         self.result = None
         # Token piles. Ints rather than Permanents: none of them is a creature
         # and nothing in this deck reads an individual one.
@@ -644,6 +645,10 @@ def run_etb(g, perm):
         g.deadeye_paired = g.has("Tivit, Seller of Secrets")
     elif s == "marionette":
         perm.counters += 3          # fabricate 3, taken as counters
+    elif s == "cyberdrive":
+        # Its animation is an ETB, so record the turn; combat() applies the
+        # burst only on that turn.
+        g.cyberdrive_turn = g.turn
 
 
 # ---------------------------------------------------------------------------
@@ -720,11 +725,24 @@ def combat(g):
         g.damage_by_turn.append(0.0)
         return
     raw = sum(g.power_of(p) for p in attackers)
-    # Cyberdrive Awakener: "each noncreature artifact you control becomes a
-    # 4/4 artifact creature until end of turn", and its static ability gives
-    # every artifact creature flying. A pile of Treasures becomes lethal out
-    # of nowhere, which is a real line this deck has.
-    bonus = 4 * sum(g.tokens.values()) if g.has("Cyberdrive Awakener") else 0
+    # Cyberdrive Awakener: "WHEN THIS CREATURE ENTERS, each noncreature
+    # artifact you control becomes a 4/4 artifact creature until end of turn."
+    #
+    # THAT IS AN ETB TRIGGER, NOT A STATIC ABILITY, and it fires ONCE. This
+    # read `g.has("Cyberdrive Awakener")` and applied the whole pile's worth
+    # of power on EVERY combat for the rest of the game, which made it the
+    # highest-scoring card in the first Tivit table (+0.0335 win) on an
+    # effect the card does not have. `cyberdrive_turn` is the turn it entered.
+    #
+    # Still approximated, and in the generous direction: tokens created THIS
+    # TURN have not been under your control since the turn began, so they are
+    # summoning sick and cannot attack. Counting the whole pile overstates the
+    # burst by however much of it Tivit made this turn -- which, on the turn
+    # you would want to do this, is most of it. Treat the number as a ceiling.
+    bonus = 0
+    if g.has("Cyberdrive Awakener") and g.turn == getattr(
+            g, "cyberdrive_turn", -1):
+        bonus = 4 * sum(g.tokens.values())
     dmg = raw + bonus
     if g.cfg.get("derived_blocking", True):
         scale = dmg / max(1e-9, raw)

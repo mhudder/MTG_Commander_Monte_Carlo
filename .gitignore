@@ -21,3 +21,6 @@ ablation_*.log
 # Regeneration scratch — the finished .txt tables ARE tracked
 ablation_*.txt.new
 regen.log
+
+# A void table kept only long enough to diff against; not an artefact.
+ablation_*_VOID_*.txt
