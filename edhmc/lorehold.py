@@ -123,6 +123,11 @@ class LoreholdGame:
             "mastery_copies": 0,
             "land_tax_fetches": 0,
             "upkeep_free_casts": 0,
+            # Radiant Scrollwielder exiles from the graveyard whether or not
+            # it can pay, so these two are NOT the same number and the gap
+            # between them is the card's real cost.
+            "scrollwielder_exiles": 0,
+            "scrollwielder_casts": 0,
             "double_vision_copies": 0,
             "own_wipes_cast": 0,
             "treasures_made": 0,
@@ -621,6 +626,60 @@ def arcane_bombardment(g):
         g.m["total_mv_cast"] += card.free_mv
         g.m["spells_cast"] += 1
         apply_spell_effects(g, card, is_copy=True)
+
+
+def radiant_scrollwielder(g):
+    """"At the beginning of your upkeep, exile an instant or sorcery card AT
+    RANDOM FROM YOUR GRAVEYARD. You may cast it this turn. If a spell cast this
+    way would be put into your graveyard, exile it instead."
+
+    THE ZONE IS THE GRAVEYARD, NOT THE LIBRARY. Until 2026-09-05 this shared
+    Galvanoth's code path and read `library[-1]`, which is a different card in
+    almost every respect:
+
+      from the LIBRARY   fires only when the top card happens to be an instant
+                         or sorcery (~a third of upkeeps), and competes with
+                         Galvanoth and the whole top-setter package for that
+                         one card.
+      from the GRAVEYARD fires EVERY upkeep from the moment one instant or
+                         sorcery is in the yard -- which in a 36-spell list is
+                         from about turn 4 -- and does not touch the top of the
+                         library at all.
+
+    Three details that are easy to get wrong and all matter here:
+
+    1. THE EXILE IS NOT OPTIONAL. "Exile ... You MAY cast it" -- the card
+       leaves the graveyard whether or not you can pay. That is a real COST in
+       this deck: Arcane Bombardment draws from the same pool, The Dawning
+       Archaic's cost reduction counts it, and Mizzix's Mastery targets it.
+    2. YOU STILL PAY. Unlike Galvanoth this is not a free cast, so it does not
+       add to `mv_cheated`.
+    3. NOT MODELLED: "Instant and sorcery spells you control have lifelink."
+       Separating spell damage from creature damage at every `deal_pod_damage`
+       call site is a bigger change than this fix, so the lifelink half is
+       absent and ANY NUMBER FOR THIS CARD IS A FLOOR. The card comment in
+       lorehold_v16.py claiming the clause "does nothing here -- life is not
+       tracked" is stale: life is tracked, and since pod v3 it decides 43% of
+       this deck's losses.
+    """
+    if not g.has("Radiant Scrollwielder"):
+        return
+    pool = [c for c in g.graveyard
+            if "Instant" in c.types or "Sorcery" in c.types]
+    if not pool:
+        return
+    picked = pool[g.rng.randrange(len(pool))]
+    g.graveyard.remove(picked)               # exiled, cast or not
+    g.m["scrollwielder_exiles"] += 1
+
+    units = mana_units(g)
+    cost = reduce_cost(g, picked)
+    if can_pay(cost, units) is None:
+        return
+    paid = pay(g, cost, units)
+    g.m["upkeep_free_casts"] += 1
+    g.m["scrollwielder_casts"] += 1
+    resolve_spell(g, picked, paid, from_hand=False)
 
 
 def apply_spell_effects(g, card, is_copy=False, was_cast=True):
@@ -1138,38 +1197,36 @@ def take_turn(g):
     # Penance, Hidden Retreat, Scroll Rack and Sensei's Divining Top are all
     # activated abilities usable at instant speed, so a pilot uses them in the
     # opponent's end step — before their own upkeep. This block used to run
-    # AFTER Galvanoth and Radiant Scrollwielder had already looked at the top
-    # card, so the card you deliberately set up was never the card they saw;
-    # they fired on whatever happened to be there. Setting up a free cast is
-    # the single best thing a top-setter can do in this deck and the engine
-    # could not express it at all.
+    # AFTER Galvanoth had already looked at the top card, so the card you
+    # deliberately set up was never the card it saw; it fired on whatever
+    # happened to be there. Setting up a free cast is the single best thing a
+    # top-setter can do in this deck and the engine could not express it.
+    #
+    # Only GALVANOTH interacts with this. Radiant Scrollwielder reads the
+    # GRAVEYARD (corrected 2026-09-05) and never touches the top of the
+    # library, so `st_card not in g.library` below still means Galvanoth took
+    # it and nothing else.
     st_card = set_top(g, upkeep_free=g.has("Galvanoth"))
     sort_top_three(g)
 
-    for engine, free in (("Galvanoth", True), ("Radiant Scrollwielder", False)):
-        if not g.has(engine) or not g.library:
-            continue
+    # GALVANOTH reads the LIBRARY: "you may look at the top card of your
+    # library. You may cast it without paying its mana cost if it's an instant
+    # or sorcery." So it competes with the top-setters for the same card, which
+    # is why set_top above knows about it.
+    if g.has("Galvanoth") and g.library:
         top = g.library[-1]
-        if "Instant" not in top.types and "Sorcery" not in top.types:
-            continue
-        if free:
+        if "Instant" in top.types or "Sorcery" in top.types:
             g.library.pop()
             g.m["upkeep_free_casts"] += 1
             g.m["mv_cheated"] += top.free_mv
             resolve_spell(g, top, 0, from_hand=False)
-        else:
-            units = mana_units(g)
-            cost = reduce_cost(g, top)
-            if can_pay(cost, units) is not None:
-                g.library.pop()
-                paid = pay(g, cost, units)
-                g.m["upkeep_free_casts"] += 1
-                resolve_spell(g, top, paid, from_hand=False)
+
+    radiant_scrollwielder(g)
 
     if st_card is not None and st_card not in g.library:
         _drawn, _cast = miracle_window(g)    # the draw step still happens
-        # Galvanoth or Radiant Scrollwielder cast it off the top — the best
-        # outcome, and better than the miracle it was otherwise set up for.
+        # Galvanoth cast it off the top — the best outcome, and better than
+        # the miracle it was otherwise set up for.
         g.m["settop_drawn"] += 1
         g.m["settop_miracled"] += 1
         g.m["settop_free_cast"] += 1

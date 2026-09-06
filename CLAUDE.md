@@ -469,12 +469,12 @@ generated tag set, a script that reads the wrong zone. Full write-up in
    flying haste) and Caldera Pyremaw (3/3 flying) were both **measured as ground
    creatures**. FIXED; no deck card changed, so no table moved. Same shape as the
    2026-09-04 `SCRIPTED_*` bug: a generated set the deck moved past.
-3. **Radiant Scrollwielder reads the wrong ZONE.** Oracle: "exile an instant or
-   sorcery card at random **from your graveyard**". The engine reads
-   `library[-1]`. From the graveyard it fires every upkeep from ~turn 4 and does
-   not compete with the top-setters at all; from the library it fires ~a third
-   of upkeeps and fights Galvanoth for the same card. Its number is a floor of
-   unknown depth.
+3. **Radiant Scrollwielder read the wrong ZONE.** Oracle: "exile an instant or
+   sorcery card at random **from your graveyard**"; the engine read
+   `library[-1]`. FIXED — and it tripled the card's firings without making it a
+   better card, because every one of them is paid for in full. Its number is
+   still a floor: "instant and sorcery spells you control have lifelink" is
+   unmodelled.
 4. **Three cards in `SCRIPTED_LOREHOLD` are not their text**: Apex of Power is
    `draw4` (no exile-and-cast, no "add ten mana of any one color"), Hit the
    Mother Lode is a flat 5 Treasures (no Discover 10), Borrowed Knowledge is
@@ -492,20 +492,58 @@ not fine now that the life-share of losses is 0.32/0.43/0.20. **Bitterblossom
 loses 1 life every upkeep and is Rendmaw's #5 card at +0.0205 win — its number
 is a ceiling.** Same for Phyrexian Arena, Talisman of Conviction, Dark Confidant.
 
-### The five-drop question now has three candidates and no trustworthy number
+### The Penance slot: RESOLVED — Caldera Pyremaw, not Galvanoth
 
-CLAUDE.md's standing recommendation was "cut Penance, but find a better
-five-drop than Galvanoth." Two of the three contenders were measured wrong:
+The standing recommendation was "cut Penance, but find a better five-drop than
+Galvanoth." Two of the three contenders had been measured on a broken
+implementation. Both were fixed and all three re-measured against the same cut
+with the same seeds (`run_fivedrop.py`, 6,000 paired games each, pod v3):
 
-| card | last number | why it is not usable |
-|---|---|---|
-| Galvanoth | +0.0128 [+0.0078, +0.0180] win T20 | staged; the only one measured on a correct implementation |
-| Caldera Pyremaw | +0.0123 ±0.0048 win T20 | measured with **no flying**, on the pre-2026-09-05 engine |
-| Radiant Scrollwielder | — | measured off the **library** instead of the graveyard |
+| card | MV | win T10 | win T20 |
+|---|---|---|---|
+| **Caldera Pyremaw** | 5 | **+0.0035 [+0.0012, +0.0060]** | **+0.0202 [+0.0150, +0.0257]** |
+| Galvanoth | 5 | +0.0020 [−0.0002, +0.0043] | +0.0128 [+0.0078, +0.0180] |
+| Radiant Scrollwielder | 4 | +0.0015 [−0.0008, +0.0038] | +0.0125 [+0.0075, +0.0178] |
 
-Caldera Pyremaw was `CANDIDATES_2026-09-04.md`'s "clearest add of the seven" and
-it was understated. Goldspan Dragon was passed at +0.0025 ±0.0045 and was
-understated by the same bug.
+Caldera is the only one significant at **both** horizons. Three swaps against a
+common baseline have overlapping CIs and cannot be ranked against each other,
+so the decision rests on the **head to head**, where Penance is absent from both
+branches: `-Galvanoth +Caldera Pyremaw` is **+0.0028 [+0.0012, +0.0047]** at ten
+turns and **+0.0093 [+0.0057, +0.0133]** at twenty, significant at both.
+
+**`pending.py` re-staged: `-Penance +Caldera Pyremaw`.** Galvanoth's own numbers
+reproduced exactly on the new engine (+0.0020 / +0.0128, identical to the
+previous staging), so the ranking is a fact about the cards and not about the
+same day's engine changes.
+
+**The proxy disagrees with the objective again.** Head to head, `mv_cheated`
+goes DOWN 1.35 while win rate goes UP — Caldera cheats no mana at all, it just
+deals damage. Same shape as the top-setter finding. Follow win rate.
+
+**Why, mechanically** (`diag_fivedrop.py`, n=4,000, T20). All three arrive in
+about the same share of games, so the difference is not castability — it is what
+they do once they land:
+
+| card | cast in | on turn | per game it resolves |
+|---|---|---|---|
+| Galvanoth | 13.9% | 9.6 | 0.68 free casts |
+| Caldera Pyremaw | 13.8% | 9.6 | **14.5 pod damage** |
+| Radiant Scrollwielder | 18.6% | **8.2** | 2.20 paid casts |
+
+**Fixing Radiant Scrollwielder's zone tripled its firings and did not make it a
+better card.** It is MV 4, so it lands a turn and a half earlier and in a third
+more games — and it still only ties Galvanoth, because unlike Galvanoth it pays
+full price for every cast: its `mv_cheated` gain is +0.61 against Galvanoth's
++1.34. Its number is still a floor (lifelink unmodelled), but it would have to
+be worth six points of win rate to matter.
+
+Note the three-way was measured on the v16 list, which still has Scroll Rack
+rather than the staged Sunbird's Invocation. That is the same baseline Galvanoth
+was measured on, so the comparison is sound — but **the two staged Lorehold
+changes have not been measured together.**
+
+Goldspan Dragon was passed at +0.0025 ±0.0045 and was understated by the same
+flying bug; it has not been re-measured.
 
 ### Fixed hazard: ablation cache key
 
@@ -601,11 +639,16 @@ Re-read against the code 2026-09-05; verdicts inline.
    — see the evasion section above. Reach on YOUR creatures is still not
    modelled and does not need to be: reach is a blocking ability and this
    engine never blocks with your creatures.
-0. **Re-measure the five-drop slot as a three-way, on the corrected engine.**
-   Fix Radiant Scrollwielder's zone first, re-run Caldera Pyremaw now that it
-   flies, and compare both against the staged Galvanoth. This is the highest
-   value work available: the slot is already staged on the weakest of the three
-   numbers. Delete the caches first.
+0. ~~Re-measure the five-drop slot as a three-way on the corrected engine.~~
+   **DONE 2026-09-05** — Caldera Pyremaw wins head to head and is re-staged.
+   See the Penance-slot section above.
+0b. **Measure the two staged Lorehold changes TOGETHER.** `-Penance +Caldera
+   Pyremaw` and `-Scroll Rack +Sunbird's Invocation` were each measured against
+   the v16 list, never against each other. Both add to the same curve and
+   Sunbird's already costs +4.28 stranded MV, so they may not be additive. Do
+   this before either is written to the `.xlsx`.
+0c. **Re-measure Goldspan Dragon.** It was passed at +0.0025 ±0.0045, measured
+   as a ground creature by the same bug that understated Caldera Pyremaw.
 2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
 3. ~~Lorehold: cut Penance, add Galvanoth.~~ **STAGED 2026-09-05** with

@@ -225,9 +225,16 @@ GALVANOTH = C("Galvanoth", "Creature", {"gen": 3, "R": 2}, 3, 3,
 RADIANT_SCROLLWIELDER = C("Radiant Scrollwielder", "Creature",
                           {"gen": 2, "R": 1, "W": 1}, 2, 4,
                           priority=7, threat=7.0, script="scrollwielder")
-# Upkeep: exile the top card; if instant/sorcery you may cast it this turn,
-# paying its cost with mana of any colour. Weaker than Galvanoth (not free).
-# Its lifelink clause does nothing here -- life is not tracked.
+# Upkeep: exile an instant or sorcery AT RANDOM FROM YOUR GRAVEYARD; you may
+# cast it this turn. THE ZONE IS THE GRAVEYARD, not the top of the library --
+# this comment said "the top card" until 2026-09-05 and the engine believed it.
+# See lorehold.radiant_scrollwielder(). Not free, unlike Galvanoth, and the
+# exile happens whether or not you pay.
+#
+# "Instant and sorcery spells you control have lifelink" is NOT modelled, so
+# any number for this card is a floor. The previous comment excused that with
+# "life is not tracked" -- it is, and since pod v3 it decides 43% of this
+# deck's losses.
 
 GOLDSPAN_DRAGON = C("Goldspan Dragon", "Creature", {"gen": 3, "R": 2}, 4, 4,
                     priority=8, threat=8.5, script="goldspan", haste=True)

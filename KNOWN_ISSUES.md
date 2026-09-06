@@ -93,7 +93,7 @@ deck changed**, so every table and `validate.py` are untouched.
 Both numbers in `CANDIDATES_2026-09-04.md` are understated as a result, and both
 matter — see §0d.
 
-## 0d. Radiant Scrollwielder reads the WRONG ZONE — not fixed
+## 0d. Radiant Scrollwielder read the WRONG ZONE — FIXED, and it did not help
 
 > At the beginning of your upkeep, exile an instant or sorcery card **at random
 > from your graveyard**. You may cast it this turn.
@@ -114,16 +114,67 @@ The 2026-09-05 "Galvanoth never saw what the top-setters set up" fix was applied
 to both engines. It was right for Galvanoth and irrelevant for Scrollwielder,
 whose whole reading is wrong. Its candidate number is a floor of unknown depth.
 
-**This lands directly on the standing open question.** CLAUDE.md's standing
-recommendation is *"cut Penance, but find a better five-drop than Galvanoth."*
-There are now three five-drops in the running and **none of them has a
-trustworthy number**:
+`lorehold.radiant_scrollwielder()` now reads the graveyard, and models the two
+details that make it a real cost as well as a benefit: **the exile is not
+optional** (the card leaves the yard whether or not you pay, competing with
+Arcane Bombardment, The Dawning Archaic and Mizzix's Mastery for the same pool),
+and **you still pay full price**, so it adds nothing to `mv_cheated`.
+`scrollwielder_exiles` and `scrollwielder_casts` are separate counters and the
+gap between them is the wasted exiles.
 
-| card | last measured | why the number is wrong |
-|---|---|---|
-| Galvanoth | +0.0128 [+0.0078, +0.0180] win T20 | staged; the most trustworthy of the three |
-| Caldera Pyremaw | +0.0123 ±0.0048 win T20 | measured with **no flying**, and on the pre-2026-09-05 engine |
-| Radiant Scrollwielder | — | measured off the **library** instead of the graveyard |
+**Still not modelled: "instant and sorcery spells you control have lifelink."**
+Separating spell damage from creature damage at every `deal_pod_damage` call
+site is a bigger change than the zone fix, so **any number for this card is a
+floor**. The card comment claiming that clause "does nothing here — life is not
+tracked" was stale and has been corrected.
+
+**The fix tripled its firings and did not make it a better card**: 0.68 → 2.20
+per game it resolves, and win rate essentially unchanged against Galvanoth. See
+§0i.
+
+## 0i. The Penance slot, resolved: Caldera Pyremaw
+
+With §0c and §0d fixed, all three contenders were measured against the same cut
+with the same seeds (`run_fivedrop.py`, 6,000 paired games each, pod v3):
+
+| card | MV | win T10 | win T20 |
+|---|---|---|---|
+| **Caldera Pyremaw** | 5 | **+0.0035 [+0.0012, +0.0060]** | **+0.0202 [+0.0150, +0.0257]** |
+| Galvanoth | 5 | +0.0020 [−0.0002, +0.0043] | +0.0128 [+0.0078, +0.0180] |
+| Radiant Scrollwielder | 4 | +0.0015 [−0.0008, +0.0038] | +0.0125 [+0.0075, +0.0178] |
+
+Caldera is the only one significant at both horizons. Those three CIs overlap,
+so they **cannot be ranked against each other** — the decision rests on the head
+to head, where Penance is absent from both branches: `-Galvanoth +Caldera
+Pyremaw` is **+0.0028 [+0.0012, +0.0047]** at ten turns and **+0.0093 [+0.0057,
++0.0133]** at twenty, significant at both. `pending.py` re-staged accordingly.
+
+Galvanoth's own numbers reproduced EXACTLY on the corrected engine (+0.0020 /
++0.0128, identical to the previous staging), so the ranking is a fact about the
+cards, not about the same day's engine changes.
+
+Mechanism (`diag_fivedrop.py`, n=4,000, T20) — all three arrive in about the
+same share of games, so the difference is what they do once they land:
+
+| card | cast in | on turn | per game it resolves |
+|---|---|---|---|
+| Galvanoth | 13.9% | 9.6 | 0.68 free casts |
+| Caldera Pyremaw | 13.8% | 9.6 | **14.5 pod damage** |
+| Radiant Scrollwielder | 18.6% | **8.2** | 2.20 paid casts |
+
+Scrollwielder is MV 4, so it lands a turn and a half earlier and in a third more
+games than the other two — and it still only ties Galvanoth, because every one
+of its casts is paid for in full (`mv_cheated` +0.61 against Galvanoth's +1.34).
+
+**The proxy disagrees with the objective again.** Head to head, `mv_cheated`
+goes DOWN 1.35 while win rate goes UP: Caldera cheats no mana at all. Same shape
+as the top-setter finding. Follow win rate.
+
+Caveat: the three-way ran on the v16 list, which still has Scroll Rack rather
+than the staged Sunbird's Invocation. That is the same baseline Galvanoth was
+measured on, so the comparison is sound — but **the two staged Lorehold changes
+have never been measured together**, and that is the next thing to do before
+either is written to the `.xlsx`.
 
 ## 0e. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
 

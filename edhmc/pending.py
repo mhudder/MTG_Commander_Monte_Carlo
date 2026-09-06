@@ -343,24 +343,72 @@ CHANGES: list[Change] = [
     Change(
         deck="lorehold",
         remove="Penance",
-        add="Galvanoth",
+        add="Caldera Pyremaw",
         staged="2026-09-05",
         rationale=(
-            "Closes queued work item 3, which recorded this as decided but "
-            "never staged. It now has evidence, and the evidence got a lot "
-            "stronger once the top-setter loop was instrumented. Penance is a "
-            "FREE top-setter — the card on top IS the cost — and that is "
+            "Closes queued work item 3. THE CUT was decided long ago and is "
+            "well supported; THE REPLACEMENT changed on 2026-09-05 from "
+            "Galvanoth to Caldera Pyremaw, measured head to head. Penance is "
+            "a FREE top-setter — the card on top IS the cost — and that is "
             "exactly the problem: it converts a draw step into re-drawing a "
             "card you already held, and only 26% of the time can you actually "
             "pay the {2} to miracle what it put there. The other 74% is "
-            "straight card disadvantage. Galvanoth instead casts the top card "
-            "FREE at your upkeep if it is an instant or sorcery, before the "
-            "draw step, so it adds a card rather than recycling one."
+            "straight card disadvantage. Caldera Pyremaw is a {3}{R}{R} 3/3 "
+            "FLIER that puts a +1/+1 counter on itself and then deals damage "
+            "equal to its power to an opponent on every instant or sorcery you "
+            "cast — so the first trigger already hits for 4, and it scales "
+            "with exactly the thing this deck does most."
         ),
         evidence=(
-            "RE-MEASURED 2026-09-05 after the top-setter POLICY fixes, and the margin SHRANK: win rate +0.0020 [-0.0002, +0.0043] at 10 turns, now inside its bar, and +0.0128 [+0.0117 -> +0.0078, +0.0180] at 20. Damage +2.49, mv_cheated +1.34. Against +0.0028 / +0.0165 before the fixes. THE REASON IS INSTRUCTIVE: the fixes made PENANCE LESS BAD. It no longer puts cards on top that it cannot pay for, so the card it is being compared against improved and the gain from cutting it fell. The swap is still positive at the long horizon and the cut is still right, but this is now a weaker case than the ledger first recorded. Galvanoth remains a poor replacement and the new instrumentation says exactly why: it is CAST IN ONLY 15.6% OF GAMES, on turn 9.8, leaving 3.5 turns in which it fires on roughly a third of upkeeps — 0.51 free casts per game it resolves, 0.08 per game overall. Ordering it correctly against the top-setters (see below) could not rescue that; the card arrives too late in too few games. RECOMMENDATION UNCHANGED: cut Penance, but find a better five-drop than Galvanoth before writing this to the .xlsx."
+            "THREE-WAY, same cut, same seeds, 6,000 paired games each, pod v3 "
+            "(run_fivedrop.py). Win rate at 10 / 20 turns: Caldera Pyremaw "
+            "+0.0035 [+0.0012, +0.0060] / +0.0202 [+0.0150, +0.0257]; "
+            "Galvanoth +0.0020 [-0.0002, +0.0043] / +0.0128 [+0.0078, "
+            "+0.0180]; Radiant Scrollwielder +0.0015 [-0.0008, +0.0038] / "
+            "+0.0125 [+0.0075, +0.0178]. Caldera is the only one of the three "
+            "significant at BOTH horizons. "
+            "HEAD TO HEAD, which is the number the decision rests on because "
+            "three swaps against a common baseline have overlapping CIs and "
+            "cannot be ranked against each other: -Galvanoth +Caldera Pyremaw "
+            "is win rate +0.0028 [+0.0012, +0.0047] at 10 turns and +0.0093 "
+            "[+0.0057, +0.0133] at 20, significant at both, damage +1.17. "
+            "WHY CALDERA AND NOT THE OTHER TWO, from diag_fivedrop.py at "
+            "n=4,000: all three arrive in about the same share of games "
+            "(Galvanoth 13.9% on turn 9.6, Caldera 13.8% on turn 9.6, "
+            "Scrollwielder 18.6% on turn 8.2), so the difference is not "
+            "castability — it is what they do once they land. Per game it "
+            "resolves: Galvanoth 0.68 free casts, Scrollwielder 2.20 paid "
+            "casts, Caldera 14.5 pod damage. "
+            "NOTE THE PROXY DISAGREES WITH THE OBJECTIVE AGAIN. Head to head, "
+            "mv_cheated goes DOWN 1.35 while win rate goes UP — Caldera "
+            "cheats no mana at all, it just deals damage. Follow win rate; "
+            "this is the same shape as the top-setter finding below. "
+            "GALVANOTH'S OWN NUMBERS REPRODUCED EXACTLY on the 2026-09-05 "
+            "engine (+0.0020 / +0.0128, identical to the previous staging), "
+            "so the ranking is a fact about the cards and not about the "
+            "engine changes made the same day."
         ),
         notes=(
+            "WHY THIS WAS NOT DECIDED CORRECTLY THE FIRST TIME. Caldera "
+            "Pyremaw was already CANDIDATES_2026-09-04.md's 'clearest add of "
+            "the seven' at +0.0123 +-0.0048, and it was UNDERSTATED: "
+            "tag_flying.py walked only mod.build(), so module-level candidates "
+            "were constructed with flying=False and a 3/3 FLIER was measured "
+            "as a ground creature. Fixed 2026-09-05. Radiant Scrollwielder was "
+            "understated in a different way — the engine read library[-1] when "
+            "the card says 'exile an instant or sorcery at random FROM YOUR "
+            "GRAVEYARD'. Fixing the zone tripled its firings (0.68 -> 2.20 per "
+            "resolve) and did NOT make it a better card, because unlike "
+            "Galvanoth it pays full price for every one of them: its "
+            "mv_cheated gain is +0.61 against Galvanoth's +1.34. Its number is "
+            "still a FLOOR — 'instant and sorcery spells you control have "
+            "lifelink' is unmodelled — but it would have to be worth six "
+            "points of win rate to matter, and it is not. "
+            "MEASURED WITHOUT THE OTHER STAGED LOREHOLD CHANGE. The baseline "
+            "is the v16 list, which still has Scroll Rack rather than "
+            "Sunbird's Invocation. That is the same baseline Galvanoth was "
+            "measured on, so the comparison is sound, but the two staged "
+            "changes have not been measured TOGETHER. "
             "THE WIDER FINDING, which matters more than this one swap. The "
             "top-setter package RAISES mv_cheated AND LOSES GAMES — ablating "
             "Library of Leng, Penance and Sensei's Divining Top together is "
@@ -371,15 +419,15 @@ CHANGES: list[Change] = [
             "guilty of the three (mv_cheated +1.56, win rate inside its bar) "
             "and is NOT proposed for a cut, but the plan of setting up your "
             "own draws deserves a harder look than a single swap. "
-            "READ THE SWAP HONESTLY: in the regenerated table Galvanoth itself "
-            "ablates to +0.25/+0.09 damage and +0.0002 win rate — INSIDE its "
-            "bars, i.e. indistinguishable from a blank. Nearly all of the "
-            "+0.0165 is Penance being bad rather than Galvanoth being good, "
-            "the same shape as the committed Hidden Retreat -> Double Vision "
-            "change. The cut is well supported; the REPLACEMENT is not, and a "
-            "better five-drop would probably beat Galvanoth into that slot. "
-            "Sensei's Divining Top is the next candidate on the same logic: "
-            "-0.0075 +-0.0058 win rate, signal 'win', a third top-setter."
+            "READ THE SWAP HONESTLY: Galvanoth itself ablated to +0.25/+0.09 "
+            "damage and +0.0002 win rate — INSIDE its bars, indistinguishable "
+            "from a blank — so nearly all of ITS +0.0128 was Penance being bad "
+            "rather than Galvanoth being good. Caldera Pyremaw is a different "
+            "case: it beats Galvanoth by +0.0093 in a paired comparison where "
+            "Penance is absent from BOTH branches, so that margin is the card "
+            "and not the cut. Sensei's Divining Top is the next candidate on "
+            "the top-setter logic: -0.0075 +-0.0058 win rate, signal 'win', a "
+            "third top-setter."
         ),
     ),
     Change(
@@ -432,6 +480,8 @@ DECKS = {
     "lorehold": (lorehold_v16, {
         "Molecule Man": lorehold_v16.MOLECULE_MAN,
         "Galvanoth": lorehold_v16.GALVANOTH,
+        "Caldera Pyremaw": lorehold_v16.CALDERA_PYREMAW,
+        "Radiant Scrollwielder": lorehold_v16.RADIANT_SCROLLWIELDER,
         "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
         "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are

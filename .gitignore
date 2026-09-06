@@ -17,3 +17,7 @@ Thumbs.db
 
 # Ablation stderr progress logs — noise, the .txt tables are the artefact
 ablation_*.log
+
+# Regeneration scratch — the finished .txt tables ARE tracked
+ablation_*.txt.new
+regen.log

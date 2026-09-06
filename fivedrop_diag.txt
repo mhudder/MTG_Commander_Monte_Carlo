@@ -1,0 +1,16 @@
+n=4,000 games, 20 turns, pod v3. Each candidate swapped in for Penance.
+
+card                     MV   cast%   turn  resolved%  mech/game  mech/resolve   mechanism
+--------------------------------------------------------------------------------------------------------
+Galvanoth                 5   13.9%    9.6      10.0%       0.07          0.68   free casts off the top
+Caldera Pyremaw           5   13.8%    9.6       9.8%       1.42         14.54   pod damage from its own trigger
+Radiant Scrollwielder     4   18.6%    8.2      13.1%       0.29          2.20   spells cast from the yard
+
+cast%      games in which the card was cast at all
+turn       mean turn it was cast, among those games
+resolved%  games where it resolved and was not answered by the pod
+mech/game  the mechanism counter averaged over ALL games
+mech/resolve  ... over only the games where it stuck. This is the number
+           that says whether the CARD is good; mech/game says whether the
+           SLOT is, and the two differ by how often you draw a five-drop.
+EXIT=0

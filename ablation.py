@@ -101,12 +101,18 @@ SCRIPTED_LOREHOLD = {
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
     # top-of-library manipulation. Penance and Scroll Rack left the deck in
-    # the 2026-09-05 staging; Galvanoth replaced Penance and IS implemented —
-    # lorehold.take_turn casts the top card free at upkeep if it is an
-    # instant or sorcery, before the draw step, so the miracle window is
-    # still live afterwards.
-    "Sensei's Divining Top", "Library of Leng", "Galvanoth",
+    # the 2026-09-05 staging.
+    "Sensei's Divining Top", "Library of Leng",
     "Verge Rangers",
+    # Replaced Penance in the 2026-09-05 re-staging, having beaten Galvanoth
+    # head to head (+0.0093 win at 20 turns). Implemented in full in
+    # lorehold.apply_spell_effects: a +1/+1 counter FIRST, then damage equal
+    # to its power to ONE opponent, on every instant or sorcery CAST — so
+    # Bombardment and Mastery copies set it off and Double Vision copies,
+    # which are put on the stack rather than cast, do not. It is a flier and
+    # is tagged as one in decks/_evasion.py; that was not true before
+    # 2026-09-05, when tag_flying.py did not walk candidates.
+    "Caldera Pyremaw",
     # card flow
     "Thrill of Possibility", "Faithless Looting", "Big Score",
     "Unexpected Windfall", "Borrowed Knowledge", "Reforge the Soul",
