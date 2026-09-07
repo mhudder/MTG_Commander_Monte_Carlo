@@ -478,9 +478,18 @@ class AzusaGame:
         pool = sorted([c for c in self.library
                       if c.is_permanent and c.mv <= x],
                      key=lambda c: -c.mv)[:count or 99]
+        # TAKE THEM OUT OF THE LIBRARY FIRST, THEN resolve any ETB. Genesis
+        # Wave reveals the top X and puts the permanents onto the battlefield
+        # as one action, so the cards have all left the library before a
+        # single trigger goes on the stack -- and doing it in the other order
+        # is not just a rules nicety, it CRASHED: `land_entered` can fire
+        # Seer's Sundial, which draws, which pops the library, which can take
+        # a card this loop still holds a reference to and was about to
+        # `remove()`. Found 2026-09-07 by the first full-size ablation run.
         for c in pool:
             self.library.remove(c)
-            perm = self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
+        for c in pool:
+            self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
             if c.is_land:
                 self.land_entered(c, played=False)
 

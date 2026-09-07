@@ -14,31 +14,39 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `034ce9f`.
+Fingerprints recorded at `b432b86`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `6445a4ed867431be` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `6445a4ed867431be` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `6445a4ed867431be` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `8dab0e449025e750` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `8dab0e449025e750` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `8dab0e449025e750` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `286df9e69d57e87e` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `286df9e69d57e87e` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `286df9e69d57e87e` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `70a73d27b6229751` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `70a73d27b6229751` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `70a73d27b6229751` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `17b73a85fdd9db71` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `bdf8311be70100d8` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `bdf8311be70100d8` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `bdf8311be70100d8` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `e21f955ffd1f53d6` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e21f955ffd1f53d6` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `e21f955ffd1f53d6` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `28c99579d4b65b4a` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `28c99579d4b65b4a` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `28c99579d4b65b4a` |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `ff3eb8061f979ee2` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `1575306ed57e80d3` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `1575306ed57e80d3` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `1575306ed57e80d3` |
 
 ## What each fingerprint covers
 
+- **azusa** — `ablation.py`, `edhmc/azusa.py`, `edhmc/decks/azusa_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`
 - **karlov** — `ablation.py`, `edhmc/decks/karlov_v2.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/karlov.py`, `edhmc/opponents.py`
 - **lorehold** — `ablation.py`, `edhmc/decks/lorehold_v16.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/lorehold.py`, `edhmc/opponents.py`
 - **rendmaw** — `ablation.py`, `edhmc/decks/rendmaw_v12.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`
+- **shilgengar** — `ablation.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`
 - **tivit** — `ablation.py`, `edhmc/decks/tivit_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/tivit.py`, `edhmc/voting.py`
 
 ## How each cache was produced
+
+### `ablation_cache_azusa_10-20_n15000_medblank.json`
+
+FIRST TABLE for this deck, 2026-09-07, from an empty cache at the common N=15000. Noise floor +-0.0022 win rate; baseline win rate 0.205 at T20. THE DAMAGE COLUMNS ARE UNUSABLE HERE and that is the first thing to know about this table -- Scute Swarm's landfall doubling gives this deck a damage distribution with a far heavier tail than any other, so the CIs run to +-278 against point estimates of the same order, and 13 rows carry a FLIP signal that is pure damage noise rather than a horizon effect. Win rate is an order of magnitude tighter and is the only column to read, exactly as it is for tivit. Measured AFTER the Genesis Wave crash fix: `wave()` removed cards from the library one at a time while `land_entered` could fire Seer's Sundial, which draws, which pops the library out from under the loop. The first full-size run died on it; the cards now all leave the library before any ETB resolves, which is also what the card actually does.
 
 ### `ablation_cache_karlov_10-20_n15000.json`
 
@@ -75,6 +83,10 @@ CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK 
 ### `ablation_cache_rendmaw_10-20_n6000.json`
 
 Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries the Grist fix, the 'enters or attacks' triggers and Overlord's tapped token. No resume across a code change. RE-DERIVED FROM AN EMPTY CACHE 2026-09-06 under the runtime work (indexed battlefield, shared baseline, parallel cards) and reproduced this file BIT FOR BIT -- every value, and the printed table byte for byte. The fingerprint below moved because those files changed; the numbers did not. That re-derivation IS the evidence, which is why it was done on all four decks rather than argued from the diff.
+
+### `ablation_cache_shilgengar_10-20_n15000_medblank.json`
+
+FIRST TABLE for this deck, 2026-09-07, measured from an empty cache at the common N=15000 so it is comparable row-for-row with the other five. Noise floor +-0.0019 win rate; baseline win rate 0.209 at T20. READ THE SACRIFICE ROWS WITH THE ENGINE'S POLICY IN MIND: `shilgengar.aristocrats_step` only ever sacrifices worthless 1/1 Spirit TOKENS, never a real card, so the whole aristocrats package (Blood Artist, Vampiric Rites, Viscera Seer, Skullclamp, Pitiless Plunderer) is measured with its engine deliberately starved -- it scores 0 to -0.0019 win rate, and that is a fact about the policy at least as much as about the cards. The commander's six-Blood reanimation ULTIMATE FIRED ZERO TIMES in 3,000 baseline games (blood_made averages 0.13 a game against the 6 it needs). Re-measured after `shilgengar_ultimate` was reordered to empty the graveyard before resolving ETB triggers, and the regenerated table is BYTE-IDENTICAL to the one before it, which is the evidence that the reorder was behaviour-neutral rather than the claim that it was.
 
 ### `ablation_cache_tivit_10-20_n15000.json`
 

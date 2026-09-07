@@ -74,6 +74,103 @@ and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 ---
 
+## 2026-09-07: first ablation tables for shilgengar and azusa
+
+Both at the common N=15,000 and horizons 10,20, so they are comparable
+row-for-row with the other four. Baseline win rate at T20: **shilgengar
+0.209, azusa 0.205** — below rendmaw (0.307), tivit (0.397) and karlov
+(0.455), which is what "least tuned" looks like from the outside. Noise
+floors ±0.0019 and ±0.0022.
+
+**THE FIRST FULL-SIZE RUN FOUND A CRASH, NOT A FINDING.** `azusa.wave()`
+(Genesis Wave) removed cards from the library one at a time while
+`land_entered` could fire Seer's Sundial, which draws, which pops the library
+out from under the loop — `ValueError: x not in list` after ~1.8M games had
+already run for the other deck. The cards now all leave the library before
+any ETB resolves, which is also what the card actually does. The same
+interleaved shape existed in `shilgengar_ultimate` and was NOT reachable
+(nothing between those removals touches the graveyard); it was hardened
+anyway, and the claim that this was behaviour-neutral is backed by
+regenerating the whole shilgengar table and diffing it **byte for byte**,
+not by argument.
+
+### shilgengar: the Angels carry it and the aristocrats package does not
+
+| tier | cards |
+|---|---|
+| top, and a real gap below them | Archangel of Thune (**+0.0268**), Massacre Wurm (+0.0242), Lyra Dawnbringer (+0.0230) |
+| next | Avacyn (+0.0101), Righteous Valkyrie (+0.0086), Requiem Angel (+0.0081) |
+| tests NEGATIVE or flat | Vampiric Rites (−0.0019, significant), Skullclamp (−0.0011), Pitiless Plunderer (−0.0009), Viscera Seer (−0.0009), Blood Artist (−0.0008), Black Market Connections (**−0.0027**) |
+
+The top three are 6x the noise floor clear of the fourth card, so that is a
+meaningful SET (not an order). All three are lifegain/anthem Angels; none of
+them sacrifices anything.
+
+**DO NOT READ THE NEGATIVE ARISTOCRATS ROWS AS A CUT LIST.**
+`aristocrats_step` only ever sacrifices worthless 1/1 Spirit tokens, never a
+real card — a policy chosen deliberately and documented in
+`edhmc/shilgengar.py` — and Spirit tokens only exist once an Angel has
+already died. So the sac engine is starved by construction: `blood_made`
+averages **0.13 a game** and **the commander's six-Blood mass-reanimation
+ultimate fired ZERO times in 3,000 games.** The deck's namesake ability is
+currently untested rather than tested-and-found-wanting. That is the first
+thing to fix about this engine, and until it is fixed these rows are a fact
+about the policy at least as much as about the cards.
+
+**Two proxy/objective disagreements, both the right way round.** Damn is
+−1.17 damage at T10 and **+0.0061 win rate**; Wrath of God −1.14 and
++0.0043. A wrath costs you damage and wins you games. Smothering Tithe is
+−0.59 damage and +0.0041 win. Follow win rate.
+
+**A knob result, said out loud.** Revel in Riches sits in the MODEL-BLIND
+table and is the only card there that is not near zero (+0.0063 ±0.0019).
+Traced: its Treasure clause is unmodelled, but its ten-Treasure ALTERNATE WIN
+is live and fires off Treasures other cards made. It resolves in 12.1% of
+games and wins via that route in 0.83% of all games — and in **33 of 33** of
+those wins Smothering Tithe was on the battlefield. `shilgengar.upkeep` hands
+Tithe one Treasure per living opponent per turn on the assumption opponents
+never pay the {2}. Make them pay sometimes and this line gets much worse.
+
+### azusa: read the win-rate column and nothing else
+
+**THE DAMAGE COLUMNS ARE UNUSABLE.** Scute Swarm's landfall doubling gives
+this deck a far heavier damage tail than any other — CIs of ±278 against
+point estimates of the same order — and **13 rows carry a FLIP signal that is
+pure damage noise**, not a horizon effect. Same situation as tivit, one step
+worse. Win rate is an order of magnitude tighter.
+
+| tier | cards |
+|---|---|
+| the deck | Scute Swarm (**+0.0261**), Avenger of Zendikar (+0.0249), Rampaging Baloths (+0.0233) |
+| next | Horn of Greed (+0.0151), Genesis Wave (+0.0137), Tireless Tracker (+0.0131), Ulamog (+0.0129), Courser of Kruphix (+0.0117) |
+| unmeasured (`--`) | Perilous Forays (+0.0010), Yavimaya Elder (−0.0003) |
+
+**THE PAYOFFS BEAT THE ENABLERS, AND IT IS NOT CLOSE.** The three cards that
+turn a land drop into a board are worth 0.023-0.026 win rate each. The cards
+that produce the extra land drops score far lower — Oracle of Mul Daya
++0.0077, Wayward Swordtooth +0.0056, **Exploration +0.0021**, barely outside
+its own bar. Extra lands are worth little on their own; having something that
+cares is worth a lot. That is the clearest deckbuilding statement either new
+table makes, and it is the one to test properly (as a group ablation) before
+acting on.
+
+**Damage and win rate point in opposite directions at the top**, and the
+mechanism is game length: Avenger of Zendikar is −6.1 damage at T20 and
++0.0249 win; Rampaging Baloths −20.1 and +0.0233; Ulamog −194 and +0.0129.
+They end games sooner, so less total damage accumulates. Follow win rate.
+
+**"Land animation" is barely modelled and its rows say so.** Sylvan Awakening
++0.0017 and Rude Awakening +0.0019, both inside or at their bars. Only one of
+the deck's three animation effects is implemented as animation at all
+(`sylvan_awakening`); Rude Awakening is modelled as its untap mode and Nissa,
+Worldwaker's abilities are not modelled. This pillar of the deck is untested,
+not disproved.
+
+**The blind table is the check that the classification is right** — every row
+in it is at or near zero except the two noted above.
+
+---
+
 ## Current state — READ THIS BEFORE TRUSTING ANY DOC
 
 Verified 2026-09-03 after the oracle-text audit; deck table updated 2026-09-07.

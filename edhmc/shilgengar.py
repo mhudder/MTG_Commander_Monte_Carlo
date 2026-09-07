@@ -358,8 +358,17 @@ class ShilgengarGame:
         self.m["mana_spent"] += 3
         self.blood -= 6
         self.m["blood_spent"] += 6
+        # Out of the graveyard FIRST, then resolve the ETB triggers. "Return
+        # EACH creature card from your graveyard to the battlefield" is one
+        # action, so every card has left the graveyard before a trigger goes
+        # on the stack. Nothing in `angel_entered` touches the graveyard
+        # today, so this is behaviour-neutral -- VERIFIED by regenerating this
+        # deck's whole ablation table and diffing it byte for byte, not
+        # argued -- but the interleaved form is the shape that crashed the
+        # Azusa engine's Genesis Wave on 2026-09-07.
         for card in pool:
             self.graveyard.remove(card)
+        for card in pool:
             perm = self.make_permanent(card, sick=True)
             if self.is_angel(perm):
                 self.angel_entered(perm)

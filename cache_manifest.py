@@ -198,6 +198,45 @@ NOTES.update({
     )
 })
 
+# 2026-09-07: the two new decks' FIRST tables. These are baselines, not
+# regenerations -- there is no earlier table to compare them against, which is
+# the one check the four older decks always have and these two do not.
+NOTES.update({
+    "ablation_cache_shilgengar_10-20_n15000_medblank.json": (
+        "FIRST TABLE for this deck, 2026-09-07, measured from an empty cache "
+        "at the common N=15000 so it is comparable row-for-row with the other "
+        "five. Noise floor +-0.0019 win rate; baseline win rate 0.209 at T20. "
+        "READ THE SACRIFICE ROWS WITH THE ENGINE'S POLICY IN MIND: "
+        "`shilgengar.aristocrats_step` only ever sacrifices worthless 1/1 "
+        "Spirit TOKENS, never a real card, so the whole aristocrats package "
+        "(Blood Artist, Vampiric Rites, Viscera Seer, Skullclamp, Pitiless "
+        "Plunderer) is measured with its engine deliberately starved -- it "
+        "scores 0 to -0.0019 win rate, and that is a fact about the policy at "
+        "least as much as about the cards. The commander's six-Blood "
+        "reanimation ULTIMATE FIRED ZERO TIMES in 3,000 baseline games "
+        "(blood_made averages 0.13 a game against the 6 it needs). "
+        "Re-measured after `shilgengar_ultimate` was reordered to empty the "
+        "graveyard before resolving ETB triggers, and the regenerated table "
+        "is BYTE-IDENTICAL to the one before it, which is the evidence that "
+        "the reorder was behaviour-neutral rather than the claim that it was."),
+    "ablation_cache_azusa_10-20_n15000_medblank.json": (
+        "FIRST TABLE for this deck, 2026-09-07, from an empty cache at the "
+        "common N=15000. Noise floor +-0.0022 win rate; baseline win rate "
+        "0.205 at T20. THE DAMAGE COLUMNS ARE UNUSABLE HERE and that is the "
+        "first thing to know about this table -- Scute Swarm's landfall "
+        "doubling gives this deck a damage distribution with a far heavier "
+        "tail than any other, so the CIs run to +-278 against point estimates "
+        "of the same order, and 13 rows carry a FLIP signal that is pure "
+        "damage noise rather than a horizon effect. Win rate is an order of "
+        "magnitude tighter and is the only column to read, exactly as it is "
+        "for tivit. Measured AFTER the Genesis Wave crash fix: `wave()` "
+        "removed cards from the library one at a time while `land_entered` "
+        "could fire Seer's Sundial, which draws, which pops the library out "
+        "from under the loop. The first full-size run died on it; the cards "
+        "now all leave the library before any ETB resolves, which is also "
+        "what the card actually does."),
+})
+
 
 def fingerprint(deck: str) -> tuple[str, list[str]]:
     """Hash the deck's source, NORMALISED FOR LINE ENDINGS.

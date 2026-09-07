@@ -671,8 +671,19 @@ KNOWN_BLIND = {
         "Angel of Despair", "Angel of Serenity", "Angel of the Ruins",
         "Path to Exile", "Swords to Plowshares", "Anguished Unmaking",
         "Generous Gift", "Despark", "Vindicate", "Mortify", "Utter End",
-        # needs opponents' creatures to die as discrete events, which nothing
-        # in this model tracks (their board is an aggregate float)
+        # HALF implemented, and the half that works is NOT the obvious one.
+        # Its Treasure-generation clause needs opponents' creatures to die as
+        # discrete events, which nothing in this model tracks -- but its
+        # ALTERNATE WIN (ten Treasures at upkeep) is live, and it fires off
+        # Treasures other cards made. Measured 2026-09-07 at N=15,000 it is
+        # +0.0063 +-0.0019 win rate, which is why it is the one card in this
+        # deck's blind table that is not near zero. Traced: it resolves in
+        # 12.1% of games, wins via the alt-win in 0.83% of ALL games, and in
+        # 33 of 33 of those wins SMOTHERING TITHE WAS ON THE BATTLEFIELD.
+        # THAT MAKES IT A KNOB RESULT: `shilgengar.upkeep` gives Tithe one
+        # Treasure per living opponent per turn on the assumption that
+        # opponents never pay the {2}. Make them pay sometimes and this line
+        # gets much worse. Do not read the +0.0063 as a fact about the card.
         "Revel in Riches",
         # a damage-prevention/mill replacement effect whose interaction with
         # resolve_clocks (a game-loss check, not a damage event) is not

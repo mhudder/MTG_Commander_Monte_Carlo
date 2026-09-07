@@ -68,12 +68,19 @@
 # regenerate those -- and if you cannot be bothered to prove it, regenerate all
 # four rather than guessing.
 
+# 2026-09-07: shilgengar and azusa joined the loop with the decks themselves.
+# Both are new and untuned, so their first tables are baselines rather than
+# regenerations -- but they belong here for the same reason tivit does, which
+# is that a table only means something next to the others at a COMMON N.
+#
+# The whole run is now about 35 minutes rather than 24.
+
 set -e
 RESUME=""
 [ "$1" = "--resume" ] && RESUME=1
 N=15000
 
-for deck in lorehold rendmaw karlov tivit; do
+for deck in lorehold rendmaw karlov tivit shilgengar azusa; do
     cache="ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "ablation_${deck}.log"
