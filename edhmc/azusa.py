@@ -53,7 +53,9 @@ below) so no card here cares what type another one is.
 
 from __future__ import annotations
 
+import inspect
 import random
+import re
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion)
@@ -76,9 +78,13 @@ TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
 # and with three drops a turn that is +3/+3 on the whole squad against one
 # extra 0/1. Avenger first is much stronger, so it deploys first.
 #
-# HAND-MAINTAINED NAME SET. Nothing checks it against the deck, which is the
-# same hazard `ablation.SCRIPTED_*` carries; a landfall card added to the list
-# and not added here is silently deployed too late to matter.
+# THIS SET IS CHECKED, not merely asserted -- see check_land_enabler_coverage()
+# at the bottom of this module, which runs at import. It was a bare
+# hand-maintained name set when it was written, carrying the identical hazard
+# `ablation.SCRIPTED_*` has been bitten by twice (KNOWN_ISSUES.md 0q): a
+# landfall card added to the deck and not added here is deployed AFTER the
+# land drops, contributes nothing on the turn it lands, and nothing anywhere
+# says so -- it just quietly scores low.
 LAND_ENABLERS = frozenset({
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
     "Courser of Kruphix", "Augur of Autumn",
@@ -849,3 +855,44 @@ def simulate(deck, commander, cfg, seed):
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and
                                       not out["test_card_answered"]) else 0
     return out
+
+
+# ---------------------------------------------------------------------------
+# The LAND_ENABLERS set, checked rather than claimed
+# ---------------------------------------------------------------------------
+
+def check_land_enabler_coverage():
+    """Every card this engine reads BY NAME when deciding how many lands it
+    may play, where it may play them from, or what happens when one enters,
+    must also be in LAND_ENABLERS -- or it will be deployed after the land
+    drops and do nothing on the turn it arrives.
+
+    WHY THIS IS DERIVED AND NOT A SECOND HAND-WRITTEN LIST. A name set that
+    nothing checks is a claim, and this repo has been bitten by that exact
+    shape twice already: `ablation.SCRIPTED_*` printed five fully-implemented
+    cards as MODEL-BLIND on 2026-09-04, and `tag_flying.py` measured two
+    fliers as ground creatures on 2026-09-05. Both were a hand-written list
+    that the deck moved past. So the authority here is the ENGINE ITSELF --
+    the three methods below ARE the definition of "land-relevant" -- and the
+    set is checked against them at import. A new landfall payoff added to
+    `land_entered` and forgotten here fails loudly instead of silently
+    scoring low. KNOWN_ISSUES.md 0q.
+    """
+    watched = (AzusaGame.land_entered, AzusaGame.land_drops_for_turn,
+               AzusaGame.playable_lands, AzusaGame.land_died)
+    named = set()
+    for fn in watched:
+        named |= set(re.findall(r'self\.(?:has|count)\("([^"]+)"\)',
+                                inspect.getsource(fn)))
+    missing = named - LAND_ENABLERS
+    if missing:
+        raise AssertionError(
+            "edhmc/azusa.py: these cards are read by the land logic but are "
+            "NOT in LAND_ENABLERS, so they would be deployed after the land "
+            "drops and do nothing the turn they land:\n"
+            + "".join(f"    {n}\n" for n in sorted(missing))
+            + "Add them to LAND_ENABLERS, or take them out of the land logic.")
+    return named
+
+
+check_land_enabler_coverage()

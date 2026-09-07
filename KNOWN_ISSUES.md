@@ -817,6 +817,72 @@ decks' baselines are bit-identical across it, so no table moved.
 
 ---
 
+## 0q. HAND-MAINTAINED NAME SETS — the failure mode this repo keeps having
+
+**Status: the third instance was caught before it bit, and is now CHECKED.
+The general problem is not solved and cannot be, only detected.**
+
+Three times now, in three files, the same shape: a list of card names written
+by hand, and a deck that moved past it. The numbers were never wrong. The
+*label* was wrong, and the label is the part that tells you whether a number
+means anything.
+
+| set | consequence | when |
+|---|---|---|
+| `ablation.SCRIPTED_RENDMAW` / `_LOREHOLD` / `_KARLOV` | five fully-implemented cards printed under MODEL-BLIND, where a low score is supposed to mean "the model cannot see this" | 2026-09-04 |
+| `tag_flying.py`'s hand-written deck dict | Goldspan Dragon and Caldera Pyremaw measured as GROUND creatures | 2026-09-05 |
+| `azusa.LAND_ENABLERS` | a landfall card not in the set is deployed AFTER the land drops, so it does nothing on the turn it lands and quietly scores low — with nothing anywhere saying so | caught 2026-09-07 |
+
+### Why the third one is the nastiest of the three
+
+The first two produce a *visibly* wrong label — a card sitting in the wrong
+table, or a flier with no evasion. `LAND_ENABLERS` produces a **plausible
+number**. A landfall payoff deployed one step too late still gets cast, still
+does something on later turns, and simply scores lower than it should. There
+is no artefact to notice. It looks exactly like a mediocre card.
+
+This is the same category as the 2026-09-05 `tag_flying` bug, but without the
+tell — and it matters more here than it looks, because the land-sequencing
+work of 2026-09-07 measured the cost of exactly this ordering mistake at
+**0.074 win rate** when it applied to the whole deck at once.
+
+### What was done
+
+`edhmc/azusa.py:check_land_enabler_coverage()`, which runs **at import**:
+
+- It scans the SOURCE of `land_entered`, `land_drops_for_turn`,
+  `playable_lands` and `land_died` for `self.has("...")` / `self.count("...")`.
+  Those four methods are the definition of "this card changes how many lands
+  I may play, where from, or what happens when one enters" — so they, not a
+  human, are the authority.
+- Any name found there and missing from `LAND_ENABLERS` raises with the list
+  and the reason.
+- It currently derives **16 names with no unmatched leftovers**: the set is
+  exactly the derived set, not a superset someone stopped pruning.
+- **It was verified to fail.** Removing `Lotus Cobra` from the set makes it
+  raise. A check that cannot fail is worse than no check, because it reads
+  like assurance — and this file already contains one instance of that
+  mistake (`check_scripted_coverage` verifies that every card is CLASSIFIED,
+  never that the classification is TRUE; see 0f).
+
+### What is still NOT checked, and cannot easily be
+
+- **`LAND_ENABLERS` membership is still a judgement about ORDER.** The check
+  proves every land-relevant card is in the set; it cannot prove the set
+  should not contain more. Avenger of Zendikar is in it because deploying it
+  before the lands beats making one extra Plant — that is a piloting
+  decision, argued in the comment at its definition, not a measurement.
+- **`SCRIPTED_*` still verifies classification, not truth** (0f).
+- **Nothing checks the other five engines for the same ordering hazard.**
+  `shilgengar.aristocrats_step` is the obvious next suspect: its sacrifice
+  policy is the reason the commander's ultimate fires zero times in 3,000
+  games, and no equivalent coverage check exists there.
+
+**The rule to carry forward: when you add a hand-maintained name set, add the
+check in the same change, and prove the check fails.**
+
+---
+
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
 
 `Card` now carries `alt_costs`, a tuple of `(cost_dict, tag)` alternatives, and

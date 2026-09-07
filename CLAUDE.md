@@ -648,6 +648,37 @@ were re-simulated.
 change.** The reverse also applies — Lightning Greaves and Whispersilk Cloak
 were left in `SCRIPTED_KARLOV` after v2 cut them; harmless, but stale.
 
+### The general form: A HAND-MAINTAINED NAME SET IS A CLAIM, AND CLAIMS ROT
+
+This has now bitten three times, in three different files, with the same
+shape every time — a list of card names written by hand, and a deck that
+moved past it:
+
+| set | what went wrong | when |
+|---|---|---|
+| `ablation.SCRIPTED_*` | five fully-implemented cards printed as MODEL-BLIND | 2026-09-04 |
+| `tag_flying.py`'s deck list | two fliers measured as GROUND creatures | 2026-09-05 |
+| `azusa.LAND_ENABLERS` | a landfall card would be deployed AFTER the land drops and score low for no stated reason | caught 2026-09-07 before it bit |
+
+**The fix is not vigilance, it is derivation.** Where the engine itself
+already names the cards, derive the set from the engine and check it:
+
+- `ablation.check_scripted_coverage()` raises if a nonland card is in neither
+  `SCRIPTED_*` nor `KNOWN_BLIND`.
+- `edhmc/decks/__init__.py`'s `discover_current_decks()` removed the
+  hand-written deck list from `audit_cards.py` and `tag_flying.py` entirely.
+- `azusa.check_land_enabler_coverage()` (2026-09-07) scans the source of
+  `land_entered`, `land_drops_for_turn`, `playable_lands` and `land_died` for
+  `self.has("...")` / `self.count("...")` and raises at IMPORT if any name it
+  finds is missing from `LAND_ENABLERS`. Those four methods ARE the
+  definition of "land-relevant", so the set cannot drift from them. It
+  currently derives 16 names with no unmatched leftovers, and it was verified
+  to actually fail when a name is removed — a check that cannot fail is
+  worse than no check, because it reads like assurance.
+
+**When you add a hand-maintained name set, add the check in the same change,
+and prove the check fails.** See `KNOWN_ISSUES.md` 0q.
+
 ### Evasion and three correctness fixes (2026-09-05)
 
 `validate.py`: `+0.00` on all six, `corr(A,B)` improved 0.8927 -> 0.9045.
