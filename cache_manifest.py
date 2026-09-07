@@ -106,11 +106,44 @@ _N15000 = (
 NOTES.update({
     f"ablation_cache_{d}_10-20_n15000.json":
         _N15000.format(old=old, extra=15000 - old, ratio=ratio, pred=pred)
+        + " SUPERSEDED the same day by the _medblank cache: it was measured "
+          "against the OLD ablation blank (priority 0.5). Kept as the "
+          "provenance for every number quoted from it, and NOT resumable -- "
+          "the cache key now carries the blank mode for that reason."
     for d, old, ratio, pred in (
         ("karlov", 6000, "0.64", "0.63"),
         ("rendmaw", 6000, "0.64", "0.63"),
         ("lorehold", 6000, "0.63", "0.63"),
         ("tivit", 2000, "0.39", "0.37"),
+    )
+})
+
+# The blank fix, 2026-09-06 (second regeneration of the day).
+_MEDBLANK = (
+    "CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation "
+    "BLANK was fixed: it was built at priority 0.5, below the minimum priority "
+    "of every deck, so `main_phase` -- which is greedy on priority -- cast it "
+    "only when nothing else was affordable. That is a dead card, not a "
+    "replacement-level one, and the tempo difference was charged to whichever "
+    "card was under test. The blank is now cast at the deck's median nonland "
+    "priority ({prio}) via experiment.repl_priority(). threat and the 1/1 body "
+    "are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are "
+    "NOT the same bug. Scores rise almost everywhere, which is the expected "
+    "direction: the blank now costs mana, so the blanked deck is worse. "
+    "52 of 256 cards moved by more than their own old CI half-width.{extra}")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        _MEDBLANK.format(prio=prio, extra=extra)
+    for d, prio, extra in (
+        ("karlov", "7.0", ""),
+        ("rendmaw", "5.0", ""),
+        ("lorehold", "5.0", ""),
+        ("tivit", "6.5",
+         " ALSO carries the Ephemerate fix (KNOWN_ISSUES.md 0k): its handler "
+         "was unreachable, so the card measured as an exact blank. This cache "
+         "is the only one of the four that reflects an ENGINE change as well "
+         "as the blank change."),
     )
 })
 

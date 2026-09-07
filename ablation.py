@@ -70,7 +70,7 @@ from edhmc.pending import build_pending
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.karlov import simulate as karlov_sim
 from edhmc.tivit import simulate as tivit_sim
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, BLANK_PRIORITY, repl_priority
 
 DECK = sys.argv[1] if len(sys.argv) > 1 else "lorehold"
 N = int(sys.argv[2]) if len(sys.argv) > 2 else 4000
@@ -247,7 +247,7 @@ SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
 METRICS = METRIC_SETS[DECK]
 
 
-def blank_like(card):
+def blank_like(card, priority):
     """A do-nothing replacement-level card of the same cost.
 
     BLANK_KEEPS_TYPES controls what the ablation actually measures, and for a
@@ -262,6 +262,8 @@ def blank_like(card):
               its weight", which is the deckbuilding question.
 
     Default is False, because a card's type line is part of what it does.
+
+    `priority` comes from `repl_priority()` -- read it before changing this.
     """
     if BLANK_KEEPS_TYPES:
         types = card.types
@@ -274,7 +276,7 @@ def blank_like(card):
     return Card(name="(blank)", types=types, cost=dict(card.cost),
                 power=1 if card.is_creature else 0,
                 toughness=1 if card.is_creature else 0,
-                priority=0.5)
+                priority=priority)
 
 
 def columns(deck, commander, turns, lo, hi):
@@ -301,7 +303,7 @@ def paired(keep, drop):
 def blanked(deck, card_name):
     deck_b = list(deck)
     idx = next(i for i, c in enumerate(deck) if c.name == card_name)
-    deck_b[idx] = blank_like(deck[idx])
+    deck_b[idx] = blank_like(deck[idx], repl_priority(deck))
     return deck_b
 
 
@@ -321,11 +323,15 @@ def ablate(deck, commander, card_name, baseline=None):
     return out
 
 
-# The key MUST include N. It used to key on deck and horizons only, so
-# resuming a run at a different sample size silently merged two sample sizes
-# into one table.
+# The key MUST include every parameter that changes what a cached number MEANS.
+# It used to key on deck and horizons only, so resuming a run at a different
+# sample size silently merged two sample sizes into one table; hence `_n{N}`.
+# `_medblank` / `_deadblank` is here for the same reason: the 2026-09-06 blank
+# priority change moves every number, and the pre-change files carry NEITHER
+# suffix, so they can no longer be picked up by a run that would misread them.
 CACHE = (f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
-         f"{'_sametype' if BLANK_KEEPS_TYPES else ''}.json")
+         f"{'_sametype' if BLANK_KEEPS_TYPES else ''}"
+         f"{'_deadblank' if BLANK_PRIORITY == 'dead' else '_medblank'}.json")
 
 
 # ---------------------------------------------------------------------------

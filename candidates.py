@@ -17,7 +17,7 @@ from edhmc.engine import Card, simulate as rendmaw_sim
 from edhmc.lorehold import simulate as lorehold_sim
 from edhmc.karlov import simulate as karlov_sim
 from edhmc.pending import build_pending
-from edhmc.experiment import DEFAULT_CFG, _swap_many
+from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
 from edhmc.decks.rendmaw_v12 import (NOXIOUS_GEARHULK, BABA_LYSAGA,
                                      EZURIS_PREDATION,
                                      CAULDRON_OF_ESSENCE, REVITALIZING_REPAST,
@@ -37,7 +37,7 @@ from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
 N = 6000
 
 
-def blank_like(card):
+def blank_like(card, priority):
     """A do-nothing replacement-level card of the same cost.
 
     This MUST match `ablation.py`'s blank, or the two tables are not on the same
@@ -48,6 +48,15 @@ def blank_like(card):
     every card in `ablation_rendmaw.txt` was not. Single-type blank, same as
     ablation.py with BLANK_KEEPS_TYPES=0 — a card's type line is part of what
     it does.
+
+    2026-09-06: `priority` is now passed in from `ablation.repl_priority()` for
+    the same reason. It was hardcoded to 0.5, below the minimum priority of
+    every deck, so BOTH tables were scoring against a card that is never cast.
+    The bias does not cancel between them: it is proportional to the card's own
+    priority, so comparing a high-priority candidate against a low-priority cut
+    target — which is exactly what the decision rule above does — was biased
+    toward the cut target. Any candidate number produced before 2026-09-06 is
+    on the wrong scale for this reason, on top of the 2026-09-04 type-line one.
     """
     if card.is_creature:
         types = frozenset({"Creature"})
@@ -57,12 +66,12 @@ def blank_like(card):
         types = frozenset({"Sorcery"})
     return Card(name="(blank)", types=types, cost=dict(card.cost),
                 power=1 if card.is_creature else 0,
-                toughness=1 if card.is_creature else 0, priority=0.5)
+                toughness=1 if card.is_creature else 0, priority=priority)
 
 
 def add_value(deck_name, sim, turns, cand, victim, n=N, extra=()):
     deck, cmd = build_pending(deck_name)
-    a = _swap_many(deck, [victim], [blank_like(cand)])
+    a = _swap_many(deck, [victim], [blank_like(cand, repl_priority(deck))])
     b = _swap_many(deck, [victim], [cand])
     cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset({cand.name}))
     ra = [sim(a, cmd, cfg, 80000 + j) for j in range(n)]

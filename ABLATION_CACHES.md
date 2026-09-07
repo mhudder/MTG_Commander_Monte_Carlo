@@ -14,18 +14,22 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `453043a`.
+Fingerprints recorded at `9a33cba`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `2b73d9ac6300ebc0` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `2b73d9ac6300ebc0` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `f05e6dc4a9fed2ab` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `f05e6dc4a9fed2ab` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `16aeb0ac3a99d3f7` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `16aeb0ac3a99d3f7` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `2e5918c6533610f0` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `2e5918c6533610f0` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `d0525c8521866cb6` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `d0525c8521866cb6` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `d0525c8521866cb6` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `32aa597ae9800391` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `32aa597ae9800391` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `32aa597ae9800391` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `29a389888ce192fa` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `29a389888ce192fa` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `29a389888ce192fa` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `406deb4248e68f7c` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `406deb4248e68f7c` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `406deb4248e68f7c` |
 
 ## What each fingerprint covers
 
@@ -38,7 +42,11 @@ Fingerprints recorded at `453043a`.
 
 ### `ablation_cache_karlov_10-20_n15000.json`
 
-Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table. SUPERSEDED the same day by the _medblank cache: it was measured against the OLD ablation blank (priority 0.5). Kept as the provenance for every number quoted from it, and NOT resumable -- the cache key now carries the blank mode for that reason.
+
+### `ablation_cache_karlov_10-20_n15000_medblank.json`
+
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (7.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
 
 ### `ablation_cache_karlov_10-20_n6000.json`
 
@@ -46,7 +54,11 @@ Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries t
 
 ### `ablation_cache_lorehold_10-20_n15000.json`
 
-Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.63, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.63, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table. SUPERSEDED the same day by the _medblank cache: it was measured against the OLD ablation blank (priority 0.5). Kept as the provenance for every number quoted from it, and NOT resumable -- the cache key now carries the blank mode for that reason.
+
+### `ablation_cache_lorehold_10-20_n15000_medblank.json`
+
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
 
 ### `ablation_cache_lorehold_10-20_n6000.json`
 
@@ -54,7 +66,11 @@ Regenerated 2026-09-05 for the deck change (-Penance +Caldera Pyremaw). RESUMED 
 
 ### `ablation_cache_rendmaw_10-20_n15000.json`
 
-Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 6000 pairs ARE the previous cache's games and the difference is the 9000 added on the end. The observed CI ratio is 0.64, against 1/sqrt(N) predicting 0.63: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table. SUPERSEDED the same day by the _medblank cache: it was measured against the OLD ablation blank (priority 0.5). Kept as the provenance for every number quoted from it, and NOT resumable -- the cache key now carries the blank mode for that reason.
+
+### `ablation_cache_rendmaw_10-20_n15000_medblank.json`
+
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
 
 ### `ablation_cache_rendmaw_10-20_n6000.json`
 
@@ -62,7 +78,11 @@ Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries t
 
 ### `ablation_cache_tivit_10-20_n15000.json`
 
-Measured from an EMPTY cache 2026-09-06 on the same code as the n2000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 2000 pairs ARE the previous cache's games and the difference is the 13000 added on the end. The observed CI ratio is 0.39, against 1/sqrt(N) predicting 0.37: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table.
+Measured from an EMPTY cache 2026-09-06 on the same code as the n2000 cache above -- no engine or deck change, only sample size. Seeds 5000..19999, so the first 2000 pairs ARE the previous cache's games and the difference is the 13000 added on the end. The observed CI ratio is 0.39, against 1/sqrt(N) predicting 0.37: the variance is clean and there is no floor underneath it. NO CARD THAT WAS ALREADY SIGNIFICANT ON WIN RATE CHANGED SIGN, in any of the four decks, which is the check that matters -- it says the smaller tables were not reporting noise as findings. This is the current table. SUPERSEDED the same day by the _medblank cache: it was measured against the OLD ablation blank (priority 0.5). Kept as the provenance for every number quoted from it, and NOT resumable -- the cache key now carries the blank mode for that reason.
+
+### `ablation_cache_tivit_10-20_n15000_medblank.json`
+
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (6.5) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. ALSO carries the Ephemerate fix (KNOWN_ISSUES.md 0k): its handler was unreachable, so the card measured as an exact blank. This cache is the only one of the four that reflects an ENGINE change as well as the blank change.
 
 ### `ablation_cache_tivit_10-20_n2000.json`
 

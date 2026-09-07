@@ -521,6 +521,15 @@ def main_phase(g):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
                 continue
+            # A ONE-SHOT blink with nothing to blink is a wasted card. The
+            # permanent blinkers (Soulherder, Teleportation Circle, ...) are
+            # engines worth deploying before the commander lands; an instant is
+            # not. `blink_tivit` already refuses to do anything without Tivit on
+            # the battlefield, so without this gate the greedy policy simply
+            # threw the card away on turn one.
+            if "blink" in c.tags and not c.is_permanent \
+                    and not g.has("Tivit, Seller of Secrets"):
+                continue
             if affordable(g, reduce_cost(g, c)):
                 options.append(c)
         if not options:
@@ -610,6 +619,20 @@ def resolve(g, card):
     elif s == "jays":
         _mine, theirs = V.dilemma(g, "jays")
         g.draw(theirs)
+    elif s == "ephemerate":
+        # "Exile target creature you control, then return it. REBOUND." One {W}
+        # is two dilemmas, a turn apart.
+        #
+        # THIS BRANCH DID NOT EXIST until 2026-09-06, and its absence made the
+        # card an exact blank: `main_phase` is greedy on priority, Ephemerate is
+        # priority 8 for {W}, so it was always cast HERE -- fell through to the
+        # graveyard having done nothing -- and left hand before `activations()`
+        # could find it, which also meant the rebound was never armed. Both
+        # hand-written Ephemerate paths were unreachable. Measured against a
+        # blank of the same cost and priority it produced bit-identical games in
+        # all 15,000 pairs. See KNOWN_ISSUES.md 0k.
+        if blink_tivit(g, "Ephemerate"):
+            g.ephemerate_rebound = g.turn + 1
     elif s == "torment":
         # "Repeat X times: each opponent loses 3 unless they sacrifice a
         # nonland permanent or discard." Against an opponent model with no
@@ -767,17 +790,15 @@ def combat(g):
 
 
 def activations(g):
-    """Post-main sinks: Ephemerate, the blink loop, Time Sieve, and Clues."""
-    eph = next((c for c in g.hand if c.name == "Ephemerate"), None)
-    if eph is not None and g.commander_cast and affordable(g, {"W": 1}):
-        if pay(g, {"W": 1}):
-            g.hand.remove(eph)
-            g.m["spells_cast"] += 1
-            blink_tivit(g, "Ephemerate")
-            g.ephemerate_rebound = g.turn + 1
-            if g.result is not None:
-                return
+    """Post-main sinks: the blink loop, Time Sieve, and Clues.
 
+    EPHEMERATE USED TO BE CAST HERE and never was: `main_phase` runs twice
+    before this and is greedy on priority, so it always took the card first.
+    The cast now lives in `main_phase` like every other spell, gated on Tivit
+    actually being on the battlefield, and the effect in `resolve()`. This
+    block additionally gated on `commander_cast` rather than on Tivit being
+    present, which would have thrown the card away after a wipe.
+    """
     deadeye_loop(g)
     if g.result is not None:
         return

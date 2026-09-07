@@ -18,12 +18,59 @@ heavy lifting:
 
 from __future__ import annotations
 
+import os
 import statistics
 from dataclasses import dataclass
 
 import numpy as np
 
 from edhmc.engine import simulate
+
+# See repl_priority(). "median" (the default since 2026-09-06) casts an
+# ablation blank at the deck's own median nonland priority; "dead" restores the
+# 0.5 that every table before that date was measured with.
+BLANK_PRIORITY = os.environ.get("BLANK_PRIORITY", "median")
+
+
+def repl_priority(deck):
+    """What priority a REPLACEMENT-LEVEL card is cast at.
+
+    Lives here rather than in `ablation.py` because `candidates.py` and
+    `run_tivit_groups.py` build the same blank and MUST stay on the same scale
+    — and importing `ablation.py` is not an option, since it reads `sys.argv`
+    at import time.
+
+    The blank used to be built at 0.5, and that was a bug rather than a choice.
+    `main_phase` is greedy on priority, so 0.5 means "cast only when nothing
+    else in hand is affordable" — a DEAD card, not a replacement-level one.
+    Every real nonland card in the four lists sits between 1.0 and 10.0, so 0.5
+    was below the minimum of every deck: the ablation was not comparing the card
+    to a mediocre card, it was comparing it to playing 99 cards, and charging
+    the difference in tempo to the card.
+
+    The median of the deck's own nonland priorities is this project's existing
+    notion of "a typical card in this list" (5.0 rendmaw / lorehold, 6.5 tivit,
+    7.0 karlov). It is derived from the deck rather than invented, which is why
+    it is preferred to a constant.
+
+    NOT changed at the same time, deliberately:
+
+      threat  the blank leaves `threat` at 0.0, which `opponents.threat_of()`
+              derives as `power*0.8` or `mv*0.5`. That LOOKS like the same
+              class of bug and is not: 13-35 of each deck's ~64 nonland cards
+              also carry threat 0.0 and derive it by the identical rule, so the
+              blank is treated exactly as an unremarkable real card is. A scary
+              card genuinely does draw more removal and more clocks in this
+              model, and charging it for that is the right question.
+      body    a creature blank is a 1/1 at every mana value, which is thin at
+              the top of the curve. Fixing it means inventing a vanilla P/T
+              curve, so it is left alone and said out loud instead.
+
+    See KNOWN_ISSUES.md 0j. `BLANK_PRIORITY=dead` restores the old value.
+    """
+    if BLANK_PRIORITY == "dead":
+        return 0.5
+    return float(np.median([c.priority for c in deck if not c.is_land]))
 
 DEFAULT_CFG = {
     "turns": 10,

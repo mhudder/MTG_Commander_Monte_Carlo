@@ -106,6 +106,11 @@ Consequences worth carrying forward:
   deck is now on the same scale and comparable row-for-row. Each table prints
   its own N and its own measured noise floor in the header, so this paragraph is
   no longer the only place that fact lives.
+  **REGENERATED A SECOND TIME on 2026-09-06** after the ablation BLANK was
+  fixed (`KNOWN_ISSUES.md` §0j) and Ephemerate was fixed (§0k). Every table
+  produced before that — including the N=15,000 set from earlier the same day —
+  is void. The new caches carry a `_medblank` suffix; the old files keep their
+  unsuffixed names and are kept as provenance only. **Do not resume onto one.**
 - **Correcting Karlov made the deck look worse, not better** (win rate
   −0.0163 ±0.0139). The old numbers were inflated by phantom lifegain triggers
   and by Well of Lost Dreams / Dawn of Hope drawing cards for free.
@@ -742,6 +747,13 @@ Three findings worth carrying forward:
   are three slots buying an outcome the deck reaches more reliably by other
   means. This is the first real deckbuilding question the deck has raised, and
   it wants a controlled test before anything is staged.
+  **PARTLY RETRACTED 2026-09-06 (blank fix, `KNOWN_ISSUES.md` §0j).** Re-run at
+  the same n=3,000 against a blank that is actually cast, the alternate-win
+  package costs **0.0123 [0.0040, 0.0203] — significant**, not zero. The
+  ordering survives (the drains are still ~12x bigger) but "three slots buying
+  nothing" was an artifact of the old blank. Of the three, Mechanized Production
+  is +0.0119 alone and Revel in Riches +0.0025; only Time Sieve is negative
+  (−0.0025, no longer significant). **Cut Time Sieve, not the package.**
 - **THE EXTRA-VOTE PAIR IS THE PREDICTED REDUNDANCY TRAP, CONFIRMED.** Ballot
   Broker and Brago's Representative are +0.0075 and +0.0040 alone — both inside
   the noise floor, both look cuttable — and **0.0253 together, 2.2× the sum**.
@@ -942,6 +954,18 @@ Covered fully at the end of `KNOWN_ISSUES.md`. Short version:
 3. **Half of each deck is model-blind.** All removal, protection and wraths
    ablate to ~0.00 because opponents' boards are a blocker count, not real
    permanents. That is a fact about the model, not about the cards.
+4. **FIXED 2026-09-06 — the blank was not replacement level.** `blank_like()`
+   built it at `priority=0.5`, and `main_phase` is greedy on priority, so it was
+   cast only when nothing else in hand was affordable. Every real nonland card
+   sits at 1.0-10.0, so 0.5 was **below the minimum of all four decks**: the
+   ablation compared each card not to a mediocre card but to playing 99 cards,
+   and charged the tempo difference to the card. It is now cast at the deck's
+   median nonland priority via `experiment.repl_priority()` (7.0 / 5.0 / 5.0 /
+   6.5). `BLANK_PRIORITY=dead` restores 0.5. `KNOWN_ISSUES.md` §0j.
+   **The blank's derived `threat` is NOT the same bug and was left alone** —
+   13-35 of each deck's ~64 nonland cards also carry `threat=0.0` and derive it
+   identically, so the blank is treated as an unremarkable real card is. An
+   earlier draft of §0j called it a bug; that was wrong.
 
 ## Why the model works
 

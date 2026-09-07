@@ -286,6 +286,226 @@ Storm Herd's X is still `cfg["storm_herd_x"] = 40` rather than your life total,
 for the same reason and with the same consequence — but it is already in
 `KNOWN_BLIND`, so nothing reads its number.
 
+## 0j. THE BLANK IS NOT REPLACEMENT LEVEL — the bottom of every table is taxed
+
+Found 2026-09-06 from a question about why Blood Artist and Smothering Tithe
+score the way they do. Neither is a card-data bug — `audit_cards.py` is still
+0 ERR and both are correctly costed. The problem is what they are measured
+*against*.
+
+`ablation.py:blank_like()` copies the real card's **cost and nothing else**.
+Three of the things it drops are load-bearing:
+
+| dropped | blank gets | verdict |
+|---|---|---|
+| `priority` | `0.5` | **THE BUG.** `main_phase` is greedy on priority, so a 0.5 blank is cast only when nothing else in hand is affordable. Every real nonland card in the four lists sits between 1.0 and 10.0, so 0.5 is *below the minimum of every deck*: this is not a mediocre card, it is a card you never cast, and the real card was charged its full tempo against an opponent that never spends any. **FIXED — see the decision below.** |
+| `threat` | `0.0` → `threat_of()` derives `power*0.8` or `mv*0.5` | **NOT a bug, and an earlier draft of this entry said it was.** It feeds `board_threat()` → `your_share()` (the share of removal aimed at you, and the odds a clock picks you) and gates `countered()` at threshold 4.0 — so it is load-bearing. But **13-35 of each deck's ~64 nonland cards also carry `threat=0.0`** and derive it by the identical rule, so the blank gets exactly the treatment an unremarkable real card gets. Swapping a scary card for a nondescript one genuinely does make you less of a target here. Charging the card for that is the right question. **Left alone.** |
+| `power`/`toughness` | `1/1` for any creature | Thin at the top of the curve, and Blood Artist is a 0/1 so its own blank is the better body. Fixing it means inventing a vanilla P/T curve. **Left alone and said out loud.** |
+
+`diag_threat_blank.py` re-runs an ablation against blanks that match the real
+card on progressively more of that, N=15,000, same seeds and pod as the tables.
+Output in `threat_blank.txt`. The `standard` row reproduces the committed table
+exactly in all 28 cases, so it is the same measurement, not a different one.
+
+**THE BIAS IS SELECTIVE, AND THAT IS THE USABLE PART.** It is proportional to
+how far a card's own `priority` sits above 0.5 and is independent of what the
+card does — so it is swamped on a high-output card and can be the whole score
+on a low-output one. **It concentrates at the bottom of the table, which is the
+half anyone reads when looking for cuts.**
+
+The per-channel numbers below are from the pre-fix diagnostic and are kept
+because they are what the decision was made on. Note across all 28 cards that
+`+threat` moves the score barely at all while `+priority` moves it a lot —
+Smothering Tithe −0.0002 → −0.0009 → **+0.0050**, Teleportation Circle
++0.0032 → +0.0029 → **+0.0075**. Blood Artist is the one card where the threat
+channel is comparable to the priority channel, which is why it flipped hardest.
+
+Win rate at T20, `standard` (the then-committed table) → the diagnostic's
+best-matched row. **THIS IS THE DIAGNOSTIC, NOT THE OUTCOME** — its
+best-matched row also matches `threat` and the body, and the decision below
+deliberately fixes only `priority`. For what actually shipped see "What the
+regeneration produced" further down; the two differ most for Blood Artist.
+
+| deck | card | table | corrected | verdict |
+|---|---|---|---|---|
+| lorehold | Blasphemous Act | −0.0057 * | −0.0056 * | **CONFIRMED** — threat 0.0, derived 4.5 on both sides |
+| lorehold | Lightning Greaves | −0.0037 * | −0.0037 * | **CONFIRMED** — unmoved |
+| tivit | Time Sieve | −0.0040 * | −0.0019 | softened out of significance |
+| karlov | Blood Artist | −0.0050 * | **+0.0014 \*** | **SIGN FLIP** |
+| rendmaw | Blood Artist | −0.0007 | **+0.0020 \*** | **SIGN FLIP** |
+| lorehold | Smothering Tithe | −0.0002 | **+0.0050 \*** | **SIGN FLIP** |
+| lorehold | Sensei's Divining Top | −0.0032 | −0.0007 | → zero |
+| tivit | Tamiyo's Journal | −0.0020 | −0.0003 | → zero |
+| tivit | Teleportation Circle | +0.0032 * | +0.0075 * | more than doubles |
+| karlov | Daxos, Blessed by the Sun | +0.0006 | +0.0045 * | hidden positive |
+| lorehold | Victory Chimes | +0.0025 | +0.0043 * | hidden positive |
+| lorehold | Ruby Medallion | +0.0008 | +0.0031 | hidden positive |
+| tivit | Revel in Riches | +0.0007 | +0.0026 * | hidden positive |
+| karlov | Mother of Runes | +0.0012 | +0.0022 * | hidden positive |
+
+Unmoved, and therefore readable as printed: every Rendmaw card tested except
+Blood Artist (Ornithopter of Paradise, Palladium / Copper / Leaden Myr, Dockside
+Chef — **all `threat=0.0`**), plus Swiftfoot Boots, Vizkopa Guildmage, Pristine
+Talisman, Boros Signet, lorehold's Mother of Runes, Grudge Keeper, Custodi
+Squire.
+
+Consequences:
+
+- **Blood Artist is not worse than nothing; it is a blank.** Matched on threat
+  and cast timing it is −0.0001 ±0.0014 in Karlov, which IS explainable —
+  creature deaths are rare in a lifegain list, so a death-trigger drain rarely
+  fires. Still a defensible cut on "it does nothing here", never on "it is
+  actively hurting". Rendmaw is the control: same text, `threat=5.5` instead of
+  7.0, a deck where tokens actually die, and a smaller gap.
+- **Smothering Tithe is not a zero.** Threat costs it nothing; the whole
+  suppression is cast eagerness. Corrected it is +0.0050 ±0.0036 win with damage
+  +0.88 → **+1.73 ±0.42**. It is undervalued a second time and independently:
+  `lorehold.py:1188` gives a flat +2 Treasures on YOUR upkeep, where the real
+  card triggers on each opponent's draw step — 3 a round before any extra draw,
+  and opponents only dodge by paying {2} every time.
+- **`candidates.py` and `run_tivit_groups.py` carry the same blank.**
+  `candidates.py:blank_like` is the same construction, faithfully matched to
+  `ablation.py` including this. Its decision rule — "is the candidate's score
+  higher than the ablation score of the card you would cut" — only cancels the
+  tax when candidate and cut target have SIMILAR threat and priority. Where they
+  differ it is biased toward low-threat, low-priority cards, and it reaches the
+  staged swaps. `run_tivit_groups.py:blank_like` uses `priority=0.0` and no
+  threat, so `tivit_groups.txt` carries the tax multiplied by group size.
+
+### THE DECISION, and what it changed
+
+**A replacement-level card is one you actually cast, at an unremarkable
+priority.** `experiment.repl_priority(deck)` returns the median nonland
+priority of the deck the blank is going into — 7.0 karlov, 5.0 rendmaw, 5.0
+lorehold, 6.5 tivit. Derived from the deck, so no new constant is invented, and
+inside the real distribution rather than below all of it.
+
+It deliberately does NOT match the blank to the *tested card's* priority. That
+would isolate the card's text, which is a different and narrower question than
+"is this slot pulling its weight" — the one the tables exist to answer. A card
+you are desperate to cast on turn two and a card you cast when convenient are
+genuinely different cards, and the ablation should keep charging for that.
+
+`threat` and the 1/1 body are unchanged, for the reasons in the table above.
+
+Applied in `edhmc/experiment.py` and used by all three blanks that must stay on
+one scale — `ablation.py`, `candidates.py`, `run_tivit_groups.py`.
+**`BLANK_PRIORITY=dead` restores 0.5 exactly**, and is verified to.
+
+**THE CACHE KEY CARRIES IT** (`_medblank` / `_deadblank`). The pre-change files
+have neither suffix, so no run can pick one up and reprint numbers measured
+against the old blank — the `_n{N}` lesson applied a second time.
+`regen_tables.sh` was updated in the same change; its `rm -f` names the cache
+literally and would otherwise have deleted nothing.
+
+**Every table dated before 2026-09-06 (second regeneration) is void**, including
+the N=15,000 set from earlier the same day. All four were regenerated.
+`CANDIDATES_2026-09-04.md` is on the old scale for this reason on top of the
+2026-09-04 type-line one, and `tivit_groups.txt` carried the largest version of
+the error, since it scales with group size — it was re-run at the same n=3,000
+so the delta is attributable to the blank alone.
+
+### What the regeneration produced
+
+Scores rise almost everywhere, which is the expected direction and worth
+stating so it is not mistaken for a finding: the blank now costs mana, so the
+blanked deck is worse and the real card scores higher. **52 of 256 cards moved
+by more than their own old CI half-width.** Only two cards significant on both
+sides changed sign (Bolt Bend, Counterspell), both from ~−0.0003 to ~+0.003 and
+both model-blind.
+
+| deck | card | old | new | outcome |
+|---|---|---|---|---|
+| lorehold | Blasphemous Act | −0.0057 * | −0.0053 * | **still the worst card in any deck** |
+| lorehold | Lightning Greaves | −0.0037 * | −0.0045 * | **confirmed, and slightly worse** |
+| karlov | Blood Artist | −0.0050 * | **−0.0047 \*** | **still significantly negative** |
+| tivit | Time Sieve | −0.0040 * | −0.0025 | out of significance (`dmg` only) |
+| rendmaw | Blood Artist | −0.0007 | −0.0001 | a clean blank |
+| tivit | Tamiyo's Journal | −0.0020 | +0.0007 | a clean blank (`--`) |
+| lorehold | Smothering Tithe | −0.0002 | +0.0017 | positive, still inside its bar |
+| tivit | Revel in Riches | +0.0007 | +0.0025 * | now significantly positive |
+| tivit | Mechanized Production | +0.0093 * | +0.0119 * | strongly positive |
+| tivit | Ephemerate | −0.0011 | +0.0087 * | the §0k fix, not the blank |
+
+**KARLOV'S BLOOD ARTIST DID NOT FLIP, and an earlier draft of this entry
+predicted it would.** The diagnostic's `+body` row (+0.0014) also matched
+`threat` and the 1/1 body; the shipped blank matches neither. So the card still
+pays a top-tier `threat` of 7.0 — equal to Kambal — and still gives up a point
+of power against a 1/1 blank, for a death trigger that rarely fires in a
+lifegain list with few sacrifice outlets. **That is now a mechanism, which is
+what the row was missing before**, and it makes the card a defensible cut. The
+open question is no longer a harness one: it is whether `threat=7.0` is the
+right number for Blood Artist in THIS list, which is a card-data judgement.
+
+The unmeasured (`--`) count in the evaluated halves collapsed — karlov 7 → 0,
+rendmaw 3 → 1, lorehold 14 → 3, tivit 9 → 1 — because a blank that is actually
+cast produces a larger and more consistent difference. That is a real gain in
+resolving power, not just a rescaling.
+
+**Group ablations moved too, and one finding REVERSED.** `tivit_groups.txt`,
+same n=3,000:
+
+| group | old (cut costs) | new | note |
+|---|---|---|---|
+| alternate wins | 0.0047, **inside its bar** | **0.0123 [0.0040, 0.0203]** | **REVERSED** — the package is worth something after all |
+| blink package | 0.0570 | 0.0730 | includes the Ephemerate fix |
+| every drain | 0.1413 | 0.1427 | unchanged |
+| the four signets | 0.0533 | 0.0500 | unchanged |
+| extra votes | 0.0253 | 0.0230 | unchanged |
+
+The standing claim that "the deck wins by draining, not by assembling an
+alternate win" **needs revising**: cutting Revel in Riches + Mechanized
+Production + Time Sieve now costs a significant 0.0123. The drains are still
+worth an order of magnitude more (0.1427), so the priority ordering survives,
+but "three slots buying an outcome the deck reaches more reliably by other
+means" was an artifact of the blank. The extra-vote redundancy trap is
+unaffected and still real: singles +0.0063 and +0.0047, sum 0.0110, against
+0.0230 for the pair — still about 2x.
+
+## 0k. FIXED — Ephemerate was a proved blank, its handler dead code
+
+Found by the above, and unrelated to it. In the `+priority` arm Ephemerate
+produced **bit-identical games to its blank in all 15,000 pairs** — ±0.0000 on
+win rate, damage and `removal_eaten`. That is the same signature as the four
+Tivit removal spells, but those are `KNOWN_BLIND` and Ephemerate is in
+`SCRIPTED_TIVIT`.
+
+It is implemented. The implementation is unreachable:
+
+1. `tivit_v1.py:120` gives it `priority=8` and `script="ephemerate"`.
+2. **Nothing anywhere reads `script="ephemerate"`.** There is no branch for it.
+3. `take_turn` runs `main_phase` twice (tivit.py:825, 829) BEFORE `activations`
+   (832). `main_phase` is greedy on priority, so it casts a priority-8 {W} spell
+   almost immediately — as a vanilla no-op, since step 2.
+4. That removes it from hand, so `activations()`'s Ephemerate block
+   (tivit.py:771) never finds it, and `g.ephemerate_rebound` is never armed, so
+   `upkeep()`'s rebound (tivit.py:662) never fires either.
+
+Both hand-written Ephemerate paths are dead. The card is a {W} blank.
+
+This does not invalidate the blink-package group result (0.057 win rate) — the
+other five members work — but Ephemerate contributed nothing to it, and its own
+row was measuring cast tempo. Same shape as §0f and as the two `SCRIPTED_*`
+labelling bugs: **a name in a set is a claim, and `check_scripted_coverage()`
+verifies that a card is CLASSIFIED, not that its classification is TRUE.**
+
+**FIXED 2026-09-06**, in two parts, because one alone would not have worked:
+
+1. `resolve()` now has an `ephemerate` branch that blinks and arms the rebound,
+   so the card works wherever it is cast. The `activations()` block is deleted —
+   it could never fire, and it gated on `commander_cast` rather than on Tivit
+   being present, so after a wipe it would have thrown the card away.
+2. `main_phase` no longer casts a ONE-SHOT blink with nothing to blink
+   (`"blink" in tags and not is_permanent and not g.has(commander)`). Without
+   this the greedy policy simply pitched it on turn one. The permanent blinkers
+   are engines worth deploying pre-commander and are untouched by the gate.
+
+Effect: from bit-identical-to-a-blank to **+0.0095 ±0.0043 win rate at T20**
+(n=4,000). `validate.py` is `+0.00` on all nine with `corr(A,B)` 0.9069
+unchanged. **The tivit table was regenerated**; the other three engines are
+untouched by this, and that claim is checked rather than assumed — the change is
+confined to `edhmc/tivit.py`.
+
 ---
 
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
@@ -568,9 +788,30 @@ The same logic applies to the soul sisters, the equipment suite, and the wraths.
 For any set of interchangeable effects, **ablate the group, not the members.**
 `ablation.py`'s `ablate()` already accepts a list of names.
 
+## 4. The blank is not replacement level, and the bottom of the table pays for it
+
+Full write-up in **§0j**. `blank_like()` copies the card's cost and nothing
+else, so the comparison is really:
+
+    (card, hand-assigned threat 5-9, cast eagerly)
+      vs
+    (blank, derived threat 0.5-2.5, cast only when nothing else is affordable)
+
+and the whole difference is charged to the card. It is independent of what the
+card does, so it is invisible on a strong card and can be the entire score on a
+weak one. Corrected, karlov's Blood Artist goes −0.0050 → +0.0014 and lorehold's
+Smothering Tithe −0.0002 → +0.0050, while Blasphemous Act and Lightning Greaves
+do not move at all.
+
+The cheap test before trusting any low row: **does the card carry an explicit
+`threat`?** If it is `0.0`, the blank derives threat by the same rule and that
+channel cancels. If it is set, run `diag_threat_blank.py` on it.
+
 ## The rule, restated
 
 1. Ignore anything inside its own error bars.
 2. Where damage and win rate disagree, follow win rate.
 3. Before cutting, ask whether another card in the deck does the same job — and
    if so, ablate them together.
+4. Before cutting a card that carries an explicit `threat`, check what it scores
+   against a blank that is not a free ride — `diag_threat_blank.py`.

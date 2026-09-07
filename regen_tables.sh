@@ -35,6 +35,18 @@
 #
 # Tivit was left out while it was the odd deck at N=2000 and its table was not
 # comparable to the others. At a common N it is, so it regenerates with them.
+#
+# 2026-09-06, SECOND REGENERATION: the ablation BLANK changed. It was built at
+# priority 0.5 -- below the minimum priority of every deck -- so `main_phase`,
+# which is greedy on priority, cast it only when nothing else was affordable.
+# That is a dead card, not a replacement-level one, and the difference in tempo
+# was charged to whichever card was under test. The blank is now cast at the
+# deck's median nonland priority. See KNOWN_ISSUES.md 0j.
+#
+# THE CACHE FILENAME CHANGED WITH IT (`_medblank`), which is deliberate: the
+# pre-change files carry no such suffix, so this run cannot pick one up and
+# reprint numbers measured against the old blank. Keep the name below in step
+# with ablation.py's CACHE or the `rm -f` silently deletes nothing.
 
 set -e
 RESUME=""
@@ -42,7 +54,7 @@ RESUME=""
 N=15000
 
 for deck in lorehold rendmaw karlov tivit; do
-    cache="ablation_cache_${deck}_10-20_n${N}.json"
+    cache="ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "ablation_${deck}.log"
     for _ in $(seq 1 400); do

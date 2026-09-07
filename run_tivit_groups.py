@@ -24,7 +24,8 @@ import numpy as np
 
 from edhmc.decks import tivit_v1
 from edhmc.engine import Card
-from edhmc.experiment import DEFAULT_CFG, _swap_many, analyse
+from edhmc.experiment import (DEFAULT_CFG, _swap_many, analyse,
+                              repl_priority)
 from edhmc.tivit import simulate
 
 METRICS = ("won", "damage", "artifacts_made", "treasures_made",
@@ -63,12 +64,19 @@ GROUPS = {
 }
 
 
-def blank_like(card):
+def blank_like(card, priority):
     """A do-nothing card of the same mana value, matching ablation.py's blank
-    for a single type line (BLANK_KEEPS_TYPES=0, the default)."""
+    for a single type line (BLANK_KEEPS_TYPES=0, the default).
+
+    2026-09-06: `priority` now comes from `repl_priority()`. It was 0.0 here —
+    even deader than ablation.py's 0.5, and below the minimum priority of every
+    deck — so a group's score included the tempo of casting every member,
+    measured against blanks that were never cast at all. That error scales with
+    GROUP SIZE, so this file carried the largest version of it in the project.
+    """
     return Card(name=f"Blank ({card.name})",
                 types=frozenset({"Artifact"}),
-                cost=dict(card.cost), priority=0.0)
+                cost=dict(card.cost), priority=priority)
 
 
 def main():
@@ -103,7 +111,7 @@ def main():
         missing = [x for x in names if x not in by_name]
         if missing:
             raise SystemExit(f"{label}: not in the deck: {missing}")
-        blanks = [blank_like(by_name[x]) for x in names]
+        blanks = [blank_like(by_name[x], repl_priority(deck)) for x in names]
         deck_b = _swap_many(deck, names, blanks)
         for turns in (10, 20):
             cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())

@@ -11,12 +11,18 @@ venv/
 # checkout, so ABLATION_CACHES.md records a source fingerprint per deck; check
 # it before resuming one. See cache_manifest.py.
 #
-# Eight, not four, since 2026-09-06: each deck has the current N=15000 cache and
-# the superseded N=6000 (tivit: N=2000) one, which is kept because it is the
-# provenance for every number quoted in CLAUDE.md above that date. The
+# TWELVE, not four, since 2026-09-06: each deck has the current N=15000
+# `_medblank` cache, the N=15000 one it superseded the same day (measured
+# against the old blank — see KNOWN_ISSUES.md 0j), and the N=6000 (tivit:
+# N=2000) one before that. The older two are kept because they are the
+# provenance for every number quoted in CLAUDE.md above their dates. The
 # "roughly six hours to rebuild" that justified tracking them is no longer true
 # either — the whole set is 23 minutes now. They stay tracked for provenance
 # rather than for the compute.
+#
+# The blank mode is IN THE FILENAME on purpose: a cache measured against a
+# different blank is not resumable onto, and a suffix nothing reads is how the
+# N-in-the-key bug happened the first time.
 
 # Spreadsheet lock/temp files
 ~$*.xlsx
