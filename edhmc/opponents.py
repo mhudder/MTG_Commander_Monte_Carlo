@@ -324,6 +324,15 @@ def board_wipe(g, opp, rolls):
     g.m["wipes_suffered"] += 1
 
 
+# Cards that grant indestructible to OTHER permanents you control, for as
+# long as they are on the battlefield -- not a static per-card tag (that would
+# say the GRANTED permanent is always indestructible, which tag_flying.py's
+# generated set deliberately refuses to claim) and not "until end of turn"
+# either, so it does not fit `try_protect`'s one-shot shape. Checked by name
+# here, the same way `flying_of` special-cases three conditional fliers.
+GRANTS_INDESTRUCTIBLE = {"Avacyn, Angel of Hope"}
+
+
 def destroy(g, perm, roll=None):
     """Remove a permanent the pod answered.
 
@@ -341,9 +350,11 @@ def destroy(g, perm, roll=None):
     """
     if perm not in g.board:
         return False
-    if perm.card.indestructible and roll is not None \
+    granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
+              and perm.card.name not in GRANTS_INDESTRUCTIBLE)
+    if (perm.card.indestructible or granted) and roll is not None \
             and roll < g.cfg.get("destroy_share", 0.60):
-        return
+        return False
     g.board.remove(perm)
     if perm.card.is_creature and hasattr(g, "on_creature_death"):
         g.on_creature_death(1, perm)

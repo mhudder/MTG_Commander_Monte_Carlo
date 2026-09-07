@@ -65,7 +65,7 @@ import sys
 import urllib.parse
 import urllib.request
 
-from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1
+from edhmc.decks import discover_current_decks
 
 HEADERS = {"User-Agent": "EDHMC/1.0", "Accept": "application/json",
            "Content-Type": "application/json"}
@@ -130,8 +130,11 @@ def named(name):
 
 
 def main():
-    decks = {"rendmaw": rendmaw_v12, "lorehold": lorehold_v16,
-             "karlov": karlov_v2, "tivit": tivit_v1}
+    # DISCOVERED, not named by hand: see edhmc.decks.discover_current_decks.
+    # A newly added "<name>_v1.py" with a build() is tagged the first time
+    # this runs, with no edit here — the same fix `audit_cards.py` got, for
+    # the same reason: this file's own history is the SCRIPTED_* class of bug.
+    decks = discover_current_decks()
     creatures = {}
     everything = {}          # indestructible is not a creature-only keyword
     for mod in decks.values():
@@ -160,8 +163,18 @@ def main():
     cards = scryfall_collection(sorted(everything))
     flying = {n for n, c in cards.items()
               if n in creatures and "Flying" in c.get("keywords", [])}
+    # Restricted to PERMANENTS, for the same reason `flying` is restricted to
+    # creatures: Scryfall's `keywords` array does not distinguish "this card
+    # has indestructible" from "this card GRANTS indestructible to something
+    # else". Found 2026-09-07 adding the Azusa deck: Sylvan Awakening ("lands
+    # you control become ... indestructible ...") is a Sorcery -- it can never
+    # be a Permanent on a battlefield for `opponents.destroy()` to check, so
+    # tagging it was harmless in practice, but it was still a false claim
+    # about the card and exactly the "a tag would be a lie" trap this
+    # generator exists to avoid.
     indestructible = {n for n, c in cards.items()
-                      if "Indestructible" in c.get("keywords", [])}
+                      if "Indestructible" in c.get("keywords", [])
+                      and n in everything and everything[n].is_permanent}
 
     print(f"{len(cards)}/{len(everything)} cards resolved "
           f"({len(creatures)} of them creatures)\n")

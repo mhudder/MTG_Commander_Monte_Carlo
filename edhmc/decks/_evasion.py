@@ -7,23 +7,43 @@ NOT here: see opponents.flying_of(). Regenerate with
 """
 
 FLYING = {
+    'Angel of Despair',
+    'Angel of Serenity',
+    'Angel of Suffering',
+    'Angel of the Ruins',
+    'Angelic Arbiter',
     'Archangel of Thune',
+    'Avacyn, Angel of Hope',
     'Caldera Pyremaw',
     'Cliffhaven Vampire',
     'Custodi Squire',
     'Cyberdrive Awakener',
     "Drana's Emissary",
+    'Emeria Shepherd',
     'Exemplar of Light',
+    'Giada, Font of Hope',
     'Goldspan Dragon',
+    'Herald of War',
     'Junk Diver',
+    'Kokusho, the Evening Star',
     'Lorehold, the Historian',
+    'Lyra Dawnbringer',
     'Magister of Worth',
     'Messenger Jays',
     'Mirkwood Bats',
     'Ornithopter of Paradise',
+    'Requiem Angel',
+    'Resplendent Angel',
+    'Reya Dawnbringer',
+    'Righteous Valkyrie',
+    "Serra's Emissary",
+    'Shilgengar, Sire of Famine',
     'Starscape Cleric',
     'Sunscorch Regent',
     'Tivit, Seller of Secrets',
+    'Twilight Shepherd',
+    'Voldaren Bloodcaster // Bloodbat Summoner',
+    'Youthful Valkyrie',
 }
 
 # Token subtypes that fly, from the text of the card that makes them.
@@ -34,13 +54,15 @@ FLYING_TOKENS = {
     'Pegasus',
 }
 
-# UNCONDITIONAL indestructible, every card type -- two of the three are LANDS,
+# UNCONDITIONAL indestructible, every card type -- two of them are LANDS,
 # so L() has to consult this as well as C(). Granted (Heroic Intervention,
 # Boros Charm) and conditional (Voice of the Blessed at ten counters)
 # indestructibility is deliberately absent: a static tag would be a lie.
 INDESTRUCTIBLE = {
+    'Avacyn, Angel of Hope',
     'Darkmoss Bridge',
     'Darksteel Citadel',
     'Erebos, Bleak-Hearted',
     'Heliod, Sun-Crowned',
+    'Ulamog, the Infinite Gyre',
 }

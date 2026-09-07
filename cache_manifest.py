@@ -36,6 +36,8 @@ PER_DECK = {
     "lorehold": ["edhmc/lorehold.py", "edhmc/decks/lorehold_v16.py"],
     "karlov": ["edhmc/karlov.py", "edhmc/decks/karlov_v2.py"],
     "tivit": ["edhmc/tivit.py", "edhmc/voting.py", "edhmc/decks/tivit_v1.py"],
+    "shilgengar": ["edhmc/shilgengar.py", "edhmc/decks/shilgengar_v1.py"],
+    "azusa": ["edhmc/azusa.py", "edhmc/decks/azusa_v1.py"],
 }
 # engine.py is Rendmaw's engine AND the shared primitives, so it is in SHARED
 # and does not repeat under rendmaw.

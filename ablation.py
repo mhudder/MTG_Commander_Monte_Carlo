@@ -70,6 +70,8 @@ from edhmc.pending import build_pending
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.karlov import simulate as karlov_sim
 from edhmc.tivit import simulate as tivit_sim
+from edhmc.shilgengar import simulate as shilgengar_sim
+from edhmc.azusa import simulate as azusa_sim
 from edhmc.experiment import DEFAULT_CFG, BLANK_PRIORITY, repl_priority
 
 DECK = sys.argv[1] if len(sys.argv) > 1 else "lorehold"
@@ -84,7 +86,8 @@ HORIZONS = tuple(int(x) for x in sys.argv[3].split(",")) if len(sys.argv) > 3 \
 BLANK_KEEPS_TYPES = os.environ.get("BLANK_KEEPS_TYPES", "0") == "1"
 
 SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-       "karlov": karlov_sim, "tivit": tivit_sim}[DECK]
+       "karlov": karlov_sim, "tivit": tivit_sim,
+       "shilgengar": shilgengar_sim, "azusa": azusa_sim}[DECK]
 METRIC_SETS = {
     "lorehold": ("mv_cheated", "damage", "miracles_cast", "total_mv_cast", "won"),
     "rendmaw": ("damage", "cards_drawn", "tokens_made", "rendmaw_triggers", "won"),
@@ -92,6 +95,10 @@ METRIC_SETS = {
     # artifacts_made is this deck's mv_cheated: the proxy the engine is built
     # around. It is NOT the objective -- follow win rate where they disagree.
     "tivit": ("damage", "artifacts_made", "tivit_triggers", "votes_cast", "won"),
+    "shilgengar": ("damage", "blood_made", "creatures_sacrificed",
+                  "single_reanimations", "won"),
+    "azusa": ("damage", "landfall_triggers", "lands_played",
+             "tokens_made", "won"),
 }
 
 # Cards whose actual text the engine implements. Everything else is a body.
@@ -242,8 +249,80 @@ SCRIPTED_TIVIT = {
     "Lightning Greaves",
 }
 
+# Written 2026-09-07 with the deck (the least tuned of the five -- see
+# shilgengar_v1.py). Membership is a claim that edhmc.shilgengar implements
+# the card's text; several entries are explicitly PARTIAL and say so at their
+# definition in that module (Massacre Wurm's ETB, Elesh Norn's team half only,
+# Avacyn's protection against opponent-sourced destroy() only, Skullclamp
+# restricted to token fodder, Voldaren Bloodcaster with no transform).
+SCRIPTED_SHILGENGAR = {
+    # NOTE: the commander itself is never in `deck` (build() returns it
+    # separately), so it does not belong in this set -- same as every other
+    # deck's commander.
+    # Angels tribal
+    "Archangel of Thune", "Resplendent Angel", "Righteous Valkyrie",
+    "Bishop of Wings", "Giada, Font of Hope", "Youthful Valkyrie",
+    "Lyra Dawnbringer", "Speaker of the Heavens",
+    "Emeria's Call // Emeria, Shattered Skyclave",
+    "Elesh Norn, Grand Cenobite", "Avacyn, Angel of Hope",
+    # aristocrats: death triggers and sac outlets
+    "Blood Artist", "Zulaport Cutthroat", "Midnight Reaper", "Grim Haruspex",
+    "Dark Prophecy", "Pitiless Plunderer", "Requiem Angel",
+    "Voldaren Bloodcaster // Bloodbat Summoner", "Viscera Seer",
+    "Cartel Aristocrat", "Vampiric Rites", "Skullclamp",
+    # reanimation
+    "Priest of Fell Rites", "Sun Titan", "Reya Dawnbringer",
+    "Emeria Shepherd",
+    # drain / removal on a body that is a REAL death trigger, not blank
+    "Kokusho, the Evening Star", "Massacre Wurm",
+    # mana and draw
+    "Smothering Tithe", "Black Market Connections", "Phyrexian Arena",
+    "Sol Ring", "Arcane Signet", "Orzhov Signet", "Fellwar Stone",
+    "Mind Stone", "Marble Diamond", "Talisman of Hierarchy",
+    "Wayfarer's Bauble",
+    # protection the opponent model respects
+    "Flawless Maneuver", "Teferi's Protection",
+    # wraths
+    "Damn", "Wrath of God",
+}
+
+# Written 2026-09-07 with the deck (the least tuned of the six -- see
+# azusa_v1.py). Membership is a claim that edhmc.azusa implements the card's
+# text; X-spells are modelled at a fixed X (documented in azusa_v1.py) and
+# Ashaya's power/toughness-only implementation (no "creatures are also
+# lands") is called out at its definition in edhmc/azusa.py.
+SCRIPTED_AZUSA = {
+    # extra land drops
+    "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
+    # landfall payoffs
+    "Avenger of Zendikar", "Courser of Kruphix", "Lotus Cobra",
+    "Rampaging Baloths", "Scute Swarm", "Tireless Provisioner",
+    "Tireless Tracker", "Titania, Protector of Argoth", "Seer's Sundial",
+    "Horn of Greed",
+    # play lands from an extra zone
+    "Augur of Autumn", "Ramunap Excavator", "Crucible of Worlds",
+    # tutors / ETB value
+    "Craterhoof Behemoth", "Eternal Witness", "Woodland Bellower",
+    "Nissa, Vastwood Seer // Nissa, Sage Animist", "Yavimaya Elder",
+    "Bane of Progress", "Ashaya, Soul of the Wild",
+    "Green Sun's Zenith", "Chord of Calling",
+    # ramp / land tutors
+    "Cultivate", "Kodama's Reach", "Seek the Horizon", "Journey of Discovery",
+    "Realms Uncharted", "Nylea's Intervention", "Life from the Loam",
+    "Regrowth", "Animist's Awakening", "Genesis Wave",
+    # sac-for-value (token fodder only)
+    "Perilous Forays", "Momentous Fall",
+    # land animation / mana
+    "Sylvan Awakening", "Rude Awakening",
+    "Sol Ring", "Harmonize", "Eye of Ugin",
+    # Annihilator, approximated as reducing an opponent's abstract creature
+    # count -- value denial, not damage
+    "Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre",
+}
+
 SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
-            "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT}[DECK]
+            "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
+            "shilgengar": SCRIPTED_SHILGENGAR, "azusa": SCRIPTED_AZUSA}[DECK]
 METRICS = METRIC_SETS[DECK]
 
 
@@ -354,9 +433,12 @@ def _worker_init(deck_name, n, horizons, baseline):
     global DECK, N, HORIZONS, SIM, SCRIPTED, METRICS
     DECK, N, HORIZONS = deck_name, n, horizons
     SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-           "karlov": karlov_sim, "tivit": tivit_sim}[DECK]
+           "karlov": karlov_sim, "tivit": tivit_sim,
+           "shilgengar": shilgengar_sim, "azusa": azusa_sim}[DECK]
     SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
-                "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT}[DECK]
+                "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
+                "shilgengar": SCRIPTED_SHILGENGAR,
+                "azusa": SCRIPTED_AZUSA}[DECK]
     METRICS = METRIC_SETS[DECK]
     _W["deck"], _W["commander"] = build_pending(DECK)
     _W["baseline"] = baseline
@@ -542,6 +624,83 @@ KNOWN_BLIND = {
         "Expropriate", "Torment of Hailfire", "Rhystic Study",
         "Capital Punishment", "Bite of the Black Rose", "Split Decision",
         "Trial of a Time Lord", "Vault 11: Voter's Dilemma",
+    },
+    "azusa": {
+        # removal / land destruction aimed at opponents -- this project
+        # tracks no opponent land or permanent objects at all, only an
+        # aggregate creature count and a life total
+        "Terastodon", "Beast Within", "Krosan Grip", "Crop Rotation",
+        # planeswalker activated abilities -- nothing in this project tracks
+        # loyalty; see edhmc/azusa.py's module docstring
+        "Nissa, Worldwaker",
+        # reads an OPPONENT drawing a card / a symmetric hand-refill effect,
+        # neither of which this model tracks at that granularity
+        "Mind's Eye", "Memory Jar",
+        # "each land tapped for mana returns to hand" is a global replacement
+        # on the shared mana model every engine uses; too easy to get subtly
+        # wrong for one deck's build-around
+        "Storm Cauldron",
+        # modelled as the non-greedy "reveal 3, keep 1, pay no life" line,
+        # which is close to a real blank in this engine
+        "Sylvan Library",
+        # symmetric mana-color-lock with no clear implementation path in an
+        # abstracted mana model, and situational even in paper play
+        "Hall of Gemstone",
+        # a sac-for-value engine whose real value depends on WHEN to fire it
+        # -- exactly the judgement-heavy timing this project is cautious
+        # about automating (see "the greedy policy is the largest source of
+        # model error")
+        "Greater Good",
+        # replaces every draw() call across the engine with a choice; too
+        # much retrofitting for the many independent draw sources in this list
+        "Abundance",
+        # untaps a target creature once a turn for no modelled payoff
+        "Quirion Ranger",
+        # a plain land tutor to hand with no clear "best" target among 19
+        # distinct utility lands
+        "Sylvan Scrying",
+        # a two-step fate-counter board wipe that would need per-permanent
+        # tracking on BOTH sides of the table (it hits your own stuff too,
+        # like Bane of Progress) -- more engineering than the card is worth
+        "Oblivion Stone",
+    },
+    "shilgengar": {
+        # removal, on a body or off one -- opponents' boards are a blocker
+        # count, so none of it has a legal target. Same limitation as every
+        # other deck in this project.
+        "Angel of Despair", "Angel of Serenity", "Angel of the Ruins",
+        "Path to Exile", "Swords to Plowshares", "Anguished Unmaking",
+        "Generous Gift", "Despark", "Vindicate", "Mortify", "Utter End",
+        # needs opponents' creatures to die as discrete events, which nothing
+        # in this model tracks (their board is an aggregate float)
+        "Revel in Riches",
+        # a damage-prevention/mill replacement effect whose interaction with
+        # resolve_clocks (a game-loss check, not a damage event) is not
+        # confidently representable -- see edhmc/shilgengar.py's docstring
+        "Angel of Suffering",
+        # landfall recursion + conditional haste unmodelled; a cheap enough
+        # body that this is not worth the engine complexity
+        "Bloodghast",
+        # cost reduction scaling with its own counters, plus an attack
+        # trigger -- a real engine piece, but not wired into
+        # cost_after_reduction; a body only for now
+        "Herald of War",
+        # static opponent-behaviour restriction; the model does not track
+        # per-opponent "cast a spell this turn" / "attacked this turn" at
+        # that granularity
+        "Angelic Arbiter",
+        # ETB regrowth-the-turn's-deaths and persist, both unmodelled
+        "Twilight Shepherd",
+        # protection from a chosen card type -- unmodelled, a floor; body only
+        "Serra's Emissary",
+        # X-spell mass reanimation, largely redundant with Shilgengar's own
+        # ultimate and Priest of Fell Rites / Sun Titan / Reya Dawnbringer;
+        # played almost entirely as its land back face in this model
+        "Agadeem's Awakening // Agadeem, the Undercrypt",
+        # reactive protection spell shaped like Flawless Maneuver but for ONE
+        # creature's death trigger -- no removal-in-response context to react
+        # to here; played almost entirely as its land back face
+        "Malakir Rebirth // Malakir Mire",
     },
 }
 

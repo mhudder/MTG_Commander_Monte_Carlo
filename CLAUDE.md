@@ -76,7 +76,7 @@ and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 ## Current state — READ THIS BEFORE TRUSTING ANY DOC
 
-Verified 2026-09-03 after the oracle-text audit; deck table updated 2026-09-06.
+Verified 2026-09-03 after the oracle-text audit; deck table updated 2026-09-07.
 
 | deck | module | spreadsheet | status |
 |---|---|---|---|
@@ -84,6 +84,64 @@ Verified 2026-09-03 after the oracle-text audit; deck table updated 2026-09-06.
 | Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
 | Karlov of the Ghost Council | `karlov_v2.py` | v2 `.xlsx` | agrees |
 | Tivit, Seller of Secrets | `tivit_v1.py` | v1 `.xlsx` | agrees |
+| Shilgengar, Sire of Famine | `shilgengar_v1.py` | v1 `.xlsx` | agrees |
+| Azusa, Lost but Seeking | `azusa_v1.py` | none — submitted as a table | n/a |
+
+**2026-09-07 (later the same day): a sixth deck — Azusa, Lost but Seeking.**
+Submitted as a plain decklist table, not a spreadsheet — there is no `.xlsx`
+for this one, so the module (`edhmc/decks/azusa_v1.py`) IS the system of
+record until one exists. **The submitted list was 99 cards, not 100** —
+counted programmatically before writing anything — and a 21st Forest was
+added to reach the legal count; flagged in the module docstring in case a
+different 100th card was intended. Two submitted mana values were wrong
+against Scryfall and are corrected in the module: Avenger of Zendikar is
+{5}{G}{G} (MV 7, not 8) and Lotus Cobra is {1}{G} (MV 2, not 3).
+
+Landfall, extra land drops, and a fetch-land-as-two-landfall-triggers
+mechanic are all real engine code in `edhmc/azusa.py` — the last one is worth
+reading if you extend this deck, since it is the same class of "a doubled
+trigger, modelled as one" correction this project's Blood Artist and Elas
+il-Kor fixes were about. Scute Swarm's landfall-doubling is implemented
+directly and can produce very large damage outliers (mean damage over a batch
+run was in the hundreds, occasionally much higher) — checked against
+`validate.py` and it is not a harness leak, just a genuinely swingy card in a
+deck built to go wide fast. Two Planeswalkers (Nissa, Worldwaker and the
+transformed back of Nissa, Vastwood Seer) have no activated abilities
+modelled — nothing else in this project tracks loyalty, and this seemed like
+the wrong card to be the first. `validate.py` is clean and `audit_cards.py` is
+0 ERR across all six decks. Least tuned of the six; nothing is staged.
+
+**2026-09-07: a fifth deck — Shilgengar, Sire of Famine.** Its spreadsheet had
+been in the repo since 2026-09-03 with no engine; `edhmc/shilgengar.py` and
+`edhmc/decks/shilgengar_v1.py` are new. This is the LEAST TUNED of the five —
+a first-pass spreadsheet, not a list that has been through ablation — and its
+own docstrings say so at every judgement call (a token-only sacrifice policy,
+Elesh Norn's team-buff-only implementation, Avacyn's protection against
+opponent-sourced `destroy()` only, Massacre Wurm's ETB approximated against an
+opponent board that is a float, not real permanents). Six of the spreadsheet's
+mana values were wrong against Scryfall and are corrected in the module, not
+the sheet (see `shilgengar_v1.py`'s docstring). `validate.py` is clean
+(`blood_made`, `creatures_sacrificed`, `damage`, all `+0.00`) and
+`audit_cards.py` is 0 ERR across all five decks. Nothing is staged against it
+yet — `python ablation.py shilgengar <n> <turns>` is the next step, same as it
+was for the other four when they were new.
+
+**Also fixed while adding it:** `validate.py` never had a Karlov A/A control
+block — four decks existed but only three engines were checked. It now checks
+all five.
+
+**And a structural fix, in `edhmc/decks/__init__.py`:** `audit_cards.py` and
+`tag_flying.py` used to name the four decks by hand in a dict, which is the
+exact shape of bug this project has been bitten by twice before (a hand-
+written registry that a later deck or card change forgets to update — see
+"Hazard: adding a card to a deck is TWO edits" below). `discover_current_decks()`
+walks `edhmc/decks/` for any `<name>_v<N>.py` exposing `build()` and resolves
+each name to its highest version, so a sixth deck gets Scryfall-checked and
+evasion-tagged automatically, with nothing to remember. `ablation.py`'s
+`SCRIPTED_*`/`KNOWN_BLIND` sets, `validate.py`'s A/A legs, `pending.py`'s
+per-deck candidate catalog, and `cache_manifest.py`'s fingerprints are
+deliberately NOT auto-discovered — each needs a real decision a script cannot
+make for itself.
 
 **UPDATED 2026-09-06.** Karlov's three changes are COMMITTED on all three legs
 — hence `karlov_v2.py` and the v2 `.xlsx`, reconciled card for card. **THREE

@@ -24,7 +24,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1
+from edhmc.decks import (rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1,
+                         shilgengar_v1, azusa_v1)
 from edhmc.experiment import _swap_many
 
 
@@ -524,6 +525,14 @@ DECKS = {
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {
         "Anointed Procession": tivit_v1.ANOINTED_PROCESSION}),
+    # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
+    # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,
+    # six mana values corrected against Scryfall (see shilgengar_v1.py's
+    # module docstring). This deck has not been through ablation yet.
+    "shilgengar": (shilgengar_v1, {}),
+    # Added 2026-09-07 as a sixth deck. The submitted list was 99 cards; a
+    # 21st Forest was added to reach 100 -- see azusa_v1.py's docstring.
+    "azusa": (azusa_v1, {}),
 }
 
 

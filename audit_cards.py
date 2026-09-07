@@ -36,7 +36,7 @@ import urllib.parse
 import urllib.request
 
 from edhmc.engine import STACK_ONLY_CREATURES
-from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12, tivit_v1
+from edhmc.decks import discover_current_decks
 from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 UA = {"User-Agent": "EDHMC/1.0", "Accept": "application/json"}
@@ -71,12 +71,14 @@ IDENTITY_LANDS = {"Command Tower", "Cavern of Souls", "Plaza of Heroes",
 # ---------------------------------------------------------------------------
 
 def collect():
-    """(deck, card, in_deck) for every Card object we can reach."""
+    """(deck, card, in_deck) for every Card object we can reach.
+
+    Decks are DISCOVERED (`edhmc.decks.discover_current_decks`), not named by
+    hand: any "<name>_v<N>.py" exposing build() is picked up automatically, on
+    its highest version number, so a newly added deck is audited the first
+    time this runs with no edit here."""
     out = []
-    for deck, mod in (("rendmaw", rendmaw_v12),
-                      ("lorehold", lorehold_v16),
-                      ("karlov", karlov_v2),
-                      ("tivit", tivit_v1)):
+    for deck, mod in sorted(discover_current_decks().items()):
         cards, commander = mod.build()
         seen = set()
         for c in [commander] + cards:
@@ -299,7 +301,12 @@ def check(deck, c, sc):
     # GRANTS indestructible (Heroic Intervention, Boros Charm) or has it
     # CONDITIONALLY (Voice of the Blessed at ten +1/+1 counters) must NOT be
     # tagged, and the keywords array is what draws that line.
-    has_indes = "Indestructible" in kw
+    # Restricted to PERMANENTS, same reason as `tag_flying.py`'s generator:
+    # Scryfall's `keywords` array does not distinguish "this card has
+    # indestructible" from "this card GRANTS indestructible to something
+    # else" (found 2026-09-07: Sylvan Awakening, a Sorcery that grants it to
+    # lands, carries the keyword and can never itself be a Permanent).
+    has_indes = "Indestructible" in kw and c.is_permanent
     if c.indestructible != has_indes:
         out.append(("ERR", f"indestructible={c.indestructible}, "
                            f"Scryfall keywords {sorted(kw)}"))
