@@ -118,6 +118,22 @@ NOTES.update({
     )
 })
 
+# The 2026-09-06 Erebos and extra-turn work changed engine.py, which is in
+# SHARED, so ALL FOUR fingerprints moved. Only two decks' numbers did, and that
+# was checked rather than argued: karlov.py and lorehold.py have their own Game
+# classes and import only Board, Card, Permanent, can_pay, available_mana, spend
+# and play_land from engine.py -- none of which was touched. The check was a
+# worktree at the previous commit running the same baselines on the same seeds.
+_KARLOV_LOREHOLD_UNTOUCHED = (
+    " STILL CURRENT after the 2026-09-06 Erebos and extra-turn work "
+    "(KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved "
+    "this fingerprint. The numbers did not move: this engine has its own Game "
+    "class and imports only the mana and card primitives from engine.py, none "
+    "of which changed. VERIFIED, not argued -- a git worktree at the previous "
+    "commit ran this deck's baseline on the same seeds at both horizons and "
+    "every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and "
+    "tivit) and were regenerated, which is what makes the pass meaningful.")
+
 # The blank fix, 2026-09-06 (second regeneration of the day).
 _MEDBLANK = (
     "CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation "
@@ -136,14 +152,37 @@ NOTES.update({
     f"ablation_cache_{d}_10-20_n15000_medblank.json":
         _MEDBLANK.format(prio=prio, extra=extra)
     for d, prio, extra in (
-        ("karlov", "7.0", ""),
-        ("rendmaw", "5.0", ""),
-        ("lorehold", "5.0", ""),
+        ("karlov", "7.0", _KARLOV_LOREHOLD_UNTOUCHED),
+        ("lorehold", "5.0", _KARLOV_LOREHOLD_UNTOUCHED),
+        ("rendmaw", "5.0",
+         " REGENERATED AGAIN FROM AN EMPTY CACHE 2026-09-06 (third time that "
+         "day) for the EREBOS correction, KNOWN_ISSUES.md 0l: Erebos, "
+         "Bleak-Hearted was a creature on the battlefield regardless of "
+         "devotion to black, it had been given Dockside Chef's activated "
+         "ability instead of its own death trigger, and it was never tagged "
+         "indestructible. The deck's baseline win rate moves -0.0018 at T10, "
+         "but ZERO of 64 cards moved by more than their own old CI half-width "
+         "-- the only row that changed materially is Erebos's own (+0.0054 "
+         "-> +0.0033 win, damage +0.61/+0.64 -> -0.18/+0.05, both -> FLIP). "
+         "So this cache differs from the one before it almost entirely in one "
+         "row, and that is the check that says the correction did not disturb "
+         "the ranking."),
         ("tivit", "6.5",
          " ALSO carries the Ephemerate fix (KNOWN_ISSUES.md 0k): its handler "
-         "was unreachable, so the card measured as an exact blank. This cache "
-         "is the only one of the four that reflects an ENGINE change as well "
-         "as the blank change."),
+         "was unreachable, so the card measured as an exact blank."
+         " REGENERATED AGAIN FROM AN EMPTY CACHE 2026-09-06 (third time that "
+         "day) for the EXTRA-TURN correction, KNOWN_ISSUES.md 0m: an extra "
+         "turn ran the opponents' whole round at the end of it, extra turns "
+         "generated during an extra turn were discarded, and Time Sieve "
+         "activated up to ten times a turn when its cost is a tap of itself. "
+         "Ten of 64 cards moved by more than their own old CI half-width and "
+         "TIME SIEVE IS THE ONLY SIGN FLIP: -0.0025 +-0.0026 (`dmg`, "
+         "negative) -> +0.0344 +-0.0034 (`both`), which makes it joint-best "
+         "in the deck with Sol Ring rather than a cut candidate. Expropriate "
+         "went from a proved blank (-0.0004 +-0.0008) to +0.0127 +-0.0022. "
+         "The five drains all came DOWN slightly, which is arithmetic and not "
+         "a finding: the deck's baseline win rate rose 0.343 -> 0.397, so any "
+         "one card is a smaller share of it."),
     )
 })
 

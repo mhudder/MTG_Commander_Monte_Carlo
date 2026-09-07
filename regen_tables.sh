@@ -47,6 +47,26 @@
 # pre-change files carry no such suffix, so this run cannot pick one up and
 # reprint numbers measured against the old blank. Keep the name below in step
 # with ablation.py's CACHE or the `rm -f` silently deletes nothing.
+#
+# 2026-09-06, THIRD REGENERATION -- and only TWO of the four decks needed it.
+# The Erebos correction (KNOWN_ISSUES.md 0l) changed engine.py and
+# decks/rendmaw_v12.py; the extra-turn correction (0m) changed edhmc/tivit.py.
+# engine.py is in EVERY deck's fingerprint, so all four fingerprints moved --
+# but karlov.py and lorehold.py have their own Game classes and import only the
+# mana and card primitives from engine.py, none of which changed.
+#
+# THAT WAS CHECKED, NOT ARGUED, because this script has been wrong about exactly
+# this once before: an earlier version of this header argued Karlov was
+# unaffected by the 2026-09-05 work, which was true of the Grist change and
+# false of the "another creature" one. The check is a git worktree at the
+# previous commit running all four baselines on the same seeds at both horizons
+# and diffing every metric. karlov and lorehold came back BIT-IDENTICAL;
+# rendmaw and tivit did not. Only the latter two were regenerated.
+#
+# So: running this script whole is always SAFE but can be wasteful. If you are
+# confident only some decks moved, prove it with the worktree diff first and
+# regenerate those -- and if you cannot be bothered to prove it, regenerate all
+# four rather than guessing.
 
 set -e
 RESUME=""

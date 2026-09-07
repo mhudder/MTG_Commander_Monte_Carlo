@@ -14,22 +14,22 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `9a33cba`.
+Fingerprints recorded at `e1de0f8`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `d0525c8521866cb6` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `d0525c8521866cb6` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `d0525c8521866cb6` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `32aa597ae9800391` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `32aa597ae9800391` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `32aa597ae9800391` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `29a389888ce192fa` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `29a389888ce192fa` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `29a389888ce192fa` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `406deb4248e68f7c` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `406deb4248e68f7c` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `406deb4248e68f7c` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `6445a4ed867431be` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `6445a4ed867431be` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `6445a4ed867431be` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `02a46868d7caa686` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `02a46868d7caa686` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `02a46868d7caa686` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `286df9e69d57e87e` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `286df9e69d57e87e` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `286df9e69d57e87e` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `70a73d27b6229751` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `70a73d27b6229751` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `70a73d27b6229751` |
 
 ## What each fingerprint covers
 
@@ -46,7 +46,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache abov
 
 ### `ablation_cache_karlov_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (7.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (7.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. STILL CURRENT after the 2026-09-06 Erebos and extra-turn work (KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved this fingerprint. The numbers did not move: this engine has its own Game class and imports only the mana and card primitives from engine.py, none of which changed. VERIFIED, not argued -- a git worktree at the previous commit ran this deck's baseline on the same seeds at both horizons and every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and tivit) and were regenerated, which is what makes the pass meaningful.
 
 ### `ablation_cache_karlov_10-20_n6000.json`
 
@@ -58,7 +58,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache abov
 
 ### `ablation_cache_lorehold_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. STILL CURRENT after the 2026-09-06 Erebos and extra-turn work (KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved this fingerprint. The numbers did not move: this engine has its own Game class and imports only the mana and card primitives from engine.py, none of which changed. VERIFIED, not argued -- a git worktree at the previous commit ran this deck's baseline on the same seeds at both horizons and every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and tivit) and were regenerated, which is what makes the pass meaningful.
 
 ### `ablation_cache_lorehold_10-20_n6000.json`
 
@@ -70,7 +70,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache abov
 
 ### `ablation_cache_rendmaw_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width.
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. REGENERATED AGAIN FROM AN EMPTY CACHE 2026-09-06 (third time that day) for the EREBOS correction, KNOWN_ISSUES.md 0l: Erebos, Bleak-Hearted was a creature on the battlefield regardless of devotion to black, it had been given Dockside Chef's activated ability instead of its own death trigger, and it was never tagged indestructible. The deck's baseline win rate moves -0.0018 at T10, but ZERO of 64 cards moved by more than their own old CI half-width -- the only row that changed materially is Erebos's own (+0.0054 -> +0.0033 win, damage +0.61/+0.64 -> -0.18/+0.05, both -> FLIP). So this cache differs from the one before it almost entirely in one row, and that is the check that says the correction did not disturb the ranking.
 
 ### `ablation_cache_rendmaw_10-20_n6000.json`
 
@@ -82,7 +82,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n2000 cache abov
 
 ### `ablation_cache_tivit_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (6.5) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. ALSO carries the Ephemerate fix (KNOWN_ISSUES.md 0k): its handler was unreachable, so the card measured as an exact blank. This cache is the only one of the four that reflects an ENGINE change as well as the blank change.
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (6.5) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. ALSO carries the Ephemerate fix (KNOWN_ISSUES.md 0k): its handler was unreachable, so the card measured as an exact blank. REGENERATED AGAIN FROM AN EMPTY CACHE 2026-09-06 (third time that day) for the EXTRA-TURN correction, KNOWN_ISSUES.md 0m: an extra turn ran the opponents' whole round at the end of it, extra turns generated during an extra turn were discarded, and Time Sieve activated up to ten times a turn when its cost is a tap of itself. Ten of 64 cards moved by more than their own old CI half-width and TIME SIEVE IS THE ONLY SIGN FLIP: -0.0025 +-0.0026 (`dmg`, negative) -> +0.0344 +-0.0034 (`both`), which makes it joint-best in the deck with Sol Ring rather than a cut candidate. Expropriate went from a proved blank (-0.0004 +-0.0008) to +0.0127 +-0.0022. The five drains all came DOWN slightly, which is arithmetic and not a finding: the deck's baseline win rate rose 0.343 -> 0.397, so any one card is a smaller share of it.
 
 ### `ablation_cache_tivit_10-20_n2000.json`
 

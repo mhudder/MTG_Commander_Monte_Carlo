@@ -506,6 +506,224 @@ unchanged. **The tivit table was regenerated**; the other three engines are
 untouched by this, and that claim is checked rather than assumed — the change is
 confined to `edhmc/tivit.py`.
 
+## 0l. FIXED — Erebos, Bleak-Hearted: three errors on one card
+
+Queued work item 8 named one of them. Verifying the card against Scryfall found
+the other two, so all three were fixed and measured separately.
+
+> Indestructible
+> As long as your devotion to black is less than five, Erebos isn't a creature.
+> Whenever another creature you control dies, you may pay 2 life. If you do,
+>   draw a card.
+> {1}{B}, Sacrifice another creature: Target creature gets -2/-1 until end of turn.
+
+1. **It was a creature from the turn it landed.** A {3}{B} 5/6 attacking in the
+   early game, and a **6/6 attacker under March of the World Ooze** — the same
+   shape as the Grist bug in §0b. Unlike Grist this is conditional on BOARD
+   STATE, so the `impending` sentinel could not express it: devotion rises and
+   falls as permanents enter and die, and the question has to be re-asked at
+   every call site. `engine.devotion(g, color)` and
+   `DEVOTION_CONDITIONAL_CREATURES` now do that inside
+   `is_battlefield_creature`, so the five places the Grist fix already covered
+   (combat, Enduring Vitality, The Great Henge, Overwhelming Stampede, and the
+   attacker filter) get it for free.
+   **Erebos is legitimately a creature for 0.05 turns a game, against the 0.38
+   it was getting** — devotion to black reaches five in this list rarely, so
+   seven-eighths of its creature-turns were illegitimate.
+2. **THE ENGINE GAVE IT DOCKSIDE CHEF'S ABILITY.** The branch read
+   `Erebos / Dockside Chef / Grim Backwoods style sac-for-card, once/turn`.
+   That is Dockside Chef's card, verbatim ({1}{B}, Sacrifice an artifact or
+   creature: Draw a card) and it is not on Erebos at all. Erebos's draw is a
+   TRIGGER off deaths that were going to happen anyway — no sacrifice, no mana,
+   no once-per-turn — which in a deck that loses a dozen tokens a game is a
+   different card. Its own activated ability is "target creature gets -2/-1",
+   model-blind against a blocker count. Gated `erebos_death_draw`.
+3. **It was never tagged indestructible**, so it ate removal it cannot eat.
+   See §0n: fixing this by hand was itself a mistake.
+
+Measured as cumulative CFG flips, N=15,000 paired games, `run_erebos.py`:
+
+| fix | win T10 | win T20 |
+|---|---|---|
+| `devotion_creature_types` | **−0.0025 [−0.0033, −0.0016]** | **−0.0047 [−0.0064, −0.0030]** |
+| `erebos_death_draw` | +0.0006 ±0.0007 | +0.0023 ±0.0021 |
+| `indestructible` | +0.0001 ±0.0002 | +0.0007 ±0.0012 |
+| **ALL THREE** | **−0.0018 ±0.0009** | −0.0018 ±0.0024 |
+
+**Two of the three point in opposite directions**, which is why the combined
+number is the one to read. Taking the phantom body away costs the deck half a
+point of win rate at twenty turns; the death trigger (0.28 draws a game for 0.56
+life) and the indestructibility give about half of it back. All three default
+on. `validate.py` is `+0.00` on all nine with `corr(A,B)` 0.9069 → 0.9053.
+
+**THIS IS THE FOURTH TIME A CORRECTION HAS MADE A DECK LOOK WORSE** — after the
+2026-09-03 Karlov audit (−0.0163), the "another creature" clause (−0.0130) and
+Grist. Three of the four were a trigger or a body the deck was never entitled to.
+
+**The card is now a cut candidate, which it was not before.** Its own ablation
+row went from +0.61/+0.64 damage and +0.0054 ±0.0025 win (`both`) to
+−0.18/+0.05 and +0.0033 ±0.0026, signal `FLIP` — its damage contribution is
+now NEGATIVE at ten turns, and its win-rate contribution is barely above the
+deck's ±0.0021 noise floor. It was scoring on a body it is not allowed to have.
+
+**`ablation_rendmaw.txt` was regenerated.** The useful part of that: the deck's
+baseline moves, but **ZERO of 64 cards moved by more than their own old CI
+half-width.** Erebos's own row is the only material change. `erebos_life_paid`
+is a cost this model underprices (§0i), so the death-draw arm is a CEILING;
+`erebos_life_floor` (10) is the only thing standing in for declining to pay and
+it is a judgement call.
+
+## 0m. FIXED — AN EXTRA TURN GAVE THE OPPONENTS AN EXTRA ROUND
+
+Found 2026-09-06 from a question about Time Sieve, which the table scored at
+**−0.0025 ±0.0026** — slightly negative, and inside its bar. The question was
+the right one, and it is the "when a result is surprising, the engine is the
+first suspect" rule paying off for the fourth time.
+
+    Time Sieve  {U}{B}  "{T}, Sacrifice five artifacts: Take an extra turn
+                        after this one."
+    Tivit       "Whenever Tivit enters or DEALS COMBAT DAMAGE TO A PLAYER,
+                council's dilemma ... While voting, you may vote an additional
+                time."
+
+In a four-player game you cast two votes and the pod casts three, and **both
+halves of the dilemma make an artifact**, so an adversarial pod can change the
+mix and not the count. One Tivit attack is exactly five artifacts — exactly Time
+Sieve's cost, with nothing spare — and the Sieve untaps on the turn it just
+bought. `attack → 5 tokens → sacrifice → extra turn → untap → attack` is
+unbounded. The pair should be one of the best things this deck does.
+
+Three bugs, in increasing order of how much they mattered:
+
+1. **`sieve_taps`** — the cost is a tap of Time Sieve itself, so the ability is
+   ONCE PER TURN. The engine ran it up to `sieve_cap` (10) times in one turn and
+   then declared the game won on reaching the cap. Ten activations a turn is
+   nine more than the card allows, and the cap needed fifty tokens in one window
+   so it almost never fired. (Artifacts have no summoning sickness, so the {T}
+   is live the turn it lands; only `tapped` gates it.)
+2. **`extra_turns_chain`** — `simulate` zeroed `g.extra_turns` before taking
+   them and never re-read it, so an extra turn generated DURING an extra turn
+   was silently discarded. One extra turn per real turn is exactly what Time
+   Sieve grants, so **the loop was truncated to a single step, every time.**
+3. **`extra_turns_skip_opponents`** — `take_turn` ends with the three
+   opponents' whole round: they develop a board, cast removal, chip you for
+   incidental damage and check their kill clocks. It ran at the end of EXTRA
+   turns too, so every extra turn you took handed the pod a free extra round.
+   That is the opposite of what an extra turn does. **`lorehold.take_turn`
+   already had this right** — its extra turns run untap/miracle/main/combat with
+   no opponent block at all — so the two engines modelled one concept in
+   opposite directions, and only one of them was wrong.
+
+Cumulative CFG flips, n=6,000, T20, `diag_time_sieve.py` part C:
+
+| fix | win rate | note |
+|---|---|---|
+| `sieve_taps` | **+0.0028 ±0.0026** | a RESTRICTION that helped, which is the tell |
+| `extra_turns_chain` | +0.0000 (chain length only) | worthless until #3 |
+| `extra_turns_skip_opponents` | **+0.0510 ±0.0059** | the whole effect |
+| **all three** | **+0.0538 ±0.0062** | deck win rate 0.343 → 0.397 |
+
+Read the ordering: making the Sieve **weaker** per turn *helped*, because each
+extra turn was a net liability; and chaining more of them was worth nothing
+until the pod round was removed, after which it became valuable. That is the
+mechanism, stated three ways.
+
+**On the minimum board the claim needs** — Tivit + Time Sieve + six lands,
+opponents given unkillable life so the turn structure is visible over twenty
+turns (part A):
+
+| engine | turns | extra | pod rounds | sieve activations | longest chain | ended |
+|---|---|---|---|---|---|---|
+| before | 16 | 10 | **16** | 11 | 3 | **loss** |
+| after | 16 | 14 | **2** | 14 | **14** | **win** |
+
+**In real games** (part B, n=6,000, T20), Time Sieve is cast in 20% of games and
+activates in 12%. Conditional on activating at least once, win rate was 0.389
+against 0.337 when it did not — i.e. the two-card infinite-turn combo was worth
+five points. It is now **0.723 against 0.351.**
+
+Consequences:
+
+- **`ablation_tivit.txt` and `tivit_groups.txt` were regenerated.** Ten of 64
+  cards moved by more than their own old half-width and **Time Sieve is the only
+  sign flip: −0.0025 ±0.0026 (`dmg`) → +0.0344 ±0.0034 (`both`)**, which makes
+  it joint-best in the deck with Sol Ring (+0.0379 ±0.0044, CIs overlapping)
+  rather than the cut candidate §0j had named.
+- **Expropriate went from a proved blank to a real card**: −0.0004 ±0.0008
+  (`--`) → +0.0127 ±0.0022 (`both`). It was paying a pod round per turn it
+  bought. Plea for Power is +0.0097. Every extra-turn source was affected, not
+  just the Sieve.
+- **THE STANDING "ALTERNATE WINS ARE WORTH NOTHING" FINDING IS NOW FULLY
+  RETRACTED.** Cutting Revel in Riches + Mechanized Production + Time Sieve
+  costs 0.0123 → **0.0520 [0.0420, 0.0617]**, a 4.2x move and the only group
+  that shifted materially. It goes from last of seven groups to fourth, ahead
+  of both the extra-vote pair (0.0213) and the artifact drains (0.0257). The
+  drains are still the biggest group (0.1233) so **the deck still wins by
+  draining** — but "three slots buying an outcome the deck reaches more reliably
+  by other means" is dead, and so is §0j's "cut Time Sieve, not the package".
+- The five drains all came DOWN 13-21%. That is arithmetic, not a finding: the
+  baseline win rate rose from 0.343 to 0.397, so any one card is a smaller share.
+
+Still deliberately not modelled, and said out loud: **Time Sieve eats only TOKEN
+artifacts**, never the real ones `artifact_count()` can see (Sol Ring, the
+signets, the artifact lands). Those are legal fuel, and a pilot would not feed
+them to a loop that has to run again next turn — but it is the conservative
+direction. And extra turns still count against the horizon, which is now the
+ONLY bound on the loop; that is a choice, not a bug, and it means a real
+infinite-turn lock is truncated at `turns`.
+
+## 0n. Hand-tagging one card is the bug CLAUDE.md warns about, and I did it
+
+Fixing Erebos's indestructibility meant setting `indestructible=True` on one
+card by hand. CLAUDE.md: *"Do not hand-tag a keyword from memory: ablation
+compares each card against a blank in the same list, so a partial tag list
+biases the whole table toward whatever got tagged."* Checked against Scryfall,
+the four lists hold **four** statically indestructible cards, and two of them
+are ones nobody would think of:
+
+| card | deck | note |
+|---|---|---|
+| Erebos, Bleak-Hearted | rendmaw | the one that prompted this |
+| Darkmoss Bridge | rendmaw | a LAND |
+| Darksteel Citadel | rendmaw | a LAND |
+| Heliod, Sun-Crowned | karlov candidate | the one pre-existing hand-tag, and it was right |
+
+So `tag_flying.py` now generates an `INDESTRUCTIBLE` set alongside `FLYING`,
+reading the same `keywords` array, over **all card types rather than creatures
+only** — and every `C()` and `L()` in the four deck modules derives the flag
+from it. Karlov's `C()` lost its hand-passed `indestructible` argument.
+`audit_cards.py` checks the field, which it did not before, so this class of
+gap now fails the audit: **0 ERR across 377 card slots.**
+
+Cards that GRANT indestructible (Boros Charm, Heroic Intervention, Dawn's Truce,
+Plaza of Heroes) or have it CONDITIONALLY are deliberately absent — a static tag
+would be a lie. **Voice of the Blessed has indestructible with ten or more
++1/+1 counters and that is NOT modelled**; ten is reachable in the Karlov list.
+Its flying at four counters already lives in `opponents.flying_of()`, so that is
+where the rest of it belongs.
+
+The two lands are **provably inert**: `spot_removal` and `ae_removal` both
+exclude `is_land`, and `board_wipe` only touches creatures. Verified rather than
+argued — stripping the tag from the two lands reproduces the Rendmaw baseline
+BIT-IDENTICALLY over 2,000 paired games. Tagged anyway, because
+`Card.indestructible` was "inert today" too, right up until Erebos.
+
+## 0o. `candidates.py` measured a SECOND COPY of a card already in the deck
+
+Found while re-measuring Goldspan Dragon. `candidates.py` answers "what does
+this card add over a replacement-level slot" by putting it in a victim slot of
+`build_pending(deck)` — and `build_pending` applies the STAGED changes. Caldera
+Pyremaw was a candidate on 2026-09-04 and was staged into the Lorehold list on
+2026-09-05, and nothing noticed: running it now builds a **101-card,
+singleton-illegal deck with two Caldera Pyremaws** and prints the marginal value
+of the duplicate under the heading "value over a blank".
+
+`add_value()` now refuses outright, and `DECKS["lorehold"]` no longer lists it.
+Same shape as the `SCRIPTED_*` sets and `tag_flying.py`'s candidate gap: a
+hand-maintained list the deck moved past. **One number was produced against this
+bug during the 2026-09-06 session and discarded**; no committed number depends
+on it, because `CANDIDATES_2026-09-04.md` predates the staging.
+
 ---
 
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values

@@ -34,6 +34,26 @@ python validate.py                  # A/A control + CRN measurement
 python ablation.py karlov 6000 20   # rank every card; caches and resumes
 python compare_decks.py             # cross-deck comparison at matched settings
 python tutor_policy.py analyse      # learned tutor target policy
+python audit_cards.py               # every card against Scryfall; expect 0 ERR
+python tag_flying.py --write        # regenerate FLYING / INDESTRUCTIBLE tags
+```
+
+Tests that pin a claimed mechanism, because a docstring is not evidence:
+
+```bash
+python test_tivit_combo.py          # the Deadeye loop's mana economy
+python test_time_sieve.py           # the Tivit + Time Sieve turn loop
+```
+
+Per-question diagnostics, each with its findings written up in `KNOWN_ISSUES.md`:
+
+```bash
+python diag_time_sieve.py           # §0m  extra turns and the Sieve loop
+python diag_threat_blank.py         # §0j  what the ablation blank is measured against
+python diag_fivedrop.py             # §0e  why Caldera beat Galvanoth
+python run_erebos.py                # §0l  the three Erebos errors, separately
+python run_goldspan.py              # 0c   Goldspan re-measured at N=15,000
+python run_lowstakes.py             # §0g/§0h  the "low stakes" fixes that were not
 ```
 
 ---
@@ -55,20 +75,27 @@ and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 ## Current state — READ THIS BEFORE TRUSTING ANY DOC
 
-Verified 2026-09-03 after the oracle-text audit.
+Verified 2026-09-03 after the oracle-text audit; deck table updated 2026-09-06.
 
 | deck | module | spreadsheet | status |
 |---|---|---|---|
 | Rendmaw, Creaking Nest | `rendmaw_v12.py` | v12 `.xlsx` | agrees |
 | Lorehold, the Historian | `lorehold_v16.py` | v16 `.xlsx` | agrees |
 | Karlov of the Ghost Council | `karlov_v2.py` | v2 `.xlsx` | agrees |
+| Tivit, Seller of Secrets | `tivit_v1.py` | v1 `.xlsx` | agrees |
 
-**UPDATED 2026-09-04.** Karlov's three changes are COMMITTED on all three legs
-— hence `karlov_v2.py` and the v2 `.xlsx`, reconciled card for card. TWO
-changes remain staged and are held back deliberately for review: Rendmaw's
-Idol of Oblivion -> Cauldron of Essence and Lorehold's Scroll Rack ->
-Sunbird's Invocation. For those two the ledger is the only leg that carries
-them. `python -m edhmc.pending` is the check; `DECK_CHANGES.md` is the summary.
+**UPDATED 2026-09-06.** Karlov's three changes are COMMITTED on all three legs
+— hence `karlov_v2.py` and the v2 `.xlsx`, reconciled card for card. **THREE
+changes remain staged** and are held back deliberately for review, with the
+ledger as their only leg: Rendmaw's Idol of Oblivion -> Cauldron of Essence,
+Lorehold's Scroll Rack -> Sunbird's Invocation, and Lorehold's Penance ->
+Caldera Pyremaw. `python -m edhmc.pending` is the check and is the only
+trustworthy statement of what is staged; `DECK_CHANGES.md` is the summary.
+
+(This paragraph said TWO until 2026-09-06 and named only the first pair. The
+Caldera staging happened on 2026-09-05 and is written up 500 lines further down
+this same file, which is exactly how a doc goes stale: the summary at the top and
+the session note at the bottom were edited by different sessions.)
 
 Note for the Karlov v2 spreadsheet: the Dashboard's 34 formulas were hard-bounded
 to `Decklist!...87`, and the list is now 88 rows. openpyxl does not rewrite
@@ -76,7 +103,10 @@ formula ranges on insert, so every metric would have silently dropped the last
 card. All 31 affected formulas were rebounded to row 150 — generous on purpose,
 so the next deck change cannot break them either.
 
-`validate.py` is clean: `+0.00` on all six, `corr(A,B) = 0.9045` (was 0.8927 before evasion, 0.8929 on the retired pod v1).
+`validate.py` is clean: `+0.00` on **all nine across three engines**,
+`corr(A,B) = 0.9053` as of 2026-09-06 (0.9069 before the Erebos work, 0.9045
+before the low-stakes fixes, 0.8927 before evasion, 0.8929 on the retired pod
+v1). CRN is worth ~10x the games.
 
 **The correlation used to be 0.9109.** It fell because Rendmaw's commander now
 hands every opponent a goaded Bird, which changes when games end. Nothing is
@@ -111,6 +141,16 @@ Consequences worth carrying forward:
   produced before that — including the N=15,000 set from earlier the same day —
   is void. The new caches carry a `_medblank` suffix; the old files keep their
   unsuffixed names and are kept as provenance only. **Do not resume onto one.**
+  **REGENERATED A THIRD TIME on 2026-09-06, but only TWO of the four**, for the
+  Erebos correction (§0l, rendmaw) and the extra-turn correction (§0m, tivit).
+  `engine.py` is in every deck's fingerprint, so **all four fingerprints moved
+  and only two decks' numbers did** — and that was CHECKED rather than argued: a
+  git worktree at the previous commit ran all four baselines on the same seeds
+  at both horizons, and karlov and lorehold came back **bit-identical** on every
+  metric while rendmaw and tivit did not. Their caches and tables stand. This is
+  the third time "this engine is independent" has had to be settled per change
+  rather than once, and the first time the answer was yes for half the decks and
+  no for the other half in the same commit.
 - **Correcting Karlov made the deck look worse, not better** (win rate
   −0.0163 ±0.0139). The old numbers were inflated by phantom lifegain triggers
   and by Well of Lost Dreams / Dawn of Hope drawing cards for free.
@@ -722,11 +762,36 @@ bigger sample — kept below, because how it was settled is the useful part.
    looked like a 2.5x range of quality were always the same card.
    `run_tivit_groups.py` still measures the floor deliberately rather than
    leaving it as a coincidence.
+   **Reproduced a third time on the 2026-09-06 extra-turn table**: the four
+   signets score +0.0168, +0.0151, +0.0167 and +0.0161 — a spread of 0.0017
+   against a ±0.0029 bar. The whole table shifted underneath them and the four
+   stayed within noise of each other, which is the property you want from a
+   noise-floor probe.
 
 ### The group ablations, which are the ones to act on
 
 `tivit_groups.txt`, 3,000 paired games. **Sign convention: the figure is what
 CUTTING the group costs you.**
+
+**CURRENT TABLE, 2026-09-06 after the extra-turn fix (§0m).** The `was` column
+is the figure before it, so the one group that actually moved is visible:
+
+| group | cards | cut costs, win T20 | was | vs sum of the singles |
+|---|---|---|---|---|
+| **every drain** | 5 | **0.1233** [0.1103, 0.1370] | 0.1427 | — |
+| token drains | 3 | 0.0850 [0.0740, 0.0963] | 0.0973 | roughly additive |
+| blink package | 6 | 0.0700 [0.0580, 0.0823] | 0.0730 | most were `--` alone |
+| **the four signets** | 4 | **0.0583** [0.0470, 0.0700] | 0.0500 | 0.0647, roughly additive — this group is the NOISE-FLOOR probe, not a deckbuilding question |
+| **alternate wins** | 3 | **0.0520** [0.0420, 0.0617] | 0.0123 | **4.2x its old figure** |
+| artifact drains | 2 | 0.0257 [0.0180, 0.0340] | 0.0327 | — |
+| **extra votes** | 2 | **0.0213** [0.0133, 0.0293] | 0.0230 | 0.0119 — **~1.8× the sum** |
+
+Only `alternate wins` moved by more than its own bar. The five drains all came
+down 13-21%, which is arithmetic and not a finding: the deck's baseline win rate
+rose 0.343 → 0.397, so any one card is a smaller share of it.
+
+The table below this point is the pre-2026-09-06 version, kept because the
+reasoning is what matters and one of its three findings is now retracted:
 
 | group | cards | cut costs, win T20 | vs sum of the singles |
 |---|---|---|---|
@@ -753,7 +818,19 @@ Three findings worth carrying forward:
   ordering survives (the drains are still ~12x bigger) but "three slots buying
   nothing" was an artifact of the old blank. Of the three, Mechanized Production
   is +0.0119 alone and Revel in Riches +0.0025; only Time Sieve is negative
-  (−0.0025, no longer significant). **Cut Time Sieve, not the package.**
+  (−0.0025, no longer significant). ~~Cut Time Sieve, not the package.~~
+  > **FULLY RETRACTED, LATER THE SAME DAY (extra-turn fix, §0m). DO NOT CUT TIME
+  > SIEVE — it is joint-best in the deck.** The package costs **0.0520 [0.0420,
+  > 0.0617]** to cut, 4.2x the blank-fixed figure and the only one of the seven
+  > groups that moved materially; it goes from last to fourth, ahead of the
+  > extra-vote pair. Time Sieve alone is **+0.0344 ±0.0034**, not −0.0025: an
+  > extra turn was running the opponents' whole round at the end of it, and
+  > Tivit + Time Sieve is a two-card infinite-turn combo the engine was
+  > truncating to one step and then charging a pod round for. **Both retractions
+  > pointed the same way and neither went far enough**, which is the argument for
+  > taking "cutting this costs nothing" as a question about the engine first.
+  > The drains are still the biggest group (0.1233), so only the PRIORITY
+  > ordering of the original claim survives.
 - **THE EXTRA-VOTE PAIR IS THE PREDICTED REDUNDANCY TRAP, CONFIRMED.** Ballot
   Broker and Brago's Representative are +0.0075 and +0.0040 alone — both inside
   the noise floor, both look cuttable — and **0.0253 together, 2.2× the sum**.
@@ -896,6 +973,104 @@ sample sizes for one deck each carry their own honest history — keying by deck
 printed one note under two headings, which is the same "a label nothing checks
 is just a claim" failure the `SCRIPTED_*` sets have produced twice.
 
+### 2026-09-06: THE TIVIT + TIME SIEVE LOOP WAS NOT BEING PLAYED
+
+Full write-up in `KNOWN_ISSUES.md` §0m; `diag_time_sieve.py` is the evidence.
+The short version, because it is the largest single correction in the project:
+
+**Tivit + Time Sieve is a two-card infinite-turn combo in a four-player game.**
+Tivit's attack trigger is a council's dilemma; you get two votes and the pod
+three; **both halves of the dilemma make an artifact**, so an adversarial pod can
+change the mix and not the count. Five artifacts is exactly Time Sieve's cost,
+and the Sieve untaps on the turn it just bought. The engine scored the card at
+**−0.0025 ±0.0026** — slightly negative — because of three bugs:
+
+1. Time Sieve activated up to ten times a turn; its cost is `{T}`, so once.
+2. Extra turns generated during an extra turn were discarded, which truncated
+   the chain to one step every time.
+3. **Every extra turn ran the opponents' whole round at the end of it**, so each
+   extra turn handed the pod a free extra round. `lorehold.take_turn` already
+   had this right, so the two engines modelled one concept in opposite ways.
+
+Deck win rate 0.343 → **0.397** (+0.0538 ±0.0062), almost all of it from #3.
+**Time Sieve's own row: −0.0025 → +0.0344 ±0.0034**, joint-best in the deck with
+Sol Ring. Expropriate went from a proved blank to +0.0127. On a forced board of
+just Tivit + Time Sieve + six lands, the old engine took 10 extra turns, gave
+the pod 16 rounds and **lost**; the new one gives the pod 2 rounds, chains 14
+extra turns and **wins**.
+
+`ablation_tivit.txt` and `tivit_groups.txt` are regenerated. **The standing
+"the deck wins by draining, not by assembling an alternate win" finding is now
+fully retracted**: cutting Revel + Mechanized + Sieve costs 0.0123 → **0.0520**.
+The drains are still the biggest group at 0.1233, so the PRIORITY ordering
+survives; the claim that the alternate-win slots buy nothing does not. **Do not
+cut Time Sieve.**
+
+### 2026-09-06: Erebos, Bleak-Hearted — three errors, and the fourth correction that cost win rate
+
+`KNOWN_ISSUES.md` §0l, closing queued work item 8. It was a creature regardless
+of devotion to black (0.38 creature-turns a game against the 0.05 it is entitled
+to), **it had been given Dockside Chef's activated ability instead of its own
+death trigger**, and it was never tagged indestructible. Measured at N=15,000:
+the body is −0.0047 win at T20, the trigger +0.0023, the indestructibility
++0.0007, **all three together −0.0018 ±0.0024**. All default on.
+
+`ablation_rendmaw.txt` is regenerated, and the check that matters is that **zero
+of 64 cards moved by more than their own old CI half-width** — the baseline
+shifts, the ranking does not. **Erebos itself went from +0.0054 ±0.0025 (`both`)
+to +0.0033 ±0.0026 with NEGATIVE damage at ten turns (`FLIP`), which makes it a
+cut candidate it was not before.** It was scoring on a body it is not allowed to
+have.
+
+Two things generalise beyond the card:
+
+- **`engine.devotion(g, color)` and `DEVOTION_CONDITIONAL_CREATURES`** answer
+  creature-ness conditioned on BOARD STATE, which the `impending` sentinel could
+  not: devotion moves as permanents enter and die, so the question is re-asked at
+  every call site instead of stamped at ETB. `karlov.is_creature_now` still does
+  the white twin for Heliod and is still deliberately a separate function.
+- **`indestructible` IS NOW A GENERATED TAG.** Setting it on one card by hand is
+  the partial-tag bias this file warns about, and doing so turned up two more
+  indestructible cards in the Rendmaw list — both LANDS (Darkmoss Bridge,
+  Darksteel Citadel). `tag_flying.py` emits `INDESTRUCTIBLE` over all card types,
+  every `C()` and `L()` derives from it, and `audit_cards.py` now checks the
+  field. **0 ERR across 377 card slots.** §0n.
+
+### 2026-09-06: Goldspan Dragon re-measured — closes queued work item 0c
+
+It was passed on 2026-09-04 at +0.0025 ±0.0045, and that number was wrong twice
+over: it was measured as a GROUND creature (the candidate flying gap, §0c) and
+against the dead blank (§0j). Re-measured at **N=15,000** — the old ±0.0045 could
+never have resolved an effect of 0.0025 — with `run_goldspan.py`:
+
+| horizon | win rate | damage | P(deploy) |
+|---|---|---|---|
+| T10 | **+0.0018 ±0.0010** | +0.94 ±0.16 | 0.088 |
+| T14 | **+0.0051 ±0.0022** | +1.31 ±0.31 | 0.137 |
+| T20 | **+0.0057 ±0.0027** | +1.30 ±0.39 | 0.154 |
+
+**Significant at all three horizons, where it used to be inside its bar** — the
+point estimate at T14 doubled. It is a real card, not the pass it was recorded as.
+
+Against the current Lorehold table its +0.0057 exceeds the two worst
+model-evaluated cards in the list (Blasphemous Act −0.0053, Lightning Greaves
+−0.0045), which on paper is an ~0.011 swap. **That is not a staging.** Three
+swaps against a common baseline have overlapping CIs and cannot be ranked
+against each other — the rule that decided the Penance slot — so this needs a
+HEAD-TO-HEAD before anything moves, and Blasphemous Act is a sweeper whose value
+is entangled with `should_cast_own_wipe`.
+
+**A confound was checked and ruled out.** Goldspan and Caldera Pyremaw are the
+same cost, the same threat and the same slot, differing by one hand-set knob:
+priority 8 against 8.5. Re-run at a matched 8.5, Goldspan is +0.0020 / +0.0050 /
++0.0055 — unchanged — and P(deploy) moves 0.137 → 0.139. The knob is not the
+story.
+
+**And one number was thrown away.** Caldera Pyremaw was run as a control and the
+row was meaningless: it is ALREADY in the staged Lorehold list, so the harness
+built a 101-card singleton-illegal deck with two copies and measured the
+duplicate. `candidates.py` now refuses. §0o.
+
 ---
 
 ## How to work here
@@ -999,8 +1174,10 @@ Re-read against the code 2026-09-05; verdicts inline.
    the v16 list, never against each other. Both add to the same curve and
    Sunbird's already costs +4.28 stranded MV, so they may not be additive. Do
    this before either is written to the `.xlsx`.
-0c. **Re-measure Goldspan Dragon.** It was passed at +0.0025 ±0.0045, measured
-   as a ground creature by the same bug that understated Caldera Pyremaw.
+0c. ~~Re-measure Goldspan Dragon.~~ **DONE 2026-09-06** — significant at all
+   three horizons (+0.0018 / +0.0051 / +0.0057) where it used to be inside its
+   bar. See the Goldspan section above. What is left is a HEAD-TO-HEAD against
+   whichever card it would replace; the standalone score is not a staging.
 2. Artist's Talent's three Class levels — currently Level 2 is granted free
    and instantly, Levels 1 and 3 do not exist.
 3. ~~Lorehold: cut Penance, add Galvanoth.~~ **STAGED 2026-09-05** with
@@ -1015,17 +1192,26 @@ Re-read against the code 2026-09-05; verdicts inline.
 7. `Card.indestructible` is priced by a single flat `destroy_share`. A card
    whose evaluation swings on that knob should be reported with it said out
    loud. Still true 2026-09-05.
-8. **EREBOS, BLEAK-HEARTED is always a creature and should not be.** "As long
-   as your devotion to black is less than five, Erebos isn't a creature." It is
-   in the Rendmaw deck as a permanent 5/6, so the early turns get a body that
-   should not exist yet — and under March of the World Ooze a 6/6 attacker.
-   This is the same gap `is_battlefield_creature` closed for Grist, but
-   conditional on board state rather than static, so the `impending` sentinel
-   cannot express it.
-   Note the machinery already exists on the other engine: `karlov.is_creature_now`
-   does exactly this for Heliod, Sun-Crowned via `devotion_white()`. Erebos
-   needs the black twin of it in `engine.py`. (Those two functions have
-   deliberately different names — one takes a Permanent, one a Card.)
+8. ~~EREBOS, BLEAK-HEARTED is always a creature and should not be.~~
+   **DONE 2026-09-06** — and two further errors on the same card turned up in
+   the process: it had been given Dockside Chef's activated ability instead of
+   its own death trigger, and it was never tagged indestructible.
+   `KNOWN_ISSUES.md` §0l, and the Erebos section above. The devotion machinery
+   is `engine.devotion()` + `DEVOTION_CONDITIONAL_CREATURES`.
+   **FOLLOW-UP WORTH DOING: Erebos is now a cut candidate**, which it was not
+   before — +0.0033 ±0.0026 win against a ±0.0021 noise floor, and negative
+   damage at ten turns. Its death trigger is the half that works; the body
+   almost never legally exists (0.05 creature-turns a game).
+8b. **Voice of the Blessed has indestructible with ten or more +1/+1 counters,
+   and it is not modelled.** Ten is reachable in the Karlov list. Its flying at
+   FOUR counters is already in `opponents.flying_of()`, which is where the rest
+   belongs. Deliberately excluded from the generated `INDESTRUCTIBLE` set,
+   because a static tag there would be a lie. §0n.
+8c. **Time Sieve eats only TOKEN artifacts**, never Sol Ring, the signets or the
+   artifact lands, all of which are legal fuel. Conservative, and defensible —
+   a pilot will not feed a loop its own mana — but it is a modelling choice.
+   Extra turns also still count against the horizon, which is now the ONLY bound
+   on the loop, so a real infinite-turn lock is truncated at `turns`. §0m.
 9. Radiant Scrollwielder's zone is FIXED, but the three mislabelled Lorehold
    cards are not: Apex of Power, Hit the Mother Lode, Borrowed Knowledge.
    `KNOWN_ISSUES.md` §0f.

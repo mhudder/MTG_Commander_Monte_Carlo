@@ -33,3 +33,14 @@ FLYING_TOKENS = {
     'Faerie',
     'Pegasus',
 }
+
+# UNCONDITIONAL indestructible, every card type -- two of the three are LANDS,
+# so L() has to consult this as well as C(). Granted (Heroic Intervention,
+# Boros Charm) and conditional (Voice of the Blessed at ten counters)
+# indestructibility is deliberately absent: a static tag would be a lie.
+INDESTRUCTIBLE = {
+    'Darkmoss Bridge',
+    'Darksteel Citadel',
+    'Erebos, Bleak-Hearted',
+    'Heliod, Sun-Crowned',
+}

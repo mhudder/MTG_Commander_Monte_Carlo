@@ -206,13 +206,35 @@ class Board(list):
 NEVER = 10 ** 9   # an `impending` that never arrives: see is_battlefield_creature
 
 
+def devotion(g, color: str) -> int:
+    """Devotion to `color`: that colour's pips among the mana costs of the
+    permanents you control. Tokens have no mana cost and count for nothing.
+
+    `karlov.devotion_white` is the same rule written for the Karlov engine,
+    which passes Cards where this one has Permanents. The two are deliberately
+    not merged for the reason given in `karlov.is_creature_now`'s docstring.
+    """
+    return sum(p.card.cost.get(color, 0) for p in g.board)
+
+
+# Permanents whose creature-ness is CONDITIONAL ON BOARD STATE, with the clause
+# that says so. Distinct from STACK_ONLY_CREATURES below, which is static and
+# can therefore be stamped once at ETB; this has to be re-asked every time.
+DEVOTION_CONDITIONAL_CREATURES = {
+    "Erebos, Bleak-Hearted": (
+        "B", 5,
+        "As long as your devotion to black is less than five, "
+        "Erebos isn't a creature."),
+}
+
+
 def is_battlefield_creature(g, p: Permanent) -> bool:
     """Creature-ness ON THE BATTLEFIELD, which is not the type line.
 
     `Card.types` is the type line as PLAYED, because that is what Rendmaw's
-    "whenever you play a card with two or more card types" reads. Two cards in
-    these lists are creatures on the stack and not on the battlefield, and the
-    single `types` field cannot say both:
+    "whenever you play a card with two or more card types" reads. Three cards in
+    these lists are creatures on the stack or only sometimes, and the single
+    `types` field cannot say so:
 
       Grist, the Hunger Tide  "As long as Grist ISN'T ON THE BATTLEFIELD, it's
                               a 1/1 Insect creature in addition to its other
@@ -226,12 +248,34 @@ def is_battlefield_creature(g, p: Permanent) -> bool:
                               "isn't a creature until the last time counter is
                               removed" -- already modelled, and this is the
                               same question asked once for both.
+      Erebos, Bleak-Hearted   "As long as your devotion to black is less than
+                              five, Erebos isn't a creature." A {3}{B} 5/6 that
+                              spent the early game as an ATTACKER it is not
+                              allowed to be -- and a 6/6 one under March of the
+                              World Ooze. Unlike the two above this is
+                              CONDITIONAL ON BOARD STATE, so the `impending`
+                              stamp cannot express it: devotion rises and falls
+                              as permanents enter and die, and the question has
+                              to be re-asked at every call site rather than
+                              answered once at ETB.
 
     The NEVER stamp is applied at ETB and gated on
     cfg["battlefield_creature_types"], so every table measured before
-    2026-09-05 reproduces with the flag off. See KNOWN_ISSUES.
+    2026-09-05 reproduces with the flag off. The devotion clause is gated
+    separately on cfg["devotion_creature_types"] -- two different errors that
+    happen to be the same question, and a table measured before one of them
+    must be able to turn just that one off. See KNOWN_ISSUES.
     """
-    return p.card.is_creature and not (p.impending and g.turn < p.impending)
+    if not p.card.is_creature:
+        return False
+    if p.impending and g.turn < p.impending:
+        return False
+    cond = DEVOTION_CONDITIONAL_CREATURES.get(p.card.name)
+    if cond is not None and g.cfg.get("devotion_creature_types", True):
+        color, need, _clause = cond
+        if devotion(g, color) < need:
+            return False
+    return True
 
 
 # Creatures on the stack that are NOT creatures on the battlefield, with the
@@ -335,6 +379,9 @@ class Game:
             "loss_route": 0,
             "wurmcoil_deaths": 0,
             "lifelinked": 0.0,
+            "erebos_draws": 0,        # "another creature you control dies"
+            "erebos_life_paid": 0,
+            "erebos_creature_turns": 0,   # turns Erebos was devotion-live
         }
         self.damage_by_turn: list[float] = []
         self.made_token_this_turn = False
@@ -451,6 +498,38 @@ class Game:
                 and not perm.is_token:
             self.make_tokens(2, 3, 3, "Wurm")
             self.m["wurmcoil_deaths"] += 1
+
+        # Erebos, Bleak-Hearted: "Whenever ANOTHER creature you control dies,
+        # you may pay 2 life. If you do, draw a card."
+        #
+        # No sacrifice and no mana -- it reads deaths that were going to happen
+        # anyway, which in a deck that loses a dozen tokens a game is a real
+        # draw engine. The engine used to give Erebos Dockside Chef's ability
+        # instead (sacrifice a body to draw, once a turn), which is both a
+        # different cost and a far worse card. See `activations`.
+        #
+        # "ANOTHER" is the same clause that cost Karlov three cards in §0h, so
+        # a death Erebos was part of does not pay. It is indestructible and, at
+        # devotion < 5, not a creature at all, so in practice it is never the
+        # one that died -- the check is here so that stays true if either
+        # changes.
+        #
+        # THE 2 LIFE IS A REAL COST AND THIS MODEL UNDERPRICES IT (§0i): life
+        # loss is nearly free here, so declining is modelled only as a floor.
+        # `erebos_life_floor` is a judgement call, said out loud. The number
+        # this card scores is a CEILING for that reason.
+        if self.cfg.get("erebos_death_draw", True) \
+                and self.has("Erebos, Bleak-Hearted") \
+                and not (perm is not None
+                         and perm.card.name == "Erebos, Bleak-Hearted"):
+            floor = self.cfg.get("erebos_life_floor", 10)
+            for _ in range(int(n)):
+                if self.your_life - 2 < floor:
+                    break
+                self.your_life -= 2
+                self.draw(1)
+                self.m["erebos_draws"] += 1
+                self.m["erebos_life_paid"] += 2
 
     # -- P/T resolution ------------------------------------------------------
 
@@ -942,8 +1021,23 @@ def activations(g: Game):
         g.draw(1 + sum(1 for _ in range(3)
                        if g.rng.random() < g.cfg.get("opp_death_rate", 0.55)))
 
-    # Erebos / Dockside Chef / Grim Backwoods style sac-for-card, once/turn
-    if (g.has("Erebos, Bleak-Hearted") or g.has("Dockside Chef")) and units:
+    # Dockside Chef: "{1}{B}, Sacrifice an artifact or creature: Draw a card."
+    # Taken once a turn off the cheapest token, with `units` standing in for the
+    # mana. Grim Backwoods is the same shape at {2}{B}{G}.
+    #
+    # EREBOS USED TO BE IN THIS CONDITION AND DOES NOT HAVE THIS ABILITY. Its
+    # activated ability is "{1}{B}, Sacrifice another creature: TARGET CREATURE
+    # GETS -2/-1 until end of turn" -- no card, and against an opponent board
+    # that is a blocker count there is nothing to shrink, so that half is
+    # model-blind. Its card draw is a TRIGGER, not an activation, and is handled
+    # in `Game.on_creature_death`: it needs no sacrifice at all, which is a
+    # different and much better card in a deck that loses a dozen tokens a game.
+    # `erebos_death_draw=False` puts Erebos back in this condition, which is
+    # what every table before 2026-09-06 was measured with.
+    sackers = g.has("Dockside Chef") or (
+        not g.cfg.get("erebos_death_draw", True)
+        and g.has("Erebos, Bleak-Hearted"))
+    if sackers and units:
         chaff = [p for p in g.board if p.is_token and not p.sick
                  and g.power_of(p) <= 2]
         if chaff:
@@ -1081,6 +1175,14 @@ def take_turn(g: Game):
         p.sick = False
     g.land_drops = 1 + (1 if g.has("Dryad of the Ilysian Grove") else 0)
     g.land_drops_used = 0
+
+    # Diagnostic only: how many of Erebos's turns on the battlefield it is
+    # actually a creature for. The whole point of the devotion clause is that
+    # this is well below the number of turns it is out.
+    for p in g.board:
+        if p.card.name in DEVOTION_CONDITIONAL_CREATURES \
+                and is_battlefield_creature(g, p):
+            g.m["erebos_creature_turns"] += 1
 
     upkeep(g)
     if g.turn > 1 or g.cfg.get("on_the_draw", True):

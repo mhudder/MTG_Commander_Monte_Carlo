@@ -106,6 +106,11 @@ class TivitGame:
             "treasures_spent": 0, "clues_cracked": 0,
             "blinks": 0, "deadeye_activations": 0, "combo_iterations": 0,
             "tivit_triggers": 0, "extra_turns": 0,
+            "sieve_activations": 0, "sieve_chain_max": 0,
+            # `extra_turns` is turns GRANTED; these two are what was actually
+            # taken and how many rounds the pod got. The gap between granted and
+            # taken is what the discarded-chain bug used to throw away.
+            "extra_turns_taken": 0, "pod_rounds": 0,
             # --- routes out ---
             "win_route": 0, "loss_route": 0,
             "token_drain": 0.0, "artifact_drain": 0.0,
@@ -803,33 +808,94 @@ def activations(g):
     if g.result is not None:
         return
 
-    # Time Sieve: "{T}, Sacrifice five artifacts: Take an extra turn."
-    if g.has("Time Sieve"):
+    time_sieve(g)
+    if g.result is not None:
+        return
+
+    crack_clues(g, 3)
+
+
+def _sacrifice_five(g) -> bool:
+    """Pay Time Sieve's "Sacrifice five artifacts" out of the token piles.
+
+    Clues and Food go before Treasures: a Treasure is mana and the other two
+    are not, so spending them first is what a pilot does. Only TOKENS are
+    eaten, never the real artifacts `artifact_count()` can see -- Sol Ring, the
+    signets and the three artifact lands are legal fuel and a pilot would not
+    feed them to a loop that has to run again next turn. That is the
+    conservative direction and is said out loud rather than fixed.
+    """
+    if sum(g.tokens.values()) < 5:
+        return False
+    need = 5
+    for kind in ("Food", "Clue", "Treasure"):
+        need -= sacrifice_tokens(g, kind, min(need, g.tokens[kind]))
+        if need <= 0:
+            return True
+    return need <= 0
+
+
+def time_sieve(g):
+    """Time Sieve: "{T}, Sacrifice five artifacts: Take an extra turn after
+    this one."
+
+    THE COST IS A TAP OF TIME SIEVE ITSELF, so the ability is ONCE PER TURN --
+    and that is the whole card. This used to run up to `sieve_cap` (10) times in
+    a single turn and, on reaching the cap, declare the game won. Neither half
+    was right: ten activations a turn is nine more than the card allows, and the
+    cap was almost never reachable anyway (it needs fifty tokens in one window),
+    so what the card actually did in nearly every game was grant one or two
+    extra turns that the engine then threw away or actively punished. See
+    `simulate` for the other two halves of the bug.
+
+    Once per turn is not a limitation on the loop -- it IS the loop. Time Sieve
+    untaps every turn, including on the extra turn it just bought, so one
+    activation per turn chained is unbounded:
+
+        Tivit attacks -> dilemma -> 5 votes -> 5 artifact tokens
+        -> sacrifice them to Time Sieve -> extra turn
+        -> untap, Tivit attacks again -> repeat
+
+    In a four-player game that is exactly five tokens for exactly five
+    artifacts, with nothing to spare, which is why the pair is a two-card
+    engine and neither half is anything without the other.
+
+    Artifacts have no summoning sickness, so the {T} is live the turn Time Sieve
+    lands; only `tapped` gates it.
+    """
+    if not g.has("Time Sieve"):
+        return
+    if not g.cfg.get("sieve_taps", True):
+        # Pre-2026-09-06 behaviour, kept so the old tivit table reproduces.
         cap = g.cfg.get("sieve_cap", 10)
         taken = 0
-        while taken < cap and sum(g.tokens.values()) >= 5:
-            need = 5
-            for kind in ("Food", "Clue", "Treasure"):
-                got = sacrifice_tokens(g, kind, min(need, g.tokens[kind]))
-                need -= got
-                if need <= 0:
-                    break
-            if need > 0:
-                break
+        while taken < cap and _sacrifice_five(g):
             g.extra_turns += 1
             g.m["extra_turns"] += 1
+            g.m["sieve_activations"] += 1
             taken += 1
             if g.result is not None:
                 return
         if taken >= cap and g.result is None:
             g.win(ROUTE_TIME_SIEVE)
-            return
+        return
 
-    crack_clues(g, 3)
+    sieve = next((p for p in g.board
+                  if p.card.name == "Time Sieve" and not p.tapped), None)
+    if sieve is None:
+        return
+    if not _sacrifice_five(g):
+        return
+    sieve.tapped = True
+    g.extra_turns += 1
+    g.m["extra_turns"] += 1
+    g.m["sieve_activations"] += 1
 
 
-def take_turn(g):
+def take_turn(g, extra=False):
     g.turn += 1
+    if extra:
+        g.m["extra_turns_taken"] += 1
     g.spells_this_turn = 0
     g.illusion_active = False
     for p in g.board:
@@ -860,7 +926,25 @@ def take_turn(g):
     g.m["mana_floated"] += len(mana_units(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
-    if g.cfg.get("opponents", True):
+    # AN EXTRA TURN IS YOUR TURN, NOT A ROUND. This block is the three
+    # opponents' whole turn cycle -- they develop a board, cast removal, chip
+    # you for incidental damage and check their kill clocks. Running it at the
+    # end of an EXTRA turn hands the pod a free extra round for every extra turn
+    # you take, which is the opposite of what an extra turn does, and it made
+    # every extra-turn card in the deck a liability: Time Sieve, Plea for Power
+    # and Expropriate all paid a pod round for each turn they bought.
+    #
+    # `lorehold.take_turn` already had this right -- its extra turns run
+    # untap/miracle/main/combat with no opponent block at all -- so the two
+    # engines modelled the same concept in opposite directions.
+    #
+    # The pre-rolled opponent grid is indexed by `g.turn`, which still advances,
+    # so CRN is unaffected: an opponent's clock is DELAYED by the turns you
+    # took, not skipped, and it still resolves at most once when the pod next
+    # gets a round.
+    skip = extra and g.cfg.get("extra_turns_skip_opponents", True)
+    if g.cfg.get("opponents", True) and not skip:
+        g.m["pod_rounds"] += 1
         watch = g.cfg.get("watch", ())
         before = {p.card.name for p in g.board if p.card.name in watch}
         OPP.opponents_act(g)
@@ -870,6 +954,53 @@ def take_turn(g):
             g.m["test_card_removed"] += 1
         OPP.incidental_damage(g)
         OPP.resolve_clocks(g)
+
+
+def take_extra_turns(g, played, budget):
+    """Spend `g.extra_turns`. Returns the new turn count against the horizon.
+
+    Extra turns are REAL turns and still count against the horizon, so a deck
+    cannot buy turns the other three engines do not get. That is a deliberate
+    choice, and it is now the ONLY thing bounding the loop.
+
+    THE CHAIN USED TO BE CUT. `g.extra_turns` was zeroed before the loop and
+    never re-read, so an extra turn generated DURING an extra turn was silently
+    discarded -- and one extra turn per real turn is exactly what Time Sieve
+    grants, so the card's whole loop was truncated to a single step every time.
+    Combined with the pod round each extra turn used to hand out (see
+    `take_turn`), Time Sieve bought one turn and paid a full round of opponents
+    for it.
+
+    Chained, Tivit + Time Sieve is unbounded: Tivit's attack trigger is five
+    votes in a four-player pod, which is exactly the five artifacts the Sieve
+    eats, and the Sieve untaps on the turn it bought. `extra_turn_cap` applies to
+    the LEGACY path only; here the horizon is the bound and `played < budget`
+    guarantees termination.
+
+    THIS LIVES IN A FUNCTION so `simulate`, `test_time_sieve.py` and
+    `diag_time_sieve.py` cannot disagree about it. They each had their own copy
+    of the loop for about an hour, and the test's copy silently failed to record
+    `sieve_chain_max` -- which is a small version of exactly the bug this
+    function exists to fix.
+    """
+    cfg = g.cfg
+    if cfg.get("extra_turns_chain", True):
+        chain = 0
+        while g.extra_turns > 0 and played < budget and g.result is None:
+            g.extra_turns -= 1
+            take_turn(g, extra=True)
+            played += 1
+            chain += 1
+    else:
+        chain = min(g.extra_turns, cfg.get("extra_turn_cap", 5))
+        for _ in range(chain):
+            if played >= budget or g.result is not None:
+                break
+            take_turn(g, extra=True)
+            played += 1
+    g.extra_turns = 0
+    g.m["sieve_chain_max"] = max(g.m["sieve_chain_max"], chain)
+    return played
 
 
 def simulate(deck, commander, cfg, seed):
@@ -882,18 +1013,7 @@ def simulate(deck, commander, cfg, seed):
         played += 1
         if g.result is not None:
             break
-        # Extra turns are REAL turns and still count against the horizon, so a
-        # deck cannot buy turns the other three engines do not get. Capped so
-        # an unconverted Time Sieve loop cannot run forever.
-        extra = min(g.extra_turns, cfg.get("extra_turn_cap", 5))
-        g.extra_turns = 0
-        for _ in range(extra):
-            if played >= budget:
-                break
-            take_turn(g)
-            played += 1
-            if g.result is not None:
-                break
+        played = take_extra_turns(g, played, budget)
 
     out = dict(g.m)
     out["damage_by_turn"] = g.damage_by_turn

@@ -1,0 +1,116 @@
+Erebos, Bleak-Hearted -- paired CFG flips and one card swap.
+N = 15,000 paired games per cell, seeds 5000..19999, same seeds both legs (CRN intact).
+Rendmaw v12, default pod (v3). Applied CUMULATIVELY in the order listed, so the three add to ALL THREE.
+
+==============================================================================
+devotion_creature_types  (Erebos was a 5/6 attacker from turn one)
+==============================================================================
+  T10
+      won                       0.068933 ->  0.066467    -0.002467 +-0.000856  *
+      damage                      45.947 ->    44.902       -1.045 +-0.086     *
+      cards_drawn                 11.517 ->    11.514       -0.003 +-0.004      
+      erebos_creature_turns        0.250 ->     0.015       -0.235 +-0.014     *
+      final_board_power           23.073 ->    22.985       -0.087 +-0.047     *
+      removal_eaten                1.120 ->     1.120       +0.001 +-0.001      
+      tokens_made                  5.804 ->     5.808       +0.003 +-0.004      
+      final_life                  16.112 ->    16.138       +0.026 +-0.018     *
+      turns_played                 9.790 ->     9.792       +0.002 +-0.001     *
+  T20
+      won                       0.302067 ->  0.297333    -0.004733 +-0.001707  *
+      damage                      76.856 ->    75.755       -1.101 +-0.134     *
+      cards_drawn                 14.993 ->    15.034       +0.042 +-0.011     *
+      erebos_creature_turns        0.376 ->     0.045       -0.331 +-0.017     *
+      final_board_power           34.623 ->    34.711       +0.088 +-0.098      
+      removal_eaten                1.341 ->     1.344       +0.003 +-0.001     *
+      tokens_made                  8.417 ->     8.460       +0.043 +-0.009     *
+      final_life                   4.540 ->     4.455       -0.085 +-0.033     *
+      turns_played                12.191 ->    12.217       +0.026 +-0.005     *
+
+==============================================================================
+erebos_death_draw  (it had Dockside Chef's ability, not its own)
+==============================================================================
+  T10
+      won                       0.066467 ->  0.067067    +0.000600 +-0.000704   
+      damage                      44.902 ->    45.153       +0.251 +-0.084     *
+      cards_drawn                 11.514 ->    11.539       +0.025 +-0.016     *
+      erebos_draws                 0.000 ->     0.163       +0.163 +-0.013     *
+      erebos_life_paid             0.000 ->     0.326       +0.326 +-0.027     *
+      erebos_creature_turns        0.015 ->     0.015       -0.001 +-0.001      
+      final_board_power           22.985 ->    23.106       +0.120 +-0.083     *
+      removal_eaten                1.120 ->     1.120       -0.000 +-0.001      
+      tokens_made                  5.808 ->     5.776       -0.032 +-0.010     *
+      final_life                  16.138 ->    15.875       -0.263 +-0.031     *
+      turns_played                 9.792 ->     9.791       -0.001 +-0.001      
+  T20
+      won                       0.297333 ->  0.299600    +0.002267 +-0.002082  *
+      damage                      75.755 ->    76.142       +0.387 +-0.211     *
+      cards_drawn                 15.034 ->    15.003       -0.032 +-0.023     *
+      erebos_draws                 0.000 ->     0.212       +0.212 +-0.015     *
+      erebos_life_paid             0.000 ->     0.424       +0.424 +-0.031     *
+      erebos_creature_turns        0.045 ->     0.038       -0.006 +-0.003     *
+      final_board_power           34.711 ->    35.012       +0.302 +-0.158     *
+      removal_eaten                1.344 ->     1.343       -0.001 +-0.002      
+      tokens_made                  8.460 ->     8.419       -0.042 +-0.019     *
+      final_life                   4.455 ->     4.381       -0.074 +-0.038     *
+      turns_played                12.217 ->    12.192       -0.025 +-0.007     *
+
+==============================================================================
+indestructible  (never set; first live use of destroy_share)
+==============================================================================
+  T10
+      won                       0.067067 ->  0.067133    +0.000067 +-0.000226   
+      damage                      45.153 ->    45.181       +0.028 +-0.023     *
+      cards_drawn                 11.539 ->    11.590       +0.051 +-0.008     *
+      erebos_draws                 0.163 ->     0.214       +0.051 +-0.008     *
+      erebos_life_paid             0.326 ->     0.428       +0.102 +-0.015     *
+      erebos_creature_turns        0.015 ->     0.016       +0.001 +-0.001     *
+      final_board_power           23.106 ->    23.305       +0.199 +-0.038     *
+      removal_eaten                1.120 ->     1.114       -0.006 +-0.002     *
+      tokens_made                  5.776 ->     5.780       +0.004 +-0.003     *
+      final_life                  15.875 ->    15.782       -0.093 +-0.018     *
+      turns_played                 9.791 ->     9.791       -0.000 +-0.001      
+  T20
+      won                       0.299600 ->  0.300267    +0.000667 +-0.001183   
+      damage                      76.142 ->    76.299       +0.157 +-0.093     *
+      cards_drawn                 15.003 ->    15.061       +0.059 +-0.012     *
+      erebos_draws                 0.212 ->     0.280       +0.068 +-0.009     *
+      erebos_life_paid             0.424 ->     0.560       +0.136 +-0.018     *
+      erebos_creature_turns        0.038 ->     0.052       +0.014 +-0.003     *
+      final_board_power           35.012 ->    35.316       +0.304 +-0.069     *
+      removal_eaten                1.343 ->     1.336       -0.007 +-0.002     *
+      tokens_made                  8.419 ->     8.422       +0.004 +-0.010      
+      final_life                   4.381 ->     4.358       -0.023 +-0.020     *
+      turns_played                12.192 ->    12.180       -0.012 +-0.004     *
+
+==============================================================================
+ALL THREE -- the whole Erebos correction
+==============================================================================
+  T10
+      won                       0.068933 ->  0.067133    -0.001800 +-0.000895  *
+      damage                      45.947 ->    45.181       -0.767 +-0.109     *
+      cards_drawn                 11.517 ->    11.590       +0.073 +-0.019     *
+      erebos_draws                 0.000 ->     0.214       +0.214 +-0.017     *
+      erebos_life_paid             0.000 ->     0.428       +0.428 +-0.034     *
+      erebos_creature_turns        0.250 ->     0.016       -0.234 +-0.014     *
+      final_board_power           23.073 ->    23.305       +0.232 +-0.091     *
+      removal_eaten                1.120 ->     1.114       -0.006 +-0.002     *
+      tokens_made                  5.804 ->     5.780       -0.025 +-0.010     *
+      final_life                  16.112 ->    15.782       -0.329 +-0.039     *
+      turns_played                 9.790 ->     9.791       +0.001 +-0.001      
+  T20
+      won                       0.302067 ->  0.300267    -0.001800 +-0.002363   
+      damage                      76.856 ->    76.299       -0.556 +-0.249     *
+      cards_drawn                 14.993 ->    15.061       +0.069 +-0.026     *
+      erebos_draws                 0.000 ->     0.280       +0.280 +-0.020     *
+      erebos_life_paid             0.000 ->     0.560       +0.560 +-0.039     *
+      erebos_creature_turns        0.376 ->     0.052       -0.324 +-0.018     *
+      final_board_power           34.623 ->    35.316       +0.693 +-0.158     *
+      removal_eaten                1.341 ->     1.336       -0.005 +-0.003     *
+      tokens_made                  8.417 ->     8.422       +0.005 +-0.020      
+      final_life                   4.540 ->     4.358       -0.182 +-0.043     *
+      turns_played                12.191 ->    12.180       -0.011 +-0.008     *
+
+* = 95% CI excludes zero. Win rate is the objective; damage and board power are proxies.
+NOTE erebos_life_paid is a cost this model UNDERPRICES (KNOWN_ISSUES 0i): life loss is
+     nearly free here, so the death-draw number is a CEILING. `erebos_life_floor` (10) is
+     the only thing standing in for declining the payment, and it is a judgement call.

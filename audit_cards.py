@@ -37,7 +37,7 @@ import urllib.request
 
 from edhmc.engine import STACK_ONLY_CREATURES
 from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12, tivit_v1
-from edhmc.decks._evasion import FLYING
+from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 UA = {"User-Agent": "EDHMC/1.0", "Accept": "application/json"}
 API = "https://api.scryfall.com/cards/collection"
@@ -289,6 +289,23 @@ def check(deck, c, sc):
         out.append(("ERR", f"flying={c.flying}, Scryfall keywords {sorted(kw)}"))
     if has_flying and c.name not in FLYING:
         out.append(("ERR", "flies but is missing from decks/_evasion.py"))
+
+    # --- indestructible ----------------------------------------------------
+    # Added 2026-09-06 with the Erebos fix. `Card.indestructible` had existed
+    # since 2026-09-04 and was set on exactly one card BY HAND, which is the
+    # partial-tag bias CLAUDE.md warns about -- and the audit did not check it,
+    # so nothing would have caught the two indestructible LANDS in the Rendmaw
+    # list. Read from the keywords array, same rule as flying: a card that
+    # GRANTS indestructible (Heroic Intervention, Boros Charm) or has it
+    # CONDITIONALLY (Voice of the Blessed at ten +1/+1 counters) must NOT be
+    # tagged, and the keywords array is what draws that line.
+    has_indes = "Indestructible" in kw
+    if c.indestructible != has_indes:
+        out.append(("ERR", f"indestructible={c.indestructible}, "
+                           f"Scryfall keywords {sorted(kw)}"))
+    if has_indes and c.name not in INDESTRUCTIBLE:
+        out.append(("ERR", "is indestructible but is missing from "
+                           "decks/_evasion.py"))
 
     # --- lands ------------------------------------------------------------
     if is_land:

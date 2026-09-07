@@ -71,6 +71,21 @@ def blank_like(card, priority):
 
 def add_value(deck_name, sim, turns, cand, victim, n=N, extra=()):
     deck, cmd = build_pending(deck_name)
+    # A CANDIDATE THAT IS ALREADY IN THE LIST IS NOT A CANDIDATE. `build_pending`
+    # applies the staged changes, so a card can be promoted from candidate to
+    # deck member without anything here noticing -- and then this function
+    # measures the marginal value of a SECOND COPY, in a singleton-illegal
+    # 101st-card deck, and prints it under the heading "value over a blank".
+    # Caldera Pyremaw did exactly that between 2026-09-04, when it was a
+    # candidate, and 2026-09-05, when `-Penance +Caldera Pyremaw` was staged.
+    # Same shape as the SCRIPTED_* sets and tag_flying.py's candidate gap: a
+    # hand-maintained list the deck moved past.
+    if any(c.name == cand.name for c in deck):
+        raise SystemExit(
+            f"{cand.name!r} is ALREADY IN the {deck_name} list (staged or "
+            f"committed), so it cannot be measured as an addition. Remove it "
+            f"from DECKS[{deck_name!r}] in candidates.py, or measure it as a "
+            f"swap with experiment.run_ab instead.")
     a = _swap_many(deck, [victim], [blank_like(cand, repl_priority(deck))])
     b = _swap_many(deck, [victim], [cand])
     cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset({cand.name}))
@@ -93,9 +108,13 @@ import sys
 DECKS = {
     "rendmaw": ("RENDMAW", "rendmaw", rendmaw_sim, 10, "Pygmy Kavu",
                 (CAULDRON_OF_ESSENCE, REVITALIZING_REPAST, WURMCOIL_ENGINE)),
+    # CALDERA_PYREMAW was here and has been REMOVED: `-Penance +Caldera
+    # Pyremaw` was staged on 2026-09-05, so `build_pending` now puts it in the
+    # list and measuring it as an addition scores a second copy. The guard in
+    # add_value() makes that an error rather than a number; this is the fix it
+    # points at. Its real evidence is the head-to-head in run_fivedrop.py.
     "lorehold": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
-                 (CALDERA_PYREMAW, GOLDSPAN_DRAGON, INVINCIBLE_HYMN,
-                  REVERSE_THE_SANDS)),
+                 (GOLDSPAN_DRAGON, INVINCIBLE_HYMN, REVERSE_THE_SANDS)),
     "karlov": ("KARLOV", "karlov", karlov_sim, 10, "Soulmender",
                (ENLIGHTENED_CONFIDANT, CRYPT_GHAST, DARK_CONFIDANT)),
     # 2026-09-04 first batch, kept so the runs are reproducible

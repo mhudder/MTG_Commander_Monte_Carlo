@@ -14,7 +14,7 @@ is a regression.
 """
 
 from edhmc.engine import Card
-from edhmc.decks._evasion import FLYING
+from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -31,13 +31,17 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 miracle_cost=miracle or {}, treasures=treasures,
                 pod_damage=pod_damage, tokens=tokens, discards=discards,
                 land_face=land_face, x_pips=x_pips, haste=haste,
-                flying=name in FLYING)
+                flying=name in FLYING,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 def L(name, produces, tapped=False, types="Land", tags=()):
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
                 produces=frozenset(produces), tapped=tapped,
-                tags=frozenset(tags))
+                tags=frozenset(tags),
+                # No land in this list is indestructible; read from the same
+                # generated set anyway so every L() in the project agrees.
+                indestructible=name in INDESTRUCTIBLE)
 
 
 COMMANDER = C("Lorehold, the Historian", "Creature",

@@ -28,19 +28,25 @@ neither 2 nor 3, and is why it is modelled as the removal spell it is cast as.
 """
 
 from edhmc.engine import Card
-from edhmc.decks._evasion import FLYING
+from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
-      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0,
-      indestructible=False):
+      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0):
+    # `indestructible` used to be a hand-passed argument and Heliod, Sun-Crowned
+    # was the only card that set it. It is now derived from the GENERATED
+    # INDESTRUCTIBLE set for the same reason `flying` is: a keyword tagged from
+    # memory on the cards you happen to think of biases the whole table toward
+    # them. The generated set agrees with the old hand-tag on Heliod and adds
+    # three cards nobody had tagged. See tag_flying.py.
     ma = (mana[0], frozenset(mana[1])) if mana else None
     return Card(name=name, types=frozenset(types.split("/")), cost=cost or {},
                 power=p, toughness=t, script=script, priority=priority,
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 lifegain=lifegain, drain=drain, lifelink=lifelink,
-                x_pips=x_pips, indestructible=indestructible,
-                flying=name in FLYING)
+                x_pips=x_pips,
+                flying=name in FLYING,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):
@@ -52,7 +58,10 @@ def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):
     Swamps."""
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
                 produces=frozenset(produces), tapped=tapped, lifegain=lifegain,
-                tags=frozenset(tags))
+                tags=frozenset(tags),
+                # No land in this list is indestructible; read from the same
+                # generated set anyway so every L() in the project agrees.
+                indestructible=name in INDESTRUCTIBLE)
 
 
 COMMANDER = C("Karlov of the Ghost Council", "Creature",
@@ -211,8 +220,10 @@ def build():
 # "Whenever you gain life, put a +1/+1 counter on target creature or
 # enchantment you control." {1}{W}: another target creature gains lifelink.
 HELIOD_SUN_CROWNED = C("Heliod, Sun-Crowned", "Enchantment/Creature",
-                       {"gen": 2, "W": 1}, 5, 5, priority=9, threat=8.0,
-                       indestructible=True)
+                       {"gen": 2, "W": 1}, 5, 5, priority=9, threat=8.0)
+# Indestructible comes from the generated INDESTRUCTIBLE set now, not from a
+# hand-passed argument here. Verified identical: Scryfall's keywords array has
+# it, which is what the old hand-tag was claiming.
 
 # {2}{W}{W} 3/3 flier. A +1/+1 counter on itself per lifegain event, and a
 # card the first time each turn it gets one.

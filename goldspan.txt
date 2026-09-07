@@ -1,0 +1,16 @@
+Value over a replacement-level blank of the same cost. N = 15,000 paired games, seeds 80000..94999.
+Baseline build_pending('lorehold'); victim slot 'Pinnacle Monk' is blanked in both legs.
+
+Goldspan Dragon   (MV 5, priority 8, threat 8.5, 4/4, flying)
+    T                   won                damage            mv_cheated           cards_drawn        treasures_made     final_board_power  P(deploy)
+   10      +0.0018+-0.0010*          +0.94+-0.16*          +0.17+-0.07*          +0.04+-0.03*          +0.19+-0.02*          +0.24+-0.07*      0.088
+   14      +0.0051+-0.0022*          +1.31+-0.31*          +0.09+-0.14           -0.05+-0.05*          +0.29+-0.03*          +0.36+-0.11*      0.137
+   20      +0.0057+-0.0027*          +1.30+-0.39*          +0.01+-0.18           -0.12+-0.05*          +0.33+-0.03*          +0.35+-0.13*      0.154
+
+Goldspan Dragon@8.5   (MV 5, priority 8.5, threat 8.5, 4/4, flying)
+    T                   won                damage            mv_cheated           cards_drawn        treasures_made     final_board_power  P(deploy)
+   10      +0.0020+-0.0010*          +0.94+-0.16*          +0.17+-0.07*          +0.04+-0.03*          +0.20+-0.02*          +0.24+-0.07*      0.090
+   14      +0.0050+-0.0023*          +1.29+-0.31*          +0.09+-0.14           -0.05+-0.05*          +0.30+-0.03*          +0.36+-0.11*      0.139
+   20      +0.0055+-0.0027*          +1.28+-0.39*          +0.02+-0.18           -0.12+-0.05*          +0.34+-0.03*          +0.35+-0.13*      0.155
+
+* = 95% CI excludes zero.  Win rate is the objective; damage and mv_cheated are proxies.

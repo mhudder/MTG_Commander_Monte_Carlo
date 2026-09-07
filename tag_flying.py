@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fetch FLYING for every creature in the three decks, from Scryfall.
+"""Fetch FLYING and INDESTRUCTIBLE for every card in the four decks, from Scryfall.
+
+(The name is historical: it collected only flying until 2026-09-06. The two
+keywords are collected by one script because they are one problem -- see below.)
 
 WHY THIS IS A SCRIPT AND NOT A HAND-EDIT
 ----------------------------------------
@@ -27,6 +30,32 @@ which is precisely the question this script is asking.
 REACH IS DELIBERATELY NOT COLLECTED. Reach is a blocking ability, and this
 engine never blocks with your creatures — the opponents' capacity to block
 fliers is the abstract `flier_block_share`. Your creatures' reach is inert.
+
+INDESTRUCTIBLE, added 2026-09-06, for exactly the reason above
+--------------------------------------------------------------
+`Card.indestructible` has existed since 2026-09-04, priced by `destroy_share`,
+and was INERT: no card in any committed list carried it, only the Heliod
+candidate, by hand. Fixing Erebos, Bleak-Hearted made it live for the first
+time — and hand-setting one card is precisely the partial-tag bias this script
+exists to prevent. Checked against Scryfall, the four lists hold THREE
+statically indestructible cards, and two of them are ones nobody would think of:
+
+    Erebos, Bleak-Hearted   rendmaw
+    Darksteel Citadel       tivit    (a LAND, so `L()` needs the tag too)
+    Darkmoss Bridge         tivit    (a LAND)
+
+The two lands are provably inert today — `spot_removal` and `ae_removal` both
+exclude `is_land`, so a land is never a removal target — but "inert today" is
+what `Card.indestructible` itself was, and the point of generating the set is
+that the next card added cannot be missed. `audit_cards.py` verifies it.
+
+NOT COLLECTED, because they are not static and a tag would be a lie:
+
+  * GRANTED until end of turn — Boros Charm, Heroic Intervention, Dawn's Truce,
+    Plaza of Heroes. Heroic Intervention is already modelled as `hold_up_rate`.
+  * CONDITIONAL — Voice of the Blessed has indestructible only with TEN or more
+    +1/+1 counters (its flying needs four, which is why it is in CONDITIONAL
+    below). Ten is reachable in the Karlov list and is NOT modelled.
 
     python tag_flying.py            # print the classification
     python tag_flying.py --write    # regenerate edhmc/decks/_evasion.py
@@ -104,9 +133,11 @@ def main():
     decks = {"rendmaw": rendmaw_v12, "lorehold": lorehold_v16,
              "karlov": karlov_v2, "tivit": tivit_v1}
     creatures = {}
+    everything = {}          # indestructible is not a creature-only keyword
     for mod in decks.values():
         deck, cmd = mod.build()
         for c in list(deck) + [cmd]:
+            everything[c.name] = c
             if c.is_creature and not c.is_land:
                 creatures[c.name] = c
         # CANDIDATES TOO. `flying=name in FLYING` is evaluated at import, so a
@@ -120,13 +151,20 @@ def main():
             if not attr.isupper():
                 continue
             v = getattr(mod, attr)
-            if type(v).__name__ == "Card" and v.is_creature and not v.is_land:
+            if type(v).__name__ != "Card":
+                continue
+            everything.setdefault(v.name, v)
+            if v.is_creature and not v.is_land:
                 creatures.setdefault(v.name, v)
 
-    cards = scryfall_collection(sorted(creatures))
-    flying = {n for n, c in cards.items() if "Flying" in c.get("keywords", [])}
+    cards = scryfall_collection(sorted(everything))
+    flying = {n for n, c in cards.items()
+              if n in creatures and "Flying" in c.get("keywords", [])}
+    indestructible = {n for n, c in cards.items()
+                      if "Indestructible" in c.get("keywords", [])}
 
-    print(f"{len(cards)}/{len(creatures)} creatures resolved\n")
+    print(f"{len(cards)}/{len(everything)} cards resolved "
+          f"({len(creatures)} of them creatures)\n")
     print(f"UNCONDITIONAL FLYING ({len(flying)}):")
     for n in sorted(flying):
         print(f"    {n}")
@@ -134,8 +172,21 @@ def main():
     for n, why in sorted(CONDITIONAL.items()):
         seen = "in deck" if n in creatures else "NOT IN ANY DECK"
         print(f"    {n:26} {why}   [{seen}]")
+    print(f"\nUNCONDITIONAL INDESTRUCTIBLE ({len(indestructible)}), all card "
+          f"types:")
+    for n in sorted(indestructible):
+        c = everything[n]
+        print(f"    {n:26} {'LAND' if c.is_land else ''}")
+    granted = {n for n, c in cards.items()
+               if n not in indestructible
+               and "indestructible" in (c.get("oracle_text") or "").lower()}
+    if granted:
+        print("\nGRANTS or CONDITIONS indestructible in its text — correctly "
+              "NOT tagged\n(a tag would claim the permanent always has it):")
+        for n in sorted(granted):
+            print(f"    {n}")
     missed = {n for n, c in cards.items()
-              if n not in flying and n not in CONDITIONAL
+              if n in creatures and n not in flying and n not in CONDITIONAL
               and "flying" in (c.get("oracle_text") or "").lower()}
     if missed:
         print(f"\nMentions 'flying' but does NOT have it (reach reminder text,")
@@ -156,6 +207,18 @@ def main():
             fh.write("}\n\n# Token subtypes that fly, from the text of the card "
                      "that makes them.\nFLYING_TOKENS = {\n")
             for n in sorted(FLYING_TOKENS):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n"
+                     "# UNCONDITIONAL indestructible, every card type -- two of "
+                     "them are LANDS,\n"
+                     "# so L() has to consult this as well as C(). Granted "
+                     "(Heroic Intervention,\n"
+                     "# Boros Charm) and conditional (Voice of the Blessed at "
+                     "ten counters)\n"
+                     "# indestructibility is deliberately absent: a static tag "
+                     "would be a lie.\n"
+                     "INDESTRUCTIBLE = {\n")
+            for n in sorted(indestructible):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
         print(f"\nwrote {OUT}")

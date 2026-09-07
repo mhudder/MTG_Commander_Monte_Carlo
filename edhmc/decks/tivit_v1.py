@@ -25,7 +25,7 @@ them into an extra turn. See edhmc/tivit.py.
 """
 
 from edhmc.engine import Card
-from edhmc.decks._evasion import FLYING
+from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -39,17 +39,25 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 power=p, toughness=t, script=script, priority=priority,
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 treasures=treasures, x_pips=x_pips, haste=haste,
-                land_face=land_face, flying=name in FLYING)
+                land_face=land_face, flying=name in FLYING,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 def L(name, produces, tapped=False, types="Land", tags=(), script=None):
     """tags: "artifact_land" is what Time Sieve, Disciple of the Vault and
     Marionette Master actually read — an artifact that happens to be a land.
     The type line carries it too, but the engine's artifact count is a tag
-    lookup, so both must agree."""
+    lookup, so both must agree.
+
+    `indestructible` is consulted here as well as in C() even though NO land in
+    this list currently has it — the project's two indestructible lands
+    (Darkmoss Bridge, Darksteel Citadel) are both in the Rendmaw list. The tag
+    is GENERATED from Scryfall (tag_flying.py) and every `L()` reads the same
+    set, so an artifact land added here cannot be missed the way Erebos was."""
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
                 produces=frozenset(produces), tapped=tapped,
-                tags=frozenset(tags), script=script)
+                tags=frozenset(tags), script=script,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 COMMANDER = C("Tivit, Seller of Secrets", "Creature",

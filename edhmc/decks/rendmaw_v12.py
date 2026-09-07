@@ -12,7 +12,7 @@ priority: casting preference when several spells are affordable (higher first).
 """
 
 from edhmc.engine import Card
-from edhmc.decks._evasion import FLYING
+from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -34,13 +34,21 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 threat=threat, tags=frozenset(tags), pod_damage=pod_damage,
                 land_face=land_face, x_pips=x_pips,
                 alt_costs=alt_costs, lifelink=lifelink,
-                flying=name in FLYING)
+                flying=name in FLYING,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 def L(name, produces, tapped=False, types="Land", script=None, tags=(), p=0, t=0):
+    # `indestructible` is consulted here as well as in C() because two of the
+    # four indestructible cards in the four lists are LANDS, and both of them
+    # are in THIS deck: Darkmoss Bridge and Darksteel Citadel, below. Inert
+    # today -- spot_removal and ae_removal both exclude is_land, so a land is
+    # never a removal target -- but Card.indestructible was "inert today" too,
+    # right up until Erebos.
     return Card(name=name, types=frozenset(types.split("/")),
                 is_land=True, produces=frozenset(produces),
-                tapped=tapped, script=script, tags=frozenset(tags), power=p, toughness=t)
+                tapped=tapped, script=script, tags=frozenset(tags), power=p, toughness=t,
+                indestructible=name in INDESTRUCTIBLE)
 
 
 COMMANDER = C("Rendmaw, Creaking Nest", "Artifact/Creature",
@@ -107,6 +115,10 @@ NONLANDS = [
 
     # --- aristocrats / draw ---
     C("Blood Artist", "Creature", {"gen": 1, "B": 1}, 0, 1, priority=6, threat=5.5),
+    # NOT a creature while devotion to black is under five
+    # (engine.DEVOTION_CONDITIONAL_CREATURES), indestructible (tagged by
+    # tag_flying.py, not by hand), and its card draw is a death TRIGGER rather
+    # than the sac-for-a-card the engine used to give it.
     C("Erebos, Bleak-Hearted", "Enchantment/Creature", {"gen": 3, "B": 1}, 5, 6, priority=6, threat=6.0),
     C("The Meathook Massacre", "Enchantment", {"gen": 2, "B": 2}, priority=4, threat=6.5,
       x_pips=2),
