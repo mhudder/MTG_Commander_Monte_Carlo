@@ -134,6 +134,15 @@ _KARLOV_LOREHOLD_UNTOUCHED = (
     "every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and "
     "tivit) and were regenerated, which is what makes the pass meaningful.")
 
+_LOREHOLD_SUNBIRD_COUNTER = (
+    " The lorehold fingerprint moved a SECOND time on 2026-09-06, for the "
+    "`sunbird_triggers` counter added while closing queued item 0b "
+    "(KNOWN_ISSUES.md 0p): the ledger justified Sunbird's Invocation with a "
+    "CONDITIONAL firing rate printed as an unconditional one, and separating "
+    "triggers from successful free casts is what showed it. METRIC ONLY -- one "
+    "dict key and one increment, no branch reads it -- and checked the same way: "
+    "all four decks' baselines bit-identical across the change. Cache current.")
+
 # The blank fix, 2026-09-06 (second regeneration of the day).
 _MEDBLANK = (
     "CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation "
@@ -153,7 +162,8 @@ NOTES.update({
         _MEDBLANK.format(prio=prio, extra=extra)
     for d, prio, extra in (
         ("karlov", "7.0", _KARLOV_LOREHOLD_UNTOUCHED),
-        ("lorehold", "5.0", _KARLOV_LOREHOLD_UNTOUCHED),
+        ("lorehold", "5.0",
+         _KARLOV_LOREHOLD_UNTOUCHED + _LOREHOLD_SUNBIRD_COUNTER),
         ("rendmaw", "5.0",
          " REGENERATED AGAIN FROM AN EMPTY CACHE 2026-09-06 (third time that "
          "day) for the EREBOS correction, KNOWN_ISSUES.md 0l: Erebos, "

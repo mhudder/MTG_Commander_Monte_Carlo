@@ -53,6 +53,7 @@ python diag_threat_blank.py         # §0j  what the ablation blank is measured 
 python diag_fivedrop.py             # §0e  why Caldera beat Galvanoth
 python run_erebos.py                # §0l  the three Erebos errors, separately
 python run_goldspan.py              # 0c   Goldspan re-measured at N=15,000
+python run_lorehold_pair.py         # §0p  the two staged Lorehold changes, 2x2
 python run_lowstakes.py             # §0g/§0h  the "low stakes" fixes that were not
 ```
 
@@ -635,11 +636,12 @@ be worth six points of win rate to matter.
 
 Note the three-way was measured on the v16 list, which still has Scroll Rack
 rather than the staged Sunbird's Invocation. That is the same baseline Galvanoth
-was measured on, so the comparison is sound — but **the two staged Lorehold
-changes have not been measured together.**
+was measured on, so the comparison is sound — and **the two staged Lorehold
+changes were measured together on 2026-09-06; they add.** See the 0b section
+below.
 
 Goldspan Dragon was passed at +0.0025 ±0.0045 and was understated by the same
-flying bug; it has not been re-measured.
+flying bug; **re-measured 2026-09-06** — see the Goldspan section.
 
 ### 2026-09-05: a fourth deck — Tivit, Seller of Secrets
 
@@ -1036,6 +1038,52 @@ Two things generalise beyond the card:
   every `C()` and `L()` derives from it, and `audit_cards.py` now checks the
   field. **0 ERR across 377 card slots.** §0n.
 
+### 2026-09-06: item 0b — the two staged Lorehold changes ADD
+
+`KNOWN_ISSUES.md` §0p; `run_lorehold_pair.py` is the harness and
+`lorehold_pair.txt` the output. **This clears the stated blocker on writing
+either change to the `.xlsx`.**
+
+The doubt was mechanical, not statistical: two additions to the same top-heavy
+curve, and **both cuts are top-setters** (Penance and Scroll Rack are both in
+`lorehold.TOP_SETTERS`). A difference of two differences needs its own design, so
+this is a **2×2 factorial with all four legs shuffled on the same seed**, which
+makes the interaction a paired quantity. N=30,000 per cell — twice the tables,
+because an interaction carries roughly twice a main effect's variance.
+
+| win rate | T10 | T20 |
+|---|---|---|
+| Caldera alone | +0.0028 ±0.0011 | +0.0194 ±0.0024 |
+| Sunbird's alone | +0.0019 ±0.0012 | +0.0146 ±0.0028 |
+| **both** | **+0.0047 ±0.0016** | **+0.0362 ±0.0035** |
+| **interaction** | **+0.0000 ±0.0008** | **+0.0022 ±0.0020** |
+| Caldera GIVEN Sunbird's | +0.0028 | **+0.0216 ±0.0026** |
+| Sunbird's GIVEN Caldera | +0.0019 | **+0.0168 ±0.0029** |
+
+Zero interaction at T10, slightly super-additive at T20 — the opposite of the
+worry. **Both predicted costs are real and both are outweighed**, and that is the
+part to carry forward rather than the headline: `stranded_mv` compounds (+0.60
+±0.18 beyond additive) and the two cards genuinely compete for miracles
+(`miracles_cast` −0.018 ±0.008). The mechanism was right; the magnitude was not.
+
+**One staged number reproduced and one did not.** Caldera: +0.0202 → +0.0194
+±0.0024. Sunbird's: +0.0215 → **+0.0146 ±0.0028**, and +0.0077 → +0.0019 at T10
+with disjoint bars. **The obvious explanation was tested and is wrong** — both
+cuts are top-setters and the 2026-09-05 policy fixes made top-setters better, so
+the cut should have got dearer, but Scroll Rack still ablates to −0.0093 ±0.0032
+against the −0.0100 it was worth on 2026-09-04. The cut is as cheap as it ever
+was; the decay is in Sunbird's own contribution and **is not attributed. Do not
+invent a mechanism for it.**
+
+And a smaller correction with a general lesson: the ledger justified Sunbird's
+with "fires 3.6 times a game for an average free spell of MV 3.8". That was a
+**conditional number printed as an unconditional one**. The card is MV 6 and
+resolves in **13.0% of games**; conditional on resolving it is 6.06 triggers and
+4.00 free casts at MV 3.77, so the old figure was right as a conditional and
+read as though 3.6 free spells arrived every game. Unconditionally it is 0.52.
+`sunbird_triggers` now exists next to `sunbird_casts` — 34% of firings find
+nothing — and `pending.py` says which number is which.
+
 ### 2026-09-06: Goldspan Dragon re-measured — closes queued work item 0c
 
 It was passed on 2026-09-04 at +0.0025 ±0.0045, and that number was wrong twice
@@ -1169,11 +1217,22 @@ Re-read against the code 2026-09-05; verdicts inline.
 0. ~~Re-measure the five-drop slot as a three-way on the corrected engine.~~
    **DONE 2026-09-05** — Caldera Pyremaw wins head to head and is re-staged.
    See the Penance-slot section above.
-0b. **Measure the two staged Lorehold changes TOGETHER.** `-Penance +Caldera
-   Pyremaw` and `-Scroll Rack +Sunbird's Invocation` were each measured against
-   the v16 list, never against each other. Both add to the same curve and
-   Sunbird's already costs +4.28 stranded MV, so they may not be additive. Do
-   this before either is written to the `.xlsx`.
+0b. ~~Measure the two staged Lorehold changes TOGETHER.~~ **DONE 2026-09-06 —
+   THEY ADD.** 2×2 factorial, N=30,000 per cell, all four legs on one seed
+   (`run_lorehold_pair.py`). Interaction on win rate +0.0000 ±0.0008 at T10 and
+   +0.0022 ±0.0020 at T20; both together +0.0362 ±0.0035. Each is worth its slot
+   with the other in (+0.0216 and +0.0168 marginally). Both predicted costs are
+   real and both outweighed: stranding compounds (+0.60 beyond additive) and the
+   two top-setter cuts do compete for miracles (−0.018). `KNOWN_ISSUES.md` §0p.
+   **The blocker on writing either to the `.xlsx` is cleared.**
+0b-i. **Sunbird's staged number did not reproduce and is not attributed.**
+   +0.0215 → +0.0146 ±0.0028 at T20, and +0.0077 → +0.0019 at T10 with disjoint
+   bars, against Caldera's +0.0202 → +0.0194 which did reproduce. The obvious
+   mechanism was tested and ruled out — Scroll Rack still ablates to
+   −0.0093 ±0.0032, essentially its 2026-09-04 value, so the CUT did not get
+   more expensive. Something in the Lorehold engine between 2026-09-04 and now
+   made Sunbird's Invocation itself worth less. Worth finding, and worth NOT
+   guessing at: §0p.
 0c. ~~Re-measure Goldspan Dragon.~~ **DONE 2026-09-06** — significant at all
    three horizons (+0.0018 / +0.0051 / +0.0057) where it used to be inside its
    bar. See the Goldspan section above. What is left is a HEAD-TO-HEAD against

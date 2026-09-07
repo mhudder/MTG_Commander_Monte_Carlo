@@ -114,6 +114,7 @@ class LoreholdGame:
             "leng_miracled": 0, "leng_mv_to_top": 0.0,
             "leng_mv_miracled": 0.0, "miracle_no_mana": 0,
             "sunbird_casts": 0,
+            "sunbird_triggers": 0,
             "pyremaw_damage": 0.0,
             "hymn_life_delta": 0.0,
             "sands_life_delta": 0.0,
@@ -836,10 +837,19 @@ def sunbird(g, card):
     top end of the curve than off a Signet.
 
     The free cast is NOT from hand, so it cannot re-trigger this.
+
+    `sunbird_triggers` counts how often the ability FIRES; `sunbird_casts` counts
+    how often it actually finds something castable. The two are very different
+    numbers and the staged justification in pending.py conflated them, so both
+    are counted separately now. A trigger finds nothing whenever X is small --
+    off a Signet it reveals two cards and needs an MV<=2 nonland among them --
+    which is the same "worth far more off the top of the curve" point the
+    docstring above makes, in the metric rather than in prose.
     """
     x = int(card.mv)
     if x <= 0 or not g.library:
         return
+    g.m["sunbird_triggers"] += 1
     revealed = [g.library.pop() for _ in range(min(x, len(g.library)))]
     castable = [c for c in revealed if not c.is_land and c.mv <= x]
     pick = max(castable, key=lambda c: (c.free_mv, c.priority), default=None)

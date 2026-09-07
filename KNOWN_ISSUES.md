@@ -172,9 +172,9 @@ as the top-setter finding. Follow win rate.
 
 Caveat: the three-way ran on the v16 list, which still has Scroll Rack rather
 than the staged Sunbird's Invocation. That is the same baseline Galvanoth was
-measured on, so the comparison is sound — but **the two staged Lorehold changes
-have never been measured together**, and that is the next thing to do before
-either is written to the `.xlsx`.
+measured on, so the comparison is sound — and **the two staged Lorehold changes
+were measured together on 2026-09-06 and they ADD** (§0p). Caldera's own number
+reproduced on that run (+0.0202 → +0.0194 ±0.0024); Sunbird's did not.
 
 ## 0f. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
 
@@ -723,6 +723,97 @@ Same shape as the `SCRIPTED_*` sets and `tag_flying.py`'s candidate gap: a
 hand-maintained list the deck moved past. **One number was produced against this
 bug during the 2026-09-06 session and discarded**; no committed number depends
 on it, because `CANDIDATES_2026-09-04.md` predates the staging.
+
+## 0p. The two staged Lorehold changes ADD — closes queued item 0b
+
+    C = -Penance     +Caldera Pyremaw       staged 2026-09-05
+    S = -Scroll Rack +Sunbird's Invocation   staged 2026-09-04
+
+Each was measured against the v16 list and never against the other, and the
+reason to doubt they add was MECHANICAL, not statistical: both are additions to
+the same top-heavy curve (MV 5 and MV 6, replacing a two-drop and a free spell),
+Sunbird's alone already cost +4.28 stranded MV, and **both cuts are top-setters**
+— Penance and Scroll Rack are both in `lorehold.TOP_SETTERS` — so cutting two at
+once could plausibly have been worth more than the sum in either direction.
+
+A difference of two differences needs its own design, so this is a 2×2 factorial
+on common random numbers with all four legs shuffled on the same seed, which
+makes the interaction a paired quantity too. `run_lorehold_pair.py`, N=30,000 per
+cell (twice the tables: an interaction has roughly twice a main effect's
+variance, and 15,000 would have left exactly the one number this exists to
+produce ambiguous).
+
+| win rate | T10 | T20 |
+|---|---|---|
+| C alone | +0.0028 ±0.0011 | +0.0194 ±0.0024 |
+| S alone | +0.0019 ±0.0012 | +0.0146 ±0.0028 |
+| **BOTH** | **+0.0047 ±0.0016** | **+0.0362 ±0.0035** |
+| **INTERACTION** (CS−C−S+A) | **+0.0000 ±0.0008** | **+0.0022 ±0.0020** |
+| Caldera GIVEN Sunbird's | +0.0028 ±0.0012 | **+0.0216 ±0.0026** |
+| Sunbird's GIVEN Caldera | +0.0019 ±0.0013 | **+0.0168 ±0.0029** |
+
+**They add.** The interaction is exactly zero at ten turns and, if anything,
+slightly SUPER-additive at twenty — the opposite of the concern. The marginal
+rows are the decision: each change is worth its slot with the other already in.
+
+**Both predicted costs are real and both are outweighed**, which is the part
+worth keeping:
+
+- `stranded_mv` **compounds**: +5.40 (C) and +7.72 (S) alone, +13.72 together
+  against +13.12 additive, an interaction of **+0.60 ±0.18**. The two-six-drops
+  worry was correct about the mechanism.
+- The two cards **do compete for miracles**: `miracles_cast` interaction
+  **−0.018 ±0.008**, sub-additive, as two top-setter cuts should be.
+- They are outweighed by the damage channel (+0.30 ±0.24) and by Sunbird's firing
+  slightly more often with Caldera in (`sunbird_casts` +0.020 ±0.010).
+
+### One staged number reproduced and the other did not
+
+**Caldera reproduced**: +0.0202 → +0.0194 ±0.0024 at T20. **Sunbird's did not**:
++0.0215 → +0.0146 ±0.0028 at T20, and +0.0077 → +0.0019 at T10 with disjoint
+bars. Its staged measurement is from 2026-09-04 and predates a great deal of
+Lorehold engine work; Caldera's is from 2026-09-05 and postdates most of it.
+
+**The obvious explanation was tested and is WRONG.** Both cuts are top-setters,
+and the 2026-09-05 top-setter POLICY fixes made top-setters materially better
+(Library of Leng: miracled 43% → 80%, deck win 0.205 → 0.219), so cutting one
+should have become more expensive. Measured on today's engine against the same
+blank the tables use, N=15,000, v16 as printed:
+
+| card | win T10 | win T20 |
+|---|---|---|
+| Scroll Rack | −0.0007 ±0.0014 | **−0.0093 ±0.0032** |
+| Penance | +0.0003 ±0.0014 | **−0.0079 ±0.0033** |
+
+Scroll Rack is still worth −0.0093, essentially the −0.0100 it ablated to on
+2026-09-04. **The cut is exactly as cheap as it was**, so the decay is in
+Sunbird's Invocation's own contribution and is NOT attributed. Do not invent a
+mechanism for it. (Note in passing that Penance at −0.0079 is no longer the
+−0.0100-class worst card it was described as either, and that the two are now
+within a bar of each other.)
+
+### And a conditional number that was printed as an unconditional one
+
+The ledger justified Sunbird's with "fires 3.6 times a game for an average free
+spell of MV 3.8". `sunbird_triggers` now exists alongside `sunbird_casts`, and
+the two are very different numbers:
+
+| | per game | conditional on it resolving |
+|---|---|---|
+| resolves at all | — | **13.0% of games** |
+| triggers | 0.79 | 6.06 |
+| free casts | **0.52** | **4.00** |
+| avg MV of the free spell | — | 3.77 |
+
+So the old figure was the CONDITIONAL one and is roughly right as such (4.00 and
+3.77 today), but the entry read as though 3.6 free spells arrived every game,
+when the card is MV 6 and lands in one game in eight. Corrected in `pending.py`.
+34% of its firings find nothing at all — off a two-drop it reveals two cards and
+needs an MV≤2 nonland among them, which is the "worth far more off the top of the
+curve" point stated as a metric rather than as prose.
+
+`sunbird_triggers` is metric-only and was verified behaviour-preserving: all four
+decks' baselines are bit-identical across it, so no table moved.
 
 ---
 

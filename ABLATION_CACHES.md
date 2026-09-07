@@ -14,16 +14,16 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `e1de0f8`.
+Fingerprints recorded at `034ce9f`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
 | `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `6445a4ed867431be` |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `6445a4ed867431be` |
 | `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `6445a4ed867431be` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `02a46868d7caa686` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `02a46868d7caa686` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `02a46868d7caa686` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `8dab0e449025e750` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `8dab0e449025e750` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `8dab0e449025e750` |
 | `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `286df9e69d57e87e` |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `286df9e69d57e87e` |
 | `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `286df9e69d57e87e` |
@@ -58,7 +58,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache abov
 
 ### `ablation_cache_lorehold_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. STILL CURRENT after the 2026-09-06 Erebos and extra-turn work (KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved this fingerprint. The numbers did not move: this engine has its own Game class and imports only the mana and card primitives from engine.py, none of which changed. VERIFIED, not argued -- a git worktree at the previous commit ran this deck's baseline on the same seeds at both horizons and every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and tivit) and were regenerated, which is what makes the pass meaningful.
+CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. STILL CURRENT after the 2026-09-06 Erebos and extra-turn work (KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved this fingerprint. The numbers did not move: this engine has its own Game class and imports only the mana and card primitives from engine.py, none of which changed. VERIFIED, not argued -- a git worktree at the previous commit ran this deck's baseline on the same seeds at both horizons and every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and tivit) and were regenerated, which is what makes the pass meaningful. The lorehold fingerprint moved a SECOND time on 2026-09-06, for the `sunbird_triggers` counter added while closing queued item 0b (KNOWN_ISSUES.md 0p): the ledger justified Sunbird's Invocation with a CONDITIONAL firing rate printed as an unconditional one, and separating triggers from successful free casts is what showed it. METRIC ONLY -- one dict key and one increment, no branch reads it -- and checked the same way: all four decks' baselines bit-identical across the change. Cache current.
 
 ### `ablation_cache_lorehold_10-20_n6000.json`
 
