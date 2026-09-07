@@ -1,0 +1,82 @@
+==============================================================================
+PART A -- forced boards, one call to activations().
+==============================================================================
+  Shilgengar and four lands on the battlefield unless stated.
+  A check that cannot fail is worse than no check, so half of
+  these cases assert the line REFUSES.
+
+                                                              ults  fed  blood  back  ok
+  one 7-toughness Angel, a creature in the yard                  1    1      7     2  .
+  SAME BOARD, EMPTY GRAVEYARD -- must refuse, it is a pure shuffle     0    0      0     0  .
+  SAME BOARD, NO MANA -- must refuse BEFORE anything dies        0    0      0     0  .
+  a 5-toughness Angel alone -- five Blood is not six             0    0      0     0  .
+  the same Angel plus one Spirit token to top it up              1    2      6     2  .
+  six non-Angels, one Blood each                                 1    6      6     7  .
+  Blood already banked, nothing needs to die                     1    0      0     1  .
+  OLD POLICY, the board that fires under the new one             0    0      0     0  .
+
+  finality: 2 creature(s) returned once; fed back to Shilgengar and with 12 Blood banked, none of them returns again.
+
+  8 cases, 0 failing.
+
+==============================================================================
+PART B -- real games, N = 4,000, T20, default pod.
+==============================================================================
+  Per-game means. `ults` is the six-Blood mass reanimation.
+
+  policy       blood   sacs  angels fed   ults  returned   damage     win
+  tokens        0.13   0.23        0.00   0.00      0.00     64.1   0.208
+  ultimate      3.20   0.99        0.53   0.45      1.67     67.8   0.242
+
+  tokens: the ultimate fires in 0.0% of games -- 5.00 creatures returned, win rate 1.000 (vs 0.208 when it does not)
+  ultimate: the ultimate fires in 39.5% of games -- 4.23 creatures returned, win rate 0.423 (vs 0.124 when it does not)
+
+==============================================================================
+PART C -- policy and reserve as separate flips, N = 4,000, T20.
+==============================================================================
+  Same deck, same seeds, flag off vs on, so common random numbers
+  are intact and nothing but the flag differs. Applied
+  CUMULATIVELY, so the two deltas add up to BOTH.
+
+  the FODDER POLICY alone, with no mana held back for it
+      won                       0.208 ->    0.235     +0.0267 +-0.0067   *
+      damage                   64.142 ->   67.258     +3.1160 +-0.4303   *
+      blood_made                0.127 ->    2.381     +2.2535 +-0.1156   *
+      blood_spent               0.002 ->    1.976     +1.9740 +-0.0999   *
+      creatures_sacrificed      0.231 ->    0.770     +0.5397 +-0.0327   *
+      angels_fed                0.000 ->    0.387     +0.3867 +-0.0207   *
+      cards_fed                 0.000 ->    0.486     +0.4860 +-0.0277   *
+      shilgengar_ults           0.000 ->    0.329     +0.3290 +-0.0167   *
+      shilgengar_reanimated     0.001 ->    1.258     +1.2570 +-0.0677   *
+      mana_floated             20.610 ->   18.917     -1.6938 +-0.1484   *
+      stranded_mv             154.177 ->  154.748     +0.5703 +-0.2064   *
+      final_board_power        20.252 ->   23.945     +3.6940 +-0.3959   *
+
+  the MANA RESERVE on top of it ({3} held through the main phase)
+      won                       0.235 ->    0.242     +0.0075 +-0.0048   *
+      damage                   67.258 ->   67.766     +0.5080 +-0.3371   *
+      blood_made                2.381 ->    3.204     +0.8230 +-0.0814   *
+      blood_spent               1.976 ->    2.712     +0.7365 +-0.0677   *
+      creatures_sacrificed      0.770 ->    0.992     +0.2213 +-0.0232   *
+      angels_fed                0.387 ->    0.534     +0.1472 +-0.0144   *
+      cards_fed                 0.486 ->    0.691     +0.2052 +-0.0197   *
+      shilgengar_ults           0.329 ->    0.452     +0.1227 +-0.0113   *
+      shilgengar_reanimated     1.258 ->    1.673     +0.4143 +-0.0416   *
+      mana_floated             18.917 ->   18.960     +0.0430 +-0.0766    
+      stranded_mv             154.748 ->  156.441     +1.6938 +-0.2667   *
+      final_board_power        23.945 ->   24.529     +0.5833 +-0.2721   *
+
+  BOTH
+      won                       0.208 ->    0.242     +0.0343 +-0.0079   *
+      damage                   64.142 ->   67.766     +3.6240 +-0.5103   *
+      blood_made                0.127 ->    3.204     +3.0765 +-0.1305   *
+      blood_spent               0.002 ->    2.712     +2.7105 +-0.1126   *
+      creatures_sacrificed      0.231 ->    0.992     +0.7610 +-0.0381   *
+      angels_fed                0.000 ->    0.534     +0.5340 +-0.0235   *
+      cards_fed                 0.000 ->    0.691     +0.6913 +-0.0322   *
+      shilgengar_ults           0.000 ->    0.452     +0.4517 +-0.0188   *
+      shilgengar_reanimated     0.001 ->    1.673     +1.6712 +-0.0730   *
+      mana_floated             20.610 ->   18.960     -1.6507 +-0.1649   *
+      stranded_mv             154.177 ->  156.441     +2.2640 +-0.3278   *
+      final_board_power        20.252 ->   24.529     +4.2773 +-0.4622   *
+

@@ -562,6 +562,24 @@ def _check_eliminations(g):
         g.result = "win"
 
 
+def your_creatures(g) -> int:
+    """How many creatures you control RIGHT NOW, for the blocker count.
+
+    Most of the time that is just the creature cards on your battlefield. The
+    exception is an engine where something else is temporarily a creature —
+    `azusa` animates its lands, and a board of twenty 2/2 lands is twenty
+    blockers whether or not the cards say "Creature" on them. An engine
+    declares that by defining `counts_as_creature`; the five that do not get the
+    identical count they always got, which is why this is discovered with
+    `hasattr` rather than added to every engine (the same way
+    `on_creature_death` is discovered by `destroy`).
+    """
+    ask = getattr(g, "counts_as_creature", None)
+    if ask is None:
+        return sum(1 for p in g.board if p.card.is_creature)
+    return sum(1 for p in g.board if ask(p))
+
+
 def combat_share(g, opp, others) -> float:
     """P(this opponent's ATTACK comes at you) — the inverse of `your_share`.
 
@@ -576,7 +594,7 @@ def combat_share(g, opp, others) -> float:
     holding five each you eat ~75% of the pod's attacks; with a board of seven
     you drop to ~27%, just under the neutral 1/3.
     """
-    mine = sum(1 for p in g.board if p.card.is_creature)
+    mine = your_creatures(g)
     w_you = 1.0 / (1.0 + mine)
     total = w_you + sum(1.0 / (1.0 + o.creatures) for o in others)
     return w_you / total if total > 0 else 0.0

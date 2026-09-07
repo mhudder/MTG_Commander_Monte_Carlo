@@ -1,0 +1,112 @@
+==============================================================================
+PART A -- forced boards, one property of one card per case.
+==============================================================================
+  Each case asserts a specific line of oracle text, and each was
+  checked to FAIL when the behaviour it pins is removed.
+
+  .  a land played AFTER Sylvan Awakening is not animated
+        4 animated, still 4 after a 5th land
+  .  haste: Sylvan lets a land played this turn attack, Rude does not
+        Sylvan 5 attackers, Rude 4
+  .  blockers: Sylvan's lands survive to the pod's round, Rude's do not
+        Sylvan 6 blockers, Rude 0
+  .  attacking with lands spends them: mana before vs after combat
+        6 -> 0
+  .  Rude Awakening entwined: untaps AND animates
+        9/9 untapped, 9 animated, entwines=1
+  .  Nissa, Vastwood Seer transforms at SEVEN lands
+        transforms at 6 lands: 0, at 7: 1
+  .  Nissa, Worldwaker: enters at 3, +1 once a turn, -7 at seven
+        3 -> 4 after two calls in one turn; ultimates=1, loyalty now 0
+  .  legacy: Sylvan attacks but never blocks and never taps a land
+        0 blockers, 6 mana still up after attacking
+
+  8 cases, 0 failing.
+
+==============================================================================
+PART B -- real games, N = 4,000, T20, default pod.
+==============================================================================
+  Per-game means. `anim dmg` is the animation's MARGINAL damage:
+  what got through with the lands attacking minus what would have
+  without them, so chump blocks are already priced in.
+
+  engine     animated  attacks  anim dmg  blk turns  pw acts   ults    damage     win
+  legacy         0.00     0.00      0.00       0.00     0.00  0.000    4579.6   0.275
+  full           8.93     1.44      9.24       3.19     1.91  0.172    4924.7   0.297
+
+==============================================================================
+PART C -- each fix as a paired CFG flip, N = 4,000, T20.
+==============================================================================
+  Same deck, same seeds, flag off vs on, so common random numbers
+  are intact and nothing but the flag differs. Applied
+  CUMULATIVELY, so the four deltas add up to ALL FOUR.
+  NOTE: this deck's damage column is unusable -- Scute Swarm's
+  doubling gives it a tail with CIs of the same order as the point
+  estimates. Read the win-rate row. (ablation_azusa.txt says so in
+  its own header.)
+
+  land_animation        (a real continuous effect, and attacking taps it)
+      won                          0.275 ->     0.276     +0.0003 +-0.0008    
+      damage                    4579.565 ->  4347.543   -232.0215 +-454.8603  
+      landfall_triggers           19.986 ->    19.991     +0.0045 +-0.0134    
+      lands_played                15.620 ->    15.625     +0.0047 +-0.0080    
+      lands_animated               0.000 ->     3.335     +3.3352 +-0.2154   *
+      animated_attacks             0.000 ->     0.450     +0.4497 +-0.0637   *
+      animated_damage              0.000 ->     1.146     +1.1460 +-0.3235   *
+      final_life                   6.683 ->     6.683     -0.0000 +-0.0258    
+      final_board_power         5677.206 ->  5323.253   -353.9522 +-693.8386  
+
+  animated_lands_block  (Sylvan lasts until YOUR NEXT TURN, so they block)
+      won                          0.276 ->     0.277     +0.0013 +-0.0011   *
+      damage                    4347.543 ->  4347.798     +0.2550 +-0.1452   *
+      landfall_triggers           19.991 ->    20.024     +0.0335 +-0.0137   *
+      lands_played                15.625 ->    15.649     +0.0238 +-0.0092   *
+      animated_blocker_turns       0.000 ->     2.714     +2.7140 +-0.1846   *
+      final_life                   6.683 ->     6.784     +0.1002 +-0.0289   *
+      final_board_power         5323.253 ->  5323.510     +0.2570 +-0.2905    
+
+  rude_awakening_modes  (the animate mode and the entwine did not exist)
+      won                          0.277 ->     0.276     -0.0008 +-0.0019    
+      damage                    4347.798 ->  4193.347   -154.4515 +-308.9582  
+      landfall_triggers           20.024 ->    19.988     -0.0365 +-0.0218   *
+      lands_played                15.649 ->    15.620     -0.0288 +-0.0136   *
+      lands_animated               3.335 ->     6.101     +2.7660 +-0.2185   *
+      animated_attacks             0.450 ->     1.011     +0.5610 +-0.0861   *
+      animated_damage              1.146 ->     4.444     +3.2980 +-2.5375   *
+      animated_blocker_turns       2.714 ->     2.719     +0.0050 +-0.0161    
+      entwines                     0.000 ->     0.161     +0.1610 +-0.0118   *
+      final_life                   6.784 ->     6.781     -0.0028 +-0.0411    
+      final_board_power         5323.510 ->  5086.620   -236.8905 +-462.6534  
+
+  planeswalker_abilities  (both Nissas were inert permanents)
+      won                          0.276 ->     0.297     +0.0210 +-0.0068   *
+      damage                    4193.347 ->  4924.729   +731.3822 +-1765.8830  
+      landfall_triggers           19.988 ->    21.277     +1.2897 +-0.1361   *
+      lands_played                15.620 ->    15.984     +0.3638 +-0.0790   *
+      lands_animated               6.101 ->     8.930     +2.8285 +-0.3026   *
+      animated_attacks             1.011 ->     1.440     +0.4290 +-0.0912   *
+      animated_damage              4.444 ->     9.243     +4.7988 +-2.3759   *
+      animated_blocker_turns       2.719 ->     3.190     +0.4710 +-0.1327   *
+      pw_activations               0.000 ->     1.913     +1.9135 +-0.0952   *
+      pw_ultimates                 0.000 ->     0.172     +0.1715 +-0.0126   *
+      nissa_transforms             0.000 ->     0.267     +0.2670 +-0.0137   *
+      entwines                     0.161 ->     0.181     +0.0198 +-0.0069   *
+      final_life                   6.781 ->     7.496     +0.7155 +-0.8721    
+      final_board_power         5086.620 ->  6651.029   +1564.4092 +-2665.0115  
+
+  ALL FOUR
+      won                          0.275 ->     0.297     +0.0217 +-0.0071   *
+      damage                    4579.565 ->  4924.729   +345.1642 +-1849.6339  
+      landfall_triggers           19.986 ->    21.277     +1.2913 +-0.1386   *
+      lands_played                15.620 ->    15.984     +0.3635 +-0.0809   *
+      lands_animated               0.000 ->     8.930     +8.9298 +-0.4455   *
+      animated_attacks             0.000 ->     1.440     +1.4398 +-0.1189   *
+      animated_damage              0.000 ->     9.243     +9.2427 +-3.3983   *
+      animated_blocker_turns       0.000 ->     3.190     +3.1900 +-0.2068   *
+      pw_activations               0.000 ->     1.913     +1.9135 +-0.0952   *
+      pw_ultimates                 0.000 ->     0.172     +0.1715 +-0.0126   *
+      nissa_transforms             0.000 ->     0.267     +0.2670 +-0.0137   *
+      entwines                     0.000 ->     0.181     +0.1807 +-0.0125   *
+      final_life                   6.683 ->     7.496     +0.8128 +-0.8735    
+      final_board_power         5677.206 ->  6651.029   +973.8235 +-2792.7248  
+

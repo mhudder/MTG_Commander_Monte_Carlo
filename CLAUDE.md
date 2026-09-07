@@ -55,6 +55,26 @@ python run_erebos.py                # §0l  the three Erebos errors, separately
 python run_goldspan.py              # 0c   Goldspan re-measured at N=15,000
 python run_lorehold_pair.py         # §0p  the two staged Lorehold changes, 2x2
 python run_lowstakes.py             # §0g/§0h  the "low stakes" fixes that were not
+python diag_shilgengar_ult.py       # 0r  the commander ability that never fired
+python diag_azusa_animation.py      # 0s  the four land-animation effects
+```
+
+The azusa one carries its own MUTATION CHECK, because a check that cannot
+fail reads like assurance and is worse than none:
+
+```bash
+python diag_azusa_animation.py --mutate   # every fix off; 7 of 8 cases MUST fail
+```
+
+And the check for whether a SHARED-code change moved a deck it was not
+meant to move -- `opponents.py` and `engine.py` are in every deck's cache
+fingerprint, so all six fingerprints move whether or not any number does:
+
+```bash
+git worktree add ../edhmc_head HEAD
+python check_unchanged_decks.py --out=new.json
+(cd ../edhmc_head && python check_unchanged_decks.py --out=old.json)
+python check_unchanged_decks.py --diff old.json new.json
 ```
 
 ---
@@ -71,6 +91,176 @@ ledger. `python -m edhmc.pending` must show the expected staged/committed counts
 and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 **All three legs move in one git commit, or the change is not committed.**
+
+---
+
+## 2026-09-07 (later still): TWO COMMANDERS' OWN CARDS WERE NOT BEING PLAYED
+
+Both decks' first tables, published earlier the same day, are **void**. Both
+engines changed; `validate.py` is `+0.00` on all eighteen metrics across six
+engines and `corr(A,B)` is unchanged at 0.9053.
+
+The two started as separate queued items and turned out to be the same bug
+twice: **a policy decision, written down as conservatism, that amounted to
+asserting a card does nothing.** Neither was visible in an ablation table,
+because in both cases the card's own row looked like an ordinary bad row.
+
+### Shilgengar's ultimate fired ZERO times in 3,000 games — and it is worth 0.034
+
+`KNOWN_ISSUES.md` §0r; `diag_shilgengar_ult.py` is the evidence.
+
+The commander reads "sacrifice another creature: create a Blood token, or
+Blood equal to its TOUGHNESS if it was an Angel", then "sacrifice six Blood:
+return each creature card from your graveyard to the battlefield". The deck is
+half Angels. `blood_made` averaged **0.10 a game**.
+
+`aristocrats_step` would only ever sacrifice 1/1 Spirit tokens, and Spirit
+tokens only exist once an Angel has already died — so the engine was starved
+by construction. The docstring said this understated the ability. It did not
+say it reduced it to zero, and nobody had measured which.
+
+**THE FIX IS ARITHMETIC, NOT A PILOT'S JUDGEMENT, which is why it was safe to
+automate.** The ultimate returns *the Angel you just sacrificed to pay for
+it*, and `activations()` runs after combat, so the bodies fed to it have
+already attacked. A nontoken sacrifice is a LOAN. So the line is taken only
+when it completes the ultimate that same turn — and **real cards now sort
+ahead of tokens as fodder, the exact reverse of the old policy**, because the
+card comes back and the token does not.
+
+| flip, 4,000 paired games, T20 | win rate |
+|---|---|
+| the fodder policy | +0.0267 ±0.0067 |
+| **the mana reserve** — `main_phase` is greedy and `activations()` runs after it, so the {3} was never there | +0.0075 ±0.0048 |
+| **both** | **+0.0343 ±0.0079** |
+
+Deck win rate **0.208 → 0.242**; the ultimate now fires in **39.5% of games**.
+The second row is worth reading twice: a fifth of the effect was not the
+policy at all, it was that nothing in the engine ever held mana back for an
+after-combat ability. That is a shape other engines may share.
+
+**THE REGENERATED TABLE MOVES FOR REASONS YOU CAN READ OFF THE CARDS**, which
+is the check that the fix is real rather than merely large: 10 of 64 rows
+moved by more than their own old CI half-width, zero already-significant rows
+flipped sign, and the movers are exactly the cards the mechanism touches.
+**Righteous Valkyrie (+0.0086 → +0.0130, 2.0x its old bar) and Elesh Norn
+(+0.0059 → +0.0083), because +2/+2 on an Angel is literally +2 Blood when you
+sacrifice it.** Bishop of Wings (2.2x) and Requiem Angel, because they make
+Spirit tokens off deaths that now happen. Blood Artist and Zulaport Cutthroat,
+because their triggers now fire. Reya Dawnbringer went DOWN (+0.0074 →
++0.0045): she reanimates one creature a turn out of a graveyard the ultimate
+now empties, and finality counters keep what it returned out of her pool.
+
+**And the rows that did NOT move are a finding rather than an omission.** The
+sac OUTLETS are still flat to negative — Viscera Seer −0.0005, Skullclamp
+−0.0013, Vampiric Rites −0.0016, Cartel Aristocrat +0.0011. **The commander is
+the only sacrifice outlet this deck needs**, so the redundant ones buy nothing.
+That is now a statement about the cards, where the old table's version of it
+was a statement about the policy — and it is the same conclusion read off a
+table that can finally see the mechanism.
+
+**FINALITY COUNTERS HAD TO BE MODELLED IN THE SAME CHANGE**, or the fix plays
+a card the game does not print: the returned creatures come back "with a
+finality counter", so the same Angel cannot be fed to a second ultimate. Two
+versions of that check passed while proving nothing — the first because after
+an ultimate the graveyard is empty so a second cast has nothing to return
+either way, the second because it ran out of mana before it ran out of
+finality. Both are written up in §0r, because "the check passed" was wrong
+twice for reasons that had nothing to do with the mechanism.
+
+### Azusa's land animation: implemented at last, and it is NOT the story
+
+`KNOWN_ISSUES.md` §0s; `diag_azusa_animation.py` is the evidence.
+
+Four effects, of which **one** was implemented as animation at all. Sylvan
+Awakening was a turn-scoped flag whose lands attacked as fabricated 2/2s that
+were never on the battlefield — so attacking with them tapped nothing and the
+same lands still paid for the postcombat main phase. Rude Awakening was its
+untap mode only: no animate mode, no entwine. Nissa, Worldwaker had no
+abilities at all. And Nissa, Vastwood Seer never transformed, so her whole
+back face was unreachable in a deck that hits seven lands on turn five.
+
+| flip, 4,000 paired games, T20, cumulative | win rate |
+|---|---|
+| `land_animation` — a real continuous effect, and attacking taps it | +0.0003 ±0.0008 |
+| `animated_lands_block` — Sylvan lasts until YOUR NEXT TURN, so they block | +0.0013 ±0.0011 |
+| `rude_awakening_modes` — the animate mode and the entwine | −0.0008 ±0.0019 |
+| **`planeswalker_abilities` — both Nissas** | **+0.0210 ±0.0068** |
+| **all four** | **+0.0217 ±0.0071** |
+
+**THE PILLAR IS REAL AND IT IS NEARLY A BLANK. THE TWO NISSAS ARE NOT.** All
+three animation fixes together sit inside their own bars — and that is now a
+RESULT rather than an absence, which is the entire point of doing the work.
+The mechanism is legible: the animation is worth **9.24 marginal damage a
+game** in a deck whose damage runs into the thousands, because Scute Swarm's
+doubling dwarfs it. **This deck does not need more damage. The animation sells
+it the one thing it already has most of.**
+
+The Nissas sell it what it is short of, and this is the land-sequencing
+finding arriving from a second direction: **+1.29 landfall triggers and +0.36
+lands played a game.** The corrected table already said this deck is
+CARD-limited rather than drop-limited; Nissa, Sage Animist's +1 is a card or a
+free land every single turn, and that is why she scores where three land
+animations do not.
+
+**"Untested, not disproved" was the right thing to have written down.** It was
+also worth 0.022 win rate to settle, and almost none of it came from the card
+the note was about.
+
+**WHAT THE REGENERATED TABLE DID, which is the check that the work was
+targeted: 3 of 58 rows moved by more than their own old CI half-width, and
+they are the three cards whose implementation changed.**
+
+| card | old | new | vs its own old bar |
+|---|---|---|---|
+| Nissa, Vastwood Seer // Sage Animist | +0.0039 | **+0.0215** | 6.1x |
+| Nissa, Worldwaker | −0.0001 (`FLIP`) | **+0.0061** (`win`) | 4.4x |
+| Sylvan Awakening | +0.0021 | +0.0048 | 1.9x |
+
+Zero sign flips among rows that were already significant, and Rude Awakening
+(+0.0019 → +0.0046) did not move by more than its own bar. **Nissa, Vastwood
+Seer is now a top-five card in the deck** — behind Scute Swarm (+0.0328),
+Rampaging Baloths (+0.0309), Avenger of Zendikar (+0.0281) and Horn of Greed
+(+0.0277) — where the previous table had her as an ordinary +0.0039. Both
+Awakenings are now *significant* and *small*, which is the shape you want from
+a mechanism that is real and does not matter much.
+
+### Planeswalker loyalty exists now, and it is the third checked name set
+
+`PLANESWALKERS` holds starting loyalty; `Permanent.counters` holds the current
+value, so no field was added to a dataclass five other engines share.
+`check_planeswalker_coverage()` raises at import if a Planeswalker in the deck
+has no entry — the §0q rule applied in the same change, because a walker
+missing from that table enters at zero loyalty and does nothing, silently,
+which is the exact state both Nissas were in.
+
+**Nissa, Worldwaker moved from `KNOWN_BLIND` to `SCRIPTED_AZUSA`** in the same
+commit. Her old entry read "planeswalker activated abilities — nothing in this
+project tracks loyalty". That stopped being true, and leaving it would have
+printed an implemented card under MODEL-BLIND — §0q's first instance verbatim,
+for the third time.
+
+### One shared-code change, and the check that it moved nothing else
+
+`opponents.combat_share` now counts blockers through `your_creatures(g)`,
+which asks the engine `counts_as_creature` when it defines one. Animated lands
+are blockers; the other five engines define no such hook and get the identical
+expression they always had. **Deliberately NOT named `is_creature_now`**:
+`karlov.is_creature_now(g, card)` is a module-level function with a different
+signature, and a `getattr` hook sharing that name is a silent failure waiting
+for whoever turns karlov's into a method.
+
+**CHECKED, NOT ARGUED**, because this file records one occasion when the
+argument was right about one change and wrong about another in the same
+commit. `check_unchanged_decks.py` is that check, made repeatable: a git
+worktree at the previous commit runs the same seeds through both versions of
+all six decks and diffs every metric exactly.
+
+    rendmaw, lorehold, karlov, tivit    BIT-IDENTICAL on all 8 metrics
+    shilgengar, azusa                   moved -- their own engines changed
+
+So only two of the six tables needed regenerating, and all six fingerprints
+moved anyway because `opponents.py` is shared. That gap between "the
+fingerprint moved" and "the numbers moved" is exactly what the tool is for.
 
 ---
 
@@ -167,6 +357,14 @@ obvious one for a deck whose commander reads "play two additional lands."**
 
 ## 2026-09-07: first ablation tables for shilgengar and azusa
 
+> **BOTH TABLES IN THIS SECTION ARE VOID, superseded later the same day.**
+> Shilgengar's engine never fired its commander's ability (KNOWN_ISSUES.md
+> 0r) and Azusa's had one of its four land animations implemented and
+> neither Nissa (0s). Both are regenerated. The section is kept because
+> the REASONING in it is still how these tables should be read -- and
+> because the paragraph below about the aristocrats package being starved
+> by its own policy is the note that led to the fix.
+
 Both at the common N=15,000 and horizons 10,20, so they are comparable
 row-for-row with the other four. Baseline win rate at T20: **shilgengar
 0.209, azusa 0.205** — below rendmaw (0.307), tivit (0.397) and karlov
@@ -207,6 +405,19 @@ ultimate fired ZERO times in 3,000 games.** The deck's namesake ability is
 currently untested rather than tested-and-found-wanting. That is the first
 thing to fix about this engine, and until it is fixed these rows are a fact
 about the policy at least as much as about the cards.
+
+> **FIXED later the same day, and this paragraph is why.** The policy now
+> feeds real Angels to the ability whenever that completes the ultimate in the
+> same turn, which is a loan rather than a cost because the ultimate returns
+> the Angel it was paid with. Worth **+0.0343 win rate**, and the rows above
+> are void -- see the section at the top of this file and KNOWN_ISSUES.md 0r.
+> Note what the regenerated table did NOT do: the sac OUTLETS (Viscera Seer,
+> Vampiric Rites, Cartel Aristocrat, Skullclamp) are still flat to negative,
+> because the commander is the only outlet the deck needs. What moved is the
+> death-trigger PAYOFFS and, best of all, the TOUGHNESS BUFFS -- Righteous
+> Valkyrie 2.0x its own old error bar and Elesh Norn 1.1x, because +2/+2 on an
+> Angel is literally +2 Blood when you sacrifice it. A ranking that moves for
+> a reason you can read off the card is the check that the fix is real.
 
 **Two proxy/objective disagreements, both the right way round.** Damn is
 −1.17 damage at T10 and **+0.0061 win rate**; Wrath of God −1.14 and

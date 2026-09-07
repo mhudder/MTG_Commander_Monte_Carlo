@@ -874,12 +874,193 @@ work of 2026-09-07 measured the cost of exactly this ordering mistake at
   decision, argued in the comment at its definition, not a measurement.
 - **`SCRIPTED_*` still verifies classification, not truth** (0f).
 - **Nothing checks the other five engines for the same ordering hazard.**
-  `shilgengar.aristocrats_step` is the obvious next suspect: its sacrifice
-  policy is the reason the commander's ultimate fires zero times in 3,000
-  games, and no equivalent coverage check exists there.
+  `shilgengar.aristocrats_step` was the obvious next suspect and it was the
+  right one — see **0r**, where the same shape of unstated policy decision
+  turned out to be worth 0.034 win rate. There is still no coverage check for
+  a sacrifice policy, because unlike `LAND_ENABLERS` there is no method whose
+  source IS the definition. What there is instead is a diagnostic that was
+  verified to fail when the mechanism is removed, which is the weaker but
+  available version of the same idea.
 
 **The rule to carry forward: when you add a hand-maintained name set, add the
 check in the same change, and prove the check fails.**
+
+---
+
+## 0r. FIXED — Shilgengar's own ability fired ZERO times in 3,000 games
+
+**Status: fixed and default-on. `ablation_shilgengar.txt` regenerated; the
+first table, published earlier the same day, is void.**
+
+The commander is `Sacrifice another creature: create a Blood token, or Blood
+equal to its TOUGHNESS if it was an Angel` plus `{W/B}{W/B}{W/B}, sacrifice
+six Blood: return each creature card from your graveyard to the battlefield`.
+The deck is half Angels. `blood_made` averaged **0.10 a game** and the
+six-Blood ultimate fired **zero times in 3,000 games**.
+
+Two causes, both in the POLICY rather than in any card's text — and the
+ablation table could not tell you either of them, because the aristocrats rows
+scored negative and read as a verdict on the cards.
+
+1. **The sacrifice policy would only ever eat 1/1 Spirit tokens** — never a
+   real card, on the stated grounds that feeding a live Lyra Dawnbringer to
+   Shilgengar was a pilot judgement call the model should not attempt. But
+   Spirit tokens only exist once an Angel has *already* died (Requiem Angel,
+   Bishop of Wings), so the engine was starved by construction. It is another
+   instance of a conservative-looking policy turning out to be an assertion
+   that a card does nothing.
+2. **No mana was ever held back for the ability.** `main_phase` is greedy and
+   `activations()` runs after it, so even when six Blood existed the {3} did
+   not. Measured separately below, and it is a fifth of the total.
+
+### Why the new policy is arithmetic and not a judgement call
+
+The ultimate returns **the Angel you just sacrificed to pay for it**. A
+nontoken sacrifice is a LOAN, not a cost — and `activations()` runs after
+combat, so the bodies have already attacked, and `take_turn` clears summoning
+sickness at the start of the next turn. So the line is taken only when it
+COMPLETES THE ULTIMATE THIS TURN, and REAL CARDS SORT AHEAD OF TOKENS as
+fodder, which is the exact reverse of the old policy: the card comes back and
+the token does not.
+
+Deliberately still conservative, so the number is a floor: it never banks
+Blood across turns (a pilot holding five Blood and a Lyra sometimes would),
+and the death triggers the sacrifices set off — Blood Artist, Grim Haruspex,
+Pitiless Plunderer — are not counted as part of the case for taking it.
+
+### FINALITY COUNTERS, without which the engine plays a card that is not printed
+
+"Return each creature card ... **with a finality counter on it**" — if such a
+creature would die again it is exiled instead of hitting the graveyard.
+Without that, sacrifice–return–sacrifice–return is an infinite value loop on
+one Angel. `yard_creatures()` is the filtered pool that every recursion effect
+in the deck now reads (the ultimate, Reya Dawnbringer, Priest of Fell Rites,
+Sun Titan, Emeria Shepherd).
+
+**The first version of that check was vacuous and passed anyway**, which is
+worth recording because it is exactly what §0q is about. Casting the ultimate
+twice in a row proves nothing: the creatures it returned are on the
+BATTLEFIELD and the graveyard is empty, so the second cast has nothing to
+return whether finality works or not. The real test feeds the returned card
+BACK to Shilgengar first — and then it failed for a second reason, the {3}
+being unaffordable, which made a mana check look like a passing finality
+check. `diag_shilgengar_ult.py` closes both, and was verified to FAIL when
+`yard_creatures` is stubbed out.
+
+### Measured (`diag_shilgengar_ult.py`, 4,000 paired games, T20)
+
+| flip | win rate |
+|---|---|
+| the fodder policy, with no mana held back | **+0.0267 ±0.0067** |
+| the mana reserve on top of it | **+0.0075 ±0.0048** |
+| **both** | **+0.0343 ±0.0079** |
+
+Deck win rate **0.208 → 0.242**. The ultimate now fires in **39.5% of games**,
+returning 4.23 creatures when it does; `blood_made` 0.13 → 3.20.
+
+**Do not read the "win rate 0.423 when it fires vs 0.124 when it does not"
+split in PART B as an effect size.** Firing it needs the commander alive, six
+Blood of fodder and {3} to spare, all of which are true in games you were
+already winning. The paired flips above are the causal number and they are a
+third of that.
+
+### What this does NOT settle
+
+The negative aristocrats rows in the first table were a fact about the policy
+at least as much as about the cards. The regenerated table is the first one in
+which they are a fact about the cards, so they should be read from scratch
+rather than diffed against the old ones.
+
+---
+
+## 0s. Azusa's land animation: TESTED AT LAST, and the pillar is not the story
+
+**Status: all four effects implemented, each behind its own flag, all
+default-on. `ablation_azusa.txt` regenerated; the first table is void.**
+
+The first table scored Sylvan Awakening +0.0017 and Rude Awakening +0.0019,
+both inside their bars, and CLAUDE.md recorded the honest reading: "this
+pillar of the deck is untested, not disproved." Four things were wrong.
+
+1. **Sylvan Awakening was a turn-scoped flag**, so its lands attacked as
+   fabricated 2/2s that were never on the battlefield — which meant attacking
+   with them TAPPED NOTHING and the same lands still paid for the postcombat
+   main phase. Its real duration is UNTIL YOUR NEXT TURN, so its lands are
+   also still creatures during the pod's round and count as blockers.
+2. **Rude Awakening was implemented as its untap mode only.** The animate mode
+   and the entwine did not exist — and entwining (untap every land, then
+   animate them) is how the card actually ends a game.
+3. **Nissa, Worldwaker had no abilities**: a five-mana Planeswalker that was a
+   0/0 permanent doing nothing at all.
+4. **Nissa, Vastwood Seer never transformed.** Only her ETB Forest search was
+   modelled, so in a deck that reaches seven lands around turn five she stayed
+   a 2/2 for the rest of the game and her entire back face was unreachable.
+
+Also corrected, with no flag because it is unobservable unless a land is a
+creature: **lands now enter summoning sick.** Every land call site passed
+`sick=False`, which was harmless while no land was ever a creature. The single
+visible consequence is that Dryad Arbor can no longer attack the turn it is
+played, which it never could.
+
+### THE ANSWER IS THAT THE ANIMATION IS NEARLY A BLANK AND THE NISSAS ARE NOT
+
+`diag_azusa_animation.py`, 4,000 paired games, T20, flips applied cumulatively:
+
+| flip | win rate |
+|---|---|
+| `land_animation` — a real continuous effect, and attacking taps it | +0.0003 ±0.0008 |
+| `animated_lands_block` — Sylvan lasts until your next turn | +0.0013 ±0.0011 |
+| `rude_awakening_modes` — the animate mode and the entwine | −0.0008 ±0.0019 |
+| **`planeswalker_abilities` — both Nissas** | **+0.0210 ±0.0068** |
+| **all four** | **+0.0217 ±0.0071** |
+
+**Essentially all of it is the two Nissas.** The three animation fixes together
+are inside their own bars, and that is now a RESULT rather than an absence: the
+mechanism is implemented, it is measured, and it is small. The reason is
+legible in the counters — the animation is worth **9.24 marginal damage a
+game** in a deck whose damage runs into the thousands, because Scute Swarm's
+doubling dwarfs it. **This deck does not need more damage. The animation sells
+it the one thing it already has most of.**
+
+The Nissas sell it what it is actually short of, and it is the same finding the
+land-sequencing work reached from the other direction: **+1.29 landfall
+triggers and +0.36 lands played a game.** The 2026-09-07 table already
+established that this deck is CARD-limited rather than drop-limited, and Nissa,
+Sage Animist's +1 is a card or a free land every single turn.
+
+### Reading the rows honestly
+
+- **The `legacy` row's zeroes in PART B are "not measured", not "never
+  happened".** The old engine did attack with its lands; none of these
+  counters existed to see it. PART C is the comparison.
+- **The damage column here is unusable**, exactly as the table's own header
+  says: CIs of ±1,765 against a point estimate of +731.
+- **Indestructible and reach are carried and cannot matter.** `spot_removal`
+  and `board_wipe` both exclude lands, so nothing the pod does can kill an
+  animated land, and this engine never blocks with your creatures. Sylvan
+  Awakening's indestructible clause is worth exactly zero here. That is a fact
+  about the pod rather than a gap in it — but it does mean the card's row is
+  not a measurement of the whole card.
+- **Both Nissas are a FLOOR.** No opponent ever attacks a Planeswalker,
+  because the pod's combat is a float rather than a set of attackers, so
+  loyalty only ever goes up and the ultimates arrive sooner than they would at
+  a real table. Pulling the other way, Nissa, Sage Animist's −2 is never taken.
+  Spot removal is the only pressure on either.
+
+### Planeswalker loyalty exists now, scoped to this engine
+
+`PLANESWALKERS` holds starting loyalty and `Permanent.counters` holds the
+current value, so no field was added to a dataclass five other engines share.
+`check_planeswalker_coverage()` raises at import if a Planeswalker in the deck
+has no entry — the §0q rule applied in the same change, because a walker
+missing from that table enters at zero loyalty and silently does nothing,
+which is the exact state both Nissas were in.
+
+**`Nissa, Worldwaker` moved from `KNOWN_BLIND` to `SCRIPTED_AZUSA`** in the
+same commit. Her old entry read "planeswalker activated abilities — nothing in
+this project tracks loyalty", which stopped being true; leaving it would have
+printed an implemented card under MODEL-BLIND, which is §0q's first instance
+verbatim.
 
 ---
 

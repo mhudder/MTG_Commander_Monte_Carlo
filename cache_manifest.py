@@ -270,6 +270,74 @@ NOTES.update({
 })
 
 
+# 2026-09-07, LATER THE SAME DAY: both new decks' first tables turned out to be
+# measuring a policy rather than a card, and both were regenerated. The notes
+# above are kept as the provenance of the numbers quoted from them.
+NOTES.update({
+    "ablation_cache_shilgengar_10-20_n15000_medblank.json": (
+        "CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the "
+        "SACRIFICE POLICY FIX, KNOWN_ISSUES.md 0r. The engine would only ever "
+        "sacrifice 1/1 Spirit tokens, and Spirit tokens only exist once an "
+        "Angel has already died, so the commander's own ability was starved "
+        "by construction: blood_made averaged 0.10 a game and the six-Blood "
+        "ultimate FIRED ZERO TIMES IN 3,000 GAMES. It now feeds real Angels "
+        "to the ability whenever that completes the ultimate in the same "
+        "turn -- which is arithmetic and not a pilot's judgement call, "
+        "because the ultimate returns the Angel it was paid with, so the "
+        "sacrifice is a loan. Separately, main_phase now holds {3} back for "
+        "the ability, which activations() runs after and could therefore "
+        "never afford. Deck win rate 0.208 -> 0.242; the two halves are "
+        "+0.0267 and +0.0075 and together +0.0343 +-0.0079. "
+        "WHAT MOVED IN THE TABLE, which is the check that the fix is real: "
+        "10 of 64 rows moved by more than their own OLD CI half-width and "
+        "ZERO of the already-significant rows flipped sign. The movers are "
+        "the cards whose text the mechanism reads -- Righteous Valkyrie "
+        "(+0.0086 -> +0.0130, 2.0x its old bar) and Elesh Norn (+0.0059 -> "
+        "+0.0083) because +2/+2 on an Angel is literally +2 Blood when you "
+        "sacrifice it; Bishop of Wings (2.2x) and Requiem Angel because they "
+        "make Spirit tokens off deaths that now happen; Blood Artist and "
+        "Zulaport Cutthroat because their triggers now fire. Reya Dawnbringer "
+        "went DOWN (+0.0074 -> +0.0045): she reanimates one creature a turn "
+        "out of a graveyard the ultimate now empties, and finality counters "
+        "keep what it returned out of her pool. "
+        "NOT MOVED, and worth reading as a finding rather than an omission: "
+        "the sac OUTLETS are still flat to negative (Viscera Seer -0.0005, "
+        "Skullclamp -0.0013, Vampiric Rites -0.0016, Cartel Aristocrat "
+        "+0.0011). The commander is the only sacrifice outlet this deck "
+        "needs, so the redundant ones buy nothing -- which is a statement "
+        "about the cards, where the old table's version of it was a "
+        "statement about the policy."),
+    "ablation_cache_azusa_10-20_n15000_medblank.json": (
+        "CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the "
+        "LAND-ANIMATION AND PLANESWALKER work, KNOWN_ISSUES.md 0s -- the "
+        "SECOND regeneration of this deck that day, after the land-sequencing "
+        "rewrite noted above. Four fixes: land animations are real continuous "
+        "effects with the animated set captured AT RESOLUTION and per-card "
+        "durations (Sylvan Awakening lasts until your next turn, so its lands "
+        "block during the pod's round; Rude Awakening's mode and Nissa's +1 "
+        "do not); an animated land that attacks is now TAPPED, so it cannot "
+        "also pay for the postcombat main phase; Rude Awakening's animate "
+        "mode and its entwine existed nowhere at all; and both Nissas had no "
+        "activated abilities, Nissa Vastwood Seer never even transforming. "
+        "THE RESULT IS THAT THE ANIMATION IS NEARLY A BLANK AND THE "
+        "PLANESWALKERS ARE NOT: of the +0.0217 +-0.0071 total, "
+        "+0.0210 +-0.0068 is the two Nissas and all three animation fixes "
+        "together sit inside their own bars. That is now a measurement rather "
+        "than an absence -- the animation is worth 9.24 marginal damage a "
+        "game in a deck whose damage runs to the thousands, because Scute "
+        "Swarm dwarfs it, while the Nissas are worth +1.29 landfall triggers "
+        "and +0.36 lands played, which is what a CARD-limited deck actually "
+        "wants. "
+        "ALSO IN THIS CACHE, with no flag because it is unobservable unless a "
+        "land is a creature: lands now enter summoning sick, so Dryad Arbor "
+        "can no longer attack the turn it is played. And Nissa, Worldwaker "
+        "MOVED FROM KNOWN_BLIND TO SCRIPTED_AZUSA -- her old entry read "
+        "'nothing in this project tracks loyalty', which stopped being true. "
+        "THE DAMAGE COLUMNS ARE STILL UNUSABLE for the reason the previous "
+        "note gives; read win rate only."),
+})
+
+
 def fingerprint(deck: str) -> tuple[str, list[str]]:
     """Hash the deck's source, NORMALISED FOR LINE ENDINGS.
 

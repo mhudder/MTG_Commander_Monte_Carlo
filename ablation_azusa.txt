@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0026.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0027.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -21,66 +21,66 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Scute Swarm                        +2141.73+-756.06     +4386.04+-987.38       +0.0337+-0.0039      both
-Craterhoof Behemoth                +2120.75+-755.30     +4367.35+-986.63       +0.0085+-0.0027      both
-Horn of Greed                       +560.42+-421.63     +1437.73+-752.84       +0.0289+-0.0035      both
-Seer's Sundial                      +822.53+-644.62     +1409.52+-767.75       +0.0144+-0.0032      both
-Ramunap Excavator                   +946.70+-683.51     +1125.34+-753.30       +0.0131+-0.0031      both
-Tireless Tracker                    +854.81+-554.83     +1022.48+-799.40       +0.0201+-0.0036      both
-Oracle of Mul Daya                  +235.43+-842.08      +992.83+-924.18       +0.0143+-0.0036      both
-Crucible of Worlds                  +517.00+-522.65      +991.19+-830.02       +0.0101+-0.0029      both
-Wayward Swordtooth                  +202.75+-624.37      +924.97+-656.20       +0.0030+-0.0027      both
-Animist's Awakening                 +462.13+-561.35      +670.42+-689.12       +0.0096+-0.0027       win
-Lotus Cobra                         +477.94+-647.67      +664.11+-755.13       +0.0059+-0.0030       win
-Nylea's Intervention                -203.30+-374.89      +597.15+-521.85       +0.0069+-0.0024      FLIP
-Augur of Autumn                      -60.17+-637.45      +543.08+-746.75       +0.0144+-0.0035      FLIP
-Seek the Horizon                    -224.08+-415.12      +483.22+-538.69       +0.0116+-0.0026      FLIP
-Chord of Calling                     +30.61+-560.85      +459.15+-631.03       +0.0078+-0.0024       win
-Exploration                         +233.72+-656.30      +456.34+-605.57       +0.0023+-0.0026        --
-Green Sun's Zenith                  +100.25+-463.67      +433.09+-547.69       +0.0101+-0.0027       win
-Tireless Provisioner                +312.80+-456.00      +397.47+-621.56       +0.0043+-0.0029       win
-Cultivate                           +224.90+-682.54      +393.60+-465.97       +0.0085+-0.0028       win
-Eternal Witness                     +234.84+-375.95      +308.52+-427.01       +0.0053+-0.0026       win
-Courser of Kruphix                   +90.85+-703.35      +248.76+-511.64       +0.0177+-0.0033       win
-Sol Ring                             +20.89+-296.25      +239.46+-644.40       +0.0099+-0.0029       win
-Kodama's Reach                      +105.56+-477.61      +222.46+-505.50       +0.0085+-0.0028       win
-Harmonize                           +344.25+-550.62      +178.78+-684.83       +0.0133+-0.0029       win
-Life from the Loam                  -468.39+-735.04      +168.39+-497.96       +0.0040+-0.0021      FLIP
-Nissa, Vastwood Seer // Nissa, Sage Animist       +47.44+-734.14      +144.63+-712.15       +0.0039+-0.0029       win
-Journey of Discovery                 +15.17+-303.77       +84.99+-541.98       +0.0063+-0.0026       win
-Avenger of Zendikar                 +113.82+-385.88       +39.51+-408.43       +0.0252+-0.0035       win
-Momentous Fall                       -65.02+-439.14       +28.90+-359.85       +0.0037+-0.0018      FLIP
-Ulamog, the Infinite Gyre            -33.93+-54.66        -1.92+-168.78       +0.0117+-0.0024       win
-Ashaya, Soul of the Wild            +198.67+-274.78        -5.80+-162.38       +0.0092+-0.0026      FLIP
-Titania, Protector of Argoth         -37.78+-318.92       -17.08+-403.62       +0.0048+-0.0029       win
-Rude Awakening                       +35.46+-385.95       -48.39+-430.70       +0.0030+-0.0020      FLIP
-Realms Uncharted                    +185.13+-435.75       -71.28+-518.64       +0.0085+-0.0026      FLIP
-Yavimaya Elder                       -59.41+-91.66       -99.70+-218.94       +0.0032+-0.0021       win
-Sylvan Awakening                     -38.09+-46.89      -125.36+-269.78       +0.0021+-0.0014       win
-Regrowth                            +486.45+-576.27      -136.53+-595.80       +0.0071+-0.0023      FLIP
-Perilous Forays                     -102.12+-560.34      -238.39+-497.43       -0.0005+-0.0014        --
-Woodland Bellower                    -37.18+-661.88      -242.98+-731.40       +0.0105+-0.0028       win
-Kozilek, Butcher of Truth           +129.00+-272.65      -252.42+-249.65       +0.0071+-0.0021      FLIP
-Rampaging Baloths                    -12.27+-214.35      -308.08+-371.79       +0.0275+-0.0039       win
-Bane of Progress                    -407.91+-338.63      -450.82+-633.06       -0.0008+-0.0022        --
-Genesis Wave                         +50.24+-345.06      -519.70+-663.31       +0.0154+-0.0030      FLIP
+Scute Swarm                        +2449.33+-768.95     +5345.31+-1180.09       +0.0328+-0.0040      both
+Craterhoof Behemoth                +2428.54+-768.36     +5324.10+-1179.29       +0.0087+-0.0029      both
+Seer's Sundial                      +911.07+-682.18     +2114.32+-909.25       +0.0141+-0.0033      both
+Oracle of Mul Daya                  +590.19+-749.42     +1461.36+-833.11       +0.0151+-0.0037      both
+Ramunap Excavator                   +596.98+-613.68     +1412.56+-774.33       +0.0121+-0.0033      both
+Horn of Greed                       +718.04+-481.68     +1147.75+-1097.56       +0.0277+-0.0036      both
+Tireless Tracker                    +958.46+-596.22     +1060.50+-1034.16       +0.0205+-0.0037      both
+Animist's Awakening                 +692.82+-654.51     +1034.25+-727.82       +0.0105+-0.0028      both
+Nissa, Vastwood Seer // Nissa, Sage Animist      +148.26+-760.90      +880.45+-997.09       +0.0215+-0.0039       win
+Crucible of Worlds                  +488.04+-569.30      +813.11+-757.18       +0.0099+-0.0031      both
+Exploration                         +171.04+-677.28      +807.58+-784.12       +0.0035+-0.0027      both
+Harmonize                           +570.32+-595.10      +720.70+-560.35       +0.0135+-0.0031      both
+Cultivate                           +157.87+-617.26      +591.37+-702.68       +0.0087+-0.0030       win
+Wayward Swordtooth                  +245.09+-573.89      +569.88+-902.79       +0.0049+-0.0028       win
+Augur of Autumn                      -32.20+-471.43      +472.01+-829.19       +0.0157+-0.0036      FLIP
+Nissa, Worldwaker                   +278.09+-324.55      +470.29+-554.71       +0.0061+-0.0023       win
+Green Sun's Zenith                  -252.37+-457.81      +391.85+-812.91       +0.0113+-0.0028      FLIP
+Tireless Provisioner                +124.80+-638.21      +346.86+-791.67       +0.0058+-0.0031       win
+Nylea's Intervention                 -57.17+-330.06      +326.62+-817.12       +0.0075+-0.0026      FLIP
+Sol Ring                             +56.67+-346.05      +322.10+-703.66       +0.0122+-0.0031       win
+Life from the Loam                  -358.11+-724.58      +312.27+-519.48       +0.0037+-0.0023      FLIP
+Eternal Witness                     +233.47+-395.11      +309.72+-624.32       +0.0036+-0.0027       win
+Chord of Calling                     +48.99+-496.92      +290.09+-694.75       +0.0075+-0.0025       win
+Titania, Protector of Argoth        -142.92+-459.40      +284.29+-854.97       +0.0043+-0.0030      FLIP
+Courser of Kruphix                    +4.71+-720.78      +272.34+-754.37       +0.0184+-0.0034       win
+Woodland Bellower                    +57.88+-670.42      +206.39+-892.03       +0.0113+-0.0029       win
+Kodama's Reach                      +441.58+-436.45      +123.35+-845.25       +0.0082+-0.0030       win
+Rampaging Baloths                   -115.03+-250.56      +105.73+-603.74       +0.0309+-0.0040      FLIP
+Avenger of Zendikar                 -168.47+-379.57       +73.62+-515.16       +0.0281+-0.0036      FLIP
+Momentous Fall                      -440.22+-545.94       +30.12+-706.65       +0.0033+-0.0020      FLIP
+Seek the Horizon                    -340.52+-589.67       +27.04+-654.77       +0.0115+-0.0027      FLIP
+Realms Uncharted                    +123.41+-547.89       +17.55+-677.86       +0.0091+-0.0027       win
+Yavimaya Elder                       -25.48+-156.87        +2.32+-205.67       +0.0035+-0.0021      FLIP
+Lotus Cobra                          -42.46+-730.01       -25.45+-948.81       +0.0079+-0.0031       win
+Ulamog, the Infinite Gyre            -57.64+-88.22       -46.28+-230.17       +0.0113+-0.0024       win
+Genesis Wave                         +10.70+-456.11      -121.67+-748.12       +0.0170+-0.0031      FLIP
+Perilous Forays                      -35.34+-545.56      -138.89+-535.58       -0.0001+-0.0015        --
+Journey of Discovery                -350.49+-524.11      -139.52+-692.65       +0.0075+-0.0027       win
+Ashaya, Soul of the Wild            -118.42+-286.43      -162.57+-338.25       +0.0095+-0.0027       win
+Kozilek, Butcher of Truth            +28.73+-80.19      -235.43+-251.82       +0.0085+-0.0023      FLIP
+Regrowth                            +327.98+-786.42      -331.61+-768.62       +0.0067+-0.0024      FLIP
+Rude Awakening                        -9.15+-289.27      -332.26+-705.47       +0.0046+-0.0025       win
+Sylvan Awakening                    -111.96+-198.98      -361.05+-395.91       +0.0048+-0.0016       win
+Bane of Progress                    -705.43+-622.32      -667.92+-1159.43       -0.0001+-0.0023        --
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Oblivion Stone                       -89.72+-234.59      +232.59+-511.52       +0.0013+-0.0017      FLIP
-Sylvan Library                      -135.96+-214.69      +136.69+-290.16       -0.0003+-0.0016      FLIP
-Greater Good                        -247.05+-652.12      +131.19+-178.57       +0.0002+-0.0017      FLIP
-Storm Cauldron                       +65.35+-351.03      +114.65+-334.47       +0.0021+-0.0018       win
-Abundance                           -142.41+-209.30       +96.55+-267.07       +0.0006+-0.0017      FLIP
-Krosan Grip                          -24.91+-52.49       +81.61+-211.46       +0.0018+-0.0016      FLIP
-Sylvan Scrying                       +46.15+-65.91       +38.71+-272.74       +0.0006+-0.0009        --
-Hall of Gemstone                     +26.48+-348.30       -10.87+-91.74       +0.0006+-0.0017      FLIP
-Mind's Eye                           +71.97+-95.12       -27.61+-340.25       -0.0005+-0.0019      FLIP
-Nissa, Worldwaker                   +104.37+-137.21       -57.97+-273.04       -0.0001+-0.0014      FLIP
-Terastodon                           -10.21+-40.69       -72.32+-114.92       +0.0045+-0.0017       win
-Quirion Ranger                      -125.83+-208.44       -89.05+-131.90       -0.0014+-0.0011       win
-Crop Rotation                       -352.35+-644.00      -283.39+-353.52       +0.0001+-0.0008        --
-Beast Within                        +176.63+-434.89      -308.24+-702.69       +0.0013+-0.0016      FLIP
-Memory Jar                           -92.30+-339.35      -430.42+-542.61       +0.0013+-0.0018        --
+Mind's Eye                          +104.85+-129.83      +391.56+-469.42       -0.0002+-0.0021        --
+Sylvan Library                       -62.31+-129.60      +283.46+-355.43       -0.0001+-0.0016      FLIP
+Storm Cauldron                       +73.96+-161.77      +158.49+-220.33       +0.0025+-0.0020       win
+Abundance                           +112.90+-146.78      +157.73+-295.59       +0.0008+-0.0018        --
+Greater Good                        -303.29+-661.76      +142.22+-224.22       +0.0012+-0.0019      FLIP
+Hall of Gemstone                     -30.60+-125.06       +17.65+-508.53       +0.0017+-0.0016      FLIP
+Quirion Ranger                      -314.73+-354.76        +1.88+-509.09       -0.0013+-0.0012      FLIP
+Beast Within                         +90.86+-470.85       -24.29+-781.63       +0.0009+-0.0017      FLIP
+Oblivion Stone                       -38.31+-280.32       -30.90+-441.24       +0.0013+-0.0019        --
+Krosan Grip                         +139.02+-186.82       -88.97+-201.13       +0.0015+-0.0018      FLIP
+Sylvan Scrying                      +161.09+-147.80       -96.10+-299.39       -0.0002+-0.0010      FLIP
+Crop Rotation                       -320.91+-650.82      -111.35+-214.30       -0.0001+-0.0009        --
+Terastodon                           -25.04+-86.01      -162.67+-174.94       +0.0048+-0.0018       win
+Memory Jar                           -86.19+-339.19      -417.82+-564.13       +0.0020+-0.0019       win

@@ -312,8 +312,13 @@ SCRIPTED_AZUSA = {
     "Regrowth", "Animist's Awakening", "Genesis Wave",
     # sac-for-value (token fodder only)
     "Perilous Forays", "Momentous Fall",
-    # land animation / mana
-    "Sylvan Awakening", "Rude Awakening",
+    # land animation, all four of them -- the animations are real continuous
+    # effects with per-card durations as of 2026-09-07, and Nissa, Worldwaker
+    # moved here from KNOWN_BLIND the same day: her abilities are implemented,
+    # so a low score is now a result rather than an absence. Read the
+    # indestructible and reach clauses as still blind (nothing the pod does
+    # can kill a land), which edhmc/azusa.py's docstring spells out.
+    "Sylvan Awakening", "Rude Awakening", "Nissa, Worldwaker",
     "Sol Ring", "Harmonize", "Eye of Ugin",
     # Annihilator, approximated as reducing an opponent's abstract creature
     # count -- value denial, not damage
@@ -630,9 +635,10 @@ KNOWN_BLIND = {
         # tracks no opponent land or permanent objects at all, only an
         # aggregate creature count and a life total
         "Terastodon", "Beast Within", "Krosan Grip", "Crop Rotation",
-        # planeswalker activated abilities -- nothing in this project tracks
-        # loyalty; see edhmc/azusa.py's module docstring
-        "Nissa, Worldwaker",
+        # (Nissa, Worldwaker was here, on the grounds that nothing in this
+        # project tracks planeswalker loyalty. It does now -- see
+        # PLANESWALKERS in edhmc/azusa.py -- so she is SCRIPTED as of
+        # 2026-09-07.)
         # reads an OPPONENT drawing a card / a symmetric hand-refill effect,
         # neither of which this model tracks at that granularity
         "Mind's Eye", "Memory Jar",

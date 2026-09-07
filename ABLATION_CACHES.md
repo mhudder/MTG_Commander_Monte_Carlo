@@ -14,24 +14,24 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `7b42470`.
+Fingerprints recorded at `d1f88d5`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `bab7d24d1b17e737` |
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `bdf8311be70100d8` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `bdf8311be70100d8` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `bdf8311be70100d8` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `e21f955ffd1f53d6` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e21f955ffd1f53d6` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `e21f955ffd1f53d6` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `28c99579d4b65b4a` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `28c99579d4b65b4a` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `28c99579d4b65b4a` |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `ff3eb8061f979ee2` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `1575306ed57e80d3` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `1575306ed57e80d3` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `1575306ed57e80d3` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `b6574e96560d40f3` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `112a3feeca5ac9ef` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `112a3feeca5ac9ef` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `112a3feeca5ac9ef` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `7a2d6db8085aa135` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `7a2d6db8085aa135` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `7a2d6db8085aa135` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `5c0796c61c852c30` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `5c0796c61c852c30` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `5c0796c61c852c30` |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `df64999b973cd5b1` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `654bd9a7648e137e` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `654bd9a7648e137e` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `654bd9a7648e137e` |
 
 ## What each fingerprint covers
 
@@ -46,7 +46,7 @@ Fingerprints recorded at `7b42470`.
 
 ### `ablation_cache_azusa_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the LAND-SEQUENCING REWRITE, which moved the deck's baseline win rate 0.205 -> 0.279 at T20 and therefore voided the table measured hours earlier the same day. The engine had four defects in one place: land_step ran ONCE before any spell resolved, and picked lands with max(options, key=mv) -- a constant key, since every land has mana value 0, so it always took the first option and playable_lands builds the hand first. Lands are now chosen by ZONE (library -> graveyard -> hand), the enabler main phase runs before AND between land drops, a second land_step runs after combat, and a cracked fetch shuffles -- which makes the Crucible/Courser reroll line real. WHAT THIS DID TO THE RANKING: the ZONE enablers roughly doubled (Augur +0.0065 -> +0.0144, Oracle +0.0077 -> +0.0143, Ramunap Excavator +0.0074 -> +0.0131, Crucible +0.0060 -> +0.0101, Courser +0.0117 -> +0.0177) and Horn of Greed nearly doubled to +0.0289, while the drop-COUNT enablers did NOT move (Exploration +0.0021 -> +0.0023, still inside its bar; Wayward Swordtooth +0.0056 -> +0.0030). That half-retracts the earlier 'the payoffs beat the enablers' finding and replaces it with a sharper one: the deck is LAND-SUPPLY limited, not land-DROP limited -- it is granted 2.77 drops a turn and uses 1.33, and on 57.9% of turns it has an unused drop and no land anywhere it may legally play from. THE MID-GAME SHUFFLE DOES NOT BREAK CRN: its seeds are pre-rolled from a dedicated stream and indexed by shuffle count, so the Nth shuffle applies the same permutation in both branches. A/A is still +0.00 and a real swap still measures CRN at 6.5-24.7x.
+CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the LAND-ANIMATION AND PLANESWALKER work, KNOWN_ISSUES.md 0s -- the SECOND regeneration of this deck that day, after the land-sequencing rewrite noted above. Four fixes: land animations are real continuous effects with the animated set captured AT RESOLUTION and per-card durations (Sylvan Awakening lasts until your next turn, so its lands block during the pod's round; Rude Awakening's mode and Nissa's +1 do not); an animated land that attacks is now TAPPED, so it cannot also pay for the postcombat main phase; Rude Awakening's animate mode and its entwine existed nowhere at all; and both Nissas had no activated abilities, Nissa Vastwood Seer never even transforming. THE RESULT IS THAT THE ANIMATION IS NEARLY A BLANK AND THE PLANESWALKERS ARE NOT: of the +0.0217 +-0.0071 total, +0.0210 +-0.0068 is the two Nissas and all three animation fixes together sit inside their own bars. That is now a measurement rather than an absence -- the animation is worth 9.24 marginal damage a game in a deck whose damage runs to the thousands, because Scute Swarm dwarfs it, while the Nissas are worth +1.29 landfall triggers and +0.36 lands played, which is what a CARD-limited deck actually wants. ALSO IN THIS CACHE, with no flag because it is unobservable unless a land is a creature: lands now enter summoning sick, so Dryad Arbor can no longer attack the turn it is played. And Nissa, Worldwaker MOVED FROM KNOWN_BLIND TO SCRIPTED_AZUSA -- her old entry read 'nothing in this project tracks loyalty', which stopped being true. THE DAMAGE COLUMNS ARE STILL UNUSABLE for the reason the previous note gives; read win rate only.
 
 ### `ablation_cache_karlov_10-20_n15000.json`
 
@@ -86,7 +86,7 @@ Regenerated from an EMPTY cache 2026-09-05 after commit 1710205, so it carries t
 
 ### `ablation_cache_shilgengar_10-20_n15000_medblank.json`
 
-FIRST TABLE for this deck, 2026-09-07, measured from an empty cache at the common N=15000 so it is comparable row-for-row with the other five. Noise floor +-0.0019 win rate; baseline win rate 0.209 at T20. READ THE SACRIFICE ROWS WITH THE ENGINE'S POLICY IN MIND: `shilgengar.aristocrats_step` only ever sacrifices worthless 1/1 Spirit TOKENS, never a real card, so the whole aristocrats package (Blood Artist, Vampiric Rites, Viscera Seer, Skullclamp, Pitiless Plunderer) is measured with its engine deliberately starved -- it scores 0 to -0.0019 win rate, and that is a fact about the policy at least as much as about the cards. The commander's six-Blood reanimation ULTIMATE FIRED ZERO TIMES in 3,000 baseline games (blood_made averages 0.13 a game against the 6 it needs). Re-measured after `shilgengar_ultimate` was reordered to empty the graveyard before resolving ETB triggers, and the regenerated table is BYTE-IDENTICAL to the one before it, which is the evidence that the reorder was behaviour-neutral rather than the claim that it was.
+CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the SACRIFICE POLICY FIX, KNOWN_ISSUES.md 0r. The engine would only ever sacrifice 1/1 Spirit tokens, and Spirit tokens only exist once an Angel has already died, so the commander's own ability was starved by construction: blood_made averaged 0.10 a game and the six-Blood ultimate FIRED ZERO TIMES IN 3,000 GAMES. It now feeds real Angels to the ability whenever that completes the ultimate in the same turn -- which is arithmetic and not a pilot's judgement call, because the ultimate returns the Angel it was paid with, so the sacrifice is a loan. Separately, main_phase now holds {3} back for the ability, which activations() runs after and could therefore never afford. Deck win rate 0.208 -> 0.242; the two halves are +0.0267 and +0.0075 and together +0.0343 +-0.0079. WHAT MOVED IN THE TABLE, which is the check that the fix is real: 10 of 64 rows moved by more than their own OLD CI half-width and ZERO of the already-significant rows flipped sign. The movers are the cards whose text the mechanism reads -- Righteous Valkyrie (+0.0086 -> +0.0130, 2.0x its old bar) and Elesh Norn (+0.0059 -> +0.0083) because +2/+2 on an Angel is literally +2 Blood when you sacrifice it; Bishop of Wings (2.2x) and Requiem Angel because they make Spirit tokens off deaths that now happen; Blood Artist and Zulaport Cutthroat because their triggers now fire. Reya Dawnbringer went DOWN (+0.0074 -> +0.0045): she reanimates one creature a turn out of a graveyard the ultimate now empties, and finality counters keep what it returned out of her pool. NOT MOVED, and worth reading as a finding rather than an omission: the sac OUTLETS are still flat to negative (Viscera Seer -0.0005, Skullclamp -0.0013, Vampiric Rites -0.0016, Cartel Aristocrat +0.0011). The commander is the only sacrifice outlet this deck needs, so the redundant ones buy nothing -- which is a statement about the cards, where the old table's version of it was a statement about the policy.
 
 ### `ablation_cache_tivit_10-20_n15000.json`
 

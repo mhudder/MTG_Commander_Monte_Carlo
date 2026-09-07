@@ -9,7 +9,7 @@ reading top to bottom.
 
 A Monte Carlo simulator for testing Commander (EDH) decklist changes: "is
 card X better than card Y in this deck?", answered with a number and a
-confidence interval. Five decks, five simulation engines, one shared opponent
+confidence interval. Six decks, six simulation engines, one shared opponent
 model, one paired A/B statistics harness. Run from the repo root with
 Python 3.10+, numpy, scipy (`pip install -r requirements.txt`).
 
@@ -28,10 +28,10 @@ python audit_cards.py              # every card's data checked against Scryfall
 | Lorehold, the Historian | miracle / top-deck | `edhmc/decks/lorehold_v16.py` | mature |
 | Karlov of the Ghost Council | lifegain / drain | `edhmc/decks/karlov_v2.py` | mature |
 | Tivit, Seller of Secrets | votes / artifacts | `edhmc/decks/tivit_v1.py` | mature |
-| Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | **new, untuned** — a first-pass list, not yet ablated |
-| Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` | **new, untuned** — no `.xlsx` yet; the module is the only record |
+| Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | new — ablated, and its commander's own ability only started firing on 2026-09-07 (`KNOWN_ISSUES.md` 0r) |
+| Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` | new — ablated; no `.xlsx` yet, so the module is the only record |
 
-Each of the first five decks is a `.xlsx` (the human-readable system of
+Each of the first four decks, and Shilgengar, is a `.xlsx` (the human-readable system of
 record for the card list) plus a matching `edhmc/decks/<name>_v<N>.py`
 module (the hand-authored, Scryfall-verified costs the simulator actually
 reads) plus its own simulation engine — `edhmc/engine.py` (Rendmaw),
@@ -136,3 +136,23 @@ disagree, the project's own rule is to follow win rate.
   kept up to date.
 - **`KNOWN_ISSUES.md`** — per-question diagnostics with numbered findings,
   cross-referenced from `CLAUDE.md`.
+
+## A pattern worth knowing before you trust any card's row
+
+Three of the largest corrections in this project were not a card's TEXT being
+wrong. They were a POLICY — a decision about how the deck is piloted — written
+down as conservatism and never measured:
+
+| policy | what it actually asserted | worth |
+|---|---|---|
+| Azusa's `land_step` ran once, before any spell resolved | every land enabler is dead on the turn it lands | 0.074 win rate |
+| Shilgengar would only sacrifice 1/1 tokens | the commander's own ability does nothing | 0.034 win rate |
+| Shilgengar's main phase spent every point of mana | an after-combat ability is never affordable | 0.008 win rate |
+
+None of the three was visible in an ablation table, because in each case the
+affected cards produced *plausible* numbers — a bit low, nothing to notice.
+The tell is a card whose text says it should be central to the deck and whose
+row says it is ordinary. When you see one, suspect the engine before the card,
+and check the MECHANISM COUNTERS (`blood_made`, `landfall_triggers`,
+`pw_activations`) rather than the win rate: a mechanism that fires zero times
+is unmistakable where a win rate 0.03 too low is not.

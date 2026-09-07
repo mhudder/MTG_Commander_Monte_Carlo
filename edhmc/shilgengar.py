@@ -38,14 +38,50 @@ never see them enter.
 
 THE SACRIFICE POLICY, SAID OUT LOUD
 ------------------------------------
-A real pilot sometimes feeds a live Lyra Dawnbringer to Shilgengar for five
-Blood on the way to the six-Blood reanimation. This model does not attempt
-that judgement call — see README's "your own decision quality" disclaimer —
-and only ever sacrifices EXPENDABLE TOKENS (1/1 Spirits from Requiem Angel and
-Bishop of Wings; never the 4/4 Angel tokens, which stay on board as real
-attackers/blockers, and never a real card). That understates Shilgengar's own
-ability and the six-Blood reanimation, which in practice both fire more often
-than this engine ever lets them. Said once here rather than at every call site.
+This engine used to sacrifice EXPENDABLE TOKENS ONLY (1/1 Spirits, never a
+real card), on the grounds that feeding a live Lyra Dawnbringer to Shilgengar
+was a pilot judgement call the model should not attempt. That was measured on
+2026-09-07 and it starved the deck's own thesis: Spirit tokens only exist once
+an Angel has already died, so `blood_made` averaged 0.10 a game and THE
+SIX-BLOOD ULTIMATE FIRED ZERO TIMES IN 3,000 GAMES. The commander's defining
+ability was untested rather than tested and found wanting.
+
+`cfg["shilgengar_sac_policy"]` now defaults to "ultimate", and the old
+behaviour is `"tokens"`. The new policy is NOT a judgement call — it is
+arithmetic, which is why it is safe to automate:
+
+  - "Sacrifice ANOTHER creature: create a Blood token. If you sacrificed an
+    ANGEL this way, create Blood equal to ITS TOUGHNESS instead." A 5-toughness
+    Angel is five sixths of the ultimate on its own.
+  - The ultimate returns EACH creature card from your graveyard — INCLUDING
+    the Angel you just sacrificed to pay for it. A nontoken sacrifice is a
+    LOAN, not a cost.
+  - `activations()` runs after `combat()`, so the bodies fed to the ability
+    have already attacked this turn, and `take_turn` clears summoning sickness
+    at the start of the next one. The reanimated board is sick for the
+    remainder of a turn in which it had already acted.
+
+So the line is only ever taken when it COMPLETES THE ULTIMATE THIS TURN
+(`ult_plan`). Sacrificing an Angel to bank Blood across turns is a real risk
+that this model still does not take, and a pilot holding five Blood and a Lyra
+would sometimes take it — the engine is a floor on the ability, not a ceiling.
+Two further deliberate conservatisms: the plan must leave you with at least
+`shilgengar_ult_min_gain` (1) more creatures on the battlefield than it
+sacrificed, so the line is never a pure shuffle, and the death triggers it
+sets off (Blood Artist, Grim Haruspex, Pitiless Plunderer) are not counted as
+part of the case for taking it even though they are real value.
+
+REAL CARDS SORT AHEAD OF TOKENS AS FODDER, which is the exact reverse of the
+old policy, and the reason is the loan: a nontoken creature comes back off the
+ultimate and a token ceases to exist.
+
+FINALITY COUNTERS ARE MODELLED, because without them the line loops. The
+ultimate returns creatures "with a finality counter on it" — if such a
+creature would die again it is EXILED instead of hitting the graveyard, so the
+same Angel cannot be fed to a second ultimate. `self.finality` tracks it and
+`yard_creatures()` is the filtered graveyard pool every recursion effect in
+this deck reads. Without that, sac-Angel/return-Angel/repeat is an engine
+that plays a card the game does not print.
 
 WHAT IS MODEL-BLIND AND WHY
 -----------------------------------------------------------------------------
@@ -101,10 +137,21 @@ class ShilgengarGame:
         self.life_gained_this_turn = 0.0     # Resplendent Angel / Speaker
         self.died_this_turn = 0              # diagnostics only
         self.marble_diamond_played = set()   # ids already handled as tapped
+        # Cards carrying a finality counter, by id(). A set of Card objects
+        # would be wrong twice over: Card is an unfrozen dataclass and so
+        # unhashable, and its __eq__ is field-wise, which would make one
+        # marked Swamp mark every Swamp. Every card is referenced by the
+        # library, hand, graveyard or board for the whole game, so no id is
+        # recycled underneath this.
+        self.finality: set[int] = set()
 
         cfg.setdefault("shroud_sources", ())
         cfg.setdefault("protection_cards",
                        ("Flawless Maneuver", "Teferi's Protection"))
+        # See "THE SACRIFICE POLICY, SAID OUT LOUD" in the module docstring.
+        cfg.setdefault("shilgengar_sac_policy", "ultimate")   # or "tokens"
+        cfg.setdefault("shilgengar_ult_min_gain", 1)
+        cfg.setdefault("shilgengar_ult_reserve", 3)
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
@@ -118,6 +165,7 @@ class ShilgengarGame:
             "test_card_answered": 0, "test_card_removed": 0,
             "test_card_countered": 0,
             "creatures_sacrificed": 0, "blood_made": 0, "blood_spent": 0,
+            "angels_fed": 0, "cards_fed": 0, "finality_marked": 0,
             "shilgengar_ults": 0, "shilgengar_reanimated": 0,
             "single_reanimations": 0, "treasures_made": 0,
             "life_gained": 0, "lifegain_triggers": 0,
@@ -169,6 +217,32 @@ class ShilgengarGame:
             return True
         return (self.has("Lyra Dawnbringer") and self.is_angel(perm)
                 and perm.card.name != "Lyra Dawnbringer")
+
+    def blood_yield(self, perm):
+        """Blood from feeding this permanent to Shilgengar's first ability.
+
+        "...create a number of Blood tokens equal to ITS TOUGHNESS instead" —
+        toughness as it stands on the battlefield, so Lyra Dawnbringer's +1/+1
+        to other Angels, Elesh Norn's +2/+2 and Righteous Valkyrie's +2/+2 all
+        raise the Blood an Angel is worth. That is the rules answer and not a
+        modelling choice: the ability reads the creature's toughness as it
+        last existed on the battlefield.
+        """
+        return self.toughness_of(perm) if self.is_angel(perm) else 1
+
+    def yard_creatures(self):
+        """Creature cards in the graveyard that recursion can actually return.
+
+        A card returned by the ultimate comes back WITH A FINALITY COUNTER, so
+        the next time it would die it is exiled instead. This engine leaves it
+        in the graveyard list and filters it here, which is behaviourally the
+        same thing for this deck — nothing in the list reads a graveyard COUNT,
+        and every effect that returns a creature (the ultimate, Reya
+        Dawnbringer, Priest of Fell Rites, Sun Titan, Emeria Shepherd) reads
+        this pool.
+        """
+        return [c for c in self.graveyard
+                if c.is_creature and id(c) not in self.finality]
 
     def _life_threshold(self):
         # "As long as you have at least 7 life more than your starting life
@@ -339,6 +413,95 @@ class ShilgengarGame:
                 self.draw(1)
                 self.sacrifice(p, to_shilgengar=False)
 
+    def ult_fodder(self):
+        """Creatures that may legally be fed to Shilgengar, best first.
+
+        "Sacrifice ANOTHER creature" — never the commander itself. Real cards
+        sort ahead of tokens because the ultimate returns a card and does not
+        return a token, and within each group the most Blood per body sorts
+        first so the plan spends as few bodies as it can.
+        """
+        return sorted(
+            (p for p in self.board
+             if p.card.is_creature and p.card is not self.commander),
+            key=lambda p: (p.is_token, -self.blood_yield(p)))
+
+    def ult_plan(self):
+        """The sacrifices that would fire the ultimate THIS TURN, or None.
+
+        `[]` means the Blood is already banked and nothing needs to die. See
+        the module docstring for why this is arithmetic rather than a pilot's
+        judgement call, and for the two conservatisms in it.
+        """
+        if self.cfg.get("shilgengar_sac_policy", "ultimate") != "ultimate":
+            return None
+        if not self.commander_cast:
+            return None
+        if not self.yard_creatures() and self.blood >= 6:
+            return None          # nothing to return; shilgengar_ultimate agrees
+        need = 6 - self.blood
+        if need <= 0:
+            return []
+        chosen, gained = [], 0
+        for p in self.ult_fodder():
+            if gained >= need:
+                break
+            chosen.append(p)
+            gained += self.blood_yield(p)
+        if gained < need:
+            return None
+        # The line must be a real gain and not a shuffle: count what the
+        # ultimate would put back against what this plan kills to pay for it.
+        # Tokens are on the wrong side of that subtraction by construction —
+        # they die and do not come back — which is what makes an Angel the
+        # right fodder and a Spirit token the wrong one.
+        returning = len(self.yard_creatures()) + sum(1 for p in chosen
+                                                    if not p.is_token)
+        if returning - len(chosen) < self.cfg.get("shilgengar_ult_min_gain", 1):
+            return None
+        return chosen
+
+    def ult_reserve(self):
+        """Mana to hold back through the main phase for the ultimate.
+
+        Without this the ability is unaffordable in practice and the measured
+        answer is a fact about the casting policy, not about the card:
+        `main_phase` is greedy and `activations()` runs after it, so every
+        point of mana is already spent by the time the ultimate is checked.
+        Nothing is held back on a turn where the line is not live, so this
+        costs the deck nothing on the turns it does not apply.
+        """
+        if self.ult_plan() is None:
+            return 0
+        return self.cfg.get("shilgengar_ult_reserve", 3)
+
+    def ultimate_line(self):
+        """Take the whole sac-for-Blood-then-reanimate line, if it is there.
+
+        THE MANA IS CHECKED BEFORE ANYTHING DIES. `shilgengar_ultimate` also
+        checks it and returns early, which would otherwise leave the Angels
+        sacrificed and the ability uncast — paying the cost for none of the
+        effect.
+        """
+        for _ in range(2):        # a second one needs six more Blood; rare
+            plan = self.ult_plan()
+            if plan is None:
+                break
+            if can_pay({"gen": 3}, available_mana(self)) is None:
+                break
+            for p in plan:
+                if p not in self.board:
+                    continue      # a death trigger got to it first
+                if self.is_angel(p):
+                    self.m["angels_fed"] += 1
+                if not p.is_token:
+                    self.m["cards_fed"] += 1
+                self.sacrifice(p, to_shilgengar=True)
+            before = self.m["shilgengar_ults"]
+            self.shilgengar_ultimate()
+            if self.m["shilgengar_ults"] == before:
+                break
+
     def shilgengar_ultimate(self):
         """{W/B}{W/B}{W/B}, sac 6 Blood: mass-reanimate the graveyard.
 
@@ -347,7 +510,7 @@ class ShilgengarGame:
         """
         if not self.commander_cast or self.blood < 6:
             return
-        pool = [c for c in self.graveyard if c.is_creature]
+        pool = self.yard_creatures()
         if not pool:
             return
         units = available_mana(self)
@@ -370,6 +533,10 @@ class ShilgengarGame:
             self.graveyard.remove(card)
         for card in pool:
             perm = self.make_permanent(card, sick=True)
+            # "...with a finality counter on it." Marked here, enforced in
+            # yard_creatures(): this card can never be returned again.
+            self.finality.add(id(card))
+            self.m["finality_marked"] += 1
             if self.is_angel(perm):
                 self.angel_entered(perm)
         self.m["shilgengar_ults"] += 1
@@ -455,7 +622,19 @@ class ShilgengarGame:
 
     # -- casting and turn loop -----------------------------------------------
 
-    def main_phase(self):
+    def main_phase(self, reserve=0):
+        """reserve: mana left unspent for Shilgengar's ultimate in
+        `activations()`, which runs after this phase and after combat. Same
+        mechanism as `lorehold.main_phase`'s miracle reserve, and for the same
+        reason: a greedy main phase spends the mana an after-combat ability
+        needs, and the ability then reads as a bad card rather than as one the
+        casting policy never let itself use.
+
+        `ult_reserve()` is read once, BEFORE the phase, so a plan that only
+        becomes live because of a creature cast during this phase does not get
+        its mana held back this turn. That understates the line slightly and
+        is the safe direction: it can only ever fail to take the ultimate.
+        """
         while True:
             units = available_mana(self)
             if not self.commander_cast:
@@ -482,7 +661,7 @@ class ShilgengarGame:
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
                 pay = can_pay(c.cost, units)
-                if pay is not None:
+                if pay is not None and len(units) - len(pay) >= reserve:
                     options.append((c, pay))
             if not options:
                 break
@@ -520,7 +699,7 @@ class ShilgengarGame:
         # Priest of Fell Rites: {T}, pay 3 life, sac itself, sorcery-speed
         # reanimate. Unearth is not modelled (a one-shot value line; scope).
         if self.count("Priest of Fell Rites") and self.your_life > 10:
-            pool = [c for c in self.graveyard if c.is_creature]
+            pool = self.yard_creatures()
             priest = next((p for p in self.board
                           if p.card.name == "Priest of Fell Rites"
                           and not p.sick), None)
@@ -554,6 +733,7 @@ class ShilgengarGame:
                 self.make_permanent(land, sick=False, tapped=True)
 
         self.aristocrats_step()
+        self.ultimate_line()
         self.shilgengar_ultimate()
 
     def combat(self):
@@ -582,7 +762,8 @@ class ShilgengarGame:
 
     def _sun_titan_reanimate(self):
         pool = [c for c in self.graveyard
-               if c.is_permanent and float(c.mv) <= 3]
+               if c.is_permanent and float(c.mv) <= 3
+               and id(c) not in self.finality]
         if not pool:
             return
         best = max(pool, key=lambda c: c.mv)
@@ -614,7 +795,7 @@ class ShilgengarGame:
             self.treasures += n
             self.m["treasures_made"] += n
         if self.has("Reya Dawnbringer"):
-            pool = [c for c in self.graveyard if c.is_creature]
+            pool = self.yard_creatures()
             if pool:
                 best = max(pool, key=lambda c: c.mv)
                 self.graveyard.remove(best)
@@ -642,7 +823,8 @@ class ShilgengarGame:
             # graveyard to your hand; if that land is a Plains, to the
             # battlefield instead." Approximated as always to the battlefield
             # when possible, since this deck always prefers the body.
-            pool = [c for c in self.graveyard if c.is_permanent and not c.is_land]
+            pool = [c for c in self.graveyard if c.is_permanent and not c.is_land
+                   and id(c) not in self.finality]
             if pool:
                 best = max(pool, key=lambda c: c.mv)
                 self.graveyard.remove(best)
@@ -667,7 +849,7 @@ def take_turn(g):
         return
     g.draw(1)
     g.land_step()
-    g.main_phase()
+    g.main_phase(reserve=g.ult_reserve())
     if g.result is not None:
         return
     g.combat()

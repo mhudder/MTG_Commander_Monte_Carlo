@@ -37,11 +37,71 @@ Bowl/Tectonic Edge's sacrifice abilities) — opponents' individual lands and
 permanents are not tracked as objects anywhere in this project, only as an
 aggregate creature count and a life total. Effects that read an OPPONENT
 drawing a card (Mind's Eye) or an opponent's individual graveyard/hand are
-blind for the same reason. Two Planeswalkers (Nissa, Worldwaker and the
-transformed back face of Nissa, Vastwood Seer) have their activated abilities
-left unmodelled — nothing else in this project tracks planeswalker loyalty,
-and inventing that machinery for one card was judged not worth it; their
-FRONT-face or on-cast value, where they have one, is scripted separately.
+blind for the same reason.
+
+LAND ANIMATION, WHICH USED TO BE THE HOLE IN THIS ENGINE
+---------------------------------------------------------
+The deck has four ways to turn its lands into creatures and until 2026-09-07
+ONE of them was implemented as animation at all. Sylvan Awakening set a
+turn-scoped flag; Rude Awakening was modelled as its untap mode only; and both
+Nissas had no activated abilities, so a five-mana Planeswalker was a 0/0
+permanent that did nothing whatsoever. `ablation_azusa.txt` scored Sylvan
+Awakening +0.0017 and Rude Awakening +0.0019, both inside their own bars, and
+the honest reading of those rows was "untested", not "disproved".
+
+`self.animations` now holds the real continuous effects. Four things about
+them are load-bearing and none of the four was true before:
+
+  1. THE SET OF LANDS IS CAPTURED AT RESOLUTION. "All lands you control
+     become 2/2 creatures" applies to the lands you control AS IT RESOLVES --
+     a land played afterwards is not animated. In a deck that plays three
+     lands a turn after its spells resolve, treating this as a static ability
+     would have been a large silent overcount.
+  2. DURATION IS PER-CARD AND IT DECIDES WHETHER THEY BLOCK. Sylvan Awakening
+     lasts UNTIL YOUR NEXT TURN, so its lands are still creatures during the
+     pod's round and count as blockers in `opponents.combat_share` -- under
+     pod v3 that is a real defensive effect and it was not modelled at all.
+     Rude Awakening's mode and Nissa's +1 last until END OF TURN and are gone
+     before the pod acts.
+  3. HASTE IS THE DIFFERENCE BETWEEN THE TWO AWAKENINGS. `make_permanent`
+     now forces every land to enter `sick=True`, so a land played this turn
+     cannot attack unless the effect grants haste -- and only Sylvan Awakening
+     does. Every land call site used to pass `sick=False`, which was harmless
+     while no land was ever a creature and is not any more.
+  4. AN ANIMATED LAND THAT ATTACKS IS TAPPED, so it cannot also be tapped for
+     mana in the postcombat main phase. `spend()` taps lands before creatures,
+     so the attack gets whatever the main phase left over. That makes every
+     animation number here a FLOOR: a pilot who wanted the alpha strike would
+     hold the mana back instead of casting the spell.
+
+INDESTRUCTIBLE AND REACH ARE CARRIED BUT CANNOT MATTER, and that is a fact
+about the pod rather than a gap in it. `spot_removal` and `board_wipe` both
+exclude lands, so nothing the pod does can kill an animated land; and this
+engine never blocks with your creatures, so reach does nothing either. Sylvan
+Awakening's indestructible clause is worth exactly zero here -- said out loud
+so its row is not read as a measurement of the whole card.
+
+PLANESWALKER LOYALTY, SCOPED TO THIS ENGINE
+--------------------------------------------
+Nothing else in this project tracks loyalty, and the note here used to say
+that inventing the machinery "for one card" was not worth it. There are two
+cards, both Nissas, and between them they are a repeatable land drop, a
+ritual, two land animations and an ultimate that puts every basic Forest left
+in the library onto the battlefield -- in a deck whose payoffs all read
+"whenever a land enters". `PLANESWALKERS` holds starting loyalty,
+`Permanent.counters` holds the current value (no new field on a dataclass
+five other engines share), and `planeswalker_step()` activates at most one
+ability per walker per turn at sorcery speed, which is the whole rule. It runs
+twice a turn so a walker cast this turn still activates the turn it lands.
+
+Two deliberate omissions, both of which make these two cards a FLOOR. Nissa,
+Sage Animist's -2 (a 4/4 Ashaya token) is never taken, because the +1 is a
+land drop and a card every turn in a 40-land deck and the -7 is the plan. And
+NO OPPONENT EVER ATTACKS A PLANESWALKER, because the pod's combat is a float
+and not a set of attackers, so loyalty here only ever goes up and the
+ultimates arrive sooner than they would at a real table. The pod can still
+answer a Nissa with spot removal, which is the only pressure on her, and it is
+why `threat` on both cards matters.
 
 SUBTYPES AND `Card.tags`
 ------------------------
@@ -93,7 +153,29 @@ LAND_ENABLERS = frozenset({
     "Tireless Provisioner", "Tireless Tracker",
     "Scute Swarm", "Rampaging Baloths", "Avenger of Zendikar",
     "Titania, Protector of Argoth",
+    # Reads a land ETB to transform herself -- see land_entered().
+    "Nissa, Vastwood Seer // Nissa, Sage Animist",
 })
+
+# Starting loyalty. `Permanent.counters` carries the current value from there.
+# Checked against the deck at import by check_planeswalker_coverage(), because
+# a hand-written name set is a claim and claims rot (KNOWN_ISSUES.md 0q) -- a
+# Planeswalker added to this list and forgotten here would enter with zero
+# loyalty and silently never do anything, which is precisely the failure this
+# engine already had for both Nissas.
+PLANESWALKERS = {
+    "Nissa, Worldwaker": 3,
+    "Nissa, Sage Animist": 3,          # the transformed back face, below
+}
+
+# The back face of Nissa, Vastwood Seer. It is not in the deck list because it
+# is never drawn, cast or shuffled -- it only ever arrives by transforming the
+# front face, which is why it is built here rather than in decks/azusa_v1.py.
+# `threat` is what makes the pod willing to spend removal on her.
+NISSA_SAGE_ANIMIST = Card(
+    name="Nissa, Sage Animist", types=frozenset({"Planeswalker"}),
+    cost={"gen": 2, "G": 1}, priority=7.5, threat=7.5,
+    tags=frozenset({"Legendary"}))
 
 
 class AzusaGame:
@@ -114,7 +196,17 @@ class AzusaGame:
         self.spells_this_turn = 0
         self.ascended = False           # Wayward Swordtooth's city's blessing
         self.craterhoof_bonus = 0
-        self.land_animation_active = False
+        self.animations: list[dict] = []   # live land-animation effects
+        self.pw_used: set[int] = set()     # walkers already activated this turn
+        self.legacy_animation = False      # the pre-2026-09-07 Sylvan flag
+
+        # Each 2026-09-07 fix behind its own knob, defaulting to the corrected
+        # behaviour, so the committed table can be reproduced and each claim
+        # measured on its own. See diag_azusa_animation.py.
+        cfg.setdefault("land_animation", "full")     # "full"|"legacy"|"off"
+        cfg.setdefault("animated_lands_block", True)
+        cfg.setdefault("rude_awakening_modes", True)
+        cfg.setdefault("planeswalker_abilities", True)
         self.bonus_mana: list[frozenset] = []   # Lotus Cobra, this turn only
 
         # SHUFFLE EFFECTS MUST NOT BREAK COMMON RANDOM NUMBERS, and a cracked
@@ -152,6 +244,10 @@ class AzusaGame:
             "reroll_fetches": 0,
             "scute_swarms_made": 0, "tokens_made": 0, "life_gained": 0,
             "single_reanimations": 0, "creatures_sacrificed": 0,
+            "lands_animated": 0, "animated_attacks": 0,
+            "animated_damage": 0.0, "animated_blocker_turns": 0,
+            "pw_activations": 0, "pw_ultimates": 0, "nissa_transforms": 0,
+            "entwines": 0,
         }
         self.damage_by_turn = []
 
@@ -163,7 +259,88 @@ class AzusaGame:
     def count(self, name):
         return self.board.names.get(name, 0)
 
+    # -- land animation ----------------------------------------------------
+
+    def animate_lands(self, power, toughness, *, targets, haste=False,
+                      trample=False, indestructible=False, reach=False,
+                      through_pod_round=False, source=""):
+        """Register one continuous animation effect.
+
+        `targets` is the set of land permanents the effect applies to, CAPTURED
+        BY THE CALLER AT RESOLUTION -- see point 1 of the module docstring. It
+        is held by `id()` rather than by object because `Permanent` is an
+        unfrozen dataclass and therefore unhashable, and because two Forests
+        compare equal field-for-field.
+        """
+        if not targets or self.cfg.get("land_animation", "full") != "full":
+            return
+        if not self.cfg.get("animated_lands_block", True):
+            # Isolates the "they block during the pod's round" half of Sylvan
+            # Awakening from the "they attack" half, so the two can be
+            # measured separately rather than as one lump.
+            through_pod_round = False
+        self.animations.append({
+            "power": power, "toughness": toughness, "haste": haste,
+            "trample": trample, "indestructible": indestructible,
+            "reach": reach, "through_pod_round": through_pod_round,
+            "expires_turn": self.turn, "source": source,
+            "targets": {id(p) for p in targets},
+        })
+        self.m["lands_animated"] += len(targets)
+
+    def animation_of(self, perm):
+        """The animation covering this permanent, biggest first, or None.
+
+        Layers are simplified to "the biggest body wins", which only ever
+        matters if two animations overlap on one land in one turn -- Nissa's
+        +1 on top of an Awakening. The real layer rules would apply the later
+        timestamp; taking the larger is within a point of power of that and
+        does not need a timestamp on every effect.
+        """
+        best = None
+        for a in self.animations:
+            if id(perm) in a["targets"] and (best is None
+                                             or a["power"] > best["power"]):
+                best = a
+        return best
+
+    def counts_as_creature(self, perm):
+        """Is this permanent a creature RIGHT NOW?
+
+        NOT named `is_creature_now`, which is what the question is actually
+        called elsewhere: `karlov.is_creature_now(g, card)` is a MODULE-LEVEL
+        function taking a Card, and `opponents.your_creatures` discovers this
+        hook by name on the game object. Two things with one name and
+        different signatures, one of them found by `getattr`, is a silent
+        failure waiting for whoever turns karlov's into a method.
+
+        The same question `karlov.is_creature_now` asks for Heliod and
+        `engine.devotion` asks for Erebos, with the same reason for asking it
+        at the call site rather than stamping it at ETB: the answer changes
+        during the turn. `opponents.combat_share` reads this through
+        `OPP.your_creatures`, which is how animated lands come to count as
+        blockers.
+        """
+        return perm.card.is_creature or (perm.card.is_land
+                                         and self.animation_of(perm) is not None)
+
+    def expire_animations(self, end_of_turn=False):
+        """`end_of_turn` drops the "until end of turn" effects, before the pod
+        acts; otherwise this drops the "until your next turn" ones, which have
+        survived the pod's round and are what makes Sylvan Awakening a
+        defensive card as well as an offensive one."""
+        if end_of_turn:
+            self.animations = [a for a in self.animations
+                               if a["through_pod_round"]]
+        else:
+            self.animations = [a for a in self.animations
+                               if a["expires_turn"] >= self.turn]
+
     def power_of(self, perm):
+        anim = self.animation_of(perm) if perm.card.is_land else None
+        if anim is not None:
+            # An animation SETS power and toughness; it does not add to them.
+            return anim["power"] + perm.counters + self.craterhoof_bonus
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
         if perm.card.name == "Ashaya, Soul of the Wild":
@@ -172,6 +349,9 @@ class AzusaGame:
         return p
 
     def toughness_of(self, perm):
+        anim = self.animation_of(perm) if perm.card.is_land else None
+        if anim is not None:
+            return anim["toughness"] + perm.counters + self.craterhoof_bonus
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
         if perm.card.name == "Ashaya, Soul of the Wild":
@@ -215,6 +395,17 @@ class AzusaGame:
 
     def make_permanent(self, card, sick=True, tapped=False, is_token=False,
                        counters=0):
+        if card.is_land:
+            # A LAND THAT ENTERS THIS TURN IS SUMMONING SICK the moment
+            # something animates it, and cannot attack unless the effect
+            # grants haste. Every land call site in this engine passed
+            # sick=False, which was harmless while lands were never creatures
+            # -- `available_mana` does not read `sick` for a land -- and is
+            # load-bearing now. Forced here rather than fixed at eight call
+            # sites, so a ninth cannot reintroduce it.
+            sick = True
+        if card.name in PLANESWALKERS and not counters:
+            counters = PLANESWALKERS[card.name]     # loyalty
         perm = Permanent(card=card, sick=sick, tapped=tapped,
                          is_token=is_token, counters=counters,
                          base_p=card.power, base_t=card.toughness)
@@ -292,6 +483,14 @@ class AzusaGame:
             self.bonus_mana.append(frozenset({"W", "U", "B", "R", "G", "C"}))
         if self.has("Tireless Tracker"):
             self.clues = getattr(self, "clues", 0) + 1
+        if self.count("Nissa, Vastwood Seer // Nissa, Sage Animist"):
+            # "Whenever a land you control enters, IF YOU CONTROL SEVEN OR
+            # MORE LANDS, exile Nissa, then return her to the battlefield
+            # transformed." The trigger did not exist: only her ETB Forest
+            # search was modelled, so in a deck that reaches seven lands
+            # around turn five she stayed a 2/2 for the rest of the game.
+            if sum(1 for p in self.board if p.card.is_land) >= 7:
+                self.transform_nissa()
         if self.has("Seer's Sundial"):
             units = self.available_mana()
             pay = can_pay({"gen": 2}, units)
@@ -299,6 +498,24 @@ class AzusaGame:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
                 self.draw(1)
+
+    def transform_nissa(self):
+        """Exile Nissa, Vastwood Seer and return her transformed.
+
+        She comes back as a NEW OBJECT with fresh loyalty, which is why this
+        is a swap rather than a retype -- and she is not summoning sick,
+        because a Planeswalker never is: she can activate the same turn.
+        """
+        if not self.cfg.get("planeswalker_abilities", True):
+            return
+        perm = next((p for p in self.board
+                     if p.card.name
+                     == "Nissa, Vastwood Seer // Nissa, Sage Animist"), None)
+        if perm is None:
+            return
+        self.board.remove(perm)
+        self.make_permanent(NISSA_SAGE_ANIMIST, sick=False)
+        self.m["nissa_transforms"] += 1
 
     def shuffle_library(self):
         """A shuffle from a card effect, drawn from the pre-rolled seeds so it
@@ -511,11 +728,21 @@ class AzusaGame:
                 self.library.remove(land)
                 self.hand.append(land)
         elif script == "rude_awakening":
-            for p in self.board:
-                if p.card.is_land:
-                    p.tapped = False
+            self.rude_awakening()
         elif script == "sylvan_awakening":
-            self.land_animation_active = True
+            # "UNTIL YOUR NEXT TURN, all lands you control become 2/2
+            # Elemental creatures with reach, indestructible, and haste.
+            # They're still lands." The duration is the whole difference
+            # between this card and Rude Awakening's animate mode: these
+            # lands are still creatures during the pod's round, so they
+            # block. Haste is the other difference -- lands played this turn
+            # are `sick` and only this card lets them attack anyway.
+            self.animate_lands(2, 2, targets=self.your_lands(), haste=True,
+                               reach=True, indestructible=True,
+                               through_pod_round=True,
+                               source="Sylvan Awakening")
+            if self.cfg.get("land_animation") == "legacy":
+                self.legacy_animation = True
         elif script == "momentous_fall":
             self.sac_for_value(momentous=True)
 
@@ -566,6 +793,85 @@ class AzusaGame:
             perm.counters += len(victims)
         elif card.name == "Yavimaya Elder":
             pass   # its DEATH trigger is in on_creature_death
+
+    def your_lands(self):
+        return [p for p in self.board if p.card.is_land]
+
+    def rude_awakening(self):
+        """Rude Awakening {4}{G}, entwine {2}{G}. Verified 2026-09-07.
+
+            Choose one --
+            * Untap all lands you control.
+            * Until end of turn, lands you control become 2/2 creatures that
+              are still lands.
+            Entwine {2}{G} (Choose both if you pay the entwine cost.)
+
+        THE ANIMATE MODE AND THE ENTWINE DID NOT EXIST. The engine untapped
+        the lands and stopped, which is the mode a pilot takes when they are
+        ramping and the WRONG one when they are killing somebody -- and
+        entwining is how this card actually ends games: untap every land and
+        then swing with all of them, which is why the untap half is printed on
+        an animation card in the first place.
+
+        Entwine is paid here rather than through `Card.alt_costs` because the
+        cost model is one-cost-per-card (KNOWN_ISSUES.md 1b) and `alt_costs`
+        is a REPLACEMENT cost, not an additional one. This is an extra
+        payment made on resolution, the same shape as Seer's Sundial's {2}.
+        """
+        if not self.cfg.get("rude_awakening_modes", True):
+            for p in self.board:                  # the pre-2026-09-07 engine:
+                if p.card.is_land:                # untap, and nothing else
+                    p.tapped = False
+            return
+        units = self.available_mana()
+        pay = can_pay({"gen": 2, "G": 1}, units)
+        both = pay is not None
+        if both:
+            spend(self, pay, units)
+            self.m["mana_spent"] += 3
+            self.m["entwines"] += 1
+
+        # Which single mode, when the entwine is unaffordable. Untapping is
+        # only worth anything if there is something left to spend it on, so
+        # the question "does this turn on a spell in hand" is the whole
+        # decision and it is computable rather than a judgement call.
+        tapped_lands = [p for p in self.board if p.card.is_land and p.tapped]
+        # Never choose a mode the configuration cannot deliver: with
+        # `land_animation` off or "legacy", `animate_lands` is a no-op, and
+        # picking the animate mode would make the card do NOTHING AT ALL
+        # rather than fall back to the untap it used to have.
+        can_animate = self.cfg.get("land_animation", "full") == "full"
+        animate = can_animate and (both
+                                   or not self._untap_would_help(tapped_lands))
+        if both or not animate:
+            for p in self.board:
+                if p.card.is_land:
+                    p.tapped = False
+        if animate:
+            # No haste and no indestructible on this mode, and it is gone by
+            # the pod's round -- so unlike Sylvan Awakening these lands never
+            # block and the ones played this turn cannot attack.
+            self.animate_lands(2, 2, targets=self.your_lands(),
+                               source="Rude Awakening")
+
+    def _untap_would_help(self, cands):
+        """Would untapping these lands turn on a spell we cannot cast now?
+
+        This is the whole untap-versus-animate decision, and it is arithmetic
+        rather than a judgement call: mana you cannot spend is worth nothing,
+        so untap when it buys a spell and animate when it does not.
+        """
+        if not cands:
+            return False
+        units = self.available_mana()
+        after = units + [p.card.produces for p in cands]
+        for c in self.hand:
+            if c.is_land:
+                continue
+            cost = self.cost_of(c)
+            if can_pay(cost, units) is None and can_pay(cost, after) is not None:
+                return True
+        return False
 
     def on_creature_death(self, n=1, perm=None):
         for _ in range(n):
@@ -711,9 +1017,122 @@ class AzusaGame:
             self.resolve(card)
 
     def _coven(self):
-        powers = {self.power_of(p) for p in self.board if p.card.is_creature}
-        return len([p for p in self.board if p.card.is_creature]) >= 3 \
-            and len(powers) >= 3
+        # "If you control three or more creatures with different powers" --
+        # an animated land IS a creature with a power while the animation
+        # lasts, so it counts, same as it does for the blocker count.
+        mine = [p for p in self.board if self.counts_as_creature(p)]
+        powers = {self.power_of(p) for p in mine}
+        return len(mine) >= 3 and len(powers) >= 3
+
+    def planeswalker_step(self):
+        """At most one loyalty ability per walker per turn, sorcery speed.
+
+        Called twice a turn — once after the land step so the untap modes can
+        feed the main phase, once after it so a Nissa cast THIS turn still
+        activates the turn she lands, which is the actual rule. `pw_used`
+        makes the second call a no-op for a walker the first one already used.
+        """
+        if not self.cfg.get("planeswalker_abilities", True):
+            return
+        for perm in list(self.board):
+            if perm.card.name not in PLANESWALKERS or id(perm) in self.pw_used:
+                continue
+            self.pw_used.add(id(perm))
+            self.m["pw_activations"] += 1
+            if perm.card.name == "Nissa, Worldwaker":
+                self._nissa_worldwaker(perm)
+            else:
+                self._nissa_sage_animist(perm)
+
+    def _nissa_worldwaker(self, perm):
+        """Nissa, Worldwaker {3}{G}{G}, loyalty 3. Verified 2026-09-07.
+
+            +1: Target land you control becomes a 4/4 Elemental creature with
+                trample. It's still a land.
+            +1: Untap up to four target Forests.
+            -7: Search your library for any number of basic land cards, put
+                them onto the battlefield, then shuffle. Those lands become
+                4/4 Elemental creatures with trample.
+
+        The ultimate is a pile of LANDS ENTERING in a deck built entirely on
+        landfall, which is why it is worth implementing even though it needs
+        four turns of ticking up to reach.
+        """
+        if perm.counters >= 7:
+            perm.counters -= 7
+            basics = [c for c in self.library if c.name == "Forest"]
+            # EVERY CARD LEAVES THE LIBRARY BEFORE ANY OF THEM ENTERS. A
+            # landfall trigger can draw (Horn of Greed) or tutor, and popping
+            # the library out from under this loop is the exact crash that
+            # took down Genesis Wave on 2026-09-07.
+            for c in basics:
+                self.library.remove(c)
+            got = []
+            for c in basics:
+                got.append(self.make_permanent(c, sick=True))
+                self.land_entered(c, played=False)
+            self.shuffle_library()
+            self.animate_lands(4, 4, targets=got, trample=True,
+                               source="Nissa, Worldwaker -7")
+            self.m["pw_ultimates"] += 1
+            return
+
+        perm.counters += 1
+        forests = [p for p in self.board
+                   if p.card.name == "Forest" and p.tapped][:4]
+        if self._untap_would_help(forests):
+            for p in forests:
+                p.tapped = False
+            return
+        # Otherwise animate the best land that could actually attack: an
+        # untapped one that has been here since the turn began, and that some
+        # other effect has not already animated into something bigger.
+        target = next((p for p in self.board
+                       if p.card.is_land and not p.tapped and not p.sick
+                       and self.animation_of(p) is None), None)
+        if target is not None:
+            self.animate_lands(4, 4, targets=[target], trample=True,
+                               source="Nissa, Worldwaker +1")
+
+    def _nissa_sage_animist(self, perm):
+        """Nissa, Sage Animist, loyalty 3 — the back face. Verified 2026-09-07.
+
+            +1: Reveal the top card of your library. If it's a land card, put
+                it onto the battlefield. Otherwise, put it into your hand.
+            -2: Create Ashaya, the Awoken World, a legendary 4/4 green
+                Elemental creature token.
+            -7: Untap up to six target lands. They become 6/6 Elemental
+                creatures. They're still lands.
+
+        The -2 is never taken; see the module docstring. In a 40-land deck the
+        +1 is a free land drop three times in five and a card the rest of the
+        time, and spending to 1 loyalty gives up the -7 that untaps six lands
+        as 6/6s — which, unlike the -2, can end the game on the spot.
+        """
+        if perm.counters >= 7:
+            perm.counters -= 7
+            targets = sorted((p for p in self.board if p.card.is_land),
+                             key=lambda p: (not p.tapped, p.sick))[:6]
+            for p in targets:
+                p.tapped = False
+            self.animate_lands(6, 6, targets=targets,
+                               source="Nissa, Sage Animist -7")
+            self.m["pw_ultimates"] += 1
+            return
+
+        perm.counters += 1
+        if not self.library:
+            return
+        top = self.library.pop()
+        if top.is_land:
+            self.make_permanent(top, sick=True, tapped=bool(top.tapped))
+            self.land_entered(top, played=False)
+            self.m["lands_from_library"] += 1
+        else:
+            # "Put it into your hand" is not a draw, so it is deliberately not
+            # counted in cards_drawn -- nothing that reads a draw trigger
+            # should see this.
+            self.hand.append(top)
 
     def activations(self):
         units = self.available_mana()
@@ -758,12 +1177,47 @@ class AzusaGame:
         attackers = [p for p in self.board if p.card.is_creature
                     and not p.tapped and not p.sick
                     and not (p.card.name == "Wayward Swordtooth" and not self.ascended)]
-        if self.land_animation_active:
+        # ANIMATED LANDS ATTACK AS THEMSELVES. They used to be fabricated as
+        # throwaway 2/2 token Permanents that were never on the battlefield,
+        # which meant tapping them for the attack tapped nothing: the same
+        # lands then paid for the postcombat main phase. The real permanent is
+        # tapped below with every other attacker, so the mana is really spent.
+        if self.legacy_animation:
+            # THE PRE-2026-09-07 PATH, kept so the committed ablation table
+            # can be reproduced. Every untapped land became a throwaway 2/2
+            # Permanent that was never on the battlefield: it could not be
+            # tapped by attacking, so the same lands still paid for the
+            # postcombat main phase, and it vanished at end of turn so it
+            # never blocked. `cfg["land_animation"]="legacy"` selects it.
             for p in self.board:
                 if p.card.is_land and not p.tapped:
-                    tok = Card(name="animated land", types=frozenset({"Creature"}),
-                              power=2, toughness=2)
-                    attackers.append(Permanent(card=tok, sick=False, tapped=False))
+                    tok = Card(name="animated land",
+                               types=frozenset({"Creature"}),
+                               power=2, toughness=2)
+                    attackers.append(Permanent(card=tok, sick=False,
+                                               tapped=False))
+        n_animated = 0
+        for p in self.board:
+            if p.card.is_creature or p.tapped:
+                continue          # creature-lands are already in `attackers`
+            anim = self.animation_of(p)
+            if anim is None or (p.sick and not anim["haste"]):
+                continue
+            attackers.append(p)
+            n_animated += 1
+        if n_animated:
+            self.m["animated_attacks"] += n_animated
+            # What the animation was WORTH this combat, defined as its
+            # marginal contribution: the damage that got through with the
+            # lands in the attack, minus what would have got through without
+            # them. Chump blocks make that smaller than the lands' total
+            # power, which is the point of measuring it this way rather than
+            # summing their power.
+            without = OPP.damage_through(
+                self, [p for p in attackers
+                       if p.card.is_creature or self.animation_of(p) is None])
+            self.m["animated_damage"] += (OPP.damage_through(self, attackers)
+                                          - without)
         # Annihilator 4: Kozilek / Ulamog force the defending opponent to
         # sacrifice up to four permanents. Approximated as reducing that
         # opponent's abstract `creatures` float -- value denial, not damage.
@@ -791,8 +1245,12 @@ def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
     g.craterhoof_bonus = 0
-    g.land_animation_active = False
     g.bonus_mana = []
+    g.pw_used = set()
+    g.legacy_animation = False
+    # "Until your next turn" ends HERE, at the start of it -- which is what
+    # gave Sylvan Awakening's lands the pod's whole round as blockers.
+    g.expire_animations()
     for p in g.board:
         p.tapped = False
         p.sick = False
@@ -805,9 +1263,14 @@ def take_turn(g):
     # spent, or they contribute nothing on the turn they arrive.
     g.main_phase(enablers_only=True)
     g.land_step()
+    # Sorcery speed, before the main phase, so an untap mode feeds it.
+    g.planeswalker_step()
     g.main_phase()
     if g.result is not None:
         return
+    # Again, so a walker CAST this main phase still activates the turn she
+    # lands. `pw_used` makes this a no-op for one that already has.
+    g.planeswalker_step()
     g.combat()
     g.activations()
     # A SECOND LAND STEP, mirroring engine.py's two `play_land` calls: drops
@@ -821,6 +1284,13 @@ def take_turn(g):
 
     g.m["mana_floated"] += len(g.available_mana())
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+
+    # END OF TURN. Rude Awakening's mode and Nissa's +1 stop here; Sylvan
+    # Awakening's does not, which is the only reason its lands ever block.
+    g.expire_animations(end_of_turn=True)
+    g.m["animated_blocker_turns"] += sum(
+        1 for p in g.board if not p.card.is_creature
+        and g.animation_of(p) is not None)
 
     if g.cfg.get("opponents", True):
         OPP.incidental_damage(g)
@@ -895,4 +1365,30 @@ def check_land_enabler_coverage():
     return named
 
 
+def check_planeswalker_coverage():
+    """Every Planeswalker in the deck must have a starting loyalty here.
+
+    Same rule as check_land_enabler_coverage() above and the same reason for
+    it (KNOWN_ISSUES.md 0q): a walker missing from PLANESWALKERS enters with
+    counters=0, is never picked up by planeswalker_step(), and sits there as
+    an inert permanent scoring like a blank -- which is exactly the state BOTH
+    Nissas were in until 2026-09-07, with nothing anywhere saying so.
+
+    The deck is imported inside the function because decks import the engine,
+    not the other way round.
+    """
+    from edhmc.decks import azusa_v1
+    deck, _ = azusa_v1.build()
+    missing = ({c.name for c in deck if "Planeswalker" in c.types}
+               - set(PLANESWALKERS))
+    if missing:
+        raise AssertionError(
+            "edhmc/azusa.py: these Planeswalkers have no entry in "
+            "PLANESWALKERS, so they would enter with zero loyalty and never "
+            "activate an ability:\n"
+            + "".join(f"    {n}\n" for n in sorted(missing)))
+    return missing
+
+
 check_land_enabler_coverage()
+check_planeswalker_coverage()
