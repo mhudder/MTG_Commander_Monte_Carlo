@@ -234,7 +234,39 @@ NOTES.update({
         "could fire Seer's Sundial, which draws, which pops the library out "
         "from under the loop. The first full-size run died on it; the cards "
         "now all leave the library before any ETB resolves, which is also "
-        "what the card actually does."),
+        "what the card actually does. "
+        "SUPERSEDED THE SAME DAY by the land-sequencing rewrite -- that table "
+        "is void and this note is kept as its provenance. See below."),
+})
+
+NOTES.update({
+    "ablation_cache_azusa_10-20_n15000_medblank.json": (
+        "CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the "
+        "LAND-SEQUENCING REWRITE, which moved the deck's baseline win rate "
+        "0.205 -> 0.279 at T20 and therefore voided the table measured hours "
+        "earlier the same day. The engine had four defects in one place: "
+        "land_step ran ONCE before any spell resolved, and picked lands with "
+        "max(options, key=mv) -- a constant key, since every land has mana "
+        "value 0, so it always took the first option and playable_lands "
+        "builds the hand first. Lands are now chosen by ZONE (library -> "
+        "graveyard -> hand), the enabler main phase runs before AND between "
+        "land drops, a second land_step runs after combat, and a cracked "
+        "fetch shuffles -- which makes the Crucible/Courser reroll line real. "
+        "WHAT THIS DID TO THE RANKING: the ZONE enablers roughly doubled "
+        "(Augur +0.0065 -> +0.0144, Oracle +0.0077 -> +0.0143, Ramunap "
+        "Excavator +0.0074 -> +0.0131, Crucible +0.0060 -> +0.0101, Courser "
+        "+0.0117 -> +0.0177) and Horn of Greed nearly doubled to +0.0289, "
+        "while the drop-COUNT enablers did NOT move (Exploration +0.0021 -> "
+        "+0.0023, still inside its bar; Wayward Swordtooth +0.0056 -> "
+        "+0.0030). That half-retracts the earlier 'the payoffs beat the "
+        "enablers' finding and replaces it with a sharper one: the deck is "
+        "LAND-SUPPLY limited, not land-DROP limited -- it is granted 2.77 "
+        "drops a turn and uses 1.33, and on 57.9% of turns it has an unused "
+        "drop and no land anywhere it may legally play from. "
+        "THE MID-GAME SHUFFLE DOES NOT BREAK CRN: its seeds are pre-rolled "
+        "from a dedicated stream and indexed by shuffle count, so the Nth "
+        "shuffle applies the same permutation in both branches. A/A is still "
+        "+0.00 and a real swap still measures CRN at 6.5-24.7x."),
 })
 
 

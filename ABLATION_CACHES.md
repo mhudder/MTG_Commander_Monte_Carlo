@@ -14,11 +14,11 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `b432b86`.
+Fingerprints recorded at `7b42470`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `17b73a85fdd9db71` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `bab7d24d1b17e737` |
 | `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `bdf8311be70100d8` |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `bdf8311be70100d8` |
 | `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `bdf8311be70100d8` |
@@ -46,7 +46,7 @@ Fingerprints recorded at `b432b86`.
 
 ### `ablation_cache_azusa_10-20_n15000_medblank.json`
 
-FIRST TABLE for this deck, 2026-09-07, from an empty cache at the common N=15000. Noise floor +-0.0022 win rate; baseline win rate 0.205 at T20. THE DAMAGE COLUMNS ARE UNUSABLE HERE and that is the first thing to know about this table -- Scute Swarm's landfall doubling gives this deck a damage distribution with a far heavier tail than any other, so the CIs run to +-278 against point estimates of the same order, and 13 rows carry a FLIP signal that is pure damage noise rather than a horizon effect. Win rate is an order of magnitude tighter and is the only column to read, exactly as it is for tivit. Measured AFTER the Genesis Wave crash fix: `wave()` removed cards from the library one at a time while `land_entered` could fire Seer's Sundial, which draws, which pops the library out from under the loop. The first full-size run died on it; the cards now all leave the library before any ETB resolves, which is also what the card actually does.
+CURRENT TABLE. Regenerated from an empty cache 2026-09-07 after the LAND-SEQUENCING REWRITE, which moved the deck's baseline win rate 0.205 -> 0.279 at T20 and therefore voided the table measured hours earlier the same day. The engine had four defects in one place: land_step ran ONCE before any spell resolved, and picked lands with max(options, key=mv) -- a constant key, since every land has mana value 0, so it always took the first option and playable_lands builds the hand first. Lands are now chosen by ZONE (library -> graveyard -> hand), the enabler main phase runs before AND between land drops, a second land_step runs after combat, and a cracked fetch shuffles -- which makes the Crucible/Courser reroll line real. WHAT THIS DID TO THE RANKING: the ZONE enablers roughly doubled (Augur +0.0065 -> +0.0144, Oracle +0.0077 -> +0.0143, Ramunap Excavator +0.0074 -> +0.0131, Crucible +0.0060 -> +0.0101, Courser +0.0117 -> +0.0177) and Horn of Greed nearly doubled to +0.0289, while the drop-COUNT enablers did NOT move (Exploration +0.0021 -> +0.0023, still inside its bar; Wayward Swordtooth +0.0056 -> +0.0030). That half-retracts the earlier 'the payoffs beat the enablers' finding and replaces it with a sharper one: the deck is LAND-SUPPLY limited, not land-DROP limited -- it is granted 2.77 drops a turn and uses 1.33, and on 57.9% of turns it has an unused drop and no land anywhere it may legally play from. THE MID-GAME SHUFFLE DOES NOT BREAK CRN: its seeds are pre-rolled from a dedicated stream and indexed by shuffle count, so the Nth shuffle applies the same permutation in both branches. A/A is still +0.00 and a real swap still measures CRN at 6.5-24.7x.
 
 ### `ablation_cache_karlov_10-20_n15000.json`
 

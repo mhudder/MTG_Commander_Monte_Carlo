@@ -74,6 +74,97 @@ and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 ---
 
+## 2026-09-07: AZUSA WAS PLAYING ITS LANDS WRONG, and it was worth 0.074 win rate
+
+Four separate defects in one place — `land_step` ran ONCE, before any spell
+resolved, and chose lands with `max(options, key=mv)`. Every land has mana
+value 0, so that key is constant, `max` returns the first option, and
+`playable_lands` builds the hand first. Measured with `diag_azusa_lands.py`:
+
+| | before | after |
+|---|---|---|
+| zone priority | hand-first ALWAYS | library → graveyard → hand |
+| top-enabler resolved too late to matter | 32.5% | 10.4% |
+| Lotus Cobra too late to see a drop | 51.1% | 35.0% |
+| turns ending with a wasted drop | 12.8% (2.25/game) | 1.0% (0.17/game) |
+| **land drops on the turn AZUSA resolves** | **1.08** | **3.10** |
+
+**The commander's own case was the worst of them** and was not on anyone's
+list: `land_drops_for_turn()` reads `commander_cast`, and land_step ran before
+the commander was ever cast, so Azusa granted nothing on the turn she landed.
+
+**Deck win rate 0.205 → 0.279 at T20** (0.038 → 0.074 at T10). That is a
+bigger move than any single card in the table — the deck was losing more to
+its own sequencing than to any card choice in it.
+
+Four changes, in `edhmc/azusa.py`:
+
+1. `choose_land()` replaces the mv sort. Library → graveyard → hand, and
+   within a zone a fetch outranks a plain land (two landfall triggers, not
+   one).
+2. **The reroll line is modelled.** With top-of-library access live and the
+   top card NOT a land, a FETCH IN THE GRAVEYARD outranks everything: cracking
+   it searches and then SHUFFLES, re-rolling a dead top card into a fresh
+   look, at no card cost because the fetch is already in the yard — plus two
+   landfall triggers and a Titania trigger for one drop. It correctly declines
+   when the top IS a land (take the free land instead). Fires ~1.15 times a
+   game. Unit-tested on all four branches in `diag_azusa_lands.py`.
+3. `main_phase(enablers_only=True)` runs before the drops and **again between
+   them**, because a one-shot pre-land phase cannot cast a two-mana Lotus
+   Cobra on turn two — the mana for it comes from the land drop itself. A
+   second `land_step()` after combat mirrors `engine.py`'s two `play_land`
+   calls.
+4. `crack_fetch` shuffles, in rules order (search → battlefield → shuffle →
+   landfall trigger).
+
+**THE SHUFFLE NEARLY BROKE COMMON RANDOM NUMBERS, which would have been much
+worse than the bug it fixes.** Across every engine in this project `self.rng`
+is touched only for the opening shuffle and mulligans. A mid-game shuffle
+drawing from it would give decks A and B different library orders the moment
+they diverged and decorrelate every later draw — the exact failure
+`opponents.py`'s design note is about. The seeds are therefore PRE-ROLLED from
+a dedicated stream and indexed by shuffle count, so the Nth shuffle in both
+branches applies the same index permutation, which is the property that makes
+the opening shuffle CRN-safe. Verified: A/A control still exactly `+0.00`, and
+on a real swap (Lotus Cobra vs a blank, n=4,000) CRN is still worth 6.5x on
+damage, 9.8x on win rate and 24.7x on landfall triggers.
+
+### And the corrected finding: this deck is LAND-SUPPLY limited, not drop limited
+
+The reason Exploration is still worth nothing while Courser and Crucible are
+worth a lot, traced rather than asserted:
+
+    land drops GRANTED per turn   2.77
+    land drops USED per turn      1.33   (48.1% utilisation)
+    turns with an unused drop and NO land anywhere to play   57.9%
+
+Azusa already grants more drops than the deck can feed. Put plainly: the deck
+is allowed roughly three land drops a turn and draws **one card** a turn, so
+the binding constraint is CARDS, not permission. A card that adds a FOURTH
+drop does nothing on the 58% of turns where the third one is already going
+begging — so Exploration (+0.0023, inside its bar) and Wayward Swordtooth
+(+0.0030) are near-blanks.
+
+Everything that scores well attacks the card constraint instead, and the
+ranking falls straight out of that one idea:
+
+- **more PLACES to find lands** — Courser +0.0177, Augur +0.0144, Oracle
+  +0.0143, Excavator +0.0131, Crucible +0.0101. The graveyard and the top of
+  the library are extra card sources that do not cost you a draw. This is why
+  they roughly doubled the moment the sequencing let them be used.
+- **turning drops back INTO cards** — Horn of Greed +0.0151 → **+0.0289**,
+  now the #2 card in the deck. It draws a card per land played, which feeds
+  the exact resource that ran out. Tireless Tracker (+0.0201) and Seer's
+  Sundial (+0.0144) are the same effect at a slower rate.
+
+A mono-green ramp deck with multiple drops a turn is card-limited almost by
+construction, and this table is that fact measured.
+
+**That is the deckbuilding statement to act on, and it is the opposite of the
+obvious one for a deck whose commander reads "play two additional lands."**
+
+---
+
 ## 2026-09-07: first ablation tables for shilgengar and azusa
 
 Both at the common N=15,000 and horizons 10,20, so they are comparable
@@ -145,14 +236,18 @@ worse. Win rate is an order of magnitude tighter.
 | next | Horn of Greed (+0.0151), Genesis Wave (+0.0137), Tireless Tracker (+0.0131), Ulamog (+0.0129), Courser of Kruphix (+0.0117) |
 | unmeasured (`--`) | Perilous Forays (+0.0010), Yavimaya Elder (−0.0003) |
 
-**THE PAYOFFS BEAT THE ENABLERS, AND IT IS NOT CLOSE.** The three cards that
-turn a land drop into a board are worth 0.023-0.026 win rate each. The cards
-that produce the extra land drops score far lower — Oracle of Mul Daya
-+0.0077, Wayward Swordtooth +0.0056, **Exploration +0.0021**, barely outside
-its own bar. Extra lands are worth little on their own; having something that
-cares is worth a lot. That is the clearest deckbuilding statement either new
-table makes, and it is the one to test properly (as a group ablation) before
-acting on.
+~~**THE PAYOFFS BEAT THE ENABLERS, AND IT IS NOT CLOSE.**~~
+> **HALF RETRACTED 2026-09-07, later the same day — see the land-sequencing
+> section below.** The claim was measured on an engine that spent its land
+> drops before any spell resolved, which denied every enabler its first turn
+> of value. On the corrected engine the ZONE enablers roughly double
+> (Augur of Autumn +0.0065 → **+0.0144**, Oracle of Mul Daya +0.0077 →
+> **+0.0143**, Ramunap Excavator +0.0074 → **+0.0131**, Crucible of Worlds
+> +0.0060 → **+0.0101**, Courser of Kruphix +0.0117 → **+0.0177**) and the
+> claim does not survive for them. It DOES survive, and gets sharper, for the
+> drop-COUNT enablers: Exploration +0.0021 → **+0.0023 and still inside its
+> own bar**, Wayward Swordtooth +0.0056 → **+0.0030**. The original framing
+> was too coarse because it lumped the two kinds together.
 
 **Damage and win rate point in opposite directions at the top**, and the
 mechanism is game length: Avenger of Zendikar is −6.1 damage at T20 and

@@ -61,6 +61,34 @@ from edhmc import opponents as OPP
 
 TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
 
+# Cards whose value is realised PER LAND DROP, so they have to be on the
+# battlefield BEFORE the drops are spent or they do nothing that turn. This is
+# the set `main_phase(enablers_only=True)` deploys in the pre-land main phase.
+#
+# Three kinds are in here and it is worth knowing which is which:
+#   - drop COUNT     Azusa, Exploration, Oracle of Mul Daya, Wayward Swordtooth
+#   - drop ZONES     Courser / Augur / Oracle (top), Crucible / Excavator (yard)
+#   - drop PAYOFFS   the landfall triggers themselves
+#
+# AVENGER OF ZENDIKAR IS A DELIBERATE JUDGEMENT CALL, not an obvious one. Its
+# ETB makes a Plant per land you control, so playing lands FIRST makes more
+# Plants -- but its landfall clause then pumps every Plant on each later drop,
+# and with three drops a turn that is +3/+3 on the whole squad against one
+# extra 0/1. Avenger first is much stronger, so it deploys first.
+#
+# HAND-MAINTAINED NAME SET. Nothing checks it against the deck, which is the
+# same hazard `ablation.SCRIPTED_*` carries; a landfall card added to the list
+# and not added here is silently deployed too late to matter.
+LAND_ENABLERS = frozenset({
+    "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
+    "Courser of Kruphix", "Augur of Autumn",
+    "Crucible of Worlds", "Ramunap Excavator",
+    "Lotus Cobra", "Horn of Greed", "Seer's Sundial",
+    "Tireless Provisioner", "Tireless Tracker",
+    "Scute Swarm", "Rampaging Baloths", "Avenger of Zendikar",
+    "Titania, Protector of Argoth",
+})
+
 
 class AzusaGame:
     def __init__(self, deck, commander, cfg, seed):
@@ -83,6 +111,23 @@ class AzusaGame:
         self.land_animation_active = False
         self.bonus_mana: list[frozenset] = []   # Lotus Cobra, this turn only
 
+        # SHUFFLE EFFECTS MUST NOT BREAK COMMON RANDOM NUMBERS, and a cracked
+        # fetch land shuffles. If a mid-game shuffle drew from `self.rng`,
+        # deck A and deck B would consume different numbers of draws the
+        # moment their boards diverged and every later draw would decorrelate
+        # -- the exact failure `opponents.py`'s docstring is about, and this
+        # project's whole method rests on not having it.
+        #
+        # So the seeds are PRE-ROLLED from a dedicated stream and indexed by
+        # how many shuffles have happened, not by when they happened. The Nth
+        # shuffle in both branches therefore applies the SAME index
+        # permutation to two equal-length libraries, which is precisely the
+        # property that makes the OPENING shuffle CRN-safe and keeps the
+        # swapped card in the same slot.
+        _shuf = random.Random(seed ^ 0x5F0F)
+        self.shuffle_seeds = [_shuf.getrandbits(32) for _ in range(64)]
+        self.shuffles_done = 0
+
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
@@ -96,6 +141,9 @@ class AzusaGame:
             "test_card_answered": 0, "test_card_removed": 0,
             "test_card_countered": 0,
             "lands_played": 0, "landfall_triggers": 0, "fetches_cracked": 0,
+            "library_shuffles": 0, "lands_from_hand": 0,
+            "lands_from_library": 0, "lands_from_graveyard": 0,
+            "reroll_fetches": 0,
             "scute_swarms_made": 0, "tokens_made": 0, "life_gained": 0,
             "single_reanimations": 0, "creatures_sacrificed": 0,
         }
@@ -246,6 +294,16 @@ class AzusaGame:
                 self.m["mana_spent"] += 2
                 self.draw(1)
 
+    def shuffle_library(self):
+        """A shuffle from a card effect, drawn from the pre-rolled seeds so it
+        cannot decorrelate the A/B pair. See __init__."""
+        if self.shuffles_done >= len(self.shuffle_seeds):
+            return                      # absurdly long game; stop shuffling
+        seed = self.shuffle_seeds[self.shuffles_done]
+        self.shuffles_done += 1
+        random.Random(seed).shuffle(self.library)
+        self.m["library_shuffles"] += 1
+
     def land_died(self, card):
         """A land you control was put into a graveyard from the battlefield
         (fetch cracks; nothing else in this list sacrifices a land)."""
@@ -269,6 +327,13 @@ class AzusaGame:
         enters_tapped = fetchland_card.name == "Terramorphic Expanse"
         self.make_permanent(forest, sick=False, tapped=enters_tapped)
         self.m["fetches_cracked"] += 1
+        # "...put it onto the battlefield, THEN SHUFFLE." The shuffle is part
+        # of the ability's resolution and finishes before the landfall trigger
+        # goes on the stack, so it happens here rather than after
+        # land_entered. It is also the whole point of replaying a fetch out of
+        # the graveyard with Courser/Oracle out: a dead top card gets re-rolled
+        # into a fresh look. See choose_land().
+        self.shuffle_library()
         self.land_entered(forest, played=False)
 
     def land_drops_for_turn(self):
@@ -297,13 +362,63 @@ class AzusaGame:
             out += [(c, "graveyard") for c in self.graveyard if c.is_land]
         return out
 
+    def top_access(self):
+        return (self.has("Augur of Autumn") or self.has("Courser of Kruphix")
+                or self.has("Oracle of Mul Daya"))
+
+    def choose_land(self, options):
+        """Which land to play, and from where. The preference order is this
+        deck's, not a generic one.
+
+        1. A FETCH LAND FROM THE GRAVEYARD, when top-of-library access is live
+           and the top card is NOT a land. Cracking it searches and then
+           SHUFFLES, which re-rolls a dead top card into a fresh look -- and
+           it costs no card at all, because the fetch is already in the yard.
+           It is also the densest drop available: two landfall triggers (the
+           fetch itself, then what it finds) plus a land-to-graveyard event
+           for Titania, for one land drop. Needs multiple drops a turn to be
+           worth it, which is exactly what this commander does.
+        2. A LAND FROM THE TOP OF THE LIBRARY. Free: the hand land keeps, and
+           playing off the top is the whole reason Courser / Augur / Oracle
+           are card advantage rather than a scry.
+        3. ANY OTHER LAND FROM THE GRAVEYARD -- also free relative to hand.
+        4. A LAND FROM HAND, last, because it is the only one that costs a
+           real card.
+
+        Within a zone a fetch outranks a plain land: two landfall triggers
+        instead of one.
+
+        THE OLD RULE WAS `max(options, key=mv)`, AND IT WAS BACKWARDS. Every
+        land has mana value 0, so the key was constant, `max` returned the
+        first option, and `playable_lands` builds the hand first -- so the
+        engine played hand lands until the hand was empty and only then
+        touched the top of the library or the graveyard.
+        """
+        if not options:
+            return None
+        top_live = self.top_access()
+        top_is_land = bool(self.library) and self.library[-1].is_land
+        if top_live and not top_is_land:
+            for c, z in options:
+                if z == "graveyard" and c.script == "fetch":
+                    self.m["reroll_fetches"] += 1
+                    return c, z
+        for want in ("library", "graveyard", "hand"):
+            picks = [(c, z) for c, z in options if z == want]
+            if picks:
+                picks.sort(key=lambda it: it[0].script != "fetch")
+                return picks[0]
+        return None
+
     def land_step(self):
         self.land_drops = self.land_drops_for_turn()
         while self.land_drops_used < self.land_drops:
             options = self.playable_lands()
-            if not options:
+            choice = self.choose_land(options)
+            if choice is None:
                 break
-            card, zone = max(options, key=lambda it: it[0].mv)
+            card, zone = choice
+            self.m[f"lands_from_{zone}"] += 1
             if zone == "hand":
                 self.hand.remove(card)
             elif zone == "library":
@@ -316,6 +431,15 @@ class AzusaGame:
             self.land_entered(card, played=True)
             if card.script == "fetch":
                 self.crack_fetch(card)
+            # INTERLEAVE: play a land, THEN deploy anything it just paid for,
+            # then play the next one. A one-shot enabler phase before any land
+            # is played cannot cast a two-mana Lotus Cobra on turn two -- the
+            # mana for it comes from the land drop itself. With multiple drops
+            # a turn this is the difference between Cobra seeing none of them
+            # and seeing all but the first. Enablers only, so this cannot turn
+            # into the whole main phase running mid-land-step.
+            if self.land_drops_used < self.land_drops:
+                self.main_phase(enablers_only=True)
 
     # -- casting -----------------------------------------------------------
 
@@ -509,7 +633,19 @@ class AzusaGame:
 
     # -- turn loop -----------------------------------------------------------
 
-    def main_phase(self):
+    def main_phase(self, enablers_only=False):
+        """`enablers_only` is the PRE-LAND main phase: deploy only what pays
+        off per land drop (LAND_ENABLERS, and the commander above all), so
+        that this turn's drops actually see them.
+
+        Before this existed, `land_step` ran once before any spell resolved,
+        which meant nothing cast on turn T could affect turn T's land drops at
+        all. Measured cost of that, over 3,000 games: on the turn AZUSA
+        HERSELF resolved the deck got 1.08 land drops instead of 3; Lotus
+        Cobra was too late to see a drop in 51% of the games it resolved in;
+        and 12.8% of all turns ended with an unused drop while a land was
+        sitting somewhere legal to play it from. See diag_azusa_lands.py.
+        """
         while True:
             units = self.available_mana()
             if not self.commander_cast:
@@ -534,12 +670,14 @@ class AzusaGame:
             for c in self.hand:
                 if c.is_land:
                     continue
+                if enablers_only and c.name not in LAND_ENABLERS:
+                    continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
                 pay = can_pay(self.cost_of(c), units)
                 if pay is not None:
                     options.append((c, pay))
-            if self.library and (self.has("Augur of Autumn")):
+            if not enablers_only and self.library and (self.has("Augur of Autumn")):
                 top = self.library[-1]
                 if top.is_creature and self._coven():
                     pay = can_pay(self.cost_of(top), units)
@@ -656,12 +794,21 @@ def take_turn(g):
     g.land_drops_used = 0
 
     g.draw(1)
+    # ENABLERS BEFORE DROPS. Azusa's own +2, Exploration, Oracle, and every
+    # landfall payoff have to be on the battlefield before the land drops are
+    # spent, or they contribute nothing on the turn they arrive.
+    g.main_phase(enablers_only=True)
     g.land_step()
     g.main_phase()
     if g.result is not None:
         return
     g.combat()
     g.activations()
+    # A SECOND LAND STEP, mirroring engine.py's two `play_land` calls: drops
+    # granted or unlocked by something cast after the first one (a Wayward
+    # Swordtooth that only just Ascended, an Oracle cast postcombat) are still
+    # usable, and `land_drops_for_turn()` is re-read here rather than cached.
+    g.land_step()
     g.main_phase()
     if g.result is not None:
         return
