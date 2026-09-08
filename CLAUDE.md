@@ -57,6 +57,9 @@ python run_lorehold_pair.py         # §0p  the two staged Lorehold changes, 2x2
 python run_lowstakes.py             # §0g/§0h  the "low stakes" fixes that were not
 python diag_shilgengar_ult.py       # 0r  the commander ability that never fired
 python diag_azusa_animation.py      # 0s  the four land-animation effects
+python run_reserve_sweep.py         # 0t  the mana reserve knobs, both engines
+python run_mingain_sweep.py         # 0r  closes the shilgengar min_gain question
+python run_miracle_reducer_fix.py   # 0u  Ruby Medallion / Longshot in the miracle cost
 ```
 
 The azusa one carries its own MUTATION CHECK, because a check that cannot
@@ -91,6 +94,164 @@ ledger. `python -m edhmc.pending` must show the expected staged/committed counts
 and `100 cards / singleton-legal / commander distinct` on all three decks.
 
 **All three legs move in one git commit, or the change is not committed.**
+
+---
+
+## 2026-09-08: THE MANA RESERVE IS FREE UNTIL IT COSTS A SPELL
+
+`KNOWN_ISSUES.md` §0t; `run_reserve_sweep.py` is the harness and
+`reserve_sweep.txt` the output. Nothing changed default; both reserves are
+confirmed, and one standing claim is now supported on the side it was missing.
+
+Two engines hold mana back for a later ability, and both numbers had been set
+to match a printed cost rather than measured. The question put to them was
+whether a LOWER hold would do better — in particular whether it is worth
+withholding mana for a play that gets answered before it can be made.
+
+**THE WASTE IS REAL AND BIGGER THAN EXPECTED.** Lorehold holds mana on 3.73
+turns a game, 7.45 mana in total, and **54% of it buys no miracle at all**. On
+**0.87 turns a game the commander is dead before the windows open** — they
+open after `opponents_act`, so removal takes them with it. That is 23% of the
+turns it holds, and it is exactly the failure the question described.
+
+**AND REMOVING IT GAINS NOTHING.** Dropping `miracle_reserve` to 0 is
+−0.0003 ±0.0052 win rate. The mechanism is the whole answer:
+
+    spells_cast    +0.08      <- the reserve was costing almost no spells
+    mana_floated   -3.00      <- the released mana goes back into the FLOAT
+    miracles_cast  -0.34      <- and the miracles it bought are real
+    mv_cheated     -1.02
+
+**The reserve was not costing the deck spells. It was parking mana the deck
+could not spend anyway** — so there was nothing to win back, however wasteful
+the holding looks. A reserve is free exactly while it is smaller than the
+deck's spare mana, and the diagnostic for that is `spells_cast`, not the
+waste counter.
+
+**THREE IS WHERE IT STARTS COSTING SPELLS, AND THAT IS WHERE WIN RATE
+BREAKS**: `spells_cast` −0.31, `stranded_mv` +2.58, win **−0.0055 ±0.0042**.
+Note what the proxy does on the way there — **it casts MORE miracles (+0.063)
+and LOSES games.** That is the sharpest proxy/objective disagreement this
+project has produced, because here the proxy is the very quantity the knob
+exists to serve. Follow win rate.
+
+This SHARPENS the standing claim rather than overturning it. CLAUDE.md said
+"raising `miracle_reserve` above 2 makes it worse — the default is right",
+and that was evidence about raising it only. Lowering it is now measured too,
+and it is flat: 2 is right, and it is right because it sits just under the
+line where holding starts to cost a spell.
+
+**A knob that is exactly right is not better than one that is roughly right.**
+`miracle_reserve="need"` holds `miracle_need(g)` — 1 with Artist's Talent, 0
+with Molecule Man — instead of a constant 2, and removes all 0.38 mana a game
+of over-holding for **−0.0001 ±0.0014** win rate. A wash, so the default stays
+2 and the option is documented rather than adopted. The interesting part is
+why it is not free: being exact costs 0.01 miracles a game, because the
+cost-reducer can be answered between your main phase and the window, and then
+the need is 2 again and you held 1. **The same removal exposure that motivated
+the question, one level down.**
+
+**Shilgengar's reserve is correctly sized and for a checkable reason.**
+Monotone below the ultimate's cost (0: −0.0056, 1: −0.0041, 2: −0.0023, all
+significant) and flat above it (4: −0.0009 ±0.0012). Its target costs exactly
+{3} or does not happen, where Lorehold's miracle can happen at several prices
+or not at all — which is also why Shilgengar's is not exposed to removal at
+all: `activations()` runs on your own turn between combat and a postcombat
+main phase that is passed no reserve, so anything unspent is released the same
+turn.
+
+**One modelling gap this turned up and did not fix: Shilgengar's Treasures are
+never spent as mana.** They accumulate for Revel in Riches' alternate win and
+nothing else reads them. A real pilot holding four Treasures pays for the
+ultimate out of them and reserves nothing — so the measured cost of that
+reserve is an overestimate, and Pitiless Plunderer, Smothering Tithe and Black
+Market Connections are all understated by whatever that is worth. Making
+Treasures spendable changes every row in the deck and needs its own
+regeneration, so it is filed rather than done.
+
+**`shilgengar_ult_min_gain` is a local optimum, not one end of a slope.**
+Raising it (2, 3, 5) was already known to be monotonically worse; the trend
+said to check lowering it too. `run_mingain_sweep.py`: relaxing the "must be
+a net gain" gate to 0 or −2 fires the ultimate MORE (+0.45 / +0.62 ults and
+reanimated creatures a game) and is WORSE (**−0.0321 ±0.0044** / **−0.0327
+±0.0044**). The default of 1 is a peak in both directions — a shuffle or a
+small net loss costs more in tempo than the extra reanimation buys back.
+
+
+---
+
+## 2026-09-08 (later): THREE COPIES OF "THE MIRACLE DISCOUNT" HAD DRIFTED APART
+
+`KNOWN_ISSUES.md` §0u; `run_miracle_reducer_fix.py` is the harness.
+`ablation_lorehold.txt` regenerated; the previous table is void.
+
+Asked, while investigating the mana reserve above, whether any other card
+lowers the miracle cost the way Molecule Man and Artist's Talent already do.
+Two more exist in this deck — **Ruby Medallion** ("Red spells you cast cost
+{1} less") and **Longshot, Rebel Bowman** ("Noncreature spells you cast cost
+{1} less") — and neither was consistently applied, because the discount was
+computed independently in three places that had quietly drifted apart:
+`miracle_value` (Molecule Man only), `miracle_need` (+ Artist's Talent), and
+the real payment inside `miracle_window` (+ Ruby Medallion). **Longshot never
+discounted a miracle at all**, even though every card this deck ever miracles
+is an instant or sorcery — i.e. always noncreature, so his discount is not
+conditional here. Ruby Medallion discounted the real payment but not either
+gate that decides whether to attempt one, so `set_top` and Library of Leng
+could both decline a miracle they could actually afford.
+
+**Consolidated into one function, `miracle_reduction(g, card)`, everything
+else now reads.** `set_top` and Library of Leng's redirect gate both had the
+specific card in scope already (the latter needed reordering: the
+affordability check used to run before the card it was checking against was
+chosen) and now pass it through for the exact figure; the one card-blind
+call site — the mana reserve above — keeps the same conservative worst-case
+number that section already established.
+
+**The mechanism moved; the objective did not, and both facts are legible.**
+
+| metric, N=15,000, T20 | delta |
+|---|---|
+| `miracles_cast` | **+0.107 ±0.012** |
+| `leng_to_top` | **+0.024 ±0.007** |
+| `leng_miracled` | **+0.018 ±0.005** |
+| win rate | −0.0012 ±0.0023, inside its bar |
+
+Ruby Medallion and Longshot both have to be drawn, kept on the battlefield,
+AND line up with a specific card's colour or type at the moment a miracle is
+decided — rare enough in a 99-card deck that the aggregate win rate cannot
+resolve it at this N, even though the mechanism counters that fire on every
+relevant turn clearly can.
+
+**A monkeypatched before/after comparison silently measured nothing, and
+here is what that looks like.** The first cut of the harness patched the OLD
+behaviour into the module in the parent process before creating a `Pool`.
+Windows' `multiprocessing` has no fork — workers are spawned as fresh
+interpreters that re-import `edhmc.lorehold` from scratch — so the patch
+never reached them, and both legs silently ran the current code. The result
+was an exact `+0.0000` on every single metric, not a small number: **when a
+before/after diff comes back at literally zero on everything, the patch
+did not apply — it is not evidence of "no effect."** Fixed by installing the
+patch inside each worker's own `_init`.
+
+**Checked for anywhere else this could apply first.** Grepped all six decks'
+card lists for "costs {N} less" text: Karlov has one more (The Wind Crystal),
+with a single call site in `karlov.reduce_cost` and no drift possible — no
+miracle-equivalent mechanic exists there to duplicate the logic against.
+Lorehold is the special case, because the decision/payment split its miracle
+windows require is what created three consumers of one fact in the first
+place.
+
+**Zero of the regenerated ablation table's 64 rows moved by more than their
+own old CI half-width, and zero already-significant rows flipped sign** —
+including Ruby Medallion's own (win 0.0009 → 0.0007) and Longshot's own
+(0.0205 → 0.0214), both comfortably inside their bars. Individual values did
+shift a little; nothing shifted far enough to register. Leave-one-out
+ablation measures a card's presence or absence, and both cards already
+carried their existing discounts either way — what the fix changed is a
+DECISION (which card to hold, whether a gate believes a miracle is
+affordable), visible in the paired harness above (same seeds, only the fix
+differs) well before it would register in a per-card table at this N.
+
 
 ---
 

@@ -337,6 +337,45 @@ NOTES.update({
         "note gives; read win rate only."),
 })
 
+# 2026-09-08: three copies of "the miracle discount" had drifted apart.
+NOTES.update({
+    "ablation_cache_lorehold_10-20_n15000_medblank.json": (
+        "CURRENT TABLE. Regenerated from an empty cache 2026-09-08 after "
+        "KNOWN_ISSUES.md 0u: Ruby Medallion ('red spells cost {1} less') and "
+        "Longshot, Rebel Bowman ('noncreature spells cost {1} less') were "
+        "applied inconsistently across THREE separate copies of the miracle "
+        "discount -- miracle_value (Molecule Man only), miracle_need (+ "
+        "Artist's Talent), and miracle_window's real payment (+ Ruby "
+        "Medallion) -- so Longshot never discounted a miracle at all despite "
+        "every miracled card being noncreature by definition, and Ruby "
+        "Medallion discounted the real payment but not the affordability "
+        "gates that decide whether to attempt one. Consolidated into one "
+        "function, miracle_reduction(g, card), that every consumer now "
+        "reads; the two call sites with a specific card in scope (set_top, "
+        "Library of Leng's redirect) pass it through, and Library of Leng's "
+        "gate had to be REORDERED since it used to check affordability "
+        "before the card it was checking against existed. "
+        "MEASURED (run_miracle_reducer_fix.py, N=15,000, paired, same seeds, "
+        "only the fix differs): miracles_cast +0.107 +-0.012, leng_to_top "
+        "+0.024 +-0.007, leng_miracled +0.018 +-0.005, all significant; win "
+        "rate -0.0012 +-0.0023, inside its bar. Both cards need to be drawn, "
+        "kept on the battlefield AND match a specific card's colour or type "
+        "at the moment a miracle is decided -- rare enough in a 99-card deck "
+        "that the aggregate win rate cannot resolve it at this N even though "
+        "the mechanism counters that fire on every relevant turn clearly "
+        "can. "
+        "ZERO OF 64 SHARED ROWS MOVED BY MORE THAN THEIR OWN OLD CI "
+        "HALF-WIDTH, and zero already-significant rows flipped sign -- "
+        "including Ruby Medallion's own (0.0009 -> 0.0007) and Longshot's "
+        "(0.0205 -> 0.0214), both comfortably inside their bars. "
+        "Leave-one-out ablation measures a card's presence or absence, and "
+        "both cards already carried their existing discounts either way in "
+        "the old code. What changed is a DECISION (which card to hold, "
+        "whether a gate believes a miracle is affordable), visible in the "
+        "paired harness above well before it would register in a per-card "
+        "table at this N."),
+})
+
 
 def fingerprint(deck: str) -> tuple[str, list[str]]:
     """Hash the deck's source, NORMALISED FOR LINE ENDINGS.

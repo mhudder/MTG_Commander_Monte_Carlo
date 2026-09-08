@@ -14,7 +14,7 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `d1f88d5`.
+Fingerprints recorded at `3753f10`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
@@ -22,9 +22,9 @@ Fingerprints recorded at `d1f88d5`.
 | `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `112a3feeca5ac9ef` |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `112a3feeca5ac9ef` |
 | `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `112a3feeca5ac9ef` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `7a2d6db8085aa135` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `7a2d6db8085aa135` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `7a2d6db8085aa135` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `9d7788bde59d962a` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `9d7788bde59d962a` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `9d7788bde59d962a` |
 | `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `5c0796c61c852c30` |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `5c0796c61c852c30` |
 | `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `5c0796c61c852c30` |
@@ -66,7 +66,7 @@ Measured from an EMPTY cache 2026-09-06 on the same code as the n6000 cache abov
 
 ### `ablation_cache_lorehold_10-20_n15000_medblank.json`
 
-CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK was fixed: it was built at priority 0.5, below the minimum priority of every deck, so `main_phase` -- which is greedy on priority -- cast it only when nothing else was affordable. That is a dead card, not a replacement-level one, and the tempo difference was charged to whichever card was under test. The blank is now cast at the deck's median nonland priority (5.0) via experiment.repl_priority(). threat and the 1/1 body are deliberately unchanged -- see KNOWN_ISSUES.md 0j for why those are NOT the same bug. Scores rise almost everywhere, which is the expected direction: the blank now costs mana, so the blanked deck is worse. 52 of 256 cards moved by more than their own old CI half-width. STILL CURRENT after the 2026-09-06 Erebos and extra-turn work (KNOWN_ISSUES.md 0l, 0m), which changed engine.py and therefore moved this fingerprint. The numbers did not move: this engine has its own Game class and imports only the mana and card primitives from engine.py, none of which changed. VERIFIED, not argued -- a git worktree at the previous commit ran this deck's baseline on the same seeds at both horizons and every metric was BIT-IDENTICAL. Two decks failed that check (rendmaw and tivit) and were regenerated, which is what makes the pass meaningful. The lorehold fingerprint moved a SECOND time on 2026-09-06, for the `sunbird_triggers` counter added while closing queued item 0b (KNOWN_ISSUES.md 0p): the ledger justified Sunbird's Invocation with a CONDITIONAL firing rate printed as an unconditional one, and separating triggers from successful free casts is what showed it. METRIC ONLY -- one dict key and one increment, no branch reads it -- and checked the same way: all four decks' baselines bit-identical across the change. Cache current.
+CURRENT TABLE. Regenerated from an empty cache 2026-09-08 after KNOWN_ISSUES.md 0u: Ruby Medallion ('red spells cost {1} less') and Longshot, Rebel Bowman ('noncreature spells cost {1} less') were applied inconsistently across THREE separate copies of the miracle discount -- miracle_value (Molecule Man only), miracle_need (+ Artist's Talent), and miracle_window's real payment (+ Ruby Medallion) -- so Longshot never discounted a miracle at all despite every miracled card being noncreature by definition, and Ruby Medallion discounted the real payment but not the affordability gates that decide whether to attempt one. Consolidated into one function, miracle_reduction(g, card), that every consumer now reads; the two call sites with a specific card in scope (set_top, Library of Leng's redirect) pass it through, and Library of Leng's gate had to be REORDERED since it used to check affordability before the card it was checking against existed. MEASURED (run_miracle_reducer_fix.py, N=15,000, paired, same seeds, only the fix differs): miracles_cast +0.107 +-0.012, leng_to_top +0.024 +-0.007, leng_miracled +0.018 +-0.005, all significant; win rate -0.0012 +-0.0023, inside its bar. Both cards need to be drawn, kept on the battlefield AND match a specific card's colour or type at the moment a miracle is decided -- rare enough in a 99-card deck that the aggregate win rate cannot resolve it at this N even though the mechanism counters that fire on every relevant turn clearly can. ZERO OF 64 SHARED ROWS MOVED BY MORE THAN THEIR OWN OLD CI HALF-WIDTH, and zero already-significant rows flipped sign -- including Ruby Medallion's own (0.0009 -> 0.0007) and Longshot's (0.0205 -> 0.0214), both comfortably inside their bars. Leave-one-out ablation measures a card's presence or absence, and both cards already carried their existing discounts either way in the old code. What changed is a DECISION (which card to hold, whether a gate believes a miracle is affordable), visible in the paired harness above well before it would register in a per-card table at this N.
 
 ### `ablation_cache_lorehold_10-20_n6000.json`
 

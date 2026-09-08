@@ -93,6 +93,15 @@ class LoreholdGame:
             "miracles_cast": 0,
             "miracle_windows": 0,
             "miracle_hits": 0,
+            # Reserve accounting: how much mana the main phase declined to
+            # spend, and how much of that the miracle cost did not actually
+            # need. See reserve_for() below.
+            "reserve_turns": 0,
+            "reserve_held": 0,
+            "reserve_overheld": 0,
+            "reserve_unused_turns": 0,
+            "reserve_wasted": 0,
+            "reserve_lost_commander": 0,
             "total_mv_cast": 0.0,
             "cards_drawn": 0,
             "spells_cast": 0,
@@ -252,6 +261,34 @@ def reduce_cost(g, card, miracle=False):
 # Top-of-library manipulation
 # ---------------------------------------------------------------------------
 
+def miracle_reduction(g, card) -> int:
+    """Generic-mana reduction on MIRACLING this specific card.
+
+    THE ONE PLACE this is computed. Before 2026-09-08 there were THREE
+    separate copies of "how much does the miracle discount come to" —
+    `miracle_value` (Molecule Man only), `miracle_need` (Molecule Man +
+    Artist's Talent), and an inline block in `miracle_window` (those two plus
+    Ruby Medallion) — and they had drifted apart exactly the way
+    KNOWN_ISSUES.md 0q says a hand-maintained fact always eventually does.
+    `miracle_window`'s version was the most complete of the three and still
+    missed one: Longshot, Rebel Bowman's "noncreature spells you cast cost
+    {1} less" was applied to a HARDCAST (`reduce_cost`) but never to a
+    miracle, even though every card this deck ever miracles is an instant or
+    sorcery — i.e. always noncreature, so Longshot's discount is not
+    conditional here, it is unconditional whenever he is on the battlefield.
+
+    Molecule Man is NOT folded in here — he does not discount the cost, he
+    overrides it to {0} outright, and all three callers already special-case
+    him before this function would run.
+    """
+    red = 1 if g.has("Artist's Talent") else 0
+    if g.has("Ruby Medallion") and card.cost.get("R", 0) > 0:
+        red += 1
+    if g.has("Longshot, Rebel Bowman") and "Creature" not in card.types:
+        red += 1
+    return red
+
+
 def miracle_value(g, card):
     """What is this card worth if we miracle it? = mana we would cheat."""
     if card.is_land:
@@ -259,24 +296,39 @@ def miracle_value(g, card):
     if g.has("Molecule Man"):
         return float(card.mv)                     # everything is castable for {0}
     if "Instant" in card.types or "Sorcery" in card.types:
-        return float(card.mv) - 2.0               # Lorehold's miracle {2}
+        cost = max(0, 2 - miracle_reduction(g, card))    # Lorehold's miracle {2}
+        return float(card.mv) - cost
     if card.miracle_cost:
-        return float(card.mv) - sum(card.miracle_cost.values())
+        cost = max(0, sum(card.miracle_cost.values()) - miracle_reduction(g, card))
+        return float(card.mv) - cost
     return -1.0                                    # no miracle available
 
 
-def miracle_need(g) -> int:
+def miracle_need(g, card=None) -> int:
     """Mana required to miracle a card off Lorehold, after cost reduction.
 
-    One number, used by BOTH the decision to put a card on top and the payment
-    when it is drawn. They used to be computed separately from different mana
-    pools, which is how the engine talked itself into placements it could not
-    pay for.
+    One number, used by the decision to put a card on top, the decision to
+    hold mana back for the windows, AND the payment when it is drawn — they
+    used to be computed separately from different mana pools (and, until
+    2026-09-08, from different SUBSETS of the reducers below), which is how
+    the engine talked itself into placements it could not pay for.
+
+    Pass the specific CARD when one is already chosen (`set_top` and Library
+    of Leng's redirect both have `best` in scope) for the exact figure — Ruby
+    Medallion and Longshot both depend on the card's own text (red,
+    noncreature) and only apply then. Without a card this returns the
+    WORST-CASE figure: only Artist's Talent, the one reducer with no card
+    gate, is assumed. That keeps every card-blind pre-check (chiefly
+    `reserve_for` in KNOWN_ISSUES.md 0t) from advertising more affordability
+    than is actually guaranteed — it can only ever hold slightly MORE than a
+    specific card would need, never less.
     """
-    need = 0 if g.has("Molecule Man") else 2
-    if g.has("Artist's Talent"):
-        need = max(0, need - 1)
-    return need
+    if g.has("Molecule Man"):
+        return 0
+    need = 2
+    need -= miracle_reduction(g, card) if card is not None else \
+        (1 if g.has("Artist's Talent") else 0)
+    return max(0, need)
 
 
 def set_top(g, pool=None, upkeep_free=False):
@@ -321,7 +373,7 @@ def set_top(g, pool=None, upkeep_free=False):
         # the number of miracles cast.
         free_cast = upkeep_free and ("Instant" in best.types
                                      or "Sorcery" in best.types)
-        need = 0 if free_cast else miracle_need(g)
+        need = 0 if free_cast else miracle_need(g, best)
         if pool < need + cost:
             return None
         # Only worth doing if the mana saved beats the cost of doing it AND
@@ -425,9 +477,7 @@ def miracle_window(g, off_turn=False):
         return card, False
 
     mcost = dict(mcost)
-    red = 1 if g.has("Artist's Talent") else 0
-    red += 1 if (g.has("Ruby Medallion") and card.cost.get("R", 0) > 0) else 0
-    mcost["gen"] = max(0, mcost.get("gen", 0) - red)
+    mcost["gen"] = max(0, mcost.get("gen", 0) - miracle_reduction(g, card))
 
     need = sum(mcost.values())
     if off_turn:
@@ -957,6 +1007,34 @@ def hold_for_miracle(g, card):
     return True
 
 
+def reserve_for(g) -> int:
+    """How much mana to leave untapped for the off-turn miracle windows.
+
+    `cfg["miracle_reserve"]` is a CONSTANT 2 by default, and 2 is the miracle
+    cost off a bare Lorehold. But the cost is not always 2: `miracle_need`
+    reads the board, and it is 1 with Artist's Talent out and 0 with Molecule
+    Man. So the constant OVER-HOLDS whenever either is on the battlefield --
+    the main phase declines to cast a spell to protect mana the miracle will
+    not spend.
+
+    `miracle_reserve="need"` holds exactly `miracle_need(g)` instead. Kept as
+    an option rather than made the default until it is measured, because
+    CLAUDE.md's standing claim that "the default is right" rests only on
+    RAISING the constant having been tried, never on lowering it or on making
+    it exact -- which is the gap this option exists to close.
+
+    `reserve_overheld` counts the mana held beyond what the miracle would
+    cost, so the size of the mistake is visible even in a run that does not
+    change the policy.
+    """
+    if not g.commander_cast:
+        return 0
+    want = g.cfg.get("miracle_reserve", 2)
+    if want == "need":
+        want = miracle_need(g)
+    return want
+
+
 def main_phase(g, reserve=0):
     """reserve: mana left untapped for miracle windows on opponents' turns.
 
@@ -1109,8 +1187,8 @@ def opponent_upkeep_windows(g):
             # both: you keep a card you already had and draw nothing new.
             # There was no gate here at all, which is most of why placements
             # were being made that could not be cast.
-            afford = (g.float_mana + g.treasures) >= miracle_need(g)
             best = max(g.hand, key=lambda c: miracle_value(g, c))
+            afford = (g.float_mana + g.treasures) >= miracle_need(g, best)
             if afford and miracle_value(g, best) > 0:
                 worst = best
                 g.hand.remove(worst)
@@ -1247,9 +1325,16 @@ def take_turn(g):
             g.m["settop_drawn"] += (drawn is st_card)
             g.m["settop_miracled"] += (drawn is st_card and cast)
     play_land(g)
-    main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
+    held = reserve_for(g)
+    if held:
+        g.m["reserve_turns"] += 1
+        g.m["reserve_held"] += held
+        g.m["reserve_overheld"] += max(0, held - miracle_need(g))
+    main_phase(g, reserve=held)
     combat(g)
-    main_phase(g, reserve=g.cfg.get("miracle_reserve", 2) if g.commander_cast else 0)
+    # Re-read rather than cached: the precombat phase can deploy the very
+    # cards that change the miracle cost (Artist's Talent, Molecule Man).
+    main_phase(g, reserve=reserve_for(g))
 
     underworld_breach(g)
     # "At the beginning of the end step, sacrifice this enchantment." Note this
@@ -1291,7 +1376,17 @@ def take_turn(g):
         main_phase(g)
         combat(g)
 
+    # WAS THE RESERVE WORTH HOLDING? The windows it is held for open AFTER
+    # `opponents_act`, so a Lorehold answered in between takes them with it and
+    # the mana was declined for nothing. Counted rather than argued.
+    _before = g.m["miracles_cast"]
     opponent_upkeep_windows(g)
+    if held:
+        if g.m["miracles_cast"] == _before:
+            g.m["reserve_unused_turns"] += 1
+            g.m["reserve_wasted"] += held
+        if not g.commander_cast:
+            g.m["reserve_lost_commander"] += 1
 
 
 def simulate(deck, commander, cfg, seed):
