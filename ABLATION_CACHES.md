@@ -14,24 +14,24 @@ provenance below is the safety net instead.
 compare the fingerprint. If it differs, DELETE the cache.**
 `./regen_tables.sh` deletes them by default; `--resume` does not.
 
-Fingerprints recorded at `3753f10`.
+Fingerprints recorded at `03671f9`.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `b6574e96560d40f3` |
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `112a3feeca5ac9ef` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `112a3feeca5ac9ef` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `112a3feeca5ac9ef` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `9d7788bde59d962a` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `9d7788bde59d962a` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `9d7788bde59d962a` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `5c0796c61c852c30` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `5c0796c61c852c30` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `5c0796c61c852c30` |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `df64999b973cd5b1` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `654bd9a7648e137e` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `654bd9a7648e137e` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `654bd9a7648e137e` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `e9ae08a4758f1151` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `7ccf9d72bac97d6f` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 63 | `7ccf9d72bac97d6f` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `7ccf9d72bac97d6f` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `db11102766725e9f` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `db11102766725e9f` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `db11102766725e9f` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `04c646e9e3be693f` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `04c646e9e3be693f` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `04c646e9e3be693f` |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `62ff61b37b4955a4` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `2f29dd9682369801` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `2f29dd9682369801` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `2f29dd9682369801` |
 
 ## What each fingerprint covers
 

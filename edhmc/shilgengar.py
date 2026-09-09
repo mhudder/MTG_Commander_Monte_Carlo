@@ -278,12 +278,14 @@ class ShilgengarGame:
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
             return
-        self.m["damage"] += amount
-        self.m["drain_damage"] += amount
-        if self.damage_by_turn:
-            self.damage_by_turn[-1] += amount
+        # BOUNDED: record what could have mattered, not what was asked for.
         n = max(1, len(OPP.living(self)))
-        OPP.damage_each(self, amount / n) if each else OPP.damage_single(self, amount)
+        dealt = (OPP.damage_each(self, amount / n) if each
+                 else OPP.damage_single(self, amount))
+        self.m["damage"] += dealt
+        self.m["drain_damage"] += dealt
+        if self.damage_by_turn:
+            self.damage_by_turn[-1] += dealt
 
     # -- tokens ------------------------------------------------------------
 
@@ -328,15 +330,14 @@ class ShilgengarGame:
         `sacrifice()` below). `perm` is the permanent that died, when known."""
         for _ in range(n):
             if self.has("Blood Artist"):
-                OPP.damage_single(self, 1)
-                self.m["damage"] += 1
-                self.m["drain_damage"] += 1
+                dealt = OPP.damage_single(self, 1)
+                self.m["damage"] += dealt
+                self.m["drain_damage"] += dealt
                 self.your_life += 1
             if self.has("Zulaport Cutthroat"):
-                k = len(OPP.living(self))
-                OPP.damage_each(self, 1)
-                self.m["damage"] += k
-                self.m["drain_damage"] += k
+                dealt = OPP.damage_each(self, 1)
+                self.m["damage"] += dealt
+                self.m["drain_damage"] += dealt
                 self.your_life += 1
             nontoken = perm is not None and not perm.is_token
             if nontoken and self.has("Midnight Reaper"):
@@ -747,13 +748,14 @@ class ShilgengarGame:
         if any(p.card.name == "Sun Titan" for p in attackers):
             self._sun_titan_reanimate()
 
-        dmg = OPP.damage_through(self, attackers)
         for p in attackers:
             p.tapped = True
+        # One attack at the whole pod; `dmg` comes back bounded at what could
+        # have mattered. Lifelink below still reads `power_of`, not this.
+        dmg = OPP.combat_damage(self, attackers)
         self.m["damage"] += dmg
         self.m["combat_damage"] += dmg
         self.damage_by_turn.append(dmg)
-        OPP.damage_single(self, dmg)
         for p in attackers:
             if self.lifelink_of(p):
                 self.gain_life(self.power_of(p))

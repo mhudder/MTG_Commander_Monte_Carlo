@@ -21,72 +21,72 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Archangel of Thune                    +2.19+-0.18         +4.38+-0.32        +0.0281+-0.0033      both
-Lyra Dawnbringer                      +1.84+-0.14         +3.80+-0.29        +0.0261+-0.0032      both
-Sol Ring                              +2.54+-0.18         +2.50+-0.27        +0.0097+-0.0028      both
-Massacre Wurm                         +1.28+-0.10         +2.30+-0.22        +0.0249+-0.0032      both
-Righteous Valkyrie                    +0.94+-0.10         +2.11+-0.22        +0.0130+-0.0026      both
-Emeria's Call // Emeria, Shattered Skyclave        +1.09+-0.10         +1.93+-0.20        +0.0077+-0.0026      both
-Requiem Angel                         +0.96+-0.07         +1.85+-0.15        +0.0103+-0.0024      both
-Fellwar Stone                         +1.25+-0.12         +1.67+-0.21        +0.0070+-0.0025      both
-Resplendent Angel                     +1.27+-0.11         +1.59+-0.20        +0.0059+-0.0024      both
-Avacyn, Angel of Hope                 +0.74+-0.08         +1.51+-0.17        +0.0087+-0.0025      both
-Talisman of Hierarchy                 +1.22+-0.12         +1.51+-0.22        +0.0064+-0.0026      both
-Arcane Signet                         +1.19+-0.12         +1.50+-0.21        +0.0058+-0.0025      both
-Elesh Norn, Grand Cenobite            +0.78+-0.08         +1.50+-0.17        +0.0083+-0.0024      both
-Orzhov Signet                         +1.18+-0.12         +1.41+-0.21        +0.0064+-0.0025      both
-Marble Diamond                        +0.98+-0.11         +1.34+-0.21        +0.0043+-0.0025      both
-Phyrexian Arena                       +0.60+-0.10         +1.25+-0.23        +0.0078+-0.0027      both
-Mind Stone                            +1.00+-0.11         +1.24+-0.20        +0.0055+-0.0025      both
-Bishop of Wings                       +0.22+-0.05         +1.05+-0.14        +0.0092+-0.0020      both
-Speaker of the Heavens                +0.26+-0.08         +0.97+-0.14        +0.0072+-0.0018      both
-Sun Titan                             +0.38+-0.04         +0.96+-0.14        +0.0055+-0.0021      both
-Kokusho, the Evening Star             +0.81+-0.07         +0.87+-0.15        +0.0023+-0.0022      both
-Emeria Shepherd                       +0.35+-0.04         +0.86+-0.12        +0.0034+-0.0019      both
-Wayfarer's Bauble                     +0.66+-0.08         +0.85+-0.17        +0.0021+-0.0022       dmg
-Flawless Maneuver                     +0.58+-0.08         +0.78+-0.14        +0.0032+-0.0017      both
-Giada, Font of Hope                   +0.72+-0.06         +0.73+-0.13        +0.0032+-0.0019      both
-Teferi's Protection                   +0.60+-0.08         +0.72+-0.14        +0.0030+-0.0017      both
-Grim Haruspex                         +0.40+-0.06         +0.69+-0.16        +0.0057+-0.0024      both
-Youthful Valkyrie                     +0.52+-0.06         +0.66+-0.13        +0.0033+-0.0018      both
-Midnight Reaper                       +0.36+-0.05         +0.62+-0.17        +0.0035+-0.0023      both
-Voldaren Bloodcaster // Bloodbat Summoner        +0.60+-0.05         +0.54+-0.10        +0.0005+-0.0015       dmg
-Reya Dawnbringer                      +0.11+-0.02         +0.45+-0.09        +0.0045+-0.0017      both
-Black Market Connections              +0.46+-0.11         +0.42+-0.22        -0.0022+-0.0027       dmg
-Zulaport Cutthroat                    +0.33+-0.05         +0.41+-0.11        +0.0043+-0.0018      both
-Priest of Fell Rites                  +0.33+-0.05         +0.34+-0.12        +0.0001+-0.0017       dmg
-Dark Prophecy                         +0.06+-0.04         +0.16+-0.13        +0.0009+-0.0019       dmg
-Cartel Aristocrat                     +0.14+-0.03         +0.12+-0.08        +0.0011+-0.0013       dmg
-Damn                                  -1.22+-0.12         +0.02+-0.22        +0.0082+-0.0027      FLIP
-Wrath of God                          -1.16+-0.12         -0.13+-0.21        +0.0065+-0.0027       win
-Viscera Seer                          -0.13+-0.03         -0.16+-0.08        -0.0005+-0.0011       dmg
-Skullclamp                            -0.05+-0.04         -0.18+-0.10        -0.0013+-0.0014       dmg
-Pitiless Plunderer                    -0.13+-0.03         -0.22+-0.09        -0.0009+-0.0012       dmg
-Vampiric Rites                        -0.09+-0.03         -0.23+-0.08        -0.0016+-0.0011      both
-Blood Artist                          -0.37+-0.05         -0.25+-0.12        +0.0015+-0.0017       dmg
-Smothering Tithe                      -0.43+-0.07         -0.76+-0.17        +0.0038+-0.0022      both
+Lyra Dawnbringer                      +1.29+-0.10         +2.49+-0.18        +0.0267+-0.0032      both
+Archangel of Thune                    +1.23+-0.10         +2.26+-0.17        +0.0255+-0.0031      both
+Sol Ring                              +1.86+-0.13         +1.92+-0.17        +0.0085+-0.0026      both
+Requiem Angel                         +0.75+-0.05         +1.36+-0.11        +0.0112+-0.0024      both
+Emeria's Call // Emeria, Shattered Skyclave        +0.83+-0.07         +1.35+-0.13        +0.0087+-0.0025      both
+Righteous Valkyrie                    +0.75+-0.07         +1.30+-0.13        +0.0124+-0.0026      both
+Fellwar Stone                         +0.93+-0.09         +1.27+-0.14        +0.0063+-0.0024      both
+Resplendent Angel                     +1.03+-0.08         +1.19+-0.12        +0.0098+-0.0025      both
+Massacre Wurm                         +0.57+-0.06         +1.15+-0.13        +0.0222+-0.0031      both
+Talisman of Hierarchy                 +0.92+-0.09         +1.13+-0.14        +0.0064+-0.0025      both
+Avacyn, Angel of Hope                 +0.53+-0.06         +1.11+-0.11        +0.0120+-0.0025      both
+Arcane Signet                         +0.90+-0.09         +1.09+-0.14        +0.0051+-0.0025      both
+Orzhov Signet                         +0.86+-0.09         +1.01+-0.14        +0.0057+-0.0023      both
+Marble Diamond                        +0.76+-0.08         +1.01+-0.13        +0.0035+-0.0024      both
+Mind Stone                            +0.77+-0.08         +0.90+-0.13        +0.0051+-0.0023      both
+Kokusho, the Evening Star             +0.66+-0.06         +0.76+-0.10        +0.0042+-0.0021      both
+Wayfarer's Bauble                     +0.51+-0.06         +0.73+-0.12        +0.0040+-0.0020      both
+Youthful Valkyrie                     +0.47+-0.04         +0.70+-0.09        +0.0062+-0.0019      both
+Giada, Font of Hope                   +0.68+-0.05         +0.67+-0.09        +0.0042+-0.0019      both
+Elesh Norn, Grand Cenobite            +0.41+-0.05         +0.67+-0.10        +0.0089+-0.0023      both
+Phyrexian Arena                       +0.39+-0.07         +0.67+-0.14        +0.0085+-0.0026      both
+Emeria Shepherd                       +0.26+-0.03         +0.61+-0.08        +0.0047+-0.0019      both
+Bishop of Wings                       +0.14+-0.03         +0.60+-0.08        +0.0089+-0.0020      both
+Voldaren Bloodcaster // Bloodbat Summoner        +0.60+-0.04         +0.55+-0.07        +0.0027+-0.0015      both
+Speaker of the Heavens                +0.13+-0.04         +0.49+-0.08        +0.0073+-0.0018      both
+Flawless Maneuver                     +0.40+-0.06         +0.49+-0.10        +0.0029+-0.0017      both
+Teferi's Protection                   +0.39+-0.06         +0.47+-0.09        +0.0023+-0.0016      both
+Zulaport Cutthroat                    +0.37+-0.04         +0.45+-0.08        +0.0036+-0.0017      both
+Grim Haruspex                         +0.16+-0.04         +0.36+-0.10        +0.0040+-0.0022      both
+Damn                                  -0.75+-0.08         +0.36+-0.15        +0.0101+-0.0025      FLIP
+Reya Dawnbringer                      +0.08+-0.02         +0.33+-0.06        +0.0047+-0.0017      both
+Midnight Reaper                       +0.16+-0.04         +0.29+-0.10        +0.0043+-0.0021      both
+Sun Titan                             +0.14+-0.03         +0.26+-0.08        +0.0009+-0.0018       dmg
+Wrath of God                          -0.73+-0.08         +0.25+-0.14        +0.0081+-0.0025      FLIP
+Black Market Connections              +0.36+-0.07         +0.19+-0.14        +0.0008+-0.0026       dmg
+Priest of Fell Rites                  +0.21+-0.03         +0.17+-0.07        +0.0006+-0.0016       dmg
+Dark Prophecy                         +0.05+-0.03         +0.05+-0.08        +0.0013+-0.0019        --
+Cartel Aristocrat                     +0.05+-0.02         +0.02+-0.05        +0.0006+-0.0011        --
+Blood Artist                          -0.15+-0.04         +0.01+-0.07        +0.0015+-0.0016      FLIP
+Viscera Seer                          -0.08+-0.02         -0.10+-0.05        -0.0005+-0.0010       dmg
+Pitiless Plunderer                    -0.09+-0.03         -0.14+-0.05        -0.0004+-0.0011       dmg
+Vampiric Rites                        -0.07+-0.02         -0.15+-0.05        -0.0011+-0.0011      both
+Skullclamp                            -0.04+-0.03         -0.15+-0.06        -0.0008+-0.0013       dmg
+Smothering Tithe                      -0.29+-0.05         -0.50+-0.11        +0.0049+-0.0021      both
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Serra's Emissary                      +0.67+-0.06         +1.40+-0.15        +0.0077+-0.0023      both
-Agadeem's Awakening // Agadeem, the Undercrypt        +0.83+-0.09         +1.35+-0.18        +0.0051+-0.0023      both
-Twilight Shepherd                     +0.57+-0.06         +1.03+-0.14        +0.0037+-0.0020      both
-Angelic Arbiter                       +0.44+-0.05         +1.01+-0.13        +0.0062+-0.0020      both
-Angel of Suffering                    +0.73+-0.06         +0.99+-0.13        +0.0044+-0.0020      both
-Angel of Serenity                     +0.36+-0.05         +0.91+-0.14        +0.0057+-0.0020      both
-Angel of Despair                      +0.41+-0.04         +0.90+-0.13        +0.0063+-0.0019      both
-Herald of War                         +0.51+-0.05         +0.86+-0.12        +0.0060+-0.0020      both
-Angel of the Ruins                    +0.34+-0.04         +0.81+-0.12        +0.0053+-0.0020      both
-Malakir Rebirth // Malakir Mire        +0.35+-0.06         +0.61+-0.12        +0.0027+-0.0016      both
-Utter End                             +0.27+-0.05         +0.38+-0.10        +0.0023+-0.0014      both
-Vindicate                             +0.21+-0.04         +0.32+-0.11        +0.0020+-0.0013      both
-Despark                               +0.14+-0.04         +0.27+-0.11        +0.0014+-0.0012      both
-Mortify                               +0.16+-0.04         +0.24+-0.11        +0.0017+-0.0015      both
-Anguished Unmaking                    +0.17+-0.05         +0.20+-0.11        +0.0011+-0.0013       dmg
-Bloodghast                            +0.18+-0.04         +0.20+-0.10        +0.0015+-0.0014      both
-Generous Gift                         +0.18+-0.05         +0.19+-0.09        +0.0006+-0.0013       dmg
-Swords to Plowshares                  +0.07+-0.03         +0.08+-0.06        +0.0013+-0.0007      both
-Path to Exile                         +0.07+-0.03         +0.07+-0.06        +0.0008+-0.0007      both
-Revel in Riches                       +0.17+-0.04         -0.01+-0.13        +0.0075+-0.0020      FLIP
+Serra's Emissary                      +0.45+-0.04         +0.99+-0.10        +0.0102+-0.0023      both
+Agadeem's Awakening // Agadeem, the Undercrypt        +0.60+-0.06         +0.97+-0.12        +0.0054+-0.0022      both
+Angel of Suffering                    +0.58+-0.05         +0.82+-0.09        +0.0065+-0.0019      both
+Twilight Shepherd                     +0.43+-0.04         +0.75+-0.09        +0.0053+-0.0020      both
+Angelic Arbiter                       +0.33+-0.04         +0.69+-0.09        +0.0077+-0.0020      both
+Herald of War                         +0.42+-0.04         +0.68+-0.08        +0.0043+-0.0019      both
+Angel of Serenity                     +0.26+-0.03         +0.66+-0.08        +0.0087+-0.0021      both
+Angel of Despair                      +0.32+-0.04         +0.65+-0.09        +0.0087+-0.0020      both
+Angel of the Ruins                    +0.26+-0.03         +0.60+-0.08        +0.0063+-0.0019      both
+Malakir Rebirth // Malakir Mire        +0.26+-0.04         +0.40+-0.08        +0.0026+-0.0016      both
+Utter End                             +0.19+-0.03         +0.29+-0.07        +0.0027+-0.0014      both
+Vindicate                             +0.15+-0.03         +0.22+-0.06        +0.0015+-0.0012      both
+Mortify                               +0.10+-0.03         +0.19+-0.07        +0.0013+-0.0013       dmg
+Anguished Unmaking                    +0.12+-0.04         +0.17+-0.07        +0.0011+-0.0011       dmg
+Despark                               +0.10+-0.03         +0.16+-0.06        +0.0011+-0.0012       dmg
+Generous Gift                         +0.13+-0.03         +0.14+-0.06        +0.0002+-0.0012       dmg
+Bloodghast                            +0.08+-0.03         +0.08+-0.06        +0.0006+-0.0012       dmg
+Path to Exile                         +0.05+-0.02         +0.07+-0.04        +0.0007+-0.0007       dmg
+Swords to Plowshares                  +0.05+-0.02         +0.07+-0.04        +0.0010+-0.0008      both
+Revel in Riches                       +0.12+-0.03         +0.02+-0.09        +0.0081+-0.0021       win

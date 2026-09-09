@@ -21,6 +21,7 @@ only *respond* differently.
 
 from __future__ import annotations
 
+import bisect
 import random
 from dataclasses import dataclass
 
@@ -469,7 +470,27 @@ def flying_of(g, perm) -> bool:
     return False
 
 
-def damage_through(g, attackers: list) -> float:
+def _blocker_counts(g, defender):
+    """How many of `defender`'s creatures block, and how many can catch a flier.
+
+    Split out of `damage_through` 2026-09-08 so that `combat_damage`'s
+    assignment step reads the SAME numbers the resolution step will, rather
+    than a second copy that can drift from it. That drift is the exact failure
+    KNOWN_ISSUES.md 0u is about — three copies of the miracle discount that had
+    quietly stopped agreeing.
+    """
+    share = g.cfg.get("block_share", 0.60)
+    fshare = g.cfg.get("flier_block_share", 0.30)
+    n_block = int((defender.creatures + defender.goaded_birds) * share)
+    n_fly = int((defender.goaded_birds + defender.creatures * fshare) * share)
+    if g.has("Ohran Frostfang"):
+        # deathtouch attackers make blocking miserable; fewer opponents do it
+        n_block = int(n_block * 0.5)
+        n_fly = int(n_fly * 0.5)
+    return n_block, min(n_fly, n_block)
+
+
+def damage_through(g, attackers: list, defender=None) -> float:
     """Opponents chump-block your biggest attackers first — and CANNOT block
     your fliers with most of their board.
 
@@ -484,6 +505,11 @@ def damage_through(g, attackers: list) -> float:
     catch a flier — fliers plus reach. Rendmaw's goaded Birds are counted in
     full instead of by that share, because they demonstrably fly: the card
     says "2/2 black Bird creature token with flying".
+
+    `defender` names whose blockers to count. The default of None keeps the
+    original meaning — the weakest board at the table — which is right for a
+    single undivided swing and is what every caller outside `combat_damage`
+    still wants.
     """
     if not attackers:
         return 0.0
@@ -491,17 +517,9 @@ def damage_through(g, attackers: list) -> float:
     # stop it, so the relevant blocker count is the *weakest* opponent's board,
     # not the table's total. Some of their creatures are also tapped from
     # attacking someone else.
-    share = g.cfg.get("block_share", 0.60)
-    fshare = g.cfg.get("flier_block_share", 0.30)
-    weakest = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
-
-    n_block = int((weakest.creatures + weakest.goaded_birds) * share)
-    n_fly = int((weakest.goaded_birds + weakest.creatures * fshare) * share)
-    if g.has("Ohran Frostfang"):
-        # deathtouch attackers make blocking miserable; fewer opponents do it
-        n_block = int(n_block * 0.5)
-        n_fly = int(n_fly * 0.5)
-    n_fly = min(n_fly, n_block)
+    if defender is None:
+        defender = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
+    n_block, n_fly = _blocker_counts(g, defender)
 
     fly_p, ground_p = [], []
     for p in attackers:
@@ -532,25 +550,41 @@ def living(g):
     return [o for o in g.opponents if o.alive and o.life > 0]
 
 
-def damage_each(g, n):
-    """'Each opponent loses N' effects."""
+def damage_each(g, n) -> float:
+    """'Each opponent loses N' effects.
+
+    RETURNS THE DAMAGE THAT COULD HAVE MATTERED, not the damage dealt: a drain
+    for 50 into a player on 3 life is worth 3, and the other 47 is meaningless.
+    Every caller records the return value in `m["damage"]` rather than the
+    number it asked for, which is what makes the damage metric bounded. See
+    `combat_damage` for the measurement that forced this.
+    """
     if n <= 0:
-        return
+        return 0.0
+    dealt = 0.0
     for o in living(g):
+        dealt += min(n, max(0.0, o.life))
         o.life -= n
     _check_eliminations(g)
+    return dealt
 
 
-def damage_single(g, n):
+def damage_single(g, n) -> float:
     """Focused damage - combat, or a single-target burn spell. Goes at the
-    opponent closest to dying, which is what a real pilot does."""
+    opponent closest to dying, which is what a real pilot does.
+
+    Returns the damage that could have mattered — see `damage_each`.
+    """
     if n <= 0:
-        return
+        return 0.0
     alive = living(g)
     if not alive:
-        return
-    min(alive, key=lambda o: o.life).life -= n
+        return 0.0
+    target = min(alive, key=lambda o: o.life)
+    dealt = min(n, max(0.0, target.life))
+    target.life -= n
     _check_eliminations(g)
+    return dealt
 
 
 def _check_eliminations(g):
@@ -560,6 +594,173 @@ def _check_eliminations(g):
             o.creatures = 0.0
     if not living(g) and g.result is None:
         g.result = "win"
+
+
+def combat_damage(g, attackers: list, scale: float = 1.0,
+                  bonus: float = 0.0) -> float:
+    """One attack declared at the WHOLE POD, split across defenders.
+
+    RETURNS THE DAMAGE THAT COULD HAVE MATTERED — the sum over defenders of
+    min(dealt, that defender's life) — because damage past lethal is
+    meaningless and, in a deck that can go arbitrarily wide, it is nearly all
+    of the number. Measured on azusa before this: mean raw damage 4,379 against
+    a MEDIAN of 67, ten games in three thousand carrying 69% of the total, and
+    98.5% of the mean sitting past the pod's 120 combined life. That is not a
+    heavy tail on a usable metric, it is a different quantity wearing its name.
+
+    `scale` and `bonus` carry the two shapes the engines' own combat steps add
+    on top of raw power, so that each keeps its existing arithmetic:
+      scale   a multiplier on damage that got through (engine.py's Coat of Arms
+              term, tivit.py's Cyberdrive burst) -- applied per attacker, so
+              the assignment plan sees the same numbers the resolution does.
+      bonus   a flat lump added to the swing (lorehold.py's prowess). It is not
+              per-attacker, so it is credited to the FIRST group only -- the
+              player closest to dying, where the old undivided swing put it.
+
+    THE BUG THIS EXISTS TO FIX (2026-09-08). Every engine's combat did
+    `damage_single(g, damage_through(g, attackers))`, which sends the entire
+    swing at one player. Measured on azusa: 491 swings of 120+ damage — the
+    pod's whole combined life total — and every single one killed EXACTLY ONE
+    opponent while a mean of 1.82 were still alive. The largest single hit was
+    933,017 damage and killed one player. A board that deals 933,017 was worth
+    precisely as much as a board that deals 41, so the deck's entire payoff
+    (go arbitrarily wide) was capped at one kill a turn when you need three.
+
+    Two things were incoherent about the old path even for one defender:
+    `damage_through` counted the WEAKEST opponent's blockers while
+    `damage_single` applied the result to the LOWEST-LIFE opponent's life, and
+    those are not usually the same player. Here each chunk is blocked by the
+    player it is actually assigned to.
+
+    THE ASSIGNMENT RULE IS A PILOT'S, NOT AN OPTIMISER'S. A real pilot does not
+    assign exactly lethal — they assign extra, so that if the defender removes
+    the biggest attacker in the assignment the swing still kills. So a defender
+    is only taken on when the assignment is lethal WITHOUT its largest
+    unblocked attacker. That is deliberately conservative: it kills fewer
+    players per turn than a perfect-information split would, which is the
+    point. Nothing here reads whether the opponent actually holds removal.
+
+    WHY THE RULE IS EXACT RATHER THAN A SEARCH. Assign the k SMALLEST
+    attackers: blockers eat the b biggest of them (`damage_through` chump-blocks
+    from the top), so the m = k - b smallest get through. "Lethal without the
+    largest of those" is
+
+        (sum of the m that get through) - (the largest of them) >= life
+
+    and a sum minus its own largest term IS the prefix one shorter, so the
+    whole condition collapses to `prefix_sum(m-1) >= life` — one binary search
+    over a prefix-sum array. That matters: azusa boards reach thousands of
+    creatures and an O(n^2) incremental scan would dominate the runtime.
+
+    Smallest-first is also the right play, not merely the cheap one: chump
+    blocks eat your biggest attackers, so feeding a 5,000-power Craterhoofed
+    creature to a 1/1 block wastes it. Small bodies secure a kill for the least
+    power spent, leaving more for the next player.
+
+    APPROXIMATION, SAID OUT LOUD: the closed form above ignores the fly/ground
+    split, so the plan can misjudge a defender who blocks fliers and ground
+    separately. It is EXACT for an all-ground or all-flying attack (azusa is
+    all-ground, so it is exact there) and a slight misjudgement otherwise —
+    which resolves as a defender surviving at 1 life, a pilot's error rather
+    than a rules error. Resolution always uses the real `damage_through`.
+
+    `cfg["combat_split"]` DEFAULTS TO TRUE as of 2026-09-08 and all six engines
+    route their combat through here. Setting it False restores the old
+    one-player swing exactly, which is what `run_combat_split.py` measures
+    against and the only way to reproduce a table published before that date.
+    """
+    if not attackers:
+        return 0.0
+    if not g.cfg.get("combat_split", True):
+        # `combat_defender` isolates a SECOND defect that the split necessarily
+        # fixes as a side effect, so that the two can be measured apart rather
+        # than reported as one number. Default "weakest" keeps the old
+        # behaviour: damage_through picks `min(g.opponents, ...)`, which ranges
+        # over ALL opponents INCLUDING DEAD ONES -- and a dead opponent has
+        # creatures = 0.0, so from the first elimination onward the old path
+        # faces NO BLOCKERS AT ALL for the rest of the game, while applying the
+        # result to whoever is closest to dying. Those are two different
+        # players. "target" counts the blockers of the player actually being
+        # hit, which is the coherent single-swing version.
+        target = min(living(g), key=lambda o: o.life, default=None)
+        if g.cfg.get("combat_defender", "weakest") == "target" and target is not None:
+            dmg = damage_through(g, attackers, defender=target)
+        else:
+            dmg = damage_through(g, attackers)
+        dmg = dmg * scale + bonus
+        # The counters below are recorded on BOTH paths, so an A/B has them on
+        # each leg rather than only on the new one. Purely observational -- no
+        # RNG is consumed and no decision reads them.
+        was = len(living(g))
+        dealt = damage_single(g, dmg)
+        g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + dmg
+        g.m["opponents_killed"] = (g.m.get("opponents_killed", 0)
+                                   + was - len(living(g)))
+        g.m["attack_targets"] = g.m.get("attack_targets", 0) + (1 if dmg > 0 else 0)
+        return dealt
+
+    alive = sorted(living(g), key=lambda o: o.life)
+    if not alive:
+        return 0.0
+
+    # Ascending power, with prefix sums, so the test above is O(log n).
+    # `scale` multiplies each attacker here rather than the total afterwards,
+    # so the plan is drawn on the same numbers the resolution will produce.
+    pool = sorted(attackers, key=g.power_of)
+    pre = [0.0]
+    for p in pool:
+        pre.append(pre[-1] + g.power_of(p) * scale)
+    n = len(pool)
+
+    plan, i = [], 0
+    for slot, opp in enumerate(alive):
+        if i >= n:
+            break
+        b, _ = _blocker_counts(g, opp)
+        # The flat `bonus` lands on the first group, so that group needs that
+        # much less out of the attackers themselves.
+        need = opp.life - (bonus if slot == 0 else 0.0)
+        if need <= 0:
+            plan.append([opp, i, i])       # the lump alone is lethal
+            continue
+        # smallest j with pre[j] - pre[i] >= need; j is the index one PAST the
+        # last attacker that has to connect, so m - 1 = j - i and k = m + b.
+        j = bisect.bisect_left(pre, pre[i] + need, i, n + 1)
+        k = (j - i) + 1 + b
+        if j > n or i + k > n:
+            # Cannot secure this one. Chip them with everything left, which is
+            # where the old undivided swing went anyway.
+            plan.append([opp, i, n])
+            i = n
+            break
+        plan.append([opp, i, i + k])
+        i += k
+    if i < n and plan:
+        # Every living opponent is already covered and there is still board
+        # left over. It has to attack somebody; pile it on the last group.
+        plan[-1][2] = n
+
+    before_alive = len(living(g))
+    effective, raw = 0.0, 0.0
+    for slot, (opp, lo, hi) in enumerate(plan):
+        dealt = damage_through(g, pool[lo:hi], defender=opp) * scale
+        if slot == 0:
+            dealt += bonus
+        if dealt <= 0:
+            continue
+        # THE RETURNED NUMBER IS THE BOUNDED ONE. Damage past a player's life
+        # total is meaningless, and in this deck it is nearly the whole figure,
+        # so `m["damage"]` is fed from here rather than from `raw`.
+        effective += min(dealt, max(0.0, opp.life))
+        raw += dealt
+        opp.life -= dealt
+    # Combat damage is simultaneous: everything lands, then deaths are checked.
+    _check_eliminations(g)
+    g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + raw
+    g.m["opponents_killed"] = (g.m.get("opponents_killed", 0)
+                               + before_alive - len(living(g)))
+    g.m["attack_targets"] = g.m.get("attack_targets", 0) + len(plan)
+    return effective
 
 
 def your_creatures(g) -> int:

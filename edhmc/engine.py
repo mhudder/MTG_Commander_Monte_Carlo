@@ -443,15 +443,14 @@ class Game:
         """`each=True` means 'each opponent loses N' (amount is the pod total)."""
         if amount <= 0:
             return
+        # BOUNDED: record what could have mattered, not what was asked for.
+        n = max(1, len(OPP.living(self)))
+        amount = (OPP.damage_each(self, amount / n) if each
+                  else OPP.damage_single(self, amount))
         self.m["damage"] += amount
         self.m["drain_damage"] += amount
         if self.damage_by_turn:
             self.damage_by_turn[-1] += amount
-        n = max(1, len(OPP.living(self)))
-        if each:
-            OPP.damage_each(self, amount / n)
-        else:
-            OPP.damage_single(self, amount)
         if self.result == "win" and self.m["turn_lethal"] == 99:
             self.m["turn_lethal"] = self.turn
 
@@ -1126,10 +1125,12 @@ def combat(g: Game):
     if g.has("Ohran Frostfang"):
         g.draw(min(len(attackers), 5))
 
-    # opponents block: chump the biggest attackers first
+    # opponents block: chump the biggest attackers first. `scale` carries the
+    # Coat of Arms term above into opponents.combat_damage, which applies it
+    # per attacker so its assignment plan and its resolution agree.
+    combat_scale = None
     if g.cfg.get("derived_blocking", True):
-        scale = dmg / max(1e-9, sum(g.power_of(p) for p in attackers))
-        dmg = OPP.damage_through(g, attackers) * scale
+        combat_scale = dmg / max(1e-9, sum(g.power_of(p) for p in attackers))
     else:
         dmg *= (1.0 - g.cfg.get("block_rate", 0.30))
 
@@ -1156,9 +1157,18 @@ def combat(g: Game):
 
     for p in attackers:
         p.tapped = True
+    # One attack at the whole pod; `dmg` comes back BOUNDED at what could have
+    # mattered. When derived_blocking is off there is no blocking model to
+    # divide, so the flat haircut above is passed through as a lump.
+    if combat_scale is not None:
+        dmg = OPP.combat_damage(g, attackers, scale=combat_scale)
+    else:
+        # derived_blocking=False is the legacy flat-haircut pod. It models no
+        # blockers per defender, so there is nothing for the split to plan
+        # against; it keeps the single swing, bounded by damage_single.
+        dmg = OPP.damage_single(g, dmg)
     g.m["damage"] += dmg
     g.damage_by_turn.append(dmg)
-    OPP.damage_single(g, dmg)
     if g.result == "win" and g.m["turn_lethal"] == 99:
         g.m["turn_lethal"] = g.turn
 

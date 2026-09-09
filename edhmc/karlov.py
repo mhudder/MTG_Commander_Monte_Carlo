@@ -177,24 +177,25 @@ class KarlovGame:
             # "each opponent loses 1 life" — and you gain NOTHING, so this is
             # not a drain() and must not manufacture a Karlov trigger.
             if self.has("Elas il-Kor, Sadistic Pilgrim"):
-                OPP.damage_each(self, 1)
-                self.m["damage"] += len(OPP.living(self))
-                self.m["drain_damage"] += len(OPP.living(self))
+                dealt = OPP.damage_each(self, 1)
+                self.m["damage"] += dealt
+                self.m["drain_damage"] += dealt
             if self.has("Daxos, Blessed by the Sun"):
                 gain_life(self, 1)
             if self.has("Syr Konrad, the Grim"):
-                OPP.damage_each(self, 1)
-                self.m["damage"] += 3
+                self.m["damage"] += OPP.damage_each(self, 1)
 
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
             return
+        # BOUNDED: record what could have mattered, not what was asked for.
+        n = max(1, len(OPP.living(self)))
+        amount = (OPP.damage_each(self, amount / n) if each
+                  else OPP.damage_single(self, amount))
         self.m["damage"] += amount
         self.m["drain_damage"] += amount
         if self.damage_by_turn:
             self.damage_by_turn[-1] += amount
-        n = max(1, len(OPP.living(self)))
-        OPP.damage_each(self, amount / n) if each else OPP.damage_single(self, amount)
 
     def opening_hand(self):
         for mulls in range(4):
@@ -312,15 +313,13 @@ def gain_life(g, amount, _depth=0):
             # "each opponent loses 1 life" — a flat 1 to EACH, not `amount` to
             # one. The old form understated small triggers 3x and overstated
             # large ones.
-            OPP.damage_each(g, 1)
-            g.m["damage"] += len(OPP.living(g))
+            g.m["damage"] += OPP.damage_each(g, 1)
         elif n in ("Marauding Blight-Priest", "Starscape Cleric"):
             # Starscape Cleric: "whenever you gain life, each opponent loses 1
             # life" — identical wording to Blight-Priest, and its Offspring
             # token has the same trigger, which is why the token is named the
             # same and this loop counts both.
-            OPP.damage_each(g, 1)
-            g.m["damage"] += len(OPP.living(g))
+            g.m["damage"] += OPP.damage_each(g, 1)
         elif n == "Heliod, Sun-Crowned":
             # "put a +1/+1 counter on target creature or enchantment you
             # control." Put it where it converts to damage: the biggest body.
@@ -336,8 +335,7 @@ def gain_life(g, amount, _depth=0):
                 g.exemplar_drew_this_turn = True
                 g.draw(1)
         elif n in COMBO_LOOP:
-            OPP.damage_single(g, amount)
-            g.m["damage"] += amount
+            g.m["damage"] += OPP.damage_single(g, amount)
             # Exquisite Blood sees that loss of life and gains it back: loop.
             if g.has(COMBO_A) and g.result is None:
                 g.result = "win"
@@ -358,9 +356,9 @@ def gain_life(g, amount, _depth=0):
 
 def drain(g, amount):
     """Lose-life-and-gain-life: two events in one, and both matter."""
-    OPP.damage_single(g, amount)
-    g.m["damage"] += amount
-    g.m["drain_damage"] += amount
+    dealt = OPP.damage_single(g, amount)
+    g.m["damage"] += dealt
+    g.m["drain_damage"] += dealt
     gain_life(g, amount)
 
 
@@ -427,9 +425,9 @@ def creature_entered(g, mine=True, entering=None):
             # "you may have that player lose 1 life" — no life gained, so this
             # is not a drain() and must not create a Karlov trigger. No
             # "another" clause here: it can never be Suture Priest itself.
-            OPP.damage_single(g, 1)
-            g.m["damage"] += 1
-            g.m["drain_damage"] += 1
+            dealt = OPP.damage_single(g, 1)
+            g.m["damage"] += dealt
+            g.m["drain_damage"] += dealt
     if mine:
         for _ in range(others("Elas il-Kor, Sadistic Pilgrim")):
             gain_life(g, 1)
@@ -479,10 +477,9 @@ def upkeep(g):
     if g.has("Drana's Emissary"):
         # "EACH opponent loses 1 life and you gain 1 life" — drain() hit only
         # one, understating its pod damage 3x.
-        n = len(OPP.living(g))
-        OPP.damage_each(g, 1)
-        g.m["damage"] += n
-        g.m["drain_damage"] += n
+        dealt = OPP.damage_each(g, 1)
+        g.m["damage"] += dealt
+        g.m["drain_damage"] += dealt
         gain_life(g, 1)
     if g.has("Phyrexian Arena"):
         g.draw(1)
@@ -511,8 +508,7 @@ def upkeep(g):
     # Aetherflux Reservoir: 50 life, deal 50
     if g.has("Aetherflux Reservoir") and g.your_life >= 51 and g.result is None:
         g.your_life -= 50
-        OPP.damage_single(g, 50)
-        g.m["damage"] += 50
+        g.m["damage"] += OPP.damage_single(g, 50)
         if g.result is None and len(OPP.living(g)) == 0:
             g.m["win_route"] = 4
 
@@ -652,9 +648,9 @@ def resolve(g, card):
         if pay_generic(g, 1) != 1:
             break
         n = len(OPP.living(g))
-        OPP.damage_each(g, 1)
-        g.m["damage"] += n
-        g.m["drain_damage"] += n
+        dealt = OPP.damage_each(g, 1)
+        g.m["damage"] += dealt
+        g.m["drain_damage"] += dealt
         g.m["extort_triggers"] += 1
         gain_life(g, n)
 
@@ -671,9 +667,9 @@ def resolve(g, card):
         # old loop created three Karlov triggers where the card makes one.
         n = len(OPP.living(g))
         total = 6 * n
-        OPP.damage_each(g, 6)
-        g.m["damage"] += total
-        g.m["drain_damage"] += total
+        dealt = OPP.damage_each(g, 6)
+        g.m["damage"] += dealt
+        g.m["drain_damage"] += dealt
         gain_life(g, total)
     if card.script == "draw2":
         g.draw(2)
@@ -751,13 +747,14 @@ def combat(g):
                 granted = {id(max(others, key=g.power_of))}
                 g.m["lifelink_grants"] += 1
 
-    dmg = OPP.damage_through(g, attackers)
     for p in attackers:
         p.tapped = True
+    # One attack at the whole pod; `dmg` comes back bounded at what could have
+    # mattered. Lifelink below still reads `power_of`, not this figure.
+    dmg = OPP.combat_damage(g, attackers)
     g.m["damage"] += dmg
     g.m["combat_damage"] += dmg
     g.damage_by_turn.append(dmg)
-    OPP.damage_single(g, dmg)
     # Lifelink: Karlov triggers scale with the number of lifelinking bodies
     team_lifelink = (g.has("Sorin, Vengeful Bloodlord")
                      or g.has("Vault of the Archangel")

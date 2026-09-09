@@ -1,0 +1,40 @@
+combat_split on azusa: N=6000 paired games, seeds 5000..10999
+  '*' = the paired difference beats its own 95% CI half-width.
+  Each leg is measured against the SAME baseline (both flags off).
+
+==============================================================================
+T20
+==============================================================================
+
+  blockers  (single swing, target's own blockers)
+    metric                         off            on           delta
+    won                          0.302         0.258     -0.0443 +-0.0063   *
+    damage                      57.286        51.182     -6.1033 +-0.3145   *
+    raw_damage                4838.264      5487.368   +649.1040 +-1239.5011 
+    opponents_killed             1.523         1.424     -0.0987 +-0.0094   *
+    attack_targets               6.725         5.896     -0.8290 +-0.0389   *
+    turn_won                    99.000        99.000     +0.0000 +-0.0000    
+    turn_lethal                 99.000        99.000     +0.0000 +-0.0000    
+    landfall_triggers           21.375        21.741     +0.3662 +-0.0487   *
+
+  split     (+ one attack at the whole pod, with insurance)
+    metric                         off            on           delta
+    won                          0.302         0.320     +0.0182 +-0.0083   *
+    damage                      57.286        55.557     -1.7290 +-0.4505   *
+    raw_damage                4838.264      1501.274  -3336.9898 +-1423.0578*
+    opponents_killed             1.523         1.511     -0.0117 +-0.0121    
+    attack_targets               6.725         8.173     +1.4487 +-0.0389   *
+    turn_won                    99.000        99.000     +0.0000 +-0.0000    
+    turn_lethal                 99.000        99.000     +0.0000 +-0.0000    
+    landfall_triggers           21.375        20.844     -0.5312 +-0.0828   *
+
+  THE SPLIT ALONE (leg 2 vs leg 1: only combat_split differs)
+    metric                         off            on           delta
+    won                          0.258         0.320     +0.0625 +-0.0064   *
+    damage                      51.182        55.557     +4.3743 +-0.3373   *
+    raw_damage                5487.368      1501.274  -3986.0938 +-1882.6191*
+    opponents_killed             1.424         1.511     +0.0870 +-0.0084   *
+    attack_targets               5.896         8.173     +2.2777 +-0.0503   *
+    turn_won                    99.000        99.000     +0.0000 +-0.0000    
+    turn_lethal                 99.000        99.000     +0.0000 +-0.0000    
+    landfall_triggers           21.741        20.844     -0.8973 +-0.0711   *

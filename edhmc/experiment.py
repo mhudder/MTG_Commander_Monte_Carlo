@@ -100,6 +100,21 @@ DEFAULT_CFG = {
 
     "opp_instant_rate": 0.8,
     "on_the_draw": True,
+
+    # --- combat is declared at the POD, not at one player (2026-09-08) -----
+    # `opponents.damage_single` used to take the entire swing to one opponent.
+    # Measured on azusa: 491 swings of 120+ damage -- the pod's whole combined
+    # life -- and every one killed EXACTLY ONE player while a mean of 1.82 were
+    # still alive; the biggest single hit was 933,017 damage and killed one.
+    # A board dealing 933,017 was worth the same as one dealing 41.
+    # `opponents.combat_damage` splits the attack, assigning each defender
+    # enough that the swing still kills if they remove its biggest attacker.
+    # False restores the old behaviour exactly and is how any table published
+    # before 2026-09-08 is reproduced.
+    "combat_split": True,
+    # Only read when combat_split is False: "weakest" is the old (incoherent)
+    # blocker source, "target" counts the blockers of the player being hit.
+    "combat_defender": "weakest",
 }
 
 # ---------------------------------------------------------------------------

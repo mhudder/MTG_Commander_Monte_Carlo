@@ -160,15 +160,14 @@ class TivitGame:
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
             return
+        # BOUNDED: record what could have mattered, not what was asked for.
+        n = max(1, len(OPP.living(self)))
+        amount = (OPP.damage_each(self, amount / n) if each
+                  else OPP.damage_single(self, amount))
         self.m["damage"] += amount
         self.m["drain_damage"] += amount
         if self.damage_by_turn:
             self.damage_by_turn[-1] += amount
-        n = max(1, len(OPP.living(self)))
-        if each:
-            OPP.damage_each(self, amount / n)
-        else:
-            OPP.damage_single(self, amount)
         if self.result == "win" and self.m["turn_lethal"] == 99:
             self.m["turn_lethal"] = self.turn
 
@@ -773,14 +772,20 @@ def combat(g):
         bonus = 4 * sum(g.tokens.values())
     dmg = raw + bonus
     if g.cfg.get("derived_blocking", True):
-        scale = dmg / max(1e-9, raw)
-        dmg = OPP.damage_through(g, attackers) * scale
+        # One attack at the whole pod. This REPLACES an even `damage_each`
+        # spread: dividing the swing equally is a split, but a naive one --
+        # it cannot finish anybody, because the player on 3 life and the
+        # player on 40 each got a third. `dmg` comes back bounded at what
+        # could have mattered.
+        dmg = OPP.combat_damage(g, attackers,
+                                scale=(raw + bonus) / max(1e-9, raw))
     else:
+        # Legacy flat-haircut pod: no per-defender blockers to plan against.
         dmg *= (1.0 - g.cfg.get("block_rate", 0.30))
+        dmg = OPP.damage_each(g, dmg / max(1, len(OPP.living(g))))
     g.damage_by_turn.append(dmg)
     g.m["damage"] += dmg
     g.m["combat_damage"] += dmg
-    OPP.damage_each(g, dmg / max(1, len(OPP.living(g))))
     if g.result == "win":
         if g.m["win_route"] == 0:
             g.m["win_route"] = ROUTE_COMBAT

@@ -207,6 +207,14 @@ class AzusaGame:
         cfg.setdefault("animated_lands_block", True)
         cfg.setdefault("rude_awakening_modes", True)
         cfg.setdefault("planeswalker_abilities", True)
+
+        # 2026-09-08: ONE ATTACK AT THE WHOLE POD, not at one player, and the
+        # damage metric bounded at what could actually have mattered. Lives in
+        # experiment.DEFAULT_CFG and opponents.combat_damage now that all six
+        # engines are wired to it -- this line only covers a cfg built by hand
+        # without DEFAULT_CFG. Worth +0.0583 +-0.0038 (T10) / +0.0624 +-0.0040
+        # (T20) on this deck. See run_combat_split.py and combat_split.txt.
+        cfg.setdefault("combat_split", True)
         self.bonus_mana: list[frozenset] = []   # Lotus Cobra, this turn only
 
         # SHUFFLE EFFECTS MUST NOT BREAK COMMON RANDOM NUMBERS, and a cracked
@@ -381,11 +389,14 @@ class AzusaGame:
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
             return
-        self.m["damage"] += amount
-        if self.damage_by_turn:
-            self.damage_by_turn[-1] += amount
+        # BOUNDED: what is recorded is what could have mattered, not what was
+        # asked for -- a drain for 50 into a player on 3 life is worth 3.
         n = max(1, len(OPP.living(self)))
-        OPP.damage_each(self, amount / n) if each else OPP.damage_single(self, amount)
+        dealt = (OPP.damage_each(self, amount / n) if each
+                 else OPP.damage_single(self, amount))
+        self.m["damage"] += dealt
+        if self.damage_by_turn:
+            self.damage_by_turn[-1] += dealt
 
     def gain_life(self, amount):
         if amount <= 0:
@@ -1230,13 +1241,16 @@ class AzusaGame:
         if not attackers:
             self.damage_by_turn.append(0.0)
             return
-        dmg = OPP.damage_through(self, attackers)
+        # ONE attack at the whole pod, not at one player, and `dmg` is the
+        # BOUNDED figure -- damage past a player's life total is meaningless
+        # and in this deck it was 98.5% of the number. `raw_damage` keeps the
+        # unbounded total for anyone who wants it.
+        dmg = OPP.combat_damage(self, attackers)
         for p in attackers:
             p.tapped = True
         self.m["damage"] += dmg
         self.m["combat_damage"] += dmg
         self.damage_by_turn.append(dmg)
-        OPP.damage_single(self, dmg)
         if self.result is None and self.m["turn_lethal"] == 99 and not OPP.living(self):
             self.m["turn_lethal"] = self.turn
 

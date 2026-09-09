@@ -541,15 +541,14 @@ def deal_pod_damage(g, amount, each=True):
     """`each=True`: an 'each opponent loses N' effect; amount is the pod total."""
     if amount <= 0:
         return
+    # BOUNDED: record what could have mattered, not what was asked for.
+    n = max(1, len(OPP.living(g)))
+    amount = (OPP.damage_each(g, amount / n) if each
+              else OPP.damage_single(g, amount))
     g.m["damage"] += amount
     g.m["spell_damage"] += amount
     if g.damage_by_turn:
         g.damage_by_turn[-1] += amount
-    n = max(1, len(OPP.living(g)))
-    if each:
-        OPP.damage_each(g, amount / n)
-    else:
-        OPP.damage_single(g, amount)
     if g.result == "win" and g.m["turn_lethal"] == 99:
         g.m["turn_lethal"] = g.turn
 
@@ -1138,13 +1137,17 @@ def combat(g):
         g.m["treasures_made"] += 1
     prowess = sum(1 for p in attackers
                   if p.card.name in ("Monastery Mentor", "Monk token"))
-    dmg = OPP.damage_through(g, attackers) + prowess * g.noncreature_this_turn
     for p in attackers:
         p.tapped = True
+    # One attack at the whole pod; `dmg` comes back bounded at what could have
+    # mattered. Prowess is a flat lump on the swing rather than per-attacker
+    # power, so it is passed as `bonus` and credited to the first defender --
+    # where the old undivided swing put all of it.
+    dmg = OPP.combat_damage(g, attackers,
+                            bonus=prowess * g.noncreature_this_turn)
     g.m["damage"] += dmg
     g.m["combat_damage"] += dmg
     g.damage_by_turn.append(dmg)
-    OPP.damage_single(g, dmg)
     if g.result == "win" and g.m["turn_lethal"] == 99:
         g.m["turn_lethal"] = g.turn
 
