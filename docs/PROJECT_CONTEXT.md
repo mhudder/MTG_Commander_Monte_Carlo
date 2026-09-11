@@ -1,5 +1,12 @@
 # EDH Monte Carlo — consolidated project context
 
+> **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the
+> 2026-09-09 reorganisation. Command lines below are pre-reorganisation and no
+> longer run as written: entry points now live in `tools/` and are invoked from
+> the repo root as `python -m tools.<name>`. Outputs are in `results/`. For
+> what is true now read `CLAUDE.md`; for what is staged run
+> `python -m edhmc.pending`.
+
 Single-file bundle of every document a fresh session needs, so this can be
 uploaded to the project's context folder as ONE file instead of six.
 

@@ -53,6 +53,17 @@ KNOWN_MODEL_LIMITS = {
     "Damn": "cast face {B}{B}; the wrath is overload {2}{W}{W}, MV 4",
     "Mizzix's Mastery": "overload {5}{R}{R}{R} is a special case in lorehold.py",
     "Overlord of the Hauntwoods": "Impending 4 modelled via alt_costs",
+    # A split/Room card: Scryfall reports the COMBINED cost and sums both
+    # halves into cmc 8, which nobody ever pays. Modelled as the {2}{G}
+    # Walk-In Closet half (lands from your graveyard) at MV 3; unlocking
+    # Forgotten Cellar for {3}{G}{G} is not modelled, so its number is a
+    # floor. This is KNOWN_ISSUES.md §1b -- one cost per Card -- in its
+    # purest form, and it is a NOTE rather than an ERR for the same reason
+    # the four above are: a deliberate, documented limit reported as a
+    # failure teaches you to ignore failures.
+    "Walk-In Closet // Forgotten Cellar":
+        "split Room: {2}{G} half modelled, MV 3; Scryfall's cmc 8 sums both "
+        "halves. Forgotten Cellar unmodelled, so the number is a floor",
 }
 
 # Lands whose Scryfall `produced_mana` is WUBRG because the card reads "any

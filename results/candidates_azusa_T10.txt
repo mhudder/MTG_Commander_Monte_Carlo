@@ -1,0 +1,12 @@
+
+AZUSA candidates — value over a blank of the same cost (10 turns, n=15,000 paired)
+  card                          MV          damage          win ratelandfall_triggers    lands_played     cards_drawn  P(deploy)
+  Greensleeves, Maro-Sorcerer    5     +2.01+-0.19     +0.0102+-0.0021     -0.04+-0.03      -0.04+-0.02      -0.03+-0.04       0.200
+  Ancient Greenwarden            6     +2.58+-0.23     +0.0269+-0.0029     +0.76+-0.06      +0.35+-0.03      +0.90+-0.08       0.185
+  Cultivator Colossus            7     +0.57+-0.14     +0.0045+-0.0018     +0.37+-0.04      -0.12+-0.02      +0.49+-0.06       0.184
+  Case of the Locked Hothouse    4     +0.19+-0.16     +0.0026+-0.0018     +0.28+-0.03      +0.24+-0.02      +0.15+-0.05       0.231
+  Conduit of Worlds              4     +1.11+-0.19     +0.0104+-0.0020     +0.95+-0.07      +0.45+-0.04      +0.20+-0.05       0.225
+  Walk-In Closet // Forgotten Cellar   3     +1.28+-0.20     +0.0114+-0.0021     +0.98+-0.07      +0.47+-0.04      +0.20+-0.05       0.232
+  Springheart Nantuko            2     +1.78+-0.16     +0.0056+-0.0017     -0.07+-0.02      -0.05+-0.01      -0.04+-0.03       0.231
+  Burgeoning                     1     -0.06+-0.05     -0.0003+-0.0006     -0.01+-0.01      -0.01+-0.01      -0.02+-0.02       0.240
+  Constant Mists                 2     +0.05+-0.06     +0.0003+-0.0006     +0.02+-0.01      +0.01+-0.01      +0.00+-0.02       0.224

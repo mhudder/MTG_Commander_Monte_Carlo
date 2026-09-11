@@ -1,9 +1,10 @@
 # Handoff
 
 Orientation for a human picking this project up — what it is, what state it's
-in, and where to look next. Not exhaustive; `CLAUDE.md` is the exhaustive
-version (1000+ lines of dated session notes) and is worth grep-ing, not
-reading top to bottom.
+in, and where to look next. Not exhaustive; `CLAUDE.md` is the operational
+doc (current state, standing rules, queued work) and is worth reading in full
+— it is about 330 lines. The dated session notes it used to carry are in
+`docs/HISTORY.md`, which is worth grep-ing and not reading top to bottom.
 
 ## What this is
 
@@ -13,11 +14,25 @@ confidence interval. Six decks, six simulation engines, one shared opponent
 model, one paired A/B statistics harness. Run from the repo root with
 Python 3.10+, numpy, scipy (`pip install -r requirements.txt`).
 
+The tree, since the 2026-09-09 reorganisation:
+
+    edhmc/          the simulator (importable package)
+    tools/          entry points        -> python -m tools.<name>
+    diagnostics/    one-question harnesses
+    tests/          mechanism tests
+    results/        every table and output; results/caches/ holds the ablation caches
+    spreadsheets/   the .xlsx system of record
+    docs/           HISTORY.md, audits, the cache manifest, archived docs
+
+**Everything runs from the repo root with `-m`.** These scripts import
+`edhmc.*`, so running `python tools/ablation.py` directly puts `tools/` on
+`sys.path` instead of the root and the import fails.
+
 ```bash
 python -m edhmc.pending            # what's staged for each deck, and why
-python validate.py                 # harness self-check — must print +0.00 everywhere
-python ablation.py karlov 6000 20  # rank every card in a deck
-python audit_cards.py              # every card's data checked against Scryfall
+python -m tools.validate                 # harness self-check — must print +0.00 everywhere
+python -m tools.ablation karlov 6000 20  # rank every card in a deck
+python -m tools.audit_cards              # every card's data checked against Scryfall
 ```
 
 ## The six decks
@@ -31,7 +46,8 @@ python audit_cards.py              # every card's data checked against Scryfall
 | Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | new — ablated, and its commander's own ability only started firing on 2026-09-07 (`KNOWN_ISSUES.md` 0r) |
 | Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` | new — ablated; no `.xlsx` yet, so the module is the only record |
 
-Each of the first four decks, and Shilgengar, is a `.xlsx` (the human-readable system of
+Each of the first four decks, and Shilgengar, is a `.xlsx` in `spreadsheets/`
+(the human-readable system of
 record for the card list) plus a matching `edhmc/decks/<name>_v<N>.py`
 module (the hand-authored, Scryfall-verified costs the simulator actually
 reads) plus its own simulation engine — `edhmc/engine.py` (Rendmaw),
@@ -55,13 +71,13 @@ off. Each engine is a few hundred lines built on the same primitives (`Card`,
 
 ## Is any of this trustworthy right now?
 
-Run `python validate.py`. It plays each deck against an exact copy of itself
+Run `python -m tools.validate`. It plays each deck against an exact copy of itself
 under the same shuffle seed (common random numbers) and must print `+0.00` on
 every metric for every engine. If it doesn't, something is leaking randomness
 between the two branches of every A/B test in the project and nothing else
 here can be trusted until that's fixed.
 
-Run `python audit_cards.py`. It checks every card's cost, power/toughness,
+Run `python -m tools.audit_cards`. It checks every card's cost, power/toughness,
 type line, and flying/indestructible against live Scryfall data. It should
 print `0 ERR`. A handful of `WARN`/`NOTE` lines are known, deliberate
 simplifications (documented inline where they're raised) — read them once,
@@ -86,6 +102,11 @@ As of this writing there are three staged, uncommitted swaps (two on
 Lorehold, one on Rendmaw) — run `python -m edhmc.pending` for the current
 list and the evidence behind each.
 
+All three were measured before the 2026-09-08 combat split and **all three
+were re-verified on it on 2026-09-09 — every figure landed inside its own
+previous bar** (`KNOWN_ISSUES.md` §0w). They are committable; what remains is
+the three-leg discipline above.
+
 ## The one rule that matters more than any other
 
 **Half of every deck is invisible to this model, and that's fine as long as
@@ -104,52 +125,58 @@ disagree, the project's own rule is to follow win rate.
 
 ## If you're adding another deck
 
-1. Get the `.xlsx` into the repo root.
+1. Get the `.xlsx` into `spreadsheets/`.
 2. Verify costs/P-T/keywords against Scryfall before writing anything —
-   `audit_cards.py`'s `fetch()` function shows the pattern. Don't hand-tag
-   flying or indestructible from memory; both are Scryfall-keyword-generated
-   (`tag_flying.py --write`) for the reason explained in that file's
-   docstring — a partial tag list biases every comparison toward whichever
-   cards you happened to remember.
+   `tools/audit_cards.py`'s `fetch()` function shows the pattern. Don't
+   hand-tag flying or indestructible from memory; both are
+   Scryfall-keyword-generated (`python -m tools.tag_flying --write`) for the
+   reason explained in that file's docstring — a partial tag list biases every
+   comparison toward whichever cards you happened to remember.
 3. Write `edhmc/decks/<name>_v1.py` (the `C()`/`L()` card-list pattern —
    copy an existing deck module) and `edhmc/<name>.py` (the engine — copy
    whichever existing engine is the closest structural match; `karlov.py` is
    the shortest full example).
 4. `audit_cards.py` and `tag_flying.py` will find it automatically — see
    `edhmc/decks/__init__.py`. Everything else needs a deliberate edit: add
-   the deck to `ablation.py`'s `SIM`/`METRIC_SETS`/`SCRIPTED_*`/`KNOWN_BLIND`
-   dicts (twice — there's a duplicate in the multiprocessing worker init),
-   `pending.py`'s `DECKS` dict, `cache_manifest.py`'s `PER_DECK`, and add an
-   A/A control block to `validate.py`.
-5. `python validate.py` must come back `+0.00` before you trust a single
+   the deck to `tools/ablation.py`'s `SIM`/`METRIC_SETS`/`SCRIPTED_*`/
+   `KNOWN_BLIND` dicts (twice — there's a duplicate in the multiprocessing
+   worker init), `edhmc/pending.py`'s `DECKS` dict,
+   `tools/cache_manifest.py`'s `PER_DECK`, and add an A/A control block to
+   `tools/validate.py`.
+5. `python -m tools.validate` must come back `+0.00` before you trust a single
    number out of the new engine.
 
 ## Reading order
 
 - **This file** — orientation, current state, how to not get burned.
+- **`CLAUDE.md`** — the operational doc: current state, the standing rules,
+  and queued work. ~330 lines, kept current, read it in full.
+- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0v` plus the
+  older `1`–`8` series, with a status index at the top. The ids are cited
+  from code, so they never get renumbered.
+- **`docs/READING_TABLES.md`** — how to read an ablation table without
+  drawing the three conclusions it invites you to draw wrongly.
 - **`README.md`** — the methodology writeup (common random numbers, paired
   inference, why they work). Trustworthy on technique; the numbers it quotes
   predate several corrections and shouldn't be cited.
-- **`CLAUDE.md`** — the full dated history. Every correction, every bug, every
-  "the model said X, it was wrong because Y." Worth searching, not reading
-  linearly — the "Current state" section near the top is the part that's
-  kept up to date.
-- **`KNOWN_ISSUES.md`** — per-question diagnostics with numbered findings,
-  cross-referenced from `CLAUDE.md`.
+- **`docs/HISTORY.md`** — the full dated narrative. Every correction, every
+  bug, every "the model said X, it was wrong because Y." Worth searching, not
+  reading linearly; several sections are explicitly marked VOID.
 
 ## A pattern worth knowing before you trust any card's row
 
-Three of the largest corrections in this project were not a card's TEXT being
+Four of the largest corrections in this project were not a card's TEXT being
 wrong. They were a POLICY — a decision about how the deck is piloted — written
 down as conservatism and never measured:
 
 | policy | what it actually asserted | worth |
 |---|---|---|
 | Azusa's `land_step` ran once, before any spell resolved | every land enabler is dead on the turn it lands | 0.074 win rate |
+| combat sent the whole swing at one player | going wider than one opponent's life is worthless | 0.063 win rate (azusa) |
 | Shilgengar would only sacrifice 1/1 tokens | the commander's own ability does nothing | 0.034 win rate |
 | Shilgengar's main phase spent every point of mana | an after-combat ability is never affordable | 0.008 win rate |
 
-None of the three was visible in an ablation table, because in each case the
+None of the four was visible in an ablation table, because in each case the
 affected cards produced *plausible* numbers — a bit low, nothing to notice.
 The tell is a card whose text says it should be central to the deck and whose
 row says it is ordinary. When you see one, suspect the engine before the card,

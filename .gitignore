@@ -32,12 +32,23 @@ venv/
 .DS_Store
 Thumbs.db
 
+# Everything below moved under results/ in the 2026-09-09 reorganisation. The
+# patterns are anchored there rather than left bare, so a stray ablation_*.log
+# written into the root by a script run the wrong way is VISIBLE in git status
+# instead of silently ignored.
+
 # Ablation stderr progress logs — noise, the .txt tables are the artefact
-ablation_*.log
+results/ablation_*.log
 
 # Regeneration scratch — the finished .txt tables ARE tracked
-ablation_*.txt.new
-regen.log
+results/ablation_*.txt.new
+results/regen.log
 
 # A void table kept only long enough to diff against; not an artefact.
-ablation_*_VOID_*.txt
+results/ablation_*_VOID_*.txt
+
+# tutor_policy.py's scratch log
+results/tutor_log.json
+
+# check_unchanged_decks.py's baseline dumps
+results/baselines*.json

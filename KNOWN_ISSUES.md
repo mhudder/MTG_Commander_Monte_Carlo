@@ -1,19 +1,92 @@
-# Known issues — deferred, not blocking
+# Known issues
 
-> **RE-VERIFIED 2026-09-05.** Every card was re-checked against Scryfall with the
-> rebuilt `audit_cards.py`, and every claim in this file was re-read against the
-> code rather than trusted. See **§0** for what that turned up; items below it
-> carry their original text with a dated verdict where one changed.
->
-> `PENDING_CHANGES.md` is stale — it predates `lorehold_v16.py` and names four
-> changes that no longer describe the ledger. `python -m edhmc.pending` is the
-> only trustworthy statement of what is staged.
+Numbered findings, each with the evidence that produced it. **The section ids
+are load-bearing** — `edhmc/azusa.py`, `tools/cache_manifest.py`,
+`diagnostics/diag_azusa_animation.py`, `docs/ABLATION_CACHES.md` and
+`CLAUDE.md` all cite them. Reorganise around them; **never renumber**. A new
+finding takes the next free letter in the `0*` series.
 
-Ordered by how much they could distort a future result.
+`python -m edhmc.pending` is the only trustworthy statement of what is staged.
+`docs/PENDING_CHANGES.md` is stale and predates `lorehold_v16.py`.
+
+Methodology that used to live at the end of this file is now
+`docs/READING_TABLES.md`. Dated session narrative is `docs/HISTORY.md`.
 
 ---
 
-# 0. The 2026-09-05 re-verification
+## Index
+
+`FIXED` — the defect is corrected and the fix is in the default path.
+`OPEN` — a real modelling gap, still live.
+`MEASURED` — a question that was asked and answered; nothing to fix.
+
+| § | status | finding |
+|---|---|---|
+| [0a](#0a) | MEASURED | card DATA is clean — 0 errors across 269 distinct names |
+| [0b](#0b) | FIXED | Grist was a creature on the battlefield |
+| [0c](#0c) | FIXED | candidates were never flying-tagged, so a flier scored as ground |
+| [0d](#0d) | FIXED | Radiant Scrollwielder read the wrong zone — and it did not help |
+| [0e](#0e) | MEASURED | the Penance slot, resolved: Caldera Pyremaw |
+| [0f](#0f) | **OPEN** | three cards in `SCRIPTED_LOREHOLD` are not implemented as their text |
+| [0g](#0g) | FIXED | two "or attacks" triggers, and one token entering untapped |
+| [0h](#0h) | FIXED | "another creature you control": three cards triggered off themselves |
+| [0i](#0i) | **OPEN** | life-loss drawbacks are free, and pod v3 made that matter |
+| [0j](#0j) | FIXED | the blank was not replacement level; every table's bottom was taxed |
+| [0k](#0k) | FIXED | Ephemerate was a proved blank, its handler dead code |
+| [0l](#0l) | FIXED | Erebos, Bleak-Hearted: three errors on one card |
+| [0m](#0m) | FIXED | an extra turn gave the opponents an extra round |
+| [0n](#0n) | FIXED | hand-tagging one card is the bug CLAUDE.md warns about, and I did it |
+| [0o](#0o) | FIXED | `candidates.py` measured a SECOND COPY of a card already in the deck |
+| [0p](#0p) | MEASURED | the two staged Lorehold changes ADD |
+| [0q](#0q) | FIXED | hand-maintained name sets — the failure mode this repo keeps having |
+| [0r](#0r) | FIXED | Shilgengar's own ability fired ZERO times in 3,000 games |
+| [0s](#0s) | MEASURED | Azusa's land animation is nearly a blank; the Nissas are not |
+| [0t](#0t) | MEASURED | the mana reserve — how much to hold, and what holding it costs |
+| [0u](#0u) | FIXED | three copies of "the miracle discount" had drifted apart |
+| [0v](#0v) | FIXED | **combat was declared at one player, and the damage metric was unbounded** |
+| [0w](#0w) | MEASURED | all three staged swaps survive the combat split unchanged |
+| [0x](#0x) | MEASURED | nine Azusa candidates; Ancient Greenwarden's doubler is the find |
+| [0y](#0y) | MEASURED | the land-animation genre loses its slots to those candidates |
+| [0z](#0z) | **OPEN** | **Ashaya is misclassified as MODEL-EVALUATED; four combos are invisible** |
+| [0z1](#0z1) | FIXED | landfall payoffs were booleans; Springheart bestow+copy implemented |
+| [0z2](#0z2) | MEASURED | two card-draw candidates; **Bane of Progress is misclassified too** |
+| [0z3](#0z3) | MEASURED | four sacrifice-lands: the TAP is the binding constraint, not the mana |
+| [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
+| [1b](#1b) | **OPEN** | cards can only have one cost — structural |
+| [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
+| [3](#3) | **OPEN** | Ashnod's Altar and Deathreap Ritual remain unresolved |
+| [4](#4) | **OPEN** | opponents' boards are a blocker count — the project's oldest limit |
+| [5](#5) | RESOLVED | your own board wipes now hit your own board |
+| [6](#6) | RESOLVED | life totals are tracked |
+| [6b](#6b) | MEASURED | life is tracked — and since pod v3 it DECIDES GAMES |
+| [7](#7) | **OPEN** | unmodelled recursion in Lorehold |
+| [8](#8) | superseded | re-run both ablations |
+
+The still-live gaps, in one place: **§0f** (three mislabelled Lorehold cards),
+**§0i** (free life-loss drawbacks), **§0z** / **§0z2** (Ashaya AND Bane of
+Progress mislabelled; every Azusa combo invisible), **§1b** (one cost per card), **§3**
+(two unresolved cards), **§4** (opponents' boards are a number), **§7**
+(Lorehold recursion). Everything else is either fixed or was a question rather
+than a defect.
+
+---
+
+# 0.# 0. Findings, 2026-09-05 onward
+
+> **RETITLED 2026-09-09.** This series began as "the 2026-09-05
+> re-verification" — every card re-checked against Scryfall with the rebuilt
+> `audit_cards.py`, and every claim in the file re-read against the code
+> rather than trusted. It has since run to `0v` and through 2026-09-08, so the
+> date in the old heading described the first four sections and none of the
+> rest. The series is kept and extended rather than restarted, because the ids
+> are cited from code.
+
+The 2026-09-05 conclusion still frames the series: **card DATA is no longer
+where the bugs are.** The remaining errors are CLAIMS ABOUT BEHAVIOUR that
+nothing checks — a name in `SCRIPTED_*`, a generated tag set, a script that
+reads the wrong zone, a policy that asserts a card does nothing.
+
+<a id="0a"></a>
 
 ## 0a. Card DATA is clean — 0 errors across 269 distinct names
 
@@ -23,7 +96,7 @@ mana cost, mana value, power, toughness, card types, `is_land`, `tapped`,
 module-level candidate**. It now reports **0 ERR**. The 52 data errors of
 2026-09-03 are genuinely fixed and have not regressed.
 
-    python audit_cards.py          # run it after any deck edit
+    python -m tools.audit_cards          # run it after any deck edit
 
 The nine remaining NOTEs are the single-cost model's known limits, each with the
 reason printed (hybrid pips on Lurrus and Revitalizing Repast, `{X}` baked into
@@ -42,6 +115,8 @@ decks**, and are worth remembering because both are easy to repeat:
    `{"name": ...}` identifier, so "Witch Enchanter // Witch-Blessed Meadow" came
    back in `not_found` and read as a nonexistent card. Both scripts now fall
    back to a fuzzy `cards/named` lookup.
+
+<a id="0b"></a>
 
 ## 0b. FIXED — Grist was a creature on the battlefield
 
@@ -74,6 +149,8 @@ point of a proxy and nothing on the objective. `validate.py` is `+0.00` on all
 six, `corr(A,B)` 0.9045 → 0.9057. Only Grist's own row in
 `ablation_rendmaw.txt` (+1.61 damage / +0.0072 win) is now stale.
 
+<a id="0c"></a>
+
 ## 0c. FIXED — candidates were never flying-tagged, so a flier scored as ground
 
 `tag_flying.py` walked `mod.build()` only. Candidates live as module-level
@@ -92,6 +169,8 @@ deck changed**, so every table and `validate.py` are untouched.
 
 Both numbers in `CANDIDATES_2026-09-04.md` are understated as a result, and both
 matter — see §0d.
+
+<a id="0d"></a>
 
 ## 0d. Radiant Scrollwielder read the WRONG ZONE — FIXED, and it did not help
 
@@ -131,6 +210,8 @@ tracked" was stale and has been corrected.
 **The fix tripled its firings and did not make it a better card**: 0.68 → 2.20
 per game it resolves, and win rate essentially unchanged against Galvanoth. See
 §0e.
+
+<a id="0e"></a>
 
 ## 0e. The Penance slot, resolved: Caldera Pyremaw
 
@@ -176,6 +257,8 @@ measured on, so the comparison is sound — and **the two staged Lorehold change
 were measured together on 2026-09-06 and they ADD** (§0p). Caldera's own number
 reproduced on that run (+0.0202 → +0.0194 ±0.0024); Sunbird's did not.
 
+<a id="0f"></a>
+
 ## 0f. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
 
 Membership in `SCRIPTED_*` is a claim that the engine implements the card. These
@@ -193,6 +276,8 @@ Storm Herd, and Discover 10 is a free Rise of the Eldrazi off the top. Borrowed
 Knowledge is a wheel, and the engine already has a `wheel` script for Reforge the
 Soul. All three **understate**, which is the safe direction, but they are
 labelled as if their scores were evidence about the cards.
+
+<a id="0g"></a>
 
 ## 0g. FIXED — two "or attacks" triggers, and one token entering untapped
 
@@ -231,6 +316,8 @@ you want, the mechanism moving and the objective not.
 
 Both gated (`attack_triggers`, `everywhere_enters_tapped`), default on.
 
+<a id="0h"></a>
+
 ## 0h. FIXED — "another creature you control": three cards triggered off
 themselves, and it was NOT small
 
@@ -264,6 +351,8 @@ entered is excluded.
 `regen_tables.sh` denied. That reasoning was right about the Grist change and
 wrong about this one.
 
+<a id="0i"></a>
+
 ## 0i. Life-loss drawbacks are free, and pod v3 made that matter
 
 The 2026-09-04 note "LIFE DOES NOT DECIDE GAMES" was true of pod v1, where 100%
@@ -285,6 +374,8 @@ now knowingly so.** The same sentence used to be true of Dark Confidant alone.
 Storm Herd's X is still `cfg["storm_herd_x"] = 40` rather than your life total,
 for the same reason and with the same consequence — but it is already in
 `KNOWN_BLIND`, so nothing reads its number.
+
+<a id="0j"></a>
 
 ## 0j. THE BLANK IS NOT REPLACEMENT LEVEL — the bottom of every table is taxed
 
@@ -462,6 +553,8 @@ means" was an artifact of the blank. The extra-vote redundancy trap is
 unaffected and still real: singles +0.0063 and +0.0047, sum 0.0110, against
 0.0230 for the pair — still about 2x.
 
+<a id="0k"></a>
+
 ## 0k. FIXED — Ephemerate was a proved blank, its handler dead code
 
 Found by the above, and unrelated to it. In the `+priority` arm Ephemerate
@@ -505,6 +598,8 @@ Effect: from bit-identical-to-a-blank to **+0.0095 ±0.0043 win rate at T20**
 unchanged. **The tivit table was regenerated**; the other three engines are
 untouched by this, and that claim is checked rather than assumed — the change is
 confined to `edhmc/tivit.py`.
+
+<a id="0l"></a>
 
 ## 0l. FIXED — Erebos, Bleak-Hearted: three errors on one card
 
@@ -572,6 +667,8 @@ half-width.** Erebos's own row is the only material change. `erebos_life_paid`
 is a cost this model underprices (§0i), so the death-draw arm is a CEILING;
 `erebos_life_floor` (10) is the only thing standing in for declining to pay and
 it is a judgement call.
+
+<a id="0m"></a>
 
 ## 0m. FIXED — AN EXTRA TURN GAVE THE OPPONENTS AN EXTRA ROUND
 
@@ -672,6 +769,8 @@ direction. And extra turns still count against the horizon, which is now the
 ONLY bound on the loop; that is a choice, not a bug, and it means a real
 infinite-turn lock is truncated at `turns`.
 
+<a id="0n"></a>
+
 ## 0n. Hand-tagging one card is the bug CLAUDE.md warns about, and I did it
 
 Fixing Erebos's indestructibility meant setting `indestructible=True` on one
@@ -708,6 +807,8 @@ argued — stripping the tag from the two lands reproduces the Rendmaw baseline
 BIT-IDENTICALLY over 2,000 paired games. Tagged anyway, because
 `Card.indestructible` was "inert today" too, right up until Erebos.
 
+<a id="0o"></a>
+
 ## 0o. `candidates.py` measured a SECOND COPY of a card already in the deck
 
 Found while re-measuring Goldspan Dragon. `candidates.py` answers "what does
@@ -723,6 +824,8 @@ Same shape as the `SCRIPTED_*` sets and `tag_flying.py`'s candidate gap: a
 hand-maintained list the deck moved past. **One number was produced against this
 bug during the 2026-09-06 session and discarded**; no committed number depends
 on it, because `CANDIDATES_2026-09-04.md` predates the staging.
+
+<a id="0p"></a>
 
 ## 0p. The two staged Lorehold changes ADD — closes queued item 0b
 
@@ -817,6 +920,8 @@ decks' baselines are bit-identical across it, so no table moved.
 
 ---
 
+<a id="0q"></a>
+
 ## 0q. HAND-MAINTAINED NAME SETS — the failure mode this repo keeps having
 
 **Status: the third instance was caught before it bit, and is now CHECKED.
@@ -886,6 +991,8 @@ work of 2026-09-07 measured the cost of exactly this ordering mistake at
 check in the same change, and prove the check fails.**
 
 ---
+
+<a id="0r"></a>
 
 ## 0r. FIXED — Shilgengar's own ability fired ZERO times in 3,000 games
 
@@ -986,6 +1093,8 @@ Both bounds are now measured; the knob is not a candidate for further tuning.
 
 ---
 
+<a id="0s"></a>
+
 ## 0s. Azusa's land animation: TESTED AT LAST, and the pillar is not the story
 
 **Status: all four effects implemented, each behind its own flag, all
@@ -1076,6 +1185,8 @@ printed an implemented card under MODEL-BLIND, which is §0q's first instance
 verbatim.
 
 ---
+
+<a id="0t"></a>
 
 ## 0t. THE MANA RESERVE — how much to hold, and what holding it actually costs
 
@@ -1202,6 +1313,8 @@ changes every row in the deck and needs its own regeneration.
 
 ---
 
+<a id="0u"></a>
+
 ## 0u. FIXED — three copies of "the miracle discount" had drifted apart
 
 **Status: consolidated into one function, all three known reducers applied
@@ -1300,6 +1413,879 @@ moved AT ALL did not, and is corrected here rather than left standing.
 
 ---
 
+<a id="0v"></a>
+
+## 0v. FIXED — combat was declared at ONE player, and the damage metric was unbounded
+
+Commit `f28ed1e`, 2026-09-08. `diagnostics/run_combat_split.py` is the
+harness, `tests/test_combat_split.py` pins the assignment rule, and
+`results/combat_split.txt` is the output. **Written up 2026-09-09** — the
+commit deliberately left the write-up open, so this section is the record.
+
+**All six ablation tables were regenerated from empty caches for this**, and
+every table produced before it is void.
+
+### The defect
+
+Every engine's combat did `damage_single(damage_through(attackers))`, which
+sends the entire swing at ONE player. Measured on azusa before the fix: **491
+swings of 120+ damage — the pod's whole combined life — and every one of them
+killed EXACTLY ONE opponent** while a mean of 1.82 were still alive. The
+largest single hit was **933,017 damage and killed one player**.
+
+A board dealing 933,017 was worth precisely as much as one dealing 41. **The
+deck's entire payoff — go arbitrarily wide — was capped at one kill a turn
+when you need three.** This is the §0r/§0s shape again and the fourth instance
+of it: not a card's text, but a policy that quietly asserted a whole strategy
+does nothing.
+
+### The fix, and why the assignment rule is a pilot's
+
+`opponents.combat_damage` splits one attack across defenders. **THE
+ASSIGNMENT RULE IS A PILOT'S, NOT AN OPTIMISER'S:** a defender is taken on
+only when the assignment is still lethal *after they remove its biggest
+unblocked attacker*. That insurance term makes it kill fewer players per turn
+than perfect information would, which is the point — the model should not
+credit the deck with reading the pod's hands.
+
+The rule has an exact closed form, which matters at 5,000 attackers: assign
+the k smallest, blockers eat the b biggest, and **"lethal minus its own
+largest term" IS the prefix one shorter** — so it is one binary search rather
+than an O(n²) scan.
+
+### AND THE DAMAGE METRIC IS NOW BOUNDED AT WHAT COULD HAVE MATTERED
+
+`damage_each` and `damage_single` return the *effective* figure, and every
+`m["damage"]` site records that instead of the number it asked for.
+`raw_damage` keeps the unbounded total.
+
+Azusa's `validate.py` baseline goes **6826.04 → 52.70**. That is not a heavy
+tail being trimmed off a usable metric — **it was a different quantity wearing
+the metric's name**: mean 4,379 against a MEDIAN of 67, ten games in three
+thousand carrying 69% of the total, and 98.5% of the mean sitting past the
+pod's 120 combined life. A drain for 50 into a player on 3 life is worth 3.
+
+### A SECOND BUG FELL OUT OF IT, and it costs more than the split gains
+
+`damage_through` picked `min(g.opponents, ...)` over ALL opponents **including
+dead ones**, and a dead opponent has `creatures = 0.0`. So from the first
+elimination onward **every deck attacked into NO BLOCKERS AT ALL, while
+applying the result to whoever was closest to dying** — two different players.
+Each chunk is now blocked by the player it is actually assigned to.
+
+### Measured apart, because one before/after reports them as one number
+
+`run_combat_split.py`, cumulative legs, same seeds, N=6,000:
+
+| deck | split alone | net of both | baseline win T20 |
+|---|---|---|---|
+| azusa | **+0.0625*** | +0.0182* | 0.3020 → 0.3202 |
+| lorehold | +0.0133* | −0.0032 | 0.1828 → 0.1797 |
+| shilgengar | +0.0040* | −0.0452* | 0.2432 → 0.1980 |
+| rendmaw | +0.0037* | −0.1075* | 0.3042 → 0.1967 |
+| tivit | +0.0003 | −0.0183* | 0.3388 → 0.3205 |
+| karlov | +0.0000 | −0.1353* | 0.4700 → 0.3347 |
+
+`*` beats its own 95% CI half-width. **The split helps every deck or does
+nothing; the drops are the blocker correction**, and they are largest on the
+creature decks that used to grind out wins into an empty blocker count after
+the first elimination.
+
+**KARLOV'S EXACT +0.0000 IS DEGENERATE, NOT UNWIRED, and that was checked
+rather than assumed.** `attack_targets` +2.07 and both damage counters move
+significantly, so the code is reached — the split just never changes WHO dies,
+because karlov's combat board cannot secure a second kill and its eliminations
+come from drains. **An unwired deck reads `attack_targets` 0.000**, which is
+exactly what rendmaw and tivit printed before they were wired. Worth knowing
+as a general test: a zero that comes with moving mechanism counters is a
+finding; a zero that comes with a dead counter is a bug.
+
+### Checks
+
+    validate.py            +0.00 on all 18 metrics across 6 engines
+    test_combat_split.py   7/7; --mutate fails exactly the 2 cases that
+                           depend on the insurance term and nothing else
+    test_time_sieve.py, test_tivit_combo.py    unchanged
+    check_unchanged_decks  all six MOVED, as intended -- and with the flags
+                           OFF all six were BIT-IDENTICAL on all 8 metrics,
+                           which is how the refactor was shown to be
+                           behaviour-neutral BEFORE the default was flipped
+
+That last line is the pattern worth copying: a refactor and a behaviour change
+in one commit are separable only if you can run the refactor with the new
+behaviour disabled and get the old numbers back exactly.
+
+### What the regenerated tables did
+
+Rows moving by more than their own old CI half-width: lorehold 3/65,
+shilgengar 10/64, rendmaw 16/64, tivit 23/64, azusa 25/58, karlov 29/63. Five
+sign flips, all marginal-to-zero rather than a finding reversing: The Dawning
+Archaic, Verdurous Gearhulk, Enduring Vitality, Farewell, Damnation.
+
+**The clearest mechanism read is azusa's Ashaya, Soul of the Wild: +0.0095 →
++0.0011, now a blank.** The engine models it as a SINGLE body whose power
+equals your land count, and a single creature can only ever kill one opponent
+however large it is. The fix devalues concentrating power into one body and
+rewards width. **Scute Swarm +0.0328 → +0.0589 is the same statement from the
+other end** — and it is now the top card in that deck by a clear margin.
+
+### What this does NOT settle
+
+The insurance term is one assumption (a defender removes exactly its biggest
+unblocked attacker) and it is a judgement call, not a measurement — the same
+class as `destroy_share` and `opp_vote_policy`. It is deliberately
+pessimistic. No knob exposes it, which means a card whose value swings on it
+cannot currently be reported with the knob said out loud. If a decision ever
+turns on that, the knob comes first.
+
+---
+
+<a id="0w"></a>
+
+## 0w. MEASURED — all three staged swaps survive the combat split unchanged
+
+2026-09-09, closing queued item 11. `diagnostics/run_swaps_0904.py` and
+`diagnostics/run_lorehold_pair.py` are the harnesses;
+`results/staged_recheck_rendmaw.txt` and
+`results/lorehold_pair_postsplit.txt` are the outputs.
+
+### Why this had to be asked
+
+The combat split (§0v) moved **16 of rendmaw's 64** ablation rows and **3 of
+lorehold's 65** by more than their own old CI half-width. All three staged
+swaps were measured before it — the Rendmaw one on 2026-09-04, the Lorehold
+pair on 2026-09-04/05 and jointly on 2026-09-06 — so their evidence described
+a combat model the project no longer uses. This repo's own rule is to
+re-measure a staged change when the engine underneath it moved, and it had
+been applied twice before (§0p, and the 2026-09-03 March of the World Ooze
+recheck).
+
+**The re-runs use the ORIGINAL N AND THE ORIGINAL SEEDS**, not a fresh
+design. That is the whole point: hold the sample fixed and the only thing
+that can move a number is the engine. A "re-verification" at a different N
+confounds the two and answers a different question.
+
+### Rendmaw: −Idol of Oblivion +Cauldron of Essence
+
+N=6,000 paired, seeds as originally run.
+
+| win rate | 2026-09-04 | 2026-09-09 |
+|---|---|---|
+| T10 | +0.0027 [+0.0007, +0.0048] | **+0.0022 [+0.0007, +0.0038]** |
+| T20 | +0.0135 [+0.0088, +0.0182] | **+0.0152 [+0.0107, +0.0198]** |
+
+Both horizons reproduce inside their own bars and both remain significant.
+The mechanism counters kept their signs and rough magnitudes — damage +1.55,
+`cards_drawn` −0.26, `tokens_made` −0.16, `stranded_mv` +1.15 — so **the two
+predicted costs are still real and still outweighed**, which is the part that
+matters. This swap trades a draw engine for a drain, and the drain still wins
+the trade when combat is declared at the pod rather than at one player.
+
+### Lorehold: the 2×2 factorial, re-run entire
+
+N=30,000 per cell, all four legs on one seed, identical design to §0p.
+
+| win rate, T20 | 2026-09-06 | 2026-09-09 |
+|---|---|---|
+| Caldera alone | +0.0194 ±0.0024 | **+0.0179 ±0.0023** |
+| Sunbird's alone | +0.0146 ±0.0028 | **+0.0152 ±0.0028** |
+| both | +0.0362 ±0.0035 | **+0.0366 ±0.0035** |
+| interaction | +0.0022 ±0.0020 | +0.0034 ±0.0020 |
+| Caldera GIVEN Sunbird's | +0.0216 ±0.0026 | **+0.0214 ±0.0026** |
+| Sunbird's GIVEN Caldera | +0.0168 ±0.0029 | **+0.0186 ±0.0029** |
+
+**Every cell landed inside its own previous bar.** The two marginal figures
+are the ones the decision rests on — is the second change still worth a slot
+once the first is in — and both reproduce.
+
+The cut targets were re-ablated in the same run: Scroll Rack −0.0107 ±0.0032
+win at T20 (was −0.0093 ±0.0032) and Penance −0.0079 ±0.0032. Both are still
+significantly worse than a blank, so **both cuts are as cheap as they ever
+were.**
+
+### Two things worth reading carefully rather than skimming
+
+**The interaction crossed into significance and that is NOT a new finding.**
++0.0022 ±0.0020 → +0.0034 ±0.0020: the point estimate moved by 0.0012, well
+under its own half-width, and it was already positive. A quantity that was
+marginally inside its bar is now marginally outside it. The conclusion is
+unchanged and was always the same one — the two changes are additive to
+slightly super-additive, which is the opposite of the concern that motivated
+§0p. **Do not report this as "the interaction became real."** It is the same
+number with the same sign, and calling a border crossing a discovery is how
+the top-eight ordering mistake got made.
+
+**Sunbird's decay did not continue, and that is evidence about the decay.**
+Its T20 figure went +0.0215 (2026-09-04) → +0.0146 (2026-09-06) → +0.0152
+(2026-09-09). Two engines in a row now put it near +0.015, so the one-off
+drop is **not an ongoing trend** — which narrows what could have caused it,
+without identifying it. It is still unattributed, it is still queued item
+0b-i, and the standing instruction stands: **do not invent a mechanism for
+it.** What can be said is that the obvious candidate was ruled out twice now,
+because Scroll Rack's own ablation has been stable at roughly −0.010 across
+all three engines.
+
+### Consequence
+
+**All three staged swaps are safe to commit on this evidence.** The blocker
+recorded on 2026-09-09 is cleared, and each change now carries a `reverified`
+entry in `edhmc/pending.py` saying so — run `python -m edhmc.pending` to read
+them. What remains before committing is the ordinary three-leg discipline:
+the deck module, the `.xlsx`, and the ledger, in one commit.
+
+---
+
+<a id="0x"></a>
+
+## 0x. MEASURED — nine Azusa candidates, and the doubler is the find
+
+2026-09-09. `results/candidates_azusa_T20.txt` and `..._T10.txt` are the
+output, `tests/test_azusa_candidates.py` pins the mechanisms,
+`edhmc/decks/azusa_v1.py` holds the definitions and the modelling notes.
+
+N=15,000 paired at both horizons — the tables' own sample size, because a
+candidate is only comparable to an ablation row measured at the same N, and
+that comparison IS the decision rule. Victim slot: Perilous Forays, the one
+card in the azusa table whose signal reads `--`, removed in both legs.
+
+### The table, T20 win rate
+
+| card | MV | win T20 | win T10 | signal |
+|---|---|---|---|---|
+| **Ancient Greenwarden** | 6 | **+0.0290 ±0.0041** | **+0.0269 ±0.0029** | both |
+| **Greensleeves, Maro-Sorcerer** | 5 | **+0.0143 ±0.0033** | +0.0102 ±0.0021 | both |
+| **Conduit of Worlds** | 4 | **+0.0116 ±0.0030** | +0.0104 ±0.0020 | both |
+| Springheart Nantuko *(floor)* | 2 | +0.0105 ±0.0028 | +0.0056 ±0.0017 | both |
+| Case of the Locked Hothouse *(floor)* | 4 | +0.0089 ±0.0032 | +0.0026 ±0.0018 | both |
+| Walk-In Closet *(floor)* | 3 | +0.0089 ±0.0030 | +0.0114 ±0.0021 | both |
+| Cultivator Colossus | 7 | +0.0054 ±0.0030 | +0.0045 ±0.0018 | both |
+| Burgeoning | 1 | −0.0009 ±0.0010 | −0.0003 ±0.0006 | MODEL-BLIND |
+| Constant Mists | 2 | +0.0005 ±0.0010 | +0.0003 ±0.0006 | MODEL-BLIND |
+
+### THE DOUBLER IS WORTH AS MUCH AS THE GRAVEYARD CLAUSE, and that was measured apart
+
+Ancient Greenwarden does three things, and +0.029 credited to the wrong one is
+a wrong deckbuilding conclusion. Measured on the same seeds, N=6,000, T20:
+
+| leg | win rate | mechanism |
+|---|---|---|
+| graveyard lands + the 5/7 reach body | +0.0170 ±0.0060 | `lands_from_graveyard` +0.68 |
+| **the landfall doubler alone** | **+0.0138 ±0.0044** | `cards_drawn` **+1.09** |
+| the whole card | +0.0308 ±0.0066 | — |
+
+**Almost exactly additive** (0.0170 + 0.0138 = 0.0308). Both halves are real
+and roughly equal, so this is not "a Crucible of Worlds with a body" and it is
+not "a landfall doubler" — it is both, and either half alone would still be a
+good card in this deck.
+
+The doubler's mechanism is CARD DRAW, not damage: +1.09 cards a game, because
+what it mostly doubles is Horn of Greed and Seer's Sundial. That lands exactly
+on the deck's standing finding — **this deck is CARD-limited, not
+drop-limited** — and it is why the doubler beats a fourth land-supply effect.
+
+Note the counter that did NOT move: `landfall_triggers` is −0.09, essentially
+flat. The doubler doubles the ABILITY, not the EVENT, and the engine counts
+the event once on purpose. A version that counted twice would have reported a
+much larger mechanism move and the same win rate, which is how a
+mechanism counter stops being evidence.
+
+### Greensleeves and Springheart score with NEGATIVE land counters
+
+Both have `landfall_triggers`, `lands_played` and `cards_drawn` slightly
+negative while win rate and damage are strongly positive. That is the
+game-length pattern the azusa table already documents for Avenger of Zendikar
+(−6.1 damage at T20, +0.0249 win) and Ulamog: they end games sooner, so fewer
+landfalls accumulate. **They are not land cards. They convert landfall into
+bodies**, and post-§0v that is worth much more than it was — width beats
+concentration now.
+
+### Cultivator Colossus is the weakest of the seven FOR A LEGIBLE REASON
+
++0.0054 ±0.0030 on a 7-drop, and `lands_played` is −0.29. Its ETB needs LANDS
+IN HAND, and this deck does not hoard them — it is allowed roughly three drops
+a turn and plays them. By the time a 7-drop resolves the hand is lands-poor,
+so the loop that makes the card famous mostly does not run. The mechanism
+counter agrees: `colossus_lands` averages well under one a game in the deck,
+against six in a forced test with five lands in hand.
+
+This is the same finding as Exploration's, arriving from a third direction:
+**cards, not permission, and not lands-in-hand either.**
+
+### The two MODEL-BLIND rows, and a diagnostic worth keeping
+
+Burgeoning and Constant Mists are unimplemented, for the reasons recorded in
+`decks/azusa_v1.py`: Burgeoning triggers on an OPPONENT playing a land and
+opponents here own no lands; Constant Mists is a fog, and the engine has no
+way to spend a card on defence (`incidental_damage` is a flat per-turn life
+subtraction, `resolve_clocks` never reads combat).
+
+**Their CIs are ±0.0010 against ±0.0030 for every implemented card, and that
+width is itself the diagnostic.** An unimplemented card produces nearly
+identical games in both branches, so the paired difference has almost no
+variance. **A suspiciously TIGHT bar around zero means unimplemented; a wide
+bar around zero means measured and genuinely marginal.** That is a cheaper
+tell than reading the SCRIPTED sets, and it would have caught the §0k
+Ephemerate case immediately.
+
+### What this does NOT license
+
+**None of these is a staging.** A candidate score minus an ablation score is
+not a swap: three swaps against a common baseline have overlapping CIs and
+cannot be ranked against each other — the rule that decided the Penance slot
+(§0e) and stopped Goldspan Dragon (§0c). Anything moving needs a HEAD-TO-HEAD
+against the specific card it would replace.
+
+**And three of the seven are REDUNDANT with each other and with the deck.**
+Conduit of Worlds, Walk-In Closet and Ancient Greenwarden all grant "play
+lands from your graveyard", and the deck already runs Crucible of Worlds
+(+0.0144) and Ramunap Excavator (+0.0157). Leave-one-out understates every
+member of an interchangeable group, and these were measured one at a time with
+both incumbents present — so **the marginal value of the SECOND one added is
+lower than its row, and these rows cannot be summed.** Add at most one, and
+prefer Greenwarden because half its value is the doubler, which nothing else
+in the list duplicates.
+
+### Engine changes, and the check that they moved nothing
+
+Six cards needed engine code (`edhmc/azusa.py`): the graveyard-land gate now
+reads three more names, `top_access` gained the Hothouse solve state,
+`land_drops_for_turn` its extra drop, `land_entered` split into
+`_landfall_payoffs` so Greenwarden can run it twice, `power_of`/`toughness_of`
+read a new `DYNAMIC_PT_LANDS` set, and Cultivator Colossus got its ETB loop.
+
+`check_dynamic_pt_coverage()` was added in the same change and mutation-tested,
+per §0q: a `*/*` card is DEFINED 0/0, so a name missing from that set is
+silently a 0/0 that dies on arrival — a worse symptom than the usual
+mislabelling, because the card never exists at all.
+
+**All six decks came back BIT-IDENTICAL on all 8 metrics** against the
+pre-change commit (`check_unchanged_decks.py`), so every ablation table
+including azusa's remains valid and nothing needed regenerating. The new code
+is gated on cards absent from the deck, and that was checked rather than
+argued. `validate.py` is `+0.00` on all 18 metrics; `audit_cards.py` is 0 ERR
+across 555 slots / 479 distinct names.
+
+### Two process failures worth recording
+
+**A separate `decks/azusa_candidates.py` was silently unaudited.**
+`audit_cards.py` and `tag_flying.py` discover cards by walking the UPPERCASE
+attributes of each `<deck>_v<N>.py` module, so a candidate file that is not a
+deck module is checked by nothing and tagged by nothing. The card count stayed
+at 470 and read as success. **This is §0c exactly** — the bug where two fliers
+were measured as ground creatures — and the fix was to follow the existing
+convention and put the candidates in the deck module, where 479 names are now
+checked.
+
+**`self.m` is a plain dict, and a new counter must be REGISTERED.**
+`self.m["colossus_lands"] += 1` is a `KeyError` on an unregistered key, and it
+only fires in the games where a 7-drop actually resolves — a minority of them,
+inside a worker process, in a harness that would have died twenty minutes into
+a run. Caught by reading the initialiser before launching rather than after.
+
+---
+
+<a id="0y"></a>
+
+## 0y. MEASURED — the land-animation genre loses its slots to the §0x candidates
+
+2026-09-09. `diagnostics/run_azusa_animation_swap.py` is the harness,
+`results/azusa_animation_swap.txt` the output. N=15,000 paired per leg, every
+leg on the same seed, both horizons.
+
+**This is the head-to-head §0x said was required.** A candidate's
+value-over-a-blank minus an incumbent's ablation row is not a swap; both are
+measured against a common baseline with overlapping CIs. Here the cut card is
+absent from one branch and present in the other, which is the comparison the
+decision actually rests on.
+
+### ALL TWELVE SWAPS ARE POSITIVE AND SIGNIFICANT AT BOTH HORIZONS
+
+T20 win rate, positive = the swap is an improvement:
+
+| out ↓ / in → | Ancient Greenwarden | Greensleeves | Conduit of Worlds |
+|---|---|---|---|
+| Sylvan Awakening | **+0.0277 ±0.0043** | +0.0128 ±0.0034 | +0.0082 ±0.0034 |
+| Rude Awakening | **+0.0271 ±0.0042** | +0.0121 ±0.0036 | +0.0069 ±0.0034 |
+| Ashaya, Soul of the Wild | **+0.0265 ±0.0040** | +0.0109 ±0.0031 | +0.0061 ±0.0034 |
+| Nissa, Worldwaker | **+0.0235 ±0.0043** | +0.0092 ±0.0035 | +0.0059 ±0.0035 |
+
+Packages, against the same baseline:
+
+| package | T10 | T20 | interaction |
+|---|---|---|---|
+| **P2** −Sylvan −Ashaya +Greenwarden +Greensleeves | +0.0321 ±0.0034 | **+0.0393 ±0.0050** | +0.0007, additive |
+| **P3** −Sylvan −Rude −Ashaya +Greenwarden +Greensleeves +Conduit | +0.0376 ±0.0039 | **+0.0434 ±0.0057** | −0.0025, sub-additive |
+
+### THE MECHANISM IS §0s CONFIRMED FROM THE REPLACEMENT SIDE
+
+P3 vs baseline at T20, and this is the whole finding in four rows:
+
+    lands_animated        -6.85 +-0.20     (baseline 8.31 -- 82% of it gone)
+    animated_damage       -6.42 +-2.18     (baseline 7.83)
+    tokens_made          +40.57 +-3.33     (baseline 60.66 -- up 67%)
+    landfall_triggers     +1.79 +-0.12
+    cards_drawn           +1.14 +-0.14
+    lands_from_graveyard  +1.46 +-0.08
+
+**You give up 6.4 animated damage a game and receive 40 tokens, 1.8 landfall
+triggers and 1.1 cards.** §0s said the animation "sells this deck the one
+thing it already has most of" — 9.24 marginal damage in a deck whose damage
+runs into the thousands. This is the same statement measured from the other
+end: the damage is real, it is genuinely lost, and it does not matter.
+
+**And §0v is why the replacement is worth so much more than the loss.** Since
+combat is declared at the pod, tokens are not damage — they are WIDTH, and
+width is extra opponents killed. A deck that concentrates power into animated
+lands was being paid for a kind of board the combat model no longer rewards.
+The two findings compose: the animation was already nearly a blank, and the
+combat split made its replacement materially better.
+
+### ANCIENT GREENWARDEN IS THE CARD, AND THE CUT BARELY MATTERS
+
+Its four rows span +0.0235 to +0.0277 — a range of 0.004 against bars of
+±0.004. **The value is the card, not which animation slot it takes.** That is
+the cleanest possible statement that the incumbent genre is interchangeable
+with a blank: swapping Greenwarden for any of the four buys the same amount.
+
+The four cut targets are likewise NOT distinguishable from each other (all
+twelve column-wise differences sit inside their bars), so **do not read a cut
+ORDER out of this table.** Their own ablation rows (+0.0011 to +0.0079) are
+tighter and are the better guide if one must be picked: Ashaya is cheapest,
+Nissa Worldwaker dearest.
+
+### CONDUIT OF WORLDS IS THE REDUNDANT ONE, CONFIRMED
+
+It is the weakest column (+0.0059 to +0.0082) and it is the reason P3 is
+sub-additive where P2 is clean. Going from P2 to P3 — cut Rude Awakening as
+well, add Conduit — buys **+0.0041**, less than Conduit's own worst 1-for-1,
+while spending an extra card. With Ancient Greenwarden, Crucible of Worlds and
+Ramunap Excavator all on the battlefield, a fourth "play lands from your
+graveyard" has very little left to do. **§0x predicted exactly this and said
+its rows could not be summed; this is that prediction measured.**
+
+### What this does and does not establish
+
+It establishes that **P2 is a real, additive, well-supported change**:
+−Sylvan Awakening −Ashaya, +Ancient Greenwarden +Greensleeves, worth
++0.0393 ±0.0050 at T20 and +0.0321 ±0.0034 at T10, significant at both.
+
+It does NOT establish that these are the BEST available replacements. The
+comparison is against the four animation cards only; no other candidate or
+incumbent was in the running, and §0x's remaining four cards were not tested
+in these slots. It also inherits §0x's floors — Greensleeves is fully
+modelled, but Ancient Greenwarden's row is exact only insofar as the doubler
+is, and the doubler was measured apart and found to be half the card.
+
+**Nothing is staged.** This is evidence for a staging, not a staging.
+
+---
+
+<a id="0z"></a>
+
+## 0z. OPEN — ASHAYA IS MISCLASSIFIED, and four Azusa combos are invisible
+
+2026-09-10, raised by a question about combos rather than by a diagnostic.
+**This retracted a cut that was one edit away from being staged**, which is
+the reason it is written up at length.
+
+### The question
+
+Do Ashaya + Quirion Ranger, or Springheart Nantuko + Lotus Cobra / Tireless
+Provisioner / Nissa Who Shakes the World, do anything in this model?
+
+**No. Not one of them.** And answering it turned up a labelling error.
+
+### THE LABELLING ERROR: Ashaya is in SCRIPTED_AZUSA and should not be
+
+Oracle text: *"Ashaya's power and toughness are each equal to the number of
+lands you control. **Nontoken creatures you control are Forest lands in
+addition to their other types.**"*
+
+The engine implements **the first sentence only** — Ashaya appears in
+`edhmc/azusa.py` exactly once, in `DYNAMIC_PT_LANDS`. The type-changing clause
+does not exist anywhere.
+
+Yet Ashaya sits in `ablation.SCRIPTED_AZUSA`, whose membership **is a claim
+that the engine implements the card's text**, and whose output is printed
+under the heading *"MODEL-EVALUATED — a low score is evidence about the
+card."* Ashaya's row is +0.0011 ±0.0023, and **it is not evidence about the
+card.** It is evidence about a 5-mana */* creature, which is half of it.
+
+**This is §0f's shape** (three cards in `SCRIPTED_LOREHOLD` that are not their
+text) and §0q's rule (a label nothing checks is a claim), and it is the fourth
+instance.
+
+**And the comment that was supposed to cover it points at nothing.**
+`ablation.py` says Ashaya's partial implementation "is called out at its
+definition in `edhmc/azusa.py`". There is no such call-out, and `git show
+HEAD:edhmc/azusa.py` confirms there never was — the pointer was false when it
+was written. A note that says "documented elsewhere" and is not is worse than
+no note, because it stops the next reader looking.
+
+### THE CONSEQUENCE, and it was nearly expensive
+
+§0y measured a package that CUT Ashaya, on the strength of its +0.0011 row
+being the weakest of the four animation cards. **That cut was withdrawn.**
+Cutting a card because the engine scores it low, when the engine has made it
+low by not implementing it, is precisely the mistake that cost this project
+0.074 win rate on Azusa's land sequencing and 0.034 on Shilgengar's ultimate.
+CLAUDE.md states the rule: *"A card scoring like a blank usually means the
+engine has made it a blank."*
+
+The replacement package (`P3B`, cutting Nissa Worldwaker instead) measures
+**+0.0421 ±0.0058** against the Ashaya-cutting one at **+0.0434 ±0.0057** —
+inside each other's bars. **Keeping Ashaya costs nothing measurable and
+removes the risk entirely.** There was never a trade-off to make.
+
+### The four combos, and what the model sees of each
+
+| combo | in the deck? | modelled? |
+|---|---|---|
+| Ashaya + **Quirion Ranger** | both, yes | **neither half.** Ashaya's type clause is unimplemented; Quirion Ranger is in `KNOWN_BLIND` and is not mentioned anywhere in `edhmc/azusa.py` |
+| Springheart + **Lotus Cobra** | Cobra yes, Springheart is a candidate | Cobra's landfall mana is modelled; **Springheart's bestow-and-copy mode is not** |
+| Springheart + **Tireless Provisioner** | Provisioner yes | same — Provisioner's Treasure is modelled, the copy mode is not |
+| Springheart + **Nissa, Who Shakes the World** | **not in the deck at all** | n/a |
+
+Two independent reasons each of these is worth zero here, and both are
+already-known limits rather than new ones:
+
+1. **Springheart Nantuko is modelled as its unattached mode only** — landfall
+   makes a 1/1 Insect. Bestow, and with it "pay {1}{G} to create a token
+   copy of the creature this is attached to", need an ATTACHMENT RELATION the
+   engine does not have. Documented at its definition in `decks/azusa_v1.py`;
+   its §0x row of +0.0105 is explicitly a FLOOR.
+2. **Quirion Ranger's reason for being blind is now stale.** It reads
+   "untaps a target creature once a turn for no modelled payoff" — true in
+   isolation, and false alongside Ashaya, where returning a creature-Forest to
+   hand and replaying it is a land drop and therefore a landfall trigger. The
+   classification is right (it IS unimplemented); the stated reason is no
+   longer the whole reason.
+
+### What this does NOT claim
+
+**It does not claim the combos are good.** Nobody has measured them, because
+nothing implements them. A card whose value rests on an unimplemented
+interaction is UNMEASURED, not underrated — the MODEL-BLIND rule in both
+directions. Implementing Ashaya's type clause would also be genuinely
+invasive: it makes every nontoken creature a land, which touches
+`available_mana`, `land_drops_for_turn`, `playable_lands`, `land_entered`,
+`land_died` and Titania, and it interacts with Scute Swarm's doubling.
+
+### What was actually changed here
+
+- **Nothing was implemented.** This is a classification and a retraction.
+- The staged Azusa package cuts **Nissa, Worldwaker** rather than Ashaya.
+- Ashaya belongs in the §0f list of cards whose `SCRIPTED_*` membership is
+  false. **Moving it to `KNOWN_BLIND` would be wrong too** — its `*/*` body is
+  real and it does attack — so the honest fix is a third category the project
+  does not have: PARTLY MODELLED, where a low score means nothing and a high
+  score means something. Until that exists, the entry here is the record.
+
+---
+
+<a id="0z1"></a>
+
+## 0z1. FIXED — every landfall payoff was a BOOLEAN, and Springheart is implemented
+
+2026-09-10, prompted by "what is Springheart worth now that we know its
+combos?" The honest first answer was **nothing had changed** — §0z was a
+classification finding and implemented no code, and identifying a combo does
+not move a measured number. Implementing it turned up a bigger problem.
+
+### THE PREREQUISITE BUG: `has()` where it needed `count()`
+
+`_landfall_payoffs` keyed **every payoff except Scute Swarm and Nissa** on the
+boolean `self.has(name)`. A second Lotus Cobra produced no extra mana. A
+second Tireless Provisioner produced no extra Treasure. A second Rampaging
+Baloths produced no extra Beast.
+
+This was invisible and harmless for three years of this deck's life, because
+the list is singleton and nothing ever made a second copy of a nontoken
+creature — `make_tokens` names its output "Beast token", which never collides
+with a card name.
+
+**It stopped being harmless the moment Springheart's copy mode was
+implemented, because that mode's entire purpose is a second copy of a landfall
+payoff.** A naive Springheart would have created the token, the token would
+have been inert, and the Lotus Cobra combo would have measured as ZERO — for a
+reason having nothing to do with either card. That is the §0k Ephemerate shape
+(a handler that is dead code) waiting to happen at one remove.
+
+Converting all of them to `count()` is **behaviour-neutral for every list in
+this project**, and that was checked rather than argued: all six decks came
+back BIT-IDENTICAL on all 8 metrics via `check_unchanged_decks.py`. No table
+needed regenerating.
+
+### Springheart Nantuko, implemented
+
+`springheart_host` is a single `Permanent` reference. It is the only
+attachment relation in the project, and building a general Aura framework for
+one card would be the wrong trade — if a second bestow card arrives,
+generalise then.
+
+Bestow and the creature mode both cost {1}{G}, so there is no mana question at
+resolution, only whether a host worth copying is on the battlefield.
+`SPRINGHEART_HOSTS` ranks them by what a copy is worth **per landfall** rather
+than by body size: Scute Swarm, Lotus Cobra, Tireless Provisioner, Rampaging
+Baloths, Greensleeves, Avenger, Courser, Tireless Tracker. If the host dies,
+Springheart becomes a creature again.
+
+### The number
+
+| | over a blank, T20 | T10 |
+|---|---|---|
+| before (unattached 1/1-Insect mode only) | +0.0105 ±0.0028 | +0.0056 ±0.0017 |
+| **after (bestow + copy)** | **+0.0141 ±0.0030** | **+0.0095 ±0.0021** |
+
+**A real move, and a modest one — the point estimate rose by about its own
+error bar.** The mechanism says why, and it is the useful part:
+
+    springheart_bestowed   0.162     it finds a host in 16.2% of games
+    springheart_copies     1.07      copies per game, unconditionally
+
+It resolves in 31% of games and finds a ranked host in about half of those.
+**The combo is real, modelled, and uncommon.** That is why implementing a
+two-card engine moved the card by +0.004 rather than by +0.04, and it is the
+same lesson as Sunbird's Invocation (§0p): a conditional number printed as an
+unconditional one reads far better than the card plays.
+
+### It changed a staged decision within a day
+
+Springheart at +0.0141 now beats **Conduit of Worlds** at +0.0116, which had
+been staged into the third Azusa slot hours earlier. Measured head-to-head in
+the identical swap on the same seeds:
+
+| swap | T10 | T20 |
+|---|---|---|
+| −Nissa Worldwaker +Conduit | +0.0061 ±0.0023 | +0.0059 ±0.0035 |
+| **−Nissa Worldwaker +Springheart** | **+0.0060 ±0.0022** | **+0.0118 ±0.0035** |
+
+and as packages: `P3B` (Conduit) +0.0421 ±0.0058 → `P3C` (Springheart)
+**+0.0499 ±0.0058** at T20, damage +3.55 → +5.81. **The ledger was updated.**
+Conduit's own entry had said "if one of the three is dropped, drop this one",
+naming Springheart as the leading alternative and noting it was unmeasured in
+the slot. It was measured, and it won.
+
+### THE NUMBER IS STILL A FLOOR, in two known ways
+
+1. **The engine bestows only onto a ranked list of landfall payoffs**, never
+   onto an arbitrary body. A pilot with no payoff out might still bestow on a
+   creature; this one stays a creature and makes Insects. Defensible — paying
+   {1}{G} a turn to copy a vanilla body against a free 1/1 is close — but it
+   is a policy, and this project's largest corrections have all been policies.
+2. **A token copy does NOT re-trigger the host's ETB.** `make_permanent` does
+   not run the ETB dispatch that `resolve` does. So copying Avenger of
+   Zendikar, Craterhoof Behemoth, Woodland Bellower, Eternal Witness or
+   Titania is scored as a bare body, and those are exactly the copies a real
+   pilot most wants. **This is the single largest remaining understatement of
+   the card** and it is why Avenger sits at rank 6 in the host list rather
+   than rank 1.
+
+Both are conservative, so the card cannot be worse than measured.
+
+---
+
+<a id="0z2"></a>
+
+## 0z2. MEASURED — two card-draw candidates, and a THIRD misclassified card
+
+2026-09-10. `diagnostics/run_azusa_draw.py`, `results/azusa_draw.txt`.
+N=15,000 paired, both horizons, **measured against the STAGED list**
+(`build_pending("azusa")`) rather than the printed v1 — the question was what
+to add to the deck as it will be, not as it was.
+
+Chosen off a Scryfall sweep for land-synergy card draw, against the deck's one
+measured weakness: it is CARD-limited, not drop-limited (2.77 drops granted a
+turn against 1.33 used; 57.9% of turns end with an unused drop and no land to
+play).
+
+### The numbers, T20 (baseline 0.3593)
+
+| swap | win rate | cards drawn |
+|---|---|---|
+| Forest → **Cryptic Caves** | +0.0068 ±0.0032 | **+0.26 ±0.09** |
+| Perilous Forays → **Ka-Zar** | +0.0153 ±0.0034 | +0.08 ±0.09 |
+| *Bane of Progress → Ka-Zar* | *+0.0253 ±0.0040* | *see below* |
+| **both (Forays→Ka-Zar, Forest→Caves)** | **+0.0218 ±0.0044** | +0.33 ±0.12 |
+
+Additive: interaction −0.0003 ±0.0044.
+
+### THE WINNER DOES NOT ADDRESS THE WEAKNESS, and the loser does
+
+**Ka-Zar's `cards_drawn` is +0.08 ±0.09 — flat, inside its own bar.** It is
+not a card-draw card in this deck. What it actually does:
+
+    lands_from_library   +0.34 +-0.02      top-of-library land access
+    damage               +2.53 +-0.24      Zabu, growing on every landfall
+
+**The redundancy prediction was right.** `top_access()` is a BOOLEAN and
+Courser, Augur and Oracle are already in the list, so a fourth enabler adds
+only the 0.34 lands the other three were missing. Ka-Zar is a good card here
+for reasons that have nothing to do with why it was picked — it is a body that
+grows, in a deck that §0v made reward width.
+
+**Cryptic Caves is the one that does the intended job** — the largest
+`cards_drawn` delta of the two, plus +0.17 landfall triggers and +0.10 lands
+from the graveyard, exactly the recur-and-replay loop it was chosen for. It is
+simply too rare to matter much: `caves_cracked` averages **0.21 a game**,
+because it is ONE land in a 41-land deck and has to be drawn before it can do
+anything. A second and third copy would scale it, and singleton forbids that.
+
+**So the honest read is the opposite of the hypothesis.** The card that
+attacks the weakness works and is small; the card that scores was not
+attacking the weakness at all.
+
+### THE CUT MATTERS MORE THAN THE CARD — and here that is a TRAP
+
+The same Ka-Zar is worth +0.0153 in the Perilous Forays slot and +0.0253 in
+the Bane of Progress slot. A full point of win rate, from the cut alone.
+
+**DO NOT TAKE THE BANE CUT.** `Bane of Progress` is in `SCRIPTED_AZUSA`,
+printed under MODEL-EVALUATED, and its implementation is:
+
+    # ETB destroys ALL artifacts/enchantments -- including yours.
+    # Opponents' are not tracked as objects, so only your own side is
+    # represented
+
+**The engine models the card's COST and none of its BENEFIT.** Its −0.0041 is
+not a bad card; it is a one-sided board wipe with the sided-ness removed. It
+is the only model-evaluated card in this deck with a significantly negative
+win rate, which makes it look like the obvious cut, which makes it **the most
+dangerous instance of this failure so far** — §0z's Ashaya at least measured
+near zero rather than actively negative.
+
+**This is the third card found in two days sitting under a label that is
+false** (Ashaya §0z, the three Lorehold cards §0f, now Bane). The pattern is
+no longer a series of accidents: `SCRIPTED_*` is BINARY, and a card whose text
+is half-implemented has nowhere honest to go. See CLAUDE.md queued item 14.
+
+### POSTSCRIPT 2026-09-10: Bane of Progress is no longer negative
+
+The four swaps were committed and azusa's table regenerated from an empty
+cache. **Bane of Progress moved −0.0041 ±0.0024 (signal `win`) to −0.0013
+±0.0022 (signal `--`)** — inside its own bars, no longer a significantly
+negative card. The warning above stands on its own merits (the engine still
+models only its cost), but the specific trap is now less inviting: it no longer
+reads as the obvious cut. The deck got stronger around it, which is the same
+arithmetic that shrank the drains in §0m — a fixed effect is a smaller share of
+a higher baseline.
+
+### The recommendation
+
+**−Perilous Forays +Ka-Zar of the Savage Land, and −Forest +Cryptic Caves:
++0.0218 ±0.0044 at T20, +0.0097 ±0.0028 at T10**, additive, both legs
+significant at both horizons. Perilous Forays is signal `--` (+0.0012 ±0.0016)
+and is fully implemented in `activations()`, so cutting it is safe in the way
+cutting Bane is not.
+
+That takes the staged deck from **35.9% → 38.1%** at T20.
+
+The `+0.0299` package in the output file is the Bane version. **It is recorded
+and must not be acted on** until Bane of Progress is either implemented
+against real opponent permanents (§4, which is the project's oldest
+limitation) or reclassified.
+
+---
+
+<a id="0z3"></a>
+
+## 0z3. MEASURED — four sacrifice-lands, and THE TAP IS THE BINDING CONSTRAINT
+
+2026-09-10. `diagnostics/run_azusa_draw.py`, `results/azusa_draw.txt`. All
+four measured **in the same Forest slot, on the same seeds**, N=15,000 paired,
+so they are directly rankable against each other rather than each against its
+own baseline.
+
+### The result, T20 win rate (baseline 0.3593)
+
+| land | cost to draw | enters | win rate | cracks/game | cards |
+|---|---|---|---|---|---|
+| **Scene of the Crime** | `{2}`, **no {T}** | tapped | **+0.0096 ±0.0038** | **0.39** | **+0.53** |
+| Horizon of Progress | `{1},{T}` | untapped | +0.0081 ±0.0030 | 0.21 | +0.28 |
+| Cryptic Caves | `{1},{T}`, 5+ lands | untapped | +0.0068 ±0.0032 | 0.21 | +0.26 |
+| The Hunter Maze | `{1}{G},{T}` | tapped | +0.0039 ±0.0032 | 0.16 | +0.15 |
+
+All four significant at both horizons.
+
+### WHY SCENE WINS IS NOT THE MANA COST — IT IS THE TAP
+
+Scene of the Crime is the **dearest** of the four to activate (`{2}` against
+`{1}`) **and** it enters tapped, and it still wins, because **its sacrifice
+ability has no `{T}` in the cost.** Every other one must be untapped to crack,
+and in this deck lands are tapped for mana during the main phase — so by the
+time `activations()` runs after combat, they usually cannot be cracked at all.
+
+It cracks **0.39 times a game against 0.21**, nearly double, and every
+mechanism counter follows: cards +0.53 against +0.26, landfall triggers +0.33
+against +0.17, lands from the graveyard +0.20 against +0.10. Those gaps are
+far outside their own bars even where the win-rate gap is not.
+
+**The Hunter Maze is worst for the same reason, compounded**: `{1}{G}` AND
+`{T}` AND enters tapped — taxed three ways. It is the only one of the four
+that taps for `{G}` rather than `{C}`, which is worth something in a deck
+running 13 colourless-only utility lands, and it is not worth this much.
+
+**THE GENERAL RULE, worth carrying to any future activated-ability land: the
+binding constraint is the TAP, not the mana.** This deck floats mana it cannot
+spend (`mana_floated` is a standing metric) and taps its lands for the main
+phase. An ability competing with its own land's tap is competing with the
+whole deck.
+
+### The honest limit on the ranking
+
+**Scene's win-rate margin over Cryptic Caves is +0.0028 against a ±0.0038 bar
+— INSIDE it.** On win rate alone these four are not cleanly ordered; only
+Scene-over-Hunter-Maze clears both bars. The mechanism counters are decisive
+and unanimous, and they point the same way rather than against, which is why
+the pick is Scene — but this is a case where the objective could not resolve
+what the mechanism could, and saying so is the point. Raising N would settle
+it; the effect sizes here (0.004–0.010) sit near the deck's ±0.0028 noise
+floor by construction.
+
+Real costs, both recorded: entering tapped shows up as `stranded_mv` +3.22,
+the highest of the four; and Scene is an ARTIFACT land, which the engine's own
+Bane of Progress wipe spares because that wipe excludes lands — legally it
+should die to it.
+
+### AND A BUG THAT INVALIDATED THE PREVIOUS KA-ZAR NUMBERS
+
+**Ka-Zar of the Savage Land was measured as a `*/*` equal to the land count —
+a 16/16 instead of a 3/2.** A patch adding it to `LAND_ENABLERS` used a `sed`
+anchor (`"Cultivator Colossus",\n})`) that matched **both** that set and
+`DYNAMIC_PT_LANDS`, and it landed in the wrong one. `power_of` then discarded
+its printed 3/2.
+
+Corrected figures: **+0.0141 ±0.0034** at T20 against the +0.0153 first
+reported, and +0.0243 against +0.0253 in the Bane slot. **The inflation was
+about +0.001 and the decision survives**, but the numbers are restated rather
+than quietly kept.
+
+**`check_dynamic_pt_coverage()` did not catch it, and now does.** It verified
+that every name in the set resolves to a real card and that no 0/0 candidate
+was missing from it — Ka-Zar passed both, because it IS a real card and it is
+NOT 0/0. The new third assertion is the one that matters: **a card in
+`DYNAMIC_PT_LANDS` that is not defined 0/0 is an error**, because `*/*` cards
+in this project are defined 0/0 by convention and anything else is having its
+real P/T silently thrown away. Mutation-tested against this exact bug.
+
+Two process notes worth keeping:
+
+- **The Pool HUNG rather than reporting.** The workers died inside
+  `_init`, and `pool.map` waited forever, so a crash presented as a slow run
+  and burned a 600-second timeout before anyone looked at stderr. If a
+  harness stalls, read the worker traceback before assuming it is slow.
+- **The baseline moved underneath the harness.** `run_azusa_draw.py` built its
+  baseline from `build_pending("azusa")`, and once Ka-Zar and the draw land
+  were themselves staged, that baseline CONTAINED THE CARDS UNDER TEST — so
+  every leg tried to add a second copy. That is §0o from the other direction:
+  not a stale hand-written list, but a baseline that moved because the
+  harness's own results had been staged. The baseline is now pinned explicitly
+  to the three swaps that are not under review.
+
+---
+
+<a id="1"></a>
+
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
 
 `Card` now carries `alt_costs`, a tuple of `(cost_dict, tag)` alternatives, and
@@ -1346,6 +2332,8 @@ Mastery remains a hand-written special case in `lorehold.py` rather than an
 > `engine.py` and the deck modules and nothing else — neither `lorehold.py` nor
 > `karlov.py` reads it. Overlord of the Hauntwoods is still the only user.
 
+<a id="1b"></a>
+
 ## 1b. (original entry) Cards can only have one cost — structural
 
 The engine gives every card exactly one mana cost and one mana value. Every error
@@ -1367,12 +2355,16 @@ cost, and have the casting policy choose among them. That closes the whole
 category instead of patching instances, and it is worth doing before many more
 modal cards get added.
 
+<a id="2"></a>
+
 ## 2. RESOLVED — Hagra Mauling is now a proper MDFC
 
 Defined with `land_face=("B", True)` and a {2}{B} instant front face, like the
 Lorehold three. Rendmaw now reads as 35 true lands plus one MDFC land face, and
 the engine plays whichever face it needs. Baseline effect was negligible, which
 is the expected result for one flexible card.
+
+<a id="3"></a>
 
 ## 3. Ashnod's Altar and Deathreap Ritual remain unresolved
 
@@ -1389,6 +2381,8 @@ change, not a card script.
 > The Meathook Massacre, so it no longer pays a cost for nothing, but its mana
 > is still unspendable.
 
+<a id="4"></a>
+
 ## 4. Opponents' boards are a blocker count
 
 This is the deepest limitation. Swords to Plowshares, Path to Exile, Chaos Warp,
@@ -1396,6 +2390,8 @@ Generous Gift, Assassin's Trophy, Beast Within, Toxic Deluge and Culling Ritual
 cannot be evaluated at all, because there are no opposing permanents to remove.
 About 28 of 63 Rendmaw cards and a similar share of Lorehold sit in this bucket.
 They ablate to ~0.00 and **that is a fact about the model, not the cards.**
+
+<a id="5"></a>
 
 ## 5. RESOLVED — your own board wipes now hit your own board
 
@@ -1421,6 +2417,8 @@ Lorehold casts 1.38 of its own sweepers a game, and paying for them properly
 costs it seven points of win rate. Every Lorehold number from before this change
 is optimistic.
 
+<a id="6"></a>
+
 ## 6. RESOLVED — life totals are tracked
 
 Resolved as a side effect of the opponent clock. `your_life` starts at 40, is
@@ -1428,6 +2426,8 @@ reduced by threat-weighted incidental damage each turn, and is read by Storm
 Herd's X, Felidar Sovereign, Aetherflux Reservoir and Serra Ascendant. This entry
 sat stale for several sessions claiming otherwise — worth re-auditing the rest of
 this file against the code rather than trusting it.
+
+<a id="7"></a>
 
 ## 7. Unmodelled recursion in Lorehold
 
@@ -1500,6 +2500,8 @@ unmeasured at this sample size.** Those rows carry a real point estimate and a
 sign, and under the old format they looked rankable. They are not. Raise `N` if
 a specific one matters.
 
+<a id="6b"></a>
+
 ## 6b. Life is tracked — and since pod v3 it DECIDES GAMES
 
 > **Added 2026-09-05.** Item 6 says life totals are tracked. Since pod v3 became
@@ -1507,6 +2509,8 @@ a specific one matters.
 > 0.32 / 0.43 / 0.20 rather than 0.00 / 0.00 / 0.00. Any note in this repo that
 > says "life buys nothing" is describing pod v1. See §0i for the four cards
 > whose life-loss drawback is still free.
+
+<a id="8"></a>
 
 ## 8. (superseded) Re-run both ablations
 
@@ -1516,94 +2520,17 @@ mana-rock fix, the drain implementation, the nine model-blind implementations an
 the Mizzix correction. The caches are cleared, so a fresh pass will pick up the
 new baselines.
 
-    python ablation.py rendmaw 2000 20
-    python ablation.py lorehold 2000 20
+    python -m tools.ablation rendmaw 2000 20
+    python -m tools.ablation lorehold 2000 20
 
 With the clock in place a single turn cap is correct again, so the multi-horizon
 reporting is now belt-and-braces rather than necessary.
 
 ---
 
-# How to read an ablation table
 
-A reasonable first filter is: **a card is pulling its weight if it is positive on
-damage, on win rate, or both; a card positive on neither is a cut candidate.**
-That is right most of the time. Three failure modes, in the order they bite.
+## How to read an ablation table
 
-## 1. A "+" is not necessarily a real "+"
-
-The tables print point estimates. Many of them are smaller than their own error
-bars. At 6,000 paired games on Karlov:
-
-| card | damage | win rate | survives? |
-|---|---|---|---|
-| Suture Priest | +3.07 ±0.59 | +0.0108 ±0.0047 | both |
-| Kambal | +3.14 ±0.59 | +0.0047 ±0.0050 | damage only |
-| Mother of Runes | +0.70 ±0.55 | +0.0033 ±0.0040 | damage only |
-| Pristine Talisman | +0.24 ±0.41 | −0.0003 ±0.0032 | **neither** |
-
-Anything under roughly **+0.6 damage** or **+0.005 win rate** at this sample size
-is indistinguishable from a blank. Treat the bottom of the table as unranked
-rather than ranked.
-
-## 2. Win rate beats damage where they disagree
-
-Since the opponent clock landed, win rate is the actual objective and damage is
-only a proxy. Extra damage on a game you were winning anyway buys nothing.
-
-Archangel of Thune is +5.13 damage but only +0.0030 win rate. Well of Lost
-Dreams is +2.35 damage and **+0.0210 win rate** — the highest in the deck. Vito
-is +0.29 damage and +0.0200 win. The damage column ranks those three in exactly
-the wrong order. **When the columns disagree, believe win rate.**
-
-## 3. Leave-one-out is blind to redundancy
-
-This is the one that produces genuinely wrong cuts. Removing one card of an
-interchangeable set understates all of them, because the others cover.
-
-Karlov runs three combo partners for Exquisite Blood. Removing any single one:
-
-| removed | damage | win rate |
-|---|---|---|
-| Sanguine Bond | +1.40 | +0.0203 |
-| Vito | +1.40 | +0.0163 |
-| Vizkopa Guildmage | −1.76 | +0.0095 |
-| **all three together** | −1.71 | **+0.0513** |
-| Exquisite Blood alone | −7.01 | +0.0240 |
-
-The three partners are worth +0.0513 win rate as a group — **more than double**
-the largest individual score, and far more than any of them looks worth alone.
-Vizkopa Guildmage in particular reads negative on damage and would be cut under
-the simple rule, when it is a third of a package worth five points of win rate.
-
-The same logic applies to the soul sisters, the equipment suite, and the wraths.
-For any set of interchangeable effects, **ablate the group, not the members.**
-`ablation.py`'s `ablate()` already accepts a list of names.
-
-## 4. The blank is not replacement level, and the bottom of the table pays for it
-
-Full write-up in **§0j**. `blank_like()` copies the card's cost and nothing
-else, so the comparison is really:
-
-    (card, hand-assigned threat 5-9, cast eagerly)
-      vs
-    (blank, derived threat 0.5-2.5, cast only when nothing else is affordable)
-
-and the whole difference is charged to the card. It is independent of what the
-card does, so it is invisible on a strong card and can be the entire score on a
-weak one. Corrected, karlov's Blood Artist goes −0.0050 → +0.0014 and lorehold's
-Smothering Tithe −0.0002 → +0.0050, while Blasphemous Act and Lightning Greaves
-do not move at all.
-
-The cheap test before trusting any low row: **does the card carry an explicit
-`threat`?** If it is `0.0`, the blank derives threat by the same rule and that
-channel cancels. If it is set, run `diag_threat_blank.py` on it.
-
-## The rule, restated
-
-1. Ignore anything inside its own error bars.
-2. Where damage and win rate disagree, follow win rate.
-3. Before cutting, ask whether another card in the deck does the same job — and
-   if so, ablate them together.
-4. Before cutting a card that carries an explicit `threat`, check what it scores
-   against a blank that is not a free ride — `diag_threat_blank.py`.
+Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not
+an issue, and it was the only section of this file nobody could cite by
+number. `CLAUDE.md`'s "Standing findings" is the short version.

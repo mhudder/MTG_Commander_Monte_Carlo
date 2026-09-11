@@ -26,8 +26,8 @@ Requires Python 3.10+, numpy, scipy. Run from this directory:
 
 ```bash
 python -m edhmc.pending            # staged changes; validates all three lists
-python validate.py                 # A/A control — must print exactly +0.00
-python ablation.py karlov 2500 20  # or rendmaw / lorehold
+python -m tools.validate                 # A/A control — must print exactly +0.00
+python -m tools.ablation karlov 2500 20  # or rendmaw / lorehold
 ```
 
 ---
@@ -346,7 +346,7 @@ same cost and measures the paired difference, giving a ranked contribution for
 all 65 slots. It caches to `ablation_cache.json` and resumes, since a full pass
 is about fifteen minutes on one core.
 
-    python ablation.py rendmaw 3000 10   # or: lorehold 3000 14
+    python -m tools.ablation rendmaw 3000 10   # or: lorehold 3000 14
     # rerun until it reports no cards left; it caches and resumes
 
 The output is deliberately split in two. Roughly half the deck — every removal,
@@ -408,5 +408,7 @@ The greedy casting policy is the largest source of model error, and it is not
 neutral between cards — it systematically underrates cards that reward holding
 mana or sequencing cleverly (instants, modal spells, X spells) and overrates
 cards you just jam on curve. Before trusting a close result, check that the sim
-is casting both cards at a sensible rate and turn; `run_swap.py` prints exactly
-that in its diagnostics block for this reason.
+is casting both cards at a sensible rate and turn. The swap harnesses in
+`diagnostics/` print exactly that alongside the win rate for this reason —
+`run_swaps_0904.py`, `run_lorehold_pair.py` and `run_fivedrop.py` are the
+current examples.

@@ -33,6 +33,13 @@ from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
                                    DARK_CONFIDANT)
+from edhmc.azusa import simulate as azusa_sim
+from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
+                                  CULTIVATOR_COLOSSUS,
+                                  CASE_OF_THE_LOCKED_HOTHOUSE,
+                                  CONDUIT_OF_WORLDS, WALK_IN_CLOSET,
+                                  SPRINGHEART_NANTUKO,
+                                  BURGEONING, CONSTANT_MISTS)
 
 N = 6000
 
@@ -117,6 +124,22 @@ DECKS = {
                  (GOLDSPAN_DRAGON, INVINCIBLE_HYMN, REVERSE_THE_SANDS)),
     "karlov": ("KARLOV", "karlov", karlov_sim, 10, "Soulmender",
                (ENLIGHTENED_CONFIDANT, CRYPT_GHAST, DARK_CONFIDANT)),
+    # 2026-09-09 batch. The victim is Perilous Forays, the one card in
+    # results/ablation_azusa.txt whose signal reads `--` -- inside its own
+    # bars on both damage and win rate, so removing it in BOTH legs biases
+    # nothing. T20 because this deck's payoffs are long-horizon: its whole
+    # table is quoted at T20 and its T10 win rate is 0.042.
+    "azusa": ("AZUSA", "azusa", azusa_sim, 20, "Perilous Forays",
+              (GREENSLEEVES, ANCIENT_GREENWARDEN, CULTIVATOR_COLOSSUS,
+               CASE_OF_THE_LOCKED_HOTHOUSE, CONDUIT_OF_WORLDS,
+               WALK_IN_CLOSET, SPRINGHEART_NANTUKO,
+               # The two the model cannot see. Measured anyway and printed
+               # under the same heading, because a MODEL-BLIND card scoring
+               # ~0.000 is the model having no eyes -- and this project's own
+               # rule is that a proved blank and an unmeasured card look
+               # identical unless you say which is which. See the notes in
+               # decks/azusa_v1.py.
+               BURGEONING, CONSTANT_MISTS)),
     # 2026-09-04 first batch, kept so the runs are reproducible
     "lorehold1": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
                   (SUNBIRDS_INVOCATION, BRASSS_BOUNTY, UNDERWORLD_BREACH)),
@@ -134,21 +157,33 @@ if __name__ == "__main__":
     args = sys.argv[1:]
     override = next((int(a.split("=")[1]) for a in args
                      if a.startswith("--turns=")), None)
+    # N IS PART OF THE IDENTITY OF A NUMBER, the same way it is for a table:
+    # a candidate is only comparable to an ablation row measured at the same
+    # sample size, and that comparison is the whole decision rule this script
+    # exists to serve. The default stays 6000 so every pre-2026-09-09 run
+    # reproduces; the azusa batch was run at 15000 to sit on its table's scale.
+    n = next((int(a.split("=")[1]) for a in args if a.startswith("--n=")), N)
     want = [a for a in args if not a.startswith("--")] or list(DECKS)
     for label, name, sim, turns, victim, cands in (DECKS[w] for w in want):
         turns = override or turns
         print(f"\n{label} candidates — value over a blank of the same cost "
-              f"({turns} turns)")
+              f"({turns} turns, n={n:,} paired)")
         # Lorehold's primary metric is mana cheated, not damage; the deck is
         # not built to put power on the board, so damage is the proxy there and
         # mv_cheated is the objective-adjacent number.
         extra = ("mv_cheated",) if name == "lorehold" else ()
+        # Azusa's mechanism counters, so a number can be traced to the card's
+        # text rather than just reported. landfall_triggers is the one that
+        # separates a landfall PAYOFF from a land-supply enabler, and
+        # lands_played separates both from a card that just draws.
+        if name == "azusa":
+            extra = ("landfall_triggers", "lands_played", "cards_drawn")
         head = f"  {'card':<28}{'MV':>4}{'damage':>16}{'win rate':>18}"
         for e in extra:
             head += f"{e:>16}"
         print(head + f"{'P(deploy)':>11}")
         for cand in cands:
-            r = add_value(name, sim, turns, cand, victim, extra=extra)
+            r = add_value(name, sim, turns, cand, victim, n=n, extra=extra)
             line = (f"  {cand.name:<28}{cand.mv:>4}"
                     f"{r['damage'][0]:>+10.2f}+-{r['damage'][1]:<5.2f}"
                     f"{r['won'][0]:>+11.4f}+-{r['won'][1]:<5.4f}")

@@ -35,7 +35,7 @@ from edhmc.experiment import DEFAULT_CFG
 SHORTLIST = ("Arcane Bombardment", "Monument to Endurance", "Land Tax",
              "Smothering Tithe", "Library of Leng", "Sol Ring",
              "Sensei's Divining Top")
-LOG = "tutor_log.json"
+LOG = "results/tutor_log.json"
 N_COLLECT = 45000
 MIN_CELL = 40
 

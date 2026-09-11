@@ -36,7 +36,7 @@ from openpyxl.utils import get_column_letter
 
 SRC = (r"C:\Users\matth\.claude\uploads"
        r"\41304e60-f0ea-4dc0-b907-5dae14490564\d6ddcfa7-Tivit_EDH.txt")
-OUT = "Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx"
+OUT = "spreadsheets/Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx"
 UA = {"User-Agent": "EDHMC/1.0", "Accept": "application/json"}
 
 ACCENT = "FF4B3F72"        # Esper purple, the analogue of Karlov's dark red

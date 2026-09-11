@@ -1,5 +1,12 @@
 # Deck changes to date
 
+> **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the
+> 2026-09-09 reorganisation. Command lines below are pre-reorganisation and no
+> longer run as written: entry points now live in `tools/` and are invoked from
+> the repo root as `python -m tools.<name>`. Outputs are in `results/`. For
+> what is true now read `CLAUDE.md`; for what is staged run
+> `python -m edhmc.pending`.
+
 Every card change across the three decks. **Committed** = applied to the
 deck module AND the `.xlsx`. **Staged** = decided and in
 `edhmc/pending.py`, not yet written to the spreadsheets.

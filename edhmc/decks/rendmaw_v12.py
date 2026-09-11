@@ -216,7 +216,9 @@ EZURIS_PREDATION = C("Ezuri's Predation", "Sorcery", {"gen": 5, "G": 3},
 
 MARCH_OF_THE_WORLD_OOZE = C("March of the World Ooze", "Enchantment",
                             {"gen": 3, "G": 3}, priority=8, tags=("pump",), threat=9.0)
-# In the deck as of v12. Kept here so run_swap.py still resolves.
+# In the deck as of v12, and referenced by name from validate.py's real
+# comparison. (It was also kept for run_swap.py, which was deleted on
+# 2026-09-09 as dead code -- it named cards cut from the deck in 2026-08.)
 
 # Cut in v12, kept so validate.py can still measure CRN on the same real
 # comparison it always has (now run in the other direction: March -> Clamp).

@@ -1,5 +1,12 @@
 # Candidate evaluation — 2026-09-04
 
+> **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the
+> 2026-09-09 reorganisation. Command lines below are pre-reorganisation and no
+> longer run as written: entry points now live in `tools/` and are invoked from
+> the repo root as `python -m tools.<name>`. Outputs are in `results/`. For
+> what is true now read `CLAUDE.md`; for what is staged run
+> `python -m edhmc.pending`.
+
 Nineteen candidate additions across the three decks, in two batches. All were
 implemented against Scryfall oracle text before being measured; ten needed new
 engine behaviour, and three needed a modelling gap closed first.

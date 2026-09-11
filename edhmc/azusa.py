@@ -145,6 +145,56 @@ TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
 # landfall card added to the deck and not added here is deployed AFTER the
 # land drops, contributes nothing on the turn it lands, and nothing anywhere
 # says so -- it just quietly scores low.
+# Cards whose printed P/T is */* equal to the number of lands you control.
+# A NAME SET, so it is checked: check_dynamic_pt_coverage() at the bottom of
+# this module raises at import if a card here is not in the deck or the
+# candidate list, and every one of them is defined with power=0/toughness=0 so
+# a missing entry would silently make it a 0/0 and die on arrival. That is the
+# §0q rule -- a hand-maintained set is a claim, so derive or check it.
+DYNAMIC_PT_LANDS = frozenset({
+    # ASHAYA IS ONLY HALF IMPLEMENTED, and this is the call-out ablation.py
+    # points at. KNOWN_ISSUES §0z. The card reads:
+    #
+    #   "Ashaya's power and toughness are each equal to the number of lands
+    #    you control. NONTOKEN CREATURES YOU CONTROL ARE FOREST LANDS IN
+    #    ADDITION TO THEIR OTHER TYPES."
+    #
+    # The second sentence does not exist in this engine. It is the half that
+    # matters most: it turns the deck's creatures into lands, which is a
+    # combo with Quirion Ranger (in the deck, and in KNOWN_BLIND) and changes
+    # available_mana, land_drops_for_turn, playable_lands, land_entered,
+    # land_died and Titania all at once -- which is also why it is not
+    # implemented. **Ashaya's ablation row is therefore not evidence about
+    # Ashaya, and it must not be cut on the strength of it.** A cut of it was
+    # staged and withdrawn on 2026-09-10 for exactly this reason.
+    "Ashaya, Soul of the Wild",
+    "Greensleeves, Maro-Sorcerer",
+    "Cultivator Colossus",
+})
+
+# Lands that SACRIFICE THEMSELVES to draw a card, and the exact cost of doing
+# it: {name: (mana cost, does the cost include {T}, minimum lands required)}.
+#
+# Table-driven rather than four special cases, because the four differ only in
+# those three numbers and the differences are the entire comparison between
+# them. Note the two that matter most:
+#
+#   Scene of the Crime pays NO {T}, so it can be cracked the turn it enters
+#   and while tapped -- which is what pays for it entering tapped.
+#
+#   Cryptic Caves is the only one with a printed land-count condition, and at
+#   five it is met on essentially every turn this ability would be wanted.
+#
+# The activation POLICY -- when a pilot actually cracks one -- is shared and
+# lives in activations(), because it is a judgement about the deck rather than
+# about the card. See KNOWN_ISSUES §0z2/§0z3.
+SAC_DRAW_LANDS = {
+    "Cryptic Caves":       ({"gen": 1},          True,  5),
+    "Horizon of Progress": ({"gen": 1},          True,  0),
+    "Scene of the Crime":  ({"gen": 2},          False, 0),
+    "The Hunter Maze":     ({"gen": 1, "G": 1},  True,  0),
+}
+
 LAND_ENABLERS = frozenset({
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
     "Courser of Kruphix", "Augur of Autumn",
@@ -155,6 +205,26 @@ LAND_ENABLERS = frozenset({
     "Titania, Protector of Argoth",
     # Reads a land ETB to transform herself -- see land_entered().
     "Nissa, Vastwood Seer // Nissa, Sage Animist",
+    # 2026-09-10 draw batch. Ka-Zar is read by top_access(); the four
+    # sac-draw lands are read by activations() via SAC_DRAW_LANDS.
+    "Ka-Zar of the Savage Land",
+    "Cryptic Caves",
+    "Horizon of Progress",
+    "Scene of the Crime",
+    "The Hunter Maze",
+    # --- 2026-09-09 candidates (decks/azusa_candidates.py). These are NOT in
+    # the deck; they are here because check_land_enabler_coverage() scans the
+    # four land methods for `self.has(...)` and raises on any name it finds
+    # that is missing from this set. That check firing is the system working:
+    # a land-relevant card the deck deploys AFTER its land drops scores low
+    # for no stated reason, which is what this set exists to prevent.
+    "Case of the Locked Hothouse",
+    "Ancient Greenwarden",
+    "Conduit of Worlds",
+    "Walk-In Closet // Forgotten Cellar",
+    "Greensleeves, Maro-Sorcerer",
+    "Springheart Nantuko",
+    "Cultivator Colossus",
 })
 
 # Starting loyalty. `Permanent.counters` carries the current value from there.
@@ -195,6 +265,8 @@ class AzusaGame:
         self.land_drops_used = 0
         self.spells_this_turn = 0
         self.ascended = False           # Wayward Swordtooth's city's blessing
+        self.hothouse_solved = False    # Case of the Locked Hothouse
+        self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
         self.animations: list[dict] = []   # live land-animation effects
         self.pw_used: set[int] = set()     # walkers already activated this turn
@@ -256,6 +328,20 @@ class AzusaGame:
             "animated_damage": 0.0, "animated_blocker_turns": 0,
             "pw_activations": 0, "pw_ultimates": 0, "nissa_transforms": 0,
             "entwines": 0,
+            # 2026-09-09 candidate counters. REGISTERED HERE, not created on
+            # first use: `self.m` is a plain dict, so `self.m[k] += 1` on an
+            # unregistered key is a KeyError that only fires in the games
+            # where the card actually resolves -- which for a 7-drop is a
+            # minority of them, in a worker process, inside a harness that
+            # would have reported it as a crash 20 minutes in.
+            "colossus_lands": 0,        # lands put onto the battlefield by
+                                        # Cultivator Colossus's ETB loop
+            "springheart_copies": 0,    # token copies of the bestow host;
+                                        # the Insect mode is in tokens_made
+            "springheart_bestowed": 0,  # 1 if it ever found a host at all
+            "caves_cracked": 0,         # Cryptic Caves sacrificed for a card
+            "hothouse_solved_turn": 99, # 99 = never solved, matching the
+                                        # turn_won / turn_lethal convention
         }
         self.damage_by_turn = []
 
@@ -351,7 +437,7 @@ class AzusaGame:
             return anim["power"] + perm.counters + self.craterhoof_bonus
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
-        if perm.card.name == "Ashaya, Soul of the Wild":
+        if perm.card.name in DYNAMIC_PT_LANDS:
             p = sum(1 for q in self.board if q.card.is_land)
         p += self.craterhoof_bonus
         return p
@@ -362,7 +448,7 @@ class AzusaGame:
             return anim["toughness"] + perm.counters + self.craterhoof_bonus
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
-        if perm.card.name == "Ashaya, Soul of the Wild":
+        if perm.card.name in DYNAMIC_PT_LANDS:
             t = sum(1 for q in self.board if q.card.is_land)
         t += self.craterhoof_bonus
         return t
@@ -463,18 +549,66 @@ class AzusaGame:
         ETB) — none of those are "playing a land".
         """
         self.m["landfall_triggers"] += 1
-        if played and self.has("Horn of Greed"):
-            self.draw(1)
-        if self.has("Avenger of Zendikar"):
+        # ANCIENT GREENWARDEN: "if a land entering causes a triggered ability
+        # of a permanent you control to trigger, that ability triggers an
+        # ADDITIONAL time." So every payoff below fires twice, not once, and
+        # that is the whole card -- modelling it as a static bonus would be
+        # the "a doubled trigger, modelled as one" error this project has
+        # already corrected for Blood Artist and Elas il-Kor.
+        #
+        # `landfall_triggers` is counted ONCE above on purpose: one land
+        # entered, and the metric counts land-entry events. What doubles is
+        # the ABILITIES, which the payoff counters below record. Counting the
+        # event twice would make the mechanism counter disagree with the game.
+        reps = 2 if self.has("Ancient Greenwarden") else 1
+        for _ in range(reps):
+            self._landfall_payoffs(card, played)
+
+    def _landfall_payoffs(self, card, played=False):
+        """The payoffs themselves, split out so Ancient Greenwarden can run
+        them twice. Everything here is a triggered ability of a permanent you
+        control, which is exactly the set Greenwarden doubles.
+
+        EVERY PAYOFF SCALES ON `count`, NOT `has`. Until 2026-09-10 all of
+        them except Scute Swarm and Nissa were keyed on the BOOLEAN `has()`,
+        so a second Lotus Cobra or a second Tireless Provisioner did exactly
+        nothing. That was invisible and harmless while the list was singleton
+        and no effect copied a nontoken creature -- `make_tokens` names its
+        tokens "Beast token" and so on, which never collide with a card name.
+
+        It stopped being harmless the moment Springheart Nantuko's copy mode
+        was implemented, because that mode's entire point is a SECOND COPY of
+        a landfall payoff. A naive Springheart would have made the token and
+        the token would have been inert, and the combo would have measured as
+        zero for a reason that has nothing to do with the card. See
+        KNOWN_ISSUES §0z1.
+
+        Converting to `count` is behaviour-neutral for every list in this
+        project today -- checked, not argued, with check_unchanged_decks.py.
+        """
+        if played:
+            self.draw(self.count("Horn of Greed"))
+        # Zabu, Ka-Zar's token: "Landfall -- whenever a land you control
+        # enters, put a +1/+1 counter on Zabu." Legendary, so at most one, and
+        # it is a TOKEN, so it grows rather than multiplying -- the opposite
+        # shape to Scute Swarm and the reason Ka-Zar is a card-advantage card
+        # with a body attached rather than a go-wide one.
+        for p in self.board:
+            if p.card.name == "Zabu":
+                p.counters += 1
+                break
+        for _ in range(self.count("Avenger of Zendikar")):
             for p in self.board:
                 if p.is_token and p.card.name == "Plant token":
                     p.counters += 1
-        if self.has("Courser of Kruphix"):
-            self.gain_life(1)
-        if self.has("Lotus Cobra"):
+        self.gain_life(self.count("Courser of Kruphix"))
+        for _ in range(self.count("Lotus Cobra")):
             self.bonus_mana.append(frozenset({"G"}))
-        if self.has("Rampaging Baloths"):
-            self.make_tokens(1, 4, 4, "Beast")
+        self.make_tokens(self.count("Rampaging Baloths"), 4, 4, "Beast")
+        self.make_tokens(self.count("Greensleeves, Maro-Sorcerer"), 3, 3,
+                         "Badger")
+        for _ in range(self.count("Springheart Nantuko")):
+            self.springheart_landfall()
         if self.has("Scute Swarm"):
             n_lands = sum(1 for p in self.board if p.card.is_land)
             n_swarms = self.count("Scute Swarm")
@@ -486,14 +620,13 @@ class AzusaGame:
                     self.m["scute_swarms_made"] += 1
                 else:
                     self.make_tokens(1, 1, 1, "Insect")
-        if self.has("Tireless Provisioner"):
+        for _ in range(self.count("Tireless Provisioner")):
             # "create a Food or a Treasure token" -- modelled as the
             # Treasure mode (immediately useful mana), the same
             # single-more-useful-mode simplification the deck's other choose-
             # one lands effects make.
             self.bonus_mana.append(frozenset({"W", "U", "B", "R", "G", "C"}))
-        if self.has("Tireless Tracker"):
-            self.clues = getattr(self, "clues", 0) + 1
+        self.clues = getattr(self, "clues", 0) + self.count("Tireless Tracker")
         if self.count("Nissa, Vastwood Seer // Nissa, Sage Animist"):
             # "Whenever a land you control enters, IF YOU CONTROL SEVEN OR
             # MORE LANDS, exile Nissa, then return her to the battlefield
@@ -502,13 +635,82 @@ class AzusaGame:
             # around turn five she stayed a 2/2 for the rest of the game.
             if sum(1 for p in self.board if p.card.is_land) >= 7:
                 self.transform_nissa()
-        if self.has("Seer's Sundial"):
+        for _ in range(self.count("Seer's Sundial")):
             units = self.available_mana()
             pay = can_pay({"gen": 2}, units)
             if pay is not None:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
                 self.draw(1)
+
+    # -- Springheart Nantuko ---------------------------------------------
+    #
+    # "Bestow {1}{G}. Enchanted creature gets +1/+1. Landfall -- whenever a
+    #  land you control enters, you may pay {1}{G} if this permanent is
+    #  attached to a creature you control. If you do, create a token that's a
+    #  copy of that creature. If you didn't create a token this way, create a
+    #  1/1 green Insect creature token."
+    #
+    # THE ATTACHMENT IS THE WHOLE CARD, and modelling it is why this was left
+    # as a floor until 2026-09-10. `springheart_host` is a single Permanent
+    # reference rather than a general Aura relation -- this is the only
+    # attachment in the project, and inventing a framework for one card would
+    # be the wrong trade. If a second bestow card ever arrives, generalise it
+    # then.
+    #
+    # BESTOW COSTS EXACTLY WHAT THE CREATURE MODE COSTS ({1}{G} either way),
+    # so choosing is free and a pilot bestows whenever a host is worth
+    # copying. That is unusual and it is why this card is a build-around.
+
+    # What a copy is WORTH per landfall, best first. A pilot picks the host
+    # whose copy compounds, not the biggest body: copying Lotus Cobra is
+    # another mana every landfall, copying Provisioner another Treasure.
+    SPRINGHEART_HOSTS = (
+        "Scute Swarm",                 # copies double every landfall
+        "Lotus Cobra",                 # +1 mana per landfall, compounding
+        "Tireless Provisioner",        # +1 Treasure per landfall
+        "Rampaging Baloths",           # a 4/4 per landfall, per copy
+        "Greensleeves, Maro-Sorcerer",
+        "Avenger of Zendikar",
+        "Courser of Kruphix",
+        "Tireless Tracker",
+    )
+
+    def springheart_pick_host(self):
+        """The creature to bestow onto, or None to enter as a creature."""
+        best, best_rank = None, len(self.SPRINGHEART_HOSTS)
+        for p in self.board:
+            if not p.card.is_creature or p.card.name == "Springheart Nantuko":
+                continue
+            try:
+                rank = self.SPRINGHEART_HOSTS.index(p.card.name)
+            except ValueError:
+                continue
+            if rank < best_rank:
+                best, best_rank = p, rank
+        return best
+
+    def springheart_landfall(self):
+        """One Springheart trigger.
+
+        The copy is a TOKEN, so it is summoning sick and cannot tap for mana
+        the turn it arrives -- which matters for a Lotus Cobra copy, whose
+        landfall trigger fires anyway because a trigger is not a tap ability.
+        """
+        host = self.springheart_host
+        if host is not None and host not in self.board:
+            host = self.springheart_host = None     # it died; Springheart is
+                                                    # a creature again
+        if host is not None:
+            units = self.available_mana()
+            pay = can_pay({"gen": 1, "G": 1}, units)
+            if pay is not None:
+                spend(self, pay, units)
+                self.m["mana_spent"] += 2
+                self.make_permanent(host.card, sick=True, is_token=True)
+                self.m["springheart_copies"] += 1
+                return
+        self.make_tokens(1, 1, 1, "Insect")
 
     def transform_nissa(self):
         """Exile Nissa, Vastwood Seer and return her transformed.
@@ -580,6 +782,9 @@ class AzusaGame:
             n += 1
         if self.has("Wayward Swordtooth") and self.ascended:
             n += 1
+        if self.has("Case of the Locked Hothouse"):
+            n += 1          # "an additional land on each of your turns" --
+                            # unconditional, NOT gated on being solved
         return n
 
     def playable_lands(self):
@@ -588,17 +793,28 @@ class AzusaGame:
         Mul Daya), and the graveyard (Ramunap Excavator / Crucible of
         Worlds). Returns (card, zone) pairs."""
         out = [(c, "hand") for c in self.hand if c.is_land]
-        if self.library and self.library[-1].is_land and (
-                self.has("Augur of Autumn") or self.has("Courser of Kruphix")
-                or self.has("Oracle of Mul Daya")):
+        if self.library and self.library[-1].is_land and self.top_access():
             out.append((self.library[-1], "library"))
-        if self.has("Ramunap Excavator") or self.has("Crucible of Worlds"):
+        if (self.has("Ramunap Excavator") or self.has("Crucible of Worlds")
+                or self.has("Conduit of Worlds")
+                or self.has("Ancient Greenwarden")
+                or self.has("Walk-In Closet // Forgotten Cellar")):
             out += [(c, "graveyard") for c in self.graveyard if c.is_land]
         return out
 
     def top_access(self):
+        """Can you play a land off the top of your library right now?
+
+        Case of the Locked Hothouse grants this only once SOLVED (seven or
+        more lands), which is why it is not a bare `has` like the other three
+        -- an unsolved Case is a land drop and nothing else. `solved` is
+        maintained in `end_step`, where the card says to check it.
+        """
         return (self.has("Augur of Autumn") or self.has("Courser of Kruphix")
-                or self.has("Oracle of Mul Daya"))
+                or self.has("Oracle of Mul Daya")
+                or self.has("Ka-Zar of the Savage Land")
+                or (self.has("Case of the Locked Hothouse")
+                    and self.hothouse_solved))
 
     def choose_land(self, options):
         """Which land to play, and from where. The preference order is this
@@ -802,6 +1018,48 @@ class AzusaGame:
                 if not v.is_token:
                     self.graveyard.append(v.card)
             perm.counters += len(victims)
+        elif card.name == "Ka-Zar of the Savage Land":
+            # "When Ka-Zar enters, create Zabu, a legendary 2/2 green Cat
+            # creature token with 'Landfall -- whenever a land you control
+            # enters, put a +1/+1 counter on Zabu.'"
+            zabu = Card(name="Zabu", types=frozenset({"Creature"}),
+                        power=2, toughness=2)
+            self.make_permanent(zabu, sick=True, is_token=True)
+            self.m["tokens_made"] += 1
+        elif card.name == "Springheart Nantuko":
+            # BESTOW OR NOT, decided as it resolves. Both modes cost {1}{G},
+            # so there is no mana question -- only whether a host worth
+            # copying is on the battlefield. If none is, it stays a 1/1
+            # creature and makes Insects, which is the mode this engine
+            # modelled exclusively until 2026-09-10.
+            host = self.springheart_pick_host()
+            if host is not None:
+                self.springheart_host = host
+                host.counters += 1              # "enchanted creature gets +1/+1"
+                self.m["springheart_bestowed"] = 1
+        elif card.name == "Cultivator Colossus":
+            # "You may put a land card from your hand onto the battlefield
+            # TAPPED. If you do, draw a card AND REPEAT THIS PROCESS." A real
+            # loop, not a fixed number: each draw can find another land, so it
+            # empties the hand of lands and replaces every one with a card.
+            #
+            # It does NOT consume land drops -- "put onto the battlefield" is
+            # not playing a land -- so land_entered is called with
+            # played=False, which is also what denies it Horn of Greed. That
+            # distinction is the one this hook already exists to make.
+            #
+            # The cap is a runaway guard, not a rule: with Scute Swarm out,
+            # each land doubles the board, and the loop is bounded by the hand
+            # in reality but by nothing in a model that can draw more lands.
+            for _ in range(40):
+                land = next((c for c in self.hand if c.is_land), None)
+                if land is None:
+                    break
+                self.hand.remove(land)
+                self.make_permanent(land, tapped=True)
+                self.m["colossus_lands"] += 1
+                self.land_entered(land, played=False)
+                self.draw(1)
         elif card.name == "Yavimaya Elder":
             pass   # its DEATH trigger is in on_creature_death
 
@@ -1163,6 +1421,56 @@ class AzusaGame:
                         break
         self.clues = clues
 
+        # CRYPTIC CAVES: "{1}, {T}, Sacrifice this land: Draw a card.
+        # Activate only if you control five or more lands."
+        #
+        # THE POLICY IS THE WHOLE CARD, so it is stated rather than buried.
+        # Cracking it trades a land for a card, which is a bad rate in most
+        # decks and a good one here -- this deck is CARD-limited and land-rich
+        # (2.77 drops granted a turn against 1.33 used). It fires when:
+        #
+        #   * the printed condition is met (five or more lands), AND
+        #   * {1} is available and the land itself is untapped, AND
+        #   * EITHER a graveyard-land recursion effect is out -- Crucible of
+        #     Worlds, Ramunap Excavator or Ancient Greenwarden -- in which
+        #     case the land comes BACK and the whole thing is free and
+        #     repeatable, and replaying it is another landfall trigger on a
+        #     drop that was going begging;
+        #   * OR you control six or more lands, so sacrificing one still
+        #     leaves the five the ability wants and does not cut your mana.
+        #
+        # The SIX is a deliberately mild threshold rather than a tuned one.
+        # A stricter gate would be the "conservatism that asserts a card does
+        # nothing" failure this project has paid for three times (§0r, §0s,
+        # §0v); a looser one would crack it on turn five holding exactly five
+        # lands, which no pilot does. `cryptic_caves_min_lands` is the knob.
+        for pm in list(self.board):
+            spec = SAC_DRAW_LANDS.get(pm.card.name)
+            if spec is None:
+                continue
+            cost, needs_tap, min_lands = spec
+            if needs_tap and pm.tapped:
+                continue            # {T} is in the cost; a tapped land cannot
+            n_lands = sum(1 for p in self.board if p.card.is_land)
+            if n_lands < min_lands:
+                continue            # the card's own printed condition
+            recursion = (self.has("Crucible of Worlds")
+                         or self.has("Ramunap Excavator")
+                         or self.has("Ancient Greenwarden"))
+            floor = self.cfg.get("cryptic_caves_min_lands", 6)
+            if not (recursion or n_lands >= floor):
+                continue
+            units = self.available_mana()
+            pay = can_pay(cost, units)
+            if pay is None:
+                continue
+            spend(self, pay, units)
+            self.m["mana_spent"] += sum(cost.values())
+            self.board.remove(pm)
+            self.land_died(pm.card)
+            self.draw(1)
+            self.m["caves_cracked"] += 1
+
         # Perilous Forays: {1}, sac a creature -> tutor a basic land to the
         # battlefield tapped. Token fodder only -- see the shilgengar.py
         # aristocrats-policy note this mirrors: never sac a real card.
@@ -1299,6 +1607,16 @@ def take_turn(g):
     g.m["mana_floated"] += len(g.available_mana())
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
+    # "To solve -- you control seven or more lands. (If unsolved, solve at the
+    # BEGINNING OF YOUR END STEP.)" Checked here rather than continuously,
+    # because the card says so and because it matters: a Case that reaches
+    # seven lands mid-turn does not give you top access until the next turn.
+    # Once solved it stays solved -- there is no unsolve.
+    if not g.hothouse_solved and g.has("Case of the Locked Hothouse"):
+        if sum(1 for p in g.board if p.card.is_land) >= 7:
+            g.hothouse_solved = True
+            g.m["hothouse_solved_turn"] = g.turn
+
     # END OF TURN. Rude Awakening's mode and Nissa's +1 stop here; Sylvan
     # Awakening's does not, which is the only reason its lands ever block.
     g.expire_animations(end_of_turn=True)
@@ -1404,5 +1722,65 @@ def check_planeswalker_coverage():
     return missing
 
 
+def check_dynamic_pt_coverage():
+    """Every name in DYNAMIC_PT_LANDS must be a real card somewhere.
+
+    These cards are printed */* and are therefore DEFINED with power=0 and
+    toughness=0, with `power_of` / `toughness_of` supplying the land count.
+    A name misspelled here is silently a 0/0: it enters, dies as a
+    state-based action, and its row reads as a bad card rather than a broken
+    one. That is the §0q failure with a worse symptom than usual, because a
+    0/0 does not merely under-score -- it never exists.
+
+    Checked against the deck AND the candidate list, because a candidate is
+    exactly where a new */* card enters this project.
+    """
+    from edhmc.decks import azusa_v1
+    deck, cmd = azusa_v1.build()
+    known = {c.name for c in deck} | {cmd.name}
+    # Module-level candidates too, discovered the same way audit_cards.py
+    # discovers them, so this cannot drift from what that tool checks.
+    module_cards = [v for a in dir(azusa_v1) if a.isupper()
+                    for v in [getattr(azusa_v1, a)]
+                    if type(v).__name__ == "Card"]
+    known |= {c.name for c in module_cards}
+    unknown = DYNAMIC_PT_LANDS - known
+    if unknown:
+        raise AssertionError(
+            "edhmc/azusa.py: DYNAMIC_PT_LANDS names no card in the deck or "
+            "the candidate list, so nothing would ever match it and the "
+            "card it was meant to describe is a 0/0:\n"
+            + "".join(f"    {n}\n" for n in sorted(unknown)))
+    # A card in this set that is NOT defined 0/0 was almost certainly added by
+    # accident, and the symptom is silent and large: its printed P/T is
+    # DISCARDED and replaced by the land count, so a 3/2 becomes a 16/16 in a
+    # deck that reaches sixteen lands. This fired for real on 2026-09-10 --
+    # Ka-Zar of the Savage Land was added to this set instead of
+    # LAND_ENABLERS by a sed whose anchor matched both blocks, and it was
+    # MEASURED as a */* before anyone noticed. §0z3.
+    wrong_pt = {c.name for c in module_cards
+                if c.name in DYNAMIC_PT_LANDS and c.is_creature
+                and (c.power, c.toughness) != (0, 0)}
+    if wrong_pt:
+        raise AssertionError(
+            "edhmc/azusa.py: these cards are in DYNAMIC_PT_LANDS but are NOT "
+            "defined 0/0, so their printed power and toughness are being "
+            "silently thrown away and replaced by your land count:\n"
+            + "".join(f"    {n}\n" for n in sorted(wrong_pt)))
+
+    # And the reverse: a */* card defined 0/0 that nobody added here.
+    zero_pt = {c.name for c in module_cards
+               if c.is_creature and c.power == 0 and c.toughness == 0}
+    stranded = zero_pt - DYNAMIC_PT_LANDS
+    if stranded:
+        raise AssertionError(
+            "edhmc/azusa.py: these candidate creatures are defined 0/0 but "
+            "are not in DYNAMIC_PT_LANDS, so they are literally 0/0 and die "
+            "on arrival:\n"
+            + "".join(f"    {n}\n" for n in sorted(stranded)))
+    return unknown
+
+
 check_land_enabler_coverage()
 check_planeswalker_coverage()
+check_dynamic_pt_coverage()

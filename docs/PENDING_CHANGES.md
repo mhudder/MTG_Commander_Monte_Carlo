@@ -1,5 +1,12 @@
 # Pending deck changes
 
+> **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the
+> 2026-09-09 reorganisation. Command lines below are pre-reorganisation and no
+> longer run as written: entry points now live in `tools/` and are invoked from
+> the repo root as `python -m tools.<name>`. Outputs are in `results/`. For
+> what is true now read `CLAUDE.md`; for what is staged run
+> `python -m edhmc.pending`.
+
 **Status: staged, NOT committed.** The `.xlsx` files are untouched and remain the
 system of record. Apply these by hand when the batch of changes is final.
 

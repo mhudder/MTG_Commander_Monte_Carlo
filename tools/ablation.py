@@ -288,9 +288,20 @@ SCRIPTED_SHILGENGAR = {
 
 # Written 2026-09-07 with the deck (the least tuned of the six -- see
 # azusa_v1.py). Membership is a claim that edhmc.azusa implements the card's
-# text; X-spells are modelled at a fixed X (documented in azusa_v1.py) and
-# Ashaya's power/toughness-only implementation (no "creatures are also
-# lands") is called out at its definition in edhmc/azusa.py.
+# text; X-spells are modelled at a fixed X (documented in azusa_v1.py).
+#
+# ASHAYA IS THE KNOWN EXCEPTION AND IT IS A REAL PROBLEM -- KNOWN_ISSUES §0z.
+# Only its */* clause is implemented; "nontoken creatures you control are
+# Forest lands" does not exist in the engine, so its row is NOT evidence about
+# the card and its Quirion Ranger interaction is invisible. It stays here
+# rather than moving to KNOWN_BLIND because its body is real and does attack,
+# which is the case for a PARTLY MODELLED category this project does not yet
+# have. Do not cut it on its ablation row.
+#
+# (An earlier version of this comment said the gap was "called out at its
+# definition in edhmc/azusa.py". It was not, and never had been -- a pointer
+# to a note that does not exist is worse than no note, because it stops the
+# next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
 SCRIPTED_AZUSA = {
     # extra land drops
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
@@ -305,6 +316,26 @@ SCRIPTED_AZUSA = {
     "Craterhoof Behemoth", "Eternal Witness", "Woodland Bellower",
     "Nissa, Vastwood Seer // Nissa, Sage Animist", "Yavimaya Elder",
     "Bane of Progress", "Ashaya, Soul of the Wild",
+    # --- 2026-09-10 additions. Each of these is a CLAIM that edhmc.azusa
+    # implements the card's text, made deliberately and with its limits said:
+    #
+    #   Ancient Greenwarden   FULL -- graveyard lands, the 5/7 reach body, and
+    #       the landfall DOUBLER (every payoff in _landfall_payoffs runs
+    #       twice). §0x measured the halves apart; both are real.
+    #   Greensleeves          FULL -- landfall makes a 3/3 Badger, and its
+    #       */* reads the land count via DYNAMIC_PT_LANDS.
+    #   Ka-Zar of the Savage  FULL -- top-of-library land access plus Zabu,
+    #       Land              the token that takes a +1/+1 counter on every
+    #                         landfall. (STAGED, not committed; it is here
+    #                         because build_pending applies the stage.)
+    #   Springheart Nantuko   A FLOOR, and the only one of the four that is.
+    #       Bestow and the pay-{1}{G}-to-copy-the-host mode ARE implemented
+    #       (§0z1), but a token copy does NOT re-trigger the host's ETB, so
+    #       copying Avenger of Zendikar or Craterhoof scores as a bare body.
+    #       SCRIPTED rather than KNOWN_BLIND because the mechanism is real and
+    #       measured; the understatement is bounded and one-directional.
+    "Ancient Greenwarden", "Greensleeves, Maro-Sorcerer",
+    "Ka-Zar of the Savage Land", "Springheart Nantuko",
     "Green Sun's Zenith", "Chord of Calling",
     # ramp / land tutors
     "Cultivate", "Kodama's Reach", "Seek the Horizon", "Journey of Discovery",
@@ -312,13 +343,16 @@ SCRIPTED_AZUSA = {
     "Regrowth", "Animist's Awakening", "Genesis Wave",
     # sac-for-value (token fodder only)
     "Perilous Forays", "Momentous Fall",
-    # land animation, all four of them -- the animations are real continuous
-    # effects with per-card durations as of 2026-09-07, and Nissa, Worldwaker
-    # moved here from KNOWN_BLIND the same day: her abilities are implemented,
-    # so a low score is now a result rather than an absence. Read the
-    # indestructible and reach clauses as still blind (nothing the pod does
-    # can kill a land), which edhmc/azusa.py's docstring spells out.
-    "Sylvan Awakening", "Rude Awakening", "Nissa, Worldwaker",
+    # LAND ANIMATION IS GONE FROM THIS DECK as of 2026-09-10. Sylvan Awakening,
+    # Rude Awakening and Nissa, Worldwaker were all here -- the animations were
+    # real continuous effects with per-card durations as of 2026-09-07, and
+    # Nissa moved here from KNOWN_BLIND the same day -- and all three were cut
+    # for Ancient Greenwarden, Greensleeves and Springheart Nantuko (§0y).
+    # Their scripts remain in edhmc/azusa.py because diag_azusa_animation.py
+    # is the evidence for the cut and still exercises them.
+    #
+    # Nissa, Vastwood Seer // Sage Animist is NOT affected and stays: §0s found
+    # the Nissas were never the animation story, and she is a top-five card.
     "Sol Ring", "Harmonize", "Eye of Ugin",
     # Annihilator, approximated as reducing an opponent's abstract creature
     # count -- value denial, not damage
@@ -413,9 +447,17 @@ def ablate(deck, commander, card_name, baseline=None):
 # `_medblank` / `_deadblank` is here for the same reason: the 2026-09-06 blank
 # priority change moves every number, and the pre-change files carry NEITHER
 # suffix, so they can no longer be picked up by a run that would misread them.
-CACHE = (f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
-         f"{'_sametype' if BLANK_KEEPS_TYPES else ''}"
-         f"{'_deadblank' if BLANK_PRIORITY == 'dead' else '_medblank'}.json")
+#
+# The directory is part of the path and NOT part of the key: `results/caches/`
+# is where every cache has lived since the 2026-09-09 reorganisation, and the
+# name inside it is unchanged, so a cache from before the move is still picked
+# up by a run that should pick it up. Moving these files was allowed to change
+# where they are and forbidden to change what they mean.
+CACHE = os.path.join(
+    "results", "caches",
+    f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
+    f"{'_sametype' if BLANK_KEEPS_TYPES else ''}"
+    f"{'_deadblank' if BLANK_PRIORITY == 'dead' else '_medblank'}.json")
 
 
 # ---------------------------------------------------------------------------
@@ -770,6 +812,7 @@ def main():
         # resumed. Names no longer in the deck are kept, at the end.
         ordered = {n: results[n] for n in nonlands if n in results}
         ordered.update({k: v for k, v in results.items() if k not in ordered})
+        os.makedirs(os.path.dirname(CACHE), exist_ok=True)
         json.dump(ordered, open(CACHE, "w"))       # resumable across runs
 
     if todo:

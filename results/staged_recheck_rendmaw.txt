@@ -1,0 +1,20 @@
+
+=== rendmaw_idol  (10 turns, n=6,000 paired)
+    OUT Idol of Oblivion
+    IN  Cauldron of Essence
+      won                   +0.0022  [ +0.0007,  +0.0038] *
+      damage                +1.0888  [ +0.9339,  +1.2489] *
+      cards_drawn           -0.1312  [ -0.1575,  -0.1060] *
+      rendmaw_triggers      -0.0452  [ -0.0565,  -0.0343] *
+      tokens_made           -0.0835  [ -0.1063,  -0.0620] *
+      stranded_mv           +0.9645  [ +0.8040,  +1.1199] *
+
+=== rendmaw_idol  (20 turns, n=6,000 paired)
+    OUT Idol of Oblivion
+    IN  Cauldron of Essence
+      won                   +0.0152  [ +0.0107,  +0.0198] *
+      damage                +1.5549  [ +1.3503,  +1.7859] *
+      cards_drawn           -0.2577  [ -0.3057,  -0.2098] *
+      rendmaw_triggers      -0.0968  [ -0.1178,  -0.0765] *
+      tokens_made           -0.1578  [ -0.2007,  -0.1158] *
+      stranded_mv           +1.1453  [ +0.8485,  +1.4344] *

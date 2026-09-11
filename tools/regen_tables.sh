@@ -19,8 +19,10 @@
 # it -- so a full cache leaves `todo` empty and the run silently REPRINTS THE
 # OLD NUMBERS. Pass --resume to keep a partial cache from an interrupted run.
 #
-#     ./regen_tables.sh            # delete caches, regenerate both
-#     ./regen_tables.sh --resume   # continue an interrupted run
+#     ./tools/regen_tables.sh            # delete caches, regenerate both
+#     ./tools/regen_tables.sh --resume   # continue an interrupted run
+#
+# BOTH FROM THE REPO ROOT. See the note above the loop.
 #
 # Since 2026-09-06 a deck takes minutes rather than ninety, so the 1800s budget
 # below never fires and the retry loop runs exactly once. Both are kept because
@@ -80,20 +82,24 @@ RESUME=""
 [ "$1" = "--resume" ] && RESUME=1
 N=15000
 
+# Run from the REPO ROOT (`./tools/regen_tables.sh`), not from tools/. Every
+# path below is root-relative, and `python -m tools.ablation` needs the root on
+# sys.path to import edhmc.
 for deck in lorehold rendmaw karlov tivit shilgengar azusa; do
-    cache="ablation_cache_${deck}_10-20_n${N}_medblank.json"
+    cache="results/caches/ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"
-    : > "ablation_${deck}.log"
+    : > "results/ablation_${deck}.log"
     for _ in $(seq 1 400); do
-        ABLATE_BUDGET=1800 python ablation.py "$deck" "$N" 10,20 \
-            > "ablation_${deck}.txt.new" 2>> "ablation_${deck}.log"
+        ABLATE_BUDGET=1800 python -m tools.ablation "$deck" "$N" 10,20 \
+            > "results/ablation_${deck}.txt.new" \
+            2>> "results/ablation_${deck}.log"
         # ablation.py returns early, printing nothing, while cards remain.
-        if grep -q "MODEL-EVALUATED" "ablation_${deck}.txt.new"; then
-            mv "ablation_${deck}.txt.new" "ablation_${deck}.txt"
+        if grep -q "MODEL-EVALUATED" "results/ablation_${deck}.txt.new"; then
+            mv "results/ablation_${deck}.txt.new" "results/ablation_${deck}.txt"
             echo "DONE $deck"
             break
         fi
     done
-    rm -f "ablation_${deck}.txt.new"
+    rm -f "results/ablation_${deck}.txt.new"
 done
 echo "ALL DONE"
