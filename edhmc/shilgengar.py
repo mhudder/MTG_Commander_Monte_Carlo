@@ -97,12 +97,38 @@ elimination (a game-loss check, not a damage event), and guessing that
 interaction risks silently making the deck unkillable. See `KNOWN_BLIND` in
 `ablation.py` for the full, reasoned list.
 
+TREASURES ARE MANA AS OF 2026-09-10 (queued item 13)
+-----------------------------------------------------
+They used to be a COUNTER THAT ONLY REVEL IN RICHES READ. Pitiless Plunderer,
+Smothering Tithe, Black Market Connections and Wayfarer's Bauble all made them
+and nothing ever spent one, so three of this deck's mana sources were scored as
+though they produced no mana — and the commander's ultimate was held a
+three-mana reserve (§0t measured what that reserve COSTS) that a pile of
+Treasures could have paid instead. `pay()` now spends them, real mana first,
+and `ult_reserve()` returns 0 when the Treasures already cover the ultimate.
+
+READ SMOTHERING TITHE'S NUMBER WITH CARE NOW. Its approximation — one Treasure
+per living opponent per round, no roll, because "opponents nearly always have a
+better use for two mana early" — was written when a Treasure was inert, and it
+is now three mana a turn in a model where the opponents never pay the {2}. That
+assumption has gone from harmless to load-bearing and it is the first thing to
+suspect if this card's row looks too good. `treasures_as_mana=False` restores
+the old behaviour exactly.
+
 WIN CONDITIONS
 --------------
   1. Combat, drain, and the mass-reanimation swing (the default plan).
   2. Revel in Riches — 10 or more Treasures (its OWN generation is
      model-blind, but Treasures from Smothering Tithe / Black Market
      Connections / Pitiless Plunderer / Wayfarer's Bauble still count).
+     NOTE THE TENSION with the change above: a Treasure spent on mana is a
+     Treasure not counted toward the ten. Resolving it greedily in favour of
+     mana cost Revel in Riches 0.0056 win rate against its own ±0.0021 bar —
+     the only row in the regenerated table to move outside its own bar. The
+     pilot's fix (hoard while Revel is out) was implemented and MEASURED at
+     -0.0013, p=0.16: it does not pay, because the deck makes 1.9 Treasures a
+     game and ten is out of reach. Greedy is the default and Revel's lower row
+     is its honest value. `treasure_hoard=True` keeps the seam. §0z6.
 """
 
 from __future__ import annotations
@@ -168,6 +194,11 @@ class ShilgengarGame:
             "angels_fed": 0, "cards_fed": 0, "finality_marked": 0,
             "shilgengar_ults": 0, "shilgengar_reanimated": 0,
             "single_reanimations": 0, "treasures_made": 0,
+            # Queued item 13: Treasures were made and never spent. Registered
+            # here, not created on first use -- `self.m` is a plain dict, so an
+            # unregistered key is a KeyError in whichever worker first spends
+            # a Treasure.
+            "treasures_spent": 0,
             "life_gained": 0, "lifegain_triggers": 0,
             "angel_tokens_made": 0, "spirit_tokens_made": 0,
         }
@@ -404,12 +435,10 @@ class ShilgengarGame:
             leftover = [p for p in self.board if p.is_token and p.card.is_creature
                        and not p.sick and self.power_of(p) <= 1]
             for p in leftover[:2]:
-                units = available_mana(self)
-                pay = can_pay({"gen": 1, "B": 1}, units)
-                if pay is None:
+                # Treasures pay for this too -- queued item 13. A Treasure is
+                # any colour, so it covers the {B} pip as well as the {1}.
+                if not self.pay({"gen": 1, "B": 1}, count_mana_spent=2):
                     break
-                spend(self, pay, units)
-                self.m["mana_spent"] += 2
                 self.your_life += 1
                 self.draw(1)
                 self.sacrifice(p, to_shilgengar=False)
@@ -462,6 +491,97 @@ class ShilgengarGame:
             return None
         return chosen
 
+    # -- Treasures as mana (queued item 13) --------------------------------
+    #
+    # "SACRIFICE THIS ARTIFACT: ADD ONE MANA OF ANY COLOR." Until 2026-09-10
+    # this deck's Treasures were a COUNTER THAT ONLY REVEL IN RICHES READ:
+    # they accumulated from Pitiless Plunderer, Smothering Tithe, Black Market
+    # Connections and Wayfarer's Bauble, and nothing ever spent one. So the
+    # three Treasure-makers were scored as though their Treasures did nothing
+    # but count toward a ten-Treasure alternate win, and the commander's
+    # ultimate was held a three-mana reserve it could often have paid out of
+    # the pile instead.
+    #
+    # A Treasure is ANY COLOUR and it is a sacrifice, not a tap, so it is
+    # available the turn it arrives and cannot be Stone Rained. It is modelled
+    # as a unit of any colour appended AFTER the real mana, which is what lets
+    # `pay()` below tell the two apart -- the same device
+    # `azusa.main_phase` uses for Castle Garenbrig's restricted pool.
+    #
+    # `treasures_as_mana=False` restores the pre-2026-09-10 behaviour and
+    # reproduces every shilgengar number published before that date.
+    ANY = frozenset({"W", "U", "B", "R", "G", "C"})
+
+    def spendable_treasures(self):
+        """How many Treasures the pilot is willing to spend as mana.
+
+        NOT simply `self.treasures`, and the reason was MEASURED rather than
+        anticipated. When Treasures first became mana (queued item 13) the
+        engine spent them greedily, and the regenerated table moved exactly one
+        row beyond its own error bar: **Revel in Riches +0.0081 -> +0.0025**,
+        a 0.0056 drop against a +-0.0021 bar. The mechanism is not subtle --
+        "at the beginning of your upkeep, if you control ten or more
+        Treasures, you win the game", and the engine was cracking them for
+        mana before the count could ever reach ten.
+
+        THE OBVIOUS FIX WAS IMPLEMENTED, MEASURED, AND IS NOT SHIPPED. The
+        pilot's answer is "with Revel in Riches out, Treasures are a win
+        condition and not mana -- hoard them until the tenth". That is
+        `treasure_hoard=True`, it is implemented below, and at N=3,000 paired
+        it is **-0.0013 [-0.0033, +0.0003], p=0.16** against spending them
+        greedily. It does not pay, and the reason is arithmetic: this deck
+        makes **1.9 Treasures a game**, so ten is reached almost only when
+        Smothering Tithe lands early, while the mana forgone is spent on every
+        turn of every game. Revel's alternate win is 0.5% of games either way.
+
+        So the DEFAULT IS GREEDY, and Revel in Riches' row falling from +0.0081
+        to +0.0025 is not damage to be repaired -- it is the honest new value
+        of a card whose resource now has a better use. The project's rule is to
+        follow win rate, and the win rate declined to endorse the pilot's
+        instinct. `treasure_hoard=True` is kept, because a future list with
+        more Treasure generation would flip this and the seam should already
+        exist when it does.
+        """
+        if not self.cfg.get("treasures_as_mana", True):
+            return 0
+        if (self.cfg.get("treasure_hoard", False)
+                and self.has("Revel in Riches") and self.treasures < 10):
+            return 0
+        return self.treasures
+
+    def pay(self, cost, count_mana_spent=None):
+        """Pay `cost` from the battlefield, then from Treasures.
+
+        Returns True if it was paid. REAL MANA FIRST and Treasures only for
+        what is left: a Treasure is a one-shot resource and a land is not, so
+        spending the land first is strictly better and is what a pilot does.
+        `can_pay` walks the pool in order and prefers the least flexible
+        source, so appending the any-colour Treasures at the END gets this for
+        free rather than by a special case.
+        """
+        units = available_mana(self)
+        n_real = len(units)
+        n_treasure = self.spendable_treasures()
+        pool = units + [self.ANY] * n_treasure
+        idx = can_pay(cost, pool)
+        if idx is None:
+            return False
+        real = [i for i in idx if i < n_real]
+        used = len(idx) - len(real)
+        spend(self, real, units)
+        if used:
+            self.treasures -= used
+            self.m["treasures_spent"] += used
+        self.m["mana_spent"] += (len(idx) if count_mana_spent is None
+                                 else count_mana_spent)
+        return True
+
+    def can_afford(self, cost):
+        """Affordability INCLUDING Treasures, without spending anything."""
+        units = available_mana(self)
+        return can_pay(cost, units
+                       + [self.ANY] * self.spendable_treasures()) is not None
+
     def ult_reserve(self):
         """Mana to hold back through the main phase for the ultimate.
 
@@ -473,6 +593,14 @@ class ShilgengarGame:
         costs the deck nothing on the turns it does not apply.
         """
         if self.ult_plan() is None:
+            return 0
+        # NOTHING NEEDS RESERVING IF THE TREASURES ALREADY COVER IT (queued
+        # item 13). This is the half of that item with a real behavioural
+        # consequence: §0t measured what holding three mana back COSTS, and
+        # the answer was a fact about a policy that a pile of Treasures makes
+        # unnecessary. A pilot sitting on three Treasures spends their whole
+        # main phase and cracks the Treasures for the ultimate.
+        if self.can_afford({"gen": 3}) and self.treasures >= 3:
             return 0
         return self.cfg.get("shilgengar_ult_reserve", 3)
 
@@ -488,7 +616,7 @@ class ShilgengarGame:
             plan = self.ult_plan()
             if plan is None:
                 break
-            if can_pay({"gen": 3}, available_mana(self)) is None:
+            if not self.can_afford({"gen": 3}):
                 break
             for p in plan:
                 if p not in self.board:
@@ -514,12 +642,9 @@ class ShilgengarGame:
         pool = self.yard_creatures()
         if not pool:
             return
-        units = available_mana(self)
-        pay = can_pay({"gen": 3}, units)
-        if pay is None:
+        # Treasures may pay for this -- see pay() and queued item 13.
+        if not self.pay({"gen": 3}, count_mana_spent=3):
             return
-        spend(self, pay, units)
-        self.m["mana_spent"] += 3
         self.blood -= 6
         self.m["blood_spent"] += 6
         # Out of the graveyard FIRST, then resolve the ETB triggers. "Return
@@ -638,13 +763,17 @@ class ShilgengarGame:
         """
         while True:
             units = available_mana(self)
+            # TREASURES ARE PART OF THE POOL (queued item 13). Appended after
+            # the real mana so `can_pay` reaches for a land first and a
+            # Treasure only for what the lands cannot cover, and so the index
+            # split below can tell which was which.
+            n_real = len(units)
+            n_treasure = self.spendable_treasures()
+            pool = units + [self.ANY] * n_treasure
             if not self.commander_cast:
                 ccost = dict(self.commander.cost)
                 ccost["gen"] = ccost.get("gen", 0) + self.commander_tax
-                pay = can_pay(ccost, units)
-                if pay is not None:
-                    spend(self, pay, units)
-                    self.m["mana_spent"] += sum(ccost.values())
+                if self.pay(ccost, count_mana_spent=sum(ccost.values())):
                     idx = self.spells_this_turn
                     self.spells_this_turn += 1
                     if OPP.countered(self, self.commander, idx):
@@ -661,13 +790,24 @@ class ShilgengarGame:
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
-                pay = can_pay(c.cost, units)
-                if pay is not None and len(units) - len(pay) >= reserve:
+                pay = can_pay(c.cost, pool)
+                # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
+                # it exists to protect is the three mana the ultimate needs
+                # after combat, and a Treasure pays that as well as a land
+                # does. Reading it off `units` alone would hold lands back
+                # while a pile of Treasures sat unspent beside them, which is
+                # the policy artefact §0t warned about rather than a cost.
+                if pay is not None and len(pool) - len(pay) >= reserve:
                     options.append((c, pay))
             if not options:
                 break
             card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
-            spend(self, pay, units)
+            real = [i for i in pay if i < n_real]
+            used = len(pay) - len(real)
+            spend(self, real, units)
+            if used:
+                self.treasures -= used
+                self.m["treasures_spent"] += used
             self.m["mana_spent"] += len(pay)
             self.hand.remove(card)
             idx = self.spells_this_turn
@@ -688,12 +828,8 @@ class ShilgengarGame:
             for _ in range(3):
                 fodder = [p for p in self.board if p.is_token
                          and p.card.is_creature and self.toughness_of(p) == 1]
-                units = available_mana(self)
-                pay = can_pay({"gen": 1}, units)
-                if not fodder or pay is None:
+                if not fodder or not self.pay({"gen": 1}, count_mana_spent=1):
                     break
-                spend(self, pay, units)
-                self.m["mana_spent"] += 1
                 self.sacrifice(fodder[0], to_shilgengar=False)
                 self.draw(2)
 
@@ -720,14 +856,11 @@ class ShilgengarGame:
         # handled here rather than in resolve(), a turn or more after casting
         # in the model just as it would be at a real table.
         if self.has("Wayfarer's Bauble"):
-            units = available_mana(self)
-            pay = can_pay({"gen": 2}, units)
             basics = [c for c in self.library if c.name in ("Swamp", "Plains")]
             bauble = next((p for p in self.board
                           if p.card.name == "Wayfarer's Bauble"), None)
-            if pay is not None and basics and bauble is not None:
-                spend(self, pay, units)
-                self.m["mana_spent"] += 2
+            if basics and bauble is not None and self.pay({"gen": 2},
+                                                          count_mana_spent=2):
                 self.board.remove(bauble)
                 land = basics[0]
                 self.library.remove(land)

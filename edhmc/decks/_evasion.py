@@ -66,3 +66,63 @@ INDESTRUCTIBLE = {
     'Heliod, Sun-Crowned',
     'Ulamog, the Infinite Gyre',
 }
+
+# SUBTYPES, read from the type line's subtype half.
+# `Card.types` holds CARD types only, so a card that reads a creature or
+# land subtype has to consult these.
+#
+#   HUMAN   Return of the Wildspeaker counts and pumps the COMPLEMENT of
+#           this set. A Human missing from here would be pumped and
+#           counted when the card says it is not.
+#   FOREST  Sapling Nursery's affinity, Nissa, Who Shakes the World's mana
+#           doubler, and Castle Garenbrig's enters-untapped condition.
+#           Dryad Arbor is one; no other nonbasic in any list is.
+HUMAN = {
+    'Augur of Autumn',
+    'Auriok Champion',
+    'Azusa, Lost but Seeking',
+    'Baba Lysaga, Night Witch',
+    'Ballot Broker',
+    'Bishop of Wings',
+    "Brago's Representative",
+    'Cartel Aristocrat',
+    'Dark Confidant',
+    'Disciple of the Vault',
+    'Dockside Chef',
+    "Dragon's Rage Channeler",
+    'Eternal Witness',
+    'Grim Haruspex',
+    'Guide of Souls',
+    'Ka-Zar of the Savage Land',
+    'Kambal, Consul of Allocation',
+    'Kambal, Profiteering Mayor',
+    'Lieutenants of the Guard',
+    'Longshot, Rebel Bowman',
+    'Marionette Master',
+    'Molecule Man',
+    'Monastery Mentor',
+    'Mother of Runes',
+    'Ophiomancer',
+    'Pitiless Plunderer',
+    'Priest of Fell Rites',
+    'Ranger of Eos',
+    'Serra Ascendant',
+    'Soul Warden',
+    "Soul's Attendant",
+    'Soulmender',
+    'Speaker of the Heavens',
+    'Syr Konrad, the Grim',
+    'Tireless Tracker',
+    'Verge Rangers',
+    'Vizkopa Guildmage',
+    'Witch Enchanter // Witch-Blessed Meadow',
+    'Yavimaya Elder',
+    'Zulaport Cutthroat',
+}
+
+FOREST = {
+    'Dryad Arbor',
+    'Forest',
+    'Overgrown Tomb',
+    'Woodland Chasm',
+}

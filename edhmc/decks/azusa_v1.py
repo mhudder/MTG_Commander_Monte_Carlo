@@ -430,3 +430,114 @@ THE_HUNTER_MAZE = L("The Hunter Maze", "G", tapped=True)
 # kept as the provenance for that decision -- §0z3.
 DRAW_CANDIDATES = (KA_ZAR, CRYPTIC_CAVES, HORIZON_OF_PROGRESS,
                    THE_HUNTER_MAZE)
+
+
+# ---------------------------------------------------------------------------
+# THIRD BATCH — seven cards submitted 2026-09-10. NOT in the deck.
+#
+# Costs, types, P/T and oracle text verified against Scryfall 2026-09-10, and
+# two of the seven are NOT what they are usually remembered as:
+#
+#   Return of the Wildspeaker reads NON-HUMAN creatures, not creatures. The
+#   deck's six Humans are Augur of Autumn, Azusa herself, Eternal Witness,
+#   Tireless Tracker, Yavimaya Elder and the staged Ka-Zar -- all small, so the
+#   DRAW mode is barely affected (the greatest power in this deck is never a
+#   Human) and the PUMP mode misses six bodies. The set is generated into
+#   decks/_evasion.py by tag_flying.py rather than written here; see §0q.
+#
+#   Castle Garenbrig's big ability is "{2}{G}{G}, {T}: Add six {G}", not the
+#   four-mana version it is often quoted as. Net +2 mana, creature-spells only.
+#
+# WHAT IS AND IS NOT MODELLED. Read this before quoting any number.
+#
+#   The Great Henge        FULL. The cost reduction is the card -- {7}{G}{G}
+#                          minus the greatest power you control, which in this
+#                          deck is routinely 5-10 -- and it is implemented in
+#                          azusa.cost_of() the same way engine.py already does
+#                          it for the Rendmaw list. The nontoken-creature ETB
+#                          draw fires from every zone a creature can enter
+#                          from, and {T}: {G}{G} + 2 life is real, including
+#                          the life, which this model does track.
+#   Sapling Nursery        FULL on the two halves that matter: Affinity for
+#                          Forests (20 Forests + Dryad Arbor) and the landfall
+#                          3/4 reach Treefolk. FLOOR: the {1}{G} exile-for-
+#                          indestructible ability is not modelled, and it is
+#                          real wipe protection in a pod that wipes.
+#   Nissa, Who Shakes      FULL, and the most invasive of the seven. The
+#     the World            static Forest doubler needed a change to the shared
+#                          `spend()` -- a Forest now taps for two -- which is
+#                          the Crypt Ghast branch already there. +1 animates a
+#                          land as a 3/3 vigilance haste and UNTAPS it, which
+#                          is a ritual as well as a body; -8 puts every Forest
+#                          left in the library onto the battlefield, which in
+#                          this deck is a landfall detonation.
+#   Return of the          MOSTLY. Both modes are implemented and the mode
+#     Wildspeaker          CHOICE is a stated policy, not an optimiser -- see
+#                          azusa.wildspeaker_mode(). FLOOR: it is an INSTANT
+#                          and this engine has no instant speed, so it is cast
+#                          in a main phase like a sorcery.
+#   Finale of Devastation  MOSTLY, at a FIXED X of 6 -- the same convention
+#                          Genesis Wave (6) and Animist's Awakening (4)
+#                          already use here, and the reason its number is an
+#                          approximation rather than a floor or a ceiling: a
+#                          real pilot scales X to the mana available, which is
+#                          a lot in this deck. Searching the GRAVEYARD as well
+#                          as the library IS modelled; the X>=10 team pump is
+#                          not.
+#   War Room               FULL, and one of the very few cards in this project
+#                          whose life payment is actually charged -- one life
+#                          per draw, mono-green, and `your_life` is read at
+#                          end of turn. Competes with itself for the tap: a
+#                          War Room that draws produces no mana that turn.
+#   Castle Garenbrig       FULL. Enters untapped only if you control a Forest,
+#                          checked as the card says; the six {G} is a
+#                          restricted pool that only creature spells may spend,
+#                          which is why it is not simply +2 mana.
+#
+# Priorities are on this deck's own scale: commander 10, Sol Ring 10, Lotus
+# Cobra 9, Craterhoof 9, Greenwarden 8.5, Courser 8, Avenger 8.5.
+# ---------------------------------------------------------------------------
+
+RETURN_OF_THE_WILDSPEAKER = C(
+    "Return of the Wildspeaker", "Instant", {"gen": 4, "G": 1},
+    priority=6.5, threat=0.0, script="return_wildspeaker")
+
+# {X}{G}{G} modelled at X=6: cost {6}{G}{G}, tutoring a creature of mana value
+# 6 or less. x_pips carries the X so audit_cards.py can reconcile the cost with
+# Scryfall's cmc 2 (which is X=0), the same way Genesis Wave and Chord do.
+FINALE_OF_DEVASTATION = C(
+    "Finale of Devastation", "Sorcery", {"gen": 6, "G": 2},
+    priority=7.5, threat=6.0, script="finale", x_pips=6)
+
+# {7}{G}{G} PRINTED, and essentially never paid: "this spell costs {X} less to
+# cast, where X is the greatest power among creatures you control". The cost
+# here is the printed one and azusa.cost_of() applies the reduction, which is
+# also how engine.py models it for the Rendmaw list. mana=(2, "G") is the
+# "{T}: Add {G}{G}" half -- NOT modelled in rendmaw_v12, modelled here.
+THE_GREAT_HENGE = C(
+    "The Great Henge", "Artifact", {"gen": 7, "G": 2},
+    priority=8.0, threat=7.0, tags=("Legendary",), mana=(2, "G"))
+
+# {6}{G}{G} PRINTED, with Affinity for Forests. azusa.cost_of() subtracts the
+# Forests you control, so in this list it is routinely a {G}{G} to {3}{G}{G}
+# enchantment rather than an eight-drop.
+SAPLING_NURSERY = C(
+    "Sapling Nursery", "Enchantment", {"gen": 6, "G": 2},
+    priority=8.0, threat=7.5)
+
+NISSA_WHO_SHAKES_THE_WORLD = C(
+    "Nissa, Who Shakes the World", "Planeswalker", {"gen": 3, "G": 2},
+    priority=8.5, threat=8.0, tags=("Legendary",))
+
+# "{3}, {T}, Pay life equal to the number of colors in your commanders' color
+# identity: Draw a card." Mono-green, so one life.
+WAR_ROOM = L("War Room", "C")
+
+# "This land enters tapped unless you control a Forest" -- tapped=False here
+# and the condition applied in azusa.land_step(), which is why audit_cards.py
+# passes it (its `unless` rule) rather than flagging it.
+CASTLE_GARENBRIG = L("Castle Garenbrig", "G")
+
+BATCH3_CANDIDATES = (RETURN_OF_THE_WILDSPEAKER, FINALE_OF_DEVASTATION,
+                     THE_GREAT_HENGE, SAPLING_NURSERY,
+                     NISSA_WHO_SHAKES_THE_WORLD, WAR_ROOM, CASTLE_GARENBRIG)

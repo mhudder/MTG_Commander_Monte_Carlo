@@ -1,0 +1,47 @@
+AZUSA batch 3 -- mechanism counters, 4,000 paired games, 20 turns
+victim slot: Sylvan Library   (land candidates are measured against a Forest)
+
+  Return of the Wildspeaker  (MV 5)
+      resolves in  28.2% of games, first on turn 9.2
+      wildspeaker_asked          0.00 ->      8.47      +8.47   (when it resolves:   +29.99)
+      wildspeaker_draws          0.00 ->      2.21      +2.21   (when it resolves:    +7.81)
+      wildspeaker_pumps          0.00 ->      0.03      +0.03   (when it resolves:    +0.10)
+      cards_drawn               20.96 ->     23.26      +2.31   (when it resolves:    +8.19)
+
+  Finale of Devastation  (MV 8)
+      resolves in  25.1% of games, first on turn 9.8, answered 1.9%
+      finale_from_yard           0.00 ->      0.09      +0.09   (when it resolves:    +0.35)
+      final_board_power      17413.98 ->  19660.03   +2246.05   (when it resolves: +8959.27)
+      mana_spent               197.99 ->    198.79      +0.81   (when it resolves:    +3.33)
+
+  The Great Henge  (MV 9)
+      resolves in  28.1% of games, first on turn 9.3, answered 7.5%
+      henge_draws                0.00 ->      2.15      +2.15   (when it resolves:    +7.65)
+      henge_life                 0.00 ->      0.41      +0.41   (when it resolves:    +1.46)
+      cards_drawn               21.04 ->     23.06      +2.02   (when it resolves:    +7.22)
+
+  Sapling Nursery  (MV 8)
+      resolves in  29.4% of games, first on turn 8.5, answered 10.8%
+      tokens_made              102.62 ->     99.63      -2.99   (when it resolves:   -11.55)
+      landfall_triggers         21.66 ->     21.42      -0.24   (when it resolves:    -0.87)
+      final_board_power      17413.98 ->  18104.01    +690.03   (when it resolves: +2449.56)
+
+  Nissa, Who Shakes the World  (MV 5)
+      resolves in  28.0% of games, first on turn 8.4, answered 7.8%
+      pw_activations             1.05 ->      2.07      +1.02   (when it resolves:    +3.49)
+      pw_ultimates               0.09 ->      0.21      +0.12   (when it resolves:    +0.41)
+      mana_spent               196.76 ->    201.93      +5.18   (when it resolves:   +19.95)
+      landfall_triggers         21.62 ->     22.68      +1.06   (when it resolves:    +3.59)
+
+  War Room  (MV 0)
+      resolves in  28.3% of games, first on turn 6.3
+      war_room_draws             0.00 ->      0.29      +0.29   (when it resolves:    +0.91)
+      cards_drawn               21.47 ->     21.73      +0.27   (when it resolves:    +1.10)
+      final_life                19.70 ->     19.26      -0.43   (when it resolves:    +0.74)
+
+  Castle Garenbrig  (MV 0)
+      resolves in  28.3% of games, first on turn 6.3
+      castle_activations         0.00 ->      0.24      +0.24   (when it resolves:    +0.81)
+      castle_mana_spent          0.00 ->      1.08      +1.08   (when it resolves:    +3.72)
+      mana_spent               200.68 ->    196.65      -4.03   (when it resolves:    -9.68)
+

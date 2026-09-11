@@ -16,8 +16,27 @@ Usage:
     deck, commander = build_pending("rendmaw", apply_pending=False)  # original
     ledger()                                       # print the diff
 
-To stage another change, append to CHANGES. To commit, update the spreadsheet
-and the deck module, then move the entry to COMMITTED.
+THE THREE STATES, which HANDOFF.md has always described and this module only
+had structures for two of:
+
+    MEASURED   a number and a confidence interval exist. NO decision. Names no
+               cut. `MEASURED: list[Candidate]`, added 2026-09-10 -- before
+               that this state lived in comments and in `results/` files that
+               nothing reads, which is the state most easily lost, because a
+               number with no decision attached looks like one somebody forgot
+               to act on.
+    STAGED     decided, with a cut named, and applied to this ledger only.
+               `CHANGES: list[Change]`. `build_pending` applies these.
+    COMMITTED  applied to all three legs -- deck module, .xlsx, this ledger --
+               in ONE git commit. `COMMITTED: list[Change]`. Azusa has no
+               .xlsx and is two legs.
+
+Measured does NOT become staged by being good. It becomes staged by a
+head-to-head against a specific cut, because everything in MEASURED shares a
+baseline and a common baseline cannot rank two cards against each other (§0c).
+
+To stage a change, append to CHANGES. To commit, update the spreadsheet and
+the deck module, then move the entry to COMMITTED.
 """
 
 from __future__ import annotations
@@ -39,6 +58,33 @@ class Change:
     evidence: str = ""
     notes: str = ""
     reverified: str = ""        # re-measured after an engine change
+
+
+@dataclass
+class Candidate:
+    """A card that has been MEASURED and NOT decided on.
+
+    HANDOFF.md has always described three states -- measured, staged,
+    committed -- and this module only had structures for the last two, so the
+    first one lived in comments and in `results/` files that nothing reads.
+    That is the state most likely to be lost: a number with nobody's decision
+    attached to it looks exactly like a number somebody forgot to act on.
+
+    A Candidate is deliberately WEAKER than a Change. It names no cut, because
+    choosing one is the decision this state has not taken; `ablation.py` scores
+    the cut side and `candidates.py` scores the add side, and pairing them is a
+    head-to-head run, not an inference (§0c). Promoting one means writing a
+    Change with a `remove`, and that needs its own evidence.
+    """
+    deck: str
+    card: str
+    measured: str               # date measured
+    win_rate: str               # the number, WITH its bar and its horizon
+    signal: str                 # both / dmg / win / --
+    rationale: str
+    evidence: str = ""
+    limits: str = ""            # floors, ceilings and modelling caveats
+    verdict: str = ""           # what the number supports, and what it does not
 
 
 # ---------------------------------------------------------------------------
@@ -520,6 +566,236 @@ COMMITTED: list[Change] = [
 ]
 
 # ---------------------------------------------------------------------------
+# Measured — a number exists, NO decision has been taken
+# ---------------------------------------------------------------------------
+# Nothing in this list is staged, and nothing in it names a cut. Read a row as
+# "this card was measured at this value in this slot", never as "this card is
+# going in". Promotion to CHANGES needs a head-to-head against a specific cut,
+# because everything here shares one baseline and therefore cannot be ranked
+# against anything else measured the same way (§0c).
+# ---------------------------------------------------------------------------
+MEASURED: list[Candidate] = [
+    Candidate(
+        deck="azusa",
+        card="The Great Henge",
+        measured="2026-09-10",
+        win_rate="+0.0217 +-0.0034 at T20 (damage +1.85 +-0.21)",
+        signal="both",
+        rationale=(
+            "THE COST REDUCTION IS THE CARD. {7}{G}{G} minus the greatest "
+            "power you control, which in this list is routinely 5-10 and is "
+            "the land count whenever Ashaya or Greensleeves is out -- so it "
+            "resolves in 28.1% of games on turn 9.3, the rate of a four-drop "
+            "rather than a nine-drop. What it then does is draw: 7.65 cards "
+            "per resolution off 'whenever a nontoken creature you control "
+            "enters', plus 1.46 life from tapping it at end of turn."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, value over a replacement-level slot in the "
+            "Sylvan Library slot. tools/candidates.py azusa3; "
+            "results/candidates_azusa_batch3_T20.txt. Mechanisms in "
+            "results/azusa_batch3_mechanisms.txt. §0z4."
+        ),
+        limits=(
+            "The ETB is hooked in make_permanent rather than resolve, so it "
+            "fires for TUTORED creatures too, which is correct and is queued "
+            "item 16 from the other side. Answered by the pod 7.5% of the time."
+        ),
+        verdict=(
+            "Clears the realistic cut bar (Titania +0.0015, Yavimaya Elder "
+            "+0.0027, Life from the Loam +0.0045) comfortably. It is INSIDE "
+            "the bars of Nissa, Wildspeaker and Sapling Nursery, so it is a "
+            "member of a set of four and not the best of them."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Nissa, Who Shakes the World",
+        measured="2026-09-10",
+        win_rate="+0.0215 +-0.0036 at T20 (damage +2.40 +-0.25, highest of the seven)",
+        signal="both",
+        rationale=(
+            "A MANA CARD THAT PASSES, and the exception that proves the "
+            "batch's rule. The static doubler is worth +19.95 mana spent per "
+            "resolution across 21 Forests, and what the deck converts that "
+            "into is LANDFALL: +3.59 triggers a resolution, plus an ultimate "
+            "that fires in 41% of the games she resolves in and puts every "
+            "Forest left in the library onto the battlefield at once."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "Needed a change to the SHARED engine.spend -- one Forest covers "
+            "two units, the Crypt Ghast branch already there -- because a "
+            "doubler implemented only in the mana pool taps two Forests to "
+            "make the two mana one of them made. check_unchanged_decks.py "
+            "reports all six decks bit-identical. Her emblem cannot matter "
+            "(nothing in this pod kills lands) and the +1's vigilance is "
+            "inert in an engine that never blocks; both are floors, both tiny."
+        ),
+        verdict=(
+            "Same set as The Great Henge. Note she is NOT a land-drop card: "
+            "lands_played goes DOWN 0.16. She is mana and landfall."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Return of the Wildspeaker",
+        measured="2026-09-10",
+        win_rate="+0.0197 +-0.0033 at T20 (damage +1.83 +-0.20)",
+        signal="both",
+        rationale=(
+            "Instant-speed draw in the deck whose one measured weakness is "
+            "cards. The DRAW mode is chosen essentially always -- 0.10 pumps "
+            "per resolution -- because the pump only wins when it kills "
+            "somebody the raw attack would not."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "ITS NUMBER IS A CEILING AND THIS IS THE ONE TO READ BEFORE "
+            "ACTING ON IT. The card ASKS FOR 30.0 CARDS a resolution and "
+            "RECEIVES 7.8, because the greatest power among non-Human "
+            "creatures on a Craterhoof-pumped Scute Swarm board runs into the "
+            "hundreds -- and `draw()` stops at an empty library while NOTHING "
+            "IN THIS PROJECT LOSES TO DECKING. Median ask 9, mean 40, 9% of "
+            "resolutions ask for 50+. At a table those are the games you win "
+            "on the spot or lose on the next draw step; here the tail is "
+            "free. Queued item 17. Also a floor in the other direction: it is "
+            "an INSTANT and this engine casts it at sorcery speed."
+        ),
+        verdict=(
+            "Good on the median case -- nine cards for five mana is good on "
+            "its own -- and the measured figure is not the median case. If "
+            "one of the four is to be discounted, it is this one."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Sapling Nursery",
+        measured="2026-09-10",
+        win_rate="+0.0170 +-0.0034 at T20 (damage +2.14 +-0.23)",
+        signal="both",
+        rationale=(
+            "Affinity for Forests makes an eight-drop a {G}{G} to {3}{G}{G} "
+            "enchantment in a list with 21 Forests, and landfall then makes a "
+            "3/4 reach Treefolk per land -- the Rampaging Baloths shape, "
+            "doubled by Ancient Greenwarden."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "IT MAKES THE DECK'S BEST CARD WORSE, which no leave-one-out "
+            "table can see. landfall_triggers -0.87 and tokens_made -11.55 "
+            "per resolution -- its own Treefolk are counted in that, so Scute "
+            "Swarm is making ~14 fewer Insects. The mechanism is sequencing: "
+            "even reduced, the Nursery costs mana and a turn, and against an "
+            "exponential payoff a small delay compounds. FLOOR: the {1}{G} "
+            "exile-for-indestructible is not modelled and is real protection "
+            "against a pod that wipes."
+        ),
+        verdict=(
+            "Still worth its slot on the objective. Worth knowing that the "
+            "cost is paid by Scute Swarm rather than by the slot it takes."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Finale of Devastation",
+        measured="2026-09-10",
+        win_rate="+0.0073 +-0.0025 at T20 (damage +0.76 +-0.14)",
+        signal="both",
+        rationale=(
+            "A creature tutor straight to the battlefield, from the library "
+            "AND the graveyard -- and 35% of its targets do come from the "
+            "yard, which is the real difference from Green Sun's Zenith."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "X IS FIXED AT 6, the convention Genesis Wave (6) and Animist's "
+            "Awakening (4) already use, so this is an APPROXIMATION rather "
+            "than a floor or a ceiling: a real pilot scales X to the mana, "
+            "and this deck has a lot of it. The X>=10 team pump is not "
+            "modelled at all."
+        ),
+        verdict=(
+            "The likeliest reason it scores here is REDUNDANCY, not weakness: "
+            "Green Sun's Zenith (+0.0166), Woodland Bellower (+0.0119) and "
+            "Chord of Calling (+0.0097) already tutor creatures, and a fourth "
+            "finds what the first three did. Same shape as Ka-Zar being a "
+            "fourth top-of-library enabler. Clears the cut bar, but only "
+            "against the weakest rows, and the fixed X is load-bearing."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="War Room",
+        measured="2026-09-10",
+        win_rate="+0.0052 +-0.0031 at T20 (damage +0.51 +-0.18)",
+        signal="both",
+        rationale=(
+            "A colourless land that draws, repeatably, for {3} and a tap and "
+            "one life -- mono-green, so the life cost is one. 0.91 draws a "
+            "game. Measured against a FOREST, which is the slot it takes."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "Its life payment is REAL and charged, which makes it one of the "
+            "few life costs in this project that is not free (§0i) -- and "
+            "final_life still goes UP +0.74, because the cards end games "
+            "sooner than the life costs. A 14th colourless-only land in a "
+            "deck with {G}{G} costs is a real cost and the engine does model "
+            "it."
+        ),
+        verdict=(
+            "DIRECTLY COMPARABLE to the §0z3 sac-lands, which were measured "
+            "in the same Forest slot: Scene of the Crime +0.0096 (committed), "
+            "Horizon of Progress +0.0081, Cryptic Caves +0.0068, War Room "
+            "+0.0052, The Hunter Maze +0.0039. It is repeatable where they "
+            "are one-shot and it still lands fourth, for §0z3's reason -- "
+            "{3} AND a tap is the dearest activation of the five, so it fires "
+            "least. The tap is the binding constraint."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Castle Garenbrig",
+        measured="2026-09-10",
+        win_rate="-0.0029 +-0.0032 at T20 (damage +0.03 +-0.19)",
+        signal="--",
+        rationale=(
+            "'{2}{G}{G}, {T}: Add six {G}' -- six, not the four it is usually "
+            "remembered as -- spendable only on creature spells."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z4."
+        ),
+        limits=(
+            "FULLY MODELLED, including the restricted pool and the "
+            "enters-tapped-unless-you-control-a-Forest condition. This is not "
+            "an unmeasured card."
+        ),
+        verdict=(
+            "THE ONLY ROW OF THE SEVEN INSIDE ITS OWN BAR, and the mechanism "
+            "says why rather than leaving it to noise: it activates 0.81 "
+            "times a game, spends 3.72 of the six {G} it makes, and "
+            "mana_spent goes DOWN 9.68 per resolution. This deck is "
+            "CARD-limited, not mana-limited -- 2.77 land drops granted a turn "
+            "against 1.33 used -- so more mana buys nothing. Do not add it, "
+            "and note the number is a measurement rather than a blank: the "
+            "card works and the deck does not want it."
+        ),
+    ),
+]
+
+# ---------------------------------------------------------------------------
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
@@ -881,8 +1157,49 @@ DECKS = {
         "Ka-Zar of the Savage Land": azusa_v1.KA_ZAR,
         "Cryptic Caves": azusa_v1.CRYPTIC_CAVES,
         "Horizon of Progress": azusa_v1.HORIZON_OF_PROGRESS,
-        "The Hunter Maze": azusa_v1.THE_HUNTER_MAZE}),
+        "The Hunter Maze": azusa_v1.THE_HUNTER_MAZE,
+        # 2026-09-10 third batch (§0z4). MEASURED, NOT STAGED -- they are here
+        # so that a Change naming one can be written the day somebody decides
+        # to, and being in this catalog is not a decision: the four cards
+        # above it that lost their comparisons are still here too.
+        "Return of the Wildspeaker": azusa_v1.RETURN_OF_THE_WILDSPEAKER,
+        "Finale of Devastation": azusa_v1.FINALE_OF_DEVASTATION,
+        "The Great Henge": azusa_v1.THE_GREAT_HENGE,
+        "Sapling Nursery": azusa_v1.SAPLING_NURSERY,
+        "Nissa, Who Shakes the World": azusa_v1.NISSA_WHO_SHAKES_THE_WORLD,
+        "War Room": azusa_v1.WAR_ROOM,
+        "Castle Garenbrig": azusa_v1.CASTLE_GARENBRIG}),
 }
+
+
+def check_measured_are_promotable():
+    """Every MEASURED card must be in its deck's catalog, and must NOT already
+    be in the deck.
+
+    Both halves are the §0q rule applied to this file. A Candidate naming a
+    card the catalog does not hold cannot be promoted to a Change without an
+    edit nobody will remember is needed -- the row would sit here looking
+    actionable and fail the moment it was acted on. And a Candidate naming a
+    card that has since been COMMITTED is the §0o failure in the ledger rather
+    than in the harness: a measured row for a card already in the list reads
+    as an available add and is not one.
+    """
+    for c in MEASURED:
+        module, catalog = DECKS[c.deck]
+        if c.card not in catalog:
+            raise AssertionError(
+                f"edhmc/pending.py: {c.card!r} is MEASURED for {c.deck} but is "
+                f"not in DECKS[{c.deck!r}]'s catalog, so no Change could name "
+                f"it. Add the Card to the catalog.")
+        deck, _ = module.build()
+        if any(card.name == c.card for card in deck):
+            raise AssertionError(
+                f"edhmc/pending.py: {c.card!r} is MEASURED for {c.deck} but is "
+                f"ALREADY IN the list, so the row describes an addition that "
+                f"cannot happen. Move it out of MEASURED -- it is committed.")
+
+
+check_measured_are_promotable()
 
 
 def pending_for(deck_name: str) -> list[Change]:
@@ -958,6 +1275,34 @@ def ledger(verbose: bool = True) -> None:
                     print(f"    note   {c.notes}")
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
+    if MEASURED:
+        # PRINTED UNDER ITS OWN HEADING AND BELOW THE STAGED ONES, because the
+        # single most useful thing this section can do is not be mistaken for
+        # the section above it. A measured card is a number; a staged card is
+        # a decision.
+        print("\n" + "=" * 78)
+        print("MEASURED — a number exists, NOTHING HAS BEEN DECIDED")
+        print("=" * 78)
+        print("  Not staged. No cut named. Promoting one of these needs a "
+              "head-to-head\n  against a specific cut: everything here shares "
+              "one baseline, so these\n  rows cannot be ranked against each "
+              "other or against anything else (§0c).")
+        for deck_name in sorted({c.deck for c in MEASURED}):
+            rows = [c for c in MEASURED if c.deck == deck_name]
+            print(f"\n{deck_name.upper()}  ({len(rows)} measured, 0 staged "
+                  f"from this batch)")
+            for c in rows:
+                print(f"  ?  {c.card}")
+                print(f"     win    {c.win_rate}   signal {c.signal}")
+                print(f"     measured {c.measured}")
+                if verbose:
+                    print(f"     why    {c.rationale}")
+                    print(f"     data   {c.evidence}")
+                    if c.limits:
+                        print(f"     limits {c.limits}")
+                    if c.verdict:
+                        print(f"     read   {c.verdict}")
+
     if COMMITTED:
         # Azusa has NO .xlsx, so for that deck "committed" is two legs -- the
         # module and this ledger -- and the module alone is the system of

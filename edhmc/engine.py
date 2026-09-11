@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from typing import Callable, Optional
 
 from edhmc import opponents as OPP
-from edhmc.decks._evasion import FLYING_TOKENS
+from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -290,16 +290,163 @@ STACK_ONLY_CREATURES = {
 # Mana
 # ----------------------------------------------------------------------------
 
-def can_pay(cost: dict, units: list[frozenset]) -> Optional[list[int]]:
+class ManaUnits(list):
+    """A mana pool that remembers where each unit came from.
+
+    A plain `list[frozenset]` is what every engine has passed around since the
+    beginning, and it forgets the two things a correct payment needs: WHICH
+    permanent produced each unit, and how much we would rather not tap it. So
+    `can_pay` chose a colour-correct assignment and `spend` -- handed those
+    exact indices -- used only their count. §0z8.
+
+    Subclassing `list` rather than changing the signature of `available_mana`
+    is what keeps all six engines' `units = available_mana(g)` call sites
+    working untouched, and it degrades safely: `units + [something]` yields a
+    pool whose extra entries have NO owner, which is exactly what a Treasure
+    or Castle Garenbrig's restricted mana is -- the caller taps those itself.
+    """
+    __slots__ = ("owners", "weights", "legacy", "surplus")
+
+    def __init__(self, units=(), owners=None, weights=None, legacy=False,
+                 surplus=True):
+        super().__init__(units)
+        self.owners = list(owners) if owners is not None else [None] * len(self)
+        self.weights = (list(weights) if weights is not None
+                        else [(9, 0, 0)] * len(self))
+        # `mana_colour_legacy` has to switch BOTH halves or it is not the old
+        # behaviour: the scarcity rule in can_pay and the owner tapping in
+        # spend. can_pay has no game to read a cfg from, so the flag rides on
+        # the pool.
+        self.legacy = legacy
+        # False = honour the assignment but leave the CHOICE of
+        # assignment exactly as it was. See §0z8.
+        self.surplus = surplus
+
+    # An appended unit is OWNERLESS -- nothing on the battlefield taps for a
+    # Treasure or for Castle Garenbrig's restricted pool, the caller handles
+    # those itself -- and carries the highest reluctance, so a tie is broken
+    # toward spending REAL mana first. That is what every caller wants: a
+    # Treasure is one-shot and a land is not.
+    FOREIGN = (9, 0, 0)
+
+    def __add__(self, other):
+        return ManaUnits(list(self) + list(other),
+                         self.owners + [None] * len(other),
+                         self.weights + [self.FOREIGN] * len(other),
+                         self.legacy, self.surplus)
+
+    # THE PARALLEL LISTS MUST SURVIVE IN-PLACE MUTATION. `lorehold.main_phase`
+    # does `units.extend(...)` to add its Treasures, which on a plain list is
+    # unremarkable and here would leave `weights` shorter than `self` -- an
+    # IndexError inside can_pay, and it fired the first time this ran. Every
+    # mutator that can grow the pool pads the other two.
+    def append(self, unit):
+        super().append(unit)
+        self.owners.append(None)
+        self.weights.append(self.FOREIGN)
+
+    def extend(self, units):
+        for u in units:
+            self.append(u)
+
+    def __iadd__(self, other):
+        self.extend(other)
+        return self
+
+    def insert(self, i, unit):
+        super().insert(i, unit)
+        self.owners.insert(i, None)
+        self.weights.insert(i, self.FOREIGN)
+
+    # ... and every mutator that can SHRINK it, for the same reason.
+    # `engine.activations` pops consumed units out of the pool so its
+    # Skullclamp loop cannot spend the same mana twice; a pop that moved only
+    # `self` would leave every later index pointing at the wrong owner, which
+    # is silent rather than loud.
+    def pop(self, i=-1):
+        self.owners.pop(i)
+        self.weights.pop(i)
+        return super().pop(i)
+
+    def __delitem__(self, i):
+        super().__delitem__(i)
+        del self.owners[i]
+        del self.weights[i]
+
+    def remove(self, unit):
+        self.__delitem__(super().index(unit))
+
+    def clear(self):
+        super().clear()
+        self.owners.clear()
+        self.weights.clear()
+
+
+def can_pay(cost: dict, units: list[frozenset],
+            weights: Optional[list] = None) -> Optional[list[int]]:
     """Greedy-with-fallback payment solver.
 
     `units` is a list of colour-sets, one entry per available mana. Returns the
     indices consumed, or None. Coloured pips are assigned before generic, and
-    within a pip the most *constrained* source is spent first, which is optimal
-    for the small, low-conflict pools a two-colour deck produces.
+    within a pip the most *constrained* source is spent first.
+
+    SCARCITY, added 2026-09-11 (§0z8). Paying generic used to take "the least
+    flexible leftovers", which is right about DUALS -- keep the flexible
+    sources -- and blind about SCARCITY, because a Plains and an Island are
+    both one colour and the tie therefore broke on board order. With one
+    Plains and two Islands, paying {2} spent the Plains, and a white card in
+    hand became uncastable for no reason anyone chose. Generic is now paid
+    from the MOST PLENTIFUL colour first: for each candidate, score its rarest
+    colour by how many remaining units can still produce it, and spend the
+    highest score first. No lookahead into the hand is needed -- "do not spend
+    your last white source on a generic cost" is right whatever you hold.
+
+    `weights` is an optional per-unit "reluctance to spend", used ONLY to
+    break ties that colour and scarcity leave open. It is what preserves
+    `spend`'s long-standing tap order -- lands before mana rocks before mana
+    creatures, so a dork can still attack -- now that the assignment made here
+    is the one actually tapped. Without it, honouring the assignment would
+    silently discard that policy. `available_mana` supplies it.
     """
     remaining = list(range(len(units)))
     used: list[int] = []
+    legacy = getattr(units, "legacy", False)
+    if weights is None and not legacy:
+        weights = getattr(units, "weights", None)
+    # Tolerant of a short list as well as of none at all: a caller that built
+    # its own pool gets the neutral weight rather than an IndexError, so a
+    # missing weight degrades to the old tie-break instead of a crash.
+    if weights:
+        def w(i):
+            return weights[i] if i < len(weights) else ManaUnits.FOREIGN
+    else:
+        def w(i):
+            return 0
+
+    # A SECOND UNIT FROM AN ALREADY-TAPPED PERMANENT IS FREE, and forgetting
+    # that was the one real regression this change introduced. Crypt Ghast
+    # makes a Swamp produce two units; Sol Ring, the bounce lands and Temple
+    # of the False God do the same. The old count-based `spend` PACKED them
+    # implicitly -- it decremented by the source's full amount, so one tap
+    # covered two -- and honouring an assignment that had spread its picks
+    # across two Swamps taps both and wastes a unit of each. Measured on
+    # Karlov (the Crypt Ghast deck) at -1.69 mana a game before this.
+    #
+    # So selection is iterative rather than a single sort: a candidate whose
+    # owner is ALREADY being tapped costs nothing extra and is taken first.
+    owners = getattr(units, "owners", None)
+    used_owners: set = set()
+
+    def owner_free(i):
+        if owners is None or i >= len(owners) or owners[i] is None:
+            return 1
+        return 0 if id(owners[i]) in used_owners else 1
+
+    def take(i):
+        remaining.remove(i)
+        used.append(i)
+        if owners is not None and i < len(owners) and owners[i] is not None:
+            used_owners.add(id(owners[i]))
 
     for color in ("W", "U", "B", "R", "G", "C"):
         need = cost.get(color, 0)
@@ -307,17 +454,51 @@ def can_pay(cost: dict, units: list[frozenset]) -> Optional[list[int]]:
             cands = [i for i in remaining if color in units[i]]
             if not cands:
                 return None
-            # spend the least flexible source that works
-            best = min(cands, key=lambda i: len(units[i]))
-            remaining.remove(best)
-            used.append(best)
+            # free mana first, then the least flexible source that works,
+            # then the cheapest one to lose among those
+            take(min(cands, key=lambda i: (owner_free(i), len(units[i]), w(i))))
 
     gen = cost.get("gen", 0)
     if gen > len(remaining):
         return None
-    # pay generic with the least flexible leftovers
-    remaining.sort(key=lambda i: len(units[i]))
-    used.extend(remaining[:gen])
+
+    if legacy:
+        # The pre-2026-09-11 generic rule: least flexible leftovers.
+        remaining.sort(key=lambda i: len(units[i]))
+        used.extend(remaining[:gen])
+        return used
+
+    if not getattr(units, "surplus", True):
+        # Assignment-only mode: the old CHOICE, but still packed by owner so
+        # a multi-unit source is not half-wasted.
+        for _ in range(gen):
+            best = min(remaining, key=lambda i: (owner_free(i), len(units[i])))
+            take(best)
+        return used
+
+    # SURPLUS, NOT SCARCITY, and the difference was measured rather than
+    # reasoned. Ranking by scarcity alone -- "spend the colour you have most
+    # of" -- preserves the RAREST colour, which is wrong whenever the rare
+    # colour is not the one the deck needs: on a Karlov list skewed toward
+    # Swamps it hoarded the odd Plains and burned the black sources its own
+    # {B}{B} costs wanted, and cost 0.0118 win rate at six lands skewed.
+    #
+    # What matters is supply RELATIVE TO DEMAND. `weights` carries, per unit,
+    # how many coloured pips the cards in hand still want of its colours, so
+    # surplus is supply minus that. Spend the biggest surplus first.
+    supply: dict = {}
+    for i in remaining:
+        for c in units[i]:
+            supply[c] = supply.get(c, 0) + 1
+
+    def generic_key(i):
+        wi = w(i)
+        want = wi[1] if isinstance(wi, tuple) and len(wi) > 1 else 0
+        surplus = min((supply[c] for c in units[i]), default=0) - want
+        return (owner_free(i), -surplus, len(units[i]), wi)
+
+    for _ in range(gen):
+        take(min(remaining, key=generic_key))
     return used
 
 
@@ -586,11 +767,81 @@ class Game:
 # Turn loop
 # ----------------------------------------------------------------------------
 
+def tap_reluctance(g: Game, p: Permanent) -> tuple:
+    """How much we would rather NOT tap this permanent for mana.
+
+    The order `spend` has always used, lifted out so `can_pay` can break ties
+    with it: a real pilot taps lands and non-creature rocks before dorks,
+    because a creature tapped for mana in the precombat main phase cannot
+    attack. Lands first, then rocks, then mana creatures (biggest last), then
+    Enduring Vitality fodder.
+    """
+    c = p.card
+    if c.is_land or c.name == "Everywhere token":
+        return (0, 0)
+    if c.mana_ability and not c.is_creature:
+        return (1, 0)
+    if c.mana_ability and c.is_creature:
+        return (2, g.power_of(p))
+    return (3, g.power_of(p))
+
+
+def hand_colour_demand(g: Game) -> dict:
+    """How many coloured pips of each colour the cards in hand still want.
+
+    SCARCITY ALONE CANNOT BREAK A REAL TIE. With one Plains and two Mountains,
+    paying {1}{R} spends a Mountain on the pip and then has to choose between
+    the Plains and the last Mountain for the generic -- one unit of each, so
+    the scarcity rule sees a tie and the choice falls back to board order. The
+    tiebreak that exists in the real game is the HAND: if you are holding a
+    white card, the Plains is the one to keep.
+
+    Cheap, and available exactly where it is needed -- `available_mana` has
+    the game, and the weights it builds are already plumbed through to
+    `can_pay`. Lands in hand are skipped (they have no coloured pips) and so
+    is the commander, which is not in hand.
+    """
+    demand: dict = {}
+    for c in getattr(g, "hand", ()):
+        if c.is_land:
+            continue
+        for color in ("W", "U", "B", "R", "G", "C"):
+            n = c.cost.get(color, 0)
+            if n:
+                demand[color] = demand.get(color, 0) + n
+    return demand
+
+
 def available_mana(g: Game) -> list[frozenset]:
-    """Enumerate one entry per point of mana available this turn."""
+    """Enumerate one entry per point of mana available this turn.
+
+    RETURNS A `ManaUnits`, which also carries WHICH PERMANENT PRODUCED EACH
+    UNIT and how reluctant we are to tap it. Before 2026-09-11 that mapping
+    was thrown away the moment this returned, so `can_pay` proved a
+    colour-correct payment and `spend` then tapped a different set of
+    permanents chosen by board order -- the engine made a payment it had not
+    proved. See §0z8.
+
+    It is still a `list[frozenset]` to every caller, so all six engines'
+    existing `units = available_mana(g)` sites are untouched.
+    """
     units: list[frozenset] = []
+    owners: list = []
+    weights: list = []
     any_color = frozenset({"B", "G", "C"})
     all_lands_any = g.has("Dryad of the Ilysian Grove")
+    demand = hand_colour_demand(g)
+
+    def add(src, n, owner):
+        # (tap order, how badly the hand wants this source's colours, power).
+        # Tap order stays PRIMARY -- a land is still spent before a mana
+        # creature -- and the hand's demand breaks ties inside a tier, so the
+        # last source of a colour something in hand needs is spent last.
+        rank, power = tap_reluctance(g, owner)
+        want = max((demand.get(c, 0) for c in src), default=0)
+        units.extend([src] * n)
+        owners.extend([owner] * n)
+        weights.extend([(rank, want, power)] * n)
 
     for p in g.board:
         if p.tapped:
@@ -599,7 +850,7 @@ def available_mana(g: Game) -> list[frozenset]:
         if c.is_land:
             src = any_color if all_lands_any else c.produces
             amt = 2 if "bounce" in c.tags else 1
-            units.extend([src] * amt)
+            add(src, amt, p)
             # Crypt Ghast: "Whenever you tap a SWAMP for mana, add an
             # additional {B}." Swamp is a land subtype the Card model does not
             # carry, so the lands that actually have it are tagged "swamp" in
@@ -607,22 +858,25 @@ def available_mana(g: Game) -> list[frozenset]:
             # Shrine, and NOT Tainted Field, Caves of Koilos, Fetid Heath or
             # the rest, which only produce black.
             if "swamp" in c.tags and g.has("Crypt Ghast"):
-                units.append(frozenset({"B"}))
+                add(frozenset({"B"}), 1, p)
         elif c.mana_ability:
             if c.is_creature and p.sick:
                 continue
             amt, colors = c.mana_ability
-            units.extend([colors] * amt)
+            add(colors, amt, p)
         elif c.name == "Everywhere token":
-            units.append(any_color)
+            add(any_color, 1, p)
 
     # Enduring Vitality: creatures tap for mana of any colour
     if g.has("Enduring Vitality"):
         for p in g.board:
             if (is_battlefield_creature(g, p) and not p.tapped and not p.sick
                     and not p.card.mana_ability):
-                units.append(any_color)
-    return units
+                add(any_color, 1, p)
+
+    return ManaUnits(units, owners, weights,
+                     legacy=g.cfg.get("mana_colour_legacy", False),
+                     surplus=g.cfg.get("mana_surplus", True))
 
 
 def cost_after_reduction(g: Game, card: Card) -> dict:
@@ -796,25 +1050,41 @@ def main_phase(g: Game, precombat: bool = False):
 
 
 def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
-    """Mark sources tapped, cheapest-to-lose first.
+    """Tap the sources that `can_pay` actually assigned.
 
-    Tapping order matters: a creature tapped for mana in the precombat main
-    phase cannot attack. A real pilot taps lands and non-creature rocks before
-    dorks, and only taps the team via Enduring Vitality as a last resort. Order
-    by "combat value we give up".
+    IT USED TO TAP BY COUNT, and that was the bug §0z8 is about. `pay_idx`
+    names the exact units chosen -- colours and all -- and this function read
+    only `len(pay_idx)`, then tapped that many permanents cheapest-to-lose
+    first. So the engine PROVED one payment and MADE a different one, and
+    which land actually got tapped was decided by board order: with a Plains
+    listed before two Mountains, paying {2} tapped the Plains and a white card
+    in hand stopped being castable. Reversing the board order reversed the
+    answer.
+
+    Now the owners recorded by `available_mana` are tapped directly. The
+    long-standing tap ORDER is not lost -- it moved into `can_pay`, which
+    breaks colour-and-scarcity ties with `tap_reluctance` so that lands are
+    still assigned before rocks before mana creatures.
+
+    FALLS BACK to the old behaviour when the owner list does not match the
+    units it was handed -- a pool a caller built itself (azusa's Castle
+    Garenbrig, shilgengar's Treasures) is only partly ours, and guessing would
+    be worse than the rule this replaces.
     """
     n = len(pay_idx)
     g.m["mana_spent"] += n
 
+    owners = getattr(units, "owners", None)
+    if g.cfg.get("mana_colour_legacy", False):
+        owners = None           # the pre-2026-09-11 rule, for §0z8's harness
+    if owners is not None and len(owners) == len(units):
+        for i in pay_idx:
+            if i < len(owners) and owners[i] is not None:
+                owners[i].tapped = True
+        return
+
     def tap_cost(p: Permanent) -> tuple:
-        c = p.card
-        if c.is_land or c.name == "Everywhere token":
-            return (0, 0)
-        if c.mana_ability and not c.is_creature:
-            return (1, 0)
-        if c.mana_ability and c.is_creature:
-            return (2, g.power_of(p))
-        return (3, g.power_of(p))       # Enduring Vitality fodder
+        return tap_reluctance(g, p)
 
     sources = []
     for p in g.board:
@@ -836,6 +1106,23 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
         amt = 2 if "bounce" in c.tags else (c.mana_ability[0] if c.mana_ability else 1)
         if c.is_land and "swamp" in c.tags and g.has("Crypt Ghast"):
             amt += 1              # the Swamp really did produce two mana
+        # NISSA, WHO SHAKES THE WORLD, the Crypt Ghast rule for Forests
+        # (2026-09-10, azusa candidate batch 3). A mana DOUBLER has to be said
+        # in two places or it is not modelled at all: `azusa.available_mana`
+        # offers the extra {G} per untapped Forest, and this says that ONE
+        # Forest covers both units. Without it the pool is the right size and
+        # the tapping is not -- paying {2} would tap two Forests to produce the
+        # two mana one of them made, so the doubler would silently give the
+        # deck nothing but a longer list.
+        #
+        # Guarded on a card that is in no other list -- checked, not assumed,
+        # with tools/check_unchanged_decks.py -- so the other five engines
+        # cannot reach this branch. FOREST is the generated subtype set, so a
+        # Forest by any other name (Dryad Arbor, a shockland in another deck)
+        # is covered and a green nonbasic that is not a Forest is not.
+        if (c.is_land and c.name in _FOREST
+                and g.has("Nissa, Who Shakes the World")):
+            amt += 1
         p.tapped = True
         left -= amt
 
@@ -881,7 +1168,24 @@ def upkeep(g: Game):
     for p in list(g.board):
         s = p.card.script
         if s == "bitterblossom":
+            # "At the beginning of your upkeep, create a 1/1 black Faerie
+            # Rogue creature token with flying, AND YOU LOSE 1 LIFE."
+            #
+            # THE LIFE WAS FREE UNTIL 2026-09-10 (§0i, §0z7). Under pod v1 that
+            # was defensible -- your life total was inert and 100% of losses
+            # were an opponent's clock -- but pod v3 made life decide roughly a
+            # third of them, and this card pays every upkeep from the turn it
+            # lands, so it was the largest uncosted drawback in any list and
+            # its +0.0205 (Rendmaw's #5 card) was a ceiling.
+            #
+            # Charged here rather than tracked as a counter, because
+            # `opponents.incidental_damage` reads `your_life` at the end of
+            # every turn and is where the loss check lives.
             g.make_tokens(1, 1, 1, "Faerie")
+            if g.cfg.get("charge_life_costs", True):
+                g.your_life -= 1
+                g.m["life_lost_to_own_cards"] = \
+                    g.m.get("life_lost_to_own_cards", 0) + 1
         elif s == "ophiomancer":
             if not any(x.is_token and x.card.name.startswith("Snake") for x in g.board):
                 g.make_tokens(1, 1, 1, "Snake")

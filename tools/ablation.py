@@ -19,10 +19,17 @@ faithfully as a mana cost, a type line and a body, which is correct for a
 creature but blind for a removal spell: Swords to Plowshares kills nothing here,
 because the opponents' boards are abstracted to a blocker count.
 
-So the output is split into two groups. In the MODEL-EVALUATED group a low score
-is evidence about the card. In the MODEL-BLIND group a low score is evidence
-about the model, and says nothing at all about the card. Do not read the second
-table as a cut list.
+So the output is split into THREE groups (the third added 2026-09-10):
+
+  MODEL-EVALUATED  the engine implements the card. A low score is evidence
+                   about the card.
+  PARTLY MODELLED  the engine implements PART of the card, and the missing
+                   part can only add. A HIGH score is evidence; A LOW SCORE IS
+                   NOT. Each row prints the specific gap. Never cut on one --
+                   two swaps have already been withdrawn or refused on exactly
+                   this (§0z, §0z2).
+  MODEL-BLIND      the engine does not implement the card at all. A low score
+                   is evidence about the MODEL. Not a cut list.
 
 Usage:  python ablation.py [deck] [n_games] [turns]
 
@@ -53,6 +60,7 @@ the committed one to the last digit.
 import json
 import os
 import sys
+import textwrap
 import time
 from multiprocessing import Pool, cpu_count
 
@@ -148,12 +156,13 @@ SCRIPTED_LOREHOLD = {
     # is tagged as one in decks/_evasion.py; that was not true before
     # 2026-09-05, when tag_flying.py did not walk candidates.
     "Caldera Pyremaw",
-    # card flow
+    # card flow. Borrowed Knowledge and Apex of Power were here until
+    # 2026-09-10 and are now in PARTLY_MODELLED -- §0f found neither is
+    # implemented as its text, and this set is a claim that they are.
     "Thrill of Possibility", "Faithless Looting", "Big Score",
-    "Unexpected Windfall", "Borrowed Knowledge", "Reforge the Soul",
-    "Apex of Power",
-    # treasures / cost
-    "Storm-Kiln Artist", "Smothering Tithe", "Hit the Mother Lode",
+    "Unexpected Windfall", "Reforge the Soul",
+    # treasures / cost. Hit the Mother Lode likewise: see PARTLY_MODELLED.
+    "Storm-Kiln Artist", "Smothering Tithe",
     # damage / win conditions
     "Guttersnipe", "Longshot, Rebel Bowman", "Soulfire Eruption",
     "Boros Charm", "Olórin's Searing Light", "Emeria's Call",
@@ -290,15 +299,11 @@ SCRIPTED_SHILGENGAR = {
 # azusa_v1.py). Membership is a claim that edhmc.azusa implements the card's
 # text; X-spells are modelled at a fixed X (documented in azusa_v1.py).
 #
-# ASHAYA IS THE KNOWN EXCEPTION AND IT IS A REAL PROBLEM -- KNOWN_ISSUES §0z.
-# Only its */* clause is implemented; "nontoken creatures you control are
-# Forest lands" does not exist in the engine, so its row is NOT evidence about
-# the card and its Quirion Ranger interaction is invisible. It stays here
-# rather than moving to KNOWN_BLIND because its body is real and does attack,
-# which is the case for a PARTLY MODELLED category this project does not yet
-# have. Do not cut it on its ablation row.
+# ASHAYA AND BANE OF PROGRESS HAVE MOVED to PARTLY_MODELLED (2026-09-10),
+# which is the third category this comment used to say the project did not
+# have. Queued items 14 and 14b, KNOWN_ISSUES §0z and §0z2.
 #
-# (An earlier version of this comment said the gap was "called out at its
+# (An earlier version of this comment said Ashaya's gap was "called out at its
 # definition in edhmc/azusa.py". It was not, and never had been -- a pointer
 # to a note that does not exist is worse than no note, because it stops the
 # next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
@@ -315,7 +320,9 @@ SCRIPTED_AZUSA = {
     # tutors / ETB value
     "Craterhoof Behemoth", "Eternal Witness", "Woodland Bellower",
     "Nissa, Vastwood Seer // Nissa, Sage Animist", "Yavimaya Elder",
-    "Bane of Progress", "Ashaya, Soul of the Wild",
+    # Bane of Progress and Ashaya were HERE until 2026-09-10 and are now in
+    # PARTLY_MODELLED, which is the category this comment block used to say the
+    # project did not have. See below.
     # --- 2026-09-10 additions. Each of these is a CLAIM that edhmc.azusa
     # implements the card's text, made deliberately and with its limits said:
     #
@@ -358,6 +365,60 @@ SCRIPTED_AZUSA = {
     # count -- value denial, not damage
     "Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre",
 }
+
+# ---------------------------------------------------------------------------
+# PARTLY MODELLED — the third category (2026-09-10, queued items 14 and 14b)
+# ---------------------------------------------------------------------------
+# The two-way split was a lie for five cards, and CLAUDE.md had asked for this
+# category twice: "the project needs a third category, PARTLY MODELLED, where
+# A LOW SCORE MEANS NOTHING AND A HIGH SCORE MEANS SOMETHING."
+#
+# That asymmetry is the whole definition. These cards have a real, implemented
+# component -- a body that attacks, a draw that happens -- and a missing one,
+# and every missing component here UNDERSTATES. So:
+#
+#   a HIGH score is evidence. The card cleared the bar on the half that works,
+#   and the missing half can only add to it.
+#   a LOW score is NOT evidence, about the card or against it. It is the score
+#   of a fraction of the card, and nobody knows what fraction.
+#
+# NEVER CUT ON A ROW IN THIS TABLE. Two swaps have already been withdrawn or
+# refused on exactly this: a cut of Ashaya was staged and withdrawn (§0z), and
+# Ka-Zar's best-scoring cut was Bane of Progress and was refused (§0z2).
+#
+# THE REASON IS REQUIRED, not decorative. A name in a set says "something is
+# wrong here" and a reader cannot tell what; check_scripted_coverage() raises
+# on an empty reason, and the reason is PRINTED in the table, so the row
+# carries its own caveat to whoever reads it next.
+PARTLY_MODELLED = {
+    "azusa": {
+        "Ashaya, Soul of the Wild":
+            "*/* off the land count is implemented; 'nontoken creatures you "
+            "control are Forest lands' is NOT, and that is the half that "
+            "combos with Quirion Ranger. §0z, queued 14b/15.",
+        "Bane of Progress":
+            "The wipe destroys only YOUR OWN artifacts and enchantments, "
+            "because opponents own no permanent objects in this project "
+            "(§4). Its negative score is a ONE-SIDED WIPE WITH THE SIDEDNESS "
+            "REMOVED -- the cost with none of the benefit. §0z2.",
+    },
+    "lorehold": {
+        "Apex of Power":
+            "Modelled as `draw4`. 'If this spell was cast from your hand, add "
+            "ten mana of any one color' does not exist -- and in a deck "
+            "holding Rise of the Eldrazi and Storm Herd that clause is the "
+            "entire card. §0f.",
+        "Hit the Mother Lode":
+            "Modelled as a flat 5 Treasures. Discover 10 -- a free cast of a "
+            "nonland of mana value 10 or less, i.e. a free Rise of the "
+            "Eldrazi off the top -- is not implemented. §0f.",
+        "Borrowed Knowledge":
+            "Modelled as `draw2`. The card is a WHEEL ('discard your hand, "
+            "then draw cards equal to...'), and the engine already has a "
+            "`wheel` script for Reforge the Soul that this does not use. §0f.",
+    },
+}
+PARTLY = PARTLY_MODELLED.get(DECK, {})
 
 SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
             "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
@@ -477,7 +538,7 @@ def _worker_init(deck_name, n, horizons, baseline):
     # rely on that: the run's parameters are passed explicitly and the module
     # globals are re-derived from them, so a worker cannot end up measuring a
     # different deck or sample size than the parent asked for.
-    global DECK, N, HORIZONS, SIM, SCRIPTED, METRICS
+    global DECK, N, HORIZONS, SIM, SCRIPTED, PARTLY, METRICS
     DECK, N, HORIZONS = deck_name, n, horizons
     SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
            "karlov": karlov_sim, "tivit": tivit_sim,
@@ -486,6 +547,11 @@ def _worker_init(deck_name, n, horizons, baseline):
                 "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
                 "shilgengar": SCRIPTED_SHILGENGAR,
                 "azusa": SCRIPTED_AZUSA}[DECK]
+    # Re-bound with the rest, though a worker only MEASURES and never renders:
+    # leaving one classification global pointing at the parent's deck is the
+    # shape of bug this whole block exists to prevent, and "it happens not to
+    # be read" is a property of today's code rather than of tomorrow's.
+    PARTLY = PARTLY_MODELLED.get(DECK, {})
     METRICS = METRIC_SETS[DECK]
     _W["deck"], _W["commander"] = build_pending(DECK)
     _W["baseline"] = baseline
@@ -775,23 +841,50 @@ def check_scripted_coverage(deck):
     a low score means anything.
 
     A name in SCRIPTED that is no longer in the deck is stale rather than
-    dangerous, so it warns. A card in the deck that is in neither SCRIPTED nor
-    KNOWN_BLIND is the failure that actually bit, so it raises.
+    dangerous, so it warns. A card in the deck that is in none of the three
+    categories is the failure that actually bit, so it raises.
+
+    THREE CATEGORIES SINCE 2026-09-10, and a card must be in EXACTLY ONE. A
+    card in both SCRIPTED and PARTLY_MODELLED is the worse kind of ambiguity:
+    it would print under MODEL-EVALUATED, where a low score is evidence, while
+    something elsewhere claims it is not. Both halves of that are checked here.
     """
     names = {c.name for c in deck if not c.is_land}
     stale = SCRIPTED - {c.name for c in deck}   # lands may be scripted too
     if stale:
         print(f"  NOTE: {len(stale)} name(s) in SCRIPTED_{DECK.upper()} are no "
               f"longer in the deck: {', '.join(sorted(stale))}", file=sys.stderr)
-    unclassified = names - SCRIPTED - KNOWN_BLIND[DECK]
+    overlap = (set(PARTLY) & SCRIPTED) | (set(PARTLY) & KNOWN_BLIND[DECK])
+    if overlap:
+        raise SystemExit(
+            f"\n{len(overlap)} card(s) are in PARTLY_MODELLED AND in another "
+            f"category, so their row would be printed under a heading that "
+            f"contradicts it:\n"
+            + "".join(f"    {n}\n" for n in sorted(overlap))
+            + "A card is in exactly one of the three.")
+    no_reason = [n for n, why in PARTLY.items() if not (why or "").strip()]
+    if no_reason:
+        raise SystemExit(
+            f"\n{len(no_reason)} card(s) in PARTLY_MODELLED have no reason:\n"
+            + "".join(f"    {n}\n" for n in sorted(no_reason))
+            + "The reason is the category's whole content -- it is printed in "
+              "the table so the row carries its own caveat. 'Partly modelled' "
+              "with no statement of WHICH part is a label, not a finding.")
+    stale_partly = set(PARTLY) - {c.name for c in deck}
+    if stale_partly:
+        print(f"  NOTE: {len(stale_partly)} name(s) in PARTLY_MODELLED are no "
+              f"longer in the {DECK} deck: {', '.join(sorted(stale_partly))}",
+              file=sys.stderr)
+    unclassified = names - SCRIPTED - KNOWN_BLIND[DECK] - set(PARTLY)
     if unclassified:
         raise SystemExit(
-            f"\n{len(unclassified)} card(s) in the {DECK} deck are in neither "
-            f"SCRIPTED_{DECK.upper()} nor KNOWN_BLIND:\n"
+            f"\n{len(unclassified)} card(s) in the {DECK} deck are in none of "
+            f"SCRIPTED_{DECK.upper()}, PARTLY_MODELLED or KNOWN_BLIND:\n"
             + "".join(f"    {n}\n" for n in sorted(unclassified))
-            + "Add each to SCRIPTED_ if the engine implements its text, or to "
-              "KNOWN_BLIND if it does not. The split between MODEL-EVALUATED "
-              "and MODEL-BLIND is a CLAIM, and it has to be made deliberately.")
+            + "Add each to SCRIPTED_ if the engine implements its text, to "
+              "PARTLY_MODELLED (with the reason) if it implements part of it, "
+              "or to KNOWN_BLIND if it does not. The split is a CLAIM, and it "
+              "has to be made deliberately.")
 
 
 def main():
@@ -863,8 +956,14 @@ rate. And before cutting anything, check whether another card does the same job
 list of names to ablate() to score a package together.""")
     for title, group in (("MODEL-EVALUATED — a low score is evidence about the card",
                           [n for n in nonlands if n in SCRIPTED]),
+                         ("PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.\n"
+                          "Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.",
+                          [n for n in nonlands if n in PARTLY]),
                          ("MODEL-BLIND — a low score is evidence about the MODEL, not the card",
-                          [n for n in nonlands if n not in SCRIPTED])):
+                          [n for n in nonlands
+                           if n not in SCRIPTED and n not in PARTLY])):
+        if not group:
+            continue
         last = str(HORIZONS[-1])
         rows = sorted(group, key=lambda n: -results[n][last]["damage"][0])
         print(f"\n{'=' * 84}\n{title}\n{'=' * 84}")
@@ -888,6 +987,13 @@ list of names to ablate() to score a package together.""")
                                           for h in hz}) > 1:
                 sig = "FLIP"
             print(f"{n:<30}{cells}{w:>+14.4f}+-{wci:<5.4f}{sig:>10}")
+            # THE REASON TRAVELS WITH THE ROW. A heading is read once and a
+            # row is read on its own -- and the row is the thing somebody
+            # copies into a cut list. Wrapped under its own card rather than
+            # collected in a footnote for that reason.
+            if n in PARTLY:
+                for line in textwrap.wrap(PARTLY[n], 76):
+                    print(f"      {line}")
 
 
 if __name__ == "__main__":

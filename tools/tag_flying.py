@@ -57,6 +57,28 @@ NOT COLLECTED, because they are not static and a tag would be a lie:
     +1/+1 counters (its flying needs four, which is why it is in CONDITIONAL
     below). Ten is reachable in the Karlov list and is NOT modelled.
 
+SUBTYPES, added 2026-09-10, for the third time the same reason
+--------------------------------------------------------------
+`Card.types` holds CARD types (Creature, Land), never creature or land
+SUBTYPES — a limitation `edhmc.shilgengar` and `edhmc.azusa` both document. Two
+cards in the 2026-09-10 Azusa batch read a subtype and cannot be evaluated
+without one:
+
+    Return of the Wildspeaker   "draw cards equal to the greatest power among
+                                NON-HUMAN creatures you control"
+    Sapling Nursery             "Affinity for FORESTS"
+
+and a third, Nissa, Who Shakes the World, doubles "whenever you tap a FOREST
+for mana". Writing those two sets by hand is the failure mode CLAUDE.md names
+and KNOWN_ISSUES §0q records four instances of, so they are GENERATED here from
+Scryfall's type line with everything else.
+
+READ THE TYPE LINE'S SUBTYPE HALF, NOT THE WHOLE LINE. "Forest" appears in the
+name of cards that are not Forests (Forest Bear) and in oracle text constantly;
+only the segment after the em dash is the subtype list. Dryad Arbor ("Land
+Creature — Forest Dryad") IS a Forest and IS a nontoken creature, which is
+exactly the kind of card a hand-written set forgets.
+
     python tag_flying.py            # print the classification
     python tag_flying.py --write    # regenerate edhmc/decks/_evasion.py
 """
@@ -119,6 +141,26 @@ def scryfall_collection(names):
     return found
 
 
+def subtypes(card):
+    """The SUBTYPE half of a type line, as a set.
+
+    "Legendary Creature — Human Monk" -> {"Human", "Monk"}. Scryfall uses an em
+    dash; a double-faced card has no top-level type line, so its faces are
+    walked and merged. Anything before the dash is a card type or a supertype
+    and is deliberately dropped -- matching on the whole line is how "Forest"
+    matches Forest Bear and how "Human" matches "Human Soldier tokens" in
+    oracle text.
+    """
+    lines = [card.get("type_line") or ""]
+    for face in card.get("card_faces", []) or []:
+        lines.append(face.get("type_line") or "")
+    out = set()
+    for line in lines:
+        if "—" in line:
+            out |= set(line.split("—", 1)[1].split())
+    return out
+
+
 def named(name):
     url = ("https://api.scryfall.com/cards/named?fuzzy="
            + urllib.parse.quote(name))
@@ -175,6 +217,16 @@ def main():
     indestructible = {n for n, c in cards.items()
                       if "Indestructible" in c.get("keywords", [])
                       and n in everything and everything[n].is_permanent}
+    # SUBTYPES. Restricted to the card types that can carry them here: a Human
+    # is a creature and a Forest is a land, and nothing else in these lists
+    # reads either. Dryad Arbor satisfies both halves of "land" and "creature"
+    # and lands in FOREST only, which is correct -- it is a Forest Dryad, not a
+    # Human.
+    humans = {n for n, c in cards.items()
+              if n in creatures and "Human" in subtypes(c)}
+    forests = {n for n, c in cards.items()
+               if n in everything and everything[n].is_land
+               and "Forest" in subtypes(c)}
 
     print(f"{len(cards)}/{len(everything)} cards resolved "
           f"({len(creatures)} of them creatures)\n")
@@ -198,6 +250,16 @@ def main():
               "NOT tagged\n(a tag would claim the permanent always has it):")
         for n in sorted(granted):
             print(f"    {n}")
+    print(f"\nHUMAN ({len(humans)}) — Return of the Wildspeaker reads the "
+          f"complement of this set:")
+    for n in sorted(humans):
+        print(f"    {n}")
+    print(f"\nFOREST ({len(forests)}) — Sapling Nursery's affinity and Nissa, "
+          f"Who Shakes the World\ncount these; a nonbasic that is not a Forest "
+          f"is not one, however green it looks:")
+    for n in sorted(forests):
+        print(f"    {n}")
+
     missed = {n for n, c in cards.items()
               if n in creatures and n not in flying and n not in CONDITIONAL
               and "flying" in (c.get("oracle_text") or "").lower()}
@@ -232,6 +294,29 @@ def main():
                      "would be a lie.\n"
                      "INDESTRUCTIBLE = {\n")
             for n in sorted(indestructible):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n"
+                     "# SUBTYPES, read from the type line's subtype half.\n"
+                     "# `Card.types` holds CARD types only, so a card that "
+                     "reads a creature or\n"
+                     "# land subtype has to consult these.\n"
+                     "#\n"
+                     "#   HUMAN   Return of the Wildspeaker counts and pumps "
+                     "the COMPLEMENT of\n"
+                     "#           this set. A Human missing from here would be "
+                     "pumped and\n"
+                     "#           counted when the card says it is not.\n"
+                     "#   FOREST  Sapling Nursery's affinity, Nissa, Who Shakes "
+                     "the World's mana\n"
+                     "#           doubler, and Castle Garenbrig's "
+                     "enters-untapped condition.\n"
+                     "#           Dryad Arbor is one; no other nonbasic in any "
+                     "list is.\n"
+                     "HUMAN = {\n")
+            for n in sorted(humans):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\nFOREST = {\n")
+            for n in sorted(forests):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
         print(f"\nwrote {OUT}")

@@ -27,7 +27,7 @@ Methodology that used to live at the end of this file is now
 | [0c](#0c) | FIXED | candidates were never flying-tagged, so a flier scored as ground |
 | [0d](#0d) | FIXED | Radiant Scrollwielder read the wrong zone — and it did not help |
 | [0e](#0e) | MEASURED | the Penance slot, resolved: Caldera Pyremaw |
-| [0f](#0f) | **OPEN** | three cards in `SCRIPTED_LOREHOLD` are not implemented as their text |
+| [0f](#0f) | **OPEN** | three Lorehold cards are not implemented as their text (now labelled PARTLY MODELLED, §0z4) |
 | [0g](#0g) | FIXED | two "or attacks" triggers, and one token entering untapped |
 | [0h](#0h) | FIXED | "another creature you control": three cards triggered off themselves |
 | [0i](#0i) | **OPEN** | life-loss drawbacks are free, and pod v3 made that matter |
@@ -47,10 +47,15 @@ Methodology that used to live at the end of this file is now
 | [0w](#0w) | MEASURED | all three staged swaps survive the combat split unchanged |
 | [0x](#0x) | MEASURED | nine Azusa candidates; Ancient Greenwarden's doubler is the find |
 | [0y](#0y) | MEASURED | the land-animation genre loses its slots to those candidates |
-| [0z](#0z) | **OPEN** | **Ashaya is misclassified as MODEL-EVALUATED; four combos are invisible** |
+| [0z](#0z) | **OPEN** | Ashaya's combos are invisible (the MISLABEL is fixed — PARTLY MODELLED, §0z4) |
 | [0z1](#0z1) | FIXED | landfall payoffs were booleans; Springheart bestow+copy implemented |
-| [0z2](#0z2) | MEASURED | two card-draw candidates; **Bane of Progress is misclassified too** |
+| [0z2](#0z2) | MEASURED | two card-draw candidates; Bane of Progress (mislabel fixed in §0z4) |
 | [0z3](#0z3) | MEASURED | four sacrifice-lands: the TAP is the binding constraint, not the mana |
+| [0z4](#0z4) | MEASURED | seven more candidates; **every mana card fails and every card card passes** |
+| [0z5](#0z5) | FIXED | token copies re-trigger ETBs — and the fix is worth nothing; the RE-RANK is worth it |
+| [0z6](#0z6) | FIXED | Shilgengar's Treasures are mana: every mechanism moves, the objective cannot resolve it |
+| [0z7](#0z7) | FIXED | two life-loss drawbacks are charged at last — Bitterblossom costs **−0.0049** |
+| [0z8](#0z8) | FIXED | the engine proved one payment and made another; **board order decided which land was tapped** |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **OPEN** | cards can only have one cost — structural |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -276,6 +281,16 @@ Storm Herd, and Discover 10 is a free Rise of the Eldrazi off the top. Borrowed
 Knowledge is a wheel, and the engine already has a `wheel` script for Reforge the
 Soul. All three **understate**, which is the safe direction, but they are
 labelled as if their scores were evidence about the cards.
+
+**THE LABEL IS FIXED AS OF 2026-09-10; THE IMPLEMENTATIONS ARE NOT.** All three
+moved out of `SCRIPTED_LOREHOLD` into `PARTLY_MODELLED`, so they now print in
+their own table under "a HIGH score is evidence; a LOW score is NOT", each with
+its specific gap printed beneath its row (§0z4, queued item 14). This section
+stays **OPEN** because that is a change to what the table CLAIMS, not to what
+the engine does. Note which way it cuts: Borrowed Knowledge (+0.0143 ±0.0036)
+and Apex of Power (+0.0159 ±0.0031) are already significant on a fraction of
+their text, so both are FLOORS and both look better than their rows, while Hit
+the Mother Lode (+0.0037 ±0.0026) was the one at risk of being read as a cut.
 
 <a id="0g"></a>
 
@@ -1888,6 +1903,14 @@ is, and the doubler was measured apart and found to be half the card.
 **This retracted a cut that was one edit away from being staged**, which is
 the reason it is written up at length.
 
+> **THE MISCLASSIFICATION IS FIXED (2026-09-10, later the same day).** Ashaya
+> is now in `ablation.PARTLY_MODELLED` and prints in the third table, with its
+> missing clause named under its own row — the category this section asked for
+> and queued item 14b tracked. §0z4. **What remains OPEN is everything below
+> the labelling:** the type-changing clause is still unimplemented and the
+> combos are still invisible, which is queued item 15. Ashaya's row
+> (+0.0019 ±0.0019) is a floor and always was; it is now printed as one.
+
 ### The question
 
 Do Ashaya + Quirion Ranger, or Springheart Nantuko + Lotus Cobra / Tireless
@@ -2281,6 +2304,520 @@ Two process notes worth keeping:
   not a stale hand-written list, but a baseline that moved because the
   harness's own results had been staged. The baseline is now pinned explicitly
   to the three swaps that are not under review.
+
+---
+
+<a id="0z4"></a>
+
+## 0z4. MEASURED — seven more candidates, and the deck says the same thing again
+
+2026-09-10. `tools/candidates.py azusa3`,
+`results/candidates_azusa_batch3_T20.txt`, mechanisms in
+`results/azusa_batch3_mechanisms.txt`, engine work in `edhmc/azusa.py`,
+mechanisms pinned by `tests/test_azusa_batch3.py`.
+
+N=15,000 paired, T20, measured as value over a replacement-level slot in the
+Sylvan Library slot — the deck's most neutral row (−0.0002 ±0.0017, signal
+`--`, and the one enchantment with no script at all, so removing it from both
+legs removes nothing the engine was modelling). Deck noise floor ±0.0029.
+
+### The result
+
+| card | MV | damage T20 | win rate T20 | signal |
+|---|---|---|---|---|
+| **The Great Henge** | 9 → ~4 | +1.85 ±0.21 | **+0.0217 ±0.0034** | both |
+| **Nissa, Who Shakes the World** | 5 | +2.40 ±0.25 | **+0.0215 ±0.0036** | both |
+| **Return of the Wildspeaker** | 5 | +1.83 ±0.20 | **+0.0197 ±0.0033** | both |
+| **Sapling Nursery** | 8 → ~3 | +2.14 ±0.23 | **+0.0170 ±0.0034** | both |
+| Finale of Devastation | 8 (X=6) | +0.76 ±0.14 | +0.0073 ±0.0025 | both |
+| War Room | land | +0.51 ±0.18 | +0.0052 ±0.0031 | both |
+| Castle Garenbrig | land | +0.03 ±0.19 | **−0.0029 ±0.0032** | `--` |
+
+**THE TOP FOUR ARE A SET, NOT A RANKING.** +0.0217, +0.0215, +0.0197 and
++0.0170 all sit inside each other's bars, and they share a baseline, so they
+cannot be ordered against each other — §0c's standing point. Placed against
+the deck's own table they land around Oracle of Mul Daya (+0.0221), Harmonize
+(+0.0220) and Courser of Kruphix (+0.0197): top-fifteen cards, not top-five.
+
+### THE FINDING, WHICH IS THE SAME ONE AS LAST TIME
+
+**Every card that attacks the CARD constraint passed, and every card that adds
+MANA failed.** The draw batch's measurement was that this deck is granted 2.77
+land drops a turn and uses 1.33, and that everything scoring well attacks
+cards rather than mana (§0z2). Four new data points, all agreeing:
+
+- The Great Henge draws **7.65 cards per resolution** and gains 1.46 life.
+- Return of the Wildspeaker draws **7.8**.
+- Nissa is the exception that proves it — she is a mana card, **+19.95 mana
+  spent per resolution**, and what she actually converts it into is landfall
+  (+3.59 triggers) and an ultimate that fires in **41% of the games she
+  resolves in**, putting every Forest left in the library onto the battlefield.
+- **Castle Garenbrig, pure mana, is the only card of the seven inside its own
+  bar** — and its `mana_spent` goes DOWN 9.68 per resolution. It activates 0.81
+  times a game and spends 3.72 of the six {G} it makes; the rest evaporates.
+  A deck that already floats mana it cannot spend gains nothing from more.
+
+### Sapling Nursery COMPETES WITH THE ENGINE ALREADY THERE
+
+Worth its own note, because the win rate (+0.0170) and the mechanism counters
+point in opposite directions and the mechanism is the interesting half.
+Sapling Nursery has the **second-highest damage of the seven** (+2.14) and adds
++2,449 board power per resolution — and it makes the deck's landfall engine
+**worse**: `landfall_triggers` −0.87 and `tokens_made` **−11.55** per
+resolution. Its own 3/4 Treefolk are counted in that figure, so Scute Swarm is
+making ~14 fewer Insects.
+
+The mechanism is sequencing. Even at its affinity-reduced cost the Nursery
+takes mana and a turn, and in a deck whose payoff is **exponential** — Scute
+Swarm copies itself on every landfall — a small delay compounds. It is still a
+good card here. It is a good card that makes the best card slightly worse, and
+a leave-one-out table cannot see that at all.
+
+### THE CEILING ON RETURN OF THE WILDSPEAKER, said out loud
+
+The draw mode is chosen essentially always: **0.10 pumps per resolution**, so
+the `auto` policy in `azusa.return_of_the_wildspeaker` almost never finds a
+pump that kills somebody the raw attack would not. Fine, and honest.
+
+What is not free is the draw. **It asks for 30.0 cards a resolution and
+receives 7.8** (total `cards_drawn` rises 8.2 — the extra 0.4 is knock-on, the
+cards it drew finding Horn of Greed and Seer's Sundial draws of their own),
+because "the greatest power among non-Human creatures" on a
+Craterhoof-pumped Scute Swarm board runs into the hundreds — Ashaya and
+Greensleeves are `*/*` on the land count, Zabu takes a counter on every
+doubled landfall, and `craterhoof_bonus` is added on top. Measured directly:
+median 9, mean 40, and 9% of resolutions ask for 50 or more.
+
+**`draw()` stops at an empty library and NOTHING IN THIS PROJECT LOSES TO
+DECKING.** The tail is therefore free in a way it is not at a table, where
+drawing 30 means winning that turn or dying to the next draw step. Its
++0.0197 is a CEILING. The card is still good on the median case — nine cards
+for five mana at instant speed is good on its own — but the tail is not
+priced. This has never mattered before because nothing in any list drew more
+than three at once; it is live now, and it would be live for any future
+draw-X card. NOT fixed, because a decking rule is an engine-wide decision.
+
+### Finale of Devastation and the fixed-X convention
+
++0.0073 ±0.0025, the weakest of the five nonlands, and the number that most
+depends on a modelling choice. X is fixed at 6, the convention Genesis Wave
+(6) and Animist's Awakening (4) already use, so this is an approximation
+rather than a floor or a ceiling: a real pilot scales X to the mana, and this
+deck has a lot of it. The graveyard half IS modelled and earns its keep —
+**35% of its targets come from the graveyard** rather than the library.
+
+The likelier reason it scores where it does is REDUNDANCY, the
+Conduit-of-Worlds shape: Green Sun's Zenith (+0.0166), Chord of Calling
+(+0.0097) and Woodland Bellower (+0.0119) already tutor creatures in this
+list, and a fourth tutor finds what the first three did.
+
+### War Room against the sac-lands it competes with
+
++0.0052 ±0.0031, measured against a Forest, which is exactly how §0z3 measured
+the four sacrifice-lands — so these five are directly comparable:
+
+| land | win rate T20 |
+|---|---|
+| Scene of the Crime (committed) | +0.0096 ±0.0038 |
+| Horizon of Progress | +0.0081 ±0.0030 |
+| Cryptic Caves | +0.0068 ±0.0032 |
+| **War Room** | **+0.0052 ±0.0031** |
+| The Hunter Maze | +0.0039 ±0.0032 |
+
+It draws 0.91 cards a game and is **repeatable**, where the other four are
+one-shot — and it still lands mid-pack, for §0z3's reason: **the tap is the
+binding constraint.** {3} AND a tap is the most expensive draw of the five, so
+it fires least. Its life payment is real and charged (one life, mono-green),
+which makes it one of the few life costs in this project that is not free
+(§0i) — and `final_life` still goes UP +0.74, because drawing cards ends games
+sooner than the life costs.
+
+### Engine work this required, and what is still a floor
+
+Seven cards, five of which needed mechanisms the engine did not have. Full
+detail in `edhmc/azusa.py`; the limits, in one place:
+
+- **Two dynamic costs**, in `cost_of` and checked by
+  `check_dynamic_cost_coverage()`: The Great Henge at {7}{G}{G} minus the
+  greatest power you control, Sapling Nursery's Affinity for Forests. Both
+  cards are unplayable at their printed cost and the reduction IS the card —
+  the Henge resolves in 28.1% of games, the rate of a four-drop.
+- **A mana doubler needs saying twice.** Nissa's Forest doubler is in
+  `azusa.available_mana` (the pool) AND in `engine.spend` (one Forest covers
+  two units). With only the first, paying {2} taps two Forests to make the two
+  mana one of them made and the doubler is worth nothing. The `spend` change
+  is the Crypt Ghast branch already there, guarded on a card in no other list;
+  `tools/check_unchanged_decks.py` reports all six decks BIT-IDENTICAL.
+- **Subtypes are now generated**, not hand-written: `HUMAN` and `FOREST` in
+  `decks/_evasion.py`, from Scryfall's type line via `tag_flying.py`, for the
+  §0q reason. This immediately caught two things a by-hand set gets wrong:
+  **Dryad Arbor is a Forest** (so Nissa's −8 fetches 21 cards, not 20, and it
+  pays affinity), and the shocklands in other lists are Forests too.
+- **The Great Henge's ETB is hooked in `make_permanent`, not `resolve`**,
+  which is queued item 16 from the other side: a creature enters from six
+  zones in this engine and only one of them is `resolve`. A hook in `resolve`
+  would miss every tutored creature.
+- FLOORS, all stated: Return of the Wildspeaker is an INSTANT cast at sorcery
+  speed; Sapling Nursery's {1}{G} exile-for-indestructible is not modelled and
+  is real wipe protection; Finale's X≥10 team pump is not modelled; Nissa's
+  emblem cannot matter (nothing in this pod kills lands) and her +1 grants
+  vigilance, which this engine has no use for.
+
+### Two bugs found on the way, both in the harness rather than the engine
+
+1. **`candidates.py` measured land candidates against a NONLAND.** Its
+   `blank_like` had an `is_land` branch that copied the type line and never
+   set `is_land` or `produces`, so a land candidate was scored against a
+   zero-cost spell that sat in hand. Dead code until now — `ablation.py`
+   blanks only nonlands, and §0z3's lands were run as real swaps by
+   `run_azusa_draw.py`. The replacement is `filler_land()`: the land the deck
+   runs most copies of, derived rather than invented, which for this list is a
+   Forest and is the slot a land candidate actually takes.
+2. **A land never set the watch counters**, because they are set in `resolve`
+   and a land is played in `land_step`. Every land candidate reported
+   P(deploy) = 0.000 and `test_card_resolved` = 0 — "the card never arrived"
+   for a card that arrived in 28% of games.
+
+And one that was already there and is worth recording: **the `azusa` entry in
+`candidates.py` can no longer run at all.** Its victim slot, Perilous Forays,
+is cut by the staged Ka-Zar swap, and three of its nine candidates were
+committed to the deck on 2026-09-10, so `add_value`'s §0o guard raises on
+them. Both failures are loud, which is the guard working. The entry is kept as
+provenance for §0x; `azusa3` is the live one.
+
+---
+
+<a id="0z5"></a>
+
+## 0z5. FIXED — a token copy re-triggers the host's ETB, and it was worth nothing
+
+2026-09-10, closing queued item 16. `diagnostics/run_springheart_etb.py`,
+`results/springheart_etb.txt`, mechanisms pinned in
+`tests/test_azusa_candidates.py`.
+
+**The queued item called this "the largest remaining understatement of
+Springheart". It is worth +0.0001 ±0.0002 and that is the finding.**
+
+### What was wrong
+
+`azusa.make_permanent` does not run the ETB dispatch that `resolve` does — the
+dispatch was inline in `resolve`, so the ONLY way to trigger an ETB was to cast
+the card from hand. Springheart Nantuko's "create a token that's a copy of that
+creature" therefore produced a bare body: a copy of Avenger of Zendikar made no
+Plants, a copy of Craterhoof Behemoth pumped nothing. The dispatch is now
+`AzusaGame.etb(card, perm, is_copy=False)` and the copy path calls it.
+
+### The measurement, N=15,000 paired, T20, same seeds in every leg
+
+| leg | win rate | copies | ETBs | legend deaths |
+|---|---|---|---|---|
+| A baseline (bare body) | 0.3874 | 1.07 | 0.00 | 0.00 |
+| B + copy ETB | 0.3875 | 1.07 | 1.07 | 0.00 |
+| C + legend rule | 0.3875 | 1.07 | 1.07 | 0.00 |
+| D + re-ranked hosts (shipped) | 0.3898 | 1.11 | 1.11 | 0.03 |
+
+| step | win rate | |
+|---|---|---|
+| A → B, the fix itself | **+0.0001, p=0.16** | inside its bar |
+| B → C, the legend rule | **0.0000, p=1** | never fires under the old host list |
+| C → D, the re-rank | **+0.0023, p=4.8e-05** | significant |
+| A → D, everything | **+0.0024, p=2.2e-05** | significant |
+
+### WHY THE FIX IS WORTH NOTHING AND THE RE-RANK IS WORTH EVERYTHING
+
+**Springheart makes 1.07 copies a game**, and under the old host ranking the
+host was almost always Scute Swarm, Lotus Cobra or Tireless Provisioner —
+**none of which has an ETB at all.** Their value is a LANDFALL trigger, which
+the copy already got (§0z1). So the fix repaired a path that the policy almost
+never walked.
+
+**The host list was the real defect, and it is a `SCRIPTED_*`-shaped one.**
+`SPRINGHEART_HOSTS` is a hand-written ranking, and Craterhoof Behemoth,
+Woodland Bellower, Eternal Witness and Titania — the four the queued item names
+as "exactly the copies a pilot most wants" — **were not in it.** They were
+absent *because their ETBs did nothing*, so the list had encoded an engine
+limitation as a judgement about cards, and fixing the engine did not fix the
+list. That is §0q with a new disguise: not a stale name set, but a POLICY
+calibrated against a bug.
+
+### AND A SECOND BUG THE FIX EXPOSED: the legend rule
+
+A token copy of a LEGENDARY creature is put into the graveyard immediately as a
+state-based action. The engine kept it. Greensleeves, Maro-Sorcerer was rank 5
+in the host list, so copying her left a permanent, illegal second Badger-maker
+on the battlefield — **and `count()`-based landfall payoffs doubled off it**,
+which is the §0z1 change making an older bug visible rather than causing one.
+
+The rule is now applied, with the consequence that a legendary host is worth
+**its ETB and nothing else**. That reverses two entries: Titania stays (her ETB
+returns a land, and the land is the point), Greensleeves is **removed** (her
+value is a landfall trigger her copy never lives to see).
+
+It also **cascades, correctly**: Titania's ETB puts a land onto the
+battlefield, that land entering IS another landfall, Springheart triggers
+again. With two lands in the graveyard the chain runs three deep and stops
+because the graveyard is empty — a real resource bound, not a recursion guard.
+Pinned as a test; the check expected one copy and the engine was right.
+
+### What this cost
+
+`results/ablation_azusa.txt` regenerated: baseline win rate 0.3874 → 0.3898,
+damage +0.09, tokens_made +2.09, final_board_power +1,159. Small, real, and
+the table is keyed on it.
+
+<a id="0z6"></a>
+
+## 0z6. FIXED — Shilgengar's Treasures are mana, and the objective cannot see it
+
+2026-09-10, closing queued item 13. `diagnostics/run_shilgengar_treasures.py`,
+`results/shilgengar_treasures.txt`.
+
+`self.treasures` was a counter that **only Revel in Riches read**. Pitiless
+Plunderer, Smothering Tithe, Black Market Connections and Wayfarer's Bauble all
+made Treasures and **nothing ever spent one**, so three of this deck's mana
+sources were scored as producing no mana — and `ult_reserve()` held three mana
+back through every main phase for an ultimate the Treasures could often have
+paid for, a cost §0t measured and charged to the reserve policy.
+
+`ShilgengarGame.pay()` now spends them, **real mana first** (a land is
+repeatable and a Treasure is not), at every payment site in the engine; and
+`ult_reserve()` returns 0 when the Treasures alone already cover the ultimate.
+
+### The measurement, N=15,000 paired, T20, same seeds
+
+| metric | inert | spendable | diff |
+|---|---|---|---|
+| treasures_spent | 0.00 | 1.45 | **+1.45** |
+| shilgengar_ults | 0.446 | 0.488 | **+0.04 (+9.4%)** |
+| blood_made | 3.19 | 3.47 | **+0.29 (+9.1%)** |
+| damage | 52.04 | 53.73 | **+1.69 (+3.3%)** |
+| mana_spent | 108.6 | 110.4 | +1.79 |
+| **win rate** | 0.1972 | 0.1993 | **+0.0021 [−0.0007, +0.0049], p=0.15** |
+
+**EVERY MECHANISM COUNTER MOVES DECISIVELY AND THE OBJECTIVE DOES NOT RESOLVE
+IT.** Damage at p≈1e-96, ultimates at p≈3e-75, and win rate inside its bar.
+This is the §0u shape exactly: a change that is unambiguously more correct,
+visible in every counter that fires on a relevant turn, and below the
+resolution of a per-deck win rate at this N. It ships because a Treasure IS
+mana, not because the win rate asked for it.
+
+### THE ASSUMPTION THIS PROMOTES, and it is the thing to watch
+
+Smothering Tithe is modelled as **one Treasure per living opponent per round,
+no roll** — written when a Treasure was inert, on the grounds that "opponents
+nearly always have a better use for two mana early". That is now **three real
+mana a turn in a model where the opponents never pay the {2}**. The assumption
+has gone from harmless to load-bearing, and it is the first thing to suspect if
+that card's row looks too good in the regenerated table. Treasures made per
+game is only 1.92, so the exposure is bounded by how rarely these cards are
+drawn, not by the assumption being cheap.
+
+A second tension, now real: **a Treasure spent on mana is a Treasure not
+counted toward Revel in Riches' ten.** That is the choice a pilot actually
+faces and the engine now resolves it greedily in favour of mana.
+
+`treasures_as_mana=False` restores the old behaviour exactly.
+`results/ablation_shilgengar.txt` is regenerated against the new baseline.
+
+---
+
+<a id="0z7"></a>
+
+## 0z7. FIXED — two life-loss drawbacks are charged, and one of them mattered
+
+2026-09-10, closing the live half of §0i and queued item 10.
+`diagnostics/run_life_costs.py`, `results/life_costs.txt`.
+
+§0i has been a standing finding since pod v3 made your life total decide
+roughly a third of losses: **cards whose drawback is losing life were not
+paying it.** Two were live in committed lists.
+
+| card | deck | oracle | was |
+|---|---|---|---|
+| Bitterblossom | rendmaw | "create a 1/1 Faerie, **and you lose 1 life**", every upkeep | free |
+| Phyrexian Arena | karlov | "you draw a card **and you lose 1 life**" | free |
+
+### AND THE SECOND ONE WAS ALREADY CHARGED SOMEWHERE ELSE
+
+`edhmc/shilgengar.py` runs Phyrexian Arena too, and **it charged the life.**
+`edhmc/karlov.py` did not. The identical card, two engines, two behaviours,
+with nothing anywhere saying so — the §0u shape (three copies of the miracle
+discount that had drifted apart) in a new place. This is now the fourth
+instance of "the same rule implemented more than once and not the same way",
+and it is worth taking as a standing hazard rather than four coincidences.
+
+### The measurement, N=15,000 paired, T20, same seeds, `charge_life_costs`
+
+| deck | free | charged | diff | |
+|---|---|---|---|---|
+| **rendmaw** (Bitterblossom) | 0.2081 | 0.2032 | **−0.0049 [−0.0061, −0.0038]** | p=1.2e-16 |
+| **karlov** (Phyrexian Arena) | 0.3357 | 0.3343 | **−0.0015 [−0.0022, −0.0007]** | p=1.0e-04 |
+
+**Both significant, and Bitterblossom's is large for one card's drawback.**
+The mechanism is not the size of the payment but WHERE rendmaw's life total
+sits: the deck finishes on a mean of 3.01 life, so it is at death's door in a
+large share of its games, and 3.32 life — what Bitterblossom costs in the games
+it resolves in — is most of that margin. It resolves in 19.5% of games on turn
+6.9 against a mean game length of 12.4 turns.
+
+§0i predicted "its +0.0205 is a CEILING, and now knowingly so". That is
+confirmed: the ceiling was about a quarter of the card's measured value.
+
+### NOT FIXED, and it is the one that cannot be
+
+**Talisman of Conviction** (lorehold) deals 1 damage to you per COLOURED tap.
+`spend()` taps a source without recording which colour it produced, so the
+engine cannot tell a coloured tap from a colourless one. Charging every tap
+would overcharge it and charging none is what happens now. Left free, said out
+loud, and it would need the mana model to carry the colour actually spent —
+which is a larger change than this card is worth.
+
+Dark Confidant (a karlov candidate) was ALREADY charged, correctly,
+`your_life -= float(top.mv)`.
+
+`charge_life_costs=False` restores the old behaviour. `results/ablation_rendmaw.txt`
+and `results/ablation_karlov.txt` are regenerated against the new baselines.
+
+---
+
+<a id="0z8"></a>
+
+## 0z8. FIXED — the engine proved one payment and then made a different one
+
+2026-09-11, raised by a question about how multicoloured costs are handled
+rather than by a diagnostic. `diagnostics/run_mana_colour.py`,
+`results/mana_colour.txt`, pinned by `tests/test_mana_colour.py`.
+
+### What was wrong
+
+`can_pay` has always been colour-correct and careful: coloured pips first,
+each taking the most constrained source that works; generic last, from the
+least flexible leftovers so duals survive. **It returns the exact indices it
+assigned.**
+
+`spend` took those indices and used `len(pay_idx)`. Nothing else. It then
+tapped that many permanents in cheapest-to-lose order, so **which land was
+actually tapped was decided by the order the lands happened to be played.**
+
+    one Plains, two Mountains, pay {2}
+      can_pay assigned  Mountain + Mountain
+      spend tapped      Plains + Mountain      -> a {W} card in hand: dead
+
+    the SAME position, Plains played last
+      spend tapped      Mountain + Mountain    -> the {W} card: castable
+
+The affordability question ("can I cast this {1}{W}{B}?") was therefore
+answered correctly all along, and the consequence of the answer was not.
+
+### THE CORRECT IMPLEMENTATION WAS ALREADY IN THE REPO
+
+`edhmc/tivit.py` does not use `engine.spend`. Its own `pay()` walks the board
+positionally and maps `can_pay`'s indices back to the permanents that produced
+them — which is exactly the fix — and it was written that way for the Esper
+deck, the one where colour bites hardest. **Five engines shared a rule that one
+engine had already found wrong and quietly worked around.** That is the FIFTH
+instance of the same-rule-implemented-twice hazard (§0u, §0z7, §0z4's mana
+doubler, §0z4's two `blank_like`s) and the strongest one yet, because here the
+correct version was sitting in the same package the whole time.
+
+### The fix
+
+`available_mana` now returns a `ManaUnits` — a `list[frozenset]` to every
+caller, so all six engines' call sites are untouched — carrying the OWNER of
+each unit and a per-unit `tap_reluctance`. `spend` taps the owners of the
+indices it was given. Three further pieces were needed:
+
+1. **THE TAP ORDER HAD TO MOVE, NOT DIE.** `spend`'s ordering encoded a real
+   policy — lands before rocks before mana creatures, so a dork can still
+   attack — and honouring the assignment would have silently discarded it. It
+   is now a tie-break inside `can_pay`, so the assignment is made in that order
+   and the property is preserved. Pinned as a test.
+2. **SCARCITY.** "Least flexible leftovers" treats a Plains and an Island as
+   interchangeable, so the tie fell to board order and a lone white source got
+   spent on a generic cost. Generic is now paid from the MOST PLENTIFUL colour
+   first.
+3. **THE HAND BREAKS A TRUE TIE.** With one Plains and two Mountains, paying
+   {1}{R} leaves one of each and scarcity cannot choose. `available_mana` has
+   the game, so it scores each source by how many coloured pips the cards in
+   HAND still want, and the Plains is kept only when something actually needs
+   white. Verified both ways.
+
+`lorehold.pay` needed a matching correction: it passed `list(range(n))` to
+`spend` rather than the chosen indices — harmless while `spend` counted, and
+wrong the moment it stopped.
+
+### WHAT IT IS WORTH: NOTHING MEASURABLE, AND THAT IS THE RESULT
+
+Colour is the binding constraint — enough mana, wrong colours — on 1.1% to
+8.1% of all payment attempts depending on the deck (karlov worst, azusa and
+lorehold least). But across all six lists at N=6,000 per cell the win-rate
+difference is **indistinguishable from zero**, and it does not grow as the
+mana base is degraded. The numbers are in `results/mana_colour.txt`.
+
+**THE FIRST EXPERIMENT TESTED THE WRONG VARIABLE**, and that is worth keeping.
+Cutting lands was the obvious way to model a greedy build, and it found
+nothing — because a deck short of lands fails by being SHORT, which is exactly
+the failure population this fix cannot touch. The second variant holds the
+mana COUNT constant and replaces fixing with basics, which is the condition
+that actually produces colour screw. It is the right test and it also finds
+nothing.
+
+### AND THEN KARLOV WENT NEGATIVE, WHICH TOOK THREE WRONG GUESSES TO EXPLAIN
+
+On a deliberately colour-starved Karlov the fix measured **−0.0118 ±0.0076** at
+six lands skewed — worse, significantly, and getting worse as the mana base
+degraded. A fix that is provably more correct and measurably harmful is not
+shippable until the mechanism is known, so it was chased rather than argued:
+
+* **"It wastes multi-unit sources."** Crypt Ghast makes a Swamp produce two
+  units and the old count-based `spend` packed them implicitly. Plausible,
+  and WRONG: mana per tap was 1.004 legacy against 1.009 fixed. An
+  owner-packing preference was added anyway — a second unit off an
+  already-tapped permanent is genuinely free — and changed nothing, because
+  units of one owner are adjacent and ties already broke that way.
+* **"It is the hand-demand heuristic."** Disabling it left the loss intact.
+* **"Scarcity is backwards."** This one was half right. Ranking by scarcity
+  alone preserves the RAREST colour, which is wrong when the rare colour is
+  not the one the deck needs — on a Swamp-heavy Karlov it hoarded the odd
+  Plains. Replaced by SURPLUS, supply minus what the hand wants. It helped
+  and did not close the gap.
+
+The answer came from bisecting a single game to the one turn where the two
+diverged (seed 98108, turn 12). Both hold the same four cards — Farewell
+`{4}{W}{W}`, Lurrus `{1}{W}{B}`, Sanguine Bond `{3}{B}{B}`, Voice of the
+Blessed `{W}{W}` — and both cast Sanguine Bond first. Then:
+
+    LEGACY  burned a Plains paying generic, leaving ONE white source.
+            Voice {W}{W} was therefore unaffordable, so it fell through and
+            cast LURRUS -- the better card.
+    FIXED   correctly preserved BOTH white sources. Voice {W}{W} became
+            affordable, Voice has the higher `priority`, so it was cast --
+            and LURRUS was locked out for the rest of the game.
+
+**THE MANA CODE DID EXACTLY ITS JOB AND THE CASTING POLICY SPENT THE PROCEEDS
+BADLY.** `main_phase` is greedy on `priority` and never asks whether casting
+the cheaper card now makes the better one uncastable. The colour fix hands
+that policy more options and it sometimes uses them worse.
+
+That is §0z5's lesson for the second time in two days: **a policy calibrated
+while a bug was open does not become right when the bug is fixed.** These
+decks' `priority` numbers were tuned in a world where which land got tapped
+was effectively arbitrary. The loss is NOT evidence against the mana fix; it
+is evidence that `priority` is now the weakest link in the casting policy, and
+it is only visible at all on a mana base far worse than any real list's.
+
+So this ships as a CORRECTNESS change, on the same footing as §0z6:
+
+* the engine no longer proves one payment and makes another;
+* **board order is no longer a hidden input** to whether a spell is castable,
+  which was the part that could have produced a result nobody could trace;
+* and the owner mapping is the thing §0z7 needed and did not have — Talisman
+  of Conviction's "1 damage per COLOURED tap" is now expressible, because the
+  engine finally knows which permanent produced which colour.
+
+`mana_colour_legacy=True` restores the old rule — BOTH halves of it, the
+count-based tapping and the flexibility-only sort — and reproduces every
+number published before 2026-09-11.
 
 ---
 

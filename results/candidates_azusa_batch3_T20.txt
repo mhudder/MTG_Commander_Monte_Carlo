@@ -1,0 +1,10 @@
+
+AZUSA candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win ratelandfall_triggers    lands_played     cards_drawn  P(deploy)
+  Return of the Wildspeaker      5     +1.83+-0.20     +0.0197+-0.0033     +0.35+-0.05      +0.27+-0.03      +2.23+-0.12       0.278
+  Finale of Devastation          8     +0.76+-0.14     +0.0073+-0.0025     +0.08+-0.04      +0.03+-0.02      +0.05+-0.06       0.248
+  The Great Henge                9     +1.85+-0.21     +0.0217+-0.0034     +0.42+-0.05      +0.29+-0.03      +1.86+-0.11       0.281
+  Sapling Nursery                8     +2.14+-0.23     +0.0170+-0.0034     -0.27+-0.05      -0.22+-0.03      -0.30+-0.08       0.295
+  Nissa, Who Shakes the World    5     +2.40+-0.25     +0.0215+-0.0036     +1.02+-0.07      -0.16+-0.04      +0.26+-0.10       0.281
+  War Room                       0     +0.51+-0.18     +0.0052+-0.0031     +0.13+-0.05      +0.15+-0.04      +0.35+-0.09       0.279
+  Castle Garenbrig               0     +0.03+-0.19     -0.0029+-0.0032     -0.15+-0.05      -0.06+-0.03      -0.24+-0.09       0.279

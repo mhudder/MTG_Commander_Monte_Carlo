@@ -482,7 +482,15 @@ def upkeep(g):
         g.m["drain_damage"] += dealt
         gain_life(g, 1)
     if g.has("Phyrexian Arena"):
+        # "At the beginning of your upkeep, you draw a card AND YOU LOSE 1
+        # LIFE." The life was free here and CHARGED in edhmc/shilgengar.py,
+        # which runs the identical card -- the same drift §0u found in three
+        # copies of the miracle discount, in a different place. §0i, §0z7.
         g.draw(1)
+        if g.cfg.get("charge_life_costs", True):
+            g.your_life -= 1
+            g.m["life_lost_to_own_cards"] = \
+                g.m.get("life_lost_to_own_cards", 0) + 1
     if g.has("Land Tax"):
         # "if an opponent controls more lands than you" — the condition was
         # missing entirely, so this fetched three basics every upkeep.

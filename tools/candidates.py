@@ -39,12 +39,17 @@ from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   CASE_OF_THE_LOCKED_HOTHOUSE,
                                   CONDUIT_OF_WORLDS, WALK_IN_CLOSET,
                                   SPRINGHEART_NANTUKO,
-                                  BURGEONING, CONSTANT_MISTS)
+                                  BURGEONING, CONSTANT_MISTS,
+                                  RETURN_OF_THE_WILDSPEAKER,
+                                  FINALE_OF_DEVASTATION, THE_GREAT_HENGE,
+                                  SAPLING_NURSERY,
+                                  NISSA_WHO_SHAKES_THE_WORLD,
+                                  WAR_ROOM, CASTLE_GARENBRIG)
 
 N = 6000
 
 
-def blank_like(card, priority):
+def blank_like(card, priority, deck):
     """A do-nothing replacement-level card of the same cost.
 
     This MUST match `ablation.py`'s blank, or the two tables are not on the same
@@ -64,16 +69,48 @@ def blank_like(card, priority):
     target — which is exactly what the decision rule above does — was biased
     toward the cut target. Any candidate number produced before 2026-09-06 is
     on the wrong scale for this reason, on top of the 2026-09-04 type-line one.
+
+    2026-09-10: THE LAND BRANCH WAS DEAD CODE AND IT WAS WRONG. It copied the
+    candidate's type line but never set `is_land` or `produces`, so a land
+    candidate was measured against a zero-cost NONLAND that sat in hand being
+    cast for no effect -- a blank that is not merely worse than the candidate
+    but worse than a card. It went unnoticed because nothing had ever taken
+    this branch: `ablation.py` blanks only nonlands (`names = {c.name for c in
+    deck if not c.is_land}`), and the two land candidates measured before now
+    (Cryptic Caves and the three rival sac-lands, §0z3) were run as real swaps
+    by run_azusa_draw.py rather than through here. See `filler_land`.
     """
+    if card.is_land:
+        return filler_land(deck)
     if card.is_creature:
         types = frozenset({"Creature"})
-    elif card.is_land:
-        types = card.types
     else:
         types = frozenset({"Sorcery"})
     return Card(name="(blank)", types=types, cost=dict(card.cost),
                 power=1 if card.is_creature else 0,
                 toughness=1 if card.is_creature else 0, priority=priority)
+
+
+def filler_land(deck):
+    """The deck's own replacement-level land: the land it runs most copies of.
+
+    DERIVED FROM THE DECK, for the same reason `repl_priority()` is (§0j). A
+    land candidate is not competing with "a blank" -- there is no such thing as
+    a blank land, since every land taps for something -- it is competing with
+    the twenty-first Forest, which is the slot it would actually take. That is
+    also how §0z3 framed Scene of the Crime, which went into the list for a
+    Forest.
+
+    Inventing a colourless or mono-green constant here instead would decide the
+    answer: a colourless blank would make War Room look free when its real cost
+    is that it does not tap for {G} in a deck with {G}{G} costs in it.
+    """
+    lands = [c for c in deck if c.is_land]
+    if not lands:
+        raise ValueError("deck has no lands to take a replacement level from")
+    modal = max({c.name for c in lands},
+                key=lambda n: sum(1 for c in lands if c.name == n))
+    return next(c for c in lands if c.name == modal)
 
 
 def add_value(deck_name, sim, turns, cand, victim, n=N, extra=()):
@@ -93,7 +130,7 @@ def add_value(deck_name, sim, turns, cand, victim, n=N, extra=()):
             f"committed), so it cannot be measured as an addition. Remove it "
             f"from DECKS[{deck_name!r}] in candidates.py, or measure it as a "
             f"swap with experiment.run_ab instead.")
-    a = _swap_many(deck, [victim], [blank_like(cand, repl_priority(deck))])
+    a = _swap_many(deck, [victim], [blank_like(cand, repl_priority(deck), deck)])
     b = _swap_many(deck, [victim], [cand])
     cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset({cand.name}))
     ra = [sim(a, cmd, cfg, 80000 + j) for j in range(n)]
@@ -140,6 +177,24 @@ DECKS = {
                # identical unless you say which is which. See the notes in
                # decks/azusa_v1.py.
                BURGEONING, CONSTANT_MISTS)),
+    # 2026-09-10 third batch. THE VICTIM CHANGED, and not by choice: the
+    # 2026-09-09 batch above used Perilous Forays, which the staged Ka-Zar swap
+    # CUTS -- so `build_pending("azusa")` no longer contains it and that entry
+    # can no longer run at all. (It could not anyway: three of its nine
+    # candidates were committed to the deck on 2026-09-10, so add_value()'s
+    # §0o guard raises on them by design. Both failures are loud, which is the
+    # point of the guard; the entry is kept as provenance for §0x.)
+    #
+    # Sylvan Library is the replacement victim and is the most neutral slot in
+    # the deck: -0.0002 +-0.0017 win rate in the current table, signal `--`,
+    # the tightest bar around zero of any row. It is also the deck module's
+    # one enchantment with NO script at all, so removing it from both legs
+    # removes nothing the engine was modelling -- which is exactly what a
+    # victim slot should be.
+    "azusa3": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
+               (RETURN_OF_THE_WILDSPEAKER, FINALE_OF_DEVASTATION,
+                THE_GREAT_HENGE, SAPLING_NURSERY,
+                NISSA_WHO_SHAKES_THE_WORLD, WAR_ROOM, CASTLE_GARENBRIG)),
     # 2026-09-04 first batch, kept so the runs are reproducible
     "lorehold1": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
                   (SUNBIRDS_INVOCATION, BRASSS_BOUNTY, UNDERWORLD_BREACH)),

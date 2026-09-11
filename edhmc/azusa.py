@@ -118,7 +118,9 @@ import random
 import re
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
-                          spend, devotion)
+                          spend, devotion, ManaUnits, tap_reluctance,
+                          hand_colour_demand)
+from edhmc.decks._evasion import FOREST, HUMAN
 from edhmc import opponents as OPP
 
 TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
@@ -225,6 +227,16 @@ LAND_ENABLERS = frozenset({
     "Greensleeves, Maro-Sorcerer",
     "Springheart Nantuko",
     "Cultivator Colossus",
+    # --- 2026-09-10 third batch. Sapling Nursery is a landfall payoff and has
+    # to be out BEFORE the drops like every other one; War Room and Castle
+    # Garenbrig are lands themselves and are read by land_step() and by
+    # activations(). Nissa, Who Shakes the World is here because her mana
+    # doubler is what PAYS for the turn's casting, so deploying her after the
+    # drops would waste the Forests played this turn.
+    "Sapling Nursery",
+    "Nissa, Who Shakes the World",
+    "War Room",
+    "Castle Garenbrig",
 })
 
 # Starting loyalty. `Permanent.counters` carries the current value from there.
@@ -236,7 +248,29 @@ LAND_ENABLERS = frozenset({
 PLANESWALKERS = {
     "Nissa, Worldwaker": 3,
     "Nissa, Sage Animist": 3,          # the transformed back face, below
+    "Nissa, Who Shakes the World": 5,  # 2026-09-10 candidate
 }
+
+# Cards whose cost is not the cost printed on them, and what reduces it. Both
+# entries are the CARD rather than a discount effect, which is why they live
+# here and are applied in cost_of() rather than in a rules-wide reducer:
+#
+#   The Great Henge   "{X} less, where X is the greatest power among creatures
+#                     you control" -- {7}{G}{G} on a board with a 5/5 is
+#                     {2}{G}{G}, and with Ashaya or Greensleeves out (both */*
+#                     equal to your land count) it is {G}{G}. engine.py already
+#                     models this for the Rendmaw list in cost_after_reduction;
+#                     this is the same rule in this engine's own hook.
+#   Sapling Nursery   "Affinity for Forests" -- {1} less per FOREST, which is a
+#                     land SUBTYPE and therefore read from the generated
+#                     decks/_evasion.py set, not from Card.types.
+#
+# A NAME SET, so it is checked: check_dynamic_cost_coverage() at the bottom of
+# this module raises at import if a name here is not a real card, for the same
+# reason DYNAMIC_PT_LANDS is checked -- a misspelling would silently leave the
+# card at its printed nine or eight mana, which in both cases is a cost nobody
+# ever pays and a card that never resolves.
+DYNAMIC_COST = frozenset({"The Great Henge", "Sapling Nursery"})
 
 # The back face of Nissa, Vastwood Seer. It is not in the deck list because it
 # is never drawn, cast or shuffled -- it only ever arrives by transforming the
@@ -268,6 +302,8 @@ class AzusaGame:
         self.hothouse_solved = False    # Case of the Locked Hothouse
         self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
+        self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
+        self.creature_mana: list[frozenset] = []   # Castle Garenbrig's six {G}
         self.animations: list[dict] = []   # live land-animation effects
         self.pw_used: set[int] = set()     # walkers already activated this turn
         self.legacy_animation = False      # the pre-2026-09-07 Sylvan flag
@@ -339,9 +375,29 @@ class AzusaGame:
             "springheart_copies": 0,    # token copies of the bestow host;
                                         # the Insect mode is in tokens_made
             "springheart_bestowed": 0,  # 1 if it ever found a host at all
+            "springheart_etbs": 0,      # token copies whose ETB fired (item 16)
+            "springheart_legend_dies": 0,  # ... and copies the legend rule
+                                           # killed on arrival
             "caves_cracked": 0,         # Cryptic Caves sacrificed for a card
             "hothouse_solved_turn": 99, # 99 = never solved, matching the
                                         # turn_won / turn_lethal convention
+            # 2026-09-10 third batch, registered here for the same reason the
+            # 2026-09-09 ones are: a KeyError in a worker, in the minority of
+            # games where an eight-drop resolves, reads as a crash 20 minutes
+            # into a run.
+            "henge_draws": 0,           # nontoken creatures that drew off The
+                                        # Great Henge
+            "henge_life": 0,            # life from tapping it at end of turn
+            "war_room_draws": 0,
+            "castle_activations": 0,    # Castle Garenbrig's six {G}, made
+            "castle_mana_spent": 0,     # ... and actually spent on a creature
+            "wildspeaker_draws": 0,     # cards actually drawn off the draw mode
+            "wildspeaker_asked": 0,     # ... and what it asked for. The gap is
+                                        # the library running out, and it is
+                                        # the card's ceiling -- see §0z4.
+            "wildspeaker_pumps": 0,     # times the pump mode was chosen
+            "finale_from_yard": 0,      # Finale targets taken from the
+                                        # graveyard rather than the library
         }
         self.damage_by_turn = []
 
@@ -430,27 +486,39 @@ class AzusaGame:
             self.animations = [a for a in self.animations
                                if a["expires_turn"] >= self.turn]
 
+    def _pump(self, perm):
+        """Turn-scoped pump that applies to this permanent.
+
+        Craterhoof's bonus is unconditional; Return of the Wildspeaker's is
+        NON-HUMAN ONLY, which is the difference between the two and the reason
+        this is not one counter. Both reset in take_turn.
+        """
+        bonus = self.craterhoof_bonus
+        if self.wildspeaker_bonus and perm.card.name not in HUMAN:
+            bonus += self.wildspeaker_bonus
+        return bonus
+
     def power_of(self, perm):
         anim = self.animation_of(perm) if perm.card.is_land else None
         if anim is not None:
             # An animation SETS power and toughness; it does not add to them.
-            return anim["power"] + perm.counters + self.craterhoof_bonus
+            return anim["power"] + perm.counters + self._pump(perm)
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
             p = sum(1 for q in self.board if q.card.is_land)
-        p += self.craterhoof_bonus
+        p += self._pump(perm)
         return p
 
     def toughness_of(self, perm):
         anim = self.animation_of(perm) if perm.card.is_land else None
         if anim is not None:
-            return anim["toughness"] + perm.counters + self.craterhoof_bonus
+            return anim["toughness"] + perm.counters + self._pump(perm)
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
             t = sum(1 for q in self.board if q.card.is_land)
-        t += self.craterhoof_bonus
+        t += self._pump(perm)
         return t
 
     def draw(self, n=1):
@@ -507,6 +575,26 @@ class AzusaGame:
                          is_token=is_token, counters=counters,
                          base_p=card.power, base_t=card.toughness)
         self.board.append(perm)
+        # THE GREAT HENGE: "Whenever a NONTOKEN creature you control enters,
+        # put a +1/+1 counter on it and draw a card."
+        #
+        # Hooked HERE rather than in resolve() on purpose, and that is the
+        # whole difference between this card being a five-drop that draws a few
+        # cards and being this deck's card engine. A creature enters from six
+        # zones in this engine -- cast from hand, Genesis Wave, Finale of
+        # Devastation, Green Sun's Zenith, Chord of Calling, Woodland Bellower
+        # -- and only the first of those goes through resolve(). Queued item 16
+        # is the same observation from the other side: make_permanent does not
+        # run the ETB dispatch resolve() does, so anything hooked only into
+        # resolve() misses every tutored creature.
+        #
+        # Dryad Arbor is a nontoken LAND CREATURE and does trigger this, which
+        # is correct and is the kind of card a by-hand reading misses.
+        if (card.is_creature and not is_token
+                and card.name != "The Great Henge" and self.has("The Great Henge")):
+            perm.counters += 1
+            self.draw(1)
+            self.m["henge_draws"] += 1
         return perm
 
     def make_tokens(self, n, p, t, subtype=""):
@@ -517,26 +605,62 @@ class AzusaGame:
             self.m["tokens_made"] += 1
 
     def available_mana(self):
+        # Returns a ManaUnits, like engine.available_mana: it carries the
+        # owner of every unit so `spend` taps what `can_pay` actually chose
+        # rather than a same-sized set picked by board order (§0z8). This
+        # engine overrides the shared function for Temple of the False God,
+        # Eye of Ugin and Nissa's Forest doubler, so it has to carry the
+        # bookkeeping itself.
         units: list[frozenset] = []
+        owners: list = []
+        weights: list = []
+
+        demand = hand_colour_demand(self)
+
+        def add(src, n, owner):
+            rank, power = tap_reluctance(self, owner)
+            want = max((demand.get(c, 0) for c in src), default=0)
+            units.extend([src] * n)
+            owners.extend([owner] * n)
+            weights.extend([(rank, want, power)] * n)
+
         n_lands = sum(1 for p in self.board if p.card.is_land)
+        # NISSA, WHO SHAKES THE WORLD: "Whenever you tap a Forest for mana, add
+        # an additional {G}." A STATIC ability, not a loyalty one, so it is
+        # live from the moment she resolves and has nothing to do with
+        # planeswalker_step(). In this list it doubles 20 basic Forests plus
+        # Dryad Arbor -- the single largest mana effect any card in this
+        # project applies, which is why it is worth the matching change in
+        # engine.spend() that makes one Forest cover two units rather than
+        # tapping two Forests to produce them.
+        nissa = self.has("Nissa, Who Shakes the World")
         for p in self.board:
             if p.tapped:
                 continue
             c = p.card
             if c.is_land:
                 if c.name == "Temple of the False God":
-                    units.extend([frozenset({"C"})] * (2 if n_lands >= 5 else 1))
+                    add(frozenset({"C"}), 2 if n_lands >= 5 else 1, p)
                 elif c.name == "Eye of Ugin":
                     pass   # no mana ability on the current oracle text
                 else:
-                    units.extend([c.produces] * 1)
+                    add(c.produces, 1, p)
+                if nissa and c.name in FOREST:
+                    add(frozenset({"G"}), 1, p)
             elif c.mana_ability:
                 if c.is_creature and p.sick:
                     continue
                 amt, colors = c.mana_ability
-                units.extend([colors] * amt)
-        units.extend(self.bonus_mana)
-        return units
+                add(colors, amt, p)
+        # Lotus Cobra's and Tireless Provisioner's floating mana has NO owner:
+        # nothing on the battlefield taps for it, so `spend` must not try.
+        for src in self.bonus_mana:
+            units.append(src)
+            owners.append(None)
+            weights.append((9, 0, 0))
+        return ManaUnits(units, owners, weights,
+                         legacy=self.cfg.get('mana_colour_legacy', False),
+                         surplus=self.cfg.get('mana_surplus', True))
 
     # -- landfall --------------------------------------------------------
 
@@ -607,6 +731,13 @@ class AzusaGame:
         self.make_tokens(self.count("Rampaging Baloths"), 4, 4, "Beast")
         self.make_tokens(self.count("Greensleeves, Maro-Sorcerer"), 3, 3,
                          "Badger")
+        # Sapling Nursery: "Landfall -- whenever a land you control enters,
+        # create a 3/4 green Treefolk creature token with reach." The reach is
+        # carried nowhere because this engine never blocks with your creatures
+        # (the module docstring says so for Sylvan Awakening); the 3/4 body is
+        # the whole of what is modelled, and it is the Rampaging Baloths shape
+        # one size down on power and one up on toughness.
+        self.make_tokens(self.count("Sapling Nursery"), 3, 4, "Treefolk")
         for _ in range(self.count("Springheart Nantuko")):
             self.springheart_landfall()
         if self.has("Scute Swarm"):
@@ -663,27 +794,56 @@ class AzusaGame:
     # copying. That is unusual and it is why this card is a build-around.
 
     # What a copy is WORTH per landfall, best first. A pilot picks the host
-    # whose copy compounds, not the biggest body: copying Lotus Cobra is
-    # another mana every landfall, copying Provisioner another Treasure.
+    # whose copy compounds, not the biggest body.
+    #
+    # RE-RANKED 2026-09-10 WHEN COPIES STARTED RE-TRIGGERING ETBs (queued item
+    # 16), because the old order was a ranking of what a BARE BODY was worth
+    # and that is no longer what a copy is. Two things changed shape:
+    #
+    #   * THE ETB CREATURES BECAME ELIGIBLE AT ALL. Craterhoof Behemoth,
+    #     Woodland Bellower, Eternal Witness and Titania were not in this list
+    #     -- the queued item names them as the copies a pilot most wants, and
+    #     they were absent precisely BECAUSE their ETBs did nothing, which is
+    #     a hand-maintained list encoding an engine limitation as a judgement
+    #     about cards. That is the §0q failure wearing a different hat.
+    #   * A LEGENDARY HOST'S COPY NOW DIES to the legend rule, so it is worth
+    #     ITS ETB AND NOTHING ELSE. That reverses two entries: Titania stays,
+    #     because her ETB returns a land from the graveyard and the land is
+    #     the point; GREENSLEEVES IS REMOVED, because her value is a LANDFALL
+    #     trigger and a copy that dies on arrival never sees a landfall. It
+    #     used to rank fifth and was worth a permanent, illegal second
+    #     Badger-maker.
+    #
+    # THE ORDER IS A POLICY, NOT A MEASUREMENT, and it is a fixed rank where a
+    # real pilot chooses in context. `springheart_hosts` overrides it so the
+    # ranking can be measured rather than argued.
     SPRINGHEART_HOSTS = (
         "Scute Swarm",                 # copies double every landfall
+        "Craterhoof Behemoth",         # ETB pumps the WHOLE team, per landfall
+        "Avenger of Zendikar",         # ETB: a Plant per land you control
         "Lotus Cobra",                 # +1 mana per landfall, compounding
         "Tireless Provisioner",        # +1 Treasure per landfall
+        "Woodland Bellower",           # ETB tutors a 3-drop onto the field
         "Rampaging Baloths",           # a 4/4 per landfall, per copy
-        "Greensleeves, Maro-Sorcerer",
-        "Avenger of Zendikar",
+        "Eternal Witness",             # ETB returns your best card
+        "Titania, Protector of Argoth",  # LEGENDARY: the copy dies, but its
+                                         # ETB returns a land -> a landfall
         "Courser of Kruphix",
         "Tireless Tracker",
+        # Greensleeves, Maro-Sorcerer was HERE and is deliberately gone: see
+        # the legend-rule note above. Copying her is now worth zero.
     )
 
     def springheart_pick_host(self):
         """The creature to bestow onto, or None to enter as a creature."""
-        best, best_rank = None, len(self.SPRINGHEART_HOSTS)
+        hosts = tuple(self.cfg.get("springheart_hosts")
+                      or self.SPRINGHEART_HOSTS)
+        best, best_rank = None, len(hosts)
         for p in self.board:
             if not p.card.is_creature or p.card.name == "Springheart Nantuko":
                 continue
             try:
-                rank = self.SPRINGHEART_HOSTS.index(p.card.name)
+                rank = hosts.index(p.card.name)
             except ValueError:
                 continue
             if rank < best_rank:
@@ -707,8 +867,42 @@ class AzusaGame:
             if pay is not None:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
-                self.make_permanent(host.card, sick=True, is_token=True)
+                tok = self.make_permanent(host.card, sick=True, is_token=True)
                 self.m["springheart_copies"] += 1
+                # THE COPY'S ETB FIRES. Queued item 16: `make_permanent` does
+                # not run the ETB dispatch that `resolve` does, so a copy of
+                # Avenger of Zendikar was a 5/5 with no Plants and a copy of
+                # Craterhoof Behemoth pumped nothing -- which are exactly the
+                # copies a pilot pays {1}{G} a land for. "Create a token that's
+                # a copy of that creature" copies the printed card, and an ETB
+                # trigger reads the battlefield it arrives on, so a copy made
+                # on the fifth landfall of the turn sees five more lands than
+                # the original did.
+                #
+                # THE LEGEND RULE then applies to the copy, and it is a real
+                # cost rather than a technicality: a token copy of a legendary
+                # creature is put into the graveyard immediately as a
+                # state-based action, and you keep only the ETB. Titania is
+                # worth copying FOR HER TRIGGER, so the copy is made, the land
+                # comes back, and the body goes. Before this, copying
+                # Greensleeves left a permanent second Badger-maker on the
+                # battlefield, which is illegal and which `count()`-based
+                # payoffs then doubled (the §0z1 change is what made that
+                # visible); she is no longer an eligible host.
+                #
+                # TWO KNOBS, NOT ONE, because the two halves push in OPPOSITE
+                # directions and a single switch would report their sum as if
+                # it were one finding: the ETB adds value to every copy, the
+                # legend rule takes a body off the legendary ones.
+                # `copy_etb=False` with `copy_legend_rule=False` reproduces
+                # every azusa number published before 2026-09-10.
+                if self.cfg.get("copy_etb", True):
+                    self.etb(host.card, tok, is_copy=True)
+                    self.m["springheart_etbs"] += 1
+                if (self.cfg.get("copy_legend_rule", True)
+                        and "Legendary" in host.card.tags and tok in self.board):
+                    self.board.remove(tok)
+                    self.m["springheart_legend_dies"] += 1
                 return
         self.make_tokens(1, 1, 1, "Insect")
 
@@ -877,7 +1071,28 @@ class AzusaGame:
                 self.graveyard.remove(card)
             self.land_drops_used += 1
             self.m["lands_played"] += 1
-            perm = self.make_permanent(card, sick=False, tapped=card.tapped)
+            # A LAND IS DEPLOYED HERE AND NEVER GOES THROUGH resolve(), so the
+            # watch counters have to be set here too or every land candidate
+            # reports P(deploy) = 0.000 and test_card_resolved = 0 -- which
+            # reads as "the card never arrived" when it arrived every game.
+            # Found 2026-09-10 measuring War Room and Castle Garenbrig, the
+            # first land candidates to go through candidates.py.
+            if card.name in self.cfg.get("watch", ()):
+                self.m["cast_test_card"] = 1
+                self.m["test_card_turn"] = min(self.m["test_card_turn"],
+                                               self.turn)
+            # CASTLE GARENBRIG: "This land enters tapped unless you control a
+            # Forest." Conditional, so `Card.tapped` cannot carry it -- the
+            # module has tapped=False and the condition is applied here, which
+            # is also why audit_cards.py's `unless` rule passes it rather than
+            # flagging it as an untapped tapped-land. In a list with 21 Forests
+            # the condition is met nearly always, and "nearly" is the point:
+            # modelling it as unconditionally untapped would be a small free
+            # gift, and as unconditionally tapped a large false cost.
+            tapped = card.tapped
+            if card.name == "Castle Garenbrig" and not self.forests():
+                tapped = True
+            perm = self.make_permanent(card, sick=False, tapped=tapped)
             self.land_entered(card, played=True)
             if card.script == "fetch":
                 self.crack_fetch(card)
@@ -898,7 +1113,28 @@ class AzusaGame:
         if card.name in ("Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre") \
                 and self.has("Eye of Ugin"):
             cost["gen"] = max(0, cost.get("gen", 0) - 2)
+        elif card.name == "The Great Henge":
+            # "This spell costs {X} less to cast, where X is the greatest power
+            # among creatures you control." The reduction applies to the
+            # GENERIC part only -- {G}{G} is always paid, which is why the card
+            # is never free however big the board gets. `counts_as_creature`
+            # rather than `card.is_creature` so an animated land counts, as it
+            # legally does.
+            best = max([self.power_of(p) for p in self.board
+                        if self.counts_as_creature(p)] or [0])
+            cost["gen"] = max(0, cost.get("gen", 0) - best)
+        elif card.name == "Sapling Nursery":
+            # "Affinity for Forests (This spell costs {1} less to cast for each
+            # Forest you control.)" FOREST is the generated subtype set: in
+            # this list that is the 20 basic Forests and Dryad Arbor, and NOT
+            # Cavern of Souls or Nykthos however green they are.
+            cost["gen"] = max(0, cost.get("gen", 0) - self.forests())
         return cost
+
+    def forests(self):
+        """Forests you control. A SUBTYPE, so it is read from the generated
+        set rather than from Card.types -- see decks/_evasion.py."""
+        return sum(1 for p in self.board if p.card.name in FOREST)
 
     def resolve(self, card):
         if card.name in self.cfg.get("watch", ()):
@@ -943,6 +1179,18 @@ class AzusaGame:
             self.tutor_creature(3)
         elif script == "chord_of_calling":
             self.tutor_creature(4)
+        elif script == "finale":
+            # Finale of Devastation {X}{G}{G}: "Search your library AND/OR
+            # GRAVEYARD for a creature card with mana value X or less and put
+            # it onto the battlefield." Fixed X=6, the project's X-spell
+            # convention (see wave()); the graveyard half is the real
+            # difference from Green Sun's Zenith and is modelled. The X>=10
+            # mode -- +X/+X and haste to the team -- is NOT: it needs twelve
+            # mana, and pretending a fixed X of 6 sometimes reaches ten would
+            # be inventing a number rather than approximating one.
+            self.tutor_creature(6, include_graveyard=True)
+        elif script == "return_wildspeaker":
+            self.return_of_the_wildspeaker()
         elif script == "genesis_wave":
             self.wave(6, count=3)
         elif script == "animist":
@@ -980,7 +1228,22 @@ class AzusaGame:
         perm = self.make_permanent(card, sick=not card.haste,
                                    tapped=bool(card.tapped))
         self.ascended = self.ascended or len(self.board) >= 10
+        self.etb(card, perm)
 
+    def etb(self, card, perm, is_copy=False):
+        """Everything a permanent does AS IT ENTERS.
+
+        SPLIT OUT OF resolve() ON 2026-09-10 to close queued item 16. It was
+        inline, so the ONLY way to trigger an ETB was to cast the card from
+        hand -- and `make_permanent` is reached from six other places
+        (Springheart's token copy, Genesis Wave, Finale of Devastation, Green
+        Sun's Zenith, Chord of Calling, Woodland Bellower, Titania, Nissa's
+        ultimates). A copy of Avenger of Zendikar was a 5/5 with no Plants.
+
+        `is_copy` marks a token copy of another permanent. It is passed to the
+        two ETBs that must NOT repeat on one -- see below -- and is otherwise
+        unused, because the whole point is that the rest of them do.
+        """
         if card.name == "Avenger of Zendikar":
             n = sum(1 for p in self.board if p.card.is_land)
             self.make_tokens(n, 0, 1, "Plant")
@@ -1026,12 +1289,19 @@ class AzusaGame:
                         power=2, toughness=2)
             self.make_permanent(zabu, sick=True, is_token=True)
             self.m["tokens_made"] += 1
-        elif card.name == "Springheart Nantuko":
+        elif card.name == "Springheart Nantuko" and not is_copy:
             # BESTOW OR NOT, decided as it resolves. Both modes cost {1}{G},
             # so there is no mana question -- only whether a host worth
             # copying is on the battlefield. If none is, it stays a 1/1
             # creature and makes Insects, which is the mode this engine
             # modelled exclusively until 2026-09-10.
+            #
+            # `not is_copy`: bestow is an alternative COST paid as the spell is
+            # cast, so a token copy of a bestowed Springheart is a plain 1/1
+            # creature and re-running the bestow decision would let a copy
+            # re-attach. springheart_pick_host() already refuses Springheart
+            # as a host, so this cannot arise today; it is guarded because the
+            # next copy effect will not know that.
             host = self.springheart_pick_host()
             if host is not None:
                 self.springheart_host = host
@@ -1153,13 +1423,31 @@ class AzusaGame:
                     self.library.remove(land)
                     self.hand.append(land)
 
-    def tutor_creature(self, max_mv, nonlegendary_only=False):
-        pool = [c for c in self.library if c.is_creature and c.mv <= max_mv
-               and (not nonlegendary_only or "Legendary" not in c.tags)]
+    def tutor_creature(self, max_mv, nonlegendary_only=False,
+                       include_graveyard=False):
+        """Search for a creature of mana value <= max_mv, onto the battlefield.
+
+        `include_graveyard` is Finale of Devastation's "library AND/OR
+        GRAVEYARD". The graveyard is searched FIRST when it holds an equally
+        big target, because a card taken from the yard does not thin the
+        library -- and in this deck the yard fills with the creatures the pod
+        has already killed, which are the expensive ones.
+        """
+        pool = [(c, "library") for c in self.library if c.is_creature
+                and c.mv <= max_mv
+                and (not nonlegendary_only or "Legendary" not in c.tags)]
+        if include_graveyard:
+            pool += [(c, "graveyard") for c in self.graveyard if c.is_creature
+                     and c.mv <= max_mv
+                     and (not nonlegendary_only or "Legendary" not in c.tags)]
         if not pool:
             return
-        best = max(pool, key=lambda c: c.mv)
-        self.library.remove(best)
+        best, zone = max(pool, key=lambda it: (it[0].mv, it[1] == "graveyard"))
+        if zone == "graveyard":
+            self.graveyard.remove(best)
+            self.m["finale_from_yard"] += 1
+        else:
+            self.library.remove(best)
         perm = self.make_permanent(best, sick=True)
         self.ascended = self.ascended or len(self.board) >= 10
         return perm
@@ -1198,6 +1486,90 @@ class AzusaGame:
             if c.is_land:
                 self.land_entered(c, played=False)
 
+    def nonhuman_creatures(self):
+        """The creatures Return of the Wildspeaker can see.
+
+        HUMAN is the generated subtype set (decks/_evasion.py). Every token
+        this deck makes -- Beast, Badger, Plant, Insect, Treefolk, Scute Swarm
+        copies -- is non-Human, and so is every animated land, so the six
+        Humans in the list (Augur, Azusa herself, Eternal Witness, Tireless
+        Tracker, Yavimaya Elder, the staged Ka-Zar) are the whole of what this
+        card cannot touch.
+        """
+        return [p for p in self.board if self.counts_as_creature(p)
+                and p.card.name not in HUMAN]
+
+    def return_of_the_wildspeaker(self):
+        """Return of the Wildspeaker {4}{G}, Instant. Verified 2026-09-10.
+
+            Choose one --
+            * Draw cards equal to the greatest power among non-Human creatures
+              you control.
+            * Non-Human creatures you control get +3/+3 until end of turn.
+
+        THE MODE CHOICE IS A POLICY, NOT AN OPTIMISER, and it is said out loud
+        here because the card's whole evaluation turns on it. A pilot draws
+        unless the pump actually finishes someone:
+
+            PUMP when +3/+3 across the attackers would kill a player this turn
+            who would otherwise survive -- that is the only thing the pump does
+            that the draw cannot do later.
+            DRAW otherwise, because this deck's one measured weakness is cards
+            (2.77 land drops granted a turn, 1.33 used), and a 5/5 in a deck of
+            them draws five.
+
+        `wildspeaker_mode` forces the hand ("draw" / "pump") so the two halves
+        can be measured apart, the same way every 2026-09-07 animation fix got
+        its own knob.
+
+        A FLOOR IN ONE RESPECT, and it is worth stating: this is an INSTANT and
+        this engine has no instant speed. A real pilot holds it up, draws off
+        the biggest creature AFTER blockers are declared, or pumps in response
+        to a wipe. Modelled as a sorcery, cast in the main phase, which is
+        strictly the worst of the three.
+        """
+        forced = self.cfg.get("wildspeaker_mode", "auto")
+        mine = self.nonhuman_creatures()
+        if not mine:
+            return
+        draw_n = max(self.power_of(p) for p in mine)
+
+        pump = False
+        if forced == "pump":
+            pump = True
+        elif forced == "auto":
+            # Would the pump kill somebody the unpumped attack would not? The
+            # attackers are the ones combat() will send: untapped, not sick.
+            attackers = [p for p in mine if not p.tapped and not p.sick]
+            extra = 3 * len(attackers)
+            alive = OPP.living(self)
+            if alive and attackers:
+                # The pod splits one attack across defenders, so the honest
+                # question is whether the extra damage covers the smallest
+                # life total still standing that the raw attack cannot.
+                raw = sum(self.power_of(p) for p in attackers)
+                weakest = min(o.life for o in alive)
+                pump = raw < weakest <= raw + extra
+        if pump:
+            self.wildspeaker_bonus += 3
+            self.m["wildspeaker_pumps"] += 1
+        else:
+            # COUNT WHAT WAS DRAWN, NOT WHAT WAS ASKED FOR. Measured at
+            # N=4,000 this asks for 30.0 cards a resolution and receives 8.2,
+            # because the greatest power on a Craterhoof-pumped Scute Swarm
+            # board runs into the hundreds and the library is 99 cards deep.
+            # Recording draw_n here would put a number in the diagnostics that
+            # is nearly four times the number of cards that actually moved.
+            #
+            # THE GAP IS ALSO THE CARD'S CEILING, and it is worth stating
+            # where the counter is: `draw()` stops at an empty library and
+            # NOTHING IN THIS PROJECT LOSES TO DECKING. A pilot who really
+            # drew 30 off this would have to win that turn. See §0z4.
+            before = self.m["cards_drawn"]
+            self.draw(draw_n)
+            self.m["wildspeaker_draws"] += self.m["cards_drawn"] - before
+            self.m["wildspeaker_asked"] += draw_n
+
     def sac_for_value(self, momentous=False):
         fodder = [p for p in self.board if p.is_token and p.card.is_creature
                  and not p.sick]
@@ -1211,6 +1583,55 @@ class AzusaGame:
             self.draw(p_)
             self.gain_life(t_)
         self.on_creature_death(1, victim)
+
+    def castle_step(self, units):
+        """Castle Garenbrig: "{2}{G}{G}, {T}: Add six {G}. Spend this mana only
+        to cast creature spells or activate abilities of creatures."
+
+        Verified 2026-09-10 -- it is SIX mana for four, not the four-for-two it
+        is often remembered as. Net +2, restricted.
+
+        THE RESTRICTION IS WHY THIS IS NOT JUST +2 MANA, and it is the whole
+        reason the ability is modelled as a separate pool rather than as
+        `bonus_mana`. Six {G} that can only cast creatures is worth a great deal
+        in a list holding Kozilek, Ulamog, Terastodon and Craterhoof, and
+        nothing at all on a turn whose play is Genesis Wave or a land tutor.
+
+        FIRED ONLY WHEN IT UNLOCKS SOMETHING. A pilot does not activate it for
+        the sake of activating it: the check is whether some creature in hand is
+        uncastable on the real mana and castable on what is left after paying
+        the {2}{G}{G} plus the six. That is conservative in one known way -- it
+        never activates to cast a creature it could already afford in order to
+        hold the real mana open for something else -- and this engine has no
+        instant-speed play to hold it open for, so the cost of that is zero.
+
+        Returns True if it fired, so the caller knows to re-read the mana.
+        """
+        if self.creature_mana or not self.has("Castle Garenbrig"):
+            return False
+        castle = next((p for p in self.board
+                       if p.card.name == "Castle Garenbrig" and not p.tapped),
+                      None)
+        if castle is None:
+            return False
+        cost = {"gen": 2, "G": 2}
+        pay = can_pay(cost, units)
+        if pay is None:
+            return False
+        used = set(pay)
+        left = [u for i, u in enumerate(units) if i not in used]
+        extra = [frozenset({"G"})] * 6
+        unlocks = any(
+            c.is_creature and can_pay(self.cost_of(c), units) is None
+            and can_pay(self.cost_of(c), left + extra) is not None
+            for c in self.hand)
+        if not unlocks:
+            return False
+        spend(self, pay, units)
+        castle.tapped = True
+        self.creature_mana = list(extra)
+        self.m["castle_activations"] += 1
+        return True
 
     # -- turn loop -----------------------------------------------------------
 
@@ -1247,6 +1668,13 @@ class AzusaGame:
                     self.ascended = self.ascended or len(self.board) >= 10
                     continue
 
+            # CASTLE GARENBRIG, if it unlocks something, BEFORE the options are
+            # built -- the six {G} are only worth making when a creature is
+            # waiting on them.
+            if self.castle_step(units):
+                units = self.available_mana()
+            n_real = len(units)
+
             options = []
             for c in self.hand:
                 if c.is_land:
@@ -1255,7 +1683,12 @@ class AzusaGame:
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
-                pay = can_pay(self.cost_of(c), units)
+                # "Spend this mana only to cast CREATURE SPELLS or activate
+                # abilities of creatures", so the restricted pool is offered to
+                # creatures and to nothing else. It sits AFTER the real units,
+                # which is what lets the payment below tell the two apart.
+                pool = units + self.creature_mana if c.is_creature else units
+                pay = can_pay(self.cost_of(c), pool)
                 if pay is not None:
                     options.append((c, pay))
             if not enablers_only and self.library and (self.has("Augur of Autumn")):
@@ -1267,7 +1700,17 @@ class AzusaGame:
             if not options:
                 break
             card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
-            spend(self, pay, units)
+            # Only the REAL units tap a permanent. Anything the payment took
+            # from Castle Garenbrig's pool is mana that has already been paid
+            # for -- charging it to the lands as well would tap four of them to
+            # spend mana the Castle made, which would make the ability a cost
+            # with no benefit.
+            real = [i for i in pay if i < n_real]
+            from_castle = len(pay) - len(real)
+            spend(self, real, units)
+            if from_castle:
+                del self.creature_mana[:from_castle]
+                self.m["castle_mana_spent"] += from_castle
             self.m["mana_spent"] += len(pay)
             from_top = bool(self.library) and card is self.library[-1]
             if from_top:
@@ -1310,6 +1753,8 @@ class AzusaGame:
             self.m["pw_activations"] += 1
             if perm.card.name == "Nissa, Worldwaker":
                 self._nissa_worldwaker(perm)
+            elif perm.card.name == "Nissa, Who Shakes the World":
+                self._nissa_who_shakes(perm)
             else:
                 self._nissa_sage_animist(perm)
 
@@ -1362,6 +1807,73 @@ class AzusaGame:
         if target is not None:
             self.animate_lands(4, 4, targets=[target], trample=True,
                                source="Nissa, Worldwaker +1")
+
+    def _nissa_who_shakes(self, perm):
+        """Nissa, Who Shakes the World {3}{G}{G}, loyalty 5. Verified against
+        Scryfall 2026-09-10.
+
+            Whenever you tap a Forest for mana, add an additional {G}.
+            +1: Put three +1/+1 counters on up to one target noncreature land
+                you control. Untap it. It becomes a 0/0 Elemental creature with
+                vigilance and haste that's still a land.
+            -8: You get an emblem with "Lands you control have indestructible."
+                Search your library for any number of Forest cards, put them
+                onto the battlefield tapped, then shuffle.
+
+        THE STATIC ABILITY IS NOT HERE. It is in `available_mana` and
+        `engine.spend`, because it is not a loyalty ability and does not wait
+        for this method -- it is live the turn she resolves, which is most of
+        why she is a five-drop worth casting in a deck with 21 Forests.
+
+        THE +1 IS A RITUAL AS WELL AS A BODY, and the untap is the half that is
+        easy to miss: a land that has already been tapped for mana this turn
+        comes back untapped, so the ability pays for part of itself. It is
+        therefore preferred on a TAPPED land, which is the opposite of Nissa,
+        Worldwaker's +1 (that one does not untap, so it wants a land that can
+        still attack).
+
+        THE ULTIMATE IS THE SAME SHAPE AS WORLDWAKER'S -7 and is implemented
+        the same way, with one difference that matters in this deck: these
+        lands enter TAPPED, so they are mana next turn rather than this one --
+        but every one of them is still a landfall trigger as it enters. The
+        emblem is not modelled and cannot matter: `spot_removal`, `ae_removal`
+        and `board_wipe` all exclude lands already, so "lands you control have
+        indestructible" is worth exactly zero here. Said out loud so the row is
+        not read as a measurement of the whole card.
+        """
+        if perm.counters >= 8:
+            perm.counters -= 8
+            forests = [c for c in self.library if c.name in FOREST]
+            # Out of the library FIRST, then onto the battlefield -- the
+            # Genesis Wave crash of 2026-09-07, and Worldwaker's -7 above,
+            # for the same reason: a landfall trigger can draw.
+            for c in forests:
+                self.library.remove(c)
+            for c in forests:
+                self.make_permanent(c, sick=True, tapped=True)
+                self.land_entered(c, played=False)
+            self.shuffle_library()
+            self.m["pw_ultimates"] += 1
+            return
+
+        perm.counters += 1
+        # "up to one target NONCREATURE land": Dryad Arbor is a creature land
+        # and is not a legal target, and a land some other effect has already
+        # animated is a creature too. A tapped land is preferred for the untap.
+        targets = [p for p in self.board if p.card.is_land
+                   and not p.card.is_creature
+                   and self.animation_of(p) is None]
+        if not targets:
+            return
+        target = max(targets, key=lambda p: p.tapped)
+        target.tapped = False
+        target.counters += 3
+        # 0/0 with three +1/+1 counters. `animate_lands` supplies the 0/0 and
+        # `power_of` adds `perm.counters`, so the land is a 3/3 -- and it stays
+        # a 3/3 if anything else puts counters on it later, which is the right
+        # behaviour and not something a flat 3/3 animation would give.
+        self.animate_lands(0, 0, targets=[target], haste=True,
+                           source="Nissa, Who Shakes the World +1")
 
     def _nissa_sage_animist(self, perm):
         """Nissa, Sage Animist, loyalty 3 — the back face. Verified 2026-09-07.
@@ -1471,6 +1983,32 @@ class AzusaGame:
             self.draw(1)
             self.m["caves_cracked"] += 1
 
+        # WAR ROOM: "{3}, {T}, Pay life equal to the number of colors in your
+        # commanders' color identity: Draw a card." Azusa is mono-green, so
+        # ONE life -- and this is one of the very few life payments in this
+        # project that is actually charged. §0i is the standing finding that
+        # life-loss drawbacks are free here; `your_life` is real, it is read at
+        # the end of every turn by `incidental_damage`, and nothing stopped
+        # this card paying properly, so it does.
+        #
+        # It runs AFTER the main phase, so the {3} is genuinely spare mana: a
+        # pilot with a spell to cast casts it. The tap is the real cost and it
+        # is modelled by the tap -- a War Room that draws produced no mana this
+        # turn, which is why a colourless utility land that draws is not
+        # strictly better than a Forest in a deck with {G}{G} costs in it.
+        for pm in list(self.board):
+            if pm.card.name != "War Room" or pm.tapped:
+                continue
+            units = self.available_mana()
+            pay = can_pay({"gen": 3}, units)
+            if pay is None:
+                continue
+            spend(self, pay, units)
+            pm.tapped = True
+            self.your_life -= 1
+            self.draw(1)
+            self.m["war_room_draws"] += 1
+
         # Perilous Forays: {1}, sac a creature -> tutor a basic land to the
         # battlefield tapped. Token fodder only -- see the shilgengar.py
         # aristocrats-policy note this mirrors: never sac a real card.
@@ -1567,6 +2105,9 @@ def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
     g.craterhoof_bonus = 0
+    g.wildspeaker_bonus = 0
+    # Castle Garenbrig's pool empties with the turn, like any unspent mana.
+    g.creature_mana = []
     g.bonus_mana = []
     g.pw_used = set()
     g.legacy_animation = False
@@ -1603,6 +2144,19 @@ def take_turn(g):
     g.main_phase()
     if g.result is not None:
         return
+
+    # THE GREAT HENGE's second half: "{T}: Add {G}{G}. You gain 2 life."
+    # The mana is a `mana_ability` and needs no code. The LIFE is taken HERE,
+    # at the end of the turn and after the last main phase, because that is
+    # when a pilot takes it: tapping the Henge earlier would hand it two mana
+    # the casting might have wanted, and tapping it later than this is not a
+    # thing you can do. Two life a turn is small and it is not nothing -- life
+    # decides a third of this project's losses since pod v3 (§0i, §6b).
+    for p in g.board:
+        if p.card.name == "The Great Henge" and not p.tapped:
+            p.tapped = True
+            g.gain_life(2)
+            g.m["henge_life"] += 2
 
     g.m["mana_floated"] += len(g.available_mana())
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
@@ -1706,12 +2260,23 @@ def check_planeswalker_coverage():
     an inert permanent scoring like a blank -- which is exactly the state BOTH
     Nissas were in until 2026-09-07, with nothing anywhere saying so.
 
+    CANDIDATES ARE CHECKED TOO, added 2026-09-10, because a candidate is where
+    a new Planeswalker actually enters this project -- `candidates.py` swaps it
+    into the list and measures it, and a walker with no entry here would be
+    measured as an inert permanent and reported as a bad card. Nissa, Who
+    Shakes the World arrived exactly that way. This is the same widening
+    check_dynamic_pt_coverage() already has, and for the same reason.
+
     The deck is imported inside the function because decks import the engine,
     not the other way round.
     """
     from edhmc.decks import azusa_v1
     deck, _ = azusa_v1.build()
-    missing = ({c.name for c in deck if "Planeswalker" in c.types}
+    module_cards = [v for a in dir(azusa_v1) if a.isupper()
+                    for v in [getattr(azusa_v1, a)]
+                    if type(v).__name__ == "Card"]
+    missing = ({c.name for c in list(deck) + module_cards
+                if "Planeswalker" in c.types}
                - set(PLANESWALKERS))
     if missing:
         raise AssertionError(
@@ -1781,6 +2346,43 @@ def check_dynamic_pt_coverage():
     return unknown
 
 
+def check_dynamic_cost_coverage():
+    """Every name in DYNAMIC_COST must be a real card, and must be the same set
+    cost_of() actually special-cases.
+
+    The failure this prevents is quiet in both directions. A name misspelled
+    HERE leaves the card at its printed cost -- The Great Henge at nine mana
+    and Sapling Nursery at eight, neither of which anybody ever pays -- so the
+    card resolves in a handful of games and its row reads as a bad card. A card
+    reduced in cost_of() and missing from here is the opposite: nothing checks
+    it at all, and the set stops describing the engine, which is how
+    `SCRIPTED_*` went stale twice (§0q).
+    """
+    from edhmc.decks import azusa_v1
+    deck, cmd = azusa_v1.build()
+    known = {c.name for c in deck} | {cmd.name}
+    known |= {v.name for a in dir(azusa_v1) if a.isupper()
+              for v in [getattr(azusa_v1, a)] if type(v).__name__ == "Card"}
+    unknown = DYNAMIC_COST - known
+    if unknown:
+        raise AssertionError(
+            "edhmc/azusa.py: DYNAMIC_COST names no card in the deck or the "
+            "candidate list, so the reduction would never apply and the card "
+            "would be cast at its printed cost:\n"
+            + "".join(f"    {n}\n" for n in sorted(unknown)))
+    # And the reverse: what cost_of() actually reduces, read off the source.
+    reduced = set(re.findall(r'card\.name == "([^"]+)"',
+                             inspect.getsource(AzusaGame.cost_of)))
+    drift = reduced - DYNAMIC_COST
+    if drift:
+        raise AssertionError(
+            "edhmc/azusa.py: cost_of() reduces the cost of these cards but "
+            "they are not in DYNAMIC_COST, so the set no longer describes the "
+            "engine:\n" + "".join(f"    {n}\n" for n in sorted(drift)))
+    return unknown
+
+
 check_land_enabler_coverage()
 check_planeswalker_coverage()
 check_dynamic_pt_coverage()
+check_dynamic_cost_coverage()

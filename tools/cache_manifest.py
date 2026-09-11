@@ -386,6 +386,139 @@ NOTES.update({
         "table at this N."),
 })
 
+# 2026-09-10: PARTLY MODELLED. `ablation.py` is in SHARED, so adding the third
+# category moved ALL SIX fingerprints -- and it is a RENDERING change: it moves
+# five rows between headings and prints a reason under each, and touches
+# nothing that decides a simulated game.
+#
+# This is exactly the case the MOVED dict above exists for, one level up. A
+# fingerprint that cries wolf teaches people to resume across changes that
+# DID matter, so the claim "no number moved" is not argued here, it is
+# demonstrated: both affected tables were re-rendered from their existing
+# caches and diffed row by row.
+_PARTLY_MODELLED = (
+    " FINGERPRINT MOVED 2026-09-10, NUMBERS DID NOT. `ablation.py` gained the "
+    "PARTLY MODELLED category (queued items 14/14b, KNOWN_ISSUES §0z4): five "
+    "cards that the engine implements only in part -- Ashaya and Bane of "
+    "Progress on azusa, Apex of Power, Hit the Mother Lode and Borrowed "
+    "Knowledge on lorehold -- moved out of MODEL-EVALUATED, where a low score "
+    "reads as evidence against the card, into a third table where it does "
+    "not. DEMONSTRATED RATHER THAN ARGUED: both tables were re-rendered from "
+    "THIS CACHE and diffed against the committed ones -- 58 of 58 azusa rows "
+    "and 65 of 65 lorehold rows identical to the digit, no row added or "
+    "lost. THIS CACHE IS CURRENT AND RESUMABLE.")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "")
+        + _PARTLY_MODELLED
+    for d in ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa")
+})
+
+# 2026-09-10, LATER: FOUR CACHES REGENERATED FROM EMPTY for four engine
+# changes closing four queued items. The two that were NOT regenerated are the
+# evidence that the four that were needed to be: `check_unchanged_decks.py`
+# against a worktree at HEAD reports lorehold and tivit BIT-IDENTICAL on all 8
+# metrics while rendmaw, karlov, shilgengar and azusa moved.
+_REGEN_2026_09_10 = {
+    "azusa": (
+        " REGENERATED FROM AN EMPTY CACHE 2026-09-10 for QUEUED ITEM 16 "
+        "(§0z5): a token copy now re-triggers the host's ETB, the legend rule "
+        "kills a copy of a legendary host, and SPRINGHEART_HOSTS was re-ranked "
+        "for a world where copies have ETBs. Baseline win rate 0.3874 -> "
+        "0.3898. ZERO OF 58 ROWS moved by more than their own old CI "
+        "half-width and none flipped sign -- Springheart's own row went "
+        "+0.0123 -> +0.0136, still `both`. A small, surgical change, and the "
+        "table is keyed on it."),
+    "shilgengar": (
+        " REGENERATED FROM AN EMPTY CACHE 2026-09-10 for QUEUED ITEM 13 "
+        "(§0z6): Treasures are spent as mana at every payment site, and "
+        "`ult_reserve()` returns 0 when they already cover the ultimate. "
+        "Baseline damage 52.04 -> 53.73, ultimates +9.4%, blood +9.1%; win "
+        "rate +0.0021 and INSIDE its bar (p=0.15) -- the §0u shape, where the "
+        "mechanism counters are decisive and the objective cannot resolve it. "
+        "EXACTLY ONE ROW moved beyond its own old bar and it is the one the "
+        "change predicted: REVEL IN RICHES +0.0081 -> +0.0025 against a "
+        "±0.0021 bar, because a Treasure spent on mana is a Treasure not "
+        "counted toward its ten. The pilot's fix (hoard while Revel is out) "
+        "was implemented, measured at -0.0013 p=0.16, and NOT shipped; the "
+        "lower row is the card's honest value. The three Treasure-makers all "
+        "rose as predicted: Smothering Tithe +0.0049 -> +0.0069, Wayfarer's "
+        "Bauble +0.0040 -> +0.0047, Pitiless Plunderer -0.0004 -> +0.0002."),
+    "rendmaw": (
+        " REGENERATED FROM AN EMPTY CACHE 2026-09-10 for §0i / QUEUED ITEM 10 "
+        "(§0z7): Bitterblossom now pays the 1 life it has always said it "
+        "pays. Deck win rate -0.0049 [-0.0061, -0.0038], p=1.2e-16. EXACTLY "
+        "ONE ROW moved beyond its own old bar and it is Bitterblossom's: "
+        "+0.0187 -> +0.0120 against a ±0.0029 bar, still signal `both` and "
+        "still a good card. §0i called its old number a ceiling and it was, "
+        "by about a quarter."),
+    "karlov": (
+        " REGENERATED FROM AN EMPTY CACHE 2026-09-10 for §0i / QUEUED ITEM 10 "
+        "(§0z7): Phyrexian Arena now pays its 1 life -- which "
+        "edhmc/shilgengar.py was ALREADY charging for the identical card, the "
+        "§0u drift shape again. Deck win rate -0.0015 [-0.0022, -0.0007], "
+        "p=1e-04. ZERO rows moved beyond their own bars; the Arena's own went "
+        "+0.0171 -> +0.0149, inside its ±0.0029."),
+}
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "") + note
+    for d, note in _REGEN_2026_09_10.items()
+})
+
+# 2026-09-11: ALL SIX REGENERATED for the colour-payment fix (§0z8). This one
+# touches `can_pay`, `available_mana` and `spend` -- the three primitives every
+# engine shares -- so there is no "unchanged deck" to check against this time,
+# and all six caches were rebuilt from empty rather than argued about.
+_COLOUR_2026_09_11 = (
+    " REGENERATED FROM AN EMPTY CACHE 2026-09-11 for the COLOUR-PAYMENT FIX "
+    "(§0z8): `can_pay` returned a colour-correct assignment and `spend` used "
+    "only its COUNT, so the engine proved one payment and made another and "
+    "BOARD ORDER decided which land was tapped. `available_mana` now returns a "
+    "ManaUnits carrying each unit's owner, `spend` taps the owners it was "
+    "given, the old tap order (lands before rocks before dorks) moved into "
+    "can_pay as a tie-break, generic is paid from the largest SURPLUS of "
+    "supply over what the hand wants, and a second unit off an already-tapped "
+    "permanent is taken first because it is free. "
+    "ACROSS ALL 377 ROWS IN THE SIX TABLES, TEN MOVED BEYOND THEIR OWN OLD CI "
+    "HALF-WIDTH AND NONE FLIPPED SIGN. The clearest single move is the one the "
+    "mechanism predicts: SOL RING +0.0077 -> +0.0121 in lorehold, because two "
+    "colourless units off one tap are exactly what a correct assignment spends "
+    "on generic while the lands cover the coloured pips. Win rate across the "
+    "six lists is a wash; this shipped as correctness, not as a win-rate play. "
+    "`mana_colour_legacy=True` reproduces every number published before "
+    "2026-09-11.")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "")
+        + _COLOUR_2026_09_11
+    for d in ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa")
+})
+
+# AZUSA'S FINGERPRINT MOVED FOR TWO REASONS ON 2026-09-10 AND ONLY ONE OF THEM
+# IS THE RENDERER. Said separately, because "the fingerprint moved but it was
+# only the table layout" would be FALSE for this deck, and a note that is true
+# of five caches and false of the sixth is the kind of thing that gets a real
+# staleness waved through.
+NOTES["ablation_cache_azusa_10-20_n15000_medblank.json"] += (
+    " SECOND REASON, AZUSA ONLY: `edhmc/azusa.py` grew the implementations for "
+    "the seven candidates of §0z4 -- two dynamic costs, Nissa's Forest "
+    "doubler, a restricted mana pool, a landfall payoff, two land abilities "
+    "and both Wildspeaker modes -- and `edhmc/engine.py` gained the matching "
+    "Forest branch in `spend`. EVERY ONE of those paths is guarded on a card "
+    "that is NOT in this list, so none of them can execute in a run of this "
+    "deck, and that is checked rather than asserted: "
+    "`tools/check_unchanged_decks.py` against a worktree at HEAD reports ALL "
+    "SIX decks bit-identical on all 8 metrics, azusa included, run twice -- "
+    "once mid-change and once with the final code. `tools/validate.py` is "
+    "+0.00 on all 18 metrics across all six engines. THIS CACHE IS CURRENT. "
+    "The day that stops being true will be the day one of those cards is "
+    "COMMITTED to the list, and then the table is void and needs a full "
+    "regeneration, not a resume.")
+
 
 def fingerprint(deck: str) -> tuple[str, list[str]]:
     """Hash the deck's source, NORMALISED FOR LINE ENDINGS.

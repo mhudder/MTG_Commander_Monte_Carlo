@@ -155,6 +155,67 @@ def main():
     check("Case of the Locked Hothouse: +1 drop always, top access only solved",
           (unsolved, g.top_access()), ((2, False), True))
 
+    # 7b-7e. QUEUED ITEM 16, closed 2026-09-10: a token copy re-triggers the
+    # host's ETB. Not mutated -- these do not depend on the two knobs above.
+    cobra = next(c for c in M.build()[0] if c.name == "Lotus Cobra")
+
+    def bestowed_on(host_name, n_lands=12):
+        """Springheart bestowed on `host_name`, with a board of lands."""
+        g = fresh()
+        for _ in range(n_lands):
+            g.make_permanent(mkland())
+        host = next(c for c in M.build()[0] if c.name == host_name)
+        g.resolve(host)
+        g.resolve(M.SPRINGHEART_NANTUKO)
+        return g
+
+    # A copy of Avenger of Zendikar makes Plants. This is the case the queued
+    # item names: it used to be a 5/5 with nothing attached.
+    g = bestowed_on("Avenger of Zendikar")
+    plants_before = sum(1 for p in g.board if p.card.name == "Plant token")
+    landfall(g, 1)
+    plants_after = sum(1 for p in g.board if p.card.name == "Plant token")
+    check("a Springheart copy of Avenger of Zendikar makes its Plants",
+          (g.m["springheart_copies"], g.m["springheart_etbs"],
+           plants_after > plants_before), (1, 1, True))
+
+    # A copy of Craterhoof pumps the team -- an ETB that reads the board it
+    # arrives on, so the copy's bonus counts the tokens already there.
+    g = bestowed_on("Craterhoof Behemoth")
+    before = g.craterhoof_bonus
+    landfall(g, 1)
+    check("a Springheart copy of Craterhoof Behemoth pumps the team again",
+          (g.m["springheart_etbs"], g.craterhoof_bonus > before), (1, True))
+
+    # THE LEGEND RULE. A copy of Titania fires her ETB and then dies, so the
+    # land comes back and the body does not stay.
+    #
+    # AND IT CASCADES, which is correct and worth pinning: Titania's ETB puts
+    # a land onto the battlefield, that land entering IS another landfall, and
+    # Springheart triggers again. With two lands in the graveyard the chain
+    # runs twice and then stops because the graveyard is empty -- so the
+    # termination condition is a real resource and not a recursion guard. This
+    # check expected 1 and the engine was right.
+    g = bestowed_on("Titania, Protector of Argoth")
+    g.graveyard.extend([mkland(), mkland()])
+    titanias_before = g.count("Titania, Protector of Argoth")
+    lands_before = sum(1 for p in g.board if p.card.is_land)
+    landfall(g, 1)
+    check("a Springheart copy of a LEGENDARY host dies to the legend rule, "
+          "keeping its ETB -- and the returned land cascades",
+          (g.m["springheart_copies"], g.m["springheart_legend_dies"],
+           g.count("Titania, Protector of Argoth"),
+           sum(1 for c in g.graveyard if c.is_land),
+           sum(1 for p in g.board if p.card.is_land) - lands_before),
+          (3, 3, titanias_before, 0, 3))
+
+    # And the host list no longer offers a legendary whose value is a LANDFALL
+    # trigger, because such a copy dies before it can ever see one.
+    check("Greensleeves is no longer an eligible Springheart host",
+          ("Greensleeves, Maro-Sorcerer" in AZ.AzusaGame.SPRINGHEART_HOSTS,
+           "Titania, Protector of Argoth" in AZ.AzusaGame.SPRINGHEART_HOSTS),
+          (False, True))
+
     # 8. The three graveyard granters. NOT mutated -- these must survive.
     got = []
     for c in (M.CONDUIT_OF_WORLDS, M.WALK_IN_CLOSET, M.ANCIENT_GREENWARDEN):

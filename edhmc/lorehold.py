@@ -224,11 +224,20 @@ def pay(g, cost, units):
         return None
     n = len(idx)
     per = 2 if g.has("Goldspan Dragon") else 1
-    # spend treasures last, real mana first
-    from_board = min(n, len(units) - g.treasures * per)
-    if from_board > 0:
-        spend(g, list(range(from_board)), units)
-    used = n - from_board
+    # WHICH units were chosen, not how many. This used to hand `spend` the
+    # range 0..from_board, which was harmless while `spend` read only the
+    # COUNT and is wrong now that it taps the permanents behind the indices it
+    # is given (§0z8): the first N units in board order are not the ones
+    # can_pay assigned, so the colour-correct payment would have been proved
+    # and then not made -- here, uniquely, by this function rather than by
+    # spend. Treasures are appended after the real mana by `mana_units`, so a
+    # chosen index at or beyond `first_treasure` is a Treasure and has no
+    # permanent to tap.
+    first_treasure = len(units) - g.treasures * per
+    real = [i for i in idx if i < first_treasure]
+    if real:
+        spend(g, real, units)
+    used = n - len(real)
     g.treasures -= -(-used // per)          # ceil: each Treasure gives `per`
     g.m["mana_spent"] += n
     return n

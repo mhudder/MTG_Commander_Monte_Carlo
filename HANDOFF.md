@@ -88,24 +88,36 @@ don't chase them.
 A card swap goes through three states:
 
 1. **Measured** — an A/B run produced a confidence interval on win rate (the
-   objective) and a couple of proxy metrics (damage, card draw). Written up
-   as a comment.
+   objective) and a couple of proxy metrics (damage, card draw). Recorded in
+   `edhmc/pending.py`'s `MEASURED` list as a `Candidate`, which names **no
+   cut**: choosing one is the decision this state has not taken. Before
+   2026-09-10 this state lived only in comments.
 2. **Staged** — recorded in `edhmc/pending.py`'s `CHANGES` list. The deck
    module does NOT yet reflect it; `python -m edhmc.pending` is the only
    trustworthy statement of what's currently staged (don't trust
    `DECK_CHANGES.md`'s table — it's a hand-written summary and it drifts).
 3. **Committed** — applied to all three legs at once: the deck module, the
    `.xlsx`, and `pending.py`'s `COMMITTED` list. A change is not considered
-   done until all three move together.
+   done until all three move together. Azusa has no `.xlsx`, so it is two
+   legs and its module is the system of record.
 
-As of this writing there are three staged, uncommitted swaps (two on
-Lorehold, one on Rendmaw) — run `python -m edhmc.pending` for the current
-list and the evidence behind each.
+**Measured does not become staged by being good.** It becomes staged by a
+head-to-head against a specific cut, because everything in `MEASURED` shares
+one baseline and a common baseline cannot rank two cards against each other
+(`KNOWN_ISSUES.md` §0c).
 
-All three were measured before the 2026-09-08 combat split and **all three
-were re-verified on it on 2026-09-09 — every figure landed inside its own
-previous bar** (`KNOWN_ISSUES.md` §0w). They are committable; what remains is
-the three-leg discipline above.
+As of 2026-09-10 there are **four staged, uncommitted swaps** (two on Lorehold,
+one on Rendmaw, one on Azusa) and **seven measured, undecided candidates** (all
+Azusa, §0z4) — run `python -m edhmc.pending` for the current list and the
+evidence behind each. **This sentence is exactly the kind that goes stale; the
+command is authoritative and this paragraph is not.**
+
+The three older ones were measured before the 2026-09-08 combat split and
+**all three were re-verified on it on 2026-09-09 — every figure landed inside
+its own previous bar** (`KNOWN_ISSUES.md` §0w). They are committable; what
+remains is the three-leg discipline above. The Azusa one (−Perilous Forays
++Ka-Zar of the Savage Land) was staged 2026-09-10 and held back deliberately
+while four other Azusa swaps were committed.
 
 ## The one rule that matters more than any other
 
