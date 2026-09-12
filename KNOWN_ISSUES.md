@@ -27,10 +27,10 @@ Methodology that used to live at the end of this file is now
 | [0c](#0c) | FIXED | candidates were never flying-tagged, so a flier scored as ground |
 | [0d](#0d) | FIXED | Radiant Scrollwielder read the wrong zone — and it did not help |
 | [0e](#0e) | MEASURED | the Penance slot, resolved: Caldera Pyremaw |
-| [0f](#0f) | **OPEN** | three Lorehold cards are not implemented as their text (now labelled PARTLY MODELLED, §0z4) |
+| [0f](#0f) | **CLOSED** | three Lorehold cards were not their text — all three implemented (§0z14) |
 | [0g](#0g) | FIXED | two "or attacks" triggers, and one token entering untapped |
 | [0h](#0h) | FIXED | "another creature you control": three cards triggered off themselves |
-| [0i](#0i) | **OPEN** | life-loss drawbacks are free, and pod v3 made that matter |
+| [0i](#0i) | **CLOSED** | life-loss drawbacks are charged; Talisman was the last one (§0z13) |
 | [0j](#0j) | FIXED | the blank was not replacement level; every table's bottom was taxed |
 | [0k](#0k) | FIXED | Ephemerate was a proved blank, its handler dead code |
 | [0l](#0l) | FIXED | Erebos, Bleak-Hearted: three errors on one card |
@@ -56,6 +56,13 @@ Methodology that used to live at the end of this file is now
 | [0z6](#0z6) | FIXED | Shilgengar's Treasures are mana: every mechanism moves, the objective cannot resolve it |
 | [0z7](#0z7) | FIXED | two life-loss drawbacks are charged at last — Bitterblossom costs **−0.0049** |
 | [0z8](#0z8) | FIXED | the engine proved one payment and made another; **board order decided which land was tapped** |
+| [0z9](#0z9) | FIXED | **"each opponent loses N" dealt up to 3N once the pod thinned** — six copies, five compensating call sites |
+| [0z10](#0z10) | FIXED | your own sweeper ignored indestructible; the pod's did not. Sweepers classified from oracle text |
+| [0z11](#0z11) | FIXED | `opponents.py` read the TYPE LINE, so a Planeswalker Grist died to every wrath |
+| [0z12](#0z12) | FIXED | **tivit cast board wipes that did nothing** — and the policy held them until it was losing |
+| [0z13](#0z13) | FIXED | §0i closed. **Its stated blocker had been false since §0z8, one day earlier** |
+| [0z14](#0z14) | FIXED | §0f closed. **§0f's own prescription would have overstated the card** |
+| [0z15](#0z15) | FIXED | four checks that could not fail, and one proposed fix that was a regression |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **OPEN** | cards can only have one cost — structural |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -67,12 +74,29 @@ Methodology that used to live at the end of this file is now
 | [7](#7) | **OPEN** | unmodelled recursion in Lorehold |
 | [8](#8) | superseded | re-run both ablations |
 
-The still-live gaps, in one place: **§0f** (three mislabelled Lorehold cards),
-**§0i** (free life-loss drawbacks), **§0z** / **§0z2** (Ashaya AND Bane of
-Progress mislabelled; every Azusa combo invisible), **§1b** (one cost per card), **§3**
-(two unresolved cards), **§4** (opponents' boards are a number), **§7**
-(Lorehold recursion). Everything else is either fixed or was a question rather
-than a defect.
+The still-live gaps, in one place — **updated 2026-09-12, when §0f and §0i
+were closed**:
+
+| § | what is still missing |
+|---|---|
+| **19** (CLAUDE.md, not here yet) | **CRN leaks mid-game `g.rng` in five files, and `validate.py` structurally cannot detect it.** The largest open problem in the project |
+| §0z / §0z2 | Ashaya's type-changing clause and every Azusa combo are unimplemented (the MISLABEL is fixed) |
+| §0z11 | the BROADENING half: an animated land is a creature and should die to a wrath. Inert today, deliberate |
+| §0z14 | Borrowed Knowledge's mode 1 counts an opponent's HAND, which the pod does not have — §4, not an omission |
+| §1b | one cost per card, structural |
+| §3 | Ashnod's Altar's mana arrives after the main phase and cannot be spent |
+| §4 | **opponents' boards are a blocker count.** The project's deepest limit; a third of every list sits here |
+| §7 | Lorehold recursion (Invoke Calamity, Volcanic Vision, Scrap Trawler) |
+
+**§0f and §0i are CLOSED** (§0z14, §0z13). Everything else is either fixed or
+was a question rather than a defect.
+
+**If you are an agent picking this up:** read §0z9–§0z15 first. They are the
+most recent batch, they changed five of six engines, **no table has been
+regenerated against them**, and §0z15 carries the two lessons most likely to
+save you a wasted day — a check that skips a category is blind exactly there,
+and one "obvious" fix in that section is a regression with the measurement
+attached.
 
 ---
 
@@ -264,7 +288,21 @@ reproduced on that run (+0.0202 → +0.0194 ±0.0024); Sunbird's did not.
 
 <a id="0f"></a>
 
-## 0f. Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text
+## 0f. CLOSED 2026-09-12 — three Lorehold cards were not their text
+
+> **CLOSED BY §0z14.** All three are implemented. Apex of Power and Hit the
+> Mother Lode moved to `SCRIPTED_LOREHOLD`; Borrowed Knowledge stays
+> `PARTLY_MODELLED` because its mode 1 counts an opponent's HAND and this
+> pod has none (§4) — unmodelable, not unimplemented. Worth **+0.0080 win
+> rate, p=0.029.**
+>
+> **AND THIS SECTION'S OWN PRESCRIPTION WAS WRONG.** It tells the reader to
+> reuse the `wheel` script for Borrowed Knowledge. A wheel draws a flat
+> SEVEN; the card draws only what it discarded, so that would have
+> OVERSTATED it — the opposite of the claim below that all three
+> understate. The text below is kept as written. §0z14.
+
+### The original entry
 
 Membership in `SCRIPTED_*` is a claim that the engine implements the card. These
 three do not, and `check_scripted_coverage()` cannot catch it — it verifies that
@@ -368,7 +406,20 @@ wrong about this one.
 
 <a id="0i"></a>
 
-## 0i. Life-loss drawbacks are free, and pod v3 made that matter
+## 0i. CLOSED 2026-09-12 — life-loss drawbacks are charged
+
+> **CLOSED BY §0z13.** §0z7 charged Bitterblossom and Phyrexian Arena;
+> Talisman of Conviction was charged on 2026-09-12 (**−0.0015 win rate,
+> p=0.014** on lorehold). Dark Confidant is a karlov CANDIDATE and has no
+> row in any table, so it was never live.
+>
+> **THE BLOCKER THIS SECTION STATES HAD BEEN FALSE FOR A DAY.** It says
+> Talisman "cannot easily" be charged because `spend()` does not record
+> which colour a source produced — true of the count-based payment, and
+> untrue since §0z8. A note saying something is infeasible is a claim with
+> a date on it. §0z13.
+
+### The original entry
 
 The 2026-09-04 note "LIFE DOES NOT DECIDE GAMES" was true of pod v1, where 100%
 of losses were an opponent's clock. **Pod v3 is the default now**, and the
@@ -2818,6 +2869,419 @@ So this ships as a CORRECTNESS change, on the same footing as §0z6:
 `mana_colour_legacy=True` restores the old rule — BOTH halves of it, the
 count-based tapping and the flexibility-only sort — and reproduces every
 number published before 2026-09-11.
+
+---
+
+<a id="0z9"></a>
+
+## 0z9. FIXED — "each opponent loses N" dealt up to 3N once the pod thinned
+
+`deal_pod_damage(amount, each=True)` takes a POD TOTAL and divides it to get
+the per-opponent figure. It divided by the number of opponents still LIVING,
+while every caller writes its total for a FULL pod — `9.0` with the comment
+"each of 3 opponents loses 3", `6.0` for Guttersnipe's 2 apiece. The divisor
+shrank as the pod did and the numerator did not:
+
+| opponents alive | The Meathook Massacre, one death | oracle text |
+|---|---|---|
+| 3 | 1.0 each | 1.0 |
+| 2 | **1.5 each** | 1.0 |
+| 1 | **3.0** | 1.0 |
+
+**The bias runs one way and it runs in the endgame**, which is exactly where
+drain converts into a win. It hit Meathook and Cauldron of Essence
+(`engine.on_creature_death`), Baba Lysaga, Guttersnipe, Longshot and Tyrant's
+Choice.
+
+**SIX COPIES OF ONE FUNCTION, AND TIVIT WAS THE ONLY ENGINE THAT CAME OUT
+RIGHT.** Its two call sites multiplied by `len(living(g))` before calling,
+cancelling a divisor the other five were being wronged by. That is the §0u
+drift shape for the sixth time, with a twist worth keeping: **the engine that
+was correct is the one the fix forced to change.**
+
+The hazard was wider than the first grep found. FIVE call sites compensated,
+and three of them (`tivit.py` x2, `lorehold.py` x1) built the numerator on a
+DIFFERENT LINE from the call, so a one-line grep missed them. All five now
+multiply by `OPP.pod_size(g)` — the same quantity the divisor uses — so
+numerator and divisor move together under either setting of the knob. Writing
+`len(g.opponents)` there instead produced a third behaviour that never
+shipped, and the first blast-radius measurement was measuring that artifact.
+
+`opponents.pod_size` divides by `len(g.opponents)`, which is DERIVED rather
+than a literal 3: elimination sets `alive`, it never removes the opponent, so
+the count stays correct if `pod_brackets` is ever given a different length.
+
+`pod_damage_full_pod=False` restores the living-count divisor.
+Pinned by `tests/test_pod_damage_and_wipes.py`.
+
+---
+
+<a id="0z10"></a>
+
+## 0z10. FIXED — your own sweeper ignored indestructible; the pod's did not
+
+`resolve_own_wipe` called `g.board.remove(p)` directly while `board_wipe` went
+through `destroy()`, which honours `card.indestructible` and Avacyn's grant.
+**The same effect obeyed two different rules depending on which side of the
+table cast it.** §0u again, in the one place where the asymmetry favours
+nobody.
+
+Live in **two of the six BUILT lists** — and the count matters, because the
+first version of this note said three. `karlov_v2.HELIOD_SUN_CROWNED` is a
+module-level CANDIDATE, not a deck member, and a grep of the module reads the
+same as membership. Counted from `build()`:
+
+| deck | indestructible | destroy-wipes |
+|---|---|---|
+| shilgengar | Avacyn, Angel of Hope | Damn, Wrath of God |
+| rendmaw | Erebos, Bleak-Hearted | Culling Ritual |
+
+Avacyn is the sharp case: she grants indestructible to everything you control,
+and your own Wrath was ignoring the grant outright.
+
+**THE BRANCH IS TAKEN FROM THE SWEEPER'S ORACLE TEXT, NOT FROM A COIN FLIP.**
+The pod's interaction is an anonymous "answer" and is priced statistically by
+`destroy_share`, because the model cannot know whether an opponent held a Doom
+Blade or a Swords. Your own wipe is a NAMED CARD whose text the deck list
+states, so pricing it the same way would be modelling as unknown something
+that is written down. `destroy()` gained a `destroys=` parameter:
+True = indestructible always saves, False = never, None = the old roll.
+
+Every classification in `WIPE_IGNORES_INDESTRUCTIBLE` / `WIPE_DESTROYS` was
+read from api.scryfall.com on 2026-09-11 and is quoted beside the name. The
+split is not obvious and two entries are worth stating:
+
+* **Blasphemous Act DOES NOT get around it.** It deals 13 damage, and
+  indestructible survives damage exactly as it survives "destroy".
+* **Promise of Loyalty DOES.** "Sacrifices the rest" is a sacrifice, which no
+  indestructible permanent survives.
+
+`check_wipe_coverage()` raises if a `wipe`-tagged card in any live deck is in
+neither set — §0q's rule applied in the same change that introduces the set.
+
+**WHAT THIS MAKES TRUE, because it reads like a regression and is not:** with
+Avacyn out, shilgengar's Damn and Wrath of God are now blanks. That is the
+card doing its job. `main_phase` is greedy and will still cast one, which is a
+POLICY gap (queued item 18), not this one.
+
+`own_wipe_indestructible=False` restores the kill-everything path.
+
+---
+
+<a id="0z11"></a>
+
+## 0z11. FIXED — `opponents.py` read the type line, not the battlefield
+
+`engine.is_battlefield_creature` exists because a card's TYPE LINE AS PLAYED
+is not its creature-ness on the battlefield (§0b). The engine's combat step
+has used it since 2026-09-05. **`opponents.py` never adopted it** and asked
+`perm.card.is_creature` at seven sites, so a permanent could be too-not-a-
+creature to attack and creature enough to die to a board wipe.
+
+All three affected cards sit in the rendmaw list **alongside its two
+sweepers**:
+
+| card | clause | what happened |
+|---|---|---|
+| Grist, the Hunger Tide | "As long as Grist ISN'T ON THE BATTLEFIELD, it's a 1/1 Insect creature" | a bare Planeswalker, dying to every Wrath |
+| Overlord of the Hauntwoods | Impending: "isn't a creature until the last time counter is removed" | wrathed during the four turns it is an enchantment |
+| Erebos, Bleak-Hearted | not a creature below devotion 5 | same |
+
+`opponents.is_creature_now` is now the single predicate for the question, used
+by both wipe paths, the wrath-width count, `should_cast_own_wipe`,
+`board_threat`, `your_creatures`, `destroy`'s death trigger and (since the
+same day) `final_board_power` in all six engines.
+
+**IT NARROWS AND NEVER BROADENS, ON PURPOSE.** The `card.is_creature` guard
+comes first, so it can only REMOVE a permanent from a victim list. That is
+deliberate: `azusa.py`'s module docstring states as a fact that
+`spot_removal` and `board_wipe` "both exclude lands, so nothing the pod does
+can kill an animated land". An animated land really is a creature and really
+should die to a Wrath — `azusa.counts_as_creature` already knows it — but
+that is the BROADENING half of the same question, it is inert today (all
+three of azusa's animation cards were cut on 2026-09-10, §0y), and folding it
+in here would have silently reversed a documented decision.
+**That half is still open.**
+
+Measured on rendmaw (N=4,000, T20): `final_board_power` **+0.93** (p=9e-08),
+damage **+0.48** (p=2e-06), `tokens_made` +0.24, `wipes_suffered` −0.012 (a
+board that no longer counts non-creatures looks narrower and draws fewer
+wraths). Win rate **+0.0027, p=0.20 — unresolved**.
+
+`pod_reads_battlefield_creatures=False` restores the type-line reading. It is
+a NEW knob rather than a reuse of `battlefield_creature_types`, which was
+tempting and wrong: that one gates only the NEVER *stamp* applied at ETB and
+does not gate the impending or devotion clauses, so it would have restored
+some of the old behaviour and not the rest — **a mutation run that passes
+while claiming to restore the old rule.** The mutation check caught exactly
+that before the knob was changed.
+
+---
+
+<a id="0z12"></a>
+
+## 0z12. FIXED — tivit cast board wipes that did nothing, and waited to do it
+
+`tivit.resolve()` had **no `wipe` branch at all**. `main_phase` already gated
+casting on `OPP.should_cast_own_wipe`, so the tag was half-wired: the engine
+HELD Damn, Farewell and Promise of Loyalty back until it was behind on board
+and then cast them for zero effect. **That is worse than a blank — a blank
+does not wait for the worst moment to do nothing.** The other four engines
+have carried the one line since §5.
+
+`own_wipes_cast` goes from **0 to 0.88 a game**. Measured (N=4,000, T20):
+`turns_played` **+0.54** (p=6e-113), `opponents_killed` **+0.057** (p=3e-08),
+damage flat (a symmetric wipe kills your board too — the gain is survival),
+win rate **+0.0055, p=0.25 — unresolved**.
+
+**TWO OF THE FIVE CARDS HAD TO BE FIXED, NOT JUST SWITCHED ON.** Their tags
+were harmless while nothing read them and would have become real
+overstatements the moment the branch worked:
+
+* **Sadistic Shell Game** — "each player chooses a creature you don't
+  control" is ONE KILL PER PLAYER. As `("wipe", "onesided")` it would have
+  zeroed all three opponents' boards: up to 21 creature-equivalents against
+  the 4 the card kills. Now a bounded 1-per-player off the biggest board,
+  measured at 0.29 kills a game.
+* **Magister of Worth** — its wipe is CONDITIONAL on the council vote and
+  spares only itself; `onesided` would have fired unconditionally and spared
+  your whole board. It previously shared a dispatch branch with four cards
+  whose entire text is the vote, so it voted and threw the result away —
+  neither mode existed. It now resolves BEFORE the permanent enters, which is
+  what makes "all creatures other than this creature" exact rather than
+  approximate. 0.072 wipes / 0.066 graveyard returns a game.
+
+Condemnation needs vote control to land at all (1–2 votes against three
+adversarial opponents never wins a council) — that is the documented
+pessimistic `opp_vote_policy` default, not a defect. Grace's "EACH PLAYER
+returns each creature card from their graveyard" is modelled for you and
+invisible for the pod (§4), so that mode understates.
+
+Consequence for the labels: all five left `KNOWN_BLIND`, where they sat under
+"nothing that removes a permanent can be evaluated". That was true of Path to
+Exile and never quite true of a board wipe — a wipe against an abstract
+creature COUNT is expressible, you set it to zero. Damn, Farewell and Sadistic
+Shell Game are now `SCRIPTED_TIVIT`; Promise of Loyalty and Magister of Worth
+are the first entries in `PARTLY_MODELLED["tivit"]`.
+
+`tivit_sweepers=False` restores the whole pre-fix state.
+
+---
+
+<a id="0z13"></a>
+
+## 0z13. FIXED — §0i is closed, and its stated blocker had been stale for a day
+
+§0i listed four cards whose life-loss drawback was free. §0z7 charged
+Bitterblossom and Phyrexian Arena. Of the remaining two, **Dark Confidant is a
+karlov CANDIDATE and has no row in any table** (the same misread as §0z10's
+Heliod), so **Talisman of Conviction was the only one still live.**
+
+§0i said it "cannot easily not be: `spend()` does not record which colour a
+source produced". **That was true of the count-based payment and stopped being
+true at §0z8**, one day earlier, which nobody went back and re-read.
+`available_mana` now records each unit's OWNER and `can_pay` returns the exact
+indices it assigned, so the owner and the pip are both in hand at every
+payment site.
+
+`engine.pip_assignment` recovers the pip POSITIONALLY from `can_pay`'s
+existing return value — coloured pips are taken first, in `COLORS` order, then
+generic, in all three of its branches — so it needs no signature change and
+makes no second copy of the assignment. Talisman is charged only when it was
+assigned to an `{R}` or `{W}` pip; one spent on generic was tapped for `{C}`
+and is free, which is both correct and what the pilot would do.
+
+Measured on lorehold (N=4,000, T20): win rate **−0.0015, p=0.014** — small and
+significant. 0.109 coloured taps a game. The chain is visible:
+`final_life` −0.036 → `turns_played` −0.007 → `cards_drawn` −0.032 →
+`miracles_cast` −0.0035. A tenth of a life buying 0.0015 win rate reads steep
+until you see that **lorehold ends on 1.73 life** with the highest life-share
+of losses of the three decks (0.43).
+
+**THE GENERAL LESSON, and it is 16b pointed the other way.** Standing finding
+16b says a POLICY written while a bug was open does not fix itself when the
+bug closes. This is the same thing about a KNOWN ISSUE: **a note saying
+something is infeasible is a claim with a date on it, and closing an engine
+gap can silently make it false.** After any §0z8-sized change, re-read the
+issues that said "cannot".
+
+Behind `talisman_coloured_tap` (its own switch) AND `charge_life_costs` (the
+§0z7 family flag, which overrides). Two knobs because reverting through the
+family flag alone would revert Bitterblossom and Phyrexian Arena with it, and
+then no measurement of this change by itself is possible.
+
+---
+
+<a id="0z14"></a>
+
+## 0z14. FIXED — §0f's three Lorehold cards, and §0f's own prescription was wrong
+
+All three are implemented. **§0f is closed except for one clause that is
+unmodelable rather than unimplemented.**
+
+### Borrowed Knowledge — and §0f told the next reader to break it
+
+§0f says: *"Borrowed Knowledge is a wheel, and the engine already has a
+`wheel` script for Reforge the Soul."* **It is not a wheel.** Oracle:
+
+> Choose one — • Discard your hand, then draw cards equal to the number of
+> cards in target opponent's hand. • Discard your hand, then draw cards equal
+> to the number of cards discarded this way.
+
+`wheel` draws a flat SEVEN; this draws only what it discarded. Following §0f's
+prescription would have **overstated** the card — the opposite of that
+section's own claim that all three of its cards understate. And the stand-in
+it replaced, `draw2`, overstated it too: **two free cards is better than a
+net-zero self-wheel.**
+
+Mode 2 is implemented; **mode 1 has no opponent hand to count (§4)**, which is
+why the card stays in `PARTLY_MODELLED` and its row is a FLOOR.
+
+**The draw was never the missing half — the DISCARD was.** `draw2` put nothing
+in the graveyard, and this is the deck where the graveyard feeds Arcane
+Bombardment, Mizzix's Mastery, The Dawning Archaic and Radiant Scrollwielder.
+
+The mutation check earned its keep here: the prediction was seven failing
+cases and it was eight. **`draw2` drew two cards off an EMPTY hand**, which is
+the one board state where Borrowed Knowledge does nothing at all — the old
+script was not a weak approximation of this card, it was a different card.
+
+### Apex of Power — the ten mana is the card
+
+Was `draw4`. "Exile the top seven cards of your library. Until end of turn,
+you may cast spells from among them. If this spell was cast FROM YOUR HAND,
+add ten mana of any one color."
+
+Two real costs came with implementing it, and `draw4` charged neither: cards
+exiled and not cast are **GONE**, not drawn; and a **COPY gets no mana**,
+which is most of why copying this card is worse than casting it.
+`mana_units`/`pay` now carry three blocks — board, Apex, Treasures — with both
+boundaries measured from the END of the list, because only the board block has
+permanents behind it and only it may reach `spend`.
+
+### Hit the Mother Lode — Discover 10
+
+Was a flat 5 Treasures. Now exiles until a nonland of MV ≤ 10, free-casts it,
+and makes 10 − MV Treasures that enter **TAPPED** and are not mana until the
+next untap step. Structurally `sunbird` with two differences that matter: it
+digs UNTIL it hits rather than looking at a fixed window, and at N=10 the hit
+is effectively guaranteed.
+
+**One deliberate departure from the reminder text:** the leftovers go to the
+bottom **in order, not shuffled**. `sunbird` shuffles its leftovers with
+`g.rng.shuffle`, which is a mid-game draw on the GAME rng and one of the CRN
+leaks below. The order of cards on the bottom of a library can only matter to
+a game that reaches them, and these games end around turn 12.
+
+### Measured together (N=4,000, T20)
+
+| metric | before | after | |
+|---|---|---|---|
+| **won** | 0.1492 | 0.1573 | **+0.0080**, p=0.029 |
+| mv_cheated | 24.60 | 26.06 | **+1.46**, p=3e-07 |
+| total_mv_cast | 55.05 | 57.51 | +2.45, p=6e-12 |
+| free_casts | 0.150 | 0.374 | +0.224, p=5e-104 |
+| cards_drawn | 28.71 | 27.90 | −0.82, p=5e-20 |
+
+**The only win-rate-positive result in the whole batch.** 91% of the Apex mana
+generated is spent (1.38 of 1.515 a game), which is the evidence that the ten
+mana is the card. `cards_drawn` falling is the honest cost of Apex exiling
+where `draw4` drew.
+
+Knobs: `borrowed_knowledge_discard`, `apex_ten_mana`, `mother_lode_discover`.
+
+---
+
+<a id="0z15"></a>
+
+## 0z15. FIXED — four checks that could not fail, and one "fix" that was a regression
+
+A cluster found by sweeping for the failure shapes this project keeps having,
+rather than by a diagnostic. **Three of the four changed no number at all**,
+which is the point: they are checks and labels, and a check that cannot fail
+reads like assurance and is worse than none.
+
+### The engines stamped their defaults into the CALLER'S cfg
+
+Five engines open with `cfg.setdefault(...)` — `shroud_sources`,
+`protection_cards`, their own knobs — run against the dict they were handed.
+A caller that built one cfg and passed it to several engines got the **FIRST
+engine's** defaults applied to all of them: construct a Lorehold game and then
+a Karlov one on the same dict and **Karlov silently ran with Lorehold's
+shroud sources and protection cards.**
+
+Nothing committed is affected, and that was luck rather than design:
+`compare_decks.run()`, `fit_pod.evaluate()` and `experiment.run_ab` all happen
+to build a fresh cfg per deck. **A convention was holding a latent bug still.**
+Found when a verification script shared one cfg across all six engines and got
+a different Karlov out of it. `engine.engine_cfg()` now hands each engine a
+private copy.
+
+### `opponents_killed` was two quantities under one name
+
+`combat_damage` maintained `m["opponents_killed"]` as *kills your attack
+made*; every engine's `simulate()` then overwrote that key with *opponents not
+alive from ANY cause*, which includes the ones eliminated by another
+opponent's clock. The in-game counter was dead weight and the reported metric
+— in `experiment.METRICS`, on every A/B — has always been the any-cause one.
+
+Renamed to `m["combat_kills"]`. **No number moved**; nothing reads either key
+as a decision input. The gap is worth knowing: **karlov shows 0.46 combat
+kills against 1.45 `opponents_killed`** — two-thirds of what that metric
+reported was the pod killing itself.
+
+### `check_scripted_coverage` skipped every land
+
+`names = {c.name for c in deck if not c.is_land}`. A basic Forest needs no
+classification, but **a `script` on a land IS a claim**, and that claim went
+unchecked: **Rogue's Passage** sat in tivit with `script="rogues_passage"`
+that nothing dispatched, nothing implemented, and that was in none of the
+three categories. §0q's shape in the checker itself.
+
+Widened to `if not c.is_land or c.script`, which immediately demanded
+classification for five more scripted lands — Khalni Garden, Havengul
+Laboratory and the three azusa fetches, all implemented, now `SCRIPTED_*`.
+Rogue's Passage is `KNOWN_BLIND` with its reason: **the thing it buys is
+already assumed.** Tivit's second trigger fires on `dmg > 0 and Tivit
+attacked` and never asks whether TIVIT connected, so the model already
+behaves as though the commander is unblockable; the {4} activation is
+uncharged too, so both halves are missing and point opposite ways.
+
+### A mutation check that raised KeyError instead of checking anything
+
+`diagnostics/diag_azusa_animation --mutate` — a command CLAUDE.md tells the
+reader to run — died with `KeyError: 'Sylvan Awakening'`. §0y cut the whole
+land-animation pillar on 2026-09-10 and `BY_NAME` was built from the deck.
+**The cards left; the engine did not**: `sylvan_awakening`,
+`rude_awakening` and Nissa's loyalty abilities are all still live
+default-path code. The three definitions are restored in the diagnostic
+verbatim from `d158724^`, the deck wins on any name it still carries, and a
+`REQUIRED` check now fails at import with a sentence instead of a KeyError
+forty lines into a case. Back to 8/8 clean and **7 of 8 failing under
+`--mutate`**, as documented.
+
+### AND ONE PROPOSED FIX THAT WAS A REGRESSION, kept here because it will be re-proposed
+
+`can_pay`'s `supply` dict is built once before the generic loop and NOT
+decremented as picks are taken, so from the second pick on it counts units
+already spent. The docstring said "how many REMAINING units can still produce
+it". **It reads like an oversight. It is not, and decrementing it is wrong.**
+
+One Plains and three Mountains, paying {3}:
+
+| rule | picks | result |
+|---|---|---|
+| snapshot | W=1 R=3, W=1 R=3, W=1 R=3 | Mountain x3 — **the Plains survives** |
+| running | W=1 R=3, W=1 R=2, W=1 **R=1** | Mountain, Mountain, **TIE** |
+
+The running count degrades exactly as the payment eats the plentiful colour,
+so the last pip of a big generic cost always falls through `-surplus`,
+`len(units)` and the weight to **board order** — the §0z8 defect, coming back
+in the one function §0z8 exists to fix. `tests/test_mana_colour.py` failed two
+cases within a minute of the change.
+
+**The code was right and the docstring was wrong.** The comment now carries
+the counter-example so the next reader does not repeat it.
 
 ---
 

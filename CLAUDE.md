@@ -69,6 +69,11 @@ python -m tests.test_azusa_candidates  # the 2026-09-09 candidates' mechanisms
 python -m tests.test_azusa_batch3      # the 2026-09-10 candidates' mechanisms
 python -m tests.test_mana_colour       # colour-correct payment, and that BOARD
                                        # ORDER cannot change the answer (§0z8)
+python -m tests.test_pod_damage_and_wipes   # §0z9/§0z10/§0z11 — the pod-damage
+                                       # divisor, own wipes vs indestructible,
+                                       # and wraths reading the battlefield
+python -m tests.test_lorehold_0f_0i    # §0z13/§0z14 — Talisman charged, and
+                                       # Borrowed Knowledge / Apex / Mother Lode
 ```
 
 Candidate evaluation, at the tables' own N so the numbers are comparable:
@@ -108,8 +113,9 @@ python -m diagnostics.run_life_costs           # §0z7 §0i, the free drawbacks
 python -m diagnostics.run_mana_colour          # §0z8 colour payment, two ways
 ```
 
-Two of these carry a MUTATION CHECK, because a check that cannot fail reads
-like assurance and is worse than none:
+SEVEN checks carry a MUTATION run, because a check that cannot fail reads
+like assurance and is worse than none. Each asserts an EXACT set of failing
+cases, so a fix that stops mattering is as loud as one that breaks:
 
 ```bash
 python -m diagnostics.diag_azusa_animation --mutate   # 7 of 8 cases MUST fail
@@ -117,6 +123,8 @@ python -m tests.test_combat_split --mutate            # exactly 2 cases MUST fai
 python -m tests.test_azusa_candidates --mutate        # exactly 3 cases MUST fail
 python -m tests.test_azusa_batch3 --mutate            # exactly 7 cases MUST fail
 python -m tests.test_mana_colour --mutate            # exactly 4 cases MUST fail
+python -m tests.test_pod_damage_and_wipes --mutate   # exactly 13 MUST fail
+python -m tests.test_lorehold_0f_0i --mutate         # exactly 17 MUST fail
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -152,8 +160,29 @@ record and it has two legs, not three.
 
 ## Current state
 
-Verified 2026-09-10. `validate.py` is `+0.00` on all 18 metrics across 6
-engines; `corr(A,B) = 0.9130`, CRN worth ~11x the games.
+> # EVERY ABLATION TABLE IN `results/` IS STALE.
+>
+> **2026-09-12. Fourteen engine defects were fixed and NOTHING has been
+> regenerated.** The tables on disk describe the engine as it stood on
+> 2026-09-11. Five of the six decks' behaviour has changed since. **Do not
+> quote a number out of `results/` and do not stage a swap on one** until the
+> regeneration below is done.
+>
+> What to do first, in this order:
+>
+> 1. `python -m tools.validate` → must be `+0.00` on all 18 metrics.
+> 2. Run the eight tests and the seven `--mutate` checks listed above.
+> 3. `./tools/regen_tables.sh` (deletes caches by default; ~35 min).
+> 4. Only then read a table.
+>
+> The batch is §0z9–§0z15. Every change has its own knob defaulting to the
+> corrected behaviour, so `git stash` is not the way to compare — flip the
+> knobs listed in §0z9–§0z15 instead.
+
+Verified 2026-09-12. `validate.py` is `+0.00` on all 18 metrics across 6
+engines; `corr(A,B) = 0.9135`, CRN worth ~11x the games. All eight tests and
+all seven mutation checks pass. `python -m edhmc.pending` reports
+100 cards / singleton-legal / commander distinct on every deck.
 
 | deck | module | spreadsheet | engine | status |
 |---|---|---|---|---|
@@ -163,6 +192,43 @@ engines; `corr(A,B) = 0.9130`, CRN worth ~11x the games.
 | Tivit, Seller of Secrets | `tivit_v1.py` | v1 | `tivit.py` | mature; nothing staged |
 | Shilgengar, Sire of Famine | `shilgengar_v1.py` | v1 | `shilgengar.py` | ablated; nothing staged |
 | Azusa, Lost but Seeking | `azusa_v1.py` | **none** | `azusa.py` | **4 changes COMMITTED 2026-09-10; 1 staged** |
+
+**2026-09-12 — THE FOURTEEN-FIX BATCH (§0z9–§0z15).** Found by reviewing the
+shared primitives rather than by a diagnostic, which is why they cluster in
+`opponents.py` and `engine.py` rather than in one deck. Grouped by what an
+agent needs to know:
+
+| § | defect | decks it moves |
+|---|---|---|
+| 0z9 | "each opponent loses N" dealt up to **3N** once the pod thinned | rendmaw, lorehold |
+| 0z10 | your own wipe ignored indestructible; the pod's did not | shilgengar, rendmaw |
+| 0z11 | wraths read the TYPE LINE, so a Planeswalker Grist died to them | rendmaw |
+| 0z12 | tivit cast board wipes that **did nothing**, and waited to do it | tivit |
+| 0z13 | §0i closed — Talisman of Conviction charged | lorehold |
+| 0z14 | §0f closed — Borrowed Knowledge, Apex of Power, Hit the Mother Lode | lorehold |
+| 0z15 | four checks that could not fail; one proposed fix that was a regression | none |
+
+**THE ONE WIN-RATE-POSITIVE RESULT IS §0z14** (+0.0080, p=0.029 on lorehold).
+Everything else moved MECHANISM COUNTERS decisively and left win rate inside
+its bars — the §0u/§0z6 shape, five more times. That is the expected outcome
+of correctness work and is not a reason to doubt it.
+
+**New knobs, all defaulting to the corrected behaviour:**
+`pod_damage_full_pod`, `own_wipe_indestructible`,
+`pod_reads_battlefield_creatures`, `tivit_sweepers`, `everywhere_is_token`,
+`talisman_coloured_tap`, `borrowed_knowledge_discard`, `apex_ten_mana`,
+`mother_lode_discover`.
+
+**Classification churn, because a label is a claim (§0q):** five tivit
+sweepers left `KNOWN_BLIND` (three to `SCRIPTED_TIVIT`, two to a new
+`PARTLY_MODELLED["tivit"]`); Apex of Power and Hit the Mother Lode left
+`PARTLY_MODELLED` for `SCRIPTED_LOREHOLD`; five scripted LANDS were classified
+for the first time; Rogue's Passage is newly `KNOWN_BLIND`. After
+regeneration, **`PARTLY_MODELLED` is Ashaya + Bane of Progress (azusa),
+Borrowed Knowledge (lorehold), Promise of Loyalty + Magister of Worth
+(tivit)**.
+
+---
 
 **2026-09-10, FOUR QUEUED ITEMS CLOSED AND FOUR TABLES REGENERATED.** Items
 14/14b (the PARTLY MODELLED category), 16 (token copies re-trigger ETBs), 13
@@ -311,8 +377,10 @@ elimination onward every deck attacked into no blockers while applying the
 result to a different player. Worth +0.0625 ±0.0064 win rate on azusa for the
 split alone. Full detail in §0v and `results/combat_split.txt`.
 
-**Doc trust, stated plainly.** `README.md` is trustworthy on methodology and
-stale on file lists and every number it quotes. `docs/PROJECT_CONTEXT.md` and
+**Doc trust, stated plainly.** `HANDOFF.md` is the human-facing orientation
+and carries the one-page summary of what the 2026-09-12 batch changed and what
+is left; read it first if you are new. `README.md` is trustworthy on
+methodology and stale on file lists and every number it quotes. `docs/PROJECT_CONTEXT.md` and
 `docs/PENDING_CHANGES.md` predate almost all of this and still name
 `lorehold_v15.py` — kept as provenance, not as guidance.
 `docs/DECK_CHANGES.md` is a hand-written summary that drifts;
@@ -383,6 +451,40 @@ all of them.** When you implement a card's rule, grep the other engines for its
 name before assuming yours is the only copy — and when one engine has quietly
 opted out of a shared primitive, ask what it knew.
 
+**A NOTE THAT SAYS SOMETHING IS INFEASIBLE IS A CLAIM WITH A DATE ON IT**
+(2026-09-12, §0z13). `KNOWN_ISSUES` §0i said Talisman of Conviction "cannot
+easily" be charged because "`spend()` does not record which colour a source
+produced". That was true of the count-based payment and **stopped being true
+at §0z8, one day earlier**. The fix took fifteen lines and closed §0i. This is
+finding 16b pointed at DOCUMENTATION instead of policy: closing an engine gap
+can silently make an issue's stated blocker false, and nothing re-reads it.
+**After any §0z8-sized change, grep the issues for "cannot" and "not
+possible".**
+
+**A CHECK THAT SKIPS A CATEGORY HAS A BLIND SPOT, AND THAT IS WHERE THE BUG
+IS** (2026-09-12, §0z15). `check_scripted_coverage` opened with
+`if not c.is_land`, so a `script` on a land — which IS a claim that the engine
+does something — went unverified for the life of the project. Widening it
+turned up six unclassified cards immediately, one of them (Rogue's Passage)
+entirely unimplemented. The same shape had already produced a mutation check
+that raised `KeyError` instead of checking anything. **When you write an
+exemption into a checker, write down what it is now blind to.**
+
+**A TAG NOTHING READS IS NOT INERT — IT IS A LOADED GUN** (2026-09-12, §0z12).
+`tivit.resolve` had no `wipe` branch, so five cards' `wipe`/`onesided` tags
+did nothing and looked harmless. Wiring the branch up made two of them
+instantly WRONG: Sadistic Shell Game would have zeroed three boards where the
+card kills four creatures. **Before you make a dormant tag live, re-read the
+oracle text of every card carrying it** — the tags were written by someone who
+knew they did nothing.
+
+**WRITE THE MUTATION EXPECTATION BEFORE YOU RUN IT.** Both mutation lists
+added in this batch were wrong on the first try, and both errors were
+informative: `draw2` drew two cards off an EMPTY hand (§0z14), and the knob
+that looked like the right switch gated only half the rule (§0z11). A
+mutation check whose expected set is written after seeing the output is a
+transcript, not a test.
+
 **A POLICY WRITTEN WHILE A BUG WAS OPEN DOES NOT FIX ITSELF WHEN THE BUG DOES**
 (2026-09-10, §0z5). `SPRINGHEART_HOSTS` ranked hosts by what a BARE BODY was
 worth, because copies did not re-trigger ETBs — so it excluded the four ETB
@@ -442,12 +544,16 @@ empty and a run silently REPRINTS THE OLD NUMBERS instead of measuring.
 it and compare before resuming one, and delete the cache if it differs.
 `./tools/regen_tables.sh` deletes by default, `--resume` does not.
 
-**CRN is the reason any of this is affordable, and a mid-game shuffle nearly
-broke it.** Across every engine `self.rng` is touched only for the opening
-shuffle and mulligans. Azusa's fetch-land shuffle draws from PRE-ROLLED seeds
-indexed by shuffle count, so the Nth shuffle in both branches applies the same
-permutation. If you add anything that shuffles, do it the same way and re-run
-the A/A control.
+**CRN is the reason any of this is affordable, and a mid-game shuffle IS
+CURRENTLY BREAKING IT.** This finding used to read "across every engine
+`self.rng` is touched only for the opening shuffle and mulligans". **That was
+measured on 2026-09-11 and it is false in five files** — see queued item 19
+for the counts and the two A/B measurements. Azusa's fetch-land shuffle is the
+pattern everything else should follow: PRE-ROLLED seeds indexed by shuffle
+count, so the Nth shuffle in both branches applies the same permutation.
+`lorehold.sunbird` does not, and it is the worst offender. If you add anything
+that shuffles or rolls mid-game, do it azusa's way — and note that the A/A
+control cannot tell you whether you got it right.
 
 ---
 
@@ -525,8 +631,44 @@ information would. §0v.
 
 ## Queued work
 
-Re-read against the code 2026-09-09; verdicts inline. Items closed before
+Re-read against the code 2026-09-12; verdicts inline. Items closed before
 2026-09-07 have been moved to `docs/HISTORY.md` with their evidence.
+
+### THE ONE THING TO DO NEXT, after the regeneration
+
+**19. CRN IS LEAKING, AND `validate.py` CANNOT SEE IT.** The standing finding
+below says "across every engine `self.rng` is touched only for the opening
+shuffle and mulligans". **That is false in five files** — `engine.py:1208`
+(Arasta), `engine.py:1325` (Deathreap Ritual), `karlov.py:447` (Kambal),
+`lorehold.py:373,679,731,824,916`, `tivit.py:708`, `voting.py:101,104,156`.
+Measured by counting draws taken after the opening hand, on real A/B pairs:
+
+| swap | mid-game draws A | B | seeds where the branches diverged |
+|---|---|---|---|
+| rendmaw, March → Skullclamp | 202 | 216 | 17/400 (4.2%) |
+| lorehold, Scroll Rack → Sunbird's | 132 | **1100** | 46/300 (**15.3%**) |
+
+Once the two branches take a different number of draws, every later draw
+reads a different slot of the same stream and the pairing is broken from
+there on.
+
+**`lorehold.py:916` is `g.rng.shuffle(revealed)` — a mid-game library
+shuffle**, which is precisely what the standing finding warns about.
+`azusa.py:928` has the correct fix (pre-rolled `shuffle_seeds` indexed by
+`shuffles_done`); lorehold never got it.
+
+**`tools/validate.py` CANNOT DETECT THIS.** Its A/A control swaps a card for
+ITSELF, so the boards never diverge and the call sequence is identical by
+construction. The "non-negotiable" `+0.00` on 18 metrics is, for this class of
+leak, a check that cannot fail.
+
+Offered as a testable hypothesis and NOT as a conclusion, because §0b-i says
+the decay is worth not guessing at: **Sunbird's Invocation is by an order of
+magnitude the largest `g.rng` consumer in the project, and §0b-i's unattributed
+one-off decay is Sunbird's.** Port azusa's pre-rolled pattern, re-measure at
+the original N and seeds, and see whether the step moves. Whatever the answer,
+`validate.py` needs an A/B-based check that asserts mid-game draw counts match
+per seed.
 
 11. ~~Re-verify the three staged swaps on the post-combat-split engine.~~
     **DONE 2026-09-09 — ALL THREE HOLD.** Re-run at original N and original
@@ -571,7 +713,7 @@ Re-read against the code 2026-09-09; verdicts inline. Items closed before
     **withdrawn** on that basis. It is now in `PARTLY_MODELLED` rather than
     `SCRIPTED_AZUSA`, so its row prints under a heading that matches what it
     is and names the missing clause. §0z.
-15. **Azusa's REMAINING combos are invisible.** Springheart + Lotus Cobra /
+15. **Azusa's REMAINING combos are invisible.** (Unchanged 2026-09-12.) Springheart + Lotus Cobra /
     Tireless Provisioner is now implemented and measured (§0z1). **Ashaya +
     Quirion Ranger is not**, and neither is implemented on either side, so any
     Azusa list is still evaluated without that half of its combo density. §0z.
@@ -604,8 +746,10 @@ Re-read against the code 2026-09-09; verdicts inline. Items closed before
     the same way `SPRINGHEART_HOSTS` was (§0z5). A one-card lookahead — "does
     casting this strand something better?" — is the obvious next step and has
     not been tried.
-17. **NOTHING IN THIS PROJECT LOSES TO DECKING, and a draw-X card made that
-    live.** `draw()` stops at an empty library in every engine; no loss is
+17. **NOTHING IN THIS PROJECT LOSES TO DECKING** — and §0z14 made it more
+    live, not less: Apex of Power now EXILES seven a resolution and
+    Discover 10 digs until it hits. Neither can lose the game.
+17-old. **The original entry.** `draw()` stops at an empty library in every engine; no loss is
     recorded and no penalty applied. Harmless for eleven months because the
     biggest single draw in any list was three — and Return of the Wildspeaker
     asks for **30.0 cards a resolution and receives 7.8** off a
@@ -658,8 +802,13 @@ Re-read against the code 2026-09-09; verdicts inline. Items closed before
     the artifact lands, all of which are legal fuel. Conservative and
     defensible, but a modelling choice. Extra turns also count against the
     horizon, which is now the only bound on the loop. §0m.
-9.  **Three cards in `SCRIPTED_LOREHOLD` are not implemented as their text**:
-    Apex of Power, Hit the Mother Lode, Borrowed Knowledge. §0f.
+9.  ~~Three cards in `SCRIPTED_LOREHOLD` are not implemented as their
+    text.~~ **DONE 2026-09-12 (§0z14).** All three implemented; Apex and
+    Mother Lode moved to `SCRIPTED_LOREHOLD`, Borrowed Knowledge stays
+    `PARTLY_MODELLED` because its mode 1 counts an opponent's HAND and the
+    pod has none (§4). Worth **+0.0080 win rate, p=0.029** — the only
+    win-rate-positive result in the batch. **§0f told the next reader to
+    reuse the `wheel` script, which would have overstated the card.**
 10. ~~Life-loss drawbacks are free.~~ **DONE 2026-09-10 for the two that were
     live, and Bitterblossom mattered.** Charging it costs rendmaw
     **−0.0049 [−0.0061, −0.0038], p=1.2e-16**; Phyrexian Arena costs karlov

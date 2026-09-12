@@ -397,8 +397,9 @@ def can_pay(cost: dict, units: list[frozenset],
     Plains and two Islands, paying {2} spent the Plains, and a white card in
     hand became uncastable for no reason anyone chose. Generic is now paid
     from the MOST PLENTIFUL colour first: for each candidate, score its rarest
-    colour by how many remaining units can still produce it, and spend the
-    highest score first. No lookahead into the hand is needed -- "do not spend
+    colour by how many units COULD PRODUCE IT AT THE START OF THIS PAYMENT,
+    and spend the highest score first. That count is a snapshot on purpose and
+    must not be decremented as picks are taken — see the note at the loop. No lookahead into the hand is needed -- "do not spend
     your last white source on a generic cost" is right whatever you hold.
 
     `weights` is an optional per-unit "reluctance to spend", used ONLY to
@@ -497,9 +498,131 @@ def can_pay(cost: dict, units: list[frozenset],
         surplus = min((supply[c] for c in units[i]), default=0) - want
         return (owner_free(i), -surplus, len(units[i]), wi)
 
+    # `supply` IS A SNAPSHOT OF THE START OF THIS PAYMENT, AND DELIBERATELY SO.
+    # It is built once above and NOT decremented as picks are taken, which
+    # reads like an oversight — `take` shrinks `remaining` on every pick, so
+    # from the second pick on, `supply` counts units already spent.
+    #
+    # DECREMENTING IT IS A REGRESSION, measured rather than argued. One Plains
+    # and three Mountains, paying {3}:
+    #
+    #   snapshot   W=1 R=3, W=1 R=3, W=1 R=3   -> Mountain, Mountain, Mountain
+    #              the Plains survives.
+    #   running    W=1 R=3, W=1 R=2, W=1 R=1   -> Mountain, Mountain, TIE
+    #              and the tie falls through -surplus, len(units) and the
+    #              weight to the order the lands happen to sit in. Board order
+    #              decides it, which is the §0z8 defect coming back in the one
+    #              function §0z8 exists to fix.
+    #
+    # The running count degrades exactly as the payment eats the plentiful
+    # colour, so the last pip of a big generic cost is always the one at risk.
+    # What the rank is FOR is "how replaceable is this unit across the whole
+    # payment", and that question is asked once, about the position you are
+    # paying from -- not re-asked against a pool you are halfway through
+    # spending. `tests/test_mana_colour.py` pins both cases.
     for _ in range(gen):
         take(min(remaining, key=generic_key))
     return used
+
+
+def engine_cfg(cfg: dict) -> dict:
+    """A PRIVATE copy of the caller's cfg for an engine to stamp defaults into.
+
+    Five of the six engines open with a block of `cfg.setdefault(...)` calls —
+    `shroud_sources`, `protection_cards`, and their own knobs. Those ran
+    against the CALLER'S dict, so a caller that built one cfg and handed it to
+    several engines got the FIRST engine's defaults applied to all of them:
+    construct a Lorehold game and then a Karlov one on the same dict, and
+    Karlov silently ran with Lorehold's shroud sources and protection cards,
+    because `setdefault` on an already-set key does nothing.
+
+    NOTHING COMMITTED IS AFFECTED, and that was luck rather than design. Every
+    tool in the repo builds a fresh cfg per deck — `compare_decks.run()` and
+    `fit_pod.evaluate()` both construct theirs inside the per-deck loop, and
+    `experiment.run_ab` does `dict(DEFAULT_CFG, **cfg)` on entry — so no table
+    or cross-deck comparison ever shared one. It was a convention holding a
+    latent bug still, and it was found by a verification script that shared a
+    cfg across all six engines and got a different Karlov out of it.
+
+    Stamping a copy also makes the mutation invisible from outside, which is
+    what a caller passing a config dict is entitled to expect.
+    """
+    return dict(cfg)
+
+
+# Sources that COST YOU LIFE when tapped for a COLOUR, with the clause that
+# says so: (damage, the colours that hurt, oracle text). Quoted from
+# api.scryfall.com, not from memory.
+#
+# Deliberately not a `Card` field, for the same reason
+# DEVOTION_CONDITIONAL_CREATURES is not one: the cost is conditional on HOW the
+# source was tapped, and a static flag cannot say "only when it made {R} or
+# {W}". Talisman of Conviction's painless {C} mode is most of why it is played.
+PAIN_ON_COLOURED_TAP = {
+    "Talisman of Conviction": (
+        1.0, frozenset({"R", "W"}),
+        "{T}: Add {C}.  {T}: Add {R} or {W}. This artifact deals 1 damage "
+        "to you."),
+}
+
+
+def pip_assignment(cost: dict, pay_idx: list[int]) -> list[tuple]:
+    """Which COLOURED PIP each of `can_pay`'s chosen indices was spent on.
+
+    `can_pay` takes the coloured pips first, in COLORS order, and appends the
+    generic picks afterwards — true of all three of its branches (the default
+    surplus rule, `legacy`, and `surplus=False`). So the pip an index covered
+    is recoverable from the return value POSITIONALLY, with no change to
+    `can_pay`'s signature and no second copy of its choice.
+
+    Indices spent on GENERIC fall off the end of the zip and are not returned,
+    which is exactly what the caller wants: a source with a drawback on its
+    coloured mode was tapped for its painless one.
+    """
+    pips = [c for c in COLORS for _ in range(cost.get(c, 0))]
+    return list(zip(pay_idx, pips))
+
+
+def coloured_tap_life(g, cost: dict, pay_idx: list[int], units) -> float:
+    """Life lost paying this cost, from sources that charge for a colour.
+
+    THE STATED BLOCKER ON THIS WAS REMOVED BY §0z8 AND THE ISSUE WAS NEVER
+    RE-READ. KNOWN_ISSUES §0i says Talisman of Conviction is still free and
+    "cannot easily not be: `spend()` does not record which colour a source
+    produced". That was true of the count-based payment. Since §0z8
+    `available_mana` records each unit's OWNER and `can_pay` returns the exact
+    indices it assigned, so the owner and the pip are both in hand at every
+    payment site — and `pip_assignment` reads the pip off the existing return
+    value rather than adding a second copy of the assignment.
+
+    This is CLAUDE.md's standing finding 16b in its other direction: a policy
+    written while a gap was open does not fix itself when the gap closes, and
+    neither does a KNOWN_ISSUE that says something is hard.
+
+    Gated on `charge_life_costs` — the knob §0z7 put Bitterblossom and
+    Phyrexian Arena behind, because it is the same question about the same
+    pod model.
+    """
+    # TWO SWITCHES, ON PURPOSE. `charge_life_costs` is the family flag §0z7
+    # put Bitterblossom and Phyrexian Arena behind and PREDATES this fix, so
+    # reverting this one through it would revert those too and no measurement
+    # of this change alone would be possible. `talisman_coloured_tap` is this
+    # change's own switch; the family flag still overrides it.
+    if not g.cfg.get("charge_life_costs", True):
+        return 0.0
+    if not g.cfg.get("talisman_coloured_tap", True):
+        return 0.0
+    owners = getattr(units, "owners", None)
+    if owners is None:
+        return 0.0                     # a pool the caller built; no permanents
+    lost = 0.0
+    for i, pip in pip_assignment(cost, pay_idx):
+        if i >= len(owners) or owners[i] is None:
+            continue
+        hurt = PAIN_ON_COLOURED_TAP.get(owners[i].card.name)
+        if hurt is not None and pip in hurt[1]:
+            lost += hurt[0]
+    return lost
 
 
 # ----------------------------------------------------------------------------
@@ -625,7 +748,8 @@ class Game:
         if amount <= 0:
             return
         # BOUNDED: record what could have mattered, not what was asked for.
-        n = max(1, len(OPP.living(self)))
+        # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
+        n = OPP.pod_size(self)
         amount = (OPP.damage_each(self, amount / n) if each
                   else OPP.damage_single(self, amount))
         self.m["damage"] += amount
@@ -1015,7 +1139,7 @@ def main_phase(g: Game, precombat: bool = False):
         g.play_card_trigger(card)
 
         if "wipe" in card.tags:
-            OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags)
+            OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
         if alt_tag == "impending":
             # enters as a noncreature enchantment; the body arrives later
             g.m["impending_casts"] += 1
@@ -1397,10 +1521,22 @@ def make_everywhere(g: Game):
     two different errors that happen to live on the same card: one gave you the
     mana a turn early, the other never gave you the second token at all.
     """
+    # `is_token=True` because it IS one — "create a tapped colorless LAND
+    # TOKEN named Everywhere". It defaulted to False, and the one place that
+    # mattered was `opponents.spot_removal`, which targets
+    # `not p.card.is_land and not p.is_token`: this permanent is deliberately
+    # `is_land=False` (so it cannot be counted for land drops or mulligans),
+    # so it read as a nonland nontoken and an opponent could spend a Doom
+    # Blade on a land token. `destroy` also put it in the GRAVEYARD as a card,
+    # which a token never becomes.
+    #
+    # `threat_of`'s token discount does not change anything here: the token
+    # has no mana cost, so its derived threat was already 0.0.
     g.board.append(Permanent(
         card=Card(name="Everywhere token", types=frozenset({"Land"}),
                   is_land=False),
-        tapped=g.cfg.get("everywhere_enters_tapped", True), sick=False))
+        tapped=g.cfg.get("everywhere_enters_tapped", True), sick=False,
+        is_token=g.cfg.get("everywhere_is_token", True)))
 
 
 def combat(g: Game):
@@ -1540,7 +1676,12 @@ def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
     out["final_life"] = g.your_life
     out["damage_by_turn"] = g.damage_by_turn
-    out["final_board_power"] = sum(g.power_of(p) for p in g.board if p.card.is_creature)
+    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
+    # an Impending Overlord are not creatures and their power is not board
+    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
+    # restores the old reading here too.
+    out["final_board_power"] = sum(g.power_of(p) for p in g.board
+                                   if OPP.is_creature_now(g, p))
     out["won"] = 1 if g.result == "win" else 0
     out["lost"] = 1 if g.result == "loss" else 0
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and

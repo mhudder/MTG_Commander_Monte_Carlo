@@ -141,7 +141,10 @@ SORCERIES = [
     C("Gamble", "Sorcery", {"R": 1}, priority=3),
     C("Mizzix's Mastery", "Sorcery", {"gen": 3, "R": 1}, priority=7, threat=7.5,
       script="mastery"),   # overload {5}{R}{R}{R} handled in main_phase
-    C("Borrowed Knowledge", "Sorcery", {"gen": 2, "R": 1, "W": 1}, priority=3, script="draw2"),
+    # Modal wheel-for-what-you-pitched, not a flat draw 2. See lorehold.py's
+    # `borrowed_knowledge` script and KNOWN_ISSUES §0f.
+    C("Borrowed Knowledge", "Sorcery", {"gen": 2, "R": 1, "W": 1}, priority=3,
+      script="borrowed_knowledge"),
     C("Promise of Loyalty", "Sorcery", {"gen": 4, "W": 1}, priority=3, tags=("wipe",)),
     C("Reforge the Soul", "Sorcery", {"gen": 3, "R": 2}, priority=6, script="wheel",
       miracle={"gen": 1, "R": 1}),
@@ -151,8 +154,9 @@ SORCERIES = [
       threat=8.0, script="approach"),
     C("Emeria's Call", "Sorcery", {"gen": 4, "W": 3}, priority=5, tags=("mdfc",),
       tokens=(2, 4, 4, "Angel"), land_face=("W", True)),
+    # Discover 10, not a flat 5 Treasures. See lorehold.discover and §0f.
     C("Hit the Mother Lode", "Sorcery", {"gen": 4, "R": 3}, priority=5,
-      script="treasures", treasures=5),
+      script="mother_lode"),
     C("Improvisation Capstone", "Sorcery", {"gen": 5, "R": 2}, priority=5, threat=7.0),
     C("Restoration Seminar", "Sorcery", {"gen": 5, "W": 2}, priority=5, threat=7.5),
     C("Volcanic Vision", "Sorcery", {"gen": 5, "R": 2}, priority=4, threat=6.5),
@@ -162,8 +166,10 @@ SORCERIES = [
     C("Blasphemous Act", "Sorcery", {"gen": 8, "R": 1}, priority=4, tags=("wipe",)),
     C("Soulfire Eruption", "Sorcery", {"gen": 6, "R": 3}, priority=6, threat=8.0,
       script="soulfire"),
+    # Exile seven and add TEN MANA of one colour, not draw 4. The mana is
+    # the card in a list holding Rise of the Eldrazi. See lorehold.apex_of_power.
     C("Apex of Power", "Sorcery", {"gen": 7, "R": 3}, priority=5, threat=8.5,
-      script="draw4"),
+      script="apex"),
     C("Storm Herd", "Sorcery", {"gen": 8, "W": 2}, priority=7, threat=8.5,
       script="storm_herd"),
     # {9}{C}{C}{C} — three TRUE colourless pips. A Boros deck pays those only

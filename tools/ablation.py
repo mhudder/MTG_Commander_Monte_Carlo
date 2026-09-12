@@ -111,6 +111,11 @@ METRIC_SETS = {
 
 # Cards whose actual text the engine implements. Everything else is a body.
 SCRIPTED_RENDMAW = {
+    # --- scripted LANDS, classified since 2026-09-12 ---
+    # `check_scripted_coverage` used to skip every land, so a script on a
+    # land was an unchecked claim. These are implemented; Rogue's Passage
+    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    "Khalni Garden",               # engine.run_etb -> a 0/1 Plant
     # mana
     "Sol Ring", "Arcane Signet", "Golgari Signet", "Copper Myr", "Leaden Myr",
     "Palladium Myr", "Ornithopter of Paradise", "Twitching Doll",
@@ -140,6 +145,12 @@ SCRIPTED_RENDMAW = {
 # Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
 # Saint Katherine left the deck in v16 and are gone from this list with them.
 SCRIPTED_LOREHOLD = {
+    # --- §0f closed 2026-09-12, except Borrowed Knowledge's mode 1 ---
+    # Apex of Power: exile seven, cast from among them, and ten mana of ONE
+    # colour -- and no mana on a copy, which is the 'cast from your hand'
+    # clause. Hit the Mother Lode: Discover 10 with the free cast and
+    # 10-minus-MV TAPPED Treasures, which are not mana until they untap.
+    "Apex of Power", "Hit the Mother Lode",
     # mana
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
@@ -231,6 +242,11 @@ SCRIPTED_KARLOV = {
 # whose text is only approximated belongs in KNOWN_BLIND even when it has
 # engine code -- that distinction is the one this project has got wrong twice.
 SCRIPTED_TIVIT = {
+    # --- scripted LANDS, classified since 2026-09-12 ---
+    # `check_scripted_coverage` used to skip every land, so a script on a
+    # land was an unchecked claim. These are implemented; Rogue's Passage
+    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    "Havengul Laboratory // Havengul Mystery",   # tivit.resolve `havengul`
     # --- the artifact engine ---
     # Every one of these is fully implemented in tivit.make_token /
     # sacrifice_tokens / deadeye_loop.
@@ -242,6 +258,14 @@ SCRIPTED_TIVIT = {
     # --- blink: each is a fresh Tivit ETB, which is a fresh dilemma ---
     "Ephemerate", "Soulherder", "Displacer Kitten", "Teleportation Circle",
     "Conjurer's Closet", "Deadeye Navigator",
+    # --- sweepers, live since 2026-09-12 ---
+    # `tivit.resolve` had no `wipe` branch, so these did nothing; they are
+    # implemented now. Damn overloads to "destroy each creature" and Farewell
+    # exiles all creatures — both symmetric, and a symmetric wipe against this
+    # opponent abstraction is faithfully "your board dies, theirs goes to 0".
+    # Sadistic Shell Game is one kill per player off the biggest board, which
+    # is exactly what its text says and what the `creatures` float can carry.
+    "Damn", "Farewell", "Sadistic Shell Game",
     # --- the vote ---
     # Extra votes are the whole mechanic and are read by voting.my_votes().
     "Ballot Broker", "Brago's Representative",
@@ -308,6 +332,13 @@ SCRIPTED_SHILGENGAR = {
 # to a note that does not exist is worse than no note, because it stops the
 # next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
 SCRIPTED_AZUSA = {
+    # --- scripted LANDS, classified since 2026-09-12 ---
+    # `check_scripted_coverage` used to skip every land, so a script on a
+    # land was an unchecked claim. These are implemented; Rogue's Passage
+    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    # Fetches crack for a land, which is a landfall trigger and a shuffle
+    # drawn from the pre-rolled seeds so CRN survives (azusa.shuffle_seeds).
+    "Terramorphic Expanse", "Windswept Heath", "Wooded Foothills",
     # extra land drops
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
     # landfall payoffs
@@ -402,20 +433,34 @@ PARTLY_MODELLED = {
             "(§4). Its negative score is a ONE-SIDED WIPE WITH THE SIDEDNESS "
             "REMOVED -- the cost with none of the benefit. §0z2.",
     },
+    "tivit": {
+        "Promise of Loyalty":
+            "Implemented as a symmetric wipe (2026-09-12). The card is "
+            "'each player puts a vow counter on a creature they control and "
+            "SACRIFICES THE REST' -- everyone KEEPS ONE, and the model keeps "
+            "none. It overstates in both directions at once, so a high score "
+            "is still evidence and a low one is not. Sacrifice also gets "
+            "around indestructible, which is why it is in "
+            "WIPE_IGNORES_INDESTRUCTIBLE.",
+        "Magister of Worth":
+            "The CONDEMNATION half is implemented (2026-09-12): a symmetric "
+            "wipe that spares only itself, conditional on the council vote. "
+            "GRACE -- 'EACH PLAYER returns each creature card from their "
+            "graveyard to the battlefield' -- is modelled for you and "
+            "invisible for the pod, which has no graveyard (§4), so that mode "
+            "understates. Condemnation also needs vote control to land at all "
+            "under the adversarial `opp_vote_policy` default.",
+    },
     "lorehold": {
-        "Apex of Power":
-            "Modelled as `draw4`. 'If this spell was cast from your hand, add "
-            "ten mana of any one color' does not exist -- and in a deck "
-            "holding Rise of the Eldrazi and Storm Herd that clause is the "
-            "entire card. §0f.",
-        "Hit the Mother Lode":
-            "Modelled as a flat 5 Treasures. Discover 10 -- a free cast of a "
-            "nonland of mana value 10 or less, i.e. a free Rise of the "
-            "Eldrazi off the top -- is not implemented. §0f.",
         "Borrowed Knowledge":
-            "Modelled as `draw2`. The card is a WHEEL ('discard your hand, "
-            "then draw cards equal to...'), and the engine already has a "
-            "`wheel` script for Reforge the Soul that this does not use. §0f.",
+            "MODE 2 IS IMPLEMENTED as of 2026-09-11 ('discard your hand, then "
+            "draw cards equal to the number of cards discarded this way'), "
+            "including the discards, which is the half this deck's graveyard "
+            "engines actually wanted. Mode 1 -- 'draw cards equal to the "
+            "number of cards in TARGET OPPONENT'S HAND' -- is UNMODELABLE "
+            "rather than unimplemented: this opponent model has no hand to "
+            "count (§4). Mode 1 is the stronger half against a full grip, so "
+            "this row is a FLOOR. §0f.",
     },
 }
 PARTLY = PARTLY_MODELLED.get(DECK, {})
@@ -715,8 +760,24 @@ KNOWN_BLIND = {
         # project and it puts a third of this list here.
         "An Offer You Can't Refuse", "Path to Exile", "Swords to Plowshares",
         "Counterspell", "Dovin's Veto", "Muddle the Mixture", "Void Rend",
-        "Damn", "Farewell", "Promise of Loyalty", "Sadistic Shell Game",
-        "Trap the Trespassers", "Council's Judgment", "Magister of Worth",
+        "Trap the Trespassers", "Council's Judgment",
+        # THE FIVE SWEEPERS LEFT THIS SET ON 2026-09-12. They were grouped
+        # under "nothing that removes a permanent can be evaluated", which is
+        # true of Path to Exile and was never quite true of a board wipe: a
+        # wipe against an abstract creature COUNT is expressible — you set it
+        # to zero — and it was only blind because `tivit.resolve` had no
+        # `wipe` branch, so all five did nothing at all. They do now, so a
+        # row that prints "not measured" would be the §0f error inverted: a
+        # score that IS evidence, labelled as if it were not.
+        # Rogue's Passage: "{4}, {T}: Target creature can't be blocked this
+        # turn." UNIMPLEMENTED — and the thing it buys is already assumed.
+        # Tivit's second trigger fires on `dmg > 0 and Tivit attacked`
+        # (tivit.combat), which never asks whether TIVIT connected, so the
+        # model already behaves as though the commander is unblockable. The
+        # {4} activation is uncharged too, so both halves are missing and
+        # they point opposite ways. Implementing it would be worth ~nothing
+        # until combat tracks damage per attacker.
+        "Rogue's Passage",
         # Ward {3}, and an attack tax, cannot be expressed against an opponent
         # model whose combat is a damage share rather than declared attackers.
         "Ghostly Prison", "Propaganda",
@@ -849,7 +910,15 @@ def check_scripted_coverage(deck):
     it would print under MODEL-EVALUATED, where a low score is evidence, while
     something elsewhere claims it is not. Both halves of that are checked here.
     """
-    names = {c.name for c in deck if not c.is_land}
+    # LANDS ARE EXEMPT, EXCEPT WHEN THEY CARRY A SCRIPT. A basic Forest needs
+    # no classification and putting 36 of them in a name set would be noise.
+    # But a `script` on a land IS a claim that the engine does something with
+    # it, and that claim went unchecked: Rogue's Passage sat in tivit with
+    # `script="rogues_passage"` that nothing dispatched and nothing
+    # implemented, in NONE of the three categories, because this line skipped
+    # it. §0q's shape in the checker itself — a check with a blind spot reads
+    # like coverage and is not.
+    names = {c.name for c in deck if not c.is_land or c.script}
     stale = SCRIPTED - {c.name for c in deck}   # lands may be scripted too
     if stale:
         print(f"  NOTE: {len(stale)} name(s) in SCRIPTED_{DECK.upper()} are no "

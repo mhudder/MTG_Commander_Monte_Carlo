@@ -3,6 +3,13 @@
 > **New here? Read `HANDOFF.md` first.** This file is the methodology writeup and
 > parts of it predate the opponent clock and the Karlov deck. Trust it on
 > technique; trust `HANDOFF.md` on current state, files and commands.
+>
+> **Every result quoted below is stale as of 2026-09-12**, when fourteen engine
+> defects were fixed and no table has yet been regenerated. `HANDOFF.md` has the
+> one-page summary of what changed and what it cost; `KNOWN_ISSUES.md`
+> §0z9–§0z15 has the detail. The techniques this file explains — common random
+> numbers, paired inference, leave-one-out ablation — are unaffected and remain
+> the reason any of this works.
 
 A simulator plus a statistical harness for answering "is card X better than card
 Y in this deck?" with a number and a confidence interval instead of a vibe.

@@ -6,6 +6,71 @@ doc (current state, standing rules, queued work) and is worth reading in full
 — it is about 330 lines. The dated session notes it used to carry are in
 `docs/HISTORY.md`, which is worth grep-ing and not reading top to bottom.
 
+---
+
+## Status, 2026-09-12 — read this before anything else
+
+**Fourteen engine defects were fixed and no table has been regenerated yet.**
+Everything in `results/` describes the engine as of 2026-09-11. Don't quote a
+number out of it, and don't stage a card swap on one, until you've run
+`./tools/regen_tables.sh` (~35 min).
+
+The simulator itself is healthy: `python -m tools.validate` is `+0.00` on all
+18 metrics, all 8 test suites pass, and all 7 mutation checks pass.
+
+### What was wrong, and what it cost
+
+Every fix is behind its own on/off switch, so any of them can be reverted and
+re-measured independently. Full detail is `KNOWN_ISSUES.md` §0z9–§0z15.
+
+| what was broken | why it mattered |
+|---|---|
+| "Each opponent loses 1 life" dealt up to **3 life each** once players were eliminated | Drain effects were inflated exactly in the endgame, where they decide games |
+| Your own board wipe killed your **indestructible** creatures; the opponents' wipes respected them | Avacyn, Angel of Hope protects your whole board — and your own Wrath ignored her |
+| Board wipes killed things that **aren't creatures** — a Planeswalker, a not-yet-a-creature | Three cards in the Rendmaw deck were dying to wraths they should dodge |
+| Tivit's five board wipes **did nothing at all**, and the AI held them until it was losing to cast them | Worse than a blank card: a blank doesn't wait for the worst moment |
+| Three Lorehold cards were stand-ins, not the real card | Apex of Power's "add ten mana" — the entire point of the card — didn't exist |
+| Talisman of Conviction's damage-to-you was free | Lorehold ends games on ~1.7 life, so small life costs matter more there than anywhere |
+| Four internal safety checks **couldn't detect the thing they were checking for** | One had been silently broken since cards were cut two days earlier |
+
+### The effect on the simulation
+
+Measured over 6,000 paired games per deck, engine-before vs engine-after:
+
+| deck | win rate | notes |
+|---|---|---|
+| **Lorehold** | **−1.8 points** (0.176 → 0.158) | The big one. Its drain cards were the most inflated |
+| Tivit | +0.7 points | Its five dead board wipes started working |
+| Rendmaw | −0.2 points | Not statistically distinguishable from zero |
+| Shilgengar | +0.1 points | Damage up slightly; win rate unmoved |
+| **Karlov, Azusa** | **no change at all** | Identical to the digit — they touch none of the fixed code |
+
+**Read this as accuracy, not as decks getting better or worse.** Only one fix
+raised a win rate for a reason anyone wanted (the three Lorehold cards, worth
++0.8 points on their own). The rest removed effects the simulator was
+crediting that the real cards don't have. Lorehold's drop is the single
+clearest result: it had been winning partly on drain damage that was up to
+three times too large.
+
+### What still needs doing
+
+1. **Regenerate the tables.** Lorehold, Tivit, Rendmaw and Shilgengar have all
+   changed. Karlov and Azusa measured identical, so they can likely be
+   skipped — confirm with `tools/check_unchanged_decks.py` first.
+2. **The common-random-numbers leak.** The technique that makes this project
+   affordable relies on two simulated games staying in lockstep, and in five
+   files they don't. Measured at up to **15% of games** on one Lorehold
+   comparison. It doesn't invalidate results — it makes them noisier than the
+   error bars claim — but it is the largest known problem and the self-check
+   that should catch it structurally can't. `CLAUDE.md` queued item 19.
+3. **Commit the four staged card swaps**, which have been ready since
+   2026-09-09 and are waiting only on the three-leg discipline below.
+
+There is also a standing limitation, not a bug: the opponents are an abstract
+threat level rather than real cards, so roughly a third of every deck (removal
+spells, counterspells) can't be evaluated at all. That is `KNOWN_ISSUES.md` §4
+and it would be a rewrite, not a fix.
+
 ## What this is
 
 A Monte Carlo simulator for testing Commander (EDH) decklist changes: "is
@@ -106,7 +171,7 @@ head-to-head against a specific cut, because everything in `MEASURED` shares
 one baseline and a common baseline cannot rank two cards against each other
 (`KNOWN_ISSUES.md` §0c).
 
-As of 2026-09-10 there are **four staged, uncommitted swaps** (two on Lorehold,
+As of 2026-09-12 there are **four staged, uncommitted swaps** (two on Lorehold,
 one on Rendmaw, one on Azusa) and **seven measured, undecided candidates** (all
 Azusa, §0z4) — run `python -m edhmc.pending` for the current list and the
 evidence behind each. **This sentence is exactly the kind that goes stale; the
@@ -163,9 +228,10 @@ disagree, the project's own rule is to follow win rate.
 - **This file** — orientation, current state, how to not get burned.
 - **`CLAUDE.md`** — the operational doc: current state, the standing rules,
   and queued work. ~330 lines, kept current, read it in full.
-- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0v` plus the
+- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0z15` plus the
   older `1`–`8` series, with a status index at the top. The ids are cited
-  from code, so they never get renumbered.
+  from code, so they never get renumbered. **§0z9–§0z15 is the 2026-09-12
+  batch** and is where an agent should start.
 - **`docs/READING_TABLES.md`** — how to read an ablation table without
   drawing the three conclusions it invites you to draw wrongly.
 - **`README.md`** — the methodology writeup (common random numbers, paired

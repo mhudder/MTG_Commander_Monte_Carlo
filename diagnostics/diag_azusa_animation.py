@@ -46,7 +46,59 @@ from edhmc import azusa as A
 from edhmc import opponents as OPP
 
 DECK, CMD = azusa_v1.build()
-BY_NAME = {c.name: c for c in DECK}
+
+# THREE OF THE CARDS THIS DIAGNOSTIC MEASURES WERE CUT FROM THE DECK ON
+# 2026-09-10, AND IT STOPPED RUNNING AT ALL.
+#
+# `BY_NAME` was built from the deck, so the first `cast(g, "Sylvan Awakening")`
+# died with `KeyError: 'Sylvan Awakening'` and took `--mutate` -- which
+# CLAUDE.md tells the reader to run, and which is the only thing that says
+# these cases can fail -- down with it. §0y cut the whole land-animation
+# pillar (Sylvan Awakening, Rude Awakening and Nissa, Worldwaker) for Ancient
+# Greenwarden, Greensleeves and Springheart Nantuko.
+#
+# THE CARDS LEFT; THE ENGINE DID NOT. `azusa.sylvan_awakening`,
+# `azusa.rude_awakening` and Nissa's loyalty abilities are all still live code
+# on the default path, still reachable by any future green list, and still
+# exactly what PART A pins. A diagnostic about a MECHANISM should not be
+# deleted because one list stopped playing it -- so the three definitions are
+# restored here, verbatim from `d158724^`, the commit before the cut.
+#
+# This is §0q's failure mode one level up: a hand-maintained name set that
+# rotted, inside the mutation check whose whole job is to notice rot. The
+# check below is the derivation-shaped fix -- the names are declared once and
+# verified to resolve, so the NEXT cut fails loudly at import with a sentence
+# instead of a KeyError forty lines into a case.
+CUT_2026_09_10 = [
+    azusa_v1.C("Nissa, Worldwaker", "Planeswalker", {"gen": 3, "G": 2}, 0, 0,
+               priority=6, threat=8.0, tags=("Legendary",)),
+    azusa_v1.C("Rude Awakening", "Sorcery", {"gen": 4, "G": 1}, priority=7,
+               threat=6.0, script="rude_awakening"),
+    azusa_v1.C("Sylvan Awakening", "Sorcery", {"gen": 2, "G": 1}, priority=7,
+               threat=6.5, script="sylvan_awakening"),
+]
+
+# The deck wins on any name it still carries, so a card that comes BACK into
+# the list is measured as the list defines it, not as this stale copy does.
+BY_NAME = {c.name: c for c in list(CUT_2026_09_10) + list(DECK)}
+
+# Every card name this file reaches for, declared in one place.
+REQUIRED = ("Forest",
+            "Nissa, Vastwood Seer // Nissa, Sage Animist",
+            "Nissa, Worldwaker",
+            "Rude Awakening",
+            "Sylvan Awakening")
+_missing = [n for n in REQUIRED if n not in BY_NAME]
+if _missing:
+    raise SystemExit(
+        f"\ndiag_azusa_animation names {len(_missing)} card(s) that are in "
+        f"neither the azusa deck nor CUT_2026_09_10:\n"
+        + "".join(f"    {n}\n" for n in _missing)
+        + "A card this diagnostic measures has been cut from the list. Either\n"
+          "add its definition to CUT_2026_09_10 (from git history, verbatim),\n"
+          "or drop the cases that use it -- but do not leave the name here\n"
+          "unresolved, which is how this file spent a day raising KeyError\n"
+          "from inside its own mutation check.")
 
 # "legacy" is the engine as it stood in the committed ablation table: Sylvan
 # Awakening as an attack-only flag, Rude Awakening as its untap mode, no

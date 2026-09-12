@@ -30,7 +30,8 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land)
+                          spend, play_land, coloured_tap_life,
+                          engine_cfg)
 from edhmc import opponents as OPP
 
 # Cards that can put a chosen card from hand onto the top of your library.
@@ -54,7 +55,11 @@ GATED_SETTERS = {"Hidden Retreat"}
 
 class LoreholdGame:
     def __init__(self, deck, commander, cfg, seed):
-        self.cfg = cfg
+        # A PRIVATE copy: the cfg.setdefault block below stamps this
+        # engine's defaults, and doing that to the CALLER'S dict let the
+        # first engine constructed decide them for every later one.
+        # See engine.engine_cfg.
+        self.cfg = cfg = engine_cfg(cfg)
         self.rng = random.Random(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
@@ -70,6 +75,16 @@ class LoreholdGame:
         self.land_drops_used = 0
         self.spells_this_turn = 0
         self.float_mana = 0
+        # Apex of Power's "add ten mana of any one color", held until end of
+        # turn. A separate pile from `treasures` because it is ONE colour and
+        # is not a permanent — see mana_units/pay, which now carry three
+        # sources rather than two.
+        self.apex_mana = 0
+        self.apex_color = "R"
+        # Treasures that entered TAPPED (Hit the Mother Lode). A Treasure's
+        # ability is "{T}, Sacrifice: add one mana", so a tapped one is not
+        # mana until it untaps. Merged into `treasures` by take_turn.
+        self.tapped_treasures = 0
         self.noncreature_this_turn = 0
         self.bombardment_fired_this_turn = False
         self.bombardment_exiled = []
@@ -212,8 +227,16 @@ class LoreholdGame:
 # ---------------------------------------------------------------------------
 
 def mana_units(g):
+    """THE POOL, IN THREE BLOCKS AND IN THIS ORDER: board, Apex, Treasures.
+
+    `pay` splits the chosen indices by that layout, so the order is load
+    bearing — Apex's mana has to sit between the two, because the Treasure
+    boundary is measured from the END of the list.
+    """
     units = available_mana(g)
     per = 2 if g.has("Goldspan Dragon") else 1     # Treasures tap for two
+    if g.apex_mana:
+        units.extend([frozenset({g.apex_color})] * g.apex_mana)
     units.extend([frozenset({"R", "W", "C"})] * (g.treasures * per))
     return units
 
@@ -233,13 +256,37 @@ def pay(g, cost, units):
     # spend. Treasures are appended after the real mana by `mana_units`, so a
     # chosen index at or beyond `first_treasure` is a Treasure and has no
     # permanent to tap.
+    #
+    # THREE BLOCKS SINCE APEX OF POWER: [board][apex][treasures]. Both
+    # boundaries are measured from the END, because only the board block has
+    # permanents behind it and only it may reach `spend`.
     first_treasure = len(units) - g.treasures * per
-    real = [i for i in idx if i < first_treasure]
+    first_apex = first_treasure - g.apex_mana
+    real = [i for i in idx if i < first_apex]
     if real:
         spend(g, real, units)
-    used = n - len(real)
-    g.treasures -= -(-used // per)          # ceil: each Treasure gives `per`
+    apex_used = sum(1 for i in idx if first_apex <= i < first_treasure)
+    treasure_used = sum(1 for i in idx if i >= first_treasure)
+    g.apex_mana -= apex_used
+    g.treasures -= -(-treasure_used // per)  # ceil: each Treasure gives `per`
+    g.m["apex_mana_spent"] = g.m.get("apex_mana_spent", 0) + apex_used
     g.m["mana_spent"] += n
+
+    # TALISMAN OF CONVICTION, and §0i's last live free drawback. "{T}: Add
+    # {C}. {T}: Add {R} or {W}. This artifact deals 1 damage to you." -- so it
+    # is charged only when `can_pay` actually assigned it to an {R} or {W}
+    # pip, and a Talisman spent on generic was tapped for {C} and costs
+    # nothing. That distinction is what `pip_assignment` recovers, and it only
+    # became recoverable at §0z8.
+    #
+    # HERE rather than in `spend`, because this engine's Treasures never reach
+    # `spend` and the whole payment is only visible at this level.
+    pain = coloured_tap_life(g, cost, idx, units)
+    if pain:
+        g.your_life -= pain
+        g.m["life_lost_to_own_cards"] = \
+            g.m.get("life_lost_to_own_cards", 0) + pain
+        g.m["coloured_taps_paid"] = g.m.get("coloured_taps_paid", 0) + 1
     return n
 
 
@@ -551,7 +598,8 @@ def deal_pod_damage(g, amount, each=True):
     if amount <= 0:
         return
     # BOUNDED: record what could have mattered, not what was asked for.
-    n = max(1, len(OPP.living(g)))
+    # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
+    n = OPP.pod_size(g)
     amount = (OPP.damage_each(g, amount / n) if each
               else OPP.damage_single(g, amount))
     g.m["damage"] += amount
@@ -759,6 +807,24 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         _draw_into_hand(g, 2)
     elif sc == "draw4":
         _draw_into_hand(g, 4)
+    elif sc == "apex":
+        if g.cfg.get("apex_ten_mana", True):
+            apex_of_power(g, is_copy=is_copy)
+        else:
+            _draw_into_hand(g, 4)       # the pre-2026-09-12 `draw4` stand-in
+    elif sc == "mother_lode" and not g.cfg.get("mother_lode_discover", True):
+        g.treasures += 5                # the pre-2026-09-12 flat 5 Treasures
+        g.m["treasures_made"] += 5
+    elif sc == "mother_lode":
+        # "Discover 10. If the discovered card's mana value is less than 10,
+        # create a number of TAPPED Treasure tokens equal to the difference."
+        hit = discover(g, 10)
+        n = 10 - int(hit.free_mv) if hit is not None else 0
+        if n > 0:
+            g.tapped_treasures += n
+            g.m["treasures_made"] += n
+            g.m["mother_lode_treasures"] = \
+                g.m.get("mother_lode_treasures", 0) + n
     elif sc == "soulfire":
         for _ in range(3):
             if g.library:
@@ -775,8 +841,12 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         # model has no per-creature power, so use the pod's average body.
         if sum(1 for c in g.graveyard
                if "Instant" in c.types or "Sorcery" in c.types) >= 2:
+            # A POD TOTAL for `opp_avg_power` apiece. `pod_size`, not `living`:
+            # deal_pod_damage divides by the same quantity, so building the
+            # numerator from the other one is what made the tivit sites look
+            # like they were moving when only the harness was.
             deal_pod_damage(g, g.cfg.get("opp_avg_power", 2.5)
-                            * len(OPP.living(g)))
+                            * OPP.pod_size(g))
     elif sc == "invincible_hymn":
         # "Count the number of cards in your library. Your life total BECOMES
         # that number." Not lifegain — a set, and it can go down.
@@ -872,8 +942,42 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         g.graveyard.extend(g.hand)
         g.hand = []
         _draw_into_hand(g, 7)
+    elif sc == "borrowed_knowledge":
+        # "Choose one — • Discard your hand, then draw cards equal to the
+        #  number of cards in TARGET OPPONENT'S HAND. • Discard your hand,
+        #  then draw cards equal to the NUMBER OF CARDS DISCARDED THIS WAY."
+        #
+        # MODE 2, because mode 1 is unmodelable rather than unimplemented:
+        # this opponent model has no hand to count (§4). Said out loud because
+        # the two modes are not close — mode 1 is how the card is usually cast
+        # and is strictly better against a full grip, so this is a FLOOR.
+        #
+        # IT WAS `draw2`, AND KNOWN_ISSUES §0f PRESCRIBES THE WRONG FIX. That
+        # section says to reuse the `wheel` script above; a wheel draws a flat
+        # 7 and this draws only what it discarded, so `wheel` would OVERSTATE
+        # the card — the opposite of §0f's own claim that all three of its
+        # cards understate.
+        #
+        # The draw is not the half that was missing. Net cards are ZERO here;
+        # what `draw2` never did is put the hand in the GRAVEYARD, which in
+        # this deck is the resource Arcane Bombardment, Mizzix's Mastery, The
+        # Dawning Archaic and Radiant Scrollwielder all feed on.
+        #
+        # No `is_copy` guard, unlike `wheel`: that guard exists to stop a copy
+        # handing you a second free seven. This card is self-limiting — a copy
+        # resolving after the original finds an empty hand and draws nothing —
+        # so suppressing it would be a modelling choice where none is needed.
+        if g.cfg.get("borrowed_knowledge_discard", True):
+            n = len(g.hand)
+            discard_triggers(g, n)
+            g.graveyard.extend(g.hand)
+            g.hand = []
+            _draw_into_hand(g, n)
+            g.m["borrowed_discards"] = g.m.get("borrowed_discards", 0) + n
+        else:
+            _draw_into_hand(g, 2)      # the pre-2026-09-11 `draw2` stand-in
     if "wipe" in card.tags:
-        OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags)
+        OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
     if card.tokens:
         make_tokens(g, *card.tokens)
     deal_pod_damage(g, card.pod_damage)
@@ -881,6 +985,98 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         discard_triggers(g, card.discards)
     if is_copy and was_cast:
         on_cast_triggers(g, card, is_copy=True)
+
+
+def discover(g, x: int):
+    """DISCOVER X — the half of Hit the Mother Lode that was a flat 5 Treasures.
+
+    "To discover N, exile cards from the top of your library until you exile a
+    NONLAND card with mana value N or less. Cast it without paying its mana
+    cost or put it into your hand. Put the rest on the bottom in a random
+    order."
+
+    Structurally this is `sunbird` with two differences, and both matter. It
+    digs UNTIL it hits rather than looking at a fixed window, so it cannot
+    whiff while a legal card sits one deeper; and at N=10 in this list the hit
+    is effectively guaranteed, where Sunbird's is conditional on the window.
+    That is why §0f called this "a free Rise of the Eldrazi off the top".
+
+    Mana value, so `free_mv`: an {X} spell in the library has X=0, which is
+    exactly the quantity `free_mv` carries (§1).
+
+    THE REST GO TO THE BOTTOM IN ORDER, NOT SHUFFLED, and that is a deliberate
+    departure from the reminder text. `sunbird` shuffles its leftovers with
+    `g.rng.shuffle`, which is a mid-game draw on the GAME rng and one of this
+    engine's CRN leaks. The order of cards on the bottom of a library can only
+    matter to a game that reaches them, and these games end around turn 12 --
+    so a second leak would buy nothing. Said out loud rather than left to be
+    rediscovered.
+    """
+    exiled, hit = [], None
+    while g.library:
+        c = g.library.pop()
+        if not c.is_land and c.free_mv <= x:
+            hit = c
+            break
+        exiled.append(c)
+    g.library[0:0] = exiled              # index 0 is the bottom
+    g.m["discover_exiled"] = g.m.get("discover_exiled", 0) + len(exiled)
+    if hit is None:
+        return None
+    g.m["free_casts"] += 1
+    g.m["discover_casts"] = g.m.get("discover_casts", 0) + 1
+    g.m["discover_mv"] = g.m.get("discover_mv", 0.0) + hit.free_mv
+    resolve_spell(g, hit, 0, from_hand=False)
+    return hit
+
+
+def apex_of_power(g, is_copy=False):
+    """Apex of Power — modelled as `draw4`, which is not what it does.
+
+    "Exile the top seven cards of your library. Until end of turn, you may
+    cast spells from among them. If this spell was cast FROM YOUR HAND, add
+    ten mana of any one color."
+
+    THE TEN MANA IS THE CARD, and §0f said so: in a list holding Rise of the
+    Eldrazi and Storm Herd, a ten-drop off the top of the exiled seven is the
+    whole point. `draw4` gave four cards to hand and no mana, which is a
+    different and much safer card.
+
+    TWO REAL COSTS COME WITH IT, and `draw4` charged neither. Cards exiled and
+    not cast are GONE -- not drawn, not bottomed -- so this mills you seven and
+    keeps what it can pay for. And the mana is one COLOUR, chosen here for
+    what the exiled cards actually want rather than being a wildcard.
+
+    "If this spell was cast from your hand" is why `is_copy` is read: an
+    Arcane Bombardment or Mizzix's Mastery copy exiles the seven and gets NO
+    mana, which is most of why copying this card is worse than casting it.
+
+    The mana lasts the turn rather than emptying at end of step. Generous, and
+    said out loud -- in practice every one of these casts happens in the same
+    main phase, so the two only differ for a pilot who would have wasted it.
+    """
+    exiled = [g.library.pop() for _ in range(min(7, len(g.library)))]
+    g.m["apex_exiled"] = g.m.get("apex_exiled", 0) + len(exiled)
+
+    if not is_copy:
+        want = {c: sum(x.cost.get(c, 0) for x in exiled) for c in ("R", "W")}
+        g.apex_color = max(("R", "W"), key=lambda c: want[c])
+        g.apex_mana += 10
+        g.m["apex_mana_made"] = g.m.get("apex_mana_made", 0) + 10
+
+    # Cast what the pool can afford, best first. Whatever is left stays exiled.
+    pool = [c for c in exiled if not c.is_land]
+    while pool:
+        units = mana_units(g)
+        best = next((c for c in sorted(pool, key=lambda c: (-c.priority, -c.mv))
+                     if can_pay(reduce_cost(g, c), units) is not None), None)
+        if best is None:
+            break
+        pool.remove(best)
+        paid = pay(g, reduce_cost(g, best), units) or 0
+        g.m["apex_casts"] = g.m.get("apex_casts", 0) + 1
+        resolve_spell(g, best, paid, from_hand=False)
+    g.m["apex_stranded"] = g.m.get("apex_stranded", 0) + len(pool)
 
 
 def sunbird(g, card):
@@ -1268,6 +1464,12 @@ def take_turn(g):
     for p in g.board:
         p.tapped = False
         p.sick = False
+    # Apex's mana is "until end of turn"; the Treasures Hit the Mother Lode
+    # made entered TAPPED and become real mana on this untap step.
+    g.apex_mana = 0
+    if g.tapped_treasures:
+        g.treasures += g.tapped_treasures
+        g.tapped_treasures = 0
     g.land_drops = 1
     g.land_drops_used = 0
 
@@ -1414,8 +1616,12 @@ def simulate(deck, commander, cfg, seed):
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
     out["final_life"] = g.your_life
     out["damage_by_turn"] = g.damage_by_turn
+    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
+    # an Impending Overlord are not creatures and their power is not board
+    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
+    # restores the old reading here too.
     out["final_board_power"] = sum(g.power_of(p) for p in g.board
-                                   if p.card.is_creature)
+                                   if OPP.is_creature_now(g, p))
     out["miracle_rate"] = (out["miracle_hits"] / out["miracle_windows"]
                            if out["miracle_windows"] else 0.0)
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and

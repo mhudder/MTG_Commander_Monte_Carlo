@@ -47,7 +47,8 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Board, Card, Permanent, can_pay, play_land)
+from edhmc.engine import (Board, Card, Permanent, can_pay, play_land,
+                          engine_cfg)
 from edhmc import opponents as OPP
 from edhmc import voting as V
 
@@ -56,7 +57,11 @@ TOKEN_KINDS = ("Treasure", "Clue", "Food")
 
 class TivitGame:
     def __init__(self, deck, commander, cfg, seed):
-        self.cfg = cfg
+        # A PRIVATE copy: the cfg.setdefault block below stamps this
+        # engine's defaults, and doing that to the CALLER'S dict let the
+        # first engine constructed decide them for every later one.
+        # See engine.engine_cfg.
+        self.cfg = cfg = engine_cfg(cfg)
         self.rng = random.Random(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
@@ -161,7 +166,8 @@ class TivitGame:
         if amount <= 0:
             return
         # BOUNDED: record what could have mattered, not what was asked for.
-        n = max(1, len(OPP.living(self)))
+        # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
+        n = OPP.pod_size(self)
         amount = (OPP.damage_each(self, amount / n) if each
                   else OPP.damage_single(self, amount))
         self.m["damage"] += amount
@@ -243,7 +249,10 @@ def on_tokens_created(g, n):
     if g.has("Kambal, Profiteering Mayor"):
         per += 1.0                     # "each opponent loses 1 and you gain 1"
     if per:
-        dmg = per * n * len(OPP.living(g))
+        # `pod_size`, not `living`: this builds a POD TOTAL that
+        # `deal_pod_damage` divides straight back down, so the two have to
+        # agree or the knob restores a behaviour that never shipped.
+        dmg = per * n * OPP.pod_size(g)
         g.deal_pod_damage(dmg)
         g.m["token_drain"] += dmg
         if g.result == "win":
@@ -263,9 +272,12 @@ def sacrifice_tokens(g, kind, n) -> int:
     if g.has("Mirkwood Bats"):
         per += 1.0                     # "create OR sacrifice a token"
     if g.has("Disciple of the Vault"):
-        per += 1.0 / max(1, len(OPP.living(g)))   # ONE opponent loses 1
+        # ONE opponent loses 1, carried as its share of an each-opponent
+        # total: this `living` is the real count of players the damage will be
+        # spread over and is NOT the pod-total divisor, so it stays.
+        per += 1.0 / max(1, len(OPP.living(g)))
     if per:
-        dmg = per * n * len(OPP.living(g))
+        dmg = per * n * OPP.pod_size(g)          # see the Mirkwood site above
         g.deal_pod_damage(dmg)
         g.m["token_drain"] += dmg
     if g.has("Marionette Master"):
@@ -594,14 +606,78 @@ def resolve(g, card):
         g.m["extra_turns"] += mine
     elif s == "tyrants_choice":
         if not V.council(g):
-            g.deal_pod_damage(4.0 * len(OPP.living(g)))
+            # A POD TOTAL, like every other deal_pod_damage caller: 4 life from
+            # each of the pod's opponents. This used to scale by the LIVING
+            # count, which cancelled the divisor `pod_size` has now fixed -- so
+            # tivit was right and the other five engines were wrong.
+            #
+            # IT MULTIPLIES BY THE SAME `pod_size` THE DIVISOR USES, which is
+            # what keeps `pod_damage_full_pod=False` an honest restoration:
+            # numerator and divisor move together, so this site yields 4.0
+            # apiece under BOTH settings and tivit reproduces bit-identically
+            # either way. Writing `len(g.opponents)` here instead would have
+            # made the knob restore a third behaviour that never shipped.
+            g.deal_pod_damage(4.0 * OPP.pod_size(g))
     elif s == "capital_punishment":
         # Sacrifice and discard are both unmodelled against this opponent
         # model; only the vote payoffs (Grudge Keeper) actually land.
         V.dilemma(g, "capital")
-    elif s in ("bite", "split_decision", "trial", "councils_judgment",
-               "magister"):
+    elif s in ("bite", "split_decision", "trial", "councils_judgment"):
         V.council(g)
+    elif s == "magister":
+        # "Will of the council — When this creature enters, starting with you,
+        # each player votes for grace or condemnation. If grace gets more
+        # votes, each player returns each creature card from their graveyard
+        # to the battlefield. If condemnation gets more votes OR THE VOTE IS
+        # TIED, destroy all creatures other than this creature."
+        #
+        # IT USED TO JUST VOTE AND THROW THE RESULT AWAY, sharing a branch
+        # with four cards whose whole text is the vote. Neither mode existed.
+        #
+        # `tie_goes_to_you=True` because condemnation takes ties and
+        # condemnation is what this deck wants: tivit's board is artifacts,
+        # its creature count is low, and Magister survives its own wipe.
+        #
+        # NOT `tags=("wipe", "onesided")`, which is what it carried while the
+        # tag did nothing: one-sided spares your WHOLE board, and the card
+        # spares exactly one creature — itself. Resolving here, before the
+        # permanent enters below, makes that exact rather than approximate.
+        #
+        # GRACE IS HALF MODELLED and understates: "EACH PLAYER returns each
+        # creature card from their graveyard" is real for you and invisible
+        # for a pod that has no graveyard (§4).
+        if not g.cfg.get("tivit_sweepers", True):
+            V.council(g)                 # the pre-fix branch: vote, discard it
+        elif V.council(g, tie_goes_to_you=True):
+            OPP.resolve_own_wipe(g, card=card)
+            g.m["magister_wipes"] = g.m.get("magister_wipes", 0) + 1
+        else:
+            for c in [x for x in g.graveyard if x.is_creature]:
+                g.graveyard.remove(c)
+                g.board.append(Permanent(card=c, sick=True))
+                g.m["magister_returns"] = g.m.get("magister_returns", 0) + 1
+    elif s == "shell_game":
+        # "Starting with the next opponent in turn order, each player chooses
+        # a creature YOU DON'T CONTROL. Destroy the chosen creatures."
+        #
+        # "You" is this card's controller, so EVERY choice comes off an
+        # opponent's board — but it is one creature per player, not a board
+        # wipe. It carried `tags=("wipe", "onesided")`, which would have
+        # zeroed all three opponents' boards: up to 21 creature-equivalents
+        # against the four the card actually kills. The tag was harmless while
+        # nothing read it and would have become a 5x overstatement the moment
+        # the branch below started working.
+        #
+        # Taken off the biggest board first, which is both what a pilot picks
+        # and what the pod's own `creatures` float can express.
+        picks = 1 + len(OPP.living(g)) if g.cfg.get("tivit_sweepers", True) else 0
+        for _ in range(picks):
+            fed = [o for o in OPP.living(g) if o.creatures >= 1.0]
+            if not fed:
+                break
+            victim = max(fed, key=lambda o: o.creatures)
+            victim.creatures -= 1.0
+            g.m["shell_game_kills"] = g.m.get("shell_game_kills", 0) + 1
     elif s == "tempt_bunnies":
         n = V.tempting_offer(g)
         g.draw(n)
@@ -643,9 +719,30 @@ def resolve(g, card):
         # hand and no permanents the life is the ONLY branch that exists, so
         # this is a CEILING -- a real opponent pays with cards for a while.
         x = card.mv - 2
-        g.deal_pod_damage(3.0 * x * len(OPP.living(g)))
+        # A POD TOTAL -- 3X from each of the pod's opponents. See the
+        # Tyrant's Choice site above for why this reads `pod_size` and not
+        # `living` or a bare `len(g.opponents)`.
+        g.deal_pod_damage(3.0 * x * OPP.pod_size(g))
         if g.result == "win":
             g.m["win_route"] = ROUTE_TORMENT
+
+    # THIS BRANCH DID NOT EXIST, AND FIVE CARDS WERE INERT BECAUSE OF IT.
+    # `main_phase` has always gated casting a sweeper on
+    # `OPP.should_cast_own_wipe`, so the tag was half-wired: the engine held
+    # Damn, Farewell and Promise of Loyalty back until it was BEHIND on board
+    # and then cast them for no effect at all. That is worse than a blank --
+    # a blank does not wait for the worst moment to do nothing. The other four
+    # engines have carried this one line since wipes were added (§5).
+    #
+    # It runs BEFORE the permanent enters, which is what lets Magister of
+    # Worth's "destroy all creatures OTHER THAN THIS CREATURE" spare itself
+    # without a special case: it is not on the battlefield yet.
+    #
+    # `tivit_sweepers=False` restores the whole pre-fix state -- this branch
+    # gone, Magister voting and discarding the result, Shell Game inert --
+    # which is what every tivit table published before this reproduces with.
+    if "wipe" in card.tags and g.cfg.get("tivit_sweepers", True):
+        OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
 
     if card.is_permanent:
         perm = Permanent(card=card, sick=not card.haste)
@@ -1028,8 +1125,12 @@ def simulate(deck, commander, cfg, seed):
     out["lost"] = 1 if g.result == "loss" else 0
     out["final_life"] = g.your_life
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
+    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
+    # an Impending Overlord are not creatures and their power is not board
+    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
+    # restores the old reading here too.
     out["final_board_power"] = sum(g.power_of(p) for p in g.board
-                                   if p.card.is_creature)
+                                   if OPP.is_creature_now(g, p))
     out["final_treasures"] = g.tokens["Treasure"]
     out["final_artifacts"] = g.artifact_count()
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and

@@ -234,11 +234,16 @@ REMOVAL = [
     C("Void Rend", "Instant", {"W": 1, "U": 1, "B": 1}, priority=2),
     C("Promise of Loyalty", "Sorcery", {"gen": 4, "W": 1}, priority=3,
       tags=("wipe",)),
+    # NOT a wipe: "each player chooses a creature you don't control" is one
+    # kill per player, not a board sweep. See tivit.resolve's `shell_game`.
     C("Sadistic Shell Game", "Sorcery", {"gen": 4, "B": 1}, priority=3,
-      tags=("wipe", "onesided")),
+      script="shell_game"),
     C("Farewell", "Sorcery", {"gen": 4, "W": 2}, priority=3, tags=("wipe",)),
+    # The wipe is CONDITIONAL on the vote and spares only itself, so it is
+    # resolved in the script rather than by the generic `wipe` tag, which
+    # would fire unconditionally and spare your whole board.
     C("Magister of Worth", "Creature", {"gen": 4, "W": 1, "B": 1}, 4, 4,
-      priority=4, threat=6.0, tags=("wipe", "onesided", "vote"),
+      priority=4, threat=6.0, tags=("vote",),
       script="magister"),
 ]
 

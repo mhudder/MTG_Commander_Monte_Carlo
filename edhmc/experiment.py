@@ -165,6 +165,11 @@ POD_V1 = {
     "archetypes": False,
 }
 
+# `opponents_killed` IS ANY-CAUSE, not "kills your board caused" — it counts
+# opponents eliminated by each other's clocks too. The kills your attack
+# actually made are `m["combat_kills"]`, which is a separate counter as of
+# 2026-09-11; before that both were written to this name and this one won.
+# See `opponents.combat_damage`.
 METRICS = ("won", "damage", "cards_drawn", "rendmaw_triggers", "tokens_made",
            "opponents_killed", "turns_played", "final_board_power",
            "removal_eaten", "wipes_suffered", "countered")

@@ -188,6 +188,60 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
 # Threat assessment
 # ---------------------------------------------------------------------------
 
+def is_creature_now(g, perm) -> bool:
+    """Is this permanent a creature ON THE BATTLEFIELD right now?
+
+    `opponents.py` asked `perm.card.is_creature` — the TYPE LINE AS PLAYED —
+    at every site below, and `engine.is_battlefield_creature` exists precisely
+    because those are not the same question. Three cards in the rendmaw list
+    are creature cards that are not creatures on the battlefield, and rendmaw
+    also holds the two sweepers, so every one of them was live:
+
+        Grist, the Hunger Tide      "As long as Grist ISN'T ON THE BATTLEFIELD,
+                                    it's a 1/1 Insect creature" — a bare
+                                    Planeswalker once it lands, and it was
+                                    dying to every Wrath in the game.
+        Overlord of the Hauntwoods  deployed for its Impending cost, it "isn't
+                                    a creature until the last time counter is
+                                    removed" — and it was being wrathed during
+                                    the four turns it is an enchantment.
+        Erebos, Bleak-Hearted       not a creature below devotion 5.
+
+    The engine's combat step has always used `is_battlefield_creature` for its
+    attacker filter. `opponents.py` never adopted it, so a permanent could be
+    too-not-a-creature to attack and creature enough to die to a board wipe.
+
+    IT NARROWS AND NEVER BROADENS, deliberately. The `card.is_creature` guard
+    comes first, so this can only ever REMOVE a permanent from a victim list —
+    it cannot add one. That matters for azusa, whose module docstring states as
+    a deliberate fact that `spot_removal` and `board_wipe` "both exclude lands,
+    so nothing the pod does can kill an animated land". An animated land really
+    is a creature and really should die to a Wrath, and `azusa.counts_as_creature`
+    already knows it — but that is the BROADENING half of the same question,
+    it is inert today (all three of azusa's animation cards were cut on
+    2026-09-10, §0y), and folding it in here would silently reverse a
+    documented decision. Left open on purpose, said out loud.
+
+    `pod_reads_battlefield_creatures=False` restores the type-line reading and
+    is what any table published before this reproduces with. It is a NEW knob
+    rather than a reuse of `battlefield_creature_types`, which was tempting and
+    wrong: that one gates the NEVER *stamp* applied at ETB, and it does not
+    gate the `impending` clause or the devotion clause at all — so flipping it
+    would have restored some of the old behaviour and not the rest, which is
+    worse than no switch. One correction, one knob.
+
+    The import is deferred because `engine` imports this module, not the other
+    way round. It is a `sys.modules` lookup after the first call, and this is
+    not one of the hot paths — `has()` is.
+    """
+    if not perm.card.is_creature:
+        return False
+    if not g.cfg.get("pod_reads_battlefield_creatures", True):
+        return True                      # the pre-fix reading: the type line
+    from edhmc.engine import is_battlefield_creature
+    return is_battlefield_creature(g, perm)
+
+
 def threat_of(g, perm) -> float:
     """How badly an opponent wants this specific permanent gone."""
     c = perm.card
@@ -204,7 +258,7 @@ def threat_of(g, perm) -> float:
 
 def board_threat(g) -> float:
     """Your total threat level, as the table perceives it."""
-    power = sum(g.power_of(p) for p in g.board if p.card.is_creature)
+    power = sum(g.power_of(p) for p in g.board if is_creature_now(g, p))
     engines = sum(threat_of(g, p) for p in g.board if not p.is_token
                   and not p.card.is_land)
     return power + engines
@@ -311,13 +365,13 @@ def board_wipe(g, opp, rolls):
     """Wraths scale with how wide the table's biggest board has gotten."""
     if g.turn < g.cfg.get("first_wipe_turn", 5):
         return
-    n = sum(1 for p in g.board if p.card.is_creature)
+    n = sum(1 for p in g.board if is_creature_now(g, p))
     width_mult = 1.0 + min(0.75, max(0, n - 4) * 0.08)
     if rolls[2] >= opp.p["wipe"] * width_mult:
         return
     if try_protect(g, rolls[5]):
         return
-    for p in [p for p in g.board if p.card.is_creature]:
+    for p in [p for p in g.board if is_creature_now(g, p)]:
         destroy(g, p, rolls[7])
     for o in g.opponents:
         o.creatures = 0.0
@@ -334,7 +388,121 @@ def board_wipe(g, opp, rolls):
 GRANTS_INDESTRUCTIBLE = {"Avacyn, Angel of Hope"}
 
 
-def destroy(g, perm, roll=None):
+# YOUR OWN SWEEPERS, classified by whether INDESTRUCTIBLE stops them. Each
+# entry quotes the clause that decides it -- not a judgement call, and not
+# guessed: every line below was read from `api.scryfall.com` on 2026-09-11.
+#
+# The opponents' interaction is a generic "answer" and is priced statistically
+# by `destroy_share`, because the model does not know whether a given opponent
+# held a Doom Blade or a Swords. YOUR OWN wipe is a named card whose text is
+# right there, so pricing it by the same coin flip would be modelling as
+# unknown something the deck list states.
+#
+# CHECKED, not merely asserted -- see check_wipe_coverage(). A `wipe`-tagged
+# card in a deck that is in neither set raises, because the failure mode is a
+# card silently taking the wrong branch. §0q.
+WIPE_IGNORES_INDESTRUCTIBLE = {
+    "Toxic Deluge":
+        "All creatures get -X/-X until end of turn.",
+    "Farewell":
+        "Choose one or more - Exile all artifacts. - Exile all creatures. ...",
+    "Promise of Loyalty":
+        "Each player puts a vow counter on a creature they control and "
+        "SACRIFICES the rest.",
+    "Massacre Wurm":
+        "creatures your opponents control get -2/-2 until end of turn.",
+}
+
+WIPE_DESTROYS = {
+    "Damn": "Overload {2}{W}{W} ... Destroy target creature -> each creature.",
+    "Damnation": "Destroy all creatures. They can't be regenerated.",
+    "Wrath of God": "Destroy all creatures. They can't be regenerated.",
+    "Austere Command": "Choose two - ... Destroy all creatures with mana value "
+                       "3 or less. - Destroy all creatures with mana value 4 "
+                       "or greater.",
+    "Ultima": "Destroy all artifacts and creatures. End the turn.",
+    "Ondu Inversion": "Destroy all nonland permanents.",
+    "Culling Ritual": "Destroy each nonland permanent with mana value 2 or "
+                      "less.",
+    # DAMAGE, not destruction -- and indestructible survives damage just as it
+    # survives "destroy", so this belongs on this side of the split. It is the
+    # one entry here whose clause does not contain the word.
+    "Blasphemous Act": "Blasphemous Act deals 13 damage to each creature.",
+    "Sadistic Shell Game": "each player chooses a creature you don't control. "
+                           "DESTROY the chosen creatures.",
+    "Magister of Worth": "If condemnation gets more votes or the vote is tied, "
+                         "DESTROY all creatures other than this creature.",
+    "Coercive Portal": "If carnage gets more votes, sacrifice this artifact "
+                       "and DESTROY all nonland permanents.",
+}
+
+
+def check_wipe_coverage(decks):
+    """Every `wipe`-tagged card must be classified ON PURPOSE.
+
+    `decks` is {name: [Card, ...]}. The two sets above decide which branch a
+    sweeper takes in `resolve_own_wipe`, and a card in neither would silently
+    take the destroys-branch and be wrong for exactly the cards that most need
+    it right -- an exile or a -X/-X wipe that the model lets an indestructible
+    creature walk away from.
+
+    This is the §0q rule applied in the same change that introduces the set:
+    a hand-maintained name set is a claim, so it gets a check, and the check is
+    proved to fail (see tests/test_own_wipe.py --mutate).
+
+    A name in a set that is in no deck is stale rather than dangerous, so it
+    is reported and not raised on -- `Coercive Portal` is not `wipe`-tagged at
+    all (it is a permanent with a script that calls `resolve_own_wipe`), so it
+    is expected to show up there.
+    """
+    tagged = {c.name for deck in decks.values() for c in deck
+              if "wipe" in c.tags}
+    both = WIPE_IGNORES_INDESTRUCTIBLE.keys() & WIPE_DESTROYS.keys()
+    if both:
+        raise SystemExit(
+            f"\n{len(both)} sweeper(s) are in BOTH wipe sets, so which branch "
+            f"they take depends on lookup order:\n"
+            + "".join(f"    {n}\n" for n in sorted(both))
+            + "A sweeper either gets around indestructible or it does not.")
+    unclassified = tagged - WIPE_IGNORES_INDESTRUCTIBLE.keys() - WIPE_DESTROYS.keys()
+    if unclassified:
+        raise SystemExit(
+            f"\n{len(unclassified)} `wipe`-tagged card(s) are in neither "
+            f"WIPE_IGNORES_INDESTRUCTIBLE nor WIPE_DESTROYS:\n"
+            + "".join(f"    {n}\n" for n in sorted(unclassified))
+            + "Read the oracle text and add it to one, WITH THE CLAUSE. A "
+              "destroy effect is stopped by indestructible; exile, sacrifice "
+              "and -X/-X are not, and damage IS. Do not guess -- "
+              "api.scryfall.com is the source of truth.")
+    no_clause = [n for n, why in
+                 list(WIPE_IGNORES_INDESTRUCTIBLE.items()) + list(WIPE_DESTROYS.items())
+                 if not (why or "").strip()]
+    if no_clause:
+        raise SystemExit(
+            f"\n{len(no_clause)} sweeper(s) are classified with no clause:\n"
+            + "".join(f"    {n}\n" for n in sorted(no_clause))
+            + "The quoted clause IS the evidence. Without it the entry is an "
+              "assertion that the next reader cannot check.")
+    stale = ((WIPE_IGNORES_INDESTRUCTIBLE.keys() | WIPE_DESTROYS.keys())
+             - tagged - {"Coercive Portal"})
+    return sorted(stale)
+
+
+def wipe_destroys(card) -> bool:
+    """Does this sweeper destroy, in the sense indestructible cares about?
+
+    None/unknown defaults to True -- a destroy effect -- because that is what
+    the overwhelming majority of sweepers are and it is the conservative branch
+    (it lets something survive rather than killing something it should not).
+    `check_wipe_coverage` is what stops that default from being reached by a
+    real card.
+    """
+    if card is None:
+        return True
+    return card.name not in WIPE_IGNORES_INDESTRUCTIBLE
+
+
+def destroy(g, perm, roll=None, destroys=None):
     """Remove a permanent the pod answered.
 
     `roll` is one of that opponent's pre-rolled numbers, supplied only so that
@@ -348,16 +516,32 @@ def destroy(g, perm, roll=None):
     0.60 is an assumption, not a measurement. It is a knob, and a card whose
     evaluation swings on it should be reported with that said out loud.
     Callers that pass no roll destroy unconditionally.
+
+    `destroys` OVERRIDES that coin flip with knowledge. It is for effects whose
+    source is a named card in your own list rather than an abstract opponent
+    answer, where the text is known and pricing it statistically would be
+    modelling as unknown something that is written down:
+
+        True    a destruction effect; indestructible ALWAYS saves.
+        False   exile, sacrifice or -X/-X; indestructible NEVER saves.
+        None    an anonymous answer; priced by `roll` against `destroy_share`.
+
+    Only `resolve_own_wipe` passes it; every opponent-sourced call still takes
+    the None path it always did.
     """
     if perm not in g.board:
         return False
     granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
               and perm.card.name not in GRANTS_INDESTRUCTIBLE)
-    if (perm.card.indestructible or granted) and roll is not None \
+    hardy = perm.card.indestructible or granted
+    if destroys is not None:
+        if hardy and destroys:
+            return False
+    elif hardy and roll is not None \
             and roll < g.cfg.get("destroy_share", 0.60):
         return False
     g.board.remove(perm)
-    if perm.card.is_creature and hasattr(g, "on_creature_death"):
+    if is_creature_now(g, perm) and hasattr(g, "on_creature_death"):
         g.on_creature_death(1, perm)
     if perm.card is g.commander:
         g.commander_cast = False          # back to the command zone
@@ -550,6 +734,45 @@ def living(g):
     return [o for o in g.opponents if o.alive and o.life > 0]
 
 
+def pod_size(g) -> int:
+    """How many opponents an 'each opponent loses N' POD TOTAL was quoted for.
+
+    `deal_pod_damage(amount, each=True)` takes a pod total and divides it to get
+    the per-opponent figure. It used to divide by the number of opponents still
+    LIVING, and every caller writes its total for a full pod -- `9.0` with the
+    comment "each of 3 opponents loses 3", `6.0` for Guttersnipe's 2 apiece. So
+    the divisor shrank as the pod did while the numerator did not, and an
+    effect that reads "each opponent loses 1" dealt 1.5 apiece with two players
+    left and 3 with one:
+
+        The Meathook Massacre, one creature dying
+          3 opponents alive -> each lost 1.0     correct
+          2 opponents alive -> each lost 1.5     oracle text says 1.0
+          1 opponent  alive -> each lost 3.0     oracle text says 1.0
+
+    The bias runs one way and it runs in the endgame, which is exactly where
+    drain converts into a win. It hit Meathook and Cauldron of Essence
+    (`engine.on_creature_death`), Baba Lysaga, Guttersnipe, Longshot and
+    Tyrant's Choice.
+
+    `tivit.py` was already right and got there differently -- its two call
+    sites multiplied by `len(living(g))` before calling, which cancelled the
+    divisor. That is the §0u drift shape again: the same rule, six copies of
+    the function, and two call sites quietly compensating for what the other
+    four did not. Those two now pass a full-pod total like everybody else.
+
+    DERIVED, not the literal 3: `g.opponents` never shrinks -- elimination sets
+    `alive`, it does not remove the opponent -- so this is the pod as built and
+    stays correct if `pod_brackets` is ever given a different length.
+
+    `pod_damage_full_pod=False` restores the living-count divisor, which is
+    what every table published before this reproduces with.
+    """
+    if not g.cfg.get("pod_damage_full_pod", True):
+        return max(1, len(living(g)))
+    return max(1, len(g.opponents))
+
+
 def damage_each(g, n) -> float:
     """'Each opponent loses N' effects.
 
@@ -668,6 +891,26 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     route their combat through here. Setting it False restores the old
     one-player swing exactly, which is what `run_combat_split.py` measures
     against and the only way to reproduce a table published before that date.
+
+    `m["combat_kills"]` IS NOT `out["opponents_killed"]`, AND IT USED TO SHARE
+    ITS NAME (renamed 2026-09-11). Two different quantities:
+
+        m["combat_kills"]        opponents YOUR ATTACK killed — counted here
+        out["opponents_killed"]  opponents not alive AT ALL, from any cause,
+                                 which includes the ones eliminated by another
+                                 opponent's clock in `resolve_clocks`
+
+    Both were written to `m["opponents_killed"]`, and every engine's
+    `simulate()` overwrites that key with the second meaning on the way out —
+    so the counter written here was dead weight, and the metric reported in
+    `experiment.METRICS` has always been the any-cause one. Reading it as "how
+    often did my board close a game" was wrong, and in a pod whose clocks
+    eliminate players on their own it was wrong by a lot.
+
+    THE RENAME CHANGES NO NUMBER. Nothing reads either key as a decision input
+    — both are purely observational — so `out["opponents_killed"]` keeps the
+    meaning every committed table was measured with, and `combat_kills` is
+    newly available rather than newly different. No regeneration.
     """
     if not attackers:
         return 0.0
@@ -694,8 +937,8 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         was = len(living(g))
         dealt = damage_single(g, dmg)
         g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + dmg
-        g.m["opponents_killed"] = (g.m.get("opponents_killed", 0)
-                                   + was - len(living(g)))
+        g.m["combat_kills"] = (g.m.get("combat_kills", 0)
+                               + was - len(living(g)))
         g.m["attack_targets"] = g.m.get("attack_targets", 0) + (1 if dmg > 0 else 0)
         return dealt
 
@@ -757,8 +1000,8 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     # Combat damage is simultaneous: everything lands, then deaths are checked.
     _check_eliminations(g)
     g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + raw
-    g.m["opponents_killed"] = (g.m.get("opponents_killed", 0)
-                               + before_alive - len(living(g)))
+    g.m["combat_kills"] = (g.m.get("combat_kills", 0)
+                           + before_alive - len(living(g)))
     g.m["attack_targets"] = g.m.get("attack_targets", 0) + len(plan)
     return effective
 
@@ -777,7 +1020,7 @@ def your_creatures(g) -> int:
     """
     ask = getattr(g, "counts_as_creature", None)
     if ask is None:
-        return sum(1 for p in g.board if p.card.is_creature)
+        return sum(1 for p in g.board if is_creature_now(g, p))
     return sum(1 for p in g.board if ask(p))
 
 
@@ -869,35 +1112,73 @@ def should_cast_own_wipe(g) -> bool:
     state: only sweep when the table's creature count meaningfully exceeds
     yours.
     """
-    mine = sum(1 for p in g.board if p.card.is_creature)
+    mine = sum(1 for p in g.board if is_creature_now(g, p))
     theirs = sum(o.creatures for o in living(g))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
 
 
-def resolve_own_wipe(g, spare_own=False):
+def resolve_own_wipe(g, spare_own=False, card=None):
     """Your sweeper resolves. It kills THEIR board and, unless it is one-sided,
-    yours too — which the engine previously ignored entirely."""
+    yours too — which the engine previously ignored entirely.
+
+    IT USED TO IGNORE INDESTRUCTIBLE, and the pod's wipe never did. This path
+    called `g.board.remove(p)` directly while `board_wipe` went through
+    `destroy()`, so the same sweeper effect obeyed two different rules
+    depending on which side of the table cast it — the §0u drift shape again,
+    in the one place where the asymmetry favours nobody.
+
+    LIVE IN TWO OF THE SIX LISTS, counted from the BUILT decks rather than by
+    grepping the modules (`karlov_v2.HELIOD_SUN_CROWNED` is a candidate, not a
+    deck member, and reading it as one is how this was first miscounted):
+
+        shilgengar  Avacyn, Angel of Hope + Damn + Wrath of God
+        rendmaw     Erebos, Bleak-Hearted + Culling Ritual
+
+    Avacyn is the sharp case, because she grants indestructible to everything
+    you control and your own Wrath was ignoring the grant outright. The other
+    four lists hold either no indestructible permanent or no destroy-wipe, so
+    the fix is inert in them today — and would stop being inert the moment
+    Heliod is staged into karlov, which is why this is derived per game rather
+    than hard-coded.
+
+    `card` is the sweeper being cast, so the branch is taken from ITS oracle
+    text rather than from `destroy_share`'s coin flip — see `wipe_destroys` and
+    WIPE_IGNORES_INDESTRUCTIBLE. Coercive Portal's upkeep mode passes none and
+    gets the destroys-branch default, which is what its text says.
+
+    NOTE WHAT THIS MAKES TRUE, because it reads like a regression and is not:
+    with Avacyn on the battlefield, shilgengar's Damn and Wrath of God are now
+    blanks. That is the card doing its job. `main_phase` is greedy and will
+    still cast one (queued item 18), which is a POLICY gap, not this one.
+
+    `own_wipe_indestructible=False` restores the old kill-everything path, and
+    is what any table published before 2026-09-11 reproduces with.
+    """
     for o in living(g):
         o.creatures = 0.0
     if spare_own:
         return
-    for p in [p for p in g.board if p.card.is_creature]:
-        g.board.remove(p)
-        if p.card is g.commander:
-            # FIXED 2026-09-04. Your own sweeper used to remove the commander
-            # from the battlefield WITHOUT returning it to the command zone, so
-            # `commander_cast` stayed True and it was never recast again.
-            # destroy() always got this right; this path never did. Measured
-            # cost of the bug, value of a wrath over a blank at 20 turns:
-            # Farewell -2.05 -> -0.98 damage, Karlov's Damn -0.0107 -> -0.0032
-            # win rate. It was worth about a point of damage on every self-wipe
-            # and it hit Lorehold hardest, where the commander IS the engine.
-            # `own_wipe_commander_returns=False` restores the old behaviour.
-            if g.cfg.get("own_wipe_commander_returns", True):
-                g.commander_cast = False
-                g.commander_tax += 2
-        elif not p.is_token:
-            g.graveyard.append(p.card)
-        if hasattr(g, "on_creature_death"):
-            g.on_creature_death(1, p)
+    destroys = wipe_destroys(card)
+    honour = g.cfg.get("own_wipe_indestructible", True)
+    for p in [p for p in g.board if is_creature_now(g, p)]:
+        # FIXED 2026-09-04. Your own sweeper used to remove the commander from
+        # the battlefield WITHOUT returning it to the command zone, so
+        # `commander_cast` stayed True and it was never recast again.
+        # destroy() always got this right; this path never did. Measured cost
+        # of the bug, value of a wrath over a blank at 20 turns: Farewell
+        # -2.05 -> -0.98 damage, Karlov's Damn -0.0107 -> -0.0032 win rate. It
+        # was worth about a point of damage on every self-wipe and it hit
+        # Lorehold hardest, where the commander IS the engine.
+        # destroy() now carries that rule for this path too, so the knob is
+        # applied by restoring what it changed rather than by a second copy.
+        was_commander = p.card is g.commander
+        cast_before, tax_before = g.commander_cast, g.commander_tax
+        if not destroy(g, p, destroys=destroys if honour else False):
+            g.m["own_wipe_survivors"] = g.m.get("own_wipe_survivors", 0) + 1
+            continue
+        # `own_wipe_commander_returns=False` restores the pre-2026-09-04
+        # behaviour, which destroy() does not have a flag for because no
+        # opponent-sourced removal ever needed one.
+        if was_commander and not g.cfg.get("own_wipe_commander_returns", True):
+            g.commander_cast, g.commander_tax = cast_before, tax_before
     g.m["own_wipes_cast"] = g.m.get("own_wipes_cast", 0) + 1

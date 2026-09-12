@@ -119,7 +119,7 @@ import re
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
-                          hand_colour_demand)
+                          hand_colour_demand, engine_cfg)
 from edhmc.decks._evasion import FOREST, HUMAN
 from edhmc import opponents as OPP
 
@@ -284,7 +284,11 @@ NISSA_SAGE_ANIMIST = Card(
 
 class AzusaGame:
     def __init__(self, deck, commander, cfg, seed):
-        self.cfg = cfg
+        # A PRIVATE copy: the cfg.setdefault block below stamps this
+        # engine's defaults, and doing that to the CALLER'S dict let the
+        # first engine constructed decide them for every later one.
+        # See engine.engine_cfg.
+        self.cfg = cfg = engine_cfg(cfg)
         self.rng = random.Random(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
@@ -545,7 +549,8 @@ class AzusaGame:
             return
         # BOUNDED: what is recorded is what could have mattered, not what was
         # asked for -- a drain for 50 into a player on 3 life is worth 3.
-        n = max(1, len(OPP.living(self)))
+        # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
+        n = OPP.pod_size(self)
         dealt = (OPP.damage_each(self, amount / n) if each
                  else OPP.damage_single(self, amount))
         self.m["damage"] += dealt
@@ -1142,7 +1147,8 @@ class AzusaGame:
             self.m["test_card_turn"] = min(self.m["test_card_turn"], self.turn)
 
         if "wipe" in card.tags:
-            OPP.resolve_own_wipe(self, spare_own="onesided" in card.tags)
+            OPP.resolve_own_wipe(self, spare_own="onesided" in card.tags,
+                                 card=card)
 
         script = card.script
         if script == "draw3":
@@ -2207,7 +2213,12 @@ def simulate(deck, commander, cfg, seed):
     out["lost"] = 1 if g.result == "loss" else 0
     out["final_life"] = g.your_life
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
-    out["final_board_power"] = sum(g.power_of(p) for p in g.board if p.card.is_creature)
+    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
+    # an Impending Overlord are not creatures and their power is not board
+    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
+    # restores the old reading here too.
+    out["final_board_power"] = sum(g.power_of(p) for p in g.board
+                                   if OPP.is_creature_now(g, p))
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and
                                       not out["test_card_answered"]) else 0
     return out
