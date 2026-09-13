@@ -63,6 +63,7 @@ Methodology that used to live at the end of this file is now
 | [0z13](#0z13) | FIXED | §0i closed. **Its stated blocker had been false since §0z8, one day earlier** |
 | [0z14](#0z14) | FIXED | §0f closed. **§0f's own prescription would have overstated the card** |
 | [0z15](#0z15) | FIXED | four checks that could not fail, and one proposed fix that was a regression |
+| [0z16](#0z16) | FIXED | **the same card, two decks, two contradictory labels** — and the checker is per-deck |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **OPEN** | cards can only have one cost — structural |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -91,12 +92,14 @@ were closed**:
 **§0f and §0i are CLOSED** (§0z14, §0z13). Everything else is either fixed or
 was a question rather than a defect.
 
-**If you are an agent picking this up:** read §0z9–§0z15 first. They are the
-most recent batch, they changed five of six engines, **no table has been
-regenerated against them**, and §0z15 carries the two lessons most likely to
-save you a wasted day — a check that skips a category is blind exactly there,
-and one "obvious" fix in that section is a regression with the measurement
-attached.
+**If you are an agent picking this up:** read §0z9–§0z16 first. They are the
+most recent batch and they changed five of six engines. **All six tables WERE
+regenerated against them on 2026-09-12** — 19 of 378 rows moved beyond their
+own old bar, one already-significant row flipped sign, and karlov and azusa
+came back byte-identical. §0z15 and §0z16 carry the lessons most likely to save
+you a wasted day: a check is blind exactly where it does not range — over
+categories in §0z15, over the other five decks in §0z16 — and one "obvious" fix
+in §0z15 is a regression with the measurement attached.
 
 ---
 
@@ -3282,6 +3285,95 @@ cases within a minute of the change.
 
 **The code was right and the docstring was wrong.** The comment now carries
 the counter-example so the next reader does not repeat it.
+
+---
+
+<a id="0z16"></a>
+
+## 0z16. FIXED — the same card, two decks, two contradictory labels
+
+Found by READING THE 2026-09-12 REGENERATION rather than by a diagnostic, which
+is the point of doing the read-through at all: the numbers were right and the
+headings over them were not.
+
+**`Farewell` was `SCRIPTED_TIVIT` and `KNOWN_BLIND["lorehold"]` at the same
+time.** So the same card's row printed under *"a low score is evidence about
+the card"* in one table and *"a low score is evidence about the MODEL, not the
+card"* in the other — through the **identical shared code path**, because all
+six engines route their own sweepers through `opponents.resolve_own_wipe`. The
+difference was not that one deck modelled the card more deeply. Neither does.
+
+Three cards were affected, across seven deck-instances:
+
+| card | SCRIPTED / PARTLY in | KNOWN_BLIND in |
+|---|---|---|
+| Farewell | tivit | lorehold, karlov |
+| Damn | tivit, shilgengar | karlov |
+| Promise of Loyalty | tivit (PARTLY) | lorehold |
+
+### Why nothing caught it
+
+`check_scripted_coverage(deck)` enforces that a card is in **exactly one** of
+the three categories — and it takes ONE DECK. Each deck's sets were internally
+consistent, so every deck passed. **The blind spot is the dimension the check
+does not range over.** That is §0z15's lesson (a check that skips a category is
+blind exactly there) with a new axis: §0z15's checker skipped lands, this one
+skips *the other five decks*.
+
+### The fix: derive the category from the tag
+
+Listing the seven instances by hand would have been the §0q failure mode
+applied to its own cure. A symmetric wipe is **partly modelled by
+construction**: `resolve_own_wipe` destroys YOUR real board through
+`destroy()`, honouring indestructible from the sweeper's own oracle text
+(§0z10) — faithful — and sets each living opponent's `creatures` float to 0.0,
+which is §4 with no card behind it. The cost is modelled and the benefit is an
+estimate, so a HIGH score is evidence and a LOW one is not. That is
+`PARTLY_MODELLED`'s definition, and it is true of every symmetric wipe in every
+deck.
+
+`ablation.symmetric_wipes()` now derives the set from the `wipe` tag, and
+`partly_for()` merges it into `PARTLY_MODELLED` — a hand-written entry wins,
+so Promise of Loyalty and Magister of Worth keep the specific reasons naming
+their missing clause. **17 instances across five decks.** Two exclusions, both
+claims rather than conveniences:
+
+* **`onesided` wipes stay `KNOWN_BLIND`.** `spare_own=True` skips the half that
+  is faithful, so a one-sided wipe is ALL abstraction and a high score means no
+  more than a low one. Massacre Wurm (rendmaw) is the only one.
+* **Sadistic Shell Game stays `SCRIPTED`**, in `WIPE_NOT_SYMMETRIC` with its
+  reason: one kill per player off the biggest board is exactly what the text
+  says and exactly what the `creatures` float can carry — it needs no knowledge
+  of WHICH creature dies. It is not a board wipe.
+
+The invariant is enforced by the check that already existed: a derived wipe is
+in `PARTLY`, so re-adding one to `SCRIPTED` or `KNOWN_BLIND` by hand trips the
+existing overlap check, whose message now says so.
+
+### It changed no number, and that was demonstrated
+
+All six tables were re-rendered from their existing caches and compared field
+by field: **0 of 378 rows changed a number; 16 rows changed category.** The
+same demonstration item 14 used, for the same reason — a classification change
+that quietly moved a measurement would be the worst of both.
+
+### Why it mattered right then
+
+The regeneration had just moved lorehold's `Ultima` to **−0.0063 ±0.0033** and
+`Farewell` to **−0.0055 ±0.0033**, both crossing from inside their bars into
+significantly negative, both printing under MODEL-BLIND. Mechanically that is
+correct — a symmetric wipe in the deck whose commander IS its engine costs you
+the engine, and the pod's half is a float — but **two significantly negative
+rows are the §0z2 Bane of Progress trap, which has already cost this project
+two withdrawn swaps.** They now print under a heading that says NEVER CUT ON
+ONE.
+
+The mirror image is the tell that the old labels were incoherent: **the same
+card scores +0.0073 in tivit and −0.0055 in lorehold**, and that divergence is
+real — tivit rebuilds from artifact tokens, lorehold's commander leaves for the
+command zone with tax. A card genuinely can be good in one list and bad in
+another. What cannot be right is one table calling that number evidence and the
+other calling it noise.
 
 ---
 

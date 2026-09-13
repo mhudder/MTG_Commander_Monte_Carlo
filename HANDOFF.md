@@ -10,13 +10,26 @@ doc (current state, standing rules, queued work) and is worth reading in full
 
 ## Status, 2026-09-12 — read this before anything else
 
-**Fourteen engine defects were fixed and no table has been regenerated yet.**
-Everything in `results/` describes the engine as of 2026-09-11. Don't quote a
-number out of it, and don't stage a card swap on one, until you've run
-`./tools/regen_tables.sh` (~35 min).
-
-The simulator itself is healthy: `python -m tools.validate` is `+0.00` on all
+**Fourteen engine defects were fixed, and all six tables have now been
+regenerated against them.** Everything in `results/` describes the current
+engine. The simulator is healthy: `python -m tools.validate` is `+0.00` on all
 18 metrics, all 8 test suites pass, and all 7 mutation checks pass.
+
+What the regeneration showed, over all 378 rows: **19 moved beyond their own
+old error bar and one already-significant row flipped sign** (Magister of
+Worth, into the category where a low score explicitly is not evidence).
+Lorehold moved most (11 of 65), which is what you'd expect of the deck whose
+drain was the most inflated; **Karlov and Azusa came back byte-identical**,
+confirming they touch none of the fixed code — and incidentally proving the
+rebuild is bit-reproducible. Every single mover traces to a named defect.
+
+**One thing came out of it that changes a decision.** The staged Rendmaw swap
+(−Idol of Oblivion +Cauldron of Essence) lost most of its evidence: re-measured
+at the original sample and seeds it is **worth nothing at ten turns** (+0.0000,
+against +0.0027 before) and about a third of its recorded value at twenty
+(+0.0055 against +0.0152). Cauldron's drain was one of the six effects inflated
+by up to 3x. It isn't refuted, but don't commit it on the number in the ledger's
+older entry.
 
 ### What was wrong, and what it cost
 
@@ -54,17 +67,24 @@ three times too large.
 
 ### What still needs doing
 
-1. **Regenerate the tables.** Lorehold, Tivit, Rendmaw and Shilgengar have all
-   changed. Karlov and Azusa measured identical, so they can likely be
-   skipped — confirm with `tools/check_unchanged_decks.py` first.
+1. ~~Regenerate the tables.~~ **DONE 2026-09-12**, all six, from empty caches.
 2. **The common-random-numbers leak.** The technique that makes this project
    affordable relies on two simulated games staying in lockstep, and in five
    files they don't. Measured at up to **15% of games** on one Lorehold
    comparison. It doesn't invalidate results — it makes them noisier than the
-   error bars claim — but it is the largest known problem and the self-check
-   that should catch it structurally can't. `CLAUDE.md` queued item 19.
-3. **Commit the four staged card swaps**, which have been ready since
-   2026-09-09 and are waiting only on the three-leg discipline below.
+   error bars claim — but it is now clearly the largest known problem, and the
+   self-check that should catch it structurally can't. `CLAUDE.md` queued
+   item 19. **This is the thing to do next.**
+3. **Commit the staged card swaps — three of them, not four.** The two Lorehold
+   swaps and the Azusa one are waiting only on the three-leg discipline below;
+   Caldera Pyremaw's own row got *stronger* in the regeneration. The Rendmaw
+   one needs a decision first, for the reason above.
+4. **Re-read the queued items written before the batch.** Two have already
+   turned out to be stale in opposite directions: item 8 called Erebos a cut
+   candidate, and §0z10 moved it the other way (withdrawn 2026-09-12); §0z16
+   found a card carrying contradictory labels in two decks. Closing an engine
+   gap silently invalidates notes written while it was open, and nothing
+   re-reads them.
 
 There is also a standing limitation, not a bug: the opponents are an abstract
 threat level rather than real cards, so roughly a third of every deck (removal
@@ -177,12 +197,20 @@ Azusa, §0z4) — run `python -m edhmc.pending` for the current list and the
 evidence behind each. **This sentence is exactly the kind that goes stale; the
 command is authoritative and this paragraph is not.**
 
-The three older ones were measured before the 2026-09-08 combat split and
-**all three were re-verified on it on 2026-09-09 — every figure landed inside
-its own previous bar** (`KNOWN_ISSUES.md` §0w). They are committable; what
-remains is the three-leg discipline above. The Azusa one (−Perilous Forays
-+Ka-Zar of the Savage Land) was staged 2026-09-10 and held back deliberately
-while four other Azusa swaps were committed.
+The three older ones were measured before the 2026-09-08 combat split and all
+three were re-verified on it on 2026-09-09 (`KNOWN_ISSUES.md` §0w). **That
+re-verification has since been overtaken for one of them.** The two Lorehold
+swaps still hold and are committable, subject only to the three-leg discipline
+above. The Rendmaw one does not: re-measured on the 2026-09-12 engine it is
+worth nothing at ten turns and a third of its recorded value at twenty, because
+§0z9's drain fix took away most of what it was being credited for. The Azusa
+one (−Perilous Forays +Ka-Zar of the Savage Land) was staged 2026-09-10, held
+back deliberately while four other Azusa swaps were committed, and is unmoved.
+
+The general lesson, which is the third time this project has paid for it: **a
+re-verification is only as current as the engine it ran on.** Each of these
+carries a dated `reverified` entry for exactly that reason, and Rendmaw's now
+carries two that disagree.
 
 ## The one rule that matters more than any other
 

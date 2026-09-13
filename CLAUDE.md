@@ -39,7 +39,9 @@ them, so **reorganise `KNOWN_ISSUES.md` around its ids, never renumber them**.
     results/                 every table, log and harness output
       caches/                ablation caches (tracked — see below)
     spreadsheets/            the .xlsx system of record for five of six decks
-    docs/                    HISTORY.md, audits, candidate write-ups, cache manifest
+    docs/                    HISTORY.md, audits, candidate write-ups, cache
+                             manifest, and the comprehensive rules
+                             (COMP_RULES.md + MagicCompRules_20260807.docx/.txt)
 
 **Everything runs from the repo root with `-m`.** These scripts import
 `edhmc.*`, and `python tools/ablation.py` puts `tools/` on `sys.path` instead
@@ -160,29 +162,46 @@ record and it has two legs, not three.
 
 ## Current state
 
-> # EVERY ABLATION TABLE IN `results/` IS STALE.
+> # ALL SIX ABLATION TABLES ARE CURRENT, as of 2026-09-12.
 >
-> **2026-09-12. Fourteen engine defects were fixed and NOTHING has been
-> regenerated.** The tables on disk describe the engine as it stood on
-> 2026-09-11. Five of the six decks' behaviour has changed since. **Do not
-> quote a number out of `results/` and do not stage a swap on one** until the
-> regeneration below is done.
+> They were regenerated against the fourteen-fix batch (§0z9–§0z15) after
+> `validate` came back `+0.00` on all 18 metrics and all eight tests and seven
+> mutation checks passed. **19 of 378 rows moved beyond their own old bar and
+> ONE already-significant row flipped sign** — Magister of Worth, into
+> `PARTLY_MODELLED`, where a low score is explicitly not evidence.
 >
-> What to do first, in this order:
+> | deck | beyond own old bar | flips | what moved it |
+> |---|---|---|---|
+> | lorehold | **11 of 65** | 0 | §0z9 (Longshot), §0z13 (Talisman), §0z14 (all three) |
+> | tivit | **6 of 64** | 1 | §0z12 — five sweepers went from dead tags to live cards |
+> | rendmaw | **2 of 64** | 0 | §0z9, and ONLY its two named `on_creature_death` cards |
+> | karlov | 0 of 63 | 0 | **byte-identical** |
+> | shilgengar | 0 of 64 | 0 | §0z10 visible in three linked rows, all inside their bars |
+> | azusa | 0 of 58 | 0 | **byte-identical** |
 >
-> 1. `python -m tools.validate` → must be `+0.00` on all 18 metrics.
-> 2. Run the eight tests and the seven `--mutate` checks listed above.
-> 3. `./tools/regen_tables.sh` (deletes caches by default; ~35 min).
-> 4. Only then read a table.
+> **Every mover is attributable to a named section of the batch**, and the two
+> byte-identical decks prove the rebuild is bit-reproducible across cache
+> deletion. Noise floors are unchanged on all six. Each change still has its
+> own knob defaulting to the corrected behaviour, so `git stash` is not the way
+> to compare — flip the knobs listed in §0z9–§0z15 instead.
 >
-> The batch is §0z9–§0z15. Every change has its own knob defaulting to the
-> corrected behaviour, so `git stash` is not the way to compare — flip the
-> knobs listed in §0z9–§0z15 instead.
+> **Two things the regeneration turned up, both live:**
+>
+> 1. **The rendmaw staged swap is no longer supported by its recorded
+>    evidence.** −Idol of Oblivion +Cauldron of Essence re-measured at the
+>    original N and seeds is **+0.0000 [−0.0010, +0.0010] at T10** (was
+>    +0.0027, significant) and **+0.0055 [+0.0015, +0.0095] at T20** (was
+>    +0.0152). §0z9's divisor inflated its drain. Not refuted, but worth
+>    nothing at the horizon where games actually end. **Re-read it before
+>    committing**; the ledger entry carries the full figures.
+> 2. **§0z16**, the cross-deck labelling defect the read-through found.
 
 Verified 2026-09-12. `validate.py` is `+0.00` on all 18 metrics across 6
-engines; `corr(A,B) = 0.9135`, CRN worth ~11x the games. All eight tests and
+engines; `corr(A,B) = 0.9118`, CRN worth ~11x the games. All eight tests and
 all seven mutation checks pass. `python -m edhmc.pending` reports
-100 cards / singleton-legal / commander distinct on every deck.
+100 cards / singleton-legal / commander distinct on every deck that has a
+staged change (azusa, lorehold, rendmaw — the other three have nothing staged,
+so no legality block is printed for them).
 
 | deck | module | spreadsheet | engine | status |
 |---|---|---|---|---|
@@ -223,10 +242,24 @@ of correctness work and is not a reason to doubt it.
 sweepers left `KNOWN_BLIND` (three to `SCRIPTED_TIVIT`, two to a new
 `PARTLY_MODELLED["tivit"]`); Apex of Power and Hit the Mother Lode left
 `PARTLY_MODELLED` for `SCRIPTED_LOREHOLD`; five scripted LANDS were classified
-for the first time; Rogue's Passage is newly `KNOWN_BLIND`. After
-regeneration, **`PARTLY_MODELLED` is Ashaya + Bane of Progress (azusa),
-Borrowed Knowledge (lorehold), Promise of Loyalty + Magister of Worth
-(tivit)**.
+for the first time; Rogue's Passage is newly `KNOWN_BLIND`.
+
+**Then §0z16 changed the shape of the category itself.** Reading the
+regeneration turned up the same card under two contradictory labels in two
+decks — Farewell was `SCRIPTED` in tivit and `KNOWN_BLIND` in lorehold and
+karlov, through the identical shared `resolve_own_wipe` path — because
+`check_scripted_coverage` takes ONE DECK and every deck was internally
+consistent. **A symmetric wipe is now DERIVED into `PARTLY_MODELLED` from its
+`wipe` tag** (`ablation.symmetric_wipes`), which is §0q's rule applied to the
+category rather than to a name set. 17 instances across five decks; `onesided`
+wipes stay `KNOWN_BLIND` (no faithful half) and Sadistic Shell Game stays
+`SCRIPTED` (not a wipe — one kill per player, which the `creatures` float can
+carry). **0 of 378 rows changed a number and 16 changed category**, re-rendered
+from the existing caches and compared field by field.
+
+So `PARTLY_MODELLED` is now Ashaya + Bane of Progress (azusa), Borrowed
+Knowledge (lorehold), Magister of Worth (tivit), **plus every symmetric wipe in
+every deck, derived rather than listed** — Promise of Loyalty among them.
 
 ---
 
@@ -334,12 +367,26 @@ resolution) while still scoring well.
 **Four swaps are STAGED and uncommitted**, ledger leg only — run
 `python -m edhmc.pending` for the evidence behind each:
 
-| deck | out | in | staged |
-|---|---|---|---|
-| lorehold | Penance | Caldera Pyremaw | 2026-09-05 |
-| lorehold | Scroll Rack | Sunbird's Invocation | 2026-09-04 |
-| rendmaw | Idol of Oblivion | Cauldron of Essence | 2026-09-04 |
-| azusa | Perilous Forays | Ka-Zar of the Savage Land | 2026-09-10 |
+| deck | out | in | staged | standing 2026-09-12 |
+|---|---|---|---|---|
+| lorehold | Penance | Caldera Pyremaw | 2026-09-05 | **strengthened** — its row rose +0.0089 → +0.0114 ±0.0026 |
+| lorehold | Scroll Rack | Sunbird's Invocation | 2026-09-04 | unmoved |
+| rendmaw | Idol of Oblivion | Cauldron of Essence | 2026-09-04 | **DO NOT COMMIT ON THE RECORDED FIGURE — see below** |
+| azusa | Perilous Forays | Ka-Zar of the Savage Land | 2026-09-10 | unmoved |
+
+**THE RENDMAW SWAP LOST MOST OF ITS EVIDENCE TO §0z9.** Re-measured 2026-09-12
+at the original N=6,000 and the original seeds, so the engine is the only thing
+that changed: **+0.0000 [−0.0010, +0.0010] at T10** — dead zero, no longer
+significant, against +0.0027 before — and **+0.0055 [+0.0015, +0.0095] at T20**,
+still significant but roughly a THIRD of the recorded +0.0152 and outside that
+interval entirely. Cauldron's death trigger is one of the six copies of the
+inflated drain (`engine.on_creature_death`), and its ablation row moved with it,
++0.0159 → +0.0082. **It is not refuted** — still positive at T20 against a
+±0.0018 floor — **but it is worth nothing at the horizon where games actually
+end (~T12), and the decision is not re-affirmed.** The ledger carries the full
+figures. Note the ledger's own `notes` had said "Cauldron's 3.0 is the one of
+the two that is correct": true of the NUMERATOR, while the bug was in the
+DIVISOR.
 
 The azusa one is **held back deliberately** while the other four azusa swaps
 were committed. Its evidence is +0.0141 ±0.0034 at T20 (§0z2, §0z3), and note
@@ -360,9 +407,12 @@ engine. Every figure landed inside its own previous bar:
 
 Both Lorehold cut targets are still significantly worse than a blank (Scroll
 Rack −0.0107 ±0.0032, Penance −0.0079 ±0.0032), so both cuts are as cheap as
-they ever were. **Nothing blocks committing these three but the ordinary
-three-leg discipline** — module, `.xlsx`, ledger, one commit. Each carries a
-`reverified` entry in the ledger.
+they ever were. **THE TWO LOREHOLD SWAPS ARE BLOCKED ONLY BY THE ORDINARY
+THREE-LEG DISCIPLINE** — module, `.xlsx`, ledger, one commit. **THE RENDMAW ONE
+IS NOT**: the 2026-09-09 re-verification quoted above was itself measured on
+the pre-§0z9 engine, and the 2026-09-12 re-measurement above is the one that
+counts. Each carries a `reverified` entry in the ledger; rendmaw's now carries
+two, and they disagree.
 
 **2026-09-08: the combat split (`KNOWN_ISSUES.md` §0v).** The largest recent
 engine change and the reason every table was regenerated. Every engine's
@@ -437,8 +487,13 @@ derive the set from the engine and raise at import if it drifts. See
 `check_dynamic_cost_coverage()`. **When you add a hand-maintained name set, add
 the check in the same change, and prove the check fails.** §0q.
 
-**THE SAME RULE, IMPLEMENTED TWICE, IS IMPLEMENTED TWO DIFFERENT WAYS.** Five
-instances now, which is a pattern and not a run of bad luck: three copies of
+**THE SAME RULE, IMPLEMENTED TWICE, IS IMPLEMENTED TWO DIFFERENT WAYS.** Six
+instances now, which is a pattern and not a run of bad luck — and the sixth
+(§0z16) is the shape pointed at a LABEL rather than at code: Farewell was
+`SCRIPTED` in tivit and `KNOWN_BLIND` in lorehold, the same card through the
+same shared function, because the checker that enforces "exactly one category"
+takes one deck at a time. **When the same card appears in two lists, check that
+the two decks say the same thing about it.** The rest: three copies of
 the miracle discount that had drifted apart (§0u); Phyrexian Arena charging its
 life in `shilgengar.py` and not in `karlov.py` (§0z7); a mana doubler that has
 to be said in BOTH `available_mana` and `spend` or it does nothing (§0z4);
@@ -565,8 +620,19 @@ wrong, not from a statistical problem. A card scoring like a blank usually
 means the engine has made it a blank. When a result is surprising, the engine
 is the first suspect, not the deck.
 
-`api.scryfall.com` is the source of truth and requires a `User-Agent` header —
-bare `urllib` gets a 400 without one:
+**The comprehensive rules are in the repo** as of 2026-09-12:
+`docs/MagicCompRules_20260807.docx` is authoritative and
+`docs/MagicCompRules_20260807.txt` is a plain-text extraction to grep
+(`grep -n "^305.7" `). `docs/COMP_RULES.md` records the provenance, how to
+regenerate the `.txt`, and the handful of rules that bear on open issues —
+**104.3j commander damage is a loss condition this project does not model at
+all**, and 305.7 + 302.6 + 603.6a together specify what implementing Ashaya's
+second clause means (queued 15), including that it must NOT fire landfall.
+A rule number is evidence about the GAME, not about this engine, and it does
+not override §4.
+
+`api.scryfall.com` is the source of truth for CARDS and requires a
+`User-Agent` header — bare `urllib` gets a 400 without one:
 
 ```python
 req = urllib.request.Request(url, headers={"User-Agent": "EDHMC/1.0",
@@ -789,10 +855,27 @@ per seed.
 7.  **`Card.indestructible` is priced by a single flat `destroy_share`.** A
     card whose evaluation swings on that knob must be reported with it said
     out loud.
-8.  **Erebos is now a cut candidate**, which it was not before — +0.0033
-    ±0.0026 against a ±0.0019 noise floor, with negative damage at ten turns.
-    Its death trigger is the half that works; the body almost never legally
-    exists (0.05 creature-turns a game). §0l.
+8.  ~~Erebos is now a cut candidate.~~ **WITHDRAWN 2026-09-12 — §0z10 MOVED IT
+    THE OTHER WAY.** Its row is now **+0.0027 ±0.0022 against a ±0.0018 noise
+    floor, signal `both`**, in MODEL-EVALUATED. The mechanism is named rather
+    than guessed: Erebos is rendmaw's ONLY indestructible creature and Culling
+    Ritual is its destroy-wipe (§0z10's own table of the two affected decks),
+    so your own sweeper used to kill it and now does not. Culling Ritual moved
+    `win` → `both` in the same regeneration, which is the same fix seen from
+    the other side. **It may still be the weakest card in the list; it does
+    not need to go, and nothing should be staged against it on this row.**
+    Note the figure has moved twice and in both directions — +0.0033 when this
+    entry was written, +0.0011 on the 2026-09-11 colour-fix table, +0.0027
+    now — so the useful reading is the SIGN and the noise floor, not the
+    point estimate. Damage is negative at BOTH horizons (−0.17) while win rate
+    is positive: the standing proxy-versus-objective split, and the rule is
+    follow win rate.
+8-old. **The original entry, kept for its reasoning.** "Erebos is now a cut
+    candidate, which it was not before — +0.0033 ±0.0026 against a ±0.0019
+    noise floor, with negative damage at ten turns. Its death trigger is the
+    half that works; the body almost never legally exists (0.05 creature-turns
+    a game). §0l." The body observation still stands and is why the damage
+    number is negative; what changed is that the engine stopped destroying it.
 8b. **Voice of the Blessed's indestructible at ten +1/+1 counters is not
     modelled**, and ten is reachable in the Karlov list. Its flying at four
     counters is already in `opponents.flying_of()`, which is where the rest

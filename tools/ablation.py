@@ -190,7 +190,9 @@ SCRIPTED_LOREHOLD = {
     # protection the opponent model respects
     "Lightning Greaves", "Mother of Runes",
     # cost reduction that scales with the graveyard / board
-    "The Dawning Archaic", "Blasphemous Act",
+    # (Blasphemous Act moved to PARTLY_MODELLED 2026-09-12: it is a symmetric
+    #  wipe, and those are derived into that category -- see symmetric_wipes().)
+    "The Dawning Archaic",
     # BLIND, despite having engine code — the implementation is not the card:
     #   Artist's Talent - Level 2 granted free and instantly; Levels 1 and 3
     #                     do not exist, and Level 3 is a damage doubler
@@ -260,12 +262,15 @@ SCRIPTED_TIVIT = {
     "Conjurer's Closet", "Deadeye Navigator",
     # --- sweepers, live since 2026-09-12 ---
     # `tivit.resolve` had no `wipe` branch, so these did nothing; they are
-    # implemented now. Damn overloads to "destroy each creature" and Farewell
-    # exiles all creatures — both symmetric, and a symmetric wipe against this
-    # opponent abstraction is faithfully "your board dies, theirs goes to 0".
-    # Sadistic Shell Game is one kill per player off the biggest board, which
-    # is exactly what its text says and what the `creatures` float can carry.
-    "Damn", "Farewell", "Sadistic Shell Game",
+    # implemented now. DAMN AND FAREWELL LEFT THIS SET ON 2026-09-12 (the same
+    # day) for PARTLY_MODELLED: both are SYMMETRIC wipes, and the claim made
+    # here -- that "your board dies, theirs goes to 0" is faithful -- is only
+    # half true. Your half is faithful; theirs zeroes an abstract creature
+    # count. See symmetric_wipes(), which now derives that category.
+    # Sadistic Shell Game STAYS, and the distinction is the point: it is one
+    # kill per player off the biggest board, which is exactly what its text
+    # says and what the `creatures` float can carry. It is not a wipe.
+    "Sadistic Shell Game",
     # --- the vote ---
     # Extra votes are the whole mechanic and are read by voting.my_votes().
     "Ballot Broker", "Brago's Representative",
@@ -315,8 +320,8 @@ SCRIPTED_SHILGENGAR = {
     "Wayfarer's Bauble",
     # protection the opponent model respects
     "Flawless Maneuver", "Teferi's Protection",
-    # wraths
-    "Damn", "Wrath of God",
+    # The two wraths (Damn, Wrath of God) moved to PARTLY_MODELLED 2026-09-12:
+    # symmetric wipes are derived into that category by symmetric_wipes().
 }
 
 # Written 2026-09-07 with the deck (the least tuned of the six -- see
@@ -463,7 +468,70 @@ PARTLY_MODELLED = {
             "this row is a FLOOR. §0f.",
     },
 }
-PARTLY = PARTLY_MODELLED.get(DECK, {})
+# ---------------------------------------------------------------------------
+# A SYMMETRIC WIPE IS PARTLY MODELLED BY CONSTRUCTION (2026-09-12)
+# ---------------------------------------------------------------------------
+# `opponents.resolve_own_wipe` does two different-quality things in one call:
+# it destroys YOUR real board through `destroy()`, honouring indestructible
+# from the sweeper's own oracle text (§0z10) -- faithful -- and it sets each
+# living opponent's `creatures` float to 0.0, which is the §4 abstraction with
+# no card-level detail behind it. So the cost is modelled and the benefit is
+# an estimate: a HIGH score is evidence, a LOW score is not. That is the
+# definition of PARTLY MODELLED, and it is true of every symmetric wipe in
+# every deck.
+#
+# THIS SET IS DERIVED FROM THE `wipe` TAG, NOT LISTED. Before this, the same
+# card carried different labels in different decks -- Farewell was SCRIPTED in
+# tivit and KNOWN_BLIND in lorehold and karlov, Damn was SCRIPTED in tivit and
+# shilgengar and KNOWN_BLIND in karlov -- through the IDENTICAL shared code
+# path. `check_scripted_coverage` could not see it, because it checks one deck
+# at a time and each deck was internally consistent. §0q's rule is that the fix
+# for a hand-maintained name set is derivation, so the category now follows the
+# tag that makes the card a wipe in the first place.
+#
+# ONESIDED WIPES ARE EXCLUDED and stay KNOWN_BLIND: `spare_own=True` skips the
+# half that is faithful, so a one-sided wipe is ALL abstraction and a high
+# score means no more than a low one. Massacre Wurm (rendmaw) is the only one.
+SYMMETRIC_WIPE_REASON = (
+    "SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(), "
+    "honouring indestructible from this card's oracle text, §0z10); the "
+    "opponents' half only zeroes an abstract creature count (§4). The COST is "
+    "modelled and the BENEFIT is an estimate."
+)
+
+# Cards carrying `wipe` that are NOT symmetric wipes, with the reason each is
+# judged faithfully modelled instead. Adding a name here is a CLAIM.
+WIPE_NOT_SYMMETRIC = {
+    # One kill per player off the biggest board, which is exactly what the
+    # text says and exactly what the `creatures` float can carry -- it needs
+    # no knowledge of WHICH creature dies. It is not a board wipe. §0z12.
+    "Sadistic Shell Game",
+}
+
+
+def symmetric_wipes(deck):
+    """The wipe-tagged cards in `deck` that are symmetric, hence PARTLY."""
+    return {c.name for c in deck
+            if "wipe" in getattr(c, "tags", frozenset())
+            and "onesided" not in getattr(c, "tags", frozenset())
+            and c.name not in WIPE_NOT_SYMMETRIC}
+
+
+def partly_for(deck_name, deck):
+    """PARTLY_MODELLED for `deck_name`, plus the derived symmetric wipes.
+
+    A hand-written entry WINS over the derived one: Promise of Loyalty
+    (tivit) and Magister of Worth already carry reasons naming the specific
+    clause that is missing, which is strictly more useful than the generic
+    wipe reason.
+    """
+    out = dict(PARTLY_MODELLED.get(deck_name, {}))
+    for name in symmetric_wipes(deck):
+        out.setdefault(name, SYMMETRIC_WIPE_REASON)
+    return out
+
+
+PARTLY = PARTLY_MODELLED.get(DECK, {})   # re-derived once the deck is built
 
 SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
             "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
@@ -596,9 +664,11 @@ def _worker_init(deck_name, n, horizons, baseline):
     # leaving one classification global pointing at the parent's deck is the
     # shape of bug this whole block exists to prevent, and "it happens not to
     # be read" is a property of today's code rather than of tomorrow's.
-    PARTLY = PARTLY_MODELLED.get(DECK, {})
     METRICS = METRIC_SETS[DECK]
     _W["deck"], _W["commander"] = build_pending(DECK)
+    # After the build, because the symmetric-wipe half of this category is
+    # derived FROM THE DECK rather than listed. See partly_for().
+    PARTLY = partly_for(DECK, _W["deck"])
     _W["baseline"] = baseline
 
 
@@ -676,7 +746,6 @@ KNOWN_BLIND = {
         'Biotransference',
         'Bow of Nylea',
         'Burnished Hart',
-        'Culling Ritual',
         'Deathreap Ritual',
         "Eyeblight's Ending",
         'Filigree Familiar',
@@ -695,7 +764,6 @@ KNOWN_BLIND = {
         'Sakura-Tribe Elder',
         'Scrap Trawler',
         'Shigeki, Jukai Visionary',
-        'Toxic Deluge',
         'Village Rites',
         'Whip of Erebos',
     },
@@ -708,7 +776,6 @@ KNOWN_BLIND = {
         "Dawn's Truce",
         "Dragon's Rage Channeler",
         'Enlightened Tutor',
-        'Farewell',
         'Gamble',
         'Generous Gift',
         'Goliath Daydreamer',
@@ -716,26 +783,19 @@ KNOWN_BLIND = {
         'Improvisation Capstone',
         'Invoke Calamity',
         'Land Tax',
-        'Ondu Inversion',
         'Path to Exile',
         'Perch Protection',
         'Pinnacle Monk',
-        'Promise of Loyalty',
         'Restoration Seminar',
         'Sejiri Shelter',
         'Storm Herd',
         'Swords to Plowshares',
-        'Ultima',
         'Volcanic Vision',
     },
     "karlov": {
         'Anguished Unmaking',
-        'Austere Command',
         'Benevolent Offering',
-        'Damn',
-        'Damnation',
         'Enlightened Tutor',
-        'Farewell',
         'Fracture',
         'Lurrus of the Dream-Den',
         'Necropotence',
@@ -747,7 +807,6 @@ KNOWN_BLIND = {
         'Soulmender',
         'Sun Titan',
         'Swords to Plowshares',
-        'Toxic Deluge',
         "Umezawa's Jitte",
     },
     # Explicitly blind, with the reason. check_scripted_coverage() raises if a
@@ -930,7 +989,12 @@ def check_scripted_coverage(deck):
             f"category, so their row would be printed under a heading that "
             f"contradicts it:\n"
             + "".join(f"    {n}\n" for n in sorted(overlap))
-            + "A card is in exactly one of the three.")
+            + "A card is in exactly one of the three.\n"
+            + "If the card is a SYMMETRIC WIPE it is put in PARTLY_MODELLED "
+              "automatically by symmetric_wipes() and must not also be listed "
+              "by hand -- remove the hand-written entry rather than the "
+              "derivation. If you believe it is NOT a symmetric wipe, say so "
+              "in WIPE_NOT_SYMMETRIC with the reason.")
     no_reason = [n for n, why in PARTLY.items() if not (why or "").strip()]
     if no_reason:
         raise SystemExit(
@@ -957,7 +1021,11 @@ def check_scripted_coverage(deck):
 
 
 def main():
+    global PARTLY
     deck, commander = build_pending(DECK)
+    # Derived from the deck, so it has to be rebound once the deck exists —
+    # and BEFORE check_scripted_coverage, which is what enforces the split.
+    PARTLY = partly_for(DECK, deck)
     nonlands = [c.name for c in deck if not c.is_land]
     check_scripted_coverage(deck)
 

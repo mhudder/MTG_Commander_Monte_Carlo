@@ -66,6 +66,37 @@ Felidar Sovereign                     -0.39+-0.08         -1.40+-0.15        +0.
 Exquisite Blood                       -1.11+-0.14         -2.31+-0.22        +0.0384+-0.0036      both
 
 ====================================================================================
+PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
+Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
+====================================================================================
+card                                    damage T10          damage T20             win rate    signal
+Austere Command                       -0.14+-0.07         -0.11+-0.11        +0.0007+-0.0022       dmg
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
+Farewell                              -0.15+-0.07         -0.15+-0.11        -0.0004+-0.0022       dmg
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
+Damnation                             -0.37+-0.10         -0.27+-0.13        +0.0007+-0.0026       dmg
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
+Toxic Deluge                          -0.89+-0.12         -0.52+-0.15        -0.0031+-0.0026      both
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
+Damn                                  -1.40+-0.13         -1.01+-0.17        -0.0003+-0.0028       dmg
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
+
+====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
@@ -83,9 +114,4 @@ Fracture                              +0.02+-0.06         +0.03+-0.08        +0.
 Enlightened Tutor                     +0.04+-0.03         +0.02+-0.04        +0.0001+-0.0008        --
 Phyrexian Reclamation                 -0.02+-0.04         -0.08+-0.07        -0.0009+-0.0012       dmg
 Soulmender                            -0.05+-0.04         -0.10+-0.06        -0.0013+-0.0012      both
-Austere Command                       -0.14+-0.07         -0.11+-0.11        +0.0007+-0.0022       dmg
 Sensei's Divining Top                 -0.03+-0.04         -0.13+-0.07        -0.0020+-0.0014      both
-Farewell                              -0.15+-0.07         -0.15+-0.11        -0.0004+-0.0022       dmg
-Damnation                             -0.37+-0.10         -0.27+-0.13        +0.0007+-0.0026       dmg
-Toxic Deluge                          -0.89+-0.12         -0.52+-0.15        -0.0031+-0.0026      both
-Damn                                  -1.40+-0.13         -1.01+-0.17        -0.0003+-0.0028       dmg
