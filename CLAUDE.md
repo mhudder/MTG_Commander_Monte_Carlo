@@ -113,6 +113,7 @@ python -m diagnostics.run_springheart_etb      # §0z5 item 16, in four legs
 python -m diagnostics.run_shilgengar_treasures # §0z6 item 13, Treasures as mana
 python -m diagnostics.run_life_costs           # §0z7 §0i, the free drawbacks
 python -m diagnostics.run_mana_colour          # §0z8 colour payment, two ways
+python -m diagnostics.run_citadel              # Bolas's Citadel; --floor sweeps the knob
 ```
 
 SEVEN checks carry a MUTATION run, because a check that cannot fail reads
@@ -364,7 +365,7 @@ gets 7.8, and nothing in this project loses to decking), and Sapling Nursery
 makes the deck's own Scute Swarm engine measurably worse (−11.55 tokens a
 resolution) while still scoring well.
 
-**Four swaps are STAGED and uncommitted**, ledger leg only — run
+**Five swaps are STAGED and uncommitted**, ledger leg only — run
 `python -m edhmc.pending` for the evidence behind each:
 
 | deck | out | in | staged | standing 2026-09-12 |
@@ -373,6 +374,26 @@ resolution) while still scoring well.
 | lorehold | Scroll Rack | Sunbird's Invocation | 2026-09-04 | unmoved |
 | rendmaw | Idol of Oblivion | Cauldron of Essence | 2026-09-04 | **DO NOT COMMIT ON THE RECORDED FIGURE — see below** |
 | azusa | Perilous Forays | Ka-Zar of the Savage Land | 2026-09-10 | unmoved |
+| karlov | Swamp | Bolas's Citadel | 2026-09-12 | new — **+0.0163 [+0.0097, +0.0230]** at T20 |
+
+**BOLAS'S CITADEL (karlov, 2026-09-12).** Modelled in `karlov.citadel_step` /
+`citadel_land_step` and measured as the real swap at N=6,000
+(`python -m diagnostics.run_citadel`). **The deck was never missing it** — it
+is in neither the v1 nor the v2 spreadsheet, both of which are exactly 100
+cards whose difference is precisely the three committed v2 swaps. Three things
+this measurement settled, in the order they matter:
+
+* **The piloting order was worth more than any mechanical detail.** A land on
+  top that you cannot play STOPS THE DIG, and in a 35-land list that is every
+  third card. Spending the land drop on the TOP land instead of the hand's
+  takes the swap from +0.0113 to +0.0163 at T20 and lands off the top from
+  0.054 to 0.134 a game. The win-rate intervals overlap, so read that half as
+  directional; the mechanism does not.
+* **The life knob is NOT load-bearing.** `citadel_life_floor` from 10 to 1 —
+  tenfold — moves win rate inside its own bar. What limits the card is the
+  14.4% resolution rate of a six-drop with triple black, and the land on top.
+* **Its number is a CEILING** for queued item 17's reason: this is the card
+  that empties a library, and nothing here loses to decking.
 
 **THE RENDMAW SWAP LOST MOST OF ITS EVIDENCE TO §0z9.** Re-measured 2026-09-12
 at the original N=6,000 and the original seeds, so the engine is the only thing
@@ -812,9 +833,16 @@ per seed.
     the same way `SPRINGHEART_HOSTS` was (§0z5). A one-card lookahead — "does
     casting this strand something better?" — is the obvious next step and has
     not been tried.
-17. **NOTHING IN THIS PROJECT LOSES TO DECKING** — and §0z14 made it more
-    live, not less: Apex of Power now EXILES seven a resolution and
-    Discover 10 digs until it hits. Neither can lose the game.
+17. **NOTHING IN THIS PROJECT LOSES TO DECKING** — and it keeps getting more
+    live, not less. §0z14: Apex of Power now EXILES seven a resolution and
+    Discover 10 digs until it hits. **2026-09-12, and this one is the sharp
+    case: BOLAS'S CITADEL IS STAGED INTO KARLOV.** Its whole function is to
+    strip the library from the top, `draw()` stops at empty, no loss is
+    recorded — and at a real table emptying your library is precisely how
+    this card kills you. None of them can lose the game here, so every one of
+    their numbers is a CEILING, and the Citadel's +0.0163 is the first staged
+    swap that depends on the gap. **Closing item 17 is now a prerequisite for
+    trusting a committed Citadel, not a tidy-up.**
 17-old. **The original entry.** `draw()` stops at an empty library in every engine; no loss is
     recorded and no penalty applied. Harmless for eleven months because the
     biggest single draw in any list was three — and Return of the Wildspeaker

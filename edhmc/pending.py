@@ -800,6 +800,75 @@ MEASURED: list[Candidate] = [
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
 
+    Change(
+        deck="karlov",
+        remove="Swamp",
+        add="Bolas's Citadel",
+        staged="2026-09-12",
+        rationale=(
+            "{3}{B}{B}{B} Legendary Artifact: 'You may play lands and cast "
+            "spells from the top of your library. If you cast a spell this "
+            "way, pay life equal to its mana value rather than pay its mana "
+            "cost.' THIS IS THE DECK THAT CAN AFFORD IT -- karlov gains 55.9 "
+            "life a game and its life-share of losses is the lowest of the "
+            "three measured (0.20), so life here is a RESOURCE rather than a "
+            "clock, and since §0z7/§0i it is a real one that gets charged. "
+            "The cut is a SWAMP, 36 lands -> 35, which is the same shape as "
+            "the committed v2 change (-Swamp +Starscape Cleric, 37 -> 36). "
+            "NOTE THIS DECK WAS NEVER MISSING THE CARD: it is in neither the "
+            "v1 nor the v2 spreadsheet nor any module, and both spreadsheets "
+            "are exactly 100 cards whose v1->v2 difference is precisely the "
+            "three committed swaps. This is a deckbuilding addition, not a "
+            "restored omission."
+        ),
+        evidence=(
+            "Measured as the REAL SWAP at the project's swap convention -- "
+            "N=6,000 paired games, default seeds, both horizons "
+            "(diagnostics/run_citadel.py, results/citadel.txt): win rate "
+            "**+0.0163 [+0.0097, +0.0230] at 20 turns** and +0.0047 [+0.0003, "
+            "+0.0088] at 10, both significant against a +-0.0025 noise floor. "
+            "Damage +0.87 and lifegain_triggers +0.37, both significant, so "
+            "the proxies agree with the objective here rather than fighting "
+            "it. It assembles the combo more often too: combo_assembled "
+            "+0.0067, i.e. 6.5% of games against 5.8%. "
+            "THE COST IS MANA AND IT IS REAL: stranded_mv +5.4, the same "
+            "shape the v2 land cut produced (+5.56). "
+            "WHAT LIMITS IT IS NOT LIFE. It resolves in only 14.4% of games "
+            "at T20 -- a six-drop with triple black -- and spends just 2.28 "
+            "life a game, about 14 per resolution. Sweeping "
+            "`citadel_life_floor` from 10 to 1, a tenfold change, moves win "
+            "rate +0.0113 -> +0.0127 at T20, inside each other's bars. THE "
+            "KNOB IS NOT LOAD-BEARING, which is said out loud because "
+            "CLAUDE.md requires it and because the answer is unusually clean: "
+            "the binding constraints are the resolution rate and the LAND ON "
+            "TOP, not the life total."
+        ),
+        notes=(
+            "THE PILOTING ORDER WAS WORTH MORE THAN ANY MECHANICAL DETAIL, "
+            "which is finding 16b's shape arriving before the bug rather than "
+            "after it. A land on top of the library that you cannot play "
+            "STOPS THE DIG -- you may not skip past it -- and in a 35-land "
+            "list that is roughly every third card. Playing the hand's land "
+            "first and then digging is the naive order and it leaves the top "
+            "land in place: measured that way the swap is +0.0113 [+0.0048, "
+            "+0.0178] at T20. Spending the land drop on the TOP land instead "
+            "(`citadel_land_step`) takes it to +0.0163 [+0.0097, +0.0230]. "
+            "The two win-rate intervals OVERLAP, so that half is directional "
+            "rather than proved; the MECHANISM is not ambiguous -- lands "
+            "played off the top go 0.054 -> 0.134 a game, up 148%. "
+            "results/citadel_naive_land_order.txt keeps the naive numbers. "
+            "**ITS NUMBER IS A CEILING AND QUEUED ITEM 17 IS WHY.** The "
+            "Citadel is exactly the card that makes 'nothing in this project "
+            "loses to decking' live: it strips the library from the top, "
+            "draw() stops at empty and no loss is recorded. At a table, "
+            "emptying your library is how this card kills you. "
+            "The sac-ten drain is implemented LETHAL-ONLY (ten nonland "
+            "permanents, and only when every living opponent is at 10 or "
+            "less), which is deliberately conservative and a floor on that "
+            "half -- the model cannot value 'I am losing anyway'."
+        ),
+    ),
+
     # -----------------------------------------------------------------------
     # AZUSA, staged 2026-09-10. Three swaps, measured together as one package
     # (`P3B` in run_azusa_animation_swap.py) as well as individually. They are
@@ -1158,8 +1227,10 @@ DECKS = {
         "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
         "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
-    # in the deck list itself and no longer swap-in candidates.
-    "karlov": (karlov_v2, {}),
+    # in the deck list itself and no longer swap-in candidates. Bolas's
+    # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
+    "karlov": (karlov_v2, {
+        "Bolas's Citadel": karlov_v2.BOLASS_CITADEL}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {

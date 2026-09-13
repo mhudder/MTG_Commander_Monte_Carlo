@@ -1,0 +1,56 @@
+
+=== -Swamp +Bolas's Citadel  (life floor 10, 10 turns, n=6,000 paired)
+      won                      +0.0033  [  -0.0008,   +0.0073]     B=    0.130
+      damage                   +0.4805  [  +0.1792,   +0.7928] *   B=   41.618
+      lifegain_triggers        +0.2392  [  +0.1422,   +0.3380] *   B=   15.232
+      final_life               -0.5524  [  -1.0735,   -0.0277] *   B=   39.679
+      cards_drawn              -0.0012  [  -0.0298,   +0.0283]     B=   11.463
+      stranded_mv              +4.4653  [  +3.8578,   +5.0759] *   B=  118.504
+      citadel_casts            +0.4087  [  +0.3657,   +0.4512] *   B=    0.409
+      citadel_life_spent       +1.1695  [  +1.0458,   +1.2950] *   B=    1.169
+      citadel_lands            +0.0288  [  +0.0243,   +0.0335] *   B=    0.029
+      combo_assembled          +0.0017  [  -0.0007,   +0.0040]     B=    0.038
+      turns_played             -0.0010  [  -0.0093,   +0.0072]     B=    9.569
+      cast_test_card           +0.0943  [  +0.0868,   +0.1018] *   B=    0.094
+
+=== -Swamp +Bolas's Citadel  (life floor 10, 20 turns, n=6,000 paired)
+      won                      +0.0113  [  +0.0048,   +0.0178] *   B=    0.358
+      damage                   +0.7868  [  +0.4186,   +1.1515] *   B=   57.598
+      lifegain_triggers        +0.3438  [  +0.2097,   +0.4852] *   B=   21.538
+      final_life               -0.2460  [  -1.0883,   +0.6312]     B=   30.625
+      cards_drawn              -0.0395  [  -0.1092,   +0.0288]     B=   15.580
+      stranded_mv              +5.5988  [  +4.7783,   +6.3993] *   B=  136.760
+      citadel_casts            +0.7137  [  +0.6518,   +0.7763] *   B=    0.714
+      citadel_life_spent       +2.0688  [  +1.8977,   +2.2392] *   B=    2.069
+      citadel_lands            +0.0542  [  +0.0478,   +0.0610] *   B=    0.054
+      combo_assembled          +0.0050  [  +0.0020,   +0.0080] *   B=    0.063
+      turns_played             -0.0932  [  -0.1253,   -0.0628] *   B=   12.105
+      cast_test_card           +0.1442  [  +0.1352,   +0.1532] *   B=    0.144
+
+=== -Swamp +Bolas's Citadel  (life floor 1, 10 turns, n=6,000 paired)
+      won                      +0.0042  [  -0.0002,   +0.0082]     B=    0.130
+      damage                   +0.5488  [  +0.2405,   +0.8605] *   B=   41.687
+      lifegain_triggers        +0.2620  [  +0.1640,   +0.3638] *   B=   15.254
+      final_life               -0.6108  [  -1.1322,   -0.0913] *   B=   39.620
+      cards_drawn              -0.0010  [  -0.0300,   +0.0282]     B=   11.463
+      stranded_mv              +4.4192  [  +3.8085,   +5.0270] *   B=  118.458
+      citadel_casts            +0.4520  [  +0.4052,   +0.4980] *   B=    0.452
+      citadel_life_spent       +1.3048  [  +1.1688,   +1.4418] *   B=    1.305
+      citadel_lands            +0.0272  [  +0.0230,   +0.0313] *   B=    0.027
+      combo_assembled          +0.0022  [  -0.0003,   +0.0047]     B=    0.039
+      turns_played             -0.0028  [  -0.0115,   +0.0057]     B=    9.567
+      cast_test_card           +0.0943  [  +0.0868,   +0.1018] *   B=    0.094
+
+=== -Swamp +Bolas's Citadel  (life floor 1, 20 turns, n=6,000 paired)
+      won                      +0.0127  [  +0.0062,   +0.0192] *   B=    0.360
+      damage                   +0.8700  [  +0.5015,   +1.2397] *   B=   57.681
+      lifegain_triggers        +0.3670  [  +0.2275,   +0.5072] *   B=   21.561
+      final_life               -0.2335  [  -1.0903,   +0.6471]     B=   30.637
+      cards_drawn              -0.0530  [  -0.1253,   +0.0168]     B=   15.566
+      stranded_mv              +5.3673  [  +4.5445,   +6.1760] *   B=  136.528
+      citadel_casts            +0.8035  [  +0.7381,   +0.8710] *   B=    0.803
+      citadel_life_spent       +2.3488  [  +2.1613,   +2.5365] *   B=    2.349
+      citadel_lands            +0.0508  [  +0.0450,   +0.0568] *   B=    0.051
+      combo_assembled          +0.0053  [  +0.0023,   +0.0085] *   B=    0.063
+      turns_played             -0.1112  [  -0.1437,   -0.0798] *   B=   12.087
+      cast_test_card           +0.1442  [  +0.1352,   +0.1532] *   B=    0.144

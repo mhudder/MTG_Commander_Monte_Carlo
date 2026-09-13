@@ -191,8 +191,8 @@ head-to-head against a specific cut, because everything in `MEASURED` shares
 one baseline and a common baseline cannot rank two cards against each other
 (`KNOWN_ISSUES.md` §0c).
 
-As of 2026-09-12 there are **four staged, uncommitted swaps** (two on Lorehold,
-one on Rendmaw, one on Azusa) and **seven measured, undecided candidates** (all
+As of 2026-09-12 there are **five staged, uncommitted swaps** (two on Lorehold,
+one on Rendmaw, one on Azusa, one on Karlov) and **seven measured, undecided candidates** (all
 Azusa, §0z4) — run `python -m edhmc.pending` for the current list and the
 evidence behind each. **This sentence is exactly the kind that goes stale; the
 command is authoritative and this paragraph is not.**

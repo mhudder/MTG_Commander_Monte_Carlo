@@ -255,6 +255,38 @@ STARSCAPE_CLERIC = C("Starscape Cleric", "Creature", {"gen": 1, "B": 1}, 2, 1,
 THE_WIND_CRYSTAL = C("The Wind Crystal", "Artifact", {"gen": 2, "W": 2},
                      priority=8, threat=7.0)
 
+# ---------------------------------------------------------------------------
+# 2026-09-12 candidate — Bolas's Citadel
+# ---------------------------------------------------------------------------
+# {3}{B}{B}{B} Legendary Artifact, MV 6. Verified against Scryfall 2026-09-12:
+#
+#   "You may look at the top card of your library any time.
+#    You may play lands and cast spells from the top of your library. If you
+#    cast a spell this way, pay life equal to its mana value rather than pay
+#    its mana cost.
+#    {T}, Sacrifice ten nonland permanents: Each opponent loses 10 life."
+#
+# PRIORITY AND THREAT ARE CALIBRATED AGAINST NECROPOTENCE (8 / 8.0), which is
+# this list's other black engine that turns life into cards. The Citadel is
+# strictly the bigger effect and costs three more mana; 8.5 / 8.5 puts it just
+# above Necropotence and just below the combo pieces (9.5 / 9.0), which is
+# where a six-mana engine that demands an answer belongs.
+#
+# THE TRIPLE BLACK IS A REAL COST AND IS MODELLED: {B}{B}{B} in a W/B list
+# with 22 black sources, and `can_pay` has proved colour-correct payment since
+# §0z8, so the engine will decline to cast it on a white-heavy board rather
+# than waving the pips through.
+# NO `script=`, DELIBERATELY. The first draft of this entry carried
+# script="citadel" and nothing dispatched it: `karlov.resolve` branches on
+# `card.script == "debt"` / `"draw2"` and an unknown script silently does
+# nothing. That is §0z15's dormant tag — a claim that the engine does
+# something on resolve, sitting next to an implementation that does not read
+# it. The Citadel is a PERSISTENT BATTLEFIELD EFFECT, not an on-resolve one,
+# so `citadel_land_step` / `citadel_step` check the board by name each turn,
+# which is where the behaviour actually belongs.
+BOLASS_CITADEL = C("Bolas's Citadel", "Artifact", {"gen": 3, "B": 3},
+                   priority=8.5, threat=8.5, tags=("Legendary",))
+
 
 # ---------------------------------------------------------------------------
 # 2026-09-04, second batch
@@ -269,7 +301,9 @@ ENLIGHTENED_CONFIDANT = C("Enlightened Confidant", "Creature",
                           lifelink=True)
 
 # {3}{B} 2/2. Extort, plus "whenever you tap a SWAMP for mana, add an
-# additional {B}" — twelve Swamp-typed lands in this list.
+# additional {B}" — twelve Swamp-typed lands in this list, ELEVEN once the
+# staged -Swamp +Bolas's Citadel commits. Crypt Ghast is a CANDIDATE and not a
+# deck member, so this is a note about the list rather than a live count.
 CRYPT_GHAST = C("Crypt Ghast", "Creature", {"gen": 3, "B": 1}, 2, 2,
                 priority=8, threat=7.0, tags=("ramp",))
 

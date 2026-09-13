@@ -206,6 +206,14 @@ SCRIPTED_LOREHOLD = {
 # the card. Cards whose text is still approximated belong in the blind group
 # even when they are not literally absent from the engine.
 SCRIPTED_KARLOV = {
+    # Bolas's Citadel (staged 2026-09-12). `karlov.citadel_step` plays lands
+    # and casts spells off the top paying LIFE = mana value, in forced library
+    # order, and `citadel_land_step` spends the land drop on a land on top so
+    # it does not block the dig. The sac-ten drain is implemented lethal-only,
+    # which is a floor on that half. ITS NUMBER IS A CEILING for a different
+    # reason -- queued item 17, nothing here loses to decking, and this is the
+    # card that empties a library.
+    "Bolas's Citadel",
     # lifegain engines
     "Soul Warden", "Soul's Attendant", "Suture Priest", "Auriok Champion",
     "Daxos, Blessed by the Sun", "Authority of the Consuls",

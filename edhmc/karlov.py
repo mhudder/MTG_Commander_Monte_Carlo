@@ -38,7 +38,7 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, engine_cfg)
+                          spend, play_land, run_etb, engine_cfg)
 from edhmc import opponents as OPP
 
 COMBO_A = "Exquisite Blood"
@@ -108,6 +108,12 @@ class KarlovGame:
             "loss_route": 0,
             "extort_triggers": 0, "confidant_cards": 0,
             "confidant_life_lost": 0.0,
+            # Bolas's Citadel. Initialised here rather than created on first
+            # use, because `experiment.analyse` reads the SAME metric off both
+            # branches and the A branch never has the card: a counter that
+            # only exists when it fires raises KeyError on the paired read.
+            "citadel_casts": 0, "citadel_life_spent": 0.0,
+            "citadel_lands": 0, "citadel_drains": 0,
         }
         self.damage_by_turn = []
 
@@ -642,6 +648,151 @@ def main_phase(g):
             return
 
 
+def citadel_land_step(g):
+    """If the TOP of the library is a land, play THAT one — before the hand.
+
+    "You may look at the top card of your library any time", so a pilot with
+    the Citadel out knows what is on top when they choose which land to play,
+    and playing the top one is the line: it spends a land drop you were going
+    to spend anyway on a card you would otherwise never see, it keeps the land
+    in hand for next turn, AND — the part that matters most — **it unblocks
+    the dig.** A land on top that you cannot play stops `citadel_step` dead,
+    because you may not skip past it.
+
+    THIS IS A POLICY AND IT IS WORTH MEASURING SEPARATELY. Playing the hand
+    land first and only then digging is the naive order, and it asserts that
+    the Citadel simply stops whenever a land is on top — which in a 35-land
+    list is roughly every third card. That is the shape of the four POLICY
+    corrections in CLAUDE.md: a piloting decision, written down as the obvious
+    order, that quietly asserts the card does much less than it does.
+
+    The one case where it is worse: the top land enters TAPPED and the hand
+    land would not, and you needed that mana this turn. Real but small against
+    a free card, and said out loud rather than modelled.
+    """
+    if not g.has("Bolas's Citadel"):
+        return
+    while (g.land_drops_used < g.land_drops and g.library
+           and g.library[-1].is_land):
+        top = g.library.pop()
+        perm = Permanent(card=top, tapped=top.tapped, sick=True)
+        g.board.append(perm)
+        g.land_drops_used += 1
+        g.m["citadel_lands"] += 1
+        g.play_card_trigger(top)
+        run_etb(g, perm)
+
+
+def citadel_step(g):
+    """Bolas's Citadel: play off the TOP of the library, paying LIFE.
+
+    "You may play lands and cast spells from the top of your library. If you
+    cast a spell this way, pay life equal to its mana value rather than pay
+    its mana cost."
+
+    THE POLICY IS THE CARD, and it is a judgement call rather than a
+    measurement — say `citadel_life_floor` out loud whenever this card's
+    number is quoted. The way the Citadel is actually piloted is to spend
+    LARGE amounts of life digging toward a combo or a board the table cannot
+    beat, not to cast one cheap spell and stop. A conservative floor would
+    assert the card is a value engine, which is the same class of error as
+    the four POLICY corrections in CLAUDE.md — each of them a decision about
+    piloting, written down as conservatism, that amounted to asserting a card
+    does nothing. So the default digs until life would drop to 10.
+
+    This is the deck that can afford it: karlov gains 55.9 life a game and its
+    life-share of losses is the lowest of the three measured (0.20). Life here
+    is a RESOURCE, and since §0z7/§0i it is a real one — life costs are
+    charged, so the dig is priced rather than free.
+
+    Three things are faithful and worth stating:
+
+      LIBRARY ORDER IS FORCED. You cannot reorder the top, so this casts in
+      the order the shuffle produced and STOPS at the first card it will not
+      pay for. It does not scan ahead for the combo piece.
+      IT PAYS MANA VALUE, NOT COST. `Card.free_mv` is the wrong quantity here
+      (it subtracts X); the card says mana value, so `mv` is right.
+      THE SPELL IS STILL COUNTERABLE. It is cast, not put onto the
+      battlefield, so it goes through `OPP.countered` like any other.
+
+    **ITS NUMBER IS A CEILING, AND QUEUED ITEM 17 IS WHY.** The Citadel is
+    precisely the card that makes "nothing in this project loses to decking"
+    live: it strips the library from the top, `draw()` stops at empty, and no
+    loss is recorded. At a real table emptying your library is how this card
+    kills you. Until item 17 is closed, read a good Citadel result as an
+    upper bound.
+
+    Returns True if it did anything, so the caller can run `main_phase` again
+    for what the dig unlocked. Returns False instantly when the card is not on
+    the battlefield, which is what keeps every Citadel-less game — and so
+    every other deck and every existing karlov number — bit-identical.
+    """
+    if not g.has("Bolas's Citadel"):
+        return False
+    floor = g.cfg.get("citadel_life_floor", 10.0)
+    did = False
+    while g.library and g.result is None:
+        top = g.library[-1]
+        if top.is_land:
+            # "You may play LANDS ... from the top" — it uses the land drop,
+            # so it competes with the land already played from hand.
+            if g.land_drops_used >= g.land_drops:
+                break
+            g.library.pop()
+            perm = Permanent(card=top, tapped=top.tapped, sick=True)
+            g.board.append(perm)
+            g.land_drops_used += 1
+            g.m["citadel_lands"] += 1
+            # THE SAME TWO HOOKS `engine.play_land` RUNS, and leaving them out
+            # was a real bug rather than a simplification: Radiant Fountain
+            # gains 2 life on arrival and this is the deck where a lifegain
+            # EVENT is the engine, so a land played off the top would have
+            # skipped a Karlov trigger.
+            g.play_card_trigger(top)
+            run_etb(g, perm)
+            did = True
+            continue
+        cost = float(top.mv)
+        # The floor is a floor on what you are LEFT with, not on what you pay.
+        if g.your_life - cost < floor:
+            break
+        g.library.pop()
+        g.your_life -= cost
+        g.m["citadel_life_spent"] += cost
+        g.m["citadel_casts"] += 1
+        did = True
+        idx = g.spells_this_turn
+        g.spells_this_turn += 1
+        if OPP.countered(g, top, idx):
+            g.m["countered"] += 1
+            g.graveyard.append(top)
+            if top.name in g.cfg.get("watch", ()):
+                g.m["test_card_countered"] += 1
+                g.m["test_card_answered"] += 1
+            continue
+        resolve(g, top)
+        if g.result is not None:
+            return did
+    # "{T}, Sacrifice ten nonland permanents: Each opponent loses 10 life."
+    # ONLY WHEN IT IS LETHAL, which is a DELIBERATELY CONSERVATIVE reading and
+    # therefore a floor on this half. Sacrificing ten permanents is otherwise
+    # catastrophic — it is the whole board — and the model has no way to value
+    # "I am about to lose anyway". The 10 is per opponent, so the pod total is
+    # 10 * pod_size and `deal_pod_damage` divides it back out (§0z9).
+    citadel = next((p for p in g.board
+                    if p.card.name == "Bolas's Citadel" and not p.tapped), None)
+    if citadel is not None and g.result is None:
+        fodder = [p for p in g.board if not p.card.is_land]
+        alive = OPP.living(g)
+        if len(fodder) >= 10 and alive and all(o.life <= 10 for o in alive):
+            citadel.tapped = True
+            for p in fodder[:10]:
+                g.board.remove(p)
+            g.deal_pod_damage(10.0 * OPP.pod_size(g), each=True)
+            g.m["citadel_drains"] += 1
+    return did
+
+
 def resolve(g, card):
     g.m["spells_cast"] += 1
     if card.name in g.cfg.get("watch", ()):
@@ -796,8 +947,18 @@ def take_turn(g):
     if g.result is not None:
         return
     g.draw(1)
+    # BEFORE the hand's land drop, so a land on top is played off the top
+    # rather than left there blocking the dig. No-ops without the Citadel.
+    citadel_land_step(g)
     play_land(g)
     main_phase(g)
+    # AFTER the free casts and BEFORE combat: you spend mana first because it
+    # costs no life, then dig with the Citadel, then attack with whatever the
+    # dig put on the board. The second `main_phase` only runs if the dig
+    # actually cast something, so a game without the Citadel takes exactly the
+    # calls it always did and reproduces to the digit.
+    if citadel_step(g):
+        main_phase(g)
     if g.result is not None:
         return
     combat(g)
