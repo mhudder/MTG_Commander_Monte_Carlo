@@ -136,7 +136,9 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, engine_cfg)
+                          spend, play_land, engine_cfg, choose_mode,
+                          CRNStreams, crn_random, crn_randrange,
+                          crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -149,7 +151,9 @@ class ShilgengarGame:
         # first engine constructed decide them for every later one.
         # See engine.engine_cfg.
         self.cfg = cfg = engine_cfg(cfg)
-        self.rng = random.Random(seed)
+        self.rng = make_rng(seed, cfg)
+        # Mid-game randomness lives here, NOT on self.rng. §0z17.
+        self.crn = CRNStreams(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
@@ -796,7 +800,9 @@ class ShilgengarGame:
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
-                pay = can_pay(c.cost, pool)
+                # §1b: the best affordable MODE, not just the printed cost.
+                _m = choose_mode(c, c.cost, pool)
+                pay = None if _m is None else _m[2]
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs
                 # after combat, and a Treasure pays that as well as a land
@@ -1028,11 +1034,16 @@ def take_turn(g):
 def simulate(deck, commander, cfg, seed):
     g = ShilgengarGame(deck, commander, cfg, seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     for _ in range(cfg.get("turns", 20)):
         take_turn(g)
         if g.result is not None:
             break
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["damage_by_turn"] = g.damage_by_turn
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn

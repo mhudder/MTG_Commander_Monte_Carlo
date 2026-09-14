@@ -48,7 +48,9 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, play_land,
-                          engine_cfg)
+                          engine_cfg, choose_mode,
+                          CRNStreams, crn_random, crn_randrange,
+                          crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
 from edhmc import voting as V
 
@@ -62,7 +64,9 @@ class TivitGame:
         # first engine constructed decide them for every later one.
         # See engine.engine_cfg.
         self.cfg = cfg = engine_cfg(cfg)
-        self.rng = random.Random(seed)
+        self.rng = make_rng(seed, cfg)
+        # Mid-game randomness lives here, NOT on self.rng. §0z17.
+        self.crn = CRNStreams(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
@@ -546,7 +550,10 @@ def main_phase(g):
             if "blink" in c.tags and not c.is_permanent \
                     and not g.has("Tivit, Seller of Secrets"):
                 continue
-            if affordable(g, reduce_cost(g, c)):
+            # §1b: every way the card can be cast, not just the printed
+            # cost. No card in this list declares one today; the point is
+            # that one CAN, and check_alt_cost_coverage enforces it.
+            if choose_mode(c, reduce_cost(g, c), mana_units(g)) is not None:
                 options.append(c)
         if not options:
             return
@@ -802,7 +809,7 @@ def upkeep(g):
         # is profit whichever way they go -- the same shape as the commander,
         # and the reason the card is worth a slot in a pod that hates you.
         n = len(OPP.living(g))
-        pick = [g.rng.randrange(3) for _ in range(n)]
+        pick = [crn_randrange(g, f"ceremonies{i}", 3) for i in range(n)]
         make_token(g, "Treasure", sum(1 for x in pick if x == 0))
         g.make_tokens(sum(1 for x in pick if x == 1), 1, 1, "Citizen")
         g.draw(sum(1 for x in pick if x == 2))
@@ -1108,6 +1115,8 @@ def take_extra_turns(g, played, budget):
 def simulate(deck, commander, cfg, seed):
     g = TivitGame(deck, commander, cfg, seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     budget = cfg.get("turns", 20)
     played = 0
     while played < budget and g.result is None:
@@ -1118,6 +1127,9 @@ def simulate(deck, commander, cfg, seed):
         played = take_extra_turns(g, played, budget)
 
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["damage_by_turn"] = g.damage_by_turn
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn

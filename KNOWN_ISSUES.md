@@ -47,7 +47,7 @@ Methodology that used to live at the end of this file is now
 | [0w](#0w) | MEASURED | all three staged swaps survive the combat split unchanged |
 | [0x](#0x) | MEASURED | nine Azusa candidates; Ancient Greenwarden's doubler is the find |
 | [0y](#0y) | MEASURED | the land-animation genre loses its slots to those candidates |
-| [0z](#0z) | **OPEN** | Ashaya's combos are invisible (the MISLABEL is fixed — PARTLY MODELLED, §0z4) |
+| [0z](#0z) | **CLOSED** | Ashaya's clause implemented 2026-09-13 (§0z18); Quirion Ranger's ability still blind |
 | [0z1](#0z1) | FIXED | landfall payoffs were booleans; Springheart bestow+copy implemented |
 | [0z2](#0z2) | MEASURED | two card-draw candidates; Bane of Progress (mislabel fixed in §0z4) |
 | [0z3](#0z3) | MEASURED | four sacrifice-lands: the TAP is the binding constraint, not the mana |
@@ -64,15 +64,19 @@ Methodology that used to live at the end of this file is now
 | [0z14](#0z14) | FIXED | §0f closed. **§0f's own prescription would have overstated the card** |
 | [0z15](#0z15) | FIXED | four checks that could not fail, and one proposed fix that was a regression |
 | [0z16](#0z16) | FIXED | **the same card, two decks, two contradictory labels** — and the checker is per-deck |
+| [0z17](#0z17) | FIXED | **CRN leaked mid-game in eleven places; the A/A control could not see it.** No precision gained |
+| [0z18](#0z18) | FIXED | **Ashaya's second clause implemented, +0.0140 win rate** — and the rules note said the opposite |
+| [0z19](#0z19) | FIXED | **§7 closed — six recursion cards.** Lorehold +0.0220; the same stale-pool bug in both engines |
+| [0z20](#0z20) | FIXED | **§3 and §1b closed.** The Altar's mana is spendable; alternative costs have a PREFERENCE and six readers |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
-| [1b](#1b) | **OPEN** | cards can only have one cost — structural |
+| [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
-| [3](#3) | **OPEN** | Ashnod's Altar and Deathreap Ritual remain unresolved |
+| [3](#3) | **CLOSED** | the Altar's mana is spendable (§0z20); fixing it did not rescue the card |
 | [4](#4) | **OPEN** | opponents' boards are a blocker count — the project's oldest limit |
 | [5](#5) | RESOLVED | your own board wipes now hit your own board |
 | [6](#6) | RESOLVED | life totals are tracked |
 | [6b](#6b) | MEASURED | life is tracked — and since pod v3 it DECIDES GAMES |
-| [7](#7) | **OPEN** | unmodelled recursion in Lorehold |
+| [7](#7) | **CLOSED** | all six recursion cards implemented 2026-09-13 (§0z19) |
 | [8](#8) | superseded | re-run both ablations |
 
 The still-live gaps, in one place — **updated 2026-09-12, when §0f and §0i
@@ -80,14 +84,10 @@ were closed**:
 
 | § | what is still missing |
 |---|---|
-| **19** (CLAUDE.md, not here yet) | **CRN leaks mid-game `g.rng` in five files, and `validate.py` structurally cannot detect it.** The largest open problem in the project |
-| §0z / §0z2 | Ashaya's type-changing clause and every Azusa combo are unimplemented (the MISLABEL is fixed) |
+| §0z2 | Bane of Progress is a one-sided wipe with the sidedness removed (§4). **Ashaya is CLOSED — §0z18**; Quirion Ranger's activated ability is still unimplemented |
 | §0z11 | the BROADENING half: an animated land is a creature and should die to a wrath. Inert today, deliberate |
 | §0z14 | Borrowed Knowledge's mode 1 counts an opponent's HAND, which the pod does not have — §4, not an omission |
-| §1b | one cost per card, structural |
-| §3 | Ashnod's Altar's mana arrives after the main phase and cannot be spent |
 | §4 | **opponents' boards are a blocker count.** The project's deepest limit; a third of every list sits here |
-| §7 | Lorehold recursion (Invoke Calamity, Volcanic Vision, Scrap Trawler) |
 
 **§0f and §0i are CLOSED** (§0z14, §0z13). Everything else is either fixed or
 was a question rather than a defect.
@@ -3374,6 +3374,401 @@ real — tivit rebuilds from artifact tokens, lorehold's commander leaves for th
 command zone with tax. A card genuinely can be good in one list and bad in
 another. What cannot be right is one table calling that number evidence and the
 other calling it noise.
+
+---
+
+<a id="0z17"></a>
+
+## 0z17. FIXED — CRN leaked mid-game in eleven places, and the self-check could not see it
+
+2026-09-13. CLAUDE.md queued item 19, which had no section id of its own
+despite being described there as the largest open problem in the project.
+
+### The defect
+
+Common random numbers are why this project can resolve 0.003 win rate at all.
+Deck A and deck B are the same list with one slot swapped and the same shuffle
+seed, so the other ~97 cards land identically and nearly all variance cancels
+in the difference. **That holds only while both branches consume the same
+random numbers in the same order.**
+
+Eleven call sites in five files drew mid-game from the single game RNG:
+`engine.py` (Arasta, Deathreap Ritual), `karlov.py` (Kambal), `lorehold.py`
+(the gated top-setter, Arcane Bombardment, Radiant Scrollwielder, the tutor,
+Sunbird's Invocation's shuffle), `tivit.py` (Master of Ceremonies) and
+`voting.py` (three). The moment two branches' boards diverged they took a
+DIFFERENT NUMBER of draws, and every later draw in both games then read a
+different slot of the same sequence. Measured before the fix: 17 of 400 seeds
+(4.2%) on one rendmaw swap; **46 of 300 (15.3%)** on one lorehold swap, whose
+Sunbird's Invocation took 1,100 mid-game draws against the other branch's 132.
+
+### The fix: ADDRESSING, not ordering
+
+`engine.CRNStreams` gives every effect its own stream, and the Nth firing of
+that effect reads index N of it. Nothing another effect does can shift it, so a
+divergence stays contained to the effect that diverged. This is
+`azusa.shuffle_library`'s pre-rolled pattern -- the project's only correct
+implementation -- generalised from shuffles to every draw and SHARED, rather
+than reimplemented per engine (§0u, six instances). Azusa's private
+`shuffle_seeds` list is deleted in favour of it.
+
+What it does not fix, because nothing can: if an effect fires three times in A
+and four in B, the fourth read is a value A never saw. That is the decks
+genuinely differing, and it is confined to that one effect's stream.
+
+`crn_streams=False` restores the old behaviour and **reproduces HEAD
+bit-identically on all six engines**, verified against a worktree. Azusa's
+legacy branch is its own old seed list rather than `g.rng`, because routing it
+to the game RNG would introduce a leak this engine never had.
+
+### The check, and why the old one could not fail
+
+`tools/validate.py`'s A/A control swaps a card for ITSELF, so the branches
+never diverge, the call sequence is identical by construction, and all eleven
+leaks passed it for months while it printed `+0.00` on eighteen metrics. §0z15,
+arriving in the place it cost most.
+
+What replaces it asserts a STRUCTURAL INVARIANT that needs no second branch:
+**after the opening hand is decided, `g.rng` is never touched again.**
+`engine.AuditRandom` counts violations under `crn_audit`; `tests/test_crn_streams.py`
+runs it over all six decks and carries the mutation check.
+
+**THE AUDIT'S OWN FIRST VERSION HAD THE BUG IT WAS WRITTEN TO CATCH.** Built
+from the deck MODULES, lorehold's `sunbird()` never executes -- Sunbird's
+Invocation is STAGED, not committed -- so the audit ran clean over the single
+worst leak in the project, and a mutation restoring that leak was NOT detected
+because the code was never reached. It now ranges over `build_pending`, which
+is what `ablation.py` and `candidates.py` actually measure. §0z15's rule
+applied to the new check on its first day.
+
+**One of the eleven sites is DEAD CODE.** `lorehold.py`'s gated-setter draw is
+guarded by `GATED_SETTERS = {"Hidden Retreat"}`, and Hidden Retreat was
+committed out of the deck on 2026-09-01. Its mutation is expected not to be
+detected and the test says so. A fifth instance of §0q -- a hand-maintained
+name set naming a card the deck moved past.
+
+### AND THE HONEST PART: closing it bought no measurable precision
+
+The leak was real, is closed, and is now structurally prevented. **It did not
+improve the pairing.** Measured on the two swaps above, N=1,500, before against
+after:
+
+| swap | metric | corr before | corr after |
+|---|---|---|---|
+| rendmaw, March -> Skullclamp | damage | 0.9387 | 0.9382 |
+| rendmaw, March -> Skullclamp | win | 0.8528 | 0.8567 |
+| lorehold, Scroll Rack -> Sunbird's | damage | 0.8979 | **0.9017** |
+| lorehold, Scroll Rack -> Sunbird's | win | 0.7952 | **0.7901** |
+
+Every one of those differences is inside the noise at that sample, and the win
+rate correlation on the worst-affected swap moved DOWN. **"15.3% of seeds
+diverged" is not "15.3% of the pairing was lost"**: the dominant shared
+randomness is the opening shuffle, which was never broken, and the mid-game
+draws the leak disturbed are second-order next to what you drew. HANDOFF.md's
+"it makes them noisier than the error bars claim" is therefore an
+OVERSTATEMENT, and is corrected there.
+
+This ships as **correctness and as a guarantee that can now fail loudly**, not
+as a precision win -- the §0u / §0z6 shape for the seventh time.
+
+### What it costs
+
+Five engines' numbers move, because their mid-game random values now come from
+different streams. **Shilgengar is bit-identical** (it has no mid-game draws at
+all), which is the same kind of confirmation the byte-identical decks gave in
+the 2026-09-12 regeneration. All six ablation tables need regenerating; the
+fingerprint moves for all six on `engine.py` alone.
+
+---
+
+<a id="0z18"></a>
+
+## 0z18. FIXED — Ashaya's second clause, and the design note pointed the wrong way
+
+2026-09-13. Queued item 15, open since 2026-09-10, and the half of §0z that the
+PARTLY_MODELLED label was holding open.
+
+Ashaya, Soul of the Wild, re-verified against Scryfall 2026-09-13:
+
+> Ashaya's power and toughness are each equal to the number of lands you
+> control. **Nontoken creatures you control are Forest lands in addition to
+> their other types.** (They're still affected by summoning sickness.)
+
+Only the first sentence existed. The second is now implemented in
+`ashaya_lands` / `is_creature_land` / `creature_lands` / `creature_land_mana` /
+`land_count`, behind `ashaya_lands`, defaulting to the corrected behaviour.
+
+### WHAT IT IS WORTH: +0.0140 win rate, and this one IS the objective
+
+Paired on the same seeds, N=2,500, T20, against azusa's ±0.0030 noise floor:
+
+| metric | paired difference |
+|---|---|
+| **win rate** | **+0.0140 ±0.0077** |
+| tokens_made | +62.77 ±11.69 |
+| mana_spent | +23.92 ±4.23 |
+| landfall_triggers | +2.00 ±0.20 |
+| damage | +0.75 ±0.44 |
+
+Ashaya resolves in **28.4%** of games; conditional on resolving, win rate is
+**+0.0493 ±0.0270** and the clause fires **6.65 creature-ETB landfall triggers
+and 1.11 land-deaths per resolution**. The token explosion is Scute Swarm:
+every nontoken creature entering is a land entering, and past six lands the
+Swarm copies itself instead of making an Insect.
+
+This is only the second win-rate-positive correctness result in the project
+(§0z14 was the first). Everything else has been the §0u shape.
+
+### THE DESIGN NOTE WAS WRONG, AND WRONG IN THE EXPENSIVE DIRECTION
+
+`docs/COMP_RULES.md` had already researched this and concluded, of 603.6a:
+**"it must not fire landfall."** That is true of creatures already on the
+battlefield when Ashaya resolves — they gain the type with no ETB event — and
+**false of every creature that enters afterwards.** The official ruling
+(2020-09-25) is explicit:
+
+> "You can't play creature cards as lands; you'll still have to cast them as
+> spells, and **they'll enter the battlefield as lands** (in addition to their
+> other types)."
+
+In a 28-creature landfall list that branch is the larger half of the card.
+Implementing the note as written would have shipped Ashaya understated and
+called it done — and the note's own framing ("a naive implementation would
+trigger every payoff off every creature and the error would be enormous") reads
+as a warning against the correct behaviour. **A rules note is evidence about
+the game and still has to be checked against the rulings.** §0z13's shape
+pointed at research rather than at a blocker.
+
+§0z's Quirion Ranger claim is wrong for the same reason and is corrected here:
+returning a creature-Forest to hand and replaying it is **not a land drop** —
+the same ruling says you cannot play creature cards as lands. Recasting it is
+a creature spell, which fires landfall as it enters, so the conclusion (a
+landfall trigger) survives and the stated mechanism does not.
+
+### The mutation caught a defect in the fix, one hour after documenting it
+
+The first mutation set was written before the run, as CLAUDE.md requires, and
+**two of nine entries were wrong** — cases 5 and 6 assert an ABSENCE, and a
+wholesale off-switch cannot distinguish those from the trivial case. Splitting
+into three targeted mutations then caught something real: the one-`{T}` rule
+("a mana dork gains Forest's ability but has one tap to spend") was written
+**twice** — in `creature_land_mana` and in `available_mana`'s `elif` chain,
+which short-circuited before the predicate was ever consulted. §0u's shape,
+committed in the same session that re-documented §0u. The predicate is now the
+only place the rule is written and the `elif` is an `if`.
+
+### What is still open
+
+**Quirion Ranger's activated ability is still unimplemented** and stays in
+`KNOWN_BLIND`. Its blindness reason in §0z is now stale in the other
+direction: it reads "no modelled payoff", and the payoff now exists.
+
+### Classification
+
+Ashaya moves **out of `PARTLY_MODELLED` and back into `SCRIPTED_AZUSA`** — the
+category working exactly as designed: the label named the missing clause, the
+clause got written, the label moved back. `PARTLY_MODELLED["azusa"]` is now
+Bane of Progress alone. **Azusa's table needs regenerating** and its row is
+evidence again.
+
+---
+
+<a id="0z19"></a>
+
+## 0z19. FIXED — §7 closed. Six recursion cards, two engines, one repeated bug
+
+2026-09-13. §7 ("Unmodelled recursion in Lorehold") has been open since the
+project's early days. All six cards are implemented, all oracle text verified
+against Scryfall the same day, behind `lorehold_recursion` and
+`artifact_recursion`, both defaulting to the corrected behaviour.
+
+### What each card is worth
+
+**Lorehold, paired on the same seeds, N=2,500, T20** — the engine correction,
+all three cards at once, against a ±0.0032 noise floor:
+
+| metric | paired difference |
+|---|---|
+| **win rate** | **+0.0220 ±0.0097** |
+| mv_cheated | +3.40 ±0.64 |
+| damage | +1.50 ±0.46 |
+| free_casts | +0.61 ±0.06 |
+
+Ablated individually on the new engine (card vs blank, N=3,000, T20), which is
+the different and smaller question of whether each earns its slot:
+
+| card | win rate | signal |
+|---|---|---|
+| Volcanic Vision | +0.0110 ±0.0076 | `*` |
+| Invoke Calamity | +0.0073 ±0.0085 | `--` |
+| Goliath Daydreamer | +0.0033 ±0.0057 | `--` |
+
+**Rendmaw**, `artifact_recursion` on/off, N=3,000, T20: win rate
+**+0.0040 ±0.0035**, damage +0.29 ±0.13, firing 0.19 times a game. Small, and
+real: artifacts only die to wipes here.
+
+### GOLIATH DAYDREAMER IS NOT THE TRAP §7 PREDICTED
+
+§7's re-check warned that Goliath "is not merely unmodelled, it is
+anti-synergistic in a way nothing in the engine can see" — it exiles your
+instants and sorceries with dream counters instead of letting them reach the
+graveyard, starving Arcane Bombardment, Mizzix's Mastery, The Dawning Archaic
+and Radiant Scrollwielder, which is this deck's entire engine. **Both halves
+are now implemented and the card is +0.0033 ±0.0057 — inside its own bar.** It
+exiles 0.231 cards a game and gives back 0.142 free casts, so the drawback is
+real, is counted (`dream_starved`), and does not dominate. The warning was
+right to demand the drawback be modelled and wrong about the sign.
+
+### THE SAME BUG, TWICE, IN TWO ENGINES, ON THE SAME DAY
+
+Both implementations crashed on the identical defect: **a selection is a
+snapshot and the zone is live.**
+
+* `invoke_calamity` picked the best pair, cast the first, and the first one's
+  resolution triggered Arcane Bombardment, which exiled the second pick out of
+  the graveyard. `remove` then raised. Fixed by re-checking membership per
+  pick; the counter `invoke_lost_target` records it and it fires about once in
+  a thousand games, so it was a real race and not a theoretical one.
+* `artifact_died` built its candidate pool once and called `take` twice — a
+  Myr Retriever dying while Scrap Trawler is on the battlefield is two
+  separate triggers — so the second selected a card the first had already
+  moved to hand. Fixed by recomputing the pool per trigger.
+
+**Anywhere one effect can cause another, a pool computed before the first is
+wrong by the time the second reads it.** Both fixes are three lines; finding
+the second one took no time at all because the first had just been found,
+which is the argument for writing these up rather than just fixing them.
+
+### The clauses that a from-memory implementation gets wrong
+
+* **Invoke Calamity is TOTAL mana value 6, not 6 each** — a two-threes card,
+  not a two-sixes card. It also reads **graveyard AND hand**, so it is live
+  with an empty yard. And it is an INSTANT that this engine casts at sorcery
+  speed: a floor.
+* **It is not a legal target for itself.** In the miracle path it is still
+  sitting in `hand` when it resolves, and nothing else excluded it. Left in, it
+  selected itself and recursed.
+* **Both spells exile themselves**, so neither can be re-bought by
+  Bombardment, Archaic, Scrollwielder or Mastery. In a deck built on re-buying
+  its own graveyard that is a real cost, and it is the half a naive
+  implementation drops.
+* **Scrap Trawler is LESSER, not lesser-or-equal** — the whole of the
+  loop prevention.
+* Invoke's free casts pass `is_copy=True` only for GRAVEYARD casts, because
+  `apex_of_power` reads that flag to decide whether its "add ten mana" fires,
+  and Apex's clause is worded "if you cast it from your hand". Invoke can do
+  either.
+
+### Classification
+
+* `SCRIPTED_LOREHOLD` gains **Invoke Calamity** and **Goliath Daydreamer**.
+* `SCRIPTED_RENDMAW` gains **Myr Retriever** and **Junk Diver**.
+* `PARTLY_MODELLED` gains two, both for §4 reasons, both floors:
+  **Volcanic Vision** (its "damage equal to that card's mana value to each
+  creature your opponents control" has no creatures with toughness to hit) and
+  **Scrap Trawler** (its second clause only ever sees artifact CREATURES die,
+  because `opponents.destroy` kills nothing that is not a creature right now —
+  no Sol Ring, no signet, no Idol of Oblivion, and no tokens).
+
+All six leave `KNOWN_BLIND`. **Lorehold's and rendmaw's tables both need
+regenerating.**
+
+### What §7 leaves behind
+
+Nothing on the Lorehold or Rendmaw side. §7's Apex of Power item was already
+closed by §0z14.
+
+---
+
+<a id="0z20"></a>
+
+## 0z20. FIXED — §3 and §1b. The Altar's mana, and what "one cost per card" really was
+
+2026-09-13.
+
+### §3 — Ashnod's Altar's mana arrives too late to spend
+
+"Sacrifice a creature: Add {C}{C}" was activated in `activations()`, which runs
+AFTER every casting decision has been taken. The engine therefore modelled the
+COST of sacrificing and none of the benefit, and §3 was right to refuse to read
+the card's slightly negative row as a finding about the card.
+
+`main_phase` now offers the Altar when — and only when — **nothing else in hand
+is castable**, sacrificing the fewest bodies that make the highest-priority
+stranded card castable. It will not eat a token speculatively, and
+`altar_fodder` is one shared definition of "expendable" used by both the mana
+path and the older deaths-for-Blood-Artist path, so the two cannot drift (§0u).
+It never eats a creature the current payment is counting on, which matters
+exactly when Enduring Vitality is out and every untapped creature taps for mana.
+
+**AND FIXING IT DOES NOT RESCUE THE CARD.** Paired, N=3,000, T20:
+
+| metric | paired difference |
+|---|---|
+| win rate | +0.0007 ±0.0009 — **inside its bar** |
+| mana_spent | +0.067 ±0.034 |
+| spells_cast | +0.026 ±0.010 |
+| tokens_made | +0.034 ±0.015 |
+
+The mechanism counters move and the objective does not: the §0u / §0z6 shape
+for the eighth time. **The Altar's own ablation row goes −0.0030 ±0.0033 →
+−0.0023 ±0.0034** — still inside its bar, still faintly negative.
+
+**`altar_keep` IS NOT LOAD-BEARING, and that is said out loud because
+CLAUDE.md requires it.** Sweeping it 6 → 3 → 1 → 0 quadruples the sacrifices
+(0.052 → 0.233 a game) and leaves win rate inside its bar at every setting
+(+0.0007, +0.0003, +0.0013, +0.0017). What limits the card is not the
+conservatism: it is that "more than six spare tokens AND nothing castable" is a
+rare board.
+
+**BOTH §3 CARDS WERE IN `KNOWN_BLIND` WHILE BEING IMPLEMENTED.** Deathreap
+Ritual's "at the beginning of EACH end step" was never unimplemented at all —
+`activations()` has drawn for your end step plus the pod's three, each gated on
+`opp_death_rate`, for as long as the entry has existed. Both move to
+`SCRIPTED_RENDMAW`. §0q's shape again, and the reason §3 read as two
+unexplained negative rows.
+
+### §1b — it was TWO problems, and `alt_costs` only ever solved one
+
+A card's alternative costs are not all of a kind:
+
+| kind | example | what the policy should do |
+|---|---|---|
+| cheaper AND worse | Overlord of the Hauntwoods, Impending 4 | take it only if you must |
+| a different route | Revitalizing Repast's hybrid {B}/{G} | take whichever is payable |
+| **dearer AND better** | **Mizzix's Mastery, overload {5}{R}{R}{R}** | **take it whenever the mana is there** |
+
+`alt_costs` was consulted **only when the printed cost was unaffordable** —
+right for the first two kinds and exactly backwards for the third. So overload
+could not be expressed at all and lived instead as a hand-written
+`if card.script == "mastery"` inside `lorehold.main_phase`, **with its cost
+typed out a second time**. §1b predicted this in its own words: "that closes
+the whole category instead of patching instances".
+
+`engine.castable_modes` gives every mode a **preference**: printed is 0.0, a
+two-tuple alternative defaults to −1.0 (today's fallback, so nothing existing
+moves), and a dearer-and-better mode declares a positive one. Ties break toward
+the cheapest, which is what makes a hybrid pip work with no preference at all.
+`engine.choose_mode` is the single place the choice is made.
+
+**AND IT WAS ONE READER FOR SIX ENGINES.** `engine.main_phase` was the only
+consumer of `alt_costs`, so the identical field on a card in Karlov, Tivit,
+Shilgengar or Azusa would have been ignored silently — cast at its printed
+cost, no error. All six now route through `choose_mode`, and
+`pending.check_alt_cost_coverage` raises if one stops: the reader set is
+**derived from the engines' own source**, not hand-maintained (§0q). It is
+mutation-tested against both failures.
+
+**The one behavioural change** is that Mastery's overload now respects the mana
+reserve like every other cost, where the old special case was applied after the
+reserve check and could spend through it. Worth **+0.0013 ±0.0026 — inside its
+bar** (N=3,000, T20), so the overload mode as a whole is not currently
+measurable, and the change ships as structure rather than as a number.
+
+**What §1b leaves open:** the entry also names evoke, escape and kicker, none
+of which any card in these six lists has. `Card` still carries one printed
+cost plus a mode list rather than a list of modes outright, which is the
+smaller refactor and the one that does not touch every deck file.
 
 ---
 

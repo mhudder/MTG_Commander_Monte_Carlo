@@ -31,7 +31,9 @@ import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life,
-                          engine_cfg)
+                          engine_cfg, choose_mode,
+                          CRNStreams, crn_random, crn_randrange,
+                          crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
 
 # Cards that can put a chosen card from hand onto the top of your library.
@@ -60,7 +62,9 @@ class LoreholdGame:
         # first engine constructed decide them for every later one.
         # See engine.engine_cfg.
         self.cfg = cfg = engine_cfg(cfg)
-        self.rng = random.Random(seed)
+        self.rng = make_rng(seed, cfg)
+        # Mid-game randomness lives here, NOT on self.rng. §0z17.
+        self.crn = CRNStreams(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
@@ -88,6 +92,10 @@ class LoreholdGame:
         self.noncreature_this_turn = 0
         self.bombardment_fired_this_turn = False
         self.bombardment_exiled = []
+        # Goliath Daydreamer's exile zone: instants/sorceries cast from
+        # hand land here with a dream counter INSTEAD of the graveyard.
+        # §0z19.
+        self.dream_exile = []
         self.dv_fired_this_turn = False
         self.monument_used = set()
         self.last_paid = 0
@@ -149,6 +157,12 @@ class LoreholdGame:
             "mastery_copies": 0,
             "land_tax_fetches": 0,
             "upkeep_free_casts": 0,
+            # §7 / §0z19 -- the three recursion cards, each counted so the
+            # mechanism is readable without inferring it from win rate.
+            "invoke_free_casts": 0, "invoke_mv": 0.0,
+            "vision_returns": 0, "vision_mv": 0.0,
+            "dream_exiled": 0, "dream_free_casts": 0,
+            "dream_starved": 0,
             # Radiant Scrollwielder exiles from the graveyard whether or not
             # it can pay, so these two are NOT the same number and the gap
             # between them is the card's real cost.
@@ -417,7 +431,7 @@ def set_top(g, pool=None, upkeep_free=False):
             continue
         if name in GATED_SETTERS:
             # only live while an opponent's instant or sorcery is on the stack
-            if g.rng.random() > g.cfg.get("opp_instant_rate", 0.8):
+            if crn_random(g, f"gated_setter:{name}") > g.cfg.get("opp_instant_rate", 0.8):
                 continue
         best = max(g.hand, key=value_of, default=None)
         if best is None or value_of(best) <= 0:
@@ -724,7 +738,7 @@ def arcane_bombardment(g):
     pool = [c for c in g.graveyard
             if "Instant" in c.types or "Sorcery" in c.types]
     if pool:
-        picked = pool[g.rng.randrange(len(pool))]
+        picked = pool[crn_randrange(g, "bombardment", len(pool))]
         g.graveyard.remove(picked)
         g.bombardment_exiled.append(picked)
 
@@ -776,7 +790,7 @@ def radiant_scrollwielder(g):
             if "Instant" in c.types or "Sorcery" in c.types]
     if not pool:
         return
-    picked = pool[g.rng.randrange(len(pool))]
+    picked = pool[crn_randrange(g, "scrollwielder", len(pool))]
     g.graveyard.remove(picked)               # exiled, cast or not
     g.m["scrollwielder_exiles"] += 1
 
@@ -825,6 +839,10 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
             g.m["treasures_made"] += n
             g.m["mother_lode_treasures"] = \
                 g.m.get("mother_lode_treasures", 0) + n
+    elif sc == "invoke_calamity":
+        invoke_calamity(g, self_card=card)
+    elif sc == "volcanic_vision":
+        volcanic_vision(g)
     elif sc == "soulfire":
         for _ in range(3):
             if g.library:
@@ -891,7 +909,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         cands = [x for x in pool if x.name in shortlist] or pool
         if cands:
             if g.cfg.get("tutor_policy") == "random":
-                pick = cands[g.rng.randrange(len(cands))]
+                pick = cands[crn_randrange(g, "tutor", len(cands))]
             elif g.cfg.get("tutor_policy") == "adaptive":
                 # Learned from 14,028 randomised tutor resolutions. The
                 # commander's presence flips which target is correct: without
@@ -1005,12 +1023,16 @@ def discover(g, x: int):
     exactly the quantity `free_mv` carries (§1).
 
     THE REST GO TO THE BOTTOM IN ORDER, NOT SHUFFLED, and that is a deliberate
-    departure from the reminder text. `sunbird` shuffles its leftovers with
-    `g.rng.shuffle`, which is a mid-game draw on the GAME rng and one of this
-    engine's CRN leaks. The order of cards on the bottom of a library can only
-    matter to a game that reaches them, and these games end around turn 12 --
-    so a second leak would buy nothing. Said out loud rather than left to be
-    rediscovered.
+    departure from the reminder text. It used to be justified by a second
+    wrong thing -- `sunbird` shuffled its leftovers on the GAME rng, so adding
+    a shuffle here "would buy nothing" against a leak that was already there.
+    **That leak is closed (§0z17): `sunbird` now uses an addressed stream, and
+    so would this.** The departure stands on its own merits instead: the order
+    of cards on the bottom of a library can only matter to a game that reaches
+    them, and these games end around turn 12.
+
+    This docstring is itself the §0z13 shape -- a note whose stated reason
+    stopped being true when an engine gap closed, and which nothing re-read.
     """
     exiled, hit = [], None
     while g.library:
@@ -1109,7 +1131,7 @@ def sunbird(g, card):
     pick = max(castable, key=lambda c: (c.free_mv, c.priority), default=None)
     if pick is not None:
         revealed.remove(pick)
-    g.rng.shuffle(revealed)
+    crn_shuffle(g, "sunbird", revealed)
     g.library[0:0] = revealed          # index 0 is the bottom of the library
     if pick is None:
         return
@@ -1134,6 +1156,29 @@ def resolve_spell(g, card, paid, from_hand=True):
 
     if card.is_permanent:
         g.board.append(Permanent(card=card, sick=not card.haste))
+    elif card.script in SELF_EXILING and g.cfg.get("lorehold_recursion", True):
+        pass                       # "Exile <self>." Not in the graveyard.
+    elif (from_hand and g.cfg.get("lorehold_recursion", True)
+          and g.has("Goliath Daydreamer")
+          and ("Instant" in card.types or "Sorcery" in card.types)):
+        # GOLIATH DAYDREAMER, FIRST ABILITY -- AND IT IS A DRAWBACK HERE.
+        #
+        #   "Whenever you cast an instant or sorcery spell FROM YOUR HAND,
+        #    exile that card with a dream counter on it instead of putting it
+        #    into your graveyard as it resolves."
+        #
+        # KNOWN_ISSUES §7 flagged this years before it was implemented and was
+        # right to: this deck's engine is its own graveyard. Arcane
+        # Bombardment, Mizzix's Mastery, The Dawning Archaic and Radiant
+        # Scrollwielder all feed on instants and sorceries in the yard, and
+        # this ability takes every one of them out of reach. It is not an
+        # "unmodelled upside" -- the unmodelled part cuts BOTH ways, which is
+        # exactly what §7's re-check warned a future measurement must not
+        # assume. `dream_starved` counts the cards it denied the graveyard so
+        # the cost is visible next to the benefit.
+        g.dream_exile.append(card)
+        g.m["dream_exiled"] += 1
+        g.m["dream_starved"] += 1
     else:
         g.graveyard.append(card)
 
@@ -1149,6 +1194,149 @@ def resolve_spell(g, card, paid, from_hand=True):
     if from_hand and g.has("Sunbird's Invocation") \
             and card.name != "Sunbird's Invocation":
         sunbird(g, card)          # it is not on the battlefield for its own cast
+
+
+# "Exile <self>." Both cards say it, and it matters here: a card that exiles
+# itself is NOT in the graveyard afterwards, so it cannot be re-bought by
+# Arcane Bombardment, The Dawning Archaic, Radiant Scrollwielder or Mizzix's
+# Mastery. In a deck built on re-buying its own graveyard that is a real cost
+# and it is the half a naive implementation drops.
+SELF_EXILING = {"invoke_calamity", "volcanic_vision"}
+
+
+def invoke_calamity(g, self_card=None):
+    """Invoke Calamity {1}{R}{R}{R}{R}, verified against Scryfall 2026-09-13.
+
+        You may cast up to two instant and/or sorcery spells with total mana
+        value 6 or less from your graveyard and/or hand without paying their
+        mana costs. If those spells would be put into your graveyard, exile
+        them instead. Exile Invoke Calamity.
+
+    TOTAL mana value 6 or less ACROSS BOTH, not 6 each -- the constraint that
+    makes this a two-threes card rather than a two-sixes card, and the one a
+    from-memory implementation gets wrong.
+
+    THE POOL IS GRAVEYARD **AND HAND**, which is why this is not just another
+    recursion spell: with nothing in the yard it still casts two off the top of
+    your hand. Both zones are searched together and the best legal pair wins.
+
+    `is_copy` is passed TRUE for a graveyard cast and FALSE for a hand cast,
+    and that is not cosmetic: `apex_of_power` reads it to decide whether its
+    "add ten mana of any one color" fires, because Apex's clause is worded
+    "if you cast it from your hand". Invoke can do either.
+
+    A FLOOR, said out loud: Invoke Calamity is an INSTANT and this engine casts
+    at sorcery speed, so the "hold it up and respond" line does not exist here.
+    """
+    if not g.cfg.get("lorehold_recursion", True):
+        return
+    cap = g.cfg.get("invoke_mv_cap", 6)
+
+    # INVOKE CALAMITY IS NOT A LEGAL TARGET FOR ITSELF. It is on the stack
+    # while it resolves, not in the graveyard and not in the hand, so the pool
+    # must exclude it -- and in the miracle path it is still sitting in `hand`
+    # when this runs, so nothing else excludes it. Left in, it selected itself,
+    # cast itself, and recursed; the crash that surfaced was `.remove()`
+    # failing on the second pick, which is a much later symptom than the bug.
+    def eligible(c):
+        return (c is not self_card
+                and ("Instant" in c.types or "Sorcery" in c.types))
+
+    pool = [("graveyard", c) for c in g.graveyard if eligible(c)]
+    pool += [("hand", c) for c in g.hand if eligible(c)]
+    if not pool:
+        return
+
+    # Best legal set of at most two by total free_mv, which is the quantity
+    # this deck's primary metric is denominated in (`mv_cheated`).
+    best, best_val = [], -1.0
+    for i, (zi, ci) in enumerate(pool):
+        if ci.free_mv <= cap and ci.free_mv > best_val:
+            best, best_val = [(zi, ci)], ci.free_mv
+        for j in range(i + 1, len(pool)):
+            zj, cj = pool[j]
+            tot = ci.free_mv + cj.free_mv
+            if tot <= cap and tot > best_val:
+                best, best_val = [(zi, ci), (zj, cj)], tot
+    for zone, card in best:
+        # RE-CHECKED PER PICK, because casting the first one can move the
+        # second. `apply_spell_effects` runs the full resolution path -- it can
+        # trigger Arcane Bombardment, which exiles a random instant or sorcery
+        # from the graveyard, and that card may be the one selected here. The
+        # selection is a snapshot; the zone is live. If it has gone, it has
+        # genuinely gone, and casting it anyway would be conjuring a card.
+        src = g.graveyard if zone == "graveyard" else g.hand
+        if card not in src:
+            g.m["invoke_lost_target"] = g.m.get("invoke_lost_target", 0) + 1
+            continue
+        src.remove(card)
+        g.m["invoke_free_casts"] += 1
+        g.m["invoke_mv"] += card.free_mv
+        g.m["free_casts"] += 1
+        g.m["mv_cheated"] += card.free_mv
+        g.m["total_mv_cast"] += card.free_mv
+        g.m["spells_cast"] += 1
+        apply_spell_effects(g, card, is_copy=(zone == "graveyard"))
+        # "If those spells would be put into your graveyard, exile them
+        # instead" -- so they are gone, not recycled.
+
+
+def volcanic_vision(g):
+    """Volcanic Vision {5}{R}{R}, verified against Scryfall 2026-09-13.
+
+        Return target instant or sorcery card from your graveyard to your
+        hand. Volcanic Vision deals damage equal to that card's mana value to
+        each creature your opponents control. Exile Volcanic Vision.
+
+    ONLY THE FIRST SENTENCE IS MODELLED, and the card is classified
+    PARTLY_MODELLED because of it. The second is a sweeper aimed at creatures
+    this project does not represent -- opponents' boards are a blocker count
+    with no toughness to compare a mana value against (§4). Inventing a
+    mapping from "MV damage" to "creatures removed" would be inventing the
+    number, so the damage half is left out and said out loud instead.
+
+    The recursion half is real and is the expensive half of the card in a deck
+    that wants its big spells back: it returns the LARGEST instant or sorcery,
+    which is also what makes the unmodelled damage biggest. Both halves scale
+    with the same choice, so this row is a FLOOR in the ordinary direction.
+    """
+    if not g.cfg.get("lorehold_recursion", True):
+        return
+    pool = [c for c in g.graveyard
+            if "Instant" in c.types or "Sorcery" in c.types]
+    if not pool:
+        return
+    best = max(pool, key=lambda c: c.free_mv)
+    g.graveyard.remove(best)
+    g.hand.append(best)
+    g.m["vision_returns"] += 1
+    g.m["vision_mv"] += best.free_mv
+
+
+def goliath_attack(g):
+    """Goliath Daydreamer's second ability, on attack.
+
+        Whenever this creature attacks, you may cast a spell from among cards
+        you own in exile with dream counters on them without paying its mana
+        cost.
+
+    Cast through `apply_spell_effects`, which is the shared resolution path --
+    NOT the hand-inlined subset `The Dawning Archaic` uses six lines above its
+    call site. That subset handles treasures, soulfire, tokens, pod damage and
+    Guttersnipe and silently drops everything else, which is §0u's shape
+    sitting in this file already; a second copy of it is not the way to add a
+    card.
+    """
+    if not g.cfg.get("lorehold_recursion", True) or not g.dream_exile:
+        return
+    best = max(g.dream_exile, key=lambda c: c.free_mv)
+    g.dream_exile.remove(best)
+    g.m["dream_free_casts"] += 1
+    g.m["free_casts"] += 1
+    g.m["mv_cheated"] += best.free_mv
+    g.m["total_mv_cast"] += best.free_mv
+    g.m["spells_cast"] += 1
+    apply_spell_effects(g, best, is_copy=True)
 
 
 def underworld_breach(g):
@@ -1277,18 +1465,21 @@ def main_phase(g, reserve=0):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
                 continue
-            cost = reduce_cost(g, c)
-            idx = can_pay(cost, units)
-            if idx is not None and len(units) - len(idx) >= reserve:
+            # THE MODE IS CHOSEN HERE, NOT AFTER THE CARD IS PICKED, and
+            # that is the one behavioural change §0z20 makes to this engine:
+            # Mizzix's Mastery's overload now respects the mana RESERVE like
+            # every other cost, where the old special case was applied after
+            # the reserve check and could spend straight through it.
+            mode = choose_mode(c, reduce_cost(g, c), units)
+            if mode is None:
+                continue
+            cost, _tag, idx = mode
+            if len(units) - len(idx) >= reserve:
                 options.append((c, cost))
         if not options:
             break
 
         card, cost = max(options, key=lambda it: (it[0].priority, it[0].mv))
-        if card.script == "mastery":
-            over = {"gen": 5, "R": 3}
-            if can_pay(over, units) is not None:
-                cost = over        # overload if the mana is there
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         paid = pay(g, cost, units)
@@ -1333,6 +1524,9 @@ def combat(g):
             deal_pod_damage(g, best.pod_damage)
             n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
             deal_pod_damage(g, 6.0 * n_snipe)
+
+    if any(p.card.name == "Goliath Daydreamer" for p in attackers):
+        goliath_attack(g)
 
     if not attackers:
         g.damage_by_turn.append(0.0)
@@ -1606,11 +1800,16 @@ def take_turn(g):
 def simulate(deck, commander, cfg, seed):
     g = LoreholdGame(deck, commander, cfg, seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     for _ in range(cfg.get("turns", 10)):
         take_turn(g)
         if g.result is not None:
             break
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)

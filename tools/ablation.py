@@ -136,6 +136,22 @@ SCRIPTED_RENDMAW = {
     # loses 1 life and you gain 1" death trigger, and the {1}{B}{G}, {T}, sac
     # a creature reanimation in activations().
     "Cauldron of Essence",
+    # --- §3 closed 2026-09-13 (§0z20). Both were in KNOWN_BLIND while being
+    # implemented in activations(), which is §0q's shape: the label is a claim
+    # and the claim was false.
+    # Ashnod's Altar: "Sacrifice a creature: Add {C}{C}." Both halves now --
+    # the deaths it manufactures for Blood Artist / Meathook, and the MANA,
+    # which used to arrive after the main phase and so could not be spent.
+    # Deathreap Ritual: "At the beginning of EACH end step, if a creature died
+    # this turn, you may draw a card" -- your end step plus the pod's three,
+    # each gated on opp_death_rate. It was never unimplemented at all.
+    "Ashnod's Altar", "Deathreap Ritual",
+    # --- §7 closed for Rendmaw 2026-09-13 (§0z19) ---
+    # "When this creature dies, return ANOTHER target artifact card from your
+    # graveyard to your hand." Both are the same trigger; Junk Diver also
+    # flies, which decks/_evasion.py already carries. Fully implemented in
+    # Game.artifact_died, reached through opponents.destroy().
+    "Myr Retriever", "Junk Diver",
     # protection the opponent model respects
     "Heroic Intervention",
     # static P/T setter (implemented in Game.power_of / toughness_of)
@@ -151,6 +167,16 @@ SCRIPTED_LOREHOLD = {
     # clause. Hit the Mother Lode: Discover 10 with the free cast and
     # 10-minus-MV TAPPED Treasures, which are not mana until they untap.
     "Apex of Power", "Hit the Mother Lode",
+    # --- §7 closed for Lorehold 2026-09-13 (§0z19) ---
+    # Invoke Calamity: up to two instants/sorceries, TOTAL mana value 6 or
+    # less, from graveyard AND hand, free, then exiled. A FLOOR only in that
+    # it is an instant and this engine casts at sorcery speed.
+    # Goliath Daydreamer: BOTH halves, and the first is a drawback -- spells
+    # cast from hand are exiled with a dream counter instead of reaching the
+    # graveyard this deck's whole engine feeds on. Measured at +0.0033
+    # ±0.0057, i.e. inside its bar: the anti-synergy §7 warned about is real
+    # and does not dominate.
+    "Invoke Calamity", "Goliath Daydreamer",
     # mana
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
@@ -345,12 +371,22 @@ SCRIPTED_SHILGENGAR = {
 # to a note that does not exist is worse than no note, because it stops the
 # next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
 SCRIPTED_AZUSA = {
+    # ASHAYA CAME BACK 2026-09-13 (§0z18, queued 15). Both clauses are now
+    # implemented: the */* off the land count, and "nontoken creatures you
+    # control are Forest lands in addition to their other types" -- the mana
+    # ability (305.7), the landfall its creatures fire as they enter (the
+    # official ruling, and the opposite of what the old note said), Titania
+    # reading creature deaths as land deaths, and the Forest count that
+    # Sapling Nursery and Nissa read. It spent three days in PARTLY_MODELLED,
+    # which is the category working as designed: the label named the missing
+    # clause, the clause got written, and the label moved back.
+    "Ashaya, Soul of the Wild",
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
     # was the one that was not, and it is in KNOWN_BLIND with its reason.
     # Fetches crack for a land, which is a landfall trigger and a shuffle
-    # drawn from the pre-rolled seeds so CRN survives (azusa.shuffle_seeds).
+    # drawn from a pre-rolled stream so CRN survives (engine.CRNStreams).
     "Terramorphic Expanse", "Windswept Heath", "Wooded Foothills",
     # extra land drops
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
@@ -435,11 +471,19 @@ SCRIPTED_AZUSA = {
 # on an empty reason, and the reason is PRINTED in the table, so the row
 # carries its own caveat to whoever reads it next.
 PARTLY_MODELLED = {
+    "rendmaw": {
+        "Scrap Trawler":
+            "Its own-death trigger is implemented (2026-09-13, §0z19) and "
+            "returns a LESSER-mana-value artifact. Its SECOND clause -- "
+            "'whenever ANOTHER ARTIFACT YOU CONTROL is put into a graveyard "
+            "from the battlefield' -- is live only for artifact CREATURES, "
+            "because `opponents.destroy` only ever kills permanents that are "
+            "creatures right now: no noncreature artifact in this list (Sol "
+            "Ring, the signets, Idol of Oblivion) is ever destroyed, and "
+            "tokens never reach the graveyard. That is the pod model's limit "
+            "(§4), not the card's, and it makes this row a FLOOR. §7.",
+    },
     "azusa": {
-        "Ashaya, Soul of the Wild":
-            "*/* off the land count is implemented; 'nontoken creatures you "
-            "control are Forest lands' is NOT, and that is the half that "
-            "combos with Quirion Ranger. §0z, queued 14b/15.",
         "Bane of Progress":
             "The wipe destroys only YOUR OWN artifacts and enchantments, "
             "because opponents own no permanent objects in this project "
@@ -465,6 +509,16 @@ PARTLY_MODELLED = {
             "under the adversarial `opp_vote_policy` default.",
     },
     "lorehold": {
+        "Volcanic Vision":
+            "The RECURSION half is implemented (2026-09-13, §0z19): it "
+            "returns the largest instant or sorcery from the graveyard to "
+            "hand and exiles itself. The DAMAGE half -- 'deals damage equal "
+            "to that card's mana value to each creature your opponents "
+            "control' -- is not, because opponents' boards are a blocker "
+            "count with no toughness to compare a mana value against (§4). "
+            "Both halves scale with the SAME choice of target, so the "
+            "unmodelled half is largest exactly when the modelled one is: "
+            "this row is a floor. §7.",
         "Borrowed Knowledge":
             "MODE 2 IS IMPLEMENTED as of 2026-09-11 ('discard your hand, then "
             "draw cards equal to the number of cards discarded this way'), "
@@ -748,29 +802,24 @@ def ablation_stream(todo, procs):
 # them explicitly is what lets the assertion below be strict.
 KNOWN_BLIND = {
     "rendmaw": {
-        "Ashnod's Altar",
         "Assassin's Trophy",
         'Beast Within',
         'Biotransference',
         'Bow of Nylea',
         'Burnished Hart',
-        'Deathreap Ritual',
         "Eyeblight's Ending",
         'Filigree Familiar',
         'Gloomshrieker',
         'Hagra Mauling',
         'Haywire Mite',
-        'Junk Diver',
         'Lignify',
         'Massacre Wurm',
         'Midnight Reaper',
-        'Myr Retriever',
         'Nameless Inversion',
         'Overwhelming Stampede',
         'Pygmy Kavu',
         'Reap',
         'Sakura-Tribe Elder',
-        'Scrap Trawler',
         'Shigeki, Jukai Visionary',
         'Village Rites',
         'Whip of Erebos',
@@ -786,10 +835,8 @@ KNOWN_BLIND = {
         'Enlightened Tutor',
         'Gamble',
         'Generous Gift',
-        'Goliath Daydreamer',
         'Hexing Squelcher',
         'Improvisation Capstone',
-        'Invoke Calamity',
         'Land Tax',
         'Path to Exile',
         'Perch Protection',
@@ -798,7 +845,6 @@ KNOWN_BLIND = {
         'Sejiri Shelter',
         'Storm Herd',
         'Swords to Plowshares',
-        'Volcanic Vision',
     },
     "karlov": {
         'Anguished Unmaking',

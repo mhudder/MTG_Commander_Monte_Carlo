@@ -38,7 +38,9 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, run_etb, engine_cfg)
+                          spend, play_land, run_etb, engine_cfg, choose_mode,
+                          CRNStreams, crn_random, crn_randrange,
+                          crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
 
 COMBO_A = "Exquisite Blood"
@@ -58,7 +60,9 @@ class KarlovGame:
         # first engine constructed decide them for every later one.
         # See engine.engine_cfg.
         self.cfg = cfg = engine_cfg(cfg)
-        self.rng = random.Random(seed)
+        self.rng = make_rng(seed, cfg)
+        # Mid-game randomness lives here, NOT on self.rng. §0z17.
+        self.crn = CRNStreams(seed)
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
@@ -455,7 +459,8 @@ def opponent_activity(g):
 
     spells = int(round(g.cfg.get("opp_spells_per_turn", 1.2) * len(OPP.living(g))))
     for _ in range(spells):
-        if g.has("Kambal, Consul of Allocation") and g.rng.random() < 0.55:
+        if (g.has("Kambal, Consul of Allocation")
+                and crn_random(g, "kambal") < 0.55):
             drain(g, 2)
         if g.has("Sunscorch Regent"):
             # "put a +1/+1 counter on this creature AND you gain 1 life" — the
@@ -625,9 +630,12 @@ def main_phase(g):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
                 continue
-            pay = can_pay(reduce_cost(g, c), units)
-            if pay is not None:
-                options.append((c, pay))
+            # §1b: every way the card can be cast, not just the printed
+            # cost. No card in this list declares one today; the point is
+            # that one CAN, and check_alt_cost_coverage enforces it.
+            mode = choose_mode(c, reduce_cost(g, c), units)
+            if mode is not None:
+                options.append((c, mode[2]))
         if not options:
             break
         card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
@@ -989,11 +997,16 @@ def take_turn(g):
 def simulate(deck, commander, cfg, seed):
     g = KarlovGame(deck, commander, cfg, seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     for _ in range(cfg.get("turns", 20)):
         take_turn(g)
         if g.result is not None:
             break
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["damage_by_turn"] = g.damage_by_turn
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn

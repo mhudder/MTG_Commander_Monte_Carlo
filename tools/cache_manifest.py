@@ -520,8 +520,44 @@ NOTES["ablation_cache_azusa_10-20_n15000_medblank.json"] += (
     "regeneration, not a resume.")
 
 
+def staged_signature(deck: str) -> str:
+    """The deck's STAGED SWAPS, in the form the fingerprint hashes them.
+
+    THE LIST IS AN INPUT TO EVERY CACHED NUMBER AND IT WAS NOT FINGERPRINTED.
+    `ablation.py` builds its baseline with `build_pending(DECK)`, which applies
+    this deck's entries in `edhmc/pending.py`'s CHANGES -- so staging a swap,
+    unstaging one, or changing which card a staged swap cuts silently replaces
+    the list every cached row was measured against. Nothing in SHARED or
+    PER_DECK covers that, so the fingerprint declared such a cache CURRENT.
+    Found 2026-09-13, when unstaging the rendmaw Cauldron swap changed that
+    deck's baseline and left its three caches and its committed table
+    describing a list the repo no longer builds.
+
+    WHY NOT SIMPLY ADD `edhmc/pending.py` TO SHARED, which is the one-line
+    version of this. Because the ledger is one file for six decks and is edited
+    constantly for reasons that touch no list at all -- a rationale reworded, a
+    recheck appended, a candidate measured, this very docstring's counterpart.
+    Every one of those would mark all fourteen caches stale with no number
+    moved, which is the failure `MOVED` and the newline normalisation both
+    exist to prevent: a fingerprint that cries wolf teaches people to resume
+    across the change that mattered. Hashing the SWAPS rather than the FILE
+    moves exactly the decks whose list moved, and only when it moves.
+
+    The signature is the ordered `-out +in` pairs, and order is deliberate:
+    `build_pending` applies them in list order and `up_to=n` slices that order,
+    so two stages swapped round are not the same baseline.
+
+    NOTE FOR THE READER OF A DIFF: adding this component moved all six
+    fingerprints ONCE, on 2026-09-13, because a hash cannot gain an input
+    without changing. Five of those six moves were the scheme and not a
+    staleness; rendmaw's was both. That is recorded per cache in NOTES.
+    """
+    from edhmc.pending import pending_for
+    return "\n".join(f"-{c.remove} +{c.add}" for c in pending_for(deck))
+
+
 def fingerprint(deck: str) -> tuple[str, list[str]]:
-    """Hash the deck's source, NORMALISED FOR LINE ENDINGS.
+    """Hash the deck's source and its staged swaps, NORMALISED FOR LINE ENDINGS.
 
     The first version hashed raw bytes, and on Windows `git checkout` rewrites
     the working tree to CRLF under core.autocrlf -- so merging a branch changed
@@ -532,6 +568,8 @@ def fingerprint(deck: str) -> tuple[str, list[str]]:
     A check that cries wolf is worse than no check, because it teaches you to
     ignore it -- and this one exists precisely to be believed when it says a
     cache is stale. Normalising newlines makes it depend on content only.
+
+    The last component is not a file: see `staged_signature`.
     """
     files = SHARED + PER_DECK[deck]
     h = hashlib.sha256()
@@ -540,7 +578,13 @@ def fingerprint(deck: str) -> tuple[str, list[str]]:
             body = fh.read().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
         h.update(key.encode())
         h.update(hashlib.sha256(body).digest())
-    return h.hexdigest()[:16], sorted(files)
+    # Hashed under a synthetic key, exactly as a file is, so the deck's staged
+    # swaps cannot collide with a real path and so the "what each fingerprint
+    # covers" section can list them.
+    staged = staged_signature(deck)
+    h.update(f"staged:{deck}".encode())
+    h.update(hashlib.sha256(staged.encode()).digest())
+    return h.hexdigest()[:16], sorted(files) + [f"staged:{deck}"]
 
 
 def caches():
@@ -609,6 +653,31 @@ def main():
         "differs — a rule that is only safe to follow if the exceptions are",
         "written down where the person following it will look.",
         "",
+        "**EVERY FINGERPRINT CHANGED AGAIN ON 2026-09-13, AND THIS TIME ONE",
+        "DECK IS GENUINELY STALE.** The fingerprint gained a component it",
+        "should always have had: the deck's STAGED SWAPS. `ablation.py` builds",
+        "its baseline with `build_pending(DECK)`, so the entries in",
+        "`edhmc/pending.py`'s CHANGES are an input to every cached number, and",
+        "nothing hashed them — staging or unstaging a swap replaced the list",
+        "the whole table was measured against while the fingerprint went on",
+        "declaring the cache current. A hash cannot gain an input without",
+        "moving, so all six moved once here.",
+        "",
+        "Five of those six moves are the scheme and nothing else: karlov,",
+        "lorehold, tivit, shilgengar and azusa have the same staged swaps they",
+        "had when their caches were built, so **those caches are CURRENT and",
+        "resumable** — the recorded value simply predates the component.",
+        "**RENDMAW IS THE EXCEPTION AND ITS THREE CACHES ARE STALE.** The",
+        "staged -Idol of Oblivion +Cauldron of Essence was UNSTAGED on",
+        "2026-09-13 (it is in `pending.WITHDRAWN`, with the reason), so",
+        "`build_pending('rendmaw')` now returns Idol and not Cauldron. The",
+        "committed `results/ablation_rendmaw.txt` was measured on the other",
+        "list and still carries a Cauldron of Essence row for a card the deck",
+        "no longer contains. **Delete those three caches and regenerate before",
+        "quoting any rendmaw number.** This entry is the exception the rule",
+        "above depends on being written down, and it is the one case where",
+        "following the rule blindly would have been right.",
+        "",
         "| cache | deck | cards | source fingerprint |",
         "|---|---|---|---|",
     ]
@@ -618,6 +687,15 @@ def main():
     for deck in sorted(PER_DECK):
         _fp, files = fingerprint(deck)
         lines.append(f"- **{deck}** — " + ", ".join(f"`{f}`" for f in files))
+        # The staged swaps are spelled out rather than left as a bare key: the
+        # whole point of the component is that the LIST is an input, and a
+        # reader checking whether a cache is stale needs to see which list.
+        staged = staged_signature(deck)
+        lines.append(f"  - `staged:{deck}` is "
+                     + (", ".join(f"`{s}`" for s in staged.split("\n"))
+                        if staged else "**empty** — nothing staged for this "
+                                       "deck, so the baseline is the module's "
+                                       "own list"))
     lines += ["", "## How each cache was produced", ""]
     for name, deck, _b, _f, _c, _files in rows:
         lines.append(f"### `{name}`")

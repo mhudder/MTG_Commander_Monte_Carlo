@@ -76,6 +76,14 @@ python -m tests.test_pod_damage_and_wipes   # §0z9/§0z10/§0z11 — the pod-da
                                        # and wraths reading the battlefield
 python -m tests.test_lorehold_0f_0i    # §0z13/§0z14 — Talisman charged, and
                                        # Borrowed Knowledge / Apex / Mother Lode
+python -m tests.test_crn_streams       # §0z17 — every engine seals its game
+                                       # RNG after the opening hand
+python -m tests.test_ashaya            # §0z18 — Ashaya's second clause, one
+                                       # assertion per rule
+python -m tests.test_recursion         # §0z19 / §7 — the six recursion cards
+                                       # across lorehold and rendmaw
+python -m tests.test_modes_and_altar   # §0z20 / §1b + §3 — castable modes,
+                                       # and Ashnod's Altar's mana
 ```
 
 Candidate evaluation, at the tables' own N so the numbers are comparable:
@@ -116,7 +124,7 @@ python -m diagnostics.run_mana_colour          # §0z8 colour payment, two ways
 python -m diagnostics.run_citadel              # Bolas's Citadel; --floor sweeps the knob
 ```
 
-SEVEN checks carry a MUTATION run, because a check that cannot fail reads
+ELEVEN checks carry a MUTATION run, because a check that cannot fail reads
 like assurance and is worse than none. Each asserts an EXACT set of failing
 cases, so a fix that stops mattering is as loud as one that breaks:
 
@@ -128,6 +136,10 @@ python -m tests.test_azusa_batch3 --mutate            # exactly 7 cases MUST fai
 python -m tests.test_mana_colour --mutate            # exactly 4 cases MUST fail
 python -m tests.test_pod_damage_and_wipes --mutate   # exactly 13 MUST fail
 python -m tests.test_lorehold_0f_0i --mutate         # exactly 17 MUST fail
+python -m tests.test_crn_streams --mutate           # exactly 5 of 6 MUST fail
+python -m tests.test_ashaya --mutate                # 3 mutations, exact sets
+python -m tests.test_recursion --mutate             # 6 mutations, exact sets
+python -m tests.test_modes_and_altar --mutate       # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -497,6 +509,17 @@ COUNTERS (`blood_made`, `landfall_triggers`, `opponents_killed`) rather than
 win rate: a mechanism that fires zero times is unmistakable where a win rate
 0.03 too low is not.
 
+**A SELECTION IS A SNAPSHOT AND THE ZONE IS LIVE** (2026-09-13, §0z19). Two
+implementations written the same day crashed on the identical defect: a pool
+of candidate cards was computed once, and then the act of using the first
+candidate moved the second one. `invoke_calamity` cast a spell whose
+resolution triggered Arcane Bombardment, which exiled its other pick out of
+the graveyard; `artifact_died` fired two triggers off one death and the first
+returned the card the second had selected. **Anywhere one effect can cause
+another — and in this project that is nearly everywhere — recompute the pool
+per use, or re-check membership before you touch it.** The second instance
+cost nothing to find because the first had just been found.
+
 **A HAND-MAINTAINED NAME SET IS A CLAIM, AND CLAIMS ROT.** This has bitten
 four times in four files with the same shape — a list of card names written by
 hand, and a deck that moved past it (`ablation.SCRIPTED_*`, `tag_flying.py`'s
@@ -620,16 +643,25 @@ empty and a run silently REPRINTS THE OLD NUMBERS instead of measuring.
 it and compare before resuming one, and delete the cache if it differs.
 `./tools/regen_tables.sh` deletes by default, `--resume` does not.
 
-**CRN is the reason any of this is affordable, and a mid-game shuffle IS
-CURRENTLY BREAKING IT.** This finding used to read "across every engine
-`self.rng` is touched only for the opening shuffle and mulligans". **That was
-measured on 2026-09-11 and it is false in five files** — see queued item 19
-for the counts and the two A/B measurements. Azusa's fetch-land shuffle is the
-pattern everything else should follow: PRE-ROLLED seeds indexed by shuffle
-count, so the Nth shuffle in both branches applies the same permutation.
-`lorehold.sunbird` does not, and it is the worst offender. If you add anything
-that shuffles or rolls mid-game, do it azusa's way — and note that the A/A
-control cannot tell you whether you got it right.
+**CRN is the reason any of this is affordable, and mid-game randomness is
+now ADDRESSED RATHER THAN ORDERED (§0z17, 2026-09-13).** This finding twice
+read as a claim about the code and was twice wrong: first "`self.rng` is
+touched only for the opening shuffle and mulligans", then "that is false in
+five files". Both are now settled by a check instead of a claim. Every
+mid-game draw goes through `engine.CRNStreams`, where each effect has its own
+stream and its Nth firing reads index N, so one branch doing more of something
+cannot shift what the other reads. **The invariant is that after the opening
+hand `g.rng` is never touched again**, and `tests/test_crn_streams.py` asserts
+it over all six decks with a mutation check behind it. If you add anything
+that rolls or shuffles mid-game, call `crn_random` / `crn_randrange` /
+`crn_shuffle` — the test will catch you if you do not, which the A/A control
+never could.
+
+**And read §0z17 for what the fix was NOT worth.** Closing the leak did not
+measurably improve the pairing on either swap that motivated it — corr moved
+by less than the noise, and DOWN on one. "15.3% of seeds diverged" was never
+"15.3% of the pairing was lost". It ships as correctness and as a check that
+can fail, not as precision.
 
 ---
 
@@ -670,7 +702,10 @@ toward whatever got tagged. It is worse than no tags at all.
 
 **Say the knob out loud** when a card's evaluation swings on one:
 `destroy_share` (0.60), `opp_vote_policy` (`"adversarial"`),
-`flier_block_share` (0.30), `archetype_weights`. These are judgement calls,
+`flier_block_share` (0.30), `archetype_weights`. And say it when it does NOT:
+`altar_keep` was swept 6 → 0 in §0z20, quadrupling the sacrifices and leaving
+win rate inside its bar at every setting, which is the more useful result and
+the one nobody would have believed unmeasured. These are judgement calls,
 not measurements, and at least one card's ranking rests on each.
 
 **Push back on suspect conclusions.** Do not present a number whose mechanism
@@ -721,41 +756,24 @@ information would. §0v.
 Re-read against the code 2026-09-12; verdicts inline. Items closed before
 2026-09-07 have been moved to `docs/HISTORY.md` with their evidence.
 
-### THE ONE THING TO DO NEXT, after the regeneration
+### THE ONE THING TO DO NEXT
 
-**19. CRN IS LEAKING, AND `validate.py` CANNOT SEE IT.** The standing finding
-below says "across every engine `self.rng` is touched only for the opening
-shuffle and mulligans". **That is false in five files** — `engine.py:1208`
-(Arasta), `engine.py:1325` (Deathreap Ritual), `karlov.py:447` (Kambal),
-`lorehold.py:373,679,731,824,916`, `tivit.py:708`, `voting.py:101,104,156`.
-Measured by counting draws taken after the opening hand, on real A/B pairs:
-
-| swap | mid-game draws A | B | seeds where the branches diverged |
-|---|---|---|---|
-| rendmaw, March → Skullclamp | 202 | 216 | 17/400 (4.2%) |
-| lorehold, Scroll Rack → Sunbird's | 132 | **1100** | 46/300 (**15.3%**) |
-
-Once the two branches take a different number of draws, every later draw
-reads a different slot of the same stream and the pairing is broken from
-there on.
-
-**`lorehold.py:916` is `g.rng.shuffle(revealed)` — a mid-game library
-shuffle**, which is precisely what the standing finding warns about.
-`azusa.py:928` has the correct fix (pre-rolled `shuffle_seeds` indexed by
-`shuffles_done`); lorehold never got it.
-
-**`tools/validate.py` CANNOT DETECT THIS.** Its A/A control swaps a card for
-ITSELF, so the boards never diverge and the call sequence is identical by
-construction. The "non-negotiable" `+0.00` on 18 metrics is, for this class of
-leak, a check that cannot fail.
-
-Offered as a testable hypothesis and NOT as a conclusion, because §0b-i says
-the decay is worth not guessing at: **Sunbird's Invocation is by an order of
-magnitude the largest `g.rng` consumer in the project, and §0b-i's unattributed
-one-off decay is Sunbird's.** Port azusa's pre-rolled pattern, re-measure at
-the original N and seeds, and see whether the step moves. Whatever the answer,
-`validate.py` needs an A/B-based check that asserts mid-game draw counts match
-per seed.
+19. ~~CRN IS LEAKING, AND `validate.py` CANNOT SEE IT.~~ **DONE
+    2026-09-13 — §0z17, and it bought no precision.** All eleven mid-game
+    `g.rng` draws in five files now go through `engine.CRNStreams`, which
+    addresses each effect's own stream by occurrence instead of consuming one
+    shared sequence in order. `crn_streams=False` reproduces the old numbers
+    BIT-IDENTICALLY on all six engines, verified against a worktree at HEAD.
+    The replacement check asserts a structural invariant the A/A control could
+    not express — after the opening hand, `g.rng` is never touched again — and
+    `tests/test_crn_streams.py --mutate` proves it catches every reachable
+    reintroduction (exactly 5 of 6; the sixth is a dead call site).
+    **THE RESULT NOBODY PREDICTED: the pairing did not improve.** corr on the
+    worst-affected swap went 0.8979 → 0.9017 on damage and 0.7952 → 0.7901 on
+    win rate, both inside the noise at N=1,500. The leak was real; its cost
+    was not what the divergence rate implied. §0z17 carries the table.
+    **FIVE ENGINES' NUMBERS MOVE and all six tables need regenerating**;
+    shilgengar is bit-identical because it has no mid-game draws.
 
 11. ~~Re-verify the three staged swaps on the post-combat-split engine.~~
     **DONE 2026-09-09 — ALL THREE HOLD.** Re-run at original N and original
@@ -800,10 +818,20 @@ per seed.
     **withdrawn** on that basis. It is now in `PARTLY_MODELLED` rather than
     `SCRIPTED_AZUSA`, so its row prints under a heading that matches what it
     is and names the missing clause. §0z.
-15. **Azusa's REMAINING combos are invisible.** (Unchanged 2026-09-12.) Springheart + Lotus Cobra /
-    Tireless Provisioner is now implemented and measured (§0z1). **Ashaya +
-    Quirion Ranger is not**, and neither is implemented on either side, so any
-    Azusa list is still evaluated without that half of its combo density. §0z.
+15. ~~Azusa's REMAINING combos are invisible.~~ **ASHAYA DONE 2026-09-13
+    (§0z18) — +0.0140 ±0.0077 win rate, the second win-rate-positive
+    correctness result in the project.** "Nontoken creatures you control are
+    Forest lands" is implemented: the {G} mana ability (305.7), summoning
+    sickness (302.6), Titania reading creature deaths as land deaths, the
+    Forest count Sapling Nursery and Nissa read, and — the big one — **a
+    nontoken creature ENTERING fires landfall**, 6.65 times per resolution,
+    which is what drives tokens_made +62.8 through Scute Swarm.
+    **`docs/COMP_RULES.md` said the opposite** ("it must not fire landfall")
+    and is corrected in place; implementing the note as written would have
+    shipped the card understated. Ashaya is back in `SCRIPTED_AZUSA`.
+    **STILL OPEN: Quirion Ranger's activated ability**, which stays
+    `KNOWN_BLIND` — and its stated reason ("no modelled payoff") is now stale
+    in the other direction.
 16. ~~A token copy does not re-trigger the host's ETB.~~ **DONE 2026-09-10 —
     AND IT WAS WORTH NOTHING.** The dispatch is now `AzusaGame.etb()` and the
     copy path calls it. **The fix itself measured +0.0001, p=0.16** (N=15,000,
@@ -862,6 +890,14 @@ per seed.
     **WATCH SMOTHERING TITHE**: its "one Treasure per opponent per round, no
     roll" approximation was written when a Treasure was inert and is now three
     real mana a turn. Load-bearing where it used to be harmless.
+1b/3. ~~One cost per card; Ashnod's Altar's unspendable mana.~~ **BOTH DONE
+    2026-09-13 (§0z20).** Alternative costs now carry a PREFERENCE, so a
+    dearer-and-better mode (Mizzix's overload) can be expressed at all, and
+    all six engines read them through `engine.choose_mode` where one did
+    before. The Altar's mana is offered during the main phase when nothing
+    else is castable — and **fixing it did not rescue the card**: its row
+    moved −0.0030 → −0.0023, still inside its bar. Both §3 cards were also in
+    `KNOWN_BLIND` while being implemented, Deathreap Ritual entirely so.
 2.  **Artist's Talent's three Class levels** — Level 2 is granted free and
     instantly; Levels 1 and 3 do not exist.
 0b-i. **Sunbird's one-off decay is still unattributed — but it has stopped.**

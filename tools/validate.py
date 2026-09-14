@@ -63,6 +63,88 @@ aa, ab_, _ = run_ab(ad, ac, "Lotus Cobra", same, n=3000,
 for r in analyse(aa, ab_, metrics=("landfall_triggers", "lands_played", "damage")):
     print("  ", r.line("A", "A"))
 
+# ---------------------------------------------------------------------------
+# THE CRN AUDIT — the check the A/A control structurally cannot perform
+# ---------------------------------------------------------------------------
+# Every control above swaps a card for ITSELF. The two branches therefore never
+# diverge, take the same draws in the same order by construction, and print
+# +0.00 whether or not the engine leaks. Eleven mid-game leaks in five files
+# passed that check for months (§0z17 / queued item 19), and one of them —
+# Sunbird's Invocation — took 1,100 mid-game draws in the branch that had it
+# against 132 in the branch that did not, decorrelating 15.3% of seeds.
+#
+# So this runs REAL swaps, where the branches genuinely differ, and asserts the
+# structural invariant instead of a difference: once the opening hand is
+# decided, the game RNG is never touched again. Everything mid-game goes
+# through engine.CRNStreams, which is addressed by effect and occurrence rather
+# than consumed in order, so one branch doing more of something cannot shift
+# what the other branch reads. Nonzero below IS the bug.
+print("\n" + "=" * 78)
+print("CRN audit — real swaps, asserting the game RNG is sealed after the "
+      "opening hand")
+print("=" * 78)
+
+# The swap is a REPLACEMENT-LEVEL BLANK, exactly as `ablation.py` builds one,
+# for two reasons: it is a real divergence (the branches play different games),
+# and it needs no per-deck candidate catalog, so every engine is covered by the
+# same three lines and a new engine cannot be quietly left out of the audit —
+# which is how §0z16's per-deck blind spot happened.
+#
+# THE LISTS ARE `build_pending`'s, NOT THE MODULES' — and getting this wrong
+# once already cost the audit its whole point. The first version built each
+# deck from its module, which is the COMMITTED list, and on that list
+# lorehold's `sunbird()` never executes: Sunbird's Invocation is STAGED, not
+# committed. So the audit ran clean over the single worst leak in the project
+# — the 1,100-draw one this section exists to prevent — and a mutation putting
+# that leak back was not detected, because the code was never reached.
+# `ablation.py` and `candidates.py` both measure `build_pending`, so that is
+# the list an audit of their randomness has to range over. §0z15's rule: a
+# check that skips a category is blind exactly where the bug is.
+from edhmc.engine import Card
+from edhmc.experiment import repl_priority
+from edhmc.pending import build_pending
+
+
+def blank_for(d):
+    return Card(name="__crn_blank__", types=frozenset({"Creature"}),
+                cost={"gen": 3}, power=1, toughness=1,
+                priority=repl_priority(d))
+
+
+CRN_CASES = [
+    ("rendmaw", "March of the World Ooze", None),
+    ("lorehold", "Verge Rangers", lh_sim),
+    ("tivit", "Academy Manufactor", tv_sim),
+    ("karlov", "Blood Artist", kv_sim),
+    ("shilgengar", "Blood Artist", sg_sim),
+    ("azusa", "Lotus Cobra", az_sim),
+]
+
+failures = 0
+for name, out_name, sim in CRN_CASES:
+    d, c = build_pending(name)
+    ra_, rb_, _ = run_ab(d, c, out_name, blank_for(d), n=300,
+                         cfg={"turns": 20, "crn_audit": True}, sim=sim)
+    leaked_a = sum(r.get("rng_after_opening", 0) for r in ra_)
+    leaked_b = sum(r.get("rng_after_opening", 0) for r in rb_)
+    mid_a = sum(r.get("crn_draws", 0) for r in ra_)
+    mid_b = sum(r.get("crn_draws", 0) for r in rb_)
+    ok = (leaked_a == 0 and leaked_b == 0)
+    failures += not ok
+    print(f"  {name:<10} game-RNG draws after opening hand: "
+          f"A={leaked_a} B={leaked_b}   {'OK' if ok else '*** LEAKING ***'}")
+    print(f"  {'':<10} addressed mid-game draws (may differ — that is the "
+          f"decks differing, not a leak): A={mid_a} B={mid_b}")
+
+if failures:
+    raise SystemExit(
+        "\nCRN AUDIT FAILED. A branch drew from the game RNG after its opening "
+        "hand, so the two branches of every A/B test can consume different "
+        "numbers from the same sequence and the pairing breaks from there on. "
+        "Route the draw through engine.crn_random / crn_randrange / "
+        "crn_shuffle. See KNOWN_ISSUES.md §0z17.")
+print("  -> sealed on every engine tested.")
+
 # The same real comparison as always, now run in the other direction: March
 # is in the deck as of v12, so this swaps it back out for the cut Skullclamp.
 print("\nCRN variance reduction on the real comparison:")

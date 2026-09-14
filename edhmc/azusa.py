@@ -18,6 +18,14 @@ runs through, the same way `on_creature_death` is the aristocrats hook in
 (Azusa +2, Exploration +1, Oracle of Mul Daya +1, Wayward Swordtooth +1 once
 Ascended) and are computed fresh each turn in `land_drops_for_turn()`.
 
+ASHAYA'S SECOND CLAUSE IS LIVE AS OF 2026-09-13 (§0z18), and it changes what
+"a land" means everywhere in this file. While Ashaya is on the battlefield,
+every NONTOKEN creature you control is a Forest land: it taps for {G} once it
+is not summoning sick, it counts in `land_count()` and `forests()`, it fires
+LANDFALL as it enters (the official ruling, not 603.6a's other half), and its
+death is a land death for Titania. `ashaya_lands=False` restores the old
+behaviour. Read `creature_land_mana` before touching `available_mana`.
+
 FETCH LANDS ARE MODELLED AS TWO LANDFALL TRIGGERS, ON PURPOSE. Playing
 Terramorphic Expanse / Windswept Heath / Wooded Foothills is a land ETB
 (landfall #1); cracking it fetches a second land that also enters the
@@ -119,7 +127,9 @@ import re
 
 from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
-                          hand_colour_demand, engine_cfg)
+                          hand_colour_demand, engine_cfg, choose_mode,
+                          CRNStreams, crn_random, crn_randrange,
+                          crn_shuffle, make_rng, seal_rng)
 from edhmc.decks._evasion import FOREST, HUMAN
 from edhmc import opponents as OPP
 
@@ -154,21 +164,25 @@ TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
 # a missing entry would silently make it a 0/0 and die on arrival. That is the
 # §0q rule -- a hand-maintained set is a claim, so derive or check it.
 DYNAMIC_PT_LANDS = frozenset({
-    # ASHAYA IS ONLY HALF IMPLEMENTED, and this is the call-out ablation.py
-    # points at. KNOWN_ISSUES §0z. The card reads:
+    # ASHAYA IS FULLY IMPLEMENTED AS OF 2026-09-13 (§0z18, queued 15). Both
+    # sentences, verified against Scryfall the same day:
     #
     #   "Ashaya's power and toughness are each equal to the number of lands
     #    you control. NONTOKEN CREATURES YOU CONTROL ARE FOREST LANDS IN
     #    ADDITION TO THEIR OTHER TYPES."
     #
-    # The second sentence does not exist in this engine. It is the half that
-    # matters most: it turns the deck's creatures into lands, which is a
-    # combo with Quirion Ranger (in the deck, and in KNOWN_BLIND) and changes
-    # available_mana, land_drops_for_turn, playable_lands, land_entered,
-    # land_died and Titania all at once -- which is also why it is not
-    # implemented. **Ashaya's ablation row is therefore not evidence about
-    # Ashaya, and it must not be cut on the strength of it.** A cut of it was
-    # staged and withdrawn on 2026-09-10 for exactly this reason.
+    # The second sentence lives in `ashaya_lands` / `is_creature_land` /
+    # `creature_lands` / `land_count` and the five places that read them:
+    # the {G} mana ability (305.7), the landfall a nontoken creature fires as
+    # it ENTERS, Titania reading creature deaths as land deaths, `forests()`
+    # for Sapling Nursery and Nissa, and this P/T set, which now counts the
+    # creature-lands and therefore counts Ashaya itself -- the second official
+    # ruling says so explicitly.
+    #
+    # Its row WAS not evidence about the card and a cut of it was staged and
+    # withdrawn on 2026-09-10 for that reason (§0z). That is now history: the
+    # row is evidence again, and Ashaya has moved back from PARTLY_MODELLED
+    # into SCRIPTED_AZUSA.
     "Ashaya, Soul of the Wild",
     "Greensleeves, Maro-Sorcerer",
     "Cultivator Colossus",
@@ -289,7 +303,10 @@ class AzusaGame:
         # first engine constructed decide them for every later one.
         # See engine.engine_cfg.
         self.cfg = cfg = engine_cfg(cfg)
-        self.rng = random.Random(seed)
+        self.rng = make_rng(seed, cfg)
+        # Mid-game randomness lives here, NOT on self.rng. §0z17.
+        self.crn = CRNStreams(seed)
+        self.seed = seed          # only the legacy shuffle path reads it
         self.library = list(deck)
         self.rng.shuffle(self.library)
         self.hand: list[Card] = []
@@ -342,9 +359,14 @@ class AzusaGame:
         # permutation to two equal-length libraries, which is precisely the
         # property that makes the OPENING shuffle CRN-safe and keeps the
         # swapped card in the same slot.
-        _shuf = random.Random(seed ^ 0x5F0F)
-        self.shuffle_seeds = [_shuf.getrandbits(32) for _ in range(64)]
-        self.shuffles_done = 0
+        # THIS ENGINE HAD THE ONLY CORRECT IMPLEMENTATION IN THE PROJECT and
+        # it is now the shared one: `engine.CRNStreams` is this pattern
+        # generalised from shuffles to every mid-game draw, and all six
+        # engines use it (§0z17). The private `shuffle_seeds` list is gone
+        # rather than kept alongside it, because a rule implemented twice is
+        # implemented two different ways -- six instances of that on record,
+        # §0u. The permutations differ from the pre-2026-09-13 ones, so this
+        # deck's numbers move even though its behaviour is unchanged.
 
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
@@ -359,6 +381,9 @@ class AzusaGame:
             "test_card_answered": 0, "test_card_removed": 0,
             "test_card_countered": 0,
             "lands_played": 0, "landfall_triggers": 0, "fetches_cracked": 0,
+            # §0z18 -- Ashaya's second clause, counted so the mechanism can be
+            # read directly rather than inferred from win rate.
+            "ashaya_landfall": 0, "ashaya_land_deaths": 0,
             "library_shuffles": 0, "lands_from_hand": 0,
             "lands_from_library": 0, "lands_from_graveyard": 0,
             "reroll_fetches": 0,
@@ -458,6 +483,68 @@ class AzusaGame:
                 best = a
         return best
 
+    # -- Ashaya's second clause (queued 15, §0z18) -------------------------
+
+    def ashaya_lands(self) -> bool:
+        """Is "nontoken creatures you control are Forest lands" live?
+
+        Ashaya, Soul of the Wild, verified against Scryfall 2026-09-13:
+
+            Ashaya's power and toughness are each equal to the number of
+            lands you control. Nontoken creatures you control are Forest
+            lands in addition to their other types. (They're still affected
+            by summoning sickness.)
+        """
+        return (self.cfg.get("ashaya_lands", True)
+                and self.has("Ashaya, Soul of the Wild"))
+
+    def is_creature_land(self, perm) -> bool:
+        """Is this permanent a land ONLY because of Ashaya?
+
+        `not perm.card.is_land` excludes Dryad Arbor, which is already a Land
+        Creature -- Forest Dryad -- and would otherwise be counted twice in
+        every land count in this engine.
+        """
+        return (perm.card.is_creature and not perm.is_token
+                and not perm.card.is_land)
+
+    def creature_land_mana(self, perm) -> bool:
+        """Does this permanent tap for Ashaya's Forest {G}?
+
+        THE WHOLE RULE IN ONE PLACE, because each clause of it is a separate
+        claim and a test has to be able to break them one at a time. Inlined
+        in `available_mana` it was three conditions in an `elif` chain that no
+        mutation could reach individually, which is the shape §0z15 warns
+        about -- a check that cannot fail for part of what it covers.
+
+          305.7   a Forest has the intrinsic "{T}: Add {G}"
+          one {T} a creature that already has a mana ability does NOT get a
+                  second: it gains Forest's, but there is one tap to spend, so
+                  it uses its own. Without this every dork in the list doubles.
+          302.6   and not the turn it arrives; the reminder text says so
+        """
+        if not self.ashaya_lands() or not self.is_creature_land(perm):
+            return False
+        if perm.card.mana_ability:
+            return False
+        return not perm.sick
+
+    def creature_lands(self):
+        if not self.ashaya_lands():
+            return []
+        return [p for p in self.board if self.is_creature_land(p)]
+
+    def land_count(self) -> int:
+        """Lands you control, Ashaya's clause included.
+
+        Ashaya's own */* reads this, and the second official ruling is
+        explicit that it counts ITSELF: "As long as Ashaya is on the
+        battlefield, it's affected by its second ability and thus its first
+        ability counts itself."
+        """
+        return (sum(1 for p in self.board if p.card.is_land)
+                + len(self.creature_lands()))
+
     def counts_as_creature(self, perm):
         """Is this permanent a creature RIGHT NOW?
 
@@ -510,7 +597,7 @@ class AzusaGame:
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
-            p = sum(1 for q in self.board if q.card.is_land)
+            p = self.land_count()
         p += self._pump(perm)
         return p
 
@@ -521,7 +608,7 @@ class AzusaGame:
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
-            t = sum(1 for q in self.board if q.card.is_land)
+            t = self.land_count()
         t += self._pump(perm)
         return t
 
@@ -600,6 +687,26 @@ class AzusaGame:
             perm.counters += 1
             self.draw(1)
             self.m["henge_draws"] += 1
+        # ASHAYA: A NONTOKEN CREATURE ENTERING IS A LAND ENTERING, AND THAT
+        # FIRES LANDFALL. The official ruling is explicit and it is the
+        # opposite of what docs/COMP_RULES.md used to say:
+        #
+        #   "You can't play creature cards as lands; you'll still have to
+        #    cast them as spells, and THEY'LL ENTER THE BATTLEFIELD AS LANDS
+        #    (in addition to their other types)."  (2020-09-25)
+        #
+        # 603.6a is about the OTHER direction -- a creature already on the
+        # battlefield when Ashaya resolves gains the type without an
+        # enters-the-battlefield event, so it fires nothing. Both halves
+        # matter and only one of them was written down. In a 28-creature
+        # landfall list this branch is the larger half of the card.
+        #
+        # `played=False`: this is not a land drop. The same ruling says so --
+        # you cast the creature, you do not play it as a land -- so Horn of
+        # Greed's "whenever a player PLAYS a land" is correctly not triggered.
+        if self.ashaya_lands() and self.is_creature_land(perm):
+            self.m["ashaya_landfall"] += 1
+            self.land_entered(card, played=False)
         return perm
 
     def make_tokens(self, n, p, t, subtype=""):
@@ -657,6 +764,15 @@ class AzusaGame:
                     continue
                 amt, colors = c.mana_ability
                 add(colors, amt, p)
+            # NOT an `elif`, and that is the point. As an `elif` the chain
+            # above answered the one-{T} question by short-circuiting, so the
+            # SAME RULE lived both here and in `creature_land_mana` -- §0u's
+            # shape, and a mutation of the predicate could not reach it, which
+            # is how it was found. The predicate is now the only place the
+            # rule is written; it returns False for a card with its own mana
+            # ability, so a dork still taps once.
+            if self.creature_land_mana(p):
+                add(frozenset({"G"}), 1, p)
         # Lotus Cobra's and Tireless Provisioner's floating mana has NO owner:
         # nothing on the battlefield taps for it, so `spend` must not try.
         for src in self.bonus_mana:
@@ -930,13 +1046,33 @@ class AzusaGame:
         self.m["nissa_transforms"] += 1
 
     def shuffle_library(self):
-        """A shuffle from a card effect, drawn from the pre-rolled seeds so it
-        cannot decorrelate the A/B pair. See __init__."""
-        if self.shuffles_done >= len(self.shuffle_seeds):
-            return                      # absurdly long game; stop shuffling
-        seed = self.shuffle_seeds[self.shuffles_done]
-        self.shuffles_done += 1
-        random.Random(seed).shuffle(self.library)
+        """A shuffle from a card effect, drawn from a pre-rolled stream so it
+        cannot decorrelate the A/B pair. See __init__ and engine.CRNStreams.
+
+        THE LEGACY BRANCH IS NOT `g.rng`, WHICH IS THE POINT. Everywhere else
+        `crn_streams=False` restores the pre-2026-09-13 behaviour by falling
+        back to the game RNG, because that is what those sites used to do. This
+        site never did: azusa had the project's only correct implementation
+        already, so its "old behaviour" is its OWN pre-rolled seed list, and
+        routing it to `g.rng` under the knob would not reproduce the old
+        numbers -- it would introduce a leak this engine never had, in the one
+        engine that got it right. The old seeds are rebuilt here exactly as
+        `__init__` used to, so azusa's pre-2026-09-13 numbers stay reproducible
+        (§0z17).
+        """
+        if not self.cfg.get("crn_streams", True):
+            if not hasattr(self, "_legacy_shuffle_seeds"):
+                _shuf = random.Random(self.seed ^ 0x5F0F)
+                self._legacy_shuffle_seeds = [_shuf.getrandbits(32)
+                                              for _ in range(64)]
+                self._legacy_shuffles_done = 0
+            if self._legacy_shuffles_done >= len(self._legacy_shuffle_seeds):
+                return                  # absurdly long game; stop shuffling
+            seed = self._legacy_shuffle_seeds[self._legacy_shuffles_done]
+            self._legacy_shuffles_done += 1
+            random.Random(seed).shuffle(self.library)
+        else:
+            crn_shuffle(self, "library", self.library)
         self.m["library_shuffles"] += 1
 
     def land_died(self, card):
@@ -1138,8 +1274,16 @@ class AzusaGame:
 
     def forests(self):
         """Forests you control. A SUBTYPE, so it is read from the generated
-        set rather than from Card.types -- see decks/_evasion.py."""
-        return sum(1 for p in self.board if p.card.name in FOREST)
+        set rather than from Card.types -- see decks/_evasion.py.
+
+        Ashaya's creature-lands are FORESTS specifically, not generic lands,
+        so they count here as well as in `land_count`. Two live consumers,
+        both flagged as floors in docs/COMP_RULES.md: Sapling Nursery's
+        Affinity for Forests, and Nissa Who Shakes the World's "whenever you
+        tap a Forest for mana".
+        """
+        return (sum(1 for p in self.board if p.card.name in FOREST)
+                + len(self.creature_lands()))
 
     def resolve(self, card):
         if card.name in self.cfg.get("watch", ()):
@@ -1340,7 +1484,7 @@ class AzusaGame:
             pass   # its DEATH trigger is in on_creature_death
 
     def your_lands(self):
-        return [p for p in self.board if p.card.is_land]
+        return [p for p in self.board if p.card.is_land] + self.creature_lands()
 
     def rude_awakening(self):
         """Rude Awakening {4}{G}, entwine {2}{G}. Verified 2026-09-07.
@@ -1419,6 +1563,20 @@ class AzusaGame:
         return False
 
     def on_creature_death(self, n=1, perm=None):
+        # ASHAYA + TITANIA. Titania reads "whenever a LAND you control is put
+        # into a graveyard from the battlefield", and under Ashaya every
+        # nontoken creature you control is a land -- so every creature death
+        # is a Titania trigger and a 5/3 Elemental. Both cards are in this
+        # list and neither half of the interaction existed before §0z18.
+        #
+        # Tokens are excluded by `is_creature_land`, which is what stops
+        # Titania feeding on the Insect tokens Scute Swarm makes -- and stops
+        # her own 5/3 Elementals feeding her, which would be a loop.
+        if (perm is not None and self.ashaya_lands()
+                and self.is_creature_land(perm)):
+            self.m["ashaya_land_deaths"] += 1
+            if self.has("Titania, Protector of Argoth"):
+                self.make_tokens(1, 5, 3, "Elemental")
         for _ in range(n):
             if perm is not None and perm.card.name == "Yavimaya Elder":
                 for _ in range(2):
@@ -1694,9 +1852,12 @@ class AzusaGame:
                 # creatures and to nothing else. It sits AFTER the real units,
                 # which is what lets the payment below tell the two apart.
                 pool = units + self.creature_mana if c.is_creature else units
-                pay = can_pay(self.cost_of(c), pool)
-                if pay is not None:
-                    options.append((c, pay))
+            # §1b: every way the card can be cast, not just the printed
+            # cost. No card in this list declares one today; the point is
+            # that one CAN, and check_alt_cost_coverage enforces it.
+                _m = choose_mode(c, self.cost_of(c), pool)
+                if _m is not None:
+                    options.append((c, _m[2]))
             if not enablers_only and self.library and (self.has("Augur of Autumn")):
                 top = self.library[-1]
                 if top.is_creature and self._coven():
@@ -2201,11 +2362,16 @@ def take_turn(g):
 def simulate(deck, commander, cfg, seed):
     g = AzusaGame(deck, commander, cfg, seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     for _ in range(cfg.get("turns", 20)):
         take_turn(g)
         if g.result is not None:
             break
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["damage_by_turn"] = g.damage_by_turn
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn

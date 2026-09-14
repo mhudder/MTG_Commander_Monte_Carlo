@@ -20,7 +20,7 @@ from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
       threat=0.0, miracle=None, treasures=0, mana=None,
       pod_damage=0.0, tokens=(), discards=0, land_face=(), x_pips=0,
-      haste=False):
+      haste=False, alt_costs=()):
     """mana: (amount, "RWC") if the permanent taps for mana.
     pod_damage: direct damage dealt across the three opponents.
     tokens: (count, power, toughness) created on resolution."""
@@ -31,6 +31,7 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 miracle_cost=miracle or {}, treasures=treasures,
                 pod_damage=pod_damage, tokens=tokens, discards=discards,
                 land_face=land_face, x_pips=x_pips, haste=haste,
+                alt_costs=alt_costs,
                 flying=name in FLYING,
                 indestructible=name in INDESTRUCTIBLE)
 
@@ -125,7 +126,8 @@ INSTANTS = [
     C("Unexpected Windfall", "Instant", {"gen": 2, "R": 2}, priority=4,
       script="draw2_treasure", treasures=2, discards=1),
     C("Bolt Bend", "Instant", {"gen": 3, "R": 1}, priority=1),
-    C("Invoke Calamity", "Instant", {"gen": 1, "R": 4}, priority=5, threat=6.0),
+    C("Invoke Calamity", "Instant", {"gen": 1, "R": 4}, priority=5, threat=6.0,
+      script="invoke_calamity"),
     C("Perch Protection", "Instant", {"gen": 4, "W": 2}, priority=3),
     # NOT a wipe: each opponent exiles their single greatest-power creature,
     # plus spell-mastery damage. Modelled as an edict, not a board sweep.
@@ -139,8 +141,14 @@ INSTANTS = [
 SORCERIES = [
     C("Faithless Looting", "Sorcery", {"R": 1}, priority=3, script="draw2", discards=2),
     C("Gamble", "Sorcery", {"R": 1}, priority=3),
+    # OVERLOAD IS A DECLARED MODE as of 2026-09-13 (§1b / §0z20), not a
+    # hand-written branch in main_phase with the cost typed out twice. The
+    # +1.0 preference is what says "dearer AND better": copy EVERY instant
+    # and sorcery in the graveyard rather than one, so take it whenever the
+    # mana is there. See engine.castable_modes.
     C("Mizzix's Mastery", "Sorcery", {"gen": 3, "R": 1}, priority=7, threat=7.5,
-      script="mastery"),   # overload {5}{R}{R}{R} handled in main_phase
+      script="mastery",
+      alt_costs=(({"gen": 5, "R": 3}, "overload", 1.0),)),
     # Modal wheel-for-what-you-pitched, not a flat draw 2. See lorehold.py's
     # `borrowed_knowledge` script and KNOWN_ISSUES §0f.
     C("Borrowed Knowledge", "Sorcery", {"gen": 2, "R": 1, "W": 1}, priority=3,
@@ -159,7 +167,8 @@ SORCERIES = [
       script="mother_lode"),
     C("Improvisation Capstone", "Sorcery", {"gen": 5, "R": 2}, priority=5, threat=7.0),
     C("Restoration Seminar", "Sorcery", {"gen": 5, "W": 2}, priority=5, threat=7.5),
-    C("Volcanic Vision", "Sorcery", {"gen": 5, "R": 2}, priority=4, threat=6.5),
+    C("Volcanic Vision", "Sorcery", {"gen": 5, "R": 2}, priority=4, threat=6.5,
+      script="volcanic_vision"),
     C("Ondu Inversion", "Sorcery", {"gen": 6, "W": 2}, priority=3, tags=("wipe", "mdfc",),
       land_face=("W", True)),
     C("Call Forth the Tempest", "Sorcery", {"gen": 5, "R": 3}, priority=4, threat=7.0),

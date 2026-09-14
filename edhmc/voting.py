@@ -66,6 +66,10 @@ still ties, so both look weak. ABLATE THEM AS A GROUP.
 from __future__ import annotations
 
 from edhmc import opponents as OPP
+# Imported as a module, not by name: `engine` imports nothing from
+# `voting`, but `tivit` imports both, and a from-import here would make
+# the cycle depend on which lands first.
+from edhmc import engine as ENG
 
 # Cards that grant you an extra vote while on the battlefield.
 EXTRA_VOTE = ("Tivit, Seller of Secrets", "Ballot Broker",
@@ -98,10 +102,11 @@ def _opp_picks_against(g) -> bool:
     if policy == "adversarial":
         return True
     if policy == "random":
-        return g.rng.random() < 0.5
+        return ENG.crn_random(g, "vote_random") < 0.5
     # "selfish": an opponent optimises for themselves, which lands on the
     # anti-you choice only some of the time.
-    return g.rng.random() < g.cfg.get("opp_vote_selfish_agree", 0.6)
+    return (ENG.crn_random(g, "vote_selfish")
+            < g.cfg.get("opp_vote_selfish_agree", 0.6))
 
 
 def dilemma(g, label="tivit"):
@@ -153,7 +158,8 @@ def tempting_offer(g) -> int:
     helps you more than them, which is the whole design of the mechanic.
     """
     rate = g.cfg.get("tempting_offer_rate", 0.5)
-    takers = sum(1 for _ in OPP.living(g) if g.rng.random() < rate)
+    takers = sum(1 for i, _ in enumerate(OPP.living(g))
+                 if ENG.crn_random(g, f"tempting_offer{i}") < rate)
     g.m["offers_taken"] += takers
     return 1 + takers
 

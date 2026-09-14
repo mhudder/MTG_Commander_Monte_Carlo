@@ -80,10 +80,36 @@ The three rules together say what implementing the second sentence means:
   is a returnable Forest.
 * **302.6** — and they cannot tap for it the turn they arrive. The card's own
   reminder text says so, and `Permanent.sick` already carries exactly this.
-* **603.6a** — **it must not fire landfall.** A creature already on the
-  battlefield gaining the land type is not an event putting a permanent onto
-  the battlefield. In a landfall deck a naive implementation would trigger
-  every payoff off every creature and the error would be enormous.
+* **603.6a** — **half of this entry was wrong, and it was corrected on
+  2026-09-13 when the clause was actually implemented (§0z18). Read the
+  correction before the original.**
+
+  ORIGINAL, and true only of one direction: "it must not fire landfall. A
+  creature already on the battlefield gaining the land type is not an event
+  putting a permanent onto the battlefield. In a landfall deck a naive
+  implementation would trigger every payoff off every creature and the error
+  would be enormous."
+
+  THAT IS RIGHT ABOUT CREATURES ALREADY ON THE BATTLEFIELD WHEN ASHAYA
+  RESOLVES — they gain the type with no ETB event and trigger nothing — AND
+  WRONG ABOUT EVERY CREATURE THAT ENTERS AFTERWARDS. The official ruling
+  (2020-09-25) settles it:
+
+  > "You can't play creature cards as lands; you'll still have to cast them as
+  > spells, and **they'll enter the battlefield as lands** (in addition to
+  > their other types)."
+
+  A nontoken creature cast under Ashaya **enters as a land and fires
+  landfall.** In this 28-creature list that is the LARGER half of the card:
+  6.65 triggers per resolution, and the whole +0.0140 win rate rests mostly on
+  it. Written as a blanket prohibition, this entry would have shipped Ashaya
+  understated — and its closing sentence reads as a warning against the
+  correct behaviour.
+
+  **The lesson, which is why the wrong version is kept above:** a rule number
+  is evidence about the GAME, and the rulings are evidence about the CARD. This
+  entry reasoned from 603.6a alone and never checked Ashaya's own rulings,
+  which are one API call away and say the opposite.
 
 **`edhmc/azusa.py`'s own note on the gap is now incomplete.** It lists the
 blast radius as `available_mana, land_drops_for_turn, playable_lands,

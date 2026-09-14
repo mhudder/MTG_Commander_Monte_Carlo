@@ -68,13 +68,23 @@ three times too large.
 ### What still needs doing
 
 1. ~~Regenerate the tables.~~ **DONE 2026-09-12**, all six, from empty caches.
-2. **The common-random-numbers leak.** The technique that makes this project
-   affordable relies on two simulated games staying in lockstep, and in five
-   files they don't. Measured at up to **15% of games** on one Lorehold
-   comparison. It doesn't invalidate results — it makes them noisier than the
-   error bars claim — but it is now clearly the largest known problem, and the
-   self-check that should catch it structurally can't. `CLAUDE.md` queued
-   item 19. **This is the thing to do next.**
+2. ~~**The common-random-numbers leak.**~~ **FIXED 2026-09-13**
+   (`KNOWN_ISSUES.md` §0z17). All eleven mid-game draws across five files now
+   use per-effect addressed streams, and a new check asserts the invariant the
+   old self-check structurally could not: after the opening hand, the game RNG
+   is never touched again.
+
+   **Correct the claim this entry used to make.** It said the leak "makes them
+   noisier than the error bars claim". Measured before and after on the two
+   swaps that motivated it, the pairing did not improve — the correlation moved
+   by less than the noise, and downward on one of them. "15% of games diverged"
+   is not "15% of the pairing was lost", because the dominant shared randomness
+   is the opening shuffle and that was never broken. The defect was real and
+   worth closing; its cost was smaller than this file implied.
+
+   The consequence is a regeneration, not a correction: five engines' numbers
+   move (Shilgengar's do not — it has no mid-game draws), so **all six tables
+   need rebuilding.**
 3. **Commit the staged card swaps — three of them, not four.** The two Lorehold
    swaps and the Azusa one are waiting only on the three-leg discipline below;
    Caldera Pyremaw's own row got *stronger* in the regeneration. The Rendmaw
@@ -86,10 +96,23 @@ three times too large.
    gap silently invalidates notes written while it was open, and nothing
    re-reads them.
 
+**2026-09-13 also closed three long-open modelling gaps**, all measured, all
+behind knobs, all with mutation-tested checks: the common-random-numbers leak
+(§0z17, no precision gained — see the entry), **Ashaya's second clause**
+(§0z18, **+0.0140** win rate on Azusa) and **§7's six recursion cards**
+(§0z19, **+0.0220** on Lorehold, +0.0040 on Rendmaw), plus **§3 and §1b**
+(§0z20 — the Altar's mana is spendable at last, and alternative costs finally
+distinguish "cheaper and worse" from "dearer and better"; neither moved a win
+rate). Five decks' numbers have moved and **all six tables need regenerating.**
+
+Seven numbered issues were closed in the day: §0z17–§0z20 covering queued
+item 19, item 15, §7, §3 and §1b.
+
 There is also a standing limitation, not a bug: the opponents are an abstract
 threat level rather than real cards, so roughly a third of every deck (removal
-spells, counterspells) can't be evaluated at all. That is `KNOWN_ISSUES.md` §4
-and it would be a rewrite, not a fix.
+spells, counterspells) can't be evaluated at all — 117 of 379 nonland cards,
+counted 2026-09-13. That is `KNOWN_ISSUES.md` §4 and it would be a rewrite,
+not a fix.
 
 ## What this is
 

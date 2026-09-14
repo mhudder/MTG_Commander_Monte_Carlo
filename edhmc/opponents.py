@@ -548,6 +548,14 @@ def destroy(g, perm, roll=None, destroys=None):
         g.commander_tax += 2
     elif not perm.is_token:
         g.graveyard.append(perm.card)
+        # ARTIFACT RECURSION (§7 / §0z19). Discovered by `hasattr`, exactly as
+        # `on_creature_death` above is: only the Rendmaw engine holds the three
+        # cards that care, and the other five must not grow a method to say so.
+        # Called AFTER the card reaches the graveyard, because Scrap Trawler
+        # compares mana values against the artifact that just died and the
+        # returned card must not be that card.
+        if hasattr(g, "artifact_died"):
+            g.artifact_died(perm.card)
     return True
 
 

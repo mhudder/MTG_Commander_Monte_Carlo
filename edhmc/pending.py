@@ -37,6 +37,24 @@ baseline and a common baseline cannot rank two cards against each other (§0c).
 
 To stage a change, append to CHANGES. To commit, update the spreadsheet and
 the deck module, then move the entry to COMMITTED.
+
+AND THE FOURTH STATE, added 2026-09-13:
+
+    WITHDRAWN  was STAGED and has been UNSTAGED. `WITHDRAWN: list[Change]`,
+               each carrying a `withdrawn` field saying when and why.
+               `build_pending` does NOT apply these, so an unstaged change is
+               out of every baseline the moment it moves here.
+
+It exists because DELETING the entry was the alternative, and the entry is
+where the evidence lives. A swap that was staged and then unstaged is not the
+same thing as a swap nobody ever proposed: the next reader needs to know it was
+considered, what it measured, and what took it off the list -- otherwise the
+same card gets re-measured and re-staged from scratch. This is the ledger's
+version of the `-old` entries CLAUDE.md keeps for its superseded findings.
+
+A WITHDRAWN entry is NOT a refutation. Re-staging one is a matter of moving it
+back to CHANGES with fresh evidence; the `withdrawn` field says what that
+evidence would have to answer.
 """
 
 from __future__ import annotations
@@ -58,6 +76,7 @@ class Change:
     evidence: str = ""
     notes: str = ""
     reverified: str = ""        # re-measured after an engine change
+    withdrawn: str = ""         # set only on WITHDRAWN: when, and why
 
 
 @dataclass
@@ -934,92 +953,6 @@ CHANGES: list[Change] = [
             "way cutting Bane is not."
         ),
     ),
-
-    Change(
-        deck="rendmaw",
-        remove="Idol of Oblivion",
-        add="Cauldron of Essence",
-        staged="2026-09-04",
-        rationale=(
-            "Cauldron's drain half is The Meathook Massacre's text word for "
-            "word — 'each opponent loses 1 life and you gain 1 life' — so it "
-            "is 3 pod life per creature death in a deck that loses a dozen "
-            "tokens a game: 12.4 drain damage per game it resolves. Its second "
-            "half is a repeatable sac outlet AND recursion (0.55 reanimations "
-            "a game), stocked mostly by the pod's own wraths, which is exactly "
-            "when you want it. Idol of Oblivion is a noncreature artifact that "
-            "ablates inside its own error bars, so cutting it costs no body."
-        ),
-        evidence=(
-            "Measured as the real swap under POD v3 (the current default), "
-            "6,000 paired games: win rate +0.0027 [+0.0007, +0.0048] at 10 "
-            "turns and +0.0135 [+0.0088, +0.0182] at 20; damage +0.95 and "
-            "+1.03. Significant on both metrics at both horizons."
-        ),
-        notes=(
-            "THE CUT CHANGED, and this is the clearest thing the new pod model "
-            "has produced. The original staging cut Ornithopter of Paradise, "
-            "which measured fine on the old pod (+0.0025 / +0.0158) and then "
-            "DECAYED as the model improved: v2 +0.0018 / +0.0155, v3 -0.0015 "
-            "[-0.0037, +0.0007] / +0.0088. The mechanism is that Ornithopter "
-            "is a 0/2 BODY as well as a dork and Cauldron is not a creature — "
-            "under pod v3 creatures attack whoever cannot block, so a spare "
-            "blocker is worth something the old pod priced at exactly zero. "
-            "Controlled check, same card in, three different cuts, pod v3, "
-            "20 turns: cutting the noncreature Idol +0.0135 [+0.0088, +0.0182]; "
-            "cutting the 0/2 Ornithopter +0.0088 [+0.0038, +0.0138]; cutting "
-            "the 1/2 Dockside Chef +0.0048 [+0.0000, +0.0097]. Monotonic in "
-            "whether the cut was a body. "
-            "COSTS, both measured and both real: Cauldron is one card type, so "
-            "the swap still loses a commander trigger, and Idol is this deck's "
-            "token-payoff draw engine — tokens_made -0.15. "
-            "SEPARATELY: the engine models Blood Artist at 3x its real drain, "
-            "which inflates the baseline Cauldron is measured alongside. "
-            "Cauldron's 3.0 is the one of the two that is correct."
-        ),
-        reverified=(
-            "RE-VERIFIED 2026-09-09 on the post-combat-split engine "
-            "(KNOWN_ISSUES.md §0v), because that change moved 16 of rendmaw's "
-            "64 ablation rows and this swap's evidence predates it. Measured "
-            "at the SAME N=6,000 and the same seeds as the original, so any "
-            "difference is the engine and not the sample: win rate +0.0022 "
-            "[+0.0007, +0.0038] at 10 turns and +0.0152 [+0.0107, +0.0198] at "
-            "20, against the original +0.0027 [+0.0007, +0.0048] and +0.0135 "
-            "[+0.0088, +0.0182]. Both horizons reproduce inside their own "
-            "bars and both remain significant; the T20 point estimate rose "
-            "slightly. Every mechanism counter kept its sign and rough "
-            "magnitude too — damage +1.55, cards_drawn -0.26, tokens_made "
-            "-0.16, stranded_mv +1.15 — so the predicted costs are still "
-            "real and still outweighed. The decision stands. "
-            "diagnostics/run_swaps_0904.py, results/staged_recheck_rendmaw.txt. "
-            "\n\n"
-            "RE-MEASURED 2026-09-12 on the §0z9–§0z15 engine, AND THIS ONE DID "
-            "NOT REPRODUCE. Same N=6,000, same seeds, same harness, so the "
-            "engine is again the only thing that changed: win rate "
-            "+0.0000 [-0.0010, +0.0010] at 10 turns — DEAD ZERO AND NO LONGER "
-            "SIGNIFICANT, against +0.0027 and +0.0022 before — and "
-            "+0.0055 [+0.0015, +0.0095] at 20, still significant but roughly "
-            "a THIRD of the +0.0152 recorded above and outside that interval "
-            "entirely. The mechanism is §0z9: `deal_pod_damage` divided a "
-            "full-pod total by the number of opponents still LIVING, so every "
-            "drain was inflated by up to 3x exactly in the endgame, and "
-            "Cauldron's death trigger is one of the six copies it hit "
-            "(engine.on_creature_death). Note what the `notes` field above "
-            "says — 'the engine models Blood Artist at 3x its real drain… "
-            "Cauldron's 3.0 is the one of the two that is correct'. That was "
-            "true of the NUMERATOR and the bug was in the DIVISOR, so the "
-            "sentence was right and the conclusion drawn from it was not. "
-            "The costs are unchanged and are now the larger half of the "
-            "picture: cards_drawn -0.22, tokens_made -0.16, rendmaw_triggers "
-            "-0.10, stranded_mv +1.34. The ablation row moved with it, "
-            "+0.0159 ±0.0026 → +0.0082 ±0.0023. "
-            "**THE SWAP IS NOT REFUTED — it is still positive and significant "
-            "at T20 against a ±0.0018 noise floor — BUT ITS RECORDED VALUE "
-            "WAS ~3x AND THE DECISION IS NOT RE-AFFIRMED HERE.** It is worth "
-            "nothing at all at the ten-turn horizon, which is where the games "
-            "actually end (~T12). Re-read it before committing."
-        ),
-    ),
     Change(
         deck="lorehold",
         remove="Penance",
@@ -1212,6 +1145,125 @@ CHANGES: list[Change] = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Withdrawn — was staged, and has been UNSTAGED
+# ---------------------------------------------------------------------------
+# NOT applied by `build_pending`, so nothing here is in any baseline.
+# Kept in full because the entry is where the evidence lives, and a swap
+# that was considered and dropped is a different fact from one nobody
+# ever proposed. See the module docstring.
+WITHDRAWN: list[Change] = [
+    Change(
+        deck="rendmaw",
+        remove="Idol of Oblivion",
+        add="Cauldron of Essence",
+        staged="2026-09-04",
+        rationale=(
+            "Cauldron's drain half is The Meathook Massacre's text word for "
+            "word — 'each opponent loses 1 life and you gain 1 life' — so it "
+            "is 3 pod life per creature death in a deck that loses a dozen "
+            "tokens a game: 12.4 drain damage per game it resolves. Its second "
+            "half is a repeatable sac outlet AND recursion (0.55 reanimations "
+            "a game), stocked mostly by the pod's own wraths, which is exactly "
+            "when you want it. Idol of Oblivion is a noncreature artifact that "
+            "ablates inside its own error bars, so cutting it costs no body."
+        ),
+        evidence=(
+            "Measured as the real swap under POD v3 (the current default), "
+            "6,000 paired games: win rate +0.0027 [+0.0007, +0.0048] at 10 "
+            "turns and +0.0135 [+0.0088, +0.0182] at 20; damage +0.95 and "
+            "+1.03. Significant on both metrics at both horizons."
+        ),
+        notes=(
+            "THE CUT CHANGED, and this is the clearest thing the new pod model "
+            "has produced. The original staging cut Ornithopter of Paradise, "
+            "which measured fine on the old pod (+0.0025 / +0.0158) and then "
+            "DECAYED as the model improved: v2 +0.0018 / +0.0155, v3 -0.0015 "
+            "[-0.0037, +0.0007] / +0.0088. The mechanism is that Ornithopter "
+            "is a 0/2 BODY as well as a dork and Cauldron is not a creature — "
+            "under pod v3 creatures attack whoever cannot block, so a spare "
+            "blocker is worth something the old pod priced at exactly zero. "
+            "Controlled check, same card in, three different cuts, pod v3, "
+            "20 turns: cutting the noncreature Idol +0.0135 [+0.0088, +0.0182]; "
+            "cutting the 0/2 Ornithopter +0.0088 [+0.0038, +0.0138]; cutting "
+            "the 1/2 Dockside Chef +0.0048 [+0.0000, +0.0097]. Monotonic in "
+            "whether the cut was a body. "
+            "COSTS, both measured and both real: Cauldron is one card type, so "
+            "the swap still loses a commander trigger, and Idol is this deck's "
+            "token-payoff draw engine — tokens_made -0.15. "
+            "SEPARATELY: the engine models Blood Artist at 3x its real drain, "
+            "which inflates the baseline Cauldron is measured alongside. "
+            "Cauldron's 3.0 is the one of the two that is correct."
+        ),
+        reverified=(
+            "RE-VERIFIED 2026-09-09 on the post-combat-split engine "
+            "(KNOWN_ISSUES.md §0v), because that change moved 16 of rendmaw's "
+            "64 ablation rows and this swap's evidence predates it. Measured "
+            "at the SAME N=6,000 and the same seeds as the original, so any "
+            "difference is the engine and not the sample: win rate +0.0022 "
+            "[+0.0007, +0.0038] at 10 turns and +0.0152 [+0.0107, +0.0198] at "
+            "20, against the original +0.0027 [+0.0007, +0.0048] and +0.0135 "
+            "[+0.0088, +0.0182]. Both horizons reproduce inside their own "
+            "bars and both remain significant; the T20 point estimate rose "
+            "slightly. Every mechanism counter kept its sign and rough "
+            "magnitude too — damage +1.55, cards_drawn -0.26, tokens_made "
+            "-0.16, stranded_mv +1.15 — so the predicted costs are still "
+            "real and still outweighed. The decision stands. "
+            "diagnostics/run_swaps_0904.py, results/staged_recheck_rendmaw.txt. "
+            "\n\n"
+            "RE-MEASURED 2026-09-12 on the §0z9–§0z15 engine, AND THIS ONE DID "
+            "NOT REPRODUCE. Same N=6,000, same seeds, same harness, so the "
+            "engine is again the only thing that changed: win rate "
+            "+0.0000 [-0.0010, +0.0010] at 10 turns — DEAD ZERO AND NO LONGER "
+            "SIGNIFICANT, against +0.0027 and +0.0022 before — and "
+            "+0.0055 [+0.0015, +0.0095] at 20, still significant but roughly "
+            "a THIRD of the +0.0152 recorded above and outside that interval "
+            "entirely. The mechanism is §0z9: `deal_pod_damage` divided a "
+            "full-pod total by the number of opponents still LIVING, so every "
+            "drain was inflated by up to 3x exactly in the endgame, and "
+            "Cauldron's death trigger is one of the six copies it hit "
+            "(engine.on_creature_death). Note what the `notes` field above "
+            "says — 'the engine models Blood Artist at 3x its real drain… "
+            "Cauldron's 3.0 is the one of the two that is correct'. That was "
+            "true of the NUMERATOR and the bug was in the DIVISOR, so the "
+            "sentence was right and the conclusion drawn from it was not. "
+            "The costs are unchanged and are now the larger half of the "
+            "picture: cards_drawn -0.22, tokens_made -0.16, rendmaw_triggers "
+            "-0.10, stranded_mv +1.34. The ablation row moved with it, "
+            "+0.0159 ±0.0026 -> +0.0082 ±0.0023. "
+            "**THE SWAP IS NOT REFUTED — it is still positive and significant "
+            "at T20 against a ±0.0018 noise floor — BUT ITS RECORDED VALUE "
+            "WAS ~3x AND THE DECISION IS NOT RE-AFFIRMED HERE.** It is worth "
+            "nothing at all at the ten-turn horizon, which is where the games "
+            "actually end (~T12). Re-read it before committing."
+        ),
+        withdrawn=(
+            "UNSTAGED 2026-09-13. NOT REFUTED AND NOT REJECTED — unstaged "
+            "because the decision was taken on evidence that no longer "
+            "describes this engine, and a staged change is a DECISION rather "
+            "than a number. The 2026-09-04 staging rested on +0.0135 at T20 "
+            "and +0.0027 at T10, both significant; on the §0z9 engine the same "
+            "N and the same seeds give +0.0055 [+0.0015, +0.0095] at T20 and "
+            "+0.0000 [-0.0010, +0.0010] at T10. The T10 figure is the one that "
+            "decides it: games in this model end around T12, so a swap worth "
+            "dead zero at ten turns is worth approximately nothing where it "
+            "would actually be played. "
+            "WHAT RE-STAGING WOULD HAVE TO ANSWER, so the next reader does not "
+            "start over: (1) is +0.0055 at T20 worth a slot, given the swap "
+            "also costs cards_drawn -0.22, tokens_made -0.16, "
+            "rendmaw_triggers -0.10 and stranded_mv +1.34, all still real; "
+            "(2) is Idol of Oblivion still the right cut, given its own row "
+            "and Cauldron's both moved in the §0z9 regeneration; and (3) is "
+            "there a better use of the slot, which was never asked because "
+            "this swap was staged before the deck's table was last rebuilt. "
+            "The evidence above is kept in full and is still valid AS "
+            "MEASUREMENT -- what changed is the engine it was measured on and "
+            "the conclusion drawn from it, not the arithmetic."
+        ),
+    ),
+]
+
+
 DECKS = {
     # March of the World Ooze is COMMITTED as of v12, so it is in the deck
     # list itself and no longer a swap-in candidate.
@@ -1296,7 +1348,87 @@ def check_measured_are_promotable():
                 f"cannot happen. Move it out of MEASURED -- it is committed.")
 
 
+def check_withdrawn_are_explained():
+    """Every WITHDRAWN entry states WHY, and is in exactly one of the lists.
+
+    Written in the same change that added the list, and mutation-checked, for
+    the reason §0q gives: a state with no check is a claim nobody verifies.
+    The two failures it exists to catch are the two this state makes possible.
+
+    An UNEXPLAINED withdrawal is the worse of them. The entry keeps its full
+    original evidence -- rationale, data, every recheck -- so an entry with an
+    empty `withdrawn` reads exactly like a well-supported staged change that
+    somebody moved by accident, and the next reader's correct response to it
+    would be to move it back. The reason is the only field that distinguishes
+    "we decided against this" from "this fell out of the list".
+
+    A card in BOTH lists is the §0z16 shape pointed at the ledger: one card,
+    two states, and each list internally consistent. `build_pending` would
+    apply it and this file would simultaneously say it applies to nothing.
+    """
+    for c in WITHDRAWN:
+        if not c.withdrawn.strip():
+            raise AssertionError(
+                f"edhmc/pending.py: -{c.remove} +{c.add} ({c.deck}) is "
+                f"WITHDRAWN with no `withdrawn` reason. An entry that keeps "
+                f"its evidence and drops its reason is indistinguishable from "
+                f"one unstaged by mistake. Say when, and why.")
+        clash = [s for s in CHANGES
+                 if s.deck == c.deck and s.add == c.add and s.remove == c.remove]
+        if clash:
+            raise AssertionError(
+                f"edhmc/pending.py: -{c.remove} +{c.add} ({c.deck}) is in "
+                f"CHANGES and WITHDRAWN at once, so the ledger both applies it "
+                f"to every baseline and says it is in none. Delete one.")
+
+
+def check_alt_cost_coverage():
+    """Every card with a second cost sits in a deck whose engine reads them.
+
+    §1b, closed 2026-09-13 (§0z20). `Card.alt_costs` existed for a year and
+    `engine.main_phase` was the ONLY reader, so Overlord of the Hauntwoods'
+    Impending worked in Rendmaw and the identical field on a card put into
+    Karlov, Tivit, Shilgengar or Azusa would have been silently ignored --
+    cast at its printed cost, no error, no way to notice. That is §0q's
+    failure mode with the claim living in a DATA FIELD instead of a name set:
+    setting `alt_costs` looks like it does something everywhere.
+
+    All six engines now go through `engine.choose_mode`, and this is the check
+    that says so. It is derived, not hand-maintained: the reader set is read
+    off the engines' source, so an engine that stops calling `choose_mode`
+    fails here rather than quietly dropping a cost.
+    """
+    import inspect
+    from edhmc import engine, lorehold, karlov, tivit, shilgengar, azusa
+    engines = {"rendmaw": engine, "lorehold": lorehold, "karlov": karlov,
+               "tivit": tivit, "shilgengar": shilgengar, "azusa": azusa}
+    readers = {name for name, mod in engines.items()
+               if "choose_mode(" in inspect.getsource(mod)}
+    missing = set(engines) - readers
+    if missing:
+        raise AssertionError(
+            f"edhmc/pending.py: {sorted(missing)} do not call "
+            f"engine.choose_mode, so any card with `alt_costs` in those decks "
+            f"would be cast at its printed cost silently. §1b / §0z20.")
+
+    for deck_name, (module, _catalog) in DECKS.items():
+        deck, commander = module.build()
+        for card in list(deck) + [commander]:
+            if card.alt_costs and deck_name not in readers:
+                raise AssertionError(
+                    f"edhmc/pending.py: {card.name!r} declares alt_costs but "
+                    f"the {deck_name} engine does not read them.")
+            for entry in card.alt_costs:
+                if len(entry) not in (2, 3):
+                    raise AssertionError(
+                        f"edhmc/pending.py: {card.name!r} has a malformed "
+                        f"alt_costs entry {entry!r}; expected (cost, tag) or "
+                        f"(cost, tag, preference).")
+
+
 check_measured_are_promotable()
+check_withdrawn_are_explained()
+check_alt_cost_coverage()
 
 
 def pending_for(deck_name: str) -> list[Change]:
@@ -1370,6 +1502,17 @@ def ledger(verbose: bool = True) -> None:
                 print(f"    data   {c.evidence}")
                 if c.notes:
                     print(f"    note   {c.notes}")
+                # PRINTED FOR STAGED ENTRIES SINCE 2026-09-13, and it was the
+                # only field of a Change this function did not show. A
+                # `reverified` is written precisely when an engine change has
+                # re-run the swap, so it is the field most likely to CONTRADICT
+                # the `data` line above it -- and the rendmaw entry proved the
+                # cost: its 2026-09-12 recheck said the evidence had collapsed
+                # to a third, and `python -m edhmc.pending`, which HANDOFF.md
+                # calls the only trustworthy statement of what is staged,
+                # printed the original figures and not the retraction.
+                if c.reverified:
+                    print(f"    recheck {c.reverified}")
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
     if MEASURED:
@@ -1399,6 +1542,34 @@ def ledger(verbose: bool = True) -> None:
                         print(f"     limits {c.limits}")
                     if c.verdict:
                         print(f"     read   {c.verdict}")
+
+    if WITHDRAWN:
+        # PRINTED, not silently dropped. The whole reason this list exists is
+        # that an unstaged change leaves no trace anywhere else: it is out of
+        # CHANGES, so `build_pending` ignores it, so no run and no table can
+        # ever mention it again. A reader who does not see it here will
+        # re-measure the card from scratch, which is the cost this heading
+        # exists to avoid.
+        print("\n" + "=" * 78)
+        print("WITHDRAWN — was staged, has been UNSTAGED, is in NO baseline")
+        print("=" * 78)
+        print("  Not refuted unless the entry says so. `build_pending` does "
+              "not apply these,\n  so nothing below is in any deck, any run "
+              "or any table. Each entry's\n  `why not` says what re-staging "
+              "it would have to answer.")
+        for c in WITHDRAWN:
+            print(f"\n{c.deck.upper()}")
+            print(f"  - OUT  {c.remove}")
+            print(f"  + IN   {c.add}")
+            print(f"    staged {c.staged}, then unstaged")
+            if verbose:
+                print(f"    why    {c.rationale}")
+                print(f"    data   {c.evidence}")
+                if c.notes:
+                    print(f"    note   {c.notes}")
+                if c.reverified:
+                    print(f"    recheck {c.reverified}")
+            print(f"    why not {c.withdrawn}")
 
     if COMMITTED:
         # Azusa has NO .xlsx, so for that deck "committed" is two legs -- the

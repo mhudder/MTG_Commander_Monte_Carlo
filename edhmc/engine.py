@@ -20,6 +20,7 @@ the rest are correctly handled as "a body with a mana cost and a type line".
 
 from __future__ import annotations
 
+import hashlib
 import random
 from dataclasses import dataclass, field
 from typing import Callable, Optional
@@ -61,7 +62,9 @@ class Card:
     haste: bool = False
     flying: bool = False      # set from decks/_evasion.py, never by hand
     x_pips: int = 0           # generic pips that are actually {X}
-    alt_costs: tuple = ()     # ((cost_dict, "tag"), ...) modal / alternative costs
+    # ((cost, "tag") | (cost, "tag", preference), ...) -- the OTHER ways this
+    # card can be cast. See engine.choose_mode; KNOWN_ISSUES §1b.
+    alt_costs: tuple = ()
     tokens: tuple = ()        # (count, power, toughness) made on resolution
     priority: float = 0.0     # higher = cast sooner when both are affordable
     threat: float = 0.0       # how badly opponents want it gone (0 = derive it)
@@ -284,6 +287,185 @@ STACK_ONLY_CREATURES = {
     "Grist, the Hunger Tide":
         "As long as Grist isn't on the battlefield, it's a 1/1 Insect creature",
 }
+
+
+# ----------------------------------------------------------------------------
+# Common random numbers — the mid-game streams
+# ----------------------------------------------------------------------------
+
+def _substream_seed(seed: int, name: str) -> int:
+    """A stable per-effect seed.
+
+    `hash()` IS NOT USABLE HERE and the reason is not academic. Python salts
+    string hashing per process unless PYTHONHASHSEED is set, and `ablation.py`
+    runs its workers under `multiprocessing` — on Windows, SPAWNED
+    interpreters, each with its own salt. A stream seeded from `hash(name)`
+    would therefore produce different numbers in the parent and in every
+    worker, and different numbers again on the next run: the cache would
+    disagree with a fresh measurement for reasons no one could see. sha256 of
+    the name is stable across processes, machines and runs.
+    """
+    h = hashlib.sha256(name.encode("utf-8")).digest()
+    return (seed * 0x9E3779B1) ^ int.from_bytes(h[:8], "big")
+
+
+class CRNStreams:
+    """One independent, INDEX-ADDRESSED random stream per named effect.
+
+    WHY THIS EXISTS (KNOWN_ISSUES §0z17, CLAUDE.md queued item 19). Common
+    random numbers are the reason this project is affordable: deck A and deck B
+    are the same list with one slot swapped, shuffled on the same seed, so the
+    other ~97 cards are dealt identically and almost all variance cancels in
+    the difference. That holds only while both branches CONSUME THE SAME RANDOM
+    NUMBERS IN THE SAME ORDER.
+
+    Eleven call sites in five files drew mid-game from the single game RNG.
+    The moment two branches' boards diverged — one has Arasta out a turn
+    earlier, one casts a spell the other cannot — they took a DIFFERENT NUMBER
+    of draws, and from that point every later draw in both games read a
+    different slot of the same sequence. The pairing was broken for the rest of
+    the game. Measured before the fix: 17 of 400 seeds (4.2%) on one rendmaw
+    swap, 46 of 300 (15.3%) on one lorehold swap, whose Sunbird's Invocation
+    took 1,100 mid-game draws against the other branch's 132.
+
+    THE FIX IS ADDRESSING RATHER THAN ORDERING. Each effect gets its own
+    stream, and the Nth firing of that effect reads index N of it. Nothing any
+    other effect does can shift it, so a divergence stays contained to the one
+    effect that diverged instead of decorrelating the whole game. This is
+    `azusa.shuffle_library`'s pre-rolled pattern — which was the only correct
+    one in the project — generalised from shuffles to every draw and shared by
+    all six engines rather than reimplemented per engine (§0u: the same rule
+    written twice is written two different ways, six times over).
+
+    WHAT IT DOES NOT AND CANNOT FIX. If an effect fires three times in branch A
+    and four in branch B, the fourth read is a value A never saw. That is not a
+    leak, it is the actual difference between the two decks, and it is confined
+    to that effect's own stream. There is no scheme that removes it, because
+    the branches genuinely did different things.
+
+    Values are generated lazily and CACHED BY INDEX, never regenerated, so a
+    stream is a growing list and index N is the same number for the life of the
+    game no matter what order it is asked for.
+    """
+
+    __slots__ = ("seed", "_rolls", "_gens", "used")
+
+    def __init__(self, seed: int):
+        self.seed = seed
+        self._rolls: dict[str, list[int]] = {}
+        self._gens: dict[str, random.Random] = {}
+        # How many times each effect has fired. Read by the CRN audit in
+        # `tools/validate.py`, which compares these per seed across an A/B
+        # pair -- that is the check the old A/A control structurally could not
+        # perform, because an A/A pair cannot diverge.
+        self.used: dict[str, int] = {}
+
+    def _bits(self, name: str, i: int) -> int:
+        rolls = self._rolls.get(name)
+        if rolls is None:
+            rolls = self._rolls[name] = []
+            self._gens[name] = random.Random(_substream_seed(self.seed, name))
+        gen = self._gens[name]
+        while len(rolls) <= i:
+            rolls.append(gen.getrandbits(32))
+        return rolls[i]
+
+    def _take(self, name: str) -> int:
+        i = self.used.get(name, 0)
+        self.used[name] = i + 1
+        return self._bits(name, i)
+
+    def random(self, name: str) -> float:
+        """The next float in [0, 1) from this effect's own stream."""
+        return self._take(name) / 4294967296.0
+
+    def randrange(self, name: str, n: int) -> int:
+        """The next index into a list of length n, from this effect's stream."""
+        return int(self.random(name) * n) if n > 0 else 0
+
+    def shuffle(self, name: str, seq: list) -> None:
+        """Shuffle `seq` with this effect's Nth pre-rolled permutation."""
+        random.Random(self._take(name)).shuffle(seq)
+
+    def draws(self) -> int:
+        """Total mid-game draws taken. The quantity §0z17 is measured in."""
+        return sum(self.used.values())
+
+
+# The three accessors every engine calls. They take the Game rather than the
+# stream so that ONE knob can restore the old behaviour exactly at every site:
+# `crn_streams=False` puts all eleven back on `g.rng` in the original order,
+# which is how any number published before 2026-09-13 is reproduced.
+class AuditRandom(random.Random):
+    """A game RNG that counts what is drawn from it AFTER the opening hand.
+
+    THE CHECK THE A/A CONTROL COULD NOT PERFORM. `tools/validate.py`'s control
+    swaps a card for ITSELF, so the two branches never diverge, the call
+    sequence is identical by construction, and every mid-game leak in the
+    project passed it for months while printing `+0.00` on eighteen metrics.
+    A check that cannot fail reads like assurance and is worse than none
+    (§0z15, and this is that finding arriving in the one place it hurt most).
+
+    What replaces it is not a cleverer A/A but a STRUCTURAL INVARIANT, which
+    holds per game and needs no second branch to compare against: after the
+    opening hand is decided, the game RNG is NEVER TOUCHED AGAIN. Every
+    mid-game draw goes through `CRNStreams`, which is addressed rather than
+    ordered and therefore cannot decorrelate. Nonzero here IS the §0z17 bug.
+
+    Off unless `crn_audit` is set, so the production path pays nothing.
+    """
+
+    def __init__(self, seed):
+        super().__init__(seed)
+        self.sealed = False
+        self.after_opening = 0
+
+    def random(self):
+        self.after_opening += self.sealed
+        return super().random()
+
+    def getrandbits(self, k):
+        self.after_opening += self.sealed
+        return super().getrandbits(k)
+
+    def shuffle(self, seq):
+        self.after_opening += self.sealed
+        return super().shuffle(seq)
+
+    def randrange(self, *a, **k):
+        self.after_opening += self.sealed
+        return super().randrange(*a, **k)
+
+
+def make_rng(seed: int, cfg: dict) -> random.Random:
+    """The game RNG. A plain `Random` unless the CRN audit is switched on."""
+    return AuditRandom(seed) if cfg.get("crn_audit") else random.Random(seed)
+
+
+def seal_rng(g) -> None:
+    """Called once, right after the opening hand: nothing may draw from
+    `g.rng` from here on. See AuditRandom."""
+    if isinstance(g.rng, AuditRandom):
+        g.rng.sealed = True
+
+
+def crn_random(g, name: str) -> float:
+    if not g.cfg.get("crn_streams", True):
+        return g.rng.random()
+    return g.crn.random(name)
+
+
+def crn_randrange(g, name: str, n: int) -> int:
+    if not g.cfg.get("crn_streams", True):
+        return g.rng.randrange(n)
+    return g.crn.randrange(name, n)
+
+
+def crn_shuffle(g, name: str, seq: list) -> None:
+    if not g.cfg.get("crn_streams", True):
+        g.rng.shuffle(seq)
+        return
+    g.crn.shuffle(name, seq)
 
 
 # ----------------------------------------------------------------------------
@@ -525,6 +707,65 @@ def can_pay(cost: dict, units: list[frozenset],
     return used
 
 
+def castable_modes(card: Card, base_cost: dict):
+    """Every way a card can be cast: (cost, tag, preference), printed first.
+
+    KNOWN_ISSUES §1b — "cards can only have one cost" — is really TWO
+    problems, and `alt_costs` only ever solved one of them.
+
+    A card's alternatives are not all of a kind. Some are CHEAPER AND WORSE:
+    Overlord of the Hauntwoods' Impending 4 deploys it for {1}{G}{G} instead
+    of {3}{G}{G} and it is a noncreature enchantment for four turns. Some are
+    just A DIFFERENT ROUTE to the same thing: Revitalizing Repast's hybrid pip
+    is {B} or {G}, and neither is better. And some are DEARER AND BETTER:
+    Mizzix's Mastery is {3}{R} to copy one instant or sorcery from the
+    graveyard and {5}{R}{R}{R} to copy EVERY one.
+
+    `alt_costs` was consulted only when the printed cost was unaffordable,
+    which is right for the first two kinds and exactly backwards for the
+    third. So overload could not be expressed at all and lived instead as a
+    hand-written `if card.script == "mastery"` in `lorehold.main_phase`, with
+    its cost typed out a second time -- the §0u shape, and precisely the
+    "patching instances instead of closing the category" that §1b predicted.
+
+    PREFERENCE closes it. Every mode carries one: the printed cost is 0.0, a
+    two-tuple alternative defaults to **-1.0** (cheaper-and-worse, today's
+    fallback behaviour, so nothing existing moves), and a dearer-and-better
+    mode declares a positive one. The policy takes the best AFFORDABLE mode
+    rather than the first one that fits.
+
+    Ties break toward the CHEAPEST, which is what makes a hybrid pip work
+    without any preference at all: {B} and {G} are both preference 0 and both
+    cost one, so whichever the pool can actually pay wins.
+    """
+    modes = [(base_cost, None, 0.0)]
+    for entry in card.alt_costs:
+        cost, tag = entry[0], entry[1]
+        pref = entry[2] if len(entry) > 2 else -1.0
+        modes.append((cost, tag, pref))
+    return modes
+
+
+def choose_mode(card: Card, base_cost: dict, units):
+    """The best affordable mode. Returns (cost, tag, pay_idx) or None.
+
+    THE ONE PLACE THIS DECISION IS MADE, for all six engines. Before §0z20 it
+    was made in `engine.main_phase` and nowhere else, so the other five
+    engines silently ignored `alt_costs` -- a card with a second cost put into
+    the Karlov or Tivit list would have been cast at its printed cost with no
+    error and no way to notice. `check_alt_cost_coverage` now raises on that.
+    """
+    best = None
+    for cost, tag, pref in castable_modes(card, base_cost):
+        pay = can_pay(cost, units)
+        if pay is None:
+            continue
+        key = (pref, -sum(cost.values()))
+        if best is None or key > best[0]:
+            best = (key, cost, tag, pay)
+    return None if best is None else (best[1], best[2], best[3])
+
+
 def engine_cfg(cfg: dict) -> dict:
     """A PRIVATE copy of the caller's cfg for an engine to stamp defaults into.
 
@@ -633,6 +874,8 @@ class Game:
     def __init__(self, deck: list[Card], commander: Card, cfg: dict,
                  rng: random.Random, seed_for_pod: int = 0):
         self.rng = rng
+        # Mid-game randomness lives here, NOT on self.rng. See CRNStreams.
+        self.crn = CRNStreams(seed_for_pod)
         self.cfg = cfg
         self.library = list(deck)
         self.rng.shuffle(self.library)
@@ -836,6 +1079,73 @@ class Game:
                 self.m["erebos_life_paid"] += 2
 
     # -- P/T resolution ------------------------------------------------------
+
+    def artifact_died(self, dead: Card):
+        """A nontoken artifact you controlled reached the graveyard. §7/§0z19.
+
+        Three cards in this list care, all verified against Scryfall
+        2026-09-13, and they are NOT the same trigger:
+
+            Myr Retriever  {2}  "When this creature dies, return ANOTHER
+                                 target artifact card from your graveyard to
+                                 your hand."
+            Junk Diver     {3}  identical, plus flying
+            Scrap Trawler  {3}  "Whenever this creature dies OR ANOTHER
+                                 ARTIFACT YOU CONTROL is put into a graveyard
+                                 from the battlefield, return to your hand
+                                 target artifact card in your graveyard with
+                                 LESSER mana value."
+
+        The first two fire only on their OWN death. The Trawler also fires on
+        every other artifact's, which is why it is checked separately and why
+        its own death is checked by NAME -- it has already left the
+        battlefield by the time this runs, so `has()` is False for it.
+
+        LESSER, NOT LESSER-OR-EQUAL. Scrap Trawler returning another Scrap
+        Trawler is the loop this clause exists to prevent, and `<` is the whole
+        of the prevention.
+
+        WHAT DOES NOT REACH HERE, said out loud rather than left implicit:
+        `destroy()` only ever kills permanents that are creatures right now,
+        so a NONCREATURE artifact -- Sol Ring, the signets, Idol of Oblivion --
+        is never destroyed in this project and never triggers the Trawler.
+        Its second clause is therefore live only for artifact CREATURES, which
+        understates it. That is a limit of the pod model (§4), not of this
+        function. Tokens do not reach the graveyard at all, so a sacrificed
+        Treasure does not trigger it either.
+        """
+        if not self.cfg.get("artifact_recursion", True):
+            return
+        if "Artifact" not in dead.types:
+            return
+
+        # THE POOL IS RECOMPUTED PER TRIGGER, NOT SNAPSHOTTED ONCE. Both
+        # triggers can fire on the same death -- a Myr Retriever dying while
+        # Scrap Trawler is on the battlefield is two separate abilities -- and
+        # the first one MOVES A CARD OUT OF THE GRAVEYARD. Built once, the
+        # second trigger then selects a card that is already in hand and
+        # `remove` raises. This is the identical defect the Invoke Calamity
+        # implementation hit the same day (§0z19): a selection is a snapshot
+        # and the zone is live.
+        #
+        # "ANOTHER target artifact card" excludes the card that just died,
+        # which is already in the graveyard by the time this is called.
+        def take(pred, tag):
+            pool = [c for c in self.graveyard
+                    if "Artifact" in c.types and c is not dead and pred(c)]
+            if not pool:
+                return
+            best = max(pool, key=lambda c: c.mv)
+            self.graveyard.remove(best)
+            self.hand.append(best)
+            self.m["artifacts_returned"] = self.m.get("artifacts_returned", 0) + 1
+            self.m[tag] = self.m.get(tag, 0) + 1
+
+        if dead.name in ("Myr Retriever", "Junk Diver"):
+            take(lambda c: True, "retriever_returns")
+
+        if dead.name == "Scrap Trawler" or self.has("Scrap Trawler"):
+            take(lambda c: c.mv < dead.mv, "trawler_returns")
 
     def power_of(self, perm: Permanent) -> int:
         if self.has("March of the World Ooze"):
@@ -1055,6 +1365,100 @@ def play_land(g: Game):
     run_etb(g, perm)
 
 
+def altar_fodder(g: Game, units=None) -> list:
+    """Creatures Ashnod's Altar is allowed to eat, in board order.
+
+    ONE DEFINITION, TWO CALLERS, and that is deliberate. The Altar is now used
+    for two different purposes -- manufacturing DEATHS for Blood Artist and
+    The Meathook Massacre in `activations`, and manufacturing MANA in
+    `main_phase` (§0z20) -- and "which creatures are expendable" is the same
+    question in both. Written twice it would be answered two different ways
+    within a month; §0u has six instances of exactly that on record.
+
+    `altar_keep` (6) is the existing conservatism, unchanged: only genuine
+    excess is fodder, because a token is a blocker and a Rendmaw trigger.
+
+    NEVER EATS A SOURCE THE CURRENT PAYMENT IS COUNTING ON. When `units` is
+    supplied, any creature that owns a unit in the pool is excluded -- with
+    Enduring Vitality on the battlefield EVERY untapped creature taps for
+    mana, so sacrificing one to pay for a spell could remove more mana than
+    the Altar adds. Tapped creatures own no unit and stay eligible.
+    """
+    keep = g.cfg.get("altar_keep", 6)
+    spare = [p for p in g.board if p.is_token and p.card.is_creature]
+    if units is not None:
+        busy = {id(o) for o in getattr(units, "owners", []) if o is not None}
+        spare = [p for p in spare if id(p) not in busy]
+    return spare[:max(0, len(spare) - keep)]
+
+
+def altar_enable(g: Game, units, precombat: bool):
+    """Ashnod's Altar: "Sacrifice a creature: Add {C}{C}." §3, closed §0z20.
+
+    THE MANA USED TO ARRIVE AFTER THE MAIN PHASE AND SO COULD NOT BE SPENT.
+    The Altar was activated in `activations()`, which runs after every casting
+    decision has been taken, so the engine modelled the COST of sacrificing
+    and none of the benefit -- and the card ablated slightly negative, which
+    KNOWN_ISSUES §3 correctly refused to read as a finding about the card.
+
+    THE POLICY IS "ONLY WHEN IT BUYS SOMETHING", which is both the right
+    piloting decision and the conservative one: this is called only when
+    NOTHING in hand is otherwise castable, and it sacrifices the FEWEST
+    bodies that make the highest-priority stranded card castable. It will not
+    eat a token speculatively, and it will not eat one to cast something it
+    could already afford.
+
+    Returns (card, pay_indices, alt_tag) with `units` EXTENDED IN PLACE, or
+    None. Extending in place matters: `spend` is handed the same object, and
+    the appended units are ownerless, which is exactly right -- nothing on the
+    battlefield taps for them, the sacrifice already paid for them.
+    """
+    if not g.cfg.get("altar_mana", True) or not g.has("Ashnod's Altar"):
+        return None
+    fodder = altar_fodder(g, units)
+    if not fodder:
+        return None
+
+    best = None
+    for c in g.hand:
+        if c.is_land:
+            continue
+        if precombat and "pump" not in c.tags:
+            continue
+        if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+            continue
+        cost = cost_after_reduction(g, c)
+        for k in range(1, len(fodder) + 1):
+            if can_pay(cost, units + [frozenset({"C"})] * (2 * k)) is None:
+                continue
+            # Highest priority wins; among equals, the FEWEST sacrifices.
+            key = (c.priority, -k)
+            if best is None or key > best[0]:
+                best = (key, c, k)
+            break
+
+    if best is None:
+        return None
+    _, card, k = best
+    for perm in fodder[:k]:
+        g.board.remove(perm)
+        g.on_creature_death(1, perm)
+        g.m["altar_sacrifices"] = g.m.get("altar_sacrifices", 0) + 1
+    for _ in range(2 * k):
+        units.append(frozenset({"C"}))
+    g.m["altar_mana_made"] = g.m.get("altar_mana_made", 0) + 2 * k
+
+    # RE-DERIVED AGAINST THE REAL POOL, because the sacrifices just changed
+    # the board and `cost_after_reduction` can read it. If it somehow no
+    # longer pays, the mana stays in the pool for the next iteration rather
+    # than being spent on a payment that was never proved.
+    pay = can_pay(cost_after_reduction(g, card), units)
+    if pay is None:
+        g.m["altar_wasted"] = g.m.get("altar_wasted", 0) + 1
+        return None
+    return (card, pay, None)
+
+
 def main_phase(g: Game, precombat: bool = False):
     """Greedy: repeatedly cast the highest-priority affordable spell.
 
@@ -1097,21 +1501,21 @@ def main_phase(g: Game, precombat: bool = False):
             # do not wrath your own winning board
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
                 continue
-            pay = can_pay(cost_after_reduction(g, c), units)
-            if pay is not None:
-                options.append((c, pay, None))
-                continue
-            # ALTERNATIVE COSTS. A card is not one cost: Impending deploys
-            # Overlord of the Hauntwoods for {1}{G}{G} instead of {3}{G}{G},
-            # at the price of it being a noncreature enchantment for four
-            # turns. Without this the engine only sees the full cost.
-            for alt_cost, tag in c.alt_costs:
-                alt = can_pay(alt_cost, units)
-                if alt is not None:
-                    options.append((c, alt, tag))
-                    break
+            # ALTERNATIVE COSTS, through the shared chooser (§1b / §0z20).
+            # A card is not one cost: Impending deploys Overlord of the
+            # Hauntwoods for {1}{G}{G} instead of {3}{G}{G}, at the price of
+            # it being a noncreature enchantment for four turns.
+            mode = choose_mode(c, cost_after_reduction(g, c), units)
+            if mode is not None:
+                _cost, tag, pay = mode
+                options.append((c, pay, tag))
         if not options:
-            break
+            # Nothing is castable on lands and rocks alone. THIS is where the
+            # Altar belongs -- see altar_enable and KNOWN_ISSUES §3.
+            picked = altar_enable(g, units, precombat)
+            if picked is None:
+                break
+            options.append(picked)
 
         def rank(item):
             c = item[0]
@@ -1329,7 +1733,7 @@ def upkeep(g: Game):
             g.make_tokens(1, 1, 1, "Insect")
     # Arasta: opponents cast instants/sorceries at some rate
     if g.has("Arasta of the Endless Web"):
-        if g.rng.random() < g.cfg.get("opp_instant_rate", 0.8):
+        if crn_random(g, "arasta") < g.cfg.get("opp_instant_rate", 0.8):
             g.make_tokens(1, 1, 2, "Spider")
 
 
@@ -1428,8 +1832,11 @@ def activations(g: Game):
     # card, which was a bug in the model, not a finding about the card.
     if g.has("Ashnod's Altar") and (g.has("Blood Artist")
                                     or g.has("The Meathook Massacre")):
-        spare = [p for p in g.board if p.is_token and p.card.is_creature]
-        for p in spare[:max(0, len(spare) - g.cfg.get("altar_keep", 6))][:2]:
+        # `altar_fodder` is the shared definition of "which creatures are
+        # expendable", also used by main_phase's mana step (§0z20). Called
+        # with no `units` here because this path is post-main and taps
+        # nothing: the selection is identical to what this block did inline.
+        for p in altar_fodder(g)[:2]:
             g.board.remove(p)
             g.on_creature_death(1)
 
@@ -1445,8 +1852,9 @@ def activations(g: Game):
     # Deathreap Ritual: a card at EACH end step where a creature died. Four
     # end steps a round in a four-player game, and creatures die constantly.
     if g.has("Deathreap Ritual") and g.creature_died_this_turn:
-        g.draw(1 + sum(1 for _ in range(3)
-                       if g.rng.random() < g.cfg.get("opp_death_rate", 0.55)))
+        g.draw(1 + sum(1 for i in range(3)
+                       if crn_random(g, f"deathreap{i}")
+                       < g.cfg.get("opp_death_rate", 0.55)))
 
     # Dockside Chef: "{1}{B}, Sacrifice an artifact or creature: Draw a card."
     # Taken once a turn off the cheapest token, with `units` standing in for the
@@ -1663,14 +2071,19 @@ def take_turn(g: Game):
 
 
 def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
-    rng = random.Random(seed)
+    rng = make_rng(seed, cfg)
     g = Game(deck, commander, cfg, rng, seed_for_pod=seed)
     g.opening_hand()
+    # From here the game RNG must never be touched again. §0z17.
+    seal_rng(g)
     for _ in range(cfg.get("turns", 10)):
         take_turn(g)
         if g.result is not None:
             break
     out = dict(g.m)
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
     out["result"] = g.result or "timeout"
     out["turns_played"] = g.turn
     out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
