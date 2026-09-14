@@ -108,6 +108,15 @@ rate). Five decks' numbers have moved and **all six tables need regenerating.**
 Seven numbered issues were closed in the day: §0z17–§0z20 covering queued
 item 19, item 15, §7, §3 and §1b.
 
+**ALL SIX TABLES WERE THEN REGENERATED** from empty caches at N=15,000
+(2026-09-13). 25 of 378 rows moved beyond their own old error bar and **no
+already-significant row flipped sign**. Shilgengar came back byte-identical on
+all 64 rows, which is the check that the work did not leak into a deck it had
+no business touching. The one row worth acting on is **Ashnod's Altar**, now
+−0.0012 ±0.0012 and significantly negative for the first time — and it got
+there by being implemented, not neglected, which is the opposite of the two
+traps that have cost this project withdrawn swaps.
+
 There is also a standing limitation, not a bug: the opponents are an abstract
 threat level rather than real cards, so roughly a third of every deck (removal
 spells, counterspells) can't be evaluated at all — 117 of 379 nonland cards,

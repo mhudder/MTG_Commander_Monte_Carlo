@@ -175,41 +175,59 @@ record and it has two legs, not three.
 
 ## Current state
 
-> # ALL SIX ABLATION TABLES ARE CURRENT, as of 2026-09-12.
+> # ALL SIX ABLATION TABLES ARE CURRENT, as of 2026-09-13.
 >
-> They were regenerated against the fourteen-fix batch (§0z9–§0z15) after
-> `validate` came back `+0.00` on all 18 metrics and all eight tests and seven
-> mutation checks passed. **19 of 378 rows moved beyond their own old bar and
-> ONE already-significant row flipped sign** — Magister of Worth, into
-> `PARTLY_MODELLED`, where a low score is explicitly not evidence.
+> Regenerated from EMPTY caches against §0z17–§0z20 after `validate` came back
+> `+0.00` on all 18 metrics with every engine's RNG sealed, and all twelve
+> tests and eleven mutation checks passed. **25 of 378 rows moved beyond their
+> own old bar and NO already-significant row flipped sign.**
 >
 > | deck | beyond own old bar | flips | what moved it |
 > |---|---|---|---|
-> | lorehold | **11 of 65** | 0 | §0z9 (Longshot), §0z13 (Talisman), §0z14 (all three) |
-> | tivit | **6 of 64** | 1 | §0z12 — five sweepers went from dead tags to live cards |
-> | rendmaw | **2 of 64** | 0 | §0z9, and ONLY its two named `on_creature_death` cards |
-> | karlov | 0 of 63 | 0 | **byte-identical** |
-> | shilgengar | 0 of 64 | 0 | §0z10 visible in three linked rows, all inside their bars |
-> | azusa | 0 of 58 | 0 | **byte-identical** |
+> | azusa | **11 of 58** | 0 | §0z18 — Ashaya's clause, and the landfall it adds |
+> | lorehold | **9 of 65** | 0 | §0z19 — the graveyard became a resource |
+> | rendmaw | **5 of 63** | 0 | §0z19's three artifact cards, §0z20's two |
+> | karlov | 0 of 64 | 0 | §0z17 only; every row inside its bar |
+> | tivit | 0 of 64 | 0 | §0z17 only; every row inside its bar |
+> | shilgengar | 0 of 64 | 0 | **byte-identical, 64 of 64** |
 >
-> **Every mover is attributable to a named section of the batch**, and the two
-> byte-identical decks prove the rebuild is bit-reproducible across cache
-> deletion. Noise floors are unchanged on all six. Each change still has its
-> own knob defaulting to the corrected behaviour, so `git stash` is not the way
-> to compare — flip the knobs listed in §0z9–§0z15 instead.
+> **Every mover is attributable, and the coherent stories are the check.**
+> Azusa's movers are Ashaya (+0.0019 → **+0.0130**), Titania (−0.0013 →
+> +0.0047, its creature-deaths-are-land-deaths half) and seven landfall/mana
+> cards measured against a baseline that now makes far more landfall.
+> Lorehold's are the three §0z19 cards plus **every rummage spell and every
+> big spell** — Faithless Looting +0.0055, Thrill of Possibility +0.0050, Rise
+> of the Eldrazi +0.0036, Hit the Mother Lode +0.0052 — which is exactly what
+> should happen when Invoke Calamity and Volcanic Vision turn the graveyard
+> into a resource that fillers stock and big spells cash.
 >
-> **Two things the regeneration turned up, both live:**
+> **Shilgengar being byte-identical is the load-bearing check**, not a
+> curiosity: it has no mid-game draws and none of the fixed code, so it proves
+> the rebuild is bit-reproducible across cache deletion and that §0z17–§0z20
+> did not leak into a deck they had no business touching. Noise floors are
+> unchanged to within a digit on all six.
 >
-> 1. **The rendmaw staged swap is no longer supported by its recorded
->    evidence.** −Idol of Oblivion +Cauldron of Essence re-measured at the
->    original N and seeds is **+0.0000 [−0.0010, +0.0010] at T10** (was
->    +0.0027, significant) and **+0.0055 [+0.0015, +0.0095] at T20** (was
->    +0.0152). §0z9's divisor inflated its drain. Not refuted, but worth
->    nothing at the horizon where games actually end. **Re-read it before
->    committing**; the ledger entry carries the full figures.
-> 2. **§0z16**, the cross-deck labelling defect the read-through found.
+> **TWO ROWS ARE WORTH ACTING ON:**
+>
+> 1. **ASHNOD'S ALTAR IS NOW A REAL CUT CANDIDATE, and this one is not a
+>    trap.** −0.0012 ±0.0012, signal `both`, in MODEL-EVALUATED — its
+>    win-rate CI excludes zero for the first time. It got there by being
+>    IMPLEMENTED (§0z20), not by being neglected, which is the opposite of the
+>    Bane of Progress and Ashaya situations that cost this project two
+>    withdrawn swaps. `altar_keep` was swept 6 → 0 and is not load-bearing, so
+>    the sign is not a policy artefact. Note it sits INSIDE the deck's ±0.0019
+>    noise floor, so it is "measurably not helping" rather than "measurably
+>    bad" — a cut needs a head-to-head against a specific replacement (§0c).
+> 2. **Ashaya is a real mid-table card at last**: +0.0130 ±0.0032, 26th of 58
+>    by win rate, up from +0.0019 ±0.0019 — a row that was explicitly not
+>    evidence about the card. It independently reproduces the §0z18 on/off
+>    measurement of +0.0140 ±0.0077, which is the cross-check that matters:
+>    two different experiments, one ablating the card and one flipping the
+>    clause, agreeing to within a third of a bar. **Any azusa decision taken
+>    against the old table's bottom half should be re-read**, and note the
+>    table is sorted by DAMAGE, not win rate.
 
-Verified 2026-09-12. `validate.py` is `+0.00` on all 18 metrics across 6
+Verified 2026-09-13. `validate.py` is `+0.00` on all 18 metrics across 6
 engines; `corr(A,B) = 0.9118`, CRN worth ~11x the games. All eight tests and
 all seven mutation checks pass. `python -m edhmc.pending` reports
 100 cards / singleton-legal / commander distinct on every deck that has a

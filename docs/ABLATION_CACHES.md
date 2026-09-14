@@ -18,7 +18,7 @@ and compare the fingerprint. If it differs, DELETE the cache.**
 `./tools/regen_tables.sh` deletes them by default; `--resume` does
 not.
 
-Fingerprints recorded at `5a377ec`.
+Fingerprints recorded at `682a1c8`.
 
 **Every fingerprint below changed on 2026-09-09 and NO cache is
 stale.** The reorganisation edited `ablation.py` — which is in the
@@ -34,31 +34,62 @@ because the rule above says to delete a cache whose fingerprint
 differs — a rule that is only safe to follow if the exceptions are
 written down where the person following it will look.
 
+**EVERY FINGERPRINT CHANGED AGAIN ON 2026-09-13, AND THIS TIME ONE
+DECK IS GENUINELY STALE.** The fingerprint gained a component it
+should always have had: the deck's STAGED SWAPS. `ablation.py` builds
+its baseline with `build_pending(DECK)`, so the entries in
+`edhmc/pending.py`'s CHANGES are an input to every cached number, and
+nothing hashed them — staging or unstaging a swap replaced the list
+the whole table was measured against while the fingerprint went on
+declaring the cache current. A hash cannot gain an input without
+moving, so all six moved once here.
+
+Five of those six moves are the scheme and nothing else: karlov,
+lorehold, tivit, shilgengar and azusa have the same staged swaps they
+had when their caches were built, so **those caches are CURRENT and
+resumable** — the recorded value simply predates the component.
+**RENDMAW IS THE EXCEPTION AND ITS THREE CACHES ARE STALE.** The
+staged -Idol of Oblivion +Cauldron of Essence was UNSTAGED on
+2026-09-13 (it is in `pending.WITHDRAWN`, with the reason), so
+`build_pending('rendmaw')` now returns Idol and not Cauldron. The
+committed `results/ablation_rendmaw.txt` was measured on the other
+list and still carries a Cauldron of Essence row for a card the deck
+no longer contains. **Delete those three caches and regenerate before
+quoting any rendmaw number.** This entry is the exception the rule
+above depends on being written down, and it is the one case where
+following the rule blindly would have been right.
+
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `145c6c8e1517a3df` |
-| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `e6bcfe6e3c463611` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `e6bcfe6e3c463611` |
-| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `e6bcfe6e3c463611` |
-| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `cbe4e633af07f984` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `cbe4e633af07f984` |
-| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `cbe4e633af07f984` |
-| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `8c8378348b97e611` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `8c8378348b97e611` |
-| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `8c8378348b97e611` |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `759e080e9991b240` |
-| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `87e530601fca82f9` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `87e530601fca82f9` |
-| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `87e530601fca82f9` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `724f186b43cf5e31` |
+| `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `4fbd678bca7abb97` |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `4fbd678bca7abb97` |
+| `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `4fbd678bca7abb97` |
+| `ablation_cache_lorehold_10-20_n15000.json` | lorehold | 65 | `e24bde4734dbe087` |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e24bde4734dbe087` |
+| `ablation_cache_lorehold_10-20_n6000.json` | lorehold | 65 | `e24bde4734dbe087` |
+| `ablation_cache_rendmaw_10-20_n15000.json` | rendmaw | 64 | `2420c73d1c5c6702` |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `2420c73d1c5c6702` |
+| `ablation_cache_rendmaw_10-20_n6000.json` | rendmaw | 64 | `2420c73d1c5c6702` |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `547d2605a3914230` |
+| `ablation_cache_tivit_10-20_n15000.json` | tivit | 64 | `21c9ed8c8db77c8e` |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `21c9ed8c8db77c8e` |
+| `ablation_cache_tivit_10-20_n2000.json` | tivit | 64 | `21c9ed8c8db77c8e` |
 
 ## What each fingerprint covers
 
-- **azusa** — `ablation.py`, `edhmc/azusa.py`, `edhmc/decks/azusa_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`
-- **karlov** — `ablation.py`, `edhmc/decks/karlov_v2.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/karlov.py`, `edhmc/opponents.py`
-- **lorehold** — `ablation.py`, `edhmc/decks/lorehold_v16.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/lorehold.py`, `edhmc/opponents.py`
-- **rendmaw** — `ablation.py`, `edhmc/decks/rendmaw_v12.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`
-- **shilgengar** — `ablation.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`
-- **tivit** — `ablation.py`, `edhmc/decks/tivit_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/tivit.py`, `edhmc/voting.py`
+- **azusa** — `ablation.py`, `edhmc/azusa.py`, `edhmc/decks/azusa_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `staged:azusa`
+  - `staged:azusa` is `-Perilous Forays +Ka-Zar of the Savage Land`
+- **karlov** — `ablation.py`, `edhmc/decks/karlov_v2.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/karlov.py`, `edhmc/opponents.py`, `staged:karlov`
+  - `staged:karlov` is `-Swamp +Bolas's Citadel`
+- **lorehold** — `ablation.py`, `edhmc/decks/lorehold_v16.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/lorehold.py`, `edhmc/opponents.py`, `staged:lorehold`
+  - `staged:lorehold` is `-Penance +Caldera Pyremaw`, `-Scroll Rack +Sunbird's Invocation`
+- **rendmaw** — `ablation.py`, `edhmc/decks/rendmaw_v12.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `staged:rendmaw`
+  - `staged:rendmaw` is **empty** — nothing staged for this deck, so the baseline is the module's own list
+- **shilgengar** — `ablation.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`, `staged:shilgengar`
+  - `staged:shilgengar` is **empty** — nothing staged for this deck, so the baseline is the module's own list
+- **tivit** — `ablation.py`, `edhmc/decks/tivit_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/tivit.py`, `edhmc/voting.py`, `staged:tivit`
+  - `staged:tivit` is **empty** — nothing staged for this deck, so the baseline is the module's own list
 
 ## How each cache was produced
 
