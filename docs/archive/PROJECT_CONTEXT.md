@@ -1,3 +1,19 @@
+<!-- ARCHIVED. Read the note below before using anything here. -->
+
+> **ARCHIVED — provenance, not guidance.**
+>
+> Superseded by `CLAUDE.md` (durable rules) and `docs/STATUS.md` (current
+> state, generated). It predates almost everything in the project as it now
+> stands and still names `lorehold_v15.py`.
+>
+> Moved to `docs/archive/` on 2026-09-15. Nothing here is checked against the
+> repository by `python -m tools.check_docs`, because holding an archived
+> document to today's code would be the check crying wolf. **Read it for how a
+> decision was reached, never for what is true now** — `docs/STATUS.md` is the
+> current state and it is generated.
+
+---
+
 # EDH Monte Carlo — consolidated project context
 
 > **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the

@@ -7,7 +7,8 @@ are load-bearing** — `edhmc/azusa.py`, `tools/cache_manifest.py`,
 finding takes the next free letter in the `0*` series.
 
 `python -m edhmc.pending` is the only trustworthy statement of what is staged.
-`docs/PENDING_CHANGES.md` is stale and predates `lorehold_v16.py`.
+`docs/archive/PENDING_CHANGES.md` is stale, predates `lorehold_v16.py`, and is
+archived for that reason. `docs/STATUS.md` carries the live ledger counts.
 
 Methodology that used to live at the end of this file is now
 `docs/READING_TABLES.md`. Dated session narrative is `docs/HISTORY.md`.
@@ -70,6 +71,7 @@ Methodology that used to live at the end of this file is now
 | [0z20](#0z20) | FIXED | **§3 and §1b closed.** The Altar's mana is spendable; alternative costs have a PREFERENCE and six readers |
 | [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
+| [0z23](#0z23) | **OPEN** | **the ten N=15,000 caches were deleted and the generated manifest was not re-run** — it lists fourteen caches, four exist, and all four disagree with their recorded fingerprint |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4090,6 +4092,93 @@ documents for a single deck does not, and redirecting its stdout over a
 committed table truncates that table to the partial run. Hit for real on
 2026-09-13, recovered with `git checkout`. Pass `ABLATE_BUDGET` when running
 one deck by hand.
+
+---
+
+<a id="0z23"></a>
+
+## 0z23. OPEN — every ablation cache is gone or stale, and the generated manifest still describes them
+
+**Found 2026-09-15 by `tools/check_docs.py` on its first run**, which is the
+only reason this entry exists: nothing else in the repo compares the manifest
+against the directory it describes.
+
+### What is true on disk
+
+`results/caches/` holds **four** cache files — the `n6000` ones for rendmaw,
+lorehold and karlov, and tivit's `n2000`. `docs/ABLATION_CACHES.md` describes
+**fourteen**. The missing ten include **every `_medblank` cache at N=15,000**,
+which is to say every cache that produced a table now committed in `results/`.
+
+They were added in `d158724` and deleted in `b09055c`, whose message says
+"Regenerates all ablation caches and tables against the new engine fingerprint;
+deletes the ones now stale". The deletion happened; the regenerated caches were
+never added back, and `python -m tools.cache_manifest --write` was not re-run in
+that commit, so the manifest went on describing files that no longer exist.
+
+`.gitignore` still carries a comment block explaining that the caches are
+tracked and that there are "TWELVE, not four".
+
+### And the four survivors are stale by the repo's own rule
+
+Every one of them disagrees with its live fingerprint:
+
+| cache | recorded | live |
+|---|---|---|
+| `ablation_cache_rendmaw_10-20_n6000.json` | `2420c73d1c5c6702` | `0ac5ad66a8f9fff1` |
+| `ablation_cache_lorehold_10-20_n6000.json` | `e24bde4734dbe087` | `fbc552aea5d15b19` |
+| `ablation_cache_karlov_10-20_n6000.json` | `4fbd678bca7abb97` | `431e2b18fdea7711` |
+| `ablation_cache_tivit_10-20_n2000.json` | `21c9ed8c8db77c8e` | `d55ddbf4fa5ff163` |
+
+The rule this file and `cache_manifest.py` both state is **"if the fingerprint
+differs, DELETE the cache"**, so all four are already condemned by it.
+
+### What this does and does not cost
+
+**It does NOT invalidate any committed table.** The tables in `results/` are
+the artefact; the caches are the intermediate that lets a run resume. Every
+table is still the output of the run that produced it, and the azusa table
+was verified to reflect the current ledger — it carries an Idol of Oblivion
+row and no Cauldron of Essence row, which is correct after the 2026-09-13
+withdrawal.
+
+**What it costs is the resume.** Any regeneration now starts from empty, at
+full cost, on all six decks. That is the thing tracking the caches was for.
+
+**And it makes one paragraph of the manifest actively misleading.** The
+manifest warns at length that "RENDMAW IS THE EXCEPTION AND ITS THREE CACHES
+ARE STALE" and that `results/ablation_rendmaw.txt` "still carries a Cauldron of
+Essence row for a card the deck no longer contains". The rendmaw caches it
+names are gone, and the table was regenerated — there is no Cauldron row in it.
+The warning is now about a state that no longer exists, in the file whose whole
+job is to be believed about staleness.
+
+### THE RESOLUTION IS A DECISION, NOT A COMMAND
+
+`python -m tools.cache_manifest --write` would make `check_docs` pass and would
+be the **wrong thing to do**. The manifest records the live fingerprint beside
+each cache, so regenerating it sets recorded equal to live *by construction* —
+certifying four caches as produced by code that did not produce them, and
+destroying the only signal that says so. The options are:
+
+1. **Delete the four survivors** and regenerate the manifest. Honest, loses
+   nothing that is not already condemned, and leaves the repo with no caches
+   until the next full run.
+2. **Restore the ten N=15,000 caches** from `b09055c^` if they still match the
+   code that produced the committed tables — check the fingerprint before
+   trusting them, because the §0z21/§0z22 work moved every engine.
+3. **Stop tracking the caches** and delete the manifest's file table, keeping
+   its per-cache notes as provenance. `.gitignore`'s own comment says the
+   rebuild is now 23 minutes rather than the six hours that justified tracking
+   them, so the original argument for tracking has weakened on its own terms.
+
+Until one is chosen, `python -m tools.check_docs` fails on two checks, and that
+is the check working. **The lesson is the one §0q keeps teaching, pointed at a
+GENERATED file:** derivation is not enough on its own, because a generated file
+is only as current as the last time someone remembered to generate it. That is
+why `check_docs` verifies the generators were RUN, and why
+`.claude/skills/session-close/SKILL.md` makes regenerating them the first step
+of closing a session.
 
 ---
 

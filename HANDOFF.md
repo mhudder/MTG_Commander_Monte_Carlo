@@ -1,127 +1,31 @@
 # Handoff
 
-Orientation for a human picking this project up — what it is, what state it's
-in, and where to look next. Not exhaustive; `CLAUDE.md` is the operational
-doc (current state, standing rules, queued work) and is worth reading in full
-— it is about 330 lines. The dated session notes it used to carry are in
-`docs/HISTORY.md`, which is worth grep-ing and not reading top to bottom.
+Orientation for a human picking this project up — what it is, how it works, and
+how not to get burned by it. **It deliberately contains no current numbers.**
 
----
+Where things live:
 
-## Status, 2026-09-12 — read this before anything else
-
-**Fourteen engine defects were fixed, and all six tables have now been
-regenerated against them.** Everything in `results/` describes the current
-engine. The simulator is healthy: `python -m tools.validate` is `+0.00` on all
-18 metrics, all 8 test suites pass, and all 7 mutation checks pass.
-
-What the regeneration showed, over all 378 rows: **19 moved beyond their own
-old error bar and one already-significant row flipped sign** (Magister of
-Worth, into the category where a low score explicitly is not evidence).
-Lorehold moved most (11 of 65), which is what you'd expect of the deck whose
-drain was the most inflated; **Karlov and Azusa came back byte-identical**,
-confirming they touch none of the fixed code — and incidentally proving the
-rebuild is bit-reproducible. Every single mover traces to a named defect.
-
-**One thing came out of it that changes a decision.** The staged Rendmaw swap
-(−Idol of Oblivion +Cauldron of Essence) lost most of its evidence: re-measured
-at the original sample and seeds it is **worth nothing at ten turns** (+0.0000,
-against +0.0027 before) and about a third of its recorded value at twenty
-(+0.0055 against +0.0152). Cauldron's drain was one of the six effects inflated
-by up to 3x. It isn't refuted, but don't commit it on the number in the ledger's
-older entry.
-
-### What was wrong, and what it cost
-
-Every fix is behind its own on/off switch, so any of them can be reverted and
-re-measured independently. Full detail is `KNOWN_ISSUES.md` §0z9–§0z15.
-
-| what was broken | why it mattered |
+| | |
 |---|---|
-| "Each opponent loses 1 life" dealt up to **3 life each** once players were eliminated | Drain effects were inflated exactly in the endgame, where they decide games |
-| Your own board wipe killed your **indestructible** creatures; the opponents' wipes respected them | Avacyn, Angel of Hope protects your whole board — and your own Wrath ignored her |
-| Board wipes killed things that **aren't creatures** — a Planeswalker, a not-yet-a-creature | Three cards in the Rendmaw deck were dying to wraths they should dodge |
-| Tivit's five board wipes **did nothing at all**, and the AI held them until it was losing to cast them | Worse than a blank card: a blank doesn't wait for the worst moment |
-| Three Lorehold cards were stand-ins, not the real card | Apex of Power's "add ten mana" — the entire point of the card — didn't exist |
-| Talisman of Conviction's damage-to-you was free | Lorehold ends games on ~1.7 life, so small life costs matter more there than anywhere |
-| Four internal safety checks **couldn't detect the thing they were checking for** | One had been silently broken since cards were cut two days earlier |
+| **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings, every runnable command. Regenerate with `python -m tools.status --write`. |
+| **the rules** | `CLAUDE.md` — the operational doc, ~560 lines, durable, worth reading in full. |
+| **a numbered finding** | `KNOWN_ISSUES.md` — `§0a`..`§0z22` plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered. |
+| **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
+| **the knobs** | `docs/KNOBS.md` — all 107, GENERATED, with defaults and which have never been swept. |
 
-### The effect on the simulation
+This file used to open with a dated status block. It was three days stale when
+it was removed, which is why state now lives in one generated file instead of
+being restated in three hand-written ones. That block is in `docs/HISTORY.md`.
 
-Measured over 6,000 paired games per deck, engine-before vs engine-after:
+## Start here, cold
 
-| deck | win rate | notes |
-|---|---|---|
-| **Lorehold** | **−1.8 points** (0.176 → 0.158) | The big one. Its drain cards were the most inflated |
-| Tivit | +0.7 points | Its five dead board wipes started working |
-| Rendmaw | −0.2 points | Not statistically distinguishable from zero |
-| Shilgengar | +0.1 points | Damage up slightly; win rate unmoved |
-| **Karlov, Azusa** | **no change at all** | Identical to the digit — they touch none of the fixed code |
-
-**Read this as accuracy, not as decks getting better or worse.** Only one fix
-raised a win rate for a reason anyone wanted (the three Lorehold cards, worth
-+0.8 points on their own). The rest removed effects the simulator was
-crediting that the real cards don't have. Lorehold's drop is the single
-clearest result: it had been winning partly on drain damage that was up to
-three times too large.
-
-### What still needs doing
-
-1. ~~Regenerate the tables.~~ **DONE 2026-09-12**, all six, from empty caches.
-2. ~~**The common-random-numbers leak.**~~ **FIXED 2026-09-13**
-   (`KNOWN_ISSUES.md` §0z17). All eleven mid-game draws across five files now
-   use per-effect addressed streams, and a new check asserts the invariant the
-   old self-check structurally could not: after the opening hand, the game RNG
-   is never touched again.
-
-   **Correct the claim this entry used to make.** It said the leak "makes them
-   noisier than the error bars claim". Measured before and after on the two
-   swaps that motivated it, the pairing did not improve — the correlation moved
-   by less than the noise, and downward on one of them. "15% of games diverged"
-   is not "15% of the pairing was lost", because the dominant shared randomness
-   is the opening shuffle and that was never broken. The defect was real and
-   worth closing; its cost was smaller than this file implied.
-
-   The consequence is a regeneration, not a correction: five engines' numbers
-   move (Shilgengar's do not — it has no mid-game draws), so **all six tables
-   need rebuilding.**
-3. **Commit the staged card swaps — three of them, not four.** The two Lorehold
-   swaps and the Azusa one are waiting only on the three-leg discipline below;
-   Caldera Pyremaw's own row got *stronger* in the regeneration. The Rendmaw
-   one needs a decision first, for the reason above.
-4. **Re-read the queued items written before the batch.** Two have already
-   turned out to be stale in opposite directions: item 8 called Erebos a cut
-   candidate, and §0z10 moved it the other way (withdrawn 2026-09-12); §0z16
-   found a card carrying contradictory labels in two decks. Closing an engine
-   gap silently invalidates notes written while it was open, and nothing
-   re-reads them.
-
-**2026-09-13 also closed three long-open modelling gaps**, all measured, all
-behind knobs, all with mutation-tested checks: the common-random-numbers leak
-(§0z17, no precision gained — see the entry), **Ashaya's second clause**
-(§0z18, **+0.0140** win rate on Azusa) and **§7's six recursion cards**
-(§0z19, **+0.0220** on Lorehold, +0.0040 on Rendmaw), plus **§3 and §1b**
-(§0z20 — the Altar's mana is spendable at last, and alternative costs finally
-distinguish "cheaper and worse" from "dearer and better"; neither moved a win
-rate). Five decks' numbers have moved and **all six tables need regenerating.**
-
-Seven numbered issues were closed in the day: §0z17–§0z20 covering queued
-item 19, item 15, §7, §3 and §1b.
-
-**ALL SIX TABLES WERE THEN REGENERATED** from empty caches at N=15,000
-(2026-09-13). 25 of 378 rows moved beyond their own old error bar and **no
-already-significant row flipped sign**. Shilgengar came back byte-identical on
-all 64 rows, which is the check that the work did not leak into a deck it had
-no business touching. The one row worth acting on is **Ashnod's Altar**, now
-−0.0012 ±0.0012 and significantly negative for the first time — and it got
-there by being implemented, not neglected, which is the opposite of the two
-traps that have cost this project withdrawn swaps.
-
-There is also a standing limitation, not a bug: the opponents are an abstract
-threat level rather than real cards, so roughly a third of every deck (removal
-spells, counterspells) can't be evaluated at all — 117 of 379 nonland cards,
-counted 2026-09-13. That is `KNOWN_ISSUES.md` §4 and it would be a rewrite,
-not a fix.
+```bash
+pip install -r requirements.txt
+python -m tools.status       # what state is the project in?
+python -m tools.check_docs   # do the docs still describe the repo?
+python -m edhmc.pending      # what is staged, and why
+python -m tools.validate     # is any of this trustworthy? must print +0.00
+```
 
 ## What this is
 
@@ -139,7 +43,8 @@ The tree, since the 2026-09-09 reorganisation:
     tests/          mechanism tests
     results/        every table and output; results/caches/ holds the ablation caches
     spreadsheets/   the .xlsx system of record
-    docs/           HISTORY.md, audits, the cache manifest, archived docs
+    docs/           STATUS.md + KNOBS.md (both GENERATED), HISTORY.md, audits,
+                    the cache manifest, COMP_RULES.md, and archive/
 
 **Everything runs from the repo root with `-m`.** These scripts import
 `edhmc.*`, so running `python tools/ablation.py` directly puts `tools/` on
@@ -211,8 +116,9 @@ A card swap goes through three states:
    2026-09-10 this state lived only in comments.
 2. **Staged** — recorded in `edhmc/pending.py`'s `CHANGES` list. The deck
    module does NOT yet reflect it; `python -m edhmc.pending` is the only
-   trustworthy statement of what's currently staged (don't trust
-   `DECK_CHANGES.md`'s table — it's a hand-written summary and it drifts).
+   trustworthy statement of what's currently staged. A hand-written summary
+   of it drifted badly enough to be archived — `docs/archive/DECK_CHANGES.md`
+   — which is why the ledger is read by a command and never transcribed.
 3. **Committed** — applied to all three legs at once: the deck module, the
    `.xlsx`, and `pending.py`'s `COMMITTED` list. A change is not considered
    done until all three move together. Azusa has no `.xlsx`, so it is two
@@ -223,21 +129,19 @@ head-to-head against a specific cut, because everything in `MEASURED` shares
 one baseline and a common baseline cannot rank two cards against each other
 (`KNOWN_ISSUES.md` §0c).
 
-As of 2026-09-12 there are **five staged, uncommitted swaps** (two on Lorehold,
-one on Rendmaw, one on Azusa, one on Karlov) and **seven measured, undecided candidates** (all
-Azusa, §0z4) — run `python -m edhmc.pending` for the current list and the
-evidence behind each. **This sentence is exactly the kind that goes stale; the
-command is authoritative and this paragraph is not.**
+The live counts are in `docs/STATUS.md`'s ledger table, derived from
+`edhmc/pending.py`, and the evidence behind each entry is
+`python -m edhmc.pending`. **They are deliberately not restated here.** The
+sentence that used to sit in this spot said "as of 2026-09-12 there are five
+staged, uncommitted swaps ... seven measured, undecided candidates", and warned
+in its own final line that it was "exactly the kind that goes stale". It was:
+by the time it was removed the ledger held four staged and thirteen measured,
+because the Rendmaw swap had moved to `WITHDRAWN` and two more Azusa batches
+had been measured.
 
-The three older ones were measured before the 2026-09-08 combat split and all
-three were re-verified on it on 2026-09-09 (`KNOWN_ISSUES.md` §0w). **That
-re-verification has since been overtaken for one of them.** The two Lorehold
-swaps still hold and are committable, subject only to the three-leg discipline
-above. The Rendmaw one does not: re-measured on the 2026-09-12 engine it is
-worth nothing at ten turns and a third of its recorded value at twenty, because
-§0z9's drain fix took away most of what it was being credited for. The Azusa
-one (−Perilous Forays +Ka-Zar of the Savage Land) was staged 2026-09-10, held
-back deliberately while four other Azusa swaps were committed, and is unmoved.
+A swap can also be **withdrawn** — staged, then unstaged, with the entry kept
+rather than deleted, because the entry is where the evidence lives. That is a
+fourth state and `edhmc/pending.py` documents it.
 
 The general lesson, which is the third time this project has paid for it: **a
 re-verification is only as current as the engine it ran on.** Each of these
@@ -285,21 +189,29 @@ disagree, the project's own rule is to follow win rate.
 
 ## Reading order
 
-- **This file** — orientation, current state, how to not get burned.
-- **`CLAUDE.md`** — the operational doc: current state, the standing rules,
-  and queued work. ~330 lines, kept current, read it in full.
-- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0z15` plus the
-  older `1`–`8` series, with a status index at the top. The ids are cited
-  from code, so they never get renumbered. **§0z9–§0z15 is the 2026-09-12
-  batch** and is where an agent should start.
-- **`docs/READING_TABLES.md`** — how to read an ablation table without
-  drawing the three conclusions it invites you to draw wrongly.
+- **This file** — orientation and how not to get burned. No current numbers.
+- **`docs/STATUS.md`** — what is true right now. GENERATED; read it, never edit
+  it. If it disagrees with prose anywhere else, it wins.
+- **`CLAUDE.md`** — the operational doc: the standing rules and the open queued
+  work. ~560 lines, durable, read it in full. It carries no dated state, which
+  is why it can be trusted without checking when it was last touched.
+- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0z22` plus the
+  older `1`–`8` series, with a status index at the top. The ids are cited from
+  43 places in the code, so they are never renumbered. Read the index, then the
+  handful of sections it points you at; the file is 4,300 lines and is not
+  meant to be read through.
+- **`docs/READING_TABLES.md`** — how to read an ablation table without drawing
+  the three conclusions it invites you to draw wrongly. Short, and it has never
+  needed updating, which is what a good doc looks like here.
+- **`docs/KNOBS.md`** — every simulation knob, GENERATED, with its default.
 - **`README.md`** — the methodology writeup (common random numbers, paired
   inference, why they work). Trustworthy on technique; the numbers it quotes
   predate several corrections and shouldn't be cited.
 - **`docs/HISTORY.md`** — the full dated narrative. Every correction, every
-  bug, every "the model said X, it was wrong because Y." Worth searching, not
-  reading linearly; several sections are explicitly marked VOID.
+  bug, every "the model said X, it was wrong because Y." **Search it, don't
+  read it**; several sections are explicitly marked VOID or SUPERSEDED.
+- **`docs/archive/`** — superseded docs kept as provenance. Each says so on its
+  first line. Nothing checks them against the repo.
 
 ## A pattern worth knowing before you trust any card's row
 

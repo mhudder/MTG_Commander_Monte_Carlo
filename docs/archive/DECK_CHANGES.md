@@ -1,3 +1,19 @@
+<!-- ARCHIVED. Read the note below before using anything here. -->
+
+> **ARCHIVED — provenance, not guidance.**
+>
+> Superseded by `python -m edhmc.pending`. This was a hand-written summary
+> of the ledger and it drifted, which is the reason the ledger is read by a
+> command rather than transcribed.
+>
+> Moved to `docs/archive/` on 2026-09-15. Nothing here is checked against the
+> repository by `python -m tools.check_docs`, because holding an archived
+> document to today's code would be the check crying wolf. **Read it for how a
+> decision was reached, never for what is true now** — `docs/STATUS.md` is the
+> current state and it is generated.
+
+---
+
 # Deck changes to date
 
 > **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the

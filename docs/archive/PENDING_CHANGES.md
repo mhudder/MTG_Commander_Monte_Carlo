@@ -1,3 +1,19 @@
+<!-- ARCHIVED. Read the note below before using anything here. -->
+
+> **ARCHIVED — provenance, not guidance.**
+>
+> Superseded by `python -m edhmc.pending`, which is the only trustworthy
+> statement of what is staged, and by `docs/STATUS.md`'s ledger table. It
+> predates `lorehold_v16.py`.
+>
+> Moved to `docs/archive/` on 2026-09-15. Nothing here is checked against the
+> repository by `python -m tools.check_docs`, because holding an archived
+> document to today's code would be the check crying wolf. **Read it for how a
+> decision was reached, never for what is true now** — `docs/STATUS.md` is the
+> current state and it is generated.
+
+---
+
 # Pending deck changes
 
 > **ARCHIVED — kept as provenance, not as guidance.** Moved to `docs/` in the
