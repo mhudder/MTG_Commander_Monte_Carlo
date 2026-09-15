@@ -130,8 +130,22 @@ from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
-from edhmc.decks._evasion import FOREST, HUMAN
+from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN
 from edhmc import opponents as OPP
+
+# TOKENS ARE NOT CARDS, so they are not in the generated FOREST set and cannot
+# be: `tag_flying.py` reads Scryfall, and Scryfall has no entry for "the token
+# Awaken the Woods makes". The set is therefore written here, next to the one
+# effect that makes one, and `is_forest()` below is the ONE place the question
+# "is this permanent a Forest" is answered -- §0u's rule, applied before the
+# second copy of the rule could be written. Both consumers (Sapling Nursery's
+# affinity and Nissa Who Shakes the World's doubler) read it.
+FOREST_TOKENS = frozenset({"Forest Dryad token"})
+
+
+def is_forest(card) -> bool:
+    """Does this card have the Forest subtype? (305.6 gives it "{T}: Add {G}".)"""
+    return card.name in FOREST or card.name in FOREST_TOKENS
 
 TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
 
@@ -251,6 +265,13 @@ LAND_ENABLERS = frozenset({
     "Nissa, Who Shakes the World",
     "War Room",
     "Castle Garenbrig",
+    # --- 2026-09-13 fourth batch. Both are read by the land logic and both
+    # have to be on the battlefield BEFORE the drops: Nissa, Resurgent Animist
+    # is a landfall payoff, and Traveling Chocobo both doubles those payoffs
+    # and grants top-of-library land access, so deploying it after the drops
+    # would waste the whole turn's worth of both.
+    "Nissa, Resurgent Animist",
+    "Traveling Chocobo",
 })
 
 # Starting loyalty. `Permanent.counters` carries the current value from there.
@@ -332,6 +353,8 @@ class AzusaGame:
         # Each 2026-09-07 fix behind its own knob, defaulting to the corrected
         # behaviour, so the committed table can be reproduced and each claim
         # measured on its own. See diag_azusa_animation.py.
+        # Read once; see ashaya_lands() for why this one and not the others.
+        self._ashaya_cfg = cfg.get("ashaya_lands", True)
         cfg.setdefault("land_animation", "full")     # "full"|"legacy"|"off"
         cfg.setdefault("animated_lands_block", True)
         cfg.setdefault("rude_awakening_modes", True)
@@ -345,6 +368,10 @@ class AzusaGame:
         # (T20) on this deck. See run_combat_split.py and combat_split.txt.
         cfg.setdefault("combat_split", True)
         self.bonus_mana: list[frozenset] = []   # Lotus Cobra, this turn only
+        # "IF THIS IS THE SECOND TIME this ability has resolved THIS TURN" --
+        # Nissa, Resurgent Animist. Resolutions, not land drops, so a doubler
+        # reaches the second one on the first land. Reset in take_turn.
+        self.animist_resolutions = 0
 
         # SHUFFLE EFFECTS MUST NOT BREAK COMMON RANDOM NUMBERS, and a cracked
         # fetch land shuffles. If a mid-game shuffle drew from `self.rng`,
@@ -427,6 +454,28 @@ class AzusaGame:
             "wildspeaker_pumps": 0,     # times the pump mode was chosen
             "finale_from_yard": 0,      # Finale targets taken from the
                                         # graveyard rather than the library
+            # 2026-09-13 fourth batch, registered here for the same reason
+            # every batch above is: `self.m` is a plain dict, so a counter
+            # created on first use is a KeyError in the minority of games where
+            # the card resolves, inside a worker, twenty minutes into a run.
+            "landfall_ability_resolutions": 0,  # land ETBs x (1 + doublers).
+                                        # `landfall_triggers` counts the
+                                        # EVENTS; this counts the ABILITIES,
+                                        # and the gap between them IS what a
+                                        # Greenwarden or a Chocobo is worth.
+            "animist_mana": 0,          # Nissa, Resurgent Animist: rituals
+            "animist_cards": 0,         # ... and cards actually found
+            "animist_whiffs": 0,        # ... reveals that found no Elf or
+                                        # Elemental at all
+            "animist_revealed": 0,      # cards moved off the top by it, which
+                                        # is the cost the top-of-library
+                                        # enablers pay for it
+            "awaken_tokens": 0,         # Forest Dryad land creature tokens
+            "charm_lands": 0,           # Archdruid's Charm, mode 1, land half
+            "charm_creatures": 0,       # ... and its creature half
+            "map_cracked": 0,           # Expedition Map activations
+            "zuran_sacs": 0,            # lands sacrificed to Zuran Orb
+            "zuran_life": 0,            # ... and the life it made
         }
         self.damage_by_turn = []
 
@@ -494,9 +543,16 @@ class AzusaGame:
             lands you control. Nontoken creatures you control are Forest
             lands in addition to their other types. (They're still affected
             by summoning sickness.)
+
+        THE KNOB IS READ ONCE, at construction, because this is one of the
+        hottest predicates in the engine -- 626,800 calls in 120 games, since
+        `creature_lands`, `land_count`, `forests` and `available_mana` all ask
+        it per permanent. `cfg` is a private copy stamped in `__init__` (see
+        `engine_cfg`) and nothing mutates it mid-game, so the cached flag and
+        the lookup cannot disagree.
         """
-        return (self.cfg.get("ashaya_lands", True)
-                and self.has("Ashaya, Soul of the Wild"))
+        return (self._ashaya_cfg
+                and "Ashaya, Soul of the Wild" in self.board.names)
 
     def is_creature_land(self, perm) -> bool:
         """Is this permanent a land ONLY because of Ashaya?
@@ -529,7 +585,64 @@ class AzusaGame:
             return False
         return not perm.sick
 
+    def land_mana_live(self, perm) -> bool:
+        """Can this LAND tap for mana right now? (302.6.)
+
+        A plain land has no summoning sickness; a land that is ALSO A CREATURE
+        does, because 302.6 gates "a creature's activated ability with the tap
+        symbol" and says nothing about what else that permanent is. Two
+        permanents in this project are in that position and NEITHER was
+        modelled -- `available_mana` read `c.is_land` and never looked at
+        `sick`:
+
+          Dryad Arbor         Land Creature -- Forest Dryad, in this list since
+                              2026-09-07, tapping for {G} on the turn it was
+                              played for the life of the project. Small (one
+                              card, ~one drop a game) and wrong.
+          Forest Dryad token  Awaken the Woods, whose own reminder text says
+                              "(They're affected by summoning sickness.)" --
+                              which is why the gap had to be closed before that
+                              card could be measured at all, rather than after.
+
+        `make_permanent` already forces every land to enter `sick=True`. That
+        was written for the ANIMATION rules -- a land animated the turn it
+        lands cannot attack -- and is exactly the flag this needs, which is why
+        no new bookkeeping appears here.
+
+        WHAT THIS IS DELIBERATELY BLIND TO, written down rather than left to be
+        discovered (§0z15): an ANIMATED land. `perm.card.is_creature` is a fact
+        about the card, so a plain land turned into a creature this turn by
+        Sylvan Awakening or Nissa, Who Shakes the World is not covered -- and
+        both of those grant HASTE, which under 702.10b lets it tap anyway, so
+        the only unmodelled case is Rude Awakening's hasteless animate mode on
+        a land played the same turn. All three of those cards are cut from the
+        list as of 2026-09-10. `land_creature_sick=False` restores the old
+        behaviour exactly.
+        """
+        if not perm.card.is_creature:
+            return True
+        if not self.cfg.get("land_creature_sick", True):
+            return True
+        return not perm.sick
+
     def creature_lands(self):
+        """The permanents Ashaya's clause turns into lands.
+
+        NOT MEMOISED, AND THAT WAS MEASURED RATHER THAN ASSUMED. This is
+        O(board) and three callers ask it on paths that run per permanent
+        (`land_count`, which `power_of` asks for every */* card; `forests`;
+        `your_lands`), which made it look like the obvious cache -- 842,029
+        calls to `is_creature_land` in 120 games. A `Board.version` stamp plus
+        a cache here measured **1.01x on azusa and 0.99x on rendmaw**:
+        nothing, in both directions.
+
+        The reason is the guard on the next line. Ashaya is on the battlefield
+        in a minority of games, so the expensive branch is already skipped in
+        most of them, and the call count was concentrated in the few games
+        where it is out. The cache was removed rather than kept: it put an
+        invariant on every Board mutator (bump the stamp) and an invalidation
+        obligation on a shared class, to buy noise.
+        """
         if not self.ashaya_lands():
             return []
         return [p for p in self.board if self.is_creature_land(p)]
@@ -729,9 +842,18 @@ class AzusaGame:
 
         demand = hand_colour_demand(self)
 
+        # `want` depends only on the colour set and on `demand`, which is fixed
+        # for this call -- and a mono-green board is twenty sources sharing one
+        # frozenset. Memoised for the same reason `can_pay` memoises its
+        # rarest-colour scan.
+        want_of: dict = {}
+
         def add(src, n, owner):
             rank, power = tap_reluctance(self, owner)
-            want = max((demand.get(c, 0) for c in src), default=0)
+            want = want_of.get(src)
+            if want is None:
+                want = want_of[src] = max((demand.get(c, 0) for c in src),
+                                          default=0)
             units.extend([src] * n)
             owners.extend([owner] * n)
             weights.extend([(rank, want, power)] * n)
@@ -746,18 +868,29 @@ class AzusaGame:
         # engine.spend() that makes one Forest cover two units rather than
         # tapping two Forests to produce them.
         nissa = self.has("Nissa, Who Shakes the World")
+        # A GUARD, NOT A SECOND COPY OF THE RULE. `creature_land_mana` is still
+        # the only place the Ashaya mana rule is written (§0u) and it asks this
+        # same question first; hoisting it only skips the call when the answer
+        # cannot be yes. Ashaya is on the battlefield in a small minority of
+        # games, and this loop runs over every permanent on every payment
+        # decision -- 800,962 calls to `ashaya_lands` in 120 games before this.
+        ashaya = self.ashaya_lands()
         for p in self.board:
             if p.tapped:
                 continue
             c = p.card
-            if c.is_land:
+            if c.is_land and self.land_mana_live(p):
                 if c.name == "Temple of the False God":
                     add(frozenset({"C"}), 2 if n_lands >= 5 else 1, p)
                 elif c.name == "Eye of Ugin":
                     pass   # no mana ability on the current oracle text
                 else:
                     add(c.produces, 1, p)
-                if nissa and c.name in FOREST:
+                # `is_forest`, not `c.name in FOREST`: Awaken the Woods makes
+                # Forest tokens, and a token is not in the generated set
+                # because Scryfall has no entry for one. One predicate, so the
+                # doubler and Sapling Nursery's affinity cannot disagree.
+                if nissa and is_forest(c):
                     add(frozenset({"G"}), 1, p)
             elif c.mana_ability:
                 if c.is_creature and p.sick:
@@ -771,7 +904,7 @@ class AzusaGame:
             # is how it was found. The predicate is now the only place the
             # rule is written; it returns False for a card with its own mana
             # ability, so a dork still taps once.
-            if self.creature_land_mana(p):
+            if ashaya and self.creature_land_mana(p):
                 add(frozenset({"G"}), 1, p)
         # Lotus Cobra's and Tireless Provisioner's floating mana has NO owner:
         # nothing on the battlefield taps for it, so `spend` must not try.
@@ -805,7 +938,18 @@ class AzusaGame:
         # entered, and the metric counts land-entry events. What doubles is
         # the ABILITIES, which the payoff counters below record. Counting the
         # event twice would make the mechanism counter disagree with the game.
-        reps = 2 if self.has("Ancient Greenwarden") else 1
+        #
+        # TRAVELING CHOCOBO CARRIES THE SAME SENTENCE and therefore STACKS:
+        # "if a land or Bird you control entering the battlefield causes a
+        # triggered ability of a permanent you control to trigger, that ability
+        # triggers an additional time." Two such effects mean one land fires
+        # every payoff THREE times, not four -- each adds one instance, they do
+        # not multiply. Counting them is why this is `count` rather than `has`:
+        # a second copy of either would add a third rep, which is what
+        # `_landfall_payoffs`' own docstring demands of every payoff here.
+        reps = (1 + self.count("Ancient Greenwarden")
+                + self.count("Traveling Chocobo"))
+        self.m["landfall_ability_resolutions"] += reps
         for _ in range(reps):
             self._landfall_payoffs(card, played)
 
@@ -872,6 +1016,28 @@ class AzusaGame:
                     self.m["scute_swarms_made"] += 1
                 else:
                     self.make_tokens(1, 1, 1, "Insect")
+        # NISSA, RESURGENT ANIMIST: "Landfall -- whenever a land you control
+        # enters, add one mana of any color. Then IF THIS IS THE SECOND TIME
+        # this ability has resolved this turn, reveal cards from the top of
+        # your library until you reveal an Elf or Elemental card. Put that card
+        # into your hand and the rest on the bottom of your library in a random
+        # order."
+        #
+        # THE SECOND, AND ONLY THE SECOND. An Azusa turn routinely resolves
+        # this three or four times and the third and fourth add mana only, so
+        # this is ONE CARD A TURN with a ritual attached -- not a card per
+        # land. Anyone quoting it as the latter is quoting a different card.
+        #
+        # The counter is RESOLUTIONS, not land drops, which is what makes it
+        # interact with the doublers above exactly as the rules say: with
+        # Greenwarden or Chocobo out, the FIRST land of the turn already
+        # resolves this ability twice and the reveal happens on that land.
+        for _ in range(self.count("Nissa, Resurgent Animist")):
+            self.bonus_mana.append(frozenset({"W", "U", "B", "R", "G", "C"}))
+            self.m["animist_mana"] += 1
+            self.animist_resolutions += 1
+            if self.animist_resolutions == 2:
+                self.animist_reveal()
         for _ in range(self.count("Tireless Provisioner")):
             # "create a Food or a Treasure token" -- modelled as the
             # Treasure mode (immediately useful mana), the same
@@ -894,6 +1060,52 @@ class AzusaGame:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
                 self.draw(1)
+
+    def animist_reveal(self):
+        """Nissa, Resurgent Animist's second-resolution reveal.
+
+        "Reveal cards from the top of your library until you reveal an Elf or
+        Elemental card. Put that card into your hand and the rest on the bottom
+        of your library in a random order."
+
+        THREE THINGS HERE ARE THE CARD RATHER THAN DECORATION.
+
+        1. IT CANNOT FAIL TO FIND unless the library holds no Elf or Elemental
+           at all, in which case the whole library is revealed and goes to the
+           bottom -- a shuffle that draws nothing. ELF_ELEMENTAL is generated
+           from Scryfall into decks/_evasion.py, because a subtype is data
+           (§0z4) and a hand-written list of "the elves, probably" would decide
+           this card's number by how good someone's memory was.
+
+        2. THE REST GO TO THE BOTTOM, so this DIGS: every card it passes over
+           leaves the top of the library. That is a real cost in a deck whose
+           four top-of-library enablers play lands from up there, and a real
+           benefit when the top card is one it cannot use -- it re-rolls it,
+           the same way cracking a fetch does (see `choose_land`).
+
+        3. "IN A RANDOM ORDER" is a mid-game randomisation, so it goes through
+           the addressed CRN stream like every other one (§0z17), not through
+           `g.rng`.
+        """
+        revealed = []
+        found = None
+        while self.library:
+            c = self.library.pop()
+            if c.name in ELF_ELEMENTAL:
+                found = c
+                break
+            revealed.append(c)
+        if found is not None:
+            self.hand.append(found)
+            self.m["animist_cards"] += 1
+        else:
+            self.m["animist_whiffs"] += 1
+        self.m["animist_revealed"] += len(revealed) + (found is not None)
+        crn_shuffle(self, "animist_bottom", revealed)
+        # Index 0 is the BOTTOM of the library here -- `draw` and `land_step`
+        # both take from the end. Reversed or not, these are shuffled; what
+        # matters is that they leave the top.
+        self.library = revealed + self.library
 
     # -- Springheart Nantuko ---------------------------------------------
     #
@@ -1148,6 +1360,12 @@ class AzusaGame:
         return (self.has("Augur of Autumn") or self.has("Courser of Kruphix")
                 or self.has("Oracle of Mul Daya")
                 or self.has("Ka-Zar of the Savage Land")
+                # "You may play lands and cast Bird spells from the top of your
+                # library." The Bird half is worth nothing in a list whose only
+                # Bird is the Chocobo itself; the land half is this, and it is
+                # a FIFTH source of the same boolean -- which is the redundancy
+                # Ka-Zar's own entry was staged in spite of (§0z3).
+                or self.has("Traveling Chocobo")
                 or (self.has("Case of the Locked Hothouse")
                     and self.hothouse_solved))
 
@@ -1282,7 +1500,7 @@ class AzusaGame:
         Affinity for Forests, and Nissa Who Shakes the World's "whenever you
         tap a Forest for mana".
         """
-        return (sum(1 for p in self.board if p.card.name in FOREST)
+        return (sum(1 for p in self.board if is_forest(p.card))
                 + len(self.creature_lands()))
 
     def resolve(self, card):
@@ -1370,6 +1588,18 @@ class AzusaGame:
                 self.legacy_animation = True
         elif script == "momentous_fall":
             self.sac_for_value(momentous=True)
+        elif script == "awaken_woods":
+            # X COMES FROM THE CARD, and there is deliberately no knob. The
+            # cost and the number of tokens are the SAME X: `cost` carries it
+            # as generic mana and `x_pips` records how much of that is the X.
+            # A cfg knob for the token count would be a second place to say one
+            # thing (§0u), and the first sweep written that way measured "eight
+            # tokens for the price of six" without anyone noticing -- the
+            # deploy rate was identical at every X, which is the tell. Varying
+            # X means varying the CARD; see diag_azusa_batch4.py's `awaken_at`.
+            self.awaken_the_woods(card.x_pips)
+        elif script == "archdruid_charm":
+            self.archdruids_charm()
 
         if not card.is_permanent:
             self.graveyard.append(card)
@@ -1649,6 +1879,236 @@ class AzusaGame:
             self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
             if c.is_land:
                 self.land_entered(c, played=False)
+
+    def awaken_the_woods(self, x):
+        """Awaken the Woods {X}{G}{G}: "Create X 1/1 green Forest Dryad LAND
+        CREATURE tokens. (They're affected by summoning sickness.)"
+
+        FOUR PROPERTIES, AND EVERY ONE OF THEM IS LOAD-BEARING HERE:
+
+          they are LANDS       so X of them entering is X LANDFALL TRIGGERS, at
+                               once, off one card. In a list holding Scute
+                               Swarm, Rampaging Baloths, Avenger of Zendikar
+                               and Greensleeves that is the whole card, and it
+                               is why this is not "a bad Hydra".
+          they are FORESTS     305.6 gives them "{T}: Add {G}" with no text
+                               box, and they count for Sapling Nursery's
+                               affinity and Nissa Who Shakes the World's
+                               doubler. `is_forest()` is where that is said.
+          they are CREATURES   so they die to the pod's wraths like any other
+                               body -- `opponents.is_creature_now` reads the
+                               card's type line and these say Creature, which
+                               is the correct answer and NOT the one animated
+                               lands get (see that function's note).
+          they are SICK        302.6: a creature's {T} ability needs it to have
+                               been under your control since the turn began, so
+                               they make no mana the turn they arrive. The
+                               card's own reminder text says so, and
+                               `land_mana_live` is what enforces it.
+
+        X IS FIXED, the project's X-spell convention (Genesis Wave 6, Animist's
+        Awakening 4, Finale 6), and unlike most fixed X's it IS load-bearing --
+        X is this card's entire text. It is therefore SWEPT rather than
+        asserted, and the sweep varies the whole card (cost and effect) rather
+        than a knob: see `diag_azusa_batch4.awaken_at` and
+        results/azusa_batch4_knob_sweeps.txt.
+        """
+        for _ in range(int(x)):
+            tok = Card(name="Forest Dryad token",
+                       types=frozenset({"Creature", "Land"}),
+                       is_land=True, produces=frozenset({"G"}),
+                       power=1, toughness=1)
+            self.make_permanent(tok, is_token=True)
+            self.m["awaken_tokens"] += 1
+            self.m["tokens_made"] += 1
+            self.land_entered(tok, played=False)
+
+    def archdruids_charm(self):
+        """Archdruid's Charm {G}{G}{G}, Instant. Verified 2026-09-13.
+
+            Choose one --
+            * Search your library for a creature or land card and reveal it.
+              Put it onto the battlefield tapped if it's a land card.
+              Otherwise, put it into your hand. Then shuffle.
+            * Put a +1/+1 counter on target creature you control. It deals
+              damage equal to its power to target creature you don't control.
+            * Exile target artifact or enchantment.
+
+        MODES 2 AND 3 ARE MODEL-BLIND AND THE CARD IS THEREFORE A FLOOR. §4:
+        opponents own no permanent objects here -- no creature to fight, no
+        artifact to exile -- so two thirds of a modal card are unrepresentable
+        and the mode choice is not a real choice in this model. That is stated
+        in the candidate's own block in decks/azusa_v1.py and it is why this
+        card belongs in PARTLY_MODELLED rather than being read as measured.
+
+        MODE 1 IS TWO CARDS IN ONE and the split matters:
+
+          the LAND half   goes to the BATTLEFIELD, tapped. It costs no land
+                          drop, so it is a landfall trigger the deck could not
+                          otherwise have had this turn -- and this deck's
+                          problem is cards, not drops (2.77 granted against
+                          1.33 used, §0z4).
+          the CREATURE    goes only to HAND. It is a tutor, not a reanimation:
+            half          you still have to cast it, and the best creature in
+                          this list costs eight.
+
+        THE CHOICE IS A STATED POLICY, not an optimiser, and `archdruid_mode`
+        measures it rather than arguing it:
+
+          "auto"      (default) take the LAND while any land-relevant permanent
+                      is out, because the trigger is immediate and the creature
+                      is not; otherwise tutor the best creature to hand.
+                      LAND_ENABLERS is the derived set that answers "does a
+                      land entering do anything here" -- reusing it rather than
+                      writing a second list of payoff names is §0q's rule.
+          "land"      always the land.
+          "creature"  always the creature.
+
+        WHICH LAND IS ALSO A POLICY, and it is deliberately the dull one: a
+        FOREST. The exciting answers -- Strip Mine, Wasteland, Homeward Path --
+        are all MODEL-BLIND, so fetching one would be fetching a blank, and
+        picking the best modelled land would make this card look better than a
+        pilot's honest average. A Forest is what it is worth here, and the
+        utility-land upside is a FLOOR nobody should quote as a measurement.
+        """
+        mode = self.cfg.get("archdruid_mode", "auto")
+        if mode == "auto":
+            mode = "land" if any(self.has(n) for n in LAND_ENABLERS) else "creature"
+        if mode == "land":
+            land = next((c for c in self.library if c.name == "Forest"), None)
+            if land is not None:
+                self.library.remove(land)
+                self.make_permanent(land, tapped=True)
+                self.m["charm_lands"] += 1
+                self.shuffle_library()      # "Then shuffle."
+                self.land_entered(land, played=False)
+                return
+            # No Forest left: fall through to the creature half rather than
+            # fizzling. "Creature OR land" is one mode, and a pilot who cannot
+            # find a land names a creature.
+        pool = [c for c in self.library if c.is_creature]
+        if not pool:
+            self.shuffle_library()
+            return
+        best = max(pool, key=lambda c: c.mv)
+        self.library.remove(best)
+        self.hand.append(best)
+        self.m["charm_creatures"] += 1
+        self.shuffle_library()
+
+    def expedition_map_step(self):
+        """Expedition Map: "{2}, {T}, Sacrifice this artifact: Search your
+        library for a land card, reveal it, put it into your HAND, then
+        shuffle."
+
+        THREE MANA AND THE CARD ITSELF FOR ONE LAND IN HAND, which in a deck
+        with 35 lands is a rate that has to be justified by WHICH land -- and
+        in this model the lands worth naming (Strip Mine, Wasteland, Ghost
+        Quarter, Homeward Path) are all MODEL-BLIND, so it cannot be. What is
+        left is the honest modelled floor: a FETCH LAND, which is the densest
+        land in the deck -- two landfall triggers and a land in the graveyard
+        for Titania -- and a Forest when none is left.
+
+        THE POLICY: crack it when the mana is spare (this runs after combat,
+        like every other activation) and the land can actually be used -- an
+        unused land drop this turn, or an empty hand of lands so the drop is
+        there next turn. A Map cracked for a land that sits in hand behind
+        three other lands has converted three mana into nothing.
+        """
+        for pm in list(self.board):
+            if pm.card.name != "Expedition Map" or pm.tapped:
+                continue
+            has_land_in_hand = any(c.is_land for c in self.hand)
+            drops_left = self.land_drops_used < self.land_drops
+            if has_land_in_hand and not drops_left:
+                continue
+            units = self.available_mana()
+            pay = can_pay({"gen": 2}, units)
+            if pay is None:
+                continue
+            target = next((c for c in self.library if c.script == "fetch"), None)
+            if target is None:
+                target = next((c for c in self.library if c.name == "Forest"),
+                              None)
+            if target is None:
+                continue
+            spend(self, pay, units)
+            self.m["mana_spent"] += 2
+            self.board.remove(pm)
+            self.graveyard.append(pm.card)
+            self.library.remove(target)
+            self.hand.append(target)
+            self.shuffle_library()
+            self.m["map_cracked"] += 1
+
+    def zuran_orb_step(self):
+        """Zuran Orb {0}: "Sacrifice a land: You gain 2 life."
+
+        THE POLICY IS THE WHOLE CARD, and the honest version of it is narrow.
+        Two life for a land is a BAD RATE, so a policy that sacrificed lands
+        for life alone would be asserting this deck wants to be a land short
+        every turn. It fires only where the sacrifice is paid for:
+
+          TITANIA IS OUT      every land death is a 5/3 Elemental
+                              (`land_died`), which is the reason this card
+                              appears in a Titania list at all.
+          RECURSION IS OUT    Crucible of Worlds / Ramunap Excavator / Ancient
+                              Greenwarden / Conduit of Worlds / Walk-In Closet
+                              all replay lands from the graveyard, so the land
+                              comes back as a future drop -- and this deck has
+                              spare drops (2.77 granted, 1.33 used). The sac is
+                              then free and the replay is another landfall.
+          YOU ARE DYING       at or below `zuran_life_floor` life, two life a
+                              land is what the card is for. This is the only
+                              part of its real function this model can express
+                              at all -- see below.
+
+        Only TAPPED lands are sacrificed, so the mana was already spent this
+        turn and the sacrifice costs nothing the turn it happens; and never
+        below `zuran_keep` lands, so it cannot strand the deck.
+
+        WHAT THIS CANNOT MODEL, which is most of why the card is played: it is
+        a FREE, INSTANT-SPEED outlet held up in response to land destruction
+        and to lethal damage. This engine has no instant speed, the pod runs no
+        land destruction, and damage arrives as a lump at end of turn rather
+        than on a stack you can respond to. Its number here is a FLOOR.
+        """
+        if not self.has("Zuran Orb"):
+            return
+        panic = self.your_life <= self.cfg.get("zuran_life_floor", 8)
+        titania = self.has("Titania, Protector of Argoth")
+        recursion = (self.has("Crucible of Worlds")
+                     or self.has("Ramunap Excavator")
+                     or self.has("Ancient Greenwarden")
+                     or self.has("Conduit of Worlds")
+                     or self.has("Walk-In Closet // Forgotten Cellar"))
+        if not (panic or titania or recursion):
+            return
+        keep = 3 if panic else self.cfg.get("zuran_keep", 6)
+        cap = self.cfg.get("zuran_max_sacs", 4 if panic else 2)
+        for pm in list(self.board):
+            if cap <= 0:
+                break
+            if not pm.card.is_land or not pm.tapped:
+                continue
+            # An Ashaya creature-land is a land you could legally sacrifice to
+            # this. Deliberately not offered: sacrificing your own creatures
+            # for two life is not what this card is for, and a policy that did
+            # it would be inventing a play rather than modelling one.
+            if sum(1 for p in self.board if p.card.is_land) <= keep:
+                break
+            self.board.remove(pm)
+            if pm.is_token:
+                self.m["zuran_sacs"] += 1
+                self.gain_life(2)
+                if titania:
+                    self.make_tokens(1, 5, 3, "Elemental")
+            else:
+                self.land_died(pm.card)     # Titania's trigger lives there
+                self.m["zuran_sacs"] += 1
+                self.gain_life(2)
+            self.m["zuran_life"] += 2
+            cap -= 1
 
     def nonhuman_creatures(self):
         """The creatures Return of the Wildspeaker can see.
@@ -2176,6 +2636,12 @@ class AzusaGame:
             self.draw(1)
             self.m["war_room_draws"] += 1
 
+        # The 2026-09-13 candidates' activated abilities. Both run here, after
+        # combat, for the reason War Room's note gives: the mana they spend is
+        # then genuinely spare -- a pilot with a spell to cast casts it.
+        self.expedition_map_step()
+        self.zuran_orb_step()
+
         # Perilous Forays: {1}, sac a creature -> tutor a basic land to the
         # battlefield tapped. Token fodder only -- see the shilgengar.py
         # aristocrats-policy note this mirrors: never sac a real card.
@@ -2276,6 +2742,9 @@ def take_turn(g):
     # Castle Garenbrig's pool empties with the turn, like any unspent mana.
     g.creature_mana = []
     g.bonus_mana = []
+    # "the second time this ability has resolved THIS TURN" (Nissa, Resurgent
+    # Animist). A per-turn counter, so it resets with the turn.
+    g.animist_resolutions = 0
     g.pw_used = set()
     g.legacy_animation = False
     # "Until your next turn" ends HERE, at the start of it -- which is what

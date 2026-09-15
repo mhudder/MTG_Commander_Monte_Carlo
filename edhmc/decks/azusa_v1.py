@@ -541,3 +541,119 @@ CASTLE_GARENBRIG = L("Castle Garenbrig", "G")
 BATCH3_CANDIDATES = (RETURN_OF_THE_WILDSPEAKER, FINALE_OF_DEVASTATION,
                      THE_GREAT_HENGE, SAPLING_NURSERY,
                      NISSA_WHO_SHAKES_THE_WORLD, WAR_ROOM, CASTLE_GARENBRIG)
+
+
+# ---------------------------------------------------------------------------
+# FOURTH BATCH — six cards submitted 2026-09-13. NOT in the deck.
+#
+# Costs, types, P/T and oracle text verified against Scryfall 2026-09-13, and
+# THREE of the six are not what they are usually remembered as:
+#
+#   Nissa, Resurgent Animist's reveal is "IF THIS IS THE SECOND TIME this
+#   ability has resolved this turn" -- the second, and only the second. The
+#   third and fourth land drops of an Azusa turn add mana and nothing else, so
+#   this is one card a turn, not one per land. The MANA half is every land.
+#
+#   Traveling Chocobo is a SECOND ANCIENT GREENWARDEN for the half that
+#   matters here -- "if a land or Bird you control entering causes a triggered
+#   ability of a permanent you control to trigger, that ability triggers an
+#   additional time" is Greenwarden's second sentence word for word, with
+#   Bird added and the graveyard half replaced by top-of-library access.
+#   Greenwarden is the #2 card in this deck's table (+0.0380), so the prior on
+#   this one is high and the REDUNDANCY question is the real one.
+#
+#   Archdruid's Charm is {G}{G}{G}, not {1}{G}{G}, and its first mode searches
+#   for "a creature OR LAND card" -- the land goes to the BATTLEFIELD tapped
+#   (a landfall trigger that costs no land drop), the creature only to HAND.
+#
+# WHAT IS AND IS NOT MODELLED. Read this before quoting any number.
+#
+#   Nissa, Resurgent       FULL, both halves. The mana is a landfall ritual on
+#     Animist              `bonus_mana`, the same path Lotus Cobra uses; the
+#                          reveal walks the library until it hits an Elf or
+#                          Elemental CARD, and that set is generated from
+#                          Scryfall into decks/_evasion.py rather than typed
+#                          here (§0z4 -- subtypes are data). "The rest on the
+#                          bottom in a random order" is modelled, and it is not
+#                          cosmetic: it is what re-rolls a dead top card for
+#                          Courser / Augur / Oracle / Ka-Zar.
+#                          FLOOR: "add one mana of ANY COLOR" is offered as any
+#                          colour, which in mono-green is {G} in practice.
+#   Traveling Chocobo      FULL on both live halves: the doubler (which STACKS
+#                          with Ancient Greenwarden -- two "triggers an
+#                          additional time" effects make one land fire three
+#                          times) and playing lands off the top. FLOOR: "cast
+#                          Bird spells from the top of your library" is worth
+#                          nothing in a list whose only Bird is this card.
+#   Archdruid's Charm      PARTLY. Mode 1 is modelled in full, both halves.
+#                          Modes 2 and 3 -- fight-removal and exile an artifact
+#                          or enchantment -- are MODEL-BLIND (§4: opponents own
+#                          no permanent objects), so its number is a FLOOR and
+#                          a low score is not evidence about the card. It is
+#                          also an INSTANT cast at sorcery speed, a second
+#                          floor.
+#   Awaken the Woods       FULL at a FIXED X, the Genesis Wave (6) / Animist's
+#                          Awakening (4) / Finale (6) convention. The tokens
+#                          are LAND CREATURES: they fire landfall as they enter
+#                          (X triggers at once), they are Forests for Sapling
+#                          Nursery and Nissa Who Shakes the World, they tap for
+#                          {G} -- but NOT the turn they arrive, because a
+#                          creature's {T} ability needs no summoning sickness
+#                          (302.6, and the card's own reminder text says so).
+#                          `awaken_x` is the knob and it is load-bearing.
+#   Expedition Map         FULL. {1} to cast, {2} + {T} + sacrifice to find a
+#                          land and put it IN HAND -- three mana and the card
+#                          itself for one land. The land it finds is chosen by
+#                          a stated policy (a fetch first, for two landfall
+#                          triggers and a Titania fodder land), not by an
+#                          optimiser.
+#   Zuran Orb              PARTLY, and the missing half is the REASON THE CARD
+#                          IS PLAYED at a real table: it is a free sacrifice
+#                          outlet held up in response to land destruction and
+#                          to lethal damage, and this engine has no instant
+#                          speed and no opponent land destruction to respond
+#                          to. What IS modelled is the half this deck actually
+#                          wants -- lands sacrificed for Titania triggers and
+#                          for a recursion loop, and the two life, which is
+#                          real since pod v3. Its number is a FLOOR.
+#
+# Priorities are on this deck's own scale: commander 10, Sol Ring 10, Lotus
+# Cobra 9, Craterhoof 9, Greenwarden 8.5, Courser 8, Avenger 8.5.
+# ---------------------------------------------------------------------------
+
+# Legendary, so a Springheart copy of her dies to the legend rule -- the same
+# note Titania and Greensleeves carry.
+NISSA_RESURGENT_ANIMIST = C(
+    "Nissa, Resurgent Animist", "Creature", {"gen": 2, "G": 1}, 3, 3,
+    priority=8.5, threat=7.0, tags=("Legendary",))
+
+TRAVELING_CHOCOBO = C(
+    "Traveling Chocobo", "Creature", {"gen": 2, "G": 1}, 3, 2,
+    priority=8.5, threat=6.5)
+
+ARCHDRUIDS_CHARM = C(
+    "Archdruid's Charm", "Instant", {"G": 3},
+    priority=6.5, threat=0.0, script="archdruid_charm")
+
+# {X}{G}{G} modelled at X=6: cost {6}{G}{G}, six tokens. x_pips carries the X
+# so audit_cards.py reconciles it with Scryfall's cmc 2, the same way Genesis
+# Wave and Finale of Devastation do.
+AWAKEN_THE_WOODS = C(
+    "Awaken the Woods", "Sorcery", {"gen": 6, "G": 2},
+    priority=7.5, threat=6.0, script="awaken_woods", x_pips=6)
+
+# Priority 6.0 is a JUDGEMENT and it is the kind that decides a number: a
+# one-mana artifact is cast on the turn nothing better is affordable, which is
+# what a mid-table priority expresses. Lower would assert the pilot hoards it;
+# higher would have them spend turn one on it ahead of a land enabler.
+EXPEDITION_MAP = C(
+    "Expedition Map", "Artifact", {"gen": 1}, priority=6.0, threat=1.0)
+
+# Cost {} -- genuinely free, mana value 0. Priority barely matters for a card
+# that consumes no mana: the greedy main phase reaches it in the same phase
+# whatever it is, because casting it cannot make anything else unaffordable.
+ZURAN_ORB = C("Zuran Orb", "Artifact", {}, priority=5.0, threat=0.5)
+
+BATCH4_CANDIDATES = (NISSA_RESURGENT_ANIMIST, TRAVELING_CHOCOBO,
+                     ARCHDRUIDS_CHARM, AWAKEN_THE_WOODS,
+                     EXPEDITION_MAP, ZURAN_ORB)

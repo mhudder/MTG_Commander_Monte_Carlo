@@ -77,6 +77,11 @@ INDESTRUCTIBLE = {
 #   FOREST  Sapling Nursery's affinity, Nissa, Who Shakes the World's mana
 #           doubler, and Castle Garenbrig's enters-untapped condition.
 #           Dryad Arbor is one; no other nonbasic in any list is.
+#   ELF_ELEMENTAL
+#           Nissa, Resurgent Animist reveals until it hits one of these, so
+#           the SIZE of this set is most of what that card is worth. NOT
+#           restricted to creatures: the card says 'Elf or Elemental CARD',
+#           and a card carries its subtypes in every zone.
 HUMAN = {
     'Augur of Autumn',
     'Auriok Champion',
@@ -125,4 +130,20 @@ FOREST = {
     'Forest',
     'Overgrown Tomb',
     'Woodland Chasm',
+}
+
+ELF_ELEMENTAL = {
+    'Ancient Greenwarden',
+    'Ashaya, Soul of the Wild',
+    'Avenger of Zendikar',
+    'Bane of Progress',
+    "Eyeblight's Ending",
+    'Greensleeves, Maro-Sorcerer',
+    "Nadier's Nightblade",
+    'Nissa, Resurgent Animist',
+    'Nissa, Vastwood Seer // Nissa, Sage Animist',
+    'Oracle of Mul Daya',
+    'Quirion Ranger',
+    'Tireless Provisioner',
+    'Titania, Protector of Argoth',
 }

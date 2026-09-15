@@ -227,6 +227,14 @@ def main():
     forests = {n for n, c in cards.items()
                if n in everything and everything[n].is_land
                and "Forest" in subtypes(c)}
+    # ELF_ELEMENTAL is NOT restricted to creatures, unlike HUMAN. Nissa,
+    # Resurgent Animist reveals until it reveals "an Elf or Elemental CARD",
+    # and a card carries its subtypes in every zone -- a tribal or enchantment
+    # card with the subtype would count. Nothing in these lists is one today;
+    # restricting the set to creatures would make that a silent assumption
+    # instead of a fact about the lists.
+    elf_elemental = {n for n, c in cards.items()
+                     if n in everything and ({"Elf", "Elemental"} & subtypes(c))}
 
     print(f"{len(cards)}/{len(everything)} cards resolved "
           f"({len(creatures)} of them creatures)\n")
@@ -259,6 +267,11 @@ def main():
           f"is not one, however green it looks:")
     for n in sorted(forests):
         print(f"    {n}")
+    print(f"\nELF or ELEMENTAL ({len(elf_elemental)}) — what Nissa, Resurgent "
+          f"Animist can reveal.\nThe hit RATE is the card, so a name missing "
+          f"here is a whiff that should have been a card:")
+    for n in sorted(elf_elemental):
+        print(f"    {n:34} {' '.join(sorted({'Elf', 'Elemental'} & subtypes(cards[n])))}")
 
     missed = {n for n, c in cards.items()
               if n in creatures and n not in flying and n not in CONDITIONAL
@@ -312,11 +325,23 @@ def main():
                      "enters-untapped condition.\n"
                      "#           Dryad Arbor is one; no other nonbasic in any "
                      "list is.\n"
+                     "#   ELF_ELEMENTAL\n"
+                     "#           Nissa, Resurgent Animist reveals until it "
+                     "hits one of these, so\n"
+                     "#           the SIZE of this set is most of what that "
+                     "card is worth. NOT\n"
+                     "#           restricted to creatures: the card says 'Elf "
+                     "or Elemental CARD',\n"
+                     "#           and a card carries its subtypes in every "
+                     "zone.\n"
                      "HUMAN = {\n")
             for n in sorted(humans):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\nFOREST = {\n")
             for n in sorted(forests):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\nELF_ELEMENTAL = {\n")
+            for n in sorted(elf_elemental):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
         print(f"\nwrote {OUT}")

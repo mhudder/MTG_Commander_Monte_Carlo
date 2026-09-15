@@ -187,6 +187,16 @@ def parse_cost(s):
             cost[sym] = cost.get(sym, 0) + 1
         else:
             cost["gen"] = cost.get("gen", 0) + 1
+    # A ZERO-MANA CARD COSTS {0}, which this loop turns into {"gen": 0} while
+    # every deck module writes the same cost as {}. The two are the same cost
+    # and the comparison below is a dict equality, so the mismatch was reported
+    # as an ERR whose message read "cost {0}, oracle {0}" -- two identical
+    # strings and a failure. Found 2026-09-13 by Zuran Orb, the project's first
+    # zero-cost card; it would have fired for any Mox or Ornithopter too. A
+    # check that reports a false failure teaches you to ignore failures, which
+    # is the reason KNOWN_MODEL_LIMITS exists a few lines up.
+    if cost.get("gen") == 0:
+        cost.pop("gen")
     return cost, x, hybrid
 
 

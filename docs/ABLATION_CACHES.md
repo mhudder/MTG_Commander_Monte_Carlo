@@ -18,7 +18,7 @@ and compare the fingerprint. If it differs, DELETE the cache.**
 `./tools/regen_tables.sh` deletes them by default; `--resume` does
 not.
 
-Fingerprints recorded at `682a1c8`.
+Fingerprints recorded at `d7c416c`.
 
 **Every fingerprint below changed on 2026-09-09 and NO cache is
 stale.** The reorganisation edited `ablation.py` — which is in the
@@ -61,7 +61,7 @@ following the rule blindly would have been right.
 
 | cache | deck | cards | source fingerprint |
 |---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `724f186b43cf5e31` |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `7cc6b64816b1a77a` |
 | `ablation_cache_karlov_10-20_n15000.json` | karlov | 63 | `4fbd678bca7abb97` |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `4fbd678bca7abb97` |
 | `ablation_cache_karlov_10-20_n6000.json` | karlov | 63 | `4fbd678bca7abb97` |

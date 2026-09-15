@@ -54,11 +54,18 @@ pip install -r requirements.txt
 python -m edhmc.pending                    # staged changes; validates the lists
 python -m tools.validate                   # A/A control + CRN measurement
 python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
+                                           # ABLATE_BUDGET=3000 for one deck by
+                                           # hand -- the default is 240s (§0z22)
 python -m tools.compare_decks              # cross-deck comparison at matched settings
 python -m tools.audit_cards                # every card against Scryfall; expect 0 ERR
 python -m tools.tag_flying --write         # regenerate FLYING / INDESTRUCTIBLE tags
 python -m tools.cache_manifest --write     # regenerate docs/ABLATION_CACHES.md
-./tools/regen_tables.sh                    # all six tables at N=15000, ~35 min
+./tools/regen_tables.sh                    # all six tables at N=15000. The
+                                           # ~35 min in this file was measured
+                                           # before §0z22; the six-deck run has
+                                           # NOT been re-timed end to end, and
+                                           # what IS measured is 1.22x per game
+                                           # and 1.45x on one azusa table.
 ```
 
 Tests, because a docstring is not evidence:
@@ -69,6 +76,8 @@ python -m tests.test_tivit_combo       # the Deadeye loop's mana economy
 python -m tests.test_time_sieve        # the Tivit + Time Sieve turn loop
 python -m tests.test_azusa_candidates  # the 2026-09-09 candidates' mechanisms
 python -m tests.test_azusa_batch3      # the 2026-09-10 candidates' mechanisms
+python -m tests.test_azusa_batch4      # §0z21 — the 2026-09-13 candidates, and
+                                       # 302.6 for LAND CREATURES (Dryad Arbor)
 python -m tests.test_mana_colour       # colour-correct payment, and that BOARD
                                        # ORDER cannot change the answer (§0z8)
 python -m tests.test_pod_damage_and_wipes   # §0z9/§0z10/§0z11 — the pod-damage
@@ -89,7 +98,8 @@ python -m tests.test_modes_and_altar   # §0z20 / §1b + §3 — castable modes,
 Candidate evaluation, at the tables' own N so the numbers are comparable:
 
 ```bash
-python -m tools.candidates azusa3 --n=15000 --turns=20  # §0z4  the live batch
+python -m tools.candidates azusa4 --n=15000 --turns=20  # §0z21 the live batch
+python -m tools.candidates azusa3 --n=15000 --turns=20  # §0z4  same victim slot
 python -m tools.candidates azusa --n=15000 --turns=20   # §0x   DEAD, see below
 ```
 
@@ -117,6 +127,8 @@ python -m diagnostics.run_reserve_sweep        # §0t  the mana reserve knobs, b
 python -m diagnostics.run_mingain_sweep        # §0r  closes the shilgengar min_gain question
 python -m diagnostics.run_miracle_reducer_fix  # §0u  the miracle cost reducers
 python -m diagnostics.diag_azusa_batch3        # §0z4 what the 7 candidates DO
+python -m diagnostics.diag_azusa_batch4        # §0z21 what the 6 candidates DO;
+                                               # --sweep the knobs, --dryad the fix
 python -m diagnostics.run_springheart_etb      # §0z5 item 16, in four legs
 python -m diagnostics.run_shilgengar_treasures # §0z6 item 13, Treasures as mana
 python -m diagnostics.run_life_costs           # §0z7 §0i, the free drawbacks
@@ -124,7 +136,7 @@ python -m diagnostics.run_mana_colour          # §0z8 colour payment, two ways
 python -m diagnostics.run_citadel              # Bolas's Citadel; --floor sweeps the knob
 ```
 
-ELEVEN checks carry a MUTATION run, because a check that cannot fail reads
+TWELVE checks carry a MUTATION run, because a check that cannot fail reads
 like assurance and is worse than none. Each asserts an EXACT set of failing
 cases, so a fix that stops mattering is as loud as one that breaks:
 
@@ -140,6 +152,7 @@ python -m tests.test_crn_streams --mutate           # exactly 5 of 6 MUST fail
 python -m tests.test_ashaya --mutate                # 3 mutations, exact sets
 python -m tests.test_recursion --mutate             # 6 mutations, exact sets
 python -m tests.test_modes_and_altar --mutate       # 4 mutations, exact sets
+python -m tests.test_azusa_batch4 --mutate          # 4 mutations, exactly 8 fail
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -227,9 +240,44 @@ record and it has two legs, not three.
 >    against the old table's bottom half should be re-read**, and note the
 >    table is sorted by DAMAGE, not win rate.
 
+**2026-09-13 — SIX MORE AZUSA CANDIDATES MEASURED, and the batch found a rule
+the engine was breaking (§0z21).** N=15,000, T20, in the SAME Sylvan Library
+slot as the §0z4 batch, so all thirteen candidate rows are on one scale.
+`results/candidates_azusa_batch4_T20.txt`.
+
+| card | win rate T20 | signal | would rank |
+|---|---|---|---|
+| Traveling Chocobo | **+0.0291 ±0.0040** | both | 8th of 44 |
+| Nissa, Resurgent Animist | **+0.0285 ±0.0041** | both | 8th of 44 |
+| Awaken the Woods | +0.0188 ±0.0029 | both | 14th |
+| Expedition Map | +0.0133 ±0.0033 | both | 25th |
+| Zuran Orb | +0.0124 ±0.0025 | both | 26th |
+| Archdruid's Charm | +0.0082 ±0.0035 | both | 37th |
+
+**All six clear the cut bar** (Yavimaya Elder +0.0023, Wayward Swordtooth
++0.0038, Titania +0.0050), and **the top two are a SET, not a ranking** —
+0.0006 apart against ±0.0040 bars, both inside Greenwarden's and Tireless
+Tracker's. Nothing is staged: that needs a head-to-head against a named cut
+(§0c). Three of the six are FLOORS for stated reasons — Archdruid's Charm and
+Zuran Orb have MODEL-BLIND halves, Expedition Map can only fetch modelled
+lands — and **Archdruid's Charm's number rests on a mode policy that both
+sweeps say is the wrong one**; re-measure `archdruid_mode` before staging it.
+
+**AND THE AZUSA TABLE WAS REGENERATED, because implementing Awaken the Woods'
+land-creature tokens exposed 302.6 being broken for a card already in the
+deck.** `available_mana` never read `sick` for a land, so **Dryad Arbor tapped
+for {G} on the turn it was played for the life of the project**. Closing it
+costs the deck **−0.0045 ±0.0022 at T10** and −0.0020 ±0.0030 at T20, 6.5% of
+games differ — and **0 of 58 ablation rows moved beyond their own old bar, with
+no sign flipped**, so the deck's own win rate moved and not one card's ranking
+did. `land_creature_sick=False` reproduces every earlier azusa number. The
+other five decks are bit-identical against a HEAD worktree.
+
 Verified 2026-09-13. `validate.py` is `+0.00` on all 18 metrics across 6
-engines; `corr(A,B) = 0.9118`, CRN worth ~11x the games. All eight tests and
-all seven mutation checks pass. `python -m edhmc.pending` reports
+engines; `corr(A,B) = 0.9108`, CRN worth ~11x the games. **All thirteen test
+suites and all twelve mutation checks exit zero** (re-run in full 2026-09-13;
+the counts this line used to carry, "eight tests and seven mutation checks",
+were stale in both halves). `python -m edhmc.pending` reports
 100 cards / singleton-legal / commander distinct on every deck that has a
 staged change (azusa, lorehold, rendmaw — the other three have nothing staged,
 so no legality block is printed for them).

@@ -45,6 +45,7 @@ from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   SAPLING_NURSERY,
                                   NISSA_WHO_SHAKES_THE_WORLD,
                                   WAR_ROOM, CASTLE_GARENBRIG)
+from edhmc.decks.azusa_v1 import BATCH4_CANDIDATES
 
 N = 6000
 
@@ -195,6 +196,15 @@ DECKS = {
                (RETURN_OF_THE_WILDSPEAKER, FINALE_OF_DEVASTATION,
                 THE_GREAT_HENGE, SAPLING_NURSERY,
                 NISSA_WHO_SHAKES_THE_WORLD, WAR_ROOM, CASTLE_GARENBRIG)),
+    # 2026-09-13 fourth batch. THE SAME VICTIM SLOT AS azusa3 ON PURPOSE:
+    # Sylvan Library is still the most neutral row in the table, and keeping it
+    # means these six and those seven are measured against the same 98 cards
+    # and can be read against each other directly. A different victim would
+    # make the two batches two scales, and §0c already says a common baseline
+    # cannot rank two cards -- changing the baseline as well would make it
+    # worse, not better.
+    "azusa4": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
+               BATCH4_CANDIDATES),
     # 2026-09-04 first batch, kept so the runs are reproducible
     "lorehold1": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
                   (SUNBIRDS_INVOCATION, BRASSS_BOUNTY, UNDERWORLD_BREACH)),

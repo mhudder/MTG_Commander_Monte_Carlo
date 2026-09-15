@@ -105,6 +105,24 @@ class Candidate:
     limits: str = ""            # floors, ceilings and modelling caveats
     verdict: str = ""           # what the number supports, and what it does not
 
+    # --- SHORTLISTED: a REVIEW FLAG, and deliberately not a fourth state ----
+    # "These three are worth a head-to-head" is a different claim from "this is
+    # going in", and the whole point of the measured/staged split is that the
+    # second one needs evidence the first does not have. A shortlisted
+    # Candidate is still a Candidate: `build_pending` does not apply it, no
+    # table contains it, and no deck list moves. What the flag buys is that the
+    # shortlist stops living in a conversation -- the state this class was
+    # written to rescue (see the docstring above).
+    #
+    # `proposed_cut` NAMES THE CUT THE HEAD-TO-HEAD SHOULD RUN, which a plain
+    # Candidate deliberately does not. It is a PROPOSAL and the number attached
+    # to this row is NOT evidence for it: an ablation row and a candidate row
+    # share a baseline and therefore cannot be subtracted from one another
+    # (§0c). `check_shortlist_is_answerable()` enforces what can be enforced --
+    # that the named cut is really in the deck.
+    shortlist: str = ""         # why it is shortlisted; empty = it is not
+    proposed_cut: str = ""      # the cut a head-to-head should test it against
+
 
 # ---------------------------------------------------------------------------
 # Committed — reflected in BOTH the deck module and the .xlsx
@@ -812,6 +830,242 @@ MEASURED: list[Candidate] = [
             "card works and the deck does not want it."
         ),
     ),
+
+    # --- 2026-09-13 fourth batch, six cards. Measured in the SAME Sylvan
+    # Library slot as the seven above and at the same N and horizon, so the
+    # thirteen rows are on one scale -- which is also why none of them can be
+    # ranked against each other beyond their bars (§0c). §0z21.
+    Candidate(
+        deck="azusa",
+        card="Traveling Chocobo",
+        measured="2026-09-13",
+        win_rate="+0.0291 +-0.0040 at T20 (damage +2.64 +-0.26)",
+        signal="both",
+        rationale=(
+            "A SECOND ANCIENT GREENWARDEN for the half this deck cares about: "
+            "'if a land or Bird you control entering causes a triggered "
+            "ability of a permanent you control to trigger, that ability "
+            "triggers an additional time' is Greenwarden's sentence with Bird "
+            "added, and the two STACK -- one land fires every payoff three "
+            "times. Measured: landfall_ability_resolutions +13.84 per "
+            "resolution against landfall_triggers +0.90, and tokens_made +243 "
+            "per resolution, which is Scute Swarm compounding. It also plays "
+            "lands off the top of the library, a FIFTH source of that boolean."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, in the Sylvan Library slot. "
+            "tools/candidates.py azusa4; "
+            "results/candidates_azusa_batch4_T20.txt. Mechanisms in "
+            "results/azusa_batch4_mechanisms.txt. §0z21."
+        ),
+        limits=(
+            "FLOOR, and a small one: 'cast Bird spells from the top of your "
+            "library' is worth nothing in a list whose only Bird is this card. "
+            "Answered by the pod 12.7% of the time. The top-of-library half is "
+            "REDUNDANT with Courser, Augur, Oracle and the staged Ka-Zar -- "
+            "that redundancy is already priced in here, because all four are "
+            "in the list this was measured against."
+        ),
+        verdict=(
+            "Would rank 8th of 44 model-evaluated cards by win rate, inside "
+            "the bars of Rampaging Baloths, Tireless Tracker, Ancient "
+            "Greenwarden and Nissa, Vastwood Seer. It is INSIDE Nissa, "
+            "Resurgent Animist's bar too (0.0006 apart against +-0.0040), so "
+            "the two are a SET and not a ranking."
+        ),
+        shortlist=(
+            "is here: highest of the six, and the one whose mechanism this "
+            "deck is built to exploit -- a second doubler in a list holding "
+            "Scute Swarm, Rampaging Baloths, Avenger and Greensleeves. "
+            "SHORTLISTED 2026-09-14 for review, NOT decided."
+        ),
+        proposed_cut="Yavimaya Elder",
+    ),
+    Candidate(
+        deck="azusa",
+        card="Nissa, Resurgent Animist",
+        measured="2026-09-13",
+        win_rate="+0.0285 +-0.0041 at T20 (damage +2.65 +-0.28)",
+        signal="both",
+        rationale=(
+            "A RITUAL THAT ALSO DRAWS. 'Landfall -- whenever a land you "
+            "control enters, add one mana of any color' is +19.75 mana per "
+            "resolution in a deck making three land drops a turn; the reveal "
+            "adds +1.52 cards per resolution. Note the doubler interaction "
+            "the rules give for free: 'the SECOND TIME this ability has "
+            "RESOLVED this turn' means that with Greenwarden or Chocobo out "
+            "the first land already gets there."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as Traveling Chocobo above. §0z21."
+        ),
+        limits=(
+            "THE REVEAL IS NARROWER THAN IT READS: the second resolution and "
+            "ONLY the second, so a three-drop turn is three mana and ONE card, "
+            "not three cards. It whiffs 0.17 times per resolution -- the deck "
+            "holds ten Elf or Elemental cards, generated into "
+            "decks/_evasion.py from Scryfall rather than typed by hand. "
+            "'Any color' is offered as any colour and is {G} in practice. "
+            "Answered by the pod 12.5% of the time."
+        ),
+        verdict=(
+            "Would rank 8th of 44 by win rate, in a set with Traveling "
+            "Chocobo and four committed cards. Both clear the deck's cut bar "
+            "-- Yavimaya Elder +0.0023, Wayward Swordtooth +0.0038, Titania "
+            "+0.0050 -- by a wide margin. The proposed cut below is a "
+            "PROPOSAL: pairing two rows that share a baseline is not a "
+            "measurement of the swap (§0c)."
+        ),
+        shortlist=(
+            "is here: statistically tied with Traveling Chocobo at the top of "
+            "the batch, and it attacks the deck's OWN measured weakness -- "
+            "this list is card-limited, not mana-limited, and this is the only "
+            "one of the six that adds a card every turn. "
+            "SHORTLISTED 2026-09-14 for review, NOT decided."
+        ),
+        proposed_cut="Wayward Swordtooth",
+    ),
+    Candidate(
+        deck="azusa",
+        card="Awaken the Woods",
+        measured="2026-09-13",
+        win_rate="+0.0188 +-0.0029 at T20 (damage +1.71 +-0.18)",
+        signal="both",
+        rationale=(
+            "'Create X 1/1 green Forest Dryad LAND CREATURE tokens.' They are "
+            "lands, so X of them entering is X landfall triggers off one card "
+            "(+6.90 per resolution at X=6); they are Forests, so they tap for "
+            "{G} (305.6) and count for Sapling Nursery and Nissa Who Shakes "
+            "the World; and they are creatures, so they die to the pod's "
+            "wraths and are summoning sick for their own mana ability (302.6)."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above, at the project's fixed-X "
+            "convention X=6. §0z21."
+        ),
+        limits=(
+            "X IS FIXED and that is an approximation, not a floor or a "
+            "ceiling -- a real pilot scales X to the mana. Swept as the WHOLE "
+            "CARD (cost and effect together) at n=4,000: X=3 +0.0163, X=4 "
+            "+0.0222, X=6 +0.0215, so X IS NOT LOAD-BEARING between 4 and 6 -- "
+            "a bigger X buys landfall and costs deploy rate, and the two "
+            "cancel. X=8 could not be measured at all: see §0z21's "
+            "`can_pay` performance cliff."
+        ),
+        verdict=(
+            "Would rank 14th of 44, inside the bars of Courser of Kruphix, "
+            "Augur of Autumn, Animist's Awakening and Lotus Cobra. An "
+            "eight-drop that resolves in 27.4% of games on turn 9.7, so it is "
+            "a late-game card in a deck whose games end around turn 12."
+        ),
+        shortlist=(
+            "is here: third of the six and the only one that is not competing "
+            "for a cheap slot -- it is a TOP-END card, so it can be reviewed "
+            "against the expensive rows rather than against the deck's "
+            "two- and three-drops. Its +0.0188 is also the most robust number "
+            "of the three, with the tightest bar. "
+            "SHORTLISTED 2026-09-14 for review, NOT decided."
+        ),
+        proposed_cut="Kozilek, Butcher of Truth",
+    ),
+    Candidate(
+        deck="azusa",
+        card="Expedition Map",
+        measured="2026-09-13",
+        win_rate="+0.0133 +-0.0033 at T20 (damage +1.44 +-0.23)",
+        signal="both",
+        rationale=(
+            "Three mana and the card itself for one land in hand, which is a "
+            "rate that has to be justified by WHICH land. Here it is a FETCH: "
+            "two landfall triggers and a land in the graveyard for Titania. "
+            "Measured, fetches_cracked +1.25 and landfall_triggers +2.69 per "
+            "resolution against 0.48 activations -- the gap is Crucible and "
+            "Ramunap Excavator replaying the fetch it found."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z21."
+        ),
+        limits=(
+            "FLOOR. The lands a pilot actually wants a tutor for -- Strip "
+            "Mine, Wasteland, Ghost Quarter, Homeward Path -- are all "
+            "MODEL-BLIND (§4), so the engine fetches the best MODELLED land "
+            "and the card's real ceiling is not measured here. The policy "
+            "(crack it only when a land drop or an empty hand can use the "
+            "land) is stated in azusa.expedition_map_step."
+        ),
+        verdict=(
+            "Would rank 25th of 44 -- mid-table, comfortably clear of the cut "
+            "bar, and the honest reading is that it is a FLOOR that already "
+            "clears it."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Zuran Orb",
+        measured="2026-09-13",
+        win_rate="+0.0124 +-0.0025 at T20 (damage +1.11 +-0.16)",
+        signal="both",
+        rationale=(
+            "A free sacrifice outlet in a deck that wants lands in the "
+            "GRAVEYARD: 3.20 lands sacrificed per resolution, each one a "
+            "Titania Elemental and two life, and each one replayable while "
+            "Crucible, Ramunap Excavator or Ancient Greenwarden is out -- "
+            "which is another land drop and another landfall on a drop that "
+            "was going begging (this deck uses 1.33 of 2.77 granted)."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z21."
+        ),
+        limits=(
+            "FLOOR, and the missing half is WHY THE CARD IS PLAYED: it is an "
+            "instant-speed outlet held up against land destruction and lethal "
+            "damage, and this engine has no instant speed, no opponent land "
+            "destruction and no stack to respond on. Its Ashaya interaction "
+            "(creature-lands are lands you could sacrifice to it) is "
+            "deliberately not offered. NEITHER KNOB IS LOAD-BEARING: "
+            "zuran_keep 4/6/8 gives +0.0143/+0.0112/+0.0118 and "
+            "zuran_life_floor 1/8/15 gives +0.0092/+0.0112/+0.0097, all "
+            "inside each other's bars (n=4,000)."
+        ),
+        verdict=(
+            "Would rank 26th of 44, and it is the cheapest row in the deck at "
+            "MV 0. A floor that clears the cut bar on the half of the card "
+            "this model can see."
+        ),
+    ),
+    Candidate(
+        deck="azusa",
+        card="Archdruid's Charm",
+        measured="2026-09-13",
+        win_rate="+0.0082 +-0.0035 at T20 (damage +0.87 +-0.23)",
+        signal="both",
+        rationale=(
+            "{G}{G}{G} instant, and only its first mode exists in this model: "
+            "search for a creature or land, the land going to the BATTLEFIELD "
+            "tapped -- a landfall trigger that costs no land drop -- and the "
+            "creature only to HAND."
+        ),
+        evidence=(
+            "N=15,000 paired, T20, same run as above. §0z21."
+        ),
+        limits=(
+            "PARTLY MODELLED, and the weakest-supported row of the six. Modes "
+            "2 and 3 (fight-removal, exile an artifact or enchantment) are "
+            "MODEL-BLIND under §4 and mode 1 fetches a Forest rather than a "
+            "blind utility land, so this is a FLOOR twice over; it is also an "
+            "INSTANT cast at sorcery speed. AND ITS NUMBER RESTS ON A POLICY: "
+            "archdruid_mode 'creature' measures +0.0130 +-0.0072 against "
+            "'land' +0.0057 and the 'auto' default +0.0077 (n=4,000). The "
+            "bars overlap, but the creature mode came out ahead twice and "
+            "'auto' takes the land on essentially every board here."
+        ),
+        verdict=(
+            "Would rank 37th of 44 -- above the cut bar, but only just, and "
+            "on a floor. IF THIS IS EVER STAGED, RE-MEASURE THE MODE FIRST: "
+            "the gap between the two pure strategies is about as large as the "
+            "card's whole score."
+        ),
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -1317,7 +1571,16 @@ DECKS = {
         "Sapling Nursery": azusa_v1.SAPLING_NURSERY,
         "Nissa, Who Shakes the World": azusa_v1.NISSA_WHO_SHAKES_THE_WORLD,
         "War Room": azusa_v1.WAR_ROOM,
-        "Castle Garenbrig": azusa_v1.CASTLE_GARENBRIG}),
+        "Castle Garenbrig": azusa_v1.CASTLE_GARENBRIG,
+        # 2026-09-13 fourth batch (§0z21). Same status as the seven above:
+        # MEASURED, NOT STAGED, listed here only so a Change naming one can be
+        # written the day somebody decides to.
+        "Nissa, Resurgent Animist": azusa_v1.NISSA_RESURGENT_ANIMIST,
+        "Traveling Chocobo": azusa_v1.TRAVELING_CHOCOBO,
+        "Archdruid's Charm": azusa_v1.ARCHDRUIDS_CHARM,
+        "Awaken the Woods": azusa_v1.AWAKEN_THE_WOODS,
+        "Expedition Map": azusa_v1.EXPEDITION_MAP,
+        "Zuran Orb": azusa_v1.ZURAN_ORB}),
 }
 
 
@@ -1346,6 +1609,58 @@ def check_measured_are_promotable():
                 f"edhmc/pending.py: {c.card!r} is MEASURED for {c.deck} but is "
                 f"ALREADY IN the list, so the row describes an addition that "
                 f"cannot happen. Move it out of MEASURED -- it is committed.")
+
+
+def check_shortlist_is_answerable():
+    """A shortlisted Candidate names a cut, and that cut is really in the deck.
+
+    The flag exists to survive being read months later, so the two ways it can
+    silently stop meaning anything are both checked:
+
+      * SHORTLISTED WITH NO CUT NAMED is the state this flag was invented to
+        replace. "These are the good ones" without a cut is exactly the
+        conversation that gets lost, and §0c is why naming the cut matters: a
+        candidate row and an ablation row share a baseline, so the pair CANNOT
+        be subtracted to get the swap -- somebody has to run it.
+      * A CUT THAT LEFT THE DECK. Proposed cuts age badly: the list moves
+        (four azusa cards were committed on 2026-09-10 and Perilous Forays is
+        cut by a staged change), and a proposal naming a card that is no longer
+        there reads as actionable and is not. Same shape as §0o.
+
+    WHAT THIS DOES NOT CHECK, said out loud (§0z15): that the proposed cut is
+    not MODEL-BLIND or PARTLY_MODELLED -- which is the trap that has already
+    cost this project two withdrawn swaps (§0z, §0z2). Those categories live in
+    `tools/ablation.py`, which reads `sys.argv` at import and therefore cannot
+    be imported from here. The rule is stated in each entry's own text instead,
+    and it is the first thing to check by hand when acting on one.
+    """
+    for c in MEASURED:
+        if not c.shortlist:
+            if c.proposed_cut:
+                raise AssertionError(
+                    f"edhmc/pending.py: {c.card!r} names a proposed cut but is "
+                    f"not shortlisted, so nothing prints it and the proposal "
+                    f"is invisible. Set `shortlist`, or drop `proposed_cut`.")
+            continue
+        if not c.proposed_cut:
+            raise AssertionError(
+                f"edhmc/pending.py: {c.card!r} is SHORTLISTED for {c.deck} "
+                f"with no `proposed_cut`. A shortlist without a named cut is "
+                f"the conversation this flag exists to replace -- name the cut "
+                f"the head-to-head should run, or clear the flag.")
+        module, _ = DECKS[c.deck]
+        deck, _cmd = module.build()
+        staged_out = {ch.remove for ch in CHANGES if ch.deck == c.deck}
+        if not any(card.name == c.proposed_cut for card in deck):
+            raise AssertionError(
+                f"edhmc/pending.py: {c.card!r} proposes cutting "
+                f"{c.proposed_cut!r}, which is NOT IN the {c.deck} list, so "
+                f"the head-to-head could not be run as written.")
+        if c.proposed_cut in staged_out:
+            raise AssertionError(
+                f"edhmc/pending.py: {c.card!r} proposes cutting "
+                f"{c.proposed_cut!r}, which a STAGED change already removes. "
+                f"Two changes cannot cut the same card; pick another target.")
 
 
 def check_withdrawn_are_explained():
@@ -1427,6 +1742,7 @@ def check_alt_cost_coverage():
 
 
 check_measured_are_promotable()
+check_shortlist_is_answerable()
 check_withdrawn_are_explained()
 check_alt_cost_coverage()
 
@@ -1531,10 +1847,21 @@ def ledger(verbose: bool = True) -> None:
             rows = [c for c in MEASURED if c.deck == deck_name]
             print(f"\n{deck_name.upper()}  ({len(rows)} measured, 0 staged "
                   f"from this batch)")
+            # SHORTLISTED ROWS FIRST, and marked, because the one thing a
+            # reader wants from this section is which of thirteen numbers
+            # somebody has actually looked at. Still Candidates: the marker
+            # says a head-to-head is proposed, not that anything is staged.
+            rows.sort(key=lambda c: (not c.shortlist, c.card))
             for c in rows:
-                print(f"  ?  {c.card}")
+                print(f"  {'>>' if c.shortlist else ' ?'}  {c.card}"
+                      + ("   [SHORTLISTED — head-to-head proposed, NOT staged]"
+                         if c.shortlist else ""))
                 print(f"     win    {c.win_rate}   signal {c.signal}")
                 print(f"     measured {c.measured}")
+                if c.shortlist:
+                    print(f"     cut?   proposed head-to-head: "
+                          f"-{c.proposed_cut} +{c.card}")
+                    print(f"     why it {c.shortlist}")
                 if verbose:
                     print(f"     why    {c.rationale}")
                     print(f"     data   {c.evidence}")

@@ -591,6 +591,17 @@ def can_pay(cost: dict, units: list[frozenset],
     is the one actually tapped. Without it, honouring the assignment would
     silently discard that policy. `available_mana` supplies it.
     """
+    # CAN THIS COST BE PAID AT ALL, asked before anything is built. A cost of
+    # N mana needs N units however they are coloured, so a hand holding an
+    # eight-drop on turn three answers this in one comparison instead of
+    # building a candidate list per pip and discovering it at the generic
+    # check. `main_phase` asks every card in hand on every pass of its casting
+    # loop, so the unaffordable ones are the common case, not the rare one.
+    # EXACT, not a heuristic: it can only reject costs the loops below would
+    # also have rejected -- they never pay a pip from nothing.
+    if sum(cost.values()) > len(units):
+        return None
+
     remaining = list(range(len(units)))
     used: list[int] = []
     legacy = getattr(units, "legacy", False)
@@ -631,6 +642,11 @@ def can_pay(cost: dict, units: list[frozenset],
         if owners is not None and i < len(owners) and owners[i] is not None:
             used_owners.add(id(owners[i]))
 
+    # `len(units[i])` and `w(i)` are fixed for the whole call and both loops
+    # below want them, so they are built once here rather than once per pip
+    # per candidate. Pure hoisting: the tuples are the same tuples.
+    lw = [(len(units[i]), w(i)) for i in range(len(units))]
+
     for color in ("W", "U", "B", "R", "G", "C"):
         need = cost.get(color, 0)
         for _ in range(need):
@@ -639,7 +655,7 @@ def can_pay(cost: dict, units: list[frozenset],
                 return None
             # free mana first, then the least flexible source that works,
             # then the cheapest one to lose among those
-            take(min(cands, key=lambda i: (owner_free(i), len(units[i]), w(i))))
+            take(min(cands, key=lambda i: (owner_free(i), lw[i])))
 
     gen = cost.get("gen", 0)
     if gen > len(remaining):
@@ -674,11 +690,37 @@ def can_pay(cost: dict, units: list[frozenset],
         for c in units[i]:
             supply[c] = supply.get(c, 0) + 1
 
-    def generic_key(i):
-        wi = w(i)
+    # THE KEY IS ALMOST ALL CONSTANT, AND IT USED TO BE REBUILT PER PIP PER
+    # UNIT. `supply` is a snapshot (see the note below), `len(units[i])` and
+    # `w(i)` are fixed for the call, so the ONLY part of this key that changes
+    # between picks is `owner_free(i)` -- which is 0 or 1. Building the rest
+    # once per unit instead of once per unit per pip is what the loop below
+    # does, and it is why `generic_key` no longer exists as a per-comparison
+    # function.
+    #
+    # THIS IS A PURE SPEEDUP AND THE ORDERING IS UNCHANGED, which is the only
+    # thing that could make it a behaviour change. `(owner_free, static)` and
+    # the old `(owner_free, -surplus, len, w)` order identically -- tuple
+    # comparison is lexicographic either way -- and a stable sort followed by
+    # "first un-taken entry, preferring owner_free == 0" selects exactly what
+    # repeated `min(remaining, key=...)` selected, including its tie-break:
+    # `min` returns the FIRST minimal element in iteration order, `remaining`
+    # is in increasing index order, and `sorted` is stable. Proved rather than
+    # argued -- all six decks come back bit-identical against a HEAD worktree.
+    # Two units with the SAME colour set have the same rarest-colour supply,
+    # and a green deck's twenty Forests are all `frozenset({"G"})` -- the same
+    # object, even. Memoising on the colour set turns one scan per unit into
+    # one scan per DISTINCT colour set.
+    rarest: dict = {}
+    static: dict[int, tuple] = {}
+    for i in remaining:
+        src = units[i]
+        have = rarest.get(src)
+        if have is None:
+            have = rarest[src] = min((supply[c] for c in src), default=0)
+        n_colours, wi = lw[i]
         want = wi[1] if isinstance(wi, tuple) and len(wi) > 1 else 0
-        surplus = min((supply[c] for c in units[i]), default=0) - want
-        return (owner_free(i), -surplus, len(units[i]), wi)
+        static[i] = (-(have - want), n_colours, wi)
 
     # `supply` IS A SNAPSHOT OF THE START OF THIS PAYMENT, AND DELIBERATELY SO.
     # It is built once above and NOT decremented as picks are taken, which
@@ -702,8 +744,25 @@ def can_pay(cost: dict, units: list[frozenset],
     # payment", and that question is asked once, about the position you are
     # paying from -- not re-asked against a pool you are halfway through
     # spending. `tests/test_mana_colour.py` pins both cases.
+    order = sorted(remaining, key=static.__getitem__)
+    taken: set = set()
     for _ in range(gen):
-        take(min(remaining, key=generic_key))
+        first = pick = None
+        for i in order:
+            if i in taken:
+                continue
+            if first is None:
+                first = i
+            # All owner_free == 0 entries sort ahead of all owner_free == 1
+            # entries, so the first one found IS the minimum; everything after
+            # it can only be worse on the leading element of the key.
+            if owner_free(i) == 0:
+                pick = i
+                break
+        if pick is None:
+            pick = first
+        taken.add(pick)
+        take(pick)
     return used
 
 

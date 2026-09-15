@@ -1,0 +1,21 @@
+DRYAD ARBOR / 302.6 -- land creatures are summoning sick for their own mana ability
+6,000 paired games, the staged azusa list, same seeds, knob off vs on
+
+  T10
+      won                     0.1900 ->     0.1855     -0.0045 +-0.0022   *
+      damage                 44.2278 ->    43.7408     -0.4870 +-0.1947   *
+      mana_spent            152.5497 ->   151.6650     -0.8847 +-1.0605  
+      lands_played           13.3627 ->    13.3338     -0.0288 +-0.0212   *
+      landfall_triggers      18.5220 ->    18.4767     -0.0453 +-0.0483  
+      turns_played            9.5697 ->     9.5732     +0.0035 +-0.0039  
+      games identical on all four headline metrics: 5608/6000 (93.5%)
+
+  T20
+      won                     0.4067 ->     0.4047     -0.0020 +-0.0030  
+      damage                 65.6147 ->    65.2495     -0.3652 +-0.2104   *
+      mana_spent            223.0507 ->   221.1763     -1.8743 +-2.4968  
+      lands_played           16.6213 ->    16.5957     -0.0257 +-0.0337  
+      landfall_triggers      23.7575 ->    23.6993     -0.0582 +-0.0615  
+      turns_played           11.3882 ->    11.3928     +0.0047 +-0.0117  
+      games identical on all four headline metrics: 5545/6000 (92.4%)
+

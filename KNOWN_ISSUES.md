@@ -68,6 +68,8 @@ Methodology that used to live at the end of this file is now
 | [0z18](#0z18) | FIXED | **Ashaya's second clause implemented, +0.0140 win rate** — and the rules note said the opposite |
 | [0z19](#0z19) | FIXED | **§7 closed — six recursion cards.** Lorehold +0.0220; the same stale-pool bug in both engines |
 | [0z20](#0z20) | FIXED | **§3 and §1b closed.** The Altar's mana is spendable; alternative costs have a PREFERENCE and six readers |
+| [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
+| [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -3769,6 +3771,325 @@ measurable, and the change ships as structure rather than as a number.
 of which any card in these six lists has. `Card` still carries one printed
 cost plus a mode list rather than a list of modes outright, which is the
 smaller refactor and the one that does not touch every deck file.
+
+---
+
+<a id="0z21"></a>
+
+## 0z21. MEASURED — six Azusa candidates, and a land creature that tapped for mana on arrival
+
+2026-09-13. Six cards submitted for review: Nissa, Resurgent Animist; Traveling
+Chocobo; Archdruid's Charm; Awaken the Woods; Expedition Map; Zuran Orb. All
+six implemented, all six measured at **N=15,000, T20, in the Sylvan Library
+slot** — the SAME victim as the §0z4 batch, so the two batches are measured
+against the same 98 cards and can be read against each other.
+
+`results/candidates_azusa_batch4_T20.txt`,
+`results/azusa_batch4_mechanisms.txt`, `results/azusa_batch4_knob_sweeps.txt`.
+
+### The rows
+
+| card | MV | win rate T20 | damage | signal | rank it would take |
+|---|---|---|---|---|---|
+| Traveling Chocobo | 3 | **+0.0291 ±0.0040** | +2.64 ±0.26 | both | **8th of 44** |
+| Nissa, Resurgent Animist | 3 | **+0.0285 ±0.0041** | +2.65 ±0.28 | both | **8th of 44** |
+| Awaken the Woods | 8 | +0.0188 ±0.0029 | +1.71 ±0.18 | both | 14th |
+| Expedition Map | 1 | +0.0133 ±0.0033 | +1.44 ±0.23 | both | 25th |
+| Zuran Orb | 0 | +0.0124 ±0.0025 | +1.11 ±0.16 | both | 26th |
+| Archdruid's Charm | 3 | +0.0082 ±0.0035 | +0.87 ±0.23 | both | 37th |
+
+**ALL SIX CLEAR THE DECK'S REALISTIC CUT BAR**, which on the current table is
+Yavimaya Elder +0.0023 ±0.0023, Wayward Swordtooth +0.0038 ±0.0029, Titania
++0.0050 ±0.0031 and Exploration +0.0053 ±0.0029. That is a statement about the
+bottom of this list as much as about these cards, and it is the same shape §0z4
+found: **the top two are a SET, not a ranking** — Chocobo and Nissa are 0.0006
+apart against bars of 0.0040, and both sit inside the bars of Rampaging
+Baloths, Tireless Tracker, Ancient Greenwarden and Nissa, Vastwood Seer. §0c.
+
+### Why the top two win, in one sentence each
+
+**TRAVELING CHOCOBO IS A SECOND ANCIENT GREENWARDEN** for the half this deck
+cares about — "if a land or Bird you control entering causes a triggered
+ability of a permanent you control to trigger, that ability triggers an
+additional time" is Greenwarden's sentence with Bird added — and the two
+STACK: `landfall_ability_resolutions` (a new counter, and the one that
+separates a doubler from a payoff) goes **+13.84 per resolution** against
+`landfall_triggers` **+0.90**. One land, three resolutions of everything. In a
+list with Scute Swarm that is exponential: tokens_made **+243 per resolution**.
+
+**NISSA, RESURGENT ANIMIST IS A RITUAL THAT ALSO DRAWS**, and the reveal is
+narrower than it reads: "if this is the SECOND TIME this ability has resolved
+this turn" is the second and only the second, so an Azusa turn making three
+land drops gets three mana and ONE card. Measured: **+19.75 mana and +1.52
+cards per resolution**, with 0.17 whiffs — the deck holds ten Elf or Elemental
+cards, generated into `decks/_evasion.py` as `ELF_ELEMENTAL` rather than typed
+by hand (§0z4: subtypes are data). Note the interaction the rules give for
+free: with a doubler out the ability resolves twice on the FIRST land, so the
+card arrives a land earlier.
+
+### The three whose number rests on a policy, said out loud
+
+**AWAKEN THE WOODS' X IS THE CARD**, so it is swept rather than asserted — and
+THE FIRST SWEEP WAS WRONG IN A WAY WORTH RECORDING. It set a cfg knob that
+changed the token count while the card's cost stayed {6}{G}{G}, i.e. it
+measured eight tokens for the price of six. **The tell was in the output and
+not in the code**: `deploy` came back identical at every X, which cannot happen
+if X is in the cost. X now comes from `card.x_pips` and there is no knob at
+all — cost and effect are one number, and a knob for half of it is §0u's shape
+waiting to happen. The sweep varies the whole card.
+
+Swept properly (n=4,000, T20), **X IS NOT LOAD-BEARING BETWEEN 4 AND 6**, which
+is the opposite of what "X is the whole card" suggests and is the more useful
+answer:
+
+| X | cost | win rate | tokens/game | deploy |
+|---|---|---|---|---|
+| 3 | {3}{G}{G} | +0.0163 ±0.0062 | 0.96 | 29.9% |
+| 4 | {4}{G}{G} | +0.0222 ±0.0062 | 1.25 | 28.9% |
+| 6 | {6}{G}{G} | +0.0215 ±0.0058 | 1.90 | 27.4% |
+
+The two effects cancel: a bigger X buys more landfall and costs deploy rate.
+Only X=3 is measurably worse, and the committed figure is quoted at X=6, the
+project's existing convention.
+
+**ARCHDRUID'S CHARM IS A FLOOR, NOT A MEASUREMENT.** Two of its three modes
+(fight-removal, exile an artifact or enchantment) are MODEL-BLIND under §4, so
+only mode 1 exists here — and mode 1 itself fetches a FOREST rather than the
+Strip Mine or Homeward Path a pilot would want, because those are blind too.
+It belongs in `PARTLY_MODELLED` if it is ever added to the list.
+
+**AND ITS HEADLINE NUMBER RESTS ON A POLICY I CHOSE, WHICH BOTH SWEEPS SAY IS
+THE WRONG ONE.** `archdruid_mode` (n=4,000): `creature` **+0.0130 ±0.0072**,
+`auto` +0.0077 ±0.0071, `land` +0.0057 ±0.0072. The bars overlap and the
+question is NOT resolved — but the creature mode came out ahead at n=1,500 and
+again at n=4,000, and `auto` takes the land on essentially every board in this
+deck, so the reported +0.0082 is close to the LAND mode's value. **If this card
+is ever staged, re-measure the mode first**: the gap between the two pure
+strategies is about as large as the card's whole score.
+
+**ZURAN ORB IS ALSO A FLOOR**, and for the reason that makes the card: it is a
+free instant-speed outlet held up against land destruction and lethal damage,
+and this engine has no instant speed, no opponent land destruction and no stack
+to respond on. What IS modelled is the half this deck wants — tapped lands
+sacrificed for Titania's Elementals and for a recursion loop, plus two life —
+and that half alone is worth +0.0124.
+
+**NEITHER OF ITS KNOBS IS LOAD-BEARING**, said out loud because CLAUDE.md
+requires it and because a card whose entire content is a policy is exactly
+where that matters. n=4,000, T20: `zuran_keep` 4 / 6 / 8 gives +0.0143 /
++0.0112 / +0.0118, and `zuran_life_floor` 1 / 8 / 15 gives +0.0092 / +0.0112 /
++0.0097 — every setting inside every other setting's bar, and the sacrifice
+count barely moves with them (1.00 to 1.33 a game). What limits the card is how
+often a payoff is on the battlefield at all, not how greedy the pilot is.
+
+### AND THE BATCH TURNED UP A DEFECT IN A CARD ALREADY IN THE DECK
+
+Awaken the Woods makes **land creature** tokens, which forced the question "can
+a land creature tap for mana the turn it arrives". 302.6 says no — the rule
+gates "a creature's activated ability with the tap symbol" and says nothing
+about what else the permanent is — and the engine said yes, because
+`available_mana` read `c.is_land` and never looked at `sick`.
+
+**DRYAD ARBOR HAS THEREFORE BEEN TAPPING FOR {G} ON THE TURN IT WAS PLAYED
+SINCE 2026-09-07**, for the life of this deck. `land_mana_live()` is the fix,
+`land_creature_sick=False` restores the old behaviour exactly, and
+`tests/test_azusa_batch4.py` pins both halves (no mana this turn, mana next).
+
+Measured on its own, N=6,000, same seeds, knob off vs on
+(`results/azusa_dryad_arbor_302_6.txt`):
+
+| horizon | win rate | damage |
+|---|---|---|
+| T10 | **−0.0045 ±0.0022** | −0.49 ±0.19 |
+| T20 | −0.0020 ±0.0030 — inside its bar | −0.37 ±0.21 |
+
+6.5% of games differ. **THE TABLE WAS REGENERATED FROM AN EMPTY CACHE AND
+0 OF 58 ROWS MOVED BEYOND THEIR OWN OLD BAR**, with no sign flipped — so the
+deck's own win rate moved and not one card's ranking did, which is what says
+the cut bar above is safe to quote against either version of the table. Five
+decks were checked against a HEAD worktree and are **bit-identical**; only
+azusa touches this code.
+
+**What is deliberately still blind**, written down rather than left to be
+found (§0z15): an ANIMATED land. `land_mana_live` reads `card.is_creature`, a
+fact about the card, so a plain land animated this turn is not covered —
+Sylvan Awakening and Nissa, Who Shakes the World both grant haste (702.10b), so
+the only unmodelled case is Rude Awakening's hasteless mode on a land played
+the same turn, and all three cards were cut from the list on 2026-09-10.
+
+### THREE SHORTLISTED 2026-09-14, and what a shortlist is NOT
+
+`Candidate` now carries `shortlist` and `proposed_cut`, and
+`python -m edhmc.pending` prints those rows first and marked. **This is a
+review flag, not a fourth state**: `build_pending` does not apply them, no
+table contains them, and no deck list moves. It exists because "these three
+are worth a head-to-head" is exactly the kind of statement that lived in a
+conversation and was lost, which is the same gap the `Candidate` class itself
+was written to close.
+
+| shortlisted | proposed cut | its row | why this cut |
+|---|---|---|---|
+| Traveling Chocobo +0.0291 | Yavimaya Elder | **+0.0023 ±0.0023** | the weakest evaluated row in the deck, and its payoff is MORE LANDS |
+| Nissa, Resurgent Animist +0.0285 | Wayward Swordtooth | +0.0038 ±0.0029 | its whole function is a FOURTH land drop |
+| Awaken the Woods +0.0188 | Kozilek, Butcher of Truth | +0.0056 ±0.0022 | top-end for top-end; Ulamog stays, so Eye of Ugin keeps a target |
+
+**All three cuts share one mechanism and it is the deck's own standing
+finding**: this list is CARD-limited, not mana-limited — 2.77 land drops
+granted a turn against 1.33 used (§0z4) — so the cards that supply more lands
+or more land drops are the ones whose rows sit at the bottom, and they sit
+there for a reason that is explainable rather than statistical.
+
+**NONE OF THIS IS EVIDENCE FOR THE SWAP, and the arithmetic that looks like it
+is is the §0c error.** A candidate row and an ablation row share a baseline;
+subtracting them does not give the swap. Each pair needs its own paired run
+before anything is staged.
+
+**Three cards that look like better cuts and are not:**
+
+* **Sylvan Library** (−0.0003 ±0.0018) is the most inviting row in the table
+  and is the trap: it is MODEL-BLIND — the module gives it no script at all,
+  which is precisely why it was chosen as the victim slot these six were
+  measured in. Its row says the model has no eyes there, not that the card
+  does nothing.
+* **Bane of Progress** (−0.0007 ±0.0023) is `PARTLY_MODELLED` and has already
+  cost this project two withdrawn swaps (§0z2).
+* **Quirion Ranger** (−0.0013 ±0.0012) is the only negative row in MODEL-BLIND
+  and its activated ability is unimplemented (§0z18 left it open).
+
+### A PERFORMANCE CLIFF IN SHARED CODE, found by the one input that reaches it
+
+Sweeping Awaken the Woods to **X=8** produced a game that does not finish: the
+first attempt at the sweep sat on **seed 80683 for 5.7 HOURS** and was killed
+with nothing written. X = 3, 4 and 6 each run 4,000 games in about 75 seconds,
+and 683 of the first 684 games at X=8 complete normally, so this is one game in
+several hundred rather than a slow configuration.
+
+**It is not this card, this engine, or unbounded tokens — it is
+`engine.can_pay`.** Profiled over 90 seconds of that seed:
+
+| | calls | internal time |
+|---|---|---|
+| `can_pay` | 11,299 | — |
+| `generic_key` (inside it) | **17,299,692** | 112s of 180s profiled |
+| `min` over those keys | 17,336,664 | 18s |
+
+That is ~1,500 key evaluations per `can_pay`. Each generic pip is assigned by a
+`min` over every available mana unit, so one call costs about
+(mana units × generic pips) — and this deck drives both factors up at once:
+**Ashaya makes every nontoken creature a Forest**, Awaken adds eight more land
+tokens, and Kozilek and Ulamog ask for {11}. A big-board game makes ~11,000
+such calls.
+
+**All six engines share `can_pay`**, and this is a performance property rather
+than a wrong answer, so it is recorded rather than fixed here — the same
+reasoning queued item 17 gives for not changing an engine-wide rule inside a
+candidate evaluation. It is also why the X sweep stops at 6.
+
+### One more check that could not fail
+
+`tools/audit_cards.py` raised an ERR on Zuran Orb reading **"cost {0}, oracle
+{0}"** — two identical strings and a failure. `parse_cost` turned the Scryfall
+string `{0}` into `{"gen": 0}` while every deck module writes the same cost as
+`{}`, and the comparison is a dict equality. Zuran Orb is this project's first
+zero-cost card; the same false ERR was waiting for any Mox or Ornithopter.
+Fixed in the parser. **A check that reports a false failure teaches you to
+ignore failures**, which is the same argument `KNOWN_MODEL_LIMITS` exists for.
+
+---
+
+<a id="0z22"></a>
+
+## 0z22. FIXED — the tables got slower; `can_pay` was most of it. 1.22x, bit-identical
+
+2026-09-14. Ablation runs had been getting longer. Profiled rather than
+guessed, optimised, and **proved to change nothing**: all six decks come back
+BIT-IDENTICAL against a pre-optimisation tree at n=1,200, `validate.py` is
+`+0.00` on all 18 metrics, and all thirteen test suites and twelve mutation
+checks still pass.
+
+### Where the time went
+
+`engine.can_pay` — shared by all six engines, called ~213 times per azusa game,
+because `main_phase` asks every card in hand on every pass of its casting loop.
+Four changes, all of them hoisting or memoising work that was already being
+recomputed:
+
+| change | what it was doing |
+|---|---|
+| **early bail** on `sum(cost.values()) > len(units)` | an eight-drop on turn three was answered by building a candidate list per pip and discovering it at the generic check. One comparison now. |
+| **the generic key is built once per unit**, not once per unit per pip | `supply` is a snapshot, `len(units[i])` and `w(i)` are fixed for the call — only `owner_free` varies, and it is 0 or 1 |
+| **memoise the rarest-colour scan** on the colour SET | a green deck's twenty Forests are all `frozenset({"G"})` |
+| **hoist `(len, w)`** out of both pip loops | the same tuples, built once |
+
+Plus two in `azusa` alone, which was the slowest deck by 4x: `ashaya_lands`
+reads its knob once at construction (626,800 calls a run), and
+`available_mana` guards the Ashaya branch and memoises `want` per colour set.
+
+**ORDERING IS UNCHANGED AND THAT IS THE WHOLE RISK.** `(owner_free, static)`
+compares identically to the old `(owner_free, -surplus, len, w)`, and a stable
+sort plus "first un-taken entry, preferring `owner_free == 0`" selects exactly
+what repeated `min(remaining, key=...)` selected, tie-break included: `min`
+returns the first minimal element in iteration order, `remaining` is in
+increasing index order, and `sorted` is stable.
+
+### What it bought
+
+Interleaved A/B, 6 reps of 200 games, medians:
+
+| deck | before | after | |
+|---|---|---|---|
+| azusa | 100.5 | 132.5 games/sec | **1.32x** |
+| tivit | 331.0 | 428.7 | 1.30x |
+| lorehold | 290.5 | 338.9 | 1.17x |
+| shilgengar | 424.7 | 477.2 | 1.12x |
+| rendmaw | 425.4 | 464.5 | 1.09x |
+| karlov | 459.8 | 492.1 | 1.07x |
+| **six-deck** | 23.30 | 19.11 ms/game | **1.22x** |
+
+End to end, a full azusa table at N=1,500 on 8 processes: **6m00s → 4m08s,
+1.45x** — better than the per-game figure, because the harness's own per-card
+overhead shrinks with it.
+
+### A CHANGE THAT LOOKED OBVIOUSLY RIGHT AND MEASURED AT NOTHING
+
+`azusa.creature_lands` is O(board) and three callers ask it on paths that run
+per permanent — 842,029 calls to `is_creature_land` in 120 games. Caching it
+behind a `Board.version` stamp is the obvious fix and it measured **1.01x on
+azusa and 0.99x on rendmaw**. It was REMOVED, not kept: it put an invariant on
+every `Board` mutator and an invalidation obligation on a shared class, to buy
+noise.
+
+The reason is the guard already on the line above it: Ashaya is on the
+battlefield in a minority of games, so the expensive branch was already being
+skipped in most of them and the call count was concentrated in the few games
+where it is out. **A call count is not a cost profile**, which is the
+transferable half of this.
+
+### AND A MEASUREMENT FINDING THAT OUTLIVES THIS SECTION
+
+**WALL-CLOCK TIMINGS TAKEN AT DIFFERENT MOMENTS ARE NOT COMPARABLE ON THIS
+MACHINE.** The same unmodified code, benchmarked twice a few minutes apart,
+gave azusa 86.5 and then 102.1 games/sec — an 18% drift, larger than most of
+the individual wins above, and a copy of the tree in a different directory ran
+15% slower than the original for no reason in the code. Two conclusions were
+nearly drawn from that noise: that the round-four changes were a regression
+(they were not), and that the memo was worth 1.17x (it is worth nothing).
+
+The fix is to **interleave A and B inside ONE process**: load both trees under
+`sys.path` manipulation, alternate reps, take medians. That cancels drift the
+way common random numbers cancel shuffle variance — the same idea this project
+already rests on, pointed at the clock instead of at the deck. Any future
+performance claim here should be measured that way.
+
+### An operational footgun worth knowing
+
+`tools/ablation.py` stops at `ABLATE_BUDGET` seconds, **default 240**, and
+prints "N cards still to do — rerun to resume". `regen_tables.sh` sets its own
+budget and retries in a loop, so it is unaffected — but the command CLAUDE.md
+documents for a single deck does not, and redirecting its stdout over a
+committed table truncates that table to the partial run. Hit for real on
+2026-09-13, recovered with `git checkout`. Pass `ABLATE_BUDGET` when running
+one deck by hand.
 
 ---
 
