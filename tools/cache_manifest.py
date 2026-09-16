@@ -645,24 +645,31 @@ def main():
         "",
         f"Fingerprints recorded at `{head()}`.",
         "",
-        "**THERE ARE NO TRACKED CACHES. This is deliberate, and it is",
-        "§0z23's chosen resolution.**",
+        # THE HEADLINE IS DERIVED, NOT ASSERTED. This opened with a flat
+        # "THERE ARE NO TRACKED CACHES", which was true the day §0z23 wrote it
+        # and became false the moment a cache was committed again -- a
+        # GENERATED file carrying a hand-written claim about its own subject,
+        # which is the very failure §0z23 was closing. It is read off `rows`
+        # now, so it cannot disagree with the table underneath it.
+        (f"**{len(rows)} cache{'' if len(rows) == 1 else 's'} tracked.** The "
+         "table below records each one's source fingerprint, taken live at "
+         "generation time; the provenance of each is in `NOTES`."
+         if rows else
+         "**THERE ARE NO TRACKED CACHES. This is deliberate, and it is "
+         "§0z23's chosen resolution.**"),
         "",
-        "Ten caches — every `_medblank` one at N=15,000, which is to say every",
-        "cache that produced a table now committed in `results/` — were deleted",
-        "in `b09055c` without this generator being re-run, so this file went on",
-        "describing fourteen files of which four existed. The four survivors",
-        "were the old `n6000`/`n2000` caches and **every one of them disagreed",
-        "with its live fingerprint**, which the rule stated above condemns.",
-        "They were deleted and this file regenerated.",
+        "**§0z23 is why the rule above exists.** Ten caches — every",
+        "`_medblank` one at N=15,000, which is to say every cache that had",
+        "produced a table committed in `results/` — were deleted in `b09055c`",
+        "without this generator being re-run, so this file went on describing",
+        "fourteen files of which four existed. The four survivors were the old",
+        "`n6000`/`n2000` caches and **every one of them disagreed with its live",
+        "fingerprint**, which the rule stated above condemns. They were deleted",
+        "and this file regenerated.",
         "",
-        "**No committed table is invalidated by this.** The tables in",
+        "**No committed table was invalidated by that.** The tables in",
         "`results/` are the artefact; a cache is the intermediate that lets a",
-        "run resume. What was lost is the resume: a regeneration now starts",
-        "from empty on every deck. `.gitignore`'s own note puts the full",
-        "rebuild at roughly 23 minutes, against the six hours that justified",
-        "tracking them in the first place, so the original argument had already",
-        "weakened on its own terms.",
+        "run resume. What was lost was the resume.",
         "",
         "**The rejected alternative is worth knowing, because it is the",
         "tempting one.** Regenerating this file WITHOUT deleting the four stale",
@@ -673,9 +680,9 @@ def main():
         "signal that said otherwise. **Never regenerate this file to silence a",
         "staleness warning.** Regenerate it when the caches themselves change.",
         "",
-        "When a cache is next produced, add it here in the same commit, and",
-        "record its note in `NOTES` — that is what makes the fingerprint",
-        "above mean anything.",
+        "A cache is added here in the same commit that produces it, with its",
+        "note in `NOTES` — that is what makes the fingerprint above mean",
+        "anything.",
         "",
     ]
     if rows:
