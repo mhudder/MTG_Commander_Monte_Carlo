@@ -37,8 +37,15 @@ import subprocess
 # Anchored on the prose that introduces a git ref, NOT on "looks like hex".
 # See the docstring: cache fingerprints are hex too, and they must keep being
 # compared.
+# Every prose prefix that introduces a git ref. ADD TO THIS LIST WHEN YOU ADD A
+# PROVENANCE LINE: renaming the cache manifest's "Fingerprints recorded at" to
+# "Generated at" silently dropped it from the mask, and the doc went stale on
+# every commit again -- the exact bug this function exists to prevent,
+# reintroduced by a rename that looked purely cosmetic. It is spelled as an
+# alternation rather than a loose ".* at" so it cannot start swallowing the
+# cache fingerprints, which are hex too and must keep comparing.
 _PROVENANCE = re.compile(
-    r"(Derived at|Fingerprints recorded at) `[0-9a-f]{7,40}`")
+    r"(Derived at|Fingerprints recorded at|Generated at) `[0-9a-f]{7,40}`")
 
 
 def head() -> str:
