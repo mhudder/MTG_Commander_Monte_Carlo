@@ -611,6 +611,57 @@ def head() -> str:
         return "unknown"
 
 
+# ---------------------------------------------------------------------------
+# 2026-09-16: the first six-deck regeneration since §0z23 emptied this
+# directory, and the first caches tracked since. Run from an EMPTY cache on
+# every deck -- there was nothing to resume, which is exactly what §0z23 cost
+# and what these files restore.
+# ---------------------------------------------------------------------------
+_REGEN_2026_09_16 = (
+    " REGENERATED FROM AN EMPTY CACHE 2026-09-16 by `./tools/regen_tables.sh`, "
+    "N=15,000, seeds 5000..19999, four workers. §0z23 had deleted every cache, "
+    "so all six decks started from nothing; this is the run that restores the "
+    "resume. `python -m tools.validate` is +0.00 on all 18 metrics across all "
+    "six engines after it, and the game RNG is sealed after the opening hand "
+    "on every engine (corr 0.9106, ~11x). "
+    "WHAT MOVED, checked per deck against the previously committed table "
+    "rather than argued: ZERO rows in ANY of the six moved beyond their own "
+    "old CI half-width, and ZERO already-significant rows flipped sign. The "
+    "largest win-rate move in the whole run is 0.0003 (rendmaw). Four label "
+    "changes in total: three in rendmaw and one in shilgengar. The rendmaw "
+    "three are §0z24 -- `FLIP` assigned on an unguarded sign, where "
+    "Biotransference kept an IDENTICAL win rate of +0.0005 +-0.0010 and "
+    "changed label anyway because a damage value that displays as 0.00 "
+    "changed sign. The shilgengar one is not that and is not a defect: Priest "
+    "of Fell Rites crossed its own bar by one digit in the last place "
+    "(+0.0016 -> +0.0017 against +-0.0016), which is the significance test "
+    "behaving as a hard threshold on a card sitting exactly on the noise "
+    "floor.")
+
+# Azusa is the control in that comparison and deserves its own sentence.
+_AZUSA_2026_09_16 = (
+    " AND AZUSA REPRODUCED BIT FOR BIT: all 58 cards re-measured from empty, "
+    "and `results/ablation_azusa.txt` came back BYTE-IDENTICAL to the "
+    "committed file -- `git diff` empty on a file whose mtime had just moved. "
+    "That is the strongest statement in this run and it is what makes the "
+    "other five decks' fourth-decimal drift interpretable rather than "
+    "mysterious: the harness IS deterministic, so the drift is a code "
+    "difference and not noise. Azusa's table is the ONLY one of the six whose "
+    "committed version was produced at `b09055c` (2026-09-15); the other five "
+    "date from `34d6395`/`5a377ec` and therefore predate it, and `b09055c` is "
+    "the only commit since to touch any file in a source fingerprint. "
+    "NOT CONCLUDED HERE -- see the close-out commit for what is and is not "
+    "established about why.")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "")
+        + _REGEN_2026_09_16
+        + (_AZUSA_2026_09_16 if d == "azusa" else "")
+    for d in ("lorehold", "rendmaw", "karlov", "tivit", "shilgengar", "azusa")
+})
+
+
 def main():
     rows = []
     for name, deck, body in caches():
