@@ -26,7 +26,7 @@ Cliffhaven Vampire                    +2.10+-0.14         +2.35+-0.16        +0.
 Marauding Blight-Priest               +2.16+-0.15         +2.24+-0.16        +0.0113+-0.0026      both
 Kambal, Consul of Allocation          +2.07+-0.13         +2.04+-0.15        +0.0085+-0.0027      both
 Serra Ascendant                       +2.00+-0.14         +1.76+-0.15        +0.0103+-0.0028      both
-Enduring Tenacity                     +1.67+-0.15         +1.71+-0.19        +0.0303+-0.0036      both
+Enduring Tenacity                     +1.68+-0.15         +1.71+-0.19        +0.0303+-0.0036      both
 Debt to the Deathless                 +1.19+-0.09         +1.70+-0.11        +0.0106+-0.0022      both
 Archangel of Thune                    +1.34+-0.12         +1.70+-0.15        +0.0197+-0.0031      both
 Blind Obedience                       +1.14+-0.10         +1.64+-0.14        +0.0093+-0.0027      both
@@ -108,7 +108,7 @@ Lurrus of the Dream-Den               +0.43+-0.07         +0.55+-0.10        +0.
 Return to Dust                        +0.29+-0.06         +0.29+-0.10        +0.0034+-0.0019      both
 Sun Titan                             +0.17+-0.05         +0.25+-0.08        +0.0031+-0.0019      both
 Anguished Unmaking                    +0.24+-0.06         +0.21+-0.09        +0.0011+-0.0019       dmg
-Fracture                              +0.03+-0.06         +0.07+-0.08        +0.0010+-0.0015        --
+Fracture                              +0.03+-0.06         +0.07+-0.08        +0.0009+-0.0015        --
 Umezawa's Jitte                       +0.12+-0.06         +0.06+-0.08        -0.0005+-0.0018        --
 Swords to Plowshares                  +0.02+-0.04         +0.06+-0.06        +0.0007+-0.0011       dmg
 Enlightened Tutor                     +0.05+-0.03         +0.05+-0.04        +0.0009+-0.0008      both
