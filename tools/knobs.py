@@ -44,8 +44,9 @@ from __future__ import annotations
 import ast
 import os
 import re
-import subprocess
 import sys
+
+from tools._generated import comparable, head
 
 OUT = os.path.join("docs", "KNOBS.md")
 ENGINE_DIR = "edhmc"
@@ -224,14 +225,6 @@ def conflicts(reads: dict[str, list[Read]]) -> dict[str, list[Read]]:
     return bad
 
 
-def head() -> str:
-    try:
-        return subprocess.run(["git", "rev-parse", "--short", "HEAD"],
-                              capture_output=True, text=True,
-                              check=True).stdout.strip()
-    except Exception:
-        return "unknown"
-
 
 def render() -> str:
     reads = scan()
@@ -347,7 +340,7 @@ def main() -> int:
         except OSError:
             print(f"MISSING {OUT} -- run `python -m tools.knobs --write`")
             return 1
-        if have != body:
+        if comparable(have) != comparable(body):
             print(f"STALE {OUT} -- run `python -m tools.knobs --write`")
             return 1
         unknown = sorted(set(conflicts(scan())) - set(ACKNOWLEDGED))

@@ -43,6 +43,8 @@ import re
 import subprocess
 import sys
 
+from tools._generated import comparable
+
 SECTION_CITE = re.compile(r"§([0-9][0-9a-z]*)")
 KNOWN_ISSUES = "KNOWN_ISSUES.md"
 CODE_DIRS = ("edhmc", "tools", "diagnostics", "tests")
@@ -223,9 +225,13 @@ def generated_checks() -> list[Result]:
             # compared unequal to its own output and every generated doc
             # reported stale -- a check that fires when nothing is wrong,
             # which is the failure `cache_manifest.py` warns about by name.
-            body = body.rstrip("\n") + "\n"
-            have = read(label).rstrip("\n") + "\n"
-            ok = have == body
+            # Both sides through the SAME normaliser -- see
+            # tools/_generated.comparable. It masks the git ref in the
+            # provenance line, which otherwise makes every generated doc stale
+            # the instant it is committed, and masks nothing else: the cache
+            # fingerprints STATUS.md prints are hex too and still compare.
+            ok = comparable(have := read(label)) == comparable(body)
+            del have
             out.append(Result(
                 f"{label} is current",
                 ok,

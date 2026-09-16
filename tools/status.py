@@ -34,6 +34,8 @@ import re
 import subprocess
 import sys
 
+from tools._generated import comparable, head
+
 OUT = os.path.join("docs", "STATUS.md")
 RESULTS = "results"
 DECKS = ["rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa"]
@@ -61,10 +63,6 @@ def sh(*args: str) -> str:
                               check=True).stdout.strip()
     except Exception:
         return ""
-
-
-def head() -> str:
-    return sh("git", "rev-parse", "--short", "HEAD") or "unknown"
 
 
 def last_commit(path: str) -> str:
@@ -223,11 +221,22 @@ def first_doc_line(path: str) -> str:
 
 
 def inventory(d: str) -> list[tuple[str, str]]:
+    """Runnable entry points in a directory, with their one-line docstring.
+
+    LEADING-UNDERSCORE MODULES ARE EXCLUDED and here is what that hides: a
+    private helper like `tools/_generated.py` is a library, not something you
+    run, and listing `python -m tools._generated` under "what can be run" would
+    be an instruction to do a meaningless thing. The cost is that a private
+    module never appears in this inventory at all, so it is invisible here
+    however large it grows -- read the directory, not this table, when you are
+    looking for code rather than for a command. (§0z15: when you write an
+    exemption into a checker, write down what it is now blind to.)
+    """
     if not os.path.isdir(d):
         return []
     out = []
     for f in sorted(os.listdir(d)):
-        if f.endswith(".py") and f != "__init__.py":
+        if f.endswith(".py") and not f.startswith("_"):
             out.append((f[:-3], first_doc_line(os.path.join(d, f))))
     return out
 
@@ -477,7 +486,7 @@ def main() -> int:
         except OSError:
             print(f"MISSING {OUT} -- run `python -m tools.status --write`")
             return 1
-        if have != body:
+        if comparable(have) != comparable(body):
             print(f"STALE {OUT} -- run `python -m tools.status --write`")
             return 1
         print(f"{OUT} is current")
