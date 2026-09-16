@@ -344,21 +344,27 @@ less precise ones. N=15,000 is the knee: cards resolved per extra minute go
 3.4 (6000→10000), 2.0 (10000→15000), then 0.8 (15000→24000), and the calls
 this project actually argues about sit at 0.0025–0.003 win rate.
 
-**The ablation caches are TRACKED, and a stale one is the hazard that buys.**
+**A STALE CACHE IS THE HAZARD THAT BUYS, AND NO CACHE IS TRACKED ANY MORE.**
 `ablation.py` keys its cache on deck, horizons, N and blank mode — **not on
 the version of the code that produced it** — so a full cache makes `todo`
 empty and a run silently REPRINTS THE OLD NUMBERS instead of measuring.
 `docs/ABLATION_CACHES.md` records a source fingerprint per cache; regenerate
-it and compare before resuming one, and delete the cache if it differs.
+it and compare before resuming one, and **delete the cache if it differs**.
 `./tools/regen_tables.sh` deletes by default, `--resume` does not.
 
-**Right now there is nothing to resume onto and the manifest does not know
-it** — ten caches were deleted without the generator being re-run, and the four
-survivors all disagree with their live fingerprint. **§0z23**, and it is a
-DECISION rather than a command: regenerating the manifest would make the check
-pass by setting recorded equal to live, certifying four caches as produced by
-code that did not produce them. `python -m tools.check_docs` fails on it until
-someone chooses.
+`results/caches/` is EMPTY as of 2026-09-16 (§0z23): ten caches had been
+deleted without the generator being re-run, and the four survivors all
+disagreed with their live fingerprint, so they were deleted too. **No
+committed table is invalidated by that** — the tables are the artefact and a
+cache is only the resume. What it costs is that the next regeneration starts
+from empty on all six decks, and `.gitignore` puts that at roughly 23 minutes.
+
+**NEVER REGENERATE THE MANIFEST TO SILENCE A STALENESS WARNING.** It records
+the fingerprint LIVE at generation time, so regenerating sets recorded equal to
+live by construction — certifying caches as produced by code that did not
+produce them, and destroying the only signal that said otherwise. Regenerate it
+when the CACHES change. If you produce a cache worth keeping, add it, its note
+in `NOTES`, and the regenerated manifest in one commit.
 
 **CRN is the reason any of this is affordable, and mid-game randomness is
 now ADDRESSED RATHER THAN ORDERED (§0z17, 2026-09-13).** This finding twice

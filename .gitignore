@@ -4,21 +4,23 @@ __pycache__/
 .venv/
 venv/
 
-# Ablation caches ARE TRACKED as of 2026-09-05. They were ignored as
-# "regenerable, and large" — the first is true and the second was not: all
-# EIGHT together are 296 KB. Tracking them lets a clone reproduce or extend the
-# tables without the run. The cost is that a stale cache can now arrive with a
-# checkout, so ABLATION_CACHES.md records a source fingerprint per deck; check
-# it before resuming one. See cache_manifest.py.
+# Ablation caches are NOT IGNORED — they are trackable, and right now there are
+# NONE. See KNOWN_ISSUES.md 0z23.
 #
-# TWELVE, not four, since 2026-09-06: each deck has the current N=15000
-# `_medblank` cache, the N=15000 one it superseded the same day (measured
-# against the old blank — see KNOWN_ISSUES.md 0j), and the N=6000 (tivit:
-# N=2000) one before that. The older two are kept because they are the
-# provenance for every number quoted in CLAUDE.md above their dates. The
-# "roughly six hours to rebuild" that justified tracking them is no longer true
-# either — the whole set is 23 minutes now. They stay tracked for provenance
-# rather than for the compute.
+# They were tracked from 2026-09-05 so a clone could reproduce or extend the
+# tables without the run. The cost is that a stale cache arrives with a
+# checkout, so docs/ABLATION_CACHES.md records a source fingerprint per deck and
+# you check it before resuming one. That safety net was then not maintained: ten
+# caches were deleted in b09055c without the generator being re-run, leaving the
+# manifest describing fourteen files of which four existed — and all four of
+# those disagreed with their live fingerprint. They were deleted on 2026-09-16
+# and results/caches/ is empty.
+#
+# The argument for tracking them had already weakened on its own terms: the
+# "roughly six hours to rebuild" that justified it is now about 23 minutes.
+# If you produce a cache worth keeping, commit it together with its NOTES entry
+# and a regenerated manifest — an untracked cache with no provenance is the
+# thing this comment exists to prevent.
 #
 # The blank mode is IN THE FILENAME on purpose: a cache measured against a
 # different blank is not resumable onto, and a suffix nothing reads is how the

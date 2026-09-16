@@ -71,7 +71,7 @@ Methodology that used to live at the end of this file is now
 | [0z20](#0z20) | FIXED | **§3 and §1b closed.** The Altar's mana is spendable; alternative costs have a PREFERENCE and six readers |
 | [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
-| [0z23](#0z23) | **OPEN** | **the ten N=15,000 caches were deleted and the generated manifest was not re-run** — it lists fourteen caches, four exist, and all four disagree with their recorded fingerprint |
+| [0z23](#0z23) | **CLOSED** | the generated cache manifest described ten files that no longer existed, and the four survivors were all stale. **Resolved by deleting them: nothing is tracked now** |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4097,7 +4097,7 @@ one deck by hand.
 
 <a id="0z23"></a>
 
-## 0z23. OPEN — every ablation cache is gone or stale, and the generated manifest still describes them
+## 0z23. CLOSED — every ablation cache was gone or stale; the survivors were deleted and the manifest regenerated
 
 **Found 2026-09-15 by `tools/check_docs.py` on its first run**, which is the
 only reason this entry exists: nothing else in the repo compares the manifest
@@ -4153,32 +4153,74 @@ names are gone, and the table was regenerated — there is no Cauldron row in it
 The warning is now about a state that no longer exists, in the file whose whole
 job is to be believed about staleness.
 
-### THE RESOLUTION IS A DECISION, NOT A COMMAND
+### RESOLVED 2026-09-16 — OPTION 1, and the manifest generator was wrong too
 
-`python -m tools.cache_manifest --write` would make `check_docs` pass and would
-be the **wrong thing to do**. The manifest records the live fingerprint beside
-each cache, so regenerating it sets recorded equal to live *by construction* —
-certifying four caches as produced by code that did not produce them, and
-destroying the only signal that says so. The options are:
+**The four survivors were deleted and `docs/ABLATION_CACHES.md` regenerated.
+Nothing is tracked in `results/caches/` now.** All nine `check_docs` checks
+pass.
 
-1. **Delete the four survivors** and regenerate the manifest. Honest, loses
-   nothing that is not already condemned, and leaves the repo with no caches
-   until the next full run.
-2. **Restore the ten N=15,000 caches** from `b09055c^` if they still match the
-   code that produced the committed tables — check the fingerprint before
-   trusting them, because the §0z21/§0z22 work moved every engine.
-3. **Stop tracking the caches** and delete the manifest's file table, keeping
-   its per-cache notes as provenance. `.gitignore`'s own comment says the
-   rebuild is now 23 minutes rather than the six hours that justified tracking
-   them, so the original argument for tracking has weakened on its own terms.
+The three options this entry offered were: delete the survivors; restore the
+ten from `b09055c^` after checking their fingerprints; or stop tracking caches
+altogether. **Option 1 was chosen and it collapses into option 3 in practice** —
+deleting every stale cache leaves none tracked, and the argument for tracking
+them had already weakened on its own terms: `.gitignore` puts the full rebuild
+at roughly 23 minutes against the six hours that originally justified it.
 
-Until one is chosen, `python -m tools.check_docs` fails on two checks, and that
-is the check working. **The lesson is the one §0q keeps teaching, pointed at a
-GENERATED file:** derivation is not enough on its own, because a generated file
-is only as current as the last time someone remembered to generate it. That is
-why `check_docs` verifies the generators were RUN, and why
-`.claude/skills/session-close/SKILL.md` makes regenerating them the first step
-of closing a session.
+**What was NOT done, and why it is the tempting wrong answer.** Regenerating
+the manifest alone would have made `check_docs` pass. The recorded fingerprint
+is taken live at generation time, so regenerating sets recorded equal to live
+*by construction* — certifying four caches as produced by code that did not
+produce them, and destroying the only signal saying otherwise. **Never
+regenerate that file to silence a staleness warning.** The generator now says
+so in its own output.
+
+### THREE DEFECTS IN THE GENERATOR FELL OUT OF DOING IT
+
+None would have surfaced without actually reaching the zero-cache state, which
+is the argument for executing a decision rather than describing one.
+
+1. **`caches()` raised `FileNotFoundError` when the directory was absent.**
+   Deleting the last cache removes the directory, because git does not track
+   empty directories — so the generator crashed in precisely the state it most
+   needed to describe. "No caches exist" is a fact about provenance, not an
+   error.
+2. **The provenance for every deleted cache would have silently vanished.**
+   `NOTES` is keyed by cache filename and was rendered only for caches present
+   on disk, so deleting a cache deleted the record of what produced the numbers
+   it produced — and several committed tables are still quoted against caches
+   that no longer exist. There is now a **"Caches that no longer exist, and
+   what produced them"** section carrying all fourteen notes.
+3. **Two long narrative blocks in the generator were describing a vanished
+   state.** One announced that "NO cache is stale" as of 2026-09-09; the other
+   warned at length that "RENDMAW IS THE EXCEPTION AND ITS THREE CACHES ARE
+   STALE" and that `results/ablation_rendmaw.txt` "still carries a Cauldron of
+   Essence row for a card the deck no longer contains". The rendmaw caches were
+   already gone and the table had been regenerated — it carries an Idol of
+   Oblivion row and no Cauldron row, which is correct after the 2026-09-13
+   withdrawal. **The file whose whole job is to be believed about staleness was
+   itself stale about staleness.** Replaced with the current state.
+
+### WHAT THIS COSTS AND WHAT IT DOES NOT
+
+**No committed table is invalidated.** The tables in `results/` are the
+artefact; a cache is the intermediate that lets a run resume. Every table is
+still the output of the run that produced it.
+
+**What is lost is the resume.** The next regeneration starts from empty on all
+six decks. That is the thing tracking the caches was for, and it was already
+lost when the ten were deleted in `b09055c` — this entry only made the loss
+legible.
+
+### THE LESSON
+
+§0q says a hand-maintained set is a claim and claims rot, and that the fix is
+derivation. This is the same finding pointed at a GENERATED file, which is the
+part that was missing: **a generated file is only as current as the last time
+someone remembered to generate it, and hardcoded prose inside a generator is
+hand-maintained no matter how derived the table beneath it is.** Both halves
+now have a check — `tools/check_docs.py` verifies the generators were run, and
+`.claude/skills/session-close/SKILL.md` makes running them the first step of
+closing a session.
 
 ---
 

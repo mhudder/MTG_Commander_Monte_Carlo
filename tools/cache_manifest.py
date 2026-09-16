@@ -588,6 +588,13 @@ def fingerprint(deck: str) -> tuple[str, list[str]]:
 
 
 def caches():
+    # The directory can be ABSENT, not merely empty: deleting the last cache
+    # removes it from the working tree, because git does not track empty
+    # directories. The first version raised FileNotFoundError there, so the
+    # generator crashed in exactly the state it most needs to describe -- "no
+    # caches exist" is a fact about provenance, not an error.
+    if not os.path.isdir(CACHE_DIR):
+        return
     for name in sorted(os.listdir(CACHE_DIR)):
         if name.startswith("ablation_cache_") and name.endswith(".json"):
             body = name[len("ablation_cache_"):-len(".json")]
@@ -628,9 +635,8 @@ def main():
         "version of the code that produced it**. A full cache makes `todo`",
         "empty, so a run silently REPRINTS THE OLD NUMBERS instead of",
         "measuring anything. While these files were gitignored that hazard was",
-        "bounded, because a fresh clone had no cache to go stale. They are",
-        "tracked now — 141 KB against roughly six hours of simulation — so the",
-        "provenance below is the safety net instead.",
+        "bounded, because a fresh clone had no cache to go stale. Tracking them",
+        "removed that safety net, which is what this file replaced it with.",
         "",
         "**Before resuming a cache, re-run `python -m tools.cache_manifest`",
         "and compare the fingerprint. If it differs, DELETE the cache.**",
@@ -639,50 +645,48 @@ def main():
         "",
         f"Fingerprints recorded at `{head()}`.",
         "",
-        "**Every fingerprint below changed on 2026-09-09 and NO cache is",
-        "stale.** The reorganisation edited `ablation.py` — which is in the",
-        "fingerprint set — to write its cache to `results/caches/` and to",
-        "`makedirs` that directory. Neither hunk is in the measurement path,",
-        "and that was CHECKED rather than argued: with the caches full, all",
-        "six decks reprinted their tables BYTE FOR BYTE from the new location",
-        "(`ABLATE_BUDGET=1 python -m tools.ablation <deck> 15000 10,20`,",
-        "compared against `results/ablation_<deck>.txt`). This is the same gap",
-        "between \"the fingerprint moved\" and \"the numbers moved\" that",
-        "`check_unchanged_decks.py` exists for, and it is recorded here",
-        "because the rule above says to delete a cache whose fingerprint",
-        "differs — a rule that is only safe to follow if the exceptions are",
-        "written down where the person following it will look.",
+        "**THERE ARE NO TRACKED CACHES. This is deliberate, and it is",
+        "§0z23's chosen resolution.**",
         "",
-        "**EVERY FINGERPRINT CHANGED AGAIN ON 2026-09-13, AND THIS TIME ONE",
-        "DECK IS GENUINELY STALE.** The fingerprint gained a component it",
-        "should always have had: the deck's STAGED SWAPS. `ablation.py` builds",
-        "its baseline with `build_pending(DECK)`, so the entries in",
-        "`edhmc/pending.py`'s CHANGES are an input to every cached number, and",
-        "nothing hashed them — staging or unstaging a swap replaced the list",
-        "the whole table was measured against while the fingerprint went on",
-        "declaring the cache current. A hash cannot gain an input without",
-        "moving, so all six moved once here.",
+        "Ten caches — every `_medblank` one at N=15,000, which is to say every",
+        "cache that produced a table now committed in `results/` — were deleted",
+        "in `b09055c` without this generator being re-run, so this file went on",
+        "describing fourteen files of which four existed. The four survivors",
+        "were the old `n6000`/`n2000` caches and **every one of them disagreed",
+        "with its live fingerprint**, which the rule stated above condemns.",
+        "They were deleted and this file regenerated.",
         "",
-        "Five of those six moves are the scheme and nothing else: karlov,",
-        "lorehold, tivit, shilgengar and azusa have the same staged swaps they",
-        "had when their caches were built, so **those caches are CURRENT and",
-        "resumable** — the recorded value simply predates the component.",
-        "**RENDMAW IS THE EXCEPTION AND ITS THREE CACHES ARE STALE.** The",
-        "staged -Idol of Oblivion +Cauldron of Essence was UNSTAGED on",
-        "2026-09-13 (it is in `pending.WITHDRAWN`, with the reason), so",
-        "`build_pending('rendmaw')` now returns Idol and not Cauldron. The",
-        "committed `results/ablation_rendmaw.txt` was measured on the other",
-        "list and still carries a Cauldron of Essence row for a card the deck",
-        "no longer contains. **Delete those three caches and regenerate before",
-        "quoting any rendmaw number.** This entry is the exception the rule",
-        "above depends on being written down, and it is the one case where",
-        "following the rule blindly would have been right.",
+        "**No committed table is invalidated by this.** The tables in",
+        "`results/` are the artefact; a cache is the intermediate that lets a",
+        "run resume. What was lost is the resume: a regeneration now starts",
+        "from empty on every deck. `.gitignore`'s own note puts the full",
+        "rebuild at roughly 23 minutes, against the six hours that justified",
+        "tracking them in the first place, so the original argument had already",
+        "weakened on its own terms.",
         "",
-        "| cache | deck | cards | source fingerprint |",
-        "|---|---|---|---|",
+        "**The rejected alternative is worth knowing, because it is the",
+        "tempting one.** Regenerating this file WITHOUT deleting the four stale",
+        "caches would have made `python -m tools.check_docs` pass — the",
+        "recorded fingerprint is taken live at generation time, so regenerating",
+        "sets recorded equal to live *by construction*, certifying four caches",
+        "as produced by code that did not produce them and destroying the only",
+        "signal that said otherwise. **Never regenerate this file to silence a",
+        "staleness warning.** Regenerate it when the caches themselves change.",
+        "",
+        "When a cache is next produced, add it here in the same commit, and",
+        "record its note in `NOTES` — that is what makes the fingerprint",
+        "above mean anything.",
+        "",
     ]
-    for name, deck, body, fp, n_cards, _files in rows:
-        lines.append(f"| `{name}` | {deck} | {n_cards} | `{fp}` |")
+    if rows:
+        lines += ["| cache | deck | cards | source fingerprint |",
+                  "|---|---|---|---|"]
+        for name, deck, body, fp, n_cards, _files in rows:
+            lines.append(f"| `{name}` | {deck} | {n_cards} | `{fp}` |")
+    else:
+        # An empty table renders as a bare header with no rows, which reads
+        # like a rendering bug rather than like a fact. Say the fact.
+        lines.append("_No caches are tracked._")
     lines += ["", "## What each fingerprint covers", ""]
     for deck in sorted(PER_DECK):
         _fp, files = fingerprint(deck)
@@ -697,11 +701,34 @@ def main():
                                        "deck, so the baseline is the module's "
                                        "own list"))
     lines += ["", "## How each cache was produced", ""]
+    if not rows:
+        lines += ["No caches are tracked — see above. The notes below are kept "
+                  "for the caches that HAVE existed, because they are the "
+                  "provenance for numbers quoted throughout the project.", ""]
     for name, deck, _b, _f, _c, _files in rows:
         lines.append(f"### `{name}`")
         lines.append("")
         lines.append(NOTES.get(name) or NOTES.get(deck) or "_no note recorded_")
         lines.append("")
+
+    # Notes whose cache is no longer on disk. Deleting a cache must not delete
+    # the record of what produced the numbers it produced -- several committed
+    # tables are still quoted against caches that no longer exist, and a note
+    # that silently stops rendering is how that provenance would be lost.
+    present = {name for name, _d, _b, _f, _c, _files in rows}
+    gone = sorted(k for k in NOTES
+                  if k.startswith("ablation_cache_") and k not in present)
+    if gone:
+        lines += ["", "## Caches that no longer exist, and what produced them",
+                  "",
+                  "Kept as provenance. These files are NOT in the repository; "
+                  "the notes are here because committed numbers were measured "
+                  "on them.", ""]
+        for name in gone:
+            lines.append(f"### `{name}` — deleted")
+            lines.append("")
+            lines.append(NOTES[name])
+            lines.append("")
 
     text = "\n".join(lines).rstrip() + "\n"
     if "--write" in sys.argv:
