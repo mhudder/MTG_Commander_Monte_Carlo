@@ -75,6 +75,7 @@ Methodology that used to live at the end of this file is now
 | [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
 | [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured; Guardian Project is +0.0481, the deck's largest candidate ever** — and one proposal's own rationale was backwards |
 | [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
+| [0z27](#0z27) | MEASURED | **two swaps staged on head-to-head evidence, and the karlov regeneration shows redundancy rewriting five rows at once** |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4435,6 +4436,107 @@ payoffs COUNT tokens is a real cost this policy pays.
   rebuilt.
 * Every card's MECHANISM counter was read before its win rate was trusted —
   which is how both blanks were explained rather than merely reported.
+
+
+---
+
+<a id="0z27"></a>
+
+## 0z27. MEASURED — two swaps staged, and the karlov table proves the redundancy finding live
+
+2026-09-16. `-Soulmender +Bloodthirsty Conqueror` (karlov) and `-Plains
++Anointed Procession` (tivit), both staged on the REAL swap rather than on
+§0z26's candidate-vs-blank rows.
+
+| swap | T10 | T20 |
+|---|---|---|
+| karlov `−Soulmender +Bloodthirsty Conqueror` | +0.0257 ±0.0028 | +0.0247 ±0.0035 |
+| tivit `−Plains +Anointed Procession` | +0.0113 ±0.0026 | +0.0145 ±0.0040 |
+
+**Both real swaps are SMALLER than their candidate rows** — Conqueror +0.0328 →
++0.0247, Procession +0.0291 → +0.0145 — because the candidate number is value
+over a blank in a FREED slot and the swap also pays for what it cut.
+Procession loses half, and that half is the land. §0c is the rule; this is what
+it costs in practice.
+
+Soulmender is the cheapest cut in the karlov list, checked rather than assumed:
+**−0.0011 ±0.0011, signal `win`** — significantly negative.
+
+### THE KARLOV REGENERATION IS THE RESULT WORTH KEEPING
+
+Staging changed `build_pending`, so the table was rebuilt. **Six rows moved
+beyond their own old bar and FIVE OF THEM ARE THE COMBO PACKAGE**, moving in a
+pattern that is entirely predicted:
+
+| card | before | after | move |
+|---|---|---|---|
+| **Exquisite Blood** | +0.0367 ±0.0036 | **+0.0292** | **−0.0075** |
+| Enduring Tenacity | +0.0303 ±0.0036 | +0.0378 | +0.0075 |
+| Vito, Thorn of the Dusk Rose | +0.0193 ±0.0033 | +0.0252 | +0.0059 |
+| Sanguine Bond | +0.0209 ±0.0032 | +0.0255 | +0.0046 |
+| Vizkopa Guildmage | +0.0043 ±0.0023 | +0.0079 | +0.0036 |
+
+**Exquisite Blood got WORSE and every loop partner got BETTER, and that is one
+mechanism seen from both sides.** Bloodthirsty Conqueror is a second COMBO_A
+half, so ablating Exquisite Blood no longer breaks the loop — Conqueror still
+closes it — and a leave-one-out score is exactly the quantity redundancy
+destroys. Symmetrically, each partner now has TWO ways to close rather than
+one, so removing a partner costs more.
+
+**This is the standing "leave-one-out is blind to redundancy" finding happening
+live in a table, rather than being recalled from Karlov's original +0.02-each
+/ +0.0513-as-a-group measurement.** The practical consequence: **Exquisite
+Blood's new row is not evidence that the card got worse.** Ablate the package
+together — Exquisite Blood, Bloodthirsty Conqueror and the four partners — or
+the table will keep understating all six.
+
+New rows, both consistent with their candidate measurements: Bloodthirsty
+Conqueror **+0.0305 ±0.0032** (`PARTLY MODELLED`, against +0.0328 as a
+candidate) and Anointed Procession **+0.0284 ±0.0034** (`MODEL-EVALUATED`,
+against +0.0291).
+
+### TIVIT MOVED THREE ROWS AND ONLY TWO ARE EXPLAINED
+
+Azorius Signet +0.0032 and Tempting Contract +0.0031 both ROSE, which is what
+cutting a land should do: at 35 lands the remaining mana sources carry more.
+**Rhystic Study FELL −0.0067 and that is NOT attributed.** It is plausibly the
+same mechanism — a three-mana enchantment that does nothing the turn it lands
+is worse in a land-light list — but that is a guess, and this project's rule is
+to say so rather than invent one. Worth watching if tivit is regenerated again.
+
+**Tivit went 64 → 65 ablation rows**: cutting a basic converts a land into a
+nonland slot.
+
+### TWO CHECKS FIRED, AND THE SECOND ONE WAS THE INTERESTING ONE
+
+**`check_scripted_coverage` refused to run the regeneration at all** until both
+newly staged cards were deliberately classified. Staging a card puts it in
+`build_pending`'s list, and §0q's rule is that the split is a CLAIM. The first
+launch spent its retries busy-failing on this before it was noticed.
+
+**Then all six caches went SUSPECT for TWO DIFFERENT REASONS, and only one of
+them was resolvable the usual way.**
+
+* karlov and tivit were **genuinely stale**: staging changes `build_pending`,
+  which is the baseline every cached number was measured against. This is
+  precisely what the fingerprint's `staged:<deck>` component exists to catch.
+  **`--verified` would have been forgery here** — `check_unchanged_decks`
+  compares SIMULATION baselines, which are computed from the deck MODULE and
+  not from the staged list, so a bit-identical result would have certified
+  nothing at all. They were deleted and rebuilt.
+* azusa, lorehold, rendmaw and shilgengar moved only because
+  `tools/ablation.py` — in every deck's fingerprint — gained two CLASSIFICATION
+  entries. Those decide which table SECTION a card prints in and touch no
+  number. The right evidence is §0z4's, not `check_unchanged_decks`:
+  **re-render each table from its existing cache and diff. All four came back
+  BYTE-IDENTICAL.**
+
+**THE LESSON: "IS THIS CACHE STILL GOOD" HAS MORE THAN ONE RIGHT CHECK, AND
+PICKING THE WRONG ONE CERTIFIES NOTHING.** `check_unchanged_decks` answers "did
+the SIMULATION move"; re-rendering from cache answers "did the TABLE move"; and
+neither answers "did the BASELINE LIST move", which only a rebuild can settle.
+Match the check to what actually changed — a fingerprint moving does not tell
+you which of the three it was.
 
 
 <a id="1"></a>

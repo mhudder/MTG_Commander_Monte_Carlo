@@ -22,28 +22,21 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
         "fingerprint": "eebd0b60234850f3",
         "utc": "2026-09-16T18:37:07Z"
+      },
+      {
+        "commit": "1d7298a",
+        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+        "fingerprint": "ad636cac99365416",
+        "utc": "2026-09-16T21:33:49Z"
       }
     ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "431e2b18fdea7711",
-    "built_commit": "3234bee",
-    "built_utc": "2026-09-16T12:22:28Z",
+    "built_at": "0d1e4ddd26f9b638",
+    "built_commit": "9cfd3fb",
+    "built_utc": "2026-09-16T20:56:38Z",
     "deck": "karlov",
-    "verified": [
-      {
-        "commit": "3234bee",
-        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
-        "fingerprint": "1a239ad6e2dee0ae",
-        "utc": "2026-09-16T12:23:35Z"
-      },
-      {
-        "commit": "527d7da",
-        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
-        "fingerprint": "58ae951bbf11131e",
-        "utc": "2026-09-16T18:37:06Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "fbc552aea5d15b19",
@@ -62,6 +55,12 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
         "fingerprint": "45c8463a23c2e8be",
         "utc": "2026-09-16T18:37:06Z"
+      },
+      {
+        "commit": "1d7298a",
+        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+        "fingerprint": "1c963ee40dcfaa49",
+        "utc": "2026-09-16T21:33:49Z"
       }
     ]
   },
@@ -82,6 +81,12 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
         "fingerprint": "f4c7a1b4f4904793",
         "utc": "2026-09-16T18:37:06Z"
+      },
+      {
+        "commit": "1d7298a",
+        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+        "fingerprint": "ce1493094eab5f40",
+        "utc": "2026-09-16T21:33:50Z"
       }
     ]
   },
@@ -102,27 +107,20 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
         "fingerprint": "2123e9f6dcbb28c6",
         "utc": "2026-09-16T18:37:07Z"
+      },
+      {
+        "commit": "1d7298a",
+        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+        "fingerprint": "6db503deed4ad071",
+        "utc": "2026-09-16T21:33:50Z"
       }
     ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "d55ddbf4fa5ff163",
-    "built_commit": "3234bee",
-    "built_utc": "2026-09-16T12:22:28Z",
+    "built_at": "0645aaf6dc10dc76",
+    "built_commit": "9cfd3fb",
+    "built_utc": "2026-09-16T20:57:57Z",
     "deck": "tivit",
-    "verified": [
-      {
-        "commit": "3234bee",
-        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
-        "fingerprint": "643f4cbb32e268df",
-        "utc": "2026-09-16T12:23:35Z"
-      },
-      {
-        "commit": "527d7da",
-        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
-        "fingerprint": "680360f69b91ad72",
-        "utc": "2026-09-16T18:37:06Z"
-      }
-    ]
+    "verified": []
   }
 }

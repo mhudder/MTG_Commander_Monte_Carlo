@@ -333,6 +333,17 @@ other lists are Forests as well.
 +0.0069 alone and 0.0253 together. Ablate interchangeable sets together — pass
 a list of names to `ablate()`.
 
+**AND ADDING A REDUNDANT CARD REWRITES EVERY ROW AROUND IT** (2026-09-16,
+§0z27). Staging Bloodthirsty Conqueror — a second copy of Exquisite Blood's
+trigger — moved SIX karlov rows beyond their own bars, five of them the combo
+package, in one coherent pattern: **Exquisite Blood fell −0.0075 and all four
+loop partners rose.** Ablating Exquisite Blood no longer breaks the loop
+because the new card still closes it, while each partner gained a second way to
+close. **Exquisite Blood's lower row is not evidence that the card got worse.**
+So the rule has a second half: after adding redundancy, the ROWS OF EVERY CARD
+IT DUPLICATES ARE UNDERSTATED, and the package must be ablated as a group or
+the table will mislead about all of them.
+
 **The blank is not replacement level, and the bottom of every table used to
 pay for it.** `blank_like()` built it below the minimum priority of all four
 decks, so ablation compared each card not to a mediocre card but to playing 99
@@ -372,6 +383,22 @@ states, rendered per cache in `docs/ABLATION_CACHES.md`: **CURRENT** (equal),
 **VERIFIED** (differ, and a recorded check says the NUMBERS did not move),
 **SUSPECT** (differ, nothing checked) and **UNRECORDED** (no provenance).
 `check_docs` fails on SUSPECT and UNRECORDED only.
+
+**"IS THIS CACHE STILL GOOD" HAS MORE THAN ONE RIGHT CHECK, AND THE WRONG ONE
+CERTIFIES NOTHING** (2026-09-16, §0z27). A moved fingerprint does not say WHAT
+moved, and there are three different questions behind it:
+
+| what changed | the check that answers it |
+|---|---|
+| the SIMULATION | `check_unchanged_decks` — baselines, same seeds, both sides |
+| the TABLE RENDERING (a classification, a category) | re-render from the existing cache and diff (§0z4) |
+| the BASELINE LIST (a swap staged or unstaged) | **nothing but a rebuild** |
+
+The third is the trap. Staging a swap changes `build_pending`, which is the
+list every cached number was measured against — and `check_unchanged_decks`
+builds from the deck MODULE, so it would come back bit-identical and certify
+nothing. **Never clear a staging-induced SUSPECT with `--verified`.** Match the
+check to what actually changed.
 
 **A SUSPECT cache is not condemned — it is unproven, and proving it is cheap.**
 `tools/check_unchanged_decks.py` runs the BASELINES ONLY against a worktree at

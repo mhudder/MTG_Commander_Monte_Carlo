@@ -778,6 +778,27 @@ NOTES.update({
 })
 
 
+
+# 2026-09-16, SECOND regeneration of the day and only TWO decks in it.
+_STAGED_2026_09_16 = (
+    " REGENERATED FROM AN EMPTY CACHE 2026-09-16 because a SWAP WAS STAGED "
+    "into this deck, which changes `build_pending` and therefore changes the "
+    "baseline every cached number was measured against. That is the one thing "
+    "the fingerprint's `staged:<deck>` component exists to catch, and it "
+    "caught it: both caches went SUSPECT and could NOT be cleared with "
+    "--verified, because `check_unchanged_decks` compares CODE and not staged "
+    "lists, so a bit-identical result there would have certified nothing. "
+    "ONLY THESE TWO DECKS WERE REBUILT -- the other four were untouched by the "
+    "staging and stayed VERIFIED, which is §0z23's targeted-regeneration "
+    "principle doing exactly what it was written for.")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "")
+        + _STAGED_2026_09_16
+    for d in ("karlov", "tivit")
+})
+
 def main():
     # `--verified <cache|deck> "<evidence>"` records that a SUSPECT cache was
     # checked and its deck's numbers had not moved. Evidence is mandatory: an
