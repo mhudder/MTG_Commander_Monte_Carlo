@@ -127,6 +127,49 @@ class Candidate:
 # ---------------------------------------------------------------------------
 # Committed — reflected in BOTH the deck module and the .xlsx
 # ---------------------------------------------------------------------------
+@dataclass
+class Proposal:
+    """A card PROPOSED for testing: oracle text verified, nothing measured yet.
+
+    THE FIFTH STATE, added 2026-09-16, and it exists for the same reason
+    WITHDRAWN does -- the alternative was a chat message, and a chat message is
+    the state most easily lost. A Proposal is WEAKER than a Candidate: a
+    Candidate has a number and a confidence interval, a Proposal has only
+    verified card text and an argument.
+
+    WHY IT CARRIES THE ORACLE TEXT. `CLAUDE.md` forbids guessing oracle text,
+    and this project's largest corrections all came from a card whose text the
+    engine had wrong. A proposal made from memory is exactly that failure
+    staged one step earlier, so the text here is copied from
+    `api.scryfall.com` on `verified`, and `check_proposals` refuses an entry
+    without it. If you cannot reach Scryfall, you cannot add a Proposal -- that
+    is deliberate.
+
+    `implement` is the honest estimate of ENGINE work, which is the real cost.
+    The measurement is minutes; making the card behave like its text is not.
+    """
+    deck: str
+    card: str
+    cost: str                   # verified mana cost
+    identity: str               # verified colour identity, "" for colourless
+    type_line: str
+    oracle: str                 # VERBATIM from Scryfall
+    verified: str               # date the text above was fetched
+    rationale: str              # why THIS deck, tied to a measured weakness
+    implement: str              # engine work needed, and what it would move
+    rejected: str = ""          # set if the proposal is dead, and why
+
+
+# The commanders' colour identities, fetched from Scryfall 2026-09-16 rather
+# than derived from cost pips -- a commander's identity includes its ability
+# text, so the cost is not always the whole answer and deriving it would be a
+# guess dressed as a derivation.
+DECK_IDENTITY = {
+    "karlov": set("BW"), "rendmaw": set("BG"), "lorehold": set("RW"),
+    "tivit": set("BUW"), "azusa": set("G"), "shilgengar": set("BW"),
+}
+
+
 COMMITTED: list[Change] = [
     Change(
         deck="lorehold",
@@ -1518,6 +1561,307 @@ WITHDRAWN: list[Change] = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# PROPOSED, 2026-09-16. Oracle text fetched from api.scryfall.com the same day
+# and pasted verbatim. NOTHING HERE IS MEASURED -- these are arguments with
+# verified card text attached, and the next step for each is a
+# `tools/candidates.py` batch entry, not a staging.
+#
+# The two rejected entries are KEPT rather than deleted, for WITHDRAWN's
+# reason: a proposal that was considered and found illegal is not the same
+# thing as one nobody thought of, and without the record the same two cards get
+# proposed again. Both were caught by the colour-identity check below, which is
+# why that check exists.
+# ---------------------------------------------------------------------------
+PROPOSED: list[Proposal] = [
+    Proposal(
+        deck="karlov", card="Heliod, Sun-Crowned", cost="{2}{W}", identity="W",
+        type_line="Legendary Enchantment Creature — God",
+        oracle=("Indestructible\n"
+                "As long as your devotion to white is less than five, Heliod "
+                "isn't a creature.\n"
+                "Whenever you gain life, put a +1/+1 counter on target "
+                "creature or enchantment you control.\n"
+                "{1}{W}: Another target creature gains lifelink until end of "
+                "turn."),
+        verified="2026-09-16",
+        rationale=("Karlov's commander counts lifegain EVENTS, not points, and "
+                   "the list already runs Soul Warden, Soul's Attendant, "
+                   "Suture Priest, Auriok Champion and Starscape Cleric to "
+                   "generate them. This is another payoff per event rather "
+                   "than another source, which is the half the deck is "
+                   "thinner on."),
+        implement=("LOW. `lifegain_triggers` already exists and karlov.py "
+                   "already dispatches on it. Devotion gating needs the "
+                   "`devotion_creature_types` knob's treatment; indestructible "
+                   "is a tag §0z10 already reads."),
+    ),
+    Proposal(
+        deck="karlov", card="Bloodthirsty Conqueror", cost="{3}{B}{B}",
+        identity="B", type_line="Creature — Vampire Knight",
+        oracle=("Flying, deathtouch\n"
+                "Whenever an opponent loses life, you gain that much life. "
+                "(Damage causes loss of life.)"),
+        verified="2026-09-16",
+        rationale=("Turns every drain into a lifegain EVENT, feeding the "
+                   "Exquisite Blood / Sanguine Bond / Vito package that "
+                   "ablates to +0.0513 as a GROUP. Leave-one-out understates "
+                   "every member of that group, so this should be measured "
+                   "with them, not against a blank."),
+        implement=("LOW-MEDIUM. §0z9 already routes 'each opponent loses N' "
+                   "through the corrected pod divisor, so the hook exists. "
+                   "Watch that it does not re-enter the drain loop -- this is "
+                   "a lifegain trigger ON life loss, and karlov already has "
+                   "two cards that close that loop."),
+    ),
+    Proposal(
+        deck="karlov", card="Alhammarret's Archive", cost="{5}", identity="",
+        type_line="Legendary Artifact",
+        oracle=("If you would gain life, you gain twice that much life "
+                "instead.\n"
+                "If you would draw a card except the first one you draw in "
+                "each of your draw steps, draw two cards instead."),
+        verified="2026-09-16",
+        rationale=("Doubles life gained and cards drawn; Well of Lost Dreams "
+                   "and Aetherflux Reservoir are both already in the list and "
+                   "both read the AMOUNT rather than the event count."),
+        implement=("MEDIUM, and it is the §0z4 trap: a doubler has to be said "
+                   "in EVERY path that reads the quantity or it does nothing. "
+                   "Grep for life_gained and cards_drawn before claiming it "
+                   "works, and note it does NOT double Karlov's own counter, "
+                   "which counts events."),
+    ),
+    Proposal(
+        deck="rendmaw", card="Parallel Lives", cost="{3}{G}", identity="G",
+        type_line="Enchantment",
+        oracle=("If an effect would create one or more tokens under your "
+                "control, it creates twice that many of those tokens "
+                "instead."),
+        verified="2026-09-16",
+        rationale=("A clean one-sided token doubler. The list already runs "
+                   "Primal Vigor, which doubles for EVERY player -- this is "
+                   "the same effect without the symmetry, and §0v made going "
+                   "wide actually pay."),
+        implement="LOW. `tokens_made` exists and the copy path is §0z5's.",
+    ),
+    Proposal(
+        deck="rendmaw", card="Mycoloth", cost="{3}{G}{G}", identity="G",
+        type_line="Creature — Fungus",
+        oracle=("Devour 2 (As this creature enters, you may sacrifice any "
+                "number of creatures. It enters with twice that many +1/+1 "
+                "counters on it.)\n"
+                "At the beginning of your upkeep, create a 1/1 green Saproling "
+                "creature token for each +1/+1 counter on this creature."),
+        verified="2026-09-16",
+        rationale=("Mass token generation on a board §0v rewards for width. "
+                   "Feeds Coat of Arms and Overwhelming Stampede, both "
+                   "already present."),
+        implement=("MEDIUM. Devour is a sacrifice-at-ETB the engine has no "
+                   "generic path for, and the upkeep trigger scales off "
+                   "counters. Read §0z12 first: making a dormant sacrifice "
+                   "path live has already turned two cards instantly wrong."),
+    ),
+    Proposal(
+        deck="rendmaw", card="Pitiless Plunderer", cost="{3}{B}", identity="B",
+        type_line="Creature — Human Pirate",
+        oracle=("Whenever another creature you control dies, create a "
+                "Treasure token. (It's an artifact with \"{T}, Sacrifice this "
+                "token: Add one mana of any color.\")"),
+        verified="2026-09-16",
+        rationale=("DIAGNOSTIC, not merely additive. Ashnod's Altar is "
+                   "rendmaw's one significantly-negative MODEL-EVALUATED row "
+                   "(-0.0013 +-0.0012) and it got there by being IMPLEMENTED "
+                   "in §0z20, not neglected. This tests whether the Altar is "
+                   "a bad card or an unfuelled one."),
+        implement=("LOW. Treasures have been real mana since §0z6 and the "
+                   "creature-death hook is `engine.on_creature_death`, which "
+                   "§0z9 already corrected."),
+    ),
+    Proposal(
+        deck="lorehold", card="Underworld Breach", cost="{1}{R}", identity="R",
+        type_line="Enchantment",
+        oracle=("Each nonland card in your graveyard has escape. The escape "
+                "cost is equal to the card's mana cost plus exile three other "
+                "cards from your graveyard. (You may cast cards from your "
+                "graveyard for their escape cost.)\n"
+                "At the beginning of the end step, sacrifice this "
+                "enchantment."),
+        verified="2026-09-16",
+        rationale=("§0z19 turned lorehold's graveyard into a resource and "
+                   "EVERY rummage spell and big spell rose with it -- "
+                   "Faithless Looting +0.0055, Thrill of Possibility +0.0050, "
+                   "Hit the Mother Lode +0.0052. This is the most direct "
+                   "extension of that finding available."),
+        implement=("MEDIUM. A `breach_cap` knob ALREADY EXISTS in "
+                   "lorehold.py -- find out what it currently gates before "
+                   "adding anything, because a knob nothing reads is §0z12's "
+                   "loaded gun."),
+    ),
+    Proposal(
+        deck="lorehold", card="Jeska's Will", cost="{2}{R}", identity="R",
+        type_line="Sorcery",
+        oracle=("Choose one. If you control a commander as you cast this "
+                "spell, you may choose both instead.\n"
+                "• Add {R} for each card in target opponent's hand.\n"
+                "• Exile the top three cards of your library. You may play "
+                "them this turn."),
+        verified="2026-09-16",
+        rationale=("Mana burst into the big spells §0z19 showed now pay off. "
+                   "Mode 2 is fully modelled; the commander clause makes both "
+                   "modes available, which §0z20 gave the engine a way to "
+                   "express."),
+        implement=("MEDIUM, and mode 1 is PARTLY_MODELLED by construction: it "
+                   "counts an OPPONENT'S HAND, which the pod does not have "
+                   "(§4). That is the identical limit §0z14 recorded for "
+                   "Borrowed Knowledge -- so this card's row is a FLOOR and "
+                   "must be classified accordingly, not as MODEL-EVALUATED."),
+    ),
+    Proposal(
+        deck="lorehold", card="Past in Flames", cost="{3}{R}", identity="R",
+        type_line="Sorcery",
+        oracle=("Each instant and sorcery card in your graveyard gains "
+                "flashback until end of turn. The flashback cost is equal to "
+                "its mana cost.\n"
+                "Flashback {4}{R} (You may cast this card from your graveyard "
+                "for its flashback cost. Then exile it.)"),
+        verified="2026-09-16",
+        rationale=("The same graveyard-as-resource axis as Underworld Breach, "
+                   "one-shot and cheaper to model. Worth measuring ALONGSIDE "
+                   "Breach rather than against it -- they are interchangeable "
+                   "enough that leave-one-out will understate both."),
+        implement=("LOW-MEDIUM. §0z19 built the recursion path for six cards "
+                   "already; this is that path applied to a whole card type."),
+    ),
+    Proposal(
+        deck="tivit", card="Anointed Procession", cost="{3}{W}", identity="W",
+        type_line="Enchantment",
+        oracle=("If an effect would create one or more tokens under your "
+                "control, it creates twice that many of those tokens "
+                "instead."),
+        verified="2026-09-16",
+        rationale=("Tivit's own trigger makes artifact tokens, and the list "
+                   "runs Academy Manufactor, Marionette Master, Disciple of "
+                   "the Vault and Time Sieve to convert them. Doubling the "
+                   "token stream feeds all four at once."),
+        implement=("LOW for the tokens. WATCH TIME SIEVE: §0m records that it "
+                   "eats only TOKEN artifacts, so doubling tokens makes the "
+                   "extra-turn loop materially easier and `sieve_cap` stops "
+                   "being decorative."),
+    ),
+    Proposal(
+        deck="tivit", card="Urza, Lord High Artificer", cost="{2}{U}{U}",
+        identity="U", type_line="Legendary Creature — Human Artificer",
+        oracle=("When Urza enters, create a 0/0 colorless Construct artifact "
+                "creature token with \"This token gets +1/+1 for each artifact "
+                "you control.\"\n"
+                "Tap an untapped artifact you control: Add {U}.\n"
+                "{5}: Shuffle your library, then exile the top card. Until end "
+                "of turn, you may play that card without paying its mana "
+                "cost."),
+        verified="2026-09-16",
+        rationale=("Converts the artifact-token pile into mana and into a "
+                   "body that scales with it -- the deck's two best-scoring "
+                   "axes joined."),
+        implement=("MEDIUM-HIGH. The Construct's P/T is DYNAMIC, which is "
+                   "`DYNAMIC_PT_LANDS`' shape and the exact place §0z3 got a "
+                   "card measured as a 16/16 instead of a 3/2. "
+                   "`check_dynamic_pt_coverage()` must cover it."),
+    ),
+    Proposal(
+        deck="tivit", card="Sai, Master Thopterist", cost="{2}{U}",
+        identity="U", type_line="Legendary Creature — Human Artificer",
+        oracle=("Whenever you cast an artifact spell, create a 1/1 colorless "
+                "Thopter artifact creature token with flying.\n"
+                "{1}{U}, Sacrifice two artifacts: Draw a card."),
+        verified="2026-09-16",
+        rationale=("The list is dense with artifacts (four signets, Sol Ring, "
+                   "Academy Manufactor, Coercive Portal and more), so the "
+                   "trigger fires often. Flying matters: `flier_block_share` "
+                   "is 0.30, so evasive tokens are worth more than ground "
+                   "ones in this model."),
+        implement=("LOW. Token creation and the generated FLYING set are both "
+                   "existing machinery -- but the tag must come from "
+                   "`tag_flying.py`, never by hand (§0n)."),
+    ),
+    Proposal(
+        deck="azusa", card="Guardian Project", cost="{3}{G}", identity="G",
+        type_line="Enchantment",
+        oracle=("Whenever a nontoken creature you control enters, if it "
+                "doesn't have the same name as another creature you control "
+                "or a creature card in your graveyard, draw a card."),
+        verified="2026-09-16",
+        rationale=("§0z4 and §0z21's standing finding is that every card "
+                   "attacking azusa's CARD constraint passed and the one pure "
+                   "MANA card failed. This is a card-advantage engine, and "
+                   "§0z18 made NONTOKEN CREATURES ENTERING fire 6.65 times a "
+                   "resolution through Ashaya -- so the trigger condition is "
+                   "one the engine now models richly."),
+        implement=("LOW-MEDIUM. The nontoken-ETB hook is exactly what §0z18 "
+                   "built. The same-name clause needs a real check against "
+                   "battlefield AND graveyard, and Scute Swarm's copies are "
+                   "TOKENS, so they must not trigger it."),
+    ),
+    Proposal(
+        deck="azusa", card="Splendid Reclamation", cost="{3}{G}", identity="G",
+        type_line="Sorcery",
+        oracle="Return all land cards from your graveyard to the battlefield tapped.",
+        verified="2026-09-16",
+        rationale=("A landfall burst that reads the deck's OWN graveyard-land "
+                   "package: Life from the Loam, Ramunap Excavator, Crucible "
+                   "of Worlds and Titania are all already in the list, and "
+                   "Titania reads land deaths directly (§0z18). Each returned "
+                   "land is a separate landfall trigger into Scute Swarm."),
+        implement=("LOW-MEDIUM. Landfall is the best-modelled mechanism in "
+                   "this engine. The lands enter TAPPED, which matters: §0z3 "
+                   "found the TAP was the binding constraint on the "
+                   "sacrifice-lands, not the mana."),
+    ),
+    Proposal(
+        deck="azusa", card="Zendikar's Roil", cost="{3}{G}{G}", identity="G",
+        type_line="Enchantment",
+        oracle=("Landfall — Whenever a land you control enters, create a 2/2 "
+                "green Elemental creature token."),
+        verified="2026-09-16",
+        rationale=("A second Rampaging Baloths on a deck averaging 21 landfall "
+                   "triggers a game. Deliberately REDUNDANT with Baloths and "
+                   "Scute Swarm, so ablate the three together -- "
+                   "leave-one-out understates every member of an "
+                   "interchangeable set."),
+        implement="LOW. Landfall token payoffs are existing machinery.",
+    ),
+
+    # ---- REJECTED, kept so they are not proposed again -------------------
+    Proposal(
+        deck="azusa", card="Felidar Retreat", cost="{3}{W}", identity="W",
+        type_line="Enchantment",
+        oracle=("Landfall — Whenever a land you control enters, choose one —\n"
+                "• Create a 2/2 white Cat Beast creature token.\n"
+                "• Put a +1/+1 counter on each creature you control. Those "
+                "creatures gain vigilance until end of turn."),
+        verified="2026-09-16",
+        rationale="Landfall token/counter payoff; mechanically a good fit.",
+        implement="n/a",
+        rejected=("ILLEGAL. Colour identity W, and Azusa is mono-GREEN. "
+                  "Proposed from memory before the identity was checked, and "
+                  "caught by `check_proposals`. This is why that check "
+                  "exists."),
+    ),
+    Proposal(
+        deck="azusa", card="Omnath, Locus of Rage", cost="{3}{R}{R}{G}{G}",
+        identity="GR", type_line="Legendary Creature — Elemental",
+        oracle=("Landfall — Whenever a land you control enters, create a 5/5 "
+                "red and green Elemental creature token.\n"
+                "Whenever Omnath or another Elemental you control dies, Omnath "
+                "deals 3 damage to any target."),
+        verified="2026-09-16",
+        rationale="The strongest landfall token payoff in the colour pair.",
+        implement="n/a",
+        rejected=("ILLEGAL. Colour identity GR, and Azusa is mono-GREEN. Same "
+                  "failure as Felidar Retreat, same run."),
+    ),
+]
+
+
 DECKS = {
     # March of the World Ooze is COMMITTED as of v12, so it is in the deck
     # list itself and no longer a swap-in candidate.
@@ -1582,6 +1926,51 @@ DECKS = {
         "Expedition Map": azusa_v1.EXPEDITION_MAP,
         "Zuran Orb": azusa_v1.ZURAN_ORB}),
 }
+
+
+def check_proposals(strict: bool = True):
+    """Every live PROPOSED entry is colour-legal, verified, and not already in.
+
+    THREE CHECKS, AND THE FIRST ONE HAS ALREADY FIRED IN ANGER. Two azusa
+    proposals -- Felidar Retreat (W) and Omnath, Locus of Rage (GR) -- were
+    written from memory into a MONO-GREEN deck. They are kept in PROPOSED with
+    `rejected` set, which is what this check demands of a dead entry.
+
+      1. COLOUR IDENTITY must fit the commander's. A proposal that cannot be
+         cast is not a weak idea, it is not an idea.
+      2. ORACLE TEXT AND A VERIFIED DATE must be present. `CLAUDE.md` forbids
+         guessing oracle text, and a proposal made from memory is that failure
+         one step earlier. No Scryfall, no Proposal.
+      3. NOT ALREADY IN THE DECK -- §0o in the ledger rather than the harness.
+
+    A rejected entry is exempt from 1 and 3 and still bound by 2: the record of
+    WHY it was rejected is worth nothing if the text it was rejected on is not
+    there to check.
+    """
+    for pr in PROPOSED:
+        if not pr.oracle.strip() or not pr.verified.strip():
+            raise AssertionError(
+                f"edhmc/pending.py: PROPOSED {pr.card!r} has no verified "
+                f"oracle text. Fetch it from api.scryfall.com and set "
+                f"`verified`; do not write card text from memory.")
+        if pr.rejected:
+            continue
+        ident = set(pr.identity)
+        allowed = DECK_IDENTITY[pr.deck]
+        if not ident <= allowed:
+            raise AssertionError(
+                f"edhmc/pending.py: PROPOSED {pr.card!r} has colour identity "
+                f"{''.join(sorted(ident)) or 'C'} but {pr.deck} is "
+                f"{''.join(sorted(allowed))}. It cannot be cast in that deck. "
+                f"Either remove it or set `rejected` with the reason.")
+        if strict:
+            module, _catalog = DECKS[pr.deck]
+            deck, _ = module.build()
+            if any(card.name == pr.card for card in deck):
+                raise AssertionError(
+                    f"edhmc/pending.py: PROPOSED {pr.card!r} is ALREADY IN "
+                    f"{pr.deck}, so it describes an addition that cannot "
+                    f"happen (§0o).")
 
 
 def check_measured_are_promotable():
@@ -1741,6 +2130,9 @@ def check_alt_cost_coverage():
                         f"(cost, tag, preference).")
 
 
+check_proposals()
+
+
 check_measured_are_promotable()
 check_shortlist_is_answerable()
 check_withdrawn_are_explained()
@@ -1793,6 +2185,33 @@ def validate(deck, commander) -> None:
     assert not dupes, f"singleton violation: {dupes}"
     assert commander.name not in seen, (
         f"{commander.name} appears in the 99 as well as the command zone")
+
+
+def print_proposals() -> None:
+    """PROPOSED, grouped by deck. Printed last because it is the weakest state:
+    verified card text and an argument, with no number attached to any of it."""
+    live = [p for p in PROPOSED if not p.rejected]
+    dead = [p for p in PROPOSED if p.rejected]
+    print("\n" + "=" * 78)
+    print(f"PROPOSED — oracle text verified, NOTHING MEASURED ({len(live)} live)")
+    print("=" * 78)
+    print("  Next step for each is a tools/candidates.py batch entry, not a")
+    print("  staging. A Proposal has no confidence interval; a Candidate does.")
+    for deck_name in sorted({p.deck for p in live}):
+        rows = [p for p in live if p.deck == deck_name]
+        print(f"\n{deck_name.upper()}  ({len(rows)})")
+        for pr in rows:
+            print(f"  + {pr.card}  {pr.cost}  [{pr.identity or 'C'}]")
+            print(f"    {pr.type_line}")
+            for line in pr.oracle.split("\n"):
+                print(f"    | {line}")
+            print(f"    why    {pr.rationale}")
+            print(f"    build  {pr.implement}")
+            print(f"    text verified {pr.verified} from api.scryfall.com")
+    if dead:
+        print(f"\nREJECTED ({len(dead)}) — kept so they are not proposed again")
+        for pr in dead:
+            print(f"  x {pr.card} ({pr.deck}): {pr.rejected}")
 
 
 def ledger(verbose: bool = True) -> None:
@@ -1914,3 +2333,4 @@ def ledger(verbose: bool = True) -> None:
 
 if __name__ == "__main__":
     ledger()
+    print_proposals()

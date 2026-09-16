@@ -20,6 +20,9 @@ Read that file for state; read this one for judgement.
     docs/HISTORY.md     the dated narrative. Search it; do not read it.
     docs/KNOBS.md       all 107 simulation knobs. GENERATED.
     HANDOFF.md          human-facing orientation, if you are new.
+    python -m edhmc.pending   the ledger: proposed, measured, staged,
+                        committed, withdrawn. The only trustworthy
+                        statement of what is pending.
 
 **The split exists because keeping state in this file WAS the cost.** Its
 "Current state" section ran to 351 lines — a third of the file — and every
@@ -427,8 +430,17 @@ second clause means (queued 15), including that it must NOT fire landfall.
 A rule number is evidence about the GAME, not about this engine, and it does
 not override §4.
 
-`api.scryfall.com` is the source of truth for CARDS and requires a
-`User-Agent` header — bare `urllib` gets a 400 without one:
+`api.scryfall.com` is the source of truth for CARDS. **It also has to be
+reachable, and in a cloud session it is not by default** (2026-09-16): the
+environment's **Network access** level must be **Custom** with
+`api.scryfall.com` in the allowed domains and *"Also include default list of
+common package managers"* ticked, or **Full**. At the default **Trusted**
+level the proxy answers `403` to CONNECT and `audit_cards` cannot run — check
+`curl -sS "$HTTPS_PROXY/__agentproxy/status"`, whose `recentRelayFailures`
+names the blocked host. It is the ONLY external host this repo contacts.
+Changing it takes effect without restarting a session.
+
+It requires a `User-Agent` header — bare `urllib` gets a 400 without one:
 
 ```python
 req = urllib.request.Request(url, headers={"User-Agent": "EDHMC/1.0",
@@ -529,6 +541,44 @@ for itself when items closed before 2026-09-07 were moved there. Each names the
 describes itself as the weakest link in the engine; item 17 is now a
 precondition for committing a staged swap rather than a tidy-up. Neither
 ordering is measured — that is the honest statement of it.
+
+20. **FIFTEEN PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH**
+    (2026-09-16). Three per deck across karlov, rendmaw, lorehold, tivit and
+    azusa, each with oracle text fetched from Scryfall and pasted verbatim
+    into `edhmc/pending.py`'s new `PROPOSED` list. Run
+    `python -m edhmc.pending` to read them with their rationale and their
+    implementation cost. **Nothing is measured** — a Proposal has verified
+    card text and an argument, and that is all. The next step for each is a
+    batch entry in `tools/candidates.py` against the victim slot that deck
+    already uses, then `python -m tools.candidates <batch> --n=15000`.
+    Measurement is cheap (~152 CPU-seconds a card); making each card behave
+    like its text is the real cost, and `implement` estimates it per card.
+    **Two proposals are already REJECTED and kept**: Felidar Retreat and
+    Omnath, Locus of Rage were written into MONO-GREEN azusa from memory and
+    are off-colour. `check_proposals()` catches that now, and all four of its
+    branches were proved to fire.
+
+21. **AZUSA'S BOTTLENECK IS NOT MORE CANDIDATES — IT IS A HEAD-TO-HEAD.**
+    Thirteen cards sit in `MEASURED` with no cut named, including two the
+    §0z21 batch called a SET rather than a ranking (Traveling Chocobo
+    +0.0291 ±0.0040, Nissa Resurgent Animist +0.0285 ±0.0041, 0.0006 apart).
+    §0c says a common baseline cannot rank two cards against each other, so
+    those thirteen rows cannot become stagings by being good. **One
+    head-to-head against a named cut converts the whole backlog into a
+    decision**, and the cheapest realistic cut is Yavimaya Elder
+    (+0.0023 ±0.0023, inside its own bar). Do this before measuring anything
+    new on azusa.
+
+22. **KARLOV'S THREE NEGATIVE ROWS MAY BE A §0j ARTEFACT, NOT CUT
+    CANDIDATES.** Mother of Runes −0.0075, Swiftfoot Boots −0.0048 and Blood
+    Artist −0.0026 are the only significantly-negative MODEL-EVALUATED rows in
+    that deck — and all three carry an EXPLICIT `threat` (6.0, 4.5, 7.0),
+    which §0j says can be the entire score on a weak card because the blank
+    derives threat by a different rule. Mother of Runes is also in
+    `protection_cards`, so it is partly modelled. **Run
+    `diagnostics/diag_threat_blank.py` on all three before treating any of
+    them as a cut.** This is the shape that has already cost two withdrawn
+    swaps.
 
 18. **`main_phase` IS GREEDY ON `priority` AND IT IS NOW THE WEAKEST LINK.**
     It casts the highest-priority affordable card and never asks whether doing
