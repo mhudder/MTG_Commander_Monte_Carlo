@@ -146,13 +146,24 @@ def check_doc_paths_exist(code_text: str) -> Result:
         not missing, "missing: " + ", ".join(missing) if missing else "")
 
 
-# Docs exempt from the cross-reference check, and WHAT THAT MAKES IT BLIND TO
+# Docs exempt from every check that holds a doc to TODAY'S tree, and WHAT
+# THAT MAKES THEM BLIND TO
 # -- §0z15's rule, because a checker's exemptions are where its bugs live.
 # HISTORY.md is a dated record and legitimately names paths that have since
 # moved; holding it to today's tree would flag provenance as breakage. The cost
 # is that a genuinely broken link inside HISTORY.md is NOT caught here. Read it
 # as a record, and follow its paths with a grep rather than a click.
-XREF_EXEMPT = (os.path.join("docs", "HISTORY.md"),)
+# ONE list, shared by check_doc_xrefs and check_shell_commands_exist. They had
+# separate opinions for about five minutes and immediately disagreed --
+# HISTORY.md names the pre-reorganisation `./regen_tables.sh`, which the xref
+# check excused and the shell check flagged. That is §0z16 in miniature: the
+# same rule, written twice, means two different things. Any future check of
+# this shape reads this list.
+HISTORICAL = (os.path.join("docs", "HISTORY.md"),)
+
+
+def _exempt(path: str) -> bool:
+    return os.path.normpath(path) in [os.path.normpath(x) for x in HISTORICAL]
 
 
 def check_doc_xrefs(docs: dict[str, str]) -> Result:
@@ -164,8 +175,7 @@ def check_doc_xrefs(docs: dict[str, str]) -> Result:
     """
     bad = []
     for path, body in docs.items():
-        if os.path.normpath(path) in [os.path.normpath(x)
-                                      for x in XREF_EXEMPT]:
+        if _exempt(path):
             continue
         for ref in set(re.findall(r"docs/[A-Za-z0-9_\-/]+\.md", body)):
             if not os.path.isfile(ref):
@@ -189,6 +199,34 @@ def check_commands_exist(docs: dict[str, str]) -> Result:
             if not (os.path.isfile(target) or os.path.isfile(pkg)):
                 bad.append(f"{path}: python -m {mod}")
     return Result("every `python -m` command in the docs resolves",
+                  not bad, "; ".join(sorted(set(bad))))
+
+
+def check_shell_commands_exist(docs: dict[str, str]) -> Result:
+    """Every `./path/script.sh` in a live doc exists AND is executable.
+
+    `check_commands_exist` covers `python -m`, and that exemption hid a real
+    defect for the life of the repo: `tools/regen_tables.sh` was committed
+    mode 100644, so the `./tools/regen_tables.sh` that CLAUDE.md and HANDOFF.md
+    both document as THE way to rebuild the tables died with "Permission
+    denied" in any fresh clone. It was found by running it, not by reading it.
+
+    An unexecutable script is worse than a missing one: the path resolves, the
+    file is right there, and the failure looks like an environment problem
+    rather than a repository one. §0z15 -- a check that skips a category is
+    blind exactly where the bug is, and "commands" meant "python commands"
+    until now.
+    """
+    bad = []
+    for path, body in docs.items():
+        if _exempt(path):
+            continue
+        for cmd in set(re.findall(r"(?<![\w/])\./([A-Za-z0-9_\-./]+\.sh)", body)):
+            if not os.path.isfile(cmd):
+                bad.append(f"{path}: ./{cmd} does not exist")
+            elif not os.access(cmd, os.X_OK):
+                bad.append(f"{path}: ./{cmd} is not executable")
+    return Result("every `./...sh` command in the docs exists and is executable",
                   not bad, "; ".join(sorted(set(bad))))
 
 
@@ -297,6 +335,7 @@ def run_all() -> list[Result]:
         check_doc_paths_exist(code_text),
         check_doc_xrefs(docs),
         check_commands_exist(docs),
+        check_shell_commands_exist(docs),
         check_caches_recorded(),
     ]
     results.extend(generated_checks())
@@ -339,6 +378,9 @@ MUTATIONS = {
     "a live doc points at a moved file":
         lambda code, issues, docs: (
             code, issues, dict(docs, **{"FAKE2.md": "see docs/MOVED_AWAY.md"})),
+    "document a shell script that does not exist":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{"FAKE3.md": "run `./tools/nope.sh`"})),
 }
 
 # Which checks each mutation must break. Written before running it: a
@@ -349,6 +391,8 @@ EXPECTED = {
     "cite a docs/ path that does not exist": {"every docs/ path cited from code exists"},
     "document a command that does not exist": {"every `python -m` command in the docs resolves"},
     "a live doc points at a moved file": {"every docs/ path named in a live doc exists"},
+    "document a shell script that does not exist":
+        {"every `./...sh` command in the docs exists and is executable"},
 }
 
 
@@ -366,6 +410,7 @@ def mutate() -> int:
             check_doc_paths_exist(c),
             check_doc_xrefs(d),
             check_commands_exist(d),
+            check_shell_commands_exist(d),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}
         want = EXPECTED[label]
