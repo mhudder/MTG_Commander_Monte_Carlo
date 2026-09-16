@@ -19,6 +19,7 @@ default.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
 import json
 import os
@@ -587,6 +588,121 @@ def fingerprint(deck: str) -> tuple[str, list[str]]:
     return h.hexdigest()[:16], sorted(files) + [f"staged:{deck}"]
 
 
+# ---------------------------------------------------------------------------
+# PROVENANCE: what a cache was BUILT at, which is a historical fact and does
+# not change, as opposed to the live fingerprint, which changes constantly.
+#
+# THIS IS THE FIX FOR THE BUG THAT MADE THIS FILE UNTRUSTWORTHY. The manifest
+# used to record the fingerprint computed AT GENERATION TIME and print it beside
+# each cache, which reads as "this cache was built by this code" and is not what
+# it means. Regenerating the file therefore certified whatever was on disk,
+# however old -- so the one command that could make the staleness check pass was
+# also the command that destroyed the evidence. A built-at fingerprint written
+# WHEN THE CACHE IS WRITTEN cannot do that: it is stamped once, by the run that
+# produced the numbers, and nothing later can forge it.
+
+PROVENANCE = os.path.join(CACHE_DIR, "PROVENANCE.json")
+
+
+def load_provenance() -> dict:
+    try:
+        with open(PROVENANCE, encoding="utf-8") as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return {}
+
+
+def save_provenance(prov: dict) -> None:
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    with open(PROVENANCE, "w", encoding="utf-8") as fh:
+        json.dump(prov, fh, indent=2, sort_keys=True)
+        fh.write("\n")
+
+
+def stamp_built(cache_name: str, deck: str) -> None:
+    """Record what a cache was built at. Called by ablation.py, once, on
+    creation. A second call is a no-op: the build fingerprint of an existing
+    cache is a fact about the past and must never be rewritten -- rewriting it
+    is precisely the forgery this scheme exists to prevent."""
+    prov = load_provenance()
+    if cache_name in prov:
+        return
+    fp, _files = fingerprint(deck)
+    prov[cache_name] = {
+        "deck": deck,
+        "built_at": fp,
+        "built_commit": head(),
+        "built_utc": datetime.datetime.now(datetime.timezone.utc)
+                             .strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "verified": [],
+    }
+    save_provenance(prov)
+
+
+def record_verified(cache_name: str, evidence: str) -> str:
+    """Record that a cache whose fingerprint has MOVED was checked and its
+    deck's numbers had not. The evidence string is required and is the whole
+    point -- see `status_of`."""
+    prov = load_provenance()
+    if cache_name not in prov:
+        raise SystemExit(f"no provenance for {cache_name}; nothing to verify")
+    deck = prov[cache_name]["deck"]
+    fp, _files = fingerprint(deck)
+    prov[cache_name].setdefault("verified", []).append({
+        "fingerprint": fp,
+        "commit": head(),
+        "utc": datetime.datetime.now(datetime.timezone.utc)
+                       .strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "evidence": evidence,
+    })
+    save_provenance(prov)
+    return fp
+
+
+def status_of(cache_name: str, prov: dict) -> tuple[str, str]:
+    """(status, explanation) for one cache. THE THREE STATES ARE THE POLICY.
+
+    CURRENT   the live fingerprint equals what the cache was built at.
+    VERIFIED  they differ, and a recorded check says the deck's NUMBERS did
+              not move across that difference. The cache is good.
+    SUSPECT   they differ and nothing has checked. NOT condemned -- suspect.
+
+    The old policy was "if the fingerprint differs, DELETE the cache", and it
+    was unusable: `engine.py`, `opponents.py`, `experiment.py` and
+    `ablation.py` are in every deck's fingerprint, so a comment change in a
+    shared file condemns all six caches and demands hours of recomputation for
+    numbers that provably did not move. A rule too expensive to obey is a rule
+    nobody obeys, and it was in fact not obeyed -- which is how ten caches came
+    to be deleted with the manifest left describing them.
+
+    SUSPECT is resolved by EVIDENCE, not by recomputation:
+    `tools/check_unchanged_decks.py` runs the BASELINES ONLY against a worktree
+    at `built_commit`. Bit-identical means the cache is still valid; record it
+    with `--verified` and it becomes VERIFIED. Only a deck whose baseline
+    actually moved needs its table rebuilt, and only that deck.
+    """
+    entry = prov.get(cache_name)
+    if not entry:
+        return "UNRECORDED", ("no provenance: nothing knows what code produced "
+                              "this. Do not resume onto it.")
+    live, _files = fingerprint(entry["deck"])
+    if entry["built_at"] == live:
+        return "CURRENT", f"built at `{entry['built_at']}`, which is live."
+    for v in reversed(entry.get("verified", [])):
+        if v["fingerprint"] == live:
+            return "VERIFIED", (
+                f"built at `{entry['built_at']}`; fingerprint has since moved "
+                f"to `{live}` and was CHECKED at `{v['commit']}` "
+                f"({v['utc']}): {v['evidence']}")
+    return "SUSPECT", (
+        f"built at `{entry['built_at']}`, live is `{live}`. The fingerprint "
+        f"moved and nothing has checked whether the NUMBERS did. Run "
+        f"`tools/check_unchanged_decks.py` against a worktree at "
+        f"`{entry['built_commit']}`; if bit-identical, record it with "
+        f"`python -m tools.cache_manifest --verified {cache_name} \"...\"`. "
+        f"Only regenerate if the baseline actually moved.")
+
+
 def caches():
     # The directory can be ABSENT, not merely empty: deleting the last cache
     # removes it from the working tree, because git does not track empty
@@ -663,6 +779,28 @@ NOTES.update({
 
 
 def main():
+    # `--verified <cache|deck> "<evidence>"` records that a SUSPECT cache was
+    # checked and its deck's numbers had not moved. Evidence is mandatory: an
+    # unevidenced "trust me" is the thing this whole scheme replaced.
+    if "--verified" in sys.argv:
+        i = sys.argv.index("--verified")
+        try:
+            target, evidence = sys.argv[i + 1], sys.argv[i + 2]
+        except IndexError:
+            raise SystemExit('usage: --verified <cache-or-deck> "<evidence>"')
+        if not evidence.strip():
+            raise SystemExit("refusing to record a verification with no "
+                             "evidence -- say what was run and what it showed")
+        names = [n for n, _d, _b in caches()
+                 if n == target or n.startswith(f"ablation_cache_{target}_")]
+        if not names:
+            raise SystemExit(f"no cache on disk matching {target!r}")
+        for n in names:
+            fp = record_verified(n, evidence)
+            print(f"recorded: {n} verified at {fp}")
+        print("Now re-run `python -m tools.cache_manifest --write`.")
+        return 0
+
     rows = []
     for name, deck, body in caches():
         if deck not in PER_DECK:
@@ -689,12 +827,53 @@ def main():
         "bounded, because a fresh clone had no cache to go stale. Tracking them",
         "removed that safety net, which is what this file replaced it with.",
         "",
-        "**Before resuming a cache, re-run `python -m tools.cache_manifest`",
-        "and compare the fingerprint. If it differs, DELETE the cache.**",
-        "`./tools/regen_tables.sh` deletes them by default; `--resume` does",
-        "not.",
+        "## The rule, and why it is no longer \"delete it\"",
         "",
-        f"Fingerprints recorded at `{head()}`.",
+        "Each cache records the fingerprint it was **built at** — stamped by",
+        "the run that produced the numbers, in `ablation.py`'s `save()`, and",
+        "never rewritten afterwards. Comparing that against the live",
+        "fingerprint gives three states:",
+        "",
+        "| state | meaning | what to do |",
+        "|---|---|---|",
+        "| **CURRENT** | built-at equals live | resume freely |",
+        "| **VERIFIED** | they differ, and a recorded check says the deck's "
+        "NUMBERS did not move across that difference | resume freely; the "
+        "evidence is below |",
+        "| **SUSPECT** | they differ and nothing has checked | **check before "
+        "resuming — do not assume either way** |",
+        "| **UNRECORDED** | no provenance at all | do not resume onto it |",
+        "",
+        "**The old rule was \"if the fingerprint differs, DELETE the cache\",",
+        "and it was unusable.** `engine.py`, `opponents.py`, `experiment.py`",
+        "and `ablation.py` are in every deck's fingerprint, so a comment",
+        "change in a shared file condemns all six caches and demands a "
+        "six-deck",
+        "regeneration — about **four hours** — for numbers that provably did",
+        "not move. A rule too expensive to obey is a rule nobody obeys, and it",
+        "was not obeyed: that is how ten caches came to be deleted with this",
+        "file left describing them (§0z23).",
+        "",
+        "**SUSPECT is resolved by evidence, not by recomputation.**",
+        "`tools/check_unchanged_decks.py` runs the BASELINES ONLY against a",
+        "worktree at the cache's `built_commit`. It takes **seconds**, not",
+        "hours. Bit-identical means the cache is still good:",
+        "",
+        "```bash",
+        "git worktree add ../edhmc_at <built_commit>",
+        "python -m tools.check_unchanged_decks --out=new.json",
+        "(cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)",
+        "python -m tools.check_unchanged_decks --diff old.json new.json",
+        "python -m tools.cache_manifest --verified <deck> \"what you ran and "
+        "what it showed\"",
+        "python -m tools.cache_manifest --write",
+        "```",
+        "",
+        "**Only a deck whose baseline actually moved needs its table rebuilt,",
+        "and only that deck.** `./tools/regen_tables.sh` still deletes every",
+        "cache by default; `--resume` does not.",
+        "",
+        "Generated at `{}`.".format(head()),
         "",
         # THE HEADLINE IS DERIVED, NOT ASSERTED. This opened with a flat
         # "THERE ARE NO TRACKED CACHES", which was true the day §0z23 wrote it
@@ -702,9 +881,9 @@ def main():
         # GENERATED file carrying a hand-written claim about its own subject,
         # which is the very failure §0z23 was closing. It is read off `rows`
         # now, so it cannot disagree with the table underneath it.
-        (f"**{len(rows)} cache{'' if len(rows) == 1 else 's'} tracked.** The "
-         "table below records each one's source fingerprint, taken live at "
-         "generation time; the provenance of each is in `NOTES`."
+        (f"**{len(rows)} cache{'' if len(rows) == 1 else 's'} tracked.** Each "
+         "row below carries the fingerprint it was BUILT at and its state "
+         "against the live one; the provenance of each is in `NOTES`."
          if rows else
          "**THERE ARE NO TRACKED CACHES. This is deliberate, and it is "
          "§0z23's chosen resolution.**"),
@@ -737,10 +916,23 @@ def main():
         "",
     ]
     if rows:
-        lines += ["| cache | deck | cards | source fingerprint |",
-                  "|---|---|---|---|"]
+        prov = load_provenance()
+        lines += ["| cache | deck | cards | built at | built | state |",
+                  "|---|---|---|---|---|---|"]
         for name, deck, body, fp, n_cards, _files in rows:
-            lines.append(f"| `{name}` | {deck} | {n_cards} | `{fp}` |")
+            entry = prov.get(name, {})
+            st, _why = status_of(name, prov)
+            lines.append(
+                f"| `{name}` | {deck} | {n_cards} | "
+                f"`{entry.get('built_at', '—')}` | "
+                f"`{entry.get('built_commit', '—')}` | **{st}** |")
+        lines += ["", "### State of each cache", ""]
+        for name, deck, _b, _f, _c, _files in rows:
+            st, why = status_of(name, prov)
+            lines += [f"- **`{name}`** — {st}. {why}"]
+            for v in prov.get(name, {}).get("verified", []):
+                lines.append(f"  - verified at `{v['fingerprint']}` "
+                             f"(`{v['commit']}`, {v['utc']}): {v['evidence']}")
     else:
         # An empty table renders as a bare header with no rows, which reads
         # like a rendering bug rather than like a fact. Say the fact.

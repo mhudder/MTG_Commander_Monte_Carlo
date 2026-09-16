@@ -12,14 +12,50 @@ measuring anything. While these files were gitignored that hazard was
 bounded, because a fresh clone had no cache to go stale. Tracking them
 removed that safety net, which is what this file replaced it with.
 
-**Before resuming a cache, re-run `python -m tools.cache_manifest`
-and compare the fingerprint. If it differs, DELETE the cache.**
-`./tools/regen_tables.sh` deletes them by default; `--resume` does
-not.
+## The rule, and why it is no longer "delete it"
 
-Fingerprints recorded at `3589108`.
+Each cache records the fingerprint it was **built at** — stamped by
+the run that produced the numbers, in `ablation.py`'s `save()`, and
+never rewritten afterwards. Comparing that against the live
+fingerprint gives three states:
 
-**6 caches tracked.** The table below records each one's source fingerprint, taken live at generation time; the provenance of each is in `NOTES`.
+| state | meaning | what to do |
+|---|---|---|
+| **CURRENT** | built-at equals live | resume freely |
+| **VERIFIED** | they differ, and a recorded check says the deck's NUMBERS did not move across that difference | resume freely; the evidence is below |
+| **SUSPECT** | they differ and nothing has checked | **check before resuming — do not assume either way** |
+| **UNRECORDED** | no provenance at all | do not resume onto it |
+
+**The old rule was "if the fingerprint differs, DELETE the cache",
+and it was unusable.** `engine.py`, `opponents.py`, `experiment.py`
+and `ablation.py` are in every deck's fingerprint, so a comment
+change in a shared file condemns all six caches and demands a six-deck
+regeneration — about **four hours** — for numbers that provably did
+not move. A rule too expensive to obey is a rule nobody obeys, and it
+was not obeyed: that is how ten caches came to be deleted with this
+file left describing them (§0z23).
+
+**SUSPECT is resolved by evidence, not by recomputation.**
+`tools/check_unchanged_decks.py` runs the BASELINES ONLY against a
+worktree at the cache's `built_commit`. It takes **seconds**, not
+hours. Bit-identical means the cache is still good:
+
+```bash
+git worktree add ../edhmc_at <built_commit>
+python -m tools.check_unchanged_decks --out=new.json
+(cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)
+python -m tools.check_unchanged_decks --diff old.json new.json
+python -m tools.cache_manifest --verified <deck> "what you ran and what it showed"
+python -m tools.cache_manifest --write
+```
+
+**Only a deck whose baseline actually moved needs its table rebuilt,
+and only that deck.** `./tools/regen_tables.sh` still deletes every
+cache by default; `--resume` does not.
+
+Generated at `3234bee`.
+
+**6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `NOTES`.
 
 **§0z23 is why the rule above exists.** Ten caches — every
 `_medblank` one at N=15,000, which is to say every cache that had
@@ -47,14 +83,29 @@ A cache is added here in the same commit that produces it, with its
 note in `NOTES` — that is what makes the fingerprint above mean
 anything.
 
-| cache | deck | cards | source fingerprint |
-|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `9574b38be817712d` |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `431e2b18fdea7711` |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `fbc552aea5d15b19` |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `0ac5ad66a8f9fff1` |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `9f1e2c62af6cd20b` |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `d55ddbf4fa5ff163` |
+| cache | deck | cards | built at | built | state |
+|---|---|---|---|---|---|
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `9574b38be817712d` | `3234bee` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `431e2b18fdea7711` | `3234bee` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `fbc552aea5d15b19` | `3234bee` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `0ac5ad66a8f9fff1` | `3234bee` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `9f1e2c62af6cd20b` | `3234bee` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `d55ddbf4fa5ff163` | `3234bee` | **VERIFIED** |
+
+### State of each cache
+
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `9574b38be817712d`; fingerprint has since moved to `2b1e86aa45105ef3` and was CHECKED at `3234bee` (2026-09-16T12:23:36Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `2b1e86aa45105ef3` (`3234bee`, 2026-09-16T12:23:36Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `431e2b18fdea7711`; fingerprint has since moved to `1a239ad6e2dee0ae` and was CHECKED at `3234bee` (2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `1a239ad6e2dee0ae` (`3234bee`, 2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `fbc552aea5d15b19`; fingerprint has since moved to `58e9ba5655aadfa1` and was CHECKED at `3234bee` (2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `58e9ba5655aadfa1` (`3234bee`, 2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `0ac5ad66a8f9fff1`; fingerprint has since moved to `7d2f689ebae32022` and was CHECKED at `3234bee` (2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `7d2f689ebae32022` (`3234bee`, 2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `9f1e2c62af6cd20b`; fingerprint has since moved to `438c94510e98b2c9` and was CHECKED at `3234bee` (2026-09-16T12:23:36Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `438c94510e98b2c9` (`3234bee`, 2026-09-16T12:23:36Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `d55ddbf4fa5ff163`; fingerprint has since moved to `643f4cbb32e268df` and was CHECKED at `3234bee` (2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
+  - verified at `643f4cbb32e268df` (`3234bee`, 2026-09-16T12:23:35Z): tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.
 
 ## What each fingerprint covers
 

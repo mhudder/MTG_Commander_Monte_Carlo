@@ -1098,6 +1098,18 @@ def main():
         ordered.update({k: v for k, v in results.items() if k not in ordered})
         os.makedirs(os.path.dirname(CACHE), exist_ok=True)
         json.dump(ordered, open(CACHE, "w"))       # resumable across runs
+        # STAMP WHAT THIS CACHE WAS BUILT AT, once, on creation. The manifest
+        # used to record the fingerprint computed when the MANIFEST was
+        # generated, which says nothing about what produced the numbers and
+        # made regenerating the manifest a way to certify any cache at all.
+        # Written here because here is the only place that knows the numbers
+        # are new. Idempotent: an existing entry is never rewritten.
+        try:
+            from tools.cache_manifest import stamp_built
+            stamp_built(os.path.basename(CACHE), DECK)
+        except Exception as exc:                      # never fail a measurement
+            print(f"  WARNING: could not stamp cache provenance: {exc}",
+                  file=sys.stderr)
 
     if todo:
         # NOT capped at len(todo): a resume with two cards left still wants

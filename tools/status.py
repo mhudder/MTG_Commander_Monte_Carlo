@@ -326,22 +326,31 @@ def render() -> str:
         for c in sorted(extra):
             w(f"- `{c}`")
         w("")
-    w("Per-deck fingerprint, live against recorded:")
+    w("Per-deck state. **A moved fingerprint is SUSPECT, not condemned** —")
+    w("resolve it with `tools/check_unchanged_decks.py` against a worktree at")
+    w("the cache's `built_commit` (seconds), then record it with")
+    w("`python -m tools.cache_manifest --verified <deck> \"<evidence>\"`.")
+    w("§0z23 for why the old \"delete it\" rule was the defect.")
     w("")
-    w("| deck | live fingerprint | recorded | agrees? | caches on disk |")
+    w("| deck | built at | live | state | caches |")
     w("|---|---|---|---|---|")
+    try:
+        from tools.cache_manifest import load_provenance, status_of
+        prov = load_provenance()
+    except Exception:
+        prov, status_of = {}, None
     for d in DECKS:
         lf = live.get(d, "")
         mine = sorted(c for c in disk if c.startswith(f"ablation_cache_{d}_"))
-        recs = {rec[c] for c in rec if c.startswith(f"ablation_cache_{d}_")}
-        rf = "/".join(sorted(recs)) if recs else "—"
         if not mine:
-            agree = "**no cache**"
-        elif all(rec.get(c) == lf for c in mine):
-            agree = "yes"
-        else:
-            agree = "**STALE — delete before resuming**"
-        w(f"| {d} | `{lf or '?'}` | `{rf}` | {agree} | {len(mine)} |")
+            w(f"| {d} | — | `{lf or '?'}` | **no cache** | 0 |")
+            continue
+        sts, builts = [], []
+        for c in mine:
+            sts.append(status_of(c, prov)[0] if status_of else "?")
+            builts.append(prov.get(c, {}).get("built_at", "—"))
+        w(f"| {d} | `{'/'.join(sorted(set(builts)))}` | `{lf or '?'}` | "
+          f"**{'/'.join(sorted(set(sts)))}** | {len(mine)} |")
     w("")
 
     # ---- ledger

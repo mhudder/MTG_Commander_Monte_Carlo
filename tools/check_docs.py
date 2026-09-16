@@ -281,32 +281,40 @@ def generated_checks() -> list[Result]:
 
 
 def check_caches_recorded() -> Result:
-    """Every cache on disk has a fingerprint, and it is the live one.
+    """Every cache on disk has PROVENANCE, and none is SUSPECT.
 
-    The repo's rule is "if the fingerprint differs, DELETE the cache". That
-    rule is only safe if something checks it, because the cost of ignoring it
-    is a run that reprints old numbers while looking like it measured.
+    THIS CHECK DELIBERATELY DOES NOT FAIL ON A MOVED FINGERPRINT. It used to,
+    and that was §0z23's defect in miniature: `engine.py`, `opponents.py`,
+    `experiment.py` and `ablation.py` are in every deck's fingerprint, so any
+    shared-file edit turned this red and the only green path was a four-hour
+    regeneration. A check whose remedy is unaffordable gets skipped.
+
+    What it fails on now is the thing that is actually wrong:
+      UNRECORDED -- a cache nothing knows the origin of;
+      SUSPECT    -- the fingerprint moved and NOBODY HAS CHECKED whether the
+                    numbers did. The remedy is seconds
+                    (`check_unchanged_decks` + `--verified`), not hours.
+    CURRENT and VERIFIED both pass. VERIFIED means someone ran the check and
+    recorded what it showed, which is a stronger statement than CURRENT.
     """
     try:
-        from tools.status import recorded_fingerprints, live_fingerprints, \
-            caches_on_disk
+        from tools.cache_manifest import (load_provenance, status_of, caches,
+                                          CACHE_DIR)
     except Exception as exc:
-        return Result("ablation caches match their recorded fingerprints",
+        return Result("ablation caches have provenance and none is suspect",
                       False, f"could not import: {exc}")
-    rec, live, disk = recorded_fingerprints(), live_fingerprints(), \
-        caches_on_disk()
-    problems = []
-    for c in disk:
-        deck = c[len("ablation_cache_"):].split("_")[0]
-        if c not in rec:
-            problems.append(f"{c}: on disk, no recorded fingerprint")
-        elif rec[c] != live.get(deck):
-            problems.append(f"{c}: recorded {rec[c]}, live {live.get(deck)}")
-    for c in rec:
-        if c not in disk:
-            problems.append(f"{c}: recorded, not on disk")
-    return Result(f"ablation caches match their fingerprints "
-                  f"({len(disk)} on disk, {len(rec)} recorded)",
+    if not os.path.isdir(CACHE_DIR):
+        return Result("ablation caches have provenance and none is suspect",
+                      True, "no caches tracked")
+    prov = load_provenance()
+    problems, states = [], {}
+    for name, _deck, _body in caches():
+        st, why = status_of(name, prov)
+        states[st] = states.get(st, 0) + 1
+        if st in ("SUSPECT", "UNRECORDED"):
+            problems.append(f"{name}: {st} -- {why}")
+    mix = ", ".join(f"{v} {k}" for k, v in sorted(states.items())) or "none"
+    return Result(f"ablation caches have provenance and none is suspect ({mix})",
                   not problems, "; ".join(problems))
 
 

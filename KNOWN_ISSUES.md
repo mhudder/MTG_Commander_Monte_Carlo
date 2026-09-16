@@ -71,7 +71,7 @@ Methodology that used to live at the end of this file is now
 | [0z20](#0z20) | FIXED | **§3 and §1b closed.** The Altar's mana is spendable; alternative costs have a PREFERENCE and six readers |
 | [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
-| [0z23](#0z23) | **CLOSED** | the generated cache manifest described ten files that no longer existed, and the four survivors were all stale. **Resolved by deleting them: nothing is tracked now** |
+| [0z23](#0z23) | **CLOSED** | the cache manifest described ten files that no longer existed, and "delete any cache whose fingerprint differs" was too expensive to obey. **Replaced by BUILT-AT provenance and a seconds-long evidence check** |
 | [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -4098,7 +4098,7 @@ one deck by hand.
 
 <a id="0z23"></a>
 
-## 0z23. CLOSED — every ablation cache was gone or stale; the survivors were deleted and the manifest regenerated
+## 0z23. CLOSED — the cache rule was unobeyable, so the caches went untracked; provenance replaces deletion
 
 **Found 2026-09-15 by `tools/check_docs.py` on its first run**, which is the
 only reason this entry exists: nothing else in the repo compares the manifest
@@ -4154,76 +4154,100 @@ names are gone, and the table was regenerated — there is no Cauldron row in it
 The warning is now about a state that no longer exists, in the file whose whole
 job is to be believed about staleness.
 
-### RESOLVED 2026-09-16 — OPTION 1, and the manifest generator was wrong too
+### RESOLVED 2026-09-16 — PROVENANCE REPLACES DELETION
 
-**The four survivors were deleted and `docs/ABLATION_CACHES.md` regenerated.
-Nothing is tracked in `results/caches/` now.** All nine `check_docs` checks
-pass.
+The first resolution was **delete the four survivors and regenerate the
+manifest**, and it was carried out: `results/caches/` went empty and all the
+checks passed. **It was the right cleanup and the wrong policy**, and the
+policy is what this entry is now about.
 
-The three options this entry offered were: delete the survivors; restore the
-ten from `b09055c^` after checking their fingerprints; or stop tracking caches
-altogether. **Option 1 was chosen and it collapses into option 3 in practice** —
-deleting every stale cache leaves none tracked, and the argument for tracking
-them had already weakened on its own terms: `.gitignore` puts the full rebuild
-at roughly 23 minutes against the six hours that originally justified it.
+**The rule it left in place was "if the fingerprint differs, DELETE the
+cache", and that rule cannot be obeyed.** `engine.py`, `opponents.py`,
+`experiment.py` and `ablation.py` are in EVERY deck's fingerprint. So a
+comment, a docstring, a bookkeeping call — anything at all in a shared file —
+condemns all six caches and demands a six-deck regeneration. **That
+regeneration was then measured: it takes about four hours** (2026-09-16,
+N=15,000, four workers), **and it moved 0 of 379 rows beyond their own old
+bar, with 0 sign flips and 0 category changes.** Four hours to confirm nothing.
 
-**What was NOT done, and why it is the tempting wrong answer.** Regenerating
-the manifest alone would have made `check_docs` pass. The recorded fingerprint
-is taken live at generation time, so regenerating sets recorded equal to live
-*by construction* — certifying four caches as produced by code that did not
-produce them, and destroying the only signal saying otherwise. **Never
-regenerate that file to silence a staleness warning.** The generator now says
-so in its own output.
+A rule that expensive is not followed, and the record shows it was not: that
+is exactly how `b09055c` came to delete ten caches without re-running the
+generator. **The defect was never really the stale manifest. It was a rule
+whose only compliant action was unaffordable, so the honest options were to
+ignore it or to go permanently cacheless.**
 
-### THREE DEFECTS IN THE GENERATOR FELL OUT OF DOING IT
+### THE REPLACEMENT: BUILT-AT, AND THREE STATES
 
-None would have surfaced without actually reaching the zero-cache state, which
-is the argument for executing a decision rather than describing one.
+A cache now records the fingerprint it was **built at** —
+`results/caches/PROVENANCE.json`, stamped by `ablation.py`'s `save()` at the
+moment the numbers are written, and **never rewritten afterwards**.
 
-1. **`caches()` raised `FileNotFoundError` when the directory was absent.**
-   Deleting the last cache removes the directory, because git does not track
-   empty directories — so the generator crashed in precisely the state it most
-   needed to describe. "No caches exist" is a fact about provenance, not an
-   error.
-2. **The provenance for every deleted cache would have silently vanished.**
-   `NOTES` is keyed by cache filename and was rendered only for caches present
-   on disk, so deleting a cache deleted the record of what produced the numbers
-   it produced — and several committed tables are still quoted against caches
-   that no longer exist. There is now a **"Caches that no longer exist, and
-   what produced them"** section carrying all fourteen notes.
-3. **Two long narrative blocks in the generator were describing a vanished
-   state.** One announced that "NO cache is stale" as of 2026-09-09; the other
-   warned at length that "RENDMAW IS THE EXCEPTION AND ITS THREE CACHES ARE
-   STALE" and that `results/ablation_rendmaw.txt` "still carries a Cauldron of
-   Essence row for a card the deck no longer contains". The rendmaw caches were
-   already gone and the table had been regenerated — it carries an Idol of
-   Oblivion row and no Cauldron row, which is correct after the 2026-09-13
-   withdrawal. **The file whose whole job is to be believed about staleness was
-   itself stale about staleness.** Replaced with the current state.
+**That immutability is the whole mechanism.** The old manifest recorded the
+fingerprint computed when the MANIFEST was generated and printed it beside each
+cache, which reads as "this cache was built by this code" and is not what it
+meant. So regenerating the manifest certified whatever happened to be on disk —
+**the one command that made the staleness check pass was also the command that
+destroyed the evidence.** A built-at stamp cannot do that; nothing later can
+forge it.
 
-### WHAT THIS COSTS AND WHAT IT DOES NOT
+Comparing built-at against live gives four states, rendered per cache in
+`docs/ABLATION_CACHES.md`:
 
-**No committed table is invalidated.** The tables in `results/` are the
-artefact; a cache is the intermediate that lets a run resume. Every table is
-still the output of the run that produced it.
+| state | meaning | what to do |
+|---|---|---|
+| **CURRENT** | built-at equals live | resume freely |
+| **VERIFIED** | they differ, and a recorded check says the deck's NUMBERS did not move | resume freely; the evidence is recorded |
+| **SUSPECT** | they differ and nothing has checked | check before resuming |
+| **UNRECORDED** | no provenance | do not resume onto it |
 
-**What is lost is the resume.** The next regeneration starts from empty on all
-six decks. That is the thing tracking the caches was for, and it was already
-lost when the ten were deleted in `b09055c` — this entry only made the loss
-legible.
+**SUSPECT is not condemned.** It is resolved by EVIDENCE, and the evidence is
+cheap: `tools/check_unchanged_decks.py` runs the BASELINES ONLY against a
+worktree at the cache's `built_commit`. A bit-identical result means the cache
+is still good; `python -m tools.cache_manifest --verified <deck> "<evidence>"`
+records that, with the evidence string mandatory — an unevidenced "trust me" is
+what this scheme replaced. Only a deck whose baseline actually moved needs its
+table rebuilt, **and only that deck.**
+
+### IT WAS EXERCISED ON ITSELF, WHICH IS THE ONLY REASON TO BELIEVE IT
+
+Adding the stamping call to `ablation.py` put a bookkeeping line in a file that
+is in the fingerprint set, so all six caches immediately went **SUSPECT** — the
+exact trivial-change-condemns-everything scenario, produced by accident while
+building the fix for it.
+
+Resolving it took **26 seconds**: baselines at HEAD, baselines in a worktree at
+`3234bee`, diffed. **BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks
+moved.** All six are now VERIFIED with that evidence attached.
+
+**26 seconds against four hours, for the same conclusion.** That ratio is the
+finding, and it is why the old rule was the defect rather than the safeguard.
+
+### WHAT THIS DOES NOT CHANGE
+
+**The underlying hazard is real and the guard still stands.** `ablation.py`
+keys its cache on deck, horizons, N and blank mode — not on the code — so a
+full cache makes `todo` empty and a run REPRINTS OLD NUMBERS while looking like
+it measured. Nothing here softens that. What changed is the response: from
+"delete on any difference" to "prove it, cheaply, and record the proof".
+
+**A SUSPECT cache is still not resumable.** The difference is that clearing it
+costs seconds of evidence rather than hours of recomputation.
 
 ### THE LESSON
 
-§0q says a hand-maintained set is a claim and claims rot, and that the fix is
-derivation. This is the same finding pointed at a GENERATED file, which is the
-part that was missing: **a generated file is only as current as the last time
-someone remembered to generate it, and hardcoded prose inside a generator is
-hand-maintained no matter how derived the table beneath it is.** Both halves
-now have a check — `tools/check_docs.py` verifies the generators were run, and
-`.claude/skills/session-close/SKILL.md` makes running them the first step of
-closing a session.
+§0q says a hand-maintained set is a claim, and claims rot; the fix is
+derivation plus a check. §0z23's first half added the missing half of that —
+**a generated file is only as current as the last time someone ran the
+generator** — and this second half adds the one after it:
 
----
+**A CHECK WHOSE ONLY REMEDY IS UNAFFORDABLE IS NOT A SAFEGUARD, IT IS A
+FUTURE VIOLATION.** It will be skipped, and the skipping will be silent,
+because the alternative is hours of compute for a result nobody expects to
+differ. When you write a check, cost its remedy. If the remedy is expensive,
+the check needs a cheap way to establish the thing it actually cares about —
+here, "did the NUMBERS move", which is answerable in seconds, rather than "did
+the fingerprint move", which is answerable instantly and is the wrong question.
+
 
 <a id="1"></a>
 

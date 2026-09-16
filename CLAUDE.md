@@ -344,27 +344,47 @@ less precise ones. N=15,000 is the knee: cards resolved per extra minute go
 3.4 (6000→10000), 2.0 (10000→15000), then 0.8 (15000→24000), and the calls
 this project actually argues about sit at 0.0025–0.003 win rate.
 
-**A STALE CACHE IS THE HAZARD THAT BUYS, AND NO CACHE IS TRACKED ANY MORE.**
-`ablation.py` keys its cache on deck, horizons, N and blank mode — **not on
-the version of the code that produced it** — so a full cache makes `todo`
-empty and a run silently REPRINTS THE OLD NUMBERS instead of measuring.
-`docs/ABLATION_CACHES.md` records a source fingerprint per cache; regenerate
-it and compare before resuming one, and **delete the cache if it differs**.
-`./tools/regen_tables.sh` deletes by default, `--resume` does not.
+**A STALE CACHE IS THE HAZARD THAT BUYS — AND THE GUARD IS PROVENANCE, NOT
+DELETION.** `ablation.py` keys its cache on deck, horizons, N and blank mode —
+**not on the version of the code that produced it** — so a full cache makes
+`todo` empty and a run silently REPRINTS THE OLD NUMBERS instead of measuring.
+That hazard is real and nothing below softens it.
 
-`results/caches/` is EMPTY as of 2026-09-16 (§0z23): ten caches had been
-deleted without the generator being re-run, and the four survivors all
-disagreed with their live fingerprint, so they were deleted too. **No
-committed table is invalidated by that** — the tables are the artefact and a
-cache is only the resume. What it costs is that the next regeneration starts
-from empty on all six decks, and `.gitignore` puts that at roughly 23 minutes.
+**Each cache records the fingerprint it was BUILT at**, stamped by the run that
+produced the numbers and never rewritten. Built-at against live gives four
+states, rendered per cache in `docs/ABLATION_CACHES.md`: **CURRENT** (equal),
+**VERIFIED** (differ, and a recorded check says the NUMBERS did not move),
+**SUSPECT** (differ, nothing checked) and **UNRECORDED** (no provenance).
+`check_docs` fails on SUSPECT and UNRECORDED only.
 
-**NEVER REGENERATE THE MANIFEST TO SILENCE A STALENESS WARNING.** It records
-the fingerprint LIVE at generation time, so regenerating sets recorded equal to
-live by construction — certifying caches as produced by code that did not
-produce them, and destroying the only signal that said otherwise. Regenerate it
-when the CACHES change. If you produce a cache worth keeping, add it, its note
-in `NOTES`, and the regenerated manifest in one commit.
+**A SUSPECT cache is not condemned — it is unproven, and proving it is cheap.**
+`tools/check_unchanged_decks.py` runs the BASELINES ONLY against a worktree at
+the cache's `built_commit`, then record what it showed:
+
+```bash
+git worktree add ../edhmc_at <built_commit>
+python -m tools.check_unchanged_decks --out=new.json
+(cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)
+python -m tools.check_unchanged_decks --diff old.json new.json
+python -m tools.cache_manifest --verified <deck> "what you ran and what it showed"
+```
+
+**Only a deck whose baseline actually moved needs its table rebuilt, and only
+that deck.**
+
+**WHY THE OLD RULE WAS THE DEFECT (§0z23).** It said "if the fingerprint
+differs, DELETE the cache". Four files shared by every engine are in every
+deck's fingerprint, so a comment change condemned all six caches and demanded a
+six-deck regeneration. That was then measured: **about four hours, and it moved
+0 of 379 rows beyond their own old bar, 0 sign flips, 0 category changes.**
+Meanwhile the evidence check answers the same question in **26 seconds**. A
+rule that expensive is not obeyed — and it was not, which is how ten caches
+came to be deleted with the generator left describing them. **When you write a
+check, cost its remedy.**
+
+**NEVER REGENERATE THE MANIFEST TO SILENCE A WARNING.** Built-at is stamped at
+measurement time precisely so that regenerating the manifest cannot forge it.
+Regenerate the manifest when the CACHES change; clear a SUSPECT with evidence.
 
 **CRN is the reason any of this is affordable, and mid-game randomness is
 now ADDRESSED RATHER THAN ORDERED (§0z17, 2026-09-13).** This finding twice

@@ -1,0 +1,86 @@
+{
+  "ablation_cache_azusa_10-20_n15000_medblank.json": {
+    "built_at": "9574b38be817712d",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "azusa",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "2b1e86aa45105ef3",
+        "utc": "2026-09-16T12:23:36Z"
+      }
+    ]
+  },
+  "ablation_cache_karlov_10-20_n15000_medblank.json": {
+    "built_at": "431e2b18fdea7711",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "karlov",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "1a239ad6e2dee0ae",
+        "utc": "2026-09-16T12:23:35Z"
+      }
+    ]
+  },
+  "ablation_cache_lorehold_10-20_n15000_medblank.json": {
+    "built_at": "fbc552aea5d15b19",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "lorehold",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "58e9ba5655aadfa1",
+        "utc": "2026-09-16T12:23:35Z"
+      }
+    ]
+  },
+  "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
+    "built_at": "0ac5ad66a8f9fff1",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "rendmaw",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "7d2f689ebae32022",
+        "utc": "2026-09-16T12:23:35Z"
+      }
+    ]
+  },
+  "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
+    "built_at": "9f1e2c62af6cd20b",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "shilgengar",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "438c94510e98b2c9",
+        "utc": "2026-09-16T12:23:36Z"
+      }
+    ]
+  },
+  "ablation_cache_tivit_10-20_n15000_medblank.json": {
+    "built_at": "d55ddbf4fa5ff163",
+    "built_commit": "3234bee",
+    "built_utc": "2026-09-16T12:22:28Z",
+    "deck": "tivit",
+    "verified": [
+      {
+        "commit": "3234bee",
+        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+        "fingerprint": "643f4cbb32e268df",
+        "utc": "2026-09-16T12:23:35Z"
+      }
+    ]
+  }
+}

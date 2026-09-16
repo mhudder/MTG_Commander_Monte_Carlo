@@ -20,11 +20,28 @@ python -m tools.cache_manifest --write  # ONLY if the caches were regenerated
 python -m tools.status --write          # always; it is cheap and fully derived
 ```
 
-**`cache_manifest --write` is the one with a trap.** It records the LIVE source
-fingerprint next to each cache, so running it certifies "these caches were
-produced by this code". Run it when the caches were rebuilt. Do **not** run it
-to silence a stale-cache warning: that makes the recorded and live values equal
-by construction and destroys the only signal saying the caches need rebuilding.
+**If `check_docs` reports a SUSPECT cache, do not regenerate the tables.** A
+SUSPECT cache means a shared file changed, so the fingerprint moved and nobody
+has checked whether the NUMBERS moved. Those are different questions and the
+second one is answerable in seconds:
+
+```bash
+git worktree add ../edhmc_at <built_commit>      # from docs/ABLATION_CACHES.md
+python -m tools.check_unchanged_decks --out=new.json
+(cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)
+python -m tools.check_unchanged_decks --diff old.json new.json
+python -m tools.cache_manifest --verified <deck> "what you ran and what it showed"
+python -m tools.cache_manifest --write
+```
+
+Bit-identical means the cache is still good. **Only a deck whose baseline
+actually moved needs its table rebuilt, and only that deck** — a six-deck
+regeneration is four hours and the last one moved 0 of 379 rows (§0z23).
+
+`cache_manifest --write` records the STATE, never the built-at stamp — that is
+written by `ablation.py` when the numbers are measured, so regenerating the
+manifest cannot forge provenance. Run it when caches or their verifications
+change.
 
 ## 2. Run the checks
 
