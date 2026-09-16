@@ -134,10 +134,21 @@ class TivitGame:
     def count(self, name):
         return self.board.names.get(name, 0)
 
+    # URZA'S CONSTRUCT: "This token gets +1/+1 for each artifact you control."
+    # Its P/T is DYNAMIC and must be read live, never frozen at creation --
+    # §0z3 is the record of what freezing one costs: Ka-Zar was measured as a
+    # 16/16 instead of a 3/2 because a dynamic body went into the wrong set,
+    # and every number in that batch had to be restated.
+    URZA_CONSTRUCT = "Construct token"
+
     def power_of(self, perm):
+        if perm.card.name == self.URZA_CONSTRUCT:
+            return perm.card.power + perm.counters + self.artifact_count()
         return perm.card.power + perm.counters
 
     def toughness_of(self, perm):
+        if perm.card.name == self.URZA_CONSTRUCT:
+            return perm.card.toughness + perm.counters + self.artifact_count()
         return perm.card.toughness + perm.counters
 
     def draw(self, n=1):
@@ -156,15 +167,31 @@ class TivitGame:
                 n += 1
         return n
 
-    def make_tokens(self, n, p, t, subtype="", tapped=False):
-        """Real creature tokens (Soldiers, Rabbits). NOT the artifact piles."""
-        for _ in range(int(n)):
+    def make_tokens(self, n, p, t, subtype="", tapped=False, artifact=False):
+        """Real creature tokens (Soldiers, Rabbits). NOT the artifact piles.
+
+        `artifact` types the token as an Artifact Creature, which is what Sai's
+        Thopters and Urza's Construct are. It matters beyond flavour:
+        `artifact_count()` counts board permanents carrying the type, and Time
+        Sieve, Marionette Master and Disciple of the Vault all read it.
+        """
+        n = int(n)
+        # ANOINTED PROCESSION -- HALF OF IT. This engine has TWO token paths,
+        # this one and the module-level make_token() for the Clue/Food/Treasure
+        # piles, and the doubler has to be said in BOTH or it silently covers
+        # only half the card. That is §0z4's exact finding about mana doublers
+        # ("said in available_mana AND spend or it does nothing"), and tivit is
+        # the one deck where the token version of the trap is live.
+        if self.has("Anointed Procession"):
+            n *= 2
+        types = {"Creature", "Artifact"} if artifact else {"Creature"}
+        for _ in range(n):
             tok = Card(name=f"{subtype or 'Token'} token",
-                       types=frozenset({"Creature"}), power=p, toughness=t)
+                       types=frozenset(types), power=p, toughness=t)
             self.board.append(Permanent(card=tok, tapped=tapped, sick=True,
                                         is_token=True))
-        self.soldier_tokens += int(n)
-        on_tokens_created(self, int(n))
+        self.soldier_tokens += n
+        on_tokens_created(self, n)
 
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
@@ -230,6 +257,11 @@ def make_token(g, kind, n=1):
     """
     if n <= 0:
         return 0
+    # ANOINTED PROCESSION -- THE OTHER HALF. See make_tokens above. It doubles
+    # the tokens CREATED, and Academy Manufactor's replacement then applies to
+    # each of them, so the two stack the way the rules stack two replacements.
+    if g.has("Anointed Procession"):
+        n *= 2
     kinds = TOKEN_KINDS if g.has("Academy Manufactor") else (kind,)
     if len(kinds) > 1:
         g.m["manufactor_extra"] += n * (len(kinds) - 1)
@@ -568,6 +600,13 @@ def main_phase(g):
             g.graveyard.append(card)
             continue
         g.m["spells_cast"] += 1
+        # SAI, MASTER THOPTERIST: "Whenever you cast an ARTIFACT SPELL, create
+        # a 1/1 colorless Thopter artifact creature token with flying."
+        # Hooked on the CAST, not the resolution, so a countered artifact
+        # spell still makes the Thopter -- which is what the card says.
+        if "Artifact" in card.types and g.has("Sai, Master Thopterist"):
+            g.make_tokens(1, 1, 1, "Thopter", artifact=True)
+            g.m["sai_thopters"] = g.m.get("sai_thopters", 0) + 1
         if card.name in g.cfg.get("watch", ()):
             g.m["cast_test_card"] = 1
             g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
@@ -587,6 +626,20 @@ def resolve(g, card):
     """Put a spell's effect on the board, or its permanent."""
     s = card.script
 
+    if card.name == "Urza, Lord High Artificer":
+        # "When Urza enters, create a 0/0 colorless Construct artifact creature
+        # token with 'This token gets +1/+1 for each artifact you control.'"
+        #
+        # A FLOOR, AND THE MISSING HALVES ARE NAMED. Urza's other two abilities
+        # are NOT modelled: "Tap an untapped artifact you control: Add {U}"
+        # would make every artifact a mana source, and "{5}: shuffle, exile the
+        # top card, play it free" is a repeatable free-cast engine. Both are
+        # real and both are large, so this row is a LOWER BOUND on the card and
+        # belongs in PARTLY_MODELLED -- a high score is evidence, a low score
+        # is not. Implementing the body alone and calling the number the card
+        # is the §0f failure this project has already paid for three times.
+        g.make_tokens(1, 0, 0, "Construct", artifact=True)
+        g.m["urza_constructs"] = g.m.get("urza_constructs", 0) + 1
     if s == "illusion":
         # "You choose how each player votes this turn. Draw a card."
         g.illusion_active = True

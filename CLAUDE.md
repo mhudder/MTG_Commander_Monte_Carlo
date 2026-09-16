@@ -555,7 +555,23 @@ describes itself as the weakest link in the engine; item 17 is now a
 precondition for committing a staged swap rather than a tidy-up. Neither
 ordering is measured — that is the honest statement of it.
 
-20. **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
+20. **ALL THIRTEEN LIVE PROPOSALS ARE NOW MEASURED** (§0z25, §0z26), across
+    five decks and four engines. The two largest: **Guardian Project +0.0481
+    ±0.0042** (azusa — the biggest candidate number that deck has ever
+    produced) and **Bloodthirsty Conqueror +0.0328 ±0.0033** (karlov, a second
+    Exquisite Blood on a body). Four rows are FLOORS with the missing clause
+    named, and two are blanks explained by mechanism rather than by win rate —
+    Sai makes 0.155 Thopters a game in a deck producing 51 artifacts, because
+    it reads artifact SPELLS and tivit makes artifact TOKENS. **NOTHING IS
+    STAGED:** §0c, every one of these shares a victim slot with its batch and
+    needs a head-to-head against a named cut. Run `python -m edhmc.pending`.
+    **ONE CARD WAS ABANDONED MID-IMPLEMENTATION** — Pitiless Plunderer needs
+    Treasures-as-mana in rendmaw, which means a decrement threaded through the
+    `spend()` five engines share; that is its own change with its own
+    measurement, not a ride-along (§0z26).
+
+20-old2. **The previous entry.**
+    **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
     THREE ARE DONE (§0z25, azusa batch 5, 2026-09-16): **Guardian Project
     +0.0481 ±0.0042** — the largest candidate number ever measured for that
     deck, with its upper bound checked rather than believed — Zendikar's Roil

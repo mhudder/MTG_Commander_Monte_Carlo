@@ -311,3 +311,30 @@ def build():
 # each of those kinds." The second Academy Manufactor effect.
 ANOINTED_PROCESSION = C("Anointed Procession", "Enchantment",
                         {"gen": 3, "W": 1}, priority=8.5, threat=7.5)
+
+# ---------------------------------------------------------------------------
+# 2026-09-16 proposals (§0z26). Oracle text verified against api.scryfall.com
+# the same day; see edhmc/pending.py's PROPOSED entries.
+# ---------------------------------------------------------------------------
+# "If an effect would create one or more tokens under your control, it creates
+# twice that many of those tokens instead." Said in BOTH of this engine's token
+# paths -- make_tokens() and the module-level make_token() -- or it would cover
+# only the creature half and miss every Clue, Food and Treasure.
+ANOINTED_PROCESSION = C("Anointed Procession", "Enchantment",
+                        {"gen": 3, "W": 1}, priority=8.0, threat=3.0)
+
+# "When Urza enters, create a 0/0 colorless Construct artifact creature token
+# with 'This token gets +1/+1 for each artifact you control.'" The other two
+# abilities are NOT modelled -- see the engine note. PARTLY_MODELLED, a FLOOR.
+URZA_LORD_HIGH_ARTIFICER = C("Urza, Lord High Artificer", "Creature",
+                             {"gen": 2, "U": 2}, 1, 4,
+                             priority=8.5, threat=8.0)
+
+# "Whenever you cast an artifact spell, create a 1/1 colorless Thopter artifact
+# creature token with flying."
+SAI_MASTER_THOPTERIST = C("Sai, Master Thopterist", "Creature",
+                          {"gen": 2, "U": 1}, 1, 4,
+                          priority=8.0, threat=5.5)
+
+BATCH_2026_09_16 = (ANOINTED_PROCESSION, URZA_LORD_HIGH_ARTIFICER,
+                    SAI_MASTER_THOPTERIST)

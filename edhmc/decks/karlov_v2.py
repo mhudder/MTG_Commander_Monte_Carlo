@@ -312,3 +312,21 @@ CRYPT_GHAST = C("Crypt Ghast", "Creature", {"gen": 3, "B": 1}, 2, 2,
 # value." The life loss is NOT a lifegain event and must not feed Karlov.
 DARK_CONFIDANT = C("Dark Confidant", "Creature", {"gen": 1, "B": 1}, 2, 1,
                    priority=8, threat=7.5)
+
+# ---------------------------------------------------------------------------
+# 2026-09-16 proposals (§0z26). Oracle text verified against api.scryfall.com
+# the same day; see edhmc/pending.py's PROPOSED entries.
+# ---------------------------------------------------------------------------
+# "Flying, deathtouch. Whenever an opponent loses life, you gain that much
+# life." WORD FOR WORD EXQUISITE BLOOD'S TRIGGER on a 5/5 body, so the engine
+# reads it as a second COMBO_A half rather than as a new effect.
+BLOODTHIRSTY_CONQUEROR = C("Bloodthirsty Conqueror", "Creature",
+                           {"gen": 3, "B": 2}, 5, 5, priority=8.5, threat=8.0)
+
+# "If you would gain life, you gain twice that much life instead. If you would
+# draw a card except the first one you draw in each of your draw steps, draw
+# two cards instead."
+ALHAMMARRETS_ARCHIVE = C("Alhammarret's Archive", "Artifact", {"gen": 5},
+                         priority=7.0, threat=4.0)
+
+BATCH_2026_09_16 = (BLOODTHIRSTY_CONQUEROR, ALHAMMARRETS_ARCHIVE)

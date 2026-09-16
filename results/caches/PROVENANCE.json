@@ -16,6 +16,12 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The azusa fingerprint moved because edhmc/azusa.py gained three card implementations for the \u00a70z25 batch (Guardian Project, Zendikar's Roil, Splendid Reclamation); every one is guarded on a card NOT in the committed list, so no path can execute in a run of this deck -- checked, not argued.",
         "fingerprint": "87f0080a94f5a10f",
         "utc": "2026-09-16T16:36:46Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "eebd0b60234850f3",
+        "utc": "2026-09-16T18:37:07Z"
       }
     ]
   },
@@ -30,6 +36,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "1a239ad6e2dee0ae",
         "utc": "2026-09-16T12:23:35Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "58ae951bbf11131e",
+        "utc": "2026-09-16T18:37:06Z"
       }
     ]
   },
@@ -44,6 +56,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "58e9ba5655aadfa1",
         "utc": "2026-09-16T12:23:35Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "45c8463a23c2e8be",
+        "utc": "2026-09-16T18:37:06Z"
       }
     ]
   },
@@ -58,6 +76,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "7d2f689ebae32022",
         "utc": "2026-09-16T12:23:35Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "f4c7a1b4f4904793",
+        "utc": "2026-09-16T18:37:06Z"
       }
     ]
   },
@@ -72,6 +96,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "438c94510e98b2c9",
         "utc": "2026-09-16T12:23:36Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "2123e9f6dcbb28c6",
+        "utc": "2026-09-16T18:37:07Z"
       }
     ]
   },
@@ -86,6 +116,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "643f4cbb32e268df",
         "utc": "2026-09-16T12:23:35Z"
+      },
+      {
+        "commit": "527d7da",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+        "fingerprint": "680360f69b91ad72",
+        "utc": "2026-09-16T18:37:06Z"
       }
     ]
   }

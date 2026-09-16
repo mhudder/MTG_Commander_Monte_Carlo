@@ -841,6 +841,10 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
                 g.m.get("mother_lode_treasures", 0) + n
     elif sc == "invoke_calamity":
         invoke_calamity(g, self_card=card)
+    elif sc == "jeskas_will":
+        jeskas_will(g)
+    elif sc == "past_in_flames":
+        past_in_flames(g, self_card=card)
     elif sc == "volcanic_vision":
         volcanic_vision(g)
     elif sc == "soulfire":
@@ -1099,6 +1103,86 @@ def apex_of_power(g, is_copy=False):
         g.m["apex_casts"] = g.m.get("apex_casts", 0) + 1
         resolve_spell(g, best, paid, from_hand=False)
     g.m["apex_stranded"] = g.m.get("apex_stranded", 0) + len(pool)
+
+
+def jeskas_will(g):
+    """Jeska's Will {2}{R}, verified against Scryfall 2026-09-16.
+
+        Choose one. If you control a commander as you cast this spell, you may
+        choose both instead.
+        - Add {R} for each card in target opponent's hand.
+        - Exile the top three cards of your library. You may play them this
+          turn.
+
+    ONLY THE SECOND MODE IS MODELLED, and the card's row is a FLOOR for it.
+    The first counts an OPPONENT'S HAND, and this project's pod does not have
+    one -- opponents are an abstract threat level, not players with cards
+    (§4). That is the identical limit §0z14 recorded for Borrowed Knowledge's
+    mode 1, and it is why this card belongs in PARTLY_MODELLED: a HIGH score
+    is evidence, a LOW score is not.
+
+    At a real table the first mode is most of the card -- it is the reason
+    Jeska's Will is played in cEDH, routinely adding four to seven red mana.
+    Reading this row as the card's value would understate it badly.
+
+    The "you MAY play them this turn" half is modelled as apex_of_power models
+    its own exile: cast what the mana can afford, best first, and whatever is
+    left is GONE rather than drawn. Lands among the three are lost, because
+    this engine's land drop comes from hand.
+    """
+    exiled = [g.library.pop() for _ in range(min(3, len(g.library)))]
+    g.m["jeska_exiled"] = g.m.get("jeska_exiled", 0) + len(exiled)
+    pool = [c for c in exiled if not c.is_land]
+    while pool:
+        units = mana_units(g)
+        best = next((c for c in sorted(pool, key=lambda c: (-c.priority, -c.mv))
+                     if can_pay(reduce_cost(g, c), units) is not None), None)
+        if best is None:
+            break
+        pool.remove(best)
+        paid = pay(g, reduce_cost(g, best), units) or 0
+        g.m["jeska_casts"] = g.m.get("jeska_casts", 0) + 1
+        resolve_spell(g, best, paid, from_hand=False)
+    g.m["jeska_stranded"] = g.m.get("jeska_stranded", 0) + len(pool)
+
+
+def past_in_flames(g, self_card=None):
+    """Past in Flames {3}{R}, verified against Scryfall 2026-09-16.
+
+        Each instant and sorcery card in your graveyard gains flashback until
+        end of turn. The flashback cost is equal to its mana cost.
+
+    NOT A FREE-CAST CARD, which is the whole difference between it and Invoke
+    Calamity and the thing a from-memory implementation gets wrong. Flashback
+    costs FULL PRICE, so this is bounded by mana and not by a card cap -- it
+    converts leftover mana into a second use of the graveyard, and with an
+    empty pool it does nothing at all.
+
+    `mv_cheated` is therefore NOT credited: nothing is cheated. What it buys
+    is card ADVANTAGE, which is why `flashback_casts` is the counter to read.
+
+    THE POOL IS RECOMPUTED PER CAST (§0z19). Resolving a flashed-back spell
+    runs the full resolution path, which can trigger Arcane Bombardment and
+    exile another instant or sorcery out of the graveyard -- possibly the next
+    pick. The selection is a snapshot and the zone is live.
+
+    Exiled after resolution, as flashback demands, so each card is used once.
+    """
+    cap = g.cfg.get("flashback_cap", 6)
+    for _ in range(cap):
+        units = mana_units(g)
+        pool = [c for c in g.graveyard
+                if c is not self_card
+                and ("Instant" in c.types or "Sorcery" in c.types)]
+        best = next((c for c in sorted(pool, key=lambda c: (-c.priority, -c.mv))
+                     if can_pay(reduce_cost(g, c), units) is not None), None)
+        if best is None:
+            break
+        g.graveyard.remove(best)          # flashback exiles it on resolution
+        paid = pay(g, reduce_cost(g, best), units) or 0
+        g.m["flashback_casts"] = g.m.get("flashback_casts", 0) + 1
+        g.m["flashback_mv"] = g.m.get("flashback_mv", 0) + best.free_mv
+        resolve_spell(g, best, paid, from_hand=False)
 
 
 def sunbird(g, card):

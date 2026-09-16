@@ -962,6 +962,11 @@ class Game:
             "rendmaw_triggers": 0,
             "attack_triggers": 0,      # Grave Titan / Overlord "or attacks"
             "tokens_made": 0,
+            # 2026-09-16 proposals (§0z26). Counted so each card's
+            # MECHANISM is readable directly -- a counter at zero is an
+            # unimplemented or uncastable card, which win rate cannot
+            # distinguish from a weak one.
+            "mycoloth_devoured": 0, "mycoloth_saprolings": 0,
             "spells_cast": 0,
             "turn_lethal": 99,
             "stranded_mv": 0,      # mana value sitting uncastable in hand
@@ -1026,6 +1031,19 @@ class Game:
 
     def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False):
         if self.has("Primal Vigor"):
+            n *= 2
+        # PARALLEL LIVES: "If an effect would create one or more tokens under
+        # your control, it creates twice that many of those tokens instead."
+        # The same replacement as Primal Vigor without the symmetry -- Vigor
+        # doubles for EVERY player, this one only for you. Stacking them is
+        # x4, which is correct: two replacement effects each double, and the
+        # order the player applies them in does not change the product.
+        #
+        # THE ONLY TOKEN PATH IN THIS ENGINE, checked rather than assumed --
+        # unlike tivit.py, which has this method AND a module-level
+        # make_token(), the §0z4 "a doubler must be said in BOTH places or it
+        # does nothing" trap.
+        if self.has("Parallel Lives"):
             n *= 2
         for _ in range(n):
             card = Card(name=f"{subtype or 'Token'} token",
@@ -1529,7 +1547,6 @@ def main_phase(g: Game, precombat: bool = False):
     """
     while True:
         units = available_mana(g)
-
         # commander first once affordable
         if not g.commander_cast and not precombat:
             ccost = dict(g.commander.cost)
@@ -1740,6 +1757,33 @@ def run_etb(g: Game, perm: Permanent):
         g.make_tokens(n, 4, 4, "Horror")
         for o in g.opponents[:1]:
             o.creatures = max(0.0, o.creatures - n)
+    elif s == "mycoloth":
+        # DEVOUR 2: "As this creature enters, you MAY sacrifice any number of
+        # creatures. It enters with twice that many +1/+1 counters on it."
+        #
+        # THE SACRIFICE POLICY IS A JUDGEMENT CALL AND IS SAID OUT LOUD.
+        # `mycoloth_devour` caps how many bodies it eats; the default eats
+        # only TOKENS, never a real card, because trading a card for two
+        # counters is a loss the pilot would not take.
+        #
+        # THIS IS EXACTLY THE SHAPE THAT COST 0.034 WIN RATE ON SHILGENGAR --
+        # "would only ever sacrifice 1/1 tokens" was written as conservatism
+        # and amounted to asserting the commander's ability does nothing. So
+        # the cap is a KNOB and the default is not claimed to be optimal:
+        # sweep `mycoloth_devour` before quoting this card's row, and note
+        # that eating tokens in a deck whose payoffs COUNT tokens (Coat of
+        # Arms, Overwhelming Stampede, Beastmaster Ascension) is a real cost
+        # this policy pays and a wider sweep might refuse to.
+        cap = g.cfg.get("mycoloth_devour", 4)
+        fodder = [q for q in g.board
+                  if q.is_token and q.card.is_creature and q is not perm]
+        fodder.sort(key=lambda q: g.power_of(q))
+        eaten = fodder[:cap]
+        for q in eaten:
+            g.board.remove(q)
+            g.on_creature_death(1, q)
+        perm.counters += 2 * len(eaten)
+        g.m["mycoloth_devoured"] += len(eaten)
     elif s == "stampede":
         pass
     elif s == "draw1":
@@ -1754,7 +1798,17 @@ def run_etb(g: Game, perm: Permanent):
 def upkeep(g: Game):
     for p in list(g.board):
         s = p.card.script
-        if s == "bitterblossom":
+        if s == "mycoloth":
+            # "At the beginning of your upkeep, create a 1/1 green Saproling
+            # creature token FOR EACH +1/+1 COUNTER on this creature." It
+            # compounds only if it is fed again; a lone Mycoloth with zero
+            # counters makes nothing, which is why the devour policy above is
+            # the whole card rather than a detail.
+            n = p.counters
+            if n:
+                g.make_tokens(n, 1, 1, "Saproling")
+                g.m["mycoloth_saprolings"] += n
+        elif s == "bitterblossom":
             # "At the beginning of your upkeep, create a 1/1 black Faerie
             # Rogue creature token with flying, AND YOU LOSE 1 LIFE."
             #

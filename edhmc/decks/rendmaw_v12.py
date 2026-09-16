@@ -252,3 +252,19 @@ REVITALIZING_REPAST = C("Revitalizing Repast", "Instant", {"B": 1},
 # as a blocker deterrent), so this is a floor.
 WURMCOIL_ENGINE = C("Wurmcoil Engine", "Artifact/Creature", {"gen": 6}, 6, 6,
                     priority=7, threat=8.0, lifelink=True)
+
+# ---------------------------------------------------------------------------
+# 2026-09-16 proposals (§0z26). Oracle text verified against api.scryfall.com
+# the same day; see edhmc/pending.py's PROPOSED entries.
+# ---------------------------------------------------------------------------
+# "If an effect would create one or more tokens under your control, it creates
+# twice that many of those tokens instead." Primal Vigor without the symmetry.
+PARALLEL_LIVES = C("Parallel Lives", "Enchantment", {"gen": 3, "G": 1},
+                   priority=8.0, threat=3.0)
+
+# "Devour 2 ... At the beginning of your upkeep, create a 1/1 green Saproling
+# creature token for each +1/+1 counter on this creature."
+MYCOLOTH = C("Mycoloth", "Creature", {"gen": 3, "G": 2}, 4, 4,
+             priority=8.0, threat=7.0, script="mycoloth")
+
+BATCH_2026_09_16 = (PARALLEL_LIVES, MYCOLOTH)

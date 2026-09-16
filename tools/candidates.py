@@ -21,19 +21,24 @@ from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
 from edhmc.decks.rendmaw_v12 import (NOXIOUS_GEARHULK, BABA_LYSAGA,
                                      EZURIS_PREDATION,
                                      CAULDRON_OF_ESSENCE, REVITALIZING_REPAST,
-                                     WURMCOIL_ENGINE)
+                                     WURMCOIL_ENGINE,
+    BATCH_2026_09_16 as RENDMAW_2026_09_16)
+from edhmc.decks.tivit_v1 import BATCH_2026_09_16 as TIVIT_2026_09_16
 from edhmc.decks.lorehold_v16 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       GOLDSPAN_DRAGON,
                                       SUNBIRDS_INVOCATION, BRASSS_BOUNTY,
                                       UNDERWORLD_BREACH,
                                       CALDERA_PYREMAW, INVINCIBLE_HYMN,
-                                      REVERSE_THE_SANDS)
+                                      REVERSE_THE_SANDS,
+    BATCH_2026_09_16 as LOREHOLD_2026_09_16)
 from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    GUIDE_OF_SOULS, ENDURING_TENACITY,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
-                                   DARK_CONFIDANT)
+                                   DARK_CONFIDANT,
+    BATCH_2026_09_16 as KARLOV_2026_09_16)
 from edhmc.azusa import simulate as azusa_sim
+from edhmc.tivit import simulate as tivit_sim
 from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   CULTIVATOR_COLOSSUS,
                                   CASE_OF_THE_LOCKED_HOTHOUSE,
@@ -211,6 +216,27 @@ DECKS = {
     # the §0c limit that already stops a common baseline ranking two cards.
     "azusa5": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
                BATCH5_CANDIDATES),
+    # 2026-09-16 (§0z26). Pygmy Kavu is the slot the original rendmaw batch
+    # used, kept so these rows and those three share a baseline.
+    "rendmaw2": ("RENDMAW", "rendmaw", rendmaw_sim, 20, "Pygmy Kavu",
+                 RENDMAW_2026_09_16),
+    # 2026-09-16 (§0z26). Soulmender is the slot karlov1 used.
+    "karlov2": ("KARLOV", "karlov", karlov_sim, 20, "Soulmender",
+                KARLOV_2026_09_16),
+    # 2026-09-16 (§0z26). Pinnacle Monk is the slot lorehold/lorehold1 used.
+    "lorehold2": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
+                  LOREHOLD_2026_09_16),
+    # 2026-09-16 (§0z26). THE VICTIM IS A BASIC PLAINS, and that is a
+    # deliberate choice rather than a convenience: tivit has no weak nonland
+    # row to free up -- its worst MODEL-EVALUATED card is Tamiyo's Journal at
+    # +0.0015, inside its own bar -- so naming one would assert a cut the
+    # evidence does not support. The victim is removed in BOTH legs, so its
+    # identity cannot bias the comparison; what it does mean is that both
+    # branches run 35 lands instead of 36, which makes a five-drop marginally
+    # harder to deploy on BOTH sides. Read these rows as "value over a blank
+    # in a land slot", and re-measure against a named cut before staging.
+    "tivit1": ("TIVIT", "tivit", tivit_sim, 20, "Plains",
+               TIVIT_2026_09_16),
     # 2026-09-04 first batch, kept so the runs are reproducible
     "lorehold1": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
                   (SUNBIRDS_INVOCATION, BRASSS_BOUNTY, UNDERWORLD_BREACH)),

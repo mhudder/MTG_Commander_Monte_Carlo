@@ -43,7 +43,24 @@ from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
                           crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
 
-COMBO_A = "Exquisite Blood"
+# "Whenever an opponent loses life, you gain that much life." TWO cards carry
+# this text and they are interchangeable halves of the loop, so the engine must
+# read a SET rather than a name -- Bloodthirsty Conqueror is Exquisite Blood on
+# a 5/5 flying deathtouch body.
+#
+# IT IS MODELLED AS A COMBO PIECE AND NOT AS A CONTINUOUS TRIGGER, which is a
+# deliberate choice and a FLOOR on both cards. Exquisite Blood's general clause
+# -- gaining life off every point the pod loses, all game -- has never been
+# modelled here; only the loop is. Implementing the general trigger for the new
+# card and not the old one would make a strictly-worse card measure strictly
+# better, which is §0u's shape (the same rule, implemented twice, implemented
+# two different ways). So both are the loop and nothing more.
+COMBO_A_CARDS = ("Exquisite Blood", "Bloodthirsty Conqueror")
+COMBO_A = COMBO_A_CARDS[0]      # kept: two call sites and the docstring cite it
+
+
+def has_combo_a(g) -> bool:
+    return any(g.has(x) for x in COMBO_A_CARDS)
 # Cards that read "whenever you gain life, target opponent loses that much
 # life". Each loops with Exquisite Blood on its own, with no mana required.
 # Enduring Tenacity is word-for-word Sanguine Bond's trigger on a 4/3 body, so
@@ -83,7 +100,11 @@ class KarlovGame:
         self.treasures = 0
         self.energy = 0                      # Guide of Souls
         self.life_gained_this_turn = 0.0     # Enlightened Confidant
-        self.exemplar_drew_this_turn = False  # Exemplar of Light, once a turn
+        self.exemplar_drew_this_turn = False
+        # Default before the first take_turn: the opening hand and every
+        # mulligan draw happen before any draw step exists, and the Archive
+        # does not double those either.
+        self.in_draw_step = False  # Exemplar of Light, once a turn
         self.wind_crystal_used = False       # The Wind Crystal taps to activate
 
         cfg.setdefault("shroud_sources",
@@ -96,6 +117,8 @@ class KarlovGame:
         self.m = {
             "damage": 0.0, "drain_damage": 0.0, "combat_damage": 0.0,
             "lifegain_triggers": 0, "life_gained": 0.0,
+            # 2026-09-16 proposals (§0z26).
+            "archive_life_doubled": 0.0, "archive_extra_draws": 0,
             "karlov_counters": 0, "cards_drawn": 0, "spells_cast": 0,
             "mana_spent": 0, "mana_floated": 0, "stranded_mv": 0,
             "turn_lethal": 99, "turn_won": 99, "combo_assembled": 0,
@@ -164,10 +187,27 @@ class KarlovGame:
             creature_entered(self, mine=True, entering=perm)
 
     def draw(self, n=1):
+        # ALHAMMARRET'S ARCHIVE: "If you would draw a card EXCEPT THE FIRST ONE
+        # YOU DRAW IN EACH OF YOUR DRAW STEPS, draw two cards instead."
+        #
+        # THE EXCEPTION IS THE WHOLE DIFFICULTY and it is why this is not a
+        # flat doubler. `drew_in_draw_step` is set by take_turn around the one
+        # draw that IS the draw step; every other draw all turn -- Phyrexian
+        # Arena, Necropotence, Well of Lost Dreams, Dawn of Hope -- is doubled.
+        # Modelling it as "double everything" would overstate the card by
+        # exactly one card a turn, every turn, which over a 12-turn game is
+        # larger than most cards' entire measured value.
+        arch = self.has("Alhammarret's Archive")
         for _ in range(n):
-            if self.library:
-                self.hand.append(self.library.pop())
-                self.m["cards_drawn"] += 1
+            if not self.library:
+                break
+            self.hand.append(self.library.pop())
+            self.m["cards_drawn"] += 1
+            if arch and not self.in_draw_step:
+                if self.library:
+                    self.hand.append(self.library.pop())
+                    self.m["cards_drawn"] += 1
+                    self.m["archive_extra_draws"] += 1
 
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
@@ -307,6 +347,18 @@ def gain_life(g, amount, _depth=0):
     if g.has("The Wind Crystal"):
         g.m["crystal_doubled"] += amount
         amount *= 2
+    # ALHAMMARRET'S ARCHIVE: "If you would gain life, you gain twice that much
+    # life instead." The Wind Crystal's replacement exactly, so it sits here
+    # and stacks with it multiplicatively -- two replacement effects, and the
+    # order of application does not change the product.
+    #
+    # LIKE THE CRYSTAL, IT DOUBLES THE AMOUNT AND NOT THE EVENT COUNT. Karlov
+    # still gets two counters, not four, and `lifegain_triggers` still counts
+    # one. That distinction is what this whole engine is built around, and it
+    # is why this card is NOT simply "a second Wind Crystal" for the commander.
+    if g.has("Alhammarret's Archive"):
+        g.m["archive_life_doubled"] += amount
+        amount *= 2
     g.your_life += amount
     g.life_gained_this_turn += amount
     g.m["life_gained"] += amount
@@ -352,7 +404,7 @@ def gain_life(g, amount, _depth=0):
         elif n in COMBO_LOOP:
             g.m["damage"] += OPP.damage_single(g, amount)
             # Exquisite Blood sees that loss of life and gains it back: loop.
-            if g.has(COMBO_A) and g.result is None:
+            if has_combo_a(g) and g.result is None:
                 g.result = "win"
                 g.m["turn_won"] = g.turn
                 g.m["win_route"] = 2
@@ -572,7 +624,7 @@ def end_step(g):
 def check_combo(g):
     if g.result is not None:
         return
-    if not g.has(COMBO_A):
+    if not has_combo_a(g):
         return
     # Sanguine Bond and Vito loop with Exquisite Blood on their own. Vizkopa
     # Guildmage does NOT: its drain is an activated ability costing {1}{W}{B},
@@ -943,6 +995,7 @@ def take_turn(g):
     g.spells_this_turn = 0
     g.creature_died_this_turn = False
     g.exemplar_drew_this_turn = False
+    g.in_draw_step = False
     g.wind_crystal_used = False
     g.life_gained_this_turn = 0.0
     for p in g.board:
@@ -954,7 +1007,11 @@ def take_turn(g):
     upkeep(g)
     if g.result is not None:
         return
+    # THE ONE DRAW THAT IS THE DRAW STEP. Alhammarret's Archive explicitly
+    # exempts it, so it is marked rather than inferred.
+    g.in_draw_step = True
     g.draw(1)
+    g.in_draw_step = False
     # BEFORE the hand's land drop, so a land on top is played off the top
     # rather than left there blocking the dig. No-ops without the Citadel.
     citadel_land_step(g)

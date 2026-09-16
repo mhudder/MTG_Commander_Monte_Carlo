@@ -332,3 +332,21 @@ REVERSE_THE_SANDS = C("Reverse the Sands", "Sorcery", {"gen": 6, "W": 2},
 # opponents actually casting one.
 HIDDEN_RETREAT = C("Hidden Retreat", "Enchantment", {"gen": 2, "W": 1},
                    priority=8, threat=6.0)
+
+# ---------------------------------------------------------------------------
+# 2026-09-16 proposals (§0z26). Oracle text verified against api.scryfall.com
+# the same day; see edhmc/pending.py's PROPOSED entries.
+# ---------------------------------------------------------------------------
+# Mode 1 counts an OPPONENT'S HAND, which this pod does not have (§4), so only
+# mode 2 is modelled and the row is a FLOOR -- PARTLY_MODELLED, the same
+# classification and the same reason as Borrowed Knowledge (§0z14).
+JESKAS_WILL = C("Jeska's Will", "Sorcery", {"gen": 2, "R": 1},
+                priority=7.5, threat=0.0, script="jeskas_will")
+
+# "Each instant and sorcery card in your graveyard gains flashback until end of
+# turn. The flashback cost is equal to its mana cost." Full price, so it is
+# bounded by mana rather than by a card cap -- NOT a free-cast card.
+PAST_IN_FLAMES = C("Past in Flames", "Sorcery", {"gen": 3, "R": 1},
+                   priority=7.0, threat=0.0, script="past_in_flames")
+
+BATCH_2026_09_16 = (JESKAS_WILL, PAST_IN_FLAMES)

@@ -655,6 +655,142 @@ COMMITTED: list[Change] = [
 # against anything else measured the same way (§0c).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = [
+    # ---- 2026-09-16, the §0z26 batch. Ten proposals implemented and measured
+    # at N=15,000 paired, T20, each in its own deck's established victim slot
+    # (tivit's is a basic Plains -- see tools/candidates.py for why).
+    Candidate(
+        deck="karlov", card="Bloodthirsty Conqueror", measured="2026-09-16",
+        win_rate="+0.0328 +-0.0033 at T20 (N=15,000 paired)", signal="both",
+        rationale=(
+            "A SECOND EXQUISITE BLOOD ON A BODY -- word for word the same "
+            "trigger. It is a redundancy card for the combo the deck already "
+            "wins with, and the combo-win counter moves 0.312 -> 0.375."),
+        evidence=("damage -2.20 +-0.21, and the NEGATIVE damage is the "
+                  "mechanism rather than a flaw: the extra wins arrive by the "
+                  "combo route, which ends the game before the board deals "
+                  "damage. The standing proxy-versus-objective split, and the "
+                  "rule is follow win rate."),
+        limits=(
+            "A FLOOR, and the reason is §0u rather than §4. The engine models "
+            "Exquisite Blood's text as a COMBO DETECTOR, not as the "
+            "continuous 'gain life whenever an opponent loses life' it "
+            "actually is -- so this card inherits that limit exactly. "
+            "Implementing the general trigger for the new card and not the old "
+            "one would have made a strictly-worse card measure strictly "
+            "better. REDUNDANT BY DESIGN: ablate it together with Exquisite "
+            "Blood and the three loop partners, never alone."),
+    ),
+    Candidate(
+        deck="tivit", card="Anointed Procession", measured="2026-09-16",
+        win_rate="+0.0291 +-0.0034 at T20 (N=15,000 paired)", signal="both",
+        rationale=(
+            "Doubles BOTH token streams: artifacts_made 51.3 -> 67.1 and "
+            "treasures_made 22.9 -> 31.2 a game. Academy Manufactor, "
+            "Marionette Master, Disciple of the Vault and Time Sieve all read "
+            "those piles, so one card feeds four payoffs."),
+        evidence="damage +0.85 +-0.21, P(deploy) 0.249.",
+        limits=(
+            "MEASURED AGAINST A BASIC PLAINS, not a named cut, so both legs "
+            "run 35 lands rather than 36 -- read it as value over a blank in a "
+            "LAND slot. WATCH TIME SIEVE (§0m): it eats only TOKEN artifacts, "
+            "so doubling the token stream makes the extra-turn loop easier and "
+            "`sieve_cap` stops being decorative."),
+    ),
+    Candidate(
+        deck="rendmaw", card="Parallel Lives", measured="2026-09-16",
+        win_rate="+0.0157 +-0.0026 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Primal Vigor without the symmetry -- Vigor doubles for "
+                   "every player, this only for you. tokens_made 8.98 -> "
+                   "10.13 a game."),
+        evidence="damage +1.45 +-0.14, P(deploy) 0.203.",
+        limits=("Stacks multiplicatively with Primal Vigor, which is already "
+                "in the list, so the pair is worth more than the sum -- "
+                "leave-one-out understates both. Ablate them together."),
+    ),
+    Candidate(
+        deck="karlov", card="Alhammarret's Archive", measured="2026-09-16",
+        win_rate="+0.0129 +-0.0024 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Doubles life gained (4.88 a game) and every draw except "
+                   "the draw step's first (0.40 a game)."),
+        evidence="damage +0.56 +-0.10, P(deploy) 0.160.",
+        limits=(
+            "THE DRAW HALF IS NEARLY INERT HERE and the counter says so: 0.40 "
+            "extra draws a game, because most of karlov's draws ARE the draw "
+            "step and the card explicitly exempts it. Nearly all the value is "
+            "the lifegain doubler. It doubles the AMOUNT, never the EVENT "
+            "COUNT, so Karlov's own counter still gets two per trigger -- the "
+            "distinction this engine is built around."),
+    ),
+    Candidate(
+        deck="lorehold", card="Past in Flames", measured="2026-09-16",
+        win_rate="+0.0102 +-0.0038 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Extends §0z19's finding that lorehold's graveyard is a "
+                   "resource. 0.56 flashback casts a game at full price."),
+        evidence="damage +0.28 +-0.18, mv_cheated +1.02 +-0.27, P(deploy) 0.322.",
+        limits=("NOT a free-cast card -- flashback costs full price, so it is "
+                "bounded by leftover mana rather than by a card cap, and with "
+                "an empty graveyard it does nothing. `flashback_cap` (6) has "
+                "never been swept."),
+    ),
+    Candidate(
+        deck="lorehold", card="Jeska's Will", measured="2026-09-16",
+        win_rate="+0.0074 +-0.0043 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Mode 2 only: exile the top three and cast what the mana "
+                   "affords. 0.31 casts and 0.44 cards stranded a game."),
+        evidence="damage +0.57 +-0.24, mv_cheated +0.63 +-0.33, P(deploy) 0.345.",
+        limits=(
+            "A HARD FLOOR AND THE BIGGEST ONE IN THIS BATCH. Mode 1 -- 'add "
+            "{R} for each card in target opponent's hand' -- counts a hand the "
+            "pod does not have (§4), exactly Borrowed Knowledge's limit "
+            "(§0z14). At a real table that mode is most of the card and "
+            "routinely adds four to seven red mana. PARTLY_MODELLED: a high "
+            "score is evidence, a low score is not."),
+    ),
+    Candidate(
+        deck="rendmaw", card="Mycoloth", measured="2026-09-16",
+        win_rate="+0.0069 +-0.0023 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Devours 0.28 tokens and makes 1.29 saprolings a game."),
+        evidence="damage +0.43 +-0.11, P(deploy) 0.161.",
+        limits=(
+            "THE DEVOUR POLICY IS A KNOB AND IT IS NOT CLAIMED TO BE OPTIMAL. "
+            "`mycoloth_devour` (4) eats only TOKENS, never a real card. That "
+            "is the SAME SHAPE that cost 0.034 win rate on shilgengar, where "
+            "'would only ever sacrifice 1/1 tokens' was written as "
+            "conservatism and amounted to asserting the commander does "
+            "nothing. Sweep the knob before quoting this row -- and note that "
+            "eating tokens in a deck whose payoffs COUNT tokens (Coat of Arms, "
+            "Overwhelming Stampede) is a real cost this policy pays."),
+    ),
+    Candidate(
+        deck="tivit", card="Urza, Lord High Artificer", measured="2026-09-16",
+        win_rate="+0.0034 +-0.0025 at T20 (N=15,000 paired)", signal="--",
+        rationale=("INSIDE ITS OWN BAR -- unmeasured, not measured as weak. "
+                   "0.17 Constructs a game."),
+        evidence="damage +0.54 +-0.15, P(deploy) 0.195.",
+        limits=(
+            "A FLOOR WITH TWO NAMED HALVES MISSING, and they are the big "
+            "ones: 'Tap an untapped artifact you control: Add {U}' would make "
+            "every artifact a mana source in a deck that makes 51 artifact "
+            "tokens a game, and '{5}: exile the top card, play it free' is a "
+            "repeatable free-cast engine. Only the Construct is modelled -- "
+            "with a DYNAMIC P/T read live, which is the §0z3 trap handled. "
+            "PARTLY_MODELLED. Do not read this row as evidence about Urza."),
+    ),
+    Candidate(
+        deck="tivit", card="Sai, Master Thopterist", measured="2026-09-16",
+        win_rate="+0.0003 +-0.0022 at T20 (N=15,000 paired)", signal="--",
+        rationale=(
+            "A BLANK, and the mechanism explains it: 0.155 Thopters a game. "
+            "Sai triggers on CASTING AN ARTIFACT SPELL, and almost every "
+            "artifact this deck produces is a TOKEN it creates rather than a "
+            "spell it casts -- 51 artifacts made a game, and the trigger sees "
+            "essentially none of them. The deck's artifact density is an "
+            "illusion from this card's point of view."),
+        evidence="damage +0.14 +-0.13, P(deploy) 0.220.",
+        limits=("Fully implemented, so this IS evidence about the card in "
+                "this list. It would be a different row in a deck that casts "
+                "artifacts from hand."),
+    ),
     # ---- 2026-09-16, batch 5 (§0z25). Same Sylvan Library slot as batches 3
     # and 4, so these rows sit on one scale with those thirteen.
     Candidate(
@@ -1934,10 +2070,16 @@ DECKS = {
     # March of the World Ooze is COMMITTED as of v12, so it is in the deck
     # list itself and no longer a swap-in candidate.
     "rendmaw": (rendmaw_v12, {
+        # 2026-09-16 batch (§0z26).
+        "Parallel Lives": rendmaw_v12.PARALLEL_LIVES,
+        "Mycoloth": rendmaw_v12.MYCOLOTH,
         "Cauldron of Essence": rendmaw_v12.CAULDRON_OF_ESSENCE}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
+        # 2026-09-16 batch (§0z26).
+        "Jeska's Will": lorehold_v16.JESKAS_WILL,
+        "Past in Flames": lorehold_v16.PAST_IN_FLAMES,
         "Molecule Man": lorehold_v16.MOLECULE_MAN,
         "Galvanoth": lorehold_v16.GALVANOTH,
         "Caldera Pyremaw": lorehold_v16.CALDERA_PYREMAW,
@@ -1948,10 +2090,17 @@ DECKS = {
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
     "karlov": (karlov_v2, {
+        # 2026-09-16 batch (§0z26), catalogued so a Change can name them.
+        "Bloodthirsty Conqueror": karlov_v2.BLOODTHIRSTY_CONQUEROR,
+        "Alhammarret's Archive": karlov_v2.ALHAMMARRETS_ARCHIVE,
         "Bolas's Citadel": karlov_v2.BOLASS_CITADEL}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {
+        # 2026-09-16 batch (§0z26).
+        "Anointed Procession": tivit_v1.ANOINTED_PROCESSION,
+        "Urza, Lord High Artificer": tivit_v1.URZA_LORD_HIGH_ARTIFICER,
+        "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST,
         "Anointed Procession": tivit_v1.ANOINTED_PROCESSION}),
     # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
     # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,

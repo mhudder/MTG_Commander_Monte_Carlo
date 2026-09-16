@@ -74,6 +74,7 @@ Methodology that used to live at the end of this file is now
 | [0z23](#0z23) | **CLOSED** | the cache manifest described ten files that no longer existed, and "delete any cache whose fingerprint differs" was too expensive to obey. **Replaced by BUILT-AT provenance and a seconds-long evidence check** |
 | [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
 | [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured; Guardian Project is +0.0481, the deck's largest candidate ever** — and one proposal's own rationale was backwards |
+| [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4337,6 +4338,103 @@ implemented, dispatched by name in three places.
 OF A BLANK.** Before calling a card unimplemented, grep the engine for its
 NAME. And before proposing a card at all, grep `tools/candidates.py` as well as
 the deck list — that check is cheaper than either.
+
+
+---
+
+<a id="0z26"></a>
+
+## 0z26. MEASURED — the remaining ten proposals, implemented across four engines
+
+2026-09-16, following §0z25's three. N=15,000 paired, T20, each in its deck's
+established victim slot. `tools/candidates.py` batches `rendmaw2`, `karlov2`,
+`lorehold2`, `tivit1`.
+
+| deck | card | win rate T20 | signal |
+|---|---|---|---|
+| karlov | **Bloodthirsty Conqueror** | **+0.0328 ±0.0033** | both |
+| tivit | **Anointed Procession** | **+0.0291 ±0.0034** | both |
+| rendmaw | Parallel Lives | +0.0157 ±0.0026 | both |
+| karlov | Alhammarret's Archive | +0.0129 ±0.0024 | both |
+| lorehold | Past in Flames | +0.0102 ±0.0038 | both |
+| lorehold | Jeska's Will | +0.0074 ±0.0043 | both, **hard floor** |
+| rendmaw | Mycoloth | +0.0069 ±0.0023 | both |
+| tivit | Urza, Lord High Artificer | +0.0034 ±0.0025 | `--`, **floor** |
+| tivit | Sai, Master Thopterist | +0.0003 ±0.0022 | `--` |
+
+**Pitiless Plunderer was NOT measured** — see below.
+
+### THE TWO BLANKS ARE THE MOST USEFUL ROWS
+
+**Sai, Master Thopterist makes 0.155 Thopters a game** in a deck that produces
+**51 artifacts a game**. It triggers on CASTING AN ARTIFACT SPELL, and almost
+every artifact tivit produces is a TOKEN it creates rather than a spell it
+casts. The deck's artifact density is an illusion from this card's point of
+view. It is fully implemented, so this IS evidence about the card in this list.
+
+**Urza, Lord High Artificer is a FLOOR and the row should not be read as the
+card.** Only the Construct is modelled — with a DYNAMIC P/T read live, which is
+§0z3's trap handled rather than repeated. The two abilities left out are the
+big ones: "Tap an untapped artifact you control: Add {U}" in a deck making 51
+artifact tokens a game, and "{5}: exile the top card, play it free". Both are
+real and large. `PARTLY_MODELLED`.
+
+### BLOODTHIRSTY CONQUEROR, AND WHY IT IS MODELLED AS A COMBO PIECE
+
+Its oracle text is **word for word Exquisite Blood's**, on a 5/5 flying
+deathtouch body. This engine models Exquisite Blood as a COMBO DETECTOR — the
+loop with Sanguine Bond / Vito / Enduring Tenacity — and not as the continuous
+"gain life whenever an opponent loses life" it actually is.
+
+So the new card was given the identical treatment and `COMBO_A` became a SET.
+**Implementing the general trigger for the new card and not the old one would
+have made a strictly-worse card measure strictly better** — §0u's shape, the
+same rule implemented twice and implemented two different ways. Both cards are
+now floors for the same reason, which is the honest state.
+
+The **damage is −2.20** while win rate is +0.0328, and that is the mechanism
+rather than a defect: the extra wins arrive by the combo route, which ends the
+game before the board deals damage. Combo wins move 0.312 → 0.375.
+
+### PITILESS PLUNDERER WAS ABANDONED MID-IMPLEMENTATION, AND WHY
+
+Its entire value in rendmaw is Treasures-as-mana. `Game.treasures` has been a
+field on the rendmaw engine since the beginning and **nothing in `engine.py`
+has ever read or written it** — a dead field, §0z12's loaded gun.
+
+Making it live means appending Treasure units to the mana pool and DECREMENTING
+them when spent. Lorehold does this with its own `pay()`, which knows where the
+treasure block starts by index. The shared `engine.spend()` does not, and its
+ownerless-unit path is already used by azusa's Castle Garenbrig and
+shilgengar's Treasures — so a `g.treasures` decrement threaded through it would
+change a primitive **five engines share**.
+
+Without the decrement the Treasures are infinite. **A card measured on infinite
+mana is not a measurement**, so the work was backed out rather than shipped.
+Treasures-as-mana for rendmaw is a real engine feature that deserves its own
+change, its own mutation test and its own before/after — not a ride-along in a
+candidate batch.
+
+### MYCOLOTH'S DEVOUR IS A POLICY, SAID OUT LOUD
+
+`mycoloth_devour` (4) eats only TOKENS, never a real card. **That is the same
+shape that cost 0.034 win rate on shilgengar**, where "would only ever sacrifice
+1/1 tokens" was written as conservatism and amounted to asserting the
+commander's ability does nothing. The knob exists so the next reader can sweep
+it; the default is not claimed to be optimal, and eating tokens in a deck whose
+payoffs COUNT tokens is a real cost this policy pays.
+
+### WHAT WAS VERIFIED
+
+* `tools/validate.py` **+0.00 on all 18 metrics** across all six engines after
+  changes to `engine.py`, `karlov.py`, `lorehold.py`, `tivit.py` and
+  `azusa.py`.
+* `check_unchanged_decks` against a worktree at `3234bee`: **BIT-IDENTICAL on
+  all 8 metrics for all six decks**, because every new path is guarded on a
+  card not in any committed list. All six caches re-verified rather than
+  rebuilt.
+* Every card's MECHANISM counter was read before its win rate was trusted —
+  which is how both blanks were explained rather than merely reported.
 
 
 <a id="1"></a>
