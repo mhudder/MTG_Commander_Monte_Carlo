@@ -10,6 +10,12 @@
         "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
         "fingerprint": "2b1e86aa45105ef3",
         "utc": "2026-09-16T12:23:36Z"
+      },
+      {
+        "commit": "5dc60f5",
+        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The azusa fingerprint moved because edhmc/azusa.py gained three card implementations for the \u00a70z25 batch (Guardian Project, Zendikar's Roil, Splendid Reclamation); every one is guarded on a card NOT in the committed list, so no path can execute in a run of this deck -- checked, not argued.",
+        "fingerprint": "87f0080a94f5a10f",
+        "utc": "2026-09-16T16:36:46Z"
       }
     ]
   },

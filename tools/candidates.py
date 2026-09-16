@@ -44,7 +44,7 @@ from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   FINALE_OF_DEVASTATION, THE_GREAT_HENGE,
                                   SAPLING_NURSERY,
                                   NISSA_WHO_SHAKES_THE_WORLD,
-                                  WAR_ROOM, CASTLE_GARENBRIG)
+                                  WAR_ROOM, CASTLE_GARENBRIG, BATCH5_CANDIDATES)
 from edhmc.decks.azusa_v1 import BATCH4_CANDIDATES
 
 N = 6000
@@ -205,6 +205,12 @@ DECKS = {
     # worse, not better.
     "azusa4": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
                BATCH4_CANDIDATES),
+    # 2026-09-16 fifth batch. SAME VICTIM SLOT AGAIN (Sylvan Library), for
+    # azusa4's reason: three batches on one slot are three sets of rows on one
+    # scale, and changing the baseline would make them incomparable on top of
+    # the §0c limit that already stops a common baseline ranking two cards.
+    "azusa5": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
+               BATCH5_CANDIDATES),
     # 2026-09-04 first batch, kept so the runs are reproducible
     "lorehold1": ("LOREHOLD", "lorehold", lorehold_sim, 14, "Pinnacle Monk",
                   (SUNBIRDS_INVOCATION, BRASSS_BOUNTY, UNDERWORLD_BREACH)),

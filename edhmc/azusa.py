@@ -411,6 +411,10 @@ class AzusaGame:
             # §0z18 -- Ashaya's second clause, counted so the mechanism can be
             # read directly rather than inferred from win rate.
             "ashaya_landfall": 0, "ashaya_land_deaths": 0,
+            # 2026-09-16 proposals. Counted so each card's MECHANISM can be
+            # read directly -- a card whose counter is zero is unimplemented
+            # or uncastable, which win rate cannot tell you apart.
+            "guardian_project_draws": 0, "reclaimed_lands": 0,
             "library_shuffles": 0, "lands_from_hand": 0,
             "lands_from_library": 0, "lands_from_graveyard": 0,
             "reroll_fetches": 0,
@@ -798,6 +802,33 @@ class AzusaGame:
         if (card.is_creature and not is_token
                 and card.name != "The Great Henge" and self.has("The Great Henge")):
             perm.counters += 1
+        # GUARDIAN PROJECT: "Whenever a NONTOKEN creature you control enters,
+        # if it doesn't have the same name as another creature you control or
+        # a creature card in your graveyard, draw a card."
+        #
+        # Hooked at the same site and for the same reason as The Great Henge
+        # above: a creature enters this engine from six zones and only one of
+        # them goes through resolve().
+        #
+        # THE NAME CLAUSE IS THE CARD and is checked against BOTH zones the
+        # text names. `perm` is already on `self.board` by this point, so the
+        # battlefield half must exclude it by identity -- comparing on name
+        # alone would make every creature see itself and the card would draw
+        # exactly zero times, which is the §0f failure (a card implemented as
+        # something that is not its text) rather than a conservative one.
+        #
+        # Scute Swarm's copies are TOKENS, so they never trigger this and
+        # never block it; that is `not is_token` doing real work in a deck
+        # whose best card makes dozens of same-named bodies.
+        if (card.is_creature and not is_token
+                and self.has("Guardian Project")):
+            same_board = any(q is not perm and q.card.is_creature
+                             and q.card.name == card.name for q in self.board)
+            same_yard = any(c.is_creature and c.name == card.name
+                            for c in self.graveyard)
+            if not (same_board or same_yard):
+                self.draw(1)
+                self.m["guardian_project_draws"] += 1
             self.draw(1)
             self.m["henge_draws"] += 1
         # ASHAYA: A NONTOKEN CREATURE ENTERING IS A LAND ENTERING, AND THAT
@@ -994,6 +1025,11 @@ class AzusaGame:
         for _ in range(self.count("Lotus Cobra")):
             self.bonus_mana.append(frozenset({"G"}))
         self.make_tokens(self.count("Rampaging Baloths"), 4, 4, "Beast")
+        # ZENDIKAR'S ROIL: "Landfall -- whenever a land you control
+        # enters, create a 2/2 green Elemental creature token." The
+        # Rampaging Baloths shape exactly, smaller body. `count` not
+        # `has`, for this function's own stated reason.
+        self.make_tokens(self.count("Zendikar's Roil"), 2, 2, "Elemental")
         self.make_tokens(self.count("Greensleeves, Maro-Sorcerer"), 3, 3,
                          "Badger")
         # Sapling Nursery: "Landfall -- whenever a land you control enters,
@@ -1520,6 +1556,31 @@ class AzusaGame:
                 best = max(self.graveyard, key=lambda c: c.mv)
                 self.graveyard.remove(best)
                 self.hand.append(best)
+        elif script == "splendid_reclamation":
+            # "Return all land cards from your graveyard to the battlefield
+            # tapped." Each one ENTERS, so each is its own landfall trigger --
+            # which is the whole reason the card is in a Scute Swarm deck and
+            # not a ramp deck.
+            #
+            # THE POOL IS SNAPSHOTTED AND THE ZONE IS LIVE (§0z19): every land
+            # returned can trigger a payoff that touches the graveyard --
+            # Titania reads land deaths, Springheart copies, Ancient
+            # Greenwarden doubles every trigger. Iterating `self.graveyard`
+            # directly while make_permanent mutates it is the exact defect
+            # §0z19 found twice in one day, so the list is taken first and
+            # each card re-checked for membership before it is moved.
+            #
+            # `played=False`: these are not land DROPS, so Horn of Greed and
+            # Wayward Swordtooth do not see them -- the same distinction
+            # land_entered()'s own docstring draws for Cultivate and fetches.
+            pool = [c for c in self.graveyard if c.is_land]
+            for c in pool:
+                if c not in self.graveyard:
+                    continue
+                self.graveyard.remove(c)
+                self.make_permanent(c, tapped=True)
+                self.land_entered(c, played=False)
+                self.m["reclaimed_lands"] += 1
         elif script == "loam":
             pool = [c for c in self.graveyard if c.is_land][:3]
             for c in pool:

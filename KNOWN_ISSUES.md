@@ -73,6 +73,7 @@ Methodology that used to live at the end of this file is now
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
 | [0z23](#0z23) | **CLOSED** | the cache manifest described ten files that no longer existed, and "delete any cache whose fingerprint differs" was too expensive to obey. **Replaced by BUILT-AT provenance and a seconds-long evidence check** |
 | [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
+| [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured; Guardian Project is +0.0481, the deck's largest candidate ever** — and one proposal's own rationale was backwards |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4247,6 +4248,95 @@ differ. When you write a check, cost its remedy. If the remedy is expensive,
 the check needs a cheap way to establish the thing it actually cares about —
 here, "did the NUMBERS move", which is answerable in seconds, rather than "did
 the fingerprint move", which is answerable instantly and is the wrong question.
+
+
+---
+
+<a id="0z25"></a>
+
+## 0z25. MEASURED — three azusa cards implemented and measured, and the biggest number came with the biggest caveat
+
+Batch 5, 2026-09-16. Oracle text verified from `api.scryfall.com` the same day
+(access to it had just been restored — see `CLAUDE.md`'s network note). Same
+**Sylvan Library** victim slot as batches 3 and 4, so all sixteen candidate
+rows sit on one scale. N=15,000 paired, T20.
+`python -m tools.candidates azusa5 --n=15000 --turns=20`.
+
+| card | win rate T20 | signal | would rank |
+|---|---|---|---|
+| **Guardian Project** | **+0.0481 ±0.0042** | both | **1st of 16 candidates; ~2nd in the deck** |
+| Zendikar's Roil | +0.0133 ±0.0029 | both | mid-table, around Springheart |
+| Splendid Reclamation | −0.0013 ±0.0022 | `--` | a blank |
+
+### GUARDIAN PROJECT, AND WHY THE NUMBER WAS CHECKED RATHER THAN BELIEVED
+
++0.0481 is larger than Traveling Chocobo (+0.0291) and Nissa, Resurgent
+Animist (+0.0285), and sits just under **Scute Swarm's own ablation row
+(+0.0518)**. A newly implemented card scoring near the best card in the deck is
+exactly where an over-implementation hides, so the upper bound was measured
+rather than argued:
+
+* nontoken creature ETBs with the enchantment out: **3.60/game**
+* `guardian_project_draws`: **3.60/game** — *equal*, so it never double-fires
+* token creature ETBs: **224.87/game**, and it fires off **none** of them
+
+The name clause can only ever SUPPRESS a draw, so draws ≤ eligible ETBs is a
+hard bound, and it holds with equality.
+
+**THE EQUALITY IS ITSELF THE FINDING.** "If it doesn't have the same name as
+another creature you control or a creature card in your graveyard" **never
+bites in a singleton list** — every creature name is unique and every copy in
+this deck is a TOKEN. The card here is simply *"draw a card whenever a nontoken
+creature enters"*, and the row must be read as that. In a list with nontoken
+copies or repeated names it is worth strictly less.
+
+Supporting metrics: damage +3.73 ±0.29, cards_drawn +5.30 ±0.22 (more than the
+3.60 draws — the rest is the cascade into lands and landfall), landfall
++1.53 ±0.10, P(deploy) 0.315, so about **11 draws per resolution** in a deck
+whose standing finding is that it is CARD-constrained rather than
+mana-constrained (§0z4, §0z21). The mechanism and the size agree.
+
+**A CEILING** for queued item 17's reason, though not a tight one: ~26 cards
+drawn from a 99-card library is nowhere near decking.
+
+### SPLENDID RECLAMATION — A BLANK, AND THE PROPOSAL'S RATIONALE WAS BACKWARDS
+
+It was proposed on the argument that it "reads the deck's OWN graveyard-land
+package: Life from the Loam, Ramunap Excavator, Crucible of Worlds and Titania
+are all already in the list." **That is exactly why it fails.** Measured:
+
+* fetches cracked 3.09/game, `lands_from_graveyard` 2.97/game
+* **maximum lands in the graveyard at any point in a whole game: 1.11**
+* lands the card actually returned: **0.217/game**
+
+Those four cards do not FEED the graveyard, they DRAIN it. They are competing
+consumers of the same resource and they win the race, because they act every
+turn while this acts once. The §0z4 Sapling Nursery shape — a card that makes
+the engine already there measurably worse — pointed at a resource rather than
+at a combo.
+
+**Not refuted as a card, refuted as a fit for THIS list.** In a deck that
+discards or sacrifices lands it is a different row entirely.
+
+### A CORRECTION MADE THE SAME SESSION, worth more than either number
+
+Two of the fifteen proposals — Heliod, Sun-Crowned (karlov) and Underworld
+Breach (lorehold) — were **already measured**, in the `karlov1` and `lorehold1`
+batches, both inside their own bars at N=6,000. Proposing them was a miss: the
+deck lists were checked and `tools/candidates.py`'s batch history was not.
+
+They were then briefly reported as *unimplemented vanilla stand-ins*, on the
+evidence that their `C(...)` constructors carry no `script=`. **That was
+wrong.** Behaviour attaches BY NAME at least as often as by script: `karlov.py`
+carries Heliod's devotion gate, lifegain trigger and lifelink activation, and
+`lorehold.py` has a whole `underworld_breach()` escape loop bounded by the
+`breach_cap` knob. Traveling Chocobo is the same shape — no script, fully
+implemented, dispatched by name in three places.
+
+**`script=` IS NOT THE IMPLEMENTATION SURFACE, AND ITS ABSENCE IS NOT EVIDENCE
+OF A BLANK.** Before calling a card unimplemented, grep the engine for its
+NAME. And before proposing a card at all, grep `tools/candidates.py` as well as
+the deck list — that check is cheaper than either.
 
 
 <a id="1"></a>

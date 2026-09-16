@@ -305,6 +305,19 @@ was worth +0.0023. **After closing an engine gap, re-read the hand-written
 policies written while it was open** — host rankings, priority orders, reserve
 sizes.
 
+**`script=` IS NOT THE IMPLEMENTATION SURFACE, AND ITS ABSENCE IS NOT EVIDENCE
+OF A BLANK** (2026-09-16, §0z25). Heliod, Sun-Crowned and Underworld Breach
+were both reported as unimplemented vanilla stat-lines on the evidence that
+their `C(...)` constructors carry no `script=`. Both are implemented in full —
+`karlov.py` has Heliod's devotion gate, lifegain trigger and lifelink
+activation; `lorehold.py` has a whole `underworld_breach()` escape loop with
+its own `breach_cap` knob. **Behaviour attaches BY NAME at least as often as by
+script**, and Traveling Chocobo is the same shape: no script, dispatched by
+name in three places. Before calling a card unimplemented, **grep the engine
+for its NAME.** This is the inverse of the standing "a card scoring like a
+blank usually means the engine made it one" — here the engine had done the
+work and the reader could not see it.
+
 **SUBTYPES ARE DATA, AND THEY COME FROM SCRYFALL** (2026-09-10, §0z4).
 `Card.types` holds CARD types, never creature or land subtypes, so a card that
 reads one — Return of the Wildspeaker's "non-Human", Sapling Nursery's
@@ -542,7 +555,21 @@ describes itself as the weakest link in the engine; item 17 is now a
 precondition for committing a staged swap rather than a tidy-up. Neither
 ordering is measured — that is the honest statement of it.
 
-20. **FIFTEEN PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH**
+20. **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
+    THREE ARE DONE (§0z25, azusa batch 5, 2026-09-16): **Guardian Project
+    +0.0481 ±0.0042** — the largest candidate number ever measured for that
+    deck, with its upper bound checked rather than believed — Zendikar's Roil
+    +0.0133 ±0.0029, and Splendid Reclamation −0.0013 ±0.0022, a blank whose
+    proposal rationale was **backwards** (the deck's Loam/Excavator/Crucible
+    package drains the graveyard it wanted to read). **TWO MORE ARE DEAD:**
+    Heliod, Sun-Crowned and Underworld Breach were ALREADY MEASURED in the
+    `karlov1` and `lorehold1` batches, both inside their bars — proposing them
+    was a miss, and the fix is one grep. **Before proposing a card, grep
+    `tools/candidates.py` as well as the deck list.** The remaining ten are in
+    `PROPOSED`; run `python -m edhmc.pending`.
+
+20-old. **The original entry, kept for its framing.**
+    **FIFTEEN PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH**
     (2026-09-16). Three per deck across karlov, rendmaw, lorehold, tivit and
     azusa, each with oracle text fetched from Scryfall and pasted verbatim
     into `edhmc/pending.py`'s new `PROPOSED` list. Run

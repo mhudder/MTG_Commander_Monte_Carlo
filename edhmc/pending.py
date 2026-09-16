@@ -655,6 +655,57 @@ COMMITTED: list[Change] = [
 # against anything else measured the same way (§0c).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = [
+    # ---- 2026-09-16, batch 5 (§0z25). Same Sylvan Library slot as batches 3
+    # and 4, so these rows sit on one scale with those thirteen.
+    Candidate(
+        deck="azusa", card="Guardian Project", measured="2026-09-16",
+        win_rate="+0.0481 +-0.0042 at T20 (N=15,000 paired)", signal="both",
+        rationale=(
+            "THE LARGEST CANDIDATE NUMBER EVER MEASURED FOR THIS DECK -- ahead "
+            "of Traveling Chocobo (+0.0291) and Nissa Resurgent Animist "
+            "(+0.0285), and just under Scute Swarm's own ablation row "
+            "(+0.0518). It is the purest attack yet on the CARD constraint "
+            "that §0z4 and §0z21 both identified: every card that attacked it "
+            "passed and the one pure MANA card failed."),
+        evidence=(
+            "damage +3.73 +-0.29, cards_drawn +5.30 +-0.22, landfall_triggers "
+            "+1.53 +-0.10, lands_played +0.61 +-0.05, P(deploy) 0.315. The "
+            "draw counter is 3.60 a game unconditionally, about 11 per "
+            "resolution. THE UPPER BOUND WAS CHECKED RATHER THAN ASSUMED: "
+            "draws (3.60) equal eligible nontoken-creature ETBs with the "
+            "enchantment out (3.60) EXACTLY, and it never fires off the "
+            "224.87 token ETBs a game -- so it cannot be over-triggering."),
+        limits=(
+            "THE NAME CLAUSE IS INERT IN A SINGLETON LIST and that is why the "
+            "two counts are equal. 'If it doesn't have the same name as "
+            "another creature you control or a creature card in your "
+            "graveyard' can only ever SUPPRESS a draw, and in a 100-card "
+            "singleton deck whose copies are all TOKENS there is nothing for "
+            "it to suppress. Read this number as 'draw a card whenever a "
+            "nontoken creature enters', which is what the card is here. "
+            "A CEILING for queued item 17's reason -- nothing in this project "
+            "loses to decking -- though at ~26 cards drawn from a 99-card "
+            "library that gap is not close to binding. "
+            "NOT A STAGING: §0c, it needs a head-to-head against a named cut, "
+            "and it shares the Sylvan Library baseline with thirteen others."),
+    ),
+    Candidate(
+        deck="azusa", card="Zendikar's Roil", measured="2026-09-16",
+        win_rate="+0.0133 +-0.0029 at T20 (N=15,000 paired)", signal="both",
+        rationale=(
+            "A second Rampaging Baloths on a deck averaging 23 landfall "
+            "triggers a game. Mid-table: it would rank around Springheart "
+            "Nantuko and the staged Ka-Zar."),
+        evidence=("damage +1.67 +-0.17, P(deploy) 0.283. landfall_triggers "
+                  "-0.21 and cards_drawn -0.24, both small and NEGATIVE -- it "
+                  "adds bodies, not engine, and costs a card slot that was "
+                  "drawing."),
+        limits=("DELIBERATELY REDUNDANT with Rampaging Baloths and Scute "
+                "Swarm. Leave-one-out understates every member of an "
+                "interchangeable set, so ablate the three together before "
+                "cutting any of them -- pass a list of names to ablate()."),
+    ),
+
     Candidate(
         deck="azusa",
         card="The Great Henge",
@@ -1591,10 +1642,18 @@ PROPOSED: list[Proposal] = [
                    "generate them. This is another payoff per event rather "
                    "than another source, which is the half the deck is "
                    "thinner on."),
-        implement=("LOW. `lifegain_triggers` already exists and karlov.py "
-                   "already dispatches on it. Devotion gating needs the "
-                   "`devotion_creature_types` knob's treatment; indestructible "
-                   "is a tag §0z10 already reads."),
+        implement=("ALREADY IMPLEMENTED IN FULL -- karlov.py carries the "
+                   "devotion gate, the lifegain trigger and the lifelink "
+                   "activation. Nothing to build."),
+        rejected=("ALREADY MEASURED, and this proposal should not have been "
+                  "written. It is in the `karlov1` batch of "
+                  "tools/candidates.py and `results/candidates_karlov.txt` "
+                  "records +0.0008 +-0.0024 at T10 and +0.0050 +-0.0045 at "
+                  "T20, N=6,000 -- INSIDE ITS BARS at both horizons. The card "
+                  "is implemented faithfully, so that is evidence about the "
+                  "card rather than about the engine. Re-measuring it at "
+                  "N=15,000 is defensible (the T20 bar is wide); proposing it "
+                  "as a new idea is not."),
     ),
     Proposal(
         deck="karlov", card="Bloodthirsty Conqueror", cost="{3}{B}{B}",
@@ -1692,10 +1751,16 @@ PROPOSED: list[Proposal] = [
                    "Faithless Looting +0.0055, Thrill of Possibility +0.0050, "
                    "Hit the Mother Lode +0.0052. This is the most direct "
                    "extension of that finding available."),
-        implement=("MEDIUM. A `breach_cap` knob ALREADY EXISTS in "
-                   "lorehold.py -- find out what it currently gates before "
-                   "adding anything, because a knob nothing reads is §0z12's "
-                   "loaded gun."),
+        implement=("ALREADY IMPLEMENTED IN FULL -- `lorehold.underworld_breach` "
+                   "is a real escape loop and `breach_cap` is the knob that "
+                   "bounds it. Nothing to build."),
+        rejected=("ALREADY MEASURED, and this proposal should not have been "
+                  "written. It is in the `lorehold1` batch and "
+                  "`results/candidates_lorehold.txt` records +0.0015 +-0.0019 "
+                  "at T10 and +0.0067 +-0.0052 at T20, N=6,000 -- INSIDE ITS "
+                  "BARS at both. The escape loop is implemented, so that is "
+                  "evidence about the card. `breach_cap` (4) is the knob its "
+                  "evaluation rests on and has never been swept."),
     ),
     Proposal(
         deck="lorehold", card="Jeska's Will", cost="{2}{R}", identity="R",
@@ -1800,6 +1865,7 @@ PROPOSED: list[Proposal] = [
                    "built. The same-name clause needs a real check against "
                    "battlefield AND graveyard, and Scute Swarm's copies are "
                    "TOKENS, so they must not trigger it."),
+        rejected='MEASURED 2026-09-16 and PROMOTED to MEASURED: +0.0481 +-0.0042 win rate at T20, N=15,000, Sylvan Library slot (§0z25). See the Candidate entry.',
     ),
     Proposal(
         deck="azusa", card="Splendid Reclamation", cost="{3}{G}", identity="G",
@@ -1815,6 +1881,7 @@ PROPOSED: list[Proposal] = [
                    "this engine. The lands enter TAPPED, which matters: §0z3 "
                    "found the TAP was the binding constraint on the "
                    "sacrifice-lands, not the mana."),
+        rejected="MEASURED 2026-09-16: -0.0013 +-0.0022 at T20 -- INSIDE ITS BAR, a blank. The mechanism explains it and the proposal's own rationale was BACKWARDS: max lands in the graveyard across a whole game is 1.1, because Life from the Loam, Ramunap Excavator and Crucible of Worlds recycle them straight back out. Those cards COMPETE with this one for the same resource rather than feeding it. Not refuted as a card, refuted as a fit for THIS list.",
     ),
     Proposal(
         deck="azusa", card="Zendikar's Roil", cost="{3}{G}{G}", identity="G",
@@ -1828,6 +1895,7 @@ PROPOSED: list[Proposal] = [
                    "leave-one-out understates every member of an "
                    "interchangeable set."),
         implement="LOW. Landfall token payoffs are existing machinery.",
+        rejected='MEASURED 2026-09-16 and PROMOTED: +0.0133 +-0.0029 at T20 (§0z25).',
     ),
 
     # ---- REJECTED, kept so they are not proposed again -------------------
@@ -1897,6 +1965,11 @@ DECKS = {
         # until 2026-09-10 and are now COMMITTED as of azusa_v1.py, so they are
         # in the deck list itself and no longer swap-in candidates. Same for
         # Scene of the Crime. Ka-Zar is still STAGED, so it stays.
+        # 2026-09-16 batch 5 (§0z25), measured and catalogued so a
+        # Change can name them without a later edit nobody remembers.
+        "Guardian Project": azusa_v1.GUARDIAN_PROJECT,
+        "Zendikar's Roil": azusa_v1.ZENDIKARS_ROIL,
+        "Splendid Reclamation": azusa_v1.SPLENDID_RECLAMATION,
         "Conduit of Worlds": azusa_v1.CONDUIT_OF_WORLDS,
         "Cultivator Colossus": azusa_v1.CULTIVATOR_COLOSSUS,
         "Case of the Locked Hothouse": azusa_v1.CASE_OF_THE_LOCKED_HOTHOUSE,

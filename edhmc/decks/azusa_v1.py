@@ -654,6 +654,32 @@ EXPEDITION_MAP = C(
 # whatever it is, because casting it cannot make anything else unaffordable.
 ZURAN_ORB = C("Zuran Orb", "Artifact", {}, priority=5.0, threat=0.5)
 
+# ---------------------------------------------------------------------------
+# 2026-09-16 fifth batch. Oracle text verified against api.scryfall.com the
+# same day; see edhmc/pending.py's PROPOSED entries for the text and the
+# argument for each. All three are MONO-GREEN, which is not a throwaway remark:
+# two earlier proposals in this batch (Felidar Retreat, Omnath Locus of Rage)
+# were off-colour for this deck and were caught by check_proposals().
+# ---------------------------------------------------------------------------
+# "Whenever a nontoken creature you control enters, if it doesn't have the
+# same name as another creature you control or a creature card in your
+# graveyard, draw a card." Hooked in make_permanent beside The Great Henge.
+GUARDIAN_PROJECT = C("Guardian Project", "Enchantment", {"gen": 3, "G": 1},
+                     priority=7.5, threat=2.0)
+
+# "Return all land cards from your graveyard to the battlefield tapped."
+# Each returned land is its own landfall trigger.
+SPLENDID_RECLAMATION = C("Splendid Reclamation", "Sorcery", {"gen": 3, "G": 1},
+                         priority=7.0, threat=0.0,
+                         script="splendid_reclamation")
+
+# "Landfall -- whenever a land you control enters, create a 2/2 green
+# Elemental creature token." The Rampaging Baloths shape, smaller body.
+ZENDIKARS_ROIL = C("Zendikar's Roil", "Enchantment", {"gen": 3, "G": 2},
+                   priority=7.5, threat=4.0)
+
+BATCH5_CANDIDATES = (GUARDIAN_PROJECT, SPLENDID_RECLAMATION, ZENDIKARS_ROIL)
+
 BATCH4_CANDIDATES = (NISSA_RESURGENT_ANIMIST, TRAVELING_CHOCOBO,
                      ARCHDRUIDS_CHARM, AWAKEN_THE_WOODS,
                      EXPEDITION_MAP, ZURAN_ORB)
