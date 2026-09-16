@@ -72,6 +72,7 @@ Methodology that used to live at the end of this file is now
 | [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
 | [0z23](#0z23) | **CLOSED** | the generated cache manifest described ten files that no longer existed, and the four survivors were all stale. **Resolved by deleting them: nothing is tracked now** |
+| [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4225,6 +4226,85 @@ closing a session.
 ---
 
 <a id="1"></a>
+
+## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
+
+**Found 2026-09-16 during the six-deck regeneration**, from the only three
+label changes in the rendmaw table. All three turned out to be the same
+defect, and none of them was a fact about a card.
+
+### The mechanism
+
+`tools/ablation.py:1175-1179` classifies a row, then overrides it:
+
+```python
+sig = ("both" if d_sig and w_sig else
+       "dmg" if d_sig else "win" if w_sig else "--")
+if len(HORIZONS) > 1 and len({np.sign(results[n][h]["damage"][0])
+                              for h in hz}) > 1:
+    sig = "FLIP"
+```
+
+The first statement is significance-tested — `d_sig` and `w_sig` compare a
+point estimate against its own CI half-width. **The override is not.** It reads
+`np.sign()` of the raw damage point estimate at each horizon and fires whenever
+the two disagree, however small either is. For a card whose damage is
+statistically zero, that sign is a coin flip.
+
+### The demonstration
+
+Three rows changed label between two runs of the SAME code on the SAME seeds:
+
+| card | what moved | label |
+|---|---|---|
+| Toxic Deluge | damage T10 `-0.00` -> `+0.00` | `FLIP` -> `both` |
+| Culling Ritual | damage T20 `+0.09` -> `+0.09` | `win` -> `both` |
+| Biotransference | damage T20 `+0.00` -> `-0.00` | `--` -> `FLIP` |
+
+**Biotransference is the clean case.** Its win rate is IDENTICAL across the two
+runs — `+0.0005 +-0.0010` both times — and its damage T20 displays as zero in
+both. The only thing that changed is the sign of a number that rounds to
+`0.00`, and the row's label changed with it.
+
+### The survey
+
+Across all 379 rows in the six committed tables, 22 carry `FLIP`:
+
+- **9 of 22** have damage inside its own error bar at BOTH horizons, so the
+  sign the override reads is noise for every one of them;
+- **11 of 22** would be labelled `--` on their own merits.
+
+**That last number is why this is OPEN rather than cosmetic.** `--` means "the
+card is indistinguishable from a blank — not a weak card, an unmeasured one",
+and the whole discipline of this project's tables is that an unmeasured row is
+never read as a verdict. `FLIP` overrides that label with something that reads
+as a *stronger* claim — the card's effect reverses with the horizon — on
+exactly the rows with the least evidence behind them.
+
+### What `FLIP` gets right, and must keep doing
+
+The other half of the rows are real and are what the signal exists for. Damn,
+Wrath of God, Promise of Loyalty and Mechanized Production all have damage
+significant at BOTH horizons with opposite signs — a board wipe costs damage
+early and pays it back late, which is a genuine horizon-dependent effect and
+worth its own label. **The fix is to gate the override, not to remove it.**
+
+### And it is in no legend
+
+`FLIP` appears in neither the legend `ablation.py` prints at the top of every
+table (which defines four signals: `both`, `dmg`, `win`, `--`) nor `CLAUDE.md`'s
+reporting rule, which names the same four. `tools/status.py:56` knows it exists
+and `docs/HISTORY.md` explains it, but the legend a reader actually sees does
+not. 22 rows across six tables print a signal their own table never defines.
+
+### Not fixed here
+
+Gating the override on significance is a change to `tools/ablation.py`, which
+is in `cache_manifest.SHARED` and therefore in all six decks' source
+fingerprints. Making it during the regeneration that produced this finding
+would have marked every cache that run produced stale on arrival. Sequencing,
+not doubt: the fix is a one-line condition plus the legend, and the row it
+changes is a LABEL, not a measurement — no committed number moves.
 
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
 
