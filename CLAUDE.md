@@ -555,6 +555,20 @@ describes itself as the weakest link in the engine; item 17 is now a
 precondition for committing a staged swap rather than a tidy-up. Neither
 ordering is measured — that is the honest statement of it.
 
+20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
+    `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10
+    and +0.0247 ±0.0035 at T20**) and `-Plains +Anointed Procession` (tivit,
+    **+0.0113 ±0.0026 / +0.0145 ±0.0040**), both significant at BOTH horizons.
+    **The real swap is SMALLER than the candidate row in both cases** — the
+    candidate number is value over a blank in a freed slot, the swap also pays
+    for what it cut, and §0c says the swap is the number a decision rests on.
+    Tivit's cut is a basic Plains (36 lands → 35) because that deck has no
+    weak nonland row; **a land cut is the kind of change this harness
+    flatters**, so read it with that in mind. Two more are explicitly HELD:
+    Alhammarret's Archive on the owner's playtest experience — which the
+    model's own counter corroborates, 0.40 extra draws a game — and Parallel
+    Lives as too expensive for what it does.
+
 20. **ALL THIRTEEN LIVE PROPOSALS ARE NOW MEASURED** (§0z25, §0z26), across
     five decks and four engines. The two largest: **Guardian Project +0.0481
     ±0.0042** (azusa — the biggest candidate number that deck has ever

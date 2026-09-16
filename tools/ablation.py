@@ -278,6 +278,12 @@ SCRIPTED_KARLOV = {
 # whose text is only approximated belongs in KNOWN_BLIND even when it has
 # engine code -- that distinction is the one this project has got wrong twice.
 SCRIPTED_TIVIT = {
+    # 2026-09-16 (§0z26). Doubles BOTH of this engine's token paths --
+    # make_tokens() for creature tokens and the module-level
+    # make_token() for the Clue/Food/Treasure piles. Fully implemented,
+    # so a low score would be evidence about the card.
+    "Anointed Procession",
+
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
@@ -471,6 +477,21 @@ SCRIPTED_AZUSA = {
 # on an empty reason, and the reason is PRINTED in the table, so the row
 # carries its own caveat to whoever reads it next.
 PARTLY_MODELLED = {
+    "karlov": {
+        "Bloodthirsty Conqueror":
+            "Its text -- 'whenever an opponent loses life, you gain that much "
+            "life' -- is WORD FOR WORD Exquisite Blood's, and this engine "
+            "models that text as a COMBO DETECTOR rather than as a continuous "
+            "trigger: it closes the loop with Sanguine Bond, Vito and "
+            "Enduring Tenacity and does nothing the rest of the game. So the "
+            "lifegain it would generate off every point the pod loses, all "
+            "game, is UNMODELLED for this card exactly as it is for Exquisite "
+            "Blood. Giving the newer card the general trigger and not the "
+            "older one would have made a strictly-worse card measure strictly "
+            "better, which is §0u's shape -- so both are understated by the "
+            "same amount and both rows are FLOORS. The 5/5 flying deathtouch "
+            "body IS modelled. §0z26.",
+    },
     "rendmaw": {
         "Scrap Trawler":
             "Its own-death trigger is implemented (2026-09-13, §0z19) and "

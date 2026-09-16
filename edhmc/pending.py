@@ -705,7 +705,17 @@ MEASURED: list[Candidate] = [
         evidence="damage +1.45 +-0.14, P(deploy) 0.203.",
         limits=("Stacks multiplicatively with Primal Vigor, which is already "
                 "in the list, so the pair is worth more than the sum -- "
-                "leave-one-out understates both. Ablate them together."),
+                "leave-one-out understates both. Ablate them together. "
+                "HELD, NOT STAGED, 2026-09-16: the deck's owner reads four "
+                "mana for a do-nothing enchantment as expensive, and that is "
+                "a cost this model systematically under-charges -- a card "
+                "that affects no board until the NEXT token is made is "
+                "exactly the kind the engine flatters, because nothing here "
+                "punishes a wasted turn. P(deploy) is 0.203, so four games in "
+                "five it never resolves at all. If it is revisited, measure "
+                "the REAL swap against a named cut rather than this "
+                "candidate-vs-blank row, and consider ablating it beside "
+                "Primal Vigor to see what the pair is worth."),
     ),
     Candidate(
         deck="karlov", card="Alhammarret's Archive", measured="2026-09-16",
@@ -719,7 +729,20 @@ MEASURED: list[Candidate] = [
             "step and the card explicitly exempts it. Nearly all the value is "
             "the lifegain doubler. It doubles the AMOUNT, never the EVENT "
             "COUNT, so Karlov's own counter still gets two per trigger -- the "
-            "distinction this engine is built around."),
+            "distinction this engine is built around. "
+            "NOT STAGED, AND THE REASON IS PLAYTEST EVIDENCE THE MODEL CANNOT "
+            "SEE. The deck's owner has run this card at real tables and "
+            "reports it did not deliver: at five mana it needs to be "
+            "high-impact, and the card draw does not trigger often enough. "
+            "THE MODEL AGREES ON THE MECHANISM AND THAT CONVERGENCE IS THE "
+            "POINT -- 0.40 extra draws a game is the same complaint stated as "
+            "a counter, arrived at independently. Where they differ is the "
+            "VERDICT: the engine scores +0.0129 on the lifegain doubler "
+            "alone, and it cannot price what a five-mana do-nothing artifact "
+            "costs at a real table, because opponents here hold no removal to "
+            "aim at it and no tempo to punish it (§4). Treat the row as a "
+            "measurement of the lifegain half in isolation, which is what it "
+            "is, and the table result as the better guide to the whole card."),
     ),
     Candidate(
         deck="lorehold", card="Past in Flames", measured="2026-09-16",
@@ -1302,6 +1325,79 @@ MEASURED: list[Candidate] = [
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
+    Change(
+        deck="karlov", remove="Soulmender", add="Bloodthirsty Conqueror",
+        staged="2026-09-16",
+        rationale=(
+            "A SECOND EXQUISITE BLOOD ON A 5/5 FLYING DEATHTOUCH BODY -- word "
+            "for word the same trigger, so it is redundancy on the package "
+            "this deck actually wins with (the three loop partners ablate to "
+            "+0.0513 as a GROUP). The cut is the cheapest in the list: "
+            "Soulmender ablates to -0.0011 +-0.0011, signal `win`, which is "
+            "SIGNIFICANTLY NEGATIVE -- a 1/1 that gains one life per trigger "
+            "in a deck whose payoffs count events and whose curve wants more."),
+        evidence=(
+            "THE REAL SWAP, not the candidate-vs-blank row. N=15,000 paired, "
+            "same seeds both legs: win rate +0.0257 [+0.0229, +0.0285] at "
+            "T10 and +0.0247 [+0.0212, +0.0282] at T20, significant at BOTH "
+            "horizons, against baselines of 0.1226 and 0.3486. The §0z26 "
+            "candidate row was +0.0328 +-0.0033 against a blank in the freed "
+            "slot; the swap is smaller because it also pays for losing "
+            "Soulmender, and the swap is the number the decision rests on "
+            "(§0c). Damage is -1.46 / -2.57 and that is the MECHANISM, not a "
+            "cost: the extra wins arrive by the combo route, which ends the "
+            "game before the board deals damage. Combo wins 0.312 -> 0.375."),
+        notes=(
+            "A FLOOR, for §0u's reason rather than §4's. This engine models "
+            "Exquisite Blood's text as a COMBO DETECTOR and not as the "
+            "continuous 'gain life whenever an opponent loses life' it is, "
+            "and the new card inherits that treatment exactly -- giving the "
+            "new card the general trigger and not the old one would have made "
+            "a strictly-worse card measure strictly better. Both cards are "
+            "understated by the same amount. REDUNDANT BY DESIGN: ablate it "
+            "with Exquisite Blood and the loop partners, never alone. "
+            "MEASURED ON THE STAGED LIST, which is the right baseline and is "
+            "said out loud because §0p showed two staged lorehold changes can "
+            "interact: `build_pending('karlov')` already applies -Swamp "
+            "+Bolas's Citadel, so this swap was measured with the Citadel IN. "
+            "The two cut different cards and neither touches the other's "
+            "mechanism, but they have not been measured as a 2x2 and that is "
+            "the check §0p exists for if both are committed together."),
+    ),
+    Change(
+        deck="tivit", remove="Plains", add="Anointed Procession",
+        staged="2026-09-16",
+        rationale=(
+            "Doubles BOTH token streams -- artifacts_made 51.3 -> 67.1 and "
+            "treasures_made 22.9 -> 31.2 a game -- and Academy Manufactor, "
+            "Marionette Master, Disciple of the Vault and Time Sieve all read "
+            "those piles, so one card feeds four payoffs. "
+            "THE CUT IS A BASIC PLAINS AND THAT IS A DELIBERATE CHOICE, not a "
+            "failure to find a better one: tivit has NO weak nonland row. Its "
+            "worst MODEL-EVALUATED card is Tamiyo's Journal at +0.0015 "
+            "+-0.0017, inside its own bar, so naming a spell as the cut would "
+            "assert a verdict the table does not support. 36 lands -> 35."),
+        evidence=(
+            "THE REAL SWAP, N=15,000 paired, same seeds both legs: win rate "
+            "+0.0113 [+0.0087, +0.0139] at T10 and +0.0145 [+0.0105, +0.0185] "
+            "at T20, significant at BOTH horizons, against baselines of "
+            "0.1083 and 0.3265. THE CANDIDATE ROW WAS +0.0291 +-0.0034 and "
+            "the swap is HALF that -- the difference is the land. Read the "
+            "+0.0291 as value over a blank in a freed slot and this as what "
+            "the deck actually gains, which is the number that decides it."),
+        notes=(
+            "WATCH TIME SIEVE (§0m): it eats only TOKEN artifacts, so "
+            "doubling the token stream makes the extra-turn loop materially "
+            "easier and `sieve_cap` stops being decorative. Extra turns "
+            "measured essentially flat here (0.505 -> 0.485 in the mechanism "
+            "run), so the loop is not what is driving the win rate -- but "
+            "that is the knob to sweep before committing. "
+            "GOING TO 35 LANDS IS THE REAL RISK and it is not visible in "
+            "this number: the model's mulligan and land-drop behaviour is "
+            "simpler than a real pilot's, so a land cut is the kind of change "
+            "this harness flatters. Committing needs the .xlsx and the module "
+            "to move with the ledger -- tivit has all three legs."),
+    ),
 
     Change(
         deck="karlov",
