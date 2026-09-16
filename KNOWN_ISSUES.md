@@ -4281,6 +4281,19 @@ never read as a verdict. `FLIP` overrides that label with something that reads
 as a *stronger* claim — the card's effect reverses with the horizon — on
 exactly the rows with the least evidence behind them.
 
+**INSTABILITY IS HOW THIS WAS NOTICED, NOT WHAT IS WRONG WITH IT** (added
+2026-09-16, from the tivit leg of the same run). All five of tivit's FLIP rows
+held their label across the regeneration, **including Propaganda, which is one
+of the nine rows above whose damage is inside its own bar at both horizons**. A
+noise-FLIP therefore does not necessarily move between runs; rendmaw happened
+to show three that did.
+
+The defect is that the label is UNSUPPORTED on those rows, not that it changes
+run to run. A row whose damage is statistically zero is handed a claim that its
+effect reverses with the horizon whether or not the sign happens to flip on the
+next regeneration, and there is no evidence behind that claim either way. The
+fix is unchanged: gate the override on significance.
+
 ### What `FLIP` gets right, and must keep doing
 
 The other half of the rows are real and are what the signal exists for. Damn,
