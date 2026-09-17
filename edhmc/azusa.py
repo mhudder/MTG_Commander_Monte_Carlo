@@ -802,6 +802,8 @@ class AzusaGame:
         if (card.is_creature and not is_token
                 and card.name != "The Great Henge" and self.has("The Great Henge")):
             perm.counters += 1
+            self.draw(1)
+            self.m["henge_draws"] += 1
         # GUARDIAN PROJECT: "Whenever a NONTOKEN creature you control enters,
         # if it doesn't have the same name as another creature you control or
         # a creature card in your graveyard, draw a card."
@@ -829,8 +831,14 @@ class AzusaGame:
             if not (same_board or same_yard):
                 self.draw(1)
                 self.m["guardian_project_draws"] += 1
-            self.draw(1)
-            self.m["henge_draws"] += 1
+        # TWO CARDS, ONE HOOK, AND THE §0z28 INDENTATION. The Henge's draw
+        # used to sit AFTER this block, and inserting the Guardian Project
+        # branch between the Henge's counter and its draw swallowed the draw
+        # into this `if`: the Henge stopped drawing and Guardian Project drew
+        # twice per creature, which is how it measured +0.0481 (§0z25). Each
+        # card's draw now lives inside its own `if`, and
+        # tests/test_azusa_batch3.py pins the Henge's; run `python -m tests`
+        # after touching either.
         # ASHAYA: A NONTOKEN CREATURE ENTERING IS A LAND ENTERING, AND THAT
         # FIRES LANDFALL. The official ruling is explicit and it is the
         # opposite of what docs/COMP_RULES.md used to say:

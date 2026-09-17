@@ -73,7 +73,8 @@ Methodology that used to live at the end of this file is now
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
 | [0z23](#0z23) | **CLOSED** | the cache manifest described ten files that no longer existed, and "delete any cache whose fingerprint differs" was too expensive to obey. **Replaced by BUILT-AT provenance and a seconds-long evidence check** |
 | [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
-| [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured; Guardian Project is +0.0481, the deck's largest candidate ever** — and one proposal's own rationale was backwards |
+| [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured** — and one proposal's own rationale was backwards. **Guardian Project's +0.0481 was measured on a doubled draw and is corrected to +0.0279 in §0z28** |
+| [0z28](#0z28) | FIXED | **The Great Henge's draw was swallowed into Guardian Project's branch, so one drew never and the other drew twice** — and the test that pinned it had been failing for three commits with nothing running it |
 | [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
 | [0z27](#0z27) | MEASURED | **two swaps staged on head-to-head evidence, and the karlov regeneration shows redundancy rewriting five rows at once** |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
@@ -4258,6 +4259,15 @@ the fingerprint move", which is answerable instantly and is the wrong question.
 
 ## 0z25. MEASURED — three azusa cards implemented and measured, and the biggest number came with the biggest caveat
 
+> **CORRECTED 2026-09-17, §0z28.** The Guardian Project row below was measured
+> on code where The Great Henge's `draw(1)` had been swallowed into Guardian
+> Project's `if`, so the card drew TWICE per nontoken creature. Re-measured on
+> the same slot, N and horizon after the fix: **+0.0279 ±0.0036**, not +0.0481.
+> The "upper bound" argument below read `guardian_project_draws`, and the extra
+> draw was credited to `henge_draws`, which is why it held with equality and
+> certified nothing. Zendikar's Roil and Splendid Reclamation are unaffected —
+> the swallowed lines fire only with Guardian Project on the battlefield.
+
 Batch 5, 2026-09-16. Oracle text verified from `api.scryfall.com` the same day
 (access to it had just been restored — see `CLAUDE.md`'s network note). Same
 **Sylvan Library** victim slot as batches 3 and 4, so all sixteen candidate
@@ -4537,6 +4547,73 @@ the SIMULATION move"; re-rendering from cache answers "did the TABLE move"; and
 neither answers "did the BASELINE LIST move", which only a rebuild can settle.
 Match the check to what actually changed — a fingerprint moving does not tell
 you which of the three it was.
+
+
+---
+
+<a id="0z28"></a>
+
+## 0z28. FIXED — two cards on one hook, one indentation apart; and a failing test nobody ran
+
+**The defect.** `azusa.make_permanent` hooks "a nontoken creature you control
+enters" for The Great Henge (counter + draw) and, since §0z25, for Guardian
+Project (draw, gated on the name clause). The §0z25 commit (`527d7da`)
+inserted the Guardian Project block BETWEEN the Henge's `perm.counters += 1`
+and its `self.draw(1)`, so the Henge's draw and its `henge_draws` counter
+landed inside `if … self.has("Guardian Project")`. Net effect, from
+`527d7da` to the fix:
+
+* **The Great Henge drew nothing.** Counter yes, card no.
+* **Guardian Project drew twice per eligible creature** — once under its own
+  name clause, once as the Henge's orphaned line — and was measured in that
+  same commit.
+
+**How it was found.** Not by a number. `tests/test_azusa_batch3.py` pins the
+Henge's draw ("draws off a nontoken creature, not off tokens", "draws off a
+TUTORED creature too") and had been failing since `527d7da` — checked by
+running it at `5dc60f5` (15/15) and `1d7298a` (13/15). Every test module in
+`tests/` was honest about its exit code; **nothing ran them.** No runner, no
+CI, and the session-close protocol listed `check_docs`, `pending` and
+`validate` and not the tests. `python -m tests` exists now and is in the
+protocol.
+
+**Why §0z25's own check did not catch it.** It compared
+`guardian_project_draws` (3.60/game) to eligible nontoken ETBs (3.60/game)
+and read the equality as a proved bound. The extra draw was credited to
+`henge_draws`, a counter nobody read for a card that was not in the list.
+`cards_drawn` (+5.30) against `guardian_project_draws` (3.60) was the visible
+gap, and it was explained away as cascade. **A mechanism counter certifies
+only what it counts; check `cards_drawn` against the SUM of every draw
+counter.**
+
+**Corrected measurement.** `python -m diagnostics.run_guardian_henge`,
+`results/guardian_henge.txt` — same method as §0z25 (`candidates.add_value`,
+Sylvan Library slot, T20, N=15,000 paired), so the rows sit on the same scale:
+
+| card | win rate T20 | damage | cards_drawn | own draw counter | other card's counter |
+|---|---|---|---|---|---|
+| Guardian Project | **+0.0279 ±0.0036** (was +0.0481 ±0.0042) | +2.13 ±0.23 | +2.53 ±0.14 | 2.76 | 0.00 |
+| The Great Henge | **+0.0242 ±0.0034** (2026-09-10: +0.0217 ±0.0034) | +1.95 ±0.22 | +1.99 ±0.13 | 2.30 | 0.00 |
+
+Guardian Project loses 42% of its number and lands **inside the bars of
+Traveling Chocobo (+0.0291 ±0.0040) and Nissa, Resurgent Animist (+0.0285
+±0.0041)**: a member of the deck's top candidate SET, not its first. The
+Henge's corrected row agrees with its pre-bug row within a third of a bar,
+which is the fix restoring the card rather than changing it. Each card's
+counter is zero when the other is under test, which is the cross-check that
+would have failed before.
+
+**What did NOT move.** Neither card is in the built azusa list, so the
+committed table, the cache and every other candidate row are unaffected —
+`tools/check_unchanged_decks.py` against a worktree at `3234bee`: BIT-IDENTICAL
+on all 8 metrics for all six decks, recorded on the azusa cache. **That check
+answers "did the deck move", not "is the card right"** — a broken candidate
+implementation is invisible to it by construction, which is why the card's
+own test is the only guard.
+
+**The lessons, promoted to `CLAUDE.md` without their dates:** a test that is
+not run does not exist; two cards on one hook are one indentation apart;
+read `$?` only from an unpiped command.
 
 
 <a id="1"></a>

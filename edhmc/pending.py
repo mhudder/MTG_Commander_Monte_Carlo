@@ -818,22 +818,28 @@ MEASURED: list[Candidate] = [
     # and 4, so these rows sit on one scale with those thirteen.
     Candidate(
         deck="azusa", card="Guardian Project", measured="2026-09-16",
-        win_rate="+0.0481 +-0.0042 at T20 (N=15,000 paired)", signal="both",
+        win_rate="+0.0279 +-0.0036 at T20 (N=15,000 paired) -- CORRECTED "
+                 "2026-09-17, §0z28; the 2026-09-16 figure of +0.0481 +-0.0042 "
+                 "was measured with the card drawing twice", signal="both",
         rationale=(
-            "THE LARGEST CANDIDATE NUMBER EVER MEASURED FOR THIS DECK -- ahead "
-            "of Traveling Chocobo (+0.0291) and Nissa Resurgent Animist "
-            "(+0.0285), and just under Scute Swarm's own ablation row "
-            "(+0.0518). It is the purest attack yet on the CARD constraint "
-            "that §0z4 and §0z21 both identified: every card that attacked it "
-            "passed and the one pure MANA card failed."),
+            "A MEMBER OF THE DECK'S TOP CANDIDATE SET, not its first: inside "
+            "the bars of Traveling Chocobo (+0.0291) and Nissa Resurgent "
+            "Animist (+0.0285). Still the purest attack on the CARD constraint "
+            "that §0z4 and §0z21 both identified. The 2026-09-16 number was "
+            "measured on code where The Great Henge's draw had been swallowed "
+            "into this card's branch (§0z28), so it drew two cards per "
+            "creature; the corrected row is 42% smaller."),
         evidence=(
-            "damage +3.73 +-0.29, cards_drawn +5.30 +-0.22, landfall_triggers "
-            "+1.53 +-0.10, lands_played +0.61 +-0.05, P(deploy) 0.315. The "
-            "draw counter is 3.60 a game unconditionally, about 11 per "
-            "resolution. THE UPPER BOUND WAS CHECKED RATHER THAN ASSUMED: "
-            "draws (3.60) equal eligible nontoken-creature ETBs with the "
-            "enchantment out (3.60) EXACTLY, and it never fires off the "
-            "224.87 token ETBs a game -- so it cannot be over-triggering."),
+            "diagnostics/run_guardian_henge.py, results/guardian_henge.txt: "
+            "damage +2.13 +-0.23, cards_drawn +2.53 +-0.14, "
+            "guardian_project_draws 2.76/game, henge_draws 0.00, "
+            "landfall_triggers +0.91 +-0.08, lands_played +0.43 +-0.04, "
+            "P(deploy) 0.315. The counters now cross-check: cards_drawn is "
+            "within a cascade of the card's OWN counter and the other card's "
+            "counter is zero. The §0z25 'upper bound' compared "
+            "guardian_project_draws to eligible ETBs and could not see a "
+            "draw credited to henge_draws -- check cards_drawn against the "
+            "SUM of every draw counter, not against one."),
         limits=(
             "THE NAME CLAUSE IS INERT IN A SINGLETON LIST and that is why the "
             "two counts are equal. 'If it doesn't have the same name as "
@@ -2097,7 +2103,7 @@ PROPOSED: list[Proposal] = [
                    "built. The same-name clause needs a real check against "
                    "battlefield AND graveyard, and Scute Swarm's copies are "
                    "TOKENS, so they must not trigger it."),
-        rejected='MEASURED 2026-09-16 and PROMOTED to MEASURED: +0.0481 +-0.0042 win rate at T20, N=15,000, Sylvan Library slot (§0z25). See the Candidate entry.',
+        rejected='MEASURED 2026-09-16 and PROMOTED to MEASURED: +0.0279 +-0.0036 win rate at T20, N=15,000, Sylvan Library slot -- CORRECTED from +0.0481 in §0z28, which is where the §0z25 number went wrong. See the Candidate entry.',
     ),
     Proposal(
         deck="azusa", card="Splendid Reclamation", cost="{3}{G}", identity="G",

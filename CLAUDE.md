@@ -324,6 +324,25 @@ for its NAME.** This is the inverse of the standing "a card scoring like a
 blank usually means the engine made it one" — here the engine had done the
 work and the reader could not see it.
 
+**A TEST THAT IS NOT RUN DOES NOT EXIST** (§0z28). Thirteen test modules,
+each honest about its exit code, and nothing ran them: a test pinning The
+Great Henge's draw failed for three commits while the card it shared a hook
+with was being reported as the deck's largest candidate ever. `python -m
+tests` runs them all and is in the closing checklist; `check_docs` cannot do
+this job, because it checks that the docs describe the repo, not that the
+engine does what the tests say. And read `$?` only from a command that was
+not piped.
+
+**TWO CARDS ON ONE HOOK ARE ONE INDENTATION APART** (§0z28). The Great Henge
+and Guardian Project both read "a nontoken creature entered" in
+`azusa.make_permanent`; inserting the second between the first's counter
+and its draw moved the draw into the new `if`. The Henge stopped drawing,
+Guardian Project drew twice, and the "upper bound" that certified it read
+the counter the extra draw was NOT credited to. **When you add to a shared
+hook, re-run the test that pins its neighbour, and check `cards_drawn`
+against the SUM of every draw counter** -- a draw credited to the wrong
+counter looks correct from the counter it was supposed to hit.
+
 **SUBTYPES ARE DATA, AND THEY COME FROM SCRYFALL** (2026-09-10, §0z4).
 `Card.types` holds CARD types, never creature or land subtypes, so a card that
 reads one — Return of the Wildspeaker's "non-Human", Sapling Nursery's
@@ -605,10 +624,11 @@ ordering is measured — that is the honest statement of it.
     Lives as too expensive for what it does.
 
 20. **ALL THIRTEEN LIVE PROPOSALS ARE NOW MEASURED** (§0z25, §0z26), across
-    five decks and four engines. The two largest: **Guardian Project +0.0481
-    ±0.0042** (azusa — the biggest candidate number that deck has ever
-    produced) and **Bloodthirsty Conqueror +0.0328 ±0.0033** (karlov, a second
-    Exquisite Blood on a body). Four rows are FLOORS with the missing clause
+    five decks and four engines. The two largest: **Bloodthirsty Conqueror
+    +0.0328 ±0.0033** (karlov, a second Exquisite Blood on a body) and
+    **Guardian Project +0.0279 ±0.0036** (azusa — CORRECTED in §0z28 from the
+    +0.0481 first reported, which was measured with the card drawing twice;
+    it is now inside the bars of Chocobo and Nissa, a member of the top set). Four rows are FLOORS with the missing clause
     named, and two are blanks explained by mechanism rather than by win rate —
     Sai makes 0.155 Thopters a game in a deck producing 51 artifacts, because
     it reads artifact SPELLS and tivit makes artifact TOKENS. **NOTHING IS
@@ -622,8 +642,9 @@ ordering is measured — that is the honest statement of it.
 20-old2. **The previous entry.**
     **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
     THREE ARE DONE (§0z25, azusa batch 5, 2026-09-16): **Guardian Project
-    +0.0481 ±0.0042** — the largest candidate number ever measured for that
-    deck, with its upper bound checked rather than believed — Zendikar's Roil
+    +0.0481 ±0.0042** — reported then as the largest candidate number ever
+    measured for that deck "with its upper bound checked"; **the bound read
+    the wrong counter and the number is +0.0279 ±0.0036 (§0z28)** — Zendikar's Roil
     +0.0133 ±0.0029, and Splendid Reclamation −0.0013 ±0.0022, a blank whose
     proposal rationale was **backwards** (the deck's Loam/Excavator/Crucible
     package drains the graveyard it wanted to read). **TWO MORE ARE DEAD:**
