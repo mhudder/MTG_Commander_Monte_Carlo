@@ -392,6 +392,12 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "9f0b2921b413382a",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "aac99db",
+        "evidence": "2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.",
+        "fingerprint": "e6d99320e0b6aeec",
+        "utc": "2026-09-17T15:54:30Z"
       }
     ]
   }

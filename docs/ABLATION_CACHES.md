@@ -53,9 +53,9 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `c6d604a`.
+Generated at `aac99db`.
 
-**6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `NOTES`.
+**6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
 **§0z23 is why the rule above exists.** Ten caches — every
 `_medblank` one at N=15,000, which is to say every cache that had
@@ -80,8 +80,8 @@ signal that said otherwise. **Never regenerate this file to silence a
 staleness warning.** Regenerate it when the caches themselves change.
 
 A cache is added here in the same commit that produces it, with its
-note in `NOTES` — that is what makes the fingerprint above mean
-anything.
+note in `results/caches/NOTES.json` (`--note`) — that is what makes
+the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
@@ -130,10 +130,11 @@ anything.
   - verified at `033be98edd639093` (`9f226af`, 2026-09-17T14:36:38Z): 2026-09-17 §0z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).
   - verified at `c8c6dde1449f4f51` (`774b8ef`, 2026-09-17T15:13:26Z): 2026-09-17 §0z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.
   - verified at `31907d899b578da5` (`c6d604a`, 2026-09-17T15:40:28Z): 2026-09-17 §0z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `444d30671994398f`; fingerprint has since moved to `9f0b2921b413382a` and was CHECKED at `c6d604a` (2026-09-17T15:40:28Z): 2026-09-17 §0z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `444d30671994398f`; fingerprint has since moved to `e6d99320e0b6aeec` and was CHECKED at `aac99db` (2026-09-17T15:54:30Z): 2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.
   - verified at `7cbb110661f3a784` (`9f226af`, 2026-09-17T14:36:37Z): 2026-09-17 §0z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).
   - verified at `ef7d84cc653e832c` (`774b8ef`, 2026-09-17T15:13:26Z): 2026-09-17 §0z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.
   - verified at `9f0b2921b413382a` (`c6d604a`, 2026-09-17T15:40:28Z): 2026-09-17 §0z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.
+  - verified at `e6d99320e0b6aeec` (`aac99db`, 2026-09-17T15:54:30Z): 2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.
 
 ## What each fingerprint covers
 

@@ -79,6 +79,35 @@ ACKNOWLEDGED = {
 }
 
 
+# LEGACY SWITCHES -- knobs that exist only to reproduce a rule the project
+# has since corrected (L5 of the 2026-09-17 review). Each is the "off switch"
+# a finding left behind so its measurement could be re-run against the old
+# behaviour. THE POLICY: a legacy switch is kept while a committed number or
+# a diagnostic cites the comparison it enables, and is a candidate for
+# removal once every table that could see the difference has been rebuilt on
+# the corrected rule -- an untested branch is a claim about the engine that
+# nothing exercises. The value is what the switch restores. `render()`
+# raises if a name here is no longer read by any engine, so this list cannot
+# outlive the knobs it describes (§0q).
+LEGACY = {
+    "another_creature_clause": "karlov's lifegain triggers firing on the commander's own entry",
+    "ashaya_lands": "azusa lands not counting as creatures under Ashaya (pre-§0z18)",
+    "combat_split": "the whole attack at one defender (pre-§0v)",
+    "copy_etb": "token copies not re-triggering ETBs (pre-§0z5)",
+    "copy_legend_rule": "legendary copies kept alongside the original",
+    "crn_streams": "mid-game randomness read in order from the game RNG (pre-§0z17)",
+    "land_animation": "the pre-2026-09-10 land-animation policy (\"legacy\")",
+    "land_creature_sick": "animated lands attacking the turn they entered",
+    "mana_colour_legacy": "count-based colour payment (pre-§0z8)",
+    "own_wipe_commander_returns": "a commander lost to its owner's wipe",
+    "own_wipe_indestructible": "indestructible creatures dying to their owner's wipe",
+    "pod_damage_full_pod": "pod damage divided by the living count instead of the full pod",
+    "pod_reads_battlefield_creatures": "the pod reading creature TYPE LINES instead of the battlefield",
+    "sieve_taps": "Time Sieve not tapping the artifacts it sacrifices (pre-§0m)",
+    "tivit_sweepers": "tivit's wipe tags dormant (pre-§0z12)",
+}
+
+
 class Read:
     """One `cfg.get("name", default)` call site."""
 
@@ -204,6 +233,12 @@ def _md_paths() -> list[str]:
 
 
 def _caller_paths() -> list[str]:
+    """Every script that could SET a knob -- minus this file, which NAMES
+    every legacy switch in `LEGACY` and would otherwise report each as
+    swept. (It did, for one regeneration, 2026-09-17: fifteen knobs read as
+    flipped by a dict that describes them. A checker's own registry is not
+    a caller -- the `SELF` exclusion `check_docs.py` already makes.)"""
+    self_path = os.path.normpath(os.path.abspath(__file__))
     out = []
     for d in CALLER_DIRS:
         if not os.path.isdir(d):
@@ -211,7 +246,10 @@ def _caller_paths() -> list[str]:
         for root, _dirs, files in os.walk(d):
             for f in sorted(files):
                 if f.endswith((".py", ".sh")):
-                    out.append(os.path.join(root, f))
+                    p = os.path.join(root, f)
+                    if os.path.normpath(os.path.abspath(p)) == self_path:
+                        continue
+                    out.append(p)
     return sorted(out)
 
 
@@ -231,6 +269,11 @@ def render() -> str:
     docs_text = _text_of(_md_paths())
     calls_text = _text_of(_caller_paths())
     bad = conflicts(reads)
+    stale = sorted(n for n in LEGACY if n not in reads)
+    if stale:
+        raise SystemExit(f"tools/knobs.py LEGACY names knobs no engine reads "
+                         f"any more: {stale} -- remove them from LEGACY (the "
+                         f"switch is gone, which is the policy working).")
 
     undocumented = [n for n in reads if n not in docs_text]
     unswept = [n for n in reads if n not in calls_text]
@@ -300,6 +343,31 @@ def render() -> str:
         default = "**conflicts**" if name in bad else f"`{first.default}`"
         w(f"| `{name}` | {default} | {len(rs)} | `{first.where}` | {sec} | "
           f"{in_docs} | {swept} |")
+    w("")
+
+    w("## Legacy switches")
+    w("")
+    w("Knobs that exist only to reproduce a rule the project has since")
+    w("corrected — the off switch a finding left behind so its measurement")
+    w("could be re-run against the old behaviour. **Policy:** a legacy switch")
+    w("is kept while a committed number or a diagnostic cites the comparison")
+    w("it enables, and is a candidate for removal once every table that could")
+    w("see the difference has been rebuilt on the corrected rule. An untested")
+    w("branch is a claim about the engine that nothing exercises. The list is")
+    w("`tools/knobs.py`'s `LEGACY`; the generator refuses to run if a name")
+    w("there is no longer read by any engine.")
+    w("")
+    w("| switch | default | restores | swept |")
+    w("|---|---|---|---|")
+    for name, what in sorted(LEGACY.items()):
+        rs = reads[name]
+        swept = "yes" if name in calls_text else "**never**"
+        w(f"| `{name}` | `{rs[0].default}` | {what} | {swept} |")
+    w("")
+    w(f"**{len(LEGACY)} of {len(reads)} knobs are legacy switches, and "
+      f"{sum(1 for n in LEGACY if n not in calls_text)} of those have never "
+      "been flipped by any run** — a switch nobody has flipped is a branch")
+    w("nobody has tested.")
     w("")
 
     w("## The knobs no document mentions")

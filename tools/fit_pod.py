@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """Fit the pod model so that COMBAT, not the clock, does most of the killing.
 
+HISTORICAL (2026-09-17): the fit that produced pod v3 on 2026-09-04, over the
+three decks that existed then, with their baseline win rates of that day typed
+in below. It still runs and still describes how the pod was fitted; it is not
+a live tool for six decks. Re-fitting the pod would be a measured engine
+change with its own finding, not a re-run of this file.
+
 THE PROBLEM
 -----------
 `incidental_damage` and `resolve_clocks` are two independent kill mechanisms.

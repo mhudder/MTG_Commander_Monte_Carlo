@@ -307,10 +307,11 @@ def build():
 # ---------------------------------------------------------------------------
 # Candidates — not in the deck. Kept here so candidates.py can resolve them.
 # ---------------------------------------------------------------------------
-# {2}: "Whenever you create one or more tokens, create an additional token of
-# each of those kinds." The second Academy Manufactor effect.
-ANOINTED_PROCESSION = C("Anointed Procession", "Enchantment",
-                        {"gen": 3, "W": 1}, priority=8.5, threat=7.5)
+# (An earlier ANOINTED_PROCESSION stood here, priority 8.5 / threat 7.5, with
+# a misremembered oracle text. The 2026-09-16 definition below rebound the
+# name, so the earlier one was dead from the day the second was written --
+# the §0u shape the L1 sweep removed from lorehold_v16.py. Deleted 2026-09-17;
+# every number ever measured used the definition below.)
 
 # ---------------------------------------------------------------------------
 # 2026-09-16 proposals (§0z26). Oracle text verified against api.scryfall.com

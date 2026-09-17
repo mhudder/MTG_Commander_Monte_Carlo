@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `774b8ef` from 20 engine sources.
+Derived at `aac99db` from 20 engine sources.
 
 **109 knobs, 162 call sites.**
 
@@ -54,7 +54,7 @@ show up first.
 | `another_creature_clause` | `True` | 1 | `edhmc/karlov.py:429` |  | yes | yes |
 | `apex_ten_mana` | `True` | 1 | `edhmc/lorehold.py:806` |  | yes | yes |
 | `archdruid_mode` | `'auto'` | 1 | `edhmc/azusa.py:2003` | §0q | yes | yes |
-| `archetype_weights` | `<none>` | 1 | `edhmc/opponents.py:163` |  | yes | yes |
+| `archetype_weights` | `<none>` | 1 | `edhmc/opponents.py:163` |  | yes | **never** |
 | `archetypes` | `False` | 1 | `edhmc/opponents.py:162` |  | yes | **never** |
 | `artifact_recursion` | `True` | 1 | `edhmc/engine.py:1300` | §4 | yes | yes |
 | `ashaya_lands` | `True` | 1 | `edhmc/azusa.py:355` | §0z17 | yes | yes |
@@ -158,6 +158,39 @@ show up first.
 | `zuran_life_floor` | `8` | 1 | `edhmc/azusa.py:2107` |  | yes | yes |
 | `zuran_max_sacs` | `4 if panic else 2` | 1 | `edhmc/azusa.py:2117` |  | **no** | **never** |
 
+## Legacy switches
+
+Knobs that exist only to reproduce a rule the project has since
+corrected — the off switch a finding left behind so its measurement
+could be re-run against the old behaviour. **Policy:** a legacy switch
+is kept while a committed number or a diagnostic cites the comparison
+it enables, and is a candidate for removal once every table that could
+see the difference has been rebuilt on the corrected rule. An untested
+branch is a claim about the engine that nothing exercises. The list is
+`tools/knobs.py`'s `LEGACY`; the generator refuses to run if a name
+there is no longer read by any engine.
+
+| switch | default | restores | swept |
+|---|---|---|---|
+| `another_creature_clause` | `True` | karlov's lifegain triggers firing on the commander's own entry | yes |
+| `ashaya_lands` | `True` | azusa lands not counting as creatures under Ashaya (pre-§0z18) | yes |
+| `combat_split` | `True` | the whole attack at one defender (pre-§0v) | yes |
+| `copy_etb` | `True` | token copies not re-triggering ETBs (pre-§0z5) | yes |
+| `copy_legend_rule` | `True` | legendary copies kept alongside the original | yes |
+| `crn_streams` | `True` | mid-game randomness read in order from the game RNG (pre-§0z17) | yes |
+| `land_animation` | `'full'` | the pre-2026-09-10 land-animation policy ("legacy") | yes |
+| `land_creature_sick` | `True` | animated lands attacking the turn they entered | yes |
+| `mana_colour_legacy` | `False` | count-based colour payment (pre-§0z8) | yes |
+| `own_wipe_commander_returns` | `True` | a commander lost to its owner's wipe | **never** |
+| `own_wipe_indestructible` | `True` | indestructible creatures dying to their owner's wipe | yes |
+| `pod_damage_full_pod` | `True` | pod damage divided by the living count instead of the full pod | yes |
+| `pod_reads_battlefield_creatures` | `True` | the pod reading creature TYPE LINES instead of the battlefield | yes |
+| `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
+| `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
+
+**15 of 109 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+nobody has tested.
+
 ## The knobs no document mentions
 
 **36 of 109.** Not an error — most knobs are
@@ -169,12 +202,12 @@ docs knows they exist.
 
 ## The knobs nothing has ever set
 
-**43 of 109.** The name appears nowhere in
+**44 of 109.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;
 §0z20 swept it 6 → 0, found it was not load-bearing, and that is the
 result nobody would have believed unmeasured.
 
-`archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `clock_rearm`, `counter_threshold`, `cryptic_caves_min_lands`, `everywhere_is_token`, `extra_turn_cap`, `first_attack_turn`, `first_wipe_turn`, `flashback_cap`, `goad_block_share`, `hand_cap`, `hold_min_value`, `land_floor`, `lorehold_recursion`, `mana_surplus`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_instant_rate`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `protection_cards`, `rhystic_rate`, `set_top_gate`, `shroud_sources`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `tivit_sweepers`, `treasure_hoard`, `wipe_threshold`, `wurm_kill_share`, `zuran_max_sacs`
+`archetype_weights`, `archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `clock_rearm`, `counter_threshold`, `cryptic_caves_min_lands`, `everywhere_is_token`, `extra_turn_cap`, `first_attack_turn`, `first_wipe_turn`, `flashback_cap`, `goad_block_share`, `hand_cap`, `hold_min_value`, `land_floor`, `lorehold_recursion`, `mana_surplus`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_instant_rate`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `protection_cards`, `rhystic_rate`, `set_top_gate`, `shroud_sources`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `tivit_sweepers`, `treasure_hoard`, `wipe_threshold`, `wurm_kill_share`, `zuran_max_sacs`
 

@@ -668,7 +668,9 @@ ordering is measured — that is the honest statement of it.
     **The real swap is SMALLER than the candidate row in both cases** — the
     candidate number is value over a blank in a freed slot, the swap also pays
     for what it cut, and §0c says the swap is the number a decision rests on.
-    Tivit's cut is a basic Plains (36 lands → 35) because that deck has no
+    Tivit's numbers were re-measured on the post-§0z30 baseline (§0z33:
+    +0.0133 / +0.0157, up inside their bars; the staging stands). Tivit's
+    cut is a basic Plains (36 lands → 35) because that deck has no
     weak nonland row; **a land cut is the kind of change this harness
     flatters**, so read it with that in mind. **And karlov's cut is
     MODEL-BLIND** (§0z31's cut check, 2026-09-17): Soulmender's tap ability

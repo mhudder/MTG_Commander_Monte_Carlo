@@ -1,0 +1,27 @@
+Anointed Procession, post-§0z30 baseline: N=15,000 paired, same seeds both legs, base = tivit module list (Plains in)
+
+=== value over a blank of the same cost, Plains slot (candidates.add_value replicated on the module list)
+  T10: damage +0.96+-0.18   win rate +0.0195+-0.0025   artifacts_made +8.25+-1.28   P(deploy) 0.199   (70s)
+  T20: damage +0.77+-0.22   win rate +0.0325+-0.0037   artifacts_made +15.25+-1.76   P(deploy) 0.269   (106s)
+
+=== real swap -Plains +Anointed Procession, module list as the A leg
+
+  T10  (71s)   baseline won 0.1236
+    won                   +0.0133  [ +0.0105,  +0.0160] *
+    damage                -0.4071  [ -0.6663,  -0.1547] *
+    artifacts_made        +7.1730  [ +5.9902,  +8.4124] *
+    treasures_made        +3.3903  [ +2.8646,  +3.9587] *
+    final_life            -0.2162  [ -0.2873,  -0.1463] *
+    opponents_killed      +0.0046  [ -0.0019,  +0.0111]  
+    cards_drawn           -0.1679  [ -0.1959,  -0.1396] *
+    stranded_mv           +1.4496  [ +1.1267,  +1.7637] *
+
+  T20  (109s)   baseline won 0.3915
+    won                   +0.0157  [ +0.0115,  +0.0201] *
+    damage                -0.9403  [ -1.2467,  -0.6554] *
+    artifacts_made       +13.6528  [+11.8980, +15.4284] *
+    treasures_made        +6.9563  [ +6.1618,  +7.7439] *
+    final_life            +0.2774  [ +0.1783,  +0.3701] *
+    opponents_killed      -0.0180  [ -0.0273,  -0.0085] *
+    cards_drawn           -0.4492  [ -0.5099,  -0.3879] *
+    stranded_mv           +0.7728  [ +0.3001,  +1.2531] *

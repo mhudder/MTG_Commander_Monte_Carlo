@@ -1420,7 +1420,16 @@ CHANGES: list[Change] = [
             "0.1083 and 0.3265. THE CANDIDATE ROW WAS +0.0291 +-0.0034 and "
             "the swap is HALF that -- the difference is the land. Read the "
             "+0.0291 as value over a blank in a freed slot and this as what "
-            "the deck actually gains, which is the number that decides it."),
+            "the deck actually gains, which is the number that decides it. "
+            "RE-MEASURED 2026-09-17 ON THE POST-§0z30 BASELINE (§0z33, "
+            "diagnostics/run_tivit_procession.py): the pod-order fix moved "
+            "tivit's baseline +0.0647 at T20, so these numbers were restated "
+            "rather than kept. Same N and seeds: real swap +0.0133 [+0.0105, "
+            "+0.0160] at T10 and +0.0157 [+0.0115, +0.0201] at T20, against "
+            "baselines of 0.1236 and 0.3915; candidate row +0.0325 +-0.0037. "
+            "Every number moved UP by less than its bar, and the token "
+            "mechanism is unchanged: artifacts_made +13.7 and treasures_made "
+            "+7.0 a game at T20. The staging stands."),
         notes=(
             "WATCH TIME SIEVE (§0m): it eats only TOKEN artifacts, so "
             "doubling the token stream makes the extra-turn loop materially "

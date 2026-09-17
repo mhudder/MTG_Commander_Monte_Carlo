@@ -81,6 +81,7 @@ Methodology that used to live at the end of this file is now
 | [0z30](#0z30) | FIXED | **One opening hand and one pod-phase order for six engines.** Three mulligan fallbacks (a fifth hand; an empty hand; 106-card games) and two pod orders were six copies of two blocks. Unifying them moves tivit's baseline +0.0647 and karlov's +0.0205 at T20 — the two engines had let the opponents' creatures grow BEFORE dealing chip damage — and moves lorehold and azusa on 3 and 2 seeds of 15,000 |
 | [0z31](#0z31) | FIXED | **`engine.Metrics` and an importable `ablation.py`.** The metrics dict reads 0 for a name nothing wrote (35 defensive `m.get(k, 0) + 1` spellings folded into `+=`); ablation's run parameters are a `Run` object passed down instead of `sys.argv` read at import, and its table renderer is a pure function — so "the committed table IS the committed cache" is a test now, over all six decks |
 | [0z32](#0z32) | FIXED | **A thin base class and one deck registry.** `engine.BaseGame` holds `has`/`count`/`draw`/`deal_pod_damage`/`opening_hand` once and `engine.finish()` the `simulate()` tail; `edhmc/registry.py` holds one `DeckSpec` per deck, checked against `decks/` at import, and eleven per-deck dicts derive from it. Bit-identical on every baseline metric; the only output key that moved is karlov's `turn_lethal` |
+| [0z33](#0z33) | MEASURED | **Anointed Procession restated on the post-§0z30 tivit baseline: +0.0157 ±0.0043 at T20 (was +0.0145), the staging stands** — with the review's L2–L5 housekeeping: main guards, notes as data, a legacy-switch policy, and a dead duplicate card definition found on the way |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4476,6 +4477,12 @@ it costs in practice.
 Soulmender is the cheapest cut in the karlov list, checked rather than assumed:
 **−0.0011 ±0.0011, signal `win`** — significantly negative.
 
+> **RESTATED 2026-09-17 (§0z33).** The tivit row was measured before
+> §0z30 moved that deck's baseline by +0.0647. Re-measured on the new
+> baseline, same N and seeds: +0.0133 ±0.0027 at T10 and +0.0157 ±0.0043 at
+> T20 (candidate row +0.0325 ±0.0037). Up, inside its bars; the staging
+> stands.
+
 > **RESTATED 2026-09-17 (§0z31's cut check).** That row is in the
 > MODEL-BLIND section: Soulmender is `KNOWN_BLIND` in karlov, its tap
 > ability is not implemented, and a blind row is "not measured", never a cut
@@ -4950,6 +4957,66 @@ word "registry" in the sentence "until a single registry exists" as naming
 `edhmc/registry.py`. It matches the file name with its extension now, which
 immediately found ten tools the map had named without one. A prose word is
 not a module mention — §0z15's shape in the doc checker.
+
+## 0z33. MEASURED — Anointed Procession on the post-§0z30 baseline, and the review's L2–L5
+
+2026-09-17. §0z30 moved tivit's baseline by more than any other deck's
+(+0.0647 win rate at T20), and the staging of `-Plains +Anointed
+Procession` (§0z27) rested on numbers measured before it. A swap's number
+is a difference on a baseline, so it was re-measured rather than kept
+(`diagnostics/run_tivit_procession.py` → `results/tivit_procession.txt`,
+N=15,000 paired, same seeds, the module list as the A leg):
+
+| measurement | before §0z30 (§0z26/§0z27) | on the new baseline |
+|---|---|---|
+| candidate row, Plains slot, T20 | +0.0291 ±0.0034 | **+0.0325 ±0.0037** |
+| real swap, T10 | +0.0113 ±0.0026 | **+0.0133 ±0.0027** |
+| real swap, T20 | +0.0145 ±0.0040 | **+0.0157 ±0.0043** |
+| baseline win rate, T10 / T20 | 0.1083 / 0.3265 | 0.1236 / 0.3915 |
+
+Every number moved up and every move is inside its own bar. The mechanism
+is unchanged — artifacts_made +13.7 and treasures_made +7.0 a game at T20 —
+and the costs are the same shape (damage −0.94, cards_drawn −0.45: games
+end by the token routes, not by combat). **The staging stands.** The one
+thing the new baseline changes is the reading: the deck now wins 39% of
+T20 games instead of 33%, so the same +0.016 is a smaller share of what
+there is to win.
+
+**Found on the way: a dead duplicate card.** `decks/tivit_v1.py` defined
+`ANOINTED_PROCESSION` twice — a first version with a misremembered oracle
+text (priority 8.5, threat 7.5) and the 2026-09-16 one (8.0, 3.0) that
+rebound the name. Every measurement used the second; the first was dead
+from the day it was written, the exact §0u shape the L1 sweep removed from
+`lorehold_v16.py`. Deleted; the two trees' card objects compare equal and
+the baseline check is bit-identical, so tivit's cache is VERIFIED rather
+than rebuilt.
+
+**The review's L2–L5, shipped with it.**
+
+- **L2.** `tools/validate.py` and `tools/compare_decks.py` ran their whole
+  body at import; both have a `main()` and a guard now, and behave
+  identically when run. `compare_decks.py` and `fit_pod.py` are marked
+  HISTORICAL in their docstrings: two and three decks, a metric from before
+  the pod had a win condition, baselines typed in from 2026-09-04. They
+  still run; they are provenance, not tools.
+- **L3.** Already closed before this pass — `status.first_doc_line` strips
+  the leading newline and no tool lists blank. Verified, not redone.
+- **L4.** `tools/cache_manifest.py` carried ~700 lines of string constants
+  describing how each cache was produced: documentation in code. They are
+  data now, `results/caches/NOTES.json` beside `PROVENANCE.json`, keyed by
+  cache file name, and `--note <cache|deck> "<text>"` appends to one the way
+  `--verified` appends evidence. The file is 552 lines; the generated
+  manifest is unchanged but for the sentence that says where the notes are.
+- **L5.** Fifteen knobs exist only to reproduce a rule the project has since
+  corrected. `tools/knobs.py` names them in `LEGACY` with what each
+  restores, `docs/KNOBS.md` renders them under "Legacy switches" with the
+  policy (kept while a committed number or a diagnostic cites the
+  comparison; a removal candidate once every table that could see the
+  difference is rebuilt), and the generator refuses to run if a `LEGACY`
+  name is no longer read by any engine. The first render reported all
+  fifteen as "swept" — because the generator's own registry named them and
+  it was scanning itself. It excludes itself now; two have never been
+  flipped by any run.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 
