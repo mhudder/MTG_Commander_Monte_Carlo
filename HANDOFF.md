@@ -13,6 +13,8 @@ Where things live:
 | **a numbered finding** | `KNOWN_ISSUES.md` — `§0a` onward plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered; `docs/STATUS.md` prints the current last id. |
 | **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
 | **the knobs** | `docs/KNOBS.md` — every one, GENERATED, with defaults and which have never been swept. |
+| **adding a card** | `.claude/skills/add-card/SKILL.md` — the procedure, from Scryfall to a committed swap, with the check that catches each mistake. |
+| **finishing a session** | `.claude/skills/session-close/SKILL.md` — regenerate the derived docs, check, and decide what is written down where. |
 
 This file used to open with a dated status block. It was three days stale when
 it was removed, which is why state now lives in one generated file instead of

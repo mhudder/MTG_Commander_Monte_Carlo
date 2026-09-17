@@ -173,6 +173,11 @@ it is a decision and not a fact: `ablation.py`'s classification sets,
 
 ## Where a card's behaviour can live
 
+**Adding a card follows a procedure, and it is written down:**
+`.claude/skills/add-card/SKILL.md`. This section is the map it points at —
+read it when a card "does nothing" in a table, and read the skill when you
+are putting one in.
+
 When a card "does nothing" in a table, look in this order:
 
 1. `decks/<deck>.py` — is it in the list at all? (`build_pending` applies staged

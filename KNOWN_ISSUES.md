@@ -82,6 +82,7 @@ Methodology that used to live at the end of this file is now
 | [0z31](#0z31) | FIXED | **`engine.Metrics` and an importable `ablation.py`.** The metrics dict reads 0 for a name nothing wrote (35 defensive `m.get(k, 0) + 1` spellings folded into `+=`); ablation's run parameters are a `Run` object passed down instead of `sys.argv` read at import, and its table renderer is a pure function — so "the committed table IS the committed cache" is a test now, over all six decks |
 | [0z32](#0z32) | FIXED | **A thin base class and one deck registry.** `engine.BaseGame` holds `has`/`count`/`draw`/`deal_pod_damage`/`opening_hand` once and `engine.finish()` the `simulate()` tail; `edhmc/registry.py` holds one `DeckSpec` per deck, checked against `decks/` at import, and eleven per-deck dicts derive from it. Bit-identical on every baseline metric; the only output key that moved is karlov's `turn_lethal` |
 | [0z33](#0z33) | MEASURED | **Anointed Procession restated on the post-§0z30 tivit baseline: +0.0157 ±0.0043 at T20 (was +0.0145), the staging stands** — with the review's L2–L5 housekeeping: main guards, notes as data, a legacy-switch policy, and a dead duplicate card definition found on the way |
+| [0z34](#0z34) | FIXED | **The procedure for adding a card is written down** — `.claude/skills/add-card/SKILL.md`, from Scryfall to a committed swap, each step naming the check that catches the mistake made at it. And `check_docs` now verifies the §ids cited from live DOCS, not only from code: 194 citations, the pointers that make the procedure traceable |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5017,6 +5018,50 @@ than rebuilt.
   fifteen as "swept" — because the generator's own registry named them and
   it was scanning itself. It excludes itself now; two have never been
   flipped by any run.
+
+## 0z34. FIXED — the card-import procedure is a skill, and doc citations are checked
+
+2026-09-17. Every step of adding a card had been learned the expensive way
+and written down in a different place: the oracle-text rule in CLAUDE.md,
+the hooks in `docs/ARCHITECTURE.md`, the three-category classification in
+`tools/ablation.py`, the staging rule in `edhmc/pending.py`, the closing
+checklist in its own skill. A session adding a card had to know all five
+existed. **`.claude/skills/add-card/SKILL.md`** is the procedure end to end
+— import, review, define, implement, pin, measure, stage, commit — with the
+check that catches the mistake at the step where it is made, and it is
+linked from CLAUDE.md, HANDOFF.md and `docs/ARCHITECTURE.md`.
+
+It is a guide, not a catalogue of interactions. Its content is the mistakes
+this project has actually made: text typed from memory (§0z26's two dead
+proposals), a card already measured (§0z26 again), behaviour that attaches
+by NAME rather than by `script=` (§0z25), a doubler said in one token path
+of two (§0z4), a generated evasion file never regenerated (§0z29), a draw
+inserted one indentation from its neighbour (§0z28), a mutation set written
+after the run, a candidate row read as a swap (§0c), and a cut whose row was
+never evidence (§0z31).
+
+**Writing it added 22 §-pointers to a document, which is 22 more things that
+can rot.** So `check_docs` gained `check_doc_sections_resolve`: every §id
+cited from a LIVE doc must resolve to a heading, the way the code check has
+always worked. It passes on **194 citations** across thirteen documents
+today, with `docs/HISTORY.md` exempt as it is from the other doc checks (it
+names the issues file with a bare sigil and no section number) — and the
+exemption is written into the docstring, per §0z15. Its mutation cites an
+id that no heading carries and must break exactly that check; ten mutations
+now, all exact.
+
+**The check caught its own write-up on the first run.** This section quoted
+both unresolvable ids while describing them, and a quoted id is
+indistinguishable from a cited one — which is the ambiguity that rots.
+Naming them in words instead is the fix, and the fact that the check fired
+on the document announcing it is the evidence that it fires.
+
+**Two things the skill deliberately does NOT do.** It does not try to
+enumerate card interactions — the engine is half-blind by construction (§4)
+and a list of interactions would rot faster than the code. And it does not
+replace the ledger: the skill says how to reach a `Change`, and
+`python -m edhmc.pending` remains the only trustworthy statement of what is
+pending.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

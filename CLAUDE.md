@@ -29,6 +29,10 @@ Read that file for state; read this one for judgement.
                         committed, withdrawn. The only trustworthy
                         statement of what is pending.
 
+    .claude/skills/     the two procedures worth following step by step:
+      add-card/         importing a card, from Scryfall to a committed swap.
+      session-close/    regenerate, check, and decide what gets written down.
+
 **The split exists because keeping state in this file WAS the cost.** Its
 "Current state" section ran to 351 lines — a third of the file — and every
 session rewrote part of it. Three of the six noise floors it quoted had drifted
@@ -527,7 +531,10 @@ can fail, not as precision.
 
 **Verify oracle text before trusting any number about a card.** Almost every
 large correction in this project came from a card whose text the engine had
-wrong, not from a statistical problem. A card scoring like a blank usually
+wrong, not from a statistical problem. **`.claude/skills/add-card/SKILL.md`
+is the whole procedure** — fetch, review which clauses this model can see,
+implement, pin with a test, measure, stage — with the check that catches each
+mistake at the step where it is made. Follow it when a card is proposed. A card scoring like a blank usually
 means the engine has made it a blank. When a result is surprising, the engine
 is the first suspect, not the deck.
 

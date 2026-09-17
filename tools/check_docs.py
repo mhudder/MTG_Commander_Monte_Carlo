@@ -108,6 +108,31 @@ def check_sections_resolve(code_text: str, issues: str) -> Result:
         "unresolved: " + ", ".join("§" + m for m in missing) if missing else "")
 
 
+def check_doc_sections_resolve(docs: dict[str, str], issues: str) -> Result:
+    """Every §id cited from a LIVE DOC resolves to a heading too.
+
+    `check_sections_resolve` above does this for code. The docs cite far more
+    of them -- CLAUDE.md alone carries 39, and `.claude/skills/add-card`
+    carries 22 pointers that are the whole reason a reader can follow the
+    procedure back to the measurement it came from. A pointer to a finding
+    that does not exist reads exactly like one that does.
+
+    BLIND TO, said out loud (§0z15): `docs/HISTORY.md`, the dated narrative,
+    exempt from the doc checks generally, which carries one bare "§0" naming
+    the issues file rather than a section. Nothing else is exempt.
+    """
+    cited = set()
+    for path, body in docs.items():
+        if _exempt(path):
+            continue
+        cited |= {(path, sec) for sec in SECTION_CITE.findall(body)}
+    headings = set(re.findall(r"^## ([0-9][0-9a-z]*)\.", issues, re.M))
+    missing = sorted({f"{p}: §{sec}" for p, sec in cited if sec not in headings})
+    return Result(
+        f"every §id cited from a live doc resolves ({len(cited)} citations)",
+        not missing, "unresolved: " + ", ".join(missing) if missing else "")
+
+
 def check_index_matches_headings(issues: str) -> Result:
     """The index table and the headings are the same set, both ways.
 
@@ -449,6 +474,7 @@ def run_all() -> list[Result]:
     results = [
         check_evasion_current(live, scanned),
         check_sections_resolve(code_text, issues),
+        check_doc_sections_resolve(docs, issues),
         check_index_matches_headings(issues),
         check_doc_paths_exist(code_text),
         check_doc_xrefs(docs),
@@ -509,6 +535,9 @@ MUTATIONS = {
         lambda code, issues, docs: (
             code, issues, dict(docs, **{"CLAUDE.md":
                                         docs["CLAUDE.md"] + "\nall 107 knobs\n"})),
+    "a doc cites a finding that does not exist":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{"FAKE4.md": "see §0zz98 for the rest"})),
 }
 
 # Which checks each mutation must break. Written before running it: a
@@ -525,6 +554,8 @@ EXPECTED = {
         {"docs/ARCHITECTURE.md names every module in edhmc/ and tools/"},
     "a knob count is typed back into CLAUDE.md":
         {"the durable docs quote no count the repo derives"},
+    "a doc cites a finding that does not exist":
+        {"every §id cited from a live doc resolves"},
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
 }
@@ -553,6 +584,7 @@ def mutate() -> int:
         results = [
             check_evasion_current(lv, sc),
             check_sections_resolve(c, i),
+            check_doc_sections_resolve(d, i),
             check_index_matches_headings(i),
             check_doc_paths_exist(c),
             check_doc_xrefs(d),
