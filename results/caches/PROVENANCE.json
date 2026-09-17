@@ -70,6 +70,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "0a4da14b948c572e",
         "utc": "2026-09-17T15:13:26Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "054a48df23622361",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   },
@@ -114,6 +120,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "b68f66c7a9f05ef2",
         "utc": "2026-09-17T15:13:25Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "cde1da1f042a52c4",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   },
@@ -176,6 +188,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "2338f4b468f683ea",
         "utc": "2026-09-17T15:13:25Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "a0c13b0491ac1b77",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   },
@@ -242,6 +260,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "8b4752accfcf6253",
         "utc": "2026-09-17T15:13:25Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "fabb363aa440bbbe",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   },
@@ -308,6 +332,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "c8c6dde1449f4f51",
         "utc": "2026-09-17T15:13:26Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "31907d899b578da5",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   },
@@ -356,6 +386,12 @@
         "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
         "fingerprint": "ef7d84cc653e832c",
         "utc": "2026-09-17T15:13:26Z"
+      },
+      {
+        "commit": "c6d604a",
+        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+        "fingerprint": "9f0b2921b413382a",
+        "utc": "2026-09-17T15:40:28Z"
       }
     ]
   }

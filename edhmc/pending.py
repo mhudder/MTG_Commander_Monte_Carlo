@@ -78,6 +78,13 @@ class Change:
     notes: str = ""
     reverified: str = ""        # re-measured after an engine change
     withdrawn: str = ""         # set only on WITHDRAWN: when, and why
+    # Set ONLY when the cut is MODEL-BLIND or PARTLY MODELLED in its deck:
+    # why the swap is staged anyway, said out loud. `check_cuts_are_measured`
+    # refuses a staged blind cut without it (§0z31's follow-up), because a
+    # blind card's row is not evidence and the head-to-head that stages the
+    # swap is then a CEILING -- the cut's real value is whatever the engine
+    # does not model.
+    cut_unmeasured: str = ""
 
 
 @dataclass
@@ -123,6 +130,7 @@ class Candidate:
     # that the named cut is really in the deck.
     shortlist: str = ""         # why it is shortlisted; empty = it is not
     proposed_cut: str = ""      # the cut a head-to-head should test it against
+    cut_unmeasured: str = ""    # as on Change: why a blind/partly cut is proposed
 
 
 # ---------------------------------------------------------------------------
@@ -1358,7 +1366,23 @@ CHANGES: list[Change] = [
             "(diagnostics/run_karlov_conqueror.py): +0.0259 [+0.0233, "
             "+0.0287] at T10 and +0.0254 [+0.0218, +0.0291] at T20, and the "
             "candidate row +0.0331 +-0.0033. Flying is worth nothing "
-            "measurable to this card; the staging rests on the trigger."),
+            "measurable to this card; the staging rests on the trigger. "
+            "AND THE CUT IS MODEL-BLIND (2026-09-17, §0z31's check): "
+            "Soulmender is in KNOWN_BLIND for karlov -- its tap ability is "
+            "not implemented, so it is a 1/1 body here -- and the "
+            "'-0.0011 +-0.0011, significantly negative' row §0z27 called the "
+            "cheapest cut was a blind row read as evidence. The head-to-head "
+            "above therefore measures the Conqueror against a vanilla 1/1, "
+            "and its +0.0254 is a CEILING by whatever '{T}: gain 1 life' in "
+            "a deck of lifegain triggers is actually worth."),
+        cut_unmeasured=(
+            "Soulmender's row is blind and the swap is a ceiling, and it is "
+            "staged anyway because the cut is a one-mana 1/1 whose tap "
+            "ability is one lifegain EVENT a turn in a deck whose payoffs "
+            "count events -- worth something, but the Conqueror's +0.0254 "
+            "is nine times the bar, and a 1/1 tapping for one trigger a turn "
+            "is not a 0.025 card. Judgement, said out loud; measure it if "
+            "the engine ever models tap-for-life."),
         notes=(
             "A FLOOR, for §0u's reason rather than §4's. This engine models "
             "Exquisite Blood's text as a COMBO DETECTOR and not as the "
@@ -2354,14 +2378,10 @@ def check_shortlist_is_answerable():
         cut by a staged change), and a proposal naming a card that is no longer
         there reads as actionable and is not. Same shape as §0o.
 
-    WHAT THIS DOES NOT CHECK, said out loud (§0z15): that the proposed cut is
-    not MODEL-BLIND or PARTLY_MODELLED -- which is the trap that has already
-    cost this project two withdrawn swaps (§0z, §0z2). Those categories live in
-    `tools/ablation.py`. Until 2026-09-17 that module read `sys.argv` at
-    import and could not be imported from here; it can be now (M4 of that
-    day's review), and wiring this check up is the open follow-up. The rule
-    is stated in each entry's own text instead, and it is the first thing to
-    check by hand when acting on one.
+    Whether the cut is MODEL-BLIND or PARTLY MODELLED -- the trap that cost
+    this project two withdrawn swaps (§0z, §0z2) -- is `check_cuts_are_measured`
+    below, which could not exist while `tools/ablation.py` read `sys.argv` at
+    import (until 2026-09-17, §0z31).
     """
     for c in MEASURED:
         if not c.shortlist:
@@ -2390,6 +2410,97 @@ def check_shortlist_is_answerable():
                 f"edhmc/pending.py: {c.card!r} proposes cutting "
                 f"{c.proposed_cut!r}, which a STAGED change already removes. "
                 f"Two changes cannot cut the same card; pick another target.")
+
+
+def classify_cut(deck_name: str, card_name: str) -> str:
+    """How `tools/ablation.py` classifies `card_name` in `deck_name`'s MODULE
+    list: 'evaluated', 'partly', 'blind', 'land', 'unclassified' or 'absent'.
+
+    The module list, not the staged one: a staged cut has already left the
+    staged list, which is exactly why `check_scripted_coverage` never sees
+    it -- that check classifies what is measured, and a cut card is not.
+    Imported lazily: ablation.py imports this module, so the import cannot
+    be at the top of this file.
+    """
+    import tools.ablation as AB
+    module, _ = DECKS[deck_name]
+    deck, _cmd = module.build()
+    card = next((c for c in deck if c.name == card_name), None)
+    if card is None:
+        return "absent"
+    if card.is_land and not card.script:
+        return "land"
+    if card_name in AB.SCRIPTED_BY_DECK[deck_name]:
+        return "evaluated"
+    if card_name in AB.partly_for(deck_name, deck):
+        return "partly"
+    if card_name in AB.KNOWN_BLIND[deck_name]:
+        return "blind"
+    return "unclassified"
+
+
+def check_cuts_are_measured(changes=None, candidates=None) -> list[str]:
+    """Every STAGED cut and every PROPOSED cut is a card whose ablation row
+    meant something -- or says why it is being cut anyway.
+
+    A MODEL-BLIND row is "not measured", never a cut list (CLAUDE.md), and a
+    PARTLY MODELLED row is a floor. A swap staged on either is the trap that
+    produced §0z and §0z2, two withdrawn swaps. The head-to-head that stages
+    a swap does not rescue it: the cut side of that comparison is the card
+    AS THE ENGINE MODELS IT, so against a blind cut the swap's number is a
+    CEILING. `cut_unmeasured` on the Change or Candidate is the required
+    acknowledgement, and the first run of this check found one to write:
+    Soulmender, the cut behind `-Soulmender +Bloodthirsty Conqueror`, is
+    KNOWN_BLIND in karlov, and §0z27 had read its row as evidence.
+
+    A cut in NO category is refused outright -- classify it in ablation.py.
+    The first run found two: Penance and Scroll Rack, staged out of lorehold
+    on 2026-09-05 and dropped from SCRIPTED_LOREHOLD for that reason, so the
+    cards whose rows justified the cuts were the only lorehold cards with no
+    classification at all.
+
+    A LAND cut passes with a note: lands are unclassified by design, and a
+    land cut is the kind of change the harness flatters (CLAUDE.md, 20b).
+
+    Not run at import: `tools.ablation` imports this module, so this runs
+    from `ledger()` (`python -m edhmc.pending`) and from
+    `tests/test_pending_cuts.py`, both of which the closing checklist runs.
+    Returns the report lines; raises on a violation.
+    """
+    changes = CHANGES if changes is None else changes
+    candidates = MEASURED if candidates is None else candidates
+    lines, bad = [], []
+    items = [("STAGED", c.deck, c.remove, c.add, c.cut_unmeasured)
+             for c in changes]
+    items += [("PROPOSED", c.deck, c.proposed_cut, c.card, c.cut_unmeasured)
+              for c in candidates if c.proposed_cut]
+    for kind, deck, cut, add, ack in items:
+        cls = classify_cut(deck, cut)
+        tag = f"{kind:<8} {deck:<11} -{cut} +{add}"
+        if cls == "land":
+            lines.append(f"  {tag}: a LAND cut -- the harness flatters these")
+        elif cls == "evaluated":
+            lines.append(f"  {tag}: MODEL-EVALUATED cut")
+        elif cls in ("blind", "partly"):
+            label = "MODEL-BLIND" if cls == "blind" else "PARTLY MODELLED"
+            if ack.strip():
+                lines.append(f"  {tag}: {label} cut, acknowledged -- {ack}")
+            else:
+                bad.append(f"{tag}: {cut!r} is {label} in {deck}, so its row "
+                           f"is not evidence and the head-to-head is a "
+                           f"CEILING. Say why it is cut anyway in "
+                           f"`cut_unmeasured`, or pick a MODEL-EVALUATED cut.")
+        elif cls == "unclassified":
+            bad.append(f"{tag}: {cut!r} is in NONE of SCRIPTED_{deck.upper()}, "
+                       f"PARTLY_MODELLED or KNOWN_BLIND -- a staged cut leaves "
+                       f"the measured list, so check_scripted_coverage never "
+                       f"sees it. Classify it in tools/ablation.py.")
+        else:
+            bad.append(f"{tag}: {cut!r} is not in the {deck} module list.")
+    if bad:
+        raise AssertionError("edhmc/pending.py: a cut whose row is not "
+                             "evidence:\n" + "".join(f"    {b}\n" for b in bad))
+    return lines
 
 
 def check_withdrawn_are_explained():
@@ -2558,6 +2669,11 @@ def ledger(verbose: bool = True) -> None:
     print("=" * 78)
     print("PENDING DECK CHANGES — not yet written to the .xlsx files")
     print("=" * 78)
+    print("Every staged and proposed cut, against tools/ablation.py's "
+          "classification (§0z31):")
+    for line in check_cuts_are_measured():
+        print(line)
+    print()
     if not CHANGES:
         print("  (none — every decided change is applied on all three legs)")
         for deck_name in sorted(DECKS):

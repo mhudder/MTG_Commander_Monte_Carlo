@@ -4476,6 +4476,14 @@ it costs in practice.
 Soulmender is the cheapest cut in the karlov list, checked rather than assumed:
 **−0.0011 ±0.0011, signal `win`** — significantly negative.
 
+> **RESTATED 2026-09-17 (§0z31's cut check).** That row is in the
+> MODEL-BLIND section: Soulmender is `KNOWN_BLIND` in karlov, its tap
+> ability is not implemented, and a blind row is "not measured", never a cut
+> list — the sentence above read it as evidence. The head-to-head therefore
+> measures the Conqueror against a vanilla 1/1, and its +0.0254 is a
+> CEILING. The staging stands on an acknowledgement written into the Change
+> (`cut_unmeasured`), which is a judgement and says so.
+
 > **RESTATED 2026-09-17 (§0z29).** Both karlov rows above were measured
 > with Bloodthirsty Conqueror as a GROUND creature (`_evasion.py` had not
 > been regenerated after the card was added). Re-measured with flying:
@@ -4849,8 +4857,34 @@ over every deck with a cache: **the table on disk IS the cache on disk, byte
 for byte.** It fails when a cache is regenerated and the table is not, when a
 classification moves a row between sections without a re-render, and when
 the renderer changes what it prints; its mutation moves one rendmaw card to
-KNOWN_BLIND and exactly rendmaw's row fails. One caller was found by the
-suite rather than by grep: `tests/test_combat_split.py`'s stub game built
+KNOWN_BLIND and exactly rendmaw's row fails.
+
+**The follow-up is closed (later on 2026-09-17).** `pending.py`'s
+`check_cuts_are_measured` classifies every STAGED and PROPOSED cut with
+`ablation.py`'s sets, in the deck's MODULE list — a staged cut has already
+left the staged list, which is precisely why `check_scripted_coverage`
+never saw one. A MODEL-BLIND or PARTLY MODELLED cut is refused unless the
+Change or Candidate carries `cut_unmeasured`, the reason it is cut anyway;
+a cut in no category is refused outright; a land cut passes with the note
+that the harness flatters land cuts. Pinned by `tests/test_pending_cuts.py`
+(four mutations, exact sets), printed by `python -m edhmc.pending`. Its
+first run found two things:
+
+- **The staged karlov cut is blind.** Soulmender is `KNOWN_BLIND` in karlov
+  (its tap ability is not modelled), and §0z27 had called its row "the
+  cheapest cut, checked rather than assumed" — a blind row read as
+  evidence, the exact shape of §0z and §0z2. The head-to-head that stages
+  `-Soulmender +Bloodthirsty Conqueror` compares the Conqueror with a
+  vanilla 1/1, so its +0.0254 is a CEILING. The staging stands on an
+  acknowledgement now written into the Change, and §0z27 says so.
+- **Two staged lorehold cuts were in no category at all.** Penance and
+  Scroll Rack were dropped from `SCRIPTED_LOREHOLD` when they were staged
+  out on 2026-09-05, so the only lorehold cards with no classification were
+  the two whose rows justified cuts. Both are implemented (the top-setter
+  table prices them) and are back in `SCRIPTED_LOREHOLD`, where a name not
+  in the measured list is a note by design.
+
+One caller was found by the suite rather than by grep: `tests/test_combat_split.py`'s stub game built
 `self.m = {}` and hit the first `+=` in `opponents.combat_damage` — the 35
 defensive spellings had been carrying exactly that stub. It builds a
 `Metrics()` now; a stub game's `m` must, and the suite says so.

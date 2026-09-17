@@ -227,9 +227,13 @@ SCRIPTED_LOREHOLD = {
     # mana
     "Sol Ring", "Arcane Signet", "Boros Signet", "Talisman of Conviction",
     "Ruby Medallion", "Bender's Waterskin", "Victory Chimes",
-    # top-of-library manipulation. Penance and Scroll Rack left the deck in
-    # the 2026-09-05 staging.
-    "Sensei's Divining Top", "Library of Leng",
+    # top-of-library manipulation. Penance and Scroll Rack are STAGED OUT
+    # (2026-09-05) and stay classified: both are implemented (lorehold's
+    # top-setter table prices them), and a staged cut's row has to be known
+    # to have been evidence -- `pending.check_cuts_are_measured` refuses a
+    # cut in no category (§0z31). A name here that is not in the measured
+    # list is a NOTE, not a failure, by check_scripted_coverage's design.
+    "Sensei's Divining Top", "Library of Leng", "Penance", "Scroll Rack",
     "Verge Rangers",
     # Replaced Penance in the 2026-09-05 re-staging, having beaten Galvanoth
     # head to head (+0.0093 win at 20 turns). Implemented in full in

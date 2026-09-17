@@ -140,6 +140,7 @@ python -m tests.test_modes_and_altar --mutate       # 4 mutations, exact sets
 python -m tests.test_azusa_batch4 --mutate          # 4 mutations, exactly 8 fail
 python -m tests.test_mulligan_and_pod_order --mutate # 5 mutations, exact sets
 python -m tests.test_metrics_and_render --mutate    # 2 mutations, exact sets
+python -m tests.test_pending_cuts --mutate          # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -669,7 +670,10 @@ ordering is measured — that is the honest statement of it.
     for what it cut, and §0c says the swap is the number a decision rests on.
     Tivit's cut is a basic Plains (36 lands → 35) because that deck has no
     weak nonland row; **a land cut is the kind of change this harness
-    flatters**, so read it with that in mind. Two more are explicitly HELD:
+    flatters**, so read it with that in mind. **And karlov's cut is
+    MODEL-BLIND** (§0z31's cut check, 2026-09-17): Soulmender's tap ability
+    is not modelled, so the head-to-head is a ceiling and the staging rests
+    on the `cut_unmeasured` judgement written into the Change. Two more are explicitly HELD:
     Alhammarret's Archive on the owner's playtest experience — which the
     model's own counter corroborates, 0.40 extra draws a game — and Parallel
     Lives as too expensive for what it does.
