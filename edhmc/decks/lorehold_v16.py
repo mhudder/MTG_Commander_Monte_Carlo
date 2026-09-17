@@ -230,11 +230,11 @@ def build():
 # ---------------------------------------------------------------------------
 # The candidates
 # ---------------------------------------------------------------------------
-# Land face: "as this enters, you may pay 3 life; if you don't, it enters
-# tapped." Life is not tracked, so we assume the 3 life is always paid and it
-# enters untapped — which FLATTERS the card. See the write-up.
-DOUBLE_VISION = C("Double Vision", "Enchantment", {"gen": 3, "R": 2},
-                  priority=9.0, threat=8.0)
+# Monastery Mentor, The Dawning Archaic, Double Vision and Arcane Bombardment
+# are DECK MEMBERS, defined once in the lists above. Each also had a
+# module-level constant here, byte-identical today and read by nothing -- the
+# §0u shape (one rule, two copies, drifting apart) waiting to happen. Removed
+# 2026-09-17 with Witch Enchanter, a candidate nothing measured.
 
 GALVANOTH = C("Galvanoth", "Creature", {"gen": 3, "R": 2}, 3, 3,
               priority=8.5, threat=8.0, script="galvanoth")
@@ -259,21 +259,8 @@ GOLDSPAN_DRAGON = C("Goldspan Dragon", "Creature", {"gen": 3, "R": 2}, 4, 4,
                     priority=8, threat=8.5, script="goldspan", haste=True)
 # 4/4 flying haste; a Treasure on attack, and YOUR Treasures tap for two mana.
 
-WITCH_ENCHANTER = C("Witch Enchanter // Witch-Blessed Meadow", "Creature",
-                    {"gen": 3, "W": 1}, 2, 2, priority=3.5, threat=4.0,
-                    land_face=("W", False))
-
-MONASTERY_MENTOR = C("Monastery Mentor", "Creature", {"gen": 2, "W": 1}, 2, 2,
-                     priority=8, threat=7.5, script="mentor")
-
-ARCANE_BOMBARDMENT = C("Arcane Bombardment", "Enchantment", {"gen": 4, "R": 2},
-                       priority=9.2, threat=8.5)
-
 MOLECULE_MAN = C("Molecule Man", "Creature", {"gen": 6}, 5, 5,
                  priority=9.9, threat=9.5)
-
-THE_DAWNING_ARCHAIC = C("The Dawning Archaic", "Creature", {"gen": 10}, 7, 7,
-                        priority=9.0, threat=8.5)
 
 # ---------------------------------------------------------------------------
 # 2026-09-04 candidates

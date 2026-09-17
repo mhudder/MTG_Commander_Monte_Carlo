@@ -199,10 +199,6 @@ class ABResult:
                 f"p={self.p_value:<7.4g}{star}")
 
 
-def _swap(deck, out_card_name, in_card):
-    return _swap_many(deck, [out_card_name], [in_card])
-
-
 def _swap_many(deck, out_names, in_cards):
     """Replace n cards with n others, preserving list positions.
 
@@ -263,21 +259,6 @@ def analyse(rows_a, rows_b, metrics=METRICS, boots=4000, rng_seed=7):
         p = 2 * st.t.sf(abs(t), df=n - 1)
         out.append(ABResult(m, a.mean(), b.mean(), d.mean(), lo, hi, p, n))
     return out
-
-
-def lethal_curve(rows, cfg):
-    """P(cumulative damage >= pod life) by turn.
-
-    Since the opponent clock landed, games end at different turns, so
-    `damage_by_turn` is ragged. Pad to the longest run before stacking.
-    """
-    turns = max((len(r["damage_by_turn"]) for r in rows), default=0)
-    if turns == 0:
-        return []
-    padded = np.array([r["damage_by_turn"] + [0.0] * (turns - len(r["damage_by_turn"]))
-                       for r in rows], dtype=float)
-    cum = np.cumsum(padded, axis=1)
-    return [(t + 1, float((cum[:, t] >= cfg["pod_life"]).mean())) for t in range(turns)]
 
 
 def report(rows_a, rows_b, name_a, name_b, cfg, results):

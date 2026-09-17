@@ -9,10 +9,10 @@ Where things live:
 |---|---|
 | **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings, every runnable command. Regenerate with `python -m tools.status --write`. |
 | **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
-| **the rules** | `CLAUDE.md` — the operational doc, ~560 lines, durable, worth reading in full. |
-| **a numbered finding** | `KNOWN_ISSUES.md` — `§0a`..`§0z22` plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered. |
+| **the rules** | `CLAUDE.md` — the operational doc, durable, worth reading in full. |
+| **a numbered finding** | `KNOWN_ISSUES.md` — `§0a` onward plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered; `docs/STATUS.md` prints the current last id. |
 | **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
-| **the knobs** | `docs/KNOBS.md` — all 107, GENERATED, with defaults and which have never been swept. |
+| **the knobs** | `docs/KNOBS.md` — every one, GENERATED, with defaults and which have never been swept. |
 
 This file used to open with a dated status block. It was three days stale when
 it was removed, which is why state now lives in one generated file instead of
@@ -197,13 +197,14 @@ disagree, the project's own rule is to follow win rate.
 - **`docs/STATUS.md`** — what is true right now. GENERATED; read it, never edit
   it. If it disagrees with prose anywhere else, it wins.
 - **`CLAUDE.md`** — the operational doc: the standing rules and the open queued
-  work. ~560 lines, durable, read it in full. It carries no dated state, which
+  work. Durable, read it in full. It carries no dated state, which
   is why it can be trusted without checking when it was last touched.
-- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` through `§0z22` plus the
-  older `1`–`8` series, with a status index at the top. The ids are cited from
-  43 places in the code, so they are never renumbered. Read the index, then the
-  handful of sections it points you at; the file is 4,300 lines and is not
-  meant to be read through.
+- **`KNOWN_ISSUES.md`** — numbered findings, `§0a` onward plus the older
+  `1`–`8` series, with a status index at the top. The ids are cited from the
+  code, so they are never renumbered; `docs/STATUS.md` prints the current last
+  id and `check_docs` the cite count. Read the index, then the handful of
+  sections it points you at; the file is thousands of lines and is not meant
+  to be read through.
 - **`docs/READING_TABLES.md`** — how to read an ablation table without drawing
   the three conclusions it invites you to draw wrongly. Short, and it has never
   needed updating, which is what a good doc looks like here.

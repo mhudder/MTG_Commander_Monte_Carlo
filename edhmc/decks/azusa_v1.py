@@ -353,13 +353,12 @@ BURGEONING = C("Burgeoning", "Enchantment", {"G": 1},
 CONSTANT_MISTS = C("Constant Mists", "Instant", {"gen": 1, "G": 1},
                    priority=4.0, threat=1.0)
 
-# Greensleeves, Ancient Greenwarden and Springheart Nantuko were here until
-# 2026-09-10 and are now COMMITTED deck members; a card in the deck is not a
-# candidate, and leaving it here is the §0o failure (measuring a second copy
-# in a singleton-illegal 101-card list).
-CANDIDATES_MODELLED = (CULTIVATOR_COLOSSUS, CASE_OF_THE_LOCKED_HOTHOUSE,
-                       CONDUIT_OF_WORLDS, WALK_IN_CLOSET)
-CANDIDATES_BLIND = (BURGEONING, CONSTANT_MISTS)
+# Greensleeves, Ancient Greenwarden and Springheart Nantuko were candidates
+# here until 2026-09-10 and are now COMMITTED deck members; a card in the deck
+# is not a candidate (§0o: measuring a second copy in a singleton-illegal
+# 101-card list). The CANDIDATES_MODELLED / CANDIDATES_BLIND tuples that once
+# grouped the survivors were read by nothing and were removed on 2026-09-17;
+# `tools/candidates.py` and `edhmc/pending.py` import the cards by name.
 
 
 # ---------------------------------------------------------------------------
@@ -424,12 +423,11 @@ SCENE_OF_THE_CRIME = L("Scene of the Crime", "C", tapped=True,
                        types="Artifact/Land")
 THE_HUNTER_MAZE = L("The Hunter Maze", "G", tapped=True)
 
-# Scene of the Crime won this comparison and is COMMITTED (in LANDS above), so
-# it leaves the candidate tuple. Ka-Zar remains STAGED, not committed, so it
-# stays. Cryptic Caves, Horizon of Progress and The Hunter Maze lost and are
-# kept as the provenance for that decision -- §0z3.
-DRAW_CANDIDATES = (KA_ZAR, CRYPTIC_CAVES, HORIZON_OF_PROGRESS,
-                   THE_HUNTER_MAZE)
+# Scene of the Crime won this comparison and is COMMITTED (in LANDS above).
+# Ka-Zar remains STAGED, not committed. Cryptic Caves, Horizon of Progress and
+# The Hunter Maze lost and are kept as the provenance for that decision --
+# §0z3. (`run_azusa_draw.py` and `pending.py` import them by name; the
+# DRAW_CANDIDATES tuple that once grouped them was read by nothing.)
 
 
 # ---------------------------------------------------------------------------

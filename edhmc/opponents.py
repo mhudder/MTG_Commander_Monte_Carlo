@@ -448,7 +448,7 @@ def check_wipe_coverage(decks):
 
     This is the §0q rule applied in the same change that introduces the set:
     a hand-maintained name set is a claim, so it gets a check, and the check is
-    proved to fail (see tests/test_own_wipe.py --mutate).
+    proved to fail (see tests/test_pod_damage_and_wipes.py --mutate).
 
     A name in a set that is in no deck is stale rather than dangerous, so it
     is reported and not raised on -- `Coercive Portal` is not `wipe`-tagged at

@@ -276,7 +276,7 @@ run_ab(deck, cmd, ["Card A", "Card B"], [new_a, new_b], n=12000,
 **A different swap in the same deck:**
 
 ```python
-from edhmc.decks.rendmaw_v11 import build, C
+from edhmc.decks.rendmaw_v12 import build, C
 from edhmc.experiment import run_ab, analyse, report
 
 deck, cmd = build()
@@ -285,7 +285,7 @@ a, b, cfg = run_ab(deck, cmd, out_card="Pygmy Kavu", in_card=new, n=20000)
 report(a, b, "Pygmy Kavu", "Bala Ged Recovery", cfg, analyse(a, b))
 ```
 
-**A new deck** — copy `decks/rendmaw_v11.py` and rewrite the card lists. The
+**A new deck** — copy `decks/rendmaw_v12.py` and rewrite the card lists. The
 `C()` and `L()` helpers are the whole interface. Three things need care:
 
 1. **Costs, not mana values.** The spreadsheets only store MV, which cannot
@@ -317,13 +317,15 @@ damage, which resolves effects down to roughly 1% of baseline. For coarse
 "is this obviously better" checks, 2,000 games is plenty. Anything below ~500 is
 not worth reading.
 
-### Two engines
+### The engines
 
-`engine.py` models decks that win by putting power on the board. `lorehold.py`
-models a miracle/top-deck deck and has its own turn loop, because the archetype
-is structurally different: its value comes from miracle windows, not combat.
-Both share `opponents.py`, `can_pay`, and the mana model, and both plug into the
-same A/B harness via `sim=`.
+There are six now, one per deck (`docs/ARCHITECTURE.md` maps them); the
+original two are the shape the rest follow. `engine.py` models decks that win
+by putting power on the board. `lorehold.py` models a miracle/top-deck deck and
+has its own turn loop, because the archetype is structurally different: its
+value comes from miracle windows, not combat. All of them share `opponents.py`,
+`can_pay`, and the mana model, and all plug into the same A/B harness via
+`sim=`.
 
 The Lorehold engine models damage from spells and tokens as well as combat —
 Guttersnipe (2 to each opponent per instant or sorcery, so 6 a pop, which in a

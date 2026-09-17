@@ -4,23 +4,23 @@ __pycache__/
 .venv/
 venv/
 
-# Ablation caches are NOT IGNORED — they are trackable, and right now there are
-# NONE. See KNOWN_ISSUES.md 0z23.
+# Ablation caches are NOT IGNORED — one per deck is tracked under
+# results/caches/, each with the fingerprint it was BUILT at recorded in
+# results/caches/PROVENANCE.json (stamped by ablation.py, never rewritten).
+# See KNOWN_ISSUES.md 0z23 and docs/ABLATION_CACHES.md, which is generated.
 #
-# They were tracked from 2026-09-05 so a clone could reproduce or extend the
-# tables without the run. The cost is that a stale cache arrives with a
-# checkout, so docs/ABLATION_CACHES.md records a source fingerprint per deck and
-# you check it before resuming one. That safety net was then not maintained: ten
-# caches were deleted in b09055c without the generator being re-run, leaving the
-# manifest describing fourteen files of which four existed — and all four of
-# those disagreed with their live fingerprint. They were deleted on 2026-09-16
-# and results/caches/ is empty.
+# They are tracked so a clone can reproduce or extend the tables without the
+# run, which is about four hours for six decks. The cost is that a stale cache
+# arrives with a checkout; the guard is provenance, not deletion -- a cache
+# whose built-at fingerprint differs from live is SUSPECT until
+# check_unchanged_decks shows its baseline did not move, and check_docs fails
+# on a SUSPECT or UNRECORDED cache. That safety net was once not maintained
+# (ten caches deleted in b09055c with the generator left describing them),
+# which is why check_docs now verifies the generated manifest too.
 #
-# The argument for tracking them had already weakened on its own terms: the
-# "roughly six hours to rebuild" that justified it is now about 23 minutes.
-# If you produce a cache worth keeping, commit it together with its NOTES entry
-# and a regenerated manifest — an untracked cache with no provenance is the
-# thing this comment exists to prevent.
+# If you produce a cache worth keeping, commit it together with its stamped
+# provenance and a regenerated manifest — an untracked cache with no
+# provenance is the thing this comment exists to prevent.
 #
 # The blank mode is IN THE FILENAME on purpose: a cache measured against a
 # different blank is not resumable onto, and a suffix nothing reads is how the

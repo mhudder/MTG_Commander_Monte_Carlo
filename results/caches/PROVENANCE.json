@@ -34,6 +34,12 @@
         "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-17, after the \u00a70z28 hook fix in azusa.make_permanent: BIT-IDENTICAL on all 8 metrics for all six decks. Expected -- neither The Great Henge nor Guardian Project is in the built list, so the baseline cannot see the fix; the CANDIDATE rows are what moved (see \u00a70z28).",
         "fingerprint": "9fba1296afcf8b8d",
         "utc": "2026-09-17T01:36:42Z"
+      },
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "0c3db6557f26a689",
+        "utc": "2026-09-17T02:24:51Z"
       }
     ]
   },
@@ -42,7 +48,14 @@
     "built_commit": "9cfd3fb",
     "built_utc": "2026-09-16T20:56:38Z",
     "deck": "karlov",
-    "verified": []
+    "verified": [
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "78323d994e25a6a7",
+        "utc": "2026-09-17T02:24:51Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "fbc552aea5d15b19",
@@ -67,6 +80,12 @@
         "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
         "fingerprint": "1c963ee40dcfaa49",
         "utc": "2026-09-16T21:33:49Z"
+      },
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "fd1ccb5977613e80",
+        "utc": "2026-09-17T02:24:51Z"
       }
     ]
   },
@@ -93,6 +112,12 @@
         "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
         "fingerprint": "ce1493094eab5f40",
         "utc": "2026-09-16T21:33:50Z"
+      },
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "48a1cf79d751d164",
+        "utc": "2026-09-17T02:24:51Z"
       }
     ]
   },
@@ -119,6 +144,12 @@
         "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
         "fingerprint": "6db503deed4ad071",
         "utc": "2026-09-16T21:33:50Z"
+      },
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "d312960e09406bfa",
+        "utc": "2026-09-17T02:24:51Z"
       }
     ]
   },
@@ -127,6 +158,13 @@
     "built_commit": "9cfd3fb",
     "built_utc": "2026-09-16T20:57:57Z",
     "deck": "tivit",
-    "verified": []
+    "verified": [
+      {
+        "commit": "f639dd9",
+        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+        "fingerprint": "d44cd5ceae1f1f34",
+        "utc": "2026-09-17T02:24:51Z"
+      }
+    ]
   }
 }

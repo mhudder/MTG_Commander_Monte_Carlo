@@ -16,9 +16,10 @@ Read that file for state; read this one for judgement.
 
     docs/STATUS.md      what is true now. GENERATED, never hand-edited.
     CLAUDE.md           this file: the rules, which do not have dates on them.
-    KNOWN_ISSUES.md     numbered findings and their evidence, `§0a`..`§0z22`.
+    KNOWN_ISSUES.md     numbered findings and their evidence, `§0a` onward.
+                        STATUS.md prints the current last id.
     docs/HISTORY.md     the dated narrative. Search it; do not read it.
-    docs/KNOBS.md       all 107 simulation knobs. GENERATED.
+    docs/KNOBS.md       every simulation knob. GENERATED.
     HANDOFF.md          human-facing orientation, if you are new.
     docs/ARCHITECTURE.md how the modules connect, the protocol between
                         opponents.py and an engine, and the pitfalls each
@@ -36,7 +37,8 @@ the ledger held four. The narrative it carried is in `docs/HISTORY.md` under
 "State as of 2026-09-13", verbatim.
 
 Numbered findings are cited by section (`§0j`, `§0r`) from this file, from
-`docs/HISTORY.md`, and from 43 places in the code. Those ids are load-bearing:
+`docs/HISTORY.md`, and from the code (`check_docs` prints how many). Those
+ids are load-bearing:
 **reorganise `KNOWN_ISSUES.md` around its ids, never renumber them.**
 `python -m tools.check_docs` verifies every cited id still resolves.
 
@@ -118,12 +120,12 @@ python -m tools.tag_flying --write     # decks/_evasion.py (FLYING/INDESTRUCTIBL
 
 ### Mutation runs, because a check that cannot fail is worse than none
 
-Thirteen checks carry one. Each asserts an EXACT set of failing cases, so a fix
+These checks carry one. Each asserts an EXACT set of failing cases, so a fix
 that stops mattering is as loud as one that breaks. `docs/STATUS.md` lists
 every test; these are the ones with `--mutate`:
 
 ```bash
-python -m tools.check_docs --mutate                 # 4 mutations, exact sets
+python -m tools.check_docs --mutate                 # every mutation an exact set
 python -m diagnostics.diag_azusa_animation --mutate # 7 of 8 cases MUST fail
 python -m tests.test_combat_split --mutate          # exactly 2 cases MUST fail
 python -m tests.test_azusa_candidates --mutate      # exactly 3 cases MUST fail
@@ -523,8 +525,8 @@ toward whatever got tagged. It is worse than no tags at all.
 **Say the knob out loud** when a card's evaluation swings on one:
 `destroy_share` (0.60), `opp_vote_policy` (`"adversarial"`),
 `flier_block_share` (0.30), `archetype_weights`. **`docs/KNOBS.md` is the full
-list** — 107 of them, derived from the `cfg.get` call sites, with defaults and
-with the 41 that nothing has ever set. Until it existed this rule could not be
+list** — derived from the `cfg.get` call sites, with defaults and with the
+ones that nothing has ever set. Until it existed this rule could not be
 mechanically followed, because nobody could enumerate the knobs. And say it
 when a knob does NOT matter:
 `altar_keep` was swept 6 → 0 in §0z20, quadrupling the sacrifices and leaving

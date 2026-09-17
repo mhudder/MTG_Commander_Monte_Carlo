@@ -406,6 +406,13 @@ def render() -> str:
     w("From `KNOWN_ISSUES.md`'s index. **The section ids are load-bearing** —")
     w("they are cited from code — so they are never renumbered.")
     w("")
+    newest, n_sections = newest_section()
+    cited = code_cite_count()
+    w(f"**{n_sections} sections**, newest `§{newest}`; **{cited} distinct ids")
+    w("cited from code**. These figures used to be typed into CLAUDE.md and")
+    w("HANDOFF.md and had rotted; they are derived here now, and `check_docs`")
+    w("fails if either file quotes one by hand.")
+    w("")
     if issues:
         by_status: dict[str, int] = {}
         for _id, status, _txt in issues:
@@ -448,6 +455,37 @@ def render() -> str:
     if shell:
         w("")
 
+    # ---- results and spreadsheets on disk
+    w("## What is in results/ and spreadsheets/")
+    w("")
+    w("Every `results/*.txt` is the evidence for some number, and evidence is")
+    w("kept -- but a file nothing names is evidence for nothing anyone can")
+    w("find. `cited by` is derived by searching the code, `KNOWN_ISSUES.md`,")
+    w("the live docs and `docs/HISTORY.md` for each file's name.")
+    w("")
+    cites = results_citations()
+    tally: dict[str, int] = {}
+    for _f, where in cites:
+        tally[where] = tally.get(where, 0) + 1
+    w(f"**{len(cites)} result files**: " + " · ".join(
+        f"{v} cited by {k}" for k, v in sorted(tally.items(),
+                                               key=lambda kv: -kv[1])))
+    w("")
+    orphans = [f for f, where in cites if where in ("HISTORY.md only", "nothing")]
+    if orphans:
+        w("Cited only from `docs/HISTORY.md`, or from nowhere -- the dated")
+        w("narrative is the only way back to what produced them:")
+        w("")
+        for f in orphans:
+            w(f"- `{f}`")
+        w("")
+    w("Spreadsheets are the system of record for a deck (azusa has none),")
+    w("matched to a module by name and version:")
+    w("")
+    for xlsx, verdict in spreadsheet_modules():
+        w(f"- `{xlsx}` — {verdict}")
+    w("")
+
     # ---- knobs
     w("## Knobs")
     w("")
@@ -474,6 +512,111 @@ def render() -> str:
     w("test in the project, and no number here can be trusted until it is fixed.")
     w("")
     return "\n".join(L) + "\n"
+
+
+def newest_section() -> tuple[str, int]:
+    """(newest 0z-series id, number of 0-series sections) from the headings."""
+    try:
+        with open("KNOWN_ISSUES.md", "r", encoding="utf-8", errors="ignore") as fh:
+            heads = re.findall(r"^## (0[a-z0-9]*)\.", fh.read(), re.M)
+    except OSError:
+        return "?", 0
+    z = [int(h[2:]) for h in heads if re.fullmatch(r"0z\d+", h)]
+    return (f"0z{max(z)}" if z else (heads[-1] if heads else "?")), len(heads)
+
+
+def code_cite_count() -> int:
+    """Distinct §ids cited from code -- the same scan check_docs verifies."""
+    try:
+        from tools.check_docs import SECTION_CITE, code_files, read
+        text = "\n".join(read(p) for p in code_files())
+        return len(set(SECTION_CITE.findall(text)))
+    except Exception:
+        return 0
+
+
+def _searchable_text() -> dict[str, str]:
+    """{bucket: text} over which a results/ or spreadsheets/ name is looked up."""
+    out: dict[str, list[str]] = {"code": [], "KNOWN_ISSUES.md": [],
+                                 "live docs": [], "HISTORY.md only": []}
+    for root, dirs, files in os.walk("."):
+        dirs[:] = [d for d in dirs
+                   if d not in (".git", "__pycache__", "archive", "results",
+                                "spreadsheets")]
+        for f in files:
+            p = os.path.relpath(os.path.join(root, f), ".")
+            if p == OUT:
+                continue        # this file lists them all; it is not a citer
+            if f.endswith((".py", ".sh")):
+                bucket = "code"
+            elif p == "KNOWN_ISSUES.md":
+                bucket = "KNOWN_ISSUES.md"
+            elif p == os.path.join("docs", "HISTORY.md"):
+                bucket = "HISTORY.md only"
+            elif f.endswith(".md"):
+                bucket = "live docs"
+            else:
+                continue
+            try:
+                with open(p, "r", encoding="utf-8", errors="ignore") as fh:
+                    out[bucket].append(fh.read())
+            except OSError:
+                pass
+    return {k: "\n".join(v) for k, v in out.items()}
+
+
+def results_citations() -> list[tuple[str, str]]:
+    """[(file, strongest citer)] for every results/*.txt, in the order
+    code > KNOWN_ISSUES.md > live docs > HISTORY.md only > nothing."""
+    if not os.path.isdir(RESULTS):
+        return []
+    text = _searchable_text()
+    out = []
+    for f in sorted(os.listdir(RESULTS)):
+        if not f.endswith(".txt"):
+            continue
+        where = "nothing"
+        for bucket in ("code", "KNOWN_ISSUES.md", "live docs", "HISTORY.md only"):
+            if f in text[bucket]:
+                where = bucket
+                break
+        out.append((f, where))
+    return out
+
+
+def spreadsheet_modules() -> list[tuple[str, str]]:
+    """[(xlsx, verdict)] -- each spreadsheet matched to the deck module whose
+    NAME it starts with. The deck modules are `<name>_v<N>.py` and the
+    spreadsheets `<Name>_..._v<N>.xlsx`, so the match is the leading token
+    and the verdict compares versions: the system of record, a superseded
+    version kept as provenance, or a deck with no module at all."""
+    d = "spreadsheets"
+    if not os.path.isdir(d):
+        return []
+    try:
+        from edhmc.decks import discover_current_decks
+        mods = {name: mod.__name__.rsplit(".", 1)[-1]
+                for name, mod in discover_current_decks().items()}
+    except Exception:
+        mods = {}
+    out = []
+    for xlsx in sorted(os.listdir(d)):
+        if not xlsx.endswith(".xlsx"):
+            continue
+        name = xlsx.split("_", 1)[0].lower()
+        m = re.search(r"_v(\d+)\.xlsx$", xlsx)
+        ver = int(m.group(1)) if m else None
+        if name not in mods:
+            verdict = "**no deck module** -- a deck this project has not built"
+        else:
+            mv = re.search(r"_v(\d+)$", mods[name])
+            mver = int(mv.group(1)) if mv else None
+            if ver is not None and mver is not None and ver < mver:
+                verdict = f"superseded by `{mods[name]}.py`; kept as provenance"
+            else:
+                verdict = f"system of record for `{mods[name]}.py`"
+        out.append((xlsx, verdict))
+    return out
 
 
 def knob_count() -> int:

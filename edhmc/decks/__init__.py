@@ -2,8 +2,10 @@
 
 `discover_current_decks()` is the registry. It walks this package, keeps only
 modules that match the version-suffix convention and expose `build()`, and
-resolves each NAME to its highest-numbered version — so `karlov_v1.py` (kept
-for history) is automatically shadowed by `karlov_v2.py` with no list to edit.
+resolves each NAME to its highest-numbered version — so a `karlov_v3.py`
+would shadow `karlov_v2.py` with no list to edit. (`karlov_v1.py` was kept
+"for history" under that rule until 2026-09-17, imported on every discovery
+and read by nothing; git history is where history lives.)
 
 WHY THIS EXISTS. This project has been burned twice by exactly this class of
 bug: `tag_flying.py` used to walk a hand-written `decks = {...}` dict and

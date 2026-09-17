@@ -147,8 +147,6 @@ def is_forest(card) -> bool:
     """Does this card have the Forest subtype? (305.6 gives it "{T}: Add {G}".)"""
     return card.name in FOREST or card.name in FOREST_TOKENS
 
-TUTOR_TARGETS_MODULE = None   # set by decks/azusa_v1.py via register_pool()
-
 # Cards whose value is realised PER LAND DROP, so they have to be on the
 # battlefield BEFORE the drops are spent or they do nothing that turn. This is
 # the set `main_phase(enablers_only=True)` deploys in the pre-land main phase.

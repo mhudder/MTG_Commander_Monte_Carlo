@@ -48,7 +48,6 @@ from tools._generated import comparable
 SECTION_CITE = re.compile(r"§([0-9][0-9a-z]*)")
 KNOWN_ISSUES = "KNOWN_ISSUES.md"
 CODE_DIRS = ("edhmc", "tools", "diagnostics", "tests")
-DOC_PATH = re.compile(r"(?:docs/)?[A-Za-z0-9_\-]+\.md")
 
 
 class Result:
@@ -97,8 +96,8 @@ def read(path: str) -> str:
 def check_sections_resolve(code_text: str, issues: str) -> Result:
     """Every §id cited from code resolves to a heading in KNOWN_ISSUES.md.
 
-    43 ids are cited from code today. The ids are load-bearing precisely
-    because code cites them, and nothing has ever checked that they land.
+    The ids are load-bearing precisely because code cites them (the count
+    is printed in the result), and nothing had ever checked that they land.
     """
     cited = set(SECTION_CITE.findall(code_text))
     headings = set(re.findall(r"^## ([0-9][0-9a-z]*)\.", issues, re.M))
@@ -112,7 +111,7 @@ def check_sections_resolve(code_text: str, issues: str) -> Result:
 def check_index_matches_headings(issues: str) -> Result:
     """The index table and the headings are the same set, both ways.
 
-    The index is how anyone navigates a 4,345-line file. A heading with no row
+    The index is how anyone navigates a file thousands of lines long. A heading with no row
     is invisible; a row with no heading is a dead link.
     """
     headings = set(re.findall(r"^## ([0-9][0-9a-z]*)\.", issues, re.M))
@@ -230,11 +229,41 @@ def check_shell_commands_exist(docs: dict[str, str]) -> Result:
                   not bad, "; ".join(sorted(set(bad))))
 
 
-def check_generated_current(name: str, ok: bool, detail: str) -> Result:
-    return Result(name, ok, detail)
-
-
 ARCHITECTURE = os.path.join("docs", "ARCHITECTURE.md")
+
+
+DURABLE = ("CLAUDE.md", "HANDOFF.md")
+# The phrasings that HAD rotted when this check was written (2026-09-17): a
+# §-id range, "all N knobs", a cite count, a line count. It is blind to any
+# other way of quoting the same figure (§0z15: an exemption is a blind spot,
+# written down) -- the durable rule is "carry no number the repo derives",
+# and this pins the four shapes that broke it. A dated finding that quotes
+# a fraction ("36 of 107 knobs named in no .md", 2026-09-15) is a measurement
+# with its date on it, and is deliberately NOT matched.
+DERIVED_COUNT = re.compile(
+    r"§0a`?\.\.`?§|"                    # `§0a`..`§0z22`
+    r"\ball\s+\d+(?:,\s*GENERATED|\s+(?:simulation\s+)?knobs)\b|"
+    r"\b\d+ of them, derived|"
+    r"\b\d+ places in the code|"
+    r"~\d[\d,]* lines\b")
+
+
+def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
+    """CLAUDE.md and HANDOFF.md quote no count that STATUS.md derives.
+
+    CLAUDE.md says of itself that it carries no dated numbers. It carried
+    four -- the issue-id range, the knob count, the cite count and its own
+    line count -- and every one had drifted from the repo it described.
+    `docs/STATUS.md` derives them now; this fails if they are typed back.
+    """
+    bad = []
+    for path in DURABLE:
+        text = docs.get(path, "")
+        for m in DERIVED_COUNT.finditer(text):
+            line = text.count("\n", 0, m.start()) + 1
+            bad.append(f"{path}:{line} quotes `{m.group(0)}`")
+    return Result("the durable docs quote no count the repo derives",
+                  not bad, "; ".join(bad))
 
 
 def check_architecture_names_modules(docs: dict[str, str]) -> Result:
@@ -386,6 +415,7 @@ def run_all() -> list[Result]:
         check_commands_exist(docs),
         check_shell_commands_exist(docs),
         check_architecture_names_modules(docs),
+        check_durable_docs_derive_counts(docs),
         check_caches_recorded(),
     ]
     results.extend(generated_checks())
@@ -435,6 +465,10 @@ MUTATIONS = {
         lambda code, issues, docs: (
             code, issues, dict(docs, **{ARCHITECTURE:
                                         docs[ARCHITECTURE].replace("voting", "v0ting")})),
+    "a knob count is typed back into CLAUDE.md":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{"CLAUDE.md":
+                                        docs["CLAUDE.md"] + "\nall 107 knobs\n"})),
 }
 
 # Which checks each mutation must break. Written before running it: a
@@ -449,6 +483,8 @@ EXPECTED = {
         {"every `./...sh` command in the docs exists and is executable"},
     "a module vanishes from the architecture map":
         {"docs/ARCHITECTURE.md names every module in edhmc/ and tools/"},
+    "a knob count is typed back into CLAUDE.md":
+        {"the durable docs quote no count the repo derives"},
 }
 
 
@@ -468,6 +504,7 @@ def mutate() -> int:
             check_commands_exist(d),
             check_shell_commands_exist(d),
             check_architecture_names_modules(d),
+            check_durable_docs_derive_counts(d),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}
         want = EXPECTED[label]

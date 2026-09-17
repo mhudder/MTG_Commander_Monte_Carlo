@@ -2202,8 +2202,7 @@ DECKS = {
         # 2026-09-16 batch (§0z26).
         "Anointed Procession": tivit_v1.ANOINTED_PROCESSION,
         "Urza, Lord High Artificer": tivit_v1.URZA_LORD_HIGH_ARTIFICER,
-        "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST,
-        "Anointed Procession": tivit_v1.ANOINTED_PROCESSION}),
+        "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST}),
     # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
     # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,
     # six mana values corrected against Scryfall (see shilgengar_v1.py's

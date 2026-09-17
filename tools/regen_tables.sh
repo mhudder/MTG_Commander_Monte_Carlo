@@ -24,13 +24,12 @@
 #
 # BOTH FROM THE REPO ROOT. See the note above the loop.
 #
-# Since 2026-09-06 a deck takes minutes rather than ninety, so the 1800s budget
-# below never fires and the retry loop runs exactly once. Both are kept because
-# they cost nothing and still cover an interrupted run. Set ABLATE_PROCS to
-# limit the worker count (default: every core).
+# The 1800s budget below is per ablation.py invocation, and the retry loop
+# re-invokes with --resume semantics (the cache) until the table prints. Set
+# ABLATE_PROCS to limit the worker count (default: every core).
 #
-# N IS 15000 AND TIVIT IS IN THE LOOP, both since 2026-09-06. The whole run is
-# about 24 minutes. Do not lower N here without lowering it in the tables too:
+# N IS 15000 AND TIVIT IS IN THE LOOP, both since 2026-09-06. Do not lower N
+# here without lowering it in the tables too:
 # this script OVERWRITES ablation_<deck>.txt, so a stale N in this file silently
 # replaces the committed tables with less precise ones. N is now printed in each
 # table's own header, which is the check on that.
@@ -75,7 +74,12 @@
 # regenerations -- but they belong here for the same reason tivit does, which
 # is that a table only means something next to the others at a COMMON N.
 #
-# The whole run is now about 35 minutes rather than 24.
+# HOW LONG IT TAKES. "24 minutes", then "35 minutes", were quoted here from
+# before §0z22 made every game 1.22x slower. The six-deck run was then measured
+# end to end (2026-09-16, KNOWN_ISSUES.md 0z23): about 14 CPU-hours, roughly
+# four hours on four cores. That cost is why caches now carry provenance and
+# are VERIFIED with a 26-second baseline check instead of being deleted --
+# read "A STALE CACHE IS THE HAZARD" in CLAUDE.md before running this whole.
 
 set -e
 RESUME=""
