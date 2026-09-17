@@ -437,6 +437,50 @@ class AuditRandom(random.Random):
         return super().randrange(*a, **k)
 
 
+def counts_as_land_in_hand(c) -> bool:
+    """A land, or a modal double-faced card whose back is one. lorehold.py
+    counted its MDFCs for the keep decision from the start; rendmaw,
+    shilgengar and tivit carry MDFCs too (`land_face` is set on them) and
+    did not, which was §0u's shape rather than a choice (§0z30)."""
+    return c.is_land or bool(c.land_face)
+
+
+def london_mulligan(g) -> None:
+    """The opening hand, ONCE, for all six engines (§0z30).
+
+    Draw seven; keep on 2-5 lands (MDFC backs count); otherwise shuffle the
+    hand back and try again, up to three mulligans. THE FOURTH HAND IS KEPT
+    WHATEVER IT HOLDS -- a pilot on their third mulligan keeps the next seven
+    -- and then `mulls` cards go to the bottom, worst first (highest-MV
+    nonland, crudely), which is the London rule.
+
+    Six copies of this existed and they disagreed on exactly that last case:
+    engine.py drew a FIFTH hand; lorehold.py cleared the hand and never
+    redrew (0.11% of its games started with no cards); karlov, tivit,
+    shilgengar and azusa neither cleared nor redrew, so the seven cards were
+    in hand AND back in the library -- a 106-card deck, in 0.1-0.4% of games.
+    CRN paired those games so the defect mostly cancelled in every A/B
+    difference, which is how it survived; it is still a defect.
+
+    `g.rng` is the ONLY randomness here and this is the last place it is
+    allowed: `seal_rng` follows this call in every `simulate`. §0z17.
+    """
+    mulls = 0
+    for mulls in range(4):
+        g.hand = [g.library.pop() for _ in range(7)]
+        lands = sum(1 for c in g.hand if counts_as_land_in_hand(c))
+        if 2 <= lands <= 5 or mulls == 3:
+            break
+        g.library.extend(g.hand)
+        g.rng.shuffle(g.library)
+        g.hand = []
+    for _ in range(mulls):
+        if g.hand:
+            worst = max(g.hand, key=lambda c: (not c.is_land, c.mv))
+            g.hand.remove(worst)
+            g.library.insert(0, worst)
+
+
 def make_rng(seed: int, cfg: dict) -> random.Random:
     """The game RNG. A plain `Random` unless the CRN audit is switched on."""
     return AuditRandom(seed) if cfg.get("crn_audit") else random.Random(seed)
@@ -1009,23 +1053,7 @@ class Game:
                 self.m["cards_drawn"] += 1
 
     def opening_hand(self):
-        """London mulligan to 7, keeping on a 2-5 land heuristic."""
-        for mulls in range(4):
-            self.hand = [self.library.pop() for _ in range(7)]
-            lands = sum(1 for c in self.hand if c.is_land)
-            if 2 <= lands <= 5:
-                break
-            self.library.extend(self.hand)
-            self.rng.shuffle(self.library)
-            self.hand = []
-        else:
-            self.hand = [self.library.pop() for _ in range(7)]
-        # bottom `mulls` cards (worst = highest MV nonland, crudely)
-        for _ in range(mulls):
-            if self.hand:
-                worst = max(self.hand, key=lambda c: (not c.is_land, c.mv))
-                self.hand.remove(worst)
-                self.library.insert(0, worst)
+        london_mulligan(self)
 
     # -- tokens --------------------------------------------------------------
 
@@ -2170,17 +2198,7 @@ def take_turn(g: Game):
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
     if g.cfg.get("opponents", True):
-        OPP.incidental_damage(g)
-        OPP.resolve_clocks(g)
-        if g.result is not None:
-            return
-        watch = g.cfg.get("watch", ())
-        before = {p.card.name for p in g.board if p.card.name in watch}
-        OPP.opponents_act(g)
-        after = {p.card.name for p in g.board if p.card.name in watch}
-        for n in before - after:
-            g.m["test_card_answered"] += 1
-            g.m["test_card_removed"] += 1
+        OPP.pod_phase(g)           # one order for six engines, §0z30
 
 
 def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:

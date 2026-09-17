@@ -86,10 +86,15 @@ code and want to know what else it touches.
    every mid-game roll goes through `CRNStreams` (one addressed stream per
    named effect). The pod's rolls were pre-generated in `make_pod` from a
    separate stream seeded identically for both branches.
-4. `take_turn` runs the engine's own phase order; at the end of your turn the
-   pod acts (`opponents_act`), chips your life (`incidental_damage`) and may
-   fire a clock (`resolve_clocks`). **The order of those three is per engine
-   today — see the drift table below.**
+4. `take_turn` runs the engine's own phase order; at the end of your turn
+   `opponents.pod_phase` runs, ONCE for all six engines: chip damage
+   (`incidental_damage`), then every clock that is due (`resolve_clocks`),
+   then — if you are still in the game — the removal round
+   (`opponents_act`). An engine with its own model of what opponents do on
+   their turns (karlov's `opponent_activity`) passes it as `before_act`.
+   Two engines ran removal first until 2026-09-17 (§0z30); the test
+   `tests/test_mulligan_and_pod_order.py` fails if an engine calls the
+   three parts itself again.
 5. `simulate` returns the metrics dict; `analyse` bootstraps the paired
    difference per metric. `won` is the objective; everything else is a proxy.
 
@@ -116,16 +121,17 @@ to all six.
 **1. Six engines, no base class.** The shared code is module-level FUNCTIONS in
 `engine.py` that take the game as an argument (`can_pay`, `spend`,
 `play_land`, …). Anything written as a METHOD on a `<Name>Game` class has six
-copies — `opening_hand`, `draw`, `deal_pod_damage`, `power_of`,
-`on_creature_death`, and the tail of `simulate()` that assembles the output
-dict. **A rule that lives in a method drifts; a rule that lives in a function
+copies — `draw`, `deal_pod_damage`, `power_of`, `on_creature_death`, and
+the tail of `simulate()` that assembles the output dict. (`opening_hand` was
+one until 2026-09-17; it is now a one-line call to `engine.london_mulligan`
+in all six, §0z30.) **A rule that lives in a method drifts; a rule that lives in a function
 does not.** Every §0u finding in `KNOWN_ISSUES.md` is an instance. Known
 drift today, said here so nobody rediscovers it:
 
 | rule | where it is written | how the copies differ |
 |---|---|---|
-| the fourth failed mulligan | `opening_hand` ×6 | `engine.py` redraws seven; `lorehold.py` keeps an EMPTY hand; the other four leave the seven cards in hand AND back in the library |
-| end-of-turn pod order | `take_turn` ×6 | four engines run damage → clocks → removal; `karlov.py` and `tivit.py` run removal → damage → clocks |
+| ~~the fourth failed mulligan~~ | CLOSED 2026-09-17, `engine.london_mulligan` ×1 | was: `engine.py` redrew seven; `lorehold.py` kept an EMPTY hand; the other four left the seven cards in hand AND back in the library. §0z30, pinned by `tests/test_mulligan_and_pod_order.py` |
+| ~~end-of-turn pod order~~ | CLOSED 2026-09-17, `opponents.pod_phase` ×1 | was: four engines ran damage → clocks → removal; `karlov.py` and `tivit.py` ran removal → damage → clocks. Worth +0.0647 win rate to tivit's baseline, §0z30 |
 | the `turns` default when no cfg supplies one | `simulate` ×6, `make_pod` | 10 in three places, 20 in four (acknowledged in `docs/KNOBS.md`; every harness passes it explicitly) |
 
 **2. Behaviour attaches BY NAME at least as often as by `script=`.** A card

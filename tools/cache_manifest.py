@@ -838,6 +838,25 @@ NOTES["ablation_cache_karlov_10-20_n15000_medblank.json"] += (
     "check. Flying turned out to be worth nothing measurable to the card -- "
     "§0z29 has the row-by-row comparison with the 2026-09-16 table.")
 
+# 2026-09-17, second regeneration of the day: M1 + M2 (§0z30), four decks.
+_SHARED_2026_09_17 = (
+    " REGENERATED FROM AN EMPTY CACHE 2026-09-17 for §0z30, one London "
+    "mulligan and one pod-phase order for six engines. A shared-code change "
+    "that was SUPPOSED to move every baseline, so the question was how much: "
+    "diagnostics/run_shared_code_shift.py, N=15,000 paired on the tables' own "
+    "seeds (results/shared_code_shift_0z30.txt). Rebuilt: karlov and tivit "
+    "(the pod order; +0.0205 and +0.0647 win rate at T20), rendmaw and "
+    "shilgengar (the MDFC keep rule; +2.0 and +6.0 stranded mana a game, win "
+    "rate at the noise floor). Lorehold and azusa moved on 3 and 2 seeds of "
+    "15,000 and are VERIFIED on that evidence rather than rebuilt.")
+
+NOTES.update({
+    f"ablation_cache_{d}_10-20_n15000_medblank.json":
+        NOTES.get(f"ablation_cache_{d}_10-20_n15000_medblank.json", "")
+        + _SHARED_2026_09_17
+    for d in ("karlov", "tivit", "rendmaw", "shilgengar")
+})
+
 def main():
     # `--verified <cache|deck> "<evidence>"` records that a SUSPECT cache was
     # checked and its deck's numbers had not moved. Evidence is mandatory: an

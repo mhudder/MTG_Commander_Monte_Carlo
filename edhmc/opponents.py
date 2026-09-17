@@ -1052,6 +1052,42 @@ def combat_share(g, opp, others) -> float:
     return w_you / total if total > 0 else 0.0
 
 
+def pod_phase(g, before_act=None):
+    """The opponents' part of a turn, ONCE, for all six engines (§0z30).
+
+    Order: chip damage, then every clock that is due, then -- if you are
+    still in the game -- the round of removal and wipes. So the threat share
+    that draws a clock's kill is read from your board AS YOU LEFT IT at end
+    of turn, and removal lands after. Four engines ran this order and two
+    (karlov, tivit) ran removal FIRST, so in those two a wrath could clear
+    your board before the clock looked at it. Nobody chose that; it was six
+    copies of one block, and one order had to be picked. This one is the
+    order in which the abstractions were written (the clock reads the
+    board the turn produced) and it is the order four of six already ran.
+
+    `before_act` is an engine's own model of what the opponents do on their
+    turns (karlov's `opponent_activity`: creatures entering, spells cast --
+    the events its taxes and drains read). It runs right before the removal
+    round, where every engine that has one already ran it.
+
+    The `watch` accounting -- was the card under test removed this round --
+    is the same in every engine and lives here for that reason.
+    """
+    incidental_damage(g)
+    resolve_clocks(g)
+    if g.result is not None:
+        return
+    if before_act is not None:
+        before_act(g)
+    watch = g.cfg.get("watch", ())
+    before = {p.card.name for p in g.board if p.card.name in watch}
+    opponents_act(g)
+    after = {p.card.name for p in g.board if p.card.name in watch}
+    for _ in before - after:
+        g.m["test_card_answered"] += 1
+        g.m["test_card_removed"] += 1
+
+
 def incidental_damage(g):
     """Opponents chip away at you every turn, not just when a clock resolves.
 

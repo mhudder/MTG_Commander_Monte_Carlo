@@ -52,15 +52,20 @@
         "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
         "fingerprint": "5746e11aba9c689d",
         "utc": "2026-09-17T03:00:51Z"
+      },
+      {
+        "commit": "af016c1",
+        "evidence": "2026-09-17 \u00a70z30 (one London mulligan, one pod-phase order): diagnostics/run_shared_code_shift.py, N=15,000 paired on the tables' seeds, old = worktree at af016c1: azusa win rate +0.0001 at T20 (CI within \u00b10.0003), result changed on 2 of 15,000 seeds, every metric inside \u00b10.03 -- results/shared_code_shift_0z30.txt. Below the table's noise floor; not rebuilt.",
+        "fingerprint": "3a95cdf538a913a7",
+        "utc": "2026-09-17T03:23:33Z"
       }
     ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "986893e167c40cd4",
-    "built_commit": "dadc7f2",
-    "built_utc": "2026-09-17T03:00:34Z",
+    "built_at": "ea61347488d1c6fe",
+    "built_commit": "af016c1",
+    "built_utc": "2026-09-17T03:23:36Z",
     "deck": "karlov",
-    "note": "STAMPED AFTER THE RUN, 2026-09-17: the rebuild from an empty cache (02:22-02:58 UTC) ran into stamp_built's no-op branch and kept the 2026-09-16 record (defect fixed in the same commit, `fresh=`). The run's tree differed from this stamp's only by decks/_evasion.py gaining SCANNED (read by check_docs alone) and cache_manifest.SHARED gaining that file; the staged karlov list simulates BIT-IDENTICALLY on both (400 seeds, 8 metrics, T20).",
     "superseded": [
       {
         "built_at": "0d1e4ddd26f9b638",
@@ -75,6 +80,14 @@
             "utc": "2026-09-17T02:24:51Z"
           }
         ]
+      },
+      {
+        "built_at": "986893e167c40cd4",
+        "built_commit": "dadc7f2",
+        "built_utc": "2026-09-17T03:00:34Z",
+        "deck": "karlov",
+        "note": "STAMPED AFTER THE RUN, 2026-09-17: the rebuild from an empty cache (02:22-02:58 UTC) ran into stamp_built's no-op branch and kept the 2026-09-16 record (defect fixed in the same commit, `fresh=`). The run's tree differed from this stamp's only by decks/_evasion.py gaining SCANNED (read by check_docs alone) and cache_manifest.SHARED gaining that file; the staged karlov list simulates BIT-IDENTICALLY on both (400 seeds, 8 metrics, T20).",
+        "verified": []
       }
     ],
     "verified": []
@@ -120,121 +133,154 @@
         "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
         "fingerprint": "8cff06f6a9248259",
         "utc": "2026-09-17T03:00:51Z"
+      },
+      {
+        "commit": "af016c1",
+        "evidence": "2026-09-17 \u00a70z30 (one London mulligan, one pod-phase order): diagnostics/run_shared_code_shift.py, N=15,000 paired on the tables' seeds, old = worktree at af016c1: lorehold win rate +0.0001 at T20 (CI within \u00b10.0003), result changed on 3 of 15,000 seeds, every metric inside \u00b10.03 -- results/shared_code_shift_0z30.txt. Below the table's noise floor; not rebuilt.",
+        "fingerprint": "ca07ba0bfa4cc992",
+        "utc": "2026-09-17T03:23:33Z"
       }
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "0ac5ad66a8f9fff1",
-    "built_commit": "3234bee",
-    "built_utc": "2026-09-16T12:22:28Z",
+    "built_at": "402f286dafb68785",
+    "built_commit": "af016c1",
+    "built_utc": "2026-09-17T04:09:15Z",
     "deck": "rendmaw",
-    "verified": [
+    "superseded": [
       {
-        "commit": "3234bee",
-        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
-        "fingerprint": "7d2f689ebae32022",
-        "utc": "2026-09-16T12:23:35Z"
-      },
-      {
-        "commit": "527d7da",
-        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
-        "fingerprint": "f4c7a1b4f4904793",
-        "utc": "2026-09-16T18:37:06Z"
-      },
-      {
-        "commit": "1d7298a",
-        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
-        "fingerprint": "ce1493094eab5f40",
-        "utc": "2026-09-16T21:33:50Z"
-      },
-      {
-        "commit": "f639dd9",
-        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "48a1cf79d751d164",
-        "utc": "2026-09-17T02:24:51Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "550cb7b6ddabf3a5",
-        "utc": "2026-09-17T02:59:01Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "d96c4472d0a3ae89",
-        "utc": "2026-09-17T03:00:51Z"
+        "built_at": "0ac5ad66a8f9fff1",
+        "built_commit": "3234bee",
+        "built_utc": "2026-09-16T12:22:28Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "3234bee",
+            "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+            "fingerprint": "7d2f689ebae32022",
+            "utc": "2026-09-16T12:23:35Z"
+          },
+          {
+            "commit": "527d7da",
+            "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+            "fingerprint": "f4c7a1b4f4904793",
+            "utc": "2026-09-16T18:37:06Z"
+          },
+          {
+            "commit": "1d7298a",
+            "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+            "fingerprint": "ce1493094eab5f40",
+            "utc": "2026-09-16T21:33:50Z"
+          },
+          {
+            "commit": "f639dd9",
+            "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "48a1cf79d751d164",
+            "utc": "2026-09-17T02:24:51Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "550cb7b6ddabf3a5",
+            "utc": "2026-09-17T02:59:01Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "d96c4472d0a3ae89",
+            "utc": "2026-09-17T03:00:51Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "9f1e2c62af6cd20b",
-    "built_commit": "3234bee",
-    "built_utc": "2026-09-16T12:22:28Z",
+    "built_at": "aa0302c4107cb043",
+    "built_commit": "af016c1",
+    "built_utc": "2026-09-17T04:30:42Z",
     "deck": "shilgengar",
-    "verified": [
+    "superseded": [
       {
-        "commit": "3234bee",
-        "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
-        "fingerprint": "438c94510e98b2c9",
-        "utc": "2026-09-16T12:23:36Z"
-      },
-      {
-        "commit": "527d7da",
-        "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
-        "fingerprint": "2123e9f6dcbb28c6",
-        "utc": "2026-09-16T18:37:07Z"
-      },
-      {
-        "commit": "1d7298a",
-        "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
-        "fingerprint": "6db503deed4ad071",
-        "utc": "2026-09-16T21:33:50Z"
-      },
-      {
-        "commit": "f639dd9",
-        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "d312960e09406bfa",
-        "utc": "2026-09-17T02:24:51Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "564fbeb7a109ea36",
-        "utc": "2026-09-17T02:59:01Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "574004d78f9d85fb",
-        "utc": "2026-09-17T03:00:51Z"
+        "built_at": "9f1e2c62af6cd20b",
+        "built_commit": "3234bee",
+        "built_utc": "2026-09-16T12:22:28Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "3234bee",
+            "evidence": "tools/check_unchanged_decks.py against a git worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. The fingerprint moved only because tools/ablation.py gained a provenance-stamping call in save(), which runs after measurement and cannot affect a number. Took 26 seconds against the ~4 hours a six-deck regeneration costs.",
+            "fingerprint": "438c94510e98b2c9",
+            "utc": "2026-09-16T12:23:36Z"
+          },
+          {
+            "commit": "527d7da",
+            "evidence": "tools/check_unchanged_decks.py against a worktree at 3234bee, 2026-09-16: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. Fingerprints moved because edhmc/engine.py, karlov.py, lorehold.py, tivit.py and azusa.py gained the \u00a70z25/\u00a70z26 card implementations; every path is guarded on a card NOT in any committed list. tools/validate.py is +0.00 on all 18 metrics after the change.",
+            "fingerprint": "2123e9f6dcbb28c6",
+            "utc": "2026-09-16T18:37:07Z"
+          },
+          {
+            "commit": "1d7298a",
+            "evidence": "Re-rendered from the EXISTING cache and diffed against the committed table: BYTE-IDENTICAL, all four untouched decks (2026-09-16). The fingerprint moved only because tools/ablation.py gained two CLASSIFICATION entries for the newly staged cards (Anointed Procession -> SCRIPTED_TIVIT, Bloodthirsty Conqueror -> PARTLY_MODELLED['karlov']); those decide which table SECTION a card prints in and touch no number, and this deck's list is unchanged. This is \u00a70z4's check, not check_unchanged_decks -- which compares SIMULATION baselines and would have certified nothing about a rendering change.",
+            "fingerprint": "6db503deed4ad071",
+            "utc": "2026-09-16T21:33:50Z"
+          },
+          {
+            "commit": "f639dd9",
+            "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "d312960e09406bfa",
+            "utc": "2026-09-17T02:24:51Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "564fbeb7a109ea36",
+            "utc": "2026-09-17T02:59:01Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "574004d78f9d85fb",
+            "utc": "2026-09-17T03:00:51Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "0645aaf6dc10dc76",
-    "built_commit": "9cfd3fb",
-    "built_utc": "2026-09-16T20:57:57Z",
+    "built_at": "444d30671994398f",
+    "built_commit": "af016c1",
+    "built_utc": "2026-09-17T03:44:22Z",
     "deck": "tivit",
-    "verified": [
+    "superseded": [
       {
-        "commit": "f639dd9",
-        "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "d44cd5ceae1f1f34",
-        "utc": "2026-09-17T02:24:51Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "f0a60601d8afd840",
-        "utc": "2026-09-17T02:59:01Z"
-      },
-      {
-        "commit": "dadc7f2",
-        "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
-        "fingerprint": "cbbd54cab743d431",
-        "utc": "2026-09-17T03:00:51Z"
+        "built_at": "0645aaf6dc10dc76",
+        "built_commit": "9cfd3fb",
+        "built_utc": "2026-09-16T20:57:57Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "f639dd9",
+            "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "d44cd5ceae1f1f34",
+            "utc": "2026-09-17T02:24:51Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED. Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "f0a60601d8afd840",
+            "utc": "2026-09-17T02:59:01Z"
+          },
+          {
+            "commit": "dadc7f2",
+            "evidence": "2026-09-17 \u00a70z29: decks/_evasion.py regenerated (diff: +Bloodthirsty Conqueror FLYING, +Sai/+Urza HUMAN, -Witch Enchanter; SCANNED added) and added to SHARED; ablation.py's provenance stamping gained fresh= (no measurement code touched). Only Bloodthirsty Conqueror is in any staged or committed list (karlov, rebuilt); the other three are candidates nowhere staged. check_unchanged_decks vs worktree at f639dd9 after the regeneration: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "cbbd54cab743d431",
+            "utc": "2026-09-17T03:00:51Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   }
 }

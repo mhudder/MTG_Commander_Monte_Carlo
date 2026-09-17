@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -215,17 +215,7 @@ class TivitGame:
         pass
 
     def opening_hand(self):
-        for mulls in range(4):
-            self.hand = [self.library.pop() for _ in range(7)]
-            if 2 <= sum(1 for c in self.hand if c.is_land) <= 5:
-                break
-            self.library.extend(self.hand)
-            self.rng.shuffle(self.library)
-        for _ in range(mulls):
-            if self.hand:
-                worst = max(self.hand, key=lambda c: (not c.is_land, c.mv))
-                self.hand.remove(worst)
-                self.library.insert(0, worst)
+        london_mulligan(self)      # shared, §0z30
 
     def win(self, route: int):
         if self.result is None:
@@ -1107,15 +1097,9 @@ def take_turn(g, extra=False):
     skip = extra and g.cfg.get("extra_turns_skip_opponents", True)
     if g.cfg.get("opponents", True) and not skip:
         g.m["pod_rounds"] += 1
-        watch = g.cfg.get("watch", ())
-        before = {p.card.name for p in g.board if p.card.name in watch}
-        OPP.opponents_act(g)
-        after = {p.card.name for p in g.board if p.card.name in watch}
-        for _ in before - after:
-            g.m["test_card_answered"] += 1
-            g.m["test_card_removed"] += 1
-        OPP.incidental_damage(g)
-        OPP.resolve_clocks(g)
+        # One order for six engines (§0z30): damage, clocks, THEN removal.
+        # This engine ran removal first until 2026-09-17.
+        OPP.pod_phase(g)
 
 
 def take_extra_turns(g, played, budget):

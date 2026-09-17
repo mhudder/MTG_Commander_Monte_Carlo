@@ -78,6 +78,7 @@ Methodology that used to live at the end of this file is now
 | [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
 | [0z27](#0z27) | MEASURED | **two swaps staged on head-to-head evidence, and the karlov regeneration shows redundancy rewriting five rows at once** |
 | [0z29](#0z29) | FIXED | **Bloodthirsty Conqueror was measured as a GROUND creature** — `_evasion.py` had not been regenerated since the card was added, and no fingerprint could see it. Flying is worth nothing to the card (its value is the trigger), the karlov table is rebuilt anyway, and `check_docs` now fails on a card the generator never scanned |
+| [0z30](#0z30) | FIXED | **One opening hand and one pod-phase order for six engines.** Three mulligan fallbacks (a fifth hand; an empty hand; 106-card games) and two pod orders were six copies of two blocks. Unifying them moves tivit's baseline +0.0647 and karlov's +0.0205 at T20 — the two engines had let the opponents' creatures grow BEFORE dealing chip damage — and moves lorehold and azusa on 3 and 2 seeds of 15,000 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4714,6 +4715,96 @@ commit `dadc7f2`.
 **The lesson, promoted to CLAUDE.md:** a generated file is only as current as
 its last generation, so check the GENERATION — and when a check comes back
 clean, ask which list it built from.
+
+## 0z30. FIXED — one opening hand and one pod-phase order for six engines; the order was worth 0.065 to tivit
+
+2026-09-17. M1 and M2 of the 2026-09-17 review, done as one shared-code
+change because both move every baseline. Pinned by
+`tests/test_mulligan_and_pod_order.py` (seven cases over every engine's
+STAGED list, five mutations with exact sets).
+
+**M1, the opening hand.** Six `opening_hand` methods, three behaviours when
+the fourth hand also failed the 2–5-land keep rule:
+
+| engine | what it did on the fourth failure | how often |
+|---|---|---|
+| `engine.py` | drew a FIFTH hand, bottomed three | — |
+| `lorehold.py` | cleared the hand and never redrew: **a game with no cards** | 0.11% of games |
+| karlov, tivit, shilgengar, azusa | neither cleared nor redrew: the seven cards in hand AND shuffled back into the library — **a 106-card deck** | 0.1–0.4% of games |
+
+And only lorehold counted a modal double-faced card's land face for the
+keep decision, while rendmaw (4 MDFCs), shilgengar (6) and tivit (2) did
+not. All six now call `engine.london_mulligan`: draw seven, keep on 2–5
+lands with MDFC backs counted, otherwise reshuffle and try again, **the
+fourth hand is kept whatever it holds**, and `mulls` cards go to the bottom.
+`g.rng` is still the only randomness and `seal_rng` still follows it.
+
+**M2, the pod phase.** Six copies of the end-of-turn block. Four ran
+`incidental_damage → resolve_clocks → opponents_act`; karlov and tivit ran
+`opponents_act → incidental_damage → resolve_clocks`. Nobody chose that.
+The consequence was not the one the review guessed at. The guess was that
+removal landing before the clock's threat read would matter; the mechanism
+that actually moved the numbers is that **`opponents_act` grows each
+opponent's creature count (`+0.7 × board` a turn, capped at 7) and
+`incidental_damage` reads that count**, so in karlov and tivit the
+creatures grew and THEN hit, every turn, and in the other four they hit and
+then grew. Two engines were being chipped by next turn's board. All six now
+call `opponents.pod_phase`: damage, clocks, then — if you are still in the
+game — removal, with an engine's own opponent model (karlov's
+`opponent_activity`) passed as `before_act` so it keeps its place just
+before the removal round.
+
+**What it moved, measured at the tables' N and not argued**
+(`diagnostics/run_shared_code_shift.py`, new for this: the same staged list
+on the old and new CODE, N=15,000 paired on the tables' own seeds, written
+to `results/shared_code_shift_0z30.txt`):
+
+| deck | win rate, T10 | win rate, T20 | final_life, T20 | stranded_mv, T20 | seeds whose result changed, T20 |
+|---|---|---|---|---|---|
+| **tivit** | **+0.0154 ±0.0020** | **+0.0647 ±0.0044** | +3.05 | +7.96 | 1,201 of 15,000 |
+| **karlov** | **+0.0094 ±0.0018** | **+0.0205 ±0.0040** | +2.67 | +2.37 | 908 |
+| rendmaw | +0.0000 | +0.0015 ±0.0011 | −0.00 | +2.02 | 72 |
+| shilgengar | +0.0003 | +0.0015 ±0.0019 | +0.10 | +6.00 | 215 |
+| lorehold | +0.0000 | +0.0001 ±0.0003 | +0.00 | +0.03 | 3 |
+| azusa | +0.0001 | +0.0001 ±0.0002 | +0.02 | −0.06 | 2 |
+
+Tivit and karlov are M2: three to five points of life a game that the old
+order took off them, and in tivit a fifth of all games at T20 ending
+differently. Rendmaw and shilgengar are M1's MDFC rule: hands with a land
+face are kept now, which is more kept hands and more stranded mana
+(+2.0 and +6.0 a game) for a win-rate shift at the edge of the noise floor.
+Lorehold and azusa are M1's fallback alone: a handful of seeds.
+
+**A/A control still `+0.00` on all eighteen metrics** (corr 0.9106) — the
+shared block draws nothing mid-game — and every pinned test passes.
+
+**The tables.** Four decks moved and four were rebuilt from empty caches
+with the change in: karlov, tivit (M2, necessarily) and rendmaw,
+shilgengar (M1, whose baselines moved significantly on one metric each).
+Lorehold and azusa are VERIFIED on the evidence above — 3 and 2 seeds of
+15,000 changed result, win rate +0.0001 — which is the `check_unchanged_decks`
+standard met at the tables' own N. The rebuilt tables against their
+predecessors at `af016c1`, row by row:
+
+| deck | rows moved beyond their old bar | sign flips among signalled rows | category changes | noise floor |
+|---|---|---|---|---|
+| karlov | 1 — Felidar Sovereign +0.0284 ±0.0028 → **+0.0355 ±0.0031** | 1 nominal: Toxic Deluge, win rate −0.0020 → +0.0009 (±0.0029, inside its bar both times; its signal is `dmg`) | 0 | ±0.0025 → ±0.0025 |
+| tivit | 3 — Mirkwood Bats +0.0327 → **+0.0373 ±0.0036**; Mechanized Production +0.0179 → **+0.0227 ±0.0030**; Brago's Representative +0.0070 → **+0.0101 ±0.0028** (`FLIP` → `win`) | 0 | 0 | ±0.0027 → ±0.0029 |
+| rendmaw | 0 | 0 | 0 | ±0.0019 → ±0.0019 |
+| shilgengar | 0 | 1 nominal: Cartel Aristocrat +0.0001 → +0.0000 (±0.0012, a `FLIP` row that §0z24 says should read `--`) | 0 | ±0.0020 → ±0.0020 |
+
+Every row that moved, moved UP, and each is a card that gets better when
+the pod chips less life: Felidar Sovereign's 40-life win fires more often
+with five more life a game; tivit's three are the deck's long-game payoffs
+in a deck whose games now run 0.6 turns longer (turns_played +0.62 at T20)
+and whose noise floor widened for the same reason. **The two M1-only
+rebuilds moved nothing**, which is the §0z23 result once more and the
+reason lorehold and azusa were not rebuilt on 3 and 2 seeds' evidence.
+
+**What is still six copies.** `draw`, `deal_pod_damage`, `power_of`,
+`on_creature_death` and the tail of `simulate()` — M5 of the review, the
+base class. The two blocks unified here were the ones where the copies had
+already changed numbers; the rest are the same shape waiting.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

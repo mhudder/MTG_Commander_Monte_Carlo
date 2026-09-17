@@ -326,6 +326,21 @@ for its NAME.** This is the inverse of the standing "a card scoring like a
 blank usually means the engine made it one" — here the engine had done the
 work and the reader could not see it.
 
+**WHEN SIX COPIES OF ONE BLOCK DISAGREE, THE DIFFERENCE IS A MODELLING
+DECISION NOBODY MADE — AND ITS SIZE IS NOT GUESSABLE** (§0z30). The
+end-of-turn pod block existed six times and two copies ran removal before
+chip damage. The review guessed the consequence (removal landing before the
+clock's threat read) and guessed small. The actual mechanism was that
+`opponents_act` grows the opponents' creature count and `incidental_damage`
+reads it, so in two engines the creatures grew and THEN hit every turn: worth
+**+0.0647 win rate to tivit's baseline** at T20, a fifth of its games ending
+differently. The mulligan fallback had three behaviours across the same six
+methods, one of which played 106-card games. Both are one function now, with
+a test that fails if an engine grows its own copy back. **A rule that lives
+in a method drifts; a rule that lives in a function does not** — and when you
+find drift, measure it at the tables' N before saying which way it matters
+(`diagnostics/run_shared_code_shift.py` is that measurement).
+
 **A GENERATED FILE IS ONLY AS CURRENT AS ITS LAST GENERATION — SO CHECK THE
 GENERATION, NOT THE FILE** (§0z29). `decks/_evasion.py` is where every card
 gets its `flying`, and it is generated from Scryfall. A card added to a deck
@@ -602,7 +617,10 @@ a bracket-calibrated range (B2 13–18, B3 10–14, B4 8–12), tuned to a pod w
 top seat behaves like a 3.5. Targeting is threat-weighted, so being ahead
 draws the kill. Games end on their own around turn 12, which is why `turns=20`
 is a safety valve rather than a modelling choice. Opponent randomness is
-pre-rolled into a fixed grid so it cannot break CRN.
+pre-rolled into a fixed grid so it cannot break CRN. **The pod acts in one
+order for every engine** (`opponents.pod_phase`): chip damage, then the
+clocks, then removal — the clock reads the board your turn produced, and the
+opponents' creatures hit before they grow. §0z30.
 
 **Combat is declared at the pod.** One attack is split across defenders, and
 the assignment rule is A PILOT'S, NOT AN OPTIMISER'S: a defender is taken on

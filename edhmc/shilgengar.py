@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -302,17 +302,7 @@ class ShilgengarGame:
                 self.m["cards_drawn"] += 1
 
     def opening_hand(self):
-        for mulls in range(4):
-            self.hand = [self.library.pop() for _ in range(7)]
-            if 2 <= sum(1 for c in self.hand if c.is_land) <= 5:
-                break
-            self.library.extend(self.hand)
-            self.rng.shuffle(self.library)
-        for _ in range(mulls):
-            if self.hand:
-                worst = max(self.hand, key=lambda c: (not c.is_land, c.mv))
-                self.hand.remove(worst)
-                self.library.insert(0, worst)
+        london_mulligan(self)      # shared, §0z30
 
     def deal_pod_damage(self, amount, each=True):
         if amount <= 0:
@@ -1018,17 +1008,7 @@ def take_turn(g):
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
     if g.cfg.get("opponents", True):
-        OPP.incidental_damage(g)
-        OPP.resolve_clocks(g)
-        if g.result is not None:
-            return
-        watch = g.cfg.get("watch", ())
-        before = {p.card.name for p in g.board if p.card.name in watch}
-        OPP.opponents_act(g)
-        after = {p.card.name for p in g.board if p.card.name in watch}
-        for _ in before - after:
-            g.m["test_card_answered"] += 1
-            g.m["test_card_removed"] += 1
+        OPP.pod_phase(g)           # one order for six engines, §0z30
 
 
 def simulate(deck, commander, cfg, seed):
