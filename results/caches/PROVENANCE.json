@@ -58,6 +58,12 @@
         "evidence": "2026-09-17 \u00a70z30 (one London mulligan, one pod-phase order): diagnostics/run_shared_code_shift.py, N=15,000 paired on the tables' seeds, old = worktree at af016c1: azusa win rate +0.0001 at T20 (CI within \u00b10.0003), result changed on 2 of 15,000 seeds, every metric inside \u00b10.03 -- results/shared_code_shift_0z30.txt. Below the table's noise floor; not rebuilt.",
         "fingerprint": "3a95cdf538a913a7",
         "utc": "2026-09-17T03:23:33Z"
+      },
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "95e0449cec44e64e",
+        "utc": "2026-09-17T14:36:38Z"
       }
     ]
   },
@@ -90,7 +96,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "2fd46bd0e86a45b9",
+        "utc": "2026-09-17T14:36:37Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "fbc552aea5d15b19",
@@ -139,6 +152,12 @@
         "evidence": "2026-09-17 \u00a70z30 (one London mulligan, one pod-phase order): diagnostics/run_shared_code_shift.py, N=15,000 paired on the tables' seeds, old = worktree at af016c1: lorehold win rate +0.0001 at T20 (CI within \u00b10.0003), result changed on 3 of 15,000 seeds, every metric inside \u00b10.03 -- results/shared_code_shift_0z30.txt. Below the table's noise floor; not rebuilt.",
         "fingerprint": "ca07ba0bfa4cc992",
         "utc": "2026-09-17T03:23:33Z"
+      },
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "69e8d4e172e1e76a",
+        "utc": "2026-09-17T14:36:37Z"
       }
     ]
   },
@@ -193,7 +212,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "51cfa4afd12f852b",
+        "utc": "2026-09-17T14:36:37Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "aa0302c4107cb043",
@@ -246,7 +272,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "033be98edd639093",
+        "utc": "2026-09-17T14:36:38Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "444d30671994398f",
@@ -281,6 +314,13 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "9f226af",
+        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+        "fingerprint": "7cbb110661f3a784",
+        "utc": "2026-09-17T14:36:37Z"
+      }
+    ]
   }
 }

@@ -181,9 +181,8 @@ disagree, the project's own rule is to follow win rate.
    the shortest full example).
 4. `audit_cards.py` and `tag_flying.py` will find it automatically — see
    `edhmc/decks/__init__.py`. Everything else needs a deliberate edit: add
-   the deck to `tools/ablation.py`'s `SIM`/`METRIC_SETS`/`SCRIPTED_*`/
-   `KNOWN_BLIND` dicts (twice — there's a duplicate in the multiprocessing
-   worker init), `edhmc/pending.py`'s `DECKS` dict,
+   the deck to `tools/ablation.py`'s `SIMS`/`METRIC_SETS`/`SCRIPTED_BY_DECK`/
+   `KNOWN_BLIND` dicts, `edhmc/pending.py`'s `DECKS` dict,
    `tools/cache_manifest.py`'s `PER_DECK`, and add an A/A control block to
    `tools/validate.py`.
 5. `python -m tools.validate` must come back `+0.00` before you trust a single

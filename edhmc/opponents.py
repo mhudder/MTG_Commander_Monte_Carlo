@@ -944,10 +944,9 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         # RNG is consumed and no decision reads them.
         was = len(living(g))
         dealt = damage_single(g, dmg)
-        g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + dmg
-        g.m["combat_kills"] = (g.m.get("combat_kills", 0)
-                               + was - len(living(g)))
-        g.m["attack_targets"] = g.m.get("attack_targets", 0) + (1 if dmg > 0 else 0)
+        g.m["raw_damage"] += dmg
+        g.m["combat_kills"] += was - len(living(g))
+        g.m["attack_targets"] += (1 if dmg > 0 else 0)
         return dealt
 
     alive = sorted(living(g), key=lambda o: o.life)
@@ -1007,10 +1006,9 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         opp.life -= dealt
     # Combat damage is simultaneous: everything lands, then deaths are checked.
     _check_eliminations(g)
-    g.m["raw_damage"] = g.m.get("raw_damage", 0.0) + raw
-    g.m["combat_kills"] = (g.m.get("combat_kills", 0)
-                           + before_alive - len(living(g)))
-    g.m["attack_targets"] = g.m.get("attack_targets", 0) + len(plan)
+    g.m["raw_damage"] += raw
+    g.m["combat_kills"] += before_alive - len(living(g))
+    g.m["attack_targets"] += len(plan)
     return effective
 
 
@@ -1218,11 +1216,11 @@ def resolve_own_wipe(g, spare_own=False, card=None):
         was_commander = p.card is g.commander
         cast_before, tax_before = g.commander_cast, g.commander_tax
         if not destroy(g, p, destroys=destroys if honour else False):
-            g.m["own_wipe_survivors"] = g.m.get("own_wipe_survivors", 0) + 1
+            g.m["own_wipe_survivors"] += 1
             continue
         # `own_wipe_commander_returns=False` restores the pre-2026-09-04
         # behaviour, which destroy() does not have a flag for because no
         # opponent-sourced removal ever needed one.
         if was_commander and not g.cfg.get("own_wipe_commander_returns", True):
             g.commander_cast, g.commander_tax = cast_before, tax_before
-    g.m["own_wipes_cast"] = g.m.get("own_wipes_cast", 0) + 1
+    g.m["own_wipes_cast"] += 1

@@ -19,7 +19,7 @@ which kind it is, and the check catches them if they decide wrong.
 """
 import sys
 
-from edhmc.engine import Card, Permanent
+from edhmc.engine import Card, Metrics, Permanent
 from edhmc import opponents as OPP
 
 MUTATE = "--mutate" in sys.argv
@@ -35,7 +35,7 @@ class FakeGame:
                          life=float(l))
             for l in lives
         ]
-        self.m = {}
+        self.m = Metrics()      # a plain dict KeyErrors on the first += (§0z31)
         self.result = None
         self.your_life = 40.0
 

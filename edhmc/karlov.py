@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -114,7 +114,7 @@ class KarlovGame:
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
-        self.m = {
+        self.m = Metrics({
             "damage": 0.0, "drain_damage": 0.0, "combat_damage": 0.0,
             "lifegain_triggers": 0, "life_gained": 0.0,
             # 2026-09-16 proposals (§0z26).
@@ -141,7 +141,7 @@ class KarlovGame:
             # only exists when it fires raises KeyError on the paired read.
             "citadel_casts": 0, "citadel_life_spent": 0.0,
             "citadel_lands": 0, "citadel_drains": 0,
-        }
+        })
         self.damage_by_turn = []
 
     # -- helpers -------------------------------------------------------------
@@ -547,8 +547,7 @@ def upkeep(g):
         g.draw(1)
         if g.cfg.get("charge_life_costs", True):
             g.your_life -= 1
-            g.m["life_lost_to_own_cards"] = \
-                g.m.get("life_lost_to_own_cards", 0) + 1
+            g.m["life_lost_to_own_cards"] += 1
     if g.has("Land Tax"):
         # "if an opponent controls more lands than you" — the condition was
         # missing entirely, so this fetched three basics every upkeep.
@@ -1043,7 +1042,7 @@ def simulate(deck, commander, cfg, seed):
         take_turn(g)
         if g.result is not None:
             break
-    out = dict(g.m)
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
     # CRN instrumentation, read by tools/validate.py's audit. §0z17.
     out["crn_draws"] = g.crn.draws()
     out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)

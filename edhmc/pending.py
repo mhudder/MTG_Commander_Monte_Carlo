@@ -2349,9 +2349,11 @@ def check_shortlist_is_answerable():
     WHAT THIS DOES NOT CHECK, said out loud (§0z15): that the proposed cut is
     not MODEL-BLIND or PARTLY_MODELLED -- which is the trap that has already
     cost this project two withdrawn swaps (§0z, §0z2). Those categories live in
-    `tools/ablation.py`, which reads `sys.argv` at import and therefore cannot
-    be imported from here. The rule is stated in each entry's own text instead,
-    and it is the first thing to check by hand when acting on one.
+    `tools/ablation.py`. Until 2026-09-17 that module read `sys.argv` at
+    import and could not be imported from here; it can be now (M4 of that
+    day's review), and wiring this check up is the open follow-up. The rule
+    is stated in each entry's own text instead, and it is the first thing to
+    check by hand when acting on one.
     """
     for c in MEASURED:
         if not c.shortlist:

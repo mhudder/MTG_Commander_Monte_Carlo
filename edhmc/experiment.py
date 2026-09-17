@@ -37,8 +37,9 @@ def repl_priority(deck):
 
     Lives here rather than in `ablation.py` because `candidates.py` and
     `run_tivit_groups.py` build the same blank and MUST stay on the same scale
-    — and importing `ablation.py` is not an option, since it reads `sys.argv`
-    at import time.
+    — and, until 2026-09-17, importing `ablation.py` was not an option, since
+    it read `sys.argv` at import time. It no longer does; this stays here
+    because the scale is a property of the harness, not of one tool.
 
     The blank used to be built at 0.5, and that was a bug rather than a choice.
     `main_phase` is greedy on priority, so 0.5 means "cast only when nothing

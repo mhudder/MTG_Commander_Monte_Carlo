@@ -125,7 +125,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -396,7 +396,7 @@ class AzusaGame:
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
-        self.m = {
+        self.m = Metrics({
             "damage": 0.0, "combat_damage": 0.0,
             "cards_drawn": 0, "mana_spent": 0, "mana_floated": 0,
             "stranded_mv": 0, "turn_lethal": 99, "turn_won": 99,
@@ -478,7 +478,7 @@ class AzusaGame:
             "map_cracked": 0,           # Expedition Map activations
             "zuran_sacs": 0,            # lands sacrificed to Zuran Orb
             "zuran_life": 0,            # ... and the life it made
-        }
+        })
         self.damage_by_turn = []
 
     # -- helpers ---------------------------------------------------------
@@ -2884,7 +2884,7 @@ def simulate(deck, commander, cfg, seed):
         take_turn(g)
         if g.result is not None:
             break
-    out = dict(g.m)
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
     # CRN instrumentation, read by tools/validate.py's audit. §0z17.
     out["crn_draws"] = g.crn.draws()
     out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)

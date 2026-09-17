@@ -437,6 +437,32 @@ class AuditRandom(random.Random):
         return super().randrange(*a, **k)
 
 
+class Metrics(dict):
+    """The per-game metrics dict: a counter that reads 0 for a name nobody
+    has incremented yet, so `g.m["x"] += 1` never raises.
+
+    WHY (M3 of the 2026-09-17 review). Each engine seeded `self.m` with a
+    ~50-key literal and then incremented ~350 sites with `+=`. A site whose
+    key was missing from the literal raised KeyError -- in a worker, twenty
+    minutes into an ablation, on the one seed where the card fired. Four
+    comments in `azusa.__init__` describe exactly that failure, and 35 sites
+    in three files had grown a defensive `m.get(k, 0) + 1` instead, so the
+    same operation was spelt two ways. The literals stay: they are the
+    documented set of metrics and the reason `experiment.analyse` finds
+    every METRICS key on both branches. This class is the safety net under
+    them, and `simulate()` returns one too, so a metric only one branch ever
+    touched reads 0 on the other instead of raising.
+
+    A missing key is NOT inserted on read -- `"x" in m` stays False until
+    something writes it -- so `dict(m)`, `json.dump(m)` and `m.keys()` are
+    exactly what the game recorded.
+    """
+    __slots__ = ()
+
+    def __missing__(self, key):
+        return 0
+
+
 def counts_as_land_in_hand(c) -> bool:
     """A land, or a modal double-faced card whose back is one. lorehold.py
     counted its MDFCs for the keep decision from the start; rendmaw,
@@ -998,7 +1024,7 @@ class Game:
         self.land_drops_used = 0
 
         # metrics
-        self.m = {
+        self.m = Metrics({
             "damage": 0.0,
             "cards_drawn": 0,
             "mana_floated": 0,
@@ -1037,7 +1063,7 @@ class Game:
             "erebos_draws": 0,        # "another creature you control dies"
             "erebos_life_paid": 0,
             "erebos_creature_turns": 0,   # turns Erebos was devotion-live
-        }
+        })
         self.damage_by_turn: list[float] = []
         self.made_token_this_turn = False
         self.beast_active = False
@@ -1243,7 +1269,7 @@ class Game:
             best = max(pool, key=lambda c: c.mv)
             self.graveyard.remove(best)
             self.hand.append(best)
-            self.m["artifacts_returned"] = self.m.get("artifacts_returned", 0) + 1
+            self.m["artifacts_returned"] += 1
             self.m[tag] = self.m.get(tag, 0) + 1
 
         if dead.name in ("Myr Retriever", "Junk Diver"):
@@ -1548,10 +1574,10 @@ def altar_enable(g: Game, units, precombat: bool):
     for perm in fodder[:k]:
         g.board.remove(perm)
         g.on_creature_death(1, perm)
-        g.m["altar_sacrifices"] = g.m.get("altar_sacrifices", 0) + 1
+        g.m["altar_sacrifices"] += 1
     for _ in range(2 * k):
         units.append(frozenset({"C"}))
-    g.m["altar_mana_made"] = g.m.get("altar_mana_made", 0) + 2 * k
+    g.m["altar_mana_made"] += 2 * k
 
     # RE-DERIVED AGAINST THE REAL POOL, because the sacrifices just changed
     # the board and `cost_after_reduction` can read it. If it somehow no
@@ -1559,7 +1585,7 @@ def altar_enable(g: Game, units, precombat: bool):
     # than being spent on a payment that was never proved.
     pay = can_pay(cost_after_reduction(g, card), units)
     if pay is None:
-        g.m["altar_wasted"] = g.m.get("altar_wasted", 0) + 1
+        g.m["altar_wasted"] += 1
         return None
     return (card, pay, None)
 
@@ -1853,8 +1879,7 @@ def upkeep(g: Game):
             g.make_tokens(1, 1, 1, "Faerie")
             if g.cfg.get("charge_life_costs", True):
                 g.your_life -= 1
-                g.m["life_lost_to_own_cards"] = \
-                    g.m.get("life_lost_to_own_cards", 0) + 1
+                g.m["life_lost_to_own_cards"] += 1
         elif s == "ophiomancer":
             if not any(x.is_token and x.card.name.startswith("Snake") for x in g.board):
                 g.make_tokens(1, 1, 1, "Snake")
@@ -2211,7 +2236,7 @@ def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
         take_turn(g)
         if g.result is not None:
             break
-    out = dict(g.m)
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
     # CRN instrumentation, read by tools/validate.py's audit. §0z17.
     out["crn_draws"] = g.crn.draws()
     out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)

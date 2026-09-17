@@ -134,6 +134,11 @@ drift today, said here so nobody rediscovers it:
 | ~~end-of-turn pod order~~ | CLOSED 2026-09-17, `opponents.pod_phase` ×1 | was: four engines ran damage → clocks → removal; `karlov.py` and `tivit.py` ran removal → damage → clocks. Worth +0.0647 win rate to tivit's baseline, §0z30 |
 | the `turns` default when no cfg supplies one | `simulate` ×6, `make_pod` | 10 in three places, 20 in four (acknowledged in `docs/KNOBS.md`; every harness passes it explicitly) |
 
+The per-game metrics dict is an `engine.Metrics` (§0z31): it reads 0 for a
+name nothing has written, so a `+=` on a metric missing from an engine's
+literal is a count, not a `KeyError` in a worker. The literals are still the
+documented set; the class is the net under them.
+
 **2. Behaviour attaches BY NAME at least as often as by `script=`.** A card
 with no `script` can still be fully implemented, dispatched by `g.has("…")`
 or `card.name == "…"` inside an engine, `opponents.py`

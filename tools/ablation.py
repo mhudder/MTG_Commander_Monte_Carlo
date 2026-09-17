@@ -62,6 +62,7 @@ import os
 import sys
 import textwrap
 import time
+from dataclasses import dataclass
 from multiprocessing import Pool, cpu_count
 
 import numpy as np
@@ -82,20 +83,80 @@ from edhmc.shilgengar import simulate as shilgengar_sim
 from edhmc.azusa import simulate as azusa_sim
 from edhmc.experiment import DEFAULT_CFG, BLANK_PRIORITY, repl_priority
 
-DECK = sys.argv[1] if len(sys.argv) > 1 else "lorehold"
-N = int(sys.argv[2]) if len(sys.argv) > 2 else 4000
-# Report a RANGE of horizons rather than one. The cutoff turn is a free
-# parameter created by the fact that opponents have no win condition, and it
-# systematically favours slow, accumulating cards. A conclusion is only
-# trustworthy if its SIGN and RANK survive the whole range.
-HORIZONS = tuple(int(x) for x in sys.argv[3].split(",")) if len(sys.argv) > 3 \
-    else (20,)   # with the opponent clock, games end on their own around T12
-# See blank_like(). Set True to isolate a card's text from its type line.
-BLANK_KEEPS_TYPES = os.environ.get("BLANK_KEEPS_TYPES", "0") == "1"
+SIMS = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
+        "karlov": karlov_sim, "tivit": tivit_sim,
+        "shilgengar": shilgengar_sim, "azusa": azusa_sim}
 
-SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-       "karlov": karlov_sim, "tivit": tivit_sim,
-       "shilgengar": shilgengar_sim, "azusa": azusa_sim}[DECK]
+
+@dataclass(frozen=True)
+class Run:
+    """One ablation run's parameters, passed explicitly to everything.
+
+    Until 2026-09-17 (M4 of that day's review) these were module globals
+    derived from `sys.argv` AT IMPORT -- `DECK = sys.argv[1]` -- and rebound
+    a second time inside `_worker_init` so a spawned worker could not measure
+    a different deck than the parent asked for. Importing the module from
+    anywhere else (a test of the classification checker, a re-render of a
+    table from its cache, `pending.py` wanting to know whether a proposed cut
+    is MODEL-BLIND) picked up whatever argv the importer had, and three docs
+    described working around that. Now `main()` parses argv into one of
+    these and hands it down; a worker gets the same object in its
+    initializer; nothing reads argv but `parse_args`.
+    """
+    deck: str
+    n: int
+    # Report a RANGE of horizons rather than one. The cutoff turn is a free
+    # parameter created by the fact that opponents have no win condition, and
+    # it systematically favours slow, accumulating cards. A conclusion is only
+    # trustworthy if its SIGN and RANK survive the whole range.
+    horizons: tuple = (20,)   # with the opponent clock, games end around T12
+    # See blank_like(). True isolates a card's text from its type line.
+    blank_keeps_types: bool = False
+
+    @property
+    def sim(self):
+        return SIMS[self.deck]
+
+    @property
+    def metrics(self):
+        return METRIC_SETS[self.deck]
+
+    @property
+    def scripted(self):
+        return SCRIPTED_BY_DECK[self.deck]
+
+    @property
+    def cache(self):
+        # The key MUST include every parameter that changes what a cached
+        # number MEANS. It used to key on deck and horizons only, so resuming
+        # a run at a different sample size silently merged two sample sizes
+        # into one table; hence `_n{N}`. `_medblank` / `_deadblank` is here
+        # for the same reason: the 2026-09-06 blank priority change moves
+        # every number, and the pre-change files carry NEITHER suffix, so
+        # they can no longer be picked up by a run that would misread them.
+        #
+        # The directory is part of the path and NOT part of the key:
+        # `results/caches/` is where every cache has lived since the
+        # 2026-09-09 reorganisation, and the name inside it is unchanged, so
+        # a cache from before the move is still picked up by a run that
+        # should pick it up. Moving these files was allowed to change where
+        # they are and forbidden to change what they mean.
+        return os.path.join(
+            "results", "caches",
+            f"ablation_cache_{self.deck}_{'-'.join(map(str, self.horizons))}"
+            f"_n{self.n}"
+            f"{'_sametype' if self.blank_keeps_types else ''}"
+            f"{'_deadblank' if BLANK_PRIORITY == 'dead' else '_medblank'}.json")
+
+
+def parse_args(argv) -> Run:
+    """`deck [N [h1,h2,...]]`, plus BLANK_KEEPS_TYPES from the environment."""
+    deck = argv[0] if argv else "lorehold"
+    n = int(argv[1]) if len(argv) > 1 else 4000
+    horizons = (tuple(int(x) for x in argv[2].split(","))
+                if len(argv) > 2 else (20,))
+    return Run(deck, n, horizons,
+               os.environ.get("BLANK_KEEPS_TYPES", "0") == "1")
 METRIC_SETS = {
     "lorehold": ("mv_cheated", "damage", "miracles_cast", "total_mv_cast", "won"),
     "rendmaw": ("damage", "cards_drawn", "tokens_made", "rendmaw_triggers", "won"),
@@ -614,19 +675,17 @@ def partly_for(deck_name, deck):
     return out
 
 
-PARTLY = PARTLY_MODELLED.get(DECK, {})   # re-derived once the deck is built
-
-SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
-            "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
-            "shilgengar": SCRIPTED_SHILGENGAR, "azusa": SCRIPTED_AZUSA}[DECK]
-METRICS = METRIC_SETS[DECK]
+SCRIPTED_BY_DECK = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
+                    "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
+                    "shilgengar": SCRIPTED_SHILGENGAR, "azusa": SCRIPTED_AZUSA}
 
 
-def blank_like(card, priority):
+def blank_like(card, priority, keep_types=False):
     """A do-nothing replacement-level card of the same cost.
 
-    BLANK_KEEPS_TYPES controls what the ablation actually measures, and for a
-    typal-payoff commander the difference is large:
+    `keep_types` (BLANK_KEEPS_TYPES in the environment, via `Run`) controls
+    what the ablation actually measures, and for a typal-payoff commander the
+    difference is large:
 
       True  - the blank copies the card's type line, so for Rendmaw an Artifact
               Creature blank still triggers the commander. This isolates the
@@ -640,7 +699,7 @@ def blank_like(card, priority):
 
     `priority` comes from `repl_priority()` -- read it before changing this.
     """
-    if BLANK_KEEPS_TYPES:
+    if keep_types:
         types = card.types
     elif card.is_creature:
         types = frozenset({"Creature"})
@@ -654,67 +713,52 @@ def blank_like(card, priority):
                 priority=priority)
 
 
-def columns(deck, commander, turns, lo, hi):
-    """One metric column per METRIC, over seeds [lo, hi).
+def columns(run, deck, commander, turns, lo, hi):
+    """One metric column per `run.metrics`, over seeds [lo, hi).
 
     The seeds are `5000 + i` and nothing else reads the RNG, so this is a pure
     function of (deck, commander, turns, lo, hi) — which is what lets the
     baseline be shared and the cards be split across processes.
     """
     cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())
-    rows = [SIM(deck, commander, cfg, 5000 + i) for i in range(lo, hi)]
-    return {m: np.array([r[m] for r in rows], float) for m in METRICS}
+    rows = [run.sim(deck, commander, cfg, 5000 + i) for i in range(lo, hi)]
+    return {m: np.array([r[m] for r in rows], float) for m in run.metrics}
 
 
-def paired(keep, drop):
+def paired(run, keep, drop):
     """{metric: (mean_diff, 95% CI half-width)} from two metric-column dicts."""
     cell = {}
-    for m in METRICS:
+    for m in run.metrics:
         d = keep[m] - drop[m]
         cell[m] = (d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(len(d)))
     return cell
 
 
-def blanked(deck, card_name):
+def blanked(run, deck, card_name):
     deck_b = list(deck)
     idx = next(i for i, c in enumerate(deck) if c.name == card_name)
-    deck_b[idx] = blank_like(deck[idx], repl_priority(deck))
+    deck_b[idx] = blank_like(deck[idx], repl_priority(deck),
+                             keep_types=run.blank_keeps_types)
     return deck_b
 
 
-def ablate(deck, commander, card_name, baseline=None):
+def ablate(run, deck, commander, card_name, baseline=None):
     """Returns {horizon: {metric: (mean_diff, ci)}}.
 
     `baseline` is {turns: metric columns for the UNMODIFIED deck}. Passing it
     is what saves half the work; omitting it measures the baseline here, which
     is what the old code did for every card in turn.
     """
-    deck_b = blanked(deck, card_name)
+    deck_b = blanked(run, deck, card_name)
     out = {}
-    for turns in HORIZONS:
+    for turns in run.horizons:
         keep = (baseline[turns] if baseline is not None
-                else columns(deck, commander, turns, 0, N))
-        out[str(turns)] = paired(keep, columns(deck_b, commander, turns, 0, N))
+                else columns(run, deck, commander, turns, 0, run.n))
+        out[str(turns)] = paired(run, keep,
+                                 columns(run, deck_b, commander, turns, 0, run.n))
     return out
 
 
-# The key MUST include every parameter that changes what a cached number MEANS.
-# It used to key on deck and horizons only, so resuming a run at a different
-# sample size silently merged two sample sizes into one table; hence `_n{N}`.
-# `_medblank` / `_deadblank` is here for the same reason: the 2026-09-06 blank
-# priority change moves every number, and the pre-change files carry NEITHER
-# suffix, so they can no longer be picked up by a run that would misread them.
-#
-# The directory is part of the path and NOT part of the key: `results/caches/`
-# is where every cache has lived since the 2026-09-09 reorganisation, and the
-# name inside it is unchanged, so a cache from before the move is still picked
-# up by a run that should pick it up. Moving these files was allowed to change
-# where they are and forbidden to change what they mean.
-CACHE = os.path.join(
-    "results", "caches",
-    f"ablation_cache_{DECK}_{'-'.join(map(str, HORIZONS))}_n{N}"
-    f"{'_sametype' if BLANK_KEEPS_TYPES else ''}"
-    f"{'_deadblank' if BLANK_PRIORITY == 'dead' else '_medblank'}.json")
 
 
 # ---------------------------------------------------------------------------
@@ -728,41 +772,27 @@ CACHE = os.path.join(
 _W = {}
 
 
-def _worker_init(deck_name, n, horizons, baseline):
-    # DECK/N/HORIZONS are derived from sys.argv at import. multiprocessing's
-    # spawn start method does forward sys.argv to the child, but this does not
-    # rely on that: the run's parameters are passed explicitly and the module
-    # globals are re-derived from them, so a worker cannot end up measuring a
-    # different deck or sample size than the parent asked for.
-    global DECK, N, HORIZONS, SIM, SCRIPTED, PARTLY, METRICS
-    DECK, N, HORIZONS = deck_name, n, horizons
-    SIM = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-           "karlov": karlov_sim, "tivit": tivit_sim,
-           "shilgengar": shilgengar_sim, "azusa": azusa_sim}[DECK]
-    SCRIPTED = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
-                "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
-                "shilgengar": SCRIPTED_SHILGENGAR,
-                "azusa": SCRIPTED_AZUSA}[DECK]
-    # Re-bound with the rest, though a worker only MEASURES and never renders:
-    # leaving one classification global pointing at the parent's deck is the
-    # shape of bug this whole block exists to prevent, and "it happens not to
-    # be read" is a property of today's code rather than of tomorrow's.
-    METRICS = METRIC_SETS[DECK]
-    _W["deck"], _W["commander"] = build_pending(DECK)
-    # After the build, because the symmetric-wipe half of this category is
-    # derived FROM THE DECK rather than listed. See partly_for().
-    PARTLY = partly_for(DECK, _W["deck"])
+def _worker_init(run, baseline):
+    # The run's parameters arrive as ONE OBJECT, the same one the parent
+    # parsed, so a worker cannot measure a different deck or sample size than
+    # the parent asked for. (Until 2026-09-17 they were module globals derived
+    # from sys.argv at import and re-derived here; a worker only measures, so
+    # the classification sets it used to rebind as well are not needed.)
+    _W["run"] = run
+    _W["deck"], _W["commander"] = build_pending(run.deck)
     _W["baseline"] = baseline
 
 
 def _baseline_chunk(args):
     """A slice of the untouched deck's games, for one horizon."""
     turns, lo, hi = args
-    return turns, lo, columns(_W["deck"], _W["commander"], turns, lo, hi)
+    return turns, lo, columns(_W["run"], _W["deck"], _W["commander"],
+                              turns, lo, hi)
 
 
 def _ablate_card(name):
-    return name, ablate(_W["deck"], _W["commander"], name, _W["baseline"])
+    return name, ablate(_W["run"], _W["deck"], _W["commander"], name,
+                        _W["baseline"])
 
 
 def _chunks(n, parts):
@@ -777,26 +807,26 @@ def _chunks(n, parts):
     return out
 
 
-def measure_baseline(pool, procs):
+def measure_baseline(run, pool, procs):
     """The untouched deck, once per horizon, split over the pool.
 
     Concatenating the slices reproduces the single-process array exactly —
     seeds 5000..5000+N-1 in order, one float64 per game — so every downstream
     mean and standard deviation is bit-identical.
     """
-    slices = _chunks(N, procs)
-    tasks = [(t, lo, hi) for t in HORIZONS for lo, hi in slices]
-    parts = {t: {} for t in HORIZONS}
+    slices = _chunks(run.n, procs)
+    tasks = [(t, lo, hi) for t in run.horizons for lo, hi in slices]
+    parts = {t: {} for t in run.horizons}
     runner = (pool.imap_unordered(_baseline_chunk, tasks) if pool
               else map(_baseline_chunk, tasks))
     for turns, lo, cols in runner:
         parts[turns][lo] = cols
     return {t: {m: np.concatenate([parts[t][lo][m] for lo, _ in slices])
-                for m in METRICS}
-            for t in HORIZONS}
+                for m in run.metrics}
+            for t in run.horizons}
 
 
-def ablation_stream(todo, procs):
+def ablation_stream(run, todo, procs):
     """Yield (card, {horizon: {metric: (diff, ci)}}) in completion order.
 
     One pool measures the baseline; a second carries it to every worker in an
@@ -804,17 +834,16 @@ def ablation_stream(todo, procs):
     once per card. Breaking out of this generator closes both pools.
     """
     if procs == 1:
-        _worker_init(DECK, N, HORIZONS, None)
-        _W["baseline"] = measure_baseline(None, 1)
+        _worker_init(run, None)
+        _W["baseline"] = measure_baseline(run, None, 1)
         for name in todo:
             yield _ablate_card(name)
         return
 
+    with Pool(procs, initializer=_worker_init, initargs=(run, None)) as scout:
+        baseline = measure_baseline(run, scout, procs)
     with Pool(procs, initializer=_worker_init,
-              initargs=(DECK, N, HORIZONS, None)) as scout:
-        baseline = measure_baseline(scout, procs)
-    with Pool(procs, initializer=_worker_init,
-              initargs=(DECK, N, HORIZONS, baseline)) as work:
+              initargs=(run, baseline)) as work:
         yield from work.imap_unordered(_ablate_card, todo)
 
 
@@ -1025,8 +1054,11 @@ KNOWN_BLIND = {
 }
 
 
-def check_scripted_coverage(deck):
+def check_scripted_coverage(deck_name, deck, partly):
     """Every nonland card must be classified ON PURPOSE.
+
+    `deck_name` picks the SCRIPTED_* and KNOWN_BLIND sets; `partly` is
+    `partly_for(deck_name, deck)`, derived from the deck after it is built.
 
     The SCRIPTED_* sets are hand-maintained name sets and NOTHING used to check
     them against the deck. On 2026-09-04 five newly added cards were
@@ -1052,6 +1084,7 @@ def check_scripted_coverage(deck):
     # implemented, in NONE of the three categories, because this line skipped
     # it. §0q's shape in the checker itself — a check with a blind spot reads
     # like coverage and is not.
+    SCRIPTED, PARTLY, DECK = SCRIPTED_BY_DECK[deck_name], partly, deck_name
     names = {c.name for c in deck if not c.is_land or c.script}
     stale = SCRIPTED - {c.name for c in deck}   # lands may be scripted too
     if stale:
@@ -1095,14 +1128,15 @@ def check_scripted_coverage(deck):
               "has to be made deliberately.")
 
 
-def main():
-    global PARTLY
-    deck, commander = build_pending(DECK)
-    # Derived from the deck, so it has to be rebound once the deck exists —
-    # and BEFORE check_scripted_coverage, which is what enforces the split.
-    PARTLY = partly_for(DECK, deck)
+def main(argv=None):
+    run = parse_args(sys.argv[1:] if argv is None else argv)
+    deck, commander = build_pending(run.deck)
+    # Derived from the deck, so it exists only once the deck does — and it is
+    # needed BEFORE check_scripted_coverage, which is what enforces the split.
+    partly = partly_for(run.deck, deck)
     nonlands = [c.name for c in deck if not c.is_land]
-    check_scripted_coverage(deck)
+    check_scripted_coverage(run.deck, deck, partly)
+    CACHE = run.cache
 
     results = {}
     # A run that starts with NO cache file is a rebuild: its numbers are new
@@ -1134,7 +1168,7 @@ def main():
         # save and every resumed run is a no-op.
         try:
             from tools.cache_manifest import stamp_built
-            stamp_built(os.path.basename(CACHE), DECK, fresh=fresh["run"])
+            stamp_built(os.path.basename(CACHE), run.deck, fresh=fresh["run"])
             fresh["run"] = False
         except Exception as exc:                      # never fail a measurement
             print(f"  WARNING: could not stamp cache provenance: {exc}",
@@ -1146,7 +1180,7 @@ def main():
         procs = max(1, int(os.environ.get("ABLATE_PROCS", "0")) or cpu_count() or 1)
         print(f"  {len(todo)} card(s) to measure on {procs} process(es)",
               file=sys.stderr)
-        stream = ablation_stream(todo, procs)
+        stream = ablation_stream(run, todo, procs)
         try:
             for name, cell in stream:
                 results[name] = cell
@@ -1162,7 +1196,21 @@ def main():
         print(f"\n{len(remaining)} cards still to do — rerun to resume.",
               file=sys.stderr)
         return
+    sys.stdout.write(render_table(run, results, nonlands, partly))
 
+
+def render_table(run, results, nonlands, partly) -> str:
+    """The table, as the text `main()` prints. A pure function of the cache
+    contents and the classification sets, so a test can re-render a committed
+    table from its committed cache and diff the two (§0z4's check, made
+    repeatable) without running a game."""
+    out = []
+
+    def print(*parts, **_kw):           # shadows the builtin on purpose:
+        out.append(" ".join(str(x) for x in parts) + "\n")   # same bytes
+
+    HORIZONS, N, SCRIPTED, PARTLY = (run.horizons, run.n, run.scripted,
+                                     partly)
     # The table did not used to say what N it was run at, so `ablation_tivit.txt`
     # at N=2000 looked exactly like the other three at N=6000 and CLAUDE.md had
     # to carry the warning in prose. A table should describe its own precision.
@@ -1226,6 +1274,7 @@ list of names to ablate() to score a package together.""")
             if n in PARTLY:
                 for line in textwrap.wrap(PARTLY[n], 76):
                     print(f"      {line}")
+    return "".join(out)
 
 
 if __name__ == "__main__":

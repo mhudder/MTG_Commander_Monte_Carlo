@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -111,7 +111,7 @@ class LoreholdGame:
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
-        self.m = {
+        self.m = Metrics({
             "mv_cheated": 0.0,
             "miracles_cast": 0,
             "miracle_windows": 0,
@@ -186,7 +186,7 @@ class LoreholdGame:
             "test_card_countered": 0,
             "clamp_activations": 0,
             "fodder_turns": 0,
-        }
+        })
         self.damage_by_turn = []
 
     # -- helpers ------------------------------------------------------------
@@ -271,7 +271,7 @@ def pay(g, cost, units):
     treasure_used = sum(1 for i in idx if i >= first_treasure)
     g.apex_mana -= apex_used
     g.treasures -= -(-treasure_used // per)  # ceil: each Treasure gives `per`
-    g.m["apex_mana_spent"] = g.m.get("apex_mana_spent", 0) + apex_used
+    g.m["apex_mana_spent"] += apex_used
     g.m["mana_spent"] += n
 
     # TALISMAN OF CONVICTION, and §0i's last live free drawback. "{T}: Add
@@ -286,9 +286,8 @@ def pay(g, cost, units):
     pain = coloured_tap_life(g, cost, idx, units)
     if pain:
         g.your_life -= pain
-        g.m["life_lost_to_own_cards"] = \
-            g.m.get("life_lost_to_own_cards", 0) + pain
-        g.m["coloured_taps_paid"] = g.m.get("coloured_taps_paid", 0) + 1
+        g.m["life_lost_to_own_cards"] += pain
+        g.m["coloured_taps_paid"] += 1
     return n
 
 
@@ -825,8 +824,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         if n > 0:
             g.tapped_treasures += n
             g.m["treasures_made"] += n
-            g.m["mother_lode_treasures"] = \
-                g.m.get("mother_lode_treasures", 0) + n
+            g.m["mother_lode_treasures"] += n
     elif sc == "invoke_calamity":
         invoke_calamity(g, self_card=card)
     elif sc == "jeskas_will":
@@ -983,7 +981,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
             g.graveyard.extend(g.hand)
             g.hand = []
             _draw_into_hand(g, n)
-            g.m["borrowed_discards"] = g.m.get("borrowed_discards", 0) + n
+            g.m["borrowed_discards"] += n
         else:
             _draw_into_hand(g, 2)      # the pre-2026-09-11 `draw2` stand-in
     if "wipe" in card.tags:
@@ -1034,12 +1032,12 @@ def discover(g, x: int):
             break
         exiled.append(c)
     g.library[0:0] = exiled              # index 0 is the bottom
-    g.m["discover_exiled"] = g.m.get("discover_exiled", 0) + len(exiled)
+    g.m["discover_exiled"] += len(exiled)
     if hit is None:
         return None
     g.m["free_casts"] += 1
-    g.m["discover_casts"] = g.m.get("discover_casts", 0) + 1
-    g.m["discover_mv"] = g.m.get("discover_mv", 0.0) + hit.free_mv
+    g.m["discover_casts"] += 1
+    g.m["discover_mv"] += hit.free_mv
     resolve_spell(g, hit, 0, from_hand=False)
     return hit
 
@@ -1070,13 +1068,13 @@ def apex_of_power(g, is_copy=False):
     main phase, so the two only differ for a pilot who would have wasted it.
     """
     exiled = [g.library.pop() for _ in range(min(7, len(g.library)))]
-    g.m["apex_exiled"] = g.m.get("apex_exiled", 0) + len(exiled)
+    g.m["apex_exiled"] += len(exiled)
 
     if not is_copy:
         want = {c: sum(x.cost.get(c, 0) for x in exiled) for c in ("R", "W")}
         g.apex_color = max(("R", "W"), key=lambda c: want[c])
         g.apex_mana += 10
-        g.m["apex_mana_made"] = g.m.get("apex_mana_made", 0) + 10
+        g.m["apex_mana_made"] += 10
 
     # Cast what the pool can afford, best first. Whatever is left stays exiled.
     pool = [c for c in exiled if not c.is_land]
@@ -1088,9 +1086,9 @@ def apex_of_power(g, is_copy=False):
             break
         pool.remove(best)
         paid = pay(g, reduce_cost(g, best), units) or 0
-        g.m["apex_casts"] = g.m.get("apex_casts", 0) + 1
+        g.m["apex_casts"] += 1
         resolve_spell(g, best, paid, from_hand=False)
-    g.m["apex_stranded"] = g.m.get("apex_stranded", 0) + len(pool)
+    g.m["apex_stranded"] += len(pool)
 
 
 def jeskas_will(g):
@@ -1119,7 +1117,7 @@ def jeskas_will(g):
     this engine's land drop comes from hand.
     """
     exiled = [g.library.pop() for _ in range(min(3, len(g.library)))]
-    g.m["jeska_exiled"] = g.m.get("jeska_exiled", 0) + len(exiled)
+    g.m["jeska_exiled"] += len(exiled)
     pool = [c for c in exiled if not c.is_land]
     while pool:
         units = mana_units(g)
@@ -1129,9 +1127,9 @@ def jeskas_will(g):
             break
         pool.remove(best)
         paid = pay(g, reduce_cost(g, best), units) or 0
-        g.m["jeska_casts"] = g.m.get("jeska_casts", 0) + 1
+        g.m["jeska_casts"] += 1
         resolve_spell(g, best, paid, from_hand=False)
-    g.m["jeska_stranded"] = g.m.get("jeska_stranded", 0) + len(pool)
+    g.m["jeska_stranded"] += len(pool)
 
 
 def past_in_flames(g, self_card=None):
@@ -1168,8 +1166,8 @@ def past_in_flames(g, self_card=None):
             break
         g.graveyard.remove(best)          # flashback exiles it on resolution
         paid = pay(g, reduce_cost(g, best), units) or 0
-        g.m["flashback_casts"] = g.m.get("flashback_casts", 0) + 1
-        g.m["flashback_mv"] = g.m.get("flashback_mv", 0) + best.free_mv
+        g.m["flashback_casts"] += 1
+        g.m["flashback_mv"] += best.free_mv
         resolve_spell(g, best, paid, from_hand=False)
 
 
@@ -1339,7 +1337,7 @@ def invoke_calamity(g, self_card=None):
         # genuinely gone, and casting it anyway would be conjuring a card.
         src = g.graveyard if zone == "graveyard" else g.hand
         if card not in src:
-            g.m["invoke_lost_target"] = g.m.get("invoke_lost_target", 0) + 1
+            g.m["invoke_lost_target"] += 1
             continue
         src.remove(card)
         g.m["invoke_free_casts"] += 1
@@ -1870,7 +1868,7 @@ def simulate(deck, commander, cfg, seed):
         take_turn(g)
         if g.result is not None:
             break
-    out = dict(g.m)
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
     # CRN instrumentation, read by tools/validate.py's audit. §0z17.
     out["crn_draws"] = g.crn.draws()
     out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)

@@ -13,8 +13,8 @@ run does not exist.
 Each module runs in its OWN SUBPROCESS, for two reasons. The modules mutate
 engine module attributes in `--mutate` mode and restore them in `finally`,
 which is fine in isolation and not something to trust across thirteen modules
-in one interpreter. And `tools/ablation.py`'s shape -- state derived at import
-from `sys.argv` -- means importing a test module is not the same as running it.
+in one interpreter. And a module's `--mutate` flag is read from `sys.argv`,
+so importing a test module is not the same as running it.
 
 TWO SIGNALS, CROSS-CHECKED. The exit code is the verdict. The "N passed, M
 failed" line each module prints is read as well, and a module that prints

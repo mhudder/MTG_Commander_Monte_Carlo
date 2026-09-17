@@ -79,6 +79,7 @@ Methodology that used to live at the end of this file is now
 | [0z27](#0z27) | MEASURED | **two swaps staged on head-to-head evidence, and the karlov regeneration shows redundancy rewriting five rows at once** |
 | [0z29](#0z29) | FIXED | **Bloodthirsty Conqueror was measured as a GROUND creature** — `_evasion.py` had not been regenerated since the card was added, and no fingerprint could see it. Flying is worth nothing to the card (its value is the trigger), the karlov table is rebuilt anyway, and `check_docs` now fails on a card the generator never scanned |
 | [0z30](#0z30) | FIXED | **One opening hand and one pod-phase order for six engines.** Three mulligan fallbacks (a fifth hand; an empty hand; 106-card games) and two pod orders were six copies of two blocks. Unifying them moves tivit's baseline +0.0647 and karlov's +0.0205 at T20 — the two engines had let the opponents' creatures grow BEFORE dealing chip damage — and moves lorehold and azusa on 3 and 2 seeds of 15,000 |
+| [0z31](#0z31) | FIXED | **`engine.Metrics` and an importable `ablation.py`.** The metrics dict reads 0 for a name nothing wrote (35 defensive `m.get(k, 0) + 1` spellings folded into `+=`); ablation's run parameters are a `Run` object passed down instead of `sys.argv` read at import, and its table renderer is a pure function — so "the committed table IS the committed cache" is a test now, over all six decks |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4805,6 +4806,57 @@ reason lorehold and azusa were not rebuilt on 3 and 2 seeds' evidence.
 `on_creature_death` and the tail of `simulate()` — M5 of the review, the
 base class. The two blocks unified here were the ones where the copies had
 already changed numbers; the rest are the same shape waiting.
+
+## 0z31. FIXED — the metrics dict cannot KeyError, and ablation.py no longer reads argv at import
+
+2026-09-17. M3 and M4 of the review, both zero-behaviour refactors, verified
+as such: `check_unchanged_decks` against a worktree at `9f226af` came back
+BIT-IDENTICAL on all eight metrics for all six decks after M3, and every
+committed table re-rendered BYTE-IDENTICAL from its committed cache through
+the refactored renderer after M4. The A/A control is `+0.00` on all eighteen
+metrics. Pinned by `tests/test_metrics_and_render.py` (two mutations, exact
+sets).
+
+**M3.** Each engine seeded `self.m` with a ~50-key literal and incremented
+about 350 sites with `+=`; a site whose key was missing from the literal
+raised `KeyError` in a worker, twenty minutes into an ablation, on the one
+seed where the card fired. Four comments in `azusa.__init__` describe that
+failure, and 35 sites in three files had grown a defensive
+`m.get(k, 0) + 1` instead — the same operation spelt two ways (§0u's shape
+in miniature). `engine.Metrics` is a `dict` whose `__missing__` returns 0
+without inserting, every engine seeds its literal into one, every
+`simulate()` returns one, and the 35 defensive spellings are `+=` again.
+The literals stay: they are the documented metric set and the reason
+`experiment.analyse` finds every `METRICS` key on both branches.
+
+**M4.** `tools/ablation.py` read `DECK`, `N` and `HORIZONS` from `sys.argv`
+at import and rebound them, with `SIM`, `SCRIPTED`, `PARTLY` and `METRICS`,
+inside `_worker_init`. Three docs described working around it
+(`experiment.repl_priority`'s docstring, `pending.check_measured…`'s, and
+the test runner's), and it blocked testing the classification checker and
+the table renderer. Now `parse_args` builds a frozen `Run(deck, n,
+horizons, blank_keeps_types)` with `sim`/`metrics`/`scripted`/`cache`
+properties; `main()` passes it down, workers receive the same object in
+their initializer, and `render_table(run, results, nonlands, partly)` is a
+pure function returning the table's text. The `CACHE` global and the second
+copy of the SIM/SCRIPTED dicts are gone.
+
+**What that bought, immediately.** The §0z4 rendering check — re-render the
+committed table from the committed cache and diff — used to be a shell
+one-liner run by hand when someone remembered. It is case C of the new test,
+over every deck with a cache: **the table on disk IS the cache on disk, byte
+for byte.** It fails when a cache is regenerated and the table is not, when a
+classification moves a row between sections without a re-render, and when
+the renderer changes what it prints; its mutation moves one rendmaw card to
+KNOWN_BLIND and exactly rendmaw's row fails. One caller was found by the
+suite rather than by grep: `tests/test_combat_split.py`'s stub game built
+`self.m = {}` and hit the first `+=` in `opponents.combat_damage` — the 35
+defensive spellings had been carrying exactly that stub. It builds a
+`Metrics()` now; a stub game's `m` must, and the suite says so.
+And `pending.py` can now import
+the classification sets, which its own docstring names as the open
+follow-up: checking that a proposed cut is not MODEL-BLIND, the trap behind
+two withdrawn swaps.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

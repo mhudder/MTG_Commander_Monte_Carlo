@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -95,7 +95,7 @@ class TivitGame:
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
-        self.m = {
+        self.m = Metrics({
             "damage": 0.0, "drain_damage": 0.0, "combat_damage": 0.0,
             "cards_drawn": 0, "spells_cast": 0,
             "mana_spent": 0, "mana_floated": 0, "stranded_mv": 0,
@@ -123,7 +123,7 @@ class TivitGame:
             # --- routes out ---
             "win_route": 0, "loss_route": 0,
             "token_drain": 0.0, "artifact_drain": 0.0,
-        }
+        })
         self.damage_by_turn = []
 
     # -- helpers ------------------------------------------------------------
@@ -596,7 +596,7 @@ def main_phase(g):
         # spell still makes the Thopter -- which is what the card says.
         if "Artifact" in card.types and g.has("Sai, Master Thopterist"):
             g.make_tokens(1, 1, 1, "Thopter", artifact=True)
-            g.m["sai_thopters"] = g.m.get("sai_thopters", 0) + 1
+            g.m["sai_thopters"] += 1
         if card.name in g.cfg.get("watch", ()):
             g.m["cast_test_card"] = 1
             g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
@@ -629,7 +629,7 @@ def resolve(g, card):
         # is not. Implementing the body alone and calling the number the card
         # is the §0f failure this project has already paid for three times.
         g.make_tokens(1, 0, 0, "Construct", artifact=True)
-        g.m["urza_constructs"] = g.m.get("urza_constructs", 0) + 1
+        g.m["urza_constructs"] += 1
     if s == "illusion":
         # "You choose how each player votes this turn. Draw a card."
         g.illusion_active = True
@@ -700,12 +700,12 @@ def resolve(g, card):
             V.council(g)                 # the pre-fix branch: vote, discard it
         elif V.council(g, tie_goes_to_you=True):
             OPP.resolve_own_wipe(g, card=card)
-            g.m["magister_wipes"] = g.m.get("magister_wipes", 0) + 1
+            g.m["magister_wipes"] += 1
         else:
             for c in [x for x in g.graveyard if x.is_creature]:
                 g.graveyard.remove(c)
                 g.board.append(Permanent(card=c, sick=True))
-                g.m["magister_returns"] = g.m.get("magister_returns", 0) + 1
+                g.m["magister_returns"] += 1
     elif s == "shell_game":
         # "Starting with the next opponent in turn order, each player chooses
         # a creature YOU DON'T CONTROL. Destroy the chosen creatures."
@@ -727,7 +727,7 @@ def resolve(g, card):
                 break
             victim = max(fed, key=lambda o: o.creatures)
             victim.creatures -= 1.0
-            g.m["shell_game_kills"] = g.m.get("shell_game_kills", 0) + 1
+            g.m["shell_game_kills"] += 1
     elif s == "tempt_bunnies":
         n = V.tempting_offer(g)
         g.draw(n)
@@ -1163,7 +1163,7 @@ def simulate(deck, commander, cfg, seed):
             break
         played = take_extra_turns(g, played, budget)
 
-    out = dict(g.m)
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
     # CRN instrumentation, read by tools/validate.py's audit. §0z17.
     out["crn_draws"] = g.crn.draws()
     out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
