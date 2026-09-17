@@ -26,6 +26,8 @@ import os
 import subprocess
 import sys
 
+from edhmc.registry import DECKS
+
 OUT = "docs/ABLATION_CACHES.md"
 CACHE_DIR = os.path.join("results", "caches")
 
@@ -48,14 +50,12 @@ SHARED = ["edhmc/opponents.py", "edhmc/experiment.py", "edhmc/engine.py",
 # the newline normalisation below exists to prevent. A rename is not a
 # behaviour change, and the fingerprint must not claim it is.
 MOVED = {"ablation.py": os.path.join("tools", "ablation.py")}
-PER_DECK = {
-    "rendmaw": ["edhmc/decks/rendmaw_v12.py"],
-    "lorehold": ["edhmc/lorehold.py", "edhmc/decks/lorehold_v16.py"],
-    "karlov": ["edhmc/karlov.py", "edhmc/decks/karlov_v2.py"],
-    "tivit": ["edhmc/tivit.py", "edhmc/voting.py", "edhmc/decks/tivit_v1.py"],
-    "shilgengar": ["edhmc/shilgengar.py", "edhmc/decks/shilgengar_v1.py"],
-    "azusa": ["edhmc/azusa.py", "edhmc/decks/azusa_v1.py"],
-}
+# Derived from edhmc/registry.py (§0z32): the engine file, its extras
+# (voting.py for tivit) and the CURRENT deck module, spelt exactly as this
+# dict used to type them, so deriving them moved no fingerprint. A new deck
+# version (`karlov_v3.py`) changes its fingerprint by construction, which is
+# right: the cache was measured on the list the old module built.
+PER_DECK = {name: spec.fingerprint_files for name, spec in DECKS.items()}
 # engine.py is Rendmaw's engine AND the shared primitives, so it is in SHARED
 # and does not repeat under rendmaw.
 

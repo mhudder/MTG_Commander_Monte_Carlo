@@ -64,6 +64,7 @@ from dataclasses import dataclass, field
 from edhmc.decks import (rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1,
                          shilgengar_v1, azusa_v1)
 from edhmc.experiment import _swap_many
+from edhmc.registry import DECKS as REGISTRY
 
 
 @dataclass
@@ -164,10 +165,8 @@ class Proposal:
 # than derived from cost pips -- a commander's identity includes its ability
 # text, so the cost is not always the whole answer and deriving it would be a
 # guess dressed as a derivation.
-DECK_IDENTITY = {
-    "karlov": set("BW"), "rendmaw": set("BG"), "lorehold": set("RW"),
-    "tivit": set("BUW"), "azusa": set("G"), "shilgengar": set("BW"),
-}
+# From edhmc/registry.py (§0z32), where every other per-deck fact lives.
+DECK_IDENTITY = {name: set(spec.identity) for name, spec in REGISTRY.items()}
 
 
 COMMITTED: list[Change] = [
@@ -2256,6 +2255,15 @@ DECKS = {
         "Expedition Map": azusa_v1.EXPEDITION_MAP,
         "Zuran Orb": azusa_v1.ZURAN_ORB}),
 }
+
+# The catalog is per deck and hand-written (which candidate cards a Change
+# may name); the SET of decks is the registry's, and the two are checked
+# against each other at import -- §0q's rule, pointed at this file.
+if set(DECKS) != set(REGISTRY):
+    raise ImportError(
+        f"edhmc/pending.py's DECKS catalog names {sorted(DECKS)} but "
+        f"edhmc/registry.py names {sorted(REGISTRY)}; a deck needs an entry "
+        f"in both (its catalog may be empty).")
 
 
 def check_proposals(strict: bool = True):

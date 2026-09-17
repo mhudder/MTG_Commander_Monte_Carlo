@@ -999,7 +999,89 @@ def coloured_tap_life(g, cost: dict, pay_idx: list[int], units) -> float:
 # Game state
 # ----------------------------------------------------------------------------
 
-class Game:
+class BaseGame:
+    """What every engine's Game has in common, written ONCE (§0z32).
+
+    Six engines, no base class, was structural fact 1 in ARCHITECTURE.md and
+    the reason §0u, §0z7, §0z8 and §0z30 happened: a rule that lives in a
+    method has six copies and the copies drift. This class holds the methods
+    whose six copies were byte-identical or differed only by omission --
+    `has`, `count`, `draw`, `deal_pod_damage` -- and `finish()` below holds
+    the tail of `simulate()` that assembled the output dict six times.
+
+    An engine's Game inherits this and keeps everything that is genuinely
+    its own: `__init__` (each builds its own state), `power_of` (Angels,
+    Urza's Construct, dynamic lands), `on_creature_death`, `make_permanent`,
+    and karlov's `draw`, which overrides to model Alhammarret's Archive.
+
+    Where the copies DIFFERED the union was taken and the difference was
+    MEASURED, not argued (§0z32): over 400 staged-list games per deck, every
+    numeric output key is identical except karlov's `turn_lethal`, which a
+    drain win now stamps at the drain (as engine.py and tivit did) instead
+    of at the next `not living` check. azusa's copy did not record
+    `drain_damage`, and azusa has no pod-drain source, so nothing moved
+    there. No table reads either key.
+    """
+
+    def has(self, name: str) -> bool:
+        return name in self.board.names
+
+    def count(self, name: str) -> int:
+        return self.board.names.get(name, 0)
+
+    def draw(self, n=1):
+        for _ in range(int(n)):
+            if self.library:
+                self.hand.append(self.library.pop())
+                self.m["cards_drawn"] += 1
+
+    def opening_hand(self):
+        london_mulligan(self)      # shared, §0z30; MDFC backs count as lands
+
+    def deal_pod_damage(self, amount: float, each: bool = True):
+        """`each=True` means 'each opponent loses N' (amount is the pod total)."""
+        if amount <= 0:
+            return
+        # BOUNDED: record what could have mattered, not what was asked for --
+        # a drain for 50 into a player on 3 life is worth 3. The divisor is
+        # the FULL POD, not the living count -- see OPP.pod_size.
+        n = OPP.pod_size(self)
+        dealt = (OPP.damage_each(self, amount / n) if each
+                 else OPP.damage_single(self, amount))
+        self.m["damage"] += dealt
+        self.m["drain_damage"] += dealt
+        if self.damage_by_turn:
+            self.damage_by_turn[-1] += dealt
+        if self.result == "win" and self.m["turn_lethal"] == 99:
+            self.m["turn_lethal"] = self.turn
+
+
+def finish(g) -> "Metrics":
+    """The output dict of a finished game -- the tail every `simulate()` had
+    its own copy of (§0z32). An engine adds its own keys after this."""
+    out = Metrics(g.m)      # reads 0 for a metric this game never touched
+    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
+    out["crn_draws"] = g.crn.draws()
+    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
+    out["damage_by_turn"] = g.damage_by_turn
+    out["result"] = g.result or "timeout"
+    out["turns_played"] = g.turn
+    out["won"] = 1 if g.result == "win" else 0
+    out["lost"] = 1 if g.result == "loss" else 0
+    out["final_life"] = g.your_life
+    out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
+    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
+    # an Impending Overlord are not creatures and their power is not board
+    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
+    # restores the old reading here too.
+    out["final_board_power"] = sum(g.power_of(p) for p in g.board
+                                   if OPP.is_creature_now(g, p))
+    out["test_card_resolved"] = 1 if (out["cast_test_card"] and
+                                      not out["test_card_answered"]) else 0
+    return out
+
+
+class Game(BaseGame):
     def __init__(self, deck: list[Card], commander: Card, cfg: dict,
                  rng: random.Random, seed_for_pod: int = 0):
         self.rng = rng
@@ -1072,15 +1154,6 @@ class Game:
 
     # -- library ops ---------------------------------------------------------
 
-    def draw(self, n=1):
-        for _ in range(n):
-            if self.library:
-                self.hand.append(self.library.pop())
-                self.m["cards_drawn"] += 1
-
-    def opening_hand(self):
-        london_mulligan(self)
-
     # -- tokens --------------------------------------------------------------
 
     def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False):
@@ -1111,27 +1184,6 @@ class Game:
             self.board.append(perm)
             self.m["tokens_made"] += 1
         self.made_token_this_turn = True
-
-    def has(self, name: str) -> bool:
-        return name in self.board.names
-
-    # -- non-combat damage ---------------------------------------------------
-
-    def deal_pod_damage(self, amount: float, each: bool = True):
-        """`each=True` means 'each opponent loses N' (amount is the pod total)."""
-        if amount <= 0:
-            return
-        # BOUNDED: record what could have mattered, not what was asked for.
-        # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
-        n = OPP.pod_size(self)
-        amount = (OPP.damage_each(self, amount / n) if each
-                  else OPP.damage_single(self, amount))
-        self.m["damage"] += amount
-        self.m["drain_damage"] += amount
-        if self.damage_by_turn:
-            self.damage_by_turn[-1] += amount
-        if self.result == "win" and self.m["turn_lethal"] == 99:
-            self.m["turn_lethal"] = self.turn
 
     def on_creature_death(self, n: int = 1, perm: Optional[Permanent] = None):
         """Aristocrats drain. Each Blood Artist effect costs the pod 3 life per
@@ -2236,23 +2288,4 @@ def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
         take_turn(g)
         if g.result is not None:
             break
-    out = Metrics(g.m)      # reads 0 for a metric this game never touched
-    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
-    out["crn_draws"] = g.crn.draws()
-    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
-    out["result"] = g.result or "timeout"
-    out["turns_played"] = g.turn
-    out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
-    out["final_life"] = g.your_life
-    out["damage_by_turn"] = g.damage_by_turn
-    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
-    # an Impending Overlord are not creatures and their power is not board
-    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
-    # restores the old reading here too.
-    out["final_board_power"] = sum(g.power_of(p) for p in g.board
-                                   if OPP.is_creature_now(g, p))
-    out["won"] = 1 if g.result == "win" else 0
-    out["lost"] = 1 if g.result == "loss" else 0
-    out["test_card_resolved"] = 1 if (out["cast_test_card"] and
-                                      not out["test_card_answered"]) else 0
-    return out
+    return finish(g)

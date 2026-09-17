@@ -80,6 +80,7 @@ Methodology that used to live at the end of this file is now
 | [0z29](#0z29) | FIXED | **Bloodthirsty Conqueror was measured as a GROUND creature** — `_evasion.py` had not been regenerated since the card was added, and no fingerprint could see it. Flying is worth nothing to the card (its value is the trigger), the karlov table is rebuilt anyway, and `check_docs` now fails on a card the generator never scanned |
 | [0z30](#0z30) | FIXED | **One opening hand and one pod-phase order for six engines.** Three mulligan fallbacks (a fifth hand; an empty hand; 106-card games) and two pod orders were six copies of two blocks. Unifying them moves tivit's baseline +0.0647 and karlov's +0.0205 at T20 — the two engines had let the opponents' creatures grow BEFORE dealing chip damage — and moves lorehold and azusa on 3 and 2 seeds of 15,000 |
 | [0z31](#0z31) | FIXED | **`engine.Metrics` and an importable `ablation.py`.** The metrics dict reads 0 for a name nothing wrote (35 defensive `m.get(k, 0) + 1` spellings folded into `+=`); ablation's run parameters are a `Run` object passed down instead of `sys.argv` read at import, and its table renderer is a pure function — so "the committed table IS the committed cache" is a test now, over all six decks |
+| [0z32](#0z32) | FIXED | **A thin base class and one deck registry.** `engine.BaseGame` holds `has`/`count`/`draw`/`deal_pod_damage`/`opening_hand` once and `engine.finish()` the `simulate()` tail; `edhmc/registry.py` holds one `DeckSpec` per deck, checked against `decks/` at import, and eleven per-deck dicts derive from it. Bit-identical on every baseline metric; the only output key that moved is karlov's `turn_lethal` |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4857,6 +4858,64 @@ And `pending.py` can now import
 the classification sets, which its own docstring names as the open
 follow-up: checking that a proposed cut is not MODEL-BLIND, the trap behind
 two withdrawn swaps.
+
+## 0z32. FIXED — a thin base class for the six engines, and one registry of decks
+
+2026-09-17. M5 and M6 of the review, the structural pass. Both verified as
+zero-behaviour the way §0z31 was: `check_unchanged_decks` against a worktree
+at `774b8ef` BIT-IDENTICAL on all eight metrics for all six decks; every
+committed table re-rendered BYTE-IDENTICAL from its committed cache; the A/A
+control `+0.00` on all eighteen metrics; and, because M5 takes the UNION
+where six copies differed, a stricter check as well — every numeric key of
+`simulate()`'s output, summed over 400 staged-list games per deck, compared
+old against new.
+
+**M5, `engine.BaseGame`.** Structural fact 1 in ARCHITECTURE.md was "six
+engines, no base class", and it was the reason §0u, §0z7, §0z8 and §0z30
+happened: a rule that lives in a method has six copies. The copies of
+`has` and `count` were byte-identical; `draw` was identical in four engines
+and overridden in karlov (Alhammarret's Archive) with lorehold using its own
+`draw_card`; `deal_pod_damage` differed by omission — azusa did not record
+`drain_damage`, and karlov, shilgengar and azusa did not stamp
+`turn_lethal` on a drain win; and the six `simulate()` tails assembled the
+same eleven output keys in two different orders, with lorehold adding
+`miracle_rate` and `tutor_log` and tivit `final_treasures` and
+`final_artifacts`. `BaseGame` holds the first four and `opening_hand`;
+`engine.finish(g)` is the tail, and each engine's `simulate` adds its own
+keys after it. About 250 lines gone. **The union was measured, not
+argued:** across every numeric output key the one difference is karlov's
+`turn_lethal`, which a drain win now stamps at the drain (as engine.py and
+tivit always did) instead of at the next `not living` check — 39,600 →
+39,249 summed over 400 games, i.e. some games record the lethal turn where
+they recorded 99. azusa's copy skipped `drain_damage` but azusa has no
+pod-drain source, so nothing moved. No table reads either key.
+
+Still per engine, and meant to be: `__init__`, `power_of`/`toughness_of`
+(Angels, Urza's Construct, dynamic lands), `on_creature_death`,
+`make_permanent`, `gain_life`, `take_turn`.
+
+**M6, `edhmc/registry.py`.** A deck was registered in eleven places by hand
+— `ablation.py`'s `SIMS` and `METRIC_SETS`, `cache_manifest.py`'s
+`PER_DECK`, `check_unchanged_decks.py`, `run_shared_code_shift.py`,
+`status.py`, `pending.py`'s `DECK_IDENTITY`, `candidates.py`'s sims,
+`validate.py`'s CRN cases, and the tests' `ENGINES` maps. One `DeckSpec`
+per deck now carries the engine, the colour identity, the table's metric
+columns and the extra fingerprint files; the deck module comes from
+`discover_current_decks()`, and the registry is checked against it at
+import, so a module without a spec or a spec without a module refuses to
+import (§0q, pointed at the registry itself). `cache_manifest.PER_DECK` is
+DERIVED from it and was proved to spell every path exactly as it had been
+typed, so no fingerprint moved for that reason. `validate.py` now refuses to
+run with a deck missing from its CRN audit cases instead of skipping it
+(§0z15). What is still hand-written per deck is a decision, not a fact:
+`ablation.py`'s SCRIPTED/PARTLY/KNOWN_BLIND classification, `pending.py`'s
+candidate catalog, `validate.py`'s one real swap per deck.
+
+**Found on the way.** `check_architecture_names_modules` accepted the bare
+word "registry" in the sentence "until a single registry exists" as naming
+`edhmc/registry.py`. It matches the file name with its extension now, which
+immediately found ten tools the map had named without one. A prose word is
+not a module mention — §0z15's shape in the doc checker.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

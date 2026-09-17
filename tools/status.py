@@ -34,11 +34,12 @@ import re
 import subprocess
 import sys
 
+from edhmc.registry import DECKS as REGISTRY
 from tools._generated import comparable, head
 
 OUT = os.path.join("docs", "STATUS.md")
 RESULTS = "results"
-DECKS = ["rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa"]
+DECKS = list(REGISTRY)
 
 RE_N = re.compile(r"N\s*=\s*([\d,]+)\s+paired games")
 RE_HORIZ = re.compile(r"Horizons:\s*\(([^)]*)\)")

@@ -28,18 +28,17 @@ from multiprocessing import Pool
 
 import numpy as np
 
+from edhmc.registry import DECKS as REGISTRY
+
 N = 15000
-DECKS = ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa")
+DECKS = tuple(REGISTRY)
 METRICS = ("won", "damage", "final_life", "cards_drawn", "stranded_mv",
            "turns_played")
 HORIZONS = (10, 20)
 
 
 def _sim(deck):
-    from edhmc import engine, lorehold, karlov, tivit, shilgengar, azusa
-    return {"rendmaw": engine, "lorehold": lorehold, "karlov": karlov,
-            "tivit": tivit, "shilgengar": shilgengar,
-            "azusa": azusa}[deck].simulate
+    return REGISTRY[deck].sim
 
 
 def measure_one(args):

@@ -21,30 +21,21 @@ regenerating, whatever the argument for why it should not.
 import json
 import sys
 
-DECKS = ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa")
+from edhmc.registry import DECKS as REGISTRY
+
+DECKS = tuple(REGISTRY)
 METRICS = ("won", "lost", "damage", "cards_drawn", "turns_played",
            "final_life", "mana_spent", "stranded_mv")
 
 
 def sim_for(deck):
-    from edhmc import engine, lorehold, karlov, tivit
-    mods = {"rendmaw": engine, "lorehold": lorehold, "karlov": karlov,
-            "tivit": tivit}
-    if deck == "shilgengar":
-        from edhmc import shilgengar
-        mods["shilgengar"] = shilgengar
-    if deck == "azusa":
-        from edhmc import azusa
-        mods["azusa"] = azusa
-    return mods[deck].simulate
+    return REGISTRY[deck].sim
 
 
 def build(deck):
-    from edhmc.decks import (rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1,
-                             shilgengar_v1, azusa_v1)
-    return {"rendmaw": rendmaw_v12, "lorehold": lorehold_v16,
-            "karlov": karlov_v2, "tivit": tivit_v1,
-            "shilgengar": shilgengar_v1, "azusa": azusa_v1}[deck].build()
+    # The deck MODULE, deliberately: this compares CODE, and a staged swap
+    # is not code (see CLAUDE.md, "more than one right check").
+    return REGISTRY[deck].build()
 
 
 def measure(n, turns):

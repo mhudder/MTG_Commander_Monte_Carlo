@@ -74,18 +74,15 @@ for _s in (sys.stdout, sys.stderr):
     if hasattr(_s, "reconfigure"):
         _s.reconfigure(encoding="utf-8")
 
-from edhmc.engine import Card, simulate as rendmaw_sim
+from edhmc.engine import Card
 from edhmc.pending import build_pending
-from edhmc.lorehold import simulate as lh_sim
-from edhmc.karlov import simulate as karlov_sim
-from edhmc.tivit import simulate as tivit_sim
-from edhmc.shilgengar import simulate as shilgengar_sim
-from edhmc.azusa import simulate as azusa_sim
+from edhmc.registry import DECKS
 from edhmc.experiment import DEFAULT_CFG, BLANK_PRIORITY, repl_priority
 
-SIMS = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
-        "karlov": karlov_sim, "tivit": tivit_sim,
-        "shilgengar": shilgengar_sim, "azusa": azusa_sim}
+# Derived from edhmc/registry.py (§0z32): one place names an engine and its
+# metric columns, and a seventh deck cannot be simulated without a table
+# definition or vice versa.
+SIMS = {name: spec.sim for name, spec in DECKS.items()}
 
 
 @dataclass(frozen=True)
@@ -157,18 +154,7 @@ def parse_args(argv) -> Run:
                 if len(argv) > 2 else (20,))
     return Run(deck, n, horizons,
                os.environ.get("BLANK_KEEPS_TYPES", "0") == "1")
-METRIC_SETS = {
-    "lorehold": ("mv_cheated", "damage", "miracles_cast", "total_mv_cast", "won"),
-    "rendmaw": ("damage", "cards_drawn", "tokens_made", "rendmaw_triggers", "won"),
-    "karlov": ("damage", "lifegain_triggers", "final_life", "cards_drawn", "won"),
-    # artifacts_made is this deck's mv_cheated: the proxy the engine is built
-    # around. It is NOT the objective -- follow win rate where they disagree.
-    "tivit": ("damage", "artifacts_made", "tivit_triggers", "votes_cast", "won"),
-    "shilgengar": ("damage", "blood_made", "creatures_sacrificed",
-                  "single_reanimations", "won"),
-    "azusa": ("damage", "landfall_triggers", "lands_played",
-             "tokens_made", "won"),
-}
+METRIC_SETS = {name: spec.metrics for name, spec in DECKS.items()}
 
 # Cards whose actual text the engine implements. Everything else is a body.
 SCRIPTED_RENDMAW = {

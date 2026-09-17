@@ -329,7 +329,11 @@ def check_architecture_names_modules(docs: dict[str, str]) -> Result:
                 if versioned.match(f):
                     continue
                 stem = f.rsplit(".", 1)[0]
-                if not re.search(r"\b" + re.escape(stem) + r"\b", text):
+                # The FILE name, `<stem>.py`, not the bare word: `registry`
+                # was matched by the sentence "until a single registry
+                # exists" while edhmc/registry.py was unnamed (2026-09-17,
+                # §0z32) -- a prose word is not a module mention.
+                if not re.search(r"\b" + re.escape(f) + r"\b", text):
                     missing.append(os.path.join(root, f))
     for d in ("diagnostics/", "tests/"):
         if d not in text:

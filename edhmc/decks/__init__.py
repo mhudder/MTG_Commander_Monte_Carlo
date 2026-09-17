@@ -18,13 +18,15 @@ This is the deck-level fix: `audit_cards.py` and `tag_flying.py` both call
 new `<name>_v1.py` with a `build()` gets it Scryfall-checked and evasion-tagged
 the next time either script runs, with no registry to remember.
 
-NOT auto-discovered, and this is deliberate rather than an oversight:
-`ablation.py` (SCRIPTED_*/KNOWN_BLIND sets are a claim about the ENGINE, which
-nothing can verify by import alone), `validate.py`'s A/A control (one hand-
-picked real swap per engine), `pending.py`'s per-deck candidate catalog, and
-`cache_manifest.py`'s source fingerprints (which files an engine's cache
-depends on). Each of those needs a genuine decision a script cannot make for
-itself; see HANDOFF.md's "adding a fifth deck" checklist.
+Everything ELSE a tool needs to know about a deck -- which engine simulates
+it, its colour identity, its table's metric columns, its fingerprint files --
+is in `edhmc/registry.py` (§0z32), ONE `DeckSpec` per deck, checked against
+this discovery at import so the two cannot disagree. What is still a
+hand-written decision per deck, deliberately: `ablation.py`'s
+SCRIPTED/PARTLY/KNOWN_BLIND classification (a claim about the ENGINE, which
+nothing can verify by import alone), `validate.py`'s one real swap per deck
+for the CRN audit, and `pending.py`'s candidate catalog. See HANDOFF.md's
+"adding a deck" checklist.
 """
 import importlib
 import pkgutil

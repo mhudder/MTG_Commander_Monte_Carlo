@@ -13,10 +13,9 @@ of your weakest card? If yes, the swap is justified whatever that card is.
 """
 import numpy as np
 
-from edhmc.engine import Card, simulate as rendmaw_sim
-from edhmc.lorehold import simulate as lorehold_sim
-from edhmc.karlov import simulate as karlov_sim
+from edhmc.engine import Card
 from edhmc.pending import build_pending
+from edhmc.registry import DECKS as REGISTRY
 from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
 from edhmc.decks.rendmaw_v12 import (NOXIOUS_GEARHULK, BABA_LYSAGA,
                                      EZURIS_PREDATION,
@@ -37,8 +36,13 @@ from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
                                    DARK_CONFIDANT,
     BATCH_2026_09_16 as KARLOV_2026_09_16)
-from edhmc.azusa import simulate as azusa_sim
-from edhmc.tivit import simulate as tivit_sim
+
+# One place names an engine (§0z32); these are the names the batches use.
+rendmaw_sim = REGISTRY["rendmaw"].sim
+lorehold_sim = REGISTRY["lorehold"].sim
+karlov_sim = REGISTRY["karlov"].sim
+azusa_sim = REGISTRY["azusa"].sim
+tivit_sim = REGISTRY["tivit"].sim
 from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   CULTIVATOR_COLOSSUS,
                                   CASE_OF_THE_LOCKED_HOTHOUSE,

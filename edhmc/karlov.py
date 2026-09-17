@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -70,7 +70,7 @@ COMBO_LOOP = ("Sanguine Bond", "Vito, Thorn of the Dusk Rose",
 COMBO_B = COMBO_LOOP + ("Vizkopa Guildmage",)
 
 
-class KarlovGame:
+class KarlovGame(BaseGame):
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
         # engine's defaults, and doing that to the CALLER'S dict let the
@@ -145,12 +145,6 @@ class KarlovGame:
         self.damage_by_turn = []
 
     # -- helpers -------------------------------------------------------------
-
-    def has(self, name):
-        return name in self.board.names
-
-    def count(self, name):
-        return self.board.names.get(name, 0)
 
     def power_of(self, perm):
         base = perm.card.power + perm.counters
@@ -238,22 +232,6 @@ class KarlovGame:
                 gain_life(self, 1)
             if self.has("Syr Konrad, the Grim"):
                 self.m["damage"] += OPP.damage_each(self, 1)
-
-    def deal_pod_damage(self, amount, each=True):
-        if amount <= 0:
-            return
-        # BOUNDED: record what could have mattered, not what was asked for.
-        # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
-        n = OPP.pod_size(self)
-        amount = (OPP.damage_each(self, amount / n) if each
-                  else OPP.damage_single(self, amount))
-        self.m["damage"] += amount
-        self.m["drain_damage"] += amount
-        if self.damage_by_turn:
-            self.damage_by_turn[-1] += amount
-
-    def opening_hand(self):
-        london_mulligan(self)      # shared, §0z30
 
 
 
@@ -1042,23 +1020,4 @@ def simulate(deck, commander, cfg, seed):
         take_turn(g)
         if g.result is not None:
             break
-    out = Metrics(g.m)      # reads 0 for a metric this game never touched
-    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
-    out["crn_draws"] = g.crn.draws()
-    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
-    out["damage_by_turn"] = g.damage_by_turn
-    out["result"] = g.result or "timeout"
-    out["turns_played"] = g.turn
-    out["won"] = 1 if g.result == "win" else 0
-    out["lost"] = 1 if g.result == "loss" else 0
-    out["final_life"] = g.your_life
-    out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
-    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
-    # an Impending Overlord are not creatures and their power is not board
-    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
-    # restores the old reading here too.
-    out["final_board_power"] = sum(g.power_of(p) for p in g.board
-                                   if OPP.is_creature_now(g, p))
-    out["test_card_resolved"] = 1 if (out["cast_test_card"] and
-                                      not out["test_card_answered"]) else 0
-    return out
+    return finish(g)

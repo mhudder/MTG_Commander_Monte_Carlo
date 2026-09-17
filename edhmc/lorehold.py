@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -55,7 +55,7 @@ GATED_SETTERS = {"Hidden Retreat"}
 # Game state
 # ---------------------------------------------------------------------------
 
-class LoreholdGame:
+class LoreholdGame(BaseGame):
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
         # engine's defaults, and doing that to the CALLER'S dict let the
@@ -191,9 +191,6 @@ class LoreholdGame:
 
     # -- helpers ------------------------------------------------------------
 
-    def has(self, name):
-        return name in self.board.names
-
     def play_card_trigger(self, card):
         """Lorehold has no play trigger; the hook exists for engine reuse."""
         return
@@ -219,9 +216,6 @@ class LoreholdGame:
         c = self.library.pop()
         self.m["cards_drawn"] += 1
         return c
-
-    def opening_hand(self):
-        london_mulligan(self)      # shared, §0z30; MDFC backs count as lands
 
 
 # ---------------------------------------------------------------------------
@@ -1868,26 +1862,8 @@ def simulate(deck, commander, cfg, seed):
         take_turn(g)
         if g.result is not None:
             break
-    out = Metrics(g.m)      # reads 0 for a metric this game never touched
-    # CRN instrumentation, read by tools/validate.py's audit. §0z17.
-    out["crn_draws"] = g.crn.draws()
-    out["rng_after_opening"] = getattr(g.rng, "after_opening", 0)
-    out["result"] = g.result or "timeout"
-    out["turns_played"] = g.turn
-    out["opponents_killed"] = sum(1 for o in g.opponents if not o.alive)
-    out["final_life"] = g.your_life
-    out["damage_by_turn"] = g.damage_by_turn
-    # The BATTLEFIELD question, not the type line: a Planeswalker Grist and
-    # an Impending Overlord are not creatures and their power is not board
-    # power. Same predicate the wipes use; `pod_reads_battlefield_creatures`
-    # restores the old reading here too.
-    out["final_board_power"] = sum(g.power_of(p) for p in g.board
-                                   if OPP.is_creature_now(g, p))
+    out = finish(g)
     out["miracle_rate"] = (out["miracle_hits"] / out["miracle_windows"]
                            if out["miracle_windows"] else 0.0)
-    out["test_card_resolved"] = 1 if (out["cast_test_card"] and
-                                      not out["test_card_answered"]) else 0
-    out["won"] = 1 if g.result == "win" else 0
-    out["lost"] = 1 if g.result == "loss" else 0
     out["tutor_log"] = g.tutor_log
     return out

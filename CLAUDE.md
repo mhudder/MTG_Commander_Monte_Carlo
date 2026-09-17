@@ -343,6 +343,20 @@ in a method drifts; a rule that lives in a function does not** — and when you
 find drift, measure it at the tables' N before saying which way it matters
 (`diagnostics/run_shared_code_shift.py` is that measurement).
 
+**A REFACTOR THAT TAKES THE UNION OF SIX COPIES IS A BEHAVIOUR CHANGE UNTIL
+EVERY OUTPUT KEY SAYS OTHERWISE** (§0z32). Folding the engines' method
+copies into `engine.BaseGame` passed the eight-metric baseline check
+bit-identically and would have been called zero-behaviour on that evidence.
+Summing EVERY numeric output key over the same games found one that moved
+(karlov's `turn_lethal`, now stamped where the other engines stamp it). The
+eight metrics are the ones the tables read; they are not all the numbers the
+engine records, and "bit-identical on the baseline" is a claim about the
+former. **When you unify copies that differ, compare the whole output, and
+write down the key that moved and why it is the right one.** The registry
+(`edhmc/registry.py`) is the same discipline for facts: one place, checked
+against disk at import, and the per-deck dicts DERIVE from it — a deck can no
+longer be simulated by a tool that cannot render its table.
+
 **A GENERATED FILE IS ONLY AS CURRENT AS ITS LAST GENERATION — SO CHECK THE
 GENERATION, NOT THE FILE** (§0z29). `decks/_evasion.py` is where every card
 gets its `flying`, and it is generated from Scryfall. A card added to a deck

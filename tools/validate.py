@@ -111,17 +111,26 @@ def blank_for(d):
                 priority=repl_priority(d))
 
 
-CRN_CASES = [
-    ("rendmaw", "March of the World Ooze", None),
-    ("lorehold", "Verge Rangers", lh_sim),
-    ("tivit", "Academy Manufactor", tv_sim),
-    ("karlov", "Blood Artist", kv_sim),
-    ("shilgengar", "Blood Artist", sg_sim),
-    ("azusa", "Lotus Cobra", az_sim),
-]
+# One hand-picked real swap per deck -- the card is the decision a script
+# cannot make; the engine comes from the registry (§0z32), and a deck with no
+# case here is reported rather than silently skipped (§0z15).
+from edhmc.registry import DECKS as REGISTRY
+CRN_CASES = {
+    "rendmaw": "March of the World Ooze",
+    "lorehold": "Verge Rangers",
+    "tivit": "Academy Manufactor",
+    "karlov": "Blood Artist",
+    "shilgengar": "Blood Artist",
+    "azusa": "Lotus Cobra",
+}
+missing = sorted(set(REGISTRY) - set(CRN_CASES))
+if missing:
+    raise SystemExit(f"validate.py has no CRN audit case for {missing}; "
+                     f"add one -- a deck the audit skips is unaudited.")
 
 failures = 0
-for name, out_name, sim in CRN_CASES:
+for name, out_name in CRN_CASES.items():
+    sim = REGISTRY[name].sim
     d, c = build_pending(name)
     ra_, rb_, _ = run_ab(d, c, out_name, blank_for(d), n=300,
                          cfg={"turns": 20, "crn_audit": True}, sim=sim)

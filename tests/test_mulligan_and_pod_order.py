@@ -71,12 +71,12 @@ import edhmc.opponents as OPP
 from edhmc.engine import Card
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import build_pending
+from edhmc.registry import DECKS as REGISTRY
 
 MUTATE = "--mutate" in sys.argv
 SEEDS = 6000          # per engine; the four-hand path is ~0.1-0.4% of seeds
 
-ENGINES = {"rendmaw": ENG, "lorehold": LH, "karlov": KV, "tivit": TV,
-           "shilgengar": SH, "azusa": AZ}
+ENGINES = {name: spec.engine_module for name, spec in REGISTRY.items()}
 
 passed = failed = 0
 FAILED_NAMES = []
@@ -193,24 +193,23 @@ def instrumented(fn, record):
     return run
 
 
-def install_mulligan(fn):
-    for mod in ENGINES.values():
-        mod.london_mulligan = fn
-
-
 def run_cases(mulligan_fn, keep_fn, pod_fn):
     """A..G with the given implementations installed. Returns the set of
     failed case letters, and prints each."""
     global FAILED_NAMES
     FAILED_NAMES = []
-    saved = ({m: mod.london_mulligan for m, mod in ENGINES.items()},
-             ENG.counts_as_land_in_hand, OPP.pod_phase)
+    # Since §0z32 every engine's opening_hand is BaseGame's, which resolves
+    # `london_mulligan` in engine.py's globals -- so that is the ONE binding
+    # to replace. (The first version patched each engine module's imported
+    # name, which reached nothing but rendmaw once the base class existed:
+    # five D cases failed, correctly, and this comment is why.)
+    saved = (ENG.london_mulligan, ENG.counts_as_land_in_hand, OPP.pod_phase)
     try:
         ENG.counts_as_land_in_hand = keep_fn
         OPP.pod_phase = pod_fn
         for name, mod in ENGINES.items():
             record = []
-            mod.london_mulligan = instrumented(mulligan_fn, record)
+            ENG.london_mulligan = instrumented(mulligan_fn, record)
             deck, cmd = build_pending(name)
             size = len(deck)
             cfg = dict(DEFAULT_CFG, turns=0, watch=frozenset())
@@ -226,8 +225,7 @@ def run_cases(mulligan_fn, keep_fn, pod_fn):
             check(f"D {name}: the four-hand path is reached ({four} of {SEEDS})",
                   four >= 1)
     finally:
-        for m, mod in ENGINES.items():
-            mod.london_mulligan = saved[0][m]
+        ENG.london_mulligan = saved[0]
         ENG.counts_as_land_in_hand = saved[1]
         OPP.pod_phase = saved[2]
 

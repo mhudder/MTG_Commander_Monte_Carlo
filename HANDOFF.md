@@ -180,9 +180,14 @@ disagree, the project's own rule is to follow win rate.
    whichever existing engine is the closest structural match; `karlov.py` is
    the shortest full example).
 4. `audit_cards.py` and `tag_flying.py` will find it automatically — see
-   `edhmc/decks/__init__.py`. Everything else needs a deliberate edit: add
-   the deck to `tools/ablation.py`'s `SIMS`/`METRIC_SETS`/`SCRIPTED_BY_DECK`/
-   `KNOWN_BLIND` dicts, `edhmc/pending.py`'s `DECKS` dict,
+   `edhmc/decks/__init__.py`, and `edhmc/registry.py` REFUSES TO IMPORT
+   until the new deck has a `DeckSpec` there (engine, colour identity, table
+   metrics, extra fingerprint files). That one entry feeds `ablation.py`'s
+   `SIMS`/`METRIC_SETS`, `cache_manifest.py`'s fingerprints,
+   `check_unchanged_decks`, `status.py` and the tests. What is still a
+   hand-written decision: `tools/ablation.py`'s `SCRIPTED_BY_DECK`/
+   `KNOWN_BLIND`/`PARTLY_MODELLED` classification, `validate.py`'s CRN
+   audit case, `edhmc/pending.py`'s `DECKS` catalog entry,
    `tools/cache_manifest.py`'s `PER_DECK`, and add an A/A control block to
    `tools/validate.py`.
 5. `python -m tools.validate` must come back `+0.00` before you trust a single

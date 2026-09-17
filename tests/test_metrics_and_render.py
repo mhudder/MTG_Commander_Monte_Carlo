@@ -45,11 +45,11 @@ import edhmc.shilgengar as SH
 import edhmc.azusa as AZ
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import build_pending
+from edhmc.registry import DECKS as REGISTRY
 import tools.ablation as AB
 
 MUTATE = "--mutate" in sys.argv
-ENGINES = {"rendmaw": ENG, "lorehold": LH, "karlov": KV, "tivit": TV,
-           "shilgengar": SH, "azusa": AZ}
+ENGINES = {name: spec.engine_module for name, spec in REGISTRY.items()}
 N, HORIZONS = 15000, (10, 20)     # the committed tables' identity
 
 passed = failed = 0

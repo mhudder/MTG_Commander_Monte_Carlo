@@ -16,21 +16,25 @@ code and want to know what else it touches.
 
 ```
    tools/                 entry points, always `python -m tools.<name>` from the repo root
-   ─ ablation             leave-one-out table for one deck; caches to results/caches/
-   ─ candidates           value-over-a-blank for ADDITIONS, batches keyed by name
-   ─ validate             A/A control + CRN audit; must print +0.00 everywhere
-   ─ check_unchanged_decks  did a shared-code change move a deck's baseline?
-   ─ check_docs           do the docs still describe the repo? (runs the generators)
-   ─ status / knobs / cache_manifest / tag_flying   the four GENERATORS (--write)
-   ─ audit_cards          every card against Scryfall
-   ─ compare_decks / fit_pod / tutor_policy / build_tivit_xlsx   older one-purpose tools
+   ─ ablation.py          leave-one-out table for one deck; caches to results/caches/
+   ─ candidates.py        value-over-a-blank for ADDITIONS, batches keyed by name
+   ─ validate.py          A/A control + CRN audit; must print +0.00 everywhere
+   ─ check_unchanged_decks.py  did a shared-code change move a deck's baseline?
+   ─ check_docs.py        do the docs still describe the repo? (runs the generators)
+   ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write)
+   ─ audit_cards.py       every card against Scryfall
+   ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
    ─ regen_tables.sh      all six tables at the common N
-   ─ _generated           shared helper: git ref + the provenance mask the checks compare with
+   ─ _generated.py        shared helper: git ref + the provenance mask the checks compare with
 
    diagnostics/           one-question harnesses: diag_* measure a MECHANISM, run_* measure a CHANGE
    tests/                 tests that pin a claimed mechanism; `python -m tests` runs them all
 
-            │ every one of these builds a deck through
+            │ every one of these asks the registry which engine and files a deck has
+            ▼
+   edhmc/registry.py      ONE DeckSpec per deck: engine, colour identity, table metrics,
+                          fingerprint files. Checked against decks/ at import (§0z32).
+            │ and builds a deck through
             ▼
    edhmc/pending.py       the LEDGER and the deck builder
                           build_pending(deck) = decks.<module>.build() + the staged CHANGES
@@ -118,13 +122,16 @@ to all six.
 
 ## Three structural facts
 
-**1. Six engines, no base class.** The shared code is module-level FUNCTIONS in
+**1. Six engines, one thin base class.** The shared code is module-level FUNCTIONS in
 `engine.py` that take the game as an argument (`can_pay`, `spend`,
 `play_land`, …). Anything written as a METHOD on a `<Name>Game` class has six
-copies — `draw`, `deal_pod_damage`, `power_of`, `on_creature_death`, and
-the tail of `simulate()` that assembles the output dict. (`opening_hand` was
-one until 2026-09-17; it is now a one-line call to `engine.london_mulligan`
-in all six, §0z30.) **A rule that lives in a method drifts; a rule that lives in a function
+copies. **Since §0z32 there is a base class**, `engine.BaseGame`, and the
+methods whose six copies were identical or differed only by omission live on
+it once: `has`, `count`, `draw` (karlov overrides for Alhammarret's
+Archive), `deal_pod_damage`, `opening_hand`; and `engine.finish(g)` is the
+tail of `simulate()` that assembled the output dict six times. What is still
+per engine and meant to be: `__init__`, `power_of`/`toughness_of`,
+`on_creature_death`, `make_permanent`, `gain_life`, and `take_turn`. **A rule that lives in a method drifts; a rule that lives in a function
 does not.** Every §0u finding in `KNOWN_ISSUES.md` is an instance. Known
 drift today, said here so nobody rediscovers it:
 
@@ -151,14 +158,18 @@ such name set is a claim that rots, so each carries a coverage check —
 `check_dynamic_cost_coverage`, `check_alt_cost_coverage`, `check_proposals` —
 and a new one needs its check in the same change (§0q).
 
-**3. A deck is registered in many places, by hand.** Only `audit_cards` and
-`tag_flying` discover decks from disk. The rest each keep their own per-deck
-table: `ablation.py` (`SIM`, `METRIC_SETS`, `SCRIPTED_*`, `KNOWN_BLIND`,
-`PARTLY_MODELLED`), `pending.py` (`DECKS`, `DECK_IDENTITY`),
-`cache_manifest.py` (`PER_DECK`), `status.py` (`DECKS`), `candidates.py`
-(`DECKS`), `check_unchanged_decks.py` (`DECKS`), and `validate.py`'s A/A
-block. `HANDOFF.md` carries the checklist; until a single registry exists,
-adding a deck means walking that list.
+**3. A deck is registered ONCE, in `edhmc/registry.py`** (§0z32; until
+2026-09-17 it was registered in eleven places by hand). `DECKS[name]` is a
+`DeckSpec` — engine, colour identity, the table's metric columns, extra
+fingerprint files — and it is checked against `decks/` discovery at import,
+so a module without a spec or a spec without a module refuses to import.
+`ablation.py`'s `SIMS`/`METRIC_SETS`, `cache_manifest.py`'s `PER_DECK`,
+`check_unchanged_decks.py`, `status.py`, `pending.py`'s `DECK_IDENTITY` and
+the tests all derive from it. What is still hand-written per deck, because
+it is a decision and not a fact: `ablation.py`'s classification sets,
+`pending.py`'s candidate catalog, and `validate.py`'s CRN audit case — and
+`validate.py` now refuses to run with a deck missing from that list.
+`HANDOFF.md` carries the checklist.
 
 ## Where a card's behaviour can live
 
