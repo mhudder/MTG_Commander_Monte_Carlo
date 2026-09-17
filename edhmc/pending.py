@@ -1352,7 +1352,14 @@ CHANGES: list[Change] = [
             "Soulmender, and the swap is the number the decision rests on "
             "(§0c). Damage is -1.46 / -2.57 and that is the MECHANISM, not a "
             "cost: the extra wins arrive by the combo route, which ends the "
-            "game before the board deals damage. Combo wins 0.312 -> 0.375."),
+            "game before the board deals damage. Combo wins 0.312 -> 0.375. "
+            "RESTATED 2026-09-17 (§0z29): those figures were measured with "
+            "the card as a GROUND creature -- decks/_evasion.py had not been "
+            "regenerated after it was added. With flying, same N and seeds "
+            "(diagnostics/run_karlov_conqueror.py): +0.0259 [+0.0233, "
+            "+0.0287] at T10 and +0.0254 [+0.0218, +0.0291] at T20, and the "
+            "candidate row +0.0331 +-0.0033. Flying is worth nothing "
+            "measurable to this card; the staging rests on the trigger."),
         notes=(
             "A FLOOR, for §0u's reason rather than §4's. This engine models "
             "Exquisite Blood's text as a COMBO DETECTOR and not as the "

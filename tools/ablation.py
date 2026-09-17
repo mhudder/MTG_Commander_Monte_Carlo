@@ -1105,6 +1105,11 @@ def main():
     check_scripted_coverage(deck)
 
     results = {}
+    # A run that starts with NO cache file is a rebuild: its numbers are new
+    # and its provenance stamp must be too (§0z29 -- a rebuild from an empty
+    # cache once kept the previous stamp). A run that resumes keeps the stamp
+    # of the run that created the cache, which is the fact being recorded.
+    fresh = {"run": not os.path.exists(CACHE)}
     if os.path.exists(CACHE):
         results = json.load(open(CACHE))
     todo = [n for n in nonlands if n not in results]
@@ -1124,10 +1129,13 @@ def main():
         # generated, which says nothing about what produced the numbers and
         # made regenerating the manifest a way to certify any cache at all.
         # Written here because here is the only place that knows the numbers
-        # are new. Idempotent: an existing entry is never rewritten.
+        # are new. Idempotent within a run: the first save of a rebuild
+        # stamps fresh (superseding the deleted cache's record), every later
+        # save and every resumed run is a no-op.
         try:
             from tools.cache_manifest import stamp_built
-            stamp_built(os.path.basename(CACHE), DECK)
+            stamp_built(os.path.basename(CACHE), DECK, fresh=fresh["run"])
+            fresh["run"] = False
         except Exception as exc:                      # never fail a measurement
             print(f"  WARNING: could not stamp cache provenance: {exc}",
                   file=sys.stderr)

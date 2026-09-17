@@ -326,6 +326,19 @@ for its NAME.** This is the inverse of the standing "a card scoring like a
 blank usually means the engine made it one" — here the engine had done the
 work and the reader could not see it.
 
+**A GENERATED FILE IS ONLY AS CURRENT AS ITS LAST GENERATION — SO CHECK THE
+GENERATION, NOT THE FILE** (§0z29). `decks/_evasion.py` is where every card
+gets its `flying`, and it is generated from Scryfall. A card added to a deck
+module without re-running `tag_flying` is constructed as a ground creature
+whatever its text says, and that is what happened to a 5/5 flier the ledger
+itself called flying in the sentence that staged it. No fingerprint saw it,
+because the generated file was in none; `check_unchanged_decks` certified it,
+because the card was staged and that check builds from the module. The fix
+has the §0q shape: the generator records what it SCANNED, `check_docs` fails
+on any card it never saw, and the file is in every cache fingerprint. **When
+you add a card, `python -m tools.tag_flying --write` is part of the change**
+— and when a check comes back clean, ask which list it built from.
+
 **A TEST THAT IS NOT RUN DOES NOT EXIST** (§0z28). Thirteen test modules,
 each honest about its exit code, and nothing ran them: a test pinning The
 Great Henge's draw failed for three commits while the card it shared a hook
@@ -556,6 +569,8 @@ file describing ten files that no longer existed. Before the last commit:
 
 ```bash
 python -m tools.knobs --write           # if you touched a cfg.get
+python -m tools.tag_flying --write      # if you added a card anywhere (needs
+                                        # Scryfall; check_docs fails until run)
 python -m tools.cache_manifest --write  # if you touched a cache or an engine
 python -m tools.status --write          # always -- it is cheap and derived
 python -m tools.check_docs              # must pass

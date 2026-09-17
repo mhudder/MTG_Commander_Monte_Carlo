@@ -171,12 +171,16 @@ def named(name):
         return None
 
 
-def main():
-    # DISCOVERED, not named by hand: see edhmc.decks.discover_current_decks.
-    # A newly added "<name>_v1.py" with a build() is tagged the first time
-    # this runs, with no edit here — the same fix `audit_cards.py` got, for
-    # the same reason: this file's own history is the SCRIPTED_* class of bug.
-    decks = discover_current_decks()
+def current_cards(decks=None):
+    """(creatures, everything) -- every Card the current deck modules
+    construct, deck members and module-level candidates alike.
+
+    Factored out of main() on 2026-09-17 so `check_docs` can ask the same
+    question WITHOUT Scryfall: is every card here in `_evasion.SCANNED`? If
+    not, a card was added and this generator was not re-run -- which is how
+    Bloodthirsty Conqueror was measured as a ground creature (§0z29).
+    """
+    decks = decks if decks is not None else discover_current_decks()
     creatures = {}
     everything = {}          # indestructible is not a creature-only keyword
     for mod in decks.values():
@@ -201,6 +205,16 @@ def main():
             everything.setdefault(v.name, v)
             if v.is_creature and not v.is_land:
                 creatures.setdefault(v.name, v)
+    return creatures, everything
+
+
+def main():
+    # DISCOVERED, not named by hand: see edhmc.decks.discover_current_decks.
+    # A newly added "<name>_v1.py" with a build() is tagged the first time
+    # this runs, with no edit here — the same fix `audit_cards.py` got, for
+    # the same reason: this file's own history is the SCRIPTED_* class of bug.
+    decks = discover_current_decks()
+    creatures, everything = current_cards(decks)
 
     cards = scryfall_collection(sorted(everything))
     flying = {n for n, c in cards.items()
@@ -342,6 +356,18 @@ def main():
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\nELF_ELEMENTAL = {\n")
             for n in sorted(elf_elemental):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
+                     "module-level candidates\n"
+                     "# alike. `check_docs` compares it with the cards the deck "
+                     "modules construct\n"
+                     "# TODAY and fails on any difference: a card added without "
+                     "re-running this\n"
+                     "# generator is constructed with flying=False whatever "
+                     "Scryfall says (§0z29).\n"
+                     "SCANNED = {\n")
+            for n in sorted(everything):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
         print(f"\nwrote {OUT}")

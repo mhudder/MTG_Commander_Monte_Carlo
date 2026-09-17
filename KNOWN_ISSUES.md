@@ -77,6 +77,7 @@ Methodology that used to live at the end of this file is now
 | [0z28](#0z28) | FIXED | **The Great Henge's draw was swallowed into Guardian Project's branch, so one drew never and the other drew twice** — and the test that pinned it had been failing for three commits with nothing running it |
 | [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
 | [0z27](#0z27) | MEASURED | **two swaps staged on head-to-head evidence, and the karlov regeneration shows redundancy rewriting five rows at once** |
+| [0z29](#0z29) | FIXED | **Bloodthirsty Conqueror was measured as a GROUND creature** — `_evasion.py` had not been regenerated since the card was added, and no fingerprint could see it. Flying is worth nothing to the card (its value is the trigger), the karlov table is rebuilt anyway, and `check_docs` now fails on a card the generator never scanned |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -4472,6 +4473,13 @@ it costs in practice.
 Soulmender is the cheapest cut in the karlov list, checked rather than assumed:
 **−0.0011 ±0.0011, signal `win`** — significantly negative.
 
+> **RESTATED 2026-09-17 (§0z29).** Both karlov rows above were measured
+> with Bloodthirsty Conqueror as a GROUND creature (`_evasion.py` had not
+> been regenerated after the card was added). Re-measured with flying:
+> +0.0259 ±0.0027 at T10 and +0.0254 ±0.0037 at T20 — inside a
+> ten-thousandth of these. The staging stands; the karlov table below was
+> rebuilt with the tag on, and §0z29 carries the comparison.
+
 ### THE KARLOV REGENERATION IS THE RESULT WORTH KEEPING
 
 Staging changed `build_pending`, so the table was rebuilt. **Six rows moved
@@ -4617,6 +4625,95 @@ read `$?` only from an unpiped command.
 
 
 <a id="1"></a>
+
+## 0z29. FIXED — a generated name set is only as current as its last generation, and it was in no fingerprint
+
+2026-09-17. Found by the L1 sweep, which fixed `tag_flying.py`'s stale
+docstring and re-ran it to prove the header change: the regeneration also
+added **Bloodthirsty Conqueror to `FLYING`**, and Sai and Urza to `HUMAN`.
+The Conqueror is `{3}{B}{B}` 5/5 **flying, deathtouch** (Scryfall
+`keywords: ['Deathtouch', 'Flying']`, re-fetched today). It was added to
+`decks/karlov_v2.py` on 2026-09-16 and measured the same day — the §0z26
+candidate row, the §0z27 head-to-head that STAGED it, and every row of the
+regenerated karlov table — with `flying=False`, because `Card.flying` is read
+from the generated `_evasion.py` at construction and nobody regenerated it.
+The ledger's own rationale calls the card "a 5/5 FLYING DEATHTOUCH body" in
+the sentence that stages it.
+
+**Three things went wrong, and only the first is the card.**
+
+1. **The generator was not re-run when the deck moved.** This is the
+   `tag_flying.py` gap of 2026-09-05 (Goldspan Dragon and Caldera Pyremaw
+   scored as ground creatures) in its second form: that fix widened the walk
+   to module-level candidates, and nothing made re-running it part of adding
+   a card. §0q's rule — derive, and CHECK that the derivation was run — had
+   been applied to `STATUS.md`, `KNOBS.md` and the cache manifest and not to
+   the one generated file that changes combat.
+2. **No fingerprint could see it.** `_evasion.py` was in neither `SHARED` nor
+   any `PER_DECK` list in `cache_manifest.py`, so regenerating it moved no
+   fingerprint, and every cache read CURRENT while the karlov baseline had
+   changed. It is in `SHARED` now.
+3. **The standing check certified the wrong list.** `check_unchanged_decks`
+   came back BIT-IDENTICAL on all six decks after the regeneration, because
+   it builds from the deck MODULE and the Conqueror is STAGED, not committed.
+   That is exactly the trap CLAUDE.md's "more than one right check" table
+   names; the STAGED karlov baseline, measured the same way on
+   `build_pending("karlov")` over the same 400 seeds, moved:
+
+   | metric | ground | flying | shift |
+   |---|---|---|---|
+   | damage | 57.508 | 57.950 | +0.443 |
+   | final_life | 30.798 | 30.779 | −0.020 |
+   | won / lost / turns_played / cards_drawn / mana_spent / stranded_mv | — | — | 0 |
+
+   Real, small, and invisible to the module-level check. Every other deck is
+   unaffected by construction: the regeneration changed four names, and the
+   other three (Sai, Urza, Witch Enchanter) are candidates in no staged list.
+
+**What flying is worth to the card: nothing measurable.**
+`diagnostics/run_karlov_conqueror.py` (→ `results/karlov_conqueror.txt`)
+re-measures both §0z26 and §0z27 with the tag on, at the table's N=15,000:
+
+| measurement | ground (§0z26 / §0z27) | flying (today) |
+|---|---|---|
+| value over a blank, Soulmender slot, T20 | +0.0328 ±0.0033 | +0.0331 ±0.0033 |
+| value over a blank, T10 | — | +0.0295 ±0.0028 |
+| real swap −Soulmender +Conqueror, T10 | +0.0257 ±0.0028 | **+0.0259 ±0.0027** |
+| real swap −Soulmender +Conqueror, T20 | +0.0247 ±0.0035 | **+0.0254 ±0.0037** |
+
+Every number reproduces inside a ten-thousandth of its bar. The card's value is the
+trigger — a second Exquisite Blood — and the games it wins end by the drain
+loop, which is why its damage and `lifegain_triggers` columns against a blank
+are NEGATIVE (−1.91 ±0.21 and −0.65 ±0.06 at T20): the games are shorter. A
+5/5 flier that attacks is not what the deck is buying. **The staging
+survives; the numbers it rests on are restated below, not kept.**
+
+**The fix is a check, not vigilance.** `tag_flying.py` now writes
+`SCANNED`, the set of every card name it fetched, into `_evasion.py`, and
+`check_docs` compares it with the cards the deck modules construct TODAY —
+deck members and module-level candidates, the same walk the generator uses —
+and fails on any difference, with `--mutate` proving it fires when a card is
+added. It cannot check the TAGS without Scryfall; it checks that the
+generator saw every card, which is the failure that actually happened. The
+closing checklist gains `python -m tools.tag_flying --write` for any session
+that adds a card.
+
+**The karlov table is rebuilt** from an empty cache with the tag on, at
+N=15,000 — the third rebuild of that deck in two days, and the only one of the
+six that the regeneration could have moved. Against the 2026-09-16 table:
+**0 of 64 rows moved beyond their own old bar, 0 sign flips among signalled
+rows, 0 category changes.** The card's own row went +0.0305 ±0.0032 →
++0.0314 ±0.0033 and the loop partners sat still (Exquisite Blood +0.0292 →
++0.0291, Sanguine Bond +0.0255 → +0.0251, Vito +0.0252 → +0.0251). The table
+was right for the wrong reason, which is the §0z23 result again — a rebuild
+that moved nothing — and the reason it was run anyway is that "nothing" is
+only known after the run. `results/karlov_conqueror.txt` and the rebuilt
+`results/ablation_karlov.txt` are the evidence; the 2026-09-16 table is at
+commit `dadc7f2`.
+
+**The lesson, promoted to CLAUDE.md:** a generated file is only as current as
+its last generation, so check the GENERATION — and when a check comes back
+clean, ask which list it built from.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

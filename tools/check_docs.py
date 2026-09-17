@@ -266,6 +266,40 @@ def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
                   not bad, "; ".join(bad))
 
 
+def evasion_sets() -> tuple[set[str], set[str]]:
+    """(cards the deck modules construct today, cards _evasion.py scanned)."""
+    from tools.tag_flying import current_cards
+    from edhmc.decks import _evasion
+    _creatures, everything = current_cards()
+    return set(everything), set(getattr(_evasion, "SCANNED", ()))
+
+
+def check_evasion_current(live: set[str], scanned: set[str]) -> Result:
+    """decks/_evasion.py was regenerated after the last card was added.
+
+    `Card.flying`, `indestructible` and the subtype sets are read from that
+    GENERATED file at construction, and the generator needs Scryfall, so
+    nothing here can check the TAGS. It can check the coverage: the file
+    records every name it scanned, and a card the modules construct that it
+    never saw is a card measured with no evasion (§0z29: a 5/5 flier scored
+    as a ground creature for a day and a table).
+    """
+    if not scanned:
+        return Result("decks/_evasion.py was regenerated after the last deck change",
+                      False, "no SCANNED set -- run `python -m tools.tag_flying --write`")
+    missing = sorted(live - scanned)
+    stale = sorted(scanned - live)
+    bits = []
+    if missing:
+        bits.append("never scanned: " + ", ".join(missing))
+    if stale:
+        bits.append("no longer in any module: " + ", ".join(stale))
+    return Result("decks/_evasion.py was regenerated after the last deck change",
+                  not bits, "; ".join(bits)
+                  + ("  -- run `python -m tools.tag_flying --write` (needs Scryfall)"
+                     if bits else ""))
+
+
 def check_architecture_names_modules(docs: dict[str, str]) -> Result:
     """Every module under edhmc/ and tools/ is named in docs/ARCHITECTURE.md.
 
@@ -407,7 +441,9 @@ def run_all() -> list[Result]:
     code_text = "\n".join(read(p) for p in code_files())
     issues = read(KNOWN_ISSUES)
     docs = live_docs()
+    live, scanned = evasion_sets()
     results = [
+        check_evasion_current(live, scanned),
         check_sections_resolve(code_text, issues),
         check_index_matches_headings(issues),
         check_doc_paths_exist(code_text),
@@ -485,6 +521,14 @@ EXPECTED = {
         {"docs/ARCHITECTURE.md names every module in edhmc/ and tools/"},
     "a knob count is typed back into CLAUDE.md":
         {"the durable docs quote no count the repo derives"},
+    "a card is added to a deck and _evasion.py is not regenerated":
+        {"decks/_evasion.py was regenerated after the last deck change"},
+}
+
+# Mutations of the evasion coverage sets, (live, scanned) -> (live, scanned).
+SET_MUTATIONS = {
+    "a card is added to a deck and _evasion.py is not regenerated":
+        lambda live, scanned: (live | {"Not A Real Card"}, scanned),
 }
 
 
@@ -492,11 +536,18 @@ def mutate() -> int:
     code_text = "\n".join(read(p) for p in code_files())
     issues = read(KNOWN_ISSUES)
     docs = live_docs()
+    live, scanned = evasion_sets()
 
     failures = 0
-    for label, fn in MUTATIONS.items():
-        c, i, d = fn(code_text, issues, docs)
+    for label in list(MUTATIONS) + list(SET_MUTATIONS):
+        if label in MUTATIONS:
+            c, i, d = MUTATIONS[label](code_text, issues, docs)
+            lv, sc = live, scanned
+        else:
+            c, i, d = code_text, issues, docs
+            lv, sc = SET_MUTATIONS[label](live, scanned)
         results = [
+            check_evasion_current(lv, sc),
             check_sections_resolve(c, i),
             check_index_matches_headings(i),
             check_doc_paths_exist(c),
@@ -514,12 +565,13 @@ def mutate() -> int:
         if not ok:
             print(f"         EXPECTED: {sorted(want)}")
             failures += 1
+    total = len(MUTATIONS) + len(SET_MUTATIONS)
     print()
     if failures:
-        print(f"{failures} of {len(MUTATIONS)} mutations did not produce the "
+        print(f"{failures} of {total} mutations did not produce the "
               f"expected failure set.")
         return 1
-    print(f"all {len(MUTATIONS)} mutations produced exactly the expected "
+    print(f"all {total} mutations produced exactly the expected "
           f"failures -- the checks can fail.")
     return 0
 

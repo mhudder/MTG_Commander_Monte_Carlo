@@ -31,8 +31,14 @@ CACHE_DIR = os.path.join("results", "caches")
 
 # The modules whose behaviour a cached number depends on. opponents.py and
 # experiment.py are shared, so a change to either invalidates every deck.
+# decks/_evasion.py is GENERATED and shared: it is where every Card gets its
+# `flying` and `indestructible`, so regenerating it changes combat for any
+# deck whose cards gained a tag. It was NOT here until 2026-09-17, when a
+# regeneration gave Bloodthirsty Conqueror the flying it had always had and
+# no fingerprint moved (§0z29) -- a behaviour change the provenance scheme
+# could not see.
 SHARED = ["edhmc/opponents.py", "edhmc/experiment.py", "edhmc/engine.py",
-          "ablation.py"]
+          "edhmc/decks/_evasion.py", "ablation.py"]
 
 # Files that have MOVED on disk since the fingerprint scheme was introduced,
 # keyed by the name the hash still uses. `fingerprint()` hashes the KEY as well
@@ -619,16 +625,28 @@ def save_provenance(prov: dict) -> None:
         fh.write("\n")
 
 
-def stamp_built(cache_name: str, deck: str) -> None:
-    """Record what a cache was built at. Called by ablation.py, once, on
-    creation. A second call is a no-op: the build fingerprint of an existing
-    cache is a fact about the past and must never be rewritten -- rewriting it
-    is precisely the forgery this scheme exists to prevent."""
+def stamp_built(cache_name: str, deck: str, fresh: bool = False,
+                note: str = "") -> None:
+    """Record what a cache was built at. Called by ablation.py on creation.
+
+    A call for a cache that already has a record is a no-op: the build
+    fingerprint of an existing cache is a fact about the past and must never
+    be rewritten -- rewriting it is precisely the forgery this scheme exists
+    to prevent.
+
+    `fresh=True` is the one exception, and it is not a rewrite: ablation.py
+    passes it when the run STARTED WITH NO CACHE FILE, i.e. the numbers are
+    new and the old record describes a cache that was deleted. The old record
+    is kept under `superseded`, so the history is longer, not different.
+    Found 2026-09-17 (§0z29): the karlov rebuild ran from an empty cache and
+    kept the 2026-09-16 stamp, because the no-op branch could not tell a
+    resumed run from a rebuild.
+    """
     prov = load_provenance()
-    if cache_name in prov:
+    if cache_name in prov and not fresh:
         return
     fp, _files = fingerprint(deck)
-    prov[cache_name] = {
+    entry = {
         "deck": deck,
         "built_at": fp,
         "built_commit": head(),
@@ -636,6 +654,12 @@ def stamp_built(cache_name: str, deck: str) -> None:
                              .strftime("%Y-%m-%dT%H:%M:%SZ"),
         "verified": [],
     }
+    if note:
+        entry["note"] = note
+    if cache_name in prov:
+        old = prov[cache_name]
+        entry["superseded"] = old.pop("superseded", []) + [old]
+    prov[cache_name] = entry
     save_provenance(prov)
 
 
@@ -798,6 +822,21 @@ NOTES.update({
         + _STAGED_2026_09_16
     for d in ("karlov", "tivit")
 })
+
+# 2026-09-17: karlov alone, for the third time in two days (§0z29).
+NOTES["ablation_cache_karlov_10-20_n15000_medblank.json"] += (
+    " REGENERATED FROM AN EMPTY CACHE 2026-09-17 because `decks/_evasion.py` "
+    "was regenerated and gave Bloodthirsty Conqueror the flying it always had. "
+    "The 2026-09-16 karlov cache was measured with that card as a GROUND "
+    "creature: the generated file had not been re-run when the card was added, "
+    "it was in no fingerprint (it is in SHARED now), and `check_unchanged_decks` "
+    "came back bit-identical because it builds from the module and the card is "
+    "STAGED. The staged baseline, measured the same way, moved (+0.44 damage a "
+    "game over 400 seeds). ONLY KARLOV WAS REBUILT: the regeneration changed "
+    "four names and the other three are candidates in no staged list, so the "
+    "other five decks were VERIFIED on that evidence plus the module-level "
+    "check. Flying turned out to be worth nothing measurable to the card -- "
+    "§0z29 has the row-by-row comparison with the 2026-09-16 table.")
 
 def main():
     # `--verified <cache|deck> "<evidence>"` records that a SUSPECT cache was
