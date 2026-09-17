@@ -20,6 +20,10 @@ Read that file for state; read this one for judgement.
     docs/HISTORY.md     the dated narrative. Search it; do not read it.
     docs/KNOBS.md       all 107 simulation knobs. GENERATED.
     HANDOFF.md          human-facing orientation, if you are new.
+    docs/ARCHITECTURE.md how the modules connect, the protocol between
+                        opponents.py and an engine, and the pitfalls each
+                        session wrote down. check_docs verifies it names
+                        every module.
     python -m edhmc.pending   the ledger: proposed, measured, staged,
                         committed, withdrawn. The only trustworthy
                         statement of what is pending.
@@ -79,6 +83,8 @@ python -m tools.status                     # what is true now, derived
 python -m edhmc.pending                    # staged changes; validates the lists
 python -m tools.validate                   # A/A control + CRN measurement
 python -m tools.check_docs                 # do the docs still describe the repo?
+python -m tests                            # every pinned mechanism test; a test
+                                           # that is not run does not exist
 python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
                                            # ABLATE_BUDGET=3000 for one deck by
                                            # hand -- the default is 240s (§0z22)
@@ -533,6 +539,8 @@ python -m tools.cache_manifest --write  # if you touched a cache or an engine
 python -m tools.status --write          # always -- it is cheap and derived
 python -m tools.check_docs              # must pass
 python -m edhmc.pending                 # legality on every deck
+python -m tests                         # must pass -- a pinned test failed for
+                                        # three commits because nothing ran it
 ```
 
 `.claude/skills/session-close/SKILL.md` carries the full protocol, including

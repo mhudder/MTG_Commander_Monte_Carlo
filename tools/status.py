@@ -216,7 +216,10 @@ def first_doc_line(path: str) -> str:
             src = fh.read()
     except OSError:
         return ""
-    m = re.search(r'"""(.*?)(?:\n|""")', src, re.S)
+    # `\s*` first: four tools open their docstring on the line AFTER the
+    # quotes, and without it they listed under "What can be run" with no
+    # description at all.
+    m = re.search(r'"""\s*(.*?)(?:\n|""")', src, re.S)
     return m.group(1).strip() if m else ""
 
 

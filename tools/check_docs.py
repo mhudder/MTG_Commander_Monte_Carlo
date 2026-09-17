@@ -234,6 +234,47 @@ def check_generated_current(name: str, ok: bool, detail: str) -> Result:
     return Result(name, ok, detail)
 
 
+ARCHITECTURE = os.path.join("docs", "ARCHITECTURE.md")
+
+
+def check_architecture_names_modules(docs: dict[str, str]) -> Result:
+    """Every module under edhmc/ and tools/ is named in docs/ARCHITECTURE.md.
+
+    The architecture map is hand-written prose, which is to say a claim. This
+    is the §0q rule applied to it: a module can be added to the package
+    without the map saying where it sits, and then the map is the thing a new
+    agent reads and the module is the thing they never find. Named means the
+    file's basename appears anywhere in the doc, with or without `.py`.
+
+    BLIND TO, said out loud (§0z15): deck modules matching `<name>_v<N>.py`
+    are documented as a PATTERN and are exempt individually, as is any
+    `__init__.py`. `diagnostics/` and `tests/` are inventoried by
+    `docs/STATUS.md` per script and are only required here as directories.
+    """
+    name = "docs/ARCHITECTURE.md names every module in edhmc/ and tools/"
+    text = docs.get(ARCHITECTURE) or docs.get(ARCHITECTURE.replace(os.sep, "/"), "")
+    if not text:
+        return Result(name, False, f"{ARCHITECTURE} is missing")
+    versioned = re.compile(r"^[a-z0-9]+_v\d+\.py$")
+    missing = []
+    for d in ("edhmc", "tools"):
+        for root, dirs, files in os.walk(d):
+            dirs[:] = [x for x in dirs if x != "__pycache__"]
+            for f in sorted(files):
+                if not f.endswith((".py", ".sh")) or f == "__init__.py":
+                    continue
+                if versioned.match(f):
+                    continue
+                stem = f.rsplit(".", 1)[0]
+                if not re.search(r"\b" + re.escape(stem) + r"\b", text):
+                    missing.append(os.path.join(root, f))
+    for d in ("diagnostics/", "tests/"):
+        if d not in text:
+            missing.append(d)
+    return Result(name, not missing,
+                  "not named: " + ", ".join(missing) if missing else "")
+
+
 def generated_checks() -> list[Result]:
     """The generated docs were actually REGENERATED.
 
@@ -344,6 +385,7 @@ def run_all() -> list[Result]:
         check_doc_xrefs(docs),
         check_commands_exist(docs),
         check_shell_commands_exist(docs),
+        check_architecture_names_modules(docs),
         check_caches_recorded(),
     ]
     results.extend(generated_checks())
@@ -389,6 +431,10 @@ MUTATIONS = {
     "document a shell script that does not exist":
         lambda code, issues, docs: (
             code, issues, dict(docs, **{"FAKE3.md": "run `./tools/nope.sh`"})),
+    "a module vanishes from the architecture map":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{ARCHITECTURE:
+                                        docs[ARCHITECTURE].replace("voting", "v0ting")})),
 }
 
 # Which checks each mutation must break. Written before running it: a
@@ -401,6 +447,8 @@ EXPECTED = {
     "a live doc points at a moved file": {"every docs/ path named in a live doc exists"},
     "document a shell script that does not exist":
         {"every `./...sh` command in the docs exists and is executable"},
+    "a module vanishes from the architecture map":
+        {"docs/ARCHITECTURE.md names every module in edhmc/ and tools/"},
 }
 
 
@@ -419,6 +467,7 @@ def mutate() -> int:
             check_doc_xrefs(d),
             check_commands_exist(d),
             check_shell_commands_exist(d),
+            check_architecture_names_modules(d),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}
         want = EXPECTED[label]

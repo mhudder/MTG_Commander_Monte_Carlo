@@ -8,6 +8,7 @@ Where things live:
 | | |
 |---|---|
 | **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings, every runnable command. Regenerate with `python -m tools.status --write`. |
+| **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
 | **the rules** | `CLAUDE.md` — the operational doc, ~560 lines, durable, worth reading in full. |
 | **a numbered finding** | `KNOWN_ISSUES.md` — `§0a`..`§0z22` plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered. |
 | **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
@@ -25,6 +26,7 @@ python -m tools.status       # what state is the project in?
 python -m tools.check_docs   # do the docs still describe the repo?
 python -m edhmc.pending      # what is staged, and why
 python -m tools.validate     # is any of this trustworthy? must print +0.00
+python -m tests              # do the pinned mechanisms still hold?
 ```
 
 ## What this is
@@ -190,6 +192,8 @@ disagree, the project's own rule is to follow win rate.
 ## Reading order
 
 - **This file** — orientation and how not to get burned. No current numbers.
+- **`docs/ARCHITECTURE.md`** — how the modules connect and where a card's
+  behaviour can live. Read before changing code.
 - **`docs/STATUS.md`** — what is true right now. GENERATED; read it, never edit
   it. If it disagrees with prose anywhere else, it wins.
 - **`CLAUDE.md`** — the operational doc: the standing rules and the open queued
