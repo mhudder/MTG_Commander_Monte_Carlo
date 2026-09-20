@@ -54,3 +54,8 @@ results/tutor_log.json
 
 # check_unchanged_decks.py's baseline dumps
 results/baselines*.json
+
+# run_karlov_boots.py / run_azusa_slot.py progress marker, written by the
+# shell that chains them so a wait loop can tell a finished run from a
+# crashed one. Not a result.
+results/.slot_progress
