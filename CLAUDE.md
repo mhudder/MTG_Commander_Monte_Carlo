@@ -427,6 +427,29 @@ cards. It is now cast at the deck's median nonland priority via
 `experiment.repl_priority()`. `BLANK_PRIORITY=dead` restores the old one.
 §0j.
 
+**AND A TOOL THAT SAYS IT REPRODUCES ANOTHER TOOL'S NUMBER MUST ACTUALLY
+REPRODUCE IT** (§0z35). `diag_threat_blank.py` exists to decide whether a
+negative row is the card or the blank's hand-tuned constants, and its
+docstring said its blank was `blank_like()` "exactly". It hardcoded
+`priority=0.5` — which WAS ablation's blank until §0j moved it to
+`repl_priority()`, after which the diagnostic was charging the priority gap to
+the card. §0z13's shape pointed at a diagnostic instead of an issue. **The fix
+is structural: the decomposition's first arm is the committed table's own
+number, so it is a check on the other arms** — and it reproduces all ten
+karlov rows to four decimals now. When a tool's output is a difference from
+another tool's baseline, make reproducing that baseline one of its rows.
+
+**§0c FORBIDS RANKING TWO ROWS AGAINST A COMMON BASELINE — AND THE PAIRED RUN
+THAT DOES RANK THEM COSTS THE SAME** (§0z35). Two candidates measured against
+the same list have overlapping CIs by construction, which is why the azusa
+backlog sat at thirteen unrankable rows and why §0z21 called its top two a
+SET. Put one card in the A leg and the other in the SAME SLOT of the B leg and
+the difference is paired on the same seeds: Chocobo → Nissa came back
++0.0001 ±0.0040, measured equal rather than unranked. It is one `run_ab` call,
+it settled Caldera over Galvanoth, and **it is also the check on two rows that
+look like the same cut** — karlov's Boots and Mother of Runes are two
+leave-one-out rows, so their 0.0009 gap is not a ranking either.
+
 **Ignore anything inside its own error bars** (`signal` reads `--`). A quarter
 to a third of every deck is statistically unmeasured. The top of a table is a
 meaningful SET, not a ranking: all four decks reshuffled their top eight
@@ -735,27 +758,38 @@ ordering is measured — that is the honest statement of it.
     are off-colour. `check_proposals()` catches that now, and all four of its
     branches were proved to fire.
 
-21. **AZUSA'S BOTTLENECK IS NOT MORE CANDIDATES — IT IS A HEAD-TO-HEAD.**
-    Thirteen cards sit in `MEASURED` with no cut named, including two the
-    §0z21 batch called a SET rather than a ranking (Traveling Chocobo
-    +0.0291 ±0.0040, Nissa Resurgent Animist +0.0285 ±0.0041, 0.0006 apart).
-    §0c says a common baseline cannot rank two cards against each other, so
-    those thirteen rows cannot become stagings by being good. **One
-    head-to-head against a named cut converts the whole backlog into a
-    decision**, and the cheapest realistic cut is Yavimaya Elder
-    (+0.0023 ±0.0023, inside its own bar). Do this before measuring anything
-    new on azusa.
+21. **AZUSA'S HEAD-TO-HEAD IS DONE AND THE TWO CARDS ARE MEASURED EQUAL —
+    THE DECISION IS THE OWNER'S** (§0z35, 2026-09-20). Against the cut the
+    owner named, Yavimaya Elder (+0.0023 ±0.0023, inside its own bar,
+    MODEL-EVALUATED), both swaps land in the same place: Traveling Chocobo
+    +0.0265 ±0.0042 and Nissa, Resurgent Animist +0.0266 ±0.0043 at T20. And
+    run 3 is the one §0c says a common baseline cannot give — **Chocobo →
+    Nissa in that one slot, paired on the same seeds, is +0.0001 [−0.0039,
+    +0.0041]**, a point estimate at a fortieth of its bar. They buy different
+    things in equal amounts (Nissa +0.27 landfall and −6.5 stranded mana;
+    Chocobo +0.57 cards and +9.0 life) and the deck can take only one. **Both
+    are ready to stage and NEITHER IS STAGED, because the reason is compute
+    rather than doubt**: staging rewrites `build_pending("azusa")`, which is
+    the third row of the cache table in the standing findings — the one nothing but a rebuild can
+    clear — so staging the wrong one of two equal cards costs a second
+    rebuild. One question to the owner, one rebuild. The other eleven
+    `MEASURED` azusa rows still need their own cuts named.
 
-22. **KARLOV'S THREE NEGATIVE ROWS MAY BE A §0j ARTEFACT, NOT CUT
-    CANDIDATES.** Mother of Runes −0.0075, Swiftfoot Boots −0.0048 and Blood
-    Artist −0.0026 are the only significantly-negative MODEL-EVALUATED rows in
-    that deck — and all three carry an EXPLICIT `threat` (6.0, 4.5, 7.0),
-    which §0j says can be the entire score on a weak card because the blank
-    derives threat by a different rule. Mother of Runes is also in
-    `protection_cards`, so it is partly modelled. **Run
-    `diagnostics/diag_threat_blank.py` on all three before treating any of
-    them as a cut.** This is the shape that has already cost two withdrawn
-    swaps.
+22. **ANSWERED: ONE OF KARLOV'S THREE NEGATIVE ROWS WAS THE §0j ARTEFACT, AND
+    SWIFTFOOT BOOTS IS THE CUT** (§0z35, 2026-09-20). Decomposed against
+    blanks that match the real card on progressively more of what `blank_like`
+    drops: **Blood Artist's whole negative row is the two constants** — text
+    alone it is +0.0024 ±0.0011, significantly POSITIVE, and it is not a cut
+    candidate. **Mother of Runes (−0.0053 ±0.0021) and Swiftfoot Boots
+    (−0.0044 ±0.0020) survive every arm**, so two of three are real. Their
+    bars overlap and §0c forbids ranking two leave-one-out rows against each
+    other, so the tie-break is mechanism and it is one-sided: cutting the
+    Boots leaves both modelled channels standing, while cutting Mother of
+    Runes closes `try_protect()` outright — `protection_cards` is a
+    one-element tuple holding her alone — and takes the staged list's
+    `shroud_sources` to one. **The Boots are the named cut for karlov's next
+    add**; nothing is staged on it, because karlov's only unstaged `MEASURED`
+    card is Alhammarret's Archive, HELD on the owner's playtest evidence.
 
 18. **`main_phase` IS GREEDY ON `priority` AND IT IS NOW THE WEAKEST LINK.**
     It casts the highest-priority affordable card and never asks whether doing

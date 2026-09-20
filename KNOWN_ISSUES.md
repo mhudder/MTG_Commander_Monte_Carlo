@@ -83,6 +83,7 @@ Methodology that used to live at the end of this file is now
 | [0z32](#0z32) | FIXED | **A thin base class and one deck registry.** `engine.BaseGame` holds `has`/`count`/`draw`/`deal_pod_damage`/`opening_hand` once and `engine.finish()` the `simulate()` tail; `edhmc/registry.py` holds one `DeckSpec` per deck, checked against `decks/` at import, and eleven per-deck dicts derive from it. Bit-identical on every baseline metric; the only output key that moved is karlov's `turn_lethal` |
 | [0z33](#0z33) | MEASURED | **Anointed Procession restated on the post-§0z30 tivit baseline: +0.0157 ±0.0043 at T20 (was +0.0145), the staging stands** — with the review's L2–L5 housekeeping: main guards, notes as data, a legacy-switch policy, and a dead duplicate card definition found on the way |
 | [0z34](#0z34) | FIXED | **The procedure for adding a card is written down** — `.claude/skills/add-card/SKILL.md`, from Scryfall to a committed swap, each step naming the check that catches the mistake made at it. And `check_docs` now verifies the §ids cited from live DOCS, not only from code: 194 citations, the pointers that make the procedure traceable |
+| [0z35](#0z35) | MEASURED | **Queued items 21 and 22 answered.** Azusa's top two candidates are measured EQUAL in the same slot (+0.0001 ±0.0040 at T20, directly paired — the ranking §0c says a common baseline cannot give), so the choice is the owner's and one rebuild. Karlov: Blood Artist's negative row is entirely §0j's two constants (text alone +0.0024 ±0.0011, POSITIVE); Swiftfoot Boots and Mother of Runes are real, and **the Boots are the cut** because `protection_cards` holds Mother of Runes alone. And `diag_threat_blank`'s blank had drifted a digit from ablation's since §0j — arm 1 reproduces the committed table now, on all ten rows |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5062,6 +5063,164 @@ and a list of interactions would rot faster than the code. And it does not
 replace the ledger: the skill says how to reach a `Change`, and
 `python -m edhmc.pending` remains the only trustworthy statement of what is
 pending.
+
+## 0z35. MEASURED — queued items 21 and 22 answered: azusa's top two are EQUAL, and only one of karlov's three negative rows is an artefact
+
+2026-09-20. Two queued items had the same shape — a table row being read as a
+decision it cannot support — and both are now measured rather than argued.
+
+### Item 21: a shared baseline cannot rank two cards, but one paired run can
+
+Thirteen azusa cards sat in `MEASURED` with no cut named, two of them
+0.0006 apart: Traveling Chocobo +0.0291 ±0.0040 and Nissa, Resurgent Animist
++0.0285 ±0.0041 (§0z21 called them a SET, not a ranking, which was correct).
+The cut is the owner's choice: **Yavimaya Elder**, +0.0023 ±0.0023 — inside
+its own bar — and MODEL-EVALUATED, so its row is evidence (§0z31).
+
+`diagnostics/run_azusa_head2head.py`, N=15,000 paired, base
+`build_pending("azusa")`, `results/azusa_head2head.txt`:
+
+| run | win T10 | win T20 |
+|---|---|---|
+| −Yavimaya Elder +Traveling Chocobo | +0.0253 [+0.0223, +0.0283] | +0.0265 [+0.0223, +0.0306] |
+| −Yavimaya Elder +Nissa, Resurgent Animist | +0.0280 [+0.0249, +0.0312] | +0.0266 [+0.0223, +0.0309] |
+| Chocobo → Nissa in that slot | +0.0027 [−0.0005, +0.0060] | **+0.0001 [−0.0039, +0.0041]** |
+
+**Run 3 is the one that settles it, and it is the measurement §0c says a
+common baseline cannot give**: both legs play the same 99 other cards on the
+same seeds, so the difference between the two candidates is PAIRED and their
+CIs do not have to overlap-by-construction. It is the same measurement that
+ranked Caldera Pyremaw over Galvanoth. The answer is that **the two cards are
+measured equal** — the point estimate is 1/40th of the bar at T20 — so the
+ranking question item 21 asked has a negative answer rather than a winner.
+
+**They are equal while buying different things**, which is why neither
+dominates:
+
+| per game, Nissa − Chocobo at T20 | |
+|---|---|
+| `landfall_triggers` | +0.27 |
+| `lands_played` | −0.19 |
+| `cards_drawn` | −0.57 |
+| `final_life` | −9.0 |
+| `stranded_mv` | −6.5 |
+
+Nissa converts mana into triggers (her Landfall reads the top of the library
+for an Elf and the deck's mana is otherwise stranded); the Chocobo draws and
+gains life off the same land drops. Both routes arrive at the same win rate
+against this pod. **Either swap is worth taking and the deck can only take
+one**, because the two share the Yavimaya slot.
+
+**NOTHING IS STAGED, and the reason is compute rather than doubt.** Staging
+changes `build_pending("azusa")`, which is the list every cached azusa number
+was measured against — the third row of §0z27's table, the one that
+**nothing but a rebuild can clear**. Staging the wrong one of two equal cards
+costs a second rebuild. One question to the owner, one rebuild. Both
+Candidates now carry these figures and this verdict in the ledger.
+
+### Item 22: the diagnostic that decides this question did not reproduce the table
+
+Item 22 asked whether karlov's three significantly-negative MODEL-EVALUATED
+rows are cuts or §0j artefacts — all three carry an explicit `threat`, which
+§0j says can be the whole score on a weak card. `diag_threat_blank.py` is the
+tool for that question, and **it was measuring the wrong thing**.
+
+`std_blank()`'s docstring said it was `ablation.py:blank_like()` "exactly".
+It hardcoded `priority=0.5`. That WAS ablation's blank, until §0j moved it to
+the deck's median nonland priority via `experiment.repl_priority()` — 7.0 for
+karlov — and the diagnostic never followed. **This is §0z13 pointed at a
+diagnostic**: a claim about another module's behaviour, true when written,
+made false by a fix elsewhere, and nothing re-read it. The consequence was
+specific: arm 1 was not the table's number, so the priority gap was being
+attributed to the CARD. The `+priority` and `+body` arms set priority
+explicitly and were never affected, which is why the text-alone endpoint
+survived the defect — and why the old `results/threat_blank.txt` was
+misleading rather than useless.
+
+**Arm 1 is now a check on the other three, and it passes.** On all ten karlov
+rows measured (N=15,000, same seeds as the committed table) the `standard`
+arm reproduces the committed table to four decimals on win rate at both
+horizons and on both damage columns. A decomposition whose first arm does not
+reproduce the number it is decomposing is not evidence.
+
+The case list also got the §0q treatment: it held the six cards that were the
+bottom of the 2026-09-10 table, and by now four others had moved into that
+region (the Conqueror staging rewrote five rows, §0z27; §0z30 moved the whole
+baseline). It is ten cards now. Deriving it from the committed table is the
+real fix and is NOT done — nothing parses a table back into names and values,
+and writing a second row parser is §0u's shape.
+
+### The answer: one artefact, two real, and the tie-break is mechanism
+
+`results/threat_blank_karlov_2026-09-20.txt`, win rate at T20:
+
+| card | standard (the table) | +threat | +priority | +body — TEXT ALONE |
+|---|---|---|---|---|
+| Blood Artist | −0.0036 ±0.0021 | −0.0015 ±0.0019 | +0.0013 ±0.0013 | **+0.0024 ±0.0011** |
+| Mother of Runes | −0.0081 ±0.0025 | −0.0059 ±0.0024 | −0.0053 ±0.0021 | **−0.0053 ±0.0021** |
+| Swiftfoot Boots | −0.0036 ±0.0022 | −0.0037 ±0.0022 | −0.0044 ±0.0020 | n/a (0/0) |
+
+**Blood Artist is the artefact item 22 suspected, and it is a clean one.** Its
+whole negative row is the two constants: give the blank Blood Artist's
+`threat` of 7.0 and the row halves, cast it at the same point in the curve and
+the sign flips, match the 0/1 body and the card is **significantly POSITIVE**
+at both horizons (+0.0009 ±0.0005 at T10, +0.0024 ±0.0011 at T20). Its damage
+goes the same way, −0.22 becoming +0.37. **It is not a cut candidate**, and
+the table row says nothing about the card.
+
+**Swiftfoot Boots and Mother of Runes are real.** Both stay significantly
+negative through every arm, so the threat tax is at most a third of Mother of
+Runes' row and none of the Boots'. That is the answer item 22 wanted, and it
+is the answer the item did not expect: two of three survive.
+
+**Which of the two is the cut is not a number question — their bars overlap**
+(−0.0044 ±0.0020 against −0.0053 ±0.0021 at the text-alone endpoint, a
+difference of 0.0009 inside either bar). §0c's rule applies to them as much as
+to two candidates: these are two leave-one-out rows against a common baseline
+and they cannot be ranked against each other. So the tie-break is MECHANISM,
+and it is one-sided:
+
+```python
+cfg.setdefault("shroud_sources", ("Lightning Greaves", "Swiftfoot Boots",
+                                  "Whispersilk Cloak", "Mother of Runes"))
+cfg.setdefault("protection_cards", ("Mother of Runes",))
+```
+
+`shroud_sources` names four cards and **the staged karlov list contains two of
+them** — Lightning Greaves and Whispersilk Cloak are both already staged OUT
+(the 2026-09-04 3-for-3, whose own rationale reads "cutting it still leaves
+Swiftfoot Boots and Mother of Runes as shroud sources for the commander").
+And `protection_cards` is a one-element tuple holding Mother of Runes alone.
+
+So **cutting Swiftfoot Boots leaves both modelled channels intact**: Mother of
+Runes still shrouds the commander through `commander_shrouded()` and still
+feeds `try_protect()`. **Cutting Mother of Runes closes `try_protect()`
+entirely** — no card in the list would be in the deck, so the function returns
+False forever — and takes `shroud_sources` to one. That is a bigger change to
+the model than either row measures, and it is not what a −0.0053 row is
+evidence for.
+
+**SWIFTFOOT BOOTS IS THE ESTABLISHED CUT FOR KARLOV.** It is not staged,
+because a cut is half a swap and karlov has no waiting add: its only unstaged
+MEASURED card is Alhammarret's Archive, HELD on the owner's playtest evidence.
+The next karlov candidate has its victim slot named and measured.
+
+**Read the Boots' row for what it is.** Its `removal_eaten` is +0.02 in every
+arm, including the arms where the blank carries the same threat — the card
+costs two mana and a card to equip, and the pod's removal lands on the rest of
+the board while it does. The engine models the Boots as shroud and nothing
+else, which is faithful enough for a cut decision here precisely because the
+alternative cut is the card that carries the SAME ability plus a second one.
+
+**A by-product worth keeping: seven rows were decomposed that nobody asked
+about**, and the four added by the §0q fix all behave the ordinary way — the
+`+priority` arm moves them up by 0.0001–0.0032 and no sign flips. Vizkopa
+Guildmage is the useful one: its DAMAGE is negative at both horizons while its
+win rate is +0.0081 — the shape Felidar Sovereign and Exquisite Blood also
+have in this deck, and all three are drain rather than board — and the
+decomposition leaves both facts standing (+0.0103 ±0.0016 win, −0.61 damage at
+the text-alone endpoint). It is a drain card and the drain does not read as
+damage. Not an artefact, not a cut.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

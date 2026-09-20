@@ -750,6 +750,27 @@ MEASURED: list[Candidate] = [
             "aim at it and no tempo to punish it (§4). Treat the row as a "
             "measurement of the lifegain half in isolation, which is what it "
             "is, and the table result as the better guide to the whole card."),
+        verdict=(
+            "THE HOLD STANDS, AND THE CUT SIDE IS NO LONGER THE MISSING HALF "
+            "(2026-09-20, §0z35). Queued item 22 asked whether karlov's three "
+            "significantly-negative MODEL-EVALUATED rows are cuts or §0j "
+            "artefacts, and diag_threat_blank answered it on the current "
+            "staged list: Blood Artist's whole negative row is the blank's two "
+            "hand-tuned constants (text alone +0.0024 +-0.0011, significantly "
+            "POSITIVE -- NOT a cut candidate), while Mother of Runes "
+            "(-0.0053 +-0.0021) and Swiftfoot Boots (-0.0044 +-0.0020) stay "
+            "negative through every arm. Their bars overlap and §0c forbids "
+            "ranking two leave-one-out rows against each other, so the "
+            "tie-break is mechanism: cutting the Boots leaves both modelled "
+            "protection channels standing, while cutting Mother of Runes "
+            "closes try_protect() outright (`protection_cards` is a "
+            "one-element tuple holding her alone) and takes the staged list's "
+            "`shroud_sources` to one. SWIFTFOOT BOOTS IS KARLOV'S NAMED CUT "
+            "for whatever is added next. It is recorded here because this is "
+            "the deck's only unstaged Candidate and a cut with no add is half "
+            "a swap -- it does NOT reopen this card, whose hold is about the "
+            "five-mana artifact and not about the slot. Evidence: "
+            "results/threat_blank_karlov_2026-09-20.txt."),
     ),
     Candidate(
         deck="lorehold", card="Past in Flames", measured="2026-09-16",
@@ -1122,7 +1143,19 @@ MEASURED: list[Candidate] = [
             "N=15,000 paired, T20, in the Sylvan Library slot. "
             "tools/candidates.py azusa4; "
             "results/candidates_azusa_batch4_T20.txt. Mechanisms in "
-            "results/azusa_batch4_mechanisms.txt. §0z21."
+            "results/azusa_batch4_mechanisms.txt. §0z21. "
+            "THE HEAD-TO-HEAD EXISTS AS OF 2026-09-20 (§0z35, queued item 21, "
+            "diagnostics/run_azusa_head2head.py, "
+            "results/azusa_head2head.txt): the REAL SWAP "
+            "-Yavimaya Elder +Traveling Chocobo on the staged list, N=15,000 "
+            "paired, same seeds both legs, is win rate "
+            "+0.0253 [+0.0223, +0.0283] at T10 and "
+            "+0.0265 [+0.0223, +0.0306] at T20, significant at BOTH horizons "
+            "against baselines of 0.1817 and 0.4017. Damage +2.16, "
+            "cards_drawn +1.27, final_life +16.0 at T20. The swap is the "
+            "candidate row MINUS the cut's own value (+0.0291 - 0.0023 = "
+            "+0.0268 predicted, +0.0265 measured), which is the consistency "
+            "§0c asserts and the first time this project has checked it."
         ),
         limits=(
             "FLOOR, and a small one: 'cast Bird spells from the top of your "
@@ -1137,13 +1170,32 @@ MEASURED: list[Candidate] = [
             "the bars of Rampaging Baloths, Tireless Tracker, Ancient "
             "Greenwarden and Nissa, Vastwood Seer. It is INSIDE Nissa, "
             "Resurgent Animist's bar too (0.0006 apart against +-0.0040), so "
-            "the two are a SET and not a ranking."
+            "the two are a SET and not a ranking. "
+            "AND THAT IS NOW MEASURED RATHER THAN INFERRED (2026-09-20, "
+            "§0z35). §0z21 said the harness CANNOT rank them, because two "
+            "rows against a common baseline have overlapping CIs (§0c). A "
+            "DIRECT PAIRED A/B does rank them -- Chocobo in the slot on the A "
+            "leg, Nissa on the B leg, same 99 cards and same seeds -- and it "
+            "returns +0.0027 [-0.0005, +0.0060] at T10 and "
+            "+0.0001 [-0.0039, +0.0041] at T20 in Nissa's favour. Not "
+            "unrankable: MEASURED EQUAL, to within +-0.0040. Either card is "
+            "the same win rate in this slot, and the choice between them is a "
+            "deckbuilding preference the harness has no opinion on."
         ),
         shortlist=(
             "is here: highest of the six, and the one whose mechanism this "
             "deck is built to exploit -- a second doubler in a list holding "
             "Scute Swarm, Rampaging Baloths, Avenger and Greensleeves. "
-            "SHORTLISTED 2026-09-14 for review, NOT decided."
+            "SHORTLISTED 2026-09-14 for review, NOT decided. "
+            "READY TO STAGE as of 2026-09-20: the cut is the owner's choice "
+            "(2026-09-20) and the head-to-head is measured at both horizons. "
+            "DELIBERATELY NOT STAGED YET, and the reason is compute rather "
+            "than doubt: staging changes `build_pending('azusa')`, which is "
+            "the list every cached azusa number was measured against, so it "
+            "forces a full azusa rebuild -- and Nissa, Resurgent Animist is "
+            "MEASURED EQUAL in the same slot, so staging the wrong one of the "
+            "two costs a second rebuild. One question to the owner, one "
+            "rebuild."
         ),
         proposed_cut="Yavimaya Elder",
     ),
@@ -1163,7 +1215,16 @@ MEASURED: list[Candidate] = [
             "the first land already gets there."
         ),
         evidence=(
-            "N=15,000 paired, T20, same run as Traveling Chocobo above. §0z21."
+            "N=15,000 paired, T20, same run as Traveling Chocobo above. §0z21. "
+            "HEAD-TO-HEAD 2026-09-20 (§0z35, "
+            "diagnostics/run_azusa_head2head.py, "
+            "results/azusa_head2head.txt): the REAL SWAP "
+            "-Yavimaya Elder +Nissa, Resurgent Animist -- the SAME CUT the "
+            "owner chose for Chocobo, not the Wayward Swordtooth named below "
+            "-- is +0.0280 [+0.0249, +0.0312] at T10 and "
+            "+0.0266 [+0.0223, +0.0309] at T20. Against Chocobo's +0.0253 / "
+            "+0.0265 in the identical slot, and directly paired against it, "
+            "the two are indistinguishable (see the verdict)."
         ),
         limits=(
             "THE REVEAL IS NARROWER THAN IT READS: the second resolution and "
@@ -1180,7 +1241,16 @@ MEASURED: list[Candidate] = [
             "-- Yavimaya Elder +0.0023, Wayward Swordtooth +0.0038, Titania "
             "+0.0050 -- by a wide margin. The proposed cut below is a "
             "PROPOSAL: pairing two rows that share a baseline is not a "
-            "measurement of the swap (§0c)."
+            "measurement of the swap (§0c). "
+            "MEASURED EQUAL WITH TRAVELING CHOCOBO, 2026-09-20 (§0z35): a "
+            "direct paired A/B in Yavimaya Elder's slot returns "
+            "+0.0001 [-0.0039, +0.0041] at T20 in Nissa's favour. THE TWO BUY "
+            "DIFFERENT THINGS IN EQUAL AMOUNTS, which is why the win rates "
+            "agree and the mechanism counters do not: against Chocobo, Nissa "
+            "is +0.27 landfall_triggers and 6.5 LESS stranded mana a game "
+            "(it ramps), while Chocobo is +0.57 cards_drawn and +9.0 "
+            "final_life. Pick on which of those the list wants; the harness "
+            "cannot choose."
         ),
         shortlist=(
             "is here: statistically tied with Traveling Chocobo at the top of "

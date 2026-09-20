@@ -30,7 +30,9 @@ cuts.
 This decomposes each card's score by re-running its ablation against blanks
 that match the real card on progressively more of what `blank_like` drops:
 
-    standard        what ablation.py does now (the number in the table)
+    standard        what ablation.py does now -- the number in the table,
+                    which arm 1 reproduces and is therefore a check on the
+                    rest (it did NOT until 2026-09-20; see std_blank)
     +threat         blank carries the real card's threat
     +priority       also cast at the same point in the curve
     +body           also the same power/toughness (creatures only)
@@ -57,7 +59,7 @@ from edhmc.lorehold import simulate as lh_sim
 from edhmc.karlov import simulate as karlov_sim
 from edhmc.tivit import simulate as tivit_sim
 from edhmc.pending import build_pending
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, repl_priority
 
 SIMS = {"lorehold": lh_sim, "rendmaw": rendmaw_sim,
         "karlov": karlov_sim, "tivit": tivit_sim}
@@ -71,8 +73,18 @@ WANT = ("won", "damage", "removal_eaten")
 # NEGATIVE. Model-blind cards are excluded: a low score there is already known
 # to be about the model.
 CASES = {
+    # KARLOV'S LIST DRIFTED, which is §0q in a diagnostic's own case list:
+    # these six were the bottom of the 2026-09-10 table, and by 2026-09-20
+    # four other cards had moved into that region (the Conqueror staging
+    # rewrote five rows, §0z27, and §0z30 moved the whole baseline). The four
+    # added below are the current table's remaining rows at or inside the
+    # +-0.0025 noise floor. Deriving this list from the committed table is the
+    # real fix and is not done here -- nothing parses a table back into names
+    # and values yet, and writing a second row parser is the §0u shape.
     "karlov": ["Blood Artist", "Daxos, Blessed by the Sun", "Swiftfoot Boots",
-               "Mother of Runes", "Pristine Talisman", "Vizkopa Guildmage"],
+               "Mother of Runes", "Pristine Talisman", "Vizkopa Guildmage",
+               "Syr Konrad, the Grim", "Suture Priest",
+               "Elas il-Kor, Sadistic Pilgrim", "Kalitas, Traitor of Ghet"],
     "rendmaw": ["Blood Artist", "Ornithopter of Paradise", "Palladium Myr",
                 "Copper Myr", "Leaden Myr", "Dockside Chef"],
     "lorehold": ["Smothering Tithe", "Blasphemous Act", "Lightning Greaves",
@@ -87,8 +99,24 @@ HORIZONS = (10, 20)
 _W = {}
 
 
-def std_blank(card):
-    """Exactly `ablation.py:blank_like()` with BLANK_KEEPS_TYPES=0 (default)."""
+def std_blank(card, blank_priority):
+    """`ablation.py:blank_like()` with BLANK_KEEPS_TYPES=0, the deck's own
+    blank priority passed in.
+
+    IT HARDCODED 0.5 UNTIL 2026-09-20 while claiming to be "exactly"
+    ablation's blank. That was true when this file was written and stopped
+    being true at §0j, which moved the blank to the deck's MEDIAN NONLAND
+    priority -- so the `standard` and `+threat` arms were built on the old
+    DEAD blank and could not reproduce the row in the table they were being
+    compared against. §0z13's shape: a note asserting equivalence, in the
+    file CLAUDE.md's queued item 22 says to run before making a cut.
+
+    The `+priority` and `+body` arms set priority explicitly and were never
+    affected, which is why the TEXT-ALONE endpoint survived the defect.
+    With the fix the FIRST arm reproduces the committed table's row, which
+    makes it a check: if `standard` and the table disagree by more than the
+    bars, something else has moved.
+    """
     if card.is_creature:
         types = frozenset({"Creature"})
     elif card.is_land:
@@ -98,12 +126,12 @@ def std_blank(card):
     return Card(name="(blank)", types=types, cost=dict(card.cost),
                 power=1 if card.is_creature else 0,
                 toughness=1 if card.is_creature else 0,
-                priority=0.5)
+                priority=blank_priority)
 
 
-def arms_for(card):
+def arms_for(card, blank_priority):
     """The blank, then the same blank matching one more real attribute each."""
-    b = std_blank(card)
+    b = std_blank(card, blank_priority)
     out = [("standard", b),
            ("+threat", replace(b, threat=card.threat)),
            ("+priority", replace(b, threat=card.threat,
@@ -168,6 +196,9 @@ def run_deck(deck_name, names, n, procs):
     mutates a Card.
     """
     deck, _ = build_pending(deck_name)
+    # The SAME blank priority ablation.py uses, so the `standard` arm below
+    # reproduces the committed table's row rather than the pre-§0j blank.
+    blank_priority = repl_priority(deck)
     by_name = {c.name: c for c in deck}
     missing = [x for x in names if x not in by_name]
     if missing:
@@ -179,7 +210,7 @@ def run_deck(deck_name, names, n, procs):
         for lo, hi in slices:
             tasks.append(("real", None, None, turns, lo, hi))
     for name in names:
-        arms_of[name] = arms_for(by_name[name])
+        arms_of[name] = arms_for(by_name[name], blank_priority)
         for arm, repl in arms_of[name]:
             for turns in HORIZONS:
                 for lo, hi in slices:
@@ -197,14 +228,15 @@ def run_deck(deck_name, names, n, procs):
 
     for name in names:
         card = by_name[name]
-        b0 = std_blank(card)
+        b0 = std_blank(card, blank_priority)
         derived = b0.power * 0.8 if b0.is_creature else b0.mv * 0.5
         print("=" * 78)
         print(f"{deck_name}: {name}")
         print(f"    real   MV {card.mv}, {card.power}/{card.toughness}, "
               f"threat {card.threat}, priority {card.priority}")
         print(f"    blank  MV {b0.mv}, {b0.power}/{b0.toughness}, "
-              f"threat {derived:.1f} (derived), priority {b0.priority}")
+              f"threat {derived:.1f} (derived), priority {b0.priority} "
+              f"(the deck's median nonland, exactly ablation.py's)")
         for turns in HORIZONS:
             real = cols_for("real", turns)
             mets = [x for x in WANT if x in real]

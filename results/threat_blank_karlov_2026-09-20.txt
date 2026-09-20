@@ -1,0 +1,170 @@
+n=15,000 paired games, seeds 5000..19999, pod v3, build_pending() lists, 4 procs.
+Sign convention: real - blanked. POSITIVE = the card beats the blank.
+'+body' is the closest row to the card's TEXT alone.
+
+==============================================================================
+karlov: Blood Artist
+    real   MV 2, 0/1, threat 7.0, priority 8
+    blank  MV 2, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           -0.0019+-0.0011  *       -0.30+-0.08    *       +0.01+-0.00    *
+    +threat            -0.0015+-0.0010  *       -0.22+-0.07    *       -0.00+-0.00     
+    +priority          +0.0001+-0.0006          -0.04+-0.03    *       -0.00+-0.00    *
+    +body              +0.0009+-0.0005  *       +0.31+-0.03    *       +0.00+-0.00     
+
+  T20                     won                  damage           removal_eaten
+    standard           -0.0036+-0.0021  *       -0.22+-0.09    *       +0.01+-0.00    *
+    +threat            -0.0015+-0.0019          -0.13+-0.09    *       +0.00+-0.00     
+    +priority          +0.0013+-0.0013  *       +0.04+-0.05            -0.00+-0.00    *
+    +body              +0.0024+-0.0011  *       +0.37+-0.04    *       -0.00+-0.00     
+
+==============================================================================
+karlov: Daxos, Blessed by the Sun
+    real   MV 2, 2/4, threat 6.0, priority 8
+    blank  MV 2, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0004+-0.0012          +0.24+-0.09    *       +0.00+-0.00    *
+    +threat            +0.0001+-0.0012          +0.26+-0.09    *       -0.00+-0.00     
+    +priority          +0.0012+-0.0008  *       +0.50+-0.06    *       +0.00+-0.00     
+    +body              +0.0011+-0.0008  *       +0.39+-0.05    *       +0.00+-0.00     
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0017+-0.0023          +0.43+-0.11    *       +0.01+-0.00    *
+    +threat            +0.0021+-0.0022          +0.48+-0.11    *       +0.00+-0.00     
+    +priority          +0.0045+-0.0019  *       +0.58+-0.08    *       -0.00+-0.00     
+    +body              +0.0035+-0.0018  *       +0.43+-0.08    *       -0.00+-0.00     
+
+==============================================================================
+karlov: Swiftfoot Boots
+    real   MV 2, 0/0, threat 4.5, priority 6
+    blank  MV 2, 0/0, threat 1.0 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           -0.0007+-0.0011          -0.09+-0.08    *       +0.02+-0.00    *
+    +threat            -0.0007+-0.0011          -0.10+-0.08    *       +0.01+-0.00    *
+    +priority          -0.0014+-0.0010  *       -0.20+-0.07    *       +0.01+-0.00    *
+
+  T20                     won                  damage           removal_eaten
+    standard           -0.0036+-0.0022  *       -0.15+-0.11    *       +0.02+-0.00    *
+    +threat            -0.0037+-0.0022  *       -0.17+-0.11    *       +0.02+-0.00    *
+    +priority          -0.0044+-0.0020  *       -0.27+-0.10    *       +0.02+-0.00    *
+
+==============================================================================
+karlov: Mother of Runes
+    real   MV 1, 1/1, threat 6.0, priority 8
+    blank  MV 1, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           -0.0029+-0.0015  *       -0.38+-0.09    *       +0.01+-0.00    *
+    +threat            -0.0024+-0.0015  *       -0.29+-0.09    *       -0.00+-0.00     
+    +priority          -0.0015+-0.0014  *       -0.17+-0.08    *       -0.00+-0.00     
+    +body              -0.0015+-0.0014  *       -0.17+-0.08    *       -0.00+-0.00     
+
+  T20                     won                  damage           removal_eaten
+    standard           -0.0081+-0.0025  *       -0.47+-0.13    *       +0.00+-0.00    *
+    +threat            -0.0059+-0.0024  *       -0.34+-0.12    *       -0.00+-0.00     
+    +priority          -0.0053+-0.0021  *       -0.22+-0.11    *       -0.00+-0.00     
+    +body              -0.0053+-0.0021  *       -0.22+-0.11    *       -0.00+-0.00     
+
+==============================================================================
+karlov: Pristine Talisman
+    real   MV 3, 0/0, threat 5.0, priority 7
+    blank  MV 3, 0/0, threat 1.5 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0043+-0.0013  *       +0.48+-0.08    *       +0.01+-0.00    *
+    +threat            +0.0041+-0.0013  *       +0.48+-0.08    *       +0.01+-0.00    *
+    +priority          +0.0041+-0.0013  *       +0.48+-0.08    *       +0.01+-0.00    *
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0061+-0.0025  *       +0.58+-0.11    *       +0.01+-0.00    *
+    +threat            +0.0058+-0.0024  *       +0.56+-0.11    *       +0.01+-0.00    *
+    +priority          +0.0058+-0.0024  *       +0.56+-0.11    *       +0.01+-0.00    *
+
+==============================================================================
+karlov: Vizkopa Guildmage
+    real   MV 2, 2/2, threat 7.5, priority 8
+    blank  MV 2, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0077+-0.0018  *       -0.32+-0.09    *       +0.00+-0.00     
+    +threat            +0.0079+-0.0017  *       -0.32+-0.08    *       -0.00+-0.00    *
+    +priority          +0.0089+-0.0015  *       -0.04+-0.05            -0.00+-0.00    *
+    +body              +0.0087+-0.0015  *       -0.20+-0.05    *       -0.00+-0.00    *
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0081+-0.0024  *       -0.61+-0.13    *       -0.00+-0.00     
+    +threat            +0.0089+-0.0023  *       -0.59+-0.13    *       -0.01+-0.00    *
+    +priority          +0.0107+-0.0018  *       -0.44+-0.10    *       -0.01+-0.00    *
+    +body              +0.0103+-0.0016  *       -0.61+-0.09    *       -0.01+-0.00    *
+
+==============================================================================
+karlov: Syr Konrad, the Grim
+    real   MV 5, 5/4, threat 7.0, priority 6
+    blank  MV 5, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0003+-0.0008          +0.42+-0.05    *       +0.01+-0.00    *
+    +threat            +0.0003+-0.0007          +0.44+-0.05    *       +0.00+-0.00    *
+    +priority          +0.0004+-0.0003  *       +0.33+-0.03    *       +0.00+-0.00    *
+    +body              +0.0002+-0.0002          +0.24+-0.02    *       +0.00+-0.00     
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0018+-0.0019          +0.59+-0.08    *       +0.01+-0.00    *
+    +threat            +0.0029+-0.0018  *       +0.61+-0.08    *       +0.00+-0.00     
+    +priority          +0.0019+-0.0012  *       +0.47+-0.04    *       +0.00+-0.00     
+    +body              +0.0009+-0.0008  *       +0.29+-0.02    *       -0.00+-0.00    *
+
+==============================================================================
+karlov: Suture Priest
+    real   MV 2, 1/1, threat 6.5, priority 8.5
+    blank  MV 2, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0011+-0.0014          +1.06+-0.09    *       +0.01+-0.00    *
+    +threat            +0.0013+-0.0014          +1.12+-0.09    *       +0.00+-0.00     
+    +priority          +0.0026+-0.0010  *       +1.34+-0.08    *       +0.00+-0.00    *
+    +body              +0.0026+-0.0010  *       +1.34+-0.08    *       +0.00+-0.00    *
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0024+-0.0024          +1.07+-0.12    *       +0.01+-0.00    *
+    +threat            +0.0031+-0.0023  *       +1.15+-0.11    *       -0.00+-0.00     
+    +priority          +0.0056+-0.0020  *       +1.28+-0.09    *       -0.00+-0.00    *
+    +body              +0.0056+-0.0020  *       +1.28+-0.09    *       -0.00+-0.00    *
+
+==============================================================================
+karlov: Elas il-Kor, Sadistic Pilgrim
+    real   MV 2, 2/2, threat 7.0, priority 8
+    blank  MV 2, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0009+-0.0013          +0.70+-0.09    *       +0.01+-0.00    *
+    +threat            +0.0009+-0.0012          +0.73+-0.09    *       +0.00+-0.00    *
+    +priority          +0.0016+-0.0008  *       +1.00+-0.06    *       +0.00+-0.00    *
+    +body              +0.0015+-0.0008  *       +0.85+-0.06    *       +0.00+-0.00    *
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0023+-0.0022  *       +0.80+-0.11    *       +0.01+-0.00    *
+    +threat            +0.0030+-0.0021  *       +0.87+-0.10    *       +0.00+-0.00     
+    +priority          +0.0041+-0.0017  *       +1.00+-0.07    *       +0.00+-0.00     
+    +body              +0.0042+-0.0016  *       +0.84+-0.07    *       -0.00+-0.00     
+
+==============================================================================
+karlov: Kalitas, Traitor of Ghet
+    real   MV 4, 3/4, threat 7.5, priority 7
+    blank  MV 4, 1/1, threat 0.8 (derived), priority 7.0 (the deck's median nonland, exactly ablation.py's)
+
+  T10                     won                  damage           removal_eaten
+    standard           +0.0010+-0.0006  *       +0.29+-0.04    *       +0.01+-0.00    *
+    +threat            +0.0011+-0.0005  *       +0.31+-0.04    *       +0.00+-0.00    *
+    +priority          +0.0011+-0.0005  *       +0.31+-0.04    *       +0.00+-0.00    *
+    +body              +0.0009+-0.0005  *       +0.19+-0.03    *       +0.00+-0.00     
+
+  T20                     won                  damage           removal_eaten
+    standard           +0.0023+-0.0017  *       +0.43+-0.07    *       +0.01+-0.00    *
+    +threat            +0.0036+-0.0015  *       +0.46+-0.06    *       +0.00+-0.00     
+    +priority          +0.0036+-0.0015  *       +0.46+-0.06    *       +0.00+-0.00     
+    +body              +0.0032+-0.0013  *       +0.31+-0.06    *       +0.00+-0.00     
+
