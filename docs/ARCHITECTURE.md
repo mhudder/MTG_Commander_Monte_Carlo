@@ -23,6 +23,10 @@ code and want to know what else it touches.
    ─ check_docs.py        do the docs still describe the repo? (runs the generators)
    ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write)
    ─ audit_cards.py       every card against Scryfall
+   ─ card_known.py        is a card already in a list, a catalog, a candidates
+                          batch, the ledger or an engine? DERIVED -- candidates.py
+                          names constants, so grepping it for a card name cannot
+                          work, which is how a measured card was called unmeasured
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
    ─ regen_tables.sh      all six tables at the common N
    ─ _generated.py        shared helper: git ref + the provenance mask the checks compare with

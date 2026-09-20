@@ -47,19 +47,31 @@ d["name"], d["mana_cost"], d["type_line"], d["oracle_text"], d["keywords"]
 If the proxy answers 403, the environment's network access is at its default
 level — CLAUDE.md says how to fix it. Do not proceed on remembered text.
 
-**Then grep before you propose.** Three places, in this order:
+**Then ask the repo whether it already knows the card.** One command, and it
+is derived rather than grepped:
 
 ```bash
-grep -n "Card Name" edhmc/decks/<deck>_v*.py     # already in the list, or a candidate?
-grep -n "Card Name" tools/candidates.py          # already MEASURED in a batch?
-grep -n "Card Name" edhmc/*.py                   # already IMPLEMENTED by name?
+python -m tools.card_known "Card Name" ...     # exit 1 if known anywhere
+python -m tools.card_known --stdin --unknown-only < names.txt   # filter a set
 ```
+
+It checks every deck list and commander, every per-deck catalog, **every card
+object in every `tools/candidates.py` batch**, all five ledger lists, and the
+name as a string literal in `edhmc/*.py` / `tools/*.py`.
+
+**This step used to say "grep three places", and one of the three could not
+work.** `tools/candidates.py` imports card CONSTANTS and never writes a card's
+name, so `grep "Enlightened Confidant" tools/candidates.py` finds nothing about
+a card that file measures — and on 2026-09-20 a session ran exactly that grep,
+concluded the card was unmeasured, and said so. It had been measured on
+2026-09-04 at +0.0087 ±0.0034. §0q applies to a PROCEDURE as much as to a name
+set: derive the answer instead of asking a human to spell a constant right.
 
 Two of fifteen proposals in one batch were cards that had already been
 measured, inside their bars (§0z26). And **behaviour attaches by name at
 least as often as by `script=`** (§0z25): Heliod, Sun-Crowned has no script
-and is implemented in full in `karlov.py`. A grep for the name is the only
-way to know.
+and is implemented in full in `karlov.py`, which is why the check looks at
+string literals in the engines too.
 
 **Record the proposal** as a `Proposal` in `edhmc/pending.py`'s `PROPOSED`
 list: deck, card, cost, colour identity, type line, the oracle text verbatim,
