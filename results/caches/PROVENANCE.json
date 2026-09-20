@@ -76,6 +76,18 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "054a48df23622361",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "aad4d9cdf5eb09bb",
+        "utc": "2026-09-20T15:01:27Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "b9b155546e8fe172",
+        "utc": "2026-09-20T15:02:17Z"
       }
     ]
   },
@@ -126,6 +138,18 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "cde1da1f042a52c4",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "a40ac3db67b14ea2",
+        "utc": "2026-09-20T15:01:27Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "b715bc34c7b21a61",
+        "utc": "2026-09-20T15:02:17Z"
       }
     ]
   },
@@ -194,6 +218,18 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "a0c13b0491ac1b77",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "7261ac6324fd3bf0",
+        "utc": "2026-09-20T15:01:26Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "d995f5cb5aa81a54",
+        "utc": "2026-09-20T15:02:17Z"
       }
     ]
   },
@@ -266,6 +302,18 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "fabb363aa440bbbe",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "0aa846f862566658",
+        "utc": "2026-09-20T15:01:26Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "7172eb0341ac611e",
+        "utc": "2026-09-20T15:02:16Z"
       }
     ]
   },
@@ -338,6 +386,18 @@
         "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
         "fingerprint": "31907d899b578da5",
         "utc": "2026-09-17T15:40:28Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "37a66bfcb8e06b9c",
+        "utc": "2026-09-20T15:01:27Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "fb27ecafbb90479f",
+        "utc": "2026-09-20T15:02:17Z"
       }
     ]
   },
@@ -398,6 +458,18 @@
         "evidence": "2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.",
         "fingerprint": "e6d99320e0b6aeec",
         "utc": "2026-09-17T15:54:30Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+        "fingerprint": "7645144c8b10e1e9",
+        "utc": "2026-09-20T15:01:27Z"
+      },
+      {
+        "commit": "488cc61",
+        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+        "fingerprint": "107568d7b3394fcc",
+        "utc": "2026-09-20T15:02:17Z"
       }
     ]
   }

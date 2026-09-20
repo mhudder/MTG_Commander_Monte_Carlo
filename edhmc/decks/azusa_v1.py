@@ -676,6 +676,40 @@ SPLENDID_RECLAMATION = C("Splendid Reclamation", "Sorcery", {"gen": 3, "G": 1},
 ZENDIKARS_ROIL = C("Zendikar's Roil", "Enchantment", {"gen": 3, "G": 2},
                    priority=7.5, threat=4.0)
 
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall set `fra`), 2026-09-20. THE SET IS NOT OUT: it
+# releases 2026-10-02, so this text is PREVIEW text fetched from Scryfall on
+# 2026-09-20 and it can still change before release. A number measured on it is
+# a claim with a date on it. This deck already contains no `fra` card; karlov's
+# Enlightened Confidant is the project's first and was imported the same way.
+# ---------------------------------------------------------------------------
+
+# "At the beginning of each player's upkeep, you create a 3/3 green Forest
+# Tentacle land creature token. (It has '{T}: Add {G}.' It's affected by
+# summoning sickness until your next turn.)"
+#
+# FOUR TOKENS A ROUND, and every property that makes Awaken the Woods' token
+# matter makes this one matter (see azusa.awaken_the_woods): they are LANDS, so
+# each is a landfall trigger; they are FORESTS, so they tap for {G} and count
+# for Sapling Nursery and Nissa Who Shakes the World; they are CREATURES, so
+# they die to the pod's wraths; and they are SICK until your next turn. The
+# difference from Awaken is that this is a rate rather than a one-off, and that
+# three of the four arrive on turns that are not yours.
+VERDANT_KRAKEN = C("Verdant Kraken", "Creature", {"gen": 4, "G": 3}, 6, 6,
+                   priority=8, threat=8.0)
+
+# "When this creature enters, you may search your library for a basic land
+# card, put that card onto the battlefield tapped, then shuffle.
+#  When this creature dies, draw a card."
+#
+# A three-mana body that ramps AND replaces itself: the ETB is a landfall
+# trigger on the turn it lands (this deck's whole engine), and the death
+# trigger is the reason it is not just a worse Wood Elves in a pod that wraths.
+SIMULACRUM_SHAPER = C("Simulacrum Shaper", "Creature", {"gen": 1, "G": 2}, 2, 2,
+                      priority=8, threat=5.0)
+
+FRA_CANDIDATES = (VERDANT_KRAKEN, SIMULACRUM_SHAPER)
+
 BATCH5_CANDIDATES = (GUARDIAN_PROJECT, SPLENDID_RECLAMATION, ZENDIKARS_ROIL)
 
 BATCH4_CANDIDATES = (NISSA_RESURGENT_ANIMIST, TRAVELING_CHOCOBO,

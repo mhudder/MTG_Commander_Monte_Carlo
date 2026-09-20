@@ -133,6 +133,8 @@ class KarlovGame(BaseGame):
             "crystal_doubled": 0.0, "offspring_paid": 0,
             "lifelink_grants": 0,
             "loss_route": 0,
+            # Reality Fracture candidates, 2026-09-20 (preview text).
+            "liliana_triggers": 0, "edgar_triggers": 0,
             "extort_triggers": 0, "confidant_cards": 0,
             "confidant_life_lost": 0.0,
             # Bolas's Citadel. Initialised here rather than created on first
@@ -205,6 +207,26 @@ class KarlovGame(BaseGame):
 
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
+        # EDGAR, ANCIENT BLOODLORD (Reality Fracture, preview text
+        # 2026-09-20): "Whenever ANOTHER creature or planeswalker you control
+        # dies, you gain 1 life."
+        #
+        # ANOTHER, so Edgar dying to the same wrath that kills the rest does
+        # not trigger off himself -- `perm` is the permanent that died and is
+        # excluded by name. In a deck whose payoffs count lifegain EVENTS
+        # rather than life, a wrath becomes a pile of Karlov counters, which
+        # is the argument for the card and the reason it is worth the slot
+        # only in a pod that actually wraths.
+        #
+        # NOT MODELLED: "{2}, Sacrifice another creature or planeswalker: put
+        # a +1/+1 counter on Edgar, he gains menace." This engine has no sac
+        # outlet policy and menace is not blocked-around here, so the
+        # activated half is a FLOOR. Named, not hidden.
+        if (perm is None or perm.card.name != "Edgar, Ancient Bloodlord") \
+                and self.has("Edgar, Ancient Bloodlord"):
+            for _ in range(int(n)):
+                gain_life(self, 1)
+                self.m["edgar_triggers"] += 1
         # Enduring Tenacity: "When this dies, IF IT WAS A CREATURE, return it to
         # the battlefield under its owner's control. It's an enchantment." So it
         # survives the first wrath, keeps its lifegain trigger, and can never do
@@ -452,6 +474,27 @@ def creature_entered(g, mine=True, entering=None):
     if mine:
         for _ in range(others("Daxos, Blessed by the Sun")):
             gain_life(g, 1)
+    # LILIANA THE FAULTLESS (Reality Fracture, preview text 2026-09-20):
+    # "Whenever another creature or planeswalker you control enters, you gain
+    # 1 life." Same shape as Daxos above -- YOUR side only, and ANOTHER, so
+    # `others()` is what reads the clause rather than `count()`.
+    #
+    # THE PLANESWALKER HALF IS DEAD IN THIS DECK, said out loud rather than
+    # left as a silent floor: karlov's list holds no planeswalker and this
+    # engine has no loyalty at all (azusa is the engine that does). If a
+    # planeswalker is ever added here, this line is one of the places that has
+    # to learn about it.
+    #
+    # Its second ability -- "{1}, {T}, Discard a card: another target creature
+    # or planeswalker you control gains hexproof until end of turn" -- is NOT
+    # modelled: single-target hexproof against an abstract pod answer is
+    # `protection_cards` shaped, and wiring it there would make this card a
+    # second Mother of Runes on a judgement rather than a measurement. It is a
+    # FLOOR by that clause, which is the whole of what is missing.
+    if mine:
+        for _ in range(others("Liliana the Faultless")):
+            gain_life(g, 1)
+            g.m["liliana_triggers"] += 1
     if g.has("Suture Priest"):
         if mine:
             for _ in range(others("Suture Priest")):

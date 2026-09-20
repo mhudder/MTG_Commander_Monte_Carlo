@@ -140,7 +140,12 @@ from edhmc import opponents as OPP
 # "is this permanent a Forest" is answered -- §0u's rule, applied before the
 # second copy of the rule could be written. Both consumers (Sapling Nursery's
 # affinity and Nissa Who Shakes the World's doubler) read it.
-FOREST_TOKENS = frozenset({"Forest Dryad token"})
+FOREST_TOKENS = frozenset({"Forest Dryad token",
+                           # Verdant Kraken (Reality Fracture, preview
+                           # text 2026-09-20): "a 3/3 green Forest
+                           # Tentacle LAND CREATURE token". Same four
+                           # properties as Awaken's token, four a round.
+                           "Forest Tentacle token"})
 
 
 def is_forest(card) -> bool:
@@ -473,6 +478,10 @@ class AzusaGame(BaseGame):
                                         # is the cost the top-of-library
                                         # enablers pay for it
             "awaken_tokens": 0,         # Forest Dryad land creature tokens
+            # Reality Fracture candidates, 2026-09-20 (preview text).
+            "kraken_tokens": 0,         # Verdant Kraken: Forest Tentacles
+            "shaper_lands": 0,          # Simulacrum Shaper: basics fetched
+            "shaper_draws": 0,          # ... and its death trigger
             "charm_lands": 0,           # Archdruid's Charm, mode 1, land half
             "charm_creatures": 0,       # ... and its creature half
             "map_cracked": 0,           # Expedition Map activations
@@ -799,6 +808,30 @@ class AzusaGame(BaseGame):
         # card's draw now lives inside its own `if`, and
         # tests/test_azusa_batch3.py pins the Henge's; run `python -m tests`
         # after touching either.
+        # SIMULACRUM SHAPER (Reality Fracture, preview text 2026-09-20): "When
+        # this creature enters, you may search your library for a basic land
+        # card, put that card onto the battlefield TAPPED, then shuffle."
+        #
+        # ITS OWN `if`, NOT an `elif` chained to anything above, because §0z28
+        # is the finding that inserting a second card into a shared hook moved
+        # the first card's draw inside the new branch. Three of this deck's
+        # payoffs read the land that arrives, so the `land_entered` call is the
+        # card: the body is a 2/2 for three.
+        #
+        # TAPPED, and `make_permanent` forces `sick` for a land anyway, so the
+        # basic makes no mana this turn -- it is a landfall trigger and a land
+        # drop you did not spend, not a ritual. "You MAY" is taken always: there
+        # is no case in this list where fetching a Forest is wrong.
+        if (card.name == "Simulacrum Shaper" and not is_token
+                and perm is not None):
+            basic = next((c for c in self.library
+                          if c.is_land and c.name == "Forest"), None)
+            if basic is not None:
+                self.library.remove(basic)
+                self.make_permanent(basic, tapped=True)
+                self.m["shaper_lands"] += 1
+                self.land_entered(basic, played=False)
+
         # ASHAYA: A NONTOKEN CREATURE ENTERING IS A LAND ENTERING, AND THAT
         # FIRES LANDFALL. The official ruling is explicit and it is the
         # opposite of what docs/COMP_RULES.md used to say:
@@ -1836,6 +1869,15 @@ class AzusaGame(BaseGame):
             self.m["ashaya_land_deaths"] += 1
             if self.has("Titania, Protector of Argoth"):
                 self.make_tokens(1, 5, 3, "Elemental")
+        # SIMULACRUM SHAPER: "When this creature dies, draw a card." Beside the
+        # Elder's trigger because this is the one death hook (§0u), and OUTSIDE
+        # the `for _ in range(n)` loop below on purpose: the Shaper is one
+        # permanent, so its trigger fires once however many creatures died in
+        # the same wipe. `destroy` calls this per permanent with n=1, and a
+        # wipe that kills the Shaper calls it once for the Shaper.
+        if perm is not None and perm.card.name == "Simulacrum Shaper":
+            self.draw(1)
+            self.m["shaper_draws"] += 1
         for _ in range(n):
             if perm is not None and perm.card.name == "Yavimaya Elder":
                 for _ in range(2):
@@ -1949,6 +1991,50 @@ class AzusaGame(BaseGame):
                        power=1, toughness=1)
             self.make_permanent(tok, is_token=True)
             self.m["awaken_tokens"] += 1
+            self.m["tokens_made"] += 1
+            self.land_entered(tok, played=False)
+
+    def verdant_kraken_tokens(self, upkeeps: int):
+        """Verdant Kraken: "At the beginning of EACH PLAYER'S upkeep, you
+        create a 3/3 green Forest Tentacle land creature token. (It has
+        '{T}: Add {G}.' It's affected by summoning sickness until your next
+        turn.)"  Preview text, Scryfall, 2026-09-20.
+
+        EACH PLAYER'S is the whole card. One upkeep a round is a 3/3 that
+        taps for {G}; FOUR is a landfall engine, and this deck's payoffs are
+        all keyed on `land_entered`. `upkeeps` is how many of them this call
+        stands for -- 1 for yours at the top of your turn, 3 for the pod's,
+        taken where the pod's round is modelled (see take_turn).
+
+        THE TOKEN IS AWAKEN THE WOODS' TOKEN ONE SIZE UP, deliberately built
+        through the same four properties rather than a second implementation
+        of them (§0u): a Forest (`FOREST_TOKENS`, so `is_forest` says yes and
+        Sapling Nursery's affinity and Nissa's doubler both read it), a land
+        (so `land_entered` fires every payoff), a creature (so the pod's
+        wraths kill it, and so it raises the board threat that draws the
+        pod's removal -- this card is NOT free in this model), and SICK
+        (302.6; `make_permanent` forces it for a land and `land_mana_live`
+        enforces it, which is why the token makes no mana the turn it lands).
+
+        WHAT IS NOT MODELLED, named rather than hidden: an opponent's upkeep
+        is not a real step in this engine -- the pod is one block at the end
+        of your turn (§0z30) -- so all three of the pod's tokens arrive at
+        once rather than spread across three turns. The landfall triggers they
+        cause therefore resolve at a moment when their mana cannot be spent,
+        which is right (it is not your turn), but any payoff that counts
+        RESOLUTIONS PER TURN sees them inside your own turn's count: Nissa,
+        Resurgent Animist's "second time this turn" is the one card in this
+        list that reads that way. The effect is to spend her window on a
+        trigger that only adds mana, which understates her and cannot
+        overstate her.
+        """
+        for _ in range(int(upkeeps) * self.count("Verdant Kraken")):
+            tok = Card(name="Forest Tentacle token",
+                       types=frozenset({"Creature", "Land"}),
+                       is_land=True, produces=frozenset({"G"}),
+                       power=3, toughness=3)
+            self.make_permanent(tok, is_token=True)
+            self.m["kraken_tokens"] += 1
             self.m["tokens_made"] += 1
             self.land_entered(tok, played=False)
 
@@ -2785,6 +2871,13 @@ def take_turn(g):
     g.land_drops = 1
     g.land_drops_used = 0
 
+    # UPKEEP, which is a real step and only matters for one card so far.
+    # Verdant Kraken triggers "at the beginning of each player's upkeep", and
+    # YOURS is the one that happens here -- after the untap (so the token that
+    # arrives is sick, 302.6) and before the draw. The pod's three are taken
+    # where the pod's round is, at the bottom of this function.
+    g.verdant_kraken_tokens(1)
+
     g.draw(1)
     # ENABLERS BEFORE DROPS. Azusa's own +2, Exploration, Oracle, and every
     # landfall payoff have to be on the battlefield before the land drops are
@@ -2842,6 +2935,14 @@ def take_turn(g):
     g.m["animated_blocker_turns"] += sum(
         1 for p in g.board if not p.card.is_creature
         and g.animation_of(p) is not None)
+
+    # THE POD'S THREE UPKEEPS. `pod_phase` is one block standing for the whole
+    # round (§0z30), so the three opponents' upkeep triggers are taken here,
+    # BEFORE it: the tokens exist while the pod acts, which means they are
+    # bodies in `board_threat` drawing removal and clocks at you. That is a
+    # real cost of the card and the model does see it; putting them after
+    # `pod_phase` would have made three 3/3s a round free.
+    g.verdant_kraken_tokens(3)
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30

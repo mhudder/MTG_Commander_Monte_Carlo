@@ -1972,6 +1972,115 @@ WITHDRAWN: list[Change] = [
 # why that check exists.
 # ---------------------------------------------------------------------------
 PROPOSED: list[Proposal] = [
+    # -----------------------------------------------------------------------
+    # REALITY FRACTURE (Scryfall `fra`), scanned 2026-09-20. THE SET IS NOT
+    # OUT -- it releases 2026-10-02, 372 of its 564 printings are spoiled, and
+    # every new card in it reads `not_legal` in Commander for that reason
+    # alone. The text below is PREVIEW text and can change before release, so
+    # any number measured on it is a claim with a date. The project has been
+    # doing this for a month without saying so: Enlightened Confidant is a
+    # `fra` card, implemented in karlov.py and measured on 2026-09-04.
+    # -----------------------------------------------------------------------
+    Proposal(
+        deck="karlov", card="Liliana the Faultless", cost="{W}",
+        identity="W", type_line="Legendary Creature — Human Cleric",
+        oracle=("Whenever another creature or planeswalker you control "
+                "enters, you gain 1 life.\n"
+                "{1}, {T}, Discard a card: Another target creature or "
+                "planeswalker you control gains hexproof until end of turn."),
+        verified="2026-09-20",
+        rationale=(
+            "A ONE-MANA LIFEGAIN-EVENT ENGINE, and the event is the axis this "
+            "deck's payoffs count: Karlov's counters, Exemplar of Light, Voice "
+            "of the Blessed and Vito all read the EVENT and not the amount. "
+            "The deck runs 28 creatures, so this is Suture Priest's trigger "
+            "one mana cheaper -- and Suture Priest ablates to +1.06 damage, "
+            "the largest damage row in the list."),
+        implement=("DONE 2026-09-20. One branch in `karlov.creature_entered` "
+                   "beside Daxos, reading `others()` so the card's word "
+                   "ANOTHER is honoured -- the clause five of this deck's six "
+                   "enters-triggers ignored until 2026-09-05. FLOOR: the "
+                   "hexproof activation is not modelled, because "
+                   "single-target hexproof against an abstract pod answer is "
+                   "`protection_cards` shaped and wiring it there would make "
+                   "this a second Mother of Runes on a judgement rather than "
+                   "a measurement. The planeswalker half is DEAD: this deck "
+                   "holds none and this engine has no loyalty. Pinned by "
+                   "tests/test_fra_karlov.py."),
+    ),
+    Proposal(
+        deck="karlov", card="Edgar, Ancient Bloodlord", cost="{W}{B}",
+        identity="WB", type_line="Legendary Creature — Vampire Noble",
+        oracle=("Whenever another creature or planeswalker you control dies, "
+                "you gain 1 life.\n"
+                "{2}, Sacrifice another creature or planeswalker: Put a "
+                "+1/+1 counter on Edgar. He gains menace until end of turn."),
+        verified="2026-09-20",
+        rationale=(
+            "TURNS THE POD'S WRATHS INTO A PILE OF LIFEGAIN EVENTS. This deck "
+            "suffers real wipes (`wipes_suffered` is a counter for a reason) "
+            "and every creature lost is currently a loss with no upside; with "
+            "Edgar out, a four-creature wipe is four Karlov counters and four "
+            "triggers for the payoffs above. Two mana for a 2/3 body."),
+        implement=("DONE 2026-09-20. One branch at the top of "
+                   "`KarlovGame.on_creature_death`, beside Enduring "
+                   "Tenacity's. FLOOR: the sacrifice activation is not "
+                   "modelled -- this engine has no sac-outlet policy and "
+                   "menace is not blocked around here. NOTE ITS 'ANOTHER' IS "
+                   "ENFORCED TWICE: `opponents.destroy` removes the permanent "
+                   "BEFORE calling the hook, so `has()` is already false when "
+                   "Edgar himself dies, and the name check is a second guard "
+                   "on top of an ordering in shared code. The mutation in "
+                   "tests/test_fra_karlov.py has to defeat both to model one "
+                   "defect, and says so."),
+    ),
+    Proposal(
+        deck="azusa", card="Verdant Kraken", cost="{4}{G}{G}{G}",
+        identity="G", type_line="Creature — Plant Kraken",
+        oracle=("At the beginning of each player's upkeep, you create a 3/3 "
+                "green Forest Tentacle land creature token. (It has "
+                "\"{T}: Add {G}.\" It's affected by summoning sickness until "
+                "your next turn.)"),
+        verified="2026-09-20",
+        rationale=(
+            "FOUR LANDFALL TRIGGERS A ROUND off one card, in the deck whose "
+            "every payoff reads `land_entered`. The token has all four of the "
+            "properties that make Awaken the Woods' token the card it is: it "
+            "is a LAND (a landfall trigger each), a FOREST (taps for {G}, and "
+            "counts for Sapling Nursery's affinity and Nissa Who Shakes the "
+            "World's doubler), a CREATURE (dies to the pod's wraths, and adds "
+            "board threat that draws removal at you) and SICK until your next "
+            "turn. The difference from Awaken is that this is a RATE, not a "
+            "one-off -- and three of the four arrive on turns that are not "
+            "yours, which is why it had to be wired at the pod's block too."),
+        implement=("DONE 2026-09-20. `azusa.verdant_kraken_tokens(upkeeps)` "
+                   "reuses awaken_the_woods' four properties rather than "
+                   "restating them (§0u); called with 1 at your upkeep in "
+                   "take_turn and with 3 immediately before OPP.pod_phase, so "
+                   "the pod's tokens exist while the pod acts. Pinned by "
+                   "tests/test_fra_azusa.py."),
+    ),
+    Proposal(
+        deck="azusa", card="Simulacrum Shaper", cost="{1}{G}{G}",
+        identity="G", type_line="Creature — Elf Druid",
+        oracle=("When this creature enters, you may search your library for a "
+                "basic land card, put that card onto the battlefield tapped, "
+                "then shuffle.\n"
+                "When this creature dies, draw a card."),
+        verified="2026-09-20",
+        rationale=(
+            "A three-mana body that ramps AND replaces itself. The ETB is a "
+            "landfall trigger on the turn it lands, which is this deck's whole "
+            "engine, and the land arrives TAPPED so it is a trigger and a free "
+            "land drop rather than a ritual. The death trigger is what makes "
+            "it more than a worse Wood Elves in a pod that wraths."),
+        implement=("DONE 2026-09-20. ETB in `make_permanent` in ITS OWN `if` "
+                   "beside The Great Henge and Guardian Project -- §0z28 is "
+                   "the finding that says why that matters -- and the death "
+                   "trigger in `on_creature_death` beside Yavimaya Elder's, "
+                   "outside the `for _ in range(n)` loop because one permanent "
+                   "triggers once. Pinned by tests/test_fra_azusa.py."),
+    ),
     Proposal(
         deck="karlov", card="Heliod, Sun-Crowned", cost="{2}{W}", identity="W",
         type_line="Legendary Enchantment Creature — God",
@@ -2304,7 +2413,10 @@ DECKS = {
         # 2026-09-16 batch (§0z26), catalogued so a Change can name them.
         "Bloodthirsty Conqueror": karlov_v2.BLOODTHIRSTY_CONQUEROR,
         "Alhammarret's Archive": karlov_v2.ALHAMMARRETS_ARCHIVE,
-        "Bolas's Citadel": karlov_v2.BOLASS_CITADEL}),
+        "Bolas's Citadel": karlov_v2.BOLASS_CITADEL,
+        # REALITY FRACTURE, 2026-09-20 (preview text; releases 2026-10-02).
+        "Liliana the Faultless": karlov_v2.LILIANA_THE_FAULTLESS,
+        "Edgar, Ancient Bloodlord": karlov_v2.EDGAR_ANCIENT_BLOODLORD}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {
@@ -2356,7 +2468,12 @@ DECKS = {
         "Archdruid's Charm": azusa_v1.ARCHDRUIDS_CHARM,
         "Awaken the Woods": azusa_v1.AWAKEN_THE_WOODS,
         "Expedition Map": azusa_v1.EXPEDITION_MAP,
-        "Zuran Orb": azusa_v1.ZURAN_ORB}),
+        "Zuran Orb": azusa_v1.ZURAN_ORB,
+        # REALITY FRACTURE, 2026-09-20 (preview text; the set releases
+        # 2026-10-02). Implemented and pinned, measured against the cut §0z35
+        # established for this deck.
+        "Verdant Kraken": azusa_v1.VERDANT_KRAKEN,
+        "Simulacrum Shaper": azusa_v1.SIMULACRUM_SHAPER}),
 }
 
 # The catalog is per deck and hand-written (which candidate cards a Change

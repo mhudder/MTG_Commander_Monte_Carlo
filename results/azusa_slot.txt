@@ -118,3 +118,57 @@ POSITIVE = the candidate beats Traveling Chocobo in that slot. 14 cards, 28 runs
     final_life           -16.5734  [-23.7456, -11.1342] *
     stranded_mv           +2.4591  [ +1.9972,  +2.9287] *
 
+  Zendikar's Roil  T20  (422s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0152  [ -0.0192,  -0.0111] *
+    damage                -1.2004  [ -1.4667,  -0.9179] *
+    landfall_triggers     -0.5449  [ -0.6234,  -0.4650] *
+    lands_played          -0.2576  [ -0.2983,  -0.2157] *
+    cards_drawn           -1.4941  [ -1.6391,  -1.3569] *
+    final_life           -17.7444  [-24.7885, -12.3466] *
+    stranded_mv           +2.1116  [ +1.6636,  +2.5675] *
+
+  Expedition Map  T10  (294s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0153  [ -0.0185,  -0.0119] *
+    damage                -1.3612  [ -1.6197,  -1.0835] *
+    landfall_triggers     +0.3887  [ +0.3149,  +0.4661] *
+    lands_played          +0.1875  [ +0.1516,  +0.2241] *
+    cards_drawn           -0.8216  [ -0.9479,  -0.7022] *
+    final_life           -10.6538  [-13.8240,  -7.5792] *
+    stranded_mv           -3.8513  [ -4.2364,  -3.4718] *
+
+  Zuran Orb  T10  (284s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0216  [ -0.0247,  -0.0186] *
+    damage                -2.2659  [ -2.5087,  -2.0112] *
+    landfall_triggers     -0.1657  [ -0.2258,  -0.1054] *
+    lands_played          -0.0087  [ -0.0379,  +0.0200]  
+    cards_drawn           -0.9655  [ -1.0853,  -0.8475] *
+    final_life           -11.1252  [-14.1842,  -8.1533] *
+    stranded_mv           -2.7523  [ -3.0775,  -2.4192] *
+
+  Expedition Map  T20  (427s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0153  [ -0.0196,  -0.0110] *
+    damage                -1.1870  [ -1.4888,  -0.8891] *
+    landfall_triggers     +0.6133  [ +0.5125,  +0.7169] *
+    lands_played          +0.3079  [ +0.2561,  +0.3592] *
+    cards_drawn           -1.0331  [ -1.1946,  -0.8836] *
+    final_life           -15.7195  [-22.8597, -10.0841] *
+    stranded_mv           -5.1220  [ -5.6645,  -4.5759] *
+
+  Archdruid's Charm  T10  (295s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0213  [ -0.0244,  -0.0181] *
+    damage                -2.3403  [ -2.6059,  -2.0719] *
+    landfall_triggers     -0.1909  [ -0.2566,  -0.1245] *
+    lands_played          -0.1701  [ -0.2018,  -0.1383] *
+    cards_drawn           -1.0471  [ -1.1688,  -0.9291] *
+    final_life           -12.9443  [-15.9444, -10.0749] *
+    stranded_mv           -0.0970  [ -0.4498,  +0.2461]  
+
+  Zuran Orb  T20  (435s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0157  [ -0.0199,  -0.0117] *
+    damage                -1.5296  [ -1.8068,  -1.2463] *
+    landfall_triggers     +0.1101  [ +0.0232,  +0.1967] *
+    lands_played          +0.2143  [ +0.1659,  +0.2608] *
+    cards_drawn           -0.9371  [ -1.0824,  -0.8012] *
+    final_life           -15.3513  [-22.5101,  -9.9903] *
+    stranded_mv           -1.9695  [ -2.4846,  -1.4210] *
+

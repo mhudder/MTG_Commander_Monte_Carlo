@@ -296,6 +296,33 @@ BOLASS_CITADEL = C("Bolas's Citadel", "Artifact", {"gen": 3, "B": 3},
 # the amount of life you gained this turn into your graveyard this way, put
 # that card into your hand." The threshold is the turn's TOTAL, not one
 # trigger's worth.
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall `fra`), 2026-09-20. PREVIEW TEXT -- the set
+# releases 2026-10-02 and this can still change. Enlightened Confidant below
+# is also a `fra` card, imported 2026-09-04, which is how long this project
+# has been measuring previews without writing that down.
+# ---------------------------------------------------------------------------
+
+# "{W} 1/1. Whenever another creature or planeswalker you control enters, you
+# gain 1 life.  {1}, {T}, Discard a card: Another target creature or
+# planeswalker you control gains hexproof until end of turn."
+#
+# A one-mana lifegain-EVENT engine, which is the axis this deck's payoffs
+# count: Karlov's own counters, Exemplar of Light, Voice of the Blessed and
+# Vito all read the EVENT, not the amount. The hexproof half is unmodelled
+# (karlov.py says why), so the row is a floor by that clause.
+LILIANA_THE_FAULTLESS = C("Liliana the Faultless", "Creature", {"W": 1}, 1, 1,
+                          priority=8, threat=5.0)
+
+# "{W}{B} 2/3. Whenever another creature or planeswalker you control dies, you
+# gain 1 life.  {2}, Sacrifice another creature or planeswalker: Put a +1/+1
+# counter on Edgar. He gains menace until end of turn."
+#
+# Turns the pod's wraths into a pile of lifegain EVENTS. The activated half is
+# unmodelled (no sac-outlet policy in this engine), so this is a floor too.
+EDGAR_ANCIENT_BLOODLORD = C("Edgar, Ancient Bloodlord", "Creature",
+                            {"W": 1, "B": 1}, 2, 3, priority=8, threat=6.0)
+
 ENLIGHTENED_CONFIDANT = C("Enlightened Confidant", "Creature",
                           {"gen": 1, "W": 1}, 2, 1, priority=8, threat=6.5,
                           lifelink=True)
