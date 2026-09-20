@@ -84,6 +84,7 @@ Methodology that used to live at the end of this file is now
 | [0z33](#0z33) | MEASURED | **Anointed Procession restated on the post-§0z30 tivit baseline: +0.0157 ±0.0043 at T20 (was +0.0145), the staging stands** — with the review's L2–L5 housekeeping: main guards, notes as data, a legacy-switch policy, and a dead duplicate card definition found on the way |
 | [0z34](#0z34) | FIXED | **The procedure for adding a card is written down** — `.claude/skills/add-card/SKILL.md`, from Scryfall to a committed swap, each step naming the check that catches the mistake made at it. And `check_docs` now verifies the §ids cited from live DOCS, not only from code: 194 citations, the pointers that make the procedure traceable |
 | [0z35](#0z35) | MEASURED | **Queued items 21 and 22 answered.** Azusa's top two candidates are measured EQUAL in the same slot (+0.0001 ±0.0040 at T20, directly paired — the ranking §0c says a common baseline cannot give), so the choice is the owner's and one rebuild. Karlov: Blood Artist's negative row is entirely §0j's two constants (text alone +0.0024 ±0.0011, POSITIVE); Swiftfoot Boots and Mother of Runes are real, and **the Boots are the cut** because `protection_cards` holds Mother of Runes alone. And `diag_threat_blank`'s blank had drifted a digit from ablation's since §0j — arm 1 reproduces the committed table now, on all ten rows |
+| [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5221,6 +5222,105 @@ have in this deck, and all three are drain rather than board — and the
 decomposition leaves both facts standing (+0.0103 ±0.0016 win, −0.61 damage at
 the text-alone endpoint). It is a drain card and the drain does not read as
 damage. Not an artefact, not a cut.
+
+## 0z36. MEASURED — karlov's staged cut is the wrong one, and the MODEL-BLIND card was the card to keep
+
+2026-09-20, `diagnostics/run_karlov_boots.py`, `results/karlov_boots.txt`.
+§0z35 named Swiftfoot Boots as karlov's cut and left it unattached, because a
+cut is half a swap. This is the other half, and it changes a staged decision.
+
+Three paired runs, N=15,000, same seeds, base `build_pending("karlov")` so
+Bolas's Citadel is IN on every leg exactly as it was for the staged
+measurement:
+
+| run | win T10 | win T20 |
+|---|---|---|
+| 1. both legs play the Conqueror; A cuts Soulmender, B cuts the Boots | +0.0028 ±0.0039 | **+0.0125 ±0.0049** |
+| 2. `−Swiftfoot Boots +Bloodthirsty Conqueror`, pre-swap baseline | **+0.0299 ±0.0029** | **+0.0401 ±0.0037** |
+| 3. `−Swiftfoot Boots +Alhammarret's Archive`, given the staging | **+0.0055 ±0.0016** | **+0.0168 ±0.0030** |
+
+**The Conqueror is worth half again as much on the Boots as on Soulmender** —
++0.0401 ±0.0037 against the ledger's +0.0254 ±0.0035 — and the cut it would
+use is MODEL-EVALUATED, so the swap stops being the ceiling §0z31 flagged.
+
+**THE GAP IS MEASURED TWICE, INDEPENDENTLY, AND THAT IS WHY IT IS BELIEVABLE.**
+Run 1 measures the difference between the two cuts directly, both legs playing
+the Conqueror: +0.0125 ±0.0049 at T20. Subtracting the two swap values gives
++0.0147 at T20 and +0.0040 against run 1's +0.0028 at T10. Two separately-run
+measurements of one quantity, agreeing inside a single bar. Run 1 is the
+significant one only at T20; at T10 it is the same sign inside its bar, so the
+*direction* is consistent at both horizons and the *size* is proved at one.
+
+### Why the blind card was the one to keep
+
+§0z31's cut check exists because a MODEL-BLIND row is not evidence, and the
+standing suspicion is that a blind cut FLATTERS a swap — you cut a card the
+engine cannot see, so you pay nothing for it. **Here it did the opposite.**
+Soulmender's tap ability is unmodelled, but the card is still a one-mana white
+BODY, and run 1 says what that body is worth: `lifegain_triggers` +0.34 and
+damage +0.71 in the leg that keeps it. It attacks, it blocks, and it carries
+this deck's lifelink grants.
+
+**And the Boots' modelled value is nearly all redundant, which is §0z27
+pointed at a cut instead of an addition.** `opponents.commander_shrouded()` is
+a boolean OR over `shroud_sources`, and Mother of Runes is in the deck on BOTH
+legs — so the Boots pay `{2}` and a card for a flag another card already sets.
+That is the mechanism behind the negative row §0z35 decomposed, and it is the
+reason the row is negative rather than merely small: the card is not weak, it
+is duplicated.
+
+So the lesson is not "blind cuts are safe" and not "blind cuts flatter". It is
+that **a blind row tells you nothing in EITHER direction**, and the only way to
+find out is to run the same card against a cut whose row is evidence. That run
+costs one `run_ab` call.
+
+**ONE NUMBER IS NOT EXPLAINED AND IS RECORDED AS UNEXPLAINED.** Run 1's
+`removal_eaten` is −0.0087 ±0.0080: the leg WITHOUT a shroud source eats
+slightly less removal, which is backwards on the face of it. It is a fifth the
+size of the effects above and nothing in the decision rests on it. Do not
+invent a mechanism for it — the two candidates (a permanent that is itself a
+removal target, and shroud changing what `your_share()` aims at) are both
+plausible and neither is measured.
+
+### Alhammarret's Archive, priced against a cut instead of a blank
+
++0.0168 ±0.0030 at T20 — **LARGER than its own candidate row of +0.0129
+±0.0024**, and the inversion is the point. A real swap is normally SMALLER
+than the candidate row because it also pays for what it cut (§0c, and every
+staged swap in the ledger). It is larger here because the cut is worth LESS
+than a blank: removing the Boots adds value on its own. **When the cut is a
+significantly-negative row, the swap is the candidate row PLUS the cut, not
+minus it** — and that is the first case in this project where it happened.
+
+**The owner's hold stands and this run does not reopen it.** The hold is
+playtest evidence the model cannot see (a five-mana artifact that has to be
+high-impact), and the model agrees about the cost where it can measure it:
+`stranded_mv` +6.3 at T20, the largest in this batch. What the run buys is that
+the card is now priced against a real cut rather than against a blank, which is
+the number the hold never had.
+
+### What is NOT staged, and the two reasons
+
+**Nothing here is staged.** Re-staging the Conqueror onto the Boots rewrites
+`build_pending("karlov")` — the third row of §0z27's table, the one **nothing
+but a rebuild can clear** — so it costs a karlov rebuild, and that is the
+owner's call and not a free consequence of a measurement.
+
+**And the Boots are ONE SLOT that two cards now want.** Run 3 was measured
+GIVEN the current staging (Conqueror in Soulmender's slot), so taking both
+changes is a CHAIN of marginal measurements worth about +0.0422, not two
+independent wins. Taking the Conqueror on the Boots instead leaves Soulmender
+in the list and the Archive with no cut again. The three options are:
+
+| option | what it does | worth |
+|---|---|---|
+| A, the live staging | `−Soulmender +Conqueror` | +0.0254 ±0.0035, a ceiling |
+| B | `−Boots +Conqueror` | +0.0401 ±0.0037, MODEL-EVALUATED cut |
+| C | A, then `−Boots +Archive` on top | ≈ +0.0422 as a chain, and the Archive is HELD |
+
+Option C's total is a chain and not a factorial: the interaction has not been
+measured, and §0p is the finding that says two staged changes in one deck can
+interact. If both are ever staged, the 2x2 is the check.
 
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 

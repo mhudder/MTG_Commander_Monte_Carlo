@@ -1,0 +1,84 @@
+azusa: every candidate against Traveling Chocobo in Yavimaya Elder's slot. N=15,000 paired, same seeds both legs, base = build_pending('azusa').
+POSITIVE = the candidate beats Traveling Chocobo in that slot. 14 cards, 28 runs, 4 procs.
+
+  Guardian Project  T10  (297s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0149  [ -0.0179,  -0.0119] *
+    damage                -1.9855  [ -2.2345,  -1.7202] *
+    landfall_triggers     +0.1025  [ +0.0364,  +0.1681] *
+    lands_played          +0.0422  [ +0.0133,  +0.0696] *
+    cards_drawn           +0.2680  [ +0.1428,  +0.3951] *
+    final_life            -8.7681  [-11.8254,  -5.7124] *
+    stranded_mv           +2.3539  [ +2.0243,  +2.6877] *
+
+  Nissa, Resurgent Animist  T10  (312s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   +0.0027  [ -0.0005,  +0.0060]  
+    damage                +0.3177  [ +0.0521,  +0.5784] *
+    landfall_triggers     +0.2584  [ +0.1834,  +0.3342] *
+    lands_played          -0.0973  [ -0.1290,  -0.0667] *
+    cards_drawn           -0.2809  [ -0.4126,  -0.1533] *
+    final_life            -5.3536  [ -8.9672,  -1.6399] *
+    stranded_mv           -4.3687  [ -4.7600,  -3.9843] *
+
+  Guardian Project  T20  (442s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0049  [ -0.0090,  -0.0007] *
+    damage                -0.9750  [ -1.2519,  -0.6903] *
+    landfall_triggers     +0.5198  [ +0.4295,  +0.6123] *
+    lands_played          +0.2341  [ +0.1900,  +0.2791] *
+    cards_drawn           +1.1483  [ +0.9888,  +1.3156] *
+    final_life           -12.0566  [-19.2328,  -6.5943] *
+    stranded_mv           +3.4678  [ +2.9621,  +3.9626] *
+
+  Nissa, Resurgent Animist  T20  (444s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   +0.0001  [ -0.0039,  +0.0041]  
+    damage                +0.1409  [ -0.1263,  +0.4055]  
+    landfall_triggers     +0.2719  [ +0.1804,  +0.3661] *
+    lands_played          -0.1939  [ -0.2363,  -0.1502] *
+    cards_drawn           -0.5739  [ -0.7303,  -0.4197] *
+    final_life            -9.0294  [-16.6433,  -2.7754] *
+    stranded_mv           -6.4909  [ -7.0247,  -5.9396] *
+
+  The Great Henge  T10  (302s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0126  [ -0.0156,  -0.0095] *
+    damage                -1.5433  [ -1.7974,  -1.2907] *
+    landfall_triggers     +0.1045  [ +0.0413,  +0.1680] *
+    lands_played          +0.0421  [ +0.0138,  +0.0703] *
+    cards_drawn           +0.1395  [ +0.0169,  +0.2573] *
+    final_life            -9.1930  [-12.3195,  -6.0426] *
+    stranded_mv           +4.6569  [ +4.2951,  +5.0385] *
+
+  Nissa, Who Shakes the World  T10  (294s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0079  [ -0.0111,  -0.0047] *
+    damage                -0.6946  [ -0.9499,  -0.4355] *
+    landfall_triggers     +0.7186  [ +0.6399,  +0.8012] *
+    lands_played          -0.1407  [ -0.1691,  -0.1107] *
+    cards_drawn           -0.6799  [ -0.8053,  -0.5561] *
+    final_life           -10.8815  [-13.9842,  -7.8997] *
+    stranded_mv           -1.7751  [ -2.1301,  -1.4185] *
+
+  The Great Henge  T20  (443s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0048  [ -0.0088,  -0.0007] *
+    damage                -0.8547  [ -1.1312,  -0.5700] *
+    landfall_triggers     +0.3762  [ +0.2917,  +0.4632] *
+    lands_played          +0.1728  [ +0.1288,  +0.2176] *
+    cards_drawn           +0.7389  [ +0.5867,  +0.8924] *
+    final_life           -12.3348  [-19.6621,  -6.7534] *
+    stranded_mv           +5.1659  [ +4.6565,  +5.6830] *
+
+  Nissa, Who Shakes the World  T20  (432s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0091  [ -0.0134,  -0.0048] *
+    damage                -0.5499  [ -0.8371,  -0.2631] *
+    landfall_triggers     +0.8213  [ +0.7260,  +0.9173] *
+    lands_played          -0.2558  [ -0.3009,  -0.2099] *
+    cards_drawn           -0.9256  [ -1.0746,  -0.7785] *
+    final_life           -12.6470  [-20.1310,  -6.7149] *
+    stranded_mv           -3.9158  [ -4.4118,  -3.4200] *
+
+  Return of the Wildspeaker  T10  (311s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0094  [ -0.0126,  -0.0062] *
+    damage                -1.1377  [ -1.3936,  -0.8821] *
+    landfall_triggers     +0.2138  [ +0.1434,  +0.2815] *
+    lands_played          +0.0705  [ +0.0399,  +0.1003] *
+    cards_drawn           +0.7091  [ +0.5653,  +0.8456] *
+    final_life            -8.5825  [-11.6283,  -5.5888] *
+    stranded_mv           +3.7782  [ +3.4221,  +4.1495] *
+

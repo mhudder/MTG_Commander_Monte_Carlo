@@ -420,6 +420,29 @@ So the rule has a second half: after adding redundancy, the ROWS OF EVERY CARD
 IT DUPLICATES ARE UNDERSTATED, and the package must be ablated as a group or
 the table will mislead about all of them.
 
+**AND REDUNDANCY ON THE CUT SIDE IS WHY A CARD'S ROW GOES NEGATIVE** (§0z36).
+Swiftfoot Boots is the karlov case: `commander_shrouded()` is a boolean OR over
+`shroud_sources`, Mother of Runes sets the same flag, and the Boots pay `{2}`
+and a card for a flag already set. That is not a weak card, it is a duplicated
+one — and it is what a significantly-negative MODEL-EVALUATED row usually
+means once §0j's two constants are ruled out. **The consequence for a swap is
+a sign flip in the arithmetic everyone has memorised**: a real swap is smaller
+than its candidate row because it pays for the cut, but when the cut's own row
+is significantly negative the swap is LARGER — Alhammarret's Archive prices at
++0.0168 against its own +0.0129 candidate row, because removing the Boots adds
+value by itself.
+
+**A MODEL-BLIND ROW TELLS YOU NOTHING IN EITHER DIRECTION, AND THE PROJECT ONLY
+EVER SUSPECTED ONE** (§0z36). The standing worry about a blind cut is that it
+FLATTERS a swap: you cut a card the engine cannot see, so you pay nothing for
+it. Karlov's staged `−Soulmender +Bloodthirsty Conqueror` is the opposite case
+— the same card measured against a MODEL-EVALUATED cut is **+0.0401 ±0.0037
+against +0.0254**, because Soulmender's unmodelled tap ability is not the whole
+card: it is still a one-mana body worth +0.34 lifegain triggers and +0.71
+damage to a deck that attacks with them. **Cutting the blind card COST win
+rate.** The remedy is one `run_ab` call — run the same addition against a cut
+whose row is evidence, and the gap is measured instead of assumed.
+
 **The blank is not replacement level, and the bottom of every table used to
 pay for it.** `blank_like()` built it below the minimum priority of all four
 decks, so ablation compared each card not to a mediocre card but to playing 99
@@ -705,7 +728,13 @@ ordering is measured — that is the honest statement of it.
     flatters**, so read it with that in mind. **And karlov's cut is
     MODEL-BLIND** (§0z31's cut check, 2026-09-17): Soulmender's tap ability
     is not modelled, so the head-to-head is a ceiling and the staging rests
-    on the `cut_unmeasured` judgement written into the Change. Two more are explicitly HELD:
+    on the `cut_unmeasured` judgement written into the Change. **AND THAT
+    JUDGEMENT IS NOW MEASURED AND WRONG** (§0z36, 2026-09-20): the same card
+    against the MODEL-EVALUATED cut item 22 established is **+0.0401 ±0.0037
+    at T20 against +0.0254**, and the gap between the two cuts is +0.0125
+    ±0.0049 measured directly. Re-staging is the owner's call because it
+    forces a karlov rebuild, but the ceiling is no longer the only problem
+    with this cut: it is the worse of two available. Two more are explicitly HELD:
     Alhammarret's Archive on the owner's playtest experience — which the
     model's own counter corroborates, 0.40 extra draws a game — and Parallel
     Lives as too expensive for what it does.
@@ -788,8 +817,12 @@ ordering is measured — that is the honest statement of it.
     Runes closes `try_protect()` outright — `protection_cards` is a
     one-element tuple holding her alone — and takes the staged list's
     `shroud_sources` to one. **The Boots are the named cut for karlov's next
-    add**; nothing is staged on it, because karlov's only unstaged `MEASURED`
-    card is Alhammarret's Archive, HELD on the owner's playtest evidence.
+    add**, and §0z36 attached it the same day: `−Swiftfoot Boots
+    +Bloodthirsty Conqueror` is +0.0401 ±0.0037 at T20 where the live staging
+    is +0.0254, and `−Swiftfoot Boots +Alhammarret's Archive` is +0.0168
+    ±0.0030 (larger than its own candidate row, because the cut is worth less
+    than a blank). Nothing is staged: the Boots are ONE slot that both cards
+    want, and re-staging rewrites `build_pending("karlov")`.
 
 18. **`main_phase` IS GREEDY ON `priority` AND IT IS NOW THE WEAKEST LINK.**
     It casts the highest-priority affordable card and never asks whether doing
