@@ -375,6 +375,17 @@ on any card it never saw, and the file is in every cache fingerprint. **When
 you add a card, `python -m tools.tag_flying --write` is part of the change**
 — and when a check comes back clean, ask which list it built from.
 
+**A JOB COUNT IS NOT PROGRESS, AND A HUNG RUN LOOKS SLOW** (§0z37). A
+28-job sweep reached 26 while two of its four workers were dead in an infinite
+loop, and for ten hours the output file was the only thing anyone looked at: it
+grew, so the run looked healthy and merely slow. `ps -o etimes=,times=` tells
+them apart in one command — **a working worker's CPU time is a fraction of its
+elapsed time, a hung one's CPU time EQUALS its elapsed time** (39370s of 39433s
+is not a slow job). Check that before believing a long run, and prefer a
+per-job timeout in any sweep that fans out: the two hung jobs were one card at
+two horizons, which a timeout would have reported as two failures instead of
+costing two cores for eleven hours.
+
 **A TEST THAT IS NOT RUN DOES NOT EXIST** (§0z28). Thirteen test modules,
 each honest about its exit code, and nothing ran them: a test pinning The
 Great Henge's draw failed for three commits while the card it shared a hook
@@ -803,6 +814,12 @@ ordering is measured — that is the honest statement of it.
     clear — so staging the wrong one of two equal cards costs a second
     rebuild. One question to the owner, one rebuild. The other eleven
     `MEASURED` azusa rows still need their own cuts named.
+    **ON HOLD SINCE 2026-09-21 (§0z37), AND THE TIE IS THE REASON IT MATTERS.**
+    Nissa's ritual half is floating landfall mana, which `spend` pays with and
+    never consumes — and the Chocobo doubles landfall triggers, so it
+    multiplies the same broken mana. Both sides of a +0.0001 tie are measured
+    on the defect. Fix §0z37, then re-run the head-to-head; do not put the
+    question to the owner before that.
 
 22. **ANSWERED: ONE OF KARLOV'S THREE NEGATIVE ROWS WAS THE §0j ARTEFACT, AND
     SWIFTFOOT BOOTS IS THE CUT** (§0z35, 2026-09-20). Decomposed against

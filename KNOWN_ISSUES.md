@@ -85,6 +85,7 @@ Methodology that used to live at the end of this file is now
 | [0z34](#0z34) | FIXED | **The procedure for adding a card is written down** — `.claude/skills/add-card/SKILL.md`, from Scryfall to a committed swap, each step naming the check that catches the mistake made at it. And `check_docs` now verifies the §ids cited from live DOCS, not only from code: 194 citations, the pointers that make the procedure traceable |
 | [0z35](#0z35) | MEASURED | **Queued items 21 and 22 answered.** Azusa's top two candidates are measured EQUAL in the same slot (+0.0001 ±0.0040 at T20, directly paired — the ranking §0c says a common baseline cannot give), so the choice is the owner's and one rebuild. Karlov: Blood Artist's negative row is entirely §0j's two constants (text alone +0.0024 ±0.0011, POSITIVE); Swiftfoot Boots and Mother of Runes are real, and **the Boots are the cut** because `protection_cards` holds Mother of Runes alone. And `diag_threat_blank`'s blank had drifted a digit from ablation's since §0j — arm 1 reproduces the committed table now, on all ten rows |
 | [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
+| [0z37](#0z37) | **OPEN** | **Floating landfall mana is paid with and never consumed.** `engine.spend` taps the owner of each unit it pays with, and a unit with no owner — azusa's `bonus_mana` from Lotus Cobra, Tireless Provisioner and Nissa, Resurgent Animist — has nothing to tap, so one trigger funds every spell that turn. §0u's shape: the same rule is implemented correctly for lorehold's Treasures and for azusa's own Castle Garenbrig pool. It made `main_phase` recast Awaken the Woods 258 times in one turn (an 11-hour hang, deterministic at seed 6328), and it makes azusa's table and the Chocobo/Nissa tie suspect |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5322,6 +5323,105 @@ Option C's total is a chain and not a factorial: the interaction has not been
 measured, and §0p is the finding that says two staged changes in one deck can
 interact. If both are ever staged, the 2x2 is the check.
 
+## 0z37. OPEN — floating landfall mana is paid with and never consumed, so one Lotus Cobra trigger funds the whole turn
+
+Found 2026-09-21 while diagnosing an eleven-hour hang. **This is an engine
+defect, not a card, and it makes azusa's committed table and both of the cards
+in the pending azusa decision suspect.** It is diagnosed and NOT yet fixed.
+
+### The five-line proof
+
+```
+bonus_mana before      : 1 unit(s)
+available_mana         : 1 unit(s)
+  paid {G} #1: bonus_mana now 1, available_mana now 1
+  paid {G} #2: bonus_mana now 1, available_mana now 1
+  paid {G} #3: bonus_mana now 1, available_mana now 1
+```
+
+`engine.spend` taps the permanent that owns each unit it was told to pay with:
+
+```python
+for i in pay_idx:
+    if i < len(owners) and owners[i] is not None:
+        owners[i].tapped = True
+    return
+```
+
+**A unit with no owner has no permanent to tap, and nothing else deducts it.**
+In azusa those units are `bonus_mana`, the floating mana three landfall cards
+make — **Lotus Cobra**, **Tireless Provisioner** and **Nissa, Resurgent
+Animist**. It is cleared once per turn in `take_turn` and is otherwise
+reusable without limit: one trigger pays for every spell cast that turn.
+
+### It is §0u's shape, and the other two copies are right
+
+The rule "a floating unit must be deducted, because there is nothing to tap"
+is implemented three times in this repo:
+
+| pool | where | deducted? |
+|---|---|---|
+| lorehold's Treasures | `lorehold.pay()`, by index arithmetic off `first_treasure` | **yes** |
+| azusa's Castle Garenbrig `creature_mana` | `azusa.main_phase`, `del self.creature_mana[:from_castle]` | **yes** |
+| azusa's `bonus_mana` (landfall mana) | nowhere | **NO** |
+
+And the reason the third is the broken one is structural rather than careless:
+the other two pools are appended **by the caller**, which therefore knows the
+boundary between real and floating units and can do the arithmetic.
+`bonus_mana` is appended **inside `available_mana` itself**, so by the time any
+payment site sees the pool the floating units are indistinguishable from real
+ones. A fix that adds the deduction at azusa's payment sites would be the same
+mistake a fourth time; it belongs in one place.
+
+### What the hang was
+
+`diagnostics/run_azusa_slot.py` put Awaken the Woods in Yavimaya Elder's slot.
+Two of four worker processes spun at 100% CPU for **eleven hours** on their
+first job while the other two completed all 26 remaining jobs at a mean of
+364s. Deterministic at **seed 6328**, reproduced in seconds.
+
+With mana effectively free, `main_phase`'s greedy loop ran this cycle inside a
+single turn:
+
+1. cast Awaken the Woods, X=6 -> six Forest Dryad land creature tokens
+2. six landfall triggers -> six floating mana that never leave the pool, and
+   six Springheart Nantuko copies of Eternal Witness at `{1}{G}` each
+3. each Witness copy's ETB returns a card from the graveyard, Awaken among them
+4. recast it
+
+**258 casts of Awaken the Woods in one turn**: 1,549 land tokens, 1,571
+Springheart copies, 6,397 Insect tokens, a board of 29,632 permanents, and
+`bonus_mana` climbing one unit per landfall and never falling. Every other part
+of that cycle is faithful to the cards; only the mana is wrong, and it is what
+makes the loop self-funding. At a real table the cycle is mana-NEGATIVE and a
+pilot stops.
+
+### What it invalidates
+
+* **azusa's committed table.** Lotus Cobra and Tireless Provisioner are both in
+  the list, so every row is measured with a turn's floating mana reusable.
+* **Nissa, Resurgent Animist, whose ritual half IS this bug.** She is one of
+  the two cards §0z35 measured as EQUAL for the Yavimaya slot (+0.0001
+  [-0.0039, +0.0041]), and Traveling Chocobo — the other — doubles landfall
+  triggers and therefore multiplies the same broken mana. **That tie is not
+  trustworthy and the owner's choice is on hold until this is fixed.**
+* **the 26 completed rows of `results/azusa_slot.txt`**, kept as provenance and
+  marked, not read as results.
+
+Karlov, lorehold, tivit, shilgengar and rendmaw are NOT affected: only
+`engine.ManaUnits.append`/`__add__` and `azusa.available_mana` create ownerless
+units, and lorehold deducts its own before calling `spend`. That claim is a grep
+over five engines, not an argument, and the fix should carry a check that makes
+it mechanical.
+
+### And a lesson about watching a run
+
+**A JOB COUNT IS NOT PROGRESS.** `results/azusa_slot.txt` grew steadily to 26 of
+28 while two workers were dead in a loop, and it looked slow rather than broken
+for ten hours. What distinguished them was `ps -o etimes=,times=`: a healthy
+worker's CPU time is a fraction of its elapsed time between jobs, a hung one's
+CPU time EQUALS its elapsed time. That check costs one command and would have
+saved ten hours of two cores.
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 
 **Found 2026-09-16 during the six-deck regeneration**, from the only three

@@ -1,3 +1,13 @@
+!!! DO NOT READ THESE AS RESULTS (2026-09-21, KNOWN_ISSUES.md 0z37) !!!
+Every row below was measured on an engine in which floating landfall mana --
+Lotus Cobra's, Tireless Provisioner's and Nissa, Resurgent Animist's -- is paid
+with and NEVER CONSUMED, so one trigger funds every spell cast that turn. All
+three cards bear on this deck. The run also never finished: Awaken the Woods
+hung both its jobs (two workers at 100% CPU for eleven hours, deterministic at
+seed 6328), which is how the defect was found. 26 of 28 rows returned.
+Kept as provenance and as the reproducer's context. Re-run after the fix.
+================================================================================
+
 azusa: every candidate against Traveling Chocobo in Yavimaya Elder's slot. N=15,000 paired, same seeds both legs, base = build_pending('azusa').
 POSITIVE = the candidate beats Traveling Chocobo in that slot. 14 cards, 28 runs, 4 procs.
 
@@ -171,4 +181,67 @@ POSITIVE = the candidate beats Traveling Chocobo in that slot. 14 cards, 28 runs
     cards_drawn           -0.9371  [ -1.0824,  -0.8012] *
     final_life           -15.3513  [-22.5101,  -9.9903] *
     stranded_mv           -1.9695  [ -2.4846,  -1.4210] *
+
+  Finale of Devastation  T10  (311s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0212  [ -0.0242,  -0.0181] *
+    damage                -2.3379  [ -2.5769,  -2.0904] *
+    landfall_triggers     -0.2345  [ -0.2963,  -0.1741] *
+    lands_played          -0.1340  [ -0.1623,  -0.1057] *
+    cards_drawn           -0.9773  [ -1.0921,  -0.8677] *
+    final_life           -10.5145  [-13.5145,  -7.5006] *
+    stranded_mv           +5.1287  [ +4.7695,  +5.5000] *
+
+  Archdruid's Charm  T20  (441s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0231  [ -0.0273,  -0.0187] *
+    damage                -2.1507  [ -2.4524,  -1.8393] *
+    landfall_triggers     -0.1389  [ -0.2310,  -0.0475] *
+    lands_played          -0.1598  [ -0.2063,  -0.1112] *
+    cards_drawn           -1.2691  [ -1.4227,  -1.1230] *
+    final_life           -17.7332  [-25.0791, -12.2612] *
+    stranded_mv           -0.5050  [ -0.9970,  -0.0106] *
+
+  War Room  T10  (291s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0082  [ -0.0115,  -0.0049] *
+    damage                -0.5926  [ -0.8466,  -0.3285] *
+    landfall_triggers     +0.3055  [ +0.2378,  +0.3788] *
+    lands_played          +0.2966  [ +0.2619,  +0.3311] *
+    cards_drawn           -0.4333  [ -0.5606,  -0.3099] *
+    final_life            -9.6609  [-12.9582,  -6.4612] *
+    stranded_mv           -2.5173  [ -3.0055,  -2.0517] *
+
+  Finale of Devastation  T20  (428s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0213  [ -0.0253,  -0.0171] *
+    damage                -1.9479  [ -2.2286,  -1.6560] *
+    landfall_triggers     -0.1297  [ -0.2113,  -0.0467] *
+    lands_played          -0.0852  [ -0.1285,  -0.0429] *
+    cards_drawn           -1.1371  [ -1.2861,  -0.9941] *
+    final_life           -16.0232  [-23.2065, -10.5655] *
+    stranded_mv           +6.1365  [ +5.6157,  +6.6600] *
+
+  Castle Garenbrig  T10  (291s)   A-leg (Traveling Chocobo) won 0.2069
+    won                   -0.0126  [ -0.0157,  -0.0094] *
+    damage                -0.6973  [ -0.9529,  -0.4305] *
+    landfall_triggers     +0.0881  [ +0.0185,  +0.1593] *
+    lands_played          +0.1491  [ +0.1155,  +0.1839] *
+    cards_drawn           -0.8148  [ -0.9448,  -0.6935] *
+    final_life            -9.1338  [-12.5127,  -5.7921] *
+    stranded_mv           -4.4817  [ -4.9754,  -4.0054] *
+
+  War Room  T20  (424s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0054  [ -0.0096,  -0.0011] *
+    damage                -0.1817  [ -0.4781,  +0.1251]  
+    landfall_triggers     +0.4852  [ +0.3921,  +0.5797] *
+    lands_played          +0.4045  [ +0.3547,  +0.4542] *
+    cards_drawn           -0.4005  [ -0.5590,  -0.2497] *
+    final_life           -16.0304  [-23.3017, -10.5587] *
+    stranded_mv           -3.6388  [ -4.2690,  -3.0167] *
+
+  Castle Garenbrig  T20  (425s)   A-leg (Traveling Chocobo) won 0.4281
+    won                   -0.0156  [ -0.0201,  -0.0113] *
+    damage                -0.7752  [ -1.0789,  -0.4677] *
+    landfall_triggers     +0.0678  [ -0.0239,  +0.1606]  
+    lands_played          +0.1513  [ +0.1040,  +0.1999] *
+    cards_drawn           -1.1427  [ -1.2962,  -0.9917] *
+    final_life           -16.3978  [-23.7565, -10.9377] *
+    stranded_mv           -6.3037  [ -6.9636,  -5.6796] *
 
