@@ -3,6 +3,8 @@
 **STATUS: PROPOSED, 2026-09-21. Nothing here is implemented.** It is written
 down so that the next session can build it, argue with it, or discard it with a
 reason. CLAUDE.md queued item 23 is the live pointer; this file is the design.
+**`docs/LEDGER_STATES.md` is its naming half** — this file designs the screen,
+that one designs the states a card passes through and the states it dies in.
 
 The idea came from the owner after a session that imported nine Reality Fracture
 cards across six decks: *there should be a cheap practice for deciding whether a

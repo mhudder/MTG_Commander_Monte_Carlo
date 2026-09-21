@@ -849,7 +849,10 @@ ordering is measured — that is the honest statement of it.
 
 23. **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
     OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is
-    the design**; nothing is implemented. The measured costs say the intuition
+    the design and `docs/LEDGER_STATES.md` is its naming half**; nothing is
+    implemented. The vocabulary matters because the intended workload is 50+
+    proposals at a time, most of them discarded before any head-to-head, and
+    the states a card DIES in are the ones this repo keeps losing to chat. The measured costs say the intuition
     that "screening is expensive" is wrong in an instructive way: a candidate row
     is ~152 CPU-seconds, a real swap is one `run_ab`, and the largest single
     measurement spend of that session was **2.6 CPU-hours ranking cards that had
