@@ -152,6 +152,9 @@ class LoreholdGame(BaseGame):
             "sands_life_delta": 0.0,
             "sunbird_mv": 0.0,
             "brass_treasures": 0,
+            # Reality Fracture, 2026-09-21 (preview text).
+            "stingcaster_casts": 0, "flashback_casts": 0,
+            "flashback_exiled": 0,
             "bombardment_copies": 0,
             "monument_triggers": 0,
             "mastery_copies": 0,
@@ -1126,7 +1129,21 @@ def jeskas_will(g):
     g.m["jeska_stranded"] += len(pool)
 
 
-def past_in_flames(g, self_card=None):
+def exile_flashback(g, card):
+    """702.34a: a card cast for its flashback cost is EXILED, not re-filed.
+
+    Its own function for two reasons. `resolve_spell` files every
+    non-permanent it resolves into the graveyard, so the removal before
+    resolution is undone and this second removal is the one that implements
+    the rule; and a mutation check needs to be able to switch the rule off to
+    prove the check can fail, which a bare `if` inside the loop did not allow.
+    """
+    if card in g.graveyard:
+        g.graveyard.remove(card)
+        g.m["flashback_exiled"] += 1
+
+
+def past_in_flames(g, self_card=None, cap=None):
     """Past in Flames {3}{R}, verified against Scryfall 2026-09-16.
 
         Each instant and sorcery card in your graveyard gains flashback until
@@ -1148,7 +1165,10 @@ def past_in_flames(g, self_card=None):
 
     Exiled after resolution, as flashback demands, so each card is used once.
     """
-    cap = g.cfg.get("flashback_cap", 6)
+    # `cap` lets ONE card reuse this function for ONE target rather than a
+    # second copy of the rule (§0u): Stingcaster Mage grants flashback to a
+    # single instant or sorcery in the yard, which is this loop with cap=1.
+    cap = g.cfg.get("flashback_cap", 6) if cap is None else cap
     for _ in range(cap):
         units = mana_units(g)
         pool = [c for c in g.graveyard
@@ -1158,11 +1178,26 @@ def past_in_flames(g, self_card=None):
                      if can_pay(reduce_cost(g, c), units) is not None), None)
         if best is None:
             break
-        g.graveyard.remove(best)          # flashback exiles it on resolution
+        g.graveyard.remove(best)
         paid = pay(g, reduce_cost(g, best), units) or 0
         g.m["flashback_casts"] += 1
         g.m["flashback_mv"] += best.free_mv
         resolve_spell(g, best, paid, from_hand=False)
+        # AND IT STAYS EXILED. 702.34a: "If the flashback cost was paid, EXILE
+        # this card instead of putting it anywhere else any time it would leave
+        # the stack." The removal above is not enough on its own, because
+        # `resolve_spell` files every non-permanent it resolves into the
+        # graveyard (its closing `else`), so the card came straight back --
+        # this line was missing from 2026-09-16 to 2026-09-21 and the docstring
+        # above claimed the opposite of what the code did.
+        #
+        # THE COST OF THE GAP WAS NOT ONE CARD, IT WAS THE CAP. The pool is
+        # recomputed per iteration (§0z19), so a card that returned to the yard
+        # was affordable and highest-priority AGAIN: one Past in Flames could
+        # cast the SAME spell up to `flashback_cap` times. Its measured
+        # +0.0102 ±0.0038 (2026-09-16) is inflated by that and is restated in
+        # KNOWN_ISSUES §0z38.
+        exile_flashback(g, best)
 
 
 def sunbird(g, card):
@@ -1220,6 +1255,32 @@ def resolve_spell(g, card, paid, from_hand=True):
 
     if card.is_permanent:
         g.board.append(Permanent(card=card, sick=not card.haste))
+        # STINGCASTER MAGE (Reality Fracture, preview text 2026-09-21):
+        # "{1}{R} 2/1 Haste. When this creature enters, TARGET instant or
+        # sorcery card in your graveyard gains flashback until end of turn.
+        # The flashback cost is equal to its mana cost."
+        #
+        # ONE target, so it is `past_in_flames` with cap=1 -- the same function,
+        # not a second copy of the rule (§0u). Everything that makes Past in
+        # Flames honest applies unchanged: flashback costs FULL PRICE, so
+        # nothing is cheated and `mv_cheated` is not credited; the pool is
+        # recomputed per cast (§0z19); and the card is exiled on resolution.
+        #
+        # A FLOOR, and the clause is named: the real card grants flashback
+        # UNTIL END OF TURN, so a pilot who cannot pay right now may still cast
+        # it later in the same turn. This fires immediately or not at all,
+        # exactly as Past in Flames does, so a Stingcaster resolved with the
+        # mana already spent does nothing where the card would have done
+        # something. Conservative in the same direction for both cards.
+        if card.name == "Stingcaster Mage":
+            # Its OWN casts, as a difference. Assigning `flashback_casts`
+            # here would have copied Past in Flames' running total into this
+            # counter and read as one Stingcaster cast per Past in Flames
+            # cast -- §0z28's lesson about a draw credited to the wrong
+            # counter, pointed at a cast.
+            before = g.m["flashback_casts"]
+            past_in_flames(g, self_card=card, cap=1)
+            g.m["stingcaster_casts"] += g.m["flashback_casts"] - before
     elif card.script in SELF_EXILING and g.cfg.get("lorehold_recursion", True):
         pass                       # "Exile <self>." Not in the graveyard.
     elif (from_hand and g.cfg.get("lorehold_recursion", True)

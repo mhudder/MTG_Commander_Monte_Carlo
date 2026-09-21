@@ -337,3 +337,21 @@ PAST_IN_FLAMES = C("Past in Flames", "Sorcery", {"gen": 3, "R": 1},
                    priority=7.0, threat=0.0, script="past_in_flames")
 
 BATCH_2026_09_16 = (JESKAS_WILL, PAST_IN_FLAMES)
+
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall `fra`), 2026-09-21. PREVIEW TEXT -- the set
+# releases 2026-10-02, so this can still change before release.
+# ---------------------------------------------------------------------------
+
+# "{1}{R} 2/1. Haste. When this creature enters, target instant or sorcery card
+# in your graveyard gains flashback until end of turn. The flashback cost is
+# equal to its mana cost."
+#
+# Past in Flames for ONE card, on a two-mana hasty body. The same function
+# implements both (`past_in_flames(cap=1)`), so it inherits the honest reading:
+# flashback costs FULL PRICE, nothing is cheated, and with an empty graveyard
+# it does nothing.
+STINGCASTER_MAGE = C("Stingcaster Mage", "Creature", {"gen": 1, "R": 1}, 2, 1,
+                     priority=7.5, threat=4.0, haste=True)
+
+FRA_CANDIDATES = (STINGCASTER_MAGE,)

@@ -2393,7 +2393,9 @@ DECKS = {
         # 2026-09-16 batch (§0z26).
         "Parallel Lives": rendmaw_v12.PARALLEL_LIVES,
         "Mycoloth": rendmaw_v12.MYCOLOTH,
-        "Cauldron of Essence": rendmaw_v12.CAULDRON_OF_ESSENCE}),
+        "Cauldron of Essence": rendmaw_v12.CAULDRON_OF_ESSENCE,
+        # REALITY FRACTURE, 2026-09-21 (preview text).
+        "Proft, Sinister Mastermind": rendmaw_v12.PROFT_SINISTER_MASTERMIND}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
@@ -2405,7 +2407,9 @@ DECKS = {
         "Caldera Pyremaw": lorehold_v16.CALDERA_PYREMAW,
         "Radiant Scrollwielder": lorehold_v16.RADIANT_SCROLLWIELDER,
         "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
-        "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION}),
+        "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION,
+        # REALITY FRACTURE, 2026-09-21 (preview text).
+        "Stingcaster Mage": lorehold_v16.STINGCASTER_MAGE}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
@@ -2423,12 +2427,17 @@ DECKS = {
         # 2026-09-16 batch (§0z26).
         "Anointed Procession": tivit_v1.ANOINTED_PROCESSION,
         "Urza, Lord High Artificer": tivit_v1.URZA_LORD_HIGH_ARTIFICER,
-        "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST}),
+        "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST,
+        # REALITY FRACTURE, 2026-09-21 (preview text).
+        "Memnarch, the Warden": tivit_v1.MEMNARCH_THE_WARDEN}),
     # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
     # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,
     # six mana values corrected against Scryfall (see shilgengar_v1.py's
     # module docstring). This deck has not been through ablation yet.
-    "shilgengar": (shilgengar_v1, {}),
+    "shilgengar": (shilgengar_v1, {
+        # REALITY FRACTURE, 2026-09-21 (preview text). The first swap-in
+        # candidate this deck has ever had catalogued.
+        "Lyra, Archangel of Dawn": shilgengar_v1.LYRA_ARCHANGEL_OF_DAWN}),
     # Added 2026-09-07 as a sixth deck. The submitted list was 99 cards; a
     # 21st Forest was added to reach 100 -- see azusa_v1.py's docstring.
     "azusa": (azusa_v1, {

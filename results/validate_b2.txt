@@ -1,0 +1,54 @@
+A/A control — identical decks under common random numbers.
+Any nonzero difference here means the harness is leaking randomness.
+   damage                   30.16     30.16     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   cards_drawn              11.65     11.65     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   tokens_made               6.07      6.07     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+
+Lorehold engine — A/A control
+   mv_cheated               27.05     27.05     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   miracles_cast             2.97      2.97     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   damage                   51.15     51.15     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+Tivit engine — A/A control
+   artifacts_made           54.21     54.21     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   votes_cast               49.17     49.17     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   damage                   58.12     58.12     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+Karlov engine — A/A control
+   lifegain_triggers        19.40     19.40     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   life_gained              56.60     56.60     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   damage                   54.45     54.45     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+Shilgengar engine — A/A control
+   blood_made                3.07      3.07     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   creatures_sacrificed      0.92      0.92     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   damage                   50.71     50.71     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+Azusa engine — A/A control
+   landfall_triggers        22.71     22.71     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   lands_played             15.80     15.80     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+   damage                   59.04     59.04     +0.00    +0.0%  [  +0.00,   +0.00] p=1         
+
+==============================================================================
+CRN audit — real swaps, asserting the game RNG is sealed after the opening hand
+==============================================================================
+  rendmaw    game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=144 B=147
+  lorehold   game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=315 B=321
+  tivit      game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=1000 B=988
+  karlov     game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=431 B=440
+  shilgengar game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=0 B=0
+  azusa      game-RNG draws after opening hand: A=0 B=0   OK
+             addressed mid-game draws (may differ — that is the decks differing, not a leak): A=897 B=935
+  -> sealed on every engine tested.
+
+CRN variance reduction on the real comparison:
+  corr(A,B)      = 0.9101
+  paired SE      = 0.1114
+  independent SE = 0.3678   (3.3x wider)
+  CRN is worth ~11x the number of games.

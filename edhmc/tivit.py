@@ -112,6 +112,8 @@ class TivitGame(BaseGame):
             # --- the artifact engine ---
             "treasures_made": 0, "clues_made": 0, "food_made": 0,
             "artifacts_made": 0, "manufactor_extra": 0,
+            # Reality Fracture, 2026-09-21 (preview text).
+            "memnarch_draws": 0,
             "treasures_spent": 0, "clues_cracked": 0,
             "blinks": 0, "deadeye_activations": 0, "combo_iterations": 0,
             "tivit_triggers": 0, "extra_turns": 0,
@@ -789,6 +791,22 @@ def run_etb(g, perm):
         g.deadeye_paired = g.has("Tivit, Seller of Secrets")
     elif s == "marionette":
         perm.counters += 3          # fabricate 3, taken as counters
+    elif perm.card.name == "Memnarch, the Warden":
+        # MEMNARCH, THE WARDEN (Reality Fracture, preview text 2026-09-21):
+        # "{10} 8/9 Legendary Artifact Creature. Indestructible. When Memnarch
+        # enters, create two 1/1 colorless MYR ARTIFACT creature tokens.
+        # Whenever Memnarch attacks, draw a card for each artifact you control."
+        #
+        # `artifact=True` is load-bearing and not flavour: an artifact token is
+        # counted by `artifact_count()`, which is what Time Sieve, Marionette
+        # Master, Disciple of the Vault -- and Memnarch's own attack trigger --
+        # all read. Two Myr that did not type as artifacts would be two bodies
+        # instead of two pieces of this deck's engine.
+        #
+        # Its INDESTRUCTIBLE is not tagged here: that comes from Scryfall
+        # through decks/_evasion.py, because hand-tagging a keyword biases the
+        # whole table toward whatever got tagged.
+        g.make_tokens(2, 1, 1, "Myr", artifact=True)
     elif s == "cyberdrive":
         # Its animation is an ETB, so record the turn; combat() applies the
         # burst only on that turn.
@@ -868,6 +886,23 @@ def combat(g):
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
+    # MEMNARCH'S ATTACK TRIGGER: "Whenever Memnarch attacks, draw a card for
+    # each artifact you control." It triggers on DECLARATION, not on damage, so
+    # it fires here -- before `combat_damage` and regardless of what gets
+    # through, which is the difference between this and the commander's own
+    # "deals combat damage to a player" trigger at the bottom of this function.
+    #
+    # `artifact_count()` is the one place that question is answered, so the
+    # draw counts token piles, artifact permanents and the three artifact lands
+    # exactly as Time Sieve does. In a deck that makes 51-67 artifacts a game
+    # this is a large number of cards, and the draw is A CEILING for the reason
+    # queued item 17 gives: `draw()` stops at an empty library and no loss is
+    # recorded, so at a real table this card can kill you and here it cannot.
+    for p in attackers:
+        if p.card.name == "Memnarch, the Warden":
+            n = g.artifact_count()
+            g.draw(n)
+            g.m["memnarch_draws"] += n
     raw = sum(g.power_of(p) for p in attackers)
     # Cyberdrive Awakener: "WHEN THIS CREATURE ENTERS, each noncreature
     # artifact you control becomes a 4/4 artifact creature until end of turn."

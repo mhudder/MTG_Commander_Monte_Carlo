@@ -86,6 +86,7 @@ Methodology that used to live at the end of this file is now
 | [0z35](#0z35) | MEASURED | **Queued items 21 and 22 answered.** Azusa's top two candidates are measured EQUAL in the same slot (+0.0001 ±0.0040 at T20, directly paired — the ranking §0c says a common baseline cannot give), so the choice is the owner's and one rebuild. Karlov: Blood Artist's negative row is entirely §0j's two constants (text alone +0.0024 ±0.0011, POSITIVE); Swiftfoot Boots and Mother of Runes are real, and **the Boots are the cut** because `protection_cards` holds Mother of Runes alone. And `diag_threat_blank`'s blank had drifted a digit from ablation's since §0j — arm 1 reproduces the committed table now, on all ten rows |
 | [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
 | [0z37](#0z37) | **OPEN** | **Floating landfall mana is paid with and never consumed.** `engine.spend` taps the owner of each unit it pays with, and a unit with no owner — azusa's `bonus_mana` from Lotus Cobra, Tireless Provisioner and Nissa, Resurgent Animist — has nothing to tap, so one trigger funds every spell that turn. §0u's shape: the same rule is implemented correctly for lorehold's Treasures and for azusa's own Castle Garenbrig pool. It made `main_phase` recast Awaken the Woods 258 times in one turn (an 11-hour hang, deterministic at seed 6328), and it makes azusa's table and the Chocobo/Nissa tie suspect |
+| [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5422,6 +5423,85 @@ for ten hours. What distinguished them was `ps -o etimes=,times=`: a healthy
 worker's CPU time is a fraction of its elapsed time between jobs, a hung one's
 CPU time EQUALS its elapsed time. That check costs one command and would have
 saved ten hours of two cores.
+## 0z38. FIXED — flashback did not exile, so one Past in Flames could cast the same spell six times
+
+Found 2026-09-21 while implementing Stingcaster Mage, whose whole text is
+"target instant or sorcery card in your graveyard gains flashback until end of
+turn". Implementing it as `past_in_flames(cap=1)` — the same function, not a
+second copy of the rule (§0u) — put a test on the shared path, and the test
+found the shared path wrong.
+
+### What the code did, against what its own docstring claimed
+
+`past_in_flames` removed the card from the graveyard before resolving it, and
+its docstring said "Exiled after resolution, as flashback demands, so each card
+is used once". **`resolve_spell` then filed it straight back**, because its
+closing branch is
+
+```python
+    else:
+        g.graveyard.append(card)
+```
+
+which every non-permanent it resolves goes through. So the card was in the
+graveyard again the moment it finished resolving.
+
+**702.34a is explicit**, and it is in this repo:
+
+> "If the flashback cost was paid, EXILE this card instead of putting it
+> anywhere else any time it would leave the stack."
+
+### The cost was not one card, it was the cap
+
+`flashback_cap` is 6 and **the pool is recomputed per iteration** (§0z19, and
+correctly so — resolving a spell can exile another out of the graveyard). A
+card that returned to the yard was therefore affordable and highest-priority
+*again* on the next pass. One Past in Flames could cast **the same spell up to
+six times**, paying its cost each time, with `flashback_casts` counting six
+honest-looking casts of one card.
+
+Reproduced directly on a six-source board with three cheap spells in the yard:
+before the fix, `cap=6` emptied a three-card yard **and left the cards in it**;
+after, the yard empties and stays empty, and `flashback_exiled` counts each one.
+
+**PAST IN FLAMES' MEASURED ROW IS INFLATED BY THIS.** It was measured at
+**+0.0102 ±0.0038 at T20 (2026-09-16, §0z26)** with the defect live, and that
+number is a CEILING of unknown size until it is re-measured. It is a MEASURED
+candidate in the ledger, not a staged swap, so nothing committed rests on it —
+but nothing should be staged on it either until it is restated.
+
+### The fix, and why it is a function
+
+```python
+def exile_flashback(g, card):
+    if card in g.graveyard:
+        g.graveyard.remove(card)
+        g.m["flashback_exiled"] += 1
+```
+
+Two reasons it is not a bare `if` inside the loop. The rule needs saying once,
+where both callers reach it; and **a mutation check has to be able to switch it
+off**, which an inline condition did not allow. `tests/test_fra_batch2.py`
+pins it with case I (the card is exiled, not re-filed) and the mutation "the
+flashback exile is removed" must break exactly C and I.
+
+### And the lesson that cost the most time here
+
+**TWO OF THAT FILE'S FIVE MUTATIONS WERE NEVER INSTALLED.** They set module
+flags — `PROFT_GATE_OFF`, `LOREHOLD_NO_EXILE` — that no production code reads,
+so they broke NOTHING and the run reported "broke nothing, expected {A}". Read
+carelessly that looks like the checks not depending on the rules; read
+correctly it means the mutation did not happen. The fix was in the engine rather
+than the test: the Threshold count is now the named constant
+`engine.PROFT_THRESHOLD` and the exile is now `lorehold.exile_flashback`, both
+reachable from a test. **A mutation that cannot change behaviour is §0z15's
+failure arrived at from the other direction — not a check with a blind spot, but
+a check whose knife was never picked up.** When a mutation breaks nothing, the
+first suspect is the mutation.
+
+Three further expectations in that file were wrong for substantive reasons and
+are kept in its docstring with the reasoning, per the standing rule that a set
+edited to match the output is a transcript rather than a test.
 ## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 
 **Found 2026-09-16 during the six-deck regeneration**, from the only three

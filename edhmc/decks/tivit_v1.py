@@ -339,3 +339,21 @@ SAI_MASTER_THOPTERIST = C("Sai, Master Thopterist", "Creature",
 
 BATCH_2026_09_16 = (ANOINTED_PROCESSION, URZA_LORD_HIGH_ARTIFICER,
                     SAI_MASTER_THOPTERIST)
+
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall `fra`), 2026-09-21. PREVIEW TEXT -- the set
+# releases 2026-10-02, so this can still change before release.
+# ---------------------------------------------------------------------------
+
+# "{10} 8/9 Legendary Artifact Creature -- Wizard. Indestructible. When Memnarch
+# enters, create two 1/1 colorless Myr artifact creature tokens. Whenever
+# Memnarch attacks, draw a card for each artifact you control."
+#
+# TEN MANA, AND THE DRAW READS THE COUNTER THIS DECK IS BUILT ON: it makes 51
+# artifacts a game before Anointed Procession and 67 after (§0z33), all of which
+# `artifact_count()` sees. The cost is the whole question -- this is a ten-drop
+# in a deck whose mana is Sol Ring, three signets and Treasures.
+MEMNARCH_THE_WARDEN = C("Memnarch, the Warden", "Artifact/Creature",
+                        {"gen": 10}, 8, 9, priority=8, threat=9.0)
+
+FRA_CANDIDATES = (MEMNARCH_THE_WARDEN,)

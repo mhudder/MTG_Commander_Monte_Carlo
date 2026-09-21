@@ -250,6 +250,24 @@ LANDS = (
 )
 
 
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall `fra`), 2026-09-21. PREVIEW TEXT -- the set
+# releases 2026-10-02, so this can still change before release.
+# ---------------------------------------------------------------------------
+
+# "{2}{W} 3/3. Flying. Whenever you gain life, put a +1/+1 counter on each
+# Angel you control."
+#
+# Archangel of Thune's trigger narrowed to one tribe, at three mana instead of
+# five, in the deck built around that tribe. `tags=("angel",)` is what makes it
+# grow ITSELF and what every Angel payoff in this list reads.
+LYRA_ARCHANGEL_OF_DAWN = C("Lyra, Archangel of Dawn", "Creature",
+                           {"gen": 2, "W": 1}, 3, 3, priority=8, threat=7.0,
+                           tags=("angel",))
+
+FRA_CANDIDATES = (LYRA_ARCHANGEL_OF_DAWN,)
+
+
 def build():
     deck = (HAYMAKERS + SUPPORT + DRAW_ENGINES + TREASURE + ROCKS
            + INTERACTION + MDFC_SPELLS + LANDS)

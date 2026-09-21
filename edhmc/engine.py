@@ -1120,6 +1120,8 @@ class Game(BaseGame):
             # distinguish from a weak one.
             "mycoloth_devoured": 0, "mycoloth_saprolings": 0,
             "spells_cast": 0,
+            # Reality Fracture, 2026-09-21 (preview text).
+            "proft_gated": 0,
             "turn_lethal": 99,
             "stranded_mv": 0,      # mana value sitting uncastable in hand
             "clamp_activations": 0,
@@ -1642,6 +1644,13 @@ def altar_enable(g: Game, units, precombat: bool):
     return (card, pay, None)
 
 
+# Proft, Sinister Mastermind's Threshold count. A NAMED CONSTANT rather than
+# a literal in the gate, so a mutation check can turn the rule off and prove
+# the gate is what stops the card -- a check that cannot fail is worse than
+# none, and the first version of that mutation set a flag nothing read.
+PROFT_THRESHOLD = 7
+
+
 def main_phase(g: Game, precombat: bool = False):
     """Greedy: repeatedly cast the highest-priority affordable spell.
 
@@ -1682,6 +1691,24 @@ def main_phase(g: Game, precombat: bool = False):
                 continue
             # do not wrath your own winning board
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+                continue
+            # PROFT, SINISTER MASTERMIND (Reality Fracture, preview text
+            # 2026-09-21): "Threshold -- You can't cast this spell unless there
+            # are seven or more cards in your graveyard."
+            #
+            # A CASTABILITY RESTRICTION, NOT A COST. Rule 601.3 is why this is
+            # a `continue` in the option filter rather than an adjustment in
+            # `cost_after_reduction`: you may not begin to cast the spell at
+            # all, so it is never an option and can never be the greedy
+            # policy's pick. Modelled as a gate on `len(g.graveyard)`, which is
+            # exactly what the card counts.
+            #
+            # Attached BY NAME, like Heliod and Traveling Chocobo before it
+            # (§0z25), and deliberately NOT as a new name SET: one name in one
+            # `if` is not the hand-maintained list §0q warns about.
+            if (c.name == "Proft, Sinister Mastermind"
+                    and len(g.graveyard) < PROFT_THRESHOLD):
+                g.m["proft_gated"] += 1
                 continue
             # ALTERNATIVE COSTS, through the shared chooser (§1b / §0z20).
             # A card is not one cost: Impending deploys Overlord of the

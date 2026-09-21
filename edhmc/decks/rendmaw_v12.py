@@ -268,3 +268,28 @@ MYCOLOTH = C("Mycoloth", "Creature", {"gen": 3, "G": 2}, 4, 4,
              priority=8.0, threat=7.0, script="mycoloth")
 
 BATCH_2026_09_16 = (PARALLEL_LIVES, MYCOLOTH)
+
+# ---------------------------------------------------------------------------
+# REALITY FRACTURE (Scryfall `fra`), 2026-09-21. PREVIEW TEXT -- the set
+# releases 2026-10-02, so this can still change before release.
+# ---------------------------------------------------------------------------
+
+# "{2}{B} 5/5 Legendary Creature -- Human Rogue. Threshold -- You can't cast
+# this spell unless there are seven or more cards in your graveyard. Menace.
+# {B}, Discard this card: Target creature gets -3/-1 until end of turn."
+#
+# A THREE-MANA 5/5 WITH A CONDITION THIS DECK MEETS BY ITSELF: it sacrifices its
+# own tokens and mills itself through Deathreap Ritual and Dockside Chef, so
+# seven cards in the yard is a mid-game formality rather than a real cost. The
+# gate is modelled in engine.main_phase as a castability restriction (601.3),
+# so an early Proft is simply not an option.
+#
+# TWO CLAUSES ARE NOT MODELLED and both are small: MENACE, because this engine
+# never blocks with your creatures and the pod's blocks are abstract (§4); and
+# the discard ability, which is a -3/-1 shrink aimed at a creature the pod does
+# not own as an object. The row is a floor by both.
+PROFT_SINISTER_MASTERMIND = C("Proft, Sinister Mastermind", "Creature",
+                              {"gen": 2, "B": 1}, 5, 5,
+                              priority=8, threat=7.5)
+
+FRA_CANDIDATES = (PROFT_SINISTER_MASTERMIND,)

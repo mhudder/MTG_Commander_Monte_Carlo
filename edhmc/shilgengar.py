@@ -208,6 +208,8 @@ class ShilgengarGame(BaseGame):
             # a Treasure.
             "treasures_spent": 0,
             "life_gained": 0, "lifegain_triggers": 0,
+            # Reality Fracture, 2026-09-21 (preview text).
+            "lyra_counters": 0,
             "angel_tokens_made": 0, "spirit_tokens_made": 0,
         })
         self.damage_by_turn = []
@@ -652,6 +654,27 @@ class ShilgengarGame(BaseGame):
             for p in self.board:
                 if p.card.is_creature:
                     p.counters += 1
+        # LYRA, ARCHANGEL OF DAWN (Reality Fracture, preview text 2026-09-21):
+        # "{2}{W} 3/3 flying. Whenever you gain life, put a +1/+1 counter on
+        # each ANGEL you control."
+        #
+        # Archangel of Thune's trigger narrowed to one tribe, and it sits in
+        # ITS OWN `if` rather than as an `elif` -- §0z28 is the finding that
+        # says why: two cards on one hook are one indentation apart, and this
+        # deck runs both. `is_angel` is the ONE place that question is answered
+        # (tags from the deck module, and `make_angel_tokens` carries the tag),
+        # so token Angels grow too, which is correct: the card says each Angel
+        # you control and says nothing about tokens.
+        #
+        # ONE COUNTER PER EVENT, NOT PER POINT. `gain_life` is called once per
+        # lifegain EVENT and the amount is its argument, so counting here is
+        # counting events -- the distinction this project's karlov engine is
+        # built around, and the same reading Archangel of Thune gets above.
+        for _ in range(self.count("Lyra, Archangel of Dawn")):
+            for p in self.board:
+                if self.is_angel(p):
+                    p.counters += 1
+                    self.m["lyra_counters"] += 1
 
     def angel_entered(self, perm):
         """An Angel (or, for Righteous Valkyrie, a Cleric) entered under your
