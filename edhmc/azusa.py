@@ -148,6 +148,36 @@ FOREST_TOKENS = frozenset({"Forest Dryad token",
                            "Forest Tentacle token"})
 
 
+class FloatingMana:
+    """One point of floating mana, with somewhere to record that it was spent.
+
+    §0z37. Lotus Cobra's, Tireless Provisioner's and Nissa, Resurgent Animist's
+    landfall mana used to be appended to the pool with `owner=None`, on the
+    reasoning that "nothing on the battlefield taps for it, so `spend` must not
+    try". That is true and it was the defect: `engine.spend` consumes a unit BY
+    TAPPING ITS OWNER, so a unit with no owner was paid with and never consumed.
+    One Lotus Cobra trigger funded every spell cast that turn, which is what let
+    `main_phase` recast Awaken the Woods 258 times in a single turn.
+
+    The fix gives each point an owner that is not a permanent but does have a
+    `tapped` flag, so the EXISTING consumption mechanism applies with no change
+    to `spend` and no change to any of azusa's payment sites. That matters:
+    the two pools in this repo that were already correct -- lorehold's
+    Treasures and this engine's own Castle Garenbrig `creature_mana` -- each
+    deduct by index arithmetic AT THE CALL SITE, and adding a third spelling of
+    that would have been §0u's shape for the fourth time.
+
+    Not a `Permanent`: it is never on the battlefield, is not a land, dies to
+    nothing, and is cleared with the turn like the unspent mana it represents.
+    """
+
+    __slots__ = ("colours", "tapped")
+
+    def __init__(self, colours):
+        self.colours = colours
+        self.tapped = False
+
+
 def is_forest(card) -> bool:
     """Does this card have the Forest subtype? (305.6 gives it "{T}: Add {G}".)"""
     return card.name in FOREST or card.name in FOREST_TOKENS
@@ -370,7 +400,9 @@ class AzusaGame(BaseGame):
         # without DEFAULT_CFG. Worth +0.0583 +-0.0038 (T10) / +0.0624 +-0.0040
         # (T20) on this deck. See run_combat_split.py and combat_split.txt.
         cfg.setdefault("combat_split", True)
-        self.bonus_mana: list[frozenset] = []   # Lotus Cobra, this turn only
+        # FloatingMana, not frozensets, since §0z37 -- each point needs
+        # somewhere to record that it was spent. Cleared with the turn.
+        self.bonus_mana: list = []              # Lotus Cobra, this turn only
         # "IF THIS IS THE SECOND TIME this ability has resolved THIS TURN" --
         # Nissa, Resurgent Animist. Resolutions, not land drops, so a doubler
         # reaches the second one on the first land. Reset in take_turn.
@@ -938,11 +970,15 @@ class AzusaGame(BaseGame):
             # ability, so a dork still taps once.
             if ashaya and self.creature_land_mana(p):
                 add(frozenset({"G"}), 1, p)
-        # Lotus Cobra's and Tireless Provisioner's floating mana has NO owner:
-        # nothing on the battlefield taps for it, so `spend` must not try.
-        for src in self.bonus_mana:
-            units.append(src)
-            owners.append(None)
+        # Lotus Cobra's, Tireless Provisioner's and Nissa, Resurgent Animist's
+        # floating mana. Its owner is a FloatingMana rather than a permanent,
+        # so `spend` consumes it by the same tap it uses for a land (§0z37),
+        # and a point already spent this turn is simply not offered again.
+        for f in self.bonus_mana:
+            if f.tapped:
+                continue
+            units.append(f.colours)
+            owners.append(f)
             weights.append((9, 0, 0))
         return ManaUnits(units, owners, weights,
                          legacy=self.cfg.get('mana_colour_legacy', False),
@@ -1024,7 +1060,7 @@ class AzusaGame(BaseGame):
                     p.counters += 1
         self.gain_life(self.count("Courser of Kruphix"))
         for _ in range(self.count("Lotus Cobra")):
-            self.bonus_mana.append(frozenset({"G"}))
+            self.bonus_mana.append(FloatingMana(frozenset({"G"})))
         self.make_tokens(self.count("Rampaging Baloths"), 4, 4, "Beast")
         # ZENDIKAR'S ROIL: "Landfall -- whenever a land you control
         # enters, create a 2/2 green Elemental creature token." The
@@ -1070,7 +1106,8 @@ class AzusaGame(BaseGame):
         # Greenwarden or Chocobo out, the FIRST land of the turn already
         # resolves this ability twice and the reveal happens on that land.
         for _ in range(self.count("Nissa, Resurgent Animist")):
-            self.bonus_mana.append(frozenset({"W", "U", "B", "R", "G", "C"}))
+            self.bonus_mana.append(
+                FloatingMana(frozenset({"W", "U", "B", "R", "G", "C"})))
             self.m["animist_mana"] += 1
             self.animist_resolutions += 1
             if self.animist_resolutions == 2:
@@ -1080,7 +1117,8 @@ class AzusaGame(BaseGame):
             # Treasure mode (immediately useful mana), the same
             # single-more-useful-mode simplification the deck's other choose-
             # one lands effects make.
-            self.bonus_mana.append(frozenset({"W", "U", "B", "R", "G", "C"}))
+            self.bonus_mana.append(
+                FloatingMana(frozenset({"W", "U", "B", "R", "G", "C"})))
         self.clues = getattr(self, "clues", 0) + self.count("Tireless Tracker")
         if self.count("Nissa, Vastwood Seer // Nissa, Sage Animist"):
             # "Whenever a land you control enters, IF YOU CONTROL SEVEN OR

@@ -1,0 +1,17 @@
+deck            metric               old       new   new-old                95% CI
+azusa@T10       won               0.1793    0.1581   -0.0212   [ -0.0240,  -0.0184] *
+azusa@T10       damage           42.8821   40.7529   -2.1291   [ -2.3607,  -1.8976] *
+azusa@T10       final_life       29.5118   18.5604  -10.9515   [-13.0351,  -8.8678] *
+azusa@T10       cards_drawn      16.4176   15.0429   -1.3747   [ -1.4934,  -1.2561] *
+azusa@T10       stranded_mv     164.9941  173.5989   +8.6047   [ +8.1243,  +9.0852] *
+azusa@T10       turns_played      9.5675    9.6004   +0.0329   [ +0.0279,  +0.0379] *
+                seeds whose result changed       480 of 15000
+
+azusa@T20       won               0.3984    0.3783   -0.0201   [ -0.0236,  -0.0165] *
+azusa@T20       damage           64.2371   62.5535   -1.6836   [ -1.9178,  -1.4494] *
+azusa@T20       final_life       29.8336   11.2122  -18.6214   [-21.3712, -15.8715] *
+azusa@T20       cards_drawn      21.8697   20.3209   -1.5488   [ -1.6850,  -1.4126] *
+azusa@T20       stranded_mv     183.1077  197.1023  +13.9945   [+13.2687, +14.7204] *
+azusa@T20       turns_played     11.3867   11.4659   +0.0792   [ +0.0676,  +0.0908] *
+                seeds whose result changed       741 of 15000
+

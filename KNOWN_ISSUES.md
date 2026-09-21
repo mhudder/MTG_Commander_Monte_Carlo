@@ -85,7 +85,7 @@ Methodology that used to live at the end of this file is now
 | [0z34](#0z34) | FIXED | **The procedure for adding a card is written down** — `.claude/skills/add-card/SKILL.md`, from Scryfall to a committed swap, each step naming the check that catches the mistake made at it. And `check_docs` now verifies the §ids cited from live DOCS, not only from code: 194 citations, the pointers that make the procedure traceable |
 | [0z35](#0z35) | MEASURED | **Queued items 21 and 22 answered.** Azusa's top two candidates are measured EQUAL in the same slot (+0.0001 ±0.0040 at T20, directly paired — the ranking §0c says a common baseline cannot give), so the choice is the owner's and one rebuild. Karlov: Blood Artist's negative row is entirely §0j's two constants (text alone +0.0024 ±0.0011, POSITIVE); Swiftfoot Boots and Mother of Runes are real, and **the Boots are the cut** because `protection_cards` holds Mother of Runes alone. And `diag_threat_blank`'s blank had drifted a digit from ablation's since §0j — arm 1 reproduces the committed table now, on all ten rows |
 | [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
-| [0z37](#0z37) | **OPEN** | **Floating landfall mana is paid with and never consumed.** `engine.spend` taps the owner of each unit it pays with, and a unit with no owner — azusa's `bonus_mana` from Lotus Cobra, Tireless Provisioner and Nissa, Resurgent Animist — has nothing to tap, so one trigger funds every spell that turn. §0u's shape: the same rule is implemented correctly for lorehold's Treasures and for azusa's own Castle Garenbrig pool. It made `main_phase` recast Awaken the Woods 258 times in one turn (an 11-hour hang, deterministic at seed 6328), and it makes azusa's table and the Chocobo/Nissa tie suspect |
+| [0z37](#0z37) | FIXED | **Floating landfall mana was paid with and never consumed** — `engine.spend` consumes a unit by tapping its owner and azusa's Lotus Cobra / Tireless Provisioner / Nissa mana had none, so one trigger funded every spell that turn. Worth **−0.0201 ±0.0036 win rate at T20** on azusa's baseline, 741 of 15,000 seeds ending differently: the second-largest baseline correction after §0z30. Fixed by giving the mana an owner (`FloatingMana`) rather than a fourth spelling of deduct-at-the-call-site |
 | [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -5324,11 +5324,13 @@ Option C's total is a chain and not a factorial: the interaction has not been
 measured, and §0p is the finding that says two staged changes in one deck can
 interact. If both are ever staged, the 2x2 is the check.
 
-## 0z37. OPEN — floating landfall mana is paid with and never consumed, so one Lotus Cobra trigger funds the whole turn
+## 0z37. FIXED — floating landfall mana was paid with and never consumed, and it was worth 0.02 win rate to azusa's baseline
 
-Found 2026-09-21 while diagnosing an eleven-hour hang. **This is an engine
-defect, not a card, and it makes azusa's committed table and both of the cards
-in the pending azusa decision suspect.** It is diagnosed and NOT yet fixed.
+Found 2026-09-21 while diagnosing an eleven-hour hang; fixed the same day.
+**This is an engine defect, not a card, and it invalidated azusa's committed
+table and both of the cards in the pending azusa decision.** Measured at the
+tables' own N, it was worth **−0.0201 ±0.0036 win rate at T20** — the
+second-largest baseline correction in this project after §0z30's pod order.
 
 ### The five-line proof
 
@@ -5415,6 +5417,78 @@ units, and lorehold deducts its own before calling `spend`. That claim is a grep
 over five engines, not an argument, and the fix should carry a check that makes
 it mechanical.
 
+### The fix: an owner, not a deduction at the call site
+
+```python
+class FloatingMana:
+    __slots__ = ("colours", "tapped")
+```
+
+`engine.spend` consumes a unit BY TAPPING ITS OWNER, so the smallest correct
+fix is to give the mana an owner that is not a permanent but does have a
+`tapped` flag. **No change to `spend`, and no change to any of azusa's payment
+sites.** That matters: the two pools that were already right — lorehold's
+Treasures and this engine's own Castle Garenbrig `creature_mana` — each deduct
+by index arithmetic AT THEIR CALL SITE, and writing a third spelling of that
+rule would have been §0u's shape for the fourth time. `available_mana` simply
+does not offer a point already spent this turn, and `take_turn` clears the pool
+as it always did.
+
+`tests/test_floating_mana.py` pins it: five cases, three mutations, exact sets.
+One mutation is the OPPOSITE failure — every payment consuming an extra point —
+because a fix that over-consumes would pass every other case in the file.
+
+### What it was worth, measured rather than argued
+
+`diagnostics/run_shared_code_shift.py`, azusa, N=15,000 paired on the same
+seeds, old code against new (`results/azusa_0z37_shift.txt`). Batch 2's changes
+sat in the same diff and were separately proved bit-identical on every deck, so
+all of this is §0z37:
+
+| metric | T10 | T20 |
+|---|---|---|
+| **won** | **−0.0212 [−0.0240, −0.0184]** | **−0.0201 [−0.0236, −0.0165]** |
+| damage | −2.13 | −1.68 |
+| final_life | −10.95 | −18.62 |
+| cards_drawn | −1.37 | −1.55 |
+| stranded_mv | +8.60 | +13.99 |
+| seeds whose result changed | 480 of 15,000 | 741 of 15,000 |
+
+**Five per cent of seeds ended differently.** The deck spent 22% less mana per
+game (216 → 170 at the 400-seat check), drew a card and a half fewer, and
+stranded fourteen more mana value — which is what it looks like when a deck
+stops being handed a turn's worth of free mana every landfall.
+
+**EVERY AZUSA NUMBER MEASURED BEFORE 2026-09-21 IS ON THE WRONG ENGINE**, by
+about two points of win rate on the baseline alone. `results/azusa_slot.txt`
+keeps its banner, and every azusa row in the ledger's `MEASURED` list was
+measured on the defect.
+
+### The rebuilt table, and the cards that WERE the bug
+
+The azusa cache was moved aside and rebuilt at N=15,000 (a moved simulation is
+the one cache state no evidence check can clear — §0z27's first row). **9 of 58
+rows moved beyond their own old bar and 5 changed signal label**, and the
+movement lands exactly where the mechanism says it should:
+
+| card | before | after |
+|---|---|---|
+| **Lotus Cobra** | +0.0168 ±0.0034 | **+0.0071 ±0.0031** |
+| **Tireless Provisioner** | +0.0139 ±0.0035 | **+0.0060 ±0.0032** |
+| Seer's Sundial | +0.0281 ±0.0038 | +0.0193 ±0.0037 |
+| Horn of Greed | +0.0421 ±0.0040 | +0.0365 ±0.0039 |
+| Tireless Tracker | +0.0303 ±0.0039 | +0.0251 ±0.0038 |
+
+**The two cards whose text PRODUCED the floating mana lost about half their
+measured worth**, which is the cleanest confirmation available that the fix
+removed what it was aimed at rather than something else. The rest of the list
+moved down by the amount a deck loses when its spare mana stops being free.
+
+**The cut the pending azusa decision rests on survives**: Yavimaya Elder is
++0.0019 ±0.0023 against +0.0023 ±0.0023, still inside its own bar. Its label
+moved `both` → `dmg`, which is a classification changing under §0z24's
+unguarded sign and not a fact about the card.
+
 ### And a lesson about watching a run
 
 **A JOB COUNT IS NOT PROGRESS.** `results/azusa_slot.txt` grew steadily to 26 of
@@ -5464,11 +5538,20 @@ Reproduced directly on a six-source board with three cheap spells in the yard:
 before the fix, `cap=6` emptied a three-card yard **and left the cards in it**;
 after, the yard empties and stays empty, and `flashback_exiled` counts each one.
 
-**PAST IN FLAMES' MEASURED ROW IS INFLATED BY THIS.** It was measured at
-**+0.0102 ±0.0038 at T20 (2026-09-16, §0z26)** with the defect live, and that
-number is a CEILING of unknown size until it is re-measured. It is a MEASURED
-candidate in the ledger, not a staged swap, so nothing committed rests on it —
-but nothing should be staged on it either until it is restated.
+**PAST IN FLAMES' MEASURED ROW WAS RESTATED, AND IT DID NOT MOVE.** It was
++0.0102 ±0.0038 at T20 with the defect live (2026-09-16, §0z26); re-running the
+same `lorehold2` batch at the same N on the fixed engine gives **+0.0102
+±0.0038** — the same number. Its MECHANISM counters did move, in the predicted
+direction: damage +0.28 → +0.19 and mv_cheated +1.02 → +0.81, which is what
+losing the repeat casts looks like. So the inflation was real and it was not
+worth win rate; the row stands as measured. `results/candidates_lorehold2_0z38.txt`.
+
+**That is worth reading carefully rather than as good news.** "The counters
+moved and the objective did not" is the same shape as §0t and the top-setter
+finding: a mechanism can change materially while win rate does not notice. It
+does NOT mean the defect was harmless in general — it means this card's edge
+did not depend on it. A card that leaned harder on repeat casts would have
+moved.
 
 ### The fix, and why it is a function
 

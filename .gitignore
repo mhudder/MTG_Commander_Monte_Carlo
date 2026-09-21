@@ -59,6 +59,9 @@ results/baselines*.json
 # shell that chains them so a wait loop can tell a finished run from a
 # crashed one. Not a result.
 results/.slot_progress
+results/.fra_progress
+results/.b2_progress
+results/.fix_progress
 
 # run_karlov_fra.py / run_azusa_fra.py stage markers, written by the shell that
 # chains them. Not a result.
