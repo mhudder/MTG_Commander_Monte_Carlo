@@ -814,12 +814,18 @@ ordering is measured — that is the honest statement of it.
     clear — so staging the wrong one of two equal cards costs a second
     rebuild. One question to the owner, one rebuild. The other eleven
     `MEASURED` azusa rows still need their own cuts named.
-    **ON HOLD SINCE 2026-09-21 (§0z37), AND THE TIE IS THE REASON IT MATTERS.**
-    Nissa's ritual half is floating landfall mana, which `spend` pays with and
-    never consumes — and the Chocobo doubles landfall triggers, so it
-    multiplies the same broken mana. Both sides of a +0.0001 tie are measured
-    on the defect. Fix §0z37, then re-run the head-to-head; do not put the
-    question to the owner before that.
+    **ANSWERED 2026-09-21: THE TIE WAS §0z37 AND THE CHOCOBO WINS.** The
+    +0.0001 [−0.0039, +0.0041] that made these two equal was an artefact of
+    floating landfall mana never being consumed — **Nissa's ritual half WAS
+    that defect**. On the fixed engine, same N and seeds: the Chocobo swap is
+    **+0.0213 ±0.0029 / +0.0257 ±0.0042**, Nissa's is **+0.0157 / +0.0201**,
+    and the direct paired comparison in that one slot is **−0.0056 ±0.0029 at
+    T10 and −0.0056 ±0.0040 at T20 — significant at BOTH horizons, same sign,
+    same size**. Nissa lost ~0.0065 to the fix; the Chocobo lost ~0.0009.
+    **There is no question left to put to the owner: Traveling Chocobo is the
+    card for the Yavimaya slot.** The lesson is the one worth keeping — two
+    cards measured EQUAL by a harness that was paying one of them twice, and
+    no amount of extra sample size would have separated them.
 
 22. **ANSWERED: ONE OF KARLOV'S THREE NEGATIVE ROWS WAS THE §0j ARTEFACT, AND
     SWIFTFOOT BOOTS IS THE CUT** (§0z35, 2026-09-20). Decomposed against

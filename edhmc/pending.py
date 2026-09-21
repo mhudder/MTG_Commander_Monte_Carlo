@@ -1187,7 +1187,7 @@ MEASURED: list[Candidate] = [
             "deck is built to exploit -- a second doubler in a list holding "
             "Scute Swarm, Rampaging Baloths, Avenger and Greensleeves. "
             "SHORTLISTED 2026-09-14 for review, NOT decided. "
-            "READY TO STAGE as of 2026-09-20: the cut is the owner's choice "
+            "THE TIE IS BROKEN AND THIS CARD WON IT (2026-09-21, §0z37). The +0.0001 [-0.0039, +0.0041] that made these two EQUAL was an artefact of floating landfall mana never being consumed -- Nissa, Resurgent Animist's ritual half WAS that defect. Re-run on the fixed engine, same N and seeds: -Yavimaya Elder +Traveling Chocobo is +0.0213 +-0.0029 at T10 and +0.0257 +-0.0042 at T20; the same swap with Nissa is +0.0157 and +0.0201; and the direct paired comparison in that one slot is Chocobo -> Nissa -0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20, SIGNIFICANT AT BOTH HORIZONS with the same sign and size. Nissa lost ~0.0065 to the fix and this card lost ~0.0009. THE OWNER'S QUESTION NO LONGER NEEDS ASKING: this is the card for the slot. Originally: READY TO STAGE as of 2026-09-20: the cut is the owner's choice "
             "(2026-09-20) and the head-to-head is measured at both horizons. "
             "DELIBERATELY NOT STAGED YET, and the reason is compute rather "
             "than doubt: staging changes `build_pending('azusa')`, which is "
