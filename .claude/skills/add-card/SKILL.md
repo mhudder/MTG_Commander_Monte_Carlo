@@ -85,6 +85,13 @@ what it prints.
 
 ## 2. Review: which clauses can this engine see?
 
+> **This step is a REVIEW and not yet a GATE, and that is a known gap.**
+> `docs/TRIAGE.md` (queued item 23) proposes turning it into one, with a
+> verdict that can stop a card before any code is written — the cheapest kill
+> available, because implementation is what actually costs a session. Three
+> cards were scanned and discarded by hand on 2026-09-21 for exactly this
+> reason; doing it by hand is the thing the proposal replaces.
+
 Read the oracle text clause by clause and sort every clause into one of
 three bins. Write the sort down in the proposal's `implement` field; it is
 the card's classification later.

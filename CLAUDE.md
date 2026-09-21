@@ -841,6 +841,31 @@ ordering is measured — that is the honest statement of it.
     than a blank). Nothing is staged: the Boots are ONE slot that both cards
     want, and re-staging rewrites `build_pending("karlov")`.
 
+23. **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
+    OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is
+    the design**; nothing is implemented. The measured costs say the intuition
+    that "screening is expensive" is wrong in an instructive way: a candidate row
+    is ~152 CPU-seconds, a real swap is one `run_ab`, and the largest single
+    measurement spend of that session was **2.6 CPU-hours ranking cards that had
+    already been measured**. What actually costs a session is MAKING A CARD
+    BEHAVE LIKE ITS TEXT — so a screen that runs after implementation saves
+    nothing, and the economy is to screen ON PAPER FIRST and escalate N only for
+    survivors. Five tiers: paper (legal / already known / **can the engine SEE
+    it**), hook (does its text land on a hook that exists), smoke (implemented,
+    does its own counter fire, at N≈1000), value (the candidate row at N=15,000),
+    decision (the head-to-head). **Tier 0 is the biggest saver and two thirds of
+    it already exists** (`check_proposals`, `tools/card_known.py`); what is
+    missing is a visibility VERDICT with teeth, which the `add-card` skill
+    currently asks for as a review that cannot stop a card. **Tier 2 does not
+    exist and is nearly free**: a count has far lower variance than a win-rate
+    difference, which is why Sai's 0.155 Thopters a game was decidable at N=1000.
+    **Two things must NOT be economised** — the head-to-head (two withdrawn swaps
+    without it, and §0z36 found a staged cut wrong by +0.0147) and the
+    mutation-pinned test (§0z28's +0.0481 was really +0.0279). **And the screen
+    itself needs a test**: back-test it over every card this repo has already
+    measured, and it FAILS if it calls BLIND anything whose row was significant.
+    Triage predicts MEASURABILITY, not value.
+
 18. **`main_phase` IS GREEDY ON `priority` AND IT IS NOW THE WEAKEST LINK.**
     It casts the highest-priority affordable card and never asks whether doing
     so makes a BETTER card uncastable. §0z8 caught it red-handed: with both
