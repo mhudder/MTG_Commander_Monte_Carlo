@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `42015bb` from 20 engine sources.
+Derived at `cdbc6f7` from 20 engine sources.
 
-**113 knobs, 166 call sites.**
+**114 knobs, 167 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -31,7 +31,7 @@ costs a written justification.
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:2994` in `simulate()`
   - `10` at `edhmc/engine.py:2344` in `simulate()`
-  - `20` at `edhmc/karlov.py:1062` in `simulate()`
+  - `20` at `edhmc/karlov.py:1170` in `simulate()`
   - `10` at `edhmc/lorehold.py:1922` in `simulate()`
   - `10` at `edhmc/opponents.py:179` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1014` in `simulate()`
@@ -65,7 +65,7 @@ show up first.
 | `borrowed_knowledge_discard` | `True` | 1 | `edhmc/lorehold.py:975` | §0f | yes | yes |
 | `breach_cap` | `4` | 1 | `edhmc/lorehold.py:1483` |  | yes | **never** |
 | `charge_life_costs` | `True` | 3 | `edhmc/engine.py:981` | §0z7 | yes | yes |
-| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:802` | §0i | yes | yes |
+| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:897` | §0i | yes | yes |
 | `clamp_cap` | `4` | 1 | `edhmc/engine.py:2023` |  | **no** | **never** |
 | `clock_rearm` | `4` | 1 | `edhmc/opponents.py:1260` |  | **no** | **never** |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:159` |  | yes | yes |
@@ -93,6 +93,7 @@ show up first.
 | `first_wipe_turn` | `5` | 1 | `edhmc/opponents.py:366` |  | yes | **never** |
 | `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:1171` | §0u | yes | yes |
 | `flier_block_share` | `0.3` | 1 | `edhmc/opponents.py:675` |  | yes | yes |
+| `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:677` | §0z19 | yes | yes |
 | `goad_block_share` | `0.3` | 1 | `edhmc/opponents.py:593` |  | yes | **never** |
 | `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1516` |  | **no** | **never** |
 | `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1522` |  | **no** | **never** |
@@ -120,7 +121,7 @@ show up first.
 | `opp_creatures_per_turn` | `0.7` | 1 | `edhmc/karlov.py:518` |  | **no** | **never** |
 | `opp_death_rate` | `0.55` | 1 | `edhmc/engine.py:2132` | §0z20 | yes | yes |
 | `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:2011` | §0z7 | **no** | **never** |
-| `opp_land_plateau` | `8` | 1 | `edhmc/karlov.py:583` | §0z7 | **no** | **never** |
+| `opp_land_plateau` | `8` | 1 | `edhmc/karlov.py:585` | §0z7 | **no** | **never** |
 | `opp_spells_per_turn` | `1.2` | 1 | `edhmc/karlov.py:523` |  | **no** | **never** |
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
@@ -142,7 +143,7 @@ show up first.
 | `sieve_cap` | `10` | 1 | `edhmc/tivit.py:1027` |  | yes | **never** |
 | `sieve_taps` | `True` | 1 | `edhmc/tivit.py:1025` |  | yes | yes |
 | `springheart_hosts` | `<none>` | 1 | `edhmc/azusa.py:1247` |  | yes | yes |
-| `starting_life` | `40` | 4 | `edhmc/karlov.py:609` |  | **no** | yes |
+| `starting_life` | `40` | 4 | `edhmc/karlov.py:704` |  | **no** | yes |
 | `storm_herd_x` | `40` | 1 | `edhmc/lorehold.py:878` |  | yes | yes |
 | `surveil_land_floor` | `6` | 1 | `edhmc/lorehold.py:675` |  | **no** | **never** |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:983` | §0z7 | yes | **never** |
@@ -192,12 +193,12 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 113 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 114 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**34 of 113.** Not an error — most knobs are
+**34 of 114.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
@@ -206,7 +207,7 @@ docs knows they exist.
 
 ## The knobs nothing has ever set
 
-**42 of 113.** The name appears nowhere in
+**42 of 114.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;

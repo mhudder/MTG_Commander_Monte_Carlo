@@ -346,6 +346,7 @@ SCANNED = {
     'Ghost Quarter',
     'Ghostly Prison',
     'Giada, Font of Hope',
+    'Ginger, Queen of Sweets',
     'Gloomshrieker',
     'Godless Shrine',
     'Goldspan Dragon',

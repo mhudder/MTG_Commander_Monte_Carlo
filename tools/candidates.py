@@ -35,7 +35,8 @@ from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
                                    DARK_CONFIDANT,
-    BATCH_2026_09_16 as KARLOV_2026_09_16)
+    BATCH_2026_09_16 as KARLOV_2026_09_16,
+    BATCH_2026_09_22 as KARLOV_2026_09_22)
 
 # One place names an engine (§0z32); these are the names the batches use.
 rendmaw_sim = REGISTRY["rendmaw"].sim
@@ -225,6 +226,17 @@ DECKS = {
     "rendmaw2": ("RENDMAW", "rendmaw", rendmaw_sim, 20, "Pygmy Kavu",
                  RENDMAW_2026_09_16),
     # 2026-09-16 (§0z26). Soulmender is the slot karlov1 used.
+    # REALITY FRACTURE, 2026-09-22. THE VICTIM IS NOT SOULMENDER, which every
+    # earlier karlov batch used: `-Soulmender +Bloodthirsty Conqueror` is
+    # STAGED, so Soulmender is no longer in `build_pending("karlov")` and the
+    # old slot raises. Swiftfoot Boots is the right replacement rather than a
+    # convenient one -- item 22 established it as the named cut for karlov's
+    # next add (§0z35), it is MODEL-EVALUATED, and the two cards already
+    # measured against it (§0z36: Conqueror +0.0401, Archive +0.0168) make
+    # this row comparable with them instead of with a slot that no longer
+    # exists.
+    "karlov3": ("KARLOV", "karlov", karlov_sim, 20, "Swiftfoot Boots",
+                KARLOV_2026_09_22),
     "karlov2": ("KARLOV", "karlov", karlov_sim, 20, "Soulmender",
                 KARLOV_2026_09_16),
     # 2026-09-16 (§0z26). Pinnacle Monk is the slot lorehold/lorehold1 used.

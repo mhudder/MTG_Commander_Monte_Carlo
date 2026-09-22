@@ -662,6 +662,60 @@ COMMITTED: list[Change] = [
 # against anything else measured the same way (§0c).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = [
+    Candidate(
+        deck="karlov",
+        card="Ginger, Queen of Sweets",
+        measured="2026-09-22",
+        win_rate=("REAL SWAP -Swiftfoot Boots +Ginger, N=15,000 paired, same "
+                  "seeds both legs, base = build_pending('karlov'): "
+                  "+0.0052 +-0.0017 at T10 and +0.0186 +-0.0033 at T20, "
+                  "significant at BOTH. Candidate row against a blank in the "
+                  "same slot: +0.0059 +-0.0027 (results/candidates_karlov3.txt)."),
+        signal="both",
+        rationale=("The first card in this project to use the monarch "
+                   "(§0z39). Chosen for karlov over the stronger raw fit in "
+                   "tivit so the number could be ATTRIBUTED -- see the "
+                   "Proposal."),
+        evidence="results/karlov_ginger.txt, results/candidates_karlov3.txt",
+        limits=(
+            "A SIX-DROP FIRST AND A MONARCH CARD SECOND. P(resolves) is "
+            "0.152 -- one game in six, the Bolas's Citadel shape (14.4%) -- "
+            "and stranded_mv is +7.1, which is what a {6} costs a list that "
+            "curves lower. THE CROWN IS HELD 1.03 TURNS conditional on "
+            "resolving, exactly as §0z39 predicted for a card that arrives "
+            "late: first_attack_turn is 3, so a card cast on turn 6 gets none "
+            "of the free window that made monarch_start look like +0.10. The "
+            "TOKENS are the bigger half: 2.96 Gingerbrutes per resolution "
+            "against 1.03 monarch draws. "
+            "FLOOR, two clauses: the Gingerbrute's '{1}: can't be blocked "
+            "except by creatures with haste' is blind (§4 -- the opponents' "
+            "blockers are a count with no haste to check), and Ginger's own "
+            "'{2},{T}, Sacrifice: gain 6 life' is a deliberate policy "
+            "omission. CEILING, one: the pod's three upkeeps are taken before "
+            "pod_phase can take the crown, so the token count is generous by "
+            "at most two in the round it changes hands. "
+            "AND THE SACRIFICE CLAUSE NEVER FIRES -- gingerbrute_sacs is "
+            "0.0000, not near zero. It is implemented and correct: a "
+            "Gingerbrute has HASTE, so `combat` attacks with it the turn it "
+            "arrives and taps it, and a tapped token cannot pay the {T} in "
+            "its own sacrifice cost. That is the rules, but it is also the "
+            "engine's attack-with-everything POLICY deciding the card's "
+            "second channel is worth nothing, which is the shape of all four "
+            "rows in CLAUDE.md's policy table. `gingerbrute_keep` therefore "
+            "does nothing at any setting and was not swept."),
+        verdict=(
+            "A REAL CARD THAT LOSES ITS SLOT, and both halves are measured. "
+            "Against the cut item 22 established it is +0.0186 +-0.0033 at "
+            "T20, level with Alhammarret's Archive (+0.0168 +-0.0030, the "
+            "same cut and the same staged baseline) and well below "
+            "Bloodthirsty Conqueror (+0.0401 +-0.0037, measured on the "
+            "pre-swap list). The ranking does not rest on comparing those "
+            "three numbers, which §0c forbids: Conqueror -> Ginger IN THE "
+            "SAME SLOT, paired on the same seeds, is -0.0247 +-0.0029 at T10 "
+            "and -0.0210 +-0.0034 at T20, significant at both and the same "
+            "size both times. The Boots are ONE slot and the Conqueror wants "
+            "it more. NOT STAGED, and not because of doubt."),
+    ),
     # ---- 2026-09-16, the §0z26 batch. Ten proposals implemented and measured
     # at N=15,000 paired, T20, each in its own deck's established victim slot
     # (tivit's is a basic Plains -- see tools/candidates.py for why).
@@ -1972,6 +2026,61 @@ WITHDRAWN: list[Change] = [
 # why that check exists.
 # ---------------------------------------------------------------------------
 PROPOSED: list[Proposal] = [
+    Proposal(
+        deck="karlov",
+        card="Ginger, Queen of Sweets",
+        cost="{6}",
+        identity="",
+        type_line="Legendary Artifact Creature — Food Noble",
+        oracle=("When Ginger enters, you become the monarch.\n"
+                "{2}, {T}, Sacrifice Ginger: You gain 6 life.\n"
+                "At the beginning of each upkeep, if you're the monarch, "
+                "create a Gingerbrute token. (It's a {1} 1/1 Food Golem "
+                "artifact creature with haste, \"{1}: This token can't be "
+                "blocked this turn except by creatures with haste,\" and "
+                "\"{2}, {T}, Sacrifice this token: You gain 3 life.\")"),
+        verified="2026-09-22",
+        rationale=(
+            "THE FIRST CARD IN THIS PROJECT THAT USES THE MONARCH, which "
+            "§0z39 built and pinned before any card asked for it. Colour "
+            "identity is EMPTY, so it is legal in all six lists and the deck "
+            "is a choice rather than a constraint. It is proposed for karlov "
+            "and NOT for tivit, which is the stronger raw fit -- there "
+            "Gingerbrute is a FOOD, so it would trigger Academy Manufactor, "
+            "be doubled by the staged Anointed Procession and feed Time Sieve "
+            "(§0m) -- precisely because that is three interactions at once "
+            "and §0z27 showed what redundancy does to a row: nobody could "
+            "attribute the number to this card. In karlov the value "
+            "decomposes into three things the engine measures separately: the "
+            "crown's card at your end step, 1/1 HASTE bodies in a deck §0v "
+            "made width worth something to, and a lifegain EVENT per "
+            "Gingerbrute sacrificed -- events being what this deck's payoffs "
+            "actually count. Every Gingerbrute entering is also a creature "
+            "entering, which the soul sisters read."),
+        implement=(
+            "DONE 2026-09-22. Four hooks, none of them new machinery: the ETB "
+            "calls opponents.become_monarch (§0z39, one implementation for "
+            "all six engines); karlov.gingerbrute_tokens(g, n) runs at your "
+            "upkeep with 1 and before pod_phase with 3, which is "
+            "azusa.verdant_kraken_tokens' shape for 'each player's upkeep' "
+            "rather than a second spelling of it (§0u); the token is built "
+            "directly rather than through Game.make_tokens because HASTE "
+            "needs sick=False and that helper forces sick=True, and widening "
+            "its signature would put two cards on one hook (§0z28); "
+            "gingerbrute_sacrifices runs at end step on spare mana, keyed to "
+            "the gingerbrute_keep knob, routed through gain_life and "
+            "on_creature_death. Counters: gingerbrutes_made, "
+            "gingerbrute_sacs. Pinned by tests/test_ginger.py. Classified "
+            "PARTLY MODELLED -- the token's unblockable activation is blind "
+            "(§4: no blockers to check for haste) and Ginger's own sacrifice "
+            "is a deliberate policy omission."),
+        rejected=("MEASURED 2026-09-22 and PROMOTED: the real swap "
+                  "-Swiftfoot Boots +Ginger is +0.0186 +-0.0033 at T20, and "
+                  "Conqueror -> Ginger in that same slot is -0.0210 +-0.0034, "
+                  "so the card is real and loses the slot. See the Candidate "
+                  "entry; this Proposal is closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
     # -----------------------------------------------------------------------
     # REALITY FRACTURE (Scryfall `fra`), scanned 2026-09-20. THE SET IS NOT
     # OUT -- it releases 2026-10-02, 372 of its 564 printings are spoiled, and
@@ -2420,7 +2529,10 @@ DECKS = {
         "Bolas's Citadel": karlov_v2.BOLASS_CITADEL,
         # REALITY FRACTURE, 2026-09-20 (preview text; releases 2026-10-02).
         "Liliana the Faultless": karlov_v2.LILIANA_THE_FAULTLESS,
-        "Edgar, Ancient Bloodlord": karlov_v2.EDGAR_ANCIENT_BLOODLORD}),
+        "Edgar, Ancient Bloodlord": karlov_v2.EDGAR_ANCIENT_BLOODLORD,
+        # REALITY FRACTURE, 2026-09-22 -- the first card in this project that
+        # uses the monarch (§0z39).
+        "Ginger, Queen of Sweets": karlov_v2.GINGER_QUEEN_OF_SWEETS}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {

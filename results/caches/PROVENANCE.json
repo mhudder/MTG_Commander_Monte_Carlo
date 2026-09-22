@@ -116,6 +116,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "c9d79719aca531a0",
         "utc": "2026-09-22T12:42:29Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "b40e6515a34b4786",
+        "utc": "2026-09-22T13:52:18Z"
       }
     ]
   },
@@ -196,6 +202,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "3e94ec578383db0f",
         "utc": "2026-09-22T12:42:29Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "b20ff0857028d7aa",
+        "utc": "2026-09-22T13:52:17Z"
       }
     ]
   },
@@ -294,6 +306,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "7e78455246d1dab7",
         "utc": "2026-09-22T12:42:29Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "3d95812a89032afd",
+        "utc": "2026-09-22T13:52:17Z"
       }
     ]
   },
@@ -396,6 +414,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "7ff79bec55f3d319",
         "utc": "2026-09-22T12:42:28Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "7ccd712cf9c306e9",
+        "utc": "2026-09-22T13:52:17Z"
       }
     ]
   },
@@ -498,6 +522,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "0d5ed61d458db87f",
         "utc": "2026-09-22T12:42:29Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "bee1cc26dda86843",
+        "utc": "2026-09-22T13:52:17Z"
       }
     ]
   },
@@ -588,6 +618,12 @@
         "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "fb263bb66c8cf690",
         "utc": "2026-09-22T12:42:29Z"
+      },
+      {
+        "commit": "cdbc6f7",
+        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+        "fingerprint": "ce45648ab40532e9",
+        "utc": "2026-09-22T13:52:17Z"
       }
     ]
   }

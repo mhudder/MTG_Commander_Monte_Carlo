@@ -549,6 +549,8 @@ def upkeep(g):
         if g.your_life <= 0 and g.result is None:
             g.result = "loss"
             return
+    # GINGER: your own upkeep is one of the four "each upkeep" triggers.
+    gingerbrute_tokens(g, 1)
     if g.has("Ajani's Mantra"):
         gain_life(g, 1)
     if g.has("Fountain of Renewal"):
@@ -597,6 +599,99 @@ def upkeep(g):
         g.m["damage"] += OPP.damage_single(g, 50)
         if g.result is None and len(OPP.living(g)) == 0:
             g.m["win_route"] = 4
+
+
+def ginger_etb(g):
+    """Ginger, Queen of Sweets: "When Ginger enters, you become the monarch."
+
+    A one-line function rather than the call inline in `resolve`, for §0z38's
+    reason: a mutation has to be able to switch off THIS rule alone. Patching
+    `opponents.become_monarch` instead disables the crown for the whole test
+    file -- which is what the first version of `tests/test_ginger.py` did,
+    breaking eight cases where it meant to break one.
+
+    The crown itself stays in `opponents.py`: one implementation for all six
+    engines (§0z39), never a karlov copy of it.
+    """
+    OPP.become_monarch(g)
+
+
+def gingerbrute_tokens(g, upkeeps: int):
+    """Ginger, Queen of Sweets: "At the beginning of EACH upkeep, if you're the
+    monarch, create a Gingerbrute token."  Preview text, Scryfall, 2026-09-22.
+
+    EACH UPKEEP IS THE CARD. One a round is a 1/1; four is an engine, and in
+    THIS deck the body is not even the point -- every Gingerbrute entering is a
+    creature entering, which `creature_entered` turns into a soul-sister
+    lifegain EVENT, and events are what this deck's payoffs count. `upkeeps` is
+    how many this call stands for: 1 for yours in `upkeep()`, 3 for the pod's,
+    taken where the pod's round is modelled. That is `azusa.verdant_kraken_
+    tokens`' shape deliberately, rather than a second spelling of it (§0u).
+
+    HASTE IS A REAL CLAUSE, not flavour: the token enters `sick=False` and can
+    attack the turn it arrives, which is why this is built here instead of
+    through `Game.make_tokens` -- that helper forces `sick=True` and types the
+    token as a bare Creature, and widening its signature would put two cards on
+    one hook (§0z28).
+
+    WHAT IS OVERSTATED, named rather than hidden: an opponent's upkeep is not a
+    real step in this engine -- the pod is one block at the end of your turn
+    (§0z30) -- so the pod's three tokens are taken while you still hold the
+    crown, before `pod_phase` can take it off you. At a table the crown passes
+    partway through the round and the opponents who act after that point make
+    no token. The count is therefore a CEILING by however many opponents act
+    after the one who takes it, which is at most two tokens in the one round
+    the crown changes hands.
+    """
+    if not g.monarch or g.result is not None:
+        return
+    for _ in range(int(upkeeps) * g.count("Ginger, Queen of Sweets")):
+        tok = Card(name="Gingerbrute token",
+                   types=frozenset({"Creature", "Artifact"}),
+                   power=1, toughness=1)
+        perm = Permanent(card=tok, sick=False, is_token=True)   # haste
+        g.board.append(perm)
+        g.m["gingerbrutes_made"] += 1
+        creature_entered(g, mine=True, entering=perm)
+
+
+def gingerbrute_sacrifices(g):
+    """Gingerbrute: "{2}, {T}, Sacrifice this token: You gain 3 life."
+
+    Taken at end of turn with mana the main phases did not want, and only down
+    to `gingerbrute_keep` bodies -- a Gingerbrute is a 1/1 HASTE attacker and
+    §0v made width worth something, so converting every one of them to life
+    would be the policy error this project keeps paying for (the table in
+    CLAUDE.md: four separate conservatisms that each asserted a card does
+    nothing). The knob is said out loud and has NOT been swept.
+
+    Three life is small; the EVENT is not, in a deck whose payoffs count
+    lifegain triggers rather than life, so this routes through `gain_life`
+    like every other event. The sacrifice is a DEATH and calls
+    `on_creature_death`, which is where Edgar's trigger reads it.
+
+    The pool is recomputed every iteration (§0z19): `gain_life` can cascade
+    into effects that move the board, so a list taken once and indexed into
+    would be a snapshot of a live zone.
+    """
+    keep = int(g.cfg.get("gingerbrute_keep", 2))
+    while g.result is None:
+        brutes = [p for p in g.board
+                  if p.card.name == "Gingerbrute token" and not p.tapped]
+        if len(brutes) <= keep:
+            return
+        units = available_mana(g)
+        idx = can_pay({"gen": 2}, units)
+        if idx is None:
+            return
+        spend_lg(g, idx, units)
+        g.m["mana_spent"] += 2
+        victim = brutes[0]
+        if victim in g.board:
+            g.board.remove(victim)
+            g.m["gingerbrute_sacs"] += 1
+            g.on_creature_death(1, victim)
+            gain_life(g, 3)
 
 
 def end_step(g):
@@ -913,6 +1008,8 @@ def resolve(g, card):
         g.board.append(perm)
         if is_creature_now(g, card):
             creature_entered(g, mine=True, entering=perm)
+        if card.script == "ginger":
+            ginger_etb(g)
         # Offspring {2}{B}: an additional cost paid as you cast, which creates a
         # 1/1 token copy on ETB. The copy has the same lifegain trigger, so it
         # carries the same name here and gain_life() counts both.
@@ -1044,6 +1141,17 @@ def take_turn(g):
     end_step(g)
     if g.result is not None:
         return
+
+    # GINGER: spare Gingerbrutes become life with mana nothing else wanted.
+    # Before the floated-mana metric, because that metric measures what was
+    # LEFT unspent and this is a real use for it.
+    gingerbrute_sacrifices(g)
+    if g.result is not None:
+        return
+    # GINGER: the pod's three upkeeps. Taken here, where the pod's round is,
+    # and BEFORE pod_phase can take the crown -- see gingerbrute_tokens for
+    # why that makes the count a ceiling.
+    gingerbrute_tokens(g, 3)
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)

@@ -529,6 +529,26 @@ SCRIPTED_AZUSA = {
 # carries its own caveat to whoever reads it next.
 PARTLY_MODELLED = {
     "karlov": {
+        "Ginger, Queen of Sweets":
+            "Two clauses of three are modelled and the third is a POLICY "
+            "omission rather than a gap. MODELLED: the ETB crown "
+            "(opponents.become_monarch), the Gingerbrute at each of the four "
+            "upkeeps while you hold it, the token's HASTE, and its "
+            "'{2}, {T}, Sacrifice: gain 3 life' -- which in this deck is a "
+            "lifegain EVENT and not merely three life. NOT MODELLED, and "
+            "named: (1) the Gingerbrute's '{1}: can't be blocked except by "
+            "creatures with haste', because the opponents' blockers are an "
+            "abstract count and there is no haste among them to check (§4) -- "
+            "so an evasive attacker is scored as a ground one; and (2) "
+            "Ginger's OWN '{2}, {T}, Sacrifice Ginger: you gain 6 life', "
+            "deliberately unimplemented because a pilot who sacrifices her "
+            "ends the token engine and the crown that feeds it, and a greedy "
+            "sacrifice policy is the exact shape of the four conservatisms in "
+            "CLAUDE.md's policy table. Both make the row a FLOOR. And the "
+            "pod's three upkeeps are taken before pod_phase can take the "
+            "crown, which makes the TOKEN COUNT a ceiling by at most two in "
+            "the round it changes hands -- so the row is bounded on both "
+            "sides and neither bound is tight.",
         "Bloodthirsty Conqueror":
             "Its text -- 'whenever an opponent loses life, you gain that much "
             "life' -- is WORD FOR WORD Exquisite Blood's, and this engine "

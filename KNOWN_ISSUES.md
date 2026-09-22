@@ -88,6 +88,7 @@ Methodology that used to live at the end of this file is now
 | [0z37](#0z37) | FIXED | **Floating landfall mana was paid with and never consumed** — `engine.spend` consumes a unit by tapping its owner and azusa's Lotus Cobra / Tireless Provisioner / Nissa mana had none, so one trigger funded every spell that turn. Worth **−0.0201 ±0.0036 win rate at T20** on azusa's baseline, 741 of 15,000 seeds ending differently: the second-largest baseline correction after §0z30. Fixed by giving the mana an owner (`FloatingMana`) rather than a fourth spelling of deduct-at-the-call-site |
 | [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
 | [0z39](#0z39) | MEASURED | **The monarch is implemented. The +0.10 it first measured was the HARNESS**: `monarch_start` grants the crown on turn 1 and `first_attack_turn` is 3, so two of its three held turns were immunity no card can buy. Granted when a card could arrive it is +0.02 to +0.04. The owner's attack-threat correction is in (a FLOOR on `combat_share`, which deters a wide board and should not for the monarch) and does NOT counterbalance -- tripling the share costs 0.002. The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
+| [0z40](#0z40) | MEASURED | **Ginger, Queen of Sweets: the first card to use the monarch, and it behaves like a six-drop.** The real swap against the cut item 22 named is **+0.0186 ±0.0033 at T20**, level with Alhammarret's Archive and well under Bloodthirsty Conqueror — and Conqueror → Ginger IN THE SAME SLOT is **−0.0210 ±0.0034**, so the ranking is measured and not inferred. P(resolves) 0.152, the crown held 1.03 turns, 2.96 Gingerbrutes a resolution. **The sacrifice clause fires 0.0000 times and is correctly implemented**: haste means combat taps the token before its own `{T}` cost can be paid |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6082,6 +6083,92 @@ What is far outside the noise is turn 1 against everything after it.
    table above is the opponents drawing cards, which is §4 again.
 3. Ginger, Queen of Sweets still needs its oracle text verified on release
    (Reality Fracture, 2026-10-02); nothing in this section depends on that card.
+
+## 0z40. MEASURED — Ginger, Queen of Sweets: a six-drop first, a monarch card second
+
+The first card in this project that uses the monarch, imported on 2026-09-22
+against the mechanism §0z39 had already built and pinned. Preview text
+(Scryfall, set `frc`, releases 2026-10-02), so every number here is provisional
+on the text not changing.
+
+### Why karlov, when the colour identity is empty
+
+Ginger is colourless and legal in all six lists, so the deck was a choice. It
+is NOT in tivit, which is the stronger raw fit and is the reason: a Gingerbrute
+is a **Food**, so in tivit it would trigger Academy Manufactor, be doubled by
+the staged Anointed Procession and feed Time Sieve (§0m) — three interactions
+at once, and §0z27 is the finding that redundancy rewrites every row around it.
+The number would have been larger and unattributable. In karlov it decomposes
+into things the engine counts separately: the crown's card, 1/1 haste bodies
+(§0v made width worth something), and a lifegain EVENT per sacrifice.
+
+### The numbers
+
+Real swap `-Swiftfoot Boots +Ginger`, N=15,000 paired, same seeds, base =
+`build_pending("karlov")`:
+
+| | T10 | T20 |
+|---|---|---|
+| **win rate** | **+0.0052 ±0.0017** | **+0.0186 ±0.0033** |
+| damage | +1.51 | +1.48 |
+| lifegain_triggers | +0.70 | +0.67 |
+| stranded_mv | +7.35 | +7.13 |
+
+Candidate row against a blank in the same slot: +0.0059 ±0.0027.
+
+**AND THE RANKING, which §0c says a common baseline cannot give.** Bloodthirsty
+Conqueror → Ginger in that one slot, paired on the same seeds, built the way
+§0z36 built the Conqueror's own +0.0401 (Soulmender restored to get the
+pre-swap list): **−0.0247 ±0.0029 at T10 and −0.0210 ±0.0034 at T20**,
+significant at both and the same size both times. That is consistent with the
+two standalone figures (+0.0401 against ~+0.019) without relying on
+subtracting them. **The Boots are one slot and the Conqueror wants it more.**
+
+### The mechanism, which is where the card actually is
+
+P(Ginger resolves) is **0.152** — one game in six, the Bolas's Citadel shape
+(14.4%) — and `stranded_mv` +7.1 is what a `{6}` costs a list that curves
+lower. Conditional on resolving: **2.96 Gingerbrutes, 1.03 monarch turns, 1.03
+monarch draws.**
+
+**The crown is held ONE turn, which is §0z39's prediction arriving on a real
+card.** `first_attack_turn` is 3, so a card cast around turn 6 gets none of the
+free early window that made `monarch_start` measure +0.10. The tokens are the
+bigger half of this card, not the crown.
+
+### The sacrifice clause fires ZERO times, and it is correct
+
+`gingerbrute_sacs` is **0.0000** — not near zero, zero. The ability is
+implemented and the implementation is right: a Gingerbrute has **haste**, so
+`karlov.combat` attacks with it the turn it arrives and sets `tapped = True`,
+and a tapped token cannot pay the `{T}` in its own sacrifice cost. The rules
+agree.
+
+**But read what decided it.** The engine attacks with everything it has, and
+that POLICY is what makes the card's second channel worth nothing — the same
+shape as all four rows in CLAUDE.md's policy table, where a piloting decision
+written as conservatism amounted to asserting a card does nothing. Here the
+policy is aggression rather than conservatism and the effect is identical. A
+pilot who held one Gingerbrute back would convert it to a lifegain event in a
+deck whose payoffs count events. `gingerbrute_keep` therefore does nothing at
+any setting and was NOT swept, because there is nothing for it to decide.
+
+### What the row is bounded by, in both directions
+
+**FLOOR** — two clauses unmodelled. The Gingerbrute's `{1}: can't be blocked
+except by creatures with haste` is blind (§4: the opponents' blockers are an
+abstract count with no haste to check), so an evasive attacker scores as a
+ground one. Ginger's own `{2}, {T}, Sacrifice: gain 6 life` is a deliberate
+policy omission — a pilot who sacrifices her ends the engine and the crown that
+feeds it.
+
+**CEILING** — the pod's three upkeeps are taken before `pod_phase` can take the
+crown, because an opponent's upkeep is not a real step in this engine (§0z30).
+At a table the crown passes partway through the round and the opponents who act
+after that make no token. Generous by at most two tokens in the one round the
+crown changes hands.
+
+Neither bound is tight, and the card is not staged.
 
 ## How to read an ablation table
 

@@ -1,0 +1,4 @@
+
+KARLOV candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  Ginger, Queen of Sweets        6     +0.97+-0.12     +0.0059+-0.0027      0.156

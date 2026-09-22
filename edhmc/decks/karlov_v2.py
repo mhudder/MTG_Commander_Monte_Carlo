@@ -357,3 +357,28 @@ ALHAMMARRETS_ARCHIVE = C("Alhammarret's Archive", "Artifact", {"gen": 5},
                          priority=7.0, threat=4.0)
 
 BATCH_2026_09_16 = (BLOODTHIRSTY_CONQUEROR, ALHAMMARRETS_ARCHIVE)
+
+# REALITY FRACTURE (Scryfall `frc`), 2026-09-22. PREVIEW TEXT -- the set
+# releases 2026-10-02 and the text can change; re-run `audit_cards` after.
+#
+# GINGER, QUEEN OF SWEETS  {6}  6/4  Legendary Artifact Creature - Food Noble
+#   "When Ginger enters, you become the monarch."
+#   "{2}, {T}, Sacrifice Ginger: You gain 6 life."
+#   "At the beginning of each upkeep, if you're the monarch, create a
+#    Gingerbrute token."  (a {1} 1/1 Food Golem artifact creature with haste,
+#    "{1}: This token can't be blocked this turn except by creatures with
+#    haste," and "{2}, {T}, Sacrifice this token: You gain 3 life.")
+#
+# COLOUR IDENTITY IS EMPTY, so this card is legal in all six lists. It is
+# here rather than in tivit -- the strongest raw fit, where Gingerbrute is a
+# FOOD and would trigger Academy Manufactor, be doubled by the staged Anointed
+# Procession and feed Time Sieve (§0m) -- precisely BECAUSE of that: three
+# interactions at once is a number nobody can attribute to this card (§0z27
+# on what redundancy does to a row). In karlov its value decomposes: the
+# crown, bodies that attack (§0v rewards width), and a lifegain EVENT per
+# sacrifice, which is the payoff this whole deck counts.
+GINGER_QUEEN_OF_SWEETS = C("Ginger, Queen of Sweets", "Artifact/Creature",
+                           {"gen": 6}, 6, 4, script="ginger",
+                           priority=8.0, threat=7.5)
+
+BATCH_2026_09_22 = (GINGER_QUEEN_OF_SWEETS,)

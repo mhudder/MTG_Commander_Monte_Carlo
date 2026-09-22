@@ -1,0 +1,69 @@
+karlov x Ginger, Queen of Sweets. N=15,000 paired, same seeds both legs, base = build_pending('karlov').
+
+  1. -Swiftfoot Boots +Ginger, Queen of Sweets, the real swap against the live staged list.
+     Compare: Bloodthirsty Conqueror +0.0401 and Alhammarret's Archive +0.0168 on this same cut (§0z36).
+  2. Bloodthirsty Conqueror -> Ginger, Queen of Sweets in the Swiftfoot Boots slot, on the PRE-SWAP list (Soulmender restored),
+     built as §0z36 built the Conqueror's +0.0401. POSITIVE = Ginger, Queen of Sweets is the better card for that slot.
+
+  real-swap  T10  (72s)   A-leg won 0.1575   P(Ginger resolves) 0.092
+    won                   +0.0052  [ +0.0035,  +0.0069] *
+    damage                +0.7667  [ +0.6534,  +0.8852] *
+    lifegain_triggers     +0.3397  [ +0.3003,  +0.3785] *
+    life_gained           +0.3539  [ +0.1403,  +0.5623] *
+    cards_drawn           +0.0798  [ +0.0682,  +0.0907] *
+    gingerbrutes_made     +0.2757  [ +0.2612,  +0.2901] *
+    gingerbrute_sacs      +0.0000  [ +0.0000,  +0.0000]  
+    monarch_turns         +0.0957  [ +0.0906,  +0.1009] *
+    monarch_draws         +0.0957  [ +0.0906,  +0.1007] *
+    monarch_lost          +0.0877  [ +0.0831,  +0.0921] *
+    stranded_mv           +5.5625  [ +5.3155,  +5.7971] *
+    CONDITIONAL on resolving: gingerbrutes_made=2.99  gingerbrute_sacs=0.00  monarch_turns=1.04  monarch_draws=1.04
+
+  vs-the-rival  T10  (73s)   A-leg won 0.1603   P(Ginger resolves) 0.096
+    won                   -0.0247  [ -0.0276,  -0.0219] *
+    damage                +1.4869  [ +1.3214,  +1.6526] *
+    lifegain_triggers     +0.5200  [ +0.4779,  +0.5633] *
+    life_gained           +1.4768  [ +1.2575,  +1.6951] *
+    cards_drawn           +0.2066  [ +0.1907,  +0.2224] *
+    gingerbrutes_made     +0.2867  [ +0.2721,  +0.3013] *
+    gingerbrute_sacs      +0.0000  [ +0.0000,  +0.0000]  
+    monarch_turns         +0.0997  [ +0.0945,  +0.1049] *
+    monarch_draws         +0.0997  [ +0.0945,  +0.1048] *
+    monarch_lost          +0.0912  [ +0.0865,  +0.0959] *
+    stranded_mv           +2.4655  [ +2.3131,  +2.6202] *
+    CONDITIONAL on resolving: gingerbrutes_made=2.99  gingerbrute_sacs=0.00  monarch_turns=1.04  monarch_draws=1.04
+
+  vs-the-rival  T20  (97s)   A-leg won 0.4049   P(Ginger resolves) 0.159
+    won                   -0.0210  [ -0.0244,  -0.0175] *
+    damage                +3.1643  [ +2.9320,  +3.4027] *
+    lifegain_triggers     +1.1289  [ +1.0510,  +1.2090] *
+    life_gained           +3.7675  [ +3.3516,  +4.2150] *
+    cards_drawn           +0.4262  [ +0.3889,  +0.4650] *
+    gingerbrutes_made     +0.4689  [ +0.4505,  +0.4878] *
+    gingerbrute_sacs      +0.0000  [ +0.0000,  +0.0000]  
+    monarch_turns         +0.1633  [ +0.1566,  +0.1699] *
+    monarch_draws         +0.1633  [ +0.1565,  +0.1695] *
+    monarch_lost          +0.1484  [ +0.1426,  +0.1541] *
+    stranded_mv           +4.1831  [ +3.8999,  +4.4733] *
+    CONDITIONAL on resolving: gingerbrutes_made=2.95  gingerbrute_sacs=0.00  monarch_turns=1.03  monarch_draws=1.03
+
+  real-swap  T20  (97s)   A-leg won 0.3924   P(Ginger resolves) 0.152
+    won                   +0.0186  [ +0.0153,  +0.0219] *
+    damage                +1.4824  [ +1.3155,  +1.6447] *
+    lifegain_triggers     +0.6719  [ +0.6048,  +0.7404] *
+    life_gained           +0.8343  [ +0.3685,  +1.3230] *
+    cards_drawn           +0.0439  [ +0.0126,  +0.0756] *
+    gingerbrutes_made     +0.4493  [ +0.4316,  +0.4671] *
+    gingerbrute_sacs      +0.0000  [ +0.0000,  +0.0000]  
+    monarch_turns         +0.1562  [ +0.1497,  +0.1627] *
+    monarch_draws         +0.1562  [ +0.1495,  +0.1625] *
+    monarch_lost          +0.1421  [ +0.1365,  +0.1477] *
+    stranded_mv           +7.1268  [ +6.7880,  +7.4597] *
+    CONDITIONAL on resolving: gingerbrutes_made=2.96  gingerbrute_sacs=0.00  monarch_turns=1.03  monarch_draws=1.03
+
+==============================================================================
+SUMMARY: win rate, paired
+==============================================================================
+run                                            win T10             win T20
+real-swap                           +0.0052 +-0.0017 *  +0.0186 +-0.0033 *
+vs-the-rival                        -0.0247 +-0.0029 *  -0.0210 +-0.0034 *
