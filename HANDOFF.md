@@ -111,22 +111,23 @@ don't chase them.
 
 ## What "staged" and "committed" mean here
 
-A card swap goes through three states:
+**The states are defined in ONE place: `docs/LEDGER_STATES.md`.** This section
+used to enumerate them and it rotted in the predicted shape — it opened "a card
+swap goes through three states" and never mentioned `PROPOSED`, which landed
+2026-09-16. `check_docs` now fails if that file omits a state the ledger
+implements. Read it for the vocabulary; what follows is what is true of the two
+ends of it, which is what a newcomer needs first.
 
-1. **Measured** — an A/B run produced a confidence interval on win rate (the
-   objective) and a couple of proxy metrics (damage, card draw). Recorded in
-   `edhmc/pending.py`'s `MEASURED` list as a `Candidate`, which names **no
-   cut**: choosing one is the decision this state has not taken. Before
-   2026-09-10 this state lived only in comments.
-2. **Staged** — recorded in `edhmc/pending.py`'s `CHANGES` list. The deck
-   module does NOT yet reflect it; `python -m edhmc.pending` is the only
-   trustworthy statement of what's currently staged. A hand-written summary
-   of it drifted badly enough to be archived — `docs/archive/DECK_CHANGES.md`
-   — which is why the ledger is read by a command and never transcribed.
-3. **Committed** — applied to all three legs at once: the deck module, the
-   `.xlsx`, and `pending.py`'s `COMMITTED` list. A change is not considered
-   done until all three move together. Azusa has no `.xlsx`, so it is two
-   legs and its module is the system of record.
+**Staged** is recorded in `edhmc/pending.py`'s `CHANGES` list. The deck module
+does NOT yet reflect it; `python -m edhmc.pending` is the only trustworthy
+statement of what's currently staged. A hand-written summary of it drifted
+badly enough to be archived — `docs/archive/DECK_CHANGES.md` — which is why the
+ledger is read by a command and never transcribed.
+
+**Committed** is applied to all three legs at once: the deck module, the
+`.xlsx`, and `pending.py`'s `COMMITTED` list. A change is not considered done
+until all three move together. Azusa has no `.xlsx`, so it is two legs and its
+module is the system of record.
 
 **Measured does not become staged by being good.** It becomes staged by a
 head-to-head against a specific cut, because everything in `MEASURED` shares
@@ -144,8 +145,9 @@ because the Rendmaw swap had moved to `WITHDRAWN` and two more Azusa batches
 had been measured.
 
 A swap can also be **withdrawn** — staged, then unstaged, with the entry kept
-rather than deleted, because the entry is where the evidence lives. That is a
-fourth state and `edhmc/pending.py` documents it.
+rather than deleted, because the entry is where the evidence lives.
+`docs/LEDGER_STATES.md` places it among the rest, and `edhmc/pending.py`
+documents it.
 
 The general lesson, which is the third time this project has paid for it: **a
 re-verification is only as current as the engine it ran on.** Each of these

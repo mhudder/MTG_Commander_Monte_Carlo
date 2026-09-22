@@ -5,9 +5,9 @@ naming half of `docs/TRIAGE.md` — that file designs the *screen*, this one
 designs the *states a card passes through and the states it dies in*.
 CLAUDE.md queued item 23 is the live pointer for both.
 
-**One thing here is an inference and is flagged rather than assumed:** the
-split of today's STAGED into SIMULATED + STAGED (§ "The split that is new").
-Everything else is the owner's vocabulary, written out.
+The vocabulary is the owner's, written out. The one part of it that was an
+inference — splitting today's STAGED into SIMULATED + STAGED — **was put to
+the owner and confirmed on 2026-09-22.**
 
 ---
 
@@ -91,7 +91,7 @@ Those are two different things and only one of them is a state:
 A card can be TRIAGED for months without ever becoming PREPARED. That is the
 parked queue, and it is the thing the funnel is for.
 
-### The split that is new — and it is an inference
+### The split that is new — confirmed 2026-09-22
 
 Today, `Change` conflates two claims: *we ran a head-to-head against a named
 cut* (evidence) and *we have decided to put this in* (decision). Splitting
@@ -100,9 +100,11 @@ will earn a head-to-head and lose it, and today there is nowhere to record a
 head-to-head that did not result in a staging — the two azusa Reality
 Fracture cards of 2026-09-20 are exactly that shape.
 
-**This split is my reading of the owner's six states, not something stated.**
-If STAGED is meant to keep carrying its own evidence, say so and this file
-collapses back to five.
+**CONFIRMED by the owner, 2026-09-22.** SIMULATED carries the head-to-head
+evidence; STAGED carries the decision that acts on it. The consequence to
+implement is that `Change` stops being one record: a head-to-head that did not
+stage is a SIMULATED record with no STAGED partner, and that is a legal,
+recordable outcome rather than a gap.
 
 ---
 

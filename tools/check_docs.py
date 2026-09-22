@@ -291,6 +291,55 @@ def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
                   not bad, "; ".join(bad))
 
 
+LEDGER_STATES = os.path.join("docs", "LEDGER_STATES.md")
+
+# `edhmc/pending.py` names its lists after the state they hold, with ONE
+# historical exception: the STAGED list is called `CHANGES`. That exception is
+# the only hand-written part of the derivation below, and it is written here
+# rather than inferred so that §0z15 applies -- an exemption is a blind spot,
+# and this one is blind to a future list whose name is not its state either.
+LEDGER_LIST_STATE = {"CHANGES": "STAGED"}
+
+
+def ledger_states() -> set[str]:
+    """The states `edhmc/pending.py` actually IMPLEMENTS, from its own lists.
+
+    Derived rather than typed, because the vocabulary doc is a hand-maintained
+    name set describing the repo and §0q says such a set needs its check in
+    the same change. States that `docs/LEDGER_STATES.md` merely PROPOSES
+    (PREPARED, SIMULATED) are deliberately not required to appear here -- the
+    check runs one way only, and that is the way that rotted.
+    """
+    text = read(os.path.join("edhmc", "pending.py"))
+    lists = re.findall(r"^([A-Z][A-Z_]+): list\[", text, re.M)
+    return {LEDGER_LIST_STATE.get(n, n) for n in lists}
+
+
+def check_vocabulary_names_states(docs: dict[str, str],
+                                  states: set[str]) -> Result:
+    """docs/LEDGER_STATES.md names every state the ledger implements.
+
+    THIS IS THE CHECK HANDOFF.md NEEDED AND DID NOT HAVE. That file enumerated
+    the ledger's states by hand, said "three states", and never mentioned
+    `PROPOSED` after it landed on 2026-09-16 -- §0q's failure mode in the
+    documentation of the ledger itself. The enumeration lives in one file now
+    and this fails if a state the code holds goes unnamed there.
+
+    One direction only, on purpose: a state the doc PROPOSES and the code does
+    not implement yet is the doc doing its job as a design.
+    """
+    text = docs.get(LEDGER_STATES, "")
+    if not text:
+        return Result("docs/LEDGER_STATES.md names every state the ledger "
+                      "implements", False, f"{LEDGER_STATES} is missing")
+    missing = sorted(st for st in states if st not in text)
+    return Result(
+        f"docs/LEDGER_STATES.md names every state the ledger implements "
+        f"({len(states)} derived)",
+        not missing,
+        "; ".join(f"{LEDGER_STATES} never names {st}" for st in missing))
+
+
 def evasion_sets() -> tuple[set[str], set[str]]:
     """(cards the deck modules construct today, cards _evasion.py scanned)."""
     from tools.tag_flying import current_cards
@@ -482,6 +531,7 @@ def run_all() -> list[Result]:
         check_shell_commands_exist(docs),
         check_architecture_names_modules(docs),
         check_durable_docs_derive_counts(docs),
+        check_vocabulary_names_states(docs, ledger_states()),
         check_caches_recorded(),
     ]
     results.extend(generated_checks())
@@ -538,6 +588,13 @@ MUTATIONS = {
     "a doc cites a finding that does not exist":
         lambda code, issues, docs: (
             code, issues, dict(docs, **{"FAKE4.md": "see §0zz98 for the rest"})),
+    # WITHDRAWN is the state the doc carries in PROSE rather than in its table,
+    # so it is the one most easily lost -- which makes it the right one to
+    # delete here.
+    "the vocabulary doc drops a state the ledger implements":
+        lambda code, issues, docs: (code, issues, dict(
+            docs, **{LEDGER_STATES: docs.get(LEDGER_STATES, "")
+                     .replace("WITHDRAWN", "the retired list")})),
 }
 
 # Which checks each mutation must break. Written before running it: a
@@ -558,6 +615,8 @@ EXPECTED = {
         {"every §id cited from a live doc resolves"},
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
+    "the vocabulary doc drops a state the ledger implements":
+        {"docs/LEDGER_STATES.md names every state the ledger implements"},
 }
 
 # Mutations of the evasion coverage sets, (live, scanned) -> (live, scanned).
@@ -572,6 +631,7 @@ def mutate() -> int:
     issues = read(KNOWN_ISSUES)
     docs = live_docs()
     live, scanned = evasion_sets()
+    states = ledger_states()
 
     failures = 0
     for label in list(MUTATIONS) + list(SET_MUTATIONS):
@@ -592,6 +652,7 @@ def mutate() -> int:
             check_shell_commands_exist(d),
             check_architecture_names_modules(d),
             check_durable_docs_derive_counts(d),
+            check_vocabulary_names_states(d, states),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}
         want = EXPECTED[label]
