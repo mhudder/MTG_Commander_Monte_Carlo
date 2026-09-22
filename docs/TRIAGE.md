@@ -66,10 +66,21 @@ killed before a line of code:
 * **Venser, Fervent Forger** — both ETB modes copy *an opponent's* spell or
   permanent. Opponents hold no spells or permanents as objects (§4), so the
   whole card is invisible and it would have measured as a 6-mana 5/3 body.
+  **REJECTED by the owner 2026-09-22** on deck merit, independently of the
+  visibility verdict.
 * **Ginger, Queen of Sweets** — its engine is the monarch, which this project
-  does not model.
+  does not model. **THE OWNER ASKED FOR THE MONARCH TO BE IMPLEMENTED
+  (2026-09-22)** on the grounds that it is a common mechanic, so this is a
+  DEFERRED rather than a BLIND verdict: the blocker is machinery, and the
+  machinery is wanted for its own sake. It is not this card's to carry alone.
 * **Saheeli, Consul of Oversight** — triggers on scry and surveil, which the
-  tivit list barely does.
+  tivit list barely does. **REJECTED by the owner 2026-09-22** on deck merit.
+
+**Two of the tier-0 examples above are now closed by the owner rather than by
+the screen**, and that is worth noticing about the screen itself: a visibility
+verdict and a merit verdict are different judgements, and only the first is
+what triage predicts (see the scope limit at the end of this file). Koth of the
+Homestead, in the tier-1 list below, was rejected in the same pass.
 
 **Tier 0's output is a VERDICT, not a note.** The `add-card` skill already asks
 for a clause-by-clause visibility review at step 2; what it lacks is teeth — the
@@ -82,11 +93,22 @@ one is its own change with its own test. Three deferrals from 2026-09-21, each
 with the reason written down at the time:
 
 * **Koth of the Homestead** — needs a landfall hook karlov does not have, and
-  lands enter that engine by at least three paths.
+  lands enter that engine by at least three paths. **REJECTED by the owner
+  2026-09-22** on deck merit, so the hook is no longer owed to this card.
+  Nothing else has asked for it yet.
 * **Pitiless Plunderer** — needs Treasures-as-mana in rendmaw, a decrement
   threaded through the `spend()` five engines share (§0z26).
 * **Ob Nixilis, the Ascended** — "at the beginning of each end step" plus
-  "tapped creatures your opponents control", neither of which exists.
+  "tapped creatures your opponents control". **HALF OF THIS DEFERRAL WAS WRONG
+  AND IT IS §0z13'S SHAPE** (checked 2026-09-22): end steps DO exist. Four
+  engines run one — `karlov.end_step`, `tivit.end_step`,
+  `shilgengar.end_step`, and `lorehold` sacrifices Underworld Breach at one —
+  and "EACH end step" already has a worked precedent in `engine.py`, where
+  Deathreap Ritual draws off the pod's three as well as yours. The surviving
+  blocker is the second clause only: `Opponent.creatures` is a `float` count
+  (§4), so "tapped creatures your opponents control" is not a countable set.
+  **A deferral names its machinery, and this one named machinery that had
+  been there all along.**
 
 Deferring is not rejecting. The verdict records what the machinery is, so the
 next session can decide whether to build it on purpose rather than discover it
