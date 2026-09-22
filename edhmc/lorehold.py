@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -215,6 +215,7 @@ class LoreholdGame(BaseGame):
 
     def draw_card(self):
         if not self.library:
+            drew_from_empty(self)              # 704.5b, queued item 17
             return None
         c = self.library.pop()
         self.m["cards_drawn"] += 1
@@ -514,8 +515,8 @@ def miracle_window(g, off_turn=False):
     g.m["miracle_windows"] += 1
 
     val = miracle_value(g, card)
-    if val <= 0 or not (g.commander_cast or g.has("Molecule Man")
-                        or card.miracle_cost):
+    if val <= 0 or not pilot_may_cast(g, card) or not (
+            g.commander_cast or g.has("Molecule Man") or card.miracle_cost):
         g.hand.append(card)
         return card, False
 
@@ -575,6 +576,38 @@ def miracle_window(g, off_turn=False):
 # Casting
 # ---------------------------------------------------------------------------
 
+# Scripts whose resolution draws a fixed number of cards, read by the pilot
+# BEFORE casting (queued item 17). THE SAME NUMBERS apply_spell_effects draws
+# -- if one changes there it must change here, and tests/test_decking.py pins
+# that every `_draw_into_hand` count in apply_spell_effects is named here.
+SPELL_DRAWS = {"draw2": 2, "draw2_treasure": 2, "draw4": 4,
+               "extra_turn": 4, "wheel": 7}
+
+
+def spell_draws(g, card) -> int:
+    """How many cards resolving `card` would draw. Borrowed Knowledge's is the
+    hand it discards (the pre-cast hand, less the card itself)."""
+    if card.script == "borrowed_knowledge":
+        if g.cfg.get("borrowed_knowledge_discard", True):
+            return max(0, len(g.hand) - (card in g.hand))
+        return 2
+    if card.script == "apex" and not g.cfg.get("apex_ten_mana", True):
+        return 4
+    return SPELL_DRAWS.get(card.script, 0)
+
+
+def pilot_may_cast(g, card) -> bool:
+    """False when casting `card` -- a choice -- would draw the library empty.
+
+    ONE predicate for every OPTIONAL cast site in this engine (the main
+    phase, a miracle, an Arcane Bombardment copy), because the same rule
+    written at three sites is §0u's shape. A MANDATORY copy (Double Vision
+    puts its copy on the stack; nobody chooses) does not ask.
+    """
+    n = spell_draws(g, card)
+    return n == 0 or draw_is_safe(g, n)
+
+
 def _draw_into_hand(g, n):
     for _ in range(n):
         c = g.draw_card()
@@ -620,7 +653,10 @@ def discard_triggers(g, n=1):
         return
     order = g.cfg.get("monument_order", MONUMENT_MODES)
     for _ in range(n):
-        mode = next((m for m in order if m not in g.monument_used), None)
+        # THE MODE IS A CHOICE, so a draw that would deck is not taken while
+        # another mode is left (queued item 17).
+        mode = next((m for m in order if m not in g.monument_used
+                     and (m != "draw" or draw_is_safe(g, 1))), None)
         if mode is None:
             return                      # all three taken this turn
         g.monument_used.add(mode)
@@ -727,6 +763,8 @@ def arcane_bombardment(g):
         g.bombardment_exiled.append(picked)
 
     for card in list(g.bombardment_exiled):
+        if not pilot_may_cast(g, card):
+            continue                # "you MAY cast any number of the copies"
         g.m["bombardment_copies"] += 1
         g.m["mv_cheated"] += card.free_mv
         g.m["total_mv_cast"] += card.free_mv
@@ -936,7 +974,9 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         if g.last_paid < 9 and pool:
             pool = [max(pool, key=lambda x: x.mv)]   # single target
         for x in pool:
-            g.graveyard.remove(x)
+            g.graveyard.remove(x)          # exiled whether or not it is cast
+            if not pilot_may_cast(g, x):
+                continue                   # "you MAY cast the copy" (item 17)
             g.m["mastery_copies"] += 1
             g.m["mv_cheated"] += x.free_mv
             g.m["total_mv_cast"] += x.free_mv
@@ -1226,7 +1266,9 @@ def sunbird(g, card):
         return
     g.m["sunbird_triggers"] += 1
     revealed = [g.library.pop() for _ in range(min(x, len(g.library)))]
-    castable = [c for c in revealed if not c.is_land and c.mv <= x]
+    # "you MAY cast" -- a pick whose draw would deck is left (item 17).
+    castable = [c for c in revealed if not c.is_land and c.mv <= x
+                and pilot_may_cast(g, c)]
     pick = max(castable, key=lambda c: (c.free_mv, c.priority), default=None)
     if pick is not None:
         revealed.remove(pick)
@@ -1394,6 +1436,8 @@ def invoke_calamity(g, self_card=None):
         if card not in src:
             g.m["invoke_lost_target"] += 1
             continue
+        if not pilot_may_cast(g, card):
+            continue                # "you MAY cast", checked per pick (§0z19)
         src.remove(card)
         g.m["invoke_free_casts"] += 1
         g.m["invoke_mv"] += card.free_mv
@@ -1590,6 +1634,8 @@ def main_phase(g, reserve=0):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
                 continue
+            if not pilot_may_cast(g, c):
+                continue
             # THE MODE IS CHOSEN HERE, NOT AFTER THE CARD IS PICKED, and
             # that is the one behavioural change §0z20 makes to this engine:
             # Mizzix's Mastery's overload now respects the mana RESERVE like
@@ -1600,11 +1646,15 @@ def main_phase(g, reserve=0):
                 continue
             cost, _tag, idx = mode
             if len(units) - len(idx) >= reserve:
-                options.append((c, cost))
+                options.append((c, cost, idx))
         if not options:
             break
 
-        card, cost = max(options, key=lambda it: (it[0].priority, it[0].mv))
+        # item 18: greedy unless `cast_lookahead`. The third element is the
+        # payment `choose_mode` proved, which is what the lookahead reads.
+        card, cost, _ = lookahead_pick(
+            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            cost_of=lambda it: it[1], pay_of=lambda it: it[2])
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         paid = pay(g, cost, units)
@@ -1687,7 +1737,12 @@ def opponent_upkeep_windows(g):
     cross_turn = sum(1 for p in g.board if "cross_turn" in p.card.tags)
     for _ in g.opponents:
         g.float_mana += cross_turn      # these untap on every untap step
-        if not g.hand:
+        # "you MAY discard a card. If you do, draw a card" -- declined when
+        # the draw would deck you (queued item 17). Conservative in one case:
+        # with Library of Leng the discarded card can go on top and be drawn
+        # straight back, which is library-neutral; the pilot here passes on
+        # that too.
+        if not g.hand or not draw_is_safe(g, 1):
             continue
         # Discard the worst card. Lands score lowest on miracle value, but
         # pitching a land you still need to hit your drops is a real mistake —

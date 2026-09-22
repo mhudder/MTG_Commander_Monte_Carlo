@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -196,14 +196,19 @@ class KarlovGame(BaseGame):
         arch = self.has("Alhammarret's Archive")
         for _ in range(n):
             if not self.library:
-                break
+                drew_from_empty(self)          # 704.5b, queued item 17
+                return
             self.hand.append(self.library.pop())
             self.m["cards_drawn"] += 1
             if arch and not self.in_draw_step:
-                if self.library:
-                    self.hand.append(self.library.pop())
-                    self.m["cards_drawn"] += 1
-                    self.m["archive_extra_draws"] += 1
+                # "draw two cards instead" is two DRAWS, so the second one
+                # off an empty library loses exactly as the first would.
+                if not self.library:
+                    drew_from_empty(self)
+                    return
+                self.hand.append(self.library.pop())
+                self.m["cards_drawn"] += 1
+                self.m["archive_extra_draws"] += 1
 
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
@@ -782,6 +787,7 @@ def main_phase(g):
                 continue
 
         options = []
+        mode_cost = {}
         for c in g.hand:
             if c.is_land:
                 continue
@@ -793,9 +799,12 @@ def main_phase(g):
             mode = choose_mode(c, reduce_cost(g, c), units)
             if mode is not None:
                 options.append((c, mode[2]))
+                mode_cost[id(c)] = mode[0]
         if not options:
             break
-        card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
+        card, pay = lookahead_pick(          # item 18; greedy unless enabled
+            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            cost_of=lambda it: mode_cost[id(it[0])], pay_of=lambda it: it[1])
         spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
         g.hand.remove(card)
@@ -880,12 +889,13 @@ def citadel_step(g):
       THE SPELL IS STILL COUNTERABLE. It is cast, not put onto the
       battlefield, so it goes through `OPP.countered` like any other.
 
-    **ITS NUMBER IS A CEILING, AND QUEUED ITEM 17 IS WHY.** The Citadel is
-    precisely the card that makes "nothing in this project loses to decking"
-    live: it strips the library from the top, `draw()` stops at empty, and no
-    loss is recorded. At a real table emptying your library is how this card
-    kills you. Until item 17 is closed, read a good Citadel result as an
-    upper bound.
+    **IT WAS CALLED A CEILING FOR QUEUED ITEM 17, AND THAT IS NOW MEASURED
+    AND FALSE** (§0z42, 2026-09-22). Decking loses now, and on the staged
+    karlov list, Citadel in, the rule changed NOTHING: N=15,000 games at each
+    of T10 and T20, identical game for game on every metric with and without
+    it. The dig stops at a land it cannot play and at the life floor long
+    before the library runs out, and these games end around turn 12. The
+    Citadel's number stands as measured.
 
     Returns True if it did anything, so the caller can run `main_phase` again
     for what the dig unlocked. Returns False instantly when the card is not on

@@ -226,6 +226,15 @@ command; use it rather than remembering.
 - **The metrics dict is a plain dict.** `g.m["new_counter"] += 1` on a key not
   registered in `__init__` is a `KeyError` in a worker, in the minority of
   games where the card resolves, twenty minutes into a run. Register the key.
+- **A draw off an empty library is a LOSS (§0z42), and whether a draw is a
+  choice is the CARD's to say.** Every draw goes through `BaseGame.draw`,
+  karlov's Archive override or lorehold's `draw_card`, and each calls
+  `engine.drew_from_empty`. A new draw that the card text makes optional (a
+  "may", an activation, a mode, a spell the pilot need not cast) must ask
+  `engine.draw_is_safe` first -- or the pilot decks itself in the games it
+  is winning, which is what the rule alone did to azusa and lorehold. A
+  mandatory draw must NOT ask. Popping the library without drawing (exile,
+  mill, reveal, "put it into your hand") is not a draw and does not lose.
 - **`engine_cfg` copies the cfg** because five engines `setdefault` their own
   knobs into it; construct games on a fresh `dict(DEFAULT_CFG, …)` and never
   share one dict across engines.

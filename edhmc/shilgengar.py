@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -780,6 +780,7 @@ class ShilgengarGame(BaseGame):
                     continue
 
             options = []
+            mode_cost = {}
             for c in self.hand:
                 if c.is_land:
                     continue
@@ -796,9 +797,13 @@ class ShilgengarGame(BaseGame):
                 # the policy artefact §0t warned about rather than a cost.
                 if pay is not None and len(pool) - len(pay) >= reserve:
                     options.append((c, pay))
+                    mode_cost[id(c)] = _m[0]
             if not options:
                 break
-            card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
+            card, pay = lookahead_pick(      # item 18; greedy unless enabled
+                self, options, pool, lambda it: (it[0].priority, it[0].mv),
+                cost_of=lambda it: mode_cost[id(it[0])],
+                pay_of=lambda it: it[1])
             real = [i for i in pay if i < n_real]
             used = len(pay) - len(real)
             spend(self, real, units)

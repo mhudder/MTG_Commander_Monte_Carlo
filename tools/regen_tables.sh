@@ -89,7 +89,11 @@ N=15000
 # Run from the REPO ROOT (`./tools/regen_tables.sh`), not from tools/. Every
 # path below is root-relative, and `python -m tools.ablation` needs the root on
 # sys.path to import edhmc.
-for deck in lorehold rendmaw karlov tivit shilgengar azusa; do
+#
+# `DECKS="azusa lorehold" ./tools/regen_tables.sh` rebuilds ONLY those decks
+# -- CLAUDE.md's rule is that only a deck whose baseline moved is rebuilt, and
+# at ~2.3 CPU-hours a deck the other four are not free. The default is all six.
+for deck in ${DECKS:-lorehold rendmaw karlov tivit shilgengar azusa}; do
     cache="results/caches/ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "results/ablation_${deck}.log"

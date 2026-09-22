@@ -27,6 +27,10 @@ committed table is measured on, so it is the list a swap's number has to be
 a difference on.
 
     python -m diagnostics.run_azusa_head2head > results/azusa_head2head.txt
+
+`results/azusa_head2head.txt` is the post-§0z37 run (2026-09-21);
+`results/azusa_head2head_0z41.txt` is the same three runs after Horn of
+Greed stopped being doubled and decking became a loss (2026-09-22).
 """
 import sys
 import time
@@ -63,6 +67,16 @@ def main() -> int:
               if a.startswith("--n=")), N)
     sim = REGISTRY["azusa"].sim
     staged, cmd = build_pending("azusa")
+    # SINCE 2026-09-22 THE CHOCOBO IS STAGED into this very slot, so the list
+    # a head-to-head has to be run on is the staged list WITH THE SWAP
+    # UNDONE. `_swap_many` swaps in place, so putting Yavimaya Elder back in
+    # the Chocobo's slot reproduces the pre-staging list exactly -- the same
+    # 99 in the same order, which is what keeps the seeds comparable with
+    # every earlier run of this file.
+    if any(c.name == TRAVELING_CHOCOBO.name for c in staged):
+        from edhmc.decks import azusa_v1
+        elder = next(c for c in azusa_v1.build()[0] if c.name == CUT)
+        staged = _swap_many(staged, [TRAVELING_CHOCOBO.name], [elder])
     assert any(c.name == CUT for c in staged), f"{CUT} is not in the staged list"
     print(f"azusa head-to-head against {CUT}. N={n:,} paired, same seeds both "
           f"legs, base = build_pending('azusa') (Ka-Zar swap applied).")

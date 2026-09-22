@@ -17,7 +17,11 @@ so the per-deck difference is paired and its CI is the honest one.
     python -m diagnostics.run_shared_code_shift --out=new.json
     python -m diagnostics.run_shared_code_shift --diff old.json new.json
 
-`--n=` (default 15000) and `--decks=a,b` narrow it. The baseline is
+`--n=` (default 15000) and `--decks=a,b` narrow it. `--cfg=k=v,k=v` sets
+knobs on this leg only, so a change that ships behind a knob can be
+measured with BOTH legs in one tree -- `--cfg=decking_loss=False` against
+the default is the knob's worth, on the same seeds, with no worktree
+(values are read as Python literals: False, 3, "legacy"). The baseline is
 `build_pending(deck)` -- the STAGED list, which is what every current
 table is measured on -- so a staged deck is compared on the list its cache
 was built from (the §0z29 trap, avoided by construction).
@@ -41,8 +45,20 @@ def _sim(deck):
     return REGISTRY[deck].sim
 
 
+def parse_cfg(text):
+    import ast
+    out = {}
+    for kv in filter(None, text.split(",")):
+        k, v = kv.split("=", 1)
+        try:
+            out[k] = ast.literal_eval(v)
+        except (ValueError, SyntaxError):
+            out[k] = v
+    return out
+
+
 def measure_one(args):
-    deck, turns, n = args
+    deck, turns, n, extra = args
     from edhmc.pending import build_pending
     from edhmc.experiment import DEFAULT_CFG
     deck_list, cmd = build_pending(deck)
@@ -50,7 +66,7 @@ def measure_one(args):
     rows = {m: [] for m in METRICS}
     for s in range(n):
         r = sim(deck_list, cmd, dict(DEFAULT_CFG, turns=turns,
-                                     watch=frozenset()), 5000 + s)
+                                     watch=frozenset(), **extra), 5000 + s)
         for m in METRICS:
             rows[m].append(float(r.get(m, 0.0)))
     return f"{deck}@T{turns}", rows
@@ -89,7 +105,9 @@ def main():
                   if a.startswith("--decks=")), list(DECKS))
     out = next((a.split("=")[1] for a in args if a.startswith("--out=")),
                "results/shared_code_shift.json")
-    jobs = [(d, t, n) for d in decks for t in HORIZONS]
+    extra = next((parse_cfg(a.split("=", 1)[1]) for a in args
+                  if a.startswith("--cfg=")), {})
+    jobs = [(d, t, n, extra) for d in decks for t in HORIZONS]
     with Pool() as pool:
         res = dict(pool.imap_unordered(measure_one, jobs))
     json.dump(res, open(out, "w"))

@@ -933,6 +933,9 @@ MEASURED: list[Candidate] = [
             "A CEILING for queued item 17's reason -- nothing in this project "
             "loses to decking -- though at ~26 cards drawn from a 99-card "
             "library that gap is not close to binding. "
+            "(ITEM 17 CLOSED 2026-09-22, §0z42: decking loses now and "
+            "Guardian Project's draw is mandatory, so this row predates the "
+            "rule and a staging would re-measure it.) "
             "NOT A STAGING: §0c, it needs a head-to-head against a named cut, "
             "and it shares the Sylvan Library baseline with thirteen others."),
     ),
@@ -1042,7 +1045,12 @@ MEASURED: list[Candidate] = [
             "resolutions ask for 50+. At a table those are the games you win "
             "on the spot or lose on the next draw step; here the tail is "
             "free. Queued item 17. Also a floor in the other direction: it is "
-            "an INSTANT and this engine casts it at sorcery speed."
+            "an INSTANT and this engine casts it at sorcery speed. "
+            "ITEM 17 CLOSED 2026-09-22 (§0z42): the tail is no longer free -- "
+            "a draw from an empty library loses -- and the mode is now chosen "
+            "like a pilot would, PUMP whenever the draw would empty the "
+            "library. This row was measured before either, so it is stale in "
+            "both directions and must be re-measured before any staging."
         ),
         verdict=(
             "Good on the median case -- nine cards for five mana is good on "
@@ -1234,9 +1242,11 @@ MEASURED: list[Candidate] = [
             "+0.0001 [-0.0039, +0.0041] at T20 in Nissa's favour. Not "
             "unrankable: MEASURED EQUAL, to within +-0.0040. Either card is "
             "the same win rate in this slot, and the choice between them is a "
-            "deckbuilding preference the harness has no opinion on."
-        ),
-        shortlist=(
+            "deckbuilding preference the harness has no opinion on. "
+            "SUPERSEDED 2026-09-21 by §0z37 (the tie was the engine's), and "
+            "STAGED 2026-09-22 as -Yavimaya Elder +Traveling Chocobo -- see "
+            "CHANGES. The shortlist history follows, kept verbatim: it was "
+            "shortlisted because it "
             "is here: highest of the six, and the one whose mechanism this "
             "deck is built to exploit -- a second doubler in a list holding "
             "Scute Swarm, Rampaging Baloths, Avenger and Greensleeves. "
@@ -1251,7 +1261,6 @@ MEASURED: list[Candidate] = [
             "two costs a second rebuild. One question to the owner, one "
             "rebuild."
         ),
-        proposed_cut="Yavimaya Elder",
     ),
     Candidate(
         deck="azusa",
@@ -1463,6 +1472,52 @@ MEASURED: list[Candidate] = [
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
     Change(
+        deck="azusa", remove="Yavimaya Elder", add="Traveling Chocobo",
+        staged="2026-09-22",
+        rationale=(
+            "A SECOND ANCIENT GREENWARDEN for the half this deck cares about: "
+            "'if a land or Bird you control entering causes a triggered "
+            "ability of a permanent you control to trigger, that ability "
+            "triggers an additional time', and the two STACK -- one land fires "
+            "every payoff three times. It also plays lands off the top of the "
+            "library, a fifth source of that boolean. THE CUT IS THE OWNER'S "
+            "(2026-09-20): Yavimaya Elder ablates to +0.0023 +-0.0023, inside "
+            "its own bar, and is MODEL-EVALUATED -- its death trigger and its "
+            "sacrifice-draw are both in azusa.py -- so its row is evidence "
+            "and not a blind card read as one (§0z36). Staged on the owner's "
+            "instruction of 2026-09-22, after §0z37 had broken the tie with "
+            "Nissa, Resurgent Animist in this card's favour."),
+        evidence=(
+            "THE REAL SWAP on the post-§0z37 engine, N=15,000 paired, same "
+            "seeds both legs, base = build_pending('azusa') with Ka-Zar "
+            "applied (diagnostics/run_azusa_head2head.py, "
+            "results/azusa_head2head.txt): win rate +0.0213 [+0.0183, "
+            "+0.0241] at T10 and +0.0257 [+0.0215, +0.0297] at T20, "
+            "significant at BOTH horizons, against baselines of 0.1597 and "
+            "0.3829. Damage +2.17 / +2.11, cards_drawn +0.80 / +1.07, "
+            "final_life +1.55 / +2.76, stranded_mv +2.12 / +3.00. AND THE "
+            "RANKING §0c says a common baseline cannot give: Chocobo -> Nissa, "
+            "Resurgent Animist in this one slot, paired on the same seeds, is "
+            "-0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20 -- this card "
+            "is the better of the two at both horizons. The pre-§0z37 figures "
+            "(+0.0253 / +0.0265, and a measured tie with Nissa) are "
+            "SUPERSEDED: the tie was floating landfall mana never being "
+            "consumed (§0z35, §0z37)."),
+        notes=(
+            "FLOOR, and a small one: 'cast Bird spells from the top of your "
+            "library' is worth nothing in a list whose only Bird is this card. "
+            "Its top-of-library half is REDUNDANT with Courser, Augur, Oracle "
+            "and the staged Ka-Zar, and that is priced in -- all four are in "
+            "the list it was measured against. REDUNDANT WITH ANCIENT "
+            "GREENWARDEN BY DESIGN (§0z27): after this lands, Greenwarden's "
+            "row is understated, and the two must be ablated as a group before "
+            "either is read as a cut. STAGING REWRITES build_pending('azusa'), "
+            "which is the third row of CLAUDE.md's cache table -- the azusa "
+            "ablation table is rebuilt in the same change, never cleared with "
+            "--verified. AZUSA HAS NO .xlsx: committing this is two legs, the "
+            "module and this ledger."),
+    ),
+    Change(
         deck="karlov", remove="Soulmender", add="Bloodthirsty Conqueror",
         staged="2026-09-16",
         rationale=(
@@ -1625,11 +1680,13 @@ CHANGES: list[Change] = [
             "rather than proved; the MECHANISM is not ambiguous -- lands "
             "played off the top go 0.054 -> 0.134 a game, up 148%. "
             "results/citadel_naive_land_order.txt keeps the naive numbers. "
-            "**ITS NUMBER IS A CEILING AND QUEUED ITEM 17 IS WHY.** The "
-            "Citadel is exactly the card that makes 'nothing in this project "
-            "loses to decking' live: it strips the library from the top, "
-            "draw() stops at empty and no loss is recorded. At a table, "
-            "emptying your library is how this card kills you. "
+            "**ITS NUMBER WAS CALLED A CEILING FOR QUEUED ITEM 17, AND THAT "
+            "IS NOW MEASURED AND FALSE** (§0z42, 2026-09-22). Decking loses "
+            "now, and on this staged list -- Citadel in -- the rule changed "
+            "nothing: N=15,000 at each of T10 and T20, identical game for "
+            "game on every metric with and without it. The dig stops at an "
+            "unplayable land or at the life floor long before the library "
+            "runs out. The number stands as measured. "
             "The sac-ten drain is implemented LETHAL-ONLY (ten nonland "
             "permanents, and only when every living opponent is at 10 or "
             "less), which is deliberately conservative and a floor on that "
@@ -3037,17 +3094,25 @@ def ledger(verbose: bool = True) -> None:
               "other or against anything else (§0c).")
         for deck_name in sorted({c.deck for c in MEASURED}):
             rows = [c for c in MEASURED if c.deck == deck_name]
-            print(f"\n{deck_name.upper()}  ({len(rows)} measured, 0 staged "
-                  f"from this batch)")
+            # DERIVED: this used to print a literal "0 staged", which went
+            # false the day the first measured card was staged.
+            staged_adds = {ch.add for ch in CHANGES if ch.deck == deck_name}
+            n_staged = sum(c.card in staged_adds for c in rows)
+            print(f"\n{deck_name.upper()}  ({len(rows)} measured, "
+                  f"{n_staged} staged from this batch)")
             # SHORTLISTED ROWS FIRST, and marked, because the one thing a
             # reader wants from this section is which of thirteen numbers
             # somebody has actually looked at. Still Candidates: the marker
             # says a head-to-head is proposed, not that anything is staged.
             rows.sort(key=lambda c: (not c.shortlist, c.card))
             for c in rows:
-                print(f"  {'>>' if c.shortlist else ' ?'}  {c.card}"
+                staged = c.card in staged_adds
+                print(f"  {'>>' if c.shortlist else ('=>' if staged else ' ?')}"
+                      f"  {c.card}"
                       + ("   [SHORTLISTED — head-to-head proposed, NOT staged]"
-                         if c.shortlist else ""))
+                         if c.shortlist else
+                         "   [STAGED — see the change above]" if staged
+                         else ""))
                 print(f"     win    {c.win_rate}   signal {c.signal}")
                 print(f"     measured {c.measured}")
                 if c.shortlist:

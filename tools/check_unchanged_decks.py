@@ -14,6 +14,12 @@ previous commit running the same seeds through both versions.
     (cd ../edhmc_head && python check_unchanged_decks.py --out old.json)
     python check_unchanged_decks.py --diff old.json new.json
 
+`--cfg=k=v,k=v` sets knobs on the side it is passed to. A change that ships
+behind a knob claims the knob's OLD value reproduces the old code; running
+the new tree with `--cfg=<old values>` against a worktree at the old commit
+is that claim checked (2026-09-22: `decking_loss=False,
+horn_doubled_legacy=True` against the commit before queued item 17).
+
 Prints a per-metric diff. BIT-IDENTICAL is the pass condition for a deck the
 change was not meant to touch; anything else means its table needs
 regenerating, whatever the argument for why it should not.
@@ -38,8 +44,9 @@ def build(deck):
     return REGISTRY[deck].build()
 
 
-def measure(n, turns):
+def measure(n, turns, extra=None):
     from edhmc.experiment import DEFAULT_CFG
+    extra = extra or {}
     out = {}
     for deck in DECKS:
         deck_list, cmd = build(deck)
@@ -49,7 +56,8 @@ def measure(n, turns):
             # The same seeds both sides. Not a statistical comparison: the
             # answer wanted here is "identical" or "not", not "close".
             r = sim(deck_list, cmd, dict(DEFAULT_CFG, turns=turns,
-                                         watch=frozenset()), 3000 + s)
+                                         watch=frozenset(), **extra),
+                    3000 + s)
             for m in METRICS:
                 totals[m] += float(r.get(m, 0.0))
         out[deck] = {m: totals[m] / n for m in METRICS}
@@ -92,7 +100,13 @@ def main():
                   if a.startswith("--turns=")), 20)
     out = next((a.split("=")[1] for a in args if a.startswith("--out=")),
                "baselines.json")
-    json.dump(measure(n, turns), open(out, "w"), indent=1, sort_keys=True)
+    extra = {}
+    for a in args:
+        if a.startswith("--cfg="):
+            from diagnostics.run_shared_code_shift import parse_cfg
+            extra = parse_cfg(a.split("=", 1)[1])
+    json.dump(measure(n, turns, extra), open(out, "w"), indent=1,
+              sort_keys=True)
     print(f"wrote {out}")
     return 0
 

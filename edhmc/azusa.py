@@ -125,7 +125,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -1018,6 +1018,18 @@ class AzusaGame(BaseGame):
         reps = (1 + self.count("Ancient Greenwarden")
                 + self.count("Traveling Chocobo"))
         self.m["landfall_ability_resolutions"] += reps
+        # HORN OF GREED IS NOT A LANDFALL PAYOFF and is deliberately OUTSIDE
+        # the doubled loop (2026-09-22, §0z41). "Whenever a player PLAYS a
+        # land" triggers on the special action, not on the land entering, and
+        # Scryfall's ruling on Ancient Greenwarden (2020-09-25) says so in as
+        # many words: "An ability that triggers whenever you play a land won't
+        # trigger an additional time." Traveling Chocobo carries the same
+        # "entering causes" sentence, so the same holds for it. Until this
+        # fix the draw sat inside `_landfall_payoffs`, so with both doublers
+        # out one land drop drew THREE cards -- and in a deck whose measured
+        # constraint is cards, that inflated both doublers' rows.
+        if played and not self.cfg.get("horn_doubled_legacy", False):
+            self.draw(self.count("Horn of Greed"))
         for _ in range(reps):
             self._landfall_payoffs(card, played)
 
@@ -1043,7 +1055,10 @@ class AzusaGame(BaseGame):
         Converting to `count` is behaviour-neutral for every list in this
         project today -- checked, not argued, with check_unchanged_decks.py.
         """
-        if played:
+        # Horn of Greed used to draw HERE, once per doubled rep -- the bug
+        # §0z41 fixed. `horn_doubled_legacy=True` restores it, so the size of
+        # the correction can be measured on the same seeds.
+        if played and self.cfg.get("horn_doubled_legacy", False):
             self.draw(self.count("Horn of Greed"))
         # Zabu, Ka-Zar's token: "Landfall -- whenever a land you control
         # enters, put a +1/+1 counter on Zabu." Legendary, so at most one, and
@@ -1129,6 +1144,10 @@ class AzusaGame(BaseGame):
             if sum(1 for p in self.board if p.card.is_land) >= 7:
                 self.transform_nissa()
         for _ in range(self.count("Seer's Sundial")):
+            # "you MAY pay {2}" -- a pilot declines it rather than deck
+            # (engine.draw_is_safe, queued item 17).
+            if not draw_is_safe(self, 1):
+                break
             units = self.available_mana()
             pay = can_pay({"gen": 2}, units)
             if pay is not None:
@@ -1496,6 +1515,14 @@ class AzusaGame(BaseGame):
             if choice is None:
                 break
             card, zone = choice
+            # A LAND DROP IS OPTIONAL, AND HORN OF GREED'S DRAW IS NOT. With
+            # the Horn out, playing a land draws, so a pilot one card from an
+            # empty library stops playing lands (queued item 17). This was
+            # 24 of azusa's 28 decking losses once the optional draws were
+            # guarded. A land played off the top costs that card as well.
+            horn = self.count("Horn of Greed")
+            if horn and not draw_is_safe(self, horn + (zone == "library")):
+                break
             self.m[f"lands_from_{zone}"] += 1
             if zone == "hand":
                 self.hand.remove(card)
@@ -2314,6 +2341,10 @@ class AzusaGame(BaseGame):
         pump = False
         if forced == "pump":
             pump = True
+        elif forced == "auto" and not draw_is_safe(self, draw_n):
+            # THE MODE IS THE PILOT'S, and a draw that empties the library
+            # is a loss (queued item 17). The pump is always legal.
+            pump = True
         elif forced == "auto":
             # Would the pump kill somebody the unpumped attack would not? The
             # attackers are the ones combat() will send: untapped, not sick.
@@ -2338,18 +2369,39 @@ class AzusaGame(BaseGame):
             # Recording draw_n here would put a number in the diagnostics that
             # is nearly four times the number of cards that actually moved.
             #
-            # THE GAP IS ALSO THE CARD'S CEILING, and it is worth stating
-            # where the counter is: `draw()` stops at an empty library and
-            # NOTHING IN THIS PROJECT LOSES TO DECKING. A pilot who really
-            # drew 30 off this would have to win that turn. See §0z4.
+            # THE GAP WAS ALSO THE CARD'S CEILING until 2026-09-22: `draw()`
+            # stopped at an empty library and nothing lost to decking. It
+            # loses now (§0z42), which is why the mode choice above picks the
+            # pump when the draw would empty the library. See §0z4.
             before = self.m["cards_drawn"]
             self.draw(draw_n)
             self.m["wildspeaker_draws"] += self.m["cards_drawn"] - before
             self.m["wildspeaker_asked"] += draw_n
 
+    def _sac_fodder(self):
+        return [p for p in self.board if p.is_token and p.card.is_creature
+                and not p.sick]
+
+    def draws_on_resolve(self, card) -> int:
+        """How many cards resolving `card` would make you draw -- the number
+        a pilot reads before CASTING it, which is optional even when the draw
+        on resolution is not (queued item 17, `engine.draw_is_safe`).
+
+        Only the scripts that draw a fixed or board-determined count. Momentous
+        Fall's is the one that matters: "draw cards equal to the sacrificed
+        creature's power", and after a Craterhoof every creature on this board
+        has power in the hundreds -- it asked for 135 cards a decked game on
+        2026-09-22 and was the largest single cause of decking.
+        """
+        if card.script == "draw3":
+            return 3
+        if card.script == "momentous_fall":
+            fodder = self._sac_fodder()
+            return min((self.power_of(p) for p in fodder), default=0)
+        return 0
+
     def sac_for_value(self, momentous=False):
-        fodder = [p for p in self.board if p.is_token and p.card.is_creature
-                 and not p.sick]
+        fodder = self._sac_fodder()
         if not fodder:
             return
         victim = min(fodder, key=self.power_of)
@@ -2453,6 +2505,7 @@ class AzusaGame(BaseGame):
             n_real = len(units)
 
             options = []
+            mode_cost = {}
             for c in self.hand:
                 if c.is_land:
                     continue
@@ -2460,6 +2513,9 @@ class AzusaGame(BaseGame):
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
+                n_draw = self.draws_on_resolve(c)
+                if n_draw and not draw_is_safe(self, n_draw):
+                    continue        # casting is optional; decking is a loss
                 # "Spend this mana only to cast CREATURE SPELLS or activate
                 # abilities of creatures", so the restricted pool is offered to
                 # creatures and to nothing else. It sits AFTER the real units,
@@ -2471,15 +2527,27 @@ class AzusaGame(BaseGame):
                 _m = choose_mode(c, self.cost_of(c), pool)
                 if _m is not None:
                     options.append((c, _m[2]))
+                    mode_cost[id(c)] = _m[0]
             if not enablers_only and self.library and (self.has("Augur of Autumn")):
                 top = self.library[-1]
                 if top.is_creature and self._coven():
                     pay = can_pay(self.cost_of(top), units)
                     if pay is not None:
                         options.append((top, pay))
+                        mode_cost[id(top)] = self.cost_of(top)
             if not options:
                 break
-            card, pay = max(options, key=lambda it: (it[0].priority, it[0].mv))
+            rank = lambda it: (it[0].priority, it[0].mv)
+            # item 18's lookahead prices every option against ONE pool, and
+            # Castle Garenbrig's restricted mana is offered to creatures only,
+            # so with any of it floating this turn falls back to greedy.
+            if self.creature_mana:
+                card, pay = max(options, key=rank)
+            else:
+                card, pay = lookahead_pick(
+                    self, options, units, rank,
+                    cost_of=lambda it: mode_cost[id(it[0])],
+                    pay_of=lambda it: it[1])
             # Only the REAL units tap a permanent. Anything the payment took
             # from Castle Garenbrig's pool is mana that has already been paid
             # for -- charging it to the lands as well would tap four of them to
@@ -2698,7 +2766,7 @@ class AzusaGame(BaseGame):
     def activations(self):
         units = self.available_mana()
         clues = getattr(self, "clues", 0)
-        while clues > 0:
+        while clues > 0 and draw_is_safe(self, 1):   # a Clue is optional
             pay = can_pay({"gen": 2}, units)
             if pay is None:
                 break
@@ -2752,6 +2820,8 @@ class AzusaGame(BaseGame):
             floor = self.cfg.get("cryptic_caves_min_lands", 6)
             if not (recursion or n_lands >= floor):
                 continue
+            if not draw_is_safe(self, 1):
+                continue            # an activation the pilot may decline
             units = self.available_mana()
             pay = can_pay(cost, units)
             if pay is None:
@@ -2779,6 +2849,8 @@ class AzusaGame(BaseGame):
         for pm in list(self.board):
             if pm.card.name != "War Room" or pm.tapped:
                 continue
+            if not draw_is_safe(self, 1):
+                continue            # an activation the pilot may decline
             units = self.available_mana()
             pay = can_pay({"gen": 3}, units)
             if pay is None:

@@ -33,7 +33,7 @@ to.
 
 | rule | what it says | bears on |
 |---|---|---|
-| **104.3c** | a player required to draw more cards than are left in their library draws the remainder and **then loses the game** the next time a player would receive priority | queued **17** — nothing in this project loses to decking |
+| **104.3c** | a player required to draw more cards than are left in their library draws the remainder and **then loses the game** the next time a player would receive priority | queued **17**, CLOSED by §0z42 — `engine.drew_from_empty` records the loss at the draw, first result wins, so the 104.4a simultaneous case (deck and kill the last opponent in one resolution) scores a loss where a table scores a draw |
 | **104.3j** | in Commander, a player dealt **21 or more combat damage by the same commander** over the game loses | **not modelled anywhere** — see below |
 | **305.7** | a permanent that gains a basic land type **gains the mana ability for that type**; gaining types in addition to its own keeps its existing types and rules text | §0z / queued **15** — Ashaya |
 | **302.6** | a creature's `{T}` ability can't be activated, and it can't attack, unless it has been under its controller's control since their most recent turn began | §0z / queued **15** — the constraint on the above |

@@ -287,9 +287,9 @@ SCRIPTED_KARLOV = {
     # and casts spells off the top paying LIFE = mana value, in forced library
     # order, and `citadel_land_step` spends the land drop on a land on top so
     # it does not block the dig. The sac-ten drain is implemented lethal-only,
-    # which is a floor on that half. ITS NUMBER IS A CEILING for a different
-    # reason -- queued item 17, nothing here loses to decking, and this is the
-    # card that empties a library.
+    # which is a floor on that half. It used to be called a CEILING for
+    # queued item 17 (nothing lost to decking); decking loses now and the
+    # karlov baseline did not move with it, so that caveat is closed (§0z42).
     "Bolas's Citadel",
     # lifegain engines
     "Soul Warden", "Soul's Attendant", "Suture Priest", "Auriok Champion",

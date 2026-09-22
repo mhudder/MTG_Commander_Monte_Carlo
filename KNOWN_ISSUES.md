@@ -89,6 +89,7 @@ Methodology that used to live at the end of this file is now
 | [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
 | [0z39](#0z39) | MEASURED | **The monarch is implemented. The +0.10 it first measured was the HARNESS**: `monarch_start` grants the crown on turn 1 and `first_attack_turn` is 3, so two of its three held turns were immunity no card can buy. Granted when a card could arrive it is +0.02 to +0.04. The owner's attack-threat correction is in (a FLOOR on `combat_share`, which deters a wide board and should not for the monarch) and does NOT counterbalance -- tripling the share costs 0.002. The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
 | [0z40](#0z40) | MEASURED | **Ginger, Queen of Sweets: the first card to use the monarch, and it behaves like a six-drop.** The real swap against the cut item 22 named is **+0.0186 ±0.0033 at T20**, level with Alhammarret's Archive and well under Bloodthirsty Conqueror — and Conqueror → Ginger IN THE SAME SLOT is **−0.0210 ±0.0034**, so the ranking is measured and not inferred. P(resolves) 0.152, the crown held 1.03 turns, 2.96 Gingerbrutes a resolution. **The sacrifice clause fires 0.0000 times and is correctly implemented**: haste means combat taps the token before its own `{T}` cost can be paid |
+| [0z41](#0z41) | FIXED | **Horn of Greed was tripled.** Its draw sat inside `_landfall_payoffs`, which Ancient Greenwarden and Traveling Chocobo run once per rep, so one land drop drew three. Greenwarden's own ruling: "an ability that triggers whenever you play a land won't trigger an additional time." Moved out of the loop; worth **−0.0049 / −0.0033** to azusa's baseline, and it flattered both doublers, so the Chocobo's staging was re-measured |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6169,6 +6170,57 @@ after that make no token. Generous by at most two tokens in the one round the
 crown changes hands.
 
 Neither bound is tight, and the card is not staged.
+
+## 0z41. FIXED — Horn of Greed was doubled by Ancient Greenwarden and Traveling Chocobo
+
+Found 2026-09-22 while attributing azusa's decking losses (§0z42), which is
+the only reason anyone looked: the fatal draws traced to `_landfall_payoffs`,
+and Horn of Greed's draw was inside it.
+
+### The defect
+
+`azusa.land_entered` runs `_landfall_payoffs` once per REP, and the reps are
+`1 + count(Ancient Greenwarden) + count(Traveling Chocobo)` -- correctly, for
+landfall. But Horn of Greed's draw sat inside the payoffs too, so with both
+doublers out one land drop drew THREE cards. Horn is not a landfall card:
+"Whenever a player PLAYS a land" triggers on the special action, not on the
+land entering. Scryfall's ruling on Ancient Greenwarden (2020-09-25) says so
+in as many words:
+
+> An ability that triggers whenever you play a land won't trigger an
+> additional time.
+
+Traveling Chocobo's clause is the same sentence ("a land or Bird you control
+entering causes a triggered ability ... to trigger"), so the same holds.
+
+### The fix, and what it was worth
+
+The draw moved out of the doubled loop into `land_entered`, once per PLAY.
+`horn_doubled_legacy=True` restores the old placement exactly, so the
+correction is measured on the same seeds (`diagnostics/run_shared_code_shift`
+with `--cfg`, the staged list, N=15,000 paired, decking_loss off both legs):
+
+| azusa | win rate | cards_drawn | seeds whose result changed |
+|---|---|---|---|
+| T10 | **−0.0049** [−0.0065, −0.0034] | −0.60 | 136 of 15,000 |
+| T20 | **−0.0033** [−0.0050, −0.0015] | −0.88 | 185 of 15,000 |
+
+Lorehold, which has no Horn, is 0 of 15,000 at both horizons.
+
+### Who it flattered
+
+**Both doublers.** A Greenwarden or a Chocobo in play turned every Horn
+trigger into two or three draws, in a deck whose measured constraint is
+CARDS (§0z4, §0z21). The Chocobo's staged swap was measured with this in
+(`cards_drawn` +1.07 at T20), so it was re-measured on the fixed engine
+before the staging was allowed to stand -- `results/azusa_head2head_0z41.txt`.
+Greenwarden's committed row carries the same inflation and is restated only
+by the azusa rebuild.
+
+The lesson is §0z28's shape one hook over: **a hook that runs N times for one
+kind of trigger will run N times for anything placed inside it.** When a
+payoff is added to a multiplied loop, check the card's trigger EVENT against
+the multiplier's rulings, not just its word "land".
 
 ## How to read an ablation table
 

@@ -146,6 +146,8 @@ python -m tests.test_mulligan_and_pod_order --mutate # 5 mutations, exact sets
 python -m tests.test_metrics_and_render --mutate    # 2 mutations, exact sets
 python -m tests.test_pending_cuts --mutate          # 4 mutations, exact sets
 python -m tests.test_monarch --mutate               # 4 mutations, exact sets
+python -m tests.test_decking --mutate               # 5 mutations, exact sets
+python -m tests.test_cast_lookahead --mutate        # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant

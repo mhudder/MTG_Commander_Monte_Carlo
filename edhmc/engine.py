@@ -1051,9 +1051,11 @@ class BaseGame:
 
     def draw(self, n=1):
         for _ in range(int(n)):
-            if self.library:
-                self.hand.append(self.library.pop())
-                self.m["cards_drawn"] += 1
+            if not self.library:
+                drew_from_empty(self)
+                return
+            self.hand.append(self.library.pop())
+            self.m["cards_drawn"] += 1
 
     def opening_hand(self):
         london_mulligan(self)      # shared, §0z30; MDFC backs count as lands
@@ -1084,6 +1086,73 @@ class BaseGame:
             self.damage_by_turn[-1] += dealt
         if self.result == "win" and self.m["turn_lethal"] == 99:
             self.m["turn_lethal"] = self.turn
+
+
+def drew_from_empty(g) -> None:
+    """A draw was attempted from an EMPTY library: you lose (704.5b, 104.3c).
+
+    QUEUED ITEM 17 (§0z42), and the one place the rule lives. Until 2026-09-22 every
+    `draw` in six engines stopped silently at an empty library, so nothing in
+    this project could lose to decking -- and every card that strips the
+    library (Bolas's Citadel, Apex of Power, Discover) measured as a CEILING.
+    Every draw path calls this: `BaseGame.draw`, karlov's Archive override,
+    lorehold's `draw_card`. A path that pops the library WITHOUT drawing --
+    exile, mill, reveal, "put it into your hand", a Citadel cast off the top
+    -- does not call it, and must not: 704.5b is about DRAWING.
+
+    TIMING. The rule is a state-based action, so the loss lands the next time
+    SBAs are checked, not mid-resolution. It is recorded here at the moment
+    of the draw with FIRST-RESULT-WINS semantics (the same `g.result is None`
+    guard every other route uses), which is exact except for one case: a
+    resolution that decks you AND then kills the last opponent is a DRAW at a
+    real table (104.4a), and is scored here as a loss. Draws are not a result
+    this project records; the case needs an empty library and a lethal in one
+    resolution, and it is written down rather than modelled.
+
+    `decking_loss=False` restores the old behaviour -- the draw stops, nothing
+    is lost -- so what the rule is worth can be measured on the same seeds.
+    `drew_from_empty` counts every attempt either way; `loss_route` 3 is a
+    game this rule ended.
+    """
+    g.m["drew_from_empty"] += 1
+    if g.cfg.get("decking_loss", True) and g.result is None:     # §0z42
+        g.result = "loss"
+        g.m["loss_route"] = 3          # decked: drew from an empty library
+
+
+def draw_is_safe(g, n) -> bool:
+    """A PILOT'S check before an OPTIONAL draw: would it leave fewer than
+    `decking_reserve` cards in the library?
+
+    THE OTHER HALF OF QUEUED ITEM 17 (§0z42), and the reason the rule alone is not
+    the change. Once drawing from an empty library loses (`drew_from_empty`),
+    a pilot that draws every card it is offered decks itself -- and measured
+    on 2026-09-22 it did, in exactly the games it was WINNING: azusa's decked
+    games had drawn 68 cards and held a board of six-figure power, lorehold's
+    had cast 54 spells in a chain. A real pilot stops drawing before the last
+    card. Asserting otherwise is a POLICY written as conservatism that says
+    those games' draw engines kill them, which is the shape of every large
+    correction in CLAUDE.md's table.
+
+    ONLY WHERE THE CARD TEXT GIVES A CHOICE. A "may" draw, an activation the
+    pilot can decline, a modal choice with a non-draw mode, a spell the pilot
+    need not cast. A MANDATORY draw -- the draw step, Horn of Greed, a spell
+    already on the stack -- is never guarded: the rule applies to it in full.
+    Callers own that distinction; this answers only the arithmetic.
+
+    `decking_reserve` (default 1) is the number of cards the pilot keeps back
+    so the next draw step does not lose. It is a judgement and is said out
+    loud as a knob; with `decking_loss=False` there is no rule and so no
+    reason to hold back, and this returns True unconditionally -- which is
+    what makes that knob restore the old behaviour exactly.
+    `decking_pilot=False` keeps the rule and removes the caution: the naive
+    pilot, so what the guard is worth can be measured apart from the rule.
+    """
+    # §0z42: both knobs off-switch the caution; the reserve is a judgement.
+    if not (g.cfg.get("decking_loss", True)
+            and g.cfg.get("decking_pilot", True)):
+        return True
+    return len(g.library) - n >= g.cfg.get("decking_reserve", 1)
 
 
 def finish(g) -> "Metrics":
@@ -1681,6 +1750,77 @@ def altar_enable(g: Game, units, precombat: bool):
 PROFT_THRESHOLD = 7
 
 
+def pool_after(units, pay_idx) -> "ManaUnits":
+    """The pool a LATER cast this turn would see, once `pay_idx` is spent.
+
+    `spend` taps each paid unit's OWNER, so every other unit that permanent
+    offered goes with it -- a Sol Ring paying one of its two is tapped for
+    both, as far as the next `available_mana` is concerned. An ownerless unit
+    (a Treasure, Castle Garenbrig's pool, anything a caller appended) goes
+    alone. That is the whole of the prediction; it is a read, and it taps
+    nothing.
+    """
+    paid = set(pay_idx)
+    owners = getattr(units, "owners", None)
+    if owners is None or len(owners) != len(units):
+        owners = [None] * len(units)
+    gone = {id(owners[i]) for i in paid
+            if i < len(owners) and owners[i] is not None}
+    keep = [i for i in range(len(units)) if i not in paid
+            and (owners[i] is None or id(owners[i]) not in gone)]
+    weights = getattr(units, "weights", None) or [ManaUnits.FOREIGN] * len(units)
+    return ManaUnits([units[i] for i in keep], [owners[i] for i in keep],
+                     [weights[i] for i in keep],
+                     getattr(units, "legacy", False),
+                     getattr(units, "surplus", True))
+
+
+def lookahead_pick(g, options, units, rank, cost_of, pay_of):
+    """QUEUED ITEM 18 (§0z43): the greedy pick, unless casting it STRANDS a card that
+    casting first would have kept.
+
+    Every engine's `main_phase` casts `max(options, key=rank)` and never asks
+    whether that payment makes another affordable card unaffordable. With
+    `cast_lookahead` on, before the greedy pick G is cast this asks, for each
+    other option O: is O affordable now, unaffordable once G is paid, and is G
+    STILL affordable once O is paid? If so, casting O first casts BOTH, and
+    greedy casts one. The highest-ranked such O is returned instead of G.
+
+    IT NEVER DROPS THE GREEDY PICK. It only reorders, so G is still cast next
+    iteration from the pool the prediction said would pay for it. That is a
+    deliberate limit, and it is why this does NOT settle §0z8's own case:
+    there, Voice of the Blessed {W}{W} and Lurrus {1}{W}{B} could not both be
+    cast from the mana on the table, and `priority` ranks Voice higher -- so
+    any policy that trusts `priority` casts Voice. Whether Lurrus is the
+    better card is a claim about the PRIORITY NUMBERS (item 18's second half,
+    that every deck's priorities were tuned while which land got tapped was
+    arbitrary), and no lookahead can answer that by itself.
+
+    One engine-specific thing each caller supplies: `cost_of(item)` is the
+    cost dict that item would pay (its chosen MODE, §1b), and `pay_of(item)`
+    its payment indices into `units`. Returns the item to cast; with the knob
+    off it is exactly `max(options, key=rank)`, so the default path is the
+    old path.
+    """
+    best = max(options, key=rank)
+    # §0z43: off by default -- measured, not yet adopted
+    if not g.cfg.get("cast_lookahead", False) or len(options) < 2:
+        return best
+    after_best = pool_after(units, pay_of(best))
+    rescues = []
+    for it in options:
+        if it is best or it[0] is best[0]:
+            continue
+        if can_pay(cost_of(it), after_best) is not None:
+            continue                    # not stranded: greedy casts both
+        if can_pay(cost_of(best), pool_after(units, pay_of(it))) is not None:
+            rescues.append(it)
+    if not rescues:
+        return best
+    g.m["lookahead_reorders"] += 1
+    return max(rescues, key=rank)
+
+
 def main_phase(g: Game, precombat: bool = False):
     """Greedy: repeatedly cast the highest-priority affordable spell.
 
@@ -1714,6 +1854,7 @@ def main_phase(g: Game, precombat: bool = False):
                 continue
 
         options = []
+        mode_cost = {}          # what each option pays, for the lookahead
         for c in g.hand:
             if c.is_land:
                 continue
@@ -1748,6 +1889,7 @@ def main_phase(g: Game, precombat: bool = False):
             if mode is not None:
                 _cost, tag, pay = mode
                 options.append((c, pay, tag))
+                mode_cost[id(c)] = _cost
         if not options:
             # Nothing is castable on lands and rocks alone. THIS is where the
             # Altar belongs -- see altar_enable and KNOWN_ISSUES §3.
@@ -1761,7 +1903,15 @@ def main_phase(g: Game, precombat: bool = False):
             ramp_bonus = 3.0 if ("ramp" in c.tags and g.turn <= 5) else 0.0
             return (c.priority + ramp_bonus, c.mv)
 
-        card, pay, alt_tag = max(options, key=rank)
+        # An Altar-enabled pick has no mode cost to price, so the lookahead
+        # sits that iteration out.
+        if all(id(it[0]) in mode_cost for it in options):
+            card, pay, alt_tag = lookahead_pick(
+                g, options, units, rank,
+                cost_of=lambda it: mode_cost[id(it[0])],
+                pay_of=lambda it: it[1])
+        else:
+            card, pay, alt_tag = max(options, key=rank)
         spend(g, pay, units)
         g.hand.remove(card)
 

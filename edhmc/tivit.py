@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -530,6 +530,7 @@ def main_phase(g):
                 continue
 
         options = []
+        units = mana_units(g)
         for c in g.hand:
             if c.is_land:
                 continue
@@ -547,11 +548,17 @@ def main_phase(g):
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-            if choose_mode(c, reduce_cost(g, c), mana_units(g)) is not None:
-                options.append(c)
+            _m = choose_mode(c, reduce_cost(g, c), units)
+            if _m is not None:
+                options.append((c, _m[2], _m[0]))
         if not options:
             return
-        card = max(options, key=lambda c: (c.priority, c.mv))
+        # item 18: greedy unless `cast_lookahead`. Tivit's own `pay` makes
+        # the payment below; the one `choose_mode` proved is what the
+        # lookahead reads, the same pool every option was priced against.
+        card = lookahead_pick(
+            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            cost_of=lambda it: it[2], pay_of=lambda it: it[1])[0]
         if not pay(g, reduce_cost(g, card)):
             return
         g.hand.remove(card)
@@ -895,9 +902,11 @@ def combat(g):
     # `artifact_count()` is the one place that question is answered, so the
     # draw counts token piles, artifact permanents and the three artifact lands
     # exactly as Time Sieve does. In a deck that makes 51-67 artifacts a game
-    # this is a large number of cards, and the draw is A CEILING for the reason
-    # queued item 17 gives: `draw()` stops at an empty library and no loss is
-    # recorded, so at a real table this card can kill you and here it cannot.
+    # this is a large number of cards. Until 2026-09-22 the draw was A CEILING
+    # because `draw()` stopped at an empty library and recorded no loss;
+    # it is a loss now (queued item 17, §0z42), and this draw is unguarded --
+    # the trigger is not modelled as a choice, so a Memnarch that draws more
+    # than the library holds decks you here exactly as it would at a table.
     for p in attackers:
         if p.card.name == "Memnarch, the Warden":
             n = g.artifact_count()
