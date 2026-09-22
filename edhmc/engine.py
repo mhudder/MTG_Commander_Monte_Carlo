@@ -1023,6 +1023,26 @@ class BaseGame:
     there. No table reads either key.
     """
 
+    # THE MONARCH (2026-09-22). A designation, not a permanent, so it lives on
+    # the game rather than the board. It is a CLASS attribute so all six
+    # engines have it without six `__init__` edits -- the §0z30 lesson, which
+    # is that a rule copied into six methods is a rule that drifts.
+    #
+    # The whole lifecycle is in `opponents.py` beside the damage path it is
+    # tied to (`monarch_end_step`, and the pass check inside
+    # `incidental_damage`), because who holds the crown is decided by the
+    # pod's combat and nothing else.
+    #
+    # NOTHING GRANTS THIS YET. No card in any of the six lists makes you the
+    # monarch, so `monarch` is False in every measured game and every code
+    # path below it is unreached -- which is why this change moves no deck's
+    # numbers. `monarch_start=True` drives it for tests and for measuring what
+    # the crown is worth before a card exists. §0z12 is the reason that
+    # distinction is written down rather than left to be discovered: a tag
+    # nothing reads is not inert, it is a loaded gun, so the read side is
+    # built and pinned FIRST and the cards come to a tested mechanism.
+    monarch = False
+
     def has(self, name: str) -> bool:
         return name in self.board.names
 
@@ -1037,6 +1057,16 @@ class BaseGame:
 
     def opening_hand(self):
         london_mulligan(self)      # shared, §0z30; MDFC backs count as lands
+        # `monarch_start` exists so the crown can be MEASURED before any card
+        # grants it -- which is tier 2 of docs/TRIAGE.md, a count at low N,
+        # and the only way to know what the mechanic is worth separately from
+        # whatever card carries it. Applied here because this is the one hook
+        # all six engines call exactly once per game; a per-engine `__init__`
+        # edit would be six copies of one rule (§0z30). Default False, so no
+        # measured game is touched.
+        if self.cfg.get("monarch_start", False):
+            self.monarch = True
+            self.m["monarch_gained"] += 1
 
     def deal_pod_damage(self, amount: float, each: bool = True):
         """`each=True` means 'each opponent loses N' (amount is the pod total)."""

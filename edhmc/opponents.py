@@ -1071,6 +1071,7 @@ def pod_phase(g, before_act=None):
     The `watch` accounting -- was the card under test removed this round --
     is the same in every engine and lives here for that reason.
     """
+    monarch_end_step(g)
     incidental_damage(g)
     resolve_clocks(g)
     if g.result is not None:
@@ -1086,6 +1087,42 @@ def pod_phase(g, before_act=None):
         g.m["test_card_removed"] += 1
 
 
+def become_monarch(g):
+    """You become the monarch. Idempotent -- taking the crown you already hold
+    is not an event, which is what the rules say and what a card that grants it
+    twice in a turn needs.
+
+    THE CROWN IS A DESIGNATION, NOT A PERMANENT, so it cannot be removed by the
+    pod's removal round and is not on `g.board`. It lives on the game
+    (`engine.BaseGame.monarch`) and it is lost ONLY to combat, below.
+    """
+    if not g.monarch:
+        g.monarch = True
+        g.m["monarch_gained"] += 1
+
+
+def monarch_end_step(g):
+    """The crown's card, at the beginning of YOUR end step.
+
+    Sequenced at the top of `pod_phase` because that IS the end of your turn
+    for all six engines -- the alternative was a call in six `take_turn`s, and
+    §0z30 is the finding that six copies of one rule drift. The order matters
+    and it is the real one: you draw at your own end step FIRST, and only then
+    do the opponents' creatures get a chance to take the crown off you.
+
+    `monarch_draws` is credited from what `draw()` actually did rather than
+    assumed, so `cards_drawn` stays equal to the SUM of the draw counters even
+    on an empty library. §0z28 is the finding: a draw credited to the wrong
+    counter looks correct from the counter it was supposed to hit.
+    """
+    if not g.monarch or g.result is not None:
+        return
+    g.m["monarch_turns"] += 1
+    before = g.m["cards_drawn"]
+    g.draw(1)
+    g.m["monarch_draws"] += g.m["cards_drawn"] - before
+
+
 def incidental_damage(g):
     """Opponents chip away at you every turn, not just when a clock resolves.
 
@@ -1098,6 +1135,20 @@ def incidental_damage(g):
         return
     rate = g.cfg.get("incidental_rate", 0.45)
     mode = g.cfg.get("combat_targeting", "threat")
+    # THE CROWN RIDES THIS SAME PATH, on purpose (2026-09-22). "A creature
+    # deals combat damage to you" has no object-level answer here -- the
+    # opponents' boards are a float count (§4) -- so the crown is lost on the
+    # turns the pod's creatures actually get through, which is precisely the
+    # quantity this loop already computes. Writing it as a second model of
+    # their offence would be §0u's shape: the same rule, implemented twice,
+    # implemented two different ways.
+    #
+    # The default rate is `incidental_rate` ITSELF rather than a new constant,
+    # because that knob already means "how much of a swing lands" and a second
+    # uncalibrated number meaning the same thing is what §0u warns about.
+    # `monarch_loss_scale` overrides it so the mechanic can be SWEPT -- and it
+    # must be, before any monarch card's number is trusted.
+    loss_scale = g.cfg.get("monarch_loss_scale", rate)
     for i, opp in enumerate(g.opponents):
         if not opp.alive:
             continue
@@ -1106,6 +1157,17 @@ def incidental_damage(g):
                  else your_share(g, opp, others))
         # An aggro deck's creatures hit harder than a control deck's.
         g.your_life -= opp.creatures * rate * share * opp.p.get("power", 1.0)
+        # GATED ON HOLDING THE CROWN, which is what keeps this change worth
+        # ZERO to all six decks: nothing grants the monarch yet, so the roll is
+        # never consumed and no existing stream can shift. `crn_random` is
+        # index-addressed per name (§0z17), so even once a card does grant it,
+        # a new stream cannot move an old one.
+        if g.monarch and (opp.creatures + opp.goaded_birds) > 0:
+            from edhmc.engine import crn_random
+            if crn_random(g, f"monarch{i}") < min(1.0, share * loss_scale):
+                g.monarch = False
+                g.m["monarch_lost"] += 1
+                break
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
         g.m["loss_route"] = 1          # ground down on life

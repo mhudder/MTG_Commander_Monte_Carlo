@@ -87,6 +87,7 @@ Methodology that used to live at the end of this file is now
 | [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
 | [0z37](#0z37) | FIXED | **Floating landfall mana was paid with and never consumed** — `engine.spend` consumes a unit by tapping its owner and azusa's Lotus Cobra / Tireless Provisioner / Nissa mana had none, so one trigger funded every spell that turn. Worth **−0.0201 ±0.0036 win rate at T20** on azusa's baseline, 741 of 15,000 seeds ending differently: the second-largest baseline correction after §0z30. Fixed by giving the mana an owner (`FloatingMana`) rather than a fourth spelling of deduct-at-the-call-site |
 | [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
+| [0z39](#0z39) | MEASURED | **The monarch is implemented, and it is worth +0.10 win rate before any card grants it.** The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5919,6 +5920,95 @@ reporting is now belt-and-braces rather than necessary.
 
 ---
 
+
+## 0z39. MEASURED — the monarch, built before a card asks for it, and it is worth a tenth of a win rate
+
+Asked for by the owner on 2026-09-22 as a common mechanic. `docs/TRIAGE.md`
+had recorded it as the blocker behind Ginger, Queen of Sweets, and the verdict
+moved from BLIND to DEFERRED on the grounds that the machinery is wanted for
+its own sake rather than to justify one card.
+
+### The modelling decision, which is the whole of it
+
+"A creature deals combat damage to you" has no object-level answer here.
+`Opponent.creatures` is a `float` (§4) — there is no creature to connect and
+no combat step in which it could. So the crown is lost **on the path that
+already models their creatures getting through**: inside
+`opponents.incidental_damage`, off the same threat-weighted `share` that
+decides how much of their swing is aimed at you. Three options were put up and
+this was chosen (option 2 of three) over a standalone per-turn probability,
+because a second model of the pod's offence is §0u's shape — the same rule,
+implemented twice, implemented two different ways.
+
+`monarch_loss_scale` defaults to `incidental_rate` **itself** rather than to a
+new constant, because that knob already means "how much of a swing lands".
+Per living opponent with creatures, `P(lose) = min(1, share × scale)`; you keep
+the crown only if none of them connects.
+
+### What it is worth, and why that is a warning rather than good news
+
+`monarch_start=True` against `False`, same seeds, N=400, T20 — a mechanism
+smoke test (TRIAGE tier 2), not a card:
+
+| deck | won | cards drawn | crown held |
+|---|---|---|---|
+| karlov | 0.3425 → 0.4450 (**+0.1025**) | 15.65 → 18.83 (+3.18) | 3.57 end steps, lost 1.00× |
+| rendmaw | 0.1800 → 0.3025 (**+0.1225**) | 15.21 → 19.12 (+3.91) | 3.54 end steps, lost 1.00× |
+
+**That is roughly 0.03 win rate per extra card, which is far above anything
+this project measures for a real card,** and it is the number to distrust
+rather than to celebrate. Two reasons, both structural:
+
+1. **THE MODEL PAYS YOU AND CHARGES YOU NOTHING.** You draw while you hold the
+   crown; when it passes, the opponent who took it draws *in reality* and draws
+   nothing here, because the pod has no hand and no card draw at all. Every
+   monarch number this engine produces is therefore a **CEILING**, and by an
+   amount the engine cannot see.
+2. **`monarch_loss_scale` decides the entire value and HAS NOT BEEN SWEPT.**
+   The crown is held ~3.5 end steps at the default and is never regained,
+   since nothing re-grants it. Halve the scale and the card doubles.
+
+`monarch_start` is not a card. It hands you the crown on turn one for free,
+which no real card does, so the table above is the mechanism's ceiling on top
+of the model's.
+
+### Zero movement, proved rather than argued
+
+This is a shared-code change — `engine.py` and `opponents.py` are in every
+deck's fingerprint — so all six fingerprints moved. No deck's numbers did:
+
+  * `check_unchanged_decks`: **BIT-IDENTICAL on all 8 metrics, 0 of 6 decks
+    moved.**
+  * and §0z32's wider check, because the eight metrics are not all the numbers
+    the engine records: **every numeric output key identical on all six decks**
+    — 87 azusa, 106 lorehold, 67 tivit, 60 karlov, 54 rendmaw, 51 shilgengar.
+  * `tools.validate`: `+0.00` on all eighteen metrics, corr 0.9101, unchanged.
+
+The reason is structural rather than lucky. Nothing grants the crown, so
+`g.monarch` is False in every measured game and the roll is **never consumed** —
+`tests/test_monarch.py` case H asserts exactly that, and it is the case that
+makes "this moves no deck" checkable instead of arguable. `crn_random` is
+index-addressed per name (§0z17), so even once a card does grant it, the new
+stream cannot shift an old one.
+
+### Why the read side was built first
+
+§0z12 — a tag nothing reads is not inert, it is a loaded gun. Five `wipe` tags
+sat dormant and looked harmless, and wiring the branch up made two of them
+instantly WRONG. The monarch is that shape in advance: the mechanism is built
+and pinned with ten cases and four mutation sets *before* a card depends on it,
+so the first monarch card arrives at a tested mechanism instead of making one
+live. The one thing with no mutation behind it is written down in the test's own
+docstring (§0z15): case E's `first_attack_turn` guard is shared with the damage
+path and cannot be switched off without reimplementing that function.
+
+### What is owed before a monarch card ships
+
+1. **Sweep `monarch_loss_scale`.** It is the card's value.
+2. **Decide whether the pod's crown is worth modelling** — the ceiling in the
+   table above is the opponents drawing cards, which is §4 again.
+3. Ginger, Queen of Sweets still needs its oracle text verified on release
+   (Reality Fracture, 2026-10-02); nothing in this section depends on that card.
 
 ## How to read an ablation table
 
