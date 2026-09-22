@@ -812,35 +812,6 @@ is half answered**: the ordering half is built and measured as a null
     are off-colour. `check_proposals()` catches that now, and all four of its
     branches were proved to fire.
 
-21. **AZUSA'S HEAD-TO-HEAD IS DONE AND THE TWO CARDS ARE MEASURED EQUAL —
-    THE DECISION IS THE OWNER'S** (§0z35, 2026-09-20). Against the cut the
-    owner named, Yavimaya Elder (+0.0023 ±0.0023, inside its own bar,
-    MODEL-EVALUATED), both swaps land in the same place: Traveling Chocobo
-    +0.0265 ±0.0042 and Nissa, Resurgent Animist +0.0266 ±0.0043 at T20. And
-    run 3 is the one §0c says a common baseline cannot give — **Chocobo →
-    Nissa in that one slot, paired on the same seeds, is +0.0001 [−0.0039,
-    +0.0041]**, a point estimate at a fortieth of its bar. They buy different
-    things in equal amounts (Nissa +0.27 landfall and −6.5 stranded mana;
-    Chocobo +0.57 cards and +9.0 life) and the deck can take only one. **Both
-    are ready to stage and NEITHER IS STAGED, because the reason is compute
-    rather than doubt**: staging rewrites `build_pending("azusa")`, which is
-    the third row of the cache table in the standing findings — the one nothing but a rebuild can
-    clear — so staging the wrong one of two equal cards costs a second
-    rebuild. One question to the owner, one rebuild. The other eleven
-    `MEASURED` azusa rows still need their own cuts named.
-    **ANSWERED 2026-09-21: THE TIE WAS §0z37 AND THE CHOCOBO WINS.** The
-    +0.0001 [−0.0039, +0.0041] that made these two equal was an artefact of
-    floating landfall mana never being consumed — **Nissa's ritual half WAS
-    that defect**. On the fixed engine, same N and seeds: the Chocobo swap is
-    **+0.0213 ±0.0029 / +0.0257 ±0.0042**, Nissa's is **+0.0157 / +0.0201**,
-    and the direct paired comparison in that one slot is **−0.0056 ±0.0029 at
-    T10 and −0.0056 ±0.0040 at T20 — significant at BOTH horizons, same sign,
-    same size**. Nissa lost ~0.0065 to the fix; the Chocobo lost ~0.0009.
-    **There is no question left to put to the owner: Traveling Chocobo is the
-    card for the Yavimaya slot.** The lesson is the one worth keeping — two
-    cards measured EQUAL by a harness that was paying one of them twice, and
-    no amount of extra sample size would have separated them.
-
 22. **ANSWERED: ONE OF KARLOV'S THREE NEGATIVE ROWS WAS THE §0j ARTEFACT, AND
     SWIFTFOOT BOOTS IS THE CUT** (§0z35, 2026-09-20). Decomposed against
     blanks that match the real card on progressively more of what `blank_like`

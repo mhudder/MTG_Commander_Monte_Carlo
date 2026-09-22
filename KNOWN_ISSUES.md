@@ -6218,6 +6218,24 @@ before the staging was allowed to stand -- `results/azusa_head2head_0z41.txt`.
 Greenwarden's committed row carries the same inflation and is restated only
 by the azusa rebuild.
 
+**AND IT UNDID A RANKING THAT WAS ONE DAY OLD.** Re-measured on the fixed
+engine, same N, seeds and base: the Chocobo swap is **+0.0173 [+0.0145,
++0.0201] at T10 and +0.0222 [+0.0181, +0.0263] at T20** (was +0.0213 /
++0.0257) -- still significant, but ~40% of its extra cards were the Horn
+(`cards_drawn` +0.62, was +1.07). Nissa, Resurgent Animist's swap barely moved
+(+0.0155 / +0.0195). And the direct comparison §0z37 had made significant --
+Chocobo → Nissa in one slot, −0.0056 at both horizons -- is now **−0.0017
+[−0.0046, +0.0013] and −0.0027 [−0.0069, +0.0013], inside the bar at both.**
+§0z37 broke a tie that a defect had made; this breaks the tie §0z37 made, with
+a second defect. The two cards are MEASURED EQUAL again, and the Chocobo is
+staged on the owner's instruction rather than on a measured edge.
+
+**That is the same lesson twice in two days, and it is worth saying once in
+the general form:** a head-to-head between two cards is exact about the
+harness it ran on, and each card's number carries every defect on the hooks
+it touches. When a fix lands on a hook one of two ranked cards uses, the
+ranking is stale even if its own bar was tight.
+
 The lesson is §0z28's shape one hook over: **a hook that runs N times for one
 kind of trigger will run N times for anything placed inside it.** When a
 payoff is added to a multiplied loop, check the card's trigger EVENT against
