@@ -2296,6 +2296,33 @@ dated, and several sections are explicitly marked VOID.
 
 ---
 
+## Queued items closed 2026-09-22 — moved from `CLAUDE.md`
+
+Moved verbatim, each with a closing note, under the same precedent as the
+section above.
+
+17. ~~NOTHING IN THIS PROJECT LOSES TO DECKING~~ **CLOSED 2026-09-22 — §0z42.** — and it keeps getting more
+    live, not less. §0z14: Apex of Power now EXILES seven a resolution and
+    Discover 10 digs until it hits. **2026-09-12, and this one is the sharp
+    case: BOLAS'S CITADEL IS STAGED INTO KARLOV.** Its whole function is to
+    strip the library from the top, `draw()` stops at empty, no loss is
+    recorded — and at a real table emptying your library is precisely how
+    this card kills you. None of them can lose the game here, so every one of
+    their numbers is a CEILING, and the Citadel's +0.0163 is the first staged
+    swap that depends on the gap. **Closing item 17 is now a prerequisite for
+    trusting a committed Citadel, not a tidy-up.**
+    **CLOSING NOTE.** A draw from an empty library loses now
+    (`engine.drew_from_empty`), and the pilot declines optional draws that
+    would deck it (`engine.draw_is_safe`) -- without that, the rule alone
+    cost azusa 0.022 at T20 in the games it was winning. **The Citadel was
+    not the card that needed it:** karlov's staged list, Citadel in, is
+    identical game for game at N=15,000 with and without the rule. Only azusa
+    (−0.0047 at T20, after the guard) and lorehold (−0.0035) moved, and both
+    tables were rebuilt.
+
+
+---
+
 ## HANDOFF.md's status block, as of 2026-09-12 — SUPERSEDED, see `docs/STATUS.md`
 
 **Moved here verbatim from `HANDOFF.md` on 2026-09-15.** It opened that file

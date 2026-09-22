@@ -90,6 +90,7 @@ Methodology that used to live at the end of this file is now
 | [0z39](#0z39) | MEASURED | **The monarch is implemented. The +0.10 it first measured was the HARNESS**: `monarch_start` grants the crown on turn 1 and `first_attack_turn` is 3, so two of its three held turns were immunity no card can buy. Granted when a card could arrive it is +0.02 to +0.04. The owner's attack-threat correction is in (a FLOOR on `combat_share`, which deters a wide board and should not for the monarch) and does NOT counterbalance -- tripling the share costs 0.002. The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
 | [0z40](#0z40) | MEASURED | **Ginger, Queen of Sweets: the first card to use the monarch, and it behaves like a six-drop.** The real swap against the cut item 22 named is **+0.0186 ±0.0033 at T20**, level with Alhammarret's Archive and well under Bloodthirsty Conqueror — and Conqueror → Ginger IN THE SAME SLOT is **−0.0210 ±0.0034**, so the ranking is measured and not inferred. P(resolves) 0.152, the crown held 1.03 turns, 2.96 Gingerbrutes a resolution. **The sacrifice clause fires 0.0000 times and is correctly implemented**: haste means combat taps the token before its own `{T}` cost can be paid |
 | [0z41](#0z41) | FIXED | **Horn of Greed was tripled.** Its draw sat inside `_landfall_payoffs`, which Ancient Greenwarden and Traveling Chocobo run once per rep, so one land drop drew three. Greenwarden's own ruling: "an ability that triggers whenever you play a land won't trigger an additional time." Moved out of the loop; worth **−0.0049 / −0.0033** to azusa's baseline, and it flattered both doublers, so the Chocobo's staging was re-measured |
+| [0z43](#0z43) | MEASURED | **The one-card cast lookahead is a measured NULL.** `engine.lookahead_pick` (queued item 18) reorders a cast when the greedy pick would strand a card that casting first would have kept; wired into all six `main_phase`s, it fires in 4-12% of games and moves win rate inside its bar in all twelve deck-horizon cells (largest +0.0010 ±0.0020). §0z8's SURPLUS rule already handles the ordering. `cast_lookahead` stays OFF; what is left of item 18 is the `priority` numbers themselves |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6221,6 +6222,75 @@ The lesson is §0z28's shape one hook over: **a hook that runs N times for one
 kind of trigger will run N times for anything placed inside it.** When a
 payoff is added to a multiplied loop, check the card's trigger EVENT against
 the multiplier's rulings, not just its word "land".
+
+## 0z43. MEASURED — the one-card cast lookahead (queued item 18): built, wired into six engines, a measured null, and OFF
+
+Queued item 18 says `main_phase` is greedy on `priority` and never asks
+whether casting the greedy pick strands something. This is the first half of
+it, built behind `cast_lookahead` (default False) and measured, not adopted.
+
+### What it does, and what it cannot do
+
+`engine.lookahead_pick` is ONE function; every engine's `main_phase` calls it
+where it used to call `max(options, key=rank)`. With the knob on, before the
+greedy pick G is cast it asks of each other affordable option O: is O
+stranded once G is paid, and is G still affordable once O is paid? If so O
+goes first and both are cast. It never drops G -- it only reorders.
+`engine.pool_after` is the prediction: `spend` taps each paid unit's OWNER, so
+a two-unit source paying one unit takes both with it.
+
+**It does not settle §0z8's own case, and cannot.** There, Voice of the
+Blessed `{W}{W}` and Lurrus `{1}{W}{B}` could not both be cast from the mana on
+the table, and `priority` ranks Voice higher; any policy that trusts
+`priority` casts Voice. Whether Lurrus is the better card is item 18's SECOND
+half -- every deck's priorities were tuned while which land got tapped was
+arbitrary -- and that is a question about the numbers, not about ordering.
+
+**And the ordering half is mostly already handled.** The test's motivating
+hand -- a Plains and a colourless rock, a `{1}` card and a `{W}` card -- is
+stranded by bare `can_pay` (it taps lands before rocks), but NOT by the live
+engine: §0z8's SURPLUS rule makes `available_mana` read the hand's colour
+demand and keep the Plains. The test pins the wiring with `mana_surplus=False`
+for exactly that reason. What the lookahead catches in real games is the
+residue the surplus rule misses.
+
+### What it was worth
+
+Wired into all six engines (azusa falls back to greedy while Castle
+Garenbrig's creature-only mana is floating, because one pool cannot price
+both kinds of option; tivit's own `pay` makes the payment, so the lookahead
+reads the payment `choose_mode` proved). N=15,000 paired, staged lists, same
+seeds, knob on against off:
+
+| deck | T10 win rate | T20 win rate | games changed, T10 / T20 |
+|---|---|---|---|
+| rendmaw | +0.0005 ±0.0006 | −0.0003 ±0.0012 | 21 / 78 |
+| lorehold | −0.0005 ±0.0006 | −0.0009 ±0.0013 | 23 / 101 |
+| karlov | −0.0004 ±0.0008 | −0.0001 ±0.0013 | 34 / 101 |
+| tivit | −0.0003 ±0.0011 | +0.0010 ±0.0020 | 70 / 243 |
+| shilgengar | +0.0001 ±0.0003 | +0.0007 ±0.0012 | 4 / 81 |
+| azusa | +0.0003 ±0.0007 | −0.0006 ±0.0011 | 29 / 77 |
+
+(N=1,000 smoke first: it fires in 4-12% of games in every deck, so the
+wiring is live everywhere -- `lookahead_reorders`.)
+
+**ALL TWELVE CELLS ARE INSIDE THEIR BARS, and the signs split five up, seven down.**
+It changes the result of up to 243 games in 15,000 and those changes cancel.
+That is a MEASURED NULL, not an unmeasured one: the ordering half of item 18
+is worth nothing this harness can see, at the tables' N, in any deck. It stays
+OFF -- turning it on would move all six baselines, and six rebuilds, for a
+policy that buys nothing.
+
+**What that leaves of item 18 is the priority numbers**, which is where §0z8
+pointed in the first place. The lookahead proves the casting ORDER is not the
+leak; if Lurrus is the better card, the only lever is `priority`, and
+re-tuning priorities is a per-deck judgement with its own measurement, not a
+code change. A per-card priority sweep through `run_ab` is the obvious next
+step and has not been tried.
+
+`tests/test_cast_lookahead.py` pins `pool_after`, the rescue rule and the
+rendmaw wiring; `--mutate` runs four mutations, exact sets, all right first
+time.
 
 ## How to read an ablation table
 

@@ -215,6 +215,7 @@ asserting a card does nothing:
 | Shilgengar would only ever sacrifice 1/1 tokens | the commander's own ability does nothing | 0.034 |
 | Shilgengar's main phase spent every point of mana | an after-combat ability is never affordable | 0.008 |
 | combat sent the whole swing at one player | going wider than one opponent's life is worthless | 0.063 (azusa) |
+| once decking could lose, the pilot still drew every card it was offered | a draw engine kills you in exactly the games it is winning | 0.022 (azusa), caught before it shipped (§0z42) |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a
@@ -223,6 +224,16 @@ When you see one, suspect the engine before the card, and check the MECHANISM
 COUNTERS (`blood_made`, `landfall_triggers`, `opponents_killed`) rather than
 win rate: a mechanism that fires zero times is unmistakable where a win rate
 0.03 too low is not.
+
+**A RULE THAT MAKES A NEW OUTCOME POSSIBLE TURNS EVERY OLD POLICY INTO A CLAIM
+ABOUT IT** (§0z42). Drawing from an empty library could not lose, so "draw
+every card you are offered" was harmless; the day it could lose, the same
+policy decked azusa in the turns it had lethal on board. Closing the rule
+without teaching the pilot would have been a 0.022 correction in the WRONG
+direction, reported as the rule's cost. **When a fix makes a loss (or a win)
+possible that was not, measure the naive pilot as well as the rule** -- the
+difference is the policy the fix just made live, and it is the §0z5 shape
+arriving on the same day as the fix instead of after it.
 
 **A SELECTION IS A SNAPSHOT AND THE ZONE IS LIVE** (2026-09-13, §0z19). Two
 implementations written the same day crashed on the identical defect: a pool
@@ -723,10 +734,10 @@ information would. §0v.
 for itself when items closed before 2026-09-07 were moved there. Each names the
 `§` that carries its measurement, and those ids are stable.
 
-**Two are live and both are prerequisites rather than improvements.** Item 18
-describes itself as the weakest link in the engine; item 17 is now a
-precondition for committing a staged swap rather than a tidy-up. Neither
-ordering is measured — that is the honest statement of it.
+**Item 17 is closed** (§0z42: decking loses, and the pilot knows it) and
+moved to `docs/HISTORY.md`; so is item 21, whose card is now staged. **Item 18
+is half answered**: the ordering half is built and measured as a null
+(§0z43), which leaves the `priority` numbers as the whole of it.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10
@@ -878,28 +889,20 @@ ordering is measured — that is the honest statement of it.
     measured, and it FAILS if it calls BLIND anything whose row was significant.
     Triage predicts MEASURABILITY, not value.
 
-18. **`main_phase` IS GREEDY ON `priority` AND IT IS NOW THE WEAKEST LINK.**
-    It casts the highest-priority affordable card and never asks whether doing
-    so makes a BETTER card uncastable. §0z8 caught it red-handed: with both
-    white sources correctly preserved, Karlov cast Voice of the Blessed
-    `{W}{W}` — higher priority, cheaper — and locked Lurrus `{1}{W}{B}` out of
-    the game. The colour fix hands the policy more options and it sometimes
-    uses them worse. **Every deck's `priority` numbers were tuned while which
-    land got tapped was effectively arbitrary**, so they are all suspect in
-    the same way `SPRINGHEART_HOSTS` was (§0z5). A one-card lookahead — "does
-    casting this strand something better?" — is the obvious next step and has
+18. **`main_phase` IS GREEDY ON `priority` — AND THE LOOKAHEAD SAYS THE
+    ORDER IS NOT THE PROBLEM; THE NUMBERS ARE** (§0z43). §0z8 caught Karlov
+    casting Voice of the Blessed `{W}{W}` over Lurrus `{1}{W}{B}` once both
+    white sources were correctly preserved. The one-card lookahead this item
+    asked for is BUILT (`engine.lookahead_pick`, all six engines,
+    `cast_lookahead`) and MEASURED: it fires in 4-12% of games and moves win
+    rate inside its bar in all twelve deck-horizon cells, because §0z8's
+    SURPLUS rule already keeps the colour a hand needs. It stays OFF. And it
+    could never have settled the Voice/Lurrus case: those two cannot both be
+    cast from that mana, and `priority` ranks Voice higher. **So what is left
+    is the claim this item always made — every deck's `priority` numbers
+    were tuned while which land got tapped was effectively arbitrary** — and
+    the next step is a per-deck priority sweep through `run_ab`, which has
     not been tried.
-
-17. **NOTHING IN THIS PROJECT LOSES TO DECKING** — and it keeps getting more
-    live, not less. §0z14: Apex of Power now EXILES seven a resolution and
-    Discover 10 digs until it hits. **2026-09-12, and this one is the sharp
-    case: BOLAS'S CITADEL IS STAGED INTO KARLOV.** Its whole function is to
-    strip the library from the top, `draw()` stops at empty, no loss is
-    recorded — and at a real table emptying your library is precisely how
-    this card kills you. None of them can lose the game here, so every one of
-    their numbers is a CEILING, and the Citadel's +0.0163 is the first staged
-    swap that depends on the gap. **Closing item 17 is now a prerequisite for
-    trusting a committed Citadel, not a tidy-up.**
 
 0b-i. **Sunbird's one-off decay is still unattributed — but it has stopped.**
     +0.0215 (2026-09-04) → +0.0146 ±0.0028 (2026-09-06) → +0.0152 ±0.0028
