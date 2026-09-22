@@ -650,6 +650,81 @@ COMMITTED: list[Change] = [
             "replaced rather than supplemented if one of them won. One did."
         ),
     ),
+    # COMMITTED 2026-09-22 to edhmc/decks/azusa_v1.py, into Yavimaya Elder's
+    # EXACT list position, so the committed list is index-for-index the one
+    # the 2026-09-22 rebuilt table was measured against (§0z42). Azusa has
+    # no .xlsx: its module is the system of record, so this is two legs.
+    # Its MEASURED row -- a 2026-09-13 candidate row of +0.0291 +-0.0040 at
+    # T20 against a blank -- was removed on commit, as check_measured_are_
+    # promotable requires and as all four earlier azusa commits did. The
+    # number the decision rests on is the head-to-head below (§0c).
+    Change(
+        deck="azusa", remove="Yavimaya Elder", add="Traveling Chocobo",
+        staged="2026-09-22",
+        rationale=(
+            "A SECOND ANCIENT GREENWARDEN for the half this deck cares about: "
+            "'if a land or Bird you control entering causes a triggered "
+            "ability of a permanent you control to trigger, that ability "
+            "triggers an additional time', and the two STACK -- one land fires "
+            "every payoff three times. It also plays lands off the top of the "
+            "library, a fifth source of that boolean. THE CUT IS THE OWNER'S "
+            "(2026-09-20): Yavimaya Elder ablates to +0.0023 +-0.0023, inside "
+            "its own bar, and is MODEL-EVALUATED -- its death trigger and its "
+            "sacrifice-draw are both in azusa.py -- so its row is evidence "
+            "and not a blind card read as one (§0z36). Staged on the owner's "
+            "instruction of 2026-09-22, after §0z37 had broken the tie with "
+            "Nissa, Resurgent Animist in this card's favour -- A RANKING THAT "
+            "DID NOT SURVIVE THE SAME DAY'S HORN OF GREED FIX (§0z41; see the "
+            "evidence). The two are MEASURED EQUAL again, so the choice is the "
+            "owner's preference and this staging rests on it, not on a "
+            "measured edge."),
+        evidence=(
+            "RE-MEASURED 2026-09-22 ON THE §0z41/§0z42 ENGINE (Horn of Greed "
+            "no longer tripled by this card and Greenwarden; decking loses), "
+            "same N, seeds and base (diagnostics/run_azusa_head2head.py, "
+            "results/azusa_head2head_0z41.txt): THE REAL SWAP is win rate "
+            "+0.0173 [+0.0145, +0.0201] at T10 and +0.0222 [+0.0181, "
+            "+0.0263] at T20, significant at BOTH horizons, against baselines "
+            "of 0.1570 and 0.3780. cards_drawn +0.44 / +0.62, down from "
+            "+0.80 / +1.07 -- about 40% of this card's extra cards were Horn "
+            "of Greed being tripled. AND THE RANKING IS GONE: Chocobo -> "
+            "Nissa, Resurgent Animist in this slot is -0.0017 [-0.0046, "
+            "+0.0013] at T10 and -0.0027 [-0.0069, +0.0013] at T20, inside the "
+            "bar at both, point estimates still in this card's favour. Nissa's "
+            "own swap barely moved (+0.0155 / +0.0195). The two buy different "
+            "things -- Nissa +0.19 landfall_triggers and 2.1 LESS stranded "
+            "mana, this card +0.25 cards and +0.67 life at T20 -- in amounts "
+            "the harness cannot separate. SUPERSEDED FIGURES FOLLOW. "
+            "THE REAL SWAP on the post-§0z37 engine, N=15,000 paired, same "
+            "seeds both legs, base = build_pending('azusa') with Ka-Zar "
+            "applied (diagnostics/run_azusa_head2head.py, "
+            "results/azusa_head2head.txt): win rate +0.0213 [+0.0183, "
+            "+0.0241] at T10 and +0.0257 [+0.0215, +0.0297] at T20, "
+            "significant at BOTH horizons, against baselines of 0.1597 and "
+            "0.3829. Damage +2.17 / +2.11, cards_drawn +0.80 / +1.07, "
+            "final_life +1.55 / +2.76, stranded_mv +2.12 / +3.00. AND THE "
+            "RANKING §0c says a common baseline cannot give: Chocobo -> Nissa, "
+            "Resurgent Animist in this one slot, paired on the same seeds, is "
+            "-0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20 -- this card "
+            "was the better of the two at both horizons ON THAT ENGINE. The "
+            "pre-§0z37 figures "
+            "(+0.0253 / +0.0265, and a measured tie with Nissa) are "
+            "SUPERSEDED: the tie was floating landfall mana never being "
+            "consumed (§0z35, §0z37)."),
+        notes=(
+            "FLOOR, and a small one: 'cast Bird spells from the top of your "
+            "library' is worth nothing in a list whose only Bird is this card. "
+            "Its top-of-library half is REDUNDANT with Courser, Augur, Oracle "
+            "and the staged Ka-Zar, and that is priced in -- all four are in "
+            "the list it was measured against. REDUNDANT WITH ANCIENT "
+            "GREENWARDEN BY DESIGN (§0z27): after this lands, Greenwarden's "
+            "row is understated, and the two must be ablated as a group before "
+            "either is read as a cut. STAGING REWRITES build_pending('azusa'), "
+            "which is the third row of CLAUDE.md's cache table -- the azusa "
+            "ablation table is rebuilt in the same change, never cleared with "
+            "--verified. AZUSA HAS NO .xlsx: committing this is two legs, the "
+            "module and this ledger."),
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -1186,84 +1261,6 @@ MEASURED: list[Candidate] = [
     # ranked against each other beyond their bars (§0c). §0z21.
     Candidate(
         deck="azusa",
-        card="Traveling Chocobo",
-        measured="2026-09-13",
-        win_rate="+0.0291 +-0.0040 at T20 (damage +2.64 +-0.26)",
-        signal="both",
-        rationale=(
-            "A SECOND ANCIENT GREENWARDEN for the half this deck cares about: "
-            "'if a land or Bird you control entering causes a triggered "
-            "ability of a permanent you control to trigger, that ability "
-            "triggers an additional time' is Greenwarden's sentence with Bird "
-            "added, and the two STACK -- one land fires every payoff three "
-            "times. Measured: landfall_ability_resolutions +13.84 per "
-            "resolution against landfall_triggers +0.90, and tokens_made +243 "
-            "per resolution, which is Scute Swarm compounding. It also plays "
-            "lands off the top of the library, a FIFTH source of that boolean."
-        ),
-        evidence=(
-            "N=15,000 paired, T20, in the Sylvan Library slot. "
-            "tools/candidates.py azusa4; "
-            "results/candidates_azusa_batch4_T20.txt. Mechanisms in "
-            "results/azusa_batch4_mechanisms.txt. §0z21. "
-            "THE HEAD-TO-HEAD EXISTS AS OF 2026-09-20 (§0z35, queued item 21, "
-            "diagnostics/run_azusa_head2head.py, "
-            "results/azusa_head2head.txt): the REAL SWAP "
-            "-Yavimaya Elder +Traveling Chocobo on the staged list, N=15,000 "
-            "paired, same seeds both legs, is win rate "
-            "+0.0253 [+0.0223, +0.0283] at T10 and "
-            "+0.0265 [+0.0223, +0.0306] at T20, significant at BOTH horizons "
-            "against baselines of 0.1817 and 0.4017. Damage +2.16, "
-            "cards_drawn +1.27, final_life +16.0 at T20. The swap is the "
-            "candidate row MINUS the cut's own value (+0.0291 - 0.0023 = "
-            "+0.0268 predicted, +0.0265 measured), which is the consistency "
-            "§0c asserts and the first time this project has checked it."
-        ),
-        limits=(
-            "FLOOR, and a small one: 'cast Bird spells from the top of your "
-            "library' is worth nothing in a list whose only Bird is this card. "
-            "Answered by the pod 12.7% of the time. The top-of-library half is "
-            "REDUNDANT with Courser, Augur, Oracle and the staged Ka-Zar -- "
-            "that redundancy is already priced in here, because all four are "
-            "in the list this was measured against."
-        ),
-        verdict=(
-            "Would rank 8th of 44 model-evaluated cards by win rate, inside "
-            "the bars of Rampaging Baloths, Tireless Tracker, Ancient "
-            "Greenwarden and Nissa, Vastwood Seer. It is INSIDE Nissa, "
-            "Resurgent Animist's bar too (0.0006 apart against +-0.0040), so "
-            "the two are a SET and not a ranking. "
-            "AND THAT IS NOW MEASURED RATHER THAN INFERRED (2026-09-20, "
-            "§0z35). §0z21 said the harness CANNOT rank them, because two "
-            "rows against a common baseline have overlapping CIs (§0c). A "
-            "DIRECT PAIRED A/B does rank them -- Chocobo in the slot on the A "
-            "leg, Nissa on the B leg, same 99 cards and same seeds -- and it "
-            "returns +0.0027 [-0.0005, +0.0060] at T10 and "
-            "+0.0001 [-0.0039, +0.0041] at T20 in Nissa's favour. Not "
-            "unrankable: MEASURED EQUAL, to within +-0.0040. Either card is "
-            "the same win rate in this slot, and the choice between them is a "
-            "deckbuilding preference the harness has no opinion on. "
-            "SUPERSEDED 2026-09-21 by §0z37 (the tie was the engine's), and "
-            "STAGED 2026-09-22 as -Yavimaya Elder +Traveling Chocobo -- see "
-            "CHANGES. The shortlist history follows, kept verbatim: it was "
-            "shortlisted because it "
-            "is here: highest of the six, and the one whose mechanism this "
-            "deck is built to exploit -- a second doubler in a list holding "
-            "Scute Swarm, Rampaging Baloths, Avenger and Greensleeves. "
-            "SHORTLISTED 2026-09-14 for review, NOT decided. "
-            "THE TIE IS BROKEN AND THIS CARD WON IT (2026-09-21, §0z37). The +0.0001 [-0.0039, +0.0041] that made these two EQUAL was an artefact of floating landfall mana never being consumed -- Nissa, Resurgent Animist's ritual half WAS that defect. Re-run on the fixed engine, same N and seeds: -Yavimaya Elder +Traveling Chocobo is +0.0213 +-0.0029 at T10 and +0.0257 +-0.0042 at T20; the same swap with Nissa is +0.0157 and +0.0201; and the direct paired comparison in that one slot is Chocobo -> Nissa -0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20, SIGNIFICANT AT BOTH HORIZONS with the same sign and size. Nissa lost ~0.0065 to the fix and this card lost ~0.0009. THE OWNER'S QUESTION NO LONGER NEEDS ASKING: this is the card for the slot. Originally: READY TO STAGE as of 2026-09-20: the cut is the owner's choice "
-            "(2026-09-20) and the head-to-head is measured at both horizons. "
-            "DELIBERATELY NOT STAGED YET, and the reason is compute rather "
-            "than doubt: staging changes `build_pending('azusa')`, which is "
-            "the list every cached azusa number was measured against, so it "
-            "forces a full azusa rebuild -- and Nissa, Resurgent Animist is "
-            "MEASURED EQUAL in the same slot, so staging the wrong one of the "
-            "two costs a second rebuild. One question to the owner, one "
-            "rebuild."
-        ),
-    ),
-    Candidate(
-        deck="azusa",
         card="Nissa, Resurgent Animist",
         measured="2026-09-13",
         win_rate="+0.0285 +-0.0041 at T20 (damage +2.65 +-0.28)",
@@ -1471,73 +1468,6 @@ MEASURED: list[Candidate] = [
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
-    Change(
-        deck="azusa", remove="Yavimaya Elder", add="Traveling Chocobo",
-        staged="2026-09-22",
-        rationale=(
-            "A SECOND ANCIENT GREENWARDEN for the half this deck cares about: "
-            "'if a land or Bird you control entering causes a triggered "
-            "ability of a permanent you control to trigger, that ability "
-            "triggers an additional time', and the two STACK -- one land fires "
-            "every payoff three times. It also plays lands off the top of the "
-            "library, a fifth source of that boolean. THE CUT IS THE OWNER'S "
-            "(2026-09-20): Yavimaya Elder ablates to +0.0023 +-0.0023, inside "
-            "its own bar, and is MODEL-EVALUATED -- its death trigger and its "
-            "sacrifice-draw are both in azusa.py -- so its row is evidence "
-            "and not a blind card read as one (§0z36). Staged on the owner's "
-            "instruction of 2026-09-22, after §0z37 had broken the tie with "
-            "Nissa, Resurgent Animist in this card's favour -- A RANKING THAT "
-            "DID NOT SURVIVE THE SAME DAY'S HORN OF GREED FIX (§0z41; see the "
-            "evidence). The two are MEASURED EQUAL again, so the choice is the "
-            "owner's preference and this staging rests on it, not on a "
-            "measured edge."),
-        evidence=(
-            "RE-MEASURED 2026-09-22 ON THE §0z41/§0z42 ENGINE (Horn of Greed "
-            "no longer tripled by this card and Greenwarden; decking loses), "
-            "same N, seeds and base (diagnostics/run_azusa_head2head.py, "
-            "results/azusa_head2head_0z41.txt): THE REAL SWAP is win rate "
-            "+0.0173 [+0.0145, +0.0201] at T10 and +0.0222 [+0.0181, "
-            "+0.0263] at T20, significant at BOTH horizons, against baselines "
-            "of 0.1570 and 0.3780. cards_drawn +0.44 / +0.62, down from "
-            "+0.80 / +1.07 -- about 40% of this card's extra cards were Horn "
-            "of Greed being tripled. AND THE RANKING IS GONE: Chocobo -> "
-            "Nissa, Resurgent Animist in this slot is -0.0017 [-0.0046, "
-            "+0.0013] at T10 and -0.0027 [-0.0069, +0.0013] at T20, inside the "
-            "bar at both, point estimates still in this card's favour. Nissa's "
-            "own swap barely moved (+0.0155 / +0.0195). The two buy different "
-            "things -- Nissa +0.19 landfall_triggers and 2.1 LESS stranded "
-            "mana, this card +0.25 cards and +0.67 life at T20 -- in amounts "
-            "the harness cannot separate. SUPERSEDED FIGURES FOLLOW. "
-            "THE REAL SWAP on the post-§0z37 engine, N=15,000 paired, same "
-            "seeds both legs, base = build_pending('azusa') with Ka-Zar "
-            "applied (diagnostics/run_azusa_head2head.py, "
-            "results/azusa_head2head.txt): win rate +0.0213 [+0.0183, "
-            "+0.0241] at T10 and +0.0257 [+0.0215, +0.0297] at T20, "
-            "significant at BOTH horizons, against baselines of 0.1597 and "
-            "0.3829. Damage +2.17 / +2.11, cards_drawn +0.80 / +1.07, "
-            "final_life +1.55 / +2.76, stranded_mv +2.12 / +3.00. AND THE "
-            "RANKING §0c says a common baseline cannot give: Chocobo -> Nissa, "
-            "Resurgent Animist in this one slot, paired on the same seeds, is "
-            "-0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20 -- this card "
-            "was the better of the two at both horizons ON THAT ENGINE. The "
-            "pre-§0z37 figures "
-            "(+0.0253 / +0.0265, and a measured tie with Nissa) are "
-            "SUPERSEDED: the tie was floating landfall mana never being "
-            "consumed (§0z35, §0z37)."),
-        notes=(
-            "FLOOR, and a small one: 'cast Bird spells from the top of your "
-            "library' is worth nothing in a list whose only Bird is this card. "
-            "Its top-of-library half is REDUNDANT with Courser, Augur, Oracle "
-            "and the staged Ka-Zar, and that is priced in -- all four are in "
-            "the list it was measured against. REDUNDANT WITH ANCIENT "
-            "GREENWARDEN BY DESIGN (§0z27): after this lands, Greenwarden's "
-            "row is understated, and the two must be ablated as a group before "
-            "either is read as a cut. STAGING REWRITES build_pending('azusa'), "
-            "which is the third row of CLAUDE.md's cache table -- the azusa "
-            "ablation table is rebuilt in the same change, never cleared with "
-            "--verified. AZUSA HAS NO .xlsx: committing this is two legs, the "
-            "module and this ledger."),
-    ),
     Change(
         deck="karlov", remove="Soulmender", add="Bloodthirsty Conqueror",
         staged="2026-09-16",

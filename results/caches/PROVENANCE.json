@@ -130,7 +130,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo COMMITTED to azusa_v1.py (2026-09-22), moved out of CHANGES into COMMITTED. The deck MODULE changed on purpose, so check_unchanged_decks -- which builds from the module -- reports MOVED and is the WRONG check for this table, which was measured against build_pending('azusa'). That list is UNCHANGED: the Chocobo was placed in Yavimaya Elder's exact list position, the position _swap_many had staged it into, so build_pending is identical card-for-card and index-for-index (99 cards, every field equal with frozensets compared as sets). And behaviourally: 2,000 games (seeds 5000-5999 -- the table's own -- at T10 and T20) through build_pending on 2128a3b vs this tree, including the regenerated _evasion.py, are GAME-FOR-GAME IDENTICAL on every numeric output key. This is not the staging-induced case the --verified rule forbids: committing an already-staged swap leaves the measured list unchanged by construction, and that was checked rather than assumed.",
+        "fingerprint": "370ffc676614275e",
+        "utc": "2026-09-22T20:58:43Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "ea61347488d1c6fe",
@@ -221,6 +228,12 @@
         "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
         "fingerprint": "531a758663f26f42",
         "utc": "2026-09-22T18:25:10Z"
+      },
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "3be53fece29c4acd",
+        "utc": "2026-09-22T20:58:42Z"
       }
     ]
   },
@@ -335,7 +348,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "3fc23da7e6f0cf52",
+        "utc": "2026-09-22T20:58:42Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "402f286dafb68785",
@@ -448,6 +468,12 @@
         "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
         "fingerprint": "828e1c2b05bb60d5",
         "utc": "2026-09-22T18:25:10Z"
+      },
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "aefd7eb474d781eb",
+        "utc": "2026-09-22T20:58:42Z"
       }
     ]
   },
@@ -562,6 +588,12 @@
         "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
         "fingerprint": "596d5cb71840275c",
         "utc": "2026-09-22T18:25:10Z"
+      },
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "c5dffecbee7b0406",
+        "utc": "2026-09-22T20:58:42Z"
       }
     ]
   },
@@ -664,6 +696,12 @@
         "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
         "fingerprint": "ce90068550f82f1d",
         "utc": "2026-09-22T18:25:10Z"
+      },
+      {
+        "commit": "2128a3b",
+        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "02383ff585198276",
+        "utc": "2026-09-22T20:58:42Z"
       }
     ]
   }

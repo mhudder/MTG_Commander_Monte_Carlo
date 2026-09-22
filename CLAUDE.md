@@ -735,7 +735,7 @@ for itself when items closed before 2026-09-07 were moved there. Each names the
 `§` that carries its measurement, and those ids are stable.
 
 **Item 17 is closed** (§0z42: decking loses, and the pilot knows it) and
-moved to `docs/HISTORY.md`; so is item 21, whose card is now staged. **Item 18
+moved to `docs/HISTORY.md`; so is item 21, whose card is now committed. **Item 18
 is half answered**: the ordering half is built and measured as a null
 (§0z43), which leaves the `priority` numbers as the whole of it.
 

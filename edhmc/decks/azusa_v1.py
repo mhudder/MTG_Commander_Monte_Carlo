@@ -118,8 +118,26 @@ CREATURES = [
       priority=6, threat=6.0),
     C("Woodland Bellower", "Creature", {"gen": 4, "G": 2}, 6, 5,
       priority=6.5, threat=7.0),
-    C("Yavimaya Elder", "Creature", {"gen": 1, "G": 2}, 2, 1,
-      priority=6, threat=4.5),
+    # CUT 2026-09-22 for Traveling Chocobo: Yavimaya Elder was +0.0023
+    # +-0.0023, inside its own bar and MODEL-EVALUATED -- the cut the owner
+    # named (queued item 21). The swap measured +0.0173 +-0.0028 at T10 and
+    # +0.0222 +-0.0041 at T20 on the §0z41/§0z42 engine, significant at both.
+    #
+    # IT TAKES THE ELDER'S EXACT POSITION IN THIS LIST, and that is not
+    # tidiness. The library is `rng.shuffle(list(deck))`, which permutes by
+    # POSITION, and `_swap_many` staged the Chocobo into this index -- so the
+    # committed list is card-for-card and index-for-index the list the
+    # rebuilt 2026-09-22 table was measured against, and that table stays
+    # valid. Appending it anywhere else would deal every game differently
+    # and cost a second two-hour rebuild for numbers that would not move.
+    #
+    # NOT RANKED OVER NISSA, said out loud: on the same engine Chocobo ->
+    # Nissa, Resurgent Animist in this slot is -0.0027 [-0.0069, +0.0013] at
+    # T20, inside its bar. About 40% of the extra cards the first ranking
+    # credited to this card were Horn of Greed being tripled (§0z41). Either
+    # card is a sound swap; this one is the owner's choice.
+    C("Traveling Chocobo", "Creature", {"gen": 2, "G": 1}, 3, 2,
+      priority=8.5, threat=6.5),
 ]
 
 # ---------------------------------------------------------------------------

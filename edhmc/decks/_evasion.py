@@ -128,7 +128,6 @@ HUMAN = {
     'Urza, Lord High Artificer',
     'Verge Rangers',
     'Vizkopa Guildmage',
-    'Yavimaya Elder',
     'Zulaport Cutthroat',
 }
 
@@ -669,7 +668,6 @@ SCANNED = {
     'Woodland Chasm',
     'Wrath of God',
     'Wurmcoil Engine',
-    'Yavimaya Elder',
     'Youthful Valkyrie',
     "Zendikar's Roil",
     'Zulaport Cutthroat',
