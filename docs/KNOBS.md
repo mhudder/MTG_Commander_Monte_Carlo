@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `408de74` from 20 engine sources.
+Derived at `3f37d2c` from 20 engine sources.
 
 **119 knobs, 176 call sites.**
 
@@ -81,8 +81,8 @@ show up first.
 | `crn_streams` | `True` | 4 | `edhmc/azusa.py:1369` | §0z17 | yes | yes |
 | `cryptic_caves_min_lands` | `6` | 1 | `edhmc/azusa.py:2820` | §0v | **no** | **never** |
 | `decking_loss` | `True` | 2 | `edhmc/engine.py:1118` | §0z42 | yes | yes |
-| `decking_pilot` | `True` | 1 | `edhmc/engine.py:1158` | §0z42 | **no** | yes |
-| `decking_reserve` | `5` | 1 | `edhmc/engine.py:1160` | §0z42 | **no** | yes |
+| `decking_pilot` | `True` | 1 | `edhmc/engine.py:1158` | §0z42 | yes | yes |
+| `decking_reserve` | `5` | 1 | `edhmc/engine.py:1160` | §0z42 | yes | yes |
 | `derived_blocking` | `True` | 2 | `edhmc/engine.py:2410` | §0z42 | **no** | yes |
 | `destroy_share` | `0.6` | 1 | `edhmc/opponents.py:541` |  | yes | yes |
 | `devotion_creature_types` | `True` | 1 | `edhmc/engine.py:277` |  | yes | yes |
@@ -203,12 +203,12 @@ nobody has tested.
 
 ## The knobs no document mentions
 
-**35 of 119.** Not an error — most knobs are
+**33 of 119.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `block_rate`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `decking_pilot`, `decking_reserve`, `derived_blocking`, `extra_turn_cap`, `hand_cap`, `hold_min_value`, `invoke_mv_cap`, `land_floor`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_instant_rate`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `rhystic_rate`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `tutor_order`, `tutor_targets`, `wildspeaker_mode`, `wurm_kill_share`, `zuran_max_sacs`
+`altar_mana`, `block_rate`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `derived_blocking`, `extra_turn_cap`, `hand_cap`, `hold_min_value`, `invoke_mv_cap`, `land_floor`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_instant_rate`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `rhystic_rate`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `tutor_order`, `tutor_targets`, `wildspeaker_mode`, `wurm_kill_share`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 

@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0029.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0030.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -21,56 +21,56 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Scute Swarm                           +4.97+-0.31         +5.03+-0.33        +0.0561+-0.0045      both
-Rampaging Baloths                     +3.11+-0.23         +3.55+-0.26        +0.0316+-0.0040      both
-Avenger of Zendikar                   +3.00+-0.24         +3.46+-0.26        +0.0329+-0.0039      both
-Horn of Greed                         +2.44+-0.24         +3.26+-0.28        +0.0365+-0.0039      both
-Nissa, Vastwood Seer // Nissa, Sage Animist        +2.04+-0.22         +2.81+-0.27        +0.0277+-0.0040      both
-Genesis Wave                          +1.93+-0.19         +2.56+-0.23        +0.0269+-0.0034      both
-Ancient Greenwarden                   +2.40+-0.23         +2.24+-0.25        +0.0301+-0.0042      both
-Springheart Nantuko                   +2.12+-0.18         +2.20+-0.22        +0.0131+-0.0032      both
-Craterhoof Behemoth                   +2.00+-0.16         +2.11+-0.18        +0.0162+-0.0032      both
-Sol Ring                              +2.26+-0.23         +2.05+-0.25        +0.0154+-0.0034      both
-Tireless Tracker                      +1.27+-0.20         +2.02+-0.25        +0.0251+-0.0038      both
-Harmonize                             +1.52+-0.17         +1.95+-0.21        +0.0180+-0.0031      both
-Oracle of Mul Daya                    +1.55+-0.21         +1.87+-0.25        +0.0197+-0.0039      both
-Greensleeves, Maro-Sorcerer           +1.73+-0.18         +1.85+-0.22        +0.0147+-0.0034      both
-Ka-Zar of the Savage Land             +1.38+-0.18         +1.85+-0.22        +0.0121+-0.0034      both
-Augur of Autumn                       +1.35+-0.19         +1.70+-0.24        +0.0169+-0.0036      both
-Seek the Horizon                      +1.29+-0.16         +1.68+-0.20        +0.0149+-0.0029      both
-Courser of Kruphix                    +0.88+-0.20         +1.68+-0.24        +0.0188+-0.0036      both
-Journey of Discovery                  +1.30+-0.16         +1.49+-0.19        +0.0121+-0.0029      both
-Cultivate                             +1.42+-0.17         +1.47+-0.21        +0.0131+-0.0033      both
-Realms Uncharted                      +1.22+-0.16         +1.46+-0.19        +0.0107+-0.0030      both
-Kodama's Reach                        +1.35+-0.17         +1.46+-0.20        +0.0133+-0.0032      both
-Woodland Bellower                     +0.93+-0.12         +1.45+-0.17        +0.0110+-0.0027      both
-Animist's Awakening                   +1.37+-0.16         +1.43+-0.18        +0.0151+-0.0029      both
-Green Sun's Zenith                    +1.06+-0.15         +1.37+-0.19        +0.0108+-0.0029      both
-Ulamog, the Infinite Gyre             +0.72+-0.09         +1.29+-0.14        +0.0112+-0.0024      both
-Ramunap Excavator                     +1.65+-0.22         +1.29+-0.23        +0.0133+-0.0034      both
-Seer's Sundial                        +0.41+-0.20         +1.23+-0.25        +0.0193+-0.0037      both
-Nylea's Intervention                  +0.91+-0.14         +1.15+-0.17        +0.0101+-0.0027      both
-Kozilek, Butcher of Truth             +0.68+-0.08         +1.00+-0.13        +0.0069+-0.0022      both
-Lotus Cobra                           +1.26+-0.18         +0.99+-0.21        +0.0071+-0.0031      both
-Tireless Provisioner                  +0.91+-0.17         +0.89+-0.20        +0.0060+-0.0032      both
-Chord of Calling                      +0.52+-0.11         +0.88+-0.14        +0.0082+-0.0025      both
-Crucible of Worlds                    +1.05+-0.20         +0.88+-0.22        +0.0079+-0.0033      both
-Regrowth                              +0.56+-0.15         +0.81+-0.17        +0.0085+-0.0027      both
-Momentous Fall                        +0.52+-0.11         +0.77+-0.15        +0.0095+-0.0024      both
-Ashaya, Soul of the Wild              +0.71+-0.15         +0.74+-0.18        +0.0089+-0.0031      both
-Eternal Witness                       +0.48+-0.11         +0.66+-0.16        +0.0057+-0.0027      both
-Life from the Loam                    +0.64+-0.14         +0.62+-0.17        +0.0064+-0.0024      both
-Titania, Protector of Argoth          +0.34+-0.15         +0.52+-0.19        +0.0031+-0.0030      both
-Yavimaya Elder                        +0.41+-0.09         +0.40+-0.13        +0.0019+-0.0023       dmg
-Exploration                           +0.58+-0.17         +0.36+-0.19        +0.0039+-0.0029      both
-Wayward Swordtooth                    +0.26+-0.13         +0.18+-0.17        +0.0013+-0.0029       dmg
+Scute Swarm                           +5.18+-0.32         +5.18+-0.33        +0.0599+-0.0046      both
+Rampaging Baloths                     +3.32+-0.24         +3.79+-0.27        +0.0361+-0.0040      both
+Avenger of Zendikar                   +3.10+-0.24         +3.68+-0.27        +0.0371+-0.0040      both
+Horn of Greed                         +2.26+-0.24         +3.14+-0.28        +0.0363+-0.0039      both
+Nissa, Vastwood Seer // Nissa, Sage Animist        +2.12+-0.22         +2.83+-0.27        +0.0279+-0.0040      both
+Genesis Wave                          +1.99+-0.20         +2.51+-0.23        +0.0262+-0.0034      both
+Traveling Chocobo                     +2.44+-0.23         +2.37+-0.26        +0.0247+-0.0039      both
+Springheart Nantuko                   +2.19+-0.19         +2.17+-0.23        +0.0131+-0.0034      both
+Sol Ring                              +2.32+-0.24         +2.14+-0.25        +0.0157+-0.0034      both
+Tireless Tracker                      +1.53+-0.21         +2.11+-0.25        +0.0252+-0.0038      both
+Greensleeves, Maro-Sorcerer           +1.93+-0.19         +2.09+-0.23        +0.0178+-0.0035      both
+Craterhoof Behemoth                   +2.12+-0.15         +2.05+-0.18        +0.0148+-0.0030      both
+Ancient Greenwarden                   +2.14+-0.23         +2.01+-0.25        +0.0282+-0.0042      both
+Harmonize                             +1.59+-0.18         +1.98+-0.21        +0.0189+-0.0031      both
+Ka-Zar of the Savage Land             +1.34+-0.18         +1.80+-0.21        +0.0131+-0.0033      both
+Seek the Horizon                      +1.35+-0.16         +1.63+-0.20        +0.0139+-0.0030      both
+Courser of Kruphix                    +0.76+-0.19         +1.62+-0.24        +0.0196+-0.0036      both
+Green Sun's Zenith                    +1.20+-0.15         +1.60+-0.20        +0.0149+-0.0029      both
+Oracle of Mul Daya                    +1.36+-0.21         +1.57+-0.25        +0.0165+-0.0038      both
+Augur of Autumn                       +1.16+-0.20         +1.56+-0.24        +0.0145+-0.0036      both
+Animist's Awakening                   +1.44+-0.16         +1.55+-0.19        +0.0149+-0.0030      both
+Woodland Bellower                     +1.03+-0.13         +1.53+-0.18        +0.0127+-0.0029      both
+Journey of Discovery                  +1.29+-0.16         +1.51+-0.19        +0.0131+-0.0031      both
+Realms Uncharted                      +1.28+-0.16         +1.47+-0.19        +0.0112+-0.0030      both
+Cultivate                             +1.41+-0.17         +1.46+-0.21        +0.0139+-0.0033      both
+Kodama's Reach                        +1.35+-0.17         +1.44+-0.21        +0.0132+-0.0032      both
+Ulamog, the Infinite Gyre             +0.79+-0.09         +1.36+-0.14        +0.0111+-0.0023      both
+Seer's Sundial                        +0.50+-0.20         +1.31+-0.25        +0.0185+-0.0037      both
+Ramunap Excavator                     +1.45+-0.21         +1.31+-0.23        +0.0148+-0.0035      both
+Nylea's Intervention                  +1.05+-0.15         +1.24+-0.18        +0.0117+-0.0028      both
+Lotus Cobra                           +1.42+-0.19         +1.04+-0.21        +0.0086+-0.0032      both
+Tireless Provisioner                  +1.00+-0.18         +1.01+-0.21        +0.0076+-0.0034      both
+Kozilek, Butcher of Truth             +0.68+-0.08         +1.01+-0.12        +0.0079+-0.0021      both
+Crucible of Worlds                    +1.06+-0.20         +0.99+-0.23        +0.0099+-0.0034      both
+Chord of Calling                      +0.61+-0.10         +0.89+-0.14        +0.0089+-0.0025      both
+Momentous Fall                        +0.59+-0.12         +0.79+-0.16        +0.0079+-0.0025      both
+Regrowth                              +0.48+-0.15         +0.76+-0.18        +0.0085+-0.0027      both
+Eternal Witness                       +0.50+-0.11         +0.73+-0.16        +0.0077+-0.0028      both
+Ashaya, Soul of the Wild              +0.78+-0.15         +0.68+-0.18        +0.0070+-0.0031      both
+Life from the Loam                    +0.68+-0.14         +0.68+-0.17        +0.0064+-0.0024      both
+Titania, Protector of Argoth          +0.39+-0.16         +0.55+-0.19        +0.0030+-0.0030      both
+Exploration                           +0.68+-0.18         +0.50+-0.20        +0.0051+-0.0030      both
+Wayward Swordtooth                    +0.24+-0.14         +0.28+-0.17        +0.0042+-0.0029      both
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Bane of Progress                      +0.18+-0.08         +0.19+-0.12        +0.0001+-0.0021       dmg
+Bane of Progress                      +0.25+-0.10         +0.28+-0.14        +0.0009+-0.0023       dmg
       The wipe destroys only YOUR OWN artifacts and enchantments, because
       opponents own no permanent objects in this project (§4). Its negative score
       is a ONE-SIDED WIPE WITH THE SIDEDNESS REMOVED -- the cost with none of the
@@ -80,17 +80,17 @@ Bane of Progress                      +0.18+-0.08         +0.19+-0.12        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Greater Good                          +0.38+-0.10         +0.43+-0.14        +0.0043+-0.0021      both
-Abundance                             +0.42+-0.11         +0.39+-0.13        +0.0027+-0.0021      both
-Hall of Gemstone                      +0.34+-0.10         +0.34+-0.13        +0.0029+-0.0020      both
-Mind's Eye                            +0.34+-0.10         +0.33+-0.13        +0.0023+-0.0021      both
-Oblivion Stone                        +0.33+-0.10         +0.32+-0.13        +0.0012+-0.0020       dmg
-Storm Cauldron                        +0.32+-0.09         +0.30+-0.12        +0.0028+-0.0021      both
-Krosan Grip                           +0.39+-0.09         +0.28+-0.12        +0.0014+-0.0019       dmg
-Beast Within                          +0.39+-0.10         +0.27+-0.12        +0.0005+-0.0020       dmg
-Terastodon                            +0.20+-0.04         +0.27+-0.08        +0.0013+-0.0015       dmg
-Memory Jar                            +0.38+-0.09         +0.18+-0.12        +0.0003+-0.0022       dmg
-Sylvan Scrying                        +0.16+-0.07         +0.15+-0.09        +0.0013+-0.0013       dmg
-Crop Rotation                         +0.04+-0.06         +0.02+-0.07        -0.0003+-0.0010        --
-Sylvan Library                        +0.14+-0.09         -0.03+-0.12        -0.0007+-0.0018      FLIP
+Greater Good                          +0.46+-0.11         +0.49+-0.14        +0.0041+-0.0022      both
+Mind's Eye                            +0.44+-0.11         +0.45+-0.14        +0.0042+-0.0024      both
+Abundance                             +0.49+-0.12         +0.39+-0.15        +0.0022+-0.0023       dmg
+Oblivion Stone                        +0.34+-0.10         +0.35+-0.13        +0.0023+-0.0021      both
+Beast Within                          +0.38+-0.11         +0.35+-0.13        +0.0024+-0.0021      both
+Memory Jar                            +0.51+-0.11         +0.34+-0.15        +0.0019+-0.0024       dmg
+Hall of Gemstone                      +0.29+-0.11         +0.34+-0.13        +0.0023+-0.0021      both
+Terastodon                            +0.23+-0.07         +0.33+-0.10        +0.0019+-0.0018      both
+Krosan Grip                           +0.36+-0.10         +0.31+-0.12        +0.0025+-0.0019      both
+Storm Cauldron                        +0.43+-0.11         +0.30+-0.14        +0.0019+-0.0023       dmg
+Sylvan Scrying                        +0.18+-0.07         +0.15+-0.08        +0.0009+-0.0013       dmg
+Crop Rotation                         +0.04+-0.06         +0.02+-0.07        -0.0005+-0.0010        --
+Sylvan Library                        +0.10+-0.10         -0.06+-0.12        +0.0001+-0.0019      FLIP
 Quirion Ranger                        -0.11+-0.06         -0.14+-0.08        -0.0011+-0.0012       dmg

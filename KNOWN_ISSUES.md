@@ -6351,6 +6351,59 @@ fix; `--mutate` runs five mutations, exact sets, and one of them was wrong on
 the first run in the way that mutation lists usually are (it changed two
 rules and reported on one).
 
+### The rebuild, and what it moved (2026-09-22)
+
+This change moves two baselines -- lorehold and azusa, the two decks whose
+pilots now hold a decking reserve -- and azusa's staged list also changed
+when Traveling Chocobo was staged in Yavimaya Elder's slot. **A staging-induced
+SUSPECT cannot be cleared with `--verified`**, so both tables were rebuilt at
+N=15,000 rather than certified. The first rebuild was killed by a container
+restart after both caches had been deleted; the second ran 125 minutes. Every
+row was then compared with the table it replaced:
+
+| | rows | beyond its own old bar | sign flips | category changes |
+|---|---|---|---|---|
+| lorehold | 65 | **0** | 0 | 0 |
+| azusa | 58 (57 in common) | **3** | 0 | 0 |
+
+**Lorehold did not move**, which is what the reserve sweep above predicted for
+a net cost of −0.0003/−0.0021. Two cards crossed the DAMAGE-significance line
+(Hexing Squelcher `--`→`dmg`, Sensei's Divining Top `dmg`→`--`) with win rate
+unchanged to the fourth decimal: the margin, not a change.
+
+**Azusa moved in ONE coherent direction, and the mechanism is the staged card.**
+Yavimaya Elder left and Traveling Chocobo arrived, as staged. The three rows
+beyond their bars all ROSE and by nearly the same amount:
+
+| card | old | new | move |
+|---|---|---|---|
+| Rampaging Baloths | +0.0316 ±0.0040 | +0.0361 ±0.0040 | +0.0045 |
+| Avenger of Zendikar | +0.0329 ±0.0039 | +0.0371 ±0.0040 | +0.0042 |
+| Green Sun's Zenith | +0.0108 ±0.0029 | +0.0149 ±0.0029 | +0.0041 |
+
+Traveling Chocobo is a landfall DOUBLER -- `reps = 1 + count("Ancient
+Greenwarden") + count("Traveling Chocobo")` -- so with it in the list every
+landfall payoff fires once more per land. Rampaging Baloths and Avenger of
+Zendikar are both in `_landfall_payoffs`, so each got more valuable to remove
+and its leave-one-out row rose. **Green Sun's Zenith is NOT a landfall payoff
+and its rise is INFERRED, not traced**: it tutors creatures, and the creatures
+it would find got better. That is the obvious reading and it has not been
+checked against what GSZ actually fetches.
+
+**This is §0z27's rule pointed the other way.** Adding a REDUNDANT card
+understates the rows of the cards it duplicates; adding a MULTIPLIER raises
+the rows of the cards it multiplies. Neither is evidence about those cards.
+Baloths and Avenger are not better cards than they were yesterday -- they are
+the same cards in a list that doubles them.
+
+**AND ONE "FLIP" THAT IS NOT ONE, which is §0z24 caught live.** Sylvan Library
+went −0.0007 ±0.0018 → +0.0001 ±0.0019: inside its bar both times, a blank
+measured twice. Its signal column reads `FLIP` rather than `--`, because FLIP
+is assigned on an unguarded sign and overrides `--`, so the comparison script
+that produced the table above counted it as a sign flip between significant
+rows until the bars were read. A tool trusting the column was fooled exactly
+as §0z24 says a reader will be.
+
 ## 0z43. MEASURED — the one-card cast lookahead (queued item 18): built, wired into six engines, a measured null, and OFF
 
 Queued item 18 says `main_phase` is greedy on `priority` and never asks
