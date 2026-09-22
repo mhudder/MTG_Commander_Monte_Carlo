@@ -208,6 +208,12 @@
         "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
         "fingerprint": "b20ff0857028d7aa",
         "utc": "2026-09-22T13:52:17Z"
+      },
+      {
+        "commit": "408de74",
+        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+        "fingerprint": "531a758663f26f42",
+        "utc": "2026-09-22T18:25:10Z"
       }
     ]
   },
@@ -420,6 +426,12 @@
         "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
         "fingerprint": "7ccd712cf9c306e9",
         "utc": "2026-09-22T13:52:17Z"
+      },
+      {
+        "commit": "408de74",
+        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+        "fingerprint": "828e1c2b05bb60d5",
+        "utc": "2026-09-22T18:25:10Z"
       }
     ]
   },
@@ -528,6 +540,12 @@
         "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
         "fingerprint": "bee1cc26dda86843",
         "utc": "2026-09-22T13:52:17Z"
+      },
+      {
+        "commit": "408de74",
+        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+        "fingerprint": "596d5cb71840275c",
+        "utc": "2026-09-22T18:25:10Z"
       }
     ]
   },
@@ -624,6 +642,12 @@
         "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
         "fingerprint": "ce45648ab40532e9",
         "utc": "2026-09-22T13:52:17Z"
+      },
+      {
+        "commit": "408de74",
+        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+        "fingerprint": "ce90068550f82f1d",
+        "utc": "2026-09-22T18:25:10Z"
       }
     ]
   }

@@ -1140,11 +1140,16 @@ def draw_is_safe(g, n) -> bool:
     already on the stack -- is never guarded: the rule applies to it in full.
     Callers own that distinction; this answers only the arithmetic.
 
-    `decking_reserve` (default 1) is the number of cards the pilot keeps back
-    so the next draw step does not lose. It is a judgement and is said out
-    loud as a knob; with `decking_loss=False` there is no rule and so no
-    reason to hold back, and this returns True unconditionally -- which is
-    what makes that knob restore the old behaviour exactly.
+    `decking_reserve` (default 5) is the number of cards the pilot keeps
+    back. It was 1 -- "enough for the next draw step" -- until it was swept
+    on 2026-09-22 (§0z42), N=15,000 paired: at T20 azusa went 0/+0.0022/
+    +0.0035/+0.0039 and lorehold 0/+0.0013/+0.0015/+0.0010 for reserves
+    1/3/5/8, significant from 3 on. One card is too few because the draws
+    that come AFTER a declined optional one -- Horn of Greed, the draw step,
+    a mandatory copy -- are not the pilot's to decline. 5 sits on the
+    plateau in both decks; with `decking_loss=False` there is no rule and so
+    no reason to hold back, and this returns True unconditionally -- which
+    is what makes that knob restore the old behaviour exactly. with `decking_loss=False` there is no rule and so no
     `decking_pilot=False` keeps the rule and removes the caution: the naive
     pilot, so what the guard is worth can be measured apart from the rule.
     """
@@ -1152,7 +1157,7 @@ def draw_is_safe(g, n) -> bool:
     if not (g.cfg.get("decking_loss", True)
             and g.cfg.get("decking_pilot", True)):
         return True
-    return len(g.library) - n >= g.cfg.get("decking_reserve", 1)
+    return len(g.library) - n >= g.cfg.get("decking_reserve", 5)
 
 
 def finish(g) -> "Metrics":

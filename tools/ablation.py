@@ -480,6 +480,15 @@ SCRIPTED_AZUSA = {
     #       measured; the understatement is bounded and one-directional.
     "Ancient Greenwarden", "Greensleeves, Maro-Sorcerer",
     "Ka-Zar of the Savage Land", "Springheart Nantuko",
+    # Traveling Chocobo (STAGED 2026-09-22, not committed; here because
+    # build_pending applies the stage). FULL on what the list can reach: the
+    # landfall DOUBLER stacks with Greenwarden's (three reps, not four), and
+    # it is a source of `top_access`. "Cast Bird spells from the top" is
+    # modelled as nothing because this card is the only Bird in the list --
+    # exact for this list, a floor for any list with another Bird. The
+    # doubler does NOT reach Horn of Greed, which triggers on PLAYING a land
+    # (§0z41), and until that fix it did.
+    "Traveling Chocobo",
     "Green Sun's Zenith", "Chord of Calling",
     # ramp / land tutors
     "Cultivate", "Kodama's Reach", "Seek the Horizon", "Journey of Discovery",

@@ -90,6 +90,7 @@ Methodology that used to live at the end of this file is now
 | [0z39](#0z39) | MEASURED | **The monarch is implemented. The +0.10 it first measured was the HARNESS**: `monarch_start` grants the crown on turn 1 and `first_attack_turn` is 3, so two of its three held turns were immunity no card can buy. Granted when a card could arrive it is +0.02 to +0.04. The owner's attack-threat correction is in (a FLOOR on `combat_share`, which deters a wide board and should not for the monarch) and does NOT counterbalance -- tripling the share costs 0.002. The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
 | [0z40](#0z40) | MEASURED | **Ginger, Queen of Sweets: the first card to use the monarch, and it behaves like a six-drop.** The real swap against the cut item 22 named is **+0.0186 ±0.0033 at T20**, level with Alhammarret's Archive and well under Bloodthirsty Conqueror — and Conqueror → Ginger IN THE SAME SLOT is **−0.0210 ±0.0034**, so the ranking is measured and not inferred. P(resolves) 0.152, the crown held 1.03 turns, 2.96 Gingerbrutes a resolution. **The sacrifice clause fires 0.0000 times and is correctly implemented**: haste means combat taps the token before its own `{T}` cost can be paid |
 | [0z41](#0z41) | FIXED | **Horn of Greed was tripled.** Its draw sat inside `_landfall_payoffs`, which Ancient Greenwarden and Traveling Chocobo run once per rep, so one land drop drew three. Greenwarden's own ruling: "an ability that triggers whenever you play a land won't trigger an additional time." Moved out of the loop; worth **−0.0049 / −0.0033** to azusa's baseline, and it flattered both doublers, so the Chocobo's staging was re-measured |
+| [0z42](#0z42) | FIXED | **Decking loses (queued item 17), and the pilot had to be taught not to.** `engine.drew_from_empty` is 704.5b in the three draw paths. The rule ALONE decked azusa in 3.3% of games at T20, in the turns it had lethal on board -- a naive pilot cost it **0.022**. `engine.draw_is_safe` declines only OPTIONAL draws; at the swept reserve of 5 the rule costs azusa −0.0006 / −0.0012 and lorehold −0.0003 / −0.0021. Rendmaw, karlov, tivit and shilgengar are identical game for game -- **including karlov with Bolas's Citadel, whose number was never a decking ceiling** |
 | [0z43](#0z43) | MEASURED | **The one-card cast lookahead is a measured NULL.** `engine.lookahead_pick` (queued item 18) reorders a cast when the greedy pick would strand a card that casting first would have kept; wired into all six `main_phase`s, it fires in 4-12% of games and moves win rate inside its bar in all twelve deck-horizon cells (largest +0.0010 ±0.0020). §0z8's SURPLUS rule already handles the ordering. `cast_lookahead` stays OFF; what is left of item 18 is the `priority` numbers themselves |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -6240,6 +6241,115 @@ The lesson is §0z28's shape one hook over: **a hook that runs N times for one
 kind of trigger will run N times for anything placed inside it.** When a
 payoff is added to a multiplied loop, check the card's trigger EVENT against
 the multiplier's rulings, not just its word "land".
+
+## 0z42. FIXED — decking loses (queued item 17), and the pilot had to learn not to do it
+
+Queued item 17, closed 2026-09-22. 704.5b: "If a player attempted to draw a
+card from a library with no cards in it since the last time state-based
+actions were checked, that player loses the game." Until this change every
+`draw` in six engines stopped silently at an empty library.
+
+### The rule, in one place
+
+`engine.drew_from_empty(g)` is the whole rule, called by the three draw paths
+the engines have: `BaseGame.draw`, karlov's Alhammarret's Archive override
+("draw two instead" is two draws, and the second can lose), and lorehold's
+`draw_card`. It records `loss_route` 3 and counts `drew_from_empty`. Anything
+that pops the library WITHOUT drawing -- exile, mill, reveal, "put it into
+your hand", a Citadel cast off the top -- does not call it, because 704.5b is
+about drawing.
+
+**One case it gets wrong, on purpose.** The rule is an SBA, and a resolution
+that decks you AND kills the last opponent is a DRAW at a table (104.4a).
+Here the first result recorded wins, so it is a loss. It needs an empty
+library and a lethal inside one resolution; it is written down in the
+docstring and in `docs/COMP_RULES.md` rather than modelled.
+
+### The rule alone was a POLICY bug waiting to happen
+
+Measured before any guard, N=1,500 per horizon, staged lists: **azusa decked
+in 3.3% of games at T20 and lorehold in 1.6%; the other four never did.** And
+the decked games were the ones they were WINNING. Azusa's had drawn 68 cards
+against 20 and held a board with six-figure power, dying on turn ~10 in the
+main phase before its own combat; lorehold's had cast 54 spells against 19 in
+a chain. A pilot does not draw its last card on the turn it has lethal on
+board. Asserting that it does is the shape of every row in CLAUDE.md's policy
+table: a piloting decision written as conservatism that says a card kills you.
+
+So the pilot learned the rule. `engine.draw_is_safe(g, n)` is one predicate --
+would this draw leave fewer than `decking_reserve` cards? -- and it is asked
+**only where the card text gives a choice**:
+
+| deck | site | why it is a choice |
+|---|---|---|
+| azusa | Seer's Sundial | "you may pay {2}" |
+| azusa | Tireless Tracker's Clues, Cryptic Caves, War Room | activations |
+| azusa | Return of the Wildspeaker | modal: pump when the draw would deck |
+| azusa | Momentous Fall, draw3 spells | casting is optional (`draws_on_resolve`) |
+| azusa | a land drop with Horn of Greed out | the land drop is optional; Horn is not |
+| lorehold | the commander's upkeep rummage | "you may discard. If you do, draw" |
+| lorehold | Monument to Endurance | modal: another mode is taken |
+| lorehold | main phase, miracle, Sunbird, Invoke Calamity, Bombardment and Mastery copies | "you may cast" (`pilot_may_cast`, `SPELL_DRAWS`) |
+
+A MANDATORY draw -- the draw step, Horn of Greed's trigger, Double Vision's
+copy, a spell already on the stack -- is never guarded. After the guards the
+only decking losses left are the draw step and one Double Vision copy.
+
+Found on the way and fixed separately: Horn of Greed was TRIPLED (§0z41).
+
+### What it was worth
+
+N=15,000 paired, staged lists, same seeds (`run_shared_code_shift --cfg`):
+
+| win rate | no rule (Horn fixed) | rule, NAIVE pilot | rule + guard, reserve 1 | rule + guard, reserve 5 (shipped) |
+|---|---|---|---|---|
+| azusa T10 | 0.1742 | −0.0074 [−0.0088, −0.0060] | −0.0018 [−0.0025, −0.0011] | **−0.0006** [−0.0010, −0.0002] |
+| azusa T20 | 0.3997 | **−0.0223** [−0.0246, −0.0199] | −0.0047 [−0.0058, −0.0035] | **−0.0012** [−0.0019, −0.0005] |
+| lorehold T10 | 0.0498 | −0.0005 [−0.0008, −0.0001] | −0.0002 [−0.0004, +0.0000] | **−0.0003** [−0.0006, −0.0000] |
+| lorehold T20 | 0.2093 | −0.0073 [−0.0087, −0.0060] | −0.0035 [−0.0045, −0.0025] | **−0.0021** [−0.0030, −0.0011] |
+
+**The naive reading of item 17 would have cost azusa 0.022 at T20** -- a
+Chocobo-sized swap, charged for a piloting error. The guard at the shipped
+reserve recovers ~95% of it; what remains, −0.0012, is the genuine cost of the
+rule: draw-step decking in a game the deck could not close in time. Lorehold
+keeps a larger residue (−0.0021) because more of its draws are mandatory --
+the draw step and Double Vision's copy in a deck built to chain. Together with
+§0z41 the azusa baseline moved **−0.0055 / −0.0045** and lorehold's
+**−0.0003 / −0.0021**; both tables are rebuilt.
+
+**Four decks did not move at all.** Rendmaw, karlov, tivit and shilgengar are
+IDENTICAL GAME FOR GAME on every metric at N=15,000 at both horizons, staged
+lists -- including karlov with Bolas's Citadel in, which was the card item 17
+was written about. The Citadel's +0.0163 was called a ceiling for this reason
+and is not one: the dig stops at an unplayable land or at the life floor long
+before the library runs out.
+
+### The knobs, said out loud
+
+`decking_loss` (default True) is the rule; False restores the old code and
+is BIT-IDENTICAL to the pre-change commit on all six decks with
+`horn_doubled_legacy=True` (check_unchanged_decks, 400 seeds, T20).
+`decking_pilot` (default True) is the caution; False is the naive pilot.
+`decking_reserve` (default 1) is how many cards the pilot keeps back:
+
+| reserve, vs 1 (T20) | 0 | 1 | 3 | 5 | 8 |
+|---|---|---|---|---|---|
+| azusa | −0.0029 | 0 | +0.0022 | **+0.0035** | +0.0039 |
+| lorehold | −0.0020 | 0 | +0.0013 | **+0.0015** | +0.0010 |
+
+Every nonzero cell is significant (N=15,000 paired; bars ±0.0007-0.0010).
+**IT WAS 1 AND IS NOW 5**, and the knob is load-bearing: "enough for the
+next draw step" is too few, because the draws that come AFTER a declined
+optional one -- Horn of Greed, the draw step, a mandatory copy -- are not the
+pilot's to decline. 5 is on the plateau in both decks and the best or tied
+at every horizon. T10 is the same shape, smaller. Said out loud because it is
+a judgement: a real pilot's buffer depends on what is on the board, and this
+is one number for all of it.
+
+`tests/test_decking.py` pins the rule, the pilot's arithmetic and the Horn
+fix; `--mutate` runs five mutations, exact sets, and one of them was wrong on
+the first run in the way that mutation lists usually are (it changed two
+rules and reported on one).
 
 ## 0z43. MEASURED — the one-card cast lookahead (queued item 18): built, wired into six engines, a measured null, and OFF
 

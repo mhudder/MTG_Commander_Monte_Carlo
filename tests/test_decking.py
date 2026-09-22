@@ -89,6 +89,11 @@ def card_named(module, name):
     return next(c for c in deck if c.name == name)
 
 
+def _short(g, n):
+    g.library = g.library[:n]
+    return g
+
+
 def azusa(**kw):
     deck, cmd = AZM.build()
     return AzusaGame(deck, cmd, cfg(**kw), 1234)
@@ -143,7 +148,7 @@ def run_cases():
           (got, g.result, g.m["loss_route"]), (None, "loss", 3))
 
     # ---- F: the pilot's arithmetic -------------------------------------
-    g = rendmaw()
+    g = rendmaw(decking_reserve=1)      # the arithmetic, at a reserve of 1
     g.library = g.library[:5]
     got = (EN.draw_is_safe(g, 4), EN.draw_is_safe(g, 5))
     g.cfg["decking_reserve"] = 0
@@ -154,8 +159,12 @@ def run_cases():
     g.cfg["decking_pilot"] = True
     g.cfg["decking_loss"] = False
     got += (EN.draw_is_safe(g, 50),)
-    check("F draw_is_safe: 5 cards keep 1 back; both knobs switch it off",
-          got, (True, False, True, True, True))
+    # the DEFAULT reserve is 5: from six cards one draw is safe, two are not
+    got += (EN.draw_is_safe(_short(rendmaw(), 6), 1),
+            EN.draw_is_safe(_short(rendmaw(), 6), 2))
+    check("F draw_is_safe: reserve 1 arithmetic, both knobs switch it off, "
+          "and the default reserve is 5",
+          got, (True, False, True, True, True, True, False))
 
     # ---- G / H: Horn of Greed is not doubled ----------------------------
     for tag, legacy, want in (("G", False, 1), ("H", True, 3)):

@@ -2317,8 +2317,8 @@ section above.
     cost azusa 0.022 at T20 in the games it was winning. **The Citadel was
     not the card that needed it:** karlov's staged list, Citadel in, is
     identical game for game at N=15,000 with and without the rule. Only azusa
-    (−0.0047 at T20, after the guard) and lorehold (−0.0035) moved, and both
-    tables were rebuilt.
+    (−0.0012 at T20, after the guard at its swept reserve of 5) and lorehold
+    (−0.0021) moved, and both tables were rebuilt.
 
 
 21. **CLOSED 2026-09-22 — STAGED, AND THE RANKING DID NOT SURVIVE THE DAY (§0z41).** ~~AZUSA'S HEAD-TO-HEAD IS DONE AND THE TWO CARDS ARE MEASURED EQUAL —
