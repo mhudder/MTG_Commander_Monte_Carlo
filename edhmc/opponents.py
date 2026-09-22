@@ -1101,6 +1101,21 @@ def become_monarch(g):
         g.m["monarch_gained"] += 1
 
 
+def monarch_attack_share(g, share: float) -> float:
+    """The share of one opponent's swing that comes at you, crown included.
+
+    A FUNCTION rather than an `if` inside `incidental_damage`, for §0z38's
+    reason: a mutation check has to be able to switch this rule off on its own,
+    and an inline condition could only be removed by disabling the whole
+    monarch path -- which is exactly what the first version of
+    `tests/test_monarch.py`'s mutation did, breaking six cases where it meant
+    to break two.
+    """
+    if not g.monarch:
+        return share
+    return max(share, g.cfg.get("monarch_attack_floor", 0.75))
+
+
 def monarch_end_step(g):
     """The crown's card, at the beginning of YOUR end step.
 
@@ -1115,6 +1130,16 @@ def monarch_end_step(g):
     on an empty library. §0z28 is the finding: a draw credited to the wrong
     counter looks correct from the counter it was supposed to hit.
     """
+    # `monarch_start_turn` grants the crown at a chosen turn instead of at the
+    # opening. It exists because `monarch_start` alone hands you the crown on
+    # TURN ONE, which is the most valuable window there is and which no real
+    # card does -- a monarch card costs mana and arrives on turn 4-6. Measuring
+    # the mechanic without this knob measures the harness. Granted ONCE: the
+    # `monarch_gained` guard stops it being handed back after it is lost.
+    start_turn = g.cfg.get("monarch_start_turn", 0)
+    if (start_turn and g.turn >= start_turn and not g.monarch
+            and not g.m["monarch_gained"] and g.result is None):
+        become_monarch(g)
     if not g.monarch or g.result is not None:
         return
     g.m["monarch_turns"] += 1
@@ -1146,8 +1171,11 @@ def incidental_damage(g):
     # The default rate is `incidental_rate` ITSELF rather than a new constant,
     # because that knob already means "how much of a swing lands" and a second
     # uncalibrated number meaning the same thing is what §0u warns about.
-    # `monarch_loss_scale` overrides it so the mechanic can be SWEPT -- and it
-    # must be, before any monarch card's number is trusted.
+    # NOTE WHAT THAT DEFAULT ACTUALLY IS: `DEFAULT_CFG` sets `incidental_rate`
+    # to 1.0, not to the 0.45 fallback written in the `cfg.get` below, so
+    # P(lose) is the floored share itself and the crown passes fast -- about one
+    # turn once the pod can attack. `monarch_loss_scale` overrides it so the
+    # mechanic can be SWEPT, and the sweep found win rate INSENSITIVE to it.
     loss_scale = g.cfg.get("monarch_loss_scale", rate)
     for i, opp in enumerate(g.opponents):
         if not opp.alive:
@@ -1155,6 +1183,28 @@ def incidental_damage(g):
         others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
         share = (combat_share(g, opp, others) if mode == "open"
                  else your_share(g, opp, others))
+        # THE CROWN IS A REASON TO ATTACK YOU THAT YOUR BOARD CANNOT DETER
+        # (owner's correction, 2026-09-22). The first cut of this mechanic only
+        # modelled the crown being LOST to the pod's EXISTING attack pattern,
+        # and at a real table anyone who can profitably swing at the monarch
+        # does, because taking the crown is worth too much to pass up.
+        #
+        # WHICH SHARE THIS CORRECTS, said precisely because the first version of
+        # this comment named the wrong function. The default `combat_targeting`
+        # is "open", so the share above is `combat_share`, weighted by how OPEN
+        # each player is (`1/(1+blockers)`) rather than by threat -- §0v already
+        # established that threat-weighting combat was backwards, because a wide
+        # board is a deterrent and not a magnet. That is right for ordinary
+        # combat and WRONG FOR THE MONARCH: the crown is the prize, so a wide
+        # board stops deterring. Measured at `creatures=4` each:
+        # `combat_share` is 0.714 on an empty board, 0.385 at three creatures
+        # and 0.238 at seven -- so this floor barely moves an empty board and
+        # TRIPLES the share of a developed one, which is the case it exists for.
+        #
+        # A FLOOR RATHER THAN A MULTIPLIER, because a multiplier scales the very
+        # deterrence being overridden: 3x of 0.238 and 3x of 0.714 move apart,
+        # where the incentive at a real table does not care what you have.
+        share = monarch_attack_share(g, share)
         # An aggro deck's creatures hit harder than a control deck's.
         g.your_life -= opp.creatures * rate * share * opp.p.get("power", 1.0)
         # GATED ON HOLDING THE CROWN, which is what keeps this change worth
@@ -1162,6 +1212,11 @@ def incidental_damage(g):
         # never consumed and no existing stream can shift. `crn_random` is
         # index-addressed per name (§0z17), so even once a card does grant it,
         # a new stream cannot move an old one.
+        # AND THE SAME FLOORED SHARE SHORTENS THE REIGN, which is why these
+        # two effects are one number and not two knobs. More of their swing
+        # aimed at you is both more damage taken AND a better chance one of
+        # them connects and takes the crown. The counterbalance is mechanical
+        # rather than tuned: `share` above is the floored value.
         if g.monarch and (opp.creatures + opp.goaded_birds) > 0:
             from edhmc.engine import crn_random
             if crn_random(g, f"monarch{i}") < min(1.0, share * loss_scale):

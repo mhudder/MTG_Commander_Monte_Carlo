@@ -37,12 +37,19 @@ CASES
   H  NOT holding the crown consumes NO monarch roll -- the six decks are unmoved
   I  `monarch_start` begins the game as the monarch
   J  `monarch_draws` is credited from the draw that HAPPENED (empty library)
+  K  the crown overrides a DEVELOPED board's deterrence (>2x the share)
+  L  the attack floor is a FLOOR on the share, pinned to the arithmetic
+  M  `monarch_start_turn` grants at its turn and not before
+  N  and grants ONCE -- the crown is not handed back after it is lost
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the end step draws nothing                          -> C
-  the crown never passes                              -> D and G
   the pass check ignores whether they have creatures   -> F
   the roll is consumed even without the crown          -> H
+  the crown never passes                              -> D, G and N
+  the monarch is attacked no more than anyone else     -> K and L
+  the floor is applied as a MULTIPLIER instead         -> L
+  monarch_start_turn grants the crown every turn       -> N
 
 WHAT HAS NO MUTATION, written down rather than left to be found (§0z15).
 Case E is guarded by `incidental_damage`'s own early return on
@@ -197,6 +204,68 @@ def run_cases():
     OPP.monarch_end_step(g)
     check("J monarch_draws counts the draw that happened, not the attempt",
           (g.m["monarch_draws"], g.m["cards_drawn"] - drawn_before), (0, 0))
+
+    # ---- K: a DEVELOPED board stops deterring the pod ---------------------
+    # The case the floor exists for, and the first version of this case had its
+    # premise wrong: it assumed an unprotected player eats nothing, which is
+    # `your_share` (removal). The attack path is `combat_share`, and an empty
+    # board eats 0.714 of the pod's swing already. What the crown changes is
+    # the DEVELOPED board: combat_share drops to 0.238 at seven creatures
+    # because a wide board deters, and the crown overrides that.
+    def with_board(n, **cfg):
+        g = fresh(creatures=4.0, monarch_loss_scale=0.0, **cfg)
+        g.board = EN.Board()
+        for _ in range(n):
+            g.board.append(EN.Permanent(card=EN.Card(
+                name="Bear", types=frozenset({"Creature"}),
+                power=2, toughness=2), sick=False))
+        return g
+
+    g = with_board(7)
+    plain = g.your_life
+    OPP.incidental_damage(g)
+    without = plain - g.your_life
+
+    g = with_board(7)
+    OPP.become_monarch(g)
+    held = g.your_life
+    OPP.incidental_damage(g)
+    with_crown = held - g.your_life
+    check("K the crown overrides a developed board's deterrence",
+          (with_crown > without * 2.0, round(without, 3)),
+          (True, round(without, 3)))
+
+    # ---- L: the floor is a FLOOR, not a multiplier ------------------------
+    # Pinned to the arithmetic: three opponents each send `floor` of a swing.
+    # A multiplier on a zero share would produce zero, so this is the case a
+    # multiplier cannot pass.
+    g = fresh(creatures=4.0, monarch_loss_scale=0.0, monarch_attack_floor=0.75)
+    OPP.become_monarch(g)
+    rate = g.cfg.get("incidental_rate", 0.45)
+    want = sum(4.0 * rate * 0.75 * o.p.get("power", 1.0) for o in g.opponents)
+    start = g.your_life
+    OPP.incidental_damage(g)
+    check("L the attack floor is applied as a floor on the share",
+          round(start - g.your_life, 6), round(want, 6))
+
+    # ---- M: monarch_start_turn grants at that turn, not before -----------
+    g = fresh(turn=2, monarch_start_turn=5)
+    OPP.monarch_end_step(g)
+    early = g.monarch
+    g.turn = 5
+    OPP.monarch_end_step(g)
+    check("M monarch_start_turn grants the crown at its turn and not before",
+          (early, g.monarch), (False, True))
+
+    # ---- N: granted once, never handed back ------------------------------
+    g = fresh(creatures=4.0, turn=5, monarch_start_turn=5,
+              monarch_loss_scale=100.0)
+    OPP.monarch_end_step(g)           # granted
+    OPP.incidental_damage(g)          # and immediately taken
+    g.turn = 6
+    OPP.monarch_end_step(g)           # must NOT be handed back
+    check("N monarch_start_turn does not hand the crown back after it is lost",
+          (g.monarch, g.m["monarch_gained"]), (False, 1))
     return set(FAIL)
 
 
@@ -211,17 +280,30 @@ def main() -> int:
     real_end = OPP.monarch_end_step
     real_inc = OPP.incidental_damage
     real_crn = EN.crn_random
+    real_share = OPP.monarch_attack_share
     expected = {
         "the end step draws nothing": {"C"},
-        "the crown never passes": {"D", "G"},
+        # N depends on the crown ACTUALLY passing -- it asserts the crown is
+        # not handed back after a loss, and there is no loss if it never
+        # passes. That dependency was missed when this set was first written.
+        "the crown never passes": {"D", "G", "N"},
         "the pass check ignores whether they have creatures": {"F"},
         "the roll is consumed even without the crown": {"H"},
+        "the monarch is attacked no more than anyone else": {"K", "L"},
+        "the floor is applied as a MULTIPLIER instead": {"L"},
+        "monarch_start_turn grants the crown every turn": {"N"},
     }
     bad = 0
     for label in expected:
         print(f"-- {label}")
         if label == "the end step draws nothing":
             def no_draw(g):
+                # the GRANT is kept -- removing it too broke M and N, which is
+                # a mutation that changes two rules and reports on one.
+                t = g.cfg.get("monarch_start_turn", 0)
+                if (t and g.turn >= t and not g.monarch
+                        and not g.m["monarch_gained"] and g.result is None):
+                    OPP.become_monarch(g)
                 if not g.monarch or g.result is not None:
                     return
                 g.m["monarch_turns"] += 1      # the counter, not the card
@@ -241,6 +323,22 @@ def main() -> int:
                     g.monarch = False
                     g.m["monarch_lost"] += 1
             OPP.incidental_damage = ungated
+        elif label == "the monarch is attacked no more than anyone else":
+            # ONLY the floor, which is why it is its own function.
+            OPP.monarch_attack_share = lambda g, share: share
+        elif label == "the floor is applied as a MULTIPLIER instead":
+            # A multiplier scales the very deterrence the floor overrides, so
+            # it still raises a developed board's share (K passes) but not to
+            # the value the floor names (L fails).
+            OPP.monarch_attack_share = (
+                lambda g, share: share * 3.0 if g.monarch else share)
+        elif label == "monarch_start_turn grants the crown every turn":
+            def regrants(g):
+                t = g.cfg.get("monarch_start_turn", 0)
+                if t and g.turn >= t and not g.monarch and g.result is None:
+                    OPP.become_monarch(g)       # the once-only guard, dropped
+                real_end(g)
+            OPP.monarch_end_step = regrants
         else:
             def always_rolls(g):
                 # the roll, taken whether or not the crown is held
@@ -253,6 +351,7 @@ def main() -> int:
         finally:
             OPP.monarch_end_step = real_end
             OPP.incidental_damage = real_inc
+            OPP.monarch_attack_share = real_share
             EN.crn_random = real_crn
         ok = broke == expected[label]
         bad += (not ok)

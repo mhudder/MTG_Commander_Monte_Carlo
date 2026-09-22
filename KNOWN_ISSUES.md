@@ -87,7 +87,7 @@ Methodology that used to live at the end of this file is now
 | [0z36](#0z36) | MEASURED | **Karlov's staged cut is the wrong one, and the MODEL-BLIND card was the one to keep.** The Conqueror is +0.0401 ±0.0037 on Swiftfoot Boots against +0.0254 on Soulmender, and the gap is measured twice independently (+0.0125 ±0.0049 directly, +0.0147 by subtraction). The Boots' shroud is redundant with Mother of Runes — §0z27 pointed at a cut — while the blind card is still a one-mana body worth +0.34 lifegain triggers. And a swap whose cut is significantly negative is LARGER than its candidate row, not smaller: the Archive prices at +0.0168 against its own +0.0129 |
 | [0z37](#0z37) | FIXED | **Floating landfall mana was paid with and never consumed** — `engine.spend` consumes a unit by tapping its owner and azusa's Lotus Cobra / Tireless Provisioner / Nissa mana had none, so one trigger funded every spell that turn. Worth **−0.0201 ±0.0036 win rate at T20** on azusa's baseline, 741 of 15,000 seeds ending differently: the second-largest baseline correction after §0z30. Fixed by giving the mana an owner (`FloatingMana`) rather than a fourth spelling of deduct-at-the-call-site |
 | [0z38](#0z38) | FIXED | **Flashback did not exile.** `past_in_flames` removed the card before resolving it and `resolve_spell` filed it straight back, so with `flashback_cap` 6 and the pool recomputed per iteration one Past in Flames could cast the SAME spell six times — its +0.0102 ±0.0038 is inflated and needs restating. 702.34a says exile; the fix is `lorehold.exile_flashback`, a function so a mutation can switch it off. And two of that test's five mutations set flags no code read, so they broke nothing: when a mutation breaks nothing, suspect the mutation |
-| [0z39](#0z39) | MEASURED | **The monarch is implemented, and it is worth +0.10 win rate before any card grants it.** The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
+| [0z39](#0z39) | MEASURED | **The monarch is implemented. The +0.10 it first measured was the HARNESS**: `monarch_start` grants the crown on turn 1 and `first_attack_turn` is 3, so two of its three held turns were immunity no card can buy. Granted when a card could arrive it is +0.02 to +0.04. The owner's attack-threat correction is in (a FLOOR on `combat_share`, which deters a wide board and should not for the monarch) and does NOT counterbalance -- tripling the share costs 0.002. The crown is lost on the path that already models their creatures connecting (`incidental_damage`), because §4 leaves no creature to connect. Zero movement PROVED on all six decks across 425 numeric output keys, since nothing grants it and the roll is never consumed. **Its numbers are CEILINGS**: you are paid for your draws and charged nothing when an opponent holds it, because the pod does not draw cards. `monarch_loss_scale` decides the whole value and has NOT been swept |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6002,9 +6002,82 @@ live. The one thing with no mutation behind it is written down in the test's own
 docstring (§0z15): case E's `first_attack_turn` guard is shared with the damage
 path and cannot be switched off without reimplementing that function.
 
+### THE +0.10 WAS THE HARNESS, NOT THE CROWN (owner's challenge, 2026-09-22)
+
+The owner's objection: the pod's attack share is weighted on an existing
+value, and at a real table **anyone who can profitably swing at the monarch
+does**, because the crown is worth too much to pass up — so the model should
+be charging the monarch far more damage than it does, and that should
+counterbalance the cards. Chasing it produced three results, and the third is
+the one that matters.
+
+**FIRST, TWO CORRECTIONS TO THIS SECTION'S OWN CLAIMS.** The text above named
+`your_share` as the attack weighting. It is not: `DEFAULT_CFG` sets
+`combat_targeting="open"`, so the attack path uses **`combat_share`**, weighted
+by how OPEN each player is (`1/(1+blockers)`) rather than by threat — §0v
+already established that threat-weighting combat was backwards. And
+`incidental_rate` is **1.0** in `DEFAULT_CFG`, not the 0.45 fallback written at
+the `cfg.get`, so `monarch_loss_scale`'s default is 1.0 and the crown passes in
+about one turn once the pod can attack.
+
+**SECOND, THE OBJECTION IS RIGHT, BUT FOR A DEVELOPED BOARD.** `combat_share`
+at `creatures=4` each: **0.714 on an empty board, 0.385 at three creatures,
+0.238 at seven.** A wide board DETERS the pod, which is right for ordinary
+combat and wrong for the monarch, where the crown is the prize. So
+`monarch_attack_floor` (0.75) is a **floor, not a multiplier** — a multiplier
+scales the very deterrence being overridden — and it barely moves an empty
+board while roughly tripling a developed one.
+
+**AND IT DOES NOT COUNTERBALANCE.** Swept at N=500, `monarch_start`:
+
+| floor | karlov won | rendmaw won | crown held |
+|---|---|---|---|
+| 0.00 (as first built) | +0.1040 | +0.1200 | 3.54 |
+| 0.50 | +0.1000 | +0.1140 | 3.13 |
+| 0.75 | +0.1040 | +0.1100 | 3.02 |
+| 1.00 | +0.1020 | +0.1020 | 3.01 |
+
+Tripling the share costs about **0.002 win rate**. What it actually does is
+shorten the reign (3.54 → 3.01 turns) and remove about half a card. **The
+counterweight cannot work in this model**: the crown's cost is chip damage, and
+chip damage over a three-turn reign is worth a point or two of life against
+three cards.
+
+**THIRD, AND THIS IS THE REAL OVERSTATEMENT.** Losing 0.56 cards cost only
+0.002 win rate, which cannot be reconciled with 3.3 cards being worth 0.104 —
+so the value is NOT linear in cards, and the non-linearity names its own cause.
+`monarch_start` grants the crown on **turn 1**, and `first_attack_turn` is
+**3**: turns 1 and 2 are free, because nobody can attack yet. **Two of the
+three held turns were immunity no real card can buy.** Granting it at a turn a
+card could actually arrive (`monarch_start_turn`), floor 0.75, N=500:
+
+| granted | karlov | rendmaw |
+|---|---|---|
+| turn 1 | **+0.1040** | **+0.1100** |
+| turn 3 | +0.0240 | +0.0400 |
+| turn 5 | +0.0220 | +0.0220 |
+| turn 7 | +0.0400 | +0.0040 |
+| turn 9 | +0.0460 | +0.0040 |
+
+**A monarch card that arrives on turn 3-5 is worth roughly +0.02 to +0.04, not
++0.10** — three to five times smaller, and squarely in the range this project
+measures for a good card. The crown is held ~1 turn once the pod can attack,
+against ~3 when granted into the immune window.
+
+**READ THE SECOND TABLE FOR ITS SHAPE, NOT ITS ROWS.** These are UNPAIRED runs
+at N=500; the spread across turns 3/5/7/9 is inside the noise and karlov's
+turn-7/9 figures reading above turn 5 should not be taken as "later is better".
+What is far outside the noise is turn 1 against everything after it.
+
 ### What is owed before a monarch card ships
 
-1. **Sweep `monarch_loss_scale`.** It is the card's value.
+1. ~~**Sweep `monarch_loss_scale`.**~~ DONE above, along with
+   `monarch_attack_floor`: win rate is INSENSITIVE to both, which is the more
+   useful result and the one nobody would have believed unmeasured. What the
+   value actually turns on is WHEN the crown arrives.
+1b. **Measure the real card paired, not `monarch_start_turn` unpaired.** The
+   +0.02 to +0.04 above is a point estimate at N=500; a card gets a `run_ab`
+   against a named cut like anything else.
 2. **Decide whether the pod's crown is worth modelling** — the ceiling in the
    table above is the opponents drawing cards, which is §4 again.
 3. Ginger, Queen of Sweets still needs its oracle text verified on release

@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `d23e650` from 20 engine sources.
+Derived at `42015bb` from 20 engine sources.
 
-**111 knobs, 164 call sites.**
+**113 knobs, 166 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -67,11 +67,11 @@ show up first.
 | `charge_life_costs` | `True` | 3 | `edhmc/engine.py:981` | §0z7 | yes | yes |
 | `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:802` | §0i | yes | yes |
 | `clamp_cap` | `4` | 1 | `edhmc/engine.py:2023` |  | **no** | **never** |
-| `clock_rearm` | `4` | 1 | `edhmc/opponents.py:1205` |  | **no** | **never** |
+| `clock_rearm` | `4` | 1 | `edhmc/opponents.py:1260` |  | **no** | **never** |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:159` |  | yes | yes |
 | `combat_defender` | `'weakest'` | 1 | `edhmc/opponents.py:937` |  | **no** | yes |
 | `combat_split` | `True` | 1 | `edhmc/opponents.py:925` |  | yes | yes |
-| `combat_targeting` | `'threat'` | 1 | `edhmc/opponents.py:1137` |  | yes | yes |
+| `combat_targeting` | `'threat'` | 1 | `edhmc/opponents.py:1162` |  | yes | yes |
 | `combo_cap` | `40` | 1 | `edhmc/tivit.py:450` |  | **no** | yes |
 | `copy_etb` | `True` | 1 | `edhmc/azusa.py:1307` | §0z1 | yes | yes |
 | `copy_legend_rule` | `True` | 1 | `edhmc/azusa.py:1310` | §0z1 | yes | yes |
@@ -89,7 +89,7 @@ show up first.
 | `extra_turn_cap` | `5` | 1 | `edhmc/tivit.py:1146` |  | **no** | **never** |
 | `extra_turns_chain` | `True` | 1 | `edhmc/tivit.py:1138` |  | yes | yes |
 | `extra_turns_skip_opponents` | `True` | 1 | `edhmc/tivit.py:1102` |  | yes | yes |
-| `first_attack_turn` | `3` | 1 | `edhmc/opponents.py:1134` |  | yes | yes |
+| `first_attack_turn` | `3` | 1 | `edhmc/opponents.py:1159` |  | yes | yes |
 | `first_wipe_turn` | `5` | 1 | `edhmc/opponents.py:366` |  | yes | **never** |
 | `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:1171` | §0u | yes | yes |
 | `flier_block_share` | `0.3` | 1 | `edhmc/opponents.py:675` |  | yes | yes |
@@ -97,7 +97,7 @@ show up first.
 | `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1516` |  | **no** | **never** |
 | `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1522` |  | **no** | **never** |
 | `hold_up_rate` | `0.6` | 1 | `edhmc/opponents.py:310` |  | yes | yes |
-| `incidental_rate` | `0.45` | 1 | `edhmc/opponents.py:1136` |  | yes | yes |
+| `incidental_rate` | `0.45` | 1 | `edhmc/opponents.py:1161` |  | yes | yes |
 | `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:1358` |  | **no** | yes |
 | `land_animation` | `'full'` | 3 | `edhmc/azusa.py:540` | §0z19 | yes | yes |
 | `land_creature_sick` | `True` | 1 | `edhmc/azusa.py:661` | §0z15 | yes | yes |
@@ -107,8 +107,10 @@ show up first.
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:985` | §0z37 | **no** | **never** |
 | `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:1551` |  | **no** | **never** |
 | `miracle_reserve` | `2` | 1 | `edhmc/lorehold.py:1549` |  | yes | yes |
-| `monarch_loss_scale` | `rate` | 1 | `edhmc/opponents.py:1151` | §0u | yes | yes |
+| `monarch_attack_floor` | `0.75` | 1 | `edhmc/opponents.py:1116` | §0z38 | yes | yes |
+| `monarch_loss_scale` | `rate` | 1 | `edhmc/opponents.py:1179` | §0u | yes | yes |
 | `monarch_start` | `False` | 1 | `edhmc/engine.py:1067` | §0z30 | yes | yes |
+| `monarch_start_turn` | `0` | 1 | `edhmc/opponents.py:1139` | §0z28 | yes | yes |
 | `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:1813` |  | **no** | **never** |
 | `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:621` |  | **no** | **never** |
 | `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:813` |  | yes | yes |
@@ -123,8 +125,8 @@ show up first.
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
 | `opponents` | `True` | 6 | `edhmc/azusa.py:2985` | §0z30 | yes | yes |
-| `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:1286` | §0u | yes | **never** |
-| `own_wipe_indestructible` | `True` | 1 | `edhmc/opponents.py:1266` | §0u | yes | yes |
+| `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:1341` | §0u | yes | **never** |
+| `own_wipe_indestructible` | `True` | 1 | `edhmc/opponents.py:1321` | §0u | yes | yes |
 | `planeswalker_abilities` | `True` | 2 | `edhmc/azusa.py:1324` |  | yes | yes |
 | `pod_brackets` | `(2, 3, 4)` | 1 | `edhmc/opponents.py:153` |  | yes | yes |
 | `pod_damage_full_pod` | `True` | 1 | `edhmc/opponents.py:779` | §0u | yes | yes |
@@ -154,7 +156,7 @@ show up first.
 | `tutor_targets` | `()` | 1 | `edhmc/lorehold.py:895` |  | **no** | yes |
 | `watch` | `()` | 16 | `edhmc/azusa.py:1514` | §0i | yes | yes |
 | `wildspeaker_mode` | `'auto'` | 1 | `edhmc/azusa.py:2308` |  | **no** | yes |
-| `wipe_threshold` | `1.4` | 1 | `edhmc/opponents.py:1221` |  | yes | **never** |
+| `wipe_threshold` | `1.4` | 1 | `edhmc/opponents.py:1276` |  | yes | **never** |
 | `wurm_kill_share` | `0.35` | 1 | `edhmc/shilgengar.py:728` |  | **no** | **never** |
 | `zuran_keep` | `6` | 1 | `edhmc/azusa.py:2240` |  | yes | yes |
 | `zuran_life_floor` | `8` | 1 | `edhmc/azusa.py:2231` |  | yes | yes |
@@ -190,12 +192,12 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 111 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 113 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**34 of 111.** Not an error — most knobs are
+**34 of 113.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
@@ -204,7 +206,7 @@ docs knows they exist.
 
 ## The knobs nothing has ever set
 
-**42 of 111.** The name appears nowhere in
+**42 of 113.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;

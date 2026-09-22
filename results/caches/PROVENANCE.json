@@ -110,6 +110,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "b088a577f9ac251b",
         "utc": "2026-09-22T03:21:00Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "c9d79719aca531a0",
+        "utc": "2026-09-22T12:42:29Z"
       }
     ]
   },
@@ -184,6 +190,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "7d2b7828b777b3bb",
         "utc": "2026-09-22T03:21:00Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "3e94ec578383db0f",
+        "utc": "2026-09-22T12:42:29Z"
       }
     ]
   },
@@ -276,6 +288,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "605c245b54dcc349",
         "utc": "2026-09-22T03:21:00Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "7e78455246d1dab7",
+        "utc": "2026-09-22T12:42:29Z"
       }
     ]
   },
@@ -372,6 +390,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "26d8d8d02174a526",
         "utc": "2026-09-22T03:20:59Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "7ff79bec55f3d319",
+        "utc": "2026-09-22T12:42:28Z"
       }
     ]
   },
@@ -468,6 +492,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "84d13c465823fc2e",
         "utc": "2026-09-22T03:21:00Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "0d5ed61d458db87f",
+        "utc": "2026-09-22T12:42:29Z"
       }
     ]
   },
@@ -552,6 +582,12 @@
         "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
         "fingerprint": "20072bfa80787969",
         "utc": "2026-09-22T03:21:00Z"
+      },
+      {
+        "commit": "42015bb",
+        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+        "fingerprint": "fb263bb66c8cf690",
+        "utc": "2026-09-22T12:42:29Z"
       }
     ]
   }
