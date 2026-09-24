@@ -108,6 +108,14 @@ def apply_moves(deck, moves: dict):
             if c.name in moves else c for c in deck]
 
 
+def card_arm(arm: str) -> tuple[str, float]:
+    """"card:<name>:<delta>" -> (name, delta). Split from the RIGHT: a card
+    name can contain a colon ("Vault 11: Voter's Dilemma"), and splitting from
+    the left crashed the first screen on exactly that card."""
+    name, d = arm[len("card:"):].rsplit(":", 1)
+    return name, float(d)
+
+
 def arm_moves(deck, arm: str) -> dict:
     """Arm label -> {card name: new priority}. Labels:
          base | noop | flat | reversed | card:<name>:<+d|-d> | joint:<json>"""
@@ -126,9 +134,9 @@ def arm_moves(deck, arm: str) -> dict:
         lo, hi = min(ps), max(ps)
         return {c.name: lo + hi - c.priority for c in nl}
     if arm.startswith("card:"):
-        _, name, d = arm.split(":", 2)
+        name, d = card_arm(arm)
         c = next(c for c in nl if c.name == name)
-        return {name: c.priority + float(d)}
+        return {name: c.priority + d}
     if arm.startswith("joint:"):
         return json.loads(arm[len("joint:"):])
     raise KeyError(arm)
@@ -139,7 +147,7 @@ def watched(deck, arm: str) -> frozenset:
     in the engine at once, so a zero there is the evidence that the shared,
     unwatched A leg is the A leg `run_ab` would have simulated."""
     if arm.startswith("card:"):
-        return frozenset([arm.split(":", 2)[1]])
+        return frozenset([card_arm(arm)[0]])
     if arm == "noop":
         return frozenset(c.name for c in nonland(deck))
     return frozenset()
@@ -459,8 +467,8 @@ def main() -> int:
         for arm, per_t in rows:
             label = arm
             if arm.startswith("card:"):
-                _, name, dd = arm.split(":", 2)
-                label = f"{name} {pri[name]:g}->{pri[name] + float(dd):g}"
+                name, dd = card_arm(arm)
+                label = f"{name} {pri[name]:g}->{pri[name] + dd:g}"
             elif arm.startswith("joint:"):
                 mv = json.loads(arm[len("joint:"):])
                 label = "JOINT " + "; ".join(

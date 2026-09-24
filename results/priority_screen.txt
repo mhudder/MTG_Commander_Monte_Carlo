@@ -1,0 +1,789 @@
+priority sweep, phase `screen`. N=5,000 paired per arm, seeds 1234..6233, horizons (20,), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+760 arms across 6 deck(s), plus BASE and NOOP per deck/horizon.
+
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP rendmaw     T20  games changed: 0   OK
+  NOOP lorehold    T20  games changed: 0   OK
+  NOOP karlov      T20  games changed: 0   OK
+  NOOP tivit       T20  games changed: 0   OK
+  NOOP shilgengar  T20  games changed: 0   OK
+  NOOP azusa       T20  games changed: 0   OK
+
+== rendmaw   (T20 base won 0.1968)
+  Tendershoot Dryad 6->4                                     T20  -0.0058 +-0.0034 * dmg  -0.70* chg   465   cast 0.135
+  Grist, the Hunger Tide 8->6                                T20  -0.0038 +-0.0021 * dmg  -0.16* chg   323   cast 0.177
+  Tendershoot Dryad 6->8                                     T20  +0.0034 +-0.0030 * dmg  +0.45* chg   388   cast 0.175
+  Arasta of the Endless Web 5->3                             T20  -0.0028 +-0.0022 * dmg  -0.31* chg   445   cast 0.134
+  Foundry Inspector 6->4                                     T20  -0.0028 +-0.0023 * dmg  -0.12* chg   601   cast 0.177
+  Erebos, Bleak-Hearted 6->8                                 T20  -0.0026 +-0.0025   dmg  -0.22* chg   324   cast 0.175
+  Burnished Hart 5->7                                        T20  -0.0024 +-0.0018 * dmg  -0.04  chg   337   cast 0.199
+  Midnight Reaper 5->7                                       T20  -0.0022 +-0.0020 * dmg  -0.07  chg   421   cast 0.200
+  Deathreap Ritual 5->7                                      T20  -0.0022 +-0.0020 * dmg  -0.22* chg   299   cast 0.177
+  Dockside Chef 5->7                                         T20  -0.0018 +-0.0016 * dmg  -0.10* chg   157   cast 0.221
+  Steel Overseer 6->4                                        T20  -0.0018 +-0.0021   dmg  -0.06  chg   352   cast 0.185
+  Arcane Signet 8->6                                         T20  -0.0016 +-0.0018   dmg  -0.03  chg   249   cast 0.209
+  Roaming Throne 8->6                                        T20  +0.0016 +-0.0025   dmg  +0.09  chg   336   cast 0.170
+  Blood Artist 6->8                                          T20  -0.0016 +-0.0018   dmg  -0.07  chg   235   cast 0.191
+  The Meathook Massacre 4->2                                 T20  +0.0016 +-0.0013 * dmg  +0.05  chg   254   cast 0.131
+  Shigeki, Jukai Visionary 5->7                              T20  -0.0016 +-0.0021   dmg  -0.11* chg   352   cast 0.214
+  Biotransference 5->7                                       T20  -0.0016 +-0.0019   dmg  -0.17* chg   295   cast 0.180
+  Massacre Wurm 4->6                                         T20  +0.0016 +-0.0022   dmg  +0.38* chg   198   cast 0.066
+  Bow of Nylea 3->5                                          T20  -0.0016 +-0.0017   dmg  -0.09* chg   393   cast 0.178
+  Twitching Doll 6->8                                        T20  -0.0014 +-0.0020   dmg  -0.05  chg   253   cast 0.217
+  Solemn Simulacrum 5->3                                     T20  +0.0014 +-0.0023   dmg  -0.05  chg   395   cast 0.152
+  Grave Titan 7->5                                           T20  -0.0014 +-0.0029   dmg  -0.29* chg   328   cast 0.129
+  Idol of Oblivion 7->9                                      T20  -0.0014 +-0.0020   dmg  -0.15* chg   227   cast 0.203
+  Whip of Erebos 4->2                                        T20  -0.0014 +-0.0016   dmg  +0.05  chg   259   cast 0.126
+  Scrap Trawler 4->2                                         T20  -0.0014 +-0.0016   dmg  -0.13* chg   277   cast 0.172
+  Biotransference 5->3                                       T20  +0.0014 +-0.0024   dmg  +0.20* chg   465   cast 0.137
+  Heroic Intervention 2->0                                   T20  +0.0014 +-0.0011 * dmg  +0.06  chg    74   cast 0.142
+  Ohran Frostfang 7->5                                       T20  -0.0012 +-0.0029   dmg  -0.17* chg   292   cast 0.134
+  Haywire Mite 3->1                                          T20  -0.0012 +-0.0011 * dmg  -0.06* chg   117   cast 0.215
+  Palladium Myr 7->9                                         T20  -0.0010 +-0.0023   dmg  -0.05  chg   193   cast 0.214
+  Ornithopter of Paradise 7->9                               T20  -0.0010 +-0.0016   dmg  -0.03  chg   225   cast 0.220
+  Twitching Doll 6->4                                        T20  +0.0010 +-0.0018   dmg  +0.01  chg   316   cast 0.201
+  Enduring Vitality 8->6                                     T20  -0.0010 +-0.0021   dmg  +0.05  chg   282   cast 0.183
+  Bitterblossom 9->7                                         T20  -0.0010 +-0.0016   dmg  -0.13* chg   240   cast 0.195
+  Filigree Familiar 4->6                                     T20  -0.0010 +-0.0019   dmg  +0.01  chg   489   cast 0.199
+  Filigree Familiar 4->2                                     T20  -0.0010 +-0.0013   dmg  -0.06* chg   254   cast 0.162
+  Woe Strider 5->3                                           T20  -0.0010 +-0.0018   dmg  -0.12* chg   377   cast 0.172
+  Metallic Mimic 7->9                                        T20  -0.0010 +-0.0020   dmg  -0.02  chg   237   cast 0.205
+  Overwhelming Stampede 6->8                                 T20  -0.0010 +-0.0009 * dmg  -0.06* chg    48   cast 0.190
+  The Meathook Massacre 4->6                                 T20  +0.0010 +-0.0024   dmg  +0.11  chg   479   cast 0.172
+  Golgari Signet 8->6                                        T20  -0.0008 +-0.0020   dmg  +0.06  chg   257   cast 0.214
+  Copper Myr 7->9                                            T20  +0.0008 +-0.0016   dmg  -0.02  chg   184   cast 0.209
+  The Great Henge 8->6                                       T20  -0.0008 +-0.0028   dmg  +0.11  chg   350   cast 0.145
+  Bitterblossom 9->11                                        T20  +0.0008 +-0.0014   dmg  +0.13* chg   133   cast 0.204
+  Woe Strider 5->7                                           T20  -0.0008 +-0.0022   dmg  +0.04  chg   403   cast 0.207
+  Midnight Reaper 5->3                                       T20  -0.0008 +-0.0023   dmg  -0.01  chg   405   cast 0.167
+  Reap 1->3                                                  T20  -0.0008 +-0.0014   dmg  -0.01  chg   178   cast 0.190
+  Gloomshrieker 5->7                                         T20  +0.0008 +-0.0024   dmg  -0.00  chg   413   cast 0.208
+  Foundry Inspector 6->8                                     T20  +0.0008 +-0.0028   dmg  +0.03  chg   366   cast 0.217
+  Massacre Wurm 4->2                                         T20  -0.0008 +-0.0016   dmg  -0.19* chg    89   cast 0.036
+  Lignify 2->0                                               T20  +0.0008 +-0.0009   dmg  +0.05  chg    95   cast 0.178
+  Heroic Intervention 2->4                                   T20  -0.0008 +-0.0014   dmg  -0.09* chg   157   cast 0.167
+  Culling Ritual 1->3                                        T20  +0.0008 +-0.0016   dmg  -0.03  chg   145   cast 0.060
+  Hagra Mauling 2->4                                         T20  -0.0008 +-0.0007 * dmg  -0.04* chg    38   cast 0.031
+  Golgari Signet 8->10                                       T20  +0.0006 +-0.0010   dmg  +0.01  chg    52   cast 0.219
+  Sakura-Tribe Elder 5->3                                    T20  -0.0006 +-0.0014   dmg  -0.04  chg   229   cast 0.187
+  Burnished Hart 5->3                                        T20  -0.0006 +-0.0015   dmg  -0.01  chg   278   cast 0.173
+  Solemn Simulacrum 5->7                                     T20  +0.0006 +-0.0021   dmg  -0.05  chg   300   cast 0.192
+  Overlord of the Hauntwoods 7->9                            T20  +0.0006 +-0.0026   dmg  +0.02  chg   278   cast 0.187
+  Grist, the Hunger Tide 8->10                               T20  +0.0006 +-0.0016   dmg  +0.11* chg   189   cast 0.190
+  March of the World Ooze 8->6                               T20  +0.0006 +-0.0009   dmg  +0.02  chg    36   cast 0.167
+  Idol of Oblivion 7->5                                      T20  -0.0006 +-0.0020   dmg  +0.02  chg   356   cast 0.191
+  Verdurous Gearhulk 6->8                                    T20  -0.0006 +-0.0007   dmg  +0.01  chg    75   cast 0.207
+  Overwhelming Stampede 6->4                                 T20  +0.0006 +-0.0010   dmg  +0.03  chg    87   cast 0.187
+  Steel Overseer 6->8                                        T20  -0.0006 +-0.0018   dmg  -0.01  chg   257   cast 0.200
+  Erebos, Bleak-Hearted 6->4                                 T20  -0.0006 +-0.0027   dmg  +0.13* chg   459   cast 0.140
+  Whip of Erebos 4->6                                        T20  -0.0006 +-0.0024   dmg  -0.15* chg   456   cast 0.164
+  Gloomshrieker 5->3                                         T20  -0.0006 +-0.0016   dmg  +0.04  chg   364   cast 0.169
+  Pygmy Kavu 2->4                                            T20  +0.0006 +-0.0012   dmg  +0.01  chg   294   cast 0.167
+  Ashnod's Altar 5->7                                        T20  +0.0006 +-0.0022   dmg  -0.15* chg   406   cast 0.194
+  Bow of Nylea 3->1                                          T20  -0.0006 +-0.0010   dmg  +0.01  chg   245   cast 0.139
+  Nameless Inversion 2->4                                    T20  +0.0006 +-0.0012   dmg  -0.03  chg   179   cast 0.189
+  Eyeblight's Ending 2->4                                    T20  -0.0006 +-0.0007   dmg  -0.10* chg   206   cast 0.178
+  Toxic Deluge 1->3                                          T20  +0.0006 +-0.0018   dmg  -0.03  chg   195   cast 0.082
+  Arcane Signet 8->10                                        T20  +0.0004 +-0.0008   dmg  +0.00  chg    72   cast 0.215
+  Leaden Myr 7->5                                            T20  -0.0004 +-0.0020   dmg  +0.04  chg   285   cast 0.205
+  Palladium Myr 7->5                                         T20  -0.0004 +-0.0022   dmg  +0.05  chg   322   cast 0.199
+  Ornithopter of Paradise 7->5                               T20  -0.0004 +-0.0014   dmg  +0.08* chg   305   cast 0.210
+  Dryad of the Ilysian Grove 9->7                            T20  -0.0004 +-0.0018   dmg  +0.02  chg   194   cast 0.183
+  Overlord of the Hauntwoods 7->5                            T20  -0.0004 +-0.0022   dmg  -0.03  chg   251   cast 0.180
+  Enduring Vitality 8->10                                    T20  -0.0004 +-0.0013   dmg  -0.02  chg    97   cast 0.195
+  Ophiomancer 8->6                                           T20  -0.0004 +-0.0022   dmg  +0.03  chg   282   cast 0.189
+  Dockside Chef 5->3                                         T20  +0.0004 +-0.0011   dmg  +0.07* chg    91   cast 0.213
+  Coat of Arms 5->3                                          T20  +0.0004 +-0.0008   dmg  +0.00  chg    35   cast 0.171
+  Blood Artist 6->4                                          T20  +0.0004 +-0.0020   dmg  +0.07  chg   402   cast 0.173
+  Pygmy Kavu 2->0                                            T20  +0.0004 +-0.0014   dmg  -0.06  chg   235   cast 0.137
+  Ashnod's Altar 5->3                                        T20  +0.0004 +-0.0020   dmg  +0.17* chg   405   cast 0.159
+  Junk Diver 4->2                                            T20  -0.0004 +-0.0008   dmg  -0.04  chg   267   cast 0.169
+  Scrap Trawler 4->6                                         T20  -0.0004 +-0.0024   dmg  +0.10  chg   493   cast 0.205
+  Lignify 2->4                                               T20  +0.0004 +-0.0010   dmg  +0.02  chg   192   cast 0.192
+  Assassin's Trophy 2->4                                     T20  -0.0004 +-0.0010   dmg  +0.03  chg   160   cast 0.190
+  Culling Ritual 1->-1                                       T20  -0.0004 +-0.0005   dmg  +0.00  chg    51   cast 0.040
+  Leaden Myr 7->9                                            T20  +0.0002 +-0.0018   dmg  -0.01  chg   202   cast 0.216
+  Dryad of the Ilysian Grove 9->11                           T20  -0.0002 +-0.0003   dmg  +0.00  chg    12   cast 0.188
+  Sakura-Tribe Elder 5->7                                    T20  -0.0002 +-0.0018   dmg  -0.03  chg   266   cast 0.207
+  The Great Henge 8->10                                      T20  -0.0002 +-0.0003   dmg  -0.00  chg    52   cast 0.155
+  Ophiomancer 8->10                                          T20  -0.0002 +-0.0014   dmg  +0.04  chg   196   cast 0.198
+  Arasta of the Endless Web 5->7                             T20  +0.0002 +-0.0022   dmg  +0.10  chg   328   cast 0.175
+  March of the World Ooze 8->10                              T20  +0.0002 +-0.0007   dmg  -0.04* chg    18   cast 0.170
+  Metallic Mimic 7->5                                        T20  +0.0002 +-0.0020   dmg  -0.00  chg   357   cast 0.194
+  Primal Vigor 7->9                                          T20  -0.0002 +-0.0025   dmg  -0.17* chg   322   cast 0.167
+  Ohran Frostfang 7->9                                       T20  +0.0002 +-0.0029   dmg  +0.13  chg   261   cast 0.147
+  Village Rites 1->3                                         T20  +0.0002 +-0.0009   dmg  +0.01  chg    65   cast 0.117
+  Shigeki, Jukai Visionary 5->3                              T20  +0.0002 +-0.0010   dmg  +0.02  chg   220   cast 0.192
+  Junk Diver 4->6                                            T20  -0.0002 +-0.0026   dmg  +0.06  chg   536   cast 0.204
+  Myr Retriever 4->6                                         T20  -0.0002 +-0.0020   dmg  -0.06  chg   355   cast 0.207
+  Haywire Mite 3->5                                          T20  -0.0002 +-0.0008   dmg  -0.06* chg    83   cast 0.218
+  Beast Within 2->4                                          T20  -0.0002 +-0.0012   dmg  -0.01  chg   234   cast 0.170
+  Eyeblight's Ending 2->0                                    T20  +0.0002 +-0.0010   dmg  -0.06  chg   216   cast 0.154
+  Hagra Mauling 2->0                                         T20  +0.0002 +-0.0006   dmg  +0.00  chg    41   cast 0.020
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.212
+  Sol Ring 10->8                                             T20  +0.0000 +-0.0008   dmg  -0.03  chg    81   cast 0.210
+  Copper Myr 7->5                                            T20  +0.0000 +-0.0018   dmg  +0.10* chg   255   cast 0.198
+  Grave Titan 7->9                                           T20  +0.0000 +-0.0020   dmg  +0.12* chg   174   cast 0.151
+  Primal Vigor 7->5                                          T20  +0.0000 +-0.0026   dmg  +0.14* chg   363   cast 0.138
+  Verdurous Gearhulk 6->4                                    T20  +0.0000 +-0.0008   dmg  -0.04* chg    87   cast 0.203
+  Beastmaster Ascension 4->6                                 T20  +0.0000 +-0.0006   dmg  -0.02  chg    39   cast 0.201
+  Beastmaster Ascension 4->2                                 T20  +0.0000 +-0.0000   dmg  -0.01  chg     6   cast 0.198
+  Coat of Arms 5->7                                          T20  +0.0000 +-0.0012   dmg  -0.05  chg   104   cast 0.173
+  Roaming Throne 8->10                                       T20  +0.0000 +-0.0014   dmg  +0.07* chg   108   cast 0.181
+  Deathreap Ritual 5->3                                      T20  +0.0000 +-0.0020   dmg  +0.19* chg   446   cast 0.135
+  Village Rites 1->-1                                        T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.112
+  Reap 1->-1                                                 T20  +0.0000 +-0.0000   dmg  +0.00  chg    10   cast 0.177
+  Myr Retriever 4->2                                         T20  +0.0000 +-0.0016   dmg  -0.05  chg   208   cast 0.191
+  Nameless Inversion 2->0                                    T20  +0.0000 +-0.0012   dmg  -0.01  chg    91   cast 0.177
+  Assassin's Trophy 2->0                                     T20  +0.0000 +-0.0010   dmg  +0.00  chg    76   cast 0.174
+  Beast Within 2->0                                          T20  +0.0000 +-0.0012   dmg  +0.01  chg   215   cast 0.143
+  Toxic Deluge 1->-1                                         T20  +0.0000 +-0.0000   dmg  +0.01* chg    20   cast 0.059
+  -> 14 of 128 rows exclude zero at 95%; ~6.4 expected by chance alone.
+
+== lorehold   (T20 base won 0.2072)
+  Storm Herd 7->5                                            T20  -0.0056 +-0.0029 * dmg  -0.35* chg   183   cast 0.187
+  Monument to Endurance 6->4                                 T20  -0.0048 +-0.0032 * dmg  -0.19* chg   309   cast 0.193
+  Monument to Endurance 6->8                                 T20  +0.0044 +-0.0035 * dmg  +0.11  chg   348   cast 0.256
+  Victory Chimes 7->5                                        T20  -0.0038 +-0.0027 * dmg  -0.02  chg   322   cast 0.233
+  Storm-Kiln Artist 7->5                                     T20  +0.0034 +-0.0028 * dmg  -0.01  chg   386   cast 0.172
+  Apex of Power 5->7                                         T20  -0.0034 +-0.0024 * dmg  -0.09* chg   155   cast 0.187
+  Longshot, Rebel Bowman 8->6                                T20  -0.0030 +-0.0032   dmg  -0.58* chg   430   cast 0.208
+  Storm-Kiln Artist 7->9                                     T20  -0.0030 +-0.0026 * dmg  -0.23* chg   276   cast 0.236
+  Caldera Pyremaw 8.5->10.5                                  T20  +0.0028 +-0.0023 * dmg  +0.14* chg   214   cast 0.187
+  Reforge the Soul 6->4                                      T20  -0.0026 +-0.0031   dmg  -0.23* chg   283   cast 0.212
+  Faithless Looting 3->1                                     T20  -0.0024 +-0.0021 * dmg  -0.06  chg   184   cast 0.263
+  Guttersnipe 6->4                                           T20  -0.0022 +-0.0030   dmg  -0.19* chg   372   cast 0.215
+  Artist's Talent 9->7                                       T20  -0.0022 +-0.0028   dmg  -0.09  chg   484   cast 0.281
+  Enlightened Tutor 6->4                                     T20  +0.0022 +-0.0024   dmg  +0.18* chg   344   cast 0.295
+  Perch Protection 3->5                                      T20  -0.0022 +-0.0024   dmg  -0.15* chg   148   cast 0.194
+  Storm Herd 7->9                                            T20  +0.0022 +-0.0025   dmg  +0.04  chg   160   cast 0.219
+  Double Vision 9->7                                         T20  +0.0020 +-0.0022   dmg  +0.20* chg   217   cast 0.162
+  Approach of the Second Sun 6->4                            T20  +0.0020 +-0.0026   dmg  +0.12* chg   316   cast 0.168
+  Improvisation Capstone 5->7                                T20  -0.0020 +-0.0026   dmg  -0.22* chg   278   cast 0.230
+  Rise of the Eldrazi 7->5                                   T20  -0.0020 +-0.0017 * dmg  -0.03  chg    73   cast 0.140
+  Pinnacle Monk 4->2                                         T20  +0.0018 +-0.0015 * dmg  +0.06  chg   103   cast 0.071
+  Monastery Mentor 8->10                                     T20  -0.0018 +-0.0025   dmg  +0.07  chg   295   cast 0.278
+  The Dawning Archaic 9->7                                   T20  -0.0018 +-0.0020   dmg  -0.07  chg   126   cast 0.155
+  Chaos Warp 2->4                                            T20  -0.0018 +-0.0021   dmg  -0.15* chg   204   cast 0.297
+  Restoration Seminar 5->7                                   T20  -0.0018 +-0.0024   dmg  -0.15* chg   261   cast 0.228
+  Lightning Greaves 6->8                                     T20  -0.0016 +-0.0026   dmg  -0.11  chg   262   cast 0.295
+  Pinnacle Monk 4->6                                         T20  -0.0016 +-0.0018   dmg  -0.05  chg   168   cast 0.106
+  Verge Rangers 7->5                                         T20  +0.0016 +-0.0030   dmg  +0.08  chg   337   cast 0.222
+  Borrowed Knowledge 3->1                                    T20  +0.0016 +-0.0027   dmg  +0.08  chg   221   cast 0.221
+  Ultima 5->7                                                T20  +0.0016 +-0.0029   dmg  +0.05  chg   262   cast 0.213
+  Emeria's Call 5->7                                         T20  +0.0016 +-0.0023   dmg  +0.04  chg   188   cast 0.196
+  Ondu Inversion 3->5                                        T20  -0.0016 +-0.0017   dmg  -0.11* chg    70   cast 0.146
+  Boros Signet 8->6                                          T20  +0.0014 +-0.0024   dmg  +0.07  chg   217   cast 0.292
+  Longshot, Rebel Bowman 8->10                               T20  +0.0014 +-0.0026   dmg  +0.36* chg   309   cast 0.261
+  Land Tax 7->9                                              T20  -0.0014 +-0.0022   dmg  -0.22* chg   173   cast 0.295
+  Boros Charm 3->1                                           T20  -0.0014 +-0.0018   dmg  -0.09* chg   256   cast 0.234
+  Thrill of Possibility 3->5                                 T20  +0.0014 +-0.0027   dmg  +0.01  chg   263   cast 0.293
+  Dawn's Truce 2->4                                          T20  -0.0014 +-0.0023   dmg  -0.07  chg   242   cast 0.280
+  Volcanic Vision 4->6                                       T20  +0.0014 +-0.0030   dmg  -0.04  chg   291   cast 0.207
+  Dragon's Rage Channeler 5->3                               T20  -0.0012 +-0.0018   dmg  -0.05  chg   251   cast 0.279
+  Monastery Mentor 8->6                                      T20  -0.0012 +-0.0031   dmg  -0.23* chg   413   cast 0.226
+  Boros Charm 3->5                                           T20  +0.0012 +-0.0025   dmg  +0.05  chg   267   cast 0.283
+  Generous Gift 2->4                                         T20  -0.0012 +-0.0018   dmg  -0.04  chg   173   cast 0.295
+  Farewell 4->2                                              T20  -0.0012 +-0.0019   dmg  -0.01  chg   124   cast 0.169
+  Hit the Mother Lode 5->7                                   T20  +0.0012 +-0.0035   dmg  +0.13  chg   297   cast 0.247
+  Blasphemous Act 4->6                                       T20  -0.0012 +-0.0028   dmg  -0.24* chg   273   cast 0.272
+  Soulfire Eruption 6->8                                     T20  -0.0012 +-0.0022   dmg  -0.07  chg   155   cast 0.216
+  Sol Ring 10->8                                             T20  -0.0010 +-0.0025   dmg  -0.05  chg   328   cast 0.306
+  Talisman of Conviction 8->6                                T20  -0.0010 +-0.0021   dmg  -0.08  chg   217   cast 0.288
+  Victory Chimes 7->9                                        T20  -0.0010 +-0.0028   dmg  -0.16* chg   335   cast 0.286
+  Guttersnipe 6->8                                           T20  -0.0010 +-0.0030   dmg  -0.07  chg   364   cast 0.273
+  Verge Rangers 7->9                                         T20  -0.0010 +-0.0026   dmg  -0.11  chg   305   cast 0.276
+  Double Vision 9->11                                        T20  -0.0010 +-0.0018   dmg  -0.05  chg   100   cast 0.184
+  Smothering Tithe 9->7                                      T20  +0.0010 +-0.0030   dmg  +0.06  chg   285   cast 0.217
+  Thrill of Possibility 3->1                                 T20  -0.0010 +-0.0027   dmg  -0.16* chg   236   cast 0.256
+  Unexpected Windfall 4->2                                   T20  +0.0010 +-0.0026   dmg  -0.09  chg   207   cast 0.226
+  Olórin's Searing Light 4->2                                T20  -0.0010 +-0.0028   dmg  -0.14* chg   249   cast 0.240
+  Mizzix's Mastery 7->9                                      T20  -0.0010 +-0.0034   dmg  -0.10  chg   313   cast 0.315
+  Promise of Loyalty 3->1                                    T20  -0.0010 +-0.0015   dmg  -0.02  chg    70   cast 0.164
+  Hit the Mother Lode 5->3                                   T20  +0.0010 +-0.0028   dmg  -0.13* chg   223   cast 0.185
+  Call Forth the Tempest 4->6                                T20  -0.0010 +-0.0022   dmg  -0.09  chg   219   cast 0.214
+  Talisman of Conviction 8->10                               T20  -0.0008 +-0.0021   dmg  -0.10  chg   309   cast 0.319
+  Bender's Waterskin 7->5                                    T20  +0.0008 +-0.0030   dmg  -0.11  chg   317   cast 0.233
+  Sunbird's Invocation 9->11                                 T20  +0.0008 +-0.0020   dmg  +0.03  chg   108   cast 0.189
+  Mother of Runes 6->4                                       T20  +0.0008 +-0.0021   dmg  -0.01  chg   200   cast 0.279
+  Big Score 4->2                                             T20  +0.0008 +-0.0024   dmg  +0.02  chg   228   cast 0.229
+  Bolt Bend 1->3                                             T20  -0.0008 +-0.0018   dmg  -0.06  chg   174   cast 0.225
+  Gamble 3->5                                                T20  -0.0008 +-0.0020   dmg  -0.12* chg   236   cast 0.312
+  Emeria's Call 5->3                                         T20  +0.0008 +-0.0018   dmg  +0.02  chg   117   cast 0.152
+  Sensei's Divining Top 9.5->7.5                             T20  -0.0006 +-0.0022   dmg  -0.02  chg   198   cast 0.321
+  Hexing Squelcher 4->6                                      T20  +0.0006 +-0.0020   dmg  -0.00  chg   254   cast 0.284
+  Hexing Squelcher 4->2                                      T20  -0.0006 +-0.0024   dmg  -0.11  chg   253   cast 0.243
+  The Dawning Archaic 9->11                                  T20  -0.0006 +-0.0007   dmg  -0.01  chg    28   cast 0.161
+  Goliath Daydreamer 4->6                                    T20  -0.0006 +-0.0031   dmg  +0.01  chg   358   cast 0.200
+  Artist's Talent 9->11                                      T20  -0.0006 +-0.0024   dmg  -0.02  chg   256   cast 0.301
+  Generous Gift 2->0                                         T20  +0.0006 +-0.0008   dmg  +0.01  chg    96   cast 0.260
+  Unexpected Windfall 4->6                                   T20  -0.0006 +-0.0034   dmg  -0.01  chg   323   cast 0.290
+  Invoke Calamity 5->7                                       T20  +0.0006 +-0.0031   dmg  -0.12  chg   322   cast 0.243
+  Olórin's Searing Light 4->6                                T20  +0.0006 +-0.0030   dmg  +0.11  chg   327   cast 0.303
+  Mizzix's Mastery 7->5                                      T20  +0.0006 +-0.0032   dmg  +0.03  chg   392   cast 0.269
+  Borrowed Knowledge 3->5                                    T20  +0.0006 +-0.0035   dmg  -0.07  chg   308   cast 0.277
+  Ultima 5->3                                                T20  +0.0006 +-0.0021   dmg  +0.02  chg   149   cast 0.164
+  Improvisation Capstone 5->3                                T20  -0.0006 +-0.0023   dmg  +0.03  chg   224   cast 0.173
+  Volcanic Vision 4->2                                       T20  +0.0006 +-0.0017   dmg  -0.03  chg   128   cast 0.159
+  Call Forth the Tempest 4->2                                T20  +0.0006 +-0.0017   dmg  +0.00  chg   123   cast 0.175
+  Soulfire Eruption 6->4                                     T20  +0.0006 +-0.0026   dmg  -0.06  chg   193   cast 0.177
+  Rise of the Eldrazi 7->9                                   T20  +0.0006 +-0.0016   dmg  +0.01  chg    63   cast 0.153
+  Sensei's Divining Top 9.5->11.5                            T20  +0.0004 +-0.0010   dmg  -0.01  chg    58   cast 0.322
+  Library of Leng 9.8->7.8                                   T20  -0.0004 +-0.0022   dmg  +0.02  chg   237   cast 0.297
+  Mother of Runes 6->8                                       T20  +0.0004 +-0.0021   dmg  -0.03  chg   216   cast 0.298
+  Dragon's Rage Channeler 5->7                               T20  +0.0004 +-0.0022   dmg  +0.10  chg   238   cast 0.311
+  Land Tax 7->5                                              T20  -0.0004 +-0.0024   dmg  -0.04  chg   210   cast 0.280
+  Caldera Pyremaw 8.5->6.5                                   T20  -0.0004 +-0.0019   dmg  -0.03  chg   216   cast 0.157
+  Swords to Plowshares 2->4                                  T20  +0.0004 +-0.0016   dmg  -0.03  chg   187   cast 0.305
+  Swords to Plowshares 2->0                                  T20  -0.0004 +-0.0008   dmg  -0.01  chg    21   cast 0.285
+  Path to Exile 2->4                                         T20  +0.0004 +-0.0017   dmg  +0.02  chg   153   cast 0.292
+  Enlightened Tutor 6->8                                     T20  +0.0004 +-0.0022   dmg  -0.15* chg   340   cast 0.316
+  Dawn's Truce 2->0                                          T20  -0.0004 +-0.0008   dmg  -0.01  chg    75   cast 0.243
+  Invoke Calamity 5->3                                       T20  +0.0004 +-0.0024   dmg  -0.03  chg   212   cast 0.186
+  Faithless Looting 3->5                                     T20  -0.0004 +-0.0026   dmg  -0.01  chg   252   cast 0.289
+  Promise of Loyalty 3->5                                    T20  +0.0004 +-0.0022   dmg  -0.10  chg   176   cast 0.197
+  Reforge the Soul 6->8                                      T20  -0.0004 +-0.0030   dmg  -0.01  chg   277   cast 0.260
+  Restoration Seminar 5->3                                   T20  -0.0004 +-0.0018   dmg  -0.02  chg   187   cast 0.169
+  Arcane Signet 8->10                                        T20  -0.0002 +-0.0024   dmg  -0.13  chg   276   cast 0.313
+  Arcane Signet 8->6                                         T20  +0.0002 +-0.0026   dmg  -0.13  chg   255   cast 0.282
+  Boros Signet 8->10                                         T20  -0.0002 +-0.0025   dmg  -0.06  chg   269   cast 0.316
+  Bender's Waterskin 7->9                                    T20  +0.0002 +-0.0030   dmg  -0.28* chg   351   cast 0.292
+  Sunbird's Invocation 9->7                                  T20  -0.0002 +-0.0030   dmg  -0.07  chg   274   cast 0.168
+  Lightning Greaves 6->4                                     T20  +0.0002 +-0.0024   dmg  +0.05  chg   267   cast 0.261
+  Goliath Daydreamer 4->2                                    T20  -0.0002 +-0.0024   dmg  -0.09  chg   208   cast 0.134
+  Arcane Bombardment 9.2->11.2                               T20  -0.0002 +-0.0008   dmg  +0.01  chg    32   cast 0.187
+  Smothering Tithe 9->11                                     T20  +0.0002 +-0.0018   dmg  -0.02  chg   126   cast 0.247
+  Path to Exile 2->0                                         T20  +0.0002 +-0.0007   dmg  +0.00  chg    17   cast 0.275
+  Sejiri Shelter 1->3                                        T20  -0.0002 +-0.0012   dmg  +0.00  chg    86   cast 0.149
+  Chaos Warp 2->0                                            T20  +0.0002 +-0.0010   dmg  +0.01  chg    87   cast 0.260
+  Perch Protection 3->1                                      T20  +0.0002 +-0.0012   dmg  +0.01  chg    67   cast 0.162
+  Gamble 3->1                                                T20  -0.0002 +-0.0014   dmg  -0.01  chg   101   cast 0.284
+  Approach of the Second Sun 6->8                            T20  -0.0002 +-0.0022   dmg  -0.15* chg   196   cast 0.218
+  Ondu Inversion 3->1                                        T20  +0.0002 +-0.0003   dmg  +0.01  chg    15   cast 0.133
+  Blasphemous Act 4->2                                       T20  +0.0002 +-0.0028   dmg  +0.13  chg   247   cast 0.220
+  Apex of Power 5->3                                         T20  -0.0002 +-0.0018   dmg  -0.03  chg   101   cast 0.160
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.310
+  Ruby Medallion 9->11                                       T20  +0.0000 +-0.0020   dmg  -0.06  chg   158   cast 0.299
+  Ruby Medallion 9->7                                        T20  +0.0000 +-0.0028   dmg  +0.09  chg   314   cast 0.281
+  Library of Leng 9.8->11.8                                  T20  +0.0000 +-0.0008   dmg  -0.02  chg    46   cast 0.298
+  Arcane Bombardment 9.2->7.2                                T20  +0.0000 +-0.0024   dmg  +0.08  chg   234   cast 0.168
+  Sejiri Shelter 1->-1                                       T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.136
+  Big Score 4->6                                             T20  +0.0000 +-0.0033   dmg  +0.03  chg   313   cast 0.296
+  Bolt Bend 1->-1                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg    10   cast 0.201
+  Farewell 4->6                                              T20  +0.0000 +-0.0025   dmg  -0.09  chg   219   cast 0.217
+  -> 11 of 130 rows exclude zero at 95%; ~6.5 expected by chance alone.
+
+== karlov   (T20 base won 0.4012)
+  Felidar Sovereign 7->5                                     T20  -0.0082 +-0.0042 * dmg  +0.79* chg   448   cast 0.110
+  Felidar Sovereign 7->9                                     T20  +0.0070 +-0.0038 * dmg  -0.75* chg   442   cast 0.172
+  Bloodthirsty Conqueror 8.5->6.5                            T20  -0.0068 +-0.0040 * dmg  +0.74* chg   580   cast 0.145
+  Sorin, Solemn Visitor 6->8                                 T20  +0.0054 +-0.0043 * dmg  +0.21  chg   631   cast 0.178
+  Sorin, Vengeful Bloodlord 7->5                             T20  -0.0048 +-0.0038 * dmg  -0.21* chg   522   cast 0.130
+  Suture Priest 8.5->6.5                                     T20  +0.0046 +-0.0034 * dmg  -0.10  chg   571   cast 0.179
+  Dawn of Hope 6.5->8.5                                      T20  -0.0046 +-0.0037 * dmg  -0.24* chg   503   cast 0.208
+  Swiftfoot Boots 6->8                                       T20  -0.0040 +-0.0032 * dmg  -0.41* chg   440   cast 0.210
+  Phyrexian Arena 7->9                                       T20  +0.0040 +-0.0041   dmg  -0.08  chg   558   cast 0.193
+  Land Tax 7->5                                              T20  -0.0038 +-0.0024 * dmg  -0.00  chg   203   cast 0.191
+  Sun Titan 5->7                                             T20  -0.0036 +-0.0028 * dmg  -0.02  chg   398   cast 0.133
+  Exemplar of Light 8->6                                     T20  -0.0036 +-0.0043   dmg  -0.22  chg   640   cast 0.134
+  Ranger of Eos 6->8                                         T20  -0.0032 +-0.0039   dmg  -0.14  chg   688   cast 0.187
+  Archangel of Thune 8.5->6.5                                T20  -0.0032 +-0.0037   dmg  -0.46* chg   561   cast 0.127
+  Syr Konrad, the Grim 6->8                                  T20  -0.0032 +-0.0034   dmg  -0.11  chg   539   cast 0.165
+  Ajani's Mantra 7->9                                        T20  -0.0032 +-0.0038   dmg  -0.17* chg   511   cast 0.218
+  Bolas's Citadel 8.5->6.5                                   T20  -0.0032 +-0.0046   dmg  -0.13  chg   491   cast 0.108
+  Daxos, Blessed by the Sun 8->6                             T20  +0.0030 +-0.0035   dmg  -0.01  chg   606   cast 0.152
+  Kalitas, Traitor of Ghet 7->9                              T20  +0.0030 +-0.0034   dmg  +0.16* chg   496   cast 0.178
+  Well of Lost Dreams 7.5->5.5                               T20  +0.0030 +-0.0042   dmg  +0.32* chg   601   cast 0.140
+  Starscape Cleric 8.5->6.5                                  T20  -0.0028 +-0.0033   dmg  -0.35* chg   517   cast 0.191
+  Umezawa's Jitte 6->8                                       T20  -0.0026 +-0.0030   dmg  -0.27* chg   435   cast 0.205
+  Cosmos Elixir 6->8                                         T20  +0.0026 +-0.0040   dmg  +0.15  chg   634   cast 0.192
+  Sorin, Solemn Visitor 6->4                                 T20  -0.0024 +-0.0026   dmg  -0.13* chg   234   cast 0.118
+  Debt to the Deathless 7->5                                 T20  +0.0024 +-0.0030   dmg  -0.35* chg   370   cast 0.089
+  Marauding Blight-Priest 7.5->5.5                           T20  -0.0022 +-0.0034   dmg  -0.36* chg   583   cast 0.157
+  Blind Obedience 7.5->9.5                                   T20  -0.0020 +-0.0032   dmg  +0.09  chg   502   cast 0.217
+  Orzhov Signet 8->6                                         T20  +0.0018 +-0.0032   dmg  -0.08  chg   483   cast 0.198
+  Necropotence 8->6                                          T20  +0.0018 +-0.0039   dmg  +0.07  chg   583   cast 0.142
+  Mother of Runes 8->10                                      T20  -0.0016 +-0.0025   dmg  -0.07  chg   291   cast 0.206
+  Kambal, Consul of Allocation 7.5->9.5                      T20  +0.0016 +-0.0032   dmg  +0.41* chg   480   cast 0.199
+  Enduring Tenacity 9.5->7.5                                 T20  -0.0016 +-0.0031   dmg  +0.06  chg   398   cast 0.173
+  Soul Warden 9.5->7.5                                       T20  -0.0014 +-0.0022   dmg  -0.11* chg   328   cast 0.210
+  Swiftfoot Boots 6->4                                       T20  -0.0014 +-0.0013 * dmg  -0.03  chg    79   cast 0.186
+  Pristine Talisman 7->5                                     T20  -0.0014 +-0.0028   dmg  +0.08  chg   411   cast 0.156
+  Dawn of Hope 6.5->4.5                                      T20  -0.0014 +-0.0021   dmg  +0.13* chg   249   cast 0.181
+  Serra Ascendant 8->10                                      T20  +0.0012 +-0.0022   dmg  +0.16* chg   267   cast 0.209
+  Voice of the Blessed 7->9                                  T20  -0.0012 +-0.0037   dmg  +0.02  chg   567   cast 0.179
+  Lurrus of the Dream-Den 6->8                               T20  -0.0012 +-0.0036   dmg  -0.07  chg   656   cast 0.198
+  Vito, Thorn of the Dusk Rose 9->7                          T20  -0.0012 +-0.0040   dmg  +0.20  chg   604   cast 0.176
+  Enduring Tenacity 9.5->11.5                                T20  +0.0012 +-0.0009 * dmg  -0.02  chg    83   cast 0.187
+  Sol Ring 10->8                                             T20  +0.0012 +-0.0018   dmg  +0.01  chg   174   cast 0.209
+  Cosmos Elixir 6->4                                         T20  +0.0012 +-0.0021   dmg  -0.02  chg   222   cast 0.138
+  Well of Lost Dreams 7.5->9.5                               T20  -0.0012 +-0.0027   dmg  -0.01  chg   359   cast 0.188
+  Aetherflux Reservoir 7->9                                  T20  -0.0012 +-0.0034   dmg  -0.06  chg   572   cast 0.187
+  Authority of the Consuls 8->6                              T20  -0.0012 +-0.0024   dmg  +0.07  chg   363   cast 0.201
+  Phyrexian Arena 7->5                                       T20  -0.0012 +-0.0034   dmg  +0.04  chg   387   cast 0.147
+  Benevolent Offering 4->2                                   T20  -0.0012 +-0.0021   dmg  -0.21* chg   246   cast 0.109
+  Soul's Attendant 9.5->7.5                                  T20  +0.0010 +-0.0024   dmg  -0.01  chg   352   cast 0.203
+  Blood Artist 8->10                                         T20  +0.0010 +-0.0026   dmg  -0.18* chg   314   cast 0.218
+  Voice of the Blessed 7->5                                  T20  -0.0010 +-0.0025   dmg  -0.13* chg   323   cast 0.141
+  Ranger of Eos 6->4                                         T20  +0.0010 +-0.0021   dmg  -0.11* chg   216   cast 0.129
+  Land Tax 7->9                                              T20  +0.0010 +-0.0034   dmg  -0.13  chg   377   cast 0.210
+  Enlightened Tutor 6->8                                     T20  -0.0010 +-0.0026   dmg  -0.15* chg   346   cast 0.220
+  Toxic Deluge 3->1                                          T20  +0.0010 +-0.0014   dmg  +0.07  chg   108   cast 0.117
+  Austere Command 3->5                                       T20  -0.0010 +-0.0012   dmg  -0.09* chg    51   cast 0.077
+  Bloodthirsty Conqueror 8.5->10.5                           T20  +0.0008 +-0.0025   dmg  -0.08  chg   280   cast 0.191
+  Vizkopa Guildmage 8->6                                     T20  +0.0008 +-0.0040   dmg  +0.32* chg   670   cast 0.174
+  Auriok Champion 9->7                                       T20  +0.0008 +-0.0035   dmg  -0.15  chg   615   cast 0.170
+  Cliffhaven Vampire 7.5->9.5                                T20  +0.0008 +-0.0029   dmg  +0.31* chg   413   cast 0.188
+  Marauding Blight-Priest 7.5->9.5                           T20  -0.0008 +-0.0027   dmg  +0.25* chg   451   cast 0.204
+  Vito, Thorn of the Dusk Rose 9->11                         T20  -0.0008 +-0.0012   dmg  +0.06  chg    90   cast 0.206
+  Archangel of Thune 8.5->10.5                               T20  +0.0008 +-0.0026   dmg  +0.31* chg   245   cast 0.173
+  Sun Titan 5->3                                             T20  +0.0008 +-0.0009   dmg  +0.01  chg    74   cast 0.090
+  Starscape Cleric 8.5->10.5                                 T20  +0.0008 +-0.0022   dmg  -0.01  chg   191   cast 0.213
+  Sensei's Divining Top 6->8                                 T20  -0.0008 +-0.0020   dmg  -0.10  chg   225   cast 0.216
+  Pristine Talisman 7->9                                     T20  -0.0008 +-0.0031   dmg  -0.07  chg   524   cast 0.198
+  Phyrexian Reclamation 5->7                                 T20  -0.0008 +-0.0011   dmg  -0.05  chg    95   cast 0.199
+  Phyrexian Reclamation 5->3                                 T20  -0.0008 +-0.0010   dmg  +0.01  chg    84   cast 0.189
+  Path to Exile 3->5                                         T20  +0.0008 +-0.0011   dmg  +0.03  chg    94   cast 0.208
+  Anguished Unmaking 3->5                                    T20  -0.0008 +-0.0014   dmg  +0.02  chg   169   cast 0.158
+  Benevolent Offering 4->6                                   T20  -0.0008 +-0.0018   dmg  -0.04  chg   240   cast 0.146
+  Return to Dust 3->1                                        T20  -0.0008 +-0.0012   dmg  -0.04  chg   119   cast 0.108
+  Bolas's Citadel 8.5->10.5                                  T20  -0.0008 +-0.0018   dmg  -0.00  chg   108   cast 0.152
+  Mother of Runes 8->6                                       T20  +0.0006 +-0.0027   dmg  +0.23* chg   346   cast 0.175
+  Serra Ascendant 8->6                                       T20  +0.0006 +-0.0030   dmg  -0.26* chg   381   cast 0.194
+  Blood Artist 8->6                                          T20  +0.0006 +-0.0030   dmg  +0.36* chg   498   cast 0.191
+  Drana's Emissary 7->9                                      T20  -0.0006 +-0.0034   dmg  +0.28* chg   618   cast 0.207
+  Drana's Emissary 7->5                                      T20  -0.0006 +-0.0032   dmg  -0.42* chg   469   cast 0.155
+  Kambal, Consul of Allocation 7.5->5.5                      T20  -0.0006 +-0.0037   dmg  -0.59* chg   599   cast 0.150
+  Sunscorch Regent 6->8                                      T20  -0.0006 +-0.0038   dmg  +0.56* chg   539   cast 0.158
+  Sunscorch Regent 6->4                                      T20  -0.0006 +-0.0024   dmg  -0.27* chg   255   cast 0.095
+  Fountain of Renewal 7->9                                   T20  -0.0006 +-0.0020   dmg  -0.17* chg   219   cast 0.210
+  Fountain of Renewal 7->5                                   T20  -0.0006 +-0.0012   dmg  -0.04  chg   121   cast 0.203
+  Authority of the Consuls 8->10                             T20  +0.0006 +-0.0018   dmg  -0.02  chg   241   cast 0.219
+  Exquisite Blood 9.5->11.5                                  T20  +0.0006 +-0.0007   dmg  -0.02  chg    35   cast 0.189
+  Anguished Unmaking 3->1                                    T20  +0.0006 +-0.0014   dmg  +0.01  chg   132   cast 0.141
+  Fracture 3->1                                              T20  -0.0006 +-0.0007   dmg  -0.05* chg    67   cast 0.165
+  Damn 3->5                                                  T20  -0.0006 +-0.0018   dmg  -0.02  chg   183   cast 0.146
+  Soul Warden 9.5->11.5                                      T20  +0.0004 +-0.0005   dmg  +0.06* chg    62   cast 0.219
+  Soul's Attendant 9.5->11.5                                 T20  +0.0004 +-0.0014   dmg  +0.06* chg    61   cast 0.209
+  Elas il-Kor, Sadistic Pilgrim 8->6                         T20  +0.0004 +-0.0037   dmg  -0.05  chg   664   cast 0.168
+  Vizkopa Guildmage 8->10                                    T20  +0.0004 +-0.0024   dmg  -0.03  chg   373   cast 0.212
+  Suture Priest 8.5->10.5                                    T20  +0.0004 +-0.0020   dmg  +0.10* chg   180   cast 0.202
+  Daxos, Blessed by the Sun 8->10                            T20  +0.0004 +-0.0024   dmg  -0.03  chg   343   cast 0.193
+  Syr Konrad, the Grim 6->4                                  T20  +0.0004 +-0.0020   dmg  -0.02  chg   274   cast 0.113
+  Exemplar of Light 8->10                                    T20  +0.0004 +-0.0026   dmg  +0.12  chg   282   cast 0.185
+  Orzhov Signet 8->10                                        T20  -0.0004 +-0.0021   dmg  +0.04  chg   225   cast 0.223
+  Umezawa's Jitte 6->4                                       T20  -0.0004 +-0.0008   dmg  -0.01  chg    76   cast 0.184
+  Swords to Plowshares 3->5                                  T20  +0.0004 +-0.0010   dmg  +0.04  chg   115   cast 0.207
+  Return to Dust 3->5                                        T20  -0.0004 +-0.0012   dmg  +0.03  chg   121   cast 0.125
+  Damn 3->1                                                  T20  +0.0004 +-0.0012   dmg  +0.03  chg    48   cast 0.127
+  Toxic Deluge 3->5                                          T20  +0.0004 +-0.0016   dmg  -0.01  chg   160   cast 0.141
+  Debt to the Deathless 7->9                                 T20  +0.0004 +-0.0028   dmg  +0.32* chg   318   cast 0.149
+  Elas il-Kor, Sadistic Pilgrim 8->10                        T20  -0.0002 +-0.0025   dmg  -0.02  chg   394   cast 0.204
+  Auriok Champion 9->11                                      T20  -0.0002 +-0.0014   dmg  -0.02  chg   108   cast 0.197
+  Cliffhaven Vampire 7.5->5.5                                T20  -0.0002 +-0.0037   dmg  -0.60* chg   674   cast 0.123
+  Lurrus of the Dream-Den 6->4                               T20  +0.0002 +-0.0013   dmg  -0.07* chg   147   cast 0.145
+  Kalitas, Traitor of Ghet 7->5                              T20  +0.0002 +-0.0031   dmg  -0.00  chg   465   cast 0.126
+  Sorin, Vengeful Bloodlord 7->9                             T20  -0.0002 +-0.0039   dmg  +0.18  chg   575   cast 0.194
+  Sensei's Divining Top 6->4                                 T20  -0.0002 +-0.0003   dmg  +0.01  chg    22   cast 0.207
+  Aetherflux Reservoir 7->5                                  T20  +0.0002 +-0.0036   dmg  -0.20* chg   554   cast 0.133
+  Necropotence 8->10                                         T20  -0.0002 +-0.0025   dmg  -0.03  chg   266   cast 0.181
+  Exquisite Blood 9.5->7.5                                   T20  +0.0002 +-0.0037   dmg  +0.35* chg   413   cast 0.168
+  Sanguine Bond 9.5->7.5                                     T20  +0.0002 +-0.0029   dmg  +0.18* chg   376   cast 0.163
+  Fracture 3->5                                              T20  +0.0002 +-0.0018   dmg  +0.06  chg   174   cast 0.175
+  Farewell 3->1                                              T20  -0.0002 +-0.0012   dmg  +0.02  chg    91   cast 0.056
+  Damnation 3->5                                             T20  -0.0002 +-0.0016   dmg  -0.07  chg   113   cast 0.106
+  Damnation 3->1                                             T20  +0.0002 +-0.0014   dmg  +0.12* chg   130   cast 0.081
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.212
+  Ajani's Mantra 7->5                                        T20  +0.0000 +-0.0026   dmg  +0.06  chg   311   cast 0.185
+  Blind Obedience 7.5->5.5                                   T20  +0.0000 +-0.0035   dmg  -0.05  chg   543   cast 0.184
+  Sanguine Bond 9.5->11.5                                    T20  +0.0000 +-0.0010   dmg  -0.00  chg    35   cast 0.177
+  Swords to Plowshares 3->1                                  T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.200
+  Path to Exile 3->1                                         T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.201
+  Enlightened Tutor 6->4                                     T20  +0.0000 +-0.0000   dmg  +0.00  chg    28   cast 0.205
+  Austere Command 3->1                                       T20  +0.0000 +-0.0012   dmg  +0.01  chg    93   cast 0.056
+  Farewell 3->5                                              T20  +0.0000 +-0.0014   dmg  -0.05  chg    46   cast 0.075
+  -> 12 of 128 rows exclude zero at 95%; ~6.4 expected by chance alone.
+
+== tivit   (T20 base won 0.4088)
+  Time Sieve 9->11                                           T20  +0.0158 +-0.0068 * dmg  -0.36  chg  1154   cast 0.372
+  Anointed Procession 8->10                                  T20  +0.0142 +-0.0063 * dmg  -0.71* chg  1473   cast 0.477
+  Torment of Hailfire 8.5->10.5                              T20  -0.0114 +-0.0061 * dmg  +1.32* chg  1178   cast 0.272
+  Rhystic Study 9.5->7.5                                     T20  +0.0106 +-0.0060 * dmg  -0.34  chg  1237   cast 0.225
+  Mirkwood Bats 8->10                                        T20  +0.0102 +-0.0056 * dmg  +1.55* chg   924   cast 0.324
+  Brago's Representative 8->10                               T20  -0.0076 +-0.0049 * dmg  -0.90* chg   877   cast 0.340
+  Deadeye Navigator 9.5->11.5                                T20  -0.0074 +-0.0058 * dmg  -1.37* chg   990   cast 0.316
+  Soulherder 9->11                                           T20  -0.0070 +-0.0058 * dmg  -1.62* chg  1180   cast 0.372
+  Lightning Greaves 8->10                                    T20  -0.0070 +-0.0051 * dmg  -0.65* chg   843   cast 0.353
+  Lieutenants of the Guard 4.5->2.5                          T20  -0.0060 +-0.0031 * dmg  -0.22* chg   384   cast 0.142
+  Ballot Broker 8->10                                        T20  -0.0056 +-0.0050 * dmg  -0.93* chg   903   cast 0.337
+  Anointed Procession 8->6                                   T20  -0.0056 +-0.0045 * dmg  -0.09  chg   758   cast 0.226
+  Tempting Contract 6.5->8.5                                 T20  +0.0054 +-0.0043 * dmg  +0.36* chg   585   cast 0.221
+  Tempting Contract 6.5->4.5                                 T20  -0.0054 +-0.0038 * dmg  -0.37* chg   526   cast 0.185
+  Teleportation Circle 7.5->9.5                              T20  -0.0054 +-0.0044 * dmg  -0.63* chg   938   cast 0.312
+  Academy Manufactor 9.5->11.5                               T20  -0.0040 +-0.0057   dmg  -1.07* chg  1023   cast 0.373
+  Kambal, Profiteering Mayor 9->11                           T20  +0.0040 +-0.0063   dmg  +1.25* chg  1176   cast 0.376
+  Mirkwood Bats 8->6                                         T20  -0.0040 +-0.0042   dmg  -0.38* chg   634   cast 0.196
+  Monologue Tax 7.5->5.5                                     T20  -0.0040 +-0.0041   dmg  -0.59* chg   497   cast 0.212
+  Trial of a Time Lord 5->7                                  T20  -0.0038 +-0.0031 * dmg  -0.25* chg   490   cast 0.216
+  Coercive Portal 6->8                                       T20  +0.0038 +-0.0047   dmg  -0.40* chg   537   cast 0.201
+  Master of Ceremonies 7.5->5.5                              T20  -0.0038 +-0.0041   dmg  -0.53* chg   483   cast 0.175
+  Mechanized Production 6->8                                 T20  -0.0038 +-0.0040   dmg  -0.04  chg   619   cast 0.225
+  Orzhov Signet 8->10                                        T20  -0.0038 +-0.0044   dmg  -0.30* chg   777   cast 0.356
+  Revel in Riches 7->9                                       T20  -0.0036 +-0.0036   dmg  -0.37* chg   558   cast 0.222
+  Arcane Signet 8->10                                        T20  -0.0036 +-0.0044   dmg  -0.40* chg   740   cast 0.347
+  Torment of Hailfire 8.5->6.5                               T20  +0.0036 +-0.0033 * dmg  -0.31* chg   411   cast 0.144
+  Dimir Signet 8->10                                         T20  -0.0034 +-0.0043   dmg  -0.43* chg   782   cast 0.359
+  Monologue Tax 7.5->9.5                                     T20  +0.0034 +-0.0054   dmg  +0.32  chg   910   cast 0.335
+  Azorius Signet 8->10                                       T20  -0.0032 +-0.0042   dmg  -0.35* chg   785   cast 0.362
+  Bite of the Black Rose 4->6                                T20  -0.0030 +-0.0030   dmg  -0.28* chg   464   cast 0.202
+  Soulherder 9->7                                            T20  +0.0030 +-0.0035   dmg  +0.19  chg   446   cast 0.207
+  Damn 3->1                                                  T20  -0.0030 +-0.0024 * dmg  -0.08  chg   179   cast 0.151
+  Marionette Master 8->6                                     T20  +0.0028 +-0.0038   dmg  -0.01  chg   536   cast 0.166
+  Propaganda 6->8                                            T20  -0.0028 +-0.0040   dmg  -0.37* chg   588   cast 0.238
+  Tyrant's Choice 5->7                                       T20  -0.0026 +-0.0022 * dmg  -0.07  chg   317   cast 0.240
+  Tempt with Bunnies 5->7                                    T20  +0.0026 +-0.0037   dmg  +0.27* chg   518   cast 0.217
+  Plea for Power 7->9                                        T20  -0.0026 +-0.0037   dmg  -0.18  chg   474   cast 0.196
+  Custodi Squire 5->3                                        T20  -0.0026 +-0.0035   dmg  +0.04  chg   453   cast 0.152
+  Cyberdrive Awakener 6->8                                   T20  -0.0026 +-0.0037   dmg  -0.02  chg   464   cast 0.179
+  Marionette Master 8->10                                    T20  +0.0026 +-0.0050   dmg  +0.51* chg   872   cast 0.270
+  Tamiyo's Journal 6.5->4.5                                  T20  +0.0026 +-0.0033   dmg  +0.22* chg   490   cast 0.162
+  Conjurer's Closet 7->5                                     T20  -0.0024 +-0.0034   dmg  -0.06  chg   506   cast 0.178
+  Idyllic Tutor 6->4                                         T20  -0.0024 +-0.0033   dmg  +0.02  chg   401   cast 0.208
+  Messenger Jays 4.5->6.5                                    T20  +0.0022 +-0.0035   dmg  +0.11  chg   499   cast 0.188
+  Ephemerate 8->10                                           T20  -0.0022 +-0.0045   dmg  -0.64* chg   726   cast 0.302
+  Academy Manufactor 9.5->7.5                                T20  -0.0022 +-0.0035   dmg  -0.18  chg   459   cast 0.211
+  Brago's Representative 8->6                                T20  -0.0020 +-0.0038   dmg  +0.21  chg   548   cast 0.218
+  Void Rend 2->4                                             T20  -0.0020 +-0.0018 * dmg  -0.12* chg   153   cast 0.196
+  Grudge Keeper 7->9                                         T20  -0.0018 +-0.0028   dmg  -0.03  chg   424   cast 0.240
+  Master of Ceremonies 7.5->9.5                              T20  -0.0018 +-0.0039   dmg  +0.26* chg   470   cast 0.211
+  Rhystic Study 9.5->11.5                                    T20  -0.0018 +-0.0054   dmg  -0.87* chg   975   cast 0.478
+  Farewell 3->5                                              T20  -0.0018 +-0.0036   dmg  -0.21* chg   297   cast 0.097
+  Messenger Jays 4.5->2.5                                    T20  -0.0016 +-0.0036   dmg  -0.26* chg   392   cast 0.150
+  Capital Punishment 4->6                                    T20  -0.0016 +-0.0030   dmg  -0.27* chg   413   cast 0.178
+  Displacer Kitten 9->11                                     T20  -0.0016 +-0.0057   dmg  -1.07* chg  1140   cast 0.364
+  Sadistic Shell Game 3->5                                   T20  +0.0016 +-0.0030   dmg  -0.08  chg   430   cast 0.169
+  Expropriate 7.5->5.5                                       T20  -0.0014 +-0.0032   dmg  -0.01  chg   353   cast 0.119
+  Cyberdrive Awakener 6->4                                   T20  +0.0014 +-0.0037   dmg  +0.06  chg   438   cast 0.135
+  Model of Unity 7->9                                        T20  -0.0014 +-0.0035   dmg  +0.05  chg   454   cast 0.237
+  Plea for Power 7->5                                        T20  +0.0012 +-0.0039   dmg  +0.01  chg   503   cast 0.172
+  Vault 11: Voter's Dilemma 5->3                             T20  -0.0012 +-0.0032   dmg  -0.14  chg   446   cast 0.167
+  Revel in Riches 7->5                                       T20  -0.0012 +-0.0028   dmg  +0.03  chg   465   cast 0.165
+  Sol Ring 10->8                                             T20  +0.0012 +-0.0060   dmg  -1.14* chg  1192   cast 0.234
+  Path to Exile 2->4                                         T20  +0.0012 +-0.0012   dmg  +0.04  chg    90   cast 0.246
+  Dovin's Veto 2->4                                          T20  -0.0012 +-0.0015   dmg  -0.06  chg   159   cast 0.226
+  Muddle the Mixture 2->4                                    T20  -0.0012 +-0.0012   dmg  -0.00  chg   153   cast 0.223
+  Farewell 3->1                                              T20  +0.0012 +-0.0015   dmg  +0.04  chg   130   cast 0.050
+  Ghostly Prison 6->8                                        T20  -0.0012 +-0.0036   dmg  -0.21  chg   595   cast 0.245
+  Illusion of Choice 6->4                                    T20  +0.0010 +-0.0020   dmg  +0.05  chg   196   cast 0.233
+  Split Decision 4->2                                        T20  -0.0010 +-0.0018   dmg  -0.04  chg   195   cast 0.224
+  Tempt with Bunnies 5->3                                    T20  +0.0010 +-0.0027   dmg  -0.22* chg   299   cast 0.196
+  Trial of a Time Lord 5->3                                  T20  +0.0010 +-0.0024   dmg  +0.09  chg   299   cast 0.188
+  Coercive Portal 6->4                                       T20  +0.0010 +-0.0041   dmg  +0.37* chg   454   cast 0.169
+  Idyllic Tutor 6->8                                         T20  -0.0010 +-0.0038   dmg  -0.08  chg   557   cast 0.228
+  Model of Unity 7->5                                        T20  -0.0010 +-0.0033   dmg  +0.03  chg   510   cast 0.217
+  Council's Judgment 3->5                                    T20  -0.0010 +-0.0027   dmg  -0.06  chg   289   cast 0.209
+  Trap the Trespassers 2->4                                  T20  -0.0010 +-0.0016   dmg  -0.02  chg   144   cast 0.211
+  Propaganda 6->4                                            T20  +0.0010 +-0.0024   dmg  +0.16* chg   346   cast 0.197
+  Grudge Keeper 7->5                                         T20  -0.0008 +-0.0028   dmg  +0.01  chg   334   cast 0.231
+  Ballot Broker 8->6                                         T20  -0.0008 +-0.0039   dmg  +0.02  chg   602   cast 0.217
+  Lieutenants of the Guard 4.5->6.5                          T20  +0.0008 +-0.0033   dmg  +0.26* chg   477   cast 0.184
+  Expropriate 7.5->9.5                                       T20  -0.0008 +-0.0033   dmg  -0.03  chg   387   cast 0.159
+  Ephemerate 8->6                                            T20  +0.0008 +-0.0012   dmg  -0.09* chg   164   cast 0.203
+  Disciple of the Vault 7->9                                 T20  -0.0008 +-0.0025   dmg  +0.05  chg   308   cast 0.240
+  Council's Judgment 3->1                                    T20  -0.0008 +-0.0012   dmg  -0.01  chg   206   cast 0.190
+  Trap the Trespassers 2->0                                  T20  -0.0008 +-0.0014   dmg  -0.03  chg   125   cast 0.201
+  Void Rend 2->0                                             T20  -0.0008 +-0.0012   dmg  +0.01  chg   103   cast 0.182
+  Magister of Worth 4->6                                     T20  +0.0008 +-0.0041   dmg  +0.20  chg   453   cast 0.164
+  Lightning Greaves 8->6                                     T20  -0.0008 +-0.0026   dmg  +0.00  chg   356   cast 0.238
+  Vault 11: Voter's Dilemma 5->7                             T20  +0.0006 +-0.0033   dmg  +0.31* chg   518   cast 0.207
+  Displacer Kitten 9->7                                      T20  +0.0006 +-0.0035   dmg  -0.08  chg   561   cast 0.196
+  Teleportation Circle 7.5->5.5                              T20  +0.0006 +-0.0034   dmg  +0.16  chg   555   cast 0.200
+  Nadier's Nightblade 7->9                                   T20  -0.0006 +-0.0033   dmg  -0.08  chg   467   cast 0.229
+  Nadier's Nightblade 7->5                                   T20  -0.0006 +-0.0033   dmg  -0.08  chg   531   cast 0.214
+  Tamiyo's Journal 6.5->8.5                                  T20  -0.0006 +-0.0031   dmg  -0.21* chg   516   cast 0.207
+  Azorius Signet 8->6                                        T20  +0.0006 +-0.0027   dmg  -0.04  chg   331   cast 0.248
+  Orzhov Signet 8->6                                         T20  -0.0006 +-0.0030   dmg  -0.04  chg   338   cast 0.238
+  An Offer You Can't Refuse 2->4                             T20  -0.0006 +-0.0012   dmg  -0.03  chg   110   cast 0.242
+  Counterspell 2->4                                          T20  -0.0006 +-0.0020   dmg  -0.03  chg   159   cast 0.221
+  Dovin's Veto 2->0                                          T20  -0.0006 +-0.0007   dmg  -0.04  chg    82   cast 0.218
+  Split Decision 4->6                                        T20  -0.0004 +-0.0016   dmg  +0.01  chg   195   cast 0.235
+  Bite of the Black Rose 4->2                                T20  +0.0004 +-0.0020   dmg  +0.02  chg   172   cast 0.172
+  Custodi Squire 5->7                                        T20  -0.0004 +-0.0034   dmg  +0.00  chg   533   cast 0.195
+  Capital Punishment 4->2                                    T20  +0.0004 +-0.0025   dmg  -0.02  chg   228   cast 0.137
+  Mechanized Production 6->4                                 T20  -0.0004 +-0.0035   dmg  -0.07  chg   433   cast 0.174
+  Demonic Tutor 7->9                                         T20  +0.0004 +-0.0032   dmg  +0.17  chg   410   cast 0.245
+  Demonic Tutor 7->5                                         T20  +0.0004 +-0.0030   dmg  +0.04  chg   358   cast 0.236
+  Dimir Signet 8->6                                          T20  -0.0004 +-0.0026   dmg  -0.17  chg   312   cast 0.243
+  Promise of Loyalty 3->5                                    T20  -0.0004 +-0.0037   dmg  +0.00  chg   349   cast 0.111
+  Ghostly Prison 6->4                                        T20  +0.0004 +-0.0026   dmg  +0.16* chg   348   cast 0.199
+  Illusion of Choice 6->8                                    T20  +0.0002 +-0.0024   dmg  -0.00  chg   259   cast 0.232
+  Tyrant's Choice 5->3                                       T20  +0.0002 +-0.0020   dmg  -0.06  chg   208   cast 0.232
+  Conjurer's Closet 7->9                                     T20  +0.0002 +-0.0030   dmg  -0.14  chg   378   cast 0.218
+  Deadeye Navigator 9.5->7.5                                 T20  -0.0002 +-0.0032   dmg  +0.27* chg   448   cast 0.179
+  Disciple of the Vault 7->5                                 T20  +0.0002 +-0.0020   dmg  +0.09  chg   210   cast 0.231
+  Kambal, Profiteering Mayor 9->7                            T20  +0.0002 +-0.0034   dmg  +0.00  chg   453   cast 0.208
+  Swords to Plowshares 2->4                                  T20  +0.0002 +-0.0010   dmg  -0.02  chg   103   cast 0.244
+  Counterspell 2->0                                          T20  +0.0002 +-0.0006   dmg  -0.02  chg    43   cast 0.212
+  Damn 3->5                                                  T20  +0.0002 +-0.0023   dmg  -0.02  chg   201   cast 0.172
+  Muddle the Mixture 2->0                                    T20  -0.0002 +-0.0003   dmg  -0.01  chg    41   cast 0.215
+  Promise of Loyalty 3->1                                    T20  -0.0002 +-0.0020   dmg  -0.01  chg   125   cast 0.059
+  Sadistic Shell Game 3->1                                   T20  -0.0002 +-0.0020   dmg  -0.04  chg   152   cast 0.136
+  Time Sieve 9->7                                            T20  +0.0000 +-0.0037   dmg  +0.20* chg   402   cast 0.217
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.404
+  Arcane Signet 8->6                                         T20  +0.0000 +-0.0025   dmg  -0.04  chg   308   cast 0.232
+  An Offer You Can't Refuse 2->0                             T20  +0.0000 +-0.0000   dmg  +0.00  chg     2   cast 0.239
+  Path to Exile 2->0                                         T20  +0.0000 +-0.0000   dmg  +0.00  chg     2   cast 0.243
+  Swords to Plowshares 2->0                                  T20  +0.0000 +-0.0000   dmg  +0.00  chg     2   cast 0.242
+  Magister of Worth 4->2                                     T20  +0.0000 +-0.0029   dmg  -0.08  chg   295   cast 0.133
+  -> 20 of 130 rows exclude zero at 95%; ~6.5 expected by chance alone.
+
+== shilgengar   (T20 base won 0.2046)
+  Massacre Wurm 7.5->5.5                                     T20  -0.0070 +-0.0036 * dmg  -0.38* chg   514   cast 0.125
+  Lyra Dawnbringer 8->6                                      T20  -0.0050 +-0.0033 * dmg  -0.32* chg   515   cast 0.162
+  Archangel of Thune 8.5->6.5                                T20  -0.0044 +-0.0032 * dmg  -0.24* chg   460   cast 0.157
+  Revel in Riches 5->7                                       T20  -0.0044 +-0.0027 * dmg  -0.45* chg   519   cast 0.158
+  Twilight Shepherd 5->7                                     T20  +0.0028 +-0.0026 * dmg  +0.21* chg   532   cast 0.156
+  Midnight Reaper 7->9                                       T20  -0.0028 +-0.0025 * dmg  -0.17* chg   316   cast 0.185
+  Talisman of Hierarchy 8->6                                 T20  -0.0028 +-0.0023 * dmg  -0.13* chg   347   cast 0.210
+  Requiem Angel 6.5->8.5                                     T20  -0.0024 +-0.0028   dmg  +0.08  chg   443   cast 0.160
+  Blood Artist 7.5->5.5                                      T20  +0.0024 +-0.0022 * dmg  +0.18* chg   409   cast 0.192
+  Serra's Emissary 7->5                                      T20  -0.0022 +-0.0021 * dmg  -0.11* chg   512   cast 0.110
+  Righteous Valkyrie 8->6                                    T20  -0.0022 +-0.0028   dmg  -0.09  chg   425   cast 0.173
+  Cartel Aristocrat 6.5->8.5                                 T20  -0.0022 +-0.0022   dmg  -0.07  chg   405   cast 0.203
+  Emeria Shepherd 6.5->4.5                                   T20  +0.0020 +-0.0020   dmg  +0.02  chg   473   cast 0.078
+  Sun Titan 6.5->4.5                                         T20  -0.0020 +-0.0025   dmg  +0.06  chg   527   cast 0.115
+  Pitiless Plunderer 7->5                                    T20  +0.0020 +-0.0025   dmg  +0.17* chg   508   cast 0.171
+  Elesh Norn, Grand Cenobite 8.5->6.5                        T20  -0.0018 +-0.0025   dmg  -0.05  chg   383   cast 0.132
+  Kokusho, the Evening Star 8->10                            T20  -0.0018 +-0.0014 * dmg  -0.08* chg   125   cast 0.170
+  Massacre Wurm 7.5->9.5                                     T20  +0.0018 +-0.0028   dmg  +0.09  chg   302   cast 0.162
+  Voldaren Bloodcaster // Bloodbat Summoner 6.5->8.5         T20  -0.0018 +-0.0022   dmg  +0.04  chg   361   cast 0.199
+  Sun Titan 6.5->8.5                                         T20  -0.0016 +-0.0030   dmg  -0.07  chg   484   cast 0.168
+  Vampiric Rites 6.5->8.5                                    T20  -0.0016 +-0.0013 * dmg  -0.15* chg   208   cast 0.215
+  Orzhov Signet 8.5->6.5                                     T20  +0.0016 +-0.0020   dmg  -0.02  chg   317   cast 0.209
+  Marble Diamond 8->6                                        T20  -0.0016 +-0.0023   dmg  -0.02  chg   349   cast 0.205
+  Lyra Dawnbringer 8->10                                     T20  +0.0014 +-0.0015   dmg  +0.01  chg   190   cast 0.176
+  Angel of Despair 5.5->7.5                                  T20  +0.0014 +-0.0025   dmg  +0.10  chg   486   cast 0.147
+  Resplendent Angel 8->10                                    T20  -0.0014 +-0.0015   dmg  +0.01  chg   160   cast 0.182
+  Priest of Fell Rites 6->8                                  T20  +0.0014 +-0.0019   dmg  +0.02  chg   346   cast 0.196
+  Phyrexian Arena 7.5->5.5                                   T20  -0.0014 +-0.0028   dmg  +0.08  chg   404   cast 0.167
+  Flawless Maneuver 2->4                                     T20  -0.0014 +-0.0019   dmg  -0.09  chg   214   cast 0.153
+  Kokusho, the Evening Star 8->6                             T20  -0.0012 +-0.0029   dmg  -0.19* chg   519   cast 0.146
+  Angel of the Ruins 5->7                                    T20  +0.0012 +-0.0020   dmg  +0.12* chg   431   cast 0.143
+  Skullclamp 7->5                                            T20  +0.0012 +-0.0012   dmg  +0.10* chg   129   cast 0.207
+  Mind Stone 7.5->9.5                                        T20  -0.0012 +-0.0018   dmg  -0.02  chg   222   cast 0.221
+  Mind Stone 7.5->5.5                                        T20  -0.0012 +-0.0025   dmg  -0.00  chg   388   cast 0.214
+  Marble Diamond 8->10                                       T20  -0.0012 +-0.0015   dmg  -0.02  chg   130   cast 0.209
+  Wrath of God 3->1                                          T20  +0.0012 +-0.0024   dmg  +0.03  chg   282   cast 0.108
+  Anguished Unmaking 3->1                                    T20  +0.0012 +-0.0016   dmg  -0.01  chg   144   cast 0.165
+  Angel of Serenity 5.5->3.5                                 T20  -0.0010 +-0.0016   dmg  -0.05  chg   220   cast 0.087
+  Angel of Suffering 5->7                                    T20  +0.0010 +-0.0022   dmg  +0.11* chg   508   cast 0.166
+  Angelic Arbiter 5.5->3.5                                   T20  -0.0010 +-0.0013   dmg  -0.13* chg   218   cast 0.093
+  Speaker of the Heavens 6->4                                T20  +0.0010 +-0.0013   dmg  +0.01  chg    72   cast 0.196
+  Pitiless Plunderer 7->9                                    T20  +0.0010 +-0.0023   dmg  -0.06  chg   334   cast 0.198
+  Vindicate 3->1                                             T20  -0.0010 +-0.0012   dmg  -0.04  chg   134   cast 0.164
+  Reya Dawnbringer 6->4                                      T20  -0.0008 +-0.0016   dmg  -0.01  chg   233   cast 0.065
+  Emeria Shepherd 6.5->8.5                                   T20  +0.0008 +-0.0024   dmg  +0.06  chg   388   cast 0.144
+  Angelic Arbiter 5.5->7.5                                   T20  +0.0008 +-0.0026   dmg  +0.15* chg   446   cast 0.147
+  Giada, Font of Hope 7.5->9.5                               T20  -0.0008 +-0.0021   dmg  -0.06  chg   292   cast 0.197
+  Zulaport Cutthroat 7.5->5.5                                T20  -0.0008 +-0.0018   dmg  +0.07  chg   386   cast 0.182
+  Voldaren Bloodcaster // Bloodbat Summoner 6.5->4.5         T20  +0.0008 +-0.0014   dmg  +0.03  chg   222   cast 0.188
+  Smothering Tithe 9->11                                     T20  +0.0008 +-0.0007 * dmg  +0.02  chg    15   cast 0.181
+  Sol Ring 10->8                                             T20  +0.0008 +-0.0009   dmg  -0.00  chg   108   cast 0.207
+  Despark 3->1                                               T20  -0.0008 +-0.0011   dmg  -0.05  chg   128   cast 0.186
+  Elesh Norn, Grand Cenobite 8.5->10.5                       T20  +0.0006 +-0.0009   dmg  -0.01  chg    86   cast 0.150
+  Twilight Shepherd 5->3                                     T20  -0.0006 +-0.0012   dmg  -0.08* chg   117   cast 0.111
+  Herald of War 5.5->7.5                                     T20  +0.0006 +-0.0024   dmg  +0.07  chg   518   cast 0.171
+  Giada, Font of Hope 7.5->5.5                               T20  -0.0006 +-0.0018   dmg  +0.03  chg   359   cast 0.186
+  Viscera Seer 7->9                                          T20  +0.0006 +-0.0011   dmg  +0.03  chg   164   cast 0.195
+  Cartel Aristocrat 6.5->4.5                                 T20  +0.0006 +-0.0011   dmg  +0.04  chg   236   cast 0.193
+  Black Market Connections 8->6                              T20  +0.0006 +-0.0028   dmg  +0.04  chg   370   cast 0.173
+  Midnight Reaper 7->5                                       T20  +0.0006 +-0.0022   dmg  +0.08  chg   377   cast 0.170
+  Grim Haruspex 7->5                                         T20  +0.0006 +-0.0024   dmg  +0.07  chg   423   cast 0.164
+  Dark Prophecy 6.5->8.5                                     T20  +0.0006 +-0.0025   dmg  -0.19* chg   360   cast 0.169
+  Dark Prophecy 6.5->4.5                                     T20  +0.0006 +-0.0022   dmg  +0.11* chg   281   cast 0.152
+  Vampiric Rites 6.5->4.5                                    T20  +0.0006 +-0.0010   dmg  +0.04* chg   115   cast 0.210
+  Arcane Signet 9->11                                        T20  +0.0006 +-0.0007   dmg  +0.02  chg    20   cast 0.216
+  Orzhov Signet 8.5->10.5                                    T20  -0.0006 +-0.0007   dmg  -0.04* chg    40   cast 0.213
+  Fellwar Stone 8->10                                        T20  +0.0006 +-0.0013   dmg  +0.00  chg    97   cast 0.216
+  Fellwar Stone 8->6                                         T20  -0.0006 +-0.0018   dmg  -0.04  chg   315   cast 0.212
+  Wayfarer's Bauble 6->4                                     T20  +0.0006 +-0.0010   dmg  +0.05* chg    73   cast 0.209
+  Wrath of God 3->5                                          T20  +0.0006 +-0.0012   dmg  +0.08* chg    54   cast 0.132
+  Generous Gift 3->1                                         T20  -0.0006 +-0.0012   dmg  -0.05* chg   140   cast 0.169
+  Mortify 3->1                                               T20  -0.0006 +-0.0012   dmg  -0.01  chg   156   cast 0.172
+  Utter End 3->5                                             T20  +0.0006 +-0.0009   dmg  +0.01  chg    57   cast 0.171
+  Serra's Emissary 7->9                                      T20  -0.0004 +-0.0024   dmg  +0.12* chg   361   cast 0.157
+  Reya Dawnbringer 6->8                                      T20  -0.0004 +-0.0018   dmg  +0.05  chg   274   cast 0.112
+  Angel of Serenity 5.5->7.5                                 T20  +0.0004 +-0.0024   dmg  +0.01  chg   445   cast 0.141
+  Angel of Suffering 5->3                                    T20  -0.0004 +-0.0008   dmg  -0.04  chg    62   cast 0.130
+  Righteous Valkyrie 8->10                                   T20  -0.0004 +-0.0016   dmg  -0.02  chg   141   cast 0.184
+  Speaker of the Heavens 6->8                                T20  +0.0004 +-0.0016   dmg  +0.05  chg   205   cast 0.197
+  Zulaport Cutthroat 7.5->9.5                                T20  -0.0004 +-0.0016   dmg  -0.09* chg   287   cast 0.193
+  Youthful Valkyrie 5.5->7.5                                 T20  -0.0004 +-0.0020   dmg  +0.01  chg   412   cast 0.198
+  Youthful Valkyrie 5.5->3.5                                 T20  -0.0004 +-0.0009   dmg  +0.00  chg    89   cast 0.191
+  Grim Haruspex 7->9                                         T20  -0.0004 +-0.0024   dmg  -0.10  chg   334   cast 0.180
+  Skullclamp 7->9                                            T20  -0.0004 +-0.0014   dmg  -0.03  chg   145   cast 0.208
+  Smothering Tithe 9->7                                      T20  -0.0004 +-0.0025   dmg  +0.05  chg   319   cast 0.173
+  Teferi's Protection 2->4                                   T20  -0.0004 +-0.0018   dmg  -0.10* chg   239   cast 0.155
+  Swords to Plowshares 3->5                                  T20  +0.0004 +-0.0008   dmg  +0.00  chg    90   cast 0.204
+  Vindicate 3->5                                             T20  +0.0004 +-0.0008   dmg  -0.03  chg   125   cast 0.185
+  Mortify 3->5                                               T20  +0.0004 +-0.0012   dmg  -0.01  chg   122   cast 0.192
+  Utter End 3->1                                             T20  +0.0004 +-0.0020   dmg  +0.05  chg   323   cast 0.151
+  Emeria's Call // Emeria, Shattered Skyclave 6->8           T20  -0.0004 +-0.0014   dmg  +0.10* chg   109   cast 0.037
+  Avacyn, Angel of Hope 9->7                                 T20  -0.0002 +-0.0022   dmg  -0.14* chg   256   cast 0.135
+  Archangel of Thune 8.5->10.5                               T20  -0.0002 +-0.0013   dmg  +0.01  chg    89   cast 0.169
+  Angel of Despair 5.5->3.5                                  T20  +0.0002 +-0.0016   dmg  -0.04  chg   233   cast 0.095
+  Herald of War 5.5->3.5                                     T20  +0.0002 +-0.0013   dmg  -0.03  chg   267   cast 0.133
+  Bloodghast 4->2                                            T20  +0.0002 +-0.0021   dmg  -0.02  chg   322   cast 0.174
+  Bishop of Wings 6.5->4.5                                   T20  +0.0002 +-0.0020   dmg  +0.06  chg   279   cast 0.180
+  Black Market Connections 8->10                             T20  +0.0002 +-0.0018   dmg  -0.00  chg   123   cast 0.179
+  Revel in Riches 5->3                                       T20  +0.0002 +-0.0003   dmg  +0.02* chg    60   cast 0.123
+  Damn 3->5                                                  T20  +0.0002 +-0.0025   dmg  +0.03  chg   254   cast 0.159
+  Flawless Maneuver 2->0                                     T20  -0.0002 +-0.0003   dmg  +0.00  chg    12   cast 0.123
+  Teferi's Protection 2->0                                   T20  -0.0002 +-0.0003   dmg  -0.01  chg    11   cast 0.128
+  Path to Exile 3->5                                         T20  +0.0002 +-0.0008   dmg  +0.04  chg    87   cast 0.204
+  Path to Exile 3->1                                         T20  +0.0002 +-0.0003   dmg  -0.00  chg    27   cast 0.201
+  Anguished Unmaking 3->5                                    T20  -0.0002 +-0.0010   dmg  -0.01  chg   111   cast 0.185
+  Generous Gift 3->5                                         T20  +0.0002 +-0.0010   dmg  +0.00  chg   106   cast 0.190
+  Despark 3->5                                               T20  +0.0002 +-0.0012   dmg  -0.02  chg   248   cast 0.197
+  Agadeem's Awakening // Agadeem, the Undercrypt 1->3        T20  -0.0002 +-0.0008   dmg  -0.01  chg    55   cast 0.027
+  Emeria's Call // Emeria, Shattered Skyclave 6->4           T20  -0.0002 +-0.0012   dmg  -0.08* chg    74   cast 0.015
+  Avacyn, Angel of Hope 9->11                                T20  +0.0000 +-0.0000   dmg  +0.00  chg     1   cast 0.143
+  Requiem Angel 6.5->4.5                                     T20  +0.0000 +-0.0024   dmg  -0.15* chg   462   cast 0.113
+  Angel of the Ruins 5->3                                    T20  +0.0000 +-0.0008   dmg  -0.05* chg   114   cast 0.093
+  Resplendent Angel 8->6                                     T20  +0.0000 +-0.0028   dmg  -0.05  chg   438   cast 0.173
+  Bloodghast 4->6                                            T20  +0.0000 +-0.0011   dmg  -0.08* chg   167   cast 0.189
+  Blood Artist 7.5->9.5                                      T20  +0.0000 +-0.0019   dmg  -0.10  chg   282   cast 0.205
+  Bishop of Wings 6.5->8.5                                   T20  +0.0000 +-0.0024   dmg  -0.04  chg   395   cast 0.193
+  Viscera Seer 7->5                                          T20  +0.0000 +-0.0012   dmg  +0.02  chg   187   cast 0.193
+  Priest of Fell Rites 6->4                                  T20  +0.0000 +-0.0016   dmg  +0.00  chg   168   cast 0.186
+  Phyrexian Arena 7.5->9.5                                   T20  +0.0000 +-0.0026   dmg  -0.04  chg   229   cast 0.182
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.207
+  Arcane Signet 9->7                                         T20  +0.0000 +-0.0020   dmg  +0.03  chg   264   cast 0.214
+  Talisman of Hierarchy 8->10                                T20  +0.0000 +-0.0012   dmg  -0.03  chg   130   cast 0.214
+  Wayfarer's Bauble 6->8                                     T20  +0.0000 +-0.0016   dmg  -0.02  chg   169   cast 0.211
+  Damn 3->1                                                  T20  +0.0000 +-0.0014   dmg  -0.07  chg   107   cast 0.144
+  Swords to Plowshares 3->1                                  T20  +0.0000 +-0.0000   dmg  -0.01* chg    30   cast 0.201
+  Agadeem's Awakening // Agadeem, the Undercrypt 1->-1       T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.019
+  Malakir Rebirth // Malakir Mire 2->4                       T20  +0.0000 +-0.0006   dmg  -0.00  chg    59   cast 0.130
+  Malakir Rebirth // Malakir Mire 2->0                       T20  +0.0000 +-0.0000   dmg  -0.00  chg     2   cast 0.122
+  -> 12 of 128 rows exclude zero at 95%; ~6.4 expected by chance alone.
+
+== azusa   (T20 base won 0.4028)
+  Momentous Fall 5->7                                        T20  -0.0048 +-0.0039 * dmg  -0.52* chg   691   cast 0.230
+  Courser of Kruphix 8->6                                    T20  -0.0044 +-0.0032 * dmg  -0.21  chg   534   cast 0.273
+  Ancient Greenwarden 8.5->6.5                               T20  +0.0032 +-0.0035   dmg  +0.08  chg   463   cast 0.233
+  Bane of Progress 5->7                                      T20  -0.0032 +-0.0037   dmg  -0.29* chg   701   cast 0.206
+  Craterhoof Behemoth 9->7                                   T20  -0.0032 +-0.0036   dmg  -0.20  chg   587   cast 0.203
+  Crucible of Worlds 6.5->8.5                                T20  -0.0032 +-0.0030 * dmg  -0.30* chg   512   cast 0.301
+  Green Sun's Zenith 7->9                                    T20  -0.0032 +-0.0033   dmg  -0.16  chg   543   cast 0.260
+  Seer's Sundial 6->8                                        T20  -0.0028 +-0.0032   dmg  -0.36* chg   452   cast 0.265
+  Avenger of Zendikar 8.5->6.5                               T20  -0.0026 +-0.0034   dmg  -0.14  chg   534   cast 0.266
+  Nylea's Intervention 5.5->3.5                              T20  -0.0026 +-0.0017 * dmg  -0.14* chg   188   cast 0.166
+  Springheart Nantuko 7->5                                   T20  -0.0024 +-0.0021 * dmg  -0.16* chg   269   cast 0.314
+  Ashaya, Soul of the Wild 7->9                              T20  +0.0024 +-0.0030   dmg  +0.01  chg   532   cast 0.247
+  Eternal Witness 7->9                                       T20  -0.0024 +-0.0040   dmg  -0.12  chg   602   cast 0.275
+  Woodland Bellower 6.5->8.5                                 T20  -0.0024 +-0.0036   dmg  -0.11  chg   586   cast 0.219
+  Cultivate 8->6                                             T20  +0.0024 +-0.0038   dmg  +0.14  chg   669   cast 0.237
+  Courser of Kruphix 8->10                                   T20  +0.0022 +-0.0026   dmg  +0.23* chg   419   cast 0.292
+  Kozilek, Butcher of Truth 7->9                             T20  -0.0020 +-0.0030   dmg  -0.07  chg   526   cast 0.220
+  Scute Swarm 8->6                                           T20  -0.0020 +-0.0033   dmg  -0.14  chg   572   cast 0.293
+  Animist's Awakening 6->8                                   T20  +0.0020 +-0.0042   dmg  +0.29* chg   738   cast 0.248
+  Animist's Awakening 6->4                                   T20  -0.0020 +-0.0028   dmg  -0.25* chg   483   cast 0.171
+  Eternal Witness 7->5                                       T20  +0.0018 +-0.0038   dmg  +0.13  chg   693   cast 0.215
+  Terastodon 6->8                                            T20  -0.0018 +-0.0030   dmg  -0.23* chg   572   cast 0.213
+  Horn of Greed 7->9                                         T20  +0.0018 +-0.0035   dmg  +0.01  chg   537   cast 0.262
+  Chord of Calling 7->9                                      T20  +0.0018 +-0.0030   dmg  +0.01  chg   441   cast 0.233
+  Augur of Autumn 8->6                                       T20  -0.0016 +-0.0031   dmg  -0.14  chg   452   cast 0.262
+  Kozilek, Butcher of Truth 7->5                             T20  +0.0016 +-0.0032   dmg  -0.01  chg   571   cast 0.145
+  Scute Swarm 8->10                                          T20  +0.0016 +-0.0028   dmg  +0.14  chg   396   cast 0.311
+  Ka-Zar of the Savage Land 8->6                             T20  +0.0016 +-0.0030   dmg  +0.02  chg   477   cast 0.266
+  Genesis Wave 8.5->6.5                                      T20  -0.0016 +-0.0035   dmg  -0.22* chg   595   cast 0.169
+  Life from the Loam 5->7                                    T20  -0.0016 +-0.0024   dmg  -0.08  chg   333   cast 0.272
+  Tireless Provisioner 8->6                                  T20  +0.0014 +-0.0031   dmg  +0.07  chg   496   cast 0.259
+  Horn of Greed 7->5                                         T20  -0.0014 +-0.0022   dmg  -0.13  chg   193   cast 0.250
+  Realms Uncharted 6->4                                      T20  -0.0014 +-0.0020   dmg  -0.05  chg   242   cast 0.223
+  Kodama's Reach 8->10                                       T20  -0.0014 +-0.0017   dmg  -0.04  chg   224   cast 0.281
+  Augur of Autumn 8->10                                      T20  +0.0012 +-0.0027   dmg  -0.04  chg   365   cast 0.275
+  Oracle of Mul Daya 8.5->6.5                                T20  -0.0012 +-0.0036   dmg  -0.15  chg   525   cast 0.254
+  Rampaging Baloths 8->6                                     T20  -0.0012 +-0.0030   dmg  -0.10  chg   430   cast 0.242
+  Ulamog, the Infinite Gyre 7->9                             T20  -0.0012 +-0.0028   dmg  -0.02  chg   395   cast 0.196
+  Woodland Bellower 6.5->4.5                                 T20  -0.0012 +-0.0034   dmg  -0.39* chg   563   cast 0.150
+  Oblivion Stone 2->4                                        T20  +0.0012 +-0.0014   dmg  +0.02  chg   282   cast 0.215
+  Greensleeves, Maro-Sorcerer 8.5->10.5                      T20  +0.0010 +-0.0016   dmg  -0.01  chg   192   cast 0.273
+  Ashaya, Soul of the Wild 7->5                              T20  -0.0010 +-0.0044   dmg  +0.14  chg   762   cast 0.167
+  Tireless Tracker 8->10                                     T20  -0.0010 +-0.0028   dmg  -0.10  chg   288   cast 0.265
+  Ulamog, the Infinite Gyre 7->5                             T20  +0.0010 +-0.0028   dmg  -0.06  chg   537   cast 0.131
+  Storm Cauldron 3->5                                        T20  -0.0010 +-0.0011   dmg  -0.05* chg   106   cast 0.170
+  Greater Good 3->1                                          T20  +0.0010 +-0.0011   dmg  +0.06* chg   208   cast 0.159
+  Ka-Zar of the Savage Land 8->10                            T20  -0.0010 +-0.0025   dmg  -0.09  chg   346   cast 0.281
+  Regrowth 6->8                                              T20  -0.0010 +-0.0032   dmg  -0.19  chg   473   cast 0.279
+  Seek the Horizon 6->8                                      T20  +0.0010 +-0.0036   dmg  +0.29* chg   699   cast 0.266
+  Bane of Progress 5->3                                      T20  +0.0008 +-0.0015   dmg  +0.08* chg   137   cast 0.154
+  Ramunap Excavator 7.5->9.5                                 T20  -0.0008 +-0.0035   dmg  -0.06  chg   499   cast 0.288
+  Sol Ring 10->8                                             T20  -0.0008 +-0.0011   dmg  -0.07  chg   182   cast 0.300
+  Storm Cauldron 3->1                                        T20  +0.0008 +-0.0015   dmg  +0.03  chg   228   cast 0.143
+  Seek the Horizon 6->4                                      T20  -0.0008 +-0.0026   dmg  -0.22* chg   377   cast 0.194
+  Sylvan Scrying 5.5->7.5                                    T20  -0.0008 +-0.0028   dmg  -0.23* chg   443   cast 0.285
+  Ancient Greenwarden 8.5->10.5                              T20  -0.0006 +-0.0016   dmg  -0.01  chg   114   cast 0.246
+  Lotus Cobra 9->7                                           T20  +0.0006 +-0.0020   dmg  +0.05  chg   341   cast 0.287
+  Oracle of Mul Daya 8.5->10.5                               T20  +0.0006 +-0.0018   dmg  -0.06  chg   153   cast 0.264
+  Quirion Ranger 4->6                                        T20  -0.0006 +-0.0012   dmg  -0.02  chg   108   cast 0.295
+  Rampaging Baloths 8->10                                    T20  +0.0006 +-0.0026   dmg  +0.03  chg   297   cast 0.253
+  Tireless Tracker 8->6                                      T20  -0.0006 +-0.0030   dmg  -0.17  chg   433   cast 0.255
+  Mind's Eye 3->5                                            T20  -0.0006 +-0.0012   dmg  +0.00  chg   113   cast 0.175
+  Krosan Grip 3->5                                           T20  +0.0006 +-0.0012   dmg  +0.01  chg   222   cast 0.227
+  Cultivate 8->10                                            T20  -0.0006 +-0.0020   dmg  -0.01  chg   236   cast 0.285
+  Kodama's Reach 8->6                                        T20  +0.0006 +-0.0038   dmg  +0.04  chg   652   cast 0.231
+  Life from the Loam 5->3                                    T20  +0.0006 +-0.0014   dmg  +0.06  chg   199   cast 0.237
+  Nylea's Intervention 5.5->7.5                              T20  -0.0006 +-0.0038   dmg  +0.01  chg   739   cast 0.236
+  Regrowth 6->4                                              T20  -0.0006 +-0.0019   dmg  -0.08  chg   249   cast 0.245
+  Greensleeves, Maro-Sorcerer 8.5->6.5                       T20  +0.0004 +-0.0033   dmg  -0.10  chg   590   cast 0.258
+  Avenger of Zendikar 8.5->10.5                              T20  +0.0004 +-0.0010   dmg  +0.07  chg    96   cast 0.283
+  Nissa, Vastwood Seer // Nissa, Sage Animist 7.5->9.5       T20  +0.0004 +-0.0034   dmg  +0.03  chg   520   cast 0.275
+  Wayward Swordtooth 6->8                                    T20  -0.0004 +-0.0028   dmg  -0.08  chg   497   cast 0.288
+  Seer's Sundial 6->4                                        T20  -0.0004 +-0.0015   dmg  -0.02  chg   103   cast 0.257
+  Mind's Eye 3->1                                            T20  +0.0004 +-0.0008   dmg  -0.02  chg   226   cast 0.146
+  Memory Jar 3->1                                            T20  +0.0004 +-0.0010   dmg  +0.06* chg   272   cast 0.143
+  Sylvan Library 3->5                                        T20  +0.0004 +-0.0010   dmg  +0.03  chg   184   cast 0.244
+  Greater Good 3->5                                          T20  +0.0004 +-0.0010   dmg  -0.03  chg   224   cast 0.190
+  Krosan Grip 3->1                                           T20  -0.0004 +-0.0005   dmg  -0.00  chg   112   cast 0.193
+  Beast Within 3->5                                          T20  +0.0004 +-0.0012   dmg  +0.08* chg   234   cast 0.232
+  Chord of Calling 7->5                                      T20  -0.0004 +-0.0034   dmg  +0.04  chg   625   cast 0.167
+  Momentous Fall 5->3                                        T20  -0.0004 +-0.0018   dmg  -0.04  chg   289   cast 0.176
+  Harmonize 6.5->8.5                                         T20  +0.0004 +-0.0040   dmg  -0.03  chg   603   cast 0.236
+  Sylvan Scrying 5.5->3.5                                    T20  +0.0004 +-0.0010   dmg  +0.03  chg    95   cast 0.246
+  Springheart Nantuko 7->9                                   T20  +0.0002 +-0.0022   dmg  -0.06  chg   408   cast 0.326
+  Lotus Cobra 9->11                                          T20  -0.0002 +-0.0003   dmg  -0.02  chg    45   cast 0.292
+  Nissa, Vastwood Seer // Nissa, Sage Animist 7.5->5.5       T20  -0.0002 +-0.0028   dmg  -0.06  chg   353   cast 0.257
+  Quirion Ranger 4->2                                        T20  +0.0002 +-0.0008   dmg  -0.02* chg   165   cast 0.284
+  Titania, Protector of Argoth 7.5->9.5                      T20  -0.0002 +-0.0035   dmg  -0.22* chg   566   cast 0.280
+  Titania, Protector of Argoth 7.5->5.5                      T20  +0.0002 +-0.0025   dmg  +0.05  chg   346   cast 0.262
+  Wayward Swordtooth 6->4                                    T20  +0.0002 +-0.0009   dmg  -0.00  chg    54   cast 0.282
+  Traveling Chocobo 8.5->10.5                                T20  -0.0002 +-0.0014   dmg  -0.04  chg   172   cast 0.280
+  Crucible of Worlds 6.5->4.5                                T20  -0.0002 +-0.0018   dmg  -0.09  chg   172   cast 0.287
+  Sylvan Library 3->1                                        T20  +0.0002 +-0.0003   dmg  +0.01  chg    85   cast 0.227
+  Exploration 9->7                                           T20  +0.0002 +-0.0020   dmg  -0.01  chg   179   cast 0.295
+  Hall of Gemstone 2->0                                      T20  -0.0002 +-0.0003   dmg  -0.01  chg    23   cast 0.183
+  Abundance 3->1                                             T20  +0.0002 +-0.0007   dmg  +0.00  chg   208   cast 0.154
+  Crop Rotation 2->4                                         T20  +0.0002 +-0.0006   dmg  +0.03* chg   156   cast 0.290
+  Realms Uncharted 6->8                                      T20  +0.0002 +-0.0035   dmg  -0.01  chg   579   cast 0.280
+  Beast Within 3->1                                          T20  +0.0002 +-0.0003   dmg  -0.01  chg   126   cast 0.199
+  Genesis Wave 8.5->10.5                                     T20  +0.0002 +-0.0020   dmg  +0.03  chg   226   cast 0.222
+  Green Sun's Zenith 7->5                                    T20  -0.0002 +-0.0036   dmg  +0.03  chg   721   cast 0.190
+  Journey of Discovery 6->8                                  T20  -0.0002 +-0.0030   dmg  -0.03  chg   596   cast 0.273
+  Journey of Discovery 6->4                                  T20  -0.0002 +-0.0020   dmg  -0.04  chg   225   cast 0.218
+  Craterhoof Behemoth 9->11                                  T20  +0.0000 +-0.0000   dmg  +0.00  chg    19   cast 0.231
+  Ramunap Excavator 7.5->5.5                                 T20  +0.0000 +-0.0025   dmg  -0.07  chg   364   cast 0.273
+  Terastodon 6->4                                            T20  +0.0000 +-0.0022   dmg  +0.03  chg   404   cast 0.149
+  Tireless Provisioner 8->10                                 T20  +0.0000 +-0.0027   dmg  -0.10  chg   336   cast 0.274
+  Traveling Chocobo 8.5->6.5                                 T20  +0.0000 +-0.0034   dmg  -0.05  chg   531   cast 0.268
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.302
+  Oblivion Stone 2->0                                        T20  +0.0000 +-0.0006   dmg  +0.00  chg    28   cast 0.186
+  Memory Jar 3->5                                            T20  +0.0000 +-0.0013   dmg  -0.01  chg   115   cast 0.175
+  Exploration 9->11                                          T20  +0.0000 +-0.0008   dmg  +0.01  chg    52   cast 0.297
+  Hall of Gemstone 2->4                                      T20  +0.0000 +-0.0012   dmg  +0.03  chg   302   cast 0.214
+  Abundance 3->5                                             T20  +0.0000 +-0.0011   dmg  -0.01  chg   224   cast 0.191
+  Crop Rotation 2->0                                         T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.280
+  Harmonize 6.5->4.5                                         T20  +0.0000 +-0.0038   dmg  -0.19  chg   595   cast 0.168
+  -> 5 of 116 rows exclude zero at 95%; ~5.8 expected by chance alone.
+
