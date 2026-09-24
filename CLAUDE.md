@@ -860,20 +860,21 @@ is half answered**: the ordering half is built and measured as a null
     measured, and it FAILS if it calls BLIND anything whose row was significant.
     Triage predicts MEASURABILITY, not value.
 
-18. **`main_phase` IS GREEDY ON `priority` — AND THE LOOKAHEAD SAYS THE
-    ORDER IS NOT THE PROBLEM; THE NUMBERS ARE** (§0z43). §0z8 caught Karlov
-    casting Voice of the Blessed `{W}{W}` over Lurrus `{1}{W}{B}` once both
-    white sources were correctly preserved. The one-card lookahead this item
-    asked for is BUILT (`engine.lookahead_pick`, all six engines,
-    `cast_lookahead`) and MEASURED: it fires in 4-12% of games and moves win
-    rate inside its bar in all twelve deck-horizon cells, because §0z8's
-    SURPLUS rule already keeps the colour a hand needs. It stays OFF. And it
-    could never have settled the Voice/Lurrus case: those two cannot both be
-    cast from that mana, and `priority` ranks Voice higher. **So what is left
-    is the claim this item always made — every deck's `priority` numbers
-    were tuned while which land got tapped was effectively arbitrary** — and
-    the next step is a per-deck priority sweep through `run_ab`, which has
-    not been tried.
+18. **BOTH HALVES ARE MEASURED; WHAT IS LEFT IS AN ADOPTION DECISION**
+    (§0z43, §0z44). The ORDER half is a null: the one-card lookahead
+    (`engine.lookahead_pick`, `cast_lookahead`, OFF) moves win rate inside
+    its bar in all twelve cells. The NUMBERS half is swept
+    (`diagnostics/run_priority_sweep.py`, four tiers, three disjoint seed
+    blocks): the tables matter — flattening one costs up to 0.045 — and
+    **four decks' numbers survive every ±2 move**, including §0z8's own
+    Voice-over-Lurrus case. **Two do not.** Karlov wants Felidar Sovereign
+    and Sorin, Solemn Visitor higher (joint +0.0099 / +0.0091); tivit ranked
+    card draw above its token engines (joint +0.0225 / +0.0211, four moves).
+    Adopting either moves that deck's baseline and forces its table rebuilt,
+    and tivit's moves include the priority of its STAGED Anointed
+    Procession — so the staged swap's number was measured on the worse of
+    the two priorities. Owner's call. Not confirmed and worth a look: Time
+    Sieve's move flips sign between horizons.
 
 0b-i. **Sunbird's one-off decay is still unattributed — but it has stopped.**
     +0.0215 (2026-09-04) → +0.0146 ±0.0028 (2026-09-06) → +0.0152 ±0.0028

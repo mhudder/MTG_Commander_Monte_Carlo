@@ -34,8 +34,15 @@ THE DESIGN IS TRIAGE, because the naive version costs ~40 CPU-hours
            (seeds start where the screen's ended), so the selection the
            screen made cannot bias the number that decides.
   joint    Every confirmed move applied together, N=15,000, both horizons,
-           on the tables' own seeds. Priorities are a RANKING, so two moves
-           interact; the joint row is the one an adoption would rest on.
+           on a THIRD seed block that neither selection step has seen.
+           Priorities are a RANKING, so two moves interact; the joint row is
+           the one an adoption would rest on.
+
+  mechanism  Each confirmed move, and the joint, through `run_ab` itself at
+           N=3,000, T20, reporting the deck's own table counters plus a few
+           per-deck extras and the share of games won by each WIN ROUTE. It
+           exists because a confirmed number whose mechanism nobody can name
+           is not a result yet. It uses the confirm block's seeds.
 
 DELTA = 2 IS A JUDGEMENT, said out loud: on a 1-10 scale with 10-14 distinct
 levels per deck, two points crosses a few tiers without sending a card to the
@@ -60,6 +67,7 @@ be resumed onto) and the run resumes from them.
     python -m diagnostics.run_priority_sweep screen  > results/priority_screen.txt
     python -m diagnostics.run_priority_sweep confirm > results/priority_confirm.txt
     python -m diagnostics.run_priority_sweep joint   > results/priority_joint.txt
+    python -m diagnostics.run_priority_sweep mechanism > results/priority_mechanism.txt
     python -m diagnostics.run_priority_sweep screen --decks=karlov --n=200  # smoke
 """
 from __future__ import annotations
@@ -87,9 +95,15 @@ DELTA = 2.0
 # `--mutate`: NOOP moves its card for real. The run must then report the gate
 # as fired (exit 0) -- a gate that cannot fail certifies nothing.
 MUTATE = "--mutate" in sys.argv
-N_DEFAULT = {"lever": 15000, "screen": 5000, "confirm": 15000, "joint": 15000}
+N_DEFAULT = {"lever": 15000, "screen": 5000, "confirm": 15000, "joint": 15000,
+             "mechanism": 3000}
 HORIZONS = {"lever": (10, 20), "screen": (20,), "confirm": (10, 20),
-            "joint": (10, 20)}
+            "joint": (10, 20), "mechanism": (20,)}
+# Counters worth reading beside the table's own, per deck, for `mechanism`.
+EXTRA_METRICS = {
+    "karlov": ("life_gained", "combo_assembled"),
+    "tivit": ("token_drain", "treasures_made", "extra_turns", "cards_drawn"),
+}
 # Metrics that differ between the legs because the B leg WATCHES a card, not
 # because the game differed. Everything else goes into the per-game hash.
 WATCH_KEYS = ("cast_test_card", "test_card_")
@@ -327,7 +341,12 @@ def noop_gate(results, cells) -> bool:
 
 def phase_cells(phase, decks, n, delta, horizons):
     cells, arms_by_deck = [], {}
-    seed0 = SEED0 + N_DEFAULT["screen"] if phase == "confirm" else SEED0
+    # Three seed blocks, never overlapping: the screen SELECTED on the first
+    # and the confirmation selected on the second, so the joint row -- the
+    # number an adoption rests on -- is measured on seeds neither has seen.
+    seed0 = {"confirm": SEED0 + N_DEFAULT["screen"],
+             "joint": SEED0 + N_DEFAULT["screen"] + N_DEFAULT["confirm"],
+             }.get(phase, SEED0)
     for d in decks:
         deck, _cmd = build_pending(d)
         if phase == "lever":
@@ -403,6 +422,60 @@ def confirmed_moves(deck_name, delta):
     return moves
 
 
+def phase_mechanism(decks, n, delta, procs) -> int:
+    """Each confirmed move alone, then the joint, via run_ab -- so this phase
+    is also a second, independent route to the confirm phase's sign."""
+    seed0 = SEED0 + N_DEFAULT["screen"]
+    jobs = []
+    for d in decks:
+        deck, _ = build_pending(d)
+        moves = confirmed_moves(d, delta)
+        if not moves:
+            continue
+        for name, pr in sorted(moves.items()):
+            jobs.append((d, {name: pr}, n, seed0))
+        if len(moves) > 1:
+            jobs.append((d, moves, n, seed0))
+    print(f"priority sweep, phase `mechanism`. N={n:,} paired via run_ab, "
+          f"T20, seeds {seed0}.. . win_route_k = share of games WON by "
+          f"route k (karlov: 2 combo, 3 Felidar, 4 Aetherflux; tivit: 1 "
+          f"combat, 2 Revel, 3 Mechanized, 4 drain, 5 Torment, 6 Time "
+          f"Sieve; 0 = damage/other).\n")
+    with Pool(procs) as pool:
+        for d, moves, rows in pool.imap(_mech_job, jobs):
+            deck, _ = build_pending(d)
+            pri = {c.name: c.priority for c in nonland(deck)}
+            print(f"== {d}: " + "; ".join(f"{k} {pri[k]:g}->{v:g}"
+                                          for k, v in sorted(moves.items())))
+            for metric, diff, lo, hi, sig in rows:
+                print(f"    {metric:<20}{diff:>+9.4f}  [{lo:>+8.4f}, "
+                      f"{hi:>+8.4f}]{' *' if sig else '  '}")
+            print()
+            sys.stdout.flush()
+    return 0
+
+
+def _mech_job(args):
+    d, moves, n, seed0 = args
+    from edhmc.experiment import run_ab
+    deck, cmd = build_pending(d)
+    names = sorted(moves)
+    new = apply_moves(deck, moves)
+    ins = [next(c for c in new if c.name == nm) for nm in names]
+    ra, rb, _cfg = run_ab(deck, cmd, names, ins, n=n, turns=20,
+                          base_seed=seed0, sim=REGISTRY[d].sim)
+    routes = sorted({r["win_route"] for r in ra + rb if r["won"]})
+    for rows in (ra, rb):
+        for r in rows:
+            for k in routes:
+                r[f"win_route_{k}"] = int(bool(r["won"]) and r["win_route"] == k)
+    metrics = (tuple(REGISTRY[d].metrics) + EXTRA_METRICS.get(d, ())
+               + tuple(f"win_route_{k}" for k in routes))
+    res = analyse(ra, rb, metrics=metrics)
+    return d, moves, [(r.metric, r.mean_diff, r.ci_low, r.ci_high,
+                       r.significant) for r in res]
+
+
 def main() -> int:
     args = sys.argv[1:]
     if not args or args[0].startswith("--"):
@@ -417,6 +490,8 @@ def main() -> int:
     delta = float(opt.get("delta", DELTA))
     procs = int(opt.get("procs", os.cpu_count() or 4))
     horizons = HORIZONS[phase]
+    if phase == "mechanism":
+        return phase_mechanism(decks, n, delta, procs)
 
     cells, arms_by_deck, seed0 = phase_cells(phase, decks, n, delta, horizons)
     print(f"priority sweep, phase `{phase}`. N={n:,} paired per arm, seeds "

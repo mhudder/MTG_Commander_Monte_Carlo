@@ -2487,3 +2487,28 @@ threat level rather than real cards, so roughly a third of every deck (removal
 spells, counterspells) can't be evaluated at all — 117 of 379 nonland cards,
 counted 2026-09-13. That is `KNOWN_ISSUES.md` §4 and it would be a rewrite,
 not a fix.
+
+---
+
+## 2026-09-24: queued item 18's second half — the priority numbers, swept
+
+`KNOWN_ISSUES.md` §0z44; `diagnostics/run_priority_sweep.py` is the harness.
+
+The naive sweep priced at ~40 CPU-hours, so it ran as triage instead: size
+the lever (FLAT and REVERSED tables), screen every nonland card ±2 at
+N=5,000, confirm the 74 survivors at N=15,000 on seeds the screen never saw,
+and measure the confirmed moves together on a third block. About three hours
+of wall clock on four cores, most of it the screen. The A leg was shared
+across arms, and the tool proved that sound three ways before a row was read
+(a NOOP that watches every card changes zero games; `--mutate` makes it fire;
+one arm reproduces `run_ab` exactly).
+
+The first screen crashed on "Vault 11: Voter's Dilemma", whose name contains
+the colon the arm labels were split on. Its four jobs were reported as FAILED
+rather than read as zero, and the rerun resumed from the per-arm cache.
+
+What came back: the tables matter everywhere except rendmaw at T20, four
+decks' numbers survive every move tried, and karlov and tivit do not — tivit
+by the widest margin, because its numbers put card draw ahead of the token
+engines that actually win its games. Nothing was adopted; see §0z44 for why
+that is the owner's decision.

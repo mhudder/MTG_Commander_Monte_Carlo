@@ -1,0 +1,15 @@
+priority sweep, phase `joint`. N=15,000 paired per arm, seeds 21234..36233, horizons (10, 20), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+2 arms across 2 deck(s), plus BASE and NOOP per deck/horizon.
+
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP karlov      T10  games changed: 0   OK
+  NOOP karlov      T20  games changed: 0   OK
+  NOOP tivit       T10  games changed: 0   OK
+  NOOP tivit       T20  games changed: 0   OK
+
+== karlov   (T10 base won 0.1564, T20 base won 0.3941)
+  JOINT Felidar Sovereign 7->9; Sorin, Solemn Visitor 6->8   T10  +0.0099 +-0.0023 * dmg  -0.31* chg  2307   T20  +0.0091 +-0.0031 * dmg  -0.50* chg  2972
+
+== tivit   (T10 base won 0.1371, T20 base won 0.4022)
+  JOINT Anointed Procession 8->10; Mirkwood Bats 8->10; Rhystic Study 9.5->7.5; Tempting Contract 6.5->8.5 T10  +0.0225 +-0.0036 * dmg  +1.29* chg  6096   T20  +0.0211 +-0.0052 * dmg  +0.86* chg  7282
+

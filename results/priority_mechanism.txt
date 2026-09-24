@@ -1,0 +1,123 @@
+priority sweep, phase `mechanism`. N=3,000 paired via run_ab, T20, seeds 6234.. . win_route_k = share of games WON by route k (karlov: 2 combo, 3 Felidar, 4 Aetherflux; tivit: 1 combat, 2 Revel, 3 Mechanized, 4 drain, 5 Torment, 6 Time Sieve; 0 = damage/other).
+
+== karlov: Felidar Sovereign 7->9
+    damage                -0.6787  [ -0.9680,  -0.3963] *
+    lifegain_triggers     -0.1483  [ -0.2387,  -0.0550] *
+    final_life            -0.2479  [ -1.0272,  +0.3569]  
+    cards_drawn           -0.0877  [ -0.1383,  -0.0353] *
+    won                   +0.0060  [ +0.0013,  +0.0107] *
+    life_gained           -0.7763  [ -1.2153,  -0.3583] *
+    combo_assembled       -0.0020  [ -0.0047,  +0.0003]  
+    win_route_0           -0.0040  [ -0.0080,  +0.0000]  
+    win_route_2           -0.0030  [ -0.0057,  -0.0003] *
+    win_route_3           +0.0130  [ +0.0077,  +0.0183] *
+
+== karlov: Sorin, Solemn Visitor 6->8
+    damage                -0.1147  [ -0.3817,  +0.1667]  
+    lifegain_triggers     +0.1210  [ +0.0127,  +0.2313] *
+    final_life            +0.2626  [ -0.7846,  +1.2652]  
+    cards_drawn           -0.0397  [ -0.0973,  +0.0187]  
+    won                   +0.0007  [ -0.0043,  +0.0057]  
+    life_gained           +1.3633  [ +0.2370,  +2.3757] *
+    combo_assembled       +0.0010  [ -0.0013,  +0.0037]  
+    win_route_0           -0.0010  [ -0.0063,  +0.0040]  
+    win_route_2           +0.0010  [ -0.0013,  +0.0037]  
+    win_route_3           +0.0007  [ -0.0027,  +0.0040]  
+
+== karlov: Felidar Sovereign 7->9; Sorin, Solemn Visitor 6->8
+    damage                -0.8200  [ -1.2083,  -0.4430] *
+    lifegain_triggers     -0.0627  [ -0.1993,  +0.0737]  
+    final_life            -0.2253  [ -1.4381,  +0.8698]  
+    cards_drawn           -0.1410  [ -0.2153,  -0.0647] *
+    won                   +0.0063  [ -0.0007,  +0.0130]  
+    life_gained           +0.3977  [ -0.7538,  +1.3947]  
+    combo_assembled       -0.0010  [ -0.0047,  +0.0023]  
+    win_route_0           -0.0053  [ -0.0117,  +0.0010]  
+    win_route_2           -0.0027  [ -0.0063,  +0.0010]  
+    win_route_3           +0.0143  [ +0.0083,  +0.0200] *
+
+== tivit: Anointed Procession 8->10
+    damage                -1.3672  [ -1.9606,  -0.7966] *
+    artifacts_made        +8.2447  [ +4.8310, +11.9196] *
+    tivit_triggers        +0.0407  [ -0.2797,  +0.3727]  
+    votes_cast            -0.3200  [ -1.6994,  +1.1255]  
+    won                   +0.0103  [ +0.0013,  +0.0190] *
+    token_drain           +0.0665  [ -5.2797,  +5.2614]  
+    treasures_made        +4.2033  [ +2.6445,  +5.8437] *
+    extra_turns           -0.0163  [ -0.0477,  +0.0157]  
+    cards_drawn           -0.3437  [ -0.4677,  -0.2260] *
+    win_route_0           +0.0003  [ -0.0020,  +0.0027]  
+    win_route_1           -0.0060  [ -0.0137,  +0.0013]  
+    win_route_2           +0.0077  [ +0.0040,  +0.0117] *
+    win_route_3           +0.0040  [ -0.0010,  +0.0087]  
+    win_route_4           +0.0033  [ -0.0053,  +0.0120]  
+    win_route_5           +0.0010  [ -0.0013,  +0.0037]  
+
+== tivit: Mirkwood Bats 8->10
+    damage                +0.9473  [ +0.4868,  +1.4431] *
+    artifacts_made        -6.2160  [ -9.9240,  -3.1579] *
+    tivit_triggers        -0.6310  [ -0.8927,  -0.3887] *
+    votes_cast            -3.1900  [ -4.2925,  -2.1399] *
+    won                   +0.0080  [ +0.0013,  +0.0150] *
+    token_drain           +2.2135  [ -2.4385,  +5.9130]  
+    treasures_made        -2.6137  [ -3.8934,  -1.4489] *
+    extra_turns           -0.0737  [ -0.1037,  -0.0453] *
+    cards_drawn           -0.4727  [ -0.5797,  -0.3713] *
+    win_route_0           -0.0017  [ -0.0033,  -0.0003] *
+    win_route_1           -0.0013  [ -0.0077,  +0.0047]  
+    win_route_2           -0.0023  [ -0.0050,  +0.0003]  
+    win_route_3           -0.0053  [ -0.0087,  -0.0023] *
+    win_route_4           +0.0157  [ +0.0083,  +0.0230] *
+    win_route_5           +0.0030  [ +0.0007,  +0.0053] *
+
+== tivit: Rhystic Study 9.5->7.5
+    damage                -0.3783  [ -0.8912,  +0.1231]  
+    artifacts_made       +10.2947  [ +6.6596, +14.2908] *
+    tivit_triggers        +0.5227  [ +0.2227,  +0.8390] *
+    votes_cast            +1.8593  [ +0.6890,  +3.1387] *
+    won                   +0.0107  [ +0.0023,  +0.0187] *
+    token_drain           +4.7277  [ -2.6427, +12.9497]  
+    treasures_made        +4.5780  [ +3.0550,  +6.2139] *
+    extra_turns           +0.0080  [ -0.0177,  +0.0343]  
+    cards_drawn           -0.3583  [ -0.4693,  -0.2530] *
+    win_route_0           +0.0007  [ -0.0013,  +0.0027]  
+    win_route_1           -0.0020  [ -0.0087,  +0.0043]  
+    win_route_2           +0.0057  [ +0.0020,  +0.0093] *
+    win_route_3           +0.0033  [ -0.0007,  +0.0073]  
+    win_route_4           +0.0027  [ -0.0057,  +0.0107]  
+    win_route_5           +0.0003  [ -0.0017,  +0.0023]  
+
+== tivit: Tempting Contract 6.5->8.5
+    damage                +0.4007  [ -0.0196,  +0.8108]  
+    artifacts_made        +0.1403  [ -1.0567,  +1.3804]  
+    tivit_triggers        -0.0087  [ -0.1703,  +0.1540]  
+    votes_cast            +0.0787  [ -0.5934,  +0.7561]  
+    won                   +0.0033  [ -0.0023,  +0.0090]  
+    token_drain           -1.3587  [ -3.4124,  +0.4390]  
+    treasures_made        +0.1343  [ -0.5892,  +0.7888]  
+    extra_turns           -0.0043  [ -0.0213,  +0.0123]  
+    cards_drawn           -0.0043  [ -0.0773,  +0.0677]  
+    win_route_0           +0.0007  [ -0.0007,  +0.0020]  
+    win_route_1           -0.0013  [ -0.0060,  +0.0030]  
+    win_route_2           +0.0010  [ -0.0010,  +0.0033]  
+    win_route_3           +0.0010  [ -0.0020,  +0.0040]  
+    win_route_4           +0.0013  [ -0.0043,  +0.0070]  
+    win_route_5           +0.0007  [ -0.0007,  +0.0020]  
+
+== tivit: Anointed Procession 8->10; Mirkwood Bats 8->10; Rhystic Study 9.5->7.5; Tempting Contract 6.5->8.5
+    damage                -0.2561  [ -1.0375,  +0.5483]  
+    artifacts_made        +4.2993  [ -0.5667,  +9.3227]  
+    tivit_triggers        -0.2873  [ -0.6970,  +0.1210]  
+    votes_cast            -2.0300  [ -3.6851,  -0.2810] *
+    won                   +0.0200  [ +0.0090,  +0.0317] *
+    token_drain           +2.3120  [ -3.0516,  +7.7511]  
+    treasures_made        +2.5373  [ +0.4622,  +4.6374] *
+    extra_turns           -0.0733  [ -0.1153,  -0.0317] *
+    cards_drawn           -0.7680  [ -0.9267,  -0.6143] *
+    win_route_0           +0.0000  [ -0.0027,  +0.0027]  
+    win_route_1           -0.0073  [ -0.0173,  +0.0023]  
+    win_route_2           +0.0077  [ +0.0027,  +0.0127] *
+    win_route_3           -0.0030  [ -0.0087,  +0.0023]  
+    win_route_4           +0.0177  [ +0.0063,  +0.0293] *
+    win_route_5           +0.0050  [ +0.0017,  +0.0087] *
+

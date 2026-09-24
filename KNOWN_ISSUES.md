@@ -92,6 +92,7 @@ Methodology that used to live at the end of this file is now
 | [0z41](#0z41) | FIXED | **Horn of Greed was tripled.** Its draw sat inside `_landfall_payoffs`, which Ancient Greenwarden and Traveling Chocobo run once per rep, so one land drop drew three. Greenwarden's own ruling: "an ability that triggers whenever you play a land won't trigger an additional time." Moved out of the loop; worth **−0.0049 / −0.0033** to azusa's baseline, and it flattered both doublers, so the Chocobo's staging was re-measured |
 | [0z42](#0z42) | FIXED | **Decking loses (queued item 17), and the pilot had to be taught not to.** `engine.drew_from_empty` is 704.5b in the three draw paths. The rule ALONE decked azusa in 3.3% of games at T20, in the turns it had lethal on board -- a naive pilot cost it **0.022**. `engine.draw_is_safe` declines only OPTIONAL draws; at the swept reserve of 5 the rule costs azusa −0.0006 / −0.0012 and lorehold −0.0003 / −0.0021. Rendmaw, karlov, tivit and shilgengar are identical game for game -- **including karlov with Bolas's Citadel, whose number was never a decking ceiling** |
 | [0z43](#0z43) | MEASURED | **The one-card cast lookahead is a measured NULL.** `engine.lookahead_pick` (queued item 18) reorders a cast when the greedy pick would strand a card that casting first would have kept; wired into all six `main_phase`s, it fires in 4-12% of games and moves win rate inside its bar in all twelve deck-horizon cells (largest +0.0010 ±0.0020). §0z8's SURPLUS rule already handles the ordering. `cast_lookahead` stays OFF; what is left of item 18 is the `priority` numbers themselves |
+| [0z44](#0z44) | MEASURED | **The `priority` numbers: right in four decks, wrong in two.** Flattening each table costs 0.015–0.045 win rate, so the numbers matter; a ±2 sweep of every nonland card (760 arms, three disjoint seed blocks) confirms **no move at all** in rendmaw, lorehold, shilgengar or azusa, two in karlov (Felidar Sovereign up, Sorin, Solemn Visitor up: joint **+0.0099 / +0.0091**) and four in tivit, which ranked card draw above its token engines (joint **+0.0225 / +0.0211**). Mechanisms read off the win routes. **Measured, not adopted**: adopting moves two baselines and a staged card's own priority |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6472,6 +6473,142 @@ step and has not been tried.
 `tests/test_cast_lookahead.py` pins `pool_after`, the rescue rule and the
 rendmaw wiring; `--mutate` runs four mutations, exact sets, all right first
 time.
+
+## 0z44. MEASURED — the `priority` numbers (queued item 18's second half): right in four decks, wrong in two, and the two are worth +0.009 and +0.021
+
+§0z43 left item 18 with one claim: every deck's `priority` numbers were
+tuned while which land got tapped was effectively arbitrary (§0z8), and the
+casting ORDER was not the leak. This measures the numbers themselves.
+`diagnostics/run_priority_sweep.py` is the harness; every table below is in
+`results/priority_{lever,screen,confirm,joint,mechanism}.txt`.
+
+**What a priority move changes, said first.** `priority` is not only the cast
+order in `main_phase`. The same number ranks lorehold's recursion picks,
+tivit's pool picks and the sacrifice-to-cast chooser in `engine.py`, so every
+row below moves every decision that reads it. The commander is never moved,
+and rendmaw's `+3` ramp bonus is left alone.
+
+### The harness, and the three checks on it
+
+Four tiers, cheapest first, because the naive sweep (every card, both
+directions, N=15,000, both horizons) prices at ~40 CPU-hours:
+
+| tier | what | N, horizons | seeds |
+|---|---|---|---|
+| lever | the whole table replaced: FLAT (every nonland card at the median, so the MV tie-break decides) and REVERSED | 15,000, T10+T20 | 1234.. |
+| screen | every nonland card ±2, one at a time — 760 arms | 5,000, T20 | 1234.. |
+| confirm | the 74 screen survivors | 15,000, T10+T20 | 6234.. (disjoint) |
+| joint | every move confirmed POSITIVE at both horizons, together | 15,000, T10+T20 | 21234.. (disjoint from both) |
+
+The A leg is simulated once per deck, horizon and seed block instead of once
+per arm, which halves the cost. That is sound only if nothing in a game reads
+`cfg["watch"]` except a counter, so the tool checks it three ways: a **NOOP**
+arm that watches every nonland card must change ZERO games (it did, in every
+phase, all 26 deck-horizon-block cells); **`--mutate`** makes NOOP a real move
+and the gate fired on all twelve lever cells, as written down before running;
+and one arm (karlov, Voice of the Blessed −2, N=400) reproduces `run_ab`'s
+numbers exactly, A legs identical game for game. `validate` was `+0.00` on
+all eighteen metrics before the run. **The seed blocks do not overlap**, so
+neither selection step can bias the number the next one reports.
+
+Δ = 2 is a judgement, said out loud: on a 1–10 scale with 10–14 distinct
+levels per deck it crosses a few tiers without sending a card to the top or
+bottom outright.
+
+### The lever: the tables carry real information
+
+| deck | FLAT T10 | FLAT T20 | REVERSED T10 | REVERSED T20 |
+|---|---|---|---|---|
+| rendmaw | −0.0033 ±0.0023 | **+0.0031 ±0.0055** | −0.0198 ±0.0027 | −0.0279 ±0.0065 |
+| lorehold | −0.0135 ±0.0031 | −0.0147 ±0.0069 | −0.0226 ±0.0034 | −0.0496 ±0.0073 |
+| karlov | −0.0280 ±0.0049 | −0.0173 ±0.0073 | −0.0863 ±0.0058 | −0.0626 ±0.0083 |
+| tivit | −0.0447 ±0.0050 | −0.0367 ±0.0077 | −0.0713 ±0.0052 | −0.0715 ±0.0081 |
+| shilgengar | −0.0022 ±0.0011 | −0.0213 ±0.0056 | −0.0059 ±0.0014 | −0.0496 ±0.0064 |
+| azusa | −0.0203 ±0.0044 | −0.0310 ±0.0065 | −0.0493 ±0.0050 | −0.0707 ±0.0079 |
+
+Written down before the run: FLAT costs every deck, REVERSED costs more. True
+in 11 of 12 cells. **Rendmaw at T20 is the exception** — its table is
+indistinguishable from "cast the biggest affordable card" at the long
+horizon, plausibly because the ramp bonus FLAT keeps is most of its ordering.
+
+### The screen: two thirds of the survivors are LOSSES
+
+74 of 760 rows excluded zero, against ~38 expected by chance. The excess sat
+in tivit (20 of 130) and rendmaw (14 of 128); **azusa was exactly chance** (5
+of 116). About two thirds of survivors were negative — moving the card
+either way LOSES — which is the table's own evidence that the numbers are
+mostly locally right.
+
+### The confirmation, on seeds the screen never saw
+
+Positive at BOTH horizons, the project's staging bar:
+
+| deck | move | T10 | T20 |
+|---|---|---|---|
+| tivit | Mirkwood Bats 8 → 10 | +0.0130 ±0.0024 | +0.0085 ±0.0030 |
+| tivit | Anointed Procession 8 → 10 | +0.0097 ±0.0026 | +0.0079 ±0.0038 |
+| tivit | Rhystic Study 9.5 → 7.5 | +0.0076 ±0.0023 | +0.0075 ±0.0034 |
+| tivit | Tempting Contract 6.5 → 8.5 | +0.0037 ±0.0017 | +0.0027 ±0.0025 |
+| karlov | Felidar Sovereign 7 → 9 | +0.0055 ±0.0017 | +0.0047 ±0.0023 |
+| karlov | Sorin, Solemn Visitor 6 → 8 | +0.0018 ±0.0016 | +0.0024 ±0.0023 |
+
+**Rendmaw, lorehold, shilgengar and azusa have no confirmed move**; the
+current number beats or ties every alternative tried. Three rows are worth
+knowing and are NOT confirmed: **Time Sieve 9 → 11 flips sign** (−0.0043
+±0.0022 at T10, +0.0121 ±0.0039 at T20) — extra turns count against the
+horizon (§0m, queued 8c), so an earlier Sieve spends T10's short budget;
+**Tendershoot Dryad 6 → 8** (rendmaw, +0.0027 ±0.0010 / +0.0013 ±0.0018)
+and **Monument to Endurance 6 → 8** (lorehold, +0.0003 / +0.0038 ±0.0019)
+have a gradient in both directions but a bar at one horizon only.
+**§0z8's own case did not survive**: Voice of the Blessed −2 was inside its
+bar at the screen, so Voice over Lurrus stands.
+
+### The joint, on a third seed block
+
+| deck | moves | T10 | T20 |
+|---|---|---|---|
+| karlov | Felidar 7 → 9; Sorin, Solemn Visitor 6 → 8 | **+0.0099 ±0.0023** | **+0.0091 ±0.0031** |
+| tivit | Procession 8 → 10; Bats 8 → 10; Rhystic 9.5 → 7.5; Contract 6.5 → 8.5 | **+0.0225 ±0.0036** | **+0.0211 ±0.0052** |
+
+Tivit's joint is well under the sum of its four singles (+0.034 at T10), and
+that is expected rather than worrying: lowering Rhystic Study and raising the
+two 8s are partly THE SAME reordering, since both put the token engines ahead
+of the draw engine.
+
+### The mechanism, in each deck's own counters
+
+`run_ab`, N=3,000, T20 (`priority_mechanism.txt`). Win route = share of games
+won that way.
+
+- **Felidar Sovereign 7 → 9**: Felidar-route wins **+0.0130** [+0.0077,
+  +0.0183]; combo-route wins −0.0030, damage −0.68, life gained −0.78. The
+  alternate win condition checks more upkeeps. Every proxy falls while the
+  objective rises — §0t's shape again.
+- **Sorin, Solemn Visitor 6 → 8**: life gained +1.36, lifegain triggers
+  +0.12 — the team-lifelink clause fires more. Its +0.002 does not resolve at
+  this N.
+- **Anointed Procession up / Rhystic Study down**: artifacts +8.2 / +10.3,
+  Treasures +4.2 / +4.6, **Revel in Riches wins +0.0077 / +0.0057**, cards
+  drawn −0.34 / −0.36.
+- **Mirkwood Bats 8 → 10**: **drain-route wins +0.0157** [+0.0083, +0.0230],
+  bought at −6.2 artifacts and −3.2 votes because Bats now displaces an engine
+  piece. Net positive.
+- **Tempting Contract 6.5 → 8.5**: nothing resolves at N=3,000. Its confirm
+  row is the most marginal of the six, and **no mechanism is claimed for it**.
+
+**The tivit story is one story**: its numbers ranked card draw above the
+token engines, and the objective wants the reverse. `cards_drawn` falls in
+every tivit move while win rate rises.
+
+### What was NOT done, deliberately
+
+**Nothing is adopted.** Changing a priority in `karlov_v2.py` or
+`tivit_v1.py` moves that deck's baseline, which forces its ablation table to
+be rebuilt (§0z27: a changed baseline has no check but a rebuild), and it
+changes the list every staged swap in those decks was measured against.
+**Anointed Procession is itself a staged card whose priority is one of the
+moves**, so its staged +0.0113 / +0.0145 was measured at a priority now shown
+to be worth ~0.008 less than the better one. That is the owner's call.
 
 ## How to read an ablation table
 
