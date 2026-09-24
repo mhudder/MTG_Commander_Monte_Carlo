@@ -66,3 +66,8 @@ results/.fix_progress
 # run_karlov_fra.py / run_azusa_fra.py stage markers, written by the shell that
 # chains them. Not a result.
 results/.fra_progress
+
+# run_priority_sweep.py's per-game arrays and phase summaries, keyed on each
+# deck's cache fingerprint so a code change cannot be resumed onto. The
+# printed results/priority_*.txt are the artefact; these are its resume state.
+results/.priority_sweep/

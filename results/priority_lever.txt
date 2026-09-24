@@ -1,0 +1,41 @@
+priority sweep, phase `lever`. N=15,000 paired per arm, seeds 1234..16233, horizons (10, 20), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+12 arms across 6 deck(s), plus BASE and NOOP per deck/horizon.
+
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP rendmaw     T10  games changed: 0   OK
+  NOOP rendmaw     T20  games changed: 0   OK
+  NOOP lorehold    T10  games changed: 0   OK
+  NOOP lorehold    T20  games changed: 0   OK
+  NOOP karlov      T10  games changed: 0   OK
+  NOOP karlov      T20  games changed: 0   OK
+  NOOP tivit       T10  games changed: 0   OK
+  NOOP tivit       T20  games changed: 0   OK
+  NOOP shilgengar  T10  games changed: 0   OK
+  NOOP shilgengar  T20  games changed: 0   OK
+  NOOP azusa       T10  games changed: 0   OK
+  NOOP azusa       T20  games changed: 0   OK
+
+== rendmaw   (T10 base won 0.0339, T20 base won 0.1953)
+  flat                                                       T10  -0.0033 +-0.0023 * dmg  -1.89* chg 12850   T20  +0.0031 +-0.0055   dmg  -0.91* chg 13189
+  reversed                                                   T10  -0.0198 +-0.0027 * dmg  -6.86* chg 14575   T20  -0.0279 +-0.0065 * dmg  -5.61* chg 14656
+
+== lorehold   (T10 base won 0.0505, T20 base won 0.2083)
+  flat                                                       T10  -0.0135 +-0.0031 * dmg  -3.54* chg 12138   T20  -0.0147 +-0.0069 * dmg  -2.58* chg 12790
+  reversed                                                   T10  -0.0226 +-0.0034 * dmg  -5.86* chg 13910   T20  -0.0496 +-0.0073 * dmg  -6.04* chg 14197
+
+== karlov   (T10 base won 0.1575, T20 base won 0.3924)
+  flat                                                       T10  -0.0280 +-0.0049 * dmg  -5.72* chg 13815   T20  -0.0173 +-0.0073 * dmg  -4.17* chg 14081
+  reversed                                                   T10  -0.0863 +-0.0058 * dmg -10.99* chg 14557   T20  -0.0626 +-0.0083 * dmg  -7.07* chg 14675
+
+== tivit   (T10 base won 0.1369, T20 base won 0.4072)
+  flat                                                       T10  -0.0447 +-0.0050 * dmg  -6.34* chg 13962   T20  -0.0367 +-0.0077 * dmg  -4.62* chg 14223
+  reversed                                                   T10  -0.0713 +-0.0052 * dmg -12.64* chg 14648   T20  -0.0715 +-0.0081 * dmg  -9.92* chg 14714
+
+== shilgengar   (T10 base won 0.0081, T20 base won 0.2045)
+  flat                                                       T10  -0.0022 +-0.0011 * dmg  -1.38* chg 13368   T20  -0.0213 +-0.0056 * dmg  -2.01* chg 13687
+  reversed                                                   T10  -0.0059 +-0.0014 * dmg  -5.91* chg 14602   T20  -0.0496 +-0.0064 * dmg  -7.04* chg 14694
+
+== azusa   (T10 base won 0.1756, T20 base won 0.4035)
+  flat                                                       T10  -0.0203 +-0.0044 * dmg  -3.34* chg 12160   T20  -0.0310 +-0.0065 * dmg  -3.48* chg 12771
+  reversed                                                   T10  -0.0493 +-0.0050 * dmg  -9.16* chg 14167   T20  -0.0707 +-0.0079 * dmg  -9.68* chg 14357
+
