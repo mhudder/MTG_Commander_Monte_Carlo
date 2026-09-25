@@ -2378,6 +2378,19 @@ sections above.
     Voice 0.016 times a game. Karlov's baseline moves with it; that deck is
     already stale pending the batched rebuild.
 
+0b-i. ~~**Sunbird's one-off decay is still unattributed — but it has stopped.**~~ **CLOSED 2026-09-25 — §0z59**: no single cause; measured at all 22 commits since 2026-09-09, the net −0.0034 ±0.0035 is inside its bar.
+    +0.0215 (2026-09-04) → +0.0146 ±0.0028 (2026-09-06) → +0.0152 ±0.0028
+    (2026-09-09), against Caldera which reproduced every time. Two engines in
+    a row now put it near +0.015, so the drop was a step and not a trend,
+    which narrows the cause without naming it. The obvious mechanism has been
+    ruled out twice: Scroll Rack still ablates to −0.0107 ±0.0032, so the CUT
+    never got more expensive. Worth finding, and **worth NOT guessing at.**
+    §0p, §0w. **AND IT MAY NOT HAVE STOPPED** (2026-09-25, §0z48): the same
+    factorial at HEAD 6a0e786 puts Sunbird's alone at +0.0109 ±0.0029 —
+    before §0z48, which then moved it only to +0.0102. About one bar below
+    the 2026-09-09 figure, unpaired, so marginal; the given-Caldera number
+    the staging rests on is still +0.0150 ±0.0031.
+
 ---
 
 ## HANDOFF.md's status block, as of 2026-09-12 — SUPERSEDED, see `docs/STATUS.md`

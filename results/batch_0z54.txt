@@ -1,0 +1,35 @@
+Second 2026-09-25 batch, N=15,000 paired, seeds 5000.., build_pending() (diagnostics/run_batch_0z54.py;
+the @head arms are the same script run from a worktree at 6b4546e). * = interval excludes zero.
+
+lorehold: everything today (new - HEAD)     T10 +0.0376 +-0.0033*  T20 +0.0803 +-0.0050*  dmgT20 -0.73 +-0.20
+Approach fix (new - old Approach)           T10 +0.0338 +-0.0030*  T20 +0.0667 +-0.0043*  dmgT20 -1.64 +-0.17
+free-cast path (old Approach - HEAD)        T10 +0.0038 +-0.0016*  T20 +0.0135 +-0.0031*  dmgT20 +0.91 +-0.12
+Approach row (card - blank)                 T10 +0.0341 +-0.0030*  T20 +0.0666 +-0.0044*  dmgT20 -1.73 +-0.18
+Dawning Archaic row (card - blank)          T10 +0.0031 +-0.0014*  T20 +0.0089 +-0.0030*  dmgT20 +0.71 +-0.13
+karlov: everything today (new - HEAD)       T10 +0.0044 +-0.0019*  T20 +0.0090 +-0.0034*  dmgT20 +0.89 +-0.18
+Necropotence fix (new - draw2)              T10 +0.0014 +-0.0016   T20 +0.0053 +-0.0028*  dmgT20 +0.17 +-0.16
+Necropotence row (card - blank)             T10 +0.0054 +-0.0017*  T20 +0.0146 +-0.0031*  dmgT20 +0.71 +-0.17
+necro floor 10 vs 20                        T10 +0.0009 +-0.0005*  T20 +0.0023 +-0.0011*  dmgT20 +0.08 +-0.05
+necro floor 30 vs 20                        T10 -0.0017 +-0.0008*  T20 -0.0055 +-0.0016*  dmgT20 -0.36 +-0.09
+necro hand target 5 vs 7                    T10 -0.0047 +-0.0014*  T20 -0.0073 +-0.0023*  dmgT20 -0.46 +-0.12
+Offering fix (new - flat 4)                 T10 +0.0032 +-0.0011*  T20 +0.0035 +-0.0021*  dmgT20 +0.71 +-0.09
+Offering row (card - blank)                 T10 +0.0058 +-0.0015*  T20 +0.0089 +-0.0027*  dmgT20 +1.24 +-0.14
+rendmaw: everything today (new - HEAD)      T10 +0.0041 +-0.0013*  T20 +0.0090 +-0.0025*  dmgT20 +0.67 +-0.14
+Doll nest policy (nest - attack)            T10 +0.0041 +-0.0013*  T20 +0.0090 +-0.0025*  dmgT20 +0.66 +-0.14
+doll_sac_at 2 vs 3                          T10 -0.0009 +-0.0009   T20 -0.0029 +-0.0018*  dmgT20 -0.19 +-0.08
+doll_sac_at 4 vs 3                          T10 +0.0002 +-0.0008   T20 -0.0004 +-0.0016   dmgT20 -0.08 +-0.07
+doll_sac_at 5 vs 3                          T10 -0.0001 +-0.0010   T20 -0.0005 +-0.0018   dmgT20 -0.33 +-0.08
+Twitching Doll row (card - blank)           T10 +0.0045 +-0.0013*  T20 +0.0111 +-0.0027*  dmgT20 +0.92 +-0.15
+
+L {'won': 0.2595, 'damage': 56.1072, 'cards_drawn': 32.0991, 'approach_wins': 0.0917, 'archaic_casts': 0.1522, 'final_life': 5.2013, 'mv_cheated': 31.5572}
+L_oldappr {'won': 0.1927, 'damage': 57.7458, 'cards_drawn': 32.9086, 'archaic_casts': 0.1602, 'final_life': 2.69, 'mv_cheated': 32.6825}
+K {'won': 0.4137, 'damage': 57.4831, 'cards_drawn': 14.1901, 'necro_cards': 1.0576, 'offering_spirits': 0.3924, 'final_life': 36.4809}
+K_oldnecro {'won': 0.4085, 'damage': 57.3106, 'cards_drawn': 14.9834, 'offering_spirits': 0.3954, 'final_life': 35.9388}
+K_floor10 {'won': 0.4161, 'damage': 57.5646, 'cards_drawn': 14.1925, 'necro_cards': 1.1417, 'offering_spirits': 0.3908, 'final_life': 36.5031}
+K_floor30 {'won': 0.4082, 'damage': 57.1268, 'cards_drawn': 14.1735, 'necro_cards': 0.8668, 'offering_spirits': 0.3918, 'final_life': 36.1364}
+K_hand5 {'won': 0.4065, 'damage': 57.0221, 'cards_drawn': 14.1847, 'necro_cards': 0.7579, 'offering_spirits': 0.3964, 'final_life': 35.6778}
+R {'won': 0.2033, 'damage': 47.2935, 'cards_drawn': 15.5499, 'doll_sacrifices': 0.1049, 'doll_spiders': 0.3148, 'final_life': 2.3557}
+R_attack {'won': 0.1943, 'damage': 46.6306, 'cards_drawn': 15.4701, 'doll_sacrifices': 0.0003, 'doll_spiders': 0.001, 'final_life': 2.1649}
+R_sac2 {'won': 0.2004, 'damage': 47.0986, 'cards_drawn': 15.5509, 'doll_sacrifices': 0.1297, 'doll_spiders': 0.2595, 'final_life': 2.294}
+R_sac4 {'won': 0.2029, 'damage': 47.2127, 'cards_drawn': 15.548, 'doll_sacrifices': 0.082, 'doll_spiders': 0.328, 'final_life': 2.3496}
+R_sac5 {'won': 0.2028, 'damage': 46.9597, 'cards_drawn': 15.5542, 'doll_sacrifices': 0.0651, 'doll_spiders': 0.3253, 'final_life': 2.3609}

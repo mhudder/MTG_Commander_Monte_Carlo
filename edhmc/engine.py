@@ -121,6 +121,9 @@ class Permanent:
     # A fresh Permanent is a fresh object: a Class that leaves and comes back
     # is level 1 again. Only Artist's Talent reads it (lorehold, §0z48).
     level: int = 1
+    # NEST counters (Twitching Doll, §0z58). Not `counters`, which are +1/+1
+    # counters and which `power_of` adds -- a nest counter is not a pump.
+    nest: int = 0
 
 
 class Board(list):
@@ -2041,6 +2044,70 @@ def main_phase(g: Game, precombat: bool = False):
             g.graveyard.append(card)
 
 
+def on_mana_tap(g, p: Permanent):
+    """A permanent was just tapped FOR MANA. Called from BOTH of `spend`'s
+    tap paths -- a rule said in one of them and not the other is §0z4's
+    mana-doubler trap. Twitching Doll: "{T}: Add one mana of any color. Put a
+    nest counter on this creature." (§0z58)
+
+    NOT EVERY OWNER IS A PERMANENT: azusa's pool carries `FloatingMana`
+    owners, which have no card. The first version read `p.card` and crashed
+    every azusa game that spent floating mana -- caught by
+    check_unchanged_decks, the gate that runs all six decks."""
+    card = getattr(p, "card", None)
+    if card is not None and card.name == "Twitching Doll":
+        p.nest += 1
+        g.m["doll_nest_counters"] += 1
+
+
+def doll_stays_home(g, p: Permanent) -> bool:
+    """`doll_policy` "nest" (the default): the Doll is a nest, not an
+    attacker. Under "attack" it swings like any creature and grows only when
+    something taps it for mana -- which, measured, was 0.03 counters a game,
+    because mana creatures are tapped last. (§0z58)"""
+    return (p.card.name == "Twitching Doll"
+            and g.cfg.get("doll_policy", "nest") == "nest")
+
+
+def twitching_doll_nest(g):
+    """End of your turn: an untapped, non-sick Doll taps for mana nobody
+    spends, for the counter. It untaps in your untap step, so this costs
+    nothing but the mana it would not have made anyway. (§0z58)"""
+    if g.cfg.get("doll_policy", "nest") != "nest":
+        return
+    for p in g.board:
+        if p.card.name == "Twitching Doll" and not p.tapped and not p.sick:
+            p.tapped = True
+            on_mana_tap(g, p)
+
+
+def twitching_doll_sacrifice(g):
+    """TWITCHING DOLL: "{T}, Sacrifice this creature: Create a 2/2 green
+    Spider creature token with reach for each counter on this creature.
+    Activate only as a sorcery." (§0z58, verified against Scryfall 2026-09-25)
+
+    THE POLICY, said out loud: at the start of your precombat main phase --
+    sorcery speed, and before anything has tapped it for mana -- an untapped,
+    non-sick Doll with at least `doll_sac_at` (3) nest counters is sacrificed.
+    The Spiders go through `make_tokens`, so Primal Vigor and Parallel Lives
+    double them and March of the World Ooze makes each a 6/6. The death is a
+    death, routed the way `opponents.destroy` routes one: the aristocrats see
+    it, the card reaches the graveyard, and artifact recursion is told.
+    """
+    at = g.cfg.get("doll_sac_at", 3)
+    for p in [q for q in g.board if q.card.name == "Twitching Doll"]:
+        if p.tapped or p.sick or p.nest < at or p not in g.board:
+            continue
+        n = p.nest
+        g.board.remove(p)
+        g.on_creature_death(1, p)
+        g.graveyard.append(p.card)
+        g.artifact_died(p.card)
+        g.make_tokens(n, 2, 2, "Spider")
+        g.m["doll_sacrifices"] += 1
+        g.m["doll_spiders"] += n
+
+
 def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
     """Tap the sources that `can_pay` actually assigned.
 
@@ -2070,9 +2137,14 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
     if g.cfg.get("mana_colour_legacy", False):
         owners = None           # the pre-2026-09-11 rule, for §0z8's harness
     if owners is not None and len(owners) == len(units):
+        tapped = []
         for i in pay_idx:
             if i < len(owners) and owners[i] is not None:
                 owners[i].tapped = True
+                if not any(t is owners[i] for t in tapped):
+                    tapped.append(owners[i])
+        for p in tapped:           # once per PERMANENT, not per unit
+            on_mana_tap(g, p)
         return
 
     def tap_cost(p: Permanent) -> tuple:
@@ -2116,6 +2188,7 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
                 and g.has("Nissa, Who Shakes the World")):
             amt += 1
         p.tapped = True
+        on_mana_tap(g, p)
         left -= amt
 
 
@@ -2451,7 +2524,8 @@ def make_everywhere(g: Game):
 
 def combat(g: Game):
     attackers = [p for p in g.board
-                 if is_battlefield_creature(g, p) and not p.tapped and not p.sick]
+                 if is_battlefield_creature(g, p) and not p.tapped and not p.sick
+                 and not doll_stays_home(g, p)]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
@@ -2549,6 +2623,7 @@ def take_turn(g: Game):
         g.draw(1)
 
     play_land(g)
+    twitching_doll_sacrifice(g)     # sorcery speed, before anything taps it
     main_phase(g, precombat=True)   # anthems / pump only
     combat(g)
     activations(g)                  # Skullclamp, Idol, sac outlets
@@ -2557,6 +2632,7 @@ def take_turn(g: Game):
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+    twitching_doll_nest(g)          # after the float metric: it is not spent
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30

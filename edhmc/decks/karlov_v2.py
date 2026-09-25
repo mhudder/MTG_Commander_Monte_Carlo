@@ -160,8 +160,7 @@ ENCHANTMENTS = [
     C("Dawn of Hope", "Enchantment", {"gen": 1, "W": 1}, priority=6.5, threat=6.0),
     C("Ajani's Mantra", "Enchantment", {"gen": 1, "W": 1}, priority=7, threat=4.5),
     C("Blind Obedience", "Enchantment", {"gen": 1, "W": 1}, priority=7.5, threat=6.0),
-    C("Necropotence", "Enchantment", {"B": 3}, priority=8, threat=8.0,
-      script="draw2"),
+    C("Necropotence", "Enchantment", {"B": 3}, priority=8, threat=8.0),
     C("Phyrexian Arena", "Enchantment", {"gen": 1, "B": 2}, priority=7, threat=6.5),
     C("Exquisite Blood", "Enchantment", {"gen": 4, "B": 1}, priority=9.5, threat=9.0),
     C("Sanguine Bond", "Enchantment", {"gen": 3, "B": 2}, priority=9.5, threat=9.0),
@@ -173,7 +172,7 @@ SPELLS = [
     C("Enlightened Tutor", "Instant", {"W": 1}, priority=6),
     C("Anguished Unmaking", "Instant", {"gen": 1, "W": 1, "B": 1}, priority=3),
     C("Benevolent Offering", "Instant", {"gen": 3, "W": 1}, priority=4,
-      lifegain=4),
+      script="benevolent_offering"),
     C("Fracture", "Instant", {"W": 1, "B": 1}, priority=3),
     C("Return to Dust", "Instant", {"gen": 2, "W": 2}, priority=3),
     # {B}{B} as cast; the wrath is its overload cost {2}{W}{W}, not modelled.

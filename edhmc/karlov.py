@@ -176,9 +176,14 @@ class KarlovGame(BaseGame):
             gain_life(self, card.lifegain)
 
     def make_tokens(self, n, p, t, subtype="", tapped=False):
+        # Flying from the generated FLYING_TOKENS, as rendmaw's does. This
+        # method had no caller until Benevolent Offering (§0z56), so the
+        # flag it never set had never mattered.
+        from edhmc.decks._evasion import FLYING_TOKENS
         for _ in range(int(n)):
             tok = Card(name=f"{subtype or 'Token'} token",
-                       types=frozenset({"Creature"}), power=p, toughness=t)
+                       types=frozenset({"Creature"}), power=p, toughness=t,
+                       flying=subtype in FLYING_TOKENS)
             perm = Permanent(card=tok, tapped=tapped, sick=True, is_token=True)
             self.board.append(perm)
             creature_entered(self, mine=True, entering=perm)
@@ -608,6 +613,98 @@ def upkeep(g):
             g.m["win_route"] = 4
 
 
+def necropotence_cards(g) -> int:
+    """How many cards the pilot buys with Necropotence this turn: enough to
+    fill the hand to `necro_hand_target` (7), never paying below
+    `necro_life_floor` (20) life, and never more than the library holds.
+    THE POLICY, and the owner is asked to confirm it (§0z57)."""
+    target = g.cfg.get("necro_hand_target", 7)
+    floor = g.cfg.get("necro_life_floor", 20)
+    return max(0, min(target - len(g.hand), int(g.your_life - floor),
+                      len(g.library)))
+
+
+def necropotence_step(g):
+    """NECROPOTENCE {B}{B}{B}, verified against Scryfall 2026-09-25:
+
+      Skip your draw step.
+      Whenever you discard a card, exile that card from your graveyard.
+      Pay 1 life: Exile the top card of your library face down. Put that
+      card into your hand at the beginning of your next end step.
+
+    It was `script="draw2"` -- two cards once, on resolution, and the draw
+    step kept. Now (§0z57): the draw step is skipped (`take_turn`), and after
+    your last main phase you pay life for cards that reach your hand at the
+    beginning of THIS turn's end step -- too late to cast this turn, which
+    is why the pilot pays here rather than earlier. The amount is
+    `necropotence_cards`. Paying life is a COST, charged whatever
+    `charge_life_costs` says, as Bolas's Citadel's is. The cards are not
+    DRAWN, so Alhammarret's Archive does not double them and `cards_drawn`
+    does not count them. The discard clause is INERT here: this engine has
+    no maximum hand size and no discard outlet.
+    """
+    if not g.has("Necropotence"):
+        return
+    n = necropotence_cards(g)
+    if n <= 0:
+        return
+    for _ in range(n):
+        g.hand.append(g.library.pop())
+    g.your_life -= n
+    g.m["necro_cards"] += n
+    g.m["necro_life_paid"] += n
+
+
+def offering_token_target(g):
+    """THE FIRST OPPONENT CHOICE, a policy said out loud (§0z56): the Spirits
+    go to the LEAST threatening opponent -- three fliers are a gift, and a
+    pilot gives it where it does least harm. None with no one alive."""
+    alive = OPP.living(g)
+    return min(alive, key=lambda o: OPP.opponent_threat(o, g.turn),
+               default=None)
+
+
+def offering_life_target(g):
+    """THE SECOND CHOICE: the opponent with the FEWEST creatures, who gains
+    least. Made when the second sentence resolves -- AFTER the Spirits exist,
+    so the first choice's three can move it. The first version chose both up
+    front; the test written for this card caught it (§0z56)."""
+    alive = OPP.living(g)
+    return min(alive, key=lambda o: (o.creatures,
+                                     OPP.opponent_threat(o, g.turn)),
+               default=None)
+
+
+def benevolent_offering(g):
+    """BENEVOLENT OFFERING {3}{W} Instant, BOTH sentences (it is not modal):
+
+      Choose an opponent. You and that player each create three 1/1 white
+      Spirit creature tokens with flying.
+      Choose an opponent. You gain 2 life for each creature you control and
+      that player gains 2 life for each creature they control.
+
+    It was `lifegain=4` -- a flat 4 life, no tokens, no scaling. The tokens
+    come first, so the lifegain counts them: with nothing else out it is
+    already 6 life, and every Spirit entering is a creature entering for the
+    soul sisters on BOTH sides. The opponent's three are +3 to an abstract
+    board count; their flying is not represented, because opponents' fliers
+    are not (§4). Cast at sorcery speed, like every instant in this engine.
+    """
+    tokens_to = offering_token_target(g)
+    g.make_tokens(3, 1, 1, "Spirit")
+    g.m["offering_spirits"] += 3
+    if tokens_to is not None:
+        tokens_to.creatures += 3
+        for _ in range(3):
+            creature_entered(g, mine=False)
+    mine = sum(1 for p in g.board if is_creature_now(g, p.card))
+    gain_life(g, 2 * mine)
+    g.m["offering_life"] += 2 * mine
+    life_to = offering_life_target(g)
+    if life_to is not None:
+        life_to.life += 2 * life_to.creatures
+
+
 def ranger_of_eos_pick(g) -> list:
     """The pilot's two picks: the highest-`priority` creature cards with mana
     value 1 or less in the library, recomputed at the moment of the search
@@ -1029,6 +1126,8 @@ def resolve(g, card):
         gain_life(g, card.lifegain)
     if card.drain:
         drain(g, card.drain)
+    if card.script == "benevolent_offering":
+        benevolent_offering(g)
     if card.script == "debt":
         # "Each opponent loses two times X life. You gain life equal to the
         # life lost this way." With X=3 that is 6 per opponent, and the life
@@ -1157,10 +1256,14 @@ def take_turn(g):
     if g.result is not None:
         return
     # THE ONE DRAW THAT IS THE DRAW STEP. Alhammarret's Archive explicitly
-    # exempts it, so it is marked rather than inferred.
-    g.in_draw_step = True
-    g.draw(1)
-    g.in_draw_step = False
+    # exempts it, so it is marked rather than inferred. NECROPOTENCE: "Skip
+    # your draw step." (§0z57)
+    if g.has("Necropotence"):
+        g.m["draw_steps_skipped"] += 1
+    else:
+        g.in_draw_step = True
+        g.draw(1)
+        g.in_draw_step = False
     # BEFORE the hand's land drop, so a land on top is played off the top
     # rather than left there blocking the dig. No-ops without the Citadel.
     citadel_land_step(g)
@@ -1180,6 +1283,7 @@ def take_turn(g):
     if g.result is not None:
         return
 
+    necropotence_step(g)
     end_step(g)
     if g.result is not None:
         return

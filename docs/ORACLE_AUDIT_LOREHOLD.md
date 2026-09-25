@@ -23,8 +23,9 @@
 > tracked life since pod v3, so the blocker this block used to cite ("this
 > engine does not track life at all") was out of date -- and the Pegasi fly
 > (`FLYING_TOKENS`). **Radiant Scrollwielder's lifelink CLOSED the same day
-> (§0z50).** Still open: Approach of the Second Sun cannot get its second
-> cast because the card is not put seventh from the top.
+> (§0z50).** **Approach of the Second Sun CLOSED 2026-09-25 (§0z55)**: seventh
+> from the top and 7 life, and the win on a second cast from hand. **The
+> Dawning Archaic's free cast** goes through the whole pipeline (§0z54).
 
 Every nonland card in `edhmc/decks/lorehold_v15.py` checked against Scryfall
 oracle text (fetched 2026-09-03), and the scripted behaviour in

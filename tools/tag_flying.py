@@ -115,6 +115,8 @@ FLYING_TOKENS = {
     "Faerie",   # Bitterblossom: "1/1 black Faerie Rogue ... with flying"
     "Pegasus",  # Storm Herd: "X 1/1 white Pegasus creature tokens with flying"
     "Angel",    # Emeria's Call: "two 4/4 white Angel Warrior ... with flying"
+    "Spirit",   # Benevolent Offering: "three 1/1 white Spirit ... with flying"
+                # (shilgengar's Spirits fly too, set on its own constructor)
 }
 
 

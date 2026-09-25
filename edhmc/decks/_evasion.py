@@ -54,6 +54,7 @@ FLYING_TOKENS = {
     'Bird',
     'Faerie',
     'Pegasus',
+    'Spirit',
 }
 
 # UNCONDITIONAL indestructible, every card type -- two of them are LANDS,

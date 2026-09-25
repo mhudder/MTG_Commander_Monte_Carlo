@@ -54,10 +54,12 @@ Auriok Champion                       +0.68+-0.11         +0.73+-0.13        +0.
 Fountain of Renewal                   +0.63+-0.07         +0.72+-0.11        +0.0061+-0.0023      both
 Orzhov Signet                         +0.74+-0.14         +0.67+-0.17        +0.0084+-0.0030      both
 Voice of the Blessed                  +0.56+-0.06         +0.65+-0.08        +0.0045+-0.0018      both
+Benevolent Offering                   +0.48+-0.08         +0.63+-0.11        +0.0075+-0.0022      both
 Ranger of Eos                         +0.50+-0.09         +0.62+-0.12        +0.0067+-0.0028      both
 Well of Lost Dreams                   +0.30+-0.10         +0.59+-0.15        +0.0154+-0.0031      both
 Syr Konrad, the Grim                  +0.42+-0.05         +0.59+-0.08        +0.0018+-0.0019       dmg
 Pristine Talisman                     +0.48+-0.08         +0.58+-0.11        +0.0061+-0.0025      both
+Necropotence                          +0.24+-0.09         +0.57+-0.15        +0.0076+-0.0029      both
 Sanguine Bond                         +0.65+-0.12         +0.54+-0.17        +0.0256+-0.0034      both
 Ajani's Mantra                        +0.35+-0.06         +0.53+-0.09        +0.0037+-0.0021      both
 Sol Ring                              +0.56+-0.14         +0.50+-0.16        +0.0055+-0.0031      both
@@ -117,8 +119,6 @@ Bloodthirsty Conqueror                -0.83+-0.14         -1.85+-0.21        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Benevolent Offering                   +0.48+-0.08         +0.63+-0.11        +0.0075+-0.0022      both
-Necropotence                          +0.24+-0.09         +0.57+-0.15        +0.0076+-0.0029      both
 Lurrus of the Dream-Den               +0.41+-0.07         +0.52+-0.09        +0.0053+-0.0021      both
 Return to Dust                        +0.24+-0.06         +0.26+-0.09        +0.0034+-0.0019      both
 Sun Titan                             +0.16+-0.04         +0.22+-0.07        +0.0028+-0.0018      both

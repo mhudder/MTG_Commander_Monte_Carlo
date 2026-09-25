@@ -862,7 +862,10 @@ MEASURED: list[Candidate] = [
             '(the opponents\' boards) is an abstract creature count, so the model '
             'half-sees the card this swap removes -- §0z36 says that can err in '
             'either direction. Lorehold\'s baseline moved twice on 2026-09-25 '
-            '(§0z48, §0z49) and these were measured after both.'),
+            '(§0z48, §0z49) and these were measured after both -- BUT BEFORE '
+            '§0z54/§0z55 moved it again by +0.08 the same day (Approach\'s win, '
+            'one free-cast path). STALE -- NOT RESTATED; re-measure before '
+            'staging.'),
         verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
             'Act\'s slot, significant at both horizons, with the cut\'s blind half '
             'said out loud. Staging is the owner\'s call.'),
@@ -2111,7 +2114,11 @@ CHANGES: list[Change] = [
             "Radiant Scrollwielder in this slot WITH its lifelink (§0z50) is "
             "-0.0085 +-0.0034 against Caldera, so the five-drop decision "
             "stands with that clause in. results/lorehold_pair_stormherd.txt, "
-            "results/text_fixes.txt."
+            "results/text_fixes.txt. AND AGAIN AFTER §0z54/§0z55 (one free-cast "
+            "path; Approach's second cast -- lorehold's baseline +0.08): "
+            "Caldera GIVEN Sunbird's +0.0249 +-0.0028 at T20, +0.0056 "
+            "+-0.0015 at T10. Larger, and the decision stands. "
+            "results/lorehold_pair_approach.txt."
         ),
     ),
     Change(
@@ -2185,7 +2192,12 @@ CHANGES: list[Change] = [
             "0b-i). Scroll Rack ablates to -0.0075 +-0.0034 at T20. "
             "results/lorehold_pair_artist.txt. AND AGAIN AFTER §0z49 (Storm "
             "Herd's X): Sunbird's GIVEN Caldera +0.0164 +-0.0029, alone "
-            "+0.0118 +-0.0028. results/lorehold_pair_stormherd.txt."
+            "+0.0118 +-0.0028. results/lorehold_pair_stormherd.txt. AND AGAIN "
+            "AFTER §0z54/§0z55: GIVEN Caldera +0.0170 +-0.0032 at T20 and "
+            "+0.0026 +-0.0017 at T10 -- significant at T10 for the first time. "
+            "The decay queued as 0b-i is closed by §0z59: no single cause, "
+            "net -0.0034 +-0.0035 since 2026-09-09. "
+            "results/lorehold_pair_approach.txt."
         ),
     ),
 ]

@@ -102,6 +102,12 @@ Methodology that used to live at the end of this file is now
 | [0z51](#0z51) | FIXED | **Ranger of Eos tutors two one-drops** instead of drawing two. Row +0.0091 ±0.0033 at T20 (+0.0067 as `draw2`); the difference between the two is inside its bar. SCRIPTED now |
 | [0z52](#0z52) | FIXED | **Lurrus's hybrid pips**, paid and counted: `alt_costs` for {W}{W}/{B}{B}, and `engine.hybrid_pips` makes devotion read {W/B} as white (CR 107.4e). 1.3% of karlov games change; win rate inside its bar. Daxos's devotion toughness is left unimplemented because nothing reads toughness |
 | [0z53](#0z53) | MEASURED | **Goldspan Dragon's head-to-heads** (queued 0c). It loses the Penance slot to Caldera (−0.0108 ±0.0027) and beats both named cuts at T20: **−Blasphemous Act +Goldspan +0.0162 ±0.0044** (significant at both horizons) and −Lightning Greaves +Goldspan +0.0084 ±0.0034. Staging is the owner's call, and the Blasphemous Act cut is a partly-modelled wipe |
+| [0z54](#0z54) | FIXED | **One path for every free cast.** The Dawning Archaic, Invoke Calamity, Goliath's dream casts and Galvanoth each wrote their own subset of `resolve_spell`: an Archaic cast triggered Guttersnipe and nothing else, an Invoke cast from HAND triggered nothing, Galvanoth counted `mv_cheated` twice, Scrollwielder's card went back to the graveyard. `cast_free` is the one path. Worth **+0.0135 ±0.0031** to lorehold at T20; the Archaic's row +0.0006 → +0.0089 |
+| [0z55](#0z55) | FIXED | **Approach of the Second Sun could never be cast twice**, so its win did not exist. Its "otherwise" -- seventh from the top, 7 life -- is in, and a second cast from hand wins, 0.09 games a game. **+0.0667 ±0.0043 at T20**, the largest single correction this project has made to one card; the row goes −0.0003 → +0.0666. A ceiling in one respect, named: the pod does not react to a known win in your library |
+| [0z56](#0z56) | FIXED | **Benevolent Offering does both its sentences** -- three flying Spirits each way, then 2 life per creature -- where it was a flat 4 life. The test caught the first version choosing the lifegain opponent BEFORE the Spirits existed. +0.0035 ±0.0021; row +0.0089 |
+| [0z57](#0z57) | FIXED | **Necropotence** skips the draw step and pays life for cards at the end step, where it was `draw2`. +0.0053 ±0.0028; row +0.0146. The amount is a POLICY put to the owner: a 10-life floor beats the 20 assumed (+0.0023 ±0.0011) |
+| [0z58](#0z58) | FIXED | **Twitching Doll was classified SCRIPTED with neither clause implemented**, and when the nest counters went in they fired 0.03 times a game -- the pilot attacked with it and tapped mana creatures last. Policy `doll_policy="nest"`: it stays home and taps for a counter each turn. +0.0090 ±0.0025; row +0.0023 → +0.0111 |
+| [0z59](#0z59) | MEASURED | **Sunbird's decay (queued 0b-i) has no single cause.** Measured at all 22 commits since 2026-09-09 on the same seeds: −0.0019 at §0z8, −0.0027 at §0z9, +0.0010 at §0z17, −0.0011 at §0z42, +0.0016 at §0z49, each inside or near its bar. Net −0.0034 ±0.0035 at 6b4546e, inside its bar |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7006,6 +7012,169 @@ creature count, "the COST is modelled and the BENEFIT is an estimate" -- so
 this swap removes a card whose upside the model estimates. §0z36 says that
 can err either way. Staging it is the owner's decision, and the ledger records
 it as a Candidate.
+
+## 0z54. FIXED — one path for every free cast
+
+The Dawning Archaic: "Whenever The Dawning Archaic attacks, you may cast
+target instant or sorcery card from your graveyard without paying its mana
+cost. If that spell would be put into your graveyard, exile it instead."
+(Scryfall, verified 2026-09-25.) Its handler was an inlined SUBSET of
+`resolve_spell` -- treasures, Soulfire, tokens, pod damage, Guttersnipe --
+and Goliath Daydreamer's docstring had already named it "§0u's shape sitting
+in this file". Fixing it found three more copies of the same shape:
+
+| path | what it did | what it does now |
+|---|---|---|
+| The Dawning Archaic | a subset; no Longshot, Pyremaw, Mentor, Artist's Talent, Bombardment | `cast_free`, exiled after |
+| Invoke Calamity, from HAND | `apply_spell_effects` as a non-copy: **no cast trigger at all** | `cast_free(from_hand=True)`, exiled |
+| Goliath's dream cast | treated the card as a copy: discards skipped, went nowhere | `cast_free`, then the graveyard |
+| Galvanoth | `mv_cheated` added by hand AND inside `resolve_spell` | `cast_free`, counted once |
+| Radiant Scrollwielder | its "exile it instead" ignored: the card returned to the graveyard | `resolve_spell(exile=True)` |
+
+`cast_free` is `resolve_spell` with `exile` and an explicit `cheated=free_mv`.
+Two policy choices are said out loud: the Archaic does not cast a WIPE off its
+own attack trigger (it would destroy the attackers, itself included), and it
+respects `pilot_may_cast`. Invoke's hand casts are FROM HAND, which Approach and
+Sunbird's Invocation both read.
+
+N=15,000 paired: the path is worth **+0.0038 ±0.0016 / +0.0135 ±0.0031** to
+lorehold's baseline at T10 / T20; the Archaic's row goes +0.0006 → **+0.0089
+±0.0030**. Galvanoth and Scrollwielder are candidates, not in the list.
+`tests/test_free_casts_and_approach.py` pins it.
+
+## 0z55. FIXED — Approach of the Second Sun could never be cast twice
+
+"If this spell was cast from your hand and you've cast another spell named
+Approach of the Second Sun this game, you win the game. Otherwise, put
+Approach of the Second Sun into its owner's library seventh from the top and
+you gain 7 life." The engine counted casts and declared a win at two, and
+had no "otherwise": the card went to the graveyard, so a second cast needed a
+copy, and the win essentially did not exist. `ablation.py` held it BLIND and
+its row was −0.0003.
+
+`approach_resolves`: seventh from the top (the bottom of a shorter library) and
+7 life; a later cast FROM HAND wins. A miracle is cast from hand, and Lorehold
+gives it miracle {2}, so the deck's own engine digs to it and recasts it
+cheaply. A cast copy (Bombardment) counts as a spell named Approach that was
+cast; a copy put on the stack (Double Vision) does not; neither is cast from
+hand.
+
+**Measured**, N=15,000 paired: the fix is **+0.0338 ±0.0030 / +0.0667 ±0.0043**
+at T10 / T20, and the row **+0.0341 / +0.0666 ±0.0044**. Approach wins 0.092
+games a game. That is the largest correction ever made to a single card here,
+bigger than Storm Herd's whole row, and it moves lorehold's win rate from about
+0.19 to 0.26.
+
+**Read it as a CEILING in one respect, named rather than priced.** The pod
+does not know what is in your library. A real table that saw Approach resolve
+knows a win is seven cards away, and holds its counterspell and points its
+attacks accordingly; this pod counters by the spell's `threat` (8.0, already
+near the cap) and targets by board state. No knob covers it. The mechanism is
+otherwise exactly the card's.
+
+## 0z56. FIXED — Benevolent Offering does both its sentences
+
+"Choose an opponent. You and that player each create three 1/1 white Spirit
+creature tokens with flying. Choose an opponent. You gain 2 life for each
+creature you control and that player gains 2 life for each creature they
+control." NOT modal: both happen, the tokens first. It was `lifegain=4`.
+
+`benevolent_offering`: three flying Spirits (Spirit added to the generated
+`FLYING_TOKENS`, verified from this card; karlov's `make_tokens` had never set
+`flying` because nothing had ever called it), +3 to the chosen opponent's
+board, every Spirit a creature entering for the soul sisters on both sides,
+then 2 life per creature you control as ONE event. The two choices are a
+policy: the Spirits go to the least threatening opponent, the lifegain to the
+one with the fewest creatures. **The test caught the first version choosing
+the lifegain opponent before the Spirits existed**: the second choice is made
+when the second sentence resolves, and the first choice's three Spirits can
+change it. The first mutation expectation was rewritten for the corrected
+function before it was re-run.
+
+N=15,000 paired: **+0.0032 ±0.0011 / +0.0035 ±0.0021**; the row goes +0.0075
+→ **+0.0089 ±0.0027**. SCRIPTED now.
+
+## 0z57. FIXED — Necropotence, and a policy the owner is asked to confirm
+
+"Skip your draw step. Whenever you discard a card, exile that card from your
+graveyard. Pay 1 life: Exile the top card of your library face down. Put that
+card into your hand at the beginning of your next end step." It was
+`script="draw2"`: two cards once, and the draw step kept.
+
+`necropotence_step`: the draw step is skipped; after your last main phase you
+pay life for cards that reach your hand at THIS turn's end step, too late to
+cast this turn. The life is always charged (a cost, as Bolas's Citadel's is).
+The cards are not drawn, so Alhammarret's Archive does not double them. The
+discard clause is INERT: this engine has no maximum hand size.
+
+**The amount is a POLICY, and the owner was asked to confirm it:** fill the
+hand to `necro_hand_target` (7), never paying below `necro_life_floor` (20).
+
+| setting | T10 win | T20 win |
+|---|---|---|
+| the fix (new − `draw2`) | +0.0014 ±0.0016 | **+0.0053 ±0.0028** |
+| the card's row (card − blank) | +0.0054 ±0.0017 | **+0.0146 ±0.0031** (table: +0.0076) |
+| floor 10 − floor 20 | +0.0009 ±0.0005 | **+0.0023 ±0.0011** |
+| floor 30 − floor 20 | −0.0017 ±0.0008 | −0.0055 ±0.0016 |
+| hand target 5 − 7 | −0.0047 ±0.0014 | −0.0073 ±0.0023 |
+
+**Lower floors and fuller hands both win more**, which fits the standing finding
+that life decides only 20% of karlov's losses: here life is a resource. The
+defaults stay at 20/7 until the owner answers; 10 is measured better.
+
+## 0z58. FIXED — Twitching Doll was SCRIPTED with neither clause in the engine
+
+"{T}: Add one mana of any color. Put a nest counter on this creature. {T},
+Sacrifice this creature: Create a 2/2 green Spider creature token with reach
+for each counter on this creature. Activate only as a sorcery." It was in
+`SCRIPTED_RENDMAW` -- a claim the engine implemented it -- with neither
+clause anywhere. §0q's label-rot pointed at a card.
+
+`Permanent.nest` (not `counters`, which are +1/+1 and read by `power_of`);
+`on_mana_tap`, called from BOTH of `spend`'s tap paths (§0z4); and
+`twitching_doll_sacrifice`, routed like `opponents.destroy` (the death, the
+graveyard, artifact recursion), Spiders through `make_tokens` so Primal Vigor
+doubles them and March makes them 6/6.
+
+**Then the counters fired 0.03 times a game.** The POLICY made the card a blank
+-- the table in CLAUDE.md, again: combat swung every untapped creature and
+`tap_reluctance` taps mana creatures last, so the Doll attacked and never
+tapped. `doll_policy="nest"`: it stays home and, still untapped at the end of
+your turn, taps for mana nobody spends, for the counter. `"attack"` is the old
+behaviour. **`on_mana_tap` crashed every azusa game** that spent floating mana,
+because azusa's owners include `FloatingMana` objects with no card;
+`check_unchanged_decks`, which runs all six decks, caught it before anything
+was measured on azusa.
+
+N=15,000 paired: nest − attack **+0.0041 ±0.0013 / +0.0090 ±0.0025**; the row
++0.0023 → **+0.0111 ±0.0027**. `doll_sac_at` 3 stays: 2 is worse (−0.0029
+±0.0018), 4 and 5 inside their bars. 0.10 sacrifices and 0.31 Spiders a game.
+
+## 0z59. MEASURED — Sunbird's decay (queued 0b-i): no single cause, and not significant today
+
+§0p/§0w left it "worth finding, and worth NOT guessing at". Measured rather
+than guessed: `diagnostics/run_sunbird_bisect.py` at all 22 commits from
+d158724 (2026-09-09, which reproduces +0.0152 ±0.0028 exactly) to 6b4546e, on
+the same seeds, so each step between commits PAIRS (`results/sunbird_bisect.txt`):
+
+| commit | change | step |
+|---|---|---|
+| 5cdc015 | §0z8, the colour-payment rule ({5}{R}{R} is harder to pay honestly) | −0.0019 ±0.0024 |
+| fe9d4af | §0z9, drain divided by the whole pod | −0.0027 ±0.0029 |
+| 682a1c8 | §0z17, the CRN leak closed | +0.0010 ±0.0025 |
+| ef641ae | §0z42, decking loses | **−0.0011 ±0.0008** |
+| 6b4546e | §0z49, Storm Herd's X | **+0.0016 ±0.0016** |
+| c9e83a1 | the decking reserve swept | +0.0003 ±0.0006 |
+| f5ccbbb | §0z48, Artist's Talent's levels | −0.0007 ±0.0021 |
+| the other 14 | | 0.0000 to the digit |
+
+**No step is the decay.** Two correct engine corrections a day apart account
+for most of it, neither resolvable alone, and later ones move it both ways.
+Net since 2026-09-09: **−0.0034 ±0.0035, inside its bar at today's HEAD.** Paired
+across commits the step bars are barely tighter than a single measurement --
+an engine change reshuffles many games -- which is why the individual steps do
+not resolve. The earlier drop (+0.0215 → +0.0146, 09-04 → 09-06) predates the
+repo's reorganisation and is not covered. Queued item 0b-i is closed.
 
 ## How to read an ablation table
 

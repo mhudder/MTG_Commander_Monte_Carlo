@@ -154,6 +154,12 @@
         "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "fdd8f1e3ee7417cd",
         "utc": "2026-09-25T20:20:15Z"
+      },
+      {
+        "commit": "6b4546e",
+        "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "f0168d0ef3a3249d",
+        "utc": "2026-09-25T21:16:56Z"
       }
     ]
   },
@@ -642,6 +648,12 @@
         "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "c36bc05558c6b657",
         "utc": "2026-09-25T20:20:15Z"
+      },
+      {
+        "commit": "6b4546e",
+        "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "8dd517d5fcc7fd9e",
+        "utc": "2026-09-25T21:16:56Z"
       }
     ]
   },

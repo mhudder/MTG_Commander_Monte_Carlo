@@ -281,9 +281,10 @@ SCRIPTED_LOREHOLD = {
     # X is your life total at resolution since §0z49. It was BLIND while X
     # was a constant 40, written when this engine tracked no life.
     "Storm Herd",
-    # BLIND, despite having engine code — the implementation is not the card:
-    #   Approach of the Second Sun - never gets its second cast, because the
-    #                     card is not put seventh from the top
+    # Its "otherwise" -- seventh from the top, 7 life -- and the win on a
+    # second cast from hand, since §0z55. It was BLIND while the second cast
+    # could not happen.
+    "Approach of the Second Sun",
 }
 
 # Reviewed 2026-09-03 against the oracle audit. Membership here is a claim
@@ -328,9 +329,12 @@ SCRIPTED_KARLOV = {
     "Starscape Cleric", "Enduring Tenacity", "Exemplar of Light",
     # Its ETB tutor since §0z51 (it was "draw 2"): karlov.ranger_of_eos_etb.
     "Ranger of Eos",
-    # MOVED OUT to the blind group 2026-09-03, still approximated:
-    #   Necropotence      - modelled as "draw 2", not skip-draw-step + pay life
-    #   Benevolent Offering - flat 4 life, no per-creature scaling, no tokens
+    # Both were BLIND from 2026-09-03 until their text went in: Necropotence
+    # skips the draw step and pays life for cards at the end step (§0z57 --
+    # the amount is a POLICY, `necro_hand_target` / `necro_life_floor`, and
+    # the owner is asked to confirm it); Benevolent Offering does both its
+    # sentences, three flying Spirits each way and 2 life per creature (§0z56).
+    "Necropotence", "Benevolent Offering",
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -903,7 +907,6 @@ KNOWN_BLIND = {
         'Whip of Erebos',
     },
     "lorehold": {
-        'Approach of the Second Sun',
         'Bolt Bend',
         'Call Forth the Tempest',
         'Chaos Warp',
@@ -924,11 +927,9 @@ KNOWN_BLIND = {
     },
     "karlov": {
         'Anguished Unmaking',
-        'Benevolent Offering',
         'Enlightened Tutor',
         'Fracture',
         'Lurrus of the Dream-Den',
-        'Necropotence',
         'Path to Exile',
         'Phyrexian Reclamation',
         'Return to Dust',

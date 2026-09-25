@@ -1,0 +1,175 @@
+Two staged Lorehold changes, 2x2 factorial on common random numbers.
+N = 30,000 paired games per cell, seeds 5000..34999, all four legs on the same seed.
+Baseline A is lorehold_v16 AS PRINTED -- neither staged change.
+
+  C  = -Penance +Caldera Pyremaw        (staged 2026-09-05)
+  S  = -Scroll Rack +Sunbird's Invocation (staged 2026-09-04)
+
+==============================================================================
+T10
+==============================================================================
+  won   (baseline A = 0.068167)
+    C alone                             +0.005767 +-0.001467   *
+    S alone                             +0.002700 +-0.001646   *
+    BOTH (CS - A)                       +0.008333 +-0.002151   *
+    INTERACTION  CS-C-S+A               -0.000133 +-0.001045    
+    Caldera GIVEN Sunbird's  CS-S       +0.005633 +-0.001535   *
+    Sunbird's GIVEN Caldera  CS-C       +0.002567 +-0.001744   *
+  damage   (baseline A = 35.514)
+    C alone                                +1.572 +-0.120      *
+    S alone                                +0.991 +-0.134      *
+    BOTH (CS - A)                          +2.637 +-0.178      *
+    INTERACTION  CS-C-S+A                  +0.074 +-0.068      *
+    Caldera GIVEN Sunbird's  CS-S          +1.646 +-0.126      *
+    Sunbird's GIVEN Caldera  CS-C          +1.065 +-0.141      *
+  mv_cheated   (baseline A = 17.270)
+    C alone                                +0.107 +-0.095      *
+    S alone                                +1.329 +-0.142      *
+    BOTH (CS - A)                          +1.434 +-0.165      *
+    INTERACTION  CS-C-S+A                  -0.002 +-0.068       
+    Caldera GIVEN Sunbird's  CS-S          +0.105 +-0.106       
+    Sunbird's GIVEN Caldera  CS-C          +1.327 +-0.138      *
+  stranded_mv   (baseline A = 161.720)
+    C alone                                +4.442 +-0.205      *
+    S alone                                +6.257 +-0.242      *
+    BOTH (CS - A)                         +10.993 +-0.317      *
+    INTERACTION  CS-C-S+A                  +0.294 +-0.080      *
+    Caldera GIVEN Sunbird's  CS-S          +4.737 +-0.216      *
+    Sunbird's GIVEN Caldera  CS-C          +6.551 +-0.249      *
+  miracles_cast   (baseline A = 2.197)
+    C alone                                +0.032 +-0.008      *
+    S alone                                +0.041 +-0.009      *
+    BOTH (CS - A)                          +0.065 +-0.012      *
+    INTERACTION  CS-C-S+A                  -0.008 +-0.005      *
+    Caldera GIVEN Sunbird's  CS-S          +0.024 +-0.008      *
+    Sunbird's GIVEN Caldera  CS-C          +0.033 +-0.009      *
+  cards_drawn   (baseline A = 23.298)
+    C alone                                +0.453 +-0.047      *
+    S alone                                +0.705 +-0.057      *
+    BOTH (CS - A)                          +1.189 +-0.073      *
+    INTERACTION  CS-C-S+A                  +0.031 +-0.025      *
+    Caldera GIVEN Sunbird's  CS-S          +0.484 +-0.049      *
+    Sunbird's GIVEN Caldera  CS-C          +0.735 +-0.058      *
+  sunbird_casts   (baseline A = 0.000)
+    C alone                                +0.000 +-0.000       
+    S alone                                +0.208 +-0.011      *
+    BOTH (CS - A)                          +0.215 +-0.011      *
+    INTERACTION  CS-C-S+A                  +0.007 +-0.005      *
+    Caldera GIVEN Sunbird's  CS-S          +0.007 +-0.005      *
+    Sunbird's GIVEN Caldera  CS-C          +0.215 +-0.011      *
+  sunbird_mv   (baseline A = 0.000)
+    C alone                                +0.000 +-0.000       
+    S alone                                +0.852 +-0.047      *
+    BOTH (CS - A)                          +0.879 +-0.047      *
+    INTERACTION  CS-C-S+A                  +0.028 +-0.020      *
+    Caldera GIVEN Sunbird's  CS-S          +0.028 +-0.020      *
+    Sunbird's GIVEN Caldera  CS-C          +0.879 +-0.047      *
+  pyremaw_damage   (baseline A = 0.000)
+    C alone                                +1.057 +-0.086      *
+    S alone                                +0.000 +-0.000       
+    BOTH (CS - A)                          +1.227 +-0.096      *
+    INTERACTION  CS-C-S+A                  +0.169 +-0.068      *
+    Caldera GIVEN Sunbird's  CS-S          +1.227 +-0.096      *
+    Sunbird's GIVEN Caldera  CS-C          +0.169 +-0.068      *
+  turns_played   (baseline A = 9.585)
+    C alone                                +0.010 +-0.003      *
+    S alone                                +0.016 +-0.004      *
+    BOTH (CS - A)                          +0.026 +-0.005      *
+    INTERACTION  CS-C-S+A                  -0.001 +-0.002       
+    Caldera GIVEN Sunbird's  CS-S          +0.009 +-0.003      *
+    Sunbird's GIVEN Caldera  CS-C          +0.015 +-0.004      *
+
+==============================================================================
+T20
+==============================================================================
+  won   (baseline A = 0.221567)
+    C alone                             +0.021233 +-0.002615   *
+    S alone                             +0.013367 +-0.003071   *
+    BOTH (CS - A)                       +0.038267 +-0.003875   *
+    INTERACTION  CS-C-S+A               +0.003667 +-0.002221   *
+    Caldera GIVEN Sunbird's  CS-S       +0.024900 +-0.002829   *
+    Sunbird's GIVEN Caldera  CS-C       +0.017033 +-0.003217   *
+  damage   (baseline A = 51.534)
+    C alone                                +2.706 +-0.160      *
+    S alone                                +1.722 +-0.172      *
+    BOTH (CS - A)                          +4.639 +-0.232      *
+    INTERACTION  CS-C-S+A                  +0.210 +-0.097      *
+    Caldera GIVEN Sunbird's  CS-S          +2.917 +-0.168      *
+    Sunbird's GIVEN Caldera  CS-C          +1.932 +-0.181      *
+  mv_cheated   (baseline A = 28.094)
+    C alone                                +0.355 +-0.170      *
+    S alone                                +3.251 +-0.242      *
+    BOTH (CS - A)                          +3.487 +-0.280      *
+    INTERACTION  CS-C-S+A                  -0.119 +-0.143       
+    Caldera GIVEN Sunbird's  CS-S          +0.236 +-0.195      *
+    Sunbird's GIVEN Caldera  CS-C          +3.132 +-0.237      *
+  stranded_mv   (baseline A = 180.715)
+    C alone                                +5.387 +-0.317      *
+    S alone                                +8.248 +-0.385      *
+    BOTH (CS - A)                         +14.220 +-0.500      *
+    INTERACTION  CS-C-S+A                  +0.585 +-0.198      *
+    Caldera GIVEN Sunbird's  CS-S          +5.972 +-0.351      *
+    Sunbird's GIVEN Caldera  CS-C          +8.833 +-0.404      *
+  miracles_cast   (baseline A = 3.069)
+    C alone                                +0.037 +-0.012      *
+    S alone                                +0.061 +-0.014      *
+    BOTH (CS - A)                          +0.079 +-0.018      *
+    INTERACTION  CS-C-S+A                  -0.019 +-0.008      *
+    Caldera GIVEN Sunbird's  CS-S          +0.019 +-0.013      *
+    Sunbird's GIVEN Caldera  CS-C          +0.042 +-0.014      *
+  cards_drawn   (baseline A = 30.225)
+    C alone                                +0.677 +-0.075      *
+    S alone                                +1.175 +-0.092      *
+    BOTH (CS - A)                          +1.910 +-0.115      *
+    INTERACTION  CS-C-S+A                  +0.058 +-0.048      *
+    Caldera GIVEN Sunbird's  CS-S          +0.735 +-0.080      *
+    Sunbird's GIVEN Caldera  CS-C          +1.232 +-0.093      *
+  sunbird_casts   (baseline A = 0.000)
+    C alone                                +0.000 +-0.000       
+    S alone                                +0.486 +-0.019      *
+    BOTH (CS - A)                          +0.498 +-0.019      *
+    INTERACTION  CS-C-S+A                  +0.013 +-0.009      *
+    Caldera GIVEN Sunbird's  CS-S          +0.013 +-0.009      *
+    Sunbird's GIVEN Caldera  CS-C          +0.498 +-0.019      *
+  sunbird_mv   (baseline A = 0.000)
+    C alone                                +0.000 +-0.000       
+    S alone                                +1.982 +-0.080      *
+    BOTH (CS - A)                          +2.032 +-0.079      *
+    INTERACTION  CS-C-S+A                  +0.049 +-0.039      *
+    Caldera GIVEN Sunbird's  CS-S          +0.049 +-0.039      *
+    Sunbird's GIVEN Caldera  CS-C          +2.032 +-0.079      *
+  pyremaw_damage   (baseline A = 0.000)
+    C alone                                +2.046 +-0.117      *
+    S alone                                +0.000 +-0.000       
+    BOTH (CS - A)                          +2.446 +-0.134      *
+    INTERACTION  CS-C-S+A                  +0.400 +-0.109      *
+    Caldera GIVEN Sunbird's  CS-S          +2.446 +-0.134      *
+    Sunbird's GIVEN Caldera  CS-C          +0.400 +-0.109      *
+  turns_played   (baseline A = 12.129)
+    C alone                                -0.009 +-0.013       
+    S alone                                +0.029 +-0.015      *
+    BOTH (CS - A)                          +0.011 +-0.019       
+    INTERACTION  CS-C-S+A                  -0.009 +-0.008      *
+    Caldera GIVEN Sunbird's  CS-S          -0.018 +-0.014      *
+    Sunbird's GIVEN Caldera  CS-C          +0.020 +-0.015      *
+
+* = 95% CI excludes zero. Win rate is the objective; damage and mv_cheated are proxies,
+and this deck's own standing finding is that mv_cheated and win rate have pointed in
+opposite directions for the top-setter cards THAT THESE TWO CHANGES CUT. Follow win rate.
+
+==============================================================================
+PART 2 -- what the CUT TARGETS are worth, v16 as printed, N = 15,000
+==============================================================================
+  Real minus blank, so POSITIVE means the card is worth that much and
+  cutting it costs that much. Same blank as ablation.py, so this is on
+  the tables' scale.
+  For reference, the 2026-09-04 table had Scroll Rack at -0.0100 win /
+  -1.78 damage, which is what made it 'the deck's worst
+  model-evaluated non-wipe card' and therefore the cut.
+
+  card               T             win rate           damage    settop placed   settop miracled
+  Scroll Rack       10     -0.0016+-0.0019      -0.53+-0.16*     +0.28+-0.02*      +0.07+-0.01*
+  Scroll Rack       20     -0.0101+-0.0036*     -1.11+-0.20*     +0.36+-0.02*      +0.10+-0.01*
+  Penance           10     -0.0005+-0.0021      -0.66+-0.16*     +0.34+-0.02*      +0.08+-0.01*
+  Penance           20     -0.0098+-0.0036*     -1.33+-0.21*     +0.48+-0.02*      +0.13+-0.01*
+

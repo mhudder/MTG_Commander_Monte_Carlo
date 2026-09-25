@@ -153,6 +153,8 @@ python -m tests.test_flip_signal --mutate          # 3 mutations, exact sets
 python -m tests.test_artists_talent --mutate       # 6 mutations, exact sets
 python -m tests.test_march_elephant --mutate       # 4 mutations, exact sets
 python -m tests.test_text_fixes --mutate           # 9 mutations, exact sets
+python -m tests.test_free_casts_and_approach --mutate # 6 mutations, exact sets
+python -m tests.test_offering_necro_doll --mutate  # 7 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -221,6 +223,7 @@ asserting a card does nothing:
 | Shilgengar's main phase spent every point of mana | an after-combat ability is never affordable | 0.008 |
 | combat sent the whole swing at one player | going wider than one opponent's life is worthless | 0.063 (azusa) |
 | once decking could lose, the pilot still drew every card it was offered | a draw engine kills you in exactly the games it is winning | 0.022 (azusa), caught before it shipped (§0z42) |
+| every untapped creature attacked, and mana creatures were tapped last | Twitching Doll's nest counters never accrue (0.03 a game) | 0.009 (rendmaw, §0z58) |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a
@@ -743,8 +746,9 @@ for itself when items closed before 2026-09-07 were moved there. Each names the
 
 **Item 17 is closed** (§0z42: decking loses, and the pilot knows it) and
 moved to `docs/HISTORY.md`; so is item 21, whose card is now committed; and so
-are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47) and 8b
-(Voice of the Blessed, §0z46), closed 2026-09-25. **Item 18
+are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47), 8b
+(Voice of the Blessed, §0z46) and 0b-i (Sunbird's decay, §0z59), closed
+2026-09-25. **Item 18
 is half answered**: the ordering half is built and measured as a null
 (§0z43), which leaves the `priority` numbers as the whole of it.
 
@@ -892,25 +896,14 @@ is half answered**: the ordering half is built and measured as a null
     measured on the old priorities and says so in its Change. Not adopted
     and worth a look: Time Sieve's move flips sign between horizons.
 
-0b-i. **Sunbird's one-off decay is still unattributed — but it has stopped.**
-    +0.0215 (2026-09-04) → +0.0146 ±0.0028 (2026-09-06) → +0.0152 ±0.0028
-    (2026-09-09), against Caldera which reproduced every time. Two engines in
-    a row now put it near +0.015, so the drop was a step and not a trend,
-    which narrows the cause without naming it. The obvious mechanism has been
-    ruled out twice: Scroll Rack still ablates to −0.0107 ±0.0032, so the CUT
-    never got more expensive. Worth finding, and **worth NOT guessing at.**
-    §0p, §0w. **AND IT MAY NOT HAVE STOPPED** (2026-09-25, §0z48): the same
-    factorial at HEAD 6a0e786 puts Sunbird's alone at +0.0109 ±0.0029 —
-    before §0z48, which then moved it only to +0.0102. About one bar below
-    the 2026-09-09 figure, unpaired, so marginal; the given-Caldera number
-    the staging rests on is still +0.0150 ±0.0031.
-
 0c. **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
     call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
     both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
     significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
     T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
-    estimate, so that swap cuts a card the model half-sees.
+    estimate, so that swap cuts a card the model half-sees. **Measured before
+    §0z54/§0z55 moved lorehold's baseline by +0.08** -- re-measure before
+    staging.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

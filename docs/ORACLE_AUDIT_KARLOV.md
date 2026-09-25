@@ -15,8 +15,8 @@
 > |---|---|
 > | Ranger of Eos tutoring two one-drops | **FIXED** — `karlov.ranger_of_eos_etb` (`KNOWN_ISSUES.md` §0z51) |
 > | Lurrus's hybrid pips | **FIXED** — `alt_costs`, and devotion reads hybrid pips (§0z52) |
-> | Necropotence modelled as `draw2` | open — the real card is a skip-the-draw-step + pay-life policy |
-> | Benevolent Offering's Spirit tokens and per-creature scaling | open — a flat 4 life |
+> | Necropotence modelled as `draw2` | **FIXED** — skips the draw step and pays life for cards at the end step (§0z57); the amount is a policy, `necro_hand_target` / `necro_life_floor`, put to the owner |
+> | Benevolent Offering's Spirit tokens and per-creature scaling | **FIXED** — both sentences, three flying Spirits each way, 2 life per creature (§0z56) |
 > | Karlov's own six-counter exile ability | open, and MODEL-BLIND by design: opponents' creatures are a number |
 > | Daxos's toughness fixed at 4 rather than tracking devotion | open and **INERT**: nothing in `karlov.py` or `opponents.py` reads toughness, so implementing it would move no number. If something ever does read it, this becomes live. |
 >

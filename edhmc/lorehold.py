@@ -134,6 +134,7 @@ class LoreholdGame(BaseGame):
             "spell_damage": 0.0,
             "combat_damage": 0.0,
             "approach_casts": 0,
+            "approach_returned": 0, "approach_wins": 0,   # §0z55
             "storm_herd_pegasi": 0,          # §0z49: X is your life now
             "extra_turns": 0,
             "turn_won": 99,
@@ -984,7 +985,10 @@ def radiant_scrollwielder(g):
     paid = pay(g, cost, units)
     g.m["upkeep_free_casts"] += 1
     g.m["scrollwielder_casts"] += 1
-    resolve_spell(g, picked, paid, from_hand=False)
+    # "If a spell cast this way would be put into your graveyard, exile it
+    # instead." It went BACK to the graveyard until §0z54, where the next
+    # upkeep could pick it again.
+    resolve_spell(g, picked, paid, from_hand=False, exile=True)
 
 
 def storm_herd_x(g) -> int:
@@ -1002,7 +1006,39 @@ def storm_herd_x(g) -> int:
     return max(0, int(g.your_life))
 
 
-def apply_spell_effects(g, card, is_copy=False, was_cast=True):
+def approach_resolves(g, card, is_copy, was_cast, from_hand):
+    """APPROACH OF THE SECOND SUN: "If this spell was cast from your hand and
+    you've cast another spell named Approach of the Second Sun this game, you
+    win the game. Otherwise, put Approach of the Second Sun into its owner's
+    library seventh from the top and you gain 7 life." (§0z55)
+
+    Until §0z55 the "otherwise" half did not exist, so the card went to the
+    graveyard and could never be cast twice -- the win was unreachable except
+    through a copy. Now the first resolution puts it SEVENTH FROM THE TOP
+    (with fewer than seven cards, at the bottom) and gains 7 life, and a
+    later cast FROM HAND wins. A miracle is cast from hand, so Lorehold can
+    miracle it back. A cast COPY (Bombardment, Mastery) counts as a spell
+    named Approach that was cast, but is never "cast from your hand"; a copy
+    put on the stack (Double Vision) is not cast at all. Either copy's
+    "otherwise" gains the life and moves nothing -- a copy is not a card.
+    """
+    prior = g.m["approach_casts"]
+    if was_cast:
+        g.m["approach_casts"] += 1
+    if not is_copy and from_hand and prior >= 1:
+        if g.m["turn_won"] == 99:
+            g.m["turn_won"] = g.turn
+            g.m["approach_wins"] += 1
+        g.result = "win"
+        return
+    g.your_life += 7
+    if not is_copy:
+        g.library.insert(max(0, len(g.library) - 6), card)
+        g.m["approach_returned"] += 1
+
+
+def apply_spell_effects(g, card, is_copy=False, was_cast=True,
+                        from_hand=False):
     """The on-resolution half of a spell: damage, tokens, treasures, draw."""
     sc = card.script
     if sc in ("treasures", "draw2_treasure"):
@@ -1098,11 +1134,9 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
     elif sc == "extra_turn":
         _draw_into_hand(g, 4)
         g.m["extra_turns"] += 1
-    elif sc == "approach" and not is_copy:
-        g.m["approach_casts"] += 1
-        if g.m["approach_casts"] >= 2 and g.m["turn_won"] == 99:
-            g.m["turn_won"] = g.turn
-            g.result = "win"
+    elif sc == "approach":
+        approach_resolves(g, card, is_copy=is_copy, was_cast=was_cast,
+                          from_hand=from_hand)
     elif sc == "tutor" and not is_copy:
         # Enlightened Tutor: find an artifact or enchantment and put it ON TOP
         # of the library, not into hand. In this deck that also consumes the
@@ -1465,16 +1499,40 @@ def sunbird(g, card):
     resolve_spell(g, pick, 0, from_hand=False)
 
 
-def resolve_spell(g, card, paid, from_hand=True):
+def cast_free(g, card, exile=False, from_hand=False):
+    """Cast `card` WITHOUT PAYING ITS MANA COST, through the whole pipeline.
+
+    ONE path for every "you may cast ... without paying its mana cost" in this
+    engine (§0z54): The Dawning Archaic, Invoke Calamity, Goliath Daydreamer's
+    dream casts, Galvanoth. Each of them used to write out its own subset of
+    `resolve_spell` -- the Archaic handled treasures, soulfire, tokens, pod
+    damage and Guttersnipe and dropped everything else, so a spell it cast
+    triggered no Longshot, Pyremaw, Mentor, Artist's Talent or Bombardment;
+    Invoke's casts from HAND triggered nothing at all -- §0u's shape, four
+    times in one file. A genuinely cast spell is a spell cast, however it was
+    paid for.
+
+    `exile`: "If that spell would be put into your graveyard, exile it
+    instead" (the Archaic, Invoke, Radiant Scrollwielder). `mv_cheated` is the
+    card's `free_mv` -- X is 0 when a cost is not paid. `from_hand`: Invoke
+    Calamity can cast from HAND, and a free cast from hand is still cast from
+    hand -- Approach of the Second Sun and Sunbird's Invocation both read it.
+    """
+    resolve_spell(g, card, 0, from_hand=from_hand, exile=exile,
+                  cheated=card.free_mv)
+
+
+def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
     g.last_paid = paid
     g.m["spells_cast"] += 1
-    g.m["total_mv_cast"] += card.mv
-    g.m["mv_cheated"] += max(0.0, card.mv - paid)
+    g.m["total_mv_cast"] += card.mv if cheated is None else card.free_mv
+    g.m["mv_cheated"] += (max(0.0, card.mv - paid) if cheated is None
+                          else cheated)
     if card.name in g.cfg.get("watch", ()):
         g.m["cast_test_card"] = 1
         g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
 
-    apply_spell_effects(g, card)
+    apply_spell_effects(g, card, from_hand=from_hand)
 
     on_cast_triggers(g, card)
 
@@ -1508,6 +1566,10 @@ def resolve_spell(g, card, paid, from_hand=True):
             g.m["stingcaster_casts"] += g.m["flashback_casts"] - before
     elif card.script in SELF_EXILING and g.cfg.get("lorehold_recursion", True):
         pass                       # "Exile <self>." Not in the graveyard.
+    elif card.script == "approach":
+        pass        # it placed itself in the library, or the game is over
+    elif exile and ("Instant" in card.types or "Sorcery" in card.types):
+        g.m["free_cast_exiled"] += 1   # "... exile it instead" (cast_free)
     elif (from_hand and g.cfg.get("lorehold_recursion", True)
           and g.has("Goliath Daydreamer")
           and ("Instant" in card.types or "Sorcery" in card.types)):
@@ -1625,12 +1687,11 @@ def invoke_calamity(g, self_card=None):
         g.m["invoke_free_casts"] += 1
         g.m["invoke_mv"] += card.free_mv
         g.m["free_casts"] += 1
-        g.m["mv_cheated"] += card.free_mv
-        g.m["total_mv_cast"] += card.free_mv
-        g.m["spells_cast"] += 1
-        apply_spell_effects(g, card, is_copy=(zone == "graveyard"))
         # "If those spells would be put into your graveyard, exile them
-        # instead" -- so they are gone, not recycled.
+        # instead" -- so they are gone, not recycled. Through `cast_free`
+        # since §0z54: a spell cast from HAND this way used to trigger
+        # nothing (it went through `apply_spell_effects` as a non-copy).
+        cast_free(g, card, exile=True, from_hand=(zone == "hand"))
 
 
 def volcanic_vision(g):
@@ -1665,6 +1726,35 @@ def volcanic_vision(g):
     g.m["vision_mv"] += best.free_mv
 
 
+def dawning_archaic_pick(g):
+    """The Archaic's target: the biggest instant or sorcery in the graveyard
+    by `free_mv` -- with two policy exclusions, said out loud. NOT A WIPE:
+    casting Blasphemous Act or Farewell off an attack trigger destroys your
+    own attackers, the Archaic among them, before they deal damage; the old
+    inlined subset could not cast a wipe at all, so this keeps a choice it
+    never had to make. And not a spell whose draws would deck you
+    (`pilot_may_cast`), because the cast is a "may"."""
+    pool = [c for c in g.graveyard
+            if ("Instant" in c.types or "Sorcery" in c.types)
+            and "wipe" not in c.tags and pilot_may_cast(g, c)]
+    return max(pool, key=lambda c: c.free_mv, default=None)
+
+
+def dawning_archaic_attack(g):
+    """THE DAWNING ARCHAIC: "Whenever The Dawning Archaic attacks, you may cast
+    target instant or sorcery card from your graveyard without paying its mana
+    cost. If that spell would be put into your graveyard, exile it instead."
+    Through `cast_free` since §0z54, so the spell does everything it does
+    when cast from hand, and is exiled afterwards."""
+    best = dawning_archaic_pick(g)
+    if best is None:
+        return
+    g.graveyard.remove(best)
+    g.m["free_casts"] += 1
+    g.m["archaic_casts"] += 1
+    cast_free(g, best, exile=True)
+
+
 def goliath_attack(g):
     """Goliath Daydreamer's second ability, on attack.
 
@@ -1672,12 +1762,11 @@ def goliath_attack(g):
         you own in exile with dream counters on them without paying its mana
         cost.
 
-    Cast through `apply_spell_effects`, which is the shared resolution path --
-    NOT the hand-inlined subset `The Dawning Archaic` uses six lines above its
-    call site. That subset handles treasures, soulfire, tokens, pod damage and
-    Guttersnipe and silently drops everything else, which is §0u's shape
-    sitting in this file already; a second copy of it is not the way to add a
-    card.
+    Cast through `cast_free` since §0z54 -- the whole pipeline. It used
+    `apply_spell_effects(is_copy=True)`, which fired the cast triggers but
+    treated a real card as a copy: its discards were skipped and it went
+    nowhere afterwards. Cast from exile, not from hand, so Goliath's own
+    first ability does not re-exile it; it goes to the graveyard.
     """
     if not g.cfg.get("lorehold_recursion", True) or not g.dream_exile:
         return
@@ -1685,10 +1774,7 @@ def goliath_attack(g):
     g.dream_exile.remove(best)
     g.m["dream_free_casts"] += 1
     g.m["free_casts"] += 1
-    g.m["mv_cheated"] += best.free_mv
-    g.m["total_mv_cast"] += best.free_mv
-    g.m["spells_cast"] += 1
-    apply_spell_effects(g, best, is_copy=True)
+    cast_free(g, best)
 
 
 def underworld_breach(g):
@@ -1862,28 +1948,7 @@ def combat(g):
 
     # The Dawning Archaic: on attack, cast a free instant/sorcery from the yard
     if any(p.card.name == "The Dawning Archaic" for p in attackers):
-        pool = [c for c in g.graveyard
-                if "Instant" in c.types or "Sorcery" in c.types]
-        if pool:
-            best = max(pool, key=lambda c: c.free_mv)
-            g.graveyard.remove(best)
-            g.m["free_casts"] += 1
-            g.m["mv_cheated"] += best.free_mv
-            g.m["total_mv_cast"] += best.free_mv
-            g.m["spells_cast"] += 1
-            if best.script == "treasures":
-                g.treasures += best.treasures
-            if best.script == "soulfire":
-                for _ in range(3):
-                    if g.library:
-                        deal_pod_damage(g, float(g.library.pop().mv), hits=1,
-                                spell=True)
-            if best.tokens:
-                make_tokens(g, *best.tokens)
-            deal_pod_damage(g, best.pod_damage, hits=1, spell=True)
-            n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
-            deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe,
-                        spell=False)
+        dawning_archaic_attack(g)
 
     if any(p.card.name == "Goliath Daydreamer" for p in attackers):
         goliath_attack(g)
@@ -2074,8 +2139,9 @@ def take_turn(g):
         if "Instant" in top.types or "Sorcery" in top.types:
             g.library.pop()
             g.m["upkeep_free_casts"] += 1
-            g.m["mv_cheated"] += top.free_mv
-            resolve_spell(g, top, 0, from_hand=False)
+            # `mv_cheated` was added here AND again inside resolve_spell --
+            # a double count in this deck's primary proxy until §0z54.
+            cast_free(g, top)
 
     radiant_scrollwielder(g)
 

@@ -32,9 +32,11 @@
 > `opponents.flying_of` and `flier_block_share`, with the goaded Birds counted
 > as catchers), and **Bitterblossom's 1 life per Faerie IS charged** (§0z7,
 > behind `charge_life_costs`), its Faeries flying via `FLYING_TOKENS`. Still
-> open: Twitching Doll's sacrifice-for-Spiders; Rendmaw's own **reach and
+> open: Rendmaw's own **reach and
 > menace** (Scryfall keywords, verified 2026-09-25) -- menace needs a term in
-> the blocking model, which no card in any deck has yet.
+> the blocking model, which no card in any deck has yet. **Twitching Doll's
+> nest counters and sacrifice CLOSED 2026-09-25 (§0z58)** -- it had been
+> classified SCRIPTED while neither clause existed.
 
 Every nonland card in `edhmc/decks/rendmaw_v11.py` checked against Scryfall
 oracle text (fetched 2026-09-03), and the scripted behaviour in
