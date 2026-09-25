@@ -148,6 +148,8 @@ python -m tests.test_pending_cuts --mutate          # 4 mutations, exact sets
 python -m tests.test_monarch --mutate               # 4 mutations, exact sets
 python -m tests.test_decking --mutate               # 5 mutations, exact sets
 python -m tests.test_cast_lookahead --mutate        # 4 mutations, exact sets
+python -m tests.test_voice_of_the_blessed --mutate # 3 mutations, exact sets
+python -m tests.test_flip_signal --mutate          # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -643,7 +645,9 @@ against a blank in the same list, so a partial tag list biases the whole table
 toward whatever got tagged. It is worse than no tags at all.
 
 **Report ablation output with error bars and a signal classification**
-(`both` / `dmg` / `win` / `--`). Never point estimates alone.
+(`both` / `dmg` / `win` / `--` / `FLIP`). Never point estimates alone.
+`FLIP` means damage is significant at EVERY horizon and changes sign between
+them; it never overrides `--` on a row whose damage is noise (§0z24).
 
 **Say the knob out loud** when a card's evaluation swings on one:
 `destroy_share` (0.60), `opp_vote_policy` (`"adversarial"`),
@@ -908,11 +912,11 @@ is half answered**: the ordering half is built and measured as a null
     card whose evaluation swings on that knob must be reported with it said
     out loud.
 
-8b. **Voice of the Blessed's indestructible at ten +1/+1 counters is not
-    modelled**, and ten is reachable in the Karlov list. Its flying at four
-    counters is already in `opponents.flying_of()`, which is where the rest
-    belongs. Deliberately excluded from the generated `INDESTRUCTIBLE` set,
-    because a static tag there would be a lie. §0n.
+8b. **CLOSED 2026-09-25 (§0z46): Voice of the Blessed is indestructible at
+    ten counters**, in `opponents.indestructible_of()` beside `flying_of()`,
+    and still kept out of the generated `INDESTRUCTIBLE` set (§0n). It saves
+    Voice 0.016 times a game. Karlov's baseline moves with it; that deck is
+    already stale pending the batched rebuild.
 
 8c. **Time Sieve eats only TOKEN artifacts**, never Sol Ring, the signets or
     the artifact lands, all of which are legal fuel. Conservative and

@@ -11,6 +11,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job

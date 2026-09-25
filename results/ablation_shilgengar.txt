@@ -11,6 +11,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job
@@ -59,7 +63,7 @@ Black Market Connections              +0.37+-0.08         +0.22+-0.15        +0.
 Dark Prophecy                         +0.07+-0.03         +0.10+-0.08        +0.0015+-0.0019       dmg
 Pitiless Plunderer                    +0.01+-0.04         +0.02+-0.08        +0.0010+-0.0017        --
 Blood Artist                          -0.16+-0.04         -0.00+-0.07        +0.0007+-0.0016        --
-Cartel Aristocrat                     +0.07+-0.02         -0.01+-0.05        +0.0000+-0.0012      FLIP
+Cartel Aristocrat                     +0.07+-0.02         -0.01+-0.05        +0.0000+-0.0012        --
 Viscera Seer                          -0.09+-0.03         -0.13+-0.05        -0.0011+-0.0009      both
 Skullclamp                            -0.03+-0.03         -0.14+-0.06        -0.0002+-0.0013       dmg
 Vampiric Rites                        -0.06+-0.02         -0.14+-0.06        -0.0014+-0.0011      both

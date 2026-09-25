@@ -11,6 +11,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job
@@ -49,11 +53,11 @@ Myr Retriever                         +0.08+-0.03         +0.20+-0.06        +0.
 Roaming Throne                        +0.28+-0.06         +0.17+-0.10        +0.0063+-0.0024      both
 Palladium Myr                         +0.20+-0.07         +0.15+-0.09        +0.0020+-0.0020      both
 Metallic Mimic                        +0.24+-0.06         +0.14+-0.08        +0.0019+-0.0019      both
-Idol of Oblivion                      -0.03+-0.06         +0.10+-0.09        +0.0043+-0.0021      FLIP
+Idol of Oblivion                      -0.03+-0.06         +0.10+-0.09        +0.0043+-0.0021      both
 Enduring Vitality                     +0.07+-0.07         +0.07+-0.10        +0.0007+-0.0021        --
-Primal Vigor                          -0.03+-0.05         +0.06+-0.09        +0.0075+-0.0022      FLIP
+Primal Vigor                          -0.03+-0.05         +0.06+-0.09        +0.0075+-0.0022       win
 Dryad of the Ilysian Grove            +0.06+-0.06         +0.06+-0.10        +0.0039+-0.0022       win
-Deathreap Ritual                      -0.00+-0.02         +0.01+-0.04        +0.0005+-0.0009      FLIP
+Deathreap Ritual                      -0.00+-0.02         +0.01+-0.04        +0.0005+-0.0009        --
 Leaden Myr                            -0.01+-0.06         -0.05+-0.08        +0.0031+-0.0018       win
 Copper Myr                            -0.06+-0.06         -0.06+-0.08        +0.0013+-0.0017        --
 Ashnod's Altar                        -0.02+-0.02         -0.08+-0.04        -0.0012+-0.0012      both
@@ -107,8 +111,8 @@ Reap                                  +0.08+-0.03         +0.12+-0.05        +0.
 Assassin's Trophy                     +0.08+-0.03         +0.10+-0.04        -0.0001+-0.0010       dmg
 Haywire Mite                          +0.12+-0.03         +0.09+-0.05        +0.0032+-0.0013      both
 Lignify                               +0.12+-0.04         +0.08+-0.06        +0.0019+-0.0014      both
-Overwhelming Stampede                 -0.04+-0.08         +0.05+-0.11        +0.0008+-0.0024      FLIP
+Overwhelming Stampede                 -0.04+-0.08         +0.05+-0.11        +0.0008+-0.0024        --
 Pygmy Kavu                            +0.05+-0.03         +0.00+-0.05        -0.0004+-0.0013        --
-Biotransference                       +0.02+-0.02         -0.01+-0.05        +0.0005+-0.0010      FLIP
+Biotransference                       +0.02+-0.02         -0.01+-0.05        +0.0005+-0.0010        --
 Sakura-Tribe Elder                    -0.04+-0.03         -0.01+-0.04        +0.0004+-0.0008        --
-Shigeki, Jukai Visionary              +0.04+-0.02         -0.04+-0.04        +0.0007+-0.0010      FLIP
+Shigeki, Jukai Visionary              +0.04+-0.02         -0.04+-0.04        +0.0007+-0.0010        --

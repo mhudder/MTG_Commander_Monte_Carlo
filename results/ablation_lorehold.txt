@@ -11,6 +11,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job
@@ -57,7 +61,7 @@ Double Vision                         +0.09+-0.13         +0.17+-0.17        +0.
 Storm-Kiln Artist                     +0.20+-0.10         +0.15+-0.12        +0.0023+-0.0025       dmg
 Mother of Runes                       +0.20+-0.08         +0.14+-0.11        +0.0004+-0.0019       dmg
 The Dawning Archaic                   +0.11+-0.07         +0.08+-0.11        +0.0006+-0.0026        --
-Lightning Greaves                     +0.10+-0.10         -0.01+-0.14        -0.0014+-0.0028      FLIP
+Lightning Greaves                     +0.10+-0.10         -0.01+-0.14        -0.0014+-0.0028        --
 Sensei's Divining Top                 -0.30+-0.17         -0.20+-0.20        +0.0025+-0.0038        --
 
 ====================================================================================
@@ -81,7 +85,7 @@ Volcanic Vision                       +0.24+-0.08         +0.40+-0.11        +0.
       blocker count with no toughness to compare a mana value against (§4). Both
       halves scale with the SAME choice of target, so the unmodelled half is
       largest exactly when the modelled one is: this row is a floor. §7.
-Ondu Inversion                        -0.59+-0.18         +0.11+-0.22        -0.0034+-0.0039      FLIP
+Ondu Inversion                        -0.59+-0.18         +0.11+-0.22        -0.0034+-0.0039        --
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
@@ -126,8 +130,8 @@ Gamble                                +0.01+-0.05         +0.04+-0.06        +0.
 Generous Gift                         +0.08+-0.07         +0.04+-0.08        +0.0004+-0.0016        --
 Path to Exile                         +0.04+-0.05         +0.02+-0.07        +0.0000+-0.0013        --
 Restoration Seminar                   +0.01+-0.02         +0.02+-0.03        +0.0001+-0.0006        --
-Call Forth the Tempest                -0.00+-0.03         +0.02+-0.04        +0.0005+-0.0010      FLIP
+Call Forth the Tempest                -0.00+-0.03         +0.02+-0.04        +0.0005+-0.0010        --
 Improvisation Capstone                +0.00+-0.02         +0.01+-0.02        +0.0001+-0.0005        --
-Swords to Plowshares                  +0.04+-0.05         -0.01+-0.06        +0.0002+-0.0013      FLIP
+Swords to Plowshares                  +0.04+-0.05         -0.01+-0.06        +0.0002+-0.0013        --
 Approach of the Second Sun            -0.08+-0.04         -0.11+-0.06        -0.0003+-0.0014       dmg
 Enlightened Tutor                     -0.37+-0.15         -0.27+-0.19        +0.0026+-0.0037       dmg

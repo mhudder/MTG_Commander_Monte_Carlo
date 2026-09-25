@@ -737,6 +737,211 @@ COMMITTED: list[Change] = [
 # against anything else measured the same way (§0c).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = [
+    # REALITY FRACTURE, recorded 2026-09-25 (§0z45).
+    Candidate(
+        deck='rendmaw',
+        card='Proft, Sinister Mastermind',
+        measured='2026-09-21',
+        win_rate=("REAL SWAP -Ashnod's Altar +Proft, N=15,000 paired: +0.0005 +-0.0006 "
+            'at T10 (inside its bar) and +0.0043 +-0.0018 at T20 (significant); d'
+            'amage T20 +0.47 +-0.08.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/fra_batch2.txt (diagnostics/run_fra_batch2.py)',
+        limits=('A LONG-HORIZON CALL ONLY: significant at T20, inside its bar at T10.'
+            ' Threshold gates a cast attempt 2.81 times a game (proft_gated), so '
+            'it arrives late by design; 601.3 makes that a castability restrictio'
+            'n, modelled as one. CURRENT. The baseline has NOT moved since this w'
+            'as measured: check_unchanged_decks 246b148 vs 2026-09-25 is BIT-IDEN'
+            'TICAL on all 8 metrics for this deck, which has no staged changes, s'
+            'o the module IS the measured list. This number describes the list as'
+            ' it is today.'),
+        verdict=('A small real card at T20 and nothing measurable at T10. The cut, Ash'
+            "nod's Altar, was chosen as the deck's worst MODEL-EVALUATED row but "
+            "sits inside its own bar, so this swap is 'least supported cut', not "
+            "'bad card out'."),
+    ),
+    Candidate(
+        deck='lorehold',
+        card='Stingcaster Mage',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Lightning Greaves +Stingcaster Mage, N=15,000 paired: +0.'
+            '0017 +-0.0017 at T10 (inside its bar) and +0.0107 +-0.0036 at T20 (s'
+            'ignificant); damage T20 +0.78 +-0.18.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/fra_batch2.txt (diagnostics/run_fra_batch2.py)',
+        limits=('IT FIRES RARELY: 0.18 casts a game, 0.1775 of them exiled, so most o'
+            'f this swap is the Greaves cut plus a 2/1 haste body rather than the'
+            ' flashback. Measured on the §0z38-fixed flashback path. STALE -- NOT'
+            " RESTATED. This deck's baseline has MOVED since the measurement (§0z"
+            '42: decking now loses and the pilot holds a decking reserve, which m'
+            'oved lorehold); check_unchanged_decks 246b148 vs 2026-09-25 reports '
+            'it MOVED on 8 of 8 metrics. Re-measure before any head-to-head decis'
+            'ion rests on it.'),
+        verdict=('Long-horizon only, and the mechanism does not explain the win rate o'
+            'n its own -- read it as a body-and-cut number, not a flashback numbe'
+            'r.'),
+    ),
+    Candidate(
+        deck='tivit',
+        card='Memnarch, the Warden',
+        measured='2026-09-21',
+        win_rate=("REAL SWAP -Tamiyo's Journal +Memnarch, the Warden, N=15,000 paired: "
+            '+0.0099 +-0.0020 at T10 and +0.0167 +-0.0033 at T20, significant at '
+            'both; damage T20 +1.52 +-0.19.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/fra_batch2.txt (diagnostics/run_fra_batch2.py)',
+        limits=("The cut, Tamiyo's Journal (+0.0006 +-0.0017), is INSIDE its own bar,"
+            " so this is 'least supported cut', not 'measured bad'. STALE -- NOT "
+            "RESTATED. This deck's baseline has MOVED since the measurement (§0z4"
+            '4: four tivit priority moves adopted 2026-09-25, and the table is st'
+            "ale pending the owner's batched rebuild); check_unchanged_decks 246b"
+            '148 vs 2026-09-25 reports it MOVED on 8 of 8 metrics. Re-measure bef'
+            'ore any head-to-head decision rests on it.'),
+        verdict=('The strongest of the batch-2 four and significant at both horizons, '
+            'on a baseline that has since moved.'),
+    ),
+    Candidate(
+        deck='shilgengar',
+        card='Lyra, Archangel of Dawn',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Vampiric Rites +Lyra, Archangel of Dawn, N=15,000 paired:'
+            ' +0.0025 +-0.0008 at T10 and +0.0121 +-0.0028 at T20, significant at'
+            ' both; damage T20 +1.83 +-0.15.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/fra_batch2.txt (diagnostics/run_fra_batch2.py)',
+        limits=('The only batch-2 cut that is genuinely negative: Vampiric Rites -0.0'
+            '014 +-0.0011, signal both. CURRENT. The baseline has NOT moved since'
+            ' this was measured: check_unchanged_decks 246b148 vs 2026-09-25 is B'
+            'IT-IDENTICAL on all 8 metrics for this deck, which has no staged cha'
+            'nges, so the module IS the measured list. This number describes the '
+            'list as it is today.'),
+        verdict=('Significant at both horizons against a cut whose own row is evidence'
+            ', and CURRENT -- the cleanest of the eight. No rival has been measur'
+            'ed for that slot.'),
+    ),
+    Candidate(
+        deck='karlov',
+        card='Liliana the Faultless',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Swiftfoot Boots +Liliana, N=15,000 paired: +0.0064 +-0.00'
+            '17 at T10 and +0.0138 +-0.0029 at T20, significant at both. AND IT L'
+            'OSES THE SLOT: Bloodthirsty Conqueror -> Liliana in that slot is -0.'
+            '0238 +-0.0029 / -0.0250 +-0.0035, significant at both.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/karlov_fra.txt (diagnostics/run_karlov_fra.py)',
+        limits=("STALE -- NOT RESTATED. This deck's baseline has MOVED since the meas"
+            'urement (§0z44: Felidar Sovereign and Sorin priority moves adopted 2'
+            "026-09-25; and Voice of the Blessed's ten-counter indestructible, 20"
+            '26-09-25); check_unchanged_decks 246b148 vs 2026-09-25 reports it MO'
+            'VED on 8 of 8 metrics. Re-measure before any head-to-head decision r'
+            'ests on it.'),
+        verdict=('Beats the cut, loses the slot to the Conqueror by a margin far outsi'
+            'de both bars. Not a contender for the Boots slot while the Conqueror'
+            ' wants it.'),
+    ),
+    Candidate(
+        deck='karlov',
+        card='Edgar, Ancient Bloodlord',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Swiftfoot Boots +Edgar, N=15,000 paired: +0.0033 +-0.0015'
+            ' at T10 and +0.0095 +-0.0028 at T20, significant at both. AND IT LOS'
+            'ES THE SLOT: Bloodthirsty Conqueror -> Edgar is -0.0273 +-0.0029 / -'
+            '0.0300 +-0.0033, significant at both.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence='results/karlov_fra.txt (diagnostics/run_karlov_fra.py)',
+        limits=("STALE -- NOT RESTATED. This deck's baseline has MOVED since the meas"
+            'urement (§0z44: Felidar Sovereign and Sorin priority moves adopted 2'
+            "026-09-25; and Voice of the Blessed's ten-counter indestructible, 20"
+            '26-09-25); check_unchanged_decks 246b148 vs 2026-09-25 reports it MO'
+            'VED on 8 of 8 metrics. Re-measure before any head-to-head decision r'
+            'ests on it.'),
+        verdict=('The weaker of the two karlov Reality Fracture cards, and it loses th'
+            'e slot to the Conqueror by more than Liliana does.'),
+    ),
+    Candidate(
+        deck='azusa',
+        card='Verdant Kraken',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Yavimaya Elder +Verdant Kraken, N=15,000 paired: +0.0163 '
+            '+-0.0024 at T10 and +0.0265 +-0.0037 at T20, significant at both. Ag'
+            'ainst the Chocobo in the same slot: -0.0049 +-0.0029 at T10 (signifi'
+            'cant) and +0.0007 +-0.0042 at T20 (inside its bar).'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence=('results/azusa_fra.txt (diagnostics/run_azusa_fra.py), measured on th'
+            'e §0z37-fixed engine'),
+        limits=('THE CUT IT WAS MEASURED AGAINST NO LONGER EXISTS: Traveling Chocobo '
+            "was COMMITTED into Yavimaya Elder's slot on 2026-09-22, so the -Yavi"
+            'maya Elder number describes a list that is gone, and the live questi'
+            "on is the Chocobo comparison. STALE -- NOT RESTATED. This deck's bas"
+            'eline has MOVED since the measurement (§0z41 Horn of Greed, §0z42 de'
+            'cking, and the Chocobo committed into this slot); check_unchanged_de'
+            'cks 246b148 vs 2026-09-25 reports it MOVED on 8 of 8 metrics. Re-mea'
+            'sure before any head-to-head decision rests on it.'),
+        verdict=('Loses to the committed Chocobo at T10 and ties at T20, so it does no'
+            't displace it. The Chocobo holds the slot on the evidence that exist'
+            's.'),
+    ),
+    Candidate(
+        deck='azusa',
+        card='Simulacrum Shaper',
+        measured='2026-09-21',
+        win_rate=('REAL SWAP -Yavimaya Elder +Simulacrum Shaper, N=15,000 paired: +0.00'
+            '40 +-0.0019 at T10 and +0.0035 +-0.0033 at T20, significant at both.'
+            ' Against the Chocobo in the same slot: -0.0173 +-0.0027 / -0.0223 +-'
+            '0.0040, significant at both.'),
+        signal='both',
+        rationale=('A Reality Fracture card (preview text; the set releases 2026-10-02),'
+            ' implemented, pinned and measured in 2026-09-20/21. Recorded here on'
+            ' 2026-09-25 because until then its number lived only in results/*.tx'
+            "t -- the 'number with nobody's decision attached' this class exists "
+            'to prevent.'),
+        evidence=('results/azusa_fra.txt (diagnostics/run_azusa_fra.py), measured on th'
+            'e §0z37-fixed engine'),
+        limits=('THE CUT IT WAS MEASURED AGAINST NO LONGER EXISTS: the Chocobo was co'
+            "mmitted into Yavimaya Elder's slot on 2026-09-22. STALE -- NOT RESTA"
+            "TED. This deck's baseline has MOVED since the measurement (§0z41 Hor"
+            'n of Greed, §0z42 decking, and the Chocobo committed into this slot)'
+            '; check_unchanged_decks 246b148 vs 2026-09-25 reports it MOVED on 8 '
+            'of 8 metrics. Re-measure before any head-to-head decision rests on i'
+            't.'),
+        verdict=('Barely beats the old cut and loses to the committed Chocobo decisive'
+            'ly at both horizons. Not a contender.'),
+    ),
     Candidate(
         deck="karlov",
         card="Ginger, Queen of Sweets",
@@ -2155,6 +2360,12 @@ PROPOSED: list[Proposal] = [
                    "a measurement. The planeswalker half is DEAD: this deck "
                    "holds none and this engine has no loyalty. Pinned by "
                    "tests/test_fra_karlov.py."),
+        rejected=(
+            'MEASURED 2026-09-21 and PROMOTED on 2026-09-25: the real-swap numb'
+            'er is now a Candidate in MEASURED, with whether it still describes'
+            ' the deck today. Closed rather than deleted so the verified oracle'
+            ' text stays where it was written (§0z45).'
+        ),
     ),
     Proposal(
         deck="karlov", card="Edgar, Ancient Bloodlord", cost="{W}{B}",
@@ -2181,6 +2392,12 @@ PROPOSED: list[Proposal] = [
                    "on top of an ordering in shared code. The mutation in "
                    "tests/test_fra_karlov.py has to defeat both to model one "
                    "defect, and says so."),
+        rejected=(
+            'MEASURED 2026-09-21 and PROMOTED on 2026-09-25: the real-swap numb'
+            'er is now a Candidate in MEASURED, with whether it still describes'
+            ' the deck today. Closed rather than deleted so the verified oracle'
+            ' text stays where it was written (§0z45).'
+        ),
     ),
     Proposal(
         deck="azusa", card="Verdant Kraken", cost="{4}{G}{G}{G}",
@@ -2207,6 +2424,12 @@ PROPOSED: list[Proposal] = [
                    "take_turn and with 3 immediately before OPP.pod_phase, so "
                    "the pod's tokens exist while the pod acts. Pinned by "
                    "tests/test_fra_azusa.py."),
+        rejected=(
+            'MEASURED 2026-09-21 and PROMOTED on 2026-09-25: the real-swap numb'
+            'er is now a Candidate in MEASURED, with whether it still describes'
+            ' the deck today. Closed rather than deleted so the verified oracle'
+            ' text stays where it was written (§0z45).'
+        ),
     ),
     Proposal(
         deck="azusa", card="Simulacrum Shaper", cost="{1}{G}{G}",
@@ -2228,6 +2451,12 @@ PROPOSED: list[Proposal] = [
                    "trigger in `on_creature_death` beside Yavimaya Elder's, "
                    "outside the `for _ in range(n)` loop because one permanent "
                    "triggers once. Pinned by tests/test_fra_azusa.py."),
+        rejected=(
+            'MEASURED 2026-09-21 and PROMOTED on 2026-09-25: the real-swap numb'
+            'er is now a Candidate in MEASURED, with whether it still describes'
+            ' the deck today. Closed rather than deleted so the verified oracle'
+            ' text stays where it was written (§0z45).'
+        ),
     ),
     Proposal(
         deck="karlov", card="Heliod, Sun-Crowned", cost="{2}{W}", identity="W",

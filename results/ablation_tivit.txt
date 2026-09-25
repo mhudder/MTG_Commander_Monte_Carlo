@@ -11,6 +11,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job
@@ -76,19 +80,19 @@ Magister of Worth                     +0.14+-0.11         +0.22+-0.15        -0.
       modelled for you and invisible for the pod, which has no graveyard (§4), so
       that mode understates. Condemnation also needs vote control to land at all
       under the adversarial `opp_vote_policy` default.
-Promise of Loyalty                    -0.61+-0.13         +0.16+-0.17        +0.0063+-0.0030      FLIP
+Promise of Loyalty                    -0.61+-0.13         +0.16+-0.17        +0.0063+-0.0030       win
       Implemented as a symmetric wipe (2026-09-12). The card is 'each player puts
       a vow counter on a creature they control and SACRIFICES THE REST' --
       everyone KEEPS ONE, and the model keeps none. It overstates in both
       directions at once, so a high score is still evidence and a low one is not.
       Sacrifice also gets around indestructible, which is why it is in
       WIPE_IGNORES_INDESTRUCTIBLE.
-Farewell                              -0.50+-0.11         +0.11+-0.15        +0.0079+-0.0028      FLIP
+Farewell                              -0.50+-0.11         +0.11+-0.15        +0.0079+-0.0028       win
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Damn                                  -1.46+-0.18         +0.08+-0.22        +0.0070+-0.0034      FLIP
+Damn                                  -1.46+-0.18         +0.08+-0.22        +0.0070+-0.0034       win
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
@@ -115,5 +119,5 @@ Counterspell                          +0.02+-0.07         +0.11+-0.11        +0.
 Path to Exile                         +0.05+-0.06         +0.06+-0.08        -0.0001+-0.0013        --
 An Offer You Can't Refuse             +0.00+-0.06         +0.01+-0.08        -0.0001+-0.0013        --
 Swords to Plowshares                  -0.00+-0.05         -0.01+-0.07        -0.0004+-0.0012        --
-Propaganda                            +0.06+-0.06         -0.02+-0.09        -0.0024+-0.0016      FLIP
+Propaganda                            +0.06+-0.06         -0.02+-0.09        -0.0024+-0.0016       win
 Ghostly Prison                        -0.02+-0.07         -0.09+-0.09        -0.0010+-0.0016       dmg

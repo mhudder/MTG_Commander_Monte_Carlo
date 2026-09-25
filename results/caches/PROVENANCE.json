@@ -136,6 +136,12 @@
         "evidence": "Chocobo COMMITTED to azusa_v1.py (2026-09-22), moved out of CHANGES into COMMITTED. The deck MODULE changed on purpose, so check_unchanged_decks -- which builds from the module -- reports MOVED and is the WRONG check for this table, which was measured against build_pending('azusa'). That list is UNCHANGED: the Chocobo was placed in Yavimaya Elder's exact list position, the position _swap_many had staged it into, so build_pending is identical card-for-card and index-for-index (99 cards, every field equal with frozensets compared as sets). And behaviourally: 2,000 games (seeds 5000-5999 -- the table's own -- at T10 and T20) through build_pending on 2128a3b vs this tree, including the regenerated _evasion.py, are GAME-FOR-GAME IDENTICAL on every numeric output key. This is not the staging-induced case the --verified rule forbids: committing an already-staged swap leaves the measured list unchanged by construction, and that was checked rather than assumed.",
         "fingerprint": "370ffc676614275e",
         "utc": "2026-09-22T20:58:43Z"
+      },
+      {
+        "commit": "a76cd5b",
+        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+        "fingerprint": "95959d6fe384fae0",
+        "utc": "2026-09-25T13:03:56Z"
       }
     ]
   },
@@ -354,6 +360,12 @@
         "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "3fc23da7e6f0cf52",
         "utc": "2026-09-22T20:58:42Z"
+      },
+      {
+        "commit": "a76cd5b",
+        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+        "fingerprint": "f901d47e8e90d847",
+        "utc": "2026-09-25T13:03:56Z"
       }
     ]
   },
@@ -474,6 +486,12 @@
         "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "aefd7eb474d781eb",
         "utc": "2026-09-22T20:58:42Z"
+      },
+      {
+        "commit": "a76cd5b",
+        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+        "fingerprint": "df9be49f5abbd0a5",
+        "utc": "2026-09-25T13:03:56Z"
       }
     ]
   },
@@ -594,6 +612,12 @@
         "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "c5dffecbee7b0406",
         "utc": "2026-09-22T20:58:42Z"
+      },
+      {
+        "commit": "a76cd5b",
+        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+        "fingerprint": "20fa035e9d7984da",
+        "utc": "2026-09-25T13:03:56Z"
       }
     ]
   },

@@ -1218,6 +1218,45 @@ def main(argv=None):
     sys.stdout.write(render_table(run, results, nonlands, partly))
 
 
+def flips(res, hz) -> bool:
+    """Does this card's DAMAGE effect genuinely reverse between horizons?
+
+    Only when damage is SIGNIFICANT at every horizon and the signs disagree
+    (§0z24). The override used to read `np.sign()` of the raw point estimate
+    at each horizon, with no significance test, so a card whose damage was
+    statistically zero -- a coin-flip sign -- was labelled FLIP whenever the
+    two coins disagreed. 11 of 22 FLIP rows in the committed tables would have
+    read `--` on their own merits: the strongest-sounding label on the rows
+    with the least evidence, overriding the one label that says "unmeasured".
+
+    A GATE, NOT A REMOVAL. Damn, Wrath of God, Promise of Loyalty and
+    Mechanized Production are significant at both horizons with opposite
+    signs -- a wipe costs damage early and repays it late -- and that is a
+    real horizon effect, which is what this label is for.
+
+    A function rather than an inline condition for §0z38's reason: a mutation
+    has to be able to switch this rule off alone.
+    """
+    if len(hz) < 2:
+        return False
+    dmg = [res[h]["damage"] for h in hz]
+    if not all(abs(m) > ci for m, ci in dmg):
+        return False
+    return len({np.sign(m) for m, _ci in dmg}) > 1
+
+
+def signal(res, hz) -> str:
+    """The row's signal. A score inside its own error bar is indistinguishable
+    from a blank -- say so, rather than letting the sign imply a ranking."""
+    last = hz[-1]
+    d_sig = abs(res[last]["damage"][0]) > res[last]["damage"][1]
+    w, wci = res[last]["won"]
+    w_sig = abs(w) > wci
+    sig = ("both" if d_sig and w_sig else
+           "dmg" if d_sig else "win" if w_sig else "--")
+    return "FLIP" if flips(res, hz) else sig
+
+
 def render_table(run, results, nonlands, partly) -> str:
     """The table, as the text `main()` prints. A pure function of the cache
     contents and the classification sets, so a test can re-render a committed
@@ -1248,6 +1287,10 @@ point estimates happen to fall. Halving it costs FOUR TIMES the games.
            win  : significant on win rate only
            --   : INSIDE its own error bars - indistinguishable from a blank.
                   Not a weak card, an unmeasured one. Do not rank these.
+           FLIP : damage is SIGNIFICANT at every horizon and changes sign
+                  between them -- a real horizon effect (a wipe costs
+                  damage early and repays it late). Read win rate for
+                  the verdict; the sign is the finding, not a ranking.
 
 Win rate is the objective; damage is a proxy. Where they disagree, follow win
 rate. And before cutting anything, check whether another card does the same job
@@ -1276,15 +1319,7 @@ list of names to ablate() to score a package together.""")
                 m, ci = results[n][h]["damage"]
                 cells += f"{m:>+13.2f}+-{ci:<5.2f}"
             w, wci = results[n][last]["won"]
-            # A score inside its own error bar is indistinguishable from a
-            # blank. Say so, rather than letting the sign imply a ranking.
-            d_sig = abs(results[n][last]["damage"][0]) > results[n][last]["damage"][1]
-            w_sig = abs(w) > wci
-            sig = ("both" if d_sig and w_sig else
-                   "dmg" if d_sig else "win" if w_sig else "--")
-            if len(HORIZONS) > 1 and len({np.sign(results[n][h]["damage"][0])
-                                          for h in hz}) > 1:
-                sig = "FLIP"
+            sig = signal(results[n], hz)
             print(f"{n:<30}{cells}{w:>+14.4f}+-{wci:<5.4f}{sig:>10}")
             # THE REASON TRAVELS WITH THE ROW. A heading is read once and a
             # row is read on its own -- and the row is the thing somebody

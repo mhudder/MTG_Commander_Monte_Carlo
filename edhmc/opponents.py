@@ -533,7 +533,7 @@ def destroy(g, perm, roll=None, destroys=None):
         return False
     granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
               and perm.card.name not in GRANTS_INDESTRUCTIBLE)
-    hardy = perm.card.indestructible or granted
+    hardy = indestructible_of(g, perm) or granted
     if destroys is not None:
         if hardy and destroys:
             return False
@@ -659,6 +659,32 @@ def flying_of(g, perm) -> bool:
         # "Delirium — ... has flying as long as there are four or more card
         # types among cards in your graveyard."
         return len({t for card in g.graveyard for t in card.types}) >= 4
+    return False
+
+
+def indestructible_of(g, perm) -> bool:
+    """Is this permanent indestructible RIGHT NOW?
+
+    `flying_of`'s twin, for the same reason it exists: unconditional
+    indestructible is a static tag generated from Scryfall into
+    `decks/_evasion.py`, and a CONDITIONAL one cannot be a tag. Voice of the
+    Blessed was deliberately kept OUT of the generated INDESTRUCTIBLE set
+    (§0n) because a static tag there would be a lie -- it is indestructible
+    only at ten counters. Until 2026-09-25 that exclusion left the clause
+    with nowhere to live, so the card was never indestructible at all.
+
+    `destroy()` is the ONE place indestructible is read, so routing that read
+    through here covers spot removal, the pod's wipes and your own wipes at
+    once. A second read site written as `perm.card.indestructible` would
+    silently skip this -- §0u's shape -- so add any new one here too.
+    """
+    if perm.card.indestructible:
+        return True
+    if perm.card.name == "Voice of the Blessed":
+        # "As long as this creature has ten or more +1/+1 counters on it, it
+        # has indestructible." Scryfall, verified 2026-09-25. The same
+        # `counters` field `flying_of` reads for its four-counter clause.
+        return perm.counters >= 10
     return False
 
 

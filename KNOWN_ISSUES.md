@@ -72,7 +72,7 @@ Methodology that used to live at the end of this file is now
 | [0z21](#0z21) | MEASURED | **six Azusa candidates; two of them land in the deck's top ten** — and a land creature was tapping for mana on arrival |
 | [0z22](#0z22) | FIXED | **the tables got slower; `can_pay` was most of it.** 1.22x per game, 1.45x on an azusa table, bit-identical |
 | [0z23](#0z23) | **CLOSED** | the cache manifest described ten files that no longer existed, and "delete any cache whose fingerprint differs" was too expensive to obey. **Replaced by BUILT-AT provenance and a seconds-long evidence check** |
-| [0z24](#0z24) | **OPEN** | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
+| [0z24](#0z24) | FIXED | **`FLIP` is assigned on an unguarded sign and overrides `--`** — 11 of 22 FLIP rows across six tables would read "unmeasured" on their own merits |
 | [0z25](#0z25) | MEASURED | **three azusa proposals implemented and measured** — and one proposal's own rationale was backwards. **Guardian Project's +0.0481 was measured on a doubled draw and is corrected to +0.0279 in §0z28** |
 | [0z28](#0z28) | FIXED | **The Great Henge's draw was swallowed into Guardian Project's branch, so one drew never and the other drew twice** — and the test that pinned it had been failing for three commits with nothing running it |
 | [0z26](#0z26) | MEASURED | **the remaining ten proposals implemented and measured across four engines** — two are blanks for legible reasons, three are floors |
@@ -93,6 +93,8 @@ Methodology that used to live at the end of this file is now
 | [0z42](#0z42) | FIXED | **Decking loses (queued item 17), and the pilot had to be taught not to.** `engine.drew_from_empty` is 704.5b in the three draw paths. The rule ALONE decked azusa in 3.3% of games at T20, in the turns it had lethal on board -- a naive pilot cost it **0.022**. `engine.draw_is_safe` declines only OPTIONAL draws; at the swept reserve of 5 the rule costs azusa −0.0006 / −0.0012 and lorehold −0.0003 / −0.0021. Rendmaw, karlov, tivit and shilgengar are identical game for game -- **including karlov with Bolas's Citadel, whose number was never a decking ceiling** |
 | [0z43](#0z43) | MEASURED | **The one-card cast lookahead is a measured NULL.** `engine.lookahead_pick` (queued item 18) reorders a cast when the greedy pick would strand a card that casting first would have kept; wired into all six `main_phase`s, it fires in 4-12% of games and moves win rate inside its bar in all twelve deck-horizon cells (largest +0.0010 ±0.0020). §0z8's SURPLUS rule already handles the ordering. `cast_lookahead` stays OFF; what is left of item 18 is the `priority` numbers themselves |
 | [0z44](#0z44) | MEASURED | **The `priority` numbers: right in four decks, wrong in two.** Flattening each table costs 0.015–0.045 win rate, so the numbers matter; a ±2 sweep of every nonland card (760 arms, three disjoint seed blocks) confirms **no move at all** in rendmaw, lorehold, shilgengar or azusa, two in karlov (Felidar Sovereign up, Sorin, Solemn Visitor up: joint **+0.0099 / +0.0091**) and four in tivit, which ranked card draw above its token engines (joint **+0.0225 / +0.0211**). Mechanisms read off the win routes. **Measured, not adopted**: adopting moves two baselines and a staged card's own priority **ADOPTED 2026-09-25 for both decks; the karlov and tivit tables are stale until the owner's batched rebuild.** |
+| [0z45](#0z45) | MEASURED | **Eight Reality Fracture numbers enter the ledger, each saying whether it still describes its deck.** Two are CURRENT (Proft, Lyra -- their decks are bit-identical since measurement); six are STALE because lorehold, tivit, karlov and azusa have all moved since, and azusa's two were measured against a cut that is no longer in the list |
+| [0z46](#0z46) | FIXED | **Voice of the Blessed is indestructible at ten counters** (queued 8b). §0n kept it out of the static INDESTRUCTIBLE set, correctly, but that left the clause nowhere to live, so it was never indestructible at all. `opponents.indestructible_of`, beside `flying_of`; it saves Voice 0.016 times a game |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -5591,7 +5593,7 @@ first suspect is the mutation.
 Three further expectations in that file were wrong for substantive reasons and
 are kept in its docstring with the reasoning, per the standing rule that a set
 edited to match the output is a transcript rather than a test.
-## 0z24. OPEN — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
+## 0z24. FIXED — `FLIP` is assigned on an unguarded sign, and it overrides the label that says "unmeasured"
 
 **Found 2026-09-16 during the six-deck regeneration**, from the only three
 label changes in the rendmaw table. All three turned out to be the same
@@ -5682,6 +5684,47 @@ fingerprints. Making it during the regeneration that produced this finding
 would have marked every cache that run produced stale on arrival. Sequencing,
 not doubt: the fix is a one-line condition plus the legend, and the row it
 changes is a LABEL, not a measurement — no committed number moves.
+
+
+### FIXED 2026-09-25
+
+**The override is now gated exactly as specified above**: `tools/ablation.py`
+has `flips(res, hz)` -- damage SIGNIFICANT at every horizon AND the signs
+disagree -- and `signal(res, hz)`, which only lets FLIP override the
+significance-based label when `flips` is true. Both are functions rather than
+an inline condition so a mutation can switch the rule off alone (§0z38).
+**`FLIP` is in the legend** every table prints, and in CLAUDE.md's reporting
+rule, so no row prints a signal its own table fails to define.
+
+**All six committed tables were re-rendered from their caches and diffed.**
+**0 rows changed any number in any column** -- a pure relabel, as predicted.
+FLIP rows went **20 → 4**: ten to `--`, five to `win`, one to `both`.
+
+**Four real flips survive**, each significant at both horizons with opposite
+signs: The Great Henge (rendmaw), Damn and Wrath of God (shilgengar), and
+Mechanized Production (tivit).
+
+**One named "real flip" no longer is, and the gate is right about it.** This
+section listed Promise of Loyalty with Damn, Wrath and Mechanized Production.
+On the CURRENT tables Promise of Loyalty, tivit's Damn and Farewell all show
+damage significant at T10 only (tivit's Damn: −1.46 ±0.18, then +0.08 ±0.22):
+a cost that FADES rather than one that REVERSES. That is not a horizon flip
+by this section's own criterion, so they now read `win`. Damn keeps FLIP in
+shilgengar and loses it in tivit -- the same card, two decks, two different
+effects, each measured in its own list.
+
+**It was caught live before it was fixed.** On 2026-09-22 a comparison script
+counted Sylvan Library (−0.0007 ±0.0018 → +0.0001 ±0.0019, a blank twice) as a
+sign flip between significant rows, because it trusted this column. It now
+reads `--`.
+
+`tests/test_flip_signal.py` pins the rule with six synthetic rows -- including
+the fading-cost case and the noise case -- and three mutations, exact sets,
+written before the run: removing the gate breaks C, D and F; gating on ANY
+significant horizon breaks C alone; removing FLIP breaks A. `ablation.py` is in
+every deck's fingerprint, so all six caches moved and the rendering-only
+evidence is recorded on each; karlov and tivit remain stale for the separate
+reason in §0z44.
 
 ## 1. PARTLY RESOLVED — alternative costs and X-spell mana values
 
@@ -6639,6 +6682,74 @@ changes the list every staged swap in those decks was measured against.
 **Anointed Procession is itself a staged card whose priority is one of the
 moves**, so its staged +0.0113 / +0.0145 was measured at a priority now shown
 to be worth ~0.008 less than the better one. That is the owner's call.
+
+## 0z45. MEASURED — eight Reality Fracture numbers enter the ledger, and each says whether it is still true
+
+Nine Reality Fracture cards were implemented, pinned and measured on
+2026-09-20/21. Until 2026-09-25 only Ginger's number was in the ledger; the
+other eight lived only in `results/*.txt` -- the "number with nobody's
+decision attached" that the `Candidate` class exists to prevent. They are now
+`Candidate`s in `MEASURED`, and the four that also sat in `PROPOSED` are closed
+there with a pointer rather than deleted, so their verified oracle text stays.
+
+**A ledger entry that does not say whether its number is current would be
+worse than none**, so that was checked, not assumed. `check_unchanged_decks`
+between 246b148 (where batch 2 was measured) and 2026-09-25:
+
+| deck | since measurement | cards | status |
+|---|---|---|---|
+| rendmaw | **BIT-IDENTICAL** | Proft, Sinister Mastermind | **CURRENT** |
+| shilgengar | **BIT-IDENTICAL** | Lyra, Archangel of Dawn | **CURRENT** |
+| lorehold | MOVED (§0z42 decking) | Stingcaster Mage | stale |
+| tivit | MOVED (§0z44 priorities) | Memnarch, the Warden | stale |
+| karlov | MOVED (§0z44, §0z46) | Liliana the Faultless, Edgar | stale |
+| azusa | MOVED (§0z41, §0z42, Chocobo) | Verdant Kraken, Simulacrum Shaper | stale |
+
+Neither CURRENT deck has a staged change, so its module IS its measured list
+and the module-based check covers it fully.
+
+**Azusa's two are stale in a sharper way.** They were measured against
+`-Yavimaya Elder`, and on 2026-09-22 the Chocobo was COMMITTED into exactly
+that slot -- so the cut no longer exists, and the live comparison is the one
+against the Chocobo: Verdant Kraken loses at T10 (−0.0049 ±0.0029) and ties at
+T20 (+0.0007 ±0.0042); Simulacrum Shaper loses at both. The committed card
+holds the slot on the evidence that exists.
+
+**Karlov's two lose their slot**: both beat Swiftfoot Boots and both lose to
+Bloodthirsty Conqueror in that same slot by −0.024 to −0.030, significant at
+both horizons.
+
+The cleanest of the eight is **Lyra**: significant at both horizons, CURRENT,
+and against the only batch-2 cut whose own row is genuinely negative (Vampiric
+Rites −0.0014 ±0.0011). No rival has been measured for that slot, so it is a
+candidate for a head-to-head rather than a staging.
+
+## 0z46. FIXED — Voice of the Blessed's ten-counter indestructible (queued 8b)
+
+"As long as this creature has ten or more +1/+1 counters on it, it has
+indestructible." (Scryfall, verified 2026-09-25.) §0n deliberately kept Voice
+OUT of the generated `INDESTRUCTIBLE` set, because a static tag would make it
+indestructible at zero counters. That was right, and it left the clause with
+nowhere to live, so the card was never indestructible at all -- in a deck
+whose engine is lifegain events and where ten counters is reachable.
+
+**It lives in `opponents.indestructible_of(g, perm)`, beside `flying_of`**,
+which already carried Voice's four-counter flying off the same `counters`
+field. `destroy()` is the ONLY place indestructible is read, so routing that
+one read covers spot removal, the pod's wipes and your own wipes together; a
+second read site written as `perm.card.indestructible` would silently skip it,
+and the function's docstring says so.
+
+**It fires**: over 2,000 karlov games at T20, removal asked about Voice 134
+times and the ten-counter clause saved it **32 times (0.016 a game)**. Small,
+and real.
+
+`tests/test_voice_of_the_blessed.py` pins it: nine counters dies to a destroy,
+ten survives, ten still dies to exile, your own known destroy and exile both
+honoured, a non-Voice creature at ten is not protected, and the four-counter
+flying neighbour re-checked per §0z28. Three mutations, exact sets, correct on
+the first run. Only karlov holds Voice, so only karlov's baseline moves, and
+karlov is already stale pending the owner's batched rebuild (§0z44).
 
 ## How to read an ablation table
 
