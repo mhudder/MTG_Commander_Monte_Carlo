@@ -18,10 +18,13 @@
 > **Artist's Talent CLOSED 2026-09-25 (`KNOWN_ISSUES.md` §0z48)**: all three
 > levels, bought with `{2}{R}` each by a stated policy, the level-2 discount
 > for noncreature spells only, and level 3's +2 per hit at `deal_pod_damage`,
-> whose `hits` argument every call site now has to state. Also open: Storm Herd's X still reads
-> `cfg["storm_herd_x"]`=40 rather than a real life total (this engine does not
-> track life at all), and Approach of the Second Sun still cannot get its
-> second cast because the card is not put seventh from the top.
+> whose `hits` argument every call site now has to state. **Storm Herd CLOSED
+> 2026-09-25 (§0z49)**: X is your life total at resolution -- the engine has
+> tracked life since pod v3, so the blocker this block used to cite ("this
+> engine does not track life at all") was out of date -- and the Pegasi fly
+> (`FLYING_TOKENS`). **Radiant Scrollwielder's lifelink CLOSED the same day
+> (§0z50).** Still open: Approach of the Second Sun cannot get its second
+> cast because the card is not put seventh from the top.
 
 Every nonland card in `edhmc/decks/lorehold_v15.py` checked against Scryfall
 oracle text (fetched 2026-09-03), and the scripted behaviour in
@@ -110,7 +113,7 @@ Artist grows with its own output. Module also has it as 2/3; it is 2/2.
 Module `miracle={"R": 1}` → `{R}`. Oracle: **miracle `{1}{R}`**. Since the
 whole deck is built to hit miracle windows, this discount is load-bearing.
 
-### Storm Herd's X is still hardcoded
+### Storm Herd's X is still hardcoded — FIXED 2026-09-25, §0z49
 
 > Create X 1/1 white Pegasus tokens with flying, where **X is your life total**.
 

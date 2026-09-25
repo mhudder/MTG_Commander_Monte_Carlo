@@ -881,6 +881,25 @@ def castable_modes(card: Card, base_cost: dict):
     return modes
 
 
+def hybrid_pips(card: Card, colour: str) -> int:
+    """How many `colour` pips a card's MANA COST has, counting hybrid pips.
+
+    Hybrid is written as the printed cost plus `alt_costs` tagged "hybrid"
+    (Revitalizing Repast, Lurrus), which is right for PAYING and wrong for
+    anything that reads the cost itself: a {W/B} pip is white AND black
+    (CR 107.4e: "a hybrid mana symbol is all of its component colors"; 700.5),
+    so {1}{W/B}{W/B} is two devotion to white. The most
+    `colour` any hybrid spelling of the cost carries is that count. Only
+    "hybrid" modes are read -- Impending and overload are other costs, not
+    other spellings of this one. (§0z52)
+    """
+    n = card.cost.get(colour, 0)
+    for entry in card.alt_costs:
+        if entry[1] == "hybrid":
+            n = max(n, entry[0].get(colour, 0))
+    return n
+
+
 def choose_mode(card: Card, base_cost: dict, units):
     """The best affordable mode. Returns (cost, tag, pay_idx) or None.
 

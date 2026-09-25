@@ -1,0 +1,3 @@
+Lurrus hybrid + devotion, N=15,000 paired, seeds 5000.. (diagnostics/run_lurrus_hybrid.py), 2026-09-25:
+Lurrus hybrid + devotion (new - old) T10  won +0.0003 +-0.0004  damage +0.0947 +-0.0322  lifegain_triggers +0.0388 +-0.0092   changed games 0.0123
+Lurrus hybrid + devotion (new - old) T20  won +0.0003 +-0.0007  damage +0.0970 +-0.0418  lifegain_triggers +0.0321 +-0.0175   changed games 0.0134

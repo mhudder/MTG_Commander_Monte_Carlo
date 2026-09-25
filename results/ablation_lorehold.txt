@@ -25,6 +25,7 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
+Storm Herd                            +3.74+-0.24         +5.05+-0.26        +0.0715+-0.0046      both
 Longshot, Rebel Bowman                +2.30+-0.17         +2.50+-0.18        +0.0168+-0.0033      both
 Rise of the Eldrazi                   +1.53+-0.15         +2.21+-0.17        +0.0323+-0.0035      both
 Sol Ring                              +2.24+-0.21         +2.10+-0.24        +0.0095+-0.0039      both
@@ -116,7 +117,6 @@ Blasphemous Act                       -1.97+-0.17         -0.89+-0.21        -0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Storm Herd                            +3.74+-0.24         +5.05+-0.26        +0.0715+-0.0046      both
 Land Tax                              +1.40+-0.18         +2.16+-0.23        +0.0180+-0.0038      both
 Sejiri Shelter                        +0.59+-0.15         +0.76+-0.19        +0.0057+-0.0030      both
 Pinnacle Monk                         +0.38+-0.13         +0.40+-0.16        +0.0023+-0.0024       dmg

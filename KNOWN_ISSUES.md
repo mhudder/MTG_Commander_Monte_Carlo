@@ -97,6 +97,11 @@ Methodology that used to live at the end of this file is now
 | [0z46](#0z46) | FIXED | **Voice of the Blessed is indestructible at ten counters** (queued 8b). §0n kept it out of the static INDESTRUCTIBLE set, correctly, but that left the clause nowhere to live, so it was never indestructible at all. `opponents.indestructible_of`, beside `flying_of`; it saves Voice 0.016 times a game |
 | [0z47](#0z47) | FIXED | **March of the World Ooze's Elephant** (queued 4), on the one opponent spell the model puts on your turn -- a counterspell -- through a new optional hook in `opponents.countered`. Writing it found **Arasta of the Endless Web** reading the same event a second way: a counterspell is an instant and made no Spider. Both read the hook now. Elephant +0.0014 ±0.0008 at T20; the hook +0.0017 ±0.0010; a floor |
 | [0z48](#0z48) | FIXED | **Artist's Talent, all three levels** (queued 2). Level 2 was granted free on resolution and discounted CREATURE spells; levels 1 and 3 did not exist. Now bought with `{2}{R}` by a stated policy. The row barely moves (+0.0043 ±0.0040 vs the table's +0.0052) because the errors cancelled: **level 3 alone is +0.0031 ±0.0010**, level 2 alone is inside its bar, and the level-1 rummage is worth nothing measurable |
+| [0z49](#0z49) | FIXED | **Storm Herd's X was a constant 40, and the largest row in lorehold's table sat on it.** X is your life total at resolution -- about 21 on average. The fix costs lorehold's baseline **−0.0271 ±0.0031** at T20 and takes the row from +0.0713 to **+0.0442 ±0.0039**. The blocker the audit cited ("this engine does not track life at all") had been false since pod v3 |
+| [0z50](#0z50) | FIXED | **Radiant Scrollwielder's lifelink.** `deal_pod_damage` takes a required `spell` argument beside §0z48's `hits`. +0.0017 ±0.0007 at T20; against Caldera in the same slot the card still loses, −0.0085 ±0.0034 |
+| [0z51](#0z51) | FIXED | **Ranger of Eos tutors two one-drops** instead of drawing two. Row +0.0091 ±0.0033 at T20 (+0.0067 as `draw2`); the difference between the two is inside its bar. SCRIPTED now |
+| [0z52](#0z52) | FIXED | **Lurrus's hybrid pips**, paid and counted: `alt_costs` for {W}{W}/{B}{B}, and `engine.hybrid_pips` makes devotion read {W/B} as white (CR 107.4e). 1.3% of karlov games change; win rate inside its bar. Daxos's devotion toughness is left unimplemented because nothing reads toughness |
+| [0z53](#0z53) | MEASURED | **Goldspan Dragon's head-to-heads** (queued 0c). It loses the Penance slot to Caldera (−0.0108 ±0.0027) and beats both named cuts at T20: **−Blasphemous Act +Goldspan +0.0162 ±0.0044** (significant at both horizons) and −Lightning Greaves +Goldspan +0.0084 ±0.0034. Staging is the owner's call, and the Blasphemous Act cut is a partly-modelled wipe |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6900,6 +6905,107 @@ the first mutation replaces, and would have charged that mutation to the
 policy. They read the permanent's own level now. Only lorehold's baseline
 moves. Its table is stale and joins the owner's batched rebuild; the card
 moves from `KNOWN_BLIND` to `SCRIPTED_LOREHOLD`.
+
+## 0z49. FIXED — Storm Herd's X was a constant 40, and the largest row in lorehold's table sat on it
+
+"Create X 1/1 white Pegasus creature tokens with flying, where X is your life
+total." (Scryfall, verified 2026-09-25.) The engine had `cfg["storm_herd_x"]`,
+40, and the oracle audit's reason was "this engine does not track life at
+all". **That stopped being true at pod v3 (2026-09-04)**, three weeks before
+anyone re-read it -- §0z13's shape: a note saying something cannot be done is
+a claim with a date on it. `lorehold.storm_herd_x` reads `g.your_life` at
+resolution (a copy resolving later reads the total then); setting the knob
+still forces a constant, which is how the old number is reproduced.
+
+**Measured**, N=15,000 paired, seeds 5000+, `build_pending("lorehold")`:
+
+| comparison | T10 win | T20 win | T20 damage |
+|---|---|---|---|
+| **the fix: X = life − X = 40** | −0.0121 ±0.0018 | **−0.0271 ±0.0031** | −1.39 ±0.11 |
+| Storm Herd's row (card − blank), new | +0.0175 ±0.0022 | **+0.0442 ±0.0039** | +3.61 ±0.21 |
+| the same row at X = 40 | +0.0296 ±0.0028 | +0.0713 ±0.0046 | +5.00 ±0.26 |
+
+The X = 40 arm reproduces the committed table's +0.0715 ±0.0046, which is the
+check on the harness (§0z35). Mechanism: 5.53 Pegasi a game against 10.71 at
+X = 40, so the card resolves about 0.27 times a game at **about 21 life**, not
+40. **It is still the deck's largest row, at five-eighths of what it was.**
+The card moves from `KNOWN_BLIND` to `SCRIPTED_LOREHOLD`: its only
+approximation was X. Lorehold's baseline moves by a quarter of the deck's
+largest card, so its table is stale on top of §0z48, and both staged lorehold
+swaps were re-measured after it (below, §0z48's factorial).
+
+## 0z50. FIXED — Radiant Scrollwielder's lifelink
+
+"Instant and sorcery spells you control have lifelink." Its docstring said
+separating spell damage from creature damage at every `deal_pod_damage` call
+site was "a bigger change than this fix". §0z48 had already made every call
+site state its `hits`; `spell` is the second required argument, and eleven
+call sites answered it -- Boros Charm, Soulfire Eruption and Olórin's Searing
+Light are spells, Guttersnipe, Longshot, Pyremaw and Urabrask are permanents,
+Monument's drain is life loss. `scrollwielder_lifelink` gains what was DEALT
+(702.15b), not the bounded figure the damage metric records.
+
+Scrollwielder is a CANDIDATE, not in the list, so no baseline moves. Measured
+in the Penance slot on the staged list: lifelink on − off **+0.0017 ±0.0007**
+at T20 (+0.0003 ±0.0003 at T10), 0.36 life a game. **Against Caldera Pyremaw
+in the same slot it still loses, −0.0033 ±0.0015 / −0.0085 ±0.0034**, so the
+2026-09-05 decision that took Caldera over it stands with the clause in.
+
+## 0z51. FIXED — Ranger of Eos tutors, it does not draw
+
+"When this creature enters, you may search your library for up to two creature
+cards with mana value 1 or less, reveal them, put them into your hand, then
+shuffle." It was `script="draw2"`. `karlov.ranger_of_eos_etb` takes the two
+highest-`priority` one-drops left in the library, recomputed at the search
+(§0z19), and shuffles through `crn_shuffle` -- it matters here, because Bolas's
+Citadel plays off the top. In the staged list the targets are Soul Warden,
+Soul's Attendant, Mother of Runes and Serra Ascendant.
+
+N=15,000 paired: the row is **+0.0041 ±0.0017 / +0.0091 ±0.0033** at T10 /
+T20 against +0.0045 / +0.0067 as `draw2` on the same blank; tutor − draw2 is
+−0.0003 ±0.0016 / +0.0023 ±0.0030, inside its bar at both. 0.26 cards found a
+game. Two specific one-drops are worth about what two random cards were, which
+is the answer, and the card moves to `SCRIPTED_KARLOV`.
+
+## 0z52. FIXED — Lurrus's hybrid pips, paid AND counted
+
+{1}{W/B}{W/B} was flattened to {1}{W}{B}. Paying it is `alt_costs` tagged
+"hybrid" -- the convention Revitalizing Repast set -- so {W}{W} or {B}{B} can
+cast it. **But a flattened cost is also wrong for anything that READS the
+cost**: "a hybrid mana symbol is all of its component colors" (107.4e), so
+Lurrus is two devotion to white (700.5), and karlov's `devotion_white` gates
+Heliod. `engine.hybrid_pips` reads the most of a colour any hybrid spelling
+carries, and devotion reads it. The pay half alone would have been §0u's shape
+inside one card.
+
+N=15,000 paired: **+0.0003 ±0.0004 / +0.0003 ±0.0007**, 1.3% of games change,
+lifegain triggers +0.03 a game. Correct, and small.
+
+**Daxos's toughness is left unimplemented, on purpose.** "Daxos's toughness is
+equal to your devotion to white" is one line now that devotion is right, and it
+would move nothing: no code in `karlov.py` or `opponents.py` reads toughness.
+Written down so that the day something does, this is found (§0z12: a value
+nothing reads is a loaded gun).
+
+## 0z53. MEASURED — Goldspan Dragon's head-to-heads (queued 0c)
+
+§0c said its significant row was not a staging. The paired runs it asked for,
+N=15,000, on the staged list after §0z49 and §0z50:
+
+| swap | T10 win | T20 win | T20 damage |
+|---|---|---|---|
+| Goldspan in Caldera's slot (Goldspan − Caldera) | −0.0039 ±0.0012 | **−0.0108 ±0.0027** | −0.35 ±0.11 |
+| **−Blasphemous Act +Goldspan** | **+0.0106 ±0.0020** | **+0.0162 ±0.0044** | +1.81 ±0.22 |
+| −Lightning Greaves +Goldspan | +0.0005 ±0.0014 | +0.0084 ±0.0034 | +1.00 ±0.17 |
+
+**It does not take the Penance slot from Caldera.** The Blasphemous Act swap
+is significant at both horizons; the Greaves one only at T20. **Read the Act
+row with its cut's category**: Blasphemous Act is a symmetric wipe in
+`PARTLY_MODELLED` -- your half faithful, the opponents' half an abstract
+creature count, "the COST is modelled and the BENEFIT is an estimate" -- so
+this swap removes a card whose upside the model estimates. §0z36 says that
+can err either way. Staging it is the owner's decision, and the ledger records
+it as a Candidate.
 
 ## How to read an ablation table
 

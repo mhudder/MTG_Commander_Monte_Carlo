@@ -8,10 +8,21 @@
 > lifegain triggers and the free card draw were flattering it. A/A control is
 > clean (+0.00 on every metric).
 >
-> Still open: Necropotence modelled as `draw2`; Benevolent Offering's three
-> Spirit tokens and per-creature scaling; Ranger of Eos tutoring two specific
-> one-drops; Karlov's own six-counter exile ability; Daxos's toughness fixed
-> at 4 rather than tracking devotion; Lurrus's hybrid pips.
+> **RE-VERIFIED AGAINST THE CODE 2026-09-25** — the list below was the
+> 2026-09-03 one, and two of its six had moved:
+>
+> | item | state |
+> |---|---|
+> | Ranger of Eos tutoring two one-drops | **FIXED** — `karlov.ranger_of_eos_etb` (`KNOWN_ISSUES.md` §0z51) |
+> | Lurrus's hybrid pips | **FIXED** — `alt_costs`, and devotion reads hybrid pips (§0z52) |
+> | Necropotence modelled as `draw2` | open — the real card is a skip-the-draw-step + pay-life policy |
+> | Benevolent Offering's Spirit tokens and per-creature scaling | open — a flat 4 life |
+> | Karlov's own six-counter exile ability | open, and MODEL-BLIND by design: opponents' creatures are a number |
+> | Daxos's toughness fixed at 4 rather than tracking devotion | open and **INERT**: nothing in `karlov.py` or `opponents.py` reads toughness, so implementing it would move no number. If something ever does read it, this becomes live. |
+>
+> The "Evasion is unmodelled" section below is SUPERSEDED: fliers have been
+> modelled since 2026-09-04 (`opponents.flying_of`, `flier_block_share`),
+> Serra Ascendant's 30-life flying included.
 
 Every nonland card in `edhmc/decks/karlov_v1.py` checked against Scryfall
 oracle text (fetched 2026-09-03), and every scripted behaviour in
@@ -211,7 +222,7 @@ fixing in the `.xlsx` as well as the module, or it will be re-applied.
 Daxos's toughness is his devotion to white — in a mono-W-heavy list that is
 routinely 4+, not 1.
 
-### Evasion is unmodelled
+### Evasion is unmodelled — SUPERSEDED 2026-09-04, see the STATUS block
 
 Cliffhaven Vampire, Drana's Emissary and Sunscorch Regent all have flying, and
 Serra Ascendant gains it at 30 life. `opponents.damage_through` has no evasion

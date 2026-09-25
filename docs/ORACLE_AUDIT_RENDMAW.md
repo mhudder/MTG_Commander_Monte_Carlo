@@ -25,8 +25,16 @@
 > `goad_block_share` (default 0.30) is standing in for it.
 >
 > March of the World Ooze's Elephant trigger is CLOSED as far as this model
-> can see it (2026-09-25, `KNOWN_ISSUES.md` §0z47). Still open: Twitching Doll's sacrifice-for-Spiders; Bitterblossom's 1 life per Faerie;
-> Rendmaw's own reach and menace.
+> can see it (2026-09-25, `KNOWN_ISSUES.md` §0z47).
+>
+> **RE-VERIFIED AGAINST THE CODE 2026-09-25.** Two claims in this block were
+> out of date: the Birds' **flying IS modelled** (since 2026-09-04,
+> `opponents.flying_of` and `flier_block_share`, with the goaded Birds counted
+> as catchers), and **Bitterblossom's 1 life per Faerie IS charged** (§0z7,
+> behind `charge_life_costs`), its Faeries flying via `FLYING_TOKENS`. Still
+> open: Twitching Doll's sacrifice-for-Spiders; Rendmaw's own **reach and
+> menace** (Scryfall keywords, verified 2026-09-25) -- menace needs a term in
+> the blocking model, which no card in any deck has yet.
 
 Every nonland card in `edhmc/decks/rendmaw_v11.py` checked against Scryfall
 oracle text (fetched 2026-09-03), and the scripted behaviour in

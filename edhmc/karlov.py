@@ -39,6 +39,7 @@ import random
 
 from edhmc.engine import (BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
+                          hybrid_pips,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
@@ -307,8 +308,9 @@ def pay_generic(g, want):
 
 def devotion_white(g):
     """Devotion to white: {W} pips among the mana costs of permanents you
-    control. Karlov himself is {W}{B} and counts for one."""
-    return sum(p.card.cost.get("W", 0) for p in g.board)
+    control. Karlov himself is {W}{B} and counts for one; Lurrus's two
+    {W/B} hybrid pips count for two (`engine.hybrid_pips`, §0z52)."""
+    return sum(hybrid_pips(p.card, "W") for p in g.board)
 
 
 def is_creature_now(g, card):
@@ -604,6 +606,34 @@ def upkeep(g):
         g.m["damage"] += OPP.damage_single(g, 50)
         if g.result is None and len(OPP.living(g)) == 0:
             g.m["win_route"] = 4
+
+
+def ranger_of_eos_pick(g) -> list:
+    """The pilot's two picks: the highest-`priority` creature cards with mana
+    value 1 or less in the library, recomputed at the moment of the search
+    (§0z19). Up to two, so it finds one, or none, when the one-drops are
+    already drawn or dead."""
+    pool = [c for c in g.library if c.is_creature and c.mv <= 1]
+    return sorted(pool, key=lambda c: (-c.priority, c.name))[:2]
+
+
+def ranger_of_eos_etb(g):
+    """RANGER OF EOS: "When this creature enters, you may search your library
+    for up to two creature cards with mana value 1 or less, reveal them, put
+    them into your hand, then shuffle." (§0z51)
+
+    It was `script="draw2"` -- two RANDOM cards where the text gives two
+    SPECIFIC ones, and gives nothing at all once the one-drops are gone. The
+    search is always taken: tutoring draws nothing, so the decking rule does
+    not reach it. The shuffle is CRN-addressed like every mid-game shuffle,
+    and it matters here: Bolas's Citadel plays off the top.
+    """
+    picks = ranger_of_eos_pick(g)
+    for c in picks:
+        g.library.remove(c)
+        g.hand.append(c)
+    g.m["ranger_tutored"] += len(picks)
+    crn_shuffle(g, "ranger_of_eos", g.library)
 
 
 def ginger_etb(g):
@@ -1020,6 +1050,8 @@ def resolve(g, card):
             creature_entered(g, mine=True, entering=perm)
         if card.script == "ginger":
             ginger_etb(g)
+        if card.script == "ranger_of_eos":
+            ranger_of_eos_etb(g)
         # Offspring {2}{B}: an additional cost paid as you cast, which creates a
         # 1/1 token copy on ETB. The copy has the same lifegain trigger, so it
         # carries the same name here and gain_life() counts both.

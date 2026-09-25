@@ -148,6 +148,12 @@
         "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "b9ac0e1ec3e77c62",
         "utc": "2026-09-25T15:50:17Z"
+      },
+      {
+        "commit": "f5ccbbb",
+        "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "fdd8f1e3ee7417cd",
+        "utc": "2026-09-25T20:20:15Z"
       }
     ]
   },
@@ -630,6 +636,12 @@
         "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "c9a39b39280d64f6",
         "utc": "2026-09-25T15:50:17Z"
+      },
+      {
+        "commit": "f5ccbbb",
+        "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "c36bc05558c6b657",
+        "utc": "2026-09-25T20:20:15Z"
       }
     ]
   },

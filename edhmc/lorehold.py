@@ -134,6 +134,7 @@ class LoreholdGame(BaseGame):
             "spell_damage": 0.0,
             "combat_damage": 0.0,
             "approach_casts": 0,
+            "storm_herd_pegasi": 0,          # §0z49: X is your life now
             "extra_turns": 0,
             "turn_won": 99,
             "free_casts": 0,
@@ -151,6 +152,7 @@ class LoreholdGame(BaseGame):
             "hymn_life_delta": 0.0,
             "sands_life_delta": 0.0,
             "sunbird_mv": 0.0,
+            "lifelink_gained": 0.0,          # Radiant Scrollwielder, §0z50
             "brass_treasures": 0,
             # Reality Fracture, 2026-09-21 (preview text).
             "stingcaster_casts": 0, "flashback_casts": 0,
@@ -747,7 +749,17 @@ def make_tokens(g, n, power, toughness, name="token"):
         g.board.append(Permanent(card=tok, sick=True, is_token=True))
 
 
-def deal_pod_damage(g, amount, each=True, *, hits):
+def scrollwielder_lifelink(g, dealt):
+    """RADIANT SCROLLWIELDER: "Instant and sorcery spells you control have
+    lifelink." Lifelink gains what the source DEALT (CR 702.15b), which is not
+    the bounded "could have mattered" figure the damage metric records: 6
+    into a player on 2 life still gains 6. Called only for spell sources."""
+    if dealt > 0 and g.has("Radiant Scrollwielder"):
+        g.your_life += dealt
+        g.m["lifelink_gained"] += dealt
+
+
+def deal_pod_damage(g, amount, each=True, *, hits, spell):
     """`each=True`: an 'each opponent loses N' effect; amount is the pod total.
 
     `hits` is REQUIRED, and it is the number of times a source you control
@@ -757,6 +769,13 @@ def deal_pod_damage(g, amount, each=True, *, hits):
     hit (`artist_bonus`, §0z48), so a call site that miscounts it misprices
     that card and nothing else. It has no default so that a new call site
     cannot be written without deciding.
+
+    `spell` is REQUIRED for the same reason: is the SOURCE an instant or
+    sorcery spell (Boros Charm, Soulfire Eruption, Olórin's Searing Light)
+    rather than a permanent (Guttersnipe, Longshot, Pyremaw, Urabrask)?
+    Radiant Scrollwielder gives the first kind lifelink (`scrollwielder_
+    lifelink`, §0z50) -- the change its own docstring once called too big,
+    until `hits` had made every call site answer half of it.
     """
     if amount <= 0:
         return
@@ -764,6 +783,10 @@ def deal_pod_damage(g, amount, each=True, *, hits):
     # BOUNDED: record what could have mattered, not what was asked for.
     # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
     n = OPP.pod_size(g)
+    alive = len(OPP.living(g))
+    if spell:
+        scrollwielder_lifelink(g, amount / n * alive if each
+                               else (amount if alive else 0.0))
     amount = (OPP.damage_each(g, amount / n) if each
               else OPP.damage_single(g, amount))
     g.m["damage"] += amount
@@ -800,7 +823,7 @@ def discard_triggers(g, n=1):
             g.treasures += 1
             g.m["treasures_made"] += 1
         elif mode == "drain":
-            deal_pod_damage(g, 9.0, hits=0)   # each of 3 LOSES 3: not damage
+            deal_pod_damage(g, 9.0, hits=0, spell=False)   # each of 3 LOSES 3: not damage
 
 
 def on_cast_triggers(g, card, is_copy=False):
@@ -814,10 +837,11 @@ def on_cast_triggers(g, card, is_copy=False):
     if inst_sorc:
         # Guttersnipe: 2 damage to EACH opponent, so 6 a pop.
         n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
-        deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe)
+        deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe,
+                        spell=False)
         # Urabrask: 1 damage to ONE target opponent per instant/sorcery.
         n_ura = sum(1 for p in g.board if p.card.name.startswith("Urabrask"))
-        deal_pod_damage(g, 1.0 * n_ura, hits=n_ura)
+        deal_pod_damage(g, 1.0 * n_ura, hits=n_ura, spell=False)
         # Caldera Pyremaw: "put a +1/+1 counter on this creature. THEN this
         # creature deals damage equal to its power to target opponent." The
         # counter lands first, so the first trigger already hits for 4, and it
@@ -827,7 +851,8 @@ def on_cast_triggers(g, card, is_copy=False):
         for q in g.board:
             if q.card.name == "Caldera Pyremaw":
                 q.counters += 1
-                deal_pod_damage(g, float(g.power_of(q)), each=False, hits=1)
+                deal_pod_damage(g, float(g.power_of(q)), each=False, hits=1,
+                                spell=False)
                 g.m["pyremaw_damage"] += g.power_of(q)
 
     if "Creature" not in card.types:
@@ -836,7 +861,8 @@ def on_cast_triggers(g, card, is_copy=False):
         # spell, so 6 a pop — a Guttersnipe on a wider trigger.
         n_long = sum(1 for p in g.board
                      if p.card.name == "Longshot, Rebel Bowman")
-        deal_pod_damage(g, 6.0 * n_long, hits=OPP.pod_size(g) * n_long)
+        deal_pod_damage(g, 6.0 * n_long, hits=OPP.pod_size(g) * n_long,
+                        spell=False)
         # Dragon's Rage Channeler: surveil 1. In a miracle deck the value is
         # binning a land off the top so the next draw is a live target.
         if g.has("Dragon's Rage Channeler") and g.library:
@@ -934,13 +960,12 @@ def radiant_scrollwielder(g):
        Archaic's cost reduction counts it, and Mizzix's Mastery targets it.
     2. YOU STILL PAY. Unlike Galvanoth this is not a free cast, so it does not
        add to `mv_cheated`.
-    3. NOT MODELLED: "Instant and sorcery spells you control have lifelink."
-       Separating spell damage from creature damage at every `deal_pod_damage`
-       call site is a bigger change than this fix, so the lifelink half is
-       absent and ANY NUMBER FOR THIS CARD IS A FLOOR. The card comment in
-       lorehold_v16.py claiming the clause "does nothing here -- life is not
-       tracked" is stale: life is tracked, and since pod v3 it decides 43% of
-       this deck's losses.
+    3. "Instant and sorcery spells you control have lifelink." MODELLED since
+       §0z50 by `scrollwielder_lifelink`, at `deal_pod_damage`, whose `spell`
+       argument every call site now states. This note used to say separating
+       spell damage from creature damage at every call site was "a bigger
+       change than this fix" -- true then, and made half-true by §0z48's
+       required `hits`, which is how it came to be fifteen lines.
     """
     if not g.has("Radiant Scrollwielder"):
         return
@@ -960,6 +985,21 @@ def radiant_scrollwielder(g):
     g.m["upkeep_free_casts"] += 1
     g.m["scrollwielder_casts"] += 1
     resolve_spell(g, picked, paid, from_hand=False)
+
+
+def storm_herd_x(g) -> int:
+    """STORM HERD: "Create X 1/1 white Pegasus creature tokens with flying,
+    where X is your life total." (§0z49)
+
+    X was `cfg["storm_herd_x"]`, 40, written when this engine tracked no life
+    at all. It has tracked life since pod v3, so X is read at RESOLUTION --
+    a copy resolving later reads the life total then. Setting `storm_herd_x`
+    still forces a constant, which is how the old number is reproduced.
+    """
+    forced = g.cfg.get("storm_herd_x")
+    if forced is not None:
+        return int(forced)
+    return max(0, int(g.your_life))
 
 
 def apply_spell_effects(g, card, is_copy=False, was_cast=True):
@@ -1008,7 +1048,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         for _ in range(3):
             if g.library:
                 # one target player per exiled card: one hit each
-                deal_pod_damage(g, float(g.library.pop().mv), hits=1)
+                deal_pod_damage(g, float(g.library.pop().mv), hits=1,
+                                spell=True)
     elif sc == "searing_light":
         # "Each opponent exiles a creature with the greatest power among
         # creatures that player controls." An edict, NOT a board wipe — it was
@@ -1026,7 +1067,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
             # numerator from the other one is what made the tivit sites look
             # like they were moving when only the harness was.
             deal_pod_damage(g, g.cfg.get("opp_avg_power", 2.5)
-                            * OPP.pod_size(g), hits=OPP.pod_size(g))
+                            * OPP.pod_size(g), hits=OPP.pod_size(g),
+                            spell=True)
     elif sc == "invincible_hymn":
         # "Count the number of cards in your library. Your life total BECOMES
         # that number." Not lifegain — a set, and it can go down.
@@ -1050,7 +1092,9 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
                 o.life = life
             OPP._check_eliminations(g)
     elif sc == "storm_herd":
-        make_tokens(g, g.cfg.get("storm_herd_x", 40), 1, 1, "Pegasus")
+        n = storm_herd_x(g)
+        make_tokens(g, n, 1, 1, "Pegasus")
+        g.m["storm_herd_pegasi"] += n
     elif sc == "extra_turn":
         _draw_into_hand(g, 4)
         g.m["extra_turns"] += 1
@@ -1164,7 +1208,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         make_tokens(g, *card.tokens)
     # `pod_damage` is a single-target DAMAGE spell's number (Boros Charm is
     # the only card carrying one; tests/test_artists_talent.py pins that).
-    deal_pod_damage(g, card.pod_damage, hits=1)
+    deal_pod_damage(g, card.pod_damage, hits=1, spell=True)
     if card.discards and not is_copy:
         discard_triggers(g, card.discards)
     if is_copy and was_cast:
@@ -1832,12 +1876,14 @@ def combat(g):
             if best.script == "soulfire":
                 for _ in range(3):
                     if g.library:
-                        deal_pod_damage(g, float(g.library.pop().mv), hits=1)
+                        deal_pod_damage(g, float(g.library.pop().mv), hits=1,
+                                spell=True)
             if best.tokens:
                 make_tokens(g, *best.tokens)
-            deal_pod_damage(g, best.pod_damage, hits=1)
+            deal_pod_damage(g, best.pod_damage, hits=1, spell=True)
             n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
-            deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe)
+            deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe,
+                        spell=False)
 
     if any(p.card.name == "Goliath Daydreamer" for p in attackers):
         goliath_attack(g)

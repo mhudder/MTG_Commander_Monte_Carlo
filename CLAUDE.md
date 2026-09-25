@@ -152,6 +152,7 @@ python -m tests.test_voice_of_the_blessed --mutate # 3 mutations, exact sets
 python -m tests.test_flip_signal --mutate          # 3 mutations, exact sets
 python -m tests.test_artists_talent --mutate       # 6 mutations, exact sets
 python -m tests.test_march_elephant --mutate       # 4 mutations, exact sets
+python -m tests.test_text_fixes --mutate           # 9 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -904,10 +905,12 @@ is half answered**: the ordering half is built and measured as a null
     the 2026-09-09 figure, unpaired, so marginal; the given-Caldera number
     the staging rests on is still +0.0150 ±0.0031.
 
-0c. **Goldspan Dragon needs a HEAD-TO-HEAD.** Significant at all three
-    horizons (+0.0018 / +0.0051 / +0.0057) where it used to sit inside its
-    bar, but a standalone score is not a staging: three swaps against a common
-    baseline have overlapping CIs and cannot be ranked against each other.
+0c. **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
+    call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
+    both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
+    significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
+    T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
+    estimate, so that swap cuts a card the model half-sees.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

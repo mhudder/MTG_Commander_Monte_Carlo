@@ -128,7 +128,7 @@ def rummaged(card, before_draw=False, monument=False):
 
 def dealt(level, amount, hits, each=False):
     g = game(level)
-    L.deal_pod_damage(g, amount, each=each, hits=hits)
+    L.deal_pod_damage(g, amount, each=each, hits=hits, spell=False)
     return round(g.m["spell_damage"], 3)
 
 

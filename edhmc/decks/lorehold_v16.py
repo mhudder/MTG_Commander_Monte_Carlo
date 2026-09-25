@@ -250,10 +250,9 @@ RADIANT_SCROLLWIELDER = C("Radiant Scrollwielder", "Creature",
 # See lorehold.radiant_scrollwielder(). Not free, unlike Galvanoth, and the
 # exile happens whether or not you pay.
 #
-# "Instant and sorcery spells you control have lifelink" is NOT modelled, so
-# any number for this card is a floor. The previous comment excused that with
-# "life is not tracked" -- it is, and since pod v3 it decides 43% of this
-# deck's losses.
+# "Instant and sorcery spells you control have lifelink" is modelled since
+# §0z50 (lorehold.scrollwielder_lifelink); every number measured before it is
+# a floor for that reason.
 
 GOLDSPAN_DRAGON = C("Goldspan Dragon", "Creature", {"gen": 3, "R": 2}, 4, 4,
                     priority=8, threat=8.5, script="goldspan", haste=True)

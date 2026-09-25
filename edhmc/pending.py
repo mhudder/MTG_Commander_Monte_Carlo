@@ -841,6 +841,32 @@ MEASURED: list[Candidate] = [
             ', and CURRENT -- the cleanest of the eight. No rival has been measur'
             'ed for that slot.'),
     ),
+    # QUEUED ITEM 0c, answered 2026-09-25 (§0z53).
+    Candidate(
+        deck='lorehold',
+        card='Goldspan Dragon',
+        measured='2026-09-25',
+        win_rate=('REAL SWAPS, N=15,000 paired, on the staged list after §0z49/§0z50: '
+            '-Blasphemous Act +Goldspan +0.0106 +-0.0020 at T10 and +0.0162 +-0.0044 at '
+            'T20 (significant at both); -Lightning Greaves +Goldspan +0.0005 +-0.0014 / '
+            '+0.0084 +-0.0034 (T20 only); Goldspan in Caldera Pyremaw\'s slot -0.0039 '
+            '+-0.0012 / -0.0108 +-0.0027 (Caldera is better).'),
+        signal='both',
+        rationale=('Queued item 0c: its leave-one-out row was significant at all three '
+            'horizons in 2026-09-06, and §0c says a standalone row is not a staging. '
+            'These are the head-to-heads it asked for, against the two cuts that '
+            'history named and against the card holding the five-drop slot.'),
+        evidence='results/text_fixes.txt (diagnostics/run_text_fixes.py)',
+        limits=('THE BETTER SWAP CUTS A PARTLY-MODELLED CARD. Blasphemous Act is a '
+            'symmetric wipe: its cost to you is modelled faithfully, the benefit '
+            '(the opponents\' boards) is an abstract creature count, so the model '
+            'half-sees the card this swap removes -- §0z36 says that can err in '
+            'either direction. Lorehold\'s baseline moved twice on 2026-09-25 '
+            '(§0z48, §0z49) and these were measured after both.'),
+        verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
+            'Act\'s slot, significant at both horizons, with the cut\'s blind half '
+            'said out loud. Staging is the owner\'s call.'),
+    ),
     Candidate(
         deck='karlov',
         card='Liliana the Faultless',
@@ -2079,7 +2105,13 @@ CHANGES: list[Change] = [
             "the change: Caldera GIVEN Sunbird's +0.0240 +-0.0027 at HEAD "
             "6a0e786 and +0.0217 +-0.0027 after -- inside its bar, and still "
             "the largest cell. Penance ablates to -0.0062 +-0.0034 at T20. "
-            "The decision stands. results/lorehold_pair_artist.txt."
+            "The decision stands. results/lorehold_pair_artist.txt. "
+            "AND AGAIN AFTER §0z49 (Storm Herd's X, which moved lorehold's "
+            "baseline -0.0271): Caldera GIVEN Sunbird's +0.0231 +-0.0026. "
+            "Radiant Scrollwielder in this slot WITH its lifelink (§0z50) is "
+            "-0.0085 +-0.0034 against Caldera, so the five-drop decision "
+            "stands with that clause in. results/lorehold_pair_stormherd.txt, "
+            "results/text_fixes.txt."
         ),
     ),
     Change(
@@ -2151,7 +2183,9 @@ CHANGES: list[Change] = [
             "the change, +0.0102 after. Roughly one bar, between two "
             "unpaired engines, so marginal -- and unattributed (queued item "
             "0b-i). Scroll Rack ablates to -0.0075 +-0.0034 at T20. "
-            "results/lorehold_pair_artist.txt."
+            "results/lorehold_pair_artist.txt. AND AGAIN AFTER §0z49 (Storm "
+            "Herd's X): Sunbird's GIVEN Caldera +0.0164 +-0.0029, alone "
+            "+0.0118 +-0.0028. results/lorehold_pair_stormherd.txt."
         ),
     ),
 ]
@@ -2805,7 +2839,9 @@ DECKS = {
         "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
         "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION,
         # REALITY FRACTURE, 2026-09-21 (preview text).
-        "Stingcaster Mage": lorehold_v16.STINGCASTER_MAGE}),
+        "Stingcaster Mage": lorehold_v16.STINGCASTER_MAGE,
+        # Queued item 0c's head-to-heads, 2026-09-25 (§0z53).
+        "Goldspan Dragon": lorehold_v16.GOLDSPAN_DRAGON}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.

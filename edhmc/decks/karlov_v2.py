@@ -32,7 +32,8 @@ from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
-      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0):
+      threat=0.0, mana=None, lifegain=0.0, drain=0.0, lifelink=False, x_pips=0,
+      alt_costs=()):
     # `indestructible` used to be a hand-passed argument and Heliod, Sun-Crowned
     # was the only card that set it. It is now derived from the GENERATED
     # INDESTRUCTIBLE set for the same reason `flying` is: a keyword tagged from
@@ -44,7 +45,7 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 power=p, toughness=t, script=script, priority=priority,
                 threat=threat, tags=frozenset(tags), mana_ability=ma,
                 lifegain=lifegain, drain=drain, lifelink=lifelink,
-                x_pips=x_pips,
+                x_pips=x_pips, alt_costs=alt_costs,
                 flying=name in FLYING,
                 indestructible=name in INDESTRUCTIBLE)
 
@@ -95,12 +96,17 @@ CREATURES = [
       priority=7.5, threat=7.5),
     C("Kambal, Consul of Allocation", "Creature", {"gen": 1, "W": 1, "B": 1}, 2, 3,
       priority=7.5, threat=7.0),
+    # {1}{W/B}{W/B}: the printed cost is one of three ways to pay it, and the
+    # other two are `alt_costs` tagged "hybrid" -- the convention Revitalizing
+    # Repast set in rendmaw. `engine.hybrid_pips` reads them for devotion
+    # (§0z52): two hybrid pips are TWO devotion to white.
     C("Lurrus of the Dream-Den", "Creature", {"gen": 1, "W": 1, "B": 1}, 3, 2,
-      priority=6, threat=6.0, lifelink=True),
+      priority=6, threat=6.0, lifelink=True,
+      alt_costs=(({"gen": 1, "W": 2}, "hybrid"), ({"gen": 1, "B": 2}, "hybrid"))),
     C("Vito, Thorn of the Dusk Rose", "Creature", {"gen": 2, "B": 1}, 1, 3,
       priority=9, threat=8.5),
     C("Ranger of Eos", "Creature", {"gen": 3, "W": 1}, 3, 2, priority=6,
-      threat=5.5, script="draw2"),
+      threat=5.5, script="ranger_of_eos"),
     C("Kalitas, Traitor of Ghet", "Creature", {"gen": 2, "B": 2}, 3, 4,
       priority=7, threat=7.5, lifelink=True),
     C("Sunscorch Regent", "Creature", {"gen": 3, "W": 2}, 4, 3, priority=6,

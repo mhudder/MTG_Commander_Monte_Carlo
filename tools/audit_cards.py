@@ -48,10 +48,11 @@ CARD_TYPES = {"Artifact", "Battle", "Creature", "Enchantment", "Instant",
 # Cards whose single-cost model cannot be right, with the reason. These are
 # reported in their own section rather than as failures.
 KNOWN_MODEL_LIMITS = {
-    "Lurrus of the Dream-Den": "hybrid {1}{W/B}{W/B} flattened to {1}{W}{B}",
+    "Lurrus of the Dream-Den": ("hybrid {1}{W/B}{W/B} modelled as {1}{W}{B} + "
+                                "{1}{W}{W} / {1}{B}{B} alt_costs (§0z52)"),
     "Revitalizing Repast": "hybrid {B/G} modelled as {B} + a {G} alt_cost",
     "Damn": "cast face {B}{B}; the wrath is overload {2}{W}{W}, MV 4",
-    "Mizzix's Mastery": "overload {5}{R}{R}{R} is a special case in lorehold.py",
+    "Mizzix's Mastery": "overload {5}{R}{R}{R} is an alt_costs mode (§0z20)",
     "Overlord of the Hauntwoods": "Impending 4 modelled via alt_costs",
     # A split/Room card: Scryfall reports the COMBINED cost and sums both
     # halves into cmc 8, which nobody ever pays. Modelled as the {2}{G}

@@ -278,8 +278,10 @@ SCRIPTED_LOREHOLD = {
     # was BLIND until then -- level 2 granted free on resolution, applied to
     # creature spells too, and levels 1 and 3 absent.
     "Artist's Talent",
+    # X is your life total at resolution since §0z49. It was BLIND while X
+    # was a constant 40, written when this engine tracked no life.
+    "Storm Herd",
     # BLIND, despite having engine code — the implementation is not the card:
-    #   Storm Herd      - X is cfg["storm_herd_x"]=40, not your life total
     #   Approach of the Second Sun - never gets its second cast, because the
     #                     card is not put seventh from the top
 }
@@ -324,10 +326,11 @@ SCRIPTED_KARLOV = {
     # creature in the engine — a global gap, not a per-card approximation, and
     # the same one Serra Ascendant already carries in this set.
     "Starscape Cleric", "Enduring Tenacity", "Exemplar of Light",
+    # Its ETB tutor since §0z51 (it was "draw 2"): karlov.ranger_of_eos_etb.
+    "Ranger of Eos",
     # MOVED OUT to the blind group 2026-09-03, still approximated:
     #   Necropotence      - modelled as "draw 2", not skip-draw-step + pay life
     #   Benevolent Offering - flat 4 life, no per-creature scaling, no tokens
-    #   Ranger of Eos     - "draw 2", not a tutor for two specific one-drops
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -917,7 +920,6 @@ KNOWN_BLIND = {
         'Pinnacle Monk',
         'Restoration Seminar',
         'Sejiri Shelter',
-        'Storm Herd',
         'Swords to Plowshares',
     },
     "karlov": {
@@ -929,7 +931,6 @@ KNOWN_BLIND = {
         'Necropotence',
         'Path to Exile',
         'Phyrexian Reclamation',
-        'Ranger of Eos',
         'Return to Dust',
         "Sensei's Divining Top",
         'Soulmender',
