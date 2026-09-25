@@ -2361,6 +2361,25 @@ section above.
 
 ---
 
+## Queued items closed 2026-09-25 — moved from `CLAUDE.md`
+
+Moved verbatim, each with a closing note, under the same precedent as the
+sections above.
+
+2.  ~~**Artist's Talent's three Class levels**~~ **CLOSED 2026-09-25 — §0z48.** All three levels, bought by a stated policy; level 3 alone is +0.0031 ±0.0010. — Level 2 is granted free and
+    instantly; Levels 1 and 3 do not exist.
+
+4.  ~~**March of the World Ooze's Elephant trigger is unmodelled**~~ **CLOSED 2026-09-25 — §0z47**, on counterspells, the one opponent spell the model puts on your turn; still a floor., so its
+    committed numbers are a floor. `KNOWN_ISSUES.md` item 1a.
+
+8b. **CLOSED 2026-09-25 (§0z46): Voice of the Blessed is indestructible at
+    ten counters**, in `opponents.indestructible_of()` beside `flying_of()`,
+    and still kept out of the generated `INDESTRUCTIBLE` set (§0n). It saves
+    Voice 0.016 times a game. Karlov's baseline moves with it; that deck is
+    already stale pending the batched rebuild.
+
+---
+
 ## HANDOFF.md's status block, as of 2026-09-12 — SUPERSEDED, see `docs/STATUS.md`
 
 **Moved here verbatim from `HANDOFF.md` on 2026-09-15.** It opened that file

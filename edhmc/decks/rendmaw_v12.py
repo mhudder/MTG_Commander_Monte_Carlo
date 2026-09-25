@@ -97,7 +97,9 @@ NONLANDS = [
     # --- token payoffs / anthems ---
     # Creatures you control have base P/T 6/6 and are Oozes. The Elephant
     # trigger ("whenever an opponent casts a spell, if it's not their turn")
-    # is still unmodelled — KNOWN_ISSUES 1a — so its numbers are a floor.
+    # is `engine.march_elephant` since §0z47, and fires only on opponents'
+    # counterspells -- the one opponent spell the model puts on your turn --
+    # so its numbers are still a floor, a higher one.
     C("March of the World Ooze", "Enchantment", {"gen": 3, "G": 3},
       priority=8, tags=("pump",), threat=9.0),
     C("Metallic Mimic", "Artifact/Creature", {"gen": 2}, 2, 1, priority=7, threat=5.0),

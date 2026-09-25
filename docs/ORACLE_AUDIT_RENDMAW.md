@@ -24,8 +24,8 @@
 > is still unmodelled — `damage_through` has no evasion term for any deck, so
 > `goad_block_share` (default 0.30) is standing in for it.
 >
-> Still open: March of the World Ooze's Elephant trigger (KNOWN_ISSUES 1a);
-> Twitching Doll's sacrifice-for-Spiders; Bitterblossom's 1 life per Faerie;
+> March of the World Ooze's Elephant trigger is CLOSED as far as this model
+> can see it (2026-09-25, `KNOWN_ISSUES.md` §0z47). Still open: Twitching Doll's sacrifice-for-Spiders; Bitterblossom's 1 life per Faerie;
 > Rendmaw's own reach and menace.
 
 Every nonland card in `edhmc/decks/rendmaw_v11.py` checked against Scryfall
@@ -129,7 +129,11 @@ nothing for the token engine — it only pumps the Myr package. The
 implementation is right; the card is just narrower here than its
 `SCRIPTED_RENDMAW` membership suggests.
 
-### March of the World Ooze — the known gap, still open
+### March of the World Ooze — the known gap, CLOSED 2026-09-25 (§0z47)
+
+`engine.march_elephant` makes the Elephant whenever an opponent counters one
+of your spells -- the only opponent spell the model places on your turn -- so
+the card's numbers are still a floor. Kept below as the finding it was.
 
 > Creatures you control have base power and toughness **6/6** and are Oozes.
 > Whenever an opponent casts a spell, **if it's not their turn**, you create a

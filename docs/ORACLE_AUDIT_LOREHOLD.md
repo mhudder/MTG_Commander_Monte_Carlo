@@ -15,9 +15,10 @@
 > Effect: Lorehold's A/A damage rose from **37.98 to 43.81**. (It had already
 > risen 34.52 → 37.98 on the v16 reconciliation alone.)
 >
-> Still open, and all of it is Artist's Talent-shaped: the Class still grants
-> its Level 2 discount free and instantly, with Level 1's rummage and Level
-> 3's +2 noncombat damage unmodelled. Also open: Storm Herd's X still reads
+> **Artist's Talent CLOSED 2026-09-25 (`KNOWN_ISSUES.md` §0z48)**: all three
+> levels, bought with `{2}{R}` each by a stated policy, the level-2 discount
+> for noncreature spells only, and level 3's +2 per hit at `deal_pod_damage`,
+> whose `hits` argument every call site now has to state. Also open: Storm Herd's X still reads
 > `cfg["storm_herd_x"]`=40 rather than a real life total (this engine does not
 > track life at all), and Approach of the Second Sun still cannot get its
 > second cast because the card is not put seventh from the top.
@@ -70,6 +71,8 @@ this one.
 ## Tier 2 — engine behaviour that does not match the text
 
 ### Artist's Talent — a three-level Class collapsed into one free level
+
+**FIXED 2026-09-25, §0z48.** Kept below as the finding it was.
 
 > (Level 1) Whenever you cast a noncreature spell, you may **discard a card. If
 > you do, draw a card.**

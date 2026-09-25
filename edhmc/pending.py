@@ -755,11 +755,13 @@ MEASURED: list[Candidate] = [
         limits=('A LONG-HORIZON CALL ONLY: significant at T20, inside its bar at T10.'
             ' Threshold gates a cast attempt 2.81 times a game (proft_gated), so '
             'it arrives late by design; 601.3 makes that a castability restrictio'
-            'n, modelled as one. CURRENT. The baseline has NOT moved since this w'
-            'as measured: check_unchanged_decks 246b148 vs 2026-09-25 is BIT-IDEN'
-            'TICAL on all 8 metrics for this deck, which has no staged changes, s'
-            'o the module IS the measured list. This number describes the list as'
-            ' it is today.'),
+            'n, modelled as one. STALE -- NOT RESTATED, since later on 2026-09-2'
+            '5: it was CURRENT when recorded (check_unchanged_decks 246b148 vs 20'
+            "26-09-25 BIT-IDENTICAL), and then §0z47 moved rendmaw's baseline -- "
+            "March of the World Ooze's Elephant and Arasta's Spider now fire on o"
+            'pponent counterspells, +0.064 tokens a game. Small, and in a deck th'
+            'at makes 9 tokens a game, but the number no longer describes the lis'
+            't. Re-measure before a decision rests on it.'),
         verdict=('A small real card at T20 and nothing measurable at T10. The cut, Ash'
             "nod's Altar, was chosen as the deck's worst MODEL-EVALUATED row but "
             "sits inside its own bar, so this swap is 'least supported cut', not "
@@ -2070,7 +2072,14 @@ CHANGES: list[Change] = [
             "direction: Penance ablates to -0.0079 +-0.0032 win at T20, still "
             "significantly worse than a blank. The decision stands. "
             "diagnostics/run_lorehold_pair.py, "
-            "results/lorehold_pair_postsplit.txt."
+            "results/lorehold_pair_postsplit.txt. "
+            "RE-VERIFIED 2026-09-25 AFTER §0z48, which matters to THIS card "
+            "specifically: Artist's Talent's level 3 adds 2 to every Pyremaw "
+            "hit. Same factorial, N=30,000, same seeds, run on BOTH sides of "
+            "the change: Caldera GIVEN Sunbird's +0.0240 +-0.0027 at HEAD "
+            "6a0e786 and +0.0217 +-0.0027 after -- inside its bar, and still "
+            "the largest cell. Penance ablates to -0.0062 +-0.0034 at T20. "
+            "The decision stands. results/lorehold_pair_artist.txt."
         ),
     ),
     Change(
@@ -2132,7 +2141,17 @@ CHANGES: list[Change] = [
             "not ATTRIBUTED (queued item 0b-i); do not invent a mechanism for "
             "it. Scroll Rack still ablates to -0.0107 +-0.0032 at T20, so the "
             "cut is as cheap as it ever was. The decision stands. "
-            "results/lorehold_pair_postsplit.txt."
+            "results/lorehold_pair_postsplit.txt. "
+            "RE-VERIFIED 2026-09-25 AFTER §0z48 (Artist's Talent's levels), "
+            "same factorial on both sides of the change: Sunbird's GIVEN "
+            "Caldera +0.0161 +-0.0030 at HEAD 6a0e786 and +0.0150 +-0.0031 "
+            "after, inside its bar; significant, and the decision stands. "
+            "BUT SUNBIRD'S ALONE HAS DROPPED AGAIN, and not because of "
+            "§0z48: +0.0152 on 2026-09-09, +0.0109 +-0.0029 at HEAD before "
+            "the change, +0.0102 after. Roughly one bar, between two "
+            "unpaired engines, so marginal -- and unattributed (queued item "
+            "0b-i). Scroll Rack ablates to -0.0075 +-0.0034 at T20. "
+            "results/lorehold_pair_artist.txt."
         ),
     ),
 ]

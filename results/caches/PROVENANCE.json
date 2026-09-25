@@ -142,6 +142,12 @@
         "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
         "fingerprint": "95959d6fe384fae0",
         "utc": "2026-09-25T13:03:56Z"
+      },
+      {
+        "commit": "6a0e786",
+        "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "b9ac0e1ec3e77c62",
+        "utc": "2026-09-25T15:50:17Z"
       }
     ]
   },
@@ -618,6 +624,12 @@
         "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
         "fingerprint": "20fa035e9d7984da",
         "utc": "2026-09-25T13:03:56Z"
+      },
+      {
+        "commit": "6a0e786",
+        "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+        "fingerprint": "c9a39b39280d64f6",
+        "utc": "2026-09-25T15:50:17Z"
       }
     ]
   },

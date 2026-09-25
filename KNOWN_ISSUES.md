@@ -95,6 +95,8 @@ Methodology that used to live at the end of this file is now
 | [0z44](#0z44) | MEASURED | **The `priority` numbers: right in four decks, wrong in two.** Flattening each table costs 0.015–0.045 win rate, so the numbers matter; a ±2 sweep of every nonland card (760 arms, three disjoint seed blocks) confirms **no move at all** in rendmaw, lorehold, shilgengar or azusa, two in karlov (Felidar Sovereign up, Sorin, Solemn Visitor up: joint **+0.0099 / +0.0091**) and four in tivit, which ranked card draw above its token engines (joint **+0.0225 / +0.0211**). Mechanisms read off the win routes. **Measured, not adopted**: adopting moves two baselines and a staged card's own priority **ADOPTED 2026-09-25 for both decks; the karlov and tivit tables are stale until the owner's batched rebuild.** |
 | [0z45](#0z45) | MEASURED | **Eight Reality Fracture numbers enter the ledger, each saying whether it still describes its deck.** Two are CURRENT (Proft, Lyra -- their decks are bit-identical since measurement); six are STALE because lorehold, tivit, karlov and azusa have all moved since, and azusa's two were measured against a cut that is no longer in the list |
 | [0z46](#0z46) | FIXED | **Voice of the Blessed is indestructible at ten counters** (queued 8b). §0n kept it out of the static INDESTRUCTIBLE set, correctly, but that left the clause nowhere to live, so it was never indestructible at all. `opponents.indestructible_of`, beside `flying_of`; it saves Voice 0.016 times a game |
+| [0z47](#0z47) | FIXED | **March of the World Ooze's Elephant** (queued 4), on the one opponent spell the model puts on your turn -- a counterspell -- through a new optional hook in `opponents.countered`. Writing it found **Arasta of the Endless Web** reading the same event a second way: a counterspell is an instant and made no Spider. Both read the hook now. Elephant +0.0014 ±0.0008 at T20; the hook +0.0017 ±0.0010; a floor |
+| [0z48](#0z48) | FIXED | **Artist's Talent, all three levels** (queued 2). Level 2 was granted free on resolution and discounted CREATURE spells; levels 1 and 3 did not exist. Now bought with `{2}{R}` by a stated policy. The row barely moves (+0.0043 ±0.0040 vs the table's +0.0052) because the errors cancelled: **level 3 alone is +0.0031 ±0.0010**, level 2 alone is inside its bar, and the level-1 rummage is worth nothing measurable |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6706,7 +6708,9 @@ between 246b148 (where batch 2 was measured) and 2026-09-25:
 | azusa | MOVED (§0z41, §0z42, Chocobo) | Verdant Kraken, Simulacrum Shaper | stale |
 
 Neither CURRENT deck has a staged change, so its module IS its measured list
-and the module-based check covers it fully.
+and the module-based check covers it fully. **Later the same day §0z47 moved
+rendmaw** (counterspells now make Elephants and Spiders), so Proft is STALE as
+well and says so in its Candidate; Lyra is the one CURRENT number left.
 
 **Azusa's two are stale in a sharper way.** They were measured against
 `-Yavimaya Elder`, and on 2026-09-22 the Chocobo was COMMITTED into exactly
@@ -6750,6 +6754,152 @@ honoured, a non-Voice creature at ten is not protected, and the four-counter
 flying neighbour re-checked per §0z28. Three mutations, exact sets, correct on
 the first run. Only karlov holds Voice, so only karlov's baseline moves, and
 karlov is already stale pending the owner's batched rebuild (§0z44).
+
+## 0z47. FIXED — March of the World Ooze's Elephant, and Arasta reading the same event a second way (queued 4)
+
+"Whenever an opponent casts a spell, if it's not their turn, you create a 3/3
+green Elephant creature token." (Scryfall, verified 2026-09-25.) The P/T
+half was in `power_of` from the start; this half was `KNOWN_ISSUES` item 1a in
+the oracle audit and queued item 4 in `CLAUDE.md`, and the committed numbers
+were called a floor for it.
+
+**The model has exactly one opponent spell on your turn: a counterspell.**
+Removal and wipes land in `opponents_act`, which is the opponents' own turns;
+karlov's `opponent_activity` spells are the same. So `opponents.countered`
+now calls `g.opponent_cast_on_your_turn(i)` when the engine defines it -- the
+`hasattr` protocol, one new row in `docs/ARCHITECTURE.md` -- and only rendmaw's
+`Game` does. It runs `engine.march_elephant`, which goes through
+`make_tokens`, the one token path, so Primal Vigor and Parallel Lives double
+the Elephant and March's own first clause makes it 6/6.
+
+**Writing it found the rule written twice.** Arasta of the Endless Web is in
+the same deck: "Whenever an opponent casts an instant or sorcery spell, create
+a 1/2 green Spider creature token with reach." It was modelled as one per-round
+roll (`opp_instant_rate`, 0.8), and a counterspell -- an instant, cast at you,
+a real event in this model -- made no Spider. `engine.arasta_spider` is now
+called from both: the roll, which stands for the pod's instants in general,
+and the hook. §0u's shape, caught on the day the second reader was written
+rather than months later.
+
+**What March still does not see, and why it stays a floor.** Instant-speed
+removal, flash creatures, cantrips, and every spell an opponent casts on
+ANOTHER opponent's turn (which also triggers March -- "if it's not THEIR
+turn"). Arasta's roll exists and March does NOT read it: it does not say whose
+turn the spell was cast on, and routing March through it would put an
+uncalibrated knob (0.8) under a second card. At a real table this card makes
+far more Elephants than 0.03 a game.
+
+**Measured**, N=15,000 paired, seeds 5000+, `build_pending("rendmaw")`:
+
+| comparison | T10 win | T20 win | T20 damage | mechanism |
+|---|---|---|---|---|
+| Elephant on − off | +0.0003 ±0.0003 | **+0.0014 ±0.0008** | +0.14 ±0.03 | 0.033 Elephants a game |
+| Arasta on counterspells, on − off | +0.0003 ±0.0003 | +0.0003 ±0.0006 | +0.04 ±0.02 | +0.03 tokens a game |
+| the whole hook, on − off | +0.0006 ±0.0004 | **+0.0017 ±0.0010** | +0.18 ±0.04 | +0.064 tokens a game |
+| March's row (card − blank), new engine | +0.0052 ±0.0014 | +0.0145 ±0.0028 | +1.89 ±0.15 | the table has +0.0131 ±0.0028 |
+
+A 6/6 body 0.033 times a game is worth 0.0014 -- about four points of win rate
+per Elephant, which is what a 6/6 on turn 8 should be. The row moves inside its
+bar. `tests/test_march_elephant.py` pins it: seven cases, four mutations,
+exact sets. The first plain run failed case C on a TEST defect, not an engine
+one -- with the counter chance forced to 1.0, a roll of 0.999 still counters
+(`rolls[i] < p`); the harness uses 1.0. Only rendmaw's baseline moves
+(`check_unchanged_decks`: the other five bit-identical). Its table is stale
+and joins the owner's batched rebuild.
+
+## 0z48. FIXED — Artist's Talent, all three levels (queued 2)
+
+    {1}{R} Enchantment — Class  (Scryfall, verified 2026-09-25)
+    Whenever you cast a noncreature spell, you may discard a card. If you do,
+    draw a card.
+    {2}{R}: Level 2 -- Noncreature spells you cast cost {1} less to cast.
+    {2}{R}: Level 3 -- If a source you control would deal noncombat damage to
+    an opponent or a permanent an opponent controls, it deals that much
+    damage plus 2 instead.
+
+**What it was**: one line in `reduce_cost`, `if g.has("Artist's Talent")`.
+Level 2 arrived free the moment the Class resolved, it discounted CREATURE
+spells as well (the text says noncreature), and levels 1 and 3 did not exist.
+`tools/ablation.py` rightly held it MODEL-BLIND. The oracle audit called the net
+direction "genuinely unclear", and that turned out to be the finding.
+
+**What it is now** (`edhmc/lorehold.py`, one function per clause, so a
+mutation can remove each alone):
+
+* **The level is on the permanent** -- `Permanent.level`, default 1 per CR
+  716.2d, so a Class that leaves and comes back is level 1 again.
+* **`artist_level_up`, a POLICY said out loud**: after the post-combat main
+  phase, spend `{2}{R}` per level with mana nothing in hand could use, and
+  never out of the miracle reserve -- the rule every spell in `main_phase`
+  obeys. Then the main phase looks again, because level 2 can make a spell
+  affordable. Greedy and late: a pilot would sometimes level BEFORE casting to
+  buy the discount. `artist_max_level` (3) caps it, which is how the levels
+  were measured apart.
+* **Level 1, `artist_rummage`**, from `on_cast_triggers`, so Bombardment and
+  Mastery copies trigger it and Double Vision's does not. The discard pick is
+  Lorehold's own, factored into `rummage_discard_choice` so the two rummages
+  are one policy (§0z30). It triggers Monument to Endurance. **Declined before
+  your draw step**: an upkeep Galvanoth or Scrollwielder cast would make its
+  draw the turn's first -- a miracle-eligible draw the function opens no
+  window for -- and demote the draw step's arranged card to second.
+* **Level 2, `artist_discount`**, noncreature only, read by BOTH `reduce_cost`
+  and `miracle_reduction` -- one function, because the discount written twice
+  is §0u.
+* **Level 3, `artist_bonus`**, +2 per HIT at `deal_pod_damage`, the one
+  noncombat chokepoint. **`hits` is now a required argument with no default**,
+  so all eleven call sites had to decide and a new one cannot be written
+  without deciding: Guttersnipe and Longshot are one hit per opponent, Urabrask,
+  Pyremaw, Boros Charm and each Soulfire target one, Olórin's Searing Light one
+  per opponent, **and Monument's "each opponent LOSES 3" zero -- life loss is
+  not damage.** Boros Charm's `hits=1` rests on every `pod_damage` card in the
+  lorehold pool being single-target damage; the test pins that census.
+
+**Measured**, N=15,000 paired, seeds 5000+, `build_pending("lorehold")`:
+
+| comparison | T10 win | T20 win | T20 damage |
+|---|---|---|---|
+| the card's row (card − blank), new engine | +0.0016 ±0.0019 | +0.0043 ±0.0040 | +0.44 ±0.22 |
+| the committed table's row, old engine | | +0.0052 ±0.0036 | +0.43 ±0.19 |
+| levels 2 and 3 (cap 3 − cap 1) | +0.0010 ±0.0009 | **+0.0040 ±0.0020** | +0.29 ±0.10 |
+| level 2 alone (cap 2 − cap 1) | +0.0002 ±0.0008 | +0.0009 ±0.0019 | +0.15 ±0.10 |
+| **level 3 (cap 3 − cap 2)** | **+0.0008 ±0.0005** | **+0.0031 ±0.0010** | +0.14 ±0.03 |
+| level 1 alone (cap 1 − blank, from the arm means) | | ≈ +0.0003 | |
+
+Mechanism: 1.60 rummages and 0.32 levels a game over all games (the card is
+not out in most of them).
+
+**The row barely moved because the errors cancelled**, which is the audit's
+"unclear direction" resolved rather than confirmed. The free level 2 was
+flattering the card; the missing level 3 was costing it about as much. **Level
+3 is the whole card**: significant at both horizons, three times its own bar at T20,
+because it turns every Guttersnipe and Longshot trigger from 2 into 4. The
+level-2 discount -- the only thing the old engine modelled -- is inside its bar
+on its own. The level-1 rummage is worth nothing measurable in win rate: 1.6
+card swaps a game in a deck that already rummages three times a round.
+
+**Both staged lorehold swaps were re-measured across the change**, because
+Caldera Pyremaw is exactly the kind of source level 3 boosts: the same 2x2
+factorial (`diagnostics/run_lorehold_pair.py`, N=30,000, same seeds) at HEAD
+6a0e786 and after. Caldera GIVEN Sunbird's +0.0240 ±0.0027 → +0.0217 ±0.0027;
+Sunbird's GIVEN Caldera +0.0161 ±0.0030 → +0.0150 ±0.0031. Both inside their
+bars, both still significant; the stagings stand
+(`results/lorehold_pair_artist.txt`). The run also showed Sunbird's ALONE at
++0.0109 at HEAD, down from +0.0152 on 2026-09-09 -- a drop that predates this
+change, filed under queued item 0b-i and not attributed.
+
+**Not modelled, and named.** The Dawning Archaic's attack trigger casts a
+spell through its own inline block, not `resolve_spell`, so the spell it casts
+triggers Guttersnipe but not Longshot, Urabrask, Pyremaw, Mentor or this
+card's rummage -- a pre-existing §0u divergence this change did not widen and
+did not fix. The level-up policy never levels before casting.
+
+`tests/test_artists_talent.py`: eighteen cases, six mutations, exact sets,
+correct on the first run -- with one expectation defect caught ON PAPER
+before it: the level-up cases read the level through `artist_level`, which
+the first mutation replaces, and would have charged that mutation to the
+policy. They read the permanent's own level now. Only lorehold's baseline
+moves. Its table is stale and joins the owner's batched rebuild; the card
+moves from `KNOWN_BLIND` to `SCRIPTED_LOREHOLD`.
 
 ## How to read an ablation table
 

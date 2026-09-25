@@ -627,6 +627,14 @@ def countered(g, card, spell_index: int) -> bool:
         p = opp.p["counter"] * mana_gate * min(1.0, threat / 9.0)
         if rolls[i] < p:
             opp.counters_left -= 1      # counterspells are a finite resource
+            # An opponent has just cast a spell ON YOUR TURN -- the only
+            # opponent spell this model places there: removal and wipes
+            # happen in `opponents_act`, which is the opponents' own turns.
+            # An engine with a card that reads that event defines the hook
+            # (rendmaw: March of the World Ooze's Elephant, §0z47).
+            hook = getattr(g, "opponent_cast_on_your_turn", None)
+            if hook is not None:
+                hook(i)
             return True
     return False
 

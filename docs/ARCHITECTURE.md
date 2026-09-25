@@ -119,6 +119,7 @@ the game object and discovers optional behaviour with `hasattr`:
 | `g.on_creature_death(n, perm)` (optional) | aristocrats triggers when the pod kills a creature |
 | `g.artifact_died(card)` (optional) | artifact recursion — only the engine that has the cards defines it |
 | `g.counts_as_creature(perm)` (optional) | an engine whose lands can be creatures says so here |
+| `g.opponent_cast_on_your_turn(i)` (optional) | opponent `i` just cast a spell during your turn -- called from `countered()`, the only such spell the model has. Rendmaw defines it for March of the World Ooze (§0z47); `tests/test_march_elephant.py` fails if another engine grows one |
 
 If you add an engine, this table is the contract. If you add a method to one
 engine that `opponents.py` will call, it must be optional (`hasattr`) or added

@@ -154,6 +154,8 @@ class LoreholdGame(BaseGame):
             "brass_treasures": 0,
             # Reality Fracture, 2026-09-21 (preview text).
             "stingcaster_casts": 0, "flashback_casts": 0,
+            # Artist's Talent's three levels (§0z48).
+            "artist_rummages": 0, "artist_levels": 0,
             "flashback_exiled": 0,
             "bombardment_copies": 0,
             "monument_triggers": 0,
@@ -191,6 +193,7 @@ class LoreholdGame(BaseGame):
             "fodder_turns": 0,
         })
         self.damage_by_turn = []
+        self.before_draw_step = False    # artist_rummage reads it (§0z48)
 
     # -- helpers ------------------------------------------------------------
 
@@ -289,6 +292,123 @@ def pay(g, cost, units):
     return n
 
 
+# ---------------------------------------------------------------------------
+# Artist's Talent (§0z48)
+# ---------------------------------------------------------------------------
+#
+#   {1}{R} Enchantment -- Class
+#   Whenever you cast a noncreature spell, you may discard a card. If you do,
+#   draw a card.
+#   {2}{R}: Level 2 -- Noncreature spells you cast cost {1} less to cast.
+#   {2}{R}: Level 3 -- If a source you control would deal noncombat damage to
+#   an opponent or a permanent an opponent controls, it deals that much damage
+#   plus 2 instead.
+#
+# Until §0z48 the card was ONE line in `reduce_cost`: level 2 granted free on
+# resolution, applied to creature spells too, and levels 1 and 3 absent.
+
+ARTIST_LEVEL_COST = {"gen": 2, "R": 1}
+
+
+def artist_level(g) -> int:
+    """The highest level among Artist's Talents you control; 0 if none."""
+    return max((p.level for p in g.board if p.card.name == "Artist's Talent"),
+               default=0)
+
+
+def artist_discount(g, card) -> int:
+    """LEVEL 2: "Noncreature spells you cast cost {1} less to cast." Read by
+    BOTH `reduce_cost` and `miracle_reduction`, which is why it is a function:
+    the same discount written in two places is §0u's shape."""
+    return 1 if artist_level(g) >= 2 and "Creature" not in card.types else 0
+
+
+def artist_bonus(g, hits) -> float:
+    """LEVEL 3: +2 for each time a source you control deals damage to an
+    opponent. Read at the one noncombat chokepoint, `deal_pod_damage`. The
+    "permanent an opponent controls" half has no target here: opponents'
+    boards are a number, and no card in this deck pings their creatures."""
+    return 2.0 * hits if artist_level(g) >= 3 else 0.0
+
+
+def artist_level_up(g, reserve=0) -> bool:
+    """THE POLICY, said out loud: level up with mana the main phase left over.
+
+    "Gain the next level as a sorcery", so it happens in a main phase, and
+    here it happens after the post-combat main phase has cast everything it
+    wanted -- a level is bought only with mana nothing else in hand could
+    use, and never out of the miracle `reserve`, the same rule every spell in
+    `main_phase` obeys. Greedy and late: a pilot with {2}{R} spare on the
+    turn Artist's Talent lands would sometimes level BEFORE casting, to buy
+    the discount on the spells after it. `artist_max_level` caps it (3; 1
+    leaves the card at its printed level, which is how each level is
+    measured apart). Returns whether anything was bought.
+    """
+    perm = next((p for p in g.board if p.card.name == "Artist's Talent"), None)
+    if perm is None:
+        return False
+    cap = g.cfg.get("artist_max_level", 3)
+    bought = False
+    while perm.level < cap:
+        units = mana_units(g)
+        idx = can_pay(ARTIST_LEVEL_COST, units)
+        if idx is None or len(units) - len(idx) < reserve:
+            break
+        pay(g, dict(ARTIST_LEVEL_COST), units)
+        perm.level += 1
+        g.m["artist_levels"] += 1
+        bought = True
+    return bought
+
+
+def rummage_discard_choice(g):
+    """The card a "discard a card, then draw a card" gives up. ONE policy for
+    Lorehold's rummage and Artist's Talent's (§0z30: the same choice written
+    twice is written two ways).
+
+    The worst card on miracle value -- but pitching a land you still need to
+    hit your drops is a real mistake, so lands are only chaff once the mana
+    base is developed.
+    """
+    my_lands = sum(1 for p in g.board if p.card.is_land)
+    pool = g.hand
+    if my_lands < g.cfg.get("land_floor", 8):
+        nonlands = [c for c in g.hand if not c.is_land]
+        if nonlands:
+            pool = nonlands
+    return min(pool, key=lambda c: miracle_value(g, c))
+
+
+def artist_rummage(g):
+    """LEVEL 1: "Whenever you cast a noncreature spell, you may discard a
+    card. If you do, draw a card." Called from `on_cast_triggers`, so
+    Bombardment and Mastery copies (genuinely cast) trigger it and Double
+    Vision's copy (put on the stack) does not.
+
+    Taken whenever there is a card to give up and the draw is safe, with the
+    rummage's pick -- except BEFORE YOUR DRAW STEP. A Galvanoth or
+    Scrollwielder cast in upkeep would make this draw the turn's FIRST, a
+    miracle-eligible draw this function does not open a window for, and
+    would leave the draw step's card -- the one `set_top` arranged -- as the
+    second. The pilot declines rather than get either wrong.
+
+    The discard goes to the graveyard even with Library of Leng out: putting
+    it on top only to draw it straight back, as a second draw, is nothing.
+    It is still a discard, so Monument to Endurance triggers.
+    """
+    if not g.has("Artist's Talent") or g.before_draw_step:
+        return
+    for _ in range(sum(1 for p in g.board if p.card.name == "Artist's Talent")):
+        if not g.hand or not draw_is_safe(g, 1):
+            return
+        card = rummage_discard_choice(g)
+        g.hand.remove(card)
+        g.graveyard.append(card)
+        _draw_into_hand(g, 1)
+        g.m["artist_rummages"] += 1
+        discard_triggers(g, 1)
+
+
 def reduce_cost(g, card, miracle=False):
     """Apply cost reduction. Returns a cost dict."""
     if miracle:
@@ -298,8 +418,10 @@ def reduce_cost(g, card, miracle=False):
     red = 0
     if g.has("Ruby Medallion") and card.cost.get("R", 0) > 0:
         red += 1
-    if g.has("Artist's Talent"):
-        red += 1
+    # Artist's Talent, LEVEL 2. Until §0z48 this was `g.has(...)` -- level 2
+    # granted free the moment the Class resolved, and applied to CREATURE
+    # spells as well.
+    red += artist_discount(g, card)
     # Longshot, Rebel Bowman: "Noncreature spells you cast cost {1} less."
     if g.has("Longshot, Rebel Bowman") and "Creature" not in card.types:
         red += 1
@@ -336,7 +458,7 @@ def miracle_reduction(g, card) -> int:
     overrides it to {0} outright, and all three callers already special-case
     him before this function would run.
     """
-    red = 1 if g.has("Artist's Talent") else 0
+    red = artist_discount(g, card)
     if g.has("Ruby Medallion") and card.cost.get("R", 0) > 0:
         red += 1
     if g.has("Longshot, Rebel Bowman") and "Creature" not in card.types:
@@ -372,8 +494,9 @@ def miracle_need(g, card=None) -> int:
     of Leng's redirect both have `best` in scope) for the exact figure — Ruby
     Medallion and Longshot both depend on the card's own text (red,
     noncreature) and only apply then. Without a card this returns the
-    WORST-CASE figure: only Artist's Talent, the one reducer with no card
-    gate, is assumed. That keeps every card-blind pre-check (chiefly
+    WORST-CASE figure: only Artist's Talent at level 2+ is assumed -- its gate
+    is "noncreature", and everything Lorehold miracles for {2} is an instant
+    or sorcery. That keeps every card-blind pre-check (chiefly
     `reserve_for` in KNOWN_ISSUES.md 0t) from advertising more affordability
     than is actually guaranteed — it can only ever hold slightly MORE than a
     specific card would need, never less.
@@ -382,7 +505,7 @@ def miracle_need(g, card=None) -> int:
         return 0
     need = 2
     need -= miracle_reduction(g, card) if card is not None else \
-        (1 if g.has("Artist's Talent") else 0)
+        (1 if artist_level(g) >= 2 else 0)
     return max(0, need)
 
 
@@ -624,10 +747,20 @@ def make_tokens(g, n, power, toughness, name="token"):
         g.board.append(Permanent(card=tok, sick=True, is_token=True))
 
 
-def deal_pod_damage(g, amount, each=True):
-    """`each=True`: an 'each opponent loses N' effect; amount is the pod total."""
+def deal_pod_damage(g, amount, each=True, *, hits):
+    """`each=True`: an 'each opponent loses N' effect; amount is the pod total.
+
+    `hits` is REQUIRED, and it is the number of times a source you control
+    DEALS DAMAGE to an opponent in this call -- Guttersnipe is one hit per
+    opponent, Boros Charm one, and "each opponent LOSES 3 life" is zero,
+    because life loss is not damage. Artist's Talent's level 3 adds 2 per
+    hit (`artist_bonus`, §0z48), so a call site that miscounts it misprices
+    that card and nothing else. It has no default so that a new call site
+    cannot be written without deciding.
+    """
     if amount <= 0:
         return
+    amount += artist_bonus(g, hits)
     # BOUNDED: record what could have mattered, not what was asked for.
     # The divisor is the FULL POD, not the living count -- see OPP.pod_size.
     n = OPP.pod_size(g)
@@ -667,7 +800,7 @@ def discard_triggers(g, n=1):
             g.treasures += 1
             g.m["treasures_made"] += 1
         elif mode == "drain":
-            deal_pod_damage(g, 9.0)     # each of 3 opponents loses 3
+            deal_pod_damage(g, 9.0, hits=0)   # each of 3 LOSES 3: not damage
 
 
 def on_cast_triggers(g, card, is_copy=False):
@@ -680,11 +813,11 @@ def on_cast_triggers(g, card, is_copy=False):
 
     if inst_sorc:
         # Guttersnipe: 2 damage to EACH opponent, so 6 a pop.
-        deal_pod_damage(g, 6.0 * sum(1 for p in g.board
-                                     if p.card.name == "Guttersnipe"))
+        n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
+        deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe)
         # Urabrask: 1 damage to ONE target opponent per instant/sorcery.
-        deal_pod_damage(g, 1.0 * sum(1 for p in g.board
-                                     if p.card.name.startswith("Urabrask")))
+        n_ura = sum(1 for p in g.board if p.card.name.startswith("Urabrask"))
+        deal_pod_damage(g, 1.0 * n_ura, hits=n_ura)
         # Caldera Pyremaw: "put a +1/+1 counter on this creature. THEN this
         # creature deals damage equal to its power to target opponent." The
         # counter lands first, so the first trigger already hits for 4, and it
@@ -694,15 +827,16 @@ def on_cast_triggers(g, card, is_copy=False):
         for q in g.board:
             if q.card.name == "Caldera Pyremaw":
                 q.counters += 1
-                deal_pod_damage(g, float(g.power_of(q)), each=False)
+                deal_pod_damage(g, float(g.power_of(q)), each=False, hits=1)
                 g.m["pyremaw_damage"] += g.power_of(q)
 
     if "Creature" not in card.types:
         g.noncreature_this_turn += 1
         # Longshot, Rebel Bowman: 2 damage to EACH opponent per noncreature
         # spell, so 6 a pop — a Guttersnipe on a wider trigger.
-        deal_pod_damage(g, 6.0 * sum(1 for p in g.board
-                                     if p.card.name == "Longshot, Rebel Bowman"))
+        n_long = sum(1 for p in g.board
+                     if p.card.name == "Longshot, Rebel Bowman")
+        deal_pod_damage(g, 6.0 * n_long, hits=OPP.pod_size(g) * n_long)
         # Dragon's Rage Channeler: surveil 1. In a miracle deck the value is
         # binning a land off the top so the next draw is a live target.
         if g.has("Dragon's Rage Channeler") and g.library:
@@ -714,6 +848,8 @@ def on_cast_triggers(g, card, is_copy=False):
         for _ in range(sum(1 for p in g.board
                            if p.card.name == "Monastery Mentor")):
             make_tokens(g, 1, 1, 1, "Monk")
+        # Artist's Talent, level 1 (§0z48).
+        artist_rummage(g)
 
     if inst_sorc and not is_copy:
         arcane_bombardment(g)
@@ -871,7 +1007,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
     elif sc == "soulfire":
         for _ in range(3):
             if g.library:
-                deal_pod_damage(g, float(g.library.pop().mv))
+                # one target player per exiled card: one hit each
+                deal_pod_damage(g, float(g.library.pop().mv), hits=1)
     elif sc == "searing_light":
         # "Each opponent exiles a creature with the greatest power among
         # creatures that player controls." An edict, NOT a board wipe — it was
@@ -889,7 +1026,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
             # numerator from the other one is what made the tivit sites look
             # like they were moving when only the harness was.
             deal_pod_damage(g, g.cfg.get("opp_avg_power", 2.5)
-                            * OPP.pod_size(g))
+                            * OPP.pod_size(g), hits=OPP.pod_size(g))
     elif sc == "invincible_hymn":
         # "Count the number of cards in your library. Your life total BECOMES
         # that number." Not lifegain — a set, and it can go down.
@@ -1025,7 +1162,9 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True):
         OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
     if card.tokens:
         make_tokens(g, *card.tokens)
-    deal_pod_damage(g, card.pod_damage)
+    # `pod_damage` is a single-target DAMAGE spell's number (Boros Charm is
+    # the only card carrying one; tests/test_artists_talent.py pins that).
+    deal_pod_damage(g, card.pod_damage, hits=1)
     if card.discards and not is_copy:
         discard_triggers(g, card.discards)
     if is_copy and was_cast:
@@ -1573,8 +1712,8 @@ def reserve_for(g) -> int:
 
     `cfg["miracle_reserve"]` is a CONSTANT 2 by default, and 2 is the miracle
     cost off a bare Lorehold. But the cost is not always 2: `miracle_need`
-    reads the board, and it is 1 with Artist's Talent out and 0 with Molecule
-    Man. So the constant OVER-HOLDS whenever either is on the battlefield --
+    reads the board, and it is 1 with Artist's Talent at level 2 and 0 with
+    Molecule Man. So the constant OVER-HOLDS whenever either is on the battlefield --
     the main phase declines to cast a spell to protect mana the miracle will
     not spend.
 
@@ -1693,12 +1832,12 @@ def combat(g):
             if best.script == "soulfire":
                 for _ in range(3):
                     if g.library:
-                        deal_pod_damage(g, float(g.library.pop().mv))
+                        deal_pod_damage(g, float(g.library.pop().mv), hits=1)
             if best.tokens:
                 make_tokens(g, *best.tokens)
-            deal_pod_damage(g, best.pod_damage)
+            deal_pod_damage(g, best.pod_damage, hits=1)
             n_snipe = sum(1 for p in g.board if p.card.name == "Guttersnipe")
-            deal_pod_damage(g, 6.0 * n_snipe)
+            deal_pod_damage(g, 6.0 * n_snipe, hits=OPP.pod_size(g) * n_snipe)
 
     if any(p.card.name == "Goliath Daydreamer" for p in attackers):
         goliath_attack(g)
@@ -1744,16 +1883,9 @@ def opponent_upkeep_windows(g):
         # that too.
         if not g.hand or not draw_is_safe(g, 1):
             continue
-        # Discard the worst card. Lands score lowest on miracle value, but
-        # pitching a land you still need to hit your drops is a real mistake —
-        # only treat lands as chaff once the mana base is developed.
-        my_lands = sum(1 for p in g.board if p.card.is_land)
-        pool = g.hand
-        if my_lands < g.cfg.get("land_floor", 8):
-            nonlands = [c for c in g.hand if not c.is_land]
-            if nonlands:
-                pool = nonlands
-        worst = min(pool, key=lambda c: miracle_value(g, c))
+        # Discard the worst card (the pick lives in one function, which
+        # Artist's Talent's rummage shares).
+        worst = rummage_discard_choice(g)
         leng_card = None
         if g.has("Library of Leng"):
             # Discard the BEST miracle target instead: it goes on top and we
@@ -1830,6 +1962,7 @@ def opponent_upkeep_windows(g):
 
 def take_turn(g):
     g.turn += 1
+    g.before_draw_step = True          # read by artist_rummage
     g.spells_this_turn = 0
     g.noncreature_this_turn = 0
     g.bombardment_fired_this_turn = False
@@ -1900,6 +2033,7 @@ def take_turn(g):
 
     radiant_scrollwielder(g)
 
+    g.before_draw_step = False
     if st_card is not None and st_card not in g.library:
         _drawn, _cast = miracle_window(g)    # the draw step still happens
         # Galvanoth cast it off the top — the best outcome, and better than
@@ -1923,6 +2057,10 @@ def take_turn(g):
     # Re-read rather than cached: the precombat phase can deploy the very
     # cards that change the miracle cost (Artist's Talent, Molecule Man).
     main_phase(g, reserve=reserve_for(g))
+    # Spare mana into Artist's Talent's levels, then look again: level 2 can
+    # make a spell affordable that was not a moment ago.
+    if artist_level_up(g, reserve=reserve_for(g)):
+        main_phase(g, reserve=reserve_for(g))
 
     underworld_breach(g)
     # "At the beginning of the end step, sacrifice this enchantment." Note this

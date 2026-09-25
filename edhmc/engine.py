@@ -115,6 +115,12 @@ class Permanent:
     impending: int = 0        # turn on which it becomes a creature
     base_p: int = 0
     base_t: int = 1
+    # A Class's level (CR 716.2a). "If a rule or effect refers to a
+    # permanent's level and that permanent doesn't have a level, it is treated
+    # as though its level is 1" (716.2d), so 1 is the default for everything.
+    # A fresh Permanent is a fresh object: a Class that leaves and comes back
+    # is level 1 again. Only Artist's Talent reads it (lorehold, §0z48).
+    level: int = 1
 
 
 class Board(list):
@@ -1218,6 +1224,7 @@ class Game(BaseGame):
             "rendmaw_triggers": 0,
             "attack_triggers": 0,      # Grave Titan / Overlord "or attacks"
             "tokens_made": 0,
+            "march_elephants": 0,     # March of the World Ooze, §0z47
             # 2026-09-16 proposals (§0z26). Counted so each card's
             # MECHANISM is readable directly -- a counter at zero is an
             # unimplemented or uncastable card, which win rate cannot
@@ -1476,6 +1483,13 @@ class Game(BaseGame):
         self.make_tokens(n, 2, 2, "Bird", tapped=True)
         self.give_opponents_birds(n)
 
+    def opponent_cast_on_your_turn(self, opp_index: int):
+        """`opponents.countered` calls this when an opponent casts a spell
+        during your turn (the protocol in docs/ARCHITECTURE.md). That spell
+        is a counterspell, so it is an INSTANT, and Arasta reads it too."""
+        march_elephant(self)
+        arasta_spider(self)
+
     def give_opponents_birds(self, n: int):
         # Primal Vigor is symmetric — "if one or more tokens WOULD BE CREATED,
         # twice that many of those tokens are created instead" applies to
@@ -1489,6 +1503,43 @@ class Game(BaseGame):
 # ----------------------------------------------------------------------------
 # Turn loop
 # ----------------------------------------------------------------------------
+
+def march_elephant(g: Game):
+    """MARCH OF THE WORLD OOZE, second clause: "Whenever an opponent casts a
+    spell, if it's not their turn, you create a 3/3 green Elephant creature
+    token." (§0z47)
+
+    The token is born 3/3 and March's first clause makes it 6/6 at once,
+    which `power_of` already does for every creature you control. It goes
+    through `make_tokens`, so Primal Vigor and Parallel Lives double it and
+    Idol of Oblivion sees it -- the §0z4 rule that a replacement applies on
+    every path, satisfied by there being one path.
+
+    A FLOOR, and the gap is named rather than priced: the only opponent spell
+    this model places on your turn is a counterspell. Instant-speed removal,
+    flash creatures, cantrips in response and every spell cast on ANOTHER
+    opponent's turn (which also triggers March -- "if it's not THEIR turn")
+    are not events here, so this fires far less than it would at a table.
+    """
+    if not g.has("March of the World Ooze"):
+        return
+    g.make_tokens(1, 3, 3, "Elephant")
+    g.m["march_elephants"] += 1
+
+
+def arasta_spider(g: Game):
+    """ARASTA OF THE ENDLESS WEB: "Whenever an opponent casts an instant or
+    sorcery spell, create a 1/2 green Spider creature token with reach."
+
+    Two callers, one per kind of event the model has: `upkeep`'s per-round
+    `opp_instant_rate` roll, which stands in for the pod's instants and
+    sorceries in general, and the counterspell hook. Until §0z47 only the
+    roll existed, so a counterspell -- an instant, cast at you -- made no
+    Spider: the same rule as March's, written a second way in the same deck.
+    """
+    if g.has("Arasta of the Endless Web"):
+        g.make_tokens(1, 1, 2, "Spider")
+
 
 def tap_reluctance(g: Game, p: Permanent) -> tuple:
     """How much we would rather NOT tap this permanent for mana.
@@ -2161,10 +2212,12 @@ def upkeep(g: Game):
                         q.counters = max(q.counters, 2)
         elif s == "grist":
             g.make_tokens(1, 1, 1, "Insect")
-    # Arasta: opponents cast instants/sorceries at some rate
+    # Arasta: opponents cast instants/sorceries at some rate. Counterspells
+    # are NOT in this roll: they are real events, and reach Arasta through
+    # `Game.opponent_cast_on_your_turn` (§0z47).
     if g.has("Arasta of the Endless Web"):
         if crn_random(g, "arasta") < g.cfg.get("opp_instant_rate", 0.8):
-            g.make_tokens(1, 1, 2, "Spider")
+            arasta_spider(g)
 
 
 def activations(g: Game):

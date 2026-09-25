@@ -201,7 +201,9 @@ SCRIPTED_RENDMAW = {
     "Myr Retriever", "Junk Diver",
     # protection the opponent model respects
     "Heroic Intervention",
-    # static P/T setter (implemented in Game.power_of / toughness_of)
+    # static P/T setter (implemented in Game.power_of / toughness_of), and
+    # since §0z47 the Elephant trigger, on the one opponent spell the model
+    # puts on your turn (a counterspell) -- `engine.march_elephant`
     "March of the World Ooze",
 }
 
@@ -270,9 +272,13 @@ SCRIPTED_LOREHOLD = {
     # (Blasphemous Act moved to PARTLY_MODELLED 2026-09-12: it is a symmetric
     #  wipe, and those are derived into that category -- see symmetric_wipes().)
     "The Dawning Archaic",
+    # All three levels since §0z48: the level-1 rummage, the level-2
+    # noncreature discount, the level-3 +2 per noncombat hit at
+    # `deal_pod_damage`, and a level-up POLICY (spare post-combat mana). It
+    # was BLIND until then -- level 2 granted free on resolution, applied to
+    # creature spells too, and levels 1 and 3 absent.
+    "Artist's Talent",
     # BLIND, despite having engine code — the implementation is not the card:
-    #   Artist's Talent - Level 2 granted free and instantly; Levels 1 and 3
-    #                     do not exist, and Level 3 is a damage doubler
     #   Storm Herd      - X is cfg["storm_herd_x"]=40, not your life total
     #   Approach of the Second Sun - never gets its second cast, because the
     #                     card is not put seventh from the top
@@ -895,7 +901,6 @@ KNOWN_BLIND = {
     },
     "lorehold": {
         'Approach of the Second Sun',
-        "Artist's Talent",
         'Bolt Bend',
         'Call Forth the Tempest',
         'Chaos Warp',

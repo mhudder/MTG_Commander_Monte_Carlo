@@ -150,6 +150,8 @@ python -m tests.test_decking --mutate               # 5 mutations, exact sets
 python -m tests.test_cast_lookahead --mutate        # 4 mutations, exact sets
 python -m tests.test_voice_of_the_blessed --mutate # 3 mutations, exact sets
 python -m tests.test_flip_signal --mutate          # 3 mutations, exact sets
+python -m tests.test_artists_talent --mutate       # 6 mutations, exact sets
+python -m tests.test_march_elephant --mutate       # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -739,7 +741,9 @@ for itself when items closed before 2026-09-07 were moved there. Each names the
 `§` that carries its measurement, and those ids are stable.
 
 **Item 17 is closed** (§0z42: decking loses, and the pilot knows it) and
-moved to `docs/HISTORY.md`; so is item 21, whose card is now committed. **Item 18
+moved to `docs/HISTORY.md`; so is item 21, whose card is now committed; and so
+are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47) and 8b
+(Voice of the Blessed, §0z46), closed 2026-09-25. **Item 18
 is half answered**: the ordering half is built and measured as a null
 (§0z43), which leaves the `priority` numbers as the whole of it.
 
@@ -876,9 +880,11 @@ is half answered**: the ordering half is built and measured as a null
     card draw above its token engines (joint +0.0225 / +0.0211, four moves).
     **BOTH ARE ADOPTED (2026-09-25), AND THE REBUILD IS DEFERRED** by the
     owner, to batch with other work. So the karlov and tivit tables are STALE
-    and their caches are deliberately left SUSPECT, each with a `--note`:
-    `check_docs` fails on exactly those two until `./tools/regen_tables.sh`
-    runs for them, and that failure is the signal, not a defect. Never clear
+    and their caches are deliberately left SUSPECT, each with a `--note` —
+    and since §0z47/§0z48 the **lorehold and rendmaw** tables are too, on the
+    same terms: `check_docs` fails on exactly those four until
+    `./tools/regen_tables.sh` runs for them, and that failure is the signal,
+    not a defect. Never clear
     it with `--verified` (the numbers moved) or by deleting the caches (that
     turns the check green over a stale table). Every staged swap in both
     decks — including Anointed Procession, whose own priority moved — was
@@ -892,18 +898,16 @@ is half answered**: the ordering half is built and measured as a null
     which narrows the cause without naming it. The obvious mechanism has been
     ruled out twice: Scroll Rack still ablates to −0.0107 ±0.0032, so the CUT
     never got more expensive. Worth finding, and **worth NOT guessing at.**
-    §0p, §0w.
+    §0p, §0w. **AND IT MAY NOT HAVE STOPPED** (2026-09-25, §0z48): the same
+    factorial at HEAD 6a0e786 puts Sunbird's alone at +0.0109 ±0.0029 —
+    before §0z48, which then moved it only to +0.0102. About one bar below
+    the 2026-09-09 figure, unpaired, so marginal; the given-Caldera number
+    the staging rests on is still +0.0150 ±0.0031.
 
 0c. **Goldspan Dragon needs a HEAD-TO-HEAD.** Significant at all three
     horizons (+0.0018 / +0.0051 / +0.0057) where it used to sit inside its
     bar, but a standalone score is not a staging: three swaps against a common
     baseline have overlapping CIs and cannot be ranked against each other.
-
-2.  **Artist's Talent's three Class levels** — Level 2 is granted free and
-    instantly; Levels 1 and 3 do not exist.
-
-4.  **March of the World Ooze's Elephant trigger is unmodelled**, so its
-    committed numbers are a floor. `KNOWN_ISSUES.md` item 1a.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.
@@ -911,12 +915,6 @@ is half answered**: the ordering half is built and measured as a null
 7.  **`Card.indestructible` is priced by a single flat `destroy_share`.** A
     card whose evaluation swings on that knob must be reported with it said
     out loud.
-
-8b. **CLOSED 2026-09-25 (§0z46): Voice of the Blessed is indestructible at
-    ten counters**, in `opponents.indestructible_of()` beside `flying_of()`,
-    and still kept out of the generated `INDESTRUCTIBLE` set (§0n). It saves
-    Voice 0.016 times a game. Karlov's baseline moves with it; that deck is
-    already stale pending the batched rebuild.
 
 8c. **Time Sieve eats only TOKEN artifacts**, never Sol Ring, the signets or
     the artifact lands, all of which are legal fuel. Conservative and
