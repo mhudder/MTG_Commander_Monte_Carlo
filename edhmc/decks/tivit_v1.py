@@ -101,8 +101,8 @@ VOTING = [
       priority=7.5, threat=7.0, script="master_of_ceremonies"),
     C("Plea for Power", "Sorcery", {"gen": 3, "U": 1}, priority=7, threat=7.0,
       script="plea", tags=("vote",)),
-    C("Tempting Contract", "Artifact", {"gen": 4}, priority=6.5, threat=6.0,
-      script="tempting_contract"),
+    C("Tempting Contract", "Artifact", {"gen": 4}, priority=8.5, threat=6.0,
+      script="tempting_contract"),  # §0z44: priority 6.5 -> 8.5, adopted 2026-09-25
     C("Vault 11: Voter's Dilemma", "Enchantment", {"gen": 2, "W": 1, "B": 1},
       priority=5, threat=6.0, script="vault11", tags=("vote",)),
     C("Custodi Squire", "Creature", {"gen": 4, "W": 1}, 3, 3, priority=5,
@@ -166,8 +166,8 @@ PAYOFFS = [
       threat=6.5, tags=("token_leave_drain",)),
     C("Mechanized Production", "Enchantment", {"gen": 2, "U": 2}, priority=6,
       threat=7.5, script="mechanized"),
-    C("Mirkwood Bats", "Creature", {"gen": 3, "B": 1}, 2, 3, priority=8,
-      threat=7.5, tags=("token_drain", "token_leave_drain")),
+    C("Mirkwood Bats", "Creature", {"gen": 3, "B": 1}, 2, 3, priority=10,
+      threat=7.5, tags=("token_drain", "token_leave_drain")),  # §0z44: priority 8 -> 10, adopted 2026-09-25
     C("Revel in Riches", "Enchantment", {"gen": 4, "B": 1}, priority=7,
       threat=8.0, script="revel"),
     C("Cyberdrive Awakener", "Artifact/Creature", {"gen": 5, "U": 1}, 4, 4,
@@ -185,8 +185,8 @@ DRAW = [
       script="tutor"),
     C("Idyllic Tutor", "Sorcery", {"gen": 2, "W": 1}, priority=6,
       script="tutor_ench"),
-    C("Rhystic Study", "Enchantment", {"gen": 2, "U": 1}, priority=9.5,
-      threat=8.5, script="rhystic"),
+    C("Rhystic Study", "Enchantment", {"gen": 2, "U": 1}, priority=7.5,
+      threat=8.5, script="rhystic"),  # §0z44: priority 9.5 -> 7.5, adopted 2026-09-25
     C("Tamiyo's Journal", "Artifact", {"gen": 5}, priority=6.5, threat=6.0,
       script="journal"),
 ]
@@ -321,8 +321,11 @@ def build():
 # twice that many of those tokens instead." Said in BOTH of this engine's token
 # paths -- make_tokens() and the module-level make_token() -- or it would cover
 # only the creature half and miss every Clue, Food and Treasure.
+# §0z44: priority 8.0 -> 10.0, adopted 2026-09-25. This card is STAGED, so
+# its staged +0.0113 / +0.0145 was measured at the old priority -- see its
+# Change in edhmc/pending.py.
 ANOINTED_PROCESSION = C("Anointed Procession", "Enchantment",
-                        {"gen": 3, "W": 1}, priority=8.0, threat=3.0)
+                        {"gen": 3, "W": 1}, priority=10.0, threat=3.0)
 
 # "When Urza enters, create a 0/0 colorless Construct artifact creature token
 # with 'This token gets +1/+1 for each artifact you control.'" The other two

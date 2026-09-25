@@ -1529,6 +1529,16 @@ CHANGES: list[Change] = [
             "The two cut different cards and neither touches the other's "
             "mechanism, but they have not been measured as a 2x2 and that is "
             "the check §0p exists for if both are committed together."),
+        reverified=(
+            'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
+            '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
+            ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
+            ' T10 / T20, so the list this swap was measured against no longer e'
+            'xists. The number above is on the OLD priorities and has not been '
+            'restated; the karlov table rebuild is deferred to a batch by the o'
+            "wner's choice. Re-measure on the new baseline before this is commi"
+            'tted.'
+        ),
     ),
     Change(
         deck="tivit", remove="Plains", add="Anointed Procession",
@@ -1572,6 +1582,17 @@ CHANGES: list[Change] = [
             "simpler than a real pilot's, so a land cut is the kind of change "
             "this harness flatters. Committing needs the .xlsx and the module "
             "to move with the ledger -- tivit has all three legs."),
+        reverified=(
+            "NOT RE-MEASURED, AND THIS CARD'S OWN PRIORITY IS ONE OF THE MOVES "
+            "(2026-09-25, §0z44). The owner adopted tivit's four priority moves"
+            ' -- Anointed Procession 8 -> 10 among them, with Mirkwood Bats 8 -'
+            '> 10, Rhystic Study 9.5 -> 7.5 and Tempting Contract 6.5 -> 8.5 --'
+            ' jointly +0.0225 / +0.0211 at T10 / T20. So the +0.0113 / +0.0145 '
+            'above was measured at a priority now shown to be worth ~0.008 less'
+            ', on a baseline that has since moved. It has not been restated; th'
+            "e tivit table rebuild is deferred to a batch by the owner's choice"
+            '. Re-measure before commit.'
+        ),
     ),
 
     Change(
@@ -1642,6 +1663,16 @@ CHANGES: list[Change] = [
             "permanents, and only when every living opponent is at 10 or "
             "less), which is deliberately conservative and a floor on that "
             "half -- the model cannot value 'I am losing anyway'."
+        ),
+        reverified=(
+            'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
+            '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
+            ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
+            ' T10 / T20, so the list this swap was measured against no longer e'
+            'xists. The number above is on the OLD priorities and has not been '
+            'restated; the karlov table rebuild is deferred to a batch by the o'
+            "wner's choice. Re-measure on the new baseline before this is commi"
+            'tted.'
         ),
     ),
 

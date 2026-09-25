@@ -870,11 +870,16 @@ is half answered**: the ordering half is built and measured as a null
     Voice-over-Lurrus case. **Two do not.** Karlov wants Felidar Sovereign
     and Sorin, Solemn Visitor higher (joint +0.0099 / +0.0091); tivit ranked
     card draw above its token engines (joint +0.0225 / +0.0211, four moves).
-    Adopting either moves that deck's baseline and forces its table rebuilt,
-    and tivit's moves include the priority of its STAGED Anointed
-    Procession — so the staged swap's number was measured on the worse of
-    the two priorities. Owner's call. Not confirmed and worth a look: Time
-    Sieve's move flips sign between horizons.
+    **BOTH ARE ADOPTED (2026-09-25), AND THE REBUILD IS DEFERRED** by the
+    owner, to batch with other work. So the karlov and tivit tables are STALE
+    and their caches are deliberately left SUSPECT, each with a `--note`:
+    `check_docs` fails on exactly those two until `./tools/regen_tables.sh`
+    runs for them, and that failure is the signal, not a defect. Never clear
+    it with `--verified` (the numbers moved) or by deleting the caches (that
+    turns the check green over a stale table). Every staged swap in both
+    decks — including Anointed Procession, whose own priority moved — was
+    measured on the old priorities and says so in its Change. Not adopted
+    and worth a look: Time Sieve's move flips sign between horizons.
 
 0b-i. **Sunbird's one-off decay is still unattributed — but it has stopped.**
     +0.0215 (2026-09-04) → +0.0146 ±0.0028 (2026-09-06) → +0.0152 ±0.0028

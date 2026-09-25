@@ -109,8 +109,8 @@ CREATURES = [
       threat=8.5, lifelink=True),
     C("Syr Konrad, the Grim", "Creature", {"gen": 3, "B": 2}, 5, 4, priority=6,
       threat=7.0),
-    C("Felidar Sovereign", "Creature", {"gen": 4, "W": 2}, 4, 6, priority=7,
-      threat=8.0, lifelink=True),
+    C("Felidar Sovereign", "Creature", {"gen": 4, "W": 2}, 4, 6, priority=9,
+      threat=8.0, lifelink=True),  # §0z44: priority 7 -> 9, adopted 2026-09-25
     C("Sun Titan", "Creature", {"gen": 4, "W": 2}, 6, 6, priority=5, threat=7.0),
     # --- v2 additions ---
     # "Whenever you gain life, each opponent loses 1 life" — Marauding
@@ -128,7 +128,7 @@ CREATURES = [
 
 PLANESWALKERS = [
     C("Sorin, Solemn Visitor", "Planeswalker", {"gen": 2, "W": 1, "B": 1},
-      priority=6, threat=7.0),
+      priority=8, threat=7.0),  # §0z44: priority 6 -> 8, adopted 2026-09-25
     C("Sorin, Vengeful Bloodlord", "Planeswalker", {"gen": 2, "W": 1, "B": 1},
       priority=7, threat=7.5),
 ]

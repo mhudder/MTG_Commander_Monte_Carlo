@@ -92,7 +92,7 @@ Methodology that used to live at the end of this file is now
 | [0z41](#0z41) | FIXED | **Horn of Greed was tripled.** Its draw sat inside `_landfall_payoffs`, which Ancient Greenwarden and Traveling Chocobo run once per rep, so one land drop drew three. Greenwarden's own ruling: "an ability that triggers whenever you play a land won't trigger an additional time." Moved out of the loop; worth **−0.0049 / −0.0033** to azusa's baseline, and it flattered both doublers, so the Chocobo's staging was re-measured |
 | [0z42](#0z42) | FIXED | **Decking loses (queued item 17), and the pilot had to be taught not to.** `engine.drew_from_empty` is 704.5b in the three draw paths. The rule ALONE decked azusa in 3.3% of games at T20, in the turns it had lethal on board -- a naive pilot cost it **0.022**. `engine.draw_is_safe` declines only OPTIONAL draws; at the swept reserve of 5 the rule costs azusa −0.0006 / −0.0012 and lorehold −0.0003 / −0.0021. Rendmaw, karlov, tivit and shilgengar are identical game for game -- **including karlov with Bolas's Citadel, whose number was never a decking ceiling** |
 | [0z43](#0z43) | MEASURED | **The one-card cast lookahead is a measured NULL.** `engine.lookahead_pick` (queued item 18) reorders a cast when the greedy pick would strand a card that casting first would have kept; wired into all six `main_phase`s, it fires in 4-12% of games and moves win rate inside its bar in all twelve deck-horizon cells (largest +0.0010 ±0.0020). §0z8's SURPLUS rule already handles the ordering. `cast_lookahead` stays OFF; what is left of item 18 is the `priority` numbers themselves |
-| [0z44](#0z44) | MEASURED | **The `priority` numbers: right in four decks, wrong in two.** Flattening each table costs 0.015–0.045 win rate, so the numbers matter; a ±2 sweep of every nonland card (760 arms, three disjoint seed blocks) confirms **no move at all** in rendmaw, lorehold, shilgengar or azusa, two in karlov (Felidar Sovereign up, Sorin, Solemn Visitor up: joint **+0.0099 / +0.0091**) and four in tivit, which ranked card draw above its token engines (joint **+0.0225 / +0.0211**). Mechanisms read off the win routes. **Measured, not adopted**: adopting moves two baselines and a staged card's own priority |
+| [0z44](#0z44) | MEASURED | **The `priority` numbers: right in four decks, wrong in two.** Flattening each table costs 0.015–0.045 win rate, so the numbers matter; a ±2 sweep of every nonland card (760 arms, three disjoint seed blocks) confirms **no move at all** in rendmaw, lorehold, shilgengar or azusa, two in karlov (Felidar Sovereign up, Sorin, Solemn Visitor up: joint **+0.0099 / +0.0091**) and four in tivit, which ranked card draw above its token engines (joint **+0.0225 / +0.0211**). Mechanisms read off the win routes. **Measured, not adopted**: adopting moves two baselines and a staged card's own priority **ADOPTED 2026-09-25 for both decks; the karlov and tivit tables are stale until the owner's batched rebuild.** |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -6600,9 +6600,39 @@ won that way.
 token engines, and the objective wants the reverse. `cards_drawn` falls in
 every tivit move while win rate rises.
 
-### What was NOT done, deliberately
+### ADOPTED 2026-09-25 -- and the rebuild is deliberately DEFERRED
 
-**Nothing is adopted.** Changing a priority in `karlov_v2.py` or
+**The owner adopted both joints, exactly as measured**: karlov's two moves
+and tivit's four, and nothing else. Time Sieve 9 → 11 is NOT among them -- it
+flips sign between horizons and was never confirmed -- and neither are the two
+single-horizon rows. Adopting fewer than a joint's moves would have committed a
+configuration nobody measured.
+
+`check_unchanged_decks` against the pre-adoption commit: **rendmaw, lorehold,
+shilgengar and azusa BIT-IDENTICAL on all 8 metrics; karlov and tivit MOVED**,
+as they must. That check builds from the deck MODULE, so it cannot see the
+staged Anointed Procession's move; `build_pending` confirms all six moves live.
+
+**THE KARLOV AND TIVIT TABLES ARE NOW STALE, AND SAY SO.** The owner chose to
+batch this rebuild with other pending work rather than run it now. Their
+caches are left SUSPECT on purpose -- it is the true state, and it is the one
+that stops harm: `ablation.py` keys its cache on deck, horizons and N rather
+than on code, so resuming onto a full stale cache would silently REPRINT the
+old numbers. Each carries a `--note` saying why. Clearing either with
+`--verified` would be false (the numbers moved), and deleting either would turn
+`check_docs` green over a stale table, which is the trap this repo has written
+down most often. **`check_docs` therefore fails on exactly these two caches
+until the batched rebuild**, and that failure is the signal, not a defect.
+`./tools/regen_tables.sh` deletes each cache before it runs, so the rebuild
+itself is safe.
+
+**Every staged swap in both decks was measured on the old priorities** and
+says so in its Change: karlov's Bloodthirsty Conqueror and Bolas's Citadel,
+and tivit's Anointed Procession, whose own priority is one of the moves.
+
+### What was not done, originally
+
+**Nothing was adopted at measurement time.** Changing a priority in `karlov_v2.py` or
 `tivit_v1.py` moves that deck's baseline, which forces its ablation table to
 be rebuilt (§0z27: a changed baseline has no check but a rebuild), and it
 changes the list every staged swap in those decks was measured against.
