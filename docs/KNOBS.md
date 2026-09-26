@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `6b4546e` from 20 engine sources.
+Derived at `101936e` from 20 engine sources.
 
 **124 knobs, 182 call sites.**
 
@@ -31,7 +31,7 @@ costs a written justification.
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:3066` in `simulate()`
   - `10` at `edhmc/engine.py:2647` in `simulate()`
-  - `20` at `edhmc/karlov.py:1316` in `simulate()`
+  - `20` at `edhmc/karlov.py:1319` in `simulate()`
   - `10` at `edhmc/lorehold.py:2227` in `simulate()`
   - `10` at `edhmc/opponents.py:179` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1019` in `simulate()`
@@ -67,7 +67,7 @@ show up first.
 | `breach_cap` | `4` | 1 | `edhmc/lorehold.py:1796` |  | yes | **never** |
 | `cast_lookahead` | `False` | 1 | `edhmc/engine.py:1885` | §0z43 | yes | yes |
 | `charge_life_costs` | `True` | 3 | `edhmc/engine.py:1009` | §0z7 | yes | yes |
-| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:1034` | §0z42 | yes | yes |
+| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:1037` | §0z42 | yes | yes |
 | `clamp_cap` | `4` | 1 | `edhmc/engine.py:2323` |  | **no** | **never** |
 | `clock_rearm` | `4` | 1 | `edhmc/opponents.py:1294` |  | **no** | **never** |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:159` |  | yes | yes |
@@ -100,7 +100,7 @@ show up first.
 | `first_wipe_turn` | `5` | 1 | `edhmc/opponents.py:366` |  | yes | **never** |
 | `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:1428` | §0u | yes | yes |
 | `flier_block_share` | `0.3` | 1 | `edhmc/opponents.py:709` |  | yes | yes |
-| `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:809` | §0z19 | yes | yes |
+| `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:812` | §0z19 | yes | yes |
 | `goad_block_share` | `0.3` | 1 | `edhmc/opponents.py:593` |  | yes | **never** |
 | `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1829` |  | **no** | **never** |
 | `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1835` |  | **no** | **never** |
@@ -124,8 +124,8 @@ show up first.
 | `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:811` |  | **no** | yes |
 | `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1063` |  | yes | yes |
 | `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:2238` |  | yes | **never** |
-| `necro_hand_target` | `7` | 1 | `edhmc/karlov.py:621` | §0z57 | yes | yes |
-| `necro_life_floor` | `20` | 1 | `edhmc/karlov.py:622` | §0z57 | yes | yes |
+| `necro_hand_target` | `7` | 1 | `edhmc/karlov.py:624` | §0z57 | yes | yes |
+| `necro_life_floor` | `10` | 1 | `edhmc/karlov.py:625` | §0z57 | yes | yes |
 | `on_the_draw` | `True` | 1 | `edhmc/engine.py:2622` |  | **no** | **never** |
 | `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1105` |  | **no** | **never** |
 | `opp_creatures_per_turn` | `0.7` | 1 | `edhmc/karlov.py:530` |  | **no** | **never** |
@@ -153,7 +153,7 @@ show up first.
 | `sieve_cap` | `10` | 1 | `edhmc/tivit.py:1036` |  | yes | **never** |
 | `sieve_taps` | `True` | 1 | `edhmc/tivit.py:1034` |  | yes | yes |
 | `springheart_hosts` | `<none>` | 1 | `edhmc/azusa.py:1266` |  | yes | yes |
-| `starting_life` | `40` | 4 | `edhmc/karlov.py:836` |  | **no** | yes |
+| `starting_life` | `40` | 4 | `edhmc/karlov.py:839` |  | **no** | yes |
 | `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1003` | §0z49 | yes | yes |
 | `surveil_land_floor` | `6` | 1 | `edhmc/lorehold.py:872` |  | **no** | **never** |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:1011` | §0z7 | yes | **never** |

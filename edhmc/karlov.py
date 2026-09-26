@@ -616,10 +616,13 @@ def upkeep(g):
 def necropotence_cards(g) -> int:
     """How many cards the pilot buys with Necropotence this turn: enough to
     fill the hand to `necro_hand_target` (7), never paying below
-    `necro_life_floor` (20) life, and never more than the library holds.
-    THE POLICY, and the owner is asked to confirm it (§0z57)."""
+    `necro_life_floor` (10) life, and never more than the library holds.
+    THE POLICY, CONFIRMED BY THE OWNER 2026-09-26 (§0z57): "like Bolas's
+    Citadel, the card is at its best played to the extremes". The first
+    default was a 20-life floor; 10 measured +0.0023 +-0.0011 better at T20,
+    and 30 and a 5-card target both measured worse."""
     target = g.cfg.get("necro_hand_target", 7)
-    floor = g.cfg.get("necro_life_floor", 20)
+    floor = g.cfg.get("necro_life_floor", 10)
     return max(0, min(target - len(g.hand), int(g.your_life - floor),
                       len(g.library)))
 

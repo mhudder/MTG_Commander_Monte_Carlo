@@ -160,6 +160,12 @@
         "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "f0168d0ef3a3249d",
         "utc": "2026-09-25T21:16:56Z"
+      },
+      {
+        "commit": "101936e",
+        "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
+        "fingerprint": "ea7d981df13f586f",
+        "utc": "2026-09-26T03:16:19Z"
       }
     ]
   },
@@ -654,6 +660,12 @@
         "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
         "fingerprint": "8dd517d5fcc7fd9e",
         "utc": "2026-09-25T21:16:56Z"
+      },
+      {
+        "commit": "101936e",
+        "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
+        "fingerprint": "ed634cdbcd376688",
+        "utc": "2026-09-26T03:16:20Z"
       }
     ]
   },

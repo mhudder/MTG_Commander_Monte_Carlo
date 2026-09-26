@@ -331,8 +331,8 @@ SCRIPTED_KARLOV = {
     "Ranger of Eos",
     # Both were BLIND from 2026-09-03 until their text went in: Necropotence
     # skips the draw step and pays life for cards at the end step (§0z57 --
-    # the amount is a POLICY, `necro_hand_target` / `necro_life_floor`, and
-    # the owner is asked to confirm it); Benevolent Offering does both its
+    # the amount is a POLICY, `necro_hand_target` 7 / `necro_life_floor` 10,
+    # confirmed by the owner); Benevolent Offering does both its
     # sentences, three flying Spirits each way and 2 life per creature (§0z56).
     "Necropotence", "Benevolent Offering",
 }

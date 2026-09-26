@@ -29,7 +29,8 @@ CASES
   C  its lifegain goes to the opponent with the FEWEST creatures (2 each)
   D  NEIGHBOUR: Soul Warden sees all six Spirits enter (both sides)
   E  Necropotence, hand 3, life 40: buys 4 cards, pays 4 life
-  F  life 22, empty hand: buys 2 -- the 20-life floor
+  F  life 12, empty hand: buys 2 -- the 10-life floor (the owner's, 2026-09-26;
+     it was 20 and this case read "life 22")
   G  a one-card library: buys 1
   H  the cards are not DRAWN (`cards_drawn` does not move)
   I  with Necropotence out the draw step is skipped
@@ -152,9 +153,9 @@ def run_cases():
     K.necropotence_step(g)
     check("E hand 3, life 40: 4 cards for 4 life",
           (len(g.hand), g.your_life), (7, 36.0))
-    g = kgame(kcard("Necropotence"), life=22.0)
+    g = kgame(kcard("Necropotence"), life=12.0)
     K.necropotence_step(g)
-    check("F life 22, empty hand: 2 cards (the floor)", len(g.hand), 2)
+    check("F life 12, empty hand: 2 cards (the floor)", len(g.hand), 2)
     g = kgame(kcard("Necropotence"), lib=1)
     K.necropotence_step(g)
     check("G a one-card library: 1 card", len(g.hand), 1)

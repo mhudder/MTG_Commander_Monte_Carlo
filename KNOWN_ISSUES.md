@@ -105,7 +105,7 @@ Methodology that used to live at the end of this file is now
 | [0z54](#0z54) | FIXED | **One path for every free cast.** The Dawning Archaic, Invoke Calamity, Goliath's dream casts and Galvanoth each wrote their own subset of `resolve_spell`: an Archaic cast triggered Guttersnipe and nothing else, an Invoke cast from HAND triggered nothing, Galvanoth counted `mv_cheated` twice, Scrollwielder's card went back to the graveyard. `cast_free` is the one path. Worth **+0.0135 ±0.0031** to lorehold at T20; the Archaic's row +0.0006 → +0.0089 |
 | [0z55](#0z55) | FIXED | **Approach of the Second Sun could never be cast twice**, so its win did not exist. Its "otherwise" -- seventh from the top, 7 life -- is in, and a second cast from hand wins, 0.09 games a game. **+0.0667 ±0.0043 at T20**, the largest single correction this project has made to one card; the row goes −0.0003 → +0.0666. A ceiling in one respect, named: the pod does not react to a known win in your library |
 | [0z56](#0z56) | FIXED | **Benevolent Offering does both its sentences** -- three flying Spirits each way, then 2 life per creature -- where it was a flat 4 life. The test caught the first version choosing the lifegain opponent BEFORE the Spirits existed. +0.0035 ±0.0021; row +0.0089 |
-| [0z57](#0z57) | FIXED | **Necropotence** skips the draw step and pays life for cards at the end step, where it was `draw2`. +0.0053 ±0.0028; row +0.0146. The amount is a POLICY put to the owner: a 10-life floor beats the 20 assumed (+0.0023 ±0.0011) |
+| [0z57](#0z57) | FIXED | **Necropotence** skips the draw step and pays life for cards at the end step, where it was `draw2`. +0.0053 ±0.0028; row +0.0146. The amount is a POLICY, confirmed by the owner 2026-09-26: fill to 7 cards, down to 10 life (10 measured +0.0023 ±0.0011 better than the 20 first assumed) |
 | [0z58](#0z58) | FIXED | **Twitching Doll was classified SCRIPTED with neither clause implemented**, and when the nest counters went in they fired 0.03 times a game -- the pilot attacked with it and tapped mana creatures last. Policy `doll_policy="nest"`: it stays home and taps for a counter each turn. +0.0090 ±0.0025; row +0.0023 → +0.0111 |
 | [0z59](#0z59) | MEASURED | **Sunbird's decay (queued 0b-i) has no single cause.** Measured at all 22 commits since 2026-09-09 on the same seeds: −0.0019 at §0z8, −0.0027 at §0z9, +0.0010 at §0z17, −0.0011 at §0z42, +0.0016 at §0z49, each inside or near its bar. Net −0.0034 ±0.0035 at 6b4546e, inside its bar |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
@@ -7119,8 +7119,14 @@ hand to `necro_hand_target` (7), never paying below `necro_life_floor` (20).
 | hand target 5 − 7 | −0.0047 ±0.0014 | −0.0073 ±0.0023 |
 
 **Lower floors and fuller hands both win more**, which fits the standing finding
-that life decides only 20% of karlov's losses: here life is a resource. The
-defaults stay at 20/7 until the owner answers; 10 is measured better.
+that life decides only 20% of karlov's losses: here life is a resource.
+
+**CONFIRMED AND ADOPTED 2026-09-26: a 10-life floor and a 7-card hand.** The
+owner's reasoning is the card's, not the table's: "similar to Bolas's
+Citadel, the card is at its best when played to the extremes" -- which the
+measurement agrees with in sign at both ends of the sweep. The numbers in the
+table above were measured at the 20-life default; the rebuilt karlov table
+carries the adopted one.
 
 ## 0z58. FIXED — Twitching Doll was SCRIPTED with neither clause in the engine
 
