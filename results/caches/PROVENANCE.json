@@ -589,9 +589,9 @@
     "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "ed634cdbcd376688",
-    "built_commit": "a699e82",
-    "built_utc": "2026-09-26T05:04:12Z",
+    "built_at": "a2a20b6aa7c39e9f",
+    "built_commit": "cec13c5",
+    "built_utc": "2026-09-26T17:44:10Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -741,16 +741,23 @@
             "utc": "2026-09-26T03:16:20Z"
           }
         ]
+      },
+      {
+        "built_at": "ed634cdbcd376688",
+        "built_commit": "a699e82",
+        "built_utc": "2026-09-26T05:04:12Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "b6f957b",
+            "evidence": "2026-09-26, \u00a70z61/\u00a70z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.",
+            "fingerprint": "b394a5a4ceaaaf95",
+            "utc": "2026-09-26T13:43:44Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "b6f957b",
-        "evidence": "2026-09-26, \u00a70z61/\u00a70z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.",
-        "fingerprint": "b394a5a4ceaaaf95",
-        "utc": "2026-09-26T13:43:44Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "14b3667429ac8c01",
