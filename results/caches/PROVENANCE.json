@@ -691,9 +691,9 @@
     ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "444d30671994398f",
-    "built_commit": "af016c1",
-    "built_utc": "2026-09-17T03:44:22Z",
+    "built_at": "14b3667429ac8c01",
+    "built_commit": "08cd25e",
+    "built_utc": "2026-09-26T04:39:39Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -721,81 +721,88 @@
             "utc": "2026-09-17T03:00:51Z"
           }
         ]
+      },
+      {
+        "built_at": "444d30671994398f",
+        "built_commit": "af016c1",
+        "built_utc": "2026-09-17T03:44:22Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "9f226af",
+            "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+            "fingerprint": "7cbb110661f3a784",
+            "utc": "2026-09-17T14:36:37Z"
+          },
+          {
+            "commit": "774b8ef",
+            "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
+            "fingerprint": "ef7d84cc653e832c",
+            "utc": "2026-09-17T15:13:26Z"
+          },
+          {
+            "commit": "c6d604a",
+            "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+            "fingerprint": "9f0b2921b413382a",
+            "utc": "2026-09-17T15:40:28Z"
+          },
+          {
+            "commit": "aac99db",
+            "evidence": "2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.",
+            "fingerprint": "e6d99320e0b6aeec",
+            "utc": "2026-09-17T15:54:30Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+            "fingerprint": "7645144c8b10e1e9",
+            "utc": "2026-09-20T15:01:27Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+            "fingerprint": "107568d7b3394fcc",
+            "utc": "2026-09-20T15:02:17Z"
+          },
+          {
+            "commit": "7c25a5f",
+            "evidence": "2026-09-21, Reality Fracture batch 2. Fingerprints moved because decks/_evasion.py was regenerated (in every deck's fingerprint since 0z29) and because engine.py, lorehold.py, tivit.py and shilgengar.py gained name-guarded branches for four new cards plus the 0z38 flashback-exile fix. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. WHOLE OUTPUT COMPARED TOO (0z32): every numeric key summed over 80 baseline games per touched deck -- lorehold 100->103 keys, rendmaw 53->54, shilgengar 49->50, tivit 66->67; the added keys are exactly the five new counters, all zero in a baseline game, and NO shared key moved. The 0z38 fix does not move any baseline because Past in Flames is a MEASURED candidate and not a member of the lorehold list, so no deck in the baseline casts a flashback spell.",
+            "fingerprint": "6383a905e9d9e6f3",
+            "utc": "2026-09-21T03:26:35Z"
+          },
+          {
+            "commit": "d23e650",
+            "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "20072bfa80787969",
+            "utc": "2026-09-22T03:21:00Z"
+          },
+          {
+            "commit": "42015bb",
+            "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "fb263bb66c8cf690",
+            "utc": "2026-09-22T12:42:29Z"
+          },
+          {
+            "commit": "cdbc6f7",
+            "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+            "fingerprint": "ce45648ab40532e9",
+            "utc": "2026-09-22T13:52:17Z"
+          },
+          {
+            "commit": "408de74",
+            "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+            "fingerprint": "ce90068550f82f1d",
+            "utc": "2026-09-22T18:25:10Z"
+          },
+          {
+            "commit": "2128a3b",
+            "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "02383ff585198276",
+            "utc": "2026-09-22T20:58:42Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "9f226af",
-        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
-        "fingerprint": "7cbb110661f3a784",
-        "utc": "2026-09-17T14:36:37Z"
-      },
-      {
-        "commit": "774b8ef",
-        "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
-        "fingerprint": "ef7d84cc653e832c",
-        "utc": "2026-09-17T15:13:26Z"
-      },
-      {
-        "commit": "c6d604a",
-        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
-        "fingerprint": "9f0b2921b413382a",
-        "utc": "2026-09-17T15:40:28Z"
-      },
-      {
-        "commit": "aac99db",
-        "evidence": "2026-09-17 L1 follow-up: decks/tivit_v1.py lost a DEAD duplicate ANOINTED_PROCESSION definition (the first of two; the second rebound the name and is the object every measurement used -- the two trees' ANOINTED_PROCESSION compare equal). check_unchanged_decks vs worktree at aac99db: BIT-IDENTICAL on all 8 metrics, all six decks; every table re-renders byte-identical.",
-        "fingerprint": "e6d99320e0b6aeec",
-        "utc": "2026-09-17T15:54:30Z"
-      },
-      {
-        "commit": "488cc61",
-        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
-        "fingerprint": "7645144c8b10e1e9",
-        "utc": "2026-09-20T15:01:27Z"
-      },
-      {
-        "commit": "488cc61",
-        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
-        "fingerprint": "107568d7b3394fcc",
-        "utc": "2026-09-20T15:02:17Z"
-      },
-      {
-        "commit": "7c25a5f",
-        "evidence": "2026-09-21, Reality Fracture batch 2. Fingerprints moved because decks/_evasion.py was regenerated (in every deck's fingerprint since 0z29) and because engine.py, lorehold.py, tivit.py and shilgengar.py gained name-guarded branches for four new cards plus the 0z38 flashback-exile fix. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. WHOLE OUTPUT COMPARED TOO (0z32): every numeric key summed over 80 baseline games per touched deck -- lorehold 100->103 keys, rendmaw 53->54, shilgengar 49->50, tivit 66->67; the added keys are exactly the five new counters, all zero in a baseline game, and NO shared key moved. The 0z38 fix does not move any baseline because Past in Flames is a MEASURED candidate and not a member of the lorehold list, so no deck in the baseline casts a flashback spell.",
-        "fingerprint": "6383a905e9d9e6f3",
-        "utc": "2026-09-21T03:26:35Z"
-      },
-      {
-        "commit": "d23e650",
-        "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
-        "fingerprint": "20072bfa80787969",
-        "utc": "2026-09-22T03:21:00Z"
-      },
-      {
-        "commit": "42015bb",
-        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
-        "fingerprint": "fb263bb66c8cf690",
-        "utc": "2026-09-22T12:42:29Z"
-      },
-      {
-        "commit": "cdbc6f7",
-        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
-        "fingerprint": "ce45648ab40532e9",
-        "utc": "2026-09-22T13:52:17Z"
-      },
-      {
-        "commit": "408de74",
-        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
-        "fingerprint": "ce90068550f82f1d",
-        "utc": "2026-09-22T18:25:10Z"
-      },
-      {
-        "commit": "2128a3b",
-        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "02383ff585198276",
-        "utc": "2026-09-22T20:58:42Z"
-      }
-    ]
+    "verified": []
   }
 }

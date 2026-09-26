@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0029.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0028.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -25,74 +25,74 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Sol Ring                              +4.45+-0.32         +4.55+-0.36        +0.0361+-0.0049      both
-Mirkwood Bats                         +4.27+-0.26         +4.21+-0.26        +0.0373+-0.0036      both
-Kambal, Profiteering Mayor            +3.56+-0.24         +3.34+-0.23        +0.0201+-0.0033      both
-Marionette Master                     +2.13+-0.17         +2.24+-0.18        +0.0173+-0.0032      both
-Monologue Tax                         +2.30+-0.22         +2.22+-0.24        +0.0233+-0.0033      both
-Tempt with Bunnies                    +1.54+-0.17         +2.16+-0.22        +0.0207+-0.0034      both
-Nadier's Nightblade                   +2.21+-0.16         +2.09+-0.17        +0.0126+-0.0027      both
-Time Sieve                            +0.59+-0.14         +2.08+-0.22        +0.0420+-0.0038      both
-Master of Ceremonies                  +2.02+-0.20         +1.99+-0.22        +0.0173+-0.0032      both
-Demonic Tutor                         +1.78+-0.20         +1.94+-0.24        +0.0175+-0.0034      both
-Dimir Signet                          +1.40+-0.18         +1.83+-0.23        +0.0141+-0.0032      both
-Arcane Signet                         +1.47+-0.19         +1.82+-0.23        +0.0136+-0.0033      both
-Tyrant's Choice                       +1.91+-0.09         +1.73+-0.10        +0.0047+-0.0018      both
-Azorius Signet                        +1.45+-0.20         +1.71+-0.23        +0.0159+-0.0033      both
-Tempting Contract                     +1.48+-0.17         +1.63+-0.21        +0.0199+-0.0030      both
-Orzhov Signet                         +1.63+-0.19         +1.60+-0.22        +0.0157+-0.0033      both
-Grudge Keeper                         +1.72+-0.14         +1.44+-0.15        +0.0034+-0.0026      both
-Plea for Power                        +1.03+-0.15         +1.26+-0.19        +0.0146+-0.0032      both
-Model of Unity                        +0.80+-0.16         +1.21+-0.20        +0.0105+-0.0031      both
-Lightning Greaves                     +0.94+-0.14         +1.18+-0.17        +0.0065+-0.0029      both
-Disciple of the Vault                 +1.05+-0.10         +1.03+-0.12        +0.0071+-0.0021      both
-Cyberdrive Awakener                   +0.89+-0.08         +0.91+-0.11        +0.0045+-0.0025      both
-Messenger Jays                        +0.68+-0.11         +0.80+-0.16        +0.0067+-0.0029      both
-Lieutenants of the Guard              +0.53+-0.10         +0.79+-0.13        +0.0079+-0.0024      both
-Ephemerate                            +0.68+-0.13         +0.79+-0.17        +0.0117+-0.0031      both
-Anointed Procession                   +1.05+-0.17         +0.77+-0.22        +0.0305+-0.0036      both
-Illusion of Choice                    +0.64+-0.16         +0.76+-0.20        +0.0095+-0.0032      both
-Academy Manufactor                    +0.69+-0.17         +0.70+-0.19        +0.0170+-0.0033      both
-Sadistic Shell Game                   +0.40+-0.09         +0.66+-0.13        +0.0089+-0.0024      both
-Custodi Squire                        +0.49+-0.09         +0.60+-0.13        +0.0075+-0.0026      both
-Idyllic Tutor                         +0.40+-0.14         +0.49+-0.19        +0.0099+-0.0031      both
-Deadeye Navigator                     +0.45+-0.14         +0.45+-0.17        +0.0176+-0.0031      both
-Displacer Kitten                      +0.52+-0.15         +0.42+-0.18        +0.0111+-0.0031      both
-Conjurer's Closet                     +0.44+-0.10         +0.27+-0.15        +0.0116+-0.0026      both
-Teleportation Circle                  +0.44+-0.13         +0.22+-0.17        +0.0100+-0.0028      both
-Soulherder                            +0.35+-0.14         +0.15+-0.16        +0.0077+-0.0028       win
-Tamiyo's Journal                      +0.13+-0.06         +0.13+-0.09        +0.0006+-0.0017       dmg
-Brago's Representative                +0.04+-0.14         +0.11+-0.17        +0.0101+-0.0028       win
-Ballot Broker                         +0.02+-0.14         +0.10+-0.17        +0.0062+-0.0029       win
-Coercive Portal                       -1.48+-0.18         -0.87+-0.22        +0.0031+-0.0033       dmg
-Revel in Riches                       -0.18+-0.09         -1.01+-0.15        +0.0063+-0.0021      both
-Mechanized Production                 +0.26+-0.14         -1.14+-0.22        +0.0227+-0.0030      FLIP
+Mirkwood Bats                         +5.70+-0.32         +5.42+-0.31        +0.0375+-0.0042      both
+Sol Ring                              +3.07+-0.31         +3.06+-0.33        +0.0267+-0.0042      both
+Kambal, Profiteering Mayor            +3.50+-0.23         +3.04+-0.22        +0.0185+-0.0032      both
+Tempt with Bunnies                    +1.78+-0.19         +2.31+-0.23        +0.0224+-0.0034      both
+Monologue Tax                         +2.44+-0.23         +2.30+-0.25        +0.0261+-0.0034      both
+Marionette Master                     +2.08+-0.17         +2.19+-0.17        +0.0184+-0.0031      both
+Demonic Tutor                         +2.57+-0.23         +2.16+-0.24        +0.0232+-0.0034      both
+Nadier's Nightblade                   +2.18+-0.16         +2.05+-0.16        +0.0111+-0.0025      both
+Tempting Contract                     +2.11+-0.21         +2.04+-0.25        +0.0239+-0.0034      both
+Time Sieve                            +0.67+-0.14         +1.86+-0.22        +0.0369+-0.0037      both
+Master of Ceremonies                  +2.11+-0.21         +1.84+-0.21        +0.0197+-0.0032      both
+Dimir Signet                          +1.45+-0.19         +1.82+-0.23        +0.0147+-0.0032      both
+Azorius Signet                        +1.60+-0.20         +1.73+-0.24        +0.0150+-0.0033      both
+Orzhov Signet                         +1.69+-0.21         +1.72+-0.23        +0.0182+-0.0033      both
+Arcane Signet                         +1.54+-0.20         +1.67+-0.23        +0.0140+-0.0033      both
+Tyrant's Choice                       +1.82+-0.09         +1.67+-0.11        +0.0038+-0.0018      both
+Grudge Keeper                         +1.65+-0.12         +1.31+-0.13        +0.0029+-0.0023      both
+Model of Unity                        +0.96+-0.17         +1.19+-0.21        +0.0109+-0.0029      both
+Plea for Power                        +1.19+-0.16         +1.17+-0.19        +0.0147+-0.0031      both
+Lightning Greaves                     +0.92+-0.14         +1.05+-0.17        +0.0047+-0.0029      both
+Disciple of the Vault                 +0.97+-0.10         +0.97+-0.12        +0.0075+-0.0020      both
+Cyberdrive Awakener                   +0.82+-0.09         +0.76+-0.11        +0.0021+-0.0023       dmg
+Sadistic Shell Game                   +0.42+-0.11         +0.74+-0.14        +0.0087+-0.0024      both
+Messenger Jays                        +0.70+-0.12         +0.74+-0.16        +0.0056+-0.0029      both
+Custodi Squire                        +0.58+-0.11         +0.73+-0.15        +0.0091+-0.0027      both
+Lieutenants of the Guard              +0.63+-0.11         +0.71+-0.14        +0.0053+-0.0024      both
+Illusion of Choice                    +0.64+-0.16         +0.65+-0.19        +0.0077+-0.0031      both
+Ephemerate                            +0.64+-0.13         +0.64+-0.17        +0.0131+-0.0030      both
+Academy Manufactor                    +0.82+-0.17         +0.62+-0.19        +0.0148+-0.0030      both
+Deadeye Navigator                     +0.55+-0.12         +0.38+-0.15        +0.0168+-0.0028      both
+Idyllic Tutor                         +0.47+-0.15         +0.37+-0.19        +0.0179+-0.0032      both
+Displacer Kitten                      +0.59+-0.14         +0.33+-0.17        +0.0099+-0.0029      both
+Conjurer's Closet                     +0.43+-0.10         +0.31+-0.14        +0.0103+-0.0025      both
+Tamiyo's Journal                      +0.23+-0.09         +0.18+-0.11        +0.0008+-0.0020       dmg
+Teleportation Circle                  +0.42+-0.12         +0.17+-0.17        +0.0111+-0.0028      both
+Soulherder                            +0.34+-0.14         +0.10+-0.16        +0.0072+-0.0026       win
+Ballot Broker                         +0.12+-0.14         +0.06+-0.17        +0.0033+-0.0028       win
+Brago's Representative                +0.14+-0.13         +0.04+-0.16        +0.0071+-0.0027       win
+Anointed Procession                   +0.18+-0.27         -0.45+-0.30        +0.0348+-0.0048      both
+Coercive Portal                       -1.44+-0.18         -0.90+-0.22        +0.0041+-0.0033      both
+Revel in Riches                       -0.19+-0.09         -1.12+-0.16        +0.0078+-0.0020      both
+Mechanized Production                 +0.22+-0.16         -1.21+-0.23        +0.0208+-0.0031      FLIP
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Magister of Worth                     +0.14+-0.11         +0.22+-0.15        -0.0047+-0.0030      both
-      The CONDEMNATION half is implemented (2026-09-12): a symmetric wipe that
-      spares only itself, conditional on the council vote. GRACE -- 'EACH PLAYER
-      returns each creature card from their graveyard to the battlefield' -- is
-      modelled for you and invisible for the pod, which has no graveyard (§4), so
-      that mode understates. Condemnation also needs vote control to land at all
-      under the adversarial `opp_vote_policy` default.
-Promise of Loyalty                    -0.61+-0.13         +0.16+-0.17        +0.0063+-0.0030       win
+Promise of Loyalty                    -0.46+-0.14         +0.12+-0.17        +0.0063+-0.0031       win
       Implemented as a symmetric wipe (2026-09-12). The card is 'each player puts
       a vow counter on a creature they control and SACRIFICES THE REST' --
       everyone KEEPS ONE, and the model keeps none. It overstates in both
       directions at once, so a high score is still evidence and a low one is not.
       Sacrifice also gets around indestructible, which is why it is in
       WIPE_IGNORES_INDESTRUCTIBLE.
-Farewell                              -0.50+-0.11         +0.11+-0.15        +0.0079+-0.0028       win
+Farewell                              -0.44+-0.12         +0.11+-0.15        +0.0068+-0.0028       win
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Damn                                  -1.46+-0.18         +0.08+-0.22        +0.0070+-0.0034       win
+Magister of Worth                     +0.23+-0.12         +0.08+-0.15        -0.0061+-0.0029       win
+      The CONDEMNATION half is implemented (2026-09-12): a symmetric wipe that
+      spares only itself, conditional on the council vote. GRACE -- 'EACH PLAYER
+      returns each creature card from their graveyard to the battlefield' -- is
+      modelled for you and invisible for the pod, which has no graveyard (§4), so
+      that mode understates. Condemnation also needs vote control to land at all
+      under the adversarial `opp_vote_policy` default.
+Damn                                  -1.40+-0.18         +0.07+-0.21        +0.0070+-0.0033       win
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
@@ -102,22 +102,22 @@ Damn                                  -1.46+-0.18         +0.08+-0.22        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Torment of Hailfire                   +3.15+-0.19         +3.55+-0.20        +0.0161+-0.0030      both
-Rhystic Study                         +1.04+-0.23         +1.44+-0.29        +0.0049+-0.0044      both
-Vault 11: Voter's Dilemma             +0.78+-0.11         +0.96+-0.14        +0.0067+-0.0024      both
-Expropriate                           +0.15+-0.06         +0.72+-0.11        +0.0174+-0.0026      both
-Trap the Trespassers                  +0.15+-0.08         +0.29+-0.12        +0.0019+-0.0019       dmg
-Capital Punishment                    +0.18+-0.06         +0.26+-0.10        +0.0033+-0.0020      both
-Bite of the Black Rose                +0.19+-0.10         +0.25+-0.12        +0.0026+-0.0020      both
-Dovin's Veto                          +0.08+-0.08         +0.21+-0.10        +0.0017+-0.0016      both
-Void Rend                             +0.13+-0.09         +0.20+-0.11        +0.0025+-0.0020      both
-Split Decision                        +0.15+-0.07         +0.19+-0.09        +0.0005+-0.0014       dmg
-Trial of a Time Lord                  +0.17+-0.07         +0.17+-0.11        +0.0012+-0.0019       dmg
-Council's Judgment                    +0.15+-0.08         +0.17+-0.11        +0.0014+-0.0019       dmg
-Muddle the Mixture                    +0.05+-0.08         +0.15+-0.11        +0.0010+-0.0018       dmg
-Counterspell                          +0.02+-0.07         +0.11+-0.11        +0.0008+-0.0017        --
-Path to Exile                         +0.05+-0.06         +0.06+-0.08        -0.0001+-0.0013        --
-An Offer You Can't Refuse             +0.00+-0.06         +0.01+-0.08        -0.0001+-0.0013        --
-Swords to Plowshares                  -0.00+-0.05         -0.01+-0.07        -0.0004+-0.0012        --
-Propaganda                            +0.06+-0.06         -0.02+-0.09        -0.0024+-0.0016       win
-Ghostly Prison                        -0.02+-0.07         -0.09+-0.09        -0.0010+-0.0016       dmg
+Torment of Hailfire                   +2.99+-0.19         +3.22+-0.19        +0.0158+-0.0028      both
+Rhystic Study                         +1.24+-0.17         +1.25+-0.21        +0.0138+-0.0031      both
+Vault 11: Voter's Dilemma             +0.81+-0.12         +0.96+-0.16        +0.0053+-0.0026      both
+Expropriate                           +0.16+-0.05         +0.72+-0.10        +0.0162+-0.0024      both
+Trap the Trespassers                  +0.22+-0.11         +0.29+-0.13        +0.0013+-0.0019       dmg
+Bite of the Black Rose                +0.19+-0.11         +0.25+-0.12        +0.0013+-0.0021       dmg
+Capital Punishment                    +0.29+-0.08         +0.22+-0.10        +0.0022+-0.0021      both
+Trial of a Time Lord                  +0.20+-0.09         +0.20+-0.12        +0.0003+-0.0019       dmg
+Split Decision                        +0.17+-0.07         +0.15+-0.09        +0.0014+-0.0014       dmg
+Void Rend                             +0.22+-0.10         +0.14+-0.13        +0.0019+-0.0022       dmg
+Dovin's Veto                          +0.03+-0.08         +0.13+-0.11        +0.0021+-0.0018      both
+Muddle the Mixture                    +0.09+-0.08         +0.11+-0.11        +0.0001+-0.0018       dmg
+Council's Judgment                    +0.18+-0.09         +0.09+-0.12        +0.0003+-0.0020        --
+Path to Exile                         +0.05+-0.05         +0.08+-0.08        +0.0015+-0.0013       win
+Swords to Plowshares                  +0.03+-0.05         +0.05+-0.07        +0.0005+-0.0012        --
+Counterspell                          +0.07+-0.08         +0.05+-0.11        +0.0012+-0.0017        --
+An Offer You Can't Refuse             +0.02+-0.06         +0.03+-0.07        +0.0003+-0.0012        --
+Propaganda                            +0.04+-0.08         -0.05+-0.11        -0.0010+-0.0018        --
+Ghostly Prison                        +0.04+-0.09         -0.05+-0.11        -0.0011+-0.0018        --
