@@ -192,6 +192,12 @@
         "evidence": "check_unchanged_decks at N=400, HEAD 2b9fff4 vs the \u00a70z67/\u00a70z68/\u00a70z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.",
         "fingerprint": "75a231f588b8fac9",
         "utc": "2026-09-26T21:54:38Z"
+      },
+      {
+        "commit": "4501246",
+        "evidence": "ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.",
+        "fingerprint": "b23755be8f9f6b7a",
+        "utc": "2026-09-26T22:56:46Z"
       }
     ]
   },

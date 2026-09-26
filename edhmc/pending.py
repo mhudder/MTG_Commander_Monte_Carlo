@@ -3453,6 +3453,24 @@ def print_proposals() -> None:
             print(f"  x {pr.card} ({pr.deck}): {pr.rejected}")
 
 
+def check_staged_are_classified() -> None:
+    """Every card in every STAGED list is classified in tools/ablation.py.
+
+    `ablation.check_scripted_coverage` refuses to build a table containing an
+    unclassified card, and it used to be the FIRST thing to notice: staging
+    -Blasphemous Act +Goldspan Dragon and -Vampiric Rites +Lyra (§0z69) put
+    two unclassified cards into `build_pending`, and the table rebuild exited
+    on the first try of every attempt until it was stopped. The ledger is
+    where a card is staged, so the ledger is where the claim about it has to
+    be made. §0q: the check moves to where the mistake is made.
+    """
+    import tools.ablation as AB
+    for deck_name in DECKS:
+        deck, _ = build_pending(deck_name)
+        AB.check_scripted_coverage(deck_name, deck,
+                                   AB.partly_for(deck_name, deck))
+
+
 def ledger(verbose: bool = True) -> None:
     print("=" * 78)
     print("PENDING DECK CHANGES — not yet written to the .xlsx files")
@@ -3461,6 +3479,7 @@ def ledger(verbose: bool = True) -> None:
           "classification (§0z31):")
     for line in check_cuts_are_measured():
         print(line)
+    check_staged_are_classified()
     print()
     if not CHANGES:
         print("  (none — every decided change is applied on all three legs)")

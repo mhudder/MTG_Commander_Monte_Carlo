@@ -403,6 +403,10 @@ SCRIPTED_SHILGENGAR = {
     # deck's commander.
     # Angels tribal
     "Archangel of Thune", "Resplendent Angel", "Righteous Valkyrie",
+    # Staged 2026-09-26 (§0z69). PREVIEW TEXT, implemented in full --
+    # flying, and a +1/+1 counter on each Angel whenever you gain life --
+    # and pinned by tests/test_fra_batch2.py.
+    "Lyra, Archangel of Dawn",
     "Bishop of Wings", "Giada, Font of Hope", "Youthful Valkyrie",
     "Lyra Dawnbringer", "Speaker of the Heavens",
     "Emeria's Call // Emeria, Shattered Skyclave",
@@ -623,6 +627,12 @@ PARTLY_MODELLED = {
             "under the adversarial `opp_vote_policy` default.",
     },
     "lorehold": {
+        "Goldspan Dragon":
+            "Staged 2026-09-26 (§0z69). MODELLED: the 4/4 flying haste body, "
+            "a Treasure whenever it attacks, and Treasures tapping for TWO "
+            "(`lorehold.available_mana`'s `per`). NOT: 'or becomes the target "
+            "of a spell' -- the pod's spot removal does target it in this "
+            "model and makes no Treasure, so the row is a floor by those.",
         "Volcanic Vision":
             "The RECURSION half is implemented (2026-09-13, §0z19): it "
             "returns the largest instant or sorcery from the graveyard to "
