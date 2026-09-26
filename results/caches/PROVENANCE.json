@@ -622,9 +622,9 @@
     "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "a2a20b6aa7c39e9f",
-    "built_commit": "cec13c5",
-    "built_utc": "2026-09-26T17:44:10Z",
+    "built_at": "d7ac5a85a5483868",
+    "built_commit": "583a347",
+    "built_utc": "2026-09-26T23:27:17Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -788,6 +788,13 @@
             "utc": "2026-09-26T13:43:44Z"
           }
         ]
+      },
+      {
+        "built_at": "a2a20b6aa7c39e9f",
+        "built_commit": "cec13c5",
+        "built_utc": "2026-09-26T17:44:10Z",
+        "deck": "shilgengar",
+        "verified": []
       }
     ],
     "verified": []
