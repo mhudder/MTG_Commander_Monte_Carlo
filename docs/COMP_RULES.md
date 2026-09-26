@@ -34,7 +34,7 @@ to.
 | rule | what it says | bears on |
 |---|---|---|
 | **104.3c** | a player required to draw more cards than are left in their library draws the remainder and **then loses the game** the next time a player would receive priority | queued **17**, CLOSED by §0z42 — `engine.drew_from_empty` records the loss at the draw, first result wins, so the 104.4a simultaneous case (deck and kill the last opponent in one resolution) scores a loss where a table scores a draw |
-| **104.3j** | in Commander, a player dealt **21 or more combat damage by the same commander** over the game loses | **not modelled anywhere** — see below |
+| **104.3j** | in Commander, a player dealt **21 or more combat damage by the same commander** over the game loses | **MODELLED for your commander since §0z65** — see below |
 | **305.7** | a permanent that gains a basic land type **gains the mana ability for that type**; gaining types in addition to its own keeps its existing types and rules text | §0z / queued **15** — Ashaya |
 | **302.6** | a creature's `{T}` ability can't be activated, and it can't attack, unless it has been under its controller's control since their most recent turn began | §0z / queued **15** — the constraint on the above |
 | **603.6a** | enters-the-battlefield triggers fire when **an event puts a permanent onto the battlefield** | §0z / queued **15** — the trap in the above |
@@ -42,7 +42,16 @@ to.
 | **702.12b** | an indestructible permanent isn't destroyed by lethal damage and **ignores the state-based action that checks for it** (704.5g) | §0z10, closed — confirms the fix |
 | **704.5j** | the legend rule puts the extras into their **owners' graveyards** | §0z5, closed — confirms the fix |
 
-### 104.3j — commander damage is an unmodelled loss condition
+### 104.3j — commander damage, MODELLED since §0z65
+
+**Superseded by §0z65, kept for its prediction.** The section below was
+written when the rule was absent. It is implemented now (`opponents.
+commander_hit`, `Opponent.cmdr_damage`, `_check_eliminations`) and measured:
+lorehold +0.0137 ±0.0036 at T20, shilgengar +0.0071, the rest inside their
+bars. **Its "sharp case" was the wrong deck** -- Karlov kills 0.07 players a
+game this way and wins no more; lorehold's 5/5 FLIER kills 0.49. Evasion, not
+growth, is what reaches 21. And "the fix only ever adds kills" held: no deck
+lost win rate.
 
 `grep -rn "commander_damage\|21 or more"` over the package returns nothing, so
 this is a win condition the project does not have. It is live rather than

@@ -112,6 +112,8 @@ Methodology that used to live at the end of this file is now
 | [0z61](#0z61) | FIXED | **Menace.** Rendmaw has it and the blocking model did not: a chump-blocking defender spent one blocker on any attacker. MENACE is generated from Scryfall's keywords, and `chump` prices a menace attacker at two blockers, stopping the most power per blocker -- the old rule exactly when nothing has menace (a 400-board property test). +0.0123 ±0.0033 to rendmaw at T20 |
 | [0z62](#0z62) | FIXED | **The pod reacts to a win it can see.** Once Approach has resolved and gone seventh from the top, `known_win_focus` (1.0) floors your share of the pod's removal and kills, and its recast is countered at the cap. Approach's row +0.0666 → **+0.0265 ±0.0041**; lorehold −0.0401. The counterspell half alone is worth −0.0008: the kills are the reaction. The knob is a judgement, put to the owner |
 | [0z63](#0z63) | MEASURED | **Every staged swap re-measured on the rebuilt baseline**, and all six stand, significant at T20. Karlov's cut still favours Swiftfoot Boots over Soulmender, by less: +0.0075 ±0.0047 at T20 (was +0.0125). Goldspan for Blasphemous Act +0.0143 / +0.0119 |
+| [0z64](#0z64) | FIXED | **Rendmaw has Treasures, and Pitiless Plunderer is measured**: a blank, +0.0014 ±0.0017 at T20. It does not rescue Ashnod's Altar (−0.0017 → −0.0012, sacrifices unmoved). The engine costs the committed list nothing (bit-identical) |
+| [0z65](#0z65) | FIXED | **Commander damage (CR 104.3j) is modelled, for your commander**: lorehold +0.0137 ±0.0036 at T20 and 0.49 commander-damage kills a game; shilgengar +0.0071; karlov and tivit kill more opponents and win no more; azusa bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7300,6 +7302,104 @@ the old baseline. **Re-measured again after §0z62** (d603578): −Blasphemous A
 −Greaves +0.0002 / +0.0048; Caldera still holds the five-drop slot (−0.0091);
 and lorehold's two stagings, Caldera GIVEN Sunbird's +0.0226 ±0.0027 and
 Sunbird's GIVEN Caldera +0.0153 ±0.0031 at T20, both stand.
+
+## 0z64. FIXED — rendmaw has Treasures; Pitiless Plunderer measured
+
+Rendmaw had no Treasure anywhere -- no maker in the list, and Treasure Vault's
+activation unimplemented -- so Pitiless Plunderer, proposed as a diagnostic
+for Ashnod's Altar, was abandoned in §0z26. Its Proposal's `implement` note
+said "Treasures have been real mana since §0z6"; §0z6 is SHILGENGAR's.
+
+**Built** (`engine.py`): `Game.treasures` is a pile, `Game.make_treasures`
+fills it through `token_doublings` -- Primal Vigor and Parallel Lives, the one
+function `make_tokens` now reads too, so the doubling cannot be said in one
+token path and not the other (§0z4) -- and `rendmaw_mana` appends one
+any-colour unit per Treasure whose owner is a `TreasureMana`: `spend` taps it
+and tapping it sacrifices the token. Skullclamp's loop pops its units instead
+of spending them, so it taps its Treasures itself (`tap_treasures`). The
+Plunderer's trigger is in `Game.on_creature_death`; its own death is excluded
+because it has left the board (the Scrap Trawler shape), and a wipe that
+removes permanents one at a time makes it a FLOOR.
+
+**Pinned** by `tests/test_treasures.py`, 11 cases and 6 mutations, exact sets.
+One expectation, written before the run, was WRONG and is kept in the file:
+setting the Treasure units' weight to 0 was expected to spend them before a
+land and changed nothing, because `can_pay` spends the least flexible source
+first and a five-colour unit loses every tie to a land before the weight is
+read. `rendmaw_mana`'s docstring said the weight did it; it now says what does.
+
+**Costs the committed list nothing**: with commander damage off,
+`check_unchanged_decks` against 4591d8a is BIT-IDENTICAL on all six decks.
+
+**Measured** (`diagnostics/run_treasures_cmdr.py`, N=15,000 paired,
+`results/treasures_cmdr_20260926.txt`, with §0z65 live):
+
+| | T10 | T20 |
+|---|---|---|
+| Plunderer, candidate row (Pygmy Kavu's slot) | +0.0003 ±0.0006 | +0.0014 ±0.0017 |
+| −Pygmy Kavu +Plunderer, real swap | +0.0000 ±0.0006 | +0.0012 ±0.0019 |
+| Ashnod's Altar row, no Plunderer | +0.0000 ±0.0005 | **−0.0017 ±0.0012** |
+| Ashnod's Altar row, Plunderer in | +0.0000 ±0.0004 | −0.0012 ±0.0012 |
+
+0.40 Treasures made and 0.32 spent a game at T20; Altar sacrifices 0.061 ->
+0.059. **The Plunderer is a blank row, and the diagnostic question is
+answered "not by this card"**: it makes too few Treasures to feed anything,
+and the Altar's usage does not move with it. A Candidate, signal `--`.
+
+## 0z65. FIXED — commander damage (CR 104.3j), for your commander
+
+> 104.3j Any player who's been dealt 21 or more combat damage by the same
+> commander over the course of the game loses the game.
+
+`docs/COMP_RULES.md` recorded this as a loss condition the project did not
+model at all. **Built** (`opponents.py`): `chump` takes items with a key and
+reports which it blocked; `damage_through(..., unblocked=[])` returns the
+attackers that got through, from the SAME blocking decision the damage total
+comes from; `commander_hit` reads the commander's power among them -- by
+identity, `perm.card is g.commander` -- and both of `combat_damage`'s paths add
+it to the defender's `Opponent.cmdr_damage`. `_check_eliminations` removes a
+player at 21, and counts `commander_damage_kills` only where life alone had
+not already killed them. `commander_damage=False` restores every earlier
+table.
+
+Two choices said out loud. **Unscaled power**: `combat_damage`'s `scale`
+spreads bonuses that belong to other attackers (Coat of Arms pumps Birds,
+Cyberdrive animates artifacts) and lorehold's prowess is a lump, so the
+commander is credited its own `power_of` -- a floor where a scale is live.
+**The plan does not aim the commander**: the assignment rule (§0v) puts it
+wherever its power sorts, so a pilot sending it at the player on 16 is not
+modelled; the rule's value is a floor. Only YOUR commander is tracked: the
+pod's commanders are folded into their clocks.
+
+**Pinned** by `tests/test_commander_damage.py`, 10 cases and 5 mutations,
+exact sets; one expectation was wrong (the attacker-blind count also broke
+E, whose 1/1 partner connects) and is kept in the file. `test_menace`'s two
+replacement `chump`s were updated to the keyed contract with their expected
+sets unchanged.
+
+**Measured**, rule on − rule off, same file:
+
+| deck | won T10 | won T20 | commander kills a game (T20) |
+|---|---|---|---|
+| lorehold | +0.0019 ±0.0008 | **+0.0137 ±0.0036** | 0.490 |
+| shilgengar | +0.0005 ±0.0003 | **+0.0071 ±0.0025** | 0.192 |
+| rendmaw | +0.0001 ±0.0001 | +0.0007 ±0.0006 | 0.005 |
+| karlov | +0.0001 ±0.0006 | −0.0001 ±0.0012 | 0.074 |
+| tivit | +0.0005 ±0.0005 | +0.0005 ±0.0014 | 0.065 |
+| azusa | bit-identical (a 0/3 commander) | | |
+
+`opponents_killed` rises significantly in all five. **The prediction on file
+was wrong about which deck**: COMP_RULES named Karlov "the sharp case",
+because it grows on counters; Karlov kills 0.07 players a game this way and
+wins no more. Lorehold's commander is a 5/5 FLIER, and at a
+`flier_block_share` of 0.30 it connects nearly every turn -- the evasion, not
+the growth, is what racks up 21. That rests on the knob, so say it with the
+number. Karlov's and tivit's extra kills convert to nothing measurable: a
+player killed a turn early by commander damage was, in those decks, a player
+the board was about to kill anyway.
+
+Five decks' baselines moved, so their tables were rebuilt; azusa's cache was
+recorded VERIFIED on the bit-identical check.
 
 ## How to read an ablation table
 

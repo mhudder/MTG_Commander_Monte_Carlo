@@ -113,7 +113,7 @@ the game object and discovers optional behaviour with `hasattr`:
 
 | it reads / calls | meaning |
 |---|---|
-| `g.board`, `g.hand`, `g.graveyard`, `g.commander`, `g.commander_cast`, `g.commander_tax` | zones and the command-zone state |
+| `g.board`, `g.hand`, `g.graveyard`, `g.commander`, `g.commander_cast`, `g.commander_tax` | zones and the command-zone state. `g.commander` is also how commander damage finds its attacker -- by IDENTITY, `perm.card is g.commander` (§0z65) -- so an engine that rebuilds the commander's `Card` loses the rule silently |
 | `g.turn`, `g.cfg`, `g.m`, `g.opponents`, `g.opp_rolls`, `g.counter_rolls`, `g.your_life`, `g.result` | turn, knobs, metrics, the pod, the pre-rolled grid, the race |
 | `g.has(name)`, `g.power_of(perm)` | the two hot helpers every engine defines |
 | `g.on_creature_death(n, perm)` (optional) | aristocrats triggers when the pod kills a creature |
@@ -237,6 +237,19 @@ command; use it rather than remembering.
   is winning, which is what the rule alone did to azusa and lorehold. A
   mandatory draw must NOT ask. Popping the library without drawing (exile,
   mill, reveal, "put it into your hand") is not a draw and does not lose.
+- **A mana unit that is POPPED rather than passed to `spend` is never
+  tapped.** Rendmaw's Treasures (§0z64) are units whose owner, a
+  `TreasureMana`, sacrifices the token when `spend` taps it. Skullclamp's
+  loop in `engine.activations` pops the units it uses and pays through
+  `spend`'s count fallback, which taps a board permanent instead -- so a
+  Treasure it used stayed on the pile until `tap_treasures` was added. Any new
+  loop that pops units must tap their owners itself.
+- **`chump`'s items carry a KEY now** (`(power, cost, key)`), and its optional
+  `blocked` list collects the keys it blocked -- that is how
+  `damage_through(..., unblocked=[])` reports which attackers got through,
+  for commander damage (§0z65). A replacement `chump` (a mutation, a
+  diagnostic) must keep both, or commander damage reads a different block
+  than the damage total did.
 - **`engine_cfg` copies the cfg** because five engines `setdefault` their own
   knobs into it; construct games on a fresh `dict(DEFAULT_CFG, …)` and never
   share one dict across engines.

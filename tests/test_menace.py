@@ -131,15 +131,21 @@ def main() -> int:
     print("MUTATION RUN -- exact sets\n")
     real_menace, real_chump = OPP.menace_of, OPP.chump
 
-    def chump_no_cost(items, budget):
-        return real_chump([(pw, 1) for pw, _ in items], budget)
+    # Items carry a third element, the attacker's key, and `blocked` collects
+    # the keys blocked (§0z65, commander damage). Both mutations keep that
+    # contract so they change only the rule they name.
+    def chump_no_cost(items, budget, blocked=None):
+        return real_chump([(it[0], 1) + tuple(it[2:]) for it in items],
+                          budget, blocked)
 
-    def chump_biggest_first(items, budget):
+    def chump_biggest_first(items, budget, blocked=None):
         stopped, used = 0.0, 0
-        for pw, cost in sorted(items, key=lambda it: it[0], reverse=True):
-            if used + cost <= budget:
-                used += cost
-                stopped += pw
+        for it in sorted(items, key=lambda it: it[0], reverse=True):
+            if used + it[1] <= budget:
+                used += it[1]
+                stopped += it[0]
+                if blocked is not None:
+                    blocked.append(it[2])
         return stopped, used
 
     muts = {

@@ -109,8 +109,10 @@ totals, an abstract creature count per opponent, and a per-opponent clock.
 **Blind** — the clause needs something the model does not have. **Opponents'
 boards are an abstract number, not permanents** (§4), so targeted removal,
 counterspells, wraths aimed at them, "whenever an opponent casts", "target
-opponent sacrifices", commander damage (104.3j) and decking an OPPONENT
-(they have no library) are all blind. Decking YOURSELF is modelled since
+opponent sacrifices" and decking an OPPONENT (they have no library) are
+all blind. Commander damage (104.3j) is NOT, since §0z65 -- but only YOUR
+commander's, dealt through `opponents.combat_damage`; a card that grows or
+protects the commander now has a second channel to show up in. Decking YOURSELF is modelled since
 §0z42: a draw from an empty library loses, and an optional draw is declined
 by `engine.draw_is_safe` -- a card that draws must say which of its draws are
 a choice. A blind clause is not a defect to fix in the card; it is a

@@ -1,0 +1,26 @@
+COMMANDER DAMAGE, rule on - rule off (paired, 95% CI; * = outside)
+  rendmaw: won                                T10 +0.0001 ±0.0001    T20 +0.0007 ±0.0006*
+  rendmaw: opponents_killed                   T10 +0.0011 ±0.0005*   T20 +0.0017 ±0.0009*
+                                              commander_damage_kills a game: T10 0.0028   T20 0.0054
+  lorehold: won                               T10 +0.0019 ±0.0008*   T20 +0.0137 ±0.0036*
+  lorehold: opponents_killed                  T10 +0.2391 ±0.0069*   T20 +0.1425 ±0.0072*
+                                              commander_damage_kills a game: T10 0.3368   T20 0.4900
+  karlov: won                                 T10 +0.0001 ±0.0006    T20 -0.0001 ±0.0012 
+  karlov: opponents_killed                    T10 +0.0151 ±0.0020*   T20 +0.0103 ±0.0022*
+                                              commander_damage_kills a game: T10 0.0579   T20 0.0737
+  tivit: won                                  T10 +0.0005 ±0.0005    T20 +0.0005 ±0.0014 
+  tivit: opponents_killed                     T10 +0.0183 ±0.0022*   T20 +0.0139 ±0.0028*
+                                              commander_damage_kills a game: T10 0.0329   T20 0.0647
+  shilgengar: won                             T10 +0.0005 ±0.0003*   T20 +0.0071 ±0.0025*
+  shilgengar: opponents_killed                T10 +0.0703 ±0.0042*   T20 +0.0462 ±0.0047*
+                                              commander_damage_kills a game: T10 0.1340   T20 0.1917
+
+PITILESS PLUNDERER (rendmaw, Pygmy Kavu's slot)
+  candidate row: Plunderer - blank            T10 +0.0003 ±0.0006    T20 +0.0014 ±0.0017 
+  swap: -Pygmy Kavu +Plunderer                T10 +0.0000 ±0.0006    T20 +0.0012 ±0.0019 
+  T10 treasures made 0.260, spent 0.166 a game; altar sacrifices 0.027 -> 0.028
+  T20 treasures made 0.395, spent 0.317 a game; altar sacrifices 0.061 -> 0.059
+
+ASHNOD'S ALTAR, row = with - blanked
+  Altar row, no Plunderer                     T10 +0.0000 ±0.0005    T20 -0.0017 ±0.0012*
+  Altar row, Plunderer in                     T10 +0.0000 ±0.0004    T20 -0.0012 ±0.0012*

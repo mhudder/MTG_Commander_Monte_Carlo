@@ -1280,8 +1280,15 @@ class Game(BaseGame):
             "erebos_draws": 0,        # "another creature you control dies"
             "erebos_life_paid": 0,
             "erebos_creature_turns": 0,   # turns Erebos was devotion-live
+            # Treasures as mana (§0z64). No card in the committed list makes
+            # one; Pitiless Plunderer is the candidate that does.
+            "treasures_made": 0, "treasures_spent": 0,
         })
         self.damage_by_turn: list[float] = []
+        # Treasure tokens on the battlefield. A count, not permanents: nothing
+        # in this list reads a Treasure except as mana, the same shape as
+        # lorehold's and shilgengar's piles. Spent through `rendmaw_mana`.
+        self.treasures = 0
         self.made_token_this_turn = False
         self.beast_active = False
         self.stampede_bonus = 0
@@ -1292,8 +1299,7 @@ class Game(BaseGame):
     # -- tokens --------------------------------------------------------------
 
     def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False):
-        if self.has("Primal Vigor"):
-            n *= 2
+        n *= token_doublings(self)
         # PARALLEL LIVES: "If an effect would create one or more tokens under
         # your control, it creates twice that many of those tokens instead."
         # The same replacement as Primal Vigor without the symmetry -- Vigor
@@ -1301,12 +1307,10 @@ class Game(BaseGame):
         # x4, which is correct: two replacement effects each double, and the
         # order the player applies them in does not change the product.
         #
-        # THE ONLY TOKEN PATH IN THIS ENGINE, checked rather than assumed --
-        # unlike tivit.py, which has this method AND a module-level
-        # make_token(), the §0z4 "a doubler must be said in BOTH places or it
-        # does nothing" trap.
-        if self.has("Parallel Lives"):
-            n *= 2
+        # ONE OF TWO TOKEN PATHS since §0z64 -- `make_treasures` is the other
+        # -- and that is the §0z4 "a doubler must be said in BOTH places or it
+        # does nothing" trap, which is why the doubling now lives in ONE
+        # function, `token_doublings`, that both call.
         for _ in range(n):
             card = Card(name=f"{subtype or 'Token'} token",
                         types=frozenset({"Creature"}), power=p, toughness=t,
@@ -1319,6 +1323,21 @@ class Game(BaseGame):
             self.board.append(perm)
             self.m["tokens_made"] += 1
         self.made_token_this_turn = True
+
+    def make_treasures(self, n: int):
+        """Create `n` Treasure tokens (§0z64). A Treasure IS a token, so the
+        same two replacement effects as `make_tokens` apply -- Primal Vigor
+        and Parallel Lives each double it -- and it counts for Idol of
+        Oblivion's "if you created a token this turn". It is not a creature,
+        so `tokens_made` (which the tables read as creature tokens) does not
+        move. Said here rather than folded into make_tokens because a
+        Treasure is not a board permanent in this model; the doubling is the
+        rule the two must share, and `treasure_doublings` is where it lives."""
+        n *= token_doublings(self)
+        self.treasures += n
+        self.m["treasures_made"] += n
+        if n:
+            self.made_token_this_turn = True
 
     def on_creature_death(self, n: int = 1, perm: Optional[Permanent] = None):
         """Aristocrats drain. Each Blood Artist effect costs the pod 3 life per
@@ -1363,6 +1382,18 @@ class Game(BaseGame):
                 and not perm.is_token:
             self.make_tokens(2, 3, 3, "Wurm")
             self.m["wurmcoil_deaths"] += 1
+
+        # Pitiless Plunderer: "Whenever ANOTHER creature you control dies,
+        # create a Treasure token." (§0z64; Scryfall 2026-09-16.) Its own
+        # death is excluded for free: it has left the board by the time this
+        # runs, so the count does not include it -- the Scrap Trawler shape.
+        # A FLOOR in one place: a wipe removes permanents one at a time
+        # (`opponents.destroy`), so the creatures that die after the
+        # Plunderer in the same wipe do not pay, where the real trigger looks
+        # back and sees them all.
+        plunderers = plunderer_count(self)
+        if plunderers:
+            self.make_treasures(int(n) * plunderers)
 
         # Erebos, Bleak-Hearted: "Whenever ANOTHER creature you control dies,
         # you may pay 2 life. If you do, draw a card."
@@ -1606,6 +1637,86 @@ def hand_colour_demand(g: Game) -> dict:
             if n:
                 demand[color] = demand.get(color, 0) + n
     return demand
+
+
+def token_doublings(g) -> int:
+    """How many times a token creation is multiplied (§0z64). Primal Vigor:
+    "If one or more tokens would be created, twice that many of those tokens
+    are created instead." Parallel Lives: the same, for tokens under your
+    control. Both are replacement effects and each doubles, so both is x4.
+    `make_tokens` and `make_treasures` both read it -- one rule, one place."""
+    return (2 if g.has("Primal Vigor") else 1) * \
+        (2 if g.has("Parallel Lives") else 1)
+
+
+def plunderer_count(g) -> int:
+    """Pitiless Plunderers on the battlefield -- Treasures per other creature
+    death. A seam of its own so the test can remove the trigger alone."""
+    return g.count("Pitiless Plunderer")
+
+
+# One Treasure's mana. "Add one mana of any color": colourless is NOT a
+# colour, so no "C" -- shilgengar's ANY includes it, which is harmless there
+# and here because no card in either list has a {C} pip.
+TREASURE_UNIT = frozenset({"W", "U", "B", "R", "G"})
+
+
+class TreasureMana:
+    """The OWNER of one Treasure's unit in a rendmaw pool (§0z64).
+
+    `spend` taps whatever owner `can_pay` assigned by setting `.tapped`, and
+    for a Treasure tapping it IS sacrificing it: the setter takes the token
+    off the pile. So a Treasure is spent exactly when -- and only when -- the
+    payment the engine proved uses it, through the same path that taps a
+    land. It has no `.card`, which `on_mana_tap` already allows for (azusa's
+    FloatingMana is the same shape)."""
+    __slots__ = ("g", "used")
+
+    def __init__(self, g):
+        self.g, self.used = g, False
+
+    @property
+    def tapped(self):
+        return self.used
+
+    @tapped.setter
+    def tapped(self, v):
+        if v and not self.used:
+            self.used = True
+            self.g.treasures -= 1
+            self.g.m["treasures_spent"] += 1
+
+
+def rendmaw_mana(g) -> "ManaUnits":
+    """`available_mana` plus one unit per Treasure (§0z64).
+
+    Lands, rocks and dorks are spent first -- a Treasure is one-shot and a
+    land is not, the rule shilgengar's `pay` states for the same reason. WHAT
+    ENFORCES IT is `can_pay`'s least-flexible-source-first rule: a
+    five-colour unit loses every tie to a land. The appended units' FOREIGN
+    weight is only a second line behind it, and tests/test_treasures.py
+    records that a mutation removing the weight changed nothing. With no Treasures
+    this IS `available_mana`, unit for unit, which is why the committed list
+    (which makes none) is unchanged by it.
+
+    NOT USED for the `mana_floated` metric: a Treasure you did not crack is
+    not mana you wasted, it is still there next turn."""
+    units = available_mana(g)
+    for _ in range(getattr(g, "treasures", 0)):
+        units.append(TREASURE_UNIT)
+        units.owners[-1] = TreasureMana(g)
+    return units
+
+
+def tap_treasures(units, pay) -> None:
+    """Spend the Treasures among `pay` in a pool that is about to be POPPED
+    rather than passed to `spend` -- Skullclamp's loop, which taps its land
+    through `spend`'s count fallback and would otherwise leave a Treasure it
+    had used on the pile."""
+    owners = getattr(units, "owners", None) or []
+    for i in pay:
+        if i < len(owners) and isinstance(owners[i], TreasureMana):
+            owners[i].tapped = True
 
 
 def available_mana(g: Game) -> list[frozenset]:
@@ -1909,7 +2020,7 @@ def main_phase(g: Game, precombat: bool = False):
     to deploy a body before combat.
     """
     while True:
-        units = available_mana(g)
+        units = rendmaw_mana(g)
         # commander first once affordable
         if not g.commander_cast and not precombat:
             ccost = dict(g.commander.cost)
@@ -2314,7 +2425,7 @@ def upkeep(g: Game):
 
 def activations(g: Game):
     """Post-main engine activations that consume leftover mana."""
-    units = available_mana(g)
+    units = rendmaw_mana(g)
 
     # Skullclamp: {1} equip a 1-toughness creature -> it dies -> draw 2.
     if g.has("Skullclamp"):
@@ -2328,6 +2439,7 @@ def activations(g: Game):
             pay = can_pay({"gen": 1}, units)
             if pay is None:
                 break
+            tap_treasures(units, pay)
             for i in sorted(pay, reverse=True):
                 units.pop(i)
             g.m["clamp_activations"] += 1

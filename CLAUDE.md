@@ -155,6 +155,8 @@ python -m tests.test_free_casts_and_approach --mutate # 6 mutations, exact sets
 python -m tests.test_offering_necro_doll --mutate  # 7 mutations, exact sets
 python -m tests.test_menace --mutate               # 3 mutations, exact sets
 python -m tests.test_known_win --mutate            # 4 mutations, exact sets
+python -m tests.test_treasures --mutate            # 6 mutations, exact sets
+python -m tests.test_commander_damage --mutate     # 5 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -622,8 +624,8 @@ is the first suspect, not the deck.
 `docs/MagicCompRules_20260807.txt` is a plain-text extraction to grep
 (`grep -n "^305.7" `). `docs/COMP_RULES.md` records the provenance, how to
 regenerate the `.txt`, and the handful of rules that bear on open issues —
-**104.3j commander damage is a loss condition this project does not model at
-all**, and 305.7 + 302.6 + 603.6a together specify what implementing Ashaya's
+**104.3j commander damage is modelled for YOUR commander only** (the pod's
+are folded into their clocks), and 305.7 + 302.6 + 603.6a together specify what implementing Ashaya's
 second clause means (queued 15), including that it must NOT fire landfall.
 A rule number is evidence about the GAME, not about this engine, and it does
 not override §4.

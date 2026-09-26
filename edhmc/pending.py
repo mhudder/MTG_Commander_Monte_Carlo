@@ -1181,6 +1181,33 @@ MEASURED: list[Candidate] = [
             "Overwhelming Stampede) is a real cost this policy pays."),
     ),
     Candidate(
+        deck="rendmaw", card="Pitiless Plunderer", measured="2026-09-26",
+        win_rate=("+0.0003 +-0.0006 at T10, +0.0014 +-0.0017 at T20 "
+                  "(N=15,000 paired, candidate row in Pygmy Kavu's slot); "
+                  "the real swap -Pygmy Kavu +Plunderer +0.0000 / +0.0012 "
+                  "+-0.0019"),
+        signal="--",
+        rationale=("INSIDE ITS OWN BAR -- unmeasured, not measured as weak. "
+                   "Proposed as a DIAGNOSTIC for Ashnod's Altar: is the Altar "
+                   "a bad card or an unfuelled one? Answered: not by this "
+                   "card. The Altar's row is -0.0017 +-0.0012 without the "
+                   "Plunderer and -0.0012 +-0.0012 with it, and altar "
+                   "sacrifices do not move (0.061 -> 0.059 a game at T20)."),
+        evidence=("0.40 Treasures made and 0.32 spent a game at T20. "
+                  "results/treasures_cmdr_20260926.txt "
+                  "(diagnostics/run_treasures_cmdr.py), §0z64."),
+        limits=("A FLOOR in one place: a wipe removes permanents one at a "
+                "time, so creatures that die after the Plunderer in the same "
+                "wipe do not pay, where the real trigger looks back. Treasures "
+                "are only MANA here -- nothing in rendmaw reads an artifact "
+                "count that a Treasure would feed. Measured with commander "
+                "damage live (§0z65), which moves rendmaw by +0.0007."),
+        verdict=("Not a card for this list on this evidence. The Treasure "
+                 "engine it needed is built and pinned (tests/test_treasures.py) "
+                 "and costs the committed list nothing, so the next "
+                 "Treasure-maker for rendmaw is a measurement, not a project."),
+    ),
+    Candidate(
         deck="tivit", card="Urza, Lord High Artificer", measured="2026-09-16",
         win_rate="+0.0034 +-0.0025 at T20 (N=15,000 paired)", signal="--",
         rationale=("INSIDE ITS OWN BAR -- unmeasured, not measured as weak. "
@@ -2643,7 +2670,10 @@ PROPOSED: list[Proposal] = [
                    "a bad card or an unfuelled one."),
         implement=("LOW. Treasures have been real mana since §0z6 and the "
                    "creature-death hook is `engine.on_creature_death`, which "
-                   "§0z9 already corrected."),
+                   "§0z9 already corrected. -- WRONG ABOUT RENDMAW: §0z6 is "
+                   "shilgengar's, and rendmaw had no Treasures at all, which "
+                   "is why §0z26 abandoned the card. Built in §0z64 "
+                   "(`engine.rendmaw_mana`) and MEASURED: see MEASURED."),
     ),
     Proposal(
         deck="lorehold", card="Underworld Breach", cost="{1}{R}", identity="R",
@@ -2847,6 +2877,8 @@ DECKS = {
         "Parallel Lives": rendmaw_v12.PARALLEL_LIVES,
         "Mycoloth": rendmaw_v12.MYCOLOTH,
         "Cauldron of Essence": rendmaw_v12.CAULDRON_OF_ESSENCE,
+        # §0z64: Treasures built, card measured.
+        "Pitiless Plunderer": rendmaw_v12.PITILESS_PLUNDERER,
         # REALITY FRACTURE, 2026-09-21 (preview text).
         "Proft, Sinister Mastermind": rendmaw_v12.PROFT_SINISTER_MASTERMIND}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so

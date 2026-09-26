@@ -127,6 +127,9 @@ class Opponent:
     # Kept separate from `creatures` so the natural-board cap in
     # opponents_act() cannot silently clip them away.
     goaded_birds: float = 0.0
+    # Combat damage YOUR COMMANDER has dealt this player (CR 104.3j: 21 or
+    # more from the same commander and they lose). §0z65.
+    cmdr_damage: float = 0.0
 
     _pcache: object = None
 
@@ -732,22 +735,30 @@ def menace_of(g, perm) -> bool:
     return perm.card.name in MENACE
 
 
-def chump(items, budget):
+def chump(items, budget, blocked=None):
     """Blockers a defender assigns, and the power they stop.
 
-    `items` is [(power, cost)], cost being the blockers it takes to block that
-    attacker: 1, or 2 for menace (§0z61). The defender stops the most power
-    per blocker first, the biggest first on a tie -- with every cost 1 that is
-    exactly "chump the biggest attackers", the rule `damage_through` has
-    always had, so a board without menace blocks as it always did. Returns
-    (power stopped, blockers used).
+    `items` is [(power, cost[, key])], cost being the blockers it takes to
+    block that attacker: 1, or 2 for menace (§0z61). The defender stops the
+    most power per blocker first, the biggest first on a tie -- with every
+    cost 1 that is exactly "chump the biggest attackers", the rule
+    `damage_through` has always had, so a board without menace blocks as it
+    always did. Returns (power stopped, blockers used).
+
+    `blocked`, when given, collects the KEY of every item blocked -- so that
+    commander damage (§0z65) reads the same blocking decision the damage
+    total does, instead of a second copy of it. Python's sort is stable, so
+    carrying a key changes no order.
     """
     stopped, used = 0.0, 0
-    for power, cost in sorted(items, key=lambda it: (it[0] / it[1], it[0]),
-                              reverse=True):
+    for it in sorted(items, key=lambda it: (it[0] / it[1], it[0]),
+                     reverse=True):
+        power, cost = it[0], it[1]
         if used + cost <= budget:
             used += cost
             stopped += power
+            if blocked is not None:
+                blocked.append(it[2])
     return stopped, used
 
 
@@ -771,7 +782,7 @@ def _blocker_counts(g, defender):
     return n_block, min(n_fly, n_block)
 
 
-def damage_through(g, attackers: list, defender=None) -> float:
+def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     """Opponents chump-block your biggest attackers first — and CANNOT block
     your fliers with most of their board.
 
@@ -791,6 +802,9 @@ def damage_through(g, attackers: list, defender=None) -> float:
     original meaning — the weakest board at the table — which is right for a
     single undivided swing and is what every caller outside `combat_damage`
     still wants.
+
+    `unblocked`, when a list, is filled with the attackers that got through
+    -- what `commander_hit` reads (§0z65).
     """
     if not attackers:
         return 0.0
@@ -803,18 +817,49 @@ def damage_through(g, attackers: list, defender=None) -> float:
     n_block, n_fly = _blocker_counts(g, defender)
 
     fly, ground = [], []
-    for p in attackers:
-        item = (g.power_of(p), 2 if menace_of(g, p) else 1)
+    for k, p in enumerate(attackers):
+        item = (g.power_of(p), 2 if menace_of(g, p) else 1, k)
         (fly if flying_of(g, p) else ground).append(item)
 
     # A defender spends its flying-capable blockers on the biggest fliers, then
     # anything left over on the ground; ground-only blockers can never touch a
     # flier no matter how big it is. A MENACE attacker takes two blockers
     # (two flying-capable ones if it also flies), which `chump` prices (§0z61).
-    stopped_fly, used_fly = chump(fly, n_fly)
-    stopped_ground, _ = chump(ground, (n_block - n_fly) + (n_fly - used_fly))
-    total = sum(pw for pw, _ in fly) + sum(pw for pw, _ in ground)
+    blocked = [] if unblocked is not None else None
+    stopped_fly, used_fly = chump(fly, n_fly, blocked)
+    stopped_ground, _ = chump(ground, (n_block - n_fly) + (n_fly - used_fly),
+                              blocked)
+    if unblocked is not None:
+        gone = set(blocked)
+        unblocked.extend(p for k, p in enumerate(attackers) if k not in gone)
+    total = sum(it[0] for it in fly) + sum(it[0] for it in ground)
     return float(total - stopped_fly - stopped_ground)
+
+
+def commander_hit(g, through) -> float:
+    """Combat damage your commander deals, given the attackers that got
+    through a defender's blocks (CR 104.3j, §0z65).
+
+    ITS OWN POWER, NOT SCALED. `combat_damage`'s `scale` spreads bonuses that
+    belong to OTHER attackers across the swing -- Coat of Arms pumps Birds
+    (engine.py), Cyberdrive Awakener animates artifacts (tivit.py) -- and
+    lorehold's prowess `bonus` is a lump; none of them pumps the commander.
+    So where a scale is live this is a floor, and it is exact everywhere else.
+
+    `commander_damage=False` turns the rule off (every table before §0z65)."""
+    if not g.cfg.get("commander_damage", True):
+        return 0.0
+    cmdr = getattr(g, "commander", None)
+    return float(sum(g.power_of(p) for p in through if p.card is cmdr))
+
+
+def commander_damage_lethal(g, o) -> bool:
+    """CR 104.3j: "Any player who's been dealt 21 or more combat damage by
+    the same commander over the course of the game loses the game." Only
+    YOUR commander is tracked -- the opponents are an abstract board, so the
+    same rule pointed at you is not modelled (their clocks stand in for how
+    they win)."""
+    return o.cmdr_damage >= 21
 
 
 
@@ -912,6 +957,12 @@ def _check_eliminations(g):
         if o.alive and o.life <= 0:
             o.alive = False
             o.creatures = 0.0
+        elif o.alive and commander_damage_lethal(g, o):
+            # 104.3j. Counted only where life alone would NOT have killed
+            # them, so the counter is the rule's own contribution. §0z65.
+            o.alive = False
+            o.creatures = 0.0
+            g.m["commander_damage_kills"] += 1
     if not living(g) and g.result is None:
         g.result = "win"
 
@@ -977,6 +1028,13 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     creature to a 1/1 block wastes it. Small bodies secure a kill for the least
     power spent, leaving more for the next player.
 
+    COMMANDER DAMAGE (CR 104.3j, §0z65) rides on the same blocks: each
+    group's `damage_through` reports which attackers got through, and the
+    commander's power among them is added to that defender's `cmdr_damage`;
+    21 eliminates them in `_check_eliminations`. The ASSIGNMENT plan does not
+    aim the commander at anyone -- it is a floor on what the rule is worth,
+    because a pilot one hit from 21 would send the commander at that player.
+
     APPROXIMATION, SAID OUT LOUD: the closed form above ignores the fly/ground
     split, and MENACE (a menace attacker takes two blockers, §0z61), so the
     plan can misjudge a defender who blocks fliers and ground separately. It is EXACT for an all-ground or all-flying attack (azusa is
@@ -1023,11 +1081,16 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         # players. "target" counts the blockers of the player actually being
         # hit, which is the coherent single-swing version.
         target = min(living(g), key=lambda o: o.life, default=None)
+        through = []
         if g.cfg.get("combat_defender", "weakest") == "target" and target is not None:
-            dmg = damage_through(g, attackers, defender=target)
+            dmg = damage_through(g, attackers, defender=target, unblocked=through)
         else:
-            dmg = damage_through(g, attackers)
+            dmg = damage_through(g, attackers, unblocked=through)
         dmg = dmg * scale + bonus
+        # damage_single hits `target` -- the same min-life player -- so the
+        # commander's share is credited to them.
+        if target is not None:
+            target.cmdr_damage += commander_hit(g, through)
         # The counters below are recorded on BOTH paths, so an A/B has them on
         # each leg rather than only on the new one. Purely observational -- no
         # RNG is consumed and no decision reads them.
@@ -1082,7 +1145,13 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     before_alive = len(living(g))
     effective, raw = 0.0, 0.0
     for slot, (opp, lo, hi) in enumerate(plan):
-        dealt = damage_through(g, pool[lo:hi], defender=opp) * scale
+        through = []
+        dealt = damage_through(g, pool[lo:hi], defender=opp,
+                               unblocked=through) * scale
+        # 104.3j: the commander's unblocked power, from the same blocks
+        # (§0z65). Before the `dealt <= 0` skip, though a commander that got
+        # through has dealt something.
+        opp.cmdr_damage += commander_hit(g, through)
         if slot == 0:
             dealt += bonus
         if dealt <= 0:

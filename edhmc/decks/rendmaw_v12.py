@@ -271,6 +271,15 @@ MYCOLOTH = C("Mycoloth", "Creature", {"gen": 3, "G": 2}, 4, 4,
 
 BATCH_2026_09_16 = (PARALLEL_LIVES, MYCOLOTH)
 
+# "Whenever another creature you control dies, create a Treasure token."
+# {3}{B} 1/4 Creature -- Human Pirate. Proposed 2026-09-16 and abandoned in
+# §0z26 because rendmaw had no Treasures; §0z64 gave it them
+# (`engine.rendmaw_mana`). ONE card type, so no Rendmaw trigger. Threat as
+# shilgengar_v1's copy; priority at this list's Blood Artist, the payoff it
+# sits beside (priorities are per-deck scales, so not shilgengar's 7).
+PITILESS_PLUNDERER = C("Pitiless Plunderer", "Creature", {"gen": 3, "B": 1},
+                       1, 4, priority=6, threat=5.5)
+
 # ---------------------------------------------------------------------------
 # REALITY FRACTURE (Scryfall `fra`), 2026-09-21. PREVIEW TEXT -- the set
 # releases 2026-10-02, so this can still change before release.
