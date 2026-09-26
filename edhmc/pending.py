@@ -167,6 +167,18 @@ class Proposal:
     rationale: str              # why THIS deck, tied to a measured weakness
     implement: str              # engine work needed, and what it would move
     rejected: str = ""          # set if the proposal is dead, and why
+    # TRIAGE (queued item 23, docs/TRIAGE.md, docs/LEDGER_STATES.md): a FLAG
+    # on the Proposal, not a state. "" = not triaged (every entry before the
+    # screen existed). LIVE = survived, escalate to a candidate row. BLIND =
+    # the engine cannot see enough of the text -- `triage_clauses` MUST quote
+    # the clauses, verbatim from `oracle`, so the verdict can be re-run when a
+    # gap closes (§0z13: an infeasibility note is a claim with a date on it).
+    # DEFERRED = needs machinery that does not exist -- `triage_note` MUST
+    # name it. `check_triage` enforces both. REJECTED stays on `rejected`.
+    # `python -m tools.triage --proposals` is the screen that proposes these.
+    triage: str = ""
+    triage_clauses: tuple = ()
+    triage_note: str = ""
 
 
 # The commanders' colour identities, fetched from Scryfall 2026-09-16 rather
@@ -2985,6 +2997,38 @@ if set(DECKS) != set(REGISTRY):
         f"in both (its catalog may be empty).")
 
 
+TRIAGE_VERDICTS = ("", "LIVE", "BLIND", "DEFERRED")
+
+
+def check_triage(pr) -> None:
+    """A triage flag must carry what makes it re-checkable (item 23).
+
+    BLIND names at least one clause, and every clause it names is in the
+    card's own oracle text (whitespace-normalised) -- so a verdict cannot
+    cite text the card does not have. DEFERRED names its machinery.
+    """
+    if pr.triage not in TRIAGE_VERDICTS:
+        raise AssertionError(
+            f"edhmc/pending.py: PROPOSED {pr.card!r} has triage "
+            f"{pr.triage!r}; it must be one of {TRIAGE_VERDICTS}.")
+    oracle = " ".join(pr.oracle.split())
+    if pr.triage == "BLIND":
+        if not pr.triage_clauses:
+            raise AssertionError(
+                f"edhmc/pending.py: PROPOSED {pr.card!r} is triaged BLIND but "
+                f"names no clause. Quote the clauses the engine cannot see "
+                f"(`python -m tools.triage --proposals` lists them).")
+        for c in pr.triage_clauses:
+            if " ".join(c.split()) not in oracle:
+                raise AssertionError(
+                    f"edhmc/pending.py: PROPOSED {pr.card!r}'s BLIND clause "
+                    f"{c!r} is not in its oracle text.")
+    if pr.triage == "DEFERRED" and not pr.triage_note.strip():
+        raise AssertionError(
+            f"edhmc/pending.py: PROPOSED {pr.card!r} is triaged DEFERRED but "
+            f"does not name the machinery it waits for (`triage_note`).")
+
+
 def check_proposals(strict: bool = True):
     """Every live PROPOSED entry is colour-legal, verified, and not already in.
 
@@ -2999,6 +3043,7 @@ def check_proposals(strict: bool = True):
          guessing oracle text, and a proposal made from memory is that failure
          one step earlier. No Scryfall, no Proposal.
       3. NOT ALREADY IN THE DECK -- §0o in the ledger rather than the harness.
+      4. A TRIAGE FLAG CARRIES ITS EVIDENCE -- `check_triage`, item 23.
 
     A rejected entry is exempt from 1 and 3 and still bound by 2: the record of
     WHY it was rejected is worth nothing if the text it was rejected on is not
@@ -3010,6 +3055,7 @@ def check_proposals(strict: bool = True):
                 f"edhmc/pending.py: PROPOSED {pr.card!r} has no verified "
                 f"oracle text. Fetch it from api.scryfall.com and set "
                 f"`verified`; do not write card text from memory.")
+        check_triage(pr)
         if pr.rejected:
             continue
         ident = set(pr.identity)

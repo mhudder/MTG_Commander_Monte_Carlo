@@ -85,12 +85,21 @@ what it prints.
 
 ## 2. Review: which clauses can this engine see?
 
-> **This step is a REVIEW and not yet a GATE, and that is a known gap.**
-> `docs/TRIAGE.md` (queued item 23) proposes turning it into one, with a
-> verdict that can stop a card before any code is written — the cheapest kill
-> available, because implementation is what actually costs a session. Three
-> cards were scanned and discarded by hand on 2026-09-21 for exactly this
-> reason; doing it by hand is the thing the proposal replaces.
+> **This step is a GATE** (queued item 23, built 2026-09-26). Run the screen
+> first; it costs seconds and implementation costs a session:
+>
+> ```bash
+> python -m tools.triage --proposals     # every live Proposal, clause by clause
+> ```
+>
+> It calls a card **BLIND** only when every clause matches a §4 limit and the
+> card has no body, and **REVIEW** otherwise — it is optimistic by
+> construction, because its only fatal error is discarding a good card. Record
+> the verdict on the Proposal: `triage="BLIND"` with `triage_clauses` quoting
+> the blind clauses verbatim, `triage="DEFERRED"` with `triage_note` naming the
+> machinery it waits for, or `triage="LIVE"`. `check_triage` refuses a BLIND
+> that quotes nothing, or quotes text the card does not have. **A BLIND or
+> DEFERRED card stops here**; REVIEW means you do the sort below by hand.
 
 Read the oracle text clause by clause and sort every clause into one of
 three bins. Write the sort down in the proposal's `implement` field; it is
@@ -290,7 +299,22 @@ key, not the eight baseline metrics (§0z32).
 
 ---
 
-## 6. Measure: a candidate row, then a head-to-head
+## 6. Measure: a smoke run, a candidate row, then a head-to-head
+
+**The smoke run (tier 2), before anything at N=15,000.** A count has far
+lower variance than a win rate, so "does this card fire" is decidable in
+seconds:
+
+```bash
+python -m tools.triage --smoke karlov "New Card" --n 1000
+```
+
+It prints P(cast) and every counter that moved against a blank in the
+candidates slot, sorted by |z|. **The card's own counter must be in that
+list.** If it is not, or the counters that moved are not the ones its text
+predicts, the implementation or the deck is the problem, and a candidate row
+would only put a confidence interval on it (Sai's Thopters, §0z26).
+
 
 **The candidate row.** Add a batch to `tools/candidates.py`'s `DECKS` dict
 naming the victim slot the deck already uses, then run it at the tables' N:
@@ -389,14 +413,17 @@ yet.
 
 1. Scryfall, with a User-Agent. Grep the deck, `candidates.py` and the
    engines for the NAME. Write the `Proposal`.
-2. Sort every clause: modelled / partly / blind. Grep the other engines for
-   the same rule. Doublers go in every path.
+2. `python -m tools.triage --proposals`: BLIND or DEFERRED stops here, with
+   the flag and its clauses on the Proposal. Otherwise sort every clause:
+   modelled / partly / blind. Grep the other engines for the same rule.
+   Doublers go in every path.
 3. `C()` with the real cost; `tag_flying --write`; batch tuple; catalog.
 4. Implement in the hook the map names; add a counter; CRN for randomness;
    classify in `ablation.py`.
 5. A test with a mutation set written first; `python -m tests`; `validate`
    at +0.00; `check_unchanged_decks` if shared code moved.
-6. Candidate row at N=15,000 → `MEASURED`. Then a real swap against a cut
+6. `tools.triage --smoke` at N=1000: its own counter must move. Then the
+   candidate row at N=15,000 → `MEASURED`. Then a real swap against a cut
    whose row was evidence.
 7. `Change` → rebuild that deck's table → three legs in one commit → the
    closing checklist → a `§` for the measurement.

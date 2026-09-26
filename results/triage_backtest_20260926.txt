@@ -1,0 +1,88 @@
+structural verdicts over every nonland in every list: {'BLIND': 49, 'BODY': 7, 'SEEN': 324}
+
+VIOLATIONS (the engine saw a card the screen called blind): 0
+
+BLIND, PROVED BLIND, AND A SIGNIFICANT ROW ANYWAY (§0j's constants): 33
+    rendmaw Reap dmg
+    rendmaw Biotransference dmg
+    rendmaw Assassin's Trophy dmg
+    rendmaw Beast Within dmg
+    lorehold Chaos Warp dmg
+    lorehold Generous Gift both
+    lorehold Bolt Bend both
+    karlov Sensei's Divining Top both
+    karlov Anguished Unmaking dmg
+    karlov Return to Dust both
+    tivit Path to Exile both
+    tivit Counterspell win
+    tivit Dovin's Veto both
+    tivit Muddle the Mixture dmg
+    tivit Void Rend dmg
+    shilgengar Path to Exile dmg
+    shilgengar Swords to Plowshares dmg
+    shilgengar Anguished Unmaking both
+    shilgengar Generous Gift dmg
+    shilgengar Despark dmg
+    shilgengar Vindicate both
+    shilgengar Mortify dmg
+    shilgengar Utter End both
+    azusa Oblivion Stone both
+    azusa Storm Cauldron dmg
+    azusa Mind's Eye both
+    azusa Memory Jar dmg
+    azusa Hall of Gemstone both
+    azusa Greater Good both
+    azusa Abundance dmg
+    azusa Krosan Grip both
+    azusa Beast Within both
+    azusa Sylvan Scrying dmg
+
+LABEL DIFFS (KNOWN_BLIND, but a channel exists): 46
+  LIVE: 33  -- the engine acts on these, so 'does not implement the card at all' is too strong: PARTLY at least
+    rendmaw    Sakura-Tribe Elder                   fields:tags   [damage on seed 5011: 43.86666666666667 vs 43.0]
+    rendmaw    Overwhelming Stampede                script;fields:tags   [damage on seed 5002: 117.9111111111111 vs 115.91111111111111]
+    rendmaw    Village Rites                        named   [damage on seed 5009: 46.275555555555556 vs 47.05777777777778]
+    rendmaw    Gloomshrieker                        types   [raw_damage on seed 5007: 170.0 vs 169.0]
+    rendmaw    Massacre Wurm                        fields:tags;named   [rendmaw_triggers on seed 5020: 2 vs 1]
+    rendmaw    Hagra Mauling                        fields:land_face   [damage on seed 5006: 31.0 vs 32.0]
+    lorehold   Dragon's Rage Channeler              named   [damage on seed 5002: 69.0 vs 65.0]
+    lorehold   Pinnacle Monk                        fields:land_face,tags   [mv_cheated on seed 5000: 13.0 vs 28.0]
+    lorehold   Land Tax                             named   [mv_cheated on seed 5002: 120.0 vs 143.0]
+    lorehold   Enlightened Tutor                    script   [mv_cheated on seed 5002: 120.0 vs 104.0]
+    lorehold   Sejiri Shelter                       fields:land_face,tags;named   [mv_cheated on seed 5002: 120.0 vs 8.0]
+    lorehold   Dawn's Truce                         named   [mv_cheated on seed 5026: 61.0 vs 21.0]
+    lorehold   Perch Protection                     named   [mv_cheated on seed 5010: 13.0 vs 19.0]
+    karlov     Lurrus of the Dream-Den              fields:lifelink,alt_costs   [damage on seed 5000: 43.0 vs 37.0]
+    tivit      Split Decision                       script;fields:tags   [votes_cast on seed 5011: 90 vs 85]
+    tivit      Trial of a Time Lord                 script;fields:tags   [votes_cast on seed 5004: 26 vs 21]
+    tivit      Bite of the Black Rose               script;fields:tags   [votes_cast on seed 5005: 20 vs 16]
+    tivit      Vault 11: Voter's Dilemma            script;fields:tags   [drain_damage on seed 5002: 100.0 vs 103.0]
+    tivit      Capital Punishment                   script;fields:tags   [votes_cast on seed 5014: 54 vs 51]
+    tivit      Expropriate                          script;fields:tags   [votes_cast on seed 5001: 74 vs 70]
+    tivit      Rhystic Study                        script;named   [damage on seed 5001: 117.0 vs 72.0]
+    tivit      Torment of Hailfire                  script;fields:x_pips   [damage on seed 5020: 113.0 vs 95.0]
+    tivit      Council's Judgment                   script;fields:tags   [votes_cast on seed 5001: 74 vs 69]
+    shilgengar Serra's Emissary                     fields:flying,tags   [creatures_sacrificed on seed 5004: 1 vs 2]
+    shilgengar Angel of Serenity                    fields:flying,tags   [raw_damage on seed 5003: 79.0 vs 75.0]
+    shilgengar Angel of Suffering                   fields:flying   [damage on seed 5016: 78.0 vs 65.0]
+    shilgengar Angel of Despair                     fields:flying,tags   [life_gained on seed 5020: 5 vs 0]
+    shilgengar Angel of the Ruins                   fields:flying,tags;types   [damage on seed 5007: 56.0 vs 55.0]
+    shilgengar Angelic Arbiter                      fields:flying,tags   [damage on seed 5001: 48.0 vs 34.0]
+    shilgengar Twilight Shepherd                    fields:flying,tags   [damage on seed 5001: 48.0 vs 47.0]
+    shilgengar Herald of War                        fields:flying,tags   [final_board_power on seed 5018: 55 vs 54]
+    shilgengar Agadeem's Awakening // Agadeem, the Undercrypt fields:land_face,x_pips   [damage on seed 5017: 26.0 vs 17.0]
+    shilgengar Malakir Rebirth // Malakir Mire      fields:land_face   [mana_spent on seed 5006: 153 vs 155]
+  inert: 13  -- a channel exists and nothing fires it
+    rendmaw    Burnished Hart                       fields:tags;types
+    rendmaw    Filigree Familiar                    types
+    rendmaw    Whip of Erebos                       types
+    rendmaw    Shigeki, Jukai Visionary             types
+    rendmaw    Haywire Mite                         types
+    rendmaw    Bow of Nylea                         types
+    rendmaw    Lignify                              types
+    rendmaw    Nameless Inversion                   types
+    rendmaw    Eyeblight's Ending                   types
+    tivit      Trap the Trespassers                 fields:tags
+    tivit      Ghostly Prison                       fields:tags
+    tivit      Propaganda                           fields:tags
+    shilgengar Revel in Riches                      named

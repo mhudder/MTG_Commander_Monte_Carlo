@@ -114,6 +114,7 @@ Methodology that used to live at the end of this file is now
 | [0z63](#0z63) | MEASURED | **Every staged swap re-measured on the rebuilt baseline**, and all six stand, significant at T20. Karlov's cut still favours Swiftfoot Boots over Soulmender, by less: +0.0075 ±0.0047 at T20 (was +0.0125). Goldspan for Blasphemous Act +0.0143 / +0.0119 |
 | [0z64](#0z64) | FIXED | **Rendmaw has Treasures, and Pitiless Plunderer is measured**: a blank, +0.0014 ±0.0017 at T20. It does not rescue Ashnod's Altar (−0.0017 → −0.0012, sacrifices unmoved). The engine costs the committed list nothing (bit-identical) |
 | [0z65](#0z65) | FIXED | **Commander damage (CR 104.3j) is modelled, for your commander**: lorehold +0.0137 ±0.0036 at T20 and 0.49 commander-damage kills a game; shilgengar +0.0071; karlov and tivit kill more opponents and win no more; azusa bit-identical |
+| [0z66](#0z66) | FIXED | **Triage tiers 0 and 2 built** (item 23): 56 cards the screen calls blind play IDENTICALLY to a matched blank, and that exact test replaced the significance one, which failed 32 times on §0j's constants. **33 KNOWN_BLIND cards are acted on by the engine** -- the label is too strong |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7403,6 +7404,70 @@ recorded VERIFIED on the bit-identical check. **The rebuild moved ONE row of
 322 beyond its old bar** -- lorehold's Storm Herd, +0.0415 -> +0.0371, a deck
 with a second way to kill a player needing its Pegasi a little less -- with 0
 sign flips (`results/rebuild_20260926b_diff.txt`).
+
+## 0z66. FIXED — triage, tiers 0 and 2; and what its back-test found
+
+Queued item 23. `docs/TRIAGE.md` designed a cheap screen to run BEFORE a card
+is implemented; `tools/triage.py` builds tiers 0 and 2 of it, `Proposal`
+carries the verdict (`triage`, `triage_clauses`, `triage_note`, enforced by
+`pending.check_triage`), and the `add-card` skill's step 2 is now a gate.
+Pinned by `tests/test_triage.py`, 12 cases and 6 mutations, exact sets, each
+written before its run and none wrong.
+
+**Tier 0, structural.** For an implemented card, the channels through which
+its deck's engine can act on it are DERIVED: a body, a land, a mana ability,
+a script, any effect field off its default, its name in the engine files that
+deck's fingerprint names, a multi-type line. None is BLIND; a body alone is
+BODY. The first version searched every engine for the name and called
+Midnight Reaper "named" in rendmaw because `shilgengar.py` dispatches on it.
+**Tier 0, text**: for a Proposal, each sentence is matched against the §4
+limits; BLIND only if every clause matches and the card has no body, REVIEW
+otherwise. All ten live proposals read REVIEW.
+
+**THE ACCEPTANCE TEST THE DESIGN PROPOSED WAS WRONG, and was replaced.** It
+said: fail if the screen calls BLIND a card whose row is significant. Run over
+the rebuilt tables it failed **32 times** (33 after the named-channel fix),
+and every one was a cheap removal spell or counterspell with a POSITIVE row at
+priority 1-2 -- Counterspell +0.0017 in tivit, Return to Dust +0.0040 in
+karlov, Utter End +0.0023 in shilgengar. Ablation's blank is cast at the
+deck's MEDIAN priority (§0j), so a dead card the pilot casts late costs less
+than a blank cast on curve. **Those rows are real and measure the constants,
+not the card.** The test that was built is exact instead: under CRN, a card
+whose text the engine cannot see plays IDENTICALLY, seed for seed, on every
+output key, to a blank matching its cost, types, body, priority and threat
+(`matched_blank`). **All 56 cards called BLIND or BODY do, over 40 seeds.** A
+MODEL-BLIND row that is significant is now demonstrated, 33 times, not to be
+evidence about the card -- CLAUDE.md said so already; this is the check.
+
+**Tier 2, `--smoke`**: the card against a blank in the candidates slot at
+N=1000, every counter that moved, sorted by |z|, with P(cast). Sai in tivit,
+seven seconds: cast in 22% of games, 0.21 Thopters a game (§0z26 had 0.155 on
+an older engine). The design expected tier 0 to kill Sai and Splendid
+Reclamation; it cannot and should not -- both are implemented, and they are
+blanks by MECHANISM, which is tier 2's question. **The first smoke run
+dropped `sai_thopters`**: a counter only the card's arm touches is absent from
+the blank arm's dict, and the two arms' keys were intersected. Case H pins it.
+
+**WHAT THE BACK-TEST FOUND ABOUT THE LABELS** (`results/triage_backtest_20260926.txt`).
+The same exact test, pointed at every card `ablation.KNOWN_BLIND` lists but
+the derivation finds a channel for, splits them in two:
+
+- **33 the engine ACTS ON** -- they play differently from their matched
+  blank. `KNOWN_BLIND` renders a card under MODEL-BLIND, whose header says
+  "the engine does not implement the card at all", and for these that is too
+  strong: tivit's six vote cards change `votes_cast`; Rhystic Study moves a
+  seed's damage 72 -> 117; Enlightened Tutor, Land Tax, Dawn's Truce,
+  Lurrus; shilgengar's eight Angels fly. The consequence is the one CLAUDE.md
+  warns about in the other direction: a HIGH row printed under MODEL-BLIND is
+  read as "not measured" when part of it is. **Not reclassified here** --
+  each needs the clause that is missing named, which is PARTLY's contract,
+  and that is a card-by-card judgement and a re-render of five tables.
+- **13 whose channel never fired** in 40 seeds -- mostly rendmaw's
+  multi-type cards (Bow of Nylea, Lignify) and name-dispatched cards whose
+  branch is elsewhere in the file. Consistent with their label; not proof.
+
+Not built, and still proposals in `docs/LEDGER_STATES.md`: PREPARED, and
+splitting `Change` into SIMULATED + STAGED.
 
 ## How to read an ablation table
 

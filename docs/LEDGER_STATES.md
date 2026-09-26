@@ -1,9 +1,13 @@
 # The ledger's states: a vocabulary for a 50-card funnel
 
-**STATUS: PROPOSED, 2026-09-21. Nothing here is implemented.** It is the
-naming half of `docs/TRIAGE.md` — that file designs the *screen*, this one
-designs the *states a card passes through and the states it dies in*.
-CLAUDE.md queued item 23 is the live pointer for both.
+**STATUS: THE TRIAGE FLAGS ARE BUILT (2026-09-26, §0z66); THE STATES ARE
+NOT.** `Proposal.triage` carries LIVE / BLIND / DEFERRED, with
+`triage_clauses` and `triage_note`, and `pending.check_triage` enforces the
+"must record" column below. PREPARED, and splitting `Change` into SIMULATED +
+STAGED, are still proposals. This is the naming half of `docs/TRIAGE.md` —
+that file designs the *screen*, this one designs the *states a card passes
+through and the states it dies in*. CLAUDE.md queued item 23 is the live
+pointer for both.
 
 The vocabulary is the owner's, written out. The one part of it that was an
 inference — splitting today's STAGED into SIMULATED + STAGED — **was put to

@@ -157,6 +157,7 @@ python -m tests.test_menace --mutate               # 3 mutations, exact sets
 python -m tests.test_known_win --mutate            # 4 mutations, exact sets
 python -m tests.test_treasures --mutate            # 6 mutations, exact sets
 python -m tests.test_commander_damage --mutate     # 5 mutations, exact sets
+python -m tests.test_triage --mutate               # 6 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -508,6 +509,16 @@ it settled Caldera over Galvanoth, and **it is also the check on two rows that
 look like the same cut** — karlov's Boots and Mother of Runes are two
 leave-one-out rows, so their 0.0009 gap is not a ranking either.
 
+**A SIGNIFICANT ROW IS NOT EVIDENCE THE ENGINE SEES THE CARD — AND THAT IS
+CHECKABLE EXACTLY** (§0z66). Thirty-three MODEL-BLIND removal spells carry
+significant rows, every one positive, because a dead card cast late costs
+less than a blank cast at median priority (§0j). Common random numbers give
+a test with no noise at all: a card whose text the engine cannot see plays
+IDENTICALLY, seed for seed, to a blank matching its cost, types, body,
+priority and threat. `tools.triage` runs it. **When you want to know whether
+the engine sees a card, ask for identity, not significance** -- and the same
+test pointed at `KNOWN_BLIND` found 33 cards the engine does act on.
+
 **Ignore anything inside its own error bars** (`signal` reads `--`). A quarter
 to a third of every deck is statistically unmeasured. The top of a table is a
 meaningful SET, not a ranking: all four decks reshuffled their top eight
@@ -847,7 +858,13 @@ is half answered**: the ordering half is built and measured as a null
     than a blank). Nothing is staged: the Boots are ONE slot that both cards
     want, and re-staging rewrites `build_pending("karlov")`.
 
-23. **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
+23. **TIERS 0 AND 2 ARE BUILT (§0z66)**: `python -m tools.triage`, a verdict
+    flag on `Proposal`, and a gate in the `add-card` skill. Its back-test
+    found **33 `KNOWN_BLIND` cards the engine acts on** -- the open half of
+    this item is reclassifying them, card by card, with the missing clause
+    named. PREPARED and the SIMULATED/STAGED split are not built.
+    **The original entry follows.**
+    **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
     OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is
     the design and `docs/LEDGER_STATES.md` is its naming half**; nothing is
     implemented. The vocabulary matters because the intended workload is 50+

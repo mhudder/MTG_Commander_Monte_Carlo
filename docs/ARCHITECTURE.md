@@ -27,6 +27,11 @@ code and want to know what else it touches.
                           batch, the ledger or an engine? DERIVED -- candidates.py
                           names constants, so grepping it for a card name cannot
                           work, which is how a measured card was called unmeasured
+   ─ triage.py            can the engine SEE a card (tier 0: channels derived from
+                          the object, or a clause screen of the oracle text), and
+                          does its counter fire (tier 2, --smoke). Its acceptance
+                          test is EXACT: a blind card plays identically to a
+                          matched blank under CRN (item 23, §0z66)
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
    ─ regen_tables.sh      all six tables at the common N
    ─ _generated.py        shared helper: git ref + the provenance mask the checks compare with
@@ -223,8 +228,10 @@ command; use it rather than remembering.
   every commit, and regenerate `docs/STATUS.md` in the SAME commit as whatever
   moved it. A hand-typed count anywhere in prose (knobs, sections, lines) is
   already wrong.
-- **`ablation.py` reads `sys.argv` at import.** Do not import it from another
-  tool; `experiment.repl_priority` exists because of this.
+- **`ablation.py` USED TO read `sys.argv` at import** -- fixed in M4
+  (2026-09-17), when its parameters became a `Run` object. It is safe to
+  import now (`tools/triage.py`, two tests and `pending.py` do), and
+  `experiment.repl_priority` is where it is for the older reason.
 - **The metrics dict is a plain dict.** `g.m["new_counter"] += 1` on a key not
   registered in `__init__` is a `KeyError` in a worker, in the minority of
   games where the card resolves, twenty minutes into a run. Register the key.

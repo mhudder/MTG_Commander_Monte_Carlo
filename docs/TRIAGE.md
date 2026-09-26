@@ -1,8 +1,14 @@
 # Triage: screening cards before measuring them
 
-**STATUS: PROPOSED, 2026-09-21. Nothing here is implemented.** It is written
-down so that the next session can build it, argue with it, or discard it with a
-reason. CLAUDE.md queued item 23 is the live pointer; this file is the design.
+**STATUS: TIERS 0 AND 2 BUILT, 2026-09-26 (§0z66).** `tools/triage.py` is the
+screen, `tests/test_triage.py` pins it (six mutations), the Proposal carries
+the verdict as a flag (`triage`, checked by `pending.check_triage`), and the
+`add-card` skill's step 2 is a gate. **Two things below turned out wrong and
+are corrected where they stand, not deleted:** the acceptance test (see "How
+to validate the screen itself") and the expectation that tier 0 kills Sai and
+Splendid Reclamation. The SIMULATED/STAGED split and PREPARED from
+`LEDGER_STATES.md` are NOT built. Written 2026-09-21 as a proposal; CLAUDE.md
+queued item 23 is the live pointer.
 **`docs/LEDGER_STATES.md` is its naming half** — this file designs the screen,
 that one designs the states a card passes through and the states it dies in.
 
@@ -178,6 +184,23 @@ Proposed acceptance test, in the spirit of the mutation runs:
 3. It should assign BLIND to the known mechanism-blanks — Sai, and Splendid
    Reclamation, whose proposal rationale was backwards (§0z25).
 4. Write the expected sets down BEFORE running it, per the standing rule.
+
+**WHAT THE BUILD FOUND, 2026-09-26 (§0z66). Both 2 and 3 were wrong.**
+
+*Point 2 fails on artefacts.* Run over the rebuilt tables it failed 32 times,
+and every one was a cheap removal spell or counterspell with a POSITIVE row at
+priority 1–2: ablation's blank is cast at the deck's MEDIAN priority, so a dead
+card cast late costs less than a blank cast on curve. Those rows measure §0j's
+constants, not the card. **The acceptance test that was built is exact
+instead**: under common random numbers, a card whose text the engine cannot
+see plays IDENTICALLY, seed for seed, to a blank matching its cost, types,
+body, priority and threat. All 56 cards the screen calls BLIND or BODY do;
+any difference would be the engine seeing something the screen missed.
+
+*Point 3 asks tier 0 to do tier 2's job.* Sai and Splendid Reclamation are
+IMPLEMENTED -- the engine sees them -- so tier 0 correctly passes them; they
+are blanks by MECHANISM, which is what the smoke run finds. Sai in tivit at
+N=1000, seven seconds: cast in 22% of games, 0.21 Thopters a game.
 
 **And one scope limit, stated so nobody expects more of it:** triage predicts
 **MEASURABILITY, not value.** Heliod, Sun-Crowned and Underworld Breach are
