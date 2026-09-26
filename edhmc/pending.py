@@ -810,8 +810,8 @@ MEASURED: list[Candidate] = [
         limits=("The cut, Tamiyo's Journal (+0.0006 +-0.0017), is INSIDE its own bar,"
             " so this is 'least supported cut', not 'measured bad'. STALE -- NOT "
             "RESTATED. This deck's baseline has MOVED since the measurement (§0z4"
-            '4: four tivit priority moves adopted 2026-09-25, and the table is st'
-            "ale pending the owner's batched rebuild); check_unchanged_decks 246b"
+            '4: four tivit priority moves adopted 2026-09-25; the table was rebui'
+            "lt 2026-09-26, §0z60, this number was not); check_unchanged_decks 246b"
             '148 vs 2026-09-25 reports it MOVED on 8 of 8 metrics. Re-measure bef'
             'ore any head-to-head decision rests on it.'),
         verdict=('The strongest of the batch-2 four and significant at both horizons, '
@@ -1771,9 +1771,9 @@ CHANGES: list[Change] = [
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
             ' T10 / T20, so the list this swap was measured against no longer e'
             'xists. The number above is on the OLD priorities and has not been '
-            'restated; the karlov table rebuild is deferred to a batch by the o'
-            "wner's choice. Re-measure on the new baseline before this is commi"
-            'tted.'
+            'restated. The karlov TABLE was rebuilt 2026-09-26 (§0z60); this SWA'
+            'P was not, and still needs re-measuring on the new baseline before '
+            'it is committed.'
         ),
     ),
     Change(
@@ -1825,9 +1825,9 @@ CHANGES: list[Change] = [
             '> 10, Rhystic Study 9.5 -> 7.5 and Tempting Contract 6.5 -> 8.5 --'
             ' jointly +0.0225 / +0.0211 at T10 / T20. So the +0.0113 / +0.0145 '
             'above was measured at a priority now shown to be worth ~0.008 less'
-            ', on a baseline that has since moved. It has not been restated; th'
-            "e tivit table rebuild is deferred to a batch by the owner's choice"
-            '. Re-measure before commit.'
+            ', on a baseline that has since moved. It has not been restated. Th'
+            'e tivit TABLE was rebuilt 2026-09-26 (§0z60); this swap was not. Re'
+            '-measure before commit.'
         ),
     ),
 
@@ -1906,9 +1906,9 @@ CHANGES: list[Change] = [
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
             ' T10 / T20, so the list this swap was measured against no longer e'
             'xists. The number above is on the OLD priorities and has not been '
-            'restated; the karlov table rebuild is deferred to a batch by the o'
-            "wner's choice. Re-measure on the new baseline before this is commi"
-            'tted.'
+            'restated. The karlov TABLE was rebuilt 2026-09-26 (§0z60); this SWA'
+            'P was not, and still needs re-measuring on the new baseline before '
+            'it is committed.'
         ),
     ),
 

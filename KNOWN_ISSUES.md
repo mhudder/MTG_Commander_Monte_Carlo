@@ -108,6 +108,7 @@ Methodology that used to live at the end of this file is now
 | [0z57](#0z57) | FIXED | **Necropotence** skips the draw step and pays life for cards at the end step, where it was `draw2`. +0.0053 ±0.0028; row +0.0146. The amount is a POLICY, confirmed by the owner 2026-09-26: fill to 7 cards, down to 10 life (10 measured +0.0023 ±0.0011 better than the 20 first assumed) |
 | [0z58](#0z58) | FIXED | **Twitching Doll was classified SCRIPTED with neither clause implemented**, and when the nest counters went in they fired 0.03 times a game -- the pilot attacked with it and tapped mana creatures last. Policy `doll_policy="nest"`: it stays home and taps for a counter each turn. +0.0090 ±0.0025; row +0.0023 → +0.0111 |
 | [0z59](#0z59) | MEASURED | **Sunbird's decay (queued 0b-i) has no single cause.** Measured at all 22 commits since 2026-09-09 on the same seeds: −0.0019 at §0z8, −0.0027 at §0z9, +0.0010 at §0z17, −0.0011 at §0z42, +0.0016 at §0z49, each inside or near its bar. Net −0.0034 ±0.0035 at 6b4546e, inside its bar |
+| [0z60](#0z60) | MEASURED | **The six-deck rebuild, 2026-09-26: 3h09m on four cores, and it moved exactly the decks the checks said it would.** Every cache CURRENT and `check_docs` green for the first time since §0z44. Shilgengar and azusa came back BYTE-IDENTICAL (0 of 122 rows moved), confirming their VERIFIED records; rendmaw moved one row (Twitching Doll); karlov 10, tivit 10, lorehold 17 -- all traceable to §0z44 and §0z47-§0z58 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7181,6 +7182,40 @@ across commits the step bars are barely tighter than a single measurement --
 an engine change reshuffles many games -- which is why the individual steps do
 not resolve. The earlier drop (+0.0215 → +0.0146, 09-04 → 09-06) predates the
 repo's reorganisation and is not covered. Queued item 0b-i is closed.
+
+## 0z60. MEASURED — the six-deck rebuild, 2026-09-26
+
+The owner deferred the karlov and tivit rebuilds on 2026-09-25 (§0z44) to
+batch them; lorehold, rendmaw and karlov then moved again (§0z47-§0z58), and on
+2026-09-26 the owner asked for all six. `./tools/regen_tables.sh` from empty
+caches at dc4f20c: **03:16 to 06:25 UTC, 3 hours 9 minutes on four cores** --
+the first end-to-end timing since §0z22 (CLAUDE.md had quoted a ~35 minute
+figure it said was never re-timed). Committed deck by deck to the feature
+branch as it ran, so no half-built cache was ever pushed.
+
+**It moved exactly what the checks predicted** (`results/rebuild_20260926_diff.txt`;
+"moved" means beyond the OLD row's own bar):
+
+| deck | rows | moved | why |
+|---|---|---|---|
+| shilgengar | 64 | **0** (byte-identical table and cache) | nothing in its simulation changed; its VERIFIED record said so |
+| azusa | 58 | **0** (byte-identical) | the same |
+| rendmaw | 64 | 1 | Twitching Doll, +0.0023 → +0.0111 (§0z58). March (§0z47) stayed inside its bar |
+| karlov | 64 | 10 | Necropotence +0.0076 → +0.0169 (§0z57, at the adopted 10-life floor); Felidar Sovereign and Sorin up (§0z44's priority moves); Ranger of Eos and the soul sisters up (Ranger now tutors the sisters, §0z51, and Benevolent Offering's Spirits trigger them, §0z56 -- the two are not separated); Exquisite Blood down |
+| tivit | 65 | 10 | §0z44's re-rank read straight off the table: Rhystic Study +0.0049 → +0.0138, the tutors and Tempting Contract up, Sol Ring and Time Sieve down |
+| lorehold | 65 | 17 | Approach −0.0003 → **+0.0666** (§0z55); Storm Herd +0.0715 → +0.0389 (§0z49, and the rest of the deck moving under it); the Archaic +0.0006 → +0.0089 (§0z54) |
+
+**Two byte-identical decks are the result worth keeping**: two days of
+shared-code changes certified by `check_unchanged_decks` in minutes, and three
+hours of rebuild agreed with every one of them. That is §0z23's point measured
+again, from the other side.
+
+**One row to look at, not to act on:** Storm-Kiln Artist is now significantly
+negative on win rate in lorehold (−0.0033 ±0.0027, from +0.0023 inside its
+bar). It is the only MODEL-EVALUATED row in the rebuild to cross zero into
+significance, and nothing done this week touches its text. **What the rebuild
+did NOT do** is re-measure any staged swap or Candidate: those numbers still
+carry their own dates, and the ledger says so per entry.
 
 ## How to read an ablation table
 

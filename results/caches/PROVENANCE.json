@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "03d51bce7993d933",
-    "built_commit": "c9e83a1",
-    "built_utc": "2026-09-22T19:14:46Z",
+    "built_at": "ea7d981df13f586f",
+    "built_commit": "f18f0c3",
+    "built_utc": "2026-09-26T05:28:27Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -128,46 +128,53 @@
             "utc": "2026-09-22T13:52:18Z"
           }
         ]
+      },
+      {
+        "built_at": "03d51bce7993d933",
+        "built_commit": "c9e83a1",
+        "built_utc": "2026-09-22T19:14:46Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "2128a3b",
+            "evidence": "Chocobo COMMITTED to azusa_v1.py (2026-09-22), moved out of CHANGES into COMMITTED. The deck MODULE changed on purpose, so check_unchanged_decks -- which builds from the module -- reports MOVED and is the WRONG check for this table, which was measured against build_pending('azusa'). That list is UNCHANGED: the Chocobo was placed in Yavimaya Elder's exact list position, the position _swap_many had staged it into, so build_pending is identical card-for-card and index-for-index (99 cards, every field equal with frozensets compared as sets). And behaviourally: 2,000 games (seeds 5000-5999 -- the table's own -- at T10 and T20) through build_pending on 2128a3b vs this tree, including the regenerated _evasion.py, are GAME-FOR-GAME IDENTICAL on every numeric output key. This is not the staging-induced case the --verified rule forbids: committing an already-staged swap leaves the measured list unchanged by construction, and that was checked rather than assumed.",
+            "fingerprint": "370ffc676614275e",
+            "utc": "2026-09-22T20:58:43Z"
+          },
+          {
+            "commit": "a76cd5b",
+            "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+            "fingerprint": "95959d6fe384fae0",
+            "utc": "2026-09-25T13:03:56Z"
+          },
+          {
+            "commit": "6a0e786",
+            "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "b9ac0e1ec3e77c62",
+            "utc": "2026-09-25T15:50:17Z"
+          },
+          {
+            "commit": "f5ccbbb",
+            "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "fdd8f1e3ee7417cd",
+            "utc": "2026-09-25T20:20:15Z"
+          },
+          {
+            "commit": "6b4546e",
+            "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "f0168d0ef3a3249d",
+            "utc": "2026-09-25T21:16:56Z"
+          },
+          {
+            "commit": "101936e",
+            "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
+            "fingerprint": "ea7d981df13f586f",
+            "utc": "2026-09-26T03:16:19Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "2128a3b",
-        "evidence": "Chocobo COMMITTED to azusa_v1.py (2026-09-22), moved out of CHANGES into COMMITTED. The deck MODULE changed on purpose, so check_unchanged_decks -- which builds from the module -- reports MOVED and is the WRONG check for this table, which was measured against build_pending('azusa'). That list is UNCHANGED: the Chocobo was placed in Yavimaya Elder's exact list position, the position _swap_many had staged it into, so build_pending is identical card-for-card and index-for-index (99 cards, every field equal with frozensets compared as sets). And behaviourally: 2,000 games (seeds 5000-5999 -- the table's own -- at T10 and T20) through build_pending on 2128a3b vs this tree, including the regenerated _evasion.py, are GAME-FOR-GAME IDENTICAL on every numeric output key. This is not the staging-induced case the --verified rule forbids: committing an already-staged swap leaves the measured list unchanged by construction, and that was checked rather than assumed.",
-        "fingerprint": "370ffc676614275e",
-        "utc": "2026-09-22T20:58:43Z"
-      },
-      {
-        "commit": "a76cd5b",
-        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
-        "fingerprint": "95959d6fe384fae0",
-        "utc": "2026-09-25T13:03:56Z"
-      },
-      {
-        "commit": "6a0e786",
-        "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "b9ac0e1ec3e77c62",
-        "utc": "2026-09-25T15:50:17Z"
-      },
-      {
-        "commit": "f5ccbbb",
-        "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "fdd8f1e3ee7417cd",
-        "utc": "2026-09-25T20:20:15Z"
-      },
-      {
-        "commit": "6b4546e",
-        "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "f0168d0ef3a3249d",
-        "utc": "2026-09-25T21:16:56Z"
-      },
-      {
-        "commit": "101936e",
-        "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
-        "fingerprint": "ea7d981df13f586f",
-        "utc": "2026-09-26T03:16:19Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "f95ee2bd46e7e94e",

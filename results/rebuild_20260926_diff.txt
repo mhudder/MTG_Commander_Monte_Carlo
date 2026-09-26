@@ -1,0 +1,41 @@
+The 2026-09-26 six-deck rebuild against the tables it replaced (git dc4f20c). A row "moved" when the change exceeds its OLD bar.
+
+== lorehold: 65 rows; 17 moved beyond their old bar; 3 significant sign flips; 21 signal changes
+   Approach of the Second Sun             -0.0003+-0.0014  dmg -> +0.0666+-0.0044 both
+   Storm Herd                             +0.0715+-0.0046 both -> +0.0389+-0.0039 both
+   The Dawning Archaic                    +0.0006+-0.0026   -- -> +0.0089+-0.0030 both
+   Enlightened Tutor                      +0.0026+-0.0037  dmg -> -0.0031+-0.0039  dmg
+   Storm-Kiln Artist                      +0.0023+-0.0025  dmg -> -0.0033+-0.0027  win
+   Unexpected Windfall                    +0.0149+-0.0038 both -> +0.0202+-0.0039 both
+   Library of Leng                        +0.0077+-0.0038 both -> +0.0028+-0.0041  dmg
+   Soulfire Eruption                      +0.0054+-0.0033 both -> +0.0006+-0.0035  dmg
+   Land Tax                               +0.0180+-0.0038 both -> +0.0227+-0.0041 both
+   Monument to Endurance                  +0.0231+-0.0038 both -> +0.0275+-0.0042 both
+   Sunbird's Invocation                   +0.0091+-0.0041 both -> +0.0048+-0.0042 both
+   Boros Signet                           +0.0048+-0.0037 both -> +0.0087+-0.0041 both
+== rendmaw: 64 rows; 1 moved beyond their old bar; 0 significant sign flips; 6 signal changes
+   Twitching Doll                         +0.0023+-0.0019 both -> +0.0111+-0.0027 both
+== karlov: 64 rows; 10 moved beyond their old bar; 0 significant sign flips; 5 signal changes
+   Necropotence                           +0.0076+-0.0029 both -> +0.0169+-0.0031 both
+   Exquisite Blood                        +0.0322+-0.0035 both -> +0.0269+-0.0034 both
+   Soul's Attendant                       +0.0061+-0.0027 both -> +0.0101+-0.0033 both
+   Felidar Sovereign                      +0.0355+-0.0031 both -> +0.0390+-0.0035 both
+   Sorin, Solemn Visitor                  +0.0170+-0.0028 both -> +0.0205+-0.0030 both
+   Ranger of Eos                          +0.0067+-0.0028 both -> +0.0100+-0.0033 both
+   Land Tax                               +0.0099+-0.0028 both -> +0.0068+-0.0029 both
+   Soul Warden                            +0.0079+-0.0026 both -> +0.0109+-0.0033 both
+   Auriok Champion                        +0.0047+-0.0025 both -> +0.0075+-0.0026 both
+   Suture Priest                          +0.0024+-0.0024  dmg -> +0.0050+-0.0024 both
+== tivit: 65 rows; 10 moved beyond their old bar; 0 significant sign flips; 9 signal changes
+   Sol Ring                               +0.0361+-0.0049 both -> +0.0267+-0.0042 both
+   Rhystic Study                          +0.0049+-0.0044 both -> +0.0138+-0.0031 both
+   Idyllic Tutor                          +0.0099+-0.0031 both -> +0.0179+-0.0032 both
+   Demonic Tutor                          +0.0175+-0.0034 both -> +0.0232+-0.0034 both
+   Time Sieve                             +0.0420+-0.0038 both -> +0.0369+-0.0037 both
+   Anointed Procession                    +0.0305+-0.0036 both -> +0.0348+-0.0048 both
+   Tempting Contract                      +0.0199+-0.0030 both -> +0.0239+-0.0034 both
+   Brago's Representative                 +0.0101+-0.0028  win -> +0.0071+-0.0027  win
+   Lieutenants of the Guard               +0.0079+-0.0024 both -> +0.0053+-0.0024 both
+   Path to Exile                          -0.0001+-0.0013   -- -> +0.0015+-0.0013  win
+== shilgengar: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== azusa: 58 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes

@@ -95,12 +95,10 @@ python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
                                            # ABLATE_BUDGET=3000 for one deck by
                                            # hand -- the default is 240s (§0z22)
 python -m tools.audit_cards                # every card against Scryfall; expect 0 ERR
-./tools/regen_tables.sh                    # all six tables at N=15000. The
-                                           # ~35 min once quoted here was measured
-                                           # before §0z22; the six-deck run has
-                                           # NOT been re-timed end to end, and
-                                           # what IS measured is 1.22x per game
-                                           # and 1.45x on one azusa table.
+./tools/regen_tables.sh                    # all six tables at N=15000:
+                                           # 3h09m end to end on four cores,
+                                           # timed in §0z60. (The ~35 min once
+                                           # quoted here predated §0z22.)
 ```
 
 **Every other entry point — every tool, every test, every diagnostic, with what
@@ -883,18 +881,13 @@ is half answered**: the ordering half is built and measured as a null
     Voice-over-Lurrus case. **Two do not.** Karlov wants Felidar Sovereign
     and Sorin, Solemn Visitor higher (joint +0.0099 / +0.0091); tivit ranked
     card draw above its token engines (joint +0.0225 / +0.0211, four moves).
-    **BOTH ARE ADOPTED (2026-09-25), AND THE REBUILD IS DEFERRED** by the
-    owner, to batch with other work. So the karlov and tivit tables are STALE
-    and their caches are deliberately left SUSPECT, each with a `--note` —
-    and since §0z47/§0z48 the **lorehold and rendmaw** tables are too, on the
-    same terms: `check_docs` fails on exactly those four until
-    `./tools/regen_tables.sh` runs for them, and that failure is the signal,
-    not a defect. Never clear
-    it with `--verified` (the numbers moved) or by deleting the caches (that
-    turns the check green over a stale table). Every staged swap in both
-    decks — including Anointed Procession, whose own priority moved — was
-    measured on the old priorities and says so in its Change. Not adopted
-    and worth a look: Time Sieve's move flips sign between horizons.
+    **BOTH ARE ADOPTED (2026-09-25), and the batched rebuild the owner
+    deferred them to has RUN** (§0z60): all six tables at N=15,000, every
+    cache CURRENT, `check_docs` green. **What the rebuild did not do** is
+    re-measure the STAGED SWAPS: every staged swap in karlov and tivit —
+    including Anointed Procession, whose own priority moved — was measured
+    on the old priorities and still says so in its Change. Not adopted and
+    worth a look: Time Sieve's move flips sign between horizons.
 
 0c. **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
     call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
