@@ -1,0 +1,9 @@
+The 2026-09-26 rebuild after §0z64/§0z65 (Treasures, commander damage) against the tables it replaced (git 5ca3b36). A row "moved" when the change exceeds its OLD bar. Azusa was not rebuilt (bit-identical; cache VERIFIED).
+
+== lorehold: 65 rows; 1 moved beyond their old bar; 0 significant sign flips; 11 signal changes
+   Storm Herd                             +0.0415+-0.0038 both -> +0.0371+-0.0037 both
+== rendmaw: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== karlov: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 1 signal changes
+== tivit: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 4 signal changes
+== shilgengar: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 5 signal changes
+== azusa: 58 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes

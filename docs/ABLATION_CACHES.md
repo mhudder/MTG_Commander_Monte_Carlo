@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `4591d8a`.
+Generated at `59f4ace`.
 
 **6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,25 +86,22 @@ the fingerprint above mean anything.
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `ea7d981df13f586f` | `f18f0c3` | **VERIFIED** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `f95ee2bd46e7e94e` | `1dce50c` | **SUSPECT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `4db281f321cddd5b` | `0333ec1` | **SUSPECT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `b9a7cf3b10944f44` | `064816c` | **SUSPECT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `ed634cdbcd376688` | `a699e82` | **SUSPECT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `14b3667429ac8c01` | `08cd25e` | **SUSPECT** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `a7e7b45e612fd50d` | `748e1c6` | **CURRENT** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `c5db2bfa0b64150f` | `5ca3b36` | **CURRENT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `93520f597db5d48f` | `fcbf86a` | **CURRENT** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `a2a20b6aa7c39e9f` | `cec13c5` | **CURRENT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `63069375a4ad4dd3` | `9be657f` | **CURRENT** |
 
 ### State of each cache
 
 - **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `ea7d981df13f586f`; fingerprint has since moved to `f6b82e6775f69db1` and was CHECKED at `4591d8a` (2026-09-26T17:12:39Z): check_unchanged_decks at N=400, 4591d8a vs the §0z64/§0z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.
   - verified at `19844e43b708087b` (`b6f957b`, 2026-09-26T13:43:44Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
   - verified at `f6b82e6775f69db1` (`4591d8a`, 2026-09-26T17:12:39Z): check_unchanged_decks at N=400, 4591d8a vs the §0z64/§0z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `f95ee2bd46e7e94e`, live is `a7e7b45e612fd50d`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `1dce50c`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-  - verified at `ad40508ae8ef965a` (`b6f957b`, 2026-09-26T13:43:43Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `4db281f321cddd5b`, live is `c5db2bfa0b64150f`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `0333ec1`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `b9a7cf3b10944f44`, live is `93520f597db5d48f`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `064816c`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `ed634cdbcd376688`, live is `a2a20b6aa7c39e9f`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `a699e82`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-  - verified at `b394a5a4ceaaaf95` (`b6f957b`, 2026-09-26T13:43:44Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `14b3667429ac8c01`, live is `63069375a4ad4dd3`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `08cd25e`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-  - verified at `14ca39682c22a8ba` (`b6f957b`, 2026-09-26T13:43:44Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `a7e7b45e612fd50d`, which is live.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `c5db2bfa0b64150f`, which is live.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `93520f597db5d48f`, which is live.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `a2a20b6aa7c39e9f`, which is live.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `63069375a4ad4dd3`, which is live.
 
 ## What each fingerprint covers
 

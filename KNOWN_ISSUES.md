@@ -7399,7 +7399,10 @@ player killed a turn early by commander damage was, in those decks, a player
 the board was about to kill anyway.
 
 Five decks' baselines moved, so their tables were rebuilt; azusa's cache was
-recorded VERIFIED on the bit-identical check.
+recorded VERIFIED on the bit-identical check. **The rebuild moved ONE row of
+322 beyond its old bar** -- lorehold's Storm Herd, +0.0415 -> +0.0371, a deck
+with a second way to kill a player needing its Pegasi a little less -- with 0
+sign flips (`results/rebuild_20260926b_diff.txt`).
 
 ## How to read an ablation table
 
