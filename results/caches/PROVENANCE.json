@@ -541,9 +541,9 @@
     "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "aa0302c4107cb043",
-    "built_commit": "af016c1",
-    "built_utc": "2026-09-17T04:30:42Z",
+    "built_at": "ed634cdbcd376688",
+    "built_commit": "a699e82",
+    "built_utc": "2026-09-26T05:04:12Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -589,106 +589,113 @@
             "utc": "2026-09-17T03:00:51Z"
           }
         ]
+      },
+      {
+        "built_at": "aa0302c4107cb043",
+        "built_commit": "af016c1",
+        "built_utc": "2026-09-17T04:30:42Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "9f226af",
+            "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+            "fingerprint": "033be98edd639093",
+            "utc": "2026-09-17T14:36:38Z"
+          },
+          {
+            "commit": "774b8ef",
+            "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
+            "fingerprint": "c8c6dde1449f4f51",
+            "utc": "2026-09-17T15:13:26Z"
+          },
+          {
+            "commit": "c6d604a",
+            "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+            "fingerprint": "31907d899b578da5",
+            "utc": "2026-09-17T15:40:28Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+            "fingerprint": "37a66bfcb8e06b9c",
+            "utc": "2026-09-20T15:01:27Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+            "fingerprint": "fb27ecafbb90479f",
+            "utc": "2026-09-20T15:02:17Z"
+          },
+          {
+            "commit": "7c25a5f",
+            "evidence": "2026-09-21, Reality Fracture batch 2. Fingerprints moved because decks/_evasion.py was regenerated (in every deck's fingerprint since 0z29) and because engine.py, lorehold.py, tivit.py and shilgengar.py gained name-guarded branches for four new cards plus the 0z38 flashback-exile fix. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. WHOLE OUTPUT COMPARED TOO (0z32): every numeric key summed over 80 baseline games per touched deck -- lorehold 100->103 keys, rendmaw 53->54, shilgengar 49->50, tivit 66->67; the added keys are exactly the five new counters, all zero in a baseline game, and NO shared key moved. The 0z38 fix does not move any baseline because Past in Flames is a MEASURED candidate and not a member of the lorehold list, so no deck in the baseline casts a flashback spell.",
+            "fingerprint": "778bb9e644086b64",
+            "utc": "2026-09-21T03:26:35Z"
+          },
+          {
+            "commit": "d23e650",
+            "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "84d13c465823fc2e",
+            "utc": "2026-09-22T03:21:00Z"
+          },
+          {
+            "commit": "42015bb",
+            "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "0d5ed61d458db87f",
+            "utc": "2026-09-22T12:42:29Z"
+          },
+          {
+            "commit": "cdbc6f7",
+            "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+            "fingerprint": "bee1cc26dda86843",
+            "utc": "2026-09-22T13:52:17Z"
+          },
+          {
+            "commit": "408de74",
+            "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+            "fingerprint": "596d5cb71840275c",
+            "utc": "2026-09-22T18:25:10Z"
+          },
+          {
+            "commit": "2128a3b",
+            "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "c5dffecbee7b0406",
+            "utc": "2026-09-22T20:58:42Z"
+          },
+          {
+            "commit": "a76cd5b",
+            "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+            "fingerprint": "20fa035e9d7984da",
+            "utc": "2026-09-25T13:03:56Z"
+          },
+          {
+            "commit": "6a0e786",
+            "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "c9a39b39280d64f6",
+            "utc": "2026-09-25T15:50:17Z"
+          },
+          {
+            "commit": "f5ccbbb",
+            "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "c36bc05558c6b657",
+            "utc": "2026-09-25T20:20:15Z"
+          },
+          {
+            "commit": "6b4546e",
+            "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
+            "fingerprint": "8dd517d5fcc7fd9e",
+            "utc": "2026-09-25T21:16:56Z"
+          },
+          {
+            "commit": "101936e",
+            "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
+            "fingerprint": "ed634cdbcd376688",
+            "utc": "2026-09-26T03:16:20Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "9f226af",
-        "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
-        "fingerprint": "033be98edd639093",
-        "utc": "2026-09-17T14:36:38Z"
-      },
-      {
-        "commit": "774b8ef",
-        "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
-        "fingerprint": "c8c6dde1449f4f51",
-        "utc": "2026-09-17T15:13:26Z"
-      },
-      {
-        "commit": "c6d604a",
-        "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
-        "fingerprint": "31907d899b578da5",
-        "utc": "2026-09-17T15:40:28Z"
-      },
-      {
-        "commit": "488cc61",
-        "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
-        "fingerprint": "37a66bfcb8e06b9c",
-        "utc": "2026-09-20T15:01:27Z"
-      },
-      {
-        "commit": "488cc61",
-        "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
-        "fingerprint": "fb27ecafbb90479f",
-        "utc": "2026-09-20T15:02:17Z"
-      },
-      {
-        "commit": "7c25a5f",
-        "evidence": "2026-09-21, Reality Fracture batch 2. Fingerprints moved because decks/_evasion.py was regenerated (in every deck's fingerprint since 0z29) and because engine.py, lorehold.py, tivit.py and shilgengar.py gained name-guarded branches for four new cards plus the 0z38 flashback-exile fix. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. WHOLE OUTPUT COMPARED TOO (0z32): every numeric key summed over 80 baseline games per touched deck -- lorehold 100->103 keys, rendmaw 53->54, shilgengar 49->50, tivit 66->67; the added keys are exactly the five new counters, all zero in a baseline game, and NO shared key moved. The 0z38 fix does not move any baseline because Past in Flames is a MEASURED candidate and not a member of the lorehold list, so no deck in the baseline casts a flashback spell.",
-        "fingerprint": "778bb9e644086b64",
-        "utc": "2026-09-21T03:26:35Z"
-      },
-      {
-        "commit": "d23e650",
-        "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
-        "fingerprint": "84d13c465823fc2e",
-        "utc": "2026-09-22T03:21:00Z"
-      },
-      {
-        "commit": "42015bb",
-        "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
-        "fingerprint": "0d5ed61d458db87f",
-        "utc": "2026-09-22T12:42:29Z"
-      },
-      {
-        "commit": "cdbc6f7",
-        "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
-        "fingerprint": "bee1cc26dda86843",
-        "utc": "2026-09-22T13:52:17Z"
-      },
-      {
-        "commit": "408de74",
-        "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
-        "fingerprint": "596d5cb71840275c",
-        "utc": "2026-09-22T18:25:10Z"
-      },
-      {
-        "commit": "2128a3b",
-        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "c5dffecbee7b0406",
-        "utc": "2026-09-22T20:58:42Z"
-      },
-      {
-        "commit": "a76cd5b",
-        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
-        "fingerprint": "20fa035e9d7984da",
-        "utc": "2026-09-25T13:03:56Z"
-      },
-      {
-        "commit": "6a0e786",
-        "evidence": "2026-09-25, \u00a70z47/\u00a70z48: engine.py (Permanent.level default 1; rendmaw-only march_elephant/arasta_spider and the Game.opponent_cast_on_your_turn hook), opponents.py (countered() calls that hook via getattr -- only rendmaw's Game defines it, pinned by tests/test_march_elephant case E), tools/ablation.py (Artist's Talent moved KNOWN_BLIND -> SCRIPTED_LOREHOLD, a lorehold-only classification; March comment). check_unchanged_decks vs a worktree at 6a0e786, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "c9a39b39280d64f6",
-        "utc": "2026-09-25T15:50:17Z"
-      },
-      {
-        "commit": "f5ccbbb",
-        "evidence": "2026-09-25, \u00a70z49-\u00a70z53: engine.py (hybrid_pips, read only by karlov's devotion), lorehold.py/karlov.py/decks (Storm Herd X, Scrollwielder lifelink, Ranger of Eos, Lurrus alt_costs), tools/ablation.py (Storm Herd and Ranger of Eos reclassified -- lorehold/karlov only), tools/audit_cards.py, pending.py (Goldspan catalog + Candidate). check_unchanged_decks vs a worktree at f5ccbbb, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "c36bc05558c6b657",
-        "utc": "2026-09-25T20:20:15Z"
-      },
-      {
-        "commit": "6b4546e",
-        "evidence": "2026-09-25, \u00a70z54-\u00a70z58: engine.py (Permanent.nest, on_mana_tap in both spend() paths -- guarded for azusa's FloatingMana owners -- Twitching Doll, rendmaw only), lorehold.py/karlov.py/decks (free-cast path, Approach, Benevolent Offering, Necropotence), decks/_evasion.py regenerated (Spirit added to FLYING_TOKENS; shilgengar sets its own Spirits' flying), tools/ablation.py (three lorehold/karlov classification moves). check_unchanged_decks vs a worktree at 6b4546e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw, lorehold and karlov moved). This deck's committed table re-renders byte-identical from this cache (tests/test_metrics_and_render). validate +0.00 on all 18 metrics.",
-        "fingerprint": "8dd517d5fcc7fd9e",
-        "utc": "2026-09-25T21:16:56Z"
-      },
-      {
-        "commit": "101936e",
-        "evidence": "2026-09-26, \u00a70z57 adopted: Necropotence's necro_life_floor default 20 -> 10 (karlov.py), and a comment in tools/ablation.py (a shared fingerprint file). check_unchanged_decks vs a worktree at 101936e, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only karlov moved). validate +0.00 on all 18 metrics.",
-        "fingerprint": "ed634cdbcd376688",
-        "utc": "2026-09-26T03:16:20Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "14b3667429ac8c01",
