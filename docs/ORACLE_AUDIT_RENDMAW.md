@@ -32,9 +32,9 @@
 > `opponents.flying_of` and `flier_block_share`, with the goaded Birds counted
 > as catchers), and **Bitterblossom's 1 life per Faerie IS charged** (§0z7,
 > behind `charge_life_costs`), its Faeries flying via `FLYING_TOKENS`. Still
-> open: Rendmaw's own **reach and
-> menace** (Scryfall keywords, verified 2026-09-25) -- menace needs a term in
-> the blocking model, which no card in any deck has yet. **Twitching Doll's
+> open: nothing on this list. Rendmaw's **menace CLOSED 2026-09-26 (§0z61)**:
+> MENACE is generated from Scryfall's keywords and a menace attacker costs two
+> blockers. Its **reach** is irrelevant here -- your blockers are not modelled. **Twitching Doll's
 > nest counters and sacrifice CLOSED 2026-09-25 (§0z58)** -- it had been
 > classified SCRIPTED while neither clause existed.
 

@@ -230,6 +230,13 @@ def main():
     # tagging it was harmless in practice, but it was still a false claim
     # about the card and exactly the "a tag would be a lie" trap this
     # generator exists to avoid.
+    # MENACE, 2026-09-26 (§0z61): "can't be blocked except by two or more
+    # creatures". Creatures only, for flying's reason: a card that GRANTS
+    # menace (Edgar's "he gains menace") carries the keyword too, and that is
+    # conditional, so it is not a tag.
+    menace = {n for n, c in cards.items()
+              if n in creatures and "Menace" in c.get("keywords", [])
+              and "gains menace" not in (c.get("oracle_text") or "").lower()}
     indestructible = {n for n, c in cards.items()
                       if "Indestructible" in c.get("keywords", [])
                       and n in everything and everything[n].is_permanent}
@@ -256,6 +263,9 @@ def main():
           f"({len(creatures)} of them creatures)\n")
     print(f"UNCONDITIONAL FLYING ({len(flying)}):")
     for n in sorted(flying):
+        print(f"    {n}")
+    print(f"\nUNCONDITIONAL MENACE ({len(menace)}):")
+    for n in sorted(menace):
         print(f"    {n}")
     print(f"\nCONDITIONAL — handled in opponents.flying_of(), not tagged:")
     for n, why in sorted(CONDITIONAL.items()):
@@ -307,6 +317,11 @@ def main():
                      "`python -m tools.tag_flying --write` after any deck change.\n"
                      '"""\n\nFLYING = {\n')
             for n in sorted(flying):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n# Unconditional menace (creatures only), from the "
+                     "same keywords array.\n# Read by opponents.menace_of(): a "
+                     "menace attacker costs two blockers.\nMENACE = {\n")
+            for n in sorted(menace):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\n# Token subtypes that fly, from the text of the card "
                      "that makes them.\nFLYING_TOKENS = {\n")

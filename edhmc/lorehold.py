@@ -197,6 +197,7 @@ class LoreholdGame(BaseGame):
         })
         self.damage_by_turn = []
         self.before_draw_step = False    # artist_rummage reads it (§0z48)
+        self.known_win = None             # a win the pod has seen (§0z62)
 
     # -- helpers ------------------------------------------------------------
 
@@ -1035,6 +1036,10 @@ def approach_resolves(g, card, is_copy, was_cast, from_hand):
     if not is_copy:
         g.library.insert(max(0, len(g.library) - 6), card)
         g.m["approach_returned"] += 1
+        # THE TABLE HAS SEEN IT (§0z62): Approach resolved and went seventh
+        # from the top, and everyone knows what the next one does. The pod
+        # reads this in `opponents.known_win_share` and `countered`.
+        g.known_win = card.name
 
 
 def apply_spell_effects(g, card, is_copy=False, was_cast=True,

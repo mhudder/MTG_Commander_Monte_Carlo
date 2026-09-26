@@ -153,6 +153,8 @@ python -m tests.test_march_elephant --mutate       # 4 mutations, exact sets
 python -m tests.test_text_fixes --mutate           # 9 mutations, exact sets
 python -m tests.test_free_casts_and_approach --mutate # 6 mutations, exact sets
 python -m tests.test_offering_necro_doll --mutate  # 7 mutations, exact sets
+python -m tests.test_menace --mutate               # 3 mutations, exact sets
+python -m tests.test_known_win --mutate            # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -894,9 +896,9 @@ is half answered**: the ordering half is built and measured as a null
     both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
     significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
     T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
-    estimate, so that swap cuts a card the model half-sees. **Measured before
-    §0z54/§0z55 moved lorehold's baseline by +0.08** -- re-measure before
-    staging.
+    estimate, so that swap cuts a card the model half-sees. Re-measured on
+    the rebuilt baseline (§0z63): −Act +Goldspan +0.0143 / +0.0119, still
+    significant at both horizons -- but before §0z62 moved lorehold again.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

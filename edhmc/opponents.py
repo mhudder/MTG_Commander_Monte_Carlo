@@ -278,9 +278,25 @@ def your_share(g, opp: Opponent, others: list[Opponent]) -> float:
     """
     mine = board_threat(g)
     theirs = sum(opponent_threat(o, g.turn) for o in others)
-    if mine + theirs <= 0:
-        return 0.0
-    return mine / (mine + theirs)
+    share = 0.0 if mine + theirs <= 0 else mine / (mine + theirs)
+    return known_win_share(g, share)
+
+
+def known_win_share(g, share: float) -> float:
+    """A WIN THE TABLE CAN SEE COMING draws everything at you (§0z62).
+
+    `g.known_win` (optional protocol: read with getattr) names a card whose
+    next resolution wins the game and whose existence the table has seen --
+    Approach of the Second Sun, once it has resolved and gone seventh from the
+    top. From then on a real pod stops weighing boards: every removal spell
+    and every opponent's kill is pointed at the player about to win.
+    `known_win_focus` is the floor this puts under your share of the pod's
+    attention. THE KNOB IS A JUDGEMENT, NOT A CALIBRATION, and its sweep is
+    in §0z62. Nothing in any other engine sets `known_win`, so their shares
+    are untouched."""
+    if getattr(g, "known_win", None):
+        return max(share, g.cfg.get("known_win_focus", 1.0))
+    return share
 
 
 # ---------------------------------------------------------------------------
@@ -606,6 +622,17 @@ def goaded_combat(g):
 # Counterspells
 # ---------------------------------------------------------------------------
 
+def counter_threat(g, card) -> float:
+    """How much the table wants this spell countered. The card's own `threat`
+    (or a stand-in from its power and mana value) -- raised to the cap, 9,
+    when it is the KNOWN WIN (§0z62): the spell every counterspell at the
+    table is being held for."""
+    threat = float(card.threat) if card.threat else max(card.power * 0.8, card.mv * 0.5)
+    if getattr(g, "known_win", None) == card.name:
+        threat = max(threat, 9.0)
+    return threat
+
+
 def countered(g, card, spell_index: int) -> bool:
     """Checked as the spell goes on the stack.
 
@@ -615,7 +642,7 @@ def countered(g, card, spell_index: int) -> bool:
     """
     if g.turn < 3 or spell_index >= N_COUNTER_SLOTS:
         return False
-    threat = float(card.threat) if card.threat else max(card.power * 0.8, card.mv * 0.5)
+    threat = counter_threat(g, card)
     if threat < g.cfg.get("counter_threshold", 4.0):
         return False
 
@@ -696,6 +723,34 @@ def indestructible_of(g, perm) -> bool:
     return False
 
 
+def menace_of(g, perm) -> bool:
+    """Does this permanent have menace -- "can't be blocked except by two or
+    more creatures"? Unconditional menace is the generated MENACE set, from
+    Scryfall's keywords array (§0z61). A CONDITIONAL grant (Edgar's "he gains
+    menace until end of turn") is not in it and is not modelled."""
+    from edhmc.decks._evasion import MENACE
+    return perm.card.name in MENACE
+
+
+def chump(items, budget):
+    """Blockers a defender assigns, and the power they stop.
+
+    `items` is [(power, cost)], cost being the blockers it takes to block that
+    attacker: 1, or 2 for menace (§0z61). The defender stops the most power
+    per blocker first, the biggest first on a tie -- with every cost 1 that is
+    exactly "chump the biggest attackers", the rule `damage_through` has
+    always had, so a board without menace blocks as it always did. Returns
+    (power stopped, blockers used).
+    """
+    stopped, used = 0.0, 0
+    for power, cost in sorted(items, key=lambda it: (it[0] / it[1], it[0]),
+                              reverse=True):
+        if used + cost <= budget:
+            used += cost
+            stopped += power
+    return stopped, used
+
+
 def _blocker_counts(g, defender):
     """How many of `defender`'s creatures block, and how many can catch a flier.
 
@@ -747,19 +802,19 @@ def damage_through(g, attackers: list, defender=None) -> float:
         defender = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
     n_block, n_fly = _blocker_counts(g, defender)
 
-    fly_p, ground_p = [], []
+    fly, ground = [], []
     for p in attackers:
-        (fly_p if flying_of(g, p) else ground_p).append(g.power_of(p))
-    fly_p.sort(reverse=True)
-    ground_p.sort(reverse=True)
+        item = (g.power_of(p), 2 if menace_of(g, p) else 1)
+        (fly if flying_of(g, p) else ground).append(item)
 
     # A defender spends its flying-capable blockers on the biggest fliers, then
     # anything left over on the ground; ground-only blockers can never touch a
-    # flier no matter how big it is.
-    blocked_fly = min(n_fly, len(fly_p))
-    spare = n_fly - blocked_fly
-    blocked_ground = min((n_block - n_fly) + spare, len(ground_p))
-    return float(sum(fly_p[blocked_fly:]) + sum(ground_p[blocked_ground:]))
+    # flier no matter how big it is. A MENACE attacker takes two blockers
+    # (two flying-capable ones if it also flies), which `chump` prices (§0z61).
+    stopped_fly, used_fly = chump(fly, n_fly)
+    stopped_ground, _ = chump(ground, (n_block - n_fly) + (n_fly - used_fly))
+    total = sum(pw for pw, _ in fly) + sum(pw for pw, _ in ground)
+    return float(total - stopped_fly - stopped_ground)
 
 
 
@@ -923,8 +978,8 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     power spent, leaving more for the next player.
 
     APPROXIMATION, SAID OUT LOUD: the closed form above ignores the fly/ground
-    split, so the plan can misjudge a defender who blocks fliers and ground
-    separately. It is EXACT for an all-ground or all-flying attack (azusa is
+    split, and MENACE (a menace attacker takes two blockers, §0z61), so the
+    plan can misjudge a defender who blocks fliers and ground separately. It is EXACT for an all-ground or all-flying attack (azusa is
     all-ground, so it is exact there) and a slight misjudgement otherwise —
     which resolves as a defender surviving at 1 life, a pilot's error rather
     than a rules error. Resolution always uses the real `damage_through`.

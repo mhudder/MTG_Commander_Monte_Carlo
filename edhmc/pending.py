@@ -862,10 +862,13 @@ MEASURED: list[Candidate] = [
             '(the opponents\' boards) is an abstract creature count, so the model '
             'half-sees the card this swap removes -- §0z36 says that can err in '
             'either direction. Lorehold\'s baseline moved twice on 2026-09-25 '
-            '(§0z48, §0z49) and these were measured after both -- BUT BEFORE '
-            '§0z54/§0z55 moved it again by +0.08 the same day (Approach\'s win, '
-            'one free-cast path). STALE -- NOT RESTATED; re-measure before '
-            'staging.'),
+            '(§0z48, §0z49) and these were measured after both -- but before '
+            '§0z54/§0z55 moved it again by +0.08. RE-MEASURED 2026-09-26 on the '
+            'rebuilt baseline (§0z63): -Blasphemous Act +Goldspan +0.0143 +-0.0026 '
+            '/ +0.0119 +-0.0047 (still significant at both horizons, smaller at '
+            'T20); -Lightning Greaves +Goldspan +0.0011 +-0.0018 / +0.0064 +-0.0037 '
+            '(T20 only); in Caldera\'s slot -0.0030 / -0.0087 (Caldera still '
+            'better). results/restage_20260926.txt.' ' MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold\'s baseline -0.035 and Approach\'s row +0.0666 -> +0.0265. Not restated.'),
         verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
             'Act\'s slot, significant at both horizons, with the cut\'s blind half '
             'said out loud. Staging is the owner\'s call.'),
@@ -1774,6 +1777,7 @@ CHANGES: list[Change] = [
             'restated. The karlov TABLE was rebuilt 2026-09-26 (§0z60); this SWA'
             'P was not, and still needs re-measuring on the new baseline before '
             'it is committed.'
+            " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Citadel staged on both sides), N=15,000 paired: +0.0255 +-0.0028 at T10, +0.0266 +-0.0035 at T20. The staging stands. THE ALTERNATIVE CUT, measured the same run: -Swiftfoot Boots +Bloodthirsty Conqueror +0.0278 / +0.0341, and the two cuts compared directly (Boots minus Soulmender, same card) +0.0023 +-0.0038 at T10, +0.0075 +-0.0047 at T20 -- still the better cut at T20, by less than the +0.0125 measured on the old baseline. results/restage_20260926.txt."
         ),
     ),
     Change(
@@ -1828,6 +1832,7 @@ CHANGES: list[Change] = [
             ', on a baseline that has since moved. It has not been restated. Th'
             'e tivit TABLE was rebuilt 2026-09-26 (§0z60); this swap was not. Re'
             '-measure before commit.'
+            " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), after §0z44 moved its own priority to 10: +0.0145 +-0.0036 at T10, +0.0191 +-0.0052 at T20 -- larger than every earlier measurement. The staging stands. results/restage_20260926.txt."
         ),
     ),
 
@@ -1909,6 +1914,7 @@ CHANGES: list[Change] = [
             'restated. The karlov TABLE was rebuilt 2026-09-26 (§0z60); this SWA'
             'P was not, and still needs re-measuring on the new baseline before '
             'it is committed.'
+            " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Conqueror staged on both sides), N=15,000 paired: +0.0013 +-0.0029 at T10 (inside), +0.0147 +-0.0042 at T20. A long-horizon card, as before; the staging stands. results/restage_20260926.txt."
         ),
     ),
 
@@ -1975,6 +1981,9 @@ CHANGES: list[Change] = [
             "Perilous Forays is signal `--` (+0.0012 +-0.0016) and is fully "
             "implemented in azusa.activations(), so cutting it is safe in the "
             "way cutting Bane is not."
+        ),
+        reverified=(
+            "RE-MEASURED 2026-09-26 (§0z63), N=15,000 paired: +0.0033 +-0.0022 at T10, +0.0133 +-0.0035 at T20. The staging stands. results/restage_20260926.txt."
         ),
     ),
     Change(
@@ -2119,6 +2128,7 @@ CHANGES: list[Change] = [
             "Caldera GIVEN Sunbird's +0.0249 +-0.0028 at T20, +0.0056 "
             "+-0.0015 at T10. Larger, and the decision stands. "
             "results/lorehold_pair_approach.txt."
+            " MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold's baseline -0.035 and Approach's row +0.0666 -> +0.0265. Not restated."
         ),
     ),
     Change(
@@ -2198,6 +2208,7 @@ CHANGES: list[Change] = [
             "The decay queued as 0b-i is closed by §0z59: no single cause, "
             "net -0.0034 +-0.0035 since 2026-09-09. "
             "results/lorehold_pair_approach.txt."
+            " MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold's baseline -0.035 and Approach's row +0.0666 -> +0.0265. Not restated."
         ),
     ),
 ]

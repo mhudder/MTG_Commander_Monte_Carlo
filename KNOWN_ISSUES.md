@@ -109,6 +109,9 @@ Methodology that used to live at the end of this file is now
 | [0z58](#0z58) | FIXED | **Twitching Doll was classified SCRIPTED with neither clause implemented**, and when the nest counters went in they fired 0.03 times a game -- the pilot attacked with it and tapped mana creatures last. Policy `doll_policy="nest"`: it stays home and taps for a counter each turn. +0.0090 ±0.0025; row +0.0023 → +0.0111 |
 | [0z59](#0z59) | MEASURED | **Sunbird's decay (queued 0b-i) has no single cause.** Measured at all 22 commits since 2026-09-09 on the same seeds: −0.0019 at §0z8, −0.0027 at §0z9, +0.0010 at §0z17, −0.0011 at §0z42, +0.0016 at §0z49, each inside or near its bar. Net −0.0034 ±0.0035 at 6b4546e, inside its bar |
 | [0z60](#0z60) | MEASURED | **The six-deck rebuild, 2026-09-26: 3h09m on four cores, and it moved exactly the decks the checks said it would.** Every cache CURRENT and `check_docs` green for the first time since §0z44. Shilgengar and azusa came back BYTE-IDENTICAL (0 of 122 rows moved), confirming their VERIFIED records; rendmaw moved one row (Twitching Doll); karlov 10, tivit 10, lorehold 17 -- all traceable to §0z44 and §0z47-§0z58 |
+| [0z61](#0z61) | FIXED | **Menace.** Rendmaw has it and the blocking model did not: a chump-blocking defender spent one blocker on any attacker. MENACE is generated from Scryfall's keywords, and `chump` prices a menace attacker at two blockers, stopping the most power per blocker -- the old rule exactly when nothing has menace (a 400-board property test). +0.0123 ±0.0033 to rendmaw at T20 |
+| [0z62](#0z62) | FIXED | **The pod reacts to a win it can see.** Once Approach has resolved and gone seventh from the top, `known_win_focus` (1.0) floors your share of the pod's removal and kills, and its recast is countered at the cap. Approach's row +0.0666 → **+0.0265 ±0.0041**; lorehold −0.0401. The counterspell half alone is worth −0.0008: the kills are the reaction. The knob is a judgement, put to the owner |
+| [0z63](#0z63) | MEASURED | **Every staged swap re-measured on the rebuilt baseline**, and all six stand, significant at T20. Karlov's cut still favours Swiftfoot Boots over Soulmender, by less: +0.0075 ±0.0047 at T20 (was +0.0125). Goldspan for Blasphemous Act +0.0143 / +0.0119 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7216,6 +7219,85 @@ bar). It is the only MODEL-EVALUATED row in the rebuild to cross zero into
 significance, and nothing done this week touches its text. **What the rebuild
 did NOT do** is re-measure any staged swap or Candidate: those numbers still
 carry their own dates, and the ledger says so per entry.
+
+## 0z61. FIXED — menace
+
+Rendmaw, Creaking Nest has "Reach, menace" (Scryfall keywords, verified
+2026-09-25) and the blocking model had no menace: `damage_through`
+chump-blocks your biggest attackers one blocker each. "A creature with menace
+can't be blocked except by two or more creatures" (702.111b).
+
+**MENACE is generated, not typed**: `tag_flying` reads it from the same
+keywords array as FLYING, creatures only, and excludes a card whose text only
+GRANTS it (Edgar's "he gains menace" is conditional). In the current lists:
+Rendmaw and Gloomshrieker; Proft and Noxious Gearhulk are candidates.
+`opponents.menace_of` reads it; `opponents.chump` prices each attacker at one
+blocker or two and stops the most power per blocker first, the biggest first on
+a tie -- which with every cost 1 IS the old rule, proved over 400 random
+boards to the digit (`tests/test_menace.py`, case A). A menace flier takes two
+flying-capable blockers. `combat_damage`'s assignment PLAN ignores menace, as it
+already ignored the fly/ground split -- said in its docstring; resolution is
+exact.
+
+N=15,000 paired (`diagnostics/run_menace_approach.py`): **+0.0051 ±0.0014 /
++0.0123 ±0.0033** to rendmaw at T10 / T20, a commander that is harder to chump.
+Only rendmaw moves (`check_unchanged_decks`). Reach stays unmodelled and
+irrelevant: this model has no blockers of yours.
+
+## 0z62. FIXED — the pod reacts to a win it can see coming
+
+§0z55 named it: once Approach of the Second Sun has resolved and gone seventh
+from the top, a real table KNOWS a win is a few draws away, and this pod did
+not -- it went on weighing boards. That made Approach's +0.0666 a ceiling.
+
+`g.known_win` (set by lorehold when Approach returns to the library; read by
+`opponents.py` with `getattr`, an ARCHITECTURE protocol row) does two things:
+`known_win_share` floors your share of the pod's removal AND of every opponent's
+kill at `known_win_focus`, and `counter_threat` raises that card's recast to the
+cap. Measured, N=15,000 paired, with the no-reaction arm reproducing §0z55's
++0.0666 exactly:
+
+| setting | lorehold, T20 | Approach's row T10 | Approach's row T20 |
+|---|---|---|---|
+| no reaction | -- | +0.0341 ±0.0030 | +0.0666 ±0.0044 |
+| counterspells held for it only (focus 0) | −0.0008 ±0.0005 | +0.0337 | +0.0658 |
+| focus 0.5 | −0.0113 ±0.0021 | +0.0318 | +0.0553 |
+| **focus 1.0 (default)** | **−0.0401 ±0.0035** | +0.0259 ±0.0028 | **+0.0265 ±0.0041** |
+
+**The counterspell half is nearly nothing** -- Approach's threat was already
+8.0, near the cap -- so the reaction is the KILLS: an opponent whose clock
+comes due takes the player about to win. Approach wins 0.062 games a game at
+focus 1.0 against 0.092 without the reaction. **The default, 1.0, is a
+judgement -- "the whole table knows and acts on it" -- not a calibration, and
+it is put to the owner.** The card is still significant at both horizons under
+the harshest setting, so the finding that Approach is a real card in this deck
+survives; its size depends on the pod.
+
+## 0z63. MEASURED — every staged swap, re-measured on the rebuilt baseline
+
+The rebuild (§0z60) refreshed the tables, not the staged swaps. Measured in
+context -- each swap undone alone, the deck's other staged changes present on
+both sides -- N=15,000 paired (`diagnostics/run_restage.py`,
+`results/restage_20260926.txt`), on the engine at b6f957b:
+
+| swap | T10 | T20 |
+|---|---|---|
+| karlov −Soulmender +Bloodthirsty Conqueror (staged) | +0.0255 ±0.0028 | +0.0266 ±0.0035 |
+| karlov −Swamp +Bolas's Citadel (staged) | +0.0013 ±0.0029 | +0.0147 ±0.0042 |
+| karlov −Swiftfoot Boots +Conqueror (the alternative) | +0.0278 ±0.0029 | +0.0341 ±0.0036 |
+| karlov, Boots cut − Soulmender cut, same card | +0.0023 ±0.0038 | **+0.0075 ±0.0047** |
+| tivit −Plains +Anointed Procession (staged) | +0.0145 ±0.0036 | +0.0191 ±0.0052 |
+| azusa −Perilous Forays +Ka-Zar (staged) | +0.0033 ±0.0022 | +0.0133 ±0.0035 |
+| lorehold −Blasphemous Act +Goldspan | +0.0143 ±0.0026 | +0.0119 ±0.0047 |
+| lorehold −Lightning Greaves +Goldspan | +0.0011 ±0.0018 | +0.0064 ±0.0037 |
+| lorehold Goldspan in Caldera's slot | −0.0030 ±0.0013 | −0.0087 ±0.0027 |
+
+**All six staged swaps stand**, each significant at T20. The karlov cut
+question (§0z36) is still answered the same way and by less: the Boots are the
+better cut by +0.0075 at T20, inside the bar at T10, where it was +0.0125 on
+the old baseline. Lorehold's two stagings were re-measured on 2026-09-25 after
+§0z55. **The lorehold rows here predate §0z62**, which moved that deck again;
+the ledger says so on each.
 
 ## How to read an ablation table
 

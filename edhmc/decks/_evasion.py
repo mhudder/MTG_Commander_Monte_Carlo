@@ -48,6 +48,15 @@ FLYING = {
     'Youthful Valkyrie',
 }
 
+# Unconditional menace (creatures only), from the same keywords array.
+# Read by opponents.menace_of(): a menace attacker costs two blockers.
+MENACE = {
+    'Gloomshrieker',
+    'Noxious Gearhulk',
+    'Proft, Sinister Mastermind',
+    'Rendmaw, Creaking Nest',
+}
+
 # Token subtypes that fly, from the text of the card that makes them.
 FLYING_TOKENS = {
     'Angel',
