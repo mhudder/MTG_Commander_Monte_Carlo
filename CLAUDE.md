@@ -155,9 +155,10 @@ python -m tests.test_free_casts_and_approach --mutate # 6 mutations, exact sets
 python -m tests.test_offering_necro_doll --mutate  # 7 mutations, exact sets
 python -m tests.test_menace --mutate               # 3 mutations, exact sets
 python -m tests.test_known_win --mutate            # 4 mutations, exact sets
-python -m tests.test_treasures --mutate            # 6 mutations, exact sets
+python -m tests.test_treasures --mutate            # 7 mutations, exact sets
 python -m tests.test_commander_damage --mutate     # 5 mutations, exact sets
 python -m tests.test_triage --mutate               # 6 mutations, exact sets
+python -m tests.test_commander_aim --mutate        # 5 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -783,9 +784,13 @@ is half answered**: the ordering half is built and measured as a null
     JUDGEMENT IS NOW MEASURED AND WRONG** (§0z36, 2026-09-20): the same card
     against the MODEL-EVALUATED cut item 22 established is **+0.0401 ±0.0037
     at T20 against +0.0254**, and the gap between the two cuts is +0.0125
-    ±0.0049 measured directly. Re-staging is the owner's call because it
-    forces a karlov rebuild, but the ceiling is no longer the only problem
-    with this cut: it is the worse of two available. Two more are explicitly HELD:
+    ±0.0049 measured directly. **THE OWNER DECIDED (2026-09-26): SOULMENDER
+    STAYS THE CUT.** The Boots remain in the list because in an
+    interaction-heavy pod the shroud does real work -- work this model
+    cannot fully see, since the pod's removal is a roll against an abstract
+    board (§4). That is a judgement about the owner's table outranking a
+    +0.0075 ±0.0047 T20 edge that is inside its bar at T10, and it is
+    recorded on the Change. Two more are explicitly HELD:
     Alhammarret's Archive on the owner's playtest experience — which the
     model's own counter corroborates, 0.40 extra draws a game — and Parallel
     Lives as too expensive for what it does.
@@ -855,8 +860,9 @@ is half answered**: the ordering half is built and measured as a null
     +Bloodthirsty Conqueror` is +0.0401 ±0.0037 at T20 where the live staging
     is +0.0254, and `−Swiftfoot Boots +Alhammarret's Archive` is +0.0168
     ±0.0030 (larger than its own candidate row, because the cut is worth less
-    than a blank). Nothing is staged: the Boots are ONE slot that both cards
-    want, and re-staging rewrites `build_pending("karlov")`.
+    than a blank). **The owner kept the Boots (2026-09-26, item 20b)**: the
+    Conqueror stays staged over Soulmender, and the Boots remain the named
+    cut for Alhammarret's Archive should that hold ever lift.
 
 23. **TIERS 0 AND 2 ARE BUILT (§0z66)**: `python -m tools.triage`, a verdict
     flag on `Proposal`, and a gate in the `add-card` skill. Its back-test
@@ -910,7 +916,9 @@ is half answered**: the ordering half is built and measured as a null
     on the old priorities and still says so in its Change. Not adopted and
     worth a look: Time Sieve's move flips sign between horizons.
 
-0c. **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
+0c. **STAGED BY THE OWNER, 2026-09-26 (§0z69)**: −Blasphemous Act +Goldspan,
+    +0.0137 ±0.0046 at T20 on the final engine. The original entry follows.
+    **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
     call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
     both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
     significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at

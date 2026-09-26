@@ -52,6 +52,9 @@ bars. **Its "sharp case" was the wrong deck** -- Karlov kills 0.07 players a
 game this way and wins no more; lorehold's 5/5 FLIER kills 0.49. Evasion, not
 growth, is what reaches 21. And "the fix only ever adds kills" held: no deck
 lost win rate.
+**Since §0z67 both sides know the rule**: a defender the commander would kill
+blocks it first, and the pilot aims the commander at a player it would kill,
+only where it gets through.
 
 `grep -rn "commander_damage\|21 or more"` over the package returns nothing, so
 this is a win condition the project does not have. It is live rather than

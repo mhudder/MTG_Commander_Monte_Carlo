@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `59f4ace`.
+Generated at `2b9fff4`.
 
 **6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,22 +86,23 @@ the fingerprint above mean anything.
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `ea7d981df13f586f` | `f18f0c3` | **VERIFIED** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `a7e7b45e612fd50d` | `748e1c6` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `c5db2bfa0b64150f` | `5ca3b36` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `93520f597db5d48f` | `fcbf86a` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `a2a20b6aa7c39e9f` | `cec13c5` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `63069375a4ad4dd3` | `9be657f` | **CURRENT** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `a7e7b45e612fd50d` | `748e1c6` | **SUSPECT** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `c5db2bfa0b64150f` | `5ca3b36` | **SUSPECT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `93520f597db5d48f` | `fcbf86a` | **SUSPECT** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `a2a20b6aa7c39e9f` | `cec13c5` | **SUSPECT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `63069375a4ad4dd3` | `9be657f` | **SUSPECT** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `ea7d981df13f586f`; fingerprint has since moved to `f6b82e6775f69db1` and was CHECKED at `4591d8a` (2026-09-26T17:12:39Z): check_unchanged_decks at N=400, 4591d8a vs the §0z64/§0z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `ea7d981df13f586f`; fingerprint has since moved to `75a231f588b8fac9` and was CHECKED at `2b9fff4` (2026-09-26T21:54:38Z): check_unchanged_decks at N=400, HEAD 2b9fff4 vs the §0z67/§0z68/§0z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.
   - verified at `19844e43b708087b` (`b6f957b`, 2026-09-26T13:43:44Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
   - verified at `f6b82e6775f69db1` (`4591d8a`, 2026-09-26T17:12:39Z): check_unchanged_decks at N=400, 4591d8a vs the §0z64/§0z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `a7e7b45e612fd50d`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `c5db2bfa0b64150f`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `93520f597db5d48f`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `a2a20b6aa7c39e9f`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `63069375a4ad4dd3`, which is live.
+  - verified at `75a231f588b8fac9` (`2b9fff4`, 2026-09-26T21:54:38Z): check_unchanged_decks at N=400, HEAD 2b9fff4 vs the §0z67/§0z68/§0z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `a7e7b45e612fd50d`, live is `565ff684a4cf1850`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `748e1c6`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `c5db2bfa0b64150f`, live is `7e5cf6d30770d7d0`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `5ca3b36`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `93520f597db5d48f`, live is `46660d84581667c7`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `fcbf86a`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `a2a20b6aa7c39e9f`, live is `28d329ee9c47ca7e`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `cec13c5`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `63069375a4ad4dd3`, live is `df7cb8279e3c1161`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `9be657f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 
 ## What each fingerprint covers
 
@@ -110,11 +111,11 @@ the fingerprint above mean anything.
 - **karlov** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/karlov_v2.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/karlov.py`, `edhmc/opponents.py`, `staged:karlov`
   - `staged:karlov` is `-Soulmender +Bloodthirsty Conqueror`, `-Swamp +Bolas's Citadel`
 - **lorehold** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/lorehold_v16.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/lorehold.py`, `edhmc/opponents.py`, `staged:lorehold`
-  - `staged:lorehold` is `-Penance +Caldera Pyremaw`, `-Scroll Rack +Sunbird's Invocation`
+  - `staged:lorehold` is `-Penance +Caldera Pyremaw`, `-Scroll Rack +Sunbird's Invocation`, `-Blasphemous Act +Goldspan Dragon`
 - **rendmaw** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/rendmaw_v12.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `staged:rendmaw`
   - `staged:rendmaw` is **empty** — nothing staged for this deck, so the baseline is the module's own list
 - **shilgengar** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`, `staged:shilgengar`
-  - `staged:shilgengar` is **empty** — nothing staged for this deck, so the baseline is the module's own list
+  - `staged:shilgengar` is `-Vampiric Rites +Lyra, Archangel of Dawn`
 - **tivit** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/tivit_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/tivit.py`, `edhmc/voting.py`, `staged:tivit`
   - `staged:tivit` is `-Plains +Anointed Procession`
 

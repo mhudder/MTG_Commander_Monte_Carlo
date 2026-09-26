@@ -1282,7 +1282,7 @@ class Game(BaseGame):
             "erebos_creature_turns": 0,   # turns Erebos was devotion-live
             # Treasures as mana (§0z64). No card in the committed list makes
             # one; Pitiless Plunderer is the candidate that does.
-            "treasures_made": 0, "treasures_spent": 0,
+            "treasures_made": 0, "treasures_spent": 0, "vault_activations": 0,
         })
         self.damage_by_turn: list[float] = []
         # Treasure tokens on the battlefield. A count, not permanents: nothing
@@ -1706,6 +1706,48 @@ def rendmaw_mana(g) -> "ManaUnits":
         units.append(TREASURE_UNIT)
         units.owners[-1] = TreasureMana(g)
     return units
+
+
+def treasure_vault(g) -> None:
+    """Treasure Vault (Scryfall, verified 2026-09-26, §0z68):
+
+        Artifact Land.  {T}: Add {C}.
+        {X}{X}, {T}, Sacrifice this land: Create X Treasure tokens.
+
+    THE POLICY, a pilot's and a knob: at the end of your turn, with the mana
+    you did not use, crack it for the largest X the untapped sources pay --
+    but only if that makes at least `vault_min_treasures` (4) Treasures
+    AFTER the token doublers. Without a doubler it trades 2X mana and a land
+    for X one-shot mana, which is a bad trade except to bank a big next
+    turn; with Primal Vigor it breaks even and fixes colours; with Parallel
+    Lives as well it is profit. The Vault's own {C} is not available: the
+    {T} is part of the cost. Treasures do not pay for it -- turning Treasures
+    into Treasures is nothing.
+
+    A FLOOR in one place: the pilot does not hold the Vault back during the
+    main phase, and `can_pay` spends a colourless land early (§0z64: least
+    flexible first), so on a turn it was tapped for mana it is only a land.
+    """
+    vault = next((p for p in g.board if p.card.name == "Treasure Vault"
+                  and not p.tapped), None)
+    if vault is None:
+        return
+    vault.tapped = True                 # the {T} in the cost
+    units = available_mana(g)
+    x = len(units) // 2
+    if x <= 0 or x * token_doublings(g) < g.cfg.get("vault_min_treasures", 4):
+        vault.tapped = False
+        return
+    pay = can_pay({"gen": 2 * x}, units)
+    if pay is None:
+        vault.tapped = False
+        return
+    spend(g, pay, units)
+    g.board.remove(vault)
+    g.graveyard.append(vault.card)
+    g.artifact_died(vault.card)
+    g.make_treasures(x)
+    g.m["vault_activations"] += 1
 
 
 def tap_treasures(units, pay) -> None:
@@ -2741,6 +2783,7 @@ def take_turn(g: Game):
     activations(g)                  # Skullclamp, Idol, sac outlets
     play_land(g)                    # second drop (Dryad) once we know our needs
     main_phase(g)                   # deploy the rest postcombat
+    treasure_vault(g)               # spare mana into Treasures, §0z68
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)

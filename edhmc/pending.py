@@ -851,7 +851,7 @@ MEASURED: list[Candidate] = [
             'list as it is today.'),
         verdict=('Significant at both horizons against a cut whose own row is evidence'
             ', and CURRENT -- the cleanest of the eight. No rival has been measur'
-            'ed for that slot.'),
+            'ed for that slot. STAGED BY THE OWNER 2026-09-26 (§0z69): see CHANGES.'),
     ),
     # QUEUED ITEM 0c, answered 2026-09-25 (§0z53).
     Candidate(
@@ -883,7 +883,7 @@ MEASURED: list[Candidate] = [
             'better). results/restage_20260926.txt.' ' RE-MEASURED AGAIN AFTER §0z62: -Blasphemous Act +Goldspan +0.0135 +-0.0025 / +0.0165 +-0.0045; -Lightning Greaves +Goldspan +0.0002 +-0.0018 / +0.0048 +-0.0036; in Caldera\'s slot -0.0029 / -0.0091. CURRENT. results/restage_20260926.txt.'),
         verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
             'Act\'s slot, significant at both horizons, with the cut\'s blind half '
-            'said out loud. Staging is the owner\'s call.'),
+            'said out loud. STAGED BY THE OWNER 2026-09-26 (§0z69): see CHANGES.'),
     ),
     Candidate(
         deck='karlov',
@@ -1817,6 +1817,7 @@ CHANGES: list[Change] = [
             'P was not, and still needs re-measuring on the new baseline before '
             'it is committed.'
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Citadel staged on both sides), N=15,000 paired: +0.0255 +-0.0028 at T10, +0.0266 +-0.0035 at T20. The staging stands. THE ALTERNATIVE CUT, measured the same run: -Swiftfoot Boots +Bloodthirsty Conqueror +0.0278 / +0.0341, and the two cuts compared directly (Boots minus Soulmender, same card) +0.0023 +-0.0038 at T10, +0.0075 +-0.0047 at T20 -- still the better cut at T20, by less than the +0.0125 measured on the old baseline. results/restage_20260926.txt."
+            " THE OWNER DECIDED, 2026-09-26: SOULMENDER STAYS THE CUT. The Boots remain because in an interaction-heavy pod the shroud does real work that this model cannot fully see (the pod's removal is a roll against an abstract board, §4). A judgement about the owner's table outranking a +0.0075 +-0.0047 edge at T20 that is inside its bar at T10."
         ),
     ),
     Change(
@@ -2249,6 +2250,52 @@ CHANGES: list[Change] = [
             "results/lorehold_pair_approach.txt."
             " AND AGAIN AFTER §0z62: Sunbird's GIVEN Caldera +0.0023 +-0.0017 at T10, +0.0153 +-0.0031 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
         ),
+    ),
+    # The owner's decisions of 2026-09-26 (§0z69). Both re-measured the same
+    # day on the engine they will be rebuilt on.
+    Change(
+        deck="lorehold", remove="Blasphemous Act", add="Goldspan Dragon",
+        staged="2026-09-26",
+        rationale=(
+            "Queued item 0c. Goldspan beats both cuts history named and loses "
+            "only to Caldera Pyremaw for Caldera's own slot; the Act is the "
+            "better of the two cuts, significant at both horizons in every "
+            "measurement since §0z53. The owner staged it."),
+        evidence=(
+            "RE-MEASURED 2026-09-26 on the final §0z67 engine (commander "
+            "damage, the aimed commander, the aware defender, known_win_focus "
+            "0.8), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, "
+            "+0.0137 +-0.0046 at T20. On the engine without the aim: +0.0132 / "
+            "+0.0137. results/aim_vault_swaps_20260926.txt "
+            "(diagnostics/run_aim_vault_swaps.py). History: §0z53 +0.0162 at "
+            "T20, §0z63 +0.0119, after §0z62 +0.0165."),
+        cut_unmeasured=(
+            "Blasphemous Act is PARTLY MODELLED -- a symmetric wipe whose cost "
+            "to you is faithful and whose BENEFIT (the opponents' boards) is "
+            "an abstract creature count. The head-to-head is therefore "
+            "uncertain in the Act's favour by whatever the real wipe does "
+            "that the count does not. Staged anyway on the owner's judgement "
+            "that the Act does not do more at their table than the model "
+            "credits; said out loud here, as §0z31 requires."),
+    ),
+    Change(
+        deck="shilgengar", remove="Vampiric Rites", add="Lyra, Archangel of Dawn",
+        staged="2026-09-26",
+        rationale=(
+            "Measured 2026-09-21 in the Reality Fracture batch and recorded as "
+            "the cleanest of its eight: significant at both horizons against a "
+            "cut whose own row is genuinely negative. The owner staged it."),
+        evidence=(
+            "RE-MEASURED 2026-09-26 on the final §0z67 engine, N=15,000 "
+            "paired: +0.0026 +-0.0008 at T10, +0.0123 +-0.0027 at T20 (the "
+            "same on the engine without the aim). "
+            "results/aim_vault_swaps_20260926.txt. First measured +0.0025 / "
+            "+0.0121 (results/fra_batch2.txt)."),
+        notes=(
+            "PREVIEW TEXT. Lyra is a Reality Fracture card and the set "
+            "releases 2026-10-02; the card was implemented from preview text. "
+            "Re-fetch its oracle text from Scryfall on release, and re-measure "
+            "if a word has changed, BEFORE this is committed."),
     ),
 ]
 

@@ -186,6 +186,12 @@
         "evidence": "check_unchanged_decks at N=400, 4591d8a vs the \u00a70z64/\u00a70z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.",
         "fingerprint": "f6b82e6775f69db1",
         "utc": "2026-09-26T17:12:39Z"
+      },
+      {
+        "commit": "2b9fff4",
+        "evidence": "check_unchanged_decks at N=400, HEAD 2b9fff4 vs the \u00a70z67/\u00a70z68/\u00a70z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.",
+        "fingerprint": "75a231f588b8fac9",
+        "utc": "2026-09-26T21:54:38Z"
       }
     ]
   },

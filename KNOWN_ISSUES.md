@@ -115,6 +115,9 @@ Methodology that used to live at the end of this file is now
 | [0z64](#0z64) | FIXED | **Rendmaw has Treasures, and Pitiless Plunderer is measured**: a blank, +0.0014 ±0.0017 at T20. It does not rescue Ashnod's Altar (−0.0017 → −0.0012, sacrifices unmoved). The engine costs the committed list nothing (bit-identical) |
 | [0z65](#0z65) | FIXED | **Commander damage (CR 104.3j) is modelled, for your commander**: lorehold +0.0137 ±0.0036 at T20 and 0.49 commander-damage kills a game; shilgengar +0.0071; karlov and tivit kill more opponents and win no more; azusa bit-identical |
 | [0z66](#0z66) | FIXED | **Triage tiers 0 and 2 built** (item 23): 56 cards the screen calls blind play IDENTICALLY to a matched blank, and that exact test replaced the significance one, which failed 32 times on §0j's constants. **33 KNOWN_BLIND cards are acted on by the engine** -- the label is too strong |
+| [0z67](#0z67) | FIXED | **The commander is aimed, and the defender knows 104.3j.** The first aim walked the commander into the block the aware defender now makes; aiming only where it gets through is +0.0009 for karlov and inside its bar elsewhere. "focus" costs win rate in three decks. Known-win focus 1.0 → 0.8 (the owner's): lorehold +0.0102 |
+| [0z68](#0z68) | FIXED | **Treasure Vault's activation is implemented** (rendmaw): 0.07 cracks a game, inside its bar at every threshold |
+| [0z69](#0z69) | MEASURED | **The owner's decisions of 2026-09-26**: Soulmender stays karlov's cut; −Blasphemous Act +Goldspan (+0.0137 ±0.0046) and −Vampiric Rites +Lyra (+0.0123 ±0.0027) are STAGED, re-measured on the final engine |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7468,6 +7471,102 @@ the derivation finds a channel for, splits them in two:
 
 Not built, and still proposals in `docs/LEDGER_STATES.md`: PREPARED, and
 splitting `Change` into SIMULATED + STAGED.
+
+## 0z67. FIXED — the commander is aimed, and the defender knows 104.3j
+
+§0z65 taught neither side about commander damage: the pilot put the commander
+wherever its power sorted in the life-damage plan, and a defender on 16 blocked
+by power per blocker as if 21 did not exist. Two knobs, both in `opponents.py`:
+
+- **`commander_block_aware`** (default on). `commander_must_block`: a defender
+  the commander would take to 21 blocks it FIRST (a priority element on
+  `chump`'s items). Commander damage is public, so this is the rules-true
+  defender. **It is not a pilot policy and win rate does not choose it** -- it
+  costs rendmaw -0.0003 and shilgengar -0.0004 at T20, both inside their bars.
+- **`commander_aim`** (default "lethal"). `commander_target`: "off" is §0z65;
+  "lethal" sends the commander at the opponent with the most life among those
+  it would take to 21; "focus" also keeps hitting whoever already has the most
+  commander damage. An aimed commander is taken out of the life plan and added
+  to its target's group, where it meets that defender's real blocks.
+
+**THE FIRST "LETHAL" WAS A POLICY THE AWARE DEFENDER BROKE ON CONTACT.** It
+aimed at any opponent the hit would kill, without asking whether the
+commander would get through -- and the aware defender blocks exactly that
+commander. Karlov aimed 1.1 times a game into a chump block, lost the
+commander from the life plan, and killed -0.0051 +-0.0028 FEWER players
+(`results/aim_vault_swaps_20260926_first.txt`). The same shape as §0z42: a
+rule that makes a new outcome possible (here, a block the pilot must expect)
+turns the old policy into a claim about it, and measuring the naive pilot is
+what found it. **Fixed by `commander_gets_through`**, which asks the same
+`damage_through` the resolution uses, so probe and combat cannot disagree.
+
+Re-measured, N=15,000 paired (`diagnostics/run_aim_vault_swaps.py`,
+`results/aim_vault_swaps_20260926.txt`), each step against the one before:
+
+| deck | aware − unaware (T20) | lethal − off (T10 / T20) | focus − lethal (T20) |
+|---|---|---|---|
+| rendmaw | -0.0003 ±0.0004 | +0.0000 / -0.0001 | -0.0001 ±0.0004 |
+| lorehold | +0.0000 | -0.0003 / -0.0001 | **-0.0013 ±0.0007** |
+| karlov | +0.0000 | **+0.0006 ±0.0006** / +0.0009 ±0.0012 | -0.0001 |
+| tivit | +0.0000 | -0.0002 / -0.0001 | **-0.0008 ±0.0005** |
+| shilgengar | -0.0004 ±0.0004 | -0.0003 / -0.0006 ±0.0007 | **-0.0014 ±0.0008** |
+
+**"lethal" is the default**: never significantly worse, and karlov's
+commander kills rise 0.073 -> 0.095 a game (+0.0087 +-0.0023 players). It
+changes little elsewhere because a 5/5 flier (lorehold) already reaches the
+right player most of the time. **"focus" is measurably worse in three decks**:
+it spends the commander on progress toward 21 instead of on the life plan,
+-0.0026 +-0.0009 players killed in lorehold. The real pilot's habit loses to
+the plan here.
+
+**Known-win focus, 1.0 -> 0.8, the owner's** ("the whole table will gang up,
+but it's not 100 percent foolproof"): lorehold **+0.0026 +-0.0010 at T10,
++0.0102 +-0.0019 at T20** against 1.0. A judgement about the owner's pod, and
+the single largest move in this batch.
+
+Pinned by `tests/test_commander_aim.py`, 10 cases and 5 mutations; one
+mutation was wrong on its first run (it removed the awareness gate as well as
+the rule it named) and is kept in the file.
+
+## 0z68. FIXED — Treasure Vault's activation (rendmaw)
+
+> Treasure Vault — Artifact Land. {T}: Add {C}. {X}{X}, {T}, Sacrifice this
+> land: Create X Treasure tokens. (Scryfall, verified 2026-09-26.)
+
+The activation was unimplemented; §0z64 built the Treasures it needs.
+`engine.treasure_vault`, at the end of your turn: crack it for the largest X
+the untapped sources pay -- its own {C} excluded, since the {T} is part of the
+cost, and never paid with Treasures -- if that makes at least
+`vault_min_treasures` (4) AFTER the doublers. Without a doubler it trades 2X
+mana and a land for X one-shot mana; with Primal Vigor it breaks even and
+fixes colours. A FLOOR: the pilot does not hold the Vault back during the
+main phase, so on a turn it tapped for mana it is only a land.
+
+Measured on the §0z67 engine against never cracking it: threshold 4 (the
+default) **-0.0001 +-0.0006** at T20, 0.072 cracks a game; threshold 2
++0.0007 +-0.0010 (0.127); threshold 6 +0.0000 (0.019). **Inside its bar at
+every setting** -- the default is a judgement, said out loud, and the card is
+still a land that sometimes banks a turn. Pinned in `tests/test_treasures.py`
+(cases L-O, two new mutations; the doubling mutation's set grew to include N).
+
+## 0z69. MEASURED — the owner's decisions of 2026-09-26
+
+- **Karlov: Soulmender stays the cut** for Bloodthirsty Conqueror. The Boots
+  are the better cut by +0.0075 +-0.0047 at T20 (§0z63), inside the bar at
+  T10; the owner keeps them because in an interaction-heavy pod the shroud
+  does real work this model cannot fully see (§4). Recorded on the Change.
+- **Lorehold: -Blasphemous Act +Goldspan Dragon, STAGED.** Re-measured on the
+  final engine: **+0.0129 +-0.0026 at T10, +0.0137 +-0.0046 at T20**. The Act
+  is PARTLY MODELLED and the Change says so in `cut_unmeasured`.
+- **Shilgengar: -Vampiric Rites +Lyra, Archangel of Dawn, STAGED.**
+  **+0.0026 +-0.0008 / +0.0123 +-0.0027**. Lyra is PREVIEW TEXT until
+  Reality Fracture releases on 2026-10-02; re-check before committing.
+- **`known_win_focus` 0.8** -- measured in §0z67.
+
+Both swaps measured the same on the engine without the aim, so neither rests
+on §0z67's default. Staging changes `build_pending`, so lorehold's and
+shilgengar's tables were rebuilt -- and with §0z67 and §0z68 moving five
+baselines, all five in one batch.
 
 ## How to read an ablation table
 

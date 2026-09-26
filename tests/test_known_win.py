@@ -7,7 +7,7 @@
 Approach of the Second Sun, once it has resolved and gone seventh from the top,
 is a win the whole table knows about. Lorehold sets `g.known_win` to its name;
 `opponents.known_win_share` then floors your share of the pod's removal and
-kills at `known_win_focus` (default 1.0), and `opponents.counter_threat`
+kills at `known_win_focus` (default 0.8, the owner's; was 1.0), and `opponents.counter_threat`
 treats a recast of that card as maximum threat.
 
 CASES
@@ -130,7 +130,7 @@ def main() -> int:
 
     def as_cap(g, s):
         if getattr(g, "known_win", None):
-            return g.cfg.get("known_win_focus", 1.0)
+            return g.cfg.get("known_win_focus", 0.8)
         return s
 
     def approach_silent(g, card, is_copy, was_cast, from_hand):

@@ -295,10 +295,12 @@ def known_win_share(g, share: float) -> float:
     and every opponent's kill is pointed at the player about to win.
     `known_win_focus` is the floor this puts under your share of the pod's
     attention. THE KNOB IS A JUDGEMENT, NOT A CALIBRATION, and its sweep is
-    in §0z62. Nothing in any other engine sets `known_win`, so their shares
-    are untouched."""
+    in §0z62. The default is 0.8, the OWNER'S (2026-09-26, §0z67): "the
+    whole table will gang up, but it's not 100 percent foolproof" -- it was
+    1.0 when §0z62 shipped. Nothing in any other engine sets `known_win`, so
+    their shares are untouched."""
     if getattr(g, "known_win", None):
-        return max(share, g.cfg.get("known_win_focus", 1.0))
+        return max(share, g.cfg.get("known_win_focus", 0.8))
     return share
 
 
@@ -751,7 +753,11 @@ def chump(items, budget, blocked=None):
     carrying a key changes no order.
     """
     stopped, used = 0.0, 0
-    for it in sorted(items, key=lambda it: (it[0] / it[1], it[0]),
+    # An optional fourth element is a PRIORITY that outranks power per
+    # blocker: a defender one hit from 21 commander damage blocks the
+    # commander first (`commander_must_block`, §0z67).
+    for it in sorted(items, key=lambda it: ((it[3] if len(it) > 3 else 0),
+                                            it[0] / it[1], it[0]),
                      reverse=True):
         power, cost = it[0], it[1]
         if used + cost <= budget:
@@ -818,7 +824,8 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
 
     fly, ground = [], []
     for k, p in enumerate(attackers):
-        item = (g.power_of(p), 2 if menace_of(g, p) else 1, k)
+        item = (g.power_of(p), 2 if menace_of(g, p) else 1, k,
+                1 if commander_must_block(g, p, defender) else 0)
         (fly if flying_of(g, p) else ground).append(item)
 
     # A defender spends its flying-capable blockers on the biggest fliers, then
@@ -860,6 +867,72 @@ def commander_damage_lethal(g, o) -> bool:
     same rule pointed at you is not modelled (their clocks stand in for how
     they win)."""
     return o.cmdr_damage >= 21
+
+
+def commander_must_block(g, perm, defender) -> bool:
+    """A defender this commander would take to 21 blocks it FIRST (§0z67).
+
+    Commander damage is public: a player on 16 facing a 5-power commander
+    chumps it before anything else, whatever else is attacking.
+    `commander_block_aware=False` is §0z65's defender, who blocks by power
+    per blocker and does not know."""
+    if not g.cfg.get("commander_block_aware", True) or defender is None:
+        return False
+    if perm.card is not getattr(g, "commander", None):
+        return False
+    if not g.cfg.get("commander_damage", True):
+        return False
+    return defender.cmdr_damage + g.power_of(perm) >= 21
+
+
+def commander_target(g, attackers, alive):
+    """(commander, defender) when the pilot AIMS the commander (§0z67).
+
+    `commander_aim`:
+      "off"     §0z65: the commander goes wherever its power sorts in the
+                life-damage plan.
+      "lethal"  if its hit takes someone to 21, it goes at them -- the one
+                with the MOST life, the kill life damage is furthest from.
+      "focus"   "lethal", and otherwise it keeps hitting whoever already has
+                the most commander damage (the least life on a tie): a real
+                pilot's habit, paid for in life damage the plan does not get.
+    An aimed commander is taken OUT of the life-damage plan and added to its
+    target's group, where it meets that defender's real blocks.
+
+    ONLY WHERE IT GETS THROUGH. A candidate counts only if `damage_through`
+    lets the commander past THAT defender's blocks on its own -- the same
+    function the resolution calls, so the probe and the combat cannot
+    disagree, and it rolls nothing. The first version skipped this and was
+    measured: with `commander_block_aware` on, a defender one hit from 21
+    blocks the commander first, so "lethal" aimed karlov's commander 1.1
+    times a game into a chump block, took it out of the life plan, and
+    killed FEWER players (§0z67).
+    """
+    mode = g.cfg.get("commander_aim", "lethal")
+    if mode == "off" or not g.cfg.get("commander_damage", True):
+        return None, None
+    cmdr = next((p for p in attackers
+                 if p.card is getattr(g, "commander", None)), None)
+    if cmdr is None or g.power_of(cmdr) <= 0:
+        return None, None
+    pw = g.power_of(cmdr)
+    lethal = [o for o in alive if o.cmdr_damage + pw >= 21
+              and commander_gets_through(g, cmdr, o)]
+    if lethal:
+        return cmdr, max(lethal, key=lambda o: o.life)
+    if mode == "focus":
+        hit = [o for o in alive if o.cmdr_damage > 0
+               and commander_gets_through(g, cmdr, o)]
+        if hit:
+            return cmdr, max(hit, key=lambda o: (o.cmdr_damage, -o.life))
+    return None, None
+
+
+def commander_gets_through(g, cmdr, defender) -> bool:
+    """Would the commander, attacking this defender alone, be unblocked?"""
+    through = []
+    damage_through(g, [cmdr], defender=defender, unblocked=through)
+    return cmdr in through
 
 
 
@@ -1105,10 +1178,14 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     if not alive:
         return 0.0
 
+    # An AIMED commander (§0z67) is planned separately: out of the life-damage
+    # plan here, into its target's group below.
+    cmdr, aim = commander_target(g, attackers, alive)
+
     # Ascending power, with prefix sums, so the test above is O(log n).
     # `scale` multiplies each attacker here rather than the total afterwards,
     # so the plan is drawn on the same numbers the resolution will produce.
-    pool = sorted(attackers, key=g.power_of)
+    pool = sorted((p for p in attackers if p is not cmdr), key=g.power_of)
     pre = [0.0]
     for p in pool:
         pre.append(pre[-1] + g.power_of(p) * scale)
@@ -1142,11 +1219,19 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         # left over. It has to attack somebody; pile it on the last group.
         plan[-1][2] = n
 
+    groups = [[opp, pool[lo:hi]] for opp, lo, hi in plan]
+    if cmdr is not None:
+        mine = next((grp for grp in groups if grp[0] is aim), None)
+        if mine is None:
+            groups.append([aim, [cmdr]])
+        else:
+            mine[1] = mine[1] + [cmdr]
+
     before_alive = len(living(g))
     effective, raw = 0.0, 0.0
-    for slot, (opp, lo, hi) in enumerate(plan):
+    for slot, (opp, group) in enumerate(groups):
         through = []
-        dealt = damage_through(g, pool[lo:hi], defender=opp,
+        dealt = damage_through(g, group, defender=opp,
                                unblocked=through) * scale
         # 104.3j: the commander's unblocked power, from the same blocks
         # (§0z65). Before the `dealt <= 0` skip, though a commander that got
@@ -1166,7 +1251,9 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     _check_eliminations(g)
     g.m["raw_damage"] += raw
     g.m["combat_kills"] += before_alive - len(living(g))
-    g.m["attack_targets"] += len(plan)
+    g.m["attack_targets"] += len(groups)
+    if cmdr is not None:
+        g.m["commander_aimed"] += 1
     return effective
 
 

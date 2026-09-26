@@ -1,0 +1,50 @@
+COMMANDER: each step against the one before (paired, 95% CI; * = outside)
+ rendmaw
+  B-A  the defender knows 104.3j                T10 +0.0000 ±0.0000    T20 -0.0003 ±0.0004 
+  C-B  aim lethal                               T10 +0.0000 ±0.0000    T20 -0.0001 ±0.0002 
+  D-C  aim focus instead                        T10 +0.0001 ±0.0002    T20 -0.0001 ±0.0004 
+  C-A  the new defaults, all told               T10 +0.0000 ±0.0000    T20 -0.0005 ±0.0004*
+                                                cmdr kills a game T20: A 0.005  B 0.003  C 0.003  D 0.003
+ lorehold
+  B-A  the defender knows 104.3j                T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000 
+  C-B  aim lethal                               T10 -0.0003 ±0.0003    T20 -0.0001 ±0.0005 
+  D-C  aim focus instead                        T10 -0.0010 ±0.0006*   T20 -0.0013 ±0.0007*
+  C-A  the new defaults, all told               T10 -0.0003 ±0.0003    T20 -0.0001 ±0.0005 
+                                                cmdr kills a game T20: A 0.491  B 0.491  C 0.491  D 0.490
+ karlov
+  B-A  the defender knows 104.3j                T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0002 
+  C-B  aim lethal                               T10 +0.0006 ±0.0006*   T20 +0.0009 ±0.0012 
+  D-C  aim focus instead                        T10 +0.0000 ±0.0000    T20 -0.0001 ±0.0001 
+  C-A  the new defaults, all told               T10 +0.0006 ±0.0006*   T20 +0.0009 ±0.0012 
+                                                cmdr kills a game T20: A 0.074  B 0.073  C 0.095  D 0.095
+ tivit
+  B-A  the defender knows 104.3j                T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000 
+  C-B  aim lethal                               T10 -0.0002 ±0.0002    T20 -0.0001 ±0.0003 
+  D-C  aim focus instead                        T10 -0.0005 ±0.0003*   T20 -0.0008 ±0.0005*
+  C-A  the new defaults, all told               T10 -0.0002 ±0.0002    T20 -0.0001 ±0.0003 
+                                                cmdr kills a game T20: A 0.065  B 0.065  C 0.065  D 0.065
+ shilgengar
+  B-A  the defender knows 104.3j                T10 +0.0000 ±0.0000    T20 -0.0004 ±0.0004 
+  C-B  aim lethal                               T10 -0.0003 ±0.0003    T20 -0.0006 ±0.0007 
+  D-C  aim focus instead                        T10 -0.0001 ±0.0001    T20 -0.0014 ±0.0008*
+  C-A  the new defaults, all told               T10 -0.0003 ±0.0003    T20 -0.0010 ±0.0008*
+                                                cmdr kills a game T20: A 0.192  B 0.186  C 0.186  D 0.186
+
+TREASURE VAULT (rendmaw, on C)
+  threshold 4 (default) - never                 T10 +0.0000 ±0.0000    T20 -0.0001 ±0.0006 
+  threshold 2 - never                           T10 -0.0003 ±0.0003*   T20 +0.0007 ±0.0010 
+  threshold 6 - never                           T10 -0.0002 ±0.0002    T20 +0.0000 ±0.0004 
+  R_v2         activations a game T20 0.127, treasures 0.412
+  rendmaw_C    activations a game T20 0.072, treasures 0.339
+  R_v6         activations a game T20 0.019, treasures 0.130
+
+KNOWN-WIN FOCUS (lorehold, on C)
+  0.8 (owner) - 1.0                             T10 +0.0026 ±0.0010*   T20 +0.0102 ±0.0019*
+
+THE TWO APPROVED SWAPS, on C
+  lorehold -Blasphemous Act +Goldspan           T10 +0.0129 ±0.0026*   T20 +0.0137 ±0.0046*
+  shilgengar -Vampiric Rites +Lyra              T10 +0.0026 ±0.0008*   T20 +0.0123 ±0.0027*
+
+THE SAME SWAPS, commander not aimed (on B)
+  lorehold -Blasphemous Act +Goldspan           T10 +0.0132 ±0.0026*   T20 +0.0137 ±0.0046*
+  shilgengar -Vampiric Rites +Lyra              T10 +0.0026 ±0.0008*   T20 +0.0123 ±0.0027*

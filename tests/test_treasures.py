@@ -2,7 +2,7 @@
 """Treasures as mana in rendmaw, and Pitiless Plunderer (§0z64).
 
     python -m tests.test_treasures
-    python -m tests.test_treasures --mutate   # 6 mutations, exact sets
+    python -m tests.test_treasures --mutate   # 7 mutations, exact sets
 
     Pitiless Plunderer {3}{B} 1/4  (Scryfall, verified 2026-09-16)
     Whenever another creature you control dies, create a Treasure token.
@@ -29,12 +29,19 @@ CASES
   I  Skullclamp's loop, paid with a Treasure, spends it (`tap_treasures`)
   J  making a Treasure counts as making a token (Idol of Oblivion)
   K  NEIGHBOUR: `make_tokens` still doubles under Parallel Lives
+  L  Treasure Vault (§0z68) with 8 untapped Swamps, no doubler: X=4, four
+     Treasures, the Vault in the graveyard, every Swamp tapped
+  M  with 7 Swamps: X=3 (its own {C} is part of the cost), under the
+     threshold of 4 -- not cracked, and left untapped
+  N  with 4 Swamps and Primal Vigor: X=2, doubled to 4 -- cracked
+  O  with no lands and 10 Treasures: not cracked -- Treasures do not pay
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the Plunderer does not trigger (plunderer_count 0)   -> B, D
   Treasures are not mana (rendmaw_mana = available_mana) -> F, G, H, I
   tapping a Treasure does not sacrifice it              -> F, G, H, I
-  token doubling ignored                                -> D, K
+  token doubling ignored                                -> D, K, N
+  the Vault never fires                                 -> L, N
   Skullclamp does not spend its Treasure                -> I
   a Treasure is not a token (Idol of Oblivion)          -> J
 
@@ -50,6 +57,7 @@ UNMUTATED, and written down (§0z15): A is the property that the committed
 list (which makes no Treasures) is unchanged; C is an absence that falls out
 of the Plunderer having left the board, with no seam; E's protection is
 can_pay's flexibility rule, shared by every engine and pinned elsewhere.
+M and O are gates inside `treasure_vault` with no seam of their own.
 """
 import random
 import sys
@@ -168,6 +176,27 @@ def run_cases():
     g.make_tokens(1, 1, 1, "Saproling")
     check("K NEIGHBOUR: make_tokens doubles under Parallel Lives",
           g.m["tokens_made"], 2)
+    def vault(swamps, *extra, treasures=0):
+        g = game(card("Treasure Vault"), *extra,
+                 *[land("Swamp", "B") for _ in range(swamps)],
+                 treasures=treasures)
+        EN.treasure_vault(g)
+        v = next((p for p in g.board if p.card.name == "Treasure Vault"), None)
+        return g, v
+    g, v = vault(8)
+    check("L 8 Swamps: four Treasures, Vault gone, Swamps tapped",
+          (g.treasures, v is None, g.m["vault_activations"],
+           all(p.tapped for p in g.board if p.card.name == "Swamp")),
+          (4, True, 1, True))
+    g, v = vault(7)
+    check("M 7 Swamps: X=3 < 4, not cracked, untapped",
+          (g.treasures, v is not None and not v.tapped), (0, True))
+    g, v = vault(4, card("Primal Vigor"))
+    check("N 4 Swamps + Primal Vigor: X=2 doubled to 4, cracked",
+          (g.treasures, v is None), (4, True))
+    g, v = vault(0, treasures=10)
+    check("O no lands, 10 Treasures: not cracked", (g.treasures, v is not None),
+          (10, True))
     return set(FAIL)
 
 
@@ -195,7 +224,9 @@ def main() -> int:
             ({"F", "G", "H", "I"}, EN.TreasureMana, "tapped",
              property(lambda self: self.used, lambda self, v: None)),
         "token doubling ignored":
-            ({"D", "K"}, EN, "token_doublings", lambda g: 1),
+            ({"D", "K", "N"}, EN, "token_doublings", lambda g: 1),
+        "the Vault never fires":
+            ({"L", "N"}, EN, "treasure_vault", lambda g: None),
         "Skullclamp does not spend its Treasure":
             ({"I"}, EN, "tap_treasures", lambda units, pay: None),
         "a Treasure is not a token":
