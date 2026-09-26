@@ -268,9 +268,9 @@
     ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "4610664e815a185e",
-    "built_commit": "c9e83a1",
-    "built_utc": "2026-09-22T18:33:35Z",
+    "built_at": "d5bf8b0c478857b4",
+    "built_commit": "dc4f20c",
+    "built_utc": "2026-09-26T03:19:04Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -376,22 +376,29 @@
             "utc": "2026-09-22T13:52:17Z"
           }
         ]
-      }
-    ],
-    "verified": [
-      {
-        "commit": "2128a3b",
-        "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "3fc23da7e6f0cf52",
-        "utc": "2026-09-22T20:58:42Z"
       },
       {
-        "commit": "a76cd5b",
-        "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
-        "fingerprint": "f901d47e8e90d847",
-        "utc": "2026-09-25T13:03:56Z"
+        "built_at": "4610664e815a185e",
+        "built_commit": "c9e83a1",
+        "built_utc": "2026-09-22T18:33:35Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "2128a3b",
+            "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "3fc23da7e6f0cf52",
+            "utc": "2026-09-22T20:58:42Z"
+          },
+          {
+            "commit": "a76cd5b",
+            "evidence": "2026-09-25: two SHARED files changed. (1) opponents.py -- Voice of the Blessed's ten-counter indestructible (\u00a70z46), a behaviour change in karlov only: check_unchanged_decks vs a76cd5b is BIT-IDENTICAL on all 8 metrics for this deck, which holds no Voice. (2) tools/ablation.py -- the \u00a70z24 FLIP gate, a RENDERING change: this deck's committed table was re-rendered from this cache and diffed, and 0 rows changed any number in any column; only FLIP labels moved, as \u00a70z24 predicted. Both questions from CLAUDE.md's 'more than one right check' table answered with the check that fits each.",
+            "fingerprint": "f901d47e8e90d847",
+            "utc": "2026-09-25T13:03:56Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "402f286dafb68785",
