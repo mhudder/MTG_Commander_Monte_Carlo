@@ -7295,9 +7295,11 @@ both sides -- N=15,000 paired (`diagnostics/run_restage.py`,
 **All six staged swaps stand**, each significant at T20. The karlov cut
 question (§0z36) is still answered the same way and by less: the Boots are the
 better cut by +0.0075 at T20, inside the bar at T10, where it was +0.0125 on
-the old baseline. Lorehold's two stagings were re-measured on 2026-09-25 after
-§0z55. **The lorehold rows here predate §0z62**, which moved that deck again;
-the ledger says so on each.
+the old baseline. **Re-measured again after §0z62** (d603578): −Blasphemous Act
++Goldspan **+0.0135 ±0.0025 / +0.0165 ±0.0045**, still significant at both;
+−Greaves +0.0002 / +0.0048; Caldera still holds the five-drop slot (−0.0091);
+and lorehold's two stagings, Caldera GIVEN Sunbird's +0.0226 ±0.0027 and
+Sunbird's GIVEN Caldera +0.0153 ±0.0031 at T20, both stand.
 
 ## How to read an ablation table
 

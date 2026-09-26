@@ -897,8 +897,8 @@ is half answered**: the ordering half is built and measured as a null
     significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
     T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
     estimate, so that swap cuts a card the model half-sees. Re-measured on
-    the rebuilt baseline (§0z63): −Act +Goldspan +0.0143 / +0.0119, still
-    significant at both horizons -- but before §0z62 moved lorehold again.
+    the current engine (§0z63, after §0z62): −Act +Goldspan +0.0135 /
+    +0.0165, still significant at both horizons.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

@@ -868,7 +868,7 @@ MEASURED: list[Candidate] = [
             '/ +0.0119 +-0.0047 (still significant at both horizons, smaller at '
             'T20); -Lightning Greaves +Goldspan +0.0011 +-0.0018 / +0.0064 +-0.0037 '
             '(T20 only); in Caldera\'s slot -0.0030 / -0.0087 (Caldera still '
-            'better). results/restage_20260926.txt.' ' MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold\'s baseline -0.035 and Approach\'s row +0.0666 -> +0.0265. Not restated.'),
+            'better). results/restage_20260926.txt.' ' RE-MEASURED AGAIN AFTER §0z62: -Blasphemous Act +Goldspan +0.0135 +-0.0025 / +0.0165 +-0.0045; -Lightning Greaves +Goldspan +0.0002 +-0.0018 / +0.0048 +-0.0036; in Caldera\'s slot -0.0029 / -0.0091. CURRENT. results/restage_20260926.txt.'),
         verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
             'Act\'s slot, significant at both horizons, with the cut\'s blind half '
             'said out loud. Staging is the owner\'s call.'),
@@ -2128,7 +2128,7 @@ CHANGES: list[Change] = [
             "Caldera GIVEN Sunbird's +0.0249 +-0.0028 at T20, +0.0056 "
             "+-0.0015 at T10. Larger, and the decision stands. "
             "results/lorehold_pair_approach.txt."
-            " MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold's baseline -0.035 and Approach's row +0.0666 -> +0.0265. Not restated."
+            " AND AGAIN AFTER §0z62 (the pod turns on you once Approach has resolved): Caldera GIVEN Sunbird's +0.0053 +-0.0015 at T10, +0.0226 +-0.0027 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
         ),
     ),
     Change(
@@ -2208,7 +2208,7 @@ CHANGES: list[Change] = [
             "The decay queued as 0b-i is closed by §0z59: no single cause, "
             "net -0.0034 +-0.0035 since 2026-09-09. "
             "results/lorehold_pair_approach.txt."
-            " MEASURED BEFORE §0z62 (2026-09-26): the pod now turns on you once Approach has resolved, which moved lorehold's baseline -0.035 and Approach's row +0.0666 -> +0.0265. Not restated."
+            " AND AGAIN AFTER §0z62: Sunbird's GIVEN Caldera +0.0023 +-0.0017 at T10, +0.0153 +-0.0031 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
         ),
     ),
 ]
