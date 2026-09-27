@@ -1,0 +1,20 @@
+The 2026-09-27 rebuild after §0z67-§0z69 against the tables it replaced (git 4501246). A row "moved" when the change exceeds its OLD bar. Azusa was not rebuilt (bit-identical; cache VERIFIED).
+
+== lorehold: 65 rows; 13 moved beyond their old bar; 0 significant sign flips; 14 signal changes
+   Approach of the Second Sun             +0.0225+-0.0040 both -> +0.0331+-0.0040 both
+   Apex of Power                          +0.0153+-0.0035 both -> +0.0230+-0.0037 both
+   Monastery Mentor                       +0.0089+-0.0029 both -> +0.0136+-0.0030 both
+   Hit the Mother Lode                    +0.0116+-0.0033 both -> +0.0162+-0.0034 both
+   Promise of Loyalty                     -0.0055+-0.0035 both -> -0.0010+-0.0038  dmg
+   Mizzix's Mastery                       +0.0117+-0.0037 both -> +0.0157+-0.0037 both
+   The Dawning Archaic                    +0.0065+-0.0028 both -> +0.0101+-0.0028 both
+   Call Forth the Tempest                 -0.0001+-0.0009   -- -> +0.0028+-0.0015  win
+   Volcanic Vision                        +0.0045+-0.0026 both -> +0.0073+-0.0029 both
+   Goliath Daydreamer                     +0.0031+-0.0021 both -> +0.0057+-0.0024 both
+   Guttersnipe                            +0.0074+-0.0021 both -> +0.0099+-0.0020 both
+   Restoration Seminar                    +0.0001+-0.0005   -- -> +0.0022+-0.0013  win
+== rendmaw: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 3 signal changes
+== karlov: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 2 signal changes
+== tivit: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== shilgengar: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 5 signal changes
+== azusa: 58 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes

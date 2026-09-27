@@ -7568,6 +7568,24 @@ on §0z67's default. Staging changes `build_pending`, so lorehold's and
 shilgengar's tables were rebuilt -- and with §0z67 and §0z68 moving five
 baselines, all five in one batch.
 
+**The rebuild** (`results/rebuild_20260927_diff.txt`): lorehold moved 13 rows
+beyond their old bars, EVERY ONE UPWARD -- Approach +0.0225 -> +0.0331, Apex
+of Power +0.0153 -> +0.0230, Monastery Mentor, Hit the Mother Lode, Mizzix's
+Mastery -- the deck's big-spell engine valued more once the pod's reaction to
+Approach is 0.8 rather than total and the Act has left the list. No other deck
+moved a row beyond its bar, and no row flipped sign anywhere. Goldspan's own
+leave-one-out row is +0.0037 +-0.0025 and Lyra's +0.0095 +-0.0026 -- smaller
+than their swaps because a swap also counts what it cut.
+
+**THE REBUILD FAILED ON ITS FIRST ATTEMPT, AND THE LEDGER NOW CATCHES THAT.**
+Neither staged card had been classified in `tools/ablation.py`, and
+`check_scripted_coverage` refuses a table with an unclassified card -- so
+every lorehold attempt exited immediately while the watch waited for a
+`Traceback` that never came. Goldspan is PARTLY ("or becomes the target of a
+spell" is not modelled), Lyra SCRIPTED. `pending.check_staged_are_classified`
+runs the same check from the ledger, and was proved to fail on the unfixed
+tree before the fix.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not
