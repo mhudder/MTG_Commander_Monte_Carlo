@@ -202,9 +202,9 @@
     ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "a7e7b45e612fd50d",
-    "built_commit": "748e1c6",
-    "built_utc": "2026-09-26T18:25:50Z",
+    "built_at": "fe1e6f8df4b26788",
+    "built_commit": "6887c87",
+    "built_utc": "2026-09-27T00:09:31Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -316,6 +316,13 @@
             "utc": "2026-09-26T13:43:43Z"
           }
         ]
+      },
+      {
+        "built_at": "a7e7b45e612fd50d",
+        "built_commit": "748e1c6",
+        "built_utc": "2026-09-26T18:25:50Z",
+        "deck": "karlov",
+        "verified": []
       }
     ],
     "verified": []
