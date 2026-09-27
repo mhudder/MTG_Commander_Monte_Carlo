@@ -848,9 +848,9 @@
     ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "e946bd0864dce903",
-    "built_commit": "a34a9d6",
-    "built_utc": "2026-09-27T00:30:10Z",
+    "built_at": "a752697f456fae62",
+    "built_commit": "7db8cb9",
+    "built_utc": "2026-09-27T02:55:29Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -977,6 +977,13 @@
         "built_at": "63069375a4ad4dd3",
         "built_commit": "9be657f",
         "built_utc": "2026-09-26T18:46:40Z",
+        "deck": "tivit",
+        "verified": []
+      },
+      {
+        "built_at": "e946bd0864dce903",
+        "built_commit": "a34a9d6",
+        "built_utc": "2026-09-27T00:30:10Z",
         "deck": "tivit",
         "verified": []
       }
