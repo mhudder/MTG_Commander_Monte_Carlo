@@ -1,0 +1,16 @@
+RENDMAW'S OUTLETS PAY (paired, 95% CI; * = outside)
+  won: pay at end step - free             T10 -0.0008 ±0.0013    T20 -0.0023 ±0.0033 
+  won: pay before main - free             T10 -0.0078 ±0.0017*   T20 -0.0209 ±0.0039*
+  won: end step - before main             T10 +0.0070 ±0.0016*   T20 +0.0185 ±0.0039*
+  cards_drawn: end step - free            T10 -0.0313 ±0.0223*   T20 +0.0672 ±0.0361*
+  R_end    T20 a game: village_rites_cast 0.183, chef_activations 0.179, backwoods_activations 0.164
+  R_main   T20 a game: village_rites_cast 0.206, chef_activations 0.374, backwoods_activations 0.613
+  R_free   T20 a game: village_rites_cast 0.109, chef_activations 0.385, backwoods_activations 0.000
+
+TIME SIEVE'S REAL FUEL
+  won: combo - never                      T10 -0.0008 ±0.0007*   T20 +0.0014 ±0.0013*
+  won: cap - never                        T10 -0.0011 ±0.0008*   T20 -0.0006 ±0.0017 
+  won: combo - cap                        T10 +0.0003 ±0.0003*   T20 +0.0020 ±0.0012*
+  T_never  T20 a game: sieve_activations 0.428, sieve_real_fuel 0.000, extra_turns 0.740
+  T_combo  T20 a game: sieve_activations 0.455, sieve_real_fuel 0.041, extra_turns 0.767
+  T_cap    T20 a game: sieve_activations 0.464, sieve_real_fuel 0.078, extra_turns 0.775

@@ -117,7 +117,7 @@ class TivitGame(BaseGame):
             "treasures_spent": 0, "clues_cracked": 0,
             "blinks": 0, "deadeye_activations": 0, "combo_iterations": 0,
             "tivit_triggers": 0, "extra_turns": 0,
-            "sieve_activations": 0, "sieve_chain_max": 0,
+            "sieve_activations": 0, "sieve_chain_max": 0, "sieve_real_fuel": 0,
             # `extra_turns` is turns GRANTED; these two are what was actually
             # taken and how many rounds the pod got. The gap between granted and
             # taken is what the discarded-chain bug used to throw away.
@@ -269,26 +269,93 @@ def sacrifice_tokens(g, kind, n) -> int:
         per += 1.0                     # "whenever a token you control leaves"
     if g.has("Mirkwood Bats"):
         per += 1.0                     # "create OR sacrifice a token"
-    if g.has("Disciple of the Vault"):
-        # ONE opponent loses 1, carried as its share of an each-opponent
-        # total: this `living` is the real count of players the damage will be
-        # spread over and is NOT the pod-total divisor, so it stays.
-        per += 1.0 / max(1, len(OPP.living(g)))
+    per += disciple_share(g)
     if per:
         dmg = per * n * OPP.pod_size(g)          # see the Mirkwood site above
         g.deal_pod_damage(dmg)
         g.m["token_drain"] += dmg
+    artifact_left_drain(g, n)
+    if g.result == "win":
+        g.m["win_route"] = ROUTE_DRAIN
+    return n
+
+
+def disciple_share(g) -> float:
+    """Disciple of the Vault: "Whenever an artifact is put into a graveyard
+    from the battlefield, you may have target opponent lose 1 life." ONE
+    opponent loses 1, carried as its share of an each-opponent total: this
+    `living` is the real count of players the damage will be spread over and
+    is NOT the pod-total divisor, so it stays. One function for the token and
+    the real-artifact paths (§0z71)."""
+    if not g.has("Disciple of the Vault"):
+        return 0.0
+    return 1.0 / max(1, len(OPP.living(g)))
+
+
+def artifact_left_drain(g, n) -> None:
+    """Marionette Master: "Whenever an artifact you control is put into a
+    graveyard from the battlefield, target opponent loses life equal to this
+    creature's power" -- a single target, and the Master is a 1/3 with
+    fabricate 3 taken as counters, so power 4.
+
+    ONE FUNCTION for tokens AND real artifacts (§0z71): Time Sieve can now
+    feed on a signet, and the Master reads that exactly as it reads a
+    Treasure. Disciple of the Vault reads real artifacts too, but its share is
+    folded into `sacrifice_tokens`' per-token sum with two token-only cards,
+    so both paths read its share from `disciple_share`.
+    """
     if g.has("Marionette Master"):
-        # "target opponent loses life equal to this creature's power" -- a
-        # single target, and the Master is a 1/3 with fabricate 3 taken as
-        # counters, so power 4.
         power = 4.0
         dmg = power * n
         g.deal_pod_damage(dmg, each=False)
         g.m["artifact_drain"] += dmg
+
+
+def sieve_real_fuel(g) -> list:
+    """The REAL artifacts Time Sieve may eat, in the order it eats them (§0z71).
+
+    `sieve_real_fuel` (the owner's two conditions, 2026-09-27):
+      "never"  tokens only -- every table before §0z71.
+      "cap"    also real artifacts of mana value <= `sieve_real_mv_cap` (2):
+               Sol Ring, the signets, Lightning Greaves, the artifact lands.
+      "combo"  the same, but ONLY while Tivit is on the battlefield -- the
+               loop that rebuilds the pile next turn is live, so the pilot
+               knows the next extra turn is coming.
+    Never Time Sieve itself, never a creature. THE ORDER IS A JUDGEMENT:
+    what taps for no mana first (Greaves), then rocks from least mana to
+    most, then the artifact lands last -- a land is a land drop as well.
+    """
+    mode = g.cfg.get("sieve_real_fuel", "combo")
+    if mode == "never":
+        return []
+    if mode == "combo" and not any(p.card is g.commander for p in g.board):
+        return []
+    cap = g.cfg.get("sieve_real_mv_cap", 2)
+    pool = [p for p in g.board
+            if "Artifact" in p.card.types and p.card.name != "Time Sieve"
+            and not p.card.is_creature and not p.is_token
+            and p.card.mv <= cap]
+    return sorted(pool, key=lambda p: (p.card.is_land,
+                                       (p.card.mana_ability or (0,))[0],
+                                       p.card.mv))
+
+
+def sacrifice_real_artifacts(g, perms) -> None:
+    """Sacrifice real artifact permanents: to the graveyard, with every
+    trigger that reads an artifact leaving (§0z71)."""
+    for p in perms:
+        g.board.remove(p)
+        g.graveyard.append(p.card)
+    n = len(perms)
+    share = disciple_share(g)
+    if n and share:
+        dmg = share * n * OPP.pod_size(g)
+        g.deal_pod_damage(dmg)
+        g.m["token_drain"] += dmg
+    artifact_left_drain(g, n)
+    g.m["sieve_real_fuel"] += n
     if g.result == "win":
         g.m["win_route"] = ROUTE_DRAIN
-    return n
 
 
 # ---------------------------------------------------------------------------
@@ -985,20 +1052,22 @@ def _sacrifice_five(g) -> bool:
     """Pay Time Sieve's "Sacrifice five artifacts" out of the token piles.
 
     Clues and Food go before Treasures: a Treasure is mana and the other two
-    are not, so spending them first is what a pilot does. Only TOKENS are
-    eaten, never the real artifacts `artifact_count()` can see -- Sol Ring, the
-    signets and the three artifact lands are legal fuel and a pilot would not
-    feed them to a loop that has to run again next turn. That is the
-    conservative direction and is said out loud rather than fixed.
+    are not, so spending them first is what a pilot does. REAL artifacts
+    make up a shortfall only, and only as `sieve_real_fuel` allows (§0z71):
+    until then Sol Ring, the signets and the artifact lands were never fuel,
+    the conservative direction item 8c named.
     """
-    if sum(g.tokens.values()) < 5:
+    real = sieve_real_fuel(g)
+    if sum(g.tokens.values()) + len(real) < 5:
         return False
     need = 5
     for kind in ("Food", "Clue", "Treasure"):
         need -= sacrifice_tokens(g, kind, min(need, g.tokens[kind]))
         if need <= 0:
             return True
-    return need <= 0
+    # Short of five tokens: real artifacts, only as many as needed (§0z71).
+    sacrifice_real_artifacts(g, real[:need])
+    return True
 
 
 def time_sieve(g):

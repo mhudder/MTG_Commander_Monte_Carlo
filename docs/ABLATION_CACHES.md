@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `b9d7735`.
+Generated at `933c91a`.
 
 **6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,24 +86,28 @@ the fingerprint above mean anything.
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `ea7d981df13f586f` | `f18f0c3` | **VERIFIED** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `fe1e6f8df4b26788` | `6887c87` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `52acc50bc7a4c8e8` | `c083070` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `9a945dcbbc86431d` | `971092f` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `d7ac5a85a5483868` | `583a347` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `e946bd0864dce903` | `a34a9d6` | **CURRENT** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `fe1e6f8df4b26788` | `6887c87` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `52acc50bc7a4c8e8` | `c083070` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `9a945dcbbc86431d` | `971092f` | **SUSPECT** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `d7ac5a85a5483868` | `583a347` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `e946bd0864dce903` | `a34a9d6` | **SUSPECT** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `ea7d981df13f586f`; fingerprint has since moved to `b23755be8f9f6b7a` and was CHECKED at `4501246` (2026-09-26T22:56:46Z): ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `ea7d981df13f586f`; fingerprint has since moved to `124c0989ab583b23` and was CHECKED at `933c91a` (2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): azusa BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
   - verified at `19844e43b708087b` (`b6f957b`, 2026-09-26T13:43:44Z): 2026-09-26, §0z61/§0z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.
   - verified at `f6b82e6775f69db1` (`4591d8a`, 2026-09-26T17:12:39Z): check_unchanged_decks at N=400, 4591d8a vs the §0z64/§0z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.
   - verified at `75a231f588b8fac9` (`2b9fff4`, 2026-09-26T21:54:38Z): check_unchanged_decks at N=400, HEAD 2b9fff4 vs the §0z67/§0z68/§0z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.
   - verified at `b23755be8f9f6b7a` (`4501246`, 2026-09-26T22:56:46Z): ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `fe1e6f8df4b26788`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `52acc50bc7a4c8e8`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `9a945dcbbc86431d`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `d7ac5a85a5483868`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `e946bd0864dce903`, which is live.
+  - verified at `124c0989ab583b23` (`933c91a`, 2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): azusa BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `fe1e6f8df4b26788`; fingerprint has since moved to `d88f716c323d61d3` and was CHECKED at `933c91a` (2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): karlov BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+  - verified at `d88f716c323d61d3` (`933c91a`, 2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): karlov BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `52acc50bc7a4c8e8`; fingerprint has since moved to `8ae10531a13a0e13` and was CHECKED at `933c91a` (2026-09-27T02:28:09Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): lorehold BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+  - verified at `8ae10531a13a0e13` (`933c91a`, 2026-09-27T02:28:09Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): lorehold BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `9a945dcbbc86431d`, live is `188dc344f1050328`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `971092f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `d7ac5a85a5483868`; fingerprint has since moved to `a27e3c8ee3f935ee` and was CHECKED at `933c91a` (2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): shilgengar BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+  - verified at `a27e3c8ee3f935ee` (`933c91a`, 2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): shilgengar BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `e946bd0864dce903`, live is `a752697f456fae62`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `a34a9d6`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 
 ## What each fingerprint covers
 

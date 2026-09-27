@@ -82,9 +82,10 @@ CREATURES = [
     C("Blood Artist", "Creature", {"gen": 1, "B": 1}, 0, 1, priority=8, threat=7.0),
     C("Suture Priest", "Creature", {"gen": 1, "W": 1}, 1, 1, priority=8.5, threat=6.5),
     C("Auriok Champion", "Creature", {"W": 2}, 1, 1, priority=9, threat=7.0),
-    # Daxos's toughness is his devotion to white, not a fixed 1. 4 is this
-    # list's typical white devotion once the early drops are down.
-    C("Daxos, Blessed by the Sun", "Enchantment/Creature", {"W": 2}, 2, 4,
+    # Daxos's toughness is * -- his devotion to white -- supplied live by
+    # `karlov.daxos_toughness` since §0z72. It was a fixed 4, "this list's
+    # typical white devotion once the early drops are down".
+    C("Daxos, Blessed by the Sun", "Enchantment/Creature", {"W": 2}, 2, 0,
       priority=8, threat=6.0),
     C("Voice of the Blessed", "Creature", {"W": 2}, 2, 2, priority=7,
       threat=7.0),

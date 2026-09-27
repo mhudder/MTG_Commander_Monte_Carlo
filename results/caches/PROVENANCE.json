@@ -198,6 +198,12 @@
         "evidence": "ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.",
         "fingerprint": "b23755be8f9f6b7a",
         "utc": "2026-09-26T22:56:46Z"
+      },
+      {
+        "commit": "933c91a",
+        "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): azusa BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+        "fingerprint": "124c0989ab583b23",
+        "utc": "2026-09-27T02:28:10Z"
       }
     ]
   },
@@ -325,7 +331,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "933c91a",
+        "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): karlov BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+        "fingerprint": "d88f716c323d61d3",
+        "utc": "2026-09-27T02:28:10Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "52acc50bc7a4c8e8",
@@ -479,7 +492,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "933c91a",
+        "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): lorehold BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+        "fingerprint": "8ae10531a13a0e13",
+        "utc": "2026-09-27T02:28:09Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "9a945dcbbc86431d",
@@ -811,7 +831,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "933c91a",
+        "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): shilgengar BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+        "fingerprint": "a27e3c8ee3f935ee",
+        "utc": "2026-09-27T02:28:10Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "e946bd0864dce903",

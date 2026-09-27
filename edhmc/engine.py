@@ -221,12 +221,17 @@ NEVER = 10 ** 9   # an `impending` that never arrives: see is_battlefield_creatu
 def devotion(g, color: str) -> int:
     """Devotion to `color`: that colour's pips among the mana costs of the
     permanents you control. Tokens have no mana cost and count for nothing.
+    A HYBRID pip counts for each of its colours (CR 107.4e, 700.5), which is
+    `hybrid_pips`.
 
-    `karlov.devotion_white` is the same rule written for the Karlov engine,
-    which passes Cards where this one has Permanents. The two are deliberately
-    not merged for the reason given in `karlov.is_creature_now`'s docstring.
+    ONE RULE FOR EVERY ENGINE since §0z72. `karlov.devotion_white` used to be
+    a second copy -- the one that counted hybrid -- while this one counted
+    only plain pips; its docstring said they were kept apart because karlov
+    passed Cards, which had stopped being true (both read `g.board`). Daxos,
+    Blessed by the Sun is the card that made it worth merging: a devotion
+    TOUGHNESS, where the two copies would have disagreed about Lurrus.
     """
-    return sum(p.card.cost.get(color, 0) for p in g.board)
+    return sum(hybrid_pips(p.card, color) for p in g.board)
 
 
 # Permanents whose creature-ness is CONDITIONAL ON BOARD STATE, with the clause
@@ -1750,6 +1755,39 @@ def treasure_vault(g) -> None:
     g.m["vault_activations"] += 1
 
 
+def pay_from(g, units, cost) -> bool:
+    """Pay `cost` out of an activation-step pool and remove what was used, so
+    the next ability in the same pass cannot spend it again (§0z70).
+
+    THE ONE RULE for rendmaw's sacrifice outlets, which used to take `units`
+    being non-empty as their mana. `spend` taps the owners `can_pay` chose --
+    lands, and a Treasure sacrificed by its `TreasureMana` -- and the pop
+    keeps the pool honest. `sac_outlets_pay=False` restores the free version
+    every table before §0z70 was measured with.
+    """
+    if not g.cfg.get("sac_outlets_pay", True):
+        return bool(units)
+    pay = can_pay(cost, units)
+    if pay is None:
+        return False
+    spend(g, pay, units)
+    for i in sorted(pay, reverse=True):
+        units.pop(i)
+    return True
+
+
+def backwoods_pool(units, land):
+    """Remove the land's own mana from `units` IN PLACE and return it: its
+    {T} is part of the cost. In place is right either way -- if the
+    activation goes ahead the land is tapped, and it is the last ability in
+    the pass, so nothing later reads the pool."""
+    owners = getattr(units, "owners", None) or []
+    for i in range(len(units) - 1, -1, -1):
+        if i < len(owners) and owners[i] is land:
+            units.pop(i)
+    return units
+
+
 def tap_treasures(units, pay) -> None:
     """Spend the Treasures among `pay` in a pool that is about to be POPPED
     rather than passed to `spend` -- Skullclamp's loop, which taps its land
@@ -2111,6 +2149,15 @@ def main_phase(g: Game, precombat: bool = False):
             if (c.name == "Proft, Sinister Mastermind"
                     and len(g.graveyard) < PROFT_THRESHOLD):
                 g.m["proft_gated"] += 1
+                continue
+            # VILLAGE RITES is cast only by `village_rites`, which pays its
+            # additional cost (a creature) and draws its two cards. Cast from
+            # here it resolved as a blank: an instant with no script. That was
+            # always possible -- on a turn with no token when `activations`
+            # ran -- and §0z73's end-step timing made it the usual case, which
+            # the counter caught at exactly zero casts. Gated on the paid path
+            # so the free one stays bit-identical to every table before §0z70.
+            if not main_phase_may_cast(g, c):
                 continue
             # ALTERNATIVE COSTS, through the shared chooser (§1b / §0z20).
             # A card is not one cost: Impending deploys Overlord of the
@@ -2569,14 +2616,16 @@ def activations(g: Game):
             g.board.remove(p)
             g.on_creature_death(1)
 
-    # Village Rites: sacrifice a creature, draw two.
-    if any(c.name == "Village Rites" for c in g.hand) and units:
-        chaff = [p for p in g.board if p.is_token and p.card.is_creature]
-        if chaff:
-            g.hand.remove(next(c for c in g.hand if c.name == "Village Rites"))
-            g.board.remove(chaff[0])
-            g.on_creature_death(1)
-            g.draw(2)
+    # Rendmaw's sacrifice outlets (§0z70/§0z73). With `sac_outlets_pay` on
+    # they spend real mana, and WHEN is then a policy: "end" (the default)
+    # runs them after the postcombat main phase on leftover mana, which is
+    # when a pilot activates an instant-speed draw outlet; "main" runs them
+    # here, before the main phase, where they compete with it for mana.
+    # Free (`sac_outlets_pay=False`) they stay here, as every table before
+    # §0z70 had them.
+    early = outlets_early(g)
+    if early:
+        village_rites(g, units)
 
     # Deathreap Ritual: a card at EACH end step where a creature died. Four
     # end steps a round in a four-player game, and creatures die constantly.
@@ -2585,9 +2634,53 @@ def activations(g: Game):
                        if crn_random(g, f"deathreap{i}")
                        < g.cfg.get("opp_death_rate", 0.55)))
 
+    if early:
+        chef_and_backwoods(g, units)
+
+def main_phase_may_cast(g, card) -> bool:
+    """False for a card only its own outlet may cast (§0z73)."""
+    return not (card.name == "Village Rites"
+                and g.cfg.get("sac_outlets_pay", True))
+
+
+def outlets_early(g) -> bool:
+    """Do the sacrifice outlets run inside `activations` (before the
+    postcombat main phase) this game? See `activations`. (§0z73)"""
+    return (not g.cfg.get("sac_outlets_pay", True)
+            or g.cfg.get("sac_outlets_timing", "end") == "main")
+
+
+def end_step_outlets(g) -> None:
+    """The sacrifice outlets on the mana the main phase left (§0z73)."""
+    if outlets_early(g):
+        return
+    units = rendmaw_mana(g)
+    village_rites(g, units)
+    chef_and_backwoods(g, units)
+
+
+def village_rites(g, units) -> None:
+    # Village Rites {B} Instant: "As an additional cost to cast this spell,
+    # sacrifice a creature. Draw two cards." (Scryfall, verified 2026-09-27.)
+    # PAID since §0z70 -- it used to check that `units` was non-empty and
+    # spend nothing, and it never reached the graveyard.
+    if any(c.name == "Village Rites" for c in g.hand):
+        chaff = [p for p in g.board if p.is_token and p.card.is_creature]
+        if chaff and pay_from(g, units, {"B": 1}):
+            rites = next(c for c in g.hand if c.name == "Village Rites")
+            g.hand.remove(rites)
+            g.board.remove(chaff[0])
+            g.on_creature_death(1)
+            g.graveyard.append(rites)
+            g.draw(2)
+            g.m["village_rites_cast"] += 1
+
+
+
+def chef_and_backwoods(g, units) -> None:
     # Dockside Chef: "{1}{B}, Sacrifice an artifact or creature: Draw a card."
-    # Taken once a turn off the cheapest token, with `units` standing in for the
-    # mana. Grim Backwoods is the same shape at {2}{B}{G}.
+    # Once a turn off the cheapest token. PAID since §0z70: this used to take
+    # `units` being non-empty as the mana, and spend none of it.
     #
     # EREBOS USED TO BE IN THIS CONDITION AND DOES NOT HAVE THIS ABILITY. Its
     # activated ability is "{1}{B}, Sacrifice another creature: TARGET CREATURE
@@ -2601,13 +2694,33 @@ def activations(g: Game):
     sackers = g.has("Dockside Chef") or (
         not g.cfg.get("erebos_death_draw", True)
         and g.has("Erebos, Bleak-Hearted"))
-    if sackers and units:
+    if sackers:
         chaff = [p for p in g.board if p.is_token and not p.sick
                  and g.power_of(p) <= 2]
-        if chaff:
+        if chaff and pay_from(g, units, {"gen": 1, "B": 1}):
             g.board.remove(chaff[0])
             g.on_creature_death(1)
             g.draw(1)
+            g.m["chef_activations"] += 1
+
+    # Grim Backwoods: "{T}: Add {C}. {2}{B}{G}, {T}, Sacrifice a creature:
+    # Draw a card." The comment above claimed it for years ("the same shape")
+    # and nothing implemented it (§0z70). Its own {C} cannot pay: the {T} is
+    # part of the cost (`backwoods_pool`).
+    backwoods = ([p for p in g.board if p.card.name == "Grim Backwoods"]
+                 if g.cfg.get("sac_outlets_pay", True) else [])
+    for land in backwoods:
+        chaff = [p for p in g.board if p.is_token and not p.sick
+                 and g.power_of(p) <= 2]
+        if land.tapped or not chaff:
+            continue
+        pool = backwoods_pool(units, land)
+        if pay_from(g, pool, {"gen": 2, "B": 1, "G": 1}):
+            land.tapped = True
+            g.board.remove(chaff[0])
+            g.on_creature_death(1)
+            g.draw(1)
+            g.m["backwoods_activations"] += 1
 
 
 def attack_triggers(g: Game, attackers: list[Permanent]):
@@ -2783,6 +2896,7 @@ def take_turn(g: Game):
     activations(g)                  # Skullclamp, Idol, sac outlets
     play_land(g)                    # second drop (Dryad) once we know our needs
     main_phase(g)                   # deploy the rest postcombat
+    end_step_outlets(g)             # draw outlets on leftover mana, §0z73
     treasure_vault(g)               # spare mana into Treasures, §0z68
 
     g.m["mana_floated"] += len(available_mana(g))

@@ -159,6 +159,9 @@ python -m tests.test_treasures --mutate            # 7 mutations, exact sets
 python -m tests.test_commander_damage --mutate     # 5 mutations, exact sets
 python -m tests.test_triage --mutate               # 6 mutations, exact sets
 python -m tests.test_commander_aim --mutate        # 5 mutations, exact sets
+python -m tests.test_sac_outlets --mutate          # 2 mutations, exact sets
+python -m tests.test_sieve_real_fuel --mutate      # 5 mutations, exact sets
+python -m tests.test_devotion --mutate             # 2 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -934,8 +937,11 @@ is half answered**: the ordering half is built and measured as a null
     card whose evaluation swings on that knob must be reported with it said
     out loud.
 
-8c. **Time Sieve eats only TOKEN artifacts**, never Sol Ring, the signets or
-    the artifact lands, all of which are legal fuel. Conservative and
-    defensible, but a modelling choice. Extra turns also count against the
-    horizon, which is now the only bound on the loop. §0m.
+8c. **ANSWERED (§0z71)**: Time Sieve may make up a shortfall from REAL
+    artifacts of mana value 2 or less, only while Tivit is on the battlefield
+    (`sieve_real_fuel="combo"`, the owner's two conditions). The original
+    entry follows. **Time Sieve eats only TOKEN artifacts**, never Sol Ring,
+    the signets or the artifact lands, all of which are legal fuel.
+    Conservative and defensible, but a modelling choice. Extra turns also
+    count against the horizon, which is now the only bound on the loop. §0m.
 

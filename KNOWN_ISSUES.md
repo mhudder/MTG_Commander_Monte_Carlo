@@ -118,6 +118,10 @@ Methodology that used to live at the end of this file is now
 | [0z67](#0z67) | FIXED | **The commander is aimed, and the defender knows 104.3j.** The first aim walked the commander into the block the aware defender now makes; aiming only where it gets through is +0.0009 for karlov and inside its bar elsewhere. "focus" costs win rate in three decks. Known-win focus 1.0 → 0.8 (the owner's): lorehold +0.0102 |
 | [0z68](#0z68) | FIXED | **Treasure Vault's activation is implemented** (rendmaw): 0.07 cracks a game, inside its bar at every threshold |
 | [0z69](#0z69) | MEASURED | **The owner's decisions of 2026-09-26**: Soulmender stays karlov's cut; −Blasphemous Act +Goldspan (+0.0137 ±0.0046) and −Vampiric Rites +Lyra (+0.0123 ±0.0027) are STAGED, re-measured on the final engine |
+| [0z70](#0z70) | FIXED | **Rendmaw's sacrifice outlets pay their costs**, and Grim Backwoods -- claimed in a comment, implemented nowhere -- is built. Village Rites now reaches the graveyard |
+| [0z71](#0z71) | FIXED | **Time Sieve may eat real artifacts** (MV ≤ 2, only while Tivit is out; queued 8c): +0.0014 ±0.0013 at T20, −0.0008 at T10 |
+| [0z72](#0z72) | FIXED | **Devotion is one rule** (hybrid-aware, `engine.devotion`), and Daxos's toughness reads it. Inert today: karlov bit-identical |
+| [0z73](#0z73) | FIXED | **Paying made WHEN a policy**: before the main phase the outlets cost rendmaw −0.0209; at the end step −0.0023, inside its bar. And Village Rites had been castable as a blank by the main phase |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7585,6 +7589,108 @@ every lorehold attempt exited immediately while the watch waited for a
 spell" is not modelled), Lyra SCRIPTED. `pending.check_staged_are_classified`
 runs the same check from the ledger, and was proved to fail on the unfixed
 tree before the fix.
+
+## 0z70. FIXED — rendmaw's sacrifice outlets pay their costs
+
+> Village Rites {B} Instant — As an additional cost to cast this spell,
+> sacrifice a creature. Draw two cards.
+> Dockside Chef — {1}{B}, Sacrifice an artifact or creature: Draw a card.
+> Grim Backwoods — Land. {T}: Add {C}. {2}{B}{G}, {T}, Sacrifice a creature:
+> Draw a card.                              (Scryfall, verified 2026-09-27)
+
+Village Rites and Dockside Chef checked that the activation pool was
+NON-EMPTY and spent none of it -- free in this model since they were written
+-- and Village Rites never reached the graveyard. Found while closing §0z64:
+a leftover Treasure made the pool non-empty without being spent. **Grim
+Backwoods was claimed and not built**: the Chef's comment said it was "the
+same shape at {2}{B}{G}", and no code did anything with it -- §0z25's shape
+inverted, a claim with no implementation behind it.
+
+`engine.pay_from` is the one rule: `can_pay`, `spend` (lands tapped, a
+Treasure sacrificed by its `TreasureMana`), and the used units popped so the
+next ability cannot reuse them. `backwoods_pool` removes the Backwoods' own
+{C}, since its {T} is part of the cost. `sac_outlets_pay=False` restores the
+free outlets, and no Backwoods, exactly (bit-identical on all six decks).
+Pinned by `tests/test_sac_outlets.py`, 11 cases and 4 mutations, exact sets;
+one prediction was flagged uncertain before the run (a tie between three
+colourless units) and held.
+
+## 0z71. FIXED — Time Sieve may eat real artifacts, conservatively (item 8c)
+
+Only the Food/Clue/Treasure piles were fuel. The owner's conditions
+(2026-09-27): below a mana-cost cap, or only when the loop is known to come
+back. `tivit.sieve_real_fuel` makes up a SHORTFALL only: "cap" allows real
+artifacts of mana value <= `sieve_real_mv_cap` (2); "combo" allows them only
+while Tivit is on the battlefield; "never" is the old rule. Never Time Sieve,
+never a creature; non-mana artifacts first (Greaves), then rocks by mana made,
+lands last -- a judgement, said out loud. Disciple of the Vault and Marionette
+Master read a real artifact as they read a Treasure, through one function
+each (`disciple_share`, `artifact_left_drain`), so the token path and the new
+one cannot drift.
+
+Measured, N=15,000 paired (`diagnostics/run_outlets_sieve.py`,
+`results/outlets_sieve_20260927.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| combo - never | **-0.0008 ±0.0007** | **+0.0014 ±0.0013** |
+| cap - never | -0.0011 ±0.0008 | -0.0006 ±0.0017 |
+| combo - cap | +0.0003 ±0.0003 | **+0.0020 ±0.0012** |
+
+**"combo" is the default.** It beats "cap" at both horizons, and against the
+old rule it is a HORIZON TRADE: a rock fed to the Sieve costs tempo early and
+buys extra turns late (0.767 against 0.740 a game at T20), significant in
+both directions. 0.04 real artifacts a game go in. Pinned by
+`tests/test_sieve_real_fuel.py`, 9 cases and 5 mutations, exact sets.
+
+## 0z72. FIXED — devotion is one rule, and Daxos's toughness reads it
+
+> Daxos, Blessed by the Sun {W}{W} 2/* — Daxos's toughness is equal to your
+> devotion to white. Whenever another creature you control enters or dies,
+> you gain 1 life.                          (Scryfall, verified 2026-09-27)
+
+**The same rule, implemented twice, two ways** (CLAUDE.md's standing
+finding): `engine.devotion` counted plain pips and `karlov.devotion_white`
+counted hybrid ones. CR 107.4e makes a hybrid symbol all of its colours, so
+the karlov copy was right; its docstring said the two were kept apart because
+karlov passed Cards, which had stopped being true. `engine.devotion` now reads
+`hybrid_pips` and `devotion_white` is a name over it. Daxos's printed toughness
+is * (0 in the Card), supplied by `karlov.daxos_toughness`; his own {W}{W}
+means he is never below 2.
+
+**Inert, and measured so**: every baseline is bit-identical. The karlov audit
+said so in advance -- nothing in `karlov.py` or `opponents.py` reads
+toughness -- and the merge moved rendmaw's and azusa's Erebos not at all
+(no hybrid permanent in either list). Built because the owner expects
+devotion to recur; it is the rule the next devotion card reads. Pinned by
+`tests/test_devotion.py`, 7 cases and 2 mutations.
+
+## 0z73. FIXED — paying made WHEN a policy; and Village Rites cast as a blank
+
+**§0z42's shape, arriving the same day as the fix.** The outlets live in
+`engine.activations`, which runs BEFORE the postcombat main phase. While they
+were free that ordering cost nothing; the day they paid, they spent mana the
+main phase needed -- four on a Backwoods draw is four not spent deploying:
+
+| rendmaw, paying minus free | T10 | T20 |
+|---|---|---|
+| paid inside `activations`, before main | **-0.0078 ±0.0017** | **-0.0209 ±0.0039** |
+| paid at the end step, on leftover mana | -0.0008 ±0.0013 | -0.0023 ±0.0033 |
+| end step minus before main | **+0.0070 ±0.0016** | **+0.0185 ±0.0039** |
+
+`sac_outlets_timing="end"` is the default: `end_step_outlets` runs after the
+postcombat main phase, which is when a pilot activates an instant-speed draw
+outlet. **Paying real costs does not lose games once the timing is right** --
+inside its bar at both horizons.
+
+**AND THE FIRST END-STEP RUN COUNTED ZERO VILLAGE RITES.** With the outlets
+after the main phase, the main phase got to Village Rites first and cast it
+as an ordinary {B} instant -- with no script, a blank. It had always been
+possible (a turn with no token when `activations` ran) and was now the usual
+case. `main_phase_may_cast` keeps it for its outlet on the paid path; Rites
+is now cast 0.18 times a game, against 0.11 when free. "A mechanism that fires
+zero times is unmistakable": it was, here, and nothing else would have shown
+it.
 
 ## How to read an ablation table
 

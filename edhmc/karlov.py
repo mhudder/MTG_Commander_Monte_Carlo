@@ -39,7 +39,7 @@ import random
 
 from edhmc.engine import (BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
-                          hybrid_pips,
+                          devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
@@ -163,6 +163,8 @@ class KarlovGame(BaseGame):
         base = perm.card.toughness + perm.counters
         if perm.card.name == "Serra Ascendant" and self.your_life >= 30:
             base += 5
+        if perm.card.name == "Daxos, Blessed by the Sun":
+            base += daxos_toughness(self)
         return base
 
     def play_card_trigger(self, card):
@@ -314,8 +316,17 @@ def pay_generic(g, want):
 def devotion_white(g):
     """Devotion to white: {W} pips among the mana costs of permanents you
     control. Karlov himself is {W}{B} and counts for one; Lurrus's two
-    {W/B} hybrid pips count for two (`engine.hybrid_pips`, §0z52)."""
-    return sum(hybrid_pips(p.card, "W") for p in g.board)
+    {W/B} hybrid pips count for two (`engine.hybrid_pips`, §0z52). A thin
+    name over `engine.devotion`, the one rule (§0z72)."""
+    return EN_devotion(g, "W")
+
+
+def daxos_toughness(g) -> int:
+    """Daxos, Blessed by the Sun: "Daxos's toughness is equal to your
+    devotion to white." (Scryfall, verified 2026-09-27; §0z72.) The printed
+    toughness is * -- 0 in the Card -- and this supplies it. His own {W}{W}
+    counts, so on the battlefield he is never below 2."""
+    return devotion_white(g)
 
 
 def is_creature_now(g, card):
