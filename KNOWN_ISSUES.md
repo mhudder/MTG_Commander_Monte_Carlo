@@ -7692,6 +7692,12 @@ is now cast 0.18 times a game, against 0.11 when free. "A mechanism that fires
 zero times is unmistakable": it was, here, and nothing else would have shown
 it.
 
+**The rebuild** (`results/rebuild_20260927b_diff.txt`), rendmaw and tivit
+only: **0 rows beyond their old bars, 0 sign flips.** The cards that changed
+read as expected: Dockside Chef, now paying {1}{B} a draw, +0.0029 -> +0.0015
+(inside its bar); Village Rites +0.0028 -> +0.0032; Time Sieve +0.0371 ->
++0.0385.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not

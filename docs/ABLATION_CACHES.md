@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `933c91a`.
+Generated at `24218f6`.
 
 **6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -88,9 +88,9 @@ the fingerprint above mean anything.
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `ea7d981df13f586f` | `f18f0c3` | **VERIFIED** |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `fe1e6f8df4b26788` | `6887c87` | **VERIFIED** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `52acc50bc7a4c8e8` | `c083070` | **VERIFIED** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `9a945dcbbc86431d` | `971092f` | **SUSPECT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `188dc344f1050328` | `1756292` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `d7ac5a85a5483868` | `583a347` | **VERIFIED** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `e946bd0864dce903` | `a34a9d6` | **SUSPECT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `a752697f456fae62` | `7db8cb9` | **CURRENT** |
 
 ### State of each cache
 
@@ -104,10 +104,10 @@ the fingerprint above mean anything.
   - verified at `d88f716c323d61d3` (`933c91a`, 2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): karlov BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
 - **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `52acc50bc7a4c8e8`; fingerprint has since moved to `8ae10531a13a0e13` and was CHECKED at `933c91a` (2026-09-27T02:28:09Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): lorehold BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
   - verified at `8ae10531a13a0e13` (`933c91a`, 2026-09-27T02:28:09Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): lorehold BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `9a945dcbbc86431d`, live is `188dc344f1050328`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `971092f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `188dc344f1050328`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `d7ac5a85a5483868`; fingerprint has since moved to `a27e3c8ee3f935ee` and was CHECKED at `933c91a` (2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): shilgengar BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
   - verified at `a27e3c8ee3f935ee` (`933c91a`, 2026-09-27T02:28:10Z): check_unchanged_decks at N=400, HEAD 933c91a vs the §0z70-§0z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): shilgengar BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `e946bd0864dce903`, live is `a752697f456fae62`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `a34a9d6`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `a752697f456fae62`, which is live.
 
 ## What each fingerprint covers
 

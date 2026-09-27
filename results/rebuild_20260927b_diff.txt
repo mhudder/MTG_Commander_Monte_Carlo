@@ -1,0 +1,8 @@
+The 2026-09-27 rebuild after §0z70-§0z73 against the tables it replaced (git 1756292). Only rendmaw and tivit were rebuilt; the other four were bit-identical and their caches VERIFIED.
+
+== lorehold: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== rendmaw: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 11 signal changes
+== karlov: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== tivit: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 2 signal changes
+== shilgengar: 64 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== azusa: 58 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
