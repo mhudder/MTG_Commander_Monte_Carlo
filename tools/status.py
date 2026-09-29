@@ -176,22 +176,19 @@ def ledger_counts():
     buckets = {
         "COMMITTED": pending.COMMITTED,
         "STAGED": pending.CHANGES,
-        "SIMULATED": pending.SIMULATED,
         "MEASURED": pending.MEASURED,
         "WITHDRAWN": pending.WITHDRAWN,
-        # PROPOSED is split by its flags (§0z79): PREPARED is engine work done
-        # and pinned, REJECTED is dead. Neither is a list of its own.
-        "PREPARED": [p for p in pending.PROPOSED
-                     if p.prepared and not p.rejected],
-        "PROPOSED": [p for p in pending.PROPOSED
-                     if not p.prepared and not p.rejected],
-        "REJECTED": [p for p in pending.PROPOSED if p.rejected],
     }
+    # THE FUNNEL COUNTS CARDS, NOT RECORDS (§0z80): each card once, in the
+    # furthest state it has reached. Counting records put ten long-measured
+    # cards in the PROPOSED column. `pending.funnel()` is the derivation.
+    funnel = pending.funnel()
     per: dict[str, dict[str, int]] = {}
-    for label, items in buckets.items():
-        for it in items:
-            per.setdefault(it.deck, {}).setdefault(label, 0)
-            per[it.deck][label] += 1
+    for label, keys in funnel.items():
+        buckets.setdefault("FUNNEL_" + label, keys)
+        for deck, _card in keys:
+            per.setdefault(deck, {}).setdefault(label, 0)
+            per[deck][label] += 1
     return (buckets, per), ""
 
 
@@ -377,9 +374,8 @@ def render() -> str:
         w("")
     else:
         # THE FUNNEL, in `docs/LEDGER_STATES.md`'s order (§0z79). Each column
-        # is one state; a card is counted in the state its record is in.
-        # SIMULATED counts only head-to-heads with NO staging -- a staged
-        # swap's head-to-head is its `evidence`, counted under STAGED.
+        # is one state and each CARD is counted once, in the furthest state it
+        # has reached (§0z80) -- a staged card is not also "measured".
         cols = ("PROPOSED", "PREPARED", "MEASURED", "SIMULATED", "STAGED",
                 "COMMITTED", "WITHDRAWN", "REJECTED")
         w("| deck | " + " | ".join(c.lower() for c in cols) + " |")
@@ -387,14 +383,16 @@ def render() -> str:
         for d in DECKS:
             c = per.get(d, {})
             w(f"| {d} | " + " | ".join(str(c.get(k, 0)) for k in cols) + " |")
-        w("| **all** | " + " | ".join(f"**{len(buckets[k])}**" for k in cols)
-          + " |")
+        w("| **all** | " + " | ".join(f"**{len(buckets['FUNNEL_' + k])}**"
+                                      for k in cols) + " |")
         w("")
-        w("The states are defined in `docs/LEDGER_STATES.md`. A SIMULATED row "
-          "is decision")
-        w("evidence with no decision on it; `python -m edhmc.pending` prints "
-          "each with its")
-        w("date, which is the engine it was measured on.")
+        w("Each card is counted once, in the furthest state it has reached. "
+          "The states")
+        w("are defined in `docs/LEDGER_STATES.md`. A SIMULATED card has "
+          "decision evidence")
+        w("and no decision; `python -m edhmc.pending` prints each with its "
+          "date, which is")
+        w("the engine it was measured on.")
         w("")
         w("### Staged and uncommitted")
         w("")

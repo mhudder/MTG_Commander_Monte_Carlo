@@ -167,7 +167,7 @@ python -m tests.test_shilgengar_life_finality --mutate # 3 mutations, exact sets
 python -m tests.test_death_lookback --mutate       # 3 mutations, exact sets
 python -m tests.test_target_and_vault --mutate     # 3 mutations, exact sets
 python -m tests.test_blind_labels --mutate         # 3 mutations, exact sets
-python -m tests.test_ledger_states --mutate        # 3 mutations, exact sets
+python -m tests.test_ledger_states --mutate        # 4 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -538,9 +538,11 @@ its own old bar.
 **Life DECIDES games, since pod v3 (2026-09-04).** The life-share of losses is
 0.32 / 0.43 / 0.20 by deck and is conditional on the archetype mix. Anything in
 `docs/HISTORY.md` dated before that saying life is irrelevant is superseded —
-that section is marked. The live consequence: **life-loss drawbacks are still
-free in the model**, so Bitterblossom, Phyrexian Arena, Dark Confidant and
-Talisman of Conviction all carry numbers that are CEILINGS. §0i.
+that section is marked. The live consequence: **a life-loss drawback is a
+real cost, and it must be charged** -- Bitterblossom, Phyrexian Arena and
+Talisman of Conviction all are (§0z7, §0z13), and an uncharged one makes its
+card's number a CEILING. That was true of all three for months, and this
+file said so for two weeks after it stopped being true (§0i, §0z80).
 
 **N is part of the identity of a table.** It is in the cache key, printed in
 the table header, and carried in one variable in `regen_tables.sh`. Changing
@@ -737,8 +739,9 @@ instructions** — including files that appear without explanation.
 
 **Common random numbers.** Deck A and deck B are the same list with slots
 swapped, shuffled on the same seed, so the other ~97 cards are dealt
-identically and nearly all variance cancels in the difference. Worth roughly
-5–7x the sample size; currently measuring ~11x at corr 0.9130.
+identically and nearly all variance cancels in the difference. Worth several
+times the sample size; `python -m tools.validate` prints the current factor
+and correlation, which is why this file does not.
 
 **Opponents have a win condition.** Three opponents each draw a kill turn from
 a bracket-calibrated range (B2 13–18, B3 10–14, B4 8–12), tuned to a pod whose
@@ -771,7 +774,8 @@ for itself when items closed before 2026-09-07 were moved there. Each names the
 moved to `docs/HISTORY.md`; so is item 21, whose card is now committed; and so
 are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47), 8b
 (Voice of the Blessed, §0z46) and 0b-i (Sunbird's decay, §0z59), closed
-2026-09-25. **Item 18
+2026-09-25, and item 23 (triage and the ledger states, §0z78, §0z79),
+closed 2026-09-29. **Item 18
 is half answered**: the ordering half is built and measured as a null
 (§0z43), which leaves the `priority` numbers as the whole of it.
 
@@ -815,10 +819,9 @@ is half answered**: the ordering half is built and measured as a null
     it reads artifact SPELLS and tivit makes artifact TOKENS. **NOTHING IS
     STAGED:** §0c, every one of these shares a victim slot with its batch and
     needs a head-to-head against a named cut. Run `python -m edhmc.pending`.
-    **ONE CARD WAS ABANDONED MID-IMPLEMENTATION** — Pitiless Plunderer needs
-    Treasures-as-mana in rendmaw, which means a decrement threaded through the
-    `spend()` five engines share; that is its own change with its own
-    measurement, not a ride-along (§0z26).
+    (Pitiless Plunderer, abandoned mid-implementation here for want of
+    Treasures-as-mana in rendmaw (§0z26), was built with them and measured
+    in §0z64.)
 
 20-old2. **The previous entry.**
     **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
@@ -872,42 +875,6 @@ is half answered**: the ordering half is built and measured as a null
     than a blank). **The owner kept the Boots (2026-09-26, item 20b)**: the
     Conqueror stays staged over Soulmender, and the Boots remain the named
     cut for Alhammarret's Archive should that hold ever lift.
-
-23. **BUILT, ALL OF IT.** Tiers 0 and 2 (§0z66): `python -m tools.triage`,
-    a verdict flag on `Proposal`, a gate in the `add-card` skill. The 33
-    `KNOWN_BLIND` cards its back-test found the engine acting on are
-    relabelled, card by card, with the missing clause named (§0z78), and
-    `tests/test_blind_labels.py` fails the next time a label rots. PREPARED
-    and the SIMULATED/STAGED split are in the ledger (§0z79) -- which moved
-    23 head-to-heads, the owner's open decisions among them, out of MEASURED.
-    **The original entry follows.**
-    **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
-    OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is
-    the design and `docs/LEDGER_STATES.md` is its naming half**; nothing is
-    implemented. The vocabulary matters because the intended workload is 50+
-    proposals at a time, most of them discarded before any head-to-head, and
-    the states a card DIES in are the ones this repo keeps losing to chat. The measured costs say the intuition
-    that "screening is expensive" is wrong in an instructive way: a candidate row
-    is ~152 CPU-seconds, a real swap is one `run_ab`, and the largest single
-    measurement spend of that session was **2.6 CPU-hours ranking cards that had
-    already been measured**. What actually costs a session is MAKING A CARD
-    BEHAVE LIKE ITS TEXT — so a screen that runs after implementation saves
-    nothing, and the economy is to screen ON PAPER FIRST and escalate N only for
-    survivors. Five tiers: paper (legal / already known / **can the engine SEE
-    it**), hook (does its text land on a hook that exists), smoke (implemented,
-    does its own counter fire, at N≈1000), value (the candidate row at N=15,000),
-    decision (the head-to-head). **Tier 0 is the biggest saver and two thirds of
-    it already exists** (`check_proposals`, `tools/card_known.py`); what is
-    missing is a visibility VERDICT with teeth, which the `add-card` skill
-    currently asks for as a review that cannot stop a card. **Tier 2 does not
-    exist and is nearly free**: a count has far lower variance than a win-rate
-    difference, which is why Sai's 0.155 Thopters a game was decidable at N=1000.
-    **Two things must NOT be economised** — the head-to-head (two withdrawn swaps
-    without it, and §0z36 found a staged cut wrong by +0.0147) and the
-    mutation-pinned test (§0z28's +0.0481 was really +0.0279). **And the screen
-    itself needs a test**: back-test it over every card this repo has already
-    measured, and it FAILS if it calls BLIND anything whose row was significant.
-    Triage predicts MEASURABILITY, not value.
 
 18. **BOTH HALVES ARE MEASURED; WHAT IS LEFT IS AN ADOPTION DECISION**
     (§0z43, §0z44). The ORDER half is a null: the one-card lookahead

@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `22d4e8c`.
+Generated at `c6f42ea`.
 
 **6 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -85,24 +85,30 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `3e2afdd68b441910` | `22d4e8c` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `ae97d771ca2d3fa2` | `35db4de` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `d45b7716f6b4da5f` | `452eeac` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `ea0fd35f9ca289af` | `d2dab44` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `4b527a1c1bd3c45e` | `ac5e81b` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `3e2afdd68b441910` | `22d4e8c` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `ae97d771ca2d3fa2` | `35db4de` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `d45b7716f6b4da5f` | `452eeac` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `ea0fd35f9ca289af` | `d2dab44` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `4b527a1c1bd3c45e` | `ac5e81b` | **VERIFIED** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `a752697f456fae62` | `7db8cb9` | **VERIFIED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `3e2afdd68b441910`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `ae97d771ca2d3fa2`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `d45b7716f6b4da5f`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `ea0fd35f9ca289af`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `4b527a1c1bd3c45e`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `a752697f456fae62`; fingerprint has since moved to `63a95f255abf2d33` and was CHECKED at `d2dab44` (2026-09-29T07:18:24Z): 2026-09-29 (§0z75-§0z79): check_unchanged_decks against a HEAD (d2dab44) worktree -- tivit BIT-IDENTICAL on all 8 metrics on the deck module with the new defaults, and BIT-IDENTICAL on the staged list (build_pending, N=400). The table was re-rendered from this cache for the §0z78 reclassification: same numbers, seven vote cards moved to PARTLY MODELLED.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `3e2afdd68b441910`; fingerprint has since moved to `ac9e321631cf0465` and was CHECKED at `c6f42ea` (2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+  - verified at `ac9e321631cf0465` (`c6f42ea`, 2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `ae97d771ca2d3fa2`; fingerprint has since moved to `212f0c1f7ec19bfc` and was CHECKED at `c6f42ea` (2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+  - verified at `212f0c1f7ec19bfc` (`c6f42ea`, 2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `d45b7716f6b4da5f`; fingerprint has since moved to `e527cd57c89f99ba` and was CHECKED at `c6f42ea` (2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+  - verified at `e527cd57c89f99ba` (`c6f42ea`, 2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `ea0fd35f9ca289af`; fingerprint has since moved to `735468c5416a6d4f` and was CHECKED at `c6f42ea` (2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+  - verified at `735468c5416a6d4f` (`c6f42ea`, 2026-09-29T12:27:12Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `4b527a1c1bd3c45e`; fingerprint has since moved to `f3a3e577f5a9916c` and was CHECKED at `c6f42ea` (2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+  - verified at `f3a3e577f5a9916c` (`c6f42ea`, 2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `a752697f456fae62`; fingerprint has since moved to `679a48323d16d80e` and was CHECKED at `c6f42ea` (2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
   - verified at `29d6d30afee3f640` (`92f9a15`, 2026-09-29T01:38:32Z): §0z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.
   - verified at `804f20233070d53c` (`92f9a15`, 2026-09-29T01:39:24Z): §0z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.
   - verified at `63a95f255abf2d33` (`d2dab44`, 2026-09-29T07:18:24Z): 2026-09-29 (§0z75-§0z79): check_unchanged_decks against a HEAD (d2dab44) worktree -- tivit BIT-IDENTICAL on all 8 metrics on the deck module with the new defaults, and BIT-IDENTICAL on the staged list (build_pending, N=400). The table was re-rendered from this cache for the §0z78 reclassification: same numbers, seven vote cards moved to PARTLY MODELLED.
+  - verified at `679a48323d16d80e` (`c6f42ea`, 2026-09-29T12:27:13Z): 2026-09-29 (§0z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).
 
 ## What each fingerprint covers
 

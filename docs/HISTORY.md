@@ -2391,6 +2391,48 @@ sections above.
     the 2026-09-09 figure, unpaired, so marginal; the given-Caldera number
     the staging rests on is still +0.0150 ±0.0031.
 
+## Queued items closed 2026-09-29 — moved from `CLAUDE.md`
+
+Moved verbatim under the same precedent as the sections above. Item 23
+closed with §0z78 (the relabelling) and §0z79 (the ledger states); §0z80
+fixed the funnel count it introduced.
+
+23. **BUILT, ALL OF IT.** Tiers 0 and 2 (§0z66): `python -m tools.triage`,
+    a verdict flag on `Proposal`, a gate in the `add-card` skill. The 33
+    `KNOWN_BLIND` cards its back-test found the engine acting on are
+    relabelled, card by card, with the missing clause named (§0z78), and
+    `tests/test_blind_labels.py` fails the next time a label rots. PREPARED
+    and the SIMULATED/STAGED split are in the ledger (§0z79) -- which moved
+    23 head-to-heads, the owner's open decisions among them, out of MEASURED.
+    **The original entry follows.**
+    **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
+    OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is
+    the design and `docs/LEDGER_STATES.md` is its naming half**; nothing is
+    implemented. The vocabulary matters because the intended workload is 50+
+    proposals at a time, most of them discarded before any head-to-head, and
+    the states a card DIES in are the ones this repo keeps losing to chat. The measured costs say the intuition
+    that "screening is expensive" is wrong in an instructive way: a candidate row
+    is ~152 CPU-seconds, a real swap is one `run_ab`, and the largest single
+    measurement spend of that session was **2.6 CPU-hours ranking cards that had
+    already been measured**. What actually costs a session is MAKING A CARD
+    BEHAVE LIKE ITS TEXT — so a screen that runs after implementation saves
+    nothing, and the economy is to screen ON PAPER FIRST and escalate N only for
+    survivors. Five tiers: paper (legal / already known / **can the engine SEE
+    it**), hook (does its text land on a hook that exists), smoke (implemented,
+    does its own counter fire, at N≈1000), value (the candidate row at N=15,000),
+    decision (the head-to-head). **Tier 0 is the biggest saver and two thirds of
+    it already exists** (`check_proposals`, `tools/card_known.py`); what is
+    missing is a visibility VERDICT with teeth, which the `add-card` skill
+    currently asks for as a review that cannot stop a card. **Tier 2 does not
+    exist and is nearly free**: a count has far lower variance than a win-rate
+    difference, which is why Sai's 0.155 Thopters a game was decidable at N=1000.
+    **Two things must NOT be economised** — the head-to-head (two withdrawn swaps
+    without it, and §0z36 found a staged cut wrong by +0.0147) and the
+    mutation-pinned test (§0z28's +0.0481 was really +0.0279). **And the screen
+    itself needs a test**: back-test it over every card this repo has already
+    measured, and it FAILS if it calls BLIND anything whose row was significant.
+    Triage predicts MEASURABILITY, not value.
+
 ---
 
 ## HANDOFF.md's status block, as of 2026-09-12 — SUPERSEDED, see `docs/STATUS.md`

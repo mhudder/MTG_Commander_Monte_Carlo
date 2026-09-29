@@ -3631,6 +3631,56 @@ def check_simulated(simulated=None, staged=None) -> None:
     _not_simulated_and_staged(simulated, staged)
 
 
+# The funnel's order, furthest first (docs/LEDGER_STATES.md). WITHDRAWN sits
+# beside STAGED: it was staged and is not now.
+FUNNEL = ("COMMITTED", "STAGED", "WITHDRAWN", "SIMULATED", "MEASURED",
+          "PREPARED", "PROPOSED", "REJECTED")
+
+
+def _further(state: str, than: str) -> bool:
+    """Is `state` further along the funnel than `than`? A function so a
+    mutation can switch this one rule off (tests/test_ledger_states.py)."""
+    return FUNNEL.index(state) < FUNNEL.index(than)
+
+
+def funnel() -> dict[str, list[tuple[str, str]]]:
+    """Each CARD once, in the furthest state any record of it has reached.
+
+    A record is never deleted when its card moves on -- the Proposal stays
+    after the card is measured, the Candidate after it is staged -- and that
+    is right, because each record holds different evidence. But counting
+    RECORDS said ten cards were "proposed" when all ten had long been
+    measured and two were staged (§0z80). So the funnel is derived per card:
+    (deck, card) -> the furthest state, the card being a Change's or a
+    Simulated's `add`, a Candidate's or a Proposal's `card`. A REJECTED
+    proposal counts as rejected only if nothing else has taken it further.
+    """
+    reached: dict[tuple[str, str], str] = {}
+
+    def mark(deck, card, state):
+        key = (deck, card)
+        if key not in reached or _further(state, reached[key]):
+            reached[key] = state
+
+    for c in COMMITTED:
+        mark(c.deck, c.add, "COMMITTED")
+    for c in CHANGES:
+        mark(c.deck, c.add, "STAGED")
+    for c in WITHDRAWN:
+        mark(c.deck, c.add, "WITHDRAWN")
+    for r in SIMULATED:
+        mark(r.deck, r.add, "SIMULATED")
+    for c in MEASURED:
+        mark(c.deck, c.card, "MEASURED")
+    for pr in PROPOSED:
+        mark(pr.deck, pr.card, "REJECTED" if pr.rejected else
+             "PREPARED" if pr.prepared else "PROPOSED")
+    out: dict[str, list[tuple[str, str]]] = {st: [] for st in FUNNEL}
+    for key, st in reached.items():
+        out[st].append(key)
+    return out
+
+
 def simulations() -> list[Simulated]:
     """Every head-to-head the ledger holds: the unstaged ones, and the
     derived halves of every staged, committed and withdrawn Change."""
@@ -4071,10 +4121,23 @@ def validate(deck, commander) -> None:
 def print_proposals() -> None:
     """PROPOSED, grouped by deck. Printed last because it is the weakest state:
     verified card text and an argument, with no number attached to any of it."""
-    live = [p for p in PROPOSED if not p.rejected]
-    dead = [p for p in PROPOSED if p.rejected]
+    # Only the proposals still AT the proposed state (§0z80): a Proposal whose
+    # card has been measured, simulated or staged keeps its record, but is
+    # listed where its card is now rather than as "nothing measured".
+    where = {k: st for st, ks in funnel().items() for k in ks}
+    moved = [p for p in PROPOSED
+             if where[(p.deck, p.card)] not in ("PROPOSED", "PREPARED",
+                                                "REJECTED")]
+    live = [p for p in PROPOSED if not p.rejected and p not in moved]
+    dead = [p for p in PROPOSED if p.rejected and p not in moved]
     print("\n" + "=" * 78)
     print(f"PROPOSED — oracle text verified, NOTHING MEASURED ({len(live)} live)")
+    if moved:
+        from collections import Counter
+        by = Counter(where[(p.deck, p.card)] for p in moved)
+        print(f"  {len(moved)} more proposal record(s) whose card has moved on "
+              f"and is listed there: "
+              + ", ".join(f"{n} {st}" for st, n in sorted(by.items())) + ".")
     print("=" * 78)
     print("  Next step for each is a tools/candidates.py batch entry, not a")
     print("  staging. A Proposal has no confidence interval; a Candidate does.")

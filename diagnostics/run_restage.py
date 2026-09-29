@@ -2,6 +2,7 @@
 """Re-measure every staged swap, and the open head-to-heads, on today's engine.
 
     python -m diagnostics.run_restage 15000 OUTDIR [ARM ...]
+    python -m diagnostics.run_restage --report OUTDIR
 
 Each arm is `build_pending(deck)` with some slots rewritten, run for N games
 at T10 and T20 on seeds 5000..; per-seed columns go to OUTDIR/<arm>_T<h>.npy
@@ -19,6 +20,14 @@ the deck's other staged changes are present on both sides.
   L_gold_slot     Goldspan Dragon in Caldera Pyremaw's slot
   L_gold_act      -Blasphemous Act +Goldspan Dragon
   L_gold_grv      -Lightning Greaves +Goldspan Dragon
+  L_noCaldera     lorehold with Caldera Pyremaw undone (Penance back)
+  L_noSunbird     ... with Sunbird's Invocation undone (Scroll Rack back)
+  L_noGold        ... with Goldspan Dragon undone (Blasphemous Act back)
+  S / S_noLyra    shilgengar as staged / with Lyra undone (Vampiric Rites back)
+
+`--report` prints every STAGED swap as "staged minus undone", which is the
+number each Change's `reverified` records. The last four arms were added on
+2026-09-29 so that all eight staged swaps are covered (§0z80).
 """
 import os
 import sys
@@ -44,7 +53,40 @@ ARMS = {
     "L_gold_slot": ("lorehold", [("Caldera Pyremaw", ("lh", "GOLDSPAN_DRAGON"))]),
     "L_gold_act": ("lorehold", [("Blasphemous Act", ("lh", "GOLDSPAN_DRAGON"))]),
     "L_gold_grv": ("lorehold", [("Lightning Greaves", ("lh", "GOLDSPAN_DRAGON"))]),
+    "L_noCaldera": ("lorehold", [("Caldera Pyremaw", ("module", "Penance"))]),
+    "L_noSunbird": ("lorehold", [("Sunbird's Invocation", ("module", "Scroll Rack"))]),
+    "L_noGold": ("lorehold", [("Goldspan Dragon", ("module", "Blasphemous Act"))]),
+    "S": ("shilgengar", []),
+    "S_noLyra": ("shilgengar", [("Lyra, Archangel of Dawn",
+                                 ("module", "Vampiric Rites"))]),
 }
+
+# Every STAGED swap, as (label, staged arm, arm with that swap undone).
+STAGED = (
+    ("karlov  -Soulmender +Bloodthirsty Conqueror", "K", "K_noConq"),
+    ("karlov  -Swamp +Bolas's Citadel", "K", "K_noCit"),
+    ("tivit   -Plains +Anointed Procession", "T", "T_noProc"),
+    ("azusa   -Perilous Forays +Ka-Zar of the Savage Land", "A", "A_noKaZar"),
+    ("lorehold -Penance +Caldera Pyremaw", "L", "L_noCaldera"),
+    ("lorehold -Scroll Rack +Sunbird's Invocation", "L", "L_noSunbird"),
+    ("lorehold -Blasphemous Act +Goldspan Dragon", "L", "L_noGold"),
+    ("shilgengar -Vampiric Rites +Lyra, Archangel of Dawn", "S", "S_noLyra"),
+)
+
+
+def report(outdir):
+    def diff(a, b, t, m):
+        x = np.load(os.path.join(outdir, f"{a}_T{t}.npy"))[:, MET.index(m)]
+        y = np.load(os.path.join(outdir, f"{b}_T{t}.npy"))[:, MET.index(m)]
+        d = x - y
+        return d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(len(d))
+    for label, a, b in STAGED:
+        cells = []
+        for t in (10, 20):
+            mu, ci = diff(a, b, t, "won")
+            cells.append(f"T{t} {mu:+.4f} +-{ci:.4f}{'*' if abs(mu) > ci else ' '}")
+        dm, dci = diff(a, b, 20, "damage")
+        print(f"{label:<54}" + "  ".join(cells) + f"  dmgT20 {dm:+.2f} +-{dci:.2f}")
 
 
 def build(arm):
@@ -80,6 +122,9 @@ def job(a):
 
 
 if __name__ == "__main__":
+    if sys.argv[1] == "--report":
+        report(sys.argv[2])
+        sys.exit(0)
     n, outdir = int(sys.argv[1]), sys.argv[2]
     arms = sys.argv[3:] or list(ARMS)
     for a in arms:

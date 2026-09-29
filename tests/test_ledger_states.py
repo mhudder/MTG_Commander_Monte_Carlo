@@ -2,7 +2,7 @@
 """The ledger's SIMULATED/STAGED split and the PREPARED flag (§0z79).
 
     python -m tests.test_ledger_states
-    python -m tests.test_ledger_states --mutate   # 3 mutations, exact sets
+    python -m tests.test_ledger_states --mutate   # 4 mutations, exact sets
 
 docs/LEDGER_STATES.md designed both and the owner confirmed the split on
 2026-09-22: a head-to-head against a named cut is EVIDENCE (SIMULATED), and
@@ -18,11 +18,19 @@ CASES
   F  PREPARED naming a file that does not exist is refused
   G  `Change.simulated` carries the Change's evidence as its result
   H  check_docs derives SIMULATED and PREPARED from pending.py
+  I  the funnel counts a card at its FURTHEST state: Bloodthirsty Conqueror
+     has a Proposal, a Candidate and a SIMULATED record, and is STAGED
+  J  the funnel counts every card exactly once
+  K  a REJECTED proposal nothing took further stays REJECTED (Felidar
+     Retreat, off-colour in azusa)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the "not both SIMULATED and staged" rule is off    -> B
   the "staged needs evidence" rule is off            -> C
   PREPARED is never checked                          -> F
+  the funnel keeps the LAST record, not the furthest -> I
+    (added with I-K, §0z80; J and K survive it because each of their cards
+    is marked once or the last mark is the furthest)
 
 THE FIRST RUN FAILED E, AND THE CODE WAS WRONG, NOT THE EXPECTATION.
 `check_prepared` split the note on whitespace, so "tests/x.py, 2026-09-29"
@@ -88,6 +96,15 @@ def run_cases():
           (ch.simulated.result, ch.simulated.remove), (ch.evidence, "X"))
     check("H check_docs derives SIMULATED and PREPARED",
           {"SIMULATED", "PREPARED"} <= CD.ledger_states(), True)
+    f = P.funnel()
+    where = {k: st for st, ks in f.items() for k in ks}
+    check("I the funnel counts Conqueror as STAGED",
+          where.get(("karlov", "Bloodthirsty Conqueror")), "STAGED")
+    keys = [k for ks in f.values() for k in ks]
+    check("J every card is counted exactly once",
+          len(keys) == len(set(keys)), True)
+    check("K an untouched rejected proposal stays REJECTED",
+          where.get(("azusa", "Felidar Retreat")), "REJECTED")
     return set(FAIL)
 
 
@@ -106,6 +123,8 @@ def main() -> int:
             ({"C"}, "_staged_have_evidence", lambda st: None),
         "PREPARED is never checked":
             ({"F"}, "check_prepared", lambda pr: None),
+        "the funnel keeps the last record":
+            ({"I"}, "_further", lambda state, than: True),
     }
     bad = 0
     for label, (want, name, fn) in muts.items():

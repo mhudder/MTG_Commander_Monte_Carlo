@@ -6,7 +6,9 @@ BLIND / DEFERRED, with `triage_clauses` and `triage_note`, enforced by
 test that pins the card (`check_prepared`). `SIMULATED: list[Simulated]`
 holds head-to-heads with no decision, and every staged Change's evidence is
 its derived SIMULATED half (`Change.simulated`, `check_simulated`).
-`docs/STATUS.md` derives the funnel per state. This is the naming half of
+`docs/STATUS.md` derives the funnel per state, counting each CARD once in the furthest
+state any record of it has reached (`pending.funnel()`, §0z80) -- records are kept
+when a card moves on, so counting them double-counts. This is the naming half of
 `docs/TRIAGE.md` — that file designs the *screen*, this one the *states a
 card passes through and the states it dies in*.
 

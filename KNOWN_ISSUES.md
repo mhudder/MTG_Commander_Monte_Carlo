@@ -128,6 +128,7 @@ Methodology that used to live at the end of this file is now
 | [0z77](#0z77) | FIXED | **Goldspan's targeted Treasure** (0.018 a game, inside its bar), and **the Treasure Vault held back -- which LOSES** (−0.0011 held with a doubler, −0.0102 always): the default stays "never" |
 | [0z78](#0z78) | FIXED | **The 33 KNOWN_BLIND cards the engine acts on, relabelled**: 4 SCRIPTED, 23 PARTLY with the missing clause named, 6 stay blind with a reason in `BLIND_BUT_LIVE`. `tests/test_blind_labels.py` holds it |
 | [0z79](#0z79) | BUILT | **PREPARED, and SIMULATED split from STAGED** (item 23). 23 unstaged head-to-heads -- the owner's open decisions among them -- were filed as MEASURED; they are `Simulated` records now |
+| [0z80](#0z80) | FIXED | **The funnel counted records, not cards** (§0z79's own bug: "10 proposed" were all long measured); three CLAUDE.md claims had outlived their facts; the stale-name note named staged-out cards every run, hiding the one truly stale name |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8026,6 +8027,44 @@ Pinned by `tests/test_ledger_states.py`: 8 cases, 3 mutations, exact sets,
 one rule per function so each mutation removes exactly one. **Its first run
 failed a case and the CODE was wrong**: `check_prepared` split its note on
 whitespace, so "tests/x.py, 2026-09-29" kept a comma and refused a real test.
+
+## 0z80. FIXED — the funnel counted records, and three claims had outlived their facts
+
+**§0z79's own funnel was wrong the day it shipped.** It counted RECORDS per
+state, and a record is never deleted when its card moves on -- so
+`docs/STATUS.md` said ten cards were PROPOSED when all ten had been measured
+long before and two were staged, and 46 were MEASURED when 25 of those had
+gone on to a head-to-head. `pending.funnel()` counts each CARD once, in the
+furthest state any record of it has reached (the order is
+`pending.FUNNEL`); STATUS and `print_proposals` read it. Corrected: 0
+proposed, 21 measured, 21 simulated, 8 staged. Pinned by
+`tests/test_ledger_states.py` (cases I-K, a fourth mutation, exact).
+
+**Three claims in CLAUDE.md, each true once:**
+
+| claim | true until | now |
+|---|---|---|
+| "life-loss drawbacks are still free in the model" | 2026-09-12 (§0i, §0z13) | charged; the rule says to charge them |
+| Pitiless Plunderer "abandoned mid-implementation" (item 20) | §0z64 | built with Treasures-as-mana, measured |
+| CRN "currently measuring ~11x at corr 0.9130" | an older engine | validate prints it; the durable file no longer quotes a number |
+
+The first is §0z13's shape exactly: an issue closed, and the standing text
+describing it was never re-read. Item 23 moved to `docs/HISTORY.md`.
+
+**THE STALE-NAME NOTE CRIED WOLF, SO NOBODY READ IT.** `check_scripted_coverage`
+compared its classifications with the list being MEASURED, and so named every
+staged-out card (Vampiric Rites, Penance, Scroll Rack, Perilous Forays) on
+every run, and two ledger cards (Cauldron of Essence, a withdrawn add;
+Ginger, a simulated candidate) whose labels are needed the day they return.
+The one truly stale name -- Yavimaya Elder, committed out of azusa on
+2026-09-22 -- sat among them for a week. `ablation.known_names` is the deck
+module, the measured list and every card the ledger holds for the deck; the
+note is silent now, and Yavimaya Elder is pruned.
+
+**NO NUMBER MOVED**, and that is checked rather than argued: pending.py and
+ablation.py are in every cache fingerprint, and `check_unchanged_decks`
+against the previous HEAD is BIT-IDENTICAL on all six decks for both the deck
+modules and the staged lists (`build_pending`).
 
 ## How to read an ablation table
 

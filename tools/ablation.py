@@ -492,7 +492,10 @@ SCRIPTED_AZUSA = {
     "Augur of Autumn", "Ramunap Excavator", "Crucible of Worlds",
     # tutors / ETB value
     "Craterhoof Behemoth", "Eternal Witness", "Woodland Bellower",
-    "Nissa, Vastwood Seer // Nissa, Sage Animist", "Yavimaya Elder",
+    "Nissa, Vastwood Seer // Nissa, Sage Animist",
+    # (Yavimaya Elder was here until 2026-09-29: committed OUT of the list on
+    # 2026-09-22, so its label described a card no deck, staging or ledger
+    # entry holds. §0z80.)
     # Bane of Progress and Ashaya were HERE until 2026-09-10 and are now in
     # PARTLY_MODELLED, which is the category this comment block used to say the
     # project did not have. See below.
@@ -1277,6 +1280,26 @@ BLIND_BUT_LIVE = {
 }
 
 
+def known_names(deck_name, deck):
+    """Every name a classification may legitimately hold for this deck.
+
+    The list being measured, AND the deck module (a card staged OUT --
+    Vampiric Rites, Soulmender -- is back the moment its swap is unstaged),
+    AND every card the ledger holds for the deck (a withdrawn add, a
+    simulated or measured candidate: each keeps its label for when it
+    returns). A stale-name note used to compare against the measured list
+    alone, so it named staged-out cards on every run and nobody read it --
+    and the one truly stale name among them, a card committed out, went
+    unpruned for a week (§0z80).
+    """
+    from edhmc import pending as P
+    known = {c.name for c in deck}
+    known |= {c.name for c in DECKS[deck_name].build()[0]}
+    known |= {card for d, card in (k for ks in P.funnel().values() for k in ks)
+              if d == deck_name}
+    return known
+
+
 def check_scripted_coverage(deck_name, deck, partly):
     """Every nonland card must be classified ON PURPOSE.
 
@@ -1309,7 +1332,8 @@ def check_scripted_coverage(deck_name, deck, partly):
     # like coverage and is not.
     SCRIPTED, PARTLY, DECK = SCRIPTED_BY_DECK[deck_name], partly, deck_name
     names = {c.name for c in deck if not c.is_land or c.script}
-    stale = SCRIPTED - {c.name for c in deck}   # lands may be scripted too
+    known = known_names(deck_name, deck)
+    stale = SCRIPTED - known                    # lands may be scripted too
     if stale:
         print(f"  NOTE: {len(stale)} name(s) in SCRIPTED_{DECK.upper()} are no "
               f"longer in the deck: {', '.join(sorted(stale))}", file=sys.stderr)
@@ -1334,7 +1358,7 @@ def check_scripted_coverage(deck_name, deck, partly):
             + "The reason is the category's whole content -- it is printed in "
               "the table so the row carries its own caveat. 'Partly modelled' "
               "with no statement of WHICH part is a label, not a finding.")
-    stale_partly = set(PARTLY) - {c.name for c in deck}
+    stale_partly = set(PARTLY) - known
     if stale_partly:
         print(f"  NOTE: {len(stale_partly)} name(s) in PARTLY_MODELLED are no "
               f"longer in the {DECK} deck: {', '.join(sorted(stale_partly))}",
