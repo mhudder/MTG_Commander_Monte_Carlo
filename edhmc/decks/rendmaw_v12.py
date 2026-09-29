@@ -304,3 +304,28 @@ PROFT_SINISTER_MASTERMIND = C("Proft, Sinister Mastermind", "Creature",
                               priority=8, threat=7.5)
 
 FRA_CANDIDATES = (PROFT_SINISTER_MASTERMIND,)
+
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them (2026-09-29). §0z74.
+# ---------------------------------------------------------------------------
+
+# DAVVOL, EVINCAR OF RATH  {2}{B}{G}  2/2  Legendary Creature - Phyrexian Noble
+#   "Whenever another creature you control enters, you lose 1 life and add {B}."
+#
+# MANDATORY, and in the deck that makes the most tokens in the project. Every
+# Bird, Saproling, Faerie and Spider is {B} -- spendable only in the step it
+# arrives in -- and a point of life. `engine.davvol_trigger`.
+DAVVOL_EVINCAR_OF_RATH = C("Davvol, Evincar of Rath", "Creature",
+                           {"gen": 2, "B": 1, "G": 1}, 2, 2,
+                           priority=6.5, threat=6.0)
+
+# THOMIL, THE DESTROYER  {3}{B}{B}  Legendary Planeswalker, loyalty 4
+#   "+2: Create a 2/2 black Zombie creature token.
+#     0: You may sacrifice a creature. If you do, add {B}{B}{B}.
+#    -5: Create a Lord of the Pit token."
+THOMIL_THE_DESTROYER = C("Thomil, the Destroyer", "Planeswalker",
+                         {"gen": 3, "B": 2}, priority=7, threat=7.0)
+
+MBC_CANDIDATES = (DAVVOL_EVINCAR_OF_RATH, THOMIL_THE_DESTROYER)

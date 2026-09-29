@@ -50,7 +50,8 @@ import random
 from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng)
+                          crn_shuffle, make_rng, seal_rng,
+                          enter_loyalty, walker_ready, walker_dies_at_zero)
 from edhmc import opponents as OPP
 from edhmc import voting as V
 
@@ -88,6 +89,13 @@ class TivitGame(BaseGame):
         # Token piles. Ints rather than Permanents: none of them is a creature
         # and nothing in this deck reads an individual one.
         self.tokens = {k: 0 for k in TOKEN_KINDS}
+        # POWERSTONES (Dyfed, §0z74) are a pile like the three above but NOT
+        # one of TOKEN_KINDS: that tuple is Academy Manufactor's "one of each"
+        # replacement, which a Powerstone is not part of. In `tokens` so that
+        # `artifact_count`, Cyberdrive and Time Sieve's fuel all see them.
+        self.tokens["Powerstone"] = 0
+        self.powerstones_tapped = 0     # of the pile; they untap each turn
+        self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
 
         cfg.setdefault("shroud_sources", ("Lightning Greaves",))
@@ -362,7 +370,11 @@ def sacrifice_real_artifacts(g, perms) -> None:
 # Mana
 # ---------------------------------------------------------------------------
 
-def mana_units(g) -> list[frozenset]:
+def untapped_powerstones(g) -> int:
+    return max(0, g.tokens["Powerstone"] - g.powerstones_tapped)
+
+
+def mana_units(g, powerstones: bool = False) -> list[frozenset]:
     """One entry per point of mana available, Treasures included.
 
     A Treasure is "{T}, Sacrifice: add one mana of any color", so it is a
@@ -382,14 +394,22 @@ def mana_units(g) -> list[frozenset]:
         elif c.mana_ability:
             amt, colors = c.mana_ability
             units.extend([colors] * amt)
+    # POWERSTONES (Dyfed, §0z74): "{T}: Add {C}. This mana can't be spent to
+    # cast a NONARTIFACT spell." So they are offered only to a payment that
+    # says it may take them -- an artifact spell, or an activated ability --
+    # and they sit BETWEEN the real mana and the Treasures, so `pay` can tell
+    # the three apart. With no Powerstones this is the pool it always was.
+    if powerstones:
+        units.extend([frozenset({"C"})] * untapped_powerstones(g))
     units.extend([any_col] * g.tokens["Treasure"])
     return units
 
 
-def pay(g, cost) -> bool:
+def pay(g, cost, powerstones: bool = False) -> bool:
     """Spend `cost` if affordable. Treasures are consumed last and their
-    sacrifice fires the artifact-leaves payoffs."""
-    units = mana_units(g)
+    sacrifice fires the artifact-leaves payoffs. `powerstones` lets Dyfed's
+    restricted mana pay too (an artifact spell or an ability, §0z74)."""
+    units = mana_units(g, powerstones)
     idx = can_pay(cost, units)
     if idx is None:
         return False
@@ -397,9 +417,15 @@ def pay(g, cost) -> bool:
     n_treasure = g.tokens["Treasure"]
     first_treasure = n_units - n_treasure
     used_treasures = sum(1 for i in idx if i >= first_treasure)
+    n_stone = untapped_powerstones(g) if powerstones else 0
+    first_stone = first_treasure - n_stone
+    used_stones = sum(1 for i in idx if first_stone <= i < first_treasure)
+    if used_stones:
+        g.powerstones_tapped += used_stones
+        g.m["powerstone_mana"] += used_stones
 
     # tap the real sources
-    real = sorted(i for i in idx if i < first_treasure)
+    real = sorted(i for i in idx if i < first_stone)
     pos = 0
     for p in g.board:
         if p.tapped:
@@ -419,8 +445,8 @@ def pay(g, cost) -> bool:
     return True
 
 
-def affordable(g, cost) -> bool:
-    return can_pay(cost, mana_units(g)) is not None
+def affordable(g, cost, powerstones: bool = False) -> bool:
+    return can_pay(cost, mana_units(g, powerstones)) is not None
 
 
 # ---------------------------------------------------------------------------
@@ -450,8 +476,30 @@ def blink_tivit(g, source):
     if not g.has("Tivit, Seller of Secrets"):
         return False
     g.m["blinks"] += 1
+    venser_counters(g)
     tivit_dilemma(g)
     return True
+
+
+def venser_counters(g) -> None:
+    """VENSER, VISIONARY TRAVELER (§0z74): "Each nontoken creature you
+    control that wasn't cast from your hand enters with two additional +1/+1
+    counters on it."
+
+    Tivit re-entering from a blink was not cast at all, and Tivit cast from
+    the COMMAND ZONE was not cast from the hand, so both get the counters.
+    A blink here keeps the same Permanent (`blink_tivit` models the fresh ETB
+    as a fresh dilemma, not a new object), so the counters are SET to two --
+    a new object has only these -- rather than added. Only when Venser is out,
+    so a game without him cannot move. NOT modelled: the other ways a creature
+    enters uncast here (Magister of Worth's grace returns), which makes the
+    static a floor."""
+    if not g.has("Venser, Visionary Traveler"):
+        return
+    for p in g.board:
+        if p.card is g.commander:
+            p.counters = 2
+            g.m["venser_counters"] += 2
 
 
 def crack_clues(g, want=1) -> int:
@@ -460,9 +508,9 @@ def crack_clues(g, want=1) -> int:
     Marionette."""
     drawn = 0
     for _ in range(int(want)):
-        if g.tokens["Clue"] <= 0 or not affordable(g, {"gen": 2}):
+        if g.tokens["Clue"] <= 0 or not affordable(g, {"gen": 2}, True):
             break
-        if not pay(g, {"gen": 2}):
+        if not pay(g, {"gen": 2}, powerstones=True):   # an ability, §0z74
             break
         sacrifice_tokens(g, "Clue", 1)
         g.draw(1)
@@ -516,9 +564,9 @@ def deadeye_loop(g):
         return
     cap = g.cfg.get("combo_cap", 40)
     n = 0
-    while n < cap and affordable(g, {"gen": 1, "U": 1}):
+    while n < cap and affordable(g, {"gen": 1, "U": 1}, True):
         before = g.tokens["Treasure"]
-        if not pay(g, {"gen": 1, "U": 1}):
+        if not pay(g, {"gen": 1, "U": 1}, powerstones=True):   # §0z74
             break
         blink_tivit(g, "Deadeye Navigator")
         g.m["deadeye_activations"] += 1
@@ -551,6 +599,8 @@ def convert_the_pile(g):
         sacrifice_tokens(g, "Treasure", g.tokens["Treasure"])
         sacrifice_tokens(g, "Clue", g.tokens["Clue"])
         sacrifice_tokens(g, "Food", g.tokens["Food"])
+        sacrifice_tokens(g, "Powerstone", g.tokens["Powerstone"])
+        g.powerstones_tapped = 0
         if g.result != "win":
             return
         g.m["win_route"] = ROUTE_DRAIN
@@ -589,6 +639,7 @@ def main_phase(g):
                     continue
                 g.board.append(Permanent(card=g.commander,
                                          sick=not g.has("Lightning Greaves")))
+                venser_counters(g)       # cast from the command zone, §0z74
                 g.commander_cast = True
                 g.m["spells_cast"] += 1
                 tivit_dilemma(g)               # the ETB half
@@ -615,7 +666,11 @@ def main_phase(g):
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-            _m = choose_mode(c, reduce_cost(g, c), units)
+            # An ARTIFACT spell may also spend Powerstone mana (§0z74); the
+            # pool is only different when a Powerstone is untapped.
+            pool = (mana_units(g, True) if "Artifact" in c.types
+                    and untapped_powerstones(g) else units)
+            _m = choose_mode(c, reduce_cost(g, c), pool)
             if _m is not None:
                 options.append((c, _m[2], _m[0]))
         if not options:
@@ -626,7 +681,8 @@ def main_phase(g):
         card = lookahead_pick(
             g, options, units, lambda it: (it[0].priority, it[0].mv),
             cost_of=lambda it: it[2], pay_of=lambda it: it[1])[0]
-        if not pay(g, reduce_cost(g, card)):
+        if not pay(g, reduce_cost(g, card),
+                   powerstones="Artifact" in card.types):
             return
         g.hand.remove(card)
         idx = g.spells_this_turn
@@ -842,6 +898,7 @@ def resolve(g, card):
 
     if card.is_permanent:
         perm = Permanent(card=card, sick=not card.haste)
+        enter_loyalty(perm)          # Venser / Dyfed (§0z74)
         g.board.append(perm)
         run_etb(g, perm)
     elif not card.is_land:
@@ -947,6 +1004,15 @@ def upkeep(g):
 
 def end_step(g):
     """End-step blinks. Each is a fresh Tivit ETB, so a fresh dilemma."""
+    # VENSER's +1: "At the beginning of the next end step, return that card to
+    # the battlefield" (§0z74). Tivit went to exile in `walker_step`, AFTER
+    # combat, so it attacked this turn and comes back now.
+    if g.venser_return:
+        g.venser_return = False
+        blink_tivit(g, "Venser, Visionary Traveler")
+        g.m["venser_blinks"] += 1
+        if g.result is not None:
+            return
     for name in ("Soulherder", "Teleportation Circle", "Conjurer's Closet"):
         if g.has(name):
             blink_tivit(g, name)
@@ -1045,7 +1111,91 @@ def activations(g):
     if g.result is not None:
         return
 
+    walker_step(g)                   # Dyfed / Venser, §0z74
+    if g.result is not None:
+        return
+
     crack_clues(g, 3)
+
+
+def make_powerstones(g, n) -> int:
+    """Dyfed's +1: "Create two TAPPED Powerstone tokens." Anointed
+    Procession doubles them (the third token path, and it is said here as it
+    is in the other two -- §0z4); Academy Manufactor does NOT, because a
+    Powerstone is not a Clue, Food or Treasure. Every creation fires
+    `on_tokens_created`, so Mirkwood Bats and Kambal see them."""
+    if g.has("Anointed Procession"):
+        n *= 2
+    g.tokens["Powerstone"] += n
+    g.powerstones_tapped += n            # they enter tapped
+    g.m["powerstones_made"] += n
+    g.m["artifacts_made"] += n
+    on_tokens_created(g, n)
+    return n
+
+
+def walker_step(g) -> None:
+    """Tivit's two walkers (§0z74), once each per turn, at sorcery speed
+    in the postcombat main phase -- after Time Sieve has had its tap.
+
+    DYFED, THE GUIDING HAND (loyalty 4). THE POLICY, SAID OUT LOUD:
+      -1  untap a Time Sieve that was tapped this turn, when five more
+          artifacts can pay for it: a SECOND extra turn. Taken first.
+      -6  when loyalty allows and Time Sieve is neither in play nor in hand:
+          it goes onto the battlefield (else the best artifact by priority).
+      +1  otherwise: two tapped Powerstones.
+    Untapping anything but the Sieve (a signet, the artifact lands) is not
+    modelled -- a mana ability's worth -- which is a floor.
+
+    VENSER, VISIONARY TRAVELER (loyalty 4): +1 on Tivit whenever Tivit is on
+    the battlefield (it returns at end step, a fresh dilemma); +1 with no
+    target otherwise. The -2 is BLIND (§4: the pod's permanents are a count)
+    and never taken. Blinking another ETB creature when Tivit is absent is
+    not modelled -- a floor."""
+    for perm in [p for p in g.board if p.card.name == "Dyfed, the Guiding Hand"]:
+        if not walker_ready(g, perm):
+            continue
+        sieve = next((p for p in g.board if p.card.name == "Time Sieve"), None)
+        fuel = sum(g.tokens.values()) + len(sieve_real_fuel(g))
+        in_hand = any(c.name == "Time Sieve" for c in g.hand)
+        if sieve is not None and sieve.tapped and fuel >= 5 \
+                and perm.counters >= 1:
+            perm.counters -= 1
+            sieve.tapped = False
+            g.m["dyfed_untaps"] += 1
+            walker_dies_at_zero(g, perm)
+            time_sieve(g)
+            if g.result is not None:
+                return
+            continue
+        if perm.counters >= 6 and sieve is None and not in_hand:
+            pool = [c for c in g.library if "Artifact" in c.types
+                    and not c.is_land]
+            if pool:
+                pick = next((c for c in pool if c.name == "Time Sieve"),
+                            max(pool, key=lambda c: c.priority))
+                g.library.remove(pick)
+                crn_shuffle(g, "dyfed_search", g.library)
+                perm.counters -= 6
+                g.m["dyfed_tutors"] += 1
+                q = Permanent(card=pick, sick=not pick.haste)
+                enter_loyalty(q)
+                g.board.append(q)
+                run_etb(g, q)
+                walker_dies_at_zero(g, perm)
+                continue
+        perm.counters += 1
+        make_powerstones(g, 2)
+        if g.result is not None:
+            return
+    for perm in [p for p in g.board
+                 if p.card.name == "Venser, Visionary Traveler"]:
+        if not walker_ready(g, perm):
+            continue
+        perm.counters += 1
+        if g.has("Tivit, Seller of Secrets") and not g.venser_return:
+            g.venser_return = True
+            g.m["venser_exiles"] += 1
 
 
 def _sacrifice_five(g) -> bool:
@@ -1061,8 +1211,14 @@ def _sacrifice_five(g) -> bool:
     if sum(g.tokens.values()) + len(real) < 5:
         return False
     need = 5
-    for kind in ("Food", "Clue", "Treasure"):
-        need -= sacrifice_tokens(g, kind, min(need, g.tokens[kind]))
+    # Powerstones (§0z74) go after Clues and before Treasures: restricted
+    # mana is worth less than any-colour mana, more than a Clue's {2} draw.
+    # Tapped ones first -- a tapped Powerstone has already made its mana.
+    for kind in ("Food", "Clue", "Powerstone", "Treasure"):
+        gone = sacrifice_tokens(g, kind, min(need, g.tokens[kind]))
+        if kind == "Powerstone":
+            g.powerstones_tapped = max(0, g.powerstones_tapped - gone)
+        need -= gone
         if need <= 0:
             return True
     # Short of five tokens: real artifacts, only as many as needed (§0z71).
@@ -1136,6 +1292,7 @@ def take_turn(g, extra=False):
     for p in g.board:
         p.tapped = False
         p.sick = False
+    g.powerstones_tapped = 0            # the Powerstone pile untaps (§0z74)
     g.land_drops = 1
     g.land_drops_used = 0
 

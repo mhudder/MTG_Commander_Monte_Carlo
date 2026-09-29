@@ -41,7 +41,9 @@ from edhmc.engine import (BaseGame, finish, drew_from_empty, lookahead_pick, Met
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng)
+                          crn_shuffle, make_rng, seal_rng,
+                          pearl_collector_trigger, pearl_collector_lifelink,
+                          perpetual_lifelink)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -220,6 +222,13 @@ class KarlovGame(BaseGame):
 
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
+        # SELENIA, THE CURSED HEART (§0z74): "When Selenia dies, create ...
+        # Selenia's Curse attached to target opponent." Once per permanent,
+        # outside any per-death loop. `opponents.curse_opponent` holds the
+        # legend rule and the targeting policy for every engine.
+        if perm is not None and perm.card.name == "Selenia, the Cursed Heart" \
+                and not perm.is_token:
+            OPP.curse_opponent(self)
         # EDGAR, ANCIENT BLOODLORD (Reality Fracture, preview text
         # 2026-09-20): "Whenever ANOTHER creature or planeswalker you control
         # dies, you gain 1 life."
@@ -371,6 +380,14 @@ def gain_life(g, amount, _depth=0):
     # is why this card is NOT simply "a second Wind Crystal" for the commander.
     if g.has("Alhammarret's Archive"):
         g.m["archive_life_doubled"] += amount
+        amount *= 2
+    # SELENIA, THE CURSED HEART (§0z74): "If you would gain life, you gain
+    # twice that much life instead." The same replacement a third time, so the
+    # same line: the AMOUNT doubles, the event count does not, and it stacks
+    # multiplicatively with the two above (616.1 -- order does not matter to
+    # a product). `count`, so a copy would quadruple as the rules say.
+    for _ in range(g.count("Selenia, the Cursed Heart")):
+        g.m["selenia_extra_life"] += amount
         amount *= 2
     g.your_life += amount
     g.life_gained_this_turn += amount
@@ -1246,10 +1263,33 @@ def combat(g):
                      or g.has("Vault of the Archangel")
                      or g.has("Sorin, Solemn Visitor"))
     for p in attackers:
-        if team_lifelink or p.card.lifelink or id(p) in granted:
+        if (team_lifelink or p.card.lifelink or id(p) in granted
+                or perpetual_lifelink(g, p)):        # Pearl Collector, §0z74
             gain_life(g, g.power_of(p))
     if g.result is None and g.m["turn_lethal"] == 99 and not OPP.living(g):
         g.m["turn_lethal"] = g.turn
+
+
+def pay_cost(g, cost) -> bool:
+    """Pay a fixed cost from the current pool, through `spend_lg` so a
+    Pristine Talisman tapped for it still gains its life. True if paid."""
+    units = available_mana(g)
+    idx = can_pay(cost, units)
+    if idx is None:
+        return False
+    spend_lg(g, idx, units)
+    g.m["mana_spent"] += len(idx)
+    return True
+
+
+def has_lifelink(g, p) -> bool:
+    """Does this permanent have lifelink outside combat's one-turn grants?
+    The same test `combat` applies, minus the Wind Crystal / Heliod grants
+    that last only until end of turn -- used to pick Pearl Collector's target."""
+    return bool(p.card.lifelink or perpetual_lifelink(g, p)
+                or g.has("Sorin, Vengeful Bloodlord")
+                or g.has("Vault of the Archangel")
+                or g.has("Sorin, Solemn Visitor"))
 
 
 def take_turn(g):
@@ -1293,9 +1333,14 @@ def take_turn(g):
     if g.result is not None:
         return
     combat(g)
+    # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
+    pearl_collector_trigger(g, g.life_gained_this_turn)
     main_phase(g)
     if g.result is not None:
         return
+    # Pearl Collector's lifelink sink, on mana the second main did not want.
+    pearl_collector_lifelink(g, lambda c: pay_cost(g, c),
+                             lambda p: has_lifelink(g, p))
 
     necropotence_step(g)
     end_step(g)

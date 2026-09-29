@@ -268,6 +268,50 @@ LYRA_ARCHANGEL_OF_DAWN = C("Lyra, Archangel of Dawn", "Creature",
 FRA_CANDIDATES = (LYRA_ARCHANGEL_OF_DAWN,)
 
 
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them regardless (2026-09-29), which is
+# a decision about the table and not about the rules. §0z74.
+# ---------------------------------------------------------------------------
+
+# "{4}{W}{B} 2/5 Flying, lifelink. If you would gain life, you gain twice that
+# much life instead. When Selenia dies, create a legendary black Aura Curse
+# enchantment token named Selenia's Curse attached to target opponent. The
+# token has enchant player and 'If enchanted player would lose life, they lose
+# twice that much life instead.'"
+#
+# An ANGEL with toughness 5: fed to Shilgengar it is five Blood, and its death
+# is the curse. The doubler is `ShilgengarGame.gain_life`; the curse is
+# `opponents.curse_opponent` / `life_loss`.
+SELENIA_THE_CURSED_HEART = C("Selenia, the Cursed Heart", "Creature",
+                             {"gen": 4, "W": 1, "B": 1}, 2, 5, priority=8,
+                             threat=7.5, tags=("angel",), lifelink=True)
+
+# "{4}{W} 4/4 Flying. Whenever Seluma deals combat damage to a player, return
+# target Angel creature card from your graveyard to the battlefield." Its
+# Rulebreaker clause works only in the command zone and is DEAD in the 99.
+SELUMA_LIGHT_OF_AYSEN = C("Seluma, Light of Aysen", "Creature",
+                          {"gen": 4, "W": 1}, 4, 4, priority=7.5, threat=7.5,
+                          tags=("angel",))
+
+# "{3}{B}{B} Planeswalker, loyalty 4. +2: Create a 2/2 black Zombie creature
+# token. 0: You may sacrifice a creature. If you do, add {B}{B}{B}. -5: Create
+# a Lord of the Pit token." Loyalty is read from `engine.PLANESWALKER_LOYALTY`.
+THOMIL_THE_DESTROYER = C("Thomil, the Destroyer", "Planeswalker",
+                         {"gen": 3, "B": 2}, priority=7, threat=7.0)
+
+# "{2}{B} 3/3 Deathtouch, Lifelink. At the beginning of your second main
+# phase, if you gained 4 or more life this turn, conjure a card named Mox Pearl
+# into your hand. This ability triggers only once. {2}{W}: Another target
+# creature perpetually gains lifelink."
+PEARL_COLLECTOR = C("Pearl Collector", "Creature", {"gen": 2, "B": 1}, 3, 3,
+                    priority=6.5, lifelink=True)
+
+MBC_CANDIDATES = (SELENIA_THE_CURSED_HEART, SELUMA_LIGHT_OF_AYSEN,
+                  THOMIL_THE_DESTROYER, PEARL_COLLECTOR)
+
+
 def build():
     deck = (HAYMAKERS + SUPPORT + DRAW_ENGINES + TREASURE + ROCKS
            + INTERACTION + MDFC_SPELLS + LANDS)

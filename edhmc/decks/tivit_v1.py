@@ -360,3 +360,39 @@ MEMNARCH_THE_WARDEN = C("Memnarch, the Warden", "Artifact/Creature",
                         {"gen": 10}, 8, 9, priority=8, threat=9.0)
 
 FRA_CANDIDATES = (MEMNARCH_THE_WARDEN,)
+
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them (2026-09-29). §0z74.
+# ---------------------------------------------------------------------------
+
+# VENSER, VISIONARY TRAVELER  {3}{W}{U}  Legendary Planeswalker, loyalty 4
+#   "Each nontoken creature you control that wasn't cast from your hand enters
+#    with two additional +1/+1 counters on it.
+#    +1: Exile up to one other target permanent you control. At the beginning
+#        of the next end step, return that card to the battlefield under its
+#        owner's control.
+#    -2: For each opponent, return up to one target nonland permanent that
+#        player controls to its owner's hand."
+#
+# The +1 on Tivit is a FRESH ETB every turn -- a dilemma a turn, taken after
+# combat so Tivit still attacks. And Tivit is cast from the COMMAND ZONE, not
+# the hand, so the static gives it two counters on the cast as well.
+VENSER_VISIONARY_TRAVELER = C("Venser, Visionary Traveler", "Planeswalker",
+                              {"gen": 3, "W": 1, "U": 1}, priority=8.0,
+                              threat=7.0)
+
+# DYFED, THE GUIDING HAND  {3}{U}{U}  Legendary Planeswalker, loyalty 4
+#   "+1: Create two tapped Powerstone tokens. (They're artifacts with '{T}: Add
+#        {C}. This mana can't be spent to cast a nonartifact spell.')
+#    -X: Untap X target artifacts.
+#    -6: Search your library for an artifact card, put it onto the battlefield,
+#        then shuffle."
+#
+# Two ARTIFACT TOKENS a turn in the deck whose engine counts artifacts: Time
+# Sieve's fuel, Marionette Master's and Disciple of the Vault's triggers.
+DYFED_THE_GUIDING_HAND = C("Dyfed, the Guiding Hand", "Planeswalker",
+                           {"gen": 3, "U": 2}, priority=7.5, threat=6.5)
+
+MBC_CANDIDATES = (VENSER_VISIONARY_TRAVELER, DYFED_THE_GUIDING_HAND)

@@ -854,6 +854,10 @@ class AzusaGame(BaseGame):
         # basic makes no mana this turn -- it is a landfall trigger and a land
         # drop you did not spend, not a ritual. "You MAY" is taken always: there
         # is no case in this list where fetching a Forest is wrong.
+        # AUTUMN WILLOW, HARMONY (§0z74): "When Autumn Willow enters, create a
+        # 1/1 green Forest Dryad land creature token." ITS OWN `if`, §0z28.
+        if card.name == "Autumn Willow, Harmony" and not is_token:
+            self.forest_dryad_tokens(1, "willow_dryads")
         if (card.name == "Simulacrum Shaper" and not is_token
                 and perm is not None):
             basic = next((c for c in self.library
@@ -939,6 +943,12 @@ class AzusaGame(BaseGame):
         # games, and this loop runs over every permanent on every payment
         # decision -- 800,962 calls to `ashaya_lands` in 120 games before this.
         ashaya = self.ashaya_lands()
+        # AUTUMN WILLOW, HARMONY (§0z74): "Whenever you tap a LAND CREATURE for
+        # mana, add an additional {G}." A doubler, so the extra unit carries
+        # the SAME owner and one tap covers both -- the Nissa pattern above.
+        # Said at all three places a land creature can tap: as a land, as a
+        # dork Ashaya has made a land, and as an Ashaya Forest.
+        willow = self.has("Autumn Willow, Harmony")
         for p in self.board:
             if p.tapped:
                 continue
@@ -956,11 +966,15 @@ class AzusaGame(BaseGame):
                 # doubler and Sapling Nursery's affinity cannot disagree.
                 if nissa and is_forest(c):
                     add(frozenset({"G"}), 1, p)
+                if willow and self.is_land_creature_now(p):
+                    add(frozenset({"G"}), 1, p)
             elif c.mana_ability:
                 if c.is_creature and p.sick:
                     continue
                 amt, colors = c.mana_ability
                 add(colors, amt, p)
+                if willow and ashaya and self.is_creature_land(p):
+                    add(frozenset({"G"}), 1, p)
             # NOT an `elif`, and that is the point. As an `elif` the chain
             # above answered the one-{T} question by short-circuiting, so the
             # SAME RULE lived both here and in `creature_land_mana` -- §0u's
@@ -970,6 +984,8 @@ class AzusaGame(BaseGame):
             # ability, so a dork still taps once.
             if ashaya and self.creature_land_mana(p):
                 add(frozenset({"G"}), 1, p)
+                if willow:
+                    add(frozenset({"G"}), 1, p)
         # Lotus Cobra's, Tireless Provisioner's and Nissa, Resurgent Animist's
         # floating mana. Its owner is a FloatingMana rather than a permanent,
         # so `spend` consumes it by the same tap it uses for a land (§0z37),
@@ -2049,15 +2065,35 @@ class AzusaGame(BaseGame):
         than a knob: see `diag_azusa_batch4.awaken_at` and
         results/azusa_batch4_knob_sweeps.txt.
         """
-        for _ in range(int(x)):
+        self.forest_dryad_tokens(x, "awaken_tokens")
+
+    def forest_dryad_tokens(self, n, counter):
+        """"1/1 green Forest Dryad land creature token(s)" -- Awaken the Woods'
+        and Autumn Willow's (§0z74) token, written ONCE (§0u) so the four
+        properties above cannot drift between the two cards. `counter` is the
+        card's own mechanism counter."""
+        for _ in range(int(n)):
             tok = Card(name="Forest Dryad token",
                        types=frozenset({"Creature", "Land"}),
                        is_land=True, produces=frozenset({"G"}),
                        power=1, toughness=1)
             self.make_permanent(tok, is_token=True)
-            self.m["awaken_tokens"] += 1
+            self.m[counter] += 1
             self.m["tokens_made"] += 1
             self.land_entered(tok, played=False)
+
+    def is_land_creature_now(self, perm) -> bool:
+        """Is this permanent a LAND CREATURE right now? Autumn Willow's
+        question (§0z74). Three ways in this engine: a land whose card is a
+        creature (Dryad Arbor, the Dryad and Tentacle tokens) or that is
+        animated -- both are `counts_as_creature` on a land -- or a nontoken
+        creature Ashaya has made a Forest."""
+        card = getattr(perm, "card", None)
+        if card is None:
+            return False                  # floating mana has no permanent
+        if card.is_land:
+            return self.counts_as_creature(perm)
+        return self.ashaya_lands() and self.is_creature_land(perm)
 
     def verdant_kraken_tokens(self, upkeeps: int):
         """Verdant Kraken: "At the beginning of EACH PLAYER'S upkeep, you

@@ -2432,6 +2432,123 @@ WITHDRAWN: list[Change] = [
 # why that check exists.
 # ---------------------------------------------------------------------------
 PROPOSED: list[Proposal] = [
+    # -----------------------------------------------------------------------
+    # MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), scanned 2026-09-29.
+    # 80 cards; the set releases 2026-11-09 and every NEW card in it reads
+    # `not_legal` in Commander on Scryfall (59 are legal in no format, ten only
+    # in digital ones). THE OWNER'S TABLE PLAYS THEM (2026-09-29), which is a
+    # decision about the table and not about the rules -- the same standing
+    # the Reality Fracture previews had. Nine cards, twelve deck pairs, all
+    # implemented and pinned on the day. §0z74.
+    # -----------------------------------------------------------------------
+    Proposal(
+        deck='shilgengar', card='Selenia, the Cursed Heart', cost='{4}{W}{B}',
+        identity='WB', type_line='Legendary Creature — Angel Warrior',
+        oracle='Flying, lifelink\nIf you would gain life, you gain twice that much life instead.\nWhen Selenia dies, create a legendary black Aura Curse enchantment token named Selenia\'s Curse attached to target opponent. The token has enchant player and "If enchanted player would lose life, they lose twice that much life instead."',
+        verified="2026-09-29",
+        rationale="AN ANGEL WITH TOUGHNESS 5, in the deck whose commander turns an Angel's toughness into Blood: fed to Shilgengar she is five of the six Blood the mass reanimation needs, and her death is the curse, which doubles every point one opponent loses for the rest of the game. Her lifegain doubler feeds Resplendent Angel's five-life threshold and Speaker of the Heavens'. The ultimate returns her with a finality counter, so she curses once.",
+        implement='DONE 2026-09-29. Modelled: flying (generated), lifelink, the doubler in `ShilgengarGame.gain_life` (amount, not events), and the curse through `opponents.curse_opponent` / `life_loss` -- one function read at every site an opponent loses life, so combat, drains and Massacre Wurm all double. The death trigger honours FINALITY (a returned Selenia is exiled, not killed). PARTLY: Blood Artist, Zulaport Cutthroat and Vampiric Rites write `your_life` directly instead of calling `gain_life`, so their gains are not doubled -- a pre-existing gap in this engine, named in §0z74. Classify SCRIPTED at staging. Pinned by tests/test_mbc.py.',
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='shilgengar', card='Seluma, Light of Aysen', cost='{4}{W}',
+        identity='W', type_line='Legendary Creature — Angel Warrior',
+        oracle='Rulebreaker — A deck with this commander can have Angel cards of any color identity and any basic land cards.\nFlying\nWhenever Seluma deals combat damage to a player, return target Angel creature card from your graveyard to the battlefield.',
+        verified="2026-09-29",
+        rationale="A 4/4 FLYING ANGEL whose combat damage is a reanimation -- the deck's recursion plan on an evasive body, and four Blood when it is fed to Shilgengar. It is also the commander of the owner's other list (spreadsheets/Seluma_Commander_Deck_v1.xlsx), so knowing what the body is worth in the 99 is worth knowing.",
+        implement="DONE 2026-09-29. `opponents.combat_damage` now reports the attackers that CONNECTED to an engine that asks (`g.combat_hits`, §0z74) -- shilgengar asks, the other five do not and cannot move -- and each connecting Seluma returns the highest-MV Angel card from `yard_creatures()` (finality respected, pool recomputed per trigger). The RULEBREAKER clause works only in the command zone and is DEAD in the 99. SMOKE FOUND A BUG FIRST: before `tag_flying --write` Seluma attacked as a ground creature and connected on 12% of attacks (§0z29's shape); flying, it connects 0.35 times a game. Its returns are rare (0.035/game) because the commander's mass reanimation keeps the graveyard empty of Angels -- a real interaction, not a defect. Classify SCRIPTED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='shilgengar', card='Thomil, the Destroyer', cost='{3}{B}{B}',
+        identity='B', type_line='Legendary Planeswalker — Thomil',
+        oracle='+2: Create a 2/2 black Zombie creature token.\n0: You may sacrifice a creature. If you do, add {B}{B}{B}.\n−5: Create a Lord of the Pit token. (It\'s a {4}{B}{B}{B} 7/7 Demon creature with flying, trample, and "At the beginning of your upkeep, sacrifice another creature. If you can\'t, this token deals 7 damage to you.")\nThomil, the Destroyer can be your commander.',
+        verified="2026-09-29",
+        rationale="A walker that makes a 2/2 body every turn and, once, a 7/7 flying trampler -- in the deck that already wants bodies to sacrifice for Blood, and whose aristocrats triggers see every death Lord of the Pit's upkeep forces.",
+        implement="DONE 2026-09-29. `engine.thomil_step` (shared with rendmaw): +2 Zombie until loyalty and board allow the -5, then Lord of the Pit, whose mandatory upkeep sacrifice is `engine.lord_of_the_pit_upkeep` through the engine's own `sacrifice`. Loyalty from `engine.PLANESWALKER_LOYALTY`, azusa's convention. FLOOR: the 0 (sacrifice a creature, add {B}{B}{B}) is not taken, and Lord of the Pit's TRAMPLE is not modelled (a chump block stops it). No opponent attacks a planeswalker here (§4, azusa's note), so loyalty only goes up. Classify PARTLY_MODELLED ('the 0 and trample are not modelled') at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='shilgengar', card='Pearl Collector', cost='{2}{B}',
+        identity='WB', type_line='Creature — Human Warlock',
+        oracle='Deathtouch, Lifelink\nAt the beginning of your second main phase, if you gained 4 or more life this turn, conjure a card named Mox Pearl into your hand. This ability triggers only once.\n{2}{W}: Another target creature perpetually gains lifelink.',
+        verified="2026-09-29",
+        rationale="A three-mana lifelink body that turns a four-life turn into a free Mox and spends spare mana on permanent lifelink -- every lifelink attacker is a lifegain event for Righteous Valkyrie's threshold and Lyra's counters.",
+        implement="DONE 2026-09-29. Lifelink on the body; `engine.pearl_collector_trigger` at the start of the postcombat main (once per object, reading `life_gained_this_turn`) conjures a fresh Mox Pearl card; `engine.pearl_collector_lifelink` is the {2}{W} sink, run after the second main phase so it only spends what nothing else wanted, keyed on the CARD's id because 'perpetually' follows the card. PARTLY: DEATHTOUCH is not modelled -- the pod's blocking is a chump count and this engine never blocks. The life-gained-this-turn count misses the direct `your_life` writes named under Selenia. Classify PARTLY_MODELLED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='karlov', card='Selenia, the Cursed Heart', cost='{4}{W}{B}',
+        identity='WB', type_line='Legendary Creature — Angel Warrior',
+        oracle='Flying, lifelink\nIf you would gain life, you gain twice that much life instead.\nWhen Selenia dies, create a legendary black Aura Curse enchantment token named Selenia\'s Curse attached to target opponent. The token has enchant player and "If enchanted player would lose life, they lose twice that much life instead."',
+        verified="2026-09-29",
+        rationale="A THIRD copy of The Wind Crystal's replacement, on a flying lifelink body. The deck counts lifegain EVENTS, which the doubler does not add -- but Sanguine Bond, Vito, Well of Lost Dreams and the life thresholds (Serra Ascendant, Felidar Sovereign) all read the AMOUNT, and the curse doubles every drain into one opponent.",
+        implement="DONE 2026-09-29. The doubler sits beside The Wind Crystal and Alhammarret's Archive in `karlov.gain_life`, stacking multiplicatively (616.1), counted as `selenia_extra_life`. The curse is `opponents.curse_opponent` from `on_creature_death`. This engine has no sacrifice policy, so she dies only to the pod's removal and wipes -- which makes the curse rarer here than in shilgengar (0.04/game against 0.12). Classify SCRIPTED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='karlov', card='Pearl Collector', cost='{2}{B}',
+        identity='WB', type_line='Creature — Human Warlock',
+        oracle='Deathtouch, Lifelink\nAt the beginning of your second main phase, if you gained 4 or more life this turn, conjure a card named Mox Pearl into your hand. This ability triggers only once.\n{2}{W}: Another target creature perpetually gains lifelink.',
+        verified="2026-09-29",
+        rationale='Lifelink on a three-drop is a lifegain event every combat, which is the axis every payoff in this list counts, and karlov gains four life in a turn easily, so the Mox is close to guaranteed.',
+        implement="DONE 2026-09-29. Same shared functions as shilgengar's: the trigger before the postcombat main, the {2}{W} sink after it (`karlov.pay_cost`, through `spend_lg` so Pristine Talisman still gains its life), and `perpetual_lifelink` read in `combat`'s lifelink test. PARTLY: deathtouch not modelled. Classify PARTLY_MODELLED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='tivit', card='Venser, Visionary Traveler', cost='{3}{W}{U}',
+        identity='WU', type_line='Legendary Planeswalker — Venser',
+        oracle="Each nontoken creature you control that wasn't cast from your hand enters with two additional +1/+1 counters on it.\n+1: Exile up to one other target permanent you control. At the beginning of the next end step, return that card to the battlefield under its owner's control.\n−2: For each opponent, return up to one target nonland permanent that player controls to its owner's hand.\nVenser, Visionary Traveler can be your commander.",
+        verified="2026-09-29",
+        rationale='Its +1 on Tivit is a FRESH ETB EVERY TURN -- a dilemma a turn with no mana spent, taken after combat so Tivit still attacks. And Tivit is cast from the COMMAND ZONE, which is not the hand, so the static puts two counters on it every time it enters.',
+        implement="DONE 2026-09-29. `tivit.walker_step` takes the +1 on Tivit after Time Sieve, and `end_step` returns it through `blink_tivit` (a dilemma); `venser_counters` sets Tivit's counters to two on every blink and on the cast. BLIND: the -2 bounces opponents' permanents, which are a count here (§4), and is never taken. FLOOR: the +1 with Tivit absent blinks nothing (other ETB creatures are not tried), and Magister of Worth's returns do not get the counters. Classify PARTLY_MODELLED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='tivit', card='Dyfed, the Guiding Hand', cost='{3}{U}{U}',
+        identity='U', type_line='Legendary Planeswalker — Dyfed',
+        oracle='+1: Create two tapped Powerstone tokens. (They\'re artifacts with "{T}: Add {C}. This mana can\'t be spent to cast a nonartifact spell.")\n−X: Untap X target artifacts.\n−6: Search your library for an artifact card, put it onto the battlefield, then shuffle.\nDyfed, the Guiding Hand can be your commander.',
+        verified="2026-09-29",
+        rationale="TWO ARTIFACT TOKENS A TURN in the deck whose engine counts artifacts: Time Sieve's fuel, Marionette Master's and Disciple of the Vault's triggers, Mirkwood Bats on creation. The -X untaps a spent Time Sieve -- a second extra turn -- and the -6 fetches it.",
+        implement="DONE 2026-09-29. Powerstones are a pile in `g.tokens` (so `artifact_count`, Cyberdrive and Time Sieve see them) but NOT in TOKEN_KINDS (Academy Manufactor's replacement does not make them). Their mana is offered only to artifact spells and activated abilities (`mana_units(g, powerstones=True)`), and they untap each turn. Anointed Procession doubles them -- the THIRD token path, said here as in the other two (§0z4). Policy: -1 to untap a tapped Time Sieve when five more artifacts can pay; -6 for Time Sieve (else the best artifact) when it is in neither play nor hand; +1 otherwise. FLOOR: untapping anything but the Sieve is not modelled. Classify SCRIPTED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='azusa', card='Autumn Willow, Harmony', cost='{3}{G}{G}',
+        identity='G', type_line='Legendary Creature — Avatar',
+        oracle="Hexproof\nWhen Autumn Willow enters, create a 1/1 green Forest Dryad land creature token. (It's affected by summoning sickness.)\nWhenever you tap a land creature for mana, add an additional {G}.",
+        verified="2026-09-29",
+        rationale='Its ETB is a Forest Dryad LAND token -- a landfall trigger on the turn it lands -- and its static is a mana doubler for every land creature: Dryad Arbor, the Dryad tokens, animated lands, and with Ashaya out every nontoken creature in the deck.',
+        implement="DONE 2026-09-29. The token is Awaken the Woods' (`azusa.forest_dryad_tokens`, one definition now for both cards); the extra {G} is offered in `azusa.available_mana` at all three places a land creature taps (as a land, as an Ashaya dork, as an Ashaya Forest) with the SAME owner so one tap covers both, and in `engine.spend`'s count fallback -- a doubler said in both places (§0z4). `willow_taps` is counted at the tap, not where the unit is offered. PARTLY: HEXPROOF is not modelled -- the pod's spot removal targets it like any creature. Classify PARTLY_MODELLED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='rendmaw', card='Davvol, Evincar of Rath', cost='{2}{B}{G}',
+        identity='BG', type_line='Legendary Creature — Phyrexian Noble',
+        oracle='Whenever another creature you control enters, you lose 1 life and add {B}.',
+        verified="2026-09-29",
+        rationale="A mana engine keyed on the deck's whole output -- every Bird, Saproling, Faerie and Spider is {B} -- with a MANDATORY life cost on every one of them, in the deck that makes the most tokens in the project. Whether the mana outruns the bleeding is exactly what this model can measure.",
+        implement="DONE 2026-09-29. `engine.davvol_trigger` at every rendmaw site where a creature enters (make_tokens, a cast, the commander, Cauldron, Lord of the Pit); the {B} is floating mana (`davvol_float`, spent through a `DavvolMana` owner, the TreasureMana shape) that `empty_mana_pool` clears at every step boundary, so an upkeep token's {B} is lost before it can be used -- counted as `davvol_mana_lost`. The life is always charged. Classify SCRIPTED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='rendmaw', card='Thomil, the Destroyer', cost='{3}{B}{B}',
+        identity='B', type_line='Legendary Planeswalker — Thomil',
+        oracle='+2: Create a 2/2 black Zombie creature token.\n0: You may sacrifice a creature. If you do, add {B}{B}{B}.\n−5: Create a Lord of the Pit token. (It\'s a {4}{B}{B}{B} 7/7 Demon creature with flying, trample, and "At the beginning of your upkeep, sacrifice another creature. If you can\'t, this token deals 7 damage to you.")\nThomil, the Destroyer can be your commander.',
+        verified="2026-09-29",
+        rationale="Zombies are Blood Artist and Meathook fodder and Lord of the Pit's upkeep turns one of them a turn into a death trigger; rendmaw has the bodies to feed it.",
+        implement="DONE 2026-09-29. `engine.thomil_step` with rendmaw's `make_tokens` for the Zombie and `rendmaw_token` for the Lord (Primal Vigor and Parallel Lives double both); the Lord's sacrifice is `rendmaw_sacrifice`, routed like Twitching Doll's. FLOOR: the 0 and the Lord's trample are not modelled; loyalty only goes up (§4). Classify PARTLY_MODELLED at staging.",
+        triage="LIVE",
+    ),
+    Proposal(
+        deck='lorehold', card='Chief Magistrate of Mercadia', cost='{4}{R}{W}',
+        identity='WR', type_line='Legendary Creature — Human Noble',
+        oracle="When Chief Magistrate of Mercadia enters, you become the monarch.\nAt the beginning of your upkeep, create a 2/1 red Goblin creature token with haste. Then if you're the monarch, for each creature token you control, create a token that's a copy of it.",
+        verified="2026-09-29",
+        rationale="THE MONARCH (§0z39) and a hasty Goblin every upkeep, and while the crown is held the upkeep DOUBLES every creature token -- Storm Herd's Pegasi, Monastery Mentor's Monks, Emeria's Call's Angels.",
+        implement="DONE 2026-09-29. ETB `opponents.become_monarch`; `lorehold.magistrate_upkeep` makes the Goblin then copies each creature token (copiable values only: a Goblin copy has haste, a Monk copy is still a 'Monk token' for the Mentor's prowess), bounded by `magistrate_token_cap` (512), a guard on the simulator rather than a claim about the card. SMOKE: the crown is taken back almost at once -- 0.127 monarch draws per 0.12 crowns gained -- because lorehold's board is thin and the pod's combat takes it (§0z39's `monarch_attack_floor`). Classify SCRIPTED at staging.",
+        triage="LIVE",
+    ),
     Proposal(
         deck="karlov",
         card="Ginger, Queen of Sweets",
@@ -2939,7 +3056,10 @@ DECKS = {
         # §0z64: Treasures built, card measured.
         "Pitiless Plunderer": rendmaw_v12.PITILESS_PLUNDERER,
         # REALITY FRACTURE, 2026-09-21 (preview text).
-        "Proft, Sinister Mastermind": rendmaw_v12.PROFT_SINISTER_MASTERMIND}),
+        "Proft, Sinister Mastermind": rendmaw_v12.PROFT_SINISTER_MASTERMIND,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Davvol, Evincar of Rath": rendmaw_v12.DAVVOL_EVINCAR_OF_RATH,
+        "Thomil, the Destroyer": rendmaw_v12.THOMIL_THE_DESTROYER}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
@@ -2955,7 +3075,9 @@ DECKS = {
         # REALITY FRACTURE, 2026-09-21 (preview text).
         "Stingcaster Mage": lorehold_v16.STINGCASTER_MAGE,
         # Queued item 0c's head-to-heads, 2026-09-25 (§0z53).
-        "Goldspan Dragon": lorehold_v16.GOLDSPAN_DRAGON}),
+        "Goldspan Dragon": lorehold_v16.GOLDSPAN_DRAGON,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Chief Magistrate of Mercadia": lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
@@ -2969,7 +3091,10 @@ DECKS = {
         "Edgar, Ancient Bloodlord": karlov_v2.EDGAR_ANCIENT_BLOODLORD,
         # REALITY FRACTURE, 2026-09-22 -- the first card in this project that
         # uses the monarch (§0z39).
-        "Ginger, Queen of Sweets": karlov_v2.GINGER_QUEEN_OF_SWEETS}),
+        "Ginger, Queen of Sweets": karlov_v2.GINGER_QUEEN_OF_SWEETS,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Selenia, the Cursed Heart": karlov_v2.SELENIA_THE_CURSED_HEART,
+        "Pearl Collector": karlov_v2.PEARL_COLLECTOR}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {
@@ -2978,7 +3103,10 @@ DECKS = {
         "Urza, Lord High Artificer": tivit_v1.URZA_LORD_HIGH_ARTIFICER,
         "Sai, Master Thopterist": tivit_v1.SAI_MASTER_THOPTERIST,
         # REALITY FRACTURE, 2026-09-21 (preview text).
-        "Memnarch, the Warden": tivit_v1.MEMNARCH_THE_WARDEN}),
+        "Memnarch, the Warden": tivit_v1.MEMNARCH_THE_WARDEN,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Venser, Visionary Traveler": tivit_v1.VENSER_VISIONARY_TRAVELER,
+        "Dyfed, the Guiding Hand": tivit_v1.DYFED_THE_GUIDING_HAND}),
     # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
     # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,
     # six mana values corrected against Scryfall (see shilgengar_v1.py's
@@ -2986,7 +3114,12 @@ DECKS = {
     "shilgengar": (shilgengar_v1, {
         # REALITY FRACTURE, 2026-09-21 (preview text). The first swap-in
         # candidate this deck has ever had catalogued.
-        "Lyra, Archangel of Dawn": shilgengar_v1.LYRA_ARCHANGEL_OF_DAWN}),
+        "Lyra, Archangel of Dawn": shilgengar_v1.LYRA_ARCHANGEL_OF_DAWN,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Selenia, the Cursed Heart": shilgengar_v1.SELENIA_THE_CURSED_HEART,
+        "Seluma, Light of Aysen": shilgengar_v1.SELUMA_LIGHT_OF_AYSEN,
+        "Thomil, the Destroyer": shilgengar_v1.THOMIL_THE_DESTROYER,
+        "Pearl Collector": shilgengar_v1.PEARL_COLLECTOR}),
     # Added 2026-09-07 as a sixth deck. The submitted list was 99 cards; a
     # 21st Forest was added to reach 100 -- see azusa_v1.py's docstring.
     "azusa": (azusa_v1, {
@@ -3031,7 +3164,9 @@ DECKS = {
         # 2026-10-02). Implemented and pinned, measured against the cut §0z35
         # established for this deck.
         "Verdant Kraken": azusa_v1.VERDANT_KRAKEN,
-        "Simulacrum Shaper": azusa_v1.SIMULACRUM_SHAPER}),
+        "Simulacrum Shaper": azusa_v1.SIMULACRUM_SHAPER,
+        # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
+        "Autumn Willow, Harmony": azusa_v1.AUTUMN_WILLOW_HARMONY}),
 }
 
 # The catalog is per deck and hand-written (which candidate cards a Change
@@ -3369,6 +3504,83 @@ def check_alt_cost_coverage():
                         f"(cost, tag, preference).")
 
 
+# Planeswalkers modelled BY NAME, as statics, with no loyalty (§0z74). Each
+# was found by the first run of `check_loyalty_coverage`; each is a FLOOR or an
+# approximation for the reason given, and none was listed anywhere before.
+WALKERS_WITHOUT_LOYALTY = {
+    "Grist, the Hunger Tide": (
+        "rendmaw: a 1/1 Insect creature everywhere but the battlefield "
+        "(engine.STACK_ONLY_CREATURES); its upkeep Insect is scripted; its "
+        "loyalty abilities are not modelled."),
+    "Sorin, Vengeful Bloodlord": (
+        "karlov: its static ('during your turn, creatures and planeswalkers "
+        "you control have lifelink') is read by name in karlov.combat; its +2 "
+        "and -X are not modelled, a floor."),
+    "Sorin, Solemn Visitor": (
+        "karlov: its +1's team lifelink is read by name in karlov.combat as "
+        "though it stood every turn; the +1/+0 and the -2 Vampire token are "
+        "not modelled."),
+}
+
+
+def check_loyalty_coverage():
+    """Every Planeswalker outside azusa enters with loyalty AND is activated.
+
+    §0q, pointed at `engine.PLANESWALKER_LOYALTY` (§0z74), which is a
+    hand-written name set. A walker missing from it enters with zero loyalty;
+    a walker in it whose deck engine never activates it enters with loyalty and
+    does nothing. Either way it scores as a blank and looks like a weak card,
+    which is the failure `azusa.check_planeswalker_coverage` was written for
+    one engine earlier. Checked over every deck list AND every catalog, since
+    a catalog card is one `Change` away from a list.
+
+    AZUSA IS EXEMPT -- it has its own table and its own check. So are the
+    walkers in `WALKERS_WITHOUT_LOYALTY` below, each with the reason: they
+    predate this table and are modelled BY NAME as statics, with no loyalty
+    tracked. That is a blind spot and it is written down (§0z15): the first
+    run of this check found all three, which nobody had listed.
+    """
+    import inspect
+    from edhmc import engine, lorehold, karlov, tivit, shilgengar
+    from edhmc.engine import PLANESWALKER_LOYALTY, WALKER_READERS
+    if set(PLANESWALKER_LOYALTY) != set(WALKER_READERS):
+        raise AssertionError(
+            "edhmc/engine.py: PLANESWALKER_LOYALTY and WALKER_READERS name "
+            f"different walkers: {sorted(set(PLANESWALKER_LOYALTY) ^ set(WALKER_READERS))}.")
+    sources = {"rendmaw": inspect.getsource(engine),
+               "lorehold": inspect.getsource(lorehold),
+               "karlov": inspect.getsource(karlov),
+               "tivit": inspect.getsource(tivit),
+               "shilgengar": inspect.getsource(shilgengar)}
+    seen = set()
+    for deck_name, (module, catalog) in DECKS.items():
+        if deck_name == "azusa":
+            continue
+        deck, commander = module.build()
+        for card in list(deck) + [commander] + list(catalog.values()):
+            if "Planeswalker" not in card.types:
+                continue
+            if card.name in WALKERS_WITHOUT_LOYALTY:
+                seen.add(card.name)
+                continue
+            if card.name not in PLANESWALKER_LOYALTY:
+                raise AssertionError(
+                    f"edhmc/pending.py: {card.name!r} is a Planeswalker in "
+                    f"{deck_name} with no entry in engine.PLANESWALKER_LOYALTY, "
+                    f"so it would enter with zero loyalty and never activate.")
+            if WALKER_READERS[card.name] not in sources[deck_name]:
+                raise AssertionError(
+                    f"edhmc/pending.py: {card.name!r} is in {deck_name}, whose "
+                    f"engine never activates it (no {WALKER_READERS[card.name]!r} "
+                    f"in its source) -- it would have loyalty and do nothing.")
+    stale = set(WALKERS_WITHOUT_LOYALTY) - seen
+    if stale:
+        raise AssertionError(
+            f"edhmc/pending.py: WALKERS_WITHOUT_LOYALTY names {sorted(stale)}, "
+            f"which no deck list or catalog outside azusa holds. An exemption "
+            f"for a card that is not there is a claim that has rotted (§0q).")
+
+
 check_proposals()
 
 
@@ -3376,6 +3588,7 @@ check_measured_are_promotable()
 check_shortlist_is_answerable()
 check_withdrawn_are_explained()
 check_alt_cost_coverage()
+check_loyalty_coverage()
 
 
 def pending_for(deck_name: str) -> list[Change]:

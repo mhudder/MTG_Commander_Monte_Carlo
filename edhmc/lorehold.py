@@ -742,6 +742,41 @@ def _draw_into_hand(g, n):
             g.hand.append(c)
 
 
+def magistrate_upkeep(g) -> None:
+    """CHIEF MAGISTRATE OF MERCADIA (verified 2026-09-29): "At the beginning
+    of your upkeep, create a 2/1 red Goblin creature token with haste. Then if
+    you're the monarch, for each creature token you control, create a token
+    that's a copy of it."
+
+    The Goblin first, THEN the copies -- so the fresh Goblin is copied too.
+    A copy copies the token's copiable values (707.2): name, power, toughness,
+    flying, haste; NOT its counters or its summoning sickness. So a copy of a
+    Goblin has haste and can attack this turn, and a copy of a Pegasus or a
+    Monk is sick -- and is a "Monk token" that Monastery Mentor's prowess
+    count reads. The pool is snapshotted BEFORE the copies are made, which is
+    what "for each creature token you control" reads as the ability resolves.
+
+    `magistrate_token_cap` (512) bounds the doubling: held for ten upkeeps the
+    crown makes a thousand tokens, a board no pod survives and a runtime no
+    sweep can afford. The cap is a guard on the simulator, not a claim about
+    the card, and a game that reaches it has long been decided."""
+    n = g.count("Chief Magistrate of Mercadia")
+    cap = g.cfg.get("magistrate_token_cap", 512)
+    for _ in range(n):
+        goblin = Card(name="Goblin token", types=frozenset({"Creature"}),
+                      power=2, toughness=1, haste=True)
+        g.board.append(Permanent(card=goblin, sick=False, is_token=True))
+        g.m["magistrate_goblins"] += 1
+        if not g.monarch:
+            continue
+        pool = [p for p in g.board if p.is_token and p.card.is_creature]
+        room = max(0, cap - len(pool))
+        for p in pool[:room]:
+            g.board.append(Permanent(card=p.card, sick=not p.card.haste,
+                                     is_token=True))
+            g.m["magistrate_copies"] += 1
+
+
 def make_tokens(g, n, power, toughness, name="token"):
     from edhmc.decks._evasion import FLYING_TOKENS
     for _ in range(int(n)):
@@ -1543,6 +1578,11 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
 
     if card.is_permanent:
         g.board.append(Permanent(card=card, sick=not card.haste))
+        # CHIEF MAGISTRATE OF MERCADIA (§0z74): "When Chief Magistrate of
+        # Mercadia enters, you become the monarch." One implementation for
+        # six engines (§0z39); idempotent if you already hold the crown.
+        if card.name == "Chief Magistrate of Mercadia":
+            OPP.become_monarch(g)
         # STINGCASTER MAGE (Reality Fracture, preview text 2026-09-21):
         # "{1}{R} 2/1 Haste. When this creature enters, TARGET instant or
         # sorcery card in your graveyard gains flashback until end of turn.
@@ -2117,6 +2157,8 @@ def take_turn(g):
         n = g.cfg.get("monologue_tax_rate", 2)   # 3 opponents, 2nd spell each
         g.treasures += n
         g.m["treasures_made"] += n
+    # Chief Magistrate of Mercadia's upkeep trigger (§0z74).
+    magistrate_upkeep(g)
 
     # INSTANT-SPEED SETUP, RESOLVED BEFORE THE UPKEEP TRIGGERS.
     #

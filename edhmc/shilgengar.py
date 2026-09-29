@@ -138,7 +138,10 @@ import random
 from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng)
+                          crn_shuffle, make_rng, seal_rng,
+                          enter_loyalty, thomil_step, lord_of_the_pit_card,
+                          lord_of_the_pit_upkeep, pearl_collector_trigger,
+                          pearl_collector_lifelink, perpetual_lifelink)
 from edhmc import opponents as OPP
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -250,6 +253,9 @@ class ShilgengarGame(BaseGame):
     def lifelink_of(self, perm):
         if perm.card.lifelink:
             return True
+        # Pearl Collector's "perpetually gains lifelink" (§0z74).
+        if perpetual_lifelink(self, perm):
+            return True
         return (self.has("Lyra Dawnbringer") and self.is_angel(perm)
                 and perm.card.name != "Lyra Dawnbringer")
 
@@ -298,7 +304,16 @@ class ShilgengarGame(BaseGame):
         perm = Permanent(card=card, sick=sick, tapped=tapped,
                          is_token=is_token, counters=counters,
                          base_p=card.power, base_t=card.toughness)
+        enter_loyalty(perm)          # Thomil (§0z74); a no-op for the rest
         self.board.append(perm)
+        return perm
+
+    def make_creature_token(self, card):
+        """A creature token that is not an Angel or a Spirit -- Thomil's
+        Zombie and Lord of the Pit (§0z74). It enters like any creature, so
+        the enters-payoffs see it."""
+        perm = self.make_permanent(card, sick=True, is_token=True)
+        self.creature_entered(perm)
         return perm
 
     def make_spirit_tokens(self, n=1):
@@ -332,6 +347,16 @@ class ShilgengarGame(BaseGame):
         `opponents.destroy` / `resolve_own_wipe`, which both check
         `hasattr(g, "on_creature_death")`) and voluntary sacrifice (via
         `sacrifice()` below). `perm` is the permanent that died, when known."""
+        # SELENIA, THE CURSED HEART (§0z74): "When Selenia dies, create ...
+        # Selenia's Curse attached to target opponent." Once per permanent,
+        # so OUTSIDE the `range(n)` loop. A Selenia returned by the ultimate
+        # carries a FINALITY counter and is exiled instead of dying, so she
+        # makes no curse the second time -- the one death trigger in this
+        # engine that honours finality (the others predate it; §0z74 names
+        # the gap).
+        if (perm is not None and perm.card.name == "Selenia, the Cursed Heart"
+                and not perm.is_token and id(perm.card) not in self.finality):
+            OPP.curse_opponent(self)
         for _ in range(n):
             if self.has("Blood Artist"):
                 dealt = OPP.damage_single(self, 1)
@@ -646,6 +671,23 @@ class ShilgengarGame(BaseGame):
     def gain_life(self, amount):
         if amount <= 0:
             return
+        # SELENIA, THE CURSED HEART (§0z74): "If you would gain life, you gain
+        # twice that much life instead." A REPLACEMENT on the amount, so the
+        # number of EVENTS is unchanged -- Archangel of Thune and Lyra below
+        # still trigger once -- and it doubles what Resplendent Angel and
+        # Speaker of the Heavens read. Two would quadruple (616.1); the card is
+        # legendary, so that needs a copy, and `count` says it either way.
+        #
+        # A FLOOR IN THIS ENGINE: Blood Artist, Zulaport Cutthroat, Vampiric
+        # Rites, Midnight Reaper's cost and the like write `your_life`
+        # directly instead of calling this method, so those gains are neither
+        # doubled nor seen by Thune/Lyra. A pre-existing gap, named in §0z74
+        # and not fixed here, because fixing it moves this deck's baseline.
+        n_selenia = self.count("Selenia, the Cursed Heart")
+        if n_selenia:
+            doubled = amount * (2 ** n_selenia)
+            self.m["selenia_extra_life"] += doubled - amount
+            amount = doubled
         self.your_life += amount
         self.life_gained_this_turn += amount
         self.m["life_gained"] += amount
@@ -730,7 +772,7 @@ class ShilgengarGame(BaseGame):
                 killed = min(o.creatures, o.creatures * share + 1)
                 o.creatures = max(0.0, o.creatures - killed)
                 if killed > 0:
-                    o.life -= 2.0 * killed
+                    o.life -= OPP.life_loss(o, 2.0 * killed)   # §0z74
             OPP._check_eliminations(self)
 
         if perm.card.is_creature:
@@ -872,6 +914,23 @@ class ShilgengarGame(BaseGame):
         self.ultimate_line()
         self.shilgengar_ultimate()
 
+    def pearl_sink(self):
+        """Pearl Collector's lifelink sink, run after the postcombat main
+        phase so it spends only what nothing else wanted (§0z74)."""
+        pearl_collector_lifelink(
+            self, lambda c: self.pay(c, count_mana_spent=sum(c.values())),
+            self.lifelink_of)
+
+    def walker_step(self):
+        """Thomil (§0z74). Sorcery speed, once per walker per turn; called
+        after each main phase so a walker cast postcombat still activates."""
+        thomil_step(
+            self,
+            make_zombie=lambda: self.make_creature_token(Card(
+                name="Zombie token", types=frozenset({"Creature"}),
+                power=2, toughness=2)),
+            make_lord=lambda: self.make_creature_token(lord_of_the_pit_card()))
+
     def combat(self):
         attackers = [p for p in self.board if p.card.is_creature
                     and not p.tapped and not p.sick]
@@ -887,7 +946,11 @@ class ShilgengarGame(BaseGame):
             p.tapped = True
         # One attack at the whole pod; `dmg` comes back bounded at what could
         # have mattered. Lifelink below still reads `power_of`, not this.
+        # `combat_hits` asks the pod which attackers CONNECTED (§0z74), for
+        # Seluma's "deals combat damage to a player" below.
+        self.combat_hits = []
         dmg = OPP.combat_damage(self, attackers)
+        hits, self.combat_hits = self.combat_hits, None
         self.m["damage"] += dmg
         self.m["combat_damage"] += dmg
         self.damage_by_turn.append(dmg)
@@ -896,6 +959,23 @@ class ShilgengarGame(BaseGame):
                 self.gain_life(self.power_of(p))
         if self.result is None and self.m["turn_lethal"] == 99 and not OPP.living(self):
             self.m["turn_lethal"] = self.turn
+        # SELUMA, LIGHT OF AYSEN (§0z74): "Whenever Seluma deals combat damage
+        # to a player, return target Angel creature card from your graveyard
+        # to the battlefield." Once per Seluma that CONNECTED -- a chump-blocked
+        # Seluma triggers nothing, which is why this reads `hits` and not
+        # `attackers`. The pool is recomputed per trigger (§0z19).
+        for p in hits:
+            if p.card.name != "Seluma, Light of Aysen" or self.result is not None:
+                continue
+            pool = [c for c in self.yard_creatures() if "angel" in c.tags]
+            self.m["seluma_hits"] += 1
+            if not pool:
+                continue
+            best = max(pool, key=lambda c: c.mv)
+            self.graveyard.remove(best)
+            back = self.make_permanent(best, sick=True)
+            self.creature_entered(back)
+            self.m["seluma_returns"] += 1
 
     def _sun_titan_reanimate(self):
         pool = [c for c in self.graveyard
@@ -911,6 +991,8 @@ class ShilgengarGame(BaseGame):
         self.m["single_reanimations"] += 1
 
     def upkeep(self):
+        # Lord of the Pit (Thomil's -5, §0z74): mandatory, first.
+        lord_of_the_pit_upkeep(self, lambda p: self.sacrifice(p))
         if self.has("Phyrexian Arena"):
             self.draw(1)
             self.your_life -= 1
@@ -989,11 +1071,16 @@ def take_turn(g):
     g.main_phase(reserve=g.ult_reserve())
     if g.result is not None:
         return
+    g.walker_step()
     g.combat()
     g.activations()
+    # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
+    pearl_collector_trigger(g, g.life_gained_this_turn)
     g.main_phase()
     if g.result is not None:
         return
+    g.walker_step()
+    g.pearl_sink()
     g.end_step()
 
     # Revel in Riches — its OWN Treasure generation is model-blind (needs

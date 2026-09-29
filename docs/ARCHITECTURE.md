@@ -126,6 +126,9 @@ the game object and discovers optional behaviour with `hasattr`:
 | `g.counts_as_creature(perm)` (optional) | an engine whose lands can be creatures says so here |
 | `g.known_win` (optional, read with `getattr`) | the name of a card whose next resolution wins and which the table has seen -- lorehold's Approach of the Second Sun. `known_win_share` floors your share of the pod's attention at `known_win_focus`, and `countered` treats a recast as maximum threat (§0z62) |
 | `g.opponent_cast_on_your_turn(i)` (optional) | opponent `i` just cast a spell during your turn -- called from `countered()`, the only such spell the model has. Rendmaw defines it for March of the World Ooze (§0z47); `tests/test_march_elephant.py` fails if another engine grows one |
+| `g.combat_hits` (optional, read with `getattr`) | an engine that sets it to `[]` before `combat_damage` gets back the attackers that CONNECTED -- the "deals combat damage to a player" question (§0z74). Shilgengar asks, for Seluma; an engine that never sets it is untouched. tivit's own commander trigger still reads `dmg > 0 and Tivit attacked`, an approximation left alone because changing it moves tivit's baseline |
+| `o.cursed`, `life_loss(o, n)` | Selenia's Curse (§0z74). EVERY site where an opponent's life goes down asks `life_loss` -- combat, `damage_each`, `damage_single`, the goaded Birds, shilgengar's Massacre Wurm. A new site that writes `o.life -=` without it is a doubler with a hole in it (§0z4's shape) |
+| `g.is_land_creature_now(perm)` (optional) | Autumn Willow's question, asked by `engine.on_mana_tap` and `spend`'s count fallback (§0z74). Only azusa can answer it, so only azusa defines it |
 
 If you add an engine, this table is the contract. If you add a method to one
 engine that `opponents.py` will call, it must be optional (`hasattr`) or added

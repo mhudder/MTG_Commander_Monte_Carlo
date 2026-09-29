@@ -1,0 +1,134 @@
+Tier 2 smoke: each card against a blank in its cut's slot, N=1,000 (tools.triage.smoke). Its OWN counter must move.
+
+shilgengar + Selenia, the Cursed Heart  (slot: Skullclamp)   OWN COUNTER MOVED
+    P(cast)                          0.181     0.000  
+    curses_made                      0.108     0.000  z=+10.9
+    lifegain_triggers                3.658     3.068  z=+9.8
+    selenia_extra_life               3.788     0.000  z=+7.5
+    life_gained                     19.965    14.036  z=+7.3
+    raw_damage                      64.964    61.845  z=+5.9
+    angels_fed                       0.659     0.600  z=+5.9
+    damage                          56.259    54.460  z=+5.9
+    combat_damage                   55.272    53.497  z=+5.8
+
+shilgengar + Seluma, Light of Aysen  (slot: Skullclamp)   OWN COUNTER MOVED
+    P(cast)                          0.185     0.000  
+    seluma_hits                      0.427     0.000  z=+11.2
+    seluma_returns                   0.068     0.000  z=+7.2
+    damage                          55.789    54.309  z=+5.9
+    combat_damage                   54.812    53.351  z=+5.9
+    raw_damage                      63.571    61.715  z=+5.5
+    final_board_power               28.850    27.851  z=+5.3
+    lifegain_triggers                3.218     3.063  z=+4.0
+    angels_fed                       0.644     0.601  z=+3.9
+
+shilgengar + Thomil, the Destroyer  (slot: Skullclamp)   OWN COUNTER MOVED
+    P(cast)                          0.178     0.000  
+    thomil_zombies                   0.449     0.000  z=+13.1
+    pw_activations                   0.685     0.000  z=+13.0
+    thomil_lords                     0.236     0.000  z=+12.4
+    lord_sacrifices                  0.409     0.000  z=+10.2
+    creatures_sacrificed             1.523     1.106  z=+9.9
+    damage                          55.713    54.014  z=+6.7
+    combat_damage                   54.676    53.056  z=+6.5
+    raw_damage                      63.370    61.343  z=+6.1
+
+shilgengar + Pearl Collector  (slot: Skullclamp)   OWN COUNTER MOVED
+    P(cast)                          0.211     0.000  
+    mox_pearls_conjured              0.160     0.000  z=+12.4
+    lifegain_triggers                4.493     3.079  z=+9.9
+    pearl_lifelink_grants            0.333     0.000  z=+9.7
+    life_gained                     21.096    14.159  z=+8.3
+    mana_spent                     113.078   109.601  z=+7.6
+    damage                          56.498    54.824  z=+5.8
+    combat_damage                   55.516    53.862  z=+5.8
+    final_board_power               30.937    28.380  z=+5.6
+
+karlov + Selenia, the Cursed Heart  (slot: Swiftfoot Boots)   OWN COUNTER MOVED
+    P(cast)                          0.134     0.000  
+    curses_made                      0.051     0.000  z=+7.3
+    selenia_extra_life               4.969     0.000  z=+6.6
+    life_gained                     71.486    67.011  z=+5.4
+    final_life                      41.870    38.670  z=+3.6
+    damage                          59.396    58.624  z=+3.3
+    combat_damage                   27.727    27.317  z=+2.6
+    raw_damage                      31.412    30.767  z=+2.4
+    opponents_killed                 1.449     1.433  z=+2.0
+
+karlov + Pearl Collector  (slot: Swiftfoot Boots)   OWN COUNTER MOVED
+    P(cast)                          0.170     0.000  
+    mox_pearls_conjured              0.138     0.000  z=+12.6
+    pearl_lifelink_grants            0.076     0.000  z=+5.3
+    spells_cast                     10.903    10.708  z=+5.3
+    damage                          59.923    58.622  z=+4.7
+    life_gained                     70.189    66.990  z=+4.6
+    final_board_power               34.450    32.911  z=+4.3
+    raw_damage                      31.643    30.900  z=+4.0
+    final_life                      41.146    38.520  z=+3.9
+
+tivit + Venser, Visionary Traveler  (slot: Tamiyo's Journal)   OWN COUNTER MOVED
+    P(cast)                          0.200     0.000  
+    pw_activations                   0.725     0.000  z=+12.2
+    venser_exiles                    0.440     0.000  z=+11.4
+    venser_blinks                    0.430     0.000  z=+11.3
+    venser_counters                  3.330     0.000  z=+6.3
+    final_board_power               10.430    10.115  z=+5.2
+    attack_targets                   5.009     5.107  z=-4.9
+    votes_cast                      55.926    52.798  z=+4.3
+    turns_played                    11.401    11.486  z=-4.2
+
+tivit + Dyfed, the Guiding Hand  (slot: Tamiyo's Journal)   OWN COUNTER MOVED
+    P(cast)                          0.194     0.000  
+    powerstones_made                 0.940     0.000  z=+12.3
+    pw_activations                   0.516     0.000  z=+12.0
+    dyfed_tutors                     0.102     0.000  z=+10.7
+    powerstone_mana                  1.616     0.000  z=+10.1
+    sieve_activations                0.657     0.486  z=+6.3
+    pod_rounds                      10.440    10.582  z=-5.9
+    extra_turns                      1.030     0.842  z=+5.8
+    sieve_chain_max                  0.659     0.562  z=+4.5
+
+azusa + Autumn Willow, Harmony  (slot: Titania, Protector of Argoth)   OWN COUNTER MOVED
+    P(cast)                          0.234     0.000  
+    willow_dryads                    0.261     0.000  z=+18.6
+    willow_taps                      0.992     0.000  z=+8.8
+    creatures_sacrificed             0.087     0.077  z=+2.5
+    crn_draws                        3.301     3.352  z=-2.3
+    fetches_cracked                  3.301     3.352  z=-2.3
+    library_shuffles                 3.301     3.352  z=-2.3
+    lands_played                    16.505    16.597  z=-2.3
+    lands_from_graveyard             3.331     3.406  z=-2.1
+
+rendmaw + Davvol, Evincar of Rath  (slot: Ashnod's Altar)   OWN COUNTER MOVED
+    P(cast)                          0.160     0.000  
+    davvol_mana_lost                 0.606     0.000  z=+8.8
+    davvol_triggers                  0.869     0.000  z=+8.6
+    davvol_mana_spent                0.263     0.000  z=+6.2
+    final_life                       2.099     2.492  z=-4.0
+    turns_played                    12.142    12.203  z=-3.9
+    attack_targets                   8.913     8.965  z=-3.8
+    stranded_mv                    128.254   129.079  z=-3.4
+    opponents_killed                 1.597     1.619  z=-3.3
+
+rendmaw + Thomil, the Destroyer  (slot: Ashnod's Altar)   OWN COUNTER MOVED
+    P(cast)                          0.150     0.000  
+    thomil_zombies                   0.351     0.000  z=+11.7
+    pw_activations                   0.537     0.000  z=+11.6
+    thomil_lords                     0.186     0.000  z=+11.0
+    tokens_made                      9.897     9.269  z=+9.5
+    lord_sacrifices                  0.392     0.000  z=+8.8
+    damage                          52.809    51.990  z=+5.0
+    raw_damage                      60.588    59.737  z=+3.4
+    removal_eaten                    1.411     1.390  z=+2.8
+
+lorehold + Chief Magistrate of Mercadia  (slot: Lightning Greaves)   OWN COUNTER MOVED
+    P(cast)                          0.113     0.000  
+    test_card_drawn_turn            78.355    99.000  z=-16.8
+    monarch_gained                   0.113     0.000  z=+11.3
+    monarch_turns                    0.117     0.000  z=+10.2
+    monarch_lost                     0.094     0.000  z=+10.2
+    monarch_draws                    0.116     0.000  z=+10.1
+    magistrate_goblins               0.152     0.000  z=+7.6
+    crn_draws                        1.124     0.991  z=+5.2
+    damage                          57.203    56.308  z=+4.2
+

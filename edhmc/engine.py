@@ -1294,6 +1294,9 @@ class Game(BaseGame):
         # in this list reads a Treasure except as mana, the same shape as
         # lorehold's and shilgengar's piles. Spent through `rendmaw_mana`.
         self.treasures = 0
+        # Davvol's {B} (§0z74): mana in the pool, spendable until the step or
+        # phase it was added in ends. Zero in every game without Davvol.
+        self.davvol_float = 0
         self.made_token_this_turn = False
         self.beast_active = False
         self.stampede_bonus = 0
@@ -1327,6 +1330,7 @@ class Game(BaseGame):
                 perm.counters += 1
             self.board.append(perm)
             self.m["tokens_made"] += 1
+            davvol_trigger(self, perm)       # §0z74
         self.made_token_this_turn = True
 
     def make_treasures(self, n: int):
@@ -1692,6 +1696,84 @@ class TreasureMana:
             self.g.m["treasures_spent"] += 1
 
 
+class DavvolMana:
+    """The OWNER of one point of Davvol's floating {B} (§0z74) -- the
+    `TreasureMana` shape: `spend` taps it, and tapping it takes the point out
+    of the pool, so it is spent exactly when the proved payment uses it."""
+    __slots__ = ("g", "used")
+
+    def __init__(self, g):
+        self.g, self.used = g, False
+
+    @property
+    def tapped(self):
+        return self.used
+
+    @tapped.setter
+    def tapped(self, v):
+        if v and not self.used:
+            self.used = True
+            self.g.davvol_float -= 1
+            self.g.m["davvol_mana_spent"] += 1
+
+
+def davvol_trigger(g, perm) -> None:
+    """DAVVOL, EVINCAR OF RATH (verified 2026-09-29): "Whenever ANOTHER
+    creature you control enters, you lose 1 life and add {B}."
+
+    MANDATORY -- no "may" -- so the life is lost whether or not the {B} can be
+    spent, and in a token deck that is the card's real price (§0i: life costs
+    are charged; pod v3 made life decide games). The {B} goes to
+    `davvol_float`, which `empty_mana_pool` clears at every step boundary
+    rather than letting it last the turn: mana made by an upkeep token or a
+    combat trigger is gone before anything can be cast with it. Called at
+    every rendmaw site where a creature enters -- `make_tokens`, a cast, the
+    commander, a reanimation. `perm` is the entering permanent; one per
+    Davvol, so a copy would double it."""
+    n = g.count("Davvol, Evincar of Rath")
+    if not n or perm.card.name == "Davvol, Evincar of Rath":
+        return
+    if not is_battlefield_creature(g, perm):
+        return
+    g.your_life -= n
+    g.davvol_float += n
+    g.m["davvol_triggers"] += n
+
+
+def empty_mana_pool(g) -> None:
+    """Mana empties between steps and phases (500.4). Only Davvol's {B} ever
+    sits in rendmaw's pool, so this is a no-op in every other game."""
+    lost = getattr(g, "davvol_float", 0)
+    if lost:
+        g.m["davvol_mana_lost"] += lost
+        g.davvol_float = 0
+
+
+def rendmaw_token(g, factory) -> None:
+    """A creature token that is not `make_tokens`' vanilla shape (Thomil's
+    Lord of the Pit, §0z74), under the same doublers: Primal Vigor and
+    Parallel Lives double it, and Davvol sees it enter."""
+    for _ in range(token_doublings(g)):
+        card = factory()
+        perm = Permanent(card=card, sick=True, is_token=True,
+                         base_p=card.power, base_t=card.toughness)
+        g.board.append(perm)
+        g.m["tokens_made"] += 1
+        davvol_trigger(g, perm)
+    g.made_token_this_turn = True
+
+
+def rendmaw_sacrifice(g, perm) -> None:
+    """A sacrifice routed the way `twitching_doll_sacrifice` routes one: the
+    aristocrats see it, a card reaches the graveyard, artifact recursion is
+    told."""
+    g.board.remove(perm)
+    g.on_creature_death(1, perm)
+    if not perm.is_token:
+        g.graveyard.append(perm.card)
+        g.artifact_died(perm.card)
+
+
 def rendmaw_mana(g) -> "ManaUnits":
     """`available_mana` plus one unit per Treasure (§0z64).
 
@@ -1710,6 +1792,10 @@ def rendmaw_mana(g) -> "ManaUnits":
     for _ in range(getattr(g, "treasures", 0)):
         units.append(TREASURE_UNIT)
         units.owners[-1] = TreasureMana(g)
+    # Davvol's floating {B} (§0z74), after the Treasures. Zero without him.
+    for _ in range(getattr(g, "davvol_float", 0)):
+        units.append(frozenset({"B"}))
+        units.owners[-1] = DavvolMana(g)
     return units
 
 
@@ -2116,6 +2202,7 @@ def main_phase(g: Game, precombat: bool = False):
                     continue
                 perm = Permanent(card=g.commander, sick=True)
                 g.board.append(perm)
+                davvol_trigger(g, perm)                      # §0z74
                 g.commander_cast = True
                 g.m["spells_cast"] += 1
                 g.make_tokens(1, 2, 2, "Bird", tapped=True)   # ETB
@@ -2238,7 +2325,9 @@ def main_phase(g: Game, precombat: bool = False):
             elif (card.name in STACK_ONLY_CREATURES
                   and g.cfg.get("battlefield_creature_types", True)):
                 perm.impending = NEVER
+            enter_loyalty(perm)          # Thomil (§0z74); no-op otherwise
             g.board.append(perm)
+            davvol_trigger(g, perm)      # §0z74
             run_etb(g, perm)
         else:
             g.graveyard.append(card)
@@ -2258,6 +2347,12 @@ def on_mana_tap(g, p: Permanent):
     if card is not None and card.name == "Twitching Doll":
         p.nest += 1
         g.m["doll_nest_counters"] += 1
+    # AUTUMN WILLOW, HARMONY (§0z74): the counter for its extra {G}, counted
+    # at the TAP rather than where the unit is offered, so it records mana a
+    # land creature actually made. Only azusa can answer the question.
+    ask = getattr(g, "is_land_creature_now", None)
+    if ask is not None and g.has("Autumn Willow, Harmony") and ask(p):
+        g.m["willow_taps"] += 1
 
 
 def doll_stays_home(g, p: Permanent) -> bool:
@@ -2387,6 +2482,12 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
         if (c.is_land and c.name in _FOREST
                 and g.has("Nissa, Who Shakes the World")):
             amt += 1
+        # AUTUMN WILLOW, HARMONY (§0z74), the same rule for a LAND CREATURE,
+        # in this count-based fallback as well as in `azusa.available_mana`.
+        ask = getattr(g, "is_land_creature_now", None)
+        if (ask is not None and g.has("Autumn Willow, Harmony")
+                and c.is_land and ask(p)):
+            amt += 1
         p.tapped = True
         on_mana_tap(g, p)
         left -= amt
@@ -2457,6 +2558,8 @@ def run_etb(g: Game, perm: Permanent):
 
 
 def upkeep(g: Game):
+    # Lord of the Pit (Thomil's -5, §0z74): mandatory, first.
+    lord_of_the_pit_upkeep(g, lambda p: rendmaw_sacrifice(g, p))
     for p in list(g.board):
         s = p.card.script
         if s == "mycoloth":
@@ -2596,6 +2699,7 @@ def activations(g: Game):
                 perm = Permanent(card=best, sick=True,
                                  base_p=best.power, base_t=best.toughness)
                 g.board.append(perm)
+                davvol_trigger(g, perm)                      # §0z74
                 run_etb(g, perm)
                 g.m["cauldron_reanimations"] += 1
 
@@ -2636,6 +2740,203 @@ def activations(g: Game):
 
     if early:
         chef_and_backwoods(g, units)
+
+# ----------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`, text fetched 2026-09-29)
+# -- the rules more than one engine needs, written ONCE (§0z30, §0z74).
+# ----------------------------------------------------------------------------
+
+# Starting loyalty, for the walkers OUTSIDE azusa (azusa has its own table and
+# its own `planeswalker_step`, which predates these). Loyalty lives in
+# `Permanent.counters`, azusa's convention, so no field is added to a dataclass
+# six engines share. `pending.check_loyalty_coverage()` fails at import if a
+# Planeswalker in any list or catalog outside azusa is missing here -- a walker
+# that enters with zero loyalty never activates and scores as a blank, which is
+# §0q's shape exactly.
+PLANESWALKER_LOYALTY = {
+    "Thomil, the Destroyer": 4,
+    "Venser, Visionary Traveler": 4,
+    "Dyfed, the Guiding Hand": 4,
+}
+
+# WHAT A DECK'S ENGINE MUST CONTAIN for a walker above to be ACTIVATED there,
+# not merely to enter with loyalty. `pending.check_loyalty_coverage` reads each
+# deck engine's source for this string: Thomil is activated by the shared
+# `thomil_step`, the tivit walkers by name in `tivit.walker_step`. A walker put
+# into a deck whose engine lacks the string would sit on the battlefield with
+# loyalty and do nothing -- the failure this pair of tables exists to refuse.
+WALKER_READERS = {
+    "Thomil, the Destroyer": "thomil_step(",
+    "Venser, Visionary Traveler": '"Venser, Visionary Traveler"',
+    "Dyfed, the Guiding Hand": '"Dyfed, the Guiding Hand"',
+}
+
+
+def enter_loyalty(perm: Permanent) -> None:
+    """A walker in the table above enters with its printed loyalty."""
+    n = PLANESWALKER_LOYALTY.get(perm.card.name)
+    if n is not None and "Planeswalker" in perm.card.types:
+        perm.counters = n
+
+
+def walker_ready(g, perm) -> bool:
+    """At most ONE loyalty ability per walker per turn (606.3), and marks it.
+
+    Keyed on the Permanent's id and the turn, so a walker that leaves and comes
+    back is a new object with a fresh activation, and no engine needs a
+    per-turn reset. An extra turn is a new `g.turn` in every engine."""
+    used = g.__dict__.setdefault("pw_activated_turn", {})
+    if used.get(id(perm)) == g.turn:
+        return False
+    used[id(perm)] = g.turn
+    g.m["pw_activations"] += 1
+    return True
+
+
+def walker_dies_at_zero(g, perm) -> None:
+    """704.5i: a planeswalker with 0 loyalty goes to the graveyard."""
+    if perm.counters <= 0 and perm in g.board:
+        g.board.remove(perm)
+        g.graveyard.append(perm.card)
+
+
+def lord_of_the_pit_card() -> Card:
+    """"a {4}{B}{B}{B} 7/7 Demon creature with flying, trample, and 'At the
+    beginning of your upkeep, sacrifice another creature. If you can't, this
+    token deals 7 damage to you.'" A fresh object per token.
+
+    TRAMPLE IS NOT MODELLED: `opponents.damage_through` prices a chump block
+    as stopping the whole attacker, so a 7/7 trampler blocked by a 1/1 is
+    scored as dealing 0 rather than 6. Its flying is carried (it is a token,
+    so `_evasion.FLYING` cannot reach it; set here from the reminder text)."""
+    return Card(name="Lord of the Pit token", types=frozenset({"Creature"}),
+                cost={"gen": 4, "B": 3}, power=7, toughness=7, flying=True,
+                script="lord_of_the_pit", tags=frozenset({"demon"}))
+
+
+def lord_of_the_pit_upkeep(g, sacrifice) -> None:
+    """Each Lord of the Pit token's upkeep: "sacrifice ANOTHER creature. If
+    you can't, this token deals 7 damage to you."
+
+    MANDATORY -- the pilot chooses which, not whether. The victim is the least
+    valuable other creature: a token before a card, then the lowest power, and
+    never your commander while anything else is available. `sacrifice(perm)` is
+    the engine's own routine, so every death payoff that engine models sees
+    it. With nothing to sacrifice the 7 damage is real (§0i: life costs are
+    charged)."""
+    for lord in [p for p in g.board if p.card.script == "lord_of_the_pit"]:
+        if lord not in g.board:
+            continue
+        others = [p for p in g.board if p is not lord
+                  and is_battlefield_creature(g, p)]
+        if others:
+            victim = min(others, key=lambda p: (
+                p.card is g.commander, not p.is_token, g.power_of(p)))
+            sacrifice(victim)
+            g.m["lord_sacrifices"] += 1
+        else:
+            g.your_life -= 7
+            g.m["lord_self_damage"] += 7
+
+
+def thomil_step(g, make_zombie, make_lord) -> None:
+    """THOMIL, THE DESTROYER {3}{B}{B}, loyalty 4 (verified 2026-09-29):
+
+        +2: Create a 2/2 black Zombie creature token.
+         0: You may sacrifice a creature. If you do, add {B}{B}{B}.
+        -5: Create a Lord of the Pit token.
+
+    THE POLICY, SAID OUT LOUD. The -5 when loyalty allows it AND at least
+    `thomil_lord_fodder` (2) other creatures are on the board to feed the
+    Lord's upkeep; the +2 otherwise. So a Thomil that lands on 4 goes to 6,
+    ultimates next turn to 1, and then makes Zombies -- which are exactly the
+    fodder the Lord eats.
+
+    THE 0 IS NOT MODELLED, and that makes the card a FLOOR. It is a sac
+    outlet that pays {B}{B}{B}, but taking it gives up the +2 (two loyalty and
+    a 2/2 body) for three mana once, and pricing that needs a lookahead on the
+    hand -- item 18's open question -- rather than a rule.
+
+    `make_zombie()` and `make_lord()` are the engine's token routines, so a
+    token doubler in that engine (Primal Vigor, Parallel Lives) sees them."""
+    fodder_needed = g.cfg.get("thomil_lord_fodder", 2)
+    for perm in [p for p in g.board if p.card.name == "Thomil, the Destroyer"]:
+        if not walker_ready(g, perm):
+            continue
+        others = sum(1 for p in g.board if is_battlefield_creature(g, p)
+                     and p.card is not g.commander)
+        if perm.counters >= 5 and others >= fodder_needed:
+            perm.counters -= 5
+            make_lord()
+            g.m["thomil_lords"] += 1
+        else:
+            perm.counters += 2
+            make_zombie()
+            g.m["thomil_zombies"] += 1
+        walker_dies_at_zero(g, perm)
+
+
+def mox_pearl_card() -> Card:
+    """"Mox Pearl {0} Artifact. {T}: Add {W}." A CONJURED card is a new object,
+    so each call makes a fresh one; priority 10 casts it the moment it is in
+    hand, which is what anybody does with a free mana rock."""
+    return Card(name="Mox Pearl", types=frozenset({"Artifact"}), cost={},
+                mana_ability=(1, frozenset({"W"})), priority=10.0)
+
+
+def pearl_collector_trigger(g, gained_this_turn: float) -> None:
+    """PEARL COLLECTOR: "At the beginning of your second main phase, if you
+    gained 4 or more life this turn, conjure a card named Mox Pearl into your
+    hand. This ability triggers only once."
+
+    ONCE PER OBJECT: a Collector that dies and comes back is a new object
+    whose ability has not triggered (the same reading as `walker_ready`).
+    Called by each engine at the top of its postcombat main phase with that
+    engine's own count of life gained this turn."""
+    if gained_this_turn < 4:
+        return
+    done = g.__dict__.setdefault("pearl_triggered", set())
+    for p in g.board:
+        if p.card.name == "Pearl Collector" and id(p) not in done:
+            done.add(id(p))
+            g.hand.append(mox_pearl_card())
+            g.m["mox_pearls_conjured"] += 1
+
+
+def perpetual_lifelink(g, perm) -> bool:
+    """Has this permanent's CARD perpetually gained lifelink (Pearl Collector)?
+
+    "Perpetually" follows the card across zones, so it is keyed on the Card
+    object's id -- never written onto the Card itself, because the deck list's
+    Card objects are shared by every game a worker plays."""
+    return id(perm.card) in g.__dict__.get("perpetual_lifelink", ())
+
+
+def pearl_collector_lifelink(g, pay, has_lifelink) -> None:
+    """PEARL COLLECTOR: "{2}{W}: ANOTHER target creature perpetually gains
+    lifelink." A mana sink, run LAST in the engine's activations so it only
+    ever spends what nothing else wanted.
+
+    TARGET: the highest-power creature you control without lifelink, a CARD
+    before a token (perpetual lasts; a token does not), never the Collector
+    itself. `pay(cost)` is the engine's payment (True if paid);
+    `has_lifelink(perm)` its own lifelink test. Capped at `pearl_lifelink_cap`
+    (2) activations a turn."""
+    if not g.has("Pearl Collector"):
+        return
+    granted = g.__dict__.setdefault("perpetual_lifelink", set())
+    for _ in range(g.cfg.get("pearl_lifelink_cap", 2)):
+        targets = [p for p in g.board if is_battlefield_creature(g, p)
+                   and p.card.name != "Pearl Collector"
+                   and not has_lifelink(p)]
+        if not targets:
+            return
+        best = max(targets, key=lambda p: (not p.is_token, g.power_of(p)))
+        if not pay({"gen": 2, "W": 1}):
+            return
+        granted.add(id(best.card))
+        g.m["pearl_lifelink_grants"] += 1
+
 
 def main_phase_may_cast(g, card) -> bool:
     """False for a card only its own outlet may cast (§0z73)."""
@@ -2886,16 +3187,23 @@ def take_turn(g: Game):
             g.m["erebos_creature_turns"] += 1
 
     upkeep(g)
+    empty_mana_pool(g)              # Davvol's {B} does not survive a step
     if g.turn > 1 or g.cfg.get("on_the_draw", True):
         g.draw(1)
 
     play_land(g)
     twitching_doll_sacrifice(g)     # sorcery speed, before anything taps it
     main_phase(g, precombat=True)   # anthems / pump only
+    empty_mana_pool(g)
     combat(g)
+    empty_mana_pool(g)
     activations(g)                  # Skullclamp, Idol, sac outlets
     play_land(g)                    # second drop (Dryad) once we know our needs
     main_phase(g)                   # deploy the rest postcombat
+    thomil_step(                    # Thomil, sorcery speed (§0z74)
+        g, make_zombie=lambda: g.make_tokens(1, 2, 2, "Zombie"),
+        make_lord=lambda: rendmaw_token(g, lord_of_the_pit_card))
+    empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
     treasure_vault(g)               # spare mana into Treasures, §0z68
 

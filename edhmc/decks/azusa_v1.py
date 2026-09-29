@@ -733,3 +733,23 @@ BATCH5_CANDIDATES = (GUARDIAN_PROJECT, SPLENDID_RECLAMATION, ZENDIKARS_ROIL)
 BATCH4_CANDIDATES = (NISSA_RESURGENT_ANIMIST, TRAVELING_CHOCOBO,
                      ARCHDRUIDS_CHARM, AWAKEN_THE_WOODS,
                      EXPEDITION_MAP, ZURAN_ORB)
+
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them (2026-09-29). §0z74.
+# ---------------------------------------------------------------------------
+
+# AUTUMN WILLOW, HARMONY  {3}{G}{G}  3/3  Legendary Creature - Avatar
+#   "Hexproof. When Autumn Willow enters, create a 1/1 green Forest Dryad land
+#    creature token. (It's affected by summoning sickness.) Whenever you tap a
+#    land creature for mana, add an additional {G}."
+#
+# The token is Awaken the Woods' token exactly (`azusa.forest_dryad_tokens`),
+# so it is a landfall trigger. The doubler reads every LAND CREATURE: the
+# Dryads, Dryad Arbor, an animated land, and -- with Ashaya out -- every
+# nontoken creature, which Ashaya makes a Forest.
+AUTUMN_WILLOW_HARMONY = C("Autumn Willow, Harmony", "Creature",
+                          {"gen": 3, "G": 2}, 3, 3, priority=7.5, threat=6.0)
+
+MBC_CANDIDATES = (AUTUMN_WILLOW_HARMONY,)

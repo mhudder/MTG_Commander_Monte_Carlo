@@ -130,6 +130,13 @@ class Opponent:
     # Combat damage YOUR COMMANDER has dealt this player (CR 104.3j: 21 or
     # more from the same commander and they lose). §0z65.
     cmdr_damage: float = 0.0
+    # SELENIA'S CURSE (Mystery Booster Commander Edition, §0z74): "If
+    # enchanted player would lose life, they lose twice that much life
+    # instead." A replacement on this player's LIFE LOSS, so it is read by
+    # `life_loss()` at every place an opponent's life goes down, and by
+    # nothing else. The token is LEGENDARY and you only ever control one, so
+    # this is a flag and not a count.
+    cursed: bool = False
 
     _pcache: object = None
 
@@ -619,7 +626,7 @@ def goaded_combat(g):
         victim = min(targets, key=lambda o: o.life)
         blocked = min(att.goaded_birds, (victim.creatures + victim.goaded_birds) * share)
         through = max(0.0, att.goaded_birds - blocked)
-        victim.life -= 2.0 * through          # 2/2 bodies
+        victim.life -= life_loss(victim, 2.0 * through)   # 2/2 bodies
     _check_eliminations(g)
 
 
@@ -869,6 +876,27 @@ def commander_damage_lethal(g, o) -> bool:
     return o.cmdr_damage >= 21
 
 
+def record_hits(g, through) -> None:
+    """Report the attackers that dealt combat damage to a player, to an engine
+    that asked (§0z74).
+
+    "WHENEVER THIS DEALS COMBAT DAMAGE TO A PLAYER" needs to know WHICH
+    attackers connected, and `damage_through` already knows -- it is how
+    commander damage finds the commander (§0z65). An engine opts in by setting
+    `g.combat_hits = []` before calling `combat_damage` and reads the list
+    after; the five engines that never set it are untouched, which is why this
+    is discovered with `getattr` rather than added to all six (the
+    `on_creature_death` pattern in `docs/ARCHITECTURE.md`'s protocol table).
+
+    tivit.py's own commander trigger reads `dmg > 0 and Tivit attacked`, which
+    credits the trigger when Tivit was chump-blocked and something else got
+    through. That approximation is left alone here -- changing it would move
+    tivit's baseline -- and named as the difference."""
+    hits = getattr(g, "combat_hits", None)
+    if hits is not None:
+        hits.extend(p for p in through if g.power_of(p) > 0)
+
+
 def commander_must_block(g, perm, defender) -> bool:
     """A defender this commander would take to 21 blocks it FIRST (§0z67).
 
@@ -949,6 +977,56 @@ def living(g):
     return [o for o in g.opponents if o.alive and o.life > 0]
 
 
+def life_loss(o, n: float) -> float:
+    """How much life opponent `o` actually loses when an effect says `n`.
+
+    ONE FUNCTION, for §0z30's reason: a replacement on life loss has to be
+    said at EVERY site where an opponent's life goes down -- combat, "each
+    opponent loses", focused drain, the goaded Birds, and the engines' own
+    local drains -- or it is a doubler with holes in it (§0z4's shape, which
+    a mana doubler had to learn in `available_mana` AND `spend`). Damage to a
+    player IS life loss (CR 120.3a), so the curse doubles combat too.
+
+    Selenia's Curse (§0z74) is the only replacement today. `o.cursed` is set
+    only by `curse_opponent`, so every deck without Selenia reads `n` back
+    unchanged and its numbers cannot move.
+    """
+    return 2.0 * n if o.cursed else n
+
+
+def curse_opponent(g) -> bool:
+    """SELENIA'S CURSE enters attached to target opponent (§0z74).
+
+    "When Selenia dies, create a LEGENDARY black Aura Curse enchantment token
+    named Selenia's Curse attached to target opponent." Two rules decide the
+    whole policy, and neither is a guess:
+
+      * LEGENDARY (704.5j): a second curse while you control the first means
+        keeping one. Kept: the one already on a living player, so a second
+        death while a curse is live makes nothing new. `curses_made` counts
+        what the rule let through.
+      * An Aura attached to a player who has LEFT THE GAME goes to the
+        graveyard (704.5m / 800.4a), so a cursed player's elimination frees the
+        slot -- read here as "no LIVING opponent is cursed".
+
+    TARGET: the living opponent with the MOST life. The curse doubles every
+    point that player loses for the rest of the game, so it is worth most on
+    the player furthest from dying; the one closest to dying is killed by
+    focused damage whether or not they are cursed. A pilot's choice, said out
+    loud -- `selenia_curse_target="low"` is the other reading.
+    """
+    alive = living(g)
+    if not alive or any(o.cursed for o in alive):
+        return False
+    if g.cfg.get("selenia_curse_target", "high") == "low":
+        victim = min(alive, key=lambda o: o.life)
+    else:
+        victim = max(alive, key=lambda o: o.life)
+    victim.cursed = True
+    g.m["curses_made"] += 1
+    return True
+
+
 def pod_size(g) -> int:
     """How many opponents an 'each opponent loses N' POD TOTAL was quoted for.
 
@@ -1001,8 +1079,9 @@ def damage_each(g, n) -> float:
         return 0.0
     dealt = 0.0
     for o in living(g):
-        dealt += min(n, max(0.0, o.life))
-        o.life -= n
+        loss = life_loss(o, n)
+        dealt += min(loss, max(0.0, o.life))
+        o.life -= loss
     _check_eliminations(g)
     return dealt
 
@@ -1019,8 +1098,9 @@ def damage_single(g, n) -> float:
     if not alive:
         return 0.0
     target = min(alive, key=lambda o: o.life)
-    dealt = min(n, max(0.0, target.life))
-    target.life -= n
+    loss = life_loss(target, n)
+    dealt = min(loss, max(0.0, target.life))
+    target.life -= loss
     _check_eliminations(g)
     return dealt
 
@@ -1164,6 +1244,8 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         # commander's share is credited to them.
         if target is not None:
             target.cmdr_damage += commander_hit(g, through)
+            if dmg > 0:
+                record_hits(g, through)
         # The counters below are recorded on BOTH paths, so an A/B has them on
         # each leg rather than only on the new one. Purely observational -- no
         # RNG is consumed and no decision reads them.
@@ -1241,6 +1323,10 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
             dealt += bonus
         if dealt <= 0:
             continue
+        record_hits(g, through)
+        # Selenia's Curse (§0z74): combat damage is life loss, so it doubles
+        # here too. `life_loss` is the identity for an uncursed player.
+        dealt = life_loss(opp, dealt)
         # THE RETURNED NUMBER IS THE BOUNDED ONE. Damage past a player's life
         # total is meaningless, and in this deck it is nearly the whole figure,
         # so `m["damage"]` is fed from here rather than from `raw`.

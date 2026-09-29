@@ -388,3 +388,34 @@ GINGER_QUEEN_OF_SWEETS = C("Ginger, Queen of Sweets", "Artifact/Creature",
                            priority=8.0, threat=7.5)
 
 BATCH_2026_09_22 = (GINGER_QUEEN_OF_SWEETS,)
+
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them (2026-09-29). §0z74.
+# ---------------------------------------------------------------------------
+
+# SELENIA, THE CURSED HEART  {4}{W}{B}  2/5  Legendary Creature - Angel Warrior
+#   "Flying, lifelink. If you would gain life, you gain twice that much life
+#    instead. When Selenia dies, create a legendary black Aura Curse
+#    enchantment token named Selenia's Curse attached to target opponent. The
+#    token has enchant player and 'If enchanted player would lose life, they
+#    lose twice that much life instead.'"
+#
+# A THIRD copy of The Wind Crystal's replacement (`karlov.gain_life`), so it
+# doubles the AMOUNT and never the event count: Karlov still gets two
+# counters. What the amount feeds here is Sanguine Bond's and Vito's drain,
+# Well of Lost Dreams, and the life thresholds (Serra Ascendant, Felidar).
+SELENIA_THE_CURSED_HEART = C("Selenia, the Cursed Heart", "Creature",
+                             {"gen": 4, "W": 1, "B": 1}, 2, 5, priority=8.0,
+                             threat=7.5, lifelink=True)
+
+# PEARL COLLECTOR  {2}{B}  3/3  Creature - Human Warlock  (colour identity BW)
+#   "Deathtouch, Lifelink. At the beginning of your second main phase, if you
+#    gained 4 or more life this turn, conjure a card named Mox Pearl into your
+#    hand. This ability triggers only once. {2}{W}: Another target creature
+#    perpetually gains lifelink."
+PEARL_COLLECTOR = C("Pearl Collector", "Creature", {"gen": 2, "B": 1}, 3, 3,
+                    priority=6.5, lifelink=True)
+
+MBC_CANDIDATES = (SELENIA_THE_CURSED_HEART, PEARL_COLLECTOR)

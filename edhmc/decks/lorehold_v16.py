@@ -354,3 +354,24 @@ STINGCASTER_MAGE = C("Stingcaster Mage", "Creature", {"gen": 1, "R": 1}, 2, 1,
                      priority=7.5, threat=4.0, haste=True)
 
 FRA_CANDIDATES = (STINGCASTER_MAGE,)
+
+# ---------------------------------------------------------------------------
+# MYSTERY BOOSTER COMMANDER EDITION (Scryfall `mbc`), text fetched 2026-09-29.
+# The set releases 2026-11-09 and its new cards read `not_legal` in Commander
+# on Scryfall; the owner's table plays them (2026-09-29). §0z74.
+# ---------------------------------------------------------------------------
+
+# CHIEF MAGISTRATE OF MERCADIA  {4}{R}{W}  3/3  Legendary Creature - Human Noble
+#   "When Chief Magistrate of Mercadia enters, you become the monarch.
+#    At the beginning of your upkeep, create a 2/1 red Goblin creature token
+#    with haste. Then if you're the monarch, for each creature token you
+#    control, create a token that's a copy of it."
+#
+# The monarch is §0z39's machinery, shared by six engines. The copy clause
+# DOUBLES the token board every upkeep the crown is held, which is the card;
+# `lorehold.magistrate_upkeep` and its `magistrate_token_cap` knob.
+CHIEF_MAGISTRATE_OF_MERCADIA = C("Chief Magistrate of Mercadia", "Creature",
+                                 {"gen": 4, "R": 1, "W": 1}, 3, 3,
+                                 priority=6.5, threat=7.5)
+
+MBC_CANDIDATES = (CHIEF_MAGISTRATE_OF_MERCADIA,)

@@ -122,6 +122,7 @@ Methodology that used to live at the end of this file is now
 | [0z71](#0z71) | FIXED | **Time Sieve may eat real artifacts** (MV ≤ 2, only while Tivit is out; queued 8c): +0.0014 ±0.0013 at T20, −0.0008 at T10 |
 | [0z72](#0z72) | FIXED | **Devotion is one rule** (hybrid-aware, `engine.devotion`), and Daxos's toughness reads it. Inert today: karlov bit-identical |
 | [0z73](#0z73) | FIXED | **Paying made WHEN a policy**: before the main phase the outlets cost rendmaw −0.0209; at the end step −0.0023, inside its bar. And Village Rites had been castable as a blank by the main phase |
+| [0z74](#0z74) | FIXED | **Mystery Booster Commander Edition: nine cards, twelve deck pairs, implemented and pinned.** Every baseline bit-identical; the loyalty check found three walkers nobody had listed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7697,6 +7698,63 @@ only: **0 rows beyond their old bars, 0 sign flips.** The cards that changed
 read as expected: Dockside Chef, now paying {1}{B} a draw, +0.0029 -> +0.0015
 (inside its bar); Village Rites +0.0028 -> +0.0032; Time Sieve +0.0371 ->
 +0.0385.
+
+## 0z74. FIXED — Mystery Booster Commander Edition: nine cards, twelve deck pairs
+
+> Scryfall `mbc`, 80 cards, releases 2026-11-09. Every NEW card in it reads
+> `not_legal` in Commander on Scryfall -- 59 are legal in no format, ten only
+> in digital ones. **The owner's table plays them (2026-09-29)**, which is a
+> decision about the table and not about the rules; the Seluma spreadsheet in
+> `spreadsheets/` was already built around one of them.
+
+Scanned all 80 against the six colour identities (59 fit at least one deck;
+21 fit none), dropped the reprints the owner did not want and the cards whose
+value is entirely blind (§4: opponents' boards, hands and libraries), and
+implemented the nine that were left. Text fetched 2026-09-29, verbatim in each
+Proposal and deck module.
+
+**SHARED MACHINERY, each written once and read by every engine that needs it:**
+
+| rule | where | who reads it |
+|---|---|---|
+| Selenia's Curse: "if enchanted player would lose life, they lose twice that much" | `opponents.life_loss` / `curse_opponent`, `Opponent.cursed` | every site an opponent's life goes down: combat, `damage_each`, `damage_single`, goaded Birds, Massacre Wurm |
+| "deals combat damage to a player" | `opponents.record_hits`, opt-in `g.combat_hits` | shilgengar (Seluma) |
+| planeswalker loyalty outside azusa | `engine.PLANESWALKER_LOYALTY`, `walker_ready`, `walker_dies_at_zero` | rendmaw, shilgengar (Thomil), tivit (Venser, Dyfed) |
+| Thomil and Lord of the Pit | `engine.thomil_step`, `lord_of_the_pit_upkeep` | rendmaw, shilgengar |
+| Pearl Collector | `engine.pearl_collector_trigger`, `pearl_collector_lifelink`, `perpetual_lifelink` | karlov, shilgengar |
+
+**A NEW HAND-MAINTAINED NAME SET GOT ITS CHECK, AND THE CHECK FOUND THREE
+CARDS NOBODY HAD LISTED.** `pending.check_loyalty_coverage` refuses a
+Planeswalker outside azusa that has no loyalty, or whose deck's engine never
+activates it (`engine.WALKER_READERS`). Its first run failed on karlov's two
+Sorins -- planeswalkers modelled by NAME as statics, with no loyalty at all --
+and it would have on Grist. They are now `pending.WALKERS_WITHOUT_LOYALTY`,
+each with the reason, and a stale exemption fails too. Five mutations of the
+check each fired (§0q; "prove the check fails").
+
+**THE SMOKE CAUGHT §0z29 AGAIN, BEFORE ANYTHING WAS MEASURED.** Seluma
+connected on 12% of its attacks: it was a ground creature, because
+`tag_flying --write` had not been re-run since the card was defined. The
+counter (`seluma_hits`) made it unmistakable where a win rate would not have.
+
+**BASELINES: BIT-IDENTICAL.** `check_unchanged_decks` against HEAD: all six
+decks BIT-IDENTICAL on all 8 metrics, AND every numeric output key summed over
+250 games per deck identical (§0z32's discipline) -- the one key tivit grew
+(`powerstone_mana`, written as 0 on every payment) is now written only when a
+Powerstone pays. `validate` +0.00 on all 18 metrics, RNG sealed on every
+engine. Pinned by `tests/test_mbc.py`: 24 cases, 11 mutations, exact sets,
+written before the first run and right on it.
+
+**PRE-EXISTING GAPS FOUND AND NOT FIXED** (both move shilgengar's baseline):
+Blood Artist, Zulaport Cutthroat and Vampiric Rites write `your_life` directly
+instead of calling `ShilgengarGame.gain_life`, so Thune, Lyra and now Selenia
+never see those gains; and a creature carrying a finality counter still fires
+every death trigger except Selenia's.
+
+**THE HEAD-TO-HEADS** -- each card against its deck's weakest MODEL-EVALUATED
+row, N=15,000 paired, both horizons -- are `diagnostics/run_mbc.py`; the
+numbers follow in this section once the run completes. Nothing is staged:
+whether any of these goes in is the owner's call on those numbers (§0c).
 
 ## How to read an ablation table
 
