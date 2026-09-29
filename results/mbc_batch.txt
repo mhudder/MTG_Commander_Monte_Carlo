@@ -1,0 +1,217 @@
+Mystery Booster Commander Edition, §0z74. N=15,000 paired, same seeds both legs, base = build_pending(<deck>).
+  shilgengar  -Skullclamp +Selenia, the Cursed Heart
+  shilgengar  -Skullclamp +Seluma, Light of Aysen
+  shilgengar  -Skullclamp +Thomil, the Destroyer
+  shilgengar  -Skullclamp +Pearl Collector
+  karlov      -Swiftfoot Boots +Selenia, the Cursed Heart
+  karlov      -Swiftfoot Boots +Pearl Collector
+  tivit       -Tamiyo's Journal +Venser, Visionary Traveler
+  tivit       -Tamiyo's Journal +Dyfed, the Guiding Hand
+  azusa       -Titania, Protector of Argoth +Autumn Willow, Harmony
+  rendmaw     -Ashnod's Altar +Davvol, Evincar of Rath
+  rendmaw     -Ashnod's Altar +Thomil, the Destroyer
+  lorehold    -Lightning Greaves +Chief Magistrate of Mercadia
+
+  shilgengar  -Skullclamp +Seluma, Light of Aysen  T10  (74s)   A-leg won 0.0109
+    won                     +0.0007  [ +0.0002,  +0.0013] *
+    damage                  +0.7765  [ +0.7066,  +0.8473] *
+    seluma_hits             +0.2341  [ +0.2215,  +0.2477] *
+    seluma_returns          +0.0311  [ +0.0280,  +0.0344] *
+    blood_made              +0.0675  [ +0.0487,  +0.0871] *
+
+  shilgengar  -Skullclamp +Selenia, the Cursed Heart  T10  (75s)   A-leg won 0.0109
+    won                     +0.0015  [ +0.0009,  +0.0023] *
+    damage                  +0.5771  [ +0.5025,  +0.6596] *
+    curses_made             +0.0616  [ +0.0578,  +0.0655] *
+    selenia_extra_life      +1.5147  [ +1.3920,  +1.6454] *
+    blood_made              +0.1043  [ +0.0849,  +0.1236] *
+    life_gained             +2.3449  [ +2.1581,  +2.5453] *
+
+  shilgengar  -Skullclamp +Seluma, Light of Aysen  T20  (101s)   A-leg won 0.2228
+    won                     +0.0091  [ +0.0066,  +0.0115] *
+    damage                  +1.3375  [ +1.2096,  +1.4633] *
+    seluma_hits             +0.3804  [ +0.3625,  +0.3989] *
+    seluma_returns          +0.0589  [ +0.0545,  +0.0634] *
+    blood_made              +0.1039  [ +0.0744,  +0.1326] *
+
+  shilgengar  -Skullclamp +Selenia, the Cursed Heart  T20  (100s)   A-leg won 0.2228
+    won                     +0.0206  [ +0.0175,  +0.0237] *
+    damage                  +1.8518  [ +1.6902,  +2.0136] *
+    curses_made             +0.0998  [ +0.0951,  +0.1045] *
+    selenia_extra_life      +3.7824  [ +3.5347,  +4.0367] *
+    blood_made              +0.2103  [ +0.1785,  +0.2415] *
+    life_gained             +5.5717  [ +5.2091,  +5.9357] *
+
+  shilgengar  -Skullclamp +Thomil, the Destroyer  T10  (81s)   A-leg won 0.0109
+    won                     +0.0003  [ -0.0001,  +0.0007]  
+    damage                  +0.7543  [ +0.6818,  +0.8230] *
+    thomil_zombies          +0.2731  [ +0.2607,  +0.2857] *
+    thomil_lords            +0.1297  [ +0.1231,  +0.1364] *
+    lord_sacrifices         +0.1553  [ +0.1448,  +0.1659] *
+    lord_self_damage        +0.0028  [ +0.0005,  +0.0056] *
+    blood_made              -0.0034  [ -0.0192,  +0.0122]  
+
+  shilgengar  -Skullclamp +Pearl Collector  T10  (83s)   A-leg won 0.0109
+    won                     +0.0012  [ +0.0006,  +0.0019] *
+    damage                  +0.7254  [ +0.6475,  +0.8005] *
+    mox_pearls_conjured     +0.0869  [ +0.0824,  +0.0914] *
+    pearl_lifelink_grants   +0.1423  [ +0.1329,  +0.1521] *
+    life_gained             +2.6047  [ +2.4384,  +2.7772] *
+
+  shilgengar  -Skullclamp +Thomil, the Destroyer  T20  (113s)   A-leg won 0.2228
+    won                     +0.0074  [ +0.0050,  +0.0098] *
+    damage                  +1.2856  [ +1.1577,  +1.4171] *
+    thomil_zombies          +0.4205  [ +0.4037,  +0.4373] *
+    thomil_lords            +0.2179  [ +0.2088,  +0.2274] *
+    lord_sacrifices         +0.3637  [ +0.3444,  +0.3827] *
+    lord_self_damage        +0.0243  [ +0.0168,  +0.0327] *
+    blood_made              +0.0139  [ -0.0126,  +0.0401]  
+
+  shilgengar  -Skullclamp +Pearl Collector  T20  (120s)   A-leg won 0.2228
+    won                     +0.0229  [ +0.0199,  +0.0257] *
+    damage                  +1.9602  [ +1.8037,  +2.1261] *
+    mox_pearls_conjured     +0.1597  [ +0.1533,  +0.1661] *
+    pearl_lifelink_grants   +0.3065  [ +0.2907,  +0.3233] *
+    life_gained             +6.6023  [ +6.2019,  +6.9935] *
+
+  karlov  -Swiftfoot Boots +Selenia, the Cursed Heart  T10  (82s)   A-leg won 0.1739
+    won                     +0.0039  [ +0.0023,  +0.0056] *
+    damage                  +0.4221  [ +0.3130,  +0.5365] *
+    curses_made             +0.0294  [ +0.0268,  +0.0321] *
+    selenia_extra_life      +2.5145  [ +2.2315,  +2.8331] *
+    life_gained             +2.2957  [ +1.9339,  +2.6696] *
+
+  karlov  -Swiftfoot Boots +Pearl Collector  T10  (77s)   A-leg won 0.1739
+    won                     +0.0100  [ +0.0081,  +0.0119] *
+    damage                  +1.0968  [ +0.9688,  +1.2305] *
+    mox_pearls_conjured     +0.1013  [ +0.0965,  +0.1061] *
+    pearl_lifelink_grants   +0.0455  [ +0.0404,  +0.0508] *
+    lifegain_triggers       +0.4255  [ +0.3846,  +0.4661] *
+
+  karlov  -Swiftfoot Boots +Selenia, the Cursed Heart  T20  (102s)   A-leg won 0.4207
+    won                     +0.0160  [ +0.0131,  +0.0190] *
+    damage                  +0.9304  [ +0.7768,  +1.0801] *
+    curses_made             +0.0529  [ +0.0493,  +0.0564] *
+    selenia_extra_life      +5.8123  [ +5.3271,  +6.3401] *
+    life_gained             +4.7280  [ +4.0486,  +5.4109] *
+
+  karlov  -Swiftfoot Boots +Pearl Collector  T20  (99s)   A-leg won 0.4207
+    won                     +0.0197  [ +0.0165,  +0.0228] *
+    damage                  +1.4754  [ +1.3102,  +1.6488] *
+    mox_pearls_conjured     +0.1423  [ +0.1369,  +0.1478] *
+    pearl_lifelink_grants   +0.0836  [ +0.0761,  +0.0910] *
+    lifegain_triggers       +0.6494  [ +0.5774,  +0.7235] *
+
+  tivit  -Tamiyo's Journal +Venser, Visionary Traveler  T10  (73s)   A-leg won 0.1597
+    won                     +0.0067  [ +0.0049,  +0.0085] *
+    damage                  +0.3863  [ +0.2545,  +0.5182] *
+    venser_blinks           +0.2398  [ +0.2265,  +0.2533] *
+    venser_counters         +1.3004  [ +1.1808,  +1.4260] *
+    tivit_triggers          +0.2265  [ +0.1854,  +0.2680] *
+    extra_turns             -0.0027  [ -0.0061,  +0.0007]  
+
+  tivit  -Tamiyo's Journal +Dyfed, the Guiding Hand  T10  (75s)   A-leg won 0.1597
+    won                     +0.0047  [ +0.0030,  +0.0065] *
+    damage                  +0.5964  [ +0.4546,  +0.7445] *
+    powerstones_made        +0.5643  [ +0.5383,  +0.5903] *
+    powerstone_mana         +0.7843  [ +0.7345,  +0.8333] *
+    dyfed_untaps            +0.0136  [ +0.0110,  +0.0163] *
+    dyfed_tutors            +0.0680  [ +0.0638,  +0.0721] *
+    extra_turns             +0.0874  [ +0.0788,  +0.0965] *
+
+  tivit  -Tamiyo's Journal +Venser, Visionary Traveler  T20  (110s)   A-leg won 0.4282
+    won                     +0.0115  [ +0.0087,  +0.0144] *
+    damage                  +0.2859  [ +0.1276,  +0.4502] *
+    venser_blinks           +0.3969  [ +0.3783,  +0.4159] *
+    venser_counters         +2.6697  [ +2.4583,  +2.9091] *
+    tivit_triggers          +0.3269  [ +0.2497,  +0.4023] *
+    extra_turns             -0.0122  [ -0.0205,  -0.0035] *
+
+  tivit  -Tamiyo's Journal +Dyfed, the Guiding Hand  T20  (111s)   A-leg won 0.4282
+    won                     +0.0220  [ +0.0189,  +0.0252] *
+    damage                  +1.2030  [ +1.0135,  +1.3966] *
+    powerstones_made        +0.8444  [ +0.8107,  +0.8796] *
+    powerstone_mana         +1.5394  [ +1.4603,  +1.6200] *
+    dyfed_untaps            +0.0427  [ +0.0366,  +0.0490] *
+    dyfed_tutors            +0.1025  [ +0.0977,  +0.1073] *
+    extra_turns             +0.2218  [ +0.2035,  +0.2413] *
+
+  rendmaw  -Ashnod's Altar +Davvol, Evincar of Rath  T10  (79s)   A-leg won 0.0419
+    won                     +0.0003  [ -0.0006,  +0.0013]  
+    damage                  +0.2830  [ +0.2147,  +0.3465] *
+    davvol_triggers         +0.6549  [ +0.6141,  +0.6964] *
+    davvol_mana_spent       +0.2171  [ +0.2007,  +0.2352] *
+    davvol_mana_lost        +0.4377  [ +0.4087,  +0.4663] *
+    final_life              -0.4164  [ -0.4605,  -0.3724] *
+
+  azusa  -Titania, Protector of Argoth +Autumn Willow, Harmony  T10  (213s)   A-leg won 0.1755
+    won                     +0.0047  [ +0.0028,  +0.0067] *
+    damage                  +0.3657  [ +0.2075,  +0.5193] *
+    willow_dryads           +0.1804  [ +0.1743,  +0.1865] *
+    willow_taps             +0.5060  [ +0.4713,  +0.5435] *
+    landfall_triggers       +0.4324  [ +0.3896,  +0.4773] *
+
+  rendmaw  -Ashnod's Altar +Davvol, Evincar of Rath  T20  (109s)   A-leg won 0.2153
+    won                     -0.0051  [ -0.0075,  -0.0027] *
+    damage                  +0.0489  [ -0.0532,  +0.1547]  
+    davvol_triggers         +1.0021  [ +0.9479,  +1.0548] *
+    davvol_mana_spent       +0.3441  [ +0.3203,  +0.3691] *
+    davvol_mana_lost        +0.6579  [ +0.6219,  +0.6935] *
+    final_life              -0.3446  [ -0.3953,  -0.2949] *
+
+  rendmaw  -Ashnod's Altar +Thomil, the Destroyer  T10  (80s)   A-leg won 0.0419
+    won                     -0.0003  [ -0.0011,  +0.0006]  
+    damage                  +0.3620  [ +0.2934,  +0.4299] *
+    thomil_zombies          +0.2189  [ +0.2081,  +0.2301] *
+    thomil_lords            +0.1025  [ +0.0968,  +0.1083] *
+    lord_sacrifices         +0.1232  [ +0.1140,  +0.1329] *
+    lord_self_damage        +0.0005  [ +0.0000,  +0.0014]  
+
+  rendmaw  -Ashnod's Altar +Thomil, the Destroyer  T20  (109s)   A-leg won 0.2153
+    won                     +0.0059  [ +0.0034,  +0.0085] *
+    damage                  +0.8884  [ +0.7822,  +0.9999] *
+    thomil_zombies          +0.3607  [ +0.3457,  +0.3750] *
+    thomil_lords            +0.1919  [ +0.1831,  +0.2002] *
+    lord_sacrifices         +0.3489  [ +0.3288,  +0.3694] *
+    lord_self_damage        +0.0037  [ +0.0014,  +0.0070] *
+
+  lorehold  -Lightning Greaves +Chief Magistrate of Mercadia  T10  (99s)   A-leg won 0.0859
+    won                     -0.0009  [ -0.0029,  +0.0011]  
+    damage                  +0.1837  [ +0.0587,  +0.3136] *
+    monarch_gained          +0.0699  [ +0.0658,  +0.0742] *
+    monarch_draws           +0.0716  [ +0.0669,  +0.0762] *
+    magistrate_goblins      +0.0662  [ +0.0603,  +0.0723] *
+    magistrate_copies       +0.0393  [ +0.0249,  +0.0561] *
+
+  lorehold  -Lightning Greaves +Chief Magistrate of Mercadia  T20  (131s)   A-leg won 0.2575
+    won                     +0.0068  [ +0.0033,  +0.0103] *
+    damage                  +0.7433  [ +0.5814,  +0.9162] *
+    monarch_gained          +0.1137  [ +0.1089,  +0.1188] *
+    monarch_draws           +0.1175  [ +0.1115,  +0.1237] *
+    magistrate_goblins      +0.1405  [ +0.1306,  +0.1505] *
+    magistrate_copies       +0.0857  [ +0.0651,  +0.1084] *
+
+  azusa  -Titania, Protector of Argoth +Autumn Willow, Harmony  T20  (325s)   A-leg won 0.4035
+    won                     +0.0024  [ -0.0007,  +0.0055]  
+    damage                  +0.2657  [ +0.0833,  +0.4503] *
+    willow_dryads           +0.2572  [ +0.2501,  +0.2641] *
+    willow_taps             +0.9606  [ +0.9045,  +1.0168] *
+    landfall_triggers       +0.5699  [ +0.5118,  +0.6310] *
+
+======================================================================================
+SUMMARY: win rate of the real swap, paired
+======================================================================================
+deck        swap                                                           win T10         win T20
+shilgengar  -Skullclamp +Selenia, the Cursed Heart                 +0.0015 +-0.0007 * +0.0206 +-0.0031 *
+shilgengar  -Skullclamp +Seluma, Light of Aysen                    +0.0007 +-0.0006 * +0.0091 +-0.0024 *
+shilgengar  -Skullclamp +Thomil, the Destroyer                     +0.0003 +-0.0004   +0.0074 +-0.0024 *
+shilgengar  -Skullclamp +Pearl Collector                           +0.0012 +-0.0006 * +0.0229 +-0.0029 *
+karlov      -Swiftfoot Boots +Selenia, the Cursed Heart            +0.0039 +-0.0017 * +0.0160 +-0.0030 *
+karlov      -Swiftfoot Boots +Pearl Collector                      +0.0100 +-0.0019 * +0.0197 +-0.0031 *
+tivit       -Tamiyo's Journal +Venser, Visionary Traveler          +0.0067 +-0.0018 * +0.0115 +-0.0028 *
+tivit       -Tamiyo's Journal +Dyfed, the Guiding Hand             +0.0047 +-0.0017 * +0.0220 +-0.0031 *
+azusa       -Titania, Protector of Argoth +Autumn Willow, Harmony  +0.0047 +-0.0019 * +0.0024 +-0.0031  
+rendmaw     -Ashnod's Altar +Davvol, Evincar of Rath               +0.0003 +-0.0009   -0.0051 +-0.0024 *
+rendmaw     -Ashnod's Altar +Thomil, the Destroyer                 -0.0003 +-0.0009   +0.0059 +-0.0025 *
+lorehold    -Lightning Greaves +Chief Magistrate of Mercadia       -0.0009 +-0.0020   +0.0068 +-0.0035 *
+exit=0

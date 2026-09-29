@@ -122,7 +122,7 @@ Methodology that used to live at the end of this file is now
 | [0z71](#0z71) | FIXED | **Time Sieve may eat real artifacts** (MV ≤ 2, only while Tivit is out; queued 8c): +0.0014 ±0.0013 at T20, −0.0008 at T10 |
 | [0z72](#0z72) | FIXED | **Devotion is one rule** (hybrid-aware, `engine.devotion`), and Daxos's toughness reads it. Inert today: karlov bit-identical |
 | [0z73](#0z73) | FIXED | **Paying made WHEN a policy**: before the main phase the outlets cost rendmaw −0.0209; at the end step −0.0023, inside its bar. And Village Rites had been castable as a blank by the main phase |
-| [0z74](#0z74) | FIXED | **Mystery Booster Commander Edition: nine cards, twelve deck pairs, implemented and pinned.** Every baseline bit-identical; the loyalty check found three walkers nobody had listed |
+| [0z74](#0z74) | MEASURED | **Mystery Booster Commander Edition: nine cards, twelve deck pairs.** Pearl Collector (shilgengar +0.0229), Dyfed (+0.0220), Selenia (shilgengar +0.0206) lead at T20; Davvol is significantly NEGATIVE (−0.0051). Baselines bit-identical; the loyalty check found three unlisted walkers |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7699,7 +7699,7 @@ read as expected: Dockside Chef, now paying {1}{B} a draw, +0.0029 -> +0.0015
 (inside its bar); Village Rites +0.0028 -> +0.0032; Time Sieve +0.0371 ->
 +0.0385.
 
-## 0z74. FIXED — Mystery Booster Commander Edition: nine cards, twelve deck pairs
+## 0z74. MEASURED — Mystery Booster Commander Edition: nine cards, twelve deck pairs
 
 > Scryfall `mbc`, 80 cards, releases 2026-11-09. Every NEW card in it reads
 > `not_legal` in Commander on Scryfall -- 59 are legal in no format, ten only
@@ -7752,9 +7752,45 @@ never see those gains; and a creature carrying a finality counter still fires
 every death trigger except Selenia's.
 
 **THE HEAD-TO-HEADS** -- each card against its deck's weakest MODEL-EVALUATED
-row, N=15,000 paired, both horizons -- are `diagnostics/run_mbc.py`; the
-numbers follow in this section once the run completes. Nothing is staged:
-whether any of these goes in is the owner's call on those numbers (§0c).
+row, N=15,000 paired, same seeds both legs (`diagnostics/run_mbc.py`,
+`results/mbc_batch.txt`). `*` = significant:
+
+| deck | swap | win T10 | win T20 |
+|---|---|---|---|
+| shilgengar | −Skullclamp +Pearl Collector | +0.0012 ±0.0006 * | **+0.0229 ±0.0029 *** |
+| tivit | −Tamiyo's Journal +Dyfed | +0.0047 ±0.0017 * | **+0.0220 ±0.0031 *** |
+| shilgengar | −Skullclamp +Selenia | +0.0015 ±0.0007 * | **+0.0206 ±0.0031 *** |
+| karlov | −Swiftfoot Boots +Pearl Collector | +0.0100 ±0.0019 * | **+0.0197 ±0.0031 *** |
+| karlov | −Swiftfoot Boots +Selenia | +0.0039 ±0.0017 * | **+0.0160 ±0.0030 *** |
+| tivit | −Tamiyo's Journal +Venser | +0.0067 ±0.0018 * | +0.0115 ±0.0028 * |
+| shilgengar | −Skullclamp +Seluma | +0.0007 ±0.0006 * | +0.0091 ±0.0024 * |
+| shilgengar | −Skullclamp +Thomil | +0.0003 ±0.0004 | +0.0074 ±0.0024 * |
+| lorehold | −Lightning Greaves +Chief Magistrate | −0.0009 ±0.0020 | +0.0068 ±0.0035 * |
+| rendmaw | −Ashnod's Altar +Thomil | −0.0003 ±0.0009 | +0.0059 ±0.0025 * |
+| azusa | −Titania +Autumn Willow | +0.0047 ±0.0019 * | +0.0024 ±0.0031 |
+| rendmaw | −Ashnod's Altar +Davvol | +0.0003 ±0.0009 | **−0.0051 ±0.0024 *** |
+
+**Mechanism, per card** (the counters are in the results file and in each
+Candidate): Pearl Collector's number in shilgengar is mostly its lifelink
+SINK (0.31 grants a game into a deck of big fliers), not the Mox. Seluma
+connects 0.38 times a game and returns an Angel only 0.059 times: the
+commander's mass reanimation keeps the graveyard empty of Angels. Dyfed adds
++0.22 extra turns a game at T20. Venser adds 0.33 dilemmas but LOSES 0.012
+extra turns, because the cut Journal's Clues were Time Sieve fuel. **Davvol
+is the one clear negative**: 1.0 triggers a game, two thirds of the {B}
+empties unspent at a step boundary, and the life is paid every time -- the
+mandatory drawback outruns the mana in the deck that makes the most tokens.
+The Magistrate holds the crown for about one end step (0.11 gained, 0.12
+draws), so its token copies are rare on lorehold's thin board.
+
+**READ KARLOV'S TWO ROWS WITH §0z36 IN MIND**: Swiftfoot Boots' own row is
+−0.0041 ±0.0022, significantly negative, so part of each swap is the Boots
+leaving -- and the owner KEPT the Boots on 2026-09-26. Both karlov cards sit
+well below Bloodthirsty Conqueror's +0.0401 against the same cut.
+
+**Nothing is staged.** Whether any of these goes in is the owner's call
+(§0c), and a card that shares a slot with another in this table needs its own
+head-to-head against that one before the two are ranked.
 
 ## How to read an ablation table
 
