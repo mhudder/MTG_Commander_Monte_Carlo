@@ -73,6 +73,31 @@ PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
+Vault 11: Voter's Dilemma             +0.83+-0.12         +0.98+-0.16        +0.0055+-0.0026      both
+      MODELLED: chapter I's 1/1 Human Soldier per opponent, and ONE vote. NOT:
+      chapters II and III are two votes and the script casts one; and neither
+      vote's effect (destroy the most-voted creature, or everyone draws) -- the
+      pod has no creature to vote for (§4). A floor.
+Expropriate                           +0.15+-0.05         +0.69+-0.10        +0.0158+-0.0025      both
+      MODELLED: an extra turn per time vote -- the half that wins games. NOT: 'for
+      each money vote, gain control of a permanent owned by the voter', which
+      needs opposing permanents to steal (§4). Understates, and badly. A floor.
+Bite of the Black Rose                +0.19+-0.11         +0.28+-0.13        +0.0011+-0.0021       dmg
+      MODELLED: the vote. NOT: sickness ('creatures your opponents control get
+      -2/-2') or psychosis ('each opponent discards two cards') -- the pod's
+      creatures are a count with no toughness, and it has no hand (§4). A floor.
+Capital Punishment                    +0.30+-0.08         +0.24+-0.09        +0.0025+-0.0021      both
+      MODELLED: the council's dilemma vote. NOT: 'each opponent sacrifices a
+      creature for each death vote and discards a card for each taxes vote' -- the
+      pod has no creature objects and no hand (§4). A floor.
+Trial of a Time Lord                  +0.20+-0.09         +0.21+-0.12        +0.0003+-0.0019       dmg
+      MODELLED: the chapter IV vote. NOT: chapters I-III's 'exile target nontoken
+      creature an opponent controls', nor the vote's effect on those cards -- the
+      pod's creatures are a count (§4). A floor.
+Split Decision                        +0.17+-0.07         +0.15+-0.09        +0.0017+-0.0015      both
+      MODELLED: the will-of-the-council vote. NOT: countering or copying the
+      target instant or sorcery -- the pod casts no spell on your turn for it to
+      target, beyond the one counterspell `march_elephant` models. A floor.
 Farewell                              -0.43+-0.12         +0.14+-0.15        +0.0075+-0.0028       win
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
@@ -85,6 +110,9 @@ Promise of Loyalty                    -0.46+-0.14         +0.12+-0.17        +0.
       directions at once, so a high score is still evidence and a low one is not.
       Sacrifice also gets around indestructible, which is why it is in
       WIPE_IGNORES_INDESTRUCTIBLE.
+Council's Judgment                    +0.18+-0.09         +0.11+-0.12        +0.0005+-0.0020        --
+      MODELLED: the vote. NOT: 'exile each permanent with the most votes' -- no
+      nonland permanent you don't control exists to vote for (§4). A floor.
 Magister of Worth                     +0.25+-0.12         +0.07+-0.15        -0.0067+-0.0029       win
       The CONDEMNATION half is implemented (2026-09-12): a symmetric wipe that
       spares only itself, conditional on the council vote. GRACE -- 'EACH PLAYER
@@ -103,18 +131,16 @@ MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
 Torment of Hailfire                   +2.96+-0.19         +3.34+-0.19        +0.0163+-0.0027      both
+      X is fixed at 6 and every opponent takes the life branch, because the pod
+      has neither a hand nor permanents to give up (§4). A CEILING -- a real
+      opponent pays with cards for a while.
 Rhystic Study                         +1.23+-0.17         +1.28+-0.21        +0.0137+-0.0031      both
-Vault 11: Voter's Dilemma             +0.83+-0.12         +0.98+-0.16        +0.0055+-0.0026      both
-Expropriate                           +0.15+-0.05         +0.69+-0.10        +0.0158+-0.0025      both
+      'Unless that player pays {1}' is a social fact this model cannot see: it
+      draws a flat `rhystic_rate` a round. The row is that knob, not the card.
 Trap the Trespassers                  +0.24+-0.11         +0.30+-0.13        +0.0012+-0.0019       dmg
-Bite of the Black Rose                +0.19+-0.11         +0.28+-0.13        +0.0011+-0.0021       dmg
-Capital Punishment                    +0.30+-0.08         +0.24+-0.09        +0.0025+-0.0021      both
-Trial of a Time Lord                  +0.20+-0.09         +0.21+-0.12        +0.0003+-0.0019       dmg
-Split Decision                        +0.17+-0.07         +0.15+-0.09        +0.0017+-0.0015      both
 Muddle the Mixture                    +0.09+-0.08         +0.14+-0.11        +0.0007+-0.0019       dmg
 Void Rend                             +0.21+-0.10         +0.14+-0.13        +0.0018+-0.0022       dmg
 Dovin's Veto                          +0.04+-0.08         +0.13+-0.11        +0.0017+-0.0018       dmg
-Council's Judgment                    +0.18+-0.09         +0.11+-0.12        +0.0005+-0.0020        --
 Path to Exile                         +0.05+-0.06         +0.09+-0.08        +0.0017+-0.0013      both
 Counterspell                          +0.07+-0.08         +0.07+-0.11        +0.0021+-0.0017       win
 Swords to Plowshares                  +0.03+-0.05         +0.06+-0.07        +0.0007+-0.0012        --

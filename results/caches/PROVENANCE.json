@@ -538,9 +538,9 @@
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "188dc344f1050328",
-    "built_commit": "1756292",
-    "built_utc": "2026-09-27T02:33:57Z",
+    "built_at": "ea0fd35f9ca289af",
+    "built_commit": "d2dab44",
+    "built_utc": "2026-09-29T07:20:44Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -694,22 +694,29 @@
         "built_utc": "2026-09-26T23:47:57Z",
         "deck": "rendmaw",
         "verified": []
-      }
-    ],
-    "verified": [
-      {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "3ffe22f7989f315d",
-        "utc": "2026-09-29T01:38:32Z"
       },
       {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "4e23287817a6b17e",
-        "utc": "2026-09-29T01:39:23Z"
+        "built_at": "188dc344f1050328",
+        "built_commit": "1756292",
+        "built_utc": "2026-09-27T02:33:57Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "3ffe22f7989f315d",
+            "utc": "2026-09-29T01:38:32Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "4e23287817a6b17e",
+            "utc": "2026-09-29T01:39:23Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "d7ac5a85a5483868",
@@ -1061,6 +1068,12 @@
         "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
         "fingerprint": "804f20233070d53c",
         "utc": "2026-09-29T01:39:24Z"
+      },
+      {
+        "commit": "d2dab44",
+        "evidence": "2026-09-29 (\u00a70z75-\u00a70z79): check_unchanged_decks against a HEAD (d2dab44) worktree -- tivit BIT-IDENTICAL on all 8 metrics on the deck module with the new defaults, and BIT-IDENTICAL on the staged list (build_pending, N=400). The table was re-rendered from this cache for the \u00a70z78 reclassification: same numbers, seven vote cards moved to PARTLY MODELLED.",
+        "fingerprint": "63a95f255abf2d33",
+        "utc": "2026-09-29T07:18:24Z"
       }
     ]
   }
