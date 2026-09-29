@@ -1,0 +1,33 @@
+The 2026-09-29 rebuild after §0z75-§0z78 against the tables it replaced (git d2dab44). rendmaw, lorehold, karlov, shilgengar and azusa rebuilt at N=15,000; tivit's baseline was bit-identical (module and staged list), its cache VERIFIED and its table re-rendered for the §0z78 relabelling.
+
+== rendmaw: 64 rows; 1 moved beyond their old bar; 0 significant sign flips; 5 signal changes
+     MOVED Blood Artist: +0.0007 -> +0.0029 (old bar 0.0017)
+     signal Ophiomancer: both -> dmg   (win +0.0021 -> +0.0019)
+     signal Blood Artist: -- -> both   (win +0.0007 -> +0.0029)
+     signal Enduring Vitality: win -> --   (win +0.0023 -> +0.0021)
+     signal Dockside Chef: dmg -> both   (win +0.0015 -> +0.0018)
+     signal Midnight Reaper: both -> dmg   (win -0.0014 -> -0.0010)
+== lorehold: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 3 signal changes
+     signal Soulfire Eruption: dmg -> both   (win +0.0031 -> +0.0033)
+     signal Artist's Talent: dmg -> both   (win +0.0039 -> +0.0041)
+     signal Farewell: dmg -> both   (win -0.0035 -> -0.0037)
+== karlov: 64 rows; 1 moved beyond their old bar; 0 significant sign flips; 5 signal changes
+     MOVED Blood Artist: -0.0021 -> +0.0001 (old bar 0.0020)
+     signal Kalitas, Traitor of Ghet: dmg -> both   (win +0.0016 -> +0.0018)
+     signal Blood Artist: both -> --   (win -0.0021 -> +0.0001)
+     signal Farewell: dmg -> --   (win +0.0009 -> +0.0007)
+     signal Austere Command: dmg -> --   (win -0.0003 -> -0.0003)
+     signal Phyrexian Reclamation: -- -> win   (win -0.0009 -> -0.0013)
+== tivit: 65 rows; 0 moved beyond their old bar; 0 significant sign flips; 0 signal changes
+== shilgengar: 64 rows; 2 moved beyond their old bar; 0 significant sign flips; 7 signal changes
+     MOVED Pitiless Plunderer: +0.0011 -> -0.0007 (old bar 0.0017)
+     MOVED Despark: +0.0000 -> +0.0017 (old bar 0.0012)
+     signal Teferi's Protection: dmg -> both   (win +0.0016 -> +0.0019)
+     signal Blood Artist: -- -> dmg   (win -0.0003 -> +0.0009)
+     signal Pitiless Plunderer: -- -> dmg   (win +0.0011 -> -0.0007)
+     signal Dark Prophecy: dmg -> both   (win +0.0015 -> +0.0023)
+     signal Despark: dmg -> both   (win +0.0000 -> +0.0017)
+     signal Mortify: dmg -> both   (win +0.0010 -> +0.0015)
+     signal Swords to Plowshares: dmg -> --   (win -0.0003 -> -0.0003)
+== azusa: 58 rows; 0 moved beyond their old bar; 0 significant sign flips; 1 signal changes
+     signal Abundance: dmg -> both   (win +0.0022 -> +0.0023)

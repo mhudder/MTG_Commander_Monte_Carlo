@@ -7924,7 +7924,16 @@ moved the default before anything shipped.
 
 Pinned by `tests/test_target_and_vault.py`: 8 cases, 3 mutations, exact sets.
 
-**THE REBUILD**
+**THE REBUILD** (`results/rebuild_20260929_diff.txt`), five decks at
+N=15,000 with tivit's cache VERIFIED: **4 of 380 rows beyond their old bars,
+0 significant sign flips.** Two are the look-back seen directly: **Blood
+Artist** +0.0007 -> +0.0029 in rendmaw, now significant, and -0.0021 ->
++0.0001 in karlov. **Karlov's revises §0z35**, which decomposed that
+negative row and put all of it on the blank's two constants: part of it was
+this engine gap, a Blood Artist that never saw its own death. The other two
+are shilgengar's and neither is a finding: Pitiless Plunderer +0.0011 ->
+-0.0007 (0.0018 against a 0.0017 bar, inside its own bar at both ends) and
+Despark 0 -> +0.0017 (MODEL-BLIND removal, §0z66's constants).
 
 ## 0z78. FIXED — the 33 KNOWN_BLIND cards the engine acts on, relabelled (item 23)
 

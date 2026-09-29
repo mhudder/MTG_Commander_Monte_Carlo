@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "ea7d981df13f586f",
-    "built_commit": "f18f0c3",
-    "built_utc": "2026-09-26T05:28:27Z",
+    "built_at": "3e2afdd68b441910",
+    "built_commit": "22d4e8c",
+    "built_utc": "2026-09-29T09:18:05Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -172,52 +172,59 @@
             "utc": "2026-09-26T03:16:19Z"
           }
         ]
+      },
+      {
+        "built_at": "ea7d981df13f586f",
+        "built_commit": "f18f0c3",
+        "built_utc": "2026-09-26T05:28:27Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "b6f957b",
+            "evidence": "2026-09-26, \u00a70z61/\u00a70z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.",
+            "fingerprint": "19844e43b708087b",
+            "utc": "2026-09-26T13:43:44Z"
+          },
+          {
+            "commit": "4591d8a",
+            "evidence": "check_unchanged_decks at N=400, 4591d8a vs the \u00a70z64/\u00a70z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.",
+            "fingerprint": "f6b82e6775f69db1",
+            "utc": "2026-09-26T17:12:39Z"
+          },
+          {
+            "commit": "2b9fff4",
+            "evidence": "check_unchanged_decks at N=400, HEAD 2b9fff4 vs the \u00a70z67/\u00a70z68/\u00a70z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.",
+            "fingerprint": "75a231f588b8fac9",
+            "utc": "2026-09-26T21:54:38Z"
+          },
+          {
+            "commit": "4501246",
+            "evidence": "ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.",
+            "fingerprint": "b23755be8f9f6b7a",
+            "utc": "2026-09-26T22:56:46Z"
+          },
+          {
+            "commit": "933c91a",
+            "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): azusa BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+            "fingerprint": "124c0989ab583b23",
+            "utc": "2026-09-27T02:28:10Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "f88aad2336a40b6c",
+            "utc": "2026-09-29T01:38:33Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "fdddd7db911d9a84",
+            "utc": "2026-09-29T01:39:24Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "b6f957b",
-        "evidence": "2026-09-26, \u00a70z61/\u00a70z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.",
-        "fingerprint": "19844e43b708087b",
-        "utc": "2026-09-26T13:43:44Z"
-      },
-      {
-        "commit": "4591d8a",
-        "evidence": "check_unchanged_decks at N=400, 4591d8a vs the \u00a70z64/\u00a70z65 tree: azusa BIT-IDENTICAL on all 8 metrics with commander damage ON (its commander is a 0/3) and with it off; all six bit-identical with it off. The fingerprint moved for shared opponents.py/engine.py code, the numbers did not.",
-        "fingerprint": "f6b82e6775f69db1",
-        "utc": "2026-09-26T17:12:39Z"
-      },
-      {
-        "commit": "2b9fff4",
-        "evidence": "check_unchanged_decks at N=400, HEAD 2b9fff4 vs the \u00a70z67/\u00a70z68/\u00a70z69 tree with its new defaults (commander_aim=lethal, commander_block_aware, vault_min_treasures=4, known_win_focus=0.8, two stagings in lorehold/shilgengar): azusa BIT-IDENTICAL on all 8 metrics -- its commander is a 0/3, and nothing staged touches it.",
-        "fingerprint": "75a231f588b8fac9",
-        "utc": "2026-09-26T21:54:38Z"
-      },
-      {
-        "commit": "4501246",
-        "evidence": "ablation.py changed only CLASSIFICATIONS (Goldspan PARTLY in lorehold, Lyra SCRIPTED in shilgengar), a rendering change: tests.test_metrics_and_render re-renders azusa's committed table from this cache BYTE-IDENTICAL. The simulation for azusa was bit-identical to 2b9fff4 at the previous verification.",
-        "fingerprint": "b23755be8f9f6b7a",
-        "utc": "2026-09-26T22:56:46Z"
-      },
-      {
-        "commit": "933c91a",
-        "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): azusa BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
-        "fingerprint": "124c0989ab583b23",
-        "utc": "2026-09-27T02:28:10Z"
-      },
-      {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "f88aad2336a40b6c",
-        "utc": "2026-09-29T01:38:33Z"
-      },
-      {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "fdddd7db911d9a84",
-        "utc": "2026-09-29T01:39:24Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "ae97d771ca2d3fa2",
