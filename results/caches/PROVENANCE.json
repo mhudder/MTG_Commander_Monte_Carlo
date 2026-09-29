@@ -236,6 +236,12 @@
         "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
         "fingerprint": "ac9e321631cf0465",
         "utc": "2026-09-29T12:56:08Z"
+      },
+      {
+        "commit": "b91a87e",
+        "evidence": "2026-09-29 (\u00a70z82-\u00a70z85): none of the changes touches an azusa card; the shared edits (opponents.protected_from_creatures, the after_died hook, delirium) are no-ops without their cards. Against a worktree at d878d04 on the NEW defaults: azusa BIT-IDENTICAL on all 8 metrics for the deck module AND the staged list (build_pending), N=400.",
+        "fingerprint": "8b36f3fa3f264fa6",
+        "utc": "2026-09-29T19:31:04Z"
       }
     ]
   },

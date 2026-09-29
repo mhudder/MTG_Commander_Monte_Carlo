@@ -130,6 +130,10 @@ Methodology that used to live at the end of this file is now
 | [0z79](#0z79) | BUILT | **PREPARED, and SIMULATED split from STAGED** (item 23). 23 unstaged head-to-heads -- the owner's open decisions among them -- were filed as MEASURED; they are `Simulated` records now |
 | [0z80](#0z80) | FIXED | **The funnel counted records, not cards** (§0z79's own bug: "10 proposed" were all long measured); three CLAUDE.md claims had outlived their facts; the stale-name note named staged-out cards every run, hiding the one truly stale name |
 | [0z81](#0z81) | MEASURED | **Every staged swap re-measured on today's engine: all eight stand**, significant at T20 and inside their bars of their last numbers (Conqueror +0.0271, Caldera +0.0239 ... Lyra +0.0124) |
+| [0z82](#0z82) | FIXED | **The ultimate plan knew a finality creature would come back; it will not** (§0z42's shape a day after §0z75). +0.0018 ±0.0010 at T20 |
+| [0z83](#0z83) | FIXED | **Five floors closed**, sagas on their real chapters, and **Solemn Simulacrum was SCRIPTED with neither clause right**. Rendmaw's three +0.0088 at T20. The first run crashed on an id() reused by a token |
+| [0z84](#0z84) | FIXED | **Herald of War, Twilight Shepherd (persist, via a new `after_died` hook), Serra's Emissary, Lurrus.** Emissary's +0.0199 is a knob result (`emissary_type`) |
+| [0z85](#0z85) | FIXED | **Four rendmaw cards nothing read**: Hart, Familiar, Whip (+0.0109, mostly lifelink), Shigeki (its first smoke fired zero times) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8092,6 +8096,146 @@ its bar last time too. The largest moves, Sunbird's +0.0020 and Citadel's
 −0.0016, are under half a bar. Each Change's `reverified` carries its line.
 The lorehold pair are measured each GIVEN the other (both staged), which is
 how their stagings were last checked.
+
+## 0z82. FIXED — Shilgengar's ultimate knew a finality creature would come back; it will not
+
+**§0z42's shape, on the day after the rule.** §0z75 made a creature with a
+finality counter exiled instead of dying, and the commander's ultimate plan
+kept its old arithmetic: `ult_fodder` sorted every real card ahead of the
+tokens *because the ultimate brings cards back*, and `ult_plan` counted every
+nontoken victim as returning. A finality creature fed to Shilgengar is
+exiled. `ShilgengarGame.returns_if_fed` now answers that question per body --
+a token no, a finality creature no, any other card yes -- and both the sort
+and the plan's "is this a real gain" check read it (`finality_aware_ult`).
+
+N=15,000 paired (`diagnostics/run_floors_batch.py`,
+`results/floors_batch_20260929.txt`): **+0.0001 ±0.0002 at T10, +0.0018
+±0.0010 at T20**, significant. The pilot feeds 0.77 cards a game against
+0.78, and exiles 0.38 finality creatures against 0.42. That closes the
+policy half §0z75 left open: the rule's −0.0057 was measured with this
+pilot, and this is the part of it a pilot recovers.
+
+## 0z83. FIXED — five floors from §0z78, Solemn Simulacrum's wrong text, and an id-reuse crash
+
+Five missing clauses named in §0z78's relabelling, and a SCRIPTED card whose
+text was wrong. Each is a knob whose old value reproduces the engine before
+it; with all of them off, all six decks are bit-identical to d878d04 on the
+deck modules and the staged lists. Text: Scryfall, 2026-09-29.
+
+| change | knob | T10 | T20 |
+|---|---|---|---|
+| tivit: Vault 11 votes on chapters II and III, Trial of a Time Lord on IV (`saga_step`) | `saga_chapters` | −0.0001 ±0.0004 | **+0.0029 ±0.0011** |
+| lorehold: Dragon's Rage Channeler's delirium +2/+2 (one `opponents.delirium`) | `drc_delirium_pt` | +0.0003 ±0.0005 | **+0.0013 ±0.0009** |
+| lorehold: Pinnacle Monk returns an instant or sorcery (`regrow_best_spell`, Volcanic Vision's pick) | `pinnacle_monk_etb` | +0.0005 ±0.0007 | +0.0011 ±0.0015 |
+| rendmaw: Sakura-Tribe Elder sacrifices for a basic at the end step (`fetch_basics`) | `elder_fetch` | **+0.0017 ±0.0013** | **+0.0037 ±0.0030** |
+| rendmaw: Solemn Simulacrum -- a land entering, a card dying | `solemn_text` | **+0.0020 ±0.0013** | +0.0008 ±0.0028 |
+| rendmaw: Gloomshrieker returns a permanent card; exiled instead of dying | `gloomshrieker_text` | **+0.0007 ±0.0006** | **+0.0041 ±0.0018** |
+| rendmaw, all three | | **+0.0040 ±0.0018** | **+0.0088 ±0.0043** |
+
+Bold is significant. The rendmaw counters: 0.64 basics fetched a game
+against 0.19, the Elder sacrificed 0.25 times, Solemn's death draw 0.07,
+Gloomshrieker's return 0.12.
+
+**SOLEMN SIMULACRUM WAS SCRIPTED, AND NEITHER CLAUSE WAS RIGHT.** Its
+constructor said `script="draw1"`: a card drawn as it ENTERED, and no land.
+The card fetches a basic entering and draws when it DIES. Twitching Doll's
+§0z58 shape exactly -- a label that says the engine plays a card, over code
+that plays a different one -- and invisible to §0z66's identity test,
+because a card that does the wrong thing still plays differently from a
+blank. Found while writing the Elder's land fetch, which it now shares.
+
+**THE FIRST MEASUREMENT CRASHED, AND THE BUG WAS §0z19's FAMILY.** tivit's
+lore counters were keyed by `id(permanent)`. Python reuses an id once its
+object is freed: a sacrificed Vault 11's id was handed to a Citizen token,
+which then "had" lore, and `saga_step` raised `KeyError: 'Citizen token'`
+forty minutes into the run. The store now holds the permanent itself, which
+keeps its id reserved, and prunes by identity; case P of
+`tests/test_floors_batch.py` forces the collision. The two other stores
+written the same day with the same flaw -- the Whip's returned creatures and
+persist's record (§0z84, §0z85) -- were fixed before they ran. **An id() is a
+name for an object only while the object lives; a store keyed by one must
+keep the object, or check it.**
+
+Pinned by `tests/test_floors_batch.py`: 14 cases, 6 mutations, exact sets.
+Two slips are kept in its docstring: the `saga_step` mutation's set was not
+updated when case P was added, and the next run said so.
+
+## 0z84. FIXED — Herald of War, Twilight Shepherd, Serra's Emissary, Lurrus
+
+Four medium floors named in §0z78, now the engine's (Scryfall, 2026-09-29).
+N=15,000 paired (`diagnostics/run_floors_batch2.py`,
+`results/floors_batch2_20260929.txt`):
+
+| card | knob | T10 | T20 | a game, T20 |
+|---|---|---|---|---|
+| Herald of War: attack counters; Angels and Humans cost {1} less per counter (`herald_cost`) | `herald_text` | **+0.0004 ±0.0003** | **+0.0039 ±0.0015** | 0.35 counters |
+| Twilight Shepherd: ETB returns this turn's dead; persist | `shepherd_text` | +0.0000 | **+0.0032 ±0.0013** | 0.05 persists |
+| Serra's Emissary: protection from creatures | `emissary_type` | **+0.0020 ±0.0007** | **+0.0199 ±0.0025** | 0.40 turns shielded |
+| shilgengar, all three | | **+0.0023 ±0.0008** | **+0.0265 ±0.0031** | |
+| karlov Lurrus: a MV ≤ 2 permanent from the graveyard, once a turn (`lurrus_pool`) | `lurrus_recast` | **+0.0015 ±0.0008** | **+0.0053 ±0.0018** | 0.15 casts |
+
+**SERRA'S EMISSARY'S NUMBER IS A KNOB RESULT, SAID OUT LOUD.** The card makes
+its controller choose a type; the model must choose one, and chooses
+"Creature" (`emissary_type`), the usual pick at a Commander table. In this
+model that means the pod's creatures cannot block yours (`damage_through`)
+and cannot chip you (`incidental_damage`, the crown's path too), via
+`opponents.protected_from_creatures`. The pod's KILL CLOCKS are rolls, not
+combats, so protection does not touch them: a floor. `emissary_type="none"`
+is the old engine, and any other type is modelled as nothing. The +0.0199
+is the value of that choice under this pod model; read it with the knob.
+
+**PERSIST NEEDED A NEW HOOK.** `opponents.destroy` fires `on_creature_death`
+BEFORE the card reaches the graveyard, and shilgengar's own `sacrifice` does
+it AFTER, so "return it from the graveyard" had no single place to live.
+`g.after_died(perm)` is an optional protocol hook called once the card is in
+the graveyard on both paths (docs/ARCHITECTURE.md); only shilgengar defines
+it. A -1/-1 counter is `counters = -1` plus a record in `persisted`.
+
+## 0z85. FIXED — four rendmaw cards nothing read (§0z78's inert list)
+
+Burnished Hart, Filigree Familiar, Whip of Erebos and Shigeki were KNOWN_BLIND
+with a channel nothing fired. Now the engine's (Scryfall, 2026-09-29), and
+`tests/test_blind_labels.py` moved their labels the moment it happened:
+
+| card | knob | T10 | T20 | a game, T20 |
+|---|---|---|---|---|
+| Burnished Hart: {3}, sacrifice, two basics, at the end step | `hart_fetch` | +0.0003 ±0.0005 | +0.0002 ±0.0016 | 0.10 |
+| Filigree Familiar: 2 life entering, a card dying | `familiar_text` | +0.0000 | **+0.0027 ±0.0014** | 0.07 draws |
+| Whip of Erebos, both clauses | `whip_text` | +0.0004 ±0.0005 | **+0.0109 ±0.0023** | |
+| ...its reanimation alone | `whip_reanimate` | +0.0002 ±0.0004 | **+0.0020 ±0.0020** | 0.29 returns |
+| Shigeki: dig four for a land at the end step | `shigeki_text` | −0.0007 ±0.0007 | +0.0003 ±0.0019 | 0.15 digs, 0.12 lands |
+| all four | | +0.0000 ±0.0010 | **+0.0147 ±0.0034** | |
+
+**MOST OF THE WHIP IS ITS LIFELINK.** The reanimation is +0.0020; the rest of
++0.0109 is "creatures you control have lifelink" on a wide token board --
+consistent with life deciding games since pod v3, and a caution against
+reading the card as a reanimator.
+
+**SHIGEKI'S FIRST SMOKE FIRED ZERO TIMES**, and a mechanism that fires zero
+times is unmistakable: the attack-with-everything policy had always tapped it
+before the end step. `shigeki_stays_home`, §0z58's Twitching Doll again. Its
+Channel mode is still unmodelled (its PARTLY reason says so).
+
+The Whip's returned creature is held in `whip_returned` as an object, and
+exiled at the end step or if it would die (`Game.exiled_instead_of_dying`).
+
+**A PRE-EXISTING GAP, NOTED AND NOT FIXED**: Baba Lysaga's sacrifice path in
+`engine.activations` never puts a sacrificed nontoken card in the
+graveyard. Baba is not in rendmaw's list, so it moves nothing today.
+
+Pinned by `tests/test_floors_batch2.py`: 15 cases, 6 mutations, exact sets
+on the first run. One case failed its first run on the TEST (it counted
+tokens named "Zombie"; they are "Zombie token").
+
+**THE LABELS MOVED WITH THE ENGINE, THE NUMBERS DID NOT.** Eleven cards changed
+category across items 4-7 (to SCRIPTED: Sakura-Tribe Elder, Gloomshrieker,
+Burnished Hart, Filigree Familiar, Whip of Erebos, Dragon's Rage Channeler,
+Lurrus, Herald of War, Twilight Shepherd; to PARTLY: Shigeki; rewritten
+PARTLY reasons: Pinnacle Monk, Vault 11, Trial of a Time Lord, Serra's
+Emissary). Five tables were RE-RENDERED from their caches -- 0 rows moved,
+new categories and reasons -- and those caches are SUSPECT until the owner
+calls the rebuild, deliberately deferred so that every engine change lands
+first.
 
 ## How to read an ablation table
 

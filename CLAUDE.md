@@ -168,6 +168,8 @@ python -m tests.test_death_lookback --mutate       # 3 mutations, exact sets
 python -m tests.test_target_and_vault --mutate     # 3 mutations, exact sets
 python -m tests.test_blind_labels --mutate         # 3 mutations, exact sets
 python -m tests.test_ledger_states --mutate        # 4 mutations, exact sets
+python -m tests.test_floors_batch --mutate         # 6 mutations, exact sets
+python -m tests.test_floors_batch2 --mutate        # 6 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant

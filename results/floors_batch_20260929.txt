@@ -1,0 +1,19 @@
+diagnostics/run_floors_batch.py, 2026-09-29, engine at b91a87e. N=15,000 paired per arm, T10 and T20, seeds 5000.., build_pending(). §0z82, §0z83.
+
+WIN RATE, new default minus the knob's old value (paired, 95% CI)
+  shilgengar: finality-aware ultimate         T10 +0.0001 ±0.0002    T20 +0.0018 ±0.0010*
+  S_def       T20 a game: cards_fed 0.766, shilgengar_ults 0.529, finality_exiled 0.378
+  S_noaware   T20 a game: cards_fed 0.782, shilgengar_ults 0.546, finality_exiled 0.415
+  tivit: saga chapters                        T10 -0.0001 ±0.0004    T20 +0.0029 ±0.0011*
+  T_def       T20 a game: saga_votes 0.338, votes_cast 50.618
+  T_nosaga    T20 a game: saga_votes 0.000, votes_cast 50.702
+  lorehold: Channeler's +2/+2                 T10 +0.0003 ±0.0005    T20 +0.0013 ±0.0009*
+  lorehold: Pinnacle Monk's ETB               T10 +0.0005 ±0.0007    T20 +0.0011 ±0.0015 
+  lorehold: both                              T10 +0.0008 ±0.0009    T20 +0.0023 ±0.0017*
+  L_def       T20 a game: monk_returns 0.066
+  rendmaw: Sakura-Tribe Elder                 T10 +0.0017 ±0.0013*   T20 +0.0037 ±0.0030*
+  rendmaw: Solemn Simulacrum                  T10 +0.0020 ±0.0013*   T20 +0.0008 ±0.0028 
+  rendmaw: Gloomshrieker                      T10 +0.0007 ±0.0006*   T20 +0.0041 ±0.0018*
+  rendmaw: all three                          T10 +0.0040 ±0.0018*   T20 +0.0088 ±0.0043*
+  R_def       T20 a game: basics_fetched 0.635, elder_sacrifices 0.246, solemn_death_draws 0.073, gloomshrieker_returns 0.124, drain_damage 1.591
+  R_old       T20 a game: basics_fetched 0.190, elder_sacrifices 0.000, solemn_death_draws 0.000, gloomshrieker_returns 0.000, drain_damage 1.561

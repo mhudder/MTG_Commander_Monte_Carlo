@@ -1,0 +1,17 @@
+diagnostics/run_floors_batch2.py, 2026-09-29, engine at b91a87e. N=15,000 paired per arm, T10 and T20, seeds 5000.., build_pending(). §0z84, §0z85.
+
+WIN RATE, new default minus the knob's old value (paired, 95% CI)
+  rendmaw: Burnished Hart                     T10 +0.0003 ±0.0005    T20 +0.0002 ±0.0016 
+  rendmaw: Filigree Familiar                  T10 +0.0000 ±0.0000    T20 +0.0027 ±0.0014*
+  rendmaw: Whip of Erebos (all)               T10 +0.0004 ±0.0005    T20 +0.0109 ±0.0023*
+  rendmaw: Whip's reanimation alone           T10 +0.0002 ±0.0004    T20 +0.0020 ±0.0020*
+  rendmaw: Shigeki                            T10 -0.0007 ±0.0007    T20 +0.0003 ±0.0019 
+  rendmaw: all four                           T10 +0.0000 ±0.0010    T20 +0.0147 ±0.0034*
+  R_def       T20 a game: hart_sacrifices 0.097, familiar_draws 0.068, whip_returns 0.292, shigeki_digs 0.152, shigeki_lands 0.123
+  shilgengar: Herald of War                   T10 +0.0004 ±0.0003*   T20 +0.0039 ±0.0015*
+  shilgengar: Twilight Shepherd               T10 +0.0000 ±0.0000    T20 +0.0032 ±0.0013*
+  shilgengar: Serra's Emissary                T10 +0.0020 ±0.0007*   T20 +0.0199 ±0.0025*
+  shilgengar: all three                       T10 +0.0023 ±0.0008*   T20 +0.0265 ±0.0031*
+  S_def       T20 a game: herald_counters 0.345, shepherd_persists 0.054, shepherd_returns 0.049, emissary_prevented_turns 0.398
+  karlov: Lurrus                              T10 +0.0015 ±0.0008*   T20 +0.0053 ±0.0018*
+  K_def       T20 a game: lurrus_casts 0.149
