@@ -1348,6 +1348,22 @@ class Game(BaseGame):
         if n:
             self.made_token_this_turn = True
 
+    def exiled_instead_of_dying(self, perm) -> bool:
+        """Gloomshrieker: "If this creature would die, exile it instead."
+        (Scryfall, 2026-09-29.) The optional protocol hook shilgengar
+        introduced for finality counters (§0z75), asked by the shared
+        `opponents.destroy`: exiled, so no death trigger and no graveyard.
+        A token copy has the ability too. Counted under `finality_exiled`,
+        the key `destroy` already writes. `gloomshrieker_text=False`
+        restores a Gloomshrieker that dies (§0z83).
+
+        Only `destroy` asks, and in rendmaw's current list that is every way
+        Gloomshrieker can leave: the outlets that sacrifice NONTOKEN
+        creatures (Baba Lysaga, Cauldron of Essence, Lord of the Pit) are not
+        in it. Should one come back, its path must ask this too."""
+        return (perm.card.name == "Gloomshrieker"
+                and self.cfg.get("gloomshrieker_text", True))
+
     def on_creature_death(self, n: int = 1, perm: Optional[Permanent] = None):
         """Aristocrats drain. Each Blood Artist effect costs the pod 3 life per
         creature that dies (1 from each of three opponents).
@@ -1387,6 +1403,14 @@ class Game(BaseGame):
         gainers = single + sum(1 for p in self.board
                                if p.card.name == "Cauldron of Essence")
         self.your_life += 1.0 * n * gainers
+
+        # Solemn Simulacrum: "When this creature dies, you may draw a card"
+        # (§0z83). A "may", so declined when it would draw the last card --
+        # the §0z42 rule for optional draws.
+        if (perm is not None and perm.card.name == "Solemn Simulacrum"
+                and self.cfg.get("solemn_text", True) and len(self.library) > 1):
+            self.draw(1)
+            self.m["solemn_death_draws"] += 1
 
         # "When this creature dies, create a 3/3 deathtouch Wurm and a 3/3
         # lifelink Wurm." Only the real card, not its own tokens.
@@ -2579,10 +2603,33 @@ def run_etb(g: Game, perm: Permanent):
         g.m["mycoloth_devoured"] += len(eaten)
     elif s == "stampede":
         pass
-    elif s == "draw1":
+    elif s == "draw1" and not (perm.card.name == "Solemn Simulacrum"
+                               and g.cfg.get("solemn_text", True)):
         g.draw(1)
     elif s == "draw2":
         g.draw(2)
+    if perm.card.name == "Gloomshrieker" and g.cfg.get("gloomshrieker_text", True):
+        # "When this creature enters, return target permanent card from your
+        # graveyard to your hand." (Scryfall, 2026-09-29; §0z83.) The pick is
+        # the highest-priority nonland permanent card, a land only if that is
+        # all there is -- the card the deck's own casting order values most.
+        pool = [c for c in g.graveyard
+                if c.types & {"Creature", "Artifact", "Enchantment",
+                              "Planeswalker", "Land", "Battle"}]
+        if pool:
+            best = max(pool, key=lambda c: (not c.is_land, c.priority, c.mv))
+            g.graveyard.remove(best)
+            g.hand.append(best)
+            g.m["gloomshrieker_returns"] += 1
+    if perm.card.name == "Solemn Simulacrum" and g.cfg.get("solemn_text", True):
+        # "When this creature enters, you may search your library for a basic
+        # land card, put that card onto the battlefield tapped, then shuffle.
+        # When this creature dies, you may draw a card." (Scryfall,
+        # 2026-09-29.) It was SCRIPTED as `draw1` -- a draw on ENTERING, and
+        # no land at all: neither clause as printed (§0z83, Twitching Doll's
+        # §0z58 shape). The death draw is in `Game.on_creature_death`.
+        # `solemn_text=False` restores the draw on entering.
+        fetch_basics(g, 1)
     if g.has("The Great Henge") and is_battlefield_creature(g, perm) and not perm.is_token:
         g.draw(1)
         perm.counters += 1
@@ -2982,6 +3029,60 @@ def outlets_early(g) -> bool:
             or g.cfg.get("sac_outlets_timing", "end") == "main")
 
 
+BASIC_LANDS = {"Plains", "Island", "Swamp", "Mountain", "Forest", "Wastes"}
+
+
+def fetch_basics(g, n: int) -> int:
+    """"Search your library for [up to n] basic land card[s], put [them] onto
+    the battlefield tapped, then shuffle." Sakura-Tribe Elder and Solemn
+    Simulacrum (§0z83); Burnished Hart's two is the same call. Not a land
+    PLAY, so no land drop is spent. The pick is the basic whose colour the
+    battlefield has FEWEST sources of -- the fixing a pilot fetches for.
+    The shuffle is addressed (`crn_shuffle`, §0z17) and happens even when
+    nothing was found, as the text says. Returns how many were fetched."""
+    got = 0
+    for _ in range(n):
+        pool = [c for c in g.library if c.is_land and c.name in BASIC_LANDS]
+        if not pool:
+            break
+
+        def sources(col):
+            return sum(1 for p in g.board
+                       if p.card.is_land and col in p.card.produces)
+        pick = min(pool, key=lambda c: (min((sources(col) for col in
+                                             c.produces), default=99),
+                                        c.name))
+        g.library.remove(pick)
+        g.board.append(Permanent(card=pick, tapped=True, sick=True))
+        got += 1
+    crn_shuffle(g, "fetch_basics", g.library)
+    g.m["basics_fetched"] += got
+    return got
+
+
+def sakura_tribe_elder(g) -> None:
+    """"Sacrifice this creature: Search your library for a basic land card,
+    put that card onto the battlefield tapped, then shuffle." (Scryfall,
+    2026-09-29.) It was a 1/1 with a cast-order tag and no ability (§0z78).
+
+    THE POLICY, a pilot's: sacrifice it at your end step once a basic is
+    left to find. Your blockers are not modelled, so the chump-then-sacrifice
+    line has nothing to buy here, and the end step still untaps the land for
+    your next turn. The death is real -- Blood Artist, the Plunderer and
+    Meathook see it. `elder_fetch=False` restores the vanilla 1/1 (§0z83)."""
+    if not g.cfg.get("elder_fetch", True):
+        return
+    for p in [p for p in g.board if p.card.name == "Sakura-Tribe Elder"]:
+        if not any(c.is_land and c.name in BASIC_LANDS for c in g.library):
+            return
+        g.board.remove(p)
+        if not p.is_token:
+            g.graveyard.append(p.card)
+        g.on_creature_death(1, p)
+        fetch_basics(g, 1)
+        g.m["elder_sacrifices"] += 1
+
+
 def end_step_outlets(g) -> None:
     """The sacrifice outlets on the mana the main phase left (§0z73)."""
     if outlets_early(g):
@@ -3236,6 +3337,7 @@ def take_turn(g: Game):
         make_lord=lambda: rendmaw_token(g, lord_of_the_pit_card))
     empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
+    sakura_tribe_elder(g)           # its sacrifice, at the end step, §0z83
     treasure_vault(g)               # spare mana into Treasures, §0z68
 
     g.m["mana_floated"] += len(available_mana(g))

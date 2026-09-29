@@ -97,6 +97,7 @@ class TivitGame(BaseGame):
         self.powerstones_tapped = 0     # of the pile; they untap each turn
         self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
+        self.saga_lore = {}             # id(Saga permanent) -> lore (§0z83)
 
         cfg.setdefault("shroud_sources", ("Lightning Greaves",))
         cfg.setdefault("protection_cards", ())
@@ -774,6 +775,8 @@ def resolve(g, card):
         # Sacrifice and discard are both unmodelled against this opponent
         # model; only the vote payoffs (Grudge Keeper) actually land.
         V.dilemma(g, "capital")
+    elif s == "trial" and g.cfg.get("saga_chapters", True):
+        pass              # its vote is chapter IV, three draw steps away (§0z83)
     elif s in ("bite", "split_decision", "trial", "councils_judgment"):
         V.council(g)
     elif s == "magister":
@@ -835,7 +838,13 @@ def resolve(g, card):
         g.draw(n)
         g.make_tokens(n, 1, 1, "Rabbit")
     elif s == "vault11":
-        V.council(g)
+        # Chapter I only: "for each opponent, create a 1/1 Human Soldier".
+        # Its two votes are chapters II and III, on later draw steps
+        # (`saga_step`, §0z83). `saga_chapters=False` votes once, now -- the
+        # engine before §0z83, which cast one vote the card does not have
+        # at this point and dropped the second.
+        if not g.cfg.get("saga_chapters", True):
+            V.council(g)
         g.make_tokens(len(OPP.living(g)), 1, 1, "Soldier")
     elif s == "custodi":
         V.council(g)
@@ -900,9 +909,46 @@ def resolve(g, card):
         perm = Permanent(card=card, sick=not card.haste)
         enter_loyalty(perm)          # Venser / Dyfed (§0z74)
         g.board.append(perm)
+        if card.name in SAGA_CHAPTERS and g.cfg.get("saga_chapters", True):
+            g.saga_lore[id(perm)] = 1        # "As this Saga enters ... add a
+                                             #  lore counter": chapter I
         run_etb(g, perm)
     elif not card.is_land:
         g.graveyard.append(card)
+
+
+# SAGAS WITH A VOTE (§0z83): "As this Saga enters and after your draw step,
+# add a lore counter. Sacrifice after <final>." (Scryfall, 2026-09-29.)
+# name -> (the chapters that vote, the final chapter). Only the votes are
+# modelled; each card's other chapters need opposing creatures (§4), and its
+# PARTLY reason in tools/ablation.py names them.
+SAGA_CHAPTERS = {
+    "Vault 11: Voter's Dilemma": ((2, 3), 3),
+    "Trial of a Time Lord": ((4,), 4),
+}
+
+
+def saga_step(g):
+    """After the draw step: a lore counter on each voting Saga, its chapter,
+    and the sacrifice after its last. A Saga that left the battlefield
+    early simply stops -- its id is dropped with it."""
+    live = {id(p): p for p in g.board}
+    for key in [k for k in g.saga_lore if k not in live]:
+        del g.saga_lore[key]
+    for key in list(g.saga_lore):
+        perm = live[key]
+        g.saga_lore[key] += 1
+        chapter = g.saga_lore[key]
+        votes, final = SAGA_CHAPTERS[perm.card.name]
+        if chapter in votes:
+            V.council(g)
+            g.m["saga_votes"] += 1
+            if g.result is not None:
+                return
+        if chapter >= final:
+            g.board.remove(perm)
+            g.graveyard.append(perm.card)
+            del g.saga_lore[key]
 
 
 def _tutor(g, pred):
@@ -1300,6 +1346,9 @@ def take_turn(g, extra=False):
     if g.result is not None:
         return
     g.draw(1)
+    saga_step(g)
+    if g.result is not None:
+        return
     play_land(g)
     main_phase(g)
     if g.result is not None:

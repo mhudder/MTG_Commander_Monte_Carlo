@@ -476,15 +476,32 @@ class ShilgengarGame(BaseGame):
     def ult_fodder(self):
         """Creatures that may legally be fed to Shilgengar, best first.
 
-        "Sacrifice ANOTHER creature" — never the commander itself. Real cards
-        sort ahead of tokens because the ultimate returns a card and does not
-        return a token, and within each group the most Blood per body sorts
-        first so the plan spends as few bodies as it can.
+        "Sacrifice ANOTHER creature" — never the commander itself. Bodies the
+        ultimate will bring back sort ahead of bodies it will not -- tokens,
+        and since §0z82 creatures carrying a finality counter, which are
+        exiled -- and within each group the most Blood per body sorts first so
+        the plan spends as few bodies as it can.
         """
         return sorted(
             (p for p in self.board
              if p.card.is_creature and p.card is not self.commander),
-            key=lambda p: (p.is_token, -self.blood_yield(p)))
+            key=lambda p: (not self.returns_if_fed(p), -self.blood_yield(p)))
+
+    def returns_if_fed(self, perm) -> bool:
+        """Would the ultimate bring this creature back after it is fed?
+
+        A token never comes back. Since §0z75 a creature with a FINALITY
+        counter does not either: fed to Shilgengar it is exiled, not put in
+        the graveyard. The plan used to treat every real card as returning --
+        true until finality exiled, and the §0z42 shape the day it did: the
+        rule changed what a sacrifice buys and the pilot kept its old
+        arithmetic. `finality_aware_ult=False` restores that arithmetic (§0z82).
+        """
+        if perm.is_token:
+            return False
+        if not self.cfg.get("finality_aware_ult", True):
+            return True
+        return not self.exiled_instead_of_dying(perm)
 
     def ult_plan(self):
         """The sacrifices that would fire the ultimate THIS TURN, or None.
@@ -516,7 +533,7 @@ class ShilgengarGame(BaseGame):
         # they die and do not come back — which is what makes an Angel the
         # right fodder and a Spirit token the wrong one.
         returning = len(self.yard_creatures()) + sum(1 for p in chosen
-                                                    if not p.is_token)
+                                                    if self.returns_if_fed(p))
         if returning - len(chosen) < self.cfg.get("shilgengar_ult_min_gain", 1):
             return None
         return chosen

@@ -227,10 +227,24 @@ class LoreholdGame(BaseGame):
         if perm.card.name == "Storm-Kiln Artist":
             base += (sum(1 for p in self.board if "Artifact" in p.card.types)
                      + self.treasures)
-        return base
+        return base + self.delirium_bonus(perm)
 
     def toughness_of(self, perm):
-        return perm.card.toughness + perm.counters
+        return perm.card.toughness + perm.counters + self.delirium_bonus(perm)
+
+    def delirium_bonus(self, perm):
+        """Dragon's Rage Channeler: "Delirium -- as long as there are four or
+        more card types among cards in your graveyard, this creature gets
+        +2/+2, has flying, and attacks each combat if able." (Scryfall,
+        2026-09-29.) The flying was modelled; the +2/+2 was not (§0z83).
+        `drc_delirium_pt=False` restores that. "Attacks each combat if able"
+        is still not modelled -- a drawback the engine's attack policy mostly
+        agrees with anyway."""
+        if (perm.card.name == "Dragon's Rage Channeler"
+                and self.cfg.get("drc_delirium_pt", True)
+                and OPP.delirium(self)):
+            return 2
+        return 0
 
     def draw_card(self):
         if not self.library:
@@ -1595,6 +1609,14 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
         # six engines (§0z39); idempotent if you already hold the crown.
         if card.name == "Chief Magistrate of Mercadia":
             OPP.become_monarch(g)
+        # PINNACLE MONK (§0z83): "When this creature enters, return target
+        # instant or sorcery card from your graveyard to your hand." (Scryfall,
+        # 2026-09-29.) Its prowess is still unmodelled, a floor its PARTLY
+        # reason names. `pinnacle_monk_etb=False` restores the body alone.
+        if (card.name == "Pinnacle Monk"
+                and g.cfg.get("pinnacle_monk_etb", True)
+                and regrow_best_spell(g) is not None):
+            g.m["monk_returns"] += 1
         # STINGCASTER MAGE (Reality Fracture, preview text 2026-09-21):
         # "{1}{R} 2/1 Haste. When this creature enters, TARGET instant or
         # sorcery card in your graveyard gains flashback until end of turn.
@@ -1772,15 +1794,26 @@ def volcanic_vision(g):
     """
     if not g.cfg.get("lorehold_recursion", True):
         return
+    best = regrow_best_spell(g)
+    if best is None:
+        return
+    g.m["vision_returns"] += 1
+    g.m["vision_mv"] += best.free_mv
+
+
+def regrow_best_spell(g):
+    """"Return target instant or sorcery card from your graveyard to your
+    hand": the largest, by `free_mv`. Volcanic Vision's rule and Pinnacle
+    Monk's (§0z83) -- one function, so the two cannot pick differently.
+    Returns the card, or None when the graveyard holds none."""
     pool = [c for c in g.graveyard
             if "Instant" in c.types or "Sorcery" in c.types]
     if not pool:
-        return
+        return None
     best = max(pool, key=lambda c: c.free_mv)
     g.graveyard.remove(best)
     g.hand.append(best)
-    g.m["vision_returns"] += 1
-    g.m["vision_mv"] += best.free_mv
+    return best
 
 
 def dawning_archaic_pick(g):

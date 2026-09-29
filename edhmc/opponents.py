@@ -772,8 +772,17 @@ def flying_of(g, perm) -> bool:
     if n == "Dragon's Rage Channeler":
         # "Delirium — ... has flying as long as there are four or more card
         # types among cards in your graveyard."
-        return len({t for card in g.graveyard for t in card.types}) >= 4
+        return delirium(g)
     return False
+
+
+def delirium(g) -> bool:
+    """Delirium: four or more card types among cards in your graveyard.
+
+    One function because Dragon's Rage Channeler reads it twice -- its
+    flying here and its +2/+2 in `lorehold.power_of` (§0z83) -- and two
+    copies of one rule drift (§0z30)."""
+    return len({t for card in g.graveyard for t in card.types}) >= 4
 
 
 def indestructible_of(g, perm) -> bool:
