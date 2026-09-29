@@ -7797,6 +7797,14 @@ well below Bloodthirsty Conqueror's +0.0401 against the same cut.
 (§0c), and a card that shares a slot with another in this table needs its own
 head-to-head against that one before the two are ranked.
 
+**RE-MEASURED 2026-09-29, after §0z75-§0z77 moved karlov, shilgengar and
+rendmaw** (same cuts, same seeds, `results/mbc_batch_20260929.txt`): **every
+swap is within 0.0008 of the table above and none changes order.** The
+largest moves are Selenia in shilgengar, +0.0206 -> +0.0214 at T20 (its
+doubler now sees the routed trigger lifegain, §0z75), and Seluma, +0.0091 ->
++0.0087. Tivit's two rows are identical, as an unchanged engine must be.
+These decisions rest on current numbers; each `Simulated` record carries both.
+
 ## 0z75. FIXED — shilgengar's trigger lifegain reaches its payoffs, and finality counters exile
 
 §0z74 found both and left them. **Blood Artist, Zulaport Cutthroat and

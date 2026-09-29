@@ -2618,70 +2618,83 @@ WITHDRAWN: list[Change] = [
 # candidate row (their text is copied verbatim), plus three recorded only in
 # other entries' prose. The staged ones are not here: `Change.simulated`.
 #
-# THE §0z74 MYSTERY BOOSTER ROWS ARE THE OWNER'S OPEN DECISIONS, and they
-# were measured on the engine BEFORE §0z75-§0z77 moved karlov, shilgengar and
-# rendmaw. Re-run `diagnostics/run_mbc.py` before deciding on one.
+# THE §0z74 MYSTERY BOOSTER ROWS ARE THE OWNER'S OPEN DECISIONS. They were
+# measured before §0z75-§0z77 moved karlov, shilgengar and rendmaw, and
+# RE-MEASURED after it (each record's `notes`): every swap within 0.0008 of
+# its first number, no order changed, tivit's identical.
 # ---------------------------------------------------------------------------
 SIMULATED: list[Simulated] = [
     Simulated(
         deck='shilgengar', remove='Skullclamp', add='Selenia, the Cursed Heart',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Skullclamp +Selenia, the Cursed Heart, N=15,000 paired: +0.0015 +-0.0007 (significant) at T10 and +0.0206 +-0.0031 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0015 +-0.0007 * at T10 and +0.0214 +-0.0031 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='shilgengar', remove='Skullclamp', add='Seluma, Light of Aysen',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Skullclamp +Seluma, Light of Aysen, N=15,000 paired: +0.0007 +-0.0005 (significant) at T10 and +0.0091 +-0.0024 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0006 +-0.0006 at T10 and +0.0087 +-0.0025 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='shilgengar', remove='Skullclamp', add='Thomil, the Destroyer',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Skullclamp +Thomil, the Destroyer, N=15,000 paired: +0.0003 +-0.0004 (inside its bar) at T10 and +0.0074 +-0.0024 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0002 +-0.0004 at T10 and +0.0078 +-0.0025 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='shilgengar', remove='Skullclamp', add='Pearl Collector',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Skullclamp +Pearl Collector, N=15,000 paired: +0.0012 +-0.0006 (significant) at T10 and +0.0229 +-0.0029 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0012 +-0.0006 * at T10 and +0.0230 +-0.0030 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='karlov', remove='Swiftfoot Boots', add='Selenia, the Cursed Heart',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Swiftfoot Boots +Selenia, the Cursed Heart, N=15,000 paired: +0.0039 +-0.0016 (significant) at T10 and +0.0160 +-0.0029 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0039 +-0.0017 * at T10 and +0.0159 +-0.0030 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='karlov', remove='Swiftfoot Boots', add='Pearl Collector',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Swiftfoot Boots +Pearl Collector, N=15,000 paired: +0.0100 +-0.0019 (significant) at T10 and +0.0197 +-0.0032 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0099 +-0.0019 * at T10 and +0.0195 +-0.0031 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='tivit', remove="Tamiyo's Journal", add='Venser, Visionary Traveler',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=("REAL SWAP -Tamiyo's Journal +Venser, Visionary Traveler, N=15,000 paired: +0.0067 +-0.0018 (significant) at T10 and +0.0115 +-0.0029 (significant) at T20."),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0067 +-0.0018 * at T10 and +0.0115 +-0.0028 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='tivit', remove="Tamiyo's Journal", add='Dyfed, the Guiding Hand',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=("REAL SWAP -Tamiyo's Journal +Dyfed, the Guiding Hand, N=15,000 paired: +0.0047 +-0.0017 (significant) at T10 and +0.0220 +-0.0032 (significant) at T20."),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0047 +-0.0017 * at T10 and +0.0220 +-0.0031 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='azusa', remove='Titania, Protector of Argoth', add='Autumn Willow, Harmony',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Titania, Protector of Argoth +Autumn Willow, Harmony, N=15,000 paired: +0.0047 +-0.0020 (significant) at T10 and +0.0024 +-0.0031 (inside its bar) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0046 +-0.0019 * at T10 and +0.0016 +-0.0031 at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='rendmaw', remove="Ashnod's Altar", add='Davvol, Evincar of Rath',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=("REAL SWAP -Ashnod's Altar +Davvol, Evincar of Rath, N=15,000 paired: +0.0003 +-0.0009 (inside its bar) at T10 and -0.0051 +-0.0024 (significant) at T20."),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0003 +-0.0009 at T10 and -0.0054 +-0.0024 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='rendmaw', remove="Ashnod's Altar", add='Thomil, the Destroyer',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=("REAL SWAP -Ashnod's Altar +Thomil, the Destroyer, N=15,000 paired: -0.0003 +-0.0009 (inside its bar) at T10 and +0.0059 +-0.0026 (significant) at T20."),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: -0.0003 +-0.0009 at T10 and +0.0053 +-0.0026 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='lorehold', remove='Lightning Greaves', add='Chief Magistrate of Mercadia',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Lightning Greaves +Chief Magistrate of Mercadia, N=15,000 paired: -0.0009 +-0.0020 (inside its bar) at T10 and +0.0068 +-0.0035 (significant) at T20.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: -0.0010 +-0.0020 at T10 and +0.0070 +-0.0035 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
     ),
     Simulated(
         deck='rendmaw', remove="Ashnod's Altar", add='Proft, Sinister Mastermind',
