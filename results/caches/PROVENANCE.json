@@ -230,6 +230,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "ac9e321631cf0465",
         "utc": "2026-09-29T12:27:13Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "ac9e321631cf0465",
+        "utc": "2026-09-29T12:56:08Z"
       }
     ]
   },
@@ -389,6 +395,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "212f0c1f7ec19bfc",
         "utc": "2026-09-29T12:27:12Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "212f0c1f7ec19bfc",
+        "utc": "2026-09-29T12:56:07Z"
       }
     ]
   },
@@ -576,6 +588,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "e527cd57c89f99ba",
         "utc": "2026-09-29T12:27:12Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "e527cd57c89f99ba",
+        "utc": "2026-09-29T12:56:07Z"
       }
     ]
   },
@@ -764,6 +782,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "735468c5416a6d4f",
         "utc": "2026-09-29T12:27:12Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "735468c5416a6d4f",
+        "utc": "2026-09-29T12:56:07Z"
       }
     ]
   },
@@ -975,6 +999,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "f3a3e577f5a9916c",
         "utc": "2026-09-29T12:27:13Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "f3a3e577f5a9916c",
+        "utc": "2026-09-29T12:56:08Z"
       }
     ]
   },
@@ -1143,6 +1173,12 @@
         "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
         "fingerprint": "679a48323d16d80e",
         "utc": "2026-09-29T12:27:13Z"
+      },
+      {
+        "commit": "f967ce2",
+        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+        "fingerprint": "679a48323d16d80e",
+        "utc": "2026-09-29T12:56:07Z"
       }
     ]
   }

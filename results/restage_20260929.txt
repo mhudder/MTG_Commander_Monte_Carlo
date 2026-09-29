@@ -1,0 +1,11 @@
+Every STAGED swap re-measured on the engine at f967ce2 (after §0z75-§0z80), 2026-09-29.
+N=15,000 paired, seeds 5000.., diagnostics/run_restage.py, in context: the staged list minus the staged list with that one swap undone. * = interval excludes zero.
+
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0251 +-0.0028*  T20 +0.0271 +-0.0034*  dmgT20 -2.41 +-0.24
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0015 +-0.0029   T20 +0.0131 +-0.0042*  dmgT20 +0.64 +-0.25
+tivit   -Plains +Anointed Procession                  T10 +0.0151 +-0.0036*  T20 +0.0181 +-0.0052*  dmgT20 -2.35 +-0.36
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0034 +-0.0022*  T20 +0.0130 +-0.0035*  dmgT20 +1.99 +-0.23
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0077 +-0.0024*  T20 +0.0239 +-0.0038*  dmgT20 +2.87 +-0.23
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0031 +-0.0026*  T20 +0.0173 +-0.0043*  dmgT20 +1.83 +-0.25
+lorehold -Blasphemous Act +Goldspan Dragon            T10 +0.0129 +-0.0026*  T20 +0.0134 +-0.0046*  dmgT20 +2.05 +-0.22
+shilgengar -Vampiric Rites +Lyra, Archangel of Dawn   T10 +0.0026 +-0.0008*  T20 +0.0124 +-0.0028*  dmgT20 +1.91 +-0.15

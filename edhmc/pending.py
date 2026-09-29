@@ -2010,7 +2010,7 @@ CHANGES: list[Change] = [
             'it is committed.'
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Citadel staged on both sides), N=15,000 paired: +0.0255 +-0.0028 at T10, +0.0266 +-0.0035 at T20. The staging stands. THE ALTERNATIVE CUT, measured the same run: -Swiftfoot Boots +Bloodthirsty Conqueror +0.0278 / +0.0341, and the two cuts compared directly (Boots minus Soulmender, same card) +0.0023 +-0.0038 at T10, +0.0075 +-0.0047 at T20 -- still the better cut at T20, by less than the +0.0125 measured on the old baseline. results/restage_20260926.txt."
             " THE OWNER DECIDED, 2026-09-26: SOULMENDER STAYS THE CUT. The Boots remain because in an interaction-heavy pod the shroud does real work that this model cannot fully see (the pod's removal is a roll against an abstract board, §4). A judgement about the owner's table outranking a +0.0075 +-0.0047 edge at T20 that is inside its bar at T10."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0251 +-0.0028 at T10, +0.0271 +-0.0034 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
     Change(
         deck="tivit", remove="Plains", add="Anointed Procession",
@@ -2065,7 +2065,7 @@ CHANGES: list[Change] = [
             'e tivit TABLE was rebuilt 2026-09-26 (§0z60); this swap was not. Re'
             '-measure before commit.'
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), after §0z44 moved its own priority to 10: +0.0145 +-0.0036 at T10, +0.0191 +-0.0052 at T20 -- larger than every earlier measurement. The staging stands. results/restage_20260926.txt."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0151 +-0.0036 at T10, +0.0181 +-0.0052 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
 
     Change(
@@ -2147,7 +2147,7 @@ CHANGES: list[Change] = [
             'P was not, and still needs re-measuring on the new baseline before '
             'it is committed.'
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Conqueror staged on both sides), N=15,000 paired: +0.0013 +-0.0029 at T10 (inside), +0.0147 +-0.0042 at T20. A long-horizon card, as before; the staging stands. results/restage_20260926.txt."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0015 +-0.0029 at T10, +0.0131 +-0.0042 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
 
     # -----------------------------------------------------------------------
@@ -2216,7 +2216,7 @@ CHANGES: list[Change] = [
         ),
         reverified=(
             "RE-MEASURED 2026-09-26 (§0z63), N=15,000 paired: +0.0033 +-0.0022 at T10, +0.0133 +-0.0035 at T20. The staging stands. results/restage_20260926.txt."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0034 +-0.0022 at T10, +0.0130 +-0.0035 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
     Change(
         deck="lorehold",
@@ -2361,7 +2361,7 @@ CHANGES: list[Change] = [
             "+-0.0015 at T10. Larger, and the decision stands. "
             "results/lorehold_pair_approach.txt."
             " AND AGAIN AFTER §0z62 (the pod turns on you once Approach has resolved): Caldera GIVEN Sunbird's +0.0053 +-0.0015 at T10, +0.0226 +-0.0027 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0077 +-0.0024 at T10, +0.0239 +-0.0038 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
     Change(
         deck="lorehold",
@@ -2441,7 +2441,7 @@ CHANGES: list[Change] = [
             "net -0.0034 +-0.0035 since 2026-09-09. "
             "results/lorehold_pair_approach.txt."
             " AND AGAIN AFTER §0z62: Sunbird's GIVEN Caldera +0.0023 +-0.0017 at T10, +0.0153 +-0.0031 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
-        ),
+        + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0031 +-0.0026 at T10, +0.0173 +-0.0043 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
     # The owner's decisions of 2026-09-26 (§0z69). Both re-measured the same
     # day on the engine they will be rebuilt on.
@@ -2469,6 +2469,7 @@ CHANGES: list[Change] = [
             "that the count does not. Staged anyway on the owner's judgement "
             "that the Act does not do more at their table than the model "
             "credits; said out loud here, as §0z31 requires."),
+        reverified="RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, +0.0134 +-0.0046 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
     ),
     Change(
         deck="shilgengar", remove="Vampiric Rites", add="Lyra, Archangel of Dawn",
@@ -2488,6 +2489,7 @@ CHANGES: list[Change] = [
             "releases 2026-10-02; the card was implemented from preview text. "
             "Re-fetch its oracle text from Scryfall on release, and re-measure "
             "if a word has changed, BEFORE this is committed."),
+        reverified="RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0026 +-0.0008 at T10, +0.0124 +-0.0028 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
     ),
 ]
 

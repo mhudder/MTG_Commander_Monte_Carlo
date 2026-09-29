@@ -888,11 +888,10 @@ is half answered**: the ordering half is built and measured as a null
     card draw above its token engines (joint +0.0225 / +0.0211, four moves).
     **BOTH ARE ADOPTED (2026-09-25), and the batched rebuild the owner
     deferred them to has RUN** (§0z60): all six tables at N=15,000, every
-    cache CURRENT, `check_docs` green. **What the rebuild did not do** is
-    re-measure the STAGED SWAPS: every staged swap in karlov and tivit —
-    including Anointed Procession, whose own priority moved — was measured
-    on the old priorities and still says so in its Change. Not adopted and
-    worth a look: Time Sieve's move flips sign between horizons.
+    cache CURRENT, `check_docs` green. The staged swaps the rebuild left on
+    the old priorities have since been re-measured on the current engine,
+    all eight inside their bars (§0z81). Not adopted and worth a look: Time
+    Sieve's move flips sign between horizons.
 
 0c. **STAGED BY THE OWNER, 2026-09-26 (§0z69)**: −Blasphemous Act +Goldspan,
     +0.0137 ±0.0046 at T20 on the final engine. The original entry follows.

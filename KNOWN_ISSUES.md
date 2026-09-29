@@ -129,6 +129,7 @@ Methodology that used to live at the end of this file is now
 | [0z78](#0z78) | FIXED | **The 33 KNOWN_BLIND cards the engine acts on, relabelled**: 4 SCRIPTED, 23 PARTLY with the missing clause named, 6 stay blind with a reason in `BLIND_BUT_LIVE`. `tests/test_blind_labels.py` holds it |
 | [0z79](#0z79) | BUILT | **PREPARED, and SIMULATED split from STAGED** (item 23). 23 unstaged head-to-heads -- the owner's open decisions among them -- were filed as MEASURED; they are `Simulated` records now |
 | [0z80](#0z80) | FIXED | **The funnel counted records, not cards** (§0z79's own bug: "10 proposed" were all long measured); three CLAUDE.md claims had outlived their facts; the stale-name note named staged-out cards every run, hiding the one truly stale name |
+| [0z81](#0z81) | MEASURED | **Every staged swap re-measured on today's engine: all eight stand**, significant at T20 and inside their bars of their last numbers (Conqueror +0.0271, Caldera +0.0239 ... Lyra +0.0124) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8065,6 +8066,32 @@ note is silent now, and Yavimaya Elder is pruned.
 ablation.py are in every cache fingerprint, and `check_unchanged_decks`
 against the previous HEAD is BIT-IDENTICAL on all six decks for both the deck
 modules and the staged lists (`build_pending`).
+
+## 0z81. MEASURED — every staged swap, re-measured on today's engine: all eight stand
+
+The eight STAGED swaps had been measured on engines before §0z75-§0z80 --
+four of them before §0z44's priority adoption, which CLAUDE.md's item 18 said
+out loud. Re-measured in context (the staged list, against the staged list
+with that one swap undone), N=15,000 paired, `diagnostics/run_restage.py`,
+`results/restage_20260929.txt`. `*` = significant:
+
+| swap | T10 | T20 | last measured, T20 |
+|---|---|---|---|
+| karlov −Soulmender +Bloodthirsty Conqueror | +0.0251 ±0.0028 * | **+0.0271 ±0.0034 *** | +0.0266 |
+| lorehold −Penance +Caldera Pyremaw | +0.0077 ±0.0024 * | **+0.0239 ±0.0038 *** | +0.0226 |
+| tivit −Plains +Anointed Procession | +0.0151 ±0.0036 * | **+0.0181 ±0.0052 *** | +0.0191 |
+| lorehold −Scroll Rack +Sunbird's Invocation | +0.0031 ±0.0026 * | **+0.0173 ±0.0043 *** | +0.0153 |
+| lorehold −Blasphemous Act +Goldspan Dragon | +0.0129 ±0.0026 * | **+0.0134 ±0.0046 *** | +0.0137 |
+| karlov −Swamp +Bolas's Citadel | +0.0015 ±0.0029 | **+0.0131 ±0.0042 *** | +0.0147 |
+| azusa −Perilous Forays +Ka-Zar | +0.0034 ±0.0022 * | **+0.0130 ±0.0035 *** | +0.0133 |
+| shilgengar −Vampiric Rites +Lyra | +0.0026 ±0.0008 * | **+0.0124 ±0.0028 *** | +0.0123 |
+
+**Every one is significant at T20 and inside its bar of its last number**;
+seven are significant at both horizons, and Bolas's Citadel's T10 was inside
+its bar last time too. The largest moves, Sunbird's +0.0020 and Citadel's
+−0.0016, are under half a bar. Each Change's `reverified` carries its line.
+The lorehold pair are measured each GIVEN the other (both staged), which is
+how their stagings were last checked.
 
 ## How to read an ablation table
 
