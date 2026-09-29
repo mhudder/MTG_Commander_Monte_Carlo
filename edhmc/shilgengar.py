@@ -351,62 +351,93 @@ class ShilgengarGame(BaseGame):
         # Selenia's Curse attached to target opponent." Once per permanent,
         # so OUTSIDE the `range(n)` loop. A Selenia returned by the ultimate
         # carries a FINALITY counter and is exiled instead of dying, so she
-        # makes no curse the second time -- the one death trigger in this
-        # engine that honours finality (the others predate it; §0z74 names
-        # the gap).
+        # makes no curse the second time. Since §0z75 every death trigger
+        # honours finality -- `exiled_instead_of_dying` keeps such a creature
+        # from reaching this method at all -- and this check stays so that
+        # `finality_exiles=False` reproduces the §0z74 engine exactly.
         if (perm is not None and perm.card.name == "Selenia, the Cursed Heart"
                 and not perm.is_token and id(perm.card) not in self.finality):
             OPP.curse_opponent(self)
         for _ in range(n):
-            if self.has("Blood Artist"):
+            # LOOK-BACK (CR 603.10a, §0z76); wording verified 2026-09-29.
+            if OPP.watching(self, "Blood Artist", perm):
                 dealt = OPP.damage_single(self, 1)
                 self.m["damage"] += dealt
                 self.m["drain_damage"] += dealt
-                self.your_life += 1
-            if self.has("Zulaport Cutthroat"):
+                self.trigger_gain(1)
+            if OPP.watching(self, "Zulaport Cutthroat", perm):
                 dealt = OPP.damage_each(self, 1)
                 self.m["damage"] += dealt
                 self.m["drain_damage"] += dealt
-                self.your_life += 1
+                self.trigger_gain(1)
             nontoken = perm is not None and not perm.is_token
-            if nontoken and self.has("Midnight Reaper"):
+            if nontoken and OPP.watching(self, "Midnight Reaper", perm):
                 self.your_life -= 1
                 self.draw(1)
             # "ANOTHER nontoken creature" -- Grim Haruspex does not see its
             # own death.
-            if nontoken and self.count("Grim Haruspex") and \
-                    not (perm.card.name == "Grim Haruspex"):
+            if nontoken and OPP.watching(self, "Grim Haruspex", perm,
+                                         another=True):
                 self.draw(1)
             if perm is not None and self.has("Dark Prophecy"):
                 self.draw(1)
                 self.your_life -= 1
-            if perm is not None and self.count("Pitiless Plunderer") and \
-                    perm.card.name != "Pitiless Plunderer":
+            if perm is not None and OPP.watching(
+                    self, "Pitiless Plunderer", perm, another=True):
                 self.treasures += 1
                 self.m["treasures_made"] += 1
-            if perm is not None and self.count("Requiem Angel") and \
-                    perm.card.name != "Requiem Angel" and \
+            if perm is not None and OPP.watching(
+                    self, "Requiem Angel", perm, another=True) and \
                     perm.card.name != "Spirit token":
                 self.make_spirit_tokens(1)
             if perm is not None and perm.card.tags and "angel" in perm.card.tags \
-                    and self.has("Bishop of Wings"):
+                    and OPP.watching(self, "Bishop of Wings", perm):
                 self.make_spirit_tokens(1)
-            if nontoken and self.has("Voldaren Bloodcaster"):
+            if nontoken and OPP.watching(self, "Voldaren Bloodcaster // Bloodbat Summoner", perm):
                 self.blood += 1
                 self.m["blood_made"] += 1
+
+    def trigger_gain(self, amount):
+        """Life gained by a trigger or an ability (Blood Artist, Zulaport
+        Cutthroat, Vampiric Rites) goes through `gain_life`, so Archangel of
+        Thune, Lyra and Selenia see it (§0z75). `gain_life_routed=False`
+        writes `your_life` directly, as every table before §0z75 did."""
+        if self.cfg.get("gain_life_routed", True):
+            self.gain_life(amount)
+        else:
+            self.your_life += amount
+
+    def exiled_instead_of_dying(self, perm) -> bool:
+        """"...with a FINALITY counter on it." CR 122.1b / the counter's
+        reminder: "If a creature with a finality counter on it would die,
+        exile it instead." So it does not die -- no death trigger fires --
+        and it never reaches the graveyard. The optional protocol hook
+        `opponents.destroy` asks (§0z75); `sacrifice` asks it too.
+        `finality_exiles=False` restores the pre-§0z75 engine, where only
+        Selenia's trigger honoured the counter."""
+        return (self.cfg.get("finality_exiles", True) and not perm.is_token
+                and id(perm.card) in self.finality)
 
     def sacrifice(self, perm, to_shilgengar=False):
         """A voluntary sacrifice — Viscera Seer, Cartel Aristocrat, Vampiric
         Rites, Skullclamp's death, or Shilgengar's own ability. Distinct from
-        `opponents.destroy`, which is the pod answering something."""
+        `opponents.destroy`, which is the pod answering something.
+
+        A FINALITY creature is still SACRIFICED -- the cost is paid, so
+        Shilgengar still makes its Blood -- but it is exiled instead of
+        dying: no death triggers, no graveyard (§0z75)."""
         self.board.remove(perm)
-        if not perm.is_token:
+        exiled = self.exiled_instead_of_dying(perm)
+        if not perm.is_token and not exiled:
             self.graveyard.append(perm.card)
         self.m["creatures_sacrificed"] += 1
         if to_shilgengar:
             amt = self.toughness_of(perm) if self.is_angel(perm) else 1
             self.blood += amt
             self.m["blood_made"] += amt
+        if exiled:
+            self.m["finality_exiled"] += 1
+            return
         self.on_creature_death(1, perm)
 
     def aristocrats_step(self):
@@ -416,7 +447,8 @@ class ShilgengarGame(BaseGame):
         payoff = any(self.has(n) for n in (
             "Blood Artist", "Zulaport Cutthroat", "Midnight Reaper",
             "Grim Haruspex", "Dark Prophecy", "Pitiless Plunderer",
-            "Requiem Angel", "Voldaren Bloodcaster")) or self.commander_cast
+            "Requiem Angel", "Voldaren Bloodcaster // Bloodbat Summoner"))
+        payoff = payoff or self.commander_cast
         if not payoff:
             return
         fodder = [p for p in self.board if p.is_token and p.card.is_creature
@@ -437,7 +469,7 @@ class ShilgengarGame(BaseGame):
                 # any colour, so it covers the {B} pip as well as the {1}.
                 if not self.pay({"gen": 1, "B": 1}, count_mana_spent=2):
                     break
-                self.your_life += 1
+                self.trigger_gain(1)
                 self.draw(1)
                 self.sacrifice(p, to_shilgengar=False)
 
@@ -678,11 +710,11 @@ class ShilgengarGame(BaseGame):
         # Speaker of the Heavens read. Two would quadruple (616.1); the card is
         # legendary, so that needs a copy, and `count` says it either way.
         #
-        # A FLOOR IN THIS ENGINE: Blood Artist, Zulaport Cutthroat, Vampiric
-        # Rites, Midnight Reaper's cost and the like write `your_life`
-        # directly instead of calling this method, so those gains are neither
-        # doubled nor seen by Thune/Lyra. A pre-existing gap, named in §0z74
-        # and not fixed here, because fixing it moves this deck's baseline.
+        # Blood Artist, Zulaport Cutthroat and Vampiric Rites wrote
+        # `your_life` directly until §0z75, so those gains were neither
+        # doubled nor seen by Thune/Lyra; they call `trigger_gain` now.
+        # Midnight Reaper and Dark Prophecy still write it directly -- they
+        # LOSE life, which nothing here reads as an event.
         n_selenia = self.count("Selenia, the Cursed Heart")
         if n_selenia:
             doubled = amount * (2 ** n_selenia)

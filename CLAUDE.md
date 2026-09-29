@@ -163,6 +163,11 @@ python -m tests.test_sac_outlets --mutate          # 4 mutations, exact sets
 python -m tests.test_sieve_real_fuel --mutate      # 5 mutations, exact sets
 python -m tests.test_devotion --mutate             # 2 mutations, exact sets
 python -m tests.test_mbc --mutate                  # 11 mutations, exact sets
+python -m tests.test_shilgengar_life_finality --mutate # 3 mutations, exact sets
+python -m tests.test_death_lookback --mutate       # 3 mutations, exact sets
+python -m tests.test_target_and_vault --mutate     # 3 mutations, exact sets
+python -m tests.test_blind_labels --mutate         # 3 mutations, exact sets
+python -m tests.test_ledger_states --mutate        # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -868,11 +873,13 @@ is half answered**: the ordering half is built and measured as a null
     Conqueror stays staged over Soulmender, and the Boots remain the named
     cut for Alhammarret's Archive should that hold ever lift.
 
-23. **TIERS 0 AND 2 ARE BUILT (§0z66)**: `python -m tools.triage`, a verdict
-    flag on `Proposal`, and a gate in the `add-card` skill. Its back-test
-    found **33 `KNOWN_BLIND` cards the engine acts on** -- the open half of
-    this item is reclassifying them, card by card, with the missing clause
-    named. PREPARED and the SIMULATED/STAGED split are not built.
+23. **BUILT, ALL OF IT.** Tiers 0 and 2 (§0z66): `python -m tools.triage`,
+    a verdict flag on `Proposal`, a gate in the `add-card` skill. The 33
+    `KNOWN_BLIND` cards its back-test found the engine acting on are
+    relabelled, card by card, with the missing clause named (§0z78), and
+    `tests/test_blind_labels.py` fails the next time a label rots. PREPARED
+    and the SIMULATED/STAGED split are in the ledger (§0z79) -- which moved
+    23 head-to-heads, the owner's open decisions among them, out of MEASURED.
     **The original entry follows.**
     **SCREENING A CARD AND CHOOSING ITS VICTIM ARE DIFFERENT JOBS, AND ONLY ONE
     OF THEM IS EXPENSIVE** (owner's proposal, 2026-09-21). **`docs/TRIAGE.md` is

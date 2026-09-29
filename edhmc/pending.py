@@ -55,6 +55,19 @@ version of the `-old` entries CLAUDE.md keeps for its superseded findings.
 A WITHDRAWN entry is NOT a refutation. Re-staging one is a matter of moving it
 back to CHANGES with fresh evidence; the `withdrawn` field says what that
 evidence would have to answer.
+AND THE SIMULATED/STAGED SPLIT, plus PREPARED (2026-09-29, §0z79), which
+`docs/LEDGER_STATES.md` designed and the owner confirmed on 2026-09-22:
+
+    PREPARED   a flag on a Proposal: the engine work is done, and it names
+               the test that pins it (`Proposal.prepared`).
+    SIMULATED  a head-to-head against a named cut, with NO decision.
+               `SIMULATED: list[Simulated]`. A staged Change is a head-to-head
+               plus a decision, and its head-to-head half is DERIVED
+               (`Change.simulated`); `simulations()` returns both kinds.
+
+`docs/LEDGER_STATES.md` is the vocabulary, and `check_docs` fails if it omits
+a state implemented here. The order is PROPOSED -> PREPARED -> MEASURED ->
+SIMULATED -> STAGED -> COMMITTED, with WITHDRAWN beside STAGED.
 """
 
 from __future__ import annotations
@@ -85,6 +98,14 @@ class Change:
     # swap is then a CEILING -- the cut's real value is whatever the engine
     # does not model.
     cut_unmeasured: str = ""
+
+    @property
+    def simulated(self) -> "Simulated":
+        """This Change's evidence half (§0z79): a staged swap IS a
+        head-to-head plus a decision, and the head-to-head is its
+        `evidence`. Derived, so it cannot drift from the entry."""
+        return Simulated(deck=self.deck, remove=self.remove, add=self.add,
+                         measured=self.staged, result=self.evidence)
 
 
 @dataclass
@@ -133,6 +154,36 @@ class Candidate:
     cut_unmeasured: str = ""    # as on Change: why a blind/partly cut is proposed
 
 
+@dataclass
+class Simulated:
+    """A HEAD-TO-HEAD: the real swap, against a named cut, paired on common
+    seeds -- and NO decision (docs/LEDGER_STATES.md, §0z79).
+
+    `Change` used to carry two claims at once: "we ran the swap" (evidence)
+    and "we are putting it in" (decision). The owner confirmed the split on
+    2026-09-22. A head-to-head that did not stage had nowhere to live except
+    a Candidate's `win_rate` string, which is a MEASURED record and says so
+    -- so the evidence for the twelve decisions §0z74 left with the owner was
+    filed under the one state this ledger says is never decision evidence.
+
+    SIMULATED holds only the head-to-heads with no STAGED partner. A staged,
+    committed or withdrawn Change IS a head-to-head with a decision attached;
+    its SIMULATED half is derived (`Change.simulated`), not written twice.
+    Staging one of these means moving it to CHANGES as a Change -- and
+    `check_simulated` fails while both lists hold it.
+
+    `result` is the number a decision would rest on: both horizons, with
+    bars, verbatim from the run. `source` is the results file.
+    """
+    deck: str
+    remove: str
+    add: str
+    measured: str               # date of the run
+    result: str                 # T10 and T20, with bars
+    source: str = ""            # results/ file the numbers came from
+    notes: str = ""
+
+
 # ---------------------------------------------------------------------------
 # Committed — reflected in BOTH the deck module and the .xlsx
 # ---------------------------------------------------------------------------
@@ -179,6 +230,14 @@ class Proposal:
     triage: str = ""
     triage_clauses: tuple = ()
     triage_note: str = ""
+    # PREPARED (docs/LEDGER_STATES.md, §0z79): the engine work is done and
+    # pinned. "" = not prepared. Otherwise it NAMES THE TEST that pins the
+    # card -- a path under tests/ -- and `check_prepared` refuses a path that
+    # is not on disk, because "implemented" with no test is §0z28's shape (a
+    # test that is not run does not exist; one that is not written, less so).
+    # A flag rather than a list, like `triage`: the card is still a Proposal
+    # until it has a number, and then it is a Candidate.
+    prepared: str = ""
 
 
 # The commanders' colour identities, fetched from Scryfall 2026-09-16 rather
@@ -2553,6 +2612,145 @@ WITHDRAWN: list[Change] = [
 
 
 # ---------------------------------------------------------------------------
+# SIMULATED (§0z79): head-to-heads with NO staging -- evidence waiting on a
+# decision, or evidence a decision went against. Generated on 2026-09-29 from
+# every MEASURED entry whose `win_rate` was a REAL SWAP rather than a
+# candidate row (their text is copied verbatim), plus three recorded only in
+# other entries' prose. The staged ones are not here: `Change.simulated`.
+#
+# THE §0z74 MYSTERY BOOSTER ROWS ARE THE OWNER'S OPEN DECISIONS, and they
+# were measured on the engine BEFORE §0z75-§0z77 moved karlov, shilgengar and
+# rendmaw. Re-run `diagnostics/run_mbc.py` before deciding on one.
+# ---------------------------------------------------------------------------
+SIMULATED: list[Simulated] = [
+    Simulated(
+        deck='shilgengar', remove='Skullclamp', add='Selenia, the Cursed Heart',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Skullclamp +Selenia, the Cursed Heart, N=15,000 paired: +0.0015 +-0.0007 (significant) at T10 and +0.0206 +-0.0031 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='shilgengar', remove='Skullclamp', add='Seluma, Light of Aysen',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Skullclamp +Seluma, Light of Aysen, N=15,000 paired: +0.0007 +-0.0005 (significant) at T10 and +0.0091 +-0.0024 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='shilgengar', remove='Skullclamp', add='Thomil, the Destroyer',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Skullclamp +Thomil, the Destroyer, N=15,000 paired: +0.0003 +-0.0004 (inside its bar) at T10 and +0.0074 +-0.0024 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='shilgengar', remove='Skullclamp', add='Pearl Collector',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Skullclamp +Pearl Collector, N=15,000 paired: +0.0012 +-0.0006 (significant) at T10 and +0.0229 +-0.0029 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Selenia, the Cursed Heart',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Swiftfoot Boots +Selenia, the Cursed Heart, N=15,000 paired: +0.0039 +-0.0016 (significant) at T10 and +0.0160 +-0.0029 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Pearl Collector',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Swiftfoot Boots +Pearl Collector, N=15,000 paired: +0.0100 +-0.0019 (significant) at T10 and +0.0197 +-0.0032 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='tivit', remove="Tamiyo's Journal", add='Venser, Visionary Traveler',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=("REAL SWAP -Tamiyo's Journal +Venser, Visionary Traveler, N=15,000 paired: +0.0067 +-0.0018 (significant) at T10 and +0.0115 +-0.0029 (significant) at T20."),
+    ),
+    Simulated(
+        deck='tivit', remove="Tamiyo's Journal", add='Dyfed, the Guiding Hand',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=("REAL SWAP -Tamiyo's Journal +Dyfed, the Guiding Hand, N=15,000 paired: +0.0047 +-0.0017 (significant) at T10 and +0.0220 +-0.0032 (significant) at T20."),
+    ),
+    Simulated(
+        deck='azusa', remove='Titania, Protector of Argoth', add='Autumn Willow, Harmony',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Titania, Protector of Argoth +Autumn Willow, Harmony, N=15,000 paired: +0.0047 +-0.0020 (significant) at T10 and +0.0024 +-0.0031 (inside its bar) at T20.'),
+    ),
+    Simulated(
+        deck='rendmaw', remove="Ashnod's Altar", add='Davvol, Evincar of Rath',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=("REAL SWAP -Ashnod's Altar +Davvol, Evincar of Rath, N=15,000 paired: +0.0003 +-0.0009 (inside its bar) at T10 and -0.0051 +-0.0024 (significant) at T20."),
+    ),
+    Simulated(
+        deck='rendmaw', remove="Ashnod's Altar", add='Thomil, the Destroyer',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=("REAL SWAP -Ashnod's Altar +Thomil, the Destroyer, N=15,000 paired: -0.0003 +-0.0009 (inside its bar) at T10 and +0.0059 +-0.0026 (significant) at T20."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add='Chief Magistrate of Mercadia',
+        measured='2026-09-29', source='results/mbc_batch.txt',
+        result=('REAL SWAP -Lightning Greaves +Chief Magistrate of Mercadia, N=15,000 paired: -0.0009 +-0.0020 (inside its bar) at T10 and +0.0068 +-0.0035 (significant) at T20.'),
+    ),
+    Simulated(
+        deck='rendmaw', remove="Ashnod's Altar", add='Proft, Sinister Mastermind',
+        measured='2026-09-21', source='results/fra_batch2.txt',
+        result=("REAL SWAP -Ashnod's Altar +Proft, N=15,000 paired: +0.0005 +-0.0006 at T10 (inside its bar) and +0.0043 +-0.0018 at T20 (significant); damage T20 +0.47 +-0.08."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add='Stingcaster Mage',
+        measured='2026-09-21', source='results/fra_batch2.txt',
+        result=('REAL SWAP -Lightning Greaves +Stingcaster Mage, N=15,000 paired: +0.0017 +-0.0017 at T10 (inside its bar) and +0.0107 +-0.0036 at T20 (significant); damage T20 +0.78 +-0.18.'),
+    ),
+    Simulated(
+        deck='tivit', remove="Tamiyo's Journal", add='Memnarch, the Warden',
+        measured='2026-09-21', source='results/fra_batch2.txt',
+        result=("REAL SWAP -Tamiyo's Journal +Memnarch, the Warden, N=15,000 paired: +0.0099 +-0.0020 at T10 and +0.0167 +-0.0033 at T20, significant at both; damage T20 +1.52 +-0.19."),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Liliana the Faultless',
+        measured='2026-09-21', source='results/karlov_fra.txt',
+        result=('REAL SWAP -Swiftfoot Boots +Liliana, N=15,000 paired: +0.0064 +-0.0017 at T10 and +0.0138 +-0.0029 at T20, significant at both. AND IT LOSES THE SLOT: Bloodthirsty Conqueror -> Liliana in that slot is -0.0238 +-0.0029 / -0.0250 +-0.0035, significant at both.'),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Edgar, Ancient Bloodlord',
+        measured='2026-09-21', source='results/karlov_fra.txt',
+        result=('REAL SWAP -Swiftfoot Boots +Edgar, N=15,000 paired: +0.0033 +-0.0015 at T10 and +0.0095 +-0.0028 at T20, significant at both. AND IT LOSES THE SLOT: Bloodthirsty Conqueror -> Edgar is -0.0273 +-0.0029 / -0.0300 +-0.0033, significant at both.'),
+    ),
+    Simulated(
+        deck='azusa', remove='Yavimaya Elder', add='Verdant Kraken',
+        measured='2026-09-21', source='results/azusa_fra.txt',
+        result=('REAL SWAP -Yavimaya Elder +Verdant Kraken, N=15,000 paired: +0.0163 +-0.0024 at T10 and +0.0265 +-0.0037 at T20, significant at both. Against the Chocobo in the same slot: -0.0049 +-0.0029 at T10 (significant) and +0.0007 +-0.0042 at T20 (inside its bar).'),
+    ),
+    Simulated(
+        deck='azusa', remove='Yavimaya Elder', add='Simulacrum Shaper',
+        measured='2026-09-21', source='results/azusa_fra.txt',
+        result=('REAL SWAP -Yavimaya Elder +Simulacrum Shaper, N=15,000 paired: +0.0040 +-0.0019 at T10 and +0.0035 +-0.0033 at T20, significant at both. Against the Chocobo in the same slot: -0.0173 +-0.0027 / -0.0223 +-0.0040, significant at both.'),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Ginger, Queen of Sweets',
+        measured='2026-09-22', source='results/karlov_ginger.txt',
+        result=("REAL SWAP -Swiftfoot Boots +Ginger, N=15,000 paired, same seeds both legs, base = build_pending('karlov'): +0.0052 +-0.0017 at T10 and +0.0186 +-0.0033 at T20, significant at BOTH. Candidate row against a blank in the same slot: +0.0059 +-0.0027 (results/candidates_karlov3.txt)."),
+    ),
+    # ---- head-to-heads recorded before the split, in other entries ----
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add='Bloodthirsty Conqueror',
+        measured='2026-09-20', source='results/karlov_boots.txt',
+        result=('+0.0299 +-0.0029 at T10 and +0.0401 +-0.0037 at T20, '
+                'significant at both, on the pre-swap baseline (§0z36).'),
+        notes=('The same card is STAGED against Soulmender instead: the owner '
+               'kept the Boots on 2026-09-26 (queued item 20b).'),
+    ),
+    Simulated(
+        deck='karlov', remove='Swiftfoot Boots', add="Alhammarret's Archive",
+        measured='2026-09-20', source='results/karlov_boots.txt',
+        result=('+0.0055 +-0.0016 at T10 and +0.0168 +-0.0030 at T20, '
+                'significant at both, given the staging (§0z36).'),
+        notes='HELD on the owner\'s playtest experience (queued item 20b).',
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add='Goldspan Dragon',
+        measured='2026-09-26', source='results/restage_20260926.txt',
+        result=('+0.0002 +-0.0018 at T10 and +0.0048 +-0.0036 at T20 (T20 '
+                'only), re-measured after §0z62.'),
+        notes=('Goldspan is STAGED against Blasphemous Act instead (§0z69); '
+               'in Caldera Pyremaw\'s slot it loses, -0.0091 at T20.'),
+    ),
+]
+
+
+# ---------------------------------------------------------------------------
 # PROPOSED, 2026-09-16. Oracle text fetched from api.scryfall.com the same day
 # and pasted verbatim. NOTHING HERE IS MEASURED -- these are arguments with
 # verified card text attached, and the next step for each is a
@@ -3356,6 +3554,77 @@ def check_triage(pr) -> None:
             f"does not name the machinery it waits for (`triage_note`).")
 
 
+def check_prepared(pr) -> None:
+    """PREPARED names the test that pins the card, and the test exists."""
+    if not pr.prepared:
+        return
+    import os
+    import re
+    # The note is free text that STARTS with the path ("tests/x.py, 2026-..."),
+    # so the path is matched, not split off: a trailing comma once made an
+    # existing test look missing (tests/test_ledger_states.py, case E).
+    m = re.match(r"(tests/[\w/]+\.py)\b", pr.prepared.strip())
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if not (m and os.path.exists(os.path.join(root, m.group(1)))):
+        raise AssertionError(
+            f"edhmc/pending.py: PROPOSED {pr.card!r} is PREPARED as "
+            f"{pr.prepared!r}, which does not start with a test file on disk "
+            f"(tests/....py). PREPARED means implemented AND pinned (§0z79).")
+
+
+def _staged_have_evidence(staged) -> None:
+    for ch in staged:
+        if not ch.evidence.strip():
+            raise AssertionError(
+                f"edhmc/pending.py: {ch.deck} -{ch.remove} +{ch.add} is staged "
+                f"with no `evidence` -- a STAGED decision needs its SIMULATED "
+                f"half, the head-to-head against the named cut (§0z79).")
+
+
+def _simulated_complete(simulated) -> None:
+    for r in simulated:
+        if not (r.result.strip() and r.remove.strip() and r.add.strip()):
+            raise AssertionError(
+                f"edhmc/pending.py: SIMULATED {r.deck} -{r.remove} +{r.add} "
+                f"is missing its cut, its add or its result.")
+
+
+def _not_simulated_and_staged(simulated, staged) -> None:
+    keys = {(c.deck, c.remove, c.add) for c in staged}
+    for r in simulated:
+        if (r.deck, r.remove, r.add) in keys:
+            raise AssertionError(
+                f"edhmc/pending.py: {r.deck} -{r.remove} +{r.add} is in "
+                f"SIMULATED and staged. Staging a head-to-head MOVES it to "
+                f"CHANGES; delete the SIMULATED record (§0z79).")
+
+
+def check_simulated(simulated=None, staged=None) -> None:
+    """The SIMULATED/STAGED split holds (§0z79).
+
+    1. Every STAGED or COMMITTED Change carries its head-to-head: `evidence`
+       is its SIMULATED half, and a staging with none is a decision with no
+       evidence.
+    2. A SIMULATED record has a result, and names a cut and an add.
+    3. No head-to-head is in SIMULATED AND staged: staging MOVES it.
+
+    One function per rule, so a mutation can switch off exactly one
+    (tests/test_ledger_states.py).
+    """
+    simulated = SIMULATED if simulated is None else simulated
+    staged = CHANGES + COMMITTED if staged is None else staged
+    _staged_have_evidence(staged)
+    _simulated_complete(simulated)
+    _not_simulated_and_staged(simulated, staged)
+
+
+def simulations() -> list[Simulated]:
+    """Every head-to-head the ledger holds: the unstaged ones, and the
+    derived halves of every staged, committed and withdrawn Change."""
+    return list(SIMULATED) + [c.simulated
+                              for c in CHANGES + COMMITTED + WITHDRAWN]
+
+
 def check_proposals(strict: bool = True):
     """Every live PROPOSED entry is colour-legal, verified, and not already in.
 
@@ -3383,6 +3652,7 @@ def check_proposals(strict: bool = True):
                 f"oracle text. Fetch it from api.scryfall.com and set "
                 f"`verified`; do not write card text from memory.")
         check_triage(pr)
+        check_prepared(pr)
         if pr.rejected:
             continue
         ident = set(pr.identity)
@@ -3732,6 +4002,7 @@ check_proposals()
 check_measured_are_promotable()
 check_shortlist_is_answerable()
 check_withdrawn_are_explained()
+check_simulated()
 check_alt_cost_coverage()
 check_loyalty_coverage()
 
@@ -3871,6 +4142,24 @@ def ledger(verbose: bool = True) -> None:
                     print(f"    recheck {c.reverified}")
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
+    if SIMULATED:
+        # BETWEEN THE STAGED AND THE MEASURED, which is where it sits in the
+        # funnel (§0z79): real evidence, and no decision yet taken on it.
+        print("\n" + "=" * 78)
+        print("SIMULATED — a head-to-head against a named cut, NO decision")
+        print("=" * 78)
+        print("  Decision evidence, unlike MEASURED below: each row is the real "
+              "swap, paired on\n  common seeds. Staging one MOVES it to "
+              "CHANGES. A row measured before an\n  engine change is only as "
+              "current as that engine -- check `measured`.")
+        for deck_name in sorted({r.deck for r in SIMULATED}):
+            print(f"\n{deck_name.upper()}")
+            for r in [r for r in SIMULATED if r.deck == deck_name]:
+                print(f"  -{r.remove} +{r.add}   ({r.measured}"
+                      + (f", {r.source}" if r.source else "") + ")")
+                print(f"     {r.result}")
+                if verbose and r.notes:
+                    print(f"     note {r.notes}")
     if MEASURED:
         # PRINTED UNDER ITS OWN HEADING AND BELOW THE STAGED ONES, because the
         # single most useful thing this section can do is not be mistaken for

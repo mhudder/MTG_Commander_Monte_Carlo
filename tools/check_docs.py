@@ -300,19 +300,27 @@ LEDGER_STATES = os.path.join("docs", "LEDGER_STATES.md")
 # and this one is blind to a future list whose name is not its state either.
 LEDGER_LIST_STATE = {"CHANGES": "STAGED"}
 
+# And ONE state that is a FLAG, not a list (§0z79): PREPARED is a field on
+# Proposal, because a prepared card is still a Proposal until it has a
+# number. Derived from the field's declaration, so deleting the field drops
+# the state and the doc check follows it.
+LEDGER_FLAG_STATE = {"prepared": "PREPARED"}
+
 
 def ledger_states() -> set[str]:
     """The states `edhmc/pending.py` actually IMPLEMENTS, from its own lists.
 
     Derived rather than typed, because the vocabulary doc is a hand-maintained
     name set describing the repo and §0q says such a set needs its check in
-    the same change. States that `docs/LEDGER_STATES.md` merely PROPOSES
-    (PREPARED, SIMULATED) are deliberately not required to appear here -- the
-    check runs one way only, and that is the way that rotted.
+    the same change. The check runs one way only -- every implemented state
+    must be in the doc -- and that is the way that rotted. PREPARED and
+    SIMULATED were proposals here until §0z79 built them.
     """
     text = read(os.path.join("edhmc", "pending.py"))
     lists = re.findall(r"^([A-Z][A-Z_]+): list\[", text, re.M)
-    return {LEDGER_LIST_STATE.get(n, n) for n in lists}
+    flags = {st for f, st in LEDGER_FLAG_STATE.items()
+             if re.search(rf"^    {f}: str = ", text, re.M)}
+    return {LEDGER_LIST_STATE.get(n, n) for n in lists} | flags
 
 
 def check_vocabulary_names_states(docs: dict[str, str],

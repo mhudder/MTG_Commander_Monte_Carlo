@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import bisect
 import random
+from contextlib import contextmanager
 from dataclasses import dataclass
 
 # Per-opponent, per-turn probabilities, once that opponent has mana (turn >= 3).
@@ -361,6 +362,14 @@ def spot_removal(g, opp, others, rolls):
     if try_protect(g, rolls[5]):
         return
     victim = max(targets, key=lambda p: threat_of(g, p))
+    # Optional protocol hook (§0z77): the pod's spot removal is a spell, and
+    # "becomes the target of a spell" is a trigger condition -- Goldspan
+    # Dragon's Treasure. Fired whether or not the spell then destroys it.
+    # Not fired when `try_protect` blanks the event above: that path never
+    # names a victim, a floor said out loud.
+    targeted = getattr(g, "on_targeted", None)
+    if targeted is not None:
+        targeted(victim)
     if destroy(g, victim, rolls[7]):
         g.m["removal_eaten"] += 1
 
@@ -399,8 +408,9 @@ def board_wipe(g, opp, rolls):
         return
     if try_protect(g, rolls[5]):
         return
-    for p in [p for p in g.board if is_creature_now(g, p)]:
-        destroy(g, p, rolls[7])
+    with simultaneous(g):
+        for p in [p for p in g.board if is_creature_now(g, p)]:
+            destroy(g, p, rolls[7])
     for o in g.opponents:
         o.creatures = 0.0
         o.goaded_birds = 0.0          # a wrath kills the Birds too
@@ -530,6 +540,53 @@ def wipe_destroys(card) -> bool:
     return card.name not in WIPE_IGNORES_INDESTRUCTIBLE
 
 
+@contextmanager
+def simultaneous(g):
+    """One event in which many creatures die at once -- a wipe (§0z76).
+
+    CR 603.10a: leaves-the-battlefield abilities "look back in time", so
+    every death trigger sees each permanent that left in the SAME event,
+    itself included. `destroy` removes creatures one at a time, so without
+    this a Blood Artist removed third missed every death after it. Inside the
+    context `destroy` records each creature in `g.dying`, and `watching`
+    counts them."""
+    before = getattr(g, "dying", None)
+    g.dying = [] if before is None else before
+    try:
+        yield
+    finally:
+        g.dying = before
+
+
+def watching(g, name, perm=None, another=False) -> int:
+    """How many `name` a death trigger for `perm` SEES (CR 603.10a, §0z76).
+
+    The board, plus everything that has died in the current simultaneous
+    event (`simultaneous`), plus `perm` itself -- a leaves-the-battlefield
+    trigger sees the permanent that is leaving. `another=True` is the
+    "Whenever ANOTHER creature ... dies" wording: `perm` is excluded.
+    `death_lookback=False` reads the live board only, which is what every
+    engine did before §0z76.
+
+    FOR WHETHER AN ABILITY TRIGGERS, not for what it does: an effect that
+    resolves afterwards reads the board as it then is.
+    """
+    n = g.count(name)
+    if not g.cfg.get("death_lookback", True):
+        return n
+    seen = {id(p) for p in g.board}
+    for p in getattr(g, "dying", None) or ():
+        if p.card.name == name and id(p) not in seen:
+            n += 1
+            seen.add(id(p))
+    if perm is not None and perm.card.name == name:
+        if id(perm) not in seen:
+            n += 1
+        if another:
+            n -= 1
+    return max(0, n)
+
+
 def destroy(g, perm, roll=None, destroys=None):
     """Remove a permanent the pod answered.
 
@@ -569,6 +626,16 @@ def destroy(g, perm, roll=None, destroys=None):
             and roll < g.cfg.get("destroy_share", 0.60):
         return False
     g.board.remove(perm)
+    # FINALITY (§0z75): "If a creature with a finality counter on it would
+    # die, exile it instead." An optional protocol hook -- only shilgengar
+    # puts the counter on anything -- so a finality creature fires no death
+    # trigger and never reaches the graveyard.
+    exiled = getattr(g, "exiled_instead_of_dying", None)
+    if exiled is not None and exiled(perm):
+        g.m["finality_exiled"] += 1
+        return True
+    if getattr(g, "dying", None) is not None:
+        g.dying.append(perm)          # one simultaneous event (§0z76)
     if is_creature_now(g, perm) and hasattr(g, "on_creature_death"):
         g.on_creature_death(1, perm)
     if perm.card is g.commander:
@@ -1650,25 +1717,26 @@ def resolve_own_wipe(g, spare_own=False, card=None):
         return
     destroys = wipe_destroys(card)
     honour = g.cfg.get("own_wipe_indestructible", True)
-    for p in [p for p in g.board if is_creature_now(g, p)]:
-        # FIXED 2026-09-04. Your own sweeper used to remove the commander from
-        # the battlefield WITHOUT returning it to the command zone, so
-        # `commander_cast` stayed True and it was never recast again.
-        # destroy() always got this right; this path never did. Measured cost
-        # of the bug, value of a wrath over a blank at 20 turns: Farewell
-        # -2.05 -> -0.98 damage, Karlov's Damn -0.0107 -> -0.0032 win rate. It
-        # was worth about a point of damage on every self-wipe and it hit
-        # Lorehold hardest, where the commander IS the engine.
-        # destroy() now carries that rule for this path too, so the knob is
-        # applied by restoring what it changed rather than by a second copy.
-        was_commander = p.card is g.commander
-        cast_before, tax_before = g.commander_cast, g.commander_tax
-        if not destroy(g, p, destroys=destroys if honour else False):
-            g.m["own_wipe_survivors"] += 1
-            continue
-        # `own_wipe_commander_returns=False` restores the pre-2026-09-04
-        # behaviour, which destroy() does not have a flag for because no
-        # opponent-sourced removal ever needed one.
-        if was_commander and not g.cfg.get("own_wipe_commander_returns", True):
-            g.commander_cast, g.commander_tax = cast_before, tax_before
+    with simultaneous(g):
+        for p in [p for p in g.board if is_creature_now(g, p)]:
+            # FIXED 2026-09-04. Your own sweeper used to remove the commander from
+            # the battlefield WITHOUT returning it to the command zone, so
+            # `commander_cast` stayed True and it was never recast again.
+            # destroy() always got this right; this path never did. Measured cost
+            # of the bug, value of a wrath over a blank at 20 turns: Farewell
+            # -2.05 -> -0.98 damage, Karlov's Damn -0.0107 -> -0.0032 win rate. It
+            # was worth about a point of damage on every self-wipe and it hit
+            # Lorehold hardest, where the commander IS the engine.
+            # destroy() now carries that rule for this path too, so the knob is
+            # applied by restoring what it changed rather than by a second copy.
+            was_commander = p.card is g.commander
+            cast_before, tax_before = g.commander_cast, g.commander_tax
+            if not destroy(g, p, destroys=destroys if honour else False):
+                g.m["own_wipe_survivors"] += 1
+                continue
+            # `own_wipe_commander_returns=False` restores the pre-2026-09-04
+            # behaviour, which destroy() does not have a flag for because no
+            # opponent-sourced removal ever needed one.
+            if was_commander and not g.cfg.get("own_wipe_commander_returns", True):
+                g.commander_cast, g.commander_tax = cast_before, tax_before
     g.m["own_wipes_cast"] += 1

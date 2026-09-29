@@ -176,8 +176,16 @@ def ledger_counts():
     buckets = {
         "COMMITTED": pending.COMMITTED,
         "STAGED": pending.CHANGES,
+        "SIMULATED": pending.SIMULATED,
         "MEASURED": pending.MEASURED,
         "WITHDRAWN": pending.WITHDRAWN,
+        # PROPOSED is split by its flags (§0z79): PREPARED is engine work done
+        # and pinned, REJECTED is dead. Neither is a list of its own.
+        "PREPARED": [p for p in pending.PROPOSED
+                     if p.prepared and not p.rejected],
+        "PROPOSED": [p for p in pending.PROPOSED
+                     if not p.prepared and not p.rejected],
+        "REJECTED": [p for p in pending.PROPOSED if p.rejected],
     }
     per: dict[str, dict[str, int]] = {}
     for label, items in buckets.items():
@@ -368,15 +376,25 @@ def render() -> str:
         w(f"*Unavailable: {ledger_err}*")
         w("")
     else:
-        w("| deck | committed | staged | measured | withdrawn |")
-        w("|---|---|---|---|---|")
+        # THE FUNNEL, in `docs/LEDGER_STATES.md`'s order (§0z79). Each column
+        # is one state; a card is counted in the state its record is in.
+        # SIMULATED counts only head-to-heads with NO staging -- a staged
+        # swap's head-to-head is its `evidence`, counted under STAGED.
+        cols = ("PROPOSED", "PREPARED", "MEASURED", "SIMULATED", "STAGED",
+                "COMMITTED", "WITHDRAWN", "REJECTED")
+        w("| deck | " + " | ".join(c.lower() for c in cols) + " |")
+        w("|---" * (len(cols) + 1) + "|")
         for d in DECKS:
             c = per.get(d, {})
-            w(f"| {d} | {c.get('COMMITTED', 0)} | {c.get('STAGED', 0)} | "
-              f"{c.get('MEASURED', 0)} | {c.get('WITHDRAWN', 0)} |")
-        w(f"| **all** | **{len(buckets['COMMITTED'])}** | "
-          f"**{len(buckets['STAGED'])}** | **{len(buckets['MEASURED'])}** | "
-          f"**{len(buckets['WITHDRAWN'])}** |")
+            w(f"| {d} | " + " | ".join(str(c.get(k, 0)) for k in cols) + " |")
+        w("| **all** | " + " | ".join(f"**{len(buckets[k])}**" for k in cols)
+          + " |")
+        w("")
+        w("The states are defined in `docs/LEDGER_STATES.md`. A SIMULATED row "
+          "is decision")
+        w("evidence with no decision on it; `python -m edhmc.pending` prints "
+          "each with its")
+        w("date, which is the engine it was measured on.")
         w("")
         w("### Staged and uncommitted")
         w("")

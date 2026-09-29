@@ -217,7 +217,7 @@ def main() -> int:
 
     muts = {
         "the Plunderer does not trigger":
-            ({"B", "D"}, EN, "plunderer_count", lambda g: 0),
+            ({"B", "D"}, EN, "plunderer_count", lambda g, perm=None: 0),
         "Treasures are not mana":
             ({"F", "G", "H", "I"}, EN, "rendmaw_mana", EN.available_mana),
         "tapping a Treasure does not sacrifice it":

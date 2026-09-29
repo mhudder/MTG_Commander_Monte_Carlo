@@ -1948,7 +1948,10 @@ class AzusaGame(BaseGame):
         if (perm is not None and self.ashaya_lands()
                 and self.is_creature_land(perm)):
             self.m["ashaya_land_deaths"] += 1
-            if self.has("Titania, Protector of Argoth"):
+            # "Whenever a land you control is put into a graveyard" -- no
+            # ANOTHER, and under Ashaya Titania is a land: look-back sees her
+            # own death and a Titania that died earlier in the wipe (§0z76).
+            if OPP.watching(self, "Titania, Protector of Argoth", perm):
                 self.make_tokens(1, 5, 3, "Elemental")
         # SIMULACRUM SHAPER: "When this creature dies, draw a card." Beside the
         # Elder's trigger because this is the one death hook (§0u), and OUTSIDE

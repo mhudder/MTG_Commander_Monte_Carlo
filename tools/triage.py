@@ -379,7 +379,9 @@ def backtest(seeds=range(5000, 5040), decks=None, labels=True) -> dict:
                 # different = the engine DOES act on the card and the label
                 # is a claim that rotted (§0q).
                 same, why = plays_identically(deck_name, c, seeds)
-                kind = "inert" if same else "LIVE"
+                kind = ("inert" if same else
+                        "reasoned" if c.name in AB.BLIND_BUT_LIVE.get(
+                            deck_name, {}) else "LIVE")
                 diffs.append((deck_name, c.name, kind, ";".join(
                     x for x in structural_channels(c, deck_name) if x != "body"),
                     why))
@@ -417,13 +419,15 @@ def main() -> int:
             print("   ", *d)
         print(f"\nLABEL DIFFS (KNOWN_BLIND, but a channel exists): "
               f"{len(r['label_diffs'])}")
-        for kind in ("LIVE", "inert"):
+        for kind in ("LIVE", "reasoned", "inert"):
             group = [d for d in r["label_diffs"] if d[2] == kind]
-            print(f"  {kind}: {len(group)}"
-                  + ("  -- the engine acts on these, so 'does not implement "
-                     "the card at all' is too strong: PARTLY at least"
-                     if kind == "LIVE" else
-                     "  -- a channel exists and nothing fires it"))
+            print(f"  {kind}: {len(group)}" + {
+                "LIVE": "  -- the engine acts on these, so 'does not "
+                        "implement the card at all' is too strong: relabel, "
+                        "or give the reason in BLIND_BUT_LIVE (§0z78)",
+                "reasoned": "  -- the engine acts on these and "
+                            "ablation.BLIND_BUT_LIVE says why they stay blind",
+                "inert": "  -- a channel exists and nothing fires it"}[kind])
             for d in group:
                 print(f"    {d[0]:<10} {d[1]:<36} {d[3]}"
                       + (f"   [{d[4]}]" if d[4] else ""))

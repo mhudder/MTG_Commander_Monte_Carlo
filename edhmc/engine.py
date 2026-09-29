@@ -1376,7 +1376,10 @@ class Game(BaseGame):
         each_opp = sum(1 for p in self.board
                        if p.card.name in ("The Meathook Massacre",
                                           "Cauldron of Essence"))
-        single = sum(1 for p in self.board if p.card.name == "Blood Artist")
+        # "Whenever THIS creature or another creature dies" -- look-back, so
+        # a Blood Artist dying in the same wipe, or dying itself, still
+        # triggers (CR 603.10a, §0z76).
+        single = OPP.watching(self, "Blood Artist", perm)
         if each_opp:
             self.deal_pod_damage(3.0 * n * each_opp)
         if single:
@@ -1396,11 +1399,9 @@ class Game(BaseGame):
         # create a Treasure token." (§0z64; Scryfall 2026-09-16.) Its own
         # death is excluded for free: it has left the board by the time this
         # runs, so the count does not include it -- the Scrap Trawler shape.
-        # A FLOOR in one place: a wipe removes permanents one at a time
-        # (`opponents.destroy`), so the creatures that die after the
-        # Plunderer in the same wipe do not pay, where the real trigger looks
-        # back and sees them all.
-        plunderers = plunderer_count(self)
+        # LOOK-BACK since §0z76: a Plunderer that dies earlier in the same
+        # wipe still sees every death after it (`opponents.watching`).
+        plunderers = plunderer_count(self, perm)
         if plunderers:
             self.make_treasures(int(n) * plunderers)
 
@@ -1424,9 +1425,8 @@ class Game(BaseGame):
         # `erebos_life_floor` is a judgement call, said out loud. The number
         # this card scores is a CEILING for that reason.
         if self.cfg.get("erebos_death_draw", True) \
-                and self.has("Erebos, Bleak-Hearted") \
-                and not (perm is not None
-                         and perm.card.name == "Erebos, Bleak-Hearted"):
+                and OPP.watching(self, "Erebos, Bleak-Hearted", perm,
+                                 another=True):
             floor = self.cfg.get("erebos_life_floor", 10)
             for _ in range(int(n)):
                 if self.your_life - 2 < floor:
@@ -1658,10 +1658,12 @@ def token_doublings(g) -> int:
         (2 if g.has("Parallel Lives") else 1)
 
 
-def plunderer_count(g) -> int:
-    """Pitiless Plunderers on the battlefield -- Treasures per other creature
-    death. A seam of its own so the test can remove the trigger alone."""
-    return g.count("Pitiless Plunderer")
+def plunderer_count(g, perm=None) -> int:
+    """Pitiless Plunderers that see this death -- Treasures per ANOTHER
+    creature dying. Look-back (§0z76): a Plunderer that died earlier in the
+    same wipe still sees the rest. A seam of its own so the test can remove
+    the trigger alone."""
+    return OPP.watching(g, "Pitiless Plunderer", perm, another=True)
 
 
 # One Treasure's mana. "Add one mana of any color": colourless is NOT a
@@ -1789,6 +1791,11 @@ def rendmaw_mana(g) -> "ManaUnits":
     NOT USED for the `mana_floated` metric: a Treasure you did not crack is
     not mana you wasted, it is still there next turn."""
     units = available_mana(g)
+    held = vault_held(g)
+    if held is not None:
+        for i in range(len(units) - 1, -1, -1):
+            if units.owners[i] is held:
+                units.pop(i)
     for _ in range(getattr(g, "treasures", 0)):
         units.append(TREASURE_UNIT)
         units.owners[-1] = TreasureMana(g)
@@ -1797,6 +1804,30 @@ def rendmaw_mana(g) -> "ManaUnits":
         units.append(frozenset({"B"}))
         units.owners[-1] = DavvolMana(g)
     return units
+
+
+def vault_held(g):
+    """The untapped Treasure Vault the pilot keeps OUT of main-phase payments,
+    or None (§0z77). Tapping it for {C} in the main phase is what made it
+    "only a land" on most turns (§0z68's floor): `can_pay` spends a
+    colourless land first. `vault_hold`:
+      "never"    §0z68: its {C} is ordinary mana. THE DEFAULT.
+      "doubler"  held while a token doubler is out -- when an end-of-turn
+                 crack is worth a land.
+      "always"   held every turn.
+    `treasure_vault` taps it itself at the end step, so holding costs the
+    main phase one colourless mana and nothing else -- and that one mana is
+    worth more than the cracks it buys: at N=15,000, T20, "doubler" is
+    -0.0011 +-0.0007 against "never" and "always" -0.0102 +-0.0028, while
+    cracks go 0.061 -> 0.063 a game (§0z77). The floor §0z68 named was
+    real and closing it is worth less than the mana. Kept as a knob."""
+    mode = g.cfg.get("vault_hold", "never")
+    if mode == "never":
+        return None
+    if mode == "doubler" and token_doublings(g) < 2:
+        return None
+    return next((p for p in g.board if p.card.name == "Treasure Vault"
+                 and not p.tapped), None)
 
 
 def treasure_vault(g) -> None:
@@ -1815,9 +1846,9 @@ def treasure_vault(g) -> None:
     {T} is part of the cost. Treasures do not pay for it -- turning Treasures
     into Treasures is nothing.
 
-    A FLOOR in one place: the pilot does not hold the Vault back during the
-    main phase, and `can_pay` spends a colourless land early (§0z64: least
-    flexible first), so on a turn it was tapped for mana it is only a land.
+    Held out of the main phase's payments by `vault_held` (§0z77) -- before
+    that, `can_pay` spent it early as a colourless land (least flexible
+    first), so on most turns it was only a land.
     """
     vault = next((p for p in g.board if p.card.name == "Treasure Vault"
                   and not p.tapped), None)

@@ -1,0 +1,39 @@
+diagnostics/run_lookback_finality.py, 2026-09-29. N=15,000 paired per arm, T10 and T20, seeds 5000.., build_pending(). §0z75-§0z77.
+Every shilgengar arm, S_old included, carries the knob-less Voldaren Bloodcaster name fix (§0z76).
+
+DEATH LOOK-BACK (paired, 95% CI; * = outside)
+  won: R look-back - live board           T10 +0.0002 ±0.0002    T20 +0.0021 ±0.0010*
+  R_def       T20 a game: drain_damage 1.515, treasures_made 0.295
+  R_nolook    T20 a game: drain_damage 1.156, treasures_made 0.296
+  won: K look-back - live board           T10 +0.0007 ±0.0005*   T20 +0.0030 ±0.0015*
+  K_def       T20 a game: damage 58.042
+  K_nolook    T20 a game: damage 57.440
+  won: A look-back - live board           T10 +0.0001 ±0.0003    T20 +0.0007 ±0.0005*
+  A_def       T20 a game: damage 64.400
+  A_nolook    T20 a game: damage 64.330
+  won: S look-back - live board           T10 +0.0001 ±0.0002    T20 +0.0075 ±0.0028*
+  S_def       T20 a game: cards_drawn 14.747, blood_made 4.200
+  S_nolook    T20 a game: cards_drawn 14.456, blood_made 3.921
+
+RENDMAW'S VAULT HOLD
+  won: doubler - never                    T10 -0.0003 ±0.0003*   T20 -0.0011 ±0.0007*
+  won: always - never                     T10 -0.0050 ±0.0012*   T20 -0.0102 ±0.0028*
+  won: doubler - always                   T10 +0.0047 ±0.0012*   T20 +0.0091 ±0.0028*
+  won: this batch - before it             T10 -0.0001 ±0.0003    T20 +0.0012 ±0.0012*
+  R_def       T20 a game: vault_activations 0.063, treasures_made 0.295
+  R_vnever    T20 a game: vault_activations 0.061, treasures_made 0.288
+  R_valways   T20 a game: vault_activations 0.062, treasures_made 0.288
+
+SHILGENGAR
+  won: routed - direct                    T10 +0.0004 ±0.0003*   T20 +0.0015 ±0.0008*
+  won: finality exiles - dies             T10 -0.0001 ±0.0001    T20 -0.0057 ±0.0018*
+  won: this batch - before it             T10 +0.0004 ±0.0004*   T20 +0.0069 ±0.0030*
+  S_def       T20 a game: lifegain_triggers 4.467, finality_exiled 0.423, blood_made 4.200
+  S_noroute   T20 a game: lifegain_triggers 3.396, finality_exiled 0.424, blood_made 4.189
+  S_nofin     T20 a game: lifegain_triggers 4.687, finality_exiled 0.000, blood_made 4.350
+  S_old       T20 a game: lifegain_triggers 3.342, finality_exiled 0.000, blood_made 3.977
+
+LOREHOLD'S GOLDSPAN
+  won: targeted Treasure - none           T10 +0.0000 ±0.0003    T20 -0.0003 ±0.0005 
+  L_def       T20 a game: goldspan_target_treasures 0.018, treasures_made 4.815
+  L_notarget  T20 a game: goldspan_target_treasures 0.000, treasures_made 4.797

@@ -205,6 +205,12 @@ SCRIPTED_RENDMAW = {
     # since §0z47 the Elephant trigger, on the one opponent spell the model
     # puts on your turn (a counterspell) -- `engine.march_elephant`
     "March of the World Ooze",
+    # "As an additional cost to cast this spell, sacrifice a creature. Draw
+    # two cards." `engine.village_rites`, which PAYS its {B} since §0z70 and
+    # sacrifices a token through `on_creature_death`. It sat in KNOWN_BLIND
+    # through all of that; the triage back-test (§0z66) found it and §0z78
+    # moved it.
+    "Village Rites",
 }
 
 # Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
@@ -285,6 +291,19 @@ SCRIPTED_LOREHOLD = {
     # second cast from hand, since §0z55. It was BLIND while the second cast
     # could not happen.
     "Approach of the Second Sun",
+    # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78); the triage back-test (§0z66)
+    # proved the engine acts on all three ---
+    # Enlightened Tutor: `resolve_spell`'s "tutor" branch puts an artifact or
+    # enchantment ON TOP, with a state-dependent pick (`tutor_policy`).
+    # Land Tax: the upkeep fetch of up to three basics to hand. "An opponent
+    # controls more lands than you" is read as `lands < min(turn, 10)`, the
+    # §4 abstraction -- the pod has no lands to count.
+    # Dawn's Truce: held up in `protection_cards` and spent by
+    # `opponents.try_protect` to blank one removal event -- the rule every
+    # protection spell in the project uses (Boros Charm and Mother of Runes
+    # above, Heroic Intervention in rendmaw). The gift's card to an opponent
+    # is the §4 abstraction: the pod has no hand.
+    "Enlightened Tutor", "Land Tax", "Dawn's Truce",
 }
 
 # Reviewed 2026-09-03 against the oracle audit. Membership here is a claim
@@ -588,6 +607,14 @@ PARTLY_MODELLED = {
             "better, which is §0u's shape -- so both are understated by the "
             "same amount and both rows are FLOORS. The 5/5 flying deathtouch "
             "body IS modelled. §0z26.",
+        # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
+        "Lurrus of the Dream-Den":
+            "MODELLED: the 3/2 lifelink body -- in this deck every hit is a "
+            "lifegain event -- and its hybrid cost, which pays and counts "
+            "for devotion (§0z52). NOT: 'once during each of your turns, you "
+            "may cast a permanent spell with mana value 2 or less from your "
+            "graveyard', the card's engine. (Companion does not apply in "
+            "the 99.) A floor.",
     },
     "rendmaw": {
         "Scrap Trawler":
@@ -600,6 +627,34 @@ PARTLY_MODELLED = {
             "Ring, the signets, Idol of Oblivion) is ever destroyed, and "
             "tokens never reach the graveyard. That is the pod model's limit "
             "(§4), not the card's, and it makes this row a FLOOR. §7.",
+        # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). The triage back-test
+        # (§0z66) proved the engine acts on each; every missing clause below
+        # understates. Oracle text read from Scryfall the same day. ---
+        "Sakura-Tribe Elder":
+            "MODELLED: the 1/1 body, and its 'ramp' tag, which moves it up "
+            "the cast order on turns 1-5. NOT: 'Sacrifice this creature: "
+            "search for a basic land, put it onto the battlefield tapped' -- "
+            "the whole of the card. It neither ramps nor dies for Blood "
+            "Artist or the Plunderer, so the row is a floor.",
+        "Overwhelming Stampede":
+            "MODELLED: '+X/+X until end of turn, X = the greatest power among "
+            "creatures you control' (the 'stampede' script). NOT: trample -- "
+            "`opponents.damage_through` prices a chump block as stopping the "
+            "whole attacker, the same floor engine.py names for its 7/7 "
+            "trampling Demons.",
+        "Gloomshrieker":
+            "MODELLED: the 2/1 menace body (MENACE, §0z61). NOT: 'When this "
+            "creature enters, return target permanent card from your "
+            "graveyard to your hand' -- a floor. Nor 'if this creature would "
+            "die, exile it instead', which points the OTHER way (a death "
+            "trigger, and a reanimation target, the card would not give) and "
+            "is bounded by one death a game; rendmaw does not implement the "
+            "`exiled_instead_of_dying` hook shilgengar introduced in §0z75.",
+        "Hagra Mauling":
+            "MODELLED: the back face, Hagra Broodpit (enters tapped, {T}: add "
+            "{B}), played when the engine needs a land. NOT: the front face's "
+            "'Destroy target creature', which has no target in an opponent "
+            "model whose creatures are a count (§4). A floor.",
     },
     "azusa": {
         "Bane of Progress":
@@ -625,14 +680,57 @@ PARTLY_MODELLED = {
             "invisible for the pod, which has no graveyard (§4), so that mode "
             "understates. Condemnation also needs vote control to land at all "
             "under the adversarial `opp_vote_policy` default.",
+        # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). The vote is a clause of
+        # its own: `voting.council` / `voting.dilemma` cast it correctly, and
+        # Grudge Keeper, Model of Unity and the extra-vote creatures read it.
+        # What each card DOES with the result needs opposing permanents,
+        # spells or hands (§4), and every one of those effects helps you, so
+        # each row is a floor. ---
+        "Split Decision":
+            "MODELLED: the will-of-the-council vote. NOT: countering or "
+            "copying the target instant or sorcery -- the pod casts no spell "
+            "on your turn for it to target, beyond the one counterspell "
+            "`march_elephant` models. A floor.",
+        "Trial of a Time Lord":
+            "MODELLED: the chapter IV vote. NOT: chapters I-III's 'exile "
+            "target nontoken creature an opponent controls', nor the vote's "
+            "effect on those cards -- the pod's creatures are a count (§4). "
+            "A floor.",
+        "Bite of the Black Rose":
+            "MODELLED: the vote. NOT: sickness ('creatures your opponents "
+            "control get -2/-2') or psychosis ('each opponent discards two "
+            "cards') -- the pod's creatures are a count with no toughness, "
+            "and it has no hand (§4). A floor.",
+        "Vault 11: Voter's Dilemma":
+            "MODELLED: chapter I's 1/1 Human Soldier per opponent, and ONE "
+            "vote. NOT: chapters II and III are two votes and the script "
+            "casts one; and neither vote's effect (destroy the most-voted "
+            "creature, or everyone draws) -- the pod has no creature to vote "
+            "for (§4). A floor.",
+        "Capital Punishment":
+            "MODELLED: the council's dilemma vote. NOT: 'each opponent "
+            "sacrifices a creature for each death vote and discards a card "
+            "for each taxes vote' -- the pod has no creature objects and no "
+            "hand (§4). A floor.",
+        "Expropriate":
+            "MODELLED: an extra turn per time vote -- the half that wins "
+            "games. NOT: 'for each money vote, gain control of a permanent "
+            "owned by the voter', which needs opposing permanents to steal "
+            "(§4). Understates, and badly. A floor.",
+        "Council's Judgment":
+            "MODELLED: the vote. NOT: 'exile each permanent with the most "
+            "votes' -- no nonland permanent you don't control exists to vote "
+            "for (§4). A floor.",
     },
     "lorehold": {
         "Goldspan Dragon":
             "Staged 2026-09-26 (§0z69). MODELLED: the 4/4 flying haste body, "
             "a Treasure whenever it attacks, and Treasures tapping for TWO "
-            "(`lorehold.available_mana`'s `per`). NOT: 'or becomes the target "
-            "of a spell' -- the pod's spot removal does target it in this "
-            "model and makes no Treasure, so the row is a floor by those.",
+            "(`lorehold.available_mana`'s `per`), and since §0z77 'or becomes "
+            "the target of a spell' when the pod's spot removal picks it "
+            "(0.018 Treasures a game). NOT: the same trigger when "
+            "`try_protect` blanks the removal -- that path names no target "
+            "-- nor when your own spells target it. A floor by those.",
         "Volcanic Vision":
             "The RECURSION half is implemented (2026-09-13, §0z19): it "
             "returns the largest instant or sorcery from the graveyard to "
@@ -652,6 +750,66 @@ PARTLY_MODELLED = {
             "rather than unimplemented: this opponent model has no hand to "
             "count (§4). Mode 1 is the stronger half against a full grip, so "
             "this row is a FLOOR. §0f.",
+        # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78) ---
+        "Dragon's Rage Channeler":
+            "MODELLED: 'whenever you cast a noncreature spell, surveil 1' "
+            "(bins a land off the top above `surveil_land_floor`), and "
+            "delirium's flying (`opponents.flying_of`). NOT: delirium's "
+            "+2/+2, nor 'attacks each combat if able' -- a drawback, but the "
+            "engine attacks with it whenever that is good anyway. A floor.",
+        "Pinnacle Monk":
+            "MODELLED: the 2/2 body, and the back face, Mystic Peak (enters "
+            "tapped; the pay-3-life untapped option is not taken). NOT: "
+            "prowess, nor 'When this creature enters, return target instant "
+            "or sorcery card from your graveyard to your hand' -- in a "
+            "miracle deck, the half that matters. A floor.",
+    },
+    "shilgengar": {
+        # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). Each is a modelled body
+        # -- flying from decks/_evasion.py -- with an unmodelled ability that
+        # helps you. ---
+        "Serra's Emissary":
+            "MODELLED: the 7/7 flier. NOT: 'You and creatures you control "
+            "have protection from the chosen card type' -- against the pod's "
+            "removal and its combat, the best clause on the card. A floor.",
+        "Angel of Serenity":
+            "MODELLED: the 5/6 flier. NOT: 'exile up to three other target "
+            "creatures from the battlefield and/or creature cards from "
+            "graveyards' -- no opposing creature to exile (§4), and the "
+            "own-graveyard trick (exile three, get them back to hand when it "
+            "leaves) is not taken. A floor.",
+        "Angel of Despair":
+            "MODELLED: the 5/5 flier. NOT: 'When this creature enters, "
+            "destroy target permanent' -- no opposing permanent (§4). A "
+            "floor.",
+        "Angel of the Ruins":
+            "MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile "
+            "of up to two artifacts and/or enchantments (no opposing "
+            "permanent, §4), nor Plainscycling {2}, which would turn a "
+            "seven-drop in a short game into a land. A floor.",
+        "Angelic Arbiter":
+            "MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell "
+            "this turn can't attack; each who attacked can't cast spells' -- "
+            "the pod's attacks and spells are rates, not per-opponent turn "
+            "records. A restriction on the pod only helps you. A floor.",
+        "Twilight Shepherd":
+            "MODELLED: the 5/5 flying vigilance body. NOT: its ETB 'return to "
+            "your hand all cards put into your graveyard from the "
+            "battlefield this turn', nor persist. A floor.",
+        "Herald of War":
+            "MODELLED: the 3/3 flier. NOT: 'whenever this creature attacks, "
+            "put a +1/+1 counter on it', nor the Angel-and-Human discount "
+            "per counter -- in an Angel deck, the card. A floor.",
+        "Agadeem's Awakening // Agadeem, the Undercrypt":
+            "MODELLED: the back face, played as a land. NOT: the front "
+            "face's X-spell mass reanimation, largely redundant here with "
+            "Shilgengar's own ultimate and the deck's other recursion. A "
+            "floor.",
+        "Malakir Rebirth // Malakir Mire":
+            "MODELLED: the back face, played as a land. NOT: the front "
+            "face's 'you lose 2 life; until end of turn, that creature gains "
+            "\"when this creature dies, return it to the battlefield\"' -- "
+            "there is no removal-in-response window to react in. A floor.",
     },
 }
 # ---------------------------------------------------------------------------
@@ -901,36 +1059,26 @@ KNOWN_BLIND = {
         'Burnished Hart',
         "Eyeblight's Ending",
         'Filigree Familiar',
-        'Gloomshrieker',
-        'Hagra Mauling',
         'Haywire Mite',
         'Lignify',
         'Massacre Wurm',
         'Midnight Reaper',
         'Nameless Inversion',
-        'Overwhelming Stampede',
         'Pygmy Kavu',
         'Reap',
-        'Sakura-Tribe Elder',
         'Shigeki, Jukai Visionary',
-        'Village Rites',
         'Whip of Erebos',
     },
     "lorehold": {
         'Bolt Bend',
         'Call Forth the Tempest',
         'Chaos Warp',
-        "Dawn's Truce",
-        "Dragon's Rage Channeler",
-        'Enlightened Tutor',
         'Gamble',
         'Generous Gift',
         'Hexing Squelcher',
         'Improvisation Capstone',
-        'Land Tax',
         'Path to Exile',
         'Perch Protection',
-        'Pinnacle Monk',
         'Restoration Seminar',
         'Sejiri Shelter',
         'Swords to Plowshares',
@@ -939,7 +1087,6 @@ KNOWN_BLIND = {
         'Anguished Unmaking',
         'Enlightened Tutor',
         'Fracture',
-        'Lurrus of the Dream-Den',
         'Path to Exile',
         'Phyrexian Reclamation',
         'Return to Dust',
@@ -959,7 +1106,9 @@ KNOWN_BLIND = {
         # project and it puts a third of this list here.
         "An Offer You Can't Refuse", "Path to Exile", "Swords to Plowshares",
         "Counterspell", "Dovin's Veto", "Muddle the Mixture", "Void Rend",
-        "Trap the Trespassers", "Council's Judgment",
+        "Trap the Trespassers",
+        # (Council's Judgment left for PARTLY_MODELLED on 2026-09-29, §0z78:
+        # its vote is cast and the vote payoffs see it.)
         # THE FIVE SWEEPERS LEFT THIS SET ON 2026-09-12. They were grouped
         # under "nothing that removes a permanent can be evaluated", which is
         # true of Path to Exile and was never quite true of a board wipe: a
@@ -980,23 +1129,17 @@ KNOWN_BLIND = {
         # Ward {3}, and an attack tax, cannot be expressed against an opponent
         # model whose combat is a damage share rather than declared attackers.
         "Ghostly Prison", "Propaganda",
-        # BLIND DESPITE HAVING ENGINE CODE -- the implementation is not the card:
-        #   Expropriate      the extra turns land, but "gain control of a
-        #                    permanent owned by the voter" needs opposing
-        #                    permanents to steal. UNDERSTATES, badly.
-        #   Torment of Hailfire  X is fixed at 6 and every opponent takes the life
-        #                    branch, because they have neither a hand nor
-        #                    permanents to give up. A CEILING, not an estimate.
-        #   Rhystic Study    "unless that player pays {1}" is a social fact this
-        #                    model cannot see; it is a flat draw rate.
-        #   Capital Punishment / Bite of the Black Rose / Split Decision /
-        #   Trial of a Time Lord / Vault 11  cast the vote correctly, so Grudge
-        #                    Keeper and Model of Unity see them -- but their
-        #                    EFFECTS (sacrifice, discard, counter, exile) all need
-        #                    opposing permanents or hands.
-        "Expropriate", "Torment of Hailfire", "Rhystic Study",
-        "Capital Punishment", "Bite of the Black Rose", "Split Decision",
-        "Trial of a Time Lord", "Vault 11: Voter's Dilemma",
+        # BLIND DESPITE HAVING ENGINE CODE -- the engine acts on both, and
+        # neither row is a floor, so neither can be PARTLY MODELLED. Each
+        # carries its reason in BLIND_BUT_LIVE below.
+        #   Torment of Hailfire  a CEILING, not an estimate.
+        #   Rhystic Study    a flat draw rate; the knob is the row.
+        # EXPROPRIATE AND THE FIVE VOTE CARDS LEFT THIS SET on 2026-09-29
+        # (§0z78). They sat here with a comment saying their implementation
+        # "is not the card" -- true -- but every missing clause UNDERSTATES,
+        # which is the definition of PARTLY MODELLED, and the triage back-test
+        # (§0z66) proved each plays differently from its matched blank.
+        "Torment of Hailfire", "Rhystic Study",
     },
     "azusa": {
         # removal / land destruction aimed at opponents -- this project
@@ -1039,10 +1182,10 @@ KNOWN_BLIND = {
         "Oblivion Stone",
     },
     "shilgengar": {
-        # removal, on a body or off one -- opponents' boards are a blocker
-        # count, so none of it has a legal target. Same limitation as every
-        # other deck in this project.
-        "Angel of Despair", "Angel of Serenity", "Angel of the Ruins",
+        # removal -- opponents' boards are a blocker count, so none of it has
+        # a legal target. Same limitation as every other deck in this project.
+        # (The three removal ANGELS left on 2026-09-29, §0z78: each is a
+        # modelled flying body, so they are PARTLY MODELLED now.)
         "Path to Exile", "Swords to Plowshares", "Anguished Unmaking",
         "Generous Gift", "Despark", "Vindicate", "Mortify", "Utter End",
         # HALF implemented, and the half that works is NOT the obvious one.
@@ -1066,26 +1209,70 @@ KNOWN_BLIND = {
         # landfall recursion + conditional haste unmodelled; a cheap enough
         # body that this is not worth the engine complexity
         "Bloodghast",
-        # cost reduction scaling with its own counters, plus an attack
-        # trigger -- a real engine piece, but not wired into
-        # cost_after_reduction; a body only for now
-        "Herald of War",
-        # static opponent-behaviour restriction; the model does not track
-        # per-opponent "cast a spell this turn" / "attacked this turn" at
-        # that granularity
-        "Angelic Arbiter",
-        # ETB regrowth-the-turn's-deaths and persist, both unmodelled
-        "Twilight Shepherd",
-        # protection from a chosen card type -- unmodelled, a floor; body only
-        "Serra's Emissary",
-        # X-spell mass reanimation, largely redundant with Shilgengar's own
-        # ultimate and Priest of Fell Rites / Sun Titan / Reya Dawnbringer;
-        # played almost entirely as its land back face in this model
-        "Agadeem's Awakening // Agadeem, the Undercrypt",
-        # reactive protection spell shaped like Flawless Maneuver but for ONE
-        # creature's death trigger -- no removal-in-response context to react
-        # to here; played almost entirely as its land back face
-        "Malakir Rebirth // Malakir Mire",
+        # (Herald of War, Angelic Arbiter, Twilight Shepherd, Serra's
+        # Emissary, and the two MDFCs Agadeem's Awakening and Malakir Rebirth
+        # left on 2026-09-29, §0z78: each has a modelled body or land face
+        # and every missing clause understates -- PARTLY MODELLED, with the
+        # clauses named there. Angel of Suffering stays, in BLIND_BUT_LIVE.)
+    },
+}
+
+
+# KNOWN_BLIND CARDS THE ENGINE ACTS ON, AND WHY THEY STAY BLIND (§0z78).
+#
+# The triage back-test (§0z66) found 33 KNOWN_BLIND cards that play
+# differently from a blank matched on cost, types, body, priority and threat
+# -- the engine does something with each. 27 moved: to SCRIPTED where the
+# text is modelled, to PARTLY_MODELLED where every missing clause
+# understates. These six did not, because PARTLY's contract is that a HIGH
+# row is evidence, and for each of them it is not: the modelled part is a
+# ceiling, or the unmodelled parts point both ways. "Not measured" is the
+# honest heading for a row like that.
+#
+# A CLAIM, SO IT IS CHECKED (§0q). `tests/test_blind_labels.py` runs the
+# identity test over every KNOWN_BLIND card and FAILS on a card the engine
+# acts on that is not listed here, and on a card listed here the engine no
+# longer acts on. The reason is printed under the card's row.
+BLIND_BUT_LIVE = {
+    "rendmaw": {
+        "Massacre Wurm":
+            "The engine acts on it and the row is still not evidence: the "
+            "6/5 body is modelled, the ETB '-2/-2 to creatures your "
+            "opponents control' is a one-sided wipe that ZEROES the pod's "
+            "creature count (overstates against big creatures), and 'whenever "
+            "a creature an opponent controls dies, that player loses 2 life' "
+            "is missing (understates). The one-sided-wipe rule in "
+            "symmetric_wipes' note keeps it here.",
+    },
+    "lorehold": {
+        "Sejiri Shelter":
+            "Played as its land face, and held up in `protection_cards`, "
+            "where `try_protect` blanks a whole removal EVENT. Right against "
+            "spot removal; a CEILING against a wipe, where the card saves "
+            "one creature.",
+        "Perch Protection":
+            "Held up in `protection_cards` and spent by `try_protect`, which "
+            "with the gift is faithful -- everything phases out. But the "
+            "gift is an opponent's EXTRA TURN, which the pod's clocks never "
+            "take (overstates), and the four 2/2 flying Birds are never made "
+            "(understates). Both directions, so not a floor.",
+    },
+    "tivit": {
+        "Torment of Hailfire":
+            "X is fixed at 6 and every opponent takes the life branch, "
+            "because the pod has neither a hand nor permanents to give up "
+            "(§4). A CEILING -- a real opponent pays with cards for a while.",
+        "Rhystic Study":
+            "'Unless that player pays {1}' is a social fact this model "
+            "cannot see: it draws a flat `rhystic_rate` a round. The row is "
+            "that knob, not the card.",
+    },
+    "shilgengar": {
+        "Angel of Suffering":
+            "The 5/3 flier is modelled. 'If damage would be dealt to you, "
+            "prevent it and mill twice that many cards' is not, and it cuts "
+            "both ways -- it stops every point of damage, and since §0z42 a "
+            "milled-out library loses the game. Not a floor.",
     },
 }
 
@@ -1162,6 +1349,18 @@ def check_scripted_coverage(deck_name, deck, partly):
               "PARTLY_MODELLED (with the reason) if it implements part of it, "
               "or to KNOWN_BLIND if it does not. The split is a CLAIM, and it "
               "has to be made deliberately.")
+    # BLIND_BUT_LIVE qualifies KNOWN_BLIND; it is not a fourth category. A
+    # name there that is not KNOWN_BLIND would print its reason under a
+    # heading that contradicts it (§0z78). Whether the engine really acts on
+    # each is a game-playing question, so tests/test_blind_labels.py asks it.
+    live = BLIND_BUT_LIVE.get(DECK, {})
+    wrong = {n for n in live if n not in KNOWN_BLIND[DECK]}
+    empty = {n for n, why in live.items() if not (why or "").strip()}
+    if wrong or empty:
+        raise SystemExit(
+            f"\nBLIND_BUT_LIVE[{DECK!r}] is inconsistent:\n"
+            + "".join(f"    {n}  (not in KNOWN_BLIND)\n" for n in sorted(wrong))
+            + "".join(f"    {n}  (no reason)\n" for n in sorted(empty)))
 
 
 def main(argv=None):
@@ -1344,6 +1543,9 @@ list of names to ablate() to score a package together.""")
             # collected in a footnote for that reason.
             if n in PARTLY:
                 for line in textwrap.wrap(PARTLY[n], 76):
+                    print(f"      {line}")
+            elif n in BLIND_BUT_LIVE.get(run.deck, {}):
+                for line in textwrap.wrap(BLIND_BUT_LIVE[run.deck][n], 76):
                     print(f"      {line}")
     return "".join(out)
 

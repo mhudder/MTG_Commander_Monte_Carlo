@@ -1,13 +1,14 @@
 # The ledger's states: a vocabulary for a 50-card funnel
 
-**STATUS: THE TRIAGE FLAGS ARE BUILT (2026-09-26, §0z66); THE STATES ARE
-NOT.** `Proposal.triage` carries LIVE / BLIND / DEFERRED, with
-`triage_clauses` and `triage_note`, and `pending.check_triage` enforces the
-"must record" column below. PREPARED, and splitting `Change` into SIMULATED +
-STAGED, are still proposals. This is the naming half of `docs/TRIAGE.md` —
-that file designs the *screen*, this one designs the *states a card passes
-through and the states it dies in*. CLAUDE.md queued item 23 is the live
-pointer for both.
+**STATUS: BUILT (2026-09-29, §0z79).** `Proposal.triage` carries LIVE /
+BLIND / DEFERRED, with `triage_clauses` and `triage_note`, enforced by
+`pending.check_triage` (§0z66). `Proposal.prepared` is PREPARED, naming the
+test that pins the card (`check_prepared`). `SIMULATED: list[Simulated]`
+holds head-to-heads with no decision, and every staged Change's evidence is
+its derived SIMULATED half (`Change.simulated`, `check_simulated`).
+`docs/STATUS.md` derives the funnel per state. This is the naming half of
+`docs/TRIAGE.md` — that file designs the *screen*, this one the *states a
+card passes through and the states it dies in*.
 
 The vocabulary is the owner's, written out. The one part of it that was an
 inference — splitting today's STAGED into SIMULATED + STAGED — **was put to
@@ -171,7 +172,7 @@ calibration this project already paid for.
 
 ---
 
-## What a first implementation would touch
+## What the implementation touched (built 2026-09-29, §0z79)
 
 * `edhmc/pending.py` — a `Prepared` state (or a flag on `Proposal` recording
   that the engine work and its test exist); `verdict` + the required-content

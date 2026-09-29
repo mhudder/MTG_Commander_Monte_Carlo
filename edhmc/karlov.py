@@ -244,8 +244,7 @@ class KarlovGame(BaseGame):
         # a +1/+1 counter on Edgar, he gains menace." This engine has no sac
         # outlet policy and menace is not blocked-around here, so the
         # activated half is a FLOOR. Named, not hidden.
-        if (perm is None or perm.card.name != "Edgar, Ancient Bloodlord") \
-                and self.has("Edgar, Ancient Bloodlord"):
+        if OPP.watching(self, "Edgar, Ancient Bloodlord", perm, another=True):
             for _ in range(int(n)):
                 gain_life(self, 1)
                 self.m["edgar_triggers"] += 1
@@ -264,17 +263,23 @@ class KarlovGame(BaseGame):
             self.m["tenacity_returns"] += 1
         for _ in range(n):
             # "target player loses 1 life and you gain 1 life" — a real drain.
-            if self.has("Blood Artist"):
+            # LOOK-BACK (CR 603.10a, §0z76): each source counts if it is on
+            # the battlefield, died earlier in the same wipe, or is the
+            # creature dying -- unless its text says ANOTHER. Oracle wording
+            # verified 2026-09-29.
+            if OPP.watching(self, "Blood Artist", perm):     # this or another
                 drain(self, 1)
             # "each opponent loses 1 life" — and you gain NOTHING, so this is
             # not a drain() and must not manufacture a Karlov trigger.
-            if self.has("Elas il-Kor, Sadistic Pilgrim"):
+            if OPP.watching(self, "Elas il-Kor, Sadistic Pilgrim", perm,
+                            another=True):
                 dealt = OPP.damage_each(self, 1)
                 self.m["damage"] += dealt
                 self.m["drain_damage"] += dealt
-            if self.has("Daxos, Blessed by the Sun"):
+            if OPP.watching(self, "Daxos, Blessed by the Sun", perm,
+                            another=True):
                 gain_life(self, 1)
-            if self.has("Syr Konrad, the Grim"):
+            if OPP.watching(self, "Syr Konrad, the Grim", perm, another=True):
                 self.m["damage"] += OPP.damage_each(self, 1)
 
 

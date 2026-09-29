@@ -123,6 +123,11 @@ Methodology that used to live at the end of this file is now
 | [0z72](#0z72) | FIXED | **Devotion is one rule** (hybrid-aware, `engine.devotion`), and Daxos's toughness reads it. Inert today: karlov bit-identical |
 | [0z73](#0z73) | FIXED | **Paying made WHEN a policy**: before the main phase the outlets cost rendmaw −0.0209; at the end step −0.0023, inside its bar. And Village Rites had been castable as a blank by the main phase |
 | [0z74](#0z74) | MEASURED | **Mystery Booster Commander Edition: nine cards, twelve deck pairs.** Pearl Collector (shilgengar +0.0229), Dyfed (+0.0220), Selenia (shilgengar +0.0206) lead at T20; Davvol is significantly NEGATIVE (−0.0051). Baselines bit-identical; the loyalty check found three unlisted walkers |
+| [0z75](#0z75) | FIXED | **Shilgengar's trigger lifegain reaches its payoffs** (Blood Artist, Zulaport, Vampiric Rites wrote `your_life` directly: +0.0015 at T20), **and finality counters exile** instead of dying (−0.0057 at T20 -- the rule's cost to a naive pilot; the policy half is open) |
+| [0z76](#0z76) | FIXED | **Death triggers look back in time** (CR 603.10a): one removal event, one reader, every engine. +0.0021 / +0.0030 / +0.0007 / +0.0075 at T20 to rendmaw / karlov / azusa / shilgengar. **Voldaren Bloodcaster had never fired** -- a name that never matched |
+| [0z77](#0z77) | FIXED | **Goldspan's targeted Treasure** (0.018 a game, inside its bar), and **the Treasure Vault held back -- which LOSES** (−0.0011 held with a doubler, −0.0102 always): the default stays "never" |
+| [0z78](#0z78) | FIXED | **The 33 KNOWN_BLIND cards the engine acts on, relabelled**: 4 SCRIPTED, 23 PARTLY with the missing clause named, 6 stay blind with a reason in `BLIND_BUT_LIVE`. `tests/test_blind_labels.py` holds it |
+| [0z79](#0z79) | BUILT | **PREPARED, and SIMULATED split from STAGED** (item 23). 23 unstaged head-to-heads -- the owner's open decisions among them -- were filed as MEASURED; they are `Simulated` records now |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -7791,6 +7796,219 @@ well below Bloodthirsty Conqueror's +0.0401 against the same cut.
 **Nothing is staged.** Whether any of these goes in is the owner's call
 (§0c), and a card that shares a slot with another in this table needs its own
 head-to-head against that one before the two are ranked.
+
+## 0z75. FIXED — shilgengar's trigger lifegain reaches its payoffs, and finality counters exile
+
+§0z74 found both and left them. **Blood Artist, Zulaport Cutthroat and
+Vampiric Rites wrote `your_life` directly**, so Archangel of Thune, Lyra and
+Selenia -- every "whenever you gain life" and every lifegain doubler -- never
+saw those gains. They call `ShilgengarGame.trigger_gain` now, which routes
+through `gain_life` (`gain_life_routed`, default True). **And a creature
+carrying a finality counter still died**: it fired every death trigger except
+Selenia's and went to the graveyard to be reanimated again. "If a creature
+with a finality counter on it would die, exile it instead" is now the
+optional protocol hook `g.exiled_instead_of_dying(perm)`, asked by the
+shared `opponents.destroy` and by shilgengar's own `sacrifice`: exiled, no
+trigger, no graveyard, counted as `finality_exiled` (`finality_exiles`,
+default True). A finality creature sacrificed to Shilgengar still makes its
+Blood -- that is a cost, not a death trigger. Text: Scryfall, 2026-09-29.
+
+N=15,000 paired, `diagnostics/run_lookback_finality.py`,
+`results/lookback_finality.txt`. `*` = outside its bar:
+
+| shilgengar | T10 | T20 |
+|---|---|---|
+| routed minus direct | +0.0004 ±0.0003 * | **+0.0015 ±0.0008 *** |
+| finality exiles minus dies | −0.0001 ±0.0001 | **−0.0057 ±0.0018 *** |
+| this whole batch minus its old knobs (both carry the Bloodcaster fix, §0z76) | +0.0004 ±0.0004 * | **+0.0069 ±0.0030 *** |
+
+Routing adds 1.07 lifegain events a game (3.40 → 4.47). Finality exiles
+0.42 creatures a game, and costs what the card text costs: those creatures
+no longer drain, make Blood through Bloodcaster, or come back.
+
+**THE FINALITY NUMBER IS THE NAIVE PILOT'S, SAID OUT LOUD (§0z42).** A rule
+that makes a creature's death worth nothing turns the sacrifice picker into
+a claim: it still chooses victims without looking at the counter, and a
+pilot would spend the finality creature before a normal one whose death
+drains and fills the graveyard. That policy is NOT built. The −0.0057 is the
+rule plus the old policy, and the policy half is open.
+
+**A PRE-EXISTING INCONSISTENCY, NAMED AND NOT CHANGED** (it moves the
+baseline): `aristocrats_step` returns early when no payoff is out and the
+commander is not cast, although its own comment says Vampiric Rites is
+"worth using alone". `tests/test_shilgengar_life_finality.py` pairs Rites
+with Pitiless Plunderer for that reason. (Rites itself is staged out, §0z69.)
+
+Pinned by `tests/test_shilgengar_life_finality.py`: 9 cases, 3 mutations,
+exact sets. ONE EXPECTATION WAS WRONG and is kept in the docstring: a hook
+that exiles every card also silences the death triggers of the ordinary
+creatures in three other cases -- which is what that mutation means -- and
+its first version ignored the knob, the same slip as §0z67's.
+
+## 0z76. FIXED — death triggers look back in time, and Voldaren Bloodcaster had never fired
+
+**CR 603.10a**: a leaves-the-battlefield ability "looks back in time" -- it
+triggers on the game as it was just before the event, so a source dying in
+the same event, or dying itself, still sees it. `opponents.destroy` removes
+creatures one at a time, and every engine's death handler counted its
+payoffs on the LIVE board: **a Blood Artist removed third in a wipe missed
+every death after it, and "whenever THIS creature or another creature dies"
+could never see its own death.** §0z69 named this as Pitiless Plunderer's
+floor; it was every death trigger in every engine.
+
+One event context and one reader, in shared code: `opponents.simultaneous(g)`
+marks a single event (both wipe paths open it; `destroy` records each
+casualty in `g.dying`), and `opponents.watching(g, name, perm, another)`
+counts a source as it was before the event. `another=True` is the wording
+"another creature" -- Pitiless Plunderer, Grim Haruspex, Syr Konrad, Elas
+il-Kor, Daxos, Edgar, Erebos, Requiem Angel. Self-inclusive: Blood Artist,
+Zulaport Cutthroat, Midnight Reaper (nontoken only), Titania ("a land", and
+under Ashaya she is one). Oracle text re-read for each, 2026-09-29.
+`death_lookback=False` restores the live board.
+
+| look-back minus live board, win rate | T10 | T20 | mechanism, T20 a game |
+|---|---|---|---|
+| rendmaw | +0.0002 ±0.0002 | **+0.0021 ±0.0010 *** | drain damage 1.16 → 1.52 |
+| karlov | **+0.0007 ±0.0005 *** | **+0.0030 ±0.0015 *** | damage 57.44 → 58.04 |
+| azusa | +0.0001 ±0.0003 | **+0.0007 ±0.0005 *** | Titania |
+| shilgengar | +0.0001 ±0.0002 | **+0.0075 ±0.0028 *** | draws +0.29, Blood +0.28 |
+
+**AND VOLDAREN BLOODCASTER HAD NEVER FIRED ONCE.** The engine asked
+`has("Voldaren Bloodcaster")`; the card is constructed as "Voldaren
+Bloodcaster // Bloodbat Summoner", and `g.board.names` holds full names. Its
+Blood-on-death trigger and its place in `aristocrats_step`'s payoff check
+were both dead code for the life of the deck. **This fix has no knob**, so
+shilgengar moves with every knob of this batch set to its old value --
+checked: HEAD plus the name fix alone is bit-identical to this tree with the
+old knobs, on all six decks. A scan of every `has` / `count` / `watching`
+call against the decks' constructed names found no other.
+
+**Leaves the tables where they were when no death happens in an event:**
+`check_unchanged_decks` with `death_lookback=False` (and this batch's other
+old values) against HEAD is bit-identical on all six decks but for the
+Bloodcaster fix above.
+
+Pinned by `tests/test_death_lookback.py`: 10 cases across rendmaw, karlov and
+shilgengar, the real `board_wipe` path, the knob and the closed context; 3
+mutations, exact sets.
+
+## 0z77. FIXED, AND ONE REVERTED BY MEASUREMENT — Goldspan's targeted Treasure; the Treasure Vault held back
+
+Two floors named in §0z68 and §0z69.
+
+**Goldspan Dragon: "whenever it attacks OR BECOMES THE TARGET OF A SPELL,
+create a Treasure."** The pod's spot removal is a spell and targets it, and
+made nothing. `opponents.spot_removal` now calls the optional protocol hook
+`g.on_targeted(victim)` before `destroy`; lorehold defines it
+(`goldspan_targeted`, default True). Not fired when `try_protect` blanks the
+removal -- that path names no target -- a floor kept in the card's PARTLY
+reason. **0.018 Treasures a game; +0.0000 ±0.0003 / −0.0003 ±0.0005.** Right
+by the text and inside its bar.
+
+**The Treasure Vault's {C} was spent in the main phase** (`can_pay` taps a
+colourless land first), so its end-step crack rarely had the Vault to
+sacrifice. `engine.vault_held` keeps it out of `rendmaw_mana`, by
+`vault_hold`: "never" (§0z68), "doubler" (held while a token doubler is out),
+"always". **Measured, holding LOSES:**
+
+| rendmaw, win rate | T10 | T20 |
+|---|---|---|
+| "doubler" minus "never" | −0.0003 ±0.0003 * | **−0.0011 ±0.0007 *** |
+| "always" minus "never" | **−0.0050 ±0.0012 *** | **−0.0102 ±0.0028 *** |
+
+and cracks go 0.061 → 0.063 a game. The floor §0z68 named was real; closing
+it is worth less than the one mana it withholds. **The default is "never"**
+-- the §0z68 behaviour, bit-identical -- and the hold is a knob. This is the
+section's reversal: the code was written for "doubler" and the measurement
+moved the default before anything shipped.
+
+Pinned by `tests/test_target_and_vault.py`: 8 cases, 3 mutations, exact sets.
+
+**THE REBUILD**
+
+## 0z78. FIXED — the 33 KNOWN_BLIND cards the engine acts on, relabelled (item 23)
+
+§0z66's back-test found 33 `KNOWN_BLIND` cards that play differently, seed for
+seed, from a blank matched on cost, types, body, priority and threat: the
+label said "the engine does not implement this card" and the engine did
+something with every one. Each was re-read against its oracle text (Scryfall,
+2026-09-29) and against the engine code that acts on it, card by card:
+
+| to | n | cards |
+|---|---|---|
+| SCRIPTED | 4 | Village Rites (rendmaw; paid and scripted since §0z70), Land Tax, Enlightened Tutor, Dawn's Truce (lorehold) |
+| PARTLY MODELLED | 23 | rendmaw: Sakura-Tribe Elder, Overwhelming Stampede, Gloomshrieker, Hagra Mauling. lorehold: Dragon's Rage Channeler, Pinnacle Monk. karlov: Lurrus. tivit: Split Decision, Trial of a Time Lord, Bite of the Black Rose, Vault 11, Capital Punishment, Expropriate, Council's Judgment. shilgengar: Serra's Emissary, Angel of Serenity, Angel of Despair, Angel of the Ruins, Angelic Arbiter, Twilight Shepherd, Herald of War, Agadeem's Awakening, Malakir Rebirth |
+| stays KNOWN_BLIND, with a reason | 6 | Massacre Wurm, Sejiri Shelter, Perch Protection, Torment of Hailfire, Rhystic Study, Angel of Suffering |
+
+**The rule that decided each one is PARTLY's contract: every missing clause
+must UNDERSTATE, so that a high row is evidence.** Each PARTLY reason names
+what is modelled and what is not, and is printed under the card's row. The six
+that stay blind fail that contract, and say how: Torment of Hailfire is a
+CEILING (the pod has nothing to sacrifice or discard); Rhystic Study's row is
+its `rhystic_rate` knob; Massacre Wurm, Perch Protection and Angel of
+Suffering each have unmodelled clauses pointing both ways; Sejiri Shelter is
+held up by `try_protect`, which blanks a whole wipe where the card saves one
+creature. Their reasons live in the new `ablation.BLIND_BUT_LIVE` and are
+printed under their MODEL-BLIND rows.
+
+**ONE PARTLY REASON NAMES A CLAUSE THAT OVERSTATES**, said out loud rather than
+hidden: Gloomshrieker's "if this creature would die, exile it instead" is not
+modelled in rendmaw, so it can fire one death trigger it should not. Bounded
+by one death a game, against an unmodelled ETB regrowth that is the card.
+
+**§0q, SO IT IS CHECKED.** `tests/test_blind_labels.py` runs the identity test
+over every KNOWN_BLIND card in every list (75 today): a card the engine acts
+on with no BLIND_BUT_LIVE reason fails, and so does a reason for a card the
+engine has stopped acting on. Three mutations, exact sets, written before the
+run and right on it. `check_scripted_coverage` refuses a BLIND_BUT_LIVE name
+that is not KNOWN_BLIND, or has no reason. The back-test now reports these
+cards as "reasoned" rather than LIVE.
+
+**Same card, two decks** (the standing rule): Enlightened Tutor is SCRIPTED in
+lorehold and stays KNOWN_BLIND in karlov, correctly -- karlov's copy has no
+script and plays identically to its blank. Land Tax is SCRIPTED in both.
+
+**A classification is a rendering change, not a simulation change** (§0z27's
+table): no number moved. Tables re-render from their caches; tivit's is
+re-rendered, the other five are rebuilt anyway for §0z75–§0z77.
+
+## 0z79. BUILT — the ledger's PREPARED flag, and SIMULATED split from STAGED (item 23)
+
+`docs/LEDGER_STATES.md` designed both; the owner confirmed the split on
+2026-09-22. What was built:
+
+| state | what it is in `edhmc/pending.py` | enforced by |
+|---|---|---|
+| PREPARED | `Proposal.prepared`: a flag naming the test that pins the card | `check_prepared` -- the named `tests/*.py` must exist |
+| SIMULATED | `SIMULATED: list[Simulated]` -- a head-to-head against a named cut with no decision; and, DERIVED, `Change.simulated` -- the evidence half of every staged, committed and withdrawn swap | `check_simulated` -- a staged swap has evidence; a record is complete; nothing is SIMULATED and staged at once |
+
+**THE EVIDENCE FOR THE OWNER'S OPEN DECISIONS WAS FILED AS MEASURED.** 23
+head-to-heads with no staging existed, and 20 of them lived in a Candidate's
+`win_rate` string -- the one state this ledger says is never decision
+evidence (§0c). Among them are all twelve §0z74 Mystery Booster rows, which
+are exactly the decisions the owner has on hold. They are `Simulated` records
+now, generated from those strings verbatim, plus three that only existed in
+other entries' prose: karlov's −Swiftfoot Boots +Bloodthirsty Conqueror and
++Alhammarret's Archive (§0z36), and lorehold's −Lightning Greaves +Goldspan
+(§0z53). The Candidates keep their rows; MEASURED still means a number
+against a blank.
+
+**Staging one MOVES it.** `check_simulated` fails while a head-to-head is in
+SIMULATED and CHANGES at once, so a staged swap's evidence is never written
+twice and cannot drift. `python -m edhmc.pending` prints SIMULATED between the
+staged and the measured, with each row's date -- which is the engine it was
+measured on. **The §0z74 rows predate §0z75-§0z77**, which moved three of
+their decks.
+
+`docs/STATUS.md`'s ledger table is the funnel now, one column per state in
+`LEDGER_STATES.md`'s order, derived. `check_docs` derives PREPARED from the
+field's declaration (it is a flag, not a list), so the vocabulary check
+covers seven states.
+
+Pinned by `tests/test_ledger_states.py`: 8 cases, 3 mutations, exact sets,
+one rule per function so each mutation removes exactly one. **Its first run
+failed a case and the CODE was wrong**: `check_prepared` split its note on
+whitespace, so "tests/x.py, 2026-09-29" kept a comma and refused a real test.
 
 ## How to read an ablation table
 

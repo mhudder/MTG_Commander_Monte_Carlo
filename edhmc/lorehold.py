@@ -56,6 +56,18 @@ GATED_SETTERS = {"Hidden Retreat"}
 # ---------------------------------------------------------------------------
 
 class LoreholdGame(BaseGame):
+    def on_targeted(self, perm):
+        """Goldspan Dragon: "Whenever Goldspan Dragon attacks OR BECOMES THE
+        TARGET OF A SPELL, create a Treasure token." (Scryfall, verified
+        2026-09-26.) The pod's spot removal targets it (§0z77);
+        `goldspan_targeted=False` restores the attack-only Goldspan that
+        every table before §0z77 was measured with."""
+        if perm.card.name == "Goldspan Dragon" \
+                and self.cfg.get("goldspan_targeted", True):
+            self.treasures += 1
+            self.m["treasures_made"] += 1
+            self.m["goldspan_target_treasures"] += 1
+
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
         # engine's defaults, and doing that to the CALLER'S dict let the
