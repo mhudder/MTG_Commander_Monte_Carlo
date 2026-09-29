@@ -97,7 +97,7 @@ class TivitGame(BaseGame):
         self.powerstones_tapped = 0     # of the pile; they untap each turn
         self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
-        self.saga_lore = {}             # id(Saga permanent) -> lore (§0z83)
+        self.saga_lore = {}             # id -> [Saga permanent, lore] (§0z83)
 
         cfg.setdefault("shroud_sources", ("Lightning Greaves",))
         cfg.setdefault("protection_cards", ())
@@ -910,8 +910,11 @@ def resolve(g, card):
         enter_loyalty(perm)          # Venser / Dyfed (§0z74)
         g.board.append(perm)
         if card.name in SAGA_CHAPTERS and g.cfg.get("saga_chapters", True):
-            g.saga_lore[id(perm)] = 1        # "As this Saga enters ... add a
-                                             #  lore counter": chapter I
+            # "As this Saga enters ... add a lore counter": chapter I. The
+            # PERMANENT is stored beside its lore, not just its id(): an id is
+            # reused once its object is freed, and a sacrificed Saga's id was
+            # handed to a Citizen token that then "had" lore (§0z83).
+            g.saga_lore[id(perm)] = [perm, 1]
         run_etb(g, perm)
     elif not card.is_land:
         g.graveyard.append(card)
@@ -932,13 +935,16 @@ def saga_step(g):
     """After the draw step: a lore counter on each voting Saga, its chapter,
     and the sacrifice after its last. A Saga that left the battlefield
     early simply stops -- its id is dropped with it."""
-    live = {id(p): p for p in g.board}
-    for key in [k for k in g.saga_lore if k not in live]:
+    # By IDENTITY of the stored permanent, never by key: a key is an id(),
+    # and an id can name a different object once its first is freed (§0z83).
+    for key in [k for k, (p, _) in g.saga_lore.items()
+                if not any(q is p for q in g.board)]:
         del g.saga_lore[key]
     for key in list(g.saga_lore):
-        perm = live[key]
-        g.saga_lore[key] += 1
-        chapter = g.saga_lore[key]
+        entry = g.saga_lore[key]
+        perm = entry[0]
+        entry[1] += 1
+        chapter = entry[1]
         votes, final = SAGA_CHAPTERS[perm.card.name]
         if chapter in votes:
             V.council(g)

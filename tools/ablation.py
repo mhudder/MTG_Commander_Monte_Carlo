@@ -211,6 +211,17 @@ SCRIPTED_RENDMAW = {
     # through all of that; the triage back-test (§0z66) found it and §0z78
     # moved it.
     "Village Rites",
+    # --- §0z83 / §0z85, 2026-09-29: the text is the engine's now ---
+    # Sakura-Tribe Elder (was PARTLY): its sacrifice for a basic, at the end
+    # step (`sakura_tribe_elder`). Gloomshrieker (was PARTLY): menace, the ETB
+    # return of a permanent card, and "exile it instead" (the
+    # `exiled_instead_of_dying` hook). Burnished Hart, Filigree Familiar and
+    # Whip of Erebos (all were KNOWN_BLIND): `burnished_hart`, the Familiar's
+    # 2 life and death draw, and the Whip's lifelink and its hasty,
+    # end-step-exiled reanimation. Solemn Simulacrum was SCRIPTED already --
+    # and wrong until §0z83 (a land entering, a card dying).
+    "Sakura-Tribe Elder", "Gloomshrieker", "Burnished Hart",
+    "Filigree Familiar", "Whip of Erebos",
 }
 
 # Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
@@ -304,6 +315,11 @@ SCRIPTED_LOREHOLD = {
     # above, Heroic Intervention in rendmaw). The gift's card to an opponent
     # is the §4 abstraction: the pod has no hand.
     "Enlightened Tutor", "Land Tax", "Dawn's Truce",
+    # Dragon's Rage Channeler (was PARTLY, §0z83): surveil, and delirium's
+    # flying AND +2/+2 through one `opponents.delirium`. "Attacks each combat
+    # if able" is unmodelled -- a DRAWBACK, and one the engine's attack
+    # policy mostly satisfies anyway, so its absence cannot flatter a low row.
+    "Dragon's Rage Channeler",
 }
 
 # Reviewed 2026-09-03 against the oracle audit. Membership here is a claim
@@ -311,6 +327,11 @@ SCRIPTED_LOREHOLD = {
 # the card. Cards whose text is still approximated belong in the blind group
 # even when they are not literally absent from the engine.
 SCRIPTED_KARLOV = {
+    # Lurrus of the Dream-Den (was PARTLY, §0z84): the 3/2 lifelink body, its
+    # hybrid cost and devotion (§0z52), and "once during each of your turns,
+    # cast a permanent spell with mana value 2 or less from your graveyard"
+    # (`karlov.lurrus_pool`). Companion does not apply in the 99.
+    "Lurrus of the Dream-Den",
     # Bolas's Citadel (staged 2026-09-12). `karlov.citadel_step` plays lands
     # and casts spells off the top paying LIFE = mana value, in forced library
     # order, and `citadel_land_step` spends the land drop on a land on top so
@@ -417,6 +438,12 @@ SCRIPTED_TIVIT = {
 # Avacyn's protection against opponent-sourced destroy() only, Skullclamp
 # restricted to token fodder, Voldaren Bloodcaster with no transform).
 SCRIPTED_SHILGENGAR = {
+    # Herald of War and Twilight Shepherd (both were PARTLY, §0z84). Herald:
+    # the flier, its attack counter, and the Angel-and-Human discount per
+    # counter (`herald_cost`). Shepherd: the flying vigilance body, its ETB
+    # regrowth of this turn's dead, and persist (`shepherd_persists`, reached
+    # through the `after_died` hook on both death paths).
+    "Herald of War", "Twilight Shepherd",
     # NOTE: the commander itself is never in `deck` (build() returns it
     # separately), so it does not belong in this set -- same as every other
     # deck's commander.
@@ -611,13 +638,6 @@ PARTLY_MODELLED = {
             "same amount and both rows are FLOORS. The 5/5 flying deathtouch "
             "body IS modelled. §0z26.",
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
-        "Lurrus of the Dream-Den":
-            "MODELLED: the 3/2 lifelink body -- in this deck every hit is a "
-            "lifegain event -- and its hybrid cost, which pays and counts "
-            "for devotion (§0z52). NOT: 'once during each of your turns, you "
-            "may cast a permanent spell with mana value 2 or less from your "
-            "graveyard', the card's engine. (Companion does not apply in "
-            "the 99.) A floor.",
     },
     "rendmaw": {
         "Scrap Trawler":
@@ -633,31 +653,25 @@ PARTLY_MODELLED = {
         # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). The triage back-test
         # (§0z66) proved the engine acts on each; every missing clause below
         # understates. Oracle text read from Scryfall the same day. ---
-        "Sakura-Tribe Elder":
-            "MODELLED: the 1/1 body, and its 'ramp' tag, which moves it up "
-            "the cast order on turns 1-5. NOT: 'Sacrifice this creature: "
-            "search for a basic land, put it onto the battlefield tapped' -- "
-            "the whole of the card. It neither ramps nor dies for Blood "
-            "Artist or the Plunderer, so the row is a floor.",
         "Overwhelming Stampede":
             "MODELLED: '+X/+X until end of turn, X = the greatest power among "
             "creatures you control' (the 'stampede' script). NOT: trample -- "
             "`opponents.damage_through` prices a chump block as stopping the "
             "whole attacker, the same floor engine.py names for its 7/7 "
             "trampling Demons.",
-        "Gloomshrieker":
-            "MODELLED: the 2/1 menace body (MENACE, §0z61). NOT: 'When this "
-            "creature enters, return target permanent card from your "
-            "graveyard to your hand' -- a floor. Nor 'if this creature would "
-            "die, exile it instead', which points the OTHER way (a death "
-            "trigger, and a reanimation target, the card would not give) and "
-            "is bounded by one death a game; rendmaw does not implement the "
-            "`exiled_instead_of_dying` hook shilgengar introduced in §0z75.",
         "Hagra Mauling":
             "MODELLED: the back face, Hagra Broodpit (enters tapped, {T}: add "
             "{B}), played when the engine needs a land. NOT: the front face's "
             "'Destroy target creature', which has no target in an opponent "
             "model whose creatures are a count (§4). A floor.",
+        # --- §0z85 ---
+        "Shigeki, Jukai Visionary":
+            "MODELLED: the 1/3, which stays home, and '{1}{G}, {T}, return "
+            "Shigeki to hand: reveal four, a land onto the battlefield "
+            "tapped, the rest to the graveyard' at the end step, while the "
+            "library holds more than `shigeki_min_library`. NOT: Channel -- "
+            "'{X}{X}{G}{G}, discard: return X nonlegendary cards from your "
+            "graveyard to your hand'. A floor.",
     },
     "azusa": {
         "Bane of Progress":
@@ -694,22 +708,11 @@ PARTLY_MODELLED = {
             "copying the target instant or sorcery -- the pod casts no spell "
             "on your turn for it to target, beyond the one counterspell "
             "`march_elephant` models. A floor.",
-        "Trial of a Time Lord":
-            "MODELLED: the chapter IV vote. NOT: chapters I-III's 'exile "
-            "target nontoken creature an opponent controls', nor the vote's "
-            "effect on those cards -- the pod's creatures are a count (§4). "
-            "A floor.",
         "Bite of the Black Rose":
             "MODELLED: the vote. NOT: sickness ('creatures your opponents "
             "control get -2/-2') or psychosis ('each opponent discards two "
             "cards') -- the pod's creatures are a count with no toughness, "
             "and it has no hand (§4). A floor.",
-        "Vault 11: Voter's Dilemma":
-            "MODELLED: chapter I's 1/1 Human Soldier per opponent, and ONE "
-            "vote. NOT: chapters II and III are two votes and the script "
-            "casts one; and neither vote's effect (destroy the most-voted "
-            "creature, or everyone draws) -- the pod has no creature to vote "
-            "for (§4). A floor.",
         "Capital Punishment":
             "MODELLED: the council's dilemma vote. NOT: 'each opponent "
             "sacrifices a creature for each death vote and discards a card "
@@ -724,6 +727,19 @@ PARTLY_MODELLED = {
             "MODELLED: the vote. NOT: 'exile each permanent with the most "
             "votes' -- no nonland permanent you don't control exists to vote "
             "for (§4). A floor.",
+        # --- rewritten §0z83: the votes are on their real chapters now ---
+        "Vault 11: Voter's Dilemma":
+            "MODELLED: chapter I's 1/1 Human Soldier per opponent, and the "
+            "votes of chapters II and III on the draw steps they fall on "
+            "(`saga_step`), then the sacrifice. NOT: either vote's effect -- "
+            "destroy the most-voted creature, or everyone draws -- because "
+            "the pod has no creature to vote for (§4). A floor.",
+        "Trial of a Time Lord":
+            "MODELLED: the chapter IV vote, on the third draw step after it "
+            "enters (`saga_step`), then the sacrifice. NOT: chapters I-III's "
+            "'exile target nontoken creature an opponent controls', nor the "
+            "vote's effect on those cards -- the pod's creatures are a count "
+            "(§4). A floor.",
     },
     "lorehold": {
         "Goldspan Dragon":
@@ -753,28 +769,26 @@ PARTLY_MODELLED = {
             "rather than unimplemented: this opponent model has no hand to "
             "count (§4). Mode 1 is the stronger half against a full grip, so "
             "this row is a FLOOR. §0f.",
-        # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78) ---
-        "Dragon's Rage Channeler":
-            "MODELLED: 'whenever you cast a noncreature spell, surveil 1' "
-            "(bins a land off the top above `surveil_land_floor`), and "
-            "delirium's flying (`opponents.flying_of`). NOT: delirium's "
-            "+2/+2, nor 'attacks each combat if able' -- a drawback, but the "
-            "engine attacks with it whenever that is good anyway. A floor.",
+        # --- rewritten §0z83 ---
         "Pinnacle Monk":
-            "MODELLED: the 2/2 body, and the back face, Mystic Peak (enters "
-            "tapped; the pay-3-life untapped option is not taken). NOT: "
-            "prowess, nor 'When this creature enters, return target instant "
-            "or sorcery card from your graveyard to your hand' -- in a "
-            "miracle deck, the half that matters. A floor.",
+            "MODELLED: the 2/2 body, its ETB 'return target instant or "
+            "sorcery card from your graveyard to your hand' (the largest, "
+            "Volcanic Vision's pick, `regrow_best_spell`), and the back face, "
+            "Mystic Peak (enters tapped; the pay-3-life untapped option is "
+            "not taken). NOT: prowess. A floor.",
     },
     "shilgengar": {
         # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). Each is a modelled body
         # -- flying from decks/_evasion.py -- with an unmodelled ability that
-        # helps you. ---
+        # helps you. (Herald of War and Twilight Shepherd went on to SCRIPTED
+        # in §0z84.) ---
         "Serra's Emissary":
-            "MODELLED: the 7/7 flier. NOT: 'You and creatures you control "
-            "have protection from the chosen card type' -- against the pod's "
-            "removal and its combat, the best clause on the card. A floor.",
+            "MODELLED: the 7/7 flier, and protection from the chosen card "
+            "type as `emissary_type` 'Creature' (§0z84): the pod's creatures "
+            "cannot block yours and their chip damage does not reach you. "
+            "NOT: the pod's kill clocks, which are rolls rather than combats "
+            "(§4) -- protection from creatures would stop a combat kill and "
+            "the model cannot tell which clock is one. A floor.",
         "Angel of Serenity":
             "MODELLED: the 5/6 flier. NOT: 'exile up to three other target "
             "creatures from the battlefield and/or creature cards from "
@@ -795,14 +809,6 @@ PARTLY_MODELLED = {
             "this turn can't attack; each who attacked can't cast spells' -- "
             "the pod's attacks and spells are rates, not per-opponent turn "
             "records. A restriction on the pod only helps you. A floor.",
-        "Twilight Shepherd":
-            "MODELLED: the 5/5 flying vigilance body. NOT: its ETB 'return to "
-            "your hand all cards put into your graveyard from the "
-            "battlefield this turn', nor persist. A floor.",
-        "Herald of War":
-            "MODELLED: the 3/3 flier. NOT: 'whenever this creature attacks, "
-            "put a +1/+1 counter on it', nor the Angel-and-Human discount "
-            "per counter -- in an Angel deck, the card. A floor.",
         "Agadeem's Awakening // Agadeem, the Undercrypt":
             "MODELLED: the back face, played as a land. NOT: the front "
             "face's X-spell mass reanimation, largely redundant here with "
@@ -1059,9 +1065,7 @@ KNOWN_BLIND = {
         'Beast Within',
         'Biotransference',
         'Bow of Nylea',
-        'Burnished Hart',
         "Eyeblight's Ending",
-        'Filigree Familiar',
         'Haywire Mite',
         'Lignify',
         'Massacre Wurm',
@@ -1069,8 +1073,6 @@ KNOWN_BLIND = {
         'Nameless Inversion',
         'Pygmy Kavu',
         'Reap',
-        'Shigeki, Jukai Visionary',
-        'Whip of Erebos',
     },
     "lorehold": {
         'Bolt Bend',

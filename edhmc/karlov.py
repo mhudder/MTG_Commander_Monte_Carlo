@@ -928,6 +928,21 @@ def reduce_cost(g, card):
     return cost
 
 
+def lurrus_pool(g):
+    """Lurrus of the Dream-Den: "Once during each of your turns, you may cast
+    a permanent spell with mana value 2 or less from your graveyard."
+    (Scryfall, 2026-09-29; §0z84.) The cards that permission can cast right
+    now: none if Lurrus is not out, or it was used this turn. The main phase
+    picks among these and the hand by the same priority -- no special
+    preference. `lurrus_recast=False` restores the body alone."""
+    if (not g.cfg.get("lurrus_recast", True)
+            or getattr(g, "lurrus_turn", -1) == g.turn
+            or not g.has("Lurrus of the Dream-Den")):
+        return []
+    return [c for c in g.graveyard
+            if c.is_permanent and not c.is_land and c.mv <= 2]
+
+
 def main_phase(g):
     while True:
         units = available_mana(g)
@@ -963,6 +978,11 @@ def main_phase(g):
             if mode is not None:
                 options.append((c, mode[2]))
                 mode_cost[id(c)] = mode[0]
+        for c in lurrus_pool(g):
+            mode = choose_mode(c, reduce_cost(g, c), units)
+            if mode is not None:
+                options.append((c, mode[2]))
+                mode_cost[id(c)] = mode[0]
         if not options:
             break
         card, pay = lookahead_pick(          # item 18; greedy unless enabled
@@ -970,7 +990,13 @@ def main_phase(g):
             cost_of=lambda it: mode_cost[id(it[0])], pay_of=lambda it: it[1])
         spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
-        g.hand.remove(card)
+        if any(c is card for c in g.hand):
+            g.hand.remove(card)
+        else:                        # Lurrus's permission, spent (§0z84)
+            at = next(i for i, c in enumerate(g.graveyard) if c is card)
+            g.graveyard.pop(at)
+            g.lurrus_turn = g.turn
+            g.m["lurrus_casts"] += 1
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         if OPP.countered(g, card, idx):

@@ -47,18 +47,23 @@ Foundry Inspector                     +0.50+-0.06         +0.41+-0.09        +0.
 Verdurous Gearhulk                    +0.48+-0.08         +0.39+-0.11        +0.0001+-0.0024       dmg
 Heroic Intervention                   +0.37+-0.05         +0.32+-0.07        +0.0028+-0.0015      both
 Steel Overseer                        +0.42+-0.07         +0.29+-0.09        +0.0011+-0.0020       dmg
+Gloomshrieker                         +0.33+-0.04         +0.28+-0.06        +0.0032+-0.0015      both
 Junk Diver                            +0.19+-0.04         +0.25+-0.07        +0.0040+-0.0017      both
 Blood Artist                          +0.09+-0.05         +0.24+-0.07        +0.0029+-0.0018      both
 The Great Henge                       -0.05+-0.06         +0.20+-0.10        +0.0049+-0.0024      both
+Filigree Familiar                     +0.21+-0.04         +0.19+-0.06        +0.0023+-0.0016      both
+Burnished Hart                        +0.18+-0.05         +0.19+-0.07        +0.0013+-0.0017       dmg
 Myr Retriever                         +0.09+-0.03         +0.16+-0.06        +0.0031+-0.0016      both
 Palladium Myr                         +0.16+-0.07         +0.13+-0.09        +0.0019+-0.0020       dmg
 Idol of Oblivion                      +0.01+-0.06         +0.11+-0.09        +0.0055+-0.0020      both
 Metallic Mimic                        +0.18+-0.06         +0.11+-0.08        +0.0013+-0.0018       dmg
+Whip of Erebos                        +0.16+-0.04         +0.10+-0.06        +0.0011+-0.0016       dmg
 Village Rites                         -0.03+-0.06         +0.06+-0.10        +0.0039+-0.0023       win
 Primal Vigor                          +0.02+-0.06         +0.06+-0.09        +0.0072+-0.0022       win
 Roaming Throne                        +0.20+-0.07         +0.04+-0.09        +0.0063+-0.0023       win
 Dryad of the Ilysian Grove            +0.07+-0.07         +0.02+-0.10        +0.0037+-0.0023       win
 Deathreap Ritual                      +0.01+-0.02         +0.01+-0.04        +0.0008+-0.0010        --
+Sakura-Tribe Elder                    -0.05+-0.03         -0.02+-0.04        -0.0003+-0.0008        --
 Enduring Vitality                     +0.05+-0.07         -0.04+-0.09        +0.0021+-0.0021        --
 Copper Myr                            -0.07+-0.06         -0.07+-0.09        +0.0017+-0.0018        --
 Leaden Myr                            -0.06+-0.06         -0.10+-0.09        +0.0020+-0.0018      both
@@ -86,13 +91,6 @@ Scrap Trawler                         +0.29+-0.04         +0.38+-0.07        +0.
       list (Sol Ring, the signets, Idol of Oblivion) is ever destroyed, and tokens
       never reach the graveyard. That is the pod model's limit (§4), not the
       card's, and it makes this row a FLOOR. §7.
-Gloomshrieker                         +0.33+-0.04         +0.28+-0.06        +0.0032+-0.0015      both
-      MODELLED: the 2/1 menace body (MENACE, §0z61). NOT: 'When this creature
-      enters, return target permanent card from your graveyard to your hand' -- a
-      floor. Nor 'if this creature would die, exile it instead', which points the
-      OTHER way (a death trigger, and a reanimation target, the card would not
-      give) and is bounded by one death a game; rendmaw does not implement the
-      `exiled_instead_of_dying` hook shilgengar introduced in §0z75.
 Toxic Deluge                          -0.01+-0.05         +0.12+-0.10        +0.0028+-0.0019      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
@@ -103,11 +101,12 @@ Culling Ritual                        +0.04+-0.05         +0.09+-0.08        +0.
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Sakura-Tribe Elder                    -0.05+-0.03         -0.02+-0.04        -0.0003+-0.0008        --
-      MODELLED: the 1/1 body, and its 'ramp' tag, which moves it up the cast order
-      on turns 1-5. NOT: 'Sacrifice this creature: search for a basic land, put it
-      onto the battlefield tapped' -- the whole of the card. It neither ramps nor
-      dies for Blood Artist or the Plunderer, so the row is a floor.
+Shigeki, Jukai Visionary              +0.04+-0.03         -0.02+-0.04        +0.0013+-0.0012       win
+      MODELLED: the 1/3, which stays home, and '{1}{G}, {T}, return Shigeki to
+      hand: reveal four, a land onto the battlefield tapped, the rest to the
+      graveyard' at the end step, while the library holds more than
+      `shigeki_min_library`. NOT: Channel -- '{X}{X}{G}{G}, discard: return X
+      nonlegendary cards from your graveyard to your hand'. A floor.
 Overwhelming Stampede                 -0.07+-0.08         -0.03+-0.12        -0.0003+-0.0025        --
       MODELLED: '+X/+X until end of turn, X = the greatest power among creatures
       you control' (the 'stampede' script). NOT: trample --
@@ -126,17 +125,13 @@ Massacre Wurm                         +0.28+-0.05         +0.57+-0.09        +0.
       loses 2 life' is missing (understates). The one-sided-wipe rule in
       symmetric_wipes' note keeps it here.
 Eyeblight's Ending                    +0.24+-0.04         +0.25+-0.06        +0.0025+-0.0016      both
-Filigree Familiar                     +0.21+-0.04         +0.19+-0.06        +0.0023+-0.0016      both
-Burnished Hart                        +0.18+-0.05         +0.19+-0.07        +0.0013+-0.0017       dmg
 Midnight Reaper                       +0.18+-0.03         +0.15+-0.05        -0.0010+-0.0014       dmg
 Bow of Nylea                          +0.17+-0.04         +0.14+-0.06        +0.0024+-0.0016      both
 Nameless Inversion                    +0.14+-0.03         +0.14+-0.05        +0.0019+-0.0014      both
 Beast Within                          +0.12+-0.03         +0.13+-0.05        +0.0001+-0.0011       dmg
 Reap                                  +0.09+-0.03         +0.13+-0.05        +0.0009+-0.0011       dmg
-Whip of Erebos                        +0.16+-0.04         +0.10+-0.06        +0.0011+-0.0016       dmg
 Assassin's Trophy                     +0.09+-0.03         +0.10+-0.05        +0.0008+-0.0010       dmg
 Haywire Mite                          +0.07+-0.03         +0.05+-0.05        +0.0025+-0.0012       win
 Pygmy Kavu                            +0.04+-0.04         +0.04+-0.05        -0.0005+-0.0012        --
 Lignify                               +0.13+-0.04         +0.03+-0.06        +0.0009+-0.0015        --
-Shigeki, Jukai Visionary              +0.04+-0.03         -0.02+-0.04        +0.0013+-0.0012       win
 Biotransference                       +0.01+-0.02         -0.04+-0.04        -0.0004+-0.0010       dmg

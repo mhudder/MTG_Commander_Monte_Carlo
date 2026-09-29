@@ -74,10 +74,10 @@ Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
 Vault 11: Voter's Dilemma             +0.83+-0.12         +0.98+-0.16        +0.0055+-0.0026      both
-      MODELLED: chapter I's 1/1 Human Soldier per opponent, and ONE vote. NOT:
-      chapters II and III are two votes and the script casts one; and neither
-      vote's effect (destroy the most-voted creature, or everyone draws) -- the
-      pod has no creature to vote for (§4). A floor.
+      MODELLED: chapter I's 1/1 Human Soldier per opponent, and the votes of
+      chapters II and III on the draw steps they fall on (`saga_step`), then the
+      sacrifice. NOT: either vote's effect -- destroy the most-voted creature, or
+      everyone draws -- because the pod has no creature to vote for (§4). A floor.
 Expropriate                           +0.15+-0.05         +0.69+-0.10        +0.0158+-0.0025      both
       MODELLED: an extra turn per time vote -- the half that wins games. NOT: 'for
       each money vote, gain control of a permanent owned by the voter', which
@@ -91,9 +91,10 @@ Capital Punishment                    +0.30+-0.08         +0.24+-0.09        +0.
       creature for each death vote and discards a card for each taxes vote' -- the
       pod has no creature objects and no hand (§4). A floor.
 Trial of a Time Lord                  +0.20+-0.09         +0.21+-0.12        +0.0003+-0.0019       dmg
-      MODELLED: the chapter IV vote. NOT: chapters I-III's 'exile target nontoken
-      creature an opponent controls', nor the vote's effect on those cards -- the
-      pod's creatures are a count (§4). A floor.
+      MODELLED: the chapter IV vote, on the third draw step after it enters
+      (`saga_step`), then the sacrifice. NOT: chapters I-III's 'exile target
+      nontoken creature an opponent controls', nor the vote's effect on those
+      cards -- the pod's creatures are a count (§4). A floor.
 Split Decision                        +0.17+-0.07         +0.15+-0.09        +0.0017+-0.0015      both
       MODELLED: the will-of-the-council vote. NOT: countering or copying the
       target instant or sorcery -- the pod casts no spell on your turn for it to

@@ -143,6 +143,7 @@ from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mull
                           lord_of_the_pit_upkeep, pearl_collector_trigger,
                           pearl_collector_lifelink, perpetual_lifelink)
 from edhmc import opponents as OPP
+from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
 
@@ -181,6 +182,11 @@ class ShilgengarGame(BaseGame):
         # library, hand, graveyard or board for the whole game, so no id is
         # recycled underneath this.
         self.finality: set[int] = set()
+        # Twilight Shepherd (§0z84): ids of cards put into the graveyard from
+        # the battlefield this turn (cleared by take_turn), and ids of
+        # Shepherds that have persisted once.
+        self.to_yard_this_turn: set[int] = set()
+        self.persisted: dict = {}
 
         cfg.setdefault("shroud_sources", ())
         cfg.setdefault("protection_cards",
@@ -355,6 +361,10 @@ class ShilgengarGame(BaseGame):
         # honours finality -- `exiled_instead_of_dying` keeps such a creature
         # from reaching this method at all -- and this check stays so that
         # `finality_exiles=False` reproduces the §0z74 engine exactly.
+        if perm is not None and not perm.is_token:
+            # "cards in your graveyard that were put there FROM THE
+            # BATTLEFIELD THIS TURN" -- Twilight Shepherd's ETB (§0z84).
+            self.to_yard_this_turn.add(id(perm.card))
         if (perm is not None and perm.card.name == "Selenia, the Cursed Heart"
                 and not perm.is_token and id(perm.card) not in self.finality):
             OPP.curse_opponent(self)
@@ -439,6 +449,8 @@ class ShilgengarGame(BaseGame):
             self.m["finality_exiled"] += 1
             return
         self.on_creature_death(1, perm)
+        if not perm.is_token:
+            self.after_died(perm)
 
     def aristocrats_step(self):
         """Once a turn: feed spare TOKENS (never real cards, never the 4/4
@@ -486,6 +498,66 @@ class ShilgengarGame(BaseGame):
             (p for p in self.board
              if p.card.is_creature and p.card is not self.commander),
             key=lambda p: (not self.returns_if_fed(p), -self.blood_yield(p)))
+
+    def herald_cost(self, card):
+        """Herald of War: "Angel spells and Human spells you cast cost {1}
+        less to cast for each +1/+1 counter on this creature." (Scryfall,
+        2026-09-29; §0z84.) Generic only, never below zero. Angels are the
+        `angel` tag this engine already reads; Humans the generated HUMAN
+        subtype set (§0z4). `herald_text=False` restores the printed cost."""
+        if not self.cfg.get("herald_text", True):
+            return card.cost
+        k = sum(max(0, p.counters) for p in self.board
+                if p.card.name == "Herald of War")
+        if not k or not ("angel" in card.tags or card.name in HUMAN):
+            return card.cost
+        cost = dict(card.cost)
+        cost["gen"] = max(0, cost.get("gen", 0) - k)
+        return cost
+
+    def after_died(self, perm):
+        """Optional protocol hook (§0z84): the dead creature's card is in the
+        graveyard now -- called by `opponents.destroy` after its graveyard
+        step, and by `sacrifice` below. `on_creature_death` runs BEFORE that
+        on the destroy path, so anything that moves the card back out
+        (persist) has to live here."""
+        self.shepherd_persists(perm)
+
+    def shepherd_persists(self, perm) -> bool:
+        """Twilight Shepherd's PERSIST: "When this creature dies, if it had no
+        -1/-1 counters on it, return it to the battlefield under its owner's
+        control with a -1/-1 counter on it." (§0z84.) A -1/-1 counter is
+        written as -1 on `counters` (the +1/+1 count; the two annihilate as
+        the rules say) and remembered in `persisted`, because a returned
+        Shepherd that later gains a +1/+1 counter still HAS had one.
+        A finality Shepherd never gets here: it was exiled (§0z75)."""
+        if (perm is None or perm.is_token
+                or perm.card.name != "Twilight Shepherd"
+                or not self.cfg.get("shepherd_text", True)
+                or id(perm) in self.persisted):
+            return False
+        at = next((i for i, c in enumerate(self.graveyard) if c is perm.card),
+                  None)
+        if at is None:                    # the card is not there to return
+            return False
+        self.graveyard.pop(at)
+        back = self.make_permanent(perm.card, sick=True, counters=-1)
+        self.persisted[id(back)] = back   # held, so the id is not reused
+        self.m["shepherd_persists"] += 1
+        self.creature_entered(back)
+        self.shepherd_etb()
+        return True
+
+    def shepherd_etb(self):
+        """Twilight Shepherd: "When this creature enters, return to your hand
+        all cards in your graveyard that were put there from the battlefield
+        this turn." (§0z84)"""
+        back = [c for c in self.graveyard if id(c) in self.to_yard_this_turn]
+        for c in back:
+            at = next(i for i, x in enumerate(self.graveyard) if x is c)
+            self.graveyard.pop(at)
+            self.hand.append(c)
+        self.m["shepherd_returns"] += len(back)
 
     def returns_if_fed(self, perm) -> bool:
         """Would the ultimate bring this creature back after it is fed?
@@ -826,6 +898,8 @@ class ShilgengarGame(BaseGame):
 
         if perm.card.is_creature:
             self.creature_entered(perm)
+        if card.name == "Twilight Shepherd" and self.cfg.get("shepherd_text", True):
+            self.shepherd_etb()
         if card.name == "Sun Titan":
             # "Whenever this creature enters OR ATTACKS" -- the ETB half; the
             # attack half is in combat().
@@ -878,7 +952,7 @@ class ShilgengarGame(BaseGame):
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
-                _m = choose_mode(c, c.cost, pool)
+                _m = choose_mode(c, self.herald_cost(c), pool)
                 pay = None if _m is None else _m[2]
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs
@@ -993,6 +1067,11 @@ class ShilgengarGame(BaseGame):
 
         for p in attackers:
             p.tapped = True
+            # Herald of War: "Whenever this creature attacks, put a +1/+1
+            # counter on it." (§0z84)
+            if p.card.name == "Herald of War" and self.cfg.get("herald_text", True):
+                p.counters += 1
+                self.m["herald_counters"] += 1
         # One attack at the whole pod; `dmg` comes back bounded at what could
         # have mattered. Lifelink below still reads `power_of`, not this.
         # `combat_hits` asks the pod which attackers CONNECTED (§0z74), for
@@ -1105,6 +1184,7 @@ class ShilgengarGame(BaseGame):
 def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
+    g.to_yard_this_turn.clear()          # Twilight Shepherd's "this turn"
     g.life_gained_this_turn = 0.0
     for p in g.board:
         p.tapped = False

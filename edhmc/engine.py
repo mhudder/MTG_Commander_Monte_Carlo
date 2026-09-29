@@ -1361,6 +1361,8 @@ class Game(BaseGame):
         Gloomshrieker can leave: the outlets that sacrifice NONTOKEN
         creatures (Baba Lysaga, Cauldron of Essence, Lord of the Pit) are not
         in it. Should one come back, its path must ask this too."""
+        if id(perm) in self.__dict__.get("whip_returned", ()):
+            return True           # Whip of Erebos's clause (§0z85)
         return (perm.card.name == "Gloomshrieker"
                 and self.cfg.get("gloomshrieker_text", True))
 
@@ -1403,6 +1405,13 @@ class Game(BaseGame):
         gainers = single + sum(1 for p in self.board
                                if p.card.name == "Cauldron of Essence")
         self.your_life += 1.0 * n * gainers
+
+        # Filigree Familiar: "When this creature dies, draw a card." NOT a
+        # "may" -- it draws even from a thin library (§0z85).
+        if (perm is not None and perm.card.name == "Filigree Familiar"
+                and self.cfg.get("familiar_text", True)):
+            self.draw(1)
+            self.m["familiar_draws"] += 1
 
         # Solemn Simulacrum: "When this creature dies, you may draw a card"
         # (§0z83). A "may", so declined when it would draw the last card --
@@ -2419,6 +2428,16 @@ def doll_stays_home(g, p: Permanent) -> bool:
             and g.cfg.get("doll_policy", "nest") == "nest")
 
 
+def shigeki_stays_home(g, p: Permanent) -> bool:
+    """Shigeki's ability needs {T} at your end step, so it does not attack
+    while `shigeki_text` is on -- a 1/3 into the pod is worth less than a
+    land a turn. Its first smoke run fired the ability ZERO times, because
+    the attack-with-everything policy had always tapped it first: §0z58's
+    Twitching Doll, again (§0z85)."""
+    return (p.card.name == "Shigeki, Jukai Visionary"
+            and g.cfg.get("shigeki_text", True))
+
+
 def twitching_doll_nest(g):
     """End of your turn: an untapped, non-sick Doll taps for mana nobody
     spends, for the counter. It untaps in your untap step, so this costs
@@ -2621,6 +2640,13 @@ def run_etb(g: Game, perm: Permanent):
             g.graveyard.remove(best)
             g.hand.append(best)
             g.m["gloomshrieker_returns"] += 1
+    if perm.card.name == "Filigree Familiar" and g.cfg.get("familiar_text", True):
+        # "When this creature enters, you gain 2 life. When this creature
+        # dies, draw a card." (Scryfall, 2026-09-29; §0z85.) The draw is in
+        # `Game.on_creature_death`. It was a 2/2 with nothing (§0z78's
+        # "inert" list: a channel existed and nothing fired it).
+        g.your_life += 2
+        g.m["familiar_life"] += 2
     if perm.card.name == "Solemn Simulacrum" and g.cfg.get("solemn_text", True):
         # "When this creature enters, you may search your library for a basic
         # land card, put that card onto the battlefield tapped, then shuffle.
@@ -3083,6 +3109,112 @@ def sakura_tribe_elder(g) -> None:
         g.m["elder_sacrifices"] += 1
 
 
+def burnished_hart(g) -> None:
+    """Burnished Hart: "{3}, Sacrifice this creature: Search your library for
+    up to two basic land cards, put them onto the battlefield tapped, then
+    shuffle." (Scryfall, 2026-09-29; §0z85.) It was a 2/2 with a cast-order
+    tag. POLICY: at your end step, on mana the turn left, while a basic is
+    left to find -- the Elder's policy, and the Vault's mana (§0z68).
+    `hart_fetch=False` restores the 2/2."""
+    if not g.cfg.get("hart_fetch", True):
+        return
+    for p in [p for p in g.board if p.card.name == "Burnished Hart"]:
+        if not any(c.is_land and c.name in BASIC_LANDS for c in g.library):
+            return
+        units = rendmaw_mana(g)
+        if not pay_from(g, units, {"gen": 3}):
+            return
+        rendmaw_sacrifice(g, p)      # aristocrats, graveyard, recursion
+        fetch_basics(g, 2)
+        g.m["hart_sacrifices"] += 1
+
+
+def shigeki(g) -> None:
+    """Shigeki, Jukai Visionary: "{1}{G}, {T}, Return Shigeki to its owner's
+    hand: Reveal the top four cards of your library. You may put a land card
+    from among them onto the battlefield tapped. Put the rest into your
+    graveyard." (Scryfall, 2026-09-29; §0z85.) A 1/3 with nothing until now.
+
+    POLICY: at your end step, once it can tap, on the turn's leftover mana,
+    while the library holds more than `shigeki_min_library` (15) cards --
+    four cards a use is a decking clock (§0z42). The main phase recasts it
+    from hand like any other card. NOT MODELLED: Channel, {X}{X}{G}{G},
+    discard it to return X nonlegendary cards -- a floor.
+    `shigeki_text=False` restores the 1/3."""
+    if not g.cfg.get("shigeki_text", True):
+        return
+    for p in [p for p in g.board if p.card.name == "Shigeki, Jukai Visionary"]:
+        if p.tapped or p.sick or id(p) in g.__dict__.get("whip_returned", ()):
+            continue                 # a Whip creature would be exiled instead
+        if len(g.library) <= g.cfg.get("shigeki_min_library", 15):
+            return
+        units = rendmaw_mana(g)
+        if not pay_from(g, units, {"gen": 1, "G": 1}):
+            return
+        g.board.remove(p)
+        if not p.is_token:
+            g.hand.append(p.card)
+        top = [g.library.pop() for _ in range(4)]
+        land = next((c for c in top if c.is_land), None)
+        for c in top:
+            if c is land:
+                g.board.append(Permanent(card=c, tapped=True, sick=True))
+            else:
+                g.graveyard.append(c)
+        g.m["shigeki_digs"] += 1
+        g.m["shigeki_lands"] += land is not None
+
+
+def whip_of_erebos(g) -> None:
+    """Whip of Erebos: "{2}{B}{B}, {T}: Return target creature card from your
+    graveyard to the battlefield. It gains haste. Exile it at the beginning
+    of the next end step. If it would leave the battlefield, exile it instead
+    of putting it anywhere else. Activate only as a sorcery." (Scryfall,
+    2026-09-29; §0z85.)
+
+    POLICY: before combat, the highest-power creature card, so the haste
+    swing is the payoff; its ETB fires too (a Grave Titan's Zombies stay).
+    The mana comes out of the turn BEFORE the postcombat main phase, which is
+    §0z73's cost and why the default is measured. `whip_reanimate=False`
+    keeps the lifelink and drops this. The returned creature is exiled at
+    your end step, and `Game.exiled_instead_of_dying` exiles it if it would
+    die first -- no death trigger, no graveyard."""
+    if not (g.cfg.get("whip_text", True) and g.cfg.get("whip_reanimate", True)):
+        return
+    whip = next((p for p in g.board if p.card.name == "Whip of Erebos"
+                 and not p.tapped), None)
+    pool = [c for c in g.graveyard if c.is_creature]
+    if whip is None or not pool:
+        return
+    units = rendmaw_mana(g)
+    if not pay_from(g, units, {"gen": 2, "B": 2}):
+        return
+    whip.tapped = True
+    best = max(pool, key=lambda c: (c.power, c.priority))
+    at = next(i for i, c in enumerate(g.graveyard) if c is best)
+    g.graveyard.pop(at)
+    perm = Permanent(card=best, sick=False, base_p=best.power,
+                     base_t=best.toughness)
+    g.board.append(perm)
+    # The PERMANENT is kept, not just its id(): an id is reused once its
+    # object is freed, and tivit's first saga code crashed on exactly that
+    # (§0z83). Holding the object keeps its id reserved.
+    g.__dict__.setdefault("whip_returned", {})[id(perm)] = perm
+    run_etb(g, perm)
+    g.m["whip_returns"] += 1
+
+
+def whip_end_step(g) -> None:
+    """"Exile it at the beginning of the next end step." (§0z85)"""
+    ids = g.__dict__.get("whip_returned")
+    if not ids:
+        return
+    for p in [p for p in g.board if id(p) in ids]:
+        g.board.remove(p)
+        g.m["whip_exiled"] += 1
+    ids.clear()
+
+
 def end_step_outlets(g) -> None:
     """The sacrifice outlets on the mana the main phase left (§0z73)."""
     if outlets_early(g):
@@ -3225,7 +3357,7 @@ def make_everywhere(g: Game):
 def combat(g: Game):
     attackers = [p for p in g.board
                  if is_battlefield_creature(g, p) and not p.tapped and not p.sick
-                 and not doll_stays_home(g, p)]
+                 and not doll_stays_home(g, p) and not shigeki_stays_home(g, p)]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
@@ -3274,8 +3406,10 @@ def combat(g: Game):
     #
     # So a lifelinking body's defensive value here is nil, and any card whose
     # whole job is a bigger life total is MODEL-BLIND.
+    # Whip of Erebos: "Creatures you control have lifelink." (§0z85)
+    whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
     for p in attackers:
-        if p.card.lifelink:
+        if p.card.lifelink or whip:
             g.your_life += g.power_of(p)
             g.m["lifelinked"] += g.power_of(p)
 
@@ -3326,6 +3460,7 @@ def take_turn(g: Game):
     play_land(g)
     twitching_doll_sacrifice(g)     # sorcery speed, before anything taps it
     main_phase(g, precombat=True)   # anthems / pump only
+    whip_of_erebos(g)               # sorcery speed, before the swing, §0z85
     empty_mana_pool(g)
     combat(g)
     empty_mana_pool(g)
@@ -3338,6 +3473,9 @@ def take_turn(g: Game):
     empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
     sakura_tribe_elder(g)           # its sacrifice, at the end step, §0z83
+    burnished_hart(g)               # {3}, sacrifice: two basics, §0z85
+    shigeki(g)                      # {1}{G}, tap, bounce: dig four, §0z85
+    whip_end_step(g)                # the Whip's creature is exiled, §0z85
     treasure_vault(g)               # spare mana into Treasures, §0z68
 
     g.m["mana_floated"] += len(available_mana(g))

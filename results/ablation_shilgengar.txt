@@ -45,8 +45,10 @@ Smothering Tithe                      +0.70+-0.09         +1.00+-0.15        +0.
 Marble Diamond                        +0.78+-0.09         +0.97+-0.14        +0.0040+-0.0025      both
 Kokusho, the Evening Star             +0.68+-0.06         +0.84+-0.11        +0.0041+-0.0023      both
 Phyrexian Arena                       +0.46+-0.07         +0.79+-0.14        +0.0085+-0.0027      both
+Twilight Shepherd                     +0.44+-0.04         +0.78+-0.09        +0.0049+-0.0021      both
 Elesh Norn, Grand Cenobite            +0.49+-0.05         +0.72+-0.10        +0.0076+-0.0024      both
 Bishop of Wings                       +0.23+-0.04         +0.71+-0.09        +0.0093+-0.0022      both
+Herald of War                         +0.44+-0.04         +0.70+-0.08        +0.0047+-0.0019      both
 Youthful Valkyrie                     +0.54+-0.05         +0.69+-0.09        +0.0062+-0.0020      both
 Giada, Font of Hope                   +0.70+-0.05         +0.69+-0.09        +0.0022+-0.0020      both
 Emeria Shepherd                       +0.31+-0.03         +0.69+-0.08        +0.0037+-0.0018      both
@@ -78,13 +80,11 @@ Agadeem's Awakening // Agadeem, the Undercrypt        +0.65+-0.08         +1.00+
       mass reanimation, largely redundant here with Shilgengar's own ultimate and
       the deck's other recursion. A floor.
 Serra's Emissary                      +0.50+-0.05         +0.99+-0.10        +0.0087+-0.0023      both
-      MODELLED: the 7/7 flier. NOT: 'You and creatures you control have protection
-      from the chosen card type' -- against the pod's removal and its combat, the
-      best clause on the card. A floor.
-Twilight Shepherd                     +0.44+-0.04         +0.78+-0.09        +0.0049+-0.0021      both
-      MODELLED: the 5/5 flying vigilance body. NOT: its ETB 'return to your hand
-      all cards put into your graveyard from the battlefield this turn', nor
-      persist. A floor.
+      MODELLED: the 7/7 flier, and protection from the chosen card type as
+      `emissary_type` 'Creature' (§0z84): the pod's creatures cannot block yours
+      and their chip damage does not reach you. NOT: the pod's kill clocks, which
+      are rolls rather than combats (§4) -- protection from creatures would stop a
+      combat kill and the model cannot tell which clock is one. A floor.
 Angelic Arbiter                       +0.35+-0.04         +0.71+-0.08        +0.0075+-0.0020      both
       MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell this turn
       can't attack; each who attacked can't cast spells' -- the pod's attacks and
@@ -98,10 +98,6 @@ Angel of Serenity                     +0.32+-0.04         +0.71+-0.09        +0.
 Angel of Despair                      +0.35+-0.04         +0.70+-0.08        +0.0075+-0.0021      both
       MODELLED: the 5/5 flier. NOT: 'When this creature enters, destroy target
       permanent' -- no opposing permanent (§4). A floor.
-Herald of War                         +0.44+-0.04         +0.70+-0.08        +0.0047+-0.0019      both
-      MODELLED: the 3/3 flier. NOT: 'whenever this creature attacks, put a +1/+1
-      counter on it', nor the Angel-and-Human discount per counter -- in an Angel
-      deck, the card. A floor.
 Angel of the Ruins                    +0.30+-0.04         +0.64+-0.08        +0.0065+-0.0020      both
       MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
       artifacts and/or enchantments (no opposing permanent, §4), nor Plainscycling

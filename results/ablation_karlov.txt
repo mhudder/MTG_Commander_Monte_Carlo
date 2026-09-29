@@ -58,6 +58,7 @@ Land Tax                              +0.63+-0.13         +0.61+-0.17        +0.
 Auriok Champion                       +0.58+-0.11         +0.61+-0.14        +0.0067+-0.0026      both
 Fountain of Renewal                   +0.55+-0.07         +0.59+-0.11        +0.0051+-0.0023      both
 Syr Konrad, the Grim                  +0.43+-0.06         +0.59+-0.09        +0.0024+-0.0019      both
+Lurrus of the Dream-Den               +0.48+-0.08         +0.55+-0.10        +0.0049+-0.0021      both
 Sol Ring                              +0.64+-0.15         +0.54+-0.18        +0.0052+-0.0031      both
 Pristine Talisman                     +0.53+-0.09         +0.51+-0.12        +0.0045+-0.0025      both
 Sanguine Bond                         +0.69+-0.13         +0.50+-0.18        +0.0252+-0.0034      both
@@ -78,12 +79,6 @@ PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Lurrus of the Dream-Den               +0.48+-0.08         +0.55+-0.10        +0.0049+-0.0021      both
-      MODELLED: the 3/2 lifelink body -- in this deck every hit is a lifegain
-      event -- and its hybrid cost, which pays and counts for devotion (§0z52).
-      NOT: 'once during each of your turns, you may cast a permanent spell with
-      mana value 2 or less from your graveyard', the card's engine. (Companion
-      does not apply in the 99.) A floor.
 Farewell                              -0.18+-0.08         -0.09+-0.11        +0.0007+-0.0023        --
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the

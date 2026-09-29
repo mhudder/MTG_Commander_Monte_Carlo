@@ -63,6 +63,7 @@ Double Vision                         +0.16+-0.13         +0.42+-0.17        +0.
 Arcane Bombardment                    +0.29+-0.14         +0.34+-0.19        +0.0045+-0.0040      both
 Ruby Medallion                        +0.42+-0.15         +0.29+-0.18        -0.0029+-0.0036       dmg
 Storm-Kiln Artist                     +0.28+-0.09         +0.27+-0.12        +0.0006+-0.0025       dmg
+Dragon's Rage Channeler               +0.18+-0.08         +0.21+-0.10        +0.0004+-0.0024       dmg
 Dawn's Truce                          +0.13+-0.08         +0.19+-0.11        +0.0015+-0.0021       dmg
 Mother of Runes                       +0.20+-0.08         +0.10+-0.10        +0.0007+-0.0020        --
 Lightning Greaves                     +0.11+-0.10         -0.08+-0.13        -0.0009+-0.0029        --
@@ -91,10 +92,10 @@ Borrowed Knowledge                    +0.69+-0.16         +0.79+-0.20        +0.
       count (§4). Mode 1 is the stronger half against a full grip, so this row is
       a FLOOR. §0f.
 Pinnacle Monk                         +0.37+-0.13         +0.36+-0.16        -0.0005+-0.0027       dmg
-      MODELLED: the 2/2 body, and the back face, Mystic Peak (enters tapped; the
-      pay-3-life untapped option is not taken). NOT: prowess, nor 'When this
-      creature enters, return target instant or sorcery card from your graveyard
-      to your hand' -- in a miracle deck, the half that matters. A floor.
+      MODELLED: the 2/2 body, its ETB 'return target instant or sorcery card from
+      your graveyard to your hand' (the largest, Volcanic Vision's pick,
+      `regrow_best_spell`), and the back face, Mystic Peak (enters tapped; the
+      pay-3-life untapped option is not taken). NOT: prowess. A floor.
 Volcanic Vision                       +0.33+-0.08         +0.35+-0.12        +0.0074+-0.0029      both
       The RECURSION half is implemented (2026-09-13, §0z19): it returns the
       largest instant or sorcery from the graveyard to hand and exiles itself. The
@@ -103,12 +104,6 @@ Volcanic Vision                       +0.33+-0.08         +0.35+-0.12        +0.
       blocker count with no toughness to compare a mana value against (§4). Both
       halves scale with the SAME choice of target, so the unmodelled half is
       largest exactly when the modelled one is: this row is a floor. §7.
-Dragon's Rage Channeler               +0.18+-0.08         +0.21+-0.10        +0.0004+-0.0024       dmg
-      MODELLED: 'whenever you cast a noncreature spell, surveil 1' (bins a land
-      off the top above `surveil_land_floor`), and delirium's flying
-      (`opponents.flying_of`). NOT: delirium's +2/+2, nor 'attacks each combat if
-      able' -- a drawback, but the engine attacks with it whenever that is good
-      anyway. A floor.
 Ondu Inversion                        -0.67+-0.18         -0.07+-0.22        -0.0029+-0.0042        --
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the

@@ -651,6 +651,12 @@ def destroy(g, perm, roll=None, destroys=None):
         # returned card must not be that card.
         if hasattr(g, "artifact_died"):
             g.artifact_died(perm.card)
+        # Optional protocol hook (§0z84): the card is in the graveyard NOW --
+        # `on_creature_death` ran before it got there. Persist lives in this
+        # hook because it moves the card back out.
+        after = getattr(g, "after_died", None)
+        if after is not None and perm.card.is_creature:
+            after(perm)
     return True
 
 
@@ -774,6 +780,21 @@ def flying_of(g, perm) -> bool:
         # types among cards in your graveyard."
         return delirium(g)
     return False
+
+
+def protected_from_creatures(g) -> bool:
+    """Serra's Emissary: "As this creature enters, choose a card type. You
+    and creatures you control have protection from the chosen card type."
+    (Scryfall, 2026-09-29; §0z84.) The choice is `emissary_type` --
+    "Creature", the usual pick at a Commander table, by default. What it
+    does here: the pod's creatures cannot block yours (`damage_through`),
+    and cannot deal combat damage to you (`incidental_damage`, which is also
+    the path the crown is lost on). NOT the clocks: an opponent's kill turn
+    is a roll, not a combat, and protection cannot answer it (§4) -- a
+    floor. Any other `emissary_type` is modelled as nothing."""
+    return (g.cfg.get("emissary_type", "Creature") == "Creature"
+            and any(p.card.name == "Serra's Emissary"
+                    for p in getattr(g, "board", ())))
 
 
 def delirium(g) -> bool:
@@ -904,6 +925,8 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     if defender is None:
         defender = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
     n_block, n_fly = _blocker_counts(g, defender)
+    if protected_from_creatures(g):
+        n_block = n_fly = 0          # Serra's Emissary (§0z84)
 
     fly, ground = [], []
     for k, p in enumerate(attackers):
@@ -1564,6 +1587,9 @@ def incidental_damage(g):
     share aimed at you is threat-weighted, same as removal and the clocks.
     """
     if g.result is not None or g.turn < g.cfg.get("first_attack_turn", 3):
+        return
+    if protected_from_creatures(g):
+        g.m["emissary_prevented_turns"] += 1   # §0z84
         return
     rate = g.cfg.get("incidental_rate", 0.45)
     mode = g.cfg.get("combat_targeting", "threat")

@@ -28,6 +28,9 @@ CASES
      of the next two draw steps; then it is sacrificed
   E  Trial of a Time Lord: its one vote on the THIRD draw step (chapter IV)
   F  `saga_chapters=False`: Vault 11 votes as it enters (the old engine)
+  P  REGRESSION: a lore entry whose Saga has left, keyed by an id a token
+     now holds -- the collision that crashed the first measurement with
+     KeyError 'Citizen token' -- is dropped: no crash, no vote
   G  lorehold Dragon's Rage Channeler: 3/3 with four card types in the
      graveyard, 1/1 with three
   H  Pinnacle Monk enters: the largest instant or sorcery comes back to hand
@@ -42,14 +45,19 @@ CASES
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   returns_if_fed ignores finality          -> A, B, C
-  saga_step does nothing                   -> D, E
+  saga_step does nothing                   -> D, E, P
+    (P was added after the first run, for the id-reuse crash; its set
+    entry was not updated with it, and the next mutation run said so. P
+    pins saga_step's prune, so a saga_step that does nothing must break
+    it -- the set was wrong, not the case.)
   delirium_bonus is always 0               -> G
   regrow_best_spell returns nothing        -> H
   fetch_basics fetches nothing             -> I, J, K
   rendmaw's Gloomshrieker is never exiled  -> L
 
 UNMUTATED (§0z15): F is the knob reproducing the old engine; M is the
-neighbour the exile must not touch.
+neighbour the exile must not touch; P is a regression with no seam of its
+own -- it pins the identity check in `saga_step`.
 """
 import random
 import sys
@@ -178,6 +186,21 @@ def case_tivit():
     T.resolve(g, vault)
     check("F saga_chapters off: Vault 11 votes as it enters",
           g.m["votes_cast"] > 0, True)
+    g = tgame()
+    T.resolve(g, vault)
+    saga = next(p for p in g.board if p.card is vault)
+    g.board.remove(saga)
+    tok = EN.Permanent(card=body("Citizen token", 1, 1), sick=False,
+                       is_token=True)
+    g.board.append(tok)
+    g.saga_lore = {id(tok): [saga, 1]}          # the collision, forced
+    try:
+        T.saga_step(g)
+        outcome = (g.saga_lore, g.m["saga_votes"], tok in g.board)
+    except (KeyError, ValueError) as exc:
+        outcome = f"raised {exc!r}"
+    check("P a stale lore entry on a reused id is dropped",
+          outcome, ({}, 0, True))
 
 
 # ------------------------------------------------------------------ lorehold
@@ -295,7 +318,7 @@ def main() -> int:
             ({"A", "B", "C"}, SH.ShilgengarGame, "returns_if_fed",
              lambda self, p: not p.is_token),
         "saga_step does nothing":
-            ({"D", "E"}, T, "saga_step", lambda g: None),
+            ({"D", "E", "P"}, T, "saga_step", lambda g: None),
         "delirium_bonus is always 0":
             ({"G"}, L.LoreholdGame, "delirium_bonus", lambda self, p: 0),
         "regrow_best_spell returns nothing":
