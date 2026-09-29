@@ -159,7 +159,7 @@ python -m tests.test_treasures --mutate            # 7 mutations, exact sets
 python -m tests.test_commander_damage --mutate     # 5 mutations, exact sets
 python -m tests.test_triage --mutate               # 6 mutations, exact sets
 python -m tests.test_commander_aim --mutate        # 5 mutations, exact sets
-python -m tests.test_sac_outlets --mutate          # 2 mutations, exact sets
+python -m tests.test_sac_outlets --mutate          # 4 mutations, exact sets
 python -m tests.test_sieve_real_fuel --mutate      # 5 mutations, exact sets
 python -m tests.test_devotion --mutate             # 2 mutations, exact sets
 ```
