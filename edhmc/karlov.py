@@ -79,6 +79,8 @@ DRAIN_ON_GAIN = ("Cliffhaven Vampire", "Marauding Blight-Priest",
 
 
 def drain_loop_partner(g) -> bool:
+    """A DRAIN_ON_GAIN card is on the battlefield, so Exquisite Blood loops
+    (§0z90)."""
     return (g.cfg.get("exquisite_drain_loop", True)
             and any(g.has(x) for x in DRAIN_ON_GAIN))
 

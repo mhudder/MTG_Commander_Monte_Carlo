@@ -137,6 +137,10 @@ Methodology that used to live at the end of this file is now
 | [0z86](#0z86) | FIXED | **Time Sieve's sign flip was the horizon** (tivit counted extra turns, lorehold did not); the pod's clock also read `g.turn`, so extra turns brought kills closer. Sieve 9 → 11 now +0.0218 / +0.0151 |
 | [0z87](#0z87) | MEASURED | **Indestructible priced from a census of the six lists** (spot 0.45, wipe 0.54, not 0.60). Moves no deck by more than 0.001; indestructibility is worth at most 0.008 on any card |
 | [0z88](#0z88) | DECIDED | **The owner moved Ancient Greenwarden's cut from Sylvan Awakening to Oblivion Stone.** Paired: +0.0033 ±0.0024 at T20, which is Sylvan Awakening against a blank -- the Stone is KNOWN_BLIND |
+| [0z89](#0z89) | FIXED | **Two recorded claims that had stopped being true**: Scrap Trawler fires on the noncreature artifacts the pod destroys (SCRIPTED now); ARCHITECTURE's Gloomshrieker row. And the Rogue's Passage note §0z91 made false |
+| [0z90](#0z90) | FIXED | **Exquisite Blood's general clause, and Blood + Cleric / Blight-Priest / Cliffhaven is an infinite loop** the engine never saw: +0.0389 ±0.0032 at T20 to karlov |
+| [0z91](#0z91) | FIXED | **Tivit's combat trigger fired when Tivit was blocked**: it needs Tivit to connect now, −0.0109 ±0.0018 at T20 |
+| [0z92](#0z92) | FIXED | **Trample**: a blocked trampler assigns the excess. rendmaw +0.0067, azusa +0.0063 at T20; `blocker_toughness` barely matters |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8445,6 +8449,159 @@ every table from its cache, and azusa's cache has no row for Sylvan
 Awakening, so C fails for azusa until the table is rebuilt. That failure is
 the check working -- the table no longer describes the list -- and it is left
 failing rather than taught to skip a stale deck.
+
+## 0z89. FIXED — two recorded claims that had stopped being true
+
+§0z13's shape twice: a sentence saying what the engine cannot do, written
+while it was true and never re-read.
+
+1. **SCRAP TRAWLER WAS LABELLED PARTLY ON A FALSE PREMISE.** Its PARTLY
+   reason, and `Game.artifact_died`'s docstring, said the pod "only ever
+   kills permanents that are creatures right now", so no noncreature
+   artifact -- Sol Ring, the signets, Idol of Oblivion -- is ever destroyed
+   and the Trawler's "another artifact" clause is live only for artifact
+   creatures. **The pod's `ae_removal` destroys noncreature artifacts**, and
+   one call disproved the claim: Idol of Oblivion destroyed by it went to the
+   graveyard and the Trawler returned Sol Ring (`trawler_returns` 1). Every
+   live sacrifice path in rendmaw either eats tokens (which are not cards and
+   correctly reach no graveyard) or routes through `artifact_died`; three
+   that do not -- Cauldron of Essence, Skullclamp and Baba Lysaga eating a
+   NONTOKEN creature -- belong to cards in no list, and the docstring now
+   names them. **Scrap Trawler is SCRIPTED.** Its numbers did not move; the
+   label did, and the rendmaw table was re-rendered from its cache (the
+   Trawler and Overwhelming Stampede, §0z92, change section; 0 numbers
+   changed).
+2. **`docs/ARCHITECTURE.md` said Gloomshrieker had no hook** for "if this
+   creature would die, exile it instead". It got `exiled_instead_of_dying`
+   in §0z83; the protocol row says so now.
+
+A THIRD, FOUND WHILE CLOSING §0z91: `ablation.py`'s note on Rogue's Passage
+said implementing it "would be worth ~nothing until combat tracks damage per
+attacker", because Tivit's trigger already treated Tivit as unblockable.
+§0z91 made combat track it, so the Passage's absence is a real gap from that
+commit on. The note says so; the card is not implemented.
+
+## 0z90. FIXED — Exquisite Blood's general clause, and a second infinite loop the engine never saw
+
+> Exquisite Blood / Bloodthirsty Conqueror — "Whenever an opponent loses
+> life, you gain that much life."
+> Starscape Cleric / Marauding Blight-Priest / Cliffhaven Vampire —
+> "Whenever you gain life, each opponent loses 1 life." (Scryfall, 2026-09-30)
+
+Both Blood cards were modelled as a COMBO DETECTOR only: they closed the loop
+with Sanguine Bond, Vito and Enduring Tenacity and did nothing else all game.
+Two things were missing, and the second is larger than a floor:
+
+1. **THE GENERAL CLAUSE** (`exquisite_general`). Every opponent who loses
+   life gains you that much, one lifegain EVENT per trigger and per copy --
+   which feeds Karlov's counters, Voice, Thune, Heliod and every other
+   per-event payoff in the deck. It needed a trigger nothing had:
+   `opponents.lost_life(g, losses)` is called by every site that lowers an
+   opponent's life, after the event lands, and calls the optional hook
+   `g.on_opponent_lost_life` once per opponent (ARCHITECTURE's protocol
+   table). Only karlov defines it.
+2. **BLOOD + A "EACH OPPONENT LOSES 1" CARD IS AN INFINITE LOOP**
+   (`exquisite_drain_loop`, `win_route` 5). Gain life, each opponent loses
+   1, Blood gains 1 per opponent -- three events -- and each fires every
+   drain card again. All three drain cards are in karlov's list, committed
+   since v1/v2, and the engine never knew they were combo pieces.
+
+Karlov's staged list, N=15,000 paired, seeds 5000.. (off = both knobs off,
+which reproduces HEAD; `diagnostics/run_engine_gaps.py`,
+`results/engine_gaps_20260930.txt`):
+
+| | T10 | T20 | a game, T20 |
+|---|---|---|---|
+| the general clause | **+0.0367 ±0.0030** | **+0.0389 ±0.0032** | 4.47 Blood gains |
+| the drain loop only | **+0.0299 ±0.0027** | **+0.0303 ±0.0027** | 0.063 loop wins |
+| both (the default) | **+0.0367 ±0.0030** | **+0.0389 ±0.0032** | 2.19 gains, 0.069 loop wins |
+
+**"BOTH" EQUALS "GENERAL" IN EVERY CELL, AND THAT IS THE CHECK.** With the
+general clause on and loop detection off, Blood and a drain card recurse
+through the real triggers until every opponent is dead: the loop plays itself
+out. Explicit detection ends the same games one step sooner and records the
+route. The two arms agreeing to four decimals at both horizons says the
+detector and the mechanism describe the same thing. The general clause's
+value beyond the loop is about +0.009 (continuous lifegain, and the Sanguine
+Bond family's loops starting from events the detector already caught).
+
+**THE LARGEST SINGLE ENGINE CORRECTION TO KARLOV'S BASELINE SINCE POD v3.**
+Every karlov row measured before it understates both Blood cards and the three
+drain cards, which were loop pieces the whole time -- §0z27's shape at the
+scale of a package. **The staged `−Soulmender +Bloodthirsty Conqueror` rests
+on a number measured without either clause**; it is a floor now, and the
+§0z81-style re-measure belongs after the rebuild.
+
+**THE NAIVE PILOT** (CLAUDE.md's §0z42 rule: a fix that makes a win possible
+makes old policy a claim). The priorities were tuned (§0z44) on an engine
+where the drain cards were ordinary drains; casting Exquisite Blood or a drain
+card earlier may now be worth more than the table says. Not measured here;
+it is the first question for karlov's next priority sweep.
+
+Pinned by `tests/test_engine_gaps.py` A-F.
+
+## 0z91. FIXED — Tivit's combat trigger fired when Tivit was blocked
+
+> Tivit, Seller of Secrets — "Whenever Tivit enters or deals combat damage to
+> a player, ..." (the dilemma vote)
+
+`tivit.combat` fired the trigger on `dmg > 0 and Tivit attacked`, so a
+chump-blocked Tivit still voted whenever anything else got through. The pod
+already reports which attackers connected (`combat_hits`, §0z74, built for
+Seluma); tivit asks now (`tivit_trigger_connects`). The legacy flat-haircut
+pod has no blocks to report and keeps the old reading.
+
+| tivit, staged list, N=15,000 paired | T10 | T20 |
+|---|---|---|
+| the trigger needs Tivit to connect | **−0.0090 ±0.0016** | **−0.0109 ±0.0018** |
+
+1.89 combat triggers a game at T20. **A correction that costs win rate is
+still a correction**: the old reading was a free dilemma every time a token
+connected past a blocked commander. The flip side is that ROGUE'S PASSAGE
+({4}, {T}: target creature can't be blocked), unimplemented and KNOWN_BLIND
+with a note saying it "would be worth ~nothing until combat tracks damage per
+attacker", now buys exactly this trigger back -- a real gap from this commit
+(§0z89). Pinned by `tests/test_engine_gaps.py` G-I.
+
+## 0z92. FIXED — trample
+
+A blocked attacker was stopped in full, so a 6/6 trampler blocked by a 1/1
+dealt nothing. `opponents.trample_of(g, perm)` is trample RIGHT NOW:
+
+* the generated `_evasion.TRAMPLE` set, creatures only and unconditional
+  (Cultivator Colossus, Rampaging Baloths, Verdurous Gearhulk -- every card in
+  the lists with the keyword; the generator excludes grants and conditions,
+  menace's rule, and nothing was excluded wrongly);
+* Lord of the Pit, a token, by name (Thomil, a held candidate);
+* the whole team for the turn after Overwhelming Stampede (rendmaw) or
+  Craterhoof Behemoth (azusa) -- "creatures you control gain trample";
+* a land animated with trample -- azusa's `animate_lands` had carried a
+  `trample` flag nothing read (§0z12's loaded gun; the only card that sets it,
+  Nissa, Worldwaker, is cut, and her text does grant trample).
+
+`chump` then stops only `min(power, blocker_toughness x blockers)` of a
+trampler, and a defender with one blocker now blocks where it stops the most:
+a 4/4 beside a 6/6 trampler, not the trampler. With no trample on the board
+every block is what it was, bit for bit.
+
+**`blocker_toughness` (2) IS A JUDGEMENT ABOUT BODIES THE POD DOES NOT HAVE**
+-- the 2/2 the goaded Birds already assume -- and it barely matters:
+
+| staged list, N=15,000 paired, T20 | toughness 1 | 2 (default) | 3 |
+|---|---|---|---|
+| rendmaw | **+0.0076 ±0.0020** | **+0.0067 ±0.0019** | **+0.0055 ±0.0017** |
+| azusa | **+0.0066 ±0.0019** | **+0.0063 ±0.0018** | **+0.0059 ±0.0018** |
+
+At T10: rendmaw +0.0025 ±0.0008, azusa +0.0069 ±0.0014 (default). The three
+settings sit inside each other's bars in both decks, so the knob is said out
+loud and does not decide anything. Overwhelming Stampede's only gap was
+trample, so it is SCRIPTED now (rendmaw's table re-rendered from its cache,
+0 numbers changed). NOT modelled: a blocked trampler's excess is not credited
+as "connected" for `combat_hits` or commander damage -- no commander and no
+connect-trigger creature in any list tramples. The pilot's lethal PLAN still
+prices a chump as stopping the whole attacker, so it under-reaches with
+tramplers -- a conservative pilot, resolved by the real `damage_through`.
+Pinned by `tests/test_engine_gaps.py` J-O.
 
 ## How to read an ablation table
 

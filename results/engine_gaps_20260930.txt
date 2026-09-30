@@ -1,0 +1,23 @@
+# python -m diagnostics.run_engine_gaps 15000 OUT && --report OUT   (staged lists, seeds 5000..19999, 2026-09-30)
+KARLOV
+  general  T10 +0.0367 ±0.0030*   T20 +0.0389 ±0.0032*   exquisite_gains 4.466
+  loop     T10 +0.0299 ±0.0027*   T20 +0.0303 ±0.0027*   drain_loop_wins 0.063
+  both     T10 +0.0367 ±0.0030*   T20 +0.0389 ±0.0032*   exquisite_gains 2.191  drain_loop_wins 0.069
+  (off, T20: won 0.425  damage 58.402)
+
+TIVIT
+  connects T10 -0.0090 ±0.0016*   T20 -0.0109 ±0.0018*   tivit_combat_triggers 1.886
+  (off, T20: won 0.445  damage 61.605)
+
+RENDMAW
+  t1       T10 +0.0026 ±0.0009*   T20 +0.0076 ±0.0020*   
+  t2       T10 +0.0025 ±0.0008*   T20 +0.0067 ±0.0019*   
+  t3       T10 +0.0021 ±0.0008*   T20 +0.0055 ±0.0017*   
+  (off, T20: won 0.239  damage 52.892)
+
+AZUSA
+  t1       T10 +0.0071 ±0.0014*   T20 +0.0066 ±0.0019*   
+  t2       T10 +0.0069 ±0.0014*   T20 +0.0063 ±0.0018*   
+  t3       T10 +0.0065 ±0.0014*   T20 +0.0059 ±0.0018*   
+  (off, T20: won 0.402  damage 64.985)
+

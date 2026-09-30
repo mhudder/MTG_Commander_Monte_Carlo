@@ -1124,8 +1124,9 @@ def combat(g):
         # it cannot finish anybody, because the player on 3 life and the
         # player on 40 each got a third. `dmg` comes back bounded at what
         # could have mattered.
-        # WHICH ATTACKERS CONNECTED (§0z91): opt in to the pod's report,
-        # the same hook shilgengar's Seluma reads (§0z74).
+        # WHICH ATTACKERS CONNECTED: opt in to the pod's report, the same
+        # hook shilgengar's Seluma reads (§0z74) -- Tivit's own trigger
+        # needs Tivit to connect (§0z91).
         if g.cfg.get("tivit_trigger_connects", True):
             g.combat_hits = []
         dmg = OPP.combat_damage(g, attackers,
