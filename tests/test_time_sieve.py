@@ -10,7 +10,8 @@ turns. So the claims are checked here:
   1. ONE ACTIVATION PER TURN. The cost is "{T}, Sacrifice five artifacts", and
      the {T} is Time Sieve's own tap.
   2. THE CHAIN RUNS. Time Sieve untaps on the turn it just bought, so extra turns
-     chain until the horizon runs out.
+     chain -- until `extra_turns_round_cap`, not the horizon, which counts
+     rounds since §0z86.
   3. AN EXTRA TURN IS NOT A ROUND. The three opponents do not act during it.
 
 And the fact about the cards that makes the loop work at all: in a four-player
@@ -110,19 +111,23 @@ def main():
     print("\nTHE CHAIN RUNS, and the pod does not get a round for each turn\n")
     g = setup()
     played = drive(g)
+    # `drive` returns the HORIZON count, which is rounds since §0z86: an
+    # extra turn no longer spends one. Every turn taken, extra or not, is
+    # `g.turn` -- that is what "turns" means in the checks below.
+    turns = g.turn
     taken, rounds = g.m["extra_turns_taken"], g.m["pod_rounds"]
     acts, chain = g.m["sieve_activations"], g.m["sieve_chain_max"]
-    print(f"        {played} turns played, {taken} of them extra, "
+    print(f"        {turns} turns played ({played} rounds), {taken} of them extra, "
           f"{rounds} pod rounds, {acts} sieve activations, "
           f"longest chain {chain}")
     check(taken >= TURNS // 2,
-          f"most turns are extra turns ({taken} of {played})")
+          f"most turns are extra turns ({taken} of {turns})")
     check(chain >= TURNS // 2,
           f"they arrive as ONE chain, not one per real turn (longest {chain})")
     check(rounds <= 2,
           f"the pod got {rounds} round(s), not one per turn")
-    check(acts <= played,
-          f"activations ({acts}) never exceed turns ({played})")
+    check(acts <= turns,
+          f"activations ({acts}) never exceed turns ({turns})")
 
     print("\nTHE OLD ENGINE, for contrast -- all three flags off\n")
     old = dict(sieve_taps=False, extra_turns_chain=False,

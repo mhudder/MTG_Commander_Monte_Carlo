@@ -21,8 +21,9 @@ WHAT IT LOOKS AT, all by importing rather than by text where it can:
     ledger         PROPOSED / MEASURED / CHANGES / COMMITTED / WITHDRAWN
     engine         the name as a string literal in edhmc/*.py or tools/*.py,
                    which is how behaviour attaches when there is no script=
-                   (§0z25). decks/_evasion.py is excluded: it is GENERATED
-                   from Scryfall, so a name there is not a claim by anyone.
+                   (§0z25). decks/_evasion.py and decks/_removal.py (§0z87)
+                   are excluded: both are GENERATED from Scryfall, so a name
+                   there is not a claim by anyone.
 
     python -m tools.card_known "Verdant Kraken" "Koth of the Homestead"
     python -m tools.card_known --stdin < names.txt      # one name per line
@@ -38,7 +39,7 @@ from edhmc.pending import (DECKS as CATALOG, PROPOSED, MEASURED, CHANGES,
 
 SRC = [p for p in list(pathlib.Path("edhmc").rglob("*.py"))
        + list(pathlib.Path("tools").rglob("*.py"))
-       if p.name != "_evasion.py" and p.name != "card_known.py"]
+       if p.name not in ("_evasion.py", "_removal.py", "card_known.py")]
 
 
 def _candidate_cards():

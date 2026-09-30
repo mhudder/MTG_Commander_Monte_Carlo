@@ -134,6 +134,7 @@ Methodology that used to live at the end of this file is now
 | [0z83](#0z83) | FIXED | **Five floors closed**, sagas on their real chapters, and **Solemn Simulacrum was SCRIPTED with neither clause right**. Rendmaw's three +0.0088 at T20. The first run crashed on an id() reused by a token |
 | [0z84](#0z84) | FIXED | **Herald of War, Twilight Shepherd (persist, via a new `after_died` hook), Serra's Emissary, Lurrus.** Emissary's +0.0199 is a knob result (`emissary_type`) |
 | [0z85](#0z85) | FIXED | **Four rendmaw cards nothing read**: Hart, Familiar, Whip (+0.0109, mostly lifelink), Shigeki (its first smoke fired zero times) |
+| [0z86](#0z86) | FIXED | **Time Sieve's sign flip was the horizon** (tivit counted extra turns, lorehold did not); the pod's clock also read `g.turn`, so extra turns brought kills closer. Sieve 9 → 11 now +0.0218 / +0.0151 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8236,6 +8237,81 @@ Emissary). Five tables were RE-RENDERED from their caches -- 0 rows moved,
 new categories and reasons -- and those caches are SUSPECT until the owner
 calls the rebuild, deliberately deferred so that every engine change lands
 first.
+
+## 0z86. FIXED — Time Sieve's sign flip was the horizon, and the pod's clock had a second bug behind it
+
+Queued item 18 left one row "worth a look": **Time Sieve 9 → 11 flipped sign
+between horizons** (§0z44: −0.0043 at T10, +0.0121 at T20). §0z44 guessed the
+cause -- extra turns count against the horizon -- and nobody tested the guess.
+Testing it found the guess right and a second bug beside it. **Both are the
+same concept modelled two ways in two engines** (§0u):
+
+1. **THE POD'S CLOCK READ `g.turn`.** Tivit's extra turns advance `g.turn`,
+   and every opponent timer compared against it -- the kill clocks and their
+   re-arm, the grid's row, when wipes, attacks and counterspells start, threat
+   growth. So each extra turn brought every opponent's KILL a round closer
+   while giving them no turn to take it in. A comment in `tivit.take_turn`
+   said the opposite ("an opponent's clock is DELAYED by the turns you took"),
+   which is §0z13's shape: a note stating a property nobody checked. Lorehold
+   never had the bug, because its extra turns do not advance `g.turn`.
+   **Fix**: `opponents.pod_turn(g)` is `g.turn` minus
+   `m["extra_turns_taken"]`, and all thirteen sites read it
+   (`pod_clock_rounds`, default True).
+2. **THE HORIZON MEANT TWO THINGS.** Tivit counted extra turns against
+   `turns`; lorehold did not. So T10 was ten of your turns in one engine and
+   ten ROUNDS in the other, and a tivit extra turn at T10 cost a real round of
+   a ten-round game. **Fix**: the horizon counts rounds in both
+   (`horizon_counts`, default "rounds"), and tivit's chain is bounded by
+   `extra_turns_round_cap` (40 a round) instead of by the horizon.
+
+Tivit's staged list, N=15,000, seeds 5000.., paired
+(`diagnostics/run_sieve_horizon.py`, `results/sieve_horizon_20260930.txt`):
+
+| Time Sieve 9 → 11 | T10 | T20 |
+|---|---|---|
+| the old engine (§0z44's flip, reproduced) | **−0.0157 ±0.0026** | **+0.0073 ±0.0036** |
+| pod clock in rounds only | **−0.0148 ±0.0026** | **+0.0124 ±0.0036** |
+| pod clock AND horizon in rounds (§0z86) | **+0.0218 ±0.0034** | **+0.0151 ±0.0036** |
+
+| the fixes themselves, Sieve at 9 | T10 | T20 |
+|---|---|---|
+| pod clock in rounds − old | **+0.0029 ±0.0012** | **+0.0113 ±0.0027** |
+| horizon in rounds, given the clock | **+0.0552 ±0.0037** | **+0.0037 ±0.0010** |
+| both − old | **+0.0581 ±0.0038** | **+0.0150 ±0.0027** |
+
+**THE FLIP WAS THE HORIZON.** Fixing the clock alone leaves it standing;
+fixing the horizon removes it, and the Sieve at 11 is then significantly
+better at BOTH horizons. §0z44's guess was right, and the row it would not
+confirm is confirmed now. **Adopting 11 is a priority decision and is left to
+the owner**, as §0z44's two adopted moves were.
+
+**THE CLOCK WAS A SEPARATE, REAL BUG** worth +0.0113 at T20 on its own and
+invisible in the flip: it cost tivit win rate at every priority equally.
+
+**TIVIT'S T10 BASELINE RISES 0.055.** At T10 the old horizon charged every
+extra turn a round of a ten-round game; the mechanism counter shows it
+directly -- extra turns a game at T10 went 0.210 → 0.402 with pod rounds
+unchanged (9.09 → 9.14). That is a fifth of tivit's T10 table moving, so the
+rebuild matters for this deck most.
+
+**CHECKED**: with `pod_clock_rounds=False, horizon_counts="turns"` all six
+decks reproduce HEAD bit-for-bit on their module AND staged lists
+(`check_unchanged_decks`, 400 games, T20). On the new defaults lorehold is
+bit-identical (its extra turns never advanced `g.turn`), and tivit is the only
+deck this item moves.
+
+**A POLICY CHOSEN UNDER THE OLD HORIZON** (§0z5): §0z71 picked
+`sieve_real_fuel="combo"` and called it "a HORIZON TRADE: a rock fed to the
+Sieve costs tempo early and buys extra turns late". Its T10 cost was measured
+while an extra turn spent a round of the horizon. The choice rested on the
+owner's two conditions, not on that number, so it stands; the number is stale.
+
+Pinned by `tests/test_pod_clock.py`: 8 cases, 3 mutations, exact sets. One case
+failed its first MUTATION run on the test -- it read `clock_fired`, which a
+clock that kills an opponent sets and then clears when it re-arms.
+`tests/test_time_sieve.py` failed once on the new default, also on the test:
+it compared activations with the HORIZON count `drive()` returns, which is
+rounds now. It compares them with `g.turn`, every turn taken.
 
 ## How to read an ablation table
 

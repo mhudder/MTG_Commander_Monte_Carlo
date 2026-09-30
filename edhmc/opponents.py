@@ -26,6 +26,10 @@ import random
 from contextlib import contextmanager
 from dataclasses import dataclass
 
+# GENERATED from Scryfall by tools.removal_census: the destroy share per
+# kind of pod answer (§0z87). In every cache fingerprint.
+from edhmc.decks import _removal
+
 # Per-opponent, per-turn probabilities, once that opponent has mana (turn >= 3).
 # Calibration target for a mixed pod over turns 3-10: roughly 4 spot removal
 # spells and ~1 board wipe reaching the table per game, which is what a
@@ -275,6 +279,30 @@ def board_threat(g) -> float:
     return power + engines
 
 
+def pod_turn(g) -> int:
+    """THE POD'S CLOCK: the turns the pod has lived through, which is YOUR
+    turns minus the EXTRA turns you took (§0z86).
+
+    Every opponent-facing timer reads this -- the kill clocks and their
+    re-arm, the pre-rolled grid's row, when wipes, attacks and counterspells
+    start, and threat growth. It used to read `g.turn`, which tivit advances
+    on an extra turn, so every extra turn you took brought each opponent's
+    KILL one round closer while giving them no turn to take it in. Lorehold
+    never had the bug: its extra turns do not advance `g.turn` at all. The
+    same concept, modelled two ways in two engines (§0u's shape).
+
+    `extra_turns_taken` is the Metrics key tivit writes; an engine that
+    takes no extra turns reads 0. `pod_clock_rounds=False` restores `g.turn`.
+    """
+    if not g.cfg.get("pod_clock_rounds", True):
+        return g.turn
+    try:
+        taken = int(g.m["extra_turns_taken"])
+    except (AttributeError, KeyError, TypeError):
+        taken = 0
+    return g.turn - taken
+
+
 def opponent_threat(opp: Opponent, turn: int) -> float:
     """A generic opponent's perceived threat level, for target selection."""
     return 4.0 * turn * opp.p["board"]
@@ -288,7 +316,7 @@ def your_share(g, opp: Opponent, others: list[Opponent]) -> float:
     a card that makes your board scarier also makes it a bigger target.
     """
     mine = board_threat(g)
-    theirs = sum(opponent_threat(o, g.turn) for o in others)
+    theirs = sum(opponent_threat(o, pod_turn(g)) for o in others)
     share = 0.0 if mine + theirs <= 0 else mine / (mine + theirs)
     return known_win_share(g, share)
 
@@ -370,7 +398,7 @@ def spot_removal(g, opp, others, rolls):
     targeted = getattr(g, "on_targeted", None)
     if targeted is not None:
         targeted(victim)
-    if destroy(g, victim, rolls[7]):
+    if destroy(g, victim, rolls[7], kind="spot"):
         g.m["removal_eaten"] += 1
 
 
@@ -390,17 +418,17 @@ def ae_removal(g, opp, others, rolls):
     sweeper = (opp.bracket >= 3 and rolls[4] < 0.20)
     if sweeper:
         for p in list(targets):
-            if destroy(g, p, rolls[7]):
+            if destroy(g, p, rolls[7], kind="wipe"):
                 g.m["ae_removal_eaten"] += 1
     else:
         victim = max(targets, key=lambda p: threat_of(g, p))
-        if destroy(g, victim, rolls[7]):
+        if destroy(g, victim, rolls[7], kind="ae"):
             g.m["ae_removal_eaten"] += 1
 
 
 def board_wipe(g, opp, rolls):
     """Wraths scale with how wide the table's biggest board has gotten."""
-    if g.turn < g.cfg.get("first_wipe_turn", 5):
+    if pod_turn(g) < g.cfg.get("first_wipe_turn", 5):
         return
     n = sum(1 for p in g.board if is_creature_now(g, p))
     width_mult = 1.0 + min(0.75, max(0, n - 4) * 0.08)
@@ -410,7 +438,7 @@ def board_wipe(g, opp, rolls):
         return
     with simultaneous(g):
         for p in [p for p in g.board if is_creature_now(g, p)]:
-            destroy(g, p, rolls[7])
+            destroy(g, p, rolls[7], kind="wipe")
     for o in g.opponents:
         o.creatures = 0.0
         o.goaded_birds = 0.0          # a wrath kills the Birds too
@@ -587,20 +615,45 @@ def watching(g, name, perm=None, another=False) -> int:
     return max(0, n)
 
 
-def destroy(g, perm, roll=None, destroys=None):
+def destroy_share_for(g, kind) -> float:
+    """The fraction of the pod's answers of this KIND that DESTROY -- which
+    indestructible survives -- rather than exile, bounce, tuck, sacrifice or
+    shrink, which it does not (§0z87).
+
+    It was one hand-written 0.60 for every kind (queued item 7). The shares
+    now come from `decks/_removal.py`, a census of the interaction the six
+    lists at this table actually run, read from Scryfall by
+    `tools.removal_census` -- spot removal 0.45, wipes 0.54. Both are BELOW
+    0.60: the old constant overvalued indestructible.
+
+    `kind` is "spot", "wipe" or "ae" (the artifact-and-enchantment event,
+    which takes the spot share: its own sample is four cards). None, and
+    `destroy_share_split=False`, read the flat `destroy_share` as before.
+    """
+    if kind is None or not g.cfg.get("destroy_share_split", True):
+        return g.cfg.get("destroy_share", 0.60)
+    if kind == "wipe":
+        return g.cfg.get("destroy_share_wipe", _removal.DESTROY_SHARE_WIPE)
+    if kind == "ae":
+        return g.cfg.get("destroy_share_ae", _removal.DESTROY_SHARE_AE)
+    return g.cfg.get("destroy_share_spot", _removal.DESTROY_SHARE_SPOT)
+
+
+def destroy(g, perm, roll=None, destroys=None, kind=None):
     """Remove a permanent the pod answered.
 
     `roll` is one of that opponent's pre-rolled numbers, supplied only so that
     INDESTRUCTIBLE can mean something. The opponent model does not distinguish
     a Swords to Plowshares from a Doom Blade — everything is a generic "answer"
-    — so indestructible is priced statistically: `destroy_share` is the fraction
-    of an EDH pod's interaction that is literally "destroy target permanent"
-    (Doom Blade, Naturalize, most wraths) as opposed to exile, bounce, -X/-X or
-    an edict, which an indestructible permanent does not survive.
+    — so indestructible is priced statistically: `destroy_share_for(g, kind)`
+    is the fraction of the pod's interaction of that kind that is literally
+    "destroy" (Doom Blade, Naturalize, most wraths) as opposed to exile,
+    bounce, -X/-X or an edict, which an indestructible permanent does not
+    survive.
 
-    0.60 is an assumption, not a measurement. It is a knob, and a card whose
-    evaluation swings on it should be reported with that said out loud.
-    Callers that pass no roll destroy unconditionally.
+    It was one assumed 0.60; it is a census per kind now (§0z87), and still a
+    knob, so a card whose evaluation swings on it should be reported with
+    that said out loud. Callers that pass no roll destroy unconditionally.
 
     `destroys` OVERRIDES that coin flip with knowledge. It is for effects whose
     source is a named card in your own list rather than an abstract opponent
@@ -609,7 +662,8 @@ def destroy(g, perm, roll=None, destroys=None):
 
         True    a destruction effect; indestructible ALWAYS saves.
         False   exile, sacrifice or -X/-X; indestructible NEVER saves.
-        None    an anonymous answer; priced by `roll` against `destroy_share`.
+        None    an anonymous answer; priced by `roll` against
+                `destroy_share_for(g, kind)`.
 
     Only `resolve_own_wipe` passes it; every opponent-sourced call still takes
     the None path it always did.
@@ -622,8 +676,7 @@ def destroy(g, perm, roll=None, destroys=None):
     if destroys is not None:
         if hardy and destroys:
             return False
-    elif hardy and roll is not None \
-            and roll < g.cfg.get("destroy_share", 0.60):
+    elif hardy and roll is not None and roll < destroy_share_for(g, kind):
         return False
     g.board.remove(perm)
     # FINALITY (§0z75): "If a creature with a finality counter on it would
@@ -662,10 +715,10 @@ def destroy(g, perm, roll=None, destroys=None):
 
 def opponents_act(g):
     """One full round of the three opponents' turns."""
-    rolls_t = g.opp_rolls[min(g.turn, len(g.opp_rolls) - 1)]
+    rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
     for i, opp in enumerate(g.opponents):
         opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
-        if g.turn < 3:
+        if pod_turn(g) < 3:
             continue
         others = [o for j, o in enumerate(g.opponents) if j != i]
         r = rolls_t[i]
@@ -725,14 +778,14 @@ def countered(g, card, spell_index: int) -> bool:
     behind untapped mana. A turn-8 six-drop is a very different proposition
     from a turn-2 one-drop, which is most of why this matters here.
     """
-    if g.turn < 3 or spell_index >= N_COUNTER_SLOTS:
+    if pod_turn(g) < 3 or spell_index >= N_COUNTER_SLOTS:
         return False
     threat = counter_threat(g, card)
     if threat < g.cfg.get("counter_threshold", 4.0):
         return False
 
-    rolls = g.counter_rolls[min(g.turn, len(g.counter_rolls) - 1)][spell_index]
-    mana_gate = min(1.0, (g.turn - 2) / 4.0)
+    rolls = g.counter_rolls[min(pod_turn(g), len(g.counter_rolls) - 1)][spell_index]
+    mana_gate = min(1.0, (pod_turn(g) - 2) / 4.0)
     for i, opp in enumerate(g.opponents):
         if opp.counters_left <= 0:
             continue
@@ -1567,7 +1620,7 @@ def monarch_end_step(g):
     # the mechanic without this knob measures the harness. Granted ONCE: the
     # `monarch_gained` guard stops it being handed back after it is lost.
     start_turn = g.cfg.get("monarch_start_turn", 0)
-    if (start_turn and g.turn >= start_turn and not g.monarch
+    if (start_turn and pod_turn(g) >= start_turn and not g.monarch
             and not g.m["monarch_gained"] and g.result is None):
         become_monarch(g)
     if not g.monarch or g.result is not None:
@@ -1586,7 +1639,7 @@ def incidental_damage(g):
     Reservoir, Serra Ascendant — and removes any cost from paying life. The
     share aimed at you is threat-weighted, same as removal and the clocks.
     """
-    if g.result is not None or g.turn < g.cfg.get("first_attack_turn", 3):
+    if g.result is not None or pod_turn(g) < g.cfg.get("first_attack_turn", 3):
         return
     if protected_from_creatures(g):
         g.m["emissary_prevented_turns"] += 1   # §0z84
@@ -1668,9 +1721,9 @@ def resolve_clocks(g):
     removal, and it means being ahead carries a real cost."""
     if g.result is not None:
         return
-    rolls_t = g.opp_rolls[min(g.turn, len(g.opp_rolls) - 1)]
+    rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
     for i, opp in enumerate(g.opponents):
-        if (not opp.alive or opp.clock_fired or g.turn < opp.kill_turn
+        if (not opp.alive or opp.clock_fired or pod_turn(g) < opp.kill_turn
                 or g.result is not None):
             continue
         opp.clock_fired = True      # a clock resolves once, not every turn
@@ -1682,7 +1735,7 @@ def resolve_clocks(g):
             g.your_life = 0.0
             return
         if others:
-            victim = max(others, key=lambda o: opponent_threat(o, g.turn))
+            victim = max(others, key=lambda o: opponent_threat(o, pod_turn(g)))
             victim.alive = False
             victim.life = 0.0
             victim.creatures = 0.0
@@ -1690,7 +1743,7 @@ def resolve_clocks(g):
             # problem. Re-arm their clock so surviving one resolution does not
             # make you safe for the rest of the game.
             opp.clock_fired = False
-            opp.kill_turn = g.turn + g.cfg.get("clock_rearm", 4)
+            opp.kill_turn = pod_turn(g) + g.cfg.get("clock_rearm", 4)
     _check_eliminations(g)
 
 

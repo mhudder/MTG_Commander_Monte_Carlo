@@ -1385,10 +1385,12 @@ def take_turn(g, extra=False):
     # untap/miracle/main/combat with no opponent block at all -- so the two
     # engines modelled the same concept in opposite directions.
     #
-    # The pre-rolled opponent grid is indexed by `g.turn`, which still advances,
-    # so CRN is unaffected: an opponent's clock is DELAYED by the turns you
-    # took, not skipped, and it still resolves at most once when the pod next
-    # gets a round.
+    # THE SENTENCE THAT STOOD HERE WAS WRONG (§0z86). It said the pod's grid
+    # and clocks read `g.turn`, "so an opponent's clock is DELAYED by the turns
+    # you took". The clock compared `g.turn` with its kill turn, and `g.turn`
+    # advances on an extra turn -- so each extra turn brought every kill one
+    # pod round CLOSER. Every pod timer now reads `opponents.pod_turn(g)`,
+    # your turns minus these extra ones (`pod_clock_rounds`).
     skip = extra and g.cfg.get("extra_turns_skip_opponents", True)
     if g.cfg.get("opponents", True) and not skip:
         g.m["pod_rounds"] += 1
@@ -1400,9 +1402,11 @@ def take_turn(g, extra=False):
 def take_extra_turns(g, played, budget):
     """Spend `g.extra_turns`. Returns the new turn count against the horizon.
 
-    Extra turns are REAL turns and still count against the horizon, so a deck
-    cannot buy turns the other three engines do not get. That is a deliberate
-    choice, and it is now the ONLY thing bounding the loop.
+    Extra turns are REAL turns. Until §0z86 they also counted against the
+    horizon, "so a deck cannot buy turns the other engines do not get" -- but
+    lorehold's never did, so the horizon meant rounds in one engine and your
+    turns in the other. It counts rounds now (`horizon_counts`), and the
+    chain is bounded by `extra_turns_round_cap` instead.
 
     THE CHAIN USED TO BE CUT. `g.extra_turns` was zeroed before the loop and
     never re-read, so an extra turn generated DURING an extra turn was silently
@@ -1425,12 +1429,22 @@ def take_extra_turns(g, played, budget):
     function exists to fix.
     """
     cfg = g.cfg
+    # THE HORIZON COUNTS ROUNDS (§0z86), as lorehold's always has: an extra
+    # turn is not a round and does not spend one. `horizon_counts="turns"`
+    # is the old rule, where it did -- which made T10 and T20 mean different
+    # things in the two engines that take extra turns. With rounds, the chain
+    # needs its own bound: `extra_turns_round_cap` (40) a round, far past the
+    # point where a real chain has won.
+    rounds = cfg.get("horizon_counts", "rounds") == "rounds"
+    cap = cfg.get("extra_turns_round_cap", 40)
     if cfg.get("extra_turns_chain", True):
         chain = 0
-        while g.extra_turns > 0 and played < budget and g.result is None:
+        while (g.extra_turns > 0 and g.result is None
+               and (chain < cap if rounds else played < budget)):
             g.extra_turns -= 1
             take_turn(g, extra=True)
-            played += 1
+            if not rounds:
+                played += 1
             chain += 1
     else:
         chain = min(g.extra_turns, cfg.get("extra_turn_cap", 5))

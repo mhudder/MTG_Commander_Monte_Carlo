@@ -1,0 +1,24 @@
+# python -m diagnostics.run_sieve_horizon 15000 OUT && --report OUT   (tivit staged list, seeds 5000..19999, 2026-09-30)
+TIME SIEVE 9 -> 11 (win rate, paired, 95% CI)
+  the old engine (§0z44's flip)                 T10 -0.0157 ±0.0026*   T20 +0.0073 ±0.0036*
+  pod clock in rounds                           T10 -0.0148 ±0.0026*   T20 +0.0124 ±0.0036*
+  pod clock AND horizon in rounds (§0z86)       T10 +0.0218 ±0.0034*   T20 +0.0151 ±0.0036*
+
+THE FIXES THEMSELVES, at Sieve's current priority 9
+  pod clock in rounds - old                     T10 +0.0029 ±0.0012*   T20 +0.0113 ±0.0027*
+  horizon in rounds, given the clock            T10 +0.0552 ±0.0037*   T20 +0.0037 ±0.0010*
+  both - old                                    T10 +0.0581 ±0.0038*   T20 +0.0150 ±0.0027*
+
+MECHANISM, a game
+  P9_old   T10: extra turns 0.210  Sieve activations 0.211  pod rounds 9.09  Sieve cast on turn 5.31 (2567 games)
+  P9_old   T20: extra turns 0.569  Sieve activations 0.457  pod rounds 10.57  Sieve cast on turn 6.96 (3282 games)
+  P9_clk   T10: extra turns 0.212  Sieve activations 0.214  pod rounds 9.09  Sieve cast on turn 5.32 (2573 games)
+  P9_clk   T20: extra turns 0.581  Sieve activations 0.466  pod rounds 10.59  Sieve cast on turn 7.00 (3300 games)
+  P9_new   T10: extra turns 0.402  Sieve activations 0.333  pod rounds 9.14  Sieve cast on turn 5.39 (2603 games)
+  P9_new   T20: extra turns 0.589  Sieve activations 0.471  pod rounds 10.59  Sieve cast on turn 7.00 (3301 games)
+  P11_old  T10: extra turns 0.338  Sieve activations 0.398  pod rounds 9.02  Sieve cast on turn 5.46 (4492 games)
+  P11_old  T20: extra turns 0.896  Sieve activations 0.831  pod rounds 10.44  Sieve cast on turn 6.90 (5612 games)
+  P11_clk  T10: extra turns 0.340  Sieve activations 0.399  pod rounds 9.01  Sieve cast on turn 5.46 (4495 games)
+  P11_clk  T20: extra turns 0.926  Sieve activations 0.855  pod rounds 10.46  Sieve cast on turn 6.93 (5644 games)
+  P11_new  T10: extra turns 0.672  Sieve activations 0.629  pod rounds 9.08  Sieve cast on turn 5.53 (4546 games)
+  P11_new  T20: extra turns 0.940  Sieve activations 0.864  pod rounds 10.47  Sieve cast on turn 6.93 (5644 games)

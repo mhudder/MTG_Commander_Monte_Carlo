@@ -382,6 +382,40 @@ def check_evasion_current(live: set[str], scanned: set[str]) -> Result:
                      if bits else ""))
 
 
+def removal_sets() -> tuple[set[str], set[str]]:
+    """(nonland cards in the module and staged lists today, cards
+    _removal.py's census scanned)."""
+    from tools.removal_census import deck_lists
+    from edhmc.decks import _removal
+    live = {n for ns in deck_lists().values() for n in ns}
+    return live, set(getattr(_removal, "SCANNED", ()))
+
+
+def check_removal_current(live: set[str], scanned: set[str]) -> Result:
+    """decks/_removal.py was regenerated after the last card was added.
+
+    The pod's destroy shares are a census of this table's own interaction
+    (§0z87), read from Scryfall, so nothing here can re-derive them. It can
+    check the census saw every card: a removal spell staged without
+    regenerating the file is an answer the shares do not count. The §0z29
+    shape, pointed at a second generated file.
+    """
+    name = "decks/_removal.py was regenerated after the last deck change"
+    if not scanned:
+        return Result(name, False,
+                      "no SCANNED set -- run `python -m tools.removal_census --write`")
+    missing = sorted(live - scanned)
+    stale = sorted(scanned - live)
+    bits = []
+    if missing:
+        bits.append("never scanned: " + ", ".join(missing))
+    if stale:
+        bits.append("no longer in any list: " + ", ".join(stale))
+    return Result(name, not bits, "; ".join(bits)
+                  + ("  -- run `python -m tools.removal_census --write` "
+                     "(needs Scryfall)" if bits else ""))
+
+
 def check_architecture_names_modules(docs: dict[str, str]) -> Result:
     """Every module under edhmc/ and tools/ is named in docs/ARCHITECTURE.md.
 
@@ -528,8 +562,10 @@ def run_all() -> list[Result]:
     issues = read(KNOWN_ISSUES)
     docs = live_docs()
     live, scanned = evasion_sets()
+    rlive, rscanned = removal_sets()
     results = [
         check_evasion_current(live, scanned),
+        check_removal_current(rlive, rscanned),
         check_sections_resolve(code_text, issues),
         check_doc_sections_resolve(docs, issues),
         check_index_matches_headings(issues),
@@ -623,14 +659,21 @@ EXPECTED = {
         {"every §id cited from a live doc resolves"},
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
+    "a card is staged and _removal.py is not regenerated":
+        {"decks/_removal.py was regenerated after the last deck change"},
     "the vocabulary doc drops a state the ledger implements":
         {"docs/LEDGER_STATES.md names every state the ledger implements"},
 }
 
-# Mutations of the evasion coverage sets, (live, scanned) -> (live, scanned).
+# Mutations of the two coverage-set pairs, evasion then removal:
+# (live, scanned, rlive, rscanned) -> the same four.
 SET_MUTATIONS = {
     "a card is added to a deck and _evasion.py is not regenerated":
-        lambda live, scanned: (live | {"Not A Real Card"}, scanned),
+        lambda live, scanned, rl, rs: (live | {"Not A Real Card"}, scanned,
+                                       rl, rs),
+    "a card is staged and _removal.py is not regenerated":
+        lambda live, scanned, rl, rs: (live, scanned,
+                                       rl | {"Not A Real Card"}, rs),
 }
 
 
@@ -639,18 +682,20 @@ def mutate() -> int:
     issues = read(KNOWN_ISSUES)
     docs = live_docs()
     live, scanned = evasion_sets()
+    rlive, rscanned = removal_sets()
     states = ledger_states()
 
     failures = 0
     for label in list(MUTATIONS) + list(SET_MUTATIONS):
         if label in MUTATIONS:
             c, i, d = MUTATIONS[label](code_text, issues, docs)
-            lv, sc = live, scanned
+            lv, sc, rl, rs = live, scanned, rlive, rscanned
         else:
             c, i, d = code_text, issues, docs
-            lv, sc = SET_MUTATIONS[label](live, scanned)
+            lv, sc, rl, rs = SET_MUTATIONS[label](live, scanned, rlive, rscanned)
         results = [
             check_evasion_current(lv, sc),
+            check_removal_current(rl, rs),
             check_sections_resolve(c, i),
             check_doc_sections_resolve(d, i),
             check_index_matches_headings(i),

@@ -170,6 +170,8 @@ python -m tests.test_blind_labels --mutate         # 3 mutations, exact sets
 python -m tests.test_ledger_states --mutate        # 4 mutations, exact sets
 python -m tests.test_floors_batch --mutate         # 6 mutations, exact sets
 python -m tests.test_floors_batch2 --mutate        # 6 mutations, exact sets
+python -m tests.test_pod_clock --mutate            # 3 mutations, exact sets
+python -m tests.test_destroy_share --mutate        # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -892,8 +894,11 @@ is half answered**: the ordering half is built and measured as a null
     deferred them to has RUN** (§0z60): all six tables at N=15,000, every
     cache CURRENT, `check_docs` green. The staged swaps the rebuild left on
     the old priorities have since been re-measured on the current engine,
-    all eight inside their bars (§0z81). Not adopted and worth a look: Time
-    Sieve's move flips sign between horizons.
+    all eight inside their bars (§0z81). **Time Sieve's sign flip is
+    EXPLAINED (§0z86)**: it was the horizon, which counted tivit's extra
+    turns and not lorehold's. With the horizon in rounds, Sieve 9 → 11 is
+    +0.0218 / +0.0151, significant at both -- an adoption decision for the
+    owner, like the two above.
 
 0c. **STAGED BY THE OWNER, 2026-09-26 (§0z69)**: −Blasphemous Act +Goldspan,
     +0.0137 ±0.0046 at T20 on the final engine. The original entry follows.

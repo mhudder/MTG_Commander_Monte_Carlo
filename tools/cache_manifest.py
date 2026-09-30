@@ -39,8 +39,12 @@ CACHE_DIR = os.path.join("results", "caches")
 # regeneration gave Bloodthirsty Conqueror the flying it had always had and
 # no fingerprint moved (§0z29) -- a behaviour change the provenance scheme
 # could not see.
+# decks/_removal.py is the same shape (§0z87): the pod's destroy share per
+# kind of answer, generated from a census of the six lists, read by
+# `opponents.destroy`. Regenerating it moves every deck that holds an
+# indestructible permanent, so it is here from the day it was written.
 SHARED = ["edhmc/opponents.py", "edhmc/experiment.py", "edhmc/engine.py",
-          "edhmc/decks/_evasion.py", "ablation.py"]
+          "edhmc/decks/_evasion.py", "edhmc/decks/_removal.py", "ablation.py"]
 
 # Files that have MOVED on disk since the fingerprint scheme was introduced,
 # keyed by the name the hash still uses. `fingerprint()` hashes the KEY as well
