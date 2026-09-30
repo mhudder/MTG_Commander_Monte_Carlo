@@ -685,7 +685,7 @@ toward whatever got tagged. It is worse than no tags at all.
 them; it never overrides `--` on a row whose damage is noise (§0z24).
 
 **Say the knob out loud** when a card's evaluation swings on one:
-`destroy_share` (a census since §0z87: spot 0.45, wipe 0.54 -- and it
+`destroy_share` (a census since §0z87: spot 0.45, wipe 0.52 -- and it
 moves no deck by 0.001), `opp_vote_policy` (`"adversarial"`),
 `flier_block_share` (0.30), `archetype_weights`. **`docs/KNOBS.md` is the full
 list** — derived from the `cfg.get` call sites, with defaults and with the
@@ -916,7 +916,7 @@ is half answered**: the ordering half is built and measured as a null
     `docs/ORACLE_AUDIT_*.md`.
 
 7.  **ANSWERED (§0z87)**: indestructible is priced per kind of answer from
-    a census of the six lists (`tools.removal_census`, spot 0.45, wipe 0.54,
+    a census of the six lists (`tools.removal_census`, spot 0.45, wipe 0.52,
     below the old flat 0.60). The knob moves no deck by 0.001, and
     indestructibility is worth at most 0.008 on any card in the lists.
 

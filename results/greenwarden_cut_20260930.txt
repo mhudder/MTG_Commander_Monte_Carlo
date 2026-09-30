@@ -1,0 +1,16 @@
+# python -m diagnostics.run_greenwarden_cut 15000   (2026-09-30, before the module edit: A = list with Oblivion Stone)
+azusa staged list, N=15,000 paired, seeds 5000..19999
+B - A: Sylvan Awakening in Oblivion Stone's slot
+
+T10
+  won                     0.1733 ->     0.1730   -0.0003 ±0.0013 
+  damage                 42.4725 ->    42.5051   +0.0326 ±0.1053 
+  landfall_triggers      17.5273 ->    17.4417   -0.0856 ±0.0230*
+  cards_drawn            15.1602 ->    15.1069   -0.0533 ±0.0353*
+  removal_eaten           1.3324 ->     1.3226   -0.0098 ±0.0023*
+T20
+  won                     0.3981 ->     0.4015   +0.0033 ±0.0024*
+  damage                 64.3020 ->    64.6073   +0.3053 ±0.1443*
+  landfall_triggers      22.4779 ->    22.4394   -0.0385 ±0.0411 
+  cards_drawn            20.3015 ->    20.2147   -0.0868 ±0.0594*
+  removal_eaten           1.5659 ->     1.5529   -0.0130 ±0.0036*

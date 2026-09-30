@@ -141,11 +141,10 @@ CREATURES = [
 ]
 
 # ---------------------------------------------------------------------------
-# Artifacts — 8
+# Artifacts — 7 as of 2026-09-30 (was 8: -Oblivion Stone, §0z88)
 # ---------------------------------------------------------------------------
 ARTIFACTS = [
     C("Sol Ring", "Artifact", {"gen": 1}, priority=10, threat=4.0, mana=(2, "C")),
-    C("Oblivion Stone", "Artifact", {"gen": 3}, priority=2, threat=6.0),
     C("Horn of Greed", "Artifact", {"gen": 3}, priority=7, threat=5.0),
     C("Crucible of Worlds", "Artifact", {"gen": 3}, priority=6.5, threat=6.0),
     C("Seer's Sundial", "Artifact", {"gen": 4}, priority=6, threat=5.0),
@@ -182,7 +181,8 @@ INSTANTS = [
 ]
 
 # ---------------------------------------------------------------------------
-# Sorceries — 12 as of 2026-09-10 (was 14: -Rude Awakening, -Sylvan Awakening)
+# Sorceries — 13 as of 2026-09-30 (14 until 2026-09-10: -Rude Awakening,
+# -Sylvan Awakening; Sylvan Awakening RETURNED 2026-09-30, §0z88)
 # ---------------------------------------------------------------------------
 SORCERIES = [
     C("Animist's Awakening", "Sorcery", {"gen": 4, "G": 1}, priority=6,
@@ -208,12 +208,16 @@ SORCERIES = [
     # CUT 2026-09-10 for Ancient Greenwarden and Greensleeves respectively:
     #   Rude Awakening    +0.0061 +-0.0026, replaced at +0.0271 +-0.0042
     #   Sylvan Awakening  +0.0052 +-0.0018, replaced at +0.0277 +-0.0043
+    # THE OWNER MOVED GREENWARDEN'S CUT on 2026-09-30 (§0z88): Oblivion Stone
+    # goes instead, and Sylvan Awakening is back in the list below.
     # The whole land-animation pillar was measured as nearly a blank in §0s --
     # 9.24 marginal damage a game in a deck whose damage runs into the
     # thousands -- and §0y measured its replacement from the other side. The
     # `rude_awakening` and `sylvan_awakening` scripts stay in edhmc/azusa.py:
     # they are still exercised by diag_azusa_animation.py, which is the
     # evidence for this cut.
+    C("Sylvan Awakening", "Sorcery", {"gen": 2, "G": 1}, priority=7,
+      threat=6.5, script="sylvan_awakening"),
     C("Seek the Horizon", "Sorcery", {"gen": 3, "G": 1}, priority=6,
       threat=4.0, script="seek_horizon"),
     C("Sylvan Scrying", "Sorcery", {"gen": 1, "G": 1}, priority=5.5,

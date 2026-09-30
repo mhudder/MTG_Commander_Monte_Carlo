@@ -6,10 +6,10 @@ survives), 'other' is exile, bounce, tuck, shuffle, sacrifice or -X/-X
 (it does not). `opponents.destroy` prices indestructible with the two
 shares below (§0z87)."""
 
-# counted once per deck that runs the card: spot 19 of 42 destroy; wipe 14 of 26 destroy; ae 2 of 4 destroy
+# counted once per deck that runs the card: spot 19 of 42 destroy; wipe 13 of 25 destroy; ae 2 of 4 destroy
 # a kind with fewer than 10 cards takes the SPOT share (ae has 4)
 DESTROY_SHARE_SPOT = 0.4524
-DESTROY_SHARE_WIPE = 0.5385
+DESTROY_SHARE_WIPE = 0.5200
 DESTROY_SHARE_AE = 0.4524
 
 # name -> (kind, class, the clause that decided it)
@@ -46,7 +46,6 @@ INTERACTION = {
     'Massacre Wurm': ('wipe', 'other', 'when this creature enters, creatures your opponents control get -2/-2 until end of turn.'),
     'Mortify': ('spot', 'destroy', 'destroy target creature or enchantment.'),
     'Nameless Inversion': ('spot', 'other', ')\ntarget creature gets +3/-3 and loses all creature types until end of turn.'),
-    'Oblivion Stone': ('wipe', 'destroy', '{5}, {t}, sacrifice this artifact: destroy each nonland permanent without a fate counter on it, then remove all fate cou'),
     'Ondu Inversion': ('wipe', 'destroy', 'destroy all nonland permanents.'),
     'Path to Exile': ('spot', 'other', 'exile target creature.'),
     'Promise of Loyalty': ('wipe', 'other', 'each player puts a vow counter on a creature they control and sacrifices the rest.'),
@@ -70,7 +69,7 @@ INTERACTION = {
 
 # deck -> the interaction it runs, as counted above
 RUN_BY = {
-    'azusa': ['Bane of Progress', 'Beast Within', 'Krosan Grip', 'Oblivion Stone', 'Terastodon', 'Ulamog, the Infinite Gyre'],
+    'azusa': ['Bane of Progress', 'Beast Within', 'Krosan Grip', 'Terastodon', 'Ulamog, the Infinite Gyre'],
     'karlov': ['Anguished Unmaking', 'Austere Command', 'Damn', 'Damnation', 'Farewell', 'Fracture', 'Path to Exile', 'Return to Dust', 'Swords to Plowshares', 'Toxic Deluge', "Umezawa's Jitte"],
     'lorehold': ['Blasphemous Act', 'Chaos Warp', 'Farewell', 'Generous Gift', 'Ondu Inversion', 'Path to Exile', 'Promise of Loyalty', 'Rise of the Eldrazi', 'Swords to Plowshares', 'Ultima'],
     'rendmaw': ["Assassin's Trophy", 'Beast Within', 'Bow of Nylea', 'Culling Ritual', 'Erebos, Bleak-Hearted', "Eyeblight's Ending", 'Grist, the Hunger Tide', 'Hagra Mauling', 'Haywire Mite', 'Massacre Wurm', 'Nameless Inversion', 'The Meathook Massacre', 'Toxic Deluge'],
@@ -288,7 +287,6 @@ SCANNED = {
     'Necropotence',
     'Nissa, Vastwood Seer // Nissa, Sage Animist',
     "Nylea's Intervention",
-    'Oblivion Stone',
     'Ohran Frostfang',
     "Olórin's Searing Light",
     'Ondu Inversion',
@@ -371,6 +369,7 @@ SCANNED = {
     'Suture Priest',
     'Swiftfoot Boots',
     'Swords to Plowshares',
+    'Sylvan Awakening',
     'Sylvan Library',
     'Sylvan Scrying',
     'Syr Konrad, the Grim',

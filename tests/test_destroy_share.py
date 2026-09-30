@@ -9,7 +9,7 @@ The pod's answers are anonymous rolls (§4), so `opponents.destroy` prices
 INDESTRUCTIBLE with the share of answers that DESTROY. That was one assumed
 0.60 for spot removal and wipes alike. `tools.removal_census` classifies every
 targeted answer and wipe in the six lists from Scryfall text into
-`decks/_removal.py`: spot 0.45, wipe 0.54, and the artifact-and-enchantment
+`decks/_removal.py`: spot 0.45, wipe 0.52, and the artifact-and-enchantment
 event takes the spot share because its own sample is four cards.
 
 CASES
@@ -20,7 +20,7 @@ CASES
   E  NEIGHBOUR: a caller that names no kind reads the flat 0.60
   F  an indestructible creature, spot removal rolled 0.50: DESTROYED -- 0.50
      is above the census's 0.45 (the flat 0.60 would have saved it)
-  G  the same creature, a wipe rolled 0.50: it SURVIVES -- below 0.54
+  G  the same creature, a wipe rolled 0.50: it SURVIVES -- below 0.52
   H  the census classifies known text: Swords to Plowshares spot/other,
      Beast Within spot/destroy, Wrath of God wipe/destroy, Farewell
      wipe/other, Lightning Bolt ("any target") nothing

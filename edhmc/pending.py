@@ -502,7 +502,7 @@ COMMITTED: list[Change] = [
     # -----------------------------------------------------------------------
     Change(
         deck="azusa",
-        remove="Sylvan Awakening",
+        remove="Oblivion Stone",
         add="Ancient Greenwarden",
         staged="2026-09-10",
         rationale=(
@@ -542,6 +542,17 @@ COMMITTED: list[Change] = [
             "that the incumbent genre is interchangeable with a blank."
         ),
         notes=(
+            "THE CUT WAS MOVED BY THE OWNER ON 2026-09-30 (§0z88): Oblivion "
+            "Stone goes instead of Sylvan Awakening, which returns to the "
+            "list. The rationale and evidence above were written and measured "
+            "against SYLVAN AWAKENING as the cut; they are kept as they were. "
+            "THE MOVE ITSELF, paired on the staged list at N=15,000 "
+            "(diagnostics/run_greenwarden_cut.py): Sylvan Awakening in "
+            "Oblivion Stone's slot is -0.0003 +-0.0013 at T10 and +0.0033 "
+            "+-0.0024 at T20. Oblivion Stone is KNOWN_BLIND -- its "
+            "fate-counter wipe is not played -- so that is Sylvan Awakening "
+            "against a blank, and it says nothing about what the Stone does "
+            "at a real table (§0z88). "
             "KNOWN_ISSUES §0x (the candidate batch), §0y (the head-to-head), "
             "§0z (what the model does NOT see). "
             "AZUSA HAS NO .xlsx, so this is a TWO-LEG change -- the module "

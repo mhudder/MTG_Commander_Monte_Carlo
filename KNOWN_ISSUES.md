@@ -136,6 +136,7 @@ Methodology that used to live at the end of this file is now
 | [0z85](#0z85) | FIXED | **Four rendmaw cards nothing read**: Hart, Familiar, Whip (+0.0109, mostly lifelink), Shigeki (its first smoke fired zero times) |
 | [0z86](#0z86) | FIXED | **Time Sieve's sign flip was the horizon** (tivit counted extra turns, lorehold did not); the pod's clock also read `g.turn`, so extra turns brought kills closer. Sieve 9 → 11 now +0.0218 / +0.0151 |
 | [0z87](#0z87) | MEASURED | **Indestructible priced from a census of the six lists** (spot 0.45, wipe 0.54, not 0.60). Moves no deck by more than 0.001; indestructibility is worth at most 0.008 on any card |
+| [0z88](#0z88) | DECIDED | **The owner moved Ancient Greenwarden's cut from Sylvan Awakening to Oblivion Stone.** Paired: +0.0033 ±0.0024 at T20, which is Sylvan Awakening against a blank -- the Stone is KNOWN_BLIND |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8395,6 +8396,55 @@ It is not to be cleared with `--verified`: the numbers did move.
 Pinned by `tests/test_destroy_share.py`: 10 cases, 3 mutations, exact sets on
 the first run. With `destroy_share_split=False` (and §0z86's two knobs off)
 all six decks reproduce HEAD bit-for-bit on module and staged lists.
+
+## 0z88. DECIDED — the owner moved Ancient Greenwarden's cut from Sylvan Awakening to Oblivion Stone
+
+A COMMITTED azusa swap, changed by the owner on 2026-09-30: `−Sylvan
+Awakening +Ancient Greenwarden` (2026-09-10, §0y) is now `−Oblivion Stone
++Ancient Greenwarden`. Sylvan Awakening is back in `azusa_v1.py`, Oblivion
+Stone is out, and the ledger's Change says so beside the original evidence,
+which was measured against Sylvan Awakening and is kept as it was. Azusa has
+no `.xlsx`, so the module and the ledger are the two legs, moved in one
+commit.
+
+The move itself, paired on azusa's staged list, N=15,000, seeds 5000..
+(`diagnostics/run_greenwarden_cut.py`, `results/greenwarden_cut_20260930.txt`),
+B = Sylvan Awakening in Oblivion Stone's slot:
+
+| | T10 | T20 |
+|---|---|---|
+| win rate | −0.0003 ±0.0013 | **+0.0033 ±0.0024** |
+| damage | +0.03 ±0.11 | **+0.31 ±0.14** |
+| cards drawn | **−0.053 ±0.035** | **−0.087 ±0.059** |
+| pod removal eaten | **−0.0098 ±0.0023** | **−0.0130 ±0.0036** |
+
+**READ IT AS SYLVAN AWAKENING AGAINST A BLANK.** Oblivion Stone is
+KNOWN_BLIND in azusa: its fate-counter wipe is never played, so in this model
+it is a {3} artifact that does nothing, and +0.0033 at T20 is about what
+Sylvan Awakening's old row over a blank said (+0.0052 ±0.0018, §0y). **What
+the Stone does at a real table -- a one-sided-by-fate-counters reset -- is
+not measured in either direction** (§0z36), and the decision rests on the
+owner's judgement of it, as it should. The one thing the model does see: as
+a threat-6.0 artifact the Stone drew a little of the pod's spot removal
+(0.01 answers a game) away from the rest of the board.
+
+**THE CENSUS MOVED WITH IT** (§0z87). Oblivion Stone was a "destroy" wipe in
+the one list that ran it, so regenerating `decks/_removal.py` takes the wipe
+share from 14 of 26 (0.5385) to 13 of 25 (**0.5200**). That is the census
+working as designed -- the shares describe the lists at this table -- and at
+§0z87's sensitivity it moves no deck measurably. `_evasion.py` was
+regenerated too; Sylvan Awakening carries no evasion tag, so only its SCANNED
+set changed.
+
+Azusa's cache was already SUSPECT (§0z87) and now its BASELINE LIST has
+changed as well, which is the case §0z27 says only a rebuild answers. It
+waits for the owner's rebuild with the other five.
+
+**AND A TEST SAYS SO**: `tests/test_metrics_and_render.py` case C re-renders
+every table from its cache, and azusa's cache has no row for Sylvan
+Awakening, so C fails for azusa until the table is rebuilt. That failure is
+the check working -- the table no longer describes the list -- and it is left
+failing rather than taught to skip a stale deck.
 
 ## How to read an ablation table
 

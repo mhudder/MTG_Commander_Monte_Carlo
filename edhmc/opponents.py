@@ -624,7 +624,7 @@ def destroy_share_for(g, kind) -> float:
     It was one hand-written 0.60 for every kind (queued item 7). The shares
     now come from `decks/_removal.py`, a census of the interaction the six
     lists at this table actually run, read from Scryfall by
-    `tools.removal_census` -- spot removal 0.45, wipes 0.54. Both are BELOW
+    `tools.removal_census` -- spot removal 0.45, wipes 0.52. Both are BELOW
     0.60: the old constant overvalued indestructible.
 
     `kind` is "spot", "wipe" or "ae" (the artifact-and-enchantment event,

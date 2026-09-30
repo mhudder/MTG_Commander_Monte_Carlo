@@ -562,13 +562,15 @@ SCRIPTED_AZUSA = {
     "Regrowth", "Animist's Awakening", "Genesis Wave",
     # sac-for-value (token fodder only)
     "Perilous Forays", "Momentous Fall",
-    # LAND ANIMATION IS GONE FROM THIS DECK as of 2026-09-10. Sylvan Awakening,
-    # Rude Awakening and Nissa, Worldwaker were all here -- the animations were
+    # LAND ANIMATION LEFT THIS DECK on 2026-09-10. Sylvan Awakening, Rude
+    # Awakening and Nissa, Worldwaker were all here -- the animations were
     # real continuous effects with per-card durations as of 2026-09-07, and
     # Nissa moved here from KNOWN_BLIND the same day -- and all three were cut
     # for Ancient Greenwarden, Greensleeves and Springheart Nantuko (§0y).
-    # Their scripts remain in edhmc/azusa.py because diag_azusa_animation.py
-    # is the evidence for the cut and still exercises them.
+    # SYLVAN AWAKENING CAME BACK on 2026-09-30 when the owner moved
+    # Greenwarden's cut to Oblivion Stone (§0z88); the other two scripts
+    # remain in edhmc/azusa.py for diag_azusa_animation.py.
+    "Sylvan Awakening",
     #
     # Nissa, Vastwood Seer // Sage Animist is NOT affected and stays: §0s found
     # the Nissas were never the animation story, and she is a top-five card.
@@ -1181,10 +1183,8 @@ KNOWN_BLIND = {
         # a plain land tutor to hand with no clear "best" target among 19
         # distinct utility lands
         "Sylvan Scrying",
-        # a two-step fate-counter board wipe that would need per-permanent
-        # tracking on BOTH sides of the table (it hits your own stuff too,
-        # like Bane of Progress) -- more engineering than the card is worth
-        "Oblivion Stone",
+        # (Oblivion Stone was here, a fate-counter wipe the engine never
+        # played; the owner cut it for Ancient Greenwarden, 2026-09-30, §0z88.)
     },
     "shilgengar": {
         # removal -- opponents' boards are a blocker count, so none of it has
