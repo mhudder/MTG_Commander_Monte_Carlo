@@ -746,6 +746,7 @@ def goaded_combat(g):
     if not birds:
         return
     share = g.cfg.get("goad_block_share", 0.30)
+    losses = []
     for att in birds:
         targets = [o for o in living(g) if o is not att]
         if not targets:
@@ -753,8 +754,11 @@ def goaded_combat(g):
         victim = min(targets, key=lambda o: o.life)
         blocked = min(att.goaded_birds, (victim.creatures + victim.goaded_birds) * share)
         through = max(0.0, att.goaded_birds - blocked)
-        victim.life -= life_loss(victim, 2.0 * through)   # 2/2 bodies
+        loss = life_loss(victim, 2.0 * through)           # 2/2 bodies
+        victim.life -= loss
+        losses.append((victim, loss))
     _check_eliminations(g)
+    lost_life(g, losses)
 
 
 # ---------------------------------------------------------------------------
@@ -895,15 +899,52 @@ def menace_of(g, perm) -> bool:
     return perm.card.name in MENACE
 
 
+def trample_of(g, perm) -> bool:
+    """Does this attacker have trample RIGHT NOW? (§0z92)
+
+    Unconditional trample is the generated TRAMPLE set, from Scryfall's
+    keywords array (creatures only, grants and conditions excluded -- menace's
+    rule). The rest is state, each named:
+
+      * Lord of the Pit, a token (Thomil), "7/7 Demon ... with flying,
+        trample" -- a token cannot be in a generated set of CARD names.
+      * the whole team for the turn after Overwhelming Stampede (rendmaw's
+        `stampede_bonus`) or Craterhoof Behemoth (azusa's `craterhoof_bonus`):
+        "creatures you control gain trample and get +X/+X until end of turn".
+      * a land animated WITH trample (azusa's Nissa, Worldwaker; the flag sat
+        in `animate_lands` unread until this function).
+
+    `trample=False` restores the old rule: a chump block stops everything.
+    """
+    if not g.cfg.get("trample", True):
+        return False
+    from edhmc.decks._evasion import TRAMPLE
+    name = perm.card.name
+    if name in TRAMPLE or name == "Lord of the Pit token":
+        return True
+    if (getattr(g, "stampede_bonus", 0) > 0
+            or getattr(g, "craterhoof_bonus", 0) > 0):
+        return True
+    animation_of = getattr(g, "animation_of", None)
+    if animation_of is not None:
+        anim = animation_of(perm)
+        if anim is not None and anim.get("trample"):
+            return True
+    return False
+
+
 def chump(items, budget, blocked=None):
     """Blockers a defender assigns, and the power they stop.
 
-    `items` is [(power, cost[, key])], cost being the blockers it takes to
-    block that attacker: 1, or 2 for menace (§0z61). The defender stops the
-    most power per blocker first, the biggest first on a tie -- with every
-    cost 1 that is exactly "chump the biggest attackers", the rule
-    `damage_through` has always had, so a board without menace blocks as it
-    always did. Returns (power stopped, blockers used).
+    `items` is [(power, cost[, key[, priority[, stops]]]], cost being the
+    blockers it takes to block that attacker: 1, or 2 for menace (§0z61).
+    `stops` is what blocking it actually stops -- its power, unless it has
+    TRAMPLE, when it is only what the blockers can absorb (§0z92). The
+    defender stops the most per blocker first, the biggest first on a tie --
+    with every cost 1 and no trample that is exactly "chump the biggest
+    attackers", the rule `damage_through` has always had, so a board without
+    menace or trample blocks as it always did. Returns (power stopped,
+    blockers used).
 
     `blocked`, when given, collects the KEY of every item blocked -- so that
     commander damage (§0z65) reads the same blocking decision the damage
@@ -914,13 +955,15 @@ def chump(items, budget, blocked=None):
     # An optional fourth element is a PRIORITY that outranks power per
     # blocker: a defender one hit from 21 commander damage blocks the
     # commander first (`commander_must_block`, §0z67).
+    def stops(it):
+        return it[4] if len(it) > 4 else it[0]
     for it in sorted(items, key=lambda it: ((it[3] if len(it) > 3 else 0),
-                                            it[0] / it[1], it[0]),
+                                            stops(it) / it[1], stops(it)),
                      reverse=True):
-        power, cost = it[0], it[1]
+        cost = it[1]
         if used + cost <= budget:
             used += cost
-            stopped += power
+            stopped += stops(it)
             if blocked is not None:
                 blocked.append(it[2])
     return stopped, used
@@ -983,9 +1026,16 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
         n_block = n_fly = 0          # Serra's Emissary (§0z84)
 
     fly, ground = [], []
+    # A blocker absorbs its toughness from a trampler (§0z92). The pod's
+    # creatures are a count with no bodies, so their toughness is a knob:
+    # `blocker_toughness`, 2, the 2/2 the goaded Birds already assume.
+    tough = g.cfg.get("blocker_toughness", 2)
     for k, p in enumerate(attackers):
-        item = (g.power_of(p), 2 if menace_of(g, p) else 1, k,
+        power, cost = g.power_of(p), 2 if menace_of(g, p) else 1
+        item = (power, cost, k,
                 1 if commander_must_block(g, p, defender) else 0)
+        if trample_of(g, p):
+            item += (min(power, tough * cost),)
         (fly if flying_of(g, p) else ground).append(item)
 
     # A defender spends its flying-capable blockers on the biggest fliers, then
@@ -1041,10 +1091,9 @@ def record_hits(g, through) -> None:
     is discovered with `getattr` rather than added to all six (the
     `on_creature_death` pattern in `docs/ARCHITECTURE.md`'s protocol table).
 
-    tivit.py's own commander trigger reads `dmg > 0 and Tivit attacked`, which
-    credits the trigger when Tivit was chump-blocked and something else got
-    through. That approximation is left alone here -- changing it would move
-    tivit's baseline -- and named as the difference."""
+    tivit.py's commander trigger asks too, since §0z91: it used to read
+    `dmg > 0 and Tivit attacked`, which credited the trigger when Tivit was
+    chump-blocked and something else got through."""
     hits = getattr(g, "combat_hits", None)
     if hits is not None:
         hits.extend(p for p in through if g.power_of(p) > 0)
@@ -1147,6 +1196,30 @@ def life_loss(o, n: float) -> float:
     return 2.0 * n if o.cursed else n
 
 
+def lost_life(g, losses) -> None:
+    """"WHENEVER AN OPPONENT LOSES LIFE" -- the optional protocol hook
+    `g.on_opponent_lost_life(o, loss)`, once per opponent per event (§0z90).
+
+    Called by every site that lowers an opponent's life, AFTER the whole
+    event has landed and eliminations are checked: the triggers go on the
+    stack once the damage is dealt, one per player who lost life, and a
+    player who just died still lost it. `losses` is [(opponent, loss)] with
+    the loss as `life_loss` returned it -- the full amount, not the part that
+    mattered, because Exquisite Blood gains "that much life".
+
+    Only karlov defines the hook (Exquisite Blood, Bloodthirsty Conqueror), so
+    every other engine returns here without reading anything. A clock kill is
+    NOT a loss of life: the clock is an abstract elimination (§4), and it
+    does not reach this function.
+    """
+    hook = getattr(g, "on_opponent_lost_life", None)
+    if hook is None:
+        return
+    for o, loss in losses:
+        if loss > 0 and g.result is None:
+            hook(o, loss)
+
+
 def curse_opponent(g) -> bool:
     """SELENIA'S CURSE enters attached to target opponent (§0z74).
 
@@ -1231,11 +1304,14 @@ def damage_each(g, n) -> float:
     if n <= 0:
         return 0.0
     dealt = 0.0
+    losses = []
     for o in living(g):
         loss = life_loss(o, n)
         dealt += min(loss, max(0.0, o.life))
         o.life -= loss
+        losses.append((o, loss))
     _check_eliminations(g)
+    lost_life(g, losses)                  # §0z90
     return dealt
 
 
@@ -1255,6 +1331,7 @@ def damage_single(g, n) -> float:
     dealt = min(loss, max(0.0, target.life))
     target.life -= loss
     _check_eliminations(g)
+    lost_life(g, [(target, loss)])        # §0z90
     return dealt
 
 
@@ -1464,6 +1541,7 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
 
     before_alive = len(living(g))
     effective, raw = 0.0, 0.0
+    losses = []
     for slot, (opp, group) in enumerate(groups):
         through = []
         dealt = damage_through(g, group, defender=opp,
@@ -1486,8 +1564,10 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         effective += min(dealt, max(0.0, opp.life))
         raw += dealt
         opp.life -= dealt
+        losses.append((opp, dealt))
     # Combat damage is simultaneous: everything lands, then deaths are checked.
     _check_eliminations(g)
+    lost_life(g, losses)                  # §0z90
     g.m["raw_damage"] += raw
     g.m["combat_kills"] += before_alive - len(living(g))
     g.m["attack_targets"] += len(groups)

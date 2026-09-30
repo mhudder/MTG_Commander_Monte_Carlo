@@ -131,6 +131,7 @@ class TivitGame(BaseGame):
             # taken and how many rounds the pod got. The gap between granted and
             # taken is what the discarded-chain bug used to throw away.
             "extra_turns_taken": 0, "pod_rounds": 0,
+            "tivit_combat_triggers": 0,        # §0z91
             # --- routes out ---
             "win_route": 0, "loss_route": 0,
             "token_drain": 0.0, "artifact_drain": 0.0,
@@ -1123,9 +1124,15 @@ def combat(g):
         # it cannot finish anybody, because the player on 3 life and the
         # player on 40 each got a third. `dmg` comes back bounded at what
         # could have mattered.
+        # WHICH ATTACKERS CONNECTED (§0z91): opt in to the pod's report,
+        # the same hook shilgengar's Seluma reads (§0z74).
+        if g.cfg.get("tivit_trigger_connects", True):
+            g.combat_hits = []
         dmg = OPP.combat_damage(g, attackers,
                                 scale=(raw + bonus) / max(1e-9, raw))
+        hits, g.combat_hits = getattr(g, "combat_hits", None), None
     else:
+        hits = None
         # Legacy flat-haircut pod: no per-defender blockers to plan against.
         dmg *= (1.0 - g.cfg.get("block_rate", 0.30))
         dmg = OPP.damage_each(g, dmg / max(1, len(OPP.living(g))))
@@ -1141,7 +1148,19 @@ def combat(g):
     # "...OR DEALS COMBAT DAMAGE TO A PLAYER." The second half of the
     # commander's trigger, and the reason Lightning Greaves is in this deck:
     # haste is a whole extra dilemma on the turn Tivit lands.
-    if dmg > 0 and any(p.card is g.commander for p in attackers):
+    #
+    # TIVIT ITSELF HAS TO CONNECT (§0z91). This read `dmg > 0 and Tivit
+    # attacked`, which fired the trigger when Tivit was chump-blocked and
+    # something else got through. `hits` is the pod's list of attackers that
+    # dealt combat damage to a player; the legacy flat-haircut pod has no
+    # blocks to ask, so it keeps the old reading, as does
+    # `tivit_trigger_connects=False`.
+    if hits is not None:
+        connected = any(p.card is g.commander for p in hits)
+    else:
+        connected = dmg > 0 and any(p.card is g.commander for p in attackers)
+    if connected:
+        g.m["tivit_combat_triggers"] += 1
         tivit_dilemma(g)
 
 

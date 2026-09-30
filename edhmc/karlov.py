@@ -51,13 +51,10 @@ from edhmc import opponents as OPP
 # read a SET rather than a name -- Bloodthirsty Conqueror is Exquisite Blood on
 # a 5/5 flying deathtouch body.
 #
-# IT IS MODELLED AS A COMBO PIECE AND NOT AS A CONTINUOUS TRIGGER, which is a
-# deliberate choice and a FLOOR on both cards. Exquisite Blood's general clause
-# -- gaining life off every point the pod loses, all game -- has never been
-# modelled here; only the loop is. Implementing the general trigger for the new
-# card and not the old one would make a strictly-worse card measure strictly
-# better, which is §0u's shape (the same rule, implemented twice, implemented
-# two different ways). So both are the loop and nothing more.
+# UNTIL §0z90 IT WAS MODELLED AS A COMBO PIECE ONLY -- a FLOOR on both cards,
+# held deliberately so the two stayed equal (§0u). Both now carry the general
+# clause, in `KarlovGame.on_opponent_lost_life`: every opponent who loses life
+# gains you that much, one lifegain EVENT per trigger (`exquisite_general`).
 COMBO_A_CARDS = ("Exquisite Blood", "Bloodthirsty Conqueror")
 COMBO_A = COMBO_A_CARDS[0]      # kept: two call sites and the docstring cite it
 
@@ -71,6 +68,19 @@ def has_combo_a(g) -> bool:
 COMBO_LOOP = ("Sanguine Bond", "Vito, Thorn of the Dusk Rose",
               "Enduring Tenacity")
 COMBO_B = COMBO_LOOP + ("Vizkopa Guildmage",)
+# "Whenever you gain life, EACH OPPONENT loses 1 life." With Exquisite Blood
+# out this is ALSO an infinite loop, and it was never modelled as one (§0z90):
+# you gain life, each opponent loses 1, Blood gains 1 per opponent -- three
+# lifegain events -- and each fires every one of these again. It grows, and
+# it kills the table. All three are in karlov's list. `exquisite_drain_loop`
+# makes them loop partners exactly as COMBO_LOOP's are.
+DRAIN_ON_GAIN = ("Cliffhaven Vampire", "Marauding Blight-Priest",
+                 "Starscape Cleric")
+
+
+def drain_loop_partner(g) -> bool:
+    return (g.cfg.get("exquisite_drain_loop", True)
+            and any(g.has(x) for x in DRAIN_ON_GAIN))
 
 
 class KarlovGame(BaseGame):
@@ -136,6 +146,8 @@ class KarlovGame(BaseGame):
             "crystal_doubled": 0.0, "offspring_paid": 0,
             "lifelink_grants": 0,
             "loss_route": 0,
+            # Exquisite Blood's general clause and the drain loop (§0z90).
+            "exquisite_gains": 0, "drain_loop_wins": 0,
             # Reality Fracture candidates, 2026-09-20 (preview text).
             "liliana_triggers": 0, "edgar_triggers": 0,
             "extort_triggers": 0, "confidant_cards": 0,
@@ -219,6 +231,26 @@ class KarlovGame(BaseGame):
                 self.hand.append(self.library.pop())
                 self.m["cards_drawn"] += 1
                 self.m["archive_extra_draws"] += 1
+
+    def on_opponent_lost_life(self, o, loss):
+        """Exquisite Blood and Bloodthirsty Conqueror: "Whenever an opponent
+        loses life, you gain that much life." (Scryfall, both, 2026-09-30.)
+
+        The optional protocol hook `opponents.lost_life` calls once per
+        opponent per event (§0z90). Each copy of the text is its own trigger,
+        so two of them gain twice, as two EVENTS -- which is what every
+        lifegain payoff in this deck counts. The loop cases never get here
+        with the game still running: a loop partner on the battlefield wins
+        inside `gain_life` first.
+        """
+        if not self.cfg.get("exquisite_general", True):
+            return
+        for name in COMBO_A_CARDS:
+            for _ in range(self.count(name)):
+                if self.result is not None:
+                    return
+                self.m["exquisite_gains"] += 1
+                gain_life(self, loss)
 
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
@@ -415,12 +447,18 @@ def gain_life(g, amount, _depth=0):
             # "each opponent loses 1 life" — a flat 1 to EACH, not `amount` to
             # one. The old form understated small triggers 3x and overstated
             # large ones.
+            if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
+                win_by_drain_loop(g)
+                return
             g.m["damage"] += OPP.damage_each(g, 1)
         elif n in ("Marauding Blight-Priest", "Starscape Cleric"):
             # Starscape Cleric: "whenever you gain life, each opponent loses 1
             # life" — identical wording to Blight-Priest, and its Offspring
             # token has the same trigger, which is why the token is named the
             # same and this loop counts both.
+            if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
+                win_by_drain_loop(g)
+                return
             g.m["damage"] += OPP.damage_each(g, 1)
         elif n == "Heliod, Sun-Crowned":
             # "put a +1/+1 counter on target creature or enchantment you
@@ -454,6 +492,15 @@ def gain_life(g, amount, _depth=0):
         # "you may pay {2}. If you do, draw a card."
         if pay_generic(g, 2) == 2:
             g.draw(1)
+
+
+def win_by_drain_loop(g) -> None:
+    """Exquisite Blood + a DRAIN_ON_GAIN card, set off by a lifegain event
+    (§0z90). `win_route` 5, so the loop is counted apart from COMBO_LOOP's 2."""
+    g.m["drain_loop_wins"] += 1
+    g.result = "win"
+    g.m["turn_won"] = g.turn
+    g.m["win_route"] = 5
 
 
 def drain(g, amount):

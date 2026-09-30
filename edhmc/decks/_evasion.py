@@ -59,6 +59,14 @@ MENACE = {
     'Rendmaw, Creaking Nest',
 }
 
+# Unconditional trample (creatures only), from the same keywords array.
+# Read by opponents.trample_of(): a blocked trampler assigns the excess (§0z92).
+TRAMPLE = {
+    'Cultivator Colossus',
+    'Rampaging Baloths',
+    'Verdurous Gearhulk',
+}
+
 # Token subtypes that fly, from the text of the card that makes them.
 FLYING_TOKENS = {
     'Angel',

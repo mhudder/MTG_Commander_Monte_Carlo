@@ -105,16 +105,13 @@ Damn                                  -1.22+-0.13         -1.02+-0.16        -0.
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
 Bloodthirsty Conqueror                -0.95+-0.15         -2.06+-0.22        +0.0315+-0.0032      both
-      Its text -- 'whenever an opponent loses life, you gain that much life' -- is
-      WORD FOR WORD Exquisite Blood's, and this engine models that text as a COMBO
-      DETECTOR rather than as a continuous trigger: it closes the loop with
-      Sanguine Bond, Vito and Enduring Tenacity and does nothing the rest of the
-      game. So the lifegain it would generate off every point the pod loses, all
-      game, is UNMODELLED for this card exactly as it is for Exquisite Blood.
-      Giving the newer card the general trigger and not the older one would have
-      made a strictly-worse card measure strictly better, which is §0u's shape --
-      so both are understated by the same amount and both rows are FLOORS. The 5/5
-      flying deathtouch body IS modelled. §0z26.
+      Exquisite Blood's text word for word, and since §0z90 BOTH halves of it are
+      modelled for both cards: the loop with Sanguine Bond, Vito, Enduring
+      Tenacity and (new) the three 'each opponent loses 1' drains, and the general
+      clause -- every opponent who loses life gains you that much, as a lifegain
+      event. The 5/5 flying body is modelled. NOT: deathtouch, which nothing in
+      the blocking model reads (a chump blocker dies either way; only Ohran
+      Frostfang makes the pod block less). A floor by that. §0z26, §0z90.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card

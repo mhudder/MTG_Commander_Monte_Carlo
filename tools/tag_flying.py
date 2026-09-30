@@ -83,6 +83,7 @@ exactly the kind of card a hand-written set forgets.
     python -m tools.tag_flying --write    # regenerate edhmc/decks/_evasion.py
 """
 import json
+import re
 import sys
 import urllib.parse
 import urllib.request
@@ -237,6 +238,15 @@ def main():
     menace = {n for n, c in cards.items()
               if n in creatures and "Menace" in c.get("keywords", [])
               and "gains menace" not in (c.get("oracle_text") or "").lower()}
+    # TRAMPLE, 2026-09-30 (§0z92): a blocked trampler assigns the damage its
+    # blockers cannot absorb to the player. Creatures only and unconditional
+    # only, for menace's reason: the keywords array also carries GRANTS
+    # ("creatures you control gain trample") and conditions ("has trample as
+    # long as"), and neither is a fact about the permanent.
+    trample = {n for n, c in cards.items()
+               if n in creatures and "Trample" in c.get("keywords", [])
+               and not re.search(r"(gains?|have|has) trample",
+                                 (c.get("oracle_text") or "").lower())}
     indestructible = {n for n, c in cards.items()
                       if "Indestructible" in c.get("keywords", [])
                       and n in everything and everything[n].is_permanent}
@@ -266,6 +276,9 @@ def main():
         print(f"    {n}")
     print(f"\nUNCONDITIONAL MENACE ({len(menace)}):")
     for n in sorted(menace):
+        print(f"    {n}")
+    print(f"\nUNCONDITIONAL TRAMPLE ({len(trample)}):")
+    for n in sorted(trample):
         print(f"    {n}")
     print(f"\nCONDITIONAL — handled in opponents.flying_of(), not tagged:")
     for n, why in sorted(CONDITIONAL.items()):
@@ -322,6 +335,11 @@ def main():
                      "same keywords array.\n# Read by opponents.menace_of(): a "
                      "menace attacker costs two blockers.\nMENACE = {\n")
             for n in sorted(menace):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n# Unconditional trample (creatures only), from the "
+                     "same keywords array.\n# Read by opponents.trample_of(): a "
+                     "blocked trampler assigns the excess (§0z92).\nTRAMPLE = {\n")
+            for n in sorted(trample):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\n# Token subtypes that fly, from the text of the card "
                      "that makes them.\nFLYING_TOKENS = {\n")

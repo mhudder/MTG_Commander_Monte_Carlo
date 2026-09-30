@@ -45,6 +45,7 @@ Ophiomancer                           +0.40+-0.06         +0.51+-0.09        +0.
 Solemn Simulacrum                     +0.35+-0.07         +0.46+-0.10        +0.0037+-0.0024      both
 Foundry Inspector                     +0.50+-0.06         +0.41+-0.09        +0.0027+-0.0021      both
 Verdurous Gearhulk                    +0.48+-0.08         +0.39+-0.11        +0.0001+-0.0024       dmg
+Scrap Trawler                         +0.29+-0.04         +0.38+-0.07        +0.0040+-0.0019      both
 Heroic Intervention                   +0.37+-0.05         +0.32+-0.07        +0.0028+-0.0015      both
 Steel Overseer                        +0.42+-0.07         +0.29+-0.09        +0.0011+-0.0020       dmg
 Gloomshrieker                         +0.33+-0.04         +0.28+-0.06        +0.0032+-0.0015      both
@@ -64,6 +65,7 @@ Roaming Throne                        +0.20+-0.07         +0.04+-0.09        +0.
 Dryad of the Ilysian Grove            +0.07+-0.07         +0.02+-0.10        +0.0037+-0.0023       win
 Deathreap Ritual                      +0.01+-0.02         +0.01+-0.04        +0.0008+-0.0010        --
 Sakura-Tribe Elder                    -0.05+-0.03         -0.02+-0.04        -0.0003+-0.0008        --
+Overwhelming Stampede                 -0.07+-0.08         -0.03+-0.12        -0.0003+-0.0025        --
 Enduring Vitality                     +0.05+-0.07         -0.04+-0.09        +0.0021+-0.0021        --
 Copper Myr                            -0.07+-0.06         -0.07+-0.09        +0.0017+-0.0018        --
 Leaden Myr                            -0.06+-0.06         -0.10+-0.09        +0.0020+-0.0018      both
@@ -82,15 +84,6 @@ Hagra Mauling                         +0.59+-0.10         +0.82+-0.14        +0.
       played when the engine needs a land. NOT: the front face's 'Destroy target
       creature', which has no target in an opponent model whose creatures are a
       count (§4). A floor.
-Scrap Trawler                         +0.29+-0.04         +0.38+-0.07        +0.0040+-0.0019      both
-      Its own-death trigger is implemented (2026-09-13, §0z19) and returns a
-      LESSER-mana-value artifact. Its SECOND clause -- 'whenever ANOTHER ARTIFACT
-      YOU CONTROL is put into a graveyard from the battlefield' -- is live only
-      for artifact CREATURES, because `opponents.destroy` only ever kills
-      permanents that are creatures right now: no noncreature artifact in this
-      list (Sol Ring, the signets, Idol of Oblivion) is ever destroyed, and tokens
-      never reach the graveyard. That is the pod model's limit (§4), not the
-      card's, and it makes this row a FLOOR. §7.
 Toxic Deluge                          -0.01+-0.05         +0.12+-0.10        +0.0028+-0.0019      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
@@ -107,11 +100,6 @@ Shigeki, Jukai Visionary              +0.04+-0.03         -0.02+-0.04        +0.
       graveyard' at the end step, while the library holds more than
       `shigeki_min_library`. NOT: Channel -- '{X}{X}{G}{G}, discard: return X
       nonlegendary cards from your graveyard to your hand'. A floor.
-Overwhelming Stampede                 -0.07+-0.08         -0.03+-0.12        -0.0003+-0.0025        --
-      MODELLED: '+X/+X until end of turn, X = the greatest power among creatures
-      you control' (the 'stampede' script). NOT: trample --
-      `opponents.damage_through` prices a chump block as stopping the whole
-      attacker, the same floor engine.py names for its 7/7 trampling Demons.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card

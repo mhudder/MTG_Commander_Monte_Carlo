@@ -1496,14 +1496,16 @@ class Game(BaseGame):
         Trawler is the loop this clause exists to prevent, and `<` is the whole
         of the prevention.
 
-        WHAT DOES NOT REACH HERE, said out loud rather than left implicit:
-        `destroy()` only ever kills permanents that are creatures right now,
-        so a NONCREATURE artifact -- Sol Ring, the signets, Idol of Oblivion --
-        is never destroyed in this project and never triggers the Trawler.
-        Its second clause is therefore live only for artifact CREATURES, which
-        understates it. That is a limit of the pod model (§4), not of this
-        function. Tokens do not reach the graveyard at all, so a sacrificed
-        Treasure does not trigger it either.
+        WHAT REACHES HERE. The pod's `ae_removal` destroys NONCREATURE
+        artifacts -- Sol Ring, the signets, Idol of Oblivion -- through
+        `destroy()`, so the Trawler's "another artifact" clause is live for
+        them too. This docstring said the opposite until 2026-09-30, and a
+        test disproved it in one call (§0z89); the card was labelled PARTLY
+        on that claim. Tokens are not CARDS and never reach the graveyard, so
+        a sacrificed Treasure correctly triggers nothing. Three sacrifice
+        paths do not reach here or the graveyard at all -- Cauldron of
+        Essence, Skullclamp and Baba Lysaga eating a NONTOKEN creature -- and
+        none of those cards is in any list.
         """
         if not self.cfg.get("artifact_recursion", True):
             return
@@ -2376,7 +2378,8 @@ def main_phase(g: Game, precombat: bool = False):
                 max(targets, key=g.power_of).counters += 1
         if card.script == "stampede":
             # +X/+X and trample until end of turn, X = greatest power you
-            # control. In a deck that goes this wide it is a finisher, and the
+            # control. The trample is `opponents.trample_of` reading
+            # `stampede_bonus` (§0z92). In a deck that goes this wide it is a finisher, and the
             # engine was previously casting it for literally no effect.
             g.stampede_bonus += max([g.power_of(p) for p in g.board
                                      if is_battlefield_creature(g, p)] or [0])
@@ -2909,10 +2912,10 @@ def lord_of_the_pit_card() -> Card:
     beginning of your upkeep, sacrifice another creature. If you can't, this
     token deals 7 damage to you.'" A fresh object per token.
 
-    TRAMPLE IS NOT MODELLED: `opponents.damage_through` prices a chump block
-    as stopping the whole attacker, so a 7/7 trampler blocked by a 1/1 is
-    scored as dealing 0 rather than 6. Its flying is carried (it is a token,
-    so `_evasion.FLYING` cannot reach it; set here from the reminder text)."""
+    Its TRAMPLE is `opponents.trample_of`, by the token's name (§0z92) -- a
+    chump block used to stop all seven. Its flying is carried here (it is a
+    token, so `_evasion.FLYING` cannot reach it; set from the reminder
+    text)."""
     return Card(name="Lord of the Pit token", types=frozenset({"Creature"}),
                 cost={"gen": 4, "B": 3}, power=7, toughness=7, flying=True,
                 script="lord_of_the_pit", tags=frozenset({"demon"}))

@@ -199,6 +199,13 @@ SCRIPTED_RENDMAW = {
     # flies, which decks/_evasion.py already carries. Fully implemented in
     # Game.artifact_died, reached through opponents.destroy().
     "Myr Retriever", "Junk Diver",
+    # Scrap Trawler: both clauses. Its "another artifact" clause fires when
+    # the pod's `ae_removal` destroys a NONCREATURE artifact -- which the
+    # PARTLY reason it carried until 2026-09-30 said never happened (§0z89).
+    "Scrap Trawler",
+    # Overwhelming Stampede: +X/+X AND, since §0z92, trample for the team
+    # (`opponents.trample_of` reads `stampede_bonus`).
+    "Overwhelming Stampede",
     # protection the opponent model respects
     "Heroic Intervention",
     # static P/T setter (implemented in Game.power_of / toughness_of), and
@@ -627,40 +634,26 @@ PARTLY_MODELLED = {
             "the round it changes hands -- so the row is bounded on both "
             "sides and neither bound is tight.",
         "Bloodthirsty Conqueror":
-            "Its text -- 'whenever an opponent loses life, you gain that much "
-            "life' -- is WORD FOR WORD Exquisite Blood's, and this engine "
-            "models that text as a COMBO DETECTOR rather than as a continuous "
-            "trigger: it closes the loop with Sanguine Bond, Vito and "
-            "Enduring Tenacity and does nothing the rest of the game. So the "
-            "lifegain it would generate off every point the pod loses, all "
-            "game, is UNMODELLED for this card exactly as it is for Exquisite "
-            "Blood. Giving the newer card the general trigger and not the "
-            "older one would have made a strictly-worse card measure strictly "
-            "better, which is §0u's shape -- so both are understated by the "
-            "same amount and both rows are FLOORS. The 5/5 flying deathtouch "
-            "body IS modelled. §0z26.",
+            "Exquisite Blood's text word for word, and since §0z90 BOTH "
+            "halves of it are modelled for both cards: the loop with Sanguine "
+            "Bond, Vito, Enduring Tenacity and (new) the three 'each opponent "
+            "loses 1' drains, and the general clause -- every opponent who "
+            "loses life gains you that much, as a lifegain event. The 5/5 "
+            "flying body is modelled. NOT: deathtouch, which nothing in the "
+            "blocking model reads (a chump blocker dies either way; only "
+            "Ohran Frostfang makes the pod block less). A floor by that. "
+            "§0z26, §0z90.",
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
     },
     "rendmaw": {
-        "Scrap Trawler":
-            "Its own-death trigger is implemented (2026-09-13, §0z19) and "
-            "returns a LESSER-mana-value artifact. Its SECOND clause -- "
-            "'whenever ANOTHER ARTIFACT YOU CONTROL is put into a graveyard "
-            "from the battlefield' -- is live only for artifact CREATURES, "
-            "because `opponents.destroy` only ever kills permanents that are "
-            "creatures right now: no noncreature artifact in this list (Sol "
-            "Ring, the signets, Idol of Oblivion) is ever destroyed, and "
-            "tokens never reach the graveyard. That is the pod model's limit "
-            "(§4), not the card's, and it makes this row a FLOOR. §7.",
+        # Scrap Trawler LEFT PARTLY on 2026-09-30 (§0z89): its reason said
+        # no noncreature artifact is ever destroyed, and the pod's
+        # `ae_removal` destroys them. It is SCRIPTED_RENDMAW now.
         # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). The triage back-test
         # (§0z66) proved the engine acts on each; every missing clause below
         # understates. Oracle text read from Scryfall the same day. ---
-        "Overwhelming Stampede":
-            "MODELLED: '+X/+X until end of turn, X = the greatest power among "
-            "creatures you control' (the 'stampede' script). NOT: trample -- "
-            "`opponents.damage_through` prices a chump block as stopping the "
-            "whole attacker, the same floor engine.py names for its 7/7 "
-            "trampling Demons.",
+        # Overwhelming Stampede LEFT PARTLY 2026-09-30: its one gap was
+        # trample, modelled since §0z92. SCRIPTED_RENDMAW now.
         "Hagra Mauling":
             "MODELLED: the back face, Hagra Broodpit (enters tapped, {T}: add "
             "{B}), played when the engine needs a land. NOT: the front face's "
@@ -1125,13 +1118,13 @@ KNOWN_BLIND = {
         # row that prints "not measured" would be the §0f error inverted: a
         # score that IS evidence, labelled as if it were not.
         # Rogue's Passage: "{4}, {T}: Target creature can't be blocked this
-        # turn." UNIMPLEMENTED — and the thing it buys is already assumed.
-        # Tivit's second trigger fires on `dmg > 0 and Tivit attacked`
-        # (tivit.combat), which never asks whether TIVIT connected, so the
-        # model already behaves as though the commander is unblockable. The
-        # {4} activation is uncharged too, so both halves are missing and
-        # they point opposite ways. Implementing it would be worth ~nothing
-        # until combat tracks damage per attacker.
+        # turn." UNIMPLEMENTED. Until §0z91 the thing it buys was already
+        # assumed -- Tivit's trigger fired on `dmg > 0 and Tivit attacked` --
+        # and this note said implementing it "would be worth ~nothing until
+        # combat tracks damage per attacker". COMBAT TRACKS IT NOW (§0z91): the
+        # trigger needs Tivit to connect, so a blocked Tivit loses its
+        # dilemma and the Passage is the card that would buy it back. A real
+        # gap since §0z91, not a null -- §0z13's shape, noted the same day.
         "Rogue's Passage",
         # Ward {3}, and an attack tax, cannot be expressed against an opponent
         # model whose combat is a damage share rather than declared attackers.

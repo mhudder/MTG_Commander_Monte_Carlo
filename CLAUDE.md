@@ -172,6 +172,7 @@ python -m tests.test_floors_batch --mutate         # 6 mutations, exact sets
 python -m tests.test_floors_batch2 --mutate        # 6 mutations, exact sets
 python -m tests.test_pod_clock --mutate            # 3 mutations, exact sets
 python -m tests.test_destroy_share --mutate        # 3 mutations, exact sets
+python -m tests.test_engine_gaps --mutate          # 6 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant

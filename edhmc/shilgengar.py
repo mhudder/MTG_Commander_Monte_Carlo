@@ -889,12 +889,16 @@ class ShilgengarGame(BaseGame):
             # the creatures assumed killed — a wrath-adjacent effect, not a
             # precise one. Said out loud rather than guessed silently.
             share = self.cfg.get("wurm_kill_share", 0.35)
+            losses = []
             for o in OPP.living(self):
                 killed = min(o.creatures, o.creatures * share + 1)
                 o.creatures = max(0.0, o.creatures - killed)
                 if killed > 0:
-                    o.life -= OPP.life_loss(o, 2.0 * killed)   # §0z74
+                    loss = OPP.life_loss(o, 2.0 * killed)      # §0z74
+                    o.life -= loss
+                    losses.append((o, loss))
             OPP._check_eliminations(self)
+            OPP.lost_life(self, losses)       # §0z90: no hook here today
 
         if perm.card.is_creature:
             self.creature_entered(perm)
