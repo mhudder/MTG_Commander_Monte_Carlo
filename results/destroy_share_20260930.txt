@@ -1,0 +1,34 @@
+# python -m diagnostics.run_destroy_share 15000 OUT && --report OUT   (staged lists, seeds 5000..19999, 2026-09-30)
+1. BASELINE, split - flat (win rate, paired, 95% CI)
+  rendmaw    T10 +0.0000 ±0.0000  (bit-identical)   T20 +0.0001 ±0.0004 
+  lorehold   T10 +0.0000 ±0.0000  (bit-identical)   T20 +0.0000 ±0.0000  (bit-identical)
+  karlov     T10 -0.0001 ±0.0002    T20 -0.0004 ±0.0004*
+  tivit      T10 +0.0000 ±0.0000  (bit-identical)   T20 +0.0000 ±0.0000  (bit-identical)
+  shilgengar T10 -0.0003 ±0.0003*   T20 -0.0010 ±0.0008*
+  azusa      T10 -0.0002 ±0.0002    T20 -0.0009 ±0.0005*
+
+2. INDESTRUCTIBILITY'S WORTH, live - mortal
+  Erebos, Bleak-Hearted (rendmaw)
+    flat  T10 +0.0001 ±0.0001    T20 +0.0005 ±0.0008 
+    split T10 +0.0001 ±0.0001    T20 +0.0007 ±0.0008 
+    split - flat, of the worth  T10 +0.0000 ±0.0000  (bit-identical)     T20 +0.0001 ±0.0004 
+    T20 flat: removal eaten 1.390, ae removal eaten 0.706 a game
+    T20 split: removal eaten 1.393, ae removal eaten 0.709 a game
+  Voice of the Blessed (karlov)
+    flat  T10 +0.0009 ±0.0005*   T20 +0.0029 ±0.0010*
+    split T10 +0.0007 ±0.0004*   T20 +0.0025 ±0.0010*
+    split - flat, of the worth  T10 -0.0001 ±0.0002      T20 -0.0004 ±0.0004*
+    T20 flat: removal eaten 1.719, ae removal eaten 0.600 a game
+    T20 split: removal eaten 1.719, ae removal eaten 0.600 a game
+  Avacyn, Angel of Hope (shilgengar)
+    flat  T10 +0.0005 ±0.0004*   T20 +0.0081 ±0.0018*
+    split T10 +0.0002 ±0.0003    T20 +0.0071 ±0.0017*
+    split - flat, of the worth  T10 -0.0003 ±0.0003*     T20 -0.0010 ±0.0008*
+    T20 flat: removal eaten 1.390, ae removal eaten 0.443 a game
+    T20 split: removal eaten 1.403, ae removal eaten 0.447 a game
+  Ulamog, the Infinite Gyre (azusa)
+    flat  T10 +0.0007 ±0.0005*   T20 +0.0056 ±0.0015*
+    split T10 +0.0005 ±0.0004*   T20 +0.0047 ±0.0014*
+    split - flat, of the worth  T10 -0.0002 ±0.0002      T20 -0.0009 ±0.0005*
+    T20 flat: removal eaten 1.556, ae removal eaten 0.459 a game
+    T20 split: removal eaten 1.566, ae removal eaten 0.459 a game

@@ -135,6 +135,7 @@ Methodology that used to live at the end of this file is now
 | [0z84](#0z84) | FIXED | **Herald of War, Twilight Shepherd (persist, via a new `after_died` hook), Serra's Emissary, Lurrus.** Emissary's +0.0199 is a knob result (`emissary_type`) |
 | [0z85](#0z85) | FIXED | **Four rendmaw cards nothing read**: Hart, Familiar, Whip (+0.0109, mostly lifelink), Shigeki (its first smoke fired zero times) |
 | [0z86](#0z86) | FIXED | **Time Sieve's sign flip was the horizon** (tivit counted extra turns, lorehold did not); the pod's clock also read `g.turn`, so extra turns brought kills closer. Sieve 9 → 11 now +0.0218 / +0.0151 |
+| [0z87](#0z87) | MEASURED | **Indestructible priced from a census of the six lists** (spot 0.45, wipe 0.54, not 0.60). Moves no deck by more than 0.001; indestructibility is worth at most 0.008 on any card |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8312,6 +8313,88 @@ clock that kills an opponent sets and then clears when it re-arms.
 `tests/test_time_sieve.py` failed once on the new default, also on the test:
 it compared activations with the HORIZON count `drive()` returns, which is
 rounds now. It compares them with `g.turn`, every turn taken.
+
+## 0z87. MEASURED — indestructible is priced from a census of this table's answers, and the knob barely matters
+
+Queued item 7: `Card.indestructible` was priced by one assumed `destroy_share`
+of 0.60, the fraction of the pod's answers that DESTROY (which indestructible
+survives) rather than exile, bounce, tuck, sacrifice or shrink (which it does
+not) -- the same 0.60 for a Doom Blade and a Wrath.
+
+**THE CENSUS.** The pod is three unknown decks; the six lists at the same
+table are six known ones. `tools/removal_census.py` reads every nonland card
+in the module and staged lists from Scryfall and classifies each targeted
+answer and wipe by explicit rules (first match wins, the deciding clause
+written beside every card), counted once per deck that runs it:
+
+| kind | destroy | of | share |
+|---|---|---|---|
+| spot removal | 19 | 42 | **0.4524** |
+| wipes | 14 | 26 | **0.5385** |
+| artifact/enchantment only | 2 | 4 | takes the spot share (fewer than 10) |
+
+The generated file `edhmc/decks/_removal.py` holds the shares, every card's
+class and clause, who runs it, and the SCANNED set. The destroy side is Beast
+Within, Vindicate, Assassin's Trophy, Krosan Grip, damage to a creature,
+Wrath, Damnation, Blasphemous Act, Austere Command; the other side is Swords,
+Path, Chaos Warp, Council's Judgment, Utter End, Anguished Unmaking, Farewell,
+Toxic Deluge, the Meathook Massacre. **Both shares are below 0.60**: the old
+constant overvalued indestructible, and more so against spot removal than
+against wipes. The rules needed several fixes before they were right, each
+visible in the clause column (Aetherflux's "any target", hyphenated
+"non-Elf", Vault 11's votes, Damn's overload, Haywire Mite's target noun);
+`tests/test_destroy_share.py` pins the classifier against five texts.
+
+**THE ENGINE.** `opponents.destroy_share_for(g, kind)`: spot removal passes
+"spot", a single Naturalize "ae", the artifact sweeper and a wrath "wipe"
+(`destroy_share_split`, default True; per-kind overrides `destroy_share_spot`
+/ `_wipe` / `_ae`; False, or a caller naming no kind, reads the flat
+`destroy_share` 0.60 as before). `_removal.py` is in every cache fingerprint,
+and `check_docs` fails if a card is staged without regenerating it -- §0z29's
+shape, pointed at the second generated file on the day it was written.
+
+Every deck's staged list, N=15,000 paired, seeds 5000..
+(`diagnostics/run_destroy_share.py`, `results/destroy_share_20260930.txt`):
+
+| deck | baseline, split − flat, T10 | T20 |
+|---|---|---|
+| rendmaw | 0 (bit-identical) | +0.0001 ±0.0004 |
+| lorehold | 0 (bit-identical) | 0 (bit-identical) |
+| karlov | −0.0001 ±0.0002 | **−0.0004 ±0.0004** |
+| tivit | 0 (bit-identical) | 0 (bit-identical) |
+| shilgengar | **−0.0003 ±0.0003** | **−0.0010 ±0.0008** |
+| azusa | −0.0002 ±0.0002 | **−0.0009 ±0.0005** |
+
+| indestructibility's worth (live − mortal), T20 | flat 0.60 | census |
+|---|---|---|
+| Avacyn, Angel of Hope (shilgengar; the grant switched off with her) | **+0.0081 ±0.0018** | **+0.0071 ±0.0017** |
+| Ulamog, the Infinite Gyre (azusa) | **+0.0056 ±0.0015** | **+0.0047 ±0.0014** |
+| Voice of the Blessed (karlov; at ten counters, §0z46) | **+0.0029 ±0.0010** | **+0.0025 ±0.0010** |
+| Erebos, Bleak-Hearted (rendmaw) | +0.0005 ±0.0008 | +0.0007 ±0.0008 |
+
+**THE KNOB DOES NOT MATTER MUCH, AND THAT IS THE USEFUL RESULT.** The census
+lowers each card's indestructibility by 12-16%, which is the ratio of the
+shares, and moves no deck by more than 0.001. Indestructibility is worth at
+most 0.008 on any card in the six lists, because the pod eats 1.4-1.7 spot
+answers a game and an indestructible permanent is one target among many.
+**Every deck's baseline shift is exactly its card's shift** (karlov −0.0004,
+shilgengar −0.0010, azusa −0.0009): nothing else moved, and the decks without
+an indestructible permanent are bit-identical, which is the check that the
+change touches only what it prices. Erebos's indestructibility is worth
+nothing measurable -- it is a creature only at devotion five.
+
+**So the rule in CLAUDE.md changes shape**: a card whose evaluation swings on
+this knob should still be reported with it said, but the swing is now
+measured, and it is under 0.001.
+
+**AZUSA'S CACHE WENT FROM VERIFIED TO SUSPECT, AND THAT IS RIGHT.**
+`_removal.py` entered every fingerprint, and azusa's baseline genuinely moved
+(Ulamog, −0.0009 at T20), so it joins the five awaiting the owner's rebuild.
+It is not to be cleared with `--verified`: the numbers did move.
+
+Pinned by `tests/test_destroy_share.py`: 10 cases, 3 mutations, exact sets on
+the first run. With `destroy_share_split=False` (and §0z86's two knobs off)
+all six decks reproduce HEAD bit-for-bit on module and staged lists.
 
 ## How to read an ablation table
 

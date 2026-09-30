@@ -288,8 +288,9 @@ def pod_turn(g) -> int:
     start, and threat growth. It used to read `g.turn`, which tivit advances
     on an extra turn, so every extra turn you took brought each opponent's
     KILL one round closer while giving them no turn to take it in. Lorehold
-    never had the bug: its extra turns do not advance `g.turn` at all. The
-    same concept, modelled two ways in two engines (§0u's shape).
+    never had the bug: its extra turns do not advance `g.turn` at all -- the
+    same concept, modelled two ways in two engines, which is §0u's shape and
+    §0z86's finding.
 
     `extra_turns_taken` is the Metrics key tivit writes; an engine that
     takes no extra turns reads 0. `pod_clock_rounds=False` restores `g.turn`.
