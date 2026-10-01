@@ -142,6 +142,7 @@ Methodology that used to live at the end of this file is now
 | [0z91](#0z91) | FIXED | **Tivit's combat trigger fired when Tivit was blocked**: it needs Tivit to connect now, −0.0109 ±0.0018 at T20 |
 | [0z92](#0z92) | FIXED | **Trample**: a blocked trampler assigns the excess. rendmaw +0.0067, azusa +0.0063 at T20; `blocker_toughness` barely matters |
 | [0z93](#0z93) | BUILT | **One run measures every horizon**: a T10 game is the first ten rounds of the T20 game once the pod's grid stops being sized by the horizon. Proved identical key for key; ablation ~41% faster; T20 bit-identical, T10 resampled once |
+| [0z94](#0z94) | BUILT | **The rebuild runs as one cloud session per deck**: `tools/rebuild_deck.sh`, provenance shards merged by `cache_manifest --merge-shards`, and the `parallel-rebuild` skill as the protocol |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8656,6 +8657,36 @@ own time.
 Not changed: `experiment.run_ab` and `tools/candidates.py`, which callers run
 one horizon at a time; both can take `snapshot_rounds` the same way when a
 diagnostic wants it.
+
+## 0z94. BUILT — the rebuild runs as one session per deck, and that is the protocol
+
+The owner asked whether the decks must be rebuilt in series. On one machine,
+yes in effect: it has four cores and each deck's ablation already uses all
+four, so overlapping two decks splits the cores and recovers only the tail of
+each deck (~3%). **Six cloud sessions are six machines**, and the rebuild's
+wall time becomes the slowest deck's instead of the sum. The owner chose that,
+pushing to the one branch, and asked for it to be written down as the protocol
+going forward: **`.claude/skills/parallel-rebuild/SKILL.md`**.
+
+A table from a leg session is the table a serial run would have printed only
+if three things hold, and each has a check rather than a promise:
+
+| invariant | how it is held |
+|---|---|
+| ONE COMMIT | `tools/rebuild_deck.sh <deck> <commit> <branch>` checks the commit out detached and refuses a dirty tree; `cache_manifest --merge-shards` refuses a shard whose built-at fingerprint is not the live one |
+| ONE INTERPRETER | each leg's commit carries an `Interpreter:` line (Python, numpy); the coordinator compares them before merging |
+| NO FILE WRITTEN BY TWO LEGS | `PROVENANCE.json` was the one shared file -- every run stamps its cache there. With `PROVENANCE_SHARD=1` a run stamps `results/caches/provenance.<deck>.json` instead; the script refuses any change outside its deck's own three files; derived docs are regenerated once, by the coordinator |
+
+**The provenance rule is unchanged, and that was the constraint.** A built-at
+stamp must be written by the run that measured, never reconstructed after
+(§0z23's forgery). The shard IS that stamp -- computed by `stamp_built` exactly
+as before, superseded chain included -- written to a different file; the merge
+moves it and checks it, and adds nothing. `check_docs` fails while any shard
+is unmerged.
+
+Pinned by `tests/test_parallel_rebuild.py`: 6 cases in a temporary cache
+directory, 3 mutations, exact sets on the first run. The script's git flow was
+dry-run end to end against a local bare repository before the first real use.
 
 ## How to read an ablation table
 

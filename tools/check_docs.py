@@ -520,10 +520,15 @@ def check_caches_recorded() -> Result:
                     (`check_unchanged_decks` + `--verified`), not hours.
     CURRENT and VERIFIED both pass. VERIFIED means someone ran the check and
     recorded what it showed, which is a stronger statement than CURRENT.
+
+    AN UNMERGED PROVENANCE SHARD FAILS IT TOO (§0z94): a parallel rebuild
+    session stamps its deck into `provenance.<deck>.json`, and until the
+    coordinator's `--merge-shards` folds it in, PROVENANCE.json describes the
+    cache that run replaced.
     """
     try:
         from tools.cache_manifest import (load_provenance, status_of, caches,
-                                          CACHE_DIR)
+                                          CACHE_DIR, shards)
     except Exception as exc:
         return Result("ablation caches have provenance and none is suspect",
                       False, f"could not import: {exc}")
@@ -532,6 +537,10 @@ def check_caches_recorded() -> Result:
                       True, "no caches tracked")
     prov = load_provenance()
     problems, states = [], {}
+    for path in shards():
+        problems.append(f"{os.path.basename(path)}: an unmerged provenance "
+                        f"shard -- run `python -m tools.cache_manifest "
+                        f"--merge-shards`")
     for name, _deck, _body in caches():
         st, why = status_of(name, prov)
         states[st] = states.get(st, 0) + 1

@@ -35,7 +35,11 @@ code and want to know what else it touches.
                           test is EXACT: a blind card plays identically to a
                           matched blank under CRN (item 23, §0z66)
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
-   ─ regen_tables.sh      all six tables at the common N
+   ─ regen_tables.sh      all six tables at the common N, in series
+   ─ rebuild_deck.sh      ONE deck's table, as one leg of a parallel rebuild: checks
+                          out a commit, rebuilds, stamps a provenance SHARD, pushes
+                          its three files. The protocol is .claude/skills/
+                          parallel-rebuild (§0z94)
    ─ _generated.py        shared helper: git ref + the provenance mask the checks compare with
 
    diagnostics/           one-question harnesses: diag_* measure a MECHANISM, run_* measure a CHANGE

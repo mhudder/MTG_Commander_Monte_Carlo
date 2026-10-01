@@ -192,6 +192,50 @@ def save_provenance(prov: dict) -> None:
         fh.write("\n")
 
 
+# PARALLEL REBUILDS (§0z94). Six sessions rebuilding six decks would each
+# rewrite PROVENANCE.json and collide on push. With PROVENANCE_SHARD=1 in the
+# environment, `stamp_built` writes its entry -- computed exactly as it always
+# was, by the run that measured -- to a per-deck SHARD beside it instead, and
+# leaves PROVENANCE.json alone. The coordinator folds the shards in with
+# `--merge-shards`, which refuses a shard whose built-at fingerprint is not the
+# live one: a shard built on different code is not merged, it is re-run.
+# `check_docs` fails while any shard is unmerged.
+SHARD_GLOB = "provenance.*.json"
+
+
+def shard_path(deck: str) -> str:
+    return os.path.join(CACHE_DIR, f"provenance.{deck}.json")
+
+
+def shards() -> list[str]:
+    import glob
+    return sorted(glob.glob(os.path.join(CACHE_DIR, SHARD_GLOB)))
+
+
+def merge_shards() -> list[str]:
+    """Fold every shard into PROVENANCE.json and delete it. All-or-nothing:
+    one shard built at a fingerprint other than the live one aborts the whole
+    merge before anything is written."""
+    prov = load_provenance()
+    merged, files = [], shards()
+    for path in files:
+        with open(path, encoding="utf-8") as fh:
+            entries = json.load(fh)
+        for name, entry in entries.items():
+            live, _files = fingerprint(entry["deck"])
+            if entry["built_at"] != live:
+                raise SystemExit(
+                    f"{path}: {name} was built at {entry['built_at']} and the "
+                    f"live fingerprint is {live} -- built on different code. "
+                    f"Nothing merged; rebuild that deck on this commit.")
+            prov[name] = entry
+            merged.append(name)
+    save_provenance(prov)
+    for path in files:
+        os.remove(path)
+    return merged
+
+
 def stamp_built(cache_name: str, deck: str, fresh: bool = False,
                 note: str = "") -> None:
     """Record what a cache was built at. Called by ablation.py on creation.
@@ -226,6 +270,12 @@ def stamp_built(cache_name: str, deck: str, fresh: bool = False,
     if cache_name in prov:
         old = prov[cache_name]
         entry["superseded"] = old.pop("superseded", []) + [old]
+    if os.environ.get("PROVENANCE_SHARD"):
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        with open(shard_path(deck), "w", encoding="utf-8") as fh:
+            json.dump({cache_name: entry}, fh, indent=2, sort_keys=True)
+            fh.write("\n")
+        return
     prov[cache_name] = entry
     save_provenance(prov)
 
@@ -339,6 +389,17 @@ def main():
         for n in names:
             fp = record_verified(n, evidence)
             print(f"recorded: {n} verified at {fp}")
+        print("Now re-run `python -m tools.cache_manifest --write`.")
+        return 0
+
+    # `--merge-shards` folds a parallel rebuild's per-deck provenance shards
+    # into PROVENANCE.json (§0z94), refusing any built on other code.
+    if "--merge-shards" in sys.argv:
+        merged = merge_shards()
+        for n in merged:
+            print(f"merged provenance for {n}")
+        if not merged:
+            print("no provenance shards to merge")
         print("Now re-run `python -m tools.cache_manifest --write`.")
         return 0
 

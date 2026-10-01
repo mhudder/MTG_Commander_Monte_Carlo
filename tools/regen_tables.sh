@@ -14,6 +14,11 @@
 #             Karlov was unaffected — which was true of the Grist change and
 #             false of this one. Measured at -0.023 win rate, so not small.
 #
+# SEVERAL DECKS AT ONCE: use .claude/skills/parallel-rebuild (§0z94) -- one
+# cloud session per deck, each running tools/rebuild_deck.sh, which calls this
+# script for its one deck (DECKS=<deck>) with PROVENANCE_SHARD=1. This script
+# in series on one machine is the fallback, and is correct.
+#
 # THE CACHE IS DELETED FIRST, and that is the whole point. ablation.py keys its
 # cache on deck, horizons and N -- NOT on the version of the code that produced
 # it -- so a full cache leaves `todo` empty and the run silently REPRINTS THE

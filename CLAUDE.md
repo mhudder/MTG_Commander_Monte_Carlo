@@ -29,9 +29,11 @@ Read that file for state; read this one for judgement.
                         committed, withdrawn. The only trustworthy
                         statement of what is pending.
 
-    .claude/skills/     the two procedures worth following step by step:
+    .claude/skills/     the three procedures worth following step by step:
       add-card/         importing a card, from Scryfall to a committed swap.
       session-close/    regenerate, check, and decide what gets written down.
+      parallel-rebuild/ rebuilding several decks' tables at once, one cloud
+                        session per deck, at one commit (§0z94).
 
 **The split exists because keeping state in this file WAS the cost.** Its
 "Current state" section ran to 351 lines — a third of the file — and every
@@ -95,10 +97,12 @@ python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
                                            # ABLATE_BUDGET=3000 for one deck by
                                            # hand -- the default is 240s (§0z22)
 python -m tools.audit_cards                # every card against Scryfall; expect 0 ERR
-./tools/regen_tables.sh                    # all six tables at N=15000:
-                                           # 3h09m on four cores when timed
-                                           # in §0z60; ~40% less since one run
-                                           # measures both horizons (§0z93).
+./tools/regen_tables.sh                    # all six tables at N=15000, in
+                                           # series: 3h09m on four cores in
+                                           # §0z60, ~40% less since §0z93.
+                                           # SEVERAL DECKS: the
+                                           # parallel-rebuild skill, one
+                                           # session per deck (§0z94).
 ```
 
 **Every other entry point — every tool, every test, every diagnostic, with what
@@ -174,6 +178,7 @@ python -m tests.test_pod_clock --mutate            # 3 mutations, exact sets
 python -m tests.test_destroy_share --mutate        # 3 mutations, exact sets
 python -m tests.test_engine_gaps --mutate          # 6 mutations, exact sets
 python -m tests.test_horizon_prefix --mutate       # 3 mutations, exact sets
+python -m tests.test_parallel_rebuild --mutate     # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
