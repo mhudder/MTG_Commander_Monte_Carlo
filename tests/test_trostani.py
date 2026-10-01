@@ -2,7 +2,7 @@
 """The Trostani engine's mechanisms, one assertion per clause (§0z96).
 
     python -m tests.test_trostani
-    python -m tests.test_trostani --mutate   # 5 mutations, exact sets
+    python -m tests.test_trostani --mutate   # 7 mutations, exact sets
 
 Every case builds a scripted board on a fresh `TrostaniGame` and checks one
 clause of oracle text, verified against Scryfall 2026-10-01.
@@ -40,6 +40,16 @@ CASES
      hasty Soul tokens, life 40 -> 80 -> 160 -> 320
   R  populate copies the Soul token, not the Soldier beside it
   S  Mimic Vat imprints a nontoken Sun Titan that dies, out of the graveyard
+  T  Luminarch's `attack_share` is the share the pod's chip damage charges:
+     over 200 random boards without the crown, the sum of creatures x rate x
+     share x power over the opponents equals the life `incidental_damage`
+     takes, to 1e-9; with the crown, every share is floored at
+     `monarch_attack_floor`. (Monarch boards are not summed: losing the crown
+     `break`s the pod's loop, so later opponents deal nothing that round --
+     a quirk of the shared code, reported with §0z96, not this test's
+     subject.)
+  U  Luminarch counts one quest counter per opponent whose turn cost you
+     nothing: safe, hit, safe -> 2
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   CDA ignored (base_pt returns the printed P/T)  -> A, Q, R
@@ -47,8 +57,10 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   legend rule off (LEGENDARY is empty)           -> C, E
   Mirari's Wake adds no mana                     -> G
   no response to the pod's wrath                 -> I
+  attack_share reads removal's threat share      -> T
+  Luminarch counts every opponent's turn         -> U
 
-UNMUTATED (§0z15): D, H, J-P and S pin clauses the five mutations above do
+UNMUTATED (§0z15): D, H, J-P and S pin clauses the seven mutations above do
 not touch; each is its own positive case.
 """
 import sys
@@ -269,6 +281,38 @@ def run_cases():
     check("S Vat imprints Sun Titan out of the graveyard",
           (g.vat.get(id(vat)) is BY_NAME["Sun Titan"],
            any(c.name == "Sun Titan" for c in g.graveyard)), (True, False))
+
+    import random
+    rnd, worst = random.Random(11), 0.0
+    for _ in range(200):
+        g = fresh()
+        g.turn = rnd.randint(3, 15)
+        g.m["extra_turns_taken"] = 0
+        g.monarch = False
+        for _ in range(rnd.randint(0, 6)):
+            g.board.append(Permanent(card=T.SOLDIER, sick=False, is_token=True,
+                                     base_p=1, base_t=1))
+        for o in g.opponents:
+            o.creatures = float(rnd.randint(0, 7))
+            o.alive = rnd.random() < 0.85
+        rate = g.cfg.get("incidental_rate", 0.45)
+        want = sum(o.creatures * rate * g.attack_share(i) * o.p.get("power", 1.0)
+                   for i, o in enumerate(g.opponents) if o.alive)
+        before = g.your_life = 1e6
+        OPP.incidental_damage(g)
+        worst = max(worst, abs((before - g.your_life) - want))
+    g.monarch = True
+    floored = all(g.attack_share(i) >= 0.75 for i, o in enumerate(g.opponents)
+                  if o.alive)
+    check("T attack_share is the chip damage's share; the crown floors it",
+          (worst < 1e-9, floored), (True, True))
+
+    g = fresh()
+    lum = put(g, "Luminarch Ascension")
+    o0, o1, o2 = g.opponents[:3]
+    g.luminarch_counters([(o0, True), (o1, False), (o2, True)], True)
+    check("U Luminarch: safe, hit, safe -> 2 counters", g.quest.get(id(lum), 0),
+          2)
     return set(FAIL)
 
 
@@ -282,7 +326,9 @@ def main() -> int:
     print("MUTATION RUN -- exact sets\n")
     G = T.TrostaniGame
     real = {"base_pt": G.base_pt, "doublers": G.doublers,
-            "available_mana": G.available_mana, "before_wipe": G.before_wipe}
+            "available_mana": G.available_mana, "before_wipe": G.before_wipe,
+            "attack_share": G.attack_share,
+            "luminarch_counters": G.luminarch_counters}
     real_legendary = T.LEGENDARY
 
     def printed_pt(self, perm):
@@ -302,6 +348,17 @@ def main() -> int:
                                    lambda self: T.shared_available_mana(self))),
         "no response to the pod's wrath": (
             {"I"}, lambda: setattr(G, "before_wipe", lambda self: None)),
+        "attack_share reads removal's threat share": (
+            {"T"}, lambda: setattr(G, "attack_share", lambda self, i: OPP.your_share(
+                self, self.opponents[i],
+                [o for j, o in enumerate(self.opponents)
+                 if j != i and o.alive]))),
+        "Luminarch counts every opponent's turn": (
+            {"U"}, lambda: setattr(G, "luminarch_counters",
+                                   lambda self, rolls, lost: real[
+                                       "luminarch_counters"](
+                                       self, [(o, True) for o, _ in rolls],
+                                       lost))),
     }
     bad = 0
     for label, (want, apply) in muts.items():

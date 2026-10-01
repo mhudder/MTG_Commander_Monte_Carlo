@@ -80,6 +80,12 @@ POLICIES, SAID OUT LOUD -- every one is a knob in docs/KNOBS.md
   * Greater Good sacrifices a creature whose power the library can afford
     (draw_is_safe), at most once a turn, when the hand holds two cards or
     fewer; the three discards are the least useful cards.
+  * With a Soul of Eternity token out, Trostani populates BEFORE the main
+    phase (`populate_soul_first`); otherwise her populate is an after-combat
+    sink.
+  * Bramble Sovereign pays {1}{G} for every copy it can, mid-phase.
+  * Luminarch Ascension rolls each opponent's turn against the share of its
+    attack aimed at you (`luminarch_per_opponent`, see `luminarch_rolls`).
   * Dawn of Hope: "whenever you gain life, you may pay {2}". Triggers are
     banked as `dawn_pending` and paid from what mana is left at the next sink
     step, at most `dawn_draws_per_turn` (4) a turn. A pilot pays at the
@@ -125,6 +131,7 @@ from edhmc.engine import (BaseGame, Board, Card, Permanent, Metrics,
                           Snapshots, finish, lookahead_pick, can_pay,
                           available_mana as shared_available_mana, spend,
                           engine_cfg, choose_mode, CRNStreams, crn_shuffle,
+                          crn_random,
                           make_rng, seal_rng, enter_loyalty, walker_ready,
                           walker_dies_at_zero, fetch_basics,
                           sakura_tribe_elder, coloured_tap_life, draw_is_safe,
@@ -258,6 +265,7 @@ class TrostaniGame(BaseGame):
         self.dawn_paid_turn = 0
         self.greater_good_turn = 0
         self.opp_yard_used = 0                # Eulogist's opposing targets
+        self.seedborn_lost: set = set()       # id(opponent) whose turn cost you life
         self.life_at_pod_start = 0.0
 
         # Lightning Greaves on the commander: "shroud". Its equip is {0}, so
@@ -906,6 +914,11 @@ class TrostaniGame(BaseGame):
                 and any(c.name in k for k in kinds)]
         if not pool or perm.tapped:
             return
+        # A pilot does not pay the last life point for a land: five games in
+        # 2,000 ended that way before this guard (the pod's chip damage is an
+        # expectation, so life can sit below 1 without being 0).
+        if self.cfg.get("charge_life_costs", True) and self.your_life <= 1:
+            return
         self.board.remove(perm)
         self.graveyard.append(perm.card)
         if self.cfg.get("charge_life_costs", True):
@@ -1351,6 +1364,7 @@ class TrostaniGame(BaseGame):
     def precombat_actions(self):
         """Sorcery-speed actions taken BEFORE spells, because each is better
         than the average spell in hand when it is live."""
+        self.populate_soul_first()
         # Untapped fetchlands left from an effect that put them in tapped.
         for p in [p for p in self.board if "fetch" in p.card.tags and not p.tapped]:
             self.crack_fetch(p)
@@ -1679,9 +1693,10 @@ class TrostaniGame(BaseGame):
     def seedborn_turns(self):
         """SEEDBORN MUSE: untap everything on each opponent's turn and run the
         instant-speed abilities again. See the module docstring."""
+        self.seedborn_lost = set()
         if not self.has("Seedborn Muse") or self.result is not None:
             return
-        for i, _ in enumerate(OPP.living(self)):
+        for i, opp in enumerate(OPP.living(self)):
             if self.result is not None:
                 return
             self.turn_key = (self.turn, i + 1)
@@ -1689,20 +1704,86 @@ class TrostaniGame(BaseGame):
                 p.tapped = False
             self.dawn_paid_turn = 0
             self.m["seedborn_untaps"] += 1
+            life = self.your_life
             self.sinks(sorcery=False)
+            if self.your_life < life:          # Talisman, a Reservoir shot
+                self.seedborn_lost.add(id(opp))
         self.turn_key = (self.turn, 0)
 
-    def luminarch_counters(self, lost):
+    def attack_share(self, i):
+        """The share of opponent `i`'s swing aimed at you: THE SAME SELECTION
+        `opponents.incidental_damage` makes -- `combat_targeting` picks the
+        share, the monarch floors it. Written twice is §0u's shape, so
+        `tests/test_trostani.py` T checks the two agree on random boards."""
+        opp = self.opponents[i]
+        others = [o for j, o in enumerate(self.opponents) if j != i and o.alive]
+        if self.cfg.get("combat_targeting", "threat") == "open":
+            share = OPP.combat_share(self, opp, others)
+        else:
+            share = OPP.your_share(self, opp, others)
+        return OPP.monarch_attack_share(self, share)
+
+    def luminarch_rolls(self):
+        """Which opponents' turns will cost you no life this round -- for
+        LUMINARCH ASCENSION's "if you didn't lose life this turn".
+
+        The pod's chip damage is an EXPECTATION spread over every opponent
+        with a creature (`incidental_damage`), so read literally it costs you
+        life on every turn from the third, and the card never gets a counter
+        (0.24 a game, measured 2026-10-01 -- the engine had made it a blank).
+        At a table each opponent's attack goes at ONE player: it comes at you
+        with probability `attack_share`, the very share the chip damage is
+        weighted by. So each opponent's turn is rolled against that share
+        (`crn_random`, one addressed stream per seat, §0z17), and only while a
+        Luminarch is out. `luminarch_per_opponent=False` restores the
+        round-level rule: any loss in the round, no counters at all."""
+        if not self.has("Luminarch Ascension"):
+            return None
+        if not self.cfg.get("luminarch_per_opponent", True):
+            return [(o, None) for o in self.opponents if o.alive]
+        attacks = (OPP.pod_turn(self) >= self.cfg.get("first_attack_turn", 3)
+                   and not OPP.protected_from_creatures(self))
+        out = []
+        for i, o in enumerate(self.opponents):
+            if not o.alive:
+                continue
+            hit = (attacks and o.creatures > 0
+                   and crn_random(self, f"luminarch{i}") < self.attack_share(i))
+            out.append((o, not hit and id(o) not in self.seedborn_lost))
+        return out
+
+    def luminarch_counters(self, rolls, lost_in_round):
         """"At the beginning of each opponent's end step, if you didn't lose
-        life this turn, you may put a quest counter." The pod's three turns
-        are one round here, so a round in which you lost life earns none --
-        a FLOOR, since the loss may have come on only one of the three."""
-        if lost:
+        life this turn, you may put a quest counter on this enchantment." One
+        counter per opponent whose turn cost you nothing (`luminarch_rolls`)
+        and who is still in the game at its end step. A seat whose verdict is
+        None -- the round-level rule -- earns one only in a round that cost no
+        life at all."""
+        if not rolls:
             return
-        n = len(OPP.living(self))
+        n = sum(1 for o, safe in rolls if o.alive and (
+            safe if safe is not None else not lost_in_round))
         for lum in [p for p in self.board if p.card.name == "Luminarch Ascension"]:
             self.quest[id(lum)] = self.quest.get(id(lum), 0) + n
             self.m["quest_counters"] += n
+
+    def populate_soul_first(self):
+        """A Soul of Eternity token is the best populate target there is --
+        each copy doubles your life, and every Soul already on the battlefield
+        grows with it -- so with one out Trostani populates BEFORE the main
+        phase spends her mana (`populate_soul_first`). Shilgengar's §0t lesson:
+        a greedy main phase starves an ability that runs after it."""
+        if not self.cfg.get("populate_soul_first", True):
+            return
+        tgt = self.populate_target()
+        if tgt is None or tgt.card.name != "Soul of Eternity" \
+                or "fixed_pt" in tgt.card.tags:
+            return
+        for t in self.untapped(COMMANDER_NAME, need_unsick=True):
+            if self.pay({"gen": 1, "G": 1, "W": 1}):
+                t.tapped = True
+                self.populate("trostani_first")
+                return
 
 
 def take_turn(g):
@@ -1747,10 +1828,11 @@ def take_turn(g):
     if g.result is None:
         g.seedborn_turns()
     if g.result is None and g.cfg.get("opponents", True):
+        rolls = g.luminarch_rolls()
         life = g.your_life
         OPP.pod_phase(g)           # one order for every engine, §0z30
         if g.result is None:
-            g.luminarch_counters(g.your_life < life)
+            g.luminarch_counters(rolls, g.your_life < life)
 
 
 def simulate(deck, commander, cfg, seed):
