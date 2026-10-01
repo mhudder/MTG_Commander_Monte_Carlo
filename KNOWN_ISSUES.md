@@ -144,6 +144,7 @@ Methodology that used to live at the end of this file is now
 | [0z93](#0z93) | BUILT | **One run measures every horizon**: a T10 game is the first ten rounds of the T20 game once the pod's grid stops being sized by the horizon. Proved identical key for key; ablation ~41% faster; T20 bit-identical, T10 resampled once |
 | [0z94](#0z94) | BUILT | **The rebuild runs as one cloud session per deck**: `tools/rebuild_deck.sh`, provenance shards merged by `cache_manifest --merge-shards`, and the `parallel-rebuild` skill as the protocol |
 | [0z95](#0z95) | MEASURED | **The first parallel rebuild: six tables in 41 minutes** against 3h09m serial; every gate green; every moved row traced to §0z82-§0z93, no significant sign flip |
+| [0z96](#0z96) | BUILT | **The seventh deck, Trostani, Selesnya's Voice**, and its engine: one token path, Soul of Eternity's toughness = life under Trostani, Seedborn rounds. Luminarch Ascension had been made a blank by the pod's smoothed chip damage (+0.0213 ±0.0054 fixed); the census now counts seven lists and moved 0 of 250 rows |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8735,6 +8736,87 @@ significant row changed sign in any deck):
 rebuild has moved past. Karlov's `−Soulmender +Bloodthirsty Conqueror` in
 particular rests on a number taken before §0z90 doubled the Conqueror's row;
 a §0z81-style re-measure of all of them belongs on this engine.
+
+## 0z96. BUILT — the seventh deck: Trostani, Selesnya's Voice
+
+The owner's list, submitted 2026-10-01 as a spreadsheet with four
+misspellings (Angle of Sanctions, Sylvain Caryatid, Luminarch Ascention, a
+trailing space on Beast Within), each resolved by Scryfall's fuzzy match and
+read against the card. All 100 names resolve; the module matches Scryfall on
+every cost, P/T and card type. `edhmc/decks/trostani_v1.py`,
+`edhmc/trostani.py`, `spreadsheets/Trostani_Selesnyas_Voice_Commander_Deck_v1.xlsx`
+(the corrected list, each correction noted on its row), and
+`docs/ORACLE_AUDIT_TROSTANI.md`, which sorts every clause of every card.
+
+**THE ENGINE'S CENTRE IS TWO CLAUSES MEETING.** Trostani gains life equal to
+the TOUGHNESS of each creature that enters, and Soul of Eternity's toughness
+is your life total, so a token copy of Soul doubles your life and the next
+copy reads the doubled total. Toughness is read at each trigger's
+resolution (`creature_entered`; two Soul tokens take 40 to 80 to 160,
+`tests/test_trostani.py` A). Every token goes through ONE path,
+`create_tokens`, which applies Queen Allenal first and then Parallel Lives,
+Anointed Procession, Mondrak and Primal Vigor (616.1, the pilot's order).
+Copies keep a CDA unless the copy names a P/T (God-Pharaoh's Gift,
+eternalize: 707.9d, the `fixed_pt` tag). The legend rule refuses a copy of a
+legendary permanent already out, from a new generated `LEGENDARY` set.
+`token_cap` (200) and `life_cap` (1e9) are guards on the simulator: no game in
+1,000 reached the token cap, and 5 ended above 1e8 life.
+
+**SHARED CODE, ALL OPTIONAL OR INERT ELSEWHERE.** Three hooks in
+`opponents.py` that only trostani defines -- `before_wipe` (Selfless Spirit
+and King Darien sacrificed in response to the pod's wrath),
+`indestructible_granted` and `flying_granted` (that grant, and Elspeth's
+emblem). Talisman of Unity in `PAIN_ON_COLOURED_TAP`, Elspeth in
+`PLANESWALKER_LOYALTY`. `PLAINS` and `LEGENDARY` in `tag_flying`'s output.
+Two checks in `pending.py` that named the six engines by hand now derive
+them from the registry -- the alt-cost check refused the seventh deck's first
+hybrid card, which is the §0q failure in the check itself.
+`check_unchanged_decks` against HEAD: all six decks **bit-identical at 400
+and at 3,000 games** with these changes alone.
+
+**THE CENSUS MOVED, BECAUSE IT IS DERIVED FROM EVERY LIST AT THE TABLE**
+(§0z87). Seven lists: spot 0.4524 -> 0.4600, wipe 0.5200 -> 0.5556. That alone
+moved rendmaw, karlov, shilgengar and azusa by about one game in 3,000 (lorehold
+and tivit bit-identical, recorded VERIFIED). Checked by restoring the old
+`_removal.py`, which made all six bit-identical again, so the attribution is
+measured. The four were rebuilt at N=15,000: **0 of 250 rows moved beyond
+their old bar, 0 sign flips**, one signal label at the floor (rendmaw's
+Biotransference `--` -> `dmg`).
+
+**A POLICY MADE A CARD A BLANK, AGAIN.** Luminarch Ascension's "if you didn't
+lose life this turn" was first read against the round: any life lost to the
+pod, no counter. The pod's chip damage is an EXPECTATION spread over every
+opponent with a creature, so that is nearly every round from the third, and
+the card earned 0.24 quest counters a game. Each opponent's turn is now
+rolled against the share of its attack aimed at you -- the share
+`incidental_damage` charges, re-derived in `TrostaniGame.attack_share` and
+pinned equal by test T: **+0.0213 ±0.0054 at T20, +0.0057 ±0.0024 at T10**,
+N=4,000 paired (`luminarch_per_opponent`), and 1.34 counters a game. Its row
+went from -0.0011 (inside the bar) to **+0.0205 ±0.0031**.
+
+**Measured nulls, said out loud:** populating a Soul token before the main
+phase (`populate_soul_first`) +0.0008 ±0.0016 at T20, kept as the pilot's line.
+
+**A SHARED-CODE QUIRK FOUND ON THE WAY, NOT FIXED HERE.** In
+`opponents.incidental_damage`, losing the crown `break`s the loop over the
+opponents, so every opponent after that one deals no chip damage that round.
+It was found because test T's sum disagreed on monarch boards. It moves only
+decks in which something grants the monarch, and it is left for its own
+change.
+
+**THE TABLE** (`results/ablation_trostani.txt`, N=15,000, floor ±0.0028).
+The top set: Elspeth (+0.0363, PARTLY), Aetherflux Reservoir (+0.0283), Soul of
+Eternity (+0.0253), Luminarch Ascension (+0.0205), God-Pharaoh's Gift,
+Seedborn Muse, Mirari's Wake, Bramble Sovereign. Two token payoffs read as
+blanks and the counters say why: Caretaker's Talent draws 0.28 times a game
+and Growing Ranks populates 0.15 times, because this list makes about ten
+tokens a game -- its tokens come from copying creatures, and the seeds a
+populate needs are scarce. That is the deck's shape in this model, not a
+defect found in the cards. The five removal spells and Aura Shards are blind
+(§4).
+
+What is NOT checked: the priorities are a first guess, the way shilgengar's
+and azusa's were on their first day (queued item 18).
 
 ## How to read an ablation table
 

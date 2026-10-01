@@ -2586,3 +2586,29 @@ decks' numbers survive every move tried, and karlov and tivit do not — tivit
 by the widest margin, because its numbers put card draw ahead of the token
 engines that actually win its games. Nothing was adopted; see §0z44 for why
 that is the owner's decision.
+
+---
+
+## 2026-10-01: the seventh deck, Trostani, Selesnya's Voice
+
+`KNOWN_ISSUES.md` §0z96; `docs/ORACLE_AUDIT_TROSTANI.md` is the card-by-card
+sort.
+
+The owner sent a one-column spreadsheet and asked for as much of each card's
+text as could be modelled. The deck went in as a new engine because none of
+the six shared its payoff: a tokens-and-copies deck whose commander turns
+every creature entering into life, with Soul of Eternity making that an
+exponent. The mechanism test was written before any measurement and caught
+a real bug on its first run: a fetchland on an empty board took a Forest
+over Temple Garden.
+
+The first table had Luminarch Ascension inside its bar, along with
+Caretaker's Talent and Growing Ranks. Their counters split them. The two
+token payoffs fired rarely because the list makes few seed tokens, which is
+the deck and not a defect. Luminarch fired almost never because the engine
+read the pod's averaged chip damage as a life loss on every turn. Fixing
+that was worth two points of win rate.
+
+Adding the deck also moved the removal census, which is defined as every
+list at the table. Four decks moved by one game in 3,000, were rebuilt, and
+no row moved beyond its bar.
