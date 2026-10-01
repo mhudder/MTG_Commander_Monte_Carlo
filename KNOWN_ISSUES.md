@@ -143,6 +143,7 @@ Methodology that used to live at the end of this file is now
 | [0z92](#0z92) | FIXED | **Trample**: a blocked trampler assigns the excess. rendmaw +0.0067, azusa +0.0063 at T20; `blocker_toughness` barely matters |
 | [0z93](#0z93) | BUILT | **One run measures every horizon**: a T10 game is the first ten rounds of the T20 game once the pod's grid stops being sized by the horizon. Proved identical key for key; ablation ~41% faster; T20 bit-identical, T10 resampled once |
 | [0z94](#0z94) | BUILT | **The rebuild runs as one cloud session per deck**: `tools/rebuild_deck.sh`, provenance shards merged by `cache_manifest --merge-shards`, and the `parallel-rebuild` skill as the protocol |
+| [0z95](#0z95) | MEASURED | **The first parallel rebuild: six tables in 41 minutes** against 3h09m serial; every gate green; every moved row traced to §0z82-§0z93, no significant sign flip |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8698,6 +8699,42 @@ PINS, installs them, proves the harness imports BEFORE the old cache is
 deleted, and prints the end of the log on any failure. **A dry run in the
 coordinator's own container tests the protocol, not the legs' environment**;
 the skill now says the legs need the package index.
+
+## 0z95. MEASURED — the first parallel rebuild: six tables in 41 minutes, every move traced
+
+All six tables rebuilt from empty caches at `244cdf1`, N=15,000, one cloud
+session per deck (§0z94), each reading T10 off its T20 games (§0z93). The
+code measured is every engine change since §0z60: §0z82-§0z93.
+
+**WALL TIME: 41 MINUTES** -- launch 01:00 UTC, the last push (azusa) 01:41 --
+against **3h09m** for the serial rebuild of §0z60. The legs finished at 12
+(karlov), 15 (tivit, rendmaw), 16 (shilgengar), 20 (lorehold) and 41 (azusa)
+minutes; azusa is the slowest deck to simulate (7.7 ms a T20 game against
+3.3-4.6 for the rest), so it sets the wall time. Every leg reported python
+3.11.15 / numpy 2.4.6, every shard merged against the live fingerprint, and
+all six caches are CURRENT. (The first launch, at 00:56, lost all six legs to
+a missing numpy before anything was measured -- §0z94.)
+
+**GATES, ALL GREEN FOR THE FIRST TIME SINCE §0z81**: validate 18 x +0.00;
+`python -m tests` 53 of 53 (test_metrics_and_render C covers azusa again);
+`check_docs` 16 of 16, mutation run 12 of 12; the ledger legal.
+
+**WHAT MOVED BEYOND ITS OLD BAR, BY DECK** (old table at `244cdf1`; no
+significant row changed sign in any deck):
+
+| deck | moved | the moves, and the change that explains them |
+|---|---|---|
+| karlov | 10 | Exquisite Blood +0.0267 -> **+0.0451**, Bloodthirsty Conqueror +0.0315 -> **+0.0473**, Starscape Cleric, Cliffhaven Vampire and Marauding Blight-Priest all up (+0.007 to +0.010): the general clause and the drain loop, §0z90. Enduring Tenacity, Sanguine Bond, Vito and Vizkopa Guildmage DOWN (-0.003 to -0.006): the loop now has three more ways to close, so cutting one partner breaks it less -- §0z27's redundancy shape; **those lower rows are not evidence the cards got worse.** Lurrus up (§0z84) |
+| rendmaw | 11 | Whip of Erebos +0.0011 -> +0.0129, Sakura-Tribe Elder, Solemn Simulacrum, Gloomshrieker, Filigree Familiar (§0z83, §0z85); Scrap Trawler +0.0040 -> +0.0070 and Myr Retriever +0.0031 -> +0.0049, NOT ATTRIBUTED: §0z89 changed the Trawler's label, not the engine, so the move is something else in the deck's new shape -- likely the new death and sacrifice paths of §0z83/§0z85 feeding artifact recursion, and not checked; Verdurous Gearhulk +0.0001 -> +0.0034 (trample, §0z92); Twitching Doll and Enduring Vitality eased inside the deck's new shape |
+| tivit | 6 | Time Sieve +0.0385 -> **+0.0473** and Expropriate +0.0158 -> +0.0227: the horizon in rounds, §0z86 -- the extra-turn cards are worth more once an extra turn no longer spends one. Magister of Worth less negative |
+| azusa | 6 | Craterhoof Behemoth +0.0149 -> +0.0214: it gives the team TRAMPLE (§0z92). Scute Swarm, Greensleeves, Seek the Horizon, Exploration, Greater Good eased (-0.003 to -0.008) with Sylvan Awakening back in Oblivion Stone's slot (§0z88), whose own row is **+0.0047 +-0.0015**, consistent with §0z88's head-to-head |
+| shilgengar | 3 | Serra's Emissary +0.0087 -> **+0.0289** (§0z84, `emissary_type`), Twilight Shepherd, Herald of War (§0z84) |
+| lorehold | 0 | five signal labels changed at the noise floor; no row moved |
+
+**NEXT, as after §0z60**: the staged swaps were measured on engines this
+rebuild has moved past. Karlov's `−Soulmender +Bloodthirsty Conqueror` in
+particular rests on a number taken before §0z90 doubled the Conqueror's row;
+a §0z81-style re-measure of all of them belongs on this engine.
 
 ## How to read an ablation table
 

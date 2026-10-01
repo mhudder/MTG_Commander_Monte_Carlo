@@ -102,7 +102,8 @@ python -m tools.audit_cards                # every card against Scryfall; expect
                                            # §0z60, ~40% less since §0z93.
                                            # SEVERAL DECKS: the
                                            # parallel-rebuild skill, one
-                                           # session per deck (§0z94).
+                                           # session per deck -- 41 min for
+                                           # all six (§0z94, §0z95).
 ```
 
 **Every other entry point — every tool, every test, every diagnostic, with what

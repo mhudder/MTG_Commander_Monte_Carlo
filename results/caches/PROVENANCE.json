@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "3e2afdd68b441910",
-    "built_commit": "22d4e8c",
-    "built_utc": "2026-09-29T09:18:05Z",
+    "built_at": "7777fe78f64e09f2",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:03:12Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -222,33 +222,40 @@
             "utc": "2026-09-29T01:39:24Z"
           }
         ]
+      },
+      {
+        "built_at": "3e2afdd68b441910",
+        "built_commit": "22d4e8c",
+        "built_utc": "2026-09-29T09:18:05Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "ac9e321631cf0465",
+            "utc": "2026-09-29T12:27:13Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "ac9e321631cf0465",
+            "utc": "2026-09-29T12:56:08Z"
+          },
+          {
+            "commit": "b91a87e",
+            "evidence": "2026-09-29 (\u00a70z82-\u00a70z85): none of the changes touches an azusa card; the shared edits (opponents.protected_from_creatures, the after_died hook, delirium) are no-ops without their cards. Against a worktree at d878d04 on the NEW defaults: azusa BIT-IDENTICAL on all 8 metrics for the deck module AND the staged list (build_pending), N=400.",
+            "fingerprint": "8b36f3fa3f264fa6",
+            "utc": "2026-09-29T19:31:04Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "ac9e321631cf0465",
-        "utc": "2026-09-29T12:27:13Z"
-      },
-      {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "ac9e321631cf0465",
-        "utc": "2026-09-29T12:56:08Z"
-      },
-      {
-        "commit": "b91a87e",
-        "evidence": "2026-09-29 (\u00a70z82-\u00a70z85): none of the changes touches an azusa card; the shared edits (opponents.protected_from_creatures, the after_died hook, delirium) are no-ops without their cards. Against a worktree at d878d04 on the NEW defaults: azusa BIT-IDENTICAL on all 8 metrics for the deck module AND the staged list (build_pending), N=400.",
-        "fingerprint": "8b36f3fa3f264fa6",
-        "utc": "2026-09-29T19:31:04Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "ae97d771ca2d3fa2",
-    "built_commit": "35db4de",
-    "built_utc": "2026-09-29T08:22:38Z",
+    "built_at": "21ee64f700368bfc",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:01:20Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -393,27 +400,34 @@
             "utc": "2026-09-29T01:39:23Z"
           }
         ]
-      }
-    ],
-    "verified": [
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "212f0c1f7ec19bfc",
-        "utc": "2026-09-29T12:27:12Z"
       },
       {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "212f0c1f7ec19bfc",
-        "utc": "2026-09-29T12:56:07Z"
+        "built_at": "ae97d771ca2d3fa2",
+        "built_commit": "35db4de",
+        "built_utc": "2026-09-29T08:22:38Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "212f0c1f7ec19bfc",
+            "utc": "2026-09-29T12:27:12Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "212f0c1f7ec19bfc",
+            "utc": "2026-09-29T12:56:07Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "d45b7716f6b4da5f",
-    "built_commit": "452eeac",
-    "built_utc": "2026-09-29T07:48:05Z",
+    "built_at": "2728a1a9e8c552b3",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:01:59Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -586,27 +600,34 @@
             "utc": "2026-09-29T01:39:23Z"
           }
         ]
-      }
-    ],
-    "verified": [
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "e527cd57c89f99ba",
-        "utc": "2026-09-29T12:27:12Z"
       },
       {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "e527cd57c89f99ba",
-        "utc": "2026-09-29T12:56:07Z"
+        "built_at": "d45b7716f6b4da5f",
+        "built_commit": "452eeac",
+        "built_utc": "2026-09-29T07:48:05Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "e527cd57c89f99ba",
+            "utc": "2026-09-29T12:27:12Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "e527cd57c89f99ba",
+            "utc": "2026-09-29T12:56:07Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "ea0fd35f9ca289af",
-    "built_commit": "d2dab44",
-    "built_utc": "2026-09-29T07:20:44Z",
+    "built_at": "8984d51894e89dd2",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:01:36Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -780,27 +801,34 @@
             "utc": "2026-09-29T01:39:23Z"
           }
         ]
-      }
-    ],
-    "verified": [
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "735468c5416a6d4f",
-        "utc": "2026-09-29T12:27:12Z"
       },
       {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "735468c5416a6d4f",
-        "utc": "2026-09-29T12:56:07Z"
+        "built_at": "ea0fd35f9ca289af",
+        "built_commit": "d2dab44",
+        "built_utc": "2026-09-29T07:20:44Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "735468c5416a6d4f",
+            "utc": "2026-09-29T12:27:12Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "735468c5416a6d4f",
+            "utc": "2026-09-29T12:56:07Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "4b527a1c1bd3c45e",
-    "built_commit": "ac5e81b",
-    "built_utc": "2026-09-29T08:48:30Z",
+    "built_at": "da928ff7033317a3",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:01:48Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -997,27 +1025,34 @@
             "utc": "2026-09-29T01:39:24Z"
           }
         ]
-      }
-    ],
-    "verified": [
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "f3a3e577f5a9916c",
-        "utc": "2026-09-29T12:27:13Z"
       },
       {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "f3a3e577f5a9916c",
-        "utc": "2026-09-29T12:56:08Z"
+        "built_at": "4b527a1c1bd3c45e",
+        "built_commit": "ac5e81b",
+        "built_utc": "2026-09-29T08:48:30Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "f3a3e577f5a9916c",
+            "utc": "2026-09-29T12:27:13Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "f3a3e577f5a9916c",
+            "utc": "2026-09-29T12:56:08Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "a752697f456fae62",
-    "built_commit": "7db8cb9",
-    "built_utc": "2026-09-27T02:55:29Z",
+    "built_at": "f35e1f889d5f4226",
+    "built_commit": "244cdf1",
+    "built_utc": "2026-10-01T01:01:33Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -1153,39 +1188,46 @@
         "built_utc": "2026-09-27T00:30:10Z",
         "deck": "tivit",
         "verified": []
+      },
+      {
+        "built_at": "a752697f456fae62",
+        "built_commit": "7db8cb9",
+        "built_utc": "2026-09-27T02:55:29Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "29d6d30afee3f640",
+            "utc": "2026-09-29T01:38:32Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "804f20233070d53c",
+            "utc": "2026-09-29T01:39:24Z"
+          },
+          {
+            "commit": "d2dab44",
+            "evidence": "2026-09-29 (\u00a70z75-\u00a70z79): check_unchanged_decks against a HEAD (d2dab44) worktree -- tivit BIT-IDENTICAL on all 8 metrics on the deck module with the new defaults, and BIT-IDENTICAL on the staged list (build_pending, N=400). The table was re-rendered from this cache for the \u00a70z78 reclassification: same numbers, seven vote cards moved to PARTLY MODELLED.",
+            "fingerprint": "63a95f255abf2d33",
+            "utc": "2026-09-29T07:18:24Z"
+          },
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "679a48323d16d80e",
+            "utc": "2026-09-29T12:27:13Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "679a48323d16d80e",
+            "utc": "2026-09-29T12:56:07Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "29d6d30afee3f640",
-        "utc": "2026-09-29T01:38:32Z"
-      },
-      {
-        "commit": "92f9a15",
-        "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
-        "fingerprint": "804f20233070d53c",
-        "utc": "2026-09-29T01:39:24Z"
-      },
-      {
-        "commit": "d2dab44",
-        "evidence": "2026-09-29 (\u00a70z75-\u00a70z79): check_unchanged_decks against a HEAD (d2dab44) worktree -- tivit BIT-IDENTICAL on all 8 metrics on the deck module with the new defaults, and BIT-IDENTICAL on the staged list (build_pending, N=400). The table was re-rendered from this cache for the \u00a70z78 reclassification: same numbers, seven vote cards moved to PARTLY MODELLED.",
-        "fingerprint": "63a95f255abf2d33",
-        "utc": "2026-09-29T07:18:24Z"
-      },
-      {
-        "commit": "c6f42ea",
-        "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
-        "fingerprint": "679a48323d16d80e",
-        "utc": "2026-09-29T12:27:13Z"
-      },
-      {
-        "commit": "f967ce2",
-        "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
-        "fingerprint": "679a48323d16d80e",
-        "utc": "2026-09-29T12:56:07Z"
-      }
-    ]
+    "verified": []
   }
 }
