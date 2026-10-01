@@ -1816,7 +1816,16 @@ def incidental_damage(g):
             if crn_random(g, f"monarch{i}") < min(1.0, share * loss_scale):
                 g.monarch = False
                 g.m["monarch_lost"] += 1
-                break
+                # THE CROWN CHANGING HANDS DOES NOT END THE ROUND (§0z97).
+                # This was a `break`, so every opponent seated after the one
+                # who took the crown dealt no chip damage that round -- found
+                # by trostani's test T, whose per-opponent sum disagreed on
+                # monarch boards (§0z96). The crown roll above is gated on
+                # `g.monarch`, so the later opponents cannot take it again;
+                # they only swing. `crown_loss_ends_chip=True` is the old
+                # loop, kept so the fix can be measured against it.
+                if g.cfg.get("crown_loss_ends_chip", False):
+                    break
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
         g.m["loss_route"] = 1          # ground down on life

@@ -1,0 +1,23 @@
+TROSTANI -- against `old` (Processor 8 above 20, Library 25)
+  lib20    T10 +0.0013 ±0.0009*   T20 +0.0000 ±0.0023    processor_life_paid 1.10  processor_tokens 0.15  library_kept 0.81
+  proc8    T10 +0.0017 ±0.0010*   T20 +0.0011 ±0.0024    processor_life_paid 1.21  processor_tokens 0.16  library_kept 0.81
+  proc12   T10 +0.0018 ±0.0011*   T20 +0.0007 ±0.0027    processor_life_paid 1.75  processor_tokens 0.15  library_kept 0.81
+  proc16   T10 +0.0024 ±0.0012*   T20 +0.0011 ±0.0028    processor_life_paid 2.24  processor_tokens 0.15  library_kept 0.81
+  proc24   T10 +0.0030 ±0.0013*   T20 +0.0001 ±0.0030    processor_life_paid 2.97  processor_tokens 0.14  library_kept 0.80
+  proc99   T10 +0.0029 ±0.0013*   T20 -0.0003 ±0.0030    processor_life_paid 4.95  processor_tokens 0.14  library_kept 0.80
+  old      won 0.28  processor_life_paid 1.10  processor_tokens 0.15  library_kept 0.68
+
+  caps against each other, paired (the Library at 20 in both):
+  proc12 - proc8   T10 +0.0001 ±0.0004    T20 -0.0004 ±0.0012 
+  proc16 - proc8   T10 +0.0007 ±0.0006*   T20 +0.0001 ±0.0015 
+  proc24 - proc8   T10 +0.0013 ±0.0008*   T20 -0.0009 ±0.0018 
+  proc99 - proc8   T10 +0.0012 ±0.0008*   T20 -0.0013 ±0.0019 
+
+THE CROWN -- fixed against the old `break`, crown on round 5
+  rendmaw    T10 -0.0012 ±0.0006*   T20 -0.0123 ±0.0019*   crowns lost 1.000   final_life -0.57
+  lorehold   T10 -0.0050 ±0.0012*   T20 -0.0183 ±0.0023*   crowns lost 1.000   final_life -0.89
+  karlov     T10 -0.0037 ±0.0011*   T20 -0.0071 ±0.0018*   crowns lost 0.986   final_life -1.06
+  tivit      T10 -0.0076 ±0.0014*   T20 -0.0209 ±0.0023*   crowns lost 0.990   final_life -1.11
+  shilgengar T10 -0.0005 ±0.0004*   T20 -0.0106 ±0.0017*   crowns lost 0.999   final_life -0.87
+  azusa      T10 -0.0011 ±0.0005*   T20 -0.0108 ±0.0017*   crowns lost 0.999   final_life -0.88
+  trostani   T10 -0.0013 ±0.0010*   T20 -0.0079 ±0.0022*   crowns lost 1.000   final_life -136490.41

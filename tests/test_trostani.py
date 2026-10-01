@@ -44,10 +44,9 @@ CASES
      over 200 random boards without the crown, the sum of creatures x rate x
      share x power over the opponents equals the life `incidental_damage`
      takes, to 1e-9; with the crown, every share is floored at
-     `monarch_attack_floor`. (Monarch boards are not summed: losing the crown
-     `break`s the pod's loop, so later opponents deal nothing that round --
-     a quirk of the shared code, reported with §0z96, not this test's
-     subject.)
+     `monarch_attack_floor`. (Monarch boards are summed in
+     tests/test_life_policies.py A: losing the crown used to `break` the
+     pod's loop, found here and reported with §0z96, fixed in §0z97.)
   U  Luminarch counts one quest counter per opponent whose turn cost you
      nothing: safe, hit, safe -> 2
 

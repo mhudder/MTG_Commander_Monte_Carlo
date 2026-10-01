@@ -145,6 +145,7 @@ Methodology that used to live at the end of this file is now
 | [0z94](#0z94) | BUILT | **The rebuild runs as one cloud session per deck**: `tools/rebuild_deck.sh`, provenance shards merged by `cache_manifest --merge-shards`, and the `parallel-rebuild` skill as the protocol |
 | [0z95](#0z95) | MEASURED | **The first parallel rebuild: six tables in 41 minutes** against 3h09m serial; every gate green; every moved row traced to §0z82-§0z93, no significant sign flip |
 | [0z96](#0z96) | BUILT | **The seventh deck, Trostani, Selesnya's Voice**, and its engine: one token path, Soul of Eternity's toughness = life under Trostani, Seedborn rounds. Luminarch Ascension had been made a blank by the pod's smoothed chip damage (+0.0213 ±0.0054 fixed); the census now counts seven lists and moved 0 of 250 rows |
+| [0z97](#0z97) | FIXED | **Losing the crown no longer ends the pod's chip round** (it `break`ed the loop, so later seats dealt nothing): worth -0.007 to -0.021 at T20 wherever the crown is held, and it moves no table, since no staged list grants it. The two monarch swaps restated: Chief Magistrate +0.0064, Ginger +0.0137 at T20. **Owner's calls on trostani**: Phyrexian Processor floor 20 -> 12, cap 8 -> 16 (the cap is not load-bearing); Sylvan Library floor 25 -> 20. Trostani rebuilt: 0 of 61 rows moved |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8817,6 +8818,69 @@ defect found in the cards. The five removal spells and Aura Shards are blind
 
 What is NOT checked: the priorities are a first guess, the way shilgengar's
 and azusa's were on their first day (queued item 18).
+
+## 0z97. FIXED — the crown does not end the pod's round; trostani's life floors are the owner's
+
+**THE `break`.** In `opponents.incidental_damage`, the opponent who took the
+crown off you ended the loop over the opponents, so every opponent seated
+after them dealt no chip damage that round. Found by trostani's test T
+(§0z96), whose per-opponent sum disagreed on monarch boards. The `break` is
+gone; the crown roll is already gated on `g.monarch`, so a later seat cannot
+take the crown twice, and it still swings. `crown_loss_ends_chip=True` is the
+old loop, kept for measuring against.
+
+**WHAT IT WAS WORTH, where it bites** (`diagnostics/run_life_policies.py`,
+N=15,000 paired, the crown granted on round 5 via `monarch_start_turn`): win
+rate at T20 rendmaw −0.0123, lorehold −0.0183, karlov −0.0071, tivit −0.0209,
+shilgengar −0.0106, azusa −0.0108, trostani −0.0079, every one significant.
+Every deck that holds the crown takes the hits it was being spared.
+
+**WHERE IT DOES NOT: NO TABLE.** No staged list holds a card that grants the
+monarch (checked by name over `build_pending`), so the crown path is never
+entered in a measured game. `check_unchanged_decks` against each cache's own
+built commit (926bc46, 244cdf1, 3abd462): all six non-trostani decks
+BIT-IDENTICAL on all 8 metrics, recorded VERIFIED. With every new default set
+back to its old value, all seven decks reproduce the previous commit bit for
+bit.
+
+**THE TWO MONARCH SWAPS, RESTATED** (`diagnostics/run_monarch_restage.py`,
+`results/monarch_restage_20261001.txt`, seeds 1234.., old and fixed loops on
+the same seeds):
+
+| swap | T10 | T20 | the fix moved it (T20) |
+|---|---|---|---|
+| lorehold −Lightning Greaves +Chief Magistrate | +0.0001 ±0.0021 | **+0.0064 ±0.0036** | −0.0013 ±0.0006 |
+| karlov −Swiftfoot Boots +Ginger | **+0.0045 ±0.0020** | **+0.0137 ±0.0031** | −0.0005 ±0.0003 |
+
+Small, because the crown is held 0.12–0.14 turns a game: §0z39's attack floor
+takes it back almost at once. Both still significant at T20; neither ledger
+state changes.
+
+**THE OWNER'S CALLS ON TROSTANI** (2026-10-01), both judgements and both said
+out loud as knobs:
+
+* **Phyrexian Processor** pays more, never below 12: `processor_floor` 20 →
+  12, `processor_life` 8 → **16**. The owner left the cap open beyond "more
+  than 8", so it was swept at floor 12 with the Library at 20, paired against
+  cap 8: 12 −0.0004, 16 +0.0001, 24 −0.0009, all of it above the floor
+  −0.0013 at T20, every one inside its bar; at T10 16 is +0.0007 ±0.0006 and
+  24 +0.0013 ±0.0008. **The cap is not load-bearing** -- the Processor makes
+  0.15 Minions a game, because it resolves late and needs {4} more to
+  activate -- so 16 is chosen as the one cap above 8 with no negative point
+  estimate at either horizon. Life paid goes 1.10 → 2.24 a game.
+* **Sylvan Library** keeps a card down to 20 life, not 25
+  (`library_life_floor`): +0.0013 ±0.0009 at T10, +0.0000 ±0.0023 at T20;
+  cards kept 0.68 → 0.81 a game. Azusa's Sylvan Library is KNOWN_BLIND and
+  has no implementation, so this is trostani's alone.
+* Together, against the old engine: +0.0024 ±0.0012 at T10, +0.0011 ±0.0028
+  at T20 (the `proc16` arm). Pinned by `tests/test_life_policies.py`, whose
+  three mutations each fail exactly their own case.
+
+**TROSTANI REBUILT** at N=15,000: **0 of 61 rows moved beyond their old bar, 0
+sign flips**, two signal labels at the floor (Birds of Paradise `--` → `dmg`,
+Karmic Guide `--` → `win`). Phyrexian Processor +0.0100 → +0.0104 ±0.0028,
+Sylvan Library +0.0121 → +0.0118 ±0.0032 -- both rows are what the cards are
+worth over a blank, and a floor nearer the card's best line barely moves that.
 
 ## How to read an ablation table
 

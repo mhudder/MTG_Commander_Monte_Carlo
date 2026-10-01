@@ -63,10 +63,13 @@ POLICIES, SAID OUT LOUD -- every one is a knob in docs/KNOBS.md
   * Karmic Guide's echo is DECLINED (`karmic_echo`): the body is a 2/2 and its
     value was the ETB; it goes to the graveyard, where Mimic Vat and God-
     Pharaoh's Gift can use it again.
-  * Phyrexian Processor pays `processor_life` (8) but never below
-    `processor_floor` (20) life; with less than 4 to pay it is not activated.
+  * Phyrexian Processor pays `processor_life` (PROCESSOR_LIFE) but never
+    below `processor_floor` (12) life; with less than 4 to pay it is not
+    activated. The owner's call (2026-10-01, §0z97): more than the first
+    cut's 8, never below 12 -- it was 8 above a floor of 20.
   * Sylvan Library keeps an extra card for 4 life only while that leaves
-    `library_life_floor` (25) life; the rest go back on top.
+    `library_life_floor` (20) life; the rest go back on top. The owner's
+    call (2026-10-01, §0z97); it was 25.
   * Aetherflux Reservoir fires 50 only while it leaves `reservoir_floor` (15).
   * Shocklands pay 2 life while `shock_life_floor` (15) is kept.
   * Selesnya Eulogist exiles a creature card from an OPPONENT'S graveyard
@@ -153,6 +156,9 @@ def token_card(name, p, t, colours, flying=False, lifelink=False,
                 flying=flying, lifelink=lifelink,
                 tags=frozenset({"token"} | {f"col_{c}" for c in colours}))
 
+
+# Phyrexian Processor's life payment cap, set from the sweep in §0z97.
+PROCESSOR_LIFE = 16
 
 # Elspeth's +1, Queen Allenal's extra token, King Darien's activation.
 SOLDIER = token_card("Soldier token", 1, 1, "W")
@@ -1124,8 +1130,8 @@ class TrostaniGame(BaseGame):
         return True
 
     def processor_payment(self):
-        pay = self.cfg.get("processor_life", 8)
-        room = self.your_life - self.cfg.get("processor_floor", 20)
+        pay = self.cfg.get("processor_life", PROCESSOR_LIFE)
+        room = self.your_life - self.cfg.get("processor_floor", 12)
         return int(max(0, min(pay, room)))
 
     def resolve(self, card, plan=None):
@@ -1587,7 +1593,7 @@ class TrostaniGame(BaseGame):
             chosen = drawn[:2]
             back = []
             kept = 0
-            floor = self.cfg.get("library_life_floor", 25)
+            floor = self.cfg.get("library_life_floor", 20)
             for c in reversed(chosen):
                 if self.your_life - 4 >= floor:
                     self.lose_life(4)

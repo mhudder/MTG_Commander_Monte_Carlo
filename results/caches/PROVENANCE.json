@@ -257,7 +257,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "6aa1e103291a9085",
+        "utc": "2026-10-01T14:22:04Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "0e6776c8f21d69ac",
@@ -436,7 +443,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "e116d0b6358ea0df",
+        "utc": "2026-10-01T14:22:05Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "2728a1a9e8c552b3",
@@ -642,6 +656,12 @@
         "evidence": "2026-10-01, adding the trostani deck (\u00a70z96). Shared files moved: engine.py (Talisman of Unity's pain entry, Elspeth's loyalty), opponents.py (three optional hooks only trostani defines), decks/_evasion.py (trostani's cards, PLAINS and LEGENDARY sets), decks/_removal.py (the census now counts seven lists: spot 0.4524->0.4600, wipe 0.5200->0.5556), tools/ablation.py (trostani's classification). check_unchanged_decks against a worktree at HEAD 78ee75a (whose engine files equal the built-at commit 244cdf1, every cache CURRENT there): BIT-IDENTICAL on all 8 metrics at --n=400 and at --n=3000. rendmaw, karlov, shilgengar and azusa moved by ~1 game in 3000 under the new census and were rebuilt; this deck did not move.",
         "fingerprint": "3a40a4b08398f1bb",
         "utc": "2026-10-01T04:42:30Z"
+      },
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "25f13b220cbc3cce",
+        "utc": "2026-10-01T14:22:05Z"
       }
     ]
   },
@@ -851,7 +871,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "099f57c00eb6b1fd",
+        "utc": "2026-10-01T14:22:06Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "94406ee9df10bf34",
@@ -1082,7 +1109,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "7e59aa865a582ef0",
+        "utc": "2026-10-01T14:22:05Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "f35e1f889d5f4226",
@@ -1269,19 +1303,32 @@
         "evidence": "2026-10-01, adding the trostani deck (\u00a70z96). Shared files moved: engine.py (Talisman of Unity's pain entry, Elspeth's loyalty), opponents.py (three optional hooks only trostani defines), decks/_evasion.py (trostani's cards, PLAINS and LEGENDARY sets), decks/_removal.py (the census now counts seven lists: spot 0.4524->0.4600, wipe 0.5200->0.5556), tools/ablation.py (trostani's classification). check_unchanged_decks against a worktree at HEAD 78ee75a (whose engine files equal the built-at commit 244cdf1, every cache CURRENT there): BIT-IDENTICAL on all 8 metrics at --n=400 and at --n=3000. rendmaw, karlov, shilgengar and azusa moved by ~1 game in 3000 under the new census and were rebuilt; this deck did not move.",
         "fingerprint": "75c8d222099be4f5",
         "utc": "2026-10-01T04:42:30Z"
+      },
+      {
+        "commit": "fe768bb",
+        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+        "fingerprint": "61337366b40886b1",
+        "utc": "2026-10-01T14:22:05Z"
       }
     ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
-    "built_at": "7017c36d57ce88b8",
-    "built_commit": "926bc46",
-    "built_utc": "2026-10-01T04:22:46Z",
+    "built_at": "5252c321cba0fd53",
+    "built_commit": "fe768bb",
+    "built_utc": "2026-10-01T13:26:08Z",
     "deck": "trostani",
     "superseded": [
       {
         "built_at": "ec532448a86572c6",
         "built_commit": "78ee75a",
         "built_utc": "2026-10-01T02:39:01Z",
+        "deck": "trostani",
+        "verified": []
+      },
+      {
+        "built_at": "7017c36d57ce88b8",
+        "built_commit": "926bc46",
+        "built_utc": "2026-10-01T04:22:46Z",
         "deck": "trostani",
         "verified": []
       }

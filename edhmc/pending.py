@@ -2707,7 +2707,8 @@ SIMULATED: list[Simulated] = [
         deck='lorehold', remove='Lightning Greaves', add='Chief Magistrate of Mercadia',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Lightning Greaves +Chief Magistrate of Mercadia, N=15,000 paired: -0.0009 +-0.0020 (inside its bar) at T10 and +0.0068 +-0.0035 (significant) at T20.'),
-        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: -0.0010 +-0.0020 at T10 and +0.0070 +-0.0035 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: -0.0010 +-0.0020 at T10 and +0.0070 +-0.0035 * at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s. '
+               'RE-MEASURED 2026-10-01 AFTER §0z97 (losing the crown no longer ends the pod\'s chip round, so the games you were monarch in are charged in full), seeds 1234.., both engines on the same seeds: +0.0001 +-0.0021 at T10 and +0.0064 +-0.0036 * at T20, against +0.0003 / +0.0077 on the old loop -- the fix itself moved the swap -0.0013 +-0.0006 at T20. Still significant at T20 only (results/monarch_restage_20261001.txt).'),
     ),
     Simulated(
         deck='rendmaw', remove="Ashnod's Altar", add='Proft, Sinister Mastermind',
@@ -2748,6 +2749,7 @@ SIMULATED: list[Simulated] = [
         deck='karlov', remove='Swiftfoot Boots', add='Ginger, Queen of Sweets',
         measured='2026-09-22', source='results/karlov_ginger.txt',
         result=("REAL SWAP -Swiftfoot Boots +Ginger, N=15,000 paired, same seeds both legs, base = build_pending('karlov'): +0.0052 +-0.0017 at T10 and +0.0186 +-0.0033 at T20, significant at BOTH. Candidate row against a blank in the same slot: +0.0059 +-0.0027 (results/candidates_karlov3.txt)."),
+        notes=("RE-MEASURED 2026-10-01 AFTER §0z97 (losing the crown no longer ends the pod's chip round), same seeds both engines: +0.0045 +-0.0020 at T10 and +0.0137 +-0.0031 at T20, significant at both, against +0.0046 / +0.0142 on the old loop -- the fix itself moved the swap -0.0005 +-0.0003 at T20. The old loop now reads +0.0142 where 2026-09-22 read +0.0186: that gap is the engine changes in between, not the crown, and is not attributed further. It still loses the slot to Bloodthirsty Conqueror (results/monarch_restage_20261001.txt)."),
     ),
     # ---- head-to-heads recorded before the split, in other entries ----
     Simulated(

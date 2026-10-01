@@ -183,6 +183,7 @@ python -m tests.test_engine_gaps --mutate          # 6 mutations, exact sets
 python -m tests.test_horizon_prefix --mutate       # 3 mutations, exact sets
 python -m tests.test_parallel_rebuild --mutate     # 3 mutations, exact sets
 python -m tests.test_trostani --mutate             # 7 mutations, exact sets
+python -m tests.test_life_policies --mutate        # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
