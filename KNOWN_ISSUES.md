@@ -8688,6 +8688,17 @@ Pinned by `tests/test_parallel_rebuild.py`: 6 cases in a temporary cache
 directory, 3 mutations, exact sets on the first run. The script's git flow was
 dry-run end to end against a local bare repository before the first real use.
 
+**THE FIRST REAL LAUNCH LOST ALL SIX LEGS IN UNDER A MINUTE**, and the dry run
+could not have caught it: it ran in a container that already had numpy. Each
+fresh leg container had none, the ablation died on `import numpy`, and two of
+the six looked SILENT because `regen_tables.sh` sends ablation's stderr to a
+log. Nothing was pushed -- every leg failed before its commit -- and the
+branch was untouched. `rebuild_deck.sh` now takes the coordinator's package
+PINS, installs them, proves the harness imports BEFORE the old cache is
+deleted, and prints the end of the log on any failure. **A dry run in the
+coordinator's own container tests the protocol, not the legs' environment**;
+the skill now says the legs need the package index.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not

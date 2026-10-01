@@ -2,7 +2,15 @@
 # ONE deck's table, rebuilt in its own session -- one leg of a PARALLEL
 # rebuild (§0z94, .claude/skills/parallel-rebuild/SKILL.md).
 #
-#   ./tools/rebuild_deck.sh <deck> <commit> <branch>
+#   ./tools/rebuild_deck.sh <deck> <commit> <branch> [<pins>]
+#
+# <pins> is the coordinator's package versions, e.g.
+# "numpy==2.4.6 scipy==1.17.1 openpyxl==3.1.5". A FRESH CONTAINER HAS NONE OF
+# THEM: the first parallel rebuild (2026-10-01) lost all six legs in under a
+# minute to `ModuleNotFoundError: numpy`, two of them silently, because
+# regen_tables.sh sends ablation's stderr to a log. requirements.txt holds
+# lower bounds only, so without pins a leg would install whatever is newest
+# and fail the coordinator's interpreter check.
 #
 # Run from the repo root of a fresh clone. It
 #   1. checks out <commit>, detached, and refuses a dirty tree -- every leg
@@ -23,6 +31,7 @@ set -euo pipefail
 deck="${1:?usage: rebuild_deck.sh <deck> <commit> <branch>}"
 commit="${2:?usage: rebuild_deck.sh <deck> <commit> <branch>}"
 branch="${3:?usage: rebuild_deck.sh <deck> <commit> <branch>}"
+pins="${4:-}"
 N=$(sed -n 's/^N=//p' tools/regen_tables.sh)
 
 git fetch origin "$branch"
@@ -32,7 +41,23 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
     exit 1
 fi
 
-DECKS="$deck" PROVENANCE_SHARD=1 ./tools/regen_tables.sh
+# DEPENDENCIES, then PROVE THEY IMPORT -- before regen_tables.sh deletes the
+# old cache, so a broken environment costs nothing.
+python -m pip install -q -r requirements.txt
+if [ -n "$pins" ]; then
+    # shellcheck disable=SC2086
+    python -m pip install -q $pins
+fi
+python -c "import numpy, scipy, openpyxl, edhmc.registry, tools.ablation" || {
+    echo "refusing: the environment cannot import the harness" >&2
+    exit 1
+}
+
+DECKS="$deck" PROVENANCE_SHARD=1 ./tools/regen_tables.sh || {
+    echo "regen_tables.sh failed for $deck; the end of its log:" >&2
+    tail -n 30 "results/ablation_${deck}.log" >&2 || true
+    exit 1
+}
 
 cache="results/caches/ablation_cache_${deck}_10-20_n${N}_medblank.json"
 shard="results/caches/provenance.${deck}.json"

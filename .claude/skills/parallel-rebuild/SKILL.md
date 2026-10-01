@@ -34,27 +34,36 @@ git status                      # clean
 git push origin <branch>        # the legs clone from the remote
 ```
 
-Record `git rev-parse --short HEAD` -- that is THE commit -- and
-`python -c 'import sys, numpy; print(sys.version.split()[0], numpy.__version__)'`.
+Record `git rev-parse --short HEAD` -- that is THE commit -- and the PINS, the
+exact package versions every leg must install:
+
+```bash
+python -c 'import numpy, scipy, openpyxl; print(f"numpy=={numpy.__version__} scipy=={scipy.__version__} openpyxl=={openpyxl.__version__}")'
+python --version     # the legs' image must report the same
+```
 
 ## 1. Launch one session per deck
 
 `mcp__Claude_Code_Remote__create_session`, once per deck, with
 `source_url` the repo, `source_revision` the branch, `outcome_branch` the
-branch, and this prompt (fill the three blanks):
+branch, and this prompt (fill the four blanks; <pins> goes in quotes):
 
 > Rebuild ONE deck's ablation table for the EDH Monte Carlo repo as one leg
 > of a parallel rebuild. Do nothing else: no other edits, no docs, no gates.
 > From the repo root run, IN THE BACKGROUND (it takes 20-60 minutes; wait for
 > its completion notification rather than sleeping):
-> `./tools/rebuild_deck.sh <deck> <commit> <branch>`
-> It checks out <commit>, rebuilds only <deck>, commits that deck's three
-> files and pushes them to <branch>, retrying on a race with the other legs.
+> `./tools/rebuild_deck.sh <deck> <commit> <branch> "<pins>"`
+> It installs the pinned packages, checks out <commit>, rebuilds only <deck>,
+> commits that deck's three files and pushes them to <branch>, retrying on a
+> race with the other legs.
 > When it exits, report its last 20 lines of output and its exit code. If it
 > fails, report the error and STOP -- do not fix, retry differently, or push
 > anything by another route.
 
-The legs need nothing from Scryfall and no network beyond git.
+The legs need nothing from Scryfall. They DO need the package index: a fresh
+container has no numpy, and the first parallel rebuild lost all six legs to
+exactly that within a minute (§0z94). The environment's network level must let
+pip through (the default package-manager list does).
 
 ## 2. Wait without polling hard
 
@@ -106,7 +115,9 @@ Then, as for any rebuild:
 | failure | caught by |
 |---|---|
 | a leg measured a different commit | `rebuild_deck.sh` checks out <commit>; `--merge-shards` refuses a fingerprint that is not the live one |
-| a leg ran a different interpreter | the `Interpreter:` line in its commit, step 3 |
+| a leg ran a different interpreter | the `Interpreter:` line in its commit, step 3; the pins make it rare |
+| a leg's container lacks the packages | `rebuild_deck.sh` installs them and proves the imports BEFORE the old cache is deleted |
+| a leg failed silently | `rebuild_deck.sh` prints the end of the ablation log on failure |
 | two legs wrote one file | `rebuild_deck.sh` refuses any change outside its deck's own three files; PROVENANCE.json is never written by a leg |
 | a shard never merged | `check_docs`: an unmerged `provenance.<deck>.json` fails the cache check |
 | a leg pushed a partial table | `regen_tables.sh` only installs a table once the run printed MODEL-EVALUATED, and `rebuild_deck.sh` refuses if the table is missing |
