@@ -47,7 +47,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -1485,13 +1485,23 @@ def simulate(deck, commander, cfg, seed):
     seal_rng(g)
     budget = cfg.get("turns", 20)
     played = 0
+    snaps = Snapshots(cfg)                 # §0z93
     while played < budget and g.result is None:
         take_turn(g)
         played += 1
         if g.result is not None:
             break
         played = take_extra_turns(g, played, budget)
+        # A round ends after its extra turns. Under the legacy horizon
+        # (`horizon_counts="turns"`) `played` can jump past a snapshot
+        # round, and `attach` then raises rather than guess.
+        snaps.after_round(g, played, outputs)
+    return snaps.attach(g, outputs(g))
 
+
+def outputs(g):
+    """`finish` plus tivit's own keys -- one builder for a snapshot (§0z93)
+    and for the end of the game."""
     out = finish(g)
     out["final_treasures"] = g.tokens["Treasure"]
     out["final_artifacts"] = g.artifact_count()

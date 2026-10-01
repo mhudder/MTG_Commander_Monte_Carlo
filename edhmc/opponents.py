@@ -191,7 +191,15 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
             # identical opponents no matter how their own boards diverge
             kill_turn=r.randint(lo, hi)))
 
-    turns = cfg.get("turns", 10) + 2
+    # THE GRID IS SIZED INDEPENDENTLY OF THE HORIZON (§0z93). It used to be
+    # `turns + 2` rows, and the counter rolls are drawn AFTER the main rolls,
+    # so a T10 game and a T20 game on the same seed met different counter
+    # rolls -- and a T10 game was not the first ten rounds of the T20 one.
+    # With `pod_grid_rounds` (20) rows or more it is, which is what lets one
+    # T20 run report T10 as well (`engine.Snapshots`). Same distributions,
+    # so this resamples T10 rather than changing the model; T20 and above
+    # are bit-identical. 0 restores the horizon-sized grid.
+    turns = max(cfg.get("turns", 10), cfg.get("pod_grid_rounds", 20)) + 2
     rolls = [[[r.random() for _ in range(N_SLOTS)] for _ in opps]
              for _ in range(turns)]
     counter_rolls = [[[r.random() for _ in opps] for _ in range(N_COUNTER_SLOTS)]

@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -2316,10 +2316,18 @@ def simulate(deck, commander, cfg, seed):
     g.opening_hand()
     # From here the game RNG must never be touched again. §0z17.
     seal_rng(g)
-    for _ in range(cfg.get("turns", 10)):
+    snaps = Snapshots(cfg)                 # §0z93
+    for i in range(cfg.get("turns", 10)):
         take_turn(g)
         if g.result is not None:
             break
+        snaps.after_round(g, i + 1, outputs)
+    return snaps.attach(g, outputs(g))
+
+
+def outputs(g):
+    """The game's output dict: `finish` plus lorehold's own keys. One
+    function, so a snapshot (§0z93) and the end of the game build it alike."""
     out = finish(g)
     out["miracle_rate"] = (out["miracle_hits"] / out["miracle_windows"]
                            if out["miracle_windows"] else 0.0)

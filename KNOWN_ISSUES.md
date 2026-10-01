@@ -141,6 +141,7 @@ Methodology that used to live at the end of this file is now
 | [0z90](#0z90) | FIXED | **Exquisite Blood's general clause, and Blood + Cleric / Blight-Priest / Cliffhaven is an infinite loop** the engine never saw: +0.0389 ±0.0032 at T20 to karlov |
 | [0z91](#0z91) | FIXED | **Tivit's combat trigger fired when Tivit was blocked**: it needs Tivit to connect now, −0.0109 ±0.0018 at T20 |
 | [0z92](#0z92) | FIXED | **Trample**: a blocked trampler assigns the excess. rendmaw +0.0067, azusa +0.0063 at T20; `blocker_toughness` barely matters |
+| [0z93](#0z93) | BUILT | **One run measures every horizon**: a T10 game is the first ten rounds of the T20 game once the pod's grid stops being sized by the horizon. Proved identical key for key; ablation ~41% faster; T20 bit-identical, T10 resampled once |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8602,6 +8603,59 @@ connect-trigger creature in any list tramples. The pilot's lethal PLAN still
 prices a chump as stopping the whole attacker, so it under-reaches with
 tramplers -- a conservative pilot, resolved by the real `damage_through`.
 Pinned by `tests/test_engine_gaps.py` J-O.
+
+## 0z93. BUILT — one run measures every horizon, and the rebuild costs ~40% less
+
+The owner asked for optimisations before the next multi-deck rebuild, which
+took 3h09m at N=15,000 (§0z60). Where the time goes:
+
+* **Per card, two horizons were two runs.** `ablation.py` already shares the
+  baseline across cards, so each card costs its blank leg at T10 and at T20.
+  A T10 game costs 72-78% of a T20 one (2.5-5.8 ms against 3.3-7.7 ms a
+  game, all six engines), so T10+T20 was ~1.75 T20-games per card.
+* **Inside a game, nothing dominates.** Payment (`can_pay`,
+  `available_mana`) is the largest share, then creature-type checks; every
+  candidate there is a few percent and each would have to be proved
+  bit-identical on its own. Not done.
+* **Skipping decks is not available.** Every cache is SUSPECT and every
+  deck's baseline has moved -- lorehold, the one that looked possibly clean,
+  moved since its built-at commit (`check_unchanged_decks`, 8 of 8 metrics).
+* The workers use every core, and the baseline re-measure on each 1800 s
+  budget restart is ~2%. Neither is worth touching.
+
+**THE CHANGE: A T10 GAME IS THE FIRST TEN ROUNDS OF THE T20 GAME.** That was
+true of every engine's play -- nothing before round 10 reads the horizon --
+except for one thing: the pod's pre-rolled grid had `turns + 2` rows, and its
+counter rolls are drawn AFTER the main rolls, so a T10 game and a T20 game on
+one seed met different counterspell rolls. The grid now has
+`max(turns, pod_grid_rounds) + 2` rows (`pod_grid_rounds` 20; 0 restores the
+old sizing). Then `engine.Snapshots` lets each of the six simulate loops
+report its output at earlier rounds (`snapshot_rounds`), and
+`ablation.columns_all` plays each game once, to the longest horizon
+(`ABLATE_PREFIX=0` runs them separately).
+
+**CHECKED, NOT ARGUED** (`tests/test_horizon_prefix.py`, 10 cases, 3
+mutations, exact sets on the first run):
+
+| claim | evidence |
+|---|---|
+| the T10 output IS the T20 game at round 10 | every output key equal, 60 seeds, all six engines |
+| a snapshot changes nothing | T20 with and without `snapshot_rounds` equal, all six |
+| ablation reads the same columns | `columns_all` == `columns` per horizon |
+| T20 did not move | `check_unchanged_decks` vs HEAD: all six decks BIT-IDENTICAL, module and staged lists |
+| one card, both ways | rendmaw Grave Titan, azusa Rampaging Baloths, tivit Time Sieve at N=1,200: identical dicts; 40%, 41%, 42% faster |
+
+**T10 NUMBERS ARE RESAMPLED ONCE, NOT CHANGED.** The counter rolls a T10 game
+reads are now the ones a T20 game reads; their distribution is the same. Every
+T10 figure published before this commit came from the old grid and will
+differ in the noise from a re-measure -- which the pending rebuild is anyway.
+T20 is untouched. **The rebuild should take about 1h50m** against 3h09m;
+that is an estimate from the per-card timing, to be replaced by the rebuild's
+own time.
+
+Not changed: `experiment.run_ab` and `tools/candidates.py`, which callers run
+one horizon at a time; both can take `snapshot_rounds` the same way when a
+diagnostic wants it.
 
 ## How to read an ablation table
 

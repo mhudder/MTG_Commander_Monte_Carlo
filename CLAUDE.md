@@ -96,9 +96,9 @@ python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
                                            # hand -- the default is 240s (§0z22)
 python -m tools.audit_cards                # every card against Scryfall; expect 0 ERR
 ./tools/regen_tables.sh                    # all six tables at N=15000:
-                                           # 3h09m end to end on four cores,
-                                           # timed in §0z60. (The ~35 min once
-                                           # quoted here predated §0z22.)
+                                           # 3h09m on four cores when timed
+                                           # in §0z60; ~40% less since one run
+                                           # measures both horizons (§0z93).
 ```
 
 **Every other entry point — every tool, every test, every diagnostic, with what
@@ -173,6 +173,7 @@ python -m tests.test_floors_batch2 --mutate        # 6 mutations, exact sets
 python -m tests.test_pod_clock --mutate            # 3 mutations, exact sets
 python -m tests.test_destroy_share --mutate        # 3 mutations, exact sets
 python -m tests.test_engine_gaps --mutate          # 6 mutations, exact sets
+python -m tests.test_horizon_prefix --mutate       # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant

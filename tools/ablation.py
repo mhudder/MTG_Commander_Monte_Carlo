@@ -109,6 +109,11 @@ class Run:
     horizons: tuple = (20,)   # with the opponent clock, games end around T12
     # See blank_like(). True isolates a card's text from its type line.
     blank_keeps_types: bool = False
+    # ONE RUN, EVERY HORIZON (§0z93): play each game to the longest horizon
+    # and read the shorter ones off it (`engine.Snapshots`). Bit-identical to
+    # running each horizon separately -- `tests/test_horizon_prefix.py` --
+    # so it is NOT in the cache key. ABLATE_PREFIX=0 runs them separately.
+    prefix: bool = True
 
     @property
     def sim(self):
@@ -153,7 +158,8 @@ def parse_args(argv) -> Run:
     horizons = (tuple(int(x) for x in argv[2].split(","))
                 if len(argv) > 2 else (20,))
     return Run(deck, n, horizons,
-               os.environ.get("BLANK_KEEPS_TYPES", "0") == "1")
+               os.environ.get("BLANK_KEEPS_TYPES", "0") == "1",
+               os.environ.get("ABLATE_PREFIX", "1") == "1")
 METRIC_SETS = {name: spec.metrics for name, spec in DECKS.items()}
 
 # Cards whose actual text the engine implements. Everything else is a body.
@@ -929,6 +935,30 @@ def columns(run, deck, commander, turns, lo, hi):
     return {m: np.array([r[m] for r in rows], float) for m in run.metrics}
 
 
+def columns_all(run, deck, commander, lo, hi):
+    """{horizon: columns} for every horizon in the run, over seeds [lo, hi).
+
+    With `run.prefix` each game is played ONCE, to the longest horizon, and
+    the shorter horizons are read from its snapshots (§0z93) -- the same
+    numbers `columns` returns per horizon, at the cost of the longest run
+    alone: a T10 game costs ~75% of a T20 one, so T10+T20 goes from ~1.75
+    T20-games to 1.0.
+    """
+    top = max(run.horizons)
+    rest = tuple(t for t in run.horizons if t != top)
+    if not run.prefix or not rest:
+        return {t: columns(run, deck, commander, t, lo, hi)
+                for t in run.horizons}
+    cfg = dict(DEFAULT_CFG, turns=top, watch=frozenset(), snapshot_rounds=rest)
+    rows = [run.sim(deck, commander, cfg, 5000 + i) for i in range(lo, hi)]
+    out = {top: {m: np.array([r[m] for r in rows], float)
+                 for m in run.metrics}}
+    for t in rest:
+        out[t] = {m: np.array([r["at_rounds"][t][m] for r in rows], float)
+                  for m in run.metrics}
+    return out
+
+
 def paired(run, keep, drop):
     """{metric: (mean_diff, 95% CI half-width)} from two metric-column dicts."""
     cell = {}
@@ -954,13 +984,10 @@ def ablate(run, deck, commander, card_name, baseline=None):
     is what the old code did for every card in turn.
     """
     deck_b = blanked(run, deck, card_name)
-    out = {}
-    for turns in run.horizons:
-        keep = (baseline[turns] if baseline is not None
-                else columns(run, deck, commander, turns, 0, run.n))
-        out[str(turns)] = paired(run, keep,
-                                 columns(run, deck_b, commander, turns, 0, run.n))
-    return out
+    if baseline is None:
+        baseline = columns_all(run, deck, commander, 0, run.n)
+    drop = columns_all(run, deck_b, commander, 0, run.n)
+    return {str(t): paired(run, baseline[t], drop[t]) for t in run.horizons}
 
 
 
@@ -988,10 +1015,9 @@ def _worker_init(run, baseline):
 
 
 def _baseline_chunk(args):
-    """A slice of the untouched deck's games, for one horizon."""
-    turns, lo, hi = args
-    return turns, lo, columns(_W["run"], _W["deck"], _W["commander"],
-                              turns, lo, hi)
+    """A slice of the untouched deck's games, for every horizon."""
+    lo, hi = args
+    return lo, columns_all(_W["run"], _W["deck"], _W["commander"], lo, hi)
 
 
 def _ablate_card(name):
@@ -1019,12 +1045,12 @@ def measure_baseline(run, pool, procs):
     mean and standard deviation is bit-identical.
     """
     slices = _chunks(run.n, procs)
-    tasks = [(t, lo, hi) for t in run.horizons for lo, hi in slices]
     parts = {t: {} for t in run.horizons}
-    runner = (pool.imap_unordered(_baseline_chunk, tasks) if pool
-              else map(_baseline_chunk, tasks))
-    for turns, lo, cols in runner:
-        parts[turns][lo] = cols
+    runner = (pool.imap_unordered(_baseline_chunk, slices) if pool
+              else map(_baseline_chunk, slices))
+    for lo, by_t in runner:
+        for t, cols in by_t.items():
+            parts[t][lo] = cols
     return {t: {m: np.concatenate([parts[t][lo][m] for lo, _ in slices])
                 for m in run.metrics}
             for t in run.horizons}

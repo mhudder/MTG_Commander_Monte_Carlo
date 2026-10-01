@@ -21,6 +21,7 @@ the rest are correctly handled as "a body with a mana cost and a type line".
 from __future__ import annotations
 
 import hashlib
+import copy
 import random
 from dataclasses import dataclass, field
 from typing import Callable, Optional
@@ -1216,6 +1217,53 @@ def finish(g) -> "Metrics":
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and
                                       not out["test_card_answered"]) else 0
     return out
+
+
+class Snapshots:
+    """A game's output at EARLIER horizons, read off the same game (§0z93).
+
+    `cfg["snapshot_rounds"]`, e.g. (10,), asks a T20 game for what a T10 game
+    on the same seed would have returned. That is exact, not approximate,
+    when nothing the game does before round 10 reads the horizon -- true of
+    every engine once the pod's grid stopped being sized by it -- and
+    `tests/test_horizon_prefix.py` checks it on every output key of all six
+    engines. It is how one run measures both horizons at about 57% of the
+    cost of two.
+
+    Each engine's loop calls `after_round(g, rounds, outputs)` once a round
+    is complete and the game is still running; `outputs(g)` is that engine's
+    whole output builder (`finish` plus its own keys), and the snapshot is a
+    deep copy, so later rounds cannot reach into it. `attach(g, out)` adds
+    `out["at_rounds"]`: a round the game ended on or before reads the final
+    output, which is what the shorter game would have returned. A round that
+    was neither snapshotted nor reached by a game that ENDED is an error --
+    the horizon was shorter than it, or the loop skipped it.
+    """
+
+    def __init__(self, cfg):
+        # The rounds to report besides the last (§0z93).
+        self.want = tuple(sorted(cfg.get("snapshot_rounds", ())))
+        self.taken = {}
+
+    def after_round(self, g, rounds, outputs) -> None:
+        if rounds in self.want and g.result is None:
+            self.taken[rounds] = copy.deepcopy(dict(outputs(g)))
+
+    def attach(self, g, out):
+        if not self.want:
+            return out
+        final = copy.deepcopy(dict(out))
+        at = {}
+        for k in self.want:
+            if k in self.taken:
+                at[k] = self.taken[k]
+            elif g.result is not None:
+                at[k] = final
+            else:
+                raise ValueError(f"no snapshot at round {k}: the game timed "
+                                 f"out without reaching it")
+        out["at_rounds"] = at
+        return out
 
 
 class Game(BaseGame):
@@ -3495,8 +3543,10 @@ def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
     g.opening_hand()
     # From here the game RNG must never be touched again. §0z17.
     seal_rng(g)
-    for _ in range(cfg.get("turns", 10)):
+    snaps = Snapshots(cfg)
+    for i in range(cfg.get("turns", 10)):
         take_turn(g)
         if g.result is not None:
             break
-    return finish(g)
+        snaps.after_round(g, i + 1, finish)
+    return snaps.attach(g, finish(g))

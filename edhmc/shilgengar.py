@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -1236,8 +1236,10 @@ def simulate(deck, commander, cfg, seed):
     g.opening_hand()
     # From here the game RNG must never be touched again. §0z17.
     seal_rng(g)
-    for _ in range(cfg.get("turns", 20)):
+    snaps = Snapshots(cfg)                 # §0z93
+    for i in range(cfg.get("turns", 20)):
         take_turn(g)
         if g.result is not None:
             break
-    return finish(g)
+        snaps.after_round(g, i + 1, finish)
+    return snaps.attach(g, finish(g))
