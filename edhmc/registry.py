@@ -92,6 +92,12 @@ DECKS: dict[str, DeckSpec] = {
     "azusa": DeckSpec(
         "azusa", "azusa", frozenset("G"),
         ("damage", "landfall_triggers", "lands_played", "tokens_made", "won")),
+    # lifegain_triggers, not life_gained: Trostani on a token copy of Soul of
+    # Eternity DOUBLES your life, so the amount is exponential and its mean
+    # is a handful of games. The count of events is bounded by the board.
+    "trostani": DeckSpec(
+        "trostani", "trostani", frozenset("GW"),
+        ("damage", "tokens_made", "populates", "lifegain_triggers", "won")),
 }
 
 

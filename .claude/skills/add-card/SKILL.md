@@ -280,7 +280,7 @@ Then:
 python -m tests.<your new module>            # yours, plain
 python -m tests.<your new module> --mutate   # the exact set
 python -m tests                              # every pinned mechanism
-python -m tools.validate                     # +0.00 on all 18 metrics
+python -m tools.validate                     # +0.00 on all 21 metrics
 ```
 
 **If you touched `engine.py`, `opponents.py`, `experiment.py` or any shared

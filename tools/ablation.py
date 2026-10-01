@@ -593,6 +593,40 @@ SCRIPTED_AZUSA = {
     "Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre",
 }
 
+
+# Written 2026-10-01 with the deck, from the owner's spreadsheet. Membership is
+# a claim that edhmc.trostani implements the card's text; the module docstring
+# names every policy (Karmic Guide's echo declined, Processor's life, Sylvan
+# Library's floor, Greater Good once a turn) and each is a knob.
+SCRIPTED_TROSTANI = {
+    # the token engine -- one token path, every doubler said once there
+    "Soul of Eternity",          # */* = life, and encore {7}{W}{W}
+    "Bramble Sovereign",         # copies YOUR nontoken creatures; the pod's are a count
+    "Seedborn Muse",             # a round of instant-speed abilities per opponent
+    "Growing Ranks", "Nesting Dovehawk", "Caretaker's Talent",
+    "Phyrexian Processor", "God-Pharaoh's Gift", "King Darien XLVIII",
+    "Queen Allenal of Ruadach", "Wurmcoil Engine", "Dawn of Hope",
+    "Anointed Procession", "Parallel Lives",
+    # Primal Vigor's symmetric half -- the OPPONENTS' tokens doubled -- is the
+    # pod's abstract board growth (§4), as in rendmaw, where it is SCRIPTED
+    # through the same reading.
+    "Primal Vigor",
+    # value and recursion
+    "Sun Titan", "Karmic Guide", "Eternal Witness", "Timeless Witness",
+    "Ulvenwald Hydra", "Selfless Spirit",
+    # engines and the payoff
+    "Mirari's Wake", "Sylvan Library", "Alhammarret's Archive",
+    "Aetherflux Reservoir", "Defense of the Heart",
+    # tutors -- Chord's convoke included
+    "Chord of Calling", "Green Sun's Zenith", "Worldly Tutor",
+    "Enlightened Tutor", "Eladamri's Call", "Congregation at Dawn",
+    # ramp
+    "Sol Ring", "Arcane Signet", "Talisman of Unity", "Birds of Paradise",
+    "Elvish Mystic", "Avacyn's Pilgrim", "Sylvan Caryatid",
+    "Sakura-Tribe Elder", "Wood Elves", "Farhaven Elf", "Solemn Simulacrum",
+    "Skyshroud Claim",
+}
+
 # ---------------------------------------------------------------------------
 # PARTLY MODELLED — the third category (2026-09-10, queued items 14 and 14b)
 # ---------------------------------------------------------------------------
@@ -618,6 +652,65 @@ SCRIPTED_AZUSA = {
 # on an empty reason, and the reason is PRINTED in the table, so the row
 # carries its own caveat to whoever reads it next.
 PARTLY_MODELLED = {
+    # 2026-10-01, with the deck. Each reason names the clause that is missing
+    # and why it can only UNDERSTATE the card.
+    "trostani": {
+        "Elspeth, Sun's Champion":
+            "MODELLED: +1 (three Soldiers, through the doublers) every turn and "
+            "the -7 emblem (+2/+2 and flying for the team, read by "
+            "flying_of). NOT: the -3, which would destroy your own Soul "
+            "tokens and aims at a pod that is a creature count (§4). Loyalty "
+            "only goes up -- the pod does not attack walkers. A floor on the "
+            "-3, a ceiling on her survival; the +1 is most of the card.",
+        "Selesnya Eulogist":
+            "MODELLED: the 3/3 and its {2}{G} populate, as often as mana and "
+            "a target allow. The target is a creature card in YOUR graveyard "
+            "or, from pod turn `eulogist_opp_yard_turn` (4), one a round from "
+            "the pod's graveyards, which are not modelled (§4). The row "
+            "reads that knob as much as the card.",
+        "Luminarch Ascension":
+            "MODELLED: the {1}{W} 4/4 flying Angel at four quest counters. "
+            "The counters are added once per pod ROUND, one per living "
+            "opponent, and only in a round in which you lost no life -- a "
+            "FLOOR, since the loss may have come on only one opponent's turn.",
+        "Mimic Vat":
+            "MODELLED: imprinting YOUR nontoken creatures as they die and the "
+            "{3},{T} hasty copy, exiled at the end step. NOT: imprinting the "
+            "pod's creatures, which die as a number (§4). A floor.",
+        "Blade of Selves":
+            "MODELLED: equip {4} on the best attacker and myriad's copies -- "
+            "tokens ENTERING, so Trostani, the doublers and Caretaker's "
+            "Talent see them -- exiled at end of combat. The copies join the "
+            "one attack the pod model declares rather than each being forced "
+            "at its own opponent (§0v).",
+        "Mondrak, Glory Dominus":
+            "MODELLED: the 4/4 and its token doubling on the one token path. "
+            "NOT: '{1}{W/P}{W/P}, Sacrifice two other artifacts and/or "
+            "creatures: Put an indestructible counter on Mondrak' -- a "
+            "protection line, so the row is a floor.",
+        "Sundering Growth":
+            "MODELLED: 'then populate' -- held until there is a token to "
+            "copy. NOT: 'destroy target artifact or enchantment', whose "
+            "targets are the pod's (§4). A floor.",
+        "Archon of Valor's Reach":
+            "MODELLED: the 5/6 body with flying and trample (generated "
+            "sets). NOT: 'Players can't cast spells of the chosen type' -- "
+            "the pod casts no typed spells here (§4). Vigilance is inert, "
+            "since your creatures never block. A floor.",
+        "Angel of Sanctions":
+            "MODELLED: the 3/4 flier and embalm {5}{W} (a token copy, which "
+            "Trostani and the doublers see). NOT: the ETB exile of an "
+            "opposing nonland permanent (§4). A floor.",
+        "Greater Good":
+            "MODELLED: sacrifice a creature, draw its power, discard three -- "
+            "once a turn, with two cards or fewer in hand, on a body the "
+            "library can afford. NOT: the instant-speed sacrifice in response "
+            "to removal, which is where the card is best. A floor.",
+        "Lightning Greaves":
+            "MODELLED: shroud on Trostani (`shroud_sources`). NOT: haste -- "
+            "the Greaves never move off the commander, so a Soul of Eternity "
+            "cast this turn does not swing. A floor.",
+    },
     "karlov": {
         "Ginger, Queen of Sweets":
             "Two clauses of three are modelled and the third is a POLICY "
@@ -887,7 +980,8 @@ def partly_for(deck_name, deck):
 
 SCRIPTED_BY_DECK = {"lorehold": SCRIPTED_LOREHOLD, "rendmaw": SCRIPTED_RENDMAW,
                     "karlov": SCRIPTED_KARLOV, "tivit": SCRIPTED_TIVIT,
-                    "shilgengar": SCRIPTED_SHILGENGAR, "azusa": SCRIPTED_AZUSA}
+                    "shilgengar": SCRIPTED_SHILGENGAR, "azusa": SCRIPTED_AZUSA,
+                    "trostani": SCRIPTED_TROSTANI}
 
 
 def blank_like(card, priority, keep_types=False):
@@ -1081,6 +1175,16 @@ def ablation_stream(run, todo, procs):
 # implement their text and a low score is evidence about the model. Listing
 # them explicitly is what lets the assertion below be strict.
 KNOWN_BLIND = {
+    "trostani": {
+        # removal -- the pod's permanents are a count (§4)
+        "Swords to Plowshares", "Path to Exile", "Beast Within",
+        # "Whenever a creature you control enters, you may destroy target
+        # artifact or enchantment" -- the pod's. No body.
+        "Aura Shards",
+        # a 2/2 body (deathtouch is inert against chump blocks) whose ETB
+        # destroys the pod's artifact, enchantment or land (§4)
+        "Acidic Slime",
+    },
     "rendmaw": {
         "Assassin's Trophy",
         'Beast Within',

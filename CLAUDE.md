@@ -1,7 +1,7 @@
 # EDH Monte Carlo — project context
 
-Monte Carlo simulator for evaluating Commander decklist changes. Six decks,
-six engines, a shared opponent model, and a paired A/B harness using common
+Monte Carlo simulator for evaluating Commander decklist changes. Seven decks,
+seven engines, a shared opponent model, and a paired A/B harness using common
 random numbers.
 
 The goal is results that are **mechanically explainable**, not merely
@@ -59,18 +59,19 @@ ids are load-bearing:
       tivit.py               Tivit engine (votes / artifact tokens / extra turns)
       shilgengar.py          Shilgengar engine (Angels / Blood / reanimation)
       azusa.py               Azusa engine (landfall / extra land drops)
+      trostani.py            Trostani engine (tokens / populate / lifegain)
       voting.py              the council mechanic and the opponent-vote model
       opponents.py           shared opponent model, clocks, combat and damage
       experiment.py          paired A/B harness
       pending.py             staged-change ledger
       decks/                 rendmaw_v12  lorehold_v16  karlov_v2
-                             tivit_v1  shilgengar_v1  azusa_v1
+                             tivit_v1  shilgengar_v1  azusa_v1  trostani_v1
     tools/                   entry points
     diagnostics/             diag_* (measure a mechanism), run_* (measure a change)
     tests/                   tests that pin a claimed mechanism
     results/                 every table, log and harness output
       caches/                ablation caches (tracked — see below)
-    spreadsheets/            the .xlsx system of record for five of six decks
+    spreadsheets/            the .xlsx system of record for six of seven decks
     docs/                    STATUS/KNOBS (generated), HISTORY, audits, the cache
                              manifest, the comprehensive rules (COMP_RULES.md +
                              MagicCompRules_20260807.docx/.txt), and archive/
@@ -97,13 +98,14 @@ python -m tools.ablation karlov 6000 20    # rank every card; caches and resumes
                                            # ABLATE_BUDGET=3000 for one deck by
                                            # hand -- the default is 240s (§0z22)
 python -m tools.audit_cards                # every card against Scryfall; expect 0 ERR
-./tools/regen_tables.sh                    # all six tables at N=15000, in
+./tools/regen_tables.sh                    # every table at N=15000, in
                                            # series: 3h09m on four cores in
                                            # §0z60, ~40% less since §0z93.
                                            # SEVERAL DECKS: the
                                            # parallel-rebuild skill, one
                                            # session per deck -- 41 min for
-                                           # all six (§0z94, §0z95).
+                                           # the six of §0z95 (§0z94).
+                                           # DECKS="a b" for only some.
 ```
 
 **Every other entry point — every tool, every test, every diagnostic, with what
@@ -140,7 +142,7 @@ python -m tests.test_azusa_batch3 --mutate          # exactly 7 cases MUST fail
 python -m tests.test_mana_colour --mutate           # exactly 4 cases MUST fail
 python -m tests.test_pod_damage_and_wipes --mutate  # exactly 13 MUST fail
 python -m tests.test_lorehold_0f_0i --mutate        # exactly 17 MUST fail
-python -m tests.test_crn_streams --mutate           # exactly 5 of 6 MUST fail
+python -m tests.test_crn_streams --mutate           # exactly 6 of 7 MUST fail
 python -m tests.test_ashaya --mutate                # 3 mutations, exact sets
 python -m tests.test_recursion --mutate             # 6 mutations, exact sets
 python -m tests.test_modes_and_altar --mutate       # 4 mutations, exact sets
@@ -180,11 +182,12 @@ python -m tests.test_destroy_share --mutate        # 3 mutations, exact sets
 python -m tests.test_engine_gaps --mutate          # 6 mutations, exact sets
 python -m tests.test_horizon_prefix --mutate       # 3 mutations, exact sets
 python -m tests.test_parallel_rebuild --mutate     # 3 mutations, exact sets
+python -m tests.test_trostani --mutate             # 5 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
 to move — `opponents.py` and `engine.py` are in every deck's cache
-fingerprint, so all six fingerprints move whether or not any number does:
+fingerprint, so every deck's fingerprint moves whether or not any number does:
 
 ```bash
 git worktree add ../edhmc_head HEAD
@@ -197,8 +200,8 @@ python -m tools.check_unchanged_decks --diff old.json new.json
 
 ## Non-negotiable checkpoints
 
-**`python -m tools.validate` must print exactly `+0.00` on all eighteen
-metrics across all six engines.** Anything else means randomness is leaking
+**`python -m tools.validate` must print exactly `+0.00` on all twenty-one
+metrics across all seven engines.** Anything else means randomness is leaking
 between branches and every result in the project is suspect. Run it before and
 after any engine change.
 
@@ -318,7 +321,7 @@ to be said in BOTH `available_mana` and `spend` or it does nothing (§0z4);
 `ablation.py`'s blank versus `candidates.py`'s, which the file itself says
 "MUST match" and which had silently diverged for lands (§0z4); and the big one
 — **`tivit.py` had written the CORRECT colour-payment rule for itself while
-the other five engines shared a broken one for months** (§0z8). **Six engines
+the other five engines shared a broken one for months** (§0z8). **Seven engines
 share five primitives and nothing checks that a rule means the same thing in
 all of them.** When you implement a card's rule, grep the other engines for its
 name before assuming yours is the only copy — and when one engine has quietly
@@ -630,7 +633,7 @@ mid-game draw goes through `engine.CRNStreams`, where each effect has its own
 stream and its Nth firing reads index N, so one branch doing more of something
 cannot shift what the other reads. **The invariant is that after the opening
 hand `g.rng` is never touched again**, and `tests/test_crn_streams.py` asserts
-it over all six decks with a mutation check behind it. If you add anything
+it over every deck with a mutation check behind it. If you add anything
 that rolls or shuffles mid-game, call `crn_random` / `crn_randrange` /
 `crn_shuffle` — the test will catch you if you do not, which the A/A control
 never could.
@@ -693,8 +696,8 @@ toward whatever got tagged. It is worse than no tags at all.
 them; it never overrides `--` on a row whose damage is noise (§0z24).
 
 **Say the knob out loud** when a card's evaluation swings on one:
-`destroy_share` (a census since §0z87: spot 0.45, wipe 0.52 -- and it
-moves no deck by 0.001), `opp_vote_policy` (`"adversarial"`),
+`destroy_share` (a census of every list since §0z87: spot 0.46, wipe 0.56
+with the seventh deck, §0z96 -- and it moves no deck by 0.001), `opp_vote_policy` (`"adversarial"`),
 `flier_block_share` (0.30), `archetype_weights`. **`docs/KNOBS.md` is the full
 list** — derived from the `cfg.get` call sites, with defaults and with the
 ones that nothing has ever set. Until it existed this rule could not be
@@ -924,8 +927,9 @@ is half answered**: the ordering half is built and measured as a null
     `docs/ORACLE_AUDIT_*.md`.
 
 7.  **ANSWERED (§0z87)**: indestructible is priced per kind of answer from
-    a census of the six lists (`tools.removal_census`, spot 0.45, wipe 0.52,
-    below the old flat 0.60). The knob moves no deck by 0.001, and
+    a census of the lists (`tools.removal_census`; spot 0.45, wipe 0.52 at
+    six decks, 0.46 / 0.56 since the seventh, §0z96 -- below the old flat
+    0.60). The knob moves no deck by 0.001, and
     indestructibility is worth at most 0.008 on any card in the lists.
 
 8c. **ANSWERED (§0z71)**: Time Sieve may make up a shortfall from REAL

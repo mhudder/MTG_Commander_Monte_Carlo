@@ -52,7 +52,7 @@ change.
 python -m tools.check_docs     # must pass
 python -m tests                # must pass; `python -m tests -k <name>` for one module
 python -m edhmc.pending        # 100 cards / singleton-legal / commander distinct
-python -m tools.validate       # +0.00 on all 18 metrics, if you touched an engine
+python -m tools.validate       # +0.00 on all 21 metrics, if you touched an engine
 ```
 
 `python -m tests` runs every pinned mechanism test in its own subprocess and

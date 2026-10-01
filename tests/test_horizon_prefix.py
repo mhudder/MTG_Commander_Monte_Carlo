@@ -14,6 +14,8 @@ CASES
   A-F  rendmaw, lorehold, karlov, tivit, shilgengar, azusa: over 60 seeds,
        the standalone T10 game's output equals the T20 game's round-10
        snapshot, key for key
+  K    the same for trostani (added with the deck, 2026-10-01; a letter
+       after J so no existing case was renamed)
   G    taking a snapshot does not perturb the game: a T20 game with
        `snapshot_rounds=(10,)` returns what one without it returns, all six
   H    ablation's `columns_all` equals `columns` run per horizon (rendmaw,
@@ -23,9 +25,9 @@ CASES
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the grid is sized by the horizon again (pod_grid_rounds=0)
-                                                 -> A, B, C, D, E, F, H, J
-  a snapshot keeps live references (no deep copy) -> A, B, C, D, E, F
-  attach ignores the snapshots (final for all)    -> A, B, C, D, E, F, H, I
+                                                 -> A, B, C, D, E, F, H, J, K
+  a snapshot keeps live references (no deep copy) -> A, B, C, D, E, F, K
+  attach ignores the snapshots (final for all)    -> A, B, C, D, E, F, H, I, K
 
 UNMUTATED (§0z15): G is the neighbour -- the snapshot must change nothing.
 """
@@ -42,7 +44,8 @@ MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []
 EXTRA_CFG = {}
 SEEDS = range(5000, 5060)
-ORDER = ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa")
+ORDER = ("rendmaw", "lorehold", "karlov", "tivit", "shilgengar", "azusa",
+         "trostani")
 LISTS = {d: build_pending(d) for d in ORDER}
 
 
@@ -61,7 +64,7 @@ def run_cases():
     PASS.clear()
     FAIL.clear()
     perturbed = []
-    for letter, deck in zip("ABCDEF", ORDER):
+    for letter, deck in zip("ABCDEFK", ORDER):
         cards, cmd = LISTS[deck]
         sim = DECKS[deck].sim
         bad = 0
@@ -126,7 +129,7 @@ def main() -> int:
         out["at_rounds"] = {k: _copy.deepcopy(dict(out)) for k in self.want}
         return out
 
-    six = {"A", "B", "C", "D", "E", "F"}
+    six = {"A", "B", "C", "D", "E", "F", "K"}       # the seven decks
     muts = {
         "the grid is sized by the horizon again":
             (six | {"H", "J"}, None, {"pod_grid_rounds": 0}),

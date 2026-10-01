@@ -260,6 +260,26 @@ def main():
     forests = {n for n, c in cards.items()
                if n in everything and everything[n].is_land
                and "Forest" in subtypes(c)}
+    # PLAINS, 2026-10-01, with the trostani deck: its fetchlands say "search
+    # your library for a Forest or Plains CARD" and Fortified Village reveals
+    # "a Forest or Plains card" -- a dual whose type line says Plains is one
+    # (Temple Garden, Canopy Vista), a Command Tower is not. FOREST's rule.
+    plains = {n for n, c in cards.items()
+              if n in everything and everything[n].is_land
+              and "Plains" in subtypes(c)}
+    # LEGENDARY, 2026-10-01, with the trostani deck: a token COPY of a
+    # legendary permanent puts two of one name on the battlefield and the
+    # legend rule (704.5j) takes one. Bramble Sovereign, populate and Mimic
+    # Vat can all make such a copy, so the engine has to know which names are
+    # legendary. The SUPERTYPE half of the type line -- the half `subtypes`
+    # drops -- and every card type, since a legendary land or artifact
+    # (Yavimaya Hollow, Alhammarret's Archive) obeys the same rule.
+    legendary = {n for n, c in cards.items()
+                 if n in everything and any(
+                     "Legendary" in (line.split("—", 1)[0])
+                     for line in [c.get("type_line") or ""] + [
+                         f.get("type_line") or ""
+                         for f in c.get("card_faces", []) or []])}
     # ELF_ELEMENTAL is NOT restricted to creatures, unlike HUMAN. Nissa,
     # Resurgent Animist reveals until it reveals "an Elf or Elemental CARD",
     # and a card carries its subtypes in every zone -- a tribal or enchantment
@@ -305,6 +325,13 @@ def main():
           f"Who Shakes the World\ncount these; a nonbasic that is not a Forest "
           f"is not one, however green it looks:")
     for n in sorted(forests):
+        print(f"    {n}")
+    print(f"\nPLAINS ({len(plains)}) — a fetchland's or Fortified Village's "
+          f"'Plains card':")
+    for n in sorted(plains):
+        print(f"    {n}")
+    print(f"\nLEGENDARY ({len(legendary)}) — the legend rule on a token copy:")
+    for n in sorted(legendary):
         print(f"    {n}")
     print(f"\nELF or ELEMENTAL ({len(elf_elemental)}) — what Nissa, Resurgent "
           f"Animist can reveal.\nThe hit RATE is the card, so a name missing "
@@ -388,6 +415,16 @@ def main():
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\nFOREST = {\n")
             for n in sorted(forests):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n# PLAINS: the land half of 'a Forest or Plains card' "
+                     "(trostani's fetches,\n# Fortified Village). FOREST's rule.\n"
+                     "PLAINS = {\n")
+            for n in sorted(plains):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n# LEGENDARY, every card type, from the type line's "
+                     "supertype half.\n# A token copy of one of these meets the "
+                     "legend rule (704.5j).\nLEGENDARY = {\n")
+            for n in sorted(legendary):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\nELF_ELEMENTAL = {\n")
             for n in sorted(elf_elemental):

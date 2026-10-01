@@ -35,7 +35,7 @@ python -m tests              # do the pinned mechanisms still hold?
 
 A Monte Carlo simulator for testing Commander (EDH) decklist changes: "is
 card X better than card Y in this deck?", answered with a number and a
-confidence interval. Six decks, six simulation engines, one shared opponent
+confidence interval. Seven decks, seven simulation engines, one shared opponent
 model, one paired A/B statistics harness. Run from the repo root with
 Python 3.10+, numpy, scipy (`pip install -r requirements.txt`).
 
@@ -61,7 +61,7 @@ python -m tools.ablation karlov 6000 20  # rank every card in a deck
 python -m tools.audit_cards              # every card's data checked against Scryfall
 ```
 
-## The six decks
+## The seven decks
 
 | commander | archetype | file | tuning status |
 |---|---|---|---|
@@ -71,28 +71,30 @@ python -m tools.audit_cards              # every card's data checked against Scr
 | Tivit, Seller of Secrets | votes / artifacts | `edhmc/decks/tivit_v1.py` | mature |
 | Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | new — ablated, and its commander's own ability only started firing on 2026-09-07 (`KNOWN_ISSUES.md` 0r) |
 | Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` | new — ablated; no `.xlsx` yet, so the module is the only record |
+| Trostani, Selesnya's Voice | tokens / populate / lifegain | `edhmc/decks/trostani_v1.py` | new 2026-10-01 — ablated once; priorities are a first guess (`docs/ORACLE_AUDIT_TROSTANI.md`, `KNOWN_ISSUES.md` §0z96) |
 
-Each of the first four decks, and Shilgengar, is a `.xlsx` in `spreadsheets/`
+Each of the first four decks, Shilgengar and Trostani, is a `.xlsx` in `spreadsheets/`
 (the human-readable system of
 record for the card list) plus a matching `edhmc/decks/<name>_v<N>.py`
 module (the hand-authored, Scryfall-verified costs the simulator actually
 reads) plus its own simulation engine — `edhmc/engine.py` (Rendmaw),
 `edhmc/lorehold.py`, `edhmc/karlov.py`, `edhmc/tivit.py`,
-`edhmc/shilgengar.py`, `edhmc/azusa.py`. Azusa was submitted as a plain table
+`edhmc/shilgengar.py`, `edhmc/azusa.py`, `edhmc/trostani.py`. Azusa was submitted as a plain table
 rather than a spreadsheet, so its module is the only system of record until
 someone builds a `.xlsx` for it. Every engine shares `edhmc/opponents.py`
 (the three-opponent interaction model) and `edhmc/experiment.py` (the A/B
 harness), and plugs into it the same way:
 `run_ab(deck, commander, out_card, in_card, sim=<engine>.simulate)`.
 
-**Why six engines instead of one.** Each commander's payoff is structurally
+**Why seven engines instead of one.** Each commander's payoff is structurally
 different enough that a shared turn loop would be mostly `if deck == X`
 branches. Rendmaw wins on the board; Lorehold wins by casting free spells off
 the top of the library; Karlov by counting lifegain events; Tivit by voting;
 Shilgengar by sacrificing creatures for Blood and periodically reanimating
 its graveyard; Azusa by playing more lands than one a turn and having that
 matter twice — once for the mana, once for every landfall trigger it sets
-off. Each engine is a few hundred lines built on the same primitives (`Card`,
+off; Trostani by copying tokens, each of which gains life equal to its
+toughness — and Soul of Eternity's toughness is your life. Each engine is a few hundred lines built on the same primitives (`Card`,
 `Permanent`, mana, the greedy casting policy).
 
 ## Is any of this trustworthy right now?

@@ -75,7 +75,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from edhmc.decks import (rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1,
-                         shilgengar_v1, azusa_v1)
+                         shilgengar_v1, azusa_v1, trostani_v1)
 from edhmc.experiment import _swap_many
 from edhmc.registry import DECKS as REGISTRY
 
@@ -3536,6 +3536,9 @@ DECKS = {
         "Simulacrum Shaper": azusa_v1.SIMULACRUM_SHAPER,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
         "Autumn Willow, Harmony": azusa_v1.AUTUMN_WILLOW_HARMONY}),
+    # Added 2026-10-01 from the owner's spreadsheet. No candidates yet: the
+    # catalog is empty, which the registry check above allows.
+    "trostani": (trostani_v1, {}),
 }
 
 # The catalog is per deck and hand-written (which candidate cards a Change
@@ -3968,9 +3971,9 @@ def check_alt_cost_coverage():
     fails here rather than quietly dropping a cost.
     """
     import inspect
-    from edhmc import engine, lorehold, karlov, tivit, shilgengar, azusa
-    engines = {"rendmaw": engine, "lorehold": lorehold, "karlov": karlov,
-               "tivit": tivit, "shilgengar": shilgengar, "azusa": azusa}
+    # DERIVED from the registry (2026-10-01): the hand-written six-engine
+    # dict this replaced refused the seventh deck's first hybrid card.
+    engines = {name: spec.engine_module for name, spec in REGISTRY.items()}
     readers = {name for name, mod in engines.items()
                if "choose_mode(" in inspect.getsource(mod)}
     missing = set(engines) - readers
@@ -4032,17 +4035,14 @@ def check_loyalty_coverage():
     run of this check found all three, which nobody had listed.
     """
     import inspect
-    from edhmc import engine, lorehold, karlov, tivit, shilgengar
     from edhmc.engine import PLANESWALKER_LOYALTY, WALKER_READERS
     if set(PLANESWALKER_LOYALTY) != set(WALKER_READERS):
         raise AssertionError(
             "edhmc/engine.py: PLANESWALKER_LOYALTY and WALKER_READERS name "
             f"different walkers: {sorted(set(PLANESWALKER_LOYALTY) ^ set(WALKER_READERS))}.")
-    sources = {"rendmaw": inspect.getsource(engine),
-               "lorehold": inspect.getsource(lorehold),
-               "karlov": inspect.getsource(karlov),
-               "tivit": inspect.getsource(tivit),
-               "shilgengar": inspect.getsource(shilgengar)}
+    # DERIVED from the registry (2026-10-01), as check_alt_cost_coverage is.
+    sources = {name: inspect.getsource(spec.engine_module)
+               for name, spec in REGISTRY.items() if name != "azusa"}
     seen = set()
     for deck_name, (module, catalog) in DECKS.items():
         if deck_name == "azusa":

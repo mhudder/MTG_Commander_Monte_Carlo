@@ -2,7 +2,7 @@
 """§0z17 — the mid-game randomness is addressed, not ordered.
 
     python -m tests.test_crn_streams
-    python -m tests.test_crn_streams --mutate    # exactly 5 of 6 MUST fail
+    python -m tests.test_crn_streams --mutate    # exactly 6 of 7 MUST fail
 
 WHAT IS BEING PINNED. Common random numbers are the reason this project can
 resolve 0.003 win rate at all: deck A and deck B are the same list with one
@@ -50,6 +50,7 @@ import edhmc.engine as ENG
 import edhmc.lorehold as LH
 import edhmc.karlov as KV
 import edhmc.tivit as TV
+import edhmc.trostani as TR
 from edhmc.experiment import run_ab, repl_priority
 from edhmc.pending import build_pending
 
@@ -57,10 +58,11 @@ N = 200
 
 SIMS = {"rendmaw": None, "lorehold": LH.simulate,
         "karlov": KV.simulate, "tivit": TV.simulate,
-        "shilgengar": None, "azusa": None}
+        "shilgengar": None, "azusa": None, "trostani": None}
 CUTS = {"rendmaw": "March of the World Ooze", "lorehold": "Verge Rangers",
         "karlov": "Blood Artist", "tivit": "Academy Manufactor",
-        "shilgengar": "Blood Artist", "azusa": "Lotus Cobra"}
+        "shilgengar": "Blood Artist", "azusa": "Lotus Cobra",
+        "trostani": "Bramble Sovereign"}
 
 
 def _sim(deck):
@@ -68,6 +70,7 @@ def _sim(deck):
         import edhmc.shilgengar as SG
         import edhmc.azusa as AZ
         SIMS["shilgengar"], SIMS["azusa"] = SG.simulate, AZ.simulate
+        SIMS["trostani"] = TR.simulate
     return SIMS[deck]
 
 
@@ -96,6 +99,8 @@ CASES = [
     ("karlov   Kambal",               KV,  "crn_random",    "karlov",   True),
     ("tivit    Master of Ceremonies", TV,  "crn_randrange", "tivit",    True),
     ("lorehold gated setter (DEAD)",  LH,  "crn_random",    "lorehold", False),
+    # 2026-10-01: trostani's tutor, fetch and hideaway shuffles.
+    ("trostani shuffles",             TR,  "crn_shuffle",   "trostani", True),
 ]
 
 LEAKS = {"crn_random":    lambda g, name: g.rng.random(),
@@ -120,7 +125,7 @@ def main(mutate=False):
         return
 
     print("MUTATION: each row puts one site back on the game RNG.")
-    print("EXPECTATION, WRITTEN BEFORE THE RUN: exactly 5 of 6 detected; the")
+    print("EXPECTATION, WRITTEN BEFORE THE RUN: exactly 6 of 7 detected; the")
     print("sixth is a dead call site (Hidden Retreat left the deck 2026-09-01).")
     print()
     got, want = [], []

@@ -22,7 +22,7 @@ code and want to know what else it touches.
    ─ check_unchanged_decks.py  did a shared-code change move a deck's baseline?
    ─ check_docs.py        do the docs still describe the repo? (runs the generators)
    ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write)
-   ─ removal_census.py    the fifth: classifies every answer and wipe in the six lists
+   ─ removal_census.py    the fifth: classifies every answer and wipe in every list
                           from Scryfall into decks/_removal.py (§0z87)
    ─ audit_cards.py       every card against Scryfall
    ─ card_known.py        is a card already in a list, a catalog, a candidates
@@ -35,7 +35,7 @@ code and want to know what else it touches.
                           test is EXACT: a blind card plays identically to a
                           matched blank under CRN (item 23, §0z66)
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
-   ─ regen_tables.sh      all six tables at the common N, in series
+   ─ regen_tables.sh      every deck's table at the common N, in series
    ─ rebuild_deck.sh      ONE deck's table, as one leg of a parallel rebuild: checks
                           out a commit, rebuilds, stamps a provenance SHARD, pushes
                           its three files. The protocol is .claude/skills/
@@ -61,11 +61,12 @@ code and want to know what else it touches.
                           POD_V1/V2/V3, repl_priority (the blank's priority — one place, on purpose)
             │  sim=<engine>.simulate(deck, commander, cfg, seed) -> dict of metrics
             ▼
-   ┌───────────────────────────────── the six engines ─────────────────────────────────┐
+   ┌──────────────────────────────── the seven engines ────────────────────────────────┐
    │ engine.py    Rendmaw's engine AND the shared primitives every other engine imports   │
    │ lorehold.py  miracles / top-of-library      karlov.py   lifegain triggers / drain    │
    │ tivit.py     votes / artifact tokens (+ voting.py)   shilgengar.py  Blood / reanimate │
    │ azusa.py     landfall / extra land drops / animated lands                            │
+   │ trostani.py  tokens / populate / Trostani's lifegain off what enters                │
    └───────────────────────────────────────────────────────────────────────────────────┘
             │ each one owns a <Name>Game class and a module-level take_turn() + simulate()
             │ each one imports from engine.py: Card, Permanent, Board, ManaUnits, can_pay,
@@ -110,7 +111,7 @@ code and want to know what else it touches.
    named effect). The pod's rolls were pre-generated in `make_pod` from a
    separate stream seeded identically for both branches.
 4. `take_turn` runs the engine's own phase order; at the end of your turn
-   `opponents.pod_phase` runs, ONCE for all six engines: chip damage
+   `opponents.pod_phase` runs, ONCE for every engine: chip damage
    (`incidental_damage`), then every clock that is due (`resolve_clocks`),
    then — if you are still in the game — the removal round
    (`opponents_act`). An engine with its own model of what opponents do on
@@ -147,18 +148,20 @@ the game object and discovers optional behaviour with `hasattr`:
 | `g.on_targeted(perm)` (optional) | the pod's spot removal has picked `perm` as its target -- "becomes the target of a spell" (§0z77). Called before `destroy`, whether or not the spell then kills it; NOT called when `try_protect` blanks the event, because that path names no target. Lorehold defines it, for Goldspan Dragon |
 | `g.after_died(perm)` (optional) | called once the dead creature's CARD is in the graveyard -- by `destroy` after its graveyard step, and by shilgengar's own `sacrifice`. `on_creature_death` runs BEFORE the card gets there on the destroy path, so anything that moves the card back out lives here: Twilight Shepherd's persist (§0z84). Only shilgengar defines it |
 | `protected_from_creatures(g)` | Serra's Emissary's chosen type, `emissary_type` "Creature" (§0z84): `damage_through` gives the pod no blockers and `incidental_damage` does not reach you. The clocks are untouched -- a roll is not a combat |
+| `g.before_wipe()` (optional) | the pod's wrath is about to resolve and `try_protect` (a card from HAND) did not answer it -- a response from the BATTLEFIELD. Trostani defines it, for Selfless Spirit and King Darien's sacrifices |
+| `g.indestructible_granted(perm)`, `g.flying_granted(perm)` (optional) | a GRANT, read by `indestructible_of` and `flying_of` beside the generated sets: the until-end-of-turn indestructible `before_wipe` buys, and Elspeth's emblem. Only trostani defines them; a grant that lives anywhere else is a second read site, which `indestructible_of`'s docstring forbids |
 | `g.dying`, `simultaneous(g)`, `watching(g, name, perm, another)` | ONE removal event, and the look-back reader (§0z76, CR 603.10a). Both wipe paths open `simultaneous`, and `destroy` appends each casualty to `g.dying`; a death trigger asks `watching` how many of its source were on the battlefield just before the event -- the dying ones and, unless `another=True`, the creature dying itself. Every engine's death handler reads its payoffs this way, so a Blood Artist removed third in a wipe still sees all of it. `death_lookback=False` restores the live-board count |
 
 If you add an engine, this table is the contract. If you add a method to one
 engine that `opponents.py` will call, it must be optional (`hasattr`) or added
-to all six.
+to all seven.
 
 ## Three structural facts
 
-**1. Six engines, one thin base class.** The shared code is module-level FUNCTIONS in
+**1. Seven engines, one thin base class.** The shared code is module-level FUNCTIONS in
 `engine.py` that take the game as an argument (`can_pay`, `spend`,
-`play_land`, …). Anything written as a METHOD on a `<Name>Game` class has six
-copies. **Since §0z32 there is a base class**, `engine.BaseGame`, and the
+`play_land`, …). Anything written as a METHOD on a `<Name>Game` class has one
+copy per engine. **Since §0z32 there is a base class**, `engine.BaseGame`, and the
 methods whose six copies were identical or differed only by omission live on
 it once: `has`, `count`, `draw` (karlov overrides for Alhammarret's
 Archive), `deal_pod_damage`, `opening_hand`; and `engine.finish(g)` is the

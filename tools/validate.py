@@ -69,6 +69,16 @@ def main() -> int:
     for r in analyse(aa, ab_, metrics=("landfall_triggers", "lands_played", "damage")):
         print("  ", r.line("A", "A"))
 
+    print("\nTrostani engine — A/A control")
+    from edhmc.decks.trostani_v1 import build as tr_build
+    from edhmc.trostani import simulate as tr_sim
+    trd, trc = tr_build()
+    same = [x for x in trd if x.name == "Bramble Sovereign"][0]
+    tra, trb, _ = run_ab(trd, trc, "Bramble Sovereign", same, n=3000,
+                         cfg={"turns": 14}, sim=tr_sim)
+    for r in analyse(tra, trb, metrics=("tokens_made", "populates", "damage")):
+        print("  ", r.line("A", "A"))
+
     # ---------------------------------------------------------------------------
     # THE CRN AUDIT — the check the A/A control structurally cannot perform
     # ---------------------------------------------------------------------------
@@ -128,6 +138,7 @@ def main() -> int:
         "karlov": "Blood Artist",
         "shilgengar": "Blood Artist",
         "azusa": "Lotus Cobra",
+        "trostani": "Bramble Sovereign",
     }
     missing = sorted(set(REGISTRY) - set(CRN_CASES))
     if missing:

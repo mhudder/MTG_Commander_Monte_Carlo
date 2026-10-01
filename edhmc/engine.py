@@ -967,6 +967,12 @@ PAIN_ON_COLOURED_TAP = {
         1.0, frozenset({"R", "W"}),
         "{T}: Add {C}.  {T}: Add {R} or {W}. This artifact deals 1 damage "
         "to you."),
+    # trostani, 2026-10-01 (Scryfall). Charged where trostani pays
+    # (`TrostaniGame.pay_from`), the karlov pattern.
+    "Talisman of Unity": (
+        1.0, frozenset({"G", "W"}),
+        "{T}: Add {C}.  {T}: Add {G} or {W}. This artifact deals 1 damage "
+        "to you."),
 }
 
 
@@ -2912,6 +2918,7 @@ PLANESWALKER_LOYALTY = {
     "Thomil, the Destroyer": 4,
     "Venser, Visionary Traveler": 4,
     "Dyfed, the Guiding Hand": 4,
+    "Elspeth, Sun's Champion": 4,          # trostani, 2026-10-01
 }
 
 # WHAT A DECK'S ENGINE MUST CONTAIN for a walker above to be ACTIVATED there,
@@ -2924,6 +2931,7 @@ WALKER_READERS = {
     "Thomil, the Destroyer": "thomil_step(",
     "Venser, Visionary Traveler": '"Venser, Visionary Traveler"',
     "Dyfed, the Guiding Hand": '"Dyfed, the Guiding Hand"',
+    "Elspeth, Sun's Champion": '"Elspeth, Sun\'s Champion"',
 }
 
 

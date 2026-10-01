@@ -445,6 +445,13 @@ def board_wipe(g, opp, rolls):
         return
     if try_protect(g, rolls[5]):
         return
+    # Optional protocol hook (2026-10-01, trostani): a response FROM THE
+    # BATTLEFIELD -- Selfless Spirit, King Darien -- that grants indestructible
+    # before the wrath resolves. `try_protect` above answers from HAND only.
+    # The grant is read by `indestructible_of` through `indestructible_granted`.
+    respond = getattr(g, "before_wipe", None)
+    if respond is not None:
+        respond()
     with simultaneous(g):
         for p in [p for p in g.board if is_creature_now(g, p)]:
             destroy(g, p, rolls[7], kind="wipe")
@@ -832,6 +839,12 @@ def flying_of(g, perm) -> bool:
     c = perm.card
     if c.flying:
         return True
+    # Optional protocol hook (2026-10-01, trostani): flying GRANTED to the
+    # team -- Elspeth, Sun's Champion's emblem ("Creatures you control get
+    # +2/+2 and have flying"). An engine that does not define it is untouched.
+    granted = getattr(g, "flying_granted", None)
+    if granted is not None and granted(perm):
+        return True
     n = c.name
     if n == "Serra Ascendant":
         # "As long as you have 30 or more life ... has flying." Same threshold
@@ -889,6 +902,12 @@ def indestructible_of(g, perm) -> bool:
     silently skip this -- §0u's shape -- so add any new one here too.
     """
     if perm.card.indestructible:
+        return True
+    # Optional protocol hook (2026-10-01, trostani): indestructible GRANTED
+    # until end of turn by a permanent's ability (Selfless Spirit, King
+    # Darien). An engine that does not define it is untouched.
+    granted = getattr(g, "indestructible_granted", None)
+    if granted is not None and granted(perm):
         return True
     if perm.card.name == "Voice of the Blessed":
         # "As long as this creature has ten or more +1/+1 counters on it, it
