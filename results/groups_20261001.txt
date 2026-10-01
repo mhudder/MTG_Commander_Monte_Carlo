@@ -1,0 +1,90 @@
+GROUP ABLATIONS, N=15,000 paired, seeds 5000.., staged lists, the tables' blank. Win rate; `sum` is the members' committed rows added up.
+  ratio = group / sum: >1 the cards cover for each other, <1 they need each other.
+  interaction = group - sum, `*` beats the conservative bound (group CI + every row's CI).
+
+RENDMAW
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  mana rocks                    (3)  T10 group +0.0178±0.0024* sum +0.0188 ratio  0.95 inter -0.0010   T20 group +0.0245±0.0048* sum +0.0264 ratio  0.93 inter -0.0019 
+  mana Myrs                     (4)  T10 group +0.0035±0.0018* sum +0.0035 ratio  1.02 inter +0.0001   T20 group +0.0081±0.0040* sum +0.0087 ratio  0.92 inter -0.0007 
+  land ramp                     (3)  T10 group +0.0063±0.0020* sum +0.0069 ratio  0.92 inter -0.0005   T20 group +0.0147±0.0045* sum +0.0142 ratio  1.04 inter +0.0005 
+  token makers                  (7)  T10 group +0.0289±0.0028* sum +0.0317 ratio  0.91 inter -0.0027   T20 group +0.0901±0.0060* sum +0.0893 ratio  1.01 inter +0.0008 
+  anthems                       (3)  T10 group +0.0186±0.0025* sum +0.0187 ratio  0.99 inter -0.0001   T20 group +0.0357±0.0048* sum +0.0341 ratio  1.04 inter +0.0015 
+  death drains                  (2)  T10 group +0.0013±0.0009* sum +0.0012 ratio  1.11 inter +0.0001   T20 group +0.0079±0.0027* sum +0.0081 ratio  0.97 inter -0.0003 
+  sac outlets                   (2)  T10 group +0.0009±0.0010  sum +0.0008 ratio  1.08 inter +0.0001   T20 group +0.0018±0.0028  sum +0.0019 ratio  0.93 inter -0.0001 
+  artifact recursion            (3)  T10 group +0.0051±0.0013* sum +0.0055 ratio  0.94 inter -0.0003   T20 group +0.0143±0.0032* sum +0.0153 ratio  0.94 inter -0.0009 
+  spot removal (control)        (6)  T10 group +0.0051±0.0014* sum +0.0055 ratio  0.94 inter -0.0003   T20 group +0.0087±0.0033* sum +0.0075 ratio  1.15 inter +0.0011 
+
+LOREHOLD
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  mana rocks                    (6)  T10 group +0.0338±0.0043* sum +0.0327 ratio  1.03 inter +0.0011   T20 group +0.0475±0.0070* sum +0.0399 ratio  1.19 inter +0.0076 
+  card flow                     (5)  T10 group +0.0319±0.0039* sum +0.0365 ratio  0.87 inter -0.0046   T20 group +0.0781±0.0066* sum +0.0877 ratio  0.89 inter -0.0095 
+  top-setters                   (2)  T10 group +0.0092±0.0033* sum +0.0093 ratio  0.99 inter -0.0001   T20 group +0.0025±0.0050  sum +0.0039 ratio  0.66 inter -0.0013 
+  spell payoffs                 (6)  T10 group +0.0213±0.0036* sum +0.0245 ratio  0.87 inter -0.0031   T20 group +0.0409±0.0061* sum +0.0457 ratio  0.89 inter -0.0048 
+  finishers                     (3)  T10 group +0.0663±0.0041* sum +0.0681 ratio  0.97 inter -0.0018   T20 group +0.1121±0.0060* sum +0.1064 ratio  1.05 inter +0.0057 
+  protection                    (2)  T10 group +0.0037±0.0019* sum +0.0035 ratio  1.04 inter +0.0001   T20 group -0.0006±0.0035  sum -0.0005 ratio  1.12 inter -0.0001 
+  own wipes                     (3)  T10 group -0.0333±0.0036* sum -0.0293 ratio  1.14 inter -0.0041   T20 group -0.0095±0.0059* sum -0.0103 ratio  0.92 inter +0.0008 
+  spot removal (control)        (4)  T10 group +0.0030±0.0019* sum +0.0038 ratio  0.79 inter -0.0008   T20 group +0.0030±0.0032  sum +0.0043 ratio  0.69 inter -0.0013 
+
+KARLOV
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  life loss -> gain             (2)  T10 group +0.0943±0.0048* sum +0.0877 ratio  1.08 inter +0.0067   T20 group +0.1030±0.0053* sum +0.0923 ratio  1.12 inter +0.0107 
+  gain -> drain                 (5)  T10 group +0.0993±0.0051* sum +0.0837 ratio  1.19 inter +0.0157   T20 group +0.1386±0.0066* sum +0.1073 ratio  1.29 inter +0.0313*
+  soul sisters                  (3)  T10 group +0.0173±0.0032* sum +0.0175 ratio  0.98 inter -0.0003   T20 group +0.0246±0.0048* sum +0.0244 ratio  1.01 inter +0.0002 
+  alternate wins                (2)  T10 group +0.0365±0.0032* sum +0.0360 ratio  1.01 inter +0.0005   T20 group +0.0537±0.0043* sum +0.0503 ratio  1.07 inter +0.0034 
+  card advantage                (4)  T10 group +0.0229±0.0031* sum +0.0206 ratio  1.11 inter +0.0023   T20 group +0.0646±0.0053* sum +0.0601 ratio  1.08 inter +0.0045 
+  mana rocks                    (3)  T10 group +0.0215±0.0033* sum +0.0216 ratio  0.99 inter -0.0001   T20 group +0.0233±0.0047* sum +0.0210 ratio  1.11 inter +0.0023 
+  shroud                        (2)  T10 group -0.0047±0.0022* sum -0.0043 ratio  1.08 inter -0.0003   T20 group -0.0091±0.0034* sum -0.0085 ratio  1.06 inter -0.0005 
+  own wipes                     (5)  T10 group -0.0139±0.0031* sum -0.0127 ratio  1.10 inter -0.0013   T20 group -0.0024±0.0052  sum -0.0033 ratio  0.73 inter +0.0009 
+  spot removal (control)        (3)  T10 group +0.0003±0.0012  sum +0.0001 ratio  2.00 inter +0.0001   T20 group +0.0018±0.0022  sum +0.0012 ratio  1.50 inter +0.0006 
+
+TIVIT
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  four signets                  (4)  T10 group +0.0440±0.0042* sum +0.0435 ratio  1.01 inter +0.0005   T20 group +0.0649±0.0058* sum +0.0658 ratio  0.99 inter -0.0009 
+  token drains                  (3)  T10 group +0.0626±0.0044* sum +0.0600 ratio  1.04 inter +0.0026   T20 group +0.0677±0.0054* sum +0.0589 ratio  1.15 inter +0.0088 
+  artifact drains               (2)  T10 group +0.0145±0.0024* sum +0.0143 ratio  1.01 inter +0.0001   T20 group +0.0241±0.0036* sum +0.0235 ratio  1.03 inter +0.0006 
+  extra votes                   (2)  T10 group +0.0098±0.0028* sum +0.0097 ratio  1.01 inter +0.0001   T20 group +0.0103±0.0037* sum +0.0108 ratio  0.96 inter -0.0005 
+  blink                         (6)  T10 group +0.0707±0.0046* sum +0.0653 ratio  1.08 inter +0.0054   T20 group +0.0803±0.0060* sum +0.0728 ratio  1.10 inter +0.0075 
+  tutors                        (2)  T10 group +0.0298±0.0033* sum +0.0310 ratio  0.96 inter -0.0012   T20 group +0.0361±0.0044* sum +0.0368 ratio  0.98 inter -0.0007 
+  token doublers                (2)  T10 group +0.0372±0.0041* sum +0.0355 ratio  1.05 inter +0.0017   T20 group +0.0475±0.0054* sum +0.0487 ratio  0.98 inter -0.0012 
+  counters and removal (control)(6)  T10 group +0.0016±0.0022  sum +0.0015 ratio  1.09 inter +0.0001   T20 group +0.0061±0.0035* sum +0.0049 ratio  1.24 inter +0.0012 
+
+SHILGENGAR
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  mana rocks                    (7)  T10 group +0.0112±0.0017* sum +0.0139 ratio  0.81 inter -0.0027   T20 group +0.0453±0.0060* sum +0.0497 ratio  0.91 inter -0.0043 
+  angel lords                   (3)  T10 group +0.0072±0.0014* sum +0.0099 ratio  0.73 inter -0.0027   T20 group +0.0436±0.0046* sum +0.0468 ratio  0.93 inter -0.0032 
+  lifegain payoffs              (4)  T10 group +0.0087±0.0015* sum +0.0115 ratio  0.76 inter -0.0027   T20 group +0.0431±0.0046* sum +0.0471 ratio  0.92 inter -0.0040 
+  death payoffs                 (5)  T10 group +0.0009±0.0008* sum +0.0008 ratio  1.17 inter +0.0001   T20 group +0.0176±0.0043* sum +0.0173 ratio  1.02 inter +0.0003 
+  sac outlets                   (2)  T10 group +0.0000±0.0004  sum -0.0001 ratio   n/a inter +0.0001   T20 group -0.0001±0.0016  sum +0.0002 ratio -0.67 inter -0.0003 
+  draw engines                  (4)  T10 group +0.0024±0.0009* sum +0.0021 ratio  1.12 inter +0.0003   T20 group +0.0151±0.0044* sum +0.0114 ratio  1.33 inter +0.0037 
+  own wipes                     (2)  T10 group -0.0006±0.0005* sum -0.0006 ratio  1.00 inter +0.0000   T20 group +0.0189±0.0038* sum +0.0164 ratio  1.15 inter +0.0025 
+  spot removal (control)        (4)  T10 group +0.0007±0.0006* sum +0.0009 ratio  0.79 inter -0.0002   T20 group +0.0027±0.0022* sum +0.0025 ratio  1.08 inter +0.0002 
+
+AZUSA
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  lands from the top            (3)  T10 group +0.0277±0.0038* sum +0.0227 ratio  1.22 inter +0.0051   T20 group +0.0571±0.0058* sum +0.0498 ratio  1.15 inter +0.0073 
+  extra land drops              (2)  T10 group +0.0062±0.0027* sum +0.0057 ratio  1.08 inter +0.0005   T20 group +0.0065±0.0040* sum +0.0053 ratio  1.24 inter +0.0013 
+  ramp spells                   (5)  T10 group +0.0414±0.0038* sum +0.0407 ratio  1.02 inter +0.0007   T20 group +0.0619±0.0060* sum +0.0593 ratio  1.04 inter +0.0026 
+  landfall creatures            (4)  T10 group +0.1353±0.0056* sum +0.1085 ratio  1.25 inter +0.0268*  T20 group +0.1950±0.0074* sum +0.1405 ratio  1.39 inter +0.0545*
+  lands from the graveyard      (3)  T10 group +0.0287±0.0036* sum +0.0271 ratio  1.06 inter +0.0016   T20 group +0.0328±0.0051* sum +0.0287 ratio  1.14 inter +0.0041 
+  finishers                     (3)  T10 group +0.0244±0.0027* sum +0.0243 ratio  1.01 inter +0.0001   T20 group +0.0433±0.0044* sum +0.0429 ratio  1.01 inter +0.0004 
+  card recursion                (2)  T10 group +0.0080±0.0022* sum +0.0084 ratio  0.95 inter -0.0004   T20 group +0.0190±0.0037* sum +0.0192 ratio  0.99 inter -0.0002 
+  tutors                        (4)  T10 group +0.0153±0.0024* sum +0.0150 ratio  1.02 inter +0.0003   T20 group +0.0290±0.0040* sum +0.0274 ratio  1.06 inter +0.0016 
+
+TROSTANI
+  reproduces the cached Sol Ring row at T10: YES
+  reproduces the cached Sol Ring row at T20: YES
+  mana dorks                    (4)  T10 group +0.0042±0.0029* sum +0.0035 ratio  1.21 inter +0.0007   T20 group -0.0022±0.0069  sum +0.0053 ratio -0.41 inter -0.0075 
+  mana rocks                    (3)  T10 group +0.0143±0.0025* sum +0.0156 ratio  0.91 inter -0.0013   T20 group +0.0239±0.0058* sum +0.0226 ratio  1.06 inter +0.0013 
+  land ramp                     (5)  T10 group +0.0111±0.0025* sum +0.0113 ratio  0.99 inter -0.0001   T20 group +0.0350±0.0062* sum +0.0346 ratio  1.01 inter +0.0004 
+  tutors                        (6)  T10 group +0.0111±0.0026* sum +0.0087 ratio  1.28 inter +0.0025   T20 group +0.0206±0.0067* sum +0.0180 ratio  1.14 inter +0.0026 
+  token doublers                (4)  T10 group +0.0139±0.0023* sum +0.0143 ratio  0.98 inter -0.0003   T20 group +0.0424±0.0053* sum +0.0403 ratio  1.05 inter +0.0021 
+  populate cards                (4)  T10 group +0.0067±0.0017* sum +0.0070 ratio  0.95 inter -0.0003   T20 group +0.0196±0.0043* sum +0.0212 ratio  0.92 inter -0.0016 
+  recursion                     (3)  T10 group +0.0017±0.0013* sum +0.0021 ratio  0.81 inter -0.0004   T20 group +0.0103±0.0040* sum +0.0087 ratio  1.18 inter +0.0016 
+  removal (control)             (4)  T10 group -0.0005±0.0010  sum -0.0004 ratio  1.33 inter -0.0001   T20 group -0.0019±0.0032  sum -0.0013 ratio  1.53 inter -0.0007 
+

@@ -380,7 +380,9 @@ class AzusaGame(BaseGame):
         self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
         self.creature_mana: list[frozenset] = []   # Castle Garenbrig's six {G}
         self.animations: list[dict] = []   # live land-animation effects
-        self.pw_used: set[int] = set()     # walkers already activated this turn
+        # walkers already activated this turn, id -> the walker, HELD so the
+        # id cannot be reused by a new permanent within the turn (§0z98)
+        self.pw_used: dict = {}
         self.legacy_animation = False      # the pre-2026-09-07 Sylvan flag
 
         # Each 2026-09-07 fix behind its own knob, defaulting to the corrected
@@ -2636,7 +2638,7 @@ class AzusaGame(BaseGame):
         for perm in list(self.board):
             if perm.card.name not in PLANESWALKERS or id(perm) in self.pw_used:
                 continue
-            self.pw_used.add(id(perm))
+            self.pw_used[id(perm)] = perm
             self.m["pw_activations"] += 1
             if perm.card.name == "Nissa, Worldwaker":
                 self._nissa_worldwaker(perm)
@@ -3009,7 +3011,7 @@ def take_turn(g):
     # "the second time this ability has resolved THIS TURN" (Nissa, Resurgent
     # Animist). A per-turn counter, so it resets with the turn.
     g.animist_resolutions = 0
-    g.pw_used = set()
+    g.pw_used = {}
     g.legacy_animation = False
     # "Until your next turn" ends HERE, at the start of it -- which is what
     # gave Sylvan Awakening's lands the pod's whole round as blockers.

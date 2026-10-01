@@ -228,7 +228,7 @@ def a_loyalty():
     g.planeswalker_step()            # same turn: must be a no-op
     once = perm.counters
     perm.counters = 7
-    g.pw_used = set()
+    g.pw_used = {}
     g.planeswalker_step()
     return ("Nissa, Worldwaker: enters at 3, +1 once a turn, -7 at seven",
             f"{start} -> {once} after two calls in one turn; "

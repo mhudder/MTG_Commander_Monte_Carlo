@@ -146,6 +146,8 @@ Methodology that used to live at the end of this file is now
 | [0z95](#0z95) | MEASURED | **The first parallel rebuild: six tables in 41 minutes** against 3h09m serial; every gate green; every moved row traced to §0z82-§0z93, no significant sign flip |
 | [0z96](#0z96) | BUILT | **The seventh deck, Trostani, Selesnya's Voice**, and its engine: one token path, Soul of Eternity's toughness = life under Trostani, Seedborn rounds. Luminarch Ascension had been made a blank by the pod's smoothed chip damage (+0.0213 ±0.0054 fixed); the census now counts seven lists and moved 0 of 250 rows |
 | [0z97](#0z97) | FIXED | **Losing the crown no longer ends the pod's chip round** (it `break`ed the loop, so later seats dealt nothing): worth -0.007 to -0.021 at T20 wherever the crown is held, and it moves no table, since no staged list grants it. The two monarch swaps restated: Chief Magistrate +0.0064, Ginger +0.0137 at T20. **Owner's calls on trostani**: Phyrexian Processor floor 20 -> 12, cap 8 -> 16 (the cap is not load-bearing); Sylvan Library floor 25 -> 20. Trostani rebuilt: 0 of 61 rows moved |
+| [0z98](#0z98) | FIXED | **An `id(permanent)` key outlived its permanent.** Trostani keyed seven pieces of state on `id(perm)` and never cleared them, so a freed id handed to a new permanent carried a dead Processor's X, Luminarch's counters, a Vat's imprint or haste -- and which id was reused depended on the process's allocation history. One game in 15,000 played differently between two processes. Fixed by holding every permanent for the game (as shilgengar already did); `walker_ready` and azusa's `pw_used` had the same shape. All seven decks bit-identical at 3,000 seeds; trostani rebuilt, every row within 0.0001 |
+| [0z99](#0z99) | MEASURED | **Group ablations for all seven decks** (58 groups): most functional groups are ADDITIVE -- their rows sum to what the group is worth. Two are not, both redundancy: azusa's four landfall creatures (+0.1950 together against +0.1405 summed, T20) and karlov's five gain->drain cards (+0.1386 against +0.1073). Lorehold's three wipes cost +0.033 at T10 together; shilgengar's sac outlets and rendmaw's are worth nothing even as a pair; tivit's extra-vote pair is no longer a redundancy trap |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8881,6 +8883,111 @@ sign flips**, two signal labels at the floor (Birds of Paradise `--` → `dmg`,
 Karmic Guide `--` → `win`). Phyrexian Processor +0.0100 → +0.0104 ±0.0028,
 Sylvan Library +0.0121 → +0.0118 ±0.0032 -- both rows are what the cards are
 worth over a blank, and a floor nearer the card's best line barely moves that.
+
+## 0z98. FIXED — an `id(permanent)` key outlived its permanent
+
+**FOUND BY A REPRODUCTION CHECK.** `diagnostics/run_groups.py` re-measures one
+cached row per deck and must match it exactly. Six decks did; trostani matched
+at T10 and missed at T20 by **one game in 15,000** (Sol Ring +0.013933 against
+the cache's +0.014000). Same code, same seeds -- so the simulation was not a
+pure function of the seed.
+
+**THE MECHANISM.** `TrostaniGame` kept seven collections keyed on
+`id(perm)` -- haste this turn, Caretaker's Talent's turn, Karmic Guide's echo,
+Mimic Vat's imprint, Mosswort Bridge's hidden card, Phyrexian Processor's X,
+Luminarch Ascension's counters -- and cleared none of them when the permanent
+left. CPython hands a freed object's id to the next object of its size, so a
+NEW permanent could inherit a dead one's state, and WHICH id is reused depends
+on everything the process allocated before: a worker that ran other games
+first plays the same seed differently. `engine.walker_ready` had the same
+shape (its docstring said a returning walker "is a new object", which is true
+only while the old one is alive) and so did azusa's per-turn `pw_used`.
+`shilgengar.py` had found it first and holds its permanents (`persisted`,
+"held, so the id is not reused").
+
+**THE FIX** holds the object for as long as its id is a key: trostani keeps
+every permanent it makes in `held` for the game, `walker_ready` stores the
+walker beside the turn, `pw_used` maps the id to the walker.
+`tests/test_id_reuse.py` pins all three plus a replay of every deck after
+5,000 unrelated allocations; its two mutations each fail exactly their case.
+
+**WHAT IT MOVED.** All seven decks BIT-IDENTICAL at 3,000 seeds against the
+previous commit (`check_unchanged_decks`), so the reuse is rare. Trostani's
+table had been built in two processes (a run stopped by a time limit and
+resumed), so it was rebuilt: every row within 0.0001 of the old one -- the
+old baseline had one game played differently, which shifts every row by
+1/15,000 -- and the groups reproduction check now matches at both horizons.
+
+## 0z99. MEASURED — group ablations: which cards cover for each other
+
+`diagnostics/run_groups.py`, `results/groups_20261001.{json,txt}`. Each group's
+cards blanked TOGETHER with the tables' own blank, seeds, N=15,000 and staged
+lists, so the group's number is comparable with the SUM of its members'
+committed rows. All fourteen reproduction checks (one cached row per deck, two
+horizons) match the cache exactly. The interaction (group minus sum) carries a
+CONSERVATIVE bound, the group's CI plus every row's CI, because the single
+rows' per-game columns are not cached; `*` beats it.
+
+**MOST GROUPS ARE ADDITIVE.** 52 functional groups and six controls. Of the
+50 functional groups whose summed rows are measurably non-zero, **31 sit
+between 0.9 and 1.1 of their summed rows at T20**, and of the 19 that do not,
+14 lean ABOVE 1 -- covering, the direction CLAUDE.md warns about -- though
+only two beat the conservative bound. Additive: mana rocks everywhere but
+lorehold (1.19), tivit's four signets (1.0 -- the table's rows for near-identical cards
+are each card's real share), land ramp, token makers, anthems, finishers,
+tutors outside trostani, recursion. **For these the leave-one-out rows can be
+added up, and the table is not understating them.**
+
+**TWO GROUPS BEAT THE BOUND, BOTH REDUNDANCY:**
+
+| deck | group | T10 group / sum | T20 group / sum |
+|---|---|---|---|
+| azusa | Scute Swarm, Avenger, Baloths, Greensleeves | +0.1353 / +0.1085 | **+0.1950 / +0.1405** (1.39) |
+| karlov | Sanguine Bond, Vito, Cliffhaven, Blight-Priest, Starscape | +0.0993 / +0.0837 | **+0.1386 / +0.1073** (1.29) |
+
+Each card in those groups is covered by the others when it is missing, so the
+rows understate the package by a quarter to a third. **A single row is still
+the right price of cutting ONE of them** -- that is exactly what leave-one-out
+measures -- but cutting two costs more than their rows add up to. Karlov's
+other half of the loop (Exquisite Blood + Bloodthirsty Conqueror) leans the
+same way (1.12 at T20, inside the bound), as §0z27 predicted.
+
+**GROUPS THAT ARE WORTH NOTHING, OR LESS, TOGETHER:**
+* **Sac outlets beside a commander that is one.** Shilgengar's Viscera Seer +
+  Cartel Aristocrat: +0.0000 / −0.0001. Rendmaw's Ashnod's Altar + Village
+  Rites: +0.0009 / +0.0018, inside the bar. The pair does not matter, so
+  neither row was hiding a shared value.
+* **Lorehold's three own wipes** (Farewell, Ultima, Promise of Loyalty):
+  **−0.0333 ±0.0036 at T10** and −0.0095 ±0.0059 at T20 -- the deck wins MORE
+  without all three. They are PARTLY modelled (the benefit of wiping the pod's
+  creature count is an estimate, §4), so this is not a cut list; it is the
+  largest number the model has produced against a package of partly-seen
+  cards. Karlov's five wipes: −0.0139 at T10, inside the bar at T20.
+  Shilgengar's two: +0.0189 at T20 -- that deck's Angels survive them.
+* **Karlov's shroud pair** (Swiftfoot Boots + Mother of Runes): −0.0047 /
+  −0.0091 together, consistent with §0z35/§0z36.
+* **Azusa's extra land drops** (Exploration + Wayward Swordtooth): +0.0062 /
+  +0.0065 together, against +0.0571 for the three cards that play lands from
+  the top. Azusa already grants two extra drops; the deck is short of LANDS to
+  play, not of permission.
+
+**TIVIT'S EXTRA-VOTE PAIR IS NO LONGER A REDUNDANCY TRAP.** It was +0.0050 /
++0.0069 alone and 0.0253 together at N=4000 before the engine work since; now
+Ballot Broker + Brago's Representative are +0.0098 / +0.0103 together against
++0.0097 / +0.0108 summed -- additive. CLAUDE.md's example stands as history.
+
+**TROSTANI (rebuilt after §0z98):** the four dorks are +0.0042 ±0.0029 at T10
+and −0.0022 ±0.0069 at T20 TOGETHER -- the group confirms what the rows said
+one at a time, so the deck's mana value is in rocks (+0.0239), land ramp
+(+0.0350) and the Wake, not in one-drop creatures. The six tutors are +0.0206
+together against +0.0180 summed (1.14) -- slightly covering, inside the bound
+-- and still small for six slots, which leaves the targeting question
+(`tutor_pick` is by fixed priority) open. Token doublers additive (1.05).
+
+**THE CONTROLS.** Each deck's model-blind or mostly-blind removal group reads
+within 0.009 of zero and matches its summed rows; where it is positive
+(rendmaw +0.0087, tivit +0.0061 at T20) the cards are PARTLY modelled or carry
+§0j's late-cast effect, as their rows already said.
 
 ## How to read an ablation table
 

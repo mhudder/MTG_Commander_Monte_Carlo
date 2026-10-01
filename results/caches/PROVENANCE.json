@@ -263,6 +263,12 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "6aa1e103291a9085",
         "utc": "2026-10-01T14:22:04Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "df0bda6778710aea",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
@@ -449,6 +455,12 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "e116d0b6358ea0df",
         "utc": "2026-10-01T14:22:05Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "fafd2746097ddc4b",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
@@ -662,6 +674,12 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "25f13b220cbc3cce",
         "utc": "2026-10-01T14:22:05Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "66a9862d449ebbf9",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
@@ -877,6 +895,12 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "099f57c00eb6b1fd",
         "utc": "2026-10-01T14:22:06Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "f7ada495cbaef116",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
@@ -1115,6 +1139,12 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "7e59aa865a582ef0",
         "utc": "2026-10-01T14:22:05Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "3b1ac41195699487",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
@@ -1309,13 +1339,19 @@
         "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
         "fingerprint": "61337366b40886b1",
         "utc": "2026-10-01T14:22:05Z"
+      },
+      {
+        "commit": "186ba49",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "fingerprint": "f048582e5289d721",
+        "utc": "2026-10-01T20:28:39Z"
       }
     ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
-    "built_at": "5252c321cba0fd53",
-    "built_commit": "fe768bb",
-    "built_utc": "2026-10-01T13:26:08Z",
+    "built_at": "e705750a116614da",
+    "built_commit": "186ba49",
+    "built_utc": "2026-10-01T19:57:04Z",
     "deck": "trostani",
     "superseded": [
       {
@@ -1329,6 +1365,13 @@
         "built_at": "7017c36d57ce88b8",
         "built_commit": "926bc46",
         "built_utc": "2026-10-01T04:22:46Z",
+        "deck": "trostani",
+        "verified": []
+      },
+      {
+        "built_at": "5252c321cba0fd53",
+        "built_commit": "fe768bb",
+        "built_utc": "2026-10-01T13:26:08Z",
         "deck": "trostani",
         "verified": []
       }

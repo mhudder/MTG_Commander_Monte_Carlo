@@ -261,6 +261,17 @@ class TrostaniGame(BaseGame):
         self.quest: dict = {}                 # id(Luminarch) -> quest counters
         self.echo_due: set = set()            # id(Karmic Guide) entered since upkeep
         self.hasty: set = set()               # ids that "gain haste" this turn
+        # EVERY PERMANENT IS HELD FOR THE GAME (§0z98). The seven collections
+        # above are keyed on `id(perm)` and none is cleared when the permanent
+        # leaves, so once it is freed CPython can hand its id to a NEW
+        # permanent -- which then inherits a dead Processor's X, a dead
+        # Luminarch's counters, a dead Vat's imprint, or haste. Which id gets
+        # reused depends on the process's allocation history, so the same
+        # seed played in two processes could differ: one game in 15,000 did
+        # (diagnostics/run_groups.py's reproduction check). Holding every
+        # permanent makes an id unique for the whole game, so `id` is
+        # identity again. shilgengar.py found this first (`persisted`).
+        self.held: list = []
         self.exile_at_end: list = []          # Mimic Vat tokens
         self.sacrifice_at_end: list = []      # encore tokens
         self.blade_on = None                  # the creature Blade of Selves equips
@@ -404,6 +415,7 @@ class TrostaniGame(BaseGame):
                          base_p=card.power, base_t=card.toughness)
         enter_loyalty(perm)
         self.board.append(perm)
+        self.held.append(perm)                     # §0z98: ids stay unique
         return perm
 
     def draw(self, n=1):
@@ -851,6 +863,7 @@ class TrostaniGame(BaseGame):
         perm = Permanent(card=card, tapped=t, sick=True,
                          base_p=card.power, base_t=card.toughness)
         self.board.append(perm)
+        self.held.append(perm)                     # §0z98: ids stay unique
         tags = card.tags
         if "gain1" in tags:
             self.gain_life(1)                      # Blossoming Sands

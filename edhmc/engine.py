@@ -2949,9 +2949,13 @@ def walker_ready(g, perm) -> bool:
     back is a new object with a fresh activation, and no engine needs a
     per-turn reset. An extra turn is a new `g.turn` in every engine."""
     used = g.__dict__.setdefault("pw_activated_turn", {})
-    if used.get(id(perm)) == g.turn:
+    # The walker is HELD in the value (§0z98): a freed Permanent's id can be
+    # handed to a new one, and "a new object" is only true while the old one
+    # is alive. Keyed on a bare id, a walker returning in the same turn could
+    # read as already used -- or not -- depending on allocation history.
+    if used.get(id(perm), (None, None))[1] == g.turn:
         return False
-    used[id(perm)] = g.turn
+    used[id(perm)] = (perm, g.turn)
     g.m["pw_activations"] += 1
     return True
 
