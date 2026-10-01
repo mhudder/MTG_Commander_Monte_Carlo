@@ -40,6 +40,8 @@ from tools._generated import comparable, head
 OUT = os.path.join("docs", "STATUS.md")
 RESULTS = "results"
 DECKS = list(REGISTRY)
+NUMBER_WORDS = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+                10: "ten"}
 
 RE_N = re.compile(r"N\s*=\s*([\d,]+)\s+paired games")
 RE_HORIZ = re.compile(r"Horizons:\s*\(([^)]*)\)")
@@ -285,7 +287,10 @@ def render() -> str:
     w("")
 
     # ---- tables
-    w("## The six ablation tables")
+    # The count is DERIVED: "six" was typed here by hand and outlived the
+    # seventh deck (§0q's shape, in the file that derives everything else).
+    n_word = NUMBER_WORDS.get(len(DECKS), str(len(DECKS)))
+    w(f"## The {n_word} ablation tables")
     w("")
     w("`rows` counts the printed card rows, split by category. A MODEL-BLIND")
     w("row is **not measured**, never a cut candidate.")
@@ -304,7 +309,7 @@ def render() -> str:
           f"±{t.floor} | {split} = {t.total} | {t.date}{flag} |")
     w("")
     tot = sum(t.total for t in tables.values() if t.exists)
-    w(f"**{tot} rows across six tables.**")
+    w(f"**{tot} rows across {n_word} tables.**")
     w("")
 
     # ---- caches
