@@ -146,8 +146,9 @@ Methodology that used to live at the end of this file is now
 | [0z95](#0z95) | MEASURED | **The first parallel rebuild: six tables in 41 minutes** against 3h09m serial; every gate green; every moved row traced to §0z82-§0z93, no significant sign flip |
 | [0z96](#0z96) | BUILT | **The seventh deck, Trostani, Selesnya's Voice**, and its engine: one token path, Soul of Eternity's toughness = life under Trostani, Seedborn rounds. Luminarch Ascension had been made a blank by the pod's smoothed chip damage (+0.0213 ±0.0054 fixed); the census now counts seven lists and moved 0 of 250 rows |
 | [0z97](#0z97) | FIXED | **Losing the crown no longer ends the pod's chip round** (it `break`ed the loop, so later seats dealt nothing): worth -0.007 to -0.021 at T20 wherever the crown is held, and it moves no table, since no staged list grants it. The two monarch swaps restated: Chief Magistrate +0.0064, Ginger +0.0137 at T20. **Owner's calls on trostani**: Phyrexian Processor floor 20 -> 12, cap 8 -> 16 (the cap is not load-bearing); Sylvan Library floor 25 -> 20. Trostani rebuilt: 0 of 61 rows moved |
-| [0z98](#0z98) | FIXED | **An `id(permanent)` key outlived its permanent.** Trostani keyed seven pieces of state on `id(perm)` and never cleared them, so a freed id handed to a new permanent carried a dead Processor's X, Luminarch's counters, a Vat's imprint or haste -- and which id was reused depended on the process's allocation history. One game in 15,000 played differently between two processes. Fixed by holding every permanent for the game (as shilgengar already did); `walker_ready` and azusa's `pw_used` had the same shape. All seven decks bit-identical at 3,000 seeds; trostani rebuilt, every row within 0.0001 |
+| [0z98](#0z98) | FIXED | **An `id(permanent)` key outlived its permanent.** Trostani keyed seven pieces of state on `id(perm)` and never cleared them, so a freed id handed to a new permanent carried a dead Processor's X, Luminarch's counters, a Vat's imprint or haste -- and which id was reused depended on the process's allocation history. One game in 15,000 played differently between two processes. Fixed by holding every permanent for the game (as shilgengar already did); `walker_ready` and azusa's `pw_used` had the same shape. All seven decks bit-identical at 400 seeds (first written as 3,000 in error; re-run at 3,000 in §0z100, still identical); trostani rebuilt, every row within 0.0001 |
 | [0z99](#0z99) | MEASURED | **Group ablations for all seven decks** (58 groups): most functional groups are ADDITIVE -- their rows sum to what the group is worth. Two are not, both redundancy: azusa's four landfall creatures (+0.1950 together against +0.1405 summed, T20) and karlov's five gain->drain cards (+0.1386 against +0.1073). Lorehold's three wipes cost +0.033 at T10 together; shilgengar's sac outlets and rendmaw's are worth nothing even as a pair; tivit's extra-vote pair is no longer a redundancy trap |
+| [0z100](#0z100) | MEASURED | **The returns curves, and the id fix finished.** Every subset of azusa's four landfall creatures and karlov's five gain->drain cards: returns DIMINISH smoothly, each copy worth about 0.8-0.9 of the one before (azusa +0.066, +0.052, +0.042, +0.035 at T20; karlov +0.035 ... +0.022). The curve's first run missed its own check by a game and found six more id-keyed sites, so the engine now holds every Card and Permanent made in a game (`begin_game`). Azusa's table rebuilt |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -8911,7 +8912,7 @@ walker beside the turn, `pw_used` maps the id to the walker.
 `tests/test_id_reuse.py` pins all three plus a replay of every deck after
 5,000 unrelated allocations; its two mutations each fail exactly their case.
 
-**WHAT IT MOVED.** All seven decks BIT-IDENTICAL at 3,000 seeds against the
+**WHAT IT MOVED.** All seven decks BIT-IDENTICAL at 400 seeds -- the tool's default, first written here as 3,000 in error (§0z100 re-ran it at 3,000: still identical) -- against the
 previous commit (`check_unchanged_decks`), so the reuse is rare. Trostani's
 table had been built in two processes (a run stopped by a time limit and
 resumed), so it was rebuilt: every row within 0.0001 of the old one -- the
@@ -8920,7 +8921,9 @@ old baseline had one game played differently, which shifts every row by
 
 ## 0z99. MEASURED — group ablations: which cards cover for each other
 
-`diagnostics/run_groups.py`, `results/groups_20261001.{json,txt}`. Each group's
+`diagnostics/run_groups.py`, `results/groups_20261002.{json,txt}` -- re-run on
+2026-10-02 after §0z100's central hold; every cell identical to the first
+run except azusa's, by a game or less. Each group's
 cards blanked TOGETHER with the tables' own blank, seeds, N=15,000 and staged
 lists, so the group's number is comparable with the SUM of its members'
 committed rows. All fourteen reproduction checks (one cached row per deck, two
@@ -8988,6 +8991,86 @@ together against +0.0180 summed (1.14) -- slightly covering, inside the bound
 within 0.009 of zero and matches its summed rows; where it is positive
 (rendmaw +0.0087, tivit +0.0061 at T20) the cards are PARTLY modelled or carry
 §0j's late-cast effect, as their rows already said.
+
+## 0z100. MEASURED — the returns curves; every Card and Permanent held for the game
+
+**THE QUESTION** (the owner's, after §0z99): would adding more of the effects
+that cover for each other raise the group's value, or the opposite?
+`diagnostics/run_curve.py` blanks EVERY subset of the group -- 16 for azusa's
+four landfall creatures, 32 for karlov's five gain->drain cards -- and averages
+the loss over every subset of each size, per game, so `step(m)` is the average
+value of the m-th copy over every order the copies could arrive in.
+`results/curve_20261002.{json,txt}`, N=15,000, the tables' blank and seeds.
+Its checks: removing one equals the mean of the members' cached rows, and
+removing all equals §0z99's group number.
+
+| copy | azusa T10 | azusa T20 | karlov T10 | karlov T20 |
+|---|---|---|---|---|
+| 1st | +0.0416 ±0.0020 | **+0.0658** ±0.0030 | +0.0232 ±0.0013 | **+0.0350** ±0.0019 |
+| 2nd | +0.0356 ±0.0015 | +0.0517 ±0.0020 | +0.0215 ±0.0011 | +0.0308 ±0.0015 |
+| 3rd | +0.0309 ±0.0014 | +0.0424 ±0.0019 | +0.0198 ±0.0010 | +0.0272 ±0.0013 |
+| 4th | +0.0271 ±0.0016 | **+0.0351** ±0.0022 | +0.0182 ±0.0010 | +0.0242 ±0.0013 |
+| 5th | | | +0.0167 ±0.0011 | **+0.0215** ±0.0015 |
+
+**RETURNS DIMINISH, SMOOTHLY AND GEOMETRICALLY.** Every copy is worth less
+than the one before at both horizons, and the first copy is worth nearly
+twice the last in azusa (+0.066 against +0.035). Each step is about 0.8 of the
+one before in azusa and about 0.89 in karlov -- karlov's loop needs only ONE
+gain->drain piece, so a further copy buys the chance of finding one in time,
+and that chance saturates slowly in a five-card group. **So a further copy
+would add LESS than the current members' rows** -- by a constant ratio, about
++0.029 for a fifth azusa landfall creature and +0.019 for a sixth karlov piece
+at T20. Those two numbers are an EXTRAPOLATION of the fitted ratio to an
+AVERAGE member, not a measurement: a real card is stronger or weaker than the
+average copy (Scute Swarm's row is +0.052, Greensleeves' +0.013), and its
+number is one head-to-head against a named cut.
+
+**THE FIRST RUN OF THE CURVE MISSED ITS OWN CHECK BY ONE GAME -- AND §0z98 WAS
+NOT FINISHED.** Azusa's "removing all" came to +0.1949 against §0z99's
++0.1950, and the single-card average missed by a quarter of a game: one game
+in one column played differently in a second process. §0z98 had fixed the
+sites it found by name; an audit of every `id(` in the engines found six
+more with the same shape -- azusa's animation targets (land ids held for the
+effect's duration), Pearl Collector's triggered set, perpetual lifelink and
+shilgengar's finality and to-graveyard sets (CARD ids, safe only while no
+Card is made and freed mid-game). Fixing each site by hand is §0q's failure
+mode, so the fix is now structural: **`engine.begin_game()` starts a hold list
+at the top of every engine's `simulate`, and every `Card` and `Permanent`
+registers itself in it on construction**, so no id can be reused within a
+game whatever keys on it -- including sites not written yet. The previous
+game's objects are released with its list. The per-site holds of §0z98 stay
+as defence in depth.
+
+`tests/test_id_reuse.py` E and F pin the central hold, and its three mutations
+switch the central hold off alone and together with each local hold, failing
+exactly E,F / A,E,F / B,E,F. **Its first draft could not fail**: E and F
+waited for the allocator to reuse a freed id, which is the allocator's choice
+-- F passed with the hold off, and E missed the missing hold in two of three
+identical runs of one mutation. The cases now ask whether the object is still ALIVE, by weak
+reference, which is what the fix promises and is exact.
+
+**WHAT IT MOVED.** All seven decks bit-identical against the previous commit at
+**3,000 games** (and at the tool's default 400, which §0z97 and §0z98 recorded
+as "3,000" in error -- corrected there and in the cache provenance). The
+curve and all 58 groups re-run on the held engine: the curves are the same to
+four decimals, both checks now pass at T20, and every group cell is
+bit-identical to §0z99's first run except azusa's, by one game or less.
+Azusa's table, built while its engine still had unheld ids, was rebuilt:
+**three rows moved by exactly one game** (Genesis Wave, Crucible of Worlds,
+Regrowth; Avenger of Zendikar at T10) -- the games the old build had played
+with a reused id. The other six caches are VERIFIED against their own built
+commits at 3,000 games, all bit-identical. Trostani's needed care: its
+recorded built commit (186ba49) is the one UNDER the §0z98 working tree its
+rebuild actually ran on, and still has the bug, so against it trostani differs
+by **one game in 3,000** (damage, mana, life; no win changes) -- the bug's
+footprint measured directly. Against 0b767bf, which holds the code the rebuild
+ran, it is bit-identical.
+
+**ONE MORE STALE CHECK, CAUGHT.** After the azusa rebuild the curve's
+single-card check still read NO: the curve file stored the cached rows' mean
+at MEASUREMENT time, so it was comparing against the table the rebuild had
+just replaced. Both reports (`run_curve`, `run_groups`) now read the cache
+when they print. All eight curve checks and all fourteen group checks pass.
 
 ## How to read an ablation table
 

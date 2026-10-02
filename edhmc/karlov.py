@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -1448,6 +1448,7 @@ def take_turn(g):
 
 
 def simulate(deck, commander, cfg, seed):
+    begin_game()                           # §0z100
     g = KarlovGame(deck, commander, cfg, seed)
     g.opening_hand()
     # From here the game RNG must never be touched again. §0z17.

@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "359d6ab2e08d8d99",
-    "built_commit": "926bc46",
-    "built_utc": "2026-10-01T03:44:47Z",
+    "built_at": "02ab4e97afd4cd53",
+    "built_commit": "0b767bf",
+    "built_utc": "2026-10-02T19:23:31Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -255,22 +255,29 @@
         "built_utc": "2026-10-01T01:03:12Z",
         "deck": "azusa",
         "verified": []
-      }
-    ],
-    "verified": [
-      {
-        "commit": "fe768bb",
-        "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
-        "fingerprint": "6aa1e103291a9085",
-        "utc": "2026-10-01T14:22:04Z"
       },
       {
-        "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
-        "fingerprint": "df0bda6778710aea",
-        "utc": "2026-10-01T20:28:39Z"
+        "built_at": "359d6ab2e08d8d99",
+        "built_commit": "926bc46",
+        "built_utc": "2026-10-01T03:44:47Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "fe768bb",
+            "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+            "fingerprint": "6aa1e103291a9085",
+            "utc": "2026-10-01T14:22:04Z"
+          },
+          {
+            "commit": "186ba49",
+            "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: azusa BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
+            "fingerprint": "df0bda6778710aea",
+            "utc": "2026-10-01T20:28:39Z"
+          }
+        ]
       }
-    ]
+    ],
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "0e6776c8f21d69ac",
@@ -458,9 +465,15 @@
       },
       {
         "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
         "fingerprint": "fafd2746097ddc4b",
         "utc": "2026-10-01T20:28:39Z"
+      },
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+        "fingerprint": "e1bdc10070aa68d9",
+        "utc": "2026-10-02T20:14:30Z"
       }
     ]
   },
@@ -677,9 +690,15 @@
       },
       {
         "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
         "fingerprint": "66a9862d449ebbf9",
         "utc": "2026-10-01T20:28:39Z"
+      },
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+        "fingerprint": "858e98711a322189",
+        "utc": "2026-10-02T20:14:30Z"
       }
     ]
   },
@@ -898,9 +917,15 @@
       },
       {
         "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
         "fingerprint": "f7ada495cbaef116",
         "utc": "2026-10-01T20:28:39Z"
+      },
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+        "fingerprint": "e0ce4c11fd6386aa",
+        "utc": "2026-10-02T20:14:30Z"
       }
     ]
   },
@@ -1142,9 +1167,15 @@
       },
       {
         "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
         "fingerprint": "3b1ac41195699487",
         "utc": "2026-10-01T20:28:39Z"
+      },
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+        "fingerprint": "131e255214bfe2ab",
+        "utc": "2026-10-02T20:14:30Z"
       }
     ]
   },
@@ -1342,9 +1373,15 @@
       },
       {
         "commit": "186ba49",
-        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics at 3,000 seeds.",
+        "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
         "fingerprint": "f048582e5289d721",
         "utc": "2026-10-01T20:28:39Z"
+      },
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+        "fingerprint": "cb6015691e9721a6",
+        "utc": "2026-10-02T20:14:30Z"
       }
     ]
   },
@@ -1376,6 +1413,13 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "0b767bf",
+        "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. This cache was rebuilt in the \u00a70z98 work on the working tree later committed as 0b767bf (its recorded built_commit 186ba49 lacks that fix): check_unchanged_decks --n=3000 against 0b767bf, trostani BIT-IDENTICAL on all 8 metrics. Against 186ba49 it differs by ONE game in 3,000 (damage, mana, life; no win) -- the id-reuse bug measured directly.",
+        "fingerprint": "ae0bf7f213104b65",
+        "utc": "2026-10-02T20:14:30Z"
+      }
+    ]
   }
 }

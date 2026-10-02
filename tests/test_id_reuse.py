@@ -2,7 +2,7 @@
 """An `id(permanent)` used as a key must not outlive its permanent (§0z98).
 
     python -m tests.test_id_reuse
-    python -m tests.test_id_reuse --mutate   # 2 mutations, exact sets
+    python -m tests.test_id_reuse --mutate   # 3 mutations, exact sets
 
 CPython hands a freed object's id to the next object of the same size, so
 state keyed on `id(perm)` that is not cleared when the permanent leaves is
@@ -10,21 +10,32 @@ inherited by whatever permanent is allocated next -- and WHICH one depends on
 the process's allocation history. The same seed then plays differently in two
 processes: one trostani game in 15,000 did, found by
 `diagnostics/run_groups.py`'s reproduction check. The fix holds the permanent
-for as long as its id is a key.
+for as long as its id is a key -- and since §0z100 the engine holds EVERY
+Card and Permanent made during a game (`engine.begin_game`), so any id key is
+safe, including ones not written yet. The local holds below stay as defence
+in depth, and the mutations prove each one on its own.
 
 CASES
-  A  trostani: a permanent made and then removed is still held, and none of
-     200 permanents made after it shares its id
-  B  engine.walker_ready: a walker activated this turn, removed, and freed;
-     a NEW walker made afterwards in the same turn may still activate
+  A  trostani: a permanent that left the battlefield is still alive (its
+     own `held` list), so its id cannot be handed on
+  B  engine.walker_ready: a walker it marked is still alive after every
+     other reference is dropped, and a NEW walker that turn may activate
   C  azusa's `pw_used` holds the walker it marks (the same rule, per-turn)
   D  NEIGHBOUR: the same seeds played twice in one process, with 5,000
      permanents allocated and freed in between, give identical outputs on
      every deck -- 20 seeds each at T20
+  E  the CENTRAL hold: a Permanent made after `begin_game()` is still alive
+     after every reference to it is dropped
+  F  the same for a Card
+  A, B, E and F ask "is it alive" by weak reference, not "was its id
+  reused": reuse is the allocator's choice, and a case that waits for it
+  passed once with the hold switched off.
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  trostani holds nothing (`held.append` is a no-op)  -> A
-  walker_ready keeps a bare id again                -> B
+  the central hold is off                            -> E, F
+  ... and trostani holds nothing                     -> A, E, F
+  ... and walker_ready keeps a bare id               -> B, E, F
+  (A and B pass with the central hold off: their local holds still work.)
 
 UNMUTATED (§0z15): C is structural and D is the neighbour; D cannot be made to
 fail on demand, since whether an id is reused inside a game depends on the
@@ -32,6 +43,7 @@ allocator, which is the whole problem.
 """
 import gc
 import sys
+import weakref
 
 import edhmc.engine as EN
 import edhmc.trostani as T
@@ -64,29 +76,30 @@ def run_cases():
     PASS.clear()
     FAIL.clear()
 
+    # HELD, CHECKED BY WEAK REFERENCE. Whether a freed id is actually REUSED
+    # is up to the allocator, so a case that waits for reuse is itself
+    # non-deterministic -- the first version of E passed with the hold off.
+    # What the fix promises is that the object is still ALIVE while its id is
+    # a key, and a weak reference answers that exactly.
     g, by = trostani_game()
     p = g.make_permanent(by["Phyrexian Processor"])
-    old = id(p)
+    ref = weakref.ref(p)
     g.board.remove(p)
     del p
     gc.collect()
-    fresh = [g.make_permanent(by["Sol Ring"]) for _ in range(200)]
-    check("A a removed permanent's id is never reused in the game",
-          any(id(q) == old for q in fresh), False)
+    check("A trostani still holds a permanent that left the battlefield",
+          ref() is not None, True)
 
     g, by = trostani_game()
     walker = by["Elspeth, Sun's Champion"]
     first = Permanent(card=walker)
     EN.walker_ready(g, first)
-    old = id(first)
+    ref = weakref.ref(first)
     del first
     gc.collect()
-    ready, reused = True, False
-    for _ in range(200):
-        nxt = Permanent(card=walker)
-        reused |= id(nxt) == old
-        ready &= EN.walker_ready(g, nxt)
-    check("B a new walker in the same turn may activate", ready, True)
+    nxt = Permanent(card=walker)
+    check("B walker_ready holds the walker it marked; a new one may activate",
+          (ref() is not None, EN.walker_ready(g, nxt)), (True, True))
 
     deck, cmd = azusa_v1.build()
     a = AzusaGame(list(deck), cmd, dict(DEFAULT_CFG, turns=20), 1)
@@ -115,6 +128,23 @@ def run_cases():
         if first != second:
             bad.append(deck_name)
     check("D every deck replays identically after other allocations", bad, [])
+
+    card = cards[0]
+    EN.begin_game()
+    p = Permanent(card=card)
+    ref = weakref.ref(p)
+    del p
+    gc.collect()
+    check("E the engine holds a freed Permanent until the next game",
+          ref() is not None, True)
+
+    EN.begin_game()
+    c = EN.Card(name="(probe)", types=frozenset({"Sorcery"}), cost={})
+    ref = weakref.ref(c)
+    del c
+    gc.collect()
+    check("F the engine holds a freed Card until the next game",
+          ref() is not None, True)
     return set(FAIL)
 
 
@@ -140,21 +170,30 @@ def main() -> int:
         used[id(perm)] = g.turn
         return True
 
+    def no_hold(self):
+        pass
+
+    central = [(EN.Permanent, "__post_init__", no_hold),
+               (EN.Card, "__post_init__", no_hold)]
     muts = {
-        "trostani holds nothing": ({"A"}, (T.TrostaniGame, "make_permanent",
-                                           make_unheld)),
-        "walker_ready keeps a bare id": ({"B"}, (EN, "walker_ready",
-                                                 bare_ready)),
+        "the central hold is off": ({"E", "F"}, central),
+        "... and trostani holds nothing": (
+            {"A", "E", "F"},
+            central + [(T.TrostaniGame, "make_permanent", make_unheld)]),
+        "... and walker_ready keeps a bare id": (
+            {"B", "E", "F"}, central + [(EN, "walker_ready", bare_ready)]),
     }
     bad = 0
-    for label, (want, (owner, name, fn)) in muts.items():
+    for label, (want, patches) in muts.items():
         print(f"-- {label}")
-        real = getattr(owner, name)
-        setattr(owner, name, fn)
+        saved = [(o, n, getattr(o, n)) for o, n, _ in patches]
+        for o, n, fn in patches:
+            setattr(o, n, fn)
         try:
             broke = run_cases()
         finally:
-            setattr(owner, name, real)
+            for o, n, real in saved:
+                setattr(o, n, real)
         ok = broke == want
         bad += (not ok)
         print(f"   broke {sorted(broke) or 'nothing'}  expected "

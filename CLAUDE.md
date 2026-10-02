@@ -184,7 +184,7 @@ python -m tests.test_horizon_prefix --mutate       # 3 mutations, exact sets
 python -m tests.test_parallel_rebuild --mutate     # 3 mutations, exact sets
 python -m tests.test_trostani --mutate             # 7 mutations, exact sets
 python -m tests.test_life_policies --mutate        # 3 mutations, exact sets
-python -m tests.test_id_reuse --mutate             # 2 mutations, exact sets
+python -m tests.test_id_reuse --mutate             # 3 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -427,7 +427,7 @@ on any card it never saw, and the file is in every cache fingerprint. **When
 you add a card, `python -m tools.tag_flying --write` is part of the change**
 — and when a check comes back clean, ask which list it built from.
 
-**`id(obj)` IS IDENTITY ONLY WHILE THE OBJECT IS ALIVE** (§0z98). A dict or set keyed on `id(perm)` that is not cleared when the permanent leaves hands its state to whatever object CPython allocates into the freed id next, and which one that is depends on the process's history -- so the same seed plays differently in two workers, a CRN leak no A/A control can see. **Hold the object for as long as its id is a key**, or key on something that cannot be reused. A tool that must reproduce a cached number exactly is what catches it: one game in 15,000 was enough.
+**`id(obj)` IS IDENTITY ONLY WHILE THE OBJECT IS ALIVE** (§0z98). A dict or set keyed on `id(perm)` that is not cleared when the permanent leaves hands its state to whatever object CPython allocates into the freed id next, and which one that is depends on the process's history -- so the same seed plays differently in two workers, a CRN leak no A/A control can see. **Hold the object for as long as its id is a key** -- and since fixing sites one by one found six more, the engine now holds every Card and Permanent for the game (`engine.begin_game`), so any id key is safe. A tool that must reproduce a cached number exactly is what catches it: one game in 15,000 was enough. **And test a hold by asking whether the object is ALIVE (a weak reference), never by waiting for an id to be reused** -- reuse is the allocator's choice, and the test that waited for it passed with the hold off (§0z100).
 
 **A JOB COUNT IS NOT PROGRESS, AND A HUNG RUN LOOKS SLOW** (§0z37). A
 28-job sweep reached 26 while two of its four workers were dead in an infinite

@@ -286,6 +286,19 @@ def report(path):
           f"`*` beats the conservative bound (group CI + every row's CI).\n")
     for deck, rows in res["decks"].items():
         print(deck.upper())
+        # `sum` is re-read from the cache NOW rather than the copy stored at
+        # measurement time, so a table rebuilt after the group run is the one
+        # compared against (§0z100).
+        cpath = cache_path(deck, res["n"])
+        if os.path.exists(cpath):
+            live = json.load(open(cpath))
+            for row in rows.values():
+                for key, cell in row["cells"].items():
+                    m, t = key.rstrip("0123456789"), key[len(key.rstrip("0123456789")):]
+                    vals = [live.get(x, {}).get(t, {}).get(m) for x in row["members"]]
+                    if all(v is not None for v in vals):
+                        cell["sum"] = [sum(v[0] for v in vals),
+                                       sum(v[1] for v in vals)]
         chk = rows["@check"]["cells"]
         for t in res["horizons"]:
             g, s = chk[f"won{t}"]["group"], chk[f"won{t}"]["sum"]

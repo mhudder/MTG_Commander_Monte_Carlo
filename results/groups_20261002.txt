@@ -70,10 +70,10 @@ AZUSA
   lands from the top            (3)  T10 group +0.0277±0.0038* sum +0.0227 ratio  1.22 inter +0.0051   T20 group +0.0571±0.0058* sum +0.0498 ratio  1.15 inter +0.0073 
   extra land drops              (2)  T10 group +0.0062±0.0027* sum +0.0057 ratio  1.08 inter +0.0005   T20 group +0.0065±0.0040* sum +0.0053 ratio  1.24 inter +0.0013 
   ramp spells                   (5)  T10 group +0.0414±0.0038* sum +0.0407 ratio  1.02 inter +0.0007   T20 group +0.0619±0.0060* sum +0.0593 ratio  1.04 inter +0.0026 
-  landfall creatures            (4)  T10 group +0.1353±0.0056* sum +0.1085 ratio  1.25 inter +0.0268*  T20 group +0.1950±0.0074* sum +0.1405 ratio  1.39 inter +0.0545*
-  lands from the graveyard      (3)  T10 group +0.0287±0.0036* sum +0.0271 ratio  1.06 inter +0.0016   T20 group +0.0328±0.0051* sum +0.0287 ratio  1.14 inter +0.0041 
+  landfall creatures            (4)  T10 group +0.1353±0.0056* sum +0.1085 ratio  1.25 inter +0.0267*  T20 group +0.1950±0.0074* sum +0.1405 ratio  1.39 inter +0.0545*
+  lands from the graveyard      (3)  T10 group +0.0287±0.0036* sum +0.0271 ratio  1.06 inter +0.0016   T20 group +0.0328±0.0051* sum +0.0288 ratio  1.14 inter +0.0040 
   finishers                     (3)  T10 group +0.0244±0.0027* sum +0.0243 ratio  1.01 inter +0.0001   T20 group +0.0433±0.0044* sum +0.0429 ratio  1.01 inter +0.0004 
-  card recursion                (2)  T10 group +0.0080±0.0022* sum +0.0084 ratio  0.95 inter -0.0004   T20 group +0.0190±0.0037* sum +0.0192 ratio  0.99 inter -0.0002 
+  card recursion                (2)  T10 group +0.0081±0.0022* sum +0.0085 ratio  0.95 inter -0.0005   T20 group +0.0191±0.0037* sum +0.0193 ratio  0.99 inter -0.0003 
   tutors                        (4)  T10 group +0.0153±0.0024* sum +0.0150 ratio  1.02 inter +0.0003   T20 group +0.0290±0.0040* sum +0.0274 ratio  1.06 inter +0.0016 
 
 TROSTANI

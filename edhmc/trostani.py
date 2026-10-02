@@ -130,7 +130,7 @@ from __future__ import annotations
 
 import dataclasses
 
-from edhmc.engine import (BaseGame, Board, Card, Permanent, Metrics,
+from edhmc.engine import (begin_game, BaseGame, Board, Card, Permanent, Metrics,
                           Snapshots, finish, lookahead_pick, can_pay,
                           available_mana as shared_available_mana, spend,
                           engine_cfg, choose_mode, CRNStreams, crn_shuffle,
@@ -1855,6 +1855,7 @@ def take_turn(g):
 
 
 def simulate(deck, commander, cfg, seed):
+    begin_game()                           # §0z100
     g = TrostaniGame(deck, commander, cfg, seed)
     g.opening_hand()
     # From here the game RNG must never be touched again. §0z17.

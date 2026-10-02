@@ -36,6 +36,26 @@ COLORS = ("W", "U", "B", "R", "G", "C")
 # Card model
 # ----------------------------------------------------------------------------
 
+# EVERY Card AND Permanent MADE DURING A GAME IS HELD UNTIL THE NEXT GAME
+# STARTS (§0z98, §0z100). Engines key state on `id(obj)` in a dozen places, and
+# an id is identity only while its object is alive: once a permanent or card
+# is freed, CPython hands its id to the next object of its size, which then
+# inherits the dead one's state -- and which object that is depends on the
+# process's allocation history, so the same seed plays differently in two
+# workers. Fixing each site found six more; holding every object for the
+# game makes ANY id key safe, including ones not written yet. Each engine's
+# `simulate` calls `begin_game()` first; the previous game's objects are
+# released with its list.
+_HELD: list = []
+
+
+def begin_game() -> list:
+    """A fresh hold list for the game about to start (§0z100)."""
+    global _HELD
+    _HELD = []
+    return _HELD
+
+
 @dataclass
 class Card:
     name: str
@@ -70,6 +90,9 @@ class Card:
     priority: float = 0.0     # higher = cast sooner when both are affordable
     threat: float = 0.0       # how badly opponents want it gone (0 = derive it)
     tags: frozenset = frozenset()
+
+    def __post_init__(self):
+        _HELD.append(self)                 # §0z100: an id key stays unique
 
     @property
     def mv(self) -> int:
@@ -125,6 +148,9 @@ class Permanent:
     # NEST counters (Twitching Doll, §0z58). Not `counters`, which are +1/+1
     # counters and which `power_of` adds -- a nest counter is not a pump.
     nest: int = 0
+
+    def __post_init__(self):
+        _HELD.append(self)                 # §0z100: an id key stays unique
 
 
 class Board(list):
@@ -3550,6 +3576,7 @@ def take_turn(g: Game):
 
 
 def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:
+    begin_game()                           # §0z100
     rng = make_rng(seed, cfg)
     g = Game(deck, commander, cfg, rng, seed_for_pod=seed)
     g.opening_hand()
