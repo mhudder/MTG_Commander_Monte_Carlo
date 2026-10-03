@@ -9277,8 +9277,22 @@ was: cutting it costs lands_played −0.60, landfall_triggers −1.00 and
 cards_drawn −0.91 a game -- Loam is land SUPPLY, the role §0z99 found the
 deck short of -- and the Hydra more than pays for it. SIMULATED and
 SHORTLISTED, not staged. Nissa, Resurgent Animist's proposal names the same
-cut; Loam is one slot, so the two would need a paired run against each
-other in it before both could be decided (§0c).
+cut; Loam is one slot -- **AND THE PAIRED RUN SETTLES IT FOR THE HYDRA**
+(`diagnostics/run_slot_pair.py`, `results/azusa_slot_loam_20261003.txt`,
+three lists on one seed set: the staged list, the Hydra in Loam's slot, Nissa
+in Loam's slot). Its Hydra leg reproduces the run above exactly.
+
+| | T10 | T20 |
+|---|---|---|
+| -Loam +Mossborn Hydra | +0.0213 ±0.0032 | +0.0201 ±0.0042 |
+| -Loam +Nissa, Resurgent Animist | +0.0101 ±0.0030 | +0.0136 ±0.0041 |
+| **Nissa minus Hydra, same slot** | **−0.0112 ±0.0030** | **−0.0065 ±0.0038** |
+
+Both swaps gain; the Hydra wins the slot at both horizons. Nissa keeps more
+of what Loam did -- +0.39 lands played, +1.05 landfall triggers and +1.19
+cards a game over the Hydra -- and still loses, because the Hydra turns the
+lands the deck already has into damage (+1.13 a game over Nissa). The
+proxies and the objective disagree here, and win rate decides (CLAUDE.md).
 
 **OTHER DECKS.** `_evasion.py` and `_removal.py` regenerated from Scryfall: only
 their scanned-name lists changed. All six other decks bit-identical at 3,000

@@ -1899,7 +1899,10 @@ MEASURED: list[Candidate] = [
             "CUT TITANIA (2026-10-03). Life from the Loam is the next "
             "MODEL-EVALUATED row at the bottom (+0.0039 +-0.0024) with Titania "
             "and Exploration both kept, and it shares Mole Man's graveyard-land "
-            "role (§0z102). A proposal only."
+            "role (§0z102). A proposal only. MEASURED THE SAME DAY: in "
+            "Loam's slot Nissa is +0.0101 / +0.0136 as a swap and LOSES the "
+            "slot to Mossborn Hydra, -0.0112 +-0.0030 / -0.0065 +-0.0038, "
+            "paired (SIMULATED, below)."
         ),
         proposed_cut="Life from the Loam",
     ),
@@ -2904,6 +2907,13 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
         result='REAL SWAP -Wayward Swordtooth +Mossborn Hydra, N=15,000 paired: +0.0315 +-0.0031 (significant) at T10 and +0.0304 +-0.0039 (significant) at T20; damage +3.06 +-0.25.',
         notes='4.2 doublings a game. The strongest T10 row of the seven for a three-drop: it is a trampler, so the counters it doubles get through the chump blocks that blunt the other big bodies.',
+    ),
+    Simulated(
+        deck='azusa', remove='Life from the Loam', add='Nissa, Resurgent Animist',
+        measured='2026-10-03', source='results/azusa_slot_loam_20261003.txt',
+        result='REAL SWAP -Life from the Loam +Nissa, Resurgent Animist, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0101 +-0.0030 (significant) at T10 and +0.0136 +-0.0041 (significant) at T20; damage +1.32 +-0.28.',
+        notes=('AND IT LOSES THE SLOT TO MOSSBORN HYDRA, measured directly (diagnostics/run_slot_pair.py, three legs on one seed set): Nissa minus Hydra in Loam\'s slot is -0.0112 +-0.0030 at T10 and -0.0065 +-0.0038 at T20, significant at both. '
+               'Nissa keeps more of what Loam did -- +0.39 lands played, +1.05 landfall triggers and +1.19 cards a game over the Hydra -- and still loses, because the Hydra turns the lands the deck has into damage (+1.13 a game over Nissa). 5.45 Animist rituals and 0.54 cards found a game.'),
     ),
     Simulated(
         deck='azusa', remove='Life from the Loam', add='Mossborn Hydra',

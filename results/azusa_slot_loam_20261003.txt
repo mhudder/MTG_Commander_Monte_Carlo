@@ -1,0 +1,35 @@
+azusa, ONE SLOT: 'Life from the Loam'. N=15,000 paired, seeds 5000.., base = build_pending('azusa'), each card in the cut's exact position.
+  A = Mossborn Hydra
+  B = Nissa, Resurgent Animist
+* = the 95% CI excludes zero.
+
+  -Life from the Loam +A (A minus base)
+      won10                 +0.0213 ±0.0032*
+      won20                 +0.0201 ±0.0042*
+      damage20              +2.4569 ±0.2819*
+      landfall_triggers20   -0.9980 ±0.0743*
+      lands_played20        -0.5990 ±0.0437*
+      cards_drawn20         -0.9145 ±0.0942*
+      stranded_mv20         +0.5915 ±0.5021*
+  -Life from the Loam +B (B minus base)
+      won10                 +0.0101 ±0.0030*
+      won20                 +0.0136 ±0.0041*
+      damage20              +1.3230 ±0.2796*
+      landfall_triggers20   +0.0556 ±0.0814
+      lands_played20        -0.2070 ±0.0441*
+      cards_drawn20         +0.2750 ±0.1119*
+      stranded_mv20         +2.2419 ±0.5882*
+  B minus A, SAME SLOT (positive = B is better)
+      won10                 -0.0112 ±0.0030*
+      won20                 -0.0065 ±0.0038*
+      damage20              -1.1339 ±0.2388*
+      landfall_triggers20   +1.0536 ±0.0775*
+      lands_played20        +0.3920 ±0.0383*
+      cards_drawn20         +1.1895 ±0.1055*
+      stranded_mv20         +1.6505 ±0.4884*
+
+  own counters, T20, means per game:
+      Mossborn Hydra: mossborn_doublings 4.11
+      Nissa, Resurgent Animist: animist_mana 5.45  animist_cards 0.54  animist_whiffs 0.02
+
+  base win rate: T10 0.2069, T20 0.4435
