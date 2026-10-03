@@ -71,3 +71,8 @@ results/.fra_progress
 # deck's cache fingerprint so a code change cannot be resumed onto. The
 # printed results/priority_*.txt are the artefact; these are its resume state.
 results/.priority_sweep/
+
+# A results file still being WRITTEN by a running job, renamed out of the
+# `*.txt` namespace so tools.status does not count it and a commit cannot pick
+# up half a table (§0z101). Renamed back to its .txt name when the run ends.
+results/.*.partial
