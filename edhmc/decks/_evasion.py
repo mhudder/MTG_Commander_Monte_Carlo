@@ -70,6 +70,8 @@ MENACE = {
 TRAMPLE = {
     "Archon of Valor's Reach",
     'Cultivator Colossus',
+    'Glacier Godmaw',
+    'Mossborn Hydra',
     'Rampaging Baloths',
     'Verdurous Gearhulk',
 }
@@ -138,6 +140,7 @@ HUMAN = {
     'Liliana the Faultless',
     'Longshot, Rebel Bowman',
     'Marionette Master',
+    'Mole Man, Moloid Master',
     'Molecule Man',
     'Monastery Mentor',
     'Mother of Runes',
@@ -202,6 +205,7 @@ LEGENDARY = {
     'Baba Lysaga, Night Witch',
     "Bolas's Citadel",
     'Bow of Nylea',
+    'Bristly Bill, Spine Sower',
     'Chief Magistrate of Mercadia',
     'Davvol, Evincar of Rath',
     'Daxos, Blessed by the Sun',
@@ -235,6 +239,7 @@ LEGENDARY = {
     'Lyra, Archangel of Dawn',
     'Memnarch, the Warden',
     'Mikokoro, Center of the Sea',
+    'Mole Man, Moloid Master',
     'Molecule Man',
     'Mondrak, Glory Dominus',
     'Nissa, Resurgent Animist',
@@ -282,6 +287,7 @@ ELF_ELEMENTAL = {
     "Eyeblight's Ending",
     'Farhaven Elf',
     'Greensleeves, Maro-Sorcerer',
+    'Mossborn Hydra',
     "Nadier's Nightblade",
     'Nissa, Resurgent Animist',
     'Nissa, Vastwood Seer // Nissa, Sage Animist',
@@ -292,6 +298,15 @@ ELF_ELEMENTAL = {
     'Tireless Provisioner',
     'Titania, Protector of Argoth',
     'Wood Elves',
+}
+
+# PLANT creature cards: Avenger of Zendikar's landfall puts a counter on
+# each Plant creature you control, and that is not only its tokens.
+PLANT = {
+    'Bristly Bill, Spine Sower',
+    'Cultivator Colossus',
+    'Sylvan Caryatid',
+    'Verdant Kraken',
 }
 
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
@@ -381,6 +396,7 @@ SCANNED = {
     'Bramble Sovereign',
     "Brass's Bounty",
     'Brightclimb Pathway // Grimclimb Pathway',
+    'Bristly Bill, Spine Sower',
     'Burgeoning',
     'Buried Ruin',
     'Burnished Hart',
@@ -399,6 +415,7 @@ SCANNED = {
     'Caves of Koilos',
     'Chaos Warp',
     'Chief Magistrate of Mercadia',
+    'Chocobo Racetrack',
     'Chord of Calling',
     'Cliffhaven Vampire',
     'Clifftop Retreat',
@@ -428,6 +445,7 @@ SCANNED = {
     'Cyberdrive Awakener',
     'Damn',
     'Damnation',
+    'Dancing from Dark to Dawn',
     'Dark Confidant',
     'Dark Prophecy',
     'Darkbore Pathway',
@@ -462,6 +480,7 @@ SCANNED = {
     'Eldrazi Temple',
     'Elegant Parlor',
     'Elesh Norn, Grand Cenobite',
+    'Elfsworn Giant',
     "Elspeth, Sun's Champion",
     'Elvish Mystic',
     'Emeria Shepherd',
@@ -508,6 +527,7 @@ SCANNED = {
     'Ghostly Prison',
     'Giada, Font of Hope',
     'Ginger, Queen of Sweets',
+    'Glacier Godmaw',
     'Gloomshrieker',
     "God-Pharaoh's Gift",
     'Godless Shrine',
@@ -606,6 +626,7 @@ SCANNED = {
     'Misty Rainforest',
     "Mizzix's Mastery",
     'Model of Unity',
+    'Mole Man, Moloid Master',
     'Molecule Man',
     'Momentous Fall',
     'Monastery Mentor',
@@ -613,6 +634,7 @@ SCANNED = {
     'Monologue Tax',
     'Monument to Endurance',
     'Mortify',
+    'Mossborn Hydra',
     'Mosswort Bridge',
     'Mother of Runes',
     'Mountain',

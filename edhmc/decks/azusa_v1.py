@@ -734,6 +734,56 @@ FRA_CANDIDATES = (VERDANT_KRAKEN, SIMULACRUM_SHAPER)
 
 BATCH5_CANDIDATES = (GUARDIAN_PROJECT, SPLENDID_RECLAMATION, ZENDIKARS_ROIL)
 
+# ---------------------------------------------------------------------------
+# 2026-10-03 sixth batch: seven LANDFALL PAYOFFS (§0z101). Oracle text verified
+# against api.scryfall.com the same day; edhmc/pending.py's PROPOSED entries
+# carry it verbatim with the argument for each. All mono-green. Priorities are
+# placed beside the payoffs already in the list (Rampaging Baloths 8, Scute
+# Swarm 8, Zendikar's Roil 7.5, Avenger 8.5) -- a policy, not a measurement.
+# ---------------------------------------------------------------------------
+# "Reach / Landfall -- create a 1/1 green Elf Warrior creature token."
+ELFSWORN_GIANT = C("Elfsworn Giant", "Creature", {"gen": 3, "G": 2}, 5, 3,
+                   priority=7.5, threat=6.5)
+
+# "Landfall -- create a 2/2 green Bird creature token with 'Whenever a land you
+# control enters, this token gets +1/+0 until end of turn.'"
+CHOCOBO_RACETRACK = C("Chocobo Racetrack", "Artifact", {"gen": 3, "G": 2},
+                      priority=7.5, threat=4.5)
+
+# "Whenever you cast a creature spell, put X +1/+1 counters on target creature
+# you control, where X is that spell's mana value. / Landfall -- create a 2/2
+# green Bear creature token."
+DANCING_FROM_DARK_TO_DAWN = C("Dancing from Dark to Dawn", "Enchantment",
+                              {"gen": 3, "G": 2}, priority=7.5, threat=4.5)
+
+# "You may play lands from your graveyard. / Landfall -- create a 1/1 green
+# Minion creature token named Moloid with 'Whenever this token attacks, you
+# may mill a card.'"  Legendary, so a Springheart copy dies on arrival.
+MOLE_MAN = C("Mole Man, Moloid Master", "Creature", {"gen": 2, "G": 1}, 1, 1,
+             priority=7.5, threat=5.0, tags=("Legendary",))
+
+# "Trample / This creature enters with a +1/+1 counter on it. / Landfall --
+# double the number of +1/+1 counters on this creature."  DEFINED 0/0 ON
+# PURPOSE: the counter is applied as it enters (azusa.ENTERS_WITH_COUNTERS),
+# which is what lets a copy or a tutored one get it too.
+MOSSBORN_HYDRA = C("Mossborn Hydra", "Creature", {"gen": 2, "G": 1}, 0, 0,
+                   priority=8, threat=6.0)
+
+# "Landfall -- put a +1/+1 counter on target creature. / {3}{G}{G}: Double the
+# number of +1/+1 counters on each creature you control."
+BRISTLY_BILL = C("Bristly Bill, Spine Sower", "Creature", {"gen": 1, "G": 1},
+                 2, 2, priority=8, threat=6.0, tags=("Legendary",))
+
+# "Trample / When this creature enters, create a Lander token. / Landfall --
+# creatures you control get +1/+1 and gain vigilance and haste until end of
+# turn."
+GLACIER_GODMAW = C("Glacier Godmaw", "Creature", {"gen": 5, "G": 2}, 6, 6,
+                   priority=8.5, threat=9.0)
+
+BATCH6_CANDIDATES = (ELFSWORN_GIANT, CHOCOBO_RACETRACK,
+                     DANCING_FROM_DARK_TO_DAWN, MOLE_MAN, MOSSBORN_HYDRA,
+                     BRISTLY_BILL, GLACIER_GODMAW)
+
 BATCH4_CANDIDATES = (NISSA_RESURGENT_ANIMIST, TRAVELING_CHOCOBO,
                      ARCHDRUIDS_CHARM, AWAKEN_THE_WOODS,
                      EXPEDITION_MAP, ZURAN_ORB)

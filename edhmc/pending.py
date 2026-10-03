@@ -3384,6 +3384,86 @@ PROPOSED: list[Proposal] = [
         rejected='MEASURED 2026-09-16 and PROMOTED: +0.0133 +-0.0029 at T20 (§0z25).',
     ),
 
+    # -----------------------------------------------------------------------
+    # AZUSA BATCH 6, 2026-10-03: seven LANDFALL PAYOFFS, picked by the owner
+    # from a Scryfall scan of every Commander-legal card with landfall-type text
+    # in mono-green identity (91 cards, 15 already known to the repo). The
+    # question is §0z100's: the landfall group's returns diminish by about 0.8
+    # a copy, so is a further payoff still worth a slot? Oracle text fetched
+    # from api.scryfall.com the same day. The owner's named cut for the
+    # head-to-heads is Wayward Swordtooth (2026-10-03).
+    # -----------------------------------------------------------------------
+    Proposal(
+        deck='azusa', card='Elfsworn Giant', cost='{3}{G}{G}',
+        identity='G', type_line='Creature — Giant',
+        oracle='Reach (This creature can block creatures with flying.)\nLandfall — Whenever a land you control enters, create a 1/1 green Elf Warrior creature token.',
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="A token per landfall on a 5/3 body: the Rampaging Baloths shape at 1/1, one mana cheaper. The closest-in-shape card to the landfall group whose returns curve §0z100 measured (each further copy about 0.8 of the last), so it is the cleanest test of whether that curve's extrapolated fifth copy (+0.029 at T20) is real for a card that is not Scute Swarm.",
+        implement="LOW. One `make_tokens` line in `_landfall_payoffs`, the Baloths pattern. REACH IS NOT MODELLED -- this engine's blockers are a count, not a defence that reads reach -- so the body is a 5/3. A Springheart host (nonlegendary landfall payoff).",
+    ),
+    Proposal(
+        deck='azusa', card='Chocobo Racetrack', cost='{3}{G}{G}',
+        identity='G', type_line='Artifact',
+        oracle='Landfall — Whenever a land you control enters, create a 2/2 green Bird creature token with "Whenever a land you control enters, this token gets +1/+0 until end of turn."',
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="Zendikar's Roil (+0.0133 +-0.0029, §0z25) with tokens that grow: every Bird gets +1/+0 for each LATER land that turn, so on a three-drop turn the first Bird attacks as a 4/2. The deck averages three landfall triggers a turn, which is exactly what the token's own trigger reads.",
+        implement='LOW-MEDIUM. The token maker is the Roil line. Each Bird token carries its OWN landfall trigger, so the +1/+0 is applied per Bird that was on the battlefield WHEN the land entered (a snapshot -- a Bird made by this land does not see it, §0z19), doubled by Greenwarden and Traveling Chocobo like any landfall trigger. Until end of turn, reset with the turn.',
+    ),
+    Proposal(
+        deck='azusa', card='Dancing from Dark to Dawn', cost='{3}{G}{G}',
+        identity='G', type_line='Enchantment',
+        oracle="Whenever you cast a creature spell, put X +1/+1 counters on target creature you control, where X is that spell's mana value.\nLandfall — Whenever a land you control enters, create a 2/2 green Bear creature token.",
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="Zendikar's Roil with a second engine attached: every creature SPELL puts counters equal to its mana value on a creature you control. This list casts Ulamog and Kozilek (MV 11 and 10) and averages several creature spells a game, so the cast trigger is large on its own.",
+        implement="MEDIUM. Landfall half: a 2/2 Bear per landfall, the Roil line. Cast half: a hook at the two places a creature SPELL is cast (the commander, and the main-phase loop including Augur of Autumn's top-of-library cast) -- NOT on Chord, Green Sun's Zenith, Finale or Genesis Wave, which put a creature onto the battlefield without casting it. The trigger fires on CAST, so a countered spell still triggers. Target policy shared with Bristly Bill (`counter_target`).",
+    ),
+    Proposal(
+        deck='azusa', card='Mole Man, Moloid Master', cost='{2}{G}',
+        identity='G', type_line='Legendary Creature — Human Villain',
+        oracle='You may play lands from your graveyard.\nLandfall — Whenever a land you control enters, create a 1/1 green Minion creature token named Moloid with "Whenever this token attacks, you may mill a card."',
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="Three mana for a token per landfall AND 'play lands from your graveyard' -- the half §0z99 said the deck is short of: it lacks LANDS to play, not permission. The graveyard clause duplicates Crucible of Worlds and Ramunap Excavator (a boolean), so expect that half to add only the games neither is out.",
+        implement="LOW-MEDIUM. Graveyard access joins the existing boolean in `playable_lands`. Landfall: a 1/1 Moloid token. 'Whenever this token attacks, you MAY mill a card' is modelled as a POLICY: mill only while graveyard-land access is live and a land drop is still unused this turn, so a milled land can be played in the second land step; never below a library floor (decking is a loss, §0z42). Legendary, so not a Springheart host.",
+    ),
+    Proposal(
+        deck='azusa', card='Mossborn Hydra', cost='{2}{G}',
+        identity='G', type_line='Creature — Elemental Hydra',
+        oracle="Trample (This creature can deal excess combat damage to the player or planeswalker it's attacking.)\nThis creature enters with a +1/+1 counter on it.\nLandfall — Whenever a land you control enters, double the number of +1/+1 counters on this creature.",
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale='A three-drop trampler whose counters DOUBLE on every landfall: 1, 2, 4 on the turn after it lands, 16 or more by the next. Greenwarden and Traveling Chocobo each add a doubling. It is the one candidate whose value is exponential in landfall rather than linear, so it tests a different part of the curve.',
+        implement="LOW. 'Enters with a +1/+1 counter' is applied in `make_permanent`, so tutors, Genesis Wave and Springheart copies all get it (defined 0/0, so `check_dynamic_pt_coverage` must learn the enters-with-counters set). Trample is generated from Scryfall. Doubling is ordered AFTER every counter-placing trigger of the same land (Bristly Bill's), as a pilot stacks it. A runaway cap on the counter count is a guard, not a rule. The pod's threat-weighted removal will meet it, which is a real cost the model sees.",
+    ),
+    Proposal(
+        deck='azusa', card='Bristly Bill, Spine Sower', cost='{1}{G}',
+        identity='G', type_line='Legendary Creature — Plant Druid',
+        oracle='Landfall — Whenever a land you control enters, put a +1/+1 counter on target creature.\n{3}{G}{G}: Double the number of +1/+1 counters on each creature you control.',
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="A two-drop that turns every landfall into a +1/+1 counter, and a five-mana activation that DOUBLES the counters on every creature you control -- Avenger's Plants already carry one per landfall. The activation is a mana sink in a deck that measurably strands mana late (stranded_mv, mana_floated).",
+        implement='MEDIUM. Landfall: one counter on a creature you control, chosen by `counter_target` (a stated policy: Mossborn Hydra first, then an evasive creature, then the highest power). Activation: before combat, with mana the main phase left, while your creatures carry at least `bristly_min_counters` counters (a knob, default 2). FIXES A GAP IT DEPENDS ON: `power_of` discarded +1/+1 counters on the */* cards (Greensleeves, Ashaya, Cultivator Colossus); a counter now adds. Legendary, so not a Springheart host.',
+    ),
+    Proposal(
+        deck='azusa', card='Glacier Godmaw', cost='{5}{G}{G}',
+        identity='G', type_line='Creature — Leviathan',
+        oracle='Trample\nWhen this creature enters, create a Lander token. (It\'s an artifact with "{2}, {T}, Sacrifice this token: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle.")\nLandfall — Whenever a land you control enters, creatures you control get +1/+1 and gain vigilance and haste until end of turn.',
+        verified="2026-10-03",
+        triage="LIVE",
+        prepared="tests/test_azusa_batch6.py",
+        rationale="A repeatable Craterhoof for this deck: every landfall gives the whole team +1/+1 and HASTE until end of turn, so the Beasts, Badgers, Insects and Plants made by this turn's land drops attack the turn they are made. Its ETB Lander token is a further land (and a further landfall) for {2}.",
+        implement="MEDIUM-HIGH, and it builds two pieces the engine lacks: per-permanent until-end-of-turn pumps and haste (an id-keyed map, safe since §0z100's hold), read by `power_of` and by `combat`'s summoning-sickness check; and the Lander token, an artifact cracked BEFORE combat for {2} (a basic onto the battlefield tapped, then shuffle -- through the CRN stream). The pump is ordered LAST among the land's triggers, so tokens made by the same land get it. VIGILANCE IS NOT MODELLED and cannot matter here: `opponents.your_creatures` counts tapped blockers too. Trample is generated.",
+    ),
+
     # ---- REJECTED, kept so they are not proposed again -------------------
     Proposal(
         deck="azusa", card="Felidar Retreat", cost="{3}{W}", identity="W",
@@ -3537,7 +3617,16 @@ DECKS = {
         "Verdant Kraken": azusa_v1.VERDANT_KRAKEN,
         "Simulacrum Shaper": azusa_v1.SIMULACRUM_SHAPER,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
-        "Autumn Willow, Harmony": azusa_v1.AUTUMN_WILLOW_HARMONY}),
+        "Autumn Willow, Harmony": azusa_v1.AUTUMN_WILLOW_HARMONY,
+        # 2026-10-03 sixth batch (§0z101): seven landfall payoffs, catalogued
+        # so a head-to-head Change can name them.
+        "Elfsworn Giant": azusa_v1.ELFSWORN_GIANT,
+        "Chocobo Racetrack": azusa_v1.CHOCOBO_RACETRACK,
+        "Dancing from Dark to Dawn": azusa_v1.DANCING_FROM_DARK_TO_DAWN,
+        "Mole Man, Moloid Master": azusa_v1.MOLE_MAN,
+        "Mossborn Hydra": azusa_v1.MOSSBORN_HYDRA,
+        "Bristly Bill, Spine Sower": azusa_v1.BRISTLY_BILL,
+        "Glacier Godmaw": azusa_v1.GLACIER_GODMAW}),
     # Added 2026-10-01 from the owner's spreadsheet. No candidates yet: the
     # catalog is empty, which the registry check above allows.
     "trostani": (trostani_v1, {}),

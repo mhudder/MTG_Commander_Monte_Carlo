@@ -149,6 +149,7 @@ Methodology that used to live at the end of this file is now
 | [0z98](#0z98) | FIXED | **An `id(permanent)` key outlived its permanent.** Trostani keyed seven pieces of state on `id(perm)` and never cleared them, so a freed id handed to a new permanent carried a dead Processor's X, Luminarch's counters, a Vat's imprint or haste -- and which id was reused depended on the process's allocation history. One game in 15,000 played differently between two processes. Fixed by holding every permanent for the game (as shilgengar already did); `walker_ready` and azusa's `pw_used` had the same shape. All seven decks bit-identical at 400 seeds (first written as 3,000 in error; re-run at 3,000 in §0z100, still identical); trostani rebuilt, every row within 0.0001 |
 | [0z99](#0z99) | MEASURED | **Group ablations for all seven decks** (58 groups): most functional groups are ADDITIVE -- their rows sum to what the group is worth. Two are not, both redundancy: azusa's four landfall creatures (+0.1950 together against +0.1405 summed, T20) and karlov's five gain->drain cards (+0.1386 against +0.1073). Lorehold's three wipes cost +0.033 at T10 together; shilgengar's sac outlets and rendmaw's are worth nothing even as a pair; tivit's extra-vote pair is no longer a redundancy trap |
 | [0z100](#0z100) | MEASURED | **The returns curves, and the id fix finished.** Every subset of azusa's four landfall creatures and karlov's five gain->drain cards: returns DIMINISH smoothly, each copy worth about 0.8-0.9 of the one before (azusa +0.066, +0.052, +0.042, +0.035 at T20; karlov +0.035 ... +0.022). The curve's first run missed its own check by a game and found six more id-keyed sites, so the engine now holds every Card and Permanent made in a game (`begin_game`). Azusa's table rebuilt |
+| [0z101](#0z101) | BUILT | **Azusa batch 6: seven landfall payoffs**, implemented and pinned (Elfsworn Giant, Chocobo Racetrack, Dancing from Dark to Dawn, Mole Man, Mossborn Hydra, Bristly Bill, Glacier Godmaw), to test §0z100's curve against the owner's cut, Wayward Swordtooth. Three gaps found on the way: **Zendikar's Roil was never in LAND_ENABLERS** (its +0.0133 is a floor), counters on a */* card were discarded, and Avenger pumped only Plant TOKENS. The coverage check never read the payoff method. Every committed list bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9071,6 +9072,78 @@ single-card check still read NO: the curve file stored the cached rows' mean
 at MEASUREMENT time, so it was comparing against the table the rebuild had
 just replaced. Both reports (`run_curve`, `run_groups`) now read the cache
 when they print. All eight curve checks and all fourteen group checks pass.
+
+## 0z101. BUILT — azusa batch 6: seven landfall payoffs, and three gaps they exposed
+
+**THE QUESTION** (the owner's, after §0z100): the landfall group's returns
+diminish by about 0.8 a copy, so is a further landfall payoff still worth a
+slot? A Scryfall scan of every Commander-legal card with landfall-type text in
+mono-green identity found 91, of which `tools.card_known` knew 15. The owner
+picked seven, and named **Wayward Swordtooth** as the cut (§0z99: the deck
+lacks lands to play, not permission to play them). Each is a `Proposal` with
+verbatim oracle text, implemented in `edhmc/azusa.py`, pinned by
+`tests/test_azusa_batch6.py` (29 cases, 7 mutations with exact sets), and
+measured by `diagnostics/run_azusa_batch6.py` (the real swap) and the
+`azusa6` candidates batch (value over a blank in the Sylvan Library slot, with
+Zendikar's Roil and Sapling Nursery re-run as anchors).
+
+| card | what is modelled | what is not |
+|---|---|---|
+| Elfsworn Giant | a 1/1 Elf Warrior per landfall | reach (blockers are a count) |
+| Chocobo Racetrack | a 2/2 Bird per landfall; each Bird +1/+0 per later land that turn | -- |
+| Dancing from Dark to Dawn | a 2/2 Bear per landfall; MV counters on a creature per creature SPELL | -- |
+| Mole Man, Moloid Master | lands from the graveyard; a 1/1 Moloid per landfall; the Moloid's mill, as a policy | -- |
+| Mossborn Hydra | enters with a counter; doubles per landfall; trample | -- |
+| Bristly Bill, Spine Sower | a counter per landfall (`counter_target`); the {3}{G}{G} doubling, precombat | -- |
+| Glacier Godmaw | team +1/+1 and HASTE per landfall; the Lander token, cracked precombat | vigilance (cannot matter: tapped creatures still count as blockers) |
+
+**ORDER AND SNAPSHOT, both pinned.** A landfall trigger belongs to the
+permanents on the battlefield WHEN THE LAND ENTERED, so `land_entered` now
+snapshots the Birds, Hydras and Godmaws before any trigger resolves: a Bird
+made by a land does not pump off it, even with Greenwarden doubling the
+Racetrack, and a Springheart copy of the Hydra made by a land is not doubled
+by it (§0z19's rule pointed at a trigger list). `_landfall_last` resolves the
+Hydra's doubling after every counter of the same land, and Godmaw's pump after
+every token, as a pilot stacks them (603.3b). Dancing reads creature SPELLS
+only: Chord, Green Sun's Zenith, Finale, Genesis Wave and Bellower cast
+nothing. Three POLICIES are knobs or stated: `bristly_min_counters` (2), the
+Moloid mill (only while a graveyard land is playable and a drop is unused,
+never below `moloid_mill_floor` = 10 cards), and `counter_target` (the Hydra,
+then an evasive creature, then the highest power).
+
+**THREE GAPS, FOUND BY THE BATCH, NONE OF WHICH MOVED A COMMITTED LIST:**
+
+* **ZENDIKAR'S ROIL WAS NEVER IN `LAND_ENABLERS`**, so since its 2026-09-16
+  implementation it was cast AFTER the turn's land drops, and its +0.0133
+  +-0.0029 row (§0z25) is a FLOOR. `check_land_enabler_coverage` exists to
+  catch exactly this, and could not: it read four land methods and NOT
+  `_landfall_payoffs`, where every payoff lives. §0z15's shape -- the check
+  skipped the category its set exists for. Widened to read the payoff methods
+  and both zone grants; the Roil was the only name it found.
+* **A +1/+1 COUNTER ON A */* CARD WAS DISCARDED.** `power_of` replaced `base +
+  counters` with the land count for Greensleeves, Ashaya and Cultivator
+  Colossus, where the */* sets the base and counters apply on top (613.4).
+  Nothing in the committed list put a counter there; The Great Henge (a
+  candidate) did, and Bristly Bill and Dancing would have.
+* **AVENGER PUMPED ONLY PLANT TOKENS**, where the card says "each Plant
+  creature you control". Bristly Bill is a Plant Druid, so a generated `PLANT`
+  set joins `_evasion.py` (tag_flying, Scryfall subtypes: Bristly Bill,
+  Cultivator Colossus, Sylvan Caryatid, Verdant Kraken). No azusa list card is
+  one.
+
+**WHAT IT MOVED: NOTHING COMMITTED.** `check_unchanged_decks --n=3000` against
+8887ad4: all seven decks bit-identical on all 8 metrics; azusa's 90 output
+keys summed over 1,000 games all identical, the 16 new counters all zero.
+Every cache recorded VERIFIED on that evidence.
+
+**ONE MUTATION SET WAS WRONG ON ITS FIRST RUN, TWICE.** The two mutations that
+wrap `_landfall_payoffs` also broke case AB, because the coverage check reads
+the SOURCE of whatever method is bound and a wrapper names no card. That is
+the check working as written -- and a reason to know that a monkeypatched
+payoff method blinds it.
+
+The measurements are recorded in the next section update, from
+`results/azusa_batch6_h2h.txt` and `results/candidates_azusa_batch6_T20.txt`.
 
 ## How to read an ablation table
 

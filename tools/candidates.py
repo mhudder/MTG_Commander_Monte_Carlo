@@ -56,6 +56,8 @@ from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
                                   NISSA_WHO_SHAKES_THE_WORLD,
                                   WAR_ROOM, CASTLE_GARENBRIG, BATCH5_CANDIDATES)
 from edhmc.decks.azusa_v1 import BATCH4_CANDIDATES
+from edhmc.decks.azusa_v1 import (BATCH6_CANDIDATES, ZENDIKARS_ROIL,
+                                  SAPLING_NURSERY as _NURSERY)
 
 N = 6000
 
@@ -221,6 +223,14 @@ DECKS = {
     # the §0c limit that already stops a common baseline ranking two cards.
     "azusa5": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
                BATCH5_CANDIDATES),
+    # 2026-10-03 sixth batch (§0z101): seven landfall payoffs. SAME VICTIM
+    # SLOT AGAIN (Sylvan Library), for azusa4's reason -- four batches on one
+    # scale. Zendikar's Roil and Sapling Nursery ride along as ANCHORS: both
+    # are landfall token makers measured in this slot on 2026-09-16 and
+    # 2026-09-10, and the Roil was measured while missing from LAND_ENABLERS,
+    # so re-running it on today's engine says what that cost.
+    "azusa6": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
+               BATCH6_CANDIDATES + (ZENDIKARS_ROIL, _NURSERY)),
     # 2026-09-16 (§0z26). Pygmy Kavu is the slot the original rendmaw batch
     # used, kept so these rows and those three share a baseline.
     "rendmaw2": ("RENDMAW", "rendmaw", rendmaw_sim, 20, "Pygmy Kavu",

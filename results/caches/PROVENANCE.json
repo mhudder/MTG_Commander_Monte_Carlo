@@ -277,7 +277,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "a2b084ba68c647f4",
+        "utc": "2026-10-03T02:25:14Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "0e6776c8f21d69ac",
@@ -474,6 +481,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
         "fingerprint": "e1bdc10070aa68d9",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "9d5d32307eefd7cd",
+        "utc": "2026-10-03T02:25:13Z"
       }
     ]
   },
@@ -699,6 +712,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 244cdf1: lorehold BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
         "fingerprint": "858e98711a322189",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "d44872ef469d5bba",
+        "utc": "2026-10-03T02:25:13Z"
       }
     ]
   },
@@ -926,6 +945,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
         "fingerprint": "e0ce4c11fd6386aa",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "bfa9f19c93a62637",
+        "utc": "2026-10-03T02:25:13Z"
       }
     ]
   },
@@ -1176,6 +1201,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 926bc46: shilgengar BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
         "fingerprint": "131e255214bfe2ab",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "ab225203dcf40082",
+        "utc": "2026-10-03T02:25:14Z"
       }
     ]
   },
@@ -1382,6 +1413,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 244cdf1: tivit BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
         "fingerprint": "cb6015691e9721a6",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "2c1ca2b3a0bcfb60",
+        "utc": "2026-10-03T02:25:13Z"
       }
     ]
   },
@@ -1419,6 +1456,12 @@
         "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. This cache was rebuilt in the \u00a70z98 work on the working tree later committed as 0b767bf (its recorded built_commit 186ba49 lacks that fix): check_unchanged_decks --n=3000 against 0b767bf, trostani BIT-IDENTICAL on all 8 metrics. Against 186ba49 it differs by ONE game in 3,000 (damage, mana, life; no win) -- the id-reuse bug measured directly.",
         "fingerprint": "ae0bf7f213104b65",
         "utc": "2026-10-02T20:14:30Z"
+      },
+      {
+        "commit": "8887ad4",
+        "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+        "fingerprint": "8091ba98844bdfe6",
+        "utc": "2026-10-03T02:25:14Z"
       }
     ]
   }

@@ -130,7 +130,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, draw_is_safe,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
-from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN
+from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT
 from edhmc import opponents as OPP
 
 # TOKENS ARE NOT CARDS, so they are not in the generated FOREST set and cannot
@@ -235,6 +235,22 @@ DYNAMIC_PT_LANDS = frozenset({
     "Cultivator Colossus",
 })
 
+# Cards printed 0/0 that "enter with N +1/+1 counters". Applied in
+# `make_permanent`, so EVERY way the card arrives gets them -- cast, tutored,
+# Genesis Wave, a Springheart token copy (the copy copies the replacement
+# effect). A NAME SET, so `check_dynamic_pt_coverage` checks it: a 0/0 creature
+# in neither this set nor DYNAMIC_PT_LANDS is literally a 0/0. §0z101.
+ENTERS_WITH_COUNTERS = {
+    "Mossborn Hydra": 1,
+}
+
+# A runaway guard on a counter count that DOUBLES, not a rule. Mossborn Hydra
+# doubles on every landfall and Bristly Bill doubles everything; with
+# Greenwarden and Chocobo out one land is three doublings, so a long game
+# overflows a float in `damage_through`. A million is past every opponent's
+# life total by four orders of magnitude, so the cap changes no outcome.
+COUNTER_CAP = 1_000_000
+
 # Lands that SACRIFICE THEMSELVES to draw a card, and the exact cost of doing
 # it: {name: (mana cost, does the cost include {T}, minimum lands required)}.
 #
@@ -305,6 +321,21 @@ LAND_ENABLERS = frozenset({
     # would waste the whole turn's worth of both.
     "Nissa, Resurgent Animist",
     "Traveling Chocobo",
+    # --- ZENDIKAR'S ROIL WAS MISSING FROM THIS SET from its 2026-09-16
+    # implementation until 2026-10-03, so it was cast AFTER the turn's land
+    # drops and its +0.0133 row (§0z25) is a FLOOR. Found when the coverage
+    # check below was widened to read `_landfall_payoffs` (§0z101).
+    "Zendikar's Roil",
+    # --- 2026-10-03 sixth batch (§0z101): seven landfall payoffs, all read by
+    # `_landfall_payoffs` / `_landfall_last` (and Mole Man by
+    # `yard_land_access`), so all must be out before the drops.
+    "Elfsworn Giant",
+    "Chocobo Racetrack",
+    "Dancing from Dark to Dawn",
+    "Mole Man, Moloid Master",
+    "Mossborn Hydra",
+    "Bristly Bill, Spine Sower",
+    "Glacier Godmaw",
 })
 
 # Starting loyalty. `Permanent.counters` carries the current value from there.
@@ -378,6 +409,15 @@ class AzusaGame(BaseGame):
         self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
         self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
+        # PER-PERMANENT until-end-of-turn effects (§0z101). Craterhoof's bonus
+        # above is one number for the whole board, which is right for its text
+        # and wrong for these: Glacier Godmaw pumps and hastes the creatures
+        # on the battlefield AS ITS TRIGGER RESOLVES, and a Racetrack Bird
+        # pumps itself. id(perm) -> [perm, +power, +toughness] / id -> perm;
+        # the perm is held as the value and every Permanent is held for the
+        # game anyway (§0z98, §0z100). Reset with the turn, like the bonus.
+        self.eot_pt: dict = {}
+        self.eot_haste: dict = {}
         self.creature_mana: list[frozenset] = []   # Castle Garenbrig's six {G}
         self.animations: list[dict] = []   # live land-animation effects
         # walkers already activated this turn, id -> the walker, HELD so the
@@ -521,6 +561,23 @@ class AzusaGame(BaseGame):
             "map_cracked": 0,           # Expedition Map activations
             "zuran_sacs": 0,            # lands sacrificed to Zuran Orb
             "zuran_life": 0,            # ... and the life it made
+            # 2026-10-03 sixth batch (§0z101), one counter per clause.
+            "elfsworn_tokens": 0,       # Elfsworn Giant: Elf Warriors
+            "racetrack_birds": 0,       # Chocobo Racetrack: Birds made
+            "racetrack_pumps": 0,       # ... and +1/+0 a Bird took
+            "dancing_bears": 0,         # Dancing from Dark to Dawn: Bears
+            "dancing_counters": 0,      # ... and counters off creature casts
+            "moloids_made": 0,          # Mole Man: Moloid tokens
+            "moloid_mills": 0,          # ... cards a Moloid milled
+            "moloid_mill_lands": 0,     # ... of which lands
+            "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
+            "bristly_counters": 0,      # Bristly Bill: landfall counters
+            "bristly_activations": 0,   # ... the {3}{G}{G} doubling
+            "bristly_counters_added": 0,  # ... and counters it added
+            "godmaw_pumps": 0,          # Glacier Godmaw: landfall resolutions
+            "godmaw_hasted": 0,         # ... sick creatures it let attack
+            "landers_made": 0,          # Lander tokens created
+            "landers_cracked": 0,       # ... and sacrificed for a basic
         })
         self.damage_by_turn = []
 
@@ -741,27 +798,49 @@ class AzusaGame(BaseGame):
             bonus += self.wildspeaker_bonus
         return bonus
 
+    def _eot(self, perm, i):
+        """Glacier Godmaw's and a Racetrack Bird's until-end-of-turn bonus to
+        this permanent: i=1 power, i=2 toughness. Zero for anything they did
+        not touch. §0z101."""
+        e = self.eot_pt.get(id(perm))
+        return e[i] if e is not None and e[0] is perm else 0
+
+    def add_eot(self, perm, dp, dt):
+        e = self.eot_pt.get(id(perm))
+        if e is None or e[0] is not perm:
+            e = self.eot_pt[id(perm)] = [perm, 0, 0]
+        e[1] += dp
+        e[2] += dt
+
     def power_of(self, perm):
         anim = self.animation_of(perm) if perm.card.is_land else None
         if anim is not None:
             # An animation SETS power and toughness; it does not add to them.
-            return anim["power"] + perm.counters + self._pump(perm)
+            return (anim["power"] + perm.counters + self._pump(perm)
+                    + self._eot(perm, 1))
         base = perm.base_p if perm.is_token else perm.card.power
-        p = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
-            p = self.land_count()
-        p += self._pump(perm)
+            # The */* sets the BASE (613.4a, layer 7a); +1/+1 counters apply on
+            # top of it (layer 7c). Until 2026-10-03 the land count REPLACED
+            # `base + counters`, so a counter on Greensleeves, Ashaya or
+            # Cultivator Colossus -- The Great Henge's, Springheart's bestow --
+            # was silently discarded. Nothing in the committed list put one
+            # there; Bristly Bill and Dancing from Dark to Dawn would (§0z101).
+            base = self.land_count()
+        p = base + perm.counters
+        p += self._pump(perm) + self._eot(perm, 1)
         return p
 
     def toughness_of(self, perm):
         anim = self.animation_of(perm) if perm.card.is_land else None
         if anim is not None:
-            return anim["toughness"] + perm.counters + self._pump(perm)
+            return (anim["toughness"] + perm.counters + self._pump(perm)
+                    + self._eot(perm, 2))
         base = perm.base_t if perm.is_token else perm.card.toughness
-        t = base + perm.counters
         if perm.card.name in DYNAMIC_PT_LANDS:
-            t = self.land_count()
-        t += self._pump(perm)
+            base = self.land_count()
+        t = base + perm.counters
+        t += self._pump(perm) + self._eot(perm, 2)
         return t
 
     def gain_life(self, amount):
@@ -783,6 +862,10 @@ class AzusaGame(BaseGame):
             sick = True
         if card.name in PLANESWALKERS and not counters:
             counters = PLANESWALKERS[card.name]     # loyalty
+        # "This creature enters with a +1/+1 counter on it" -- a replacement
+        # effect on ENTERING, so it is here and not in `etb`: a tutored,
+        # Waved or Springheart-copied Mossborn Hydra gets it too (§0z101).
+        counters += ENTERS_WITH_COUNTERS.get(card.name, 0)
         perm = Permanent(card=card, sick=sick, tapped=tapped,
                          is_token=is_token, counters=counters,
                          base_p=card.power, base_t=card.toughness)
@@ -1048,10 +1131,97 @@ class AzusaGame(BaseGame):
         # constraint is cards, that inflated both doublers' rows.
         if played and not self.cfg.get("horn_doubled_legacy", False):
             self.draw(self.count("Horn of Greed"))
+        # WHO HAS A TRIGGER, read BEFORE any of them resolves (§0z101). A
+        # landfall ability triggers when the land enters, so a Racetrack Bird,
+        # a Mossborn Hydra or a Godmaw made BY one of this land's own triggers
+        # (a Springheart copy, a Racetrack's new Bird) did not see the land and
+        # must not be pumped or doubled by it. A selection is a snapshot and
+        # the zone is live -- §0z19's rule, pointed at a trigger list.
+        birds = [p for p in self.board
+                 if p.is_token and p.card.name == "Bird token"]
+        hydras = [p for p in self.board if p.card.name == "Mossborn Hydra"]
+        godmaws = [p for p in self.board if p.card.name == "Glacier Godmaw"]
         for _ in range(reps):
-            self._landfall_payoffs(card, played)
+            self._landfall_payoffs(card, played, birds)
+        self._landfall_last(reps, hydras, godmaws)
 
-    def _landfall_payoffs(self, card, played=False):
+    def _landfall_last(self, reps, hydras, godmaws):
+        """The two landfall triggers a pilot puts at the BOTTOM of the stack,
+        so they resolve after every other trigger of the same land (§0z101).
+
+        All of one land's triggers go on the stack together and their
+        controller orders them (603.3b). Mossborn Hydra DOUBLES, so it goes
+        after every trigger that ADDS a counter (Bristly Bill's, and Bill on
+        the Hydra itself is the reason Bill's target policy prefers it).
+        Glacier Godmaw pumps and hastes the creatures on the battlefield AS IT
+        RESOLVES, so it goes after every token maker -- the Beasts, Badgers
+        and Insects this land made get the +1/+1 and can attack. Godmaw last
+        of all, because its pump is until end of turn and a doubled COUNTER
+        is permanent; the order between the two changes nothing.
+
+        `reps` is the land's trigger multiplicity (Greenwarden, Chocobo):
+        each rep is one more trigger of each, so a Hydra doubles `reps` times.
+        `hydras` and `godmaws` are the snapshot `land_entered` took -- a copy
+        made by this land's own Springheart trigger is not in them.
+        """
+        for p in hydras:
+            if p not in self.board:
+                continue                    # left before its trigger resolved
+            for _ in range(reps):
+                p.counters = min(COUNTER_CAP, p.counters * 2)
+                self.m["mossborn_doublings"] += 1
+        for g in godmaws:
+            if g not in self.board:
+                continue
+            for _ in range(reps):
+                # "Creatures you control get +1/+1 and gain vigilance and haste
+                # until end of turn." VIGILANCE IS NOT MODELLED and cannot
+                # matter: `opponents.your_creatures` counts a tapped attacker
+                # as a blocker, so not tapping changes nothing here.
+                for p in self.board:
+                    if not self.counts_as_creature(p):
+                        continue
+                    self.add_eot(p, 1, 1)
+                    if p.sick and id(p) not in self.eot_haste:
+                        self.eot_haste[id(p)] = p
+                self.m["godmaw_pumps"] += 1
+
+    def counter_target(self):
+        """Where a "+1/+1 counter on target creature" goes -- Bristly Bill's
+        landfall, Dancing from Dark to Dawn's cast trigger. A POLICY, stated
+        because it is one (§0z101):
+
+          1. Mossborn Hydra, whose own trigger then DOUBLES the counter --
+             `_landfall_last` orders the doubling after the counter.
+          2. Otherwise an EVASIVE creature (flying or trample right now), so
+             the counter is not the one a chump block soaks.
+          3. Otherwise the highest power.
+
+        Creatures only, never a land: a counter on an animated land outlives
+        the animation and does nothing while it is a land. None if you control
+        no creature, and the trigger then does nothing (the opponents' boards
+        are not objects, §4).
+        """
+        mine = [p for p in self.board
+                if p.card.is_creature and not p.card.is_land]
+        if not mine:
+            return None
+        return max(mine, key=lambda p: (
+            p.card.name == "Mossborn Hydra",
+            OPP.flying_of(self, p) or OPP.trample_of(self, p),
+            self.power_of(p)))
+
+    def make_lander(self):
+        """A Lander token: 'an artifact with "{2}, {T}, Sacrifice this token:
+        Search your library for a basic land card, put it onto the
+        battlefield tapped, then shuffle."' A real permanent rather than a
+        count (unlike Tireless Tracker's Clues), so it counts toward the
+        city's blessing and Bane of Progress sees it, as the rules say."""
+        tok = Card(name="Lander token", types=frozenset({"Artifact"}))
+        self.make_permanent(tok, sick=False, is_token=True)
+        self.m["landers_made"] += 1
+
+    def _landfall_payoffs(self, card, played=False, birds=()):
         """The payoffs themselves, split out so Ancient Greenwarden can run
         them twice. Everything here is a triggered ability of a permanent you
         control, which is exactly the set Greenwarden doubles.
@@ -1087,9 +1257,15 @@ class AzusaGame(BaseGame):
             if p.card.name == "Zabu":
                 p.counters += 1
                 break
+        # AVENGER: "put a +1/+1 counter on each PLANT creature you control" --
+        # its own Plant tokens AND any Plant creature card (the generated PLANT
+        # set: Bristly Bill, Cultivator Colossus, Verdant Kraken). Until
+        # 2026-10-03 only the tokens were read; no card in the committed list
+        # is a Plant, so that was a gap only a candidate could fall into.
         for _ in range(self.count("Avenger of Zendikar")):
             for p in self.board:
-                if p.is_token and p.card.name == "Plant token":
+                if ((p.is_token and p.card.name == "Plant token")
+                        or (p.card.name in PLANT and p.card.is_creature)):
                     p.counters += 1
         self.gain_life(self.count("Courser of Kruphix"))
         for _ in range(self.count("Lotus Cobra")):
@@ -1109,6 +1285,42 @@ class AzusaGame(BaseGame):
         # the whole of what is modelled, and it is the Rampaging Baloths shape
         # one size down on power and one up on toughness.
         self.make_tokens(self.count("Sapling Nursery"), 3, 4, "Treefolk")
+        # --- 2026-10-03 sixth batch (§0z101). Each its OWN statement, none
+        # nested in a neighbour's `if` -- §0z28's indentation. ---------------
+        # ELFSWORN GIANT: "create a 1/1 green Elf Warrior creature token."
+        n = self.count("Elfsworn Giant")
+        self.make_tokens(n, 1, 1, "Elf Warrior")
+        self.m["elfsworn_tokens"] += n
+        # CHOCOBO RACETRACK'S BIRDS: "Whenever a land you control enters, this
+        # token gets +1/+0 until end of turn." Each Bird's own trigger, for
+        # the Birds that were here when the land entered (`birds`, snapshot)
+        # -- one per rep, because Greenwarden doubles the Bird's trigger too.
+        for b in birds:
+            if b in self.board:
+                self.add_eot(b, 1, 0)
+                self.m["racetrack_pumps"] += 1
+        # CHOCOBO RACETRACK: "create a 2/2 green Bird creature token with ..."
+        n = self.count("Chocobo Racetrack")
+        self.make_tokens(n, 2, 2, "Bird")
+        self.m["racetrack_birds"] += n
+        # DANCING FROM DARK TO DAWN: "create a 2/2 green Bear creature token."
+        # Its cast-trigger half is `creature_spell_cast`.
+        n = self.count("Dancing from Dark to Dawn")
+        self.make_tokens(n, 2, 2, "Bear")
+        self.m["dancing_bears"] += n
+        # MOLE MAN: "create a 1/1 green Minion creature token named Moloid
+        # with 'Whenever this token attacks, you may mill a card.'" The mill
+        # is in `combat`; the token's name is what finds it there.
+        n = self.count("Mole Man, Moloid Master")
+        self.make_tokens(n, 1, 1, "Moloid")
+        self.m["moloids_made"] += n
+        # BRISTLY BILL: "put a +1/+1 counter on target creature." Ordered
+        # before Mossborn Hydra's doubling by `_landfall_last`.
+        for _ in range(self.count("Bristly Bill, Spine Sower")):
+            t = self.counter_target()
+            if t is not None:
+                t.counters = min(COUNTER_CAP, t.counters + 1)
+                self.m["bristly_counters"] += 1
         for _ in range(self.count("Springheart Nantuko")):
             self.springheart_landfall()
         if self.has("Scute Swarm"):
@@ -1266,17 +1478,24 @@ class AzusaGame(BaseGame):
         "Scute Swarm",                 # copies double every landfall
         "Craterhoof Behemoth",         # ETB pumps the WHOLE team, per landfall
         "Avenger of Zendikar",         # ETB: a Plant per land you control
+        "Glacier Godmaw",              # 2026-10-03 candidate: ETB Lander, and a
+                                       # second team pump + haste per landfall
         "Lotus Cobra",                 # +1 mana per landfall, compounding
+        "Mossborn Hydra",              # 2026-10-03 candidate: the copy enters
+                                       # with its counter and doubles too
         "Tireless Provisioner",        # +1 Treasure per landfall
         "Woodland Bellower",           # ETB tutors a 3-drop onto the field
         "Rampaging Baloths",           # a 4/4 per landfall, per copy
+        "Elfsworn Giant",              # 2026-10-03 candidate: a 1/1 per landfall
         "Eternal Witness",             # ETB returns your best card
         "Titania, Protector of Argoth",  # LEGENDARY: the copy dies, but its
                                          # ETB returns a land -> a landfall
         "Courser of Kruphix",
         "Tireless Tracker",
         # Greensleeves, Maro-Sorcerer was HERE and is deliberately gone: see
-        # the legend-rule note above. Copying her is now worth zero.
+        # the legend-rule note above. Copying her is now worth zero. Mole Man
+        # and Bristly Bill (2026-10-03) are legendary and have no ETB, so they
+        # are absent for the same reason.
     )
 
     def springheart_pick_host(self):
@@ -1454,12 +1673,21 @@ class AzusaGame(BaseGame):
         out = [(c, "hand") for c in self.hand if c.is_land]
         if self.library and self.library[-1].is_land and self.top_access():
             out.append((self.library[-1], "library"))
-        if (self.has("Ramunap Excavator") or self.has("Crucible of Worlds")
-                or self.has("Conduit of Worlds")
-                or self.has("Ancient Greenwarden")
-                or self.has("Walk-In Closet // Forgotten Cellar")):
+        if self.yard_land_access():
             out += [(c, "graveyard") for c in self.graveyard if c.is_land]
         return out
+
+    def yard_land_access(self):
+        """Can you play lands from your graveyard right now? A BOOLEAN over
+        six cards, which is the redundancy Mole Man's half of the text runs
+        into (§0z101): with Crucible or Ramunap out it adds nothing. One
+        method, read by `playable_lands` and by the Moloids' mill policy, so
+        the two cannot disagree (§0u)."""
+        return (self.has("Ramunap Excavator") or self.has("Crucible of Worlds")
+                or self.has("Conduit of Worlds")
+                or self.has("Ancient Greenwarden")
+                or self.has("Walk-In Closet // Forgotten Cellar")
+                or self.has("Mole Man, Moloid Master"))
 
     def top_access(self):
         """Can you play a land off the top of your library right now?
@@ -1857,6 +2085,11 @@ class AzusaGame(BaseGame):
                 self.draw(1)
         elif card.name == "Yavimaya Elder":
             pass   # its DEATH trigger is in on_creature_death
+        elif card.name == "Glacier Godmaw":
+            # "When this creature enters, create a Lander token." A COPY makes
+            # one too -- the copy's ETB is the printed card's (queued item 16).
+            # Cracked in `precombat_step`. §0z101.
+            self.make_lander()
 
     def your_lands(self):
         return [p for p in self.board if p.card.is_land] + self.creature_lands()
@@ -2529,6 +2762,7 @@ class AzusaGame(BaseGame):
                     self.m["mana_spent"] += sum(ccost.values())
                     idx = self.spells_this_turn
                     self.spells_this_turn += 1
+                    self.creature_spell_cast(self.commander)
                     if OPP.countered(self, self.commander, idx):
                         self.m["countered"] += 1
                         self.commander_tax += 2
@@ -2608,6 +2842,8 @@ class AzusaGame(BaseGame):
                 self.hand.remove(card)
             idx = self.spells_this_turn
             self.spells_this_turn += 1
+            if card.is_creature:
+                self.creature_spell_cast(card)
             if OPP.countered(self, card, idx):
                 self.m["countered"] += 1
                 self.graveyard.append(card)
@@ -2616,6 +2852,26 @@ class AzusaGame(BaseGame):
                     self.m["test_card_countered"] += 1
                 continue
             self.resolve(card)
+
+    def creature_spell_cast(self, card):
+        """A creature SPELL was just cast (§0z101). Called from the two places
+        this engine casts one -- the commander, and `main_phase`'s loop, which
+        includes Augur of Autumn's cast from the top -- and from nowhere else:
+        Chord of Calling, Green Sun's Zenith, Finale, Genesis Wave and Woodland
+        Bellower put a creature onto the battlefield WITHOUT casting it, and a
+        Springheart copy is not cast either. Called BEFORE the counterspell
+        check, because the trigger is on CAST: a countered spell still fired it.
+
+        DANCING FROM DARK TO DAWN: "Whenever you cast a creature spell, put X
+        +1/+1 counters on target creature you control, where X is that
+        spell's mana value." X is the PRINTED mana value -- a cost reduction
+        (Eye of Ugin, The Great Henge) changes what you pay, not the MV.
+        """
+        for _ in range(self.count("Dancing from Dark to Dawn")):
+            t = self.counter_target()
+            if t is not None and card.mv > 0:
+                t.counters = min(COUNTER_CAP, t.counters + card.mv)
+                self.m["dancing_counters"] += card.mv
 
     def _coven(self):
         # "If you control three or more creatures with different powers" --
@@ -2929,10 +3185,78 @@ class AzusaGame(BaseGame):
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
 
+    def precombat_step(self):
+        """Activated abilities a pilot uses BEFORE attacking, with the mana
+        the main phase left (§0z101). Everything else this engine activates
+        waits for `activations()`, after combat, so that its mana is spare;
+        these two are here because what they buy is only worth it BEFORE the
+        attack.
+
+        LANDER TOKENS first: "{2}, {T}, Sacrifice this token: Search your
+        library for a basic land card, put it onto the battlefield tapped,
+        then shuffle." The land ENTERS, so it is a landfall trigger, and
+        cracking it before combat is what lets Glacier Godmaw's pump and
+        haste, Bristly Bill's counter and a Racetrack Bird's +1/+0 reach this
+        attack. Always cracked when a Forest is left to find -- a land and a
+        landfall for {2} has no case in this list where holding it is right.
+
+        BRISTLY BILL second, so it doubles the counters the Landers' landfall
+        just placed: "{3}{G}{G}: Double the number of +1/+1 counters on each
+        creature you control." Repeatable, so it is activated while
+        affordable and while your creatures carry at least
+        `bristly_min_counters` counters between them (default 2): five mana
+        for one counter is a bad trade a pilot would not make, and the
+        postcombat main phase can still want the mana.
+        """
+        for pm in list(self.board):
+            if pm.card.name != "Lander token" or pm.tapped:
+                continue
+            forest = next((c for c in self.library if c.name == "Forest"), None)
+            if forest is None:
+                break
+            units = self.available_mana()
+            pay = can_pay({"gen": 2}, units)
+            if pay is None:
+                break
+            spend(self, pay, units)
+            self.m["mana_spent"] += 2
+            self.board.remove(pm)
+            self.library.remove(forest)
+            self.make_permanent(forest, tapped=True)
+            self.shuffle_library()
+            self.m["landers_cracked"] += 1
+            self.land_entered(forest, played=False)
+        if not self.has("Bristly Bill, Spine Sower"):
+            return
+        floor = self.cfg.get("bristly_min_counters", 2)
+        for _ in range(20):             # a runaway guard, not a rule
+            mine = [p for p in self.board
+                    if self.counts_as_creature(p) and p.counters > 0
+                    and "Planeswalker" not in p.card.types]
+            total = sum(p.counters for p in mine)
+            if total < floor:
+                break
+            units = self.available_mana()
+            pay = can_pay({"gen": 3, "G": 2}, units)
+            if pay is None:
+                break
+            spend(self, pay, units)
+            self.m["mana_spent"] += 5
+            for p in mine:
+                p.counters = min(COUNTER_CAP, p.counters * 2)
+            self.m["bristly_activations"] += 1
+            self.m["bristly_counters_added"] += total
+
     def combat(self):
+        # GLACIER GODMAW's haste (§0z101): a creature that was sick when one of
+        # its triggers resolved this turn may attack. `eot_haste` holds only
+        # those; nothing else grants a creature haste in this engine.
+        hasted = self.eot_haste
         attackers = [p for p in self.board if p.card.is_creature
-                    and not p.tapped and not p.sick
+                    and not p.tapped and (not p.sick or id(p) in hasted)
                     and not (p.card.name == "Wayward Swordtooth" and not self.ascended)]
+        self.m["godmaw_hasted"] += sum(1 for p in attackers
+                                      if p.sick and id(p) in hasted)
         # ANIMATED LANDS ATTACK AS THEMSELVES. They used to be fabricated as
         # throwaway 2/2 token Permanents that were never on the battlefield,
         # which meant tapping them for the attack tapped nothing: the same
@@ -2957,7 +3281,8 @@ class AzusaGame(BaseGame):
             if p.card.is_creature or p.tapped:
                 continue          # creature-lands are already in `attackers`
             anim = self.animation_of(p)
-            if anim is None or (p.sick and not anim["haste"]):
+            if anim is None or (p.sick and not anim["haste"]
+                                and id(p) not in hasted):
                 continue
             attackers.append(p)
             n_animated += 1
@@ -2983,6 +3308,26 @@ class AzusaGame(BaseGame):
                 if living:
                     victim = min(living, key=lambda o: o.life)
                     victim.creatures = max(0.0, victim.creatures - 4)
+        # MOLE MAN'S MOLOIDS: "Whenever this token attacks, you MAY mill a
+        # card." A POLICY (§0z101): mill only while a land in the graveyard is
+        # playable AND a land drop is still unused this turn, so a land milled
+        # here can be played in the second land step -- otherwise the mill is
+        # a coin flip that loses a card nearly two times in three. Never below
+        # `moloid_mill_floor` cards, because decking is a loss (§0z42) and a
+        # mill is not a draw `draw_is_safe` would see.
+        floor = self.cfg.get("moloid_mill_floor", 10)
+        for p in attackers:
+            if p.card.name != "Moloid token":
+                continue
+            if not (self.yard_land_access()
+                    and self.land_drops_used < self.land_drops_for_turn()
+                    and len(self.library) > floor):
+                continue
+            c = self.library.pop()
+            self.graveyard.append(c)
+            self.m["moloid_mills"] += 1
+            if c.is_land:
+                self.m["moloid_mill_lands"] += 1
         if not attackers:
             self.damage_by_turn.append(0.0)
             return
@@ -3005,6 +3350,8 @@ def take_turn(g):
     g.spells_this_turn = 0
     g.craterhoof_bonus = 0
     g.wildspeaker_bonus = 0
+    g.eot_pt = {}                       # Godmaw / Racetrack Bird pumps
+    g.eot_haste = {}                    # Godmaw's haste, §0z101
     # Castle Garenbrig's pool empties with the turn, like any unspent mana.
     g.creature_mana = []
     g.bonus_mana = []
@@ -3043,6 +3390,7 @@ def take_turn(g):
     # Again, so a walker CAST this main phase still activates the turn she
     # lands. `pw_used` makes this a no-op for one that already has.
     g.planeswalker_step()
+    g.precombat_step()                  # Landers, Bristly Bill (§0z101)
     g.combat()
     g.activations()
     # A SECOND LAND STEP, mirroring engine.py's two `play_land` calls: drops
@@ -3135,8 +3483,16 @@ def check_land_enabler_coverage():
     `land_entered` and forgotten here fails loudly instead of silently
     scoring low. KNOWN_ISSUES.md 0q.
     """
+    # WIDENED 2026-10-03 (§0z101). It watched the four methods above and NOT
+    # the payoffs themselves, which live in `_landfall_payoffs` -- so the
+    # payoff list, the thing this set most exists for, was exactly what the
+    # check could not see (§0z15: a check that skips a category has its blind
+    # spot there). `top_access` and `yard_land_access` are the zone grants
+    # that `playable_lands` delegates to.
     watched = (AzusaGame.land_entered, AzusaGame.land_drops_for_turn,
-               AzusaGame.playable_lands, AzusaGame.land_died)
+               AzusaGame.playable_lands, AzusaGame.land_died,
+               AzusaGame._landfall_payoffs, AzusaGame._landfall_last,
+               AzusaGame.top_access, AzusaGame.yard_land_access)
     named = set()
     for fn in watched:
         named |= set(re.findall(r'self\.(?:has|count)\("([^"]+)"\)',
@@ -3237,7 +3593,16 @@ def check_dynamic_pt_coverage():
     # And the reverse: a */* card defined 0/0 that nobody added here.
     zero_pt = {c.name for c in module_cards
                if c.is_creature and c.power == 0 and c.toughness == 0}
-    stranded = zero_pt - DYNAMIC_PT_LANDS
+    # A 0/0 that ENTERS WITH COUNTERS (Mossborn Hydra) is not stranded -- but
+    # only if the name in ENTERS_WITH_COUNTERS is a real card, checked below,
+    # or a misspelling would exempt nothing and silence the check (§0z101).
+    stranded = zero_pt - DYNAMIC_PT_LANDS - set(ENTERS_WITH_COUNTERS)
+    unknown_ewc = set(ENTERS_WITH_COUNTERS) - known
+    if unknown_ewc:
+        raise AssertionError(
+            "edhmc/azusa.py: ENTERS_WITH_COUNTERS names no card in the deck "
+            "or the candidate list:\n"
+            + "".join(f"    {n}\n" for n in sorted(unknown_ewc)))
     if stranded:
         raise AssertionError(
             "edhmc/azusa.py: these candidate creatures are defined 0/0 but "

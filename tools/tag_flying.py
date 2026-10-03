@@ -288,6 +288,12 @@ def main():
     # instead of a fact about the lists.
     elf_elemental = {n for n, c in cards.items()
                      if n in everything and ({"Elf", "Elemental"} & subtypes(c))}
+    # PLANT, 2026-10-03 (§0z101): Avenger of Zendikar pumps "each PLANT
+    # creature you control", and Bristly Bill, Spine Sower is a Plant Druid --
+    # so a card, not only Avenger's own tokens, can be one. Creatures only:
+    # the clause says "Plant creature".
+    plants = {n for n, c in cards.items()
+              if n in creatures and "Plant" in subtypes(c)}
 
     print(f"{len(cards)}/{len(everything)} cards resolved "
           f"({len(creatures)} of them creatures)\n")
@@ -338,6 +344,11 @@ def main():
           f"here is a whiff that should have been a card:")
     for n in sorted(elf_elemental):
         print(f"    {n:34} {' '.join(sorted({'Elf', 'Elemental'} & subtypes(cards[n])))}")
+
+    print(f"\nPLANT ({len(plants)}) — Avenger of Zendikar's landfall pumps "
+          f"these as well as its tokens:")
+    for n in sorted(plants):
+        print(f"    {n}")
 
     missed = {n for n, c in cards.items()
               if n in creatures and n not in flying and n not in CONDITIONAL
@@ -428,6 +439,12 @@ def main():
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\nELF_ELEMENTAL = {\n")
             for n in sorted(elf_elemental):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# PLANT creature cards: Avenger of Zendikar's landfall "
+                     "puts a counter on\n# each Plant creature you control, "
+                     "and that is not only its tokens.\nPLANT = {\n")
+            for n in sorted(plants):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
