@@ -1,0 +1,15 @@
+counter_target: focus vs spread. N=15,000 games per card, three legs per seed (A = staged list with Wayward Swordtooth; B = the card in its slot under each policy), seeds 5000.., T10 read off the T20 game. * = the 95% CI excludes zero.
+
+  card                         horizon       swap, focus      swap, spread    spread - focus
+  Bristly Bill, Spine Sower        T10  +0.0011 ±0.0023   +0.0098 ±0.0024*  +0.0087 ±0.0016*
+  Bristly Bill, Spine Sower        T20  +0.0009 ±0.0035   +0.0113 ±0.0035*  +0.0105 ±0.0021*
+  Dancing from Dark to Dawn        T10  +0.0066 ±0.0024*  +0.0078 ±0.0024*  +0.0012 ±0.0008*
+  Dancing from Dark to Dawn        T20  +0.0206 ±0.0037*  +0.0245 ±0.0038*  +0.0039 ±0.0015*
+
+mechanism, T20, per game (B legs): damage is bounded; counters as the counters record them
+  Bristly Bill, Spine Sower      focus  damage 66.30  bristly_counters 4.16  bristly_activations 0.64  dancing_counters 0.00
+  Bristly Bill, Spine Sower     spread  damage 67.31  bristly_counters 4.02  bristly_activations 0.59  dancing_counters 0.00
+                                        damage spread - focus +1.01 ±0.11
+  Dancing from Dark to Dawn      focus  damage 67.89  bristly_counters 0.00  bristly_activations 0.00  dancing_counters 5.03
+  Dancing from Dark to Dawn     spread  damage 68.28  bristly_counters 0.00  bristly_activations 0.00  dancing_counters 4.98
+                                        damage spread - focus +0.40 ±0.06

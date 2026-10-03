@@ -1191,16 +1191,21 @@ class AzusaGame(BaseGame):
         landfall, Dancing from Dark to Dawn's cast trigger. A POLICY, and
         `counter_target` (cfg) chooses between two (§0z101):
 
+            "spread"  THE DEFAULT. Mossborn Hydra; else the SMALLEST creature,
+                    ties to the one with fewer counters. The owner's
+                    (2026-10-03): one enormous creature does little without
+                    evasion, and in this model the pod chump-blocks the BIGGEST
+                    attackers (§0v), so a counter on a small body is power that
+                    connects -- and it leaves more creatures carrying counters
+                    for Bill's doubling. MEASURED BETTER, paired on the same
+                    seeds (diagnostics/run_counter_spread.py): spread minus
+                    focus is +0.0105 +-0.0021 at T20 with Bristly Bill and
+                    +0.0039 +-0.0015 with Dancing from Dark to Dawn, with the
+                    same number of counters placed -- the gain is WHERE they go.
           "focus"   Mossborn Hydra; else an EVASIVE creature (flying or
                     trample right now), so a chump block does not soak the
-                    counter; else the highest power. The first rule written.
-          "spread"  Mossborn Hydra; else the SMALLEST creature, ties to the
-                    one with fewer counters. The owner's (2026-10-03): one
-                    enormous creature does little without evasion, and in this
-                    model the pod chump-blocks the BIGGEST attackers (§0v), so
-                    a counter on a small body is power that connects -- and it
-                    leaves more creatures carrying counters for Bill's
-                    doubling.
+                    counter; else the highest power. The first rule written,
+                    kept so the comparison reproduces.
 
         Mossborn Hydra is first under both, because a counter there is
         DOUBLED by its own trigger on every later land; it is the one target
@@ -1218,7 +1223,7 @@ class AzusaGame(BaseGame):
         hydra = [p for p in mine if p.card.name == "Mossborn Hydra"]
         if hydra:
             return hydra[0]
-        if self.cfg.get("counter_target", "focus") == "spread":
+        if self.cfg.get("counter_target", "spread") == "spread":
             return min(mine, key=lambda p: (self.power_of(p), p.counters))
         return max(mine, key=lambda p: (
             OPP.flying_of(self, p) or OPP.trample_of(self, p),

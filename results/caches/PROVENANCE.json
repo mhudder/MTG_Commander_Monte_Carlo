@@ -289,6 +289,12 @@
         "evidence": "\u00a70z101: the counter_target knob (focus/spread) in azusa.counter_target, read only by Bristly Bill and Dancing from Dark to Dawn, neither in any list. check_unchanged_decks --n=3000 against a worktree at 5dcd8e2 (the commit before the knob): all seven decks BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "d54f7595358c9575",
         "utc": "2026-10-03T02:40:51Z"
+      },
+      {
+        "commit": "59af4f2",
+        "evidence": "\u00a70z101: counter_target's default flipped from focus to spread (measured better, results/counter_spread.txt); read only by Bristly Bill and Dancing from Dark to Dawn, neither in any list. check_unchanged_decks --n=3000 against a worktree at 59af4f2: all seven decks BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "2ea74d5c9b387f7e",
+        "utc": "2026-10-03T02:49:22Z"
       }
     ]
   },

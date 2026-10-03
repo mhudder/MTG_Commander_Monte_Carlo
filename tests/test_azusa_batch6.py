@@ -37,7 +37,7 @@ CASES
   P  ... twice per land with Greenwarden
   Q  Bristly Bill's counter lands BEFORE the Hydra doubles
   R  a Springheart copy of the Hydra made by a land is not doubled by it
-  S  counter_target: evasive beats power, and the Hydra beats both
+  S  counter_target="focus": evasive beats power, the Hydra beats both
   T  Bill's activation doubles every creature's counters, precombat
   U  ... and is not taken below `bristly_min_counters`
   V  Avenger of Zendikar pumps Bristly Bill, who is a Plant
@@ -282,14 +282,14 @@ def run_cases():
           "by it", (h.counters, [p.counters for p in copies]), (4, [1]))
 
     # ---- Bristly Bill, Spine Sower ----------------------------------------
-    g = fresh()
+    g = fresh(counter_target="focus")
     put(g, M.BRISTLY_BILL)
     put(g, named("Kozilek, Butcher of Truth"))
     put(g, named("Rampaging Baloths"))
     first = g.counter_target().card.name
     put(g, M.MOSSBORN_HYDRA)
     second = g.counter_target().card.name
-    check("S counter_target: evasive beats power, the Hydra beats both",
+    check("S counter_target='focus': evasive beats power, the Hydra beats both",
           (first, second), ("Rampaging Baloths", "Mossborn Hydra"))
 
     g = fresh()
@@ -312,7 +312,11 @@ def run_cases():
     check("U ... and is not taken below bristly_min_counters",
           (a.counters, g.m["bristly_activations"]), (1, 0))
 
-    g = fresh()
+    # "focus" so Bill's OWN counter goes to the 5/5 Avenger and this case
+    # pins Avenger's half alone. Under the default "spread" Bill, the smallest
+    # creature, takes his own counter as well -- V failed exactly that way the
+    # day the default flipped, which is the policy working, not Avenger.
+    g = fresh(counter_target="focus")
     put(g, named("Avenger of Zendikar"))
     bill = put(g, M.BRISTLY_BILL)
     landfall(g, 1)

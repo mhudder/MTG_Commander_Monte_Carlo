@@ -2775,6 +2775,53 @@ SIMULATED: list[Simulated] = [
         notes=('Goldspan is STAGED against Blasphemous Act instead (§0z69); '
                'in Caldera Pyremaw\'s slot it loses, -0.0091 at T20.'),
     ),
+    # AZUSA BATCH 6 (§0z101), 2026-10-03. The real swap against the OWNER'S
+    # NAMED CUT, Wayward Swordtooth, N=15,000 paired, seeds 5000.., T10 read off
+    # the T20 game. All seven cut the same card, so these rows share a baseline
+    # and §0c forbids ranking them by their bars; each is a decision against
+    # Swordtooth, and none is taken.
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Elfsworn Giant',
+        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
+        result='REAL SWAP -Wayward Swordtooth +Elfsworn Giant, N=15,000 paired: +0.0033 +-0.0023 (significant) at T10 and +0.0121 +-0.0035 (significant) at T20; damage +0.95 +-0.21.',
+        notes='4.0 Elf Warriors a game. 1/1s are the thinnest payoff of the seven: the same slot, cards and seeds give Chocobo Racetrack more than twice the T20 number.',
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Chocobo Racetrack',
+        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
+        result='REAL SWAP -Wayward Swordtooth +Chocobo Racetrack, N=15,000 paired: +0.0134 +-0.0026 (significant) at T10 and +0.0276 +-0.0038 (significant) at T20; damage +2.15 +-0.24.',
+        notes="3.6 Birds and 39.7 Bird pumps a game: each Bird's own landfall trigger is most of the card. Zendikar's Roil with tokens that grow.",
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Dancing from Dark to Dawn',
+        measured='2026-10-03', source='results/counter_spread.txt',
+        result="REAL SWAP -Wayward Swordtooth +Dancing from Dark to Dawn, N=15,000 paired: +0.0078 +-0.0024 (significant) at T10 and +0.0245 +-0.0038 (significant) at T20 under counter_target='spread', the default.",
+        notes="3.9 Bears and 5.0 cast-trigger counters a game. Under the first policy, 'focus', it was +0.0066 +-0.0024 / +0.0206 +-0.0037 (results/azusa_batch6_h2h.txt); spread minus focus is +0.0039 +-0.0015 at T20, paired on the same seeds.",
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Mole Man, Moloid Master',
+        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
+        result='REAL SWAP -Wayward Swordtooth +Mole Man, Moloid Master, N=15,000 paired: +0.0275 +-0.0031 (significant) at T10 and +0.0352 +-0.0041 (significant) at T20; damage +3.29 +-0.28.',
+        notes='THE ONLY ONE OF THE SEVEN THAT RAISES lands_played (+0.37) despite cutting a land drop: 3.83 lands a game from the graveyard, most of them fetch lands replayed and cracked again. A second Crucible of Worlds on a body that makes a Moloid per landfall -- and the graveyard half is a boolean shared with Crucible, Ramunap and Greenwarden, so this number includes the games where it duplicates them.',
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Mossborn Hydra',
+        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
+        result='REAL SWAP -Wayward Swordtooth +Mossborn Hydra, N=15,000 paired: +0.0315 +-0.0031 (significant) at T10 and +0.0304 +-0.0039 (significant) at T20; damage +3.06 +-0.25.',
+        notes='4.2 doublings a game. The strongest T10 row of the seven for a three-drop: it is a trampler, so the counters it doubles get through the chump blocks that blunt the other big bodies.',
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Bristly Bill, Spine Sower',
+        measured='2026-10-03', source='results/counter_spread.txt',
+        result="REAL SWAP -Wayward Swordtooth +Bristly Bill, Spine Sower, N=15,000 paired: +0.0098 +-0.0024 (significant) at T10 and +0.0113 +-0.0035 (significant) at T20 under counter_target='spread', the default.",
+        notes="Under the first policy, 'focus' (counters on an evasive or the biggest creature), it was +0.0011 +-0.0023 / +0.0009 +-0.0035, INSIDE ITS BAR (results/azusa_batch6_h2h.txt). The owner predicted the fix: one huge creature does little without evasion, and the pod chump-blocks the biggest attackers. Spread minus focus is +0.0105 +-0.0021 at T20, paired, with the same number of counters placed (4.0 against 4.2 a game) -- the policy, not the card, was the gap.",
+    ),
+    Simulated(
+        deck='azusa', remove='Wayward Swordtooth', add='Glacier Godmaw',
+        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
+        result='REAL SWAP -Wayward Swordtooth +Glacier Godmaw, N=15,000 paired: +0.0228 +-0.0030 (significant) at T10 and +0.0265 +-0.0042 (significant) at T20; damage +2.34 +-0.26.',
+        notes='17 summoning-sick creatures a game attack because of its haste -- the landfall tokens made this turn. The Lander is a footnote (0.14 cracked a game). A seven-drop, so P(cast) is the lowest of the seven (0.260).',
+    ),
 ]
 
 
