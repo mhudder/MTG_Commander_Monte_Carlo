@@ -1,0 +1,34 @@
+azusa batch 6: -Wayward Swordtooth +X, the real swap. N=15,000 paired per card, seeds 5000.., base = build_pending('azusa'), one T20 run per swap with T10 read off the same game (§0z93).
+POSITIVE = the swap gains. * = the 95% CI excludes zero.
+
+  card                                   win T10           win T20      damage T20  P(cast)
+  Elfsworn Giant                +0.0033 ±0.0023*  +0.0121 ±0.0035*    +0.95 ±0.21     0.271
+  Chocobo Racetrack             +0.0134 ±0.0026*  +0.0276 ±0.0038*    +2.15 ±0.24     0.273
+  Dancing from Dark to Dawn     +0.0066 ±0.0024*  +0.0206 ±0.0037*    +1.77 ±0.22     0.273
+  Mole Man, Moloid Master       +0.0275 ±0.0031*  +0.0352 ±0.0041*    +3.29 ±0.28     0.287
+  Mossborn Hydra                +0.0315 ±0.0031*  +0.0304 ±0.0039*    +3.06 ±0.25     0.284
+  Bristly Bill, Spine Sower     +0.0011 ±0.0023   +0.0009 ±0.0035     +0.19 ±0.20     0.301
+  Glacier Godmaw                +0.0228 ±0.0030*  +0.0265 ±0.0042*    +2.34 ±0.26     0.260
+
+mechanism, T20 (B minus A for the shared counters; the card's own counters are B-leg means per game):
+  Elfsworn Giant
+      landfall_triggers -0.48±0.06  lands_played -0.34±0.04  cards_drawn -0.30±0.08  final_life +0.21±0.17
+      own: elfsworn_tokens 3.99
+  Chocobo Racetrack
+      landfall_triggers -0.83±0.07  lands_played -0.54±0.04  cards_drawn -0.63±0.08  final_life +0.57±0.18
+      own: racetrack_birds 3.64  racetrack_pumps 39.74
+  Dancing from Dark to Dawn
+      landfall_triggers -0.68±0.06  lands_played -0.44±0.04  cards_drawn -0.50±0.08  final_life +0.38±0.18
+      own: dancing_bears 3.86  dancing_counters 5.03
+  Mole Man, Moloid Master
+      landfall_triggers +0.83±0.09  lands_played +0.37±0.05  cards_drawn -0.08±0.10  final_life +1.09±0.16
+      own: moloids_made 5.60  moloid_mills 1.08  lands_from_graveyard 3.83
+  Mossborn Hydra
+      landfall_triggers -1.04±0.07  lands_played -0.69±0.04  cards_drawn -0.90±0.08  final_life +0.22±0.13
+      own: mossborn_doublings 4.20
+  Bristly Bill, Spine Sower
+      landfall_triggers -0.43±0.06  lands_played -0.30±0.04  cards_drawn -0.27±0.08  final_life -0.12±0.17
+      own: bristly_counters 4.16  bristly_activations 0.64
+  Glacier Godmaw
+      landfall_triggers -0.75±0.07  lands_played -0.58±0.04  cards_drawn -0.85±0.10  final_life +0.52±0.22
+      own: godmaw_pumps 2.55  godmaw_hasted 17.03  landers_cracked 0.14

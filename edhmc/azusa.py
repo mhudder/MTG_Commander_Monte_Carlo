@@ -1188,14 +1188,23 @@ class AzusaGame(BaseGame):
 
     def counter_target(self):
         """Where a "+1/+1 counter on target creature" goes -- Bristly Bill's
-        landfall, Dancing from Dark to Dawn's cast trigger. A POLICY, stated
-        because it is one (§0z101):
+        landfall, Dancing from Dark to Dawn's cast trigger. A POLICY, and
+        `counter_target` (cfg) chooses between two (§0z101):
 
-          1. Mossborn Hydra, whose own trigger then DOUBLES the counter --
-             `_landfall_last` orders the doubling after the counter.
-          2. Otherwise an EVASIVE creature (flying or trample right now), so
-             the counter is not the one a chump block soaks.
-          3. Otherwise the highest power.
+          "focus"   Mossborn Hydra; else an EVASIVE creature (flying or
+                    trample right now), so a chump block does not soak the
+                    counter; else the highest power. The first rule written.
+          "spread"  Mossborn Hydra; else the SMALLEST creature, ties to the
+                    one with fewer counters. The owner's (2026-10-03): one
+                    enormous creature does little without evasion, and in this
+                    model the pod chump-blocks the BIGGEST attackers (§0v), so
+                    a counter on a small body is power that connects -- and it
+                    leaves more creatures carrying counters for Bill's
+                    doubling.
+
+        Mossborn Hydra is first under both, because a counter there is
+        DOUBLED by its own trigger on every later land; it is the one target
+        whose value is not "one more power".
 
         Creatures only, never a land: a counter on an animated land outlives
         the animation and does nothing while it is a land. None if you control
@@ -1206,8 +1215,12 @@ class AzusaGame(BaseGame):
                 if p.card.is_creature and not p.card.is_land]
         if not mine:
             return None
+        hydra = [p for p in mine if p.card.name == "Mossborn Hydra"]
+        if hydra:
+            return hydra[0]
+        if self.cfg.get("counter_target", "focus") == "spread":
+            return min(mine, key=lambda p: (self.power_of(p), p.counters))
         return max(mine, key=lambda p: (
-            p.card.name == "Mossborn Hydra",
             OPP.flying_of(self, p) or OPP.trample_of(self, p),
             self.power_of(p)))
 

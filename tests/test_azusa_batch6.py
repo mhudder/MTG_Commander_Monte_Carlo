@@ -2,7 +2,7 @@
 """Pin the seven landfall payoffs of azusa batch 6 (2026-10-03, §0z101).
 
     python -m tests.test_azusa_batch6
-    python -m tests.test_azusa_batch6 --mutate   # 7 mutations, exact sets
+    python -m tests.test_azusa_batch6 --mutate   # 8 mutations, exact sets
 
 The batch-3/4 shape: put the permanent on the battlefield, fire the trigger,
 assert the printed effect. One case per clause, plus the ORDER and SNAPSHOT
@@ -48,6 +48,7 @@ CASES
   AA a +1/+1 counter on a */* card adds to its land count
   AB the land-enabler check reads `_landfall_payoffs` now
   AC the 0/0 check accepts Mossborn Hydra (it enters with a counter)
+  AD counter_target="spread": the smallest creature, and the Hydra still first
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   ENTERS_WITH_COUNTERS is empty              -> N, O, P, Q, R, AC
@@ -57,6 +58,8 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   PLANT is empty                             -> V
   creature_spell_cast does nothing           -> H
   yard_land_access forgets Mole Man          -> J, L
+  counter_target ignores its policy knob     -> AD   (added with AD, before
+                                                     its first run)
 
 TWO OF THESE SETS WERE WRONG ON THE FIRST RUN, and the error is recorded
 rather than edited away: both mutations that WRAP `_landfall_payoffs` also
@@ -378,6 +381,17 @@ def run_cases():
         ok = False
     check("AC the 0/0 check accepts Mossborn Hydra", ok, True)
 
+    g = fresh(counter_target="spread")
+    put(g, M.BRISTLY_BILL)
+    put(g, named("Kozilek, Butcher of Truth"))
+    put(g, named("Rampaging Baloths"))
+    small = put(g, M.MOLE_MAN)               # 1/1, the smallest
+    first = g.counter_target() is small
+    put(g, M.MOSSBORN_HYDRA)
+    second = g.counter_target().card.name
+    check("AD counter_target='spread': the smallest creature, the Hydra first",
+          (first, second), (True, "Mossborn Hydra"))
+
     return set(FAIL)
 
 
@@ -434,6 +448,19 @@ def yard_without_mole_man(self):
             or self.has("Walk-In Closet // Forgotten Cellar"))
 
 
+def focus_only(self):
+    mine = [p for p in self.board
+            if p.card.is_creature and not p.card.is_land]
+    if not mine:
+        return None
+    hydra = [p for p in mine if p.card.name == "Mossborn Hydra"]
+    if hydra:
+        return hydra[0]
+    return max(mine, key=lambda p: (
+        AZ.OPP.flying_of(self, p) or AZ.OPP.trample_of(self, p),
+        self.power_of(p)))
+
+
 MUTATIONS = {
     "ENTERS_WITH_COUNTERS is empty":
         ({"N", "O", "P", "Q", "R", "AC"},
@@ -454,6 +481,8 @@ MUTATIONS = {
         ({"H"}, [(AzusaGame, "creature_spell_cast", lambda self, c: None)]),
     "yard_land_access forgets Mole Man":
         ({"J", "L"}, [(AzusaGame, "yard_land_access", yard_without_mole_man)]),
+    "counter_target ignores its policy knob":
+        ({"AD"}, [(AzusaGame, "counter_target", focus_only)]),
 }
 
 
