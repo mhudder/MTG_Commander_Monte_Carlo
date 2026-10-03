@@ -114,8 +114,15 @@ CREATURES = [
       priority=7.5, threat=7.5, tags=("Legendary",)),
     C("Ulamog, the Infinite Gyre", "Creature", {"gen": 11}, 10, 10,
       priority=7, threat=9.5, tags=("Legendary",)),
-    C("Wayward Swordtooth", "Creature", {"gen": 2, "G": 1}, 5, 5,
-      priority=6, threat=6.0),
+    # CUT 2026-10-03 for Mole Man, Moloid Master, into Wayward Swordtooth's
+    # EXACT list position (the head-to-head swapped it in place): the owner's
+    # decision on §0z101's evidence. Swordtooth's row was +0.0032 +-0.0030,
+    # inside its bar -- the deck is short of LANDS to play, not of permission
+    # (§0z99) -- and Mole Man is the one card of batch 6 that adds land
+    # SUPPLY: REAL SWAP +0.0275 +-0.0031 at T10, +0.0352 +-0.0041 at T20.
+    # The same Card as MOLE_MAN below; `_check_mole_man` holds them equal.
+    C("Mole Man, Moloid Master", "Creature", {"gen": 2, "G": 1}, 1, 1,
+      priority=7.5, threat=5.0, tags=("Legendary",)),
     C("Woodland Bellower", "Creature", {"gen": 4, "G": 2}, 6, 5,
       priority=6.5, threat=7.0),
     # CUT 2026-09-22 for Traveling Chocobo: Yavimaya Elder was +0.0023
@@ -807,3 +814,17 @@ AUTUMN_WILLOW_HARMONY = C("Autumn Willow, Harmony", "Creature",
                           {"gen": 3, "G": 2}, 3, 3, priority=7.5, threat=6.0)
 
 MBC_CANDIDATES = (AUTUMN_WILLOW_HARMONY,)
+
+
+def _check_mole_man():
+    """The list's Mole Man and the catalog's MOLE_MAN are ONE card written
+    twice (the list cannot reference a constant defined below it). Two copies
+    of one card drift -- CLAUDE.md, "the same rule, implemented twice" -- so
+    they are compared field for field at import."""
+    listed = next(c for c in build()[0] if c.name == MOLE_MAN.name)
+    if listed != MOLE_MAN:
+        raise AssertionError("azusa_v1: the deck list's Mole Man differs from "
+                             "MOLE_MAN; they are the same card")
+
+
+_check_mole_man()

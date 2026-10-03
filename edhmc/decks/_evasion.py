@@ -879,7 +879,6 @@ SCANNED = {
     'Wasteland',
     'Watery Grave',
     "Wayfarer's Bauble",
-    'Wayward Swordtooth',
     'Well of Lost Dreams',
     'Whip of Erebos',
     'Windswept Heath',

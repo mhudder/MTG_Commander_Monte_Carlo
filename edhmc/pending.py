@@ -807,6 +807,32 @@ COMMITTED: list[Change] = [
             "--verified. AZUSA HAS NO .xlsx: committing this is two legs, the "
             "module and this ledger."),
     ),
+    # COMMITTED 2026-10-03 to edhmc/decks/azusa_v1.py, into Wayward
+    # Swordtooth's EXACT list position, so the committed list is index-for-
+    # index the one the head-to-head measured. Azusa has no .xlsx: two legs.
+    # Its MEASURED row (+0.0363 +-0.0042 at T20 against a blank) and its
+    # SIMULATED head-to-head moved here on commit (check_measured_are_
+    # promotable; check_simulated rule 3). The azusa table is rebuilt in the
+    # same change, since this rewrites the list every cached row was measured
+    # against.
+    Change(
+        deck="azusa", remove="Wayward Swordtooth", add="Mole Man, Moloid Master",
+        staged="2026-10-03",
+        rationale=(
+            "THE OWNER'S DECISION (2026-10-03), on §0z101's evidence. "
+            "'You may play lands from your graveyard' plus a 1/1 Moloid per "
+            "landfall: a second Crucible of Worlds on a token maker, and the "
+            "only one of batch 6's seven landfall payoffs that adds land "
+            "SUPPLY -- 3.83 lands a game from the graveyard, lands_played "
+            "+0.62 -- which is the constraint §0z99 named (the deck is short of "
+            "lands to play, not of permission). THE CUT IS THE OWNER'S: "
+            "Wayward Swordtooth ablated to +0.0032 +-0.0030, inside its bar, "
+            "and the swap and the blank row agree to 0.004 for every card in "
+            "the batch because the cut is worth nothing. Exploration stays: "
+            "the owner expects its extra drop to grow with land recursion, and "
+            "the rebuilt table re-measures it with Mole Man in the list."),
+        evidence="REAL SWAP -Wayward Swordtooth +Mole Man, Moloid Master, N=15,000 paired: +0.0275 +-0.0031 (significant) at T10 and +0.0352 +-0.0041 (significant) at T20; damage +3.29 +-0.28. THE ONLY ONE OF THE SEVEN THAT RAISES lands_played (+0.37) despite cutting a land drop: 3.83 lands a game from the graveyard, most of them fetch lands replayed and cracked again. A second Crucible of Worlds on a body that makes a Moloid per landfall -- and the graveyard half is a boolean shared with Crucible, Ramunap and Greenwarden, so this number includes the games where it duplicates them.",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -844,14 +870,6 @@ MEASURED: list[Candidate] = [
         evidence='damage +2.81 +-0.22, P(deploy) 0.271, 3.9 Bears and 5.0 cast-trigger counters a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0078 / +0.0245 under spread (focus: +0.0066 / +0.0206).',
         limits="The row READS A POLICY: where the counters go is `counter_target`, 'spread' by default since §0z101 (spread minus focus +0.0039 +-0.0015 at T20).",
         verdict='Roil-plus: +0.007 over the Roil anchor in the same slot, which is the cast trigger.',
-    ),
-    Candidate(
-        deck='azusa', card='Mole Man, Moloid Master', measured='2026-10-03',
-        win_rate='+0.0363 +-0.0042 at T20 (N=15,000 paired)', signal='both',
-        rationale='Lands from the graveyard and a Moloid per landfall: a second Crucible of Worlds on a token maker.',
-        evidence='damage +3.59 +-0.29, P(deploy) 0.284, landfall_triggers +1.11, lands_played +0.62 -- the only card in the batch that RAISES both. 3.83 lands a game from the graveyard, mostly fetch lands replayed and cracked again; 5.6 Moloids, 1.1 mills a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0275 / +0.0352.',
-        limits='The graveyard clause is a BOOLEAN shared with Crucible of Worlds, Ramunap Excavator and Ancient Greenwarden, so it adds nothing in games where one of them is out; the Moloid mill is a stated policy (`moloid_mill_floor`).',
-        verdict="The batch's largest T20 row, and it attacks the constraint §0z99 named -- the deck is short of lands to play -- rather than adding another payoff on the same supply.",
     ),
     Candidate(
         deck='azusa', card='Mossborn Hydra', measured='2026-10-03',
@@ -1865,9 +1883,15 @@ MEASURED: list[Candidate] = [
             "the batch, and it attacks the deck's OWN measured weakness -- "
             "this list is card-limited, not mana-limited, and this is the only "
             "one of the six that adds a card every turn. "
-            "SHORTLISTED 2026-09-14 for review, NOT decided."
+            "SHORTLISTED 2026-09-14 for review, NOT decided. THE PROPOSED "
+            "CUT MOVED 2026-10-03: it was Wayward Swordtooth, which the owner "
+            "committed out for Mole Man (§0z101). Titania, Protector of "
+            "Argoth is the next MODEL-EVALUATED row at the bottom of the table "
+            "(+0.0015 +-0.0031, inside its bar) once Exploration -- which the "
+            "owner is keeping -- is set aside. Still a proposal, never "
+            "measured as a swap."
         ),
-        proposed_cut="Wayward Swordtooth",
+        proposed_cut="Titania, Protector of Argoth",
     ),
     Candidate(
         deck="azusa",
@@ -2864,12 +2888,6 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-03', source='results/counter_spread.txt',
         result="REAL SWAP -Wayward Swordtooth +Dancing from Dark to Dawn, N=15,000 paired: +0.0078 +-0.0024 (significant) at T10 and +0.0245 +-0.0038 (significant) at T20 under counter_target='spread', the default.",
         notes="3.9 Bears and 5.0 cast-trigger counters a game. Under the first policy, 'focus', it was +0.0066 +-0.0024 / +0.0206 +-0.0037 (results/azusa_batch6_h2h.txt); spread minus focus is +0.0039 +-0.0015 at T20, paired on the same seeds.",
-    ),
-    Simulated(
-        deck='azusa', remove='Wayward Swordtooth', add='Mole Man, Moloid Master',
-        measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
-        result='REAL SWAP -Wayward Swordtooth +Mole Man, Moloid Master, N=15,000 paired: +0.0275 +-0.0031 (significant) at T10 and +0.0352 +-0.0041 (significant) at T20; damage +3.29 +-0.28.',
-        notes='THE ONLY ONE OF THE SEVEN THAT RAISES lands_played (+0.37) despite cutting a land drop: 3.83 lands a game from the graveyard, most of them fetch lands replayed and cracked again. A second Crucible of Worlds on a body that makes a Moloid per landfall -- and the graveyard half is a boolean shared with Crucible, Ramunap and Greenwarden, so this number includes the games where it duplicates them.',
     ),
     Simulated(
         deck='azusa', remove='Wayward Swordtooth', add='Mossborn Hydra',

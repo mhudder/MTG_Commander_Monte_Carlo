@@ -150,6 +150,7 @@ Methodology that used to live at the end of this file is now
 | [0z99](#0z99) | MEASURED | **Group ablations for all seven decks** (58 groups): most functional groups are ADDITIVE -- their rows sum to what the group is worth. Two are not, both redundancy: azusa's four landfall creatures (+0.1950 together against +0.1405 summed, T20) and karlov's five gain->drain cards (+0.1386 against +0.1073). Lorehold's three wipes cost +0.033 at T10 together; shilgengar's sac outlets and rendmaw's are worth nothing even as a pair; tivit's extra-vote pair is no longer a redundancy trap |
 | [0z100](#0z100) | MEASURED | **The returns curves, and the id fix finished.** Every subset of azusa's four landfall creatures and karlov's five gain->drain cards: returns DIMINISH smoothly, each copy worth about 0.8-0.9 of the one before (azusa +0.066, +0.052, +0.042, +0.035 at T20; karlov +0.035 ... +0.022). The curve's first run missed its own check by a game and found six more id-keyed sites, so the engine now holds every Card and Permanent made in a game (`begin_game`). Azusa's table rebuilt |
 | [0z101](#0z101) | MEASURED | **Azusa batch 6: seven landfall payoffs against Wayward Swordtooth.** All seven swaps significant at T20; top set Mole Man (+0.0352), Mossborn Hydra (+0.0304), Chocobo Racetrack (+0.0276), Glacier Godmaw (+0.0265). The cut is worth nothing. **Spreading counters beats focusing them** (+0.0105 ±0.0021 for Bristly Bill, the owner's call) and is the default. Three gaps on the way: Zendikar's Roil was never in LAND_ENABLERS, counters on a */* card were discarded, Avenger pumped only Plant tokens |
+| [0z102](#0z102) | COMMITTED | **-Wayward Swordtooth +Mole Man, Moloid Master (azusa), the owner's call.** Rebuilt table: Mole Man +0.0384 ±0.0042, second in the deck. Four rows fell beyond their bars, three of them Mole Man's own role -- Ancient Greenwarden, Crucible of Worlds (graveyard lands) and Journey of Discovery (land supply) -- §0z27's redundancy shape. Exploration did NOT rise (+0.0021 -> +0.0026 ±0.0030). Titania (+0.0004) is the weakest MODEL-EVALUATED row |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9208,6 +9209,64 @@ was a floor by about a third of its own value.
 Nothing is staged: these are SIMULATED head-to-heads and MEASURED rows with
 no decision attached, and Wayward Swordtooth stays in the list until the
 owner decides.
+
+## 0z102. COMMITTED — -Wayward Swordtooth +Mole Man, Moloid Master (azusa)
+
+**THE OWNER'S DECISION (2026-10-03)**, on §0z101's evidence: the real swap
+was +0.0275 ±0.0031 at T10 and +0.0352 ±0.0041 at T20, and Swordtooth's own
+row was inside its bar. Two legs, one commit (azusa has no `.xlsx`): Mole Man
+takes Swordtooth's EXACT list position in `edhmc/decks/azusa_v1.py` (as
+Chocobo took Yavimaya Elder's), and the ledger's COMMITTED entry carries the
+head-to-head as its evidence -- its MEASURED row and SIMULATED record moved
+there, as `check_measured_are_promotable` and `check_simulated` require. The
+inline card and the catalog's `MOLE_MAN` are compared at import
+(`_check_mole_man`), since they are one card written twice. Classified
+SCRIPTED. **Exploration stays, the owner's call**: its extra drop should grow
+as land recursion grows, and this rebuild is that test.
+
+**THE LEDGER CAUGHT A DANGLING PROPOSAL.** Nissa, Resurgent Animist is
+shortlisted with Swordtooth as her proposed cut, so the commit failed
+`check_shortlist_is_answerable`. The proposal moved to Titania, Protector of
+Argoth, the next MODEL-EVALUATED row at the bottom once Exploration is set
+aside -- still a proposal, never a measured swap. The six other batch-6
+head-to-heads keep Swordtooth as their cut: they are the record of what was
+measured, and the cut no longer exists.
+
+**THE REBUILT TABLE** (N=15,000; `results/ablation_azusa.txt`). Mole Man is
+**+0.0384 ±0.0042**, second only to Scute Swarm. Four rows fell beyond their
+old bars, all DOWN:
+
+| card | before | after | why |
+|---|---|---|---|
+| Ancient Greenwarden | +0.0292 | +0.0249 | "play lands from your graveyard" -- now one of four sources |
+| Genesis Wave | +0.0279 | +0.0238 | not explained (no clause shared with Mole Man) |
+| Crucible of Worlds | +0.0117 | +0.0083 | the same graveyard permission, now covered by Mole Man |
+| Journey of Discovery | +0.0122 | +0.0093 | land SUPPLY, which Mole Man now adds |
+
+Three of the four are §0z27's shape: adding a card that DUPLICATES a role
+lowers the rows of every card it duplicates, because each is now covered
+when it is missing. **Their lower rows are not evidence those cards got
+worse** -- Crucible's +0.0083 is the price of cutting IT with Mole Man in, and
+the graveyard-land package (Crucible, Ramunap, Greenwarden, Mole Man) must be
+ablated together before any one of them is read as weak. Genesis Wave has no
+shared clause; it fell by a bar's width and is reported, not explained.
+
+**EXPLORATION DID NOT RISE.** +0.0021 -> +0.0026 ±0.0030, inside its own bar
+before and after. With Mole Man in the list the second extra drop still rarely
+binds -- Azusa grants two already -- so the land recursion the owner expected
+to feed it is being played through the drops the deck already has. The test
+is one rebuild old; a group or head-to-head would sharpen it.
+
+**THE BOTTOM OF THE TABLE** (MODEL-EVALUATED only -- the blind rows are not
+evidence): Titania, Protector of Argoth +0.0004 ±0.0031 (down from +0.0015),
+Exploration +0.0026, Life from the Loam +0.0039 ±0.0024, Sylvan Awakening
++0.0049 ±0.0015. The rest of the bottom eleven are MODEL-BLIND or PARTLY
+modelled (Sylvan Library, Crop Rotation, Quirion Ranger, Hall of Gemstone,
+Bane of Progress, ...), which measures the model, not the cards.
+
+**OTHER DECKS.** `_evasion.py` and `_removal.py` regenerated from Scryfall: only
+their scanned-name lists changed. All six other decks bit-identical at 3,000
+games against fd2ccd9; their caches VERIFIED.
 
 ## How to read an ablation table
 

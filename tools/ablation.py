@@ -521,10 +521,13 @@ SCRIPTED_AZUSA = {
     # Fetches crack for a land, which is a landfall trigger and a shuffle
     # drawn from a pre-rolled stream so CRN survives (engine.CRNStreams).
     "Terramorphic Expanse", "Windswept Heath", "Wooded Foothills",
-    # extra land drops
-    "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
+    # extra land drops (Wayward Swordtooth CUT 2026-10-03 for Mole Man)
+    "Exploration", "Oracle of Mul Daya",
     # landfall payoffs
     "Avenger of Zendikar", "Courser of Kruphix", "Lotus Cobra",
+    # lands from the graveyard and a Moloid per landfall, all of it modelled
+    # (§0z101's table: nothing unmodelled); committed 2026-10-03
+    "Mole Man, Moloid Master",
     "Rampaging Baloths", "Scute Swarm", "Tireless Provisioner",
     "Tireless Tracker", "Titania, Protector of Argoth", "Seer's Sundial",
     "Horn of Greed",
