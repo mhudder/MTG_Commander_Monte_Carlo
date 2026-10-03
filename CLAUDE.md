@@ -255,6 +255,7 @@ asserting a card does nothing:
 | combat sent the whole swing at one player | going wider than one opponent's life is worthless | 0.063 (azusa) |
 | once decking could lose, the pilot still drew every card it was offered | a draw engine kills you in exactly the games it is winning | 0.022 (azusa), caught before it shipped (§0z42) |
 | every untapped creature attacked, and mana creatures were tapped last | Twitching Doll's nest counters never accrue (0.03 a game) | 0.009 (rendmaw, §0z58) |
+| every "+1/+1 counter on target creature" went on the biggest or an evasive creature | stacking power on one body is as good as spreading it, in a pod that chump-blocks the biggest attacker | 0.0105 (Bristly Bill, azusa, §0z101) -- the owner's call, caught before it shipped |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a

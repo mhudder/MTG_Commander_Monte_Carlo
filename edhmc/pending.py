@@ -819,6 +819,64 @@ COMMITTED: list[Change] = [
 # against anything else measured the same way (§0c).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = [
+    # AZUSA BATCH 6 (§0z101), measured 2026-10-03: value over a blank in the
+    # Sylvan Library slot (azusa3/4/5's), results/candidates_azusa_batch6_T20.txt.
+    # The real swaps against Wayward Swordtooth are SIMULATED entries.
+    Candidate(
+        deck='azusa', card='Elfsworn Giant', measured='2026-10-03',
+        win_rate='+0.0083 +-0.0031 at T20 (N=15,000 paired)', signal='both',
+        rationale='A token per landfall on a 5/3, the Rampaging Baloths shape at 1/1.',
+        evidence='damage +1.15 +-0.19, P(deploy) 0.266, 4.0 Elf Warriors a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0033 / +0.0121.',
+        limits='REACH is not modelled (blockers are a count, §4): the row is the body and the tokens.',
+        verdict='The weakest token maker in the batch: 1/1s are the thinnest landfall payoff, and Chocobo Racetrack in the same slot is more than three times the row.',
+    ),
+    Candidate(
+        deck='azusa', card='Chocobo Racetrack', measured='2026-10-03',
+        win_rate='+0.0283 +-0.0035 at T20 (N=15,000 paired)', signal='both',
+        rationale="Zendikar's Roil with tokens that grow: each Bird +1/+0 per later land that turn.",
+        evidence='damage +2.77 +-0.23, P(deploy) 0.271, 3.6 Birds and 39.7 Bird pumps a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0134 / +0.0276.',
+        verdict="A member of the batch's top set (with Mole Man, Mossborn Hydra and Glacier Godmaw); the Roil anchor in the same slot is +0.0179, so the Birds' own trigger is worth about +0.010.",
+    ),
+    Candidate(
+        deck='azusa', card='Dancing from Dark to Dawn', measured='2026-10-03',
+        win_rate="+0.0251 +-0.0035 at T20 (N=15,000 paired), counter_target='spread'", signal='both',
+        rationale="Zendikar's Roil plus MV counters on a creature for every creature spell cast.",
+        evidence='damage +2.81 +-0.22, P(deploy) 0.271, 3.9 Bears and 5.0 cast-trigger counters a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0078 / +0.0245 under spread (focus: +0.0066 / +0.0206).',
+        limits="The row READS A POLICY: where the counters go is `counter_target`, 'spread' by default since §0z101 (spread minus focus +0.0039 +-0.0015 at T20).",
+        verdict='Roil-plus: +0.007 over the Roil anchor in the same slot, which is the cast trigger.',
+    ),
+    Candidate(
+        deck='azusa', card='Mole Man, Moloid Master', measured='2026-10-03',
+        win_rate='+0.0363 +-0.0042 at T20 (N=15,000 paired)', signal='both',
+        rationale='Lands from the graveyard and a Moloid per landfall: a second Crucible of Worlds on a token maker.',
+        evidence='damage +3.59 +-0.29, P(deploy) 0.284, landfall_triggers +1.11, lands_played +0.62 -- the only card in the batch that RAISES both. 3.83 lands a game from the graveyard, mostly fetch lands replayed and cracked again; 5.6 Moloids, 1.1 mills a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0275 / +0.0352.',
+        limits='The graveyard clause is a BOOLEAN shared with Crucible of Worlds, Ramunap Excavator and Ancient Greenwarden, so it adds nothing in games where one of them is out; the Moloid mill is a stated policy (`moloid_mill_floor`).',
+        verdict="The batch's largest T20 row, and it attacks the constraint §0z99 named -- the deck is short of lands to play -- rather than adding another payoff on the same supply.",
+    ),
+    Candidate(
+        deck='azusa', card='Mossborn Hydra', measured='2026-10-03',
+        win_rate='+0.0324 +-0.0040 at T20 (N=15,000 paired)', signal='both',
+        rationale='A three-drop trampler whose counters double on every landfall.',
+        evidence='damage +3.20 +-0.27, P(deploy) 0.282, 4.2 doublings a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0315 / +0.0304 -- the largest T10 number in the batch.',
+        limits='A runaway cap on counters (COUNTER_CAP, a million) is a guard that changes no outcome.',
+        verdict='Top set. Exponential, and a TRAMPLER, which is why its counters get through the chump blocks that blunt the other big bodies (§0z92).',
+    ),
+    Candidate(
+        deck='azusa', card='Bristly Bill, Spine Sower', measured='2026-10-03',
+        win_rate="+0.0069 +-0.0030 at T20 (N=15,000 paired), counter_target='spread'", signal='both',
+        rationale="A counter per landfall and a repeatable doubling of every creature's counters.",
+        evidence='damage +0.87 +-0.18, P(deploy) 0.298, 4.0 landfall counters and 0.6 doublings a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0098 / +0.0113 under spread; under focus +0.0011 / +0.0009, INSIDE ITS BAR.',
+        limits="The row READS A POLICY and the policy was most of the gap: spread minus focus +0.0105 +-0.0021 at T20 (results/counter_spread.txt), the owner's prediction. The doubling is mostly OVERKILL -- it fires on boards that have already won (unbounded damage balloons, bounded damage barely moves) -- and concentrated counters die together to removal and wipes.",
+        verdict='The weakest row of the seven even spread: a +1/+1 counter per land is a smaller rate than a body per land in a model that rewards width (§0v). Not a cut list; a decision against Swordtooth like the others.',
+    ),
+    Candidate(
+        deck='azusa', card='Glacier Godmaw', measured='2026-10-03',
+        win_rate='+0.0243 +-0.0038 at T20 (N=15,000 paired)', signal='both',
+        rationale='A repeatable Craterhoof: team +1/+1 and HASTE per landfall, and a Lander token.',
+        evidence='damage +2.49 +-0.23, P(deploy) 0.258, 17 summoning-sick creatures a game attack because of its haste; 0.14 Landers cracked. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0228 / +0.0265.',
+        limits='VIGILANCE is not modelled and cannot matter (tapped creatures still count as blockers). A seven-drop: the lowest P(deploy) of the seven.',
+        verdict="Top set. The haste is the card -- this turn's landfall tokens attack the turn they are made.",
+    ),
     # MYSTERY BOOSTER COMMANDER EDITION, measured 2026-09-29 (§0z74).
     Candidate(
         deck='shilgengar',
@@ -1509,7 +1567,13 @@ MEASURED: list[Candidate] = [
         limits=("DELIBERATELY REDUNDANT with Rampaging Baloths and Scute "
                 "Swarm. Leave-one-out understates every member of an "
                 "interchangeable set, so ablate the three together before "
-                "cutting any of them -- pass a list of names to ablate()."),
+                "cutting any of them -- pass a list of names to ablate(). "
+                "THIS ROW IS A FLOOR (§0z101): the card was missing from "
+                "azusa.LAND_ENABLERS when it was measured, so it was cast "
+                "after the turn's land drops. RE-MEASURED 2026-10-03 in the "
+                "same slot: +0.0179 +-0.0033 at T20 "
+                "(results/candidates_azusa_batch6_T20.txt), and the fix alone "
+                "is +0.0053 +-0.0024, paired (results/roil_enabler.txt)."),
     ),
 
     Candidate(
@@ -1637,7 +1701,10 @@ MEASURED: list[Candidate] = [
             "even reduced, the Nursery costs mana and a turn, and against an "
             "exponential payoff a small delay compounds. FLOOR: the {1}{G} "
             "exile-for-indestructible is not modelled and is real protection "
-            "against a pod that wipes."
+            "against a pod that wipes. RE-MEASURED 2026-10-03 in the same "
+            "slot as an anchor for azusa batch 6 (§0z101): +0.0189 +-0.0036 "
+            "at T20, inside this row's bar "
+            "(results/candidates_azusa_batch6_T20.txt)."
         ),
         verdict=(
             "Still worth its slot on the objective. Worth knowing that the "
@@ -3447,6 +3514,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="A token per landfall on a 5/3 body: the Rampaging Baloths shape at 1/1, one mana cheaper. The closest-in-shape card to the landfall group whose returns curve §0z100 measured (each further copy about 0.8 of the last), so it is the cleanest test of whether that curve's extrapolated fifth copy (+0.029 at T20) is real for a card that is not Scute Swarm.",
         implement="LOW. One `make_tokens` line in `_landfall_payoffs`, the Baloths pattern. REACH IS NOT MODELLED -- this engine's blockers are a count, not a defence that reads reach -- so the body is a 5/3. A Springheart host (nonlegendary landfall payoff).",
     ),
@@ -3457,6 +3525,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="Zendikar's Roil (+0.0133 +-0.0029, §0z25) with tokens that grow: every Bird gets +1/+0 for each LATER land that turn, so on a three-drop turn the first Bird attacks as a 4/2. The deck averages three landfall triggers a turn, which is exactly what the token's own trigger reads.",
         implement='LOW-MEDIUM. The token maker is the Roil line. Each Bird token carries its OWN landfall trigger, so the +1/+0 is applied per Bird that was on the battlefield WHEN the land entered (a snapshot -- a Bird made by this land does not see it, §0z19), doubled by Greenwarden and Traveling Chocobo like any landfall trigger. Until end of turn, reset with the turn.',
     ),
@@ -3467,6 +3536,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="Zendikar's Roil with a second engine attached: every creature SPELL puts counters equal to its mana value on a creature you control. This list casts Ulamog and Kozilek (MV 11 and 10) and averages several creature spells a game, so the cast trigger is large on its own.",
         implement="MEDIUM. Landfall half: a 2/2 Bear per landfall, the Roil line. Cast half: a hook at the two places a creature SPELL is cast (the commander, and the main-phase loop including Augur of Autumn's top-of-library cast) -- NOT on Chord, Green Sun's Zenith, Finale or Genesis Wave, which put a creature onto the battlefield without casting it. The trigger fires on CAST, so a countered spell still triggers. Target policy shared with Bristly Bill (`counter_target`).",
     ),
@@ -3477,6 +3547,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="Three mana for a token per landfall AND 'play lands from your graveyard' -- the half §0z99 said the deck is short of: it lacks LANDS to play, not permission. The graveyard clause duplicates Crucible of Worlds and Ramunap Excavator (a boolean), so expect that half to add only the games neither is out.",
         implement="LOW-MEDIUM. Graveyard access joins the existing boolean in `playable_lands`. Landfall: a 1/1 Moloid token. 'Whenever this token attacks, you MAY mill a card' is modelled as a POLICY: mill only while graveyard-land access is live and a land drop is still unused this turn, so a milled land can be played in the second land step; never below a library floor (decking is a loss, §0z42). Legendary, so not a Springheart host.",
     ),
@@ -3487,6 +3558,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale='A three-drop trampler whose counters DOUBLE on every landfall: 1, 2, 4 on the turn after it lands, 16 or more by the next. Greenwarden and Traveling Chocobo each add a doubling. It is the one candidate whose value is exponential in landfall rather than linear, so it tests a different part of the curve.',
         implement="LOW. 'Enters with a +1/+1 counter' is applied in `make_permanent`, so tutors, Genesis Wave and Springheart copies all get it (defined 0/0, so `check_dynamic_pt_coverage` must learn the enters-with-counters set). Trample is generated from Scryfall. Doubling is ordered AFTER every counter-placing trigger of the same land (Bristly Bill's), as a pilot stacks it. A runaway cap on the counter count is a guard, not a rule. The pod's threat-weighted removal will meet it, which is a real cost the model sees.",
     ),
@@ -3497,6 +3569,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="A two-drop that turns every landfall into a +1/+1 counter, and a five-mana activation that DOUBLES the counters on every creature you control -- Avenger's Plants already carry one per landfall. The activation is a mana sink in a deck that measurably strands mana late (stranded_mv, mana_floated).",
         implement='MEDIUM. Landfall: one counter on a creature you control, chosen by `counter_target` (a stated policy: Mossborn Hydra first, then an evasive creature, then the highest power). Activation: before combat, with mana the main phase left, while your creatures carry at least `bristly_min_counters` counters (a knob, default 2). FIXES A GAP IT DEPENDS ON: `power_of` discarded +1/+1 counters on the */* cards (Greensleeves, Ashaya, Cultivator Colossus); a counter now adds. Legendary, so not a Springheart host.',
     ),
@@ -3507,6 +3580,7 @@ PROPOSED: list[Proposal] = [
         verified="2026-10-03",
         triage="LIVE",
         prepared="tests/test_azusa_batch6.py",
+        rejected="MEASURED 2026-10-03 and PROMOTED: a Candidate in MEASURED and the real swap against Wayward Swordtooth in SIMULATED (§0z101). Closed rather than deleted so the verified oracle text stays where it was written.",
         rationale="A repeatable Craterhoof for this deck: every landfall gives the whole team +1/+1 and HASTE until end of turn, so the Beasts, Badgers, Insects and Plants made by this turn's land drops attack the turn they are made. Its ETB Lander token is a further land (and a further landfall) for {2}.",
         implement="MEDIUM-HIGH, and it builds two pieces the engine lacks: per-permanent until-end-of-turn pumps and haste (an id-keyed map, safe since §0z100's hold), read by `power_of` and by `combat`'s summoning-sickness check; and the Lander token, an artifact cracked BEFORE combat for {2} (a basic onto the battlefield tapped, then shuffle -- through the CRN stream). The pump is ordered LAST among the land's triggers, so tokens made by the same land get it. VIGILANCE IS NOT MODELLED and cannot matter here: `opponents.your_creatures` counts tapped blockers too. Trample is generated.",
     ),

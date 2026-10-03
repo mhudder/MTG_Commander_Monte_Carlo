@@ -149,7 +149,7 @@ Methodology that used to live at the end of this file is now
 | [0z98](#0z98) | FIXED | **An `id(permanent)` key outlived its permanent.** Trostani keyed seven pieces of state on `id(perm)` and never cleared them, so a freed id handed to a new permanent carried a dead Processor's X, Luminarch's counters, a Vat's imprint or haste -- and which id was reused depended on the process's allocation history. One game in 15,000 played differently between two processes. Fixed by holding every permanent for the game (as shilgengar already did); `walker_ready` and azusa's `pw_used` had the same shape. All seven decks bit-identical at 400 seeds (first written as 3,000 in error; re-run at 3,000 in §0z100, still identical); trostani rebuilt, every row within 0.0001 |
 | [0z99](#0z99) | MEASURED | **Group ablations for all seven decks** (58 groups): most functional groups are ADDITIVE -- their rows sum to what the group is worth. Two are not, both redundancy: azusa's four landfall creatures (+0.1950 together against +0.1405 summed, T20) and karlov's five gain->drain cards (+0.1386 against +0.1073). Lorehold's three wipes cost +0.033 at T10 together; shilgengar's sac outlets and rendmaw's are worth nothing even as a pair; tivit's extra-vote pair is no longer a redundancy trap |
 | [0z100](#0z100) | MEASURED | **The returns curves, and the id fix finished.** Every subset of azusa's four landfall creatures and karlov's five gain->drain cards: returns DIMINISH smoothly, each copy worth about 0.8-0.9 of the one before (azusa +0.066, +0.052, +0.042, +0.035 at T20; karlov +0.035 ... +0.022). The curve's first run missed its own check by a game and found six more id-keyed sites, so the engine now holds every Card and Permanent made in a game (`begin_game`). Azusa's table rebuilt |
-| [0z101](#0z101) | BUILT | **Azusa batch 6: seven landfall payoffs**, implemented and pinned (Elfsworn Giant, Chocobo Racetrack, Dancing from Dark to Dawn, Mole Man, Mossborn Hydra, Bristly Bill, Glacier Godmaw), to test §0z100's curve against the owner's cut, Wayward Swordtooth. Three gaps found on the way: **Zendikar's Roil was never in LAND_ENABLERS** (its +0.0133 is a floor), counters on a */* card were discarded, and Avenger pumped only Plant TOKENS. The coverage check never read the payoff method. Every committed list bit-identical |
+| [0z101](#0z101) | MEASURED | **Azusa batch 6: seven landfall payoffs against Wayward Swordtooth.** All seven swaps significant at T20; top set Mole Man (+0.0352), Mossborn Hydra (+0.0304), Chocobo Racetrack (+0.0276), Glacier Godmaw (+0.0265). The cut is worth nothing. **Spreading counters beats focusing them** (+0.0105 ±0.0021 for Bristly Bill, the owner's call) and is the default. Three gaps on the way: Zendikar's Roil was never in LAND_ENABLERS, counters on a */* card were discarded, Avenger pumped only Plant tokens |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9073,7 +9073,7 @@ at MEASUREMENT time, so it was comparing against the table the rebuild had
 just replaced. Both reports (`run_curve`, `run_groups`) now read the cache
 when they print. All eight curve checks and all fourteen group checks pass.
 
-## 0z101. BUILT — azusa batch 6: seven landfall payoffs, and three gaps they exposed
+## 0z101. MEASURED — azusa batch 6: seven landfall payoffs, spread counters, and three gaps
 
 **THE QUESTION** (the owner's, after §0z100): the landfall group's returns
 diminish by about 0.8 a copy, so is a further landfall payoff still worth a
@@ -9142,8 +9142,72 @@ the SOURCE of whatever method is bound and a wrapper names no card. That is
 the check working as written -- and a reason to know that a monkeypatched
 payoff method blinds it.
 
-The measurements are recorded in the next section update, from
-`results/azusa_batch6_h2h.txt` and `results/candidates_azusa_batch6_T20.txt`.
+**THE NUMBERS.** N=15,000 paired, T10 read off the T20 game (§0z93). The
+real swap is `results/azusa_batch6_h2h.txt` (Bill and Dancing restated from
+`results/counter_spread.txt` under the default policy); value over a blank in
+the Sylvan Library slot is `results/candidates_azusa_batch6_T20.txt`.
+
+| card | swap -Swordtooth, T10 | swap, T20 | over a blank, T20 | what moves it |
+|---|---|---|---|---|
+| Mole Man, Moloid Master | +0.0275 ±0.0031 | **+0.0352 ±0.0041** | +0.0363 ±0.0042 | 3.83 lands a game from the graveyard; lands_played **+0.62** |
+| Mossborn Hydra | **+0.0315 ±0.0031** | +0.0304 ±0.0039 | +0.0324 ±0.0040 | 4.2 doublings a game, on a trampler |
+| Chocobo Racetrack | +0.0134 ±0.0026 | +0.0276 ±0.0038 | +0.0283 ±0.0035 | 3.6 Birds, 39.7 Bird pumps |
+| Glacier Godmaw | +0.0228 ±0.0030 | +0.0265 ±0.0042 | +0.0243 ±0.0038 | 17 sick creatures a game attack |
+| Dancing from Dark to Dawn | +0.0078 ±0.0024 | +0.0245 ±0.0038 | +0.0251 ±0.0035 | 3.9 Bears, 5.0 cast-trigger counters |
+| Elfsworn Giant | +0.0033 ±0.0023 | +0.0121 ±0.0035 | +0.0083 ±0.0031 | 4.0 Elf Warriors |
+| Bristly Bill, Spine Sower | +0.0098 ±0.0024 | +0.0113 ±0.0035 | +0.0069 ±0.0030 | 4.0 counters, 0.6 doublings |
+| *anchor:* Zendikar's Roil | | | +0.0179 ±0.0033 | was +0.0133 ±0.0029 (§0z25) |
+| *anchor:* Sapling Nursery | | | +0.0189 ±0.0036 | was +0.0170 ±0.0034 (2026-09-10) |
+
+All seven swaps are significant at T20 and all but Elfsworn Giant at both
+horizons. They share one cut, so §0c forbids ranking them by their bars: the
+TOP SET is Mole Man, Mossborn Hydra, Chocobo Racetrack and Glacier Godmaw,
+within 0.009 of each other at T20 with overlapping bars, and only a direct
+paired run orders two of them. **The swap and the blank row agree to within
+about 0.004 for every card, because the cut is worth nothing** -- Swordtooth's
+own row is +0.0032 ±0.0030 -- which is §0z99's finding confirmed from the other
+side: the deck does not miss the extra land drop.
+
+**THE CURVE'S PREDICTION HOLDS FOR THE TOKEN MAKERS AND IS BEATEN BY THE
+CARDS THAT ARE NOT ONE.** §0z100 extrapolated about +0.029 at T20 for a fifth
+copy of an AVERAGE member of the landfall group. Racetrack (+0.0283) and
+Godmaw (+0.0243) land on it; Dancing (+0.0251) near it; the plain token makers
+(Elfsworn +0.0083, Roil +0.0179, Nursery +0.0189) under it, as the group's
+weaker members (Greensleeves +0.013) do. The two that BEAT it do something the
+group does not: Mole Man adds land SUPPLY (the only card here that raises
+lands_played) and Mossborn Hydra scales exponentially on a trampler.
+
+**SPREAD THE COUNTERS (the owner's call, 2026-10-03, measured).** Bristly
+Bill under the first `counter_target` policy -- counters on an evasive or the
+biggest creature -- was +0.0009 ±0.0035, inside its bar. The owner's
+objection: one huge creature does little without evasion. In this model the
+pod chump-blocks the BIGGEST attackers (§0v), so a counter on a small body is
+power that connects. `diagnostics/run_counter_spread.py`, three legs per seed:
+
+| | spread − focus, T10 | spread − focus, T20 | damage |
+|---|---|---|---|
+| Bristly Bill | +0.0087 ±0.0016 | **+0.0105 ±0.0021** | +1.01 ±0.11 |
+| Dancing from Dark to Dawn | +0.0012 ±0.0008 | +0.0039 ±0.0015 | +0.40 ±0.06 |
+
+with the same number of counters placed under both (Bill 4.0 against 4.2):
+the gain is WHERE they go. `spread` is the default; `focus` reproduces. Bill
+is still the smallest row of the seven -- a +1/+1 counter per land is a
+smaller rate than a body per land in a model that rewards width -- and its
+doubling is mostly overkill, firing on boards that have already won. **This
+is the "conservatism that asserts a card does nothing" shape (CLAUDE.md's
+policy table) caught before it shipped**: the first rule written made a card
+read as a blank, and the owner's intuition about the table was the check.
+
+**ROIL'S MISSING ENABLER, MEASURED DIRECTLY** (`diagnostics/run_roil_enabler.py`,
+`results/roil_enabler.txt`: each seed played with the Roil in LAND_ENABLERS and
+out): **+0.0053 ±0.0024 at T20**, +0.0015 ±0.0016 at T10, damage +0.50. That
+is the whole of the anchor's rise from +0.0133 to +0.0179, so three weeks of
+other engine changes netted about nothing for this card -- and the §0z25 row
+was a floor by about a third of its own value.
+
+Nothing is staged: these are SIMULATED head-to-heads and MEASURED rows with
+no decision attached, and Wayward Swordtooth stays in the list until the
+owner decides.
 
 ## How to read an ablation table
 

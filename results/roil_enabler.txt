@@ -1,0 +1,5 @@
+Zendikar's Roil cast BEFORE the land drops (in LAND_ENABLERS, today) minus AFTER them (the 2026-09-16 engine's omission). N=15,000 seeds, each played both ways, Roil in the Sylvan Library slot of build_pending('azusa'), seeds 5000.., T10 off the T20 game. * = the 95% CI excludes zero.
+
+  Roil before the drops minus after: won T10     +0.0015 ±0.0016
+  Roil before the drops minus after: won T20     +0.0053 ±0.0024*
+  Roil before the drops minus after: damage T20  +0.5007 ±0.1342*
