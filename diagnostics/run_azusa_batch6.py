@@ -3,6 +3,8 @@
 Wayward Swordtooth (§0z101).
 
     python -m diagnostics.run_azusa_batch6 15000 > results/azusa_batch6_h2h.txt
+    python -m diagnostics.run_azusa_batch6 15000 --cut="Life from the Loam" \
+        --cards="Mossborn Hydra"        # any cut, any subset of CARDS
 
 THE QUESTION is §0z100's. The landfall group's returns diminish by about 0.8
 a copy, and the curve's extrapolated fifth copy is +0.029 at T20 for an
@@ -52,10 +54,11 @@ SEED0 = 5000
 
 
 def job(a):
-    add, lo, hi = a
+    add, lo, hi, cut = a
     base, cmd = build_pending("azusa")
+    assert any(c.name == cut for c in base), f"{cut!r} is not in the list"
     card = CATALOG["azusa"][1][add]
-    ra, rb, _ = run_ab(base, cmd, CUT, card, n=hi - lo,
+    ra, rb, _ = run_ab(base, cmd, cut, card, n=hi - lo,
                        cfg={"snapshot_rounds": (10,)}, base_seed=SEED0 + lo,
                        turns=20, sim=REGISTRY["azusa"].sim)
     keys = SHARED + OWN[add]
@@ -77,21 +80,25 @@ def ci(d):
 
 def main():
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 15000
-    tasks = [(c, k * n // CHUNKS, (k + 1) * n // CHUNKS)
-             for c in CARDS for k in range(CHUNKS)]
+    opt = dict(a[2:].split("=", 1) for a in sys.argv[2:] if a.startswith("--"))
+    cut = opt.get("cut", CUT)
+    cards = tuple(opt["cards"].split(",")) if "cards" in opt else CARDS
+    assert set(cards) <= set(CARDS), "only batch-6 cards have OWN counters"
+    tasks = [(c, k * n // CHUNKS, (k + 1) * n // CHUNKS, cut)
+             for c in cards for k in range(CHUNKS)]
     with Pool(4) as p:
         res = p.map(job, tasks, chunksize=1)
     rows = {}
-    for (c, _lo, _hi), r in zip(tasks, res):
+    for (c, _lo, _hi, _cut), r in zip(tasks, res):
         rows.setdefault(c, []).extend(r)
 
-    print(f"azusa batch 6: -{CUT} +X, the real swap. N={n:,} paired per "
+    print(f"azusa batch 6: -{cut} +X, the real swap. N={n:,} paired per "
           f"card, seeds {SEED0}.., base = build_pending('azusa'), one T20 run "
           "per swap with T10 read off the same game (§0z93).\n"
           "POSITIVE = the swap gains. * = the 95% CI excludes zero.\n")
     print(f"  {'card':<28}{'win T10':>18}{'win T20':>18}"
           f"{'damage T20':>16}{'P(cast)':>9}")
-    for c in CARDS:
+    for c in cards:
         r = rows[c]
         cells = []
         for ia, ib in ((0, 1), (2, 3)):
@@ -103,7 +110,7 @@ def main():
               f"{dm:>+9.2f} ±{dh:<5.2f}{pc:>9.3f}")
     print("\nmechanism, T20 (B minus A for the shared counters; the card's own "
           "counters are B-leg means per game):")
-    for c in CARDS:
+    for c in cards:
         r = rows[c]
         parts = []
         for i, k in enumerate(SHARED[1:], start=1):

@@ -9267,6 +9267,19 @@ Exploration +0.0026, Life from the Loam +0.0039 ±0.0024, Sylvan Awakening
 modelled (Sylvan Library, Crop Rotation, Quirion Ranger, Hall of Gemstone,
 Bane of Progress, ...), which measures the model, not the cards.
 
+**-LIFE FROM THE LOAM +MOSSBORN HYDRA, the owner's pairing (2026-10-03).**
+`diagnostics/run_azusa_batch6.py --cut="Life from the Loam"
+--cards="Mossborn Hydra"`, `results/azusa_hydra_loam_20261003.txt`, on the
+list WITH Mole Man: **+0.0213 ±0.0032 at T10, +0.0201 ±0.0042 at T20**,
+significant at both, damage +2.46 ±0.28. Smaller than the same card against
+Swordtooth (+0.0315 / +0.0304) because Loam is worth more than Swordtooth
+was: cutting it costs lands_played −0.60, landfall_triggers −1.00 and
+cards_drawn −0.91 a game -- Loam is land SUPPLY, the role §0z99 found the
+deck short of -- and the Hydra more than pays for it. SIMULATED and
+SHORTLISTED, not staged. Nissa, Resurgent Animist's proposal names the same
+cut; Loam is one slot, so the two would need a paired run against each
+other in it before both could be decided (§0c).
+
 **OTHER DECKS.** `_evasion.py` and `_removal.py` regenerated from Scryfall: only
 their scanned-name lists changed. All six other decks bit-identical at 3,000
 games against fd2ccd9; their caches VERIFIED.

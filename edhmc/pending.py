@@ -878,6 +878,12 @@ MEASURED: list[Candidate] = [
         evidence='damage +3.20 +-0.27, P(deploy) 0.282, 4.2 doublings a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0315 / +0.0304 -- the largest T10 number in the batch.',
         limits='A runaway cap on counters (COUNTER_CAP, a million) is a guard that changes no outcome.',
         verdict='Top set. Exponential, and a TRAMPLER, which is why its counters get through the chump blocks that blunt the other big bodies (§0z92).',
+        shortlist=("SHORTLISTED 2026-10-03 by the owner, with Life from the Loam "
+                   "as the cut (Wayward Swordtooth, its batch-6 cut, was "
+                   "committed out for Mole Man). The head-to-head on the "
+                   "current list is SIMULATED below: +0.0213 / +0.0201, "
+                   "significant at both horizons. NOT staged: a decision."),
+        proposed_cut="Life from the Loam",
     ),
     Candidate(
         deck='azusa', card='Bristly Bill, Spine Sower', measured='2026-10-03',
@@ -2898,6 +2904,13 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
         result='REAL SWAP -Wayward Swordtooth +Mossborn Hydra, N=15,000 paired: +0.0315 +-0.0031 (significant) at T10 and +0.0304 +-0.0039 (significant) at T20; damage +3.06 +-0.25.',
         notes='4.2 doublings a game. The strongest T10 row of the seven for a three-drop: it is a trampler, so the counters it doubles get through the chump blocks that blunt the other big bodies.',
+    ),
+    Simulated(
+        deck='azusa', remove='Life from the Loam', add='Mossborn Hydra',
+        measured='2026-10-03', source='results/azusa_hydra_loam_20261003.txt',
+        result='REAL SWAP -Life from the Loam +Mossborn Hydra, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0213 +-0.0032 (significant) at T10 and +0.0201 +-0.0042 (significant) at T20; damage +2.46 +-0.28.',
+        notes=('THE OWNER\'S PAIRING (2026-10-03). Smaller than the Swordtooth swap (+0.0315 / +0.0304) because Loam is worth more than Swordtooth was: cutting it costs lands_played -0.60, landfall_triggers -1.00 and cards_drawn -0.91 a game (B minus A, T20) -- Loam is LAND SUPPLY, the role §0z99 found the deck short of, and the Hydra more than pays for it. 4.11 doublings a game. '
+               'Loam\'s own row (+0.0039 +-0.0024) is the price of cutting it with Mole Man, Crucible, Ramunap and Greenwarden in the list (§0z102).'),
     ),
     Simulated(
         deck='azusa', remove='Wayward Swordtooth', add='Bristly Bill, Spine Sower',

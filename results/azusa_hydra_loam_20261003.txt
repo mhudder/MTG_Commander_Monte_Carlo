@@ -1,0 +1,10 @@
+azusa batch 6: -Life from the Loam +X, the real swap. N=15,000 paired per card, seeds 5000.., base = build_pending('azusa'), one T20 run per swap with T10 read off the same game (§0z93).
+POSITIVE = the swap gains. * = the 95% CI excludes zero.
+
+  card                                   win T10           win T20      damage T20  P(cast)
+  Mossborn Hydra                +0.0213 ±0.0032*  +0.0201 ±0.0042*    +2.46 ±0.28     0.281
+
+mechanism, T20 (B minus A for the shared counters; the card's own counters are B-leg means per game):
+  Mossborn Hydra
+      landfall_triggers -1.00±0.07  lands_played -0.60±0.04  cards_drawn -0.91±0.09  final_life +0.07±0.18
+      own: mossborn_doublings 4.11
