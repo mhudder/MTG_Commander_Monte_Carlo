@@ -1889,9 +1889,13 @@ MEASURED: list[Candidate] = [
             "Argoth is the next MODEL-EVALUATED row at the bottom of the table "
             "(+0.0015 +-0.0031, inside its bar) once Exploration -- which the "
             "owner is keeping -- is set aside. Still a proposal, never "
-            "measured as a swap."
+            "measured as a swap. MOVED AGAIN THE SAME DAY: THE OWNER WILL NOT "
+            "CUT TITANIA (2026-10-03). Life from the Loam is the next "
+            "MODEL-EVALUATED row at the bottom (+0.0039 +-0.0024) with Titania "
+            "and Exploration both kept, and it shares Mole Man's graveyard-land "
+            "role (§0z102). A proposal only."
         ),
-        proposed_cut="Titania, Protector of Argoth",
+        proposed_cut="Life from the Loam",
     ),
     Candidate(
         deck="azusa",
@@ -2780,7 +2784,7 @@ SIMULATED: list[Simulated] = [
         deck='azusa', remove='Titania, Protector of Argoth', add='Autumn Willow, Harmony',
         measured='2026-09-29', source='results/mbc_batch.txt',
         result=('REAL SWAP -Titania, Protector of Argoth +Autumn Willow, Harmony, N=15,000 paired: +0.0047 +-0.0020 (significant) at T10 and +0.0024 +-0.0031 (inside its bar) at T20.'),
-        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0046 +-0.0019 * at T10 and +0.0016 +-0.0031 at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s.'),
+        notes=('RE-MEASURED 2026-09-29 on the engine after §0z75-§0z77, same cut and seeds: +0.0046 +-0.0019 * at T10 and +0.0016 +-0.0031 at T20 (results/mbc_batch_20260929.txt). The row above is §0z74\'s. THE OWNER WILL NOT CUT TITANIA (2026-10-03): this head-to-head stands as a measurement, and its cut is not available.'),
     ),
     Simulated(
         deck='rendmaw', remove="Ashnod's Altar", add='Davvol, Evincar of Rath',
