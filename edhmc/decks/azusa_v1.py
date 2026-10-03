@@ -206,8 +206,14 @@ SORCERIES = [
       threat=4.0, script="journey_of_discovery"),
     C("Kodama's Reach", "Sorcery", {"gen": 2, "G": 1}, priority=8,
       threat=4.0, script="cultivate"),
-    C("Life from the Loam", "Sorcery", {"gen": 1, "G": 1}, priority=5,
-      threat=4.0, script="loam"),
+    # CUT 2026-10-03 for Mossborn Hydra, into Life from the Loam's EXACT list
+    # position (a creature in the sorceries section: position, not section,
+    # is what the head-to-head measured). The owner's decision on §0z102's
+    # paired run: -Loam +Hydra +0.0213 +-0.0032 at T10, +0.0201 +-0.0042 at
+    # T20, and the Hydra beat Nissa, Resurgent Animist in this slot. The same
+    # Card as MOSSBORN_HYDRA below; `_check_inline_copies` holds them equal.
+    C("Mossborn Hydra", "Creature", {"gen": 2, "G": 1}, 0, 0,
+      priority=8, threat=6.0),
     C("Nylea's Intervention", "Sorcery", {"gen": 3, "G": 2}, priority=5.5,
       threat=4.0, script="nylea_land", x_pips=3),
     C("Regrowth", "Sorcery", {"gen": 1, "G": 1}, priority=6, threat=4.0,
@@ -816,15 +822,17 @@ AUTUMN_WILLOW_HARMONY = C("Autumn Willow, Harmony", "Creature",
 MBC_CANDIDATES = (AUTUMN_WILLOW_HARMONY,)
 
 
-def _check_mole_man():
-    """The list's Mole Man and the catalog's MOLE_MAN are ONE card written
-    twice (the list cannot reference a constant defined below it). Two copies
-    of one card drift -- CLAUDE.md, "the same rule, implemented twice" -- so
-    they are compared field for field at import."""
-    listed = next(c for c in build()[0] if c.name == MOLE_MAN.name)
-    if listed != MOLE_MAN:
-        raise AssertionError("azusa_v1: the deck list's Mole Man differs from "
-                             "MOLE_MAN; they are the same card")
+def _check_inline_copies():
+    """The list's committed batch-6 cards and the catalog's constants are ONE
+    card written twice each (the list cannot reference a constant defined
+    below it). Two copies of one card drift -- CLAUDE.md, "the same rule,
+    implemented twice" -- so they are compared field for field at import."""
+    deck = build()[0]
+    for const in (MOLE_MAN, MOSSBORN_HYDRA):
+        listed = next(c for c in deck if c.name == const.name)
+        if listed != const:
+            raise AssertionError(f"azusa_v1: the deck list's {const.name} "
+                                 f"differs from its catalog constant")
 
 
-_check_mole_man()
+_check_inline_copies()

@@ -833,6 +833,28 @@ COMMITTED: list[Change] = [
             "the rebuilt table re-measures it with Mole Man in the list."),
         evidence="REAL SWAP -Wayward Swordtooth +Mole Man, Moloid Master, N=15,000 paired: +0.0275 +-0.0031 (significant) at T10 and +0.0352 +-0.0041 (significant) at T20; damage +3.29 +-0.28. THE ONLY ONE OF THE SEVEN THAT RAISES lands_played (+0.37) despite cutting a land drop: 3.83 lands a game from the graveyard, most of them fetch lands replayed and cracked again. A second Crucible of Worlds on a body that makes a Moloid per landfall -- and the graveyard half is a boolean shared with Crucible, Ramunap and Greenwarden, so this number includes the games where it duplicates them.",
     ),
+    # COMMITTED 2026-10-03 to edhmc/decks/azusa_v1.py, into Life from the
+    # Loam's EXACT list position. Two legs (azusa has no .xlsx). Its MEASURED
+    # row and its SIMULATED head-to-head moved here on commit. The azusa table
+    # is rebuilt in the same change.
+    Change(
+        deck="azusa", remove="Life from the Loam", add="Mossborn Hydra",
+        staged="2026-10-03",
+        rationale=(
+            "THE OWNER'S DECISION (2026-10-03). 'Trample. This creature enters "
+            "with a +1/+1 counter on it. Landfall -- double the number of "
+            "+1/+1 counters on this creature': 4.1 doublings a game on a "
+            "trampler, so the counters get through the chump blocks that "
+            "blunt the deck's other big bodies (§0z92). THE CUT IS THE "
+            "OWNER'S, proposed after Titania was ruled out: Loam ablated to "
+            "+0.0039 +-0.0024 with Mole Man, Crucible, Ramunap and Greenwarden "
+            "in the list (§0z102). Loam is real land supply -- cutting it costs "
+            "0.60 lands played a game -- and the Hydra more than pays for it. "
+            "PAIRED IN THIS SLOT AGAINST NISSA, RESURGENT ANIMIST, the other "
+            "card proposed for it: Nissa minus Hydra -0.0112 +-0.0030 at T10, "
+            "-0.0065 +-0.0038 at T20 (results/azusa_slot_loam_20261003.txt)."),
+        evidence="REAL SWAP -Life from the Loam +Mossborn Hydra, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0213 +-0.0032 (significant) at T10 and +0.0201 +-0.0042 (significant) at T20; damage +2.46 +-0.28.",
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -870,20 +892,6 @@ MEASURED: list[Candidate] = [
         evidence='damage +2.81 +-0.22, P(deploy) 0.271, 3.9 Bears and 5.0 cast-trigger counters a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0078 / +0.0245 under spread (focus: +0.0066 / +0.0206).',
         limits="The row READS A POLICY: where the counters go is `counter_target`, 'spread' by default since §0z101 (spread minus focus +0.0039 +-0.0015 at T20).",
         verdict='Roil-plus: +0.007 over the Roil anchor in the same slot, which is the cast trigger.',
-    ),
-    Candidate(
-        deck='azusa', card='Mossborn Hydra', measured='2026-10-03',
-        win_rate='+0.0324 +-0.0040 at T20 (N=15,000 paired)', signal='both',
-        rationale='A three-drop trampler whose counters double on every landfall.',
-        evidence='damage +3.20 +-0.27, P(deploy) 0.282, 4.2 doublings a game. REAL SWAP for Wayward Swordtooth (SIMULATED, below): +0.0315 / +0.0304 -- the largest T10 number in the batch.',
-        limits='A runaway cap on counters (COUNTER_CAP, a million) is a guard that changes no outcome.',
-        verdict='Top set. Exponential, and a TRAMPLER, which is why its counters get through the chump blocks that blunt the other big bodies (§0z92).',
-        shortlist=("SHORTLISTED 2026-10-03 by the owner, with Life from the Loam "
-                   "as the cut (Wayward Swordtooth, its batch-6 cut, was "
-                   "committed out for Mole Man). The head-to-head on the "
-                   "current list is SIMULATED below: +0.0213 / +0.0201, "
-                   "significant at both horizons. NOT staged: a decision."),
-        proposed_cut="Life from the Loam",
     ),
     Candidate(
         deck='azusa', card='Bristly Bill, Spine Sower', measured='2026-10-03',
@@ -1902,9 +1910,13 @@ MEASURED: list[Candidate] = [
             "role (§0z102). A proposal only. MEASURED THE SAME DAY: in "
             "Loam's slot Nissa is +0.0101 / +0.0136 as a swap and LOSES the "
             "slot to Mossborn Hydra, -0.0112 +-0.0030 / -0.0065 +-0.0038, "
-            "paired (SIMULATED, below)."
+            "paired (SIMULATED, below). AND THE OWNER COMMITTED THE HYDRA "
+            "THERE (2026-10-03), so the proposal moved a third time, to "
+            "Sylvan Awakening: the next MODEL-EVALUATED row at the bottom "
+            "(+0.0049 +-0.0015) with Titania and Exploration kept. A proposal "
+            "only; Nissa has now lost one measured slot."
         ),
-        proposed_cut="Life from the Loam",
+        proposed_cut="Sylvan Awakening",
     ),
     Candidate(
         deck="azusa",
@@ -2914,13 +2926,6 @@ SIMULATED: list[Simulated] = [
         result='REAL SWAP -Life from the Loam +Nissa, Resurgent Animist, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0101 +-0.0030 (significant) at T10 and +0.0136 +-0.0041 (significant) at T20; damage +1.32 +-0.28.',
         notes=('AND IT LOSES THE SLOT TO MOSSBORN HYDRA, measured directly (diagnostics/run_slot_pair.py, three legs on one seed set): Nissa minus Hydra in Loam\'s slot is -0.0112 +-0.0030 at T10 and -0.0065 +-0.0038 at T20, significant at both. '
                'Nissa keeps more of what Loam did -- +0.39 lands played, +1.05 landfall triggers and +1.19 cards a game over the Hydra -- and still loses, because the Hydra turns the lands the deck has into damage (+1.13 a game over Nissa). 5.45 Animist rituals and 0.54 cards found a game.'),
-    ),
-    Simulated(
-        deck='azusa', remove='Life from the Loam', add='Mossborn Hydra',
-        measured='2026-10-03', source='results/azusa_hydra_loam_20261003.txt',
-        result='REAL SWAP -Life from the Loam +Mossborn Hydra, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0213 +-0.0032 (significant) at T10 and +0.0201 +-0.0042 (significant) at T20; damage +2.46 +-0.28.',
-        notes=('THE OWNER\'S PAIRING (2026-10-03). Smaller than the Swordtooth swap (+0.0315 / +0.0304) because Loam is worth more than Swordtooth was: cutting it costs lands_played -0.60, landfall_triggers -1.00 and cards_drawn -0.91 a game (B minus A, T20) -- Loam is LAND SUPPLY, the role §0z99 found the deck short of, and the Hydra more than pays for it. 4.11 doublings a game. '
-               'Loam\'s own row (+0.0039 +-0.0024) is the price of cutting it with Mole Man, Crucible, Ramunap and Greenwarden in the list (§0z102).'),
     ),
     Simulated(
         deck='azusa', remove='Wayward Swordtooth', add='Bristly Bill, Spine Sower',

@@ -151,6 +151,7 @@ Methodology that used to live at the end of this file is now
 | [0z100](#0z100) | MEASURED | **The returns curves, and the id fix finished.** Every subset of azusa's four landfall creatures and karlov's five gain->drain cards: returns DIMINISH smoothly, each copy worth about 0.8-0.9 of the one before (azusa +0.066, +0.052, +0.042, +0.035 at T20; karlov +0.035 ... +0.022). The curve's first run missed its own check by a game and found six more id-keyed sites, so the engine now holds every Card and Permanent made in a game (`begin_game`). Azusa's table rebuilt |
 | [0z101](#0z101) | MEASURED | **Azusa batch 6: seven landfall payoffs against Wayward Swordtooth.** All seven swaps significant at T20; top set Mole Man (+0.0352), Mossborn Hydra (+0.0304), Chocobo Racetrack (+0.0276), Glacier Godmaw (+0.0265). The cut is worth nothing. **Spreading counters beats focusing them** (+0.0105 ±0.0021 for Bristly Bill, the owner's call) and is the default. Three gaps on the way: Zendikar's Roil was never in LAND_ENABLERS, counters on a */* card were discarded, Avenger pumped only Plant tokens |
 | [0z102](#0z102) | COMMITTED | **-Wayward Swordtooth +Mole Man, Moloid Master (azusa), the owner's call.** Rebuilt table: Mole Man +0.0384 ±0.0042, second in the deck. Four rows fell beyond their bars, three of them Mole Man's own role -- Ancient Greenwarden, Crucible of Worlds (graveyard lands) and Journey of Discovery (land supply) -- §0z27's redundancy shape. Exploration did NOT rise (+0.0021 -> +0.0026 ±0.0030). Titania (+0.0004) is the weakest MODEL-EVALUATED row and is kept on the owner's call, as Exploration is |
+| [0z103](#0z103) | COMMITTED | **-Life from the Loam +Mossborn Hydra (azusa), the owner's call**, on the paired run that beat Nissa in the same slot. Rebuilt: Hydra +0.0266 ±0.0038; Scute Swarm and Avenger fell beyond their bars -- §0z100's curve, a fifth landfall payoff lowering the four it overlaps. Nissa's proposed cut moved to Sylvan Awakening |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9297,6 +9298,36 @@ proxies and the objective disagree here, and win rate decides (CLAUDE.md).
 **OTHER DECKS.** `_evasion.py` and `_removal.py` regenerated from Scryfall: only
 their scanned-name lists changed. All six other decks bit-identical at 3,000
 games against fd2ccd9; their caches VERIFIED.
+
+## 0z103. COMMITTED — -Life from the Loam +Mossborn Hydra (azusa)
+
+**THE OWNER'S DECISION (2026-10-03)**, on §0z102's paired run: in Loam's slot
+the Hydra is +0.0213 ±0.0032 at T10 and +0.0201 ±0.0042 at T20, and beats
+Nissa, Resurgent Animist there by 0.0112 ±0.0030 / 0.0065 ±0.0038. Two legs in
+one commit: the Hydra takes Loam's EXACT list position in `azusa_v1.py` (a
+creature in the sorceries section -- position is what was measured), and the
+ledger's COMMITTED entry carries the head-to-head. The inline copies of both
+committed batch-6 cards are checked against their catalog constants at import
+(`_check_inline_copies`). Classified SCRIPTED; Loam out of the classifier.
+
+**NISSA'S PROPOSAL MOVED A THIRD TIME**, because `check_shortlist_is_answerable`
+refuses a proposed cut that is not in the list: to Sylvan Awakening (+0.0049
+±0.0015), the next MODEL-EVALUATED row at the bottom with Titania and
+Exploration kept. A proposal only -- and Nissa has now lost one measured slot.
+
+**THE REBUILT TABLE** (N=15,000): the Hydra is **+0.0266 ±0.0038**. Two rows
+fell beyond their old bars, both LANDFALL CREATURES: Scute Swarm +0.0513 ->
++0.0443, Avenger of Zendikar +0.0357 -> +0.0305. That is §0z100's curve
+arriving in the table: a fifth landfall payoff covers for the four it overlaps,
+so each of their rows -- the price of cutting that one card -- falls. Their
+package is not weaker; it is bigger. No sign flips. The bottom of the
+MODEL-EVALUATED rows is now Titania (−0.0007 ±0.0030, kept), Exploration
+(+0.0010 ±0.0030, kept), Sylvan Awakening (+0.0047 ±0.0015), then Regrowth,
+Ashaya and Eternal Witness near +0.007.
+
+**OTHER DECKS.** `_evasion.py`/`_removal.py` regenerated (scanned-name lists
+only). All six other decks bit-identical at 3,000 games against 51fa782;
+VERIFIED.
 
 ## How to read an ablation table
 

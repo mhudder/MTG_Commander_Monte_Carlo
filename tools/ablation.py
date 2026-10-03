@@ -574,8 +574,12 @@ SCRIPTED_AZUSA = {
     "Green Sun's Zenith", "Chord of Calling",
     # ramp / land tutors
     "Cultivate", "Kodama's Reach", "Seek the Horizon", "Journey of Discovery",
-    "Realms Uncharted", "Nylea's Intervention", "Life from the Loam",
+    "Realms Uncharted", "Nylea's Intervention",
     "Regrowth", "Animist's Awakening", "Genesis Wave",
+    # (Life from the Loam CUT 2026-10-03 for Mossborn Hydra)
+    # counters that double per landfall, on a trampler -- all of it modelled
+    # (§0z101's table); committed 2026-10-03
+    "Mossborn Hydra",
     # sac-for-value (token fodder only)
     "Perilous Forays", "Momentous Fall",
     # LAND ANIMATION LEFT THIS DECK on 2026-09-10. Sylvan Awakening, Rude

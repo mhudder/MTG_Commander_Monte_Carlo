@@ -590,7 +590,6 @@ SCANNED = {
     'Leaden Myr',
     'Library of Leng',
     'Lieutenants of the Guard',
-    'Life from the Loam',
     'Lightning Greaves',
     'Lignify',
     'Liliana the Faultless',

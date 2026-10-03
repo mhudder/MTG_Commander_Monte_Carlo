@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "058978809294bba4",
-    "built_commit": "fd2ccd9",
-    "built_utc": "2026-10-03T13:18:11Z",
+    "built_at": "a5312ae0b1073adc",
+    "built_commit": "51fa782",
+    "built_utc": "2026-10-03T20:51:29Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -301,6 +301,13 @@
             "utc": "2026-10-03T02:49:22Z"
           }
         ]
+      },
+      {
+        "built_at": "058978809294bba4",
+        "built_commit": "fd2ccd9",
+        "built_utc": "2026-10-03T13:18:11Z",
+        "deck": "azusa",
+        "verified": []
       }
     ],
     "verified": []
@@ -512,6 +519,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: karlov BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "92f780e195dfbf64",
         "utc": "2026-10-03T14:04:06Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: karlov BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "826e0780ff9e462d",
+        "utc": "2026-10-03T21:33:32Z"
       }
     ]
   },
@@ -749,6 +762,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: lorehold BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "bdd403ca82dbb212",
         "utc": "2026-10-03T14:04:06Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: lorehold BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "859193c1a5ed1341",
+        "utc": "2026-10-03T21:33:31Z"
       }
     ]
   },
@@ -988,6 +1007,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: rendmaw BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "65ef8e10a7b2a014",
         "utc": "2026-10-03T14:04:06Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: rendmaw BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "d70943e319733bcd",
+        "utc": "2026-10-03T21:33:31Z"
       }
     ]
   },
@@ -1250,6 +1275,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: shilgengar BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "6e67a4d1dc0526c4",
         "utc": "2026-10-03T14:04:07Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: shilgengar BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "30b4357c4f13d9fd",
+        "utc": "2026-10-03T21:33:32Z"
       }
     ]
   },
@@ -1468,6 +1499,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: tivit BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "6c0b9e316a597e68",
         "utc": "2026-10-03T14:04:07Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: tivit BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "63ae9272bfec7c77",
+        "utc": "2026-10-03T21:33:32Z"
       }
     ]
   },
@@ -1517,6 +1554,12 @@
         "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: trostani BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "c5f8697c2e5bda18",
         "utc": "2026-10-03T14:04:07Z"
+      },
+      {
+        "commit": "51fa782",
+        "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: trostani BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "a3547066f77cac14",
+        "utc": "2026-10-03T21:33:32Z"
       }
     ]
   }
