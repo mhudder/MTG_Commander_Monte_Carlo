@@ -2804,7 +2804,7 @@ class AzusaGame(BaseGame):
                     continue
                 if enablers_only and c.name not in LAND_ENABLERS:
                     continue
-                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
+                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
                 n_draw = self.draws_on_resolve(c)
                 if n_draw and not draw_is_safe(self, n_draw):

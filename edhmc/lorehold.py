@@ -766,7 +766,7 @@ def pilot_may_cast(g, card) -> bool:
     # predicate, every optional site. `wipe_gate_all_casts=False` restores
     # the old rule.
     if ("wipe" in card.tags and g.cfg.get("wipe_gate_all_casts", True)
-            and not OPP.should_cast_own_wipe(g)):
+            and not OPP.should_cast_own_wipe(g, card)):
         return False
     n = spell_draws(g, card)
     return n == 0 or draw_is_safe(g, n)
@@ -2025,7 +2025,7 @@ def main_phase(g, reserve=0):
             # Hold an MDFC for its land face while the mana base is short.
             if c.land_face and n_lands < g.cfg.get("mdfc_land_floor", 5):
                 continue
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
             if not pilot_may_cast(g, c):
                 continue

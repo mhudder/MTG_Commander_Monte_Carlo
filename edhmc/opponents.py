@@ -655,6 +655,16 @@ def destroy_share_for(g, kind) -> float:
     return g.cfg.get("destroy_share_spot", _removal.DESTROY_SHARE_SPOT)
 
 
+def is_hardy(g, perm) -> bool:
+    """Is this permanent indestructible right now -- printed, or granted by
+    a card on your battlefield (Avacyn)? ONE rule, read by `destroy` and by
+    the wipe gate's "cost" measure (§0z106), so the gate cannot believe a
+    creature survives that `destroy` would kill (§0u)."""
+    granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
+               and perm.card.name not in GRANTS_INDESTRUCTIBLE)
+    return indestructible_of(g, perm) or granted
+
+
 def destroy(g, perm, roll=None, destroys=None, kind=None):
     """Remove a permanent the pod answered.
 
@@ -686,9 +696,7 @@ def destroy(g, perm, roll=None, destroys=None, kind=None):
     """
     if perm not in g.board:
         return False
-    granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
-              and perm.card.name not in GRANTS_INDESTRUCTIBLE)
-    hardy = indestructible_of(g, perm) or granted
+    hardy = is_hardy(g, perm)
     if destroys is not None:
         if hardy and destroys:
             return False
@@ -1927,22 +1935,43 @@ def resolve_clocks(g):
 
 
 
-def should_cast_own_wipe(g) -> bool:
+def should_cast_own_wipe(g, card=None) -> bool:
     """Would a real pilot fire their own sweeper right now?
 
     A wrath is a catch-up card. You cast it when you are behind on board, not
     when you are ahead — and a greedy "cast the biggest thing you can afford"
     policy will happily nuke its own winning position. So gate it on the board
-    state: only sweep when the table's creature count meaningfully exceeds
-    yours.
+    state: only sweep when the table's board meaningfully exceeds yours.
+
+    WHAT "YOUR BOARD" MEANS is `wipe_gate_measure` (§0z106):
+      count   bodies against bodies -- the gate as it was written. A 13/13
+              Karlov counts as one body, so karlov swept 82% of its wipes
+              with its commander on board and the pilot ahead by power.
+      power   power against power: theirs is `creatures * p["power"]`, the
+              number chip damage already multiplies by.
+      cost    power against power, but only YOUR creatures this sweeper
+              would actually KILL: nothing for a one-sided wipe (Massacre
+              Wurm), and nothing indestructible against a destroy effect
+              (Avacyn's grant) -- `is_hardy` and `wipe_destroys`, the same
+              two rules `resolve_own_wipe` applies. A wipe that costs you
+              nothing is a catch-up card with no catch.
+    `card` is the sweeper; without it the cost measure assumes a symmetric
+    destroy, which is the conservative branch.
     """
-    if g.cfg.get("wipe_gate_measure", "count") == "power":
-        mine = sum(max(0, g.power_of(p)) for p in g.board
-                   if is_creature_now(g, p))
-        theirs = sum(o.creatures * o.p.get("power", 1.0) for o in living(g))
-    else:
+    measure = g.cfg.get("wipe_gate_measure", "count")
+    if measure == "count":
         mine = sum(1 for p in g.board if is_creature_now(g, p))
         theirs = sum(o.creatures for o in living(g))
+    else:
+        dying = [p for p in g.board if is_creature_now(g, p)]
+        if measure == "cost":
+            if card is not None and "onesided" in card.tags:
+                dying = []
+            elif (wipe_destroys(card)
+                  and g.cfg.get("own_wipe_indestructible", True)):
+                dying = [p for p in dying if not is_hardy(g, p)]
+        mine = sum(max(0, g.power_of(p)) for p in dying)
+        theirs = sum(o.creatures * o.p.get("power", 1.0) for o in living(g))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
 
 

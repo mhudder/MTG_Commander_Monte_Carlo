@@ -1095,7 +1095,7 @@ class TrostaniGame(BaseGame):
             for c in self.hand:
                 if c.is_land:
                     continue
-                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
+                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
                 if c.name in ("Chord of Calling", "Green Sun's Zenith"):
                     plan = self.x_plan(c, pool if c.name == "Chord of Calling"

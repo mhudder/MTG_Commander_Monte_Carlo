@@ -654,7 +654,7 @@ def main_phase(g):
         for c in g.hand:
             if c.is_land:
                 continue
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
             # A ONE-SHOT blink with nothing to blink is a wasted card. The
             # permanent blinkers (Soulherder, Teleportation Circle, ...) are

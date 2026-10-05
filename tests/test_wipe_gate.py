@@ -2,7 +2,7 @@
 """Your own sweeper asks the wipe gate at every OPTIONAL cast site (§0z104).
 
     python -m tests.test_wipe_gate
-    python -m tests.test_wipe_gate --mutate   # 1 mutation, exact set
+    python -m tests.test_wipe_gate --mutate   # 2 mutations, exact sets
 
 `opponents.should_cast_own_wipe` -- sweep only when the table's creatures
 meaningfully outnumber yours -- was asked in the main phase alone, so
@@ -21,18 +21,31 @@ CASES
      Damn stays on top, and `citadel_wipe_held` counts it
   E  NEIGHBOUR: the same miracle while LOSING casts Farewell
 
-MUTATION, WRITTEN BEFORE THE RUN, exact set:
+THE MEASURE (§0z106), each case with `wipe_gate_measure` set explicitly:
+  F  BIG: one 13-power body against three seats of three 1-power creatures.
+     "count" opens the gate (1 body against 9), "power" and "cost" close it
+     (13 power against 9) -- karlov's commander-on-board case
+  G  ONE-SIDED: on the WINNING board, "cost" opens the gate for Massacre
+     Wurm (it kills none of yours) and keeps it shut for Damn
+  H  INDESTRUCTIBLE: with every one of your bodies indestructible, "cost"
+     opens the gate for Damn (destroy -- they survive) and keeps it shut for
+     Farewell (exile ignores indestructible)
+
+MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   wipe_gate_all_casts=False (the old engine)   -> A, B, C, D
+  every measure forced to "count"              -> F, G, H
 
 UNMUTATED (§0z15): E is the neighbour -- the gate must not stop a wipe the
 pilot wants.
 """
+import dataclasses
 import sys
 
 from edhmc import engine as EN
 from edhmc import karlov as KA
 from edhmc import lorehold as LO
-from edhmc.decks import karlov_v2, lorehold_v16
+from edhmc import opponents as OPP
+from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import DECKS as CATALOG
 
@@ -44,6 +57,9 @@ KDECK, KCMD = karlov_v2.build()
 FAREWELL = next(c for c in LDECK if c.name == "Farewell")
 DAMN = next(c for c in KDECK if c.name == "Damn")
 CITADEL = CATALOG["karlov"][1]["Bolas's Citadel"]
+RDECK, _ = rendmaw_v12.build()
+WURM = next(c for c in RDECK if c.name == "Massacre Wurm")
+FORCE_COUNT = False
 BODY = EN.Card(name="Body", types=frozenset({"Creature"}), power=2,
                toughness=2, cost={"gen": 2})
 
@@ -84,6 +100,18 @@ def lorehold(winning):
     return g
 
 
+def gate(g, card, measure):
+    """The gate under one measure; FORCE_COUNT is the mutation."""
+    g.cfg["wipe_gate_measure"] = "count" if FORCE_COUNT else measure
+    return OPP.should_cast_own_wipe(g, card)
+
+
+def seats(g, n):
+    for o in g.opponents:
+        o.alive, o.creatures = True, float(n)
+        o.archetype, o._pcache = None, None   # bare bracket: power 1.0
+
+
 def run_cases():
     PASS.clear()
     FAIL.clear()
@@ -120,6 +148,30 @@ def run_cases():
     LO.miracle_window(g)
     check("E NEIGHBOUR: a miracled Farewell while losing is cast",
           g.m["own_wipes_cast"], 1)
+
+    g = lorehold(True)
+    for p in [p for p in g.board if p.card is BODY]:
+        g.board.remove(p)
+    g.board.append(EN.Permanent(card=EN.Card(
+        name="Big", types=frozenset({"Creature"}), power=13, toughness=13,
+        cost={"gen": 6}), sick=False))
+    seats(g, 3)
+    check("F one 13-power body against nine 1-power: count opens, power and "
+          "cost do not", [gate(g, DAMN, m) for m in ("count", "power", "cost")],
+          [True, False, False])
+
+    g = lorehold(True)
+    seats(g, 3)
+    check("G cost: a one-sided wipe passes where a symmetric one does not",
+          [gate(g, WURM, "cost"), gate(g, DAMN, "cost")], [True, False])
+
+    g = lorehold(True)
+    seats(g, 3)
+    for p in g.board:
+        if p.card.is_creature:
+            p.card = dataclasses.replace(p.card, indestructible=True)
+    check("H cost: indestructible bodies survive Damn but not Farewell",
+          [gate(g, DAMN, "cost"), gate(g, FAREWELL, "cost")], [True, False])
     return set(FAIL)
 
 
@@ -130,18 +182,26 @@ def main() -> int:
         run_cases()
         print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
         return 1 if FAIL else 0
-    print("MUTATION RUN -- exact set\n")
-    want = {"A", "B", "C", "D"}
-    EXTRA = {"wipe_gate_all_casts": False}
-    try:
-        broke = run_cases()
-    finally:
-        EXTRA = {}
-    ok = broke == want
-    print(f"   broke {sorted(broke) or 'nothing'}  expected {sorted(want)}  "
-          f"{'OK' if ok else '!!! UNEXPECTED'}\n")
-    print(f"{int(ok)} passed, {int(not ok)} failed (1 mutation, exact set)")
-    return 0 if ok else 1
+    global FORCE_COUNT
+    print("MUTATION RUN -- exact sets\n")
+    results = []
+    for label, want, extra, force in (
+            ("wipe_gate_all_casts=False", {"A", "B", "C", "D"},
+             {"wipe_gate_all_casts": False}, False),
+            ("every measure forced to count", {"F", "G", "H"}, {}, True)):
+        EXTRA, FORCE_COUNT = extra, force
+        try:
+            broke = run_cases()
+        finally:
+            EXTRA, FORCE_COUNT = {}, False
+        ok = broke == want
+        results.append(ok)
+        print(f"   {label}: broke {sorted(broke) or 'nothing'}  expected "
+              f"{sorted(want)}  {'OK' if ok else '!!! UNEXPECTED'}\n")
+    n_ok = sum(results)
+    print(f"{n_ok} passed, {len(results) - n_ok} failed "
+          f"({len(results)} mutations, exact sets)")
+    return 0 if all(results) else 1
 
 
 if __name__ == "__main__":

@@ -2210,7 +2210,7 @@ def altar_enable(g: Game, units, precombat: bool):
             continue
         if precombat and "pump" not in c.tags:
             continue
-        if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+        if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
             continue
         cost = cost_after_reduction(g, c)
         for k in range(1, len(fodder) + 1):
@@ -2363,7 +2363,7 @@ def main_phase(g: Game, precombat: bool = False):
             if precombat and "pump" not in c.tags:
                 continue
             # do not wrath your own winning board
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
             # PROFT, SINISTER MASTERMIND (Reality Fracture, preview text
             # 2026-09-21): "Threshold -- You can't cast this spell unless there

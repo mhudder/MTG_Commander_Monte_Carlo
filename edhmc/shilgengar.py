@@ -953,7 +953,7 @@ class ShilgengarGame(BaseGame):
             for c in self.hand:
                 if c.is_land:
                     continue
-                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self):
+                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
                 _m = choose_mode(c, self.herald_cost(c), pool)

@@ -1018,7 +1018,7 @@ def main_phase(g):
         for c in g.hand:
             if c.is_land:
                 continue
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g):
+            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
@@ -1176,7 +1176,7 @@ def citadel_step(g):
         # as an unplayable land does: the order is forced.
         # `wipe_gate_all_casts=False` restores the old dig.
         if ("wipe" in top.tags and g.cfg.get("wipe_gate_all_casts", True)
-                and not OPP.should_cast_own_wipe(g)):
+                and not OPP.should_cast_own_wipe(g, top)):
             g.m["citadel_wipe_held"] += 1
             break
         g.library.pop()

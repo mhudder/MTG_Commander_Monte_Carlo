@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Should the wipe gate count BODIES or POWER? (§0z106)
+"""Should the wipe gate count BODIES, POWER, or what the wipe COSTS? (§0z106)
 
     python -m diagnostics.run_wipe_gate_power 15000 > results/wipe_gate_power_20261005.txt
 
@@ -15,6 +15,11 @@ Three arms per deck, each deck's staged list, same seeds (5000..), one T20
 game per seed with T10 read off it (§0z93):
   count   wipe_gate_measure="count" (the gate as it was)
   power   wipe_gate_measure="power"
+  cost    wipe_gate_measure="cost" -- power, counting only YOUR creatures
+          the sweeper would kill (none for a one-sided wipe, none that is
+          indestructible against a destroy). Added after the first run found
+          power costing rendmaw (Massacre Wurm, one-sided, held) and
+          shilgengar (Avacyn's grant) at T20
   never   wipe_threshold=1e9 -- no optional own wipe is ever cast; what the
           gate is worth at all, as a reference
 """
@@ -32,6 +37,7 @@ DECKS_HERE = ("karlov", "lorehold", "rendmaw", "tivit", "shilgengar",
 ARMS = {
     "count": dict(wipe_gate_measure="count"),
     "power": dict(wipe_gate_measure="power"),
+    "cost": dict(wipe_gate_measure="cost"),
     "never": dict(wipe_threshold=1e9),
 }
 KEYS = ("won", "damage", "own_wipes_cast")
@@ -71,7 +77,7 @@ def main():
         base = np.array(cols[(d, "count")])
         print(f"{d}  (count: won T20 {base[:, 1].mean():.4f}, "
               f"own wipes {base[:, 3].mean():.3f}/game)")
-        for arm in ("power", "never"):
+        for arm in ("power", "cost", "never"):
             b = np.array(cols[(d, arm)])
             cells = []
             for i, name in enumerate(names):
