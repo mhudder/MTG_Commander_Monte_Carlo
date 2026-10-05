@@ -757,6 +757,17 @@ def pilot_may_cast(g, card) -> bool:
     written at three sites is §0u's shape. A MANDATORY copy (Double Vision
     puts its copy on the stack; nobody chooses) does not ask.
     """
+    # YOUR OWN SWEEPER IS A CHOICE TOO (§0z104). The wipe gate
+    # (`opponents.should_cast_own_wipe`: sweep only when the table's creatures
+    # meaningfully outnumber yours) was asked in the main phase alone, so a
+    # Farewell that arrived by miracle, Arcane Bombardment, discover, Apex,
+    # Jeska's Will, Goliath or Galvanoth wiped a board the pilot was WINNING
+    # with -- 34% of this deck's own wipes resolved with the gate closed. One
+    # predicate, every optional site. `wipe_gate_all_casts=False` restores
+    # the old rule.
+    if ("wipe" in card.tags and g.cfg.get("wipe_gate_all_casts", True)
+            and not OPP.should_cast_own_wipe(g)):
+        return False
     n = spell_draws(g, card)
     return n == 0 or draw_is_safe(g, n)
 
@@ -1355,6 +1366,13 @@ def discover(g, x: int):
     g.m["discover_exiled"] += len(exiled)
     if hit is None:
         return None
+    # "Cast it without paying its mana cost OR PUT IT INTO YOUR HAND" -- the
+    # cast is a choice, so it asks `pilot_may_cast` like every other optional
+    # site (§0z104). It did not, so a discovered Farewell always resolved.
+    if g.cfg.get("wipe_gate_all_casts", True) and not pilot_may_cast(g, hit):
+        g.hand.append(hit)
+        g.m["discover_to_hand"] += 1
+        return None
     g.m["free_casts"] += 1
     g.m["discover_casts"] += 1
     g.m["discover_mv"] += hit.free_mv
@@ -1399,6 +1417,11 @@ def apex_of_power(g, is_copy=False):
     # Cast what the pool can afford, best first. Whatever is left stays exiled.
     pool = [c for c in exiled if not c.is_land]
     while pool:
+        # "you MAY cast": a choice (§0z104), so a gated card is not cast.
+        if g.cfg.get("wipe_gate_all_casts", True):
+            pool = [c for c in pool if pilot_may_cast(g, c)]
+            if not pool:
+                break
         units = mana_units(g)
         best = next((c for c in sorted(pool, key=lambda c: (-c.priority, -c.mv))
                      if can_pay(reduce_cost(g, c), units) is not None), None)
@@ -1440,6 +1463,11 @@ def jeskas_will(g):
     g.m["jeska_exiled"] += len(exiled)
     pool = [c for c in exiled if not c.is_land]
     while pool:
+        # "you MAY cast": a choice (§0z104), so a gated card is not cast.
+        if g.cfg.get("wipe_gate_all_casts", True):
+            pool = [c for c in pool if pilot_may_cast(g, c)]
+            if not pool:
+                break
         units = mana_units(g)
         best = next((c for c in sorted(pool, key=lambda c: (-c.priority, -c.mv))
                      if can_pay(reduce_cost(g, c), units) is not None), None)
@@ -1860,7 +1888,13 @@ def goliath_attack(g):
     """
     if not g.cfg.get("lorehold_recursion", True) or not g.dream_exile:
         return
-    best = max(g.dream_exile, key=lambda c: c.free_mv)
+    # "You may cast a spell from among cards you own in exile with dream
+    # counters": a choice (§0z104), so a gated card stays in exile.
+    pool = (g.dream_exile if not g.cfg.get("wipe_gate_all_casts", True)
+            else [c for c in g.dream_exile if pilot_may_cast(g, c)])
+    if not pool:
+        return
+    best = max(pool, key=lambda c: c.free_mv)
     g.dream_exile.remove(best)
     g.m["dream_free_casts"] += 1
     g.m["free_casts"] += 1
@@ -2228,7 +2262,9 @@ def take_turn(g):
     # is why set_top above knows about it.
     if g.has("Galvanoth") and g.library:
         top = g.library[-1]
-        if "Instant" in top.types or "Sorcery" in top.types:
+        if (("Instant" in top.types or "Sorcery" in top.types)
+                and (not g.cfg.get("wipe_gate_all_casts", True)
+                     or pilot_may_cast(g, top))):      # "you MAY cast it"
             g.library.pop()
             g.m["upkeep_free_casts"] += 1
             # `mv_cheated` was added here AND again inside resolve_spell --

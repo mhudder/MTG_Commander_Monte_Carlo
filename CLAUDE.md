@@ -186,6 +186,7 @@ python -m tests.test_trostani --mutate             # 7 mutations, exact sets
 python -m tests.test_life_policies --mutate        # 3 mutations, exact sets
 python -m tests.test_id_reuse --mutate             # 3 mutations, exact sets
 python -m tests.test_azusa_batch6 --mutate         # 8 mutations, exact sets
+python -m tests.test_wipe_gate --mutate            # 1 mutation, exact set
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -256,6 +257,7 @@ asserting a card does nothing:
 | once decking could lose, the pilot still drew every card it was offered | a draw engine kills you in exactly the games it is winning | 0.022 (azusa), caught before it shipped (§0z42) |
 | every untapped creature attacked, and mana creatures were tapped last | Twitching Doll's nest counters never accrue (0.03 a game) | 0.009 (rendmaw, §0z58) |
 | every "+1/+1 counter on target creature" went on the biggest or an evasive creature | stacking power on one body is as good as spreading it, in a pod that chump-blocks the biggest attacker | 0.0105 (Bristly Bill, azusa, §0z101) -- the owner's call, caught before it shipped |
+| your own sweeper asked the wipe gate in the main phase only | a wipe that arrives by miracle, copy, discover or free cast is fired whatever the board | 0.047 (lorehold, §0z104) -- Arcane Bombardment read ordinary for weeks |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a

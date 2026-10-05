@@ -1,0 +1,10 @@
+Staged swaps in lorehold and karlov, re-measured after §0z104 (the wipe gate at every optional cast site), 2026-10-05.
+N=15,000 paired, seeds 5000.., diagnostics/run_restage.py arms K K_noConq K_noCit L L_noCaldera L_noSunbird L_noGold; staged minus undone.
+
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0418 +-0.0034*  T20 +0.0443 +-0.0038*  dmgT20 -3.58 +-0.27
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0043 +-0.0031*  T20 +0.0193 +-0.0042*  dmgT20 +0.58 +-0.25
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0083 +-0.0025*  T20 +0.0269 +-0.0038*  dmgT20 +2.95 +-0.24
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0051 +-0.0027*  T20 +0.0233 +-0.0042*  dmgT20 +2.15 +-0.26
+lorehold -Blasphemous Act +Goldspan Dragon            T10 +0.0105 +-0.0026*  T20 +0.0015 +-0.0042   dmgT20 +1.45 +-0.22
+-Blasphemous Act +Goldspan, wipe gate OFF:  T10 +0.0130 ±0.0026*  T20 +0.0131 ±0.0046*
+-Blasphemous Act +Goldspan, wipe gate ON :  T10 +0.0105 ±0.0026*  T20 +0.0015 ±0.0042 

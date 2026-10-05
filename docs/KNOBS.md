@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `ef5bd55` from 23 engine sources.
+Derived at `1322273` from 23 engine sources.
 
-**197 knobs, 280 call sites.**
+**198 knobs, 287 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -31,8 +31,8 @@ costs a written justification.
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:3475` in `simulate()`
   - `10` at `edhmc/engine.py:3586` in `simulate()`
-  - `20` at `edhmc/karlov.py:1457` in `simulate()`
-  - `10` at `edhmc/lorehold.py:2321` in `simulate()`
+  - `20` at `edhmc/karlov.py:1467` in `simulate()`
+  - `10` at `edhmc/lorehold.py:2357` in `simulate()`
   - `10` at `edhmc/opponents.py:202` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1241` in `simulate()`
   - `20` at `edhmc/tivit.py:1487` in `simulate()`
@@ -66,7 +66,7 @@ show up first.
 | `block_share` | `0.6` | 1 | `edhmc/opponents.py:1008` |  | yes | yes |
 | `blocker_toughness` | `2` | 1 | `edhmc/opponents.py:1059` | §0z92 | yes | yes |
 | `borrowed_knowledge_discard` | `True` | 2 | `edhmc/lorehold.py:744` | §0f | yes | yes |
-| `breach_cap` | `4` | 1 | `edhmc/lorehold.py:1886` |  | yes | **never** |
+| `breach_cap` | `4` | 1 | `edhmc/lorehold.py:1920` |  | yes | **never** |
 | `bristly_min_counters` | `2` | 1 | `edhmc/azusa.py:3249` | §0z101 | yes | yes |
 | `cast_lookahead` | `False` | 1 | `edhmc/engine.py:2308` | §0z43 | yes | yes |
 | `charge_life_costs` | `True` | 5 | `edhmc/engine.py:1047` | §0z7 | yes | yes |
@@ -124,22 +124,22 @@ show up first.
 | `finality_exiles` | `True` | 1 | `edhmc/shilgengar.py:428` | §0z75 | yes | yes |
 | `first_attack_turn` | `3` | 2 | `edhmc/opponents.py:1750` | §0z17 | yes | yes |
 | `first_wipe_turn` | `5` | 1 | `edhmc/opponents.py:440` |  | yes | **never** |
-| `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:1494` | §0u | yes | yes |
+| `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:1522` | §0u | yes | yes |
 | `flier_block_share` | `0.3` | 1 | `edhmc/opponents.py:1009` |  | yes | yes |
 | `gain_life_routed` | `True` | 1 | `edhmc/shilgengar.py:415` | §0z75 | yes | yes |
 | `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:894` | §0z19 | yes | yes |
 | `gloomshrieker_text` | `True` | 2 | `edhmc/engine.py:1447` | §0z85 | yes | yes |
 | `goad_block_share` | `0.3` | 1 | `edhmc/opponents.py:763` |  | yes | **never** |
 | `goldspan_targeted` | `True` | 1 | `edhmc/lorehold.py:66` | §0z77 | yes | yes |
-| `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1919` |  | **no** | **never** |
+| `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1953` |  | **no** | **never** |
 | `hart_fetch` | `True` | 1 | `edhmc/engine.py:3208` | §0z68 | yes | yes |
 | `herald_text` | `True` | 2 | `edhmc/shilgengar.py:508` | §0z4 | yes | yes |
-| `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1925` |  | **no** | **never** |
+| `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1959` |  | **no** | **never** |
 | `hold_up_rate` | `0.6` | 1 | `edhmc/opponents.py:376` |  | yes | yes |
 | `horizon_counts` | `'rounds'` | 1 | `edhmc/tivit.py:1458` | §0z86 | yes | yes |
 | `horn_doubled_legacy` | `False` | 2 | `edhmc/azusa.py:1132` | §0z41 | yes | yes |
 | `incidental_rate` | `0.45` | 1 | `edhmc/opponents.py:1755` | §0z84 | yes | yes |
-| `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:1724` |  | **no** | yes |
+| `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:1752` |  | **no** | yes |
 | `karmic_echo` | `'decline'` | 1 | `edhmc/trostani.py:1551` |  | yes | **never** |
 | `known_win_focus` | `0.8` | 1 | `edhmc/opponents.py:348` | §0z62 | yes | yes |
 | `land_animation` | `'full'` | 3 | `edhmc/azusa.py:599` | §0z19 | yes | yes |
@@ -147,27 +147,27 @@ show up first.
 | `land_floor` | `8` | 1 | `edhmc/lorehold.py:405` | §0z30 | **no** | **never** |
 | `library_life_floor` | `20` | 1 | `edhmc/trostani.py:1609` |  | yes | yes |
 | `life_cap` | `1000000000.0` | 1 | `edhmc/trostani.py:460` |  | yes | **never** |
-| `lorehold_recursion` | `True` | 5 | `edhmc/lorehold.py:1646` | §0z28 | yes | **never** |
+| `lorehold_recursion` | `True` | 5 | `edhmc/lorehold.py:1674` | §0z28 | yes | **never** |
 | `luminarch_per_opponent` | `True` | 1 | `edhmc/trostani.py:1761` | §0z17 | yes | **never** |
 | `lurrus_recast` | `True` | 1 | `edhmc/karlov.py:987` | §0z84 | yes | yes |
-| `magistrate_token_cap` | `512` | 1 | `edhmc/lorehold.py:790` |  | **no** | **never** |
+| `magistrate_token_cap` | `512` | 1 | `edhmc/lorehold.py:801` |  | **no** | **never** |
 | `mana_colour_legacy` | `False` | 3 | `edhmc/azusa.py:1085` | §0z37 | yes | yes |
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:1086` | §0z37 | yes | yes |
 | `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:2121` |  | **no** | **never** |
-| `miracle_reserve` | `2` | 1 | `edhmc/lorehold.py:1952` |  | yes | yes |
+| `miracle_reserve` | `2` | 1 | `edhmc/lorehold.py:1986` |  | yes | yes |
 | `moloid_mill_floor` | `10` | 1 | `edhmc/azusa.py:3336` | §0z42 | yes | **never** |
 | `monarch_attack_floor` | `0.75` | 1 | `edhmc/opponents.py:1707` | §0z38 | yes | yes |
 | `monarch_loss_scale` | `rate` | 1 | `edhmc/opponents.py:1773` | §0u | yes | yes |
 | `monarch_start` | `False` | 1 | `edhmc/engine.py:1135` | §0z30 | yes | yes |
 | `monarch_start_turn` | `0` | 1 | `edhmc/opponents.py:1730` | §0z28 | yes | yes |
-| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:2202` |  | **no** | **never** |
-| `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:873` |  | **no** | yes |
-| `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1129` |  | yes | yes |
+| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:2236` |  | **no** | **never** |
+| `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:884` |  | **no** | yes |
+| `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1140` |  | yes | yes |
 | `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:2696` |  | yes | **never** |
 | `necro_hand_target` | `7` | 1 | `edhmc/karlov.py:706` | §0z57 | yes | yes |
 | `necro_life_floor` | `10` | 1 | `edhmc/karlov.py:707` | §0z57 | yes | yes |
 | `on_the_draw` | `True` | 1 | `edhmc/engine.py:3546` |  | **no** | **never** |
-| `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1171` |  | **no** | **never** |
+| `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1182` |  | **no** | **never** |
 | `opp_creatures_per_turn` | `0.7` | 1 | `edhmc/karlov.py:612` |  | **no** | **never** |
 | `opp_death_rate` | `0.55` | 1 | `edhmc/engine.py:2926` | §0z70 | yes | yes |
 | `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:2801` | §0z47 | yes | yes |
@@ -179,7 +179,7 @@ show up first.
 | `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:1945` | §0u | yes | **never** |
 | `own_wipe_indestructible` | `True` | 1 | `edhmc/opponents.py:1924` | §0u | yes | yes |
 | `pearl_lifelink_cap` | `2` | 1 | `edhmc/engine.py:3121` |  | **no** | **never** |
-| `pinnacle_monk_etb` | `True` | 1 | `edhmc/lorehold.py:1617` | §0z83 | yes | yes |
+| `pinnacle_monk_etb` | `True` | 1 | `edhmc/lorehold.py:1645` | §0z83 | yes | yes |
 | `planeswalker_abilities` | `True` | 2 | `edhmc/azusa.py:1598` |  | yes | yes |
 | `pod_brackets` | `(2, 3, 4)` | 1 | `edhmc/opponents.py:168` |  | yes | yes |
 | `pod_clock_rounds` | `True` | 1 | `edhmc/opponents.py:306` | §0z86 | yes | yes |
@@ -217,8 +217,8 @@ show up first.
 | `solemn_text` | `True` | 3 | `edhmc/engine.py:1500` | §0z42 | yes | yes |
 | `springheart_hosts` | `<none>` | 1 | `edhmc/azusa.py:1521` |  | yes | yes |
 | `starting_life` | `40` | 4 | `edhmc/karlov.py:921` |  | **no** | yes |
-| `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1065` | §0z49 | yes | yes |
-| `surveil_land_floor` | `6` | 1 | `edhmc/lorehold.py:934` |  | **no** | **never** |
+| `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1076` | §0z49 | yes | yes |
+| `surveil_land_floor` | `6` | 1 | `edhmc/lorehold.py:945` |  | **no** | **never** |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:1049` | §0z7 | yes | **never** |
 | `tempting_offer_rate` | `0.5` | 1 | `edhmc/voting.py:160` |  | **no** | **never** |
 | `thomil_lord_fodder` | `2` | 1 | `edhmc/engine.py:3055` |  | **no** | **never** |
@@ -231,15 +231,16 @@ show up first.
 | `trostani_attacks` | `False` | 1 | `edhmc/trostani.py:1653` |  | yes | **never** |
 | `turns` | **conflicts** | 8 | `edhmc/azusa.py:3475` | §0z17 | yes | yes |
 | `tutor_floor` | `6` | 1 | `edhmc/trostani.py:1043` |  | **no** | **never** |
-| `tutor_order` | `()` | 1 | `edhmc/lorehold.py:1236` |  | **no** | yes |
-| `tutor_policy` | `<none>` | 2 | `edhmc/lorehold.py:1217` |  | yes | yes |
-| `tutor_targets` | `()` | 1 | `edhmc/lorehold.py:1214` |  | **no** | yes |
+| `tutor_order` | `()` | 1 | `edhmc/lorehold.py:1247` |  | **no** | yes |
+| `tutor_policy` | `<none>` | 2 | `edhmc/lorehold.py:1228` |  | yes | yes |
+| `tutor_targets` | `()` | 1 | `edhmc/lorehold.py:1225` |  | **no** | yes |
 | `vault_hold` | `'never'` | 1 | `edhmc/engine.py:1939` | §0z68 | yes | yes |
 | `vault_min_treasures` | `4` | 1 | `edhmc/engine.py:1975` | §0z77 | yes | yes |
 | `watch` | `()` | 18 | `edhmc/azusa.py:1805` | §0t | yes | yes |
 | `whip_reanimate` | `True` | 1 | `edhmc/engine.py:3271` | §0z73 | yes | yes |
 | `whip_text` | `True` | 2 | `edhmc/engine.py:3271` | §0z73 | yes | yes |
 | `wildspeaker_mode` | `'auto'` | 1 | `edhmc/azusa.py:2627` |  | **no** | yes |
+| `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1178` | §0z104 | yes | yes |
 | `wipe_response` | `True` | 1 | `edhmc/trostani.py:375` |  | **no** | **never** |
 | `wipe_threshold` | `1.4` | 1 | `edhmc/opponents.py:1879` |  | yes | **never** |
 | `wurm_kill_share` | `0.35` | 1 | `edhmc/shilgengar.py:891` |  | **no** | **never** |
@@ -277,12 +278,12 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 197 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 198 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**46 of 197.** Not an error — most knobs are
+**46 of 198.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
@@ -291,7 +292,7 @@ docs knows they exist.
 
 ## The knobs nothing has ever set
 
-**59 of 197.** The name appears nowhere in
+**59 of 198.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;

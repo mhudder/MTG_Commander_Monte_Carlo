@@ -1169,6 +1169,16 @@ def citadel_step(g):
         # The floor is a floor on what you are LEFT with, not on what you pay.
         if g.your_life - cost < floor:
             break
+        # YOUR OWN SWEEPER IS A CHOICE (§0z104): "you MAY cast spells from
+        # the top". The main phase asks the wipe gate and this dig did not,
+        # so a Damn on top wiped a board the pilot was winning with -- 38 of
+        # this deck's 439 own wipes. A wipe the gate refuses STOPS the dig,
+        # as an unplayable land does: the order is forced.
+        # `wipe_gate_all_casts=False` restores the old dig.
+        if ("wipe" in top.tags and g.cfg.get("wipe_gate_all_casts", True)
+                and not OPP.should_cast_own_wipe(g)):
+            g.m["citadel_wipe_held"] += 1
+            break
         g.library.pop()
         g.your_life -= cost
         g.m["citadel_life_spent"] += cost

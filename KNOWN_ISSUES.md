@@ -152,6 +152,7 @@ Methodology that used to live at the end of this file is now
 | [0z101](#0z101) | MEASURED | **Azusa batch 6: seven landfall payoffs against Wayward Swordtooth.** All seven swaps significant at T20; top set Mole Man (+0.0352), Mossborn Hydra (+0.0304), Chocobo Racetrack (+0.0276), Glacier Godmaw (+0.0265). The cut is worth nothing. **Spreading counters beats focusing them** (+0.0105 ±0.0021 for Bristly Bill, the owner's call) and is the default. Three gaps on the way: Zendikar's Roil was never in LAND_ENABLERS, counters on a */* card were discarded, Avenger pumped only Plant tokens |
 | [0z102](#0z102) | COMMITTED | **-Wayward Swordtooth +Mole Man, Moloid Master (azusa), the owner's call.** Rebuilt table: Mole Man +0.0384 ±0.0042, second in the deck. Four rows fell beyond their bars, three of them Mole Man's own role -- Ancient Greenwarden, Crucible of Worlds (graveyard lands) and Journey of Discovery (land supply) -- §0z27's redundancy shape. Exploration did NOT rise (+0.0021 -> +0.0026 ±0.0030). Titania (+0.0004) is the weakest MODEL-EVALUATED row and is kept on the owner's call, as Exploration is |
 | [0z103](#0z103) | COMMITTED | **-Life from the Loam +Mossborn Hydra (azusa), the owner's call**, on the paired run that beat Nissa in the same slot. Rebuilt: Hydra +0.0266 ±0.0038; Scute Swarm and Avenger fell beyond their bars -- §0z100's curve, a fifth landfall payoff lowering the four it overlaps. Nissa's proposed cut moved to Sylvan Awakening |
+| [0z104](#0z104) | FIXED | **Your own sweeper asked the wipe gate in the main phase ONLY.** Lorehold's miracle, Arcane Bombardment, discover, Apex, Jeska's Will, Goliath and Galvanoth -- and karlov's Bolas's Citadel -- cast wipes without asking: 34% of lorehold's own wipes resolved on a board it was winning. One predicate (`pilot_may_cast`), every optional site: **lorehold +0.0242 / +0.0465**, karlov +0.0021 at T20. All four lorehold wipes flip to significantly POSITIVE; -Blasphemous Act +Goldspan falls inside its bar at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9328,6 +9329,96 @@ Ashaya and Eternal Witness near +0.007.
 **OTHER DECKS.** `_evasion.py`/`_removal.py` regenerated (scanned-name lists
 only). All six other decks bit-identical at 3,000 games against 51fa782;
 VERIFIED.
+
+## 0z104. FIXED — your own sweeper asks the wipe gate at every optional cast site
+
+**FOUND BY A GROUP.** §0z99 found lorehold's three own wipes worth −0.0333
+±0.0036 at T10 TOGETHER: the deck won more without them. The standing rule
+is to suspect the engine before the card, so every lorehold self-wipe in
+2,000 games was traced to its casting path and the board it hit. **0.84 own
+wipes a game, and 34% of them (576 of 1,670) resolved with the wipe gate
+CLOSED** -- `opponents.should_cast_own_wipe`, "sweep only when the table's
+creatures meaningfully outnumber yours", had said no.
+
+**THE MECHANISM.** The gate was asked in `main_phase` and nowhere else. Every
+other way this deck casts a spell skipped it:
+
+| path | gate open | gate CLOSED |
+|---|---|---|
+| miracle (the commander's {2}) | 677 | **253** |
+| Arcane Bombardment's copies | 23 | **176** |
+| free casts (Goliath, Galvanoth, ...) | 69 | 48 |
+| Apex of Power | 19 | 41 |
+| Sunbird's Invocation | 16 | 28 |
+| discover (Hit the Mother Lode) | 17 | 13 |
+| main phase | 244 | 0 |
+
+`pilot_may_cast` already called itself "ONE predicate for every OPTIONAL cast
+site" -- it held only the decking rule. **The wipe gate now lives there**, and
+the four optional sites that did not ask it now do: discover ("cast it OR
+put it into your hand" -- a refused wipe goes to hand), Apex of Power and
+Jeska's Will ("you may cast"), Goliath Daydreamer's dream casts and
+Galvanoth. Double Vision's copy is mandatory and still does not ask. One
+audit of all seven decks found one more leak of the same shape: **karlov's
+Bolas's Citadel** dug wipes off the top without asking -- 38 of its 439 --
+and now stops its dig at a refused wipe, as it does at an unplayable land.
+Tivit's 318 closed-gate wipes are council VOTES (Coercive Portal's upkeep,
+Magister of Worth) -- not the pilot's choice, and correctly not gated. The
+other four decks: none. `wipe_gate_all_casts=False` restores the old engine.
+
+**WHAT IT WAS WORTH** (`diagnostics/run_wipe_gate.py`,
+`results/wipe_gate_20261005.txt`, N=15,000 paired, staged lists):
+
+| | won T10 | won T20 | own wipes / game |
+|---|---|---|---|
+| lorehold | **+0.0242 ±0.0025** | **+0.0465 ±0.0040** | 0.83 → 0.55 |
+| karlov | +0.0007 ±0.0007 | +0.0021 ±0.0013 | 0.44 → 0.41 |
+
+**This is the third-largest policy correction on record** -- after azusa's
+land step (0.074) and combat split (0.063) -- and
+the CLAUDE.md shape exactly: a conservatism nobody chose -- the gate written
+once, in one place -- that amounted to asserting that a deck's free-cast
+engines also fire its wipes at random. `tests/test_wipe_gate.py` pins the
+gate, the miracle, discover and the Citadel, and its old-engine mutation
+fails exactly those four.
+
+**THE TABLES** (both rebuilt at N=15,000). Karlov: 0 rows moved beyond their
+bars. **Lorehold: 24 moved, nearly all UP**, and every own wipe FLIPPED from
+negative to significantly positive -- Farewell −0.0037 → +0.0085, Ultima
+−0.0045 → +0.0077, Promise of Loyalty −0.0021 → +0.0104, Ondu Inversion
+−0.0028 → +0.0085. The free-cast engines that had been firing them rose the
+most: Arcane Bombardment +0.0031 → +0.0117, Sunbird's Invocation +0.0053 →
++0.0147, Apex of Power +0.0235 → +0.0345, Storm Herd +0.0385 → +0.0501.
+**The tell CLAUDE.md names -- a card whose text says it should be central and
+whose row says it is ordinary -- was Arcane Bombardment for weeks.**
+
+**THE GROUPS, RE-RUN** (`results/groups_20261002.txt`, merged; all fourteen
+reproduction checks pass). Lorehold's own wipes: T10 −0.0333 → **−0.0162**,
+T20 −0.0095 → **+0.0256**. At T20 the three wipes now earn their slots; at
+T10 they still cost, which is the FLIP shape a wipe is expected to have (it
+spends tempo early and repays it late). Karlov's wipes barely moved (T10
+−0.0132, T20 −0.0003). Every other lorehold group rose. Azusa's groups were
+re-run on the current list as well: two named cards committed out since, and
+**the four cards that play lands from the graveyard -- Crucible, Ramunap,
+Greenwarden, Mole Man -- are +0.0985 together against +0.0762 summed at T20
+(ratio 1.29)**, beating the conservative bound: the overlap §0z102 predicted.
+
+**THE STAGED SWAPS, RE-MEASURED** (`results/restage_20261005.txt`):
+
+| swap | T10 | T20 | 09-29, T20 |
+|---|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0418 | +0.0443 | +0.0271 |
+| karlov -Swamp +Bolas's Citadel | +0.0043 | +0.0193 | +0.0131 |
+| lorehold -Penance +Caldera Pyremaw | +0.0083 | +0.0269 | +0.0239 |
+| lorehold -Scroll Rack +Sunbird's Invocation | +0.0051 | +0.0233 | +0.0173 |
+| **lorehold -Blasphemous Act +Goldspan Dragon** | +0.0105 | **+0.0015 ±0.0042** | +0.0134 |
+
+Four stand and grew (the Conqueror chiefly from §0z90's general Exquisite Blood
+clause, not this fix). **The Goldspan swap no longer clears its bar at T20**,
+and that one is attributed: the same run with the gate off reproduces
++0.0130 / +0.0131. Blasphemous Act was over-firing like every other wipe, so
+cutting it looked better than it is. The staging was the owner's; it is
+recorded on the Change and left for the owner to keep or withdraw.
 
 ## How to read an ablation table
 

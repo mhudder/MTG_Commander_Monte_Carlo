@@ -151,13 +151,17 @@ GROUPS = {
         "@check": ["Sol Ring"],
         "lands from the top": ["Oracle of Mul Daya", "Courser of Kruphix",
                                "Augur of Autumn"],
-        "extra land drops": ["Exploration", "Wayward Swordtooth"],
+        # Wayward Swordtooth was committed out for Mole Man (§0z102), so the
+        # pair this group measured in §0z99 no longer exists.
         "ramp spells": ["Kodama's Reach", "Cultivate", "Realms Uncharted",
                         "Seek the Horizon", "Journey of Discovery"],
         "landfall creatures": ["Scute Swarm", "Avenger of Zendikar",
                                "Rampaging Baloths", "Greensleeves, Maro-Sorcerer"],
+        # Life from the Loam was committed out for Mossborn Hydra (§0z103);
+        # the four cards that now share "play lands from your graveyard":
         "lands from the graveyard": ["Ramunap Excavator", "Crucible of Worlds",
-                                     "Life from the Loam"],
+                                     "Mole Man, Moloid Master",
+                                     "Ancient Greenwarden"],
         "finishers": ["Craterhoof Behemoth", "Ulamog, the Infinite Gyre",
                       "Kozilek, Butcher of Truth"],
         "card recursion": ["Regrowth", "Eternal Witness"],

@@ -2126,7 +2126,7 @@ CHANGES: list[Change] = [
             "The two cut different cards and neither touches the other's "
             "mechanism, but they have not been measured as a 2x2 and that is "
             "the check §0p exists for if both are committed together."),
-        reverified=(
+        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0418 +-0.0034 at T10, +0.0443 +-0.0038 at T20 (up from +0.0271 at T20 on 2026-09-29: the engine changes since, chiefly §0z90's general Exquisite Blood clause, which this second copy of the trigger shares). results/restage_20261005.txt. " + (
             'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
             '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
@@ -2264,7 +2264,7 @@ CHANGES: list[Change] = [
             "less), which is deliberately conservative and a floor on that "
             "half -- the model cannot value 'I am losing anyway'."
         ),
-        reverified=(
+        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0043 +-0.0031 at T10, +0.0193 +-0.0042 at T20; the Citadel's dig now stops at a wipe the gate refuses. results/restage_20261005.txt. " + (
             'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
             '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
@@ -2455,7 +2455,7 @@ CHANGES: list[Change] = [
             "the top-setter logic: -0.0075 +-0.0058 win rate, signal 'win', a "
             "third top-setter."
         ),
-        reverified=(
+        reverified='RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0083 +-0.0025 at T10, +0.0269 +-0.0038 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v). Re-run as the SAME 2x2 factorial at the "
             "same N=30,000 per cell and the same seeds as the 2026-09-06 "
@@ -2535,7 +2535,7 @@ CHANGES: list[Change] = [
             "LESS (-0.98) but wins less (+0.0045 / +0.0128), so this is the "
             "better of the two measured options."
         ),
-        reverified=(
+        reverified='RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0051 +-0.0027 at T10, +0.0233 +-0.0042 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-05 after the top-setter policy fixes and the Galvanoth ordering fix. 6,000 paired games: win rate +0.0010 [-0.0017, +0.0037] at 10 turns and +0.0193 [+0.0133, +0.0253] at 20; damage +1.17 and +3.02; mv_cheated +1.20 and +3.20. The 20-turn result has been stable and significant across every engine version tried (+0.0215, +0.0108, +0.0173, +0.0182, +0.0193); the 10-turn result has been inside its bar since evasion landed. A long-horizon call, and the best-supported of the three staged changes. Scroll Rack is a TOP-SETTER, and the top-setter plan is the weakest part of this deck's construction. "
             "RE-VERIFIED AGAIN 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v), same 2x2 factorial, same N=30,000 and "
@@ -2596,7 +2596,7 @@ CHANGES: list[Change] = [
             "that the count does not. Staged anyway on the owner's judgement "
             "that the Act does not do more at their table than the model "
             "credits; said out loud here, as §0z31 requires."),
-        reverified="RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, +0.0134 +-0.0046 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
+        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0105 +-0.0026 at T10 and +0.0015 +-0.0042 at T20 -- INSIDE ITS BAR AT T20. Attributed: the same run with wipe_gate_all_casts=False gives +0.0130 / +0.0131, so the gate alone moved this swap by about 0.012 at T20 -- Blasphemous Act was over-firing like the other wipes, and cutting it looked better than it is. THE STAGING RESTS ON NUMBERS THE FIX HAS OVERTAKEN; it is the owner's to keep or withdraw. results/restage_20261005.txt. " + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, +0.0134 +-0.0046 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
     ),
     Change(
         deck="shilgengar", remove="Vampiric Rites", add="Lyra, Archangel of Dawn",
