@@ -167,7 +167,7 @@ SCRIPTED_RENDMAW = {
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
-    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    # was the one that was not, until §0z107 (`opponents.rogues_passage`).
     "Khalni Garden",               # engine.run_etb -> a 0/1 Plant
     # mana
     "Sol Ring", "Arcane Signet", "Golgari Signet", "Copper Myr", "Leaden Myr",
@@ -340,6 +340,11 @@ SCRIPTED_LOREHOLD = {
 # the card. Cards whose text is still approximated belong in the blind group
 # even when they are not literally absent from the engine.
 SCRIPTED_KARLOV = {
+    # Rogue's Passage (§0z107): "{4}, {T}: Target creature can't be blocked
+    # this turn." `opponents.rogues_passage`, before blocks. It was a plain
+    # land here, unclassified because lands without a script are exempt, so
+    # it carries `script="rogues_passage"` now and the claim is checked.
+    "Rogue's Passage",
     # Lurrus of the Dream-Den (was PARTLY, §0z84): the 3/2 lifelink body, its
     # hybrid cost and devotion (§0z52), and "once during each of your turns,
     # cast a permanent spell with mana value 2 or less from your graveyard"
@@ -404,8 +409,14 @@ SCRIPTED_TIVIT = {
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
-    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    # was the one that was not, until §0z107 (`opponents.rogues_passage`).
     "Havengul Laboratory // Havengul Mystery",   # tivit.resolve `havengul`
+    # Rogue's Passage (§0z107): "{4}, {T}: Target creature can't be blocked
+    # this turn." `opponents.rogues_passage`, before blocks; it was KNOWN_BLIND
+    # with `script="rogues_passage"` naming a function nothing defined, and a
+    # real gap since §0z91 made Tivit's trigger need Tivit to connect. Paid
+    # from what the main phase left, so a FLOOR on the card.
+    "Rogue's Passage",
     # --- the artifact engine ---
     # Every one of these is fully implemented in tivit.make_token /
     # sacrifice_tokens / deadeye_loop.
@@ -517,7 +528,7 @@ SCRIPTED_AZUSA = {
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
-    # was the one that was not, and it is in KNOWN_BLIND with its reason.
+    # was the one that was not, until §0z107 (`opponents.rogues_passage`).
     # Fetches crack for a land, which is a landfall trigger and a shuffle
     # drawn from a pre-rolled stream so CRN survives (engine.CRNStreams).
     "Terramorphic Expanse", "Windswept Heath", "Wooded Foothills",
@@ -1254,15 +1265,6 @@ KNOWN_BLIND = {
         # `wipe` branch, so all five did nothing at all. They do now, so a
         # row that prints "not measured" would be the §0f error inverted: a
         # score that IS evidence, labelled as if it were not.
-        # Rogue's Passage: "{4}, {T}: Target creature can't be blocked this
-        # turn." UNIMPLEMENTED. Until §0z91 the thing it buys was already
-        # assumed -- Tivit's trigger fired on `dmg > 0 and Tivit attacked` --
-        # and this note said implementing it "would be worth ~nothing until
-        # combat tracks damage per attacker". COMBAT TRACKS IT NOW (§0z91): the
-        # trigger needs Tivit to connect, so a blocked Tivit loses its
-        # dilemma and the Passage is the card that would buy it back. A real
-        # gap since §0z91, not a null -- §0z13's shape, noted the same day.
-        "Rogue's Passage",
         # Ward {3}, and an attack tax, cannot be expressed against an opponent
         # model whose combat is a damage share rather than declared attackers.
         "Ghostly Prison", "Propaganda",

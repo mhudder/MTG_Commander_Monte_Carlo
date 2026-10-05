@@ -50,7 +50,8 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 indestructible=name in INDESTRUCTIBLE)
 
 
-def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):
+def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=(),
+      script=None):
     """tags: "swamp" marks a land with the SWAMP SUBTYPE, which is what Crypt
     Ghast reads — not merely a land that produces black. In this list that is
     the eleven basics and Godless Shrine, and nothing else: Tainted Field,
@@ -59,7 +60,7 @@ def L(name, produces, tapped=False, types="Land", lifegain=0.0, tags=()):
     Swamps."""
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
                 produces=frozenset(produces), tapped=tapped, lifegain=lifegain,
-                tags=frozenset(tags),
+                tags=frozenset(tags), script=script,
                 # No land in this list is indestructible; read from the same
                 # generated set anyway so every L() in the project agrees.
                 indestructible=name in INDESTRUCTIBLE)
@@ -196,7 +197,7 @@ LANDS = (
         L("Secluded Steppe", "W", tapped=True),
         L("Opal Palace", "C"),
         L("Cavern of Souls", "WB"),
-        L("Rogue's Passage", "C"),
+        L("Rogue's Passage", "C", script="rogues_passage"),
         L("Temple of the False God", "C"),
         L("Caves of Koilos", "WBC"),
         L("Command Tower", "WB"),

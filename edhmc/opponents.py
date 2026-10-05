@@ -1016,6 +1016,60 @@ def _blocker_counts(g, defender):
     return n_block, min(n_fly, n_block)
 
 
+def unblockable_ids(g) -> set:
+    """Ids of your permanents that "can't be blocked this turn" (§0z107).
+
+    Stamped with the turn it was granted on, so a grant cannot outlive its
+    turn without anything having to clear it -- the same shape as tivit's
+    `cyberdrive_turn`. Ids are safe as keys because `engine.begin_game` holds
+    every Permanent for the game (§0z100)."""
+    turn, ids = getattr(g, "unblockable", (None, ()))
+    return ids if turn == g.turn else set()
+
+
+def rogues_passage(g, attackers: list, pay) -> bool:
+    """Rogue's Passage: "{T}: Add {C}. {4}, {T}: Target creature can't be
+    blocked this turn." (§0z107)
+
+    A PILOT'S STEP, run after attackers are declared and before blocks. It
+    fires only when it buys something: a dry run of the blocks
+    (`damage_through` against the weakest board, as the planner reads it)
+    must chump at least one attacker. The target is the commander when the
+    commander would be blocked -- tivit's trigger and commander damage both
+    need it to connect -- and otherwise the biggest attacker that would be,
+    because chump blocks eat the biggest first.
+
+    PAID FROM WHAT THE MAIN PHASE LEFT. `pay(cost) -> bool` is the engine's
+    own payment; the Passage is tapped FIRST so it cannot pay for itself.
+    Nothing holds mana back for it, so it fires only on turns the main phase
+    did not spend down: a floor on the card, said out loud.
+
+    `rogues_passage=False` restores the card as a plain colourless land,
+    which is what every table before §0z107 measured."""
+    if not attackers or not g.cfg.get("rogues_passage", True):
+        return False
+    passage = next((p for p in g.board if p.card.name == "Rogue's Passage"
+                    and not p.tapped), None)
+    if passage is None:
+        return False
+    through: list = []
+    damage_through(g, attackers, unblocked=through)
+    got = {id(p) for p in through}
+    blocked = [p for p in attackers if id(p) not in got]
+    if not blocked:
+        return False
+    cmdr = getattr(g, "commander", None)
+    target = next((p for p in blocked if p.card is cmdr), None) \
+        or max(blocked, key=g.power_of)
+    passage.tapped = True
+    if not pay({"gen": 4}):
+        passage.tapped = False
+        return False
+    g.unblockable = (g.turn, unblockable_ids(g) | {id(target)})
+    g.m["passage_activations"] += 1
+    return True
+
+
 def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     """Opponents chump-block your biggest attackers first — and CANNOT block
     your fliers with most of their board.
@@ -1057,7 +1111,14 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     # creatures are a count with no bodies, so their toughness is a knob:
     # `blocker_toughness`, 2, the 2/2 the goaded Birds already assume.
     tough = g.cfg.get("blocker_toughness", 2)
+    # "Can't be blocked this turn" (Rogue's Passage, §0z107): never offered
+    # to the chump assignment, so it always connects.
+    free = unblockable_ids(g)
+    free_power = 0
     for k, p in enumerate(attackers):
+        if id(p) in free:
+            free_power += g.power_of(p)
+            continue
         power, cost = g.power_of(p), 2 if menace_of(g, p) else 1
         item = (power, cost, k,
                 1 if commander_must_block(g, p, defender) else 0)
@@ -1076,7 +1137,8 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     if unblocked is not None:
         gone = set(blocked)
         unblocked.extend(p for k, p in enumerate(attackers) if k not in gone)
-    total = sum(it[0] for it in fly) + sum(it[0] for it in ground)
+    total = (sum(it[0] for it in fly) + sum(it[0] for it in ground)
+             + free_power)
     return float(total - stopped_fly - stopped_ground)
 
 
@@ -1874,8 +1936,13 @@ def should_cast_own_wipe(g) -> bool:
     state: only sweep when the table's creature count meaningfully exceeds
     yours.
     """
-    mine = sum(1 for p in g.board if is_creature_now(g, p))
-    theirs = sum(o.creatures for o in living(g))
+    if g.cfg.get("wipe_gate_measure", "count") == "power":
+        mine = sum(max(0, g.power_of(p)) for p in g.board
+                   if is_creature_now(g, p))
+        theirs = sum(o.creatures * o.p.get("power", 1.0) for o in living(g))
+    else:
+        mine = sum(1 for p in g.board if is_creature_now(g, p))
+        theirs = sum(o.creatures for o in living(g))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
 
 

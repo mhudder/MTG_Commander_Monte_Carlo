@@ -1129,6 +1129,7 @@ def combat(g):
         # needs Tivit to connect (§0z91).
         if g.cfg.get("tivit_trigger_connects", True):
             g.combat_hits = []
+        OPP.rogues_passage(g, attackers, lambda c: pay(g, c))     # §0z107
         dmg = OPP.combat_damage(g, attackers,
                                 scale=(raw + bonus) / max(1e-9, raw))
         hits, g.combat_hits = getattr(g, "combat_hits", None), None

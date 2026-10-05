@@ -1342,6 +1342,7 @@ def combat(g):
 
     for p in attackers:
         p.tapped = True
+    OPP.rogues_passage(g, attackers, lambda c: pay_cost(g, c))   # §0z107
     # One attack at the whole pod; `dmg` comes back bounded at what could have
     # mattered. Lifelink below still reads `power_of`, not this figure.
     dmg = OPP.combat_damage(g, attackers)
