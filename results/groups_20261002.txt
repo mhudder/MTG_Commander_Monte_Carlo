@@ -78,12 +78,12 @@ AZUSA
 TROSTANI
   reproduces the cached Sol Ring row at T10: YES
   reproduces the cached Sol Ring row at T20: YES
-  mana dorks                    (4)  T10 group +0.0036±0.0030* sum +0.0031 ratio  1.15 inter +0.0005   T20 group -0.0034±0.0068  sum +0.0031 ratio -1.09 inter -0.0065 
-  mana rocks                    (3)  T10 group +0.0140±0.0025* sum +0.0156 ratio  0.90 inter -0.0016   T20 group +0.0243±0.0057* sum +0.0231 ratio  1.05 inter +0.0012 
-  land ramp                     (5)  T10 group +0.0106±0.0025* sum +0.0107 ratio  0.99 inter -0.0001   T20 group +0.0350±0.0062* sum +0.0338 ratio  1.04 inter +0.0012 
-  tutors                        (6)  T10 group +0.0106±0.0026* sum +0.0083 ratio  1.28 inter +0.0023   T20 group +0.0185±0.0066* sum +0.0163 ratio  1.13 inter +0.0021 
-  token doublers                (4)  T10 group +0.0130±0.0023* sum +0.0136 ratio  0.96 inter -0.0006   T20 group +0.0403±0.0053* sum +0.0381 ratio  1.06 inter +0.0022 
-  populate cards                (4)  T10 group +0.0067±0.0017* sum +0.0069 ratio  0.97 inter -0.0002   T20 group +0.0182±0.0043* sum +0.0196 ratio  0.93 inter -0.0014 
-  recursion                     (3)  T10 group +0.0015±0.0013* sum +0.0020 ratio  0.77 inter -0.0005   T20 group +0.0096±0.0039* sum +0.0082 ratio  1.17 inter +0.0014 
-  removal (control)             (4)  T10 group -0.0005±0.0010  sum -0.0003 ratio  1.40 inter -0.0001   T20 group -0.0023±0.0032  sum -0.0017 ratio  1.31 inter -0.0005 
+  mana dorks                    (4)  T10 group +0.0105±0.0027* sum +0.0105 ratio  1.00 inter +0.0000   T20 group +0.0226±0.0060* sum +0.0166 ratio  1.36 inter +0.0060 
+  mana rocks                    (3)  T10 group +0.0149±0.0028* sum +0.0165 ratio  0.90 inter -0.0016   T20 group +0.0221±0.0058* sum +0.0206 ratio  1.07 inter +0.0015 
+  land ramp                     (5)  T10 group +0.0130±0.0026* sum +0.0126 ratio  1.03 inter +0.0004   T20 group +0.0351±0.0063* sum +0.0312 ratio  1.13 inter +0.0039 
+  tutors                        (6)  T10 group +0.0147±0.0029* sum +0.0175 ratio  0.84 inter -0.0028   T20 group +0.0453±0.0068* sum +0.0423 ratio  1.07 inter +0.0030 
+  token doublers                (4)  T10 group +0.0136±0.0022* sum +0.0142 ratio  0.96 inter -0.0006   T20 group +0.0316±0.0052* sum +0.0331 ratio  0.96 inter -0.0015 
+  populate cards                (4)  T10 group +0.0132±0.0023* sum +0.0136 ratio  0.97 inter -0.0004   T20 group +0.0189±0.0050* sum +0.0183 ratio  1.04 inter +0.0007 
+  recursion                     (3)  T10 group +0.0019±0.0013* sum +0.0015 ratio  1.27 inter +0.0004   T20 group +0.0108±0.0041* sum +0.0116 ratio  0.93 inter -0.0008 
+  removal (control)             (4)  T10 group +0.0004±0.0012  sum +0.0003 ratio  1.50 inter +0.0001   T20 group -0.0037±0.0034* sum -0.0038 ratio  0.96 inter +0.0001 
 

@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `3c19739`.
+Generated at `5e76366`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -91,7 +91,7 @@ the fingerprint above mean anything.
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `d6c162f17fd82f27` | `a1cdd9e` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `777e0c9f7e518826` | `a1cdd9e` | **CURRENT** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `83c408fae55d5593` | `a1cdd9e` | **CURRENT** |
-| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `9e92fd7edb44d483` | `a1cdd9e` | **CURRENT** |
+| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `4892172f0d6c3eb8` | `5e76366` | **CURRENT** |
 
 ### State of each cache
 
@@ -103,7 +103,7 @@ the fingerprint above mean anything.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `d6c162f17fd82f27`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `777e0c9f7e518826`, which is live.
 - **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `83c408fae55d5593`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — CURRENT. built at `9e92fd7edb44d483`, which is live.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — CURRENT. built at `4892172f0d6c3eb8`, which is live.
 
 ## What each fingerprint covers
 
@@ -150,7 +150,7 @@ CURRENT TABLE. Measured from an EMPTY cache 2026-09-06 after the ablation BLANK 
 
 ### `ablation_cache_trostani_10-20_n15000_medblank.json`
 
-Rebuilt 2026-10-01 at N=15,000 for §0z97 (Processor floor 12 / cap 16, Sylvan Library floor 20). 0 of 61 rows moved beyond the old bar, 0 sign flips; Birds of Paradise and Karmic Guide changed label at the floor. Rebuilt 2026-10-01 after §0z98 (permanents held so id() keys cannot be reused): every row within 0.0001 of the §0z97 build, whose baseline had one game played differently by a reused id. Reproduced exactly by diagnostics/run_groups.py at both horizons. Rebuilt 2026-10-05 at a1cdd9e for §0z106/§0z107 (the wipe gate's cost measure; Rogue's Passage), as one leg of a parallel rebuild (§0z94), python 3.11.15 / numpy 2.4.6. What moved is in KNOWN_ISSUES §0z109.
+Rebuilt 2026-10-01 at N=15,000 for §0z97 (Processor floor 12 / cap 16, Sylvan Library floor 20). 0 of 61 rows moved beyond the old bar, 0 sign flips; Birds of Paradise and Karmic Guide changed label at the floor. Rebuilt 2026-10-01 after §0z98 (permanents held so id() keys cannot be reused): every row within 0.0001 of the §0z97 build, whose baseline had one game played differently by a reused id. Reproduced exactly by diagnostics/run_groups.py at both horizons. Rebuilt 2026-10-05 at a1cdd9e for §0z106/§0z107 (the wipe gate's cost measure; Rogue's Passage), as one leg of a parallel rebuild (§0z94), python 3.11.15 / numpy 2.4.6. What moved is in KNOWN_ISSUES §0z109. Rebuilt 2026-10-05 locally after §0z110's five priority moves were adopted (Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake). 40 cells moved beyond their old bars; Bramble Sovereign flipped at T10. KNOWN_ISSUES §0z111.
 
 
 ## Caches that no longer exist, and what produced them

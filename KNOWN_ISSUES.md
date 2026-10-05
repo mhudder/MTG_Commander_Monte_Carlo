@@ -159,6 +159,7 @@ Methodology that used to live at the end of this file is now
 | [0z108](#0z108) | MEASURED | **§0z105's moved lorehold rows were mostly the BLANK.** Goldspan (priority 8) out and the Act (4) in moved the list's median, and with it the blank, from 6 to 5. Re-blanked at 6 on today's list, the three MODEL-BLIND rows return to their old values exactly and Arcane Bombardment nearly; the rest is the deck. A one-card swap can move every row of a table through `repl_priority` |
 | [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. **Karlov's five wipes as a group: −0.0132 / −0.0003 before, +0.0030 / +0.0132 now, significant at both.** Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
 | [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. **ADOPTED by the owner 2026-10-05**; trostani's table rebuilt |
+| [0z111](#0z111) | MEASURED | **Trostani rebuilt with the five priority moves, and ONE OF THE FIVE DOES NOT HOLD IN CONTEXT.** Bramble Sovereign's own row flipped, +0.0027 → −0.0095 ±0.0035 at T10; paired on a fresh seed block, Bramble at 10.5 against 8.5 WITH the other four adopted is **−0.0071 ±0.0033 at T10, +0.0004 ±0.0059 at T20**. At 10.5 it outranks Seedborn Muse (10). Each move was confirmed against the OLD list, the joint against all five; neither asked about one move given the rest. Left as adopted: the owner's call. Tutors as a group +0.0453 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9668,6 +9669,52 @@ tokens, so the engines came down a turn late. **ADOPTED BY THE OWNER,
 were. The .xlsx carries no priorities, so the module is the only leg, and the
 blank's priority stays at 6.5 (the §0z108 check). Trostani's table was
 rebuilt on its own; what moved is below.
+
+## 0z111. MEASURED — Trostani rebuilt on the adopted priorities; Bramble Sovereign's move does not hold given the other four
+
+Trostani's table rebuilt locally at N=15,000 after §0z110's five moves were
+adopted (`./tools/regen_tables.sh`, DECKS=trostani). validate +0.00 on all
+21 metrics. **40 cells moved beyond their old bars, one significant sign
+flip.** The blank's priority did not move (6.5 before and after, §0z108).
+
+The largest moves, against the table they replaced:
+
+| card | old | new |
+|---|---|---|
+| Soul of Eternity, T20 | +0.0200 ±0.0061 | −0.0031 ±0.0043 |
+| Aetherflux Reservoir, T20 | +0.0291 ±0.0031 | +0.0158 ±0.0028 |
+| **Bramble Sovereign, T10** | +0.0027 ±0.0014 | **−0.0095 ±0.0035** (the flip) |
+| Defense of the Heart, T20 | +0.0061 ±0.0027 | +0.0179 ±0.0032 |
+| Congregation at Dawn, T20 | −0.0009 ±0.0030 | +0.0087 ±0.0032 |
+| King Darien XLVIII, T20 | +0.0109 ±0.0028 | +0.0169 ±0.0035 |
+| Nesting Dovehawk, T10 | +0.0047 ±0.0012 | +0.0103 ±0.0019 |
+
+The tutors rose (Defense of the Heart, Congregation, Eladamri's Call, Chord,
+Enlightened Tutor, Green Sun's Zenith): what they find is now cast sooner.
+**Tutors as a group are +0.0453 ±0.0068 at T20** (`results/groups_20261002.txt`,
+all fourteen reproduction checks pass). The life-total payoffs fell
+(Aetherflux, Soul of Eternity), consistent with §0z110's mechanism run, which
+saw damage wins rise and Aetherflux wins fall. Soul of Eternity's fall is NOT
+attributed beyond that: it sits at priority 9, among the raised engines.
+
+**BRAMBLE SOVEREIGN.** Its row says the adopted list does better at T10
+without the card it just promoted, and that cannot be squared with §0z110
+unless the moves interact: each was confirmed against the OLD list, and the
+joint run against all five at once, so nothing asked about one move GIVEN
+the other four. `diagnostics/run_trostani_bramble.py`
+(`results/trostani_bramble_20261005.txt`) asks it, paired, on seeds 40000..
+(neither the sweep's blocks nor the table's -- the question was chosen by
+looking at the table): **Bramble at 10.5 minus at 8.5, on the adopted list,
+is −0.0071 ±0.0033 at T10 and +0.0004 ±0.0059 at T20**, with +0.37 tokens
+and +0.18 populates but −0.49 damage. At 10.5 it is the highest-priority
+card in the deck and comes down ahead of Seedborn Muse (10), whose own move
+was the largest of the five.
+
+**LEFT AS ADOPTED** -- the owner adopted the five, and reverting one is the
+owner's call. Reverting Bramble to 8.5 would cost one more trostani rebuild.
+**The lesson for the next sweep: a joint run says the SET helps; it does not
+say every member does given the rest. Leave-one-out the joint before
+adopting it** -- one paired run per move, against the joint list.
 
 ## How to read an ablation table
 

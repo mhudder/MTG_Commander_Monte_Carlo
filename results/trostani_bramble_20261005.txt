@@ -1,0 +1,7 @@
+trostani, adopted list, Bramble Sovereign at 10.5 minus at 8.5. N=15,000 paired, seeds 40000.. (§0z111). * = CI excludes zero.
+
+    won T10           -0.0071 ±0.0033*
+    won T20           +0.0004 ±0.0059
+    damage T20        -0.4929 ±0.4041*
+    tokens_made T20   +0.3740 ±0.1912*
+    populates T20     +0.1794 ±0.0692*
