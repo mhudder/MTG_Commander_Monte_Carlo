@@ -157,7 +157,7 @@ Methodology that used to live at the end of this file is now
 | [0z106](#0z106) | FIXED | **The wipe gate counted BODIES.** Karlov swept 82% of its wipes with its commander on board carrying 11 counters, two bodies against ten and well AHEAD by power. The gate now weighs power, counting only your creatures the sweeper would kill (`wipe_gate_measure="cost"`): **karlov +0.0143, lorehold +0.0136, rendmaw +0.0111, tivit +0.0083 at T20**, all significant; shilgengar and trostani inside their bars. Power ALONE cost rendmaw (a one-sided Massacre Wurm held back) and shilgengar (Avacyn's grant ignored) -- the two reasons "cost" exists. Six tables rebuilt |
 | [0z107](#0z107) | IMPLEMENTED | **Rogue's Passage**: "{4}, {T}: target creature can't be blocked this turn" -- a land in karlov and tivit that did nothing (tivit's `script=` named a function nobody wrote). A pilot step before blocks; `damage_through` never chumps an unblockable attacker. Karlov +0.0036 ±0.0015 at T20 (0.06 activations a game); tivit a null, its commander flies |
 | [0z108](#0z108) | MEASURED | **§0z105's moved lorehold rows were mostly the BLANK.** Goldspan (priority 8) out and the Act (4) in moved the list's median, and with it the blank, from 6 to 5. Re-blanked at 6 on today's list, the three MODEL-BLIND rows return to their old values exactly and Arcane Bombardment nearly; the rest is the deck. A one-card swap can move every row of a table through `repl_priority` |
-| [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
+| [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. **Karlov's five wipes as a group: −0.0132 / −0.0003 before, +0.0030 / +0.0132 now, significant at both.** Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
 | [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. An adoption decision for the owner; not applied |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -9611,6 +9611,15 @@ python 3.11.15 / numpy 2.4.6 on every leg, shards merged with
 | tivit | 8 | the wipes: Damn −0.0090 → −0.0003 (T10), **Farewell −0.0021 → +0.0035 at T10, a significant sign flip**, Promise of Loyalty −0.0045 → +0.0009; the Deadeye loop up |
 | shilgengar | 1 | Damn at T10, −0.0005 → 0.0000 |
 | trostani | 0 | |
+
+**THE GROUPS, RE-RUN** for the six decks (`results/groups_20261002.txt`,
+all fourteen reproduction checks pass; the returns curves re-run and all
+four of their checks pass, `results/curve_20261002.txt`). **Karlov's five
+own wipes together: −0.0132 at T10 and −0.0003 at T20 before, +0.0030
+±0.0024 and +0.0132 ±0.0040 now -- significant at both horizons, which is
+the question §0z106 began with.** Lorehold's four: −0.0237 / +0.0291 before,
+−0.0029 ±0.0032 (inside its bar) / +0.0418 ±0.0052 now. Shilgengar's two:
++0.0169 at T20.
 
 The CLAUDE.md tell, again: **karlov's own wipes read as cut candidates
 (−0.004 to −0.005 at T10) because the pilot fired them on a winning board**
