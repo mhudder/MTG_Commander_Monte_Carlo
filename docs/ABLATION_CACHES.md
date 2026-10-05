@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `1322273`.
+Generated at `77897a8`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -87,7 +87,7 @@ the fingerprint above mean anything.
 |---|---|---|---|---|---|
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `a5312ae0b1073adc` | `51fa782` | **CURRENT** |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `dfaee5d4e6e59dd1` | `1322273` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `f6199b520fa9aa4f` | `1322273` | **CURRENT** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `112ba55c82028385` | `77897a8` | **CURRENT** |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `9520a32524e24878` | `3abd462` | **VERIFIED** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `94406ee9df10bf34` | `926bc46` | **VERIFIED** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `f35e1f889d5f4226` | `244cdf1` | **VERIFIED** |
@@ -97,7 +97,7 @@ the fingerprint above mean anything.
 
 - **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `a5312ae0b1073adc`, which is live.
 - **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `dfaee5d4e6e59dd1`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `f6199b520fa9aa4f`, which is live.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `112ba55c82028385`, which is live.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `9520a32524e24878`; fingerprint has since moved to `d70943e319733bcd` and was CHECKED at `51fa782` (2026-10-03T21:33:31Z): §0z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: rendmaw BIT-IDENTICAL on all 8 metrics.
   - verified at `099f57c00eb6b1fd` (`fe768bb`, 2026-10-01T14:22:06Z): §0z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.
   - verified at `f7ada495cbaef116` (`186ba49`, 2026-10-01T20:28:39Z): §0z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 3abd462: rendmaw BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, §0z100).
@@ -133,7 +133,7 @@ the fingerprint above mean anything.
 - **karlov** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/karlov_v2.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/karlov.py`, `edhmc/opponents.py`, `staged:karlov`
   - `staged:karlov` is `-Soulmender +Bloodthirsty Conqueror`, `-Swamp +Bolas's Citadel`
 - **lorehold** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/lorehold_v16.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/lorehold.py`, `edhmc/opponents.py`, `staged:lorehold`
-  - `staged:lorehold` is `-Penance +Caldera Pyremaw`, `-Scroll Rack +Sunbird's Invocation`, `-Blasphemous Act +Goldspan Dragon`
+  - `staged:lorehold` is `-Penance +Caldera Pyremaw`, `-Scroll Rack +Sunbird's Invocation`
 - **rendmaw** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/rendmaw_v12.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `staged:rendmaw`
   - `staged:rendmaw` is **empty** — nothing staged for this deck, so the baseline is the module's own list
 - **shilgengar** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`, `staged:shilgengar`

@@ -536,9 +536,9 @@
     "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "f6199b520fa9aa4f",
-    "built_commit": "1322273",
-    "built_utc": "2026-10-05T00:48:57Z",
+    "built_at": "112ba55c82028385",
+    "built_commit": "77897a8",
+    "built_utc": "2026-10-05T02:29:31Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -781,6 +781,13 @@
             "utc": "2026-10-03T21:33:31Z"
           }
         ]
+      },
+      {
+        "built_at": "f6199b520fa9aa4f",
+        "built_commit": "1322273",
+        "built_utc": "2026-10-05T00:48:57Z",
+        "deck": "lorehold",
+        "verified": []
       }
     ],
     "verified": []

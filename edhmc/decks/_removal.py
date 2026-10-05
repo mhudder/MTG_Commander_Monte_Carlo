@@ -233,7 +233,6 @@ SCANNED = {
     'Giada, Font of Hope',
     'Gloomshrieker',
     "God-Pharaoh's Gift",
-    'Goldspan Dragon',
     'Golgari Signet',
     'Goliath Daydreamer',
     'Grave Titan',

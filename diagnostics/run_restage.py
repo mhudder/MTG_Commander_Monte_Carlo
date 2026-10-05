@@ -22,7 +22,8 @@ the deck's other staged changes are present on both sides.
   L_gold_grv      -Lightning Greaves +Goldspan Dragon
   L_noCaldera     lorehold with Caldera Pyremaw undone (Penance back)
   L_noSunbird     ... with Sunbird's Invocation undone (Scroll Rack back)
-  L_noGold        ... with Goldspan Dragon undone (Blasphemous Act back)
+  (L_noGold was the Goldspan swap undone; that swap was WITHDRAWN 2026-10-05,
+   §0z105, so `L` has the Act and L_gold_act - L is the withdrawn swap.)
   S / S_noLyra    shilgengar as staged / with Lyra undone (Vampiric Rites back)
 
 `--report` prints every STAGED swap as "staged minus undone", which is the
@@ -55,7 +56,6 @@ ARMS = {
     "L_gold_grv": ("lorehold", [("Lightning Greaves", ("lh", "GOLDSPAN_DRAGON"))]),
     "L_noCaldera": ("lorehold", [("Caldera Pyremaw", ("module", "Penance"))]),
     "L_noSunbird": ("lorehold", [("Sunbird's Invocation", ("module", "Scroll Rack"))]),
-    "L_noGold": ("lorehold", [("Goldspan Dragon", ("module", "Blasphemous Act"))]),
     "S": ("shilgengar", []),
     "S_noLyra": ("shilgengar", [("Lyra, Archangel of Dawn",
                                  ("module", "Vampiric Rites"))]),
@@ -69,8 +69,13 @@ STAGED = (
     ("azusa   -Perilous Forays +Ka-Zar of the Savage Land", "A", "A_noKaZar"),
     ("lorehold -Penance +Caldera Pyremaw", "L", "L_noCaldera"),
     ("lorehold -Scroll Rack +Sunbird's Invocation", "L", "L_noSunbird"),
-    ("lorehold -Blasphemous Act +Goldspan Dragon", "L", "L_noGold"),
+    # -Blasphemous Act +Goldspan Dragon was WITHDRAWN 2026-10-05 (§0z105).
     ("shilgengar -Vampiric Rites +Lyra, Archangel of Dawn", "S", "S_noLyra"),
+)
+
+# WITHDRAWN swaps, as (label, arm WITH the swap, staged arm without it).
+WITHDRAWN = (
+    ("lorehold -Blasphemous Act +Goldspan Dragon (WITHDRAWN)", "L_gold_act", "L"),
 )
 
 
@@ -80,7 +85,10 @@ def report(outdir):
         y = np.load(os.path.join(outdir, f"{b}_T{t}.npy"))[:, MET.index(m)]
         d = x - y
         return d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(len(d))
-    for label, a, b in STAGED:
+    have = lambda arm: os.path.exists(os.path.join(outdir, f"{arm}_T10.npy"))
+    for label, a, b in STAGED + WITHDRAWN:
+        if not (have(a) and have(b)):
+            continue
         cells = []
         for t in (10, 20):
             mu, ci = diff(a, b, t, "won")

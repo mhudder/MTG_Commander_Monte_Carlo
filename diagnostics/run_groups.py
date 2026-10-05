@@ -89,7 +89,10 @@ GROUPS = {
         "finishers": ["Storm Herd", "Approach of the Second Sun",
                       "Rise of the Eldrazi"],
         "protection": ["Mother of Runes", "Lightning Greaves"],
-        "own wipes": ["Farewell", "Ultima", "Promise of Loyalty"],
+        # Blasphemous Act rejoined 2026-10-05: its swap for Goldspan was
+        # withdrawn (§0z105), so it is in the staged list again.
+        "own wipes": ["Farewell", "Ultima", "Promise of Loyalty",
+                      "Blasphemous Act"],
         "spot removal (control)": ["Path to Exile", "Swords to Plowshares",
                                    "Chaos Warp", "Generous Gift"],
     },
