@@ -2433,6 +2433,24 @@ fixed the funnel count it introduced.
     measured, and it FAILS if it calls BLIND anything whose row was significant.
     Triage predicts MEASURABILITY, not value.
 
+## Queued items closed 2026-10-05 — moved from `CLAUDE.md`
+
+Moved verbatim under the same precedent as the sections above. Item 0c
+closed when the owner WITHDREW the staging (§0z105): §0z104 asked the wipe
+gate at every optional cast site, and −Blasphemous Act +Goldspan fell from
++0.0134 to +0.0015 ±0.0042 at T20, inside its bar. Blasphemous Act stays.
+
+0c. **STAGED BY THE OWNER, 2026-09-26 (§0z69)**: −Blasphemous Act +Goldspan,
+    +0.0137 ±0.0046 at T20 on the final engine. The original entry follows.
+    **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
+    call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
+    both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
+    significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
+    T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
+    estimate, so that swap cuts a card the model half-sees. Re-measured on
+    the current engine (§0z63, after §0z62): −Act +Goldspan +0.0135 /
+    +0.0165, still significant at both horizons.
+
 ---
 
 ## HANDOFF.md's status block, as of 2026-09-12 — SUPERSEDED, see `docs/STATUS.md`

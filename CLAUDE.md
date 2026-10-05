@@ -799,7 +799,9 @@ moved to `docs/HISTORY.md`; so is item 21, whose card is now committed; and so
 are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47), 8b
 (Voice of the Blessed, §0z46) and 0b-i (Sunbird's decay, §0z59), closed
 2026-09-25, and item 23 (triage and the ledger states, §0z78, §0z79),
-closed 2026-09-29. **Item 18
+closed 2026-09-29, and item 0c (Goldspan Dragon: staged, then WITHDRAWN
+by the owner once §0z104 put it inside its bar at T20, §0z105), closed
+2026-10-05. **Item 18
 is half answered**: the ordering half is built and measured as a null
 (§0z43), which leaves the `priority` numbers as the whole of it.
 
@@ -919,17 +921,6 @@ is half answered**: the ordering half is built and measured as a null
     turns and not lorehold's. With the horizon in rounds, Sieve 9 → 11 is
     +0.0218 / +0.0151, significant at both -- an adoption decision for the
     owner, like the two above.
-
-0c. **STAGED BY THE OWNER, 2026-09-26 (§0z69)**: −Blasphemous Act +Goldspan,
-    +0.0137 ±0.0046 at T20 on the final engine. The original entry follows.
-    **Goldspan Dragon's head-to-heads are MEASURED; staging is the owner's
-    call** (§0z53). It loses Caldera's slot (−0.0108 ±0.0027 at T20) and beats
-    both named cuts: **−Blasphemous Act +Goldspan +0.0162 ±0.0044**,
-    significant at both horizons, and −Lightning Greaves +0.0084 ±0.0034 at
-    T20 only. The Act is a partly-modelled symmetric wipe whose BENEFIT is an
-    estimate, so that swap cuts a card the model half-sees. Re-measured on
-    the current engine (§0z63, after §0z62): −Act +Goldspan +0.0135 /
-    +0.0165, still significant at both horizons.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

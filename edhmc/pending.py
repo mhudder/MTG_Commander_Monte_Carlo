@@ -1176,7 +1176,9 @@ MEASURED: list[Candidate] = [
             'better). results/restage_20260926.txt.' ' RE-MEASURED AGAIN AFTER §0z62: -Blasphemous Act +Goldspan +0.0135 +-0.0025 / +0.0165 +-0.0045; -Lightning Greaves +Goldspan +0.0002 +-0.0018 / +0.0048 +-0.0036; in Caldera\'s slot -0.0029 / -0.0091. CURRENT. results/restage_20260926.txt.'),
         verdict=('Not a replacement for Caldera. A real candidate for Blasphemous '
             'Act\'s slot, significant at both horizons, with the cut\'s blind half '
-            'said out loud. STAGED BY THE OWNER 2026-09-26 (§0z69): see CHANGES.'),
+            'said out loud. STAGED BY THE OWNER 2026-09-26 (§0z69); WITHDRAWN BY '
+            'THE OWNER 2026-10-05 after §0z104 put it inside its bar at T20 '
+            '(§0z105): see WITHDRAWN. Blasphemous Act stays.'),
     ),
     Candidate(
         deck='karlov',
@@ -2570,34 +2572,9 @@ CHANGES: list[Change] = [
             " AND AGAIN AFTER §0z62: Sunbird's GIVEN Caldera +0.0023 +-0.0017 at T10, +0.0153 +-0.0031 at T20. The decision stands. results/lorehold_pair_knownwin.txt."
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0031 +-0.0026 at T10, +0.0173 +-0.0043 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
-    # The owner's decisions of 2026-09-26 (§0z69). Both re-measured the same
-    # day on the engine they will be rebuilt on.
-    Change(
-        deck="lorehold", remove="Blasphemous Act", add="Goldspan Dragon",
-        staged="2026-09-26",
-        rationale=(
-            "Queued item 0c. Goldspan beats both cuts history named and loses "
-            "only to Caldera Pyremaw for Caldera's own slot; the Act is the "
-            "better of the two cuts, significant at both horizons in every "
-            "measurement since §0z53. The owner staged it."),
-        evidence=(
-            "RE-MEASURED 2026-09-26 on the final §0z67 engine (commander "
-            "damage, the aimed commander, the aware defender, known_win_focus "
-            "0.8), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, "
-            "+0.0137 +-0.0046 at T20. On the engine without the aim: +0.0132 / "
-            "+0.0137. results/aim_vault_swaps_20260926.txt "
-            "(diagnostics/run_aim_vault_swaps.py). History: §0z53 +0.0162 at "
-            "T20, §0z63 +0.0119, after §0z62 +0.0165."),
-        cut_unmeasured=(
-            "Blasphemous Act is PARTLY MODELLED -- a symmetric wipe whose cost "
-            "to you is faithful and whose BENEFIT (the opponents' boards) is "
-            "an abstract creature count. The head-to-head is therefore "
-            "uncertain in the Act's favour by whatever the real wipe does "
-            "that the count does not. Staged anyway on the owner's judgement "
-            "that the Act does not do more at their table than the model "
-            "credits; said out loud here, as §0z31 requires."),
-        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0105 +-0.0026 at T10 and +0.0015 +-0.0042 at T20 -- INSIDE ITS BAR AT T20. Attributed: the same run with wipe_gate_all_casts=False gives +0.0130 / +0.0131, so the gate alone moved this swap by about 0.012 at T20 -- Blasphemous Act was over-firing like the other wipes, and cutting it looked better than it is. THE STAGING RESTS ON NUMBERS THE FIX HAS OVERTAKEN; it is the owner's to keep or withdraw. results/restage_20261005.txt. " + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, +0.0134 +-0.0046 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
-    ),
+    # The owner's decision of 2026-09-26 (§0z69), re-measured the same day
+    # on the engine it will be rebuilt on. Its sibling, -Blasphemous Act
+    # +Goldspan Dragon, was WITHDRAWN 2026-10-05 (§0z105): see WITHDRAWN.
     Change(
         deck="shilgengar", remove="Vampiric Rites", add="Lyra, Archangel of Dawn",
         staged="2026-09-26",
@@ -2736,6 +2713,43 @@ WITHDRAWN: list[Change] = [
             "MEASUREMENT -- what changed is the engine it was measured on and "
             "the conclusion drawn from it, not the arithmetic."
         ),
+    ),
+    Change(
+        deck="lorehold", remove="Blasphemous Act", add="Goldspan Dragon",
+        staged="2026-09-26",
+        rationale=(
+            "Queued item 0c. Goldspan beats both cuts history named and loses "
+            "only to Caldera Pyremaw for Caldera's own slot; the Act is the "
+            "better of the two cuts, significant at both horizons in every "
+            "measurement since §0z53. The owner staged it."),
+        evidence=(
+            "RE-MEASURED 2026-09-26 on the final §0z67 engine (commander "
+            "damage, the aimed commander, the aware defender, known_win_focus "
+            "0.8), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, "
+            "+0.0137 +-0.0046 at T20. On the engine without the aim: +0.0132 / "
+            "+0.0137. results/aim_vault_swaps_20260926.txt "
+            "(diagnostics/run_aim_vault_swaps.py). History: §0z53 +0.0162 at "
+            "T20, §0z63 +0.0119, after §0z62 +0.0165."),
+        cut_unmeasured=(
+            "Blasphemous Act is PARTLY MODELLED -- a symmetric wipe whose cost "
+            "to you is faithful and whose BENEFIT (the opponents' boards) is "
+            "an abstract creature count. The head-to-head is therefore "
+            "uncertain in the Act's favour by whatever the real wipe does "
+            "that the count does not. Staged anyway on the owner's judgement "
+            "that the Act does not do more at their table than the model "
+            "credits; said out loud here, as §0z31 requires."),
+        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0105 +-0.0026 at T10 and +0.0015 +-0.0042 at T20 -- INSIDE ITS BAR AT T20. Attributed: the same run with wipe_gate_all_casts=False gives +0.0130 / +0.0131, so the gate alone moved this swap by about 0.012 at T20 -- Blasphemous Act was over-firing like the other wipes, and cutting it looked better than it is. THE STAGING RESTS ON NUMBERS THE FIX HAS OVERTAKEN; it is the owner's to keep or withdraw. results/restage_20261005.txt. " + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0129 +-0.0026 at T10, +0.0134 +-0.0046 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
+        withdrawn=(
+            "WITHDRAWN BY THE OWNER 2026-10-05 (§0z105): Blasphemous Act stays. "
+            "Not refuted -- the swap is still +0.0105 +-0.0026 at T10 -- but "
+            "the T20 number the staging rested on (+0.0137 at staging, +0.0134 "
+            "at §0z81) is +0.0015 +-0.0042 once the wipe gate is asked at every "
+            "optional cast site (§0z104), inside its bar. About 0.012 of the old "
+            "edge was the Act misfiring by miracle and free cast on boards the "
+            "pilot was winning, so cutting it looked better than it was. The "
+            "owner keeps the sweeper. WHAT RE-STAGING WOULD HAVE TO ANSWER: a "
+            "T20 head-to-head significant on the gated engine, and the Act's "
+            "unmodelled half (the real opposing boards) said out loud again."),
     ),
 ]
 
@@ -2888,7 +2902,8 @@ SIMULATED: list[Simulated] = [
         measured='2026-09-26', source='results/restage_20260926.txt',
         result=('+0.0002 +-0.0018 at T10 and +0.0048 +-0.0036 at T20 (T20 '
                 'only), re-measured after §0z62.'),
-        notes=('Goldspan is STAGED against Blasphemous Act instead (§0z69); '
+        notes=('Goldspan was staged against Blasphemous Act instead (§0z69) '
+               'and WITHDRAWN 2026-10-05 (§0z105); '
                'in Caldera Pyremaw\'s slot it loses, -0.0091 at T20.'),
     ),
     # AZUSA BATCH 6 (§0z101), 2026-10-03. The real swap against the OWNER'S
