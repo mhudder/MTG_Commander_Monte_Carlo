@@ -1,0 +1,28 @@
+lorehold, N=15,000 paired, seeds 5000.., today's staged list (the Act in). Win rate, card minus blank.
+  old    the table with Goldspan in, blank at 6 (651817b~1)
+  at 5   today's list, today's blank -- must equal the committed row
+  at 6   today's list, the OLD blank
+
+T10  card                                    old             at 5             at 6  reproduces
+     Apex of Power               +0.0209 ±0.0026  +0.0189 ±0.0025  +0.0190 ±0.0025  YES
+     Arcane Bombardment          +0.0061 ±0.0024  +0.0034 ±0.0023  +0.0046 ±0.0023  YES
+     Call Forth the Tempest      +0.0016 ±0.0008  +0.0003 ±0.0004  +0.0016 ±0.0008  YES
+     Farewell                    -0.0058 ±0.0019  -0.0035 ±0.0016  -0.0030 ±0.0017  YES
+     Guttersnipe                 +0.0062 ±0.0014  +0.0043 ±0.0013  +0.0049 ±0.0013  YES
+     Improvisation Capstone      +0.0009 ±0.0007  -0.0001 ±0.0002  +0.0009 ±0.0007  YES
+     Longshot, Rebel Bowman      +0.0101 ±0.0020  +0.0079 ±0.0019  +0.0082 ±0.0019  YES
+     Restoration Seminar         +0.0008 ±0.0007  +0.0000 ±0.0002  +0.0007 ±0.0007  YES
+     Soulfire Eruption           +0.0006 ±0.0018  +0.0013 ±0.0017  +0.0017 ±0.0017  YES
+
+T20  card                                    old             at 5             at 6  reproduces
+     Apex of Power               +0.0345 ±0.0037  +0.0308 ±0.0036  +0.0318 ±0.0037  YES
+     Arcane Bombardment          +0.0117 ±0.0037  +0.0091 ±0.0038  +0.0114 ±0.0038  YES
+     Call Forth the Tempest      +0.0021 ±0.0013  -0.0001 ±0.0009  +0.0021 ±0.0014  YES
+     Farewell                    +0.0085 ±0.0033  +0.0105 ±0.0031  +0.0111 ±0.0032  YES
+     Guttersnipe                 +0.0099 ±0.0021  +0.0074 ±0.0022  +0.0075 ±0.0020  YES
+     Improvisation Capstone      +0.0014 ±0.0012  +0.0004 ±0.0005  +0.0018 ±0.0012  YES
+     Longshot, Rebel Bowman      +0.0139 ±0.0030  +0.0139 ±0.0030  +0.0145 ±0.0030  YES
+     Restoration Seminar         +0.0029 ±0.0012  +0.0007 ±0.0006  +0.0020 ±0.0013  YES
+     Soulfire Eruption           +0.0039 ±0.0031  -0.0003 ±0.0031  +0.0009 ±0.0030  YES
+
+every 'at 5' reproduces its committed row: YES

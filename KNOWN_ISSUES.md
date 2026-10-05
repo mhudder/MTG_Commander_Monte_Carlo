@@ -154,6 +154,9 @@ Methodology that used to live at the end of this file is now
 | [0z103](#0z103) | COMMITTED | **-Life from the Loam +Mossborn Hydra (azusa), the owner's call**, on the paired run that beat Nissa in the same slot. Rebuilt: Hydra +0.0266 ±0.0038; Scute Swarm and Avenger fell beyond their bars -- §0z100's curve, a fifth landfall payoff lowering the four it overlaps. Nissa's proposed cut moved to Sylvan Awakening |
 | [0z104](#0z104) | FIXED | **Your own sweeper asked the wipe gate in the main phase ONLY.** Lorehold's miracle, Arcane Bombardment, discover, Apex, Jeska's Will, Goliath and Galvanoth -- and karlov's Bolas's Citadel -- cast wipes without asking: 34% of lorehold's own wipes resolved on a board it was winning. One predicate (`pilot_may_cast`), every optional site: **lorehold +0.0242 / +0.0465**, karlov +0.0021 at T20. All four lorehold wipes flip to significantly POSITIVE; -Blasphemous Act +Goldspan falls inside its bar at T20 |
 | [0z105](#0z105) | WITHDRAWN | **-Blasphemous Act +Goldspan Dragon (lorehold), the owner's call.** After §0z104 the swap is +0.0105 at T10 and +0.0015 ±0.0042 at T20, inside its bar; the Act stays. Rebuilt table: the Act's own row is -0.0072 / +0.0040, the wipe shape; 12 cells moved beyond their bars, all small. The four own wipes together: -0.0237 at T10, +0.0291 at T20. Caldera and Sunbird's both stand |
+| [0z106](#0z106) | FIXED | **The wipe gate counted BODIES.** Karlov swept 82% of its wipes with its commander on board carrying 11 counters, two bodies against ten and well AHEAD by power. The gate now weighs power, counting only your creatures the sweeper would kill (`wipe_gate_measure="cost"`): **karlov +0.0143, lorehold +0.0136, rendmaw +0.0111, tivit +0.0083 at T20**, all significant; shilgengar and trostani inside their bars. Power ALONE cost rendmaw (a one-sided Massacre Wurm held back) and shilgengar (Avacyn's grant ignored) -- the two reasons "cost" exists. Six tables rebuilt |
+| [0z107](#0z107) | IMPLEMENTED | **Rogue's Passage**: "{4}, {T}: target creature can't be blocked this turn" -- a land in karlov and tivit that did nothing (tivit's `script=` named a function nobody wrote). A pilot step before blocks; `damage_through` never chumps an unblockable attacker. Karlov +0.0036 ±0.0015 at T20 (0.06 activations a game); tivit a null, its commander flies |
+| [0z108](#0z108) | MEASURED | **§0z105's moved lorehold rows were mostly the BLANK.** Goldspan (priority 8) out and the Act (4) in moved the list's median, and with it the blank, from 6 to 5. Re-blanked at 6 on today's list, the three MODEL-BLIND rows return to their old values exactly and Arcane Bombardment nearly; the rest is the deck. A one-card swap can move every row of a table through `repl_priority` |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9464,6 +9467,127 @@ measures the withdrawn swap as `L_gold_act − L` and reproduces §0z104's
 `_removal.py`'s SCANNED set -- a name in no list. That file is in every
 deck's fingerprint, so the six other caches went SUSPECT; cleared with
 `check_unchanged_decks --n=3000` (see PROVENANCE).
+
+## 0z106. FIXED — the wipe gate weighs what the sweeper would cost you, not your body count
+
+**FOUND BY TRACING KARLOV'S WIPES.** §0z104's group re-run left karlov's five
+own wipes at −0.0132 at T10 and flat at T20 -- the shape lorehold had before
+its gate was fixed, without lorehold's late repayment. So every own wipe in
+3,000 karlov games was traced (0.43 a game, in 32% of games): at the cast,
+**2.7 of the deck's creatures against 9.6 of theirs, with KARLOV HIMSELF on
+the board in 82% of them carrying 11 counters on average**, at 49 life.
+`should_cast_own_wipe` asked `theirs > mine * 1.4 + 1` in BODIES, so a 13/13
+commander counted as one 1/1. By power the pilot was ahead -- 16.7 against
+about 9.6, since an opposing creature here is a body of `p["power"]`
+(0.65-1.35 by archetype), the number chip damage already multiplies by -- and
+swept anyway. Games with an own wipe won 0.350 against 0.476 overall.
+
+**THREE MEASURES, ONE RUN** (`diagnostics/run_wipe_gate_power.py`,
+`results/wipe_gate_power_20261005.txt`, N=15,000 paired, staged lists; each
+arm minus the body count; win rate):
+
+| deck | power T10 | power T20 | **cost T10** | **cost T20** | never T20 |
+|---|---|---|---|---|---|
+| karlov | +0.0167* | +0.0143* | **+0.0167*** | **+0.0143*** | +0.0106* |
+| lorehold | +0.0250* | +0.0136* | **+0.0250*** | **+0.0136*** | −0.0202* |
+| rendmaw | −0.0005* | **−0.0055*** | **+0.0027*** | **+0.0111*** | −0.0093* |
+| tivit | +0.0216* | +0.0083* | **+0.0216*** | **+0.0083*** | −0.0056* |
+| shilgengar | +0.0007* | **−0.0045*** | +0.0009* | −0.0019 | −0.0148* |
+| trostani | −0.0008* | −0.0015 | −0.0008* | −0.0015 | −0.0033* |
+
+POWER ALONE FIXED THREE DECKS AND COST TWO, and both costs had a mechanism
+in the code before anyone guessed: **rendmaw's Massacre Wurm is tagged
+`onesided`** -- it kills none of your creatures -- and went through the same
+"am I behind" gate, so weighing your board held back a 6/5 that costs your
+board nothing; and **shilgengar runs Avacyn**, whose grant makes its own
+Damn and Wrath one-sided in fact, and the gate counted the indestructible
+bodies as losses. **"cost" counts only the creatures the sweeper would KILL**
+-- none for a one-sided wipe, none indestructible against a destroy -- by
+the same two rules `resolve_own_wipe` applies (`wipe_destroys`, and
+`is_hardy`, lifted out of `destroy` so the gate and the resolution cannot
+drift, §0u). It keeps every gain power made and turns rendmaw's loss into
++0.0111; shilgengar and trostani land inside their bars. **"never" is not
+the answer** (−0.020 lorehold, −0.015 shilgengar at T20): the wipes are
+worth casting, at the right time.
+
+**THE DEFAULT IS "cost"** (`wipe_gate_measure`, "count" restores every
+table before this). `should_cast_own_wipe(g, card)` takes the sweeper at
+all ten call sites. `tests/test_wipe_gate.py` F-H pin the three measures --
+one 13-power body against nine, a one-sided wipe, an indestructible board
+against Damn and against Farewell -- with a mutation forcing "count" that
+breaks exactly those three.
+
+**NOT MODELLED, SAID OUT LOUD:** Promise of Loyalty's "each player puts a
+vow counter on a creature they control and sacrifices the rest" resolves as
+a full wipe here, so you and each opponent keep nothing. The gate and the
+resolution agree, so this change neither helps nor hides it; it is a
+card-text gap in lorehold and tivit for its own entry.
+
+The policy table in CLAUDE.md gets its ninth row. The six decks with own
+wipes are rebuilt; azusa has none and is checked bit-identical.
+
+## 0z107. IMPLEMENTED — Rogue's Passage
+
+"{T}: Add {C}. {4}, {T}: Target creature can't be blocked this turn." In
+karlov's list and tivit's it was a colourless land. Tivit's copy carried
+`script="rogues_passage"` and nothing defined it (§0z15 found that and
+labelled it `KNOWN_BLIND`); karlov's carried no script at all, so as a land
+it was never classified. §0z91 made the gap real for tivit -- its commander
+trigger needs Tivit to CONNECT.
+
+`opponents.rogues_passage(g, attackers, pay)` is a pilot step after attackers
+and before blocks, in both engines. It dry-runs the blocks
+(`damage_through`, the planner's view) and fires only if an attacker would
+be chump-blocked: the COMMANDER if it is one of them, otherwise the biggest,
+since chump blocks eat the biggest first. The Passage taps first, so it
+cannot pay for itself, and {4} comes from what the main phase left -- no
+mana is held for it, which makes the number a FLOOR. The grant is stamped
+with the turn (`unblockable_ids`), and `damage_through` never offers such an
+attacker to the chump assignment. `rogues_passage=False` restores the land.
+Reclassified SCRIPTED in both decks; karlov's `L()` grew a `script`
+parameter so the claim is checked. `tests/test_rogues_passage.py`, seven
+cases, a mutation breaking exactly C, F and G -- two of whose first drafts
+were wrong about the BLOCKER model, not the card: three creatures a seat is
+ONE blocker at `block_share` 0.6, and with one blocker the chump falls on
+the bigger body, so the commander was never at risk.
+
+**MEASURED** (`diagnostics/run_rogues_passage.py`,
+`results/rogues_passage_20261005.txt`, N=15,000 paired): **karlov +0.0036
+±0.0015 at T20** (T10 +0.0001), 0.061 activations a game, +0.55 combat
+damage. **Tivit: a null**, 0.023 activations and Tivit's combat triggers
+unchanged -- Tivit flies, and only `flier_block_share` of a board can block
+it.
+
+## 0z108. MEASURED — §0z105's moved lorehold rows were mostly the blank
+
+Withdrawing the Goldspan swap moved twelve lorehold cells beyond their old
+bars; §0z105 did not attribute them. Three were MODEL-BLIND sorceries --
+Call Forth the Tempest, Improvisation Capstone, Restoration Seminar -- which
+cannot move because of anything they do: a blind card's row is a dead card
+against the blank (§0z66). What moved is the blank. It is cast at the list's
+median nonland priority (`experiment.repl_priority`, §0j), and Goldspan
+(priority 8) out with the Act (priority 4) in **took that median from 6 to
+5**. Every row in the table is measured against a different blank.
+
+`diagnostics/diag_blank_shift.py` (`results/blank_shift_20261005.txt`)
+blanks each moved card on today's list at 5 -- which reproduces all eighteen
+committed cells exactly -- and at 6:
+
+| card | old (T20) | at 5 | at 6 |
+|---|---|---|---|
+| Call Forth the Tempest | +0.0021 | −0.0001 | **+0.0021** |
+| Improvisation Capstone | +0.0014 | +0.0004 | **+0.0018** |
+| Restoration Seminar | +0.0029 | +0.0007 | +0.0020 |
+| Arcane Bombardment | +0.0117 | +0.0091 | **+0.0114** |
+| Apex of Power | +0.0345 | +0.0308 | +0.0318 |
+| Guttersnipe | +0.0099 | +0.0074 | +0.0075 |
+
+The blind rows return exactly (at T10 too: +0.0016, +0.0009, +0.0007 against
++0.0016, +0.0009, +0.0008); Arcane Bombardment nearly; the rest partly, and
+that remainder is the deck changing. **A one-card swap can move every row of
+a table through `repl_priority`** -- when a table is rebuilt for a swap,
+check whether the blank's priority moved before reading its moved rows as
+the swap's effect on those cards.
 
 ## How to read an ablation table
 

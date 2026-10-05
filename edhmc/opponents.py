@@ -1031,7 +1031,10 @@ def unblockable_ids(g) -> set:
     turn without anything having to clear it -- the same shape as tivit's
     `cyberdrive_turn`. Ids are safe as keys because `engine.begin_game` holds
     every Permanent for the game (§0z100)."""
-    turn, ids = getattr(g, "unblockable", (None, ()))
+    grant = getattr(g, "unblockable", None)
+    if grant is None:                  # nothing granted this game
+        return set()
+    turn, ids = grant
     return ids if turn == g.turn else set()
 
 
@@ -1943,7 +1946,8 @@ def should_cast_own_wipe(g, card=None) -> bool:
     policy will happily nuke its own winning position. So gate it on the board
     state: only sweep when the table's board meaningfully exceeds yours.
 
-    WHAT "YOUR BOARD" MEANS is `wipe_gate_measure` (§0z106):
+    WHAT "YOUR BOARD" MEANS is `wipe_gate_measure` (§0z106), "cost" by
+    default since 2026-10-05:
       count   bodies against bodies -- the gate as it was written. A 13/13
               Karlov counts as one body, so karlov swept 82% of its wipes
               with its commander on board and the pilot ahead by power.
@@ -1955,10 +1959,15 @@ def should_cast_own_wipe(g, card=None) -> bool:
               (Avacyn's grant) -- `is_hardy` and `wipe_destroys`, the same
               two rules `resolve_own_wipe` applies. A wipe that costs you
               nothing is a catch-up card with no catch.
+    Measured against "count" at N=15,000 (results/wipe_gate_power_20261005.txt),
+    "cost" is +0.0143 karlov, +0.0136 lorehold, +0.0111 rendmaw and +0.0083
+    tivit at T20, all significant; shilgengar and trostani inside their bars.
+    "power" alone cost rendmaw and shilgengar, for the two reasons "cost"
+    exists. `wipe_gate_measure="count"` restores every table before §0z106.
     `card` is the sweeper; without it the cost measure assumes a symmetric
     destroy, which is the conservative branch.
     """
-    measure = g.cfg.get("wipe_gate_measure", "count")
+    measure = g.cfg.get("wipe_gate_measure", "cost")
     if measure == "count":
         mine = sum(1 for p in g.board if is_creature_now(g, p))
         theirs = sum(o.creatures for o in living(g))

@@ -101,7 +101,8 @@ def lorehold(winning):
 
 
 def gate(g, card, measure):
-    """The gate under one measure; FORCE_COUNT is the mutation."""
+    """The gate under one measure; FORCE_COUNT is the mutation. A to E run
+    under the default ("cost" since §0z106) and hold under every measure."""
     g.cfg["wipe_gate_measure"] = "count" if FORCE_COUNT else measure
     return OPP.should_cast_own_wipe(g, card)
 

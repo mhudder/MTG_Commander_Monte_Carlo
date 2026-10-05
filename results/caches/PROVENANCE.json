@@ -316,6 +316,12 @@
         "evidence": "2026-10-05 (\u00a70z105): the only fingerprint change is edhmc/decks/_removal.py dropping Goldspan Dragon from SCANNED (a name in no list) after the swap's withdrawal. check_unchanged_decks --n=3000, working tree vs worktree at 77897a8: all seven decks BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "8d9231b21aad7f0f",
         "utc": "2026-10-05T03:08:23Z"
+      },
+      {
+        "commit": "dd73066",
+        "evidence": "2026-10-05 (\u00a70z106, \u00a70z107): the wipe gate's cost measure and Rogue's Passage touch shared files in every fingerprint; azusa casts no own wipe and runs no Passage. check_unchanged_decks --n=3000, working tree vs worktree at b0e7562: azusa BIT-IDENTICAL on all 8 metrics (the other six moved and are rebuilt).",
+        "fingerprint": "f35c30e5abfbbe5e",
+        "utc": "2026-10-05T13:54:35Z"
       }
     ]
   },

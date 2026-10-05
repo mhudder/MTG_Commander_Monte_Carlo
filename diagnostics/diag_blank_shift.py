@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Did lorehold's rows move because of the CARD swap or because of the BLANK?
-(§0z107)
+(§0z108)
 
     python -m diagnostics.diag_blank_shift 15000 > results/blank_shift_20261005.txt
 

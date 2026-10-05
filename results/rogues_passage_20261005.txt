@@ -1,0 +1,18 @@
+Rogue's Passage's activation (§0z107). N=15,000 paired, seeds 5000.., staged lists. ON minus OFF; * = CI excludes zero.
+
+karlov  (off: won T20 0.4659; on: 0.061 activations/game)
+    won T10                       +0.0001 ±0.0003
+    won T20                       +0.0036 ±0.0015*
+    damage T20                    +0.4240 ±0.0622*
+    passage_activations T20       +0.0615 ±0.0058*
+    combat_damage T20             +0.5506 ±0.0643*
+    tivit_combat_triggers T20     +0.0000 ±0.0000
+
+tivit  (off: won T20 0.4343; on: 0.023 activations/game)
+    won T10                       -0.0003 ±0.0005
+    won T20                       -0.0003 ±0.0006
+    damage T20                    +0.0097 ±0.0285
+    passage_activations T20       +0.0225 ±0.0029*
+    combat_damage T20             +0.0167 ±0.0142*
+    tivit_combat_triggers T20     -0.0003 ±0.0015
+
