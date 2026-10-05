@@ -84,9 +84,9 @@ TOKENS = [
     C("Soul of Eternity", "Creature", {"gen": 5, "W": 2}, 0, 0,
       priority=9, threat=9.0),
     C("Bramble Sovereign", "Creature", {"gen": 2, "G": 2}, 4, 4,
-      priority=8.5, threat=8.0),
+      priority=10.5, threat=8.0),  # §0z110: priority 8.5 -> 10.5, adopted 2026-10-05
     C("Seedborn Muse", "Creature", {"gen": 3, "G": 2}, 2, 4,
-      priority=8, threat=7.5),
+      priority=10, threat=7.5),  # §0z110: priority 8 -> 10, adopted 2026-10-05
     C("Elspeth, Sun's Champion", "Planeswalker", {"gen": 4, "W": 2},
       priority=8.5, threat=8.5),
     # {2}{G/W}{G/W}: the printed cost is one spelling; the hybrid alts are the
@@ -95,7 +95,7 @@ TOKENS = [
       threat=6.5, alt_costs=(({"gen": 2, "W": 2}, "hybrid"),
                              ({"gen": 2, "G": 1, "W": 1}, "hybrid"))),
     C("Nesting Dovehawk", "Creature", {"gen": 3, "W": 1}, 2, 2,
-      priority=7, threat=6.0),
+      priority=9, threat=6.0),  # §0z110: priority 7 -> 9, adopted 2026-10-05
     C("Selesnya Eulogist", "Creature", {"gen": 2, "G": 1}, 3, 3,
       priority=6.5, threat=5.0),
     C("Luminarch Ascension", "Enchantment", {"gen": 1, "W": 1},
@@ -111,7 +111,7 @@ TOKENS = [
       threat=7.5),
     C("Blade of Selves", "Artifact", {"gen": 2}, priority=6, threat=5.0),
     C("King Darien XLVIII", "Creature", {"gen": 1, "G": 1, "W": 1}, 2, 3,
-      priority=7, threat=6.5),
+      priority=9, threat=6.5),  # §0z110: priority 7 -> 9, adopted 2026-10-05
     # "Queen Allenal of Ruadach's power and toughness are each equal to the
     # number of creatures you control."
     C("Queen Allenal of Ruadach", "Creature", {"G": 1, "W": 2}, 0, 0,
@@ -166,7 +166,7 @@ VALUE = [
 # ---------------------------------------------------------------------------
 ENGINES = [
     C("Mirari's Wake", "Enchantment", {"gen": 3, "G": 1, "W": 1},
-      priority=7.5, threat=7.5),
+      priority=9.5, threat=7.5),  # §0z110: priority 7.5 -> 9.5, adopted 2026-10-05
     C("Sylvan Library", "Enchantment", {"gen": 1, "G": 1}, priority=7,
       threat=5.5),
     C("Alhammarret's Archive", "Artifact", {"gen": 5}, priority=6.5,
