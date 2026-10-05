@@ -1,0 +1,6 @@
+Lorehold's staged swaps after -Blasphemous Act +Goldspan Dragon was WITHDRAWN (§0z105), 2026-10-05.
+N=15,000 paired, seeds 5000.., diagnostics/run_restage.py arms L L_noCaldera L_noSunbird L_gold_act; staged minus undone, and the withdrawn swap as L_gold_act - L.
+
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0093 +-0.0024*  T20 +0.0279 +-0.0038*  dmgT20 +2.89 +-0.24
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0050 +-0.0026*  T20 +0.0272 +-0.0042*  dmgT20 +2.07 +-0.25
+lorehold -Blasphemous Act +Goldspan Dragon (WITHDRAWN)T10 +0.0105 +-0.0026*  T20 +0.0015 +-0.0042   dmgT20 +1.45 +-0.22

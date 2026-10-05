@@ -153,6 +153,7 @@ Methodology that used to live at the end of this file is now
 | [0z102](#0z102) | COMMITTED | **-Wayward Swordtooth +Mole Man, Moloid Master (azusa), the owner's call.** Rebuilt table: Mole Man +0.0384 ±0.0042, second in the deck. Four rows fell beyond their bars, three of them Mole Man's own role -- Ancient Greenwarden, Crucible of Worlds (graveyard lands) and Journey of Discovery (land supply) -- §0z27's redundancy shape. Exploration did NOT rise (+0.0021 -> +0.0026 ±0.0030). Titania (+0.0004) is the weakest MODEL-EVALUATED row and is kept on the owner's call, as Exploration is |
 | [0z103](#0z103) | COMMITTED | **-Life from the Loam +Mossborn Hydra (azusa), the owner's call**, on the paired run that beat Nissa in the same slot. Rebuilt: Hydra +0.0266 ±0.0038; Scute Swarm and Avenger fell beyond their bars -- §0z100's curve, a fifth landfall payoff lowering the four it overlaps. Nissa's proposed cut moved to Sylvan Awakening |
 | [0z104](#0z104) | FIXED | **Your own sweeper asked the wipe gate in the main phase ONLY.** Lorehold's miracle, Arcane Bombardment, discover, Apex, Jeska's Will, Goliath and Galvanoth -- and karlov's Bolas's Citadel -- cast wipes without asking: 34% of lorehold's own wipes resolved on a board it was winning. One predicate (`pilot_may_cast`), every optional site: **lorehold +0.0242 / +0.0465**, karlov +0.0021 at T20. All four lorehold wipes flip to significantly POSITIVE; -Blasphemous Act +Goldspan falls inside its bar at T20 |
+| [0z105](#0z105) | WITHDRAWN | **-Blasphemous Act +Goldspan Dragon (lorehold), the owner's call.** After §0z104 the swap is +0.0105 at T10 and +0.0015 ±0.0042 at T20, inside its bar; the Act stays. Rebuilt table: the Act's own row is -0.0072 / +0.0040, the wipe shape; 12 cells moved beyond their bars, all small. The four own wipes together: -0.0237 at T10, +0.0291 at T20. Caldera and Sunbird's both stand |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9419,6 +9420,50 @@ and that one is attributed: the same run with the gate off reproduces
 +0.0130 / +0.0131. Blasphemous Act was over-firing like every other wipe, so
 cutting it looked better than it is. The staging was the owner's; it is
 recorded on the Change and left for the owner to keep or withdraw.
+
+## 0z105. WITHDRAWN — -Blasphemous Act +Goldspan Dragon (lorehold), the owner's call
+
+**THE DECISION.** §0z104 re-measured the swap on the gated engine and found it
+inside its bar at T20 (+0.0015 ±0.0042, against +0.0134 at §0z81), with the
+drop attributed: the same run with `wipe_gate_all_casts=False` reproduces
++0.0130 / +0.0131. About 0.012 of the edge the staging rested on was the Act
+firing by miracle and free cast on boards the pilot was winning. **The owner
+withdrew it and keeps Blasphemous Act** (2026-10-05). The Change is in
+`WITHDRAWN` with that reason and what re-staging would have to answer; queued
+item 0c is closed and moved to `docs/HISTORY.md`. Not refuted -- the swap is
+still +0.0105 ±0.0026 at T10 -- but a staging is a decision, and the number
+under it moved.
+
+**THE TABLE, REBUILT** (`build_pending('lorehold')` changed, so a rebuild
+and never `--verified`; N=15,000 from empty). 12 of about 200 cells moved
+beyond their old bars, all by a few thousandths and all but one DOWN: Apex
+of Power (T20), Arcane Bombardment, Guttersnipe, Longshot (T10) and Soulfire
+Eruption (T20); Call Forth the Tempest, Improvisation Capstone and
+Restoration Seminar to within 0.0007 of zero at both horizons. The one rise
+is Farewell's T10 cost, smaller (−0.0058 → −0.0035). Not attributed card by card -- the swap took out one card and
+put back a wipe, and §0z27 says every row around a redundant card moves.
+**The Act's own row is −0.0072 ±0.0022 at T10 and +0.0040 ±0.0037 at
+T20**: the shape of every lorehold wipe since §0z104, early tempo spent and
+repaid late, and the reason a cut that looks free at T10 is not.
+
+**THE GROUPS** (`results/groups_20261002.txt`, all fourteen checks pass).
+The own-wipes group takes the Act back (`diagnostics/run_groups.py`):
+**four wipes together −0.0237 ±0.0036 at T10, +0.0291 ±0.0058 at T20** --
+the three-card group of §0z104 was −0.0162 / +0.0256. At T20 the group is
+exactly its rows' sum (interaction +0.0000); at T10 it costs more than the
+sum (ratio 1.36), so the early cost compounds when several wipes are drawn.
+
+**THE OTHER STAGED SWAPS** (`results/restage_20261005b.txt`, the Act now in
+both legs): −Penance +Caldera Pyremaw **+0.0093 ±0.0024 / +0.0279 ±0.0038**,
+−Scroll Rack +Sunbird's Invocation **+0.0050 ±0.0026 / +0.0272 ±0.0042**.
+Both stand, inside their bars of §0z104's measurement. `run_restage` now
+measures the withdrawn swap as `L_gold_act − L` and reproduces §0z104's
++0.0105 / +0.0015 exactly.
+
+**THE CENSUS.** `tools.removal_census --write` drops Goldspan from
+`_removal.py`'s SCANNED set -- a name in no list. That file is in every
+deck's fingerprint, so the six other caches went SUSPECT; cleared with
+`check_unchanged_decks --n=3000` (see PROVENANCE).
 
 ## How to read an ablation table
 
