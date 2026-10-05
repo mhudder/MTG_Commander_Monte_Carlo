@@ -84,7 +84,7 @@ TOKENS = [
     C("Soul of Eternity", "Creature", {"gen": 5, "W": 2}, 0, 0,
       priority=9, threat=9.0),
     C("Bramble Sovereign", "Creature", {"gen": 2, "G": 2}, 4, 4,
-      priority=10.5, threat=8.0),  # §0z110: priority 8.5 -> 10.5, adopted 2026-10-05
+      priority=8.5, threat=8.0),  # §0z110 moved it to 10.5; REVERTED 2026-10-05 (§0z111)
     C("Seedborn Muse", "Creature", {"gen": 3, "G": 2}, 2, 4,
       priority=10, threat=7.5),  # §0z110: priority 8 -> 10, adopted 2026-10-05
     C("Elspeth, Sun's Champion", "Planeswalker", {"gen": 4, "W": 2},

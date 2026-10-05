@@ -53,7 +53,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `5e76366`.
+Generated at `f07700b`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -91,7 +91,7 @@ the fingerprint above mean anything.
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `d6c162f17fd82f27` | `a1cdd9e` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `777e0c9f7e518826` | `a1cdd9e` | **CURRENT** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `83c408fae55d5593` | `a1cdd9e` | **CURRENT** |
-| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `4892172f0d6c3eb8` | `5e76366` | **CURRENT** |
+| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `4892172f0d6c3eb8` | `5e76366` | **SUSPECT** |
 
 ### State of each cache
 
@@ -103,7 +103,7 @@ the fingerprint above mean anything.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `d6c162f17fd82f27`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `777e0c9f7e518826`, which is live.
 - **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `83c408fae55d5593`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — CURRENT. built at `4892172f0d6c3eb8`, which is live.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPECT. built at `4892172f0d6c3eb8`, live is `cac6170faa5ec125`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `5e76366`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_trostani_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 
 ## What each fingerprint covers
 

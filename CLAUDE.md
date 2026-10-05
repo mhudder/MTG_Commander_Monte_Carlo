@@ -924,7 +924,9 @@ is half answered**: the ordering half is built and measured as a null
     +0.0218 / +0.0151, significant at both -- an adoption decision for the
     owner, like the two above. **Trostani, the seventh deck, is swept too
     (§0z110)**: five moves, every one raising a token or populate engine,
-    joint +0.0129 / +0.0519 -- tivit's shape, **ADOPTED 2026-10-05**.
+    joint +0.0129 / +0.0519 -- tivit's shape, **ADOPTED 2026-10-05**,
+    except Bramble Sovereign, which loses at T10 given the other four
+    (§0z111) and is back at 8.5. **Trostani's rebuild is deferred.**
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.
