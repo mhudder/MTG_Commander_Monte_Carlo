@@ -158,7 +158,7 @@ Methodology that used to live at the end of this file is now
 | [0z107](#0z107) | IMPLEMENTED | **Rogue's Passage**: "{4}, {T}: target creature can't be blocked this turn" -- a land in karlov and tivit that did nothing (tivit's `script=` named a function nobody wrote). A pilot step before blocks; `damage_through` never chumps an unblockable attacker. Karlov +0.0036 ±0.0015 at T20 (0.06 activations a game); tivit a null, its commander flies |
 | [0z108](#0z108) | MEASURED | **§0z105's moved lorehold rows were mostly the BLANK.** Goldspan (priority 8) out and the Act (4) in moved the list's median, and with it the blank, from 6 to 5. Re-blanked at 6 on today's list, the three MODEL-BLIND rows return to their old values exactly and Arcane Bombardment nearly; the rest is the deck. A one-card swap can move every row of a table through `repl_priority` |
 | [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. **Karlov's five wipes as a group: −0.0132 / −0.0003 before, +0.0030 / +0.0132 now, significant at both.** Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
-| [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. An adoption decision for the owner; not applied |
+| [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. **ADOPTED by the owner 2026-10-05**; trostani's table rebuilt |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9663,9 +9663,11 @@ activations, and the deck was casting it after its card draw and mana.
 
 **THE SAME SHAPE AS TIVIT'S** (§0z44, adopted 2026-09-25): a token deck
 whose priorities ranked draw and mana above the engines that make the
-tokens, so the engines came down a turn late. **AN ADOPTION DECISION FOR THE
-OWNER, NOT APPLIED** -- item 18's precedent. Adopting it moves trostani's
-baseline and needs that one table rebuilt.
+tokens, so the engines came down a turn late. **ADOPTED BY THE OWNER,
+2026-10-05**, all five moves, annotated in `decks/trostani_v1.py` as tivit's
+were. The .xlsx carries no priorities, so the module is the only leg, and the
+blank's priority stays at 6.5 (the §0z108 check). Trostani's table was
+rebuilt on its own; what moved is below.
 
 ## How to read an ablation table
 

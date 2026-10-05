@@ -924,7 +924,7 @@ is half answered**: the ordering half is built and measured as a null
     +0.0218 / +0.0151, significant at both -- an adoption decision for the
     owner, like the two above. **Trostani, the seventh deck, is swept too
     (§0z110)**: five moves, every one raising a token or populate engine,
-    joint +0.0129 / +0.0519 -- tivit's shape, and the owner's to adopt.
+    joint +0.0129 / +0.0519 -- tivit's shape, **ADOPTED 2026-10-05**.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.
