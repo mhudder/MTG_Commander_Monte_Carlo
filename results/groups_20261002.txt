@@ -18,14 +18,14 @@ RENDMAW
 LOREHOLD
   reproduces the cached Sol Ring row at T10: YES
   reproduces the cached Sol Ring row at T20: YES
-  mana rocks                    (6)  T10 group +0.0463±0.0046* sum +0.0455 ratio  1.02 inter +0.0008   T20 group +0.0641±0.0070* sum +0.0581 ratio  1.10 inter +0.0060 
-  card flow                     (5)  T10 group +0.0430±0.0042* sum +0.0513 ratio  0.84 inter -0.0083   T20 group +0.1012±0.0067* sum +0.1181 ratio  0.86 inter -0.0169 
-  top-setters                   (2)  T10 group +0.0121±0.0034* sum +0.0123 ratio  0.98 inter -0.0002   T20 group +0.0085±0.0049* sum +0.0097 ratio  0.87 inter -0.0013 
-  spell payoffs                 (6)  T10 group +0.0305±0.0039* sum +0.0351 ratio  0.87 inter -0.0046   T20 group +0.0543±0.0061* sum +0.0585 ratio  0.93 inter -0.0043 
-  finishers                     (3)  T10 group +0.0835±0.0045* sum +0.0848 ratio  0.98 inter -0.0013   T20 group +0.1269±0.0062* sum +0.1202 ratio  1.06 inter +0.0067 
-  protection                    (2)  T10 group +0.0057±0.0020* sum +0.0059 ratio  0.97 inter -0.0002   T20 group +0.0019±0.0034  sum +0.0022 ratio  0.88 inter -0.0003 
-  own wipes                     (3)  T10 group -0.0162±0.0032* sum -0.0135 ratio  1.20 inter -0.0027   T20 group +0.0256±0.0053* sum +0.0267 ratio  0.96 inter -0.0011 
-  spot removal (control)        (4)  T10 group +0.0033±0.0020* sum +0.0035 ratio  0.94 inter -0.0002   T20 group +0.0050±0.0030* sum +0.0064 ratio  0.78 inter -0.0014 
+  mana rocks                    (6)  T10 group +0.0445±0.0045* sum +0.0446 ratio  1.00 inter -0.0001   T20 group +0.0618±0.0072* sum +0.0607 ratio  1.02 inter +0.0011 
+  card flow                     (5)  T10 group +0.0379±0.0040* sum +0.0471 ratio  0.80 inter -0.0092   T20 group +0.0987±0.0066* sum +0.1191 ratio  0.83 inter -0.0204 
+  top-setters                   (2)  T10 group +0.0120±0.0033* sum +0.0123 ratio  0.97 inter -0.0003   T20 group +0.0085±0.0049* sum +0.0108 ratio  0.78 inter -0.0023 
+  spell payoffs                 (6)  T10 group +0.0247±0.0037* sum +0.0259 ratio  0.95 inter -0.0012   T20 group +0.0486±0.0060* sum +0.0505 ratio  0.96 inter -0.0019 
+  finishers                     (3)  T10 group +0.0769±0.0044* sum +0.0783 ratio  0.98 inter -0.0014   T20 group +0.1233±0.0063* sum +0.1149 ratio  1.07 inter +0.0085 
+  protection                    (2)  T10 group +0.0043±0.0020* sum +0.0043 ratio  1.00 inter +0.0000   T20 group +0.0031±0.0034  sum +0.0032 ratio  0.98 inter -0.0001 
+  own wipes                     (4)  T10 group -0.0237±0.0036* sum -0.0174 ratio  1.36 inter -0.0063   T20 group +0.0291±0.0058* sum +0.0291 ratio  1.00 inter +0.0000 
+  spot removal (control)        (4)  T10 group +0.0037±0.0017* sum +0.0036 ratio  1.02 inter +0.0001   T20 group +0.0057±0.0027* sum +0.0060 ratio  0.96 inter -0.0003 
 
 KARLOV
   reproduces the cached Sol Ring row at T10: YES
