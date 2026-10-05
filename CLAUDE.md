@@ -922,7 +922,9 @@ is half answered**: the ordering half is built and measured as a null
     EXPLAINED (§0z86)**: it was the horizon, which counted tivit's extra
     turns and not lorehold's. With the horizon in rounds, Sieve 9 → 11 is
     +0.0218 / +0.0151, significant at both -- an adoption decision for the
-    owner, like the two above.
+    owner, like the two above. **Trostani, the seventh deck, is swept too
+    (§0z110)**: five moves, every one raising a token or populate engine,
+    joint +0.0129 / +0.0519 -- tivit's shape, and the owner's to adopt.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.

@@ -1,0 +1,145 @@
+priority sweep, phase `screen`. N=5,000 paired per arm, seeds 1234..6233, horizons (20,), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+122 arms across 1 deck(s), plus BASE and NOOP per deck/horizon.
+
+  simulating 248 jobs (620,000 games, one leg each) on 4 workers
+  20/248 jobs, 1.2 min elapsed, last job 15s
+  40/248 jobs, 2.4 min elapsed, last job 14s
+  60/248 jobs, 3.6 min elapsed, last job 15s
+  80/248 jobs, 4.8 min elapsed, last job 14s
+  100/248 jobs, 6.0 min elapsed, last job 14s
+  120/248 jobs, 7.2 min elapsed, last job 14s
+  140/248 jobs, 8.3 min elapsed, last job 15s
+  160/248 jobs, 9.5 min elapsed, last job 14s
+  180/248 jobs, 10.7 min elapsed, last job 15s
+  200/248 jobs, 11.9 min elapsed, last job 15s
+  220/248 jobs, 13.1 min elapsed, last job 14s
+  240/248 jobs, 14.3 min elapsed, last job 14s
+  248/248 jobs, 14.7 min elapsed, last job 14s
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP trostani    T20  games changed: 0   OK
+
+== trostani   (T20 base won 0.2694)
+  Seedborn Muse 8->10                                        T20  +0.0360 +-0.0104 * dmg  +1.74* chg  2763   cast 0.503
+  Bramble Sovereign 8.5->10.5                                T20  +0.0284 +-0.0097 * dmg  +1.44* chg  2720   cast 0.509
+  King Darien XLVIII 7->9                                    T20  +0.0244 +-0.0083 * dmg  +2.44* chg  2293   cast 0.322
+  Nesting Dovehawk 7->9                                      T20  +0.0140 +-0.0075 * dmg  +1.18* chg  2004   cast 0.347
+  Wurmcoil Engine 7->9                                       T20  +0.0140 +-0.0070 * dmg  +1.52* chg  1849   cast 0.327
+  Solemn Simulacrum 7->9                                     T20  +0.0112 +-0.0079 * dmg  +0.72* chg  1998   cast 0.351
+  Sun Titan 7.5->9.5                                         T20  +0.0092 +-0.0094   dmg  -0.62  chg  2674   cast 0.499
+  Elvish Mystic 9->7                                         T20  +0.0088 +-0.0057 * dmg  +0.33  chg  1478   cast 0.207
+  Mondrak, Glory Dominus 8.5->10.5                           T20  +0.0084 +-0.0094   dmg  -0.79* chg  2562   cast 0.521
+  Skyshroud Claim 6.5->4.5                                   T20  -0.0062 +-0.0044 * dmg  -0.64* chg   593   cast 0.138
+  Elvish Mystic 9->11                                        T20  -0.0058 +-0.0081   dmg  -1.65* chg  2365   cast 0.476
+  Birds of Paradise 9->7                                     T20  +0.0056 +-0.0058   dmg  +0.38  chg  1604   cast 0.206
+  Mirari's Wake 7.5->9.5                                     T20  +0.0054 +-0.0045 * dmg  +0.36* chg   575   cast 0.220
+  Arcane Signet 9->11                                        T20  +0.0052 +-0.0051   dmg  -0.04  chg   756   cast 0.346
+  Talisman of Unity 8.5->10.5                                T20  -0.0052 +-0.0055   dmg  -0.52* chg   922   cast 0.350
+  Anointed Procession 8->10                                  T20  +0.0050 +-0.0064   dmg  -0.96* chg  1115   cast 0.345
+  Aetherflux Reservoir 6.5->8.5                              T20  +0.0050 +-0.0047 * dmg  -0.06  chg   731   cast 0.218
+  Avacyn's Pilgrim 9->7                                      T20  +0.0046 +-0.0060   dmg  +0.30  chg  1483   cast 0.203
+  Birds of Paradise 9->11                                    T20  +0.0044 +-0.0084   dmg  -1.17* chg  2453   cast 0.470
+  Archon of Valor's Reach 6.5->4.5                           T20  +0.0042 +-0.0036 * dmg  -0.08  chg   583   cast 0.132
+  Mirari's Wake 7.5->5.5                                     T20  -0.0042 +-0.0047   dmg  -0.76* chg   751   cast 0.142
+  Nesting Dovehawk 7->5                                      T20  -0.0040 +-0.0044   dmg  -0.41* chg   716   cast 0.153
+  Caretaker's Talent 7.5->5.5                                T20  +0.0040 +-0.0042   dmg  +0.42* chg   570   cast 0.172
+  Talisman of Unity 8.5->6.5                                 T20  +0.0038 +-0.0034 * dmg  +0.17  chg   463   cast 0.203
+  Mondrak, Glory Dominus 8.5->6.5                            T20  +0.0036 +-0.0048   dmg  +0.06  chg   860   cast 0.184
+  Sylvan Library 7->9                                        T20  +0.0036 +-0.0035 * dmg  +0.11  chg   444   cast 0.213
+  Aetherflux Reservoir 6.5->4.5                              T20  -0.0036 +-0.0044   dmg  -0.08  chg   628   cast 0.151
+  Sol Ring 10->8                                             T20  +0.0036 +-0.0058   dmg  -0.21  chg  1016   cast 0.205
+  Sakura-Tribe Elder 8->10                                   T20  -0.0036 +-0.0106   dmg  -1.89* chg  3064   cast 0.530
+  Growing Ranks 7.5->5.5                                     T20  +0.0034 +-0.0041   dmg  +0.52* chg   694   cast 0.151
+  Luminarch Ascension 7->9                                   T20  +0.0034 +-0.0039   dmg  +0.23  chg   494   cast 0.225
+  Primal Vigor 7.5->9.5                                      T20  +0.0034 +-0.0040   dmg  -0.05  chg   558   cast 0.228
+  Selfless Spirit 5->7                                       T20  +0.0034 +-0.0030 * dmg  +0.07  chg   507   cast 0.206
+  Solemn Simulacrum 7->5                                     T20  -0.0034 +-0.0045   dmg  -0.44* chg   696   cast 0.144
+  Wood Elves 7.5->9.5                                        T20  +0.0032 +-0.0101   dmg  -0.68  chg  2981   cast 0.495
+  Elspeth, Sun's Champion 8.5->6.5                           T20  -0.0030 +-0.0044   dmg  -0.55* chg   532   cast 0.161
+  Avacyn's Pilgrim 9->11                                     T20  +0.0026 +-0.0083   dmg  -1.18* chg  2399   cast 0.475
+  Sylvan Caryatid 8.5->10.5                                  T20  +0.0026 +-0.0092   dmg  -1.68* chg  2936   cast 0.500
+  Wood Elves 7.5->5.5                                        T20  -0.0026 +-0.0047   dmg  -0.43* chg   660   cast 0.169
+  Eternal Witness 6->4                                       T20  +0.0024 +-0.0030   dmg  +0.01  chg   419   cast 0.162
+  Angel of Sanctions 5.5->7.5                                T20  +0.0024 +-0.0040   dmg  +0.30* chg   711   cast 0.186
+  Defense of the Heart 5->7                                  T20  +0.0024 +-0.0045   dmg  +0.55* chg   634   cast 0.182
+  Phyrexian Processor 6.5->8.5                               T20  -0.0022 +-0.0045   dmg  -0.92* chg   657   cast 0.203
+  Green Sun's Zenith 7->9                                    T20  +0.0022 +-0.0038   dmg  +0.03  chg   447   cast 0.202
+  Skyshroud Claim 6.5->8.5                                   T20  +0.0022 +-0.0048   dmg  +0.45* chg   683   cast 0.201
+  Caretaker's Talent 7.5->9.5                                T20  +0.0020 +-0.0033   dmg  -0.16  chg   471   cast 0.223
+  Blade of Selves 6->8                                       T20  -0.0018 +-0.0034   dmg  -0.17  chg   444   cast 0.210
+  Queen Allenal of Ruadach 7.5->9.5                          T20  -0.0018 +-0.0097   dmg  -1.32* chg  3042   cast 0.506
+  Parallel Lives 8->6                                        T20  +0.0018 +-0.0042   dmg  +0.13  chg   674   cast 0.167
+  Ulvenwald Hydra 6->8                                       T20  +0.0018 +-0.0045   dmg  +0.23  chg   682   cast 0.182
+  Green Sun's Zenith 7->5                                    T20  +0.0018 +-0.0039   dmg  -0.20  chg   517   cast 0.181
+  Growing Ranks 7.5->9.5                                     T20  +0.0016 +-0.0038   dmg  -0.05  chg   567   cast 0.217
+  Wurmcoil Engine 7->5                                       T20  -0.0016 +-0.0039   dmg  -0.39* chg   614   cast 0.123
+  Parallel Lives 8->10                                       T20  +0.0016 +-0.0060   dmg  -1.03* chg  1096   cast 0.336
+  Aura Shards 4->6                                           T20  +0.0016 +-0.0026   dmg  +0.02  chg   363   cast 0.189
+  Elspeth, Sun's Champion 8.5->10.5                          T20  +0.0014 +-0.0020   dmg  +0.02  chg   157   cast 0.188
+  Karmic Guide 6->4                                          T20  +0.0014 +-0.0030   dmg  +0.11  chg   396   cast 0.132
+  Angel of Sanctions 5.5->3.5                                T20  -0.0014 +-0.0021   dmg  -0.01  chg   257   cast 0.118
+  Greater Good 5->3                                          T20  +0.0014 +-0.0016   dmg  +0.07  chg   133   cast 0.129
+  Worldly Tutor 6->8                                         T20  +0.0014 +-0.0034   dmg  +0.10  chg   401   cast 0.214
+  Luminarch Ascension 7->5                                   T20  -0.0012 +-0.0035   dmg  -0.25* chg   466   cast 0.190
+  Dawn of Hope 6.5->4.5                                      T20  +0.0012 +-0.0026   dmg  +0.08  chg   317   cast 0.171
+  King Darien XLVIII 7->5                                    T20  -0.0012 +-0.0042   dmg  -0.19  chg   644   cast 0.163
+  Sundering Growth 4->6                                      T20  +0.0012 +-0.0016   dmg  +0.05  chg   122   cast 0.104
+  Anointed Procession 8->6                                   T20  +0.0012 +-0.0043   dmg  +0.39* chg   723   cast 0.171
+  Alhammarret's Archive 6.5->4.5                             T20  -0.0012 +-0.0036   dmg  -0.07  chg   579   cast 0.127
+  Eladamri's Call 6->8                                       T20  -0.0012 +-0.0045   dmg  -0.20  chg   586   cast 0.202
+  Congregation at Dawn 5.5->3.5                              T20  +0.0012 +-0.0027   dmg  +0.02  chg   220   cast 0.162
+  Soul of Eternity 9->7                                      T20  -0.0010 +-0.0097   dmg  -3.48* chg  2675   cast 0.181
+  Blade of Selves 6->4                                       T20  +0.0010 +-0.0024   dmg  +0.07  chg   236   cast 0.190
+  Timeless Witness 5.5->7.5                                  T20  +0.0010 +-0.0045   dmg  -0.16  chg   744   cast 0.200
+  Greater Good 5->7                                          T20  -0.0010 +-0.0043   dmg  -0.37* chg   608   cast 0.177
+  Chord of Calling 6.5->4.5                                  T20  -0.0010 +-0.0036   dmg  -0.01  chg   518   cast 0.147
+  Worldly Tutor 6->4                                         T20  +0.0010 +-0.0016   dmg  +0.02  chg   135   cast 0.204
+  Congregation at Dawn 5.5->7.5                              T20  -0.0010 +-0.0044   dmg  -0.13  chg   696   cast 0.208
+  Sylvan Caryatid 8.5->6.5                                   T20  +0.0010 +-0.0040   dmg  +0.11  chg   556   cast 0.193
+  Farhaven Elf 7.5->9.5                                      T20  +0.0010 +-0.0102   dmg  -0.86* chg  2976   cast 0.502
+  Beast Within 3->5                                          T20  -0.0010 +-0.0011   dmg  -0.04  chg   105   cast 0.157
+  Bramble Sovereign 8.5->6.5                                 T20  -0.0008 +-0.0045   dmg  -0.31  chg   896   cast 0.185
+  Selesnya Eulogist 6.5->8.5                                 T20  -0.0008 +-0.0040   dmg  +0.02  chg   688   cast 0.219
+  Phyrexian Processor 6.5->4.5                               T20  +0.0008 +-0.0040   dmg  +0.27* chg   529   cast 0.134
+  Mimic Vat 6->4                                             T20  -0.0008 +-0.0030   dmg  +0.20* chg   353   cast 0.171
+  Defense of the Heart 5->3                                  T20  +0.0008 +-0.0017   dmg  +0.00  chg   135   cast 0.129
+  Lightning Greaves 6->8                                     T20  -0.0008 +-0.0032   dmg  -0.10  chg   460   cast 0.205
+  Chord of Calling 6.5->8.5                                  T20  +0.0008 +-0.0047   dmg  -0.01  chg   720   cast 0.196
+  Enlightened Tutor 6->8                                     T20  -0.0008 +-0.0035   dmg  -0.05  chg   383   cast 0.204
+  Sakura-Tribe Elder 8->6                                    T20  +0.0008 +-0.0046   dmg  -0.02  chg   616   cast 0.193
+  Farhaven Elf 7.5->5.5                                      T20  -0.0008 +-0.0052   dmg  -0.59* chg   692   cast 0.182
+  Wrath of God 2->4                                          T20  +0.0008 +-0.0015   dmg  +0.02  chg    91   cast 0.051
+  Dawn of Hope 6.5->8.5                                      T20  +0.0006 +-0.0033   dmg  -0.31* chg   423   cast 0.192
+  God-Pharaoh's Gift 6.5->8.5                                T20  +0.0006 +-0.0040   dmg  -0.27* chg   464   cast 0.180
+  Sundering Growth 4->2                                      T20  -0.0006 +-0.0009   dmg  -0.01  chg    41   cast 0.097
+  Eternal Witness 6->8                                       T20  +0.0006 +-0.0046   dmg  -0.18  chg   677   cast 0.205
+  Acidic Slime 3.5->1.5                                      T20  -0.0006 +-0.0011   dmg  -0.04  chg    73   cast 0.114
+  Selfless Spirit 5->3                                       T20  +0.0006 +-0.0012   dmg  -0.00  chg    99   cast 0.186
+  Lightning Greaves 6->4                                     T20  +0.0006 +-0.0020   dmg  +0.10  chg   242   cast 0.186
+  Mimic Vat 6->8                                             T20  -0.0004 +-0.0040   dmg  -0.23  chg   619   cast 0.212
+  Queen Allenal of Ruadach 7.5->5.5                          T20  +0.0004 +-0.0042   dmg  +0.01  chg   692   cast 0.174
+  Primal Vigor 7.5->5.5                                      T20  +0.0004 +-0.0046   dmg  +0.22  chg   701   cast 0.147
+  Acidic Slime 3.5->5.5                                      T20  +0.0004 +-0.0021   dmg  +0.01  chg   265   cast 0.137
+  Aura Shards 4->2                                           T20  +0.0004 +-0.0012   dmg  +0.01  chg   126   cast 0.166
+  Seedborn Muse 8->6                                         T20  -0.0002 +-0.0048   dmg  -0.40* chg   717   cast 0.155
+  Selesnya Eulogist 6.5->4.5                                 T20  -0.0002 +-0.0034   dmg  -0.03  chg   507   cast 0.171
+  God-Pharaoh's Gift 6.5->4.5                                T20  +0.0002 +-0.0039   dmg  -0.07  chg   511   cast 0.112
+  Karmic Guide 6->8                                          T20  +0.0002 +-0.0045   dmg  -0.40* chg   783   cast 0.203
+  Timeless Witness 5.5->3.5                                  T20  +0.0002 +-0.0025   dmg  -0.04  chg   285   cast 0.140
+  Archon of Valor's Reach 6.5->8.5                           T20  -0.0002 +-0.0043   dmg  -0.03  chg   834   cast 0.226
+  Ulvenwald Hydra 6->4                                       T20  +0.0002 +-0.0030   dmg  -0.13  chg   375   cast 0.113
+  Enlightened Tutor 6->4                                     T20  +0.0002 +-0.0018   dmg  -0.04  chg   136   cast 0.197
+  Eladamri's Call 6->4                                       T20  +0.0002 +-0.0029   dmg  -0.08  chg   318   cast 0.178
+  Arcane Signet 9->7                                         T20  +0.0002 +-0.0030   dmg  -0.02  chg   449   cast 0.208
+  Path to Exile 3->5                                         T20  -0.0002 +-0.0003   dmg  -0.01  chg    57   cast 0.192
+  Beast Within 3->1                                          T20  +0.0002 +-0.0009   dmg  +0.03  chg    54   cast 0.153
+  Soul of Eternity 9->11                                     T20  +0.0000 +-0.0010   dmg  -0.02  chg    35   cast 0.483
+  Sun Titan 7.5->5.5                                         T20  +0.0000 +-0.0043   dmg  -0.11  chg   689   cast 0.130
+  Sylvan Library 7->5                                        T20  +0.0000 +-0.0037   dmg  -0.17  chg   456   cast 0.180
+  Alhammarret's Archive 6.5->8.5                             T20  +0.0000 +-0.0042   dmg  -0.33* chg   625   cast 0.194
+  Sol Ring 10->12                                            T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.345
+  Swords to Plowshares 3->5                                  T20  +0.0000 +-0.0006   dmg  -0.00  chg    49   cast 0.206
+  Swords to Plowshares 3->1                                  T20  +0.0000 +-0.0000   dmg  -0.01  chg     6   cast 0.204
+  Path to Exile 3->1                                         T20  +0.0000 +-0.0006   dmg  +0.00  chg     8   cast 0.190
+  Wrath of God 2->0                                          T20  +0.0000 +-0.0000   dmg  +0.00  chg     0   cast 0.044
+  -> 14 of 122 rows exclude zero at 95%; ~6.1 expected by chance alone.
+

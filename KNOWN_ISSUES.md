@@ -157,6 +157,8 @@ Methodology that used to live at the end of this file is now
 | [0z106](#0z106) | FIXED | **The wipe gate counted BODIES.** Karlov swept 82% of its wipes with its commander on board carrying 11 counters, two bodies against ten and well AHEAD by power. The gate now weighs power, counting only your creatures the sweeper would kill (`wipe_gate_measure="cost"`): **karlov +0.0143, lorehold +0.0136, rendmaw +0.0111, tivit +0.0083 at T20**, all significant; shilgengar and trostani inside their bars. Power ALONE cost rendmaw (a one-sided Massacre Wurm held back) and shilgengar (Avacyn's grant ignored) -- the two reasons "cost" exists. Six tables rebuilt |
 | [0z107](#0z107) | IMPLEMENTED | **Rogue's Passage**: "{4}, {T}: target creature can't be blocked this turn" -- a land in karlov and tivit that did nothing (tivit's `script=` named a function nobody wrote). A pilot step before blocks; `damage_through` never chumps an unblockable attacker. Karlov +0.0036 ±0.0015 at T20 (0.06 activations a game); tivit a null, its commander flies |
 | [0z108](#0z108) | MEASURED | **§0z105's moved lorehold rows were mostly the BLANK.** Goldspan (priority 8) out and the Act (4) in moved the list's median, and with it the blank, from 6 to 5. Re-blanked at 6 on today's list, the three MODEL-BLIND rows return to their old values exactly and Arcane Bombardment nearly; the rest is the deck. A one-card swap can move every row of a table through `repl_priority` |
+| [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
+| [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. An adoption decision for the owner; not applied |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9588,6 +9590,73 @@ that remainder is the deck changing. **A one-card swap can move every row of
 a table through `repl_priority`** -- when a table is rebuilt for a swap,
 check whether the blank's priority moved before reading its moved rows as
 the swap's effect on those cards.
+
+## 0z109. REBUILT — six tables for the wipe gate's cost measure and Rogue's Passage
+
+`check_unchanged_decks --n=3000` against b0e7562 (before §0z106/§0z107):
+azusa BIT-IDENTICAL (no own wipe, no Passage; recorded `--verified`), the
+other six MOVED -- rendmaw, lorehold, karlov and tivit by +0.010 to +0.015
+win rate at that N, shilgengar and trostani by noise. The six were rebuilt
+at **a1cdd9e** as a parallel rebuild (§0z94): one cloud session per deck,
+python 3.11.15 / numpy 2.4.6 on every leg, shards merged with
+`--merge-shards`. **Slowest leg 28 minutes** (trostani), fastest 15 (tivit).
+
+**WHAT MOVED** beyond its own old bar, against the tables at a1cdd9e:
+
+| deck | cells moved | the pattern |
+|---|---|---|
+| rendmaw | 2 | Massacre Wurm, +0.0051 → **+0.0167** at T20 (+0.0010 → +0.0036 at T10) -- the one-sided wipe the gate used to hold |
+| lorehold | 29 | every cell UP: Approach +0.0248 → +0.0325, Apex +0.0308 → +0.0363 (T20), Ultima +0.0058 → +0.0119, Blasphemous Act −0.0072 → −0.0015 (T10) and +0.0040 → +0.0093 (T20) |
+| karlov | 15 | the wipes: Toxic Deluge −0.0042 → +0.0004 (T10), −0.0003 → +0.0043 (T20); Damn −0.0051 → −0.0010; Damnation −0.0010 → +0.0021 (T10). Vito and Sol Ring up |
+| tivit | 8 | the wipes: Damn −0.0090 → −0.0003 (T10), **Farewell −0.0021 → +0.0035 at T10, a significant sign flip**, Promise of Loyalty −0.0045 → +0.0009; the Deadeye loop up |
+| shilgengar | 1 | Damn at T10, −0.0005 → 0.0000 |
+| trostani | 0 | |
+
+The CLAUDE.md tell, again: **karlov's own wipes read as cut candidates
+(−0.004 to −0.005 at T10) because the pilot fired them on a winning board**
+-- not because the cards were weak. No sign flip outside tivit's Farewell,
+and no card changed category.
+
+## 0z110. MEASURED — Trostani's priorities, swept
+
+The seventh deck arrived after item 18's sweep (§0z44), so its `priority`
+numbers were a first guess never checked against the simulation (an open
+item since §0z96 built the deck). `diagnostics/run_priority_sweep.py --decks=trostani`, all five
+phases, on the a1cdd9e engine; `results/priority_*_trostani.txt`. Each
+phase's NOOP control changed zero games.
+
+**LEVER.** The table matters: REVERSED costs −0.0379 at T10 and −0.0852 at
+T20; FLAT −0.0115 at T10 and nothing at T20.
+
+**SCREEN → CONFIRM** (N=5,000 then N=15,000 on a disjoint block, ±2). 14 of
+122 screen rows survived (~6 expected by chance); on the confirm block five
+are significant at BOTH horizons and all five RAISE a token or populate
+engine:
+
+| move | T10 | T20 |
+|---|---|---|
+| Seedborn Muse 8 → 10 | +0.0187 ±0.0031 | +0.0282 ±0.0059 |
+| Bramble Sovereign 8.5 → 10.5 | +0.0049 ±0.0027 | +0.0193 ±0.0056 |
+| King Darien XLVIII 7 → 9 | +0.0026 ±0.0019 | +0.0181 ±0.0048 |
+| Nesting Dovehawk 7 → 9 | +0.0024 ±0.0018 | +0.0150 ±0.0042 |
+| Mirari's Wake 7.5 → 9.5 | +0.0021 ±0.0013 | +0.0046 ±0.0024 |
+
+Wurmcoil Engine 7 → 9 is T20 only (+0.0130), Elvish Mystic 9 → 7 T10 only;
+Skyshroud Claim 6.5 → 4.5 LOSES at both (its number is right).
+
+**JOINT** (a third seed block neither selection saw): the five together are
+**+0.0129 ±0.0034 at T10 and +0.0519 ±0.0069 at T20.** **MECHANISM**
+(`run_ab`, N=3,000): +3.40 tokens, +1.51 populates, +3.20 lifegain triggers
+a game, the gain all in combat/damage wins (+0.055) with Aetherflux wins
+slightly down (−0.011). Seedborn Muse alone is +2.96 tokens and +1.11
+populates: untapping on every opponent's turn is a round of instant-speed
+activations, and the deck was casting it after its card draw and mana.
+
+**THE SAME SHAPE AS TIVIT'S** (§0z44, adopted 2026-09-25): a token deck
+whose priorities ranked draw and mana above the engines that make the
+tokens, so the engines came down a turn late. **AN ADOPTION DECISION FOR THE
+OWNER, NOT APPLIED** -- item 18's precedent. Adopting it moves trostani's
+baseline and needs that one table rebuilt.
 
 ## How to read an ablation table
 

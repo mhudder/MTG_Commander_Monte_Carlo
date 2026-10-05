@@ -1,0 +1,15 @@
+priority sweep, phase `lever`. N=15,000 paired per arm, seeds 1234..16233, horizons (10, 20), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+2 arms across 1 deck(s), plus BASE and NOOP per deck/horizon.
+
+  simulating 48 jobs (120,000 games, one leg each) on 4 workers
+  20/48 jobs, 0.8 min elapsed, last job 9s
+  40/48 jobs, 1.9 min elapsed, last job 13s
+  48/48 jobs, 2.3 min elapsed, last job 13s
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP trostani    T10  games changed: 0   OK
+  NOOP trostani    T20  games changed: 0   OK
+
+== trostani   (T10 base won 0.0469, T20 base won 0.2757)
+  flat                                                       T10  -0.0115 +-0.0037 * dmg  -2.46* chg 14346   T20  -0.0019 +-0.0081   dmg  -1.35* chg 14510
+  reversed                                                   T10  -0.0379 +-0.0035 * dmg -12.10* chg 14829   T20  -0.0852 +-0.0084 * dmg -14.82* chg 14869
+

@@ -1,0 +1,13 @@
+priority sweep, phase `joint`. N=15,000 paired per arm, seeds 21234..36233, horizons (10, 20), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+1 arms across 1 deck(s), plus BASE and NOOP per deck/horizon.
+
+  simulating 36 jobs (90,000 games, one leg each) on 4 workers
+  20/36 jobs, 0.9 min elapsed, last job 14s
+  36/36 jobs, 1.9 min elapsed, last job 16s
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP trostani    T10  games changed: 0   OK
+  NOOP trostani    T20  games changed: 0   OK
+
+== trostani   (T10 base won 0.0454, T20 base won 0.2806)
+  JOINT Bramble Sovereign 8.5->10.5; King Darien XLVIII 7->9; Mirari's Wake 7.5->9.5; Nesting Dovehawk 7->9; Seedborn Muse 8->10 T10  +0.0129 +-0.0034 * dmg  +0.46* chg  9769   T20  +0.0519 +-0.0069 * dmg  +2.66* chg 11246
+

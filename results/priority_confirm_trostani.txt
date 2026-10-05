@@ -1,0 +1,34 @@
+priority sweep, phase `confirm`. N=15,000 paired per arm, seeds 6234..21233, horizons (10, 20), delta 2, staged lists (build_pending). A leg shared per deck/horizon.
+14 arms across 1 deck(s), plus BASE and NOOP per deck/horizon.
+
+  simulating 192 jobs (480,000 games, one leg each) on 4 workers
+  20/192 jobs, 0.8 min elapsed, last job 10s
+  40/192 jobs, 1.6 min elapsed, last job 10s
+  60/192 jobs, 2.5 min elapsed, last job 11s
+  80/192 jobs, 3.3 min elapsed, last job 9s
+  100/192 jobs, 4.2 min elapsed, last job 14s
+  120/192 jobs, 5.3 min elapsed, last job 14s
+  140/192 jobs, 6.5 min elapsed, last job 15s
+  160/192 jobs, 7.8 min elapsed, last job 14s
+  180/192 jobs, 9.0 min elapsed, last job 15s
+  192/192 jobs, 9.7 min elapsed, last job 14s
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP trostani    T10  games changed: 0   OK
+  NOOP trostani    T20  games changed: 0   OK
+
+== trostani   (T10 base won 0.0467, T20 base won 0.2794)
+  Aetherflux Reservoir 6.5->8.5                              T10  -0.0007 +-0.0014   dmg  -0.28* chg  1746   T20  +0.0000 +-0.0027   dmg  -0.14  chg  2169   cast 0.206
+  Archon of Valor's Reach 6.5->4.5                           T10  +0.0003 +-0.0007   dmg  -0.21* chg  1215   T20  -0.0003 +-0.0020   dmg  -0.21* chg  1682   cast 0.119
+  Bramble Sovereign 8.5->10.5                                T10  +0.0049 +-0.0027 * dmg  -0.85* chg  6655   T20  +0.0193 +-0.0056 * dmg  +0.23  chg  8186   cast 0.515
+  Elvish Mystic 9->7                                         T10  +0.0019 +-0.0013 * dmg  +0.13  chg  2997   T20  +0.0021 +-0.0033   dmg  +0.28* chg  4477   cast 0.202
+  King Darien XLVIII 7->9                                    T10  +0.0026 +-0.0019 * dmg  +0.85* chg  5092   T20  +0.0181 +-0.0048 * dmg  +2.12* chg  6812   cast 0.325
+  Mirari's Wake 7.5->9.5                                     T10  +0.0021 +-0.0013 * dmg  +0.37* chg  1370   T20  +0.0046 +-0.0024 * dmg  +0.38* chg  1761   cast 0.224
+  Nesting Dovehawk 7->9                                      T10  +0.0024 +-0.0018 * dmg  +0.27* chg  4259   T20  +0.0150 +-0.0042 * dmg  +1.06* chg  5813   cast 0.335
+  Seedborn Muse 8->10                                        T10  +0.0187 +-0.0031 * dmg  +0.72* chg  6743   T20  +0.0282 +-0.0059 * dmg  +1.05* chg  8286   cast 0.509
+  Selfless Spirit 5->7                                       T10  -0.0005 +-0.0008   dmg  +0.02  chg  1314   T20  +0.0007 +-0.0020   dmg  +0.11  chg  1575   cast 0.205
+  Skyshroud Claim 6.5->4.5                                   T10  -0.0011 +-0.0010 * dmg  -0.29* chg  1469   T20  -0.0027 +-0.0024 * dmg  -0.45* chg  1861   cast 0.139
+  Solemn Simulacrum 7->9                                     T10  -0.0009 +-0.0017   dmg  +0.28* chg  4502   T20  +0.0021 +-0.0044   dmg  +0.56* chg  6012   cast 0.350
+  Sylvan Library 7->9                                        T10  -0.0004 +-0.0010   dmg  -0.01  chg  1070   T20  +0.0000 +-0.0023   dmg  +0.01  chg  1298   cast 0.207
+  Talisman of Unity 8.5->6.5                                 T10  -0.0011 +-0.0010 * dmg  -0.11* chg  1116   T20  -0.0009 +-0.0020   dmg  -0.10  chg  1342   cast 0.201
+  Wurmcoil Engine 7->9                                       T10  -0.0005 +-0.0014   dmg  +0.19* chg  3982   T20  +0.0130 +-0.0040 * dmg  +1.38* chg  5594   cast 0.333
+
