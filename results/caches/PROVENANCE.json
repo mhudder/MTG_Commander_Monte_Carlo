@@ -328,6 +328,12 @@
         "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: azusa BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
         "fingerprint": "e5a899735be8d82b",
         "utc": "2026-10-06T03:36:05Z"
+      },
+      {
+        "commit": "669afff",
+        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+        "fingerprint": "9934b23c15b129a9",
+        "utc": "2026-10-06T12:56:30Z"
       }
     ]
   },
@@ -572,6 +578,12 @@
         "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: karlov BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
         "fingerprint": "f601d4d3699c41a3",
         "utc": "2026-10-06T03:36:04Z"
+      },
+      {
+        "commit": "669afff",
+        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+        "fingerprint": "39fcd5ed52e9e738",
+        "utc": "2026-10-06T12:56:29Z"
       }
     ]
   },
@@ -850,6 +862,12 @@
         "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: lorehold BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
         "fingerprint": "a2a455dceb53ac83",
         "utc": "2026-10-06T03:36:04Z"
+      },
+      {
+        "commit": "669afff",
+        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+        "fingerprint": "dd0242bff72ca1b5",
+        "utc": "2026-10-06T12:56:29Z"
       }
     ]
   },
@@ -1396,6 +1414,12 @@
         "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: shilgengar BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
         "fingerprint": "82b59b0543ef9b7d",
         "utc": "2026-10-06T03:36:04Z"
+      },
+      {
+        "commit": "669afff",
+        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+        "fingerprint": "2af07f842a6d5bc5",
+        "utc": "2026-10-06T12:56:30Z"
       }
     ]
   },

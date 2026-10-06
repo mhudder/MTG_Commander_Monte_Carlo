@@ -161,6 +161,7 @@ Methodology that used to live at the end of this file is now
 | [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. **ADOPTED by the owner 2026-10-05**; trostani's table rebuilt |
 | [0z111](#0z111) | MEASURED | **Trostani rebuilt with the five priority moves, and ONE OF THE FIVE DOES NOT HOLD IN CONTEXT.** Bramble Sovereign's own row flipped, +0.0027 → −0.0095 ±0.0035 at T10; paired on a fresh seed block, Bramble at 10.5 against 8.5 WITH the other four adopted is **−0.0071 ±0.0033 at T10, +0.0004 ±0.0059 at T20**. At 10.5 it outranks Seedborn Muse (10). Each move was confirmed against the OLD list, the joint against all five; neither asked about one move given the rest. **Reverted by the owner**, the other four stand; trostani's rebuild deferred. Tutors as a group +0.0453 at T20 |
 | [0z112](#0z112) | MEASURED | **The land ablation: every nonbasic land in seven decks against the basic it would replace** (147 lands, N=15,000, identity-classified). Its NOOP arm found **one Card object per basic NAME in every deck** (`[L(...)] * n`): identity checks read two copies as one card -- Shigeki put two Forests onto the battlefield, trostani's hideaway dropped a card; rendmaw 54 games in 15,000, trostani 7, the rest none. And its largest row, **tivit's Havengul Laboratory at −0.0581**, was a POLICY: the Clue activation ran in the upkeep, four mana before every main phase. Moved to the end step: **+0.0381 / +0.0589**. Painlands pay no life anywhere |
+| [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9837,6 +9838,90 @@ Rendmaw (aliasing), tivit (Havengul) and trostani (aliasing, and §0z111's
 deferred rebuild) MOVED -- `check_unchanged_decks --n=3000` against a1cdd9e --
 and are SUSPECT until rebuilt. Lorehold, karlov, shilgengar and azusa are
 bit-identical and VERIFIED.
+
+## 0z113. MEASURED — land candidates for six decks: fetches for azusa, Gaea's Cradle for rendmaw, and blanks elsewhere
+
+The owner's request after §0z112 (2026-10-06): find lands that would help each
+deck, Trostani excepted. Eighteen proposals, oracle text from Scryfall,
+recorded in `edhmc/pending.py` under "LAND CANDIDATES"; seventeen
+implemented, pinned and measured. Urza's Saga (tivit) is DEFERRED: lore
+counters, a Construct whose power counts artifacts, and a chapter-III tutor.
+
+**The measurement.** `diagnostics/run_land_candidates.py`
+(`results/land_candidates_20261006.{json,txt}`), N=15,000 paired, seeds
+5000.., staged lists, one T20 game per seed with T10 read off it (§0z93).
+Each candidate replaces one copy of the basic `run_land_ablation.basic_for`
+picks -- for every colourless land here, the deck's most common basic. That
+IS the swap a land candidate proposes, so these rows are already land-for-land
+swaps. NOOP arm: 0 metric columns changed in all six decks.
+
+| deck | candidate | for | won T10 | won T20 | mechanism, per game |
+|---|---|---|---|---|---|
+| azusa | Verdant Catacombs (= Misty Rainforest, Prismatic Vista) | Forest | **+0.0165 ±0.0035** | **+0.0188 ±0.0047** | 0.69 cracks |
+| azusa | Fabled Passage | Forest | **+0.0153 ±0.0035** | **+0.0176 ±0.0046** | 0.68 cracks |
+| azusa | Evolving Wilds | Forest | **+0.0127 ±0.0034** | **+0.0165 ±0.0046** | 0.68 cracks |
+| azusa | Field of the Dead | Forest | **+0.0033 ±0.0024** | **+0.0098 ±0.0036** | 2.97 Zombies |
+| azusa | Myriad Landscape | Forest | +0.0011 ±0.0023 | +0.0031 ±0.0036 | 0.13 cracks |
+| rendmaw | Gaea's Cradle | Forest | **+0.0053 ±0.0016** | **+0.0104 ±0.0032** | 8.3 mana |
+| rendmaw | Ancient Tomb | Forest | **+0.0042 ±0.0016** | **−0.0049 ±0.0031** | 1.8 damage |
+| lorehold | Ancient Tomb | Mountain | **+0.0083 ±0.0025** | +0.0027 ±0.0035 | 1.0 damage |
+| lorehold | Command Beacon | Mountain | +0.0003 ±0.0013 | −0.0006 ±0.0023 | 0.10 uses |
+| karlov | Scoured Barrens | Plains | +0.0014 ±0.0018 | +0.0009 ±0.0025 | 0.10 lifegain triggers |
+| karlov | Kabira Crossroads | Plains | **−0.0017 ±0.0017** | −0.0017 ±0.0025 | |
+| karlov | Ancient Tomb | Swamp | +0.0009 ±0.0022 | **−0.0050 ±0.0030** | 1.2 damage |
+| shilgengar | Scoured Barrens | Plains | −0.0001 ±0.0005 | +0.0005 ±0.0019 | 0.21 lifegain triggers |
+| shilgengar | Ancient Tomb | Swamp | **+0.0012 ±0.0007** | −0.0002 ±0.0028 | 1.5 damage |
+| tivit | Treasure Vault | Swamp | −0.0007 ±0.0014 | −0.0003 ±0.0018 | 0.01 cracks |
+
+**What it says.** Azusa is the one deck where a land is a spell: every fetch
+is two landfall triggers for one drop, and all three kinds sit inside one
+another's bars -- **including Evolving Wilds and Fabled Passage, which pay no
+life**, so the uncharged life of the true fetches (a CEILING, as in §0z112)
+is not what the row is made of. Each row is ONE fetch for ONE Forest;
+stacking several is not measured. Gaea's Cradle is the best land outside
+azusa. Ancient Tomb is the instructive one: fast mana that wins early games
+and loses long ones -- rendmaw's sign changes between horizons, both
+significant -- because 1-2 life a game is a real cost since pod v3. The
+lifegain lands are blanks where the decks already have their colours
+(§0z112's critical-mass finding, again), and the two policy lands do almost
+nothing: lorehold's commander dies twice in too few games for the Beacon to
+matter (beacon_min_tax 2: −0.0018 ±0.0028 at T20), and tivit spends its mana,
+so the Vault is a colourless land (vault_min_treasures 2: +0.0005 ±0.0019).
+
+**Nothing is staged.** These are MEASURED Candidates (`python -m
+edhmc.pending`). Every row is already a swap against a named basic, but a
+Change still needs the owner's call -- and for azusa, which fetches and how
+many.
+
+### Implemented, and what the test found
+
+* **Shared engine** (rendmaw, karlov, lorehold, shilgengar):
+  `engine.named_land_mana` gives Ancient Tomb 2 and Gaea's Cradle one per
+  creature, read by BOTH `available_mana` and `spend`'s count path (§0z4);
+  the Tomb's 2 damage is charged once per tap in `on_mana_tap`, behind
+  `charge_life_costs`.
+* **A source that hurts is spent last** -- and this needed a change to
+  `can_pay` that the test found. Case C first FAILED unmutated: the Tomb's two
+  {C} are two units of supply, so the colour-SURPLUS rule read colourless as
+  the most plentiful colour on a small board and spent the Tomb, for 2 life
+  and a wasted {C}, on a {1} a Forest could pay. `tap_reluctance` was only a
+  tie-break below surplus. A pain flag (`PAINFUL_RANK`) now leads the generic
+  key; it is 0 for every other unit, so no other pool reorders.
+* shilgengar's `play_card_trigger` fires a land's `lifegain` through
+  `gain_life` (it was a no-op); karlov's land hook already did.
+* `lorehold.command_beacon` (knob `beacon_min_tax`, 4): the tax is charged
+  at DEATH in this engine, so a cast from hand takes 2 off and the next death
+  or counter puts it back. `tivit.treasure_vault`: rendmaw's policy and knob
+  (`vault_min_treasures`) on tivit's own mana and token code; Treasures may
+  not pay, Powerstones may.
+* azusa: Evolving Wilds and Fabled Passage share the fetch path
+  (`FETCH_SCRIPTS`, now read by `choose_land` too); Myriad Landscape after
+  combat on spare mana; Field of the Dead in the landfall payoffs.
+
+`tests/test_land_candidates.py` pins seventeen cases; seven mutations, exact
+sets. All seven decks are BIT-IDENTICAL against the previous HEAD
+(`check_unchanged_decks`): every new path is guarded by a name no list holds.
+No table moved and no cache is touched.
 
 ## How to read an ablation table
 

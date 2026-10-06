@@ -1,0 +1,54 @@
+LAND CANDIDATES, N=15,000 paired, seeds 5000.., staged lists (§0z113). Each candidate in place of the basic it would replace; win rate, candidate minus basic; * = CI excludes zero. Counters are per game, candidate minus basic.
+
+AZUSA   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Verdant Catacombs                         Forest      +0.0165 ±0.0035*  +0.0188 ±0.0047*
+      fetches_cracked +0.694  life_gained +0.184
+  Fabled Passage                            Forest      +0.0153 ±0.0035*  +0.0176 ±0.0046*
+      fetches_cracked +0.680  life_gained +0.193
+  Evolving Wilds                            Forest      +0.0127 ±0.0034*  +0.0165 ±0.0046*
+      fetches_cracked +0.683  life_gained +0.086
+  Field of the Dead                         Forest      +0.0033 ±0.0024*  +0.0098 ±0.0036*
+      fetches_cracked -0.095  field_zombies +2.967  life_gained -0.178
+  Myriad Landscape                          Forest      +0.0011 ±0.0023   +0.0031 ±0.0036 
+      fetches_cracked -0.100  life_gained -0.078  myriad_cracked +0.129
+
+KARLOV   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Scoured Barrens                           Plains      +0.0014 ±0.0018   +0.0009 ±0.0025 
+      life_gained -0.011  life_lost_to_own_cards +0.002  lifegain_triggers +0.099
+  Kabira Crossroads                         Plains      -0.0017 ±0.0017*  -0.0017 ±0.0025 
+      life_gained +0.203  life_lost_to_own_cards -0.001  lifegain_triggers +0.084
+  Ancient Tomb                              Swamp       +0.0009 ±0.0022   -0.0050 ±0.0030*
+      life_gained -0.514  life_lost_to_own_cards +1.201  lifegain_triggers -0.048  tomb_damage +1.223
+
+LOREHOLD   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Ancient Tomb                              Mountain    +0.0083 ±0.0025*  +0.0027 ±0.0035 
+      life_lost_to_own_cards +1.015  tomb_damage +1.006
+  Command Beacon                            Mountain    +0.0003 ±0.0013   -0.0006 ±0.0023 
+      beacon_tax_saved +0.430  beacon_used +0.101  life_lost_to_own_cards +0.004
+  Command Beacon @ beacon_min_tax=2         Mountain    +0.0002 ±0.0016   -0.0018 ±0.0028 
+      beacon_tax_saved +0.400  beacon_used +0.161  life_lost_to_own_cards +0.002
+
+RENDMAW   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Gaea's Cradle                             Forest      +0.0053 ±0.0016*  +0.0104 ±0.0032*
+      cradle_mana +8.279  life_lost_to_own_cards +0.010  vault_activations +0.005
+  Ancient Tomb                              Forest      +0.0042 ±0.0016*  -0.0049 ±0.0031*
+      life_lost_to_own_cards +1.817  tomb_damage +1.823  vault_activations -0.001
+
+SHILGENGAR   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Scoured Barrens                           Plains      -0.0001 ±0.0005   +0.0005 ±0.0019 
+      land_lifegain +0.206  life_gained +0.211  lifegain_triggers +0.205
+  Ancient Tomb                              Swamp       +0.0012 ±0.0007*  -0.0002 ±0.0028 
+      life_gained -0.038  life_lost_to_own_cards +1.544  lifegain_triggers -0.020  tomb_damage +1.544
+
+TIVIT   NOOP changed 0 metric columns (must be 0)
+  candidate                                 for                  won T10           won T20
+  Treasure Vault @ vault_min_treasures=2    Swamp       +0.0004 ±0.0016   +0.0005 ±0.0019 
+      vault_activations +0.029  vault_x +0.067
+  Treasure Vault                            Swamp       -0.0007 ±0.0014   -0.0003 ±0.0018 
+      vault_activations +0.010  vault_x +0.035
+
