@@ -57,9 +57,7 @@ Ramunap Excavator                     +1.11+-0.20         +1.06+-0.21        +0.
 Nylea's Intervention                  +0.95+-0.14         +0.99+-0.17        +0.0082+-0.0027      both
 Chord of Calling                      +0.63+-0.10         +0.91+-0.14        +0.0089+-0.0025      both
 Lotus Cobra                           +1.16+-0.19         +0.90+-0.21        +0.0085+-0.0033      both
-Ulamog, the Infinite Gyre             +0.51+-0.07         +0.88+-0.10        +0.0097+-0.0020      both
 Seer's Sundial                        +0.12+-0.19         +0.84+-0.22        +0.0149+-0.0035      both
-Kozilek, Butcher of Truth             +0.54+-0.07         +0.82+-0.10        +0.0077+-0.0020      both
 Crucible of Worlds                    +0.92+-0.20         +0.79+-0.22        +0.0089+-0.0032      both
 Tireless Provisioner                  +0.79+-0.18         +0.71+-0.20        +0.0077+-0.0032      both
 Momentous Fall                        +0.53+-0.12         +0.71+-0.14        +0.0083+-0.0024      both
@@ -75,6 +73,15 @@ PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
+Ulamog, the Infinite Gyre             +0.51+-0.07         +0.88+-0.10        +0.0097+-0.0020      both
+      MISSING: the cast trigger 'destroy target permanent' (an opponent's
+      permanent, BLIND under §4) and the graveyard shuffle Kozilek also has.
+      Indestructible and annihilator (approximated) are modelled.
+Kozilek, Butcher of Truth             +0.54+-0.07         +0.82+-0.10        +0.0077+-0.0020      both
+      MISSING: 'When Kozilek is put into a graveyard from anywhere, its owner
+      shuffles their graveyard into their library' -- a death, mill or discard
+      puts it and the yard's lands in the graveyard to stay. Annihilator is an
+      abstract-count approximation (§4).
 Bane of Progress                      +0.22+-0.11         +0.22+-0.14        -0.0001+-0.0023       dmg
       The wipe destroys only YOUR OWN artifacts and enchantments, because
       opponents own no permanent objects in this project (§4). Its negative score

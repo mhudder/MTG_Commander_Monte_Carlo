@@ -606,9 +606,9 @@ SCRIPTED_AZUSA = {
     # Nissa, Vastwood Seer // Sage Animist is NOT affected and stays: §0s found
     # the Nissas were never the animation story, and she is a top-five card.
     "Sol Ring", "Harmonize", "Eye of Ugin",
-    # Annihilator, approximated as reducing an opponent's abstract creature
-    # count -- value denial, not damage
-    "Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre",
+    # Kozilek and Ulamog moved to PARTLY_MODELLED on 2026-10-06 (§0z114):
+    # both have a clause the engine does not model, and Kozilek's cast draw
+    # was missing entirely while this set claimed it.
 }
 
 
@@ -786,6 +786,18 @@ PARTLY_MODELLED = {
             "graveyard to your hand'. A floor.",
     },
     "azusa": {
+        # §0z114. Annihilator 4 is approximated (an opponent's abstract
+        # creature count falls by four); Kozilek's cast draw is modelled.
+        "Kozilek, Butcher of Truth":
+            "MISSING: 'When Kozilek is put into a graveyard from anywhere, its "
+            "owner shuffles their graveyard into their library' -- a death, "
+            "mill or discard puts it and the yard's lands in the graveyard to "
+            "stay. Annihilator is an abstract-count approximation (§4).",
+        "Ulamog, the Infinite Gyre":
+            "MISSING: the cast trigger 'destroy target permanent' (an "
+            "opponent's permanent, BLIND under §4) and the graveyard shuffle "
+            "Kozilek also has. Indestructible and annihilator (approximated) "
+            "are modelled.",
         "Bane of Progress":
             "The wipe destroys only YOUR OWN artifacts and enchantments, "
             "because opponents own no permanent objects in this project "

@@ -1962,6 +1962,16 @@ MEASURED: list[Candidate] = [
             "SHORTLISTED 2026-09-14 for review, NOT decided."
         ),
         proposed_cut="Kozilek, Butcher of Truth",
+        cut_unmeasured=(
+            "KOZILEK BECAME PARTLY MODELLED ON 2026-10-06 (§0z114), and the "
+            "change matters to THIS pairing: its 'When you cast this spell, "
+            "draw four cards' was MISSING when the shortlist named it as the "
+            "cut, so every number that priced Kozilek (its ablation row, and "
+            "KNOWN_ISSUES's +0.0056 head-to-head) understated it. It is "
+            "modelled now; the graveyard-shuffle clause still is not, so its "
+            "row is a floor. RE-MEASURE THIS HEAD-TO-HEAD before acting on it "
+            "-- Eye of Ugin's tutor, also new, finds Kozilek first."
+        ),
     ),
     Candidate(
         deck="azusa",
@@ -2170,7 +2180,7 @@ MEASURED: list[Candidate] = [
         rationale='{C}{C} from a land, for 2 damage a tap.',
         evidence='N=15,000 paired, seeds 5000.., staged list, one T20 game per seed with T10 read off it; the candidate in place of one Swamp. diagnostics/run_land_candidates.py, results/land_candidates_20261006.txt. Counters a game: life_gained -0.514, life_lost_to_own_cards +1.201, lifegain_triggers -0.048, tomb_damage +1.223. §0z113.',
         limits='Every clause modelled: the damage is charged per tap (1.2 a game). Spent LAST among lands (`PAINFUL_RANK`).',
-        verdict='Inside at T10, significantly NEGATIVE at T20: the life is a real cost in a deck whose objective is life, and colourless mana is worth little to its coloured costs.',
+        verdict='Inside at T10, significantly NEGATIVE at T20: the life is a real cost in a deck whose objective is life, and colourless mana is worth little to its coloured costs. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
     Candidate(
         deck='lorehold',
@@ -2181,7 +2191,7 @@ MEASURED: list[Candidate] = [
         rationale='{C}{C} from a land, for 2 damage a tap.',
         evidence='N=15,000 paired, seeds 5000.., staged list, one T20 game per seed with T10 read off it; the candidate in place of one Mountain. diagnostics/run_land_candidates.py, results/land_candidates_20261006.txt. Counters a game: life_lost_to_own_cards +1.015, tomb_damage +1.006. §0z113.',
         limits='Every clause modelled; 1.0 damage a game.',
-        verdict='Significant at T10 (+0.0083) and inside at T20: the fast mana matters early and the life is paid back later. A T10-only signal; not enough for a swap on its own.',
+        verdict='Significant at T10 (+0.0083) and inside at T20: the fast mana matters early and the life is paid back later. A T10-only signal; not enough for a swap on its own. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
     Candidate(
         deck='lorehold',
@@ -2214,7 +2224,7 @@ MEASURED: list[Candidate] = [
         rationale='{C}{C} from a land, for 2 damage a tap.',
         evidence='N=15,000 paired, seeds 5000.., staged list, one T20 game per seed with T10 read off it; the candidate in place of one Swamp. diagnostics/run_land_candidates.py, results/land_candidates_20261006.txt. Counters a game: life_gained -0.038, life_lost_to_own_cards +1.544, lifegain_triggers -0.020, tomb_damage +1.544. §0z113.',
         limits='Every clause modelled; 1.5 damage a game.',
-        verdict='+0.0012 at T10 (significant, tiny) and nothing at T20. A blank in practice.',
+        verdict='+0.0012 at T10 (significant, tiny) and nothing at T20. A blank in practice. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
     Candidate(
         deck='rendmaw',
@@ -2225,7 +2235,7 @@ MEASURED: list[Candidate] = [
         rationale="{G} per creature you control -- a token deck's mana land.",
         evidence='N=15,000 paired, seeds 5000.., staged list, one T20 game per seed with T10 read off it; the candidate in place of one Forest. diagnostics/run_land_candidates.py, results/land_candidates_20261006.txt. Counters a game: cradle_mana +8.279, life_lost_to_own_cards +0.010, vault_activations +0.005. §0z113.',
         limits="Every clause modelled, in `available_mana` and in `spend`'s fallback (§0z4); 8.3 mana a game.",
-        verdict='Significant at both horizons (+0.0053 / +0.0104) in place of a Forest. The best land candidate outside azusa.',
+        verdict='Significant at both horizons (+0.0053 / +0.0104) in place of a Forest. The best land candidate outside azusa. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
     Candidate(
         deck='rendmaw',
@@ -2236,7 +2246,7 @@ MEASURED: list[Candidate] = [
         rationale='{C}{C} from a land, for 2 damage a tap.',
         evidence='N=15,000 paired, seeds 5000.., staged list, one T20 game per seed with T10 read off it; the candidate in place of one Forest. diagnostics/run_land_candidates.py, results/land_candidates_20261006.txt. Counters a game: life_lost_to_own_cards +1.817, tomb_damage +1.823, vault_activations -0.001. §0z113.',
         limits='Every clause modelled; 1.8 damage a game.',
-        verdict='SIGN CHANGE: +0.0042 at T10 and -0.0049 at T20, both significant. Fast mana early, and 1.8 life a game that costs the long games. Not a swap.',
+        verdict='SIGN CHANGE: +0.0042 at T10 and -0.0049 at T20, both significant. Fast mana early, and 1.8 life a game that costs the long games. Not a swap. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
     Candidate(
         deck='tivit',

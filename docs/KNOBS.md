@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `669afff` from 23 engine sources.
+Derived at `9409bab` from 23 engine sources.
 
-**202 knobs, 295 call sites.**
+**204 knobs, 298 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -29,7 +29,7 @@ that is not in `tools/knobs.py`'s `ACKNOWLEDGED`, and an entry there
 costs a written justification.
 
 - **`turns`**  — *acknowledged*
-  - `20` at `edhmc/azusa.py:3536` in `simulate()`
+  - `20` at `edhmc/azusa.py:3595` in `simulate()`
   - `10` at `edhmc/engine.py:3636` in `simulate()`
   - `20` at `edhmc/karlov.py:1468` in `simulate()`
   - `10` at `edhmc/lorehold.py:2406` in `simulate()`
@@ -68,7 +68,7 @@ show up first.
 | `blocker_toughness` | `2` | 1 | `edhmc/opponents.py:1124` | §0z92 | yes | yes |
 | `borrowed_knowledge_discard` | `True` | 2 | `edhmc/lorehold.py:744` | §0f | yes | yes |
 | `breach_cap` | `4` | 1 | `edhmc/lorehold.py:1920` |  | yes | **never** |
-| `bristly_min_counters` | `2` | 1 | `edhmc/azusa.py:3310` | §0z101 | yes | yes |
+| `bristly_min_counters` | `2` | 1 | `edhmc/azusa.py:3369` | §0z101 | yes | yes |
 | `cast_lookahead` | `False` | 1 | `edhmc/engine.py:2343` | §0z43 | yes | yes |
 | `charge_life_costs` | `True` | 6 | `edhmc/engine.py:1054` | §0z113 | yes | yes |
 | `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:1145` | §0z42 | yes | yes |
@@ -89,7 +89,7 @@ show up first.
 | `crn_audit` | `<none>` | 1 | `edhmc/engine.py:553` |  | yes | yes |
 | `crn_streams` | `True` | 4 | `edhmc/azusa.py:1640` | §0z17 | yes | yes |
 | `crown_loss_ends_chip` | `False` | 1 | `edhmc/opponents.py:1900` | §0z96 | yes | yes |
-| `cryptic_caves_min_lands` | `6` | 1 | `edhmc/azusa.py:3158` | §0v | **no** | **never** |
+| `cryptic_caves_min_lands` | `6` | 1 | `edhmc/azusa.py:3217` | §0v | **no** | **never** |
 | `dawn_draws_per_turn` | `4` | 1 | `edhmc/trostani.py:1283` |  | **no** | **never** |
 | `death_lookback` | `True` | 1 | `edhmc/opponents.py:619` | §0z76 | yes | yes |
 | `decking_loss` | `True` | 2 | `edhmc/engine.py:1191` | §0z42 | yes | yes |
@@ -120,6 +120,7 @@ show up first.
 | `extra_turns_chain` | `True` | 1 | `edhmc/tivit.py:1543` | §0z86 | yes | yes |
 | `extra_turns_round_cap` | `40` | 1 | `edhmc/tivit.py:1542` | §0z86 | yes | yes |
 | `extra_turns_skip_opponents` | `True` | 1 | `edhmc/tivit.py:1497` | §0z86 | yes | yes |
+| `eye_tutor` | `'on'` | 1 | `edhmc/azusa.py:3133` | §0z114 | **no** | yes |
 | `familiar_text` | `True` | 2 | `edhmc/engine.py:1499` | §0z83 | yes | yes |
 | `finality_aware_ult` | `True` | 1 | `edhmc/shilgengar.py:578` | §0z82 | yes | yes |
 | `finality_exiles` | `True` | 1 | `edhmc/shilgengar.py:432` | §0z75 | yes | yes |
@@ -144,6 +145,7 @@ show up first.
 | `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:1752` |  | **no** | yes |
 | `karmic_echo` | `'decline'` | 1 | `edhmc/trostani.py:1551` |  | yes | **never** |
 | `known_win_focus` | `0.8` | 1 | `edhmc/opponents.py:348` | §0z62 | yes | yes |
+| `kozilek_cast_draw` | `True` | 2 | `edhmc/azusa.py:2714` | §0z114 | **no** | yes |
 | `land_animation` | `'full'` | 3 | `edhmc/azusa.py:602` | §0z19 | yes | yes |
 | `land_creature_sick` | `True` | 1 | `edhmc/azusa.py:723` | §0z15 | yes | yes |
 | `land_floor` | `8` | 1 | `edhmc/lorehold.py:405` | §0z30 | **no** | **never** |
@@ -157,7 +159,7 @@ show up first.
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:1089` | §0z37 | yes | yes |
 | `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:2156` |  | **no** | **never** |
 | `miracle_reserve` | `2` | 1 | `edhmc/lorehold.py:1986` |  | yes | yes |
-| `moloid_mill_floor` | `10` | 1 | `edhmc/azusa.py:3397` | §0z42 | yes | **never** |
+| `moloid_mill_floor` | `10` | 1 | `edhmc/azusa.py:3456` | §0z42 | yes | **never** |
 | `monarch_attack_floor` | `0.75` | 1 | `edhmc/opponents.py:1780` | §0z38 | yes | yes |
 | `monarch_loss_scale` | `rate` | 1 | `edhmc/opponents.py:1846` | §0u | yes | yes |
 | `monarch_start` | `False` | 1 | `edhmc/engine.py:1142` | §0z30 | yes | yes |
@@ -177,7 +179,7 @@ show up first.
 | `opp_spells_per_turn` | `1.2` | 1 | `edhmc/karlov.py:617` |  | **no** | **never** |
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
-| `opponents` | `True` | 7 | `edhmc/azusa.py:3525` | §0z30 | yes | yes |
+| `opponents` | `True` | 7 | `edhmc/azusa.py:3584` | §0z30 | yes | yes |
 | `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:2050` | §0u | yes | **never** |
 | `own_wipe_indestructible` | `True` | 2 | `edhmc/opponents.py:1980` | §0u | yes | yes |
 | `pearl_lifelink_cap` | `2` | 1 | `edhmc/engine.py:3171` |  | **no** | **never** |
@@ -232,7 +234,7 @@ show up first.
 | `treasure_hoard` | `False` | 1 | `edhmc/shilgengar.py:670` |  | yes | **never** |
 | `treasures_as_mana` | `True` | 1 | `edhmc/shilgengar.py:668` |  | yes | yes |
 | `trostani_attacks` | `False` | 1 | `edhmc/trostani.py:1653` |  | yes | **never** |
-| `turns` | **conflicts** | 8 | `edhmc/azusa.py:3536` | §0z17 | yes | yes |
+| `turns` | **conflicts** | 8 | `edhmc/azusa.py:3595` | §0z17 | yes | yes |
 | `tutor_floor` | `6` | 1 | `edhmc/trostani.py:1043` |  | **no** | **never** |
 | `tutor_order` | `()` | 1 | `edhmc/lorehold.py:1247` |  | **no** | yes |
 | `tutor_policy` | `<none>` | 2 | `edhmc/lorehold.py:1228` |  | yes | yes |
@@ -282,21 +284,21 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 202 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 204 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**46 of 202.** Not an error — most knobs are
+**48 of 204.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `block_rate`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `hand_cap`, `hold_min_value`, `invoke_mv_cap`, `land_floor`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `pearl_lifelink_cap`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`altar_mana`, `block_rate`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `eye_tutor`, `hand_cap`, `hold_min_value`, `invoke_mv_cap`, `kozilek_cast_draw`, `land_floor`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `pearl_lifelink_cap`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 
-**57 of 202.** The name appears nowhere in
+**57 of 204.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;

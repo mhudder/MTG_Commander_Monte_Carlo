@@ -2710,6 +2710,9 @@ class AzusaGame(BaseGame):
         """
         if card.script == "draw3":
             return 3
+        if (card.name == "Kozilek, Butcher of Truth"
+                and self.cfg.get("kozilek_cast_draw", True)):
+            return 4                 # "When you cast this spell, draw four"
         if card.script == "momentous_fall":
             fodder = self._sac_fodder()
             return min((self.power_of(p) for p in fodder), default=0)
@@ -2908,6 +2911,16 @@ class AzusaGame(BaseGame):
         spell's mana value." X is the PRINTED mana value -- a cost reduction
         (Eye of Ugin, The Great Henge) changes what you pay, not the MV.
         """
+        # KOZILEK, BUTCHER OF TRUTH: "When you cast this spell, draw four
+        # cards." (Scryfall, 2026-10-06; §0z114.) A CAST trigger, so it draws
+        # even if the spell is countered -- and it is mandatory, which is why
+        # `draws_on_resolve` reports it and the pilot does not cast Kozilek
+        # into an empty library. It was missing while the card sat in
+        # SCRIPTED_AZUSA, which claimed it was implemented.
+        if (card.name == "Kozilek, Butcher of Truth"
+                and self.cfg.get("kozilek_cast_draw", True)):
+            self.draw(4)
+            self.m["kozilek_draws"] += 4
         for _ in range(self.count("Dancing from Dark to Dawn")):
             t = self.counter_target()
             if t is not None and card.mv > 0:
@@ -3101,7 +3114,53 @@ class AzusaGame(BaseGame):
             # should see this.
             self.hand.append(top)
 
+    def eye_of_ugin_step(self):
+        """EYE OF UGIN: "{7}, {T}: Search your library for a colorless
+        creature card, reveal it, put it into your hand, then shuffle."
+        (Scryfall, 2026-10-06; §0z114.) It was not implemented at all: the
+        cost reduction was, so the land was a {2} discount on two cards and
+        a land that taps for nothing -- the land ablation read it at -0.0109
+        against a Forest.
+
+        THE POLICY, said out loud (`eye_tutor`, default "on"): after combat,
+        on the mana the turn left, FIRST among the activations -- a ten-drop
+        is worth more than a Clue -- and only while no colourless creature
+        is already in hand, so it fetches one at a time. It takes the
+        cheapest one (Kozilek, Butcher of Truth before Ulamog, the Infinite
+        Gyre), because Kozilek also draws four on cast. "Colorless creature"
+        is derived: a nonland creature with no coloured pip -- Dryad Arbor's
+        empty cost is a land's, and it is green."""
+        if self.cfg.get("eye_tutor", "on") != "on":
+            return
+        eye = next((p for p in self.board if p.card.name == "Eye of Ugin"
+                    and not p.tapped), None)
+        if eye is None:
+            return
+
+        def colourless_creature(c):
+            return (c.is_creature and not c.is_land
+                    and not any(c.cost.get(k) for k in "WUBRG"))
+        if any(colourless_creature(c) for c in self.hand):
+            return
+        targets = [c for c in self.library if colourless_creature(c)]
+        if not targets:
+            return
+        eye.tapped = True                    # {T} is in the cost
+        units = self.available_mana()
+        pay = can_pay({"gen": 7}, units)
+        if pay is None:
+            eye.tapped = False
+            return
+        spend(self, pay, units)
+        self.m["mana_spent"] += 7
+        pick = min(targets, key=lambda c: (c.mv, c.name))
+        self.library.remove(pick)
+        self.hand.append(pick)
+        self.shuffle_library()
+        self.m["eye_tutors"] += 1
+
     def activations(self):
+        self.eye_of_ugin_step()
         units = self.available_mana()
         clues = getattr(self, "clues", 0)
         while clues > 0 and draw_is_safe(self, 1):   # a Clue is optional
