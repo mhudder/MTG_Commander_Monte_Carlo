@@ -1,0 +1,9 @@
+Games that differ between aliased and distinct basics, N=15,000 per deck, seeds 5000.., staged lists, T20, every numeric key (§0z112).
+
+  rendmaw        54 games differ   net won -1   first seeds [5026, 5035, 5537, 5694, 6068]
+  lorehold        0 games differ   net won +0   first seeds []
+  karlov          0 games differ   net won +0   first seeds []
+  tivit           0 games differ   net won +0   first seeds []
+  shilgengar      0 games differ   net won +0   first seeds []
+  azusa           0 games differ   net won +0   first seeds []
+  trostani        7 games differ   net won +2   first seeds [6262, 7966, 9305, 13335, 15898]

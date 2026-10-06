@@ -1013,7 +1013,10 @@ def upkeep(g):
 
     if g.has("Tamiyo's Journal"):
         make_token(g, "Clue")
-    if g.has("Havengul Laboratory // Havengul Mystery"):
+    if (g.cfg.get("havengul_at", "end") == "upkeep"
+            and g.has("Havengul Laboratory // Havengul Mystery")):
+        # THE OLD TIMING, kept so every table before §0z112 reproduces: four
+        # of the turn's mana spent before the main phase, and no {T}.
         if affordable(g, {"gen": 4}) and pay(g, {"gen": 4}):
             make_token(g, "Clue")
     if g.has("Tempting Contract"):
@@ -1071,6 +1074,34 @@ def end_step(g):
             blink_tivit(g, name)
             if g.result is not None:
                 return
+    havengul_end_step(g)
+
+
+def havengul_end_step(g):
+    """Havengul Laboratory: "{T}: Add {C}. {4}, {T}: Investigate." (Scryfall,
+    2026-10-06; §0z112.) AT THE END STEP, ON MANA THE TURN LEFT -- the
+    Shigeki and Burnished Hart policy (§0z85). It ran in the UPKEEP, before
+    the main phase, so it spent four of every turn's mana on a Clue ahead of
+    the deck's spells, and never tapped the land its {T} names: the land
+    ablation measured the card at -0.058 against a Swamp at T20.
+
+    The land taps FIRST, so its own {C} cannot pay for it. The transform to
+    Havengul Mystery (three Clues sacrificed in a turn) is NOT MODELLED, so
+    neither is the Mystery's "{T}, Pay 1 life: Add {B}" -- the deck module
+    lists the Laboratory as {C} only. `havengul_at="upkeep"` restores the old
+    timing."""
+    if g.cfg.get("havengul_at", "end") != "end":
+        return
+    lab = next((p for p in g.board if not p.tapped and p.card.name
+                == "Havengul Laboratory // Havengul Mystery"), None)
+    if lab is None:
+        return
+    lab.tapped = True
+    if affordable(g, {"gen": 4}) and pay(g, {"gen": 4}):
+        make_token(g, "Clue")
+        g.m["havengul_clues"] += 1
+    else:
+        lab.tapped = False
 
 
 def combat(g):

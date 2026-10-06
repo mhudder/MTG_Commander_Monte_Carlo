@@ -265,7 +265,7 @@ PROTECTION = [
 # Lands (35)
 # ---------------------------------------------------------------------------
 LANDS = (
-    [L("Plains", "W")] * 6 + [L("Island", "U")] * 5 + [L("Swamp", "B")] * 5 +
+    [L("Plains", "W") for _ in range(6)] + [L("Island", "U") for _ in range(5)] + [L("Swamp", "B") for _ in range(5)] +
     [
         L("Command Tower", "WUB"),
         L("Arcane Sanctum", "WUB", tapped=True),
@@ -287,8 +287,10 @@ LANDS = (
         L("Vault of Whispers", "B", types="Artifact/Land",
           tags=("artifact_land",)),
         L("Archway of Innovation", "U", tapped=True),
-        # "{4}, {T}: Investigate." A Clue source that is also a land.
-        L("Havengul Laboratory // Havengul Mystery", "BC",
+        # "{T}: Add {C}. {4}, {T}: Investigate." A Clue source that is also a
+        # land. {C} ONLY (§0z112): the {B} belongs to the transformed face,
+        # Havengul Mystery, whose transform is not modelled. It was "BC".
+        L("Havengul Laboratory // Havengul Mystery", "C",
           script="havengul"),
         L("Bojuka Bog", "B", tapped=True),
         L("Reliquary Tower", "C"),

@@ -164,8 +164,8 @@ NONLANDS = [
 # Lands (36)
 # --------------------------------------------------------------------------
 LANDS = (
-    [L("Forest", "G")] * 7 +
-    [L("Swamp", "B")] * 6 +
+    [L("Forest", "G") for _ in range(7)] +
+    [L("Swamp", "B") for _ in range(6)] +
     [
         L("Command Tower", "BG"),
         L("Overgrown Tomb", "BG"),

@@ -192,8 +192,8 @@ SORCERIES = [
 # Lands (34)
 # ---------------------------------------------------------------------------
 LANDS = (
-    [L("Mountain", "R")] * 6 +
-    [L("Plains", "W")] * 6 +
+    [L("Mountain", "R") for _ in range(6)] +
+    [L("Plains", "W") for _ in range(6)] +
     [
         L("Command Tower", "RW"),
         L("Sacred Foundry", "RW"),

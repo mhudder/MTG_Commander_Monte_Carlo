@@ -277,7 +277,7 @@ LANDS = [
     # spend into cards. It taps for {C} here; its second ability makes any
     # colour and is modelled as the one that matters in mono-green.
     L("Scene of the Crime", "C", tapped=True, types="Artifact/Land"),
-] + [L("Forest", "G")] * 20
+] + [L("Forest", "G") for _ in range(20)]
 
 
 def build():

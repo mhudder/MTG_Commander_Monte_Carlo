@@ -237,7 +237,7 @@ INTERACTION = [
 # Lands -- 37
 # ---------------------------------------------------------------------------
 LANDS = (
-    [L("Forest", "G")] * 7 + [L("Plains", "W")] * 9 +
+    [L("Forest", "G") for _ in range(7)] + [L("Plains", "W") for _ in range(9)] +
     [
         L("Command Tower", "WG"),
         # "{T}: Add one mana of any color that a land an opponent controls

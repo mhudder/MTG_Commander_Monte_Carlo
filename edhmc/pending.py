@@ -4379,6 +4379,7 @@ def build_pending(deck_name: str, apply_pending: bool = True, up_to: int = None)
     if up_to is not None:
         changes = changes[:up_to]
     if not changes:
+        validate(deck, commander)    # a deck with nothing staged is still a list
         return deck, commander
     outs = [c.remove for c in changes]
     ins = []
@@ -4404,6 +4405,20 @@ def validate(deck, commander) -> None:
         seen[card.name] = seen.get(card.name, 0) + 1
     dupes = {k: v for k, v in seen.items() if v > 1}
     assert not dupes, f"singleton violation: {dupes}"
+    # ONE OBJECT PER COPY (§0z112). `[L("Forest", "G")] * 7` is seven
+    # references to ONE Card, and every rule that compares cards by identity
+    # then treats two copies as one card: Shigeki put two revealed Forests onto
+    # the battlefield, and trostani's hideaway dropped the picked card's
+    # duplicate from the game. Basics are where copies live, so basics are
+    # where this was -- in all seven lists.
+    ids, aliased = set(), set()
+    for card in deck:
+        if id(card) in ids:
+            aliased.add(card.name)
+        ids.add(id(card))
+    assert not aliased, (
+        f"one Card object appears more than once in the list: {sorted(aliased)} "
+        f"-- build copies with [L(...) for _ in range(n)], not [L(...)] * n")
     assert commander.name not in seen, (
         f"{commander.name} appears in the 99 as well as the command zone")
 

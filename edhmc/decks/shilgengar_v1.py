@@ -222,7 +222,7 @@ MDFC_SPELLS = [
 # `karlov_v2.py`'s Concealed Courtyard / Isolated Chapel / Fetid Heath).
 # ---------------------------------------------------------------------------
 LANDS = (
-    [L("Swamp", "B")] * 8 + [L("Plains", "W")] * 5 +
+    [L("Swamp", "B") for _ in range(8)] + [L("Plains", "W") for _ in range(5)] +
     [
         L("Bloodstained Mire", "B"),
         L("Phyrexian Tower", "C"),

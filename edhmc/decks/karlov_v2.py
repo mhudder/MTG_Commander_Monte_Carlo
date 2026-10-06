@@ -189,7 +189,7 @@ SPELLS = [
 ]
 
 LANDS = (
-    [L("Plains", "W")] * 7 + [L("Swamp", "B", tags=("swamp",))] * 10 +
+    [L("Plains", "W") for _ in range(7)] + [L("Swamp", "B", tags=("swamp",)) for _ in range(10)] +
     [
         L("Barren Moor", "B", tapped=True),
         L("Radiant Fountain", "C", lifegain=2),
