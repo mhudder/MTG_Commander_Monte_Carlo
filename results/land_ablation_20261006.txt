@@ -2,10 +2,10 @@ LAND ABLATION, N=15,000 paired, seeds 5000.., staged lists. Each nonbasic land a
   BY NAME       = some of 1,000 games differ from a renamed, script-free twin: an implemented ability is in the row.
   BY ITS FIELDS = every game identical: colours, tap state, and the lifegain/tags shown; any rules text those do not encode is BLIND (the row is a floor).
 
-RENDMAW  demand {'W': 0, 'U': 0, 'B': 29, 'R': 0, 'G': 36}   NOOP changed 9 metric columns (must be 0)   Sol Ring row reproduces the cached table: YES
+RENDMAW  demand {'W': 0, 'U': 0, 'B': 29, 'R': 0, 'G': 36}   NOOP changed 0 metric columns (must be 0)   Sol Ring row reproduces the cached table: NO
   -- BY NAME (3)
     Khalni Garden                    vs Forest   G     tapped  T10 +0.0003 ±0.0012   T20 +0.0017 ±0.0024   [205 of 1000 games differ]
-    Treasure Vault                   vs Forest   C             T10 +0.0003 ±0.0009   T20 +0.0012 ±0.0020   [47 of 1000 games differ]
+    Treasure Vault                   vs Forest   C             T10 +0.0003 ±0.0009   T20 +0.0013 ±0.0020   [47 of 1000 games differ]
     Grim Backwoods                   vs Forest   C             T10 +0.0001 ±0.0009   T20 -0.0001 ±0.0021   [82 of 1000 games differ]
   -- BY ITS FIELDS (19)
     Golgari Rot Farm                 vs Forest   BG    tapped  T10 +0.0025 ±0.0014*  T20 +0.0073 ±0.0031*  fields: bounce
@@ -14,7 +14,7 @@ RENDMAW  demand {'W': 0, 'U': 0, 'B': 29, 'R': 0, 'G': 36}   NOOP changed 9 metr
     Overgrown Tomb                   vs Forest   BG            T10 +0.0007 ±0.0007   T20 +0.0009 ±0.0016 
     Darksteel Citadel                vs Forest   C             T10 +0.0003 ±0.0008   T20 +0.0008 ±0.0018 
         text beyond mana (heuristic -- read it): Indestructible / {T}: Add {C}.
-    Necroblossom Snarl               vs Forest   BG            T10 -0.0001 ±0.0008   T20 +0.0003 ±0.0016 
+    Necroblossom Snarl               vs Forest   BG            T10 -0.0001 ±0.0008   T20 +0.0004 ±0.0016 
     Llanowar Wastes                  vs Forest   BCG           T10 +0.0000 ±0.0007   T20 +0.0003 ±0.0016 
     Deathcap Glade                   vs Forest   BG            T10 -0.0003 ±0.0006   T20 +0.0002 ±0.0014 
     Castle Locthwain                 vs Swamp    B             T10 +0.0001 ±0.0001   T20 +0.0001 ±0.0007 
@@ -22,17 +22,17 @@ RENDMAW  demand {'W': 0, 'U': 0, 'B': 29, 'R': 0, 'G': 36}   NOOP changed 9 metr
     Darkbore Pathway                 vs Forest   BG            T10 +0.0004 ±0.0007   T20 -0.0003 ±0.0015 
     Cavern of Souls                  vs Forest   BG            T10 +0.0003 ±0.0007   T20 -0.0004 ±0.0015 
     Command Tower                    vs Forest   BG            T10 +0.0003 ±0.0008   T20 -0.0009 ±0.0016 
-    Darkmoss Bridge                  vs Forest   BG    tapped  T10 -0.0005 ±0.0011   T20 -0.0010 ±0.0023 
+    Darkmoss Bridge                  vs Forest   BG    tapped  T10 -0.0005 ±0.0011   T20 -0.0009 ±0.0023 
         text beyond mana (heuristic -- read it): This land enters tapped. / Indestructible / {T}: Add {B} or {G}.
-    High Market                      vs Forest   C             T10 +0.0003 ±0.0007   T20 -0.0012 ±0.0016 
+    High Market                      vs Forest   C             T10 +0.0003 ±0.0007   T20 -0.0011 ±0.0016 
         text beyond mana (heuristic -- read it): {T}: Add {C}. / {T}, Sacrifice a creature: You gain 1 life.
     Tainted Wood                     vs Forest   BG            T10 -0.0002 ±0.0007   T20 -0.0017 ±0.0016*
-    Woodland Chasm                   vs Forest   BG    tapped  T10 -0.0005 ±0.0009   T20 -0.0022 ±0.0022 
+    Woodland Chasm                   vs Forest   BG    tapped  T10 -0.0005 ±0.0009   T20 -0.0021 ±0.0022 
     Bojuka Bog                       vs Swamp    B     tapped  T10 -0.0019 ±0.0011*  T20 -0.0023 ±0.0023*
         text beyond mana (heuristic -- read it): This land enters tapped. / When this land enters, exile target player's graveyard. / {T}: Add {B}.
-    Witch's Cottage                  vs Swamp    B     tapped  T10 -0.0014 ±0.0010*  T20 -0.0028 ±0.0022*
+    Witch's Cottage                  vs Swamp    B     tapped  T10 -0.0014 ±0.0010*  T20 -0.0027 ±0.0022*
         text beyond mana (heuristic -- read it): ({T}: Add {B}.) / This land enters tapped unless you control three or more other Swamps. / When this land enters untapped, you may put target creature
-    Dryad Arbor                      vs Forest   G             T10 -0.0022 ±0.0014*  T20 -0.0056 ±0.0031*
+    Dryad Arbor                      vs Forest   G             T10 -0.0022 ±0.0014*  T20 -0.0055 ±0.0031*
 
 LOREHOLD  demand {'W': 31, 'U': 0, 'B': 0, 'R': 52, 'G': 0}   NOOP changed 0 metric columns (must be 0)   Sol Ring row reproduces the cached table: YES
   -- BY NAME (1)
@@ -202,36 +202,36 @@ AZUSA  demand {'W': 0, 'U': 0, 'B': 0, 'R': 0, 'G': 73}   NOOP changed 0 metric 
     Petrified Field                  vs Forest   C             T10 -0.0023 ±0.0016*  T20 -0.0046 ±0.0026*
         text beyond mana (heuristic -- read it): {T}: Add {C}. / {T}, Sacrifice this land: Return target land card from your graveyard to your hand.
 
-TROSTANI  demand {'W': 31, 'U': 0, 'B': 0, 'R': 0, 'G': 45}   NOOP changed 4 metric columns (must be 0)   Sol Ring row reproduces the cached table: NO
+TROSTANI  demand {'W': 31, 'U': 0, 'B': 0, 'R': 0, 'G': 45}   NOOP changed 0 metric columns (must be 0)   Sol Ring row reproduces the cached table: NO
   -- BY NAME (5)
-    Mosswort Bridge                  vs Forest   G     tapped  T10 -0.0001 ±0.0019   T20 +0.0035 ±0.0038   [126 of 1000 games differ]  fields: hideaway4
+    Mosswort Bridge                  vs Forest   G     tapped  T10 -0.0001 ±0.0019   T20 +0.0036 ±0.0038   [126 of 1000 games differ]  fields: hideaway4
     Radiant Grove                    vs Forest   GW    tapped  T10 -0.0013 ±0.0014   T20 -0.0008 ±0.0030   [32 of 1000 games differ]
-    Scattered Groves                 vs Forest   GW    tapped  T10 -0.0011 ±0.0015   T20 -0.0016 ±0.0032   [31 of 1000 games differ]  fields: cycling2
+    Scattered Groves                 vs Forest   GW    tapped  T10 -0.0011 ±0.0015   T20 -0.0015 ±0.0032   [31 of 1000 games differ]  fields: cycling2
     Canopy Vista                     vs Forest   GW            T10 +0.0009 ±0.0019   T20 -0.0025 ±0.0044   [373 of 1000 games differ]  fields: battle
-    Temple Garden                    vs Forest   GW            T10 +0.0017 ±0.0035   T20 -0.0086 ±0.0067*  [711 of 1000 games differ]  fields: shock
+    Temple Garden                    vs Forest   GW            T10 +0.0017 ±0.0035   T20 -0.0085 ±0.0067*  [711 of 1000 games differ]  fields: shock
   -- BY ITS FIELDS (17)
     Marsh Flats                      vs Plains                 T10 +0.0011 ±0.0018   T20 +0.0037 ±0.0037   fields: fetch, fetch_Plains
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle.
-    Command Tower                    vs Forest   GW            T10 +0.0001 ±0.0013   T20 +0.0028 ±0.0028 
-    Sunpetal Grove                   vs Forest   GW            T10 +0.0001 ±0.0012   T20 +0.0010 ±0.0027   fields: check
+    Command Tower                    vs Forest   GW            T10 +0.0001 ±0.0013   T20 +0.0027 ±0.0028 
+    Sunpetal Grove                   vs Forest   GW            T10 +0.0001 ±0.0012   T20 +0.0011 ±0.0027   fields: check
     Sungrass Prairie                 vs Forest   GW            T10 -0.0009 ±0.0014   T20 +0.0009 ±0.0029 
         text beyond mana (heuristic -- read it): {1}, {T}: Add {G}{W}.
-    Reflecting Pool                  vs Forest   GW            T10 +0.0006 ±0.0014   T20 +0.0008 ±0.0028 
-    Verdant Catacombs                vs Plains                 T10 +0.0011 ±0.0020   T20 +0.0005 ±0.0037   fields: fetch, fetch_Forest
+    Reflecting Pool                  vs Forest   GW            T10 +0.0006 ±0.0014   T20 +0.0009 ±0.0028 
+    Verdant Catacombs                vs Plains                 T10 +0.0011 ±0.0020   T20 +0.0006 ±0.0037   fields: fetch, fetch_Forest
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle.
-    Fortified Village                vs Forest   GW            T10 +0.0001 ±0.0015   T20 +0.0004 ±0.0031   fields: reveal
+    Fortified Village                vs Forest   GW            T10 +0.0002 ±0.0015   T20 +0.0005 ±0.0031   fields: reveal
     Yavimaya Hollow                  vs Plains   C             T10 -0.0008 ±0.0015   T20 +0.0004 ±0.0030 
         text beyond mana (heuristic -- read it): {T}: Add {C}. / {G}, {T}: Regenerate target creature.
     Blossoming Sands                 vs Forest   GW    tapped  T10 -0.0013 ±0.0013*  T20 +0.0001 ±0.0030   fields: gain1
     Misty Rainforest                 vs Plains                 T10 -0.0003 ±0.0019   T20 -0.0001 ±0.0038   fields: fetch, fetch_Forest
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle.
-    Flooded Strand                   vs Plains                 T10 -0.0008 ±0.0018   T20 -0.0004 ±0.0037   fields: fetch, fetch_Plains
+    Flooded Strand                   vs Plains                 T10 -0.0008 ±0.0018   T20 -0.0003 ±0.0037   fields: fetch, fetch_Plains
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle.
-    Windswept Heath                  vs Plains                 T10 +0.0008 ±0.0019   T20 -0.0015 ±0.0037   fields: fetch, fetch_Forest, fetch_Plains
+    Windswept Heath                  vs Plains                 T10 +0.0008 ±0.0019   T20 -0.0013 ±0.0037   fields: fetch, fetch_Forest, fetch_Plains
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle.
     Exotic Orchard                   vs Forest   GW            T10 +0.0009 ±0.0014   T20 -0.0017 ±0.0028 
-    Cavern of Souls                  vs Plains   C             T10 -0.0018 ±0.0015*  T20 -0.0022 ±0.0030 
-    Wooded Foothills                 vs Plains                 T10 +0.0011 ±0.0018   T20 -0.0028 ±0.0038   fields: fetch, fetch_Forest
+    Cavern of Souls                  vs Plains   C             T10 -0.0017 ±0.0015*  T20 -0.0022 ±0.0030 
+    Wooded Foothills                 vs Plains                 T10 +0.0011 ±0.0018   T20 -0.0027 ±0.0038   fields: fetch, fetch_Forest
         text beyond mana (heuristic -- read it): {T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Forest card, put it onto the battlefield, then shuffle.
     Selesnya Sanctuary               vs Forest   GW    tapped  T10 -0.0029 ±0.0018*  T20 -0.0059 ±0.0037*  fields: bounce
     Temple of Plenty                 vs Forest   GW    tapped  T10 -0.0023 ±0.0016*  T20 -0.0059 ±0.0033*  fields: scry1
