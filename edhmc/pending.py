@@ -2546,6 +2546,35 @@ CHANGES: list[Change] = [
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0034 +-0.0022 at T10, +0.0130 +-0.0035 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
     Change(
+        deck="azusa",
+        remove="Forest",
+        add="Fabled Passage",
+        staged="2026-10-06",
+        rationale=(
+            "'{T}, Sacrifice this land: Search your library for a basic land "
+            "card, put it onto the battlefield tapped, then shuffle. Then if "
+            "you control four or more lands, untap that land.' Two landfall "
+            "triggers from one land drop in a landfall deck, a Forest thinned "
+            "from the library, and a land in the graveyard for the recursion "
+            "package -- for no life."
+        ),
+        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
+    ),
+    Change(
+        deck="azusa",
+        remove="Forest",
+        add="Evolving Wilds",
+        staged="2026-10-06",
+        rationale=(
+            "'{T}, Sacrifice this land: Search your library for a basic land "
+            "card, put it onto the battlefield tapped, then shuffle.' Fabled "
+            "Passage without the untap: the same two landfalls for no life."
+        ),
+        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
+    ),
+    Change(
         deck="lorehold",
         remove="Penance",
         add="Caldera Pyremaw",

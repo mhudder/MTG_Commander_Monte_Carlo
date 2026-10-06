@@ -532,6 +532,8 @@ SCRIPTED_AZUSA = {
     # Fetches crack for a land, which is a landfall trigger and a shuffle
     # drawn from a pre-rolled stream so CRN survives (engine.CRNStreams).
     "Terramorphic Expanse", "Windswept Heath", "Wooded Foothills",
+    # STAGED 2026-10-06 (§0z114): every clause modelled, neither pays life.
+    "Fabled Passage", "Evolving Wilds",
     # extra land drops (Wayward Swordtooth CUT 2026-10-03 for Mole Man)
     "Exploration", "Oracle of Mul Daya",
     # landfall payoffs

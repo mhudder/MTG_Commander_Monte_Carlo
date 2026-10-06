@@ -584,6 +584,12 @@
         "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
         "fingerprint": "39fcd5ed52e9e738",
         "utc": "2026-10-06T12:56:29Z"
+      },
+      {
+        "commit": "29f939d",
+        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "a44cad0d763486a2",
+        "utc": "2026-10-06T14:04:23Z"
       }
     ]
   },
@@ -868,6 +874,12 @@
         "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
         "fingerprint": "dd0242bff72ca1b5",
         "utc": "2026-10-06T12:56:29Z"
+      },
+      {
+        "commit": "29f939d",
+        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "ff19527ae4e3222a",
+        "utc": "2026-10-06T14:04:22Z"
       }
     ]
   },
@@ -1420,6 +1432,12 @@
         "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
         "fingerprint": "2af07f842a6d5bc5",
         "utc": "2026-10-06T12:56:30Z"
+      },
+      {
+        "commit": "29f939d",
+        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "bb3d8d8e8a708d3e",
+        "utc": "2026-10-06T14:04:23Z"
       }
     ]
   },

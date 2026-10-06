@@ -162,6 +162,7 @@ Methodology that used to live at the end of this file is now
 | [0z111](#0z111) | MEASURED | **Trostani rebuilt with the five priority moves, and ONE OF THE FIVE DOES NOT HOLD IN CONTEXT.** Bramble Sovereign's own row flipped, +0.0027 → −0.0095 ±0.0035 at T10; paired on a fresh seed block, Bramble at 10.5 against 8.5 WITH the other four adopted is **−0.0071 ±0.0033 at T10, +0.0004 ±0.0059 at T20**. At 10.5 it outranks Seedborn Muse (10). Each move was confirmed against the OLD list, the joint against all five; neither asked about one move given the rest. **Reverted by the owner**, the other four stand; trostani's rebuild deferred. Tutors as a group +0.0453 at T20 |
 | [0z112](#0z112) | MEASURED | **The land ablation: every nonbasic land in seven decks against the basic it would replace** (147 lands, N=15,000, identity-classified). Its NOOP arm found **one Card object per basic NAME in every deck** (`[L(...)] * n`): identity checks read two copies as one card -- Shigeki put two Forests onto the battlefield, trostani's hideaway dropped a card; rendmaw 54 games in 15,000, trostani 7, the rest none. And its largest row, **tivit's Havengul Laboratory at −0.0581**, was a POLICY: the Clue activation ran in the upkeep, four mana before every main phase. Moved to the end step: **+0.0381 / +0.0589**. Painlands pay no life anywhere |
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
+| [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were both missing** (azusa), Kozilek labelled SCRIPTED. Implemented: **+0.0224 ±0.0033 at T20**; the Eye now ties a Forest at T20 where it cost 0.011. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237, both horizons. Awaken the Woods' Kozilek cut was priced on the broken card |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9922,6 +9923,79 @@ many.
 sets. All seven decks are BIT-IDENTICAL against the previous HEAD
 (`check_unchanged_decks`): every new path is guarded by a name no list holds.
 No table moved and no cache is touched.
+
+## 0z114. FIXED — Eye of Ugin's search and Kozilek's cast draw were missing; azusa's two fetches STAGED
+
+The owner asked (2026-10-06) whether Eye of Ugin's search is used: "it is to
+be used both as a landfall trigger, but also to search for the high CMC
+payoffs. It's not a conventional land." **It was not.** Eye of Ugin
+(Scryfall): *"Colorless Eldrazi spells you cast cost {2} less to cast. {7},
+{T}: Search your library for a colorless creature card, reveal it, put it into
+your hand, then shuffle."* Only the first sentence was modelled -- the land
+counted for landfall like any land, discounted Kozilek and Ulamog, and taps
+for nothing, which is why §0z112 read it at **−0.0109 against a Forest**. The
+tutor had no implementation at all.
+
+**And the card it finds first was missing a clause too.** Kozilek, Butcher of
+Truth: *"When you cast this spell, draw four cards. Annihilator 4. When
+Kozilek is put into a graveyard from anywhere, its owner shuffles their
+graveyard into their library."* The cast draw was not implemented, while the
+card sat in `SCRIPTED_AZUSA` -- the label said fully modelled. The CLAUDE.md
+tell exactly: a card whose text says it should be central (a ten-drop that
+draws four) and whose row read ordinary (+0.0077).
+
+**Fixed.** `AzusaGame.eye_of_ugin_step` (knob `eye_tutor`, "on"): after
+combat on the turn's spare mana, first among the activations, while no
+colourless creature is already in hand; it takes the cheapest (Kozilek before
+Ulamog). "Colorless creature" is derived (a nonland creature with no coloured
+pip -- Dryad Arbor is a land and green). Kozilek's draw is in
+`creature_spell_cast` (a cast trigger, so it draws through a counter) and in
+`draws_on_resolve`, so the pilot never casts it into a library under four
+(§0z42); knob `kozilek_cast_draw`. Kozilek and Ulamog move to
+PARTLY_MODELLED: the graveyard shuffle is not modelled for either, and
+Ulamog's cast trigger destroys an opponent's permanent (§4). The azusa table
+was re-rendered from its cache: those two rows are the only change.
+`tests/test_eye_of_ugin.py`, seven cases, two mutations.
+
+**Measured** (`diagnostics/run_eye_of_ugin.py`,
+`results/eye_of_ugin_20261006.txt`), N=15,000 paired, the staged list, every
+arm minus the new baseline:
+
+| arm | won T10 | won T20 | per game |
+|---|---|---|---|
+| old engine (both missing) | **−0.0087 ±0.0019** | **−0.0224 ±0.0033** | 1.2 fewer cards drawn |
+| no Eye tutor | **−0.0023 ±0.0010** | **−0.0100 ±0.0022** | 0.13 tutors a game |
+| no Kozilek draw | **−0.0077 ±0.0017** | **−0.0155 ±0.0029** | 1.0 cards a game |
+| Eye of Ugin → Forest | **+0.0115 ±0.0029** | −0.0003 ±0.0042 | |
+
+**The correction is worth +0.0224 to azusa at T20.** The Eye is now worth a
+Forest at T20 and less at T10: it fetches a ten-drop late and taps for
+nothing early, which is the trade the card makes. Before the fix it was a
+Forest that cost a point of win rate.
+
+**The Kozilek cut on Awaken the Woods' shortlist was priced on the broken
+card**: its ablation row and the +0.0056 head-to-head (§0z21's table) were
+both measured without the draw. The Candidate carries `cut_unmeasured` saying
+so; re-measure before acting on it.
+
+### Fabled Passage and Evolving Wilds -- STAGED, the owner's choice
+
+The owner chose the two fetches that pay no life (2026-10-06), so neither row
+is a ceiling; Gaea's Cradle and Ancient Tomb were deferred on price. Measured
+on the fixed engine, the pair as one change (two Forests, first in list
+order -- exactly the staged list): **+0.0257 ±0.0048 at T10 and +0.0237
+±0.0061 at T20**, fetches_cracked +1.23, landfall +1.70 a game. Alone,
+Fabled Passage +0.0157 / +0.0179 and Evolving Wilds +0.0126 / +0.0158: the
+pair is subadditive at T20 (+0.0237 against +0.0337 summed), the second fetch
+worth less than the first. Two Changes in the ledger, land for land, so the
+land count does not move.
+
+### The table
+
+azusa's cache is SUSPECT twice over -- the engine changed and the staged list
+changed -- and only a rebuild clears that (CLAUDE.md, "more than one right
+check"). Its Kozilek row is understated until then. Deferred with the other
+three, as the owner asked.
 
 ## How to read an ablation table
 
