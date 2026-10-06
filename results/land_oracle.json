@@ -1,11 +1,63 @@
 {
+ "Ancient Den": {
+  "type_line": "Artifact Land",
+  "oracle_text": "{T}: Add {W}."
+ },
+ "Arcane Sanctum": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\n{T}: Add {W}, {U}, or {B}."
+ },
+ "Archway of Innovation": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control an Island.\n{T}: Add {U}.\n{U}, {T}: The next spell you cast this turn has improvise. (Your artifacts can help cast that spell. Each artifact you tap after you're done activating mana abilities pays for {1}.)"
+ },
+ "Arid Mesa": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Plains card, put it onto the battlefield, then shuffle."
+ },
  "Barren Moor": {
   "type_line": "Land",
   "oracle_text": "This land enters tapped.\n{T}: Add {B}.\nCycling {B} ({B}, Discard this card: Draw a card.)"
  },
+ "Battlefield Forge": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {R} or {W}. This land deals 1 damage to you."
+ },
+ "Bloodstained Mire": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Mountain card, put it onto the battlefield, then shuffle."
+ },
+ "Blossoming Sands": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, you gain 1 life.\n{T}: Add {G} or {W}."
+ },
  "Bojuka Bog": {
   "type_line": "Land",
   "oracle_text": "This land enters tapped.\nWhen this land enters, exile target player's graveyard.\n{T}: Add {B}."
+ },
+ "Boros Garrison": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {R}{W}."
+ },
+ "Brightclimb Pathway // Grimclimb Pathway": {
+  "type_line": "Land // Land",
+  "oracle_text": "{T}: Add {W}. // {T}: Add {B}."
+ },
+ "Buried Ruin": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{2}, {T}, Sacrifice this land: Return target artifact card from your graveyard to your hand."
+ },
+ "Canopy Vista": {
+  "type_line": "Land \u2014 Forest Plains",
+  "oracle_text": "({T}: Add {G} or {W}.)\nThis land enters tapped unless you control two or more basic lands."
+ },
+ "Castle Ardenvale": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control a Plains.\n{T}: Add {W}.\n{2}{W}{W}, {T}: Create a 1/1 white Human creature token."
+ },
+ "Castle Locthwain": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control a Swamp.\n{T}: Add {B}.\n{1}{B}{B}, {T}: Draw a card, then you lose life equal to the number of cards in your hand."
  },
  "Cavern of Souls": {
   "type_line": "Land",
@@ -15,6 +67,10 @@
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. This land deals 1 damage to you."
  },
+ "Clifftop Retreat": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control a Mountain or a Plains.\n{T}: Add {R} or {W}."
+ },
  "Command Tower": {
   "type_line": "Land",
   "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
@@ -23,25 +79,189 @@
   "type_line": "Land",
   "oracle_text": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {W} or {B}."
  },
+ "Crystal Vein": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Add {C}{C}."
+ },
+ "Darkbore Pathway": {
+  "type_line": "Land // Land",
+  "oracle_text": "{T}: Add {B}. // {T}: Add {G}."
+ },
+ "Darkmoss Bridge": {
+  "type_line": "Artifact Land",
+  "oracle_text": "This land enters tapped.\nIndestructible\n{T}: Add {B} or {G}."
+ },
+ "Darksteel Citadel": {
+  "type_line": "Artifact Land",
+  "oracle_text": "Indestructible\n{T}: Add {C}."
+ },
+ "Deathcap Glade": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {B} or {G}."
+ },
+ "Dryad Arbor": {
+  "type_line": "Land Creature \u2014 Forest Dryad",
+  "oracle_text": "(This land isn't a spell, it's affected by summoning sickness, and it has \"{T}: Add {G}.\")"
+ },
+ "Dust Bowl": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{3}, {T}, Sacrifice a land: Destroy target nonbasic land."
+ },
+ "Eldrazi Temple": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {C}{C}. Spend this mana only to cast colorless Eldrazi spells or activate abilities of colorless Eldrazi."
+ },
+ "Elegant Parlor": {
+  "type_line": "Land \u2014 Mountain Plains",
+  "oracle_text": "({T}: Add {R} or {W}.)\nThis land enters tapped.\nWhen this land enters, surveil 1. (Look at the top card of your library. You may put it into your graveyard.)"
+ },
+ "Exotic Orchard": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add one mana of any color that a land an opponent controls could produce."
+ },
+ "Eye of Ugin": {
+  "type_line": "Legendary Land",
+  "oracle_text": "Colorless Eldrazi spells you cast cost {2} less to cast.\n{7}, {T}: Search your library for a colorless creature card, reveal it, put it into your hand, then shuffle."
+ },
+ "Fabled Passage": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle. Then if you control four or more lands, untap that land."
+ },
  "Fetid Heath": {
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{W/B}, {T}: Add {W}{W}, {W}{B}, or {B}{B}."
+ },
+ "Flooded Strand": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Island card, put it onto the battlefield, then shuffle."
+ },
+ "Fortified Village": {
+  "type_line": "Land",
+  "oracle_text": "As this land enters, you may reveal a Forest or Plains card from your hand. If you don't, this land enters tapped.\n{T}: Add {G} or {W}."
+ },
+ "Geier Reach Sanitarium": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{2}, {T}: Each player draws a card, then discards a card."
+ },
+ "Ghost Quarter": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target land. Its controller may search their library for a basic land card, put it onto the battlefield, then shuffle."
  },
  "Godless Shrine": {
   "type_line": "Land \u2014 Plains Swamp",
   "oracle_text": "({T}: Add {W} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
  },
+ "Golgari Rot Farm": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {B}{G}."
+ },
+ "Grim Backwoods": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{2}{B}{G}, {T}, Sacrifice a creature: Draw a card."
+ },
+ "Hallowed Fountain": {
+  "type_line": "Land \u2014 Plains Island",
+  "oracle_text": "({T}: Add {W} or {U}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Havengul Laboratory // Havengul Mystery": {
+  "type_line": "Legendary Land // Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{4}, {T}: Investigate. (Create a colorless Clue artifact token with \"{2}, Sacrifice this artifact: Draw a card.\")\nAt the beginning of your end step, if you sacrificed three or more Clues this turn, transform Havengul Laboratory. // When this land transforms into Havengul Mystery, return target creature card from your graveyard to the battlefield.\nWhen the creature put onto the battlefield with Havengul Mystery leaves the battlefield, transform Havengul Mystery.\n{T}, Pay 1 life: Add {B}."
+ },
+ "High Market": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: You gain 1 life."
+ },
+ "Homeward Path": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Each player gains control of all creatures they own."
+ },
  "Isolated Chapel": {
   "type_line": "Land",
   "oracle_text": "This land enters tapped unless you control a Plains or a Swamp.\n{T}: Add {W} or {B}."
+ },
+ "Khalni Garden": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, create a 0/1 green Plant creature token.\n{T}: Add {G}."
+ },
+ "Llanowar Wastes": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {G}. This land deals 1 damage to you."
+ },
+ "Marsh Flats": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Plains or Swamp card, put it onto the battlefield, then shuffle."
+ },
+ "Mikokoro, Center of the Sea": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{2}, {T}: Each player draws a card."
+ },
+ "Misty Rainforest": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Island card, put it onto the battlefield, then shuffle."
+ },
+ "Mosswort Bridge": {
+  "type_line": "Land",
+  "oracle_text": "Hideaway 4 (When this land enters, look at the top four cards of your library, exile one face down, then put the rest on the bottom in a random order.)\nThis land enters tapped.\n{T}: Add {G}.\n{G}, {T}: You may play the exiled card without paying its mana cost if creatures you control have total power 10 or greater."
+ },
+ "Necroblossom Snarl": {
+  "type_line": "Land",
+  "oracle_text": "As this land enters, you may reveal a Swamp or Forest card from your hand. If you don't, this land enters tapped.\n{T}: Add {B} or {G}."
+ },
+ "Needleverge Pathway": {
+  "type_line": "Land // Land",
+  "oracle_text": "{T}: Add {R}. // {T}: Add {W}."
+ },
+ "Nykthos, Shrine to Nyx": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{2}, {T}: Choose a color. Add an amount of mana of that color equal to your devotion to that color. (Your devotion to a color is the number of mana symbols of that color in the mana costs of permanents you control.)"
  },
  "Opal Palace": {
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color in your commander's color identity. If you spend this mana to cast your commander, it enters with a number of additional +1/+1 counters on it equal to the number of times it's been cast from the command zone this game."
  },
+ "Orzhov Basilica": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {W}{B}."
+ },
+ "Overgrown Tomb": {
+  "type_line": "Land \u2014 Swamp Forest",
+  "oracle_text": "({T}: Add {B} or {G}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Petrified Field": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Return target land card from your graveyard to your hand."
+ },
+ "Phyrexian Tower": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice a creature: Add {B}{B}."
+ },
+ "Plaza of Heroes": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a legendary spell.\n{T}: Add one mana of any color among legendary permanents you control.\n{3}, {T}, Exile this land: Target legendary creature gains hexproof and indestructible until end of turn."
+ },
+ "Prairie Stream": {
+  "type_line": "Land \u2014 Plains Island",
+  "oracle_text": "({T}: Add {W} or {U}.)\nThis land enters tapped unless you control two or more basic lands."
+ },
+ "Prismatic Vista": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield, then shuffle."
+ },
  "Radiant Fountain": {
   "type_line": "Land",
   "oracle_text": "When this land enters, you gain 2 life.\n{T}: Add {C}."
+ },
+ "Radiant Grove": {
+  "type_line": "Land \u2014 Forest Plains",
+  "oracle_text": "({T}: Add {G} or {W}.)\nThis land enters tapped."
+ },
+ "Raffine's Tower": {
+  "type_line": "Land \u2014 Plains Island Swamp",
+  "oracle_text": "({T}: Add {W}, {U}, or {B}.)\nThis land enters tapped.\nCycling {3} ({3}, Discard this card: Draw a card.)"
+ },
+ "Reflecting Pool": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add one mana of any type that a land you control could produce."
  },
  "Reliquary Tower": {
   "type_line": "Land",
@@ -51,28 +271,180 @@
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{4}, {T}: Target creature can't be blocked this turn."
  },
+ "Rugged Prairie": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{R/W}, {T}: Add {R}{R}, {R}{W}, or {W}{W}."
+ },
+ "Sacred Foundry": {
+  "type_line": "Land \u2014 Mountain Plains",
+  "oracle_text": "({T}: Add {R} or {W}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Scattered Groves": {
+  "type_line": "Land \u2014 Forest Plains",
+  "oracle_text": "({T}: Add {G} or {W}.)\nThis land enters tapped.\nCycling {2} ({2}, Discard this card: Draw a card.)"
+ },
+ "Scavenger Grounds": {
+  "type_line": "Land \u2014 Desert",
+  "oracle_text": "{T}: Add {C}.\n{2}, {T}, Sacrifice a Desert: Exile all graveyards."
+ },
+ "Scene of the Crime": {
+  "type_line": "Artifact Land \u2014 Clue",
+  "oracle_text": "This land enters tapped.\n{T}: Add {C}.\n{T}, Tap an untapped creature you control: Add one mana of any color.\n{2}, Sacrifice this land: Draw a card."
+ },
+ "Sea of Clouds": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {W} or {U}."
+ },
+ "Seat of the Synod": {
+  "type_line": "Artifact Land",
+  "oracle_text": "{T}: Add {U}."
+ },
  "Secluded Steppe": {
   "type_line": "Land",
   "oracle_text": "This land enters tapped.\n{T}: Add {W}.\nCycling {W} ({W}, Discard this card: Draw a card.)"
+ },
+ "Selesnya Sanctuary": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, return a land you control to its owner's hand.\n{T}: Add {G}{W}."
+ },
+ "Shattered Sanctum": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {W} or {B}."
+ },
+ "Shineshadow Snarl": {
+  "type_line": "Land",
+  "oracle_text": "As this land enters, you may reveal a Plains or Swamp card from your hand. If you don't, this land enters tapped.\n{T}: Add {W} or {B}."
  },
  "Shizo, Death's Storehouse": {
   "type_line": "Legendary Land",
   "oracle_text": "{T}: Add {B}.\n{B}, {T}: Target legendary creature gains fear until end of turn. (It can't be blocked except by artifact creatures and/or black creatures.)"
  },
+ "Silent Clearing": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life: Add {W} or {B}.\n{1}, {T}, Sacrifice this land: Draw a card."
+ },
+ "Slayers' Stronghold": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{R}{W}, {T}: Target creature gets +2/+0 and gains vigilance and haste until end of turn."
+ },
+ "Spectator Seating": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {R} or {W}."
+ },
+ "Strip Mine": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target land."
+ },
+ "Sunbaked Canyon": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life: Add {R} or {W}.\n{1}, {T}, Sacrifice this land: Draw a card."
+ },
+ "Sundown Pass": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control two or more other lands.\n{T}: Add {R} or {W}."
+ },
+ "Sungrass Prairie": {
+  "type_line": "Land",
+  "oracle_text": "{1}, {T}: Add {G}{W}."
+ },
+ "Sunhome, Fortress of the Legion": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{2}{R}{W}, {T}: Target creature gains double strike until end of turn."
+ },
+ "Sunken Hollow": {
+  "type_line": "Land \u2014 Island Swamp",
+  "oracle_text": "({T}: Add {U} or {B}.)\nThis land enters tapped unless you control two or more basic lands."
+ },
+ "Sunpetal Grove": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control a Forest or a Plains.\n{T}: Add {G} or {W}."
+ },
  "Tainted Field": {
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. Activate only if you control a Swamp."
+ },
+ "Tainted Wood": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {B} or {G}. Activate only if you control a Swamp."
+ },
+ "Tectonic Edge": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{1}, {T}, Sacrifice this land: Destroy target nonbasic land. Activate only if an opponent controls four or more lands."
+ },
+ "Temple Garden": {
+  "type_line": "Land \u2014 Forest Plains",
+  "oracle_text": "({T}: Add {G} or {W}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Temple of Plenty": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\n{T}: Add {G} or {W}."
  },
  "Temple of Silence": {
   "type_line": "Land",
   "oracle_text": "This land enters tapped.\nWhen this land enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\n{T}: Add {W} or {B}."
  },
+ "Temple of Triumph": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\n{T}: Add {R} or {W}."
+ },
  "Temple of the False God": {
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}{C}. Activate only if you control five or more lands."
  },
+ "Terramorphic Expanse": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Sacrifice this land: Search your library for a basic land card, put it onto the battlefield tapped, then shuffle."
+ },
+ "Treasure Vault": {
+  "type_line": "Artifact Land",
+  "oracle_text": "{T}: Add {C}.\n{X}{X}, {T}, Sacrifice this land: Create X Treasure tokens."
+ },
+ "Tree of Tales": {
+  "type_line": "Artifact Land",
+  "oracle_text": "{T}: Add {G}."
+ },
+ "Vault of Champions": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you have two or more opponents.\n{T}: Add {W} or {B}."
+ },
+ "Vault of Whispers": {
+  "type_line": "Artifact Land",
+  "oracle_text": "{T}: Add {B}."
+ },
  "Vault of the Archangel": {
   "type_line": "Land",
   "oracle_text": "{T}: Add {C}.\n{2}{W}{B}, {T}: Creatures you control gain deathtouch and lifelink until end of turn."
+ },
+ "Verdant Catacombs": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Swamp or Forest card, put it onto the battlefield, then shuffle."
+ },
+ "Wasteland": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}, Sacrifice this land: Destroy target nonbasic land."
+ },
+ "Watery Grave": {
+  "type_line": "Land \u2014 Island Swamp",
+  "oracle_text": "({T}: Add {U} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Windswept Heath": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Forest or Plains card, put it onto the battlefield, then shuffle."
+ },
+ "Witch's Cottage": {
+  "type_line": "Land \u2014 Swamp",
+  "oracle_text": "({T}: Add {B}.)\nThis land enters tapped unless you control three or more other Swamps.\nWhen this land enters untapped, you may put target creature card from your graveyard on top of your library."
+ },
+ "Wooded Foothills": {
+  "type_line": "Land",
+  "oracle_text": "{T}, Pay 1 life, Sacrifice this land: Search your library for a Mountain or Forest card, put it onto the battlefield, then shuffle."
+ },
+ "Woodland Chasm": {
+  "type_line": "Snow Land \u2014 Swamp Forest",
+  "oracle_text": "({T}: Add {B} or {G}.)\nThis land enters tapped."
+ },
+ "Yavimaya Hollow": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {C}.\n{G}, {T}: Regenerate target creature."
  }
 }
