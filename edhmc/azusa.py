@@ -267,6 +267,9 @@ COUNTER_CAP = 1_000_000
 # The activation POLICY -- when a pilot actually cracks one -- is shared and
 # lives in activations(), because it is a judgement about the deck rather than
 # about the card. See KNOWN_ISSUES §0z2/§0z3.
+# The scripts a fetch land may carry: how the land it finds enters (§0z113).
+FETCH_SCRIPTS = frozenset({"fetch", "fetch_tapped", "fetch_untap4"})
+
 SAC_DRAW_LANDS = {
     "Cryptic Caves":       ({"gen": 1},          True,  5),
     "Horizon of Progress": ({"gen": 1},          True,  0),
@@ -1341,6 +1344,19 @@ class AzusaGame(BaseGame):
                 self.m["bristly_counters"] += 1
         for _ in range(self.count("Springheart Nantuko")):
             self.springheart_landfall()
+        # FIELD OF THE DEAD: "Whenever this land or another land you control
+        # enters, if you control seven or more lands with different names,
+        # create a 2/2 black Zombie creature token." (Scryfall, 2026-10-06;
+        # §0z113.) A triggered ability of a permanent you control, so it is in
+        # the doubled loop like every payoff here. The condition is read as
+        # the trigger resolves -- the land that entered is already counted.
+        fields = sum(1 for p in self.board
+                     if p.card.script == "field_of_the_dead")
+        if fields:
+            names = {p.card.name for p in self.board if p.card.is_land}
+            if len(names) >= 7:
+                self.make_tokens(fields, 2, 2, "Zombie")
+                self.m["field_zombies"] += fields
         if self.has("Scute Swarm"):
             n_lands = sum(1 for p in self.board if p.card.is_land)
             n_swarms = self.count("Scute Swarm")
@@ -1656,8 +1672,15 @@ class AzusaGame(BaseGame):
         if forest is None:
             return
         self.library.remove(forest)
-        enters_tapped = fetchland_card.name == "Terramorphic Expanse"
-        self.make_permanent(forest, sick=False, tapped=enters_tapped)
+        # TAPPED for Terramorphic Expanse and Evolving Wilds; Fabled Passage
+        # untaps it "if you control four or more lands" (§0z113).
+        enters_tapped = (fetchland_card.name == "Terramorphic Expanse"
+                         or fetchland_card.script in ("fetch_tapped",
+                                                      "fetch_untap4"))
+        perm = self.make_permanent(forest, sick=False, tapped=enters_tapped)
+        if (fetchland_card.script == "fetch_untap4" and perm is not None
+                and sum(1 for p in self.board if p.card.is_land) >= 4):
+            perm.tapped = False
         self.m["fetches_cracked"] += 1
         # "...put it onto the battlefield, THEN SHUFFLE." The shuffle is part
         # of the ability's resolution and finishes before the landfall trigger
@@ -1819,7 +1842,7 @@ class AzusaGame(BaseGame):
                 tapped = True
             perm = self.make_permanent(card, sick=False, tapped=tapped)
             self.land_entered(card, played=True)
-            if card.script == "fetch":
+            if card.script in FETCH_SCRIPTS:
                 self.crack_fetch(card)
             # INTERLEAVE: play a land, THEN deploy anything it just paid for,
             # then play the next one. A one-shot enabler phase before any land
@@ -3202,6 +3225,44 @@ class AzusaGame(BaseGame):
                 self.library.remove(land)
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
+        self.myriad_landscape_step()
+
+    def myriad_landscape_step(self):
+        """Myriad Landscape: "{2}, {T}, Sacrifice this land: Search your
+        library for up to two basic land cards that share a land type, put
+        them onto the battlefield tapped, then shuffle." (Scryfall,
+        2026-10-06; §0z113.) Two Forests here -- the only basic type in the
+        list. POLICY: after combat, on spare mana, once it can tap (it enters
+        tapped), while a Forest is left to find -- War Room's reasoning above.
+        Two landfall triggers, and the sacrifice is a land leaving."""
+        for pm in [p for p in self.board if p.card.script == "myriad"]:
+            if pm.tapped or pm not in self.board:
+                continue
+            if not any(c.name == "Forest" for c in self.library):
+                return
+            pm.tapped = True                 # {T} is in the cost
+            units = self.available_mana()
+            pay = can_pay({"gen": 2}, units)
+            if pay is None:
+                pm.tapped = False
+                return
+            spend(self, pay, units)
+            self.m["mana_spent"] += 2
+            self.board.remove(pm)
+            self.land_died(pm.card)
+            found = []
+            for _ in range(2):
+                forest = next((c for c in self.library if c.name == "Forest"),
+                              None)
+                if forest is None:
+                    break
+                self.library.remove(forest)
+                self.make_permanent(forest, sick=False, tapped=True)
+                found.append(forest)
+            self.shuffle_library()           # "...then shuffle", before landfall
+            for forest in found:
+                self.land_entered(forest, played=False)
+            self.m["myriad_cracked"] += 1
 
     def precombat_step(self):
         """Activated abilities a pilot uses BEFORE attacking, with the mana

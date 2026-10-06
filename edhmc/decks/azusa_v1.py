@@ -822,6 +822,35 @@ AUTUMN_WILLOW_HARMONY = C("Autumn Willow, Harmony", "Creature",
 MBC_CANDIDATES = (AUTUMN_WILLOW_HARMONY,)
 
 
+# ---------------------------------------------------------------------------
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from Scryfall that day; the
+# Proposals in edhmc/pending.py carry it verbatim. The fetches crack through
+# azusa.crack_fetch (`script` names how the fetched Forest enters); the true
+# fetches' 1 life is not charged -- a CEILING, as for the deck's own.
+# ---------------------------------------------------------------------------
+VERDANT_CATACOMBS = L("Verdant Catacombs", "", script="fetch")
+MISTY_RAINFOREST = L("Misty Rainforest", "", script="fetch")
+PRISMATIC_VISTA = L("Prismatic Vista", "", script="fetch")
+# "...put it onto the battlefield tapped" -- Terramorphic Expanse's text.
+EVOLVING_WILDS = L("Evolving Wilds", "", script="fetch_tapped")
+# "...tapped, then shuffle. Then if you control four or more lands, untap
+# that land."
+FABLED_PASSAGE = L("Fabled Passage", "", script="fetch_untap4")
+# "This land enters tapped. {T}: Add {C}. {2}, {T}, Sacrifice this land:
+# Search your library for up to two basic land cards that share a land type,
+# put them onto the battlefield tapped, then shuffle." azusa.activations.
+MYRIAD_LANDSCAPE = L("Myriad Landscape", "C", tapped=True, script="myriad")
+# "This land enters tapped. {T}: Add {C}. Whenever this land or another land
+# you control enters, if you control seven or more lands with different names,
+# create a 2/2 black Zombie creature token." azusa._landfall_payoffs.
+FIELD_OF_THE_DEAD = L("Field of the Dead", "C", tapped=True,
+                      script="field_of_the_dead")
+
+LAND_CANDIDATES = (VERDANT_CATACOMBS, MISTY_RAINFOREST, PRISMATIC_VISTA,
+                   EVOLVING_WILDS, FABLED_PASSAGE, MYRIAD_LANDSCAPE,
+                   FIELD_OF_THE_DEAD)
+
+
 def _check_inline_copies():
     """The list's committed batch-6 cards and the catalog's constants are ONE
     card written twice each (the list cannot reference a constant defined
