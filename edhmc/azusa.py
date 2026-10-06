@@ -1784,13 +1784,13 @@ class AzusaGame(BaseGame):
         top_is_land = bool(self.library) and self.library[-1].is_land
         if top_live and not top_is_land:
             for c, z in options:
-                if z == "graveyard" and c.script == "fetch":
+                if z == "graveyard" and c.script in FETCH_SCRIPTS:
                     self.m["reroll_fetches"] += 1
                     return c, z
         for want in ("library", "graveyard", "hand"):
             picks = [(c, z) for c, z in options if z == want]
             if picks:
-                picks.sort(key=lambda it: it[0].script != "fetch")
+                picks.sort(key=lambda it: it[0].script not in FETCH_SCRIPTS)
                 return picks[0]
         return None
 

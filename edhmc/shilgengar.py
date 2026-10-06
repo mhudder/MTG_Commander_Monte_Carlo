@@ -300,8 +300,12 @@ class ShilgengarGame(BaseGame):
     def play_card_trigger(self, card):
         """`engine.play_land` calls this unconditionally on every land played
         (it is Rendmaw's "2+ card types -> Bird" hook there). No land in this
-        list has an ETB effect worth modelling, so it is a no-op here."""
-        return
+        list has an ETB effect worth modelling -- but the land candidates
+        have one (§0z113): Scoured Barrens, "When this land enters, you gain
+        1 life", through `gain_life` so every lifegain payoff sees it."""
+        if card.is_land and card.lifegain:
+            self.gain_life(card.lifegain)
+            self.m["land_lifegain"] += card.lifegain
 
     # -- tokens ------------------------------------------------------------
 

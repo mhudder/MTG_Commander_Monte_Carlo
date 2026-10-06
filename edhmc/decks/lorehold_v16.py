@@ -375,3 +375,14 @@ CHIEF_MAGISTRATE_OF_MERCADIA = C("Chief Magistrate of Mercadia", "Creature",
                                  priority=6.5, threat=7.5)
 
 MBC_CANDIDATES = (CHIEF_MAGISTRATE_OF_MERCADIA,)
+
+
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from api.scryfall.com,
+# recorded verbatim on each Proposal in edhmc/pending.py. Measured in place of
+# the basic they would replace (diagnostics/run_land_candidates.py).
+# "{T}: Add {C}{C}. This land deals 2 damage to you."
+ANCIENT_TOMB = L("Ancient Tomb", "C")
+# "{T}: Add {C}. {T}, Sacrifice this land: Put your commander into your hand
+# from the command zone." -- `lorehold.command_beacon`, by name.
+COMMAND_BEACON = L("Command Beacon", "C")
+LAND_CANDIDATES = (ANCIENT_TOMB, COMMAND_BEACON)

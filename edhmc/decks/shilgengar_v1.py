@@ -51,9 +51,9 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
                 indestructible=name in INDESTRUCTIBLE)
 
 
-def L(name, produces, tapped=False, types="Land", tags=()):
+def L(name, produces, tapped=False, types="Land", tags=(), lifegain=0.0):
     return Card(name=name, types=frozenset(types.split("/")), is_land=True,
-                produces=frozenset(produces), tapped=tapped,
+                produces=frozenset(produces), tapped=tapped, lifegain=lifegain,
                 tags=frozenset(tags),
                 indestructible=name in INDESTRUCTIBLE)
 
@@ -317,3 +317,14 @@ def build():
            + INTERACTION + MDFC_SPELLS + LANDS)
     assert len(deck) == 99, f"deck is {len(deck)} cards, expected 99"
     return deck, COMMANDER
+
+
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from api.scryfall.com,
+# recorded verbatim on each Proposal in edhmc/pending.py. Measured in place of
+# the basic they would replace (diagnostics/run_land_candidates.py).
+# "This land enters tapped. When this land enters, you gain 1 life.
+# {T}: Add {W} or {B}." The life goes through `ShilgengarGame.gain_life`.
+SCOURED_BARRENS = L("Scoured Barrens", "WB", tapped=True, lifegain=1)
+# "{T}: Add {C}{C}. This land deals 2 damage to you."
+ANCIENT_TOMB = L("Ancient Tomb", "C")
+LAND_CANDIDATES = (SCOURED_BARRENS, ANCIENT_TOMB)

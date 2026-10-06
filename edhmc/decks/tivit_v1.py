@@ -398,3 +398,12 @@ DYFED_THE_GUIDING_HAND = C("Dyfed, the Guiding Hand", "Planeswalker",
                            {"gen": 3, "U": 2}, priority=7.5, threat=6.5)
 
 MBC_CANDIDATES = (VENSER_VISIONARY_TRAVELER, DYFED_THE_GUIDING_HAND)
+
+
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from api.scryfall.com,
+# recorded verbatim on the Proposal in edhmc/pending.py.
+# "{T}: Add {C}. {X}{X}, {T}, Sacrifice this land: Create X Treasure
+# tokens." -- `tivit.treasure_vault`, by name. An artifact land.
+TREASURE_VAULT = L("Treasure Vault", "C", types="Artifact/Land",
+                   tags=("artifact_land",))
+LAND_CANDIDATES = (TREASURE_VAULT,)

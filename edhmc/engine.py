@@ -831,7 +831,14 @@ def can_pay(cost: dict, units: list[frozenset],
             have = rarest[src] = min((supply[c] for c in src), default=0)
         n_colours, wi = lw[i]
         want = wi[1] if isinstance(wi, tuple) and len(wi) > 1 else 0
-        static[i] = (-(have - want), n_colours, wi)
+        # A SOURCE THAT HURTS IS SPENT LAST, ahead of surplus (§0z113).
+        # Ancient Tomb's two {C} are two units of supply, so the surplus rule
+        # read it as the most plentiful colour on a small board and spent it
+        # -- for 2 life and a wasted {C} -- on a {1} a Plains could pay. The
+        # flag is 0 for every other unit, so no other pool is reordered.
+        hurts = 1 if isinstance(wi, tuple) and wi and wi[0] == PAINFUL_RANK \
+            else 0
+        static[i] = (hurts, -(have - want), n_colours, wi)
 
     # `supply` IS A SNAPSHOT OF THE START OF THIS PAYMENT, AND DELIBERATELY SO.
     # It is built once above and NOT decremented as picks are taken, which
@@ -1718,6 +1725,9 @@ def arasta_spider(g: Game):
         g.make_tokens(1, 1, 2, "Spider")
 
 
+PAINFUL_RANK = 1.5     # tap_reluctance's rank for a land that deals damage
+
+
 def tap_reluctance(g: Game, p: Permanent) -> tuple:
     """How much we would rather NOT tap this permanent for mana.
 
@@ -1728,6 +1738,11 @@ def tap_reluctance(g: Game, p: Permanent) -> tuple:
     Enduring Vitality fodder.
     """
     c = p.card
+    # Ancient Tomb hurts, so it is the land tapped LAST -- after the rocks,
+    # before any creature (§0z113). A pilot taps it when the mana is needed;
+    # `can_pay` reads PAINFUL_RANK ahead of colour surplus for that reason.
+    if c.name == "Ancient Tomb":
+        return (PAINFUL_RANK, 0)
     if c.is_land or c.name == "Everywhere token":
         return (0, 0)
     if c.mana_ability and not c.is_creature:
@@ -2031,6 +2046,24 @@ def tap_treasures(units, pay) -> None:
             owners[i].tapped = True
 
 
+def named_land_mana(g, p) -> int | None:
+    """How much mana a land with a NAMED mana rule makes, or None for any
+    other land (which then makes its usual 1, or 2 for a karoo). Read by
+    `available_mana` AND by `spend`'s fallback: a mana amount said in one
+    and not the other is §0z4's doubler trap (§0z113).
+
+      Ancient Tomb    "{T}: Add {C}{C}. This land deals 2 damage to you."
+                      -- the damage is charged in `on_mana_tap`.
+      Gaea's Cradle   "{T}: Add {G} for each creature you control."
+    """
+    name = p.card.name
+    if name == "Ancient Tomb":
+        return 2
+    if name == "Gaea's Cradle":
+        return sum(1 for q in g.board if is_battlefield_creature(g, q))
+    return None
+
+
 def available_mana(g: Game) -> list[frozenset]:
     """Enumerate one entry per point of mana available this turn.
 
@@ -2068,7 +2101,9 @@ def available_mana(g: Game) -> list[frozenset]:
         c = p.card
         if c.is_land:
             src = any_color if all_lands_any else c.produces
-            amt = 2 if "bounce" in c.tags else 1
+            amt = named_land_mana(g, p)
+            if amt is None:
+                amt = 2 if "bounce" in c.tags else 1
             add(src, amt, p)
             # Crypt Ghast: "Whenever you tap a SWAMP for mana, add an
             # additional {B}." Swamp is a land subtype the Card model does not
@@ -2491,6 +2526,17 @@ def on_mana_tap(g, p: Permanent):
     every azusa game that spent floating mana -- caught by
     check_unchanged_decks, the gate that runs all six decks."""
     card = getattr(p, "card", None)
+    # ANCIENT TOMB (§0z113): "{T}: Add {C}{C}. This land deals 2 damage to
+    # you." Charged once per TAP, here, so both of `spend`'s paths pay it.
+    # Behind `charge_life_costs`, the family switch for every life drawback.
+    if (card is not None and card.name == "Ancient Tomb"
+            and g.cfg.get("charge_life_costs", True)):
+        g.your_life -= 2
+        g.m["life_lost_to_own_cards"] += 2
+        g.m["tomb_damage"] += 2
+    if card is not None and card.name == "Gaea's Cradle":
+        g.m["cradle_taps"] += 1
+        g.m["cradle_mana"] += named_land_mana(g, p) or 0
     if card is not None and card.name == "Twitching Doll":
         p.nest += 1
         g.m["doll_nest_counters"] += 1
@@ -2619,7 +2665,11 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
         if left <= 0:
             break
         c = p.card
-        amt = 2 if "bounce" in c.tags else (c.mana_ability[0] if c.mana_ability else 1)
+        amt = named_land_mana(g, p) if c.is_land else None
+        if amt is None:
+            amt = 2 if "bounce" in c.tags else (c.mana_ability[0] if c.mana_ability else 1)
+        elif amt == 0:
+            continue             # a Cradle with no creatures makes nothing
         if c.is_land and "swamp" in c.tags and g.has("Crypt Ghast"):
             amt += 1              # the Swamp really did produce two mana
         # NISSA, WHO SHAKES THE WORLD, the Crypt Ghast rule for Forests

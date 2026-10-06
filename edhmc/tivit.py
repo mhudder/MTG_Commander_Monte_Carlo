@@ -1075,6 +1075,57 @@ def end_step(g):
             if g.result is not None:
                 return
     havengul_end_step(g)
+    treasure_vault(g)
+
+
+def treasure_vault(g) -> None:
+    """Treasure Vault (Scryfall, 2026-10-06; §0z113):
+
+        Artifact Land.  {T}: Add {C}.
+        {X}{X}, {T}, Sacrifice this land: Create X Treasure tokens.
+
+    rendmaw's policy (`engine.treasure_vault`, §0z68), restated for this
+    engine's mana and token code -- the knob is the SAME knob: at the end
+    step, after Havengul, crack it for the largest X the mana the turn left
+    pays, if that makes at least `vault_min_treasures` (4) Treasures after
+    Anointed Procession. Treasures do not pay for it (Treasures into
+    Treasures is nothing), Powerstones may (it is an activated ability). The
+    Vault taps first: its own {C} is part of the cost. Leaving the
+    battlefield, it is an artifact going to the graveyard, so Disciple and
+    Marionette Master see it (`sacrifice_real_artifacts`'s triggers)."""
+    vault = next((p for p in g.board if p.card.name == "Treasure Vault"
+                  and not p.tapped), None)
+    if vault is None:
+        return
+    vault.tapped = True
+    held = g.tokens["Treasure"]
+    g.tokens["Treasure"] = 0                # Treasures may not pay
+    try:
+        x = len(mana_units(g, True)) // 2
+        per = 2 if g.has("Anointed Procession") else 1
+        if x <= 0 or x * per < g.cfg.get("vault_min_treasures", 4):
+            vault.tapped = False
+            return
+        paid = pay(g, {"gen": 2 * x}, powerstones=True)
+    finally:
+        g.tokens["Treasure"] += held
+    if not paid:
+        vault.tapped = False
+        return
+    g.board.remove(vault)
+    g.graveyard.append(vault.card)
+    share = disciple_share(g)
+    if share:
+        dmg = share * OPP.pod_size(g)
+        g.deal_pod_damage(dmg)
+        g.m["token_drain"] += dmg
+    artifact_left_drain(g, 1)
+    if g.result == "win":
+        g.m["win_route"] = ROUTE_DRAIN
+        return
+    make_token(g, "Treasure", x)
+    g.m["vault_activations"] += 1
+    g.m["vault_x"] += x
 
 
 def havengul_end_step(g):

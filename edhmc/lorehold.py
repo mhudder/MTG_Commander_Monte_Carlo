@@ -1989,6 +1989,53 @@ def reserve_for(g) -> int:
     return want
 
 
+def command_beacon(g) -> bool:
+    """COMMAND BEACON (§0z113): "{T}: Add {C}. {T}, Sacrifice this land: Put
+    your commander into your hand from the command zone."
+
+    A cast from HAND pays no commander tax (903.8 taxes casts from the
+    command zone only), so the Beacon saves the tax for the price of a land.
+    The policy, said out loud: sacrifice it only when the tax has reached
+    `beacon_min_tax` (default 4 -- two deaths) AND the commander can be cast
+    from hand THIS TURN from the rest of the pool, and then cast it at once.
+    The commander therefore never sits in hand, where a rummage could take
+    it -- a pilot holding it would face that, and this one does not.
+
+    The engine charges the tax at DEATH (`opponents.destroy` adds 2), not at
+    the cast. A cast from hand adds nothing, so the tax comes down by 2 here
+    and the next death -- or a counter -- puts it back: net, the Beacon cast
+    leaves the tax where it was. Returns True when it cast the commander.
+    """
+    if g.commander_tax < g.cfg.get("beacon_min_tax", 4):
+        return False
+    beacon = next((p for p in g.board if p.card.name == "Command Beacon"
+                   and not p.tapped), None)
+    if beacon is None:
+        return False
+    beacon.tapped = True              # its mana is not available: it is the cost
+    units = mana_units(g)
+    cost = dict(g.commander.cost)
+    if can_pay(cost, units) is None:
+        beacon.tapped = False
+        return False
+    g.board.remove(beacon)
+    g.graveyard.append(beacon.card)
+    g.m["beacon_used"] += 1
+    g.m["beacon_tax_saved"] += g.commander_tax
+    idx = g.spells_this_turn
+    g.spells_this_turn += 1
+    pay(g, cost, units)
+    g.commander_tax -= 2
+    if OPP.countered(g, g.commander, idx):
+        g.m["countered"] += 1
+        g.commander_tax += 2
+        return True
+    g.board.append(Permanent(card=g.commander, sick=False))
+    g.commander_cast = True
+    g.m["spells_cast"] += 1
+    return True
+
+
 def main_phase(g, reserve=0):
     """reserve: mana left untapped for miracle windows on opponents' turns.
 
@@ -2001,6 +2048,8 @@ def main_phase(g, reserve=0):
     while True:
         units = mana_units(g)
 
+        if not g.commander_cast and command_beacon(g):
+            continue
         if not g.commander_cast:
             ccost = dict(g.commander.cost)
             ccost["gen"] = ccost.get("gen", 0) + g.commander_tax

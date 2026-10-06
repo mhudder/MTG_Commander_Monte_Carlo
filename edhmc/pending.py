@@ -3880,7 +3880,10 @@ DECKS = {
         "Proft, Sinister Mastermind": rendmaw_v12.PROFT_SINISTER_MASTERMIND,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
         "Davvol, Evincar of Rath": rendmaw_v12.DAVVOL_EVINCAR_OF_RATH,
-        "Thomil, the Destroyer": rendmaw_v12.THOMIL_THE_DESTROYER}),
+        "Thomil, the Destroyer": rendmaw_v12.THOMIL_THE_DESTROYER,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        "Gaea's Cradle": rendmaw_v12.GAEAS_CRADLE,
+        "Ancient Tomb": rendmaw_v12.ANCIENT_TOMB}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v16, {
@@ -3898,7 +3901,10 @@ DECKS = {
         # Queued item 0c's head-to-heads, 2026-09-25 (§0z53).
         "Goldspan Dragon": lorehold_v16.GOLDSPAN_DRAGON,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
-        "Chief Magistrate of Mercadia": lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA}),
+        "Chief Magistrate of Mercadia": lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        "Ancient Tomb": lorehold_v16.ANCIENT_TOMB,
+        "Command Beacon": lorehold_v16.COMMAND_BEACON}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
@@ -3915,7 +3921,11 @@ DECKS = {
         "Ginger, Queen of Sweets": karlov_v2.GINGER_QUEEN_OF_SWEETS,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
         "Selenia, the Cursed Heart": karlov_v2.SELENIA_THE_CURSED_HEART,
-        "Pearl Collector": karlov_v2.PEARL_COLLECTOR}),
+        "Pearl Collector": karlov_v2.PEARL_COLLECTOR,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        "Scoured Barrens": karlov_v2.SCOURED_BARRENS,
+        "Kabira Crossroads": karlov_v2.KABIRA_CROSSROADS,
+        "Ancient Tomb": karlov_v2.ANCIENT_TOMB}),
     # Added 2026-09-05 as a fourth deck. Nothing is staged yet: the list is the
     # one in Tivit_Seller_of_Secrets_Commander_Deck_v1.xlsx, card for card.
     "tivit": (tivit_v1, {
@@ -3927,7 +3937,9 @@ DECKS = {
         "Memnarch, the Warden": tivit_v1.MEMNARCH_THE_WARDEN,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
         "Venser, Visionary Traveler": tivit_v1.VENSER_VISIONARY_TRAVELER,
-        "Dyfed, the Guiding Hand": tivit_v1.DYFED_THE_GUIDING_HAND}),
+        "Dyfed, the Guiding Hand": tivit_v1.DYFED_THE_GUIDING_HAND,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        "Treasure Vault": tivit_v1.TREASURE_VAULT}),
     # Added 2026-09-07 as a fifth deck. Nothing is staged yet: the list is the
     # one in Shilgengar_Sire_of_Famine_Commander_Deck_v1.xlsx, card for card,
     # six mana values corrected against Scryfall (see shilgengar_v1.py's
@@ -3940,7 +3952,10 @@ DECKS = {
         "Selenia, the Cursed Heart": shilgengar_v1.SELENIA_THE_CURSED_HEART,
         "Seluma, Light of Aysen": shilgengar_v1.SELUMA_LIGHT_OF_AYSEN,
         "Thomil, the Destroyer": shilgengar_v1.THOMIL_THE_DESTROYER,
-        "Pearl Collector": shilgengar_v1.PEARL_COLLECTOR}),
+        "Pearl Collector": shilgengar_v1.PEARL_COLLECTOR,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        "Scoured Barrens": shilgengar_v1.SCOURED_BARRENS,
+        "Ancient Tomb": shilgengar_v1.ANCIENT_TOMB}),
     # Added 2026-09-07 as a sixth deck. The submitted list was 99 cards; a
     # 21st Forest was added to reach 100 -- see azusa_v1.py's docstring.
     "azusa": (azusa_v1, {
@@ -3996,7 +4011,9 @@ DECKS = {
         "Mole Man, Moloid Master": azusa_v1.MOLE_MAN,
         "Mossborn Hydra": azusa_v1.MOSSBORN_HYDRA,
         "Bristly Bill, Spine Sower": azusa_v1.BRISTLY_BILL,
-        "Glacier Godmaw": azusa_v1.GLACIER_GODMAW}),
+        "Glacier Godmaw": azusa_v1.GLACIER_GODMAW,
+        # LAND CANDIDATES, 2026-10-06 (§0z113).
+        **{c.name: c for c in azusa_v1.LAND_CANDIDATES}}),
     # Added 2026-10-01 from the owner's spreadsheet. No candidates yet: the
     # catalog is empty, which the registry check above allows.
     "trostani": (trostani_v1, {}),

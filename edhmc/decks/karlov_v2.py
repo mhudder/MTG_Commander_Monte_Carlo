@@ -420,3 +420,18 @@ PEARL_COLLECTOR = C("Pearl Collector", "Creature", {"gen": 2, "B": 1}, 3, 3,
                     priority=6.5, lifelink=True)
 
 MBC_CANDIDATES = (SELENIA_THE_CURSED_HEART, PEARL_COLLECTOR)
+
+
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from api.scryfall.com,
+# recorded verbatim on each Proposal in edhmc/pending.py. Measured in place of
+# the basic they would replace (diagnostics/run_land_candidates.py).
+# "This land enters tapped. When this land enters, you gain 1 life.
+# {T}: Add {W} or {B}." The life goes through karlov's land `lifegain` hook.
+SCOURED_BARRENS = L("Scoured Barrens", "WB", tapped=True, lifegain=1)
+# "This land enters tapped. When this land enters, you gain 2 life.
+# {T}: Add {W}."
+KABIRA_CROSSROADS = L("Kabira Crossroads", "W", tapped=True, lifegain=2)
+# "{T}: Add {C}{C}. This land deals 2 damage to you." -- engine.named_land_mana
+# and engine.on_mana_tap.
+ANCIENT_TOMB = L("Ancient Tomb", "C")
+LAND_CANDIDATES = (SCOURED_BARRENS, KABIRA_CROSSROADS, ANCIENT_TOMB)

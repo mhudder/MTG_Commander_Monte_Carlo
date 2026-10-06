@@ -329,3 +329,13 @@ THOMIL_THE_DESTROYER = C("Thomil, the Destroyer", "Planeswalker",
                          {"gen": 3, "B": 2}, priority=7, threat=7.0)
 
 MBC_CANDIDATES = (DAVVOL_EVINCAR_OF_RATH, THOMIL_THE_DESTROYER)
+
+
+# LAND CANDIDATES, 2026-10-06 (§0z113). Oracle text from api.scryfall.com,
+# recorded verbatim on each Proposal in edhmc/pending.py. Measured in place of
+# the basic they would replace (diagnostics/run_land_candidates.py).
+# "{T}: Add {G} for each creature you control." -- engine.named_land_mana.
+GAEAS_CRADLE = L("Gaea's Cradle", "G")
+# "{T}: Add {C}{C}. This land deals 2 damage to you."
+ANCIENT_TOMB = L("Ancient Tomb", "C")
+LAND_CANDIDATES = (GAEAS_CRADLE, ANCIENT_TOMB)
