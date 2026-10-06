@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `f62ba44` from 23 engine sources.
+Derived at `f7ab114` from 23 engine sources.
 
 **223 knobs, 326 call sites.**
 
@@ -154,11 +154,11 @@ show up first.
 | `kozilek_cast_draw` | `True` | 2 | `edhmc/azusa.py:2742` | §0z115 | yes | yes |
 | `land_animation` | `'full'` | 3 | `edhmc/azusa.py:602` | §0z19 | yes | yes |
 | `land_creature_sick` | `True` | 1 | `edhmc/azusa.py:723` | §0z15 | yes | yes |
-| `land_etb_rules` | `True` | 1 | `edhmc/engine.py:2188` | §0z115 | **no** | yes |
-| `land_fetch` | `True` | 3 | `edhmc/azusa.py:1676` | §0z115 | **no** | yes |
+| `land_etb_rules` | `True` | 1 | `edhmc/engine.py:2188` | §0z115 | yes | yes |
+| `land_fetch` | `True` | 3 | `edhmc/azusa.py:1676` | §0z115 | yes | yes |
 | `land_floor` | `8` | 1 | `edhmc/lorehold.py:405` | §0z30 | **no** | **never** |
 | `land_only_if` | `True` | 3 | `edhmc/azusa.py:1049` | §0z115 | **no** | yes |
-| `land_outlets` | `True` | 1 | `edhmc/shilgengar.py:480` | §0z115 | **no** | **never** |
+| `land_outlets` | `True` | 1 | `edhmc/shilgengar.py:480` | §0z115 | **no** | yes |
 | `library_life_floor` | `20` | 1 | `edhmc/trostani.py:1609` |  | yes | yes |
 | `life_cap` | `1000000000.0` | 1 | `edhmc/trostani.py:460` |  | yes | **never** |
 | `locthwain` | `True` | 1 | `edhmc/engine.py:2365` | §0z85 | **no** | yes |
@@ -229,7 +229,7 @@ show up first.
 | `shilgengar_ult_min_gain` | `1` | 1 | `edhmc/shilgengar.py:632` |  | yes | yes |
 | `shilgengar_ult_reserve` | `3` | 1 | `edhmc/shilgengar.py:750` | §0t | yes | yes |
 | `shock_life_floor` | `15` | 3 | `edhmc/engine.py:2197` | §0z115 | yes | yes |
-| `shock_pay` | `'floor'` | 1 | `edhmc/engine.py:2203` | §0z115 | **no** | yes |
+| `shock_pay` | `'floor'` | 1 | `edhmc/engine.py:2203` | §0z115 | yes | yes |
 | `shroud_sources` | `()` | 1 | `edhmc/opponents.py:364` |  | yes | yes |
 | `sieve_cap` | `10` | 1 | `edhmc/tivit.py:1416` |  | yes | **never** |
 | `sieve_real_fuel` | `'combo'` | 1 | `edhmc/tivit.py:338` | §0z71 | yes | yes |
@@ -257,7 +257,7 @@ show up first.
 | `tutor_policy` | `<none>` | 2 | `edhmc/lorehold.py:1229` |  | yes | yes |
 | `tutor_targets` | `()` | 1 | `edhmc/lorehold.py:1226` |  | **no** | yes |
 | `vault_hold` | `'never'` | 1 | `edhmc/engine.py:2025` | §0z68 | yes | yes |
-| `vault_min_power` | `3` | 1 | `edhmc/engine.py:2341` | §4 | **no** | **never** |
+| `vault_min_power` | `3` | 1 | `edhmc/engine.py:2341` | §4 | yes | **never** |
 | `vault_min_treasures` | `4` | 2 | `edhmc/engine.py:2061` | §0z68 | yes | yes |
 | `vault_paid` | `True` | 1 | `edhmc/engine.py:2331` | §4 | **no** | yes |
 | `watch` | `()` | 18 | `edhmc/azusa.py:1845` | §0z104 | yes | yes |
@@ -308,21 +308,21 @@ nobody has tested.
 
 ## The knobs no document mentions
 
-**65 of 223.** Not an error — most knobs are
+**61 of 223.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `land_etb_rules`, `land_fetch`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `shock_pay`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `vault_min_power`, `vault_paid`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`altar_mana`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `vault_paid`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 
-**60 of 223.** The name appears nowhere in
+**59 of 223.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;
 §0z20 swept it 6 → 0, found it was not load-bearing, and that is the
 result nobody would have believed unmeasured.
 
-`archetype_weights`, `archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `cryptic_caves_min_lands`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_spot`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `everywhere_is_token`, `extra_turn_cap`, `first_wipe_turn`, `goad_block_share`, `hand_cap`, `hold_min_value`, `karmic_echo`, `land_floor`, `land_outlets`, `life_cap`, `locthwain_life_floor`, `locthwain_max_loss`, `lorehold_recursion`, `luminarch_per_opponent`, `magistrate_token_cap`, `mdfc_land_floor`, `moloid_mill_floor`, `monologue_tax_rate`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `pearl_lifelink_cap`, `populate_soul_first`, `protect_min`, `queen_soldier`, `reservoir_floor`, `scry_land_bottom`, `selenia_curse_target`, `set_top_gate`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `thomil_lord_fodder`, `tivit_sweepers`, `token_cap`, `treasure_hoard`, `trostani_attacks`, `tutor_floor`, `vault_min_power`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`archetype_weights`, `archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `cryptic_caves_min_lands`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_spot`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `everywhere_is_token`, `extra_turn_cap`, `first_wipe_turn`, `goad_block_share`, `hand_cap`, `hold_min_value`, `karmic_echo`, `land_floor`, `life_cap`, `locthwain_life_floor`, `locthwain_max_loss`, `lorehold_recursion`, `luminarch_per_opponent`, `magistrate_token_cap`, `mdfc_land_floor`, `moloid_mill_floor`, `monologue_tax_rate`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `pearl_lifelink_cap`, `populate_soul_first`, `protect_min`, `queen_soldier`, `reservoir_floor`, `scry_land_bottom`, `selenia_curse_target`, `set_top_gate`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `thomil_lord_fodder`, `tivit_sweepers`, `token_cap`, `treasure_hoard`, `trostani_attacks`, `tutor_floor`, `vault_min_power`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 

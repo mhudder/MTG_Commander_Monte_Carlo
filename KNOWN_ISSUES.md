@@ -163,6 +163,7 @@ Methodology that used to live at the end of this file is now
 | [0z112](#0z112) | MEASURED | **The land ablation: every nonbasic land in seven decks against the basic it would replace** (147 lands, N=15,000, identity-classified). Its NOOP arm found **one Card object per basic NAME in every deck** (`[L(...)] * n`): identity checks read two copies as one card -- Shigeki put two Forests onto the battlefield, trostani's hideaway dropped a card; rendmaw 54 games in 15,000, trostani 7, the rest none. And its largest row, **tivit's Havengul Laboratory at −0.0581**, was a POLICY: the Clue activation ran in the upkeep, four mana before every main phase. Moved to the end step: **+0.0381 / +0.0589**. Painlands pay no life anywhere |
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
 | [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were both missing** (azusa), Kozilek labelled SCRIPTED. Implemented: **+0.0224 ±0.0033 at T20**; the Eye now ties a Forest at T20 where it cost 0.011. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237, both horizons. Awaken the Woods' Kozilek cut was priced on the broken card |
+| [0z115](#0z115) | FIXED | **Lands play by their own text**: entry conditions, painland/horizon/fetch/shock life and karoos generated from Scryfall into `LAND_RULES`; Temple of the False God, Nykthos, Eldrazi Temple and **Vault of the Archangel -- free permanent lifelink in karlov, worth 0.028** -- corrected; Mikokoro, Geier Reach (lorehold **+0.0115**), the Castles, High Market, Phyrexian Tower, Petrified Field, Crystal Vein implemented. Life and entry costs take 0.007-0.032 from every deck. Trostani moved through a latent bug: an uncracked fetch paid {1}. The shock policy does not matter. All seven tables SUSPECT: the rebuild is unblocked |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9996,6 +9997,117 @@ azusa's cache is SUSPECT twice over -- the engine changed and the staged list
 changed -- and only a rebuild clears that (CLAUDE.md, "more than one right
 check"). Its Kozilek row is understated until then. Deferred with the other
 three, as the owner asked.
+
+## 0z115. FIXED — lands play by their own text: entering tapped, life costs, and the utility lands' abilities
+
+The owner, 2026-10-06, before the rebuild: "the life cost of the painlands
+definitely needs to be implemented and rules where lands enter tapped must be
+respected", plus the lands the model got wrong and the on-theme abilities it
+did not model (§0z112's reading of the land ablation).
+
+### Rules from oracle text, not hand tags
+
+`tools/tag_flying.py` now classifies every land's Scryfall text
+(`classify_land`) into `_evasion.LAND_RULES` and `LAND_TYPES`, beside FLYING
+and the subtype sets (§0z4's rule pointed at land text). It reads shock,
+fast, slow, battle, bond, check, count (Witch's Cottage) and reveal (snarl)
+entry conditions, painland and horizon-land pain, fetches (life, types,
+tapped / untap-at-four), karoos, and conditional mana (Tainted Field's Swamp,
+Temple of the False God's five lands) -- and it RAISES on an enters-tapped
+clause it cannot read. First run: two misreads caught before use (Cryptic
+Caves' land-count condition is on its sacrifice, not its mana; Ancient Tomb
+has no painless mode). The generated rules agree with trostani's hand tags
+(the only deck that had them) and with every module's static `tapped` field.
+
+`engine` applies them for every engine that plays lands through `play_land`
+(rendmaw, lorehold, karlov, tivit, shilgengar) and through the two other land
+plays (Bolas's Citadel, Verge Rangers); azusa charges its true fetches' life
+in its own `crack_fetch`. The painlands' pip is known only from the cost, so
+`can_pay` now returns a `Payment` carrying it and `spend` charges once
+(ARCHITECTURE.md's pitfalls). Every rule has a switch, and with all of them
+off the engine matches the previous HEAD on every output key in all seven
+decks (300 games each, every numeric key, not the eight metrics).
+
+### The lands the model got wrong (group 1)
+
+* **Vault of the Archangel** was free, permanent team lifelink in karlov; it
+  is "{2}{W}{B}, {T}: ... until end of turn". Now one shared activation
+  (karlov and shilgengar), at combat on spare mana, at `vault_min_power` (3).
+* **Temple of the False God** tapped for {C} from turn one (karlov) or {C}
+  below five lands (azusa): it makes nothing below five.
+* **Nykthos** was listed as a green land; it taps for {C}, and its devotion
+  ability is modelled the Castle Garenbrig way (fires when it unlocks a card,
+  at devotion 4 or more). The {C} is a data fix with no switch.
+* **Eldrazi Temple**'s second {C} for an Eldrazi: {1} off Kozilek and Ulamog.
+
+### Life and entry (group 2)
+
+Shock pays 2 life above `shock_life_floor` (15), trostani's rule; painlands
+1 life per coloured pip; horizon lands 1 per tap; true fetches 1 life,
+cracked as played for the colour the board lacks, thinning the library;
+karoos return a land to hand.
+
+### The utility lands' abilities (group 3)
+
+Lorehold: **Mikokoro** and **Geier Reach Sanitarium** draw on an opponent's
+turn -- a miracle window while Lorehold is not out, a draw or a rummage on
+leftover mana while she is. Shilgengar: **Castle Ardenvale** (a 1/1 at the end
+step), **High Market** and **Phyrexian Tower** (outlets when no free one is
+live; the Tower's {B}{B} is not modelled), **Castle Locthwain** (also
+rendmaw's, with **High Market**). Azusa: **Petrified Field** (returns a fetch),
+**Crystal Vein** (sacrificed when its {C}{C} unlocks a card).
+
+### Measured
+
+`diagnostics/run_land_fidelity.py` (`results/land_fidelity_20261006.txt`),
+N=15,000 paired, the staged lists. Each row turns a GROUP OFF and is ARM
+MINUS THE NEW ENGINE, so a positive number is what the missing rule had been
+flattering the deck by:
+
+| deck | all off, T20 | G1 the wrong lands | G2 life and entry | G3 abilities |
+|---|---|---|---|---|
+| rendmaw | **+0.0149 ±0.0038** | −0.0003 | **+0.0166 ±0.0036** | **−0.0022 ±0.0012** |
+| lorehold | **+0.0187 ±0.0074** | 0 | **+0.0321 ±0.0071** | **−0.0115 ±0.0037** |
+| karlov | **+0.0350 ±0.0045** | **+0.0279 ±0.0042** | **+0.0072 ±0.0021** | 0 |
+| tivit | **+0.0103 ±0.0034** | 0 | **+0.0103 ±0.0034** | 0 |
+| shilgengar | **+0.0417 ±0.0059** | **+0.0236 ±0.0030** | **+0.0210 ±0.0054** | **−0.0024 ±0.0011** |
+| azusa | **+0.0065 ±0.0044** | +0.0007 ±0.0028 | **+0.0088 ±0.0015** | −0.0031 ±0.0033 (T10 −0.0032*) |
+
+**Karlov's Vault was worth 0.028 of the deck's win rate as a free
+ability**, the largest single correction here and a policy-shaped one: an
+activated ability read as a static, costing nothing and lasting forever. For
+shilgengar "G1 off" is a FREE Vault, not the old engine (which had none), so
++0.0236 is what a free Vault would add there. Life and entry costs take
+0.007 to 0.032 from every deck, lorehold most (three shocks, two painlands
+including a horizon land, two true fetches, a karoo: 2.9 life a game).
+Lorehold's draw lands are worth **+0.0115 ±0.0037** at T20 -- the miracle
+deck's windows, as predicted.
+
+**The shocklands' policy does not matter.** `shock_pay="needed"` (pay only
+when the untapped land lets a card be cast this turn) against the default
+"floor" is inside its bar in every deck (karlov +0.0007 ±0.0009, lorehold
++0.0017 ±0.0027). The default stays trostani's rule, and the knob is said
+out loud as not load-bearing.
+
+### Trostani moved too, and the cause was a latent bug
+
+Trostani has its own land rules and none of §0z115's switches touch it -- but
+its baseline moved, and only `land_fetch=False` restored it. Its fetchlands
+produce no colour, and `engine.available_mana` added a unit for every land:
+an EMPTY colour set, which `can_pay` happily spent on generic. **An uncracked
+fetch (nothing left to find, or one life left) paid {1}.** A fetch has no mana
+ability; `fetch_waits` now gives it none, in every engine.
+
+### Also
+
+* Revel in Riches moved from KNOWN_BLIND to PARTLY_MODELLED: its alt-win is
+  modelled, and the 40 label seeds reached it under some intermediate engines
+  and not others, so the label test flipped with every change. Said once.
+* The tables: every deck's baseline moved (`check_unchanged_decks --n=3000`
+  against f62ba44: seven of seven), so all seven are SUSPECT and the rebuild
+  this work was done ahead of is now unblocked. The staged swaps should be
+  re-measured on this engine at the same time (§0z81's restage).
+* `tests/test_land_rules.py`: 26 cases, 14 mutations, exact sets.
 
 ## How to read an ablation table
 

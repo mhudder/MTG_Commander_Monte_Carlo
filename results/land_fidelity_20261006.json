@@ -1,0 +1,2033 @@
+{
+ "n": 15000,
+ "decks": {
+  "rendmaw": {
+   "baseline_counters": {
+    "shock_life": 0.4089333333333333,
+    "painland_life": 0.27926666666666666,
+    "fetch_life": 0.0,
+    "karoo_bounces": 0.4588,
+    "fetches_cracked": 0.0,
+    "lands_entered_tapped_by_rule": 0.22153333333333333,
+    "archangel_vault_activations": 0.0,
+    "nykthos_activations": 0.0,
+    "crystal_vein_sacs": 0.0,
+    "petrified_returns": 0.0,
+    "locthwain_draws": 0.07353333333333334,
+    "high_market_sacs": 0.0482,
+    "land_outlet_sacs": 0.0,
+    "ardenvale_tokens": 0.0,
+    "draw_land_activations": 0.0,
+    "draw_land_windows": 0.0,
+    "life_lost_to_own_cards": 1.5114666666666667
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "damage10": [
+       2.3989426712000252,
+       0.18448344388838306
+      ],
+      "cards_drawn10": [
+       0.1596,
+       0.025953224916325766
+      ],
+      "tokens_made10": [
+       0.3906,
+       0.03519649509838337
+      ],
+      "rendmaw_triggers10": [
+       0.1136,
+       0.015432698951384414
+      ],
+      "won10": [
+       0.006733333333333333,
+       0.001664812074655865
+      ],
+      "damage20": [
+       2.70625117366624,
+       0.23984535125333778
+      ],
+      "cards_drawn20": [
+       0.20473333333333332,
+       0.0423681045950894
+      ],
+      "tokens_made20": [
+       0.4644,
+       0.04904377666388363
+      ],
+      "rendmaw_triggers20": [
+       0.1412,
+       0.021579692656082113
+      ],
+      "won20": [
+       0.014866666666666667,
+       0.003840227123919037
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.7534
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "damage10": [
+       0.16969376188839103,
+       0.04388053010288477
+      ],
+      "cards_drawn10": [
+       0.006933333333333333,
+       0.0045327570901388505
+      ],
+      "tokens_made10": [
+       0.0154,
+       0.00877487060176101
+      ],
+      "rendmaw_triggers10": [
+       -0.0015333333333333334,
+       0.0043199862416397426
+      ],
+      "won10": [
+       0.0004,
+       0.0004888842865940782
+      ],
+      "damage20": [
+       0.1347194588883295,
+       0.060746170724737376
+      ],
+      "cards_drawn20": [
+       0.007,
+       0.009931225517439465
+      ],
+      "tokens_made20": [
+       0.0154,
+       0.012187791127180127
+      ],
+      "rendmaw_triggers20": [
+       -0.0010666666666666667,
+       0.005704778583364657
+      ],
+      "won20": [
+       -0.0002666666666666667,
+       0.0010775324041212813
+      ]
+     },
+     "counters": {
+      "shock_life": 0.4090666666666667,
+      "painland_life": 0.2652,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.4588,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.22173333333333334,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.07386666666666666,
+      "high_market_sacs": 0.049,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.503
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "damage10": [
+       2.252321832117703,
+       0.179641516704292
+      ],
+      "cards_drawn10": [
+       0.1886,
+       0.025362114631240256
+      ],
+      "tokens_made10": [
+       0.3842,
+       0.03408206271206931
+      ],
+      "rendmaw_triggers10": [
+       0.12046666666666667,
+       0.014755597699061748
+      ],
+      "won10": [
+       0.006533333333333334,
+       0.0016076239449635803
+      ],
+      "damage20": [
+       2.5960640018791428,
+       0.2312649042347943
+      ],
+      "cards_drawn20": [
+       0.2832,
+       0.04067773741643291
+      ],
+      "tokens_made20": [
+       0.4928666666666667,
+       0.04709076843439224
+      ],
+      "rendmaw_triggers20": [
+       0.16973333333333335,
+       0.020583842195781347
+      ],
+      "won20": [
+       0.0166,
+       0.0035663054699229756
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.07653333333333333,
+      "high_market_sacs": 0.051333333333333335,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.8598
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "damage10": [
+       -0.012322237005557369,
+       0.015178556979093715
+      ],
+      "cards_drawn10": [
+       -0.03253333333333333,
+       0.003635670199833473
+      ],
+      "tokens_made10": [
+       -0.007666666666666666,
+       0.0026138069886558974
+      ],
+      "rendmaw_triggers10": [
+       -0.005866666666666667,
+       0.001854809381929382
+      ],
+      "won10": [
+       -6.666666666666667e-05,
+       0.0002921873409301819
+      ],
+      "damage20": [
+       -0.039244465240557025,
+       0.033266541956565115
+      ],
+      "cards_drawn20": [
+       -0.07993333333333333,
+       0.009425684025324637
+      ],
+      "tokens_made20": [
+       -0.03453333333333333,
+       0.00831596765654132
+      ],
+      "rendmaw_triggers20": [
+       -0.0222,
+       0.004438214683147371
+      ],
+      "won20": [
+       -0.0022,
+       0.0011899489055622282
+      ]
+     },
+     "counters": {
+      "shock_life": 0.40786666666666666,
+      "painland_life": 0.276,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.4583333333333333,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.2212,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.3989333333333334
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "damage10": [
+       -0.00762612069979042,
+       0.035703266474009905
+      ],
+      "cards_drawn10": [
+       0.0048,
+       0.005921653197353608
+      ],
+      "tokens_made10": [
+       -0.009733333333333333,
+       0.0073925379116887464
+      ],
+      "rendmaw_triggers10": [
+       -0.008133333333333333,
+       0.004539774860648739
+      ],
+      "won10": [
+       -6.666666666666667e-05,
+       0.00039201161541709825
+      ],
+      "damage20": [
+       0.044373303835667684,
+       0.05476841614654124
+      ],
+      "cards_drawn20": [
+       0.016533333333333334,
+       0.01159950976837217
+      ],
+      "tokens_made20": [
+       0.0062,
+       0.011652766297774937
+      ],
+      "rendmaw_triggers20": [
+       -0.0002666666666666667,
+       0.006882281530383908
+      ],
+      "won20": [
+       0.00013333333333333334,
+       0.001225800988731301
+      ]
+     },
+     "counters": {
+      "shock_life": 0.18733333333333332,
+      "painland_life": 0.2813333333333333,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.46126666666666666,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.32626666666666665,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0748,
+      "high_market_sacs": 0.048,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.2950666666666666
+     }
+    }
+   }
+  },
+  "lorehold": {
+   "baseline_counters": {
+    "shock_life": 0.8668,
+    "painland_life": 1.1161333333333334,
+    "fetch_life": 0.5838,
+    "karoo_bounces": 0.2693333333333333,
+    "fetches_cracked": 0.7376666666666667,
+    "lands_entered_tapped_by_rule": 0.2606,
+    "archangel_vault_activations": 0.0,
+    "nykthos_activations": 0.0,
+    "crystal_vein_sacs": 0.0,
+    "petrified_returns": 0.0,
+    "locthwain_draws": 0.0,
+    "high_market_sacs": 0.0,
+    "land_outlet_sacs": 0.0,
+    "ardenvale_tokens": 0.0,
+    "draw_land_activations": 0.6648,
+    "draw_land_windows": 0.2322,
+    "life_lost_to_own_cards": 2.9408
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "mv_cheated10": [
+       0.411,
+       0.34307196496422443
+      ],
+      "damage10": [
+       1.4906888888888887,
+       0.4142227162412262
+      ],
+      "miracles_cast10": [
+       0.0344,
+       0.026617225267657384
+      ],
+      "total_mv_cast10": [
+       0.7868666666666667,
+       0.5014386305216846
+      ],
+      "won10": [
+       0.0104,
+       0.005054752415517162
+      ],
+      "mv_cheated20": [
+       0.5938666666666667,
+       0.4773783528803969
+      ],
+      "damage20": [
+       2.0281,
+       0.4710902010507307
+      ],
+      "miracles_cast20": [
+       0.017333333333333333,
+       0.031982515112578984
+      ],
+      "total_mv_cast20": [
+       0.9569333333333333,
+       0.7027884615663077
+      ],
+      "won20": [
+       0.018733333333333334,
+       0.0074376218824096715
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.13706666666666667
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "mv_cheated10": [
+       0.0,
+       0.0
+      ],
+      "damage10": [
+       0.0,
+       0.0
+      ],
+      "miracles_cast10": [
+       0.0,
+       0.0
+      ],
+      "total_mv_cast10": [
+       0.0,
+       0.0
+      ],
+      "won10": [
+       0.0,
+       0.0
+      ],
+      "mv_cheated20": [
+       0.0,
+       0.0
+      ],
+      "damage20": [
+       0.0,
+       0.0
+      ],
+      "miracles_cast20": [
+       0.0,
+       0.0
+      ],
+      "total_mv_cast20": [
+       0.0,
+       0.0
+      ],
+      "won20": [
+       0.0,
+       0.0
+      ]
+     },
+     "counters": {
+      "shock_life": 0.8668,
+      "painland_life": 1.1161333333333334,
+      "fetch_life": 0.5838,
+      "karoo_bounces": 0.2693333333333333,
+      "fetches_cracked": 0.7376666666666667,
+      "lands_entered_tapped_by_rule": 0.2606,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.6648,
+      "draw_land_windows": 0.2322,
+      "life_lost_to_own_cards": 2.9408
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "mv_cheated10": [
+       0.7448666666666667,
+       0.33490732223083136
+      ],
+      "damage10": [
+       1.9174777777777776,
+       0.40501768247758957
+      ],
+      "miracles_cast10": [
+       0.06586666666666667,
+       0.025871187335978044
+      ],
+      "total_mv_cast10": [
+       1.492,
+       0.48847095197304924
+      ],
+      "won10": [
+       0.014066666666666667,
+       0.004854269201909044
+      ],
+      "mv_cheated20": [
+       1.4824666666666666,
+       0.46157787372235165
+      ],
+      "damage20": [
+       2.821055555555555,
+       0.45768684244423646
+      ],
+      "miracles_cast20": [
+       0.08786666666666666,
+       0.030927429964830517
+      ],
+      "total_mv_cast20": [
+       2.686733333333333,
+       0.6798887380052085
+      ],
+      "won20": [
+       0.03213333333333333,
+       0.007097868716383361
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.7044,
+      "draw_land_windows": 0.2476,
+      "life_lost_to_own_cards": 0.14326666666666665
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "mv_cheated10": [
+       -0.28926666666666667,
+       0.12013691356095145
+      ],
+      "damage10": [
+       -0.45092222222222217,
+       0.13469458653022776
+      ],
+      "miracles_cast10": [
+       -0.030733333333333335,
+       0.009698600058826324
+      ],
+      "total_mv_cast10": [
+       -0.6450666666666667,
+       0.17772019689520263
+      ],
+      "won10": [
+       -0.003266666666666667,
+       0.0020024665190439867
+      ],
+      "mv_cheated20": [
+       -0.6746666666666666,
+       0.2064195369217822
+      ],
+      "damage20": [
+       -0.8192777777777778,
+       0.1804091766233987
+      ],
+      "miracles_cast20": [
+       -0.056466666666666665,
+       0.01383087974560169
+      ],
+      "total_mv_cast20": [
+       -1.4616,
+       0.3062617648801174
+      ],
+      "won20": [
+       -0.011533333333333333,
+       0.003689009210800039
+      ]
+     },
+     "counters": {
+      "shock_life": 0.8598666666666667,
+      "painland_life": 1.0978666666666668,
+      "fetch_life": 0.5721333333333334,
+      "karoo_bounces": 0.2690666666666667,
+      "fetches_cracked": 0.7247333333333333,
+      "lands_entered_tapped_by_rule": 0.26033333333333336,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.8952
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "mv_cheated10": [
+       -0.045533333333333335,
+       0.10269810506893913
+      ],
+      "damage10": [
+       -0.03013333333333335,
+       0.11893562853863325
+      ],
+      "miracles_cast10": [
+       0.0006,
+       0.007977350444898303
+      ],
+      "total_mv_cast10": [
+       -0.0564,
+       0.1497556212197023
+      ],
+      "won10": [
+       -0.0012666666666666666,
+       0.0018057956805352293
+      ],
+      "mv_cheated20": [
+       0.1198,
+       0.15426275777565135
+      ],
+      "damage20": [
+       0.15863333333333338,
+       0.13893527143260942
+      ],
+      "miracles_cast20": [
+       0.008333333333333333,
+       0.010378239703281607
+      ],
+      "total_mv_cast20": [
+       0.1872,
+       0.225597544505403
+      ],
+      "won20": [
+       0.0016666666666666668,
+       0.0027000514295506517
+      ]
+     },
+     "counters": {
+      "shock_life": 0.4544,
+      "painland_life": 1.1135333333333333,
+      "fetch_life": 0.5860666666666666,
+      "karoo_bounces": 0.2713333333333333,
+      "fetches_cracked": 0.7406,
+      "lands_entered_tapped_by_rule": 0.339,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.671,
+      "draw_land_windows": 0.23446666666666666,
+      "life_lost_to_own_cards": 2.5327333333333333
+     }
+    }
+   }
+  },
+  "karlov": {
+   "baseline_counters": {
+    "shock_life": 0.44266666666666665,
+    "painland_life": 0.5120666666666667,
+    "fetch_life": 0.0,
+    "karoo_bounces": 0.0,
+    "fetches_cracked": 0.0,
+    "lands_entered_tapped_by_rule": 0.15766666666666668,
+    "archangel_vault_activations": 0.16366666666666665,
+    "nykthos_activations": 0.0,
+    "crystal_vein_sacs": 0.0,
+    "petrified_returns": 0.0,
+    "locthwain_draws": 0.0,
+    "high_market_sacs": 0.0,
+    "land_outlet_sacs": 0.0,
+    "ardenvale_tokens": 0.0,
+    "draw_land_activations": 0.0,
+    "draw_land_windows": 0.0,
+    "life_lost_to_own_cards": 1.441
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "damage10": [
+       3.4439545679012347,
+       0.23368837626829328
+      ],
+      "lifegain_triggers10": [
+       1.3018666666666667,
+       0.10665774751166435
+      ],
+      "final_life10": [
+       9.795240228769634,
+       0.6417818718090342
+      ],
+      "cards_drawn10": [
+       0.051,
+       0.019630243262516944
+      ],
+      "won10": [
+       0.027533333333333333,
+       0.0034015369720694195
+      ],
+      "damage20": [
+       3.121911111111111,
+       0.2777959012537513
+      ],
+      "lifegain_triggers20": [
+       1.3213333333333332,
+       0.14979409113288233
+      ],
+      "final_life20": [
+       10.187862297168001,
+       0.9141365180563388
+      ],
+      "cards_drawn20": [
+       -0.0458,
+       0.0416218561002226
+      ],
+      "won20": [
+       0.035,
+       0.004505071825833801
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.4978666666666667
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "damage10": [
+       3.114452839506173,
+       0.22154118509550297
+      ],
+      "lifegain_triggers10": [
+       1.2236,
+       0.10241608000002513
+      ],
+      "final_life10": [
+       8.890778861628771,
+       0.6343684256462607
+      ],
+      "cards_drawn10": [
+       0.042666666666666665,
+       0.017951313471493893
+      ],
+      "won10": [
+       0.024,
+       0.003193723827257504
+      ],
+      "damage20": [
+       2.805567901234568,
+       0.2594487046091813
+      ],
+      "lifegain_triggers20": [
+       1.2714,
+       0.13987978229283368
+      ],
+      "final_life20": [
+       9.113640481009721,
+       0.8700409484038515
+      ],
+      "cards_drawn20": [
+       -0.05053333333333333,
+       0.037798882056451474
+      ],
+      "won20": [
+       0.027933333333333334,
+       0.004175948081642481
+      ]
+     },
+     "counters": {
+      "shock_life": 0.4437333333333333,
+      "painland_life": 0.5024666666666666,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.15573333333333333,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.4362
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "damage10": [
+       0.381639012345679,
+       0.0852924851478238
+      ],
+      "lifegain_triggers10": [
+       0.06993333333333333,
+       0.04072821873972332
+      ],
+      "final_life10": [
+       0.9570908067958623,
+       0.13789038221543987
+      ],
+      "cards_drawn10": [
+       0.010666666666666666,
+       0.008466729383476406
+      ],
+      "won10": [
+       0.004,
+       0.0013564634014711328
+      ],
+      "damage20": [
+       0.36230469135802473,
+       0.118798613038443
+      ],
+      "lifegain_triggers20": [
+       0.0598,
+       0.06574523385201576
+      ],
+      "final_life20": [
+       0.9321269018547025,
+       0.3146232461168001
+      ],
+      "cards_drawn20": [
+       0.013066666666666667,
+       0.021269870638194906
+      ],
+      "won20": [
+       0.0072,
+       0.0020711352934627237
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.164,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.4948666666666667
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "damage10": [
+       0.0,
+       0.0
+      ],
+      "lifegain_triggers10": [
+       0.0,
+       0.0
+      ],
+      "final_life10": [
+       0.0,
+       0.0
+      ],
+      "cards_drawn10": [
+       0.0,
+       0.0
+      ],
+      "won10": [
+       0.0,
+       0.0
+      ],
+      "damage20": [
+       0.0,
+       0.0
+      ],
+      "lifegain_triggers20": [
+       0.0,
+       0.0
+      ],
+      "final_life20": [
+       0.0,
+       0.0
+      ],
+      "cards_drawn20": [
+       0.0,
+       0.0
+      ],
+      "won20": [
+       0.0,
+       0.0
+      ]
+     },
+     "counters": {
+      "shock_life": 0.44266666666666665,
+      "painland_life": 0.5120666666666667,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.15766666666666668,
+      "archangel_vault_activations": 0.16366666666666665,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.441
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "damage10": [
+       -0.003936296296296297,
+       0.03248206194926448
+      ],
+      "lifegain_triggers10": [
+       -0.0028,
+       0.012000326429885395
+      ],
+      "final_life10": [
+       0.07568000076290075,
+       0.05558120224054167
+      ],
+      "cards_drawn10": [
+       -0.0033333333333333335,
+       0.0024159419464747666
+      ],
+      "won10": [
+       0.0002666666666666667,
+       0.0004131960162094204
+      ],
+      "damage20": [
+       -0.005654320987654323,
+       0.047546472254196656
+      ],
+      "lifegain_triggers20": [
+       -0.010066666666666666,
+       0.023979282613846613
+      ],
+      "final_life20": [
+       0.13271033012698316,
+       0.14091830771628175
+      ],
+      "cards_drawn20": [
+       -0.0068,
+       0.008955786548478778
+      ],
+      "won20": [
+       0.0006666666666666666,
+       0.0009422217386119398
+      ]
+     },
+     "counters": {
+      "shock_life": 0.2733333333333333,
+      "painland_life": 0.5146,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.22106666666666666,
+      "archangel_vault_activations": 0.16353333333333334,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.2737333333333334
+     }
+    }
+   }
+  },
+  "tivit": {
+   "baseline_counters": {
+    "shock_life": 1.3188,
+    "painland_life": 0.0,
+    "fetch_life": 0.0,
+    "karoo_bounces": 0.0,
+    "fetches_cracked": 0.0,
+    "lands_entered_tapped_by_rule": 0.2763333333333333,
+    "archangel_vault_activations": 0.0,
+    "nykthos_activations": 0.0,
+    "crystal_vein_sacs": 0.0,
+    "petrified_returns": 0.0,
+    "locthwain_draws": 0.0,
+    "high_market_sacs": 0.0,
+    "land_outlet_sacs": 0.0,
+    "ardenvale_tokens": 0.0,
+    "draw_land_activations": 0.0,
+    "draw_land_windows": 0.0,
+    "life_lost_to_own_cards": 1.3188
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "damage10": [
+       0.3792021899348215,
+       0.21454799242181916
+      ],
+      "artifacts_made10": [
+       -0.20873333333333333,
+       1.1790012064809334
+      ],
+      "tivit_triggers10": [
+       0.0562,
+       0.09318205705892349
+      ],
+      "votes_cast10": [
+       0.326,
+       0.4519368316807778
+      ],
+      "won10": [
+       0.003,
+       0.002570153189823765
+      ],
+      "damage20": [
+       0.7839812047395329,
+       0.22080182452805533
+      ],
+      "artifacts_made20": [
+       0.3518,
+       1.3679671340741044
+      ],
+      "tivit_triggers20": [
+       0.09853333333333333,
+       0.11702130808594106
+      ],
+      "votes_cast20": [
+       0.5460666666666667,
+       0.5349195771571361
+      ],
+      "won20": [
+       0.010333333333333333,
+       0.0034059755641953036
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "damage10": [
+       0.0,
+       0.0
+      ],
+      "artifacts_made10": [
+       0.0,
+       0.0
+      ],
+      "tivit_triggers10": [
+       0.0,
+       0.0
+      ],
+      "votes_cast10": [
+       0.0,
+       0.0
+      ],
+      "won10": [
+       0.0,
+       0.0
+      ],
+      "damage20": [
+       0.0,
+       0.0
+      ],
+      "artifacts_made20": [
+       0.0,
+       0.0
+      ],
+      "tivit_triggers20": [
+       0.0,
+       0.0
+      ],
+      "votes_cast20": [
+       0.0,
+       0.0
+      ],
+      "won20": [
+       0.0,
+       0.0
+      ]
+     },
+     "counters": {
+      "shock_life": 1.3188,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.2763333333333333,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.3188
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "damage10": [
+       0.3792021899348215,
+       0.21454799242181916
+      ],
+      "artifacts_made10": [
+       -0.20873333333333333,
+       1.1790012064809334
+      ],
+      "tivit_triggers10": [
+       0.0562,
+       0.09318205705892349
+      ],
+      "votes_cast10": [
+       0.326,
+       0.4519368316807778
+      ],
+      "won10": [
+       0.003,
+       0.002570153189823765
+      ],
+      "damage20": [
+       0.7839812047395329,
+       0.22080182452805533
+      ],
+      "artifacts_made20": [
+       0.3518,
+       1.3679671340741044
+      ],
+      "tivit_triggers20": [
+       0.09853333333333333,
+       0.11702130808594106
+      ],
+      "votes_cast20": [
+       0.5460666666666667,
+       0.5349195771571361
+      ],
+      "won20": [
+       0.010333333333333333,
+       0.0034059755641953036
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "damage10": [
+       0.0,
+       0.0
+      ],
+      "artifacts_made10": [
+       0.0,
+       0.0
+      ],
+      "tivit_triggers10": [
+       0.0,
+       0.0
+      ],
+      "votes_cast10": [
+       0.0,
+       0.0
+      ],
+      "won10": [
+       0.0,
+       0.0
+      ],
+      "damage20": [
+       0.0,
+       0.0
+      ],
+      "artifacts_made20": [
+       0.0,
+       0.0
+      ],
+      "tivit_triggers20": [
+       0.0,
+       0.0
+      ],
+      "votes_cast20": [
+       0.0,
+       0.0
+      ],
+      "won20": [
+       0.0,
+       0.0
+      ]
+     },
+     "counters": {
+      "shock_life": 1.3188,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.2763333333333333,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 1.3188
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "damage10": [
+       -0.16548363636363642,
+       0.10471670874576627
+      ],
+      "artifacts_made10": [
+       0.24373333333333333,
+       0.4999376477433782
+      ],
+      "tivit_triggers10": [
+       0.015,
+       0.04804175274580798
+      ],
+      "votes_cast10": [
+       0.07346666666666667,
+       0.22239451925373505
+      ],
+      "won10": [
+       -0.0012666666666666666,
+       0.0014724481006427803
+      ],
+      "damage20": [
+       0.08169110149110147,
+       0.11786622714705232
+      ],
+      "artifacts_made20": [
+       0.4155333333333333,
+       0.6732083189728164
+      ],
+      "tivit_triggers20": [
+       0.043,
+       0.06288620372787268
+      ],
+      "votes_cast20": [
+       0.15973333333333334,
+       0.2652586119738722
+      ],
+      "won20": [
+       0.0008666666666666666,
+       0.002102905345930024
+      ]
+     },
+     "counters": {
+      "shock_life": 0.6642666666666667,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.532,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.6642666666666667
+     }
+    }
+   }
+  },
+  "shilgengar": {
+   "baseline_counters": {
+    "shock_life": 0.9452,
+    "painland_life": 1.4872,
+    "fetch_life": 0.42893333333333333,
+    "karoo_bounces": 0.3576,
+    "fetches_cracked": 0.42893333333333333,
+    "lands_entered_tapped_by_rule": 0.42686666666666667,
+    "archangel_vault_activations": 0.26653333333333334,
+    "nykthos_activations": 0.0,
+    "crystal_vein_sacs": 0.0,
+    "petrified_returns": 0.0,
+    "locthwain_draws": 0.04833333333333333,
+    "high_market_sacs": 0.0,
+    "land_outlet_sacs": 0.003266666666666667,
+    "ardenvale_tokens": 0.0958,
+    "draw_land_activations": 0.0,
+    "draw_land_windows": 0.0,
+    "life_lost_to_own_cards": 2.9284666666666666
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "damage10": [
+       3.729945432098766,
+       0.24401633330715033
+      ],
+      "blood_made10": [
+       0.3034,
+       0.04844534124020037
+      ],
+      "creatures_sacrificed10": [
+       0.0328,
+       0.013546912887948048
+      ],
+      "single_reanimations10": [
+       -0.0152,
+       0.006518551687736774
+      ],
+      "won10": [
+       0.0114,
+       0.0021273732062610097
+      ],
+      "damage20": [
+       5.552036444444444,
+       0.3701982965075687
+      ],
+      "blood_made20": [
+       0.47713333333333335,
+       0.06856159953082668
+      ],
+      "creatures_sacrificed20": [
+       0.0408,
+       0.02010085219293763
+      ],
+      "single_reanimations20": [
+       -0.028066666666666667,
+       0.011036236551782342
+      ],
+      "won20": [
+       0.04173333333333333,
+       0.00585819476197664
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "damage10": [
+       1.2058906172839505,
+       0.10601925712841509
+      ],
+      "blood_made10": [
+       0.16306666666666667,
+       0.025295270378019135
+      ],
+      "creatures_sacrificed10": [
+       0.019866666666666668,
+       0.004826131681575237
+      ],
+      "single_reanimations10": [
+       0.0026,
+       0.0014367788459866034
+      ],
+      "won10": [
+       0.007,
+       0.0013596381107353237
+      ],
+      "damage20": [
+       2.1429842469135805,
+       0.17959476358109983
+      ],
+      "blood_made20": [
+       0.3098666666666667,
+       0.03893245251272192
+      ],
+      "creatures_sacrificed20": [
+       0.04986666666666666,
+       0.008746860696311802
+      ],
+      "single_reanimations20": [
+       0.0076,
+       0.003767165578054311
+      ],
+      "won20": [
+       0.0236,
+       0.002990184724899737
+      ]
+     },
+     "counters": {
+      "shock_life": 0.9652,
+      "painland_life": 1.4714,
+      "fetch_life": 0.4318666666666667,
+      "karoo_bounces": 0.35886666666666667,
+      "fetches_cracked": 0.4318666666666667,
+      "lands_entered_tapped_by_rule": 0.4256,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.063,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0038,
+      "ardenvale_tokens": 0.11526666666666667,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.9559333333333333
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "damage10": [
+       2.5527372839506173,
+       0.21920860072917903
+      ],
+      "blood_made10": [
+       0.18273333333333333,
+       0.04244216693241141
+      ],
+      "creatures_sacrificed10": [
+       0.04886666666666667,
+       0.012869059690355181
+      ],
+      "single_reanimations10": [
+       -0.015266666666666666,
+       0.006461948196742319
+      ],
+      "won10": [
+       0.0032,
+       0.0015452719979533482
+      ],
+      "damage20": [
+       3.831860395061728,
+       0.34029904704474623
+      ],
+      "blood_made20": [
+       0.2915333333333333,
+       0.060100449520820734
+      ],
+      "creatures_sacrificed20": [
+       0.08506666666666667,
+       0.018810026703089545
+      ],
+      "single_reanimations20": [
+       -0.029,
+       0.010683412988927457
+      ],
+      "won20": [
+       0.021,
+       0.005353343167382422
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 0.0,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.2956666666666667,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.05993333333333333,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0033333333333333335,
+      "ardenvale_tokens": 0.107,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0818
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "damage10": [
+       -0.048042222222222215,
+       0.011538255602568293
+      ],
+      "blood_made10": [
+       -0.028866666666666665,
+       0.005566187905116734
+      ],
+      "creatures_sacrificed10": [
+       -0.026266666666666667,
+       0.0033408135010742964
+      ],
+      "single_reanimations10": [
+       -0.0004,
+       0.000413168465951273
+      ],
+      "won10": [
+       -6.666666666666667e-05,
+       0.00022632633516410342
+      ],
+      "damage20": [
+       -0.15331293827160491,
+       0.03898001931037039
+      ],
+      "blood_made20": [
+       -0.07286666666666666,
+       0.011050285800027931
+      ],
+      "creatures_sacrificed20": [
+       -0.06653333333333333,
+       0.0063231810822852695
+      ],
+      "single_reanimations20": [
+       -0.002266666666666667,
+       0.0014309696103671497
+      ],
+      "won20": [
+       -0.0024,
+       0.0011385158546405325
+      ]
+     },
+     "counters": {
+      "shock_life": 0.9436,
+      "painland_life": 1.4726,
+      "fetch_life": 0.42773333333333335,
+      "karoo_bounces": 0.3576,
+      "fetches_cracked": 0.42773333333333335,
+      "lands_entered_tapped_by_rule": 0.4264,
+      "archangel_vault_activations": 0.2668,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.843933333333333
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "damage10": [
+       -0.06045861728395062,
+       0.04554173841970111
+      ],
+      "blood_made10": [
+       -0.007066666666666666,
+       0.012737074333776282
+      ],
+      "creatures_sacrificed10": [
+       -0.0014666666666666667,
+       0.003946108530895496
+      ],
+      "single_reanimations10": [
+       0.0012666666666666666,
+       0.0017383466899219034
+      ],
+      "won10": [
+       -0.00013333333333333334,
+       0.0004132125454826123
+      ],
+      "damage20": [
+       0.035157481481481484,
+       0.08545047585741129
+      ],
+      "blood_made20": [
+       -0.0034666666666666665,
+       0.019209893514391178
+      ],
+      "creatures_sacrificed20": [
+       -0.0007333333333333333,
+       0.005646125275916731
+      ],
+      "single_reanimations20": [
+       0.0034,
+       0.003459270934679087
+      ],
+      "won20": [
+       0.0007333333333333333,
+       0.0016372611553780185
+      ]
+     },
+     "counters": {
+      "shock_life": 0.5397333333333333,
+      "painland_life": 1.4901333333333333,
+      "fetch_life": 0.42833333333333334,
+      "karoo_bounces": 0.3596666666666667,
+      "fetches_cracked": 0.42833333333333334,
+      "lands_entered_tapped_by_rule": 0.5646666666666667,
+      "archangel_vault_activations": 0.2638666666666667,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.048466666666666665,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0030666666666666668,
+      "ardenvale_tokens": 0.0964,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.5256
+     }
+    }
+   }
+  },
+  "azusa": {
+   "baseline_counters": {
+    "shock_life": 0.0,
+    "painland_life": 0.0,
+    "fetch_life": 2.335,
+    "karoo_bounces": 0.0,
+    "fetches_cracked": 4.796333333333333,
+    "lands_entered_tapped_by_rule": 0.0,
+    "archangel_vault_activations": 0.0,
+    "nykthos_activations": 0.13713333333333333,
+    "crystal_vein_sacs": 0.20033333333333334,
+    "petrified_returns": 0.08153333333333333,
+    "locthwain_draws": 0.0,
+    "high_market_sacs": 0.0,
+    "land_outlet_sacs": 0.0,
+    "ardenvale_tokens": 0.0,
+    "draw_land_activations": 0.0,
+    "draw_land_windows": 0.0,
+    "life_lost_to_own_cards": 2.335
+   },
+   "arms": {
+    "all off": {
+     "cells": {
+      "damage10": [
+       0.009466666666666667,
+       0.2667459584461955
+      ],
+      "landfall_triggers10": [
+       -0.0484,
+       0.05747785338437386
+      ],
+      "lands_played10": [
+       -0.0384,
+       0.031606692645694164
+      ],
+      "tokens_made10": [
+       -0.043866666666666665,
+       2.4946000993191193
+      ],
+      "won10": [
+       -0.0006,
+       0.003155088570067425
+      ],
+      "damage20": [
+       0.40613333333333335,
+       0.29137363875511063
+      ],
+      "landfall_triggers20": [
+       0.0374,
+       0.07857773686299355
+      ],
+      "lands_played20": [
+       0.016133333333333333,
+       0.04583519567351466
+      ],
+      "tokens_made20": [
+       0.3404,
+       3.2090411676418142
+      ],
+      "won20": [
+       0.006466666666666667,
+       0.0044088115086127295
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 4.7918,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0
+     }
+    },
+    "G1 off": {
+     "cells": {
+      "damage10": [
+       0.3044,
+       0.18094346853855223
+      ],
+      "landfall_triggers10": [
+       0.0922,
+       0.03923167323922611
+      ],
+      "lands_played10": [
+       0.06733333333333333,
+       0.020797635946237052
+      ],
+      "tokens_made10": [
+       0.7882666666666667,
+       1.6393647323693352
+      ],
+      "won10": [
+       0.0014,
+       0.0021981126575606022
+      ],
+      "damage20": [
+       0.1894,
+       0.1901531845905238
+      ],
+      "landfall_triggers20": [
+       0.06786666666666667,
+       0.05191553500987728
+      ],
+      "lands_played20": [
+       0.0546,
+       0.029115979464514944
+      ],
+      "tokens_made20": [
+       0.3253333333333333,
+       2.2509141300236304
+      ],
+      "won20": [
+       0.0007333333333333333,
+       0.002817747016928481
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 2.3417333333333334,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 4.819266666666667,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.0,
+      "crystal_vein_sacs": 0.20546666666666666,
+      "petrified_returns": 0.08153333333333333,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.3417333333333334
+     }
+    },
+    "G2 off": {
+     "cells": {
+      "damage10": [
+       0.17846666666666666,
+       0.04993808917978506
+      ],
+      "landfall_triggers10": [
+       0.04493333333333333,
+       0.008714606092528044
+      ],
+      "lands_played10": [
+       0.028466666666666668,
+       0.005954993667994441
+      ],
+      "tokens_made10": [
+       0.3842,
+       0.2561097655900696
+      ],
+      "won10": [
+       0.0018666666666666666,
+       0.0006908004067790201
+      ],
+      "damage20": [
+       0.615,
+       0.09420806409432513
+      ],
+      "landfall_triggers20": [
+       0.15526666666666666,
+       0.01912328512210543
+      ],
+      "lands_played20": [
+       0.10386666666666666,
+       0.013305477474105756
+      ],
+      "tokens_made20": [
+       1.3168,
+       0.48698813814247904
+      ],
+      "won20": [
+       0.0088,
+       0.0015060559536721274
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 0.0,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 4.828133333333334,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.13793333333333332,
+      "crystal_vein_sacs": 0.20066666666666666,
+      "petrified_returns": 0.08186666666666667,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 0.0
+     }
+    },
+    "G3 off": {
+     "cells": {
+      "damage10": [
+       -0.4524666666666667,
+       0.19812916414181517
+      ],
+      "landfall_triggers10": [
+       -0.19013333333333332,
+       0.043027437869636295
+      ],
+      "lands_played10": [
+       -0.13013333333333332,
+       0.024477713538870384
+      ],
+      "tokens_made10": [
+       -0.9584,
+       1.9920010973970548
+      ],
+      "won10": [
+       -0.0032,
+       0.0023149300097451953
+      ],
+      "damage20": [
+       -0.44366666666666665,
+       0.21588681584567176
+      ],
+      "landfall_triggers20": [
+       -0.21013333333333334,
+       0.05899209261649461
+      ],
+      "lands_played20": [
+       -0.15266666666666667,
+       0.034552638831665185
+      ],
+      "tokens_made20": [
+       -0.5888,
+       2.4545603798459896
+      ],
+      "won20": [
+       -0.0031333333333333335,
+       0.00329242420733197
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 2.309266666666667,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 4.7325333333333335,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.13593333333333332,
+      "crystal_vein_sacs": 0.0,
+      "petrified_returns": 0.0,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.309266666666667
+     }
+    },
+    "shock needed": {
+     "cells": {
+      "damage10": [
+       0.0,
+       0.0
+      ],
+      "landfall_triggers10": [
+       0.0,
+       0.0
+      ],
+      "lands_played10": [
+       0.0,
+       0.0
+      ],
+      "tokens_made10": [
+       0.0,
+       0.0
+      ],
+      "won10": [
+       0.0,
+       0.0
+      ],
+      "damage20": [
+       0.0,
+       0.0
+      ],
+      "landfall_triggers20": [
+       0.0,
+       0.0
+      ],
+      "lands_played20": [
+       0.0,
+       0.0
+      ],
+      "tokens_made20": [
+       0.0,
+       0.0
+      ],
+      "won20": [
+       0.0,
+       0.0
+      ]
+     },
+     "counters": {
+      "shock_life": 0.0,
+      "painland_life": 0.0,
+      "fetch_life": 2.335,
+      "karoo_bounces": 0.0,
+      "fetches_cracked": 4.796333333333333,
+      "lands_entered_tapped_by_rule": 0.0,
+      "archangel_vault_activations": 0.0,
+      "nykthos_activations": 0.13713333333333333,
+      "crystal_vein_sacs": 0.20033333333333334,
+      "petrified_returns": 0.08153333333333333,
+      "locthwain_draws": 0.0,
+      "high_market_sacs": 0.0,
+      "land_outlet_sacs": 0.0,
+      "ardenvale_tokens": 0.0,
+      "draw_land_activations": 0.0,
+      "draw_land_windows": 0.0,
+      "life_lost_to_own_cards": 2.335
+     }
+    }
+   }
+  }
+ }
+}

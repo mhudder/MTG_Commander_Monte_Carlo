@@ -265,6 +265,7 @@ asserting a card does nothing:
 | your own sweeper asked the wipe gate in the main phase only | a wipe that arrives by miracle, copy, discover or free cast is fired whatever the board | 0.047 (lorehold, §0z104) -- Arcane Bombardment read ordinary for weeks |
 | the wipe gate counted bodies | a 13/13 commander is one 1/1, and a one-sided wipe costs as much as a symmetric one | 0.014 (karlov), 0.011 (rendmaw), §0z106 -- weighing power alone cost two decks for exactly those reasons |
 | Havengul Laboratory's Clue activation ran in the upkeep | four of every turn's mana go to a Clue before any spell | 0.059 (tivit, §0z112) -- found by the land ablation, which read the land at −0.058 against a Swamp |
+| Vault of the Archangel was read as `g.has(...)` | an activated ability costs nothing, needs no tap and lasts forever | 0.028 (karlov, §0z115) -- the land ablation's best row, +0.0276 against a Swamp, was the free ability |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a
@@ -480,7 +481,11 @@ hook, re-run the test that pins its neighbour, and check `cards_drawn`
 against the SUM of every draw counter** -- a draw credited to the wrong
 counter looks correct from the counter it was supposed to hit.
 
-**SUBTYPES ARE DATA, AND THEY COME FROM SCRYFALL** (2026-09-10, §0z4).
+**SUBTYPES ARE DATA, AND THEY COME FROM SCRYFALL** (2026-09-10, §0z4) --
+**AND SO ARE A LAND'S RULES** (§0z115): how it enters, what it costs to tap,
+what it fetches, generated into `LAND_RULES` by a classifier that raises on
+text it cannot read. Tagging land rules by hand left every painland free and
+every check land untapped in six decks for the life of the project.
 `Card.types` holds CARD types, never creature or land subtypes, so a card that
 reads one — Return of the Wildspeaker's "non-Human", Sapling Nursery's
 "Affinity for Forests", Nissa's "whenever you tap a Forest" — needs a set, and

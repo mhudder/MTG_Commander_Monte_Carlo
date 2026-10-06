@@ -1,0 +1,44 @@
+LAND FIDELITY (§0z115), N=15,000 paired, staged lists, seeds 5000... Each arm turns a group of the new rules OFF; the row is ARM MINUS THE NEW ENGINE (* = CI excludes zero).
+
+RENDMAW   per game, new engine: shock_life 0.41  painland_life 0.28  karoo_bounces 0.46  lands_entered_tapped_by_rule 0.22  locthwain_draws 0.07  high_market_sacs 0.05  life_lost_to_own_cards 1.51
+  all off         +0.0067 ±0.0017*  +0.0149 ±0.0038*  +2.7063 ±0.2398*
+  G1 off          +0.0004 ±0.0005   -0.0003 ±0.0011   +0.1347 ±0.0607*
+  G2 off          +0.0065 ±0.0016*  +0.0166 ±0.0036*  +2.5961 ±0.2313*
+  G3 off          -0.0001 ±0.0003   -0.0022 ±0.0012*  -0.0392 ±0.0333*
+  shock needed    -0.0001 ±0.0004   +0.0001 ±0.0012   +0.0444 ±0.0548 
+
+LOREHOLD   per game, new engine: shock_life 0.87  painland_life 1.12  fetch_life 0.58  karoo_bounces 0.27  fetches_cracked 0.74  lands_entered_tapped_by_rule 0.26  draw_land_activations 0.66  draw_land_windows 0.23  life_lost_to_own_cards 2.94
+  all off         +0.0104 ±0.0051*  +0.0187 ±0.0074*  +2.0281 ±0.4711*
+  G1 off          +0.0000 ±0.0000   +0.0000 ±0.0000   +0.0000 ±0.0000 
+  G2 off          +0.0141 ±0.0049*  +0.0321 ±0.0071*  +2.8211 ±0.4577*
+  G3 off          -0.0033 ±0.0020*  -0.0115 ±0.0037*  -0.8193 ±0.1804*
+  shock needed    -0.0013 ±0.0018   +0.0017 ±0.0027   +0.1586 ±0.1389*
+
+KARLOV   per game, new engine: shock_life 0.44  painland_life 0.51  lands_entered_tapped_by_rule 0.16  archangel_vault_activations 0.16  life_lost_to_own_cards 1.44
+  all off         +0.0275 ±0.0034*  +0.0350 ±0.0045*  +3.1219 ±0.2778*
+  G1 off          +0.0240 ±0.0032*  +0.0279 ±0.0042*  +2.8056 ±0.2594*
+  G2 off          +0.0040 ±0.0014*  +0.0072 ±0.0021*  +0.3623 ±0.1188*
+  G3 off          +0.0000 ±0.0000   +0.0000 ±0.0000   +0.0000 ±0.0000 
+  shock needed    +0.0003 ±0.0004   +0.0007 ±0.0009   -0.0057 ±0.0475 
+
+TIVIT   per game, new engine: shock_life 1.32  lands_entered_tapped_by_rule 0.28  life_lost_to_own_cards 1.32
+  all off         +0.0030 ±0.0026*  +0.0103 ±0.0034*  +0.7840 ±0.2208*
+  G1 off          +0.0000 ±0.0000   +0.0000 ±0.0000   +0.0000 ±0.0000 
+  G2 off          +0.0030 ±0.0026*  +0.0103 ±0.0034*  +0.7840 ±0.2208*
+  G3 off          +0.0000 ±0.0000   +0.0000 ±0.0000   +0.0000 ±0.0000 
+  shock needed    -0.0013 ±0.0015   +0.0009 ±0.0021   +0.0817 ±0.1179 
+
+SHILGENGAR   per game, new engine: shock_life 0.95  painland_life 1.49  fetch_life 0.43  karoo_bounces 0.36  fetches_cracked 0.43  lands_entered_tapped_by_rule 0.43  archangel_vault_activations 0.27  locthwain_draws 0.05  land_outlet_sacs 0.00  ardenvale_tokens 0.10  life_lost_to_own_cards 2.93
+  all off         +0.0114 ±0.0021*  +0.0417 ±0.0059*  +5.5520 ±0.3702*
+  G1 off          +0.0070 ±0.0014*  +0.0236 ±0.0030*  +2.1430 ±0.1796*
+  G2 off          +0.0032 ±0.0015*  +0.0210 ±0.0054*  +3.8319 ±0.3403*
+  G3 off          -0.0001 ±0.0002   -0.0024 ±0.0011*  -0.1533 ±0.0390*
+  shock needed    -0.0001 ±0.0004   +0.0007 ±0.0016   +0.0352 ±0.0855 
+
+AZUSA   per game, new engine: fetch_life 2.33  fetches_cracked 4.80  nykthos_activations 0.14  crystal_vein_sacs 0.20  petrified_returns 0.08  life_lost_to_own_cards 2.33
+  all off         -0.0006 ±0.0032   +0.0065 ±0.0044*  +0.4061 ±0.2914*
+  G1 off          +0.0014 ±0.0022   +0.0007 ±0.0028   +0.1894 ±0.1902 
+  G2 off          +0.0019 ±0.0007*  +0.0088 ±0.0015*  +0.6150 ±0.0942*
+  G3 off          -0.0032 ±0.0023*  -0.0031 ±0.0033   -0.4437 ±0.2159*
+  shock needed    +0.0000 ±0.0000   +0.0000 ±0.0000   +0.0000 ±0.0000 
+
