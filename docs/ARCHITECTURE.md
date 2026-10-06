@@ -285,3 +285,18 @@ command; use it rather than remembering.
 - **`engine_cfg` copies the cfg** because five engines `setdefault` their own
   knobs into it; construct games on a fresh `dict(DEFAULT_CFG, …)` and never
   share one dict across engines.
+- **A land's rules come from its text, not its `L()` fields** (§0z115).
+  `tools/tag_flying.py` classifies every land's Scryfall text into
+  `_evasion.LAND_RULES` / `LAND_TYPES` (and raises on an enters-tapped clause
+  it cannot read); `engine.land_enters_tapped`, `enter_land`,
+  `after_land_enters`, `land_colours` and the pain tables read them. A land
+  played anywhere other than `play_land` -- Bolas's Citadel, Verge Rangers --
+  must go through `enter_land` and `after_land_enters`, or it skips its own
+  rule. The `L(tapped=...)` field is now only the fallback with
+  `land_etb_rules` off.
+- **`can_pay` returns a `Payment`**, a list carrying the cost it pays, so
+  `spend` can charge a painland for the pip it paid. A FILTERED copy (a
+  real-mana half, a slice) carries nothing: its caller charges with
+  `charge_coloured_pain(g, payment, units)` (shilgengar), or computes it
+  itself (lorehold, trostani). Either way `coloured_tap_life` marks the
+  Payment charged, so nothing pays twice.
