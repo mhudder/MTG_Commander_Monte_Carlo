@@ -188,6 +188,7 @@ python -m tests.test_id_reuse --mutate             # 3 mutations, exact sets
 python -m tests.test_azusa_batch6 --mutate         # 8 mutations, exact sets
 python -m tests.test_wipe_gate --mutate            # 2 mutations, exact sets
 python -m tests.test_rogues_passage --mutate       # 1 mutation, exact set
+python -m tests.test_card_aliasing --mutate       # 1 mutation, exact set
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant
@@ -260,6 +261,7 @@ asserting a card does nothing:
 | every "+1/+1 counter on target creature" went on the biggest or an evasive creature | stacking power on one body is as good as spreading it, in a pod that chump-blocks the biggest attacker | 0.0105 (Bristly Bill, azusa, §0z101) -- the owner's call, caught before it shipped |
 | your own sweeper asked the wipe gate in the main phase only | a wipe that arrives by miracle, copy, discover or free cast is fired whatever the board | 0.047 (lorehold, §0z104) -- Arcane Bombardment read ordinary for weeks |
 | the wipe gate counted bodies | a 13/13 commander is one 1/1, and a one-sided wipe costs as much as a symmetric one | 0.014 (karlov), 0.011 (rendmaw), §0z106 -- weighing power alone cost two decks for exactly those reasons |
+| Havengul Laboratory's Clue activation ran in the upkeep | four of every turn's mana go to a Clue before any spell | 0.059 (tivit, §0z112) -- found by the land ablation, which read the land at −0.058 against a Swamp |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a
@@ -434,6 +436,16 @@ you add a card, `python -m tools.tag_flying --write` is part of the change**
 — and when a check comes back clean, ask which list it built from.
 
 **`id(obj)` IS IDENTITY ONLY WHILE THE OBJECT IS ALIVE** (§0z98). A dict or set keyed on `id(perm)` that is not cleared when the permanent leaves hands its state to whatever object CPython allocates into the freed id next, and which one that is depends on the process's history -- so the same seed plays differently in two workers, a CRN leak no A/A control can see. **Hold the object for as long as its id is a key** -- and since fixing sites one by one found six more, the engine now holds every Card and Permanent for the game (`engine.begin_game`), so any id key is safe. A tool that must reproduce a cached number exactly is what catches it: one game in 15,000 was enough. **And test a hold by asking whether the object is ALIVE (a weak reference), never by waiting for an id to be reused** -- reuse is the allocator's choice, and the test that waited for it passed with the hold off (§0z100).
+
+**`[card] * n` IS ONE CARD** (§0z112). Every deck built its basics that
+way, so every rule that compares cards by identity read two copies as one:
+Shigeki put two revealed Forests onto the battlefield, and a hideaway dropped
+the pick's duplicates from the game. No A/A control can see it -- both legs
+alias alike -- and the land ablation's NOOP arm (a basic swapped for a
+field-identical copy) did. **Build copies with a comprehension, and give a
+tool that swaps cards a NOOP arm**: if replacing a card with an equal one
+changes a game, identity is leaking into the rules. `pending.validate`
+refuses an aliased list.
 
 **A JOB COUNT IS NOT PROGRESS, AND A HUNG RUN LOOKS SLOW** (§0z37). A
 28-job sweep reached 26 while two of its four workers were dead in an infinite

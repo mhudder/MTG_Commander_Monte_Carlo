@@ -160,6 +160,7 @@ Methodology that used to live at the end of this file is now
 | [0z109](#0z109) | REBUILT | **Six tables rebuilt for §0z106/§0z107** at a1cdd9e, one cloud session per deck, slowest leg 28 minutes. **Karlov's five wipes as a group: −0.0132 / −0.0003 before, +0.0030 / +0.0132 now, significant at both.** Own wipes rose everywhere -- karlov's Toxic Deluge, Damn and Damnation and tivit's three wipes up beyond their bars, tivit's Farewell a significant sign flip -- and so did lorehold's free-cast engines; rendmaw's Massacre Wurm tripled. Trostani moved nothing, azusa VERIFIED bit-identical |
 | [0z110](#0z110) | MEASURED | **Trostani's priorities, swept** (item 18's tool). Five moves confirm, every one RAISING a token or populate engine -- Seedborn Muse, Bramble Sovereign, King Darien, Nesting Dovehawk, Mirari's Wake: **joint +0.0129 ±0.0034 at T10, +0.0519 ±0.0069 at T20** on a third seed block, +3.4 tokens and +1.5 populates a game. Tivit's §0z44 shape. **ADOPTED by the owner 2026-10-05**; trostani's table rebuilt |
 | [0z111](#0z111) | MEASURED | **Trostani rebuilt with the five priority moves, and ONE OF THE FIVE DOES NOT HOLD IN CONTEXT.** Bramble Sovereign's own row flipped, +0.0027 → −0.0095 ±0.0035 at T10; paired on a fresh seed block, Bramble at 10.5 against 8.5 WITH the other four adopted is **−0.0071 ±0.0033 at T10, +0.0004 ±0.0059 at T20**. At 10.5 it outranks Seedborn Muse (10). Each move was confirmed against the OLD list, the joint against all five; neither asked about one move given the rest. **Reverted by the owner**, the other four stand; trostani's rebuild deferred. Tutors as a group +0.0453 at T20 |
+| [0z112](#0z112) | MEASURED | **The land ablation: every nonbasic land in seven decks against the basic it would replace** (147 lands, N=15,000, identity-classified). Its NOOP arm found **one Card object per basic NAME in every deck** (`[L(...)] * n`): identity checks read two copies as one card -- Shigeki put two Forests onto the battlefield, trostani's hideaway dropped a card; rendmaw 54 games in 15,000, trostani 7, the rest none. And its largest row, **tivit's Havengul Laboratory at −0.0581**, was a POLICY: the Clue activation ran in the upkeep, four mana before every main phase. Moved to the end step: **+0.0381 / +0.0589**. Painlands pay no life anywhere |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -9718,6 +9719,124 @@ until it runs -- a baseline change, which only a rebuild clears (never
 **The lesson for the next sweep: a joint run says the SET helps; it does not
 say every member does given the rest. Leave-one-out the joint before
 adopting it** -- one paired run per move, against the joint list.
+
+## 0z112. MEASURED — the land ablation, and the two engine faults it found
+
+**WHY.** `tools/ablation.py` blanks nonland cards only, so all 441 rows across
+the seven tables were spells and 19-22 lands per deck had never been
+measured. There is no blank land; the slot a land competes with is a BASIC.
+`diagnostics/run_land_ablation.py` replaces each nonbasic with a fresh copy
+of the basic of the colour the deck's spells ask for most (coloured pips over
+the nonland cards), or the deck's commonest basic for a land that makes none
+of its colours -- paired, the tables' seeds and N, T10 read off the T20 game,
+staged lists. **147 lands** (`results/land_ablation_20261006.{json,txt}`, the
+oracle text cached in `results/land_oracle.json`).
+
+**CLASSIFIED BY IDENTITY, NOT BY READING (§0z66).** Each land is also played
+over 1,000 games against a TWIN -- the same Card renamed and without its
+`script`. Every game identical means the engine reads the land only through
+its `L()` fields (colours, enters-tapped, `lifegain`, `tags`), and any rules
+text those do not encode is BLIND: the row is a floor. A game that differs
+means the engine dispatches on its name. The oracle text of every
+fields-only land is printed under its row with a heuristic flag for text
+beyond mana -- a reading aid; the identity test is the classification. Two
+checks pass in all seven decks: a NOOP arm (a basic replaced by a fresh copy
+of itself) changes nothing, and a blanked Sol Ring reproduces the cached row
+-- in five decks; rendmaw's and trostani's tables predate this section's fixes.
+
+### What the lands are worth (T20, land minus basic; * = beyond the bar)
+
+| deck | above the basic | below it |
+|---|---|---|
+| karlov | **Vault of the Archangel +0.0276***, Caves of Koilos +0.0053* (a CEILING -- see below), seven duals +0.0024 to +0.0038* | colourless lands at T10, Opal Palace −0.0023* |
+| azusa | **the fetches +0.016 to +0.020*** (two landfalls), Scene of the Crime +0.0055* | **Eye of Ugin −0.0109*** (taps for nothing), the colourless utility lands −0.002 to −0.005, their abilities blind |
+| lorehold | Plaza of Heroes +0.0060*, Boros Garrison +0.0055* | -- its duals are worth nothing over a Mountain |
+| shilgengar | Orzhov Basilica +0.0070* | Bojuka Bog −0.0029*; both Castles, Phyrexian Tower and High Market read 0.000 -- blind |
+| rendmaw | Golgari Rot Farm +0.0073*, Vault of Whispers +0.0027* | Dryad Arbor −0.0055* (a land that dies as a creature) |
+| tivit | three duals +0.0016 to +0.0018* | Archway of Innovation −0.0035*; **Havengul Laboratory −0.0581*** (below) |
+| trostani | -- | **Temple Garden −0.0085*** (by name, 711 of 1,000 games differ -- the shock), Selesnya Sanctuary and Temple of Plenty −0.0059* |
+
+THE KAROOS (Rot Farm, Basilica, Garrison) are worth a land and a half
+everywhere but trostani. Colour fixing is worth a few thousandths in the two
+decks with real two-colour demand (karlov, tivit) and nothing in lorehold.
+**Trostani's Temple Garden is the one row to look at next**: the engine
+pays the shock's 2 life by name in most games, in a deck where life decides
+games, and the row says that is a loss. Whether the pilot pays it too
+eagerly is untested.
+
+### Fault 1 -- one Card object per basic NAME, in every deck
+
+The NOOP arm failed in rendmaw (9 metric columns) and trostani (4): a basic
+replaced by a field-identical copy changed games. Every deck module built its
+basics as `[L("Forest", "G")] * 7`, seven references to ONE object, and every
+rule that compares cards by identity then read two copies as one card.
+Traced to the game: **Shigeki, Jukai Visionary** reveals four and puts "a
+land card" onto the battlefield with `if c is land` -- two Forests among the
+four were the same object, so both went onto the battlefield; **trostani's
+hideaway** kept `[c for c in top if c is not pick]`, so a picked basic took
+its duplicates with it and they left the game.
+
+The fix is at the source: the modules build one object per copy
+(`[L(...) for _ in range(n)]`), and `pending.validate` -- now run on every
+deck, including the ones with nothing staged, which it used to skip --
+refuses a list holding one object twice. It was proved to fail on the old
+lists first. `diagnostics/diag_card_aliasing.py`
+(`results/card_aliasing_20261006.txt`, N=15,000, every numeric key): **rendmaw
+54 games differ, trostani 7, the other five none.**
+`tests/test_card_aliasing.py` pins it -- every built list distinct, the check
+refuses an alias, Shigeki puts ONE Forest down, the hideaway keeps three of
+four -- and its mutation (aliased copies) breaks exactly A, C and D, showing
+the old behaviour: two Forests down, four cards gone.
+
+§0z98's lesson from the other side: there an id outlived its object; here two
+copies shared one. **`[card] * n` is one card.**
+
+### Fault 2 -- Havengul Laboratory's activation ran in the upkeep
+
+The land ablation's largest row by far: tivit's Havengul Laboratory at
+**−0.0383 ±0.0032 at T10 and −0.0581 ±0.0042 at T20** against a Swamp -- the
+tell in CLAUDE.md, a card whose row says it is worse than a basic land. Its
+"{4}, {T}: Investigate" ran in `upkeep`, after the untap and BEFORE the main
+phase: four of every turn's mana spent on a Clue ahead of the deck's spells,
+without the {T} its cost names. And the module listed it as tapping for {B}
+or {C}, where the Laboratory face taps for {C} -- the {B} is the transformed
+face's, Havengul Mystery, and the transform is not modelled.
+
+`tivit.havengul_end_step` activates it AT THE END STEP ON LEFTOVER MANA -- the
+Shigeki and Burnished Hart policy (§0z85) -- tapping the land first so its
+own {C} cannot pay; the module lists {C} only. `havengul_at="upkeep"`
+restores the old timing. `diagnostics/run_havengul.py`
+(`results/havengul_20261006.txt`, N=15,000 paired):
+
+| | won T10 | won T20 | damage T20 | cards drawn |
+|---|---|---|---|---|
+| timing fixed, minus old | **+0.0381 ±0.0032** | **+0.0589 ±0.0042** | +6.71 | +0.58 |
+| timing and colours, minus old | +0.0379 | +0.0577 | +6.60 | +0.57 |
+
+The colour alone is −0.0012 ±0.0016, noise. **The timing fix recovers almost
+exactly what the land ablation charged the card** -- −0.0581 against +0.0589
+-- so the row was the policy, not the card: the second-largest policy
+correction on record, after azusa's land step.
+
+### Not fixed, said out loud -- the owner's call
+
+* **No painland pays its life anywhere.** `PAIN_ON_COLOURED_TAP` holds the
+  two Talismans and nothing else, so Caves of Koilos, Llanowar Wastes,
+  Battlefield Forge and the rest are free untapped duals: every painland row
+  is a CEILING. Life decides games (pod v3).
+* **Karlov's shocks and fastlands enter untapped for free** (Godless Shrine
+  carries only a subtype tag) -- ceilings too. Trostani's are modelled.
+* **Blind land text**: cycling (Secluded Steppe, Barren Moor), scry (Temple of
+  Silence), filters (Fetid Heath), Shizo's fear, both Castles, Mikokoro,
+  Phyrexian Tower, High Market, the Wastelands, Reliquary Tower (there is no
+  maximum hand size in the engine at all). Each such row is a floor.
+
+### The tables
+
+Rendmaw (aliasing), tivit (Havengul) and trostani (aliasing, and §0z111's
+deferred rebuild) MOVED -- `check_unchanged_decks --n=3000` against a1cdd9e --
+and are SUSPECT until rebuilt. Lorehold, karlov, shilgengar and azusa are
+bit-identical and VERIFIED.
 
 ## How to read an ablation table
 

@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `dd73066` from 23 engine sources.
+Derived at `1c237d2` from 23 engine sources.
 
-**200 knobs, 290 call sites.**
+**201 knobs, 292 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -35,7 +35,7 @@ costs a written justification.
   - `10` at `edhmc/lorehold.py:2357` in `simulate()`
   - `10` at `edhmc/opponents.py:202` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1241` in `simulate()`
-  - `20` at `edhmc/tivit.py:1488` in `simulate()`
+  - `20` at `edhmc/tivit.py:1519` in `simulate()`
   - `20` at `edhmc/trostani.py:1864` in `simulate()`
 
   DORMANT, VERIFIED 2026-09-15. Four engines default it to 20 (azusa, karlov, shilgengar, tivit) and three to 10 (engine.py, lorehold, opponents.make_pod). No run consults any of them: `experiment.py`'s BASE cfg sets `turns: 10` unconditionally and `run_ab` only overrides it, so every harnessed simulation is handed an explicit value. The split is a LOADED GUN in §0z12's sense, not a live defect -- calling an engine's `simulate(cfg={})` directly, as a new diagnostic easily might, silently gives rendmaw and lorehold a ten-turn game and everything else a twenty-turn one, and `make_pod` would size the opponents' clock grid for the wrong horizon. Fixing it means picking one default, which is an engine decision with a measurement attached, not a documentation change.
@@ -115,10 +115,10 @@ show up first.
 | `everywhere_is_token` | `True` | 1 | `edhmc/engine.py:3443` |  | yes | **never** |
 | `exquisite_drain_loop` | `True` | 1 | `edhmc/karlov.py:84` | §0z90 | yes | yes |
 | `exquisite_general` | `True` | 1 | `edhmc/karlov.py:248` | §0z90 | yes | yes |
-| `extra_turn_cap` | `5` | 1 | `edhmc/tivit.py:1471` | §0z86 | **no** | **never** |
-| `extra_turns_chain` | `True` | 1 | `edhmc/tivit.py:1461` | §0z86 | yes | yes |
-| `extra_turns_round_cap` | `40` | 1 | `edhmc/tivit.py:1460` | §0z86 | yes | yes |
-| `extra_turns_skip_opponents` | `True` | 1 | `edhmc/tivit.py:1415` | §0z86 | yes | yes |
+| `extra_turn_cap` | `5` | 1 | `edhmc/tivit.py:1502` | §0z86 | **no** | **never** |
+| `extra_turns_chain` | `True` | 1 | `edhmc/tivit.py:1492` | §0z86 | yes | yes |
+| `extra_turns_round_cap` | `40` | 1 | `edhmc/tivit.py:1491` | §0z86 | yes | yes |
+| `extra_turns_skip_opponents` | `True` | 1 | `edhmc/tivit.py:1446` | §0z86 | yes | yes |
 | `familiar_text` | `True` | 2 | `edhmc/engine.py:1492` | §0z83 | yes | yes |
 | `finality_aware_ult` | `True` | 1 | `edhmc/shilgengar.py:574` | §0z82 | yes | yes |
 | `finality_exiles` | `True` | 1 | `edhmc/shilgengar.py:428` | §0z75 | yes | yes |
@@ -133,10 +133,11 @@ show up first.
 | `goldspan_targeted` | `True` | 1 | `edhmc/lorehold.py:66` | §0z77 | yes | yes |
 | `hand_cap` | `7` | 1 | `edhmc/lorehold.py:1953` |  | **no** | **never** |
 | `hart_fetch` | `True` | 1 | `edhmc/engine.py:3208` | §0z68 | yes | yes |
+| `havengul_at` | `'end'` | 2 | `edhmc/tivit.py:1016` | §0z85 | yes | yes |
 | `herald_text` | `True` | 2 | `edhmc/shilgengar.py:508` | §0z4 | yes | yes |
 | `hold_min_value` | `3.0` | 1 | `edhmc/lorehold.py:1959` |  | **no** | **never** |
 | `hold_up_rate` | `0.6` | 1 | `edhmc/opponents.py:376` |  | yes | yes |
-| `horizon_counts` | `'rounds'` | 1 | `edhmc/tivit.py:1459` | §0z86 | yes | yes |
+| `horizon_counts` | `'rounds'` | 1 | `edhmc/tivit.py:1490` | §0z86 | yes | yes |
 | `horn_doubled_legacy` | `False` | 2 | `edhmc/azusa.py:1132` | §0z41 | yes | yes |
 | `incidental_rate` | `0.45` | 1 | `edhmc/opponents.py:1828` | §0z84 | yes | yes |
 | `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:1752` |  | **no** | yes |
@@ -160,7 +161,7 @@ show up first.
 | `monarch_loss_scale` | `rate` | 1 | `edhmc/opponents.py:1846` | §0u | yes | yes |
 | `monarch_start` | `False` | 1 | `edhmc/engine.py:1135` | §0z30 | yes | yes |
 | `monarch_start_turn` | `0` | 1 | `edhmc/opponents.py:1803` | §0z28 | yes | yes |
-| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:2236` |  | **no** | **never** |
+| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:2236` | §0z112 | **no** | **never** |
 | `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:884` |  | **no** | yes |
 | `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1140` |  | yes | yes |
 | `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:2696` |  | yes | **never** |
@@ -193,7 +194,7 @@ show up first.
 | `protection_cards` | `('Heroic Intervention',)` | 1 | `edhmc/opponents.py:369` |  | yes | yes |
 | `queen_soldier` | `True` | 1 | `edhmc/trostani.py:568` |  | **no** | **never** |
 | `reservoir_floor` | `15` | 1 | `edhmc/trostani.py:1491` |  | yes | **never** |
-| `rhystic_rate` | `1` | 1 | `edhmc/tivit.py:1039` |  | yes | yes |
+| `rhystic_rate` | `1` | 1 | `edhmc/tivit.py:1042` | §0z112 | yes | yes |
 | `rogues_passage` | `True` | 1 | `edhmc/opponents.py:1060` | §0z107 | yes | yes |
 | `rude_awakening_modes` | `True` | 1 | `edhmc/azusa.py:2136` |  | yes | yes |
 | `sac_outlets_pay` | `True` | 4 | `edhmc/engine.py:2000` | §0z70 | yes | yes |
@@ -210,10 +211,10 @@ show up first.
 | `shilgengar_ult_reserve` | `3` | 1 | `edhmc/shilgengar.py:724` | §0t | yes | yes |
 | `shock_life_floor` | `15` | 2 | `edhmc/trostani.py:840` |  | yes | **never** |
 | `shroud_sources` | `()` | 1 | `edhmc/opponents.py:364` |  | yes | yes |
-| `sieve_cap` | `10` | 1 | `edhmc/tivit.py:1334` |  | yes | **never** |
+| `sieve_cap` | `10` | 1 | `edhmc/tivit.py:1365` |  | yes | **never** |
 | `sieve_real_fuel` | `'combo'` | 1 | `edhmc/tivit.py:338` | §0z71 | yes | yes |
 | `sieve_real_mv_cap` | `2` | 1 | `edhmc/tivit.py:343` | §0z71 | yes | yes |
-| `sieve_taps` | `True` | 1 | `edhmc/tivit.py:1332` |  | yes | yes |
+| `sieve_taps` | `True` | 1 | `edhmc/tivit.py:1363` |  | yes | yes |
 | `snapshot_rounds` | `()` | 1 | `edhmc/engine.py:1277` | §0z93 | yes | yes |
 | `solemn_text` | `True` | 3 | `edhmc/engine.py:1500` | §0z42 | yes | yes |
 | `springheart_hosts` | `<none>` | 1 | `edhmc/azusa.py:1521` |  | yes | yes |
@@ -224,7 +225,7 @@ show up first.
 | `tempting_offer_rate` | `0.5` | 1 | `edhmc/voting.py:160` |  | **no** | **never** |
 | `thomil_lord_fodder` | `2` | 1 | `edhmc/engine.py:3055` |  | **no** | **never** |
 | `tivit_sweepers` | `True` | 3 | `edhmc/tivit.py:805` | §4 | yes | **never** |
-| `tivit_trigger_connects` | `True` | 1 | `edhmc/tivit.py:1130` | §0z91 | yes | yes |
+| `tivit_trigger_connects` | `True` | 1 | `edhmc/tivit.py:1161` | §0z91 | yes | yes |
 | `token_cap` | `200` | 1 | `edhmc/trostani.py:574` |  | yes | **never** |
 | `trample` | `True` | 1 | `edhmc/opponents.py:954` | §0z92 | yes | yes |
 | `treasure_hoard` | `False` | 1 | `edhmc/shilgengar.py:666` |  | yes | **never** |
@@ -280,12 +281,12 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 200 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 201 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**46 of 200.** Not an error — most knobs are
+**46 of 201.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
@@ -294,7 +295,7 @@ docs knows they exist.
 
 ## The knobs nothing has ever set
 
-**58 of 200.** The name appears nowhere in
+**58 of 201.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;

@@ -1,0 +1,21 @@
+Havengul Laboratory's timing and colours (§0z112). tivit, N=15,000 paired, seeds 5000.., staged list. * = CI excludes zero.
+
+old: won T20 0.4422
+
+timing minus old
+    won T10               +0.0381 ±0.0032*
+    won T20               +0.0589 ±0.0042*
+    damage T20            +6.7064 ±0.3679*
+    cards_drawn T20       +0.5845 ±0.0553*
+    mana_spent T20        +2.0205 ±0.4009*
+    havengul_clues T20    +0.0688 ±0.0066*
+
+fixed minus old
+    won T10               +0.0379 ±0.0032*
+    won T20               +0.0577 ±0.0042*
+    damage T20            +6.5954 ±0.3694*
+    cards_drawn T20       +0.5696 ±0.0550*
+    mana_spent T20        +1.8417 ±0.4046*
+    havengul_clues T20    +0.0530 ±0.0059*
+
+fixed minus timing (the colour alone), won T20: -0.0012 ±0.0016

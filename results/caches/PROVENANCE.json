@@ -322,6 +322,12 @@
         "evidence": "2026-10-05 (\u00a70z106, \u00a70z107): the wipe gate's cost measure and Rogue's Passage touch shared files in every fingerprint; azusa casts no own wipe and runs no Passage. check_unchanged_decks --n=3000, working tree vs worktree at b0e7562: azusa BIT-IDENTICAL on all 8 metrics (the other six moved and are rebuilt).",
         "fingerprint": "f35c30e5abfbbe5e",
         "utc": "2026-10-05T13:54:35Z"
+      },
+      {
+        "commit": "1c237d2",
+        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: azusa BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+        "fingerprint": "e5a899735be8d82b",
+        "utc": "2026-10-06T03:36:05Z"
       }
     ]
   },
@@ -560,7 +566,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "1c237d2",
+        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: karlov BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+        "fingerprint": "f601d4d3699c41a3",
+        "utc": "2026-10-06T03:36:04Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "2dea6ce4c2aec831",
@@ -831,7 +844,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "1c237d2",
+        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: lorehold BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+        "fingerprint": "a2a455dceb53ac83",
+        "utc": "2026-10-06T03:36:04Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "d6c162f17fd82f27",
@@ -1370,7 +1390,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "1c237d2",
+        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: shilgengar BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+        "fingerprint": "82b59b0543ef9b7d",
+        "utc": "2026-10-06T03:36:04Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "83c408fae55d5593",
