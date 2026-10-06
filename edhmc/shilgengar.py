@@ -135,7 +135,8 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (charge_coloured_pain, vault_of_the_archangel,
+                          vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -257,7 +258,7 @@ class ShilgengarGame(BaseGame):
         return t
 
     def lifelink_of(self, perm):
-        if perm.card.lifelink:
+        if perm.card.lifelink or vault_active(self):
             return True
         # Pearl Collector's "perpetually gains lifelink" (§0z74).
         if perpetual_lifelink(self, perm):
@@ -471,9 +472,27 @@ class ShilgengarGame(BaseGame):
                  and not p.sick and self.power_of(p) <= 1]
         free_outlet = self.has("Viscera Seer") or self.has("Cartel Aristocrat") \
             or self.commander_cast
+        # THE LAND OUTLETS (§0z115), one sacrifice each a turn ({T}):
+        # High Market ("{T}, Sacrifice a creature: You gain 1 life") and
+        # Phyrexian Tower ("{T}, Sacrifice a creature: Add {B}{B}" -- the
+        # {B}{B} is not modelled: this engine floats no mana). Used only
+        # when no free outlet is live; Shilgengar's own makes Blood.
+        land_outlets = [] if free_outlet or not self.cfg.get(
+            "land_outlets", True) else [
+            q for q in self.board if q.card.name in ("High Market",
+                                                     "Phyrexian Tower")
+            and not q.tapped]
         for p in fodder[:3]:
             if not free_outlet:
-                break
+                if not land_outlets:
+                    break
+                outlet = land_outlets.pop(0)
+                outlet.tapped = True
+                self.sacrifice(p, to_shilgengar=False)
+                self.m["land_outlet_sacs"] += 1
+                if outlet.card.name == "High Market":
+                    self.trigger_gain(1)
+                continue
             self.sacrifice(p, to_shilgengar=self.commander_cast)
         # Vampiric Rites: paid outlet, worth using on whatever fodder is left
         # even without a payoff on board, since it draws a card on its own.
@@ -692,6 +711,9 @@ class ShilgengarGame(BaseGame):
         real = [i for i in idx if i < n_real]
         used = len(idx) - len(real)
         spend(self, real, units)
+        # `real` is a filtered copy, so `spend` cannot see the cost: the
+        # painlands are charged here from the whole Payment (§0z115).
+        charge_coloured_pain(self, idx, units)
         if used:
             self.treasures -= used
             self.m["treasures_spent"] += used
@@ -980,6 +1002,7 @@ class ShilgengarGame(BaseGame):
             real = [i for i in pay if i < n_real]
             used = len(pay) - len(real)
             spend(self, real, units)
+            charge_coloured_pain(self, pay, units)       # §0z115, as in pay()
             if used:
                 self.treasures -= used
                 self.m["treasures_spent"] += used
@@ -1072,6 +1095,9 @@ class ShilgengarGame(BaseGame):
         # half. The ETB half fires in resolve()/sun_titan below.
         if any(p.card.name == "Sun Titan" for p in attackers):
             self._sun_titan_reanimate()
+        # VAULT OF THE ARCHANGEL (§0z115), karlov's rule, now shared: it was
+        # not modelled here at all.
+        vault_of_the_archangel(self, attackers, lambda c: self.pay(c))
 
         for p in attackers:
             p.tapped = True
@@ -1168,6 +1194,29 @@ class ShilgengarGame(BaseGame):
             self.make_angel_tokens(1)
         if self.has("Speaker of the Heavens") and self._life_threshold():
             self.make_angel_tokens(1)
+        # THE LANDS' END-STEP ABILITIES, on the mana the turn left (§0z115).
+        castle_locthwain(self, lambda c: self.pay(c))
+        self.castle_ardenvale()
+
+    def castle_ardenvale(self):
+        """CASTLE ARDENVALE: "{2}{W}{W}, {T}: Create a 1/1 white Human
+        creature token." (§0z115.) At the end step on spare mana, the castle
+        tapped first so its own {W} cannot pay: a body for Shilgengar to eat
+        (one Blood) or to chump with."""
+        if not self.cfg.get("castle_ardenvale", True):
+            return
+        castle = next((p for p in self.board if p.card.name
+                       == "Castle Ardenvale" and not p.tapped), None)
+        if castle is None:
+            return
+        castle.tapped = True
+        if not self.pay({"gen": 2, "W": 2}):
+            castle.tapped = False
+            return
+        self.make_creature_token(Card(
+            name="Human token", types=frozenset({"Creature"}),
+            power=1, toughness=1))
+        self.m["ardenvale_tokens"] += 1
 
     def land_step(self):
         before = sum(1 for p in self.board if p.card.is_land)

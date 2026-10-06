@@ -117,6 +117,13 @@ Malakir Rebirth // Malakir Mire        +0.18+-0.08         +0.30+-0.12        +0
       life; until end of turn, that creature gains "when this creature dies,
       return it to the battlefield"' -- there is no removal-in-response window to
       react in. A floor.
+Revel in Riches                       +0.20+-0.04         +0.19+-0.07        +0.0023+-0.0016      both
+      MODELLED: the alt-win, ten or more Treasures at your upkeep, off Treasures
+      the rest of the deck makes (Smothering Tithe, in every win traced). MISSING:
+      'whenever a creature an opponent controls dies, create a Treasure' -- the
+      pod's creatures are a count, not deaths (§4). A FLOOR, and a knob result:
+      Tithe's Treasures assume no opponent ever pays its {2}. Left KNOWN_BLIND
+      until §0z115.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
@@ -131,7 +138,6 @@ Utter End                             +0.23+-0.03         +0.32+-0.06        +0.
 Anguished Unmaking                    +0.19+-0.04         +0.26+-0.07        +0.0015+-0.0013      both
 Generous Gift                         +0.16+-0.03         +0.23+-0.06        +0.0016+-0.0012      both
 Vindicate                             +0.16+-0.03         +0.21+-0.06        +0.0015+-0.0013      both
-Revel in Riches                       +0.20+-0.04         +0.19+-0.07        +0.0023+-0.0016      both
 Mortify                               +0.15+-0.03         +0.18+-0.05        +0.0016+-0.0012      both
 Despark                               +0.12+-0.03         +0.12+-0.06        +0.0011+-0.0011      both
 Path to Exile                         +0.04+-0.02         +0.07+-0.04        +0.0005+-0.0009       dmg

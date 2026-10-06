@@ -904,6 +904,13 @@ PARTLY_MODELLED = {
             "not taken). NOT: prowess. A floor.",
     },
     "shilgengar": {
+        "Revel in Riches":
+            "MODELLED: the alt-win, ten or more Treasures at your upkeep, off "
+            "Treasures the rest of the deck makes (Smothering Tithe, in every "
+            "win traced). MISSING: 'whenever a creature an opponent controls "
+            "dies, create a Treasure' -- the pod's creatures are a count, not "
+            "deaths (§4). A FLOOR, and a knob result: Tithe's Treasures assume "
+            "no opponent ever pays its {2}. Left KNOWN_BLIND until §0z115.",
         # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). Each is a modelled body
         # -- flying from decks/_evasion.py -- with an unmodelled ability that
         # helps you. (Herald of War and Twilight Shepherd went on to SCRIPTED
@@ -1352,7 +1359,10 @@ KNOWN_BLIND = {
         # Treasure per living opponent per turn on the assumption that
         # opponents never pay the {2}. Make them pay sometimes and this line
         # gets much worse. Do not read the +0.0063 as a fact about the card.
-        "Revel in Riches",
+        # MOVED TO PARTLY_MODELLED 2026-10-06 (§0z115): the 40 label seeds
+        # reach its alt-win under some engines and not others, so the label
+        # test flipped with every land change. The clause is modelled; that
+        # is PARTLY, said once.
         # a damage-prevention/mill replacement effect whose interaction with
         # resolve_clocks (a game-loss check, not a damage event) is not
         # confidently representable -- see edhmc/shilgengar.py's docstring

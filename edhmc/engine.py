@@ -28,6 +28,7 @@ from typing import Callable, Optional
 
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
+from edhmc.decks._evasion import LAND_RULES, LAND_TYPES
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -675,8 +676,30 @@ class ManaUnits(list):
         self.weights.clear()
 
 
+class Payment(list):
+    """`can_pay`'s answer: the unit indices it chose, CARRYING THE COST they
+    pay (§0z115). A painland hurts only when it pays a coloured pip, and
+    which pip a unit paid is recoverable only from the cost
+    (`pip_assignment`), so the cost travels with the payment to `spend`,
+    which charges it once (`charged`). A plain list -- a slice, a filtered
+    copy -- carries nothing, and its caller charges explicitly."""
+    __slots__ = ("cost", "charged")
+
+
 def can_pay(cost: dict, units: list[frozenset],
             weights: Optional[list] = None) -> Optional[list[int]]:
+    """`_can_pay`, with its answer wrapped as a `Payment` (§0z115)."""
+    used = _can_pay(cost, units, weights)
+    if used is None:
+        return None
+    pay = Payment(used)
+    pay.cost = cost
+    pay.charged = False
+    return pay
+
+
+def _can_pay(cost: dict, units: list[frozenset],
+             weights: Optional[list] = None) -> Optional[list[int]]:
     """Greedy-with-fallback payment solver.
 
     `units` is a list of colour-sets, one entry per available mana. Returns the
@@ -1008,6 +1031,25 @@ PAIN_ON_COLOURED_TAP = {
         "to you."),
 }
 
+# THE PAINLANDS, 2026-10-06 (§0z115): every land whose text says "{T}: Add
+# {W} or {B}. This land deals 1 damage to you" beside a painless "{T}: Add
+# {C}." -- generated from Scryfall into `LAND_RULES` and merged here, so a
+# painland added to a list is charged without anyone remembering to list it.
+# The Talismans above are hand-written and stay so; nothing generates them.
+for _name, _rule in LAND_RULES.items():
+    _pain = _rule.get("pain")
+    if _pain and not _pain[2]:
+        PAIN_ON_COLOURED_TAP.setdefault(
+            _name, (float(_pain[0]), frozenset(_pain[1]),
+                    "a painland, from its oracle text (§0z115)"))
+
+# Lands that hurt on EVERY tap, colour or not: Ancient Tomb ("{T}: Add
+# {C}{C}. This land deals 2 damage to you.") and the horizon lands ("{T},
+# Pay 1 life: Add {W} or {B}."), which have no painless mode. Charged per tap
+# in `on_mana_tap`, which both of `spend`'s paths call (§0z115).
+ALWAYS_PAIN = {_name: _rule["pain"][0] for _name, _rule in LAND_RULES.items()
+               if _rule.get("pain") and _rule["pain"][2]}
+
 
 def pip_assignment(cost: dict, pay_idx: list[int]) -> list[tuple]:
     """Which COLOURED PIP each of `can_pay`'s chosen indices was spent on.
@@ -1051,20 +1093,49 @@ def coloured_tap_life(g, cost: dict, pay_idx: list[int], units) -> float:
     # reverting this one through it would revert those too and no measurement
     # of this change alone would be possible. `talisman_coloured_tap` is this
     # change's own switch; the family flag still overrides it.
+    if isinstance(pay_idx, Payment):
+        pay_idx.charged = True         # whoever asked charges it; spend won't
     if not g.cfg.get("charge_life_costs", True):
-        return 0.0
-    if not g.cfg.get("talisman_coloured_tap", True):
         return 0.0
     owners = getattr(units, "owners", None)
     if owners is None:
         return 0.0                     # a pool the caller built; no permanents
+    # A THIRD SWITCH since §0z115: the painlands are generated from oracle
+    # text and measured on their own (`painland_life`), the Talismans keep
+    # theirs, and `charge_life_costs` above overrides both.
+    talismans = g.cfg.get("talisman_coloured_tap", True)
+    lands = g.cfg.get("painland_life", True)
     lost = 0.0
     for i, pip in pip_assignment(cost, pay_idx):
         if i >= len(owners) or owners[i] is None:
             continue
-        hurt = PAIN_ON_COLOURED_TAP.get(owners[i].card.name)
-        if hurt is not None and pip in hurt[1]:
-            lost += hurt[0]
+        card = getattr(owners[i], "card", None)
+        if card is None:
+            continue
+        hurt = PAIN_ON_COLOURED_TAP.get(card.name)
+        if hurt is None or pip not in hurt[1]:
+            continue
+        if not (lands if card.is_land else talismans):
+            continue
+        lost += hurt[0]
+    return lost
+
+
+def charge_coloured_pain(g, pay, units) -> float:
+    """Charge the life a payment's coloured taps cost -- once (§0z115).
+
+    `spend` calls this for every `Payment` it is handed. A caller that hands
+    `spend` a FILTERED list (shilgengar's real-mana half, lorehold's board
+    half) calls it itself with the whole `Payment`, whose indices into the
+    real pool are the same ones."""
+    if not isinstance(pay, Payment) or pay.charged:
+        return 0.0
+    lost = coloured_tap_life(g, pay.cost, pay, units)
+    if lost:
+        g.your_life -= lost
+        g.m["life_lost_to_own_cards"] += lost
+        g.m["painland_life"] += lost
+        g.m["coloured_taps_paid"] += 1
     return lost
 
 
@@ -2046,6 +2117,270 @@ def tap_treasures(units, pay) -> None:
             owners[i].tapped = True
 
 
+# ----------------------------------------------------------------------------
+# Land rules (§0z115): how a land enters, what it costs, what it is
+# ----------------------------------------------------------------------------
+#
+# Read from `LAND_RULES` and `LAND_TYPES`, which `tools/tag_flying.py`
+# generates from each land's Scryfall text -- the subtype rule (§0z4) pointed
+# at land text. Every engine that plays a land through `play_land` (rendmaw,
+# lorehold, karlov, tivit, shilgengar) gets these; azusa plays its own and
+# trostani has its own copy, which `tests/test_land_rules.py` checks agrees.
+# Each rule has a switch that restores the pre-§0z115 behaviour:
+#   land_etb_rules   the enters-tapped conditions and the shocklands' 2 life
+#   land_fetch       a fetchland searches (and pays its life) when played
+#   karoo_bounce     a karoo returns a land to hand
+#   land_only_if     Tainted Field's Swamp, Temple of the False God's five
+#   painland_life    (above) the painlands' and horizon lands' life
+
+BASIC_NAMES = frozenset({"Plains", "Island", "Swamp", "Mountain", "Forest",
+                         "Wastes"})
+
+
+def land_types(card) -> tuple:
+    """A land's basic land types -- Plains, Island, Swamp, Mountain, Forest
+    -- from its type line. A basic is its own; a shock or a battle land has
+    two; a Command Tower has none."""
+    return LAND_TYPES.get(card.name, ())
+
+
+def controls_type(g, kind: str, exclude=None) -> bool:
+    return any(p.card.is_land and kind in land_types(p.card)
+               for p in g.board if p is not exclude)
+
+
+def land_colours(g, card) -> frozenset:
+    """The colours a land can tap for NOW. Tainted Field: "{T}: Add {C}.
+    {T}: Add {W} or {B}. Activate only if you control a Swamp." -- without
+    a Swamp it makes {C} only (`land_only_if`)."""
+    rule = LAND_RULES.get(card.name, {}).get("only_if")
+    if (rule and rule[0] == "control" and g.cfg.get("land_only_if", True)
+            and not controls_type(g, rule[1])):
+        return frozenset({"C"})
+    return card.produces
+
+
+def fetch_waits(g, card) -> bool:
+    """A fetchland on the battlefield is one that found nothing to fetch
+    (they are cracked as they are played): it makes no mana."""
+    return ("fetch" in LAND_RULES.get(card.name, {})
+            and g.cfg.get("land_fetch", True))
+
+
+def land_enters_tapped(g, card, preview: bool = False) -> bool:
+    """Does `card` enter tapped, by its own text, given the board NOW (the
+    land itself not yet on it)? `preview` asks without paying: a shockland
+    is assumed paid when the life can be spared. With `land_etb_rules` off
+    -- or no rule -- the module's static `tapped` field answers, which is
+    every engine's behaviour before §0z115.
+
+      shock    "you may pay 2 life. If you don't, it enters tapped" -- paid
+               while it leaves `shock_life_floor` (15), trostani's rule
+      fast     "unless you control two or fewer other lands"
+      slow     "unless you control two or more other lands"
+      battle   "unless you control two or more basic lands"
+      bond     "unless you have two or more opponents"
+      check    "unless you control a Plains or a Swamp"
+      count    "unless you control three or more other Swamps"
+      reveal   "you may reveal a Plains or Swamp card from your hand"
+    """
+    rule = LAND_RULES.get(card.name, {}).get("etb")
+    if rule is None or not g.cfg.get("land_etb_rules", True):
+        return bool(card.tapped)
+    kind = rule[0]
+    lands = [p for p in g.board if p.card.is_land]
+    if kind == "tapped":
+        return True
+    if kind == "shock":
+        if not g.cfg.get("charge_life_costs", True):
+            return False
+        if g.your_life - 2 < g.cfg.get("shock_life_floor", 15):
+            return True
+        # THE POLICY (`shock_pay`): "floor" pays whenever the floor allows --
+        # trostani's rule; "needed" pays only when the untapped land lets a
+        # card in hand be cast this turn that could not be without it, and
+        # otherwise plays it tapped, as a pilot with nothing to cast does.
+        if g.cfg.get("shock_pay", "floor") == "needed":
+            units = list(available_mana(g))
+            with_it = units + [card.produces]
+            if not any(not c.is_land and c.cost
+                       and can_pay(c.cost, units) is None
+                       and can_pay(c.cost, with_it) is not None
+                       for c in getattr(g, "hand", ()) if c is not card):
+                return True
+        if not preview:
+            g.your_life -= 2
+            g.m["shock_life"] += 2
+            g.m["life_lost_to_own_cards"] += 2
+        return False
+    if kind == "fast":
+        return len(lands) > 2
+    if kind == "slow":
+        return len(lands) < 2
+    if kind == "battle":
+        return sum(1 for p in lands if p.card.name in BASIC_NAMES) < 2
+    if kind == "bond":
+        return len(OPP.living(g)) < 2
+    if kind == "check":
+        return not any(t in land_types(p.card) for p in lands for t in rule[1])
+    if kind == "count":
+        return sum(1 for p in lands if rule[1] in land_types(p.card)) < rule[2]
+    if kind == "reveal":
+        return not any(c is not card and c.is_land
+                       and set(land_types(c)) & set(rule[1])
+                       for c in getattr(g, "hand", ()))
+    raise ValueError(f"unknown land rule {rule!r} for {card.name}")
+
+
+def enter_land(g, card, tapped=None) -> "Permanent":
+    """Put a land onto the battlefield by its own entry rule (or `tapped`,
+    when the effect that puts it there says so). The caller runs its
+    engine's hooks, then `after_land_enters`."""
+    t = land_enters_tapped(g, card) if tapped is None else tapped
+    perm = Permanent(card=card, tapped=t, sick=True,
+                     base_p=card.power, base_t=card.toughness)
+    g.board.append(perm)
+    if t and not card.tapped:
+        g.m["lands_entered_tapped_by_rule"] += 1
+    return perm
+
+
+def after_land_enters(g, perm) -> None:
+    """A land's own enter trigger and the pilot's immediate crack (§0z115):
+    a karoo returns a land to hand; a fetchland searches."""
+    rule = LAND_RULES.get(perm.card.name, {})
+    if rule.get("karoo") and g.cfg.get("karoo_bounce", True):
+        karoo_bounce(g, perm)
+    if "fetch" in rule and g.cfg.get("land_fetch", True) and perm in g.board:
+        crack_land_fetch(g, perm, rule["fetch"])
+
+
+def karoo_bounce(g, perm) -> None:
+    """Golgari Rot Farm: "When this land enters, return a land you control
+    to its owner's hand." Trostani's choice (`karoo_bounce` there): another
+    land if there is one -- a tapped basic first -- else itself. It comes
+    back as next turn's land drop; this turn's mana from it is gone."""
+    others = [p for p in g.board if p.card.is_land and p is not perm]
+    target = perm if not others else min(others, key=lambda p: (
+        p.card.name not in BASIC_NAMES, not p.tapped, len(p.card.produces)))
+    g.board.remove(target)
+    g.hand.append(target.card)
+    g.m["karoo_bounces"] += 1
+
+
+def crack_land_fetch(g, perm, rule) -> None:
+    """A fetchland, cracked as it is played: "{T}, Pay 1 life, Sacrifice
+    this land: Search your library for a Mountain or Plains card, put it
+    onto the battlefield, then shuffle." `rule` is (life, types, mode):
+    types () is "a basic land card"; mode "tapped" (Evolving Wilds) or
+    "untap4" (Fabled Passage: tapped, then untapped with four lands).
+
+    The pick fixes the colour the board has least of, then prefers a land
+    that enters untapped -- a Marsh Flats can find Godless Shrine, which
+    asks for its own 2 life. With nothing to find it is not cracked. The
+    last life point is never paid for a land (trostani's guard)."""
+    life, types, mode = rule
+    if types:
+        pool = [c for c in g.library if c.is_land
+                and set(land_types(c)) & set(types)]
+    else:
+        pool = [c for c in g.library if c.is_land and c.name in BASIC_NAMES]
+    charge = g.cfg.get("charge_life_costs", True) and life
+    if not pool or (charge and g.your_life <= life):
+        return
+    have: dict = {}
+    for p in g.board:
+        if p.card.is_land and p is not perm:
+            for col in p.card.produces:
+                have[col] = have.get(col, 0) + 1
+    want = hand_colour_demand(g)
+
+    def score(c):
+        new = sum(1 for col in c.produces if not have.get(col))
+        return (new, max((want.get(col, 0) for col in c.produces), default=0),
+                not land_enters_tapped(g, c, preview=True), len(c.produces),
+                c.name)
+    pick = max(pool, key=score)
+    g.board.remove(perm)
+    g.graveyard.append(perm.card)
+    if charge:
+        g.your_life -= life
+        g.m["life_lost_to_own_cards"] += life
+        g.m["fetch_life"] += life
+    g.library.remove(pick)
+    tapped = True if mode in ("tapped", "untap4") else None
+    found = enter_land(g, pick, tapped=tapped)
+    if mode == "untap4" and sum(1 for p in g.board if p.card.is_land) >= 4:
+        found.tapped = False
+    crn_shuffle(g, "land_fetch", g.library)
+    g.m["fetches_cracked"] += 1
+
+
+def vault_of_the_archangel(g, attackers, pay) -> bool:
+    """VAULT OF THE ARCHANGEL: "{2}{W}{B}, {T}: Creatures you control gain
+    deathtouch and lifelink until end of turn." (§0z115.) ONE rule for
+    karlov and shilgengar. Karlov read the Vault as permanent, FREE team
+    lifelink -- no mana, no tap -- which is why its land row was +0.0276
+    against a Swamp; shilgengar did not model it at all.
+
+    Activated before combat damage, on the mana the main phase left, when
+    the attack's power reaches `vault_min_power` (3) -- below that the life
+    is worth less than the four mana. Sets `vault_turn`, which the engines'
+    lifelink tests read. Deathtouch is not modelled: the pod's blockers are
+    a count (§4). `vault_paid=False` restores karlov's free lifelink."""
+    if not g.cfg.get("vault_paid", True):
+        if any(p.card.name == "Vault of the Archangel" for p in g.board):
+            g.vault_turn = g.turn
+            return True
+        return False
+    vault = next((p for p in g.board if p.card.name == "Vault of the Archangel"
+                  and not p.tapped), None)
+    if vault is None or not attackers:
+        return False
+    power = sum(g.power_of(p) for p in attackers)
+    if power < g.cfg.get("vault_min_power", 3):
+        return False
+    vault.tapped = True                    # {T} is in the cost
+    if not pay({"gen": 2, "W": 1, "B": 1}):
+        vault.tapped = False
+        return False
+    g.vault_turn = g.turn
+    g.m["archangel_vault_activations"] += 1
+    return True
+
+
+def vault_active(g) -> bool:
+    return getattr(g, "vault_turn", None) == g.turn
+
+
+def castle_locthwain(g, pay) -> bool:
+    """CASTLE LOCTHWAIN: "{1}{B}{B}, {T}: Draw a card, then you lose life
+    equal to the number of cards in your hand." (§0z115.) At the end step,
+    on spare mana -- the Shigeki policy (§0z85) -- while the life lost
+    (the hand after the draw) is at most `locthwain_max_loss` (2) and
+    leaves `locthwain_life_floor` (15). The castle taps first: its own {B}
+    cannot pay. `pay(cost)` is the engine's payer and returns True if paid."""
+    castle = next((p for p in g.board if p.card.name == "Castle Locthwain"
+                   and not p.tapped), None)
+    if castle is None or not g.cfg.get("locthwain", True):
+        return False
+    loss = len(g.hand) + 1
+    if (loss > g.cfg.get("locthwain_max_loss", 2)
+            or g.your_life - loss < g.cfg.get("locthwain_life_floor", 15)
+            or not draw_is_safe(g, 1)):
+        return False
+    castle.tapped = True
+    if not pay({"gen": 1, "B": 2}):
+        castle.tapped = False
+        return False
+    g.draw(1)
+    loss = len(g.hand)
+    g.your_life -= loss
+    g.m["life_lost_to_own_cards"] += loss
+    g.m["locthwain_draws"] += 1
+    return True
+
+
 def named_land_mana(g, p) -> int | None:
     """How much mana a land with a NAMED mana rule makes, or None for any
     other land (which then makes its usual 1, or 2 for a karoo). Read by
@@ -2059,6 +2394,13 @@ def named_land_mana(g, p) -> int | None:
     name = p.card.name
     if name == "Ancient Tomb":
         return 2
+    # TEMPLE OF THE FALSE GOD (§0z115): "{T}: Add {C}{C}. Activate only if you
+    # control five or more lands." Its module lists one {C}, which tapped for
+    # one from the first turn: wrong both ways. `land_only_if` restores that.
+    rule = LAND_RULES.get(name, {}).get("only_if")
+    if rule and rule[0] == "lands" and g.cfg.get("land_only_if", True):
+        n = sum(1 for q in g.board if q.card.is_land)
+        return 2 if n >= rule[1] else 0
     if name == "Gaea's Cradle":
         return sum(1 for q in g.board if is_battlefield_creature(g, q))
     return None
@@ -2100,7 +2442,9 @@ def available_mana(g: Game) -> list[frozenset]:
             continue
         c = p.card
         if c.is_land:
-            src = any_color if all_lands_any else c.produces
+            if fetch_waits(g, c):
+                continue              # a fetch is a search, not a mana source
+            src = any_color if all_lands_any else land_colours(g, c)
             amt = named_land_mana(g, p)
             if amt is None:
                 amt = 2 if "bounce" in c.tags else 1
@@ -2164,7 +2508,7 @@ def play_land(g: Game):
 
     def face(c: Card):
         if c.is_land:
-            return c.produces, c.tapped
+            return c.produces, land_enters_tapped(g, c, preview=True)
         return frozenset(c.land_face[0]), c.land_face[1]
 
     def score(c: Card):
@@ -2177,12 +2521,15 @@ def play_land(g: Game):
     if not best.is_land:                      # played as its land face
         best = Card(name=best.name + " (land)", types=frozenset({"Land"}),
                     is_land=True, produces=prod, tapped=tapped)
-    perm = Permanent(card=best, tapped=tapped, sick=True,
-                     base_p=best.power, base_t=best.toughness)
-    g.board.append(perm)
+        perm = Permanent(card=best, tapped=tapped, sick=True,
+                         base_p=best.power, base_t=best.toughness)
+        g.board.append(perm)
+    else:
+        perm = enter_land(g, best)            # its own rule (§0z115)
     g.land_drops_used += 1
     g.play_card_trigger(best)
     run_etb(g, perm)
+    after_land_enters(g, perm)
 
 
 def altar_fodder(g: Game, units=None) -> list:
@@ -2526,14 +2873,19 @@ def on_mana_tap(g, p: Permanent):
     every azusa game that spent floating mana -- caught by
     check_unchanged_decks, the gate that runs all six decks."""
     card = getattr(p, "card", None)
-    # ANCIENT TOMB (§0z113): "{T}: Add {C}{C}. This land deals 2 damage to
-    # you." Charged once per TAP, here, so both of `spend`'s paths pay it.
-    # Behind `charge_life_costs`, the family switch for every life drawback.
-    if (card is not None and card.name == "Ancient Tomb"
-            and g.cfg.get("charge_life_costs", True)):
-        g.your_life -= 2
-        g.m["life_lost_to_own_cards"] += 2
-        g.m["tomb_damage"] += 2
+    # ANCIENT TOMB (§0z113) AND THE HORIZON LANDS (§0z115): a land that hurts
+    # on EVERY tap ("{T}: Add {C}{C}. This land deals 2 damage to you.";
+    # "{T}, Pay 1 life: Add {R} or {W}.") pays here, once per TAP, so both
+    # of `spend`'s paths charge it. Behind `charge_life_costs`, the family
+    # switch; the horizon lands also behind `painland_life`, their own.
+    dmg = ALWAYS_PAIN.get(card.name) if card is not None else None
+    if (dmg and g.cfg.get("charge_life_costs", True)
+            and (card.name == "Ancient Tomb"
+                 or g.cfg.get("painland_life", True))):
+        g.your_life -= dmg
+        g.m["life_lost_to_own_cards"] += dmg
+        g.m["tomb_damage" if card.name == "Ancient Tomb"
+            else "painland_life"] += dmg
     if card is not None and card.name == "Gaea's Cradle":
         g.m["cradle_taps"] += 1
         g.m["cradle_mana"] += named_land_mana(g, p) or 0
@@ -2643,6 +2995,7 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
                     tapped.append(owners[i])
         for p in tapped:           # once per PERMANENT, not per unit
             on_mana_tap(g, p)
+        charge_coloured_pain(g, pay_idx, units)      # painlands (§0z115)
         return
 
     def tap_cost(p: Permanent) -> tuple:
@@ -3354,6 +3707,29 @@ def whip_end_step(g) -> None:
     ids.clear()
 
 
+def high_market(g) -> None:
+    """HIGH MARKET: "{T}: Add {C}. {T}, Sacrifice a creature: You gain 1
+    life." (§0z115.) Rendmaw's free outlet, once a turn at the end step
+    with the mana it would have made already unspent: a spare token, only
+    while a death is worth something -- Ashnod's Altar's condition (Blood
+    Artist, The Meathook Massacre)."""
+    if not g.cfg.get("high_market", True):
+        return
+    market = next((p for p in g.board if p.card.name == "High Market"
+                   and not p.tapped), None)
+    if market is None or not (g.has("Blood Artist")
+                              or g.has("The Meathook Massacre")):
+        return
+    chaff = [p for p in g.board if p.is_token and p.card.is_creature]
+    if not chaff:
+        return
+    market.tapped = True
+    g.board.remove(chaff[0])
+    g.on_creature_death(1, chaff[0])
+    g.your_life += 1
+    g.m["high_market_sacs"] += 1
+
+
 def end_step_outlets(g) -> None:
     """The sacrifice outlets on the mana the main phase left (§0z73)."""
     if outlets_early(g):
@@ -3611,6 +3987,8 @@ def take_turn(g: Game):
         make_lord=lambda: rendmaw_token(g, lord_of_the_pit_card))
     empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
+    castle_locthwain(g, lambda c: pay_from(g, rendmaw_mana(g), c))  # §0z115
+    high_market(g)                  # a free outlet, once a turn, §0z115
     sakura_tribe_elder(g)           # its sacrifice, at the end step, §0z83
     burnished_hart(g)               # {3}, sacrifice: two basics, §0z85
     shigeki(g)                      # {1}{G}, tap, bounce: dig four, §0z85

@@ -130,7 +130,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, draw_is_safe,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
-from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT
+from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
 # TOKENS ARE NOT CARDS, so they are not in the generated FOREST set and cannot
@@ -1043,7 +1043,11 @@ class AzusaGame(BaseGame):
             c = p.card
             if c.is_land and self.land_mana_live(p):
                 if c.name == "Temple of the False God":
-                    add(frozenset({"C"}), 2 if n_lands >= 5 else 1, p)
+                    # "Activate only if you control five or more lands" --
+                    # it made one {C} below five here, which the card cannot
+                    # (§0z115). `land_only_if` restores that.
+                    below = 0 if self.cfg.get("land_only_if", True) else 1
+                    add(frozenset({"C"}), 2 if n_lands >= 5 else below, p)
                 elif c.name == "Eye of Ugin":
                     pass   # no mana ability on the current oracle text
                 else:
@@ -1665,6 +1669,19 @@ class AzusaGame(BaseGame):
         landfall events: the fetch itself (already counted by the caller) and
         the Forest it finds. Terramorphic's fetched land enters TAPPED; the
         two true fetches (paying 1 life, unmodelled) do not."""
+        # A TRUE FETCH PAYS 1 LIFE (§0z115): "{T}, Pay 1 life, Sacrifice this
+        # land" -- the number from its oracle text (`LAND_RULES`), behind
+        # `land_fetch` and `charge_life_costs`. Never the last life point.
+        life = LAND_RULES.get(fetchland_card.name, {}).get("fetch", (0,))[0]
+        if not (life and self.cfg.get("land_fetch", True)
+                and self.cfg.get("charge_life_costs", True)):
+            life = 0
+        if life and self.your_life <= life:
+            return
+        if life:
+            self.your_life -= life
+            self.m["life_lost_to_own_cards"] += life
+            self.m["fetch_life"] += life
         self.board.remove(next(p for p in self.board
                                if p.card is fetchland_card))
         self.land_died(fetchland_card)
@@ -1861,6 +1878,17 @@ class AzusaGame(BaseGame):
         if card.name in ("Kozilek, Butcher of Truth", "Ulamog, the Infinite Gyre") \
                 and self.has("Eye of Ugin"):
             cost["gen"] = max(0, cost.get("gen", 0) - 2)
+        # ELDRAZI TEMPLE: "{T}: Add {C}. {T}: Add {C}{C}. Spend this mana only
+        # to cast colorless Eldrazi spells or activate abilities of colorless
+        # Eldrazi." (§0z115.) Its {C} is in the pool; the SECOND {C} it makes
+        # for an Eldrazi is this {1} off -- while it is untapped, once a turn
+        # (`eldrazi_temple_turn`). If the payment leaves the Temple untapped,
+        # the other sources paid one less and its {C} is still there: the
+        # same total. `eldrazi_temple` restores the plain {C}.
+        if (card.name in ("Kozilek, Butcher of Truth",
+                          "Ulamog, the Infinite Gyre")
+                and self.eldrazi_temple_ready()):
+            cost["gen"] = max(0, cost.get("gen", 0) - 1)
         elif card.name == "The Great Henge":
             # "This spell costs {X} less to cast, where X is the greatest power
             # among creatures you control." The reduction applies to the
@@ -2780,6 +2808,64 @@ class AzusaGame(BaseGame):
         self.m["castle_activations"] += 1
         return True
 
+    def eldrazi_temple_ready(self) -> bool:
+        """An untapped Eldrazi Temple whose second {C} has not been spent on
+        an Eldrazi this turn (`cost_of`, §0z115)."""
+        return (self.cfg.get("eldrazi_temple", True)
+                and getattr(self, "eldrazi_temple_turn", None) != self.turn
+                and any(p.card.name == "Eldrazi Temple" and not p.tapped
+                        for p in self.board))
+
+    def nykthos_step(self, units):
+        """NYKTHOS, SHRINE TO NYX: "{T}: Add {C}. {2}, {T}: Choose a color.
+        Add an amount of mana of that color equal to your devotion to that
+        color." (Scryfall, 2026-10-06; §0z115.) Green, in this list. It was
+        listed as a land tapping for {G}, which it never does, and the
+        devotion ability did not exist.
+
+        Castle Garenbrig's policy, said out loud: FIRED ONLY WHEN IT UNLOCKS
+        SOMETHING -- a card in hand uncastable on the real mana and castable
+        on what is left after the {2} plus the devotion mana -- and only at
+        devotion 4 or more, below which tapping it for {C} is as good. The
+        mana is unrestricted, so it floats in `bonus_mana` (§0z37) for the
+        rest of the turn. Conservative in Castle's way: never fired to cast a
+        second spell beside one already affordable."""
+        if not self.cfg.get("nykthos_devotion", True):
+            return False
+        nyk = next((p for p in self.board if p.card.name
+                    == "Nykthos, Shrine to Nyx" and not p.tapped), None)
+        if nyk is None:
+            return False
+        d = devotion(self, "G")
+        if d < 4:
+            return False
+        own = [i for i, o in enumerate(units.owners) if o is nyk]
+        rest = ManaUnits([u for i, u in enumerate(units) if i not in own],
+                         [o for i, o in enumerate(units.owners)
+                          if i not in own],
+                         [w for i, w in enumerate(units.weights)
+                          if i not in own])
+        pay = can_pay({"gen": 2}, rest)
+        if pay is None:
+            return False
+        used = set(pay)
+        left = [u for i, u in enumerate(rest) if i not in used]
+        extra = [frozenset({"G"})] * d
+        unlocks = any(
+            not c.is_land and can_pay(self.cost_of(c), units) is None
+            and can_pay(self.cost_of(c), left + extra) is not None
+            for c in self.hand)
+        if not unlocks:
+            return False
+        spend(self, pay, rest)
+        self.m["mana_spent"] += 2
+        nyk.tapped = True
+        self.bonus_mana.extend(FloatingMana(frozenset({"G"}))
+                               for _ in range(d))
+        self.m["nykthos_activations"] += 1
+        self.m["nykthos_mana"] += d
+        return True
+
     # -- turn loop -----------------------------------------------------------
 
     def main_phase(self, enablers_only=False):
@@ -2819,6 +2905,10 @@ class AzusaGame(BaseGame):
             # CASTLE GARENBRIG, if it unlocks something, BEFORE the options are
             # built -- the six {G} are only worth making when a creature is
             # waiting on them.
+            if self.nykthos_step(units):
+                units = self.available_mana()
+            if self.crystal_vein_step(units):
+                units = self.available_mana()
             if self.castle_step(units):
                 units = self.available_mana()
             n_real = len(units)
@@ -2917,6 +3007,10 @@ class AzusaGame(BaseGame):
         # `draws_on_resolve` reports it and the pilot does not cast Kozilek
         # into an empty library. It was missing while the card sat in
         # SCRIPTED_AZUSA, which claimed it was implemented.
+        if card.name in ("Kozilek, Butcher of Truth",
+                         "Ulamog, the Infinite Gyre"):
+            if any(p.card.name == "Eldrazi Temple" for p in self.board):
+                self.eldrazi_temple_turn = self.turn        # §0z115
         if (card.name == "Kozilek, Butcher of Truth"
                 and self.cfg.get("kozilek_cast_draw", True)):
             self.draw(4)
@@ -3285,6 +3379,61 @@ class AzusaGame(BaseGame):
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
         self.myriad_landscape_step()
+        self.petrified_field_step()
+
+    def petrified_field_step(self):
+        """PETRIFIED FIELD: "{T}: Add {C}. {T}, Sacrifice this land: Return
+        target land card from your graveyard to your hand." (Scryfall,
+        2026-10-06; §0z115.) Not modelled before: a colourless land.
+
+        THE POLICY: after combat, while it is untapped, when the graveyard
+        holds a land and the hand holds fewer lands than next turn's drops,
+        and only while nothing already lets the deck play lands from the
+        graveyard (`yard_land_access`: then the yard IS a hand). It returns
+        a fetch first -- two landfalls when replayed -- else the land the
+        deck has least of. The Field itself goes to the graveyard (a land
+        dying, `land_died`)."""
+        if not self.cfg.get("petrified_field", True) or self.yard_land_access():
+            return
+        field = next((p for p in self.board if p.card.name
+                      == "Petrified Field" and not p.tapped), None)
+        if field is None:
+            return
+        yard = [c for c in self.graveyard if c.is_land]
+        if not yard:
+            return
+        if sum(1 for c in self.hand if c.is_land) >= self.land_drops_for_turn():
+            return
+        pick = max(yard, key=lambda c: (c.script in FETCH_SCRIPTS,
+                                        c.name != "Forest", c.name))
+        self.board.remove(field)
+        self.land_died(field.card)
+        self.graveyard.remove(pick)
+        self.hand.append(pick)
+        self.m["petrified_returns"] += 1
+
+    def crystal_vein_step(self, units):
+        """CRYSTAL VEIN: "{T}: Add {C}. {T}, Sacrifice this land: Add {C}{C}."
+        (Scryfall, 2026-10-06; §0z115.) Castle Garenbrig's policy: only when
+        the extra {C} unlocks a card in hand this turn. The two {C} float in
+        `bonus_mana` (§0z37); the Vein goes to the graveyard (`land_died`)."""
+        if not self.cfg.get("crystal_vein", True):
+            return False
+        vein = next((p for p in self.board if p.card.name == "Crystal Vein"
+                     and not p.tapped), None)
+        if vein is None:
+            return False
+        rest = [u for u, o in zip(units, units.owners) if o is not vein]
+        extra = rest + [frozenset({"C"})] * 2
+        if not any(not c.is_land and can_pay(self.cost_of(c), units) is None
+                   and can_pay(self.cost_of(c), extra) is not None
+                   for c in self.hand):
+            return False
+        self.board.remove(vein)
+        self.land_died(vein.card)
+        self.bonus_mana.extend(FloatingMana(frozenset({"C"})) for _ in range(2))
+        self.m["crystal_vein_sacs"] += 1
+        return True
 
     def myriad_landscape_step(self):
         """Myriad Landscape: "{2}, {T}, Sacrifice this land: Search your

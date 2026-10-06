@@ -253,7 +253,7 @@ LANDS = [
     L("Eye of Ugin", ""),   # no mana ability on the current oracle text
     L("Ghost Quarter", "C"),
     L("Homeward Path", "C"),
-    L("Nykthos, Shrine to Nyx", "G"),
+    L("Nykthos, Shrine to Nyx", "C"),   # {T}: Add {C}; the devotion ability is azusa.nykthos_step (§0z115)
     L("Petrified Field", "C"),
     L("Reliquary Tower", "C"),
     L("Scavenger Grounds", "C"),

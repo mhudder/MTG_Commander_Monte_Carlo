@@ -43,7 +43,8 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           pearl_collector_trigger, pearl_collector_lifelink,
-                          perpetual_lifelink)
+                          perpetual_lifelink, enter_land, after_land_enters,
+                          vault_of_the_archangel, vault_active)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -1087,12 +1088,12 @@ def citadel_land_step(g):
     while (g.land_drops_used < g.land_drops and g.library
            and g.library[-1].is_land):
         top = g.library.pop()
-        perm = Permanent(card=top, tapped=top.tapped, sick=True)
-        g.board.append(perm)
+        perm = enter_land(g, top)          # its own entry rule (§0z115)
         g.land_drops_used += 1
         g.m["citadel_lands"] += 1
         g.play_card_trigger(top)
         run_etb(g, perm)
+        after_land_enters(g, perm)
 
 
 def citadel_step(g):
@@ -1152,8 +1153,7 @@ def citadel_step(g):
             if g.land_drops_used >= g.land_drops:
                 break
             g.library.pop()
-            perm = Permanent(card=top, tapped=top.tapped, sick=True)
-            g.board.append(perm)
+            perm = enter_land(g, top)      # its own entry rule (§0z115)
             g.land_drops_used += 1
             g.m["citadel_lands"] += 1
             # THE SAME TWO HOOKS `engine.play_land` RUNS, and leaving them out
@@ -1163,6 +1163,7 @@ def citadel_step(g):
             # skipped a Karlov trigger.
             g.play_card_trigger(top)
             run_etb(g, perm)
+            after_land_enters(g, perm)
             did = True
             continue
         cost = float(top.mv)
@@ -1340,6 +1341,9 @@ def combat(g):
                 granted = {id(max(others, key=g.power_of))}
                 g.m["lifelink_grants"] += 1
 
+    # VAULT OF THE ARCHANGEL is an ACTIVATION, {2}{W}{B} and a tap, before
+    # damage -- it was read as free, permanent team lifelink (§0z115).
+    vault_of_the_archangel(g, attackers, lambda c: pay_cost(g, c))
     for p in attackers:
         p.tapped = True
     OPP.rogues_passage(g, attackers, lambda c: pay_cost(g, c))   # §0z107
@@ -1351,7 +1355,7 @@ def combat(g):
     g.damage_by_turn.append(dmg)
     # Lifelink: Karlov triggers scale with the number of lifelinking bodies
     team_lifelink = (g.has("Sorin, Vengeful Bloodlord")
-                     or g.has("Vault of the Archangel")
+                     or vault_active(g)
                      or g.has("Sorin, Solemn Visitor"))
     for p in attackers:
         if (team_lifelink or p.card.lifelink or id(p) in granted
@@ -1379,7 +1383,7 @@ def has_lifelink(g, p) -> bool:
     that last only until end of turn -- used to pick Pearl Collector's target."""
     return bool(p.card.lifelink or perpetual_lifelink(g, p)
                 or g.has("Sorin, Vengeful Bloodlord")
-                or g.has("Vault of the Archangel")
+                or vault_active(g)
                 or g.has("Sorin, Solemn Visitor"))
 
 

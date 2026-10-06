@@ -30,7 +30,7 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, coloured_tap_life,
+                          spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
@@ -646,8 +646,9 @@ def verge_rangers_filter(g):
     if not top.is_land:
         return
     g.library.pop()
-    g.board.append(Permanent(card=top, tapped=top.tapped, sick=True))
+    perm = enter_land(g, top)              # its own entry rule (§0z115)
     g.land_drops_used += 1
+    after_land_enters(g, perm)
 
 
 # ---------------------------------------------------------------------------
@@ -2153,6 +2154,65 @@ def combat(g):
 # Turn loop
 # ---------------------------------------------------------------------------
 
+DRAW_LANDS = ("Mikokoro, Center of the Sea", "Geier Reach Sanitarium")
+
+
+def draw_land_windows(g):
+    """MIKOKORO, CENTER OF THE SEA: "{2}, {T}: Each player draws a card."
+    GEIER REACH SANITARIUM: "{2}, {T}: Each player draws a card, then
+    discards a card." (Scryfall, 2026-10-06; §0z115.) Instant speed, so
+    a draw on an OPPONENT'S turn -- and the first card drawn on a turn is a
+    miracle. Neither was modelled: both were colourless lands.
+
+    THE POLICY, said out loud (`draw_lands`, default on), paid from the mana
+    held over your turn (`float_mana`, which counts the land's own {C} --
+    so each activation costs 3 of it):
+      Lorehold NOT on the battlefield: her rummage opens no windows, so the
+        land's draw IS one -- used on the opponents' upkeeps, one land each,
+        as the commander's rummage would be.
+      Lorehold on the battlefield: her rummage already took each turn's
+        first draw, so the land's is a plain draw (Mikokoro) or a rummage
+        (the Sanitarium) on what the windows left, after the round.
+    The opponents' draws are blind (§4). The Sanitarium's discard is the
+    rummage's pick, to the graveyard (Artist's Talent's rule)."""
+    ready = [p for p in getattr(g, "draw_lands_ready", ())
+             if p in g.board and p.card.name in DRAW_LANDS]
+    if not ready or not g.cfg.get("draw_lands", True) or g.result is not None:
+        return
+
+    def activate(land):
+        g.float_mana -= 3
+        g.m["draw_land_activations"] += 1
+
+    def sanitarium_discard(land):
+        if land.card.name == "Geier Reach Sanitarium" and g.hand:
+            worst = rummage_discard_choice(g)
+            g.hand.remove(worst)
+            g.graveyard.append(worst)
+            discard_triggers(g, 1)
+
+    if not g.commander_cast:
+        for _ in g.opponents:
+            if (not ready or g.float_mana < 3 or not draw_is_safe(g, 1)
+                    or g.result is not None):
+                break
+            land = ready.pop(0)
+            activate(land)
+            g.spells_this_turn = 0
+            g.noncreature_this_turn = 0
+            _drawn, cast = miracle_window(g, off_turn=True)
+            g.m["draw_land_windows"] += 1
+            g.m["draw_land_miracles"] += cast
+            sanitarium_discard(land)
+        return
+    for land in ready:
+        if g.float_mana < 3 or not draw_is_safe(g, 1) or g.result is not None:
+            break
+        activate(land)
+        _draw_into_hand(g, 1)
+        sanitarium_discard(land)
+
+
 def opponent_upkeep_windows(g):
     """Lorehold's rummage: three extra miracle windows per round."""
     if not g.commander_cast:
@@ -2365,6 +2425,10 @@ def take_turn(g):
         g.m["test_card_drawn_turn"] = g.turn
 
     g.float_mana = len(mana_units(g))
+    # The draw lands left untapped are counted in that float; they untap on
+    # your untap step, so each is one activation a round (§0z115).
+    g.draw_lands_ready = [p for p in g.board if not p.tapped
+                          and p.card.name in DRAW_LANDS]
     g.m["mana_floated"] += g.float_mana
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
@@ -2388,6 +2452,7 @@ def take_turn(g):
     # the mana was declined for nothing. Counted rather than argued.
     _before = g.m["miracles_cast"]
     opponent_upkeep_windows(g)
+    draw_land_windows(g)
     if held:
         if g.m["miracles_cast"] == _before:
             g.m["reserve_unused_turns"] += 1

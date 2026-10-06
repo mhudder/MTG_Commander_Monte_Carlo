@@ -174,6 +174,118 @@ def named(name):
         return None
 
 
+BASIC_TYPES = ("Plains", "Island", "Swamp", "Mountain", "Forest")
+_TYPE = r"(Plains|Island|Swamp|Mountain|Forest)"
+_COLOURS = {"W", "U", "B", "R", "G"}
+
+
+def land_oracle(card) -> str:
+    """The FRONT face's text: a modal or transforming land enters as its
+    front face, and the back's text is not a rule about how it enters."""
+    if card.get("oracle_text") is not None:
+        return card["oracle_text"]
+    faces = card.get("card_faces") or [{}]
+    return faces[0].get("oracle_text") or ""
+
+
+def classify_land(text: str) -> dict:
+    """What a land's ORACLE TEXT says about entering, tapping and life, as
+    data (§0z115). Each key is one rule the engines read from
+    `edhmc.lands`; a land with none of them returns {}.
+
+      etb       how it enters: ("tapped",), ("shock",), ("fast",), ("slow",),
+                ("battle",), ("bond",), ("check", types), ("reveal", types),
+                ("count", type, n)
+      pain      (life, colours, always): a mana ability that hurts -- the
+                painlands only for a colour, the horizon lands on every tap
+      fetch     (life, types, mode): "{T}, [Pay 1 life,] Sacrifice: search
+                ... put it onto the battlefield[ tapped]"; types () = any
+                basic; mode "untapped" / "tapped" / "untap4" (Fabled Passage)
+      karoo     True: "return a land you control to its owner's hand"
+      only_if   ("control", type) or ("lands", n): a mana ability that works
+                only under a condition (Tainted Field, Temple of the False God)
+
+    RAISES on enters-tapped text it cannot read. A rule guessed from a near
+    miss is the partial-tag bias this generator exists to prevent (§0z29);
+    an unread rule stops the generator instead."""
+    out: dict = {}
+    t = " ".join(text.split())
+    low = t.lower()
+    m = re.search(r"enters tapped unless you control an? " + _TYPE
+                  + r"(?: or an? " + _TYPE + r")?\.", t)
+    if m:
+        out["etb"] = ("check", tuple(x for x in m.groups() if x))
+    elif "unless you control two or fewer other lands" in low:
+        out["etb"] = ("fast",)
+    elif "unless you control two or more other lands" in low:
+        out["etb"] = ("slow",)
+    elif "unless you control two or more basic lands" in low:
+        out["etb"] = ("battle",)
+    elif "unless you have two or more opponents" in low:
+        out["etb"] = ("bond",)
+    elif (m := re.search(r"unless you control (\w+) or more other "
+                         + _TYPE + r"s\.", t)):
+        n = {"two": 2, "three": 3, "four": 4}[m.group(1)]
+        out["etb"] = ("count", m.group(2), n)
+    elif (m := re.search(r"you may reveal an? " + _TYPE + r" or " + _TYPE
+                         + r" card from your hand\. If you don't, this land "
+                         r"enters tapped", t)):
+        out["etb"] = ("reveal", m.groups())
+    elif "you may pay 2 life. if you don't, it enters tapped" in low:
+        out["etb"] = ("shock",)
+    elif re.search(r"(?:^|[.)] )this land enters tapped\.", low):
+        out["etb"] = ("tapped",)
+    elif "enters tapped" in low and "onto the battlefield tapped" not in low:
+        raise ValueError(f"unread enters-tapped rule: {t!r}")
+    m = re.search(r"\{T\}: Add ([^.]*)\. This land deals (\d) damage to you",
+                  t)
+    if m:
+        # A painless "{T}: Add {C}." beside it makes the pain a price of the
+        # COLOURS (a painland); with no such mode every tap hurts (Ancient
+        # Tomb, whose only ability is the painful one).
+        painless = re.search(r"(?:^|\. )\{T\}: Add \{C\}\.", t) is not None
+        out["pain"] = (int(m.group(2)),
+                       tuple(sorted(set(re.findall(r"\{([WUBRG])\}",
+                                                   m.group(1))))),
+                       not painless)
+    m = re.search(r"\{T\}, Pay (\d) life: Add ([^.]*)\.", t)
+    if m:
+        out["pain"] = (int(m.group(1)),
+                       tuple(sorted(set(re.findall(r"\{([WUBRG])\}",
+                                                   m.group(2))))), True)
+    m = re.search(r"\{T\}, (?:Pay (\d) life, )?Sacrifice this land: Search "
+                  r"your library for (a basic land card|an? " + _TYPE
+                  + r" or " + _TYPE + r" card), put it onto the battlefield"
+                  r"( tapped)?", t)
+    if m:
+        types = () if m.group(2).startswith("a basic") else \
+            (m.group(3), m.group(4))
+        mode = "tapped" if m.group(5) else "untapped"
+        if "if you control four or more lands, untap that land" in low:
+            mode = "untap4"
+        out["fetch"] = (int(m.group(1) or 0), types, mode)
+    if "return a land you control to its owner's hand" in low:
+        out["karoo"] = True
+    # A condition on a MANA ability only -- Cryptic Caves' "Activate only if
+    # you control five or more lands" is on its sacrifice ability and is not
+    # a rule about its mana. The gated colours are carried: Tainted Field
+    # loses {W}/{B} without a Swamp and keeps its {C}.
+    m = re.search(r"\{T\}: Add ([^.]*)\. Activate only if you control an? "
+                  + _TYPE + r"\.", t)
+    if m:
+        out["only_if"] = ("control", m.group(2),
+                          tuple(sorted(set(re.findall(r"\{([WUBRGC])\}",
+                                                      m.group(1))))))
+    m = re.search(r"\{T\}: Add ([^.]*)\. Activate only if you control "
+                  r"(\w+) or more lands\.", t)
+    if m:
+        out["only_if"] = ("lands", {"five": 5, "four": 4, "three": 3,
+                                    "seven": 7}[m.group(2)],
+                          tuple(sorted(set(re.findall(r"\{([WUBRGC])\}",
+                                                      m.group(1))))))
+    return out
+
+
 def current_cards(decks=None):
     """(creatures, everything) -- every Card the current deck modules
     construct, deck members and module-level candidates alike.
@@ -295,6 +407,21 @@ def main():
     plants = {n for n, c in cards.items()
               if n in creatures and "Plant" in subtypes(c)}
 
+    # LANDS, 2026-10-06 (§0z115): each land's basic land types and the rules
+    # its own text states about entering, tapping and life -- read from
+    # Scryfall like every set above, never tagged by hand. `edhmc.lands`
+    # reads both, for every engine that plays lands through it.
+    land_types = {n: tuple(t for t in BASIC_TYPES if t in subtypes(c))
+                  for n, c in cards.items()
+                  if n in everything and everything[n].is_land
+                  and set(BASIC_TYPES) & subtypes(c)}
+    land_rules = {}
+    for n, c in cards.items():
+        if n in everything and everything[n].is_land:
+            rule = classify_land(land_oracle(c))
+            if rule:
+                land_rules[n] = rule
+
     print(f"{len(cards)}/{len(everything)} cards resolved "
           f"({len(creatures)} of them creatures)\n")
     print(f"UNCONDITIONAL FLYING ({len(flying)}):")
@@ -349,6 +476,11 @@ def main():
           f"these as well as its tokens:")
     for n in sorted(plants):
         print(f"    {n}")
+
+    print(f"\nLAND RULES ({len(land_rules)}) -- entering, tapping and life, "
+          f"from the oracle text:")
+    for n in sorted(land_rules):
+        print(f"    {n:42} {land_rules[n]}")
 
     missed = {n for n, c in cards.items()
               if n in creatures and n not in flying and n not in CONDITIONAL
@@ -446,6 +578,21 @@ def main():
                      "and that is not only its tokens.\nPLANT = {\n")
             for n in sorted(plants):
                 fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# LAND TYPES: a land's basic land types (Plains, "
+                     "Island, Swamp, Mountain,\n# Forest), from the type line. "
+                     "A check land, a snarl, a fetch and Witch's\n# Cottage "
+                     "read these (§0z115).\nLAND_TYPES = {\n")
+            for n in sorted(land_types):
+                fh.write(f"    {n!r}: {land_types[n]!r},\n")
+            fh.write("}\n")
+            fh.write("\n# LAND RULES: what each land's own text says about "
+                     "entering, tapping and\n# life, classified by "
+                     "`tag_flying.classify_land` (which raises on text it\n# "
+                     "cannot read). Read by `edhmc.lands` (§0z115).\n"
+                     "LAND_RULES = {\n")
+            for n in sorted(land_rules):
+                fh.write(f"    {n!r}: {land_rules[n]!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"
