@@ -1,0 +1,78 @@
+{
+ "Barren Moor": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\n{T}: Add {B}.\nCycling {B} ({B}, Discard this card: Draw a card.)"
+ },
+ "Bojuka Bog": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, exile target player's graveyard.\n{T}: Add {B}."
+ },
+ "Cavern of Souls": {
+  "type_line": "Land",
+  "oracle_text": "As this land enters, choose a creature type.\n{T}: Add {C}.\n{T}: Add one mana of any color. Spend this mana only to cast a creature spell of the chosen type, and that spell can't be countered."
+ },
+ "Caves of Koilos": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. This land deals 1 damage to you."
+ },
+ "Command Tower": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add one mana of any color in your commander's color identity."
+ },
+ "Concealed Courtyard": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control two or fewer other lands.\n{T}: Add {W} or {B}."
+ },
+ "Fetid Heath": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{W/B}, {T}: Add {W}{W}, {W}{B}, or {B}{B}."
+ },
+ "Godless Shrine": {
+  "type_line": "Land \u2014 Plains Swamp",
+  "oracle_text": "({T}: Add {W} or {B}.)\nAs this land enters, you may pay 2 life. If you don't, it enters tapped."
+ },
+ "Isolated Chapel": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped unless you control a Plains or a Swamp.\n{T}: Add {W} or {B}."
+ },
+ "Opal Palace": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{1}, {T}: Add one mana of any color in your commander's color identity. If you spend this mana to cast your commander, it enters with a number of additional +1/+1 counters on it equal to the number of times it's been cast from the command zone this game."
+ },
+ "Radiant Fountain": {
+  "type_line": "Land",
+  "oracle_text": "When this land enters, you gain 2 life.\n{T}: Add {C}."
+ },
+ "Reliquary Tower": {
+  "type_line": "Land",
+  "oracle_text": "You have no maximum hand size.\n{T}: Add {C}."
+ },
+ "Rogue's Passage": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{4}, {T}: Target creature can't be blocked this turn."
+ },
+ "Secluded Steppe": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\n{T}: Add {W}.\nCycling {W} ({W}, Discard this card: Draw a card.)"
+ },
+ "Shizo, Death's Storehouse": {
+  "type_line": "Legendary Land",
+  "oracle_text": "{T}: Add {B}.\n{B}, {T}: Target legendary creature gains fear until end of turn. (It can't be blocked except by artifact creatures and/or black creatures.)"
+ },
+ "Tainted Field": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{T}: Add {W} or {B}. Activate only if you control a Swamp."
+ },
+ "Temple of Silence": {
+  "type_line": "Land",
+  "oracle_text": "This land enters tapped.\nWhen this land enters, scry 1. (Look at the top card of your library. You may put that card on the bottom.)\n{T}: Add {W} or {B}."
+ },
+ "Temple of the False God": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}{C}. Activate only if you control five or more lands."
+ },
+ "Vault of the Archangel": {
+  "type_line": "Land",
+  "oracle_text": "{T}: Add {C}.\n{2}{W}{B}, {T}: Creatures you control gain deathtouch and lifelink until end of turn."
+ }
+}
