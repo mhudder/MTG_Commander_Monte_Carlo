@@ -2334,7 +2334,7 @@ CHANGES: list[Change] = [
             "The two cut different cards and neither touches the other's "
             "mechanism, but they have not been measured as a 2x2 and that is "
             "the check §0p exists for if both are committed together."),
-        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0418 +-0.0034 at T10, +0.0443 +-0.0038 at T20 (up from +0.0271 at T20 on 2026-09-29: the engine changes since, chiefly §0z90's general Exquisite Blood clause, which this second copy of the trigger shares). results/restage_20261005.txt. " + (
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0447 +-0.0035 at T10, +0.0474 +-0.0038 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + "RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0418 +-0.0034 at T10, +0.0443 +-0.0038 at T20 (up from +0.0271 at T20 on 2026-09-29: the engine changes since, chiefly §0z90's general Exquisite Blood clause, which this second copy of the trigger shares). results/restage_20261005.txt. " + (
             'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
             '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
@@ -2389,7 +2389,7 @@ CHANGES: list[Change] = [
             "simpler than a real pilot's, so a land cut is the kind of change "
             "this harness flatters. Committing needs the .xlsx and the module "
             "to move with the ledger -- tivit has all three legs."),
-        reverified=(
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0120 +-0.0040 at T10, +0.0081 +-0.0050 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + (
             "NOT RE-MEASURED, AND THIS CARD'S OWN PRIORITY IS ONE OF THE MOVES "
             "(2026-09-25, §0z44). The owner adopted tivit's four priority moves"
             ' -- Anointed Procession 8 -> 10 among them, with Mirkwood Bats 8 -'
@@ -2472,7 +2472,7 @@ CHANGES: list[Change] = [
             "less), which is deliberately conservative and a floor on that "
             "half -- the model cannot value 'I am losing anyway'."
         ),
-        reverified="RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0043 +-0.0031 at T10, +0.0193 +-0.0042 at T20; the Citadel's dig now stops at a wipe the gate refuses. results/restage_20261005.txt. " + (
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0049 +-0.0030 at T10, +0.0131 +-0.0040 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + "RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0043 +-0.0031 at T10, +0.0193 +-0.0042 at T20; the Citadel's dig now stops at a wipe the gate refuses. results/restage_20261005.txt. " + (
             'NOT RE-MEASURED -- THE BASELINE MOVED UNDER IT (2026-09-25, §0z44)'
             '. The owner adopted two karlov priority moves (Felidar Sovereign 7'
             ' -> 9, Sorin, Solemn Visitor 6 -> 8), jointly +0.0099 / +0.0091 at'
@@ -2549,7 +2549,7 @@ CHANGES: list[Change] = [
             "implemented in azusa.activations(), so cutting it is safe in the "
             "way cutting Bane is not."
         ),
-        reverified=(
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0037 +-0.0023 at T10, +0.0115 +-0.0034 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + (
             "RE-MEASURED 2026-09-26 (§0z63), N=15,000 paired: +0.0033 +-0.0022 at T10, +0.0133 +-0.0035 at T20. The staging stands. results/restage_20260926.txt."
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0034 +-0.0022 at T10, +0.0130 +-0.0035 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
@@ -2567,6 +2567,7 @@ CHANGES: list[Change] = [
             "package -- for no life."
         ),
         evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        reverified=("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0138 +-0.0036 at T10, +0.0117 +-0.0048 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
         notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
     ),
     Change(
@@ -2580,6 +2581,7 @@ CHANGES: list[Change] = [
             "Passage without the untap: the same two landfalls for no life."
         ),
         evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        reverified=("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0079 +-0.0037 at T10, +0.0063 +-0.0049 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
         notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
     ),
     Change(
@@ -2692,7 +2694,7 @@ CHANGES: list[Change] = [
             "the top-setter logic: -0.0075 +-0.0058 win rate, signal 'win', a "
             "third top-setter."
         ),
-        reverified='RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0083 +-0.0025 at T10, +0.0269 +-0.0038 at T20. results/restage_20261005.txt. ' + (
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0104 +-0.0023 at T10, +0.0246 +-0.0037 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0083 +-0.0025 at T10, +0.0269 +-0.0038 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v). Re-run as the SAME 2x2 factorial at the "
             "same N=30,000 per cell and the same seeds as the 2026-09-06 "
@@ -2772,7 +2774,7 @@ CHANGES: list[Change] = [
             "LESS (-0.98) but wins less (+0.0045 / +0.0128), so this is the "
             "better of the two measured options."
         ),
-        reverified='RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0051 +-0.0027 at T10, +0.0233 +-0.0042 at T20. results/restage_20261005.txt. ' + (
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0073 +-0.0025 at T10, +0.0231 +-0.0041 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0051 +-0.0027 at T10, +0.0233 +-0.0042 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-05 after the top-setter policy fixes and the Galvanoth ordering fix. 6,000 paired games: win rate +0.0010 [-0.0017, +0.0037] at 10 turns and +0.0193 [+0.0133, +0.0253] at 20; damage +1.17 and +3.02; mv_cheated +1.20 and +3.20. The 20-turn result has been stable and significant across every engine version tried (+0.0215, +0.0108, +0.0173, +0.0182, +0.0193); the 10-turn result has been inside its bar since evasion landed. A long-horizon call, and the best-supported of the three staged changes. Scroll Rack is a TOP-SETTER, and the top-setter plan is the weakest part of this deck's construction. "
             "RE-VERIFIED AGAIN 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v), same 2x2 factorial, same N=30,000 and "
@@ -2828,7 +2830,7 @@ CHANGES: list[Change] = [
             "releases 2026-10-02; the card was implemented from preview text. "
             "Re-fetch its oracle text from Scryfall on release, and re-measure "
             "if a word has changed, BEFORE this is committed."),
-        reverified="RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0026 +-0.0008 at T10, +0.0124 +-0.0028 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
+        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0029 +-0.0009 at T10, +0.0141 +-0.0028 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0026 +-0.0008 at T10, +0.0124 +-0.0028 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
     ),
 ]
 

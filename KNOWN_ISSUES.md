@@ -167,6 +167,7 @@ Methodology that used to live at the end of this file is now
 | [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. **Items 1-5 FIXED in §0z117, 6-13 in §0z118**; the label, per-engine and smaller lists stay open |
 | [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference implemented through `card_types` (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), shilgengar's Angel/Cleric tags derived from Scryfall (+0.0047), Coercive Portal's real carnage (costs tivit 0.011 under adversarial voting). Karlov, azusa, trostani bit-identical |
 | [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks; protection answers the events its text answers, and **Mother of Runes, home by the owner's rule, makes one removal a round fizzle: +0.007 to karlov**; four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0054 with no commander SHROUD**: a shroud redirects the pod's removal to its engine pieces. Trostani bit-identical |
+| [0z119](#0z119) | REBUILT | **All seven tables rebuilt at bd9e7ae** (parallel, slowest leg 53 min). Every sign flip is a fix's own card: **Mother of Runes now positive** (+0.0037 T20), Coercive Portal negative, Bramble Sovereign back; Biotransference, Kokusho, Kozilek up; lorehold's discard spells down with its paid discards. **The legs ran Python 3.13 and the interpreter matters**: 3.11 plays one game in 15,000 differently -- the coordinator moved to 3.13, proven by `tools/repro_row.py`. All nine staged swaps significant at both horizons |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10507,6 +10508,92 @@ six moved, as intended, and every cache was already SUSPECT for the rebuild
 for the new Sejiri Shelter and Promise of Loyalty reasons, their only
 change. The ledger's §0z35 tie-break ("cutting Mother of Runes closes
 `try_protect()` outright") is annotated: that channel was not her text.
+
+## 0z119. REBUILT — all seven tables on the §0z112–§0z118 engine, and the interpreter is part of a table
+
+The owner, 2026-10-07: "push to main and start the rebuild", after
+§0z116's thirteen items were fixed (§0z117, §0z118). Every cache was SUSPECT:
+the old tables were built at a1cdd9e (five decks), 51fa782 (azusa) and
+5e76366 (trostani), before the Havengul fix (§0z112), the land rules
+(§0z114, §0z115), the thirteen oracle fixes and azusa's two staged fetches.
+All seven were rebuilt at **bd9e7ae** as a parallel rebuild (§0z94), one
+cloud session per deck. **Slowest leg 53 minutes** (azusa, launch to push),
+fastest 16 (karlov). Shards merged with `--merge-shards`; `check_docs`
+16/16 with every cache CURRENT, 65 test modules green, validate 21 × +0.00.
+
+**THE INTERPRETER MOVED UNDER THE REBUILD.** Every leg reported
+`python 3.13.16, numpy 2.4.6`; every earlier rebuild, and this coordinator,
+ran 3.11.15. The protocol says a mismatched leg is re-run -- so the first
+question was whether the mismatch is real. **It is.** `check_unchanged_decks`
+on the same commit under 3.11.15 and 3.13.12 (same pins): azusa
+BIT-IDENTICAL, the other six MOVED -- most only in the last bits of
+`final_life`, but rendmaw's damage +0.039, lorehold's +0.005 and trostani's
+cards drawn +0.0025 a game: some games play differently. Recomputing one
+cached row both ways settles it: rendmaw's Steel Overseer reproduces under
+3.13.12 to the last bit and does NOT under 3.11.15 (T20 +0.0014 against the
+cached +0.0013 -- one game in 15,000). The likely mechanism: Python 3.12
+made `sum()` of floats compensated (Neumaier), so a total that differed in
+its last bit can tip a comparison.
+
+Seven legs agreed and only the coordinator differed, so **the coordinator
+moved to the legs' interpreter** rather than seven legs to an image that no
+longer ships 3.11: a 3.13.12 environment with the same pins
+(`uv venv -p /usr/bin/python3.13`), and **`tools/repro_row.py`**, new, which
+recomputes one cached row and compares every cell exactly. IDENTICAL on
+karlov's Mother of Runes, rendmaw's Steel Overseer and azusa's Kozilek --
+three decks, two of them among the six that move between interpreters. Every
+gate above ran under 3.13. The skill now says what to do when "yours" is the
+interpreter that moved, and CLAUDE.md carries the lesson. **Nothing measured
+before today is affected beyond its own noise**: a paired difference at
+N=15,000 is three orders of magnitude above one game in 15,000.
+
+**WHAT MOVED** beyond its own old bar (`won`, both horizons), against the
+tables at bd9e7ae:
+
+| deck | cells moved | sign flips | the pattern, and the § it comes from |
+|---|---|---|---|
+| rendmaw | 7 of 128 | 0 | **Biotransference −0.0011 → +0.0069** at T20 (§0z117, implemented); Whip of Erebos, Burnished Hart up; Steel Overseer down to inside its bar at T20 (it taps now, §0z118) |
+| lorehold | 46 of 130 | 0 | the deck lost 0.034 when its discards were paid (§0z117), and the discard spells fell with it: **Faithless Looting +0.0247 → +0.0046**, Unexpected Windfall +0.0243 → +0.0122, Big Score +0.0249 → +0.0142, Thrill +0.0208 → +0.0121; the rest of the top down by a bar (Storm Herd +0.0525 → +0.0432, Rise of the Eldrazi, Approach) |
+| karlov | 12 of 128 | **2** | **Mother of Runes −0.0043 → +0.0028 (T10), −0.0055 → +0.0037 (T20)** -- §0z118's prediction: protection that makes removal fizzle, not a shroud. Swiftfoot Boots stays negative (−0.0054 at T20): a shroud redirects removal. The Conqueror and both Sorins up |
+| tivit | 26 of 130 | **1** | **Coercive Portal +0.0074 → −0.0038 at T20** (its real carnage, §0z117); **Kambal +0.0198 → +0.0077 at T10** (once per batch, §0z118) while Mirkwood Bats rises (+0.0360 → +0.0431): the per-token drain is now the Bats' alone; Time Sieve, Deadeye Navigator, Nadier's Nightblade up |
+| shilgengar | 17 of 128 | 0 | **Kokusho +0.0039 → +0.0095** (§0z117); the tribe up with its tags and Giada (Righteous Valkyrie, Angel of Suffering, Giada +0.0024 → +0.0057, Bishop of Wings); Teferi's Protection +0.0016 → +0.0044 (a wrath you phase out of kills theirs, §0z118) |
+| azusa | 22 of 116 | 0 | **Kozilek +0.0077 → +0.0268** (its cast draw, §0z114); Crucible of Worlds and Ramunap Excavator up with the fetches' real rules (§0z115); the staged Ka-Zar slightly down |
+| trostani | 33 of 122 | **1** | its old table predated the adopted priorities (§0z110): **Seedborn Muse +0.0225 → +0.0447**, King Darien +0.0169 → +0.0341, and Bramble Sovereign's T10 row flips −0.0095 → +0.0029 back at 8.5 (§0z111) |
+
+**Every sign flip is a fix's own card**, and no row moved that a fix does
+not name or that the deck's own level does not explain. **Damn** moved
+nowhere significant in any of its three decks: karlov −0.0006 ±0.0018 at
+T20, tivit +0.0105, shilgengar +0.0074 -- a wrath at {2}{W}{W} that the gate
+fires late is still worth a slot at the long horizon.
+
+**THE NINE STAGED SWAPS, RE-MEASURED** on this engine and interpreter
+(`diagnostics/run_restage.py`, `results/restage_20261007.txt`; the 3.11
+run agreed to the fourth decimal everywhere but one digit), in context,
+staged minus undone -- **every one significant at both horizons**, and
+recorded on each Change's `reverified`:
+
+| swap | T10 | T20 | last measured T20 |
+|---|---|---|---|
+| karlov −Soulmender +Bloodthirsty Conqueror | +0.0447 ±0.0035 | +0.0474 ±0.0038 | +0.0443 |
+| karlov −Swamp +Bolas's Citadel | +0.0049 ±0.0030 | +0.0131 ±0.0040 | +0.0193 |
+| tivit −Plains +Anointed Procession | +0.0120 ±0.0040 | +0.0081 ±0.0050 | +0.0145 |
+| azusa −Perilous Forays +Ka-Zar | +0.0037 ±0.0023 | +0.0115 ±0.0034 | |
+| azusa −Forest +Fabled Passage | +0.0138 ±0.0036 | +0.0117 ±0.0048 | +0.0179 |
+| azusa −Forest +Evolving Wilds | +0.0079 ±0.0037 | +0.0063 ±0.0049 | +0.0158 |
+| azusa, both fetches | +0.0257 ±0.0047 | +0.0257 ±0.0061 | +0.0237 |
+| lorehold −Penance +Caldera Pyremaw | +0.0104 ±0.0023 | +0.0246 ±0.0037 | +0.0269 |
+| lorehold −Scroll Rack +Sunbird's Invocation | +0.0073 ±0.0025 | +0.0231 ±0.0041 | +0.0233 |
+| shilgengar −Vampiric Rites +Lyra | +0.0029 ±0.0009 | +0.0141 ±0.0028 | +0.0124 |
+
+Two came down by about a bar. The likely reasons, NOT separately
+measured: **Bolas's Citadel** (+0.0193 → +0.0131) can no longer cast Damn
+off the top as a wrath (overload is an alternative cost, §0z118), and the
+lands it plays now obey their own entry rules (§0z115); **Anointed
+Procession** (+0.0145 → +0.0081) doubled every token Kambal drained for,
+and Kambal now drains once per batch (§0z118). Both are still significant
+at both horizons. The two fetches together hold
+their value; alone, Evolving Wilds is now only just outside its bar at T20 --
+the second fetch is worth less than the first, as §0z114 measured.
 
 ## How to read an ablation table
 

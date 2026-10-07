@@ -20,6 +20,8 @@ code and want to know what else it touches.
    ─ candidates.py        value-over-a-blank for ADDITIONS, batches keyed by name
    ─ validate.py          A/A control + CRN audit; must print +0.00 everywhere
    ─ check_unchanged_decks.py  did a shared-code change move a deck's baseline?
+   ─ repro_row.py         recompute ONE cached ablation row, compare to the last bit
+                          -- does this interpreter reproduce the tables? (§0z119)
    ─ check_docs.py        do the docs still describe the repo? (runs the generators)
    ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write)
    ─ removal_census.py    the fifth: classifies every answer and wipe in every list

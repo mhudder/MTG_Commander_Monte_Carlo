@@ -444,6 +444,16 @@ you add a card, `python -m tools.tag_flying --write` is part of the change**
 
 **`id(obj)` IS IDENTITY ONLY WHILE THE OBJECT IS ALIVE** (§0z98). A dict or set keyed on `id(perm)` that is not cleared when the permanent leaves hands its state to whatever object CPython allocates into the freed id next, and which one that is depends on the process's history -- so the same seed plays differently in two workers, a CRN leak no A/A control can see. **Hold the object for as long as its id is a key** -- and since fixing sites one by one found six more, the engine now holds every Card and Permanent for the game (`engine.begin_game`), so any id key is safe. A tool that must reproduce a cached number exactly is what catches it: one game in 15,000 was enough. **And test a hold by asking whether the object is ALIVE (a weak reference), never by waiting for an id to be reused** -- reuse is the allocator's choice, and the test that waited for it passed with the hold off (§0z100).
 
+**THE INTERPRETER IS PART OF A TABLE'S IDENTITY** (§0z119). Python 3.11
+and 3.13 play about one game in 15,000 differently on the same seed, with
+the same numpy -- most likely because 3.12 made `sum()` of floats
+compensated, and a total that differs in its last bit can flip a
+comparison. The A/A control cannot see it (both legs share an interpreter),
+and neither can any paired difference worth reporting. **A tool that must
+reproduce a cached number exactly must run on the interpreter that built
+it** -- `tools.repro_row` is the check, and the parallel-rebuild skill says
+what to do when the cloud image moves under you.
+
 **`[card] * n` IS ONE CARD** (§0z112). Every deck built its basics that
 way, so every rule that compares cards by identity read two copies as one:
 Shigeki put two revealed Forests onto the battlefield, and a hideaway dropped

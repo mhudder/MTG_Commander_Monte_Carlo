@@ -84,6 +84,23 @@ git log --format='%s%n%b' <commit>..HEAD | grep -E '^Rebuild|^Interpreter'
 **Every leg's `Interpreter:` line must match yours.** A leg on another
 Python or numpy is re-run, not merged.
 
+**AND "YOURS" CAN BE THE ONE THAT MOVED** (§0z119). The legs' image went
+from Python 3.11.15 to 3.13.16 between two rebuilds while an older
+coordinator container stayed on 3.11 -- and the two interpreters play about
+one game in 15,000 differently (Python 3.12 made float `sum()`
+compensated). When every leg agrees and only you differ, do not re-run
+seven legs: coordinate on THEIR interpreter, with the same pins --
+
+```bash
+uv venv -p /usr/bin/python3.13 /tmp/py313
+uv pip install -p /tmp/py313/bin/python "<pins>"
+PYTHONPATH=. /tmp/py313/bin/python -m tools.repro_row <deck> "<card>"
+```
+
+-- and require IDENTICAL on a row or two before trusting it; then run step
+4's gates under that interpreter. A patch-level difference (3.13.12 against
+3.13.16) reproduced every row tried.
+
 ```bash
 python -m tools.cache_manifest --merge-shards   # refuses a shard built on
                                                 # any other code

@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "a5312ae0b1073adc",
-    "built_commit": "51fa782",
-    "built_utc": "2026-10-03T20:51:29Z",
+    "built_at": "aa741f5192c6a702",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:32:50Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -308,39 +308,46 @@
         "built_utc": "2026-10-03T13:18:11Z",
         "deck": "azusa",
         "verified": []
+      },
+      {
+        "built_at": "a5312ae0b1073adc",
+        "built_commit": "51fa782",
+        "built_utc": "2026-10-03T20:51:29Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "0c15a51",
+            "evidence": "2026-10-05 (\u00a70z105): the only fingerprint change is edhmc/decks/_removal.py dropping Goldspan Dragon from SCANNED (a name in no list) after the swap's withdrawal. check_unchanged_decks --n=3000, working tree vs worktree at 77897a8: all seven decks BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "8d9231b21aad7f0f",
+            "utc": "2026-10-05T03:08:23Z"
+          },
+          {
+            "commit": "dd73066",
+            "evidence": "2026-10-05 (\u00a70z106, \u00a70z107): the wipe gate's cost measure and Rogue's Passage touch shared files in every fingerprint; azusa casts no own wipe and runs no Passage. check_unchanged_decks --n=3000, working tree vs worktree at b0e7562: azusa BIT-IDENTICAL on all 8 metrics (the other six moved and are rebuilt).",
+            "fingerprint": "f35c30e5abfbbe5e",
+            "utc": "2026-10-05T13:54:35Z"
+          },
+          {
+            "commit": "1c237d2",
+            "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: azusa BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+            "fingerprint": "e5a899735be8d82b",
+            "utc": "2026-10-06T03:36:05Z"
+          },
+          {
+            "commit": "669afff",
+            "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+            "fingerprint": "9934b23c15b129a9",
+            "utc": "2026-10-06T12:56:30Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "0c15a51",
-        "evidence": "2026-10-05 (\u00a70z105): the only fingerprint change is edhmc/decks/_removal.py dropping Goldspan Dragon from SCANNED (a name in no list) after the swap's withdrawal. check_unchanged_decks --n=3000, working tree vs worktree at 77897a8: all seven decks BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "8d9231b21aad7f0f",
-        "utc": "2026-10-05T03:08:23Z"
-      },
-      {
-        "commit": "dd73066",
-        "evidence": "2026-10-05 (\u00a70z106, \u00a70z107): the wipe gate's cost measure and Rogue's Passage touch shared files in every fingerprint; azusa casts no own wipe and runs no Passage. check_unchanged_decks --n=3000, working tree vs worktree at b0e7562: azusa BIT-IDENTICAL on all 8 metrics (the other six moved and are rebuilt).",
-        "fingerprint": "f35c30e5abfbbe5e",
-        "utc": "2026-10-05T13:54:35Z"
-      },
-      {
-        "commit": "1c237d2",
-        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: azusa BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
-        "fingerprint": "e5a899735be8d82b",
-        "utc": "2026-10-06T03:36:05Z"
-      },
-      {
-        "commit": "669afff",
-        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
-        "fingerprint": "9934b23c15b129a9",
-        "utc": "2026-10-06T12:56:30Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "77e4a6364e1aad57",
-    "built_commit": "a1cdd9e",
-    "built_utc": "2026-10-05T13:57:11Z",
+    "built_at": "0ebe28e2a348c07b",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:30:49Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -570,33 +577,40 @@
             "utc": "2026-10-05T03:08:24Z"
           }
         ]
+      },
+      {
+        "built_at": "77e4a6364e1aad57",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:57:11Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "1c237d2",
+            "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: karlov BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+            "fingerprint": "f601d4d3699c41a3",
+            "utc": "2026-10-06T03:36:04Z"
+          },
+          {
+            "commit": "669afff",
+            "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+            "fingerprint": "39fcd5ed52e9e738",
+            "utc": "2026-10-06T12:56:29Z"
+          },
+          {
+            "commit": "29f939d",
+            "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "a44cad0d763486a2",
+            "utc": "2026-10-06T14:04:23Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "1c237d2",
-        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: karlov BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
-        "fingerprint": "f601d4d3699c41a3",
-        "utc": "2026-10-06T03:36:04Z"
-      },
-      {
-        "commit": "669afff",
-        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
-        "fingerprint": "39fcd5ed52e9e738",
-        "utc": "2026-10-06T12:56:29Z"
-      },
-      {
-        "commit": "29f939d",
-        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "a44cad0d763486a2",
-        "utc": "2026-10-06T14:04:23Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "2dea6ce4c2aec831",
-    "built_commit": "a1cdd9e",
-    "built_utc": "2026-10-05T13:57:27Z",
+    "built_at": "a1f01dca5b726256",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:31:27Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -860,33 +874,40 @@
             "utc": "2026-10-05T03:08:24Z"
           }
         ]
+      },
+      {
+        "built_at": "2dea6ce4c2aec831",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:57:27Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "1c237d2",
+            "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: lorehold BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+            "fingerprint": "a2a455dceb53ac83",
+            "utc": "2026-10-06T03:36:04Z"
+          },
+          {
+            "commit": "669afff",
+            "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+            "fingerprint": "dd0242bff72ca1b5",
+            "utc": "2026-10-06T12:56:29Z"
+          },
+          {
+            "commit": "29f939d",
+            "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "ff19527ae4e3222a",
+            "utc": "2026-10-06T14:04:22Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "1c237d2",
-        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: lorehold BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
-        "fingerprint": "a2a455dceb53ac83",
-        "utc": "2026-10-06T03:36:04Z"
-      },
-      {
-        "commit": "669afff",
-        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
-        "fingerprint": "dd0242bff72ca1b5",
-        "utc": "2026-10-06T12:56:29Z"
-      },
-      {
-        "commit": "29f939d",
-        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "ff19527ae4e3222a",
-        "utc": "2026-10-06T14:04:22Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "d6c162f17fd82f27",
-    "built_commit": "a1cdd9e",
-    "built_utc": "2026-10-05T13:57:24Z",
+    "built_at": "3f59d1106b91c7c7",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:31:08Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -1137,14 +1158,21 @@
             "utc": "2026-10-05T03:08:24Z"
           }
         ]
+      },
+      {
+        "built_at": "d6c162f17fd82f27",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:57:24Z",
+        "deck": "rendmaw",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "777e0c9f7e518826",
-    "built_commit": "a1cdd9e",
-    "built_utc": "2026-10-05T13:58:10Z",
+    "built_at": "b2414498e6abb104",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:30:54Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -1418,33 +1446,40 @@
             "utc": "2026-10-05T03:08:24Z"
           }
         ]
+      },
+      {
+        "built_at": "777e0c9f7e518826",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:58:10Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "1c237d2",
+            "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: shilgengar BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+            "fingerprint": "82b59b0543ef9b7d",
+            "utc": "2026-10-06T03:36:04Z"
+          },
+          {
+            "commit": "669afff",
+            "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+            "fingerprint": "2af07f842a6d5bc5",
+            "utc": "2026-10-06T12:56:30Z"
+          },
+          {
+            "commit": "29f939d",
+            "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "bb3d8d8e8a708d3e",
+            "utc": "2026-10-06T14:04:23Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "1c237d2",
-        "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: shilgengar BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
-        "fingerprint": "82b59b0543ef9b7d",
-        "utc": "2026-10-06T03:36:04Z"
-      },
-      {
-        "commit": "669afff",
-        "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
-        "fingerprint": "2af07f842a6d5bc5",
-        "utc": "2026-10-06T12:56:30Z"
-      },
-      {
-        "commit": "29f939d",
-        "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "bb3d8d8e8a708d3e",
-        "utc": "2026-10-06T14:04:23Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "83c408fae55d5593",
-    "built_commit": "a1cdd9e",
-    "built_utc": "2026-10-05T13:56:58Z",
+    "built_at": "d30fa7936e87ad23",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:31:28Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -1674,14 +1709,21 @@
             "utc": "2026-10-05T03:08:25Z"
           }
         ]
+      },
+      {
+        "built_at": "83c408fae55d5593",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:56:58Z",
+        "deck": "tivit",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
-    "built_at": "4892172f0d6c3eb8",
-    "built_commit": "5e76366",
-    "built_utc": "2026-10-05T15:20:18Z",
+    "built_at": "f14c8abaffff896a",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:31:52Z",
     "deck": "trostani",
     "superseded": [
       {
@@ -1747,6 +1789,13 @@
         "built_at": "9e92fd7edb44d483",
         "built_commit": "a1cdd9e",
         "built_utc": "2026-10-05T13:58:02Z",
+        "deck": "trostani",
+        "verified": []
+      },
+      {
+        "built_at": "4892172f0d6c3eb8",
+        "built_commit": "5e76366",
+        "built_utc": "2026-10-05T15:20:18Z",
         "deck": "trostani",
         "verified": []
       }
