@@ -164,7 +164,8 @@ Methodology that used to live at the end of this file is now
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
 | [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were both missing** (azusa), Kozilek labelled SCRIPTED. Implemented: **+0.0224 ±0.0033 at T20**; the Eye now ties a Forest at T20 where it cost 0.011. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237, both horizons. Awaken the Woods' Kozilek cut was priced on the broken card |
 | [0z115](#0z115) | FIXED | **Lands play by their own text**: entry conditions, painland/horizon/fetch/shock life and karoos generated from Scryfall into `LAND_RULES`; Temple of the False God, Nykthos, Eldrazi Temple and **Vault of the Archangel -- free permanent lifelink in karlov, worth 0.028** -- corrected; Mikokoro, Geier Reach (lorehold **+0.0115**), the Castles, High Market, Phyrexian Tower, Petrified Field, Crystal Vein implemented. Life and entry costs take 0.007-0.032 from every deck. Trostani moved through a latent bug: an uncracked fetch paid {1}. The shock policy does not matter. All seven tables SUSPECT: the rebuild is unblocked |
-| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. Nothing measured or fixed yet |
+| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. **Items 1-5 FIXED in §0z117**; 6-13 open |
+| [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference implemented through `card_types` (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), shilgengar's Angel/Cleric tags derived from Scryfall (+0.0047), Coercive Portal's real carnage (costs tivit 0.011 under adversarial voting). Karlov, azusa, trostani bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10286,6 +10287,72 @@ rebuild §0z115 already unblocked. Items 1-5 are the ones the project's own
 tell would have caught: a card whose text is central and whose row is
 ordinary. The audit tool's ERR for trostani's X-spells should learn the
 cast-time-X convention, or it will teach the next reader to ignore an ERR.
+
+## 0z117. FIXED — §0z116's top five: Kokusho, Biotransference, lorehold's discards, shilgengar's tribe, Coercive Portal
+
+The owner, 2026-10-07: "fix the top five first" -- §0z116's items 1-5, the
+ones the project's own tell would have caught. Oracle text re-fetched from
+Scryfall for each. Every fix has a switch; `tests/test_top_five.py` pins
+thirteen cases with four mutations, exact sets.
+
+1. **Kokusho, the Evening Star** (shilgengar): "When Kokusho dies, each
+   opponent loses 5 life. You gain life equal to the life lost this way." In
+   `on_creature_death`, every death path, bounded by what the pod could lose,
+   one lifegain event (`kokusho_text`).
+2. **Biotransference** (rendmaw): `engine.card_types` / `is_artifact` add
+   Artifact to every creature card you own while it is out, and every place
+   rendmaw asks a type reads them -- the two-or-more-types Rendmaw trigger,
+   Foundry Inspector, Steel Overseer, the artifact recursion (Scrap Trawler,
+   Myr Retriever, Junk Diver), Baba Lysaga. "Whenever you cast an artifact
+   spell, you lose 1 life and create a 2/2 black Necron Warrior": on the
+   cast, before the counterspell check (`biotransference_text`). KNOWN_BLIND
+   -> SCRIPTED. Known gap: rendmaw's sacrifice paths other than
+   `opponents.destroy` call no `artifact_died`, so Scrap Trawler misses a
+   creature sacrificed to an outlet.
+3. **Lorehold's discards**: Thrill of Possibility, Big Score and Unexpected
+   Windfall discard as an additional cost, before the draw; Faithless Looting
+   after it ("draw two cards, then discard two cards"). The rummage's pick,
+   to the graveyard, Monument to Endurance firing (`discard_text`). A copy pays
+   no additional cost. Library of Leng's redirect is not taken (a floor, as
+   for Artist's Talent).
+4. **Shilgengar's tribe**: `angel` and `cleric` are DERIVED from generated
+   ANGEL and CLERIC sets (`tag_flying`, type line), never from the hand tags.
+   It changes exactly the three cards §0z116 named: Avacyn, Angel of Hope and
+   Angel of Suffering become Angels, Bishop of Wings a Cleric. No switch -- it
+   is data, as FLYING is.
+5. **Coercive Portal** (tivit): carnage sacrifices the Portal and destroys
+   every nonland permanent -- creatures as one event, then the other nonland
+   permanents, then every token pile (Treasures, Clues, Food, Powerstones) --
+   with Disciple of the Vault, Marionette Master and Nadier's Nightblade
+   reading the event as it was before it (CR 603.10a). Artifact lands stay
+   (`portal_text`).
+
+**Measured** (`diagnostics/run_top_five.py`,
+`results/top_five_20261007.txt`), N=15,000 paired, staged lists, each fix
+turned OFF, arm minus the new engine:
+
+| deck | fix off | won T10 | won T20 | mechanism, per game |
+|---|---|---|---|---|
+| rendmaw | Biotransference | **−0.0011 ±0.0007** | **−0.0081 ±0.0021** | 0.45 Necrons |
+| lorehold | discards | **+0.0156 ±0.0031** | **+0.0344 ±0.0050** | 1.27 cards discarded |
+| tivit | Portal's text | **+0.0023 ±0.0016** | **+0.0113 ±0.0033** | carnage 0.12; own wipes 0.35 against 0.76 |
+| shilgengar | Kokusho | −0.0002 ±0.0002 | **−0.0056 ±0.0015** | 0.78 life drained |
+| shilgengar | the old hand tags | **−0.0005 ±0.0004** | **−0.0047 ±0.0017** | Blood 4.13 against 3.90 |
+
+**Lorehold's free discards were worth 0.034 of its win rate at T20** -- the
+largest of the five, and a free card every cast: the hand grew by two where
+the text grows it by one. Biotransference, Kokusho and the tribe tags add
+0.005 to 0.008 each. **Coercive Portal's true text COSTS tivit 0.011**: the
+old creature wipe left the deck's artifacts and Treasures standing; the real
+carnage takes them. Under `opp_vote_policy="adversarial"` the pod votes
+carnage whenever it can win the vote, so this row rests on that knob, said
+out loud: a table that votes homage makes the Portal a card-draw engine.
+
+The other three decks are BIT-IDENTICAL to bdd9909 (`check_unchanged_decks`,
+karlov, azusa, trostani); rendmaw, lorehold, tivit and shilgengar moved, as
+intended, and their caches were already SUSPECT for the rebuild (§0z115).
+rendmaw's table was re-rendered from its cache for Biotransference's new
+category, its only change.
 
 ## How to read an ablation table
 

@@ -1,0 +1,13 @@
+§0z116's TOP FIVE, FIXED (§0z117). N=15,000 paired, staged lists; each row turns ONE fix off: ARM MINUS THE NEW ENGINE (* = CI excludes zero).
+
+  deck       arm                              won T10           won T20        damage T20
+  rendmaw    Biotransference off     -0.0011 ±0.0007*  -0.0081 ±0.0021*  -0.7463 ±0.0909*
+      per game, new -> off: biotransference_necrons 0.45->0.00  rendmaw_triggers 2.89->2.84  own_wipes_cast 0.04->0.04  life_lost_to_own_cards 1.96->1.51
+  lorehold   discards off            +0.0156 ±0.0031*  +0.0344 ±0.0050*  +2.5233 ±0.2667*
+      per game, new -> off: spell_discards 1.27->0.00  own_wipes_cast 0.35->0.35  life_lost_to_own_cards 2.82->2.94
+  tivit      Portal text off         +0.0023 ±0.0016*  +0.0113 ±0.0033*  -0.7340 ±0.2018*
+      per game, new -> off: portal_carnage 0.12->0.00  portal_tokens_destroyed 1.56->0.00  own_wipes_cast 0.35->0.76  life_lost_to_own_cards 1.30->1.32
+  shilgengar Kokusho off             -0.0002 ±0.0002   -0.0056 ±0.0015*  -0.7800 ±0.0731*
+      per game, new -> off: kokusho_drain 0.78->0.00  blood_made 4.13->4.12  own_wipes_cast 0.15->0.15  life_lost_to_own_cards 2.94->2.93
+  shilgengar old hand tags           -0.0005 ±0.0004*  -0.0047 ±0.0017*  -0.3573 ±0.0697*
+      per game, new -> off: kokusho_drain 0.78->0.79  blood_made 4.13->3.90  life_lost_to_own_cards 2.94->2.94

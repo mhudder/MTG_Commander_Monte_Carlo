@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `bdd9909` from 23 engine sources.
+Derived at `8105574` from 23 engine sources.
 
 **227 knobs, 331 call sites.**
 
@@ -63,7 +63,7 @@ show up first.
 | `attack_triggers` | `True` | 1 | `edhmc/engine.py:3862` |  | yes | yes |
 | `battlefield_creature_types` | `True` | 1 | `edhmc/engine.py:2882` | §0z92 | yes | yes |
 | `beacon_min_tax` | `4` | 1 | `edhmc/lorehold.py:2049` | §0z113 | yes | yes |
-| `biotransference_text` | `True` | 1 | `edhmc/engine.py:165` | §0z116 | **no** | yes |
+| `biotransference_text` | `True` | 1 | `edhmc/engine.py:165` | §0z116 | yes | yes |
 | `block_rate` | `0.3` | 2 | `edhmc/engine.py:3948` | §0z107 | **no** | **never** |
 | `block_share` | `0.6` | 1 | `edhmc/opponents.py:1016` |  | yes | yes |
 | `blocker_toughness` | `2` | 1 | `edhmc/opponents.py:1124` | §0z92 | yes | yes |
@@ -105,7 +105,7 @@ show up first.
 | `destroy_share_spot` | `_removal.DESTROY_SHARE_SPOT` | 1 | `edhmc/opponents.py:655` | §0z87 | yes | **never** |
 | `destroy_share_wipe` | `_removal.DESTROY_SHARE_WIPE` | 1 | `edhmc/opponents.py:652` | §0z87 | **no** | **never** |
 | `devotion_creature_types` | `True` | 1 | `edhmc/engine.py:345` |  | yes | yes |
-| `discard_text` | `True` | 2 | `edhmc/lorehold.py:1163` | §0f | **no** | yes |
+| `discard_text` | `True` | 2 | `edhmc/lorehold.py:1163` | §0f | yes | yes |
 | `doll_policy` | `'nest'` | 2 | `edhmc/engine.py:2936` | §0z58 | yes | yes |
 | `doll_sac_at` | `3` | 1 | `edhmc/engine.py:2974` | §0z58 | yes | yes |
 | `draw_lands` | `True` | 1 | `edhmc/lorehold.py:2219` | §4 | **no** | yes |
@@ -153,7 +153,7 @@ show up first.
 | `karmic_echo` | `'decline'` | 1 | `edhmc/trostani.py:1551` |  | yes | **never** |
 | `karoo_bounce` | `True` | 1 | `edhmc/engine.py:2278` | §0z115 | **no** | yes |
 | `known_win_focus` | `0.8` | 1 | `edhmc/opponents.py:348` | §0z62 | yes | yes |
-| `kokusho_text` | `True` | 1 | `edhmc/shilgengar.py:382` | §0z116 | **no** | yes |
+| `kokusho_text` | `True` | 1 | `edhmc/shilgengar.py:382` | §0z116 | yes | yes |
 | `kozilek_cast_draw` | `True` | 2 | `edhmc/azusa.py:2742` | §0z115 | yes | yes |
 | `land_animation` | `'full'` | 3 | `edhmc/azusa.py:602` | §0z19 | yes | yes |
 | `land_creature_sick` | `True` | 1 | `edhmc/azusa.py:723` | §0z15 | yes | yes |
@@ -210,7 +210,7 @@ show up first.
 | `pod_grid_rounds` | `20` | 1 | `edhmc/opponents.py:202` | §0z93 | yes | yes |
 | `pod_reads_battlefield_creatures` | `True` | 1 | `edhmc/opponents.py:262` | §0y | yes | yes |
 | `populate_soul_first` | `True` | 1 | `edhmc/trostani.py:1795` | §0t | yes | **never** |
-| `portal_text` | `True` | 1 | `edhmc/tivit.py:1076` | §0z117 | **no** | yes |
+| `portal_text` | `True` | 1 | `edhmc/tivit.py:1076` | §0z117 | yes | yes |
 | `processor_floor` | `12` | 1 | `edhmc/trostani.py:1147` |  | yes | yes |
 | `processor_life` | `PROCESSOR_LIFE` | 1 | `edhmc/trostani.py:1146` |  | yes | yes |
 | `protect_min` | `3` | 2 | `edhmc/trostani.py:380` |  | **no** | **never** |
@@ -312,12 +312,12 @@ nobody has tested.
 
 ## The knobs no document mentions
 
-**65 of 227.** Not an error — most knobs are
+**61 of 227.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `biotransference_text`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `discard_text`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `kokusho_text`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `portal_text`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `vault_paid`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`altar_mana`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_order`, `tutor_targets`, `vault_paid`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 

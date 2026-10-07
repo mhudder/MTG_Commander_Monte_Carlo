@@ -1,0 +1,345 @@
+{
+ "n": 15000,
+ "arms": [
+  {
+   "deck": "rendmaw",
+   "arm": "Biotransference off",
+   "cells": {
+    "damage10": [
+     -0.44671801213699486,
+     0.05232782717481598
+    ],
+    "cards_drawn10": [
+     -0.0014,
+     0.004134185411793979
+    ],
+    "tokens_made10": [
+     -0.2729333333333333,
+     0.017960783577028638
+    ],
+    "rendmaw_triggers10": [
+     -0.031266666666666665,
+     0.0040746232326495345
+    ],
+    "won10": [
+     -0.0010666666666666667,
+     0.0006912352993395041
+    ],
+    "damage20": [
+     -0.746305768420374,
+     0.09093161534741753
+    ],
+    "cards_drawn20": [
+     0.05773333333333333,
+     0.012769710211830137
+    ],
+    "tokens_made20": [
+     -0.506,
+     0.029867822926925955
+    ],
+    "rendmaw_triggers20": [
+     -0.0472,
+     0.0077334533445715175
+    ],
+    "won20": [
+     -0.008133333333333333,
+     0.0021191590270126385
+    ]
+   },
+   "new": {
+    "biotransference_necrons": 0.4524666666666667,
+    "rendmaw_triggers": 2.885466666666667,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.04186666666666667,
+    "life_lost_to_own_cards": 1.956
+   },
+   "off": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 2.8382666666666667,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.0428,
+    "life_lost_to_own_cards": 1.5114666666666667
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "discards off",
+   "cells": {
+    "mv_cheated10": [
+     1.3962,
+     0.20371056613179556
+    ],
+    "damage10": [
+     1.9946777777777775,
+     0.2190562017291365
+    ],
+    "miracles_cast10": [
+     0.09513333333333333,
+     0.014483422356522831
+    ],
+    "total_mv_cast10": [
+     2.9668666666666668,
+     0.28798845506182746
+    ],
+    "won10": [
+     0.0156,
+     0.003147923241102142
+    ],
+    "mv_cheated20": [
+     2.202933333333333,
+     0.3002600673759585
+    ],
+    "damage20": [
+     2.5233111111111115,
+     0.2667137006790869
+    ],
+    "miracles_cast20": [
+     0.11653333333333334,
+     0.01887746320467039
+    ],
+    "total_mv_cast20": [
+     4.4494,
+     0.43378134072050994
+    ],
+    "won20": [
+     0.0344,
+     0.00500360758950475
+    ]
+   },
+   "new": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 1.2693333333333334,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.34526666666666667,
+    "life_lost_to_own_cards": 2.8154
+   },
+   "off": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.3472,
+    "life_lost_to_own_cards": 2.9408
+   }
+  },
+  {
+   "deck": "tivit",
+   "arm": "Portal text off",
+   "cells": {
+    "damage10": [
+     -0.6019649350649351,
+     0.170689009536493
+    ],
+    "artifacts_made10": [
+     1.2172666666666667,
+     0.633819614899003
+    ],
+    "tivit_triggers10": [
+     0.1038,
+     0.043973737284024976
+    ],
+    "votes_cast10": [
+     1.7049333333333334,
+     0.2351838114834877
+    ],
+    "won10": [
+     0.0023333333333333335,
+     0.0016264124768561514
+    ],
+    "damage20": [
+     -0.7340118518518518,
+     0.20175652337854233
+    ],
+    "artifacts_made20": [
+     2.4106666666666667,
+     0.9780932839727884
+    ],
+    "tivit_triggers20": [
+     0.18313333333333334,
+     0.09035350181537521
+    ],
+    "votes_cast20": [
+     3.2967333333333335,
+     0.41322314260140963
+    ],
+    "won20": [
+     0.011333333333333334,
+     0.003274797623484511
+    ]
+   },
+   "new": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.1182,
+    "portal_tokens_destroyed": 1.5586666666666666,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.3542,
+    "life_lost_to_own_cards": 1.2958666666666667
+   },
+   "off": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 0.0,
+    "own_wipes_cast": 0.7568,
+    "life_lost_to_own_cards": 1.3188
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "Kokusho off",
+   "cells": {
+    "damage10": [
+     -0.6223027160493827,
+     0.04741829387292329
+    ],
+    "blood_made10": [
+     -0.0022,
+     0.002398542701027096
+    ],
+    "creatures_sacrificed10": [
+     -0.0006,
+     0.0008366476891614978
+    ],
+    "single_reanimations10": [
+     -0.00013333333333333334,
+     0.0001847844119509945
+    ],
+    "won10": [
+     -0.0002,
+     0.00022630621592632208
+    ],
+    "damage20": [
+     -0.7800202469135802,
+     0.07312151883404043
+    ],
+    "blood_made20": [
+     -0.012466666666666666,
+     0.008707700389543967
+    ],
+    "creatures_sacrificed20": [
+     -0.0030666666666666668,
+     0.00223236798071301
+    ],
+    "single_reanimations20": [
+     -0.0017333333333333333,
+     0.0013194210598631362
+    ],
+    "won20": [
+     -0.0056,
+     0.0014523283225731753
+    ]
+   },
+   "new": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.7846565925925927,
+    "blood_made": 4.13,
+    "own_wipes_cast": 0.15293333333333334,
+    "life_lost_to_own_cards": 2.9403333333333332
+   },
+   "off": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.0,
+    "blood_made": 4.117533333333333,
+    "own_wipes_cast": 0.1528,
+    "life_lost_to_own_cards": 2.9318666666666666
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "old hand tags",
+   "cells": {
+    "damage10": [
+     -0.13474987654320986,
+     0.02833991850026855
+    ],
+    "blood_made10": [
+     -0.11686666666666666,
+     0.014847202879087033
+    ],
+    "creatures_sacrificed10": [
+     -0.010466666666666668,
+     0.0038968822935193125
+    ],
+    "single_reanimations10": [
+     0.0007333333333333333,
+     0.0006788851133972562
+    ],
+    "won10": [
+     -0.0005333333333333334,
+     0.0004131298925033117
+    ],
+    "damage20": [
+     -0.3572911604938272,
+     0.06974646529625625
+    ],
+    "blood_made20": [
+     -0.23086666666666666,
+     0.021956429422519512
+    ],
+    "creatures_sacrificed20": [
+     -0.0061333333333333335,
+     0.006211253946867455
+    ],
+    "single_reanimations20": [
+     0.0029333333333333334,
+     0.0020238023774121327
+    ],
+    "won20": [
+     -0.004666666666666667,
+     0.0017121062362544324
+    ]
+   },
+   "new": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.7846565925925927,
+    "blood_made": 4.13,
+    "own_wipes_cast": 0.15293333333333334,
+    "life_lost_to_own_cards": 2.9403333333333332
+   },
+   "off": {
+    "biotransference_necrons": 0.0,
+    "rendmaw_triggers": 0.0,
+    "spell_discards": 0.0,
+    "portal_carnage": 0.0,
+    "portal_tokens_destroyed": 0.0,
+    "kokusho_drain": 0.793424,
+    "blood_made": 3.8991333333333333,
+    "own_wipes_cast": 0.15293333333333334,
+    "life_lost_to_own_cards": 2.9372
+   }
+  }
+ ]
+}
