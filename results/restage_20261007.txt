@@ -1,0 +1,13 @@
+Every staged swap re-measured on the §0z118 engine (bd9e7ae), 2026-10-07, ahead of the seven-deck rebuild.
+N=15,000 paired, seeds 5000.., diagnostics/run_restage.py arms K K_noConq K_noCit T T_noProc A A_noKaZar A_noPassage A_noWilds A_noFetches L L_noCaldera L_noSunbird S S_noLyra; staged minus undone.
+
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0447 +-0.0035*  T20 +0.0474 +-0.0038*  dmgT20 -3.98 +-0.29
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0049 +-0.0030*  T20 +0.0131 +-0.0040*  dmgT20 +0.24 +-0.25
+tivit   -Plains +Anointed Procession                  T10 +0.0120 +-0.0040*  T20 +0.0081 +-0.0050*  dmgT20 -2.93 +-0.36
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0037 +-0.0023*  T20 +0.0115 +-0.0034*  dmgT20 +1.47 +-0.23
+azusa   -Forest +Fabled Passage                       T10 +0.0138 +-0.0036*  T20 +0.0117 +-0.0048*  dmgT20 +1.05 +-0.32
+azusa   -Forest +Evolving Wilds                       T10 +0.0079 +-0.0037*  T20 +0.0063 +-0.0049*  dmgT20 +0.90 +-0.34
+azusa   both fetches, as one change                   T10 +0.0257 +-0.0047*  T20 +0.0257 +-0.0061*  dmgT20 +2.26 +-0.43
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0104 +-0.0023*  T20 +0.0247 +-0.0037*  dmgT20 +2.88 +-0.24
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0073 +-0.0025*  T20 +0.0231 +-0.0041*  dmgT20 +2.23 +-0.24
+shilgengar -Vampiric Rites +Lyra, Archangel of Dawn   T10 +0.0029 +-0.0009*  T20 +0.0141 +-0.0028*  dmgT20 +1.91 +-0.15
