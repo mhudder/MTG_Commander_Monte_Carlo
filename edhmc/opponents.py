@@ -356,60 +356,97 @@ def known_win_share(g, share: float) -> float:
 def commander_shrouded(g) -> bool:
     """Equipment/abilities that make the commander an illegal target.
 
-    Lightning Greaves and Mother of Runes do not blank a removal spell once —
-    they take the commander off the table as a target for as long as they are
-    around. Without this, a five-mana commander in a deck built to protect it
-    gets destroyed on repeat and the whole engine never runs.
+    Lightning Greaves and Swiftfoot Boots do not blank a removal spell once
+    -- they take the commander off the table as a target for as long as they
+    are around. Without this, a five-mana commander in a deck built to
+    protect it gets destroyed on repeat and the whole engine never runs.
+
+    Mother of Runes is NOT a shroud source (§0z118): her {T} answers ONE
+    removal aimed at ANY creature of yours (`mother_protects`).
+    `protect_events=False` reads her as a shroud source again, the old rule.
     """
-    for n in g.cfg.get("shroud_sources", ()):
-        if n in TAP_SHROUD and g.cfg.get("protect_events", True):
-            # A {T} ability: she must be untapped and have been yours since
-            # your turn began (§0z118). A Mother cast this turn protects
-            # nothing until your next one.
-            if any(p.card.name == n and not p.tapped and not p.sick
-                   for p in g.board):
-                return True
-        elif g.has(n):
-            return True
-    return False
+    keyed = g.cfg.get("protect_events", True)
+    return any(g.has(n) for n in g.cfg.get("shroud_sources", ())
+               if not (keyed and n in TAP_PROTECT))
 
 
 # "{T}: Target creature you control gains protection from the color of your
-# choice until end of turn." A shroud source that is an ACTIVATED ability on
-# the battlefield (§0z118): `commander_shrouded` needs it untapped and not
-# summoning sick, and `holds_back` keeps it home from combat so that it is.
-# Its ONE use a round goes to the commander -- protecting another creature
-# instead would expose the commander to the rest of the pod's round, and that
-# choice is not modelled: a floor on her, said out loud.
-TAP_SHROUD = {"Mother of Runes"}
+# choice until end of turn." (Mother of Runes, Scryfall 2026-10-07.) An
+# ACTIVATED ability on the battlefield: one use per untap, needing an
+# untapped creature that has been yours since your turn began. THE OWNER'S
+# RULE (2026-10-07): "she should always stay home and never attack ... used
+# for one of two purposes: to protect an important creature, or to force a
+# trade for an important creature on an opponent's side". So she never
+# attacks (`holds_back`), and `mother_use` says which purpose takes her tap:
+#   "defend"  THE DEFAULT. She is held through the pod's round and blanks the
+#             first spot removal aimed at a creature you control -- the pod
+#             aims at its biggest threat, so that is the important one. The
+#             removal FIZZLES: it is not redirected, as a shroud would.
+#   "attack"  In your combat, when an attacker would be chump-blocked, she
+#             gives the commander (or, failing that, the biggest blocked
+#             attacker) protection from the blockers' colour, so it cannot be
+#             blocked -- Rogue's Passage's mechanism (§0z107). The pod's
+#             blockers are a count that never dies, so the TRADE the owner
+#             describes is not modelled; the damage that connects is. She is
+#             then tapped through the pod's round and defends nothing.
+# Opponents who play around an untapped Mother are not modelled either.
+TAP_PROTECT = {"Mother of Runes"}
+
+
+def mother_ready(g):
+    """An untapped, non-sick Mother of Runes, or None."""
+    return next((p for p in g.board if p.card.name in TAP_PROTECT
+                 and not p.tapped and not p.sick), None)
 
 
 def holds_back(g, perm) -> bool:
-    """A creature the pilot does not attack with because its {T} ability is
-    worth more untapped (`TAP_SHROUD`). Read by the engines that run one.
+    """A creature the pilot never attacks with because its {T} ability is
+    the card (`TAP_PROTECT`): the owner's rule. Read by the engines that run
+    one. `protect_events=False` lets her attack, as the old engine did."""
+    return (perm.card.name in TAP_PROTECT
+            and g.cfg.get("protect_events", True))
 
-    A POLICY, not text, `mother_home` (§0z118):
-      "needed"  home only when HER shroud is the one the commander has:
-                the commander is on the battlefield and no other shroud
-                source is. THE DEFAULT.
-      "always"  never attacks -- the first rule written, which cost karlov
-                0.005 at T20: its Boots and Greaves already shroud the
-                commander (§0z36's redundancy), so she sat home for a flag
-                that was set.
-      "never"   attacks like any creature, and is tapped for the pod's round.
-    """
-    if (perm.card.name not in TAP_SHROUD
-            or not g.cfg.get("protect_events", True)):
+
+def mother_protects(g, victim) -> bool:
+    """The pod's spot removal is aimed at `victim`: Mother of Runes answers
+    it if she is ready, the victim is a creature, and she is held for it
+    (`mother_use="defend"`). Taps her; True if the removal fizzles."""
+    if (not g.cfg.get("protect_events", True)
+            or g.cfg.get("mother_use", "defend") != "defend"
+            or not is_creature_now(g, victim)):
         return False
-    mode = g.cfg.get("mother_home", "needed")
-    if mode == "never":
+    mother = mother_ready(g)
+    if mother is None:
         return False
-    if mode == "always":
-        return True
-    if not any(p.card is g.commander for p in g.board):
+    mother.tapped = True
+    g.m["mother_protects"] += 1
+    return True
+
+
+def mother_attack(g, attackers: list) -> bool:
+    """`mother_use="attack"`: after attackers are declared, protection from
+    the blockers' colour on the attacker that would otherwise be blocked --
+    the commander first, else the biggest (`rogues_passage`'s choice). It
+    then cannot be blocked this turn (`unblockable_ids`)."""
+    if (not attackers or not g.cfg.get("protect_events", True)
+            or g.cfg.get("mother_use", "defend") != "attack"):
         return False
-    return not any(g.has(n) for n in g.cfg.get("shroud_sources", ())
-                   if n not in TAP_SHROUD)
+    mother = mother_ready(g)
+    if mother is None:
+        return False
+    through: list = []
+    damage_through(g, attackers, unblocked=through)
+    got = {id(p) for p in through} | unblockable_ids(g)
+    blocked = [p for p in attackers if id(p) not in got]
+    if not blocked:
+        return False
+    cmdr = getattr(g, "commander", None)
+    target = next((p for p in blocked if p.card is cmdr), None) \
+        or max(blocked, key=g.power_of)
+    mother.tapped = True
+    g.unblockable = (g.turn, unblockable_ids(g) | {id(target)})
+    g.m["mother_attacks"] += 1
+    return True
 
 
 # WHICH EVENT EACH PROTECTION SPELL ANSWERS, AND HOW (§0z118). Every line was
@@ -525,6 +562,8 @@ def spot_removal(g, opp, others, rolls):
     if not targets:
         return
     victim = max(targets, key=lambda p: threat_of(g, p))
+    if mother_protects(g, victim):        # her {T}, §0z118
+        return
     how = try_protect(g, rolls[5], "spot", victim)
     if how == "blank":
         return

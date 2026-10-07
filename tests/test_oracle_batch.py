@@ -11,9 +11,11 @@ CASES
      wrath
   C  lorehold: Dawn's Truce against a wrath grants indestructible (gift
      promised), it does not blank the wrath
-  D  karlov: a summoning-sick Mother shrouds nothing; an untapped one does
-  E  ... and lorehold's pilot keeps her home from combat while hers is
-     the commander's only shroud
+  D  karlov: Mother of Runes' {T} blanks ONE spot removal aimed at a
+     creature you control; a sick Mother blanks nothing; she is no shroud
+  E  ... and she never attacks, in karlov or lorehold (the owner's rule)
+  V  ... `mother_use="attack"`: the commander, about to be chump-blocked,
+     is given protection and cannot be blocked
   U  shilgengar: Teferi's Protection against the pod's wrath -- your board
      phases out, the pod's creatures still die
   F  karlov: Damn with only {B}{B} available is not cast as a wrath
@@ -38,7 +40,7 @@ CASES
   S  azusa: Green Sun's Zenith shuffles into the library, not the graveyard
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  protect_events=False   -> A, B, C, D, E, U
+  protect_events=False   -> A, B, C, D, E, U, V
   damn_overload=False    -> F, G
   kambal_batch=False     -> H
   vigor_counters=False   -> I, J
@@ -152,23 +154,32 @@ def run_cases():
     check("C Dawn's Truce against a wrath: indestructible, not a blank",
           OPP.try_protect(g, 0.0, "wipe"), "indestructible")
     mother = card("karlov", "Mother of Runes")
-    shrouded = []
-    for sick in (True, False):
-        g = fresh("karlov", board=[mother, g_cmd := LISTS["karlov"][1]],
-                  sick=(mother,) if sick else ())
-        g.commander_cast = True
-        shrouded.append(OPP.commander_shrouded(g))
-    check("D a sick Mother shrouds nothing; an untapped one does",
-          shrouded, [False, True])
-    # lorehold's pilot keeps her home while her shroud is the commander's
-    # only one ("needed"); karlov's attacks with her ("never"), measured.
-    lm = card("lorehold", "Mother of Runes")
-    g = fresh("lorehold", board=[lm, LISTS["lorehold"][1]])
-    home = OPP.holds_back(g, perm(g, "Mother of Runes"))
-    g.board.append(EN.Permanent(card=card("lorehold", "Lightning Greaves")))
-    check("E ... lorehold keeps her home while hers is the only shroud",
-          (home, OPP.holds_back(g, perm(g, "Mother of Runes"))),
-          (True, False))
+    kcmd = LISTS["karlov"][1]
+    g = fresh("karlov", board=[mother, kcmd, body("Bear")])
+    g.commander_cast = True
+    bear = perm(g, "Bear")
+    first, second = OPP.mother_protects(g, bear), OPP.mother_protects(g, bear)
+    shrouded = OPP.commander_shrouded(g)
+    g = fresh("karlov", board=[mother, body("Bear")], sick=(mother,))
+    check("D Mother's {T} blanks one removal on a creature; not sick, not "
+          "twice, and she is no shroud",
+          (first, second, OPP.mother_protects(g, perm(g, "Bear")), shrouded),
+          (True, False, False, False))
+    check("E ... and she never attacks, in either deck",
+          [OPP.holds_back(fresh(d, board=[card(d, "Mother of Runes")]),
+                          EN.Permanent(card=card(d, "Mother of Runes")))
+           for d in ("karlov", "lorehold")], [True, True])
+    g = fresh("karlov", board=[mother, kcmd])
+    g.cfg["mother_use"] = "attack"
+    g.commander_cast = True
+    for o in g.opponents:
+        o.creatures = 5.0
+    attacker = perm(g, kcmd.name)
+    OPP.mother_attack(g, [attacker])
+    check("V mother_use='attack': the commander, about to be chump-blocked, "
+          "cannot be blocked, and she is tapped",
+          (id(attacker) in OPP.unblockable_ids(g),
+           perm(g, "Mother of Runes").tapped), (True, True))
 
     g = fresh("shilgengar",
               board=lands("shilgengar", *["Plains"] * 5) + [body("Bear")],
@@ -316,7 +327,7 @@ def main() -> int:
         print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
         return 1 if FAIL else 0
     mutations = [
-        ({"protect_events": False}, {"A", "B", "C", "D", "E", "U"}),
+        ({"protect_events": False}, {"A", "B", "C", "D", "E", "U", "V"}),
         ({"damn_overload": False}, {"F", "G"}),
         ({"kambal_batch": False}, {"H"}),
         ({"vigor_counters": False}, {"I", "J"}),

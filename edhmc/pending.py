@@ -1448,10 +1448,12 @@ MEASURED: list[Candidate] = [
             "results/threat_blank_karlov_2026-09-20.txt. AND THE TIE-BREAK'S "
             "FIRST HALF IS GONE (§0z118, 2026-10-07): the try_protect channel "
             "was not her text -- she was DISCARDED FROM HAND to blank removal "
-            "and wrath alike. She is a {T} shroud source on the battlefield "
-            "only now, kept home from combat, so cutting her closes nothing "
-            "the Boots do not also cover. Re-read both rows after the "
-            "rebuild before naming a cut on this evidence."),
+            "and wrath alike. Now she never attacks (the owner's rule) and "
+            "her {T} makes one spot removal a round fizzle -- worth +0.0069 "
+            "at T20 against never using her -- while a SHROUD (the Boots) "
+            "redirects the removal, and karlov wins +0.0054 with no "
+            "commander shroud at all. Re-read both rows after the rebuild "
+            "before naming a cut on this evidence."),
     ),
     Candidate(
         deck="lorehold", card="Past in Flames", measured="2026-09-16",

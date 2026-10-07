@@ -2197,6 +2197,7 @@ def combat(g):
                   if p.card.name in ("Monastery Mentor", "Monk token"))
     for p in attackers:
         p.tapped = True
+    OPP.mother_attack(g, attackers)          # `mother_use="attack"`, §0z118
     # One attack at the whole pod; `dmg` comes back bounded at what could have
     # mattered. Prowess is a flat lump on the swing rather than per-attacker
     # power, so it is passed as `bonus` and credited to the first defender --

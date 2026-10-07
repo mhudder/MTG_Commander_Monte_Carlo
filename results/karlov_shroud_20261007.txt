@@ -1,8 +1,8 @@
 KARLOV: IS THE COMMANDER'S SHROUD WORTH ANYTHING? N=15,000 paired, ARM MINUS THE SHIPPED ENGINE
 
-  no shroud                     T10 +0.0018 ±0.0012
-  no shroud                     T20 +0.0057 ±0.0020
-     removal_eaten a game 1.693, shipped 1.702
-  Mother home, no other shroud  T10 -0.0017 ±0.0017
-  Mother home, no other shroud  T20 -0.0001 ±0.0028
-     removal_eaten a game 1.704, shipped 1.702
+  no shroud                     T10 +0.0017 ±0.0011
+  no shroud                     T20 +0.0054 ±0.0019
+     removal_eaten a game 1.561, shipped 1.572
+  Mother never used             T10 -0.0046 ±0.0013
+  Mother never used             T20 -0.0069 ±0.0019
+     removal_eaten a game 1.703, shipped 1.572

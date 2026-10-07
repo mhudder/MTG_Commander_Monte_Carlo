@@ -132,12 +132,6 @@ class KarlovGame(BaseGame):
         cfg.setdefault("protection_cards",
                        () if cfg.get("protect_events", True)
                        else ("Mother of Runes",))
-        # She ATTACKS in this deck (§0z118): kept home whenever her shroud
-        # was the commander's only one ("needed") or always, she cost karlov
-        # 0.005 at T20 against attacking -- the Boots and Greaves usually
-        # shroud the commander already, and a body in this deck's swing is
-        # worth more. A POLICY, measured, and the owner's to overrule.
-        cfg.setdefault("mother_home", "never")
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
@@ -1367,6 +1361,7 @@ def combat(g):
     for p in attackers:
         p.tapped = True
     OPP.rogues_passage(g, attackers, lambda c: pay_cost(g, c))   # §0z107
+    OPP.mother_attack(g, attackers)                              # §0z118
     # One attack at the whole pod; `dmg` comes back bounded at what could have
     # mattered. Lifelink below still reads `power_of`, not this figure.
     dmg = OPP.combat_damage(g, attackers)

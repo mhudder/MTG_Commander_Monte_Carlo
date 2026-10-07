@@ -166,7 +166,7 @@ Methodology that used to live at the end of this file is now
 | [0z115](#0z115) | FIXED | **Lands play by their own text**: entry conditions, painland/horizon/fetch/shock life and karoos generated from Scryfall into `LAND_RULES`; Temple of the False God, Nykthos, Eldrazi Temple and **Vault of the Archangel -- free permanent lifelink in karlov, worth 0.028** -- corrected; Mikokoro, Geier Reach (lorehold **+0.0115**), the Castles, High Market, Phyrexian Tower, Petrified Field, Crystal Vein implemented. Life and entry costs take 0.007-0.032 from every deck. Trostani moved through a latent bug: an uncracked fetch paid {1}. The shock policy does not matter. All seven tables SUSPECT: the rebuild is unblocked |
 | [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. **Items 1-5 FIXED in §0z117, 6-13 in §0z118**; the label, per-engine and smaller lists stay open |
 | [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference implemented through `card_types` (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), shilgengar's Angel/Cleric tags derived from Scryfall (+0.0047), Coercive Portal's real carnage (costs tivit 0.011 under adversarial voting). Karlov, azusa, trostani bit-identical |
-| [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks (+0.002 to +0.005 flattered); protection answers the events its text answers (Mother of Runes is a {T} shroud, not a discard); four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0057 with NO commander shroud**: shroud sends the pod's removal to its engine pieces. Trostani bit-identical |
+| [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks; protection answers the events its text answers, and **Mother of Runes, home by the owner's rule, makes one removal a round fizzle: +0.007 to karlov**; four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0054 with no commander SHROUD**: a shroud redirects the pod's removal to its engine pieces. Trostani bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10373,13 +10373,13 @@ exact sets.
    promises the gift and grants indestructible; Heroic Intervention, Boros
    Charm and Flawless Maneuver grant it; Teferi's Protection and Perch
    Protection phase out. **Mother of Runes is no longer a card discarded from
-   hand** (karlov's whole `protection_cards`): she is a {T} shroud source
-   that must be untapped and not summoning sick (`TAP_SHROUD`).
-   **Two more defects surfaced while measuring it.** A blanked wrath returned
-   before the pod's creatures died, so phasing out spared every opponent's
-   board too; a wrath you phase out of now still kills theirs (case U). And
-   keeping Mother home from combat is a POLICY the {T} rule made live
-   (§0z42's lesson), so it has its own knob, `mother_home`, measured below.
+   hand** (karlov's whole `protection_cards`), and no longer a shroud source
+   either: her {T}, untapped and not summoning sick (`TAP_PROTECT`), makes
+   ONE spot removal aimed at a creature you control FIZZLE, and she never
+   attacks -- the owner's rule, below. **A defect surfaced while measuring
+   it:** a blanked wrath returned before the pod's creatures died, so phasing
+   out spared every opponent's board too; a wrath you phase out of now still
+   kills theirs (case U).
 7. **Damn is a wrath only at its overload** (`damn_overload`). Cast for
    {B}{B} it is "destroy target creature", blind here; the `wipe` tag made it
    a two-mana wrath in karlov, shilgengar and tivit. Every main phase now
@@ -10438,10 +10438,10 @@ fix turned OFF, arm minus the new engine (bold: the bar excludes zero):
 | shilgengar | Giada tokens only | **−0.0010 ±0.0005** | **−0.0024 ±0.0013** | 1.03 counters |
 | shilgengar | Damn at {B}{B} | −0.0001 ±0.0002 | **+0.0023 ±0.0014** | own wipes 0.12 against 0.15 |
 | shilgengar | protection | +0.0001 ±0.0003 | **−0.0020 ±0.0014** | Flawless Maneuver's indestructible, 0.05 |
-| karlov | protection | **−0.0018 ±0.0015** | **−0.0037 ±0.0024** | Mother from hand 0.02 |
-| karlov | Damn at {B}{B} | −0.0007 ±0.0008 | **+0.0018 ±0.0015** | own wipes 0.11 against 0.15 |
-| lorehold | protection | **+0.0017 ±0.0009** | +0.0003 ±0.0016 | Sejiri / Truce no longer blank a wrath |
-| lorehold | sweepers' scope | +0.0004 ±0.0017 | +0.0011 ±0.0032 | Ultima ends 0.06 turns |
+| karlov | protection | **−0.0055 ±0.0016** | **−0.0094 ±0.0025** | Mother's {T}, below |
+| karlov | Damn at {B}{B} | −0.0008 ±0.0008 | +0.0013 ±0.0015 | own wipes 0.11 against 0.15 |
+| lorehold | protection | −0.0004 ±0.0014 | **−0.0028 ±0.0022** | Mother's {T}; Sejiri / Truce no longer blank a wrath |
+| lorehold | sweepers' scope | +0.0004 ±0.0017 | +0.0013 ±0.0032 | Ultima ends 0.06 turns |
 | rendmaw | Steel Overseer free | **+0.0009 ±0.0007** | +0.0009 ±0.0014 | 0.60 activations; damage +0.43 |
 | rendmaw | Primal Vigor | **−0.0003 ±0.0003** | **−0.0009 ±0.0005** | |
 | rendmaw | protection | −0.0001 ±0.0004 | **−0.0009 ±0.0009** | Heroic Intervention lets the wrath kill theirs |
@@ -10450,8 +10450,9 @@ fix turned OFF, arm minus the new engine (bold: the bar excludes zero):
 
 **Kambal's per-token drain flattered tivit by 0.015 at T10** -- the largest
 of the eight, and the shape of §0z117's discards: a batch trigger read per
-object. **Damn at {B}{B} flattered all three decks that run it** (0.0018 to
-0.0048 at T20): a two-mana wrath is a better card than a four-mana one.
+object. **Damn at {B}{B} flattered the decks that run it** (tivit 0.0048 and
+shilgengar 0.0023 at T20, karlov +0.0013 inside its bar): a two-mana wrath
+is a better card than a four-mana one.
 **Protection cuts both ways, and the sign is the mechanism.** A blanked
 wrath spared the pod's boards as well as yours, so where the fix turns a
 blank into indestructible (Heroic Intervention, Flawless Maneuver) the
@@ -10459,30 +10460,46 @@ wrath now kills theirs and the deck GAINS (rendmaw, shilgengar); where it
 removes a blank that was never the card's text (lorehold's Sejiri Shelter
 and Dawn's Truce against wraths) the deck loses a little.
 
-**Mother of Runes, and what the commander's shroud is worth to karlov.**
-`mother_home`, the policy, arm minus each deck's shipped default:
+**Mother of Runes, the owner's rule** (2026-10-07): "she should always stay
+home and never attack ... used for one of two purposes: to protect an
+important creature, or to force a trade for an important creature on an
+opponent's side so that they protect their life total." She never attacks
+(`holds_back`), and `mother_use` says which purpose takes her tap:
+"defend", the default, blanks the first spot removal of the pod's round
+aimed at a creature you control -- the pod aims at its biggest threat, so
+that is the important one -- and "attack" gives a blocked attacker (the
+commander first) protection from the blockers' colour so it connects. The
+model's blockers are a count that never dies, so the TRADE is not
+modelled; the damage it pushes through is. Arm minus "defend":
 
-| deck | default | arm | won T10 | won T20 |
+| deck | `mother_use` | won T10 | won T20 | damage T20 |
 |---|---|---|---|---|
-| karlov | "never" (she attacks) | "always" home | **−0.0032 ±0.0013** | **−0.0051 ±0.0022** |
-| karlov | | "needed" (home while hers is the only shroud) | **−0.0029 ±0.0013** | **−0.0049 ±0.0021** |
-| lorehold | "needed" | "always" | −0.0001 ±0.0003 | −0.0002 ±0.0006 |
-| lorehold | | "never" | **−0.0011 ±0.0008** | −0.0007 ±0.0014 |
+| karlov | "attack" | **−0.0016 ±0.0015** | −0.0011 ±0.0025 | **+0.74** |
+| karlov | "none" (home, never used) | **−0.0046 ±0.0013** | **−0.0069 ±0.0019** | **−0.55** |
+| lorehold | "attack" | **−0.0030 ±0.0011** | **−0.0035 ±0.0018** | **−0.41** |
+| lorehold | "none" | **−0.0034 ±0.0011** | **−0.0044 ±0.0017** | **−0.69** |
 
-The first rule written kept her home in both decks and cost karlov 0.005.
-`diagnostics/run_karlov_shroud.py` (`results/karlov_shroud_20261007.txt`)
-asks why: **karlov with NO commander shroud at all -- Boots, Greaves, Cloak
-and Mother shrouding nothing -- wins +0.0018 ±0.0012 at T10 and +0.0057
-±0.0020 at T20.** With the commander an illegal target the pod's spot
-removal takes the next-biggest threat, and in this deck that is an engine
-piece worth more than a commander that recasts for three. **This is the
+**Her protection is worth 0.007 to karlov and 0.004 to lorehold at T20**,
+and defending beats the combat trick in both. The rule is the owner's; the
+measurement agrees with it.
+
+**Before the owner's rule, this section measured the wrong reading.** The
+first fix made her a {T} SHROUD on the commander, kept home for it, and that
+cost karlov 0.005 at T20 against letting her attack. The reason is
+`diagnostics/run_karlov_shroud.py` (`results/karlov_shroud_20261007.txt`):
+**karlov with no commander shroud at all -- Boots, Greaves and Cloak
+shrouding nothing -- wins +0.0017 ±0.0011 at T10 and +0.0054 ±0.0019 at
+T20.** With the commander an illegal target, the pod's spot removal takes
+the next-biggest threat, and in this deck that is an engine piece worth more
+than a commander that recasts for three. A shroud REDIRECTS the removal;
+Mother's protection makes it FIZZLE, which is why the same card is worth
++0.007 read as her text and cost 0.005 read as a shroud. **That is the
 mechanism under §0z35's and §0z36's negative rows for the Boots and Mother
-of Runes** -- not redundancy alone. It is a statement about how the model's
-pod picks a target (`threat_of`), and the owner's call that the Boots do
-real work in an interaction-heavy pod (item 20b) is a call about a real
-table's targeting that this measurement does not overrule. So karlov
-ships `mother_home="never"` -- its old behaviour, she attacks -- and
-lorehold `"needed"`. **A POLICY, measured; the owner's to overrule.**
+of Runes** -- not redundancy alone, and Mother's row should come out
+positive at the rebuild. It is a statement about how the model's pod picks
+a target (`threat_of`); the owner's call that the Boots do real work in an
+interaction-heavy pod (item 20b) is a call about a real table's targeting,
+which this measurement does not overrule.
 
 Trostani is BIT-IDENTICAL to 10d6c81 (`check_unchanged_decks`); the other
 six moved, as intended, and every cache was already SUSPECT for the rebuild

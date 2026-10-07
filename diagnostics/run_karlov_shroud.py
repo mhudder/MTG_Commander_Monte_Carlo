@@ -6,15 +6,16 @@
 N paired games on the staged list, the tables' seeds (5000..), one T20 game
 per seed with T10 read off it. ARM MINUS THE SHIPPED ENGINE:
 
-  no shroud                     `shroud_sources=()`: Swiftfoot Boots,
-                                Lightning Greaves, Whispersilk Cloak and
-                                Mother of Runes shroud nothing
-  Mother home, no other shroud  only Mother shrouds, and she never attacks
+  no shroud          `shroud_sources=()`: Swiftfoot Boots, Lightning
+                     Greaves and Whispersilk Cloak shroud nothing
+  Mother never used  `mother_use="none"`: she stays home and never taps --
+                     what her {T}, blanking one removal a round, is worth
 
-Written because §0z118's Mother of Runes arms said keeping her home to
-shroud the commander COST karlov: with the commander an illegal target the
-pod's spot removal takes the next-biggest threat, and in this deck that is
-an engine piece worth more than a three-mana commander recast.
+Written because §0z118's first Mother of Runes arms said keeping her home
+to SHROUD the commander cost karlov: with the commander an illegal target
+the pod's spot removal takes the next-biggest threat, and in this deck that
+is an engine piece worth more than a three-mana commander recast. Her text
+is not a shroud -- the removal fizzles -- and that is what she is now.
 """
 import sys
 
@@ -27,8 +28,7 @@ from edhmc.pending import build_pending
 
 ARMS = {"base": {},
         "no shroud": {"shroud_sources": ()},
-        "Mother home, no other shroud": {
-            "mother_home": "always", "shroud_sources": ("Mother of Runes",)}}
+        "Mother never used": {"mother_use": "none"}}
 
 
 def job(task):

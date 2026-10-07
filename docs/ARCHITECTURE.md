@@ -305,9 +305,10 @@ command; use it rather than remembering.
   card says which of "spot", "ae", "wipe" it answers and whether it blanks
   the event or grants indestructible for it (`event_indestructible`, read by
   `is_hardy`). A card added to an engine's `protection_cards` with no
-  `PROTECTION` row answers nothing. A shroud source that is a {T} ability
-  (`TAP_SHROUD`, Mother of Runes) needs an untapped, non-sick permanent, and
-  the engines that run one keep it home with `holds_back`.
+  `PROTECTION` row answers nothing. Mother of Runes is not a shroud source
+  but a {T} protection (`TAP_PROTECT`): `mother_protects` in `spot_removal`
+  or `mother_attack` in an engine's combat, per `mother_use`, and the
+  engines that run her keep her home with `holds_back`.
 - **Your sweeper destroys what ITS text says** (§0z118). `resolve_own_wipe`
   and the wipe gate's "cost" both read `own_wipe_victims` and
   `own_wipe_pod_left`, so a sweeper with a scope (`OWN_WIPE_SCOPE`) is
