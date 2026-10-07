@@ -25,111 +25,111 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Mirari's Wake                         +1.80+-0.18         +2.24+-0.24        +0.0174+-0.0035      both
-Seedborn Muse                         +1.73+-0.29         +2.23+-0.34        +0.0225+-0.0053      both
-Defense of the Heart                  +1.73+-0.19         +2.15+-0.23        +0.0179+-0.0032      both
-King Darien XLVIII                    +1.41+-0.16         +2.05+-0.23        +0.0169+-0.0035      both
-Sol Ring                              +2.05+-0.26         +2.03+-0.33        +0.0095+-0.0045      both
-God-Pharaoh's Gift                    +0.67+-0.08         +1.77+-0.17        +0.0164+-0.0028      both
-Wurmcoil Engine                       +0.81+-0.10         +1.72+-0.18        +0.0127+-0.0029      both
-Soul of Eternity                      +1.50+-0.21         +1.71+-0.27        -0.0031+-0.0043       dmg
-Green Sun's Zenith                    +1.00+-0.18         +1.44+-0.25        +0.0082+-0.0034      both
-Nesting Dovehawk                      +1.55+-0.18         +1.33+-0.23        +0.0115+-0.0036      both
-Dawn of Hope                          +0.62+-0.12         +1.33+-0.18        +0.0123+-0.0026      both
-Aetherflux Reservoir                  +0.91+-0.11         +1.32+-0.15        +0.0158+-0.0028      both
-Congregation at Dawn                  +0.67+-0.13         +1.26+-0.22        +0.0087+-0.0032      both
-Eladamri's Call                       +0.71+-0.16         +1.22+-0.24        +0.0099+-0.0034      both
-Skyshroud Claim                       +0.73+-0.12         +1.13+-0.20        +0.0067+-0.0030      both
-Sylvan Library                        +0.97+-0.16         +1.07+-0.23        +0.0116+-0.0032      both
-Sun Titan                             +0.69+-0.11         +1.02+-0.19        +0.0076+-0.0029      both
-Talisman of Unity                     +0.94+-0.16         +1.01+-0.22        +0.0053+-0.0031      both
-Farhaven Elf                          +0.76+-0.15         +1.01+-0.23        +0.0051+-0.0034      both
-Chord of Calling                      +0.64+-0.12         +1.00+-0.20        +0.0074+-0.0030      both
-Arcane Signet                         +0.96+-0.16         +0.98+-0.23        +0.0059+-0.0032      both
-Wood Elves                            +0.59+-0.15         +0.93+-0.23        +0.0069+-0.0034      both
-Phyrexian Processor                   +0.86+-0.13         +0.91+-0.20        +0.0069+-0.0028      both
-Solemn Simulacrum                     +0.53+-0.13         +0.86+-0.20        +0.0053+-0.0032      both
-Selfless Spirit                       +0.78+-0.11         +0.85+-0.15        +0.0029+-0.0024      both
-Enlightened Tutor                     +0.84+-0.18         +0.80+-0.25        +0.0037+-0.0034      both
-Sakura-Tribe Elder                    +0.61+-0.18         +0.70+-0.25        +0.0073+-0.0035      both
-Primal Vigor                          +0.44+-0.09         +0.67+-0.16        +0.0081+-0.0028      both
-Parallel Lives                        +0.45+-0.11         +0.66+-0.17        +0.0073+-0.0028      both
-Ulvenwald Hydra                       +0.52+-0.09         +0.65+-0.16        +0.0031+-0.0027      both
-Anointed Procession                   +0.44+-0.12         +0.60+-0.17        +0.0078+-0.0028      both
-Timeless Witness                      +0.27+-0.09         +0.58+-0.16        +0.0058+-0.0027      both
-Elvish Mystic                         +0.46+-0.17         +0.58+-0.23        +0.0060+-0.0033      both
-Worldly Tutor                         +0.38+-0.18         +0.56+-0.25        +0.0044+-0.0034      both
-Birds of Paradise                     +0.41+-0.17         +0.56+-0.23        +0.0054+-0.0033      both
-Avacyn's Pilgrim                      +0.53+-0.17         +0.49+-0.23        +0.0009+-0.0033       dmg
-Alhammarret's Archive                 +0.21+-0.06         +0.43+-0.12        +0.0034+-0.0019      both
-Eternal Witness                       +0.23+-0.08         +0.39+-0.15        +0.0029+-0.0025      both
-Queen Allenal of Ruadach              +0.43+-0.10         +0.36+-0.17        +0.0017+-0.0027       dmg
-Sylvan Caryatid                       +0.24+-0.16         +0.35+-0.21        +0.0043+-0.0031      both
-Bramble Sovereign                     -0.96+-0.37         +0.18+-0.46        +0.0051+-0.0065        --
-Karmic Guide                          +0.06+-0.07         +0.14+-0.14        +0.0029+-0.0024       win
-Caretaker's Talent                    +0.02+-0.11         +0.11+-0.17        +0.0024+-0.0026        --
-Growing Ranks                         -0.06+-0.09         -0.17+-0.15        -0.0005+-0.0024       dmg
+King Darien XLVIII                    +2.70+-0.22         +3.76+-0.29        +0.0341+-0.0043      both
+Seedborn Muse                         +3.04+-0.40         +2.96+-0.47        +0.0447+-0.0066      both
+Sol Ring                              +2.36+-0.27         +2.29+-0.34        +0.0137+-0.0045      both
+Mirari's Wake                         +1.96+-0.19         +2.27+-0.24        +0.0205+-0.0035      both
+Dawn of Hope                          +1.28+-0.16         +2.14+-0.22        +0.0199+-0.0029      both
+Soul of Eternity                      +2.06+-0.24         +2.08+-0.33        +0.0000+-0.0048       dmg
+Green Sun's Zenith                    +1.63+-0.21         +1.99+-0.27        +0.0139+-0.0035      both
+Wurmcoil Engine                       +0.80+-0.10         +1.81+-0.19        +0.0122+-0.0029      both
+Defense of the Heart                  +1.46+-0.18         +1.81+-0.22        +0.0131+-0.0030      both
+God-Pharaoh's Gift                    +0.73+-0.10         +1.81+-0.18        +0.0182+-0.0028      both
+Phyrexian Processor                   +1.61+-0.18         +1.70+-0.22        +0.0165+-0.0030      both
+Eladamri's Call                       +1.39+-0.20         +1.67+-0.25        +0.0123+-0.0035      both
+Aetherflux Reservoir                  +1.06+-0.13         +1.42+-0.16        +0.0168+-0.0028      both
+Congregation at Dawn                  +0.71+-0.14         +1.27+-0.21        +0.0091+-0.0032      both
+Sylvan Library                        +0.97+-0.17         +1.24+-0.23        +0.0133+-0.0032      both
+Chord of Calling                      +0.88+-0.14         +1.19+-0.21        +0.0095+-0.0031      both
+Bramble Sovereign                     +0.76+-0.14         +1.16+-0.21        +0.0107+-0.0031      both
+Skyshroud Claim                       +0.83+-0.14         +1.12+-0.21        +0.0078+-0.0030      both
+Talisman of Unity                     +1.02+-0.17         +1.09+-0.22        +0.0069+-0.0030      both
+Arcane Signet                         +0.92+-0.17         +1.05+-0.24        +0.0075+-0.0032      both
+Sun Titan                             +0.63+-0.11         +1.05+-0.19        +0.0084+-0.0028      both
+Wood Elves                            +0.64+-0.16         +0.97+-0.23        +0.0075+-0.0034      both
+Farhaven Elf                          +0.69+-0.16         +0.94+-0.23        +0.0060+-0.0034      both
+Selfless Spirit                       +0.83+-0.11         +0.92+-0.15        +0.0045+-0.0023      both
+Worldly Tutor                         +0.80+-0.20         +0.88+-0.27        +0.0056+-0.0036      both
+Solemn Simulacrum                     +0.53+-0.14         +0.87+-0.20        +0.0051+-0.0031      both
+Enlightened Tutor                     +0.89+-0.19         +0.75+-0.25        +0.0034+-0.0034      both
+Primal Vigor                          +0.47+-0.10         +0.73+-0.16        +0.0099+-0.0027      both
+Ulvenwald Hydra                       +0.52+-0.09         +0.73+-0.16        +0.0063+-0.0026      both
+Timeless Witness                      +0.31+-0.10         +0.67+-0.17        +0.0068+-0.0027      both
+Anointed Procession                   +0.46+-0.12         +0.67+-0.18        +0.0085+-0.0028      both
+Parallel Lives                        +0.44+-0.12         +0.62+-0.17        +0.0081+-0.0027      both
+Sakura-Tribe Elder                    +0.55+-0.20         +0.62+-0.26        +0.0061+-0.0036      both
+Avacyn's Pilgrim                      +0.52+-0.18         +0.49+-0.24        +0.0035+-0.0033      both
+Elvish Mystic                         +0.44+-0.18         +0.49+-0.23        +0.0050+-0.0034      both
+Alhammarret's Archive                 +0.25+-0.07         +0.48+-0.12        +0.0045+-0.0019      both
+Birds of Paradise                     +0.41+-0.18         +0.48+-0.24        +0.0046+-0.0034      both
+Sylvan Caryatid                       +0.32+-0.17         +0.47+-0.22        +0.0032+-0.0031      both
+Eternal Witness                       +0.28+-0.08         +0.40+-0.14        +0.0021+-0.0025       dmg
+Queen Allenal of Ruadach              +0.42+-0.10         +0.33+-0.16        +0.0020+-0.0027       dmg
+Karmic Guide                          +0.15+-0.08         +0.33+-0.14        +0.0039+-0.0024      both
+Caretaker's Talent                    -0.01+-0.11         +0.20+-0.17        +0.0031+-0.0027      both
+Nesting Dovehawk                      +0.22+-0.19         +0.14+-0.25        +0.0039+-0.0039       win
+Growing Ranks                         -0.13+-0.09         -0.10+-0.15        -0.0004+-0.0024        --
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Elspeth, Sun's Champion               +2.31+-0.20         +3.39+-0.26        +0.0273+-0.0035      both
+Elspeth, Sun's Champion               +2.48+-0.21         +3.58+-0.27        +0.0281+-0.0036      both
       MODELLED: +1 (three Soldiers, through the doublers) every turn and the -7
       emblem (+2/+2 and flying for the team, read by flying_of). NOT: the -3,
       which would destroy your own Soul tokens and aims at a pod that is a
       creature count (§4). Loyalty only goes up -- the pod does not attack
       walkers. A floor on the -3, a ceiling on her survival; the +1 is most of the
       card.
-Luminarch Ascension                   +1.81+-0.19         +2.41+-0.24        +0.0195+-0.0033      both
+Luminarch Ascension                   +2.63+-0.23         +3.05+-0.27        +0.0255+-0.0034      both
       MODELLED: the {1}{W} 4/4 flying Angel at four quest counters. The counters
       are added once per pod ROUND, one per living opponent, and only in a round
       in which you lost no life -- a FLOOR, since the loss may have come on only
       one opponent's turn.
-Archon of Valor's Reach               +0.69+-0.07         +0.91+-0.12        +0.0032+-0.0020      both
+Archon of Valor's Reach               +0.62+-0.06         +0.95+-0.12        +0.0023+-0.0019      both
       MODELLED: the 5/6 body with flying and trample (generated sets). NOT:
       'Players can't cast spells of the chosen type' -- the pod casts no typed
       spells here (§4). Vigilance is inert, since your creatures never block. A
       floor.
-Mondrak, Glory Dominus                +0.74+-0.12         +0.87+-0.18        +0.0099+-0.0029      both
+Mondrak, Glory Dominus                +0.62+-0.12         +0.78+-0.18        +0.0089+-0.0029      both
       MODELLED: the 4/4 and its token doubling on the one token path. NOT:
       '{1}{W/P}{W/P}, Sacrifice two other artifacts and/or creatures: Put an
       indestructible counter on Mondrak' -- a protection line, so the row is a
       floor.
-Blade of Selves                       +0.85+-0.12         +0.78+-0.16        -0.0008+-0.0025       dmg
+Blade of Selves                       +0.76+-0.11         +0.73+-0.16        -0.0001+-0.0024       dmg
       MODELLED: equip {4} on the best attacker and myriad's copies -- tokens
       ENTERING, so Trostani, the doublers and Caretaker's Talent see them --
       exiled at end of combat. The copies join the one attack the pod model
       declares rather than each being forced at its own opponent (§0v).
-Wrath of God                          +0.32+-0.10         +0.62+-0.17        +0.0029+-0.0026      both
+Wrath of God                          +0.34+-0.10         +0.62+-0.18        +0.0020+-0.0026       dmg
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Selesnya Eulogist                     +0.44+-0.07         +0.46+-0.11        +0.0026+-0.0021      both
+Angel of Sanctions                    +0.38+-0.08         +0.55+-0.14        +0.0037+-0.0023      both
+      MODELLED: the 3/4 flier and embalm {5}{W} (a token copy, which Trostani and
+      the doublers see). NOT: the ETB exile of an opposing nonland permanent (§4).
+      A floor.
+Selesnya Eulogist                     +0.40+-0.06         +0.48+-0.11        +0.0044+-0.0020      both
       MODELLED: the 3/3 and its {2}{G} populate, as often as mana and a target
       allow. The target is a creature card in YOUR graveyard or, from pod turn
       `eulogist_opp_yard_turn` (4), one a round from the pod's graveyards, which
       are not modelled (§4). The row reads that knob as much as the card.
-Angel of Sanctions                    +0.33+-0.07         +0.46+-0.14        +0.0011+-0.0023       dmg
-      MODELLED: the 3/4 flier and embalm {5}{W} (a token copy, which Trostani and
-      the doublers see). NOT: the ETB exile of an opposing nonland permanent (§4).
-      A floor.
-Sundering Growth                      +0.34+-0.08         +0.45+-0.13        +0.0046+-0.0022      both
+Sundering Growth                      +0.33+-0.08         +0.45+-0.13        +0.0045+-0.0021      both
       MODELLED: 'then populate' -- held until there is a token to copy. NOT:
       'destroy target artifact or enchantment', whose targets are the pod's (§4).
       A floor.
-Mimic Vat                             +0.22+-0.08         +0.39+-0.14        +0.0019+-0.0024       dmg
-      MODELLED: imprinting YOUR nontoken creatures as they die and the {3},{T}
-      hasty copy, exiled at the end step. NOT: imprinting the pod's creatures,
-      which die as a number (§4). A floor.
-Greater Good                          +0.22+-0.10         +0.34+-0.17        +0.0049+-0.0027      both
+Greater Good                          +0.27+-0.10         +0.41+-0.17        +0.0049+-0.0027      both
       MODELLED: sacrifice a creature, draw its power, discard three -- once a
       turn, with two cards or fewer in hand, on a body the library can afford.
       NOT: the instant-speed sacrifice in response to removal, which is where the
       card is best. A floor.
-Lightning Greaves                     +0.05+-0.07         +0.02+-0.13        -0.0005+-0.0021        --
+Mimic Vat                             +0.23+-0.08         +0.32+-0.14        +0.0019+-0.0023       dmg
+      MODELLED: imprinting YOUR nontoken creatures as they die and the {3},{T}
+      hasty copy, exiled at the end step. NOT: imprinting the pod's creatures,
+      which die as a number (§4). A floor.
+Lightning Greaves                     +0.13+-0.08         +0.05+-0.14        -0.0003+-0.0021        --
       MODELLED: shroud on Trostani (`shroud_sources`). NOT: haste -- the Greaves
       never move off the commander, so a Soul of Eternity cast this turn does not
       swing. A floor.
@@ -138,8 +138,8 @@ Lightning Greaves                     +0.05+-0.07         +0.02+-0.13        -0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Acidic Slime                          +0.24+-0.08         +0.21+-0.14        +0.0011+-0.0022       dmg
-Aura Shards                           +0.22+-0.09         +0.20+-0.15        -0.0015+-0.0023       dmg
-Beast Within                          +0.20+-0.09         +0.11+-0.13        -0.0018+-0.0020        --
-Path to Exile                         +0.03+-0.05         +0.08+-0.09        +0.0004+-0.0013        --
-Swords to Plowshares                  +0.08+-0.06         -0.03+-0.09        -0.0009+-0.0014        --
+Acidic Slime                          +0.33+-0.10         +0.37+-0.14        +0.0021+-0.0022       dmg
+Beast Within                          +0.20+-0.09         +0.16+-0.13        -0.0003+-0.0020       dmg
+Aura Shards                           +0.19+-0.10         +0.09+-0.15        -0.0021+-0.0022        --
+Swords to Plowshares                  +0.12+-0.07         +0.06+-0.09        -0.0005+-0.0013        --
+Path to Exile                         +0.04+-0.06         -0.00+-0.10        -0.0001+-0.0014        --
