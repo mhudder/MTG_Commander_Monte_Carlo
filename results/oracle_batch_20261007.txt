@@ -1,0 +1,51 @@
+§0z116's ITEMS 6-13, FIXED (§0z118). N=15,000 paired, staged lists; each row turns fixes off: ARM MINUS THE NEW ENGINE (* = CI excludes zero).
+
+  deck       arm                              won T10           won T20        damage T20
+  rendmaw    protect_events off      -0.0001 ±0.0004   -0.0009 ±0.0009*  -0.0660 ±0.0465*
+      per game, new -> off: protected_indestructible 0.01->0.00  removal_eaten 1.33->1.33  wipes_suffered 0.70->0.69  overseer_activations 0.60->0.60  culling_mana 0.11->0.11  culling_mana_spent 0.05->0.05
+  rendmaw    vigor_counters off      -0.0003 ±0.0003*  -0.0009 ±0.0005*  -0.0272 ±0.0108*
+      per game, new -> off: protected 0.05->0.05  removal_eaten 1.33->1.33  wipes_suffered 0.70->0.70  overseer_activations 0.60->0.60
+  rendmaw    own_wipe_scope off      -0.0001 ±0.0001   +0.0005 ±0.0008   -0.0153 ±0.0399 
+      per game, new -> off: removal_eaten 1.33->1.33  wipes_suffered 0.70->0.70  own_wipes_cast 0.04->0.04  overseer_activations 0.60->0.60  culling_mana 0.11->0.00  culling_mana_spent 0.05->0.00
+  rendmaw    overseer_taps off       +0.0009 ±0.0007*  +0.0009 ±0.0014   +0.4297 ±0.0532*
+      per game, new -> off: protected 0.05->0.05  removal_eaten 1.33->1.33  wipes_suffered 0.70->0.70  overseer_activations 0.60->0.00  culling_mana 0.11->0.11
+  rendmaw    all off                 +0.0005 ±0.0008   +0.0001 ±0.0018   +0.3303 ±0.0814*
+      per game, new -> off: protected_indestructible 0.01->0.00  removal_eaten 1.33->1.33  wipes_suffered 0.70->0.69  own_wipes_cast 0.04->0.04  overseer_activations 0.60->0.00  culling_mana 0.11->0.00  culling_mana_spent 0.05->0.00
+  lorehold   protect_events off      +0.0017 ±0.0009*  +0.0003 ±0.0016   -0.0522 ±0.0887 
+      per game, new -> off: protected 0.09->0.10  protected_indestructible 0.02->0.00  removal_eaten 1.14->1.13  wipes_suffered 0.55->0.52  own_wipes_cast 0.37->0.38
+  lorehold   own_wipe_scope off      +0.0004 ±0.0017   +0.0011 ±0.0032   +0.1680 ±0.1631*
+      per game, new -> off: protected 0.09->0.09  protected_indestructible 0.02->0.02  removal_eaten 1.14->1.15  wipes_suffered 0.55->0.54  own_wipes_cast 0.37->0.34  turns_ended 0.06->0.00
+  lorehold   all off                 +0.0021 ±0.0019*  +0.0014 ±0.0035   +0.1392 ±0.1856 
+      per game, new -> off: protected 0.09->0.10  protected_indestructible 0.02->0.00  removal_eaten 1.14->1.14  wipes_suffered 0.55->0.52  own_wipes_cast 0.37->0.35  turns_ended 0.06->0.00
+  karlov     protect_events off      -0.0018 ±0.0015*  -0.0037 ±0.0024*  -0.0692 ±0.1284 
+      per game, new -> off: protected 0.00->0.02  removal_eaten 1.70->1.70  wipes_suffered 0.54->0.54  own_wipes_cast 0.11->0.11  citadel_wipe_held 0.04->0.04  own_wipe_survivors 0.00->0.00
+  karlov     damn_overload off       -0.0007 ±0.0008   +0.0018 ±0.0015*  -0.0213 ±0.0859 
+      per game, new -> off: removal_eaten 1.70->1.70  wipes_suffered 0.54->0.55  own_wipes_cast 0.11->0.15  citadel_wipe_held 0.04->0.04  own_wipe_survivors 0.00->0.00
+  karlov     all off                 -0.0025 ±0.0017*  -0.0021 ±0.0028   -0.0790 ±0.1533 
+      per game, new -> off: protected 0.00->0.02  removal_eaten 1.70->1.70  wipes_suffered 0.54->0.54  own_wipes_cast 0.11->0.15  citadel_wipe_held 0.04->0.04  own_wipe_survivors 0.00->0.00
+  tivit      damn_overload off       -0.0001 ±0.0013   +0.0048 ±0.0020*  +0.3341 ±0.1330*
+      per game, new -> off: removal_eaten 1.11->1.11  wipes_suffered 0.50->0.51  own_wipes_cast 0.34->0.39  kambal_triggers 1.81->1.81  token_drain 66.94->65.97
+  tivit      kambal_batch off        +0.0154 ±0.0021*  +0.0085 ±0.0024*  +1.2990 ±0.1118*
+      per game, new -> off: removal_eaten 1.11->1.09  wipes_suffered 0.50->0.50  own_wipes_cast 0.34->0.34  kambal_triggers 1.81->0.00  token_drain 66.94->73.11
+  tivit      own_wipe_scope off      +0.0002 ±0.0012   +0.0013 ±0.0018   -0.0393 ±0.0906 
+      per game, new -> off: removal_eaten 1.11->1.11  wipes_suffered 0.50->0.50  own_wipes_cast 0.34->0.32  kambal_triggers 1.81->1.84  token_drain 66.94->67.64
+  tivit      all off                 +0.0161 ±0.0027*  +0.0137 ±0.0035*  +1.6072 ±0.1931*
+      per game, new -> off: removal_eaten 1.11->1.09  wipes_suffered 0.50->0.50  own_wipes_cast 0.34->0.35  kambal_triggers 1.81->0.00  token_drain 66.94->72.76
+  shilgengar protect_events off      +0.0001 ±0.0003   -0.0020 ±0.0014*  -0.1272 ±0.0810*
+      per game, new -> off: protected 0.10->0.11  protected_indestructible 0.05->0.00  removal_eaten 1.38->1.36  wipes_suffered 0.59->0.56  own_wipes_cast 0.12->0.12  giada_counters 1.03->1.03  own_wipe_survivors 0.10->0.11
+  shilgengar damn_overload off       -0.0001 ±0.0002   +0.0023 ±0.0014*  +0.3000 ±0.0934*
+      per game, new -> off: protected 0.10->0.10  protected_indestructible 0.05->0.05  removal_eaten 1.38->1.38  wipes_suffered 0.59->0.60  own_wipes_cast 0.12->0.15  giada_counters 1.03->1.04  own_wipe_survivors 0.10->0.12
+  shilgengar giada_text off          -0.0010 ±0.0005*  -0.0024 ±0.0013*  -0.2455 ±0.0525*
+      per game, new -> off: protected 0.10->0.10  removal_eaten 1.38->1.38  wipes_suffered 0.59->0.59  own_wipes_cast 0.12->0.12  giada_counters 1.03->0.00  own_wipe_survivors 0.10->0.10
+  shilgengar all off                 -0.0009 ±0.0007*  -0.0017 ±0.0024   -0.0602 ±0.1328 
+      per game, new -> off: protected 0.10->0.11  protected_indestructible 0.05->0.00  removal_eaten 1.38->1.36  wipes_suffered 0.59->0.57  own_wipes_cast 0.12->0.15  giada_counters 1.03->0.00  own_wipe_survivors 0.10->0.12
+  azusa      gsz_shuffle off         +0.0005 ±0.0022   +0.0007 ±0.0031   +0.0144 ±0.1957 
+      per game, new -> off: removal_eaten 1.49->1.48  wipes_suffered 0.60->0.60  gsz_shuffled 0.26->0.00
+  karlov     mother_home always      -0.0032 ±0.0013*  -0.0051 ±0.0022*  -0.4804 ±0.1188*
+      per game, new -> off: removal_eaten 1.70->1.71  wipes_suffered 0.54->0.55  own_wipes_cast 0.11->0.11  citadel_wipe_held 0.04->0.04  own_wipe_survivors 0.00->0.00
+  karlov     mother_home needed      -0.0029 ±0.0013*  -0.0049 ±0.0021*  -0.3927 ±0.1171*
+      per game, new -> off: removal_eaten 1.70->1.71  wipes_suffered 0.54->0.55  own_wipes_cast 0.11->0.11  citadel_wipe_held 0.04->0.04  own_wipe_survivors 0.00->0.00
+  lorehold   mother_home always      -0.0001 ±0.0003   -0.0002 ±0.0006   -0.1583 ±0.0184*
+      per game, new -> off: removal_eaten 1.14->1.14  wipes_suffered 0.55->0.55  own_wipes_cast 0.37->0.37
+  lorehold   mother_home never       -0.0011 ±0.0008*  -0.0007 ±0.0014   -0.1579 ±0.0731*
+      per game, new -> off: protected 0.09->0.09  protected_indestructible 0.02->0.02  removal_eaten 1.14->1.14  wipes_suffered 0.55->0.55  own_wipes_cast 0.37->0.37

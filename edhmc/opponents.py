@@ -386,9 +386,30 @@ TAP_SHROUD = {"Mother of Runes"}
 
 def holds_back(g, perm) -> bool:
     """A creature the pilot does not attack with because its {T} ability is
-    worth more untapped (`TAP_SHROUD`). Read by the engines that run one."""
-    return (perm.card.name in TAP_SHROUD
-            and g.cfg.get("protect_events", True))
+    worth more untapped (`TAP_SHROUD`). Read by the engines that run one.
+
+    A POLICY, not text, `mother_home` (§0z118):
+      "needed"  home only when HER shroud is the one the commander has:
+                the commander is on the battlefield and no other shroud
+                source is. THE DEFAULT.
+      "always"  never attacks -- the first rule written, which cost karlov
+                0.005 at T20: its Boots and Greaves already shroud the
+                commander (§0z36's redundancy), so she sat home for a flag
+                that was set.
+      "never"   attacks like any creature, and is tapped for the pod's round.
+    """
+    if (perm.card.name not in TAP_SHROUD
+            or not g.cfg.get("protect_events", True)):
+        return False
+    mode = g.cfg.get("mother_home", "needed")
+    if mode == "never":
+        return False
+    if mode == "always":
+        return True
+    if not any(p.card is g.commander for p in g.board):
+        return False
+    return not any(g.has(n) for n in g.cfg.get("shroud_sources", ())
+                   if n not in TAP_SHROUD)
 
 
 # WHICH EVENT EACH PROTECTION SPELL ANSWERS, AND HOW (§0z118). Every line was
@@ -556,6 +577,14 @@ def board_wipe(g, opp, rolls):
         return
     how = try_protect(g, rolls[5], "wipe")
     if how == "blank":
+        if g.cfg.get("protect_events", True):
+            # Phasing out (Teferi's Protection, Perch Protection) saves YOUR
+            # permanents; the wrath still resolves for everyone else (§0z118).
+            # The old early return spared the pod's creatures too.
+            for o in g.opponents:
+                o.creatures = 0.0
+                o.goaded_birds = 0.0
+            g.m["wipes_suffered"] += 1
         return
     # Optional protocol hook (2026-10-01, trostani): a response FROM THE
     # BATTLEFIELD -- Selfless Spirit, King Darien -- that grants indestructible

@@ -21,6 +21,9 @@ been flattering the deck by, a negative one what the fix is worth to it.
   giada_text      11  Giada's counters on every Angel that enters
   overseer_taps   12  Steel Overseer taps to activate
   gsz_shuffle     13  Green Sun's Zenith shuffles into the library
+  mother_home     --  NOT a fix: when the pilot keeps Mother of Runes home
+                      from combat so her {T} shroud is up -- "needed" (the
+                      default) against "always" and "never"
 """
 import json
 import sys
@@ -49,6 +52,14 @@ for _d, _ks in KNOBS.items():
         ARMS.append((_d, f"{_k} off", {_k: False}))
     if len(_ks) > 1:
         ARMS.append((_d, "all off", {k: False for k in _ks}))
+# NOT a fix: the pilot's policy the {T} rule made live (CLAUDE.md, §0z42's
+# lesson) -- Mother of Runes attacks, and is tapped for the pod's round.
+# Each deck's default ("never" in karlov, "needed" in lorehold) is the
+# baseline; the other two are the arms.
+for _d, _modes in (("karlov", ("always", "needed")),
+                   ("lorehold", ("always", "never"))):
+    for _m in _modes:
+        ARMS.append((_d, f"mother_home {_m}", {"mother_home": _m}))
 COUNTERS = ("protected", "protected_indestructible", "removal_eaten",
             "wipes_suffered", "own_wipes_cast", "citadel_wipe_held",
             "kambal_triggers", "token_drain", "overseer_activations",

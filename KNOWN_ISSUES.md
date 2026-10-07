@@ -164,8 +164,9 @@ Methodology that used to live at the end of this file is now
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
 | [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were both missing** (azusa), Kozilek labelled SCRIPTED. Implemented: **+0.0224 ±0.0033 at T20**; the Eye now ties a Forest at T20 where it cost 0.011. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237, both horizons. Awaken the Woods' Kozilek cut was priced on the broken card |
 | [0z115](#0z115) | FIXED | **Lands play by their own text**: entry conditions, painland/horizon/fetch/shock life and karoos generated from Scryfall into `LAND_RULES`; Temple of the False God, Nykthos, Eldrazi Temple and **Vault of the Archangel -- free permanent lifelink in karlov, worth 0.028** -- corrected; Mikokoro, Geier Reach (lorehold **+0.0115**), the Castles, High Market, Phyrexian Tower, Petrified Field, Crystal Vein implemented. Life and entry costs take 0.007-0.032 from every deck. Trostani moved through a latent bug: an uncracked fetch paid {1}. The shock policy does not matter. All seven tables SUSPECT: the rebuild is unblocked |
-| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. **Items 1-5 FIXED in §0z117**; 6-13 open |
+| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. **Items 1-5 FIXED in §0z117, 6-13 in §0z118**; the label, per-engine and smaller lists stay open |
 | [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference implemented through `card_types` (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), shilgengar's Angel/Cleric tags derived from Scryfall (+0.0047), Coercive Portal's real carnage (costs tivit 0.011 under adversarial voting). Karlov, azusa, trostani bit-identical |
+| [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks (+0.002 to +0.005 flattered); protection answers the events its text answers (Mother of Runes is a {T} shroud, not a discard); four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0057 with NO commander shroud**: shroud sends the pod's removal to its engine pieces. Trostani bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10165,7 +10166,7 @@ flying and land data are clean in all seven lists.**
    default adversarial vote carnage wins (three votes to Tivit's two), and
    after it the Portal, Sol Ring and every Treasure are still there, so the
    Portal is a creature wipe (Tivit included) every upkeep.
-6. **Mother of Runes** (karlov) is the whole of `protection_cards`, which
+6. **FIXED in §0z118.** **Mother of Runes** (karlov) is the whole of `protection_cards`, which
    `opponents.try_protect` reads from HAND: with four lands she is discarded
    to blank a removal event or a board wipe. *Verified*. Her text is a {T}
    ability on the battlefield; protection from a colour never stops an
@@ -10174,30 +10175,30 @@ flying and land data are clean in all seven lists.**
    Shelter (one creature, protection from a colour) and un-gifted Dawn's
    Truce (hexproof) blank wipes the same way: `try_protect` has no notion of
    which event a card answers.
-7. **Damn** (karlov, shilgengar, tivit) is cast for {B}{B} with the `wipe`
+7. **FIXED in §0z118.** **Damn** (karlov, shilgengar, tivit) is cast for {B}{B} with the `wipe`
    tag, so it is a two-mana wrath. The wrath is its overload, {2}{W}{W}; at
    {B}{B} it is single-target removal. The deck modules' own note says it is
    "modelled as the removal spell it is cast as"; the tag says otherwise.
-8. **Kambal, Profiteering Mayor** (tivit): "Whenever ONE OR MORE tokens you
+8. **FIXED in §0z118.** **Kambal, Profiteering Mayor** (tivit): "Whenever ONE OR MORE tokens you
    control enter" is one trigger per batch. `on_tokens_created` drains per
    token. *Verified*: one batch of five Treasures takes 15 from the pod where
    the text takes 3; with Academy Manufactor a dilemma is 15 drains, not 1.
-9. **Primal Vigor's second clause** ("+1/+1 counters ... twice that many")
+9. **FIXED in §0z118.** **Primal Vigor's second clause** ("+1/+1 counters ... twice that many")
    is implemented in trostani (`counter_doubler`) and nowhere in rendmaw,
    where Metallic Mimic, The Great Henge, Verdurous Gearhulk, Steel Overseer
    and Woe Strider's escape all place counters. §0u.
-10. **Culling Ritual** (rendmaw) resolves as a full creature wipe, both sides,
+10. **FIXED in §0z118.** **Culling Ritual** (rendmaw) resolves as a full creature wipe, both sides,
     Rendmaw (MV 5) included; the text destroys each nonland permanent of
     MANA VALUE 2 OR LESS -- tokens, Sol Ring, the signets, the Myr -- and adds
     {B} or {G} for each. **Ondu Inversion** ("all nonland permanents") and
     **Ultima** ("all artifacts and creatures. End the turn.") resolve as
     creature-only wipes. **Promise of Loyalty** (lorehold, tivit) is a full
     wipe where each player, you included, keeps one creature.
-11. **Giada, Font of Hope** (shilgengar): the extra counters are applied only
+11. **FIXED in §0z118.** **Giada, Font of Hope** (shilgengar): the extra counters are applied only
     to Angel TOKENS (`make_angel_tokens`); a cast or reanimated Angel gets none.
-12. **Steel Overseer** (rendmaw): its {T} ability is free and runs in
+12. **FIXED in §0z118.** **Steel Overseer** (rendmaw): its {T} ability is free and runs in
     `activations`, after combat -- so it attacks AND activates every turn.
-13. **Green Sun's Zenith** (azusa) goes to the graveyard; the text shuffles it
+13. **FIXED in §0z118.** **Green Sun's Zenith** (azusa) goes to the graveyard; the text shuffles it
     into the library (trostani does). Regrowth and Eternal Witness can rebuy it.
 
 ### Labels that claim more, or less, than the engine does
@@ -10353,6 +10354,142 @@ karlov, azusa, trostani); rendmaw, lorehold, tivit and shilgengar moved, as
 intended, and their caches were already SUSPECT for the rebuild (§0z115).
 rendmaw's table was re-rendered from its cache for Biotransference's new
 category, its only change.
+
+## 0z118. FIXED — §0z116's items 6-13: protection per event, Damn's overload, Kambal, Primal Vigor, four sweepers, Giada, Steel Overseer, Green Sun's Zenith
+
+The owner, 2026-10-07: "fix items 6 to 13 before the rebuild". Oracle text
+re-fetched from Scryfall for every card named below, and for the five other
+protection spells `try_protect` reads. Every fix has a switch;
+`tests/test_oracle_batch.py` pins twenty-one cases with eight mutations,
+exact sets.
+
+6. **Protection answers the events its text answers** (`protect_events`).
+   `opponents.PROTECTION` says, per card, which of the pod's three events --
+   spot removal, artifact/enchantment removal, the wrath -- it answers, and
+   whether it BLANKS the event (hexproof, phasing, protection from a colour)
+   or grants INDESTRUCTIBLE for it (`event_indestructible`, priced by
+   `destroy_share` like every indestructible). Sejiri Shelter answers a spot
+   removal on a creature, never a wrath; Dawn's Truce against a wrath
+   promises the gift and grants indestructible; Heroic Intervention, Boros
+   Charm and Flawless Maneuver grant it; Teferi's Protection and Perch
+   Protection phase out. **Mother of Runes is no longer a card discarded from
+   hand** (karlov's whole `protection_cards`): she is a {T} shroud source
+   that must be untapped and not summoning sick (`TAP_SHROUD`).
+   **Two more defects surfaced while measuring it.** A blanked wrath returned
+   before the pod's creatures died, so phasing out spared every opponent's
+   board too; a wrath you phase out of now still kills theirs (case U). And
+   keeping Mother home from combat is a POLICY the {T} rule made live
+   (§0z42's lesson), so it has its own knob, `mother_home`, measured below.
+7. **Damn is a wrath only at its overload** (`damn_overload`). Cast for
+   {B}{B} it is "destroy target creature", blind here; the `wipe` tag made it
+   a two-mana wrath in karlov, shilgengar and tivit. Every main phase now
+   casts a gated wipe at `opponents.wipe_mode_cost` ({2}{W}{W} for an
+   `OVERLOAD_WIPES` card), and Bolas's Citadel -- life is an alternative
+   cost, so is overload -- stops its dig at Damn rather than spend the wrath
+   as a 1-for-1 this model cannot see.
+8. **Kambal, Profiteering Mayor drains once per batch** (`kambal_batch`):
+   "Whenever ONE OR MORE tokens you control enter". One `on_tokens_created`
+   call is one event; Mirkwood Bats stays per token, as its text is. The
+   "you gain 1 life" half is new -- nothing in tivit gained life before.
+9. **Primal Vigor doubles +1/+1 counters in rendmaw** (`vigor_counters`),
+   through one `engine.plus_counters` at all six sites: Metallic Mimic, The
+   Great Henge, Verdurous Gearhulk, Steel Overseer, Mycoloth's devour and
+   Revitalizing Repast. Woe Strider's escape is not modelled at all, so it
+   has no counters to double.
+10. **Each sweeper destroys what its text says** (`own_wipe_scope`),
+    through `own_wipe_victims` and `own_wipe_pod_left`, which the wipe gate's
+    "cost" measure reads too. **Culling Ritual** takes nonland permanents of
+    mana value 2 or less -- Sol Ring, the signets, every token, not Rendmaw
+    -- and floats {B}/{G} for each (`ritual_float`, emptied with Davvol's);
+    the pod loses `culling_pod_share` (0.5) of its creatures, **A JUDGEMENT,
+    NOT A CENSUS**. **Ondu Inversion** takes every nonland permanent,
+    Treasures included; **Ultima** artifacts and creatures, then ENDS THE
+    TURN (`TURN_ENDERS`: combat and the second main phase are skipped, so the
+    pilot casts it after combat); **Promise of Loyalty** leaves each player
+    one creature -- yours the commander if it is there, else the biggest. The
+    vow ("can't attack you") is not modelled.
+11. **Giada's counters on every Angel that enters** (`giada_text`), read in
+    `make_permanent`: cast, reanimated, returned by the ultimate, or a token.
+12. **Steel Overseer taps to activate** (`overseer_taps`). `steel_overseer`
+    runs before combat, needs an untapped Overseer that is not summoning
+    sick, and taps it -- so the Overseer that activates does not attack. It
+    ran free after combat and did both every turn.
+13. **Green Sun's Zenith shuffles into the library** (`gsz_shuffle`), on its
+    own CRN stream as trostani's does.
+
+**Two mutation expectations were wrong on the first run, both
+informative.** Case I (Vigor doubling Steel Overseer's counter) broke under
+`overseer_taps=False` because it called the new activation only; it now
+calls both paths. `test_wipe_gate`'s D (the Citadel stops at a refused
+Damn) held under `wipe_gate_all_casts=False`, because the overload rule
+stops the dig at Damn whatever the gate says; D now runs with
+`damn_overload=False`, so it pins the gate alone.
+
+**Measured** (`diagnostics/run_oracle_batch.py`,
+`results/oracle_batch_20261007.txt`), N=15,000 paired, staged lists, each
+fix turned OFF, arm minus the new engine (bold: the bar excludes zero):
+
+| deck | fix off | won T10 | won T20 | mechanism, per game |
+|---|---|---|---|---|
+| tivit | Kambal per token | **+0.0154 ±0.0021** | **+0.0085 ±0.0024** | 1.81 triggers; token drain 66.9 against 73.1 |
+| tivit | Damn at {B}{B} | −0.0001 ±0.0013 | **+0.0048 ±0.0020** | own wipes 0.34 against 0.39 |
+| tivit | sweepers' scope | +0.0002 ±0.0012 | +0.0013 ±0.0018 | Promise keeps one |
+| tivit | **all three** | **+0.0161 ±0.0027** | **+0.0137 ±0.0035** | |
+| shilgengar | Giada tokens only | **−0.0010 ±0.0005** | **−0.0024 ±0.0013** | 1.03 counters |
+| shilgengar | Damn at {B}{B} | −0.0001 ±0.0002 | **+0.0023 ±0.0014** | own wipes 0.12 against 0.15 |
+| shilgengar | protection | +0.0001 ±0.0003 | **−0.0020 ±0.0014** | Flawless Maneuver's indestructible, 0.05 |
+| karlov | protection | **−0.0018 ±0.0015** | **−0.0037 ±0.0024** | Mother from hand 0.02 |
+| karlov | Damn at {B}{B} | −0.0007 ±0.0008 | **+0.0018 ±0.0015** | own wipes 0.11 against 0.15 |
+| lorehold | protection | **+0.0017 ±0.0009** | +0.0003 ±0.0016 | Sejiri / Truce no longer blank a wrath |
+| lorehold | sweepers' scope | +0.0004 ±0.0017 | +0.0011 ±0.0032 | Ultima ends 0.06 turns |
+| rendmaw | Steel Overseer free | **+0.0009 ±0.0007** | +0.0009 ±0.0014 | 0.60 activations; damage +0.43 |
+| rendmaw | Primal Vigor | **−0.0003 ±0.0003** | **−0.0009 ±0.0005** | |
+| rendmaw | protection | −0.0001 ±0.0004 | **−0.0009 ±0.0009** | Heroic Intervention lets the wrath kill theirs |
+| rendmaw | Culling Ritual | −0.0001 ±0.0001 | +0.0005 ±0.0008 | 0.11 mana, 0.05 spent |
+| azusa | Green Sun's Zenith | +0.0005 ±0.0022 | +0.0007 ±0.0031 | 0.26 shuffles |
+
+**Kambal's per-token drain flattered tivit by 0.015 at T10** -- the largest
+of the eight, and the shape of §0z117's discards: a batch trigger read per
+object. **Damn at {B}{B} flattered all three decks that run it** (0.0018 to
+0.0048 at T20): a two-mana wrath is a better card than a four-mana one.
+**Protection cuts both ways, and the sign is the mechanism.** A blanked
+wrath spared the pod's boards as well as yours, so where the fix turns a
+blank into indestructible (Heroic Intervention, Flawless Maneuver) the
+wrath now kills theirs and the deck GAINS (rendmaw, shilgengar); where it
+removes a blank that was never the card's text (lorehold's Sejiri Shelter
+and Dawn's Truce against wraths) the deck loses a little.
+
+**Mother of Runes, and what the commander's shroud is worth to karlov.**
+`mother_home`, the policy, arm minus each deck's shipped default:
+
+| deck | default | arm | won T10 | won T20 |
+|---|---|---|---|---|
+| karlov | "never" (she attacks) | "always" home | **−0.0032 ±0.0013** | **−0.0051 ±0.0022** |
+| karlov | | "needed" (home while hers is the only shroud) | **−0.0029 ±0.0013** | **−0.0049 ±0.0021** |
+| lorehold | "needed" | "always" | −0.0001 ±0.0003 | −0.0002 ±0.0006 |
+| lorehold | | "never" | **−0.0011 ±0.0008** | −0.0007 ±0.0014 |
+
+The first rule written kept her home in both decks and cost karlov 0.005.
+`diagnostics/run_karlov_shroud.py` (`results/karlov_shroud_20261007.txt`)
+asks why: **karlov with NO commander shroud at all -- Boots, Greaves, Cloak
+and Mother shrouding nothing -- wins +0.0018 ±0.0012 at T10 and +0.0057
+±0.0020 at T20.** With the commander an illegal target the pod's spot
+removal takes the next-biggest threat, and in this deck that is an engine
+piece worth more than a commander that recasts for three. **This is the
+mechanism under §0z35's and §0z36's negative rows for the Boots and Mother
+of Runes** -- not redundancy alone. It is a statement about how the model's
+pod picks a target (`threat_of`), and the owner's call that the Boots do
+real work in an interaction-heavy pod (item 20b) is a call about a real
+table's targeting that this measurement does not overrule. So karlov
+ships `mother_home="never"` -- its old behaviour, she attacks -- and
+lorehold `"needed"`. **A POLICY, measured; the owner's to overrule.**
+
+Trostani is BIT-IDENTICAL to 10d6c81 (`check_unchanged_decks`); the other
+six moved, as intended, and every cache was already SUSPECT for the rebuild
+(§0z115). Lorehold's and tivit's tables were re-rendered from their caches
+for the new Sejiri Shelter and Promise of Loyalty reasons, their only
+change. The ledger's §0z35 tie-break ("cutting Mother of Runes closes
+`try_protect()` outright") is annotated: that channel was not her text.
 
 ## How to read an ablation table
 

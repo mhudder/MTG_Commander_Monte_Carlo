@@ -1,0 +1,1925 @@
+{
+ "n": 15000,
+ "arms": [
+  {
+   "deck": "rendmaw",
+   "arm": "protect_events off",
+   "cells": {
+    "damage10": [
+     -0.026659901285447714,
+     0.03336613625644954
+    ],
+    "cards_drawn10": [
+     0.0009333333333333333,
+     0.0028924878183782857
+    ],
+    "tokens_made10": [
+     0.004666666666666667,
+     0.004085791250818981
+    ],
+    "rendmaw_triggers10": [
+     0.0026,
+     0.0020449017211980744
+    ],
+    "won10": [
+     -0.00013333333333333334,
+     0.0003695873043452435
+    ],
+    "damage20": [
+     -0.0660330566627178,
+     0.046488231620400174
+    ],
+    "cards_drawn20": [
+     -0.008133333333333333,
+     0.006700006454282345
+    ],
+    "tokens_made20": [
+     -0.0098,
+     0.00915215904612873
+    ],
+    "rendmaw_triggers20": [
+     -0.0006666666666666666,
+     0.004165093147869853
+    ],
+    "won20": [
+     -0.0009333333333333333,
+     0.0009051921679001419
+    ]
+   },
+   "new": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3347333333333333,
+    "wipes_suffered": 0.7003333333333334,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6004666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.3348,
+    "wipes_suffered": 0.686,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6015333333333334,
+    "culling_mana": 0.1076,
+    "culling_mana_spent": 0.046066666666666665,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "rendmaw",
+   "arm": "vigor_counters off",
+   "cells": {
+    "damage10": [
+     -0.012696321097318003,
+     0.006450363364720287
+    ],
+    "cards_drawn10": [
+     0.0006666666666666666,
+     0.0008467778006405962
+    ],
+    "tokens_made10": [
+     0.0008,
+     0.0010931972412111443
+    ],
+    "rendmaw_triggers10": [
+     0.0002666666666666667,
+     0.0003200488765630384
+    ],
+    "won10": [
+     -0.0003333333333333333,
+     0.00029214058659159553
+    ],
+    "damage20": [
+     -0.027166027160486127,
+     0.010794300587129676
+    ],
+    "cards_drawn20": [
+     0.0020666666666666667,
+     0.0019857521717012417
+    ],
+    "tokens_made20": [
+     0.0029333333333333334,
+     0.004313867725430326
+    ],
+    "rendmaw_triggers20": [
+     0.0006,
+     0.001069545312047482
+    ],
+    "won20": [
+     -0.0008666666666666666,
+     0.0005058965943694916
+    ]
+   },
+   "new": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3347333333333333,
+    "wipes_suffered": 0.7003333333333334,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6004666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.04873333333333333,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3348,
+    "wipes_suffered": 0.7008,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6006666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "rendmaw",
+   "arm": "own_wipe_scope off",
+   "cells": {
+    "damage10": [
+     -0.03823491895740799,
+     0.02324010780973035
+    ],
+    "cards_drawn10": [
+     -0.0004,
+     0.0026779514156382613
+    ],
+    "tokens_made10": [
+     -0.0061333333333333335,
+     0.004406996678247576
+    ],
+    "rendmaw_triggers10": [
+     -0.0011333333333333334,
+     0.0014133068342114025
+    ],
+    "won10": [
+     -6.666666666666667e-05,
+     0.0001306666666666667
+    ],
+    "damage20": [
+     -0.015306507748137037,
+     0.039850690519373566
+    ],
+    "cards_drawn20": [
+     0.011666666666666667,
+     0.007411429933326911
+    ],
+    "tokens_made20": [
+     0.006666666666666667,
+     0.008613721734371162
+    ],
+    "rendmaw_triggers20": [
+     0.005266666666666667,
+     0.0034139512879713526
+    ],
+    "won20": [
+     0.0005333333333333334,
+     0.0007839796724553958
+    ]
+   },
+   "new": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3347333333333333,
+    "wipes_suffered": 0.7003333333333334,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6004666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3346,
+    "wipes_suffered": 0.7008,
+    "own_wipes_cast": 0.0418,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6010666666666666,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "rendmaw",
+   "arm": "overseer_taps off",
+   "cells": {
+    "damage10": [
+     0.44162345940338543,
+     0.042746186862891736
+    ],
+    "cards_drawn10": [
+     0.0013333333333333333,
+     0.0015895383771776443
+    ],
+    "tokens_made10": [
+     -0.0008,
+     0.0016936416346241712
+    ],
+    "rendmaw_triggers10": [
+     0.00046666666666666666,
+     0.0008568346482711833
+    ],
+    "won10": [
+     0.0009333333333333333,
+     0.0006912847016370288
+    ],
+    "damage20": [
+     0.4297201345746268,
+     0.053232290791793396
+    ],
+    "cards_drawn20": [
+     -0.016466666666666668,
+     0.007198695840744874
+    ],
+    "tokens_made20": [
+     -0.022933333333333333,
+     0.00848870073348369
+    ],
+    "rendmaw_triggers20": [
+     -0.006733333333333333,
+     0.004032466114833366
+    ],
+    "won20": [
+     0.0008666666666666666,
+     0.0013516004017098836
+    ]
+   },
+   "new": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3347333333333333,
+    "wipes_suffered": 0.7003333333333334,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6004666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0486,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3314,
+    "wipes_suffered": 0.6985333333333333,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.10633333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "rendmaw",
+   "arm": "all off",
+   "cells": {
+    "damage10": [
+     0.3671294759006731,
+     0.05946684979842188
+    ],
+    "cards_drawn10": [
+     0.0024666666666666665,
+     0.004327773630526074
+    ],
+    "tokens_made10": [
+     -0.0015333333333333334,
+     0.006341200616060067
+    ],
+    "rendmaw_triggers10": [
+     0.0021333333333333334,
+     0.002652112325650507
+    ],
+    "won10": [
+     0.0005333333333333334,
+     0.0008263920324188406
+    ],
+    "damage20": [
+     0.33030285886455824,
+     0.08136692085012735
+    ],
+    "cards_drawn20": [
+     -0.011066666666666667,
+     0.012448884313330256
+    ],
+    "tokens_made20": [
+     -0.022266666666666667,
+     0.015649219112300168
+    ],
+    "rendmaw_triggers20": [
+     -0.0018666666666666666,
+     0.006819910484931821
+    ],
+    "won20": [
+     0.00013333333333333334,
+     0.001829393069673818
+    ]
+   },
+   "new": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.014066666666666667,
+    "removal_eaten": 1.3347333333333333,
+    "wipes_suffered": 0.7003333333333334,
+    "own_wipes_cast": 0.04393333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.6004666666666667,
+    "culling_mana": 0.10693333333333334,
+    "culling_mana_spent": 0.0456,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.048666666666666664,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.3313333333333333,
+    "wipes_suffered": 0.6850666666666667,
+    "own_wipes_cast": 0.04186666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "protect_events off",
+   "cells": {
+    "mv_cheated10": [
+     0.11826666666666667,
+     0.05327119517502134
+    ],
+    "damage10": [
+     0.09297777777777777,
+     0.0667776364453714
+    ],
+    "miracles_cast10": [
+     0.013466666666666667,
+     0.004611187154580551
+    ],
+    "total_mv_cast10": [
+     0.12493333333333333,
+     0.07596650386963823
+    ],
+    "won10": [
+     0.0017333333333333333,
+     0.0009235671582096337
+    ],
+    "mv_cheated20": [
+     0.06833333333333333,
+     0.08673396365746132
+    ],
+    "damage20": [
+     -0.05221111111111113,
+     0.0886714794203179
+    ],
+    "miracles_cast20": [
+     0.0094,
+     0.006007563272189867
+    ],
+    "total_mv_cast20": [
+     -0.007266666666666667,
+     0.12682982265934897
+    ],
+    "won20": [
+     0.0003333333333333333,
+     0.0015842929682724903
+    ]
+   },
+   "new": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1404,
+    "wipes_suffered": 0.5462,
+    "own_wipes_cast": 0.3748666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0988,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1324666666666667,
+    "wipes_suffered": 0.5198,
+    "own_wipes_cast": 0.37666666666666665,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "own_wipe_scope off",
+   "cells": {
+    "mv_cheated10": [
+     -0.0496,
+     0.11591522128057456
+    ],
+    "damage10": [
+     0.06681111111111111,
+     0.1350299417819572
+    ],
+    "miracles_cast10": [
+     -0.018533333333333332,
+     0.009100978963128612
+    ],
+    "total_mv_cast10": [
+     -0.08506666666666667,
+     0.1642180464893319
+    ],
+    "won10": [
+     0.0004,
+     0.0016528598237855045
+    ],
+    "mv_cheated20": [
+     0.0052,
+     0.18821461412808765
+    ],
+    "damage20": [
+     0.1680222222222222,
+     0.16305283881990482
+    ],
+    "miracles_cast20": [
+     -0.0162,
+     0.01210317263443438
+    ],
+    "total_mv_cast20": [
+     -0.013933333333333334,
+     0.2651077098713082
+    ],
+    "won20": [
+     0.0010666666666666667,
+     0.003200727769025249
+    ]
+   },
+   "new": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1404,
+    "wipes_suffered": 0.5462,
+    "own_wipes_cast": 0.3748666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.08993333333333334,
+    "protected_indestructible": 0.017533333333333335,
+    "removal_eaten": 1.1491333333333333,
+    "wipes_suffered": 0.5442,
+    "own_wipes_cast": 0.3443333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "all off",
+   "cells": {
+    "mv_cheated10": [
+     0.08573333333333333,
+     0.12779463970445623
+    ],
+    "damage10": [
+     0.174,
+     0.15038349831708317
+    ],
+    "miracles_cast10": [
+     -0.004666666666666667,
+     0.01018703893599173
+    ],
+    "total_mv_cast10": [
+     0.061066666666666665,
+     0.18149043441988255
+    ],
+    "won10": [
+     0.0021333333333333334,
+     0.0018932952053371584
+    ],
+    "mv_cheated20": [
+     0.10073333333333333,
+     0.20200500904511456
+    ],
+    "damage20": [
+     0.1392222222222222,
+     0.18563153082731396
+    ],
+    "miracles_cast20": [
+     -0.0051333333333333335,
+     0.013404200574192955
+    ],
+    "total_mv_cast20": [
+     0.0051333333333333335,
+     0.2879610044884177
+    ],
+    "won20": [
+     0.0014,
+     0.003518353616958812
+    ]
+   },
+   "new": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1404,
+    "wipes_suffered": 0.5462,
+    "own_wipes_cast": 0.3748666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.09953333333333333,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1414666666666666,
+    "wipes_suffered": 0.518,
+    "own_wipes_cast": 0.34526666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "karlov",
+   "arm": "protect_events off",
+   "cells": {
+    "damage10": [
+     -0.05749827160493827,
+     0.08820939879797063
+    ],
+    "lifegain_triggers10": [
+     -0.0722,
+     0.04565579092277887
+    ],
+    "final_life10": [
+     0.3802798064035389,
+     0.19465144119137384
+    ],
+    "cards_drawn10": [
+     0.0021333333333333334,
+     0.00790525314576265
+    ],
+    "won10": [
+     -0.0018,
+     0.0015179867698113252
+    ],
+    "damage20": [
+     -0.06915901234567902,
+     0.1283881322519788
+    ],
+    "lifegain_triggers20": [
+     -0.08046666666666667,
+     0.06989884505123944
+    ],
+    "final_life20": [
+     0.42679047294413397,
+     0.4424148034029211
+    ],
+    "cards_drawn20": [
+     0.013533333333333333,
+     0.020335305103290242
+    ],
+    "won20": [
+     -0.0036666666666666666,
+     0.0023909524156565647
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7018666666666666,
+    "wipes_suffered": 0.5432666666666667,
+    "own_wipes_cast": 0.1104,
+    "citadel_wipe_held": 0.04133333333333333,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0008
+   },
+   "off": {
+    "protected": 0.017866666666666666,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7006666666666668,
+    "wipes_suffered": 0.54,
+    "own_wipes_cast": 0.1096,
+    "citadel_wipe_held": 0.0408,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0006
+   }
+  },
+  {
+   "deck": "karlov",
+   "arm": "damn_overload off",
+   "cells": {
+    "damage10": [
+     -0.17251259259259258,
+     0.05690542258849176
+    ],
+    "lifegain_triggers10": [
+     -0.09166666666666666,
+     0.0345592020361848
+    ],
+    "final_life10": [
+     0.22942655562156097,
+     0.08480063404805357
+    ],
+    "cards_drawn10": [
+     -0.0002,
+     0.005015111282761188
+    ],
+    "won10": [
+     -0.0006666666666666666,
+     0.0008467778006405962
+    ],
+    "damage20": [
+     -0.021343703703703712,
+     0.0858896630593764
+    ],
+    "lifegain_triggers20": [
+     -0.03866666666666667,
+     0.05237016363574978
+    ],
+    "final_life20": [
+     0.20316418507841888,
+     0.19107973102900797
+    ],
+    "cards_drawn20": [
+     0.0372,
+     0.015401032386869932
+    ],
+    "won20": [
+     0.0018,
+     0.0015066963865063144
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7018666666666666,
+    "wipes_suffered": 0.5432666666666667,
+    "own_wipes_cast": 0.1104,
+    "citadel_wipe_held": 0.04133333333333333,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0008
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7022666666666666,
+    "wipes_suffered": 0.5454,
+    "own_wipes_cast": 0.14813333333333334,
+    "citadel_wipe_held": 0.04126666666666667,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0009333333333333333
+   }
+  },
+  {
+   "deck": "karlov",
+   "arm": "all off",
+   "cells": {
+    "damage10": [
+     -0.2164775308641975,
+     0.10424910841722651
+    ],
+    "lifegain_triggers10": [
+     -0.15933333333333333,
+     0.057050015642167676
+    ],
+    "final_life10": [
+     0.590834828196506,
+     0.21162283727062178
+    ],
+    "cards_drawn10": [
+     0.0032,
+     0.009293132031484163
+    ],
+    "won10": [
+     -0.002533333333333333,
+     0.001723192286746626
+    ],
+    "damage20": [
+     -0.07896938271604938,
+     0.15326598383781387
+    ],
+    "lifegain_triggers20": [
+     -0.11706666666666667,
+     0.08646951209199727
+    ],
+    "final_life20": [
+     0.5499711980810968,
+     0.47358474878102386
+    ],
+    "cards_drawn20": [
+     0.05193333333333333,
+     0.024999024322521025
+    ],
+    "won20": [
+     -0.0021333333333333334,
+     0.002784034170821022
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7018666666666666,
+    "wipes_suffered": 0.5432666666666667,
+    "own_wipes_cast": 0.1104,
+    "citadel_wipe_held": 0.04133333333333333,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0008
+   },
+   "off": {
+    "protected": 0.017666666666666667,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7012,
+    "wipes_suffered": 0.5424666666666667,
+    "own_wipes_cast": 0.14646666666666666,
+    "citadel_wipe_held": 0.040933333333333335,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0006666666666666666
+   }
+  },
+  {
+   "deck": "tivit",
+   "arm": "damn_overload off",
+   "cells": {
+    "damage10": [
+     -0.14482222222222224,
+     0.10727810980874823
+    ],
+    "artifacts_made10": [
+     0.14526666666666666,
+     0.3537046736774685
+    ],
+    "tivit_triggers10": [
+     0.020066666666666667,
+     0.04888859629368735
+    ],
+    "votes_cast10": [
+     0.11213333333333333,
+     0.2434928681897472
+    ],
+    "won10": [
+     -6.666666666666667e-05,
+     0.0012736231356631693
+    ],
+    "damage20": [
+     0.3340879408173526,
+     0.13298917343452765
+    ],
+    "artifacts_made20": [
+     0.7134666666666667,
+     0.5693407148143143
+    ],
+    "tivit_triggers20": [
+     0.10613333333333333,
+     0.06539964388535319
+    ],
+    "votes_cast20": [
+     0.5343333333333333,
+     0.28541711157939487
+    ],
+    "won20": [
+     0.0048,
+     0.0020059359685434164
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1097333333333332,
+    "wipes_suffered": 0.5038666666666667,
+    "own_wipes_cast": 0.34353333333333336,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8095333333333334,
+    "token_drain": 66.94023333333334,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1124666666666667,
+    "wipes_suffered": 0.5065333333333333,
+    "own_wipes_cast": 0.3873333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8078666666666667,
+    "token_drain": 65.971,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "tivit",
+   "arm": "kambal_batch off",
+   "cells": {
+    "damage10": [
+     1.687661585081585,
+     0.12652630930425532
+    ],
+    "artifacts_made10": [
+     -1.757,
+     0.32527640438189187
+    ],
+    "tivit_triggers10": [
+     -0.16173333333333334,
+     0.034728915049950425
+    ],
+    "votes_cast10": [
+     -0.9554,
+     0.13435111095532704
+    ],
+    "won10": [
+     0.0154,
+     0.002144926523275956
+    ],
+    "damage20": [
+     1.2990120612720613,
+     0.11179337006674217
+    ],
+    "artifacts_made20": [
+     -3.0584666666666664,
+     0.406336535232851
+    ],
+    "tivit_triggers20": [
+     -0.3448,
+     0.05183782117345939
+    ],
+    "votes_cast20": [
+     -1.7733333333333334,
+     0.19295165350985627
+    ],
+    "won20": [
+     0.008533333333333334,
+     0.002384192026147406
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1097333333333332,
+    "wipes_suffered": 0.5038666666666667,
+    "own_wipes_cast": 0.34353333333333336,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8095333333333334,
+    "token_drain": 66.94023333333334,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.0933333333333333,
+    "wipes_suffered": 0.4958666666666667,
+    "own_wipes_cast": 0.33513333333333334,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 73.1141,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "tivit",
+   "arm": "own_wipe_scope off",
+   "cells": {
+    "damage10": [
+     -0.04447301587301587,
+     0.09075884086925949
+    ],
+    "artifacts_made10": [
+     0.2848,
+     0.4336108604969624
+    ],
+    "tivit_triggers10": [
+     0.009866666666666666,
+     0.049367460350662175
+    ],
+    "votes_cast10": [
+     0.07626666666666666,
+     0.21457999228862415
+    ],
+    "won10": [
+     0.0002,
+     0.0012327438048684127
+    ],
+    "damage20": [
+     -0.039329629629629624,
+     0.09061495026162847
+    ],
+    "artifacts_made20": [
+     0.5015333333333334,
+     0.6527110042500368
+    ],
+    "tivit_triggers20": [
+     0.04133333333333333,
+     0.06553752643444995
+    ],
+    "votes_cast20": [
+     0.22606666666666667,
+     0.2979662190452846
+    ],
+    "won20": [
+     0.0013333333333333333,
+     0.0018292698613341363
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1097333333333332,
+    "wipes_suffered": 0.5038666666666667,
+    "own_wipes_cast": 0.34353333333333336,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8095333333333334,
+    "token_drain": 66.94023333333334,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1075333333333333,
+    "wipes_suffered": 0.5038,
+    "own_wipes_cast": 0.31726666666666664,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8356666666666666,
+    "token_drain": 67.6442,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "tivit",
+   "arm": "all off",
+   "cells": {
+    "damage10": [
+     1.5062996803196802,
+     0.18784252608697385
+    ],
+    "artifacts_made10": [
+     -1.3188666666666666,
+     0.6394686298542345
+    ],
+    "tivit_triggers10": [
+     -0.13086666666666666,
+     0.07697134497487235
+    ],
+    "votes_cast10": [
+     -0.7534,
+     0.34827352297595476
+    ],
+    "won10": [
+     0.016133333333333333,
+     0.002747498418065821
+    ],
+    "damage20": [
+     1.607157674047086,
+     0.19309539045397334
+    ],
+    "artifacts_made20": [
+     -1.7494666666666667,
+     0.9417394906633226
+    ],
+    "tivit_triggers20": [
+     -0.17926666666666666,
+     0.10328690521108697
+    ],
+    "votes_cast20": [
+     -0.9528,
+     0.4496201064530897
+    ],
+    "won20": [
+     0.013666666666666667,
+     0.0034970024959354246
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.1097333333333332,
+    "wipes_suffered": 0.5038666666666667,
+    "own_wipes_cast": 0.34353333333333336,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 1.8095333333333334,
+    "token_drain": 66.94023333333334,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.0932666666666666,
+    "wipes_suffered": 0.49853333333333333,
+    "own_wipes_cast": 0.3542,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 72.76193333333333,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "protect_events off",
+   "cells": {
+    "damage10": [
+     0.04139175308641975,
+     0.04289913811657833
+    ],
+    "blood_made10": [
+     0.010733333333333333,
+     0.009592776768563429
+    ],
+    "creatures_sacrificed10": [
+     0.0032,
+     0.0025265383267130503
+    ],
+    "single_reanimations10": [
+     0.0,
+     0.0008055102805114839
+    ],
+    "won10": [
+     6.666666666666667e-05,
+     0.000345721382634755
+    ],
+    "damage20": [
+     -0.12716503703703702,
+     0.08095698400601636
+    ],
+    "blood_made20": [
+     -0.007733333333333333,
+     0.014985125267467746
+    ],
+    "creatures_sacrificed20": [
+     -0.0024,
+     0.004119586306430965
+    ],
+    "single_reanimations20": [
+     -0.0023333333333333335,
+     0.00179604139497423
+    ],
+    "won20": [
+     -0.002,
+     0.0014310714299768008
+    ]
+   },
+   "new": {
+    "protected": 0.10066666666666667,
+    "protected_indestructible": 0.04533333333333334,
+    "removal_eaten": 1.3772,
+    "wipes_suffered": 0.5926,
+    "own_wipes_cast": 0.11933333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0284,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.1042
+   },
+   "off": {
+    "protected": 0.10653333333333333,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.3611333333333333,
+    "wipes_suffered": 0.563,
+    "own_wipes_cast": 0.11953333333333334,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0279333333333334,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.10713333333333333
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "damn_overload off",
+   "cells": {
+    "damage10": [
+     0.01016948148148148,
+     0.03885923202578739
+    ],
+    "blood_made10": [
+     0.014933333333333333,
+     0.009545833398439665
+    ],
+    "creatures_sacrificed10": [
+     0.0021333333333333334,
+     0.0027345287723135794
+    ],
+    "single_reanimations10": [
+     0.0004,
+     0.000995140268666382
+    ],
+    "won10": [
+     -6.666666666666667e-05,
+     0.00022632633516410342
+    ],
+    "damage20": [
+     0.300022024691358,
+     0.09337188754782999
+    ],
+    "blood_made20": [
+     0.045066666666666665,
+     0.016421732064439393
+    ],
+    "creatures_sacrificed20": [
+     0.0088,
+     0.004179100366047986
+    ],
+    "single_reanimations20": [
+     0.0038666666666666667,
+     0.0023146693765231574
+    ],
+    "won20": [
+     0.002266666666666667,
+     0.0014428526806314458
+    ]
+   },
+   "new": {
+    "protected": 0.10066666666666667,
+    "protected_indestructible": 0.04533333333333334,
+    "removal_eaten": 1.3772,
+    "wipes_suffered": 0.5926,
+    "own_wipes_cast": 0.11933333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0284,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.1042
+   },
+   "off": {
+    "protected": 0.10073333333333333,
+    "protected_indestructible": 0.045533333333333335,
+    "removal_eaten": 1.3782666666666668,
+    "wipes_suffered": 0.5955333333333334,
+    "own_wipes_cast": 0.15213333333333334,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0369333333333333,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.12186666666666666
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "giada_text off",
+   "cells": {
+    "damage10": [
+     -0.2173417777777778,
+     0.03071083170697898
+    ],
+    "blood_made10": [
+     -0.0126,
+     0.0055015737641225
+    ],
+    "creatures_sacrificed10": [
+     0.006333333333333333,
+     0.0018681767565662515
+    ],
+    "single_reanimations10": [
+     6.666666666666667e-05,
+     0.00022632633516410342
+    ],
+    "won10": [
+     -0.001,
+     0.0005385326824364755
+    ],
+    "damage20": [
+     -0.24554083950617284,
+     0.05247916472344284
+    ],
+    "blood_made20": [
+     -0.021933333333333332,
+     0.009983970698264712
+    ],
+    "creatures_sacrificed20": [
+     0.013066666666666667,
+     0.002914400119112868
+    ],
+    "single_reanimations20": [
+     0.0014,
+     0.0011314224257015408
+    ],
+    "won20": [
+     -0.0024,
+     0.0013061456035987325
+    ]
+   },
+   "new": {
+    "protected": 0.10066666666666667,
+    "protected_indestructible": 0.04533333333333334,
+    "removal_eaten": 1.3772,
+    "wipes_suffered": 0.5926,
+    "own_wipes_cast": 0.11933333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0284,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.1042
+   },
+   "off": {
+    "protected": 0.1004,
+    "protected_indestructible": 0.04533333333333334,
+    "removal_eaten": 1.3770666666666667,
+    "wipes_suffered": 0.5942666666666667,
+    "own_wipes_cast": 0.11986666666666666,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.10393333333333334
+   }
+  },
+  {
+   "deck": "shilgengar",
+   "arm": "all off",
+   "cells": {
+    "damage10": [
+     -0.1538719012345679,
+     0.0648816310869208
+    ],
+    "blood_made10": [
+     0.014266666666666667,
+     0.01452209980376024
+    ],
+    "creatures_sacrificed10": [
+     0.0118,
+     0.004125794289544092
+    ],
+    "single_reanimations10": [
+     0.0005333333333333334,
+     0.0012935489651982235
+    ],
+    "won10": [
+     -0.0009333333333333333,
+     0.0006661266444951438
+    ],
+    "damage20": [
+     -0.06022434567901234,
+     0.13280226805422818
+    ],
+    "blood_made20": [
+     0.015733333333333332,
+     0.024151273952466655
+    ],
+    "creatures_sacrificed20": [
+     0.019666666666666666,
+     0.006537729081044847
+    ],
+    "single_reanimations20": [
+     0.0028666666666666667,
+     0.003111169018847553
+    ],
+    "won20": [
+     -0.0016666666666666668,
+     0.0023772012485460243
+    ]
+   },
+   "new": {
+    "protected": 0.10066666666666667,
+    "protected_indestructible": 0.04533333333333334,
+    "removal_eaten": 1.3772,
+    "wipes_suffered": 0.5926,
+    "own_wipes_cast": 0.11933333333333333,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 1.0284,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.1042
+   },
+   "off": {
+    "protected": 0.10666666666666667,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.3618,
+    "wipes_suffered": 0.5675333333333333,
+    "own_wipes_cast": 0.15293333333333334,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.12473333333333333
+   }
+  },
+  {
+   "deck": "azusa",
+   "arm": "gsz_shuffle off",
+   "cells": {
+    "damage10": [
+     -0.0794,
+     0.17003430585798973
+    ],
+    "landfall_triggers10": [
+     -0.0322,
+     0.04060473449673316
+    ],
+    "lands_played10": [
+     -0.026533333333333332,
+     0.021035778076512364
+    ],
+    "tokens_made10": [
+     1.5907333333333333,
+     1.991959217449441
+    ],
+    "won10": [
+     0.0005333333333333334,
+     0.0022328910967254795
+    ],
+    "damage20": [
+     0.0144,
+     0.19572821976662272
+    ],
+    "landfall_triggers20": [
+     -0.047066666666666666,
+     0.0584271584191274
+    ],
+    "lands_played20": [
+     -0.03526666666666667,
+     0.03354311247469181
+    ],
+    "tokens_made20": [
+     2.3304666666666667,
+     2.654821430017836
+    ],
+    "won20": [
+     0.0007333333333333333,
+     0.0031388037299626406
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.4862,
+    "wipes_suffered": 0.6034,
+    "own_wipes_cast": 0.0,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.26453333333333334,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.4846,
+    "wipes_suffered": 0.6034666666666667,
+    "own_wipes_cast": 0.0,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "karlov",
+   "arm": "mother_home always",
+   "cells": {
+    "damage10": [
+     -0.4868681481481481,
+     0.08490450846206829
+    ],
+    "lifegain_triggers10": [
+     -0.118,
+     0.03397977769879458
+    ],
+    "final_life10": [
+     -0.015877422239709334,
+     0.1585934424343229
+    ],
+    "cards_drawn10": [
+     0.002,
+     0.006406799030927946
+    ],
+    "won10": [
+     -0.0032,
+     0.0012792846591028653
+    ],
+    "damage20": [
+     -0.48043950617283954,
+     0.1188264493638491
+    ],
+    "lifegain_triggers20": [
+     -0.13746666666666665,
+     0.05717608260539657
+    ],
+    "final_life20": [
+     0.07320406901237803,
+     0.4534510683940907
+    ],
+    "cards_drawn20": [
+     0.03866666666666667,
+     0.018453586142289945
+    ],
+    "won20": [
+     -0.005066666666666666,
+     0.0021535557108355867
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7018666666666666,
+    "wipes_suffered": 0.5432666666666667,
+    "own_wipes_cast": 0.1104,
+    "citadel_wipe_held": 0.04133333333333333,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0008
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7116666666666667,
+    "wipes_suffered": 0.5450666666666667,
+    "own_wipes_cast": 0.10993333333333333,
+    "citadel_wipe_held": 0.04086666666666667,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0006
+   }
+  },
+  {
+   "deck": "karlov",
+   "arm": "mother_home needed",
+   "cells": {
+    "damage10": [
+     -0.41933481481481477,
+     0.08410810729960756
+    ],
+    "lifegain_triggers10": [
+     -0.10953333333333333,
+     0.03383017926383409
+    ],
+    "final_life10": [
+     0.017142017537018755,
+     0.1574766690051734
+    ],
+    "cards_drawn10": [
+     0.0016,
+     0.006382796734268438
+    ],
+    "won10": [
+     -0.0028666666666666667,
+     0.0012593102992595779
+    ],
+    "damage20": [
+     -0.39269234567901234,
+     0.11709030377512843
+    ],
+    "lifegain_triggers20": [
+     -0.12426666666666666,
+     0.056603387914464155
+    ],
+    "final_life20": [
+     0.07575965067828053,
+     0.44495000110557353
+    ],
+    "cards_drawn20": [
+     0.037333333333333336,
+     0.018087953481714554
+    ],
+    "won20": [
+     -0.004866666666666667,
+     0.002117696103604776
+    ]
+   },
+   "new": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7018666666666666,
+    "wipes_suffered": 0.5432666666666667,
+    "own_wipes_cast": 0.1104,
+    "citadel_wipe_held": 0.04133333333333333,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0008
+   },
+   "off": {
+    "protected": 0.0,
+    "protected_indestructible": 0.0,
+    "removal_eaten": 1.7112,
+    "wipes_suffered": 0.5451333333333334,
+    "own_wipes_cast": 0.11013333333333333,
+    "citadel_wipe_held": 0.0408,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0006
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "mother_home always",
+   "cells": {
+    "mv_cheated10": [
+     0.0044666666666666665,
+     0.004994130802946144
+    ],
+    "damage10": [
+     -0.17406666666666668,
+     0.012840647722007673
+    ],
+    "miracles_cast10": [
+     0.0005333333333333334,
+     0.0006128419872577399
+    ],
+    "total_mv_cast10": [
+     0.0064,
+     0.007663368748437411
+    ],
+    "won10": [
+     -6.666666666666667e-05,
+     0.0002921873409301819
+    ],
+    "mv_cheated20": [
+     0.026066666666666665,
+     0.014255009542246948
+    ],
+    "damage20": [
+     -0.15826666666666667,
+     0.018408593789669685
+    ],
+    "miracles_cast20": [
+     0.0024,
+     0.001344792115694246
+    ],
+    "total_mv_cast20": [
+     0.03866666666666667,
+     0.020965909351204418
+    ],
+    "won20": [
+     -0.0002,
+     0.0005988012969810751
+    ]
+   },
+   "new": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1404,
+    "wipes_suffered": 0.5462,
+    "own_wipes_cast": 0.3748666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1408,
+    "wipes_suffered": 0.5465333333333333,
+    "own_wipes_cast": 0.37493333333333334,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  },
+  {
+   "deck": "lorehold",
+   "arm": "mother_home never",
+   "cells": {
+    "mv_cheated10": [
+     -0.18033333333333335,
+     0.0579550951921002
+    ],
+    "damage10": [
+     -0.16924444444444448,
+     0.06180244533590454
+    ],
+    "miracles_cast10": [
+     -0.03573333333333333,
+     0.005464559878714786
+    ],
+    "total_mv_cast10": [
+     -0.2568666666666667,
+     0.0805789291405002
+    ],
+    "won10": [
+     -0.0010666666666666667,
+     0.0008466729383476408
+    ],
+    "mv_cheated20": [
+     -0.13806666666666667,
+     0.08239894026790641
+    ],
+    "damage20": [
+     -0.15785555555555553,
+     0.07314480643473921
+    ],
+    "miracles_cast20": [
+     -0.03986666666666667,
+     0.006366991304200595
+    ],
+    "total_mv_cast20": [
+     -0.19946666666666665,
+     0.11899885058690064
+    ],
+    "won20": [
+     -0.0007333333333333333,
+     0.0013890024414186482
+    ]
+   },
+   "new": {
+    "protected": 0.08973333333333333,
+    "protected_indestructible": 0.017866666666666666,
+    "removal_eaten": 1.1404,
+    "wipes_suffered": 0.5462,
+    "own_wipes_cast": 0.3748666666666667,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   },
+   "off": {
+    "protected": 0.0904,
+    "protected_indestructible": 0.018,
+    "removal_eaten": 1.1393333333333333,
+    "wipes_suffered": 0.5459333333333334,
+    "own_wipes_cast": 0.37406666666666666,
+    "citadel_wipe_held": 0.0,
+    "kambal_triggers": 0.0,
+    "token_drain": 0.0,
+    "overseer_activations": 0.0,
+    "culling_mana": 0.0,
+    "culling_mana_spent": 0.0,
+    "turns_ended": 0.0562,
+    "giada_counters": 0.0,
+    "gsz_shuffled": 0.0,
+    "own_wipe_survivors": 0.0
+   }
+  }
+ ]
+}

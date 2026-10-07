@@ -268,6 +268,7 @@ asserting a card does nothing:
 | the wipe gate counted bodies | a 13/13 commander is one 1/1, and a one-sided wipe costs as much as a symmetric one | 0.014 (karlov), 0.011 (rendmaw), §0z106 -- weighing power alone cost two decks for exactly those reasons |
 | Havengul Laboratory's Clue activation ran in the upkeep | four of every turn's mana go to a Clue before any spell | 0.059 (tivit, §0z112) -- found by the land ablation, which read the land at −0.058 against a Swamp |
 | Vault of the Archangel was read as `g.has(...)` | an activated ability costs nothing, needs no tap and lasts forever | 0.028 (karlov, §0z115) -- the land ablation's best row, +0.0276 against a Swamp, was the free ability |
+| Mother of Runes was kept home from combat to shroud the commander | the commander's shroud is worth a body | 0.005 (karlov, §0z118) -- caught before it shipped: karlov wins MORE with no commander shroud at all, because the pod's removal then takes the commander instead of an engine piece |
 
 None was visible in an ablation table, because in each case the affected cards
 produced *plausible* numbers — a bit low, nothing to notice. **The tell is a

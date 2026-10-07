@@ -12,7 +12,10 @@ CASES
   C  lorehold: Dawn's Truce against a wrath grants indestructible (gift
      promised), it does not blank the wrath
   D  karlov: a summoning-sick Mother shrouds nothing; an untapped one does
-  E  ... and the pilot keeps her home from combat
+  E  ... and lorehold's pilot keeps her home from combat while hers is
+     the commander's only shroud
+  U  shilgengar: Teferi's Protection against the pod's wrath -- your board
+     phases out, the pod's creatures still die
   F  karlov: Damn with only {B}{B} available is not cast as a wrath
   G  ... with {2}{W}{W} it is, and all four lands pay for it
   H  tivit: Kambal and five Treasures at once: each opponent loses 1, you
@@ -35,7 +38,7 @@ CASES
   S  azusa: Green Sun's Zenith shuffles into the library, not the graveyard
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  protect_events=False   -> A, B, C, D, E
+  protect_events=False   -> A, B, C, D, E, U
   damn_overload=False    -> F, G
   kambal_batch=False     -> H
   vigor_counters=False   -> I, J
@@ -157,8 +160,27 @@ def run_cases():
         shrouded.append(OPP.commander_shrouded(g))
     check("D a sick Mother shrouds nothing; an untapped one does",
           shrouded, [False, True])
-    check("E ... and she is kept home from combat",
-          OPP.holds_back(g, perm(g, "Mother of Runes")), True)
+    # lorehold's pilot keeps her home while her shroud is the commander's
+    # only one ("needed"); karlov's attacks with her ("never"), measured.
+    lm = card("lorehold", "Mother of Runes")
+    g = fresh("lorehold", board=[lm, LISTS["lorehold"][1]])
+    home = OPP.holds_back(g, perm(g, "Mother of Runes"))
+    g.board.append(EN.Permanent(card=card("lorehold", "Lightning Greaves")))
+    check("E ... lorehold keeps her home while hers is the only shroud",
+          (home, OPP.holds_back(g, perm(g, "Mother of Runes"))),
+          (True, False))
+
+    g = fresh("shilgengar",
+              board=lands("shilgengar", *["Plains"] * 5) + [body("Bear")],
+              hand=[card("shilgengar", "Teferi's Protection")])
+    g.turn = 10
+    for o in g.opponents:
+        o.creatures = 4.0
+    OPP.board_wipe(g, g.opponents[0], [0.0] * 8)
+    check("U Teferi's Protection: you phase out, the pod's creatures die",
+          ([p.card.name for p in g.board if not p.card.is_land],
+           [o.creatures for o in g.opponents]),
+          (["Bear"], [0.0, 0.0, 0.0]))
 
     # -- 7: Damn is a wrath only at its overload -----------------------------
     damn = card("karlov", "Damn")
@@ -294,7 +316,7 @@ def main() -> int:
         print(f"\n{len(PASS)} passed, {len(FAIL)} failed")
         return 1 if FAIL else 0
     mutations = [
-        ({"protect_events": False}, {"A", "B", "C", "D", "E"}),
+        ({"protect_events": False}, {"A", "B", "C", "D", "E", "U"}),
         ({"damn_overload": False}, {"F", "G"}),
         ({"kambal_batch": False}, {"H"}),
         ({"vigor_counters": False}, {"I", "J"}),
