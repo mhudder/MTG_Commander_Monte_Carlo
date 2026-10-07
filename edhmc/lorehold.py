@@ -1115,6 +1115,31 @@ def approach_resolves(g, card, is_copy, was_cast, from_hand):
         g.known_win = card.name
 
 
+# "Draw ..., THEN discard": the discard follows the draw. Every other
+# `discards` card in this list discards as an additional cost, first.
+DISCARD_AFTER_DRAW = frozenset({"Faithless Looting"})
+
+
+def discard_cards(g, n) -> int:
+    """Discard n cards, the rummage's pick each time, to the GRAVEYARD --
+    where Arcane Bombardment, The Dawning Archaic, Mizzix's Mastery and
+    Radiant Scrollwielder look -- firing Monument to Endurance. Library of
+    Leng's "you may put it on top of your library instead" is not taken
+    here, as Artist's Talent's rummage does not take it (a floor)."""
+    done = 0
+    for _ in range(n):
+        if not g.hand:
+            break
+        worst = rummage_discard_choice(g)
+        g.hand.remove(worst)
+        g.graveyard.append(worst)
+        done += 1
+    if done:
+        discard_triggers(g, done)
+        g.m["spell_discards"] += done
+    return done
+
+
 def apply_spell_effects(g, card, is_copy=False, was_cast=True,
                         from_hand=False):
     """The on-resolution half of a spell: damage, tokens, treasures, draw."""
@@ -1129,8 +1154,22 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         g.treasures += n
         g.m["treasures_made"] += n
         g.m["brass_treasures"] += n
+    # A DISCARD AS AN ADDITIONAL COST -- Thrill of Possibility, Big Score,
+    # Unexpected Windfall -- is paid before the draw; Faithless Looting's
+    # "draw two cards, then discard two cards" after it (§0z117; §0z116
+    # item 3). Both used to fire Monument to Endurance and remove no card,
+    # so the hand grew by two where the text grows it by one (or none). A
+    # copy pays no additional cost, but it does resolve Looting's discard.
+    n_disc = card.discards if g.cfg.get("discard_text", True) else 0
+    after = card.name in DISCARD_AFTER_DRAW
+    if n_disc and not after and not is_copy:
+        discard_cards(g, n_disc)
     if sc in ("draw2", "draw2_treasure"):
         _draw_into_hand(g, 2)
+    if n_disc and after:
+        discard_cards(g, n_disc)
+    if sc in ("draw2", "draw2_treasure"):
+        pass
     elif sc == "draw4":
         _draw_into_hand(g, 4)
     elif sc == "apex":
@@ -1321,8 +1360,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
     # `pod_damage` is a single-target DAMAGE spell's number (Boros Charm is
     # the only card carrying one; tests/test_artists_talent.py pins that).
     deal_pod_damage(g, card.pod_damage, hits=1, spell=True)
-    if card.discards and not is_copy:
-        discard_triggers(g, card.discards)
+    if card.discards and not is_copy and not g.cfg.get("discard_text", True):
+        discard_triggers(g, card.discards)      # the pre-§0z117 stand-in
     if is_copy and was_cast:
         on_cast_triggers(g, card, is_copy=True)
 

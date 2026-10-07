@@ -373,6 +373,19 @@ class ShilgengarGame(BaseGame):
         if (perm is not None and perm.card.name == "Selenia, the Cursed Heart"
                 and not perm.is_token and id(perm.card) not in self.finality):
             OPP.curse_opponent(self)
+        # KOKUSHO, THE EVENING STAR (§0z117): "When Kokusho dies, each
+        # opponent loses 5 life. You gain life equal to the life lost this
+        # way." It was SCRIPTED and nothing read its name (§0z116 item 1).
+        # The gain is what the pod actually lost (`damage_each` is bounded),
+        # one lifegain event. A finality Kokusho is exiled and never gets here.
+        if (perm is not None and perm.card.name == "Kokusho, the Evening Star"
+                and self.cfg.get("kokusho_text", True)):
+            lost = OPP.damage_each(self, 5)
+            self.m["damage"] += lost
+            self.m["drain_damage"] += lost
+            self.m["kokusho_drain"] += lost
+            if lost:
+                self.trigger_gain(lost)
         for _ in range(n):
             # LOOK-BACK (CR 603.10a, §0z76); wording verified 2026-09-29.
             if OPP.watching(self, "Blood Artist", perm):

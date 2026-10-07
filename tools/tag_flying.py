@@ -406,6 +406,14 @@ def main():
     # the clause says "Plant creature".
     plants = {n for n, c in cards.items()
               if n in creatures and "Plant" in subtypes(c)}
+    # ANGEL and CLERIC, 2026-10-07 (§0z117): shilgengar's tribal payoffs read
+    # them, and its hand-typed tags had Avacyn, Angel of Hope and Angel of
+    # Suffering as non-Angels and Bishop of Wings as no Cleric (§0z116 item 4).
+    # Creatures only: every payoff says "Angel creature" or reads a creature.
+    angels = {n for n, c in cards.items()
+              if n in creatures and "Angel" in subtypes(c)}
+    clerics = {n for n, c in cards.items()
+               if n in creatures and "Cleric" in subtypes(c)}
 
     # LANDS, 2026-10-06 (§0z115): each land's basic land types and the rules
     # its own text states about entering, tapping and life -- read from
@@ -577,6 +585,16 @@ def main():
                      "puts a counter on\n# each Plant creature you control, "
                      "and that is not only its tokens.\nPLANT = {\n")
             for n in sorted(plants):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# ANGEL and CLERIC creature cards (§0z117): "
+                     "shilgengar's tribe, from the type\n# line -- its "
+                     "`angel`/`cleric` tags are derived from these.\n"
+                     "ANGEL = {\n")
+            for n in sorted(angels):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\nCLERIC = {\n")
+            for n in sorted(clerics):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# LAND TYPES: a land's basic land types (Plains, "

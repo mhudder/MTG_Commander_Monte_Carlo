@@ -154,6 +154,32 @@ class Permanent:
         _HELD.append(self)                 # §0z100: an id key stays unique
 
 
+def biotransference_on(g) -> bool:
+    """BIOTRANSFERENCE (§0z117): "Creatures you control are artifacts in
+    addition to their other types. The same is true for creature spells you
+    control and creature cards you own that aren't on the battlefield." It
+    was KNOWN_BLIND and unimplemented (§0z116 item 2). Every zone is yours in
+    this model, so the rule is: while it is on your battlefield, every
+    creature card is also an artifact. `biotransference_text` restores the
+    blank."""
+    return (g.cfg.get("biotransference_text", True)
+            and g.has("Biotransference"))
+
+
+def card_types(g, card) -> frozenset:
+    """A card's types as the game sees them NOW: Biotransference adds
+    Artifact to every creature. Read wherever a type is asked about -- the
+    two-or-more-types Rendmaw trigger, Foundry Inspector, Steel Overseer,
+    the artifact recursion, Baba Lysaga."""
+    if "Creature" in card.types and biotransference_on(g):
+        return card.types | {"Artifact"}
+    return card.types
+
+
+def is_artifact(g, card) -> bool:
+    return "Artifact" in card_types(g, card)
+
+
 class Board(list):
     """The battlefield, with an O(1) index from card name to count.
 
@@ -1667,7 +1693,7 @@ class Game(BaseGame):
         """
         if not self.cfg.get("artifact_recursion", True):
             return
-        if "Artifact" not in dead.types:
+        if not is_artifact(self, dead):
             return
 
         # THE POOL IS RECOMPUTED PER TRIGGER, NOT SNAPSHOTTED ONCE. Both
@@ -1683,7 +1709,7 @@ class Game(BaseGame):
         # which is already in the graveyard by the time this is called.
         def take(pred, tag):
             pool = [c for c in self.graveyard
-                    if "Artifact" in c.types and c is not dead and pred(c)]
+                    if is_artifact(self, c) and c is not dead and pred(c)]
             if not pool:
                 return
             best = max(pool, key=lambda c: c.mv)
@@ -1729,7 +1755,7 @@ class Game(BaseGame):
         Your own Birds are goaded too, but `combat()` already attacks with
         everything that can, so that half needs no separate handling.
         """
-        if not card.multitype:
+        if len(card_types(self, card)) < 2:      # Biotransference, §0z117
             return
         n = 1 + sum(1 for p in self.board if p.card.name == "Roaming Throne")
         if not self.commander_cast:
@@ -2479,7 +2505,7 @@ def available_mana(g: Game) -> list[frozenset]:
 
 def cost_after_reduction(g: Game, card: Card) -> dict:
     cost = dict(card.cost)
-    if "Artifact" in card.types and g.has("Foundry Inspector"):
+    if is_artifact(g, card) and g.has("Foundry Inspector"):
         cost["gen"] = max(0, cost.get("gen", 0) - 1)
     if card.name == "The Great Henge":
         best = max([g.power_of(p) for p in g.board
@@ -2810,6 +2836,7 @@ def main_phase(g: Game, precombat: bool = False):
 
         idx = g.spells_this_turn
         g.spells_this_turn += 1
+        biotransference_cast(g, card)        # a CAST trigger, §0z117
         if OPP.countered(g, card, idx):
             g.m["countered"] += 1
             g.graveyard.append(card)
@@ -3238,7 +3265,7 @@ def activations(g: Game):
     # Steel Overseer: +1/+1 counter on each artifact creature
     if g.has("Steel Overseer"):
         for p in g.board:
-            if "Artifact" in p.card.types and p.card.is_creature:
+            if is_artifact(g, p.card) and p.card.is_creature:
                 p.counters += 1
 
     # Baba Lysaga: {T}, sac up to three permanents. Needs 3+ CARD TYPES among
@@ -3251,10 +3278,10 @@ def activations(g: Game):
         chosen, seen = [], set()
         for p in sorted(fodder, key=lambda p: (p.is_token is False,
                                                g.power_of(p))):
-            new = p.card.types - seen
+            new = card_types(g, p.card) - seen
             if new or len(chosen) < 3:
                 chosen.append(p)
-                seen |= p.card.types
+                seen |= card_types(g, p.card)
             if len(chosen) == 3:
                 break
         if len(seen) >= 3 and len(chosen) == 3:
@@ -3705,6 +3732,21 @@ def whip_end_step(g) -> None:
         g.board.remove(p)
         g.m["whip_exiled"] += 1
     ids.clear()
+
+
+def biotransference_cast(g, card) -> None:
+    """Biotransference's second clause: "Whenever you cast an artifact
+    spell, you lose 1 life and create a 2/2 black Necron Warrior artifact
+    creature token." With its first clause every creature spell is an
+    artifact spell, so this fires on nearly every cast. On the CAST, before
+    the counterspell check. One per Biotransference."""
+    if not biotransference_on(g) or not is_artifact(g, card):
+        return
+    for _ in range(g.count("Biotransference")):
+        g.your_life -= 1
+        g.m["life_lost_to_own_cards"] += 1
+        g.make_tokens(1, 2, 2, "Necron")
+        g.m["biotransference_necrons"] += 1
 
 
 def high_market(g) -> None:

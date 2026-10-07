@@ -10132,33 +10132,33 @@ flying and land data are clean in all seven lists.**
 
 ### Text the engine contradicts -- whole clauses missing or wrong
 
-1. **Kokusho, the Evening Star** (shilgengar, SCRIPTED as "a REAL death
+1. **FIXED in §0z117.** **Kokusho, the Evening Star** (shilgengar, SCRIPTED as "a REAL death
    trigger"). "When Kokusho dies, each opponent loses 5 life. You gain life
    equal to the life lost this way." **No code in `edhmc/` reads the name.**
    *Verified*: sacrificed, it moves no life total. A vanilla 5/5 flier in the
    deck built to sacrifice and mass-reanimate.
-2. **Biotransference** (rendmaw, KNOWN_BLIND). Every clause is model-visible
+2. **FIXED in §0z117.** **Biotransference** (rendmaw, KNOWN_BLIND). Every clause is model-visible
    and the first is central to the commander: creatures -- and creature
    SPELLS -- are artifacts, so every creature spell is a two-type card and a
    Rendmaw Bird for each player; Foundry Inspector discounts creature spells;
    Scrap Trawler, Myr Retriever and Junk Diver can return creature cards; and
    each artifact spell cast costs 1 life and makes a 2/2 Necron. Unimplemented,
    so its row is the blank it was made into -- CLAUDE.md's tell exactly.
-3. **Lorehold's discard costs are never paid.** Thrill of Possibility, Big
+3. **FIXED in §0z117.** **Lorehold's discard costs are never paid.** Thrill of Possibility, Big
    Score, Unexpected Windfall ("As an additional cost ... discard a card") and
    Faithless Looting ("draw two cards, then discard two cards"):
    `apply_spell_effects` fires Monument to Endurance for the discard and
    removes no card from hand. *Verified*: hand 6 -> 8 for all four, where the
    text gives 7, 7, 7 and 6. The discards also never reach the graveyard
    (Bombardment, the Archaic, Mastery) or Library of Leng's redirect to the top.
-4. **Shilgengar's subtype tags are hand-typed and wrong** -- §0z4's rule that
+4. **FIXED in §0z117.** **Shilgengar's subtype tags are hand-typed and wrong** -- §0z4's rule that
    subtypes are data from Scryfall, not memory. Avacyn, Angel of Hope and
    Angel of Suffering carry no `angel` tag; Bishop of Wings no `cleric` tag.
    *Verified*: Avacyn fed to Shilgengar makes 1 Blood, not 8; Angel of
    Suffering 1, not 3. Neither is seen by Righteous Valkyrie, Bishop of Wings,
    Youthful Valkyrie, Giada, either Lyra, Herald of War or Seluma, and Bishop
    entering does not trigger Righteous Valkyrie. Nothing checks these tags.
-5. **Coercive Portal** (tivit). Carnage: "sacrifice this artifact and destroy
+5. **FIXED in §0z117.** **Coercive Portal** (tivit). Carnage: "sacrifice this artifact and destroy
    all NONLAND PERMANENTS". The engine calls `resolve_own_wipe(g)` --
    creatures only -- and never sacrifices the Portal. *Verified*: under the
    default adversarial vote carnage wins (three votes to Tivit's two), and

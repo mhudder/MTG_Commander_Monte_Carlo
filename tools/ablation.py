@@ -164,6 +164,10 @@ METRIC_SETS = {name: spec.metrics for name, spec in DECKS.items()}
 
 # Cards whose actual text the engine implements. Everything else is a body.
 SCRIPTED_RENDMAW = {
+    # Biotransference (§0z117): creatures are artifacts everywhere
+    # (`engine.card_types`), and every artifact spell cast is 1 life and a
+    # 2/2 Necron (`biotransference_cast`).
+    "Biotransference",
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
@@ -1227,7 +1231,7 @@ KNOWN_BLIND = {
     "rendmaw": {
         "Assassin's Trophy",
         'Beast Within',
-        'Biotransference',
+        # Biotransference left 2026-10-07: implemented (§0z117).
         'Bow of Nylea',
         "Eyeblight's Ending",
         'Haywire Mite',

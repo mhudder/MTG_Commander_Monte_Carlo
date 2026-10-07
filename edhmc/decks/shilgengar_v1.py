@@ -35,7 +35,20 @@ this and what reads the tag.
 """
 
 from edhmc.engine import Card
-from edhmc.decks._evasion import FLYING, INDESTRUCTIBLE
+from edhmc.decks._evasion import ANGEL, CLERIC, FLYING, INDESTRUCTIBLE
+
+
+def tribe_tags(name, tags) -> frozenset:
+    """`angel` and `cleric` are DERIVED from the type line (§0z117), never
+    taken from the hand-typed `tags`: those had Avacyn, Angel of Hope and
+    Angel of Suffering as non-Angels and Bishop of Wings as no Cleric
+    (§0z116 item 4). Every other tag is the module's own."""
+    out = set(tags) - {"angel", "cleric"}
+    if name in ANGEL:
+        out.add("angel")
+    if name in CLERIC:
+        out.add("cleric")
+    return frozenset(out)
 
 
 def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
@@ -44,7 +57,7 @@ def C(name, types, cost=None, p=0, t=0, script=None, priority=0.0, tags=(),
     ma = (mana[0], frozenset(mana[1])) if mana else None
     return Card(name=name, types=frozenset(types.split("/")), cost=cost or {},
                 power=p, toughness=t, script=script, priority=priority,
-                threat=threat, tags=frozenset(tags), mana_ability=ma,
+                threat=threat, tags=tribe_tags(name, tags), mana_ability=ma,
                 lifelink=lifelink, tapped=tapped, land_face=land_face,
                 x_pips=x_pips,
                 flying=name in FLYING,

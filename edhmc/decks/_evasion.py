@@ -310,6 +310,62 @@ PLANT = {
     'Verdant Kraken',
 }
 
+# ANGEL and CLERIC creature cards (§0z117): shilgengar's tribe, from the type
+# line -- its `angel`/`cleric` tags are derived from these.
+ANGEL = {
+    'Angel of Despair',
+    'Angel of Sanctions',
+    'Angel of Serenity',
+    'Angel of Suffering',
+    'Angel of the Ruins',
+    'Angelic Arbiter',
+    'Archangel of Thune',
+    'Avacyn, Angel of Hope',
+    'Emeria Shepherd',
+    'Exemplar of Light',
+    'Giada, Font of Hope',
+    'Herald of War',
+    'Karmic Guide',
+    'Lyra Dawnbringer',
+    'Lyra, Archangel of Dawn',
+    'Magister of Worth',
+    'Requiem Angel',
+    'Resplendent Angel',
+    'Reya Dawnbringer',
+    'Righteous Valkyrie',
+    'Selenia, the Cursed Heart',
+    'Seluma, Light of Aysen',
+    "Serra's Emissary",
+    'Twilight Shepherd',
+    'Youthful Valkyrie',
+}
+
+CLERIC = {
+    'Auriok Champion',
+    'Bishop of Wings',
+    'Custodi Squire',
+    'Disciple of the Vault',
+    "Drana's Emissary",
+    'Elas il-Kor, Sadistic Pilgrim',
+    'Enlightened Confidant',
+    'Guide of Souls',
+    'Liliana the Faultless',
+    'Marauding Blight-Priest',
+    'Mother of Runes',
+    'Radiant Scrollwielder',
+    'Ramunap Excavator',
+    'Righteous Valkyrie',
+    'Selfless Spirit',
+    'Soul Warden',
+    "Soul's Attendant",
+    'Soulmender',
+    'Speaker of the Heavens',
+    'Starscape Cleric',
+    'Suture Priest',
+    'Vito, Thorn of the Dusk Rose',
+    'Voice of the Blessed',
+}
+
 # LAND TYPES: a land's basic land types (Plains, Island, Swamp, Mountain,
 # Forest), from the type line. A check land, a snarl, a fetch and Witch's
 # Cottage read these (§0z115).

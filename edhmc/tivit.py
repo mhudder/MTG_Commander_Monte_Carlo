@@ -1047,7 +1047,7 @@ def upkeep(g):
         if V.council(g, tie_goes_to_you=True):
             g.draw(1)
         else:
-            OPP.resolve_own_wipe(g)
+            coercive_carnage(g)
     if g.has("Mechanized Production"):
         make_token(g, "Treasure")
         if g.tokens["Treasure"] >= 8:
@@ -1056,6 +1056,79 @@ def upkeep(g):
     if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
         g.win(ROUTE_REVEL)
         return
+
+
+def coercive_carnage(g) -> None:
+    """COERCIVE PORTAL's carnage: "sacrifice this artifact and destroy all
+    NONLAND PERMANENTS." (§0z117; §0z116 item 5.) It was a creature-only wipe
+    that never sacrificed the Portal, so under adversarial voting it wiped
+    every upkeep and left Sol Ring and every Treasure standing.
+
+    In order: the Portal is sacrificed (an artifact to the graveyard:
+    Disciple of the Vault and Marionette Master see it); every creature dies
+    as one event (`resolve_own_wipe`, indestructible honoured); every other
+    nonland permanent is destroyed; every token pile is destroyed --
+    Treasures, Clues, Food and Powerstones are artifacts, and Nadier's
+    Nightblade sees them leave. Mirkwood Bats does not: they are destroyed,
+    not sacrificed. Artifact LANDS stay -- they are lands. The pod's side is
+    its creature count, which the wipe zeroes (§4). `portal_text=False`
+    restores the pre-§0z117 creature-only wipe."""
+    if not g.cfg.get("portal_text", True):
+        OPP.resolve_own_wipe(g)
+        return
+    portal = next((p for p in g.board if p.card.name == "Coercive Portal"),
+                  None)
+    if portal is not None:
+        g.board.remove(portal)
+        g.graveyard.append(portal.card)
+        g.m["portal_sacrificed"] += 1
+        _artifacts_left(g, 1)
+    # ONE EVENT (CR 603.10a): the payoffs that die in it still see every
+    # artifact and token that left with them, so they are read BEFORE it.
+    share = disciple_share(g)
+    marionette = g.has("Marionette Master")
+    nightblade = g.count("Nadier's Nightblade")
+    gone = sum(1 for p in g.board if not p.card.is_land
+               and "Artifact" in p.card.types)
+    OPP.resolve_own_wipe(g)
+    for p in [p for p in g.board if not p.card.is_land
+              and not p.card.is_creature]:
+        OPP.destroy(g, p, destroys=True)
+    # Artifacts before minus artifacts after: an indestructible one stays.
+    gone -= sum(1 for p in g.board if not p.card.is_land
+                and "Artifact" in p.card.types)
+    piles = sum(g.tokens.values())
+    for k in g.tokens:
+        g.tokens[k] = 0
+    n = gone + piles
+    if n and share:
+        dmg = share * n * OPP.pod_size(g)
+        g.deal_pod_damage(dmg)
+        g.m["token_drain"] += dmg
+    if n and marionette:
+        dmg = 4.0 * n
+        g.deal_pod_damage(dmg, each=False)
+        g.m["artifact_drain"] += dmg
+    if piles and nightblade:
+        dmg = 1.0 * nightblade * piles * OPP.pod_size(g)
+        g.deal_pod_damage(dmg)
+        g.m["token_drain"] += dmg
+    g.m["portal_tokens_destroyed"] += piles
+    g.m["portal_carnage"] += 1
+    if g.result == "win":
+        g.m["win_route"] = ROUTE_DRAIN
+
+
+def _artifacts_left(g, n) -> None:
+    """n artifacts put into the graveyard from the battlefield: Disciple of
+    the Vault's share and Marionette Master, as `sacrifice_real_artifacts`
+    charges them (§0z71)."""
+    share = disciple_share(g)
+    if n and share:
+        dmg = share * n * OPP.pod_size(g)
+        g.deal_pod_damage(dmg)
+        g.m["token_drain"] += dmg
+    artifact_left_drain(g, n)
 
 
 def end_step(g):
