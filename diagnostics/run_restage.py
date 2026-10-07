@@ -16,6 +16,9 @@ the deck's other staged changes are present on both sides.
   K_bootsConq     the Conqueror in Swiftfoot Boots' slot instead (Soulmender kept)
   T / T_noProc    tivit as staged / with Anointed Procession undone (Plains back)
   A / A_noKaZar   azusa as staged / with Ka-Zar undone (Perilous Forays back)
+  A_noPassage     ... with Fabled Passage undone (a Forest back); A_noWilds the
+  A_noWilds       same for Evolving Wilds; A_noFetches both (staged 2026-10-06)
+  A_noFetches
   L               lorehold as staged
   L_gold_slot     Goldspan Dragon in Caldera Pyremaw's slot
   L_gold_act      -Blasphemous Act +Goldspan Dragon
@@ -50,6 +53,10 @@ ARMS = {
     "T_noProc": ("tivit", [("Anointed Procession", ("module", "Plains"))]),
     "A": ("azusa", []),
     "A_noKaZar": ("azusa", [("Ka-Zar of the Savage Land", ("module", "Perilous Forays"))]),
+    "A_noPassage": ("azusa", [("Fabled Passage", ("module", "Forest"))]),
+    "A_noWilds": ("azusa", [("Evolving Wilds", ("module", "Forest"))]),
+    "A_noFetches": ("azusa", [("Fabled Passage", ("module", "Forest")),
+                              ("Evolving Wilds", ("module", "Forest"))]),
     "L": ("lorehold", []),
     "L_gold_slot": ("lorehold", [("Caldera Pyremaw", ("lh", "GOLDSPAN_DRAGON"))]),
     "L_gold_act": ("lorehold", [("Blasphemous Act", ("lh", "GOLDSPAN_DRAGON"))]),
@@ -67,6 +74,9 @@ STAGED = (
     ("karlov  -Swamp +Bolas's Citadel", "K", "K_noCit"),
     ("tivit   -Plains +Anointed Procession", "T", "T_noProc"),
     ("azusa   -Perilous Forays +Ka-Zar of the Savage Land", "A", "A_noKaZar"),
+    ("azusa   -Forest +Fabled Passage", "A", "A_noPassage"),
+    ("azusa   -Forest +Evolving Wilds", "A", "A_noWilds"),
+    ("azusa   both fetches, as one change", "A", "A_noFetches"),
     ("lorehold -Penance +Caldera Pyremaw", "L", "L_noCaldera"),
     ("lorehold -Scroll Rack +Sunbird's Invocation", "L", "L_noSunbird"),
     # -Blasphemous Act +Goldspan Dragon was WITHDRAWN 2026-10-05 (§0z105).
@@ -107,7 +117,11 @@ def build(arm):
     deck = list(staged)
     for out, (src, name) in edits:
         if src == "module":
-            card = next(c for c in module if c.name == name)
+            # A card object not already in the list: two edits that put a
+            # basic back must put two DIFFERENT Forests back (§0z112).
+            used = {id(c) for c in deck}
+            card = next(c for c in module if c.name == name
+                        and id(c) not in used)
         elif src == "pending":
             card = next(c for c in staged if c.name == name)
         else:
@@ -116,6 +130,7 @@ def build(arm):
         deck[i] = card
     names = [c.name for c in deck if not c.is_land]
     assert len(names) == len(set(names)), f"{arm}: singleton violation"
+    assert len({id(c) for c in deck}) == len(deck), f"{arm}: aliased card"
     return deck_name, deck, cmd
 
 
