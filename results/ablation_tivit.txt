@@ -93,12 +93,11 @@ Farewell                              +0.31+-0.12         +0.54+-0.13        +0.
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
 Promise of Loyalty                    +0.16+-0.14         +0.52+-0.16        +0.0093+-0.0027      both
-      Implemented as a symmetric wipe (2026-09-12). The card is 'each player puts
-      a vow counter on a creature they control and SACRIFICES THE REST' --
-      everyone KEEPS ONE, and the model keeps none. It overstates in both
-      directions at once, so a high score is still evidence and a low one is not.
-      Sacrifice also gets around indestructible, which is why it is in
-      WIPE_IGNORES_INDESTRUCTIBLE.
+      'Each player puts a vow counter on a creature they control and SACRIFICES
+      THE REST': each player keeps one (§0z118 -- until then the model kept none).
+      Missing: the vow, 'can't attack you', on the creature each opponent keeps --
+      their creatures are a count and chip damage still reads it, so a FLOOR.
+      Sacrifice gets around indestructible: WIPE_IGNORES_INDESTRUCTIBLE.
 Trial of a Time Lord                  +0.12+-0.10         +0.25+-0.11        +0.0015+-0.0018       dmg
       MODELLED: the chapter IV vote, on the third draw step after it enters
       (`saga_step`), then the sacrifice. NOT: chapters I-III's 'exile target

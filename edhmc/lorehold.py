@@ -86,6 +86,8 @@ class LoreholdGame(BaseGame):
         self.commander_cast = False
         self.commander_tax = 0
         self.treasures = 0
+        self.turn_ended = False       # Ultima ended this turn, §0z118
+        self.precombat = False
         self.turn = 0
         self.land_drops = 1
         self.land_drops_used = 0
@@ -1115,6 +1117,10 @@ def approach_resolves(g, card, is_copy, was_cast, from_hand):
         g.known_win = card.name
 
 
+# "End the turn." (Ultima, 2026-10-07): the rest of YOUR turn is skipped
+# when it resolves (§0z118). Read by `apply_spell_effects` and `main_phase`.
+TURN_ENDERS = {"Ultima"}
+
 # "Draw ..., THEN discard": the discard follows the draw. Every other
 # `discards` card in this list discards as an additional cost, first.
 DISCARD_AFTER_DRAW = frozenset({"Faithless Looting"})
@@ -1355,6 +1361,13 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
             _draw_into_hand(g, 2)      # the pre-2026-09-11 `draw2` stand-in
     if "wipe" in card.tags:
         OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
+        # ULTIMA: "... End the turn." Every remaining step of the turn is
+        # skipped -- combat, the second main phase, the end step's casts --
+        # so the pilot casts it after combat (`main_phase`). §0z118;
+        # `own_wipe_scope=False` is the old wipe that let the turn go on.
+        if card.name in TURN_ENDERS and g.cfg.get("own_wipe_scope", True):
+            g.turn_ended = True
+            g.m["turns_ended"] += 1
     if card.tokens:
         make_tokens(g, *card.tokens)
     # `pod_damage` is a single-target DAMAGE spell's number (Boros Charm is
@@ -2086,6 +2099,8 @@ def main_phase(g, reserve=0):
     and Bender's Waterskin, which untap on EVERY untap step.
     """
     while True:
+        if g.turn_ended:
+            break                     # Ultima ended the turn (§0z118)
         units = mana_units(g)
 
         if not g.commander_cast and command_beacon(g):
@@ -2115,6 +2130,11 @@ def main_phase(g, reserve=0):
             if c.land_face and n_lands < g.cfg.get("mdfc_land_floor", 5):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
+                continue
+            # A spell that ends the turn waits for the main phase after
+            # combat, or it costs the attack (§0z118).
+            if (c.name in TURN_ENDERS and g.precombat
+                    and g.cfg.get("own_wipe_scope", True)):
                 continue
             if not pilot_may_cast(g, c):
                 continue
@@ -2157,7 +2177,8 @@ def main_phase(g, reserve=0):
 
 def combat(g):
     attackers = [p for p in g.board
-                 if p.card.is_creature and not p.tapped and not p.sick]
+                 if p.card.is_creature and not p.tapped and not p.sick
+                 and not OPP.holds_back(g, p)]
 
     # The Dawning Archaic: on attack, cast a free instant/sorcery from the yard
     if any(p.card.name == "The Dawning Archaic" for p in attackers):
@@ -2345,6 +2366,8 @@ def opponent_upkeep_windows(g):
 
 def take_turn(g):
     g.turn += 1
+    g.turn_ended = False               # Ultima, §0z118
+    g.precombat = True
     g.before_draw_step = True          # read by artist_rummage
     g.spells_this_turn = 0
     g.noncreature_this_turn = 0
@@ -2422,7 +2445,9 @@ def take_turn(g):
     radiant_scrollwielder(g)
 
     g.before_draw_step = False
-    if st_card is not None and st_card not in g.library:
+    if g.turn_ended:
+        pass                                 # an upkeep Ultima, §0z118
+    elif st_card is not None and st_card not in g.library:
         _drawn, _cast = miracle_window(g)    # the draw step still happens
         # Galvanoth cast it off the top — the best outcome, and better than
         # the miracle it was otherwise set up for.
@@ -2434,20 +2459,24 @@ def take_turn(g):
         if st_card is not None:
             g.m["settop_drawn"] += (drawn is st_card)
             g.m["settop_miracled"] += (drawn is st_card and cast)
-    play_land(g)
-    held = reserve_for(g)
-    if held:
-        g.m["reserve_turns"] += 1
-        g.m["reserve_held"] += held
-        g.m["reserve_overheld"] += max(0, held - miracle_need(g))
-    main_phase(g, reserve=held)
-    combat(g)
+    held = 0
+    if not g.turn_ended:
+        play_land(g)
+        held = reserve_for(g)
+        if held:
+            g.m["reserve_turns"] += 1
+            g.m["reserve_held"] += held
+            g.m["reserve_overheld"] += max(0, held - miracle_need(g))
+        main_phase(g, reserve=held)
+    if not g.turn_ended:
+        combat(g)
+    g.precombat = False
     # Re-read rather than cached: the precombat phase can deploy the very
     # cards that change the miracle cost (Artist's Talent, Molecule Man).
     main_phase(g, reserve=reserve_for(g))
     # Spare mana into Artist's Talent's levels, then look again: level 2 can
     # make a spell affordable that was not a moment ago.
-    if artist_level_up(g, reserve=reserve_for(g)):
+    if not g.turn_ended and artist_level_up(g, reserve=reserve_for(g)):
         main_phase(g, reserve=reserve_for(g))
 
     underworld_breach(g)
@@ -2482,9 +2511,13 @@ def take_turn(g):
             p.tapped = False
             p.sick = False
         g.spells_this_turn = 0
+        g.turn_ended = False
+        g.precombat = True
         miracle_window(g)
         main_phase(g)
-        combat(g)
+        if not g.turn_ended:
+            combat(g)
+        g.precombat = False
 
     # WAS THE RESERVE WORTH HOLDING? The windows it is held for open AFTER
     # `opponents_act`, so a Lorehold answered in between takes them with it and

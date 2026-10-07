@@ -1481,6 +1481,7 @@ class Game(BaseGame):
         # Davvol's {B} (§0z74): mana in the pool, spendable until the step or
         # phase it was added in ends. Zero in every game without Davvol.
         self.davvol_float = 0
+        self.ritual_float = 0         # Culling Ritual's mana, §0z118
         self.made_token_this_turn = False
         self.beast_active = False
         self.stampede_bonus = 0
@@ -1489,6 +1490,12 @@ class Game(BaseGame):
     # -- library ops ---------------------------------------------------------
 
     # -- tokens --------------------------------------------------------------
+
+    def add_ritual_mana(self, n: int) -> None:
+        """Culling Ritual's "{B} or {G} for each permanent destroyed this
+        way", into the pool until the phase ends (§0z118). The optional
+        protocol hook `opponents.resolve_own_wipe` calls."""
+        self.ritual_float += n
 
     def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False):
         n *= token_doublings(self)
@@ -1511,7 +1518,7 @@ class Game(BaseGame):
                              is_token=True, base_p=p, base_t=t)
             # Metallic Mimic: named Bird
             if subtype == "Bird" and self.has("Metallic Mimic"):
-                perm.counters += 1
+                perm.counters += plus_counters(self, 1)
             self.board.append(perm)
             self.m["tokens_made"] += 1
             davvol_trigger(self, perm)       # §0z74
@@ -1885,6 +1892,19 @@ def token_doublings(g) -> int:
         (2 if g.has("Parallel Lives") else 1)
 
 
+def plus_counters(g, n: int) -> int:
+    """How many +1/+1 counters are put when an effect says `n` (§0z118).
+    Primal Vigor's second clause: "If one or more +1/+1 counters would be
+    put on a creature, twice that many +1/+1 counters are put on that
+    creature instead." It was said in trostani (`counter_doubler`) and
+    nowhere in rendmaw, which has six cards that put counters. Loyalty
+    counters are not +1/+1 counters and do not read this.
+    `vigor_counters=False` is the old rule."""
+    if not g.cfg.get("vigor_counters", True):
+        return n
+    return n * 2 ** g.count("Primal Vigor")
+
+
 def plunderer_count(g, perm=None) -> int:
     """Pitiless Plunderers that see this death -- Treasures per ANOTHER
     creature dying. Look-back (§0z76): a Plunderer that died earlier in the
@@ -1946,6 +1966,23 @@ class DavvolMana:
             self.g.m["davvol_mana_spent"] += 1
 
 
+class RitualMana(DavvolMana):
+    """One point of Culling Ritual's floating {B}-or-{G} (§0z118), owned the
+    way Davvol's {B} is and emptied with it by `empty_mana_pool`."""
+    __slots__ = ()
+
+    @property
+    def tapped(self):
+        return self.used
+
+    @tapped.setter
+    def tapped(self, v):
+        if v and not self.used:
+            self.used = True
+            self.g.ritual_float -= 1
+            self.g.m["culling_mana_spent"] += 1
+
+
 def davvol_trigger(g, perm) -> None:
     """DAVVOL, EVINCAR OF RATH (verified 2026-09-29): "Whenever ANOTHER
     creature you control enters, you lose 1 life and add {B}."
@@ -1976,6 +2013,8 @@ def empty_mana_pool(g) -> None:
     if lost:
         g.m["davvol_mana_lost"] += lost
         g.davvol_float = 0
+    if getattr(g, "ritual_float", 0):
+        g.ritual_float = 0                # Culling Ritual's, §0z118
 
 
 def rendmaw_token(g, factory) -> None:
@@ -2030,6 +2069,10 @@ def rendmaw_mana(g) -> "ManaUnits":
     for _ in range(getattr(g, "davvol_float", 0)):
         units.append(frozenset({"B"}))
         units.owners[-1] = DavvolMana(g)
+    # Culling Ritual's {B} or {G} for each permanent it destroyed (§0z118).
+    for _ in range(getattr(g, "ritual_float", 0)):
+        units.append(frozenset({"B", "G"}))
+        units.owners[-1] = RitualMana(g)
     return units
 
 
@@ -2864,7 +2907,7 @@ def main_phase(g: Game, precombat: bool = False):
             # see coming. Its number is therefore a floor.
             targets = [p for p in g.board if p.card.is_creature]
             if targets:
-                max(targets, key=g.power_of).counters += 1
+                max(targets, key=g.power_of).counters += plus_counters(g, 1)
         if card.script == "stampede":
             # +X/+X and trample until end of turn, X = greatest power you
             # control. The trample is `opponents.trample_of` reading
@@ -3097,7 +3140,7 @@ def run_etb(g: Game, perm: Permanent):
     elif s == "gearhulk":
         for p in g.board:
             if p.card.is_creature:
-                p.counters += 4
+                p.counters += plus_counters(g, 4)
                 break
     elif s == "predation":
         # A 4/4 for each creature the target opponent controls, and each token
@@ -3131,7 +3174,7 @@ def run_etb(g: Game, perm: Permanent):
         for q in eaten:
             g.board.remove(q)
             g.on_creature_death(1, q)
-        perm.counters += 2 * len(eaten)
+        perm.counters += plus_counters(g, 2 * len(eaten))
         g.m["mycoloth_devoured"] += len(eaten)
     elif s == "stampede":
         pass
@@ -3171,7 +3214,27 @@ def run_etb(g: Game, perm: Permanent):
         fetch_basics(g, 1)
     if g.has("The Great Henge") and is_battlefield_creature(g, perm) and not perm.is_token:
         g.draw(1)
-        perm.counters += 1
+        perm.counters += plus_counters(g, 1)
+
+
+def steel_overseer(g) -> None:
+    """STEEL OVERSEER: "{T}: Put a +1/+1 counter on each artifact creature
+    you control." A TAP ability (§0z118): it needs an untapped Overseer that
+    has been yours since your turn began, and an Overseer that activates does
+    not attack. It ran free after combat, so it did both every turn. Now it
+    activates BEFORE combat -- the counters swing this turn, and a 1/1 attack
+    is worth less than a counter on every artifact creature -- and the tap is
+    what keeps it home."""
+    if not g.cfg.get("overseer_taps", True):
+        return
+    for o in [p for p in g.board if p.card.name == "Steel Overseer"]:
+        if o.tapped or o.sick or o not in g.board:
+            continue
+        o.tapped = True
+        g.m["overseer_activations"] += 1
+        for p in g.board:
+            if is_artifact(g, p.card) and p.card.is_creature:
+                p.counters += plus_counters(g, 1)
 
 
 def upkeep(g: Game):
@@ -3262,11 +3325,13 @@ def activations(g: Game):
     if g.has("Idol of Oblivion") and g.made_token_this_turn:
         g.draw(1)
 
-    # Steel Overseer: +1/+1 counter on each artifact creature
-    if g.has("Steel Overseer"):
+    # Steel Overseer: +1/+1 counter on each artifact creature. The OLD rule
+    # -- free, untapped, after combat -- lives here only for
+    # `overseer_taps=False`; the activation is `steel_overseer` (§0z118).
+    if g.has("Steel Overseer") and not g.cfg.get("overseer_taps", True):
         for p in g.board:
             if is_artifact(g, p.card) and p.card.is_creature:
-                p.counters += 1
+                p.counters += plus_counters(g, 1)
 
     # Baba Lysaga: {T}, sac up to three permanents. Needs 3+ CARD TYPES among
     # them -- which is exactly what this deck is made of, so the check is
@@ -4018,6 +4083,7 @@ def take_turn(g: Game):
     twitching_doll_sacrifice(g)     # sorcery speed, before anything taps it
     main_phase(g, precombat=True)   # anthems / pump only
     whip_of_erebos(g)               # sorcery speed, before the swing, §0z85
+    steel_overseer(g)               # its tap, before the swing, §0z118
     empty_mana_pool(g)
     combat(g)
     empty_mana_pool(g)

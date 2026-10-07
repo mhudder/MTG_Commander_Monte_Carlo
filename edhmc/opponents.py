@@ -361,24 +361,131 @@ def commander_shrouded(g) -> bool:
     around. Without this, a five-mana commander in a deck built to protect it
     gets destroyed on repeat and the whole engine never runs.
     """
-    return any(g.has(n) for n in g.cfg.get("shroud_sources", ()))
+    for n in g.cfg.get("shroud_sources", ()):
+        if n in TAP_SHROUD and g.cfg.get("protect_events", True):
+            # A {T} ability: she must be untapped and have been yours since
+            # your turn began (§0z118). A Mother cast this turn protects
+            # nothing until your next one.
+            if any(p.card.name == n and not p.tapped and not p.sick
+                   for p in g.board):
+                return True
+        elif g.has(n):
+            return True
+    return False
 
 
-def try_protect(g, roll: float) -> bool:
-    """A protection spell held up from hand to blank one event."""
+# "{T}: Target creature you control gains protection from the color of your
+# choice until end of turn." A shroud source that is an ACTIVATED ability on
+# the battlefield (§0z118): `commander_shrouded` needs it untapped and not
+# summoning sick, and `holds_back` keeps it home from combat so that it is.
+# Its ONE use a round goes to the commander -- protecting another creature
+# instead would expose the commander to the rest of the pod's round, and that
+# choice is not modelled: a floor on her, said out loud.
+TAP_SHROUD = {"Mother of Runes"}
+
+
+def holds_back(g, perm) -> bool:
+    """A creature the pilot does not attack with because its {T} ability is
+    worth more untapped (`TAP_SHROUD`). Read by the engines that run one."""
+    return (perm.card.name in TAP_SHROUD
+            and g.cfg.get("protect_events", True))
+
+
+# WHICH EVENT EACH PROTECTION SPELL ANSWERS, AND HOW (§0z118). Every line was
+# read from `api.scryfall.com` on 2026-10-07. Until then `try_protect` read a
+# name list and blanked WHATEVER event came first -- so Sejiri Shelter (one
+# creature, protection from a colour) stopped a wrath, and Mother of Runes, a
+# {T} ability on the battlefield, was discarded from HAND to do it.
+#
+#   "blank"           the event does not happen to you: hexproof, phasing,
+#                     protection from the answer's colour
+#   "indestructible"  the event happens, and `destroy` prices each permanent's
+#                     survival by `destroy_share_for` exactly as it prices a
+#                     printed indestructible -- an exile or an edict still
+#                     takes it
+#
+# "creature": the grant covers one creature, or creatures only -- it answers a
+# spot removal only when the victim is a creature.
+# "exile": the spell exiles itself rather than going to the graveyard.
+PROTECTION = {
+    "Heroic Intervention": {   # "hexproof and indestructible"
+        "spot": "blank", "ae": "blank", "wipe": "indestructible"},
+    "Boros Charm": {           # "Permanents you control gain indestructible"
+        "spot": "indestructible", "ae": "indestructible",
+        "wipe": "indestructible"},
+    # "You and permanents you control gain hexproof ... If the gift was
+    # promised, permanents you control also gain indestructible." The gift is
+    # promised only against a wrath; the card an opponent draws for it is not
+    # modelled (they have no hand), a ceiling on that half.
+    "Dawn's Truce": {"spot": "blank", "ae": "blank", "wipe": "indestructible"},
+    "Sejiri Shelter": {        # "Target creature you control gains protection"
+        "spot": "blank", "creature": True},
+    # The gift (an opponent's extra turn) is promised: "all permanents you
+    # control phase out". That extra turn is not modelled, a ceiling.
+    "Perch Protection": {"spot": "blank", "ae": "blank", "wipe": "blank",
+                         "exile": True},
+    "Flawless Maneuver": {     # "Creatures you control gain indestructible"
+        "spot": "indestructible", "wipe": "indestructible", "creature": True},
+    "Teferi's Protection": {   # "All permanents you control phase out"
+        "spot": "blank", "ae": "blank", "wipe": "blank", "exile": True},
+}
+
+
+def try_protect(g, roll: float, event=None, victim=None):
+    """A protection spell held up from hand against one event.
+
+    Returns "blank" (the event is answered), "indestructible" (it resolves,
+    and the caller wraps it in `event_indestructible`) or None. `event` is
+    "spot", "ae" or "wipe"; a card answers only the events its text answers
+    (`PROTECTION`). `protect_events=False` is the old rule: every listed card
+    blanks every event."""
     names = g.cfg.get("protection_cards", ("Heroic Intervention",))
-    hi = next((c for c in g.hand if c.name in names), None)
-    if hi is None:
-        return False
+    keyed = g.cfg.get("protect_events", True) and event is not None
+
+    def answers(c):
+        if c.name not in names:
+            return None
+        if not keyed:
+            return "blank"
+        rule = PROTECTION.get(c.name, {})
+        how = rule.get(event)
+        if how is None:
+            return None
+        if (rule.get("creature") and event == "spot" and victim is not None
+                and not is_creature_now(g, victim)):
+            return None
+        return how
+    held = [(c, answers(c)) for c in g.hand]
+    held = [(c, how) for c, how in held if how is not None]
+    if not held:
+        return None
     lands = sum(1 for p in g.board if p.card.is_land)
     if lands < 4:
-        return False                      # not enough mana to hold it up
+        return None                       # not enough mana to hold it up
     if roll >= g.cfg.get("hold_up_rate", 0.60):
-        return False                      # you tapped out instead
+        return None                       # you tapped out instead
+    # A blank before an indestructible grant: it answers more.
+    hi, how = min(held, key=lambda ch: ch[1] != "blank")
     g.hand.remove(hi)
-    g.graveyard.append(hi)
+    if not (keyed and PROTECTION.get(hi.name, {}).get("exile")):
+        g.graveyard.append(hi)            # an "Exile <this>" card is gone
     g.m["protected"] += 1
-    return True
+    if how == "indestructible":
+        g.m["protected_indestructible"] += 1
+    return how
+
+
+@contextmanager
+def event_indestructible(g, on: bool):
+    """Permanents you control are indestructible for one event -- the grant
+    of a protection spell `try_protect` returned "indestructible" for. Read
+    by `is_hardy`, so `destroy` prices it as every indestructible is."""
+    before = getattr(g, "protected_event", False)
+    g.protected_event = before or on
+    try:
+        yield
+    finally:
+        g.protected_event = before
 
 
 # ---------------------------------------------------------------------------
@@ -396,9 +503,10 @@ def spot_removal(g, opp, others, rolls):
         targets = [p for p in targets if p.card is not g.commander]
     if not targets:
         return
-    if try_protect(g, rolls[5]):
-        return
     victim = max(targets, key=lambda p: threat_of(g, p))
+    how = try_protect(g, rolls[5], "spot", victim)
+    if how == "blank":
+        return
     # Optional protocol hook (§0z77): the pod's spot removal is a spell, and
     # "becomes the target of a spell" is a trigger condition -- Goldspan
     # Dragon's Treasure. Fired whether or not the spell then destroys it.
@@ -407,8 +515,9 @@ def spot_removal(g, opp, others, rolls):
     targeted = getattr(g, "on_targeted", None)
     if targeted is not None:
         targeted(victim)
-    if destroy(g, victim, rolls[7], kind="spot"):
-        g.m["removal_eaten"] += 1
+    with event_indestructible(g, how == "indestructible"):
+        if destroy(g, victim, rolls[7], kind="spot"):
+            g.m["removal_eaten"] += 1
 
 
 def ae_removal(g, opp, others, rolls):
@@ -422,17 +531,19 @@ def ae_removal(g, opp, others, rolls):
                and not p.card.is_land and not p.is_token]
     if not targets:
         return
-    if try_protect(g, rolls[5]):
+    how = try_protect(g, rolls[5], "ae")
+    if how == "blank":
         return
     sweeper = (opp.bracket >= 3 and rolls[4] < 0.20)
-    if sweeper:
-        for p in list(targets):
-            if destroy(g, p, rolls[7], kind="wipe"):
+    with event_indestructible(g, how == "indestructible"):
+        if sweeper:
+            for p in list(targets):
+                if destroy(g, p, rolls[7], kind="wipe"):
+                    g.m["ae_removal_eaten"] += 1
+        else:
+            victim = max(targets, key=lambda p: threat_of(g, p))
+            if destroy(g, victim, rolls[7], kind="ae"):
                 g.m["ae_removal_eaten"] += 1
-    else:
-        victim = max(targets, key=lambda p: threat_of(g, p))
-        if destroy(g, victim, rolls[7], kind="ae"):
-            g.m["ae_removal_eaten"] += 1
 
 
 def board_wipe(g, opp, rolls):
@@ -443,7 +554,8 @@ def board_wipe(g, opp, rolls):
     width_mult = 1.0 + min(0.75, max(0, n - 4) * 0.08)
     if rolls[2] >= opp.p["wipe"] * width_mult:
         return
-    if try_protect(g, rolls[5]):
+    how = try_protect(g, rolls[5], "wipe")
+    if how == "blank":
         return
     # Optional protocol hook (2026-10-01, trostani): a response FROM THE
     # BATTLEFIELD -- Selfless Spirit, King Darien -- that grants indestructible
@@ -452,7 +564,7 @@ def board_wipe(g, opp, rolls):
     respond = getattr(g, "before_wipe", None)
     if respond is not None:
         respond()
-    with simultaneous(g):
+    with simultaneous(g), event_indestructible(g, how == "indestructible"):
         for p in [p for p in g.board if is_creature_now(g, p)]:
             destroy(g, p, rolls[7], kind="wipe")
     for o in g.opponents:
@@ -468,6 +580,32 @@ def board_wipe(g, opp, rolls):
 # either, so it does not fit `try_protect`'s one-shot shape. Checked by name
 # here, the same way `flying_of` special-cases three conditional fliers.
 GRANTS_INDESTRUCTIBLE = {"Avacyn, Angel of Hope"}
+
+
+# A WRATH THAT IS A CARD'S OVERLOAD (§0z118). "Destroy target creature ...
+# Overload {2}{W}{W}": Damn is cast for {B}{B} as single-target removal --
+# blind here, the pod's creatures are a count -- and is a wrath ONLY when
+# overloaded. It carried the `wipe` tag at {B}{B}, a two-mana wrath. The main
+# phases cast a gated wipe at THIS cost (`wipe_mode_cost`); a cast that cannot
+# overload (Bolas's Citadel pays life INSTEAD of the mana cost, and overload
+# is an alternative cost too) is not a wipe. `damn_overload=False` is the old
+# {B}{B} wrath.
+OVERLOAD_WIPES = {"Damn": {"gen": 2, "W": 2}}
+
+
+def wipe_mode_cost(g, card, base):
+    """What a `wipe`-tagged card costs when it is cast AS the wipe: its
+    overload for an `OVERLOAD_WIPES` card, otherwise `base`, unchanged."""
+    if (card.name in OVERLOAD_WIPES and "wipe" in card.tags
+            and g.cfg.get("damn_overload", True)):
+        return dict(OVERLOAD_WIPES[card.name])
+    return base
+
+
+def overload_only(g, card) -> bool:
+    """Is this card a wipe only when overloaded? A cast that pays some other
+    cost (life, nothing) gets the single-target mode instead."""
+    return card.name in OVERLOAD_WIPES and g.cfg.get("damn_overload", True)
 
 
 # YOUR OWN SWEEPERS, classified by whether INDESTRUCTIBLE stops them. Each
@@ -570,6 +708,84 @@ def check_wipe_coverage(decks):
     return sorted(stale)
 
 
+# WHAT EACH OF YOUR SWEEPERS DESTROYS (§0z118). Every one of these resolved
+# as "destroy all creatures" on both sides until then. Read from
+# `api.scryfall.com` on 2026-10-07:
+#
+#   Culling Ritual      "Destroy each nonland permanent with mana value 2 or
+#                       less. Add {B} or {G} for each permanent destroyed this
+#                       way." Rendmaw (MV 5) used to die to it; Sol Ring, the
+#                       signets, the Myr and every token did not.
+#   Ondu Inversion      "Destroy all nonland permanents."
+#   Ultima              "Destroy all artifacts and creatures. End the turn."
+#   Promise of Loyalty  "Each player puts a vow counter on a creature they
+#                       control and sacrifices the rest." The vow ("can't
+#                       attack you") is not modelled: the pod's creature that
+#                       stays is a count, and chip damage still reads it.
+#
+# `own_wipe_scope=False` is the old creature wipe for all four.
+OWN_WIPE_SCOPE = {
+    "Culling Ritual": "mv2",
+    "Ondu Inversion": "nonland",
+    "Ultima": "artifacts_creatures",
+    "Promise of Loyalty": "keep_one",
+}
+
+
+def own_wipe_scope(g, card):
+    if card is None or not g.cfg.get("own_wipe_scope", True):
+        return None
+    return OWN_WIPE_SCOPE.get(card.name)
+
+
+def own_wipe_victims(g, card) -> list:
+    """YOUR permanents this sweeper would take, before indestructible --
+    the one list `resolve_own_wipe` destroys and the wipe gate prices."""
+    scope = own_wipe_scope(g, card)
+    if scope == "nonland":
+        return [p for p in g.board if not p.card.is_land]
+    if scope == "artifacts_creatures":
+        return [p for p in g.board if not p.card.is_land
+                and (is_creature_now(g, p) or "Artifact" in p.card.types)]
+    if scope == "mv2":
+        return [p for p in g.board if not p.card.is_land and p.card.mv <= 2]
+    creatures = [p for p in g.board if is_creature_now(g, p)]
+    if scope == "keep_one" and creatures:
+        # The vow goes on the commander if it is there, else the biggest.
+        keep = next((p for p in creatures if p.card is g.commander),
+                    max(creatures, key=g.power_of))
+        creatures = [p for p in creatures if p is not keep]
+    return creatures
+
+
+def own_wipe_pod_left(g, card, creatures: float) -> float:
+    """How many of an opponent's creatures survive your sweeper. Their
+    board is a count, so Culling Ritual's "mana value 2 or less" is a share,
+    `culling_pod_share` (0.5) -- A JUDGEMENT, NOT A CENSUS: the pod's
+    commanders and finishers are dear, its tokens and dorks are cheap."""
+    scope = own_wipe_scope(g, card)
+    if scope == "keep_one":
+        return min(creatures, 1.0)
+    if scope == "mv2":
+        return creatures * (1.0 - g.cfg.get("culling_pod_share", 0.5))
+    return 0.0
+
+
+def own_wipe_treasures(g, card) -> int:
+    """Treasures kept as a COUNT (rendmaw, lorehold) that the sweeper
+    destroys -- they are artifacts of mana value 0. Zeroed; how many."""
+    if own_wipe_scope(g, card) not in ("nonland", "artifacts_creatures",
+                                       "mv2"):
+        return 0
+    n = 0
+    for attr in ("treasures", "tapped_treasures"):
+        k = getattr(g, attr, 0)
+        if isinstance(k, int) and k > 0:
+            n += k
+            setattr(g, attr, 0)
+    return n
+
+
 def wipe_destroys(card) -> bool:
     """Does this sweeper destroy, in the sense indestructible cares about?
 
@@ -662,6 +878,8 @@ def is_hardy(g, perm) -> bool:
     creature survives that `destroy` would kill (§0u)."""
     granted = (any(g.has(n) for n in GRANTS_INDESTRUCTIBLE)
                and perm.card.name not in GRANTS_INDESTRUCTIBLE)
+    # A protection spell's grant for this one event (`event_indestructible`).
+    granted = granted or getattr(g, "protected_event", False)
     return indestructible_of(g, perm) or granted
 
 
@@ -1974,13 +2192,19 @@ def should_cast_own_wipe(g, card=None) -> bool:
     else:
         dying = [p for p in g.board if is_creature_now(g, p)]
         if measure == "cost":
+            # What THIS sweeper takes (§0z118): Culling Ritual spares the
+            # commander, Promise of Loyalty keeps one creature a side.
+            dying = [p for p in own_wipe_victims(g, card)
+                     if is_creature_now(g, p)]
             if card is not None and "onesided" in card.tags:
                 dying = []
             elif (wipe_destroys(card)
                   and g.cfg.get("own_wipe_indestructible", True)):
                 dying = [p for p in dying if not is_hardy(g, p)]
         mine = sum(max(0, g.power_of(p)) for p in dying)
-        theirs = sum(o.creatures * o.p.get("power", 1.0) for o in living(g))
+        theirs = sum((o.creatures - (own_wipe_pod_left(g, card, o.creatures)
+                                     if measure == "cost" else 0.0))
+                     * o.p.get("power", 1.0) for o in living(g))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
 
 
@@ -2021,14 +2245,18 @@ def resolve_own_wipe(g, spare_own=False, card=None):
     `own_wipe_indestructible=False` restores the old kill-everything path, and
     is what any table published before 2026-09-11 reproduces with.
     """
+    pod_killed = 0.0
     for o in living(g):
-        o.creatures = 0.0
+        left = own_wipe_pod_left(g, card, o.creatures)
+        pod_killed += o.creatures - left
+        o.creatures = left
     if spare_own:
         return
     destroys = wipe_destroys(card)
     honour = g.cfg.get("own_wipe_indestructible", True)
+    killed = own_wipe_treasures(g, card)
     with simultaneous(g):
-        for p in [p for p in g.board if is_creature_now(g, p)]:
+        for p in own_wipe_victims(g, card):
             # FIXED 2026-09-04. Your own sweeper used to remove the commander from
             # the battlefield WITHOUT returning it to the command zone, so
             # `commander_cast` stayed True and it was never recast again.
@@ -2044,9 +2272,19 @@ def resolve_own_wipe(g, spare_own=False, card=None):
             if not destroy(g, p, destroys=destroys if honour else False):
                 g.m["own_wipe_survivors"] += 1
                 continue
+            killed += 1
             # `own_wipe_commander_returns=False` restores the pre-2026-09-04
             # behaviour, which destroy() does not have a flag for because no
             # opponent-sourced removal ever needed one.
             if was_commander and not g.cfg.get("own_wipe_commander_returns", True):
                 g.commander_cast, g.commander_tax = cast_before, tax_before
     g.m["own_wipes_cast"] += 1
+    if own_wipe_scope(g, card) == "mv2":
+        # "Add {B} or {G} for each permanent destroyed this way": yours, and
+        # the pod's creatures, rounded down. The pod's own rocks are not
+        # permanents here, a floor. The engine that runs the card spends it.
+        n = killed + int(pod_killed)
+        g.m["culling_mana"] += n
+        add = getattr(g, "add_ritual_mana", None)
+        if add is not None:
+            add(n)

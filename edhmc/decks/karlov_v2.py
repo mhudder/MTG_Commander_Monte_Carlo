@@ -23,8 +23,11 @@ Costs are hand-authored and were verified against Scryfall oracle text on
 
 NOTE: the spreadsheet previously "corrected" Damn and Fracture to MV 3. Both
 are MV 2 ({B}{B} and {W}{B}); the correction was the error and has been undone
-on both legs. Damn's wrath mode is its overload cost {2}{W}{W}, MV 4 — which is
-neither 2 nor 3, and is why it is modelled as the removal spell it is cast as.
+on both legs. Damn's wrath mode is its overload cost {2}{W}{W}, an alternative
+cost: its MV stays 2. The `wipe` tag used to make it a {B}{B} wrath; since
+§0z118 the main phase casts it as the wrath only at the overload
+(`opponents.OVERLOAD_WIPES`), and never as the single-target spell, which is
+blind here.
 """
 
 from edhmc.engine import Card

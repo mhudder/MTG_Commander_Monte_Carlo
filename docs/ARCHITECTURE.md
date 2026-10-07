@@ -300,3 +300,17 @@ command; use it rather than remembering.
   `charge_coloured_pain(g, payment, units)` (shilgengar), or computes it
   itself (lorehold, trostani). Either way `coloured_tap_life` marks the
   Payment charged, so nothing pays twice.
+- **A protection spell answers an EVENT, not a name** (§0z118).
+  `opponents.try_protect(g, roll, event, victim)` reads `PROTECTION`: each
+  card says which of "spot", "ae", "wipe" it answers and whether it blanks
+  the event or grants indestructible for it (`event_indestructible`, read by
+  `is_hardy`). A card added to an engine's `protection_cards` with no
+  `PROTECTION` row answers nothing. A shroud source that is a {T} ability
+  (`TAP_SHROUD`, Mother of Runes) needs an untapped, non-sick permanent, and
+  the engines that run one keep it home with `holds_back`.
+- **Your sweeper destroys what ITS text says** (§0z118). `resolve_own_wipe`
+  and the wipe gate's "cost" both read `own_wipe_victims` and
+  `own_wipe_pod_left`, so a sweeper with a scope (`OWN_WIPE_SCOPE`) is
+  priced as it resolves. A wrath that is an overload (`OVERLOAD_WIPES`, Damn)
+  is cast at `wipe_mode_cost` in every main phase; any other cast path that
+  can put one on the stack must ask `overload_only` first.

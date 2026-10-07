@@ -133,7 +133,7 @@ def run_cases():
           g.m["rendmaw_triggers"], 1)
     g = fresh("rendmaw", board=[bio, card("rendmaw", "Steel Overseer"),
                                 bear])
-    EN.activations(g)
+    EN.steel_overseer(g)
     check("G ... Steel Overseer counts a non-artifact creature",
           next(p for p in g.board if p.card is bear).counters, 1)
 

@@ -181,8 +181,11 @@ def test_own_wipe_that_gets_around_it():
           wipe_board("Toxic Deluge", board), [])
     check("Farewell (EXILE all creatures) kills Heliod anyway",
           wipe_board("Farewell", board), [])
+    # Each player KEEPS ONE (§0z118): the vow goes on the bigger Bear, and
+    # Heliod is sacrificed through its indestructibility.
     check("Promise of Loyalty (SACRIFICE the rest) kills Heliod anyway",
-          wipe_board("Promise of Loyalty", board), [])
+          wipe_board("Promise of Loyalty",
+                     [creature("Bear", 3, 3), board[1]]), ["Bear"])
 
 
 def test_avacyn_grants_it_to_the_whole_board():

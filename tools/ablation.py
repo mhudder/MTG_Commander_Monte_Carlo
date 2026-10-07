@@ -327,10 +327,11 @@ SCRIPTED_LOREHOLD = {
     # controls more lands than you" is read as `lands < min(turn, 10)`, the
     # §4 abstraction -- the pod has no lands to count.
     # Dawn's Truce: held up in `protection_cards` and spent by
-    # `opponents.try_protect` to blank one removal event -- the rule every
-    # protection spell in the project uses (Boros Charm and Mother of Runes
-    # above, Heroic Intervention in rendmaw). The gift's card to an opponent
-    # is the §4 abstraction: the pod has no hand.
+    # `opponents.try_protect` on the events its text answers (§0z118):
+    # hexproof blanks a spot or artifact removal; against a wrath the gift is
+    # promised and everything is indestructible, priced by `destroy_share`.
+    # The gift's card to an opponent is the §4 abstraction: the pod has no
+    # hand.
     "Enlightened Tutor", "Land Tax", "Dawn's Truce",
     # Dragon's Rage Channeler (was PARTLY, §0z83): surveil, and delirium's
     # flying AND +2/+2 through one `opponents.delirium`. "Attacks each combat
@@ -812,13 +813,12 @@ PARTLY_MODELLED = {
     },
     "tivit": {
         "Promise of Loyalty":
-            "Implemented as a symmetric wipe (2026-09-12). The card is "
-            "'each player puts a vow counter on a creature they control and "
-            "SACRIFICES THE REST' -- everyone KEEPS ONE, and the model keeps "
-            "none. It overstates in both directions at once, so a high score "
-            "is still evidence and a low one is not. Sacrifice also gets "
-            "around indestructible, which is why it is in "
-            "WIPE_IGNORES_INDESTRUCTIBLE.",
+            "'Each player puts a vow counter on a creature they control and "
+            "SACRIFICES THE REST': each player keeps one (§0z118 -- until "
+            "then the model kept none). Missing: the vow, 'can't attack you', "
+            "on the creature each opponent keeps -- their creatures are a "
+            "count and chip damage still reads it, so a FLOOR. Sacrifice gets "
+            "around indestructible: WIPE_IGNORES_INDESTRUCTIBLE.",
         "Magister of Worth":
             "The CONDEMNATION half is implemented (2026-09-12): a symmetric "
             "wipe that spares only itself, conditional on the council vote. "
@@ -1011,9 +1011,9 @@ def partly_for(deck_name, deck):
     """PARTLY_MODELLED for `deck_name`, plus the derived symmetric wipes.
 
     A hand-written entry WINS over the derived one: Promise of Loyalty
-    (tivit) and Magister of Worth already carry reasons naming the specific
-    clause that is missing, which is strictly more useful than the generic
-    wipe reason.
+    (tivit) and Magister of Worth carry reasons naming the specific clause
+    that is missing, which is strictly more useful than the generic wipe
+    reason.
     """
     out = dict(PARTLY_MODELLED.get(deck_name, {}))
     for name in symmetric_wipes(deck):
@@ -1412,9 +1412,11 @@ BLIND_BUT_LIVE = {
     "lorehold": {
         "Sejiri Shelter":
             "Played as its land face, and held up in `protection_cards`, "
-            "where `try_protect` blanks a whole removal EVENT. Right against "
-            "spot removal; a CEILING against a wipe, where the card saves "
-            "one creature.",
+            "where `try_protect` blanks a spot removal aimed at a creature "
+            "and nothing else (§0z118 -- it used to blank a whole wrath). "
+            "The pod's answer has no colour, so 'protection from the color "
+            "of your choice' always stops it: a ceiling against an artifact "
+            "or same-coloured answer.",
         "Perch Protection":
             "Held up in `protection_cards` and spent by `try_protect`, which "
             "with the gift is faithful -- everything phases out. But the "

@@ -312,12 +312,30 @@ class ShilgengarGame(BaseGame):
 
     def make_permanent(self, card, sick=True, tapped=False, is_token=False,
                        counters=0):
+        if self.cfg.get("giada_text", True):
+            counters += self.giada_counters(card)
         perm = Permanent(card=card, sick=sick, tapped=tapped,
                          is_token=is_token, counters=counters,
                          base_p=card.power, base_t=card.toughness)
         enter_loyalty(perm)          # Thomil (§0z74); a no-op for the rest
         self.board.append(perm)
         return perm
+
+    def giada_counters(self, card) -> int:
+        """GIADA, FONT OF HOPE: "Each other Angel you control enters with an
+        additional +1/+1 counter on it for each Angel you already control."
+        Read here, where every permanent enters -- cast, reanimated, returned
+        by the ultimate, or a token (§0z118). It was applied in
+        `make_angel_tokens` only, so a cast or reanimated Angel got none.
+        `giada_text=False` is that old rule. Counted before the newcomer is on
+        the battlefield, so the board is what you "already control"."""
+        if (not card.is_creature or "angel" not in card.tags
+                or card.name == "Giada, Font of Hope"
+                or not self.has("Giada, Font of Hope")):
+            return 0
+        n = sum(1 for q in self.board if self.is_angel(q))
+        self.m["giada_counters"] += n
+        return n
 
     def make_creature_token(self, card):
         """A creature token that is not an Angel or a Spirit -- Thomil's
@@ -344,7 +362,9 @@ class ShilgengarGame(BaseGame):
             tok = Card(name="Angel token", types=frozenset({"Creature"}),
                        power=p, toughness=t, flying=True, tags=frozenset({"angel"}))
             counters = 0
-            if self.has("Giada, Font of Hope"):
+            if (self.has("Giada, Font of Hope")
+                    and not self.cfg.get("giada_text", True)):
+                # The old rule; with the fix `make_permanent` adds them.
                 counters = sum(1 for q in self.board if self.is_angel(q))
             perm = self.make_permanent(tok, sick=True, is_token=True,
                                        counters=counters)
@@ -995,7 +1015,8 @@ class ShilgengarGame(BaseGame):
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
-                _m = choose_mode(c, self.herald_cost(c), pool)
+                _m = choose_mode(c, OPP.wipe_mode_cost(
+                    self, c, self.herald_cost(c)), pool)
                 pay = None if _m is None else _m[2]
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs

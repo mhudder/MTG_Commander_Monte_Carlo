@@ -1445,7 +1445,13 @@ MEASURED: list[Candidate] = [
             "the deck's only unstaged Candidate and a cut with no add is half "
             "a swap -- it does NOT reopen this card, whose hold is about the "
             "five-mana artifact and not about the slot. Evidence: "
-            "results/threat_blank_karlov_2026-09-20.txt."),
+            "results/threat_blank_karlov_2026-09-20.txt. AND THE TIE-BREAK'S "
+            "FIRST HALF IS GONE (§0z118, 2026-10-07): the try_protect channel "
+            "was not her text -- she was DISCARDED FROM HAND to blank removal "
+            "and wrath alike. She is a {T} shroud source on the battlefield "
+            "only now, kept home from combat, so cutting her closes nothing "
+            "the Boots do not also cover. Re-read both rows after the "
+            "rebuild before naming a cut on this evidence."),
     ),
     Candidate(
         deck="lorehold", card="Past in Flames", measured="2026-09-16",

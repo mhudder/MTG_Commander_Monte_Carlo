@@ -133,7 +133,13 @@ def run_cases():
     check("C discover puts a refused wipe into hand",
           (FAREWELL in g.hand, g.m["discover_to_hand"]), (True, 1))
 
-    g = KA.KarlovGame(list(KDECK), KCMD, dict(DEFAULT_CFG, **EXTRA), 1)
+    # `damn_overload=False` (§0z118): off the top, Damn cannot be overloaded
+    # and the dig stops at it WHATEVER the gate says -- so D pins the gate
+    # only with that rule off. (The first mutation run after §0z118 found D
+    # holding under `wipe_gate_all_casts=False`; this is why.)
+    g = KA.KarlovGame(list(KDECK), KCMD,
+                      dict(DEFAULT_CFG, **{**EXTRA, "damn_overload": False}),
+                      1)
     g.board = EN.Board()
     g.hand, g.graveyard = [], []
     g.board.append(EN.Permanent(card=CITADEL, sick=False))

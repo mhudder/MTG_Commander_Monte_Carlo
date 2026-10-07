@@ -248,19 +248,30 @@ def make_token(g, kind, n=1):
 
 
 def on_tokens_created(g, n):
-    """Payoffs that read "whenever you create a token"."""
+    """Payoffs that read "whenever you create a token". ONE CALL IS ONE
+    EVENT: every token it reports entered at once."""
     if n <= 0:
         return
     per = 0.0
     if g.has("Mirkwood Bats"):
-        per += 1.0                     # "each opponent loses 1"
+        per += n                       # "each opponent loses 1", per token
     if g.has("Kambal, Profiteering Mayor"):
-        per += 1.0                     # "each opponent loses 1 and you gain 1"
+        # "Whenever ONE OR MORE tokens you control enter, each opponent loses
+        # 1 life and you gain 1 life" -- once per batch, not per token: five
+        # Treasures at once took 15 from the pod where the text takes 3
+        # (§0z118). `kambal_batch=False` is the old per-token drain. The
+        # life gained is new with the fix; nothing else in tivit gains life.
+        if g.cfg.get("kambal_batch", True):
+            per += 1.0
+            g.your_life += 1
+            g.m["kambal_triggers"] += 1
+        else:
+            per += n
     if per:
         # `pod_size`, not `living`: this builds a POD TOTAL that
         # `deal_pod_damage` divides straight back down, so the two have to
         # agree or the knob restores a behaviour that never shipped.
-        dmg = per * n * OPP.pod_size(g)
+        dmg = per * OPP.pod_size(g)
         g.deal_pod_damage(dmg)
         g.m["token_drain"] += dmg
         if g.result == "win":
@@ -672,7 +683,8 @@ def main_phase(g):
             # pool is only different when a Powerstone is untapped.
             pool = (mana_units(g, True) if "Artifact" in c.types
                     and untapped_powerstones(g) else units)
-            _m = choose_mode(c, reduce_cost(g, c), pool)
+            _m = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c)),
+                             pool)
             if _m is not None:
                 options.append((c, _m[2], _m[0]))
         if not options:
@@ -683,7 +695,7 @@ def main_phase(g):
         card = lookahead_pick(
             g, options, units, lambda it: (it[0].priority, it[0].mv),
             cost_of=lambda it: it[2], pay_of=lambda it: it[1])[0]
-        if not pay(g, reduce_cost(g, card),
+        if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card)),
                    powerstones="Artifact" in card.types):
             return
         g.hand.remove(card)

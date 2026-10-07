@@ -2044,6 +2044,16 @@ class AzusaGame(BaseGame):
             self.archdruids_charm()
 
         if not card.is_permanent:
+            if (script == "green_sun"
+                    and self.cfg.get("gsz_shuffle", True)):
+                # "Shuffle Green Sun's Zenith into its owner's library" --
+                # never the graveyard, where Regrowth and Eternal Witness
+                # could rebuy it (§0z118). Trostani's resolution, its own
+                # stream so no other shuffle's draw moves.
+                self.library.append(card)
+                crn_shuffle(self, "gsz", self.library)
+                self.m["gsz_shuffled"] += 1
+                return
             self.graveyard.append(card)
             return
 

@@ -126,7 +126,12 @@ class KarlovGame(BaseGame):
         cfg.setdefault("shroud_sources",
                        ("Lightning Greaves", "Swiftfoot Boots",
                         "Whispersilk Cloak", "Mother of Runes"))
-        cfg.setdefault("protection_cards", ("Mother of Runes",))
+        # Mother of Runes is a {T} ability on the battlefield, never a card
+        # discarded from hand to blank an event (§0z118): she is a shroud
+        # source only. `protect_events=False` restores the old hand channel.
+        cfg.setdefault("protection_cards",
+                       () if cfg.get("protect_events", True)
+                       else ("Mother of Runes",))
         self.opponents, self.opp_rolls, self.counter_rolls = OPP.make_pod(cfg, seed)
         OPP.init_life(self)
 
@@ -1024,7 +1029,8 @@ def main_phase(g):
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-            mode = choose_mode(c, reduce_cost(g, c), units)
+            mode = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c)),
+                               units)
             if mode is not None:
                 options.append((c, mode[2]))
                 mode_cost[id(c)] = mode[0]
@@ -1180,6 +1186,13 @@ def citadel_step(g):
                 and not OPP.should_cast_own_wipe(g, top)):
             g.m["citadel_wipe_held"] += 1
             break
+        # Life INSTEAD of the mana cost is an alternative cost, and so is
+        # overload: off the top, Damn is "destroy target creature" -- blind
+        # here -- so the pilot keeps the wrath to draw rather than spend it
+        # as a 1-for-1 this model cannot see (§0z118).
+        if "wipe" in top.tags and OPP.overload_only(g, top):
+            g.m["citadel_wipe_held"] += 1
+            break
         g.library.pop()
         g.your_life -= cost
         g.m["citadel_life_spent"] += cost
@@ -1298,7 +1311,8 @@ def combat(g):
     if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
         g.m["heliod_animated"] += 1
     attackers = [p for p in g.board
-                 if is_creature_now(g, p.card) and not p.tapped and not p.sick]
+                 if is_creature_now(g, p.card) and not p.tapped and not p.sick
+                 and not OPP.holds_back(g, p)]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
