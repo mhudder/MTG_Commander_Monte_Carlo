@@ -1,0 +1,265 @@
+{
+  "ablation_cache_karlov_10-20_n15000_medblank.json": {
+    "built_at": "0ebe28e2a348c07b",
+    "built_commit": "bd9e7ae",
+    "built_utc": "2026-10-07T13:30:49Z",
+    "deck": "karlov",
+    "superseded": [
+      {
+        "built_at": "0d1e4ddd26f9b638",
+        "built_commit": "9cfd3fb",
+        "built_utc": "2026-09-16T20:56:38Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "f639dd9",
+            "evidence": "2026-09-17 L1 dead-code sweep: comment-only edits to opponents.py, azusa.py, decks/azusa_v1.py, decks/lorehold_v16.py (unreferenced constants removed), karlov_v1.py deleted. check_unchanged_decks vs worktree at f639dd9: BIT-IDENTICAL on all 8 metrics, all six decks.",
+            "fingerprint": "78323d994e25a6a7",
+            "utc": "2026-09-17T02:24:51Z"
+          }
+        ]
+      },
+      {
+        "built_at": "986893e167c40cd4",
+        "built_commit": "dadc7f2",
+        "built_utc": "2026-09-17T03:00:34Z",
+        "deck": "karlov",
+        "note": "STAMPED AFTER THE RUN, 2026-09-17: the rebuild from an empty cache (02:22-02:58 UTC) ran into stamp_built's no-op branch and kept the 2026-09-16 record (defect fixed in the same commit, `fresh=`). The run's tree differed from this stamp's only by decks/_evasion.py gaining SCANNED (read by check_docs alone) and cache_manifest.SHARED gaining that file; the staged karlov list simulates BIT-IDENTICALLY on both (400 seeds, 8 metrics, T20).",
+        "verified": []
+      },
+      {
+        "built_at": "ea61347488d1c6fe",
+        "built_commit": "af016c1",
+        "built_utc": "2026-09-17T03:23:36Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "9f226af",
+            "evidence": "2026-09-17 \u00a70z31 (M3 engine.Metrics + M4 ablation.py Run object): zero-behaviour refactors. check_unchanged_decks vs worktree at 9f226af after M3: BIT-IDENTICAL on all 8 metrics, all six decks; every committed table re-rendered from its committed cache through the refactored render_table: BYTE-IDENTICAL, all six (now pinned by tests/test_metrics_and_render.py).",
+            "fingerprint": "2fd46bd0e86a45b9",
+            "utc": "2026-09-17T14:36:37Z"
+          },
+          {
+            "commit": "774b8ef",
+            "evidence": "2026-09-17 \u00a70z32 (M5 engine.BaseGame + finish(); M6 edhmc/registry.py): check_unchanged_decks vs worktree at 774b8ef BIT-IDENTICAL on all 8 metrics, all six decks; every numeric output key summed over 400 staged-list games identical except karlov turn_lethal (a stamp no table reads); every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py); PER_DECK derived from the registry spells the same paths.",
+            "fingerprint": "b68f66c7a9f05ef2",
+            "utc": "2026-09-17T15:13:25Z"
+          },
+          {
+            "commit": "c6d604a",
+            "evidence": "2026-09-17 \u00a70z31 cut check: tools/ablation.py gained Penance and Scroll Rack in SCRIPTED_LOREHOLD (classification only; both are staged OUT of the measured list). Every committed table re-rendered BYTE-IDENTICAL from its cache (tests/test_metrics_and_render.py). No simulation code touched.",
+            "fingerprint": "cde1da1f042a52c4",
+            "utc": "2026-09-17T15:40:28Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "2026-09-20, Reality Fracture batch 1. The fingerprint moved because tools/tag_flying regenerated decks/_evasion.py (it is in every deck's fingerprint since 0z29) and because azusa.py and karlov.py gained name-guarded branches for four new cards. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. AND THE WHOLE OUTPUT WAS COMPARED, not just those eight (0z32): summing every numeric output key over 80 baseline games per deck, azusa went 84 keys to 87 and karlov 58 to 60, the added keys are exactly the five new counters (kraken_tokens, shaper_lands, shaper_draws, liliana_triggers, edgar_triggers), every one of them zero in a baseline game, and no shared key moved at all.",
+            "fingerprint": "a40ac3db67b14ea2",
+            "utc": "2026-09-20T15:01:27Z"
+          },
+          {
+            "commit": "488cc61",
+            "evidence": "SUPERSEDES the note above it from the same day, which was recorded before decks/_evasion.py had been regenerated for the two karlov cards (check_docs caught that: they were never scanned). Re-run after: check_unchanged_decks against the worktree at 488cc61 is BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved, and the whole-output comparison stands as described above.",
+            "fingerprint": "b715bc34c7b21a61",
+            "utc": "2026-09-20T15:02:17Z"
+          },
+          {
+            "commit": "7c25a5f",
+            "evidence": "2026-09-21, Reality Fracture batch 2. Fingerprints moved because decks/_evasion.py was regenerated (in every deck's fingerprint since 0z29) and because engine.py, lorehold.py, tivit.py and shilgengar.py gained name-guarded branches for four new cards plus the 0z38 flashback-exile fix. check_unchanged_decks against a worktree at 488cc61: BIT-IDENTICAL on all 8 metrics for all six decks, 0 decks moved. WHOLE OUTPUT COMPARED TOO (0z32): every numeric key summed over 80 baseline games per touched deck -- lorehold 100->103 keys, rendmaw 53->54, shilgengar 49->50, tivit 66->67; the added keys are exactly the five new counters, all zero in a baseline game, and NO shared key moved. The 0z38 fix does not move any baseline because Past in Flames is a MEASURED candidate and not a member of the lorehold list, so no deck in the baseline casts a flashback spell.",
+            "fingerprint": "eae16ec88094cdbb",
+            "utc": "2026-09-21T03:26:35Z"
+          },
+          {
+            "commit": "d23e650",
+            "evidence": "\u00a70z39 monarch (engine.py BaseGame.monarch + opponents.py monarch lifecycle). check_unchanged_decks baselines, same seeds both sides, worktree at d23e650: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check -- every numeric output key identical on all six decks (425 keys total). Nothing grants the crown, so g.monarch is False in every measured game and the crn_random roll is never consumed; tests/test_monarch.py case H asserts that. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "7d2b7828b777b3bb",
+            "utc": "2026-09-22T03:21:00Z"
+          },
+          {
+            "commit": "42015bb",
+            "evidence": "\u00a70z39 monarch, complete change incl. the owner's attack-floor correction (monarch_attack_share) and monarch_start_turn. check_unchanged_decks baselines vs worktree at d23e650, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. AND \u00a70z32's wider check: every numeric output key identical on all six decks (425 keys). Every monarch path is gated on g.monarch, nothing grants the crown, so the crn_random roll is never consumed -- tests/test_monarch.py case H asserts it. validate +0.00 on all 18 metrics, corr 0.9101 unchanged.",
+            "fingerprint": "3e94ec578383db0f",
+            "utc": "2026-09-22T12:42:29Z"
+          },
+          {
+            "commit": "cdbc6f7",
+            "evidence": "\u00a70z40 Ginger, Queen of Sweets imported into karlov (karlov.py + the card constant + regenerated _evasion.py). check_unchanged_decks baselines vs a worktree at cdbc6f7, same seeds both sides: BIT-IDENTICAL on all 8 metrics, 0 of 6 decks moved. The card is a module-level CANDIDATE and is in no built list, and both new hooks early-return without the crown, so no measured game reaches them. validate +0.00 on all 18 metrics.",
+            "fingerprint": "b20ff0857028d7aa",
+            "utc": "2026-09-22T13:52:17Z"
+          },
+          {
+            "commit": "408de74",
+            "evidence": "2026-09-22 \u00a70z41/\u00a70z42/\u00a70z43 (Horn of Greed moved out of azusa's doubled loop; decking loses via engine.drew_from_empty with the engine.draw_is_safe pilot guard in azusa and lorehold only; engine.lookahead_pick wired into all six main_phases behind cast_lookahead=False; Traveling Chocobo classified in SCRIPTED_AZUSA). check_unchanged_decks against a worktree at 7e4fe90: BIT-IDENTICAL on all 8 metrics for this deck at the new defaults, and for all six decks with decking_loss=False,horn_doubled_legacy=True. AND ON THE STAGED LIST, which is what this cache was measured on: diagnostics/run_shared_code_shift at N=15,000, T10 and T20, the rule on against off -- IDENTICAL GAME FOR GAME on every metric (0 of 15,000 results changed at each horizon). The committed table re-renders BYTE-IDENTICAL from its cache (tests/test_metrics_and_render). No number moved.",
+            "fingerprint": "531a758663f26f42",
+            "utc": "2026-09-22T18:25:10Z"
+          },
+          {
+            "commit": "2128a3b",
+            "evidence": "Chocobo committed to azusa_v1.py (2026-09-22). For THIS deck the only moved file is the regenerated decks/_evasion.py, which dropped 'Yavimaya Elder' from HUMAN and SCANNED because the Elder left the only list that held it -- no card in this deck changes. check_unchanged_decks vs a worktree at 2128a3b, same seeds both sides: BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "3be53fece29c4acd",
+            "utc": "2026-09-22T20:58:42Z"
+          }
+        ]
+      },
+      {
+        "built_at": "f95ee2bd46e7e94e",
+        "built_commit": "1dce50c",
+        "built_utc": "2026-09-26T04:16:34Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "b6f957b",
+            "evidence": "2026-09-26, \u00a70z61/\u00a70z62: opponents.py (menace_of, chump -- the old blocking rule exactly when nothing has menace, proved over 400 random boards; known_win_share and counter_threat, read only when an engine sets g.known_win, which only lorehold does), decks/_evasion.py regenerated (MENACE added; no deck in this list holds a menace creature). check_unchanged_decks vs a worktree at b6f957b, same seeds both sides: BIT-IDENTICAL on all 8 metrics for this deck (only rendmaw and lorehold moved). validate +0.00 on all 18 metrics.",
+            "fingerprint": "ad40508ae8ef965a",
+            "utc": "2026-09-26T13:43:43Z"
+          }
+        ]
+      },
+      {
+        "built_at": "a7e7b45e612fd50d",
+        "built_commit": "748e1c6",
+        "built_utc": "2026-09-26T18:25:50Z",
+        "deck": "karlov",
+        "verified": []
+      },
+      {
+        "built_at": "fe1e6f8df4b26788",
+        "built_commit": "6887c87",
+        "built_utc": "2026-09-27T00:09:31Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "933c91a",
+            "evidence": "check_unchanged_decks at N=400, HEAD 933c91a vs the \u00a70z70-\u00a70z73 tree at its defaults (sac_outlets_pay, sac_outlets_timing=end, sieve_real_fuel=combo, the merged hybrid-aware engine.devotion, Daxos's devotion toughness): karlov BIT-IDENTICAL on all 8 metrics. Only rendmaw and tivit moved.",
+            "fingerprint": "d88f716c323d61d3",
+            "utc": "2026-09-27T02:28:10Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386 -- all six decks BIT-IDENTICAL on all 8 metrics, and every numeric output key summed over 250 games per deck identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "8db6c0e5eb66acbb",
+            "utc": "2026-09-29T01:38:32Z"
+          },
+          {
+            "commit": "92f9a15",
+            "evidence": "\u00a70z74 (Mystery Booster Commander Edition, 2026-09-29): check_unchanged_decks against a worktree at f2eb386, re-run after tag_flying --write -- all six decks BIT-IDENTICAL on all 8 metrics; every numeric output key summed over 250 games per deck also identical. The new cards are catalogue-only and the shared hooks are opt-in, so no baseline moved.",
+            "fingerprint": "bf9b067291886e63",
+            "utc": "2026-09-29T01:39:23Z"
+          }
+        ]
+      },
+      {
+        "built_at": "ae97d771ca2d3fa2",
+        "built_commit": "35db4de",
+        "built_utc": "2026-09-29T08:22:38Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "c6f42ea",
+            "evidence": "2026-09-29 (\u00a70z80): pending.funnel(), ablation.known_names and the Yavimaya Elder prune touch no simulation. check_unchanged_decks against a worktree at c6f42ea -- all six decks BIT-IDENTICAL on all 8 metrics, for the deck modules AND the staged lists (build_pending, N=400).",
+            "fingerprint": "212f0c1f7ec19bfc",
+            "utc": "2026-09-29T12:27:12Z"
+          },
+          {
+            "commit": "f967ce2",
+            "evidence": "2026-09-29 (\u00a70z81): the staged Changes' reverified strings were appended; nothing else. check_unchanged_decks against a worktree at f967ce2 -- all six decks BIT-IDENTICAL on all 8 metrics, deck modules AND staged lists.",
+            "fingerprint": "212f0c1f7ec19bfc",
+            "utc": "2026-09-29T12:56:07Z"
+          }
+        ]
+      },
+      {
+        "built_at": "21ee64f700368bfc",
+        "built_commit": "244cdf1",
+        "built_utc": "2026-10-01T01:01:20Z",
+        "deck": "karlov",
+        "verified": []
+      },
+      {
+        "built_at": "0e6776c8f21d69ac",
+        "built_commit": "926bc46",
+        "built_utc": "2026-10-01T03:16:03Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "fe768bb",
+            "evidence": "\u00a70z97 (2026-10-01): opponents.incidental_damage no longer breaks its loop when the crown is lost. check_unchanged_decks against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. No staged list holds a card that grants the monarch (checked by name over build_pending), so the crown path is never entered in this deck's measured games.",
+            "fingerprint": "e116d0b6358ea0df",
+            "utc": "2026-10-01T14:22:05Z"
+          },
+          {
+            "commit": "186ba49",
+            "evidence": "\u00a70z98 (2026-10-01): id()-keyed state now holds its permanent (trostani, engine.walker_ready, azusa pw_used). check_unchanged_decks, current tree against baselines measured at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics at 400 seeds (the tool's default; first recorded here as 3,000 in error, corrected 2026-10-02, \u00a70z100).",
+            "fingerprint": "fafd2746097ddc4b",
+            "utc": "2026-10-01T20:28:39Z"
+          },
+          {
+            "commit": "0b767bf",
+            "evidence": "\u00a70z100 (2026-10-02): engine.begin_game holds every Card and Permanent for the game. check_unchanged_decks --n=3000, current tree against a worktree at the cache's built commit 926bc46: karlov BIT-IDENTICAL on all 8 metrics. Also: all of this deck's \u00a70z99 groups (15,000 games each) reproduced bit for bit on the held engine.",
+            "fingerprint": "e1bdc10070aa68d9",
+            "utc": "2026-10-02T20:14:30Z"
+          },
+          {
+            "commit": "8887ad4",
+            "evidence": "\u00a70z101 (azusa batch 6: seven candidate payoffs, the */* counter fix, PLANT, Avenger's Plants, Zendikar's Roil in LAND_ENABLERS, a widened coverage check; tag_flying regenerated _evasion.py with a PLANT set). check_unchanged_decks --n=3000 against a worktree at 8887ad4, where this cache is VERIFIED against its built commit (\u00a70z100): BIT-IDENTICAL on all 8 metrics, all seven decks. Azusa additionally: every one of 90 numeric output keys summed over 1,000 games identical, the 16 new counters all zero. No candidate is in any list.",
+            "fingerprint": "9d5d32307eefd7cd",
+            "utc": "2026-10-03T02:25:13Z"
+          },
+          {
+            "commit": "fd2ccd9",
+            "evidence": "\u00a70z102 (2026-10-03): azusa's list changed (-Wayward Swordtooth +Mole Man) and _evasion.py/_removal.py were regenerated (scanned-name lists only; no flag or removal share moved). check_unchanged_decks --n=3000 against fd2ccd9, where this cache was VERIFIED: karlov BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "92f780e195dfbf64",
+            "utc": "2026-10-03T14:04:06Z"
+          },
+          {
+            "commit": "51fa782",
+            "evidence": "\u00a70z103 (2026-10-03): azusa's list changed (-Life from the Loam +Mossborn Hydra) and _evasion.py/_removal.py were regenerated (scanned-name lists only). check_unchanged_decks --n=3000 against 51fa782, where this cache was VERIFIED: karlov BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "826e0780ff9e462d",
+            "utc": "2026-10-03T21:33:32Z"
+          }
+        ]
+      },
+      {
+        "built_at": "dfaee5d4e6e59dd1",
+        "built_commit": "1322273",
+        "built_utc": "2026-10-05T01:14:20Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "0c15a51",
+            "evidence": "2026-10-05 (\u00a70z105): the only fingerprint change is edhmc/decks/_removal.py dropping Goldspan Dragon from SCANNED (a name in no list) after the swap's withdrawal. check_unchanged_decks --n=3000, working tree vs worktree at 77897a8: all seven decks BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "acb0425cd9928b94",
+            "utc": "2026-10-05T03:08:24Z"
+          }
+        ]
+      },
+      {
+        "built_at": "77e4a6364e1aad57",
+        "built_commit": "a1cdd9e",
+        "built_utc": "2026-10-05T13:57:11Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "1c237d2",
+            "evidence": "2026-10-06 (\u00a70z112): the deck modules now build one Card object per copy of a basic, and pending.validate refuses an aliased list; tivit's Havengul fix touches no other deck. check_unchanged_decks --n=3000, working tree vs worktree at a1cdd9e: karlov BIT-IDENTICAL on all 8 metrics; diag_card_aliasing at N=15,000, every numeric output key: 0 games differ.",
+            "fingerprint": "f601d4d3699c41a3",
+            "utc": "2026-10-06T03:36:04Z"
+          },
+          {
+            "commit": "669afff",
+            "evidence": "2026-10-06, after \u00a70z113's land-candidate engine changes (named_land_mana, PAINFUL_RANK in can_pay, Tomb damage in on_mana_tap, shilgengar land lifegain, lorehold Command Beacon, tivit Treasure Vault, azusa fetch variants): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (the commit this cache was built at) -- BIT-IDENTICAL on all 8 metrics. Every new path is guarded by a card name no list holds.",
+            "fingerprint": "39fcd5ed52e9e738",
+            "utc": "2026-10-06T12:56:29Z"
+          },
+          {
+            "commit": "29f939d",
+            "evidence": "2026-10-06, after \u00a70z114 (azusa's Eye of Ugin tutor and Kozilek cast draw in azusa.py; Kozilek/Ulamog/Fabled/Evolving classification in tools/ablation.py, azusa entries only): check_unchanged_decks --n=3000 against a worktree at a1cdd9e (this cache's built commit) -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "a44cad0d763486a2",
+            "utc": "2026-10-06T14:04:23Z"
+          }
+        ]
+      }
+    ],
+    "verified": []
+  }
+}
