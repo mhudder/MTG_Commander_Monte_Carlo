@@ -164,6 +164,7 @@ Methodology that used to live at the end of this file is now
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, N=15,000, each in place of the basic it would replace). **Azusa's fetches +0.0165 to +0.0188 at T20** -- Evolving Wilds and Fabled Passage, which pay no life, inside the true fetches' bar; Field of the Dead +0.0098; **rendmaw's Gaea's Cradle +0.0104**. Ancient Tomb wins early and loses late (rendmaw's sign changes between horizons); the lifegain lands, Command Beacon and tivit's Treasure Vault are blanks. The test found `can_pay`'s surplus rule spending the Tomb on a {1}: pain now leads the generic key. Nothing staged |
 | [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were both missing** (azusa), Kozilek labelled SCRIPTED. Implemented: **+0.0224 ±0.0033 at T20**; the Eye now ties a Forest at T20 where it cost 0.011. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237, both horizons. Awaken the Woods' Kozilek cut was priced on the broken card |
 | [0z115](#0z115) | FIXED | **Lands play by their own text**: entry conditions, painland/horizon/fetch/shock life and karoos generated from Scryfall into `LAND_RULES`; Temple of the False God, Nykthos, Eldrazi Temple and **Vault of the Archangel -- free permanent lifelink in karlov, worth 0.028** -- corrected; Mikokoro, Geier Reach (lorehold **+0.0115**), the Castles, High Market, Phyrexian Tower, Petrified Field, Crystal Vein implemented. Life and entry costs take 0.007-0.032 from every deck. Trostani moved through a latent bug: an uncracked fetch paid {1}. The shock policy does not matter. All seven tables SUSPECT: the rebuild is unblocked |
+| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks against Scryfall: card DATA is clean, and thirteen modelled behaviours contradict the text.** The worst: **Kokusho** (shilgengar, SCRIPTED) has no code at all; **Biotransference** (rendmaw, BLIND) is unimplemented though it makes every creature spell a Rendmaw trigger; lorehold's **discard costs are never paid** (four cards a card up); **Avacyn and Angel of Suffering are not tagged Angels**; **Coercive Portal** never sacrifices itself and wipes creatures only; **Mother of Runes** protects from HAND; **Damn** is a two-mana wrath in three decks. Nothing measured or fixed yet |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10108,6 +10109,183 @@ ability; `fetch_waits` now gives it none, in every engine.
   this work was done ahead of is now unblocked. The staged swaps should be
   re-measured on this engine at the same time (§0z81's restage).
 * `tests/test_land_rules.py`: 26 cases, 14 mutations, exact sets.
+
+## 0z116. OPEN — oracle re-audit of all seven decks: the data is clean, thirteen behaviours are not the text
+
+Every card in the seven built lists, plus the staged additions (589 distinct
+names), fetched from `api.scryfall.com/cards/collection` on 2026-10-07, and
+every engine read against the oracle text it claims to implement. Each
+finding marked *verified* was reproduced at runtime against a constructed game
+state, not inferred from reading. **Nothing here is measured and nothing is
+fixed**: this is the list, ordered by how much of a card the engine gets
+wrong, for the owner to choose from.
+
+### The data audit
+
+`python -m tools.audit_cards`: 710 card slots, **2 ERR, 8 WARN, 32 NOTE**.
+Both ERRs are false positives in the AUDIT, not the deck: trostani's Chord of
+Calling and Green Sun's Zenith carry their pips only and `trostani.x_plan`
+chooses X per target at cast time, a convention `audit_cards` does not know
+(it only knows azusa's and karlov's fixed-X `x_pips`). The WARNs are the
+documented restricted-mana lands and two candidates. **Costs, P/T, types,
+flying and land data are clean in all seven lists.**
+
+### Text the engine contradicts -- whole clauses missing or wrong
+
+1. **Kokusho, the Evening Star** (shilgengar, SCRIPTED as "a REAL death
+   trigger"). "When Kokusho dies, each opponent loses 5 life. You gain life
+   equal to the life lost this way." **No code in `edhmc/` reads the name.**
+   *Verified*: sacrificed, it moves no life total. A vanilla 5/5 flier in the
+   deck built to sacrifice and mass-reanimate.
+2. **Biotransference** (rendmaw, KNOWN_BLIND). Every clause is model-visible
+   and the first is central to the commander: creatures -- and creature
+   SPELLS -- are artifacts, so every creature spell is a two-type card and a
+   Rendmaw Bird for each player; Foundry Inspector discounts creature spells;
+   Scrap Trawler, Myr Retriever and Junk Diver can return creature cards; and
+   each artifact spell cast costs 1 life and makes a 2/2 Necron. Unimplemented,
+   so its row is the blank it was made into -- CLAUDE.md's tell exactly.
+3. **Lorehold's discard costs are never paid.** Thrill of Possibility, Big
+   Score, Unexpected Windfall ("As an additional cost ... discard a card") and
+   Faithless Looting ("draw two cards, then discard two cards"):
+   `apply_spell_effects` fires Monument to Endurance for the discard and
+   removes no card from hand. *Verified*: hand 6 -> 8 for all four, where the
+   text gives 7, 7, 7 and 6. The discards also never reach the graveyard
+   (Bombardment, the Archaic, Mastery) or Library of Leng's redirect to the top.
+4. **Shilgengar's subtype tags are hand-typed and wrong** -- §0z4's rule that
+   subtypes are data from Scryfall, not memory. Avacyn, Angel of Hope and
+   Angel of Suffering carry no `angel` tag; Bishop of Wings no `cleric` tag.
+   *Verified*: Avacyn fed to Shilgengar makes 1 Blood, not 8; Angel of
+   Suffering 1, not 3. Neither is seen by Righteous Valkyrie, Bishop of Wings,
+   Youthful Valkyrie, Giada, either Lyra, Herald of War or Seluma, and Bishop
+   entering does not trigger Righteous Valkyrie. Nothing checks these tags.
+5. **Coercive Portal** (tivit). Carnage: "sacrifice this artifact and destroy
+   all NONLAND PERMANENTS". The engine calls `resolve_own_wipe(g)` --
+   creatures only -- and never sacrifices the Portal. *Verified*: under the
+   default adversarial vote carnage wins (three votes to Tivit's two), and
+   after it the Portal, Sol Ring and every Treasure are still there, so the
+   Portal is a creature wipe (Tivit included) every upkeep.
+6. **Mother of Runes** (karlov) is the whole of `protection_cards`, which
+   `opponents.try_protect` reads from HAND: with four lands she is discarded
+   to blank a removal event or a board wipe. *Verified*. Her text is a {T}
+   ability on the battlefield; protection from a colour never stops an
+   untargeted wrath. §0z35's tie-break ("cutting Mother of Runes closes
+   `try_protect()` outright") rests on this channel. Lorehold's Sejiri
+   Shelter (one creature, protection from a colour) and un-gifted Dawn's
+   Truce (hexproof) blank wipes the same way: `try_protect` has no notion of
+   which event a card answers.
+7. **Damn** (karlov, shilgengar, tivit) is cast for {B}{B} with the `wipe`
+   tag, so it is a two-mana wrath. The wrath is its overload, {2}{W}{W}; at
+   {B}{B} it is single-target removal. The deck modules' own note says it is
+   "modelled as the removal spell it is cast as"; the tag says otherwise.
+8. **Kambal, Profiteering Mayor** (tivit): "Whenever ONE OR MORE tokens you
+   control enter" is one trigger per batch. `on_tokens_created` drains per
+   token. *Verified*: one batch of five Treasures takes 15 from the pod where
+   the text takes 3; with Academy Manufactor a dilemma is 15 drains, not 1.
+9. **Primal Vigor's second clause** ("+1/+1 counters ... twice that many")
+   is implemented in trostani (`counter_doubler`) and nowhere in rendmaw,
+   where Metallic Mimic, The Great Henge, Verdurous Gearhulk, Steel Overseer
+   and Woe Strider's escape all place counters. §0u.
+10. **Culling Ritual** (rendmaw) resolves as a full creature wipe, both sides,
+    Rendmaw (MV 5) included; the text destroys each nonland permanent of
+    MANA VALUE 2 OR LESS -- tokens, Sol Ring, the signets, the Myr -- and adds
+    {B} or {G} for each. **Ondu Inversion** ("all nonland permanents") and
+    **Ultima** ("all artifacts and creatures. End the turn.") resolve as
+    creature-only wipes. **Promise of Loyalty** (lorehold, tivit) is a full
+    wipe where each player, you included, keeps one creature.
+11. **Giada, Font of Hope** (shilgengar): the extra counters are applied only
+    to Angel TOKENS (`make_angel_tokens`); a cast or reanimated Angel gets none.
+12. **Steel Overseer** (rendmaw): its {T} ability is free and runs in
+    `activations`, after combat -- so it attacks AND activates every turn.
+13. **Green Sun's Zenith** (azusa) goes to the graveyard; the text shuffles it
+    into the library (trostani does). Regrowth and Eternal Witness can rebuy it.
+
+### Labels that claim more, or less, than the engine does
+
+* SCRIPTED with a clause missing: Kalitas (karlov -- no code reads the name;
+  the 3/4 lifelink body is all of it), both Sorins (documented in
+  `WALKERS_WITHOUT_LOYALTY`; Solemn Visitor's +1/+0 is also missing, and
+  `karlov.py`'s comment that "karlov's list holds no planeswalker" is false),
+  Elesh Norn (shilgengar: her -2/-2 has no handler and her +2/+2 skips the
+  commander), Kokusho (above).
+* KNOWN_BLIND although the engine runs a script: Torment of Hailfire and
+  Rhystic Study (tivit), Massacre Wurm (rendmaw -- a full one-sided wipe).
+* KNOWN_BLIND although the text is model-visible: Biotransference, Midnight
+  Reaper, Haywire Mite and Bow of Nylea's attacking deathtouch (rendmaw; Ohran
+  Frostfang's identical clause IS read), Hexing Squelcher ("Spells you control
+  can't be countered" -- the pod's counterspells are modelled; see below),
+  Gamble (lorehold), Bloodghast (shilgengar), **Crop Rotation** (azusa --
+  listed as "land destruction aimed at opponents"; it is a land tutor to the
+  battlefield, two land events in the landfall deck), Storm Cauldron's extra
+  land drop.
+
+### The same card, implemented differently per engine (§0u, §0z16)
+
+| card | one engine | the other |
+|---|---|---|
+| Massacre Wurm | rendmaw: full one-sided wipe, no drain, BLIND | shilgengar: 35% cull, 2 life a kill, SCRIPTED |
+| Midnight Reaper | rendmaw: absent, BLIND | shilgengar: implemented |
+| Sun Titan | karlov: absent, BLIND | shilgengar, trostani: implemented |
+| Sylvan Library | azusa: BLIND | trostani: SCRIPTED |
+| Land Tax | karlov: `min(turn, 8)`, any basic | lorehold: `min(turn, 10)`, Plains only |
+| Smothering Tithe | lorehold: 2 a round | shilgengar: 1 per living opponent |
+| Extra turns | tivit: a full turn, pod skipped | lorehold: the pod's round FIRST, then a turn with no land drop or upkeep |
+| Aetherflux Reservoir | trostani: triggers on cast, countered or not | karlov: on resolution only, and not for the commander |
+
+### Rules this model has and nobody reads
+
+* **"Can't be countered" exists nowhere**, though `opponents.countered`
+  counters your spells: Hexing Squelcher, Rise of the Eldrazi (12 mana,
+  threat 9 -- the deck's likeliest counter target), Cavern of Souls'
+  creature spells (four decks), Void Rend and Dovin's Veto.
+* **Pathways are modelled as permanent duals** (Darkbore, Needleverge,
+  Brightclimb). A pathway is a modal double-faced card: you choose one face
+  as you play it and it taps for that one colour. The audit passes it because
+  Scryfall's `produced_mana` lists both faces.
+* **Cast triggers skip countered spells** in karlov (Reservoir, extort) and
+  rendmaw (its own "whenever you play a card with two or more card types").
+* **Uncharged life costs** (§0i's rule): Anguished Unmaking's 3 life (karlov,
+  shilgengar) and Toxic Deluge's X (karlov, rendmaw).
+
+### Smaller departures, one line each
+
+* karlov: Land Tax omits its shuffle; extort pays {W/B} from any source;
+  Syr Konrad and Blood Artist miss your wipes' kills on the pod's side, and
+  Konrad its other two clauses and its mill; Aetherflux fires only at upkeep.
+* rendmaw: Coat of Arms counts attacking Birds only (not Zombies, Saprolings,
+  Spiders, Myr, non-attacking Birds -- or March of the World Ooze making
+  everything an Ooze); Beastmaster Ascension keeps no quest counters between
+  combats; Verdurous Gearhulk's counters go to the first creature in board
+  order; Ophiomancer ignores Sakura-Tribe Elder and Shigeki (both Snakes);
+  Ohran Frostfang draws per attacker, not per connection; Roaming Throne
+  doubles Rendmaw's play trigger but not its ETB.
+* lorehold: Sensei's Divining Top's {1} is never paid, before each of four
+  windows a round; Smothering Tithe ignores the draws Reforge the Soul and
+  the draw lands force; Blasphemous Act counts the pod's creatures as 3.
+* tivit: Revel in Riches and Mechanized Production can win mid-turn in
+  `convert_the_pile`; under adversarial voting Tyrant's Choice always takes
+  the 4-life mode (a pod voting against you votes death); Messenger Jays
+  discards nothing for its draws, and it and Lieutenants drop their counters.
+* shilgengar: Revel in Riches wins at your END step (text: your upkeep);
+  Emeria Shepherd always returns to the battlefield (only off a Plains);
+  Resplendent Angel checks only your end step; Speaker taps while sick.
+* azusa: "then shuffle" is honoured for fetches and not for the spell
+  searches (Cultivate, Kodama's Reach, Seek the Horizon, Journey, Realms
+  Uncharted, Nylea's Intervention, Chord, Zenith, Bellower, Nissa's ETB,
+  Yavimaya Elder) in the deck with five top-of-library land sources; Tireless
+  Provisioner's Treasure empties with the turn; Momentous Fall sacrifices the
+  smallest token; Realms Uncharted is two Forests.
+* trostani: Sylvan Library may put back only the two extra cards, not the
+  draw step's. The rest of the engine reads its text faithfully -- the most
+  faithful of the seven.
+
+### What to do with it
+
+Each numbered item above is a §0z114-sized fix with a test behind it, and
+each moves its deck's baseline, so they belong in ONE batch ahead of the
+rebuild §0z115 already unblocked. Items 1-5 are the ones the project's own
+tell would have caught: a card whose text is central and whose row is
+ordinary. The audit tool's ERR for trostani's X-spells should learn the
+cast-time-X convention, or it will teach the next reader to ignore an ERR.
 
 ## How to read an ablation table
 
