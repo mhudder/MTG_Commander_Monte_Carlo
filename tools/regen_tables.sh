@@ -97,9 +97,11 @@ N=15000
 #
 # `DECKS="azusa lorehold" ./tools/regen_tables.sh` rebuilds ONLY those decks
 # -- CLAUDE.md's rule is that only a deck whose baseline moved is rebuilt, and
-# at ~2.3 CPU-hours a deck the other four are not free. The default is all of
-# them; trostani joined with the deck on 2026-10-01.
-for deck in ${DECKS:-lorehold rendmaw karlov tivit shilgengar azusa trostani}; do
+# at ~2.3 CPU-hours a deck the other four are not free. The default is every
+# deck a review covers, read from edhmc/registry.py: a SUSPENDED deck is left
+# out, and is rebuilt only when named (`DECKS=trostani ./tools/regen_tables.sh`).
+ACTIVE_DECKS=$(python -m edhmc.registry --active) || exit 1
+for deck in ${DECKS:-$ACTIVE_DECKS}; do
     cache="results/caches/ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"
     : > "results/ablation_${deck}.log"

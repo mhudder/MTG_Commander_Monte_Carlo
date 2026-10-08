@@ -1959,26 +1959,14 @@ MEASURED: list[Candidate] = [
             "Would rank 14th of 44, inside the bars of Courser of Kruphix, "
             "Augur of Autumn, Animist's Awakening and Lotus Cobra. An "
             "eight-drop that resolves in 27.4% of games on turn 9.7, so it is "
-            "a late-game card in a deck whose games end around turn 12."
-        ),
-        shortlist=(
-            "is here: third of the six and the only one that is not competing "
-            "for a cheap slot -- it is a TOP-END card, so it can be reviewed "
-            "against the expensive rows rather than against the deck's "
-            "two- and three-drops. Its +0.0188 is also the most robust number "
-            "of the three, with the tightest bar. "
-            "SHORTLISTED 2026-09-14 for review, NOT decided."
-        ),
-        proposed_cut="Kozilek, Butcher of Truth",
-        cut_unmeasured=(
-            "KOZILEK BECAME PARTLY MODELLED ON 2026-10-06 (§0z114), and the "
-            "change matters to THIS pairing: its 'When you cast this spell, "
-            "draw four cards' was MISSING when the shortlist named it as the "
-            "cut, so every number that priced Kozilek (its ablation row, and "
-            "KNOWN_ISSUES's +0.0056 head-to-head) understated it. It is "
-            "modelled now; the graveyard-shuffle clause still is not, so its "
-            "row is a floor. RE-MEASURE THIS HEAD-TO-HEAD before acting on it "
-            "-- Eye of Ugin's tutor, also new, finds Kozilek first."
+            "a late-game card in a deck whose games end around turn 12. "
+            "SHORTLIST WITHDRAWN BY THE OWNER, 2026-10-08, for now: it was "
+            "shortlisted 2026-09-14 against Kozilek, Butcher of Truth, and "
+            "the §0z119 rebuild put Kozilek at +0.0116 +-0.0020 (T10) and "
+            "+0.0268 +-0.0035 (T20) -- sixth in azusa at T20, up from "
+            "+0.0077 once its cast draw was modelled (§0z114). The head-to-head "
+            "was never run. Not refuted: the +0.0188 row above stands, and "
+            "re-shortlisting it means naming a different cut."
         ),
     ),
     Candidate(

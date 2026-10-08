@@ -521,6 +521,12 @@ def check_caches_recorded() -> Result:
     CURRENT and VERIFIED both pass. VERIFIED means someone ran the check and
     recorded what it showed, which is a stronger statement than CURRENT.
 
+    SUSPENDED passes too, and THAT IS AN EXEMPTION (§0z15): a deck the owner
+    suspended in `edhmc/registry.py` is out of every review, so a moved
+    fingerprint on it is expected and nobody will check it. What this check is
+    then blind to is whether that deck's numbers still describe HEAD -- which
+    the state's own text, in STATUS and ABLATION_CACHES, says they may not.
+
     AN UNMERGED PROVENANCE SHARD FAILS IT TOO (§0z94): a parallel rebuild
     session stamps its deck into `provenance.<deck>.json`, and until the
     coordinator's `--merge-shards` folds it in, PROVENANCE.json describes the

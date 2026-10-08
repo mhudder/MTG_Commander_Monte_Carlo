@@ -168,6 +168,7 @@ Methodology that used to live at the end of this file is now
 | [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference implemented through `card_types` (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), shilgengar's Angel/Cleric tags derived from Scryfall (+0.0047), Coercive Portal's real carnage (costs tivit 0.011 under adversarial voting). Karlov, azusa, trostani bit-identical |
 | [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks; protection answers the events its text answers, and **Mother of Runes, home by the owner's rule, makes one removal a round fizzle: +0.007 to karlov**; four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0054 with no commander SHROUD**: a shroud redirects the pod's removal to its engine pieces. Trostani bit-identical |
 | [0z119](#0z119) | REBUILT | **All seven tables rebuilt at bd9e7ae** (parallel, slowest leg 53 min). Every sign flip is a fix's own card: **Mother of Runes now positive** (+0.0037 T20), Coercive Portal negative, Bramble Sovereign back; Biotransference, Kokusho, Kozilek up; lorehold's discard spells down with its paid discards. **The legs ran Python 3.13 and the interpreter matters**: 3.11 plays one game in 15,000 differently -- the coordinator moved to 3.13, proven by `tools/repro_row.py`. All nine staged swaps significant at both horizons |
+| [0z120](#0z120) | DECIDED | **Trostani is SUSPENDED** from every review and re-measure, by the owner (2026-10-08): one entry in `edhmc/registry.py`, read by `regen_tables.sh`, `check_unchanged_decks` and the cache manifest, whose new SUSPENDED state keeps `check_docs` green when the code moves under it. **Awaken the Woods' shortlist against Kozilek is withdrawn** -- Kozilek is +0.0268 at T20 since §0z114 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10558,10 +10559,21 @@ tables at bd9e7ae:
 | tivit | 26 of 130 | **1** | **Coercive Portal +0.0074 → −0.0038 at T20** (its real carnage, §0z117); **Kambal +0.0198 → +0.0077 at T10** (once per batch, §0z118) while Mirkwood Bats rises (+0.0360 → +0.0431): the per-token drain is now the Bats' alone; Time Sieve, Deadeye Navigator, Nadier's Nightblade up |
 | shilgengar | 17 of 128 | 0 | **Kokusho +0.0039 → +0.0095** (§0z117); the tribe up with its tags and Giada (Righteous Valkyrie, Angel of Suffering, Giada +0.0024 → +0.0057, Bishop of Wings); Teferi's Protection +0.0016 → +0.0044 (a wrath you phase out of kills theirs, §0z118) |
 | azusa | 22 of 116 | 0 | **Kozilek +0.0077 → +0.0268** (its cast draw, §0z114); Crucible of Worlds and Ramunap Excavator up with the fetches' real rules (§0z115); the staged Ka-Zar slightly down |
-| trostani | 33 of 122 | **1** | its old table predated the adopted priorities (§0z110): **Seedborn Muse +0.0225 → +0.0447**, King Darien +0.0169 → +0.0341, and Bramble Sovereign's T10 row flips −0.0095 → +0.0029 back at 8.5 (§0z111) |
+| trostani | 33 of 122 | **1** | *(corrected 2026-10-08, below)* the old table was §0z111's, at f07700b -- all five §0z110 moves, **Bramble Sovereign at 10.5**. What moved the deck since, as those sections record: Bramble back to 8.5 (§0z111), basics no longer one object (§0z112, 7 games in 15,000) and an uncracked fetch no longer paying {1} (§0z115); §0z117 and §0z118 left it bit-identical. **Seedborn Muse +0.0103 → +0.0339 (T10), +0.0225 → +0.0447 (T20)** -- §0z111 found Bramble at 10.5 coming down ahead of it; King Darien +0.0169 → +0.0341 (T20); Bramble's T10 row flips −0.0095 → +0.0029. **Nesting Dovehawk +0.0103 → +0.0018 (T10)** gives back its §0z111 rise, and no fix names it |
 
 **Every sign flip is a fix's own card**, and no row moved that a fix does
-not name or that the deck's own level does not explain. **Damn** moved
+not name or that the deck's own level does not explain. **Except one, found
+on review (2026-10-08): Nesting Dovehawk**, above, which was not
+attributed; trostani was suspended the same day (§0z120), so it stays
+unexplained.
+
+**CORRECTED 2026-10-08.** The trostani row first said "its old table
+predated the adopted priorities (§0z110)". It did not: the cache it replaced
+was the §0z111 rebuild (`f07700b`), which carried all five moves with
+Bramble Sovereign at 10.5. The numbers were right and the attribution was
+not; the row now names what did move the deck.
+
+**Damn** moved
 nowhere significant in any of its three decks: karlov −0.0006 ±0.0018 at
 T20, tivit +0.0105, shilgengar +0.0074 -- a wrath at {2}{W}{W} that the gate
 fires late is still worth a slot at the long horizon.
@@ -10594,6 +10606,42 @@ and Kambal now drains once per batch (§0z118). Both are still significant
 at both horizons. The two fetches together hold
 their value; alone, Evolving Wilds is now only just outside its bar at T20 --
 the second fetch is worth less than the first, as §0z114 measured.
+
+## 0z120. DECIDED — Trostani suspended from review; Awaken the Woods' shortlist withdrawn
+
+The owner, 2026-10-08, reviewing the §0z119 rebuild.
+
+**TROSTANI IS SUSPENDED.** "I do not want it to be part of any review in the
+near future unlike the other 6 decks." The decision lives in ONE place,
+`edhmc/registry.py`'s `SUSPENDED` (with `ACTIVE`, the decks a review covers),
+and the review tools read it rather than a list of their own (§0q):
+
+| reads it | what changes |
+|---|---|
+| `tools/regen_tables.sh` | the default deck list is `python -m edhmc.registry --active`; trostani is rebuilt only when named |
+| `tools/check_unchanged_decks.py` | measures and diffs the ACTIVE decks; `--include-suspended` adds the rest |
+| `tools/cache_manifest.py` | a suspended deck's moved fingerprint reads **SUSPENDED**, not SUSPECT, so `check_docs` passes it |
+| `tools/status.py` | lists the suspended decks under the tables |
+| parallel-rebuild skill | launches the ACTIVE decks |
+
+**What is NOT suspended, on purpose:** the deck is still simulated by
+`python -m tests` and by `validate`'s A/A control, which check that the
+engine is correct and CRN holds, not what any card is worth -- so a shared-code
+change that breaks trostani still fails loudly. **What the checks are now
+blind to** (§0z15): whether trostani's table still describes HEAD. The
+SUSPENDED state's own text says the table describes its build commit
+(`bd9e7ae`). `tests/test_suspended.py` pins all of it, and its mutation
+(the manifest forgetting the suspension) breaks exactly the two cases
+written down before the run. Unsuspending is deleting the registry entry; the
+cache then reads SUSPECT if the code moved, and the evidence check applies.
+
+**AWAKEN THE WOODS' SHORTLIST IS WITHDRAWN.** It was shortlisted 2026-09-14
+against Kozilek, Butcher of Truth, and the head-to-head was never run. Since
+Kozilek's cast draw was modelled (§0z114) its row is +0.0116 ±0.0020 at T10
+and +0.0268 ±0.0035 at T20, sixth in azusa -- the cut the shortlist named is
+no longer a bottom card. The Candidate keeps its measured +0.0188 ±0.0029 row
+and the reason, in its `verdict`; re-shortlisting it means naming another
+cut.
 
 ## How to read an ablation table
 

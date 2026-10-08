@@ -1,5 +1,14 @@
-# Verified working on Python 3.12.3, 2026-09-03.
-# Lower bounds, not exact pins — nothing here depends on a specific patch release.
+# Lower bounds: any version at or above these RUNS the simulator.
+#
+# REPRODUCING a committed table exactly is a stricter matter. The interpreter
+# is part of a table's identity (§0z119): Python 3.11 and 3.13 play about one
+# game in 15,000 differently on the same seed, most likely because 3.12 made
+# float sum() compensated. The tables at the §0z119 rebuild were built on
+# Python 3.13.16 with numpy==2.4.6; `python -m tools.repro_row` reproduces
+# them on 3.13.12 and not on 3.11. A paired difference worth reporting is far
+# above one game in 15,000, so this matters only to a tool that must match a
+# cached number to the last bit -- and for those, match the interpreter and
+# numpy (.claude/skills/parallel-rebuild says how).
 numpy>=1.24
 scipy>=1.10
 openpyxl>=3.1

@@ -26,7 +26,7 @@ import os
 import subprocess
 import sys
 
-from edhmc.registry import DECKS
+from edhmc.registry import DECKS, SUSPENDED
 
 OUT = "docs/ABLATION_CACHES.md"
 CACHE_DIR = os.path.join("results", "caches")
@@ -307,6 +307,8 @@ def status_of(cache_name: str, prov: dict) -> tuple[str, str]:
     VERIFIED  they differ, and a recorded check says the deck's NUMBERS did
               not move across that difference. The cache is good.
     SUSPECT   they differ and nothing has checked. NOT condemned -- suspect.
+    SUSPENDED they differ, and the deck is SUSPENDED in `edhmc/registry.py`,
+              so nothing will check: a deliberate choice, not an oversight.
 
     The old policy was "if the fingerprint differs, DELETE the cache", and it
     was unusable: `engine.py`, `opponents.py`, `experiment.py` and
@@ -335,6 +337,15 @@ def status_of(cache_name: str, prov: dict) -> tuple[str, str]:
                 f"built at `{entry['built_at']}`; fingerprint has since moved "
                 f"to `{live}` and was CHECKED at `{v['commit']}` "
                 f"({v['utc']}): {v['evidence']}")
+    if entry["deck"] in SUSPENDED:
+        # Not SUSPECT: nobody is going to check, on purpose. The table stays
+        # the one built at `built_commit` and says so; check_docs passes it.
+        return "SUSPENDED", (
+            f"built at `{entry['built_at']}`, live is `{live}`, and the deck "
+            f"is SUSPENDED (`edhmc/registry.py`): "
+            f"{SUSPENDED[entry['deck']]} Its numbers describe "
+            f"`{entry['built_commit']}`, not HEAD. Unsuspend it before "
+            f"trusting or resuming onto this cache.")
     return "SUSPECT", (
         f"built at `{entry['built_at']}`, live is `{live}`. The fingerprint "
         f"moved and nothing has checked whether the NUMBERS did. Run "
@@ -454,7 +465,7 @@ def main():
         "Each cache records the fingerprint it was **built at** — stamped by",
         "the run that produced the numbers, in `ablation.py`'s `save()`, and",
         "never rewritten afterwards. Comparing that against the live",
-        "fingerprint gives three states:",
+        "fingerprint gives these states:",
         "",
         "| state | meaning | what to do |",
         "|---|---|---|",
@@ -464,6 +475,9 @@ def main():
         "evidence is below |",
         "| **SUSPECT** | they differ and nothing has checked | **check before "
         "resuming — do not assume either way** |",
+        "| **SUSPENDED** | they differ, and the deck is suspended in "
+        "`edhmc/registry.py` | the table describes its build commit; "
+        "unsuspend before resuming |",
         "| **UNRECORDED** | no provenance at all | do not resume onto it |",
         "",
         "**The old rule was \"if the fingerprint differs, DELETE the cache\",",

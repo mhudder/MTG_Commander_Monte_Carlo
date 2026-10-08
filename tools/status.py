@@ -34,7 +34,7 @@ import re
 import subprocess
 import sys
 
-from edhmc.registry import DECKS as REGISTRY
+from edhmc.registry import DECKS as REGISTRY, SUSPENDED
 from tools._generated import comparable, head
 
 OUT = os.path.join("docs", "STATUS.md")
@@ -311,6 +311,16 @@ def render() -> str:
     tot = sum(t.total for t in tables.values() if t.exists)
     w(f"**{tot} rows across {n_word} tables.**")
     w("")
+    if SUSPENDED:
+        # Read off edhmc/registry.py. A suspended deck's table is still here,
+        # and still the one its cache was built at -- it is just out of review.
+        w("**Suspended** — out of every review and re-measure until the entry")
+        w("in `edhmc/registry.py`'s `SUSPENDED` is deleted. Its table and cache")
+        w("stay, and describe the commit they were built at:")
+        w("")
+        for d in sorted(SUSPENDED):
+            w(f"- **{d}** — {SUSPENDED[d]}")
+        w("")
 
     # ---- caches
     w("## Ablation caches")

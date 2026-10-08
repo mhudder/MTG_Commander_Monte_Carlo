@@ -34,6 +34,11 @@ git status                      # clean
 git push origin <branch>        # the legs clone from the remote
 ```
 
+**Which decks:** `python -m edhmc.registry --active`. A deck in the
+registry's `SUSPENDED` is not launched unless the owner names it; its cache
+reads SUSPENDED, so `check_docs` stays green without it, and step 4's
+"every cache CURRENT" means every ACTIVE deck's.
+
 Record `git rev-parse --short HEAD` -- that is THE commit -- and the PINS, the
 exact package versions every leg must install:
 
@@ -113,7 +118,7 @@ python -m tools.status --write
 ```bash
 python -m tools.validate
 python -m tests                 # now fully green: the caches cover the decks
-python -m tools.check_docs      # now fully green: every cache CURRENT
+python -m tools.check_docs      # now fully green: every ACTIVE cache CURRENT
 python -m edhmc.pending
 ```
 

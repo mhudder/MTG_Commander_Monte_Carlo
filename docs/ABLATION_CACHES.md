@@ -17,13 +17,14 @@ removed that safety net, which is what this file replaced it with.
 Each cache records the fingerprint it was **built at** — stamped by
 the run that produced the numbers, in `ablation.py`'s `save()`, and
 never rewritten afterwards. Comparing that against the live
-fingerprint gives three states:
+fingerprint gives these states:
 
 | state | meaning | what to do |
 |---|---|---|
 | **CURRENT** | built-at equals live | resume freely |
 | **VERIFIED** | they differ, and a recorded check says the deck's NUMBERS did not move across that difference | resume freely; the evidence is below |
 | **SUSPECT** | they differ and nothing has checked | **check before resuming — do not assume either way** |
+| **SUSPENDED** | they differ, and the deck is suspended in `edhmc/registry.py` | the table describes its build commit; unsuspend before resuming |
 | **UNRECORDED** | no provenance at all | do not resume onto it |
 
 **The old rule was "if the fingerprint differs, DELETE the cache",
@@ -53,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `01d7d75`.
+Generated at `c2c568b`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 

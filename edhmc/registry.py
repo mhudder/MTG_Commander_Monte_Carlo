@@ -101,6 +101,31 @@ DECKS: dict[str, DeckSpec] = {
 }
 
 
+# SUSPENDED decks are still simulated -- by the tests, by `validate`'s A/A
+# control, by anything that asks for one by name -- but no REVIEW reaches
+# them: `regen_tables.sh` and `check_unchanged_decks` leave them out unless
+# asked, and a suspended deck's moved fingerprint reads SUSPENDED rather than
+# SUSPECT, so `check_docs` does not demand a rebuild nobody wants. What that
+# makes the checks blind to: a shared-code change that moves a suspended
+# deck. Its table goes on describing the commit it was built at, and STATUS
+# says so. Unsuspending is deleting the entry; the cache then reads SUSPECT
+# if the code moved, and the usual evidence check applies.
+SUSPENDED: dict[str, str] = {
+    "trostani": ("the owner, 2026-10-08: out of every review and re-measure "
+                 "for the near future. Table as rebuilt at bd9e7ae (§0z119)."),
+}
+
+# The decks a review covers, in registry order.
+ACTIVE: tuple[str, ...] = tuple(d for d in DECKS if d not in SUSPENDED)
+
+
+def check_suspended_are_decks() -> None:
+    stray = sorted(set(SUSPENDED) - set(DECKS))
+    if stray:
+        raise ImportError(f"edhmc/registry.py: SUSPENDED names {stray}, which "
+                          f"is not a deck in DECKS -- §0q.")
+
+
 def check_registry_matches_disk() -> None:
     """Raise if the registry and the deck modules on disk disagree."""
     from edhmc.decks import discover_current_decks
@@ -115,3 +140,11 @@ def check_registry_matches_disk() -> None:
 
 
 check_registry_matches_disk()
+check_suspended_are_decks()
+
+
+if __name__ == "__main__":
+    # `python -m edhmc.registry --active` prints the decks a review covers, for
+    # shell scripts: `regen_tables.sh` reads its default list from here.
+    import sys
+    print(" ".join(ACTIVE if "--active" in sys.argv[1:] else DECKS))

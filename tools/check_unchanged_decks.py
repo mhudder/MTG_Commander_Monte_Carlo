@@ -14,6 +14,9 @@ previous commit running the same seeds through both versions.
     (cd ../edhmc_head && python check_unchanged_decks.py --out old.json)
     python check_unchanged_decks.py --diff old.json new.json
 
+`--include-suspended` adds the decks `edhmc/registry.py` SUSPENDS, which are
+otherwise left out of both the measurement and the diff.
+
 `--cfg=k=v,k=v` sets knobs on the side it is passed to. A change that ships
 behind a knob claims the knob's OLD value reproduces the old code; running
 the new tree with `--cfg=<old values>` against a worktree at the old commit
@@ -27,9 +30,12 @@ regenerating, whatever the argument for why it should not.
 import json
 import sys
 
-from edhmc.registry import DECKS as REGISTRY
+from edhmc.registry import ACTIVE, DECKS as REGISTRY, SUSPENDED
 
-DECKS = tuple(REGISTRY)
+# The decks a review covers. A SUSPENDED deck (edhmc/registry.py) is left out
+# unless `--include-suspended` is passed -- its cache reads SUSPENDED, not
+# SUSPECT, so there is nothing for this check to clear.
+DECKS = ACTIVE
 METRICS = ("won", "lost", "damage", "cards_drawn", "turns_played",
            "final_life", "mana_spent", "stranded_mv")
 
@@ -87,7 +93,13 @@ def diff(old_path, new_path):
 
 
 def main():
+    global DECKS
     args = sys.argv[1:]
+    if "--include-suspended" in args:
+        DECKS = tuple(REGISTRY)
+    elif SUSPENDED:
+        print(f"  suspended, not checked: {', '.join(sorted(SUSPENDED))} "
+              f"(--include-suspended to add them)", file=sys.stderr)
     if "--diff" in args:
         i = args.index("--diff")
         diff(args[i + 1], args[i + 2])
