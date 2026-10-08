@@ -1,0 +1,268 @@
+{
+ "n": 15000,
+ "arms": {
+  "base": [],
+  "-Altar": [
+   "Ashnod's Altar"
+  ],
+  "-Rites": [
+   "Village Rites"
+  ],
+  "-Chef": [
+   "Dockside Chef"
+  ],
+  "-outlets": [
+   "Ashnod's Altar",
+   "Village Rites",
+   "Dockside Chef"
+  ],
+  "-Rites -Chef": [
+   "Village Rites",
+   "Dockside Chef"
+  ],
+  "-payoffs": [
+   "Blood Artist",
+   "The Meathook Massacre",
+   "Erebos, Bleak-Hearted"
+  ],
+  "-payoffs -Altar": [
+   "Blood Artist",
+   "The Meathook Massacre",
+   "Erebos, Bleak-Hearted",
+   "Ashnod's Altar"
+  ],
+  "-outlets -payoffs": [
+   "Ashnod's Altar",
+   "Village Rites",
+   "Dockside Chef",
+   "Blood Artist",
+   "The Meathook Massacre",
+   "Erebos, Bleak-Hearted"
+  ]
+ },
+ "compare": {
+  "Ashnod's Altar (the table's row)": {
+   "won10": [
+    0.0002,
+    0.0002921717569819633
+   ],
+   "won20": [
+    -0.0015333333333333334,
+    0.001286726344978063
+   ],
+   "damage20": [
+    -0.04924502235352455,
+    0.05353838211096742
+   ]
+  },
+  "Village Rites (row)": {
+   "won10": [
+    0.0005333333333333334,
+    0.001012137398457198
+   ],
+   "won20": [
+    0.005266666666666667,
+    0.002575856762636254
+   ],
+   "damage20": [
+    0.10289503871822299,
+    0.10712764897630785
+   ]
+  },
+  "Dockside Chef (row)": {
+   "won10": [
+    0.0005333333333333334,
+    0.0007618886366210177
+   ],
+   "won20": [
+    0.0019333333333333333,
+    0.0018615183683731225
+   ],
+   "damage20": [
+    -0.0903285504096389,
+    0.06854717322937252
+   ]
+  },
+  "Altar, the other two outlets gone": {
+   "won10": [
+    0.00013333333333333334,
+    0.00026133333333333336
+   ],
+   "won20": [
+    -0.0013333333333333333,
+    0.0012667228516224688
+   ],
+   "damage20": [
+    -0.03704119734972968,
+    0.0529596556041295
+   ]
+  },
+  "Altar, the three payoffs gone": {
+   "won10": [
+    0.00013333333333333334,
+    0.00026133333333333336
+   ],
+   "won20": [
+    -0.0016666666666666668,
+    0.0012598633826631591
+   ],
+   "damage20": [
+    -0.04869874876074008,
+    0.05037664059295588
+   ]
+  },
+  "outlets as a group (3)": {
+   "won10": [
+    0.0012,
+    0.0012801652736822158
+   ],
+   "won20": [
+    0.0054,
+    0.0032812807704122784
+   ],
+   "damage20": [
+    -0.0729098881302837,
+    0.13530871587148025
+   ]
+  },
+  "payoffs as a group (3)": {
+   "won10": [
+    0.0019333333333333333,
+    0.0011462160383170562
+   ],
+   "won20": [
+    0.010466666666666668,
+    0.0034506967002744322
+   ],
+   "damage20": [
+    0.8140197728533332,
+    0.1467817459629421
+   ]
+  },
+  "outlets + payoffs (6)": {
+   "won10": [
+    0.0029333333333333334,
+    0.001652205427414385
+   ],
+   "won20": [
+    0.015333333333333332,
+    0.004428327654554419
+   ],
+   "damage20": [
+    0.5966065592649535,
+    0.18937866860610453
+   ]
+  }
+ },
+ "counters": {
+  "base": {
+   "altar_sacrifices": 0.07233333333333333,
+   "altar_mana_made": 0.14466666666666667,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.17993333333333333,
+   "chef_activations": 0.17753333333333332,
+   "backwoods_activations": 0.15093333333333334,
+   "high_market_sacs": 0.048933333333333336,
+   "drain_damage": 1.517298862591308,
+   "cards_drawn": 15.202133333333334
+  },
+  "-Altar": {
+   "altar_sacrifices": 0.0,
+   "altar_mana_made": 0.0,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.18413333333333334,
+   "chef_activations": 0.17773333333333333,
+   "backwoods_activations": 0.15133333333333332,
+   "high_market_sacs": 0.0492,
+   "drain_damage": 1.4792494434879941,
+   "cards_drawn": 15.213733333333334
+  },
+  "-Rites": {
+   "altar_sacrifices": 0.06726666666666667,
+   "altar_mana_made": 0.13453333333333334,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.0,
+   "chef_activations": 0.18153333333333332,
+   "backwoods_activations": 0.15526666666666666,
+   "high_market_sacs": 0.049666666666666665,
+   "drain_damage": 1.455440858537221,
+   "cards_drawn": 14.831866666666667
+  },
+  "-Chef": {
+   "altar_sacrifices": 0.06873333333333333,
+   "altar_mana_made": 0.13746666666666665,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.17926666666666666,
+   "chef_activations": 0.0,
+   "backwoods_activations": 0.16006666666666666,
+   "high_market_sacs": 0.051333333333333335,
+   "drain_damage": 1.4662241975140342,
+   "cards_drawn": 15.0326
+  },
+  "-outlets": {
+   "altar_sacrifices": 0.0,
+   "altar_mana_made": 0.0,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.0,
+   "chef_activations": 0.0,
+   "backwoods_activations": 0.16506666666666667,
+   "high_market_sacs": 0.051533333333333334,
+   "drain_damage": 1.3697358185332271,
+   "cards_drawn": 14.661066666666667
+  },
+  "-Rites -Chef": {
+   "altar_sacrifices": 0.06466666666666666,
+   "altar_mana_made": 0.12933333333333333,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.0,
+   "chef_activations": 0.0,
+   "backwoods_activations": 0.165,
+   "high_market_sacs": 0.051333333333333335,
+   "drain_damage": 1.4082941994856082,
+   "cards_drawn": 14.6612
+  },
+  "-payoffs": {
+   "altar_sacrifices": 0.0662,
+   "altar_mana_made": 0.1324,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.17986666666666667,
+   "chef_activations": 0.1826,
+   "backwoods_activations": 0.16313333333333332,
+   "high_market_sacs": 0.0,
+   "drain_damage": 0.0,
+   "cards_drawn": 14.9486
+  },
+  "-payoffs -Altar": {
+   "altar_sacrifices": 0.0,
+   "altar_mana_made": 0.0,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.18373333333333333,
+   "chef_activations": 0.18306666666666666,
+   "backwoods_activations": 0.16286666666666666,
+   "high_market_sacs": 0.0,
+   "drain_damage": 0.0,
+   "cards_drawn": 14.969533333333333
+  },
+  "-outlets -payoffs": {
+   "altar_sacrifices": 0.0,
+   "altar_mana_made": 0.0,
+   "altar_wasted": 0.0,
+   "village_rites_cast": 0.0,
+   "chef_activations": 0.0,
+   "backwoods_activations": 0.17593333333333333,
+   "high_market_sacs": 0.0,
+   "drain_damage": 0.0,
+   "cards_drawn": 14.427333333333333
+  }
+ },
+ "repro": {
+  "T10": [
+   0.0002,
+   0.0002
+  ],
+  "T20": [
+   -0.0015333333333333334,
+   -0.0015333333333333334
+  ]
+ }
+}

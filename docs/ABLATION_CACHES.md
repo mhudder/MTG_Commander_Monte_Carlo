@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `c2c568b`.
+Generated at `cf49650`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,23 +86,29 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `aa741f5192c6a702` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `0ebe28e2a348c07b` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `a1f01dca5b726256` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `3f59d1106b91c7c7` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `b2414498e6abb104` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `d30fa7936e87ad23` | `bd9e7ae` | **CURRENT** |
-| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `aa741f5192c6a702` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `0ebe28e2a348c07b` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `a1f01dca5b726256` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `3f59d1106b91c7c7` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `b2414498e6abb104` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `d30fa7936e87ad23` | `bd9e7ae` | **VERIFIED** |
+| `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `aa741f5192c6a702`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `0ebe28e2a348c07b`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `a1f01dca5b726256`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `3f59d1106b91c7c7`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `b2414498e6abb104`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `d30fa7936e87ad23`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — CURRENT. built at `f14c8abaffff896a`, which is live.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `aa741f5192c6a702`; fingerprint has since moved to `f6abf380d97639b0` and was CHECKED at `cf49650` (2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered azusa's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `f6abf380d97639b0` (`cf49650`, 2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered azusa's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `0ebe28e2a348c07b`; fingerprint has since moved to `dc3f519081f21847` and was CHECKED at `cf49650` (2026-10-08T14:30:13Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered karlov's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `dc3f519081f21847` (`cf49650`, 2026-10-08T14:30:13Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered karlov's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `a1f01dca5b726256`; fingerprint has since moved to `a9a5666c4a5a06a4` and was CHECKED at `cf49650` (2026-10-08T14:30:13Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered lorehold's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `a9a5666c4a5a06a4` (`cf49650`, 2026-10-08T14:30:13Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered lorehold's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `3f59d1106b91c7c7`; fingerprint has since moved to `ffc6f41de0af9ad4` and was CHECKED at `cf49650` (2026-10-08T14:30:13Z): 2026-10-08, §0z121: tools/ablation.py moved Deathreap Ritual from SCRIPTED to KNOWN_BLIND, a CLASSIFICATION change. Re-rendered from this cache: the one row moved MODEL-EVALUATED -> MODEL-BLIND, every number unchanged. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `ffc6f41de0af9ad4` (`cf49650`, 2026-10-08T14:30:13Z): 2026-10-08, §0z121: tools/ablation.py moved Deathreap Ritual from SCRIPTED to KNOWN_BLIND, a CLASSIFICATION change. Re-rendered from this cache: the one row moved MODEL-EVALUATED -> MODEL-BLIND, every number unchanged. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `b2414498e6abb104`; fingerprint has since moved to `18999bb691f4ef22` and was CHECKED at `cf49650` (2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered shilgengar's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `18999bb691f4ef22` (`cf49650`, 2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered shilgengar's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `d30fa7936e87ad23`; fingerprint has since moved to `148bbe56bc8de9f6` and was CHECKED at `cf49650` (2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered tivit's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+  - verified at `148bbe56bc8de9f6` (`cf49650`, 2026-10-08T14:30:14Z): 2026-10-08, §0z121: only tools/ablation.py's rendmaw classification changed. Re-rendered tivit's table from this cache: byte-identical to the committed table. check_unchanged_decks against bd9e7ae: BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `4f4f0fe879b89f33`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

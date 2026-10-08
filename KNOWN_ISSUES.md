@@ -169,6 +169,7 @@ Methodology that used to live at the end of this file is now
 | [0z118](#0z118) | FIXED | **§0z116's items 6-13**: **Kambal's per-token drain had flattered tivit by 0.015** (T10); Damn was a {B}{B} wrath in three decks; protection answers the events its text answers, and **Mother of Runes, home by the owner's rule, makes one removal a round fizzle: +0.007 to karlov**; four sweepers destroy what they say; Primal Vigor, Giada, Steel Overseer, Green Sun's Zenith. **Karlov wins +0.0054 with no commander SHROUD**: a shroud redirects the pod's removal to its engine pieces. Trostani bit-identical |
 | [0z119](#0z119) | REBUILT | **All seven tables rebuilt at bd9e7ae** (parallel, slowest leg 53 min). Every sign flip is a fix's own card: **Mother of Runes now positive** (+0.0037 T20), Coercive Portal negative, Bramble Sovereign back; Biotransference, Kokusho, Kozilek up; lorehold's discard spells down with its paid discards. **The legs ran Python 3.13 and the interpreter matters**: 3.11 plays one game in 15,000 differently -- the coordinator moved to 3.13, proven by `tools/repro_row.py`. All nine staged swaps significant at both horizons |
 | [0z120](#0z120) | DECIDED | **Trostani is SUSPENDED** from every review and re-measure, by the owner (2026-10-08): one entry in `edhmc/registry.py`, read by `regen_tables.sh`, `check_unchanged_decks` and the cache manifest, whose new SUSPENDED state keeps `check_docs` green when the code moves under it. **Awaken the Woods' shortlist against Kozilek is withdrawn** -- Kozilek is +0.0268 at T20 since §0z114 |
+| [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10642,6 +10643,112 @@ and +0.0268 ±0.0035 at T20, sixth in azusa -- the cut the shortlist named is
 no longer a bottom card. The Candidate keeps its measured +0.0188 ±0.0029 row
 and the reason, in its `verdict`; re-shortlisting it means naming another
 cut.
+
+## 0z121. MEASURED — rendmaw: Deathreap Ritual made MODEL-BLIND; the sacrifice outlets measured as a group
+
+The owner, 2026-10-08: "double check if deathreap is triggering properly, if
+it is only triggering on my creatures and opponents creatures can't be
+modelled properly, then I would call the card MODEL-BLIND instead", and then
+"review the sacrifice engines in rendmaw as a group. I am curious if Ashnod's
+altar is only low because it is the 'weakest' or if the engines themselves are
+just not useful in the deck".
+
+### Deathreap Ritual: barely triggering, and blind by the owner's rule
+
+"Morbid -- At the beginning of each end step, if a creature died this turn,
+you may draw a card." EACH end step, ANY creature. `engine.activations` has
+it (§0z20 moved it to SCRIPTED on that ground), and a probe of 2,000 games
+(staged list, T20) says the implementation almost never fires:
+
+| per turn Deathreap is on the battlefield (1,415 turns, 301 games) | |
+|---|---|
+| "a creature died this turn" when the card checks it | **1.3%** |
+| the same flag at the real end step, just before the pod phase | 11.9% |
+| a creature of yours died during the pod's turns | 18.1% |
+| the pod wiped | 6.0% |
+| cards drawn | **0.03** |
+
+Three defects, none of them the card's:
+1. **The check runs in `activations`**, right after combat -- before the
+   postcombat main phase and before `end_step_outlets`, Sakura-Tribe Elder,
+   Burnished Hart and High Market, which is where most of your turn's deaths
+   happen. Since §0z73 moved the paid outlets to the end step (`"end"`, the
+   default), Village Rites, Dockside Chef and Grim Backwoods kill AFTER the
+   card looks. 10.6% of its turns had a death it did not see.
+2. **The pod's three end steps are nested under YOUR turn's flag**: each is a
+   flat `opp_death_rate` (0.55) roll, but only rolled when one of your
+   creatures died before combat ended on your turn -- so the stand-in for the
+   pod's end steps is gated on the one event least related to them. Deaths of
+   your creatures during the pod's turns (18.1%) set the flag and are reset
+   unread at your next untap.
+3. **The pod's creatures never "die"** for this purpose: chump blocks, the
+   pod's combat and its removal on each other are not events (§4), and your
+   own wipes reduce `o.creatures` without setting the flag.
+
+The third is the owner's condition, and it holds: the card's trigger is about
+every creature at the table and the pod's are a count, so the most this engine
+can do for three of its four end steps is the flat knob. **Deathreap Ritual is
+in `KNOWN_BLIND` for rendmaw now**, with the reason written beside it in
+`tools/ablation.py`. It plays identically to its matched blank on
+`test_blind_labels`' 40 seeds, so it carries no `BLIND_BUT_LIVE` reason. Its
+row (−0.0001 ±0.0010 at T20) moved from MODEL-EVALUATED to MODEL-BLIND;
+re-rendered from the cache, nothing else moved, and `check_unchanged_decks`
+against bd9e7ae is bit-identical on the six active decks (every cache
+VERIFIED with that evidence; trostani is SUSPENDED, §0z120).
+
+**NOT FIXED, on purpose.** Defects 1 and 2 are real and are engine changes
+(`engine.py` is in every fingerprint); with the card labelled blind they bias
+nothing that is read as evidence. Fixing them would make the card's own-turn
+half live (11.9% instead of 1.3%) and its pod half a knob -- PARTLY MODELLED
+at best. If the owner wants the card measured, that is the change: the check
+at the end of `take_turn`, before `pod_phase`, and the pod's rolls ungated.
+§0z5's shape: §0z73 moved the outlets past a check written before it.
+
+### The sacrifice outlets, as a group
+
+`diagnostics/run_rendmaw_sac.py`, N=15,000 paired, seeds 5000.., the staged
+list and the tables' blank, Python 3.13.12 (§0z119) -- its first row
+reproduces the cached Ashnod's Altar row to the last bit at both horizons.
+`results/rendmaw_sac_20261008.{json,txt}`. Outlets: Ashnod's Altar, Village
+Rites, Dockside Chef (the three land outlets cannot be blanked, and Woe
+Strider's scry outlet is not implemented). Payoffs: Blood Artist, The
+Meathook Massacre, Erebos, Bleak-Hearted.
+
+| value (with − without) | T10 | T20 | damage T20 |
+|---|---|---|---|
+| Ashnod's Altar (the table's row) | +0.0002 ±0.0003 | −0.0015 ±0.0013* | −0.05 ±0.05 |
+| Village Rites (row) | +0.0005 ±0.0010 | +0.0053 ±0.0026* | +0.10 ±0.11 |
+| Dockside Chef (row) | +0.0005 ±0.0008 | +0.0019 ±0.0019* (by a hair) | −0.09 ±0.07* |
+| **Altar, the other two outlets gone** | +0.0001 ±0.0003 | **−0.0013 ±0.0013** | −0.04 ±0.05 |
+| **Altar, the three payoffs gone** | +0.0001 ±0.0003 | **−0.0017 ±0.0013*** | −0.05 ±0.05 |
+| outlets as a group (3) | +0.0012 ±0.0013 | +0.0054 ±0.0033* | −0.07 ±0.14 |
+| payoffs as a group (3) | +0.0019 ±0.0011* | +0.0105 ±0.0035* | +0.81 ±0.15* |
+| outlets + payoffs (6) | +0.0029 ±0.0017* | +0.0153 ±0.0044* | +0.60 ±0.19* |
+
+**THE ANSWER: NOT REDUNDANCY -- THE ALTAR DOES ALMOST NOTHING IN ANY CONTEXT,
+AND THE OUTLETS AS A CLASS DO LITTLE.**
+* The Altar's value is the same with the other outlets present (−0.0015),
+  with them gone (−0.0013) and with the payoffs gone (−0.0017). A card that
+  was low because others covered for it would RISE when they are blanked; it
+  does not move. It sacrifices **0.072 creatures a game** and makes 0.145
+  mana -- §0z20's finding, unchanged: "more than six spare tokens AND nothing
+  castable" is a rare board, and `altar_keep` was swept 6 → 0 there with win
+  rate flat. The faint negative is the slot (§0j): a blank at median priority
+  is cast; a three-mana artifact that rarely activates costs the tempo.
+* The outlets are **additive, not substitutes**: +0.0054 as a group against
+  +0.0057 summed (interaction −0.0003). Nearly all of it is Village Rites,
+  which is a draw-two spell that happens to sacrifice a token; nothing at T10.
+* **They do not feed the payoffs.** The package (+0.0153) is the sum of its
+  halves (+0.0054 + 0.0105 = +0.0159): the drains are fed by the deaths the
+  deck has anyway -- wipes, combat, Twitching Doll, the pod's removal. Drain
+  damage is 1.52 a game with the outlets and 1.41 without Rites and Chef.
+
+**What the model cannot see, so the outlets' rows are FLOORS** (§4): a
+sacrifice IN RESPONSE to removal or theft. Nothing lets an outlet answer the
+pod's `destroy`, so the outlets' commonest real use -- the Altar turning a
+doomed creature into {C}{C} and a drain, the Rites into two cards -- is never
+offered. That is the half of an outlet the model is blind to, and the Altar
+is the outlet most dependent on it (it is free and instant-speed).
 
 ## How to read an ablation table
 

@@ -199,10 +199,8 @@ SCRIPTED_RENDMAW = {
     # Ashnod's Altar: "Sacrifice a creature: Add {C}{C}." Both halves now --
     # the deaths it manufactures for Blood Artist / Meathook, and the MANA,
     # which used to arrive after the main phase and so could not be spent.
-    # Deathreap Ritual: "At the beginning of EACH end step, if a creature died
-    # this turn, you may draw a card" -- your end step plus the pod's three,
-    # each gated on opp_death_rate. It was never unimplemented at all.
-    "Ashnod's Altar", "Deathreap Ritual",
+    # Deathreap Ritual LEFT 2026-10-08 for KNOWN_BLIND: see BLIND_BUT_LIVE.
+    "Ashnod's Altar",
     # --- §7 closed for Rendmaw 2026-09-13 (§0z19) ---
     # "When this creature dies, return ANOTHER target artifact card from your
     # graveyard to your hand." Both are the same trigger; Junk Diver also
@@ -1238,6 +1236,18 @@ KNOWN_BLIND = {
         'Lignify',
         'Massacre Wurm',
         'Midnight Reaper',
+        # Deathreap Ritual joined 2026-10-08, by the owner's rule (§0z121):
+        # "At the beginning of EACH end step, if a creature died this turn"
+        # reads every player's creatures, and the pod's are a count with no
+        # deaths of their own -- chump blocks, their combat, their removal on
+        # each other (§4). The engine draws on YOUR creatures' deaths and
+        # stands in for the pod's three end steps with a flat
+        # `opp_death_rate`. As implemented it fires on 1.3% of the turns it is
+        # out (the check runs in `activations`, before the postcombat main and
+        # the end-step outlets, and the pod's three draws are nested under
+        # it), and it plays identically to its blank on test_blind_labels' 40
+        # seeds -- so it carries no BLIND_BUT_LIVE reason.
+        'Deathreap Ritual',
         'Nameless Inversion',
         'Pygmy Kavu',
         'Reap',
