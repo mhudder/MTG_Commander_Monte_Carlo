@@ -1,0 +1,110 @@
+Lorehold's second 2026-10-09 batch, staged list, N = 15,000 paired games per comparison, seeds 80000.., 95% CIs. '*' = outside its bar.
+
+PART 1  Furygale Flocking (vs blank, Monk's slot)
+  T10: won +0.0344+-0.0032*  damage +5.69+-0.25*  mv_cheated +0.71+-0.11*  miracles_cast -0.02+-0.01*
+        spell_damage -0.56+-0.09*  combat_damage +6.25+-0.26*  cards_drawn -0.24+-0.05*  furygale_tokens +1.35+-0.04*
+        wheel_casts -0.00+-0.00*  turns_played -0.02+-0.00*
+  T20: won +0.0556+-0.0046*  damage +6.17+-0.27*  mv_cheated +0.17+-0.17  miracles_cast -0.08+-0.01*
+        spell_damage -1.26+-0.12*  combat_damage +7.44+-0.28*  cards_drawn -0.79+-0.08*  furygale_tokens +1.67+-0.05*
+        wheel_casts -0.01+-0.00*  turns_played -0.15+-0.01*
+  P(cast) 0.280   leg won at T20 0.3454
+
+PART 1  Searing Wind (vs blank, Monk's slot)
+  T10: won +0.0025+-0.0009*  damage +0.97+-0.05*  mv_cheated -0.07+-0.02*  miracles_cast -0.00+-0.00*
+        spell_damage +1.14+-0.06*  combat_damage -0.17+-0.02*  cards_drawn -0.02+-0.01*  searing_wind_resolved +0.14+-0.01*
+        turns_played -0.00+-0.00*
+  T20: won +0.0054+-0.0016*  damage +1.11+-0.06*  mv_cheated -0.25+-0.05*  miracles_cast -0.01+-0.00*
+        spell_damage +1.56+-0.07*  combat_damage -0.44+-0.04*  cards_drawn -0.10+-0.02*  searing_wind_resolved +0.21+-0.01*
+        wheel_casts -0.00+-0.00*  turns_played -0.02+-0.00*
+  P(cast) 0.167   leg won at T20 0.2984
+
+PART 1  Explosive Welcome (vs blank, Monk's slot)
+  T10: won +0.0018+-0.0008*  damage +0.92+-0.05*  mv_cheated -0.06+-0.03*  miracles_cast -0.00+-0.00*
+        spell_damage +1.06+-0.05*  combat_damage -0.14+-0.02*  cards_drawn -0.02+-0.01*  welcome_resolved +0.15+-0.01*
+        welcome_mana_added +0.08+-0.01*  turns_played -0.00+-0.00*
+  T20: won +0.0038+-0.0016*  damage +1.02+-0.06*  mv_cheated -0.23+-0.07*  miracles_cast -0.01+-0.00*
+        spell_damage +1.37+-0.06*  combat_damage -0.35+-0.04*  cards_drawn -0.09+-0.02*  welcome_resolved +0.21+-0.01*
+        welcome_mana_added +0.16+-0.01*  wheel_casts -0.00+-0.00*  turns_played -0.02+-0.00*
+  P(cast) 0.175   leg won at T20 0.2967
+
+PART 1  Gideon's Phalanx (vs blank, Monk's slot)
+  T10: won +0.0033+-0.0012*  damage +1.16+-0.09*  mv_cheated -0.01+-0.05  miracles_cast -0.00+-0.00
+        spell_damage +0.03+-0.04  combat_damage +1.13+-0.08*  cards_drawn +0.04+-0.02*  phalanx_knights +0.59+-0.03*
+        phalanx_mastery +0.14+-0.01*  wheel_casts +0.00+-0.00*  turns_played +0.00+-0.00*
+  T20: won +0.0106+-0.0024*  damage +1.57+-0.11*  mv_cheated -0.22+-0.09*  miracles_cast -0.01+-0.01*
+        spell_damage -0.08+-0.06*  combat_damage +1.65+-0.10*  cards_drawn -0.04+-0.04*  phalanx_knights +0.84+-0.03*
+        phalanx_mastery +0.20+-0.01*  wheel_casts +0.00+-0.00  turns_played -0.01+-0.01*
+  P(cast) 0.176   leg won at T20 0.3031
+
+PART 1  Raphael's Technique (vs blank, Monk's slot)
+  T10: won +0.0089+-0.0024*  damage +1.06+-0.14*  mv_cheated +0.80+-0.13*  miracles_cast +0.05+-0.01*
+        spell_damage +0.79+-0.12*  combat_damage +0.27+-0.09*  cards_drawn +1.56+-0.08*  wheel_casts +0.17+-0.01*
+        turns_played -0.01+-0.00*
+  T20: won +0.0191+-0.0035*  damage +1.36+-0.17*  mv_cheated +1.30+-0.20*  miracles_cast +0.06+-0.01*
+        spell_damage +1.09+-0.14*  combat_damage +0.27+-0.12*  cards_drawn +2.07+-0.10*  wheel_casts +0.22+-0.01*
+        turns_played -0.06+-0.01*
+  P(cast) 0.206   leg won at T20 0.3111
+
+PART 1  Immolating Gyre (vs blank, Monk's slot)
+  T10: won +0.0045+-0.0013*  damage +0.92+-0.09*  mv_cheated +0.11+-0.06*  miracles_cast +0.01+-0.00*
+        spell_damage +0.27+-0.06*  combat_damage +0.65+-0.06*  cards_drawn +0.15+-0.03*  wheel_casts +0.00+-0.00*
+        gyre_resolved +0.14+-0.01*  gyre_x +0.96+-0.05*  gyre_pod_killed +0.98+-0.05*  turns_played +0.01+-0.00*
+  T20: won +0.0189+-0.0026*  damage +1.61+-0.13*  mv_cheated +0.26+-0.10*  miracles_cast +0.03+-0.01*
+        spell_damage +0.41+-0.08*  combat_damage +1.20+-0.10*  cards_drawn +0.30+-0.05*  wheel_casts +0.00+-0.00*
+        gyre_resolved +0.18+-0.01*  gyre_x +1.44+-0.07*  gyre_pod_killed +1.17+-0.05*  turns_played +0.05+-0.01*
+  P(cast) 0.159   leg won at T20 0.3109
+
+PART 1  Profound Journey (vs blank, Monk's slot)
+  T10: won +0.0161+-0.0022*  damage +1.70+-0.15*  mv_cheated +2.37+-0.20*  miracles_cast +0.01+-0.01*
+        spell_damage +1.47+-0.14*  combat_damage +0.23+-0.08*  cards_drawn +0.24+-0.05*  wheel_casts +0.00+-0.00*
+        journey_returns +0.26+-0.01*  rebound_casts +0.09+-0.00*  turns_played -0.02+-0.00*
+  T20: won +0.0210+-0.0031*  damage +1.86+-0.16*  mv_cheated +3.48+-0.26*  miracles_cast +0.00+-0.01
+        spell_damage +1.81+-0.15*  combat_damage +0.05+-0.10  cards_drawn +0.26+-0.07*  wheel_casts +0.00+-0.00*
+        journey_returns +0.38+-0.01*  rebound_casts +0.13+-0.01*  turns_played -0.08+-0.01*
+  P(cast) 0.175   leg won at T20 0.3135
+
+PART 2  Gyre, gyre_full_x 3  (vs blank)
+  T10: won +0.0054+-0.0014*  damage +1.08+-0.10*  mv_cheated +0.13+-0.06*  miracles_cast +0.02+-0.01*
+        spell_damage +0.30+-0.06*  combat_damage +0.78+-0.07*  cards_drawn +0.18+-0.03*  wheel_casts +0.00+-0.00*
+        gyre_resolved +0.14+-0.01*  gyre_x +0.96+-0.05*  gyre_pod_killed +1.14+-0.05*  turns_played +0.02+-0.00*
+  T20: won +0.0218+-0.0027*  damage +1.86+-0.14*  mv_cheated +0.32+-0.11*  miracles_cast +0.03+-0.01*
+        spell_damage +0.45+-0.08*  combat_damage +1.41+-0.10*  cards_drawn +0.35+-0.05*  wheel_casts +0.01+-0.00*
+        gyre_resolved +0.18+-0.01*  gyre_x +1.44+-0.07*  gyre_pod_killed +1.34+-0.06*  turns_played +0.06+-0.01*
+  P(cast) 0.161   leg won at T20 0.3138
+
+PART 2  Gyre, gyre_full_x 12 (vs blank)
+  T10: won +0.0035+-0.0012*  damage +0.66+-0.07*  mv_cheated +0.07+-0.05*  miracles_cast +0.00+-0.00*
+        spell_damage +0.21+-0.05*  combat_damage +0.45+-0.05*  cards_drawn +0.12+-0.02*  wheel_casts +0.00+-0.00*
+        gyre_resolved +0.13+-0.01*  gyre_x +0.95+-0.05*  gyre_pod_killed +0.66+-0.04*  turns_played +0.01+-0.00*
+  T20: won +0.0131+-0.0023*  damage +1.13+-0.11*  mv_cheated +0.14+-0.10*  miracles_cast +0.02+-0.01*
+        spell_damage +0.29+-0.07*  combat_damage +0.85+-0.08*  cards_drawn +0.23+-0.04*  wheel_casts +0.00+-0.00*
+        gyre_resolved +0.17+-0.01*  gyre_x +1.43+-0.07*  gyre_pod_killed +0.82+-0.04*  turns_played +0.04+-0.01*
+  P(cast) 0.151   leg won at T20 0.3051
+
+PART 3  Explosive Welcome - Searing Wind (same slot)
+  T10: won -0.0009+-0.0010  damage -0.09+-0.05*  mv_cheated -0.15+-0.05*  miracles_cast -0.00+-0.00*
+        spell_damage -0.13+-0.04*  combat_damage +0.03+-0.03*  cards_drawn -0.00+-0.02  searing_wind_resolved -0.14+-0.01*
+        welcome_resolved +0.15+-0.01*  welcome_mana_added +0.08+-0.01*  wheel_casts +0.00+-0.00  turns_played +0.00+-0.00*
+  T20: won -0.0017+-0.0018  damage -0.14+-0.06*  mv_cheated -0.20+-0.08*  miracles_cast -0.00+-0.00
+        spell_damage -0.24+-0.05*  combat_damage +0.10+-0.04*  cards_drawn +0.01+-0.03  searing_wind_resolved -0.21+-0.01*
+        welcome_resolved +0.21+-0.01*  welcome_mana_added +0.16+-0.01*  wheel_casts -0.00+-0.00  turns_played +0.01+-0.00*
+  P(cast) 0.175   leg won at T20 0.2967
+
+PART 3  Gideon's Phalanx - Furygale Flocking (same slot)
+  T10: won -0.0295+-0.0032*  damage -4.53+-0.23*  mv_cheated -1.10+-0.11*  miracles_cast +0.01+-0.01*
+        spell_damage +0.51+-0.10*  combat_damage -5.04+-0.23*  cards_drawn +0.26+-0.05*  furygale_tokens -1.35+-0.04*
+        phalanx_knights +0.59+-0.03*  phalanx_mastery +0.14+-0.01*  wheel_casts +0.00+-0.00*  turns_played +0.03+-0.00*
+  T20: won -0.0423+-0.0044*  damage -4.62+-0.24*  mv_cheated -0.92+-0.17*  miracles_cast +0.06+-0.01*
+        spell_damage +1.08+-0.12*  combat_damage -5.70+-0.25*  cards_drawn +0.71+-0.08*  furygale_tokens -1.67+-0.05*
+        phalanx_knights +0.84+-0.03*  phalanx_mastery +0.20+-0.01*  wheel_casts +0.01+-0.00*  turns_played +0.14+-0.01*
+  P(cast) 0.176   leg won at T20 0.3031
+
+PART 3  -Reforge the Soul +Raphael's Technique (real swap)
+  T10: won -0.0026+-0.0014*  damage -0.18+-0.09*  mv_cheated +0.03+-0.08  miracles_cast -0.00+-0.01
+        spell_damage -0.13+-0.08*  combat_damage -0.05+-0.05  cards_drawn -0.14+-0.04*  wheel_casts -0.02+-0.00*
+        turns_played +0.00+-0.00*
+  T20: won -0.0031+-0.0022*  damage -0.15+-0.11*  mv_cheated +0.11+-0.12  miracles_cast +0.00+-0.01
+        spell_damage -0.16+-0.09*  combat_damage +0.01+-0.07  cards_drawn -0.13+-0.05*  wheel_casts -0.02+-0.00*
+        turns_played +0.02+-0.01*
+  P(cast) 0.205   leg won at T20 0.2939
+

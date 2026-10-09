@@ -172,6 +172,7 @@ Methodology that used to live at the end of this file is now
 | [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
 | [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
 | [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED in lorehold**, by the owner: its table-facing choice (the answer an opponent's board calls for) is §4-blind and its default pick is the highest mana value, so its −0.0019 row is a floor. **Ruby Medallion is modelled faithfully but seldom matters**: its {1} miracle discount reaches every decision and payment, but it is out for 2.0 miracle windows a game and makes 0.022 miracles a game possible that full price would not. −Ruby +Prisoner's Dilemma: +0.0295 ±0.0044 at T20 (snitch), +0.0103 ±0.0040 (silence) |
+| [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield` |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10994,6 +10995,121 @@ share moved), which moved every fingerprint; the five other active decks are
 BIT-IDENTICAL against aa03208 and VERIFIED with that. `tools/candidates.py`
 loses its `lorehold3` batch and `run_prisoners_dilemma.py` refuses to run,
 both for Caldera Pyremaw's reason: the card is in the list now.
+
+## 0z124. MEASURED — lorehold: seven big Boros instants and sorceries
+
+The owner, 2026-10-09: "I'm interested in exploring relatively obscure, but
+powerful cards for the Lorehold, the Historian deck ... high cost (6 or
+greater) instant or sorcery spells in Boros colours." A Scryfall search
+(`(t:instant or t:sorcery) id<=rw mv>=6 f:commander`, 229 cards) was cut to
+a shortlist by what each does when **Lorehold makes its cost {2}**, and the
+owner picked seven to model, with a verdict on each before any number
+existed. Oracle text is verbatim on each Proposal in `edhmc/pending.py`.
+
+### Three rules the search turned on
+
+* **Miracle sets X to 0**, so X spells are dead here.
+* **An Adventure or Omen card is a creature card in hand** (715.4), so it
+  gets no miracle from Lorehold; a split card is an instant or sorcery card
+  (709.4).
+* **A cost reduction applies to an alternative cost** (601.2f). Furygale
+  Flocking's "{1} less for each instant and sorcery card in your graveyard"
+  takes the miracle {2} to nothing with two in the yard -- and Lorehold's
+  rummage puts one there on every opponent's upkeep.
+
+### What the engine gained
+
+| | where | why |
+|---|---|---|
+| a card's own cost reduction | `lorehold.self_reduction`, read by `reduce_cost` AND `miracle_reduction` | 601.2f; one rule, two cost paths (§0u) |
+| a permanent entering | `lorehold.enters_battlefield`, the ETBs that were inline in `resolve_spell` | a reanimated card fires them too |
+| reanimation | `reanimation_target` / `profound_journey`; no target, no cast (`pilot_may_cast`) | Profound Journey |
+| rebound (702.88a) | `_evasion.REBOUND`, generated from Scryfall keywords by `tag_flying`; `resolve_spell` exiles, `rebound_upkeep` casts | Profound Journey (and Ephemerate, in no lorehold list) |
+| a chosen burn target | `opponents.damage_single(target=)`, `deal_pod_damage(target=)` | Explosive Welcome's two targets must differ |
+| a scaled one-sided sweeper | `OWN_WIPE_SCOPE` "damage_x", `opponents.gyre_share`, `WIPE_DESTROYS` | Immolating Gyre |
+| mana from a resolving spell | `g.in_main`; Explosive Welcome's {R}{R}{R} into Apex's pool only in a main phase | 500.4: mana empties between steps |
+
+`check_unchanged_decks`: all seven decks **bit-identical** against 2852268,
+and the five active non-lorehold decks against bd9e7ae, their caches'
+built commit (VERIFIED with that evidence). `tests/test_lorehold_big_spells.py`:
+15 cases, 6 mutations, every expected set right on the first run.
+`validate`: +0.00 on all 21 metrics.
+
+### The rows
+
+`diagnostics/run_lorehold_big_spells.py`, `results/lorehold_big_spells_20261009.txt`:
+N=15,000 paired, seeds 80000.., the staged list, each card in Pinnacle
+Monk's slot against a blank of its cost, T10 read off the T20 game. Every
+T20 row is `python -m tools.candidates lorehold4 --n=15000`
+(`results/candidates_lorehold4.txt`) -- REPRODUCTION PENDING: the batch is still running; its first three rows match to the last digit.
+
+| card | T10 | T20 | P(cast) | the mechanism, at T20 |
+|---|---|---|---|---|
+| Furygale Flocking | +0.0344 ±0.0032 | **+0.0556 ±0.0046** | 0.280 | 1.67 tokens a game, combat damage +7.44 |
+| Profound Journey | +0.0161 ±0.0022 | +0.0210 ±0.0031 | 0.175 | 0.38 returns a game (0.13 by rebound), mv_cheated +3.48 |
+| Raphael's Technique | +0.0089 ±0.0024 | +0.0191 ±0.0035 | 0.206 | +0.22 wheels, +2.07 cards drawn |
+| Immolating Gyre | +0.0045 ±0.0013 | +0.0189 ±0.0026 | 0.159 | X ~8 at resolution, 1.17 pod creatures killed |
+| Gideon's Phalanx | +0.0033 ±0.0012 | +0.0106 ±0.0024 | 0.176 | 0.84 Knights, combat damage +1.65 |
+| Searing Wind | +0.0025 ±0.0009 | +0.0054 ±0.0016 | 0.167 | spell damage +1.56 |
+| Explosive Welcome | +0.0018 ±0.0008 | +0.0038 ±0.0016 | 0.175 | spell damage +1.37; its mana survived 0.16 a game |
+
+**All seven are significant at both horizons.** The top of a candidate
+batch is a set, not a ranking (§0c) -- but the paired comparisons below
+are rankings, and Furygale is outside the bar of everything here.
+
+**Furygale is the largest candidate row lorehold has had** (Prisoner's
+Dilemma +0.0301, §0z122). It is cast in 28% of games against ~17% for the
+rest, because its reduction makes it cheap from HAND as well as off the
+top. Two things make it a slight ceiling: "attack THAT opponent" is not
+modelled (the six join the pod-wide split), and tokens are never the pod's
+spot-removal target in this model -- true of every token in every list.
+
+**Profound Journey returns the engine the pod destroyed.** Of 1,179 returns
+in 3,000 games: Arcane Bombardment 13%, Library of Leng 10%, Sunbird's
+Invocation 9%, The Dawning Archaic 9%, Sol Ring 8%, Sensei's Divining Top
+7%, Double Vision 6%. That is why a reanimation spell raises SPELL damage
+(+1.81): the copy engines come back.
+
+### The knob, said out loud
+
+Immolating Gyre's X has nothing to compare against: the pod's creatures
+are a count with no toughness (§4). `gyre_full_x` (6) is the X at which
+every one dies, toughness spread evenly below it -- a judgement.
+
+| gyre_full_x | T10 | T20 |
+|---|---|---|
+| 3 | +0.0054 ±0.0014 | +0.0218 ±0.0027 |
+| **6** (default) | +0.0045 ±0.0013 | +0.0189 ±0.0026 |
+| 12 | +0.0035 ±0.0012 | +0.0131 ±0.0023 |
+
+Significant at every setting. X averages about 8 when it resolves, so at
+the default it is usually a full one-sided wipe; the knob moves the row by
+a third at most.
+
+### The owner's verdicts, measured
+
+The owner judged each card before any number existed. Two cards in the
+same slot on the same seeds are a paired head-to-head (§0c, §0z35):
+
+| the owner's call | measured, T10 / T20 | |
+|---|---|---|
+| Phalanx is "weaker than Flocking usually" | −0.0295 ±0.0032 / **−0.0423 ±0.0044** | confirmed |
+| Raphael's is "a weaker Reforge the Soul" (−Reforge +Raphael, a real swap) | −0.0026 ±0.0014 / **−0.0031 ±0.0022** | confirmed |
+| Welcome is "a weaker version of Searing Wind" | −0.0009 ±0.0010 / −0.0017 ±0.0018 | inside its bar; damage −0.14 ±0.06 is significant |
+| Journey is "a weaker Restoration Seminar" | not measured | Seminar is KNOWN_BLIND -- unimplemented |
+| Furygale "excellent"; Gyre "not sure, interested to model" | above | the two largest surprises the other way: Gyre is real |
+
+Raphael's loses to Reforge for a reason in the text: Reforge has its own
+miracle {1}{R}, which needs no Lorehold on the battlefield.
+
+**Restoration Seminar** ("Return target nonland permanent card from your
+graveyard to the battlefield. Paradigm") is in the list and has never been
+implemented; its row is a blank. The reanimation path built here is most
+of it -- Paradigm's copy each first main phase is the rest.
+
+Nothing is staged: a candidate row names no cut (§0c), and the owner
+chooses. Raphael's head-to-head is in SIMULATED as a comparison, not a
+proposal.
 
 ## How to read an ablation table
 
