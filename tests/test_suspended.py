@@ -15,7 +15,9 @@ CASES
   A  trostani is SUSPENDED, and ACTIVE is every other deck in registry order
   B  a trostani cache whose fingerprint moved reads SUSPENDED
   C  NEIGHBOUR: a karlov cache whose fingerprint moved still reads SUSPECT
-  D  check_docs' cache check passes with trostani's fingerprint moved
+  D  check_docs' cache check passes with trostani's fingerprint moved --
+     asked about TROSTANI'S CACHE ALONE, so another deck's state cannot
+     decide it (it did, until 2026-10-09: §0z123)
   E  check_unchanged_decks measures the ACTIVE decks only, by default
   F  `python -m edhmc.registry --active` -- regen_tables.sh's default list --
      leaves trostani out
@@ -70,12 +72,20 @@ def run_cases():
     check("C NEIGHBOUR: a moved karlov cache reads SUSPECT",
           CM.status_of(CACHE.format("karlov"), prov)[0], "SUSPECT")
 
-    saved = CM.load_provenance
+    # ONLY TROSTANI'S CACHE IS ASKED ABOUT. This case ran the whole check
+    # until 2026-10-09, so its answer was also the state of every OTHER
+    # deck's cache: a SUSPECT lorehold (a staged swap, rebuild deferred,
+    # §0z123) failed it although nothing about the suspension had moved.
+    # `caches` and `shards` are narrowed to trostani's, so the case answers
+    # one question -- does the suspension exempt a moved trostani cache?
+    saved = CM.load_provenance, CM.caches, CM.shards
     CM.load_provenance = lambda: moved(real, "trostani")
+    CM.caches = lambda: [c for c in saved[1]() if c[0] == CACHE.format("trostani")]
+    CM.shards = lambda: [p for p in saved[2]() if "trostani" in p]
     try:
         res = CD.check_caches_recorded()
     finally:
-        CM.load_provenance = saved
+        CM.load_provenance, CM.caches, CM.shards = saved
     check("D check_docs passes a moved trostani cache", res.ok, True)
 
     check("E check_unchanged_decks covers the active decks only",

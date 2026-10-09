@@ -10982,12 +10982,14 @@ deferred the rebuild.** Staging changes `build_pending`, so lorehold's cache
 is SUSPECT and only a rebuild clears it (§0z27's third row) -- not
 `--verified`, and not `check_unchanged_decks`, which builds from the deck
 module and read lorehold BIT-IDENTICAL here, certifying nothing. Until the
-rebuild: `check_docs` fails on lorehold's cache, and two tests fail with it,
+rebuild: `check_docs` fails on lorehold's cache, and so does
 **`test_metrics_and_render` C** (lorehold's cache does not cover the staged
-list -- correct, the new card has no row) and **`test_suspended` D**, which
-asks the global cache check about a moved TROSTANI cache and so also fails
-on any other deck's SUSPECT: a test whose answer depends on state it is not
-about. The census picked the new card up (`decks/_removal.py`'s SCANNED, no
+list -- correct, the new card has no row). **`test_suspended` D failed too,
+and was FIXED rather than waited out**: it asked the global cache check
+about a moved TROSTANI cache, so any other deck's SUSPECT failed it -- a
+test whose answer depended on state it was not about. It now narrows the
+check to trostani's cache, and its mutation (the suspension forgotten)
+still breaks exactly B and D. The census picked the new card up (`decks/_removal.py`'s SCANNED, no
 share moved), which moved every fingerprint; the five other active decks are
 BIT-IDENTICAL against aa03208 and VERIFIED with that. `tools/candidates.py`
 loses its `lorehold3` batch and `run_prisoners_dilemma.py` refuses to run,
