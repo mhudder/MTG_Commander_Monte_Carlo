@@ -386,3 +386,18 @@ ANCIENT_TOMB = L("Ancient Tomb", "C")
 # from the command zone." -- `lorehold.command_beacon`, by name.
 COMMAND_BEACON = L("Command Beacon", "C")
 LAND_CANDIDATES = (ANCIENT_TOMB, COMMAND_BEACON)
+
+# ---------------------------------------------------------------------------
+# 2026-10-09, the owner's proposal. Oracle text from api.scryfall.com the same
+# day, verbatim on the Proposal in edhmc/pending.py.
+# ---------------------------------------------------------------------------
+# {3}{R}{R} sorcery. "Each opponent secretly chooses silence or snitch ... If
+# each opponent chose silence, 4 damage to each of them. If each chose snitch,
+# 8 damage to each of them. Otherwise, 12 damage to each opponent who chose
+# silence. Flashback {5}{R}{R}." The choice is the knob `dilemma_choice`
+# (lorehold.prisoners_dilemma); the flashback cost comes from Scryfall
+# through `_evasion.FLASHBACK`, not from here.
+PRISONERS_DILEMMA = C("Prisoner's Dilemma", "Sorcery", {"gen": 3, "R": 2},
+                      priority=5, script="prisoners_dilemma")
+
+BATCH_2026_10_09 = (PRISONERS_DILEMMA,)

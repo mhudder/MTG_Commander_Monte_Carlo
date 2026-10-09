@@ -286,6 +286,33 @@ def classify_land(text: str) -> dict:
     return out
 
 
+_PIP = re.compile(r"\{([^}]+)\}")
+
+
+def flashback_cost(text: str):
+    """The cost on a card's own "Flashback {..}" line, as a C() cost dict, or
+    None when the card has no such line (it only GRANTS flashback). Raises on
+    a flashback cost this cannot read -- hybrid, X, Phyrexian, or a non-mana
+    cost -- because a misread cost would be a cast at the wrong price, and an
+    unread one a card that silently has no flashback (classify_land's rule).
+    """
+    m = re.search(r"^Flashback(?:\s|—)(.*)$", text, re.M)
+    if m is None:
+        return None
+    rest = m.group(1).split("(")[0].strip()
+    if not re.fullmatch(r"(\{[^}]+\})+", rest):
+        raise ValueError(f"tag_flying: unreadable flashback cost {rest!r}")
+    cost = {}
+    for pip in _PIP.findall(rest):
+        if pip.isdigit():
+            cost["gen"] = cost.get("gen", 0) + int(pip)
+        elif pip in ("W", "U", "B", "R", "G", "C"):
+            cost[pip] = cost.get(pip, 0) + 1
+        else:
+            raise ValueError(f"tag_flying: unreadable flashback pip {{{pip}}}")
+    return cost
+
+
 def current_cards(decks=None):
     """(creatures, everything) -- every Card the current deck modules
     construct, deck members and module-level candidates alike.
@@ -423,6 +450,20 @@ def main():
                   for n, c in cards.items()
                   if n in everything and everything[n].is_land
                   and set(BASIC_TYPES) & subtypes(c)}
+    # FLASHBACK, 2026-10-09: "You may cast this card from your graveyard for
+    # its flashback cost. Then exile it." (702.34a.) The keyword says the card
+    # HAS it -- a GRANT (Past in Flames' "gains flashback") carries the
+    # keyword too, so the cost is read from the card's own "Flashback {..}"
+    # line and a card whose line is not a mana cost raises rather than
+    # becoming a free cast. Lorehold is the only reader (`lorehold.
+    # flashback_options`); every other engine ignores the table.
+    flashback = {}
+    for n, c in cards.items():
+        if n in everything and "Flashback" in c.get("keywords", []):
+            cost = flashback_cost(c.get("oracle_text") or "")
+            if cost is not None:
+                flashback[n] = cost
+
     land_rules = {}
     for n, c in cards.items():
         if n in everything and everything[n].is_land:
@@ -484,6 +525,10 @@ def main():
           f"these as well as its tokens:")
     for n in sorted(plants):
         print(f"    {n}")
+
+    print(f"\nFLASHBACK ({len(flashback)}) -- the card's own flashback cost:")
+    for n in sorted(flashback):
+        print(f"    {n:42} {flashback[n]}")
 
     print(f"\nLAND RULES ({len(land_rules)}) -- entering, tapping and life, "
           f"from the oracle text:")
@@ -611,6 +656,14 @@ def main():
                      "LAND_RULES = {\n")
             for n in sorted(land_rules):
                 fh.write(f"    {n!r}: {land_rules[n]!r},\n")
+            fh.write("}\n")
+            fh.write("\n# FLASHBACK: a card's OWN flashback cost, from its "
+                     "\"Flashback {..}\" line\n# (a grant such as Past in "
+                     "Flames' carries the keyword and no cost, and\n# is not "
+                     "here). Read by lorehold's main phase (702.34a).\n"
+                     "FLASHBACK = {\n")
+            for n in sorted(flashback):
+                fh.write(f"    {n!r}: {flashback[n]!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"

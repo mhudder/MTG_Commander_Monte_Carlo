@@ -170,6 +170,7 @@ Methodology that used to live at the end of this file is now
 | [0z119](#0z119) | REBUILT | **All seven tables rebuilt at bd9e7ae** (parallel, slowest leg 53 min). Every sign flip is a fix's own card: **Mother of Runes now positive** (+0.0037 T20), Coercive Portal negative, Bramble Sovereign back; Biotransference, Kokusho, Kozilek up; lorehold's discard spells down with its paid discards. **The legs ran Python 3.13 and the interpreter matters**: 3.11 plays one game in 15,000 differently -- the coordinator moved to 3.13, proven by `tools/repro_row.py`. All nine staged swaps significant at both horizons |
 | [0z120](#0z120) | DECIDED | **Trostani is SUSPENDED** from every review and re-measure, by the owner (2026-10-08): one entry in `edhmc/registry.py`, read by `regen_tables.sh`, `check_unchanged_decks` and the cache manifest, whose new SUSPENDED state keeps `check_docs` green when the code moves under it. **Awaken the Woods' shortlist against Kozilek is withdrawn** -- Kozilek is +0.0268 at T20 since §0z114 |
 | [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
+| [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10749,6 +10750,120 @@ pod's `destroy`, so the outlets' commonest real use -- the Altar turning a
 doomed creature into {C}{C} and a drain, the Rites into two cards -- is never
 offered. That is the half of an outlet the model is blind to, and the Altar
 is the outlet most dependent on it (it is free and instant-speed).
+
+## 0z122. MEASURED — lorehold: Prisoner's Dilemma, and a card's own flashback
+
+The owner, 2026-10-09: "I would like to evaluate the card Prisoner's Dilemma
+in Lorehold." Oracle text from api.scryfall.com the same day, verbatim on the
+Proposal in `edhmc/pending.py`:
+
+> {3}{R}{R} Sorcery. Each opponent secretly chooses silence or snitch, then
+> the choices are revealed. If each opponent chose silence, Prisoner's
+> Dilemma deals 4 damage to each of them. If each opponent chose snitch,
+> Prisoner's Dilemma deals 8 damage to each of them. Otherwise, Prisoner's
+> Dilemma deals 12 damage to each opponent who chose silence.
+> Flashback {5}{R}{R}
+
+### The opponents' choice is a knob, and the card has a right answer
+
+The second opponent DECISION in the project after the vote (`voting.py`). Per
+opponent, by what the others chose:
+
+| | others all silent | others all snitch | others mixed |
+|---|---|---|---|
+| I choose silence | 4 | 12 | 12 |
+| I choose snitch | **0** | **8** | **0** |
+
+**Snitch is strictly better for every opponent whatever the others do**, so
+"each snitches, 8 apiece" is the only equilibrium and the default of the new
+knob `dilemma_choice` ("snitch"). "silence" is the table colluding against
+you -- each silent opponent paying 4 to hold a bloc any one of them can leave
+for free -- and is the floor. Deliberately NOT `opp_vote_policy`: its
+"adversarial" bloc costs its members nothing, this one costs each of them
+damage. A mixed reveal (12 to each silent player, up to 24 on two of them) is
+not a setting, so neither number is a ceiling. `lorehold.prisoners_dilemma`,
+damage through `deal_pod_damage` with full-pod `hits` (Artist's Talent's +2 a
+head, Scrollwielder's lifelink).
+
+### Native flashback, and the card it found already in the list
+
+No engine cast a card's OWN flashback before this: Past in Flames and
+Stingcaster Mage GRANT it. The cost is read from Scryfall, not typed --
+`tag_flying` writes `_evasion.FLASHBACK` from the `Flashback` keyword and the
+card's own "Flashback {..}" line (a grant carries the keyword and no line;
+an unreadable cost raises). `lorehold.flashback_options` offers each one to
+the main phase from the graveyard, through the same gates as a card in hand
+(the wipe gate, `pilot_may_cast`, the miracle reserve), and it is exiled when
+it leaves the stack (702.34a). Knob `native_flashback`, default on.
+
+**The first run of the generator listed three cards: Prisoner's Dilemma, Past
+in Flames, and FAITHLESS LOOTING** -- in the lorehold list since before v16,
+in `SCRIPTED_LOREHOLD`, and its Flashback {2}{R} never cast. Its row has been
+a floor for the life of the project and nothing said so. A `C()` cost cannot
+carry a second cost from another zone, so the clause had nowhere to live and
+nobody noticed it was missing -- §0z25's shape from the other side: the
+script WAS the implementation surface, and it was incomplete.
+
+`check_unchanged_decks` against a worktree at bd9e7ae, both sides Python
+3.11.15: rendmaw, karlov, tivit, shilgengar and azusa **bit-identical**;
+lorehold MOVED on 8 of 8 (won +0.005, cards drawn +0.79, mana spent +2.9 over
+its 400 games), and with `--cfg=native_flashback=False` lorehold is
+bit-identical too, so the move is exactly the flashback. The five caches are
+VERIFIED with that evidence; lorehold's table is rebuilt (below).
+
+Past in Flames, a candidate, has its own Flashback {4}{R} as well and is now
+cast from the graveyard too: its +0.0102 row (2026-09-16, restated in
+§0z38) predates that and is a floor for it.
+
+### What it measured
+
+`diagnostics/run_prisoners_dilemma.py`, N=15,000 paired, the staged list,
+every leg T20 with a T10 snapshot (§0z93), Python 3.11.15.
+`results/prisoners_dilemma.txt`; `results/candidates_lorehold3.txt`.
+
+| comparison | T10 | T20 | damage T20 |
+|---|---|---|---|
+| Faithless Looting's flashback (on − off) | +0.0007 ±0.0022 | +0.0033 ±0.0037 | +0.42 ±0.18* |
+| **Dilemma over a blank, snitch** (Monk's slot, seeds 80000..) | **+0.0127 ±0.0020*** | **+0.0301 ±0.0034*** | +6.03 ±0.21* |
+| Dilemma over a blank, silence | +0.0063 ±0.0016* | +0.0137 ±0.0027* | +3.26 ±0.13* |
+| −Soulfire Eruption +Dilemma, snitch | +0.0117 ±0.0026* | +0.0262 ±0.0041* | +5.22 ±0.22* |
+| −Soulfire Eruption +Dilemma, silence | +0.0039 ±0.0023* | +0.0092 ±0.0037* | +2.22 ±0.17* |
+| −Enlightened Tutor +Dilemma, snitch | +0.0155 ±0.0029* | +0.0332 ±0.0045* | +6.70 ±0.27* |
+| −Enlightened Tutor +Dilemma, silence | +0.0082 ±0.0027* | +0.0157 ±0.0043* | +3.76 ±0.23* |
+
+The snitch candidate arm reproduces `python -m tools.candidates lorehold3`
+to every printed digit (+6.03 ±0.21, +0.0301 ±0.0034, mv_cheated −0.72
+±0.13, P(deploy) 0.304), which is the check on the script (§0z35).
+
+**THE MECHANISM, from the counters.** It resolves **0.46 times a game** at
+T20, in the 30% of games it is cast at all, and **0.21 of those resolutions
+are its own flashback** -- nearly half come off the graveyard. The other 0.25
+are fewer than P(cast), so in some games it is ONLY ever cast from the
+graveyard: the rummage or Looting discarded it first. At 24 damage to the table a resolution, the
+nominal 11 a game is +7.7 spell damage after the bound (a drain into a dead
+player is worth nothing). The silence arm halves the damage and halves the
+win rate, which is the card's text and not a coincidence: the whole card is
+the damage. It costs `mv_cheated` (−0.72): the mana a 5-drop and a 7-mana
+flashback spend is mana the miracle reserve and other casts do not get. That
+is the proxy disagreeing with the objective, as this deck's proxies do.
+
+**Why it out-scores Soulfire Eruption**, the like-for-like burn: Soulfire is
+nine mana, single target, and three random hits off the library's top; the
+Dilemma is five, hits every opponent, and comes back. Both cuts are
+MODEL-EVALUATED rows that are evidence (§0z31).
+
+**The limits, said out loud.** The knob is the card (snitch +0.0301, silence
++0.0137). The rummage's discard policy (`rummage_discard_choice`) does not
+know a flashback card is worth more in the graveyard than a blank one, so a
+discarded Dilemma is valued as its miracle value only -- a small
+understatement.
+
+### The rebuild
+
+IN PROGRESS at this section's first commit: lorehold's table is being rebuilt
+under Python 3.13.12 with numpy 2.4.6 (§0z119; the interpreter reproduced
+karlov's Mother of Runes row IDENTICAL first, `tools.repro_row`). Until it
+lands, lorehold's cache is SUSPECT and `check_docs` fails on it, knowingly.
 
 ## How to read an ablation table
 

@@ -289,6 +289,13 @@ SCRIPTED_LOREHOLD = {
     "Guttersnipe", "Longshot, Rebel Bowman", "Soulfire Eruption",
     "Boros Charm", "Olórin's Searing Light", "Emeria's Call",
     "Rise of the Eldrazi",
+    # Proposed 2026-10-09. Every clause: the opponents' choice is the knob
+    # `dilemma_choice` (snitch, the dominant strategy, or silence, the table
+    # colluding), the damage goes through `deal_pod_damage`, and its own
+    # Flashback {5}{R}{R} is cast from the graveyard (`flashback_options`).
+    # Faithless Looting's flashback, in the list above as SCRIPTED since
+    # before then, was never cast until the same change.
+    "Prisoner's Dilemma",
     # Staged 2026-09-04. lorehold.sunbird() implements the whole text: reveal
     # the top X where X is the triggering spell's mana value, free-cast one
     # spell of MV <= X from among them, bottom the rest in random order — and

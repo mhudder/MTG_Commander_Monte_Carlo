@@ -474,6 +474,15 @@ LAND_RULES = {
     'Woodland Chasm': {'etb': ('tapped',)},
 }
 
+# FLASHBACK: a card's OWN flashback cost, from its "Flashback {..}" line
+# (a grant such as Past in Flames' carries the keyword and no cost, and
+# is not here). Read by lorehold's main phase (702.34a).
+FLASHBACK = {
+    'Faithless Looting': {'gen': 2, 'R': 1},
+    'Past in Flames': {'gen': 4, 'R': 1},
+    "Prisoner's Dilemma": {'gen': 5, 'R': 2},
+}
+
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
 # alike. `check_docs` compares it with the cards the deck modules construct
 # TODAY and fails on any difference: a card added without re-running this
@@ -858,6 +867,7 @@ SCANNED = {
     'Priest of Fell Rites',
     'Primal Vigor',
     'Prismatic Vista',
+    "Prisoner's Dilemma",
     'Pristine Talisman',
     'Proft, Sinister Mastermind',
     'Promise of Loyalty',

@@ -35,6 +35,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
+from edhmc.decks._evasion import FLASHBACK
 
 # Cards that can put a chosen card from hand onto the top of your library.
 # (cost in generic mana to do it, roughly)
@@ -174,6 +175,9 @@ class LoreholdGame(BaseGame):
             # Artist's Talent's three levels (§0z48).
             "artist_rummages": 0, "artist_levels": 0,
             "flashback_exiled": 0,
+            # A card's OWN flashback (2026-10-09), and Prisoner's Dilemma.
+            "native_flashback_casts": 0, "test_card_flashbacks": 0,
+            "dilemma_resolved": 0,
             "bombardment_copies": 0,
             "monument_triggers": 0,
             "mastery_copies": 0,
@@ -441,9 +445,17 @@ def artist_rummage(g):
         discard_triggers(g, 1)
 
 
-def reduce_cost(g, card, miracle=False):
-    """Apply cost reduction. Returns a cost dict."""
-    if miracle:
+def reduce_cost(g, card, miracle=False, flashback=False):
+    """Apply cost reduction. Returns a cost dict.
+
+    `flashback`: start from the card's OWN flashback cost (`_evasion.
+    FLASHBACK`, from Scryfall). Every reduction below still applies -- they
+    read the spell, not the zone it was cast from (Ruby Medallion's "red
+    spells", Longshot's "noncreature spells").
+    """
+    if flashback:
+        cost = dict(FLASHBACK[card.name])
+    elif miracle:
         cost = dict(card.miracle_cost)
     else:
         cost = dict(card.cost)
@@ -1209,6 +1221,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
                 # one target player per exiled card: one hit each
                 deal_pod_damage(g, float(g.library.pop().mv), hits=1,
                                 spell=True)
+    elif sc == "prisoners_dilemma":
+        prisoners_dilemma(g)
     elif sc == "searing_light":
         # "Each opponent exiles a creature with the greatest power among
         # creatures that player controls." An edict, NOT a board wipe — it was
@@ -1531,6 +1545,76 @@ def jeskas_will(g):
         g.m["jeska_casts"] += 1
         resolve_spell(g, best, paid, from_hand=False)
     g.m["jeska_stranded"] += len(pool)
+
+
+# PRISONER'S DILEMMA, the payoff table, per opponent, by what the OTHERS chose:
+#                       others all silent   others all snitch   others mixed
+#   I choose silence           4                  12                 12
+#   I choose snitch            0                   8                  0
+# Snitch is STRICTLY better for every opponent whatever the others do, so it
+# is the only equilibrium and the default; 'silence' is the table colluding
+# against you, the floor. A mixed reveal is not a setting.
+DILEMMA_DAMAGE = {"snitch": 8.0, "silence": 4.0}
+
+
+def prisoners_dilemma(g):
+    """PRISONER'S DILEMMA {3}{R}{R} (Scryfall, 2026-10-09):
+
+        Each opponent secretly chooses silence or snitch, then the choices
+        are revealed. If each opponent chose silence, Prisoner's Dilemma
+        deals 4 damage to each of them. If each opponent chose snitch,
+        Prisoner's Dilemma deals 8 damage to each of them. Otherwise,
+        Prisoner's Dilemma deals 12 damage to each opponent who chose
+        silence.
+
+    THE CHOICE IS THE OPPONENTS', AND IT IS A KNOB, `dilemma_choice` -- the
+    second opponent decision in the project after the vote (`voting.py`),
+    and deliberately NOT `opp_vote_policy`: there, "adversarial" is a bloc
+    that costs its members nothing, while here every silent opponent pays 4
+    to 12 to hold the bloc, and each is better off defecting whatever the
+    others do (DILEMMA_DAMAGE). Say the knob out loud with the number.
+
+    DAMAGE, not life loss, so Artist's Talent's level 3 adds 2 to each
+    opponent and Radiant Scrollwielder's lifelink reads it. "Each opponent"
+    is the living ones, and both arguments are FULL-POD figures, as
+    Guttersnipe's and Olórin's Searing Light's are: `deal_pod_damage`
+    divides the total, Talent's bonus included, by `OPP.pod_size` and
+    `damage_each` deals the quotient to the living. `hits=alive` would give
+    each survivor 2 x alive / pod of the Talent's 2.
+    """
+    choice = g.cfg.get("dilemma_choice", "snitch")
+    each = DILEMMA_DAMAGE[choice]
+    if not OPP.living(g):
+        return
+    g.m["dilemma_resolved"] += 1
+    n = OPP.pod_size(g)
+    deal_pod_damage(g, each * n, hits=n, spell=True)
+
+
+def flashback_options(g, units, reserve):
+    """The graveyard cards castable for their OWN flashback cost right now:
+    [(card, cost, pay_idx)], in `main_phase`'s option shape. 702.34a:
+    "You may cast this card from your graveyard for its flashback cost.
+    Then exile it." Cast as a sorcery or an instant would be; every card in
+    `_evasion.FLASHBACK` today is a sorcery, so the main phase is the window.
+
+    The same gates as a card in hand -- the wipe gate and the decking
+    predicate (`pilot_may_cast`), and the miracle reserve -- because a
+    flashback is a cast and a choice. `native_flashback=False` is the engine
+    before 2026-10-09, when no card's own flashback was ever cast (Faithless
+    Looting's included).
+    """
+    if not g.cfg.get("native_flashback", True):
+        return []
+    out = []
+    for c in g.graveyard:
+        if c.name not in FLASHBACK or not pilot_may_cast(g, c):
+            continue
+        cost = reduce_cost(g, c, flashback=True)
+        idx = can_pay(cost, units)
+        if idx is not None and len(units) - len(idx) >= reserve:
+            out.append((c, cost, idx))
+    return out
 
 
 def exile_flashback(g, card):
@@ -2149,6 +2233,10 @@ def main_phase(g, reserve=0):
             cost, _tag, idx = mode
             if len(units) - len(idx) >= reserve:
                 options.append((c, cost, idx))
+        # A card's own flashback, from the graveyard (2026-10-09). The pool
+        # is recomputed every pass, as Past in Flames' is (§0z19).
+        flashed = flashback_options(g, units, reserve)
+        options.extend(flashed)
         if not options:
             break
 
@@ -2160,6 +2248,21 @@ def main_phase(g, reserve=0):
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         paid = pay(g, cost, units)
+        if any(card is f[0] for f in flashed):
+            # FLASHBACK: off the graveyard, and EXILED whenever it leaves the
+            # stack -- countered or resolved (702.34a). Not from hand, so no
+            # Sunbird's Invocation and no Goliath dream.
+            g.graveyard.remove(card)
+            g.m["native_flashback_casts"] += 1
+            if card.name in g.cfg.get("watch", ()):
+                g.m["test_card_flashbacks"] += 1
+            if OPP.countered(g, card, idx):
+                g.m["countered"] += 1
+                g.m["flashback_exiled"] += 1
+                continue
+            resolve_spell(g, card, paid, from_hand=False)
+            exile_flashback(g, card)
+            continue
         g.hand.remove(card)
         if OPP.countered(g, card, idx):
             g.m["countered"] += 1

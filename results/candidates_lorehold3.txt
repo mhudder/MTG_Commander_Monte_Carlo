@@ -1,0 +1,4 @@
+
+LOREHOLD candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Prisoner's Dilemma             5     +6.03+-0.21     +0.0301+-0.0034     -0.72+-0.13       0.304

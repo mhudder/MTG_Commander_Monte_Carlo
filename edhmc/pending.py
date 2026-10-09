@@ -2255,6 +2255,35 @@ MEASURED: list[Candidate] = [
         limits='Every clause modelled. A POLICY: cracked at the end step for >= `vault_min_treasures` (4); 0.01 cracks a game. At vault_min_treasures=2: 0.03 cracks, +0.0005 +-0.0019 at T20.',
         verdict='A blank: tivit spends its mana, so the Vault is nearly always a colourless land in place of a coloured one.',
     ),
+    Candidate(
+        deck="lorehold", card="Prisoner's Dilemma", measured="2026-10-09",
+        win_rate=("+0.0301 +-0.0034 at T20, +0.0127 +-0.0020 at T10 (value over a "
+                  "blank in Pinnacle Monk's slot, N=15,000, `dilemma_choice` "
+                  "'snitch'); +0.0137 +-0.0027 / +0.0063 +-0.0016 with 'silence'"),
+        signal="both",
+        rationale=("The owner's proposal. A miracle for {2} off Lorehold that deals 24 "
+                   "to the table when each opponent plays the dominant strategy, and a "
+                   "second cast off the graveyard for {5}{R}{R}."),
+        evidence=("results/candidates_lorehold3.txt (tools.candidates lorehold3) and "
+                  "results/prisoners_dilemma.txt PART 2, the same seeds: the snitch arm "
+                  "reproduces the candidates row exactly (+6.03 +-0.21 damage, +0.0301 "
+                  "+-0.0034, P(deploy) 0.304). 0.46 resolutions a game at T20, 0.21 of "
+                  "them from its own flashback. §0z122."),
+        limits=("THE KNOB IS THE CARD: `dilemma_choice`. 'snitch' (8 each) is the only "
+                "equilibrium -- snitch is strictly better for every opponent whatever "
+                "the others choose -- and 'silence' (4 each) is the table colluding "
+                "against it, the floor; both are significant at both horizons. A mixed "
+                "reveal (12 to each silent opponent, up to 24 on two players) is not "
+                "modelled, so neither setting is a ceiling. The rummage's discard "
+                "policy does not know a flashback card is worth more in the graveyard, "
+                "a small understatement. Measured on the engine where Faithless "
+                "Looting's flashback is cast too (§0z122)."),
+        verdict=("Significant at both horizons under BOTH settings of the knob. On the "
+                 "table's scale it sits with the deck's top rows at T20 (Storm Herd "
+                 "+0.0432, Rise of the Eldrazi +0.0361), though §0c forbids ranking it "
+                 "against them. The head-to-heads are in SIMULATED; the decision -- and "
+                 "the cut -- is the owner's."),
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -3178,6 +3207,18 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-03', source='results/azusa_batch6_h2h.txt',
         result='REAL SWAP -Wayward Swordtooth +Glacier Godmaw, N=15,000 paired: +0.0228 +-0.0030 (significant) at T10 and +0.0265 +-0.0042 (significant) at T20; damage +2.34 +-0.26.',
         notes='17 summoning-sick creatures a game attack because of its haste -- the landfall tokens made this turn. The Lander is a footnote (0.14 cracked a game). A seven-drop, so P(cast) is the lowest of the seven (0.260).',
+    ),
+    Simulated(
+        deck='lorehold', remove='Soulfire Eruption', add="Prisoner's Dilemma",
+        measured='2026-10-09', source='results/prisoners_dilemma.txt',
+        result=("REAL SWAP -Soulfire Eruption +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0117 +-0.0026 (significant) at T10 and +0.0262 +-0.0041 (significant) at T20; 'silence' +0.0039 +-0.0023 (significant) at T10 and +0.0092 +-0.0037 (significant) at T20."),
+        notes=("The like-for-like cut: a red damage sorcery (+0.0041 +-0.0028 in the table, MODEL-EVALUATED). Both legs on the staged list with native flashback on (Faithless Looting's included). The knob is `dilemma_choice`; §0z122."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Enlightened Tutor', add="Prisoner's Dilemma",
+        measured='2026-10-09', source='results/prisoners_dilemma.txt',
+        result=("REAL SWAP -Enlightened Tutor +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0155 +-0.0029 (significant) at T10 and +0.0332 +-0.0045 (significant) at T20; 'silence' +0.0082 +-0.0027 (significant) at T10 and +0.0157 +-0.0043 (significant) at T20."),
+        notes=("The lowest win-rate MODEL-EVALUATED row in the table (-0.0025 +-0.0034, signal dmg). Both legs on the staged list with native flashback on (Faithless Looting's included). The knob is `dilemma_choice`; §0z122."),
     ),
 ]
 
@@ -4105,6 +4146,26 @@ PROPOSED: list[Proposal] = [
         triage='DEFERRED',
         triage_note=('Needs Saga lore counters added after the draw step, a chapter-II activation creating a 0/0 Construct whose power counts artifacts, a chapter-III tutor for a {0}/{1} artifact, and the sacrifice after III. tivit has saga lore (§0z83) but none of the rest; measured after the cheaper lands.'),
     ),
+    Proposal(
+        deck='lorehold', card="Prisoner's Dilemma",
+        cost='{3}{R}{R}', identity='R',
+        type_line='Sorcery',
+        oracle="Each opponent secretly chooses silence or snitch, then the choices are revealed. If each opponent chose silence, Prisoner's Dilemma deals 4 damage to each of them. If each opponent chose snitch, Prisoner's Dilemma deals 8 damage to each of them. Otherwise, Prisoner's Dilemma deals 12 damage to each opponent who chose silence.\nFlashback {5}{R}{R}",
+        verified='2026-10-09',
+        rationale=("The owner's proposal (2026-10-09). A sorcery is a miracle for {2} off Lorehold, and a discarded one is not lost: "
+                   "the rummage feeds the graveyard and flashback casts it from there. Snitch strictly dominates for every opponent "
+                   "(0 < 4 when the others stay silent, 8 < 12 when they snitch), so the equilibrium is 8 to each opponent -- 24 "
+                   "damage to the table, against Soulfire Eruption's single-target +0.0041 row."),
+        implement=("Every clause is modelled. The CHOICE is the opponents', and it is a knob, `dilemma_choice`: 'snitch' (each "
+                   "plays the dominant strategy: 8 each) or 'silence' (the table colludes: 4 each, the floor). A mixed reveal (12 to "
+                   "each silent player) is not a setting. Damage through `deal_pod_damage`, one hit per opponent (Artist's Talent, "
+                   "Scrollwielder's lifelink). FLASHBACK IS NEW TO THIS ENGINE: a native flashback cost, read from Scryfall by "
+                   "`tag_flying` into `_evasion.FLASHBACK` rather than typed, cast from the graveyard in the main phase and exiled "
+                   "(702.34a)."),
+        triage='LIVE',
+        prepared='tests/test_prisoners_dilemma.py',
+        rejected='MEASURED 2026-10-09 and PROMOTED: the Candidate in MEASURED carries the number, and SIMULATED the two head-to-heads (§0z122). Closed rather than deleted so the verified oracle text stays where it was written.',
+    ),
 ]
 
 
@@ -4146,7 +4207,9 @@ DECKS = {
         "Chief Magistrate of Mercadia": lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA,
         # LAND CANDIDATES, 2026-10-06 (§0z113).
         "Ancient Tomb": lorehold_v16.ANCIENT_TOMB,
-        "Command Beacon": lorehold_v16.COMMAND_BEACON}),
+        "Command Beacon": lorehold_v16.COMMAND_BEACON,
+        # The owner's proposal, 2026-10-09.
+        "Prisoner's Dilemma": lorehold_v16.PRISONERS_DILEMMA}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.
