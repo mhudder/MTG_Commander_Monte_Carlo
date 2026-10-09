@@ -10860,10 +10860,20 @@ understatement.
 
 ### The rebuild
 
-IN PROGRESS at this section's first commit: lorehold's table is being rebuilt
-under Python 3.13.12 with numpy 2.4.6 (§0z119; the interpreter reproduced
-karlov's Mother of Runes row IDENTICAL first, `tools.repro_row`). Until it
-lands, lorehold's cache is SUSPECT and `check_docs` fails on it, knowingly.
+Lorehold's table rebuilt at 4401798's code, N=15,000, both horizons,
+**Python 3.13.12, numpy 2.4.6** -- the tables' interpreter (§0z119), checked
+first: `tools.repro_row` reproduced karlov's Mother of Runes IDENTICAL, and
+afterwards lorehold's own Faithless Looting row IDENTICAL from the new cache.
+Twenty minutes on four cores.
+
+**0 of 65 rows moved beyond their old bar (`won`), no category changed, no
+sign flipped.** Five signal labels changed at the margin (Artist's Talent
+both → dmg, Ruby Medallion -- → dmg, Lightning Greaves dmg → both, Sensei's
+Divining Top win → dmg, Restoration Seminar -- → win), each a bar grazing
+zero. **Faithless Looting: win +0.0046 → +0.0079, damage T20 +0.41 →
++0.83** -- its flashback, the one row the change was aimed at, and inside
+its old bar on win rate. The noise floor is ±0.0030. `check_docs` 16/16, 67
+test modules green, validate 21 × +0.00.
 
 ## How to read an ablation table
 

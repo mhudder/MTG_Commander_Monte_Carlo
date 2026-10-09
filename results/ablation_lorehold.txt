@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0029.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0030.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -25,63 +25,63 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Storm Herd                            +3.26+-0.21         +3.93+-0.22        +0.0432+-0.0038      both
-Longshot, Rebel Bowman                +2.55+-0.17         +2.68+-0.18        +0.0136+-0.0030      both
-Apex of Power                         +2.18+-0.18         +2.50+-0.19        +0.0324+-0.0035      both
-Emeria's Call                         +1.70+-0.15         +2.30+-0.19        +0.0145+-0.0033      both
-Land Tax                              +1.71+-0.19         +2.16+-0.23        +0.0229+-0.0037      both
-Rise of the Eldrazi                   +1.86+-0.16         +2.05+-0.17        +0.0361+-0.0035      both
-Olórin's Searing Light                +1.50+-0.09         +2.05+-0.12        +0.0143+-0.0023      both
-Sol Ring                              +2.34+-0.22         +1.99+-0.24        +0.0179+-0.0038      both
-Monastery Mentor                      +1.52+-0.15         +1.90+-0.17        +0.0141+-0.0029      both
-Monument to Endurance                 +1.38+-0.17         +1.76+-0.20        +0.0281+-0.0037      both
-Reforge the Soul                      +1.14+-0.15         +1.75+-0.18        +0.0217+-0.0037      both
-Guttersnipe                           +1.66+-0.12         +1.61+-0.13        +0.0088+-0.0023      both
-Big Score                             +1.04+-0.15         +1.40+-0.19        +0.0142+-0.0035      both
-Hit the Mother Lode                   +1.13+-0.13         +1.36+-0.15        +0.0138+-0.0030      both
-Caldera Pyremaw                       +1.02+-0.11         +1.30+-0.13        +0.0110+-0.0025      both
-Unexpected Windfall                   +0.92+-0.15         +1.18+-0.18        +0.0122+-0.0035      both
-Thrill of Possibility                 +0.86+-0.17         +1.17+-0.20        +0.0121+-0.0037      both
-Talisman of Conviction                +0.98+-0.17         +1.10+-0.20        +0.0072+-0.0034      both
-Boros Signet                          +0.97+-0.17         +1.04+-0.20        +0.0074+-0.0034      both
-Soulfire Eruption                     +0.93+-0.11         +1.04+-0.13        +0.0041+-0.0028      both
-Sunbird's Invocation                  +0.65+-0.14         +1.03+-0.18        +0.0109+-0.0038      both
-Bender's Waterskin                    +0.92+-0.16         +1.03+-0.19        +0.0076+-0.0034      both
-Mizzix's Mastery                      +0.78+-0.14         +1.02+-0.17        +0.0141+-0.0033      both
-Victory Chimes                        +0.97+-0.17         +1.01+-0.20        +0.0086+-0.0033      both
-Arcane Signet                         +1.06+-0.18         +0.97+-0.20        +0.0064+-0.0034      both
-The Dawning Archaic                   +0.70+-0.11         +0.93+-0.12        +0.0104+-0.0025      both
-Dragon's Rage Channeler               +0.84+-0.09         +0.91+-0.11        +0.0029+-0.0023      both
-Boros Charm                           +0.82+-0.07         +0.85+-0.08        +0.0016+-0.0015      both
-Arcane Bombardment                    +0.42+-0.15         +0.78+-0.18        +0.0101+-0.0037      both
-Goliath Daydreamer                    +0.61+-0.09         +0.72+-0.11        +0.0054+-0.0022      both
-Invoke Calamity                       +0.47+-0.10         +0.71+-0.12        +0.0075+-0.0026      both
-Smothering Tithe                      +0.43+-0.16         +0.53+-0.19        +0.0050+-0.0035      both
-Verge Rangers                         +0.43+-0.12         +0.42+-0.15        +0.0023+-0.0027       dmg
-Faithless Looting                     +0.29+-0.17         +0.41+-0.20        +0.0046+-0.0036      both
-Double Vision                         +0.22+-0.13         +0.41+-0.16        +0.0076+-0.0033      both
-Library of Leng                       +0.43+-0.16         +0.33+-0.18        +0.0037+-0.0035      both
-Mother of Runes                       +0.29+-0.10         +0.29+-0.12        +0.0023+-0.0021      both
-Storm-Kiln Artist                     +0.30+-0.09         +0.27+-0.12        +0.0019+-0.0024       dmg
-Artist's Talent                       +0.34+-0.17         +0.26+-0.20        +0.0038+-0.0037      both
-Dawn's Truce                          +0.15+-0.07         +0.19+-0.09        +0.0018+-0.0016      both
-Ruby Medallion                        +0.23+-0.14         +0.16+-0.16        -0.0021+-0.0032        --
-Lightning Greaves                     +0.15+-0.10         +0.16+-0.13        +0.0021+-0.0025       dmg
-Sensei's Divining Top                 -0.23+-0.17         -0.17+-0.20        +0.0036+-0.0035       win
-Enlightened Tutor                     -0.42+-0.15         -0.40+-0.18        -0.0025+-0.0034       dmg
-Approach of the Second Sun            -0.72+-0.10         -2.00+-0.17        +0.0267+-0.0038      both
+Storm Herd                            +3.32+-0.21         +3.90+-0.22        +0.0439+-0.0038      both
+Longshot, Rebel Bowman                +2.55+-0.17         +2.69+-0.18        +0.0141+-0.0030      both
+Apex of Power                         +2.18+-0.18         +2.50+-0.19        +0.0335+-0.0035      both
+Emeria's Call                         +1.68+-0.15         +2.21+-0.19        +0.0131+-0.0034      both
+Olórin's Searing Light                +1.52+-0.09         +2.09+-0.12        +0.0141+-0.0023      both
+Land Tax                              +1.67+-0.19         +2.06+-0.23        +0.0228+-0.0037      both
+Rise of the Eldrazi                   +1.82+-0.16         +2.02+-0.17        +0.0359+-0.0035      both
+Sol Ring                              +2.33+-0.22         +2.02+-0.24        +0.0171+-0.0038      both
+Monastery Mentor                      +1.58+-0.15         +1.98+-0.18        +0.0165+-0.0030      both
+Monument to Endurance                 +1.46+-0.17         +1.82+-0.20        +0.0268+-0.0037      both
+Reforge the Soul                      +1.20+-0.15         +1.76+-0.19        +0.0233+-0.0037      both
+Guttersnipe                           +1.71+-0.12         +1.67+-0.13        +0.0081+-0.0023      both
+Big Score                             +1.03+-0.15         +1.39+-0.19        +0.0145+-0.0036      both
+Hit the Mother Lode                   +1.15+-0.13         +1.37+-0.15        +0.0156+-0.0031      both
+Caldera Pyremaw                       +1.04+-0.11         +1.34+-0.13        +0.0130+-0.0026      both
+Unexpected Windfall                   +0.90+-0.15         +1.17+-0.18        +0.0142+-0.0035      both
+Thrill of Possibility                 +0.86+-0.17         +1.15+-0.20        +0.0133+-0.0038      both
+Soulfire Eruption                     +0.92+-0.11         +1.06+-0.13        +0.0029+-0.0027      both
+Mizzix's Mastery                      +0.83+-0.14         +1.04+-0.16        +0.0150+-0.0033      both
+Sunbird's Invocation                  +0.68+-0.15         +1.03+-0.19        +0.0141+-0.0038      both
+Bender's Waterskin                    +0.90+-0.16         +1.03+-0.19        +0.0089+-0.0034      both
+Talisman of Conviction                +0.95+-0.18         +1.00+-0.20        +0.0071+-0.0034      both
+Boros Signet                          +0.98+-0.17         +0.99+-0.20        +0.0087+-0.0035      both
+Arcane Signet                         +1.06+-0.18         +0.98+-0.20        +0.0075+-0.0034      both
+Victory Chimes                        +0.96+-0.17         +0.97+-0.20        +0.0098+-0.0033      both
+The Dawning Archaic                   +0.70+-0.10         +0.93+-0.13        +0.0115+-0.0025      both
+Arcane Bombardment                    +0.50+-0.15         +0.86+-0.18        +0.0101+-0.0036      both
+Dragon's Rage Channeler               +0.83+-0.10         +0.86+-0.11        +0.0037+-0.0024      both
+Boros Charm                           +0.83+-0.07         +0.86+-0.08        +0.0019+-0.0016      both
+Faithless Looting                     +0.69+-0.19         +0.83+-0.23        +0.0079+-0.0042      both
+Invoke Calamity                       +0.49+-0.10         +0.76+-0.12        +0.0089+-0.0026      both
+Goliath Daydreamer                    +0.59+-0.09         +0.66+-0.11        +0.0063+-0.0022      both
+Smothering Tithe                      +0.44+-0.16         +0.45+-0.19        +0.0056+-0.0036      both
+Double Vision                         +0.29+-0.13         +0.43+-0.16        +0.0071+-0.0033      both
+Verge Rangers                         +0.45+-0.12         +0.42+-0.15        +0.0021+-0.0028       dmg
+Mother of Runes                       +0.30+-0.10         +0.31+-0.12        +0.0031+-0.0021      both
+Library of Leng                       +0.43+-0.16         +0.30+-0.18        +0.0038+-0.0035      both
+Artist's Talent                       +0.36+-0.17         +0.30+-0.21        +0.0034+-0.0038       dmg
+Storm-Kiln Artist                     +0.30+-0.09         +0.23+-0.12        +0.0023+-0.0024       dmg
+Dawn's Truce                          +0.17+-0.07         +0.21+-0.09        +0.0024+-0.0017      both
+Ruby Medallion                        +0.26+-0.15         +0.18+-0.17        -0.0014+-0.0032       dmg
+Lightning Greaves                     +0.13+-0.10         +0.16+-0.13        +0.0033+-0.0025      both
+Sensei's Divining Top                 -0.27+-0.16         -0.24+-0.20        +0.0015+-0.0036       dmg
+Enlightened Tutor                     -0.41+-0.15         -0.39+-0.19        -0.0019+-0.0034       dmg
+Approach of the Second Sun            -0.69+-0.10         -2.03+-0.17        +0.0263+-0.0038      both
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Promise of Loyalty                    +0.21+-0.10         +0.89+-0.13        +0.0112+-0.0027      both
+Promise of Loyalty                    +0.20+-0.10         +0.96+-0.13        +0.0121+-0.0026      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Borrowed Knowledge                    +0.62+-0.15         +0.81+-0.18        +0.0035+-0.0034      both
+Borrowed Knowledge                    +0.57+-0.15         +0.74+-0.19        +0.0041+-0.0035      both
       MODE 2 IS IMPLEMENTED as of 2026-09-11 ('discard your hand, then draw cards
       equal to the number of cards discarded this way'), including the discards,
       which is the half this deck's graveyard engines actually wanted. Mode 1 --
@@ -89,32 +89,27 @@ Borrowed Knowledge                    +0.62+-0.15         +0.81+-0.18        +0.
       UNMODELABLE rather than unimplemented: this opponent model has no hand to
       count (§4). Mode 1 is the stronger half against a full grip, so this row is
       a FLOOR. §0f.
-Blasphemous Act                       -0.43+-0.13         +0.69+-0.16        +0.0073+-0.0029      FLIP
+Blasphemous Act                       -0.42+-0.13         +0.70+-0.16        +0.0074+-0.0030      FLIP
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Farewell                              -0.16+-0.11         +0.61+-0.14        +0.0073+-0.0028      FLIP
+Ondu Inversion                        +0.06+-0.17         +0.65+-0.20        +0.0049+-0.0034      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Ondu Inversion                        +0.04+-0.17         +0.58+-0.20        +0.0037+-0.0033      both
+Farewell                              -0.20+-0.11         +0.62+-0.14        +0.0091+-0.0028      FLIP
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
-Pinnacle Monk                         +0.41+-0.13         +0.51+-0.16        +0.0057+-0.0028      both
+Pinnacle Monk                         +0.40+-0.13         +0.47+-0.16        +0.0036+-0.0028      both
       MODELLED: the 2/2 body, its ETB 'return target instant or sorcery card from
       your graveyard to your hand' (the largest, Volcanic Vision's pick,
       `regrow_best_spell`), and the back face, Mystic Peak (enters tapped; the
       pay-3-life untapped option is not taken). NOT: prowess. A floor.
-Ultima                                -0.23+-0.11         +0.46+-0.14        +0.0087+-0.0028      FLIP
-      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
-      honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
-Volcanic Vision                       +0.30+-0.07         +0.45+-0.10        +0.0067+-0.0023      both
+Volcanic Vision                       +0.28+-0.07         +0.44+-0.09        +0.0077+-0.0023      both
       The RECURSION half is implemented (2026-09-13, §0z19): it returns the
       largest instant or sorcery from the graveyard to hand and exiles itself. The
       DAMAGE half -- 'deals damage equal to that card's mana value to each
@@ -122,29 +117,34 @@ Volcanic Vision                       +0.30+-0.07         +0.45+-0.10        +0.
       blocker count with no toughness to compare a mana value against (§4). Both
       halves scale with the SAME choice of target, so the unmodelled half is
       largest exactly when the modelled one is: this row is a floor. §7.
+Ultima                                -0.25+-0.11         +0.42+-0.14        +0.0081+-0.0028      FLIP
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4). The COST is
+      modelled and the BENEFIT is an estimate.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Sejiri Shelter                        +0.76+-0.15         +0.81+-0.18        +0.0065+-0.0029      both
+Sejiri Shelter                        +0.71+-0.15         +0.77+-0.18        +0.0068+-0.0029      both
       Played as its land face, and held up in `protection_cards`, where
       `try_protect` blanks a spot removal aimed at a creature and nothing else
       (§0z118 -- it used to blank a whole wrath). The pod's answer has no colour,
       so 'protection from the color of your choice' always stops it: a ceiling
       against an artifact or same-coloured answer.
-Perch Protection                      +0.43+-0.08         +0.48+-0.10        +0.0033+-0.0018      both
+Perch Protection                      +0.44+-0.09         +0.46+-0.10        +0.0029+-0.0018      both
       Held up in `protection_cards` and spent by `try_protect`, which with the
       gift is faithful -- everything phases out. But the gift is an opponent's
       EXTRA TURN, which the pod's clocks never take (overstates), and the four 2/2
       flying Birds are never made (understates). Both directions, so not a floor.
-Bolt Bend                             +0.20+-0.08         +0.30+-0.10        +0.0025+-0.0017      both
-Generous Gift                         +0.15+-0.07         +0.21+-0.08        +0.0007+-0.0014       dmg
-Hexing Squelcher                      +0.21+-0.05         +0.18+-0.07        +0.0012+-0.0013       dmg
-Chaos Warp                            +0.09+-0.07         +0.17+-0.08        +0.0007+-0.0014       dmg
-Path to Exile                         +0.02+-0.05         +0.09+-0.07        +0.0007+-0.0012       dmg
-Gamble                                -0.01+-0.05         +0.04+-0.06        -0.0001+-0.0011        --
-Call Forth the Tempest                +0.02+-0.02         +0.04+-0.03        +0.0006+-0.0008       dmg
-Swords to Plowshares                  +0.05+-0.05         +0.04+-0.07        -0.0010+-0.0013        --
-Improvisation Capstone                +0.01+-0.02         +0.01+-0.03        +0.0002+-0.0007        --
-Restoration Seminar                   +0.00+-0.02         +0.01+-0.03        +0.0005+-0.0005        --
+Bolt Bend                             +0.20+-0.08         +0.32+-0.10        +0.0028+-0.0018      both
+Generous Gift                         +0.12+-0.08         +0.16+-0.09        +0.0009+-0.0016       dmg
+Chaos Warp                            +0.14+-0.07         +0.16+-0.09        +0.0005+-0.0015       dmg
+Hexing Squelcher                      +0.20+-0.05         +0.16+-0.07        +0.0009+-0.0014       dmg
+Path to Exile                         +0.02+-0.06         +0.10+-0.08        +0.0002+-0.0013       dmg
+Gamble                                +0.01+-0.05         +0.06+-0.06        +0.0007+-0.0011        --
+Swords to Plowshares                  +0.04+-0.06         +0.04+-0.07        -0.0003+-0.0014        --
+Call Forth the Tempest                +0.02+-0.02         +0.04+-0.03        +0.0006+-0.0007       dmg
+Restoration Seminar                   +0.00+-0.02         +0.02+-0.03        +0.0006+-0.0006       win
+Improvisation Capstone                +0.01+-0.02         +0.01+-0.03        +0.0000+-0.0006        --
