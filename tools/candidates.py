@@ -29,8 +29,7 @@ from edhmc.decks.lorehold_v16 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       UNDERWORLD_BREACH,
                                       CALDERA_PYREMAW, INVINCIBLE_HYMN,
                                       REVERSE_THE_SANDS,
-    BATCH_2026_09_16 as LOREHOLD_2026_09_16,
-    BATCH_2026_10_09 as LOREHOLD_2026_10_09)
+    BATCH_2026_09_16 as LOREHOLD_2026_09_16)
 from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    GUIDE_OF_SOULS, ENDURING_TENACITY,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
@@ -253,11 +252,11 @@ DECKS = {
     # 2026-09-16 (§0z26). Pinnacle Monk is the slot lorehold/lorehold1 used.
     "lorehold2": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
                   LOREHOLD_2026_09_16),
-    # 2026-10-09, Prisoner's Dilemma. Pinnacle Monk is still the slot, so this
-    # row shares lorehold2's scale. `diagnostics/run_prisoners_dilemma.py`
-    # reproduces it on the same seeds and adds the `dilemma_choice` arms.
-    "lorehold3": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
-                  LOREHOLD_2026_10_09),
+    # "lorehold3" (Prisoner's Dilemma, 2026-10-09) was here and has been
+    # REMOVED, Caldera Pyremaw's reason above: `-Ruby Medallion +Prisoner's
+    # Dilemma` was staged the same day, so `build_pending` now puts the card
+    # in the list and add_value() would refuse it. Its row is
+    # results/candidates_lorehold3.txt and the MEASURED entry (§0z122).
     # 2026-09-16 (§0z26). THE VICTIM IS A BASIC PLAINS, and that is a
     # deliberate choice rather than a convenience: tivit has no weak nonland
     # row to free up -- its worst MODEL-EVALUATED card is Tamiyo's Journal at

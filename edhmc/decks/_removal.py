@@ -342,6 +342,7 @@ SCANNED = {
     'Plea for Power',
     'Priest of Fell Rites',
     'Primal Vigor',
+    "Prisoner's Dilemma",
     'Pristine Talisman',
     'Promise of Loyalty',
     'Propaganda',

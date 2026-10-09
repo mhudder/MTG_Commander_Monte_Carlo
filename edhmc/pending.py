@@ -2281,8 +2281,8 @@ MEASURED: list[Candidate] = [
         verdict=("Significant at both horizons under BOTH settings of the knob. On the "
                  "table's scale it sits with the deck's top rows at T20 (Storm Herd "
                  "+0.0432, Rise of the Eldrazi +0.0361), though §0c forbids ranking it "
-                 "against them. The head-to-heads are in SIMULATED; the decision -- and "
-                 "the cut -- is the owner's."),
+                 "against them. STAGED 2026-10-09 against Ruby Medallion (CHANGES); the "
+                 "other two head-to-heads are in SIMULATED."),
     ),
 ]
 
@@ -2290,6 +2290,35 @@ MEASURED: list[Candidate] = [
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
+    Change(
+        deck="lorehold", remove="Ruby Medallion", add="Prisoner's Dilemma",
+        staged="2026-10-09",
+        rationale=(
+            "STAGED BY THE OWNER 2026-10-09. A miracle for {2} off Lorehold that "
+            "deals 8 to each opponent when they play the dominant strategy, and "
+            "casts itself again from the graveyard for {5}{R}{R} (§0z122). The "
+            "cut is a MODEL-EVALUATED card whose text is modelled faithfully "
+            "and which seldom matters here: Ruby is out for 2.0 miracle windows "
+            "a game and makes 0.022 miracles a game possible that full price "
+            "would not (§0z123)."),
+        evidence=(
+            "REAL SWAP -Ruby Medallion +Prisoner's Dilemma, N=15,000 paired, seeds 5000.., "
+            "the staged list with native flashback on: 'snitch' +0.0125 +-0.0028 "
+            "(significant) at T10 and +0.0295 +-0.0044 (significant) at T20; "
+            "'silence' +0.0045 +-0.0025 (significant) at T10 and +0.0103 +-0.0040 "
+            "(significant) at T20. results/prisoners_dilemma_ruby.txt "
+            "(diagnostics/run_prisoners_dilemma.py --cuts=\"Ruby Medallion\")."),
+        notes=(
+            "THE KNOB IS THE CARD: `dilemma_choice` ('snitch' default, the only "
+            "equilibrium; 'silence' the floor). REBUILD DEFERRED BY THE OWNER: "
+            "staging changes `build_pending`, so lorehold's cache is SUSPECT "
+            "until its table is rebuilt -- `check_docs` fails on it knowingly "
+            "until then, and nothing but a rebuild clears it (§0z27). The "
+            "other head-to-heads, against Soulfire Eruption (+0.0262 at T20) "
+            "and Enlightened Tutor (+0.0332, a ceiling since §0z123), stay in "
+            "SIMULATED. Not committed: the deck module and the .xlsx are "
+            "untouched."),
+    ),
     Change(
         deck="karlov", remove="Soulmender", add="Bloodthirsty Conqueror",
         staged="2026-09-16",
@@ -3219,12 +3248,6 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-09', source='results/prisoners_dilemma.txt',
         result=("REAL SWAP -Enlightened Tutor +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0155 +-0.0029 (significant) at T10 and +0.0332 +-0.0045 (significant) at T20; 'silence' +0.0082 +-0.0027 (significant) at T10 and +0.0157 +-0.0043 (significant) at T20."),
         notes=("The lowest win-rate MODEL-EVALUATED row when measured (-0.0025 +-0.0034, signal dmg) -- and PARTLY MODELLED since 2026-10-09 by the owner's call (§0z123): its table-facing choice is not modelled, so this swap is a CEILING. Both legs on the staged list with native flashback on (Faithless Looting's included). The knob is `dilemma_choice`; §0z122."),
-    ),
-    Simulated(
-        deck='lorehold', remove='Ruby Medallion', add="Prisoner's Dilemma",
-        measured='2026-10-09', source='results/prisoners_dilemma_ruby.txt',
-        result=("REAL SWAP -Ruby Medallion +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0125 +-0.0028 (significant) at T10 and +0.0295 +-0.0044 (significant) at T20; 'silence' +0.0045 +-0.0025 (significant) at T10 and +0.0103 +-0.0040 (significant) at T20."),
-        notes=("Ruby's row is -0.0014 +-0.0032, MODEL-EVALUATED, and its text is modelled faithfully: the {1} discount reaches the hardcast, the miracle cost, the miracle value, set_top's and Library of Leng's affordability checks, and the off-turn payment -- but it is out for only 2.0 miracle windows a game (cast in 27% of games, median turn 7, removed in 24% of those) and makes 0.022 miracles a game possible that full price would not (§0z123). Both legs on the staged list with native flashback on. The knob is `dilemma_choice`."),
     ),
 ]
 

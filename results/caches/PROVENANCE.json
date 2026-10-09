@@ -360,6 +360,12 @@
         "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered azusa's table from this cache with no games simulated: byte-identical to the committed table.",
         "fingerprint": "134cd32750dae9dd",
         "utc": "2026-10-09T13:49:49Z"
+      },
+      {
+        "commit": "aa03208",
+        "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: azusa BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "32c4e3c969f69852",
+        "utc": "2026-10-09T14:03:10Z"
       }
     ]
   },
@@ -642,6 +648,12 @@
         "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered karlov's table from this cache with no games simulated: byte-identical to the committed table.",
         "fingerprint": "c599b2fd15da28ea",
         "utc": "2026-10-09T13:49:48Z"
+      },
+      {
+        "commit": "aa03208",
+        "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: karlov BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "44d083189de9786e",
+        "utc": "2026-10-09T14:03:10Z"
       }
     ]
   },
@@ -1244,6 +1256,12 @@
         "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered rendmaw's table from this cache with no games simulated: byte-identical to the committed table.",
         "fingerprint": "7556108e803785a1",
         "utc": "2026-10-09T13:49:48Z"
+      },
+      {
+        "commit": "aa03208",
+        "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: rendmaw BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "4f43a542c2db31b5",
+        "utc": "2026-10-09T14:03:10Z"
       }
     ]
   },
@@ -1570,6 +1588,12 @@
         "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered shilgengar's table from this cache with no games simulated: byte-identical to the committed table.",
         "fingerprint": "03ab947fc20a57b0",
         "utc": "2026-10-09T13:49:49Z"
+      },
+      {
+        "commit": "aa03208",
+        "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: shilgengar BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "1274f4c8e11b06ad",
+        "utc": "2026-10-09T14:03:10Z"
       }
     ]
   },
@@ -1833,6 +1857,12 @@
         "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered tivit's table from this cache with no games simulated: byte-identical to the committed table.",
         "fingerprint": "367f9857713989e9",
         "utc": "2026-10-09T13:49:49Z"
+      },
+      {
+        "commit": "aa03208",
+        "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: tivit BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "67a58bc371f2a952",
+        "utc": "2026-10-09T14:03:10Z"
       }
     ]
   },

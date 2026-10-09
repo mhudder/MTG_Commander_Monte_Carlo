@@ -40,6 +40,15 @@ MET = ("won", "damage", "spell_damage", "dilemma_resolved",
        "miracles_cast", "mv_cheated", "turns_played")
 CARD = MOD.PRISONERS_DILEMMA
 DECK, CMD = build_pending("lorehold")
+# MEASURED BEFORE IT WAS STAGED. `-Ruby Medallion +Prisoner's Dilemma` was
+# staged on 2026-10-09 after both runs, so the staged list now holds the card
+# and every leg here would play a second copy. Refuse rather than measure that.
+if any(c.name == CARD.name for c in DECK):
+    raise SystemExit(
+        f"{CARD.name!r} is staged in lorehold's list (edhmc/pending.py), so this "
+        f"script would measure a second copy. Its results are "
+        f"results/prisoners_dilemma*.txt, measured before the staging (§0z122, "
+        f"§0z123); a re-measure is a run_ab against the list WITHOUT the Change.")
 VICTIM = "Pinnacle Monk"
 BLANK = blank_like(CARD, repl_priority(DECK), DECK)
 WATCH = frozenset({CARD.name})
