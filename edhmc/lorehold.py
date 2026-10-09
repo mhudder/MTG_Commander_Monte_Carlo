@@ -35,7 +35,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng)
 from edhmc import opponents as OPP
-from edhmc.decks._evasion import FLASHBACK
+from edhmc.decks._evasion import FLASHBACK, REBOUND
 
 # Cards that can put a chosen card from hand onto the top of your library.
 # (cost in generic mana to do it, roughly)
@@ -117,6 +117,14 @@ class LoreholdGame(BaseGame):
         self.tutor_log = []
         self.made_token_this_turn = False
         self.beast_active = False
+        # Rebound (702.88a): cards cast from hand and exiled, each cast free
+        # at your next upkeep (`rebound_upkeep`). Profound Journey, 2026-10-09.
+        self.rebound_exile = []
+        # True while `main_phase` runs: mana added by a resolving spell
+        # (Explosive Welcome) survives only inside the step that made it
+        # (500.4), and the main phase is the only step this engine casts in
+        # with mana it did not hold over.
+        self.in_main = False
 
         cfg.setdefault("shroud_sources",
                        ("Lightning Greaves", "Mother of Runes", "Plaza of Heroes"))
@@ -445,6 +453,23 @@ def artist_rummage(g):
         discard_triggers(g, 1)
 
 
+def self_reduction(g, card) -> int:
+    """A card's OWN "this spell costs {1} less" -- read by BOTH `reduce_cost`
+    (a hardcast) and `miracle_reduction` (the miracle {2}, and with it every
+    miracle decision), because a cost reduction applies to an alternative cost
+    as well (601.2f) and one rule written in two places drifts (§0u).
+
+    FURYGALE FLOCKING (Scryfall, 2026-10-09): "This spell costs {1} less to
+    cast for each instant and sorcery card in your graveyard." Generic only,
+    so with two in the yard the miracle is free. `furygale_reduction=False`
+    prices it at the printed cost, for the mutation check."""
+    if (card.script == "furygale"
+            and g.cfg.get("furygale_reduction", True)):
+        return sum(1 for c in g.graveyard
+                   if "Instant" in c.types or "Sorcery" in c.types)
+    return 0
+
+
 def reduce_cost(g, card, miracle=False, flashback=False):
     """Apply cost reduction. Returns a cost dict.
 
@@ -474,6 +499,7 @@ def reduce_cost(g, card, miracle=False, flashback=False):
                    if "Instant" in c.types or "Sorcery" in c.types)
     if card.name == "Blasphemous Act":
         red += min(9, sum(1 for p in g.board if p.card.is_creature) + 3)
+    red += self_reduction(g, card)
     cost["gen"] = max(0, cost.get("gen", 0) - red)
     return cost
 
@@ -507,6 +533,7 @@ def miracle_reduction(g, card) -> int:
         red += 1
     if g.has("Longshot, Rebel Bowman") and "Creature" not in card.types:
         red += 1
+    red += self_reduction(g, card)
     return red
 
 
@@ -783,6 +810,10 @@ def pilot_may_cast(g, card) -> bool:
     if ("wipe" in card.tags and g.cfg.get("wipe_gate_all_casts", True)
             and not OPP.should_cast_own_wipe(g, card)):
         return False
+    # NO LEGAL TARGET, NO CAST (601.2c): Profound Journey targets a permanent
+    # card in your graveyard.
+    if card.script == "profound_journey" and reanimation_target(g) is None:
+        return False
     n = spell_draws(g, card)
     return n == 0 or draw_is_safe(g, n)
 
@@ -848,7 +879,7 @@ def scrollwielder_lifelink(g, dealt):
         g.m["lifelink_gained"] += dealt
 
 
-def deal_pod_damage(g, amount, each=True, *, hits, spell):
+def deal_pod_damage(g, amount, each=True, *, hits, spell, target=None):
     """`each=True`: an 'each opponent loses N' effect; amount is the pod total.
 
     `hits` is REQUIRED, and it is the number of times a source you control
@@ -876,8 +907,11 @@ def deal_pod_damage(g, amount, each=True, *, hits, spell):
     if spell:
         scrollwielder_lifelink(g, amount / n * alive if each
                                else (amount if alive else 0.0))
+    # `target` (each=False only): an opponent the caller chose -- a spell
+    # whose two targets must differ (Explosive Welcome). None is
+    # `damage_single`'s closest-to-dying pick.
     amount = (OPP.damage_each(g, amount / n) if each
-              else OPP.damage_single(g, amount))
+              else OPP.damage_single(g, amount, target=target))
     g.m["damage"] += amount
     g.m["spell_damage"] += amount
     if g.damage_by_turn:
@@ -1223,6 +1257,29 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
                                 spell=True)
     elif sc == "prisoners_dilemma":
         prisoners_dilemma(g)
+    elif sc == "furygale":
+        furygale_flocking(g)
+    elif sc == "searing_wind":
+        # "Searing Wind deals 10 damage to any target." One opponent, the
+        # closest to dying (`damage_single`), one hit (2026-10-09).
+        g.m["searing_wind_resolved"] += 1
+        deal_pod_damage(g, 10.0, each=False, hits=1, spell=True)
+    elif sc == "explosive_welcome":
+        explosive_welcome(g)
+    elif sc == "phalanx":
+        gideons_phalanx(g)
+    elif sc == "profound_journey":
+        profound_journey(g)
+    elif sc == "gyre":
+        # IMMOLATING GYRE: its counters only -- the damage is the `wipe` tag
+        # below (`resolve_own_wipe`, one-sided, `opponents.gyre_share`).
+        # Read BEFORE the wipe, so `gyre_pod_killed` is what X took.
+        share = OPP.gyre_share(g)
+        g.m["gyre_resolved"] += 1
+        g.m["gyre_x"] += sum(1 for c in g.graveyard
+                             if "Instant" in c.types or "Sorcery" in c.types)
+        g.m["gyre_pod_killed"] += share * sum(o.creatures
+                                              for o in OPP.living(g))
     elif sc == "searing_light":
         # "Each opponent exiles a creature with the greatest power among
         # creatures that player controls." An edict, NOT a board wipe — it was
@@ -1335,6 +1392,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
             g.m["spells_cast"] += 1
             apply_spell_effects(g, x, is_copy=True)
     elif sc == "wheel" and not is_copy:
+        g.m["wheel_casts"] += 1
         discard_triggers(g, len(g.hand))
         g.graveyard.extend(g.hand)
         g.hand = []
@@ -1591,6 +1649,150 @@ def prisoners_dilemma(g):
     deal_pod_damage(g, each * n, hits=n, spell=True)
 
 
+# ---------------------------------------------------------------------------
+# The owner's second batch, 2026-10-09: big instants and sorceries that
+# Lorehold's miracle {2} makes cheap. Oracle text from api.scryfall.com the
+# same day, verbatim on each Proposal in edhmc/pending.py.
+# ---------------------------------------------------------------------------
+
+def furygale_flocking(g):
+    """FURYGALE FLOCKING {8}{R}{R}: "For each opponent, create two 3/3 blue
+    and red Elemental creature tokens with flying that attack that opponent
+    this turn if able. They gain haste until end of turn." (Its cost
+    reduction is `self_reduction`.)
+
+    "Each opponent" is the LIVING ones. FLYING FROM THIS CARD'S TEXT, not
+    `FLYING_TOKENS`: that set is keyed by subtype, and azusa's Elementals
+    (Zendikar's Roil, Avenger) do not fly -- adding the subtype there would
+    hand them wings. Haste until end of turn is an UNSICK token on the turn
+    it is made (the untap step unsicks everything after), never `haste` on
+    the Card -- a copy of the token would inherit that.
+
+    NOT MODELLED, and named: "attack THAT opponent" -- the six join the one
+    attack `combat_damage` splits across the pod, so a pair is not pinned to
+    its own defender. Made on an opponent's upkeep they cannot attack that
+    turn (it is not your combat) and attack on yours, as the rules say."""
+    n = 2 * len(OPP.living(g))
+    for _ in range(n):
+        tok = Card(name="Elemental token", types=frozenset({"Creature"}),
+                   power=3, toughness=3, flying=True)
+        g.board.append(Permanent(card=tok, sick=False, is_token=True))
+    g.m["furygale_tokens"] += n
+
+
+def explosive_welcome(g):
+    """EXPLOSIVE WELCOME {7}{R}: "Explosive Welcome deals 5 damage to any
+    target and 3 damage to any other target. Add {R}{R}{R}."
+
+    TWO DIFFERENT TARGETS. The pilot's pick: the two opponents closest to
+    dying, the 5 on the lower -- unless the 3 alone kills the lower (Artist's
+    Talent's +2 counted), when the 3 goes there and the 5 to the next. With
+    one opponent left the second target is a creature (§4) and does nothing
+    here. One hit each, so Talent and Scrollwielder read both.
+
+    THE MANA EMPTIES BETWEEN STEPS (500.4), so {R}{R}{R} is added only when
+    the spell resolves in a MAIN PHASE (`g.in_main`) -- a hardcast, or a free
+    cast there -- into the one-colour pool Apex of Power uses, which lasts
+    the turn (Apex's documented generosity). From a miracle in the draw step
+    or an opponent's upkeep it is lost, and counted (`welcome_mana_lost`)."""
+    g.m["welcome_resolved"] += 1
+    alive = sorted(OPP.living(g), key=lambda o: o.life)
+    if alive:
+        first = alive[0]
+        second = alive[1] if len(alive) > 1 else None
+        if second is not None and first.life <= 3 + artist_bonus(g, 1):
+            plan = ((3.0, first), (5.0, second))
+        else:
+            plan = ((5.0, first), (3.0, second))
+        for amount, o in plan:
+            if o is not None:
+                deal_pod_damage(g, amount, each=False, hits=1, spell=True,
+                                target=o)
+    if (g.in_main and g.cfg.get("welcome_mana", True)
+            and (g.apex_mana == 0 or g.apex_color == "R")):
+        g.apex_color = "R"
+        g.apex_mana += 3
+        g.m["welcome_mana_added"] += 3
+    else:
+        g.m["welcome_mana_lost"] += 3
+
+
+def gideons_phalanx(g):
+    """GIDEON'S PHALANX {5}{W}{W}: "Create four 2/2 white Knight creature
+    tokens with vigilance. Spell mastery -- If there are two or more instant
+    and/or sorcery cards in your graveyard, creatures you control gain
+    indestructible until end of turn."
+
+    The Knights are modelled. VIGILANCE IS INERT HERE, said rather than
+    built: nothing in this pod reads whether your creatures are tapped.
+    SPELL MASTERY IS NOT MODELLED: its indestructible matters only cast in
+    response to a wrath, and the pod's removal is one round at the end of
+    your turn that no miracle window overlaps -- as a protection spell it
+    would need a `PROTECTION` entry that pays seven mana, which
+    `try_protect` cannot express. Counted when it WOULD have applied
+    (`phalanx_mastery`), so the floor has a size."""
+    make_tokens(g, 4, 2, 2, "Knight")
+    g.m["phalanx_knights"] += 4
+    if sum(1 for c in g.graveyard
+           if "Instant" in c.types or "Sorcery" in c.types) >= 2:
+        g.m["phalanx_mastery"] += 1
+
+
+def reanimation_target(g):
+    """"Target permanent card from your graveyard": the pilot's pick, or None
+    when there is no legal target. A nonland card by (priority, mana value)
+    -- the deck's own casting order -- and a land only when nothing else is
+    there. Recomputed per call: the zone is live (§0z19)."""
+    perms = [c for c in g.graveyard if c.is_permanent or c.is_land]
+    if not perms:
+        return None
+    nonland = [c for c in perms if not c.is_land]
+    if nonland:
+        return max(nonland, key=lambda c: (c.priority, c.mv))
+    return perms[0]
+
+
+def profound_journey(g):
+    """PROFOUND JOURNEY {5}{W}{W}: "Return target permanent card from your
+    graveyard to the battlefield. Rebound." The return; rebound is
+    `resolve_spell` (cast from hand -> exiled) and `rebound_upkeep`.
+
+    A permanent enters through `enters_battlefield`, the path a resolved
+    permanent spell takes, so its ETBs fire; it is not CAST, so no cast
+    trigger does. A land enters through `enter_land`, its own rule
+    (§0z115). The target is re-read on resolution: an earlier effect in the
+    same turn can have moved it (§0z19), and no target means nothing
+    returns."""
+    pick = reanimation_target(g)
+    if pick is None:
+        g.m["journey_fizzled"] += 1
+        return
+    g.graveyard.remove(pick)
+    g.m["journey_returns"] += 1
+    g.m["journey_mv"] += pick.mv
+    if pick.is_land:
+        after_land_enters(g, enter_land(g, pick))
+    else:
+        enters_battlefield(g, pick)
+
+
+def rebound_upkeep(g):
+    """REBOUND's second half: "At the beginning of your next upkeep, you may
+    cast this card from exile without paying its mana cost." A choice, so it
+    asks `pilot_may_cast` (a target, the decking rule, the wipe gate); a card
+    not cast stays in exile for good. Cast from EXILE, so it goes to the
+    graveyard after this resolution -- no second rebound."""
+    pending, g.rebound_exile = g.rebound_exile, []
+    for card in pending:
+        if g.result is not None:
+            return
+        if not pilot_may_cast(g, card):
+            g.m["rebound_declined"] += 1
+            continue
+        g.m["rebound_casts"] += 1
+        cast_free(g, card)
+
+
 def flashback_options(g, units, reserve):
     """The graveyard cards castable for their OWN flashback cost right now:
     [(card, cost, pay_idx)], in `main_phase`'s option shape. 702.34a:
@@ -1753,6 +1955,54 @@ def cast_free(g, card, exile=False, from_hand=False):
                   cheated=card.free_mv)
 
 
+def enters_battlefield(g, card):
+    """A nonland permanent CARD you control enters the battlefield, and its
+    "when this enters" abilities fire -- cast or not. ONE path for a resolved
+    permanent spell and a reanimated card (Profound Journey, 2026-10-09):
+    the ETBs below used to live inline in `resolve_spell`, where a second
+    way onto the battlefield would have had to copy them (§0u)."""
+    g.board.append(Permanent(card=card, sick=not card.haste))
+    # CHIEF MAGISTRATE OF MERCADIA (§0z74): "When Chief Magistrate of
+    # Mercadia enters, you become the monarch." One implementation for
+    # six engines (§0z39); idempotent if you already hold the crown.
+    if card.name == "Chief Magistrate of Mercadia":
+        OPP.become_monarch(g)
+    # PINNACLE MONK (§0z83): "When this creature enters, return target
+    # instant or sorcery card from your graveyard to your hand." (Scryfall,
+    # 2026-09-29.) Its prowess is still unmodelled, a floor its PARTLY
+    # reason names. `pinnacle_monk_etb=False` restores the body alone.
+    if (card.name == "Pinnacle Monk"
+            and g.cfg.get("pinnacle_monk_etb", True)
+            and regrow_best_spell(g) is not None):
+        g.m["monk_returns"] += 1
+    # STINGCASTER MAGE (Reality Fracture, preview text 2026-09-21):
+    # "{1}{R} 2/1 Haste. When this creature enters, TARGET instant or
+    # sorcery card in your graveyard gains flashback until end of turn.
+    # The flashback cost is equal to its mana cost."
+    #
+    # ONE target, so it is `past_in_flames` with cap=1 -- the same function,
+    # not a second copy of the rule (§0u). Everything that makes Past in
+    # Flames honest applies unchanged: flashback costs FULL PRICE, so
+    # nothing is cheated and `mv_cheated` is not credited; the pool is
+    # recomputed per cast (§0z19); and the card is exiled on resolution.
+    #
+    # A FLOOR, and the clause is named: the real card grants flashback
+    # UNTIL END OF TURN, so a pilot who cannot pay right now may still cast
+    # it later in the same turn. This fires immediately or not at all,
+    # exactly as Past in Flames does, so a Stingcaster resolved with the
+    # mana already spent does nothing where the card would have done
+    # something. Conservative in the same direction for both cards.
+    if card.name == "Stingcaster Mage":
+        # Its OWN casts, as a difference. Assigning `flashback_casts`
+        # here would have copied Past in Flames' running total into this
+        # counter and read as one Stingcaster cast per Past in Flames
+        # cast -- §0z28's lesson about a draw credited to the wrong
+        # counter, pointed at a cast.
+        before = g.m["flashback_casts"]
+        past_in_flames(g, self_card=card, cap=1)
+        g.m["stingcaster_casts"] += g.m["flashback_casts"] - before
+
+
 def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
     g.last_paid = paid
     g.m["spells_cast"] += 1
@@ -1768,50 +2018,21 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
     on_cast_triggers(g, card)
 
     if card.is_permanent:
-        g.board.append(Permanent(card=card, sick=not card.haste))
-        # CHIEF MAGISTRATE OF MERCADIA (§0z74): "When Chief Magistrate of
-        # Mercadia enters, you become the monarch." One implementation for
-        # six engines (§0z39); idempotent if you already hold the crown.
-        if card.name == "Chief Magistrate of Mercadia":
-            OPP.become_monarch(g)
-        # PINNACLE MONK (§0z83): "When this creature enters, return target
-        # instant or sorcery card from your graveyard to your hand." (Scryfall,
-        # 2026-09-29.) Its prowess is still unmodelled, a floor its PARTLY
-        # reason names. `pinnacle_monk_etb=False` restores the body alone.
-        if (card.name == "Pinnacle Monk"
-                and g.cfg.get("pinnacle_monk_etb", True)
-                and regrow_best_spell(g) is not None):
-            g.m["monk_returns"] += 1
-        # STINGCASTER MAGE (Reality Fracture, preview text 2026-09-21):
-        # "{1}{R} 2/1 Haste. When this creature enters, TARGET instant or
-        # sorcery card in your graveyard gains flashback until end of turn.
-        # The flashback cost is equal to its mana cost."
-        #
-        # ONE target, so it is `past_in_flames` with cap=1 -- the same function,
-        # not a second copy of the rule (§0u). Everything that makes Past in
-        # Flames honest applies unchanged: flashback costs FULL PRICE, so
-        # nothing is cheated and `mv_cheated` is not credited; the pool is
-        # recomputed per cast (§0z19); and the card is exiled on resolution.
-        #
-        # A FLOOR, and the clause is named: the real card grants flashback
-        # UNTIL END OF TURN, so a pilot who cannot pay right now may still cast
-        # it later in the same turn. This fires immediately or not at all,
-        # exactly as Past in Flames does, so a Stingcaster resolved with the
-        # mana already spent does nothing where the card would have done
-        # something. Conservative in the same direction for both cards.
-        if card.name == "Stingcaster Mage":
-            # Its OWN casts, as a difference. Assigning `flashback_casts`
-            # here would have copied Past in Flames' running total into this
-            # counter and read as one Stingcaster cast per Past in Flames
-            # cast -- §0z28's lesson about a draw credited to the wrong
-            # counter, pointed at a cast.
-            before = g.m["flashback_casts"]
-            past_in_flames(g, self_card=card, cap=1)
-            g.m["stingcaster_casts"] += g.m["flashback_casts"] - before
+        enters_battlefield(g, card)
     elif card.script in SELF_EXILING and g.cfg.get("lorehold_recursion", True):
         pass                       # "Exile <self>." Not in the graveyard.
     elif card.script == "approach":
         pass        # it placed itself in the library, or the game is over
+    elif (from_hand and card.name in REBOUND
+          and g.cfg.get("rebound", True)):
+        # REBOUND (702.88a): "If you cast this spell from your hand, exile it
+        # as it resolves. At the beginning of your next upkeep, you may cast
+        # this card from exile without paying its mana cost." A miracle is
+        # cast from hand. Ahead of Invoke Calamity's and Goliath's "exile it
+        # instead": every one is a replacement the CONTROLLER orders, and a
+        # pilot takes the one that gives the card back (616.1).
+        g.rebound_exile.append(card)
+        g.m["rebound_exiled"] += 1
     elif exile and ("Instant" in card.types or "Sorcery" in card.types):
         g.m["free_cast_exiled"] += 1   # "... exile it instead" (cast_free)
     elif (from_hand and g.cfg.get("lorehold_recursion", True)
@@ -2174,6 +2395,14 @@ def command_beacon(g) -> bool:
 
 
 def main_phase(g, reserve=0):
+    g.in_main = True
+    try:
+        _main_phase(g, reserve)
+    finally:
+        g.in_main = False
+
+
+def _main_phase(g, reserve=0):
     """reserve: mana left untapped for miracle windows on opponents' turns.
 
     This is not a detail. Lorehold's rummage creates three miracle windows per
@@ -2513,6 +2742,9 @@ def take_turn(g):
         g.m["treasures_made"] += n
     # Chief Magistrate of Mercadia's upkeep trigger (§0z74).
     magistrate_upkeep(g)
+    # Rebound (702.88a): each card exiled by it is cast free now.
+    if g.rebound_exile:
+        rebound_upkeep(g)
 
     # INSTANT-SPEED SETUP, RESOLVED BEFORE THE UPKEEP TRIGGERS.
     #

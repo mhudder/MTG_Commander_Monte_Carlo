@@ -317,3 +317,11 @@ command; use it rather than remembering.
   priced as it resolves. A wrath that is an overload (`OVERLOAD_WIPES`, Damn)
   is cast at `wipe_mode_cost` in every main phase; any other cast path that
   can put one on the stack must ask `overload_only` first.
+- **In lorehold, a nonland permanent enters through `enters_battlefield`**
+  (2026-10-09) -- a resolved permanent spell and a reanimated card (Profound
+  Journey) alike, so its "when this enters" abilities fire either way. A new
+  ETB goes there, and a new way onto the battlefield calls it; writing the
+  ETB inline in `resolve_spell` again makes reanimation skip it (§0u).
+  A card's OWN cost reduction is `self_reduction`, read by both `reduce_cost`
+  and `miracle_reduction`, because a reduction applies to the miracle {2}
+  too (601.2f).

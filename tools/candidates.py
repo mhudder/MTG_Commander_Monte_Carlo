@@ -29,7 +29,8 @@ from edhmc.decks.lorehold_v16 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       UNDERWORLD_BREACH,
                                       CALDERA_PYREMAW, INVINCIBLE_HYMN,
                                       REVERSE_THE_SANDS,
-    BATCH_2026_09_16 as LOREHOLD_2026_09_16)
+    BATCH_2026_09_16 as LOREHOLD_2026_09_16,
+    BATCH_2026_10_09_SPELLS as LOREHOLD_2026_10_09_SPELLS)
 from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    GUIDE_OF_SOULS, ENDURING_TENACITY,
                                    STARSCAPE_CLERIC, THE_WIND_CRYSTAL,
@@ -257,6 +258,12 @@ DECKS = {
     # Dilemma` was staged the same day, so `build_pending` now puts the card
     # in the list and add_value() would refuse it. Its row is
     # results/candidates_lorehold3.txt and the MEASURED entry (§0z122).
+    # The owner's second 2026-10-09 batch: seven big instants and sorceries.
+    # Pinnacle Monk's slot again, so these rows share lorehold2's and
+    # lorehold3's baseline. diagnostics/run_lorehold_big_spells.py reproduces
+    # each T20 row on the same seeds as its check.
+    "lorehold4": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
+                  LOREHOLD_2026_10_09_SPELLS),
     # 2026-09-16 (§0z26). THE VICTIM IS A BASIC PLAINS, and that is a
     # deliberate choice rather than a convenience: tivit has no weak nonland
     # row to free up -- its worst MODEL-EVALUATED card is Tamiyo's Journal at

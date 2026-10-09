@@ -196,6 +196,7 @@ python -m tests.test_top_five --mutate             # 4 mutations, exact sets
 python -m tests.test_oracle_batch --mutate         # 8 mutations, exact sets
 python -m tests.test_suspended --mutate            # 1 mutation, exact set
 python -m tests.test_prisoners_dilemma --mutate    # 4 mutations, exact sets
+python -m tests.test_lorehold_big_spells --mutate    # 6 mutations, exact sets
 ```
 
 And the check for whether a SHARED-code change moved a deck it was not meant

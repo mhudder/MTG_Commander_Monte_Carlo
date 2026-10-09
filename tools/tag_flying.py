@@ -464,6 +464,14 @@ def main():
             if cost is not None:
                 flashback[n] = cost
 
+    # REBOUND, 2026-10-09 (702.88a): "If you cast this spell from your hand,
+    # exile it as it resolves. At the beginning of your next upkeep, you may
+    # cast this card from exile without paying its mana cost." The keyword is
+    # the whole rule -- there is no cost to read -- so the set is the keyword.
+    # Lorehold is the only reader (`lorehold.resolve_spell`).
+    rebound = {n for n, c in cards.items()
+               if n in everything and "Rebound" in c.get("keywords", [])}
+
     land_rules = {}
     for n, c in cards.items():
         if n in everything and everything[n].is_land:
@@ -529,6 +537,11 @@ def main():
     print(f"\nFLASHBACK ({len(flashback)}) -- the card's own flashback cost:")
     for n in sorted(flashback):
         print(f"    {n:42} {flashback[n]}")
+
+    print(f"\nREBOUND ({len(rebound)}) -- cast from hand, exiled, recast free "
+          f"next upkeep:")
+    for n in sorted(rebound):
+        print(f"    {n}")
 
     print(f"\nLAND RULES ({len(land_rules)}) -- entering, tapping and life, "
           f"from the oracle text:")
@@ -664,6 +677,12 @@ def main():
                      "FLASHBACK = {\n")
             for n in sorted(flashback):
                 fh.write(f"    {n!r}: {flashback[n]!r},\n")
+            fh.write("}\n")
+            fh.write("\n# REBOUND: cards with the keyword, from Scryfall "
+                     "(702.88a). Read by lorehold's\n# resolve_spell: cast from "
+                     "hand, exiled, recast free next upkeep.\nREBOUND = {\n")
+            for n in sorted(rebound):
+                fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"

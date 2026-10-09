@@ -343,6 +343,13 @@ SCRIPTED_LOREHOLD = {
     # if able" is unmodelled -- a DRAWBACK, and one the engine's attack
     # policy mostly satisfies anyway, so its absence cannot flatter a low row.
     "Dragon's Rage Channeler",
+    # The owner's second batch, 2026-10-09. Searing Wind: 10 to the opponent
+    # closest to dying. Explosive Welcome: 5 and 3 to two DIFFERENT
+    # opponents, and {R}{R}{R} kept only in a main phase (500.4). Profound
+    # Journey: the best permanent card from the graveyard through
+    # `enters_battlefield`, and rebound read from Scryfall. "Any target"'s
+    # creature and planeswalker halves are §4, unused rather than missing.
+    "Searing Wind", "Explosive Welcome", "Profound Journey",
 }
 
 # Reviewed 2026-09-03 against the oracle audit. Membership here is a claim
@@ -877,6 +884,33 @@ PARTLY_MODELLED = {
             "(§4). A floor.",
     },
     "lorehold": {
+        # The owner's second batch, 2026-10-09.
+        "Furygale Flocking":
+            "MODELLED: {1} less per instant and sorcery in the graveyard, on "
+            "the hardcast AND the miracle {2} (`self_reduction`); two 3/3 "
+            "flying tokens per living opponent, unsick the turn they are made. "
+            "NOT: 'attack THAT opponent' -- the six join the one attack "
+            "`combat_damage` splits across the pod rather than going two at "
+            "each player, so the split is the pilot's, a slight CEILING.",
+        "Gideon's Phalanx":
+            "MODELLED: four 2/2 Knights. Vigilance is inert (nothing here "
+            "reads a tapped creature of yours). NOT: spell mastery's "
+            "indestructible, which matters only cast in response to a wrath "
+            "-- the pod's removal is a round no miracle window overlaps, and "
+            "`try_protect` cannot hold up a seven-mana spell. A FLOOR; "
+            "`phalanx_mastery` counts when it would have applied.",
+        "Raphael's Technique":
+            "MODELLED: Reforge the Soul's `wheel` (discard the hand, draw "
+            "seven, declined when seven would deck you); the opponents' half "
+            "is blind (no hands, §4). NOT: Sneak {2}{R}, which returns an "
+            "unblocked attacker -- usually the commander, whose recast costs "
+            "more than the sneak saves -- and 'may': the pilot always wheels.",
+        "Immolating Gyre":
+            "MODELLED: X = instants and sorceries in your graveyard, read on "
+            "resolution; one-sided, through `resolve_own_wipe` and the wipe "
+            "gate. THE KNOB: the pod's creatures have no toughness (§4), so "
+            "X kills the share min(1, X / `gyre_full_x`) of each board "
+            "(gyre_full_x 6, a judgement). Planeswalkers: §4.",
         # The owner, 2026-10-09 (§0z123): "a difficult card to model, as there
         # are so many options depending on opponents board states".
         "Enlightened Tutor":

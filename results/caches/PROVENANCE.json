@@ -366,6 +366,12 @@
         "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: azusa BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "32c4e3c969f69852",
         "utc": "2026-10-09T14:03:10Z"
+      },
+      {
+        "commit": "2852268",
+        "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
+        "fingerprint": "5421808eb85c10db",
+        "utc": "2026-10-09T16:35:46Z"
       }
     ]
   },
@@ -654,6 +660,12 @@
         "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: karlov BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "44d083189de9786e",
         "utc": "2026-10-09T14:03:10Z"
+      },
+      {
+        "commit": "2852268",
+        "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
+        "fingerprint": "80f58b315b5f5983",
+        "utc": "2026-10-09T16:35:45Z"
       }
     ]
   },
@@ -1262,6 +1274,12 @@
         "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: rendmaw BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "4f43a542c2db31b5",
         "utc": "2026-10-09T14:03:10Z"
+      },
+      {
+        "commit": "2852268",
+        "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
+        "fingerprint": "06ebea460ffc93da",
+        "utc": "2026-10-09T16:35:44Z"
       }
     ]
   },
@@ -1594,6 +1612,12 @@
         "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: shilgengar BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "1274f4c8e11b06ad",
         "utc": "2026-10-09T14:03:10Z"
+      },
+      {
+        "commit": "2852268",
+        "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
+        "fingerprint": "3c89ab1bdc3826d7",
+        "utc": "2026-10-09T16:35:46Z"
       }
     ]
   },
@@ -1863,6 +1887,12 @@
         "evidence": "2026-10-09, staging -Ruby Medallion +Prisoner's Dilemma (lorehold) moved only decks/_removal.py's SCANNED set (one name added; no destroy share changed). check_unchanged_decks against a worktree at aa03208: tivit BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "67a58bc371f2a952",
         "utc": "2026-10-09T14:03:10Z"
+      },
+      {
+        "commit": "2852268",
+        "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
+        "fingerprint": "11876055062ef136",
+        "utc": "2026-10-09T16:35:45Z"
       }
     ]
   },

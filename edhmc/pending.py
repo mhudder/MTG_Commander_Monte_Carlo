@@ -4195,6 +4195,122 @@ PROPOSED: list[Proposal] = [
         prepared='tests/test_prisoners_dilemma.py',
         rejected='MEASURED 2026-10-09 and PROMOTED: the Candidate in MEASURED carries the number, and SIMULATED the two head-to-heads (§0z122). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # THE OWNER'S SECOND BATCH, 2026-10-09: high-mana-value Boros instants and
+    # sorceries, found by a Scryfall search (`(t:instant or t:sorcery) id<=rw
+    # mv>=6 f:commander`) and picked by the owner from a shortlist. Lorehold
+    # gives each a miracle cost of {2}, so the printed cost is mostly the
+    # hardcast fallback and the effect is what is being bought.
+    Proposal(
+        deck='lorehold', card='Furygale Flocking',
+        cost='{8}{R}{R}', identity='R',
+        type_line='Sorcery',
+        oracle='This spell costs {1} less to cast for each instant and sorcery card in your graveyard.\nFor each opponent, create two 3/3 blue and red Elemental creature tokens with flying that attack that opponent this turn if able. They gain haste until end of turn.',
+        verified='2026-10-09',
+        rationale=("The owner's pick ('excellent'). The cost reduction applies to an alternative cost (601.2f), so with two "
+                   "instants or sorceries in the graveyard -- Lorehold's rummage puts one there every opponent's upkeep -- "
+                   "the miracle {2} is free, and the card is six 3/3 flying attackers with haste in a creature-sparse list."),
+        implement=("MODELLED: the reduction, in ONE function read by both `reduce_cost` (hardcast) and `miracle_reduction` "
+                   "(the miracle, and so every miracle decision); two tokens per LIVING opponent, 3/3 flying (from this card's "
+                   "text -- `FLYING_TOKENS` is keyed by subtype and azusa's Elementals do not fly), unsick on the turn they are "
+                   "made. NOT MODELLED: 'attack THAT opponent' -- the tokens join the one attack `combat_damage` splits across "
+                   "the pod, so each pair is not pinned to its own defender. Made on an opponent's upkeep they cannot attack "
+                   "that turn, which is the rules, and attack on yours."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card='Searing Wind',
+        cost='{8}{R}', identity='R',
+        type_line='Instant',
+        oracle='Searing Wind deals 10 damage to any target.',
+        verified='2026-10-09',
+        rationale=("The owner: 'fair'. Ten damage for {2} at instant speed, in any of the three windows on opponents' "
+                   "upkeeps -- reach for a deck whose damage is mostly spells."),
+        implement=("MODELLED: 10 damage to ONE opponent, the one closest to dying (`OPP.damage_single`), one hit "
+                   "(Artist's Talent's +2, Scrollwielder's lifelink). 'Any target' also allows a creature or planeswalker, "
+                   "which the pod does not have as objects (§4) -- unused, a floor of no size worth naming."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card='Explosive Welcome',
+        cost='{7}{R}', identity='R',
+        type_line='Instant',
+        oracle='Explosive Welcome deals 5 damage to any target and 3 damage to any other target. Add {R}{R}{R}.',
+        verified='2026-10-09',
+        rationale=("The owner: 'a weaker Searing Wind'. Measured beside it so the gap is a number: eight damage split two "
+                   "ways against ten to one player, and three red mana."),
+        implement=("MODELLED: 5 and 3 to two DIFFERENT opponents, the two closest to dying, the 3 on the lower when 3 kills "
+                   "it; with one opponent left the 3 has no player to hit (a creature, §4). The {R}{R}{R} empties between "
+                   "steps (500.4), so it is added only when the spell resolves in a MAIN PHASE -- a hardcast or a free cast "
+                   "there -- and is lost from a miracle in the draw step or an opponent's upkeep, which is almost always."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card="Gideon's Phalanx",
+        cost='{5}{W}{W}', identity='W',
+        type_line='Instant',
+        oracle='Create four 2/2 white Knight creature tokens with vigilance.\nSpell mastery — If there are two or more instant and/or sorcery cards in your graveyard, creatures you control gain indestructible until end of turn.',
+        verified='2026-10-09',
+        rationale=("The owner: 'weaker than Flocking usually, but might help fix the deck being creature-sparse'. Eight "
+                   "power for {2} at instant speed, so the Knights made on an opponent's upkeep attack on your turn."),
+        implement=("MODELLED: four 2/2 Knight tokens. INERT HERE, said rather than built: vigilance (nothing in this pod "
+                   "reads whether your creatures are tapped). NOT MODELLED: spell mastery's indestructible -- it matters "
+                   "only cast in response to a wrath, and the pod's removal is a round at the end of your turn that no "
+                   "miracle window overlaps; using it as a protection spell needs a PROTECTION entry that pays seven mana, "
+                   "which `try_protect` cannot express. PARTLY MODELLED: the row is a floor."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card="Raphael's Technique",
+        cost='{4}{R}{R}', identity='R',
+        type_line='Instant',
+        oracle='Sneak {2}{R} (You may cast this spell for {2}{R} if you also return an unblocked attacker you control to hand during the declare blockers step.)\nEach player may discard their hand and draw seven cards.',
+        verified='2026-10-09',
+        rationale=("The owner: 'a weaker Reforge the Soul'. A second wheel; measured so 'weaker' has a size."),
+        implement=("MODELLED: the existing `wheel` script, Reforge the Soul's: discard the hand to the graveyard (Monument "
+                   "fires), draw seven, declined when seven would deck you. The opponents' half is blind (no hands, §4). "
+                   "NOT MODELLED: Sneak, an alternative cost that returns an unblocked attacker -- in this list usually the "
+                   "commander, whose recast costs more than the sneak saves. And 'may': the pilot always wheels, as "
+                   "Reforge's text forces. PARTLY MODELLED for Sneak."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card='Immolating Gyre',
+        cost='{4}{R}{R}', identity='R',
+        type_line='Sorcery',
+        oracle="Immolating Gyre deals X damage to each creature and planeswalker you don't control, where X is the number of instant and sorcery cards in your graveyard.",
+        verified='2026-10-09',
+        rationale=("The owner: 'not sure how strong it is, interested to model'. A ONE-SIDED sweeper whose size is the "
+                   "graveyard Lorehold's rummage fills -- a catch-up card that costs this list nothing."),
+        implement=("MODELLED: X read on resolution; the pod's creatures die in the share `min(1, X / gyre_full_x)` -- THE "
+                   "KNOB, a judgement: the pod's creatures are a count with no toughness (§4), so `gyre_full_x` (6) is the X "
+                   "at which every one of them dies, with toughness spread evenly below it. Routed through `resolve_own_wipe` "
+                   "(one-sided, so yours are spared) and the wipe gate, which prices the same share. Damage, so it is in "
+                   "WIPE_DESTROYS. NOT MODELLED: planeswalkers (§4)."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
+    Proposal(
+        deck='lorehold', card='Profound Journey',
+        cost='{5}{W}{W}', identity='W',
+        type_line='Sorcery',
+        oracle="Return target permanent card from your graveyard to the battlefield.\nRebound (If you cast this spell from your hand, exile it as it resolves. At the beginning of your next upkeep, you may cast this card from exile without paying its mana cost.)",
+        verified='2026-10-09',
+        rationale=("The owner: 'a weaker Restoration Seminar'. Two reanimations for one card when it is cast from hand -- "
+                   "and a miracle IS cast from hand."),
+        implement=("NEW TO THIS ENGINE: reanimation and rebound. The best permanent card in the graveyard (by priority, a "
+                   "land only when nothing else is there) enters through the same path a cast permanent does, its ETBs "
+                   "included. Rebound is read from Scryfall's keywords (`_evasion.REBOUND`), exiles the card when cast from "
+                   "hand and casts it free at your next upkeep. No legal target, no cast. NOTE: Restoration Seminar, the card "
+                   "the owner compares it to, is KNOWN_BLIND in this engine -- unimplemented -- so the two cannot be compared "
+                   "here until it is."),
+        triage='LIVE',
+        prepared='tests/test_lorehold_big_spells.py',
+    ),
 ]
 
 
@@ -4238,7 +4354,9 @@ DECKS = {
         "Ancient Tomb": lorehold_v16.ANCIENT_TOMB,
         "Command Beacon": lorehold_v16.COMMAND_BEACON,
         # The owner's proposal, 2026-10-09.
-        "Prisoner's Dilemma": lorehold_v16.PRISONERS_DILEMMA}),
+        "Prisoner's Dilemma": lorehold_v16.PRISONERS_DILEMMA,
+        # The owner's second batch, 2026-10-09.
+        **{c.name: c for c in lorehold_v16.BATCH_2026_10_09_SPELLS}}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.

@@ -401,3 +401,48 @@ PRISONERS_DILEMMA = C("Prisoner's Dilemma", "Sorcery", {"gen": 3, "R": 2},
                       priority=5, script="prisoners_dilemma")
 
 BATCH_2026_10_09 = (PRISONERS_DILEMMA,)
+
+# ---------------------------------------------------------------------------
+# 2026-10-09, the owner's second batch: high-mana-value Boros instants and
+# sorceries that Lorehold's miracle {2} makes cheap. Oracle text from
+# api.scryfall.com the same day, verbatim on each Proposal in edhmc/pending.py.
+# ---------------------------------------------------------------------------
+# {8}{R}{R} sorcery. "This spell costs {1} less to cast for each instant and
+# sorcery card in your graveyard. For each opponent, create two 3/3 blue and
+# red Elemental creature tokens with flying that attack that opponent this
+# turn if able. They gain haste until end of turn." The reduction applies to
+# the miracle {2} too (601.2f) -- `lorehold.self_reduction`.
+FURYGALE_FLOCKING = C("Furygale Flocking", "Sorcery", {"gen": 8, "R": 2},
+                      priority=6, script="furygale")
+# {8}{R} instant. "Searing Wind deals 10 damage to any target."
+SEARING_WIND = C("Searing Wind", "Instant", {"gen": 8, "R": 1},
+                 priority=5, script="searing_wind")
+# {7}{R} instant. "Explosive Welcome deals 5 damage to any target and 3 damage
+# to any other target. Add {R}{R}{R}."
+EXPLOSIVE_WELCOME = C("Explosive Welcome", "Instant", {"gen": 7, "R": 1},
+                      priority=5, script="explosive_welcome")
+# {5}{W}{W} instant. "Create four 2/2 white Knight creature tokens with
+# vigilance. Spell mastery -- If there are two or more instant and/or sorcery
+# cards in your graveyard, creatures you control gain indestructible until end
+# of turn."
+GIDEONS_PHALANX = C("Gideon's Phalanx", "Instant", {"gen": 5, "W": 2},
+                    priority=5, script="phalanx")
+# {4}{R}{R} instant. "Sneak {2}{R} ... Each player may discard their hand and
+# draw seven cards." Reforge the Soul's wheel, at instant speed and without
+# its own miracle cost.
+RAPHAELS_TECHNIQUE = C("Raphael's Technique", "Instant", {"gen": 4, "R": 2},
+                       priority=6, script="wheel")
+# {4}{R}{R} sorcery. "Immolating Gyre deals X damage to each creature and
+# planeswalker you don't control, where X is the number of instant and sorcery
+# cards in your graveyard." A ONE-SIDED sweeper whose size is the graveyard;
+# how much of the pod's board X kills is the knob `gyre_full_x`.
+IMMOLATING_GYRE = C("Immolating Gyre", "Sorcery", {"gen": 4, "R": 2},
+                    priority=4, tags=("wipe", "onesided"), script="gyre")
+# {5}{W}{W} sorcery. "Return target permanent card from your graveyard to the
+# battlefield. Rebound." Rebound is read from Scryfall (`_evasion.REBOUND`).
+PROFOUND_JOURNEY = C("Profound Journey", "Sorcery", {"gen": 5, "W": 2},
+                     priority=5, script="profound_journey")
+
+BATCH_2026_10_09_SPELLS = (FURYGALE_FLOCKING, SEARING_WIND, EXPLOSIVE_WELCOME,
+                           GIDEONS_PHALANX, RAPHAELS_TECHNIQUE,
+                           IMMOLATING_GYRE, PROFOUND_JOURNEY)

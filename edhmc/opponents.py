@@ -722,6 +722,11 @@ WIPE_DESTROYS = {
                          "DESTROY all creatures other than this creature.",
     "Coercive Portal": "If carnage gets more votes, sacrifice this artifact "
                        "and DESTROY all nonland permanents.",
+    # DAMAGE, Blasphemous Act's side of the split; one-sided, so it never
+    # reaches your board (lorehold candidate, 2026-10-09).
+    "Immolating Gyre": "Immolating Gyre deals X damage to each creature and "
+                       "planeswalker you don't control, where X is the number "
+                       "of instant and sorcery cards in your graveyard.",
 }
 
 
@@ -797,6 +802,8 @@ OWN_WIPE_SCOPE = {
     "Ondu Inversion": "nonland",
     "Ultima": "artifacts_creatures",
     "Promise of Loyalty": "keep_one",
+    # X damage, X = instants and sorceries in YOUR graveyard (2026-10-09).
+    "Immolating Gyre": "damage_x",
 }
 
 
@@ -836,7 +843,23 @@ def own_wipe_pod_left(g, card, creatures: float) -> float:
         return min(creatures, 1.0)
     if scope == "mv2":
         return creatures * (1.0 - g.cfg.get("culling_pod_share", 0.5))
+    if scope == "damage_x":
+        return creatures * (1.0 - gyre_share(g))
     return 0.0
+
+
+def gyre_share(g) -> float:
+    """IMMOLATING GYRE's X, as the share of a pod board it kills.
+
+    X is read from the graveyard as the spell resolves (it is on the stack,
+    not in the yard). The pod's creatures are a COUNT with no toughness (§4),
+    so how many X damage kills is `gyre_full_x` (6) -- A JUDGEMENT, NOT A
+    CENSUS: the X at which every one of them dies, with toughness spread
+    evenly from 1 to it, so the share is X / gyre_full_x, capped at 1."""
+    x = sum(1 for c in g.graveyard
+            if "Instant" in c.types or "Sorcery" in c.types)
+    full = g.cfg.get("gyre_full_x", 6)
+    return min(1.0, x / full) if full > 0 else 1.0
 
 
 def own_wipe_treasures(g, card) -> int:
@@ -1701,9 +1724,13 @@ def damage_each(g, n) -> float:
     return dealt
 
 
-def damage_single(g, n) -> float:
+def damage_single(g, n, target=None) -> float:
     """Focused damage - combat, or a single-target burn spell. Goes at the
     opponent closest to dying, which is what a real pilot does.
+
+    `target`: a caller that has already chosen (a spell with two targets that
+    must differ -- lorehold's Explosive Welcome) names the opponent; a dead
+    one takes nothing. None is the closest-to-dying pick.
 
     Returns the damage that could have mattered — see `damage_each`.
     """
@@ -1712,7 +1739,10 @@ def damage_single(g, n) -> float:
     alive = living(g)
     if not alive:
         return 0.0
-    target = min(alive, key=lambda o: o.life)
+    if target is not None and target not in alive:
+        return 0.0
+    if target is None:
+        target = min(alive, key=lambda o: o.life)
     loss = life_loss(target, n)
     dealt = min(loss, max(0.0, target.life))
     target.life -= loss

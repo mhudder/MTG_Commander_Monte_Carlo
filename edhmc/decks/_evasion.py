@@ -483,6 +483,13 @@ FLASHBACK = {
     "Prisoner's Dilemma": {'gen': 5, 'R': 2},
 }
 
+# REBOUND: cards with the keyword, from Scryfall (702.88a). Read by lorehold's
+# resolve_spell: cast from hand, exiled, recast free next upkeep.
+REBOUND = {
+    'Ephemerate',
+    'Profound Journey',
+}
+
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
 # alike. `check_docs` compares it with the cards the deck modules construct
 # TODAY and fails on any difference: a card added without re-running this
@@ -674,6 +681,7 @@ SCANNED = {
     'Exotic Orchard',
     'Expedition Map',
     'Exploration',
+    'Explosive Welcome',
     'Expropriate',
     'Exquisite Blood',
     'Eye of Ugin',
@@ -696,6 +704,7 @@ SCANNED = {
     'Foundry Inspector',
     'Fountain of Renewal',
     'Fracture',
+    'Furygale Flocking',
     "Gaea's Cradle",
     'Galvanoth',
     'Gamble',
@@ -705,6 +714,7 @@ SCANNED = {
     'Ghost Quarter',
     'Ghostly Prison',
     'Giada, Font of Hope',
+    "Gideon's Phalanx",
     'Ginger, Queen of Sweets',
     'Glacier Godmaw',
     'Gloomshrieker',
@@ -745,6 +755,7 @@ SCANNED = {
     'Idol of Oblivion',
     'Idyllic Tutor',
     'Illusion of Choice',
+    'Immolating Gyre',
     'Improvisation Capstone',
     'Invincible Hymn',
     'Invoke Calamity',
@@ -869,6 +880,7 @@ SCANNED = {
     'Prismatic Vista',
     "Prisoner's Dilemma",
     'Pristine Talisman',
+    'Profound Journey',
     'Proft, Sinister Mastermind',
     'Promise of Loyalty',
     'Propaganda',
@@ -882,6 +894,7 @@ SCANNED = {
     'Rampaging Baloths',
     'Ramunap Excavator',
     'Ranger of Eos',
+    "Raphael's Technique",
     'Realms Uncharted',
     'Reap',
     'Reflecting Pool',
@@ -919,6 +932,7 @@ SCANNED = {
     'Scroll Rack',
     'Scute Swarm',
     'Sea of Clouds',
+    'Searing Wind',
     'Seat of the Synod',
     'Secluded Steppe',
     'Seedborn Muse',
