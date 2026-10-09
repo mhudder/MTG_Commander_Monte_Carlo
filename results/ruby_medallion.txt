@@ -1,0 +1,13 @@
+Ruby Medallion, lorehold staged list, T20, N = 15,000 paired
+
+PART 1  Ruby against the table's blank
+  won              ruby   0.2695  blank   0.2709  diff -0.0014 +-0.0032
+  miracles_cast    ruby   2.7030  blank   2.6751  diff +0.0279 +-0.0125*
+  miracle_no_mana  ruby   0.8999  blank   0.9185  diff -0.0186 +-0.0058*
+  mv_cheated       ruby  25.1204  blank  24.0969  diff +1.0235 +-0.1935*
+  ruby_miracles    ruby   0.2683  blank   0.0000  diff +0.2683 +-0.0135*
+  ruby_enabled     ruby   0.0219  blank   0.0000  diff +0.0219 +-0.0027*
+  ruby_windows     ruby   2.0045  blank   0.0000  diff +2.0045 +-0.0794*
+
+PART 2  when it arrives
+  cast in 0.267 of games; median turn 7; removed in 0.240 of those; 4.97 turns of game left after the cast

@@ -326,8 +326,8 @@ SCRIPTED_LOREHOLD = {
     "Approach of the Second Sun",
     # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78); the triage back-test (§0z66)
     # proved the engine acts on all three ---
-    # Enlightened Tutor: `resolve_spell`'s "tutor" branch puts an artifact or
-    # enchantment ON TOP, with a state-dependent pick (`tutor_policy`).
+    # Enlightened Tutor was the third, and is PARTLY_MODELLED since
+    # 2026-10-09 (§0z123): the owner's call that its row understates it.
     # Land Tax: the upkeep fetch of up to three basics to hand. "An opponent
     # controls more lands than you" is read as `lands < min(turn, 10)`, the
     # §4 abstraction -- the pod has no lands to count.
@@ -337,7 +337,7 @@ SCRIPTED_LOREHOLD = {
     # promised and everything is indestructible, priced by `destroy_share`.
     # The gift's card to an opponent is the §4 abstraction: the pod has no
     # hand.
-    "Enlightened Tutor", "Land Tax", "Dawn's Truce",
+    "Land Tax", "Dawn's Truce",
     # Dragon's Rage Channeler (was PARTLY, §0z83): surveil, and delirium's
     # flying AND +2/+2 through one `opponents.delirium`. "Attacks each combat
     # if able" is unmodelled -- a DRAWBACK, and one the engine's attack
@@ -877,6 +877,17 @@ PARTLY_MODELLED = {
             "(§4). A floor.",
     },
     "lorehold": {
+        # The owner, 2026-10-09 (§0z123): "a difficult card to model, as there
+        # are so many options depending on opponents board states".
+        "Enlightened Tutor":
+            "MODELLED: an artifact or enchantment from the library put ON TOP "
+            "(`resolve_spell`'s tutor branch), which spends the next draw. "
+            "NOT: the choice a pilot makes from the TABLE -- fetching the "
+            "answer an opponent's board calls for, or the protection a "
+            "threatened engine needs -- because the pod's boards are a count "
+            "with no permanents to answer (§4). And the default pick is the "
+            "highest mana value left (`tutor_order` empty, `tutor_policy` "
+            "unset), not a pilot's. A floor by both.",
         "Goldspan Dragon":
             "Staged 2026-09-26 (§0z69). MODELLED: the 4/4 flying haste body, "
             "a Treasure whenever it attacks, and Treasures tapping for TWO "

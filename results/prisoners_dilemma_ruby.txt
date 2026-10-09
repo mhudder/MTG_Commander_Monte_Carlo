@@ -1,0 +1,37 @@
+Prisoner's Dilemma, lorehold staged list, N = 15,000 paired games per comparison, 95% CIs. '*' = outside its bar.
+
+PART 1  Faithless Looting's flashback (on - off)
+  T10: won +0.0007+-0.0022  damage +0.40+-0.15*  spell_damage +0.22+-0.10*
+        dilemma_resolved +0.00+-0.00  native_flashback_casts +0.25+-0.01*  test_card_flashbacks +0.00+-0.00  miracles_cast +0.00+-0.01  mv_cheated -0.02+-0.14  turns_played -0.00+-0.00
+  T20: won +0.0033+-0.0037  damage +0.42+-0.18*  spell_damage +0.32+-0.13*
+        dilemma_resolved +0.00+-0.00  native_flashback_casts +0.32+-0.01*  test_card_flashbacks +0.00+-0.00  miracles_cast -0.00+-0.01  mv_cheated -0.09+-0.21  turns_played -0.01+-0.01
+  P(cast) 0.000   leg won at T20 0.2695
+
+PART 2  candidate, snitch  (vs blank, Monk's slot)
+  T10: won +0.0127+-0.0020*  damage +5.43+-0.20*  spell_damage +6.07+-0.21*
+        dilemma_resolved +0.31+-0.01*  native_flashback_casts +0.12+-0.01*  test_card_flashbacks +0.12+-0.01*  miracles_cast -0.01+-0.00*  mv_cheated -0.22+-0.07*  turns_played -0.02+-0.00*
+  T20: won +0.0301+-0.0034*  damage +6.03+-0.21*  spell_damage +7.73+-0.23*
+        dilemma_resolved +0.46+-0.01*  native_flashback_casts +0.20+-0.01*  test_card_flashbacks +0.21+-0.01*  miracles_cast -0.05+-0.01*  mv_cheated -0.72+-0.13*  turns_played -0.08+-0.01*
+  P(cast) 0.304   leg won at T20 0.2939
+
+PART 2  candidate, silence (vs blank, Monk's slot)
+  T10: won +0.0063+-0.0016*  damage +2.86+-0.12*  spell_damage +3.14+-0.12*
+        dilemma_resolved +0.31+-0.01*  native_flashback_casts +0.12+-0.01*  test_card_flashbacks +0.13+-0.01*  miracles_cast -0.01+-0.00*  mv_cheated -0.12+-0.06*  turns_played -0.01+-0.00*
+  T20: won +0.0137+-0.0027*  damage +3.26+-0.13*  spell_damage +4.05+-0.13*
+        dilemma_resolved +0.46+-0.01*  native_flashback_casts +0.21+-0.01*  test_card_flashbacks +0.22+-0.01*  miracles_cast -0.02+-0.01*  mv_cheated -0.35+-0.12*  turns_played -0.04+-0.01*
+  P(cast) 0.304   leg won at T20 0.2774
+
+PART 3  -Ruby Medallion +Dilemma, snitch
+  T10: won +0.0125+-0.0028*  damage +5.10+-0.24*  spell_damage +5.71+-0.23*
+        dilemma_resolved +0.31+-0.01*  native_flashback_casts +0.11+-0.01*  test_card_flashbacks +0.13+-0.01*  miracles_cast +0.04+-0.01*  mv_cheated -0.65+-0.16*  turns_played -0.02+-0.01*
+  T20: won +0.0295+-0.0044*  damage +5.79+-0.26*  spell_damage +7.40+-0.25*
+        dilemma_resolved +0.46+-0.01*  native_flashback_casts +0.20+-0.01*  test_card_flashbacks +0.22+-0.01*  miracles_cast +0.03+-0.01*  mv_cheated -1.23+-0.22*  turns_played -0.08+-0.01*
+  P(cast) 0.309   leg won at T20 0.2991
+
+PART 3  -Ruby Medallion +Dilemma, silence
+  T10: won +0.0045+-0.0025*  damage +2.53+-0.19*  spell_damage +2.81+-0.16*
+        dilemma_resolved +0.31+-0.01*  native_flashback_casts +0.12+-0.01*  test_card_flashbacks +0.13+-0.01*  miracles_cast +0.05+-0.01*  mv_cheated -0.54+-0.16*  turns_played -0.01+-0.00*
+  T20: won +0.0103+-0.0040*  damage +3.01+-0.21*  spell_damage +3.75+-0.18*
+        dilemma_resolved +0.47+-0.01*  native_flashback_casts +0.21+-0.01*  test_card_flashbacks +0.22+-0.01*  miracles_cast +0.06+-0.01*  mv_cheated -0.88+-0.22*  turns_played -0.04+-0.01*
+  P(cast) 0.309   leg won at T20 0.2798
+

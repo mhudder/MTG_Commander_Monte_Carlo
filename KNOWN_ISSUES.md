@@ -171,6 +171,7 @@ Methodology that used to live at the end of this file is now
 | [0z120](#0z120) | DECIDED | **Trostani is SUSPENDED** from every review and re-measure, by the owner (2026-10-08): one entry in `edhmc/registry.py`, read by `regen_tables.sh`, `check_unchanged_decks` and the cache manifest, whose new SUSPENDED state keeps `check_docs` green when the code moves under it. **Awaken the Woods' shortlist against Kozilek is withdrawn** -- Kozilek is +0.0268 at T20 since §0z114 |
 | [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
 | [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
+| [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED in lorehold**, by the owner: its table-facing choice (the answer an opponent's board calls for) is §4-blind and its default pick is the highest mana value, so its −0.0019 row is a floor. **Ruby Medallion is modelled faithfully but seldom matters**: its {1} miracle discount reaches every decision and payment, but it is out for 2.0 miracle windows a game and makes 0.022 miracles a game possible that full price would not. −Ruby +Prisoner's Dilemma: +0.0295 ±0.0044 at T20 (snitch), +0.0103 ±0.0040 (silence) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10874,6 +10875,105 @@ zero. **Faithless Looting: win +0.0046 → +0.0079, damage T20 +0.41 →
 +0.83** -- its flashback, the one row the change was aimed at, and inside
 its old bar on win rate. The noise floor is ±0.0030. `check_docs` 16/16, 67
 test modules green, validate 21 × +0.00.
+
+## 0z123. DECIDED — lorehold: Enlightened Tutor is PARTLY MODELLED; Ruby Medallion audited
+
+The owner, 2026-10-09, after §0z122 listed lorehold's five weakest
+MODEL-EVALUATED rows (Enlightened Tutor −0.0019, Ruby Medallion −0.0014,
+Sensei's Divining Top +0.0015, Boros Charm +0.0019, Verge Rangers +0.0021 --
+four of the five inside their bars): "enlightened tutor is a difficult card
+to model, as there are so many options depending on opponents board states.
+I believe the model undervalues it", and "check how ruby medallion is
+modelled before running prisoner's dilemma against it. In theory, the ruby
+should allow twice as many lorehold spell activations, as it reduces the
+cost of red 'miracle' cards."
+
+### Enlightened Tutor: SCRIPTED → PARTLY_MODELLED (lorehold only)
+
+The engine does act on it (§0z78 moved it out of KNOWN_BLIND on the triage
+back-test): `resolve_spell`'s tutor branch puts an artifact or enchantment
+on top. Two things it does not do, both written into the reason the table
+now prints under the row:
+* **The table-facing choice.** A pilot tutors for what the opponents' boards
+  call for, or for protection a threatened engine needs; the pod's boards are
+  a count (§4), so that half is blind.
+* **The default pick is not a pilot's.** With `tutor_order` empty and
+  `tutor_policy` unset, it takes the highest mana value left -- the
+  "adaptive" order learned in `tools.tutor_policy` is off by default.
+
+Both can only understate it, so the row is a FLOOR and is no longer read as
+cut evidence. **Lorehold only**: the card is SCRIPTED in trostani and
+KNOWN_BLIND in karlov, and those are separate implementations in separate
+engines, each labelled for what its engine does -- §0z16's rule asks that the
+labels be checked, and they were, not that they agree across engines that
+differ.
+
+`tools/ablation.py` is in every cache fingerprint, so all six active caches
+moved. This is a RENDERING change (§0z27's middle row): each deck's table was
+re-rendered from its cache with no game simulated. rendmaw, karlov, tivit,
+shilgengar and azusa are **byte-identical**; lorehold differs in exactly one
+row, Enlightened Tutor, same numbers, moved from MODEL-EVALUATED to PARTLY
+MODELLED with its reason. Each cache is VERIFIED with that evidence.
+
+The §0z122 head-to-head `−Enlightened Tutor +Prisoner's Dilemma` (+0.0332
+at T20) now cuts a PARTLY MODELLED card, so it is a ceiling; its note in
+`SIMULATED` says so.
+
+### Ruby Medallion: faithful, and rarely decisive
+
+"Red spells you cast cost {1} less to cast." `miracle_reduction` adds 1 for a
+card with an {R} pip, and it is the one function every miracle decision
+reads: `miracle_value`, `miracle_need(card)`, `miracle_window`'s payment on
+and off your turn, `set_top`'s and Library of Leng's affordability checks.
+`reduce_cost` gives the same {1} to a hardcast. 20 of the list's 36 instants
+and sorceries are red (Boros Charm and Borrowed Knowledge, multicoloured,
+included); the 16 that are not -- Approach, Storm Herd, Rise of the Eldrazi,
+the white wipes and answers -- correctly pay full price. The owner's
+mechanism is in the code: with two mana floated, two red miracles at {1}.
+
+`diagnostics/diag_ruby_medallion.py`, N=15,000 paired, the staged list, T20,
+`results/ruby_medallion.txt`. Its `won` row reproduces the table's
+(−0.0014 ±0.0032).
+
+| Ruby − blank, per game | |
+|---|---|
+| miracle windows with Ruby on the battlefield | 2.00 (of 21.1) |
+| red miracles cast while it is out | 0.27 |
+| **of those, unaffordable at full price** | **0.022** |
+| miracles cast | +0.028 ±0.013 |
+| `mv_cheated` | +1.02 ±0.19 |
+| win rate | −0.0014 ±0.0032 |
+
+**Why the doubling seldom happens.** Ruby is cast in 27% of games, at a
+median turn 7, is removed in 24% of those (threat 6.0), and has about five
+turns of game left when it lands -- two windows a game on average. And the
+discount is decisive only in a round where two red miracle targets are
+drawn and the float is exactly short; most of the time the saved {1} is
+float that would have been unspent anyway. The mana it saves is real
+(`mv_cheated` +1.02), the miracles it adds are few, and the win rate does
+not see either -- §0t's shape, a proxy moving and the objective not.
+
+**One policy it never gets**: the miracle reserve is a flat 2
+(`miracle_reserve`), so a pilot with Ruby out does not hold 1 and spend the
+other on their own turn. That would be a reserve policy, not card text, and
+§0t found the constant right when it was swept; it is named here, not built.
+
+### −Ruby Medallion +Prisoner's Dilemma
+
+`python -m diagnostics.run_prisoners_dilemma 15000 --cuts="Ruby Medallion"`,
+the same seeds and legs as §0z122 (its candidate row reproduced again),
+`results/prisoners_dilemma_ruby.txt`:
+
+| | T10 | T20 | damage T20 |
+|---|---|---|---|
+| snitch | +0.0125 ±0.0028* | **+0.0295 ±0.0044*** | +5.79 ±0.26* |
+| silence | +0.0045 ±0.0025* | +0.0103 ±0.0040* | +3.01 ±0.21* |
+
+Ruby is a MODEL-EVALUATED cut whose text is modelled, so this is a swap on
+evidence -- the same size as the Soulfire Eruption swap (+0.0262; the two
+are inside each other's bars), and significant at both horizons under both settings of
+`dilemma_choice`. Ruby's own value is what this model cannot see much of
+either way: two windows a game.
 
 ## How to read an ablation table
 

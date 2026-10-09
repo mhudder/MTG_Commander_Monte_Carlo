@@ -68,7 +68,6 @@ Dawn's Truce                          +0.17+-0.07         +0.21+-0.09        +0.
 Ruby Medallion                        +0.26+-0.15         +0.18+-0.17        -0.0014+-0.0032       dmg
 Lightning Greaves                     +0.13+-0.10         +0.16+-0.13        +0.0033+-0.0025      both
 Sensei's Divining Top                 -0.27+-0.16         -0.24+-0.20        +0.0015+-0.0036       dmg
-Enlightened Tutor                     -0.41+-0.15         -0.39+-0.19        -0.0019+-0.0034       dmg
 Approach of the Second Sun            -0.69+-0.10         -2.03+-0.17        +0.0263+-0.0038      both
 
 ====================================================================================
@@ -122,6 +121,14 @@ Ultima                                -0.25+-0.11         +0.42+-0.14        +0.
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4). The COST is
       modelled and the BENEFIT is an estimate.
+Enlightened Tutor                     -0.41+-0.15         -0.39+-0.19        -0.0019+-0.0034       dmg
+      MODELLED: an artifact or enchantment from the library put ON TOP
+      (`resolve_spell`'s tutor branch), which spends the next draw. NOT: the
+      choice a pilot makes from the TABLE -- fetching the answer an opponent's
+      board calls for, or the protection a threatened engine needs -- because the
+      pod's boards are a count with no permanents to answer (§4). And the default
+      pick is the highest mana value left (`tutor_order` empty, `tutor_policy`
+      unset), not a pilot's. A floor by both.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card

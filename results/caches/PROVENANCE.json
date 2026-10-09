@@ -354,6 +354,12 @@
         "evidence": "2026-10-09, Prisoner's Dilemma (lorehold) + _evasion.FLASHBACK: check_unchanged_decks against a worktree at bd9e7ae, both sides Python 3.11.15 -- azusa BIT-IDENTICAL on all 8 metrics. Only lorehold moved (Faithless Looting's flashback); with native_flashback=False lorehold is bit-identical too.",
         "fingerprint": "fc36c2ea2ae6b6b2",
         "utc": "2026-10-09T03:40:16Z"
+      },
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered azusa's table from this cache with no games simulated: byte-identical to the committed table.",
+        "fingerprint": "134cd32750dae9dd",
+        "utc": "2026-10-09T13:49:49Z"
       }
     ]
   },
@@ -630,6 +636,12 @@
         "evidence": "2026-10-09, Prisoner's Dilemma (lorehold) + _evasion.FLASHBACK: check_unchanged_decks against a worktree at bd9e7ae, both sides Python 3.11.15 -- karlov BIT-IDENTICAL on all 8 metrics. Only lorehold moved (Faithless Looting's flashback); with native_flashback=False lorehold is bit-identical too.",
         "fingerprint": "a9cc72341f66660d",
         "utc": "2026-10-09T03:40:16Z"
+      },
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered karlov's table from this cache with no games simulated: byte-identical to the committed table.",
+        "fingerprint": "c599b2fd15da28ea",
+        "utc": "2026-10-09T13:49:48Z"
       }
     ]
   },
@@ -942,7 +954,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered from this cache with no games simulated: the one difference is Enlightened Tutor's row, same numbers, moved from MODEL-EVALUATED to PARTLY MODELLED with its reason.",
+        "fingerprint": "5d6518d56f6cde79",
+        "utc": "2026-10-09T13:49:49Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "3f59d1106b91c7c7",
@@ -1219,6 +1238,12 @@
         "evidence": "2026-10-09, Prisoner's Dilemma (lorehold) + _evasion.FLASHBACK: check_unchanged_decks against a worktree at bd9e7ae, both sides Python 3.11.15 -- rendmaw BIT-IDENTICAL on all 8 metrics. Only lorehold moved (Faithless Looting's flashback); with native_flashback=False lorehold is bit-identical too.",
         "fingerprint": "049257fccf7591c8",
         "utc": "2026-10-09T03:40:15Z"
+      },
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered rendmaw's table from this cache with no games simulated: byte-identical to the committed table.",
+        "fingerprint": "7556108e803785a1",
+        "utc": "2026-10-09T13:49:48Z"
       }
     ]
   },
@@ -1539,6 +1564,12 @@
         "evidence": "2026-10-09, Prisoner's Dilemma (lorehold) + _evasion.FLASHBACK: check_unchanged_decks against a worktree at bd9e7ae, both sides Python 3.11.15 -- shilgengar BIT-IDENTICAL on all 8 metrics. Only lorehold moved (Faithless Looting's flashback); with native_flashback=False lorehold is bit-identical too.",
         "fingerprint": "2f7a3d3ad0b83947",
         "utc": "2026-10-09T03:40:16Z"
+      },
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered shilgengar's table from this cache with no games simulated: byte-identical to the committed table.",
+        "fingerprint": "03ab947fc20a57b0",
+        "utc": "2026-10-09T13:49:49Z"
       }
     ]
   },
@@ -1796,6 +1827,12 @@
         "evidence": "2026-10-09, Prisoner's Dilemma (lorehold) + _evasion.FLASHBACK: check_unchanged_decks against a worktree at bd9e7ae, both sides Python 3.11.15 -- tivit BIT-IDENTICAL on all 8 metrics. Only lorehold moved (Faithless Looting's flashback); with native_flashback=False lorehold is bit-identical too.",
         "fingerprint": "5c1435e3de275b26",
         "utc": "2026-10-09T03:40:16Z"
+      },
+      {
+        "commit": "4d33ec1",
+        "evidence": "2026-10-09, \u00a70z123: only tools/ablation.py's lorehold classification changed (Enlightened Tutor SCRIPTED -> PARTLY_MODELLED). Re-rendered tivit's table from this cache with no games simulated: byte-identical to the committed table.",
+        "fingerprint": "367f9857713989e9",
+        "utc": "2026-10-09T13:49:49Z"
       }
     ]
   },

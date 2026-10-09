@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prisoner's Dilemma in lorehold, and the flashback rule it brought with it.
 
-    python -m diagnostics.run_prisoners_dilemma [N] [--procs 4]
+    python -m diagnostics.run_prisoners_dilemma [N] [--procs=4] [--cuts="A;B"]
 
 Lorehold's STAGED list (`build_pending`), every leg played to T20 with a T10
 snapshot (§0z93), so one run reports both horizons. Three questions:
@@ -53,7 +53,12 @@ LEGS = [
     ("silence", _swap_many(DECK, [VICTIM], [CARD]),
      {"dilemma_choice": "silence"}, 80000),
 ]
-for cut in ("Soulfire Eruption", "Enlightened Tutor"):
+# `--cuts=A;B` replaces the two cuts of the first run (2026-10-09) -- the
+# second run, against Ruby Medallion, is `--cuts="Ruby Medallion"` (§0z123).
+CUTS = next((tuple(a.split("=", 1)[1].split(";")) for a in sys.argv[1:]
+             if a.startswith("--cuts=")),
+            ("Soulfire Eruption", "Enlightened Tutor"))
+for cut in CUTS:
     swapped = _swap_many(DECK, [cut], [CARD])
     LEGS.append((f"-{cut}/snitch", swapped, {}, 5000))
     LEGS.append((f"-{cut}/silence", swapped, {"dilemma_choice": "silence"},
@@ -64,7 +69,7 @@ COMPARE = [
     ("PART 2  candidate, snitch  (vs blank, Monk's slot)", "snitch", "blank"),
     ("PART 2  candidate, silence (vs blank, Monk's slot)", "silence", "blank"),
 ]
-for cut in ("Soulfire Eruption", "Enlightened Tutor"):
+for cut in CUTS:
     for ch in ("snitch", "silence"):
         COMPARE.append((f"PART 3  -{cut} +Dilemma, {ch}",
                         f"-{cut}/{ch}", "fb_on"))

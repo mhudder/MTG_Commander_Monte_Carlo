@@ -3218,7 +3218,13 @@ SIMULATED: list[Simulated] = [
         deck='lorehold', remove='Enlightened Tutor', add="Prisoner's Dilemma",
         measured='2026-10-09', source='results/prisoners_dilemma.txt',
         result=("REAL SWAP -Enlightened Tutor +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0155 +-0.0029 (significant) at T10 and +0.0332 +-0.0045 (significant) at T20; 'silence' +0.0082 +-0.0027 (significant) at T10 and +0.0157 +-0.0043 (significant) at T20."),
-        notes=("The lowest win-rate MODEL-EVALUATED row in the table (-0.0025 +-0.0034, signal dmg). Both legs on the staged list with native flashback on (Faithless Looting's included). The knob is `dilemma_choice`; §0z122."),
+        notes=("The lowest win-rate MODEL-EVALUATED row when measured (-0.0025 +-0.0034, signal dmg) -- and PARTLY MODELLED since 2026-10-09 by the owner's call (§0z123): its table-facing choice is not modelled, so this swap is a CEILING. Both legs on the staged list with native flashback on (Faithless Looting's included). The knob is `dilemma_choice`; §0z122."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Ruby Medallion', add="Prisoner's Dilemma",
+        measured='2026-10-09', source='results/prisoners_dilemma_ruby.txt',
+        result=("REAL SWAP -Ruby Medallion +Prisoner's Dilemma, N=15,000 paired, seeds 5000..: 'snitch' +0.0125 +-0.0028 (significant) at T10 and +0.0295 +-0.0044 (significant) at T20; 'silence' +0.0045 +-0.0025 (significant) at T10 and +0.0103 +-0.0040 (significant) at T20."),
+        notes=("Ruby's row is -0.0014 +-0.0032, MODEL-EVALUATED, and its text is modelled faithfully: the {1} discount reaches the hardcast, the miracle cost, the miracle value, set_top's and Library of Leng's affordability checks, and the off-turn payment -- but it is out for only 2.0 miracle windows a game (cast in 27% of games, median turn 7, removed in 24% of those) and makes 0.022 miracles a game possible that full price would not (§0z123). Both legs on the staged list with native flashback on. The knob is `dilemma_choice`."),
     ),
 ]
 
