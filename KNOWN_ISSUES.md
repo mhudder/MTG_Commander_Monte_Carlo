@@ -11041,7 +11041,7 @@ built commit (VERIFIED with that evidence). `tests/test_lorehold_big_spells.py`:
 N=15,000 paired, seeds 80000.., the staged list, each card in Pinnacle
 Monk's slot against a blank of its cost, T10 read off the T20 game. Every
 T20 row is `python -m tools.candidates lorehold4 --n=15000`
-(`results/candidates_lorehold4.txt`) -- REPRODUCTION PENDING: the batch is still running; its first three rows match to the last digit.
+(`results/candidates_lorehold4.txt`), reproduced to the last digit -- all seven rows, damage, win rate, mv_cheated and P(deploy).
 
 | card | T10 | T20 | P(cast) | the mechanism, at T20 |
 |---|---|---|---|---|
