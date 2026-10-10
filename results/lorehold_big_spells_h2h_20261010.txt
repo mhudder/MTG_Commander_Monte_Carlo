@@ -1,0 +1,111 @@
+REAL SWAPS against the staged list, the tables' seeds.
+Lorehold's second 2026-10-09 batch, staged list, N = 15,000 paired games per comparison, seeds 5000.., 95% CIs. '*' = outside its bar.
+
+H2H  -Verge Rangers +Furygale Flocking
+  T10: won +0.0287+-0.0035*  damage +5.12+-0.27*  mv_cheated +1.55+-0.15*  miracles_cast +0.05+-0.01*
+        spell_damage -0.62+-0.14*  combat_damage +5.74+-0.26*  cards_drawn -0.35+-0.07*  furygale_tokens +1.38+-0.05*
+        wheel_casts -0.01+-0.00*  turns_played -0.03+-0.01*
+  T20: won +0.0455+-0.0049*  damage +5.29+-0.29*  mv_cheated +1.22+-0.22*  miracles_cast -0.01+-0.02
+        spell_damage -1.49+-0.17*  combat_damage +6.78+-0.29*  cards_drawn -0.99+-0.10*  furygale_tokens +1.71+-0.05*
+        wheel_casts -0.02+-0.00*  turns_played -0.16+-0.02*
+  P(cast) 0.279   leg won at T20 0.3446
+
+H2H  -Verge Rangers +Profound Journey
+  T10: won +0.0123+-0.0030*  damage +1.12+-0.21*  mv_cheated +2.73+-0.23*  miracles_cast +0.06+-0.01*
+        spell_damage +1.34+-0.18*  combat_damage -0.21+-0.13*  cards_drawn +0.16+-0.08*  wheel_casts +0.00+-0.00
+        journey_returns +0.25+-0.01*  rebound_casts +0.08+-0.00*  turns_played -0.02+-0.01*
+  T20: won +0.0155+-0.0043*  damage +1.03+-0.24*  mv_cheated +3.96+-0.31*  miracles_cast +0.06+-0.02*
+        spell_damage +1.61+-0.21*  combat_damage -0.58+-0.16*  cards_drawn +0.05+-0.10  wheel_casts -0.00+-0.00
+        journey_returns +0.38+-0.01*  rebound_casts +0.13+-0.01*  turns_played -0.08+-0.01*
+  P(cast) 0.177   leg won at T20 0.3145
+
+H2H  -Verge Rangers +Raphael's Technique
+  T10: won +0.0050+-0.0030*  damage +0.43+-0.21*  mv_cheated +1.02+-0.17*  miracles_cast +0.09+-0.01*
+        spell_damage +0.61+-0.17*  combat_damage -0.19+-0.13*  cards_drawn +1.38+-0.09*  wheel_casts +0.16+-0.01*
+        turns_played -0.02+-0.01*
+  T20: won +0.0116+-0.0044*  damage +0.40+-0.24*  mv_cheated +1.56+-0.24*  miracles_cast +0.12+-0.02*
+        spell_damage +0.84+-0.19*  combat_damage -0.44+-0.17*  cards_drawn +1.82+-0.12*  wheel_casts +0.22+-0.01*
+        turns_played -0.07+-0.01*
+  P(cast) 0.211   leg won at T20 0.3107
+
+H2H  -Verge Rangers +Immolating Gyre
+  T10: won +0.0027+-0.0025*  damage +0.22+-0.18*  mv_cheated +0.33+-0.14*  miracles_cast +0.06+-0.01*
+        spell_damage +0.12+-0.14  combat_damage +0.10+-0.12  cards_drawn -0.03+-0.06  wheel_casts -0.00+-0.00*
+        gyre_resolved +0.13+-0.01*  gyre_x +0.93+-0.05*  gyre_pod_killed +0.94+-0.05*  turns_played +0.00+-0.00
+  T20: won +0.0129+-0.0041*  damage +0.63+-0.21*  mv_cheated +0.49+-0.20*  miracles_cast +0.08+-0.01*
+        spell_damage +0.15+-0.16  combat_damage +0.48+-0.16*  cards_drawn +0.05+-0.09  wheel_casts -0.01+-0.00*
+        gyre_resolved +0.18+-0.01*  gyre_x +1.45+-0.06*  gyre_pod_killed +1.15+-0.05*  turns_played +0.05+-0.01*
+  P(cast) 0.160   leg won at T20 0.3119
+
+H2H  -Lightning Greaves +Furygale Flocking
+  T10: won +0.0303+-0.0033*  damage +5.71+-0.27*  mv_cheated +1.42+-0.15*  miracles_cast +0.03+-0.01*
+        spell_damage -0.53+-0.13*  combat_damage +6.24+-0.27*  cards_drawn -0.34+-0.06*  furygale_tokens +1.37+-0.05*
+        wheel_casts -0.01+-0.00*  turns_played -0.01+-0.01*
+  T20: won +0.0493+-0.0049*  damage +6.20+-0.29*  mv_cheated +1.19+-0.21*  miracles_cast -0.03+-0.02*
+        spell_damage -1.31+-0.16*  combat_damage +7.51+-0.29*  cards_drawn -0.94+-0.10*  furygale_tokens +1.72+-0.05*
+        wheel_casts -0.01+-0.00*  turns_played -0.15+-0.02*
+  P(cast) 0.283   leg won at T20 0.3484
+
+H2H  -Lightning Greaves +Profound Journey
+  T10: won +0.0147+-0.0028*  damage +1.42+-0.20*  mv_cheated +2.77+-0.24*  miracles_cast +0.05+-0.01*
+        spell_damage +1.41+-0.18*  combat_damage +0.01+-0.11  cards_drawn +0.08+-0.07*  wheel_casts +0.00+-0.00
+        journey_returns +0.26+-0.01*  rebound_casts +0.09+-0.00*  turns_played -0.02+-0.01*
+  T20: won +0.0225+-0.0042*  damage +1.67+-0.22*  mv_cheated +4.45+-0.33*  miracles_cast +0.05+-0.02*
+        spell_damage +1.90+-0.20*  combat_damage -0.23+-0.15*  cards_drawn +0.10+-0.10*  wheel_casts -0.00+-0.00
+        journey_returns +0.40+-0.01*  rebound_casts +0.13+-0.01*  turns_played -0.07+-0.01*
+  P(cast) 0.180   leg won at T20 0.3215
+
+H2H  -Lightning Greaves +Raphael's Technique
+  T10: won +0.0087+-0.0028*  damage +0.77+-0.20*  mv_cheated +1.14+-0.18*  miracles_cast +0.10+-0.01*
+        spell_damage +0.71+-0.16*  combat_damage +0.05+-0.12  cards_drawn +1.40+-0.09*  wheel_casts +0.17+-0.01*
+        turns_played -0.01+-0.01*
+  T20: won +0.0190+-0.0044*  damage +0.95+-0.22*  mv_cheated +1.88+-0.25*  miracles_cast +0.12+-0.02*
+        spell_damage +1.05+-0.19*  combat_damage -0.10+-0.16  cards_drawn +1.94+-0.12*  wheel_casts +0.22+-0.01*
+        turns_played -0.06+-0.01*
+  P(cast) 0.216   leg won at T20 0.3181
+
+H2H  -Lightning Greaves +Immolating Gyre
+  T10: won +0.0029+-0.0023*  damage +0.56+-0.16*  mv_cheated +0.27+-0.13*  miracles_cast +0.04+-0.01*
+        spell_damage +0.14+-0.13*  combat_damage +0.41+-0.10*  cards_drawn -0.08+-0.06*  wheel_casts -0.00+-0.00
+        gyre_resolved +0.14+-0.01*  gyre_x +0.94+-0.05*  gyre_pod_killed +0.97+-0.05*  turns_played +0.01+-0.00*
+  T20: won +0.0149+-0.0039*  damage +1.17+-0.19*  mv_cheated +0.70+-0.20*  miracles_cast +0.07+-0.01*
+        spell_damage +0.30+-0.15*  combat_damage +0.88+-0.14*  cards_drawn +0.08+-0.09  wheel_casts -0.00+-0.00
+        gyre_resolved +0.19+-0.01*  gyre_x +1.45+-0.06*  gyre_pod_killed +1.17+-0.05*  turns_played +0.06+-0.01*
+  P(cast) 0.163   leg won at T20 0.3139
+
+H2H  -Boros Charm +Furygale Flocking
+  T10: won +0.0291+-0.0033*  damage +4.80+-0.26*  mv_cheated +1.68+-0.13*  miracles_cast +0.08+-0.01*
+        spell_damage -1.43+-0.13*  combat_damage +6.24+-0.26*  cards_drawn -0.17+-0.06*  furygale_tokens +1.35+-0.05*
+        wheel_casts -0.00+-0.00*  turns_played -0.01+-0.01*
+  T20: won +0.0459+-0.0047*  damage +5.24+-0.27*  mv_cheated +1.54+-0.20*  miracles_cast +0.04+-0.01*
+        spell_damage -2.30+-0.15*  combat_damage +7.54+-0.29*  cards_drawn -0.74+-0.09*  furygale_tokens +1.69+-0.05*
+        wheel_casts -0.01+-0.00*  turns_played -0.16+-0.02*
+  P(cast) 0.280   leg won at T20 0.3450
+
+H2H  -Boros Charm +Profound Journey
+  T10: won +0.0152+-0.0027*  damage +0.85+-0.18*  mv_cheated +3.15+-0.25*  miracles_cast +0.10+-0.01*
+        spell_damage +0.52+-0.16*  combat_damage +0.33+-0.10*  cards_drawn +0.30+-0.07*  wheel_casts +0.00+-0.00
+        journey_returns +0.27+-0.01*  rebound_casts +0.09+-0.00*  turns_played -0.02+-0.00*
+  T20: won +0.0224+-0.0039*  damage +0.96+-0.20*  mv_cheated +4.65+-0.32*  miracles_cast +0.12+-0.01*
+        spell_damage +0.73+-0.18*  combat_damage +0.22+-0.14*  cards_drawn +0.29+-0.09*  wheel_casts +0.00+-0.00
+        journey_returns +0.39+-0.01*  rebound_casts +0.13+-0.01*  turns_played -0.08+-0.01*
+  P(cast) 0.182   leg won at T20 0.3215
+
+H2H  -Boros Charm +Raphael's Technique
+  T10: won +0.0091+-0.0027*  damage +0.12+-0.18  mv_cheated +1.30+-0.16*  miracles_cast +0.14+-0.01*
+        spell_damage -0.25+-0.15*  combat_damage +0.38+-0.11*  cards_drawn +1.60+-0.09*  wheel_casts +0.17+-0.01*
+        turns_played -0.01+-0.00*
+  T20: won +0.0194+-0.0041*  damage +0.34+-0.20*  mv_cheated +1.91+-0.22*  miracles_cast +0.17+-0.02*
+        spell_damage -0.05+-0.17  combat_damage +0.39+-0.14*  cards_drawn +2.12+-0.11*  wheel_casts +0.23+-0.01*
+        turns_played -0.07+-0.01*
+  P(cast) 0.216   leg won at T20 0.3185
+
+H2H  -Boros Charm +Immolating Gyre
+  T10: won +0.0035+-0.0021*  damage -0.03+-0.14  mv_cheated +0.54+-0.11*  miracles_cast +0.10+-0.01*
+        spell_damage -0.75+-0.11*  combat_damage +0.72+-0.09*  cards_drawn +0.14+-0.05*  wheel_casts +0.00+-0.00
+        gyre_resolved +0.14+-0.01*  gyre_x +0.94+-0.05*  gyre_pod_killed +0.97+-0.05*  turns_played +0.02+-0.00*
+  T20: won +0.0167+-0.0035*  damage +0.58+-0.17*  mv_cheated +0.89+-0.17*  miracles_cast +0.14+-0.01*
+        spell_damage -0.76+-0.13*  combat_damage +1.34+-0.13*  cards_drawn +0.26+-0.08*  wheel_casts +0.00+-0.00
+        gyre_resolved +0.19+-0.01*  gyre_x +1.43+-0.06*  gyre_pod_killed +1.17+-0.05*  turns_played +0.05+-0.01*
+  P(cast) 0.164   leg won at T20 0.3158
+

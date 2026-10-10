@@ -261,9 +261,16 @@ DECKS = {
     # The owner's second 2026-10-09 batch: seven big instants and sorceries.
     # Pinnacle Monk's slot again, so these rows share lorehold2's and
     # lorehold3's baseline. diagnostics/run_lorehold_big_spells.py reproduces
-    # each T20 row on the same seeds as its check.
+    # each T20 row on the same seeds as its check. THREE OF THE SEVEN WERE
+    # STAGED 2026-10-10 (Furygale Flocking, Profound Journey, Immolating
+    # Gyre), Caldera Pyremaw's reason above: `build_pending` now holds them
+    # and add_value() would refuse. Their rows are in
+    # results/candidates_lorehold4.txt, measured before the staging (§0z124).
     "lorehold4": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
-                  LOREHOLD_2026_10_09_SPELLS),
+                  tuple(c for c in LOREHOLD_2026_10_09_SPELLS
+                        if c.name not in ("Furygale Flocking",
+                                          "Profound Journey",
+                                          "Immolating Gyre"))),
     # 2026-09-16 (§0z26). THE VICTIM IS A BASIC PLAINS, and that is a
     # deliberate choice rather than a convenience: tivit has no weak nonland
     # row to free up -- its worst MODEL-EVALUATED card is Tamiyo's Journal at

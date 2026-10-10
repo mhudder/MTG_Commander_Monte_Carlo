@@ -32,7 +32,8 @@ snapshot (§0z93), so one run reports both horizons. All legs share seeds
           owner named on 2026-10-10: Verge Rangers, Lightning Greaves, Boros
           Charm. `--package="cut>add;cut>add"` adds one leg with ALL those
           swaps applied together, against the same base (§0p: staged changes
-          can interact, and a set is measured as a set).
+          can interact, and a set is measured as a set). `--package` alone
+          runs the base and that one leg.
 """
 import sys
 from multiprocessing import Pool
@@ -56,7 +57,12 @@ DECK, CMD = build_pending("lorehold")
 for c in CARDS:
     if any(x.name == c.name for x in DECK):
         raise SystemExit(f"{c.name!r} is in lorehold's list (staged or "
-                         f"committed); this script would measure a second copy.")
+                         f"committed); this script would measure a second copy. "
+                         f"Furygale Flocking, Profound Journey and Immolating "
+                         f"Gyre were staged 2026-10-10 after every run here: "
+                         f"results/lorehold_big_spells_*.txt (§0z124). A "
+                         f"re-measure is a run_ab against the list WITHOUT "
+                         f"those Changes.")
 VICTIM = "Pinnacle Monk"
 SEED = 80000
 
@@ -85,7 +91,7 @@ H2H = next((tuple(a.split("=", 1)[1].split(";")) for a in sys.argv[1:]
             if a.startswith("--h2h=")), ())
 PACKAGE = next((tuple(tuple(x.split(">")) for x in a.split("=", 1)[1].split(";"))
                 for a in sys.argv[1:] if a.startswith("--package=")), ())
-if H2H:
+if H2H or PACKAGE:
     KEPT = (MOD.FURYGALE_FLOCKING, MOD.PROFOUND_JOURNEY,
             MOD.RAPHAELS_TECHNIQUE, MOD.IMMOLATING_GYRE)
     SEED = 5000
@@ -110,10 +116,10 @@ def blank_of(card):
     return _blanks[tuple(sorted(card.cost.items()))]
 
 
-COMPARE = [] if H2H else [
+COMPARE = [] if (H2H or PACKAGE) else [
     (f"PART 1  {c.name} (vs blank, Monk's slot)", c.name, blank_of(c))
     for c in CARDS]
-COMPARE += COMPARE_H2H if H2H else [
+COMPARE += COMPARE_H2H if (H2H or PACKAGE) else [
     ("PART 2  Gyre, gyre_full_x 3  (vs blank)", "Gyre x3", blank_of(GYRE)),
     ("PART 2  Gyre, gyre_full_x 12 (vs blank)", "Gyre x12", blank_of(GYRE)),
     ("PART 3  Explosive Welcome - Searing Wind (same slot)",
@@ -146,7 +152,7 @@ def main():
         rows = np.array(p.map(job, range(n), chunksize=50), float)
     # rows: (n, legs, horizon, metric)
     idx = {leg[0]: i for i, leg in enumerate(LEGS)}
-    if H2H:
+    if H2H or PACKAGE:
         print("REAL SWAPS against the staged list, the tables' seeds.")
     print(f"Lorehold's second 2026-10-09 batch, staged list, N = {n:,} paired "
           f"games per comparison, seeds {SEED}.., 95% CIs. '*' = outside its "

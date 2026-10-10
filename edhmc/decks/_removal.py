@@ -6,10 +6,10 @@ survives), 'other' is exile, bounce, tuck, shuffle, sacrifice or -X/-X
 (it does not). `opponents.destroy` prices indestructible with the two
 shares below (§0z87)."""
 
-# counted once per deck that runs the card: spot 23 of 50 destroy; wipe 15 of 27 destroy; ae 5 of 7 destroy
+# counted once per deck that runs the card: spot 23 of 50 destroy; wipe 16 of 28 destroy; ae 5 of 7 destroy
 # a kind with fewer than 10 cards takes the SPOT share (ae has 7)
 DESTROY_SHARE_SPOT = 0.4600
-DESTROY_SHARE_WIPE = 0.5556
+DESTROY_SHARE_WIPE = 0.5714
 DESTROY_SHARE_AE = 0.4600
 
 # name -> (kind, class, the clause that decided it)
@@ -45,6 +45,7 @@ INTERACTION = {
     'Grist, the Hunger Tide': ('spot', 'destroy', 'when you do, destroy target creature or planeswalker.'),
     'Hagra Mauling': ('spot', 'destroy', 'destroy target creature.'),
     'Haywire Mite': ('spot', 'other', '{g}, sacrifice this creature: exile target noncreature artifact or noncreature enchantment.'),
+    'Immolating Gyre': ('wipe', 'destroy', "immolating gyre deals x damage to each creature and planeswalker you don't control, where x is the number of instant and"),
     'Krosan Grip': ('spot', 'destroy', ')\ndestroy target artifact or enchantment.'),
     'Magister of Worth': ('wipe', 'destroy', 'if condemnation gets more votes or the vote is tied, destroy all creatures other than this creature.'),
     'Massacre Wurm': ('wipe', 'other', 'when this creature enters, creatures your opponents control get -2/-2 until end of turn.'),
@@ -77,7 +78,7 @@ INTERACTION = {
 RUN_BY = {
     'azusa': ['Bane of Progress', 'Beast Within', 'Krosan Grip', 'Terastodon', 'Ulamog, the Infinite Gyre'],
     'karlov': ['Anguished Unmaking', 'Austere Command', 'Damn', 'Damnation', 'Farewell', 'Fracture', 'Path to Exile', 'Return to Dust', 'Swords to Plowshares', 'Toxic Deluge', "Umezawa's Jitte"],
-    'lorehold': ['Blasphemous Act', 'Chaos Warp', 'Farewell', 'Generous Gift', 'Ondu Inversion', 'Path to Exile', 'Promise of Loyalty', 'Rise of the Eldrazi', 'Swords to Plowshares', 'Ultima'],
+    'lorehold': ['Blasphemous Act', 'Chaos Warp', 'Farewell', 'Generous Gift', 'Immolating Gyre', 'Ondu Inversion', 'Path to Exile', 'Promise of Loyalty', 'Rise of the Eldrazi', 'Swords to Plowshares', 'Ultima'],
     'rendmaw': ["Assassin's Trophy", 'Beast Within', 'Bow of Nylea', 'Culling Ritual', 'Erebos, Bleak-Hearted', "Eyeblight's Ending", 'Grist, the Hunger Tide', 'Hagra Mauling', 'Haywire Mite', 'Massacre Wurm', 'Nameless Inversion', 'The Meathook Massacre', 'Toxic Deluge'],
     'shilgengar': ['Angel of Despair', 'Angel of the Ruins', 'Anguished Unmaking', 'Damn', 'Despark', 'Elesh Norn, Grand Cenobite', 'Generous Gift', 'Massacre Wurm', 'Mortify', 'Path to Exile', 'Swords to Plowshares', 'Utter End', 'Vindicate', 'Wrath of God'],
     'tivit': ['Bite of the Black Rose', 'Capital Punishment', 'Coercive Portal', "Council's Judgment", 'Damn', 'Farewell', 'Magister of Worth', 'Path to Exile', 'Promise of Loyalty', 'Swords to Plowshares', 'Trial of a Time Lord', "Tyrant's Choice", "Vault 11: Voter's Dilemma", 'Void Rend'],
@@ -226,6 +227,7 @@ SCANNED = {
     'Foundry Inspector',
     'Fountain of Renewal',
     'Fracture',
+    'Furygale Flocking',
     'Gamble',
     'Generous Gift',
     'Genesis Wave',
@@ -256,6 +258,7 @@ SCANNED = {
     'Idol of Oblivion',
     'Idyllic Tutor',
     'Illusion of Choice',
+    'Immolating Gyre',
     'Improvisation Capstone',
     'Invoke Calamity',
     'Journey of Discovery',
@@ -344,6 +347,7 @@ SCANNED = {
     'Primal Vigor',
     "Prisoner's Dilemma",
     'Pristine Talisman',
+    'Profound Journey',
     'Promise of Loyalty',
     'Propaganda',
     'Pygmy Kavu',

@@ -1,0 +1,14 @@
+REAL SWAPS against the staged list, the tables' seeds.
+Lorehold's second 2026-10-09 batch, staged list, N = 15,000 paired games per comparison, seeds 5000.., 95% CIs. '*' = outside its bar.
+
+PACKAGE -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey, -Boros Charm +Immolating Gyre
+  T10: won +0.0471+-0.0046*  damage +6.35+-0.35*  mv_cheated +4.73+-0.29*  miracles_cast +0.18+-0.02*
+        spell_damage -0.10+-0.23  combat_damage +6.45+-0.30*  cards_drawn -0.18+-0.10*  furygale_tokens +1.45+-0.05*
+        wheel_casts -0.01+-0.00*  gyre_resolved +0.13+-0.01*  gyre_x +0.94+-0.05*  gyre_pod_killed +0.92+-0.05*
+        journey_returns +0.25+-0.01*  rebound_casts +0.08+-0.00*  turns_played -0.04+-0.01*
+  T20: won +0.0773+-0.0064*  damage +7.11+-0.37*  mv_cheated +6.22+-0.40*  miracles_cast +0.15+-0.02*
+        spell_damage -0.63+-0.27*  combat_damage +7.74+-0.34*  cards_drawn -0.72+-0.15*  furygale_tokens +1.79+-0.05*
+        wheel_casts -0.02+-0.01*  gyre_resolved +0.18+-0.01*  gyre_x +1.37+-0.06*  gyre_pod_killed +1.09+-0.05*
+        journey_returns +0.37+-0.01*  rebound_casts +0.13+-0.01*  turns_played -0.19+-0.02*
+  P(cast) 0.473   leg won at T20 0.3763
+

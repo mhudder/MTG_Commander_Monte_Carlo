@@ -172,7 +172,7 @@ Methodology that used to live at the end of this file is now
 | [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
 | [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
 | [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED in lorehold**, by the owner: its table-facing choice (the answer an opponent's board calls for) is §4-blind and its default pick is the highest mana value, so its −0.0019 row is a floor. **Ruby Medallion is modelled faithfully but seldom matters**: its {1} miracle discount reaches every decision and payment, but it is out for 2.0 miracle windows a game and makes 0.022 miracles a game possible that full price would not. −Ruby +Prisoner's Dilemma: +0.0295 ±0.0044 at T20 (snitch), +0.0103 ±0.0040 (silence) |
-| [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield` |
+| [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield`. **STAGED 2026-10-10** by the owner: −Verge Rangers +Furygale, −Lightning Greaves +Profound Journey, −Boros Charm +Immolating Gyre -- together +0.0471 / +0.0773 at T10 / T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11107,9 +11107,57 @@ graveyard to the battlefield. Paradigm") is in the list and has never been
 implemented; its row is a blank. The reanimation path built here is most
 of it -- Paradigm's copy each first main phase is the rest.
 
-Nothing is staged: a candidate row names no cut (§0c), and the owner
-chooses. Raphael's head-to-head is in SIMULATED as a comparison, not a
-proposal.
+Raphael's head-to-head is in SIMULATED as a comparison, not a proposal.
+
+### Staged, 2026-10-10
+
+The owner ruled Gideon's Phalanx and everything below it out, read the
+eight lowest MODEL-EVALUATED rows at T20 (Ruby Medallion, already staged
+out, left aside), and named three cuts in order: **Verge Rangers**
+(+0.0021 ±0.0028), **Lightning Greaves** (+0.0033 ±0.0025) and **Boros
+Charm** (+0.0019 ±0.0016) -- then paired them with the batch by strength.
+Every one of the twelve pairings was run as a REAL SWAP on the tables' seeds
+(`run_lorehold_big_spells --h2h`, `results/lorehold_big_spells_h2h_20261010.txt`),
+and all twelve are significant at both horizons:
+
+| cut | +Furygale | +Journey | +Raphael's | +Gyre |
+|---|---|---|---|---|
+| Verge Rangers | **+0.0287 / +0.0455** | +0.0123 / +0.0155 | +0.0050 / +0.0116 | +0.0027 / +0.0129 |
+| Lightning Greaves | +0.0303 / +0.0493 | **+0.0147 / +0.0225** | +0.0087 / +0.0190 | +0.0029 / +0.0149 |
+| Boros Charm | +0.0291 / +0.0459 | +0.0152 / +0.0224 | +0.0091 / +0.0194 | **+0.0035 / +0.0167** |
+
+(T10 / T20, bars ±0.0021 to ±0.0049.) Bold is what the owner STAGED:
+`−Verge Rangers +Furygale Flocking`, `−Lightning Greaves +Profound
+Journey`, `−Boros Charm +Immolating Gyre`. **The three together** (§0p),
+against the same base: **+0.0471 ±0.0046 at T10, +0.0773 ±0.0064 at T20**
+(`results/lorehold_big_spells_package_20261010.txt`) -- additive at T10
+(+0.0469 summed), below the sum at T20 (+0.0847): three cards drawing on the
+same miracle windows.
+
+**Two of the cuts are protection**, which this model sees only in part (§4):
+Lightning Greaves is a shroud source and Boros Charm's other mode is a
+protection spell. Boros Charm's damage row is also understated -- its
+"4 damage to target player" is spread as 4/3 to each opponent, a defect
+queued separately. All three make the swap a CEILING; the owner chose the
+cuts knowing it. Lorehold's cache stays SUSPECT: staging changes the list
+every cached number was measured against, and only the deferred rebuild
+clears it (§0z27).
+
+**AND STAGING A WIPE MOVED THREE OTHER DECKS.** The removal census
+(`tools.removal_census`, §0z87) is derived from every list, and Immolating
+Gyre is a damage wipe, so `DESTROY_SHARE_WIPE` went **0.5556 → 0.5714**. That
+constant prices indestructible against the pod's wraths in EVERY deck.
+`check_unchanged_decks` at its default 400 games called all seven decks
+bit-identical; at **3,000** it found four moved: shilgengar −0.00033 win
+rate (one game), trostani +0.00067 (two), rendmaw and azusa in damage only
+-- each the size §0z87 measured for the whole knob. Karlov and tivit have
+no indestructible source of any kind, so no game can read the constant;
+their caches are VERIFIED on that mechanism and the 3,000-game check.
+**Rendmaw, shilgengar and azusa are SUSPECT, honestly: their numbers did
+move**, by about a game in three thousand, and only a rebuild clears that.
+The lesson is §0z27's third row pointed at a NEIGHBOUR: a derived constant
+read by every deck makes one deck's staging a shared-code change -- and a
+400-game check cannot see a threshold that moves a rare event.
 
 ## How to read an ablation table
 

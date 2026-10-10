@@ -666,6 +666,12 @@
         "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
         "fingerprint": "80f58b315b5f5983",
         "utc": "2026-10-09T16:35:45Z"
+      },
+      {
+        "commit": "33b0cea",
+        "evidence": "2026-10-10, lorehold staged -Verge Rangers +Furygale, -Lightning Greaves +Profound Journey, -Boros Charm +Immolating Gyre; decks/_removal.py regenerated, DESTROY_SHARE_WIPE 0.5556 -> 0.5714 (Immolating Gyre counted). This deck has NO indestructible source -- printed, granted or a protection spell's wipe grant -- and destroy_share_for(g, 'wipe') is read only when a pod wipe meets an indestructible permanent, so no game can read the constant. check_unchanged_decks --n=3000 against the previous commit: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "01c9328ec61a2453",
+        "utc": "2026-10-10T01:05:00Z"
       }
     ]
   },
@@ -1893,6 +1899,12 @@
         "evidence": "2026-10-09, lorehold's seven-card batch (opponents.damage_single target kwarg, Immolating Gyre's wipe scope, _evasion REBOUND, ablation.py lorehold classifications for cards in no list): check_unchanged_decks against a worktree at bd9e7ae (this cache's built commit) BIT-IDENTICAL on all 8 metrics; also bit-identical against 2852268. No row can move: the only rendering change names cards in no list.",
         "fingerprint": "11876055062ef136",
         "utc": "2026-10-09T16:35:45Z"
+      },
+      {
+        "commit": "33b0cea",
+        "evidence": "2026-10-10, lorehold staged -Verge Rangers +Furygale, -Lightning Greaves +Profound Journey, -Boros Charm +Immolating Gyre; decks/_removal.py regenerated, DESTROY_SHARE_WIPE 0.5556 -> 0.5714 (Immolating Gyre counted). This deck has NO indestructible source -- printed, granted or a protection spell's wipe grant -- and destroy_share_for(g, 'wipe') is read only when a pod wipe meets an indestructible permanent, so no game can read the constant. check_unchanged_decks --n=3000 against the previous commit: BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "24437a888b1e44f0",
+        "utc": "2026-10-10T01:05:00Z"
       }
     ]
   },

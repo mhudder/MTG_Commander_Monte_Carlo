@@ -2290,7 +2290,7 @@ MEASURED: list[Candidate] = [
         rationale='Six 3/3 flying hasty attackers for {2} or nothing -- its own reduction applies to the miracle cost (601.2f), and the rummage fills the graveyard that pays it.',
         evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. Counters at T20: furygale_tokens +1.67 a game (P(cast) 0.280, the highest of the batch: the reduction makes it castable from hand too), combat_damage +7.44, spell_damage -1.26 (the miracles it displaces).",
         limits="A slight CEILING: 'attack THAT opponent' is not modelled -- the six join the pod-wide split (`combat_damage`) rather than going two at each player. Tokens are never the pod's spot-removal target in this model (true of every token in every list); its wipes do take them.",
-        verdict="The largest candidate row ever measured for lorehold, and outside the bar of every other card in this batch. On the table's scale it sits above Storm Herd (+0.0432 at T20), though §0c forbids ranking a candidate row against a leave-one-out row. The owner called it 'excellent'; the number agrees. Staging needs a head-to-head against a named cut.",
+        verdict="The largest candidate row ever measured for lorehold, and outside the bar of every other card in this batch. On the table's scale it sits above Storm Herd (+0.0432 at T20), though §0c forbids ranking a candidate row against a leave-one-out row. The owner called it 'excellent'; the number agrees. Staging needs a head-to-head against a named cut. STAGED 2026-10-10 against Verge Rangers (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
     Candidate(
         deck="lorehold", card='Searing Wind', measured="2026-10-09",
@@ -2335,7 +2335,7 @@ MEASURED: list[Candidate] = [
         rationale="A one-sided sweeper whose X is the graveyard Lorehold's rummage fills.",
         evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. gyre_resolved +0.18 a game, X averaging 8 at resolution, 1.17 pod creatures killed a game, combat_damage +1.20 at T20. THE KNOB: gyre_full_x 3 -> +0.0218 +-0.0027, 12 -> +0.0131 +-0.0023 at T20; significant at every setting.",
         limits="THE KNOB IS A JUDGEMENT: the pod's creatures have no toughness (§4), so X kills min(1, X / gyre_full_x) of each board. Planeswalkers are §4.",
-        verdict="The owner asked how strong it is: significant at both horizons and at every setting of the knob that prices it, with X large enough (about 8) that it is usually a full one-sided wipe. A long-horizon card -- most of its value is at T20, when the pod's boards have grown.",
+        verdict="The owner asked how strong it is: significant at both horizons and at every setting of the knob that prices it, with X large enough (about 8) that it is usually a full one-sided wipe. A long-horizon card -- most of its value is at T20, when the pod's boards have grown. STAGED 2026-10-10 against Boros Charm (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
     Candidate(
         deck="lorehold", card='Profound Journey', measured="2026-10-09",
@@ -2344,7 +2344,7 @@ MEASURED: list[Candidate] = [
         rationale='Two reanimations for one card: a miracle is cast from hand, so rebound always applies.',
         evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. journey_returns +0.38 a game (0.13 of them the rebound), mv_cheated +3.48 at T20. What it returns, 3,000 games: Arcane Bombardment 13%, Library of Leng 10%, Sunbird's Invocation 9%, The Dawning Archaic 9%, Sol Ring 8%, Sensei's Divining Top 7%, Double Vision 6% -- the engine pieces the pod destroyed, which is why spell_damage rises (+1.81).",
         limits='Every clause. Restoration Seminar, the card the owner compares it to, is KNOWN_BLIND in this engine (unimplemented), so the two are NOT compared here.',
-        verdict="Significant at both horizons, second in this batch at T10. The owner's 'weaker Restoration Seminar' cannot be checked until Seminar is implemented -- which the reanimation path built for this card now makes cheap.",
+        verdict="Significant at both horizons, second in this batch at T10. The owner's 'weaker Restoration Seminar' cannot be checked until Seminar is implemented -- which the reanimation path built for this card now makes cheap. STAGED 2026-10-10 against Lightning Greaves (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
 ]
 
@@ -2352,6 +2352,27 @@ MEASURED: list[Candidate] = [
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
+    Change(
+        deck="lorehold", remove='Verge Rangers', add='Furygale Flocking',
+        staged="2026-10-10",
+        rationale="STAGED BY THE OWNER 2026-10-10, the first of three cuts named in order, paired with the batch's strongest card. Six 3/3 flying hasty attackers for {2} or nothing: the card's own reduction applies to the miracle cost (601.2f) and Lorehold's rummage fills the graveyard that pays it (§0z124). The cut was the owner's: a MODEL-EVALUATED creature whose row was +0.0021 +-0.0028 at T20, inside its bar.",
+        evidence="REAL SWAP -Verge Rangers +Furygale Flocking, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0287 +-0.0035 (significant) at T10 and +0.0455 +-0.0049 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
+        notes="A slight CEILING on the add: 'attack THAT opponent' is not modelled -- the six join the pod-wide split. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
+    ),
+    Change(
+        deck="lorehold", remove='Lightning Greaves', add='Profound Journey',
+        staged="2026-10-10",
+        rationale="STAGED BY THE OWNER 2026-10-10, the second cut. Two reanimations for one card -- a miracle is cast from hand, so rebound applies -- and what comes back is the engine the pod destroyed: Arcane Bombardment, Library of Leng, Sunbird's Invocation, The Dawning Archaic (§0z124). The cut was the owner's: +0.0033 +-0.0025 at T20.",
+        evidence="REAL SWAP -Lightning Greaves +Profound Journey, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0147 +-0.0028 (significant) at T10 and +0.0225 +-0.0042 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
+        notes="THE CUT IS PROTECTION, which this model sees only in part: Greaves is a shroud source (`shroud_sources`), and the pod's removal is a roll against an abstract board (§4) -- the reason the owner kept Swiftfoot Boots in karlov. So the swap may be a CEILING. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
+    ),
+    Change(
+        deck="lorehold", remove='Boros Charm', add='Immolating Gyre',
+        staged="2026-10-10",
+        rationale="STAGED BY THE OWNER 2026-10-10, the third cut. A one-sided sweeper whose X is the graveyard Lorehold fills, usually a full wipe of the pod's boards (§0z124). The cut was the owner's: +0.0019 +-0.0016 at T20.",
+        evidence="REAL SWAP -Boros Charm +Immolating Gyre, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0035 +-0.0021 (significant) at T10 and +0.0167 +-0.0035 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
+        notes="TWO CAVEATS ON THE CUT, both making the swap a CEILING: Boros Charm's damage mode is spread as 4/3 to each opponent instead of 4 to one (a known engine defect, queued separately), so its row is understated; and its indestructible mode is a protection spell (`PROTECTION`), which the pod's abstract removal sees only in part. THE ADD RESTS ON A KNOB: `gyre_full_x` (6), a judgement about the pod's toughness -- over a blank the row held from +0.0131 to +0.0218 across 3..12. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
+    ),
     Change(
         deck="lorehold", remove="Ruby Medallion", add="Prisoner's Dilemma",
         staged="2026-10-09",
@@ -3315,6 +3336,59 @@ SIMULATED: list[Simulated] = [
         measured='2026-10-09', source='results/lorehold_big_spells_20261009.txt',
         result=("REAL SWAP -Reforge the Soul +Raphael's Technique, N=15,000 paired, seeds 80000..: -0.0026 +-0.0014 (significant) at T10 and -0.0031 +-0.0022 (significant) at T20."),
         notes=("The owner's comparison ('a weaker Reforge the Soul'), measured: the same wheel, and Reforge has its own miracle {1}{R} that needs no Lorehold on the battlefield. Raphael's Sneak is not modelled (PARTLY). A comparison, not a proposal -- nobody suggested cutting Reforge. §0z124."),
+    ),    Simulated(
+        deck='lorehold', remove='Verge Rangers', add='Profound Journey',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Verge Rangers +Profound Journey, N=15,000 paired, seeds 5000..: +0.0123 +-0.0030 (significant) at T10 and +0.0155 +-0.0043 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Verge Rangers', add="Raphael's Technique",
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result="REAL SWAP -Verge Rangers +Raphael's Technique, N=15,000 paired, seeds 5000..: +0.0050 +-0.0030 (significant) at T10 and +0.0116 +-0.0044 (significant) at T20.",
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Verge Rangers', add='Immolating Gyre',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Verge Rangers +Immolating Gyre, N=15,000 paired, seeds 5000..: +0.0027 +-0.0025 (significant) at T10 and +0.0129 +-0.0041 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add='Furygale Flocking',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Lightning Greaves +Furygale Flocking, N=15,000 paired, seeds 5000..: +0.0303 +-0.0033 (significant) at T10 and +0.0493 +-0.0049 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add="Raphael's Technique",
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result="REAL SWAP -Lightning Greaves +Raphael's Technique, N=15,000 paired, seeds 5000..: +0.0087 +-0.0028 (significant) at T10 and +0.0190 +-0.0044 (significant) at T20.",
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Lightning Greaves', add='Immolating Gyre',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Lightning Greaves +Immolating Gyre, N=15,000 paired, seeds 5000..: +0.0029 +-0.0023 (significant) at T10 and +0.0149 +-0.0039 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Boros Charm', add='Furygale Flocking',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Boros Charm +Furygale Flocking, N=15,000 paired, seeds 5000..: +0.0291 +-0.0033 (significant) at T10 and +0.0459 +-0.0047 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Boros Charm', add='Profound Journey',
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result='REAL SWAP -Boros Charm +Profound Journey, N=15,000 paired, seeds 5000..: +0.0152 +-0.0027 (significant) at T10 and +0.0224 +-0.0039 (significant) at T20.',
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
+    ),
+    Simulated(
+        deck='lorehold', remove='Boros Charm', add="Raphael's Technique",
+        measured='2026-10-10', source='results/lorehold_big_spells_h2h_20261010.txt',
+        result="REAL SWAP -Boros Charm +Raphael's Technique, N=15,000 paired, seeds 5000..: +0.0091 +-0.0027 (significant) at T10 and +0.0194 +-0.0041 (significant) at T20.",
+        notes=("One of the twelve pairings of the owner's three cuts with the four contenders kept after §0z124; the owner staged -Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre (CHANGES). Measured on the staged list before those three were staged. §0z124."),
     ),
 ]
 
