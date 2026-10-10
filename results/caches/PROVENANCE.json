@@ -672,6 +672,12 @@
         "evidence": "2026-10-10, lorehold staged -Verge Rangers +Furygale, -Lightning Greaves +Profound Journey, -Boros Charm +Immolating Gyre; decks/_removal.py regenerated, DESTROY_SHARE_WIPE 0.5556 -> 0.5714 (Immolating Gyre counted). This deck has NO indestructible source -- printed, granted or a protection spell's wipe grant -- and destroy_share_for(g, 'wipe') is read only when a pod wipe meets an indestructible permanent, so no game can read the constant. check_unchanged_decks --n=3000 against the previous commit: BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "01c9328ec61a2453",
         "utc": "2026-10-10T01:05:00Z"
+      },
+      {
+        "commit": "75f3bb8",
+        "evidence": "2026-10-10, lorehold v17 committed (-Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey): decks/_removal.py's SCANNED list lost one name (read only by check_docs; no destroy share moved). check_unchanged_decks --n=3000 against the previous commit 75f3bb8: BIT-IDENTICAL on all 8 metrics. And this deck has no indestructible source, so \u00a70z124's DESTROY_SHARE_WIPE move cannot reach it.",
+        "fingerprint": "4619efb44b75bd4c",
+        "utc": "2026-10-10T01:15:22Z"
       }
     ]
   },
@@ -1905,6 +1911,12 @@
         "evidence": "2026-10-10, lorehold staged -Verge Rangers +Furygale, -Lightning Greaves +Profound Journey, -Boros Charm +Immolating Gyre; decks/_removal.py regenerated, DESTROY_SHARE_WIPE 0.5556 -> 0.5714 (Immolating Gyre counted). This deck has NO indestructible source -- printed, granted or a protection spell's wipe grant -- and destroy_share_for(g, 'wipe') is read only when a pod wipe meets an indestructible permanent, so no game can read the constant. check_unchanged_decks --n=3000 against the previous commit: BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "24437a888b1e44f0",
         "utc": "2026-10-10T01:05:00Z"
+      },
+      {
+        "commit": "75f3bb8",
+        "evidence": "2026-10-10, lorehold v17 committed (-Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey): decks/_removal.py's SCANNED list lost one name (read only by check_docs; no destroy share moved). check_unchanged_decks --n=3000 against the previous commit 75f3bb8: BIT-IDENTICAL on all 8 metrics. And this deck has no indestructible source, so \u00a70z124's DESTROY_SHARE_WIPE move cannot reach it.",
+        "fingerprint": "3bb4533bced5cc37",
+        "utc": "2026-10-10T01:15:22Z"
       }
     ]
   },

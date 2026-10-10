@@ -10,11 +10,11 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from edhmc.decks import lorehold_v16
+from edhmc.decks import lorehold_v17
 from edhmc.experiment import DEFAULT_CFG
 from edhmc import lorehold as L
 
-DECK, CMD = lorehold_v16.build()
+DECK, CMD = lorehold_v17.build()
 
 OBS = ("won", "mv_cheated", "miracles_cast", "damage", "spells_cast",
        "settop_placed", "settop_miracled", "leng_to_top", "leng_miracled",

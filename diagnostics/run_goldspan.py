@@ -40,7 +40,7 @@ from edhmc.engine import Card
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.pending import build_pending
 from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
-from edhmc.decks.lorehold_v16 import GOLDSPAN_DRAGON, CALDERA_PYREMAW
+from edhmc.decks.lorehold_v17 import GOLDSPAN_DRAGON, CALDERA_PYREMAW
 
 VICTIM = "Pinnacle Monk"          # same slot candidates.py used
 BASE_SEED = 80000                 # same seeds candidates.py used

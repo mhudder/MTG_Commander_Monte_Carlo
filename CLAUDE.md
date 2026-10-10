@@ -64,7 +64,7 @@ ids are load-bearing:
       opponents.py           shared opponent model, clocks, combat and damage
       experiment.py          paired A/B harness
       pending.py             staged-change ledger
-      decks/                 rendmaw_v12  lorehold_v16  karlov_v2
+      decks/                 rendmaw_v12  lorehold_v17  karlov_v2
                              tivit_v1  shilgengar_v1  azusa_v1  trostani_v1
     tools/                   entry points
     diagnostics/             diag_* (measure a mechanism), run_* (measure a change)

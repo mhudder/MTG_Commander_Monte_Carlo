@@ -37,7 +37,7 @@ from edhmc.lorehold import simulate as lorehold_sim
 from edhmc.pending import build_pending
 from edhmc.experiment import run_ab, analyse
 
-from edhmc.decks.lorehold_v16 import (GALVANOTH, CALDERA_PYREMAW,
+from edhmc.decks.lorehold_v17 import (GALVANOTH, CALDERA_PYREMAW,
                                       RADIANT_SCROLLWIELDER)
 
 CUT = "Penance"

@@ -15,7 +15,7 @@ from edhmc.pending import build_pending
 from edhmc.experiment import run_ab, analyse, POD_V2
 
 from edhmc.decks.rendmaw_v12 import CAULDRON_OF_ESSENCE
-from edhmc.decks.lorehold_v16 import SUNBIRDS_INVOCATION, GALVANOTH
+from edhmc.decks.lorehold_v17 import SUNBIRDS_INVOCATION, GALVANOTH
 from edhmc.decks.karlov_v2 import (STARSCAPE_CLERIC, ENDURING_TENACITY,
                                    EXEMPLAR_OF_LIGHT)
 

@@ -58,7 +58,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from edhmc.decks import lorehold_v16 as MOD
+from edhmc.decks import lorehold_v17 as MOD
 from edhmc.engine import Card
 from edhmc.lorehold import simulate as lh_sim
 from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
@@ -208,7 +208,7 @@ def main():
           f"numbers.")
     print(f"N = {n:,} paired games per cell, seeds {BASE_SEED}.."
           f"{BASE_SEED + n - 1}, all four legs on the same seed.")
-    print(f"Baseline A is lorehold_v16 AS PRINTED -- neither staged change.\n")
+    print(f"Baseline A is lorehold_v17 AS PRINTED -- neither staged change.\n")
     print("  C  = -Penance +Caldera Pyremaw        (staged 2026-09-05)")
     print("  S  = -Scroll Rack +Sunbird's Invocation (staged 2026-09-04)\n")
 

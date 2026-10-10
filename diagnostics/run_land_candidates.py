@@ -40,7 +40,7 @@ import tools.ablation as AB
 from diagnostics.run_land_ablation import basic_for, swap
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import build_pending
-from edhmc.decks import (azusa_v1, karlov_v2, lorehold_v16, rendmaw_v12,
+from edhmc.decks import (azusa_v1, karlov_v2, lorehold_v17, rendmaw_v12,
                          shilgengar_v1, tivit_v1)
 from tools.candidates import filler_land
 
@@ -59,11 +59,11 @@ SAME_AS = {"Misty Rainforest": "Verdant Catacombs",
 
 # (deck, card, cfg overrides, label)
 ARMS = [(d, c, {}, c.name) for d, mod in (
-            ("rendmaw", rendmaw_v12), ("lorehold", lorehold_v16),
+            ("rendmaw", rendmaw_v12), ("lorehold", lorehold_v17),
             ("karlov", karlov_v2), ("tivit", tivit_v1),
             ("shilgengar", shilgengar_v1), ("azusa", azusa_v1))
         for c in mod.LAND_CANDIDATES if c.name not in SAME_AS]
-ARMS += [("lorehold", lorehold_v16.COMMAND_BEACON, {"beacon_min_tax": 2},
+ARMS += [("lorehold", lorehold_v17.COMMAND_BEACON, {"beacon_min_tax": 2},
           "Command Beacon @ beacon_min_tax=2"),
          ("tivit", tivit_v1.TREASURE_VAULT, {"vault_min_treasures": 2},
           "Treasure Vault @ vault_min_treasures=2")]

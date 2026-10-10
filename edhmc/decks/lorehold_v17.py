@@ -1,5 +1,10 @@
 """
-Lorehold, the Historian v16 — deck definition.
+Lorehold, the Historian v17 — deck definition.
+
+v17 (2026-10-10) commits two of the owner's three staged swaps from §0z124:
+-Verge Rangers +Furygale Flocking and -Lightning Greaves +Profound Journey,
+each in its cut's EXACT list position, so the list is card for card the one
+the head-to-heads measured. -Boros Charm +Immolating Gyre stays STAGED.
 
     Lorehold, the Historian  {3}{R}{W}  5/5 Elder Dragon, flying haste
       Each instant and sorcery card in your hand has miracle {2}.
@@ -68,7 +73,13 @@ ARTIFACTS = [
     C("Sensei's Divining Top", "Artifact", {"gen": 1}, priority=9.5, threat=6.5),
     C("Scroll Rack", "Artifact", {"gen": 2}, priority=9.5, threat=7.5),
     C("Library of Leng", "Artifact", {"gen": 1}, priority=9.8, threat=7.0),
-    C("Lightning Greaves", "Artifact", {"gen": 2}, priority=6, threat=4.0),
+    # COMMITTED 2026-10-10 into Lightning Greaves' exact list position (the
+    # order is the library order every measurement shuffled), so a sorcery
+    # sits in the artifact block. -Lightning Greaves +Profound Journey,
+    # §0z124. {5}{W}{W}: "Return target permanent card from your graveyard
+    # to the battlefield. Rebound." Rebound from `_evasion.REBOUND`.
+    C("Profound Journey", "Sorcery", {"gen": 5, "W": 2},
+      priority=5, script="profound_journey"),
     C("Monument to Endurance", "Artifact", {"gen": 3}, priority=6, threat=5.0),
 ]
 
@@ -85,7 +96,14 @@ CREATURES = [
     C("Guttersnipe", "Creature", {"gen": 2, "R": 1}, 2, 2, priority=6, threat=6.5),
     C("Pinnacle Monk", "Creature", {"gen": 3, "R": 2}, 2, 2, priority=4,
       tags=("mdfc",), land_face=("R", True)),
-    C("Verge Rangers", "Creature", {"gen": 2, "W": 1}, 3, 3, priority=7, threat=5.0),
+    # COMMITTED 2026-10-10 into Verge Rangers' exact list position, so a
+    # sorcery sits in the creature block. -Verge Rangers +Furygale Flocking,
+    # §0z124. {8}{R}{R}: "This spell costs {1} less to cast for each instant
+    # and sorcery card in your graveyard. For each opponent, create two 3/3
+    # blue and red Elemental creature tokens with flying that attack that
+    # opponent this turn if able. They gain haste until end of turn."
+    C("Furygale Flocking", "Sorcery", {"gen": 8, "R": 2},
+      priority=6, script="furygale"),
     C("Hexing Squelcher", "Creature", {"gen": 1, "R": 1}, 2, 2, priority=4),
     C("Storm-Kiln Artist", "Creature", {"gen": 3, "R": 1}, 2, 2, priority=7, threat=7.0),
     C("Monastery Mentor", "Creature", {"gen": 2, "W": 1}, 2, 2,
@@ -412,8 +430,9 @@ BATCH_2026_10_09 = (PRISONERS_DILEMMA,)
 # red Elemental creature tokens with flying that attack that opponent this
 # turn if able. They gain haste until end of turn." The reduction applies to
 # the miracle {2} too (601.2f) -- `lorehold.self_reduction`.
-FURYGALE_FLOCKING = C("Furygale Flocking", "Sorcery", {"gen": 8, "R": 2},
-                      priority=6, script="furygale")
+# COMMITTED in v17 (2026-10-10): the list holds the card, and this name is
+# THAT object, not a second definition of it (§0u).
+FURYGALE_FLOCKING = next(c for c in CREATURES if c.name == "Furygale Flocking")
 # {8}{R} instant. "Searing Wind deals 10 damage to any target."
 SEARING_WIND = C("Searing Wind", "Instant", {"gen": 8, "R": 1},
                  priority=5, script="searing_wind")
@@ -440,8 +459,15 @@ IMMOLATING_GYRE = C("Immolating Gyre", "Sorcery", {"gen": 4, "R": 2},
                     priority=4, tags=("wipe", "onesided"), script="gyre")
 # {5}{W}{W} sorcery. "Return target permanent card from your graveyard to the
 # battlefield. Rebound." Rebound is read from Scryfall (`_evasion.REBOUND`).
-PROFOUND_JOURNEY = C("Profound Journey", "Sorcery", {"gen": 5, "W": 2},
-                     priority=5, script="profound_journey")
+# COMMITTED in v17 (2026-10-10), in the artifact block: THAT object.
+PROFOUND_JOURNEY = next(c for c in ARTIFACTS if c.name == "Profound Journey")
+
+# THE TWO CUTS, kept as constants so the swaps can be re-measured in reverse
+# (rendmaw_v12's SKULLCLAMP precedent). Text as in v16.
+VERGE_RANGERS = C("Verge Rangers", "Creature", {"gen": 2, "W": 1}, 3, 3,
+                  priority=7, threat=5.0)
+LIGHTNING_GREAVES = C("Lightning Greaves", "Artifact", {"gen": 2},
+                      priority=6, threat=4.0)
 
 BATCH_2026_10_09_SPELLS = (FURYGALE_FLOCKING, SEARING_WIND, EXPLOSIVE_WELCOME,
                            GIDEONS_PHALANX, RAPHAELS_TECHNIQUE,

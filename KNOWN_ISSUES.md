@@ -172,7 +172,7 @@ Methodology that used to live at the end of this file is now
 | [0z121](#0z121) | MEASURED | **Deathreap Ritual is MODEL-BLIND** by the owner's rule: its trigger reads every player's creatures and the pod's are a count -- and as implemented it fired on **1.3%** of the turns it was out (checked mid-turn, before the end-step outlets; the pod's three draws nested under that check). **Rendmaw's sacrifice outlets do not cover for each other**: as a group +0.0054 at T20 against +0.0057 summed, nothing at T10; **Ashnod's Altar is −0.0015 whatever else is blanked** -- 0.07 sacrifices a game. The death payoffs carry the package (+0.0105) |
 | [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
 | [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED in lorehold**, by the owner: its table-facing choice (the answer an opponent's board calls for) is §4-blind and its default pick is the highest mana value, so its −0.0019 row is a floor. **Ruby Medallion is modelled faithfully but seldom matters**: its {1} miracle discount reaches every decision and payment, but it is out for 2.0 miracle windows a game and makes 0.022 miracles a game possible that full price would not. −Ruby +Prisoner's Dilemma: +0.0295 ±0.0044 at T20 (snitch), +0.0103 ±0.0040 (silence) |
-| [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield`. **STAGED 2026-10-10** by the owner: −Verge Rangers +Furygale, −Lightning Greaves +Profound Journey, −Boros Charm +Immolating Gyre -- together +0.0471 / +0.0773 at T10 / T20 |
+| [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield`. **STAGED 2026-10-10** by the owner: −Verge Rangers +Furygale, −Lightning Greaves +Profound Journey, −Boros Charm +Immolating Gyre -- together +0.0471 / +0.0773 at T10 / T20. **The first two COMMITTED the same day (lorehold v17)**; Gyre stays staged |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11158,6 +11158,29 @@ move**, by about a game in three thousand, and only a rebuild clears that.
 The lesson is §0z27's third row pointed at a NEIGHBOUR: a derived constant
 read by every deck makes one deck's staging a shared-code change -- and a
 400-game check cannot see a threshold that moves a rare event.
+
+### Committed, 2026-10-10: lorehold v17
+
+The owner: "implement the first two, do not implement the third one yet."
+**`−Verge Rangers +Furygale Flocking` and `−Lightning Greaves +Profound
+Journey` are COMMITTED** on all three legs in one commit:
+`edhmc/decks/lorehold_v17.py` (renamed from v16, every reference
+re-pointed), `spreadsheets/Lorehold_Commander_Deck_Final_v17.xlsx` (v16 kept
+as provenance; the two rows replaced in place, Collection Status left blank
+for the owner), and the two Changes moved to COMMITTED. Each card took its
+cut's EXACT list position, so `build_pending("lorehold")` is card for card,
+in order, the list every head-to-head above measured. Module and sheet
+reconcile 100 against 100. **`−Boros Charm +Immolating Gyre` stays STAGED.**
+
+Two checks broke on the commit, both fixtures that named a cut card or
+leaned on a shuffle of the real list: `tools.validate` and
+`tests/test_crn_streams.py` used Verge Rangers as lorehold's sample card
+(now Hexing Squelcher), and `tests/test_lorehold_0f_0i.py`'s Mother Lode
+case relied on seed 1's top card costing less than 10 -- in v17 that card is
+Furygale Flocking, mana value 10, and discover 10 correctly made no
+Treasures. The test now names its discovery target. **A fixture built on
+the real list is a claim about that list**, and it fails on a correct
+engine the day the list moves.
 
 ## How to read an ablation table
 

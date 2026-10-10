@@ -69,7 +69,7 @@ import edhmc.engine as EN
 import edhmc.karlov as K
 import edhmc.lorehold as L
 from edhmc.decks import karlov_v2 as KM
-from edhmc.decks import lorehold_v16 as LM
+from edhmc.decks import lorehold_v17 as LM
 from edhmc.experiment import DEFAULT_CFG
 
 MUTATE = "--mutate" in sys.argv

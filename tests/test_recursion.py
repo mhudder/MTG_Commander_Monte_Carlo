@@ -35,7 +35,7 @@ import sys
 import edhmc.lorehold as L
 import edhmc.engine as E
 from edhmc.engine import Card, Permanent
-from edhmc.decks.lorehold_v16 import build
+from edhmc.decks.lorehold_v17 import build
 from edhmc.decks.rendmaw_v12 import build as rw_build
 from edhmc.experiment import DEFAULT_CFG
 

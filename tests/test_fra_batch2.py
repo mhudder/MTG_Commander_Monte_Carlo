@@ -69,7 +69,7 @@ import edhmc.engine as EN
 import edhmc.lorehold as LH
 import edhmc.tivit as TV
 import edhmc.shilgengar as SH
-from edhmc.decks import rendmaw_v12 as RM, lorehold_v16 as LM
+from edhmc.decks import rendmaw_v12 as RM, lorehold_v17 as LM
 from edhmc.decks import tivit_v1 as TM, shilgengar_v1 as SM
 
 MUTATE = "--mutate" in sys.argv

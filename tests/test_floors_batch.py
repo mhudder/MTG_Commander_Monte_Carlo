@@ -67,7 +67,7 @@ import edhmc.lorehold as L
 import edhmc.opponents as OPP
 import edhmc.shilgengar as SH
 import edhmc.tivit as T
-from edhmc.decks import lorehold_v16 as LM
+from edhmc.decks import lorehold_v17 as LM
 from edhmc.decks import rendmaw_v12 as RM
 from edhmc.decks import shilgengar_v1 as SM
 from edhmc.decks import tivit_v1 as TM

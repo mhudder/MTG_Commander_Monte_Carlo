@@ -8,7 +8,7 @@ commit's engine is the one imported:
     (cd ../edhmc_at && python /path/to/diagnostics/run_sunbird_bisect.py \
         30000 /tmp/<commit>.npy 4)
 
-Legs A (lorehold_v16 as printed) and S (-Scroll Rack +Sunbird's Invocation)
+Legs A (lorehold_v17 as printed) and S (-Scroll Rack +Sunbird's Invocation)
 at T20, N paired games, seeds 5000.., the cfg `run_lorehold_pair` uses --
 so its first commit reproduces the 2026-09-09 figure (+0.0152 +-0.0028), and
 it did. Saves per-seed `won` for both legs. SAME SEEDS AT EVERY COMMIT, so
@@ -23,7 +23,7 @@ from multiprocessing import Pool
 N, OUT, PROCS = int(sys.argv[1]), sys.argv[2], int(sys.argv[3])
 _W = {}
 def _init():
-    from edhmc.decks import lorehold_v16 as MOD
+    from edhmc.decks import lorehold_v17 as MOD
     from edhmc.lorehold import simulate
     from edhmc.experiment import DEFAULT_CFG, _swap_many
     deck, cmd = MOD.build()

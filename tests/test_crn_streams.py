@@ -59,8 +59,8 @@ N = 200
 SIMS = {"rendmaw": None, "lorehold": LH.simulate,
         "karlov": KV.simulate, "tivit": TV.simulate,
         "shilgengar": None, "azusa": None, "trostani": None}
-# lorehold's was Verge Rangers until 2026-10-10, when the owner staged it
-# out (-Verge Rangers +Furygale Flocking); any creature in the list serves.
+# lorehold's was Verge Rangers until 2026-10-10, when the owner cut it
+# (-Verge Rangers +Furygale Flocking, committed in v17); any creature serves.
 CUTS = {"rendmaw": "March of the World Ooze", "lorehold": "Hexing Squelcher",
         "karlov": "Blood Artist", "tivit": "Academy Manufactor",
         "shilgengar": "Blood Artist", "azusa": "Lotus Cobra",

@@ -45,14 +45,14 @@ from edhmc import engine as EN
 from edhmc import karlov as KA
 from edhmc import lorehold as LO
 from edhmc import opponents as OPP
-from edhmc.decks import karlov_v2, lorehold_v16, rendmaw_v12
+from edhmc.decks import karlov_v2, lorehold_v17, rendmaw_v12
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import DECKS as CATALOG
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []
 EXTRA = {}
-LDECK, LCMD = lorehold_v16.build()
+LDECK, LCMD = lorehold_v17.build()
 KDECK, KCMD = karlov_v2.build()
 FAREWELL = next(c for c in LDECK if c.name == "Farewell")
 DAMN = next(c for c in KDECK if c.name == "Damn")

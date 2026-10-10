@@ -29,7 +29,7 @@ from edhmc.experiment import DEFAULT_CFG
 DECKS = {
     "azusa": ("edhmc.azusa", "edhmc.decks.azusa_v1"),
     "rendmaw": ("edhmc.engine", "edhmc.decks.rendmaw_v12"),
-    "lorehold": ("edhmc.lorehold", "edhmc.decks.lorehold_v16"),
+    "lorehold": ("edhmc.lorehold", "edhmc.decks.lorehold_v17"),
     "karlov": ("edhmc.karlov", "edhmc.decks.karlov_v2"),
     "tivit": ("edhmc.tivit", "edhmc.decks.tivit_v1"),
     "shilgengar": ("edhmc.shilgengar", "edhmc.decks.shilgengar_v1"),

@@ -85,7 +85,7 @@ from edhmc import tivit as TV
 from edhmc import azusa as AZ
 from edhmc import lorehold as LO
 from edhmc.decks import (shilgengar_v1, karlov_v2, tivit_v1, azusa_v1,
-                         rendmaw_v12, lorehold_v16)
+                         rendmaw_v12, lorehold_v17)
 from edhmc.experiment import DEFAULT_CFG
 
 MUTATE = "--mutate" in sys.argv
@@ -397,14 +397,14 @@ def davvol_cases():
 
 
 def magistrate_cases():
-    g = fresh(LO.LoreholdGame, lorehold_v16)
-    LO.resolve_spell(g, lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA, 6)
+    g = fresh(LO.LoreholdGame, lorehold_v17)
+    LO.resolve_spell(g, lorehold_v17.CHIEF_MAGISTRATE_OF_MERCADIA, 6)
     check("W resolving it makes you the monarch", g.monarch, True)
 
     out = []
     for crown in (True, False):
-        g = fresh(LO.LoreholdGame, lorehold_v16)
-        g.board.append(perm(lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA))
+        g = fresh(LO.LoreholdGame, lorehold_v17)
+        g.board.append(perm(lorehold_v17.CHIEF_MAGISTRATE_OF_MERCADIA))
         LO.make_tokens(g, 1, 1, 1, "Pegasus")
         g.monarch = crown
         LO.magistrate_upkeep(g)

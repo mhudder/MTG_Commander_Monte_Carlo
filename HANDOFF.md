@@ -66,7 +66,7 @@ python -m tools.audit_cards              # every card's data checked against Scr
 | commander | archetype | file | tuning status |
 |---|---|---|---|
 | Rendmaw, Creaking Nest | tokens / aggro | `edhmc/decks/rendmaw_v12.py` | mature — ablated, staged changes under review |
-| Lorehold, the Historian | miracle / top-deck | `edhmc/decks/lorehold_v16.py` | mature |
+| Lorehold, the Historian | miracle / top-deck | `edhmc/decks/lorehold_v17.py` | mature |
 | Karlov of the Ghost Council | lifegain / drain | `edhmc/decks/karlov_v2.py` | mature |
 | Tivit, Seller of Secrets | votes / artifacts | `edhmc/decks/tivit_v1.py` | mature |
 | Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | new — ablated, and its commander's own ability only started firing on 2026-09-07 (`KNOWN_ISSUES.md` 0r) |

@@ -23,7 +23,7 @@ from edhmc.decks.rendmaw_v12 import (NOXIOUS_GEARHULK, BABA_LYSAGA,
                                      WURMCOIL_ENGINE,
     BATCH_2026_09_16 as RENDMAW_2026_09_16)
 from edhmc.decks.tivit_v1 import BATCH_2026_09_16 as TIVIT_2026_09_16
-from edhmc.decks.lorehold_v16 import (GALVANOTH, RADIANT_SCROLLWIELDER,
+from edhmc.decks.lorehold_v17 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       GOLDSPAN_DRAGON,
                                       SUNBIRDS_INVOCATION, BRASSS_BOUNTY,
                                       UNDERWORLD_BREACH,

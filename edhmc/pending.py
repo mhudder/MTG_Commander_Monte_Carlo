@@ -74,7 +74,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from edhmc.decks import (rendmaw_v12, lorehold_v16, karlov_v2, tivit_v1,
+from edhmc.decks import (rendmaw_v12, lorehold_v17, karlov_v2, tivit_v1,
                          shilgengar_v1, azusa_v1, trostani_v1)
 from edhmc.experiment import _swap_many
 from edhmc.registry import DECKS as REGISTRY
@@ -854,6 +854,26 @@ COMMITTED: list[Change] = [
             "card proposed for it: Nissa minus Hydra -0.0112 +-0.0030 at T10, "
             "-0.0065 +-0.0038 at T20 (results/azusa_slot_loam_20261003.txt)."),
         evidence="REAL SWAP -Life from the Loam +Mossborn Hydra, N=15,000 paired, on the list WITH Mole Man (§0z102): +0.0213 +-0.0032 (significant) at T10 and +0.0201 +-0.0042 (significant) at T20; damage +2.46 +-0.28.",
+    ),
+    # COMMITTED 2026-10-10 to edhmc/decks/lorehold_v17.py and
+    # Lorehold_Commander_Deck_Final_v17.xlsx, each into its cut's EXACT list
+    # position. Their MEASURED rows moved here on commit (the candidate rows:
+    # Furygale +0.0556 +-0.0046, Profound Journey +0.0210 +-0.0031 at T20, over
+    # a blank, §0z124). -Boros Charm +Immolating Gyre, staged the same day,
+    # is NOT committed: the owner's call.
+    Change(
+        deck="lorehold", remove='Verge Rangers', add='Furygale Flocking',
+        staged="2026-10-10",
+        rationale="STAGED BY THE OWNER 2026-10-10, the first of three cuts named in order, paired with the batch's strongest card. Six 3/3 flying hasty attackers for {2} or nothing: the card's own reduction applies to the miracle cost (601.2f) and Lorehold's rummage fills the graveyard that pays it (§0z124). The cut was the owner's: a MODEL-EVALUATED creature whose row was +0.0021 +-0.0028 at T20, inside its bar.",
+        evidence="REAL SWAP -Verge Rangers +Furygale Flocking, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0287 +-0.0035 (significant) at T10 and +0.0455 +-0.0049 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
+        notes="A slight CEILING on the add: 'attack THAT opponent' is not modelled -- the six join the pod-wide split. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
+    ),
+    Change(
+        deck="lorehold", remove='Lightning Greaves', add='Profound Journey',
+        staged="2026-10-10",
+        rationale="STAGED BY THE OWNER 2026-10-10, the second cut. Two reanimations for one card -- a miracle is cast from hand, so rebound applies -- and what comes back is the engine the pod destroyed: Arcane Bombardment, Library of Leng, Sunbird's Invocation, The Dawning Archaic (§0z124). The cut was the owner's: +0.0033 +-0.0025 at T20.",
+        evidence="REAL SWAP -Lightning Greaves +Profound Journey, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0147 +-0.0028 (significant) at T10 and +0.0225 +-0.0042 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
+        notes="THE CUT IS PROTECTION, which this model sees only in part: Greaves is a shroud source (`shroud_sources`), and the pod's removal is a roll against an abstract board (§4) -- the reason the owner kept Swiftfoot Boots in karlov. So the swap may be a CEILING. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
     ),
 ]
 
@@ -2256,43 +2276,6 @@ MEASURED: list[Candidate] = [
         verdict='A blank: tivit spends its mana, so the Vault is nearly always a colourless land in place of a coloured one.',
     ),
     Candidate(
-        deck="lorehold", card="Prisoner's Dilemma", measured="2026-10-09",
-        win_rate=("+0.0301 +-0.0034 at T20, +0.0127 +-0.0020 at T10 (value over a "
-                  "blank in Pinnacle Monk's slot, N=15,000, `dilemma_choice` "
-                  "'snitch'); +0.0137 +-0.0027 / +0.0063 +-0.0016 with 'silence'"),
-        signal="both",
-        rationale=("The owner's proposal. A miracle for {2} off Lorehold that deals 24 "
-                   "to the table when each opponent plays the dominant strategy, and a "
-                   "second cast off the graveyard for {5}{R}{R}."),
-        evidence=("results/candidates_lorehold3.txt (tools.candidates lorehold3) and "
-                  "results/prisoners_dilemma.txt PART 2, the same seeds: the snitch arm "
-                  "reproduces the candidates row exactly (+6.03 +-0.21 damage, +0.0301 "
-                  "+-0.0034, P(deploy) 0.304). 0.46 resolutions a game at T20, 0.21 of "
-                  "them from its own flashback. §0z122."),
-        limits=("THE KNOB IS THE CARD: `dilemma_choice`. 'snitch' (8 each) is the only "
-                "equilibrium -- snitch is strictly better for every opponent whatever "
-                "the others choose -- and 'silence' (4 each) is the table colluding "
-                "against it, the floor; both are significant at both horizons. A mixed "
-                "reveal (12 to each silent opponent, up to 24 on two players) is not "
-                "modelled, so neither setting is a ceiling. The rummage's discard "
-                "policy does not know a flashback card is worth more in the graveyard, "
-                "a small understatement. Measured on the engine where Faithless "
-                "Looting's flashback is cast too (§0z122)."),
-        verdict=("Significant at both horizons under BOTH settings of the knob. On the "
-                 "table's scale it sits with the deck's top rows at T20 (Storm Herd "
-                 "+0.0432, Rise of the Eldrazi +0.0361), though §0c forbids ranking it "
-                 "against them. STAGED 2026-10-09 against Ruby Medallion (CHANGES); the "
-                 "other two head-to-heads are in SIMULATED."),
-    ),    Candidate(
-        deck="lorehold", card='Furygale Flocking', measured="2026-10-09",
-        win_rate="+0.0556 +-0.0046 at T20, +0.0344 +-0.0032 at T10 (value over a blank in Pinnacle Monk's slot, N=15,000)",
-        signal="both",
-        rationale='Six 3/3 flying hasty attackers for {2} or nothing -- its own reduction applies to the miracle cost (601.2f), and the rummage fills the graveyard that pays it.',
-        evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. Counters at T20: furygale_tokens +1.67 a game (P(cast) 0.280, the highest of the batch: the reduction makes it castable from hand too), combat_damage +7.44, spell_damage -1.26 (the miracles it displaces).",
-        limits="A slight CEILING: 'attack THAT opponent' is not modelled -- the six join the pod-wide split (`combat_damage`) rather than going two at each player. Tokens are never the pod's spot-removal target in this model (true of every token in every list); its wipes do take them.",
-        verdict="The largest candidate row ever measured for lorehold, and outside the bar of every other card in this batch. On the table's scale it sits above Storm Herd (+0.0432 at T20), though §0c forbids ranking a candidate row against a leave-one-out row. The owner called it 'excellent'; the number agrees. Staging needs a head-to-head against a named cut. STAGED 2026-10-10 against Verge Rangers (CHANGES); the other head-to-heads are in SIMULATED.",
-    ),
-    Candidate(
         deck="lorehold", card='Searing Wind', measured="2026-10-09",
         win_rate='+0.0054 +-0.0016 at T20, +0.0025 +-0.0009 at T10',
         signal="both",
@@ -2337,35 +2320,12 @@ MEASURED: list[Candidate] = [
         limits="THE KNOB IS A JUDGEMENT: the pod's creatures have no toughness (§4), so X kills min(1, X / gyre_full_x) of each board. Planeswalkers are §4.",
         verdict="The owner asked how strong it is: significant at both horizons and at every setting of the knob that prices it, with X large enough (about 8) that it is usually a full one-sided wipe. A long-horizon card -- most of its value is at T20, when the pod's boards have grown. STAGED 2026-10-10 against Boros Charm (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
-    Candidate(
-        deck="lorehold", card='Profound Journey', measured="2026-10-09",
-        win_rate='+0.0210 +-0.0031 at T20, +0.0161 +-0.0022 at T10',
-        signal="both",
-        rationale='Two reanimations for one card: a miracle is cast from hand, so rebound always applies.',
-        evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. journey_returns +0.38 a game (0.13 of them the rebound), mv_cheated +3.48 at T20. What it returns, 3,000 games: Arcane Bombardment 13%, Library of Leng 10%, Sunbird's Invocation 9%, The Dawning Archaic 9%, Sol Ring 8%, Sensei's Divining Top 7%, Double Vision 6% -- the engine pieces the pod destroyed, which is why spell_damage rises (+1.81).",
-        limits='Every clause. Restoration Seminar, the card the owner compares it to, is KNOWN_BLIND in this engine (unimplemented), so the two are NOT compared here.',
-        verdict="Significant at both horizons, second in this batch at T10. The owner's 'weaker Restoration Seminar' cannot be checked until Seminar is implemented -- which the reanimation path built for this card now makes cheap. STAGED 2026-10-10 against Lightning Greaves (CHANGES); the other head-to-heads are in SIMULATED.",
-    ),
 ]
 
 # ---------------------------------------------------------------------------
 # Staged — decided, not yet in the spreadsheets
 # ---------------------------------------------------------------------------
 CHANGES: list[Change] = [
-    Change(
-        deck="lorehold", remove='Verge Rangers', add='Furygale Flocking',
-        staged="2026-10-10",
-        rationale="STAGED BY THE OWNER 2026-10-10, the first of three cuts named in order, paired with the batch's strongest card. Six 3/3 flying hasty attackers for {2} or nothing: the card's own reduction applies to the miracle cost (601.2f) and Lorehold's rummage fills the graveyard that pays it (§0z124). The cut was the owner's: a MODEL-EVALUATED creature whose row was +0.0021 +-0.0028 at T20, inside its bar.",
-        evidence="REAL SWAP -Verge Rangers +Furygale Flocking, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0287 +-0.0035 (significant) at T10 and +0.0455 +-0.0049 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
-        notes="A slight CEILING on the add: 'attack THAT opponent' is not modelled -- the six join the pod-wide split. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
-    ),
-    Change(
-        deck="lorehold", remove='Lightning Greaves', add='Profound Journey',
-        staged="2026-10-10",
-        rationale="STAGED BY THE OWNER 2026-10-10, the second cut. Two reanimations for one card -- a miracle is cast from hand, so rebound applies -- and what comes back is the engine the pod destroyed: Arcane Bombardment, Library of Leng, Sunbird's Invocation, The Dawning Archaic (§0z124). The cut was the owner's: +0.0033 +-0.0025 at T20.",
-        evidence="REAL SWAP -Lightning Greaves +Profound Journey, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0147 +-0.0028 (significant) at T10 and +0.0225 +-0.0042 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
-        notes="THE CUT IS PROTECTION, which this model sees only in part: Greaves is a shroud source (`shroud_sources`), and the pod's removal is a roll against an abstract board (§4) -- the reason the owner kept Swiftfoot Boots in karlov. So the swap may be a CEILING. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
-    ),
     Change(
         deck="lorehold", remove='Boros Charm', add='Immolating Gyre',
         staged="2026-10-10",
@@ -4482,29 +4442,35 @@ DECKS = {
         "Ancient Tomb": rendmaw_v12.ANCIENT_TOMB}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
-    "lorehold": (lorehold_v16, {
+    "lorehold": (lorehold_v17, {
         # 2026-09-16 batch (§0z26).
-        "Jeska's Will": lorehold_v16.JESKAS_WILL,
-        "Past in Flames": lorehold_v16.PAST_IN_FLAMES,
-        "Molecule Man": lorehold_v16.MOLECULE_MAN,
-        "Galvanoth": lorehold_v16.GALVANOTH,
-        "Caldera Pyremaw": lorehold_v16.CALDERA_PYREMAW,
-        "Radiant Scrollwielder": lorehold_v16.RADIANT_SCROLLWIELDER,
-        "Hidden Retreat": lorehold_v16.HIDDEN_RETREAT,
-        "Sunbird's Invocation": lorehold_v16.SUNBIRDS_INVOCATION,
+        "Jeska's Will": lorehold_v17.JESKAS_WILL,
+        "Past in Flames": lorehold_v17.PAST_IN_FLAMES,
+        "Molecule Man": lorehold_v17.MOLECULE_MAN,
+        "Galvanoth": lorehold_v17.GALVANOTH,
+        "Caldera Pyremaw": lorehold_v17.CALDERA_PYREMAW,
+        "Radiant Scrollwielder": lorehold_v17.RADIANT_SCROLLWIELDER,
+        "Hidden Retreat": lorehold_v17.HIDDEN_RETREAT,
+        "Sunbird's Invocation": lorehold_v17.SUNBIRDS_INVOCATION,
         # REALITY FRACTURE, 2026-09-21 (preview text).
-        "Stingcaster Mage": lorehold_v16.STINGCASTER_MAGE,
+        "Stingcaster Mage": lorehold_v17.STINGCASTER_MAGE,
         # Queued item 0c's head-to-heads, 2026-09-25 (§0z53).
-        "Goldspan Dragon": lorehold_v16.GOLDSPAN_DRAGON,
+        "Goldspan Dragon": lorehold_v17.GOLDSPAN_DRAGON,
         # MYSTERY BOOSTER COMMANDER EDITION, 2026-09-29 (§0z74).
-        "Chief Magistrate of Mercadia": lorehold_v16.CHIEF_MAGISTRATE_OF_MERCADIA,
+        "Chief Magistrate of Mercadia": lorehold_v17.CHIEF_MAGISTRATE_OF_MERCADIA,
         # LAND CANDIDATES, 2026-10-06 (§0z113).
-        "Ancient Tomb": lorehold_v16.ANCIENT_TOMB,
-        "Command Beacon": lorehold_v16.COMMAND_BEACON,
+        "Ancient Tomb": lorehold_v17.ANCIENT_TOMB,
+        "Command Beacon": lorehold_v17.COMMAND_BEACON,
         # The owner's proposal, 2026-10-09.
-        "Prisoner's Dilemma": lorehold_v16.PRISONERS_DILEMMA,
-        # The owner's second batch, 2026-10-09.
-        **{c.name: c for c in lorehold_v16.BATCH_2026_10_09_SPELLS}}),
+        "Prisoner's Dilemma": lorehold_v17.PRISONERS_DILEMMA,
+        # The owner's second batch, 2026-10-09. Furygale Flocking and
+        # Profound Journey are COMMITTED in v17 (in the list itself, so no
+        # longer swap-in candidates); the two cuts are catalogued so a
+        # re-measure can name them.
+        **{c.name: c for c in lorehold_v17.BATCH_2026_10_09_SPELLS
+           if c.name not in ("Furygale Flocking", "Profound Journey")},
+        "Verge Rangers": lorehold_v17.VERGE_RANGERS,
+        "Lightning Greaves": lorehold_v17.LIGHTNING_GREAVES}),
     # The three 2026-09-04 Karlov changes are COMMITTED as of v2, so they are
     # in the deck list itself and no longer swap-in candidates. Bolas's
     # Citadel (2026-09-12) is a candidate and NOT yet a deck member.

@@ -50,7 +50,7 @@ import sys
 import edhmc.lorehold as L
 import edhmc.opponents as OPP
 import edhmc.tivit as T
-from edhmc.decks import lorehold_v16 as LM
+from edhmc.decks import lorehold_v17 as LM
 from edhmc.decks import tivit_v1 as TM
 from edhmc.experiment import DEFAULT_CFG
 

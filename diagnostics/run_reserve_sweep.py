@@ -33,12 +33,12 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from edhmc.decks import lorehold_v16, shilgengar_v1
+from edhmc.decks import lorehold_v17, shilgengar_v1
 from edhmc.experiment import DEFAULT_CFG
 from edhmc import lorehold as L
 from edhmc import shilgengar as S
 
-L_DECK, L_CMD = lorehold_v16.build()
+L_DECK, L_CMD = lorehold_v17.build()
 S_DECK, S_CMD = shilgengar_v1.build()
 
 L_OBS = ("won", "mv_cheated", "miracles_cast", "damage", "spells_cast",

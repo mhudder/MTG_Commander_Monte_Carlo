@@ -456,7 +456,6 @@ SCANNED = {
     'Vampiric Rites',
     "Vault 11: Voter's Dilemma",
     'Verdurous Gearhulk',
-    'Verge Rangers',
     'Victory Chimes',
     'Village Rites',
     'Vindicate',

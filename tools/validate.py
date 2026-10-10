@@ -20,11 +20,13 @@ def main() -> int:
         print("  ", r.line("A", "A"))
 
     print("\n\nLorehold engine — A/A control")
-    from edhmc.decks.lorehold_v16 import build as lh_build
+    from edhmc.decks.lorehold_v17 import build as lh_build
     from edhmc.lorehold import simulate as lh_sim
     ld, lc = lh_build()
-    same = [x for x in ld if x.name == "Verge Rangers"][0]
-    la, lb, _ = run_ab(ld, lc, "Verge Rangers", same, n=3000,
+    # Verge Rangers until 2026-10-10, when v17 committed it out
+    # (-Verge Rangers +Furygale Flocking). An A/A needs only a card in the list.
+    same = [x for x in ld if x.name == "Hexing Squelcher"][0]
+    la, lb, _ = run_ab(ld, lc, "Hexing Squelcher", same, n=3000,
                        cfg={"turns": 14}, sim=lh_sim)
     for r in analyse(la, lb, metrics=("mv_cheated", "miracles_cast", "damage")):
         print("  ", r.line("A", "A"))
@@ -133,7 +135,7 @@ def main() -> int:
     from edhmc.registry import DECKS as REGISTRY
     CRN_CASES = {
         "rendmaw": "March of the World Ooze",
-        "lorehold": "Verge Rangers",
+        "lorehold": "Hexing Squelcher",     # Verge Rangers until v17
         "tivit": "Academy Manufactor",
         "karlov": "Blood Artist",
         "shilgengar": "Blood Artist",

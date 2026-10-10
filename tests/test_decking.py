@@ -59,7 +59,7 @@ import edhmc.engine as EN
 import edhmc.lorehold as LH
 from edhmc.azusa import AzusaGame
 from edhmc.karlov import KarlovGame
-from edhmc.decks import (azusa_v1 as AZM, karlov_v2 as KM, lorehold_v16 as LM,
+from edhmc.decks import (azusa_v1 as AZM, karlov_v2 as KM, lorehold_v17 as LM,
                          rendmaw_v12 as RM)
 from edhmc.engine import Permanent
 from edhmc.experiment import DEFAULT_CFG

@@ -110,7 +110,7 @@ def report(outdir):
 def build(arm):
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS as R
-    from edhmc.decks import lorehold_v16 as LM
+    from edhmc.decks import lorehold_v17 as LM
     deck_name, edits = ARMS[arm]
     staged, cmd = build_pending(deck_name)
     module, _ = R[deck_name].build()

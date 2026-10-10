@@ -33,7 +33,7 @@ import sys
 
 import edhmc.lorehold as L
 from edhmc.engine import Card, Permanent, pip_assignment, coloured_tap_life
-from edhmc.decks.lorehold_v16 import build
+from edhmc.decks.lorehold_v17 import build
 from edhmc.experiment import DEFAULT_CFG
 
 MUTATE = "--mutate" in sys.argv
@@ -204,6 +204,12 @@ def test_mother_lode():
     the difference." It was a flat 5, untapped."""
     print("\nHit the Mother Lode: Discover 10, and the Treasures enter tapped")
     g = game()
+    # THE DISCOVERED CARD IS NAMED, not left to seed 1's shuffle: from v17
+    # (2026-10-10) that shuffle put Furygale Flocking -- mana value 10 -- on
+    # top, and discover 10 hitting a 10 rightly makes no Treasures, so the
+    # tapped-pile case below failed on a correct engine. Scroll Rack: mana
+    # value 2, a permanent, and makes no Treasures of its own.
+    g.library.append(next(c for c in DECK if c.name == "Scroll Rack"))
     L.apply_spell_effects(g, LODE)
     mv = g.m.get("discover_mv", 0)
     check("it free-casts a nonland of mana value <= 10",

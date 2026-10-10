@@ -40,7 +40,7 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from edhmc.decks import lorehold_v16 as MOD
+from edhmc.decks import lorehold_v17 as MOD
 from edhmc.experiment import DEFAULT_CFG, _swap_many, repl_priority
 from edhmc.lorehold import simulate as sim
 from edhmc.pending import build_pending

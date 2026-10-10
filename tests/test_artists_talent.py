@@ -63,7 +63,7 @@ import edhmc.lorehold as L
 import edhmc.opponents as OPP
 from edhmc.engine import Card, Permanent
 from edhmc.experiment import DEFAULT_CFG
-from edhmc.decks import lorehold_v16 as M
+from edhmc.decks import lorehold_v17 as M
 from edhmc.pending import build_pending
 
 MUTATE = "--mutate" in sys.argv

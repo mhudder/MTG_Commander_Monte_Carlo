@@ -70,7 +70,7 @@ import edhmc.shilgengar as SH
 import edhmc.tivit as TI
 from edhmc.decks import azusa_v1 as AM
 from edhmc.decks import karlov_v2 as KM
-from edhmc.decks import lorehold_v16 as LM
+from edhmc.decks import lorehold_v17 as LM
 from edhmc.decks import rendmaw_v12 as RM
 from edhmc.decks import shilgengar_v1 as SM
 from edhmc.decks import tivit_v1 as TM

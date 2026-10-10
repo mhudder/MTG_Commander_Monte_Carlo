@@ -26,7 +26,7 @@ def build(spec):
     from edhmc.pending import build_pending
     from edhmc.experiment import repl_priority, _swap_many
     from tools.ablation import blank_like
-    from edhmc.decks import lorehold_v16 as LM
+    from edhmc.decks import lorehold_v17 as LM
     deck, cmd = build_pending(spec["deck"])
     if "blank" in spec:
         i = next(i for i, c in enumerate(deck) if c.name == spec["blank"])
