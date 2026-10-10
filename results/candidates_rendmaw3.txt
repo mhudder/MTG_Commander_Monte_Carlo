@@ -1,0 +1,8 @@
+
+RENDMAW candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  H.E.R.B.I.E., Lovable Robot    2     -0.00+-0.09     +0.0013+-0.0020      0.209
+  The Swarmweaver                4     +1.11+-0.11     +0.0074+-0.0025      0.174
+  Wickerfolk Indomitable         4     +0.35+-0.07     +0.0035+-0.0020      0.179
+  Fire Navy Trebuchet            3     +0.42+-0.09     +0.0050+-0.0022      0.185
+  Dalek Squadron                 3     +2.13+-0.14     +0.0071+-0.0025      0.197

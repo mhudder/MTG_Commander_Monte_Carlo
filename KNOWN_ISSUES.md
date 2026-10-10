@@ -11229,7 +11229,9 @@ by name (`trostani.py`), a hand-written copy of the same fact.
 
 ### The rows
 
-`diagnostics/run_rendmaw_multitype.py`, `results/rendmaw_multitype_20261010.txt`:
+`diagnostics/run_rendmaw_multitype.py`, `results/rendmaw_multitype_20261010.txt`
+(every T20 row reproduced to the last digit -- win rate, damage, P(cast) -- by
+`python -m tools.candidates rendmaw3 --n=15000`, `results/candidates_rendmaw3.txt`):
 N=15,000 paired, seeds 80000.., the staged list, each card in Pygmy Kavu's
 slot (rendmaw's candidate slot since the first batch) against a ONE-type
 blank of its cost, T10 read off the T20 game.
