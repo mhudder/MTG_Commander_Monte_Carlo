@@ -678,6 +678,12 @@
         "evidence": "2026-10-10, lorehold v17 committed (-Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey): decks/_removal.py's SCANNED list lost one name (read only by check_docs; no destroy share moved). check_unchanged_decks --n=3000 against the previous commit 75f3bb8: BIT-IDENTICAL on all 8 metrics. And this deck has no indestructible source, so \u00a70z124's DESTROY_SHARE_WIPE move cannot reach it.",
         "fingerprint": "4619efb44b75bd4c",
         "utc": "2026-10-10T01:15:22Z"
+      },
+      {
+        "commit": "c69d6cc",
+        "evidence": "2026-10-10, \u00a70z125 (rendmaw multi-type batch: engine.py, _evasion.py and tag_flying.py moved every fingerprint). check_unchanged_decks --n=3000, a worktree at bd9e7ae (the cache's built commit) against the working tree with the batch in: karlov BIT-IDENTICAL on all 8 metrics. Also against HEAD c69d6cc at the default N: all six active decks bit-identical.",
+        "fingerprint": "9b97a9669068b7ba",
+        "utc": "2026-10-10T02:04:55Z"
       }
     ]
   },
@@ -1917,6 +1923,12 @@
         "evidence": "2026-10-10, lorehold v17 committed (-Verge Rangers +Furygale Flocking, -Lightning Greaves +Profound Journey): decks/_removal.py's SCANNED list lost one name (read only by check_docs; no destroy share moved). check_unchanged_decks --n=3000 against the previous commit 75f3bb8: BIT-IDENTICAL on all 8 metrics. And this deck has no indestructible source, so \u00a70z124's DESTROY_SHARE_WIPE move cannot reach it.",
         "fingerprint": "3bb4533bced5cc37",
         "utc": "2026-10-10T01:15:22Z"
+      },
+      {
+        "commit": "c69d6cc",
+        "evidence": "2026-10-10, \u00a70z125 (rendmaw multi-type batch: engine.py, _evasion.py and tag_flying.py moved every fingerprint). check_unchanged_decks --n=3000, a worktree at bd9e7ae (the cache's built commit) against the working tree with the batch in: tivit BIT-IDENTICAL on all 8 metrics. Also against HEAD c69d6cc at the default N: all six active decks bit-identical.",
+        "fingerprint": "e51707042caf3f71",
+        "utc": "2026-10-10T02:04:55Z"
       }
     ]
   },

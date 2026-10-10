@@ -339,3 +339,58 @@ GAEAS_CRADLE = L("Gaea's Cradle", "G")
 # "{T}: Add {C}{C}. This land deals 2 damage to you."
 ANCIENT_TOMB = L("Ancient Tomb", "C")
 LAND_CANDIDATES = (GAEAS_CRADLE, ANCIENT_TOMB)
+
+
+# ---------------------------------------------------------------------------
+# THE OWNER'S MULTI-TYPE BATCH, 2026-10-10 (§0z125). A Scryfall search for
+# cards with two or more card types that fit the deck's flying, token and
+# forced-combat themes; the owner asked for these five to be modelled, and
+# named H.E.R.B.I.E. regardless. Oracle text verbatim on each Proposal in
+# edhmc/pending.py. EVERY ONE IS TWO CARD TYPES, so every cast is a Rendmaw
+# trigger -- that is the half of each card this engine already had.
+# ---------------------------------------------------------------------------
+
+# {2} 1/1 Legendary Artifact Creature -- Robot Scout. "Flying / At the
+# beginning of combat on your turn, if you've cast a noncreature spell this
+# turn, surveil 1. / {T}: Add {C}. / {1}, {T}: Add one mana of any color."
+# A mana creature on the Copper Myr line. The filter ({1},{T}: any colour) is
+# net zero mana and is not modelled -- a floor on fixing. The surveil is
+# `herbie_surveil`, at the beginning of combat.
+HERBIE_LOVABLE_ROBOT = C("H.E.R.B.I.E., Lovable Robot", "Artifact/Creature",
+                         {"gen": 2}, 1, 1, priority=7, tags=("ramp",),
+                         mana=(1, "C"))
+
+# {2}{B}{G} 2/3 Legendary Artifact Creature -- Scarecrow. "When The
+# Swarmweaver enters, create two 1/1 black and green Insect creature tokens
+# with flying. / Delirium -- As long as there are four or more card types
+# among cards in your graveyard, Insects and Spiders you control get +1/+1
+# and have deathtouch." The pump is in `Game.power_of`/`toughness_of`
+# (`swarmweaver_bonus`); deathtouch is §4-blind.
+THE_SWARMWEAVER = C("The Swarmweaver", "Artifact/Creature",
+                    {"gen": 2, "B": 1, "G": 1}, 2, 3,
+                    script="swarmweaver", priority=7, threat=6.0)
+
+# {3}{B} 4/3 Artifact Creature -- Scarecrow. "You may cast this card from your
+# graveyard by paying 2 life and sacrificing an artifact or creature in
+# addition to paying its other costs." Cast from the graveyard by
+# `main_phase` (`wickerfolk_option`): every recast is a Rendmaw trigger.
+WICKERFOLK_INDOMITABLE = C("Wickerfolk Indomitable", "Artifact/Creature",
+                           {"gen": 3, "B": 1}, 4, 3, priority=5)
+
+# {2}{B} 0/4 Artifact Creature -- Wall. "Defender, reach / Whenever you
+# attack, create a 2/1 colorless Construct artifact creature token with
+# flying named Ballistic Boulder that's tapped and attacking. Sacrifice that
+# token at the beginning of the next end step." `enters_attacking` and
+# `boulder_end_step`; defender from the generated `_evasion.DEFENDER`.
+FIRE_NAVY_TREBUCHET = C("Fire Navy Trebuchet", "Artifact/Creature",
+                        {"gen": 2, "B": 1}, 0, 4, priority=6, threat=4.5)
+
+# {2}{B} 3/3 Artifact Creature -- Dalek. "Menace / Myriad" -- one token copy
+# per opponent other than the defending player, tapped and attacking, exiled
+# at end of combat. `enters_attacking` and `myriad_exile`.
+DALEK_SQUADRON = C("Dalek Squadron", "Artifact/Creature",
+                   {"gen": 2, "B": 1}, 3, 3, priority=6)
+
+BATCH_2026_10_10 = (HERBIE_LOVABLE_ROBOT, THE_SWARMWEAVER,
+                    WICKERFOLK_INDOMITABLE, FIRE_NAVY_TREBUCHET,
+                    DALEK_SQUADRON)

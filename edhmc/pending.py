@@ -4419,6 +4419,98 @@ PROPOSED: list[Proposal] = [
         prepared='tests/test_lorehold_big_spells.py',
         rejected='MEASURED 2026-10-09 and PROMOTED: the Candidate in MEASURED carries the number (§0z124). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # --- The owner, 2026-10-10: "new, possibly obscure cards for Rendmaw ...
+    # two or more types that may fit the deck's themes (flying, token
+    # generation, forced combat)", H.E.R.B.I.E. named regardless. A Scryfall
+    # search (`id<=bg f:commander` and two card types on the face cast, 950
+    # cards; 262 after a theme screen on the oracle text) was cut to twelve,
+    # and the owner asked for the five recommended to be modelled. Every card
+    # here is two card types, so every cast is a Rendmaw trigger. §0z125.
+    Proposal(
+        deck='rendmaw', card='H.E.R.B.I.E., Lovable Robot',
+        cost='{2}', identity='',
+        type_line='Legendary Artifact Creature — Robot Scout',
+        oracle="Flying\nAt the beginning of combat on your turn, if you've cast a noncreature spell this turn, surveil 1.\n{T}: Add {C}.\n{1}, {T}: Add one mana of any color.",
+        verified='2026-10-10',
+        rationale=("The owner's pick. A turn-two Rendmaw trigger that is also a mana creature -- the Copper Myr "
+                   "slot, with flying."),
+        implement=("MODELLED: a 1/1 flier, and {T}: Add {C} as a mana creature (`mana=(1, 'C')`, summoning-sick "
+                   "like every Myr). The surveil, at the beginning of combat if a noncreature spell was cast this "
+                   "turn, bins a land off the top when six lands are out (`surveil_land_floor`, lorehold's Dragon's "
+                   "Rage Channeler rule). NOT MODELLED: '{1}, {T}: Add one mana of any color' -- a filter, net zero "
+                   "mana, that turns a colourless source into a coloured one; the payment solver has no way to "
+                   "spend a unit to change another's colour. A FLOOR, and a small one in a two-colour list whose "
+                   "lands make both. PARTLY MODELLED."),
+        triage="LIVE",
+        prepared="tests/test_rendmaw_multitype.py",
+    ),
+    Proposal(
+        deck='rendmaw', card='The Swarmweaver',
+        cost='{2}{B}{G}', identity='BG',
+        type_line='Legendary Artifact Creature — Scarecrow',
+        oracle='When The Swarmweaver enters, create two 1/1 black and green Insect creature tokens with flying.\nDelirium — As long as there are four or more card types among cards in your graveyard, Insects and Spiders you control get +1/+1 and have deathtouch.',
+        verified='2026-10-10',
+        rationale=("Three bodies, two of them fliers, on a Scarecrow -- Rendmaw's own type. Delirium is easy in a "
+                   "graveyard made of multi-type cards, and the list already has Insects and Spiders: Grist's and "
+                   "Arasta's tokens, Haywire Mite, Twitching Doll, Arasta herself."),
+        implement=("MODELLED: two 1/1 FLYING Insect tokens (a token-level flying flag: Grist's Insects do not "
+                   "fly, so 'Insect' cannot join FLYING_TOKENS); +1/+1 to every Insect and Spider you control while "
+                   "`opponents.delirium` holds, read in `power_of`/`toughness_of`. Subtypes come from Scryfall "
+                   "(`_evasion.INSECT_SPIDER`, generated), tokens by their name. NOT MODELLED: deathtouch -- the "
+                   "pod's blockers are a count with no toughness and your creatures never block (§4). PARTLY."),
+        triage="LIVE",
+        prepared="tests/test_rendmaw_multitype.py",
+    ),
+    Proposal(
+        deck='rendmaw', card='Wickerfolk Indomitable',
+        cost='{3}{B}', identity='B',
+        type_line='Artifact Creature — Scarecrow',
+        oracle='You may cast this card from your graveyard by paying 2 life and sacrificing an artifact or creature in addition to paying its other costs.',
+        verified='2026-10-10',
+        rationale=("A repeatable Rendmaw trigger: every cast from the graveyard is a 'play', and the sacrifice can "
+                   "be one of the Birds the trigger just made. A 4/3 body each time, and a death for Blood Artist "
+                   "and the Meathook."),
+        implement=("NEW TO THIS ENGINE: casting a card from the graveyard. `main_phase` offers it from the "
+                   "graveyard with the additional costs: 2 life (charged, §0i) above `wickerfolk_life_floor` (10, a "
+                   "judgement, erebos_life_floor's) and the sacrifice of a creature token (the smallest), else a "
+                   "Treasure -- an artifact. A death, so `on_creature_death` fires. Every clause is modelled. THE "
+                   "POLICY IS A FLOOR: the pilot never sacrifices Wickerfolk on purpose to recast it; it comes back "
+                   "only after the pod kills it."),
+        triage="LIVE",
+        prepared="tests/test_rendmaw_multitype.py",
+    ),
+    Proposal(
+        deck='rendmaw', card='Fire Navy Trebuchet',
+        cost='{2}{B}', identity='B',
+        type_line='Artifact Creature — Wall',
+        oracle="Defender, reach\nWhenever you attack, create a 2/1 colorless Construct artifact creature token with flying named Ballistic Boulder that's tapped and attacking. Sacrifice that token at the beginning of the next end step.",
+        verified='2026-10-10',
+        rationale=("Rendmaw's Birds are goaded, so this deck attacks every turn: a free 2/1 flier in every swing, "
+                   "and a death at every end step for Blood Artist, the Meathook and Erebos."),
+        implement=("MODELLED: 'whenever you attack' -- a 2/1 flying artifact creature token joins the attack "
+                   "(`enters_attacking`), and is sacrificed at the end step (`boulder_end_step`), a death. DEFENDER "
+                   "is new to this engine: read from Scryfall's keywords (`_evasion.DEFENDER`, generated) and "
+                   "excluded from `combat`'s attackers. Reach is inert (your creatures never block, §4). Every "
+                   "clause that acts is modelled."),
+        triage="LIVE",
+        prepared="tests/test_rendmaw_multitype.py",
+    ),
+    Proposal(
+        deck='rendmaw', card='Dalek Squadron',
+        cost='{2}{B}', identity='B',
+        type_line='Artifact Creature — Dalek',
+        oracle="Menace\nMyriad (Whenever this creature attacks, for each opponent other than defending player, you may create a token copy that's tapped and attacking that player or a planeswalker they control. Exile the tokens at end of combat.)",
+        verified='2026-10-10',
+        rationale=("Forced combat pointed outward: one attacker becomes one per opponent, each with menace -- "
+                   "Rendmaw's own evasion -- and the copies are tokens, which Primal Vigor doubles."),
+        implement=("MODELLED: menace (generated MENACE, for the card and its copies, which share its name); "
+                   "myriad -- one 3/3 menace token copy per living opponent but one, tapped and attacking, exiled "
+                   "(no death) after combat damage. NOT MODELLED: 'attacking THAT player' -- the copies join the one "
+                   "attack `combat_damage` splits across the pod rather than going one at each other opponent, so "
+                   "the split is the pilot's (Furygale Flocking's caveat, §0z124), a slight CEILING. PARTLY."),
+        triage="LIVE",
+        prepared="tests/test_rendmaw_multitype.py",
+    ),
 ]
 
 
@@ -4439,7 +4531,9 @@ DECKS = {
         "Thomil, the Destroyer": rendmaw_v12.THOMIL_THE_DESTROYER,
         # LAND CANDIDATES, 2026-10-06 (§0z113).
         "Gaea's Cradle": rendmaw_v12.GAEAS_CRADLE,
-        "Ancient Tomb": rendmaw_v12.ANCIENT_TOMB}),
+        "Ancient Tomb": rendmaw_v12.ANCIENT_TOMB,
+        # The owner's multi-type batch, 2026-10-10 (§0z125).
+        **{c.name: c for c in rendmaw_v12.BATCH_2026_10_10}}),
     # The four 2026-08-31/09-01 Lorehold changes are COMMITTED as of v16, so
     # they are in the deck list itself and no longer swap-in candidates.
     "lorehold": (lorehold_v17, {

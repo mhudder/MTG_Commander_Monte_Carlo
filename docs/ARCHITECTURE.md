@@ -317,6 +317,16 @@ command; use it rather than remembering.
   priced as it resolves. A wrath that is an overload (`OVERLOAD_WIPES`, Damn)
   is cast at `wipe_mode_cost` in every main phase; any other cast path that
   can put one on the stack must ask `overload_only` first.
+- **In rendmaw, a token's flying is the SUBTYPE's unless the maker says
+  otherwise** (§0z125): `make_tokens` reads `FLYING_TOKENS` by subtype, and
+  The Swarmweaver's Insects fly where Grist's do not, so it passes
+  `flying=True`. A token that enters TAPPED AND ATTACKING (Ballistic
+  Boulder, a myriad copy) is appended to `combat`'s `attackers` in
+  `enters_attacking`, after the attack triggers -- it was never declared,
+  so it triggers no "whenever ... attacks" of its own. And a card cast from
+  the GRAVEYARD (Wickerfolk Indomitable) is a `main_phase` option tagged
+  `"graveyard"`, whose additional costs are paid in
+  `wickerfolk_additional_costs` instead of `g.hand.remove`.
 - **In lorehold, a nonland permanent enters through `enters_battlefield`**
   (2026-10-09) -- a resolved permanent spell and a reanimated card (Profound
   Journey) alike, so its "when this enters" abilities fire either way. A new

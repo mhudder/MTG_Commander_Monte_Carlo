@@ -237,6 +237,13 @@ SCRIPTED_RENDMAW = {
     # and wrong until §0z83 (a land entering, a card dying).
     "Sakura-Tribe Elder", "Gloomshrieker", "Burnished Hart",
     "Filigree Familiar", "Whip of Erebos",
+    # --- The owner's multi-type batch, 2026-10-10 (§0z125). Candidates. ---
+    # Wickerfolk Indomitable: cast from the graveyard for 2 life and a
+    # sacrifice (`wickerfolk_option`). Fire Navy Trebuchet: defender (the
+    # generated DEFENDER), and a Ballistic Boulder in every attack,
+    # sacrificed at the end step; reach is inert (your creatures never
+    # block, §4). The pilot's sacrifice choices are floors, said on each.
+    "Wickerfolk Indomitable", "Fire Navy Trebuchet",
 }
 
 # Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
@@ -782,6 +789,25 @@ PARTLY_MODELLED = {
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
     },
     "rendmaw": {
+        # The owner's multi-type batch, 2026-10-10 (§0z125). Candidates.
+        "H.E.R.B.I.E., Lovable Robot":
+            "MODELLED: the 1/1 flier, {T}: Add {C} (a summoning-sick mana "
+            "creature), and the surveil at the beginning of combat after a "
+            "noncreature spell (`herbie_surveil`, lorehold's land-binning "
+            "rule). NOT: '{1}, {T}: Add one mana of any color' -- a net-zero "
+            "filter the payment solver cannot express. A floor on fixing.",
+        "The Swarmweaver":
+            "MODELLED: two 1/1 flying Insects on entering, and +1/+1 to every "
+            "Insect and Spider you control under delirium (`swarmweaver_bonus`"
+            ", the generated INSECT_SPIDER and the tokens by name). NOT: "
+            "deathtouch -- the pod's blockers are a count with no toughness "
+            "and your creatures never block (§4). A floor.",
+        "Dalek Squadron":
+            "MODELLED: menace, and myriad -- a 3/3 menace copy per other "
+            "living opponent, tapped and attacking, exiled after combat. NOT: "
+            "'attacking THAT player': the copies join the one attack "
+            "`combat_damage` splits, so their targets are the pilot's plan, "
+            "not one each. A slight CEILING (Furygale Flocking's caveat).",
         # Scrap Trawler LEFT PARTLY on 2026-09-30 (§0z89): its reason said
         # no noncreature artifact is ever destroyed, and the pod's
         # `ae_removal` destroys them. It is SCRIPTED_RENDMAW now.

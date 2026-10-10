@@ -29,6 +29,7 @@ from typing import Callable, Optional
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
 from edhmc.decks._evasion import LAND_RULES, LAND_TYPES
+from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -1486,6 +1487,12 @@ class Game(BaseGame):
         self.beast_active = False
         self.stampede_bonus = 0
         self.creature_died_this_turn = False
+        # The owner's multi-type batch (§0z125). H.E.R.B.I.E.'s surveil reads
+        # the first; Fire Navy Trebuchet's Ballistic Boulders and Dalek
+        # Squadron's myriad copies are held until they leave.
+        self.noncreature_cast_this_turn = False
+        self.boulders: list = []
+        self.myriad_copies: list = []
 
     # -- library ops ---------------------------------------------------------
 
@@ -1497,7 +1504,13 @@ class Game(BaseGame):
         protocol hook `opponents.resolve_own_wipe` calls."""
         self.ritual_float += n
 
-    def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False):
+    def make_tokens(self, n: int, p: int, t: int, subtype: str = "", tapped=False,
+                    flying=None, artifact=False, name=None):
+        """Returns the permanents made. `flying` overrides the subtype's
+        FLYING_TOKENS default for a maker whose tokens differ from another's
+        of the same subtype -- The Swarmweaver's Insects fly and Grist's do
+        not (§0z125). `artifact` and `name` are for a token the text names
+        and types: Ballistic Boulder, and a myriad copy of Dalek Squadron."""
         n *= token_doublings(self)
         # PARALLEL LIVES: "If an effect would create one or more tokens under
         # your control, it creates twice that many of those tokens instead."
@@ -1510,10 +1523,14 @@ class Game(BaseGame):
         # -- and that is the §0z4 "a doubler must be said in BOTH places or it
         # does nothing" trap, which is why the doubling now lives in ONE
         # function, `token_doublings`, that both call.
+        made = []
         for _ in range(n):
-            card = Card(name=f"{subtype or 'Token'} token",
-                        types=frozenset({"Creature"}), power=p, toughness=t,
-                        flying=subtype in FLYING_TOKENS)
+            card = Card(name=name or f"{subtype or 'Token'} token",
+                        types=frozenset({"Artifact", "Creature"} if artifact
+                                        else {"Creature"}),
+                        power=p, toughness=t,
+                        flying=(subtype in FLYING_TOKENS if flying is None
+                                else flying))
             perm = Permanent(card=card, tapped=tapped, sick=True,
                              is_token=True, base_p=p, base_t=t)
             # Metallic Mimic: named Bird
@@ -1522,7 +1539,9 @@ class Game(BaseGame):
             self.board.append(perm)
             self.m["tokens_made"] += 1
             davvol_trigger(self, perm)       # §0z74
+            made.append(perm)
         self.made_token_this_turn = True
+        return made
 
     def make_treasures(self, n: int):
         """Create `n` Treasure tokens (§0z64). A Treasure IS a token, so the
@@ -1736,7 +1755,7 @@ class Game(BaseGame):
             base = 6
         else:
             base = perm.base_p if perm.is_token else perm.card.power
-        p = base + perm.counters + self.stampede_bonus
+        p = base + perm.counters + self.stampede_bonus + swarmweaver_bonus(self, perm)
         if self.has("Beastmaster Ascension") and self.beast_active:
             p += 5
         return p
@@ -1746,7 +1765,7 @@ class Game(BaseGame):
             base = 6
         else:
             base = perm.base_t if perm.is_token else perm.card.toughness
-        return base + perm.counters
+        return base + perm.counters + swarmweaver_bonus(self, perm)
 
     # -- Rendmaw -------------------------------------------------------------
 
@@ -2852,6 +2871,12 @@ def main_phase(g: Game, precombat: bool = False):
                 _cost, tag, pay = mode
                 options.append((c, pay, tag))
                 mode_cost[id(c)] = _cost
+        if not precombat:
+            wicker = wickerfolk_option(g, units)        # §0z125
+            if wicker is not None:
+                (c, pay, tag), _cost = wicker
+                options.append((c, pay, tag))
+                mode_cost[id(c)] = _cost
         if not options:
             # Nothing is castable on lands and rocks alone. THIS is where the
             # Altar belongs -- see altar_enable and KNOWN_ISSUES §3.
@@ -2875,10 +2900,15 @@ def main_phase(g: Game, precombat: bool = False):
         else:
             card, pay, alt_tag = max(options, key=rank)
         spend(g, pay, units)
-        g.hand.remove(card)
+        if alt_tag == "graveyard":
+            wickerfolk_additional_costs(g, card)     # §0z125
+        else:
+            g.hand.remove(card)
 
         idx = g.spells_this_turn
         g.spells_this_turn += 1
+        if not card.is_creature:
+            g.noncreature_cast_this_turn = True     # H.E.R.B.I.E., §0z125
         biotransference_cast(g, card)        # a CAST trigger, §0z117
         if OPP.countered(g, card, idx):
             g.m["countered"] += 1
@@ -3133,6 +3163,12 @@ def run_etb(g: Game, perm: Permanent):
         g.make_tokens(1, 0, 1, "Plant")
     elif s == "woe_strider":
         g.make_tokens(1, 0, 1, "Goat")
+    elif s == "swarmweaver":
+        # "When The Swarmweaver enters, create two 1/1 black and green Insect
+        # creature tokens with flying." FLYING by the card, not by subtype:
+        # Grist's Insects do not fly (§0z125).
+        made = g.make_tokens(2, 1, 1, "Insect", flying=True)
+        g.m["swarmweaver_insects"] += len(made)
     elif s == "grave_titan":
         g.make_tokens(2, 2, 2, "Zombie")
     elif s == "overlord":
@@ -3910,6 +3946,158 @@ def chef_and_backwoods(g, units) -> None:
             g.m["backwoods_activations"] += 1
 
 
+# ----------------------------------------------------------------------------
+# THE OWNER'S MULTI-TYPE BATCH, 2026-10-10 (§0z125). Oracle text verbatim on
+# each Proposal in edhmc/pending.py; every card is two card types, so every
+# cast is also a Rendmaw trigger through `play_card_trigger`.
+# ----------------------------------------------------------------------------
+
+# Token subtypes that are Insects or Spiders: Grist's and The Swarmweaver's
+# Insects, Arasta's and Twitching Doll's Spiders. A token is named by its
+# subtype in `make_tokens`; a CARD is read from the generated INSECT_SPIDER.
+INSECT_SPIDER_TOKENS = ("Insect token", "Spider token")
+
+
+def swarmweaver_bonus(g, perm) -> int:
+    """THE SWARMWEAVER: "Delirium -- As long as there are four or more card
+    types among cards in your graveyard, Insects and Spiders you control get
+    +1/+1 and have deathtouch." The +1/+1, read by `power_of` and
+    `toughness_of`. Legendary, so never more than one. Deathtouch is not
+    modelled: the pod's blockers are a count with no toughness, and your
+    creatures never block (§4). Delirium is the shared `opponents.delirium`."""
+    if not g.has("The Swarmweaver"):
+        return 0
+    name = perm.card.name
+    if name not in INSECT_SPIDER and name not in INSECT_SPIDER_TOKENS:
+        return 0
+    return 1 if OPP.delirium(g) else 0
+
+
+def herbie_surveil(g) -> None:
+    """H.E.R.B.I.E., LOVABLE ROBOT: "At the beginning of combat on your
+    turn, if you've cast a noncreature spell this turn, surveil 1." The
+    surveil is lorehold's Dragon's Rage Channeler rule: bin a land off the
+    top once `surveil_land_floor` (6) lands are out, else leave it. Rare
+    here -- the precombat main casts only pump -- and counted, so the
+    rarity is a number."""
+    if not g.noncreature_cast_this_turn or not g.library:
+        return
+    for _ in range(g.count("H.E.R.B.I.E., Lovable Robot")):
+        g.m["herbie_surveils"] += 1
+        top = g.library[-1]
+        n_lands = sum(1 for p in g.board if p.card.is_land)
+        if top.is_land and n_lands >= g.cfg.get("surveil_land_floor", 6):
+            g.graveyard.append(g.library.pop())
+            g.m["herbie_binned"] += 1
+        if not g.library:
+            return
+
+
+WICKERFOLK = "Wickerfolk Indomitable"
+
+
+def wickerfolk_fodder(g):
+    """The sacrifice Wickerfolk's graveyard cast pays: the smallest creature
+    token, recomputed per cast (§0z19). A POLICY, said out loud: a Treasure
+    (an artifact) or a nontoken body would also be legal, and the pilot
+    never offers either -- a floor."""
+    tokens = [p for p in g.board
+              if p.is_token and is_battlefield_creature(g, p)]
+    return min(tokens, key=g.power_of) if tokens else None
+
+
+def wickerfolk_option(g, units):
+    """WICKERFOLK INDOMITABLE: "You may cast this card from your graveyard by
+    paying 2 life and sacrificing an artifact or creature in addition to
+    paying its other costs." The cast from the graveyard as a main-phase
+    option, ((card, pay, "graveyard"), cost), or None. Its mana cost is the
+    card's own, reduced as any artifact spell is (Foundry Inspector). The
+    life is paid above `wickerfolk_life_floor` (10, erebos_life_floor's
+    judgement). `wickerfolk_gy=False` turns the clause off."""
+    if not g.cfg.get("wickerfolk_gy", True):
+        return None
+    card = next((c for c in g.graveyard if c.name == WICKERFOLK), None)
+    if card is None or wickerfolk_fodder(g) is None:
+        return None
+    if g.your_life - 2 < g.cfg.get("wickerfolk_life_floor", 10):
+        return None
+    mode = choose_mode(card, cost_after_reduction(g, card), units)
+    if mode is None:
+        return None
+    cost, _tag, pay = mode
+    return (card, pay, "graveyard"), cost
+
+
+def wickerfolk_additional_costs(g, card) -> None:
+    """The cast from the graveyard: the card leaves the graveyard, 2 life is
+    paid (§0i: a life cost is charged) and a creature token is sacrificed --
+    a death, so Blood Artist and the Meathook see it."""
+    g.graveyard.remove(card)
+    g.your_life -= 2
+    g.m["wickerfolk_life_paid"] += 2
+    victim = wickerfolk_fodder(g)
+    g.board.remove(victim)
+    g.on_creature_death(1, victim)
+    g.m["wickerfolk_gy_casts"] += 1
+
+
+def enters_attacking(g, attackers: list) -> None:
+    """Tokens that enter TAPPED AND ATTACKING, appended to `attackers` so
+    they are in this combat's damage and its split (§0z125). They were never
+    declared, so they trigger no "whenever ... attacks" of their own.
+
+    FIRE NAVY TREBUCHET: "Whenever you attack, create a 2/1 colorless
+    Construct artifact creature token with flying named Ballistic Boulder
+    that's tapped and attacking. Sacrifice that token at the beginning of the
+    next end step." One per Trebuchet; the Trebuchet itself has defender and
+    stays home. The sacrifice is `boulder_end_step`.
+
+    DALEK SQUADRON, myriad: "for each opponent other than defending player,
+    you may create a token copy that's tapped and attacking that player ...
+    Exile the tokens at end of combat." One 3/3 menace copy per living
+    opponent but one, for each Squadron that attacked. NOT MODELLED: 'that
+    player' -- the copies join the attack `combat_damage` splits, so where
+    they go is the pilot's plan, not one each (a slight ceiling, Furygale
+    Flocking's caveat in §0z124). The exile is `myriad_exile`."""
+    for _ in range(g.count("Fire Navy Trebuchet")):
+        made = g.make_tokens(1, 2, 1, "Construct", tapped=True, flying=True,
+                             artifact=True, name="Ballistic Boulder")
+        attackers.extend(made)
+        g.boulders.extend(made)
+        g.m["boulders_made"] += len(made)
+    others = len(OPP.living(g)) - 1
+    if others <= 0:
+        return
+    for p in [a for a in attackers
+              if a.card.name == "Dalek Squadron" and not a.is_token]:
+        made = g.make_tokens(others, 3, 3, "Dalek", tapped=True, flying=False,
+                             artifact=True, name="Dalek Squadron")
+        attackers.extend(made)
+        g.myriad_copies.extend(made)
+        g.m["myriad_copies"] += len(made)
+
+
+def myriad_exile(g) -> None:
+    """Dalek Squadron's copies are EXILED at end of combat: no death, no
+    graveyard, no trigger."""
+    for p in g.myriad_copies:
+        if any(q is p for q in g.board):
+            g.board.remove(p)
+    g.myriad_copies = []
+
+
+def boulder_end_step(g) -> None:
+    """"Sacrifice that token at the beginning of the next end step." A death,
+    so Blood Artist, the Meathook and Erebos see it. A Boulder that already
+    left -- an outlet ate it, a wipe -- is skipped (§0z19)."""
+    for p in g.boulders:
+        if any(q is p for q in g.board):
+            g.board.remove(p)
+            g.on_creature_death(1, p)
+            g.m["boulders_sacrificed"] += 1
+    g.boulders = []
+
+
 def attack_triggers(g: Game, attackers: list[Permanent]):
     """"Whenever this ... ENTERS OR ATTACKS" — the half that was missing.
 
@@ -3977,8 +4165,12 @@ def make_everywhere(g: Game):
 
 
 def combat(g: Game):
+    herbie_surveil(g)        # "at the beginning of combat on your turn", §0z125
+    # DEFENDER (702.3b) is the generated `_evasion.DEFENDER` (§0z125). No card
+    # in the committed list has it, so the filter is the identity there.
     attackers = [p for p in g.board
                  if is_battlefield_creature(g, p) and not p.tapped and not p.sick
+                 and p.card.name not in DEFENDER
                  and not doll_stays_home(g, p) and not shigeki_stays_home(g, p)]
     if not attackers:
         g.damage_by_turn.append(0.0)
@@ -3986,6 +4178,10 @@ def combat(g: Game):
     g.beast_active = (g.has("Beastmaster Ascension") and len(attackers) >= 7)
 
     attack_triggers(g, attackers)
+    enters_attacking(g, attackers)          # Boulder, myriad: §0z125
+    if g.has("The Swarmweaver"):
+        g.m["swarmweaver_pumped"] += sum(swarmweaver_bonus(g, p)
+                                         for p in attackers)
 
     dmg = sum(g.power_of(p) for p in attackers)
 
@@ -4047,6 +4243,7 @@ def combat(g: Game):
         # blockers per defender, so there is nothing for the split to plan
         # against; it keeps the single swing, bounded by damage_single.
         dmg = OPP.damage_single(g, dmg)
+    myriad_exile(g)                         # "at end of combat", §0z125
     g.m["damage"] += dmg
     g.damage_by_turn.append(dmg)
     if g.result == "win" and g.m["turn_lethal"] == 99:
@@ -4060,6 +4257,7 @@ def take_turn(g: Game):
     g.beast_active = False
     g.stampede_bonus = 0
     g.creature_died_this_turn = False
+    g.noncreature_cast_this_turn = False
     for p in g.board:
         p.tapped = False
         p.sick = False
@@ -4095,6 +4293,7 @@ def take_turn(g: Game):
         make_lord=lambda: rendmaw_token(g, lord_of_the_pit_card))
     empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
+    boulder_end_step(g)             # Ballistic Boulder is sacrificed, §0z125
     castle_locthwain(g, lambda c: pay_from(g, rendmaw_mana(g), c))  # §0z115
     high_market(g)                  # a free outlet, once a turn, §0z115
     sakura_tribe_elder(g)           # its sacrifice, at the end step, §0z83

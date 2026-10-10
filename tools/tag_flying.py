@@ -472,6 +472,20 @@ def main():
     rebound = {n for n, c in cards.items()
                if n in everything and "Rebound" in c.get("keywords", [])}
 
+    # INSECT_SPIDER, 2026-10-10 (§0z125): The Swarmweaver's delirium pumps
+    # "Insects and Spiders you control". Creatures only -- the clause reads
+    # creatures on the battlefield -- and from the type line, never by hand.
+    # Tokens are named by their subtype ("Insect token") and read by name.
+    insect_spider = {n for n, c in cards.items()
+                     if n in creatures and ({"Insect", "Spider"} & subtypes(c))}
+    # DEFENDER, 2026-10-10 (§0z125): "can't attack" (702.3b). Fire Navy
+    # Trebuchet is a Wall with defender; rendmaw's `combat` reads this, and an
+    # engine that does not is blind to the keyword. Unconditional only, for
+    # menace's reason: "loses defender" (Manor Gargoyle) is a condition.
+    defender = {n for n, c in cards.items()
+                if n in creatures and "Defender" in c.get("keywords", [])
+                and "loses defender" not in (c.get("oracle_text") or "").lower()}
+
     land_rules = {}
     for n, c in cards.items():
         if n in everything and everything[n].is_land:
@@ -541,6 +555,15 @@ def main():
     print(f"\nREBOUND ({len(rebound)}) -- cast from hand, exiled, recast free "
           f"next upkeep:")
     for n in sorted(rebound):
+        print(f"    {n}")
+
+    print(f"\nINSECT or SPIDER ({len(insect_spider)}) -- The Swarmweaver's "
+          f"delirium pumps these:")
+    for n in sorted(insect_spider):
+        print(f"    {n}")
+
+    print(f"\nDEFENDER ({len(defender)}) -- can't attack:")
+    for n in sorted(defender):
         print(f"    {n}")
 
     print(f"\nLAND RULES ({len(land_rules)}) -- entering, tapping and life, "
@@ -682,6 +705,18 @@ def main():
                      "(702.88a). Read by lorehold's\n# resolve_spell: cast from "
                      "hand, exiled, recast free next upkeep.\nREBOUND = {\n")
             for n in sorted(rebound):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# INSECT_SPIDER: creature cards that are an Insect or "
+                     "a Spider, from the\n# type line. The Swarmweaver's "
+                     "delirium pumps them (§0z125).\nINSECT_SPIDER = {\n")
+            for n in sorted(insect_spider):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# DEFENDER: creatures with the keyword, unconditional "
+                     "(702.3b: can't\n# attack). Read by rendmaw's `combat` "
+                     "(§0z125).\nDEFENDER = {\n")
+            for n in sorted(defender):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "

@@ -21,7 +21,8 @@ from edhmc.decks.rendmaw_v12 import (NOXIOUS_GEARHULK, BABA_LYSAGA,
                                      EZURIS_PREDATION,
                                      CAULDRON_OF_ESSENCE, REVITALIZING_REPAST,
                                      WURMCOIL_ENGINE,
-    BATCH_2026_09_16 as RENDMAW_2026_09_16)
+    BATCH_2026_09_16 as RENDMAW_2026_09_16,
+    BATCH_2026_10_10 as RENDMAW_2026_10_10)
 from edhmc.decks.tivit_v1 import BATCH_2026_09_16 as TIVIT_2026_09_16
 from edhmc.decks.lorehold_v17 import (GALVANOTH, RADIANT_SCROLLWIELDER,
                                       GOLDSPAN_DRAGON,
@@ -236,6 +237,11 @@ DECKS = {
     # used, kept so these rows and those three share a baseline.
     "rendmaw2": ("RENDMAW", "rendmaw", rendmaw_sim, 20, "Pygmy Kavu",
                  RENDMAW_2026_09_16),
+    # The owner's multi-type batch, 2026-10-10 (§0z125). Pygmy Kavu's slot
+    # again, so these rows share rendmaw/rendmaw2's baseline.
+    # diagnostics/run_rendmaw_multitype.py reproduces each T20 row.
+    "rendmaw3": ("RENDMAW", "rendmaw", rendmaw_sim, 20, "Pygmy Kavu",
+                 RENDMAW_2026_10_10),
     # 2026-09-16 (§0z26). Soulmender is the slot karlov1 used.
     # REALITY FRACTURE, 2026-09-22. THE VICTIM IS NOT SOULMENDER, which every
     # earlier karlov batch used: `-Soulmender +Bloodthirsty Conqueror` is

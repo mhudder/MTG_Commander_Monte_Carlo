@@ -27,6 +27,7 @@ FLYING = {
     'Exemplar of Light',
     'Giada, Font of Hope',
     'Goldspan Dragon',
+    'H.E.R.B.I.E., Lovable Robot',
     'Herald of War',
     'Junk Diver',
     'Karmic Guide',
@@ -59,6 +60,7 @@ FLYING = {
 # Unconditional menace (creatures only), from the same keywords array.
 # Read by opponents.menace_of(): a menace attacker costs two blockers.
 MENACE = {
+    'Dalek Squadron',
     'Gloomshrieker',
     'Noxious Gearhulk',
     'Proft, Sinister Mastermind',
@@ -222,6 +224,7 @@ LEGENDARY = {
     'Ginger, Queen of Sweets',
     'Greensleeves, Maro-Sorcerer',
     'Grist, the Hunger Tide',
+    'H.E.R.B.I.E., Lovable Robot',
     'Havengul Laboratory // Havengul Mystery',
     'Heliod, Sun-Crowned',
     'Ka-Zar of the Savage Land',
@@ -265,6 +268,7 @@ LEGENDARY = {
     'The Dawning Archaic',
     'The Great Henge',
     'The Meathook Massacre',
+    'The Swarmweaver',
     'The Wind Crystal',
     'Thomil, the Destroyer',
     'Titania, Protector of Argoth',
@@ -490,6 +494,23 @@ REBOUND = {
     'Profound Journey',
 }
 
+# INSECT_SPIDER: creature cards that are an Insect or a Spider, from the
+# type line. The Swarmweaver's delirium pumps them (§0z125).
+INSECT_SPIDER = {
+    'Arasta of the Endless Web',
+    'Haywire Mite',
+    'Scute Swarm',
+    'Springheart Nantuko',
+    'Twitching Doll',
+}
+
+# DEFENDER: creatures with the keyword, unconditional (702.3b: can't
+# attack). Read by rendmaw's `combat` (§0z125).
+DEFENDER = {
+    'Fire Navy Trebuchet',
+    'Sylvan Caryatid',
+}
+
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
 # alike. `check_docs` compares it with the cards the deck modules construct
 # TODAY and fails on any difference: a card added without re-running this
@@ -626,6 +647,7 @@ SCANNED = {
     'Cultivator Colossus',
     'Custodi Squire',
     'Cyberdrive Awakener',
+    'Dalek Squadron',
     'Damn',
     'Damnation',
     'Dancing from Dark to Dawn',
@@ -697,6 +719,7 @@ SCANNED = {
     'Field of the Dead',
     'Filigree Familiar',
     'Finale of Devastation',
+    'Fire Navy Trebuchet',
     'Flawless Maneuver',
     'Flooded Strand',
     'Forest',
@@ -736,6 +759,7 @@ SCANNED = {
     'Guardian Project',
     'Guide of Souls',
     'Guttersnipe',
+    'H.E.R.B.I.E., Lovable Robot',
     'Hagra Mauling',
     'Hall of Gemstone',
     'Hallowed Fountain',
@@ -1022,6 +1046,7 @@ SCANNED = {
     'The Great Henge',
     'The Hunter Maze',
     'The Meathook Massacre',
+    'The Swarmweaver',
     'The Wind Crystal',
     'Thomil, the Destroyer',
     'Thrill of Possibility',
@@ -1077,6 +1102,7 @@ SCANNED = {
     "Wayfarer's Bauble",
     'Well of Lost Dreams',
     'Whip of Erebos',
+    'Wickerfolk Indomitable',
     'Windswept Heath',
     "Witch's Cottage",
     'Woe Strider',
