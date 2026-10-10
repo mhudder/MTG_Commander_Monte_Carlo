@@ -42,7 +42,11 @@ code and want to know what else it touches.
                           out a commit, rebuilds, stamps a provenance SHARD, pushes
                           its three files. The protocol is .claude/skills/
                           parallel-rebuild (§0z94)
-   ─ _generated.py        shared helper: git ref + the provenance mask the checks compare with
+   ─ issue.py             prints one KNOWN_ISSUES section by id (or --find over the
+                          index), so following a § from CLAUDE.md costs a section
+                          and not the whole file
+   ─ _generated.py        shared helper: git ref, the provenance mask the checks compare
+                          with, and implements_mutate (read by tests and STATUS.md)
 
    diagnostics/           one-question harnesses: diag_* measure a MECHANISM, run_* measure a CHANGE
    tests/                 tests that pin a claimed mechanism; `python -m tests` runs them all

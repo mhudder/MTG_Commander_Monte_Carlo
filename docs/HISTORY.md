@@ -2630,3 +2630,116 @@ that was worth two points of win rate.
 Adding the deck also moved the removal census, which is defined as every
 list at the table. Four decks moved by one game in 3,000, were rebuilt, and
 no row moved beyond its bar.
+
+
+## Queued items answered or superseded, moved 2026-10-10 — moved from `CLAUDE.md`
+
+Moved verbatim under the same precedent as the sections above, when
+`CLAUDE.md` was condensed to its rules and the open queue moved to
+`docs/QUEUE.md`. Items 22, 7 and 8c had been marked ANSWERED in place; item 20
+and its two older entries were superseded by the ledger (`python -m
+edhmc.pending`), which carries every one of those cards in its current state.
+The section's own preamble is kept first, as it stood.
+
+## Queued work
+
+**Open items only.** Sixteen closed items — 19, 15, 1b/3, 9, 10, 13, 14,
+14-old, 14b, 16, 16b, 17-old, 11, 12, 8, 8-old — moved to `docs/HISTORY.md` on
+2026-09-15 with their evidence intact, following the precedent this section set
+for itself when items closed before 2026-09-07 were moved there. Each names the
+`§` that carries its measurement, and those ids are stable.
+
+**Item 17 is closed** (§0z42: decking loses, and the pilot knows it) and
+moved to `docs/HISTORY.md`; so is item 21, whose card is now committed; and so
+are items 2 (Artist's Talent, §0z48), 4 (March's Elephant, §0z47), 8b
+(Voice of the Blessed, §0z46) and 0b-i (Sunbird's decay, §0z59), closed
+2026-09-25, and item 23 (triage and the ledger states, §0z78, §0z79),
+closed 2026-09-29, and item 0c (Goldspan Dragon: staged, then WITHDRAWN
+by the owner once §0z104 put it inside its bar at T20, §0z105), closed
+2026-10-05. **Item 18
+is half answered**: the ordering half is built and measured as a null
+(§0z43), which leaves the `priority` numbers as the whole of it.
+
+
+20. **ALL THIRTEEN LIVE PROPOSALS ARE NOW MEASURED** (§0z25, §0z26), across
+    five decks and four engines. The two largest: **Bloodthirsty Conqueror
+    +0.0328 ±0.0033** (karlov, a second Exquisite Blood on a body) and
+    **Guardian Project +0.0279 ±0.0036** (azusa — CORRECTED in §0z28 from the
+    +0.0481 first reported, which was measured with the card drawing twice;
+    it is now inside the bars of Chocobo and Nissa, a member of the top set). Four rows are FLOORS with the missing clause
+    named, and two are blanks explained by mechanism rather than by win rate —
+    Sai makes 0.155 Thopters a game in a deck producing 51 artifacts, because
+    it reads artifact SPELLS and tivit makes artifact TOKENS. **NOTHING IS
+    STAGED:** §0c, every one of these shares a victim slot with its batch and
+    needs a head-to-head against a named cut. Run `python -m edhmc.pending`.
+    (Pitiless Plunderer, abandoned mid-implementation here for want of
+    Treasures-as-mana in rendmaw (§0z26), was built with them and measured
+    in §0z64.)
+
+20-old2. **The previous entry.**
+    **TWELVE PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH.**
+    THREE ARE DONE (§0z25, azusa batch 5, 2026-09-16): **Guardian Project
+    +0.0481 ±0.0042** — reported then as the largest candidate number ever
+    measured for that deck "with its upper bound checked"; **the bound read
+    the wrong counter and the number is +0.0279 ±0.0036 (§0z28)** — Zendikar's Roil
+    +0.0133 ±0.0029, and Splendid Reclamation −0.0013 ±0.0022, a blank whose
+    proposal rationale was **backwards** (the deck's Loam/Excavator/Crucible
+    package drains the graveyard it wanted to read). **TWO MORE ARE DEAD:**
+    Heliod, Sun-Crowned and Underworld Breach were ALREADY MEASURED in the
+    `karlov1` and `lorehold1` batches, both inside their bars — proposing them
+    was a miss, and the fix is one grep. **Before proposing a card, grep
+    `tools/candidates.py` as well as the deck list.** The remaining ten are in
+    `PROPOSED`; run `python -m edhmc.pending`.
+
+20-old. **The original entry, kept for its framing.**
+    **FIFTEEN PROPOSED CARDS ARE WAITING FOR A `candidates.py` BATCH**
+    (2026-09-16). Three per deck across karlov, rendmaw, lorehold, tivit and
+    azusa, each with oracle text fetched from Scryfall and pasted verbatim
+    into `edhmc/pending.py`'s new `PROPOSED` list. Run
+    `python -m edhmc.pending` to read them with their rationale and their
+    implementation cost. **Nothing is measured** — a Proposal has verified
+    card text and an argument, and that is all. The next step for each is a
+    batch entry in `tools/candidates.py` against the victim slot that deck
+    already uses, then `python -m tools.candidates <batch> --n=15000`.
+    Measurement is cheap (~152 CPU-seconds a card); making each card behave
+    like its text is the real cost, and `implement` estimates it per card.
+    **Two proposals are already REJECTED and kept**: Felidar Retreat and
+    Omnath, Locus of Rage were written into MONO-GREEN azusa from memory and
+    are off-colour. `check_proposals()` catches that now, and all four of its
+    branches were proved to fire.
+
+22. **ANSWERED: ONE OF KARLOV'S THREE NEGATIVE ROWS WAS THE §0j ARTEFACT, AND
+    SWIFTFOOT BOOTS IS THE CUT** (§0z35, 2026-09-20). Decomposed against
+    blanks that match the real card on progressively more of what `blank_like`
+    drops: **Blood Artist's whole negative row is the two constants** — text
+    alone it is +0.0024 ±0.0011, significantly POSITIVE, and it is not a cut
+    candidate. **Mother of Runes (−0.0053 ±0.0021) and Swiftfoot Boots
+    (−0.0044 ±0.0020) survive every arm**, so two of three are real. Their
+    bars overlap and §0c forbids ranking two leave-one-out rows against each
+    other, so the tie-break is mechanism and it is one-sided: cutting the
+    Boots leaves both modelled channels standing, while cutting Mother of
+    Runes closes `try_protect()` outright — `protection_cards` is a
+    one-element tuple holding her alone — and takes the staged list's
+    `shroud_sources` to one. **The Boots are the named cut for karlov's next
+    add**, and §0z36 attached it the same day: `−Swiftfoot Boots
+    +Bloodthirsty Conqueror` is +0.0401 ±0.0037 at T20 where the live staging
+    is +0.0254, and `−Swiftfoot Boots +Alhammarret's Archive` is +0.0168
+    ±0.0030 (larger than its own candidate row, because the cut is worth less
+    than a blank). **The owner kept the Boots (2026-09-26, item 20b)**: the
+    Conqueror stays staged over Soulmender, and the Boots remain the named
+    cut for Alhammarret's Archive should that hold ever lift.
+
+
+7.  **ANSWERED (§0z87)**: indestructible is priced per kind of answer from
+    a census of the lists (`tools.removal_census`; spot 0.45, wipe 0.52 at
+    six decks, 0.46 / 0.56 since the seventh, §0z96 -- below the old flat
+    0.60). The knob moves no deck by 0.001, and
+    indestructibility is worth at most 0.008 on any card in the lists.
+
+8c. **ANSWERED (§0z71)**: Time Sieve may make up a shortfall from REAL
+    artifacts of mana value 2 or less, only while Tivit is on the battlefield
+    (`sieve_real_fuel="combo"`, the owner's two conditions). The original
+    entry follows. **Time Sieve eats only TOKEN artifacts**, never Sol Ring,
+    the signets or the artifact lands, all of which are legal fuel.
+    Conservative and defensible, but a modelling choice. Extra turns also
+    count against the horizon, which is now the only bound on the loop. §0m.

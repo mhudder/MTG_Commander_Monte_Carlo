@@ -9,8 +9,9 @@ Where things live:
 |---|---|
 | **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings, every runnable command. Regenerate with `python -m tools.status --write`. |
 | **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
-| **the rules** | `CLAUDE.md` — the operational doc, durable, worth reading in full. |
-| **a numbered finding** | `KNOWN_ISSUES.md` — `§0a` onward plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered; `docs/STATUS.md` prints the current last id. |
+| **the rules** | `CLAUDE.md` — every standing rule in a few lines, with the `§` that holds its evidence. Claude loads it into every session, so it is kept short (`check_docs` enforces a byte budget). Its longer pre-2026-10-10 form is `docs/archive/CLAUDE_2026-10-10.md`. |
+| **what is queued** | `docs/QUEUE.md` — the open work items, under the numbers the issues cite them by. Closed items move to `docs/HISTORY.md`. |
+| **a numbered finding** | `KNOWN_ISSUES.md` — `§0a` onward plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered; `docs/STATUS.md` prints the current last id. Read one section with `python -m tools.issue 0z36`, or search the index with `--find`. |
 | **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
 | **the knobs** | `docs/KNOBS.md` — every one, GENERATED, with defaults and which have never been swept. |
 | **adding a card** | `.claude/skills/add-card/SKILL.md` — the procedure, from Scryfall to a committed swap, with the check that catches each mistake. |
@@ -63,15 +64,20 @@ python -m tools.audit_cards              # every card's data checked against Scr
 
 ## The seven decks
 
-| commander | archetype | file | tuning status |
-|---|---|---|---|
-| Rendmaw, Creaking Nest | tokens / aggro | `edhmc/decks/rendmaw_v12.py` | mature — ablated, staged changes under review |
-| Lorehold, the Historian | miracle / top-deck | `edhmc/decks/lorehold_v17.py` | mature |
-| Karlov of the Ghost Council | lifegain / drain | `edhmc/decks/karlov_v2.py` | mature |
-| Tivit, Seller of Secrets | votes / artifacts | `edhmc/decks/tivit_v1.py` | mature |
-| Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` | new — ablated, and its commander's own ability only started firing on 2026-09-07 (`KNOWN_ISSUES.md` 0r) |
-| Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` | new — ablated; no `.xlsx` yet, so the module is the only record |
-| Trostani, Selesnya's Voice | tokens / populate / lifegain | `edhmc/decks/trostani_v1.py` | new 2026-10-01 — ablated once; priorities are a first guess (`docs/ORACLE_AUDIT_TROSTANI.md`, `KNOWN_ISSUES.md` §0z96) |
+| commander | archetype | file |
+|---|---|---|
+| Rendmaw, Creaking Nest | tokens / aggro | `edhmc/decks/rendmaw_v12.py` |
+| Lorehold, the Historian | miracle / top-deck | `edhmc/decks/lorehold_v17.py` |
+| Karlov of the Ghost Council | lifegain / drain | `edhmc/decks/karlov_v2.py` |
+| Tivit, Seller of Secrets | votes / artifacts | `edhmc/decks/tivit_v1.py` |
+| Shilgengar, Sire of Famine | Angels / aristocrats | `edhmc/decks/shilgengar_v1.py` |
+| Azusa, Lost but Seeking | landfall / ramp / big creatures | `edhmc/decks/azusa_v1.py` (no `.xlsx`: the module is the record) |
+| Trostani, Selesnya's Voice | tokens / populate / lifegain | `edhmc/decks/trostani_v1.py` |
+
+Which tables are current, which caches need checking and which deck the owner
+has suspended from review are state, so they are in `docs/STATUS.md`. This
+table used to carry a "tuning status" column, and it went stale the same way
+every hand-written status here has.
 
 Each of the first four decks, Shilgengar and Trostani, is a `.xlsx` in `spreadsheets/`
 (the human-readable system of
@@ -151,10 +157,9 @@ rather than deleted, because the entry is where the evidence lives.
 `docs/LEDGER_STATES.md` places it among the rest, and `edhmc/pending.py`
 documents it.
 
-The general lesson, which is the third time this project has paid for it: **a
-re-verification is only as current as the engine it ran on.** Each of these
-carries a dated `reverified` entry for exactly that reason, and Rendmaw's now
-carries two that disagree.
+The general lesson, which this project has paid for more than once: **a
+re-verification is only as current as the engine it ran on.** That is why each
+staged change carries a dated `reverified` entry.
 
 ## The one rule that matters more than any other
 
@@ -192,10 +197,9 @@ disagree, the project's own rule is to follow win rate.
    `SIMS`/`METRIC_SETS`, `cache_manifest.py`'s fingerprints,
    `check_unchanged_decks`, `status.py` and the tests. What is still a
    hand-written decision: `tools/ablation.py`'s `SCRIPTED_BY_DECK`/
-   `KNOWN_BLIND`/`PARTLY_MODELLED` classification, `validate.py`'s CRN
-   audit case, `edhmc/pending.py`'s `DECKS` catalog entry,
-   `tools/cache_manifest.py`'s `PER_DECK`, and add an A/A control block to
-   `tools/validate.py`.
+   `KNOWN_BLIND`/`PARTLY_MODELLED` classification, `edhmc/pending.py`'s
+   `DECKS` catalog entry, and, in `tools/validate.py`, an A/A control block
+   and a CRN audit case.
 5. `python -m tools.validate` must come back `+0.00` before you trust a single
    number out of the new engine.
 
@@ -206,15 +210,16 @@ disagree, the project's own rule is to follow win rate.
   behaviour can live. Read before changing code.
 - **`docs/STATUS.md`** — what is true right now. GENERATED; read it, never edit
   it. If it disagrees with prose anywhere else, it wins.
-- **`CLAUDE.md`** — the operational doc: the standing rules and the open queued
-  work. Durable, read it in full. It carries no dated state, which
-  is why it can be trusted without checking when it was last touched.
+- **`CLAUDE.md`** — the standing rules, each in a few lines with its `§`.
+  Short, and you can read it in full. It carries no dated state, which is why
+  it can be trusted without checking when it was last touched.
+- **`docs/QUEUE.md`** — the open queued work.
 - **`KNOWN_ISSUES.md`** — numbered findings, `§0a` onward plus the older
   `1`–`8` series, with a status index at the top. The ids are cited from the
   code, so they are never renumbered; `docs/STATUS.md` prints the current last
   id and `check_docs` the cite count. Read the index, then the handful of
-  sections it points you at; the file is thousands of lines and is not meant
-  to be read through.
+  sections it points you at (`python -m tools.issue <id>` prints one); the
+  file is thousands of lines and is not meant to be read through.
 - **`docs/READING_TABLES.md`** — how to read an ablation table without drawing
   the three conclusions it invites you to draw wrongly. Short, and it has never
   needed updating, which is what a good doc looks like here.
@@ -247,4 +252,5 @@ The tell is a card whose text says it should be central to the deck and whose
 row says it is ordinary. When you see one, suspect the engine before the card,
 and check the MECHANISM COUNTERS (`blood_made`, `landfall_triggers`,
 `pw_activations`) rather than the win rate: a mechanism that fires zero times
-is unmistakable where a win rate 0.03 too low is not.
+is unmistakable where a win rate 0.03 too low is not. `CLAUDE.md` lists every
+policy correction on record, each with its `§`.

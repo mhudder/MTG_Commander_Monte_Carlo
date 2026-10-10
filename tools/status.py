@@ -35,7 +35,7 @@ import subprocess
 import sys
 
 from edhmc.registry import DECKS as REGISTRY, SUSPENDED
-from tools._generated import comparable, head
+from tools._generated import comparable, head, implements_mutate
 
 OUT = os.path.join("docs", "STATUS.md")
 RESULTS = "results"
@@ -469,16 +469,22 @@ def render() -> str:
     w("exist — which the hand-written lists it replaces had already done, in")
     w("seven places. **Everything runs from the repo root with `-m`.**")
     w("")
+    w("`--mutate` marks a script with a mutation mode: it corrupts what it")
+    w("checks, once per case, and asserts an EXACT set of failures, so a check")
+    w("that stops mattering is as loud as one that breaks. `python -m tests")
+    w("--mutate` runs every test module's; the others run one at a time.")
+    w("")
     for label, d in (("tools", "tools"), ("tests", "tests"),
                      ("diagnostics", "diagnostics")):
         items = inventory(d)
         w(f"### `{d}/` — {len(items)}")
         w("")
-        w("| command | what it does |")
-        w("|---|---|")
+        w("| command | `--mutate` | what it does |")
+        w("|---|---|---|")
         for name, doc in items:
             doc = doc.replace("|", "\\|")
-            w(f"| `python -m {d}.{name}` | {doc[:110]} |")
+            mut = "yes" if implements_mutate(os.path.join(d, name + ".py")) else ""
+            w(f"| `python -m {d}.{name}` | {mut} | {doc[:110]} |")
         w("")
     shell = sorted(f for f in os.listdir("tools") if f.endswith(".sh")) \
         if os.path.isdir("tools") else []
@@ -533,7 +539,7 @@ def render() -> str:
     w("commands rather than as answers:")
     w("")
     w("```bash")
-    w("python -m tools.validate        # must print +0.00 on all 18 metrics")
+    w("python -m tools.validate        # +0.00 on every metric of every engine")
     w("python -m edhmc.pending         # staged changes, and deck legality")
     w("python -m tools.check_docs      # do the docs still match the repo?")
     w("python -m tools.audit_cards     # every card against Scryfall; expect 0 ERR")

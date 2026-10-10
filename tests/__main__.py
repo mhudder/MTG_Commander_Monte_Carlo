@@ -30,6 +30,8 @@ import subprocess
 import sys
 import time
 
+from tools._generated import implements_mutate
+
 TALLY = re.compile(r"(\d+) passed, (\d+) failed")
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -74,8 +76,7 @@ def main() -> int:
         # Only the modules that implement --mutate; the others would run their
         # plain mode and report success for a question nobody asked.
         mods = [m for m in mods
-                if "--mutate" in open(os.path.join(HERE, m.split(".")[1] + ".py"),
-                                      encoding="utf-8").read()]
+                if implements_mutate(os.path.join(HERE, m.split(".")[1] + ".py"))]
     if not mods:
         print("no test modules matched")
         return 2

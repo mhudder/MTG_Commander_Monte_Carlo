@@ -291,6 +291,34 @@ def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
                   not bad, "; ".join(bad))
 
 
+
+# CLAUDE.md is loaded into EVERY session, so its size is paid on every session.
+# It said of itself "500 lines instead of 1,042" and had grown back to 984
+# lines and 63 KB when it was condensed (2026-10-10), because the session-close
+# rule "only a LESSON is promoted" had nothing behind it. This is the thing
+# behind it. The budget is BYTES, not lines, because a line count can be met
+# by rewrapping. It leaves room for a few lessons. When the file reaches it,
+# condense or move evidence under its section. Raising the number is the same
+# move as `--verified` without evidence.
+CLAUDE_BUDGET = 24_000
+
+
+def check_claude_md_budget(docs: dict[str, str]) -> Result:
+    """CLAUDE.md stays within its byte budget.
+
+    BLIND TO, said out loud (§0z15): what the bytes SAY. A file within budget
+    can still carry a dated number (the check above catches four shapes of
+    that) or a rule stated twice. It also does not see the skills or
+    STATUS.md, which are read on demand rather than loaded every session.
+    """
+    n = len(docs.get("CLAUDE.md", "").encode("utf-8"))
+    return Result(f"CLAUDE.md is within its size budget "
+                  f"({n:,} of {CLAUDE_BUDGET:,} bytes)",
+                  n <= CLAUDE_BUDGET,
+                  "" if n <= CLAUDE_BUDGET else
+                  "condense it: a lesson's evidence belongs under its "
+                  "KNOWN_ISSUES section, not here")
+
 LEDGER_STATES = os.path.join("docs", "LEDGER_STATES.md")
 
 # `edhmc/pending.py` names its lists after the state they hold, with ONE
@@ -590,6 +618,7 @@ def run_all() -> list[Result]:
         check_shell_commands_exist(docs),
         check_architecture_names_modules(docs),
         check_durable_docs_derive_counts(docs),
+        check_claude_md_budget(docs),
         check_vocabulary_names_states(docs, ledger_states()),
         check_caches_recorded(),
     ]
@@ -647,6 +676,12 @@ MUTATIONS = {
     "a doc cites a finding that does not exist":
         lambda code, issues, docs: (
             code, issues, dict(docs, **{"FAKE4.md": "see §0zz98 for the rest"})),
+    # Evidence pasted back in, which is how the file grew the first time.
+    "CLAUDE.md grows past its budget":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{"CLAUDE.md": docs["CLAUDE.md"]
+                                        + "a lesson, retold at length.\n"
+                                        * 1000})),
     # WITHDRAWN is the state the doc carries in PROSE rather than in its table,
     # so it is the one most easily lost -- which makes it the right one to
     # delete here.
@@ -672,6 +707,8 @@ EXPECTED = {
         {"the durable docs quote no count the repo derives"},
     "a doc cites a finding that does not exist":
         {"every §id cited from a live doc resolves"},
+    "CLAUDE.md grows past its budget":
+        {"CLAUDE.md is within its size budget"},
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
     "a card is staged and _removal.py is not regenerated":
@@ -720,6 +757,7 @@ def mutate() -> int:
             check_shell_commands_exist(d),
             check_architecture_names_modules(d),
             check_durable_docs_derive_counts(d),
+            check_claude_md_budget(d),
             check_vocabulary_names_states(d, states),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}

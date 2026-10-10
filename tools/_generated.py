@@ -65,3 +65,27 @@ def comparable(text: str) -> str:
     Everything else -- every row, every number, every name -- still compares.
     """
     return _PROVENANCE.sub(r"\1 `<ref>`", text).rstrip("\n") + "\n"
+
+
+def implements_mutate(path: str) -> bool:
+    """Does the script at `path` have a `--mutate` mode?
+
+    ONE definition, read by `python -m tests --mutate` (which runs only the
+    modules that have one) and by `docs/STATUS.md` (which marks them). The
+    list of those modules used to be typed into CLAUDE.md, seventy lines long,
+    and a third copy of the rule is how the two would start to disagree.
+    It asks for the flag being READ (`"--mutate" in sys.argv`, or in the
+    `args`/`argv` a `main()` was handed), not for the
+    word: the first version matched any mention, and `tools/status.py` --
+    whose rendered prose explains the flag -- listed itself as having one.
+    BLIND TO a mode read some other way (an argparse option, say); every
+    script that has one today reads it one of those three ways.
+    """
+    try:
+        with open(path, encoding="utf-8", errors="ignore") as fh:
+            return bool(_READS_MUTATE.search(fh.read()))
+    except OSError:
+        return False
+
+
+_READS_MUTATE = re.compile(r"""["']--mutate["']\s+in\s+(?:sys\.argv|args|argv)\b""")

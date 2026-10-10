@@ -52,7 +52,7 @@ change.
 python -m tools.check_docs     # must pass
 python -m tests                # must pass; `python -m tests -k <name>` for one module
 python -m edhmc.pending        # 100 cards / singleton-legal / commander distinct
-python -m tools.validate       # +0.00 on all 21 metrics, if you touched an engine
+python -m tools.validate       # +0.00 on every metric of every engine, if you touched an engine
 ```
 
 `python -m tests` runs every pinned mechanism test in its own subprocess and
@@ -81,10 +81,17 @@ This is the part that keeps `CLAUDE.md` small. One rule:
 |---|---|
 | a number, a CI, a before/after | `KNOWN_ISSUES.md`, new `§`, with the harness that produced it |
 | a decision about a card swap | `edhmc/pending.py` — `MEASURED`, `CHANGES`, `COMMITTED` or `WITHDRAWN` |
-| a rule that will still be true in a month | `CLAUDE.md`, **Standing findings**, phrased without a date |
+| a rule that will still be true in a month | `CLAUDE.md`, **Standing findings**: the rule, one line of why, its `§`. No date and no number; the evidence stays under the `§` |
+| a queued item opened or closed | `docs/QUEUE.md` under its number; a closed one moves verbatim to `docs/HISTORY.md` |
 | the session's narrative, "we tried X and it failed because Y" | `docs/HISTORY.md` |
 | which tables are current, what is staged, what can be run | **nowhere — it is derived.** `python -m tools.status --write` |
 | a doc that is now superseded | `docs/archive/`, with a banner saying what replaced it |
+
+**`CLAUDE.md` is loaded into every session, so it has a byte budget**, and
+`check_docs` fails past it. That file grew back from 500 lines to 984 the
+first time this rule was only advice. When it fails, condense: move the
+evidence under its `§` (`python -m tools.issue <id>` reads one back) and keep
+the rule. Do not raise the budget to make the failure go away.
 
 **Never write into a doc something the repo already knows.** If you find
 yourself typing a noise floor, a row count, a staged-swap list or a script
