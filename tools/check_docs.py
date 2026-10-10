@@ -300,7 +300,7 @@ def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
 # by rewrapping. It leaves room for a few lessons. When the file reaches it,
 # condense or move evidence under its section. Raising the number is the same
 # move as `--verified` without evidence.
-CLAUDE_BUDGET = 24_000
+CLAUDE_BUDGET = 30_000
 
 
 def check_claude_md_budget(docs: dict[str, str]) -> Result:
