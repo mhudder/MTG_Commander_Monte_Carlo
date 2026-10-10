@@ -88,11 +88,12 @@ This is the part that keeps `CLAUDE.md` small. One rule:
 | which tables are current, what is staged, what can be run | **nowhere — it is derived.** `python -m tools.status --write` |
 | a doc that is now superseded | `docs/archive/`, with a banner saying what replaced it |
 
-**`CLAUDE.md` is loaded into every session, so it has a byte budget**, and
-`check_docs` fails past it. That file grew back from 500 lines to 984 the
-first time this rule was only advice. When it fails, condense: move the
-evidence under its `§` (`python -m tools.issue <id>` reads one back) and keep
-the rule. Do not raise the budget to make the failure go away.
+**The docs a session reads whole have byte budgets** (`DOC_BUDGETS` in
+`tools/check_docs.py`: `CLAUDE.md`, `docs/ARCHITECTURE.md`, the add-card
+skill), and `check_docs` fails past them. `CLAUDE.md` grew back from 500 lines
+to 984 the first time this rule was only advice. When one fails, condense:
+move the evidence under its `§` (`python -m tools.issue <id>` reads one back)
+and keep the rule. Raising a budget is the owner's call, not a way to pass.
 
 **Never write into a doc something the repo already knows.** If you find
 yourself typing a noise floor, a row count, a staged-swap list or a script

@@ -28,24 +28,19 @@ code and want to know what else it touches.
    ─ removal_census.py    the fifth: classifies every answer and wipe in every list
                           from Scryfall into decks/_removal.py (§0z87)
    ─ audit_cards.py       every card against Scryfall
-   ─ card_known.py        is a card already in a list, a catalog, a candidates
-                          batch, the ledger or an engine? DERIVED -- candidates.py
-                          names constants, so grepping it for a card name cannot
-                          work, which is how a measured card was called unmeasured
-   ─ triage.py            can the engine SEE a card (tier 0: channels derived from
-                          the object, or a clause screen of the oracle text), and
-                          does its counter fire (tier 2, --smoke). Its acceptance
-                          test is EXACT: a blind card plays identically to a
-                          matched blank under CRN (item 23, §0z66)
+   ─ card_known.py        is a card already in a list, catalog, candidates batch,
+                          the ledger or an engine? DERIVED: candidates.py names
+                          constants, so grepping it for a card name cannot work
+   ─ triage.py            can the engine SEE a card (tier 0), does its counter fire
+                          (tier 2, --smoke)? A blind card must play IDENTICALLY to a
+                          matched blank under CRN (§0z66)
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
    ─ regen_tables.sh      every deck's table at the common N, in series
    ─ rebuild_deck.sh      ONE deck's table, as one leg of a parallel rebuild: checks
                           out a commit, rebuilds, stamps a provenance SHARD, pushes
                           its three files. The protocol is .claude/skills/
                           parallel-rebuild (§0z94)
-   ─ issue.py             prints one KNOWN_ISSUES section by id (or --find over the
-                          index), so following a § from CLAUDE.md costs a section
-                          and not the whole file
+   ─ issue.py             one KNOWN_ISSUES section by id, or --find over the index
    ─ _generated.py        shared helper: git ref, the provenance mask the checks compare
                           with, and implements_mutate (read by tests and STATUS.md)
 
@@ -60,7 +55,7 @@ code and want to know what else it touches.
             ▼
    edhmc/pending.py       the LEDGER and the deck builder
                           build_pending(deck) = decks.<module>.build() + the staged CHANGES
-                          states: PROPOSED → MEASURED → STAGED (CHANGES) → COMMITTED, or WITHDRAWN
+                          its states are docs/LEDGER_STATES.md
                           plus the checks that keep those lists honest (check_proposals, …)
             │
             ▼
@@ -123,9 +118,8 @@ code and want to know what else it touches.
    then — if you are still in the game — the removal round
    (`opponents_act`). An engine with its own model of what opponents do on
    their turns (karlov's `opponent_activity`) passes it as `before_act`.
-   Two engines ran removal first until 2026-09-17 (§0z30); the test
-   `tests/test_mulligan_and_pod_order.py` fails if an engine calls the
-   three parts itself again.
+   `tests/test_mulligan_and_pod_order.py` fails if an engine calls the three
+   parts itself (§0z30).
 5. `simulate` returns the metrics dict; `analyse` bootstraps the paired
    difference per metric. `won` is the objective; everything else is a proxy.
 
@@ -151,7 +145,7 @@ the game object and discovers optional behaviour with `hasattr`:
 | `trample_of(g, perm)` | trample RIGHT NOW (§0z92): the generated `TRAMPLE` set, Lord of the Pit by name, the team after Overwhelming Stampede (`stampede_bonus`) or Craterhoof (`craterhoof_bonus`), and an azusa land animated with trample. `chump` then stops only `min(power, blocker_toughness x blockers)` of a blocked trampler |
 | `o.cursed`, `life_loss(o, n)` | Selenia's Curse (§0z74). EVERY site where an opponent's life goes down asks `life_loss` -- combat, `damage_each`, `damage_single`, the goaded Birds, shilgengar's Massacre Wurm. A new site that writes `o.life -=` without it is a doubler with a hole in it (§0z4's shape) |
 | `g.is_land_creature_now(perm)` (optional) | Autumn Willow's question, asked by `engine.on_mana_tap` and `spend`'s count fallback (§0z74). Only azusa can answer it, so only azusa defines it |
-| `g.exiled_instead_of_dying(perm)` (optional) | a replacement effect that turns a death into an exile -- finality counters (§0z75). `destroy` asks it after removing the permanent: yes means no graveyard and NO death trigger. Shilgengar defines it; its own `sacrifice` asks the same question. Rendmaw defines it too, for Gloomshrieker's identical text (§0z83) -- this row said it had no hook until 2026-09-30 (§0z89) |
+| `g.exiled_instead_of_dying(perm)` (optional) | a replacement effect that turns a death into an exile -- finality counters (§0z75). `destroy` asks it after removing the permanent: yes means no graveyard and NO death trigger. Shilgengar defines it; its own `sacrifice` asks the same question. Rendmaw defines it too, for Gloomshrieker's identical text (§0z83) |
 | `g.on_targeted(perm)` (optional) | the pod's spot removal has picked `perm` as its target -- "becomes the target of a spell" (§0z77). Called before `destroy`, whether or not the spell then kills it; NOT called when `try_protect` blanks the event, because that path names no target. Lorehold defines it, for Goldspan Dragon |
 | `g.after_died(perm)` (optional) | called once the dead creature's CARD is in the graveyard -- by `destroy` after its graveyard step, and by shilgengar's own `sacrifice`. `on_creature_death` runs BEFORE the card gets there on the destroy path, so anything that moves the card back out lives here: Twilight Shepherd's persist (§0z84). Only shilgengar defines it |
 | `protected_from_creatures(g)` | Serra's Emissary's chosen type, `emissary_type` "Creature" (§0z84): `damage_through` gives the pod no blockers and `incidental_damage` does not reach you. The clocks are untouched -- a roll is not a combat |
@@ -175,14 +169,11 @@ Archive), `deal_pod_damage`, `opening_hand`; and `engine.finish(g)` is the
 tail of `simulate()` that assembled the output dict six times. What is still
 per engine and meant to be: `__init__`, `power_of`/`toughness_of`,
 `on_creature_death`, `make_permanent`, `gain_life`, and `take_turn`. **A rule that lives in a method drifts; a rule that lives in a function
-does not.** Every §0u finding in `KNOWN_ISSUES.md` is an instance. Known
-drift today, said here so nobody rediscovers it:
-
-| rule | where it is written | how the copies differ |
-|---|---|---|
-| ~~the fourth failed mulligan~~ | CLOSED 2026-09-17, `engine.london_mulligan` ×1 | was: `engine.py` redrew seven; `lorehold.py` kept an EMPTY hand; the other four left the seven cards in hand AND back in the library. §0z30, pinned by `tests/test_mulligan_and_pod_order.py` |
-| ~~end-of-turn pod order~~ | CLOSED 2026-09-17, `opponents.pod_phase` ×1 | was: four engines ran damage → clocks → removal; `karlov.py` and `tivit.py` ran removal → damage → clocks. Worth +0.0647 win rate to tivit's baseline, §0z30 |
-| the `turns` default when no cfg supplies one | `simulate` ×6, `make_pod` | 10 in three places, 20 in four (acknowledged in `docs/KNOBS.md`; every harness passes it explicitly) |
+does not** (§0u, §0z30). The mulligan (`engine.london_mulligan`) and the pod
+order (`opponents.pod_phase`) were per-engine copies that disagreed and are one
+function each now. **Known drift today**: the `turns` default when no cfg
+supplies one is 10 in three places and 20 in four (`simulate`, `make_pod`);
+every harness passes it explicitly, and `docs/KNOBS.md` says so.
 
 The per-game metrics dict is an `engine.Metrics` (§0z31): it reads 0 for a
 name nothing has written, so a `+=` on a metric missing from an engine's
@@ -201,8 +192,7 @@ such name set is a claim that rots, so each carries a coverage check —
 `check_dynamic_cost_coverage`, `check_alt_cost_coverage`, `check_proposals` —
 and a new one needs its check in the same change (§0q).
 
-**3. A deck is registered ONCE, in `edhmc/registry.py`** (§0z32; until
-2026-09-17 it was registered in eleven places by hand). `DECKS[name]` is a
+**3. A deck is registered ONCE, in `edhmc/registry.py`** (§0z32). `DECKS[name]` is a
 `DeckSpec` — engine, colour identity, the table's metric columns, extra
 fingerprint files — and it is checked against `decks/` discovery at import,
 so a module without a spec or a spec without a module refuses to import.
@@ -236,37 +226,14 @@ When a card "does nothing" in a table, look in this order:
 
 ## Pitfalls, written down by the sessions that hit them
 
-These are the traps a new agent walks into on this repo. Each has a check or a
-command; use it rather than remembering.
+The traps that are specific to the code. The general ones (a test that is not
+run, `$?` after a pipe, two cards on one hook, generated docs) are standing
+findings in `CLAUDE.md` and are not repeated here.
 
-- **A test that is not run does not exist.** The pinned tests live in `tests/`
-  and nothing ran them automatically; a mechanism regression survived three
-  commits with its own test failing the whole time. `python -m tests` runs
-  every module and fails if any fails. It is in the closing protocol now.
-- **`$?` after a pipe is the exit code of the LAST command in the pipe.**
-  `python -m tests.test_ashaya | tail; echo $?` reports `tail`. Use `python -m tests`,
-  or `set -o pipefail`.
-- **Two cards hooked at one site are one indentation away from being one
-  card.** The Great Henge and Guardian Project share the "nontoken creature
-  entered" hook in `azusa.make_permanent`; inserting the second swallowed the
-  first's draw into the new `if`. When you add to a shared hook, re-run the
-  test that pins its neighbour, and read the mechanism counters of BOTH cards.
 - **`check_unchanged_decks` compares BASELINES.** A card that is not in the
   built list is invisible to it, so it can certify a cache while a candidate's
   implementation is broken. It answers "did the deck move", not "is the card
   right". The card's own test answers that.
-- **Generated docs are only as current as their last `--write`.**
-  `python -m tools.check_docs` runs every generator and diffs; run it before
-  every commit, and regenerate `docs/STATUS.md` in the SAME commit as whatever
-  moved it. A hand-typed count anywhere in prose (knobs, sections, lines) is
-  already wrong.
-- **`ablation.py` USED TO read `sys.argv` at import** -- fixed in M4
-  (2026-09-17), when its parameters became a `Run` object. It is safe to
-  import now (`tools/triage.py`, two tests and `pending.py` do), and
-  `experiment.repl_priority` is where it is for the older reason.
-- **The metrics dict is a plain dict.** `g.m["new_counter"] += 1` on a key not
-  registered in `__init__` is a `KeyError` in a worker, in the minority of
-  games where the card resolves, twenty minutes into a run. Register the key.
 - **A draw off an empty library is a LOSS (§0z42), and whether a draw is a
   choice is the CARD's to say.** Every draw goes through `BaseGame.draw`,
   karlov's Archive override or lorehold's `draw_card`, and each calls

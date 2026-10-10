@@ -162,7 +162,7 @@ def check_index_matches_headings(issues: str) -> Result:
 # its key number; the rest is the section's job, one `tools.issue <id>` away.
 # 250, not 200: the rows between them carry a headline, a number AND the
 # consequence, and read well. Raising it is the owner's call, as with
-# CLAUDE_BUDGET.
+# DOC_BUDGETS.
 INDEX_ROW_MAX = 250
 
 
@@ -318,32 +318,42 @@ def check_durable_docs_derive_counts(docs: dict[str, str]) -> Result:
 
 
 
-# CLAUDE.md is loaded into EVERY session, so its size is paid on every session.
-# It said of itself "500 lines instead of 1,042" and had grown back to 984
-# lines and 63 KB when it was condensed (2026-10-10), because the session-close
-# rule "only a LESSON is promoted" had nothing behind it. This is the thing
-# behind it. The budget is BYTES, not lines, because a line count can be met
-# by rewrapping. It leaves room for a few lessons. When the file reaches it,
-# condense or move evidence under its section. Raising the number is the same
-# move as `--verified` without evidence.
-CLAUDE_BUDGET = 30_000
+# Byte budgets for the docs a session READS WHOLE. CLAUDE.md is loaded into
+# every session; ARCHITECTURE.md and the add-card skill are read whenever code
+# or a card is touched. CLAUDE.md said of itself "500 lines instead of 1,042"
+# and had grown back to 984 lines and 63 KB when it was condensed
+# (2026-10-10), because the rule "only a LESSON is promoted" had nothing
+# behind it; the other two were growing the same way. BYTES, not lines: a
+# line count can be met by rewrapping. When a file reaches its budget,
+# condense it or move the evidence under its section. Raising a number is the
+# owner's call (CLAUDE.md's was raised to 30,000 by the owner), never a way
+# to make the check pass.
+ADD_CARD = os.path.join(".claude", "skills", "add-card", "SKILL.md")
+DOC_BUDGETS = {
+    "CLAUDE.md": 30_000,
+    os.path.join("docs", "ARCHITECTURE.md"): 30_000,
+    ADD_CARD: 15_000,
+}
 
 
-def check_claude_md_budget(docs: dict[str, str]) -> Result:
-    """CLAUDE.md stays within its byte budget.
+def check_doc_budgets(docs: dict[str, str]) -> Result:
+    """Every budgeted doc stays within its byte budget.
 
-    BLIND TO, said out loud (§0z15): what the bytes SAY. A file within budget
-    can still carry a dated number (the check above catches four shapes of
-    that) or a rule stated twice. It also does not see the skills or
-    STATUS.md, which are read on demand rather than loaded every session.
+    BLIND TO, said out loud (§0z15): what the bytes SAY -- a file within
+    budget can still carry a dated number or a rule stated twice -- and every
+    doc not in DOC_BUDGETS. The other skills and STATUS.md are not budgeted:
+    STATUS.md is generated, and a generator's output is sized by the repo.
     """
-    n = len(docs.get("CLAUDE.md", "").encode("utf-8"))
-    return Result(f"CLAUDE.md is within its size budget "
-                  f"({n:,} of {CLAUDE_BUDGET:,} bytes)",
-                  n <= CLAUDE_BUDGET,
-                  "" if n <= CLAUDE_BUDGET else
-                  "condense it: a lesson's evidence belongs under its "
-                  "KNOWN_ISSUES section, not here")
+    over = []
+    for path, cap in DOC_BUDGETS.items():
+        n = len(docs.get(path, "").encode("utf-8"))
+        if n > cap:
+            over.append(f"{path}: {n:,} of {cap:,} bytes -- condense it; the "
+                        f"evidence belongs under its KNOWN_ISSUES section")
+    return Result(f"the budgeted docs are within their size budgets "
+                  f"({len(DOC_BUDGETS)} docs)",
+                  not over, "; ".join(over))
+
 
 LEDGER_STATES = os.path.join("docs", "LEDGER_STATES.md")
 
@@ -651,7 +661,7 @@ def run_all() -> list[Result]:
         check_shell_commands_exist(docs),
         check_architecture_names_modules(docs),
         check_durable_docs_derive_counts(docs),
-        check_claude_md_budget(docs),
+        check_doc_budgets(docs),
         check_vocabulary_names_states(docs, ledger_states()),
         check_caches_recorded(),
     ]
@@ -721,6 +731,10 @@ MUTATIONS = {
             code, issues, dict(docs, **{"CLAUDE.md": docs["CLAUDE.md"]
                                         + "a lesson, retold at length.\n"
                                         * 1000})),
+    "the add-card skill grows past its budget":
+        lambda code, issues, docs: (
+            code, issues, dict(docs, **{ADD_CARD: docs[ADD_CARD]
+                                        + "a story behind a step.\n" * 200})),
     # WITHDRAWN is the state the doc carries in PROSE rather than in its table,
     # so it is the one most easily lost -- which makes it the right one to
     # delete here.
@@ -749,7 +763,9 @@ EXPECTED = {
     "a doc cites a finding that does not exist":
         {"every §id cited from a live doc resolves"},
     "CLAUDE.md grows past its budget":
-        {"CLAUDE.md is within its size budget"},
+        {"the budgeted docs are within their size budgets"},
+    "the add-card skill grows past its budget":
+        {"the budgeted docs are within their size budgets"},
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
     "a card is staged and _removal.py is not regenerated":
@@ -799,7 +815,7 @@ def mutate() -> int:
             check_shell_commands_exist(d),
             check_architecture_names_modules(d),
             check_durable_docs_derive_counts(d),
-            check_claude_md_budget(d),
+            check_doc_budgets(d),
             check_vocabulary_names_states(d, states),
         ]
         broke = {r.name.split(" (")[0] for r in results if not r.ok}

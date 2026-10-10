@@ -9,7 +9,7 @@ Where things live:
 |---|---|
 | **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings. Regenerate with `python -m tools.status --write`, which also writes `docs/COMMANDS.md`, every runnable command discovered from disk. |
 | **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
-| **the rules** | `CLAUDE.md` — every standing rule in a few lines, with the `§` that holds its evidence. Claude loads it into every session, so it is kept short (`check_docs` enforces a byte budget). Its longer pre-2026-10-10 form is `docs/archive/CLAUDE_2026-10-10.md`. |
+| **the rules** | `CLAUDE.md` — every standing rule in a few lines, with the `§` that holds its evidence. Claude loads it into every session, so it is kept short (`check_docs` enforces a byte budget, as it does for `docs/ARCHITECTURE.md` and the add-card skill). Its longer pre-2026-10-10 form is `docs/archive/CLAUDE_2026-10-10.md`. |
 | **what is queued** | `docs/QUEUE.md` — the open work items, under the numbers the issues cite them by. Closed items move to `docs/HISTORY.md`. |
 | **a numbered finding** | `KNOWN_ISSUES.md` — `§0a` onward plus the older `1`–`8` series, with an index at the top. The ids are cited from code and are never renumbered; `docs/STATUS.md` prints the current last id. Read one section with `python -m tools.issue 0z36`, or search the index with `--find`. |
 | **how we got here** | `docs/HISTORY.md` — every dated session note. **Search it; do not read it.** Several sections are marked VOID or SUPERSEDED, deliberately. |
