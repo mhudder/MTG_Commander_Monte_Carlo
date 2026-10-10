@@ -2320,6 +2320,53 @@ MEASURED: list[Candidate] = [
         limits="THE KNOB IS A JUDGEMENT: the pod's creatures have no toughness (§4), so X kills min(1, X / gyre_full_x) of each board. Planeswalkers are §4.",
         verdict="The owner asked how strong it is: significant at both horizons and at every setting of the knob that prices it, with X large enough (about 8) that it is usually a full one-sided wipe. A long-horizon card -- most of its value is at T20, when the pod's boards have grown. STAGED 2026-10-10 against Boros Charm (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
+    # --- The owner's multi-type batch for rendmaw, 2026-10-10 (§0z125). Every card
+    # is two card types; PART 2 of the diagnostic prices that half on its own.
+    Candidate(
+        deck="rendmaw", card='The Swarmweaver', measured="2026-10-10",
+        win_rate='+0.0074 +-0.0025 at T20, +0.0036 +-0.0012 at T10',
+        signal='both',
+        rationale="Two flying Insects on a Scarecrow, and a delirium pump for the list's Insects and Spiders.",
+        evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. swarmweaver_insects +0.41 a game, swarmweaver_pumped +0.31 (attackers pumped under delirium), tokens_made +0.39, damage +1.11 at T20. ITS TYPE LINE (vs itself as a one-type Creature, same slot): +0.0019 +-0.0015 at T20, +0.0022 +-0.0009 at T10 -- the Rendmaw trigger and the artifact half.",
+        limits='A FLOOR: deathtouch is not modelled (§4).',
+        verdict='Significant at both horizons; with Dalek Squadron the top of the batch -- a set, not a ranking (§0c).',
+    ),
+    Candidate(
+        deck="rendmaw", card='Dalek Squadron', measured="2026-10-10",
+        win_rate='+0.0071 +-0.0025 at T20, +0.0044 +-0.0012 at T10',
+        signal='both',
+        rationale='Menace, and myriad: one attacker becomes one per opponent.',
+        evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. myriad_copies +0.76 a game, damage +2.13 -- the largest damage row of the five -- at T20. ITS TYPE LINE: +0.0027 +-0.0014 at T20, +0.0020 +-0.0008 at T10.",
+        limits="A slight CEILING: the copies join the pod-wide split instead of one going at each other opponent (Furygale Flocking's caveat, §0z124).",
+        verdict='Significant at both horizons; with The Swarmweaver the top of the batch.',
+    ),
+    Candidate(
+        deck="rendmaw", card='Fire Navy Trebuchet', measured="2026-10-10",
+        win_rate='+0.0050 +-0.0022 at T20, +0.0021 +-0.0010 at T10',
+        signal='both',
+        rationale='A 2/1 flier in every attack, sacrificed at the end step -- a death for the aristocrat payoffs.',
+        evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. boulders_made +0.53 a game, every one sacrificed; drain_damage +0.10, tokens_made +0.60, cards_drawn +0.04 (Erebos) at T20. ITS TYPE LINE: +0.0023 +-0.0014 at T20, +0.0017 +-0.0008 at T10.",
+        limits='Every clause that acts is modelled; reach is inert (your creatures never block, §4).',
+        verdict='Significant at both horizons, smaller than the top two.',
+    ),
+    Candidate(
+        deck="rendmaw", card='Wickerfolk Indomitable', measured="2026-10-10",
+        win_rate='+0.0035 +-0.0020 at T20, +0.0015 +-0.0008 at T10',
+        signal='both',
+        rationale='A 4/3 that can be recast from the graveyard -- a repeatable Rendmaw trigger.',
+        evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. wickerfolk_gy_casts +0.04 a game at T20 (0.08 life). THE GRAVEYARD CLAUSE ALONE (vs the card with `wickerfolk_gy` off): +0.0003 +-0.0010 at T20 -- inside its bar. THE KNOB: `wickerfolk_life_floor` 6 -> +0.0031, 14 -> +0.0034 at T20, the default 10 +0.0035: not load-bearing. ITS TYPE LINE: +0.0023 +-0.0015 at T20, +0.0017 +-0.0007 at T10.",
+        limits='A FLOOR on the recast: the pilot never sacrifices Wickerfolk on purpose to recast it, and a Treasure or a nontoken body is never offered as the sacrifice. It returns only after the pod kills it, which is rare.',
+        verdict='Significant at both horizons, but as a 4/3 for four that triggers Rendmaw: the clause it was picked for fires 0.04 times a game and is worth nothing measurable.',
+    ),
+    Candidate(
+        deck="rendmaw", card='H.E.R.B.I.E., Lovable Robot', measured="2026-10-10",
+        win_rate='+0.0013 +-0.0020 at T20, -0.0001 +-0.0009 at T10',
+        signal='--',
+        rationale="The owner's pick: a two-mana flying mana creature that triggers Rendmaw.",
+        evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. herbie_surveils +0.07 a game at T20 (a land binned 0.01). ITS TYPE LINE: +0.0022 +-0.0013 at T20, +0.0007 +-0.0006 at T10 -- significant: the Rendmaw trigger is real, and the rest of the card (a {C} mana creature that taps instead of attacking) is worth no more than a two-mana 1/1 blank here.",
+        limits="A FLOOR on fixing: '{1}, {T}: Add one mana of any color' is not modelled. The surveil is rare by construction -- the precombat main casts only pump.",
+        verdict='INSIDE ITS BAR at both horizons: unmeasured, not bad. Its trigger half is significant on its own; the mana half is not visible in a list that already has eight two-mana rocks and mana creatures.',
+    ),
 ]
 
 # ---------------------------------------------------------------------------
@@ -4443,6 +4490,7 @@ PROPOSED: list[Proposal] = [
                    "lands make both. PARTLY MODELLED."),
         triage="LIVE",
         prepared="tests/test_rendmaw_multitype.py",
+        rejected="MEASURED 2026-10-10 and PROMOTED: the Candidate in MEASURED carries the number (§0z125). Closed rather than deleted so the verified oracle text stays where it was written.",
     ),
     Proposal(
         deck='rendmaw', card='The Swarmweaver',
@@ -4460,6 +4508,7 @@ PROPOSED: list[Proposal] = [
                    "pod's blockers are a count with no toughness and your creatures never block (§4). PARTLY."),
         triage="LIVE",
         prepared="tests/test_rendmaw_multitype.py",
+        rejected="MEASURED 2026-10-10 and PROMOTED: the Candidate in MEASURED carries the number (§0z125). Closed rather than deleted so the verified oracle text stays where it was written.",
     ),
     Proposal(
         deck='rendmaw', card='Wickerfolk Indomitable',
@@ -4478,6 +4527,7 @@ PROPOSED: list[Proposal] = [
                    "only after the pod kills it."),
         triage="LIVE",
         prepared="tests/test_rendmaw_multitype.py",
+        rejected="MEASURED 2026-10-10 and PROMOTED: the Candidate in MEASURED carries the number (§0z125). Closed rather than deleted so the verified oracle text stays where it was written.",
     ),
     Proposal(
         deck='rendmaw', card='Fire Navy Trebuchet',
@@ -4494,6 +4544,7 @@ PROPOSED: list[Proposal] = [
                    "clause that acts is modelled."),
         triage="LIVE",
         prepared="tests/test_rendmaw_multitype.py",
+        rejected="MEASURED 2026-10-10 and PROMOTED: the Candidate in MEASURED carries the number (§0z125). Closed rather than deleted so the verified oracle text stays where it was written.",
     ),
     Proposal(
         deck='rendmaw', card='Dalek Squadron',
@@ -4510,6 +4561,7 @@ PROPOSED: list[Proposal] = [
                    "the split is the pilot's (Furygale Flocking's caveat, §0z124), a slight CEILING. PARTLY."),
         triage="LIVE",
         prepared="tests/test_rendmaw_multitype.py",
+        rejected="MEASURED 2026-10-10 and PROMOTED: the Candidate in MEASURED carries the number (§0z125). Closed rather than deleted so the verified oracle text stays where it was written.",
     ),
 ]
 

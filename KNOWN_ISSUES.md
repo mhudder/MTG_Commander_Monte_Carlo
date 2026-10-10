@@ -173,7 +173,7 @@ Methodology that used to live at the end of this file is now
 | [0z122](#0z122) | MEASURED | **Prisoner's Dilemma is +0.0301 ±0.0034 at T20** over a blank in lorehold (+0.0127 at T10), and still +0.0137 if the table colludes on silence -- the knob is `dilemma_choice`, and snitch is every opponent's dominant strategy. Head-to-heads: −Soulfire Eruption +0.0262, −Enlightened Tutor +0.0332 at T20. **Native flashback is new to lorehold**, read from Scryfall into `_evasion.FLASHBACK` -- and the generator found **Faithless Looting's own Flashback {2}{R} had never been cast**: +0.32 casts a game, +0.0033 ±0.0037 at T20, inside its bar. Lorehold's table rebuilt |
 | [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED in lorehold**, by the owner: its table-facing choice (the answer an opponent's board calls for) is §4-blind and its default pick is the highest mana value, so its −0.0019 row is a floor. **Ruby Medallion is modelled faithfully but seldom matters**: its {1} miracle discount reaches every decision and payment, but it is out for 2.0 miracle windows a game and makes 0.022 miracles a game possible that full price would not. −Ruby +Prisoner's Dilemma: +0.0295 ±0.0044 at T20 (snitch), +0.0103 ±0.0040 (silence) |
 | [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**, the owner's picks: over a blank at T20, **Furygale Flocking +0.0556 ±0.0046** -- the largest lorehold candidate row yet, its own reduction makes the miracle free (601.2f) -- then Profound Journey +0.0210, Raphael's Technique +0.0191, Immolating Gyre +0.0189 (knob `gyre_full_x`: +0.0131 to +0.0218), Gideon's Phalanx +0.0106, Searing Wind +0.0054, Explosive Welcome +0.0038; all significant at both horizons. The owner's three comparisons, paired: Phalanx − Furygale −0.0423, −Reforge +Raphael −0.0031 (both confirmed), Welcome − Wind −0.0017, inside its bar. New in the engine: reanimation, rebound (from Scryfall), `self_reduction`, `enters_battlefield`. **STAGED 2026-10-10** by the owner: −Verge Rangers +Furygale, −Lightning Greaves +Profound Journey, −Boros Charm +Immolating Gyre -- together +0.0471 / +0.0773 at T10 / T20. **The first two COMMITTED the same day (lorehold v17)**; Gyre stays staged |
-| [0z125](#0z125) | BUILT | **Five multi-type cards for rendmaw**, the owner's search (two card types, flying / tokens / forced combat): H.E.R.B.I.E., Lovable Robot, The Swarmweaver, Wickerfolk Indomitable, Fire Navy Trebuchet, Dalek Squadron. New in the engine: casting from the graveyard, defender and Insect/Spider read from Scryfall, tokens that enter attacking, myriad. All seven decks bit-identical; measurement to follow |
+| [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**, the owner's search (two card types; flying, tokens, forced combat). Over a blank at T20: **The Swarmweaver +0.0074 ±0.0025**, **Dalek Squadron +0.0071 ±0.0025**, Fire Navy Trebuchet +0.0050, Wickerfolk Indomitable +0.0035 -- all significant at both horizons -- and **H.E.R.B.I.E., Lovable Robot +0.0013 ±0.0020, inside its bar**. **Two card types are worth about +0.002 on every one of them**, measured against the same card as a one-type Creature. Wickerfolk's graveyard cast fires 0.04 times a game and is worth nothing measurable. New in the engine: graveyard casting, defender, Insect/Spider from Scryfall, tokens entering attacking, myriad |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11183,7 +11183,7 @@ Treasures. The test now names its discovery target. **A fixture built on
 the real list is a claim about that list**, and it fails on a correct
 engine the day the list moves.
 
-## 0z125. BUILT — rendmaw: the owner's multi-type batch
+## 0z125. MEASURED — rendmaw: the owner's multi-type batch
 
 The owner, 2026-10-10: "review new, possibly obscure cards for Rendmaw ...
 two or more types that may fit the deck's themes (flying, token generation,
@@ -11226,6 +11226,67 @@ exactly the §0z124 amounts already on record. No card in any committed list
 has defender, so the new attacker filter is the identity there; the generated
 set found **Sylvan Caryatid** in trostani, whose engine already keeps it home
 by name (`trostani.py`), a hand-written copy of the same fact.
+
+### The rows
+
+`diagnostics/run_rendmaw_multitype.py`, `results/rendmaw_multitype_20261010.txt`:
+N=15,000 paired, seeds 80000.., the staged list, each card in Pygmy Kavu's
+slot (rendmaw's candidate slot since the first batch) against a ONE-type
+blank of its cost, T10 read off the T20 game.
+
+| card | T10 | T20 | P(cast) | the mechanism, at T20 |
+|---|---|---|---|---|
+| The Swarmweaver | +0.0036 ±0.0012 | **+0.0074 ±0.0025** | 0.174 | 0.41 flying Insects a game; 0.31 attackers pumped under delirium |
+| Dalek Squadron | +0.0044 ±0.0012 | **+0.0071 ±0.0025** | 0.197 | 0.76 myriad copies a game, damage +2.13 |
+| Fire Navy Trebuchet | +0.0021 ±0.0010 | +0.0050 ±0.0022 | 0.185 | 0.53 Boulders a game, every one a death: drain +0.10 |
+| Wickerfolk Indomitable | +0.0015 ±0.0008 | +0.0035 ±0.0020 | 0.179 | 0.04 graveyard casts a game |
+| H.E.R.B.I.E., Lovable Robot | −0.0001 ±0.0009 | +0.0013 ±0.0020 | 0.209 | 0.07 surveils a game |
+
+**Four are significant at both horizons; H.E.R.B.I.E. is inside its bar at
+both** -- unmeasured, not bad. The top two are a set, not a ranking (§0c).
+For scale, the T20 column of `ablation_rendmaw.txt` puts Arasta of the
+Endless Web at +0.0073 and Scrap Trawler at +0.0070 (leave-one-out, so the
+comparison is of size, not a head-to-head).
+
+### What two card types are worth
+
+The question the search was built on, measured directly: each card against
+ITSELF with its type line cut to "Creature", same slot, same seeds. The
+difference is everything the second type buys here -- the Rendmaw trigger on
+the cast, and the artifact half (Foundry Inspector's discount, Steel
+Overseer, the artifact recursion):
+
+| card | T10 | T20 | rendmaw_triggers at T20 |
+|---|---|---|---|
+| H.E.R.B.I.E. | +0.0007 ±0.0006 | +0.0022 ±0.0013 | +0.06 |
+| The Swarmweaver | +0.0022 ±0.0009 | +0.0019 ±0.0015 | +0.08 |
+| Wickerfolk Indomitable | +0.0017 ±0.0007 | +0.0023 ±0.0015 | +0.10 |
+| Fire Navy Trebuchet | +0.0017 ±0.0008 | +0.0023 ±0.0014 | +0.07 |
+| Dalek Squadron | +0.0020 ±0.0008 | +0.0027 ±0.0014 | +0.08 |
+
+**About +0.002 a card, significant on all five, and remarkably flat** -- it
+is a fact about the deck, not the card: one Bird for each player per cast.
+It is also why H.E.R.B.I.E. is a blank overall: its trigger half is +0.0022,
+and the rest of the card -- a {C} mana creature that taps for mana instead
+of attacking, in a list with eight two-mana rocks and mana creatures already
+-- is worth slightly less than the 1/1 blank it replaced.
+
+### Wickerfolk's clause, and its knob
+
+The card against itself with `wickerfolk_gy` off: **+0.0003 ±0.0010 at
+T20**, inside its bar. It is recast 0.04 times a game, because it reaches
+the graveyard only when the pod kills it -- the pilot never sacrifices it on
+purpose, a policy floor. `wickerfolk_life_floor` 6 / 10 / 14 gives +0.0031 /
++0.0035 / +0.0034 at T20: **the knob is not load-bearing.** The card's row is
+a 4/3 for four that triggers Rendmaw.
+
+### What would decide a swap
+
+Nothing is staged: a candidate row is value over a blank in a freed slot,
+and a swap pays for its cut (§0c). Staging needs the owner's cuts and a
+head-to-head on the tables' seeds, as §0z124 did for lorehold. Rendmaw's
+cache is SUSPECT (§0z124's wipe-share move), so its table is a guide to the
+cut side, not a measurement on today's list.
 
 ## How to read an ablation table
 

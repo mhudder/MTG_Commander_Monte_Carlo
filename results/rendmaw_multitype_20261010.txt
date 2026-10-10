@@ -1,0 +1,119 @@
+Rendmaw's multi-type batch (§0z125), staged list, N = 15,000 paired games per comparison, seeds 80000.., 95% CIs. '*' = outside its bar.
+
+PART 1  H.E.R.B.I.E., Lovable Robot (vs blank, Kavu's slot)
+  T10: won -0.0001+-0.0009  damage +0.04+-0.07  rendmaw_triggers +0.05+-0.01*  tokens_made +0.02+-0.01*
+        cards_drawn -0.01+-0.01  drain_damage -0.01+-0.01  herbie_surveils +0.05+-0.00*  herbie_binned +0.00+-0.00*
+        final_life -0.02+-0.06  turns_played -0.00+-0.00
+  T20: won +0.0013+-0.0020  damage -0.00+-0.09  rendmaw_triggers +0.06+-0.01*  tokens_made +0.03+-0.02*
+        cards_drawn -0.02+-0.02*  drain_damage -0.01+-0.01  herbie_surveils +0.07+-0.00*  herbie_binned +0.01+-0.00*
+        final_life -0.03+-0.11  turns_played -0.00+-0.01
+  P(cast) 0.209   leg won at T20 0.2475
+
+PART 1  The Swarmweaver (vs blank, Kavu's slot)
+  T10: won +0.0036+-0.0012*  damage +0.89+-0.08*  rendmaw_triggers +0.05+-0.01*  tokens_made +0.30+-0.02*
+        cards_drawn +0.00+-0.01  drain_damage +0.01+-0.01  swarmweaver_insects +0.29+-0.01*  swarmweaver_pumped +0.10+-0.01*
+        final_life +0.20+-0.05*  turns_played -0.00+-0.00
+  T20: won +0.0074+-0.0025*  damage +1.11+-0.11*  rendmaw_triggers +0.06+-0.01*  tokens_made +0.39+-0.03*
+        cards_drawn -0.05+-0.02*  drain_damage +0.01+-0.02  swarmweaver_insects +0.41+-0.01*  swarmweaver_pumped +0.31+-0.03*
+        final_life +0.12+-0.13  turns_played -0.03+-0.01*
+  P(cast) 0.174   leg won at T20 0.2518
+
+PART 1  Wickerfolk Indomitable (vs blank, Kavu's slot)
+  T10: won +0.0015+-0.0008*  damage +0.33+-0.04*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.06+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage -0.00+-0.01  wickerfolk_gy_casts +0.01+-0.00*  wickerfolk_life_paid +0.03+-0.00*
+        final_life -0.03+-0.03  turns_played -0.00+-0.00*
+  T20: won +0.0035+-0.0020*  damage +0.35+-0.07*  rendmaw_triggers +0.09+-0.01*  tokens_made +0.06+-0.01*
+        cards_drawn -0.05+-0.01*  drain_damage -0.00+-0.01  wickerfolk_gy_casts +0.04+-0.00*  wickerfolk_life_paid +0.08+-0.01*
+        final_life +0.05+-0.11  turns_played -0.03+-0.01*
+  P(cast) 0.179   leg won at T20 0.2481
+
+PART 1  Fire Navy Trebuchet (vs blank, Kavu's slot)
+  T10: won +0.0021+-0.0010*  damage +0.41+-0.06*  rendmaw_triggers +0.06+-0.01*  tokens_made +0.41+-0.02*
+        cards_drawn +0.05+-0.01*  drain_damage +0.08+-0.02*  boulders_made +0.35+-0.02*  boulders_sacrificed +0.35+-0.02*
+        final_life +0.02+-0.04  turns_played -0.00+-0.00*
+  T20: won +0.0050+-0.0022*  damage +0.42+-0.09*  rendmaw_triggers +0.09+-0.01*  tokens_made +0.60+-0.03*
+        cards_drawn +0.04+-0.02*  drain_damage +0.10+-0.02*  boulders_made +0.53+-0.02*  boulders_sacrificed +0.53+-0.02*
+        final_life +0.14+-0.14  turns_played -0.03+-0.01*
+  P(cast) 0.185   leg won at T20 0.2491
+
+PART 1  Dalek Squadron (vs blank, Kavu's slot)
+  T10: won +0.0044+-0.0012*  damage +2.30+-0.13*  rendmaw_triggers +0.05+-0.01*  tokens_made +0.68+-0.03*
+        cards_drawn +0.01+-0.01*  drain_damage -0.02+-0.01*  myriad_copies +0.65+-0.03*  final_life -0.05+-0.05*
+        turns_played -0.01+-0.00*
+  T20: won +0.0071+-0.0025*  damage +2.13+-0.14*  rendmaw_triggers +0.05+-0.01*  tokens_made +0.70+-0.04*
+        cards_drawn -0.09+-0.02*  drain_damage -0.06+-0.02*  myriad_copies +0.76+-0.04*  final_life +0.03+-0.14
+        turns_played -0.07+-0.01*
+  P(cast) 0.197   leg won at T20 0.2512
+
+PART 2  H.E.R.B.I.E., Lovable Robot: its type line (vs itself as a Creature)
+  T10: won +0.0007+-0.0006*  damage +0.06+-0.03*  rendmaw_triggers +0.04+-0.00*  tokens_made +0.05+-0.01*
+        cards_drawn +0.00+-0.00  drain_damage -0.00+-0.00  herbie_surveils -0.00+-0.00*  final_life -0.00+-0.02
+        turns_played -0.00+-0.00
+  T20: won +0.0022+-0.0013*  damage +0.03+-0.04  rendmaw_triggers +0.06+-0.01*  tokens_made +0.06+-0.01*
+        cards_drawn -0.01+-0.01*  drain_damage -0.00+-0.01  herbie_surveils -0.00+-0.00*  herbie_binned +0.00+-0.00
+        final_life +0.08+-0.08  turns_played -0.01+-0.00*
+  P(cast) 0.209   leg won at T20 0.2475
+
+PART 2  The Swarmweaver: its type line (vs itself as a Creature)
+  T10: won +0.0022+-0.0009*  damage +0.06+-0.03*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.07+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage +0.00+-0.00  swarmweaver_insects +0.01+-0.00*  swarmweaver_pumped -0.02+-0.01*
+        final_life +0.02+-0.02  turns_played -0.00+-0.00*
+  T20: won +0.0019+-0.0015*  damage +0.02+-0.05  rendmaw_triggers +0.08+-0.01*  tokens_made +0.09+-0.01*
+        cards_drawn -0.02+-0.01*  drain_damage +0.00+-0.01  swarmweaver_insects +0.02+-0.00*  swarmweaver_pumped -0.03+-0.01*
+        final_life +0.03+-0.08  turns_played -0.01+-0.00*
+  P(cast) 0.174   leg won at T20 0.2518
+
+PART 2  Wickerfolk Indomitable: its type line (vs itself as a Creature)
+  T10: won +0.0017+-0.0007*  damage +0.09+-0.03*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.07+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage +0.00+-0.00*  wickerfolk_gy_casts +0.00+-0.00*  wickerfolk_life_paid +0.00+-0.00*
+        final_life +0.03+-0.03*  turns_played -0.00+-0.00
+  T20: won +0.0023+-0.0015*  damage +0.05+-0.05  rendmaw_triggers +0.10+-0.01*  tokens_made +0.10+-0.01*
+        cards_drawn -0.02+-0.01*  drain_damage +0.00+-0.01  wickerfolk_gy_casts +0.00+-0.00*  wickerfolk_life_paid +0.00+-0.00*
+        final_life +0.05+-0.08  turns_played -0.01+-0.00*
+  P(cast) 0.179   leg won at T20 0.2481
+
+PART 2  Fire Navy Trebuchet: its type line (vs itself as a Creature)
+  T10: won +0.0017+-0.0008*  damage +0.06+-0.04*  rendmaw_triggers +0.05+-0.00*  tokens_made +0.04+-0.01*
+        cards_drawn +0.00+-0.00  drain_damage -0.00+-0.01  boulders_made -0.02+-0.00*  boulders_sacrificed -0.02+-0.00*
+        final_life +0.02+-0.03  turns_played +0.00+-0.00
+  T20: won +0.0023+-0.0014*  damage -0.01+-0.05  rendmaw_triggers +0.07+-0.01*  tokens_made +0.05+-0.01*
+        cards_drawn -0.01+-0.01*  drain_damage -0.01+-0.01  boulders_made -0.02+-0.01*  boulders_sacrificed -0.02+-0.01*
+        final_life +0.01+-0.07  turns_played -0.01+-0.00*
+  P(cast) 0.185   leg won at T20 0.2491
+
+PART 2  Dalek Squadron: its type line (vs itself as a Creature)
+  T10: won +0.0020+-0.0008*  damage -0.06+-0.04*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.02+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage -0.00+-0.00  myriad_copies -0.04+-0.01*  final_life +0.05+-0.03*
+        turns_played -0.00+-0.00
+  T20: won +0.0027+-0.0014*  damage -0.10+-0.05*  rendmaw_triggers +0.08+-0.01*  tokens_made +0.03+-0.01*
+        cards_drawn -0.01+-0.01*  drain_damage -0.01+-0.01  myriad_copies -0.05+-0.01*  final_life +0.05+-0.05*
+        turns_played -0.00+-0.00*
+  P(cast) 0.197   leg won at T20 0.2512
+
+PART 3  Wickerfolk: the graveyard cast (vs the card without it)
+  T10: won -0.0001+-0.0001  damage +0.01+-0.01  rendmaw_triggers +0.01+-0.00*  tokens_made +0.01+-0.00*
+        cards_drawn -0.00+-0.00*  drain_damage +0.00+-0.01  wickerfolk_gy_casts +0.01+-0.00*  wickerfolk_life_paid +0.03+-0.00*
+        final_life -0.04+-0.01*
+  T20: won +0.0003+-0.0010  damage +0.02+-0.03  rendmaw_triggers +0.02+-0.00*  tokens_made +0.02+-0.01*
+        cards_drawn -0.01+-0.00*  drain_damage +0.00+-0.01  wickerfolk_gy_casts +0.04+-0.00*  wickerfolk_life_paid +0.08+-0.01*
+        final_life -0.06+-0.05*  turns_played -0.00+-0.00*
+  P(cast) 0.179   leg won at T20 0.2481
+
+PART 3  Wickerfolk, life floor 6 (vs blank)
+  T10: won +0.0015+-0.0008*  damage +0.33+-0.04*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.06+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage -0.00+-0.01  wickerfolk_gy_casts +0.01+-0.00*  wickerfolk_life_paid +0.03+-0.00*
+        final_life -0.03+-0.03  turns_played -0.00+-0.00*
+  T20: won +0.0031+-0.0020*  damage +0.35+-0.07*  rendmaw_triggers +0.09+-0.01*  tokens_made +0.06+-0.01*
+        cards_drawn -0.05+-0.01*  drain_damage -0.01+-0.01  wickerfolk_gy_casts +0.04+-0.00*  wickerfolk_life_paid +0.09+-0.01*
+        final_life +0.03+-0.11  turns_played -0.03+-0.01*
+  P(cast) 0.179   leg won at T20 0.2478
+
+PART 3  Wickerfolk, life floor 14 (vs blank)
+  T10: won +0.0015+-0.0008*  damage +0.33+-0.04*  rendmaw_triggers +0.06+-0.00*  tokens_made +0.06+-0.01*
+        cards_drawn -0.00+-0.00  drain_damage -0.00+-0.01  wickerfolk_gy_casts +0.01+-0.00*  wickerfolk_life_paid +0.03+-0.00*
+        final_life -0.03+-0.03  turns_played -0.00+-0.00*
+  T20: won +0.0034+-0.0020*  damage +0.35+-0.07*  rendmaw_triggers +0.09+-0.01*  tokens_made +0.06+-0.01*
+        cards_drawn -0.05+-0.01*  drain_damage -0.00+-0.01  wickerfolk_gy_casts +0.03+-0.00*  wickerfolk_life_paid +0.07+-0.01*
+        final_life +0.05+-0.11  turns_played -0.03+-0.01*
+  P(cast) 0.178   leg won at T20 0.2481
+
