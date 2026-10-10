@@ -24,6 +24,15 @@ snapshot (§0z93), so one run reports both horizons. All legs share seeds
           Profound Journey is NOT compared with Restoration Seminar: Seminar
           is KNOWN_BLIND here -- unimplemented -- so that difference would be
           Journey against a dead card.
+
+  --h2h="A;B;C"  INSTEAD of the three parts above: REAL SWAPS on the
+          tables' seeds (5000..), every contender the owner kept (Furygale
+          Flocking, Profound Journey, Raphael's Technique, Immolating Gyre)
+          in place of each named cut, against the staged list. The cuts the
+          owner named on 2026-10-10: Verge Rangers, Lightning Greaves, Boros
+          Charm. `--package="cut>add;cut>add"` adds one leg with ALL those
+          swaps applied together, against the same base (§0p: staged changes
+          can interact, and a set is measured as a set).
 """
 import sys
 from multiprocessing import Pool
@@ -72,13 +81,39 @@ LEGS.append(("-Reforge +Raphael", _swap_many(DECK, ["Reforge the Soul"], [RAPH])
              {}, frozenset({RAPH.name})))
 
 
+H2H = next((tuple(a.split("=", 1)[1].split(";")) for a in sys.argv[1:]
+            if a.startswith("--h2h=")), ())
+PACKAGE = next((tuple(tuple(x.split(">")) for x in a.split("=", 1)[1].split(";"))
+                for a in sys.argv[1:] if a.startswith("--package=")), ())
+if H2H:
+    KEPT = (MOD.FURYGALE_FLOCKING, MOD.PROFOUND_JOURNEY,
+            MOD.RAPHAELS_TECHNIQUE, MOD.IMMOLATING_GYRE)
+    SEED = 5000
+    LEGS = [("base", DECK, {}, frozenset())]
+    COMPARE_H2H = []
+    for cut in H2H:
+        for c in KEPT:
+            leg = f"-{cut} +{c.name}"
+            LEGS.append((leg, _swap_many(DECK, [cut], [c]), {},
+                         frozenset({c.name})))
+            COMPARE_H2H.append((f"H2H  {leg}", leg, "base"))
+    if PACKAGE:
+        by = {c.name: c for c in MOD.BATCH_2026_10_09_SPELLS}
+        leg = "PACKAGE " + ", ".join(f"-{c} +{a}" for c, a in PACKAGE)
+        LEGS.append((leg, _swap_many(DECK, [c for c, _ in PACKAGE],
+                                     [by[a] for _, a in PACKAGE]),
+                     {}, frozenset(a for _, a in PACKAGE)))
+        COMPARE_H2H.append((leg, leg, "base"))
+
+
 def blank_of(card):
     return _blanks[tuple(sorted(card.cost.items()))]
 
 
-COMPARE = [(f"PART 1  {c.name} (vs blank, Monk's slot)", c.name, blank_of(c))
-           for c in CARDS]
-COMPARE += [
+COMPARE = [] if H2H else [
+    (f"PART 1  {c.name} (vs blank, Monk's slot)", c.name, blank_of(c))
+    for c in CARDS]
+COMPARE += COMPARE_H2H if H2H else [
     ("PART 2  Gyre, gyre_full_x 3  (vs blank)", "Gyre x3", blank_of(GYRE)),
     ("PART 2  Gyre, gyre_full_x 12 (vs blank)", "Gyre x12", blank_of(GYRE)),
     ("PART 3  Explosive Welcome - Searing Wind (same slot)",
@@ -111,6 +146,8 @@ def main():
         rows = np.array(p.map(job, range(n), chunksize=50), float)
     # rows: (n, legs, horizon, metric)
     idx = {leg[0]: i for i, leg in enumerate(LEGS)}
+    if H2H:
+        print("REAL SWAPS against the staged list, the tables' seeds.")
     print(f"Lorehold's second 2026-10-09 batch, staged list, N = {n:,} paired "
           f"games per comparison, seeds {SEED}.., 95% CIs. '*' = outside its "
           f"bar.\n")
