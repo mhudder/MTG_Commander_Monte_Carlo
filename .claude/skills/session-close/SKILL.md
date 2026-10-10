@@ -107,6 +107,8 @@ A new finding takes the next free letter in the `0*` series of
 in the code cite these ids, and `check_docs` verifies every one still lands.
 Add the index row in the same edit as the heading; `check_docs` enforces that
 the two sets match, in both directions.
+The row is a headline and its key number, **at most 250 characters**
+(`check_docs` enforces it): the index is read whole, the section is not.
 
 ## 5. Commit
 

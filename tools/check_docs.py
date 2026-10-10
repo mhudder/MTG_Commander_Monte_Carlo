@@ -156,6 +156,32 @@ def check_index_matches_headings(issues: str) -> Result:
         not bits, "; ".join(bits))
 
 
+# The index is how a session finds a section without reading the file, so it
+# is read whole; by 2026-10-10 its rows had grown to a median of 197
+# characters and a longest of 945 (45 KB of index). A row is a headline and
+# its key number; the rest is the section's job, one `tools.issue <id>` away.
+# 250, not 200: the rows between them carry a headline, a number AND the
+# consequence, and read well. Raising it is the owner's call, as with
+# CLAUDE_BUDGET.
+INDEX_ROW_MAX = 250
+
+
+def check_index_rows_short(issues: str) -> Result:
+    """Every KNOWN_ISSUES index row's finding text is at most INDEX_ROW_MAX.
+
+    BLIND TO, said out loud (§0z15): the id and status columns, which are
+    short by construction, and whether a short row is a GOOD summary of its
+    section -- only that it is short enough to scan.
+    """
+    rows = re.findall(r"^\|\s*\[([0-9a-z]+)\]\(#[0-9a-z]+\)\s*\|\s*.*?\s*\|"
+                      r"\s*(.*?)\s*\|\s*$", issues, re.M)
+    long = [f"§{sid} ({len(txt)})" for sid, txt in rows if len(txt) > INDEX_ROW_MAX]
+    return Result(f"KNOWN_ISSUES index rows are at most {INDEX_ROW_MAX} characters",
+                  not long,
+                  ("too long -- move the detail into the section: "
+                   + ", ".join(long)) if long else "")
+
+
 def check_doc_paths_exist(code_text: str) -> Result:
     """Every `docs/*.md` path named in code exists.
 
@@ -618,6 +644,7 @@ def run_all() -> list[Result]:
         check_sections_resolve(code_text, issues),
         check_doc_sections_resolve(docs, issues),
         check_index_matches_headings(issues),
+        check_index_rows_short(issues),
         check_doc_paths_exist(code_text),
         check_doc_xrefs(docs),
         check_commands_exist(docs),
@@ -658,6 +685,12 @@ MUTATIONS = {
         lambda code, issues, docs: (
             code, re.sub(r"^\|\s*\[0j\]\(#0j\).*$", "", issues, count=1,
                          flags=re.M), docs),
+    # The way the index grew: a measurement pasted into its row.
+    "an index row grows a paragraph":
+        lambda code, issues, docs: (
+            code, re.sub(r"^(\|\s*\[0j\]\(#0j\).*?)( \|\s*)$",
+                         lambda m: m.group(1) + " and then" * 40 + m.group(2),
+                         issues, count=1, flags=re.M), docs),
     "cite a docs/ path that does not exist":
         lambda code, issues, docs: (
             code + "\n# see docs/NO_SUCH_DOC.md\n", issues, docs),
@@ -702,6 +735,8 @@ MUTATIONS = {
 EXPECTED = {
     "cite an unknown section from code": {"every §id cited from code resolves"},
     "drop a heading's index row": {"KNOWN_ISSUES index matches its headings"},
+    "an index row grows a paragraph":
+        {f"KNOWN_ISSUES index rows are at most {INDEX_ROW_MAX} characters"},
     "cite a docs/ path that does not exist": {"every docs/ path cited from code exists"},
     "document a command that does not exist": {"every `python -m` command in the docs resolves"},
     "a live doc points at a moved file": {"every docs/ path named in a live doc exists"},
@@ -757,6 +792,7 @@ def mutate() -> int:
             check_sections_resolve(c, i),
             check_doc_sections_resolve(d, i),
             check_index_matches_headings(i),
+            check_index_rows_short(i),
             check_doc_paths_exist(c),
             check_doc_xrefs(d),
             check_commands_exist(d),
