@@ -16,6 +16,11 @@ Usage:
     deck, commander = build_pending("rendmaw", apply_pending=False)  # original
     ledger()                                       # print the diff
 
+    python -m edhmc.pending                  # checks, legality, one line per entry
+    python -m edhmc.pending --card Conqueror # the evidence for entries naming a card
+    python -m edhmc.pending --deck karlov    # the evidence for one deck
+    python -m edhmc.pending --full           # everything (the default until 2026-10-10)
+
 THE THREE STATES, which HANDOFF.md has always described and this module only
 had structures for two of:
 
@@ -72,6 +77,7 @@ SIMULATED -> STAGED -> COMMITTED, with WITHDRAWN beside STAGED.
 
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass, field
 
 from edhmc.decks import (rendmaw_v12, lorehold_v17, karlov_v2, tivit_v1,
@@ -5336,18 +5342,20 @@ def validate(deck, commander) -> None:
         f"{commander.name} appears in the 99 as well as the command zone")
 
 
-def print_proposals() -> None:
+def print_proposals(keep=None) -> None:
     """PROPOSED, grouped by deck. Printed last because it is the weakest state:
     verified card text and an argument, with no number attached to any of it."""
     # Only the proposals still AT the proposed state (§0z80): a Proposal whose
     # card has been measured, simulated or staged keeps its record, but is
     # listed where its card is now rather than as "nothing measured".
+    keep = keep or (lambda *_: True)
     where = {k: st for st, ks in funnel().items() for k in ks}
-    moved = [p for p in PROPOSED
+    mine = [p for p in PROPOSED if keep(p.deck, p.card)]
+    moved = [p for p in mine
              if where[(p.deck, p.card)] not in ("PROPOSED", "PREPARED",
                                                 "REJECTED")]
-    live = [p for p in PROPOSED if not p.rejected and p not in moved]
-    dead = [p for p in PROPOSED if p.rejected and p not in moved]
+    live = [p for p in mine if not p.rejected and p not in moved]
+    dead = [p for p in mine if p.rejected and p not in moved]
     print("\n" + "=" * 78)
     print(f"PROPOSED — oracle text verified, NOTHING MEASURED ({len(live)} live)")
     if moved:
@@ -5394,7 +5402,15 @@ def check_staged_are_classified() -> None:
                                    AB.partly_for(deck_name, deck))
 
 
-def ledger(verbose: bool = True) -> None:
+def ledger(verbose: bool = True, keep=None) -> None:
+    """The whole ledger, with the evidence behind every entry.
+
+    `keep(deck, *card_names)` limits the ENTRIES printed (`--deck`, `--card`);
+    the checks and the legality of every deck staged against still run in
+    full, because a filter that skipped a check would be a check that skips a
+    category (§0z15).
+    """
+    keep = keep or (lambda *_: True)
     print("=" * 78)
     print("PENDING DECK CHANGES — not yet written to the .xlsx files")
     print("=" * 78)
@@ -5411,7 +5427,11 @@ def ledger(verbose: bool = True) -> None:
             print(f"  {deck_name:<10} -> {len(deck) + 1} cards, "
                   f"singleton-legal, commander distinct")
     for deck_name in sorted({c.deck for c in CHANGES}):
-        rows = pending_for(deck_name)
+        rows = [c for c in pending_for(deck_name)
+                if keep(c.deck, c.remove, c.add)]
+        if not rows:
+            build_pending(deck_name)          # still validated, not printed
+            continue
         print(f"\n{deck_name.upper()}  ({len(rows)} change"
               f"{'s' if len(rows) != 1 else ''})")
         for c in rows:
@@ -5436,7 +5456,8 @@ def ledger(verbose: bool = True) -> None:
                     print(f"    recheck {c.reverified}")
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
-    if SIMULATED:
+    simulated = [r for r in SIMULATED if keep(r.deck, r.remove, r.add)]
+    if simulated:
         # BETWEEN THE STAGED AND THE MEASURED, which is where it sits in the
         # funnel (§0z79): real evidence, and no decision yet taken on it.
         print("\n" + "=" * 78)
@@ -5446,15 +5467,16 @@ def ledger(verbose: bool = True) -> None:
               "swap, paired on\n  common seeds. Staging one MOVES it to "
               "CHANGES. A row measured before an\n  engine change is only as "
               "current as that engine -- check `measured`.")
-        for deck_name in sorted({r.deck for r in SIMULATED}):
+        for deck_name in sorted({r.deck for r in simulated}):
             print(f"\n{deck_name.upper()}")
-            for r in [r for r in SIMULATED if r.deck == deck_name]:
+            for r in [r for r in simulated if r.deck == deck_name]:
                 print(f"  -{r.remove} +{r.add}   ({r.measured}"
                       + (f", {r.source}" if r.source else "") + ")")
                 print(f"     {r.result}")
                 if verbose and r.notes:
                     print(f"     note {r.notes}")
-    if MEASURED:
+    measured = [c for c in MEASURED if keep(c.deck, c.card)]
+    if measured:
         # PRINTED UNDER ITS OWN HEADING AND BELOW THE STAGED ONES, because the
         # single most useful thing this section can do is not be mistaken for
         # the section above it. A measured card is a number; a staged card is
@@ -5466,8 +5488,8 @@ def ledger(verbose: bool = True) -> None:
               "head-to-head\n  against a specific cut: everything here shares "
               "one baseline, so these\n  rows cannot be ranked against each "
               "other or against anything else (§0c).")
-        for deck_name in sorted({c.deck for c in MEASURED}):
-            rows = [c for c in MEASURED if c.deck == deck_name]
+        for deck_name in sorted({c.deck for c in measured}):
+            rows = [c for c in measured if c.deck == deck_name]
             # DERIVED: this used to print a literal "0 staged", which went
             # false the day the first measured card was staged.
             staged_adds = {ch.add for ch in CHANGES if ch.deck == deck_name}
@@ -5501,7 +5523,8 @@ def ledger(verbose: bool = True) -> None:
                     if c.verdict:
                         print(f"     read   {c.verdict}")
 
-    if WITHDRAWN:
+    withdrawn = [c for c in WITHDRAWN if keep(c.deck, c.remove, c.add)]
+    if withdrawn:
         # PRINTED, not silently dropped. The whole reason this list exists is
         # that an unstaged change leaves no trace anywhere else: it is out of
         # CHANGES, so `build_pending` ignores it, so no run and no table can
@@ -5515,7 +5538,7 @@ def ledger(verbose: bool = True) -> None:
               "not apply these,\n  so nothing below is in any deck, any run "
               "or any table. Each entry's\n  `why not` says what re-staging "
               "it would have to answer.")
-        for c in WITHDRAWN:
+        for c in withdrawn:
             print(f"\n{c.deck.upper()}")
             print(f"  - OUT  {c.remove}")
             print(f"  + IN   {c.add}")
@@ -5529,7 +5552,8 @@ def ledger(verbose: bool = True) -> None:
                     print(f"    recheck {c.reverified}")
             print(f"    why not {c.withdrawn}")
 
-    if COMMITTED:
+    committed = [c for c in COMMITTED if keep(c.deck, c.remove, c.add)]
+    if committed:
         # Azusa has NO .xlsx, so for that deck "committed" is two legs -- the
         # module and this ledger -- and the module alone is the system of
         # record. Said in the output rather than only in CLAUDE.md, because
@@ -5537,12 +5561,112 @@ def ledger(verbose: bool = True) -> None:
         print("\nCOMMITTED (in the deck module AND the .xlsx -- except azusa, "
               "which has\n           no .xlsx: its module alone is the system "
               "of record)")
-        for c in COMMITTED:
+        for c in committed:
             print(f"  {c.deck}: -{c.remove} +{c.add} ({c.staged})")
             if verbose and c.reverified:
                 print(f"    recheck {c.reverified}")
 
 
+def _clip(text: str, n: int) -> str:
+    """One line of at most n characters, keeping any leading indent."""
+    text = text or ""
+    indent = text[: len(text) - len(text.lstrip(" "))]
+    line = indent + " ".join(text.split())
+    return line if len(line) <= n else line[: n - 3] + "..."
+
+
+def _number(text: str) -> str:
+    """A result without its "REAL SWAP -X +Y, N=15,000 paired:" preamble,
+    which repeats the line above it and pushes the T20 figure off the end."""
+    import re
+    return re.sub(r"^\s*REAL SWAP[^:]*:\s*", "", text or "")
+
+
+def summary() -> None:
+    """One line per entry, and every check and legality line in full.
+
+    THE DEFAULT SINCE 2026-10-10. The full ledger printed 165 KB, half of it
+    the evidence behind seventy-odd MEASURED rows, and CLAUDE.md sends every
+    session here to check legality -- so every session paid about forty
+    thousand tokens to read three lines. The evidence is one flag away
+    (`--full`, `--deck`, `--card`); what this view drops is the prose, never
+    a check: the import-time checks, the cut classification and
+    `validate()` on EVERY deck run exactly as in `ledger()`. It is stricter
+    than `ledger()` in one place: that function prints legality only for
+    decks with something staged, and this one prints all of them.
+    """
+    print("LEDGER SUMMARY -- one line per entry. The evidence behind each:")
+    print("  python -m edhmc.pending --card NAME   (or --deck DECK, or --full)")
+    print()
+    print("Every staged and proposed cut, against tools/ablation.py's "
+          "classification (§0z31):")
+    for line in check_cuts_are_measured():
+        print(_clip(line, 150))
+    check_staged_are_classified()
+
+    print("\nLEGALITY, every deck with its staged changes applied")
+    for deck_name in sorted(DECKS):
+        deck, _cmd = build_pending(deck_name)
+        n = len(pending_for(deck_name))
+        print(f"  {deck_name:<10} -> {len(deck) + 1} cards, singleton-legal, "
+              f"commander distinct   ({n} staged)")
+
+    print(f"\nSTAGED ({len(CHANGES)}) -- in build_pending, not yet on all legs")
+    for c in sorted(CHANGES, key=lambda c: c.deck):
+        print(f"  {c.deck:<10} -{c.remove} +{c.add}   staged {c.staged}"
+              + ("; rechecked" if c.reverified else ""))
+
+    print(f"\nSIMULATED ({len(SIMULATED)}) -- a head-to-head, NO decision")
+    for r in sorted(SIMULATED, key=lambda r: r.deck):
+        print(f"  {r.deck:<10} -{r.remove} +{r.add}")
+        print(f"             {_clip(_number(r.result), 140)}")
+
+    staged_adds = {(c.deck, c.add) for c in CHANGES}
+    print(f"\nMEASURED ({len(MEASURED)}) -- a number, NOTHING decided "
+          f"(>> shortlisted, => staged)")
+    for c in sorted(MEASURED, key=lambda c: (c.deck, not c.shortlist, c.card)):
+        mark = (">>" if c.shortlist else
+                "=>" if (c.deck, c.card) in staged_adds else "  ")
+        print(f"  {mark} {c.deck:<10} {c.card:<34} "
+              f"{_clip(_number(c.win_rate), 70)}  [{c.signal}]")
+
+    if WITHDRAWN:
+        print(f"\nWITHDRAWN ({len(WITHDRAWN)}) -- unstaged, in no baseline")
+        for c in WITHDRAWN:
+            print(f"  {c.deck:<10} -{c.remove} +{c.add}   "
+                  f"{_clip(c.withdrawn, 70)}")
+
+    by_deck: dict[str, int] = {}
+    for c in COMMITTED:
+        by_deck[c.deck] = by_deck.get(c.deck, 0) + 1
+    print(f"\nCOMMITTED ({len(COMMITTED)}): "
+          + ", ".join(f"{d} {n}" for d, n in sorted(by_deck.items())))
+
+    where = {k: st for st, ks in funnel().items() for k in ks}
+    live = [p for p in PROPOSED if not p.rejected
+            and where[(p.deck, p.card)] in ("PROPOSED", "PREPARED")]
+    print(f"PROPOSED, still unmeasured ({len(live)}): "
+          + (", ".join(f"{p.card} ({p.deck})" for p in live) or "none"))
+
+
+def _filter(args: list[str]):
+    """`--deck D` and `--card NAME` (case-insensitive substring), ANDed."""
+    deck = args[args.index("--deck") + 1].lower() if "--deck" in args else ""
+    card = args[args.index("--card") + 1].lower() if "--card" in args else ""
+    if deck and deck not in DECKS:
+        raise SystemExit(f"no deck {deck!r}; decks are {', '.join(sorted(DECKS))}")
+
+    def keep(d: str, *names: str) -> bool:
+        return ((not deck or d == deck)
+                and (not card or any(card in n.lower() for n in names)))
+    return keep
+
+
 if __name__ == "__main__":
-    ledger()
-    print_proposals()
+    _args = sys.argv[1:]
+    if "--full" in _args or "--deck" in _args or "--card" in _args:
+        _keep = _filter(_args)
+        ledger(keep=_keep)
+        print_proposals(keep=_keep)
+    else:
+        summary()

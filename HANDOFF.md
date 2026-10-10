@@ -7,7 +7,7 @@ Where things live:
 
 | | |
 |---|---|
-| **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings, every runnable command. Regenerate with `python -m tools.status --write`. |
+| **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings. Regenerate with `python -m tools.status --write`, which also writes `docs/COMMANDS.md`, every runnable command discovered from disk. |
 | **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
 | **the rules** | `CLAUDE.md` — every standing rule in a few lines, with the `§` that holds its evidence. Claude loads it into every session, so it is kept short (`check_docs` enforces a byte budget). Its longer pre-2026-10-10 form is `docs/archive/CLAUDE_2026-10-10.md`. |
 | **what is queued** | `docs/QUEUE.md` — the open work items, under the numbers the issues cite them by. Closed items move to `docs/HISTORY.md`. |
@@ -56,7 +56,7 @@ The tree, since the 2026-09-09 reorganisation:
 `sys.path` instead of the root and the import fails.
 
 ```bash
-python -m edhmc.pending            # what's staged for each deck, and why
+python -m edhmc.pending            # what's staged for each deck (--card NAME for why)
 python -m tools.validate                 # harness self-check — must print +0.00 everywhere
 python -m tools.ablation karlov 6000 20  # rank every card in a deck
 python -m tools.audit_cards              # every card's data checked against Scryfall

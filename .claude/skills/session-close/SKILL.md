@@ -20,7 +20,8 @@ python -m tools.tag_flying --write      # if you added a card to any deck module
                                         # (needs Scryfall; check_docs fails
                                         # until it is run -- §0z29)
 python -m tools.cache_manifest --write  # ONLY if the caches were regenerated
-python -m tools.status --write          # always; it is cheap and fully derived
+python -m tools.status --write          # always; cheap, fully derived; writes
+                                        # STATUS.md and COMMANDS.md
 ```
 
 **If `check_docs` reports a SUSPECT cache, do not regenerate the tables.** A

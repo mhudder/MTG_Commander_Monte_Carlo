@@ -19,14 +19,15 @@ budget. Read the evidence only when you need it:
 
 | where | what |
 |---|---|
-| `docs/STATUS.md` | what is true now: tables, noise floors, caches, ledger, open findings, every runnable command. GENERATED (`python -m tools.status --write`), never hand-edited. Read it first. |
+| `docs/STATUS.md` | what is true now: tables, noise floors, caches, ledger, open findings. GENERATED (`python -m tools.status --write`), never hand-edited. Read it first. |
+| `docs/COMMANDS.md` | every tool, test and diagnostic, discovered from disk. GENERATED with STATUS.md. Look commands up; don't read it through. |
 | `docs/QUEUE.md` | the open queued work, by item number. Hand-kept. |
 | `KNOWN_ISSUES.md` | numbered findings and their evidence, `§0a` onward. Large: **use `tools.issue`, never read it whole.** |
 | `docs/HISTORY.md` | the dated narrative. Search it; do not read it. |
 | `docs/KNOBS.md` | every simulation knob. GENERATED. |
 | `docs/ARCHITECTURE.md` | how the modules connect, the opponents↔engine protocol, pitfalls. |
 | `HANDOFF.md` | human-facing orientation. |
-| `python -m edhmc.pending` | the ledger: the only trustworthy statement of what is staged. |
+| `python -m edhmc.pending` | the ledger: the only trustworthy statement of what is staged. Prints one line per entry; `--card NAME`, `--deck DECK` or `--full` for the evidence. |
 | `.claude/skills/` | `add-card` (Scryfall to committed swap), `session-close`, `parallel-rebuild` (one cloud session per deck, §0z94). |
 | `docs/archive/CLAUDE_2026-10-10.md` | this file before it was condensed, every finding with its full prose. |
 
@@ -55,7 +56,8 @@ also keeps `results/`, `docs/`, `spreadsheets/` resolving against the root.
 ```bash
 pip install -r requirements.txt
 python -m tools.status                     # what is true now, derived
-python -m edhmc.pending                    # staged changes; validates the lists
+python -m edhmc.pending                    # legality + one line per entry;
+                                           # --card NAME / --deck D / --full
 python -m tools.validate                   # A/A control + CRN measurement
 python -m tools.check_docs                 # do the docs still describe the repo?
 python -m tests                            # every pinned mechanism test
@@ -69,13 +71,12 @@ python -m tools.audit_cards                # every card vs Scryfall; expect 0 ER
                                            # the parallel-rebuild skill (§0z94)
 ```
 
-Every other entry point is in `docs/STATUS.md` under "What can be run",
-DISCOVERED FROM DISK, with a column marking which have a `--mutate` mode. A
+Every other entry point is in `docs/COMMANDS.md`, DISCOVERED FROM DISK, with a column marking which have a `--mutate` mode. A
 mutation run corrupts what it checks and asserts an EXACT set of failures, so
 a check that stops mattering is as loud as one that breaks. (This file used to
 hand-list them; the list had drifted from the tests on disk, which is §0q.)
 
-Generated files, regenerated with `--write`: `tools.status` (STATUS.md),
+Generated files, regenerated with `--write`: `tools.status` (STATUS.md and COMMANDS.md),
 `tools.knobs` (KNOBS.md), `tools.cache_manifest` (ABLATION_CACHES.md),
 `tools.tag_flying` (`decks/_evasion.py`), `tools.removal_census`
 (`decks/_removal.py`).

@@ -494,13 +494,19 @@ def generated_checks() -> list[Result]:
     without re-running the generator.
     """
     out = []
-    for label, module in (("docs/KNOBS.md", "tools.knobs"),
-                          ("docs/STATUS.md", "tools.status"),
-                          ("docs/ABLATION_CACHES.md", "tools.cache_manifest")):
+    # The third field is the function that renders the file: tools.status
+    # writes two docs, and checking only the one called `render` would leave
+    # docs/COMMANDS.md the generated file nothing checked (§0z15).
+    for label, module, fn in (("docs/KNOBS.md", "tools.knobs", "render"),
+                              ("docs/STATUS.md", "tools.status", "render"),
+                              ("docs/COMMANDS.md", "tools.status",
+                               "render_commands"),
+                              ("docs/ABLATION_CACHES.md", "tools.cache_manifest",
+                               "render")):
         try:
-            mod = __import__(module, fromlist=["render"])
-            if hasattr(mod, "render"):
-                body = mod.render()
+            mod = __import__(module, fromlist=[fn])
+            if hasattr(mod, fn):
+                body = getattr(mod, fn)()
             else:  # noqa: RET505
                 # cache_manifest.py builds its body inside main() and has no
                 # render(). Run it as a subprocess rather than refactor it:
