@@ -14,7 +14,7 @@ thing it already has most of. §0x then produced three candidates scoring
 WHY THIS NEEDS ITS OWN HARNESS AND NOT ARITHMETIC. A candidate's
 value-over-a-blank minus an incumbent's ablation score is NOT the swap. Both
 are measured against a common baseline with overlapping CIs, and this project
-has stopped two changes on exactly that rule (§0c Goldspan, §0e the Penance
+has stopped two changes on exactly that rule (queued item 0c, Goldspan; §0e the Penance
 slot). The swap has to be measured as the swap, with the cut card absent from
 one branch and present in the other, on the same seeds.
 

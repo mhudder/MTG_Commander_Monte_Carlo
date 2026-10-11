@@ -8,8 +8,13 @@ difference under common random numbers. That isolates "what does this card add
 over a replacement-level slot", which is directly comparable to the numbers
 `ablation.py` produces for cards already in the deck.
 
-So the cut decision is: is the candidate's score higher than the ablation score
-of your weakest card? If yes, the swap is justified whatever that card is.
+WHAT THIS DOES NOT DECIDE: the cut. A candidate row and an ablation row share
+a baseline, so "candidate score minus the weakest card's score" is not the
+swap and cannot rank the two (§0e). The swap also pays for what it cuts, and
+redundancy on the cut side can make it larger than either row suggests
+(§0z36). A row here earns a candidate a HEAD-TO-HEAD against a named cut, one
+paired `run_ab` with the cut in one leg and the candidate in the other; that
+run, not this table, is what a staging rests on.
 """
 import numpy as np
 
@@ -214,7 +219,7 @@ DECKS = {
     # Sylvan Library is still the most neutral row in the table, and keeping it
     # means these six and those seven are measured against the same 98 cards
     # and can be read against each other directly. A different victim would
-    # make the two batches two scales, and §0c already says a common baseline
+    # make the two batches two scales, and §0e already says a common baseline
     # cannot rank two cards -- changing the baseline as well would make it
     # worse, not better.
     "azusa4": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
@@ -222,7 +227,7 @@ DECKS = {
     # 2026-09-16 fifth batch. SAME VICTIM SLOT AGAIN (Sylvan Library), for
     # azusa4's reason: three batches on one slot are three sets of rows on one
     # scale, and changing the baseline would make them incomparable on top of
-    # the §0c limit that already stops a common baseline ranking two cards.
+    # the §0e limit that already stops a common baseline ranking two cards.
     "azusa5": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library",
                BATCH5_CANDIDATES),
     # 2026-10-03 sixth batch (§0z101): seven landfall payoffs. SAME VICTIM

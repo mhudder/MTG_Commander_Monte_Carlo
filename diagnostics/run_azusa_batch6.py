@@ -14,7 +14,7 @@ THE CUT IS THE OWNER'S (2026-10-03): Wayward Swordtooth, a MODEL-EVALUATED
 row (+0.0032 +-0.0030 at T20) whose job -- an extra land drop -- §0z99 found
 the deck does not lack: Exploration + Swordtooth together are +0.0065 against
 +0.0571 for the three cards that play lands from the top. Every swap below
-cuts the same card, so the seven rows share a baseline and §0c forbids
+cuts the same card, so the seven rows share a baseline and §0e forbids
 ranking them against each other by their bars; they are seven decisions, each
 against the same named cut.
 

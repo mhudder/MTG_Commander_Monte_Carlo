@@ -141,7 +141,7 @@ module is the system of record.
 **Measured does not become staged by being good.** It becomes staged by a
 head-to-head against a specific cut, because everything in `MEASURED` shares
 one baseline and a common baseline cannot rank two cards against each other
-(`KNOWN_ISSUES.md` §0c).
+(`KNOWN_ISSUES.md` §0e).
 
 The live counts are in `docs/STATUS.md`'s ledger table, derived from
 `edhmc/pending.py`, and the evidence behind each entry is
@@ -225,9 +225,10 @@ disagree, the project's own rule is to follow win rate.
   the three conclusions it invites you to draw wrongly. Short, and it has never
   needed updating, which is what a good doc looks like here.
 - **`docs/KNOBS.md`** — every simulation knob, GENERATED, with its default.
-- **`README.md`** — the methodology writeup (common random numbers, paired
-  inference, why they work). Trustworthy on technique; the numbers it quotes
-  predate several corrections and shouldn't be cited.
+- **`README.md`** — the landing page: what this is, the techniques in one
+  paragraph each, what the model cannot see, and the start-here commands. The
+  original methodology writeup, with its superseded September numbers, is
+  `docs/archive/README_2026-09.md`.
 - **`docs/HISTORY.md`** — the full dated narrative. Every correction, every
   bug, every "the model said X, it was wrong because Y." **Search it, don't
   read it**; several sections are explicitly marked VOID or SUPERSEDED.

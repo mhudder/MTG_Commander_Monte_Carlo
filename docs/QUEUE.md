@@ -28,7 +28,7 @@ What is closed and where it went:
     **+0.0113 ±0.0026 / +0.0145 ±0.0040**), both significant at BOTH horizons.
     **The real swap is SMALLER than the candidate row in both cases** — the
     candidate number is value over a blank in a freed slot, the swap also pays
-    for what it cut, and §0c says the swap is the number a decision rests on.
+    for what it cut, and §0e says the swap is the number a decision rests on.
     Tivit's numbers were re-measured on the post-§0z30 baseline (§0z33:
     +0.0133 / +0.0157, up inside their bars; the staging stands). Tivit's
     cut is a basic Plains (36 lands → 35) because that deck has no

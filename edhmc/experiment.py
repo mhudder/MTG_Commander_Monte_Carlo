@@ -121,8 +121,9 @@ DEFAULT_CFG = {
 # ---------------------------------------------------------------------------
 # Pod v2 — combat that actually kills (2026-09-04)
 # ---------------------------------------------------------------------------
-# Opt-in: dict(DEFAULT_CFG, **POD_V2). DEFAULT_CFG is untouched, so every
-# number in the project reproduces exactly until a run asks for this.
+# No longer opt-in: DEFAULT_CFG has carried these values (and POD_V3's
+# archetypes) since 2026-09-04, so `dict(DEFAULT_CFG, **POD_V2)` changes
+# nothing. To reproduce a number from before that date, use POD_V1 below.
 #
 #   combat_targeting="open"  creatures swing at the player who cannot block,
 #                            not at the scariest board (see opponents.combat_share)

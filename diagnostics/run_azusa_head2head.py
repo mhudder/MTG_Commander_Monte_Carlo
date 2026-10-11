@@ -2,7 +2,7 @@
 """Queued item 21: the azusa backlog, converted into a decision.
 
 Thirteen azusa cards sat in `MEASURED` with no cut named. A candidate row is
-value over a blank in a FREED slot, and §0c says a common baseline cannot
+value over a blank in a FREED slot, and §0e says a common baseline cannot
 rank two cards against each other -- so the two cards at the top of that
 backlog, Traveling Chocobo (+0.0291 +-0.0040) and Nissa, Resurgent Animist
 (+0.0285 +-0.0041), were a SET and not a ranking, 0.0006 apart. The cut is
@@ -10,14 +10,14 @@ Yavimaya Elder (+0.0023 +-0.0023, inside its own bar), MODEL-EVALUATED, the
 owner's choice.
 
 THREE RUNS, because two of them answer different questions and the third
-answers the one §0c says a shared baseline cannot:
+answers the one §0e says a shared baseline cannot:
 
   1. -Yavimaya Elder +Traveling Chocobo        does the swap beat the list?
   2. -Yavimaya Elder +Nissa, Resurgent Animist the same question, other card
   3. Chocobo -> Nissa IN Yavimaya's slot       which of the two is better?
 
 Run 3 is the one that ranks them: both legs are the same 99 other cards on
-the same seeds, so the difference is PAIRED and the §0c objection (two swaps
+the same seeds, so the difference is PAIRED and the §0e objection (two swaps
 against a common baseline have overlapping CIs) does not apply. It is the
 same measurement that settled Caldera Pyremaw over Galvanoth.
 
@@ -87,7 +87,7 @@ def main() -> int:
     print(f"\n=== 2. the real swap -{CUT} +{NISSA_RESURGENT_ANIMIST.name}")
     report("nissa", staged, cmd, CUT, NISSA_RESURGENT_ANIMIST, sim, n)
 
-    # 3. The ranking §0c says a shared baseline cannot give. A leg plays
+    # 3. The ranking §0e says a shared baseline cannot give. A leg plays
     # Chocobo in Yavimaya's slot, B leg plays Nissa there; everything else is
     # identical on the same seeds, so a significant difference RANKS them.
     print(f"\n=== 3. {TRAVELING_CHOCOBO.name} -> {NISSA_RESURGENT_ANIMIST.name} "

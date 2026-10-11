@@ -275,7 +275,6 @@ SCRIPTED_LOREHOLD = {
     # cut in no category (§0z31). A name here that is not in the measured
     # list is a NOTE, not a failure, by check_scripted_coverage's design.
     "Sensei's Divining Top", "Library of Leng", "Penance", "Scroll Rack",
-    "Verge Rangers",
     # Replaced Penance in the 2026-09-05 re-staging, having beaten Galvanoth
     # head to head (+0.0093 win at 20 turns). Implemented in full in
     # lorehold.apply_spell_effects: a +1/+1 counter FIRST, then damage equal
@@ -312,8 +311,9 @@ SCRIPTED_LOREHOLD = {
     # copy engines
     "Double Vision", "Arcane Bombardment", "Mizzix's Mastery",
     "Monastery Mentor", "Monument to Endurance",
-    # protection the opponent model respects
-    "Lightning Greaves", "Mother of Runes",
+    # protection the opponent model respects. Lightning Greaves and Verge
+    # Rangers left with v17 (committed out, 2026-10-10) and left this set.
+    "Mother of Runes",
     # cost reduction that scales with the graveyard / board
     # (Blasphemous Act moved to PARTLY_MODELLED 2026-09-12: it is a symmetric
     #  wipe, and those are derived into that category -- see symmetric_wipes().)

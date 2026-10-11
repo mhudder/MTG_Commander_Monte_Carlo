@@ -201,7 +201,7 @@ MEASURED: list[Candidate] = [
         rationale="Two flying Insects on a Scarecrow, and a delirium pump for the list's Insects and Spiders.",
         evidence="diagnostics/run_rendmaw_multitype.py, results/rendmaw_multitype_20261010.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pygmy Kavu's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates rendmaw3 --n=15000` (results/candidates_rendmaw3.txt). §0z125. swarmweaver_insects +0.41 a game, swarmweaver_pumped +0.31 (attackers pumped under delirium), tokens_made +0.39, damage +1.11 at T20. ITS TYPE LINE (vs itself as a one-type Creature, same slot): +0.0019 +-0.0015 at T20, +0.0022 +-0.0009 at T10 -- the Rendmaw trigger and the artifact half.",
         limits='A FLOOR: deathtouch is not modelled (§4).',
-        verdict='Significant at both horizons; with Dalek Squadron the top of the batch -- a set, not a ranking (§0c).',
+        verdict='Significant at both horizons; with Dalek Squadron the top of the batch -- a set, not a ranking (§0e).',
     ),
     Candidate(
         deck="rendmaw", card='Dalek Squadron', measured="2026-10-10",

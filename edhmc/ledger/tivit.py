@@ -40,7 +40,7 @@ MEASURED: list[Candidate] = [
         rationale="Mystery Booster Commander Edition (§0z74): implemented, pinned (tests/test_mbc.py) and measured 2026-09-29 against the deck's weakest MODEL-EVALUATED row. 0.84 Powerstones a game at T20, 1.54 Powerstone mana spent, +0.22 extra turns (the -1 untaps the Sieve 0.043 times, the -6 fetches it 0.10 times).",
         evidence='results/mbc_batch.txt (diagnostics/run_mbc.py); smoke in results/mbc_smoke.txt',
         limits='FLOOR: untapping anything but Time Sieve is not modelled.',
-        verdict="Significant at both horizons; the strongest tivit card here, comparable to Anointed Procession's staged +0.0145 in a different slot (not a ranking, §0c).",
+        verdict="Significant at both horizons; the strongest tivit card here, comparable to Anointed Procession's staged +0.0145 in a different slot (not a ranking, §0e).",
     ),
     Candidate(
         deck='tivit',

@@ -263,7 +263,7 @@ COMMITTED: list[Change] = [
     # Its MEASURED row -- a 2026-09-13 candidate row of +0.0291 +-0.0040 at
     # T20 against a blank -- was removed on commit, as check_measured_are_
     # promotable requires and as all four earlier azusa commits did. The
-    # number the decision rests on is the head-to-head below (§0c).
+    # number the decision rests on is the head-to-head below (§0e).
     Change(
         deck="azusa", remove="Yavimaya Elder", add="Traveling Chocobo",
         staged="2026-09-22",
@@ -309,7 +309,7 @@ COMMITTED: list[Change] = [
             "significant at BOTH horizons, against baselines of 0.1597 and "
             "0.3829. Damage +2.17 / +2.11, cards_drawn +0.80 / +1.07, "
             "final_life +1.55 / +2.76, stranded_mv +2.12 / +3.00. AND THE "
-            "RANKING §0c says a common baseline cannot give: Chocobo -> Nissa, "
+            "RANKING §0e says a common baseline cannot give: Chocobo -> Nissa, "
             "Resurgent Animist in this one slot, paired on the same seeds, is "
             "-0.0056 +-0.0029 at T10 and -0.0056 +-0.0040 at T20 -- this card "
             "was the better of the two at both horizons ON THAT ENGINE. The "
@@ -530,7 +530,7 @@ MEASURED: list[Candidate] = [
             "(ITEM 17 CLOSED 2026-09-22, §0z42: decking loses now and "
             "Guardian Project's draw is mandatory, so this row predates the "
             "rule and a staging would re-measure it.) "
-            "NOT A STAGING: §0c, it needs a head-to-head against a named cut, "
+            "NOT A STAGING: §0e, it needs a head-to-head against a named cut, "
             "and it shares the Sylvan Library baseline with thirteen others."),
     ),
     Candidate(
@@ -784,7 +784,7 @@ MEASURED: list[Candidate] = [
     # --- 2026-09-13 fourth batch, six cards. Measured in the SAME Sylvan
     # Library slot as the seven above and at the same N and horizon, so the
     # thirteen rows are on one scale -- which is also why none of them can be
-    # ranked against each other beyond their bars (§0c). §0z21.
+    # ranked against each other beyond their bars (§0e). §0z21.
     Candidate(
         deck="azusa",
         card="Nissa, Resurgent Animist",
@@ -827,7 +827,7 @@ MEASURED: list[Candidate] = [
             "-- Yavimaya Elder +0.0023, Wayward Swordtooth +0.0038, Titania "
             "+0.0050 -- by a wide margin. The proposed cut below is a "
             "PROPOSAL: pairing two rows that share a baseline is not a "
-            "measurement of the swap (§0c). "
+            "measurement of the swap (§0e). "
             "MEASURED EQUAL WITH TRAVELING CHOCOBO, 2026-09-20 (§0z35): a "
             "direct paired A/B in Yavimaya Elder's slot returns "
             "+0.0001 [-0.0039, +0.0041] at T20 in Nissa's favour. THE TWO BUY "
@@ -1210,7 +1210,7 @@ SIMULATED: list[Simulated] = [
     # AZUSA BATCH 6 (§0z101), 2026-10-03. The real swap against the OWNER'S
     # NAMED CUT, Wayward Swordtooth, N=15,000 paired, seeds 5000.., T10 read off
     # the T20 game. All seven cut the same card, so these rows share a baseline
-    # and §0c forbids ranking them by their bars; each is a decision against
+    # and §0e forbids ranking them by their bars; each is a decision against
     # Swordtooth, and none is taken.
     Simulated(
         deck='azusa', remove='Wayward Swordtooth', add='Elfsworn Giant',

@@ -38,7 +38,7 @@ had structures for two of:
 
 Measured does NOT become staged by being good. It becomes staged by a
 head-to-head against a specific cut, because everything in MEASURED shares a
-baseline and a common baseline cannot rank two cards against each other (§0c).
+baseline and a common baseline cannot rank two cards against each other (§0e).
 
 To stage a change, append to CHANGES. To commit, update the spreadsheet and
 the deck module, then move the entry to COMMITTED.
@@ -113,7 +113,7 @@ COMMITTED: list[Change] = gather("COMMITTED")
 # "this card was measured at this value in this slot", never as "this card is
 # going in". Promotion to CHANGES needs a head-to-head against a specific cut,
 # because everything here shares one baseline and therefore cannot be ranked
-# against anything else measured the same way (§0c).
+# against anything else measured the same way (§0e).
 # ---------------------------------------------------------------------------
 MEASURED: list[Candidate] = gather("MEASURED")
 
@@ -411,7 +411,7 @@ def check_shortlist_is_answerable():
 
       * SHORTLISTED WITH NO CUT NAMED is the state this flag was invented to
         replace. "These are the good ones" without a cut is exactly the
-        conversation that gets lost, and §0c is why naming the cut matters: a
+        conversation that gets lost, and §0e is why naming the cut matters: a
         candidate row and an ablation row share a baseline, so the pair CANNOT
         be subtracted to get the swap -- somebody has to run it.
       * A CUT THAT LEFT THE DECK. Proposed cuts age badly: the list moves
@@ -915,7 +915,7 @@ def ledger(verbose: bool = True, keep=None) -> None:
         print("  Not staged. No cut named. Promoting one of these needs a "
               "head-to-head\n  against a specific cut: everything here shares "
               "one baseline, so these\n  rows cannot be ranked against each "
-              "other or against anything else (§0c).")
+              "other or against anything else (§0e).")
         for deck_name in sorted({c.deck for c in measured}):
             rows = [c for c in measured if c.deck == deck_name]
             # DERIVED: this used to print a literal "0 staged", which went

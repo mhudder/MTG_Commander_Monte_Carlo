@@ -179,6 +179,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**: Furygale Flocking leads, +0.0556 ±0.0046 at T20, then Profound Journey, Raphael's Technique, Immolating Gyre. Three STAGED by the owner (+0.0773 at T20); two committed in v17 |
 | [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**: The Swarmweaver +0.0074, Dalek Squadron +0.0071, Fire Navy Trebuchet and Wickerfolk significant; H.E.R.B.I.E. inside its bar. **A second card type is worth about +0.002** on each |
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
+| [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -1912,7 +1913,7 @@ Ephemerate case immediately.
 **None of these is a staging.** A candidate score minus an ablation score is
 not a swap: three swaps against a common baseline have overlapping CIs and
 cannot be ranked against each other — the rule that decided the Penance slot
-(§0e) and stopped Goldspan Dragon (§0c). Anything moving needs a HEAD-TO-HEAD
+(§0e) and stopped Goldspan Dragon (queued item 0c). Anything moving needs a HEAD-TO-HEAD
 against the specific card it would replace.
 
 **And three of the seven are REDUNDANT with each other and with the deck.**
@@ -2500,7 +2501,7 @@ legs removes nothing the engine was modelling). Deck noise floor ±0.0029.
 
 **THE TOP FOUR ARE A SET, NOT A RANKING.** +0.0217, +0.0215, +0.0197 and
 +0.0170 all sit inside each other's bars, and they share a baseline, so they
-cannot be ordered against each other — §0c's standing point. Placed against
+cannot be ordered against each other — §0e's standing point. Placed against
 the deck's own table they land around Oracle of Mul Daya (+0.0221), Harmonize
 (+0.0220) and Courser of Kruphix (+0.0197): top-fifteen cards, not top-five.
 
@@ -3913,7 +3914,7 @@ Yavimaya Elder +0.0023 ±0.0023, Wayward Swordtooth +0.0038 ±0.0029, Titania
 bottom of this list as much as about these cards, and it is the same shape §0z4
 found: **the top two are a SET, not a ranking** — Chocobo and Nissa are 0.0006
 apart against bars of 0.0040, and both sit inside the bars of Rampaging
-Baloths, Tireless Tracker, Ancient Greenwarden and Nissa, Vastwood Seer. §0c.
+Baloths, Tireless Tracker, Ancient Greenwarden and Nissa, Vastwood Seer. §0e.
 
 ### Why the top two win, in one sentence each
 
@@ -4049,7 +4050,7 @@ or more land drops are the ones whose rows sit at the bottom, and they sit
 there for a reason that is explainable rather than statistical.
 
 **NONE OF THIS IS EVIDENCE FOR THE SWAP, and the arithmetic that looks like it
-is is the §0c error.** A candidate row and an ablation row share a baseline;
+is is the §0e error.** A candidate row and an ablation row share a baseline;
 subtracting them does not give the swap. Each pair needs its own paired run
 before anything is staged.
 
@@ -4568,7 +4569,7 @@ payoffs COUNT tokens is a real cost this policy pays.
 **Both real swaps are SMALLER than their candidate rows** — Conqueror +0.0328 →
 +0.0247, Procession +0.0291 → +0.0145 — because the candidate number is value
 over a blank in a FREED slot and the swap also pays for what it cut.
-Procession loses half, and that half is the land. §0c is the rule; this is what
+Procession loses half, and that half is the land. §0e is the rule; this is what
 it costs in practice.
 
 Soulmender is the cheapest cut in the karlov list, checked rather than assumed:
@@ -5133,7 +5134,7 @@ proposals), a card already measured (§0z26 again), behaviour that attaches
 by NAME rather than by `script=` (§0z25), a doubler said in one token path
 of two (§0z4), a generated evasion file never regenerated (§0z29), a draw
 inserted one indentation from its neighbour (§0z28), a mutation set written
-after the run, a candidate row read as a swap (§0c), and a cut whose row was
+after the run, a candidate row read as a swap (§0e), and a cut whose row was
 never evidence (§0z31).
 
 **Writing it added 22 §-pointers to a document, which is 22 more things that
@@ -5181,7 +5182,7 @@ its own bar — and MODEL-EVALUATED, so its row is evidence (§0z31).
 | −Yavimaya Elder +Nissa, Resurgent Animist | +0.0280 [+0.0249, +0.0312] | +0.0266 [+0.0223, +0.0309] |
 | Chocobo → Nissa in that slot | +0.0027 [−0.0005, +0.0060] | **+0.0001 [−0.0039, +0.0041]** |
 
-**Run 3 is the one that settles it, and it is the measurement §0c says a
+**Run 3 is the one that settles it, and it is the measurement §0e says a
 common baseline cannot give**: both legs play the same 99 other cards on the
 same seeds, so the difference between the two candidates is PAIRED and their
 CIs do not have to overlap-by-construction. It is the same measurement that
@@ -5270,7 +5271,7 @@ is the answer the item did not expect: two of three survive.
 
 **Which of the two is the cut is not a number question — their bars overlap**
 (−0.0044 ±0.0020 against −0.0053 ±0.0021 at the text-alone endpoint, a
-difference of 0.0009 inside either bar). §0c's rule applies to them as much as
+difference of 0.0009 inside either bar). §0e's rule applies to them as much as
 to two candidates: these are two leave-one-out rows against a common baseline
 and they cannot be ranked against each other. So the tie-break is MECHANISM,
 and it is one-sided:
@@ -5380,7 +5381,7 @@ plausible and neither is measured.
 
 +0.0168 ±0.0030 at T20 — **LARGER than its own candidate row of +0.0129
 ±0.0024**, and the inversion is the point. A real swap is normally SMALLER
-than the candidate row because it also pays for what it cut (§0c, and every
+than the candidate row because it also pays for what it cut (§0e, and every
 staged swap in the ledger). It is larger here because the cut is worth LESS
 than a blank: removing the Boots adds value on its own. **When the cut is a
 significantly-negative row, the swap is the candidate row PLUS the cut, not
@@ -6247,7 +6248,7 @@ Real swap `-Swiftfoot Boots +Ginger`, N=15,000 paired, same seeds, base =
 
 Candidate row against a blank in the same slot: +0.0059 ±0.0027.
 
-**AND THE RANKING, which §0c says a common baseline cannot give.** Bloodthirsty
+**AND THE RANKING, which §0e says a common baseline cannot give.** Bloodthirsty
 Conqueror → Ginger in that one slot, paired on the same seeds, built the way
 §0z36 built the Conqueror's own +0.0401 (Soulmender restored to get the
 pre-swap list): **−0.0247 ±0.0029 at T10 and −0.0210 ±0.0034 at T20**,
@@ -7066,7 +7067,7 @@ nothing reads is a loaded gun).
 
 ## 0z53. MEASURED — Goldspan Dragon's head-to-heads (queued 0c)
 
-§0c said its significant row was not a staging. The paired runs it asked for,
+Queued item 0c said its significant row was not a staging. The paired runs it asked for,
 N=15,000, on the staged list after §0z49 and §0z50:
 
 | swap | T10 win | T20 win | T20 damage |
@@ -7845,7 +7846,7 @@ leaving -- and the owner KEPT the Boots on 2026-09-26. Both karlov cards sit
 well below Bloodthirsty Conqueror's +0.0401 against the same cut.
 
 **Nothing is staged.** Whether any of these goes in is the owner's call
-(§0c), and a card that shares a slot with another in this table needs its own
+(§0e), and a card that shares a slot with another in this table needs its own
 head-to-head against that one before the two are ranked.
 
 **RE-MEASURED 2026-09-29, after §0z75-§0z77 moved karlov, shilgengar and
@@ -8053,7 +8054,7 @@ re-rendered, the other five are rebuilt anyway for §0z75–§0z77.
 **THE EVIDENCE FOR THE OWNER'S OPEN DECISIONS WAS FILED AS MEASURED.** 23
 head-to-heads with no staging existed, and 20 of them lived in a Candidate's
 `win_rate` string -- the one state this ledger says is never decision
-evidence (§0c). Among them are all twelve §0z74 Mystery Booster rows, which
+evidence (§0e). Among them are all twelve §0z74 Mystery Booster rows, which
 are exactly the decisions the owner has on hold. They are `Simulated` records
 now, generated from those strings verbatim, plus three that only existed in
 other entries' prose: karlov's −Swiftfoot Boots +Bloodthirsty Conqueror and
@@ -9189,7 +9190,7 @@ the Sylvan Library slot is `results/candidates_azusa_batch6_T20.txt`.
 | *anchor:* Sapling Nursery | | | +0.0189 ±0.0036 | was +0.0170 ±0.0034 (2026-09-10) |
 
 All seven swaps are significant at T20 and all but Elfsworn Giant at both
-horizons. They share one cut, so §0c forbids ranking them by their bars: the
+horizons. They share one cut, so §0e forbids ranking them by their bars: the
 TOP SET is Mole Man, Mossborn Hydra, Chocobo Racetrack and Glacier Godmaw,
 within 0.009 of each other at T20 with overlapping bars, and only a direct
 paired run orders two of them. **The swap and the blank row agree to within
@@ -11060,7 +11061,7 @@ T20 row is `python -m tools.candidates lorehold4 --n=15000`
 | Explosive Welcome | +0.0018 ±0.0008 | +0.0038 ±0.0016 | 0.175 | spell damage +1.37; its mana survived 0.16 a game |
 
 **All seven are significant at both horizons.** The top of a candidate
-batch is a set, not a ranking (§0c) -- but the paired comparisons below
+batch is a set, not a ranking (§0e) -- but the paired comparisons below
 are rankings, and Furygale is outside the bar of everything here.
 
 **Furygale is the largest candidate row lorehold has had** (Prisoner's
@@ -11095,7 +11096,7 @@ a third at most.
 ### The owner's verdicts, measured
 
 The owner judged each card before any number existed. Two cards in the
-same slot on the same seeds are a paired head-to-head (§0c, §0z35):
+same slot on the same seeds are a paired head-to-head (§0e, §0z35):
 
 | the owner's call | measured, T10 / T20 | |
 |---|---|---|
@@ -11250,7 +11251,7 @@ blank of its cost, T10 read off the T20 game.
 | H.E.R.B.I.E., Lovable Robot | −0.0001 ±0.0009 | +0.0013 ±0.0020 | 0.209 | 0.07 surveils a game |
 
 **Four are significant at both horizons; H.E.R.B.I.E. is inside its bar at
-both** -- unmeasured, not bad. The top two are a set, not a ranking (§0c).
+both** -- unmeasured, not bad. The top two are a set, not a ranking (§0e).
 For scale, the T20 column of `ablation_rendmaw.txt` puts Arasta of the
 Endless Web at +0.0073 and Scrap Trawler at +0.0070 (leave-one-out, so the
 comparison is of size, not a head-to-head).
@@ -11290,7 +11291,7 @@ a 4/3 for four that triggers Rendmaw.
 ### What would decide a swap
 
 Nothing is staged: a candidate row is value over a blank in a freed slot,
-and a swap pays for its cut (§0c). Staging needs the owner's cuts and a
+and a swap pays for its cut (§0e). Staging needs the owner's cuts and a
 head-to-head on the tables' seeds, as §0z124 did for lorehold. Rendmaw's
 cache is SUSPECT (§0z124's wipe-share move), so its table is a guide to the
 cut side, not a measurement on today's list.
@@ -11357,6 +11358,63 @@ Before `--verified`, play the list the cache measured, at 2,000+ seeds.
 parallel-rebuild skill (§0z94), which would have taken about the slowest deck's
 time. `tools/regen_tables.sh` now says so when it is given more than one deck,
 and CLAUDE.md names the skill as the method and series as the fallback.
+
+<a id="0z127"></a>
+
+## 0z127. FIXED — a generated doc stale by construction, and a citation into the wrong namespace
+
+**2026-10-11**, a review of `c72377e` (= `main`). Two defects in the checks
+and the docs; no simulation code changed.
+
+**1. `check_docs` was red on `main`, and the closing protocol made it so.**
+`docs/STATUS.md`'s table list ends each row in the table's last-commit date
+and an "(uncommitted edits)" flag, both read from git (`tools/status.py`'s
+`last_commit` and `dirty`), not from the table. The protocol writes STATUS.md
+and then commits; a commit that also rebuilt a table moves that table's date
+and clears its flag the instant it lands, so its own STATUS.md is stale. This
+is the bug `tools/_generated.comparable` already fixed for the provenance ref,
+in a second cell nobody had masked. `c72377e` (§0z126's rebuild) was committed
+that way: four rows read `(uncommitted edits)`. The fix masks that last cell
+of an `ablation_<deck>.txt` row in the comparison only. N, horizons, noise
+floor and row counts still compare, so a rebuilt table is still caught.
+**Blind to:** a table re-committed with every printed figure unchanged, which
+is not staleness. Pinned by `tests/test_generated_compare.py`: removing the
+mask breaks B only, and widening it to the whole row breaks C and E, exactly.
+
+**2. `§0c` named the wrong evidence for the rule CLAUDE.md states first among
+its statistics.** "Never rank two rows measured against a common baseline"
+was cited as §0c in CLAUDE.md, HANDOFF.md, the add-card skill, the ledger,
+`pending.py`, ten diagnostics and this file: 55 lines. §0c is the
+candidate flying-tag bug. The rule's evidence is **§0e** (the Penance slot:
+three overlapping CIs, settled by a head-to-head). The slip dates from
+`d158724`: queued work item **0c** was Goldspan's head-to-head, the work that
+rule stopped, and "0c" crossed from `docs/QUEUE.md`'s namespace into this
+file's. `check_docs` verifies that a cited id RESOLVES, and §0c does, so
+nothing could see it. Every citation that meant the rule now reads §0e. Four
+that meant queued item 0c say so. Three that mean the flying-tag bug keep
+§0c. `docs/HISTORY.md` and `docs/archive/` are dated and left as written.
+**The lesson:** two id namespaces with the same spelling (`0c` the item, `§0c`
+the finding) make a resolving citation wrong without any check failing. A
+queue item is "item 0c", never "§0c".
+
+**Also in this change:** `tools/candidates.py`'s docstring said a candidate
+beating "the ablation score of your weakest card" justified the swap, which
+is the comparison §0e forbids. It now says a row earns a head-to-head. The
+README, unrevised since before pod v3 (three engines, tools at the root, a
+banner calling every table unregenerated), was archived as
+`docs/archive/README_2026-09.md` and replaced by a short landing page.
+`SCRIPTED_LOREHOLD` dropped Lightning Greaves and Verge Rangers, both
+committed out in v17. `experiment.py`'s POD_V2 comment no longer calls it
+opt-in.
+
+**The caches.** `tools/ablation.py` and `edhmc/experiment.py` are in every
+fingerprint, so all six active caches went SUSPECT on comments and a
+classification set. Cleared by the CLAUDE.md recipe against a worktree at
+`c72377e`, with the remedy matched to what moved (§0z27):
+`check_unchanged_decks` at **2,000 seeds** (§0z126's floor) read
+**BIT-IDENTICAL on all 8 metrics for all six active decks** (trostani is SUSPENDED); `build_pending` produced byte-identical lists
+(full `Card` repr, all seven decks); and every table re-rendered from its
+cache was byte-identical to the committed one.
 
 ## How to read an ablation table
 

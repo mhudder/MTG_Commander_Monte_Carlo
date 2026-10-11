@@ -51,7 +51,7 @@ class Candidate:
     A Candidate is deliberately WEAKER than a Change. It names no cut, because
     choosing one is the decision this state has not taken; `ablation.py` scores
     the cut side and `candidates.py` scores the add side, and pairing them is a
-    head-to-head run, not an inference (§0c). Promoting one means writing a
+    head-to-head run, not an inference (§0e). Promoting one means writing a
     Change with a `remove`, and that needs its own evidence.
     """
     deck: str
@@ -77,7 +77,7 @@ class Candidate:
     # Candidate deliberately does not. It is a PROPOSAL and the number attached
     # to this row is NOT evidence for it: an ablation row and a candidate row
     # share a baseline and therefore cannot be subtracted from one another
-    # (§0c). `check_shortlist_is_answerable()` enforces what can be enforced --
+    # (§0e). `check_shortlist_is_answerable()` enforces what can be enforced --
     # that the named cut is really in the deck.
     shortlist: str = ""         # why it is shortlisted; empty = it is not
     proposed_cut: str = ""      # the cut a head-to-head should test it against

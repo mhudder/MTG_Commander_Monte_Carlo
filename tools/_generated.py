@@ -47,6 +47,20 @@ import subprocess
 _PROVENANCE = re.compile(
     r"(Derived at|Fingerprints recorded at|Generated at) `[0-9a-f]{7,40}`")
 
+# The SECOND git-state fact a generated doc prints, and the same bug as the
+# ref. STATUS.md's table list ends each row in the table's last-commit date
+# and an "(uncommitted edits)" flag -- both read from git, not from the table.
+# The closing protocol writes STATUS.md and THEN commits, so a commit that
+# rebuilt a table made its own STATUS.md stale: the date moves and the flag
+# drops the instant the commit lands. c72377e was committed that way, red.
+# Anchored on a row naming an `ablation_<deck>.txt` and on the last cell only:
+# N, horizons, noise floor and row counts are read off the table itself and
+# must keep comparing, so a rebuilt table is still caught. BLIND TO: a table
+# re-committed with every printed figure unchanged -- which is not staleness.
+_TABLE_DATE = re.compile(
+    r"^(\| \w+ \| `ablation_\w+\.txt` \|.*\| )"
+    r"\d{4}-\d{2}-\d{2}(?: \*\(uncommitted edits\)\*)? \|$", re.M)
+
 
 def head() -> str:
     """Short git ref of HEAD, or 'unknown' outside a repo."""
@@ -61,10 +75,13 @@ def head() -> str:
 def comparable(text: str) -> str:
     """A generated doc with the volatile bits masked, for equality testing.
 
-    Masks the git ref in the provenance line and normalises trailing newlines.
+    Masks the git ref in the provenance line and the last-commit cell of each
+    ablation-table row (`_TABLE_DATE`), and normalises trailing newlines.
     Everything else -- every row, every number, every name -- still compares.
     """
-    return _PROVENANCE.sub(r"\1 `<ref>`", text).rstrip("\n") + "\n"
+    text = _PROVENANCE.sub(r"\1 `<ref>`", text)
+    text = _TABLE_DATE.sub(r"\1<date> |", text)
+    return text.rstrip("\n") + "\n"
 
 
 def implements_mutate(path: str) -> bool:

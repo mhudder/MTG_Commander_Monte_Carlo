@@ -135,7 +135,7 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   identically to a matching blank.
 - **Ignore anything inside its own error bars** (`signal` reads `--`). The top
   of a table is a SET, not a ranking.
-- **§0c: never rank two rows measured against a common baseline.** Put one card
+- **§0e: never rank two rows measured against a common baseline.** Put one card
   in the A leg and the other in the same slot of the B leg: one `run_ab` call,
   paired, same cost (§0z35). And the real decision is the SWAP, not the
   candidate row.
@@ -249,6 +249,10 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   Read `$?` only from a command that was not piped.
 - **A tool that says it reproduces another tool's number must reproduce it**
   (§0z35). Make reproducing the baseline one of its rows.
+- **A citation that resolves can still be wrong** (§0z127). A queue item is
+  "item 0c", never "§0c": the same spelling in two namespaces sent the
+  common-baseline rule's citations to an unrelated section, and every check
+  passed.
 - **A note that says something is infeasible is a claim with a date on it**
   (§0z13). After an engine change of §0z8's size, grep the issues for
   "cannot" and "not possible".

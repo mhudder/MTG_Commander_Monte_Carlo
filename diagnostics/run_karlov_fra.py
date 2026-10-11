@@ -12,7 +12,7 @@ PREVIEW TEXT: Reality Fracture releases 2026-10-02 and this was fetched on
                        Boots are ONE SLOT that the Conqueror already wants.
                        A new card is only worth that slot if it beats the
                        Conqueror in it, and a shared baseline cannot say
-                       (§0c) -- this can, because both legs put a card in the
+                       (§0e) -- this can, because both legs put a card in the
                        same slot on the same seeds.
 
 BASELINE. `build_pending("karlov")` applies both staged changes, so the

@@ -11,7 +11,7 @@ comparison is paired on the same seeds:
                  row is the check that this reproduces the committed table.
   Scrollwielder  in Caldera Pyremaw's slot, lifelink on vs off (the clause
                  patched out in each worker), and against Caldera itself.
-  Goldspan       in Caldera's slot, and for the two cuts §0c named.
+  Goldspan       in Caldera's slot, and for the two cuts queued item 0c named.
   Ranger of Eos  the tutor vs its old `draw2`, and its row both ways.
 
 Lurrus's hybrid pips (§0z52) are diagnostics/run_lurrus_hybrid.py.

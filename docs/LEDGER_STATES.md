@@ -139,7 +139,7 @@ can't see it" cannot.
 ## Five rules that fall out of the split
 
 **1. A MEASURED number is never decision evidence.** It is a screen. The
-decision rests on SIMULATED. This is §0c, restated for the new boundary:
+decision rests on SIMULATED. This is §0e, restated for the new boundary:
 cards sharing a baseline have overlapping CIs by construction and cannot be
 ranked against one another.
 

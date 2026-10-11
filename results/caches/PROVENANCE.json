@@ -380,7 +380,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_azusa.txt.",
+        "fingerprint": "d30e674650191925",
+        "utc": "2026-10-11T15:11:15Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "0ebe28e2a348c07b",
@@ -691,6 +698,12 @@
         "evidence": "2026-10-10, \u00a70z125 (rendmaw multi-type batch: engine.py, _evasion.py and tag_flying.py moved every fingerprint). check_unchanged_decks --n=3000, a worktree at bd9e7ae (the cache's built commit) against the working tree with the batch in: karlov BIT-IDENTICAL on all 8 metrics. Also against HEAD c69d6cc at the default N: all six active decks bit-identical.",
         "fingerprint": "9b97a9669068b7ba",
         "utc": "2026-10-10T02:04:55Z"
+      },
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_karlov.txt.",
+        "fingerprint": "09561424e7da1888",
+        "utc": "2026-10-11T15:11:14Z"
       }
     ]
   },
@@ -1017,7 +1030,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_lorehold.txt.",
+        "fingerprint": "611b6b62ed4215a2",
+        "utc": "2026-10-11T15:11:14Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "08632e094e2bf826",
@@ -1320,7 +1340,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_rendmaw.txt.",
+        "fingerprint": "04ce698d7705d6fc",
+        "utc": "2026-10-11T15:11:14Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "e8df47d6680937d6",
@@ -1665,7 +1692,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_shilgengar.txt.",
+        "fingerprint": "96ba6d40c76529c2",
+        "utc": "2026-10-11T15:11:14Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "d30fa7936e87ad23",
@@ -1957,6 +1991,12 @@
         "evidence": "2026-10-10, \u00a70z125 (rendmaw multi-type batch: engine.py, _evasion.py and tag_flying.py moved every fingerprint). check_unchanged_decks --n=3000, a worktree at bd9e7ae (the cache's built commit) against the working tree with the batch in: tivit BIT-IDENTICAL on all 8 metrics. Also against HEAD c69d6cc at the default N: all six active decks bit-identical.",
         "fingerprint": "e51707042caf3f71",
         "utc": "2026-10-10T02:04:55Z"
+      },
+      {
+        "commit": "c72377e",
+        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_tivit.txt.",
+        "fingerprint": "1f58ab99cb1a18ce",
+        "utc": "2026-10-11T15:11:14Z"
       }
     ]
   },

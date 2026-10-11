@@ -225,7 +225,7 @@ Read it with its bar and signal (`--` is unmeasured, not bad). Record a
 `verdict` saying what the number supports. A top-set card whose counter
 barely fires is an engine blank: suspect the engine.
 
-**A candidate row is not a swap** (§0c). Staging needs the real swap against
+**A candidate row is not a swap** (§0e). Staging needs the real swap against
 a named cut, same seeds, both horizons, written as a diagnostic
 (`diagnostics/run_karlov_conqueror.py` is the shape):
 

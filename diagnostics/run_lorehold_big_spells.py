@@ -16,7 +16,7 @@ snapshot (§0z93), so one run reports both horizons. All legs share seeds
           against the default 6 -- how much of the row is the judgement.
 
   PART 3  THE OWNER'S COMPARISONS, measured rather than argued. Two cards in
-          the SAME slot on the SAME seeds are a paired head-to-head (§0c,
+          the SAME slot on the SAME seeds are a paired head-to-head (§0e,
           §0z35): Explosive Welcome minus Searing Wind ("a weaker Searing
           Wind"), Gideon's Phalanx minus Furygale Flocking ("weaker than
           Flocking usually"). And `-Reforge the Soul +Raphael's Technique`

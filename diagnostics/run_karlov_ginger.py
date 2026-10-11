@@ -14,7 +14,7 @@ Two runs, both paired on the same seeds:
      Bloodthirsty Conqueror +0.0401 +-0.0037 and Alhammarret's Archive
      +0.0168 +-0.0030 at T20.
 
-  2. THE DIRECT RANKING, which §0c says a common baseline cannot give: the
+  2. THE DIRECT RANKING, which §0e says a common baseline cannot give: the
      Conqueror in the A leg and Ginger in the SAME slot of the B leg, so the
      difference is paired rather than inferred. POSITIVE = Ginger is better.
 
@@ -52,7 +52,7 @@ def legs(label):
     if label == "real-swap":
         return staged, [CUT], [catalog[ADD]], cmd
     if label == "vs-the-rival":
-        # THE SAME SLOT, which is the only comparison §0c allows between two
+        # THE SAME SLOT, which is the only comparison §0e allows between two
         # cards. The first version of this leg passed outs=[CUT, RIVAL] against
         # the staged list, which already HOLDS the Conqueror -- it swapped the
         # Boots for a second copy of him and then swapped one of the two away.

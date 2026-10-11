@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Two candidates for ONE azusa slot, ranked by a paired run (§0c, §0z35).
+"""Two candidates for ONE azusa slot, ranked by a paired run (§0e, §0z35).
 
     python -m diagnostics.run_slot_pair 15000 "Life from the Loam" \\
         "Mossborn Hydra" "Nissa, Resurgent Animist" \\
@@ -8,7 +8,7 @@
 Three lists on the same seeds (5000..): the staged list, the list with card
 A in the cut's EXACT position, and the list with card B there. So each
 swap's number is the real swap, and B minus A is measured directly rather
-than inferred from two rows that share a baseline -- the comparison §0c
+than inferred from two rows that share a baseline -- the comparison §0e
 forbids and this run makes. One T20 game per list per seed, T10 read off it
 (§0z93). The cards' own mechanism counters print beside the objective.
 """

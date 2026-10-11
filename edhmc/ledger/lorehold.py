@@ -196,7 +196,7 @@ MEASURED: list[Candidate] = [
             '+-0.0012 / -0.0108 +-0.0027 (Caldera is better).'),
         signal='both',
         rationale=('Queued item 0c: its leave-one-out row was significant at all three '
-            'horizons in 2026-09-06, and §0c says a standalone row is not a staging. '
+            'horizons in 2026-09-06, and §0e says a standalone row is not a staging. '
             'These are the head-to-heads it asked for, against the two cuts that '
             'history named and against the card holding the five-drop slot.'),
         evidence='results/text_fixes.txt (diagnostics/run_text_fixes.py)',

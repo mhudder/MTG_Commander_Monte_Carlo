@@ -41,7 +41,7 @@ intuition that "screening is expensive".**
    implementation saves almost nothing.
 2. **The single largest measurement spend was not screening at all** — it was
    ranking cards that had already been measured, to decide which one takes a
-   slot. That is the step §0c forces and §0z35 finally answered, and it is the
+   slot. That is the step §0e forces and §0z35 finally answered, and it is the
    step the owner correctly identified as separate.
 
 So the economy is: **screen on paper before writing code, and escalate N only

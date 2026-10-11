@@ -5,7 +5,7 @@ PREVIEW TEXT: Reality Fracture releases 2026-10-02 and this was fetched on
 2026-09-20, so every number here is a claim with a date on it.
 
 Each card is run BOTH ways, because the two answer different questions and the
-project has confused them before (§0c):
+project has confused them before (§0e):
 
   vs YAVIMAYA ELDER   the real swap. What the deck gains by playing this card
                       instead of the cut §0z35 named. This is the number a

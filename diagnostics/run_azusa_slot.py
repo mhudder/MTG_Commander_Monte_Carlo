@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Every azusa candidate, measured IN ONE SLOT against one reference card.
 
-WHY THIS SHAPE AND NOT FIFTEEN SWAPS. §0c: candidate rows share a baseline,
+WHY THIS SHAPE AND NOT FIFTEEN SWAPS. §0e: candidate rows share a baseline,
 so they have overlapping CIs by construction and cannot be ranked against
 each other -- which is why fifteen azusa cards sat in `MEASURED` with nothing
 decided. §0z35 showed the way out: put one card in the A leg and another in
