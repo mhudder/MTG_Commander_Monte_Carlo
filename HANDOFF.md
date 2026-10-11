@@ -7,7 +7,7 @@ Where things live:
 
 | | |
 |---|---|
-| **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings. Regenerate with `python -m tools.status --write`, which also writes `docs/COMMANDS.md`, every runnable command discovered from disk. |
+| **what is true right now** | `docs/STATUS.md` — GENERATED. Tables, noise floors, staged swaps, open findings. Regenerate with `python -m tools.status --write`, which also writes `docs/COMMANDS.md`, every runnable command discovered from disk, and `docs/RESULTS.md`, every `results/` file by what cites it. |
 | **how it connects** | `docs/ARCHITECTURE.md` — the module map, the contract between `opponents.py` and an engine, and the pitfalls previous sessions hit. Checked by `check_docs`. |
 | **the rules** | `CLAUDE.md` — every standing rule in a few lines, with the `§` that holds its evidence. Claude loads it into every session, so it is kept short (`check_docs` enforces a byte budget, as it does for `docs/ARCHITECTURE.md` and the add-card skill). Its longer pre-2026-10-10 form is `docs/archive/CLAUDE_2026-10-10.md`. |
 | **what is queued** | `docs/QUEUE.md` — the open work items, under the numbers the issues cite them by. Closed items move to `docs/HISTORY.md`. |

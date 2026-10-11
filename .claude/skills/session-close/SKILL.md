@@ -21,7 +21,7 @@ python -m tools.tag_flying --write      # if you added a card to any deck module
                                         # until it is run -- §0z29)
 python -m tools.cache_manifest --write  # ONLY if the caches were regenerated
 python -m tools.status --write          # always; cheap, fully derived; writes
-                                        # STATUS.md and COMMANDS.md
+                                        # STATUS.md, COMMANDS.md, RESULTS.md
 ```
 
 **If `check_docs` reports a SUSPECT cache, do not regenerate the tables.** A

@@ -1,32 +1,38 @@
 #!/usr/bin/env python3
-"""The ledger's default view is short, and loses no check (2026-10-10).
+"""The ledger's default view is short, and loses no check (2026-10-10/11).
 
     python -m tests.test_pending_summary
-    python -m tests.test_pending_summary --mutate   # 3 mutations, exact sets
+    python -m tests.test_pending_summary --mutate   # 5 mutations, exact sets
 
 `python -m edhmc.pending` printed the whole ledger, evidence and all: 165 KB,
 about forty thousand tokens, for a command CLAUDE.md sends every session to
-for three lines of legality. It now prints `summary()`, one line per entry,
-and the evidence moved behind `--full`, `--deck` and `--card`. What must not
-move with it is any CHECK: legality on every deck, every staged change named.
+for three lines of legality. On 2026-10-10 it printed `summary()`, one line
+per entry, 19 KB; on 2026-10-11 the default became `check_view()`, the checks,
+legality and staged cuts with every other state as a count, under 2 KB, and
+the one-line-per-entry view moved behind `--summary`. What must not move with
+either is any CHECK: legality on every deck, every staged change named.
 
-CASES
-  A summary prints a legality line for EVERY deck, including the decks with
-    nothing staged (the full ledger only printed decks with something staged)
-  B summary names every staged change as `-OUT +IN`
-  C summary is under a quarter the size of the full ledger
+CASES (A-C run the default, `main([])`; G-H run `main(["--summary"])`)
+  A the default prints a legality line for EVERY deck, including the decks
+    with nothing staged (the full ledger only printed decks with something
+    staged)
+  B the default names every staged change as `-OUT +IN`
+  C the default is under a quarter the size of `--summary`
   D `--card conqueror` keeps karlov's Conqueror swap and drops azusa's Forest
   E `--deck karlov` keeps a karlov entry and drops an azusa one
   F an unknown `--deck` is refused, not silently empty
-  G summary names every MEASURED card
+  G `--summary` names every MEASURED card
+  H `--summary` is under a quarter the size of the full ledger
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
+  the default goes back to --summary           -> C
   the default goes back to the full ledger     -> A, C
+  --summary goes back to the full ledger       -> H
   --card is ignored                            -> D
   --deck is ignored                            -> E, F (nothing left to refuse)
 
-UNMUTATED (§0z15): B and G hold under the full ledger too, so no mutation
-here can break them alone.
+UNMUTATED (§0z15): B holds under every view, and G under the full ledger
+too, so no mutation here can break them alone.
 """
 import contextlib
 import io
@@ -63,15 +69,16 @@ def run_cases():
     global PASS, FAIL, FULL
     PASS, FAIL = [], []
     FULL = FULL or full()
-    out = captured(P.summary)
+    out = captured(P.main, [])
+    summ = captured(P.main, ["--summary"])
     legal = {d for d in P.DECKS
              if f"  {d:<10} -> 100 cards, singleton-legal" in out}
     check("A a legality line for every deck", sorted(legal), sorted(P.DECKS))
     missing = [f"-{c.remove} +{c.add}" for c in P.CHANGES
                if f"-{c.remove} +{c.add}" not in out]
     check("B every staged change named", missing, [])
-    check("C under a quarter of the full ledger",
-          len(out) * 4 < len(FULL), True)
+    check("C the default under a quarter of --summary",
+          len(out) * 4 < len(summ), True)
     keep = P._filter(["--card", "conqueror"])
     check("D --card keeps the Conqueror, drops a Forest",
           (keep("karlov", "Soulmender", "Bloodthirsty Conqueror"),
@@ -86,8 +93,10 @@ def run_cases():
     except SystemExit:
         refused = True
     check("F an unknown deck is refused", refused, True)
-    absent = [c.card for c in P.MEASURED if c.card not in out]
-    check("G every measured card named", absent, [])
+    absent = [c.card for c in P.MEASURED if c.card not in summ]
+    check("G --summary names every measured card", absent, [])
+    check("H --summary under a quarter of the full ledger",
+          len(summ) * 4 < len(FULL), True)
     return set(FAIL)
 
 
@@ -99,7 +108,8 @@ def main():
         return 1 if FAIL else 0
 
     print("MUTATION RUN -- exact sets\n")
-    real = {"summary": P.summary, "_filter": P._filter}
+    real = {"summary": P.summary, "check_view": P.check_view,
+            "_filter": P._filter}
 
     def without(flag):
         """`_filter` as if `flag` and its value had never been passed."""
@@ -111,8 +121,13 @@ def main():
         return f
 
     muts = {
+        "the default goes back to --summary":
+            ({"C"}, "check_view", real["summary"]),
         "the default goes back to the full ledger":
-            ({"A", "C"}, "summary",
+            ({"A", "C"}, "check_view",
+             lambda: (P.ledger(), P.print_proposals())),
+        "--summary goes back to the full ledger":
+            ({"H"}, "summary",
              lambda: (P.ledger(), P.print_proposals())),
         "--card is ignored": ({"D"}, "_filter", without("--card")),
         "--deck is ignored": ({"E", "F"}, "_filter", without("--deck")),

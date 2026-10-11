@@ -2743,3 +2743,23 @@ is half answered**: the ordering half is built and measured as a null
     the signets or the artifact lands, all of which are legal fuel.
     Conservative and defensible, but a modelling choice. Extra turns also
     count against the horizon, which is now the only bound on the loop. §0m.
+
+## 2026-10-11: what a session pays to start, measured from its transcripts
+
+A review of the twenty session transcripts on disk. A session starts at 63-86K
+tokens; `CLAUDE.md` is about 5K of that, and the rest is the harness. Nearly
+every session then read `HANDOFF.md`, `docs/STATUS.md` and
+`docs/ARCHITECTURE.md` whole (about 13K more), and the cost after that was
+command output: the longest session ran 6,259 tool calls and twenty compactions.
+Three changes, none to the simulation:
+
+- `python -m edhmc.pending` printed `summary()`, 19 KB, on every run; its
+  default is now `check_view()`, 1.9 KB: every check, every legality line and
+  every staged cut, with the other states as counts. `--summary` is the old
+  default. `tests/test_pending_summary.py` pins both sizes and that the default
+  keeps every legality line and staged swap.
+- `docs/STATUS.md`'s list of orphaned `results/` files and the spreadsheet
+  table moved to a generated `docs/RESULTS.md` (10.2 KB to 7.9 KB); the
+  citation counts are unchanged and `check_docs` checks the new file is current.
+- `CLAUDE.md`'s table says a session need not read `HANDOFF.md`, and that
+  `ARCHITECTURE.md` is read before changing code, not to orient.

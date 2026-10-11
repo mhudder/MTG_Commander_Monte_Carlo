@@ -542,12 +542,14 @@ def generated_checks() -> list[Result]:
     """
     out = []
     # The third field is the function that renders the file: tools.status
-    # writes two docs, and checking only the one called `render` would leave
+    # writes three docs, and checking only the one called `render` would leave
     # docs/COMMANDS.md the generated file nothing checked (§0z15).
     for label, module, fn in (("docs/KNOBS.md", "tools.knobs", "render"),
                               ("docs/STATUS.md", "tools.status", "render"),
                               ("docs/COMMANDS.md", "tools.status",
                                "render_commands"),
+                              ("docs/RESULTS.md", "tools.status",
+                               "render_results"),
                               ("docs/ABLATION_CACHES.md", "tools.cache_manifest",
                                "render")):
         try:

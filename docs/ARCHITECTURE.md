@@ -24,7 +24,7 @@ code and want to know what else it touches.
                           -- does this interpreter reproduce the tables? (§0z119)
    ─ check_docs.py        do the docs still describe the repo? (runs the generators)
    ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write);
-                          status.py writes STATUS.md and COMMANDS.md
+                          status.py writes STATUS.md, COMMANDS.md, RESULTS.md
    ─ removal_census.py    the fifth: classifies every answer and wipe in every list
                           from Scryfall into decks/_removal.py (§0z87)
    ─ audit_cards.py       every card against Scryfall

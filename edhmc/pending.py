@@ -16,7 +16,8 @@ Usage:
     deck, commander = build_pending("rendmaw", apply_pending=False)  # original
     ledger()                                       # print the diff
 
-    python -m edhmc.pending                  # checks, legality, one line per entry
+    python -m edhmc.pending                  # checks, legality, staged cuts, counts
+    python -m edhmc.pending --summary        # one line per entry (the default until 2026-10-11)
     python -m edhmc.pending --card Conqueror # the evidence for entries naming a card
     python -m edhmc.pending --deck karlov    # the evidence for one deck
     python -m edhmc.pending --full           # everything (the default until 2026-10-10)
@@ -1010,22 +1011,11 @@ def _number(text: str) -> str:
     return re.sub(r"^\s*REAL SWAP[^:]*:\s*", "", text or "")
 
 
-def summary() -> None:
-    """One line per entry, and every check and legality line in full.
-
-    THE DEFAULT SINCE 2026-10-10. The full ledger printed 165 KB, half of it
-    the evidence behind seventy-odd MEASURED rows, and CLAUDE.md sends every
-    session here to check legality -- so every session paid about forty
-    thousand tokens to read three lines. The evidence is one flag away
-    (`--full`, `--deck`, `--card`); what this view drops is the prose, never
-    a check: the import-time checks, the cut classification and
-    `validate()` on EVERY deck run exactly as in `ledger()`. It is stricter
-    than `ledger()` in one place: that function prints legality only for
-    decks with something staged, and this one prints all of them.
-    """
-    print("LEDGER SUMMARY -- one line per entry. The evidence behind each:")
-    print("  python -m edhmc.pending --card NAME   (or --deck DECK, or --full)")
-    print()
+def _checks_and_legality() -> None:
+    """Every check `summary()` and `check_view()` share, and their output:
+    the cut classification of every staged and proposed swap (§0z31), the
+    import-time classification check, and `build_pending` -- which runs
+    `validate()` -- on EVERY deck, printed as one legality line each."""
     print("Every staged and proposed cut, against tools/ablation.py's "
           "classification (§0z31):")
     for line in check_cuts_are_measured():
@@ -1038,6 +1028,56 @@ def summary() -> None:
         n = len(pending_for(deck_name))
         print(f"  {deck_name:<10} -> {len(deck) + 1} cards, singleton-legal, "
               f"commander distinct   ({n} staged)")
+
+
+def _live_proposed() -> list:
+    where = {k: st for st, ks in funnel().items() for k in ks}
+    return [p for p in PROPOSED if not p.rejected
+            and where[(p.deck, p.card)] in ("PROPOSED", "PREPARED")]
+
+
+def check_view() -> None:
+    """Every check, every legality line and every staged cut -- and the rest
+    of the ledger as COUNTS.
+
+    THE DEFAULT SINCE 2026-10-11. `summary()` was the default for a day and
+    printed 19 KB, about five thousand tokens, three-quarters of it the
+    MEASURED and SIMULATED rows; CLAUDE.md sends every commit here for the
+    seven legality lines, and the session transcripts showed it run hundreds
+    of times in one session. This view runs exactly the checks `summary()`
+    runs (`_checks_and_legality`) and names every staged swap in the
+    classification block; what it drops is the per-entry listing of the
+    other states, one flag away (`--summary`).
+    """
+    print("LEDGER CHECK -- checks, legality, staged cuts. One line per entry:")
+    print("  python -m edhmc.pending --summary   (evidence: --card NAME, "
+          "--deck DECK, --full)")
+    print()
+    _checks_and_legality()
+    print(f"\nSTAGED {len(CHANGES)} · SIMULATED {len(SIMULATED)} · "
+          f"MEASURED {len(MEASURED)} · WITHDRAWN {len(WITHDRAWN)} · "
+          f"COMMITTED {len(COMMITTED)} · PROPOSED, still unmeasured "
+          f"{len(_live_proposed())}")
+
+
+def summary() -> None:
+    """One line per entry, and every check and legality line in full.
+
+    THE DEFAULT FROM 2026-10-10 TO 2026-10-11, now `--summary`
+    (`check_view()` replaced it). The full ledger printed 165 KB, half of it
+    the evidence behind seventy-odd MEASURED rows, and CLAUDE.md sends every
+    session here to check legality -- so every session paid about forty
+    thousand tokens to read three lines. The evidence is one flag away
+    (`--full`, `--deck`, `--card`); what this view drops is the prose, never
+    a check: the import-time checks, the cut classification and
+    `validate()` on EVERY deck run exactly as in `ledger()`. It is stricter
+    than `ledger()` in one place: that function prints legality only for
+    decks with something staged, and this one prints all of them.
+    """
+    print("LEDGER SUMMARY -- one line per entry. The evidence behind each:")
+    print("  python -m edhmc.pending --card NAME   (or --deck DECK, or --full)")
+    print()
+    _checks_and_legality()
 
     print(f"\nSTAGED ({len(CHANGES)}) -- in build_pending, not yet on all legs")
     for c in sorted(CHANGES, key=lambda c: c.deck):
@@ -1070,9 +1110,7 @@ def summary() -> None:
     print(f"\nCOMMITTED ({len(COMMITTED)}): "
           + ", ".join(f"{d} {n}" for d, n in sorted(by_deck.items())))
 
-    where = {k: st for st, ks in funnel().items() for k in ks}
-    live = [p for p in PROPOSED if not p.rejected
-            and where[(p.deck, p.card)] in ("PROPOSED", "PREPARED")]
+    live = _live_proposed()
     print(f"PROPOSED, still unmeasured ({len(live)}): "
           + (", ".join(f"{p.card} ({p.deck})" for p in live) or "none"))
 
@@ -1090,11 +1128,18 @@ def _filter(args: list[str]):
     return keep
 
 
-if __name__ == "__main__":
-    _args = sys.argv[1:]
-    if "--full" in _args or "--deck" in _args or "--card" in _args:
-        _keep = _filter(_args)
-        ledger(keep=_keep)
-        print_proposals(keep=_keep)
-    else:
+def main(args: list[str]) -> None:
+    """The command line. Names are looked up at call time, so a test can
+    swap `check_view` or `summary` for a mutation."""
+    if "--full" in args or "--deck" in args or "--card" in args:
+        keep = _filter(args)
+        ledger(keep=keep)
+        print_proposals(keep=keep)
+    elif "--summary" in args:
         summary()
+    else:
+        check_view()
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
