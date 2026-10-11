@@ -81,7 +81,7 @@ This is the part that keeps `CLAUDE.md` small. One rule:
 | what you have | where it goes |
 |---|---|
 | a number, a CI, a before/after | `KNOWN_ISSUES.md`, new `§`, with the harness that produced it |
-| a decision about a card swap | `edhmc/pending.py` — `MEASURED`, `CHANGES`, `COMMITTED` or `WITHDRAWN` |
+| a decision about a card swap | the deck's ledger file, `edhmc/ledger/<deck>.py` — `MEASURED`, `SIMULATED`, `CHANGES`, `COMMITTED` or `WITHDRAWN` |
 | a rule that will still be true in a month | `CLAUDE.md`, **Standing findings**: the rule, one line of why, its `§`. No date and no number; the evidence stays under the `§` |
 | a queued item opened or closed | `docs/QUEUE.md` under its number; a closed one moves verbatim to `docs/HISTORY.md` |
 | the session's narrative, "we tried X and it failed because Y" | `docs/HISTORY.md` |
@@ -114,7 +114,7 @@ The row is a headline and its key number, **at most 250 characters**
 ## 5. Commit
 
 All legs of a deck change move in ONE commit: the deck module, the `.xlsx`,
-and the `pending.py` ledger. Azusa has no `.xlsx` and moves in two legs.
+and the ledger (`edhmc/ledger/<deck>.py`). Azusa has no `.xlsx` and moves in two legs.
 
 Write the commit message so the next session can tell, without running
 anything, **what moved and what was checked.** Say which decks' numbers

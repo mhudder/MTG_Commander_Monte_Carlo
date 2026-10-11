@@ -103,7 +103,7 @@ python -m tools.cache_manifest --verified <deck> "what you ran and what it showe
   leaks between branches and every result is suspect.
 - **A deck change is committed only when all three legs agree, in ONE git
   commit**: the module in `edhmc/decks/`, the `.xlsx` in `spreadsheets/`, and
-  the `edhmc/pending.py` ledger. `python -m edhmc.pending` must show `100 cards
+  the ledger (`edhmc/ledger/<deck>.py`). `python -m edhmc.pending` must show `100 cards
   / singleton-legal / commander distinct` on every deck. Azusa has no `.xlsx`:
   two legs.
 - **`python -m tools.check_docs` and `python -m tests` pass before you
@@ -292,7 +292,8 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 - **When a before/after diff is literally zero on every metric, the patch did
   not apply.** Windows `multiprocessing` re-imports in fresh workers, so install
   a monkeypatch inside each worker's `_init` (§0u).
-- **Stage changes in `edhmc/pending.py` and check legality before committing.**
+- **Stage changes in the ledger** (each deck's entries are `edhmc/ledger/<deck>.py`;
+  the logic and checks are `edhmc/pending.py`) **and check legality before committing.**
 - **Comprehensive rules are in the repo**: `docs/MagicCompRules_20260807.txt`
   (grep `^305.7`; the `.docx` is authoritative), with `docs/COMP_RULES.md` for
   provenance and the rules that bear on open issues. Commander damage (104.3j)

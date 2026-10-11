@@ -126,14 +126,15 @@ swap goes through three states" and never mentioned `PROPOSED`, which landed
 implements. Read it for the vocabulary; what follows is what is true of the two
 ends of it, which is what a newcomer needs first.
 
-**Staged** is recorded in `edhmc/pending.py`'s `CHANGES` list. The deck module
+**Staged** is recorded in the ledger's `CHANGES` list (each deck's entries are in
+`edhmc/ledger/<deck>.py`; `edhmc/pending.py` gathers them and checks them). The deck module
 does NOT yet reflect it; `python -m edhmc.pending` is the only trustworthy
 statement of what's currently staged. A hand-written summary of it drifted
 badly enough to be archived — `docs/archive/DECK_CHANGES.md` — which is why the
 ledger is read by a command and never transcribed.
 
 **Committed** is applied to all three legs at once: the deck module, the
-`.xlsx`, and `pending.py`'s `COMMITTED` list. A change is not considered done
+`.xlsx`, and the ledger's `COMMITTED` list. A change is not considered done
 until all three move together. Azusa has no `.xlsx`, so it is two legs and its
 module is the system of record.
 
@@ -197,8 +198,8 @@ disagree, the project's own rule is to follow win rate.
    `SIMS`/`METRIC_SETS`, `cache_manifest.py`'s fingerprints,
    `check_unchanged_decks`, `status.py` and the tests. What is still a
    hand-written decision: `tools/ablation.py`'s `SCRIPTED_BY_DECK`/
-   `KNOWN_BLIND`/`PARTLY_MODELLED` classification, `edhmc/pending.py`'s
-   `DECKS` catalog entry, and, in `tools/validate.py`, an A/A control block
+   `KNOWN_BLIND`/`PARTLY_MODELLED` classification, a ledger module
+   `edhmc/ledger/<name>.py` with its `CATALOG`, and, in `tools/validate.py`, an A/A control block
    and a CRN audit case.
 5. `python -m tools.validate` must come back `+0.00` before you trust a single
    number out of the new engine.

@@ -372,7 +372,8 @@ LEDGER_FLAG_STATE = {"prepared": "PREPARED"}
 
 
 def ledger_states() -> set[str]:
-    """The states `edhmc/pending.py` actually IMPLEMENTS, from its own lists.
+    """The states the ledger actually IMPLEMENTS: `edhmc/pending.py`'s lists
+    and the flag fields of `edhmc/ledger/records.py`.
 
     Derived rather than typed, because the vocabulary doc is a hand-maintained
     name set describing the repo and §0q says such a set needs its check in
@@ -382,8 +383,18 @@ def ledger_states() -> set[str]:
     """
     text = read(os.path.join("edhmc", "pending.py"))
     lists = re.findall(r"^([A-Z][A-Z_]+): list\[", text, re.M)
+    # The FLAG states are fields of the record types, which moved to
+    # edhmc/ledger/records.py when the ledger was split (2026-10-11). This
+    # read pending.py alone for a day of that change and derived six states
+    # instead of seven -- PREPARED dropped and the check stayed green, which
+    # is §0z15 exactly. So it now refuses to derive from a file that does not
+    # hold the record types at all.
+    records = read(os.path.join("edhmc", "ledger", "records.py"))
+    if "class Proposal" not in records:
+        raise RuntimeError("edhmc/ledger/records.py does not define Proposal: "
+                           "the ledger's flag states cannot be derived")
     flags = {st for f, st in LEDGER_FLAG_STATE.items()
-             if re.search(rf"^    {f}: str = ", text, re.M)}
+             if re.search(rf"^    {f}: str = ", records, re.M)}
     return {LEDGER_LIST_STATE.get(n, n) for n in lists} | flags
 
 

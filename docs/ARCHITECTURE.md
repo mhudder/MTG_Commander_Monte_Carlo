@@ -53,10 +53,16 @@ code and want to know what else it touches.
                           fingerprint files. Checked against decks/ at import (§0z32).
             │ and builds a deck through
             ▼
-   edhmc/pending.py       the LEDGER and the deck builder
+   edhmc/pending.py       the LEDGER's logic and the deck builder
                           build_pending(deck) = decks.<module>.build() + the staged CHANGES
                           its states are docs/LEDGER_STATES.md
                           plus the checks that keep those lists honest (check_proposals, …)
+   edhmc/ledger/          the ledger's DATA, gathered by pending.py: records.py (Change,
+                          Candidate, Simulated, Proposal) and one module per deck --
+                          rendmaw.py, lorehold.py, karlov.py, tivit.py, shilgengar.py,
+                          azusa.py, trostani.py -- holding that deck's six lists and its
+                          swap-in CATALOG. An entry filed under the wrong deck refuses
+                          to import
             │
             ▼
    edhmc/experiment.py    the paired A/B harness: run_ab, analyse, report, DEFAULT_CFG,
@@ -200,7 +206,7 @@ so a module without a spec or a spec without a module refuses to import.
 `check_unchanged_decks.py`, `status.py`, `pending.py`'s `DECK_IDENTITY` and
 the tests all derive from it. What is still hand-written per deck, because
 it is a decision and not a fact: `ablation.py`'s classification sets,
-`pending.py`'s candidate catalog, and `validate.py`'s CRN audit case — and
+each `edhmc/ledger/<deck>.py`'s `CATALOG`, and `validate.py`'s CRN audit case — and
 `validate.py` now refuses to run with a deck missing from that list.
 `HANDOFF.md` carries the checklist.
 

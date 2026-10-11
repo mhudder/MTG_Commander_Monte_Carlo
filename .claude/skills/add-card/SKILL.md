@@ -15,12 +15,12 @@ The longer form, with the story behind each step, is
 
 | stage | what exists | where |
 |---|---|---|
-| PROPOSED | verified oracle text and an argument | `edhmc/pending.py` `PROPOSED` |
+| PROPOSED | verified oracle text and an argument | `edhmc/ledger/<deck>.py` `PROPOSED` |
 | defined | a `C()`/`L()` constant | `edhmc/decks/<deck>_v<N>.py` |
 | implemented | every clause modelled or named as a gap | the engine; `tools/ablation.py`'s classification |
 | pinned | a test that fails if the mechanism stops firing | `tests/test_*.py` |
-| MEASURED | a candidate row with its bar and signal | `pending.py` `MEASURED` |
-| STAGED | a head-to-head against a named cut | `pending.py` `CHANGES` |
+| MEASURED | a candidate row with its bar and signal | `edhmc/ledger/<deck>.py` `MEASURED` |
+| STAGED | a head-to-head against a named cut | `edhmc/ledger/<deck>.py` `CHANGES` |
 | COMMITTED | module, `.xlsx` and ledger, one commit | all three legs |
 
 ---
@@ -134,7 +134,7 @@ BLOODTHIRSTY_CONQUEROR = C("Bloodthirsty Conqueror", "Creature",
   `check_docs` fails until it is run).
 
 Add the constant to the deck's batch tuple (for `tools/candidates.py`) and to
-`pending.py`'s `DECKS` catalog (so a `Change` can name it).
+the `CATALOG` in `edhmc/ledger/<deck>.py` (so a `Change` can name it).
 
 ---
 
