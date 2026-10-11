@@ -101,6 +101,16 @@ N=15000
 # deck a review covers, read from edhmc/registry.py: a SUSPENDED deck is left
 # out, and is rebuilt only when named (`DECKS=trostani ./tools/regen_tables.sh`).
 ACTIVE_DECKS=$(python -m edhmc.registry --active) || exit 1
+# More than one deck in series is the FALLBACK, not the method (§0z94,
+# §0z126): one cloud session per deck finishes in the slowest deck's time
+# instead of the sum. A parallel leg (tools/rebuild_deck.sh) passes one deck,
+# so this only speaks when someone is about to wait for several in a row.
+set -- ${DECKS:-$ACTIVE_DECKS}
+if [ "$#" -gt 1 ]; then
+    echo "NOTE: rebuilding $# decks in series. The preferred method is one" >&2
+    echo "cloud session per deck: .claude/skills/parallel-rebuild/SKILL.md." >&2
+    echo "Serial is the fallback when sessions are unavailable." >&2
+fi
 for deck in ${DECKS:-$ACTIVE_DECKS}; do
     cache="results/caches/ablation_cache_${deck}_10-20_n${N}_medblank.json"
     [ -z "$RESUME" ] && rm -f "$cache"

@@ -66,10 +66,14 @@ python -m tools.check_docs --mutate        # the doc checks can fail
 python -m tools.ablation karlov 6000 20    # rank every card; caches, resumes;
                                            # ABLATE_BUDGET=3000 by hand (§0z22)
 python -m tools.audit_cards                # every card vs Scryfall; expect 0 ERR
-./tools/regen_tables.sh                    # every table at N=15000, in series;
-                                           # DECKS="a b" for some. Several decks:
-                                           # the parallel-rebuild skill (§0z94)
+./tools/regen_tables.sh                    # tables at N=15000, IN SERIES;
+                                           # DECKS="a b" for some
 ```
+
+**Rebuilding more than one deck: use the parallel-rebuild skill** — one cloud
+session per deck, so the wall time is the slowest deck's, not the sum (§0z94).
+`regen_tables.sh` in series is the fallback when sessions are unavailable, and
+it says so when given several decks (§0z126).
 
 Every other entry point is in `docs/COMMANDS.md`, DISCOVERED FROM DISK, with a column marking which have a `--mutate` mode. A
 mutation run corrupts what it checks and asserts an EXACT set of failures, so
@@ -270,6 +274,10 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   (the recipe under Layout). Only a deck whose baseline moved is rebuilt. The
   old "delete it" rule cost hours and moved nothing (§0z23). **When you write a
   check, cost its remedy.**
+- **BIT-IDENTICAL at 400 seeds is evidence about 400 games** (§0z126). A shared
+  number that moves one game in 2,000 (the removal census, which counts every
+  STAGED list, so staging a card in one deck moves them all) passes it. Before
+  `--verified`, play the list the cache measured (`build_pending`), at 2,000+.
 - **Never regenerate the manifest to silence a warning.** Built-at is stamped
   at measurement time so the manifest cannot forge it.
 

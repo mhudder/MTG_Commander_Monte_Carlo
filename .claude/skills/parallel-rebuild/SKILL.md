@@ -25,7 +25,7 @@ tables, so finish them first -- the owner's standing practice is "as many
 engine changes as possible, then rebuild".
 
 ```bash
-python -m tools.validate        # 18 x +0.00
+python -m tools.validate        # +0.00 on every metric of every engine
 python -m tests                 # green, except a test that names the stale
                                 # caches themselves (test_metrics_and_render C)
 python -m tools.check_docs      # green except the SUSPECT caches

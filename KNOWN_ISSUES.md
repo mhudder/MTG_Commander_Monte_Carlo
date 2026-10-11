@@ -178,6 +178,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z123](#0z123) | DECIDED | **Enlightened Tutor is PARTLY MODELLED** by the owner: its −0.0019 row is a floor. **Ruby Medallion is faithful but seldom matters**. −Ruby +Prisoner's Dilemma +0.0295 ±0.0044 at T20 (snitch), +0.0103 (silence) |
 | [0z124](#0z124) | MEASURED | **Seven big Boros spells in lorehold**: Furygale Flocking leads, +0.0556 ±0.0046 at T20, then Profound Journey, Raphael's Technique, Immolating Gyre. Three STAGED by the owner (+0.0773 at T20); two committed in v17 |
 | [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**: The Swarmweaver +0.0074, Dalek Squadron +0.0071, Fire Navy Trebuchet and Wickerfolk significant; H.E.R.B.I.E. inside its bar. **A second card type is worth about +0.002** on each |
+| [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11293,6 +11294,69 @@ and a swap pays for its cut (§0c). Staging needs the owner's cuts and a
 head-to-head on the tables' seeds, as §0z124 did for lorehold. Rendmaw's
 cache is SUSPECT (§0z124's wipe-share move), so its table is a guide to the
 cut side, not a measurement on today's list.
+
+## 0z126. REBUILT — four SUSPECT tables, and a census shift the clearing check could not see
+
+**2026-10-11.** Rebuilt at `1dcdd28`, N=15,000, Python 3.13.12 / numpy 2.4.6,
+serially on one four-core session: 1h56m wall (00:49-02:45 UTC). The one-row
+reproduction check came first (`tools.repro_row karlov "Mother of Runes"`:
+IDENTICAL against a table built on 3.13.16), and `validate` printed +0.00 on
+all 21 metrics.
+
+**Why each deck.**
+
+* **lorehold** -- its BASELINE LIST moved: -Ruby Medallion +Prisoner's
+  Dilemma staged (bb64cca), then -Verge Rangers +Furygale Flocking,
+  -Lightning Greaves +Profound Journey and -Boros Charm +Immolating Gyre
+  (75f3bb8), the first two committed as v17 (c69d6cc). Only a rebuild clears
+  that (§0z27). On the module alone `check_unchanged_decks` read +0.0975 win
+  rate.
+* **rendmaw, shilgengar, azusa** -- `check_unchanged_decks` at its default 400
+  seeds, module lists, against `bd9e7ae` (the caches' built commit): all three
+  **BIT-IDENTICAL**. The same comparison on the STAGED lists (`build_pending`,
+  what the tables measure) at 2,000 seeds: **all three moved** -- rendmaw's
+  and azusa's damage by one point in 2,000 games, shilgengar by a game. Bisected
+  over the eight commits that touched fingerprinted files, the move is exactly
+  `75f3bb8`, "Stage three lorehold swaps", and the mechanism is
+  `decks/_removal.py`: Immolating Gyre is a destroy wipe, the census counts
+  every staged list, and `DESTROY_SHARE_WIPE` went 0.5556 -> 0.5714 -- the
+  number every deck's indestructibility is priced by (§0z87).
+* **karlov and tivit** (VERIFIED, not rebuilt): the same staged-list comparison
+  at 2,000 seeds is BIT-IDENTICAL for both; their records stand.
+
+**What moved.** Cache against cache, win rate, beyond the OLD row's own bar:
+
+| deck | rows | identical on every metric | beyond old bar | significant sign flips | category changes |
+|---|---|---|---|---|---|
+| lorehold | 65 (4 out, 4 in) | 0 of 61 | 34 cells | 0 | 0 |
+| rendmaw | 64 | 5 | 0 | 0 | 0 |
+| shilgengar | 64 | 12 | 0 | 0 | 0 |
+| azusa | 58 | 8 | 0 | 0 | 0 |
+
+Lorehold's new rows, over a blank: **Furygale Flocking +0.0339 / +0.0488
+±0.0044** (T10 / T20), Prisoner's Dilemma +0.0172 / +0.0261, Profound Journey
++0.0175 / +0.0234, Immolating Gyre +0.0068 / +0.0173 -- all significant at both
+horizons. Its moved cells have two shapes. **The finishers fell at T20** --
+Approach of the Second Sun −0.0138 (+0.0263 -> +0.0125), Storm Herd −0.0121,
+Monument to Endurance −0.0055, Apex of Power −0.0035 -- §0z27's redundancy
+shape: Furygale is another way to win, so each finisher's leave-one-out row is
+understated, not worse. **Most other rows rose at T10** (Sol Ring +0.0053,
+Rise of the Eldrazi +0.0048, Unexpected Windfall +0.0043 ...): a deck that wins
+earlier makes early contributions count. Signals that changed: Library of
+Leng both -> --, Farewell FLIP -> both, Gamble -- -> both, Restoration Seminar
+win -> both. Rendmaw's one signal change, Deathreap Ritual -- -> FLIP, is on a
+MODEL-BLIND card whose win rate stayed inside its old bar.
+
+**The lesson** (promoted to CLAUDE.md): BIT-IDENTICAL at 400 seeds is evidence
+about 400 games. A shared number that moves one game in 2,000 passes it, and
+the census is such a number -- staging a card in one deck moves every deck.
+Before `--verified`, play the list the cache measured, at 2,000+ seeds.
+`check_unchanged_decks`'s default is still 400; raising it is the owner's call.
+
+**And the method.** This rebuild ran in series on one session, against the
+parallel-rebuild skill (§0z94), which would have taken about the slowest deck's
+time. `tools/regen_tables.sh` now says so when it is given more than one deck,
+and CLAUDE.md names the skill as the method and series as the fallback.
 
 ## How to read an ablation table
 
