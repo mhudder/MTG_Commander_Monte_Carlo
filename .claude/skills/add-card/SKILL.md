@@ -52,7 +52,8 @@ It checks every list, catalog, `tools/candidates.py` batch (which names
 CONSTANTS, so grepping it for a card name finds nothing), the ledger, and
 string literals in the engines, because behaviour attaches by name at least as
 often as by `script=` (§0z25). Two of fifteen proposals in one batch had
-already been measured (§0z26).
+already been measured (§0z26). `python -m tools.where --card NAME --all` names
+the def around every line that mentions a card; `--show` prints one def.
 
 **Record a `Proposal`** in `PROPOSED`: deck, card, cost, identity, type line,
 oracle text verbatim, date verified, rationale, and `implement` (what it would

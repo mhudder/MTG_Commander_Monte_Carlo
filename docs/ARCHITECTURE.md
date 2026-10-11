@@ -41,6 +41,8 @@ code and want to know what else it touches.
                           its three files. The protocol is .claude/skills/
                           parallel-rebuild (§0z94)
    ─ issue.py             one KNOWN_ISSUES section by id, or --find over the index
+   ─ where.py             one def's lines or source, a module's outline, or every
+                          def naming a card -- from the syntax tree, per call
    ─ _generated.py        shared helper: git ref, the provenance mask the checks compare
                           with, and implements_mutate (read by tests and STATUS.md)
 

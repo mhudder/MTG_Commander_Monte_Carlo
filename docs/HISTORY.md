@@ -2763,3 +2763,15 @@ Three changes, none to the simulation:
   citation counts are unchanged and `check_docs` checks the new file is current.
 - `CLAUDE.md`'s table says a session need not read `HANDOFF.md`, and that
   `ARCHITECTURE.md` is read before changing code, not to orient.
+
+## 2026-10-11 (later): `tools.where`, the engine modules one def at a time
+
+The same transcripts showed the engine modules read in guessed `sed -n` ranges:
+430 reads of `engine.py` and 360 of `azusa.py` and `lorehold.py` in one session,
+about 2.5M characters. `python -m tools.where` answers from the syntax tree on
+every call, so there is no generated index to go stale: a module's outline
+(14 KB for `engine.py`'s 200 KB), every def of a name, one def's source with
+the `Read offset=/limit=` that reads the same lines, and `--card NAME`, every
+def around a line naming a card (§0z25). `tests/test_where.py` checks the
+ranges against the source text, not the tree: every def line indexed, every
+range starting on its first decorator and ending on its last body line.

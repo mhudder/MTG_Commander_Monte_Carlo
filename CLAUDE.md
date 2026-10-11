@@ -12,10 +12,14 @@ result yet.
 every session.** It holds the standing rules and nothing else: each rule is
 stated once, with its one-line reason and the `§` that carries the evidence.
 It has no dates and no measurements, and `check_docs` fails if it outgrows its
-budget. Read the evidence only when you need it:
+budget. Read the evidence only when you need it, and the code one def at a
+time (the engine modules are ~200 KB; don't `sed -n` through them):
 
     python -m tools.issue 0z36     one KNOWN_ISSUES section, not the whole file
     python -m tools.issue --find wipe   index rows matching a word
+    python -m tools.where engine   outline: every def in a module, with its lines
+    python -m tools.where --show Game.make_tokens  one def's source (--in MODULE)
+    python -m tools.where --card "Exquisite Blood"   every def naming a card
 
 | where | what |
 |---|---|
@@ -204,7 +208,7 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   The add-card skill is the whole procedure.
 - **`script=` is not the implementation surface** (§0z25). Behaviour attaches
   BY NAME at least as often. Before calling a card unimplemented, grep the
-  engine for its NAME.
+  engine for its NAME (`tools.where --card NAME --all`).
 - **A tag nothing reads is a loaded gun** (§0z12). Before making a dormant tag
   live, re-read the oracle text of every card carrying it.
 - **Subtypes and a land's rules are data from Scryfall, generated, never typed**
