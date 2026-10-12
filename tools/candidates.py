@@ -43,7 +43,8 @@ from edhmc.decks.karlov_v2 import (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT,
                                    ENLIGHTENED_CONFIDANT, CRYPT_GHAST,
                                    DARK_CONFIDANT,
     BATCH_2026_09_16 as KARLOV_2026_09_16,
-    BATCH_2026_09_22 as KARLOV_2026_09_22)
+    BATCH_2026_09_22 as KARLOV_2026_09_22,
+    KARLOV_2026_10_12)
 
 # One place names an engine (§0z32); these are the names the batches use.
 rendmaw_sim = REGISTRY["rendmaw"].sim
@@ -261,6 +262,12 @@ DECKS = {
                 KARLOV_2026_09_22),
     "karlov2": ("KARLOV", "karlov", karlov_sim, 20, "Soulmender",
                 KARLOV_2026_09_16),
+    # The owner's Scryfall search, 2026-10-12 (§0z128). Swiftfoot Boots'
+    # slot, karlov3's, so these rows share its baseline and compare with
+    # Ginger's. Forbidden Orchard is a LAND and is not here: it is measured
+    # against the basic it would replace, diagnostics/run_karlov_orchard.py.
+    "karlov4": ("KARLOV", "karlov", karlov_sim, 20, "Swiftfoot Boots",
+                KARLOV_2026_10_12),
     # 2026-09-16 (§0z26). Pinnacle Monk is the slot lorehold/lorehold1 used.
     "lorehold2": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
                   LOREHOLD_2026_09_16),

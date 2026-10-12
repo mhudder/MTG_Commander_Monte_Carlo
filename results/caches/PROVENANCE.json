@@ -386,6 +386,12 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_azusa.txt.",
         "fingerprint": "d30e674650191925",
         "utc": "2026-10-11T15:11:15Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_azusa.txt.",
+        "fingerprint": "d12247d417ef8c5d",
+        "utc": "2026-10-12T02:29:44Z"
       }
     ]
   },
@@ -704,6 +710,18 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_karlov.txt.",
         "fingerprint": "09561424e7da1888",
         "utc": "2026-10-11T15:11:14Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. karlov's STAGED list (build_pending) on both trees, seeds 5000..6999, T20, 10 metrics: BIT-IDENTICAL. The table re-rendered from this cache diffs byte-identical with results/ablation_karlov.txt.",
+        "fingerprint": "5eff98d5bbccd1b8",
+        "utc": "2026-10-12T02:29:44Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, re-checked after a DOCSTRING-ONLY edit to karlov.orchard_tapped (the Spirit's cost is chip damage as well as a blocker, \u00a70z128): karlov's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics, BIT-IDENTICAL against the worktree at 4e1970e; the table re-rendered from this cache diffs byte-identical with results/ablation_karlov.txt. The earlier module-level check_unchanged_decks --n=2000 (all six decks bit-identical) is on the record above.",
+        "fingerprint": "cb3526d8ede0de95",
+        "utc": "2026-10-12T02:39:36Z"
       }
     ]
   },
@@ -1036,6 +1054,12 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_lorehold.txt.",
         "fingerprint": "611b6b62ed4215a2",
         "utc": "2026-10-11T15:11:14Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_lorehold.txt.",
+        "fingerprint": "6044a5eac8a4f9be",
+        "utc": "2026-10-12T02:29:44Z"
       }
     ]
   },
@@ -1346,6 +1370,12 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_rendmaw.txt.",
         "fingerprint": "04ce698d7705d6fc",
         "utc": "2026-10-11T15:11:14Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_rendmaw.txt.",
+        "fingerprint": "0c75eef98b2ecee8",
+        "utc": "2026-10-12T02:29:43Z"
       }
     ]
   },
@@ -1698,6 +1728,12 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_shilgengar.txt.",
         "fingerprint": "96ba6d40c76529c2",
         "utc": "2026-10-11T15:11:14Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_shilgengar.txt.",
+        "fingerprint": "080773a83d6b00c2",
+        "utc": "2026-10-12T02:29:44Z"
       }
     ]
   },
@@ -1997,6 +2033,12 @@
         "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_tivit.txt.",
         "fingerprint": "1f58ab99cb1a18ce",
         "utc": "2026-10-11T15:11:14Z"
+      },
+      {
+        "commit": "4e1970e",
+        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_tivit.txt.",
+        "fingerprint": "16476c532b06fc3b",
+        "utc": "2026-10-12T02:29:44Z"
       }
     ]
   },

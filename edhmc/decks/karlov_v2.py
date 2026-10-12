@@ -438,3 +438,32 @@ KABIRA_CROSSROADS = L("Kabira Crossroads", "W", tapped=True, lifegain=2)
 # and engine.on_mana_tap.
 ANCIENT_TOMB = L("Ancient Tomb", "C")
 LAND_CANDIDATES = (SCOURED_BARRENS, KABIRA_CROSSROADS, ANCIENT_TOMB)
+
+
+# THE OWNER'S SCRYFALL SEARCH, 2026-10-12 (§0z128). Oracle text from
+# api.scryfall.com, recorded verbatim on each Proposal in
+# edhmc/ledger/karlov.py.
+# "Deathtouch. Whenever another creature you control dies, you gain life equal
+# to its toughness. Whenever you gain life, each opponent loses 1 life."
+# Marauding Blight-Priest's trigger, so the same threat.
+SOUTH_WIND_AVATAR = C("South Wind Avatar", "Creature", {"gen": 3, "B": 1}, 3, 4,
+                      priority=7.5, threat=7.5)
+# "Whenever you gain life, each opponent loses 1 life."
+EPICURE_OF_BLOOD = C("Epicure of Blood", "Creature", {"gen": 4, "B": 1}, 4, 4,
+                     priority=7.0, threat=7.5)
+# "Whenever a land an opponent controls enters, that player loses 2 life and
+# you gain 2 life." karlov.polluted_bonds, on the pod's turn.
+POLLUTED_BONDS = C("Polluted Bonds", "Enchantment", {"gen": 3, "B": 2},
+                   priority=7.0)
+# "{T}: Add one mana of any color. Whenever you tap this land for mana, target
+# opponent creates a 1/1 colorless Spirit creature token." Any colour is W or
+# B in this list. karlov.orchard_tapped, from spend_lg.
+FORBIDDEN_ORCHARD = L("Forbidden Orchard", "WB")
+# "When this creature enters, each opponent creates a 1/1 white Human creature
+# token. Whenever a creature an opponent controls dies, put a +1/+1 counter on
+# this creature." karlov.resolve, by script.
+SLAUGHTER_SPECIALIST = C("Slaughter Specialist", "Creature", {"gen": 1, "B": 1},
+                         3, 3, script="slaughter_specialist", priority=7.5)
+
+KARLOV_2026_10_12 = (SOUTH_WIND_AVATAR, EPICURE_OF_BLOOD, POLLUTED_BONDS,
+                     SLAUGHTER_SPECIALIST)

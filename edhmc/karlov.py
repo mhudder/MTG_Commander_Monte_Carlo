@@ -76,7 +76,10 @@ COMBO_B = COMBO_LOOP + ("Vizkopa Guildmage",)
 # it kills the table. All three are in karlov's list. `exquisite_drain_loop`
 # makes them loop partners exactly as COMBO_LOOP's are.
 DRAIN_ON_GAIN = ("Cliffhaven Vampire", "Marauding Blight-Priest",
-                 "Starscape Cleric")
+                 "Starscape Cleric",
+                 # Candidates, 2026-10-12 (§0z128): the same text, word for
+                 # word, so the same loop.
+                 "South Wind Avatar", "Epicure of Blood")
 
 
 def drain_loop_partner(g) -> bool:
@@ -166,6 +169,11 @@ class KarlovGame(BaseGame):
             # only exists when it fires raises KeyError on the paired read.
             "citadel_casts": 0, "citadel_life_spent": 0.0,
             "citadel_lands": 0, "citadel_drains": 0,
+            # Candidates, 2026-10-12 (§0z128).
+            "southwind_drains": 0, "southwind_death_gains": 0,
+            "epicure_drains": 0, "bonds_triggers": 0,
+            "orchard_spirits": 0, "orchard_idle_taps": 0,
+            "specialist_tokens": 0,
         })
         self.damage_by_turn = []
 
@@ -301,6 +309,17 @@ class KarlovGame(BaseGame):
                            threat=perm.card.threat)
             self.board.append(Permanent(card=glimmer, sick=False))
             self.m["tenacity_returns"] += 1
+        # SOUTH WIND AVATAR (candidate, 2026-10-12, §0z128): "Whenever ANOTHER
+        # creature you control dies, you gain life equal to its toughness."
+        # Look-back for whether it triggers (a wipe that kills the Avatar too
+        # still pays for the rest); the amount is the dying permanent's
+        # toughness as it last existed, counters included. Every caller
+        # passes the one permanent that died, so `perm` None pays nothing.
+        if perm is not None:
+            for _ in range(OPP.watching(self, "South Wind Avatar", perm,
+                                        another=True)):
+                gain_life(self, self.toughness_of(perm))
+                self.m["southwind_death_gains"] += 1
         for _ in range(n):
             # "target player loses 1 life and you gain 1 life" — a real drain.
             # LOOK-BACK (CR 603.10a, §0z76): each source counts if it is on
@@ -338,13 +357,91 @@ def spend_lg(g, pay_idx, units):
     """
     before = {id(p) for p in g.board
               if p.card.name in TAP_LIFEGAIN and not p.tapped}
+    orchards = [p for p in g.board
+                if p.card.name == "Forbidden Orchard" and not p.tapped]
     spend(g, pay_idx, units)
     for p in g.board:
         if p.card.name in TAP_LIFEGAIN and p.tapped and id(p) in before:
             gain_life(g, TAP_LIFEGAIN[p.card.name])
+    for p in orchards:
+        if p.tapped:
+            orchard_tapped(g)
 
 
 TAP_LIFEGAIN = {"Pristine Talisman": 1}
+
+
+def orchard_tapped(g):
+    """FORBIDDEN ORCHARD (candidate, 2026-10-12, §0z128): "Whenever you tap
+    this land for mana, target opponent creates a 1/1 colorless Spirit
+    creature token." Mandatory, so it fires on EVERY tap, payoff or none.
+
+    The Spirit takes Benevolent Offering's path: +1 to the target's abstract
+    creature count, then one opponent creature entering for the soul sisters,
+    Authority of the Consuls and Suture Priest. The count is charged as ONE
+    AVERAGE POD CREATURE -- a blocker, and chip damage to you through
+    `opponents.incidental_damage`, which reads it (§4) -- so a 1/1 is if
+    anything over-charged. The target is Offering's: the least threatening
+    opponent."""
+    to = offering_token_target(g)
+    if to is None:
+        return
+    to.creatures += 1
+    g.m["orchard_spirits"] += 1
+    creature_entered(g, mine=False)
+
+
+# The cards `creature_entered(g, mine=False)` pays for: what an opponent's
+# creature entering is worth to you. A HAND-MAINTAINED SET, so it is checked:
+# tests/test_karlov_pod_triggers.py derives it from creature_entered itself
+# and fails if a card is added there and not here, or the reverse (§0q).
+OPP_ETB_PAYOFFS = ("Soul Warden", "Soul's Attendant", "Auriok Champion",
+                   "Suture Priest", "Authority of the Consuls")
+
+
+def orchard_idle_tap(g):
+    """THE ORCHARD POLICY, said out loud (§0z128). Mana empties between steps,
+    so a pilot can tap Forbidden Orchard for nothing but its trigger. Done at
+    the end of your turn, to an Orchard the turn's payments left untapped,
+    only when an OPP_ETB_PAYOFFS card is on the battlefield -- without one the
+    Spirit is a gift with nothing in return. `orchard_idle_tap=False` is the
+    naive pilot, who taps it only when the mana is wanted."""
+    if not g.cfg.get("orchard_idle_tap", True):
+        return
+    if not any(g.has(n) for n in OPP_ETB_PAYOFFS):
+        return
+    for p in g.board:
+        if p.card.name == "Forbidden Orchard" and not p.tapped:
+            p.tapped = True
+            g.m["orchard_idle_taps"] += 1
+            orchard_tapped(g)
+            if g.result is not None:
+                return
+
+
+def polluted_bonds(g):
+    """POLLUTED BONDS (candidate, 2026-10-12, §0z128): "Whenever a land an
+    opponent controls enters, that player loses 2 life and you gain 2 life."
+
+    The pod has no land count (§4). Land Tax's approximation is the model's
+    one statement about it -- one drop a round until `opp_land_plateau` -- and
+    this reads the same knob rather than inventing a second: in each round
+    through the plateau, EVERY living opponent makes one drop. A floor on
+    ramp, fetchlands and the drops after the plateau; a ceiling on missed
+    drops. Called from `opponent_activity`, which is the pod's turns."""
+    if not g.has("Polluted Bonds"):
+        return
+    if OPP.pod_turn(g) > g.cfg.get("opp_land_plateau", 8):
+        return
+    for o in list(OPP.living(g)):
+        for _ in range(g.count("Polluted Bonds")):
+            if g.result is not None or o not in OPP.living(g):
+                break
+            dealt = OPP.damage_single(g, 2, target=o)
+            g.m["damage"] += dealt
+            g.m["drain_damage"] += dealt
+            g.m["bonds_triggers"] += 1
+            gain_life(g, 2)
 
 
 def pay_generic(g, want):
@@ -468,6 +565,16 @@ def gain_life(g, amount, _depth=0):
                 win_by_drain_loop(g)
                 return
             g.m["damage"] += OPP.damage_each(g, 1)
+        elif n in ("South Wind Avatar", "Epicure of Blood"):
+            # Candidates, 2026-10-12 (§0z128): "Whenever you gain life, each
+            # opponent loses 1 life" -- the branch above, word for word. Its
+            # own branch only so each card's counter says it fired.
+            if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
+                win_by_drain_loop(g)
+                return
+            g.m["damage"] += OPP.damage_each(g, 1)
+            g.m["southwind_drains" if n == "South Wind Avatar"
+                else "epicure_drains"] += 1
         elif n == "Heliod, Sun-Crowned":
             # "put a +1/+1 counter on target creature or enchantment you
             # control." Put it where it converts to damage: the biggest body.
@@ -615,6 +722,9 @@ def creature_entered(g, mine=True, entering=None):
 
 def opponent_activity(g):
     """Opponents' creatures entering and spells cast, which this deck taxes."""
+    polluted_bonds(g)
+    if g.result is not None:
+        return
     per_opp = g.cfg.get("opp_creatures_per_turn", 0.7)
     n_creatures = int(round(per_opp * len(OPP.living(g))))
     for _ in range(n_creatures):
@@ -822,6 +932,21 @@ def ranger_of_eos_etb(g):
         g.hand.append(c)
     g.m["ranger_tutored"] += len(picks)
     crn_shuffle(g, "ranger_of_eos", g.library)
+
+
+def slaughter_specialist_etb(g):
+    """SLAUGHTER SPECIALIST (candidate, 2026-10-12, §0z128): "When this
+    creature enters, each opponent creates a 1/1 white Human creature token."
+    Benevolent Offering's path once per living opponent: +1 to that
+    opponent's creature count, then an opponent creature entering.
+
+    NOT MODELLED: "Whenever a creature an opponent controls dies, put a +1/+1
+    counter on this creature." The pod's creatures are a count that a wipe
+    zeroes; nothing kills one at a time (§4). A floor by that clause."""
+    for o in list(OPP.living(g)):
+        o.creatures += 1
+        g.m["specialist_tokens"] += 1
+        creature_entered(g, mine=False)
 
 
 def ginger_etb(g):
@@ -1286,6 +1411,8 @@ def resolve(g, card):
             ginger_etb(g)
         if card.script == "ranger_of_eos":
             ranger_of_eos_etb(g)
+        if card.script == "slaughter_specialist":
+            slaughter_specialist_etb(g)
         # Offspring {2}{B}: an additional cost paid as you cast, which creates a
         # 1/1 token copy on ETB. The copy has the same lifegain trigger, so it
         # carries the same name here and gain_life() counts both.
@@ -1470,6 +1597,11 @@ def take_turn(g):
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+    # After the metric above, so an Orchard tapped for its trigger alone is
+    # not counted as mana spent. No-ops without the card.
+    orchard_idle_tap(g)
+    if g.result is not None:
+        return
 
     if g.cfg.get("opponents", True):
         # One order for six engines (§0z30): damage, clocks, THEN removal.

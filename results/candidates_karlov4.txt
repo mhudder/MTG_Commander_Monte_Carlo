@@ -1,0 +1,7 @@
+
+KARLOV candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  South Wind Avatar              4     +1.59+-0.16     +0.0205+-0.0028      0.159
+  Epicure of Blood               5     +1.02+-0.13     +0.0147+-0.0024      0.134
+  Polluted Bonds                 5     +0.90+-0.10     +0.0047+-0.0016      0.144
+  Slaughter Specialist           2     -0.60+-0.11     -0.0055+-0.0021      0.198

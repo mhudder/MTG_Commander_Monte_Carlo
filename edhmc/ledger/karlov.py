@@ -364,6 +364,104 @@ MEASURED: list[Candidate] = [
         limits='Every clause modelled: the damage is charged per tap (1.2 a game). Spent LAST among lands (`PAINFUL_RANK`).',
         verdict='Inside at T10, significantly NEGATIVE at T20: the life is a real cost in a deck whose objective is life, and colourless mana is worth little to its coloured costs. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
+    # THE OWNER'S SCRYFALL SEARCH, 2026-10-12 (§0z128). Candidate rows, not
+    # swaps: each is value over a blank in Swiftfoot Boots' slot, and staging
+    # needs a head-to-head against a named, MODEL-EVALUATED cut (§0e).
+    Candidate(
+        deck="karlov", card="South Wind Avatar", measured="2026-10-12",
+        win_rate="+0.0205 +-0.0028 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Blight-Priest's 'whenever you gain life, each opponent "
+                   "loses 1' on a 3/4 for four, a fourth Exquisite Blood loop "
+                   "partner, and a death clause that gains each dying "
+                   "creature's toughness."),
+        evidence=("damage +1.59 +-0.16, P(deploy) 0.159. "
+                  "N=15,000 paired, the staged list, Swiftfoot Boots' slot (karlov3's), "
+                  "against a blank of the same cost; python -m tools.candidates "
+                  "karlov4, results/candidates_karlov4.txt."
+                  " Smoke (300 games): southwind_drains 1.81 and "
+                  "southwind_death_gains 0.20 a game, drain_loop_wins up."),
+        limits=("PARTLY: deathtouch is not modelled (nothing in the blocking "
+                "model reads it), a floor by that."),
+        verdict=("THE STRONGEST OF THE FIVE, and in the class the table ranks "
+                 "highest: the row is the size of Blight-Priest's "
+                 "leave-one-out +0.0201 and Cliffhaven's +0.0194 (a "
+                 "comparison of size, not a head-to-head). Worth a real swap "
+                 "against a MODEL-EVALUATED cut."),
+    ),
+    Candidate(
+        deck="karlov", card="Epicure of Blood", measured="2026-10-12",
+        win_rate="+0.0147 +-0.0024 at T20 (N=15,000 paired)", signal="both",
+        rationale=("The same trigger on a vanilla 4/4 for five."),
+        evidence=("damage +1.02 +-0.13, P(deploy) 0.134. "
+                  "N=15,000 paired, the staged list, Swiftfoot Boots' slot (karlov3's), "
+                  "against a blank of the same cost; python -m tools.candidates "
+                  "karlov4, results/candidates_karlov4.txt."),
+        limits="Every clause modelled.",
+        verdict=("Real, and below South Wind Avatar by about the mana and the "
+                 "death clause -- a SET with it, not a ranking, until the two "
+                 "are put in the same slot of one paired run (§0e)."),
+    ),
+    Candidate(
+        deck="karlov", card="Polluted Bonds", measured="2026-10-12",
+        win_rate="+0.0047 +-0.0016 at T20 (N=15,000 paired)", signal="both",
+        rationale=("The pod's land drops as drains of 2, each a lifegain "
+                   "event."),
+        evidence=("damage +0.90 +-0.10, P(deploy) 0.144. "
+                  "N=15,000 paired, the staged list, Swiftfoot Boots' slot (karlov3's), "
+                  "against a blank of the same cost; python -m tools.candidates "
+                  "karlov4, results/candidates_karlov4.txt."
+                  " Smoke: about 2.6 triggers in a game it is cast."),
+        limits=("READS `opp_land_plateau` (8): drops stop at pod round 8, "
+                "so a five-drop cast on turn five sees about three rounds of "
+                "them. A floor on ramp and fetches, a ceiling on missed drops "
+                "-- the row is the knob's as much as the card's."),
+        verdict=("Small and real. The timing is the limit: by the time it "
+                 "lands, the model's pod has nearly stopped making land "
+                 "drops."),
+    ),
+    Candidate(
+        deck="karlov", card="Slaughter Specialist", measured="2026-10-12",
+        win_rate="-0.0055 +-0.0021 at T20 (N=15,000 paired)", signal="both",
+        rationale=("Three opponent creatures entering for two mana, on a 3/3."),
+        evidence=("damage -0.60 +-0.11, P(deploy) 0.198. "
+                  "N=15,000 paired, the staged list, Swiftfoot Boots' slot (karlov3's), "
+                  "against a blank of the same cost; python -m tools.candidates "
+                  "karlov4, results/candidates_karlov4.txt."
+                  " Smoke: specialist_tokens 0.53 a game, combat_damage and "
+                  "raw_damage down -- the gifted creatures block."),
+        limits=("PARTLY: its +1/+1 counter per opponent creature death is not "
+                "modelled, a floor by that. Each gifted 1/1 is charged as one "
+                "AVERAGE pod creature (a blocker and chip damage, §4), so its "
+                "cost is if anything over-charged."),
+        verdict=("NEGATIVE AND SIGNIFICANT: three blockers and three sources "
+                 "of chip damage for the pod cost more than three soul-sister "
+                 "triggers return. The two clauses the model is uncertain "
+                 "about both point the same way (it would be better), so this "
+                 "is a floor -- but a floor below zero is not a case for the "
+                 "slot."),
+    ),
+    Candidate(
+        deck="karlov", card="Forbidden Orchard", measured="2026-10-12",
+        win_rate=("-0.0045 +-0.0027 at T20 against the Plains it replaces; "
+                  "+0.0009 +-0.0018 at T10 (inside its bar)"),
+        signal="both",
+        rationale=("Every tap gives an opponent a 1/1: a creature entering for "
+                   "the soul sisters, Authority of the Consuls and Suture "
+                   "Priest."),
+        evidence=("diagnostics/run_karlov_orchard.py, results/karlov_orchard.txt: "
+                  "N=15,000 paired, -Plains +Forbidden Orchard on the staged "
+                  "list. At T20: orchard_spirits +1.38 a game, "
+                  "lifegain_triggers +0.70, life_gained +1.27, combat_damage "
+                  "-1.99, damage -1.24. The naive pilot "
+                  "(orchard_idle_tap=False): -0.0049 +-0.0027, so the idle-tap "
+                  "policy does not matter. NOOP arm exactly zero."),
+        limits=("Each Spirit is charged as one AVERAGE pod creature, a blocker "
+                "and chip damage (§4), so a 1/1 is if anything over-charged."),
+        verdict=("NEGATIVE AT T20: about 0.7 lifegain events a game do not "
+                 "pay for 1.4 blockers handed to the pod. The knob "
+                 "`orchard_idle_tap` does not matter (-0.0045 against "
+                 "-0.0049)."),
+    ),
 ]
 
 
@@ -825,6 +923,123 @@ PROPOSED: list[Proposal] = [
         triage='LIVE',
         rejected='MEASURED 2026-10-06 and PROMOTED: the Candidate in MEASURED carries the number (§0z113). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # THE OWNER'S SCRYFALL SEARCH, 2026-10-12: "cards that gain life whenever
+    # ANY creature enters". Every W/B card with that exact trigger is already
+    # in the list (Soul Warden, Soul's Attendant, Auriok Champion, Authority
+    # of the Consuls), so the batch widens to what the deck's own table ranks
+    # highest -- "whenever you gain life, each opponent loses 1" -- and to
+    # cards that make the PODS' turns into lifegain events (§0z128).
+    Proposal(
+        deck="karlov", card="South Wind Avatar", cost="{3}{B}",
+        identity="B", type_line="Creature — Snake Spirit Avatar",
+        oracle=("Deathtouch\n"
+                "Whenever another creature you control dies, you gain life "
+                "equal to its toughness.\n"
+                "Whenever you gain life, each opponent loses 1 life."),
+        verified="2026-10-12",
+        rationale=("Marauding Blight-Priest's trigger word for word, the class "
+                   "the table ranks highest: Starscape Cleric +0.0294, "
+                   "Blight-Priest +0.0201, Cliffhaven Vampire +0.0194. A "
+                   "fourth DRAIN_ON_GAIN card is also a fourth Exquisite Blood "
+                   "loop partner (§0z90). The death clause turns a wipe into "
+                   "lifegain events."),
+        implement=("LOW. DRAIN_ON_GAIN membership and its branch in "
+                   "`gain_life`; the death clause in `on_creature_death` "
+                   "through `watching(..., another=True)`, the toughness read "
+                   "off the dying permanent. NOT: deathtouch, which nothing in "
+                   "the blocking model reads (Bloodthirsty Conqueror's gap)."),
+        triage="LIVE",
+        rejected=("MEASURED 2026-10-12 and PROMOTED: the Candidate in MEASURED "
+                  "carries the number (§0z128). Closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
+    Proposal(
+        deck="karlov", card="Epicure of Blood", cost="{4}{B}",
+        identity="B", type_line="Creature — Vampire",
+        oracle="Whenever you gain life, each opponent loses 1 life.",
+        verified="2026-10-12",
+        rationale=("The same trigger on a 4/4 for five: Blight-Priest's text "
+                   "and an Exquisite Blood loop partner, with nothing else to "
+                   "model. Measured beside South Wind Avatar so the two "
+                   "differ only by a mana and a death clause."),
+        implement=("LOW. DRAIN_ON_GAIN membership and its branch in "
+                   "`gain_life`. Every clause modelled."),
+        triage="LIVE",
+        rejected=("MEASURED 2026-10-12 and PROMOTED: the Candidate in MEASURED "
+                  "carries the number (§0z128). Closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
+    Proposal(
+        deck="karlov", card="Polluted Bonds", cost="{3}{B}{B}",
+        identity="B", type_line="Enchantment",
+        oracle=("Whenever a land an opponent controls enters, that player "
+                "loses 2 life and you gain 2 life."),
+        verified="2026-10-12",
+        rationale=("Turns the pod's land drops into drains: up to three "
+                   "lifegain EVENTS a round, each one a Karlov trigger and a "
+                   "trigger for every DRAIN_ON_GAIN card, on a permanent that "
+                   "is not a creature."),
+        implement=("MEDIUM. The pod has no land count (§4). Land Tax already "
+                   "approximates the best opponent's as one drop a round to "
+                   "`opp_land_plateau` (8); this applies the same drop to "
+                   "EVERY living opponent, so the row reads that knob. A "
+                   "floor on ramp, fetches and late drops; a ceiling on "
+                   "missed drops."),
+        triage="LIVE",
+        rejected=("MEASURED 2026-10-12 and PROMOTED: the Candidate in MEASURED "
+                  "carries the number (§0z128). Closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
+    Proposal(
+        deck="karlov", card="Forbidden Orchard", cost="", identity="",
+        type_line="Land",
+        oracle=("{T}: Add one mana of any color.\n"
+                "Whenever you tap this land for mana, target opponent creates "
+                "a 1/1 colorless Spirit creature token."),
+        verified="2026-10-12",
+        rationale=("Every Spirit is a creature entering under an opponent: "
+                   "Soul Warden, Soul's Attendant, Auriok Champion and "
+                   "Authority of the Consuls each gain 1, and Suture Priest "
+                   "drains 1. Replaces a basic, so the land count is "
+                   "unchanged."),
+        implement=("MEDIUM. The trigger on every tap in `spend_lg` (every "
+                   "karlov payment goes through it), the Spirit through "
+                   "Benevolent Offering's path: +1 to the target's abstract "
+                   "creature count, then `creature_entered(mine=False)`. A "
+                   "POLICY, said out loud: an Orchard still untapped at the "
+                   "end of your turn is tapped for its trigger alone when a "
+                   "payoff for an opponent's creature entering is on the "
+                   "battlefield (`orchard_idle_tap`). The Spirit is charged as "
+                   "ONE AVERAGE POD CREATURE: a blocker, and chip damage to "
+                   "you through `incidental_damage`, which reads the same "
+                   "count (§4). A 1/1 is smaller than that average, so its "
+                   "cost is if anything over-charged."),
+        triage="LIVE",
+        rejected=("MEASURED 2026-10-12 and PROMOTED: the Candidate in MEASURED "
+                  "carries the number (§0z128). Closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
+    Proposal(
+        deck="karlov", card="Slaughter Specialist", cost="{1}{B}",
+        identity="B", type_line="Creature — Vampire Warrior",
+        oracle=("When this creature enters, each opponent creates a 1/1 white "
+                "Human creature token.\n"
+                "Whenever a creature an opponent controls dies, put a +1/+1 "
+                "counter on this creature."),
+        verified="2026-10-12",
+        rationale=("Three opponent creatures entering at once for two mana -- "
+                   "three triggers for every soul sister, Authority of the "
+                   "Consuls and Suture Priest on the battlefield -- on a 3/3."),
+        implement=("MEDIUM. The ETB through Benevolent Offering's path, once "
+                   "per living opponent. NOT: the +1/+1 counter per opponent "
+                   "creature death -- the pod's creatures are a count that "
+                   "wipes zero and nothing else kills one at a time (§4). A "
+                   "floor by that clause."),
+        triage="LIVE",
+        rejected=("MEASURED 2026-10-12 and PROMOTED: the Candidate in MEASURED "
+                  "carries the number (§0z128). Closed rather than deleted so the "
+                  "verified oracle text stays where it was written."),
+    ),
 ]
 
 
@@ -848,4 +1063,10 @@ CATALOG = (karlov_v2, {
     # LAND CANDIDATES, 2026-10-06 (§0z113).
     "Scoured Barrens": karlov_v2.SCOURED_BARRENS,
     "Kabira Crossroads": karlov_v2.KABIRA_CROSSROADS,
-    "Ancient Tomb": karlov_v2.ANCIENT_TOMB})
+    "Ancient Tomb": karlov_v2.ANCIENT_TOMB,
+    # THE OWNER'S SCRYFALL SEARCH, 2026-10-12 (§0z128).
+    "South Wind Avatar": karlov_v2.SOUTH_WIND_AVATAR,
+    "Epicure of Blood": karlov_v2.EPICURE_OF_BLOOD,
+    "Polluted Bonds": karlov_v2.POLLUTED_BONDS,
+    "Forbidden Orchard": karlov_v2.FORBIDDEN_ORCHARD,
+    "Slaughter Specialist": karlov_v2.SLAUGHTER_SPECIALIST})

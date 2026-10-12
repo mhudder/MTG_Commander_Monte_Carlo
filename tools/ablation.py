@@ -417,6 +417,13 @@ SCRIPTED_KARLOV = {
     # confirmed by the owner); Benevolent Offering does both its
     # sentences, three flying Spirits each way and 2 life per creature (§0z56).
     "Necropotence", "Benevolent Offering",
+    # Candidates, 2026-10-12 (§0z128). Epicure of Blood is Blight-Priest's
+    # text and nothing else. Polluted Bonds reads the pod's land drops off
+    # Land Tax's approximation (`opp_land_plateau`) -- an assumption about
+    # the pod, as Land Tax's own is, not a missing clause. Forbidden
+    # Orchard's trigger fires on every tap (`karlov.orchard_tapped`) and its
+    # idle tap is a policy said out loud (`orchard_idle_tap`).
+    "Epicure of Blood", "Polluted Bonds", "Forbidden Orchard",
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -786,6 +793,21 @@ PARTLY_MODELLED = {
             "blocking model reads (a chump blocker dies either way; only "
             "Ohran Frostfang makes the pod block less). A floor by that. "
             "§0z26, §0z90.",
+        # Candidates, 2026-10-12 (§0z128).
+        "South Wind Avatar":
+            "MODELLED: 'whenever you gain life, each opponent loses 1 life' "
+            "(a DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) "
+            "and 'whenever another creature you control dies, you gain life "
+            "equal to its toughness', on the 3/4. NOT: deathtouch, which "
+            "nothing in the blocking model reads -- Bloodthirsty Conqueror's "
+            "gap. A floor by that.",
+        "Slaughter Specialist":
+            "MODELLED: the 3/3, and 'each opponent creates a 1/1' on entering "
+            "-- +1 to each opponent's creature count and three opponent "
+            "creatures entering for the soul sisters. NOT: 'whenever a "
+            "creature an opponent controls dies, put a +1/+1 counter on this "
+            "creature', because the pod's creatures are a count that a wipe "
+            "zeroes and nothing kills one at a time (§4). A floor by that.",
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
     },
     "rendmaw": {

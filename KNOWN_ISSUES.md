@@ -180,6 +180,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**: The Swarmweaver +0.0074, Dalek Squadron +0.0071, Fire Navy Trebuchet and Wickerfolk significant; H.E.R.B.I.E. inside its bar. **A second card type is worth about +0.002** on each |
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
+| [0z128](#0z128) | MEASURED | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure of Blood +0.0147 at T20, Polluted Bonds +0.0047; Slaughter Specialist and Forbidden Orchard NEGATIVE |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11415,6 +11416,99 @@ classification set. Cleared by the CLAUDE.md recipe against a worktree at
 **BIT-IDENTICAL on all 8 metrics for all six active decks** (trostani is SUSPENDED); `build_pending` produced byte-identical lists
 (full `Card` repr, all seven decks); and every table re-rendered from its
 cache was byte-identical to the committed one.
+
+<a id="0z128"></a>
+
+## 0z128. MEASURED — karlov: five cards from the owner's Scryfall search
+
+**2026-10-12.** The owner asked for "obscure or unusual cards that would
+benefit the Karlov deck", starting from "cards that gain life whenever ANY
+creature enters". Searched on Scryfall (`legal:commander id<=wb`, seven
+queries). **Every W/B card with that exact trigger is already in the list**
+-- Soul Warden, Soul's Attendant, Auriok Champion, Authority of the Consuls
+-- so the search widened to what the deck's own table ranks highest
+("whenever you gain life, each opponent loses 1": Starscape Cleric +0.0294,
+Marauding Blight-Priest +0.0201, Cliffhaven Vampire +0.0194) and to cards
+that turn the POD's actions into lifegain events. Cards that gain only off
+YOUR creatures entering were left out: that class measures weakly here
+(Guide of Souls +0.0013, `results/candidates_karlov.txt`; Daxos, Elas
+il-Kor and Suture Priest significant on damage only). The owner chose five.
+Oracle text is verbatim on each Proposal in `edhmc/ledger/karlov.py`;
+`tools.card_known` knew none of them.
+
+### What the engine gained (all in `edhmc/karlov.py`, no shared code)
+
+| card | where | modelled | not |
+|---|---|---|---|
+| South Wind Avatar | `DRAIN_ON_GAIN` and its branch in `gain_life`; `on_creature_death` | each opponent loses 1 per lifegain event; the Exquisite Blood loop (§0z90); another creature of yours dying gains its toughness, counters included | deathtouch (nothing reads it; Bloodthirsty Conqueror's gap) -- PARTLY, a floor |
+| Epicure of Blood | the same branch | all of it | -- |
+| Polluted Bonds | `polluted_bonds`, from `opponent_activity` (the pod's turns) | each living opponent's land drop drains 2, through `opp_land_plateau` (8) -- Land Tax's approximation, the model's only statement about the pod's lands (§4) | ramp, fetches and drops after the plateau (a floor); missed drops (a ceiling) |
+| Forbidden Orchard | `orchard_tapped`, from `spend_lg` (every karlov payment); `orchard_idle_tap` | every tap gives the least threatening opponent (Benevolent Offering's choice) a 1/1: +1 to its creature count and an opponent creature entering | -- |
+| Slaughter Specialist | `slaughter_specialist_etb`, by script from `resolve` | each living opponent gets a 1/1, as above | "+1/+1 counter whenever a creature an opponent controls dies": the pod's creatures are a count a wipe zeroes (§4) -- PARTLY, a floor |
+
+**WHAT A GIFTED CREATURE COSTS.** +1 to an opponent's `creatures`, which is
+read twice: as blockers (`opponents._blocker_counts`) and as chip damage to you
+(`incidental_damage`, `creatures x rate x share x power`). It is charged as
+one AVERAGE pod creature, so a 1/1 is if anything over-charged. The first
+draft of the Orchard's Proposal said the Spirit "never attacks you" and
+called the row a ceiling; `incidental_damage` reads the same count, so that
+was wrong, and was corrected before the rows were recorded.
+
+**THE ORCHARD POLICY, said out loud.** Mana empties between steps, so a pilot
+can tap the Orchard for its trigger alone. An Orchard the turn left untapped
+is tapped at the end of your turn, but only when a card in `OPP_ETB_PAYOFFS`
+is on the battlefield. `orchard_idle_tap=False` is the naive pilot, measured
+beside it: **the knob does not matter** (-0.0045 against -0.0049 at T20).
+`OPP_ETB_PAYOFFS` is a hand-maintained set, so it is checked: case Q of the
+test derives it from `creature_entered` itself over the whole list and catalog.
+
+### Gates
+
+`tests/test_karlov_pod_triggers.py`: 18 cases, 10 mutations, every expected
+set right on the first run. `validate`: +0.00 on all 21 metrics.
+`check_unchanged_decks --n=2000` against a worktree at `4e1970e`: all six
+active decks BIT-IDENTICAL; karlov's STAGED list (`build_pending`) the same on
+both trees, seeds 5000..6999, 10 metrics. Every table re-renders byte-identical
+from its cache (`tools/ablation.py` moved: classification entries for cards in
+no table). All six caches recorded VERIFIED with that evidence.
+
+### The rows
+
+`python -m tools.candidates karlov4 --n=15000` (`results/candidates_karlov4.txt`):
+N=15,000 paired, the staged list, each card in Swiftfoot Boots' slot (karlov3's,
+so comparable with Ginger's +0.0059) against a blank of its cost, T20.
+
+| card | damage | win rate T20 | P(deploy) | signal |
+|---|---|---|---|---|
+| South Wind Avatar | +1.59 ±0.16 | **+0.0205 ±0.0028** | 0.159 | both |
+| Epicure of Blood | +1.02 ±0.13 | **+0.0147 ±0.0024** | 0.134 | both |
+| Polluted Bonds | +0.90 ±0.10 | +0.0047 ±0.0016 | 0.144 | both |
+| Slaughter Specialist | −0.60 ±0.11 | **−0.0055 ±0.0021** | 0.198 | both, negative |
+
+Forbidden Orchard against the Plains it replaces (`run_land_ablation.basic_for`),
+`diagnostics/run_karlov_orchard.py`, `results/karlov_orchard.txt`, N=15,000:
+
+| arm | T10 | T20 | at T20 |
+|---|---|---|---|
+| the swap | +0.0009 ±0.0018 | **−0.0045 ±0.0027** | 1.38 Spirits a game; lifegain events +0.70; combat damage −1.99 |
+| naive pilot | +0.0001 ±0.0018 | −0.0049 ±0.0027 | 1.20 Spirits a game |
+| NOOP | 0 | 0 | exactly zero on every metric |
+
+**The two "each opponent loses 1" cards are real; the two that feed the pod
+creatures are not.** South Wind Avatar is the size of Blight-Priest's and
+Cliffhaven's leave-one-out rows (a comparison of size, not a head-to-head),
+and it and Epicure are a SET until put in the same slot of one paired run
+(§0e). Polluted Bonds is small: by the time a five-drop lands, the model's
+pod has nearly stopped making land drops, so the row is `opp_land_plateau`'s
+as much as the card's. **Slaughter Specialist and Forbidden Orchard lose
+win rate**: a creature given to the pod is a blocker and a source of chip
+damage for the rest of the game, and one soul-sister trigger per creature
+does not pay for it. The clauses the model is unsure of (the Specialist's
+counters, the 1/1's size) both point upward, so both rows are floors -- but
+floors below zero.
+
+**Not staged.** A candidate row is not a swap: staging South Wind Avatar or
+Epicure needs a head-to-head against a named MODEL-EVALUATED cut (§0z31, §0z36).
 
 ## How to read an ablation table
 

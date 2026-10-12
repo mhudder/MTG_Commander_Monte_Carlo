@@ -7,9 +7,9 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `0ea9987` from 32 engine sources.
+Derived at `4e1970e` from 32 engine sources.
 
-**245 knobs, 363 call sites.**
+**246 knobs, 365 call sites.**
 
 `CLAUDE.md`'s standing rule is to **say the knob out loud** when a
 card's evaluation swings on one — and to say it when it does NOT, which
@@ -31,7 +31,7 @@ costs a written justification.
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:3754` in `simulate()`
   - `10` at `edhmc/engine.py:4321` in `simulate()`
-  - `20` at `edhmc/karlov.py:1487` in `simulate()`
+  - `20` at `edhmc/karlov.py:1619` in `simulate()`
   - `10` at `edhmc/lorehold.py:2879` in `simulate()`
   - `10` at `edhmc/opponents.py:202` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1328` in `simulate()`
@@ -52,7 +52,7 @@ show up first.
 | `altar_keep` | `6` | 1 | `edhmc/engine.py:2642` | §0u | yes | yes |
 | `altar_mana` | `True` | 1 | `edhmc/engine.py:2671` | §3 | **no** | yes |
 | `animated_lands_block` | `True` | 1 | `edhmc/azusa.py:604` |  | yes | yes |
-| `another_creature_clause` | `True` | 1 | `edhmc/karlov.py:551` |  | yes | yes |
+| `another_creature_clause` | `True` | 1 | `edhmc/karlov.py:658` |  | yes | yes |
 | `apex_ten_mana` | `True` | 2 | `edhmc/lorehold.py:789` | §0z116 | yes | yes |
 | `archdruid_mode` | `'auto'` | 1 | `edhmc/azusa.py:2507` | §0q | yes | yes |
 | `archetype_weights` | `<none>` | 1 | `edhmc/opponents.py:178` |  | yes | **never** |
@@ -73,7 +73,7 @@ show up first.
 | `cast_lookahead` | `False` | 1 | `edhmc/engine.py:2778` | §0z43 | yes | yes |
 | `castle_ardenvale` | `True` | 1 | `edhmc/shilgengar.py:1240` | §0z115 | **no** | yes |
 | `charge_life_costs` | `True` | 9 | `edhmc/azusa.py:1677` | §0z115 | yes | yes |
-| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:1152` | §0z42 | yes | yes |
+| `citadel_life_floor` | `10.0` | 1 | `edhmc/karlov.py:1277` | §0z42 | yes | yes |
 | `clamp_cap` | `4` | 1 | `edhmc/engine.py:3342` |  | **no** | **never** |
 | `clock_rearm` | `4` | 1 | `edhmc/opponents.py:2252` |  | **no** | yes |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:174` |  | yes | yes |
@@ -123,8 +123,8 @@ show up first.
 | `eulogist_opp_yard_turn` | `4` | 1 | `edhmc/trostani.py:1364` |  | yes | yes |
 | `everywhere_enters_tapped` | `True` | 1 | `edhmc/engine.py:4163` |  | yes | yes |
 | `everywhere_is_token` | `True` | 1 | `edhmc/engine.py:4164` |  | yes | **never** |
-| `exquisite_drain_loop` | `True` | 1 | `edhmc/karlov.py:85` | §0z90 | yes | yes |
-| `exquisite_general` | `True` | 1 | `edhmc/karlov.py:254` | §0z90 | yes | yes |
+| `exquisite_drain_loop` | `True` | 1 | `edhmc/karlov.py:88` | §0z90 | yes | yes |
+| `exquisite_general` | `True` | 1 | `edhmc/karlov.py:262` | §0z90 | yes | yes |
 | `extra_turn_cap` | `5` | 1 | `edhmc/tivit.py:1638` | §0z86 | **no** | **never** |
 | `extra_turns_chain` | `True` | 1 | `edhmc/tivit.py:1628` | §0z86 | yes | yes |
 | `extra_turns_round_cap` | `40` | 1 | `edhmc/tivit.py:1627` | §0z86 | yes | yes |
@@ -140,7 +140,7 @@ show up first.
 | `furygale_reduction` | `True` | 1 | `edhmc/lorehold.py:467` | §0u | **no** | **never** |
 | `gain_life_routed` | `True` | 1 | `edhmc/shilgengar.py:453` | §0z75 | yes | yes |
 | `giada_text` | `True` | 2 | `edhmc/shilgengar.py:315` |  | yes | yes |
-| `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:900` | §0z19 | yes | yes |
+| `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:1025` | §0z19 | yes | yes |
 | `gloomshrieker_text` | `True` | 2 | `edhmc/engine.py:1577` | §0z125 | yes | yes |
 | `goad_block_share` | `0.3` | 1 | `edhmc/opponents.py:1080` |  | yes | **never** |
 | `goldspan_targeted` | `True` | 1 | `edhmc/lorehold.py:67` | §0z77 | yes | yes |
@@ -177,7 +177,7 @@ show up first.
 | `locthwain_max_loss` | `2` | 1 | `edhmc/engine.py:2456` | §0z85 | **no** | **never** |
 | `lorehold_recursion` | `True` | 5 | `edhmc/lorehold.py:2022` | §0z54 | yes | **never** |
 | `luminarch_per_opponent` | `True` | 1 | `edhmc/trostani.py:1761` | §0z17 | yes | **never** |
-| `lurrus_recast` | `True` | 1 | `edhmc/karlov.py:993` | §0z84 | yes | yes |
+| `lurrus_recast` | `True` | 1 | `edhmc/karlov.py:1118` | §0z84 | yes | yes |
 | `magistrate_token_cap` | `512` | 1 | `edhmc/lorehold.py:847` |  | **no** | **never** |
 | `mana_colour_legacy` | `False` | 3 | `edhmc/azusa.py:1092` | §0z37 | yes | yes |
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:1093` | §0z37 | yes | yes |
@@ -194,19 +194,20 @@ show up first.
 | `mother_use` | `'defend'` | 2 | `edhmc/opponents.py:415` |  | yes | yes |
 | `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:3205` | §0z125 | yes | **never** |
 | `native_flashback` | `True` | 1 | `edhmc/lorehold.py:1809` |  | yes | yes |
-| `necro_hand_target` | `7` | 1 | `edhmc/karlov.py:712` | §0z57 | yes | yes |
-| `necro_life_floor` | `10` | 1 | `edhmc/karlov.py:713` | §0z57 | yes | yes |
+| `necro_hand_target` | `7` | 1 | `edhmc/karlov.py:822` | §0z57 | yes | yes |
+| `necro_life_floor` | `10` | 1 | `edhmc/karlov.py:823` | §0z57 | yes | yes |
 | `nykthos_devotion` | `True` | 1 | `edhmc/azusa.py:2843` | §0z37 | **no** | yes |
 | `on_the_draw` | `True` | 1 | `edhmc/engine.py:4277` |  | **no** | **never** |
 | `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1299` | §0z116 | **no** | **never** |
-| `opp_creatures_per_turn` | `0.7` | 1 | `edhmc/karlov.py:618` |  | **no** | **never** |
+| `opp_creatures_per_turn` | `0.7` | 1 | `edhmc/karlov.py:728` |  | **no** | **never** |
 | `opp_death_rate` | `0.55` | 1 | `edhmc/engine.py:3457` | §0z70 | yes | yes |
 | `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:3330` | §0z47 | yes | yes |
-| `opp_land_plateau` | `8` | 1 | `edhmc/karlov.py:685` | §0z7 | **no** | **never** |
-| `opp_spells_per_turn` | `1.2` | 1 | `edhmc/karlov.py:623` |  | **no** | **never** |
+| `opp_land_plateau` | `8` | 2 | `edhmc/karlov.py:434` | §0z7 | yes | yes |
+| `opp_spells_per_turn` | `1.2` | 1 | `edhmc/karlov.py:733` |  | **no** | **never** |
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
 | `opponents` | `True` | 7 | `edhmc/azusa.py:3743` | §0z115 | yes | yes |
+| `orchard_idle_tap` | `True` | 1 | `edhmc/karlov.py:409` | §0z128 | yes | yes |
 | `overseer_taps` | `True` | 2 | `edhmc/engine.py:3264` | §0z118 | yes | yes |
 | `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:2377` | §0u | yes | **never** |
 | `own_wipe_indestructible` | `True` | 2 | `edhmc/opponents.py:2300` | §0u | yes | yes |
@@ -225,7 +226,7 @@ show up first.
 | `portal_text` | `True` | 1 | `edhmc/tivit.py:1088` | §0z117 | yes | yes |
 | `processor_floor` | `12` | 1 | `edhmc/trostani.py:1147` |  | yes | yes |
 | `processor_life` | `PROCESSOR_LIFE` | 1 | `edhmc/trostani.py:1146` |  | yes | yes |
-| `protect_events` | `True` | 7 | `edhmc/karlov.py:133` | §0z118 | yes | yes |
+| `protect_events` | `True` | 7 | `edhmc/karlov.py:136` | §0z118 | yes | yes |
 | `protect_min` | `3` | 2 | `edhmc/trostani.py:380` |  | **no** | **never** |
 | `protection_cards` | `('Heroic Intervention',)` | 1 | `edhmc/opponents.py:500` |  | yes | yes |
 | `queen_soldier` | `True` | 1 | `edhmc/trostani.py:568` |  | **no** | **never** |
@@ -256,7 +257,7 @@ show up first.
 | `snapshot_rounds` | `()` | 1 | `edhmc/engine.py:1382` | §0z93 | yes | yes |
 | `solemn_text` | `True` | 3 | `edhmc/engine.py:1630` | §0z125 | yes | yes |
 | `springheart_hosts` | `<none>` | 1 | `edhmc/azusa.py:1541` |  | yes | yes |
-| `starting_life` | `40` | 4 | `edhmc/karlov.py:927` |  | **no** | yes |
+| `starting_life` | `40` | 4 | `edhmc/karlov.py:1052` |  | **no** | yes |
 | `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1125` | §0z49 | yes | yes |
 | `surveil_land_floor` | `6` | 2 | `edhmc/engine.py:3989` |  | **no** | **never** |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:1133` | §0z115 | yes | **never** |
@@ -286,7 +287,7 @@ show up first.
 | `wickerfolk_gy` | `True` | 1 | `edhmc/engine.py:4017` |  | yes | yes |
 | `wickerfolk_life_floor` | `10` | 1 | `edhmc/engine.py:4022` |  | yes | yes |
 | `wildspeaker_mode` | `'auto'` | 1 | `edhmc/azusa.py:2688` |  | **no** | yes |
-| `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1185` | §0z104 | yes | yes |
+| `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1310` | §0z104 | yes | yes |
 | `wipe_gate_measure` | `'cost'` | 1 | `edhmc/opponents.py:2286` | §0z106 | yes | yes |
 | `wipe_response` | `True` | 1 | `edhmc/trostani.py:375` |  | **no** | **never** |
 | `wipe_threshold` | `1.4` | 1 | `edhmc/opponents.py:2306` | §0z118 | yes | yes |
@@ -325,26 +326,26 @@ there is no longer read by any engine.
 | `sieve_taps` | `True` | Time Sieve not tapping the artifacts it sacrifices (pre-§0m) | yes |
 | `tivit_sweepers` | `True` | tivit's wipe tags dormant (pre-§0z12) | **never** |
 
-**15 of 245 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
+**15 of 246 knobs are legacy switches, and 2 of those have never been flipped by any run** — a switch nobody has flipped is a branch
 nobody has tested.
 
 ## The knobs no document mentions
 
-**62 of 245.** Not an error — most knobs are
+**61 of 246.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`altar_mana`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `clock_rearm`, `combat_defender`, `combo_cap`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `hold_min_value`, `invoke_mv_cap`, `karoo_bounce`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `starting_life`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 
-**61 of 245.** The name appears nowhere in
+**60 of 246.** The name appears nowhere in
 `tools/`, `diagnostics/` or `tests/`, so no run has ever moved it off
 its default. **A knob nobody has ever moved is a default nobody has
 ever measured.** `altar_keep` sat here for the life of the project;
 §0z20 swept it 6 → 0, found it was not load-bearing, and that is the
 result nobody would have believed unmeasured.
 
-`archetype_weights`, `archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `cryptic_caves_min_lands`, `culling_pod_share`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_spot`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `everywhere_is_token`, `extra_turn_cap`, `first_wipe_turn`, `furygale_reduction`, `goad_block_share`, `hand_cap`, `hold_min_value`, `karmic_echo`, `land_floor`, `life_cap`, `locthwain_life_floor`, `locthwain_max_loss`, `lorehold_recursion`, `luminarch_per_opponent`, `magistrate_token_cap`, `mdfc_land_floor`, `moloid_mill_floor`, `monologue_tax_rate`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_land_plateau`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `pearl_lifelink_cap`, `populate_soul_first`, `protect_min`, `queen_soldier`, `reservoir_floor`, `scry_land_bottom`, `selenia_curse_target`, `set_top_gate`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `thomil_lord_fodder`, `tivit_sweepers`, `token_cap`, `treasure_hoard`, `trostani_attacks`, `tutor_floor`, `vault_min_power`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
+`archetype_weights`, `archetypes`, `block_rate`, `breach_cap`, `clamp_cap`, `cryptic_caves_min_lands`, `culling_pod_share`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_spot`, `destroy_share_wipe`, `elspeth_ult`, `elspeth_ult_creatures`, `everywhere_is_token`, `extra_turn_cap`, `first_wipe_turn`, `furygale_reduction`, `goad_block_share`, `hand_cap`, `hold_min_value`, `karmic_echo`, `land_floor`, `life_cap`, `locthwain_life_floor`, `locthwain_max_loss`, `lorehold_recursion`, `luminarch_per_opponent`, `magistrate_token_cap`, `mdfc_land_floor`, `moloid_mill_floor`, `monologue_tax_rate`, `mycoloth_devour`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `own_wipe_commander_returns`, `pearl_lifelink_cap`, `populate_soul_first`, `protect_min`, `queen_soldier`, `reservoir_floor`, `scry_land_bottom`, `selenia_curse_target`, `set_top_gate`, `sieve_cap`, `surveil_land_floor`, `talisman_coloured_tap`, `tempting_offer_rate`, `thomil_lord_fodder`, `tivit_sweepers`, `token_cap`, `treasure_hoard`, `trostani_attacks`, `tutor_floor`, `vault_min_power`, `wipe_response`, `wurm_kill_share`, `zuran_max_sacs`
 
