@@ -400,6 +400,7 @@ SCANNED = {
     'Soulfire Eruption',
     'Soulherder',
     'Soulmender',
+    'South Wind Avatar',
     'Speaker of the Heavens',
     'Split Decision',
     'Springheart Nantuko',

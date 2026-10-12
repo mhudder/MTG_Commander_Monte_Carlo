@@ -180,7 +180,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**: The Swarmweaver +0.0074, Dalek Squadron +0.0071, Fire Navy Trebuchet and Wickerfolk significant; H.E.R.B.I.E. inside its bar. **A second card type is worth about +0.002** on each |
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
-| [0z128](#0z128) | MEASURED | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 ±0.0030 at T20 |
+| [0z128](#0z128) | REBUILT | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 at T20, STAGED; table rebuilt |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11419,7 +11419,7 @@ cache was byte-identical to the committed one.
 
 <a id="0z128"></a>
 
-## 0z128. MEASURED — karlov: five cards from the owner's Scryfall search
+## 0z128. REBUILT — karlov: five cards from the owner's Scryfall search, one staged
 
 **2026-10-12.** The owner asked for "obscure or unusual cards that would
 benefit the Karlov deck", starting from "cards that gain life whenever ANY
@@ -11529,9 +11529,28 @@ Significant at both horizons. **The gain is mostly the Exquisite Blood
 loop**: the Avatar is a fourth DRAIN_ON_GAIN partner, and the loop's wins
 account for nearly all of the T20 difference. What Daxos supplied -- about
 one lifegain event a game, and its Karlov counters -- is the cost, and it is
-small beside that. Recorded as SIMULATED in `edhmc/ledger/karlov.py`; **not
-staged until the owner decides.** Epicure of Blood has not been run against a
-cut.
+small beside that. Epicure of Blood has not been run against a cut.
+
+### STAGED by the owner, and karlov's table rebuilt
+
+The owner, 2026-10-12: "yes, stage it". `−Daxos +South Wind Avatar` is the
+third karlov entry in CHANGES. Staging moved the baseline, so the table was
+REBUILT from an empty cache at N=15,000 (`DECKS=karlov ./tools/regen_tables.sh`,
+20 minutes); nothing but a rebuild clears a staging-induced SUSPECT (§0z27).
+Staging also added the card to `decks/_removal.py`'s SCANNED set and nothing
+else (it is not removal), which moves every deck's fingerprint: the other
+five were played on their staged lists against a worktree at `b3efb12`,
+seeds 5000..6999, 10 metrics, and are BIT-IDENTICAL -- §0z126's check at
+2,000 seeds -- and recorded VERIFIED.
+
+**The rebuilt table, against the one before.** No row moved outside its
+combined bar. South Wind Avatar enters at **+0.0207 ±0.0029** (PARTLY, for
+deathtouch). The rest moved the way a fourth loop partner predicts (§0z27):
+the other partners each matter a little less when removed -- Vito −0.0035,
+Starscape Cleric −0.0029, Enduring Tenacity −0.0025, Sanguine Bond −0.0017,
+Blight-Priest −0.0014 -- and the two cards the loop needs matter a little
+more: Exquisite Blood +0.0028, Bloodthirsty Conqueror +0.0018. Swiftfoot
+Boots reads −0.0061 ±0.0022, still the one significantly negative row.
 
 ## How to read an ablation table
 

@@ -621,6 +621,37 @@ CHANGES: list[Change] = [
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), in context (Conqueror staged on both sides), N=15,000 paired: +0.0013 +-0.0029 at T10 (inside), +0.0147 +-0.0042 at T20. A long-horizon card, as before; the staging stands. results/restage_20260926.txt."
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0015 +-0.0029 at T10, +0.0131 +-0.0042 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
     ),
+    Change(
+        deck="karlov",
+        remove="Daxos, Blessed by the Sun",
+        add="South Wind Avatar",
+        staged="2026-10-12",
+        rationale=(
+            "STAGED BY THE OWNER, 2026-10-12 (§0z128): 'I'm fairly confident "
+            "South Wind Avatar is a better fit in the deck, the real question "
+            "is which card to cut', then 'run it against Daxos', then 'yes, "
+            "stage it'. {3}{B} 3/4 deathtouch: 'Whenever another creature you "
+            "control dies, you gain life equal to its toughness. Whenever you "
+            "gain life, each opponent loses 1 life.' Marauding Blight-Priest's "
+            "trigger, so a fourth Exquisite Blood loop partner (§0z90). The "
+            "cut is MODEL-EVALUATED: Daxos +0.0013 +-0.0021 at T20, "
+            "significant on damage only, both clauses modelled."),
+        evidence=(
+            "REAL SWAP -Daxos +South Wind Avatar, N=15,000 paired, same seeds "
+            "both legs, base = build_pending('karlov'): +0.0153 +-0.0023 at "
+            "T10 and +0.0187 +-0.0030 at T20, significant at BOTH. "
+            "diagnostics/run_karlov_southwind.py, results/karlov_southwind.txt. "
+            "Candidate row against a blank in Swiftfoot Boots' slot: +0.0205 "
+            "+-0.0028 at T20 (results/candidates_karlov4.txt)."),
+        notes=(
+            "THE MECHANISM IS MOSTLY THE LOOP: drain_loop_wins +0.0157 at T20 "
+            "(+0.0113 at T10), nearly the whole difference. Damage +1.28; "
+            "lifegain events -1.16 and Karlov counters -1.49 a game (what "
+            "Daxos supplied); southwind_drains +1.44 and death gains +0.17 a "
+            "game. PARTLY MODELLED: deathtouch is not read by the blocking "
+            "model, a floor by that. Measured with the two earlier karlov "
+            "changes staged on both legs, so it is already in context."),
+    ),
 ]
 
 
@@ -655,24 +686,6 @@ SIMULATED: list[Simulated] = [
         measured='2026-09-22', source='results/karlov_ginger.txt',
         result=("REAL SWAP -Swiftfoot Boots +Ginger, N=15,000 paired, same seeds both legs, base = build_pending('karlov'): +0.0052 +-0.0017 at T10 and +0.0186 +-0.0033 at T20, significant at BOTH. Candidate row against a blank in the same slot: +0.0059 +-0.0027 (results/candidates_karlov3.txt)."),
         notes=("RE-MEASURED 2026-10-01 AFTER §0z97 (losing the crown no longer ends the pod's chip round), same seeds both engines: +0.0045 +-0.0020 at T10 and +0.0137 +-0.0031 at T20, significant at both, against +0.0046 / +0.0142 on the old loop -- the fix itself moved the swap -0.0005 +-0.0003 at T20. The old loop now reads +0.0142 where 2026-09-22 read +0.0186: that gap is the engine changes in between, not the crown, and is not attributed further. It still loses the slot to Bloodthirsty Conqueror (results/monarch_restage_20261001.txt)."),
-    ),
-    Simulated(
-        deck='karlov', remove='Daxos, Blessed by the Sun', add='South Wind Avatar',
-        measured='2026-10-12', source='results/karlov_southwind.txt',
-        result=("REAL SWAP -Daxos +South Wind Avatar, N=15,000 paired, same "
-                "seeds both legs, base = build_pending('karlov'): +0.0153 "
-                "+-0.0023 at T10 and +0.0187 +-0.0030 at T20, significant at "
-                "BOTH. Candidate row against a blank in Swiftfoot Boots' slot: "
-                "+0.0205 +-0.0028 at T20 (results/candidates_karlov4.txt)."),
-        notes=("The cut is MODEL-EVALUATED (Daxos +0.0013 +-0.0021 at T20, "
-               "damage-only). THE MECHANISM IS MOSTLY THE LOOP: "
-               "drain_loop_wins +0.0157 at T20 (+0.0113 at T10) -- a fourth "
-               "DRAIN_ON_GAIN partner for Exquisite Blood and Bloodthirsty "
-               "Conqueror (§0z90). Damage +1.28; lifegain events -1.16 and "
-               "Karlov counters -1.49 a game, the events Daxos supplied; "
-               "southwind_drains +1.44 and death gains +0.17 a game. "
-               "diagnostics/run_karlov_southwind.py, §0z128. The owner chose "
-               "the cut; NOT STAGED until the owner decides."),
     ),
     # ---- head-to-heads recorded before the split, in other entries ----
     Simulated(
