@@ -180,7 +180,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z125](#0z125) | MEASURED | **Five multi-type cards for rendmaw**: The Swarmweaver +0.0074, Dalek Squadron +0.0071, Fire Navy Trebuchet and Wickerfolk significant; H.E.R.B.I.E. inside its bar. **A second card type is worth about +0.002** on each |
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
-| [0z128](#0z128) | MEASURED | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure of Blood +0.0147 at T20, Polluted Bonds +0.0047; Slaughter Specialist and Forbidden Orchard NEGATIVE |
+| [0z128](#0z128) | MEASURED | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 ±0.0030 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11507,8 +11507,31 @@ does not pay for it. The clauses the model is unsure of (the Specialist's
 counters, the 1/1's size) both point upward, so both rows are floors -- but
 floors below zero.
 
-**Not staged.** A candidate row is not a swap: staging South Wind Avatar or
-Epicure needs a head-to-head against a named MODEL-EVALUATED cut (§0z31, §0z36).
+### The swap the owner named: −Daxos +South Wind Avatar
+
+The owner, 2026-10-12: "I'm fairly confident South Wind Avatar is a better
+fit in the deck, the real question is which card to cut", then, of the
+bottom eight MODEL-EVALUATED rows, "run it against Daxos". Daxos's row is
++0.0013 ±0.0021 at T20, significant on damage only, with both clauses
+modelled -- a cut whose row is evidence (§0z31).
+`diagnostics/run_karlov_southwind.py`, `results/karlov_southwind.txt`,
+N=15,000 paired, the staged list:
+
+| | T10 | T20 |
+|---|---|---|
+| win rate | **+0.0153 ±0.0023** | **+0.0187 ±0.0030** |
+| damage | +1.51 | +1.28 |
+| drain_loop_wins | +0.0113 | +0.0157 |
+| lifegain events | −0.63 | −1.16 |
+| Karlov counters | −0.89 | −1.49 |
+
+Significant at both horizons. **The gain is mostly the Exquisite Blood
+loop**: the Avatar is a fourth DRAIN_ON_GAIN partner, and the loop's wins
+account for nearly all of the T20 difference. What Daxos supplied -- about
+one lifegain event a game, and its Karlov counters -- is the cost, and it is
+small beside that. Recorded as SIMULATED in `edhmc/ledger/karlov.py`; **not
+staged until the owner decides.** Epicure of Blood has not been run against a
+cut.
 
 ## How to read an ablation table
 
