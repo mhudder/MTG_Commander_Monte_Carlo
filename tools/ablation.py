@@ -1383,8 +1383,16 @@ KNOWN_BLIND = {
         # the end-step outlets, and the pod's three draws are nested under
         # it), and it plays identically to its blank on test_blind_labels' 40
         # seeds -- so it carries no BLIND_BUT_LIVE reason.
+        # UNDER `pod_bodies` (§0z132) it is read at all four real end steps
+        # and hears the pod's deaths; the pod killing its own creatures is
+        # still the `opp_death_rate` knob, so it would be PARTLY MODELLED
+        # there. The label is the default pod's, which is what the tables use.
         'Deathreap Ritual',
         'Nameless Inversion',
+        # Pygmy Kavu: "draw a card for each black creature your opponents
+        # control". Under `pod_bodies` the bodies have a colour
+        # (`pod_black_share`, a judgement) and `engine.pygmy_kavu` draws
+        # (§0z132); on the default pod they have none, so it is a body.
         'Pygmy Kavu',
         'Reap',
     },

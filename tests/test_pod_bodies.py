@@ -43,8 +43,22 @@ CASES
   P  an edict for more than the board leaves 0, not a fraction (the count's
      own arithmetic)
 
+  -- added with change 1's gaps (§0z132, 2026-10-13) --
+  Q  the pod's chump blockers die (pod_block_policy "always"): two blocked
+     attackers, 5 and 3 power, kill the two weakest bodies
+  R  deathtouch: a 1-power deathtouch attacker kills a toughness-4 blocker;
+     the same attacker without it does not
+  S  the cost-aware pod: at 40 life it takes an 8-power swing unblocked; at
+     14 (floor 10) it chumps only the 5 and loses one body
+  T  a goaded Bird chumps before the defender's own creatures, and dies
+  U  Deathreap Ritual under bodies: your end step draws on a pod death; an
+     opponent's end step draws on one and not without one (rate 0); off
+     bodies, the end-step reading does nothing
+  V  Pygmy Kavu draws one per BLACK body; off bodies, nothing
+  W  pod_blocker_deaths=False: the same blocks as Q, no deaths
+
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  kill_pod_bodies never tells the hook           -> D, F, I, K, L, N, O*
+  kill_pod_bodies never tells the hook           -> D, F, I, K, L, N, O*, U**
   every own sweeper kills every body             -> E, F, G, H, O*
   bodies leave oldest-first                      -> C
   the wipe gate ignores bodies                   -> E
@@ -57,6 +71,17 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
     transcript, not a prediction (§0z14).
   the entering source is not named               -> O
   an edict leaves the fraction                   -> P
+  (§0z132, written before their run)
+  the pod's blockers never die                   -> Q, R, S, T
+  deathtouch is never read                       -> R
+  the pod always chumps (no cost-aware need)     -> S
+  goaded Birds do not block first                -> T
+  opponents' end steps are unheard               -> U
+  a pod death is not a death at the table        -> U
+  Pygmy Kavu counts every body, not black ones   -> V
+  ** U WAS ADDED WITHOUT EXTENDING THE FIRST SET, which then broke U too:
+    right, because Deathreap's count of deaths at the table hears pod deaths
+    through the same hook. A transcript, not a prediction (§0z14).
 
 UNMUTATED (§0z15): A and B are properties of `roll_body_pools`, read by the
 plain run; J is the OFF path.
@@ -275,6 +300,94 @@ def run_cases():
     OPP.kill_pod_count(g, o, 4)
     check("P an edict past the board leaves 0", o.creatures, 0.0)
 
+    def solo(g, life=40.0, creatures=4.0, pool=POOL):
+        for o in g.opponents[1:]:
+            o.alive, o.life, o.creatures = False, 0.0, 0.0
+        o = g.opponents[0]
+        o.life, o.creatures = life, creatures
+        o.body_pool, o.bodies, o.next_body = pool, [], 0
+        return o
+
+    def attacker(power, name=None):
+        c = EN.Card(name=name or f"A{power}", types=frozenset({"Creature"}),
+                    power=power, toughness=power)
+        return EN.Permanent(card=c, sick=False, base_p=power, base_t=power)
+
+    g = rgame(pod_block_policy="always")
+    o = solo(g)
+    dealt = OPP.combat_damage(g, [attacker(5), attacker(3)])
+    check("Q chump blockers die: the two weakest bodies",
+          (dealt, [b.toughness for b in o.bodies], o.creatures,
+           g.m["pod_blockers_killed"]),
+          (0.0, [3, 4], 2.0, 2))
+
+    tough = (B(4, 1), B(5, 1), B(6, 1), B(6, 2))
+    g = rgame(pod_block_policy="always")
+    o = solo(g, creatures=2.0, pool=tough)
+    OPP.combat_damage(g, [attacker(1, "Grave Titan")])
+    with_dt = [b.toughness for b in o.bodies]
+    g = rgame(pod_block_policy="always")
+    o = solo(g, creatures=2.0, pool=tough)
+    OPP.combat_damage(g, [attacker(1)])
+    check("R deathtouch kills a toughness-4 blocker; a 1/1 does not",
+          (with_dt, [b.toughness for b in o.bodies]), ([5], [4, 5]))
+
+    g = rgame()
+    o = solo(g)
+    at40 = OPP.combat_damage(g, [attacker(5), attacker(3)])
+    left40 = len(OPP.pod_bodies(g, o))
+    g = rgame()
+    o = solo(g, life=14.0)
+    OPP.combat_damage(g, [attacker(5), attacker(3)])
+    check("S cost-aware: unblocked at 40; at 14 only the 5 is chumped",
+          (at40, left40, 14.0 - o.life, [b.toughness for b in o.bodies]),
+          (8.0, 4, 3.0, [2, 3, 4]))
+
+    g = rgame(pod_block_policy="always")
+    o = solo(g)
+    o.goaded_birds = 2.0
+    OPP.combat_damage(g, [attacker(5), attacker(3)])
+    check("T goaded Birds chump first, and die",
+          (o.goaded_birds, len(OPP.pod_bodies(g, o)), g.m["pod_birds_killed"]),
+          (0.0, 4, 2))
+
+    reap = find(RM, "Deathreap Ritual")
+    g = rgame(opp_death_rate=0.0)
+    put(g, reap)
+    o = g.opponents[0]
+    g.deaths_mark = g.table_deaths
+    OPP.kill_pod_bodies(g, o, lambda b: b.toughness == 1)
+    EN.deathreap_end_step(g)                  # yours: a pod body died
+    mine = g.m["deathreap_draws"]
+    g.pod_end_step(1)                         # nothing died since
+    quiet = g.m["deathreap_draws"]
+    OPP.kill_pod_bodies(g, o, lambda b: b.toughness == 2)
+    g.pod_end_step(2)
+    theirs = g.m["deathreap_draws"]
+    g2 = rgame(pod_bodies=False)
+    put(g2, reap)
+    g2.table_deaths += 1
+    EN.deathreap_end_step(g2)
+    check("U Deathreap at every end step under bodies; off, nothing",
+          (mine, quiet, theirs, g2.m["deathreap_draws"]), (1, 1, 2, 0))
+
+    kavu = find(RM, "Pygmy Kavu")
+    pool = (B(1, 1, True), B(2, 3, False), B(3, 2, True), B(4, 4, False))
+    g = rgame()
+    solo(g, pool=pool)
+    EN.run_etb(g, EN.Permanent(card=kavu, sick=True))
+    g2 = rgame(pod_bodies=False)
+    solo(g2, pool=pool)
+    EN.run_etb(g2, EN.Permanent(card=kavu, sick=True))
+    check("V Pygmy Kavu: one card per black body; off, none",
+          (g.m["kavu_draws"], g2.m["kavu_draws"]), (2, 0))
+
+    g = rgame(pod_block_policy="always", pod_blocker_deaths=False)
+    o = solo(g)
+    dealt = OPP.combat_damage(g, [attacker(5), attacker(3)])
+    check("W pod_blocker_deaths=False: the same blocks, no deaths",
+          (dealt, len(OPP.pod_bodies(g, o))), (0.0, 4))
+
     return set(FAIL)
 
 
@@ -331,9 +444,33 @@ def main() -> int:
         finally:
             g.cfg = cfg
 
+    real_blockers = OPP.pod_blocker_deaths
+    real_pod_deaths = EN.Game.on_pod_creature_deaths
+
+    def birdless(g, o, blocked):
+        birds = o.goaded_birds
+        o.goaded_birds = 0.0
+        try:
+            return real_blockers(g, o, blocked)
+        finally:
+            o.goaded_birds = birds
+
+    def uncounted(self, o, n):
+        real_pod_deaths(self, o, n)
+        self.table_deaths -= n
+
+    def every_kavu(g):
+        if not OPP.pod_bodies_on(g):
+            return 0
+        n = sum(len(OPP.pod_bodies(g, o)) for o in OPP.living(g))
+        before = g.m["cards_drawn"]
+        g.draw(n)
+        g.m["kavu_draws"] += g.m["cards_drawn"] - before
+        return n
+
     muts = {
         "kill_pod_bodies never tells the hook":
-            ({"D", "F", "I", "K", "L", "N", "O"}, OPP, "kill_pod_bodies",
+            ({"D", "F", "I", "K", "L", "N", "O", "U"}, OPP, "kill_pod_bodies",
              silent_kill),
         "every own sweeper kills every body":
             ({"E", "F", "G", "H", "O"}, OPP, "own_wipe_body_rule",
@@ -352,6 +489,21 @@ def main() -> int:
                  g, spare_own="onesided" in card.tags, card=card)),
         "an edict leaves the fraction":
             ({"P"}, OPP, "kill_pod_count", edict_fraction),
+        "the pod's blockers never die":
+            ({"Q", "R", "S", "T"}, OPP, "pod_blocker_deaths",
+             lambda g, o, blocked: 0),
+        "deathtouch is never read":
+            ({"R"}, OPP, "deathtouch_of", lambda g, p: False),
+        "the pod always chumps":
+            ({"S"}, OPP, "chump_need", lambda *a: None),
+        "goaded Birds do not block first":
+            ({"T"}, OPP, "pod_blocker_deaths", birdless),
+        "opponents' end steps are unheard":
+            ({"U"}, EN.Game, "pod_end_step", lambda self, i: None),
+        "a pod death is not a death at the table":
+            ({"U"}, EN.Game, "on_pod_creature_deaths", uncounted),
+        "Pygmy Kavu counts every body":
+            ({"V"}, EN, "pygmy_kavu", every_kavu),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():

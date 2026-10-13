@@ -158,6 +158,19 @@ POD_V2 = {
 # average difficulty — see opponents.ARCHETYPES.
 POD_V3 = dict(POD_V2, archetypes=True)
 
+# POD_V4 -- A CANDIDATE, NOT THE DEFAULT (§0z130, §0z131, §0z132). Item 24's
+# changes 1 and 2: the pod's creatures as bodies that die (and block only when
+# it matters), and its kills as routes your answers can delay -- with the kill
+# timing re-fitted so the mean T20 win rate over the active decks equals this
+# pod's (`diagnostics/fit_threat_clock.py`: 1.89 rounds earlier, the owner's
+# target, 2026-10-13). Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
+# rebuild of every table; until then every number in the project is this pod's.
+POD_V4 = {
+    "pod_bodies": True,
+    "pod_threats": True,
+    "threat_clock_shift": 1.9,
+}
+
 # The pod as it stood before 2026-09-04, kept so any earlier number in the
 # project can be reproduced exactly.
 POD_V1 = {

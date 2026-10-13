@@ -111,7 +111,10 @@ What is closed and where it went:
       Gemstone stay blind (reasons in `tools/ablation.py`); Angel of
       Suffering waits for change 2 (is a clock damage?); the selection
       cards are change 4.
-    - **1. The pod's creatures as bodies** -- **BUILT, OFF (§0z130)**:
+    - **1. The pod's creatures as bodies** -- **BUILT, OFF (§0z130);
+      ITS GAPS CLOSED (§0z132)**: chump blockers die, the pod blocks only
+      when it matters (`pod_chump_floor`), deathtouch is read, Deathreap
+      Ritual and Pygmy Kavu read the bodies. Before that:
       `pod_bodies`, bit-identical off; switching it on is a POD_V4 call for
       the owner, with every table rebuilt. Originally: a pre-rolled power/toughness list
       per opponent instead of `Opponent.creatures`. Unlocks -X/-X and damage
@@ -125,8 +128,12 @@ What is closed and where it went:
       lifts every deck +0.038 to +0.082 at T20, all of it fewer clock
       losses, and `threat_rebuild_max` (1 / 3 / 5) moves that by a third
       either way: a judgement with no data, said with every result.
-      Switching it on is part of the same POD_V4 call as change 1, with
-      whether `clock_shift` is re-fitted. Not done: attack taxes,
+      **THE KILL TIMING IS RE-FITTED (§0z132)**, at the owner's request:
+      `threat_clock_shift` 1.9 holds the mean T20 win rate with bodies and
+      threats both on, and every deck's answers are then worth +0.04 to
+      +0.11. That pod is `experiment.POD_V4`, a candidate: adopting it is
+      the owner's call, with a rebuild of every table, `KNOWN_BLIND`
+      re-read and `tools.triage` taught `ANSWERS`. Not done: attack taxes,
       Damn's single-target mode, the voting answers, the wipe gate
       reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind

@@ -1,0 +1,26 @@
+Every spot answer blanked together, keep minus blank, N=2000 paired, staged lists
+
+rendmaw: 5 answers -- Nameless Inversion, Assassin's Trophy, Beast Within, Eyeblight's Ending, Hagra Mauling
+   today   T10 +0.0050 ±0.0042*   T20 +0.0050 ±0.0096 
+   POD_V4  T10 +0.0085 ±0.0067*   T20 +0.0410 ±0.0145*
+
+lorehold: 5 answers -- Swords to Plowshares, Path to Exile, Chaos Warp, Generous Gift, Rise of the Eldrazi
+   today   T10 +0.0440 ±0.0102*   T20 +0.0395 ±0.0120*
+   POD_V4  T10 +0.0440 ±0.0127*   T20 +0.0725 ±0.0159*
+
+karlov: 5 answers -- Swords to Plowshares, Path to Exile, Anguished Unmaking, Fracture, Return to Dust
+   today   T10 +0.0045 ±0.0040*   T20 +0.0045 ±0.0085 
+   POD_V4  T10 +0.0105 ±0.0068*   T20 +0.0550 ±0.0149*
+
+tivit: 4 answers -- Trial of a Time Lord, Path to Exile, Swords to Plowshares, Void Rend
+   today   T10 +0.0005 ±0.0045    T20 -0.0015 ±0.0084 
+   POD_V4  T10 +0.0205 ±0.0092*   T20 +0.0520 ±0.0144*
+
+shilgengar: 10 answers -- Angel of Despair, Angel of the Ruins, Path to Exile, Swords to Plowshares, Anguished Unmaking, Generous Gift, Despark, Vindicate, Mortify, Utter End
+   today   T10 +0.0005 ±0.0010    T20 +0.0205 ±0.0112*
+   POD_V4  T10 +0.0030 ±0.0044    T20 +0.1055 ±0.0187*
+
+azusa: 4 answers -- Terastodon, Ulamog, the Infinite Gyre, Krosan Grip, Beast Within
+   today   T10 +0.0135 ±0.0065*   T20 +0.0210 ±0.0098*
+   POD_V4  T10 +0.0270 ±0.0088*   T20 +0.0740 ±0.0146*
+

@@ -1488,6 +1488,10 @@ class Game(BaseGame):
         self.beast_active = False
         self.stampede_bonus = 0
         self.creature_died_this_turn = False
+        # Every creature death at the table, yours and (under `pod_bodies`)
+        # the pod's, and where the last end step left the count (§0z132).
+        self.table_deaths = 0
+        self.deaths_mark = 0
         # The owner's multi-type batch (§0z125). H.E.R.B.I.E.'s surveil reads
         # the first; Fire Navy Trebuchet's Ballistic Boulders and Dalek
         # Squadron's myriad copies are held until they leave.
@@ -1590,6 +1594,7 @@ class Game(BaseGame):
         leaves-the-battlefield triggers like Wurmcoil Engine's.
         """
         self.creature_died_this_turn = True
+        self.table_deaths += n                 # Deathreap's end steps, §0z132
 
         # CORRECTED 2026-09-04 against oracle text. These three are not the
         # same effect and were all being paid 3 pod life per death:
@@ -1682,6 +1687,11 @@ class Game(BaseGame):
 
         midnight_reaper(self, n, perm)       # item 24
 
+    def pod_end_step(self, i: int) -> None:
+        """Opponent `i`'s end step, called by `opponents_act` under
+        `pod_bodies` only (§0z132)."""
+        deathreap_end_step(self, i)
+
     def on_pod_creature_deaths(self, o, n: int) -> None:
         """`n` of opponent `o`'s creatures died -- an event only under
         `pod_bodies` (item 24, change 1; `opponents.kill_pod_bodies`). Three
@@ -1695,6 +1705,7 @@ class Game(BaseGame):
           The Meathook Massacre "Whenever a creature an opponent controls
                                 dies, you gain 1 life."
         """
+        self.table_deaths += n                 # Deathreap's end steps, §0z132
         artists = self.count("Blood Artist")
         if artists:
             self.deal_pod_damage(1.0 * n * artists, each=False)
@@ -3195,6 +3206,8 @@ def spend(g: Game, pay_idx: list[int], units: list[frozenset]):
 
 def run_etb(g: Game, perm: Permanent):
     s = perm.card.script
+    if perm.card.name == "Pygmy Kavu":           # by name, §0z132
+        pygmy_kavu(g)
     if s == "khalni_garden":
         g.make_tokens(1, 0, 1, "Plant")
     elif s == "woe_strider":
@@ -3490,7 +3503,11 @@ def activations(g: Game):
 
     # Deathreap Ritual: a card at EACH end step where a creature died. Four
     # end steps a round in a four-player game, and creatures die constantly.
-    if g.has("Deathreap Ritual") and g.creature_died_this_turn:
+    # Under `pod_bodies` it is read at the real end steps instead
+    # (`deathreap_end_step`, §0z132); this is the old reading, kept as it
+    # was so every table that measured it reproduces.
+    if (g.has("Deathreap Ritual") and g.creature_died_this_turn
+            and not OPP.pod_bodies_on(g)):
         g.draw(1 + sum(1 for i in range(3)
                        if crn_random(g, f"deathreap{i}")
                        < g.cfg.get("opp_death_rate", 0.55)))
@@ -4405,8 +4422,60 @@ def take_turn(g: Game):
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
     twitching_doll_nest(g)          # after the float metric: it is not spent
 
+    deathreap_end_step(g)           # your end step, under pod_bodies
+
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
+
+
+def deathreap_end_step(g, opp_index=None) -> None:
+    """DEATHREAP RITUAL under `pod_bodies` (§0z132), text verified against
+    Scryfall 2026-10-13: "Morbid -- At the beginning of each end step, if a
+    creature died this turn, you may draw a card."
+
+    Four end steps a round. Yours is read at the end of `take_turn`, after
+    the end-step outlets that do most of your killing -- §0z121's first
+    defect was a check that ran before them. Each opponent's is read after
+    that opponent acts in `opponents_act` (the `pod_end_step` hook), not
+    nested under your turn's flag (§0z121's second). "This turn" is every
+    death at the table since the last end step: yours, and the pod's bodies
+    -- chump blockers, sweepers, edicts, the pod's wraths.
+
+    WHAT IS STILL A KNOB. The pod killing its OWN creatures -- their combat
+    and their removal on each other -- is not modelled (§4), so on an
+    opponent's turn with no modelled death the old `opp_death_rate` roll
+    stands in for it. That overstates a little (it is the TOTAL rate, now
+    added to events), and it is why the card is PARTLY MODELLED, not
+    evaluated. Off `pod_bodies` this does nothing: `activations` keeps the
+    old reading."""
+    if not OPP.pod_bodies_on(g) or not g.has("Deathreap Ritual"):
+        g.deaths_mark = g.table_deaths
+        return
+    died = g.table_deaths > g.deaths_mark
+    g.deaths_mark = g.table_deaths
+    if not died and opp_index is not None:
+        died = (crn_random(g, f"deathreap{opp_index}")
+                < g.cfg.get("opp_death_rate", 0.55))
+    if died and draw_is_safe(g, 1):
+        before = g.m["cards_drawn"]
+        g.draw(1)
+        g.m["deathreap_draws"] += g.m["cards_drawn"] - before
+
+
+def pygmy_kavu(g) -> int:
+    """PYGMY KAVU, verified against Scryfall 2026-10-13: "When this creature
+    enters, draw a card for each black creature your opponents control."
+    Under `pod_bodies` the pod's creatures have a colour (`pod_black_share`,
+    §0z132); off it they do not, and the card is a body, as it always was."""
+    if not OPP.pod_bodies_on(g):
+        return 0
+    n = sum(1 for o in OPP.living(g) for b in OPP.pod_bodies(g, o)
+            if b.black)
+    if n:
+        before = g.m["cards_drawn"]
+        g.draw(n)
+        g.m["kavu_draws"] += g.m["cards_drawn"] - before
+    return n
 
 
 def simulate(deck: list[Card], commander: Card, cfg: dict, seed: int) -> dict:

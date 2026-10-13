@@ -78,6 +78,18 @@ TRAMPLE = {
     'Verdurous Gearhulk',
 }
 
+# Unconditional deathtouch (creatures only), from the same keywords array.
+# Read by opponents.deathtouch_of(): a blocker it damages dies (§0z132).
+DEATHTOUCH = {
+    'Acidic Slime',
+    'Bloodthirsty Conqueror',
+    'Elas il-Kor, Sadistic Pilgrim',
+    'Grave Titan',
+    'Pearl Collector',
+    'South Wind Avatar',
+    'Wurmcoil Engine',
+}
+
 # Token subtypes that fly, from the text of the card that makes them.
 FLYING_TOKENS = {
     'Angel',

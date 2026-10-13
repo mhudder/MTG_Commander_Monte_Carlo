@@ -251,7 +251,7 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
 # body that opponent ever fields is the same body on both branches. Nothing
 # here touches `make_pod`'s stream, so `pod_bodies=False` plays every game
 # bit-for-bit as before.
-PodBody = namedtuple("PodBody", "toughness mv")
+PodBody = namedtuple("PodBody", "toughness mv black", defaults=(False,))
 POD_BODY_POOL = 96       # bodies per opponent per game; drawn cyclically past it
 
 
@@ -261,8 +261,17 @@ def roll_body_pools(cfg, seed, opps) -> None:
     mvmax = max(1, int(round(2 / share))) if share > 0 else 1
     for i, o in enumerate(opps):
         r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
-        o.body_pool = tuple(PodBody(r.randint(1, tmax), r.randint(1, mvmax))
-                            for _ in range(POD_BODY_POOL))
+        pool = [(r.randint(1, tmax), r.randint(1, mvmax))
+                for _ in range(POD_BODY_POOL)]
+        # BLACK, for Pygmy Kavu (§0z132): from a SECOND stream, so toughness
+        # and mana value are the bodies change 1 rolled, unchanged. Each body
+        # is black with `pod_black_share` (0.25) -- A JUDGEMENT: black is in
+        # a bit under half of Commander decks, and not every creature in
+        # them is black.
+        rb = random.Random((seed * 1000003) ^ (0xB1AC4 + 7919 * i))
+        black = cfg.get("pod_black_share", 0.25)
+        o.body_pool = tuple(PodBody(t, mv, rb.random() < black)
+                            for t, mv in pool)
 
 
 def pod_bodies_on(g) -> bool:
@@ -387,10 +396,16 @@ def roll_threat_routes(cfg, seed, opps) -> None:
         o.pieces = tuple(ThreatPiece(_pick(r.random(), w), r.randint(1, tmax),
                                      r.randint(1, mvmax), r.randint(lo, hi))
                          for w in slots)
-        o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
         o.rebuild_pool = tuple(r.randint(1, dmax)
                                for _ in range(THREAT_REBUILD_POOL))
         o.next_rebuild = 0
+        # THE RETUNE (§0z132): a kill that can be delayed has to come sooner
+        # for the pod to stay as strong. `threat_clock_shift` rounds earlier,
+        # its fraction rolled LAST from this stream so nothing above moves.
+        whole, frac = divmod(float(cfg.get("threat_clock_shift", 0.0)), 1.0)
+        early = int(whole) + (1 if r.random() < frac else 0)
+        o.kill_turn = max(4, o.kill_turn - early)
+        o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
 
 
 def pod_threats_on(g) -> bool:
@@ -1534,6 +1549,11 @@ def opponents_act(g):
         board_wipe(g, opp, r)
         spot_removal(g, opp, others, r)
         ae_removal(g, opp, others, r)
+        # That opponent's END STEP, an event only under `pod_bodies`, where
+        # a death on their turn is one (§0z132; rendmaw's Deathreap Ritual).
+        end = getattr(g, "pod_end_step", None)
+        if end is not None and opp.alive and pod_bodies_on(g):
+            end(i)
     goaded_combat(g)
 
 
@@ -1765,7 +1785,85 @@ def trample_of(g, perm) -> bool:
     return False
 
 
-def chump(items, budget, blocked=None):
+def deathtouch_of(g, perm) -> bool:
+    """Does this attacker have deathtouch RIGHT NOW? (item 24, §0z132)
+
+    Unconditional deathtouch is the generated DEATHTOUCH set (trample's rule:
+    creatures, grants excluded). The rest is state, each named:
+
+      * Ohran Frostfang: "Attacking creatures you control have deathtouch."
+        Read only for attackers, which is the only place this is asked.
+      * trostani's "Phyrexian Wurm token (deathtouch)", a token by name.
+
+    A FLOOR: rendmaw's Wurmcoil Engine makes two tokens both named "Wurm",
+    so the deathtouch one cannot be told from the lifelink one and neither
+    is read as deathtouch."""
+    from edhmc.decks._evasion import DEATHTOUCH
+    name = perm.card.name
+    return (name in DEATHTOUCH or name == "Phyrexian Wurm token (deathtouch)"
+            or g.has("Ohran Frostfang"))
+
+
+def pod_blocker_deaths(g, o, blocked) -> int:
+    """Under `pod_bodies`, the pod's chump blockers die (item 24, §0z132).
+
+    `blocked` are your attackers `o` blocked this combat (what
+    `damage_through` did not let through). The defender chumps with its
+    goaded Birds first, then its WEAKEST bodies, the biggest attackers first
+    -- what a player throws in front of a 6/6 is the creature they value
+    least. A menace attacker takes two. A blocker dies if the attacker has
+    deathtouch, or if the attacker's power covers its toughness (weakest
+    first, so a 4-power attacker kills a toughness 1 and a toughness 3 that
+    double-block it). A block by the count's fraction is a floor: no death.
+    Each death is an event the engine's hook hears. Returns how many.
+
+    THE POD'S BLOCKING POLICY PREDATES THIS. `block_share` has 60% of a
+    defender's board chump every combat, a rule written when a chump cost
+    nothing. `pod_blocker_deaths=False` keeps bodies without these deaths,
+    so the two can be measured apart (§0z132; §0z42's shape)."""
+    if (not pod_bodies_on(g) or not blocked or not o.alive
+            or not g.cfg.get("pod_blocker_deaths", True)):
+        return 0
+    bodies = pod_bodies(g, o)
+    # A goaded Bird (rendmaw) chumps FIRST: it must attack someone else
+    # anyway, and a 2/2 token is worth less than any creature of their own.
+    birds = int(o.goaded_birds + 1e-9)
+    order = (["bird"] * birds
+             + sorted(range(len(bodies)), key=lambda i: bodies[i].toughness))
+    dead, birds_dead, k = set(), 0, 0
+    for p in sorted(blocked, key=g.power_of, reverse=True):
+        cost = 2 if menace_of(g, p) else 1
+        mine = order[k:k + cost]
+        k += cost
+        if not mine:
+            break
+        touch = deathtouch_of(g, p)
+        left = g.power_of(p)
+        for i in mine:
+            t = 2 if i == "bird" else bodies[i].toughness
+            if touch or t <= left:
+                left -= 0 if touch else t
+                if i == "bird":
+                    birds_dead += 1
+                else:
+                    dead.add(i)
+    n = 0
+    if birds_dead:
+        o.goaded_birds = max(0.0, o.goaded_birds - birds_dead)
+        g.m["pod_birds_killed"] += birds_dead
+        hook = getattr(g, "on_pod_creature_deaths", None)
+        if hook is not None:
+            hook(o, birds_dead)
+        n += birds_dead
+    if dead:
+        flags = iter([i in dead for i in range(len(bodies))])
+        k = kill_pod_bodies(g, o, lambda b: next(flags))
+        g.m["pod_blockers_killed"] += k
+        n += k
+    return n
+
+
+def chump(items, budget, blocked=None, need=None):
     """Blockers a defender assigns, and the power they stop.
 
     `items` is [(power, cost[, key[, priority[, stops]]]], cost being the
@@ -1782,6 +1880,10 @@ def chump(items, budget, blocked=None):
     commander damage (§0z65) reads the same blocking decision the damage
     total does, instead of a second copy of it. Python's sort is stable, so
     carrying a key changes no order.
+
+    `need`, when given, is how much the defender NEEDS to stop (a
+    cost-aware pod, §0z132): it stops chumping once it has, except for a
+    priority item (a commander one hit from 21), which it always blocks.
     """
     stopped, used = 0.0, 0
     # An optional fourth element is a PRIORITY that outranks power per
@@ -1793,6 +1895,9 @@ def chump(items, budget, blocked=None):
                                             stops(it) / it[1], stops(it)),
                      reverse=True):
         cost = it[1]
+        if (need is not None and stopped >= need
+                and not (len(it) > 3 and it[3])):
+            break
         if used + cost <= budget:
             used += cost
             stopped += stops(it)
@@ -1878,6 +1983,30 @@ def rogues_passage(g, attackers: list, pay) -> bool:
     return True
 
 
+def cost_aware_blocking(g) -> bool:
+    """Does the pod weigh a chump block's cost? Only when it HAS one: under
+    `pod_bodies` with `pod_blocker_deaths` (§0z132). `pod_block_policy=
+    "always"` keeps the old rule, chump with every blocker, for measuring."""
+    return (pod_bodies_on(g) and g.cfg.get("pod_blocker_deaths", True)
+            and g.cfg.get("pod_block_policy", "cost") == "cost")
+
+
+def chump_need(g, defender, fly, ground, free_power):
+    """How much of this swing the defender must stop, or None for the old
+    rule (block with everything). A COST-AWARE DEFENDER (§0z132) chumps only
+    until the swing would leave it above `pod_chump_floor` life (10, A
+    JUDGEMENT: a player at 40 takes a hit and keeps their creatures, a
+    player facing lethal or near it throws them in front). Raw power, before
+    an engine's `scale` or `bonus` and before Selenia's Curse -- what the
+    defender sees on the board."""
+    if not cost_aware_blocking(g):
+        return None
+    total = (sum(it[0] for it in fly) + sum(it[0] for it in ground)
+             + free_power)
+    room = max(0.0, defender.life - g.cfg.get("pod_chump_floor", 10))
+    return max(0.0, total - room)
+
+
 def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     """Opponents chump-block your biggest attackers first — and CANNOT block
     your fliers with most of their board.
@@ -1939,9 +2068,11 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     # flier no matter how big it is. A MENACE attacker takes two blockers
     # (two flying-capable ones if it also flies), which `chump` prices (§0z61).
     blocked = [] if unblocked is not None else None
-    stopped_fly, used_fly = chump(fly, n_fly, blocked)
+    need = chump_need(g, defender, fly, ground, free_power)
+    stopped_fly, used_fly = chump(fly, n_fly, blocked, need)
     stopped_ground, _ = chump(ground, (n_block - n_fly) + (n_fly - used_fly),
-                              blocked)
+                              blocked,
+                              None if need is None else need - stopped_fly)
     if unblocked is not None:
         gone = set(blocked)
         unblocked.extend(p for k, p in enumerate(attackers) if k not in gone)
@@ -2446,6 +2577,7 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     before_alive = len(living(g))
     effective, raw = 0.0, 0.0
     losses = []
+    chumped = []          # (defender, the attackers it blocked), §0z132
     for slot, (opp, group) in enumerate(groups):
         through = []
         dealt = damage_through(g, group, defender=opp,
@@ -2454,6 +2586,8 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         # (§0z65). Before the `dealt <= 0` skip, though a commander that got
         # through has dealt something.
         opp.cmdr_damage += commander_hit(g, through)
+        got = {id(p) for p in through}
+        chumped.append((opp, [p for p in group if id(p) not in got]))
         if slot == 0:
             dealt += bonus
         if dealt <= 0:
@@ -2472,6 +2606,13 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     # Combat damage is simultaneous: everything lands, then deaths are checked.
     _check_eliminations(g)
     lost_life(g, losses)                  # §0z90
+    # The blockers died in the same damage step; their death triggers resolve
+    # with the rest, after it -- and a defender the swing killed has no board
+    # left to die (`pod_wipe_board`'s rule). A no-op off `pod_bodies`.
+    for opp, blocked in chumped:
+        pod_blocker_deaths(g, opp, blocked)
+    if pod_bodies_on(g):
+        _check_eliminations(g)
     g.m["raw_damage"] += raw
     g.m["combat_kills"] += before_alive - len(living(g))
     g.m["attack_targets"] += len(groups)

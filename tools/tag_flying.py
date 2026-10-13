@@ -386,6 +386,15 @@ def main():
                if n in creatures and "Trample" in c.get("keywords", [])
                and not re.search(r"(gains?|have|has) trample",
                                  (c.get("oracle_text") or "").lower())}
+    # DEATHTOUCH, 2026-10-13 (item 24, §0z132): under `pod_bodies` a blocker
+    # an attacker with deathtouch damages dies, whatever its toughness.
+    # Trample's rule exactly: creatures, unconditional, grants excluded
+    # (Ohran Frostfang's "attacking creatures you control have deathtouch" is
+    # read by name in `opponents.deathtouch_of`, not tagged).
+    deathtouch = {n for n, c in cards.items()
+                  if n in creatures and "Deathtouch" in c.get("keywords", [])
+                  and not re.search(r"(gains?|have|has) deathtouch",
+                                    (c.get("oracle_text") or "").lower())}
     indestructible = {n for n, c in cards.items()
                       if "Indestructible" in c.get("keywords", [])
                       and n in everything and everything[n].is_permanent}
@@ -504,6 +513,9 @@ def main():
     print(f"\nUNCONDITIONAL TRAMPLE ({len(trample)}):")
     for n in sorted(trample):
         print(f"    {n}")
+    print(f"\nUNCONDITIONAL DEATHTOUCH ({len(deathtouch)}):")
+    for n in sorted(deathtouch):
+        print(f"    {n}")
     print(f"\nCONDITIONAL — handled in opponents.flying_of(), not tagged:")
     for n, why in sorted(CONDITIONAL.items()):
         seen = "in deck" if n in creatures else "NOT IN ANY DECK"
@@ -599,6 +611,11 @@ def main():
                      "same keywords array.\n# Read by opponents.trample_of(): a "
                      "blocked trampler assigns the excess (§0z92).\nTRAMPLE = {\n")
             for n in sorted(trample):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n\n# Unconditional deathtouch (creatures only), from the "
+                     "same keywords array.\n# Read by opponents.deathtouch_of(): "
+                     "a blocker it damages dies (§0z132).\nDEATHTOUCH = {\n")
+            for n in sorted(deathtouch):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n\n# Token subtypes that fly, from the text of the card "
                      "that makes them.\nFLYING_TOKENS = {\n")

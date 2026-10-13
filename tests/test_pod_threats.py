@@ -43,6 +43,9 @@ CASES
   K  tivit's Coercive Portal (carnage) takes noncreature pieces too
   L  rendmaw's main phase holds Beast Within with nothing out and casts it
      at a piece once one is out (the end-to-end hold and answer)
+  M  the retune (§0z132): `threat_clock_shift` 2 brings every kill two
+     rounds earlier and its pieces with it; 0.5 brings some one earlier and
+     none more; routes and delays do not move
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   a removed piece does not push the kill            -> D, G, L *
@@ -54,6 +57,8 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the Portal takes creature pieces only             -> K
   a piece is out on the turn it lands               -> C, L *
   the hold ignores what is out (always holds)       -> H, L
+  (§0z132, written before its run)
+  the clock shift is ignored                        -> M
   * TWO PREDICTIONS WERE WRONG, corrected after the first run and recorded
     here as a transcript, not a prediction (§0z14). The first was written
     as D, G, I, K, L: I and K read which pieces are OUT, not the clock, so a
@@ -309,6 +314,23 @@ def run_cases():
           (held, bw in g.hand, o.kill_turn > 8),
           (True, False, True))
 
+    base = OPP.make_pod(dict(cfg, pod_threats=True), 11)[0]
+    two = OPP.make_pod(dict(cfg, pod_threats=True, threat_clock_shift=2.0),
+                       11)[0]
+    half = [o.kill_turn for seed in range(30) for o in OPP.make_pod(
+        dict(cfg, pod_threats=True, threat_clock_shift=0.5), seed)[0]]
+    flat = [o.kill_turn for seed in range(30) for o in OPP.make_pod(
+        dict(cfg, pod_threats=True), seed)[0]]
+    steps = {a - b for a, b in zip(flat, half)}
+    check("M the clock shift: 2 rounds earlier, pieces too; 0.5 some by 1",
+          ([a.kill_turn - b.kill_turn for a, b in zip(base, two)],
+           all(b.piece_lands == [b.kill_turn - p.lead for p in b.pieces]
+               for b in two),
+           [(a.route, a.pieces, a.rebuild_pool) for a in base]
+           == [(b.route, b.pieces, b.rebuild_pool) for b in two],
+           steps),
+          ([2, 2, 2], True, True, {0, 1}))
+
     return set(FAIL)
 
 
@@ -321,6 +343,7 @@ def main() -> int:
 
     print("MUTATION RUN -- exact sets\n")
     real_remove = OPP.remove_threat_piece
+    real_roll = OPP.roll_threat_routes
     real_reach = OPP.answer_reach
     real_wipe = OPP.wipe_threat_pieces
 
@@ -381,6 +404,10 @@ def main() -> int:
             ({"C", "L"}, OPP, "present_pieces", same_turn),
         "the hold ignores what is out":
             ({"H", "L"}, OPP, "hold_answer", always_hold),
+        "the clock shift is ignored":
+            ({"M"}, OPP, "roll_threat_routes",
+             lambda cfg, seed, opps: real_roll(
+                 dict(cfg, threat_clock_shift=0.0), seed, opps)),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():

@@ -184,6 +184,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z129](#0z129) | REBUILT | **Item 24, change 0**: nine KNOWN_BLIND cards given code. Five tables rebuilt: Capstone +0.0404 (lorehold's top row), Seminar +0.0333, Quirion +0.0112, Reclamation, Sun Titan, Jitte, Reaper ~+0.005 |
 | [0z130](#0z130) | BUILT | **Item 24, change 1**: the pod's creatures as bodies (toughness, mana value), behind `pod_bodies`, OFF and bit-identical; Massacre Wurm had three rules; ON moves tivit +0.013, lorehold +0.011 |
 | [0z131](#0z131) | BUILT | **Item 24, change 2**: opponent kills as routes of removable pieces, behind `pod_threats`, OFF and bit-identical; ON lifts T20 win +0.038 to +0.082, all via fewer clock losses; rebuild delay is the knob |
+| [0z132](#0z132) | BUILT | Change 1's gaps closed (blockers die, cost-aware pod blocking, deathtouch, Deathreap, Pygmy Kavu); kill timing re-fitted 1.9 rounds earlier: `POD_V4` holds mean win, answers worth +0.04 to +0.11 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11853,6 +11854,106 @@ wipe gate does not yet ask whether a sweep would break a route; creature
 pieces are not change 1's bodies, so a piece's death is not a "creature an
 opponent controls dies" event. Return to Dust's census clause carries only
 its first target, so it is read as one.
+
+<a id="0z132"></a>
+
+## 0z132. BUILT — change 1's gaps closed, and the kill timing re-fitted for a pod whose kills can be delayed (`POD_V4`, a candidate)
+
+**2026-10-13, at the owner's request.** Two things. The four gaps §0z130
+left (chump blockers never died, deathtouch was not read, Deathreap Ritual
+stood on a flat rate, Pygmy Kavu needed a colour), and the owner's call on
+§0z131's biggest open question: "I would retune the kill timing a bit, since
+people can now delay a kill and it should be advantageous to have cards that
+can do that." The target, chosen by the owner: with bodies and threats on,
+the mean T20 win rate over the active decks equals today's pod's.
+
+Everything here is under `pod_bodies` or `pod_threats`, both still OFF. **OFF
+is bit-identical** against `dc20734`: every staged list, seeds 5000..6999,
+every numeric output key.
+
+### Change 1's gaps
+
+| gap | what now | where |
+|---|---|---|
+| chump blockers never died | a blocker dies if your attacker's power covers its toughness (weakest first) or it has deathtouch; goaded Birds chump first; each death is an event | `pod_blocker_deaths`, from `combat_damage` at resolution only |
+| deathtouch | the generated `DEATHTOUCH` set (Scryfall keywords, trample's rule: 7 cards), Ohran Frostfang's grant, trostani's deathtouch Wurm by name. A floor: rendmaw's Wurmcoil tokens share one name and are not read | `tools.tag_flying`, `deathtouch_of` |
+| Deathreap Ritual | read at all four real end steps (yours at the end of `take_turn`, each opponent's after it acts, `pod_end_step`) on every death at the table since the last one -- §0z121's first two defects. The pod killing its own creatures is still unmodelled, so an opponent's end step with no modelled death keeps the `opp_death_rate` roll: PARTLY MODELLED, and still `KNOWN_BLIND` on the default pod | `engine.deathreap_end_step` |
+| Pygmy Kavu | bodies are black with `pod_black_share` (0.25, a judgement), from a second stream so toughness and mana value are change 1's | `engine.pygmy_kavu`, `roll_body_pools` |
+
+**BLOCKERS DYING MADE THE POD'S BLOCKING POLICY A CLAIM (§0z42's shape).**
+`block_share` chumps with 60% of a defender's board every combat, a rule
+written when a chump cost nothing. With deaths on and that rule kept, every
+deck gained 1.3 to 8.3 points at T20 (600 paired games each; rendmaw
++0.083 ±0.031), nearly all of it fewer losses on life: the pod threw its
+boards away and stopped hitting you. The owner chose a cost-aware pod: a
+defender chumps your biggest attackers only until the swing would leave it
+above `pod_chump_floor` (10 life, a judgement), and always blocks a
+commander one hit from 21 (`chump_need`, `pod_block_policy="cost"`).
+Measured the same way, the gain is about the same size (rendmaw +0.090,
+karlov +0.033, tivit +0.033, azusa +0.033) but now comes from the other end:
+defenders take hits, your swings kill more, and games end before the clocks.
+`pod_block_policy="always"` keeps the old rule; `pod_blocker_deaths=False`
+keeps bodies without the deaths.
+
+### The re-fit (`diagnostics/fit_threat_clock.py`, `results/pod_v4_clock_fit_20261013.txt`)
+
+`threat_clock_shift` brings every kill that many rounds earlier, its fraction
+rolled last from each opponent's threat stream (so routes and delays do not
+move). Swept at N=1,500 (0 / 1 / 2 / 3 rounds: mean T20 +0.095 / +0.041 /
+-0.005 / -0.054 against the target), fitted at **1.89**, adopted as 1.9 and
+confirmed at N=3,000: **mean T20 0.4079 against a target of 0.4079.**
+
+| deck | T20 against today's pod, POD_V4 | game length |
+|---|---|---|
+| rendmaw | **+0.063 ±0.019** | -1.02 rounds |
+| shilgengar | **+0.041 ±0.019** | -0.40 |
+| tivit | +0.005 ±0.018 | -0.53 |
+| lorehold | **-0.023 ±0.019** | -0.50 |
+| karlov | **-0.040 ±0.019** | -0.79 |
+| azusa | **-0.045 ±0.019** | -0.67 |
+
+The average is held; the spread is the point. Games are about half a round
+to a round shorter -- `experiment.py`'s POD_V2 note anchors the pod at the
+Command Zone's 10.29-turn average, and the POD_V4 decks land at 10.1-11.3.
+
+### Answers are worth having now (`diagnostics/run_answer_worth.py`, `results/answer_worth_20261013.txt`)
+
+Every spot answer in a deck blanked TOGETHER (leave-one-out is blind to
+redundancy, §0z27), keep minus blank, N=2,000 paired, T20:
+
+| deck | answers | today's pod | POD_V4 |
+|---|---|---|---|
+| rendmaw | 5 | +0.005 ±0.010 | **+0.041 ±0.015** |
+| lorehold | 5 | **+0.040 ±0.012** | **+0.073 ±0.016** |
+| karlov | 5 | +0.005 ±0.009 | **+0.055 ±0.015** |
+| tivit | 4 | -0.002 ±0.008 | **+0.052 ±0.014** |
+| shilgengar | 10 | **+0.021 ±0.011** | **+0.106 ±0.019** |
+| azusa | 4 | **+0.021 ±0.010** | **+0.074 ±0.015** |
+
+Today's rows that are significant are §0j's priority constant and the
+cards' other channels (lorehold's are instants its prowess and miracles
+read), not their text. On POD_V4 every deck's answers are worth 4-11
+points.
+
+**The knobs, said out loud.** `threat_rebuild_max` (3) is still the largest
+(§0z131); `threat_clock_shift` (1.9) is fitted to the owner's target, not
+measured; `pod_chump_floor` (10) and `pod_black_share` (0.25) are judgements.
+
+### Gates
+
+`tests/test_pod_bodies.py`: 23 cases, 15 mutations (Q-W new; the old "hook"
+mutation now also breaks U, recorded as a transcript, §0z14).
+`tests/test_pod_threats.py`: 13 cases, 10 mutations (M, the shift).
+`tests/test_triage.py`'s BODY example moved again, from Pygmy Kavu (SEEN now,
+through its name) to Hexing Squelcher. `validate` +0.00 everywhere.
+
+**NOT DONE.** `tools.triage` reads names in an engine's files, and the
+answers `pod_threats` reads are derived from the census, so on POD_V4 it
+would still call Swords BLIND and Terastodon a BODY: when POD_V4 is adopted
+triage has to read `ANSWERS`. The blind labels (`KNOWN_BLIND`) are the
+default pod's, and adopting POD_V4 means re-reading them -- most of the 27
+answers become evaluable. The pod's own creatures still do not die to each
+other. Adopting POD_V4 is the owner's call, with a rebuild of every table.
 
 ## How to read an ablation table
 

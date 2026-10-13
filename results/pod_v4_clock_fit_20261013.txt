@@ -1,0 +1,13 @@
+POD_V4 candidate {'pod_bodies': True, 'pod_threats': True}, N=3000 per deck, staged lists, seeds 5000..7999
+target: mean T20 win rate of the off pod over 6 active decks = 0.4079
+
+threat_clock_shift=1.9
+   rendmaw     T10 0.0793 (+0.0340)   T20 0.3127 (+0.0630 ±0.0194)   turns 10.94 (-1.02)
+   lorehold    T10 0.2267 (+0.0003)   T20 0.4397 (-0.0227 ±0.0188)   turns 10.12 (-0.50)
+   karlov      T10 0.2350 (+0.0037)   T20 0.4603 (-0.0403 ±0.0188)   turns 10.42 (-0.79)
+   tivit       T10 0.2557 (+0.0137)   T20 0.4653 (+0.0047 ±0.0179)   turns 10.76 (-0.53)
+   shilgengar  T10 0.0267 (+0.0120)   T20 0.3027 (+0.0407 ±0.0192)   turns 11.31 (-0.40)
+   azusa       T10 0.2623 (-0.0163)   T20 0.4670 (-0.0453 ±0.0187)   turns 10.18 (-0.67)
+   mean T20 0.4079  (+0.0000 against the target)
+
+fitted threat_clock_shift: not bracketed -- widen --shifts
