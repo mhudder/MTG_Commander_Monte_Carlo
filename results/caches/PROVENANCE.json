@@ -412,6 +412,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "d85403c571c18ddc",
         "utc": "2026-10-13T03:02:38Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "09ccfe8c99d172f0",
+        "utc": "2026-10-13T16:35:57Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "35928c8a862c3457",
+        "utc": "2026-10-13T16:38:00Z"
       }
     ]
   },
@@ -763,6 +775,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "4f5f18e7eec136e3",
         "utc": "2026-10-13T03:02:37Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "6fba5f3e10de70e5",
+        "utc": "2026-10-13T16:35:58Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "ff796c0d68f1cb40",
+        "utc": "2026-10-13T16:38:00Z"
       }
     ]
   },
@@ -1121,6 +1145,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "9d5e13e7059c2b72",
         "utc": "2026-10-13T03:02:37Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "1a90617f9be2c62d",
+        "utc": "2026-10-13T16:35:58Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "2734799bde9525b5",
+        "utc": "2026-10-13T16:38:01Z"
       }
     ]
   },
@@ -1457,6 +1493,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "e0849127c3383fda",
         "utc": "2026-10-13T03:02:37Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "fdbc286ccbb38344",
+        "utc": "2026-10-13T16:35:58Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "3f98e55bd40387b2",
+        "utc": "2026-10-13T16:38:01Z"
       }
     ]
   },
@@ -1835,6 +1883,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "8c9131fd1c9928a5",
         "utc": "2026-10-13T03:02:38Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "00c561c8b43506d6",
+        "utc": "2026-10-13T16:35:58Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "afea7a76446dbd11",
+        "utc": "2026-10-13T16:38:01Z"
       }
     ]
   },
@@ -2158,6 +2218,18 @@
         "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
         "fingerprint": "12b55e2ef17b2a7a",
         "utc": "2026-10-13T03:02:37Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key; and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Also: with pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck), so removing a piece is the only channel.",
+        "fingerprint": "4a8211fc35812fae",
+        "utc": "2026-10-13T16:35:58Z"
+      },
+      {
+        "commit": "0817220",
+        "evidence": "Item 24 change 2 (\u00a70z131): pod_threats ships OFF. Against a worktree at 0817220, where this cache was already VERIFIED: every staged list (build_pending), seeds 5000..6999, T20, BIT-IDENTICAL on every numeric output key, and check_unchanged_decks --n=2000 --include-suspended BIT-IDENTICAL on all seven module lists. Re-checked at this fingerprint after a comment-only edit: staged lists, seeds 7000..7399, every numeric key, BIT-IDENTICAL. With pod_threats ON and threat_hold=False, every game in which no piece was removed matched OFF on every metric (400 seeds per deck).",
+        "fingerprint": "4cba7bb9855428ad",
+        "utc": "2026-10-13T16:38:01Z"
       }
     ]
   },

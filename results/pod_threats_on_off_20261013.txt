@@ -1,0 +1,142 @@
+pod_threats (item 24, change 2), STAGED lists, N=3000 paired against off, seeds 5000..7999
+
+rendmaw T10   off: won 0.0453  lost_to_clock 0.1467
+   on       won -0.0020 ±0.0026   opponents_killed -0.0247 ±0.0088*  lost_to_clock -0.0250 ±0.0061*  lost_on_life +0.0003 ±0.0028 
+            answers_cast 0.15  answers_whiffed 0.01  pieces_removed 0.15  rounds_delayed 0.30  wipe_pieces 0.01
+   naive    won -0.0007 ±0.0009   opponents_killed -0.0137 ±0.0052*  lost_to_clock -0.0170 ±0.0049*  lost_on_life +0.0003 ±0.0007 
+            answers_cast 0.49  answers_whiffed 0.41  pieces_removed 0.08  rounds_delayed 0.18  wipe_pieces 0.01
+   rebuild1 won -0.0020 ±0.0026   opponents_killed -0.0207 ±0.0089*  lost_to_clock -0.0213 ±0.0062*  lost_on_life +0.0003 ±0.0028 
+            answers_cast 0.15  answers_whiffed 0.01  pieces_removed 0.15  rounds_delayed 0.17  wipe_pieces 0.01
+   rebuild5 won -0.0020 ±0.0026   opponents_killed -0.0243 ±0.0088*  lost_to_clock -0.0260 ±0.0061*  lost_on_life +0.0003 ±0.0028 
+            answers_cast 0.15  answers_whiffed 0.01  pieces_removed 0.15  rounds_delayed 0.43  wipe_pieces 0.01
+
+rendmaw T20   off: won 0.2497  lost_to_clock 0.4777
+   on       won +0.0380 ±0.0104*  opponents_killed +0.0613 ±0.0197*  lost_to_clock -0.0573 ±0.0117*  lost_on_life +0.0160 ±0.0073*
+            answers_cast 0.42  answers_whiffed 0.02  pieces_removed 0.42  rounds_delayed 0.81  wipe_pieces 0.03
+   naive    won +0.0277 ±0.0072*  opponents_killed +0.0387 ±0.0137*  lost_to_clock -0.0393 ±0.0084*  lost_on_life +0.0100 ±0.0046*
+            answers_cast 0.68  answers_whiffed 0.49  pieces_removed 0.23  rounds_delayed 0.46  wipe_pieces 0.04
+   rebuild1 won +0.0223 ±0.0097*  opponents_killed +0.0400 ±0.0193*  lost_to_clock -0.0347 ±0.0109*  lost_on_life +0.0110 ±0.0069*
+            answers_cast 0.42  answers_whiffed 0.02  pieces_removed 0.43  rounds_delayed 0.46  wipe_pieces 0.03
+   rebuild5 won +0.0487 ±0.0110*  opponents_killed +0.0753 ±0.0201*  lost_to_clock -0.0723 ±0.0122*  lost_on_life +0.0203 ±0.0076*
+            answers_cast 0.42  answers_whiffed 0.02  pieces_removed 0.42  rounds_delayed 1.17  wipe_pieces 0.03
+
+lorehold T10   off: won 0.2263  lost_to_clock 0.1083
+   on       won +0.0100 ±0.0077*  opponents_killed -0.0070 ±0.0161   lost_to_clock -0.0143 ±0.0066*  lost_on_life -0.0037 ±0.0048 
+            answers_cast 0.31  answers_whiffed 0.20  pieces_removed 0.15  rounds_delayed 0.29  wipe_pieces 0.05
+   naive    won +0.0033 ±0.0031*  opponents_killed -0.0133 ±0.0081*  lost_to_clock -0.0140 ±0.0052*  lost_on_life +0.0003 ±0.0007 
+            answers_cast 0.79  answers_whiffed 0.71  pieces_removed 0.13  rounds_delayed 0.24  wipe_pieces 0.05
+   rebuild1 won +0.0100 ±0.0077*  opponents_killed +0.0007 ±0.0158   lost_to_clock -0.0120 ±0.0066*  lost_on_life -0.0037 ±0.0048 
+            answers_cast 0.31  answers_whiffed 0.20  pieces_removed 0.16  rounds_delayed 0.17  wipe_pieces 0.05
+   rebuild5 won +0.0103 ±0.0077*  opponents_killed -0.0073 ±0.0160   lost_to_clock -0.0163 ±0.0065*  lost_on_life -0.0037 ±0.0048 
+            answers_cast 0.31  answers_whiffed 0.20  pieces_removed 0.15  rounds_delayed 0.43  wipe_pieces 0.05
+
+lorehold T20   off: won 0.4623  lost_to_clock 0.2870
+   on       won +0.0410 ±0.0124*  opponents_killed +0.0433 ±0.0228*  lost_to_clock -0.0383 ±0.0118*  lost_on_life -0.0033 ±0.0069 
+            answers_cast 0.43  answers_whiffed 0.21  pieces_removed 0.33  rounds_delayed 0.57  wipe_pieces 0.11
+   naive    won +0.0270 ±0.0078*  opponents_killed +0.0343 ±0.0141*  lost_to_clock -0.0303 ±0.0082*  lost_on_life +0.0030 ±0.0030*
+            answers_cast 0.94  answers_whiffed 0.75  pieces_removed 0.29  rounds_delayed 0.49  wipe_pieces 0.11
+   rebuild1 won +0.0307 ±0.0120*  opponents_killed +0.0347 ±0.0225*  lost_to_clock -0.0280 ±0.0113*  lost_on_life -0.0033 ±0.0070 
+            answers_cast 0.44  answers_whiffed 0.21  pieces_removed 0.34  rounds_delayed 0.33  wipe_pieces 0.12
+   rebuild5 won +0.0483 ±0.0123*  opponents_killed +0.0510 ±0.0226*  lost_to_clock -0.0503 ±0.0116*  lost_on_life +0.0010 ±0.0070 
+            answers_cast 0.44  answers_whiffed 0.21  pieces_removed 0.33  rounds_delayed 0.85  wipe_pieces 0.11
+
+karlov T10   off: won 0.2313  lost_to_clock 0.1330
+   on       won +0.0033 ±0.0029*  opponents_killed -0.0187 ±0.0091*  lost_to_clock -0.0330 ±0.0067*  lost_on_life -0.0007 ±0.0016 
+            answers_cast 0.17  answers_whiffed 0.02  pieces_removed 0.17  rounds_delayed 0.34  wipe_pieces 0.01
+   naive    won +0.0007 ±0.0016   opponents_killed -0.0100 ±0.0055*  lost_to_clock -0.0190 ±0.0049*  lost_on_life +0.0000 ±0.0000 
+            answers_cast 0.57  answers_whiffed 0.51  pieces_removed 0.08  rounds_delayed 0.15  wipe_pieces 0.01
+   rebuild1 won +0.0030 ±0.0028*  opponents_killed -0.0133 ±0.0089*  lost_to_clock -0.0273 ±0.0065*  lost_on_life -0.0007 ±0.0016 
+            answers_cast 0.18  answers_whiffed 0.02  pieces_removed 0.18  rounds_delayed 0.19  wipe_pieces 0.01
+   rebuild5 won +0.0033 ±0.0029*  opponents_killed -0.0203 ±0.0091*  lost_to_clock -0.0337 ±0.0068*  lost_on_life -0.0007 ±0.0016 
+            answers_cast 0.17  answers_whiffed 0.02  pieces_removed 0.17  rounds_delayed 0.49  wipe_pieces 0.01
+
+karlov T20   off: won 0.5007  lost_to_clock 0.4223
+   on       won +0.0543 ±0.0110*  opponents_killed +0.0733 ±0.0211*  lost_to_clock -0.0613 ±0.0113*  lost_on_life +0.0030 ±0.0033 
+            answers_cast 0.45  answers_whiffed 0.03  pieces_removed 0.47  rounds_delayed 0.88  wipe_pieces 0.04
+   naive    won +0.0333 ±0.0075*  opponents_killed +0.0477 ±0.0140*  lost_to_clock -0.0360 ±0.0078*  lost_on_life +0.0010 ±0.0017 
+            answers_cast 0.75  answers_whiffed 0.57  pieces_removed 0.21  rounds_delayed 0.40  wipe_pieces 0.03
+   rebuild1 won +0.0360 ±0.0104*  opponents_killed +0.0510 ±0.0209*  lost_to_clock -0.0417 ±0.0108*  lost_on_life +0.0027 ±0.0031 
+            answers_cast 0.45  answers_whiffed 0.03  pieces_removed 0.47  rounds_delayed 0.49  wipe_pieces 0.04
+   rebuild5 won +0.0690 ±0.0112*  opponents_killed +0.0940 ±0.0216*  lost_to_clock -0.0820 ±0.0119*  lost_on_life +0.0043 ±0.0035*
+            answers_cast 0.46  answers_whiffed 0.03  pieces_removed 0.47  rounds_delayed 1.27  wipe_pieces 0.04
+
+tivit T10   off: won 0.2420  lost_to_clock 0.0927
+   on       won +0.0067 ±0.0051*  opponents_killed -0.0267 ±0.0136*  lost_to_clock -0.0327 ±0.0070*  lost_on_life +0.0017 ±0.0031 
+            answers_cast 0.33  answers_whiffed 0.13  pieces_removed 0.25  rounds_delayed 0.46  wipe_pieces 0.06
+   naive    won +0.0033 ±0.0021*  opponents_killed -0.0183 ±0.0079*  lost_to_clock -0.0220 ±0.0056*  lost_on_life +0.0010 ±0.0011 
+            answers_cast 0.71  answers_whiffed 0.63  pieces_removed 0.14  rounds_delayed 0.26  wipe_pieces 0.06
+   rebuild1 won +0.0053 ±0.0051*  opponents_killed -0.0210 ±0.0136*  lost_to_clock -0.0263 ±0.0071*  lost_on_life +0.0013 ±0.0031 
+            answers_cast 0.34  answers_whiffed 0.13  pieces_removed 0.27  rounds_delayed 0.26  wipe_pieces 0.06
+   rebuild5 won +0.0067 ±0.0051*  opponents_killed -0.0280 ±0.0135*  lost_to_clock -0.0340 ±0.0071*  lost_on_life +0.0017 ±0.0031 
+            answers_cast 0.33  answers_whiffed 0.14  pieces_removed 0.25  rounds_delayed 0.67  wipe_pieces 0.06
+
+tivit T20   off: won 0.4607  lost_to_clock 0.2703
+   on       won +0.0617 ±0.0119*  opponents_killed +0.0697 ±0.0233*  lost_to_clock -0.0737 ±0.0121*  lost_on_life +0.0103 ±0.0063*
+            answers_cast 0.62  answers_whiffed 0.16  pieces_removed 0.60  rounds_delayed 1.03  wipe_pieces 0.14
+   naive    won +0.0380 ±0.0087*  opponents_killed +0.0440 ±0.0165*  lost_to_clock -0.0463 ±0.0093*  lost_on_life +0.0073 ±0.0036*
+            answers_cast 0.91  answers_whiffed 0.69  pieces_removed 0.36  rounds_delayed 0.62  wipe_pieces 0.14
+   rebuild1 won +0.0443 ±0.0114*  opponents_killed +0.0513 ±0.0232*  lost_to_clock -0.0507 ±0.0114*  lost_on_life +0.0050 ±0.0060 
+            answers_cast 0.62  answers_whiffed 0.15  pieces_removed 0.62  rounds_delayed 0.58  wipe_pieces 0.16
+   rebuild5 won +0.0777 ±0.0122*  opponents_killed +0.0937 ±0.0234*  lost_to_clock -0.0943 ±0.0124*  lost_on_life +0.0130 ±0.0065*
+            answers_cast 0.62  answers_whiffed 0.16  pieces_removed 0.59  rounds_delayed 1.48  wipe_pieces 0.13
+
+shilgengar T10   off: won 0.0147  lost_to_clock 0.1463
+   on       won -0.0003 ±0.0017   opponents_killed -0.0507 ±0.0122*  lost_to_clock -0.0577 ±0.0093*  lost_on_life -0.0017 ±0.0046 
+            answers_cast 0.46  answers_whiffed 0.07  pieces_removed 0.39  rounds_delayed 0.73  wipe_pieces 0.01
+   naive    won -0.0007 ±0.0016   opponents_killed -0.0240 ±0.0084*  lost_to_clock -0.0337 ±0.0070*  lost_on_life +0.0020 ±0.0016*
+            answers_cast 1.26  answers_whiffed 1.10  pieces_removed 0.17  rounds_delayed 0.35  wipe_pieces 0.01
+   rebuild1 won -0.0003 ±0.0017   opponents_killed -0.0413 ±0.0121*  lost_to_clock -0.0463 ±0.0095*  lost_on_life -0.0017 ±0.0046 
+            answers_cast 0.47  answers_whiffed 0.07  pieces_removed 0.41  rounds_delayed 0.42  wipe_pieces 0.01
+   rebuild5 won -0.0003 ±0.0017   opponents_killed -0.0527 ±0.0120*  lost_to_clock -0.0607 ±0.0092*  lost_on_life -0.0013 ±0.0046 
+            answers_cast 0.45  answers_whiffed 0.07  pieces_removed 0.39  rounds_delayed 1.04  wipe_pieces 0.01
+
+shilgengar T20   off: won 0.2620  lost_to_clock 0.4550
+   on       won +0.0823 ±0.0149*  opponents_killed +0.1470 ±0.0293*  lost_to_clock -0.1147 ±0.0160*  lost_on_life +0.0287 ±0.0084*
+            answers_cast 1.20  answers_whiffed 0.11  pieces_removed 1.13  rounds_delayed 1.98  wipe_pieces 0.03
+   naive    won +0.0533 ±0.0108*  opponents_killed +0.0840 ±0.0205*  lost_to_clock -0.0710 ±0.0117*  lost_on_life +0.0157 ±0.0052*
+            answers_cast 1.70  answers_whiffed 1.23  pieces_removed 0.51  rounds_delayed 0.94  wipe_pieces 0.03
+   rebuild1 won +0.0440 ±0.0138*  opponents_killed +0.0887 ±0.0284*  lost_to_clock -0.0667 ±0.0150*  lost_on_life +0.0217 ±0.0081*
+            answers_cast 1.19  answers_whiffed 0.11  pieces_removed 1.13  rounds_delayed 1.12  wipe_pieces 0.03
+   rebuild5 won +0.1107 ±0.0151*  opponents_killed +0.1897 ±0.0287*  lost_to_clock -0.1523 ±0.0159*  lost_on_life +0.0343 ±0.0088*
+            answers_cast 1.20  answers_whiffed 0.11  pieces_removed 1.12  rounds_delayed 2.83  wipe_pieces 0.03
+
+azusa T10   off: won 0.2787  lost_to_clock 0.1343
+   on       won +0.0043 ±0.0034*  opponents_killed -0.0037 ±0.0091   lost_to_clock -0.0253 ±0.0060*  lost_on_life +0.0007 ±0.0009 
+            answers_cast 0.31  answers_whiffed 0.17  pieces_removed 0.14  rounds_delayed 0.28  wipe_pieces 0.00
+   naive    won +0.0040 ±0.0026*  opponents_killed -0.0013 ±0.0065   lost_to_clock -0.0190 ±0.0052*  lost_on_life +0.0003 ±0.0007 
+            answers_cast 0.50  answers_whiffed 0.41  pieces_removed 0.10  rounds_delayed 0.19  wipe_pieces 0.00
+   rebuild1 won +0.0040 ±0.0035*  opponents_killed -0.0013 ±0.0090   lost_to_clock -0.0213 ±0.0061*  lost_on_life +0.0007 ±0.0009 
+            answers_cast 0.31  answers_whiffed 0.16  pieces_removed 0.14  rounds_delayed 0.16  wipe_pieces 0.00
+   rebuild5 won +0.0043 ±0.0034*  opponents_killed -0.0047 ±0.0091   lost_to_clock -0.0253 ±0.0060*  lost_on_life +0.0007 ±0.0009 
+            answers_cast 0.30  answers_whiffed 0.17  pieces_removed 0.14  rounds_delayed 0.41  wipe_pieces 0.00
+
+azusa T20   off: won 0.5123  lost_to_clock 0.3430
+   on       won +0.0437 ±0.0097*  opponents_killed +0.0773 ±0.0194*  lost_to_clock -0.0497 ±0.0100*  lost_on_life +0.0060 ±0.0046*
+            answers_cast 0.58  answers_whiffed 0.22  pieces_removed 0.37  rounds_delayed 0.70  wipe_pieces 0.00
+   naive    won +0.0347 ±0.0081*  opponents_killed +0.0600 ±0.0158*  lost_to_clock -0.0397 ±0.0085*  lost_on_life +0.0050 ±0.0035*
+            answers_cast 0.75  answers_whiffed 0.49  pieces_removed 0.27  rounds_delayed 0.51  wipe_pieces 0.00
+   rebuild1 won +0.0330 ±0.0092*  opponents_killed +0.0577 ±0.0192*  lost_to_clock -0.0340 ±0.0094*  lost_on_life +0.0010 ±0.0041 
+            answers_cast 0.57  answers_whiffed 0.21  pieces_removed 0.37  rounds_delayed 0.40  wipe_pieces 0.00
+   rebuild5 won +0.0520 ±0.0098*  opponents_killed +0.0937 ±0.0191*  lost_to_clock -0.0590 ±0.0101*  lost_on_life +0.0063 ±0.0047*
+            answers_cast 0.58  answers_whiffed 0.22  pieces_removed 0.37  rounds_delayed 0.99  wipe_pieces 0.00
+
+trostani T10   off: won 0.0657  lost_to_clock 0.1547
+   on       won +0.0003 ±0.0030   opponents_killed -0.0283 ±0.0100*  lost_to_clock -0.0413 ±0.0078*  lost_on_life +0.0003 ±0.0020 
+            answers_cast 0.32  answers_whiffed 0.10  pieces_removed 0.22  rounds_delayed 0.43  wipe_pieces 0.01
+   naive    won -0.0003 ±0.0011   opponents_killed -0.0163 ±0.0063*  lost_to_clock -0.0210 ±0.0056*  lost_on_life +0.0003 ±0.0007 
+            answers_cast 0.64  answers_whiffed 0.54  pieces_removed 0.11  rounds_delayed 0.22  wipe_pieces 0.01
+   rebuild1 won +0.0000 ±0.0029   opponents_killed -0.0197 ±0.0098*  lost_to_clock -0.0337 ±0.0073*  lost_on_life +0.0003 ±0.0020 
+            answers_cast 0.32  answers_whiffed 0.10  pieces_removed 0.23  rounds_delayed 0.24  wipe_pieces 0.01
+   rebuild5 won +0.0003 ±0.0030   opponents_killed -0.0310 ±0.0102*  lost_to_clock -0.0437 ±0.0075*  lost_on_life +0.0003 ±0.0020 
+            answers_cast 0.32  answers_whiffed 0.10  pieces_removed 0.22  rounds_delayed 0.63  wipe_pieces 0.01
+
+trostani T20   off: won 0.3323  lost_to_clock 0.5253
+   on       won +0.0683 ±0.0122*  opponents_killed +0.1373 ±0.0265*  lost_to_clock -0.0767 ±0.0126*  lost_on_life +0.0057 ±0.0041*
+            answers_cast 0.70  answers_whiffed 0.14  pieces_removed 0.58  rounds_delayed 1.08  wipe_pieces 0.02
+   naive    won +0.0400 ±0.0087*  opponents_killed +0.0813 ±0.0181*  lost_to_clock -0.0460 ±0.0091*  lost_on_life +0.0040 ±0.0026*
+            answers_cast 0.91  answers_whiffed 0.63  pieces_removed 0.30  rounds_delayed 0.57  wipe_pieces 0.02
+   rebuild1 won +0.0427 ±0.0114*  opponents_killed +0.0833 ±0.0261*  lost_to_clock -0.0490 ±0.0120*  lost_on_life +0.0050 ±0.0040*
+            answers_cast 0.70  answers_whiffed 0.14  pieces_removed 0.58  rounds_delayed 0.60  wipe_pieces 0.02
+   rebuild5 won +0.0857 ±0.0127*  opponents_killed +0.1560 ±0.0269*  lost_to_clock -0.0960 ±0.0131*  lost_on_life +0.0063 ±0.0042*
+            answers_cast 0.71  answers_whiffed 0.14  pieces_removed 0.59  rounds_delayed 1.60  wipe_pieces 0.01
+

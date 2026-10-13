@@ -2869,6 +2869,8 @@ def main_phase(g: Game, precombat: bool = False):
             # do not wrath your own winning board
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
+            if OPP.hold_answer(g, c):      # item 24, change 2
+                continue
             # PROFT, SINISTER MASTERMIND (Reality Fracture, preview text
             # 2026-09-21): "Threshold -- You can't cast this spell unless there
             # are seven or more cards in your graveyard."

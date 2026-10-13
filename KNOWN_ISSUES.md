@@ -183,6 +183,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z128](#0z128) | REBUILT | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 at T20, STAGED; table rebuilt |
 | [0z129](#0z129) | REBUILT | **Item 24, change 0**: nine KNOWN_BLIND cards given code. Five tables rebuilt: Capstone +0.0404 (lorehold's top row), Seminar +0.0333, Quirion +0.0112, Reclamation, Sun Titan, Jitte, Reaper ~+0.005 |
 | [0z130](#0z130) | BUILT | **Item 24, change 1**: the pod's creatures as bodies (toughness, mana value), behind `pod_bodies`, OFF and bit-identical; Massacre Wurm had three rules; ON moves tivit +0.013, lorehold +0.011 |
+| [0z131](#0z131) | BUILT | **Item 24, change 2**: opponent kills as routes of removable pieces, behind `pod_threats`, OFF and bit-identical; ON lifts T20 win +0.038 to +0.082, all via fewer clock losses; rebuild delay is the knob |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11762,6 +11763,96 @@ knowable from this repo; the point of bodies is that there is now ONE.
 deathtouch is not read; Deathreap Ritual still stands in `opp_death_rate`
 for the pod's deaths; Pygmy Kavu needs a colour. Each is a consumer of this
 model, not a change to it.
+
+<a id="0z131"></a>
+
+## 0z131. BUILT — item 24's change 2: opponent threats as objects that carry the clock, behind `pod_threats` (OFF)
+
+**2026-10-13.** The root of the blind list (item 24) is that an opponent's
+win is a ROLL: `make_pod` draws `kill_turn`, `resolve_clocks` fires it, and
+nothing you do to a board delays it. Measured on the staged lists before
+this change (800 games each, T20), the clock ends 24-47% of ALL games and is
+the largest single way to lose in rendmaw, shilgengar, karlov and azusa.
+This change keeps the roll and makes it removable. It ships OFF: switching
+it on is a pod-model decision (POD_V4, queue item 24) with a rebuild of
+every table.
+
+### The model
+
+| what | where | rule |
+|---|---|---|
+| the route | `roll_threat_routes`, `ROUTE_MIX`, `ROUTE_PIECES` | per opponent, from its OWN stream: a kind (combat, combo, drain) by archetype, and two pieces, each a type, a toughness and mana value (change 1's spread) and a `lead` -- how many rounds before the kill it lands. A combat route's first piece is a creature; combat and drain leads are 1..3, combo 0..2 |
+| the kill | unchanged | `kill_turn` is the same roll from the same stream; each piece lands at `kill_turn - lead` |
+| what is out | `present_pieces` | from the pod turn AFTER it lands, so a lead-0 combo piece is never answerable at sorcery speed (that is change 3) |
+| a removal | `remove_threat_piece` | the piece comes back `d` rounds on, `d` pre-rolled uniform on 1..`threat_rebuild_max` (3); the kill moves to at least its return plus its lead |
+| your answers | `ANSWERS`, `answer_reach` | DERIVED from the census clause (`_removal.INTERACTION`, generated from Scryfall): types, "up to N", "mana value N or greater", "+X/-N". 27 cards; 11 spot-kind cards are `ANSWER_NOT_MODELLED`, each with its reason (repeatables, activations, edicts the opponent chooses, votes). The import raises on a clause it cannot read |
+| when they resolve | `countered` -> `answer_pod_threat` | the one place every engine reports a cast; a spell that is not countered answers there |
+| your sweepers | `resolve_own_wipe` -> `wipe_threat_pieces` | `OWN_WIPE_SCOPE` decides: creatures by default, toughness for X damage and -2/-2, mana value for Culling Ritual, everything for Ondu Inversion and Coercive Portal's carnage |
+| the pilot | `answer_target`, `hold_answer` | aims at the opponent with the most pieces OUT, then the higher bracket -- what a player can see, never `kill_turn` or `lead`. A pure answer (instant or sorcery) is HELD while nothing it can hit is out (`threat_hold`); a creature that answers is a body and is cast as one |
+
+**Only your answers move a clock.** The kill ranges were calibrated against
+a pod that already fights itself, so the pod's removal and wraths do not
+touch pieces: the calibration priced them.
+
+### Gates
+
+`tests/test_pod_threats.py`: 12 cases, 9 mutations. Two of the nine
+expected sets were wrong on the first run and are corrected in the
+docstring as a transcript (§0z14): the sweeper cases read reach, not the
+clock, and case L's hold reads the same "out" rule as case C.
+**OFF is bit-identical** against a worktree at `0817220`: every staged list,
+seeds 5000..6999, every numeric output key, and `check_unchanged_decks
+--n=2000 --include-suspended` on all seven module lists. **ON without a
+removal is OFF**: with `threat_hold=False`, every game in which no piece
+was removed matched OFF on every metric, 400 seeds a deck, 2,276 games --
+removing a piece is the only channel. `validate` +0.00 everywhere.
+
+### ON against OFF, N=3,000 paired, staged lists (`results/pod_threats_on_off_20261013.txt`)
+
+| deck | won T10 | won T20 | lost to a clock, T20 | rounds the kills moved | answers a game |
+|---|---|---|---|---|---|
+| rendmaw | -0.0020 ±0.0026 | **+0.0380 ±0.0104** | -0.057 | 0.81 | 0.42 |
+| lorehold | **+0.0100 ±0.0077** | **+0.0410 ±0.0124** | -0.038 | 0.57 | 0.43 |
+| karlov | **+0.0033 ±0.0029** | **+0.0543 ±0.0110** | -0.061 | 0.88 | 0.45 |
+| tivit | **+0.0067 ±0.0051** | **+0.0617 ±0.0119** | -0.074 | 1.03 | 0.62 |
+| shilgengar | -0.0003 ±0.0017 | **+0.0823 ±0.0149** | -0.115 | 1.98 | 1.20 |
+| azusa | **+0.0043 ±0.0034** | **+0.0437 ±0.0097** | -0.050 | 0.70 | 0.58 |
+| trostani | +0.0003 ±0.0030 | **+0.0683 ±0.0122** | -0.077 | 1.08 | 0.70 |
+
+The mechanism is the clock, and it reads that way: every deck's
+`lost_to_clock` falls, by about as much as its win rate rises, and the
+counter that should move (`threat_rounds_delayed`) is in proportion to it.
+At T10 most games end before a moved kill would have fired, so the effect
+is a T20 one. Shilgengar gains most because it casts the most answers
+(Swords, Path, Vindicate, Utter End, Despark, Mortify, Generous Gift,
+Anguished Unmaking, Angel of Despair).
+
+**THE REBUILD DELAY IS THE KNOB, AND IT IS LARGE.** `threat_rebuild_max`
+1 / 3 / 5 at T20: rendmaw +0.022 / +0.038 / +0.049, karlov +0.036 / +0.054
+/ +0.069, shilgengar +0.044 / +0.082 / +0.111 -- every deck alike, a third
+of the effect either side of the default. No data in this repo says how
+long a real opponent takes to rebuild a removed piece; 3 (mean 2 rounds)
+is a judgement, and every result this model moves must say it out loud.
+
+**The naive pilot gets about two thirds of it.** `threat_hold=False` casts
+answers on priority: shilgengar +0.053 instead of +0.082, with 1.23 of its
+1.70 answers a game finding nothing out.
+
+**WHAT SWITCHING IT ON WOULD MEAN.** Every deck's baseline rises 4-8 points
+at T20, because something the calibration assumed nobody could do is now
+possible. `clock_shift` and the kill ranges were fitted (POD_V2) to game
+length with clocks that could not be delayed; whether to re-fit them under
+`pod_threats` is the owner's call, and part of the POD_V4 decision.
+
+**NOT DONE.** Ghostly Prison and Propaganda (an attack tax on a combat
+route); counterspells against a combo piece and instant-speed answers
+(change 3, which is also what reaches a lead-0 piece); the eleven
+`ANSWER_NOT_MODELLED` cards; Damn's single-target mode (only the overload
+is a wipe here); the voting answers (Council's Judgment, Vault 11); the
+wipe gate does not yet ask whether a sweep would break a route; creature
+pieces are not change 1's bodies, so a piece's death is not a "creature an
+opponent controls dies" event. Return to Dust's census clause carries only
+its first target, so it is read as one.
 
 ## How to read an ablation table
 

@@ -1181,6 +1181,8 @@ def main_phase(g):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
+            if OPP.hold_answer(g, c):      # item 24, change 2
+                continue
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.

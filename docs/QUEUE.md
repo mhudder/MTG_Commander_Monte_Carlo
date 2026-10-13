@@ -119,7 +119,16 @@ What is closed and where it went:
       and "whenever a creature an opponent controls dies". Homogeneous bodies
       should reproduce today's numbers, so `check_unchanged_decks` can prove
       the refactor before anything moves.
-    - **2. Opponent threats as objects that carry the clock.** Each kill
+    - **2. Opponent threats as objects that carry the clock** -- **BUILT,
+      OFF (§0z131)**: `pod_threats`, bit-identical off; 27 answers derived
+      from the census clause, held until something they hit is out. ON
+      lifts every deck +0.038 to +0.082 at T20, all of it fewer clock
+      losses, and `threat_rebuild_max` (1 / 3 / 5) moves that by a third
+      either way: a judgement with no data, said with every result.
+      Switching it on is part of the same POD_V4 call as change 1, with
+      whether `clock_shift` is re-fitted. Not done: attack taxes,
+      Damn's single-target mode, the voting answers, the wipe gate
+      reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind
       (combat, combo, drain); removing a piece pushes `kill_turn` back by a
       pre-rolled rebuild delay; the route kind decides which answers work

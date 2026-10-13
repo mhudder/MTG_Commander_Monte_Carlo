@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import bisect
 import random
+import re
 from contextlib import contextmanager
 from collections import namedtuple
 from dataclasses import dataclass, field
@@ -150,6 +151,15 @@ class Opponent:
     bodies: list = field(default_factory=list)
     body_pool: tuple = ()
     next_body: int = 0
+    # THE KILL AS A ROUTE OF PIECES (item 24, change 2; `pod_threats`, OFF).
+    # `route` is its kind, `pieces` the pre-rolled ThreatPieces it needs,
+    # `piece_lands[k]` the pod turn piece k is (re)played on, and
+    # `rebuild_pool` the pre-rolled rounds a removed piece takes to come back.
+    route: object = None
+    pieces: tuple = ()
+    piece_lands: list = field(default_factory=list)
+    rebuild_pool: tuple = ()
+    next_rebuild: int = 0
 
     _pcache: object = None
 
@@ -214,6 +224,8 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
                      for _ in range(turns)]
     if cfg.get("pod_bodies", False):
         roll_body_pools(cfg, seed, opps)
+    if cfg.get("pod_threats", False):          # item 24, change 2: §0z131
+        roll_threat_routes(cfg, seed, opps)
     return opps, rolls, counter_rolls
 
 
@@ -293,6 +305,299 @@ def kill_pod_bodies(g, o, dies=None) -> int:
         hook = getattr(g, "on_pod_creature_deaths", None)
         if hook is not None:
             hook(o, n)
+    return n
+
+
+# ---------------------------------------------------------------------------
+# Opponent threats as objects that carry the clock (item 24, change 2)
+# ---------------------------------------------------------------------------
+# THE ROOT OF THE BLIND LIST is that an opponent's win is a ROLL: `make_pod`
+# draws `kill_turn` and `resolve_clocks` fires it, so nothing you do to a
+# board can delay it, and every removal spell in seven decks is a body. Under
+# `pod_threats` the roll STAYS -- the same `kill_turn`, from the same stream --
+# and is also a ROUTE: a kind (combat, combo, drain) and the pieces it needs,
+# each a typed permanent that lands `lead` rounds before the kill. Removing a
+# piece sends it back to be rebuilt, a pre-rolled number of rounds later, and
+# the kill cannot fire until it has been back for its lead again.
+#
+# ONLY YOUR ANSWERS MOVE A CLOCK. The clocks were calibrated against a pod
+# that already fights itself, so the pod's own removal and wraths do not
+# touch pieces: the calibration has priced them.
+#
+# WHAT A PLAYER CAN SEE. A piece is on the battlefield from the pod turn after
+# it lands, and the pilot answers what is there. It reads how many of an
+# opponent's pieces are out, never `kill_turn`, `lead` or the route's size.
+# A lead-0 piece lands and wins in one round of the pod's turns: no sorcery-
+# speed answer can reach it, which is change 3's job (a response window).
+#
+# THE NUMBERS ARE JUDGEMENTS, not a census, and one of them has no data at
+# all: the rebuild delay, uniform on 1..`threat_rebuild_max` (3). Say it out
+# loud with every result it moves. The route mix and the piece types are
+# ROUTE_MIX and ROUTE_PIECES below; toughness and mana value are change 1's
+# spread (`roll_body_pools`), so one board answers every question.
+#
+# CRN. Every piece and delay is pre-rolled per opponent from its OWN stream;
+# `make_pod`'s is untouched, so `pod_threats=False` plays every game bit-for-
+# bit as before, and so does `pod_threats=True` in a game where no answer is
+# ever cast -- the kill turns are the old ones until a piece is removed.
+ThreatPiece = namedtuple("ThreatPiece", "type toughness mv lead")
+
+# P(route kind | archetype). Archetypes off (POD_V1) reads midrange.
+ROUTE_MIX = {
+    "aggro":    {"combat": 0.85, "combo": 0.05, "drain": 0.10},
+    "midrange": {"combat": 0.55, "combo": 0.15, "drain": 0.30},
+    "control":  {"combat": 0.30, "combo": 0.20, "drain": 0.50},
+    "combo":    {"combat": 0.10, "combo": 0.80, "drain": 0.10},
+}
+# Per kind: (one type distribution per piece, the lead range in rounds). A
+# combat route's first piece is always a creature (the army's reason to be);
+# its leads start at 1 because a creature that lands is summoning sick.
+ROUTE_PIECES = {
+    "combat": (({"Creature": 1.0},
+                {"Creature": 0.60, "Enchantment": 0.25, "Artifact": 0.15}),
+               (1, 3)),
+    "combo":  (({"Artifact": 0.40, "Creature": 0.40, "Enchantment": 0.20},
+                {"Artifact": 0.40, "Creature": 0.40, "Enchantment": 0.20}),
+               (0, 2)),
+    "drain":  (({"Enchantment": 0.45, "Creature": 0.35, "Planeswalker": 0.20},
+                {"Creature": 0.50, "Artifact": 0.30, "Enchantment": 0.20}),
+               (1, 3)),
+}
+THREAT_REBUILD_POOL = 32     # delays per opponent per game; cyclic past it
+
+
+def _pick(roll: float, weights: dict) -> str:
+    acc = 0.0
+    for name, w in weights.items():
+        acc += w
+        if roll < acc:
+            return name
+    return list(weights)[-1]
+
+
+def roll_threat_routes(cfg, seed, opps) -> None:
+    tmax = max(1, int(cfg.get("gyre_full_x", 6)))
+    share = cfg.get("culling_pod_share", 0.5)
+    mvmax = max(1, int(round(2 / share))) if share > 0 else 1
+    dmax = max(1, int(cfg.get("threat_rebuild_max", 3)))   # §0z131: no data
+    for i, o in enumerate(opps):
+        r = random.Random((seed * 1000003) ^ (0x7A12E7 + 7919 * i))
+        o.route = _pick(r.random(), ROUTE_MIX[o.archetype or "midrange"])
+        slots, (lo, hi) = ROUTE_PIECES[o.route]
+        o.pieces = tuple(ThreatPiece(_pick(r.random(), w), r.randint(1, tmax),
+                                     r.randint(1, mvmax), r.randint(lo, hi))
+                         for w in slots)
+        o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
+        o.rebuild_pool = tuple(r.randint(1, dmax)
+                               for _ in range(THREAT_REBUILD_POOL))
+        o.next_rebuild = 0
+
+
+def pod_threats_on(g) -> bool:
+    return bool(g.cfg.get("pod_threats", False))
+
+
+def present_pieces(g, o) -> list:
+    """Indices of `o`'s pieces on the battlefield during YOUR turn: played on
+    an earlier pod turn and not since removed. A dead opponent has none."""
+    if not o.alive:
+        return []
+    t = pod_turn(g)
+    return [k for k, lands in enumerate(o.piece_lands) if lands < t]
+
+
+def remove_threat_piece(g, o, k) -> int:
+    """Piece k of `o` leaves the battlefield. It is replayed `d` rounds on
+    (pre-rolled, 1..`threat_rebuild_max`): d=1 is the pod's very next turns.
+    The kill needs it back for its `lead`, so `kill_turn` becomes at least
+    its return plus its lead. Returns the rounds the kill moved (0 when the
+    clock was far enough out that the rebuild fits inside it)."""
+    pool = o.rebuild_pool
+    d = pool[o.next_rebuild % len(pool)]
+    o.next_rebuild += 1
+    lands = pod_turn(g) + d - 1
+    o.piece_lands[k] = lands
+    g.m["threat_pieces_removed"] += 1
+    moved = max(0, lands + o.pieces[k].lead - o.kill_turn)
+    if moved:
+        o.kill_turn += moved
+        g.m["threat_rounds_delayed"] += moved
+    return moved
+
+
+# YOUR ANSWERS, read from the census (`tools.removal_census`, GENERATED from
+# Scryfall): every 'spot' card's deciding clause names what it can hit. The
+# reach is DERIVED from that clause by `answer_reach`, which raises on a
+# clause it cannot read, so a new card is classified or the import fails.
+# The cards below are spot-kind in the census and are NOT a one-shot answer
+# at cast, each for its stated reason; they stay blind under `pod_threats`.
+ANSWER_NOT_MODELLED = {
+    "Aura Shards": "a trigger per creature entering, not a one-shot at cast",
+    "Bow of Nylea": "an activated mode, and only fliers",
+    "Erebos, Bleak-Hearted": "an activated -2/-1, a sacrifice each",
+    "Grist, the Hunger Tide": "a loyalty ability",
+    "Haywire Mite": "an activated sacrifice ability",
+    "Umezawa's Jitte": "counters spent one at a time",
+    "Selesnya Eulogist": "exiles a creature CARD from a graveyard",
+    "Capital Punishment": "an edict: the opponent chooses, never the piece",
+    "Tyrant's Choice": "an edict: the opponent chooses, never the piece",
+    "Council's Judgment": "a vote (edhmc.voting), not wired",
+    "Vault 11: Voter's Dilemma": "a vote (edhmc.voting), not wired",
+}
+
+PIECE_TYPES = ("Creature", "Artifact", "Enchantment", "Planeswalker")
+Reach = namedtuple("Reach", "types n max_toughness min_mv")
+
+
+def answer_reach(clause: str) -> Reach:
+    """What a spot answer's deciding clause can hit, among a route's piece
+    types: the text after "target" up to the sentence's end. "noncreature
+    permanent" is every non-creature type; any other "permanent" is all of
+    them; otherwise the type words it names. "up to two/three" is how many;
+    "mana value N or greater" and "+X/-N" are conditions."""
+    c = clause.lower()
+    at = c.find("target ")
+    if at < 0:
+        raise ValueError(f"no 'target' in {clause!r}")
+    seg = c[at + len("target "):].split(".")[0]
+    if "noncreature permanent" in seg:
+        types = frozenset(PIECE_TYPES) - {"Creature"}
+    elif "permanent" in seg:
+        types = frozenset(PIECE_TYPES)
+    else:
+        types = frozenset(t for t in PIECE_TYPES if t.lower() in seg)
+    if not types:
+        raise ValueError(f"no piece type in {clause!r}")
+    pre = c[max(0, at - 12):at]
+    n = 3 if "up to three" in pre else 2 if "up to two" in pre else 1
+    m = re.search(r"mana value (\d+) or greater", seg)
+    min_mv = int(m.group(1)) if m else 0
+    m = re.search(r"\+\d+/-(\d+)", seg)
+    max_t = int(m.group(1)) if m else 99
+    return Reach(types, n, max_t, min_mv)
+
+
+def _derive_answers() -> dict:
+    out = {}
+    for name, (kind, _cls, clause) in _removal.INTERACTION.items():
+        if kind != "spot" or name in ANSWER_NOT_MODELLED:
+            continue
+        try:
+            out[name] = answer_reach(clause)
+        except ValueError as e:
+            raise SystemExit(
+                f"\n{name}: the census clause does not say what it hits ({e}).\n"
+                "Classify it in ANSWER_NOT_MODELLED with a reason, or fix "
+                "`answer_reach`. Do not guess -- the clause IS the evidence.")
+    stale = set(ANSWER_NOT_MODELLED) - set(_removal.INTERACTION)
+    if stale:
+        raise SystemExit(f"\nANSWER_NOT_MODELLED names cards the census "
+                         f"never read: {sorted(stale)}")
+    return out
+
+
+ANSWERS = _derive_answers()
+
+
+def hits(reach: Reach, piece: ThreatPiece) -> bool:
+    return (piece.type in reach.types
+            and (piece.type != "Creature" or piece.toughness <= reach.max_toughness)
+            and piece.mv >= reach.min_mv)
+
+
+def answer_target(g, reach: Reach):
+    """(opponent, piece index) the pilot aims this answer at, or None. The
+    opponent with the most pieces OUT -- the route closest to complete, as
+    the table sees it -- then the higher bracket, then seat order; within
+    them the first piece this answer can hit."""
+    best, key = None, None
+    for i, o in enumerate(g.opponents):
+        present = present_pieces(g, o)
+        ok = [k for k in present if hits(reach, o.pieces[k])]
+        if not ok:
+            continue
+        kk = (len(present), o.bracket, -i)
+        if key is None or kk > key:
+            best, key = (o, ok[0]), kk
+    return best
+
+
+def answer_pod_threat(g, card) -> int:
+    """A spot answer resolves under `pod_threats`: it removes up to its `n`
+    pieces. Called from `countered`, the one place every engine reports a
+    spell going on the stack (§0z30), when the spell was NOT countered. A
+    `wipe`-tagged card is not answered here: it resolves through
+    `resolve_own_wipe`, and `wipe_threat_pieces` takes its share."""
+    if not pod_threats_on(g) or "wipe" in card.tags:
+        return 0
+    reach = ANSWERS.get(card.name)
+    if reach is None:
+        return 0
+    done = 0
+    for _ in range(reach.n):
+        pick = answer_target(g, reach)
+        if pick is None:
+            break
+        remove_threat_piece(g, *pick)
+        done += 1
+    g.m["threat_answers_cast"] += 1
+    if not done:
+        g.m["threat_answers_whiffed"] += 1
+    return done
+
+
+def hold_answer(g, card) -> bool:
+    """THE PILOT HOLDS a pure answer -- an instant or sorcery whose only job
+    is to answer -- while nothing it can hit is out (`threat_hold`, on).
+    A creature that answers on entering is a body too and is cast as one.
+    Off under `pod_threats=False`, so the main phases are untouched there;
+    `threat_hold=False` is the naive pilot, which fires on priority: about
+    two thirds of the held pilot's worth (§0z131)."""
+    if not pod_threats_on(g) or not g.cfg.get("threat_hold", True):
+        return False
+    if "wipe" in card.tags or not ({"Instant", "Sorcery"} & card.types):
+        return False
+    reach = ANSWERS.get(card.name)
+    return reach is not None and answer_target(g, reach) is None
+
+
+def wipe_threat_pieces(g, card, scope=None) -> int:
+    """Your sweeper takes the pieces its scope reaches (`OWN_WIPE_SCOPE`, the
+    rule `resolve_own_wipe` applies to your board and theirs): every scope
+    reaches creatures, toughness and mana value as change 1 reads them;
+    "nonland" reaches everything, "artifacts_creatures" artifacts too, "mv2"
+    any piece of mana value 2 or less. `scope` overrides the card's."""
+    if not pod_threats_on(g):
+        return 0
+    scope = scope if scope is not None else own_wipe_scope(g, card)
+    x = gyre_x(g) if scope == "damage_x" else None
+
+    def dies(p):
+        if scope == "nonland":
+            return True
+        if scope == "mv2":
+            return p.mv <= 2
+        if p.type != "Creature":
+            return scope == "artifacts_creatures" and p.type == "Artifact"
+        if scope == "damage_x":
+            return p.toughness <= x
+        if scope == "minus_2":
+            return p.toughness <= 2
+        return True
+
+    n = 0
+    for o in living(g):
+        present = present_pieces(g, o)
+        dying = [k for k in present if dies(o.pieces[k])]
+        if scope == "keep_one":
+            # The vow goes on their best creature, and it is the piece.
+            if dying:
+                keep = max(dying, key=lambda k: o.pieces[k].toughness)
+                dying = [k for k in dying if k != keep]
+        for k in dying:
+            remove_threat_piece(g, o, k)
+            n += 1
+    g.m["threat_wipe_pieces"] += n
     return n
 
 
@@ -1285,7 +1590,19 @@ def countered(g, card, spell_index: int) -> bool:
     Weighted by the spell's threat and by how many blue opponents are sitting
     behind untapped mana. A turn-8 six-drop is a very different proposition
     from a turn-2 one-drop, which is most of why this matters here.
+
+    THE ONE PLACE EVERY ENGINE REPORTS A CAST, so a spell that is NOT
+    countered resolves its answer half here (`answer_pod_threat`, item 24
+    change 2, a no-op unless `pod_threats`): ten cast sites in seven engines
+    would be ten copies of one rule, which is §0z30's shape.
     """
+    if _countered(g, card, spell_index):
+        return True
+    answer_pod_threat(g, card)
+    return False
+
+
+def _countered(g, card, spell_index: int) -> bool:
     if pod_turn(g) < 3 or spell_index >= N_COUNTER_SLOTS:
         return False
     threat = counter_threat(g, card)
@@ -2528,6 +2845,7 @@ def resolve_own_wipe(g, spare_own=False, card=None):
     `own_wipe_indestructible=False` restores the old kill-everything path, and
     is what any table published before 2026-09-11 reproduces with.
     """
+    wipe_threat_pieces(g, card)                  # item 24, change 2
     pod_killed = 0.0
     for o in living(g):
         if pod_bodies_on(g):                     # item 24, change 1

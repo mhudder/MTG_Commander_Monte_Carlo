@@ -1048,6 +1048,8 @@ class ShilgengarGame(BaseGame):
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
+                if OPP.hold_answer(self, c):      # item 24, change 2
+                    continue
                 # §1b: the best affordable MODE, not just the printed cost.
                 _m = choose_mode(c, OPP.wipe_mode_cost(
                     self, c, self.herald_cost(c)), pool)

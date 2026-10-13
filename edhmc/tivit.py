@@ -681,6 +681,8 @@ def main_phase(g):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
+            if OPP.hold_answer(g, c):      # item 24, change 2
+                continue
             # A ONE-SHOT blink with nothing to blink is a wasted card. The
             # permanent blinkers (Soulherder, Teleportation Circle, ...) are
             # engines worth deploying before the commander lands; an instant is
@@ -1120,6 +1122,9 @@ def coercive_carnage(g) -> None:
     gone = sum(1 for p in g.board if not p.card.is_land
                and "Artifact" in p.card.types)
     OPP.resolve_own_wipe(g)
+    # The pod's noncreature pieces are nonland permanents too (item 24,
+    # change 2; a no-op unless `pod_threats`).
+    OPP.wipe_threat_pieces(g, None, scope="nonland")
     for p in [p for p in g.board if not p.card.is_land
               and not p.card.is_creature]:
         OPP.destroy(g, p, destroys=True)

@@ -2970,6 +2970,8 @@ class AzusaGame(BaseGame):
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
+                if OPP.hold_answer(self, c):      # item 24, change 2
+                    continue
                 n_draw = self.draws_on_resolve(c)
                 if n_draw and not draw_is_safe(self, n_draw):
                     continue        # casting is optional; decking is a loss

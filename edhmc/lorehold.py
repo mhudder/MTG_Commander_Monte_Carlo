@@ -2550,6 +2550,8 @@ def _main_phase(g, reserve=0):
                 continue
             if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
                 continue
+            if OPP.hold_answer(g, c):      # item 24, change 2
+                continue
             # A spell that ends the turn waits for the main phase after
             # combat, or it costs the attack (§0z118).
             if (c.name in TURN_ENDERS and g.precombat
