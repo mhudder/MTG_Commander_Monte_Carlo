@@ -11622,6 +11622,24 @@ slot instead (seeds 5000..5999, T20):
 The two Lessons are the large ones: each was a seven-mana blank and is now a
 free spell every turn after it resolves.
 
+### Soulmender is the staged cut, so its staging was re-measured
+
+`-Soulmender +Bloodthirsty Conqueror` was staged with a `cut_unmeasured`
+judgement: Soulmender's row was blind, so the swap was a CEILING by whatever
+its tap is worth (§0z31, §0z36). Now that the tap is modelled,
+`diagnostics/run_karlov_conqueror.py` at N=15,000 paired, in context
+(`results/karlov_conqueror_20261013.txt`, python 3.11):
+
+| | T10 | T20 |
+|---|---|---|
+| 2026-10-07, Soulmender a vanilla 1/1 (py 3.13) | +0.0447 ±0.0035 | +0.0474 ±0.0038 |
+| 2026-10-13, Soulmender's tap live | **+0.0471 [+0.0435, +0.0508]** | **+0.0421 [+0.0385, +0.0462]** |
+
+The live tap costs the swap about 0.005 at T20 and nothing at T10, inside the
+combined bars (the baseline also gained South Wind Avatar in between, so the
+two rows are not one paired difference). **The judgement held; the staging
+stands**, now on a MODEL-EVALUATED cut.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not

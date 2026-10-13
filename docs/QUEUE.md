@@ -46,7 +46,9 @@ What is closed and where it went:
     cannot fully see, since the pod's removal is a roll against an abstract
     board (§4). That is a judgement about the owner's table outranking a
     +0.0075 ±0.0047 T20 edge that is inside its bar at T10, and it is
-    recorded on the Change. Two more are explicitly HELD:
+    recorded on the Change. **SOULMENDER IS MODELLED SINCE §0z129** and the
+    swap was re-measured with its tap live: +0.0471 / +0.0421 at T10 / T20,
+    the cut MODEL-EVALUATED now. Two more are explicitly HELD:
     Alhammarret's Archive on the owner's playtest experience — which the
     model's own counter corroborates, 0.40 extra draws a game — and Parallel
     Lives as too expensive for what it does.

@@ -1,0 +1,25 @@
+Bloodthirsty Conqueror: flying=True, N=15,000 paired, same seeds both legs
+
+=== value over a blank of the same cost, Soulmender slot (candidates.add_value replicated on the pre-swap staged list)
+  T10: damage -2.09+-0.20   win rate +0.0525+-0.0036   lifegain_triggers +0.58+-0.14   P(deploy) 0.113   (83s)
+  T20: damage -4.02+-0.28   win rate +0.0491+-0.0038   lifegain_triggers +0.38+-0.16   P(deploy) 0.154   (109s)
+
+=== real swap -Soulmender +Bloodthirsty Conqueror, staged list (Citadel in) with this swap undone as the A leg
+
+  T10  (87s)
+    won                   +0.0471  [ +0.0435,  +0.0508] *
+    damage                -2.7269  [ -2.9487,  -2.5089] *
+    lifegain_triggers     -0.0606  [ -0.1941,  +0.0790]  
+    final_life            +0.7589  [ +0.4525,  +1.0478] *
+    opponents_killed      -0.0383  [ -0.0443,  -0.0320] *
+    cards_drawn           -0.2060  [ -0.2249,  -0.1875] *
+    stranded_mv           +2.0135  [ +1.8209,  +2.2111] *
+
+  T20  (113s)
+    won                   +0.0421  [ +0.0385,  +0.0462] *
+    damage                -4.8493  [ -5.1632,  -4.5451] *
+    lifegain_triggers     -0.3521  [ -0.5120,  -0.1900] *
+    final_life            +1.5653  [ +0.9196,  +2.2095] *
+    opponents_killed      -0.1079  [ -0.1172,  -0.0987] *
+    cards_drawn           -0.4832  [ -0.5225,  -0.4445] *
+    stranded_mv           +0.7345  [ +0.4461,  +1.0443] *
