@@ -2693,7 +2693,7 @@ def draw_land_windows(g):
             discard_triggers(g, 1)
 
     if not g.commander_cast:
-        for _ in g.opponents:
+        for _ in OPP.acting(g):          # each opponent's TURN, §0z133
             if (not ready or g.float_mana < 3 or not draw_is_safe(g, 1)
                     or g.result is not None):
                 break
@@ -2719,7 +2719,7 @@ def opponent_upkeep_windows(g):
     if not g.commander_cast:
         return
     cross_turn = sum(1 for p in g.board if "cross_turn" in p.card.tags)
-    for _ in g.opponents:
+    for _ in OPP.acting(g):          # each opponent's TURN, §0z133
         g.float_mana += cross_turn      # these untap on every untap step
         # "you MAY discard a card. If you do, draw a card" -- declined when
         # the draw would deck you (queued item 17). Conservative in one case:

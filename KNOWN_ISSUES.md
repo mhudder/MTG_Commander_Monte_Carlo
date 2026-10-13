@@ -185,6 +185,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z130](#0z130) | BUILT | **Item 24, change 1**: the pod's creatures as bodies (toughness, mana value), behind `pod_bodies`, OFF and bit-identical; Massacre Wurm had three rules; ON moves tivit +0.013, lorehold +0.011 |
 | [0z131](#0z131) | BUILT | **Item 24, change 2**: opponent kills as routes of removable pieces, behind `pod_threats`, OFF and bit-identical; ON lifts T20 win +0.038 to +0.082, all via fewer clock losses; rebuild delay is the knob |
 | [0z132](#0z132) | BUILT | Change 1's gaps closed (blockers die, cost-aware pod blocking, deathtouch, Deathreap, Pygmy Kavu); kill timing re-fitted 1.9 rounds earlier: `POD_V4` holds mean win, answers worth +0.04 to +0.11 |
+| [0z133](#0z133) | FIXED | Eliminated opponents kept taking turns: removal, wraths and counterspells from the dead, and lorehold windows on their turns. Fixed by default; T20 karlov +0.022 ... lorehold -0.005; every table needs a rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11954,6 +11955,76 @@ triage has to read `ANSWERS`. The blind labels (`KNOWN_BLIND`) are the
 default pod's, and adopting POD_V4 means re-reading them -- most of the 27
 answers become evaluable. The pod's own creatures still do not die to each
 other. Adopting POD_V4 is the owner's call, with a rebuild of every table.
+
+<a id="0z133"></a>
+
+## 0z133. FIXED — eliminated opponents kept taking turns
+
+**2026-10-13**, found while wiring §0z132's end-step hook and fixed at the
+owner's request. `opponents_act` looped over every seat with no `alive`
+check, so an opponent who had been eliminated:
+
+- regrew a board every round (elimination sets `creatures` to 0);
+- rolled spot removal, artifact/enchantment removal and wraths at you;
+- stayed in `others`, so its threat diluted your share of every LIVING
+  opponent's removal.
+
+Four more sites had the same shape: `countered` let a dead blue player spend
+a counterspell; `damage_through`'s default defender ("the weakest board")
+ranged over the dead -- harmless while they regrew, but once they stop, a
+dead player's empty board would always be the weakest; rendmaw's Ezuri's
+Predation sized off the smallest board including the dead and aimed at seat
+0 dead or alive; and lorehold opened its miracle/rummage window on every
+opponent's turn, the dead ones' included. `incidental_damage`,
+`resolve_clocks`, `goaded_combat` and `voting` always skipped the dead.
+
+**How often**, before the fix (500 games a deck, staged lists, T20): an
+opponent is eliminated in 72-80% of games, and from then on the dead
+contributed 0.09-0.16 spot removals, 0.02-0.07 artifact removals, 0.04-0.09
+wraths and 0.06-0.08 counterspells a game -- about 0.3-0.4 interaction
+events, against a calibration of roughly four spot removals and one wipe.
+
+**The fix** is `opponents.dead_act` / `acting`: the dead take no turn, are not
+counted in `others`, cannot counter, are not the weakest board, are not
+Predation's target, and give lorehold no window. **It is the default (the
+owner, 2026-10-13); `dead_opponents_act=True` restores every old loop.**
+
+### What it moved (`results/dead_opponents_shift_20261013.txt`)
+
+`diagnostics/run_shared_code_shift.py`, both legs in one tree
+(`--cfg=dead_opponents_act=False`), N=15,000 per deck and horizon, staged
+lists:
+
+| deck | won T10 | won T20 | why |
+|---|---|---|---|
+| karlov | +0.0127 | **+0.0224** | fewer removal spells and wraths aimed at you |
+| azusa | +0.0143 | **+0.0205** | the same |
+| rendmaw | +0.0072 | **+0.0192** | the same, and Predation aims at the living |
+| shilgengar | +0.0015 | **+0.0135** | the same |
+| tivit | +0.0031 | **+0.0040** | the same |
+| lorehold | -0.0027 | **-0.0053** | -1.7 cards a game: the windows on dead players' turns were free draws and miracles |
+
+Every T20 shift is significant and outside the tables' noise floors
+(±0.0020-0.0032). **Every active table is therefore stale: the six caches
+read SUSPECT, and the owner chose to rebuild later.** They are NOT to be
+cleared with `--verified` -- the numbers moved; only a rebuild (the
+parallel-rebuild skill) clears them. Trostani is SUSPENDED and moves too.
+
+**Measured on the old rule, and to be read that way:** §0z131's ON/OFF table,
+§0z132's blocking split and `results/answer_worth_20261013.txt`.
+
+**POD_V4's clock shift, re-fitted on the fixed pod**
+(`results/pod_v4_clock_refit_20261013.txt`, N=2,000): the target moved to a
+mean T20 of 0.4233, and 1.5 / 2.0 / 2.5 rounds land at +0.016 / -0.001 /
+-0.025 against it. Fitted 1.97; `experiment.POD_V4` now carries **2.0**
+(it was 1.9). The spread is §0z132's: rendmaw +0.071, shilgengar +0.042,
+tivit +0.015, lorehold -0.029, karlov -0.047, azusa -0.058.
+
+### Gates
+
+`tests/test_dead_opponents.py`: 6 cases, each run under both rules, 3
+mutations whose sets were written before the run and were exact. `validate`
++0.00 on every metric with the fix as the default; 82 test modules pass.
 
 ## How to read an ablation table
 

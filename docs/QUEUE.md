@@ -22,6 +22,15 @@ What is closed and where it went:
 
 ---
 
+25. **REBUILD THE SIX ACTIVE TABLES** (queued 2026-10-13). §0z133 made
+    eliminated opponents stop acting, as the default, and moved every deck
+    at T20 (karlov +0.022, azusa +0.021, rendmaw +0.019, shilgengar +0.014,
+    tivit +0.004, lorehold -0.005). The owner chose "default now, rebuild
+    later": until the rebuild the six caches read SUSPECT, `check_docs`
+    fails on that one check, and every table describes the old pod. Use the
+    parallel-rebuild skill. Never clear them with `--verified`: the numbers
+    moved. If POD_V4 is adopted first, one rebuild covers both.
+
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10
     and +0.0247 ±0.0035 at T20**) and `-Plains +Anointed Procession` (tivit,
@@ -133,7 +142,7 @@ What is closed and where it went:
       threats both on, and every deck's answers are then worth +0.04 to
       +0.11. That pod is `experiment.POD_V4`, a candidate: adopting it is
       the owner's call, with a rebuild of every table, `KNOWN_BLIND`
-      re-read and `tools.triage` taught `ANSWERS`. Not done: attack taxes,
+      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.0 since §0z133 (re-fitted on the fixed pod). Not done: attack taxes,
       Damn's single-target mode, the voting answers, the wipe gate
       reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind

@@ -3230,9 +3230,12 @@ def run_etb(g: Game, perm: Permanent):
     elif s == "predation":
         # A 4/4 for each creature the target opponent controls, and each token
         # fights one of them. Sized off the pod's own board development.
-        n = int(max(1, min(o.creatures for o in g.opponents)))
+        # "Target opponent": a LIVING one under §0z133 -- seat 0 even when
+        # dead, and the smallest board including the dead, were the old rule.
+        foes = OPP.acting(g) or g.opponents
+        n = int(max(1, min(o.creatures for o in foes)))
         g.make_tokens(n, 4, 4, "Horror")
-        for o in g.opponents[:1]:
+        for o in foes[:1]:
             if OPP.pod_bodies_on(g):             # item 24: fights are deaths
                 OPP.kill_pod_count(g, o, n)
             else:

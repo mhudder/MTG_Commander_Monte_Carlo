@@ -1537,14 +1537,40 @@ def destroy(g, perm, roll=None, destroys=None, kind=None):
     return True
 
 
+def dead_act(g) -> bool:
+    """Do ELIMINATED opponents still take turns? (§0z133)
+
+    They did, by omission: `opponents_act` looped over every seat with no
+    `alive` check, so a dead opponent regrew a board and rolled spot
+    removal, artifact removal and wraths at you every round, its threat
+    diluted your share of the living opponents' attention, and `countered`
+    let a dead blue player spend a counterspell. `incidental_damage`,
+    `resolve_clocks` and `goaded_combat` always skipped the dead; these were
+    the sites that did not. THE FIX IS THE DEFAULT (the owner, 2026-10-13);
+    `dead_opponents_act=True` restores the old loops, which is what every
+    table before §0z133 was measured with."""
+    return g.cfg.get("dead_opponents_act", False)
+
+
+def acting(g) -> list:
+    """The opponents who take turns: the living, or every seat on the old
+    rule. For a count of the pod's TURNS (lorehold's windows), not of who
+    an effect can reach."""
+    return list(g.opponents) if dead_act(g) else living(g)
+
+
 def opponents_act(g):
     """One full round of the three opponents' turns."""
     rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
+    old = dead_act(g)
     for i, opp in enumerate(g.opponents):
+        if not old and not opp.alive:
+            continue                      # an eliminated player has no turn
         opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
         if pod_turn(g) < 3:
             continue
-        others = [o for j, o in enumerate(g.opponents) if j != i]
+        others = [o for j, o in enumerate(g.opponents)
+                  if j != i and (old or o.alive)]
         r = rolls_t[i]
         board_wipe(g, opp, r)
         spot_removal(g, opp, others, r)
@@ -1631,8 +1657,9 @@ def _countered(g, card, spell_index: int) -> bool:
 
     rolls = g.counter_rolls[min(pod_turn(g), len(g.counter_rolls) - 1)][spell_index]
     mana_gate = min(1.0, (pod_turn(g) - 2) / 4.0)
+    old = dead_act(g)
     for i, opp in enumerate(g.opponents):
-        if opp.counters_left <= 0:
+        if opp.counters_left <= 0 or not (old or opp.alive):
             continue
         p = opp.p["counter"] * mana_gate * min(1.0, threat / 9.0)
         if rolls[i] < p:
@@ -2038,7 +2065,12 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
     # not the table's total. Some of their creatures are also tapped from
     # attacking someone else.
     if defender is None:
-        defender = min(g.opponents, key=lambda o: o.creatures + o.goaded_birds)
+        # The weakest board AMONG THE LIVING (§0z133): a dead player's board
+        # is empty for good once the dead stop regrowing one, and would
+        # always be the weakest. `combat_split=False`'s legacy path keeps
+        # every seat under the old rule, as its comment there describes.
+        pool = list(g.opponents) if dead_act(g) else (living(g) or g.opponents)
+        defender = min(pool, key=lambda o: o.creatures + o.goaded_birds)
     n_block, n_fly = _blocker_counts(g, defender)
     if protected_from_creatures(g):
         n_block = n_fly = 0          # Serra's Emissary (§0z84)
