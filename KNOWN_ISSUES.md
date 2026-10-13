@@ -181,7 +181,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
 | [0z128](#0z128) | REBUILT | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 at T20, STAGED; table rebuilt |
-| [0z129](#0z129) | IMPLEMENTED | **Item 24, change 0**: nine KNOWN_BLIND cards that needed code, not a model (Sun Titan, Soulmender, Reclamation, Jitte, Midnight Reaper, Bloodghast, two Lessons, Quirion Ranger) |
+| [0z129](#0z129) | REBUILT | **Item 24, change 0**: nine KNOWN_BLIND cards given code. Five tables rebuilt: Capstone +0.0404 (lorehold's top row), Seminar +0.0333, Quirion +0.0112, Reclamation, Sun Titan, Jitte, Reaper ~+0.005 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11555,7 +11555,7 @@ Boots reads −0.0061 ±0.0022, still the one significantly negative row.
 
 <a id="0z129"></a>
 
-## 0z129. IMPLEMENTED — item 24's change 0: nine blind cards that needed code, not a model
+## 0z129. REBUILT — item 24's change 0: nine blind cards that needed code, not a model
 
 **2026-10-13.** Queue item 24 sorted the 75 `KNOWN_BLIND` cards by what
 each is missing, and a quarter of them needed nothing from the pod model:
@@ -11639,6 +11639,46 @@ The live tap costs the swap about 0.005 at T20 and nothing at T10, inside the
 combined bars (the baseline also gained South Wind Avatar in between, so the
 two rows are not one paired difference). **The judgement held; the staging
 stands**, now on a MODEL-EVALUATED cut.
+
+### The rebuild: five tables at `06712b2`, in parallel
+
+rendmaw, lorehold, karlov, shilgengar and azusa, one cloud session each
+(parallel-rebuild, §0z94), every leg on python 3.13.16 / numpy 2.4.6.
+**Wall time 74 minutes**, launch 01:31 UTC to the last push (azusa, 02:45);
+the other four pushed in 17-27. azusa ran 21 minutes longer than its last
+leg -- Quirion Ranger replays a land most turns it is out. Two rows were
+recomputed on the coordinator under python 3.13.12 (`tools.repro_row`):
+karlov's Sun Titan and lorehold's Restoration Seminar, both IDENTICAL.
+tivit was already VERIFIED (bit-identical on its module and staged lists);
+trostani is SUSPENDED. Gates under 3.13: validate +0.00 on all 21 metrics,
+79 test modules, `check_docs` 20 of 20, every deck legal.
+
+**Every change-0 row, old table against new** (win rate, ±95%):
+
+| card | deck | before | after | class |
+|---|---|---|---|---|
+| Improvisation Capstone | lorehold | +0.0003 ±0.0005 | **+0.0404 ±0.0036** | MODEL-EVALUATED -- the deck's top win-rate row |
+| Restoration Seminar | lorehold | +0.0009 ±0.0006 | **+0.0333 ±0.0033** | MODEL-EVALUATED |
+| Quirion Ranger | azusa | +0.0003 ±0.0012 | **+0.0112 ±0.0028** | MODEL-EVALUATED |
+| Phyrexian Reclamation | karlov | +0.0001 ±0.0013 | **+0.0071 ±0.0022** | MODEL-EVALUATED |
+| Sun Titan | karlov | +0.0031 ±0.0016 | **+0.0069 ±0.0020** | MODEL-EVALUATED |
+| Umezawa's Jitte | karlov | -0.0007 ±0.0017 | **+0.0049 ±0.0024** | PARTLY |
+| Midnight Reaper | rendmaw | +0.0003 ±0.0013 | **+0.0047 ±0.0022** | MODEL-EVALUATED |
+| Bloodghast | shilgengar | +0.0007 ±0.0013 | +0.0013 ±0.0018 (`dmg`) | MODEL-EVALUATED, inside its bar on win rate |
+
+Soulmender is the staged cut and has no row (above).
+
+**Capstone at the top of lorehold's table is traced, not just printed**:
+its counters are 0.88 free casts a game off the exile and a free copy every
+precombat main phase after the first resolution (`paradigm_copies`), and
+`mv_cheated` rises ~8 a game. A seven-mana card that is a free spell every
+turn thereafter is a strong card at a real table too.
+
+**One other row moved outside its combined bar, in five tables**: lorehold's
+Furygale Flocking, +0.0488 ±0.0044 -> +0.0415 ±0.0043. It is PARTLY and
+in the same deck as the two Lessons; a stronger deck makes any one card
+matter less, and that is all this note claims -- it is not traced further.
+No other row in rendmaw, karlov, shilgengar or azusa moved beyond its bar.
 
 ## How to read an ablation table
 

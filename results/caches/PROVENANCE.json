@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "080ef810cf55783b",
-    "built_commit": "1dcdd28",
-    "built_utc": "2026-10-11T01:53:45Z",
+    "built_at": "e84f0f31fd3ac674",
+    "built_commit": "06712b2",
+    "built_utc": "2026-10-13T01:36:56Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -378,33 +378,40 @@
             "utc": "2026-10-09T16:35:46Z"
           }
         ]
+      },
+      {
+        "built_at": "080ef810cf55783b",
+        "built_commit": "1dcdd28",
+        "built_utc": "2026-10-11T01:53:45Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "c72377e",
+            "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_azusa.txt.",
+            "fingerprint": "d30e674650191925",
+            "utc": "2026-10-11T15:11:15Z"
+          },
+          {
+            "commit": "4e1970e",
+            "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_azusa.txt.",
+            "fingerprint": "d12247d417ef8c5d",
+            "utc": "2026-10-12T02:29:44Z"
+          },
+          {
+            "commit": "b3efb12",
+            "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
+            "fingerprint": "a5f368270b4ef8e0",
+            "utc": "2026-10-12T02:58:52Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c72377e",
-        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_azusa.txt.",
-        "fingerprint": "d30e674650191925",
-        "utc": "2026-10-11T15:11:15Z"
-      },
-      {
-        "commit": "4e1970e",
-        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_azusa.txt.",
-        "fingerprint": "d12247d417ef8c5d",
-        "utc": "2026-10-12T02:29:44Z"
-      },
-      {
-        "commit": "b3efb12",
-        "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
-        "fingerprint": "a5f368270b4ef8e0",
-        "utc": "2026-10-12T02:58:52Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "f3e035dad9c84fe9",
-    "built_commit": "b3efb12",
-    "built_utc": "2026-10-12T02:59:22Z",
+    "built_at": "7a2014f1588a73dd",
+    "built_commit": "06712b2",
+    "built_utc": "2026-10-13T01:34:13Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -734,14 +741,21 @@
             "utc": "2026-10-12T02:39:36Z"
           }
         ]
+      },
+      {
+        "built_at": "f3e035dad9c84fe9",
+        "built_commit": "b3efb12",
+        "built_utc": "2026-10-12T02:59:22Z",
+        "deck": "karlov",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "e5748a9fd75c3bcc",
-    "built_commit": "1dcdd28",
-    "built_utc": "2026-10-11T00:50:39Z",
+    "built_at": "ddcc6bcf792edf00",
+    "built_commit": "06712b2",
+    "built_utc": "2026-10-13T01:34:38Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1059,33 +1073,40 @@
             "utc": "2026-10-09T13:49:49Z"
           }
         ]
+      },
+      {
+        "built_at": "e5748a9fd75c3bcc",
+        "built_commit": "1dcdd28",
+        "built_utc": "2026-10-11T00:50:39Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "c72377e",
+            "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_lorehold.txt.",
+            "fingerprint": "611b6b62ed4215a2",
+            "utc": "2026-10-11T15:11:14Z"
+          },
+          {
+            "commit": "4e1970e",
+            "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_lorehold.txt.",
+            "fingerprint": "6044a5eac8a4f9be",
+            "utc": "2026-10-12T02:29:44Z"
+          },
+          {
+            "commit": "b3efb12",
+            "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
+            "fingerprint": "bf1c958b8d721b43",
+            "utc": "2026-10-12T02:58:51Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c72377e",
-        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_lorehold.txt.",
-        "fingerprint": "611b6b62ed4215a2",
-        "utc": "2026-10-11T15:11:14Z"
-      },
-      {
-        "commit": "4e1970e",
-        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_lorehold.txt.",
-        "fingerprint": "6044a5eac8a4f9be",
-        "utc": "2026-10-12T02:29:44Z"
-      },
-      {
-        "commit": "b3efb12",
-        "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
-        "fingerprint": "bf1c958b8d721b43",
-        "utc": "2026-10-12T02:58:51Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "08632e094e2bf826",
-    "built_commit": "1dcdd28",
-    "built_utc": "2026-10-11T01:13:43Z",
+    "built_at": "fb14e65e25ba028a",
+    "built_commit": "06712b2",
+    "built_utc": "2026-10-13T01:34:30Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -1381,33 +1402,40 @@
             "utc": "2026-10-09T16:35:44Z"
           }
         ]
+      },
+      {
+        "built_at": "08632e094e2bf826",
+        "built_commit": "1dcdd28",
+        "built_utc": "2026-10-11T01:13:43Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "c72377e",
+            "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_rendmaw.txt.",
+            "fingerprint": "04ce698d7705d6fc",
+            "utc": "2026-10-11T15:11:14Z"
+          },
+          {
+            "commit": "4e1970e",
+            "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_rendmaw.txt.",
+            "fingerprint": "0c75eef98b2ecee8",
+            "utc": "2026-10-12T02:29:43Z"
+          },
+          {
+            "commit": "b3efb12",
+            "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
+            "fingerprint": "edeb2db877060bfc",
+            "utc": "2026-10-12T02:58:51Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c72377e",
-        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_rendmaw.txt.",
-        "fingerprint": "04ce698d7705d6fc",
-        "utc": "2026-10-11T15:11:14Z"
-      },
-      {
-        "commit": "4e1970e",
-        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_rendmaw.txt.",
-        "fingerprint": "0c75eef98b2ecee8",
-        "utc": "2026-10-12T02:29:43Z"
-      },
-      {
-        "commit": "b3efb12",
-        "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
-        "fingerprint": "edeb2db877060bfc",
-        "utc": "2026-10-12T02:58:51Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "e8df47d6680937d6",
-    "built_commit": "1dcdd28",
-    "built_utc": "2026-10-11T01:33:39Z",
+    "built_at": "b06ed6f0ee829ce3",
+    "built_commit": "06712b2",
+    "built_utc": "2026-10-13T01:33:26Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -1745,28 +1773,35 @@
             "utc": "2026-10-09T16:35:46Z"
           }
         ]
+      },
+      {
+        "built_at": "e8df47d6680937d6",
+        "built_commit": "1dcdd28",
+        "built_utc": "2026-10-11T01:33:39Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "c72377e",
+            "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_shilgengar.txt.",
+            "fingerprint": "96ba6d40c76529c2",
+            "utc": "2026-10-11T15:11:14Z"
+          },
+          {
+            "commit": "4e1970e",
+            "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_shilgengar.txt.",
+            "fingerprint": "080773a83d6b00c2",
+            "utc": "2026-10-12T02:29:44Z"
+          },
+          {
+            "commit": "b3efb12",
+            "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
+            "fingerprint": "3c7ddab9b529f01a",
+            "utc": "2026-10-12T02:58:52Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c72377e",
-        "evidence": "2026-10-11, \u00a70z127: moved only by comments, docstrings and the removal of two cut cards (Lightning Greaves, Verge Rangers) from SCRIPTED_LOREHOLD, in tools/ablation.py and edhmc/experiment.py. check_unchanged_decks at --n=2000 against a worktree at c72377e: BIT-IDENTICAL on all 8 metrics. build_pending lists byte-identical to c72377e (full Card repr). Table re-rendered from this cache byte-identical to results/ablation_shilgengar.txt.",
-        "fingerprint": "96ba6d40c76529c2",
-        "utc": "2026-10-11T15:11:14Z"
-      },
-      {
-        "commit": "4e1970e",
-        "evidence": "2026-10-12, the karlov candidate batch (\u00a70z128): karlov.py gained five candidates' rules (no-ops without the cards), _evasion.py's SCANNED set gained five names (FLYING/INDESTRUCTIBLE/subtype sets unchanged), tools/ablation.py gained classification entries for cards in no table. check_unchanged_decks --n=2000 against a worktree at 4e1970e: BIT-IDENTICAL on all 8 metrics for all six active decks. The table re-rendered from this cache diffs byte-identical with results/ablation_shilgengar.txt.",
-        "fingerprint": "080773a83d6b00c2",
-        "utc": "2026-10-12T02:29:44Z"
-      },
-      {
-        "commit": "b3efb12",
-        "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
-        "fingerprint": "3c7ddab9b529f01a",
-        "utc": "2026-10-12T02:58:52Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "d30fa7936e87ad23",
