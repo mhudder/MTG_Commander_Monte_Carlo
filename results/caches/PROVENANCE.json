@@ -2076,6 +2076,12 @@
         "evidence": "2026-10-12, staging -Daxos +South Wind Avatar in karlov (\u00a70z128) regenerated decks/_removal.py: its SCANNED set gained 'South Wind Avatar' and NOTHING ELSE (the destroy shares are unchanged; the card is not removal). This deck's STAGED list (build_pending), seeds 5000..6999, T20, 10 metrics incl. removal_eaten and wipes_suffered: BIT-IDENTICAL against a worktree at b3efb12 (\u00a70z126's check, at 2,000 seeds).",
         "fingerprint": "225ace6e1b83bf46",
         "utc": "2026-10-12T02:58:52Z"
+      },
+      {
+        "commit": "feab46d",
+        "evidence": "item 24 change 0 (engine.py, karlov, lorehold, shilgengar, azusa): tools.check_unchanged_decks --n=2000 --include-suspended against a worktree at feab46d: tivit BIT-IDENTICAL on all 8 metrics; tivit's STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric (65 keys): byte-identical JSON. HEAD's cache was already VERIFIED.",
+        "fingerprint": "93441c56e88a8180",
+        "utc": "2026-10-13T01:28:09Z"
       }
     ]
   },

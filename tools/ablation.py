@@ -168,6 +168,10 @@ SCRIPTED_RENDMAW = {
     # (`engine.card_types`), and every artifact spell cast is 1 life and a
     # 2/2 Necron (`biotransference_cast`).
     "Biotransference",
+    # Midnight Reaper (item 24, 2026-10-13): KNOWN_BLIND here for want of
+    # code while shilgengar modelled it; `engine.midnight_reaper`, look-back,
+    # nontoken deaths only.
+    "Midnight Reaper",
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
@@ -249,6 +253,12 @@ SCRIPTED_RENDMAW = {
 # Reviewed 2026-09-03. Monologue Tax, Hidden Retreat, Urabrask and Triumph of
 # Saint Katherine left the deck in v16 and are gone from this list with them.
 SCRIPTED_LOREHOLD = {
+    # --- item 24, change 0 (2026-10-13): two Lessons that were KNOWN_BLIND
+    # for want of code. Each effect (`restoration_seminar`,
+    # `improvisation_capstone`) and PARADIGM (`paradigm_step`: a free copy,
+    # cast, at the beginning of each precombat main phase; the Capstone's
+    # declined at `capstone_min_library` or fewer cards).
+    "Restoration Seminar", "Improvisation Capstone",
     # --- §0f closed 2026-09-12, except Borrowed Knowledge's mode 1 ---
     # Apex of Power: exile seven, cast from among them, and ten mana of ONE
     # colour -- and no mana on a copy, which is the 'cast from your hand'
@@ -424,6 +434,14 @@ SCRIPTED_KARLOV = {
     # Orchard's trigger fires on every tap (`karlov.orchard_tapped`) and its
     # idle tap is a policy said out loud (`orchard_idle_tap`).
     "Epicure of Blood", "Polluted Bonds", "Forbidden Orchard",
+    # Item 24, change 0 (2026-10-13): three cards that were KNOWN_BLIND for
+    # want of code, not for want of a model. Sun Titan's ETB and attack
+    # triggers (`karlov.sun_titan`, the pick shared as
+    # `engine.sun_titan_pick`); Soulmender's tap as a lifegain event at the
+    # end step, staying home (`soulmender_tap`); Phyrexian Reclamation's
+    # return, in two windows and above `reclamation_life_floor`. Vigilance
+    # is inert: nothing here reads your untapped creatures on the pod's turn.
+    "Sun Titan", "Soulmender", "Phyrexian Reclamation",
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -493,6 +511,11 @@ SCRIPTED_TIVIT = {
 # Avacyn's protection against opponent-sourced destroy() only, Skullclamp
 # restricted to token fodder, Voldaren Bloodcaster with no transform).
 SCRIPTED_SHILGENGAR = {
+    # Bloodghast (item 24, 2026-10-13): landfall return from the graveyard,
+    # haste while an opponent is at 10 or less, and aristocrats fodder when
+    # a land in hand will bring it back (`bloodghast_fodder`, a policy).
+    # "Can't block" is inert: your creatures never block here.
+    "Bloodghast",
     # Herald of War and Twilight Shepherd (both were PARTLY, §0z84). Herald:
     # the flier, its attack counter, and the Angel-and-Human discount per
     # counter (`herald_cost`). Shepherd: the flying vigilance body, its ETB
@@ -546,6 +569,11 @@ SCRIPTED_SHILGENGAR = {
 # to a note that does not exist is worse than no note, because it stops the
 # next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
 SCRIPTED_AZUSA = {
+    # Quirion Ranger (item 24, 2026-10-13): "Return a Forest you control to
+    # its owner's hand" is the card here -- the Forest is replayed with a
+    # spare land drop (`AzusaGame.quirion_ranger_bounce`), a tapped one
+    # first. The untap is inert: no creature in the list taps for value.
+    "Quirion Ranger",
     # ASHAYA CAME BACK 2026-09-13 (§0z18, queued 15). Both clauses are now
     # implemented: the */* off the land count, and "nontoken creatures you
     # control are Forest lands in addition to their other types" -- the mana
@@ -763,6 +791,14 @@ PARTLY_MODELLED = {
             "cast this turn does not swing. A floor.",
     },
     "karlov": {
+        "Umezawa's Jitte":
+            "MODELLED (item 24): equip {2} at the end of the first main "
+            "phase, two charge counters whenever the holder attacks (it "
+            "deals combat damage to a player or to the pod's chump blocker), "
+            "and every counter spent at once on 'you gain 2 life', one "
+            "lifegain EVENT each. NOT: the +2/+2 mode (a policy choice -- an "
+            "event is worth more here) and the -1/-1 mode, whose targets are "
+            "the pod's creatures, a count (§4). A floor.",
         "Ginger, Queen of Sweets":
             "Two clauses of three are modelled and the third is a POLICY "
             "omission rather than a gap. MODELLED: the ETB crown "
@@ -1335,7 +1371,7 @@ KNOWN_BLIND = {
         'Haywire Mite',
         'Lignify',
         'Massacre Wurm',
-        'Midnight Reaper',
+        # (Midnight Reaper left 2026-10-13: implemented, item 24.)
         # Deathreap Ritual joined 2026-10-08, by the owner's rule (§0z121):
         # "At the beginning of EACH end step, if a creature died this turn"
         # reads every player's creatures, and the pod's are a count with no
@@ -1359,11 +1395,11 @@ KNOWN_BLIND = {
         'Gamble',
         'Generous Gift',
         'Hexing Squelcher',
-        'Improvisation Capstone',
         'Path to Exile',
         'Perch Protection',
-        'Restoration Seminar',
         'Sejiri Shelter',
+        # (Improvisation Capstone and Restoration Seminar left 2026-10-13:
+        # both effects and paradigm implemented, item 24.)
         'Swords to Plowshares',
     },
     "karlov": {
@@ -1371,13 +1407,11 @@ KNOWN_BLIND = {
         'Enlightened Tutor',
         'Fracture',
         'Path to Exile',
-        'Phyrexian Reclamation',
         'Return to Dust',
         "Sensei's Divining Top",
-        'Soulmender',
-        'Sun Titan',
         'Swords to Plowshares',
-        "Umezawa's Jitte",
+        # (Sun Titan, Soulmender, Phyrexian Reclamation and Umezawa's Jitte
+        # left on 2026-10-13: implemented, item 24's change 0.)
     },
     # Explicitly blind, with the reason. check_scripted_coverage() raises if a
     # nonland card is in neither set, which is the guard against the 2026-09-04
@@ -1435,7 +1469,11 @@ KNOWN_BLIND = {
         # which is close to a real blank in this engine
         "Sylvan Library",
         # symmetric mana-color-lock with no clear implementation path in an
-        # abstracted mana model, and situational even in paper play
+        # abstracted mana model, and situational even in paper play. ITEM 24
+        # (2026-10-13) looked again: on YOUR side it is close to nothing in a
+        # mono-green list -- you choose green on your upkeep, and you tap
+        # little on the pod's turns -- so what is missing is the pod's half
+        # (§4), and blind is the right label.
         "Hall of Gemstone",
         # a sac-for-value engine whose real value depends on WHEN to fire it
         # -- exactly the judgement-heavy timing this project is cautious
@@ -1445,8 +1483,8 @@ KNOWN_BLIND = {
         # replaces every draw() call across the engine with a choice; too
         # much retrofitting for the many independent draw sources in this list
         "Abundance",
-        # untaps a target creature once a turn for no modelled payoff
-        "Quirion Ranger",
+        # (Quirion Ranger left 2026-10-13: its COST is the payoff -- a
+        # Forest back to hand is a spare land drop replayed, item 24.)
         # a plain land tutor to hand with no clear "best" target among 19
         # distinct utility lands
         "Sylvan Scrying",
@@ -1481,9 +1519,9 @@ KNOWN_BLIND = {
         # resolve_clocks (a game-loss check, not a damage event) is not
         # confidently representable -- see edhmc/shilgengar.py's docstring
         "Angel of Suffering",
-        # landfall recursion + conditional haste unmodelled; a cheap enough
-        # body that this is not worth the engine complexity
-        "Bloodghast",
+        # (Bloodghast left 2026-10-13: its landfall recursion and haste are
+        # modelled, item 24 -- "not worth the engine complexity" was the
+        # reason it sat here.)
         # (Herald of War, Angelic Arbiter, Twilight Shepherd, Serra's
         # Emissary, and the two MDFCs Agadeem's Awakening and Malakir Rebirth
         # left on 2026-09-29, §0z78: each has a modelled body or land face

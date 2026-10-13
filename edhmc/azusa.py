@@ -488,6 +488,7 @@ class AzusaGame(BaseGame):
             "test_card_answered": 0, "test_card_removed": 0,
             "test_card_countered": 0,
             "lands_played": 0, "landfall_triggers": 0, "fetches_cracked": 0,
+            "quirion_bounces": 0, "quirion_tapped_bounces": 0,   # item 24
             # §0z18 -- Ashaya's second clause, counted so the mechanism can be
             # read directly rather than inferred from win rate.
             "ashaya_landfall": 0, "ashaya_land_deaths": 0,
@@ -1811,11 +1812,48 @@ class AzusaGame(BaseGame):
                 return picks[0]
         return None
 
+    def quirion_ranger_bounce(self) -> bool:
+        """QUIRION RANGER, verified against Scryfall 2026-10-13: "Return a
+        Forest you control to its owner's hand: Untap target creature.
+        Activate only once each turn." KNOWN_BLIND until item 24, as "untaps a
+        target creature once a turn for no modelled payoff" -- but the COST is
+        the payoff in this deck: a Forest back in hand is a land drop this
+        deck has spare, so it is replayed for a landfall trigger and, when
+        the Forest returned was already tapped, one more {G}.
+
+        THE POLICY, said out loud: only when a land drop is left and nothing
+        else is playable, once a turn, returning a TAPPED Forest if there is
+        one (the mana line), else an untapped one (landfall alone). Never a
+        token (it would cease to exist) nor a creature-land (Ashaya's or an
+        animated one: a body). The untap itself is inert -- this list has no
+        creature with a {T} ability that pays, and your creatures never block
+        -- so the target is the Ranger. `quirion_bounce=False` is the old
+        blank."""
+        if (not self.cfg.get("quirion_bounce", True)
+                or not self.has("Quirion Ranger")
+                or getattr(self, "quirion_turn", None) == self.turn):
+            return False
+        pool = [p for p in self.board
+                if p.card.is_land and is_forest(p.card) and not p.is_token
+                and not p.card.is_creature
+                and self.animation_of(p) is None]
+        if not pool:
+            return False
+        pick = max(pool, key=lambda p: (p.tapped, p.card.name == "Forest"))
+        self.board.remove(pick)
+        self.hand.append(pick.card)
+        self.quirion_turn = self.turn
+        self.m["quirion_bounces"] += 1
+        self.m["quirion_tapped_bounces"] += int(pick.tapped)
+        return True
+
     def land_step(self):
         self.land_drops = self.land_drops_for_turn()
         while self.land_drops_used < self.land_drops:
             options = self.playable_lands()
             choice = self.choose_land(options)
+            if choice is None and self.quirion_ranger_bounce():
+                choice = self.choose_land(self.playable_lands())
             if choice is None:
                 break
             card, zone = choice

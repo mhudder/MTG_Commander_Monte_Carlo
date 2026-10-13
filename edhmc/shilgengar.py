@@ -142,7 +142,8 @@ from edhmc.engine import (charge_coloured_pain, vault_of_the_archangel,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, thomil_step, lord_of_the_pit_card,
                           lord_of_the_pit_upkeep, pearl_collector_trigger,
-                          pearl_collector_lifelink, perpetual_lifelink)
+                          pearl_collector_lifelink, perpetual_lifelink,
+                          counts_as_land_in_hand)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
 
@@ -212,6 +213,7 @@ class ShilgengarGame(BaseGame):
             "angels_fed": 0, "cards_fed": 0, "finality_marked": 0,
             "shilgengar_ults": 0, "shilgengar_reanimated": 0,
             "single_reanimations": 0, "treasures_made": 0,
+            "bloodghast_returns": 0, "bloodghast_hasty": 0,   # item 24
             # Queued item 13: Treasures were made and never spent. Registered
             # here, not created on first use -- `self.m` is a plain dict, so an
             # unregistered key is a KeyError in whichever worker first spends
@@ -503,6 +505,7 @@ class ShilgengarGame(BaseGame):
             return
         fodder = [p for p in self.board if p.is_token and p.card.is_creature
                  and not p.sick and self.power_of(p) <= 1]
+        fodder += self.bloodghast_fodder()               # item 24
         free_outlet = self.has("Viscera Seer") or self.has("Cartel Aristocrat") \
             or self.commander_cast
         # THE LAND OUTLETS (§0z115), one sacrifice each a turn ({T}):
@@ -1120,6 +1123,12 @@ class ShilgengarGame(BaseGame):
             make_lord=lambda: self.make_creature_token(lord_of_the_pit_card()))
 
     def combat(self):
+        # BLOODGHAST's haste, read as combat begins (item 24).
+        if self.bloodghast_hasty():
+            for p in self.board:
+                if p.card.name == "Bloodghast" and p.sick:
+                    p.sick = False
+                    self.m["bloodghast_hasty"] += 1
         attackers = [p for p in self.board if p.card.is_creature
                     and not p.tapped and not p.sick]
         if not attackers:
@@ -1254,7 +1263,13 @@ class ShilgengarGame(BaseGame):
 
     def land_step(self):
         before = sum(1 for p in self.board if p.card.is_land)
+        lands_before = {id(p) for p in self.board if p.card.is_land}
         play_land(self)
+        # Landfall for Bloodghast: did ANY land enter? Not the count, which a
+        # karoo's bounce or a cracked fetch leaves unchanged (item 24).
+        if any(p.card.is_land and id(p) not in lands_before
+               for p in self.board):
+            self.bloodghast_landfall()
         if sum(1 for p in self.board if p.card.is_land) > before \
                 and self.has("Emeria Shepherd"):
             # Landfall: "return target nonland permanent card from your
@@ -1270,6 +1285,44 @@ class ShilgengarGame(BaseGame):
                 if perm.card.is_creature:
                     self.creature_entered(perm)
                 self.m["single_reanimations"] += 1
+
+    # -- Bloodghast (item 24) ----------------------------------------------
+
+    def bloodghast_landfall(self):
+        """BLOODGHAST, verified against Scryfall 2026-10-13: "This creature
+        can't block. / This creature has haste as long as an opponent has 10
+        or less life. / Landfall -- Whenever a land you control enters, you
+        may return this card from your graveyard to the battlefield."
+
+        Was KNOWN_BLIND for want of code (item 24). "You may" is always
+        taken: a recursive body is what this deck sacrifices. A Bloodghast
+        returned by the ultimate carries a finality counter and is exiled
+        instead of dying (§0z75), so it never reaches `yard_creatures`.
+        "Can't block" is inert: your creatures never block here."""
+        for card in [c for c in self.yard_creatures()
+                     if c.name == "Bloodghast"]:
+            self.graveyard.remove(card)
+            perm = self.make_permanent(card, sick=True)
+            self.creature_entered(perm)
+            self.m["bloodghast_returns"] += 1
+
+    def bloodghast_hasty(self) -> bool:
+        """BLOODGHAST: "Haste as long as an opponent has 10 or less life."
+        """
+        return any(o.alive and o.life <= 10 for o in self.opponents)
+
+    def bloodghast_fodder(self):
+        """THE POLICY, said out loud: a Bloodghast joins the aristocrats
+        step's fodder, after the tokens, when a land in hand will bring it
+        back next turn -- the reason the card is in an aristocrats list.
+        `bloodghast_fodder=False` is the naive pilot, who sacrifices tokens
+        only (the old rule for every real card)."""
+        if not self.cfg.get("bloodghast_fodder", True):
+            return []
+        if not any(counts_as_land_in_hand(c) for c in self.hand):
+            return []
+        return [p for p in self.board if p.card.name == "Bloodghast"
+                and not p.is_token and not p.sick]
 
 
 def take_turn(g):

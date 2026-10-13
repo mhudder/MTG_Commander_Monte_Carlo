@@ -120,6 +120,9 @@ class LoreholdGame(BaseGame):
         # Rebound (702.88a): cards cast from hand and exiled, each cast free
         # at your next upkeep (`rebound_upkeep`). Profound Journey, 2026-10-09.
         self.rebound_exile = []
+        # PARADIGM (item 24): name -> the card, once a spell with that name
+        # has resolved and exiled itself. `paradigm_step` copies each.
+        self.paradigm = {}
         # True while `main_phase` runs: mana added by a resolving spell
         # (Explosive Welcome) survives only inside the step that made it
         # (500.4), and the main phase is the only step this engine casts in
@@ -814,6 +817,8 @@ def pilot_may_cast(g, card) -> bool:
     # card in your graveyard.
     if card.script == "profound_journey" and reanimation_target(g) is None:
         return False
+    if card.script == "seminar" and seminar_target(g) is None:
+        return False
     n = spell_draws(g, card)
     return n == 0 or draw_is_safe(g, n)
 
@@ -1270,6 +1275,12 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         gideons_phalanx(g)
     elif sc == "profound_journey":
         profound_journey(g)
+    elif sc == "seminar":
+        restoration_seminar(g)
+        g.paradigm[card.name] = card
+    elif sc == "capstone":
+        improvisation_capstone(g)
+        g.paradigm[card.name] = card
     elif sc == "gyre":
         # IMMOLATING GYRE: its counters only -- the damage is the `wipe` tag
         # below (`resolve_own_wipe`, one-sided, `opponents.gyre_share`).
@@ -1932,6 +1943,90 @@ def sunbird(g, card):
     resolve_spell(g, pick, 0, from_hand=False)
 
 
+# PARADIGM (Strixhaven's Lessons, 702.x): "Then exile this spell. After you
+# first resolve a spell with this name, you may cast a copy of it from exile
+# without paying its mana cost at the beginning of each of your first main
+# phases." Both cards were KNOWN_BLIND -- a vanilla seven-mana sorcery each --
+# for want of code (item 24).
+PARADIGM = {"seminar", "capstone"}
+
+
+def seminar_target(g):
+    """RESTORATION SEMINAR's "target NONLAND permanent card from your
+    graveyard": `reanimation_target`'s pick (priority, then mana value)
+    without its land fallback. None when there is no legal target."""
+    pool = [c for c in g.graveyard if c.is_permanent and not c.is_land]
+    if not pool:
+        return None
+    return max(pool, key=lambda c: (c.priority, c.mv))
+
+
+def restoration_seminar(g):
+    """RESTORATION SEMINAR {5}{W}{W} Sorcery -- Lesson, verified against
+    Scryfall 2026-10-13: "Return target nonland permanent card from your
+    graveyard to the battlefield. Paradigm." Profound Journey's return,
+    nonland only; the card enters through `enters_battlefield` so its ETBs
+    fire. The target is re-read on resolution (§0z19)."""
+    pick = seminar_target(g)
+    if pick is None:
+        g.m["seminar_fizzled"] += 1
+        return
+    g.graveyard.remove(pick)
+    g.m["seminar_returns"] += 1
+    g.m["seminar_mv"] += pick.mv
+    enters_battlefield(g, pick)
+
+
+def improvisation_capstone(g):
+    """IMPROVISATION CAPSTONE {5}{R}{R} Sorcery -- Lesson, verified against
+    Scryfall 2026-10-13: "Exile cards from the top of your library until you
+    exile cards with total mana value 4 or greater. You may cast any number
+    of spells from among them without paying their mana costs. Paradigm."
+
+    Mana value in the library is `free_mv` (X is 0); a land adds 0, so the
+    dig runs past lands, which are lost -- they cannot be cast. Every spell
+    the pilot MAY cast (`pilot_may_cast`: a target, the wipe gate, the
+    decking rule) is cast, best first, through `cast_free`; the rest stay
+    exiled, as Jeska's Will's leftovers do."""
+    exiled, total = [], 0.0
+    while g.library and total < 4:
+        c = g.library.pop()
+        exiled.append(c)
+        total += c.free_mv
+    g.m["capstone_exiled"] += len(exiled)
+    for c in sorted((c for c in exiled if not c.is_land),
+                    key=lambda c: (-c.priority, -c.mv)):
+        if g.result is not None:
+            return
+        if not pilot_may_cast(g, c):
+            continue
+        g.m["capstone_casts"] += 1
+        cast_free(g, c)
+
+
+def paradigm_step(g):
+    """PARADIGM's copies, "at the beginning of each of your first main
+    phases": once per exiled Lesson, free, CAST (so every cast trigger
+    sees it), a copy that goes nowhere after resolving. "You may", so it
+    asks `pilot_may_cast` -- Restoration Seminar with no target is not
+    cast.
+
+    THE CAPSTONE'S DECKING RULE, said out loud: its copy EXILES from the
+    library rather than drawing, which `pilot_may_cast`'s decking check
+    does not see, so it is declined while the library holds
+    `capstone_min_library` (15, Shigeki's floor) cards or fewer (§0z42)."""
+    floor = g.cfg.get("capstone_min_library", 15)
+    for card in list(g.paradigm.values()):
+        if g.result is not None:
+            return
+        if (not pilot_may_cast(g, card)
+                or (card.script == "capstone" and len(g.library) <= floor)):
+            g.m["paradigm_declined"] += 1
+            continue
+        g.m["paradigm_copies"] += 1
+        cast_free(g, card)
+
+
 def cast_free(g, card, exile=False, from_hand=False):
     """Cast `card` WITHOUT PAYING ITS MANA COST, through the whole pipeline.
 
@@ -2019,6 +2114,8 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
 
     if card.is_permanent:
         enters_battlefield(g, card)
+    elif card.script in PARADIGM:
+        pass                 # "Then exile this spell" (a copy: nothing)
     elif card.script in SELF_EXILING and g.cfg.get("lorehold_recursion", True):
         pass                       # "Exile <self>." Not in the graveyard.
     elif card.script == "approach":
@@ -2797,6 +2894,8 @@ def take_turn(g):
             g.m["settop_miracled"] += (drawn is st_card and cast)
     held = 0
     if not g.turn_ended:
+        paradigm_step(g)               # "each of your first main phases"
+    if not g.turn_ended:
         play_land(g)
         held = reserve_for(g)
         if held:
@@ -2850,6 +2949,7 @@ def take_turn(g):
         g.turn_ended = False
         g.precombat = True
         miracle_window(g)
+        paradigm_step(g)
         main_phase(g)
         if not g.turn_ended:
             combat(g)

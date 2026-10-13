@@ -78,3 +78,61 @@ What is closed and where it went:
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`.
+
+24. **WHAT WOULD LET THE MODEL SEE ITS BLIND CARDS** (queued 2026-10-13, at
+    the owner's request after a look at simulating Riku of Many Paths). The
+    75 cards in the seven `KNOWN_BLIND` sets in `tools/ablation.py`, sorted
+    by what each is missing (one session's reading of each card's note --
+    a judgement, not derived):
+
+    | missing | cards | e.g. |
+    |---|---|---|
+    | opponent permanents worth removing | 36 | Swords, Path, Beast Within, Vindicate, Krosan Grip |
+    | nothing: YOUR side's text, unimplemented | 19 | Sun Titan, Bloodghast, Jitte, Sylvan Library, Top |
+    | the pod's spells, hands and draws | 10 | Counterspell, Dovin's Veto, Rhystic Study, Mind's Eye |
+    | the pod's creatures as bodies that die | 5 | Massacre Wurm, Pygmy Kavu, Deathreap Ritual |
+    | a response window | 3 | Greater Good, Perch Protection, Sejiri Shelter |
+    | attack taxes (the clocks are not combats) | 2 | Ghostly Prison, Propaganda |
+
+    **The root is that an opponent's win is a ROLL** (`make_pod`'s
+    `kill_turn`, fired by `opponents.resolve_clocks`), so nothing you do to a
+    board can delay it. Giving the pod permanents to target does nothing
+    unless removing one moves the clock. The changes, in the order proposed:
+
+    - **0. Implement the own-side cards.** No model change; each moves only
+      its own deck. Sun Titan works in shilgengar and trostani and is blind
+      in karlov; Midnight Reaper works in shilgengar and is blind in rendmaw
+      (§0u's shape). Bloodghast, Phyrexian Reclamation, Umezawa's Jitte,
+      Soulmender, Restoration Seminar and Improvisation Capstone had no code
+      anywhere. **FIRST PASS DONE (§0z129)**: those nine, plus Quirion
+      Ranger and the two Lorehold Lessons. Storm Cauldron and Hall of
+      Gemstone stay blind (reasons in `tools/ablation.py`); Angel of
+      Suffering waits for change 2 (is a clock damage?); the selection
+      cards are change 4.
+    - **1. The pod's creatures as bodies**: a pre-rolled power/toughness list
+      per opponent instead of `Opponent.creatures`. Unlocks -X/-X and damage
+      wipes (Gyre's `gyre_full_x` knob goes away), deathtouch in blocking,
+      and "whenever a creature an opponent controls dies". Homogeneous bodies
+      should reproduce today's numbers, so `check_unchanged_decks` can prove
+      the refactor before anything moves.
+    - **2. Opponent threats as objects that carry the clock.** Each kill
+      route is pre-rolled pieces (type, landing turn) and a route kind
+      (combat, combo, drain); removing a piece pushes `kill_turn` back by a
+      pre-rolled rebuild delay; the route kind decides which answers work
+      (wipes and Propaganda against combat, a counterspell against a combo).
+      About half the blind list. **The rebuild delay is a number nobody has
+      data for**: it ships as a swept knob, said out loud with every result
+      it moves.
+    - **3. Holding mana up through the pod's turn**: a response window in
+      `pod_phase` and an end-step cast for whatever was held. Counterspells
+      (with 2), protection in response (`try_protect` is the seed), flash.
+      It charges a counterspell its real cost: tempo.
+    - **4. A shared "which card do I want next"** for selection and tutors
+      (Sylvan Library, Sensei's Divining Top, Abundance, Enlightened Tutor,
+      Gamble, Sylvan Scrying, Crop Rotation). Your side only.
+
+    Not proposed: opponent hands and graveyards (Rhystic Study is a social
+    knob however it is built). **Changes 1-3 touch `opponents.py`, which is
+    in every fingerprint**: each goes in behind a knob that reproduces the
+    current pod bit-for-bit, and is switched on as a POD_V4
+    (`experiment.py`) with one parallel rebuild of every table.

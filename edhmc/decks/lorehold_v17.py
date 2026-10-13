@@ -183,8 +183,10 @@ SORCERIES = [
     # Discover 10, not a flat 5 Treasures. See lorehold.discover and §0f.
     C("Hit the Mother Lode", "Sorcery", {"gen": 4, "R": 3}, priority=5,
       script="mother_lode"),
-    C("Improvisation Capstone", "Sorcery", {"gen": 5, "R": 2}, priority=5, threat=7.0),
-    C("Restoration Seminar", "Sorcery", {"gen": 5, "W": 2}, priority=5, threat=7.5),
+    C("Improvisation Capstone", "Sorcery", {"gen": 5, "R": 2}, priority=5, threat=7.0,
+      script="capstone"),
+    C("Restoration Seminar", "Sorcery", {"gen": 5, "W": 2}, priority=5, threat=7.5,
+      script="seminar"),
     C("Volcanic Vision", "Sorcery", {"gen": 5, "R": 2}, priority=4, threat=6.5,
       script="volcanic_vision"),
     C("Ondu Inversion", "Sorcery", {"gen": 6, "W": 2}, priority=3, tags=("wipe", "mdfc",),

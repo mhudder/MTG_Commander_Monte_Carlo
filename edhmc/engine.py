@@ -1468,6 +1468,7 @@ class Game(BaseGame):
             "wurmcoil_deaths": 0,
             "lifelinked": 0.0,
             "erebos_draws": 0,        # "another creature you control dies"
+            "reaper_draws": 0, "reaper_life_lost": 0,   # item 24
             "erebos_life_paid": 0,
             "erebos_creature_turns": 0,   # turns Erebos was devotion-live
             # Treasures as mana (§0z64). No card in the committed list makes
@@ -1678,6 +1679,8 @@ class Game(BaseGame):
                 self.draw(1)
                 self.m["erebos_draws"] += 1
                 self.m["erebos_life_paid"] += 2
+
+        midnight_reaper(self, n, perm)       # item 24
 
     # -- P/T resolution ------------------------------------------------------
 
@@ -3634,6 +3637,50 @@ def perpetual_lifelink(g, perm) -> bool:
     object's id -- never written onto the Card itself, because the deck list's
     Card objects are shared by every game a worker plays."""
     return id(perm.card) in g.__dict__.get("perpetual_lifelink", ())
+
+
+def midnight_reaper(g, n, perm) -> None:
+    """MIDNIGHT REAPER, verified against Scryfall 2026-10-13: "Whenever a
+    nontoken creature you control dies, this creature deals 1 damage to you
+    and you draw a card."
+
+    Item 24 found it KNOWN_BLIND in rendmaw while shilgengar modelled it
+    inline; this is rendmaw's, as a function so the next engine reuses it
+    (shilgengar's inline copy is the same rule and is left where it is, so
+    its table does not move). Not "another": LOOK-BACK, so the Reaper sees
+    its own death and the rest of a wipe it dies in (CR 603.10a, §0z76). Not
+    a "may": the draw is taken from a thin library too (§0z42). Tokens are
+    excluded -- in rendmaw most deaths are Birds and Necrons -- and `perm`
+    None (a count of deaths with no object) pays nothing, as shilgengar's."""
+    if perm is None or perm.is_token:
+        return
+    for _ in range(int(n) * OPP.watching(g, "Midnight Reaper", perm)):
+        g.your_life -= 1
+        g.m["reaper_life_lost"] += 1
+        g.draw(1)
+        g.m["reaper_draws"] += 1
+
+
+def sun_titan_pick(graveyard, exclude=()) -> Optional[Card]:
+    """SUN TITAN, verified against Scryfall 2026-10-13: "Whenever this creature
+    enters or attacks, you may return target permanent card with mana value 3
+    or less from your graveyard to the battlefield."
+
+    The pilot's pick, as a FUNCTION so a third engine does not write a third
+    rule (item 24 found the card blind in karlov while shilgengar and trostani
+    each had their own). trostani's order: a nonland first, then the deck's
+    own `priority`, then mana value. Mana value is `free_mv`: X is 0 in the
+    graveyard. `exclude` holds ids a deck's rules forbid (shilgengar's
+    finality-countered cards). None when nothing qualifies.
+
+    shilgengar's `_sun_titan_reanimate` predates this and still ranks by mana
+    value alone and reads `mv` rather than `free_mv` -- §0u's shape, left in
+    place because changing it moves shilgengar's table (item 24)."""
+    pool = [c for c in graveyard if c.is_permanent and c.free_mv <= 3
+            and id(c) not in exclude]
+    if not pool:
+        return None
+    return max(pool, key=lambda c: (not c.is_land, c.priority, c.mv))
 
 
 def pearl_collector_lifelink(g, pay, has_lifelink) -> None:

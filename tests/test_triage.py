@@ -23,7 +23,9 @@ CASES
   B  karlov's Exquisite Blood, which has no script and is dispatched by name
      (§0z25's shape): SEEN, through `named`
   C  tivit's Counterspell: BLIND
-  D  karlov's Sun Titan (implemented in shilgengar, not karlov): BODY
+  D  rendmaw's Pygmy Kavu (its ETB counts the pod's black creatures): BODY.
+     Until 2026-10-13 this was karlov's Sun Titan, which item 24 implemented
+     there (§0z129) -- it is SEEN now, through its name
   E  text "Counter target spell." on an Instant: BLIND, the clause named
   F  the same clause on a CREATURE: REVIEW -- a body is always visible
   G  "Return target creature card from your graveyard to the battlefield."
@@ -79,8 +81,9 @@ def run_cases():
                                             "karlov")), ("SEEN", True))
     check("C tivit's Counterspell: BLIND",
           T.structural_verdict(card("tivit", "Counterspell"), "tivit"), "BLIND")
-    check("D karlov's Sun Titan: BODY",
-          T.structural_verdict(card("karlov", "Sun Titan"), "karlov"), "BODY")
+    check("D rendmaw's Pygmy Kavu: BODY",
+          T.structural_verdict(card("rendmaw", "Pygmy Kavu"), "rendmaw"),
+          "BODY")
     e = T.text_screen("Counter target spell.", "Instant")
     check("E 'Counter target spell.' on an Instant: BLIND, clause named",
           (e["verdict"], e["blind_clauses"]),

@@ -181,6 +181,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z126](#0z126) | REBUILT | **Four SUSPECT tables rebuilt at 1dcdd28.** Lorehold for its staged swaps; rendmaw, shilgengar, azusa because staging Immolating Gyre moved the removal census -- which the 400-seed clearing check calls BIT-IDENTICAL |
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
 | [0z128](#0z128) | REBUILT | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 at T20, STAGED; table rebuilt |
+| [0z129](#0z129) | IMPLEMENTED | **Item 24, change 0**: nine KNOWN_BLIND cards that needed code, not a model (Sun Titan, Soulmender, Reclamation, Jitte, Midnight Reaper, Bloodghast, two Lessons, Quirion Ranger) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11551,6 +11552,75 @@ Starscape Cleric −0.0029, Enduring Tenacity −0.0025, Sanguine Bond −0.0017
 Blight-Priest −0.0014 -- and the two cards the loop needs matter a little
 more: Exquisite Blood +0.0028, Bloodthirsty Conqueror +0.0018. Swiftfoot
 Boots reads −0.0061 ±0.0022, still the one significantly negative row.
+
+<a id="0z129"></a>
+
+## 0z129. IMPLEMENTED — item 24's change 0: nine blind cards that needed code, not a model
+
+**2026-10-13.** Queue item 24 sorted the 75 `KNOWN_BLIND` cards by what
+each is missing, and a quarter of them needed nothing from the pod model:
+own-side text that had never been written. This is the first pass. Every
+oracle text was fetched from Scryfall on the day.
+
+| card | deck | where | what is modelled | policy said out loud |
+|---|---|---|---|---|
+| Sun Titan | karlov | `karlov.sun_titan`, `enter_permanent`; the pick is `engine.sun_titan_pick` | ETB and attack: a permanent card of mana value 3 or less (`free_mv`) returns, a nonland first, then `priority` | "you may" always taken |
+| Soulmender | karlov | `karlov.soulmender_step`, `may_attack` | `{T}`: one lifegain EVENT a turn, at your end step | stays home (`soulmender_tap`; False is the naive pilot who attacks with it) |
+| Phyrexian Reclamation | karlov | `karlov.reclamation_step` | `{1}{B}`, 2 life: a creature card to hand | before the second main only if the mana also recasts it; at the end step on spare mana; never below `reclamation_life_floor` (10) |
+| Umezawa's Jitte | karlov | `karlov.jitte_equip`, `jitte_combat` | equip {2}; two counters whenever the holder attacks (it deals combat damage to a player or to the chump blocker) | every counter spent at once on "gain 2 life", one event each -- PARTLY: the +2/+2 is not taken, the -1/-1 aims at the pod's count (§4) |
+| Midnight Reaper | rendmaw | `engine.midnight_reaper` | 1 damage and a draw per nontoken death, look-back (§0z76), mandatory (§0z42) | -- |
+| Bloodghast | shilgengar | `bloodghast_landfall`, `bloodghast_hasty`, `bloodghast_fodder` | landfall return from the graveyard (not a finality card, §0z75); haste while an opponent is at 10 or less | aristocrats fodder when a land in hand will bring it back (`bloodghast_fodder`) |
+| Restoration Seminar | lorehold | `restoration_seminar`, `paradigm_step` | return a NONLAND permanent card; paradigm | the copy is not cast without a target |
+| Improvisation Capstone | lorehold | `improvisation_capstone`, `paradigm_step` | exile to mana value 4, cast every spell the pilot may (`pilot_may_cast`); paradigm | the copy is declined at `capstone_min_library` (15) cards or fewer: it exiles, which the decking check does not see |
+| Quirion Ranger | azusa | `AzusaGame.quirion_ranger_bounce` | the COST is the card: a Forest back to hand is replayed with a spare land drop, a tapped one first (one more {G}) | only when nothing else is playable; never a token or a creature-land (`quirion_bounce`) |
+
+**THE SAME CARD, TWO RULES (§0u).** Sun Titan was modelled in shilgengar
+and trostani and blind in karlov; the two copies disagree (shilgengar ranks
+by `mv` and ignores lands, trostani reads `free_mv` and prefers a nonland).
+karlov uses trostani's rule through a new shared function; shilgengar's is
+LEFT, because changing it moves shilgengar's table. Midnight Reaper is the
+same shape: shilgengar's inline copy and `engine.midnight_reaper` are one
+rule written twice, with no difference found.
+
+**NOT DONE, and why.** Storm Cauldron (a global replacement on the shared
+mana model -- the old reason stands). Hall of Gemstone (looked at again: on
+your side a mono-green deck chooses green, so what is missing is the pod's
+half -- blind is the right label). Angel of Suffering waits for item 24's
+change 2: whether a pod clock is DAMAGE is exactly what route kinds decide.
+The selection cards (Sylvan Library, Top, Abundance, the tutors) are change
+4.
+
+### Gates
+
+Five tests, every mutation set written before its run:
+`test_karlov_change0` (15 cases, 11 mutations), `test_rendmaw_reaper` (5, 3),
+`test_shilgengar_bloodghast` (8, 6), `test_lorehold_paradigm` (6, 6),
+`test_azusa_quirion` (7, 5). **Two mutants were wrong on the first run, not
+the engine**: shilgengar's finality mutant omitted the return counter, and
+azusa's preference mutant flipped the Forests' tapped state (the input)
+rather than the key. Each mutant was fixed and the expectation left as
+written; both are recorded in their test's docstring.
+
+### Smoke: each card in its own slot against a blank, N=1000
+
+`tools.triage --smoke` puts a card in a VICTIM slot -- for a card already in
+the list that is a second copy against the first, which is not this
+question. Each card here was played against ablation's blank in its own
+slot instead (seeds 5000..5999, T20):
+
+| card | its counter | per game |
+|---|---|---|
+| Sun Titan | `sun_titan_returns` | 0.087 |
+| Umezawa's Jitte | `jitte_life_events` | 0.62 |
+| Phyrexian Reclamation | `reclamation_returns` | 0.137 |
+| Midnight Reaper | `reaper_draws` | 0.385 |
+| Bloodghast | `bloodghast_returns` | 0.128 |
+| Restoration Seminar | `seminar_returns` | 0.57 (and `won` +0.038, z +6.0) |
+| Improvisation Capstone | `capstone_casts` | 0.88 |
+| Quirion Ranger | `quirion_bounces` | 0.53 (0.36 of them tapped) |
+
+The two Lessons are the large ones: each was a seven-mana blank and is now a
+free spell every turn after it resolves.
 
 ## How to read an ablation table
 

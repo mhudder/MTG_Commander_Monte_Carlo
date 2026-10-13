@@ -44,7 +44,8 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           crn_shuffle, make_rng, seal_rng,
                           pearl_collector_trigger, pearl_collector_lifelink,
                           perpetual_lifelink, enter_land, after_land_enters,
-                          vault_of_the_archangel, vault_active)
+                          vault_of_the_archangel, vault_active,
+                          sun_titan_pick)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -125,6 +126,8 @@ class KarlovGame(BaseGame):
         # does not double those either.
         self.in_draw_step = False  # Exemplar of Light, once a turn
         self.wind_crystal_used = False       # The Wind Crystal taps to activate
+        self.jitte_on = None                 # Umezawa's Jitte's holder (item 24)
+        self.jitte_counters = 0
 
         cfg.setdefault("shroud_sources",
                        ("Lightning Greaves", "Swiftfoot Boots",
@@ -174,6 +177,10 @@ class KarlovGame(BaseGame):
             "epicure_drains": 0, "bonds_triggers": 0,
             "orchard_spirits": 0, "orchard_idle_taps": 0,
             "specialist_tokens": 0,
+            # Item 24, change 0: blind cards made live.
+            "sun_titan_returns": 0, "soulmender_taps": 0,
+            "reclamation_returns": 0, "reclamation_life_paid": 0,
+            "jitte_equips": 0, "jitte_counters": 0, "jitte_life_events": 0,
         })
         self.damage_by_turn = []
 
@@ -1403,16 +1410,7 @@ def resolve(g, card):
         g.draw(2)
 
     if card.is_permanent:
-        perm = Permanent(card=card, sick=not card.haste)
-        g.board.append(perm)
-        if is_creature_now(g, card):
-            creature_entered(g, mine=True, entering=perm)
-        if card.script == "ginger":
-            ginger_etb(g)
-        if card.script == "ranger_of_eos":
-            ranger_of_eos_etb(g)
-        if card.script == "slaughter_specialist":
-            slaughter_specialist_etb(g)
+        enter_permanent(g, card)
         # Offspring {2}{B}: an additional cost paid as you cast, which creates a
         # 1/1 token copy on ETB. The copy has the same lifegain trigger, so it
         # carries the same name here and gain_life() counts both.
@@ -1434,15 +1432,61 @@ def resolve(g, card):
         g.graveyard.append(card)
 
 
+def enter_permanent(g, card):
+    """A nonland permanent card enters under your control: resolving (from
+    `resolve`) or put there by an effect (Sun Titan). Its own enter
+    triggers fire either way; offspring is a CAST cost and stays in
+    `resolve`. Extracted from `resolve` for Sun Titan (item 24) -- the cast
+    path runs exactly the calls it ran before."""
+    perm = Permanent(card=card, sick=not card.haste)
+    g.board.append(perm)
+    if is_creature_now(g, card):
+        creature_entered(g, mine=True, entering=perm)
+    if card.script == "ginger":
+        ginger_etb(g)
+    if card.script == "ranger_of_eos":
+        ranger_of_eos_etb(g)
+    if card.script == "slaughter_specialist":
+        slaughter_specialist_etb(g)
+    if card.name == "Sun Titan":
+        sun_titan(g)          # "whenever this creature ENTERS or attacks"
+    return perm
+
+
+def sun_titan(g):
+    """SUN TITAN (item 24; was KNOWN_BLIND here while shilgengar and trostani
+    modelled it): "Whenever this creature enters or attacks, you may return
+    target permanent card with mana value 3 or less from your graveyard to
+    the battlefield." The pick is `engine.sun_titan_pick`, shared. "You may"
+    is always taken: nothing this deck returns is a drawback. A land comes
+    back by its own entry rule (a fetchland is cracked again)."""
+    card = sun_titan_pick(g.graveyard)
+    if card is None:
+        return
+    at = next(i for i, c in enumerate(g.graveyard) if c is card)
+    g.graveyard.pop(at)
+    g.m["sun_titan_returns"] += 1
+    if card.is_land:
+        perm = enter_land(g, card)
+        g.play_card_trigger(card)          # Radiant Fountain, as play_land
+        after_land_enters(g, perm)
+    else:
+        enter_permanent(g, card)
+        check_combo(g)
+
+
 def combat(g):
     if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
         g.m["heliod_animated"] += 1
-    attackers = [p for p in g.board
-                 if is_creature_now(g, p.card) and not p.tapped and not p.sick
-                 and not OPP.holds_back(g, p)]
+    attackers = [p for p in g.board if may_attack(g, p)]
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
+    # SUN TITAN: "whenever this creature enters OR ATTACKS" -- the attack
+    # half, resolved before damage; what it returns is not attacking.
+    for p in attackers:
+        if p.card.name == "Sun Titan":
+            sun_titan(g)
 
     # Guide of Souls: "Whenever you attack, you may pay {E}{E}{E}. When you do,
     # put two +1/+1 counters and a flying counter on target attacking creature."
@@ -1495,6 +1539,7 @@ def combat(g):
     g.m["damage"] += dmg
     g.m["combat_damage"] += dmg
     g.damage_by_turn.append(dmg)
+    jitte_combat(g, attackers)
     # Lifelink: Karlov triggers scale with the number of lifelinking bodies
     team_lifelink = (g.has("Sorin, Vengeful Bloodlord")
                      or vault_active(g)
@@ -1505,6 +1550,137 @@ def combat(g):
             gain_life(g, g.power_of(p))
     if g.result is None and g.m["turn_lethal"] == 99 and not OPP.living(g):
         g.m["turn_lethal"] = g.turn
+
+
+def may_attack(g, p) -> bool:
+    """Does the pilot attack with this permanent? Untapped, unsick, a
+    creature now, and not one whose {T} ability is the card: Mother of Runes
+    (`OPP.holds_back`) and, since item 24, Soulmender (`soulmender_tap`)."""
+    return (is_creature_now(g, p.card) and not p.tapped and not p.sick
+            and not OPP.holds_back(g, p)
+            and not (p.card.name == "Soulmender"
+                     and g.cfg.get("soulmender_tap", True)))
+
+
+def soulmender_step(g):
+    """SOULMENDER (item 24; was KNOWN_BLIND): "{T}: You gain 1 life." Each
+    activation is a lifegain EVENT, which is the whole of this deck (Karlov's
+    counters, the soul sisters' payoffs, Exquisite Blood's partners).
+
+    THE POLICY, said out loud: Soulmender never attacks (`may_attack`) and is
+    tapped at your end step, once per untap, when it is not summoning sick
+    (CR 302.6: a {T} ability needs it). A 1/1 attacker is chump-blocked or
+    deals 1; the tap is a trigger. `soulmender_tap=False` is the naive pilot,
+    who attacks with it and never taps it -- the old blank."""
+    if not g.cfg.get("soulmender_tap", True):
+        return
+    for p in list(g.board):
+        if (p.card.name == "Soulmender" and not p.tapped and not p.sick
+                and g.result is None):
+            p.tapped = True
+            g.m["soulmender_taps"] += 1
+            gain_life(g, 1)
+
+
+def reclamation_step(g, recast: bool):
+    """PHYREXIAN RECLAMATION (item 24; was KNOWN_BLIND): "{1}{B}, Pay 2 life:
+    Return target creature card from your graveyard to your hand."
+
+    THE POLICY, said out loud. Two windows:
+      recast=True   before the postcombat main phase, only when the mana
+                    left also pays the card's own cost, so it is cast THIS
+                    turn by `main_phase` (which may still prefer something
+                    else in hand -- the return is not wasted, only slower).
+      recast=False  at the end step, on mana nothing else wanted, as many
+                    times as it pays: the card waits in hand for next turn.
+    The pick is the highest-`priority` creature card, then the larger. Life
+    is paid only while it leaves you above `reclamation_life_floor` (10):
+    life decides games since pod v3 (CLAUDE.md), and this deck's life is a
+    resource it gains in ones."""
+    if not g.has("Phyrexian Reclamation"):
+        return
+    floor = g.cfg.get("reclamation_life_floor", 10)
+    while g.result is None and g.your_life - 2 > floor:
+        pool = [c for c in g.graveyard if c.is_creature]
+        if not pool:
+            return
+        card = max(pool, key=lambda c: (c.priority, c.mv))
+        need = {"gen": 1, "B": 1}
+        if recast:
+            need = dict(reduce_cost(g, card))
+            need["gen"] = need.get("gen", 0) + 1
+            need["B"] = need.get("B", 0) + 1
+        if can_pay(need, available_mana(g)) is None:
+            return
+        if not pay_cost(g, {"gen": 1, "B": 1}):
+            return
+        g.your_life -= 2
+        g.m["reclamation_life_paid"] += 2
+        at = next(i for i, c in enumerate(g.graveyard) if c is card)
+        g.hand.append(g.graveyard.pop(at))
+        g.m["reclamation_returns"] += 1
+        if recast:
+            return                 # one, to be cast now
+
+
+def jitte_perm(g):
+    return next((p for p in g.board if p.card.name == "Umezawa's Jitte"),
+                None)
+
+
+def jitte_equip(g):
+    """UMEZAWA'S JITTE (item 24; was KNOWN_BLIND), verified 2026-10-13:
+    "Whenever equipped creature deals combat damage, put two charge counters
+    on Umezawa's Jitte. Remove a charge counter: Choose one -- Equipped
+    creature gets +2/+2 until end of turn; Target creature gets -1/-1 until
+    end of turn; You gain 2 life. Equip {2}"
+
+    EQUIP, at the end of the precombat main phase (sorcery speed), on mana
+    the main phase left, when the Jitte is unattached or on a creature that
+    will not attack. The holder is the commander if it attacks, else the
+    attacker with the most power: every attacker deals combat damage here --
+    to a player or to the chump blocker the pod assigns -- so the choice
+    only matters for which body the pod's removal must find."""
+    jp = jitte_perm(g)
+    if jp is None:
+        g.jitte_on = None
+        g.jitte_counters = 0
+        return
+    holder = g.jitte_on
+    if holder is not None and any(p is holder for p in g.board) \
+            and may_attack(g, holder):
+        return
+    cands = [p for p in g.board if may_attack(g, p)]
+    if not cands:
+        return
+    cmd = next((p for p in cands if p.card is g.commander), None)
+    target = cmd or max(cands, key=g.power_of)
+    if target is holder:
+        return
+    if not pay_cost(g, {"gen": 2}):
+        return
+    g.jitte_on = target
+    g.m["jitte_equips"] += 1
+
+
+def jitte_combat(g, attackers):
+    """The trigger and the counters. Equipped creature attacked with power
+    above 0 and the pod is still in the game: it dealt combat damage, two
+    counters. THE POLICY: every counter is removed at once for "you gain 2
+    life", one lifegain EVENT each -- in this deck an event is worth more
+    than +2/+2 on one attacker. The pump and the -1/-1 are not taken; the
+    -1/-1 aims at the pod's creatures, a count (§4). PARTLY MODELLED."""
+    holder = getattr(g, "jitte_on", None)
+    if holder is None or jitte_perm(g) is None:
+        return
+    if (any(p is holder for p in attackers) and g.power_of(holder) > 0
+            and OPP.living(g)):
+        g.jitte_counters += 2
+        g.m["jitte_counters"] += 2
+    while g.jitte_counters > 0 and g.result is None:
+        g.jitte_counters -= 1
+        g.m["jitte_life_events"] += 1
+        gain_life(g, 2)
 
 
 def pay_cost(g, cost) -> bool:
@@ -1569,9 +1745,11 @@ def take_turn(g):
         main_phase(g)
     if g.result is not None:
         return
+    jitte_equip(g)                 # sorcery speed: the end of main phase 1
     combat(g)
     # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
     pearl_collector_trigger(g, g.life_gained_this_turn)
+    reclamation_step(g, recast=True)
     main_phase(g)
     if g.result is not None:
         return
@@ -1583,6 +1761,11 @@ def take_turn(g):
     end_step(g)
     if g.result is not None:
         return
+    soulmender_step(g)
+    if g.result is not None:
+        return
+    # Spare mana: a card back (Reclamation) before 3 life (Gingerbrute).
+    reclamation_step(g, recast=False)
 
     # GINGER: spare Gingerbrutes become life with mana nothing else wanted.
     # Before the floated-mana metric, because that metric measures what was
