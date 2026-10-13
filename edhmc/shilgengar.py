@@ -447,6 +447,31 @@ class ShilgengarGame(BaseGame):
                 self.blood += 1
                 self.m["blood_made"] += 1
 
+    def on_pod_creature_deaths(self, o, n):
+        """`n` of opponent `o`'s creatures died -- an event only under
+        `pod_bodies` (item 24, change 1). Blood Artist ("this creature or
+        ANOTHER creature dies": any player's), Massacre Wurm ("THAT player
+        loses 2 life") and Revel in Riches ("create a Treasure token") --
+        texts verified 2026-10-13. Massacre Wurm's own -2/-2 reaches here
+        too, so its ETB pays no drain of its own under the knob."""
+        for _ in range(int(n) * self.count("Blood Artist")):
+            dealt = OPP.damage_single(self, 1)
+            self.m["damage"] += dealt
+            self.m["drain_damage"] += dealt
+            self.trigger_gain(1)
+            self.m["artist_pod_drains"] += 1
+        wurms = self.count("Massacre Wurm")
+        if wurms and o.alive:
+            dealt = OPP.damage_single(self, 2.0 * n * wurms, target=o)
+            self.m["damage"] += dealt
+            self.m["drain_damage"] += dealt
+            self.m["wurm_drains"] += n * wurms
+        revel = int(n) * self.count("Revel in Riches")
+        if revel:
+            self.treasures += revel
+            self.m["treasures_made"] += revel
+            self.m["revel_treasures"] += revel
+
     def trigger_gain(self, amount):
         """Life gained by a trigger or an ability (Blood Artist, Zulaport
         Cutthroat, Vampiric Rites) goes through `gain_life`, so Archangel of
@@ -952,7 +977,13 @@ class ShilgengarGame(BaseGame):
             # precise one. Said out loud rather than guessed silently.
             share = self.cfg.get("wurm_kill_share", 0.35)
             losses = []
-            for o in OPP.living(self):
+            # UNDER `pod_bodies` (item 24, change 1) the -2/-2 kills each
+            # body of toughness 2 or less, and the drain is paid by
+            # `on_pod_creature_deaths` -- the same hook a pod wrath reaches,
+            # which the card's "whenever" also covers. Off, the share above.
+            for o in (OPP.living(self) if OPP.pod_bodies_on(self) else ()):
+                OPP.kill_pod_bodies(self, o, lambda b: b.toughness <= 2)
+            for o in ([] if OPP.pod_bodies_on(self) else OPP.living(self)):
                 killed = min(o.creatures, o.creatures * share + 1)
                 o.creatures = max(0.0, o.creatures - killed)
                 if killed > 0:

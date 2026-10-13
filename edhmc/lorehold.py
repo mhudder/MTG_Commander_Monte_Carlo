@@ -2282,6 +2282,15 @@ def volcanic_vision(g):
         return
     g.m["vision_returns"] += 1
     g.m["vision_mv"] += best.free_mv
+    # THE DAMAGE HALF, UNDER `pod_bodies` ONLY (item 24, change 1): the
+    # bodies carry the toughness the paragraph above found missing -- from
+    # `gyre_full_x`'s spread, the judgement the Gyre already rests on, not a
+    # new number. Off, it stays out, as above.
+    if OPP.pod_bodies_on(g):
+        dmg = best.free_mv
+        for o in OPP.living(g):
+            g.m["vision_pod_killed"] += OPP.kill_pod_bodies(
+                g, o, lambda b: b.toughness <= dmg)
 
 
 def regrow_best_spell(g):

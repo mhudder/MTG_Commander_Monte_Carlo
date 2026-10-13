@@ -1682,6 +1682,37 @@ class Game(BaseGame):
 
         midnight_reaper(self, n, perm)       # item 24
 
+    def on_pod_creature_deaths(self, o, n: int) -> None:
+        """`n` of opponent `o`'s creatures died -- an event only under
+        `pod_bodies` (item 24, change 1; `opponents.kill_pod_bodies`). Three
+        cards in this list read it, every text verified 2026-10-13:
+
+          Blood Artist          "Whenever this creature or ANOTHER creature
+                                dies, target player loses 1 life and you
+                                gain 1 life" -- any player's creature.
+          Massacre Wurm         "Whenever a creature an opponent controls
+                                dies, THAT player loses 2 life."
+          The Meathook Massacre "Whenever a creature an opponent controls
+                                dies, you gain 1 life."
+        """
+        artists = self.count("Blood Artist")
+        if artists:
+            self.deal_pod_damage(1.0 * n * artists, each=False)
+            self.your_life += 1.0 * n * artists
+            self.m["artist_pod_drains"] += n * artists
+        src = getattr(self, "etb_source", None)
+        wurms = self.count("Massacre Wurm") + (
+            src is not None and src.name == "Massacre Wurm")
+        if wurms and o.alive:
+            dealt = OPP.damage_single(self, 2.0 * n * wurms, target=o)
+            self.m["damage"] += dealt
+            self.m["drain_damage"] += dealt
+            self.m["wurm_drains"] += n * wurms
+        meathook = self.count("The Meathook Massacre")
+        if meathook:
+            self.your_life += 1.0 * n * meathook
+            self.m["meathook_pod_gains"] += n * meathook
+
     # -- P/T resolution ------------------------------------------------------
 
     def artifact_died(self, dead: Card):
@@ -2928,7 +2959,7 @@ def main_phase(g: Game, precombat: bool = False):
         g.play_card_trigger(card)
 
         if "wipe" in card.tags:
-            OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
+            resolve_wipe_spell(g, card)
         if alt_tag == "impending":
             # enters as a noncreature enchantment; the body arrives later
             g.m["impending_casts"] += 1
@@ -3187,7 +3218,10 @@ def run_etb(g: Game, perm: Permanent):
         n = int(max(1, min(o.creatures for o in g.opponents)))
         g.make_tokens(n, 4, 4, "Horror")
         for o in g.opponents[:1]:
-            o.creatures = max(0.0, o.creatures - n)
+            if OPP.pod_bodies_on(g):             # item 24: fights are deaths
+                OPP.kill_pod_count(g, o, n)
+            else:
+                o.creatures = max(0.0, o.creatures - n)
     elif s == "mycoloth":
         # DEVOUR 2: "As this creature enters, you MAY sacrifice any number of
         # creatures. It enters with twice that many +1/+1 counters on it."
@@ -3637,6 +3671,22 @@ def perpetual_lifelink(g, perm) -> bool:
     object's id -- never written onto the Card itself, because the deck list's
     Card objects are shared by every game a worker plays."""
     return id(perm.card) in g.__dict__.get("perpetual_lifelink", ())
+
+
+def resolve_wipe_spell(g, card) -> None:
+    """A `wipe`-tagged spell resolves in rendmaw's main phase. A PERMANENT
+    one is an enters trigger (Massacre Wurm's -2/-2), and its source is on
+    the battlefield when the trigger resolves -- so its own "whenever a
+    creature an opponent controls dies" sees the deaths it causes. This
+    engine resolves the sweep before the permanent joins `g.board`, so the
+    source is named in `g.etb_source` for the length of the sweep, and
+    `on_pod_creature_deaths` counts it (item 24, change 1; the deaths are
+    events only under `pod_bodies`)."""
+    g.etb_source = card if card.is_permanent else None
+    try:
+        OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
+    finally:
+        g.etb_source = None
 
 
 def midnight_reaper(g, n, perm) -> None:

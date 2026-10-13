@@ -406,7 +406,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "d85403c571c18ddc",
+        "utc": "2026-10-13T03:02:38Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "7a2014f1588a73dd",
@@ -750,7 +757,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "4f5f18e7eec136e3",
+        "utc": "2026-10-13T03:02:37Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "ddcc6bcf792edf00",
@@ -1101,7 +1115,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "9d5e13e7059c2b72",
+        "utc": "2026-10-13T03:02:37Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "fb14e65e25ba028a",
@@ -1430,7 +1451,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "e0849127c3383fda",
+        "utc": "2026-10-13T03:02:37Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "b06ed6f0ee829ce3",
@@ -1801,7 +1829,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "8c9131fd1c9928a5",
+        "utc": "2026-10-13T03:02:38Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "d30fa7936e87ad23",
@@ -2117,6 +2152,12 @@
         "evidence": "item 24 change 0 (engine.py, karlov, lorehold, shilgengar, azusa): tools.check_unchanged_decks --n=2000 --include-suspended against a worktree at feab46d: tivit BIT-IDENTICAL on all 8 metrics; tivit's STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric (65 keys): byte-identical JSON. HEAD's cache was already VERIFIED.",
         "fingerprint": "93441c56e88a8180",
         "utc": "2026-10-13T01:28:09Z"
+      },
+      {
+        "commit": "d22a232",
+        "evidence": "item 24 change 1 (\u00a70z130: pod_bodies, OFF by default) on top of 11c802d: check_unchanged_decks --n=2000 against a worktree at 11c802d, BIT-IDENTICAL on all 8 metrics; and the STAGED list (build_pending) played on both trees, seeds 5000..6999, every numeric metric, byte-identical JSON (the same engine code against 9fb3a42).",
+        "fingerprint": "12b55e2ef17b2a7a",
+        "utc": "2026-10-13T03:02:37Z"
       }
     ]
   },

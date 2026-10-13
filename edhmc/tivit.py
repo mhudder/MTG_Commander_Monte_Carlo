@@ -167,6 +167,10 @@ class TivitGame(BaseGame):
                 n += 1
         return n
 
+    def on_pod_creature_deaths(self, o, n):
+        """The `opponents.kill_pod_bodies` hook (item 24, change 1)."""
+        on_pod_creature_deaths(self, o, n)
+
     def make_tokens(self, n, p, t, subtype="", tapped=False, artifact=False):
         """Real creature tokens (Soldiers, Rabbits). NOT the artifact piles.
 
@@ -245,6 +249,16 @@ def make_token(g, kind, n=1):
     g.m["artifacts_made"] += made
     on_tokens_created(g, made)
     return made
+
+
+def on_pod_creature_deaths(g, o, n):
+    """REVEL IN RICHES (verified 2026-10-13): "Whenever a creature an
+    opponent controls dies, create a Treasure token." An event only under
+    `pod_bodies` (item 24, change 1); through `make_token`, so Anointed
+    Procession doubles it and Academy Manufactor sees it."""
+    k = int(n) * g.count("Revel in Riches")
+    if k:
+        g.m["revel_treasures"] += make_token(g, "Treasure", k)
 
 
 def on_tokens_created(g, n):
@@ -844,7 +858,10 @@ def resolve(g, card):
             if not fed:
                 break
             victim = max(fed, key=lambda o: o.creatures)
-            victim.creatures -= 1.0
+            if OPP.pod_bodies_on(g):             # item 24: DESTROY, a death
+                OPP.kill_pod_count(g, victim, 1)
+            else:
+                victim.creatures -= 1.0
             g.m["shell_game_kills"] += 1
     elif s == "tempt_bunnies":
         n = V.tempting_offer(g)

@@ -111,7 +111,9 @@ What is closed and where it went:
       Gemstone stay blind (reasons in `tools/ablation.py`); Angel of
       Suffering waits for change 2 (is a clock damage?); the selection
       cards are change 4.
-    - **1. The pod's creatures as bodies**: a pre-rolled power/toughness list
+    - **1. The pod's creatures as bodies** -- **BUILT, OFF (§0z130)**:
+      `pod_bodies`, bit-identical off; switching it on is a POD_V4 call for
+      the owner, with every table rebuilt. Originally: a pre-rolled power/toughness list
       per opponent instead of `Opponent.creatures`. Unlocks -X/-X and damage
       wipes (Gyre's `gyre_full_x` knob goes away), deathtouch in blocking,
       and "whenever a creature an opponent controls dies". Homogeneous bodies

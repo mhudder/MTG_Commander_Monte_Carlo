@@ -275,6 +275,29 @@ class KarlovGame(BaseGame):
                 self.m["exquisite_gains"] += 1
                 gain_life(self, loss)
 
+    def on_pod_creature_deaths(self, o, n):
+        """`n` of opponent `o`'s creatures died -- an event only under
+        `pod_bodies` (item 24, change 1). Texts verified 2026-10-13:
+
+          Blood Artist          "this creature or ANOTHER creature dies":
+                                any player's -- a drain, two events.
+          Syr Konrad, the Grim  "Whenever ANOTHER creature dies ... deals 1
+                                damage to each opponent" -- any player's.
+          Slaughter Specialist  "Whenever a creature an opponent controls
+                                dies, put a +1/+1 counter on this creature"
+                                (catalog; the clause its PARTLY note names)."""
+        for _ in range(int(n)):
+            for _ in range(self.count("Blood Artist")):
+                drain(self, 1)
+                self.m["artist_pod_drains"] += 1
+            for _ in range(self.count("Syr Konrad, the Grim")):
+                self.m["damage"] += OPP.damage_each(self, 1)
+                self.m["konrad_pod_triggers"] += 1
+        for p in self.board:
+            if p.card.name == "Slaughter Specialist":
+                p.counters += int(n)
+                self.m["specialist_counters"] += int(n)
+
     def on_creature_death(self, n=1, perm=None):
         self.creature_died_this_turn = True
         # SELENIA, THE CURSED HEART (§0z74): "When Selenia dies, create ...

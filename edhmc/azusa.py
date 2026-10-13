@@ -3642,7 +3642,12 @@ class AzusaGame(BaseGame):
                 living = OPP.living(self)
                 if living:
                     victim = min(living, key=lambda o: o.life)
-                    victim.creatures = max(0.0, victim.creatures - 4)
+                    if OPP.pod_bodies_on(self):
+                        # "sacrifices": the defender gives up its smallest,
+                        # and each is a death (item 24, change 1)
+                        OPP.kill_pod_count(self, victim, 4, biggest=False)
+                    else:
+                        victim.creatures = max(0.0, victim.creatures - 4)
         # MOLE MAN'S MOLOIDS: "Whenever this token attacks, you MAY mill a
         # card." A POLICY (§0z101): mill only while a land in the graveyard is
         # playable AND a land drop is still unused this turn, so a land milled

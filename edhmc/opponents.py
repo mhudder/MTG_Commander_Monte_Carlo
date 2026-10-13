@@ -24,7 +24,8 @@ from __future__ import annotations
 import bisect
 import random
 from contextlib import contextmanager
-from dataclasses import dataclass
+from collections import namedtuple
+from dataclasses import dataclass, field
 
 # GENERATED from Scryfall by tools.removal_census: the destroy share per
 # kind of pod answer (§0z87). In every cache fingerprint.
@@ -142,6 +143,13 @@ class Opponent:
     # nothing else. The token is LEGENDARY and you only ever control one, so
     # this is a flag and not a count.
     cursed: bool = False
+    # THE POD'S CREATURES AS BODIES (item 24, change 1; `pod_bodies`, OFF).
+    # `creatures` stays the one COUNT every existing reader uses; `bodies`
+    # is the floor of it as objects, reconciled on read (`pod_bodies`), and
+    # `body_pool` the pre-rolled sequence they are drawn from in order.
+    bodies: list = field(default_factory=list)
+    body_pool: tuple = ()
+    next_body: int = 0
 
     _pcache: object = None
 
@@ -204,7 +212,88 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
              for _ in range(turns)]
     counter_rolls = [[[r.random() for _ in opps] for _ in range(N_COUNTER_SLOTS)]
                      for _ in range(turns)]
+    if cfg.get("pod_bodies", False):
+        roll_body_pools(cfg, seed, opps)
     return opps, rolls, counter_rolls
+
+
+# ---------------------------------------------------------------------------
+# The pod's creatures as bodies (item 24, change 1)
+# ---------------------------------------------------------------------------
+# §4: "opponents' boards are a blocker count". The count stays -- chip
+# damage, blocking and the threat model all read it, and none of them is
+# touched here -- and under `pod_bodies` each opponent's creatures are ALSO
+# bodies with a toughness and a mana value, for the effects that ask about
+# one: a sweeper of X damage or -X/-X, "mana value 2 or less", and every
+# "whenever a creature an opponent controls dies".
+#
+# THE DISTRIBUTION IS THE OLD JUDGEMENTS, NOT A NEW ONE. Toughness is uniform
+# on 1..`gyre_full_x` (6): exactly the spread `gyre_share` already assumed,
+# so the expected kill of an X-damage sweeper is unchanged. Mana value is
+# uniform on 1..round(2 / `culling_pod_share`) (4 at the default 0.5): so
+# P(mana value <= 2) is exactly `culling_pod_share`. What bodies add is that
+# the SAME creature answers every question -- a Massacre Wurm and a Gyre see
+# one board -- and that each death is an event.
+#
+# CRN. Each opponent's pool is pre-rolled from its own stream, and the k-th
+# body that opponent ever fields is the same body on both branches. Nothing
+# here touches `make_pod`'s stream, so `pod_bodies=False` plays every game
+# bit-for-bit as before.
+PodBody = namedtuple("PodBody", "toughness mv")
+POD_BODY_POOL = 96       # bodies per opponent per game; drawn cyclically past it
+
+
+def roll_body_pools(cfg, seed, opps) -> None:
+    tmax = max(1, int(cfg.get("gyre_full_x", 6)))
+    share = cfg.get("culling_pod_share", 0.5)
+    mvmax = max(1, int(round(2 / share))) if share > 0 else 1
+    for i, o in enumerate(opps):
+        r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
+        o.body_pool = tuple(PodBody(r.randint(1, tmax), r.randint(1, mvmax))
+                            for _ in range(POD_BODY_POOL))
+
+
+def pod_bodies_on(g) -> bool:
+    return bool(g.cfg.get("pod_bodies", False))
+
+
+def pod_bodies(g, o) -> list:
+    """This opponent's creatures as bodies, reconciled to the COUNT: a body
+    per whole creature. New creatures take the next bodies of the pool; when
+    the count falls by a path that names no body (an elimination, a legacy
+    write), the newest leave first. Callers read; they kill through
+    `kill_pod_bodies`."""
+    n = int(o.creatures + 1e-9)
+    pool = o.body_pool
+    while len(o.bodies) < n and pool:
+        o.bodies.append(pool[o.next_body % len(pool)])
+        o.next_body += 1
+    del o.bodies[n:]
+    return o.bodies
+
+
+def kill_pod_bodies(g, o, dies=None) -> int:
+    """Kill this opponent's bodies that `dies(body)` names -- every one when
+    `dies` is None, and then the count goes to 0 exactly, as every sweeper
+    always set it. Each death is an event: the engine's optional
+    `on_pod_creature_deaths(o, n)` hook is told (Massacre Wurm, Blood Artist,
+    Revel in Riches...). Returns how many died."""
+    bodies = pod_bodies(g, o)
+    if dies is None:
+        n = len(bodies)
+        o.bodies = []
+        o.creatures = 0.0
+    else:
+        keep = [b for b in bodies if not dies(b)]
+        n = len(bodies) - len(keep)
+        o.bodies = keep
+        o.creatures = max(0.0, o.creatures - n)
+    if n:
+        g.m["pod_bodies_killed"] += n
+        hook = getattr(g, "on_pod_creature_deaths", None)
+        if hook is not None:
+            hook(o, n)
+    return n
 
 
 # ---------------------------------------------------------------------------
@@ -621,7 +710,7 @@ def board_wipe(g, opp, rolls):
             # permanents; the wrath still resolves for everyone else (§0z118).
             # The old early return spared the pod's creatures too.
             for o in g.opponents:
-                o.creatures = 0.0
+                pod_wipe_board(g, o)
                 o.goaded_birds = 0.0
             g.m["wipes_suffered"] += 1
         return
@@ -636,9 +725,19 @@ def board_wipe(g, opp, rolls):
         for p in [p for p in g.board if is_creature_now(g, p)]:
             destroy(g, p, rolls[7], kind="wipe")
     for o in g.opponents:
-        o.creatures = 0.0
+        pod_wipe_board(g, o)
         o.goaded_birds = 0.0          # a wrath kills the Birds too
     g.m["wipes_suffered"] += 1
+
+
+def pod_wipe_board(g, o) -> None:
+    """An opponent's wrath kills every opponent's creatures. On the count
+    that is a 0; under `pod_bodies` each is a death a "whenever a creature
+    an opponent controls dies" card sees (item 24, change 1). Only a LIVING
+    opponent's creatures die: a dead player's board is already gone."""
+    if pod_bodies_on(g) and o.alive:
+        kill_pod_bodies(g, o)
+    o.creatures = 0.0
 
 
 # Cards that grant indestructible to OTHER permanents you control, for as
@@ -804,6 +903,12 @@ OWN_WIPE_SCOPE = {
     "Promise of Loyalty": "keep_one",
     # X damage, X = instants and sorceries in YOUR graveyard (2026-10-09).
     "Immolating Gyre": "damage_x",
+    # "creatures your opponents control get -2/-2 until end of turn." A
+    # one-sided wipe, so the scope only matters to the pod's side: every one
+    # of their creatures dies on the count (the old rule, an overstatement
+    # its BLIND_BUT_LIVE note names), toughness 2 or less under
+    # `pod_bodies` (item 24, change 1).
+    "Massacre Wurm": "minus_2",
 }
 
 
@@ -848,6 +953,73 @@ def own_wipe_pod_left(g, card, creatures: float) -> float:
     return 0.0
 
 
+def kill_pod_count(g, o, n, biggest=True) -> int:
+    """Kill `n` of this opponent's creatures by a path that names how many
+    and not which -- an edict, a fight, annihilator, Sadistic Shell Game --
+    under `pod_bodies`: the toughest first when `biggest` (the pilot's pick,
+    and what an opponent's best blocker is), else the smallest (what an
+    opponent SACRIFICES). Each is a death event. Off, the caller keeps its
+    own arithmetic on the count; this is never called. (Item 24, change 1.)"""
+    bodies = pod_bodies(g, o)
+    k = min(int(n), len(bodies))
+    if k <= 0:
+        if n >= o.creatures:
+            o.creatures = 0.0
+        return 0
+    order = sorted(range(len(bodies)), key=lambda i: bodies[i].toughness,
+                   reverse=biggest)
+    doomed = set(order[:k])
+    flags = iter([i in doomed for i in range(len(bodies))])
+    zero = n >= o.creatures          # the count's own arithmetic hit 0
+    killed = kill_pod_bodies(g, o, lambda b: next(flags))
+    if zero:
+        o.creatures = 0.0            # the fraction goes too, as it did
+    return killed
+
+
+def own_wipe_body_rule(g, card):
+    """Under `pod_bodies`: which of an opponent's bodies your sweeper kills --
+    ONE rule for the wipe gate and the resolution. X damage kills toughness
+    X or less, -2/-2 toughness 2 or less, "mana value 2 or less" its own
+    words; Promise of Loyalty ("keep_one") keeps the toughest; every other
+    sweeper kills them all (None)."""
+    scope = own_wipe_scope(g, card)
+    if scope == "damage_x":
+        x = gyre_x(g)
+        return lambda b: b.toughness <= x
+    if scope == "minus_2":
+        return lambda b: b.toughness <= 2
+    if scope == "mv2":
+        return lambda b: b.mv <= 2
+    if scope == "keep_one":
+        return "keep_one"
+    return None
+
+
+def own_wipe_pod_kill(g, card, o) -> float:
+    """Resolve your sweeper against one opponent under `pod_bodies`. Returns
+    how many of their creatures died."""
+    before = o.creatures
+    rule = own_wipe_body_rule(g, card)
+    if rule == "keep_one":
+        bodies = pod_bodies(g, o)
+        if bodies:
+            best = max(range(len(bodies)), key=lambda i: bodies[i].toughness)
+            flags = iter([i != best for i in range(len(bodies))])
+            kill_pod_bodies(g, o, lambda b: next(flags))
+        o.creatures = min(o.creatures, 1.0)
+    else:
+        kill_pod_bodies(g, o, rule)
+    return before - o.creatures
+
+
+def gyre_x(g) -> int:
+    """IMMOLATING GYRE's X: instants and sorceries in your graveyard, read as
+    it resolves (it is on the stack, not in the yard)."""
+    return sum(1 for c in g.graveyard
+               if "Instant" in c.types or "Sorcery" in c.types)
+
+
 def gyre_share(g) -> float:
     """IMMOLATING GYRE's X, as the share of a pod board it kills.
 
@@ -856,8 +1028,7 @@ def gyre_share(g) -> float:
     so how many X damage kills is `gyre_full_x` (6) -- A JUDGEMENT, NOT A
     CENSUS: the X at which every one of them dies, with toughness spread
     evenly from 1 to it, so the share is X / gyre_full_x, capped at 1."""
-    x = sum(1 for c in g.graveyard
-            if "Instant" in c.types or "Sorcery" in c.types)
+    x = gyre_x(g)
     full = g.cfg.get("gyre_full_x", 6)
     return min(1.0, x / full) if full > 0 else 1.0
 
@@ -2254,6 +2425,20 @@ def resolve_clocks(g):
 
 
 
+def pod_left_for_gate(g, card, o) -> float:
+    """How many of `o`'s creatures the wipe gate expects to survive: the
+    count's share rule, or under `pod_bodies` the bodies themselves -- the
+    same rule `resolve_own_wipe` will apply (item 24, change 1)."""
+    if not pod_bodies_on(g):
+        return own_wipe_pod_left(g, card, o.creatures)
+    rule = own_wipe_body_rule(g, card)
+    if rule is None:
+        return 0.0
+    if rule == "keep_one":
+        return min(o.creatures, 1.0)
+    return o.creatures - sum(1 for b in pod_bodies(g, o) if rule(b))
+
+
 def should_cast_own_wipe(g, card=None) -> bool:
     """Would a real pilot fire their own sweeper right now?
 
@@ -2300,7 +2485,7 @@ def should_cast_own_wipe(g, card=None) -> bool:
                   and g.cfg.get("own_wipe_indestructible", True)):
                 dying = [p for p in dying if not is_hardy(g, p)]
         mine = sum(max(0, g.power_of(p)) for p in dying)
-        theirs = sum((o.creatures - (own_wipe_pod_left(g, card, o.creatures)
+        theirs = sum((o.creatures - (pod_left_for_gate(g, card, o)
                                      if measure == "cost" else 0.0))
                      * o.p.get("power", 1.0) for o in living(g))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
@@ -2345,6 +2530,9 @@ def resolve_own_wipe(g, spare_own=False, card=None):
     """
     pod_killed = 0.0
     for o in living(g):
+        if pod_bodies_on(g):                     # item 24, change 1
+            pod_killed += own_wipe_pod_kill(g, card, o)
+            continue
         left = own_wipe_pod_left(g, card, o.creatures)
         pod_killed += o.creatures - left
         o.creatures = left

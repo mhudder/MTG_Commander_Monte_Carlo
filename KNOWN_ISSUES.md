@@ -182,6 +182,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z127](#0z127) | FIXED | **STATUS.md went stale on the commit that wrote it** (a table's git date was compared), and **§0c was cited for the common-baseline rule, whose evidence is §0e**: 55 citations re-pointed |
 | [0z128](#0z128) | REBUILT | **Five karlov cards from a Scryfall search**: South Wind Avatar +0.0205 and Epicure +0.0147 at T20, Bonds +0.0047; Specialist and Orchard NEGATIVE. −Daxos +Avatar +0.0187 at T20, STAGED; table rebuilt |
 | [0z129](#0z129) | REBUILT | **Item 24, change 0**: nine KNOWN_BLIND cards given code. Five tables rebuilt: Capstone +0.0404 (lorehold's top row), Seminar +0.0333, Quirion +0.0112, Reclamation, Sun Titan, Jitte, Reaper ~+0.005 |
+| [0z130](#0z130) | BUILT | **Item 24, change 1**: the pod's creatures as bodies (toughness, mana value), behind `pod_bodies`, OFF and bit-identical; Massacre Wurm had three rules; ON moves tivit +0.013, lorehold +0.011 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11679,6 +11680,88 @@ Furygale Flocking, +0.0488 ±0.0044 -> +0.0415 ±0.0043. It is PARTLY and
 in the same deck as the two Lessons; a stronger deck makes any one card
 matter less, and that is all this note claims -- it is not traced further.
 No other row in rendmaw, karlov, shilgengar or azusa moved beyond its bar.
+
+<a id="0z130"></a>
+
+## 0z130. BUILT — item 24's change 1: the pod's creatures as bodies, behind `pod_bodies` (OFF)
+
+**2026-10-13.** §4's "opponents' boards are a blocker count" is half of
+what keeps removal-adjacent cards blind. This change keeps the count --
+chip damage, blocking and the threat model still read `Opponent.creatures`
+and nothing of theirs is touched -- and adds, under `pod_bodies`, the same
+creatures as **bodies with a toughness and a mana value**, each death an
+event. It ships OFF: switching it on is a pod-model decision (a POD_V4,
+queue item 24) with a rebuild of every table.
+
+### The model
+
+| what | where | rule |
+|---|---|---|
+| the bodies | `opponents.roll_body_pools`, `pod_bodies` | pre-rolled per opponent from its OWN stream (`make_pod`'s is untouched); the k-th body an opponent ever fields is the same on both branches; the floor of the count, newest leave first |
+| the distribution | `roll_body_pools` | **the old judgements, not a new one**: toughness uniform on 1..`gyre_full_x` (6) -- exactly what `gyre_share` assumed -- and mana value uniform on 1..round(2 / `culling_pod_share`), so P(mana value <= 2) is `culling_pod_share` (0.5) |
+| a death | `kill_pod_bodies` | the engine's optional `on_pod_creature_deaths(o, n)` hook hears it |
+| your sweepers | `own_wipe_body_rule`, `own_wipe_pod_kill`, `pod_left_for_gate` | Gyre kills toughness <= X, Massacre Wurm <= 2 (new scope `minus_2`), Culling Ritual mana value <= 2, Promise of Loyalty keeps the toughest, the rest kill all; the wipe gate reads the same rule |
+| the pod's wrath | `pod_wipe_board` | every body dies, each an event |
+| edicts, fights | `kill_pod_count` | rendmaw's Predation fight, azusa's annihilator (the defender sacrifices its smallest), tivit's Sadistic Shell Game: whole bodies, events; past the board the count goes to 0, as its own arithmetic did |
+
+### What reads a death (every text verified 2026-10-13)
+
+A Scryfall pass over all 589 nonland cards in the seven built lists found
+six with "a creature (an opponent controls) dies" in any player's sense:
+
+| card | decks | under `pod_bodies` |
+|---|---|---|
+| Blood Artist | karlov, rendmaw, shilgengar | a drain per pod death ("this creature or another creature") |
+| Massacre Wurm | rendmaw, shilgengar | "that player loses 2 life" per pod death |
+| The Meathook Massacre | rendmaw | 1 life per pod death |
+| Revel in Riches | shilgengar, tivit | a Treasure per pod death (tivit through `make_token`: doubled) |
+| Syr Konrad, the Grim | karlov | 1 to each opponent per pod death |
+| Mimic Vat | trostani | NOT DONE: imprinting a pod creature needs a card |
+
+Plus Slaughter Specialist's counter (karlov catalog) and **Volcanic Vision's
+damage half** (lorehold), which its own docstring left out for want of a
+toughness: it kills toughness <= the returned card's mana value.
+
+**MASSACRE WURM HAD THREE RULES (§0u).** rendmaw zeroed the pod's board and
+paid no drain at all; shilgengar killed `0.35 x count + 1` (`wurm_kill_share`)
+and drained 2 for each; the text kills toughness 2 or less and drains for
+every opponent's creature that dies, however. Under bodies both engines play
+the text. And rendmaw resolves a sweeping permanent's effect BEFORE the
+permanent joins the battlefield, so the Wurm could not see the deaths its
+own -2/-2 caused; `engine.resolve_wipe_spell` names the entering source for
+the length of the sweep. The first on/off measurement caught it --
+`wurm_drains` read 0 in rendmaw -- and case O pins it.
+
+### Gates
+
+`tests/test_pod_bodies.py`: 16 cases, 8 mutations. The first six mutation
+sets were written before the first run and were exact; O and P were added
+with the Wurm fix, and two of the earlier sets broke O as well -- right, and
+recorded in the docstring as a transcript, not a prediction (§0z14).
+**OFF is bit-identical**: all seven staged lists (`build_pending`), seeds
+5000..6999, every numeric metric, against a worktree at `9fb3a42`.
+
+### ON against OFF, N=3,000 paired, staged lists (`results/pod_bodies_on_off_20261013.txt`)
+
+| deck | won T10 | won T20 | what moved |
+|---|---|---|---|
+| rendmaw | -0.0017 ±0.0017 | **-0.0073 ±0.0051** | the Wurm kills a third of a board, not all of it; its drain +0.25/game |
+| lorehold | **+0.0033 ±0.0031** | **+0.0107 ±0.0045** | Volcanic Vision's damage, 0.9 bodies/game |
+| karlov | +0.0003 ±0.0007 | +0.0000 ±0.0009 | Blood Artist +0.09 drains/game |
+| tivit | **+0.0137 ±0.0045** | **+0.0127 ±0.0044** | Revel in Riches +0.65 Treasures/game |
+| shilgengar | **+0.0027 ±0.0024** | **-0.0090 ±0.0058** | the Wurm's share (≈0.68 of a 3-creature board) becomes a third; Revel, Blood Artist up |
+| azusa | -- | -- | nothing reads a body; exactly neutral |
+
+About five pod bodies die a game, most to the pod's own wraths -- each now an
+event the payoffs above hear. **The two negatives are a judgement replacing
+a judgement**: `wurm_kill_share` and "zero the board" both overstated what
+-2/-2 kills against `gyre_full_x`'s spread. Which spread is right is not
+knowable from this repo; the point of bodies is that there is now ONE.
+
+**NOT DONE.** The pod's chump blockers never die (blocking reads the count);
+deathtouch is not read; Deathreap Ritual still stands in `opp_death_rate`
+for the pod's deaths; Pygmy Kavu needs a colour. Each is a consumer of this
+model, not a change to it.
 
 ## How to read an ablation table
 
