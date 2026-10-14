@@ -187,6 +187,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z132](#0z132) | BUILT | Change 1's gaps closed (blockers die, cost-aware pod blocking, deathtouch, Deathreap, Pygmy Kavu); kill timing re-fitted 1.9 rounds earlier: `POD_V4` holds mean win, answers worth +0.04 to +0.11 |
 | [0z133](#0z133) | FIXED | Eliminated opponents kept taking turns: removal, wraths and counterspells from the dead, and lorehold windows on their turns. Fixed by default; T20 karlov +0.022 ... lorehold -0.005; every table needs a rebuild |
 | [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
+| [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12107,6 +12108,69 @@ the pod does not counter your response; An Offer You Can't Refuse's two
 Treasures for the pod are nothing; the pod's counterspells still roll as
 before (`countered`), not against your held mana. Change 4 (selection and
 tutors) is the last of item 24.
+
+<a id="0z135"></a>
+
+## 0z135. BUILT — item 24's change 0, finished: Storm Cauldron, Angel of Suffering, one rule each for Sun Titan and Midnight Reaper; two azusa mana bugs
+
+**2026-10-14.** §0z129 left three of change 0's cards and two cards written
+twice. Every text was re-read on Scryfall on the day.
+
+| card | deck | where | what is modelled | said out loud |
+|---|---|---|---|---|
+| Storm Cauldron | azusa | `cauldron_live`, `land_tapped_for_mana` (from `engine.on_mana_tap`), `cauldron_flush` | one more land drop; every land tapped for mana returns to hand -- a TRIGGER, resolved at the pilot's next decision, so a land sacrificed as part of the same cost stays gone -- and the land step replays it | a token land and an Ashaya creature-land are not tapped under it; the pod's half (their lands bounce, their extra drop) is not modelled, a floor. PARTLY_MODELLED |
+| Angel of Suffering | shilgengar | `engine.damage_you` | every point of DAMAGE dealt to you prevented, twice it milled (fractions carried): the pod's combat, painlands, Ancient Tomb, Midnight Reaper; under `pod_threats` a combat route's kill too, the attacker back next round (`opponents.angel_prevents_kill`) | life LOSS and life PAYMENTS are not damage; on the default pod a kill is a roll of no known kind and is not prevented, a floor. PARTLY_MODELLED |
+| Sun Titan | shilgengar, trostani | `engine.sun_titan_pick` | shilgengar's copy ranked by mana value alone and read `mv`; trostani's was the shared rule already (bit-identical) | §0u: one rule in three engines now |
+| Midnight Reaper | shilgengar | `engine.midnight_reaper` | shilgengar's inline copy, the same rule; the damage goes through `damage_you` | -- |
+
+**Hall of Gemstone stays blind.** On your side a mono-green deck names green
+and nothing changes; all it does is lock the pod's colours, and the pod has
+no mana (§4), under POD_V4 as well.
+
+### Two azusa bugs Storm Cauldron found
+
+1. **PHANTOM FETCH MANA.** azusa's `available_mana` offered a unit with NO
+   colour for every land that makes no mana -- its five fetchlands -- and
+   `can_pay` let an empty unit pay generic. About **1.3 free mana a game**
+   from fetches left on the battlefield (1,000 games). Found when Cauldron
+   tried to return a tapped Terramorphic Expanse. Fixed in `add`;
+   `fetch_phantom_mana=True` restores it. Worth -0.005 ±0.005 at T10 and
+   -0.002 ±0.006 at T20 to azusa (N=3,000). No other engine offered one (a
+   survey of every mana-less land in the seven lists).
+2. **A LAND PAYING ITS OWN ACTIVATION.** The sacrifice-to-draw lands paid
+   their {1} from a pool holding the land itself, whose {T} is part of the
+   cost -- rendmaw's `backwoods_pool` rule, now applied
+   (`land_pays_own_activation=True` restores it). Inert on the current list
+   (Cryptic Caves is not in it; Scene of the Crime's draw has no {T}): 0 of
+   3,000 games changed.
+
+### Measured (`diagnostics/run_card_vs_blank.py`, `results/change0_finish_20261014.txt`)
+
+Each card against ablation's blank in its own slot, N=3,000 paired, staged
+lists:
+
+| card | pod | won T10 | won T20 | mechanism |
+|---|---|---|---|---|
+| Angel of Suffering | today | **+0.0077 ±0.0033** | **+0.0320 ±0.0074** | 1.46 damage prevented, 2.84 cards milled a game |
+| Angel of Suffering | POD_V4 | **+0.0100 ±0.0037** | **+0.0250 ±0.0079** | 2.15 prevented, 3.31 milled, 0.02 kills prevented |
+| Storm Cauldron | today | +0.0037 ±0.0048 | +0.0037 ±0.0066 | 1.83 lands returned, +0.65 lands played and landfall triggers |
+| Storm Cauldron | POD_V4 | **+0.0053 ±0.0044** | +0.0000 ±0.0059 | 1.49 returned, +0.55 lands played |
+
+The Angel was the card §0z121's reasoning called "cuts both ways"; measured,
+the cut that matters is the damage, not the mill -- `drew_from_empty` moves
+by 0.002 a game. Cauldron fires but buys little: about half an extra land a
+game, at five mana.
+
+**What moved, and only that**: against `7bc677f` on every staged list
+(seeds 5000..5599, every numeric key) rendmaw, lorehold, karlov, tivit and
+trostani are BIT-IDENTICAL; azusa and shilgengar moved, as they should.
+Both are already in queue item 25's rebuild.
+
+### Gates
+
+`tests/test_change0_finish.py`: 11 cases, 8 mutations, every set written
+before its run and exact. `test_triage` and `test_blind_labels` pass with the
+two cards moved to PARTLY_MODELLED.
 
 ## How to read an ablation table
 

@@ -116,10 +116,12 @@ What is closed and where it went:
       (§0u's shape). Bloodghast, Phyrexian Reclamation, Umezawa's Jitte,
       Soulmender, Restoration Seminar and Improvisation Capstone had no code
       anywhere. **FIRST PASS DONE (§0z129)**: those nine, plus Quirion
-      Ranger and the two Lorehold Lessons. Storm Cauldron and Hall of
-      Gemstone stay blind (reasons in `tools/ablation.py`); Angel of
-      Suffering waits for change 2 (is a clock damage?); the selection
-      cards are change 4.
+      Ranger and the two Lorehold Lessons. **FINISHED (§0z135)**: Storm
+      Cauldron (azusa) and Angel of Suffering (shilgengar, +0.032 at T20)
+      built, PARTLY_MODELLED; Sun Titan and Midnight Reaper one rule each;
+      Hall of Gemstone stays blind (its half is the pod's mana). On the way:
+      azusa's fetchlands made 1.3 phantom mana a game. The selection cards
+      are change 4.
     - **1. The pod's creatures as bodies** -- **BUILT, OFF (§0z130);
       ITS GAPS CLOSED (§0z132)**: chump blockers die, the pod blocks only
       when it matters (`pod_chump_floor`), deathtouch is read, Deathreap

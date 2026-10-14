@@ -125,7 +125,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -694,6 +694,8 @@ class AzusaGame(BaseGame):
             return False
         if perm.card.mana_ability:
             return False
+        if self.cauldron_live():
+            return False          # it would go back to hand (§0z135)
         return not perm.sick
 
     def land_mana_live(self, perm) -> bool:
@@ -730,6 +732,8 @@ class AzusaGame(BaseGame):
         list as of 2026-09-10. `land_creature_sick=False` restores the old
         behaviour exactly.
         """
+        if perm.is_token and self.cauldron_live():
+            return False          # it would cease to exist (§0z135)
         if not perm.card.is_creature:
             return True
         if not self.cfg.get("land_creature_sick", True):
@@ -1017,6 +1021,15 @@ class AzusaGame(BaseGame):
         want_of: dict = {}
 
         def add(src, n, owner):
+            # A LAND THAT MAKES NO MANA OFFERS NONE (§0z135). Every fetchland
+            # here (Evolving Wilds, Fabled Passage, Terramorphic Expanse,
+            # Windswept Heath, Wooded Foothills) has `produces` empty, and an
+            # empty unit paid GENERIC in `can_pay`: about 1.3 phantom mana a
+            # game from fetches left on the battlefield, found when Storm
+            # Cauldron tried to return one to hand. `fetch_phantom_mana=True`
+            # restores it, for reproducing tables before §0z135.
+            if not src and not self.cfg.get("fetch_phantom_mana", False):
+                return
             rank, power = tap_reluctance(self, owner)
             want = want_of.get(src)
             if want is None:
@@ -1114,6 +1127,7 @@ class AzusaGame(BaseGame):
         via search/fetch/tutor (Cultivate, a cracked fetch land, Titania's
         ETB) — none of those are "playing a land".
         """
+        self.cauldron_flush()          # §0z135: queued triggers first
         self.m["landfall_triggers"] += 1
         # ANCIENT GREENWARDEN: "if a land entering causes a triggered ability
         # of a permanent you control to trigger, that ability triggers an
@@ -1733,13 +1747,62 @@ class AzusaGame(BaseGame):
         if self.has("Case of the Locked Hothouse"):
             n += 1          # "an additional land on each of your turns" --
                             # unconditional, NOT gated on being solved
+        if self.cauldron_live():
+            n += 1          # Storm Cauldron: "Each player may play an
+                            # additional land during each of their turns."
         return n
+
+    def cauldron_live(self) -> bool:
+        """STORM CAULDRON, verified against Scryfall 2026-10-14: "Each player
+        may play an additional land during each of their turns. Whenever a
+        land is tapped for mana, return it to its owner's hand." (§0z135)
+
+        In this deck it is an engine: a land tapped for mana comes back to
+        hand and a spare land drop replays it -- one more mana and one more
+        landfall trigger a drop. The land step already interleaves "play a
+        land, cast what it paid for", so a land returned mid-turn is replayed
+        by the drops left. THE POD'S HALF IS NOT MODELLED (their lands bounce
+        too, and they get the extra drop; the pod has no mana, §4) -- it slows
+        them, so this is a floor. Two pilot rules, said out loud: a TOKEN land
+        is not tapped for mana under it (it would cease to exist), nor is an
+        Ashaya creature-land (the creature would go back to hand), in
+        `land_mana_live` and `creature_land_mana`. `storm_cauldron=False` is
+        the old blank."""
+        return (self.cfg.get("storm_cauldron", True)
+                and self.has("Storm Cauldron"))
+
+    def land_tapped_for_mana(self, p) -> None:
+        """`engine.on_mana_tap`'s hook: queue a LAND for Storm Cauldron."""
+        card = getattr(p, "card", None)
+        if card is not None and card.is_land and self.cauldron_live():
+            self.__dict__.setdefault("cauldron_queue", []).append(p)
+
+    def cauldron_flush(self) -> None:
+        """Storm Cauldron's queued triggers resolve: each land tapped for
+        mana returns to hand. A TRIGGER, so it resolves after the spell or
+        activation the mana paid for -- a land SACRIFICED as part of that
+        cost (Scene of the Crime's draw, Cryptic Caves) is gone by then and
+        the trigger does nothing. Run at the pilot's next decision: the next
+        payment (`available_mana`), the next land drop (`playable_lands`),
+        and before the pod's turn."""
+        queue = self.__dict__.pop("cauldron_queue", None)
+        for p in queue or ():
+            # BY IDENTITY: two tapped Forests are equal permanents, and the
+            # one that was tapped is the one that returns.
+            at = next((i for i, q in enumerate(self.board) if q is p), None)
+            if at is None:
+                continue
+            self.board.pop(at)
+            if not p.is_token:
+                self.hand.append(p.card)
+            self.m["cauldron_returns"] += 1
 
     def playable_lands(self):
         """Everywhere this deck can play a land FROM, this turn: hand, the
         top of the library (Augur of Autumn / Courser of Kruphix / Oracle of
         Mul Daya), and the graveyard (Ramunap Excavator / Crucible of
         Worlds). Returns (card, zone) pairs."""
+        self.cauldron_flush()          # §0z135
         out = [(c, "hand") for c in self.hand if c.is_land]
         if self.library and self.library[-1].is_land and self.top_access():
             out.append((self.library[-1], "library"))
@@ -3375,6 +3438,14 @@ class AzusaGame(BaseGame):
             if not draw_is_safe(self, 1):
                 continue            # an activation the pilot may decline
             units = self.available_mana()
+            # Its {T} is part of the cost, so it cannot also tap for the
+            # {1} (§0z135, rendmaw's `backwoods_pool` rule). It could: the
+            # pool held the land's own {C}, which Storm Cauldron then
+            # returned to hand mid-activation. `land_pays_own_activation=True`
+            # restores the old pool.
+            if needs_tap and not self.cfg.get("land_pays_own_activation",
+                                               False):
+                backwoods_pool(units, pm)
             pay = can_pay(cost, units)
             if pay is None:
                 continue
@@ -3796,6 +3867,7 @@ def take_turn(g):
     # `pod_phase` would have made three 3/3s a round free.
     g.verdant_kraken_tokens(3)
 
+    g.cauldron_flush()             # §0z135: before the pod's turn
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
 

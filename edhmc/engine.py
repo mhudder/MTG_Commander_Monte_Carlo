@@ -1159,6 +1159,7 @@ def charge_coloured_pain(g, pay, units) -> float:
         return 0.0
     lost = coloured_tap_life(g, pay.cost, pay, units)
     if lost:
+        lost = damage_you(g, lost)        # "deals 1 damage to you", §0z135
         g.your_life -= lost
         g.m["life_lost_to_own_cards"] += lost
         g.m["painland_life"] += lost
@@ -3020,6 +3021,39 @@ def main_phase(g: Game, precombat: bool = False):
             g.graveyard.append(card)
 
 
+def damage_you(g, n: float) -> float:
+    """DAMAGE dealt to YOU -- not life loss, not a life payment -- and the
+    damage that actually reaches your life total (§0z135).
+
+    ANGEL OF SUFFERING, verified against Scryfall 2026-10-14: "If damage
+    would be dealt to you, prevent that damage and mill twice that many
+    cards." With it out, nothing reaches you and twice the damage is milled
+    from the top of your library. The pod's chip damage is an EXPECTATION, a
+    fraction, so the mill carries its remainder between hits
+    (`angel_mill_owed`). It cuts both ways, which is why it was blind: since
+    §0z42 a library milled empty loses on the next draw.
+
+    The one rule for every site that DEALS damage to you: the pod's combat
+    (`opponents.incidental_damage`, and under `pod_threats` a combat
+    route's kill), painlands and Talismans (`charge_coloured_pain`), Ancient
+    Tomb (`on_mana_tap`), shilgengar's Midnight Reaper. Life LOSS (Phyrexian
+    Arena, Dark Prophecy) and life PAYMENTS (fetches, the horizon lands) are
+    not damage and do not come here. `angel_of_suffering=False` is the old
+    flier with no text."""
+    if (n <= 0 or not g.cfg.get("angel_of_suffering", True)
+            or not g.has("Angel of Suffering")):
+        return n
+    owed = getattr(g, "angel_mill_owed", 0.0) + 2.0 * n
+    k = int(owed + 1e-9)
+    g.angel_mill_owed = owed - k
+    k = min(k, len(g.library))
+    for _ in range(k):
+        g.graveyard.append(g.library.pop())
+    g.m["angel_prevented"] += n
+    g.m["angel_milled"] += k
+    return 0.0
+
+
 def on_mana_tap(g, p: Permanent):
     """A permanent was just tapped FOR MANA. Called from BOTH of `spend`'s
     tap paths -- a rule said in one of them and not the other is §0z4's
@@ -3040,6 +3074,8 @@ def on_mana_tap(g, p: Permanent):
     if (dmg and g.cfg.get("charge_life_costs", True)
             and (card.name == "Ancient Tomb"
                  or g.cfg.get("painland_life", True))):
+        if card.name == "Ancient Tomb":       # DAMAGE; the rest pay life
+            dmg = damage_you(g, dmg)
         g.your_life -= dmg
         g.m["life_lost_to_own_cards"] += dmg
         g.m["tomb_damage" if card.name == "Ancient Tomb"
@@ -3056,6 +3092,13 @@ def on_mana_tap(g, p: Permanent):
     ask = getattr(g, "is_land_creature_now", None)
     if ask is not None and g.has("Autumn Willow, Harmony") and ask(p):
         g.m["willow_taps"] += 1
+    # STORM CAULDRON (azusa, §0z135): "Whenever a land is tapped for mana,
+    # return it to its owner's hand." A TRIGGER: the engine queues the land
+    # here and returns it once the activation or spell it paid for is done
+    # (azusa's `cauldron_flush`), never mid-payment.
+    tapped = getattr(g, "land_tapped_for_mana", None)
+    if tapped is not None:
+        tapped(p)
 
 
 def doll_stays_home(g, p: Permanent) -> bool:
@@ -3728,9 +3771,7 @@ def midnight_reaper(g, n, perm) -> None:
     and you draw a card."
 
     Item 24 found it KNOWN_BLIND in rendmaw while shilgengar modelled it
-    inline; this is rendmaw's, as a function so the next engine reuses it
-    (shilgengar's inline copy is the same rule and is left where it is, so
-    its table does not move). Not "another": LOOK-BACK, so the Reaper sees
+    inline; this is the one rule, and shilgengar calls it since §0z135. Not "another": LOOK-BACK, so the Reaper sees
     its own death and the rest of a wipe it dies in (CR 603.10a, §0z76). Not
     a "may": the draw is taken from a thin library too (§0z42). Tokens are
     excluded -- in rendmaw most deaths are Birds and Necrons -- and `perm`
@@ -3738,8 +3779,9 @@ def midnight_reaper(g, n, perm) -> None:
     if perm is None or perm.is_token:
         return
     for _ in range(int(n) * OPP.watching(g, "Midnight Reaper", perm)):
-        g.your_life -= 1
-        g.m["reaper_life_lost"] += 1
+        lost = damage_you(g, 1)           # it DEALS damage (§0z135)
+        g.your_life -= lost
+        g.m["reaper_life_lost"] += lost
         g.draw(1)
         g.m["reaper_draws"] += 1
 
@@ -3756,9 +3798,9 @@ def sun_titan_pick(graveyard, exclude=()) -> Optional[Card]:
     graveyard. `exclude` holds ids a deck's rules forbid (shilgengar's
     finality-countered cards). None when nothing qualifies.
 
-    shilgengar's `_sun_titan_reanimate` predates this and still ranks by mana
-    value alone and reads `mv` rather than `free_mv` -- §0u's shape, left in
-    place because changing it moves shilgengar's table (item 24)."""
+    shilgengar's `_sun_titan_reanimate` ranked by mana value alone and read
+    `mv` rather than `free_mv` -- §0u's shape -- until §0z135; karlov,
+    shilgengar and trostani all call this now."""
     pool = [c for c in graveyard if c.is_permanent and c.free_mv <= 3
             and id(c) not in exclude]
     if not pool:

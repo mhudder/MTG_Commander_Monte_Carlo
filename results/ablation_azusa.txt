@@ -88,6 +88,12 @@ Bane of Progress                      +0.26+-0.11         +0.30+-0.14        +0.
       opponents own no permanent objects in this project (§4). Its negative score
       is a ONE-SIDED WIPE WITH THE SIDEDNESS REMOVED -- the cost with none of the
       benefit. §0z2.
+Storm Cauldron                        +0.44+-0.12         +0.28+-0.15        +0.0028+-0.0024      both
+      MODELLED (§0z135): your extra land drop, and every land tapped for mana
+      returning to hand to be replayed by the drops left -- one more mana and one
+      more landfall a drop. NOT: the pod's half (their lands bounce too and they
+      get the drop; the pod has no mana, §4), which slows them -- a floor. Pilot
+      rules: token lands and Ashaya creature-lands are not tapped under it.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
@@ -99,7 +105,6 @@ Greater Good                          +0.48+-0.11         +0.38+-0.14        +0.
 Beast Within                          +0.34+-0.11         +0.36+-0.13        +0.0026+-0.0021      both
 Mind's Eye                            +0.38+-0.12         +0.36+-0.14        +0.0037+-0.0023      both
 Krosan Grip                           +0.31+-0.10         +0.33+-0.13        +0.0039+-0.0020      both
-Storm Cauldron                        +0.44+-0.12         +0.28+-0.15        +0.0028+-0.0024      both
 Terastodon                            +0.28+-0.08         +0.26+-0.10        +0.0029+-0.0018      both
 Sylvan Scrying                        +0.16+-0.08         +0.17+-0.09        +0.0021+-0.0014      both
 Hall of Gemstone                      +0.25+-0.10         +0.16+-0.13        +0.0020+-0.0021       dmg

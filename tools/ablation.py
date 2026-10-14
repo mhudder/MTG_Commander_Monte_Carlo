@@ -889,6 +889,13 @@ PARTLY_MODELLED = {
             "graveyard to your hand'. A floor.",
     },
     "azusa": {
+        "Storm Cauldron":
+            "MODELLED (§0z135): your extra land drop, and every land tapped "
+            "for mana returning to hand to be replayed by the drops left -- "
+            "one more mana and one more landfall a drop. NOT: the pod's half "
+            "(their lands bounce too and they get the drop; the pod has no "
+            "mana, §4), which slows them -- a floor. Pilot rules: token lands "
+            "and Ashaya creature-lands are not tapped under it.",
         # §0z114. Annihilator 4 is approximated (an opponent's abstract
         # creature count falls by four); Kozilek's cast draw is modelled.
         "Kozilek, Butcher of Truth":
@@ -1042,6 +1049,13 @@ PARTLY_MODELLED = {
             "not taken). NOT: prowess. A floor.",
     },
     "shilgengar": {
+        "Angel of Suffering":
+            "MODELLED (§0z135): every point of damage dealt to you -- the "
+            "pod's combat, painlands, Midnight Reaper -- prevented, and twice "
+            "it milled (`engine.damage_you`); under `pod_threats` a combat "
+            "route's kill too. NOT, on the default pod: a kill aimed at you "
+            "is a roll of no known kind and is not prevented -- a prevented "
+            "kill cannot be worse than a loss, so a floor.",
         "Revel in Riches":
             "MODELLED: the alt-win, ten or more Treasures at your upkeep, off "
             "Treasures the rest of the deck makes (Smothering Tithe, in every "
@@ -1473,10 +1487,7 @@ KNOWN_BLIND = {
         # reads an OPPONENT drawing a card / a symmetric hand-refill effect,
         # neither of which this model tracks at that granularity
         "Mind's Eye", "Memory Jar",
-        # "each land tapped for mana returns to hand" is a global replacement
-        # on the shared mana model every engine uses; too easy to get subtly
-        # wrong for one deck's build-around
-        "Storm Cauldron",
+        # (Storm Cauldron left 2026-10-14 for PARTLY_MODELLED, §0z135.)
         # modelled as the non-greedy "reveal 3, keep 1, pay no life" line,
         # which is close to a real blank in this engine
         "Sylvan Library",
@@ -1527,10 +1538,7 @@ KNOWN_BLIND = {
         # reach its alt-win under some engines and not others, so the label
         # test flipped with every land change. The clause is modelled; that
         # is PARTLY, said once.
-        # a damage-prevention/mill replacement effect whose interaction with
-        # resolve_clocks (a game-loss check, not a damage event) is not
-        # confidently representable -- see edhmc/shilgengar.py's docstring
-        "Angel of Suffering",
+        # (Angel of Suffering left 2026-10-14 for PARTLY_MODELLED, §0z135.)
         # (Bloodghast left 2026-10-13: its landfall recursion and haste are
         # modelled, item 24 -- "not worth the engine complexity" was the
         # reason it sat here.)
@@ -1594,13 +1602,8 @@ BLIND_BUT_LIVE = {
             "cannot see: it draws a flat `rhystic_rate` a round. The row is "
             "that knob, not the card.",
     },
-    "shilgengar": {
-        "Angel of Suffering":
-            "The 5/3 flier is modelled. 'If damage would be dealt to you, "
-            "prevent it and mill twice that many cards' is not, and it cuts "
-            "both ways -- it stops every point of damage, and since §0z42 a "
-            "milled-out library loses the game. Not a floor.",
-    },
+    # (shilgengar's Angel of Suffering left 2026-10-14 for PARTLY_MODELLED,
+    # §0z135: its text is modelled now.)
 }
 
 

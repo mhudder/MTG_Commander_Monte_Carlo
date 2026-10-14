@@ -131,6 +131,7 @@ from __future__ import annotations
 import dataclasses
 
 from edhmc.engine import (begin_game, BaseGame, Board, Card, Permanent, Metrics,
+                          sun_titan_pick,
                           Snapshots, finish, lookahead_pick, can_pay,
                           available_mana as shared_available_mana, spend,
                           engine_cfg, choose_mode, CRNStreams, crn_shuffle,
@@ -762,10 +763,9 @@ class TrostaniGame(BaseGame):
         permanent card with mana value 3 or less from your graveyard to the
         battlefield." A nonland pick first; a fetchland comes back and is
         cracked again."""
-        pool = [c for c in self.graveyard if c.is_permanent and c.free_mv <= 3]
-        if not pool:
+        best = sun_titan_pick(self.graveyard)      # the shared rule, §0z135
+        if best is None:
             return
-        best = max(pool, key=lambda c: (not c.is_land, c.priority, c.mv))
         self.take(self.graveyard, best)
         self.m["titan_returns"] += 1
         if best.is_land:

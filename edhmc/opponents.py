@@ -3096,7 +3096,9 @@ def incidental_damage(g):
         # where the incentive at a real table does not care what you have.
         share = monarch_attack_share(g, share)
         # An aggro deck's creatures hit harder than a control deck's.
-        g.your_life -= opp.creatures * rate * share * opp.p.get("power", 1.0)
+        from edhmc.engine import damage_you            # Angel, §0z135
+        g.your_life -= damage_you(
+            g, opp.creatures * rate * share * opp.p.get("power", 1.0))
         # GATED ON HOLDING THE CROWN, which is what keeps this change worth
         # ZERO to all six decks: nothing grants the monarch yet, so the roll is
         # never consumed and no existing stream can shift. `crn_random` is
@@ -3127,6 +3129,26 @@ def incidental_damage(g):
         g.m["loss_route"] = 1          # ground down on life
 
 
+def angel_prevents_kill(g, opp) -> bool:
+    """A kill aimed at you is DAMAGE only when the route that carries it is a
+    COMBAT route (`pod_threats`, §0z131) -- a combo or a drain is not, and
+    on the default pod the kill is a roll of no known kind, which nothing
+    prevents (Serra's Emissary's rule). Angel of Suffering prevents it and
+    mills twice your life total, the least that kills you (`damage_you`);
+    the attacker swings again next round (`clock_fired` re-armed one round
+    on). §0z135."""
+    if not pod_threats_on(g) or opp.route != "combat":
+        return False
+    from edhmc.engine import damage_you
+    lethal = max(1.0, g.your_life)
+    if damage_you(g, lethal) > 0:
+        return False
+    g.m["angel_prevented_kills"] += 1
+    opp.kill_turn = pod_turn(g) + 1
+    opp.clock_fired = False
+    return True
+
+
 def resolve_clocks(g):
     """Each opponent's own clock. When it comes due, that opponent eliminates
     somebody - and who it is, is THREAT-WEIGHTED. Being the strongest board at
@@ -3142,6 +3164,8 @@ def resolve_clocks(g):
         opp.clock_fired = True      # a clock resolves once, not every turn
         others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
         share = your_share(g, opp, others)
+        if rolls_t[i][6] < share and angel_prevents_kill(g, opp):
+            continue                   # §0z135: damage, prevented and milled
         if rolls_t[i][6] < share:
             g.result = "loss"          # you were the biggest threat
             g.m["loss_route"] = 2      # an opponent's clock picked YOU

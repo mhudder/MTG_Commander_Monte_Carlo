@@ -136,6 +136,7 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (charge_coloured_pain, vault_of_the_archangel,
+                          damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
@@ -431,9 +432,9 @@ class ShilgengarGame(BaseGame):
                 self.m["drain_damage"] += dealt
                 self.trigger_gain(1)
             nontoken = perm is not None and not perm.is_token
-            if nontoken and OPP.watching(self, "Midnight Reaper", perm):
-                self.your_life -= 1
-                self.draw(1)
+            if nontoken:
+                # The shared rule since §0z135 (§0u: it was an inline copy).
+                midnight_reaper(self, 1, perm)
             # "ANOTHER nontoken creature" -- Grim Haruspex does not see its
             # own death.
             if nontoken and OPP.watching(self, "Grim Haruspex", perm,
@@ -1226,12 +1227,11 @@ class ShilgengarGame(BaseGame):
             self.m["seluma_returns"] += 1
 
     def _sun_titan_reanimate(self):
-        pool = [c for c in self.graveyard
-               if c.is_permanent and float(c.mv) <= 3
-               and id(c) not in self.finality]
-        if not pool:
+        # The shared pick since §0z135 (§0u): this copy ranked by mana value
+        # alone and read `mv`, not `free_mv` (X is 0 in the graveyard).
+        best = sun_titan_pick(self.graveyard, exclude=self.finality)
+        if best is None:
             return
-        best = max(pool, key=lambda c: c.mv)
         self.graveyard.remove(best)
         perm = self.make_permanent(best, sick=True)
         if perm.card.is_creature:
