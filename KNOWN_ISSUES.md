@@ -189,6 +189,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
 | [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
 | [0z136](#0z136) | FIXED / OPEN | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). OPEN for POD_V4: 18-29% of answers go to a re-armed clock and buy half as much |
+| [0z137](#0z137) | BUILT | **`rearm_rule`**: what a re-armed clock's route is under `pod_threats` -- `keep` (as it was, the default), `reland` or `prefer_unfired`. Bit-identical as `keep`; measurement in progress |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12265,6 +12266,39 @@ not fired. Queued with POD_V4 (queue item 24, the owner, 2026-10-14).
   taps after `end_step`, so Enlightened Confidant (not in the list) would
   not see its life; Bloodghast returns on a land played in the land step,
   not on one Sun Titan returns.
+
+<a id="0z137"></a>
+
+## 0z137. BUILT -- `rearm_rule`: what a re-armed clock's route is (§0z136's open half)
+
+**2026-10-14**, at the owner's request: build both candidates §0z136 named
+behind one knob, and measure them against the original reading.
+
+`opponents.rearm_rule` (cfg `rearm_rule`, default `"keep"`), read only under
+`pod_threats`:
+
+- **`keep`** -- the pieces stay out where they were (the original reading).
+- **`reland`** -- the route is rebuilt on a pre-rolled route of the same kind
+  (`Opponent.rearm_routes`, `REARM_ROUTES` = 2 per opponent, rolled LAST from
+  the opponent's own stream in `roll_threat_routes`, whatever the rule), each
+  piece landing `lead` rounds before the re-armed kill, as a fresh route's do.
+- **`prefer_unfired`** -- the pieces stay out, and `answer_target` and
+  `end_step_answers` aim at an opponent whose clock has never fired before
+  one whose has (`unfired_first`).
+
+`Opponent.rearms` counts re-arms under every rule. An unknown rule raises.
+
+**`keep` is the old code**: `check_unchanged_decks` against a worktree at
+`185e10e`, 400 seeds, BIT-IDENTICAL on all six active decks on the default
+pod and on POD_V4 (`--cfg=pod_bodies=True,pod_threats=True,
+threat_clock_shift=2.0,pod_responses=True`). Nothing in the default pod reads
+the knob. `tests/test_rearm_rule.py`: 8 cases, 5 mutations; the expected sets
+were written before the run and the corrections are recorded in its docstring
+as a transcript (§0z14).
+
+**The measurement is in progress** (`diagnostics/run_rearm_rule.py`, N=15,000
+paired; `run_rearm_answers --cfg=rearm_rule=...`; `fit_threat_clock
+--cfg=rearm_rule=...`). Its results go here.
 
 ## How to read an ablation table
 

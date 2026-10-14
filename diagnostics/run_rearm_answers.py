@@ -4,6 +4,7 @@ already fired and been RE-ARMED, and what they buy (§0z136).
     python -m diagnostics.run_rearm_answers               # N=3000, POD_V4
     python -m diagnostics.run_rearm_answers --n=600 --decks=rendmaw,tivit
     python -m diagnostics.run_rearm_answers --out=results/x.txt
+    python -m diagnostics.run_rearm_answers --cfg=rearm_rule=reland   (§0z137)
 
 When an opponent's clock eliminates ANOTHER opponent, `resolve_clocks`
 re-arms it `clock_rearm` (4) rounds on -- and leaves its route's pieces
@@ -30,7 +31,7 @@ N = 3000
 
 
 def measure(args):
-    deck, n = args
+    deck, n, extra = args
     from edhmc import opponents as O
     from edhmc.pending import build_pending
     from edhmc.experiment import DEFAULT_CFG, POD_V4
@@ -62,7 +63,7 @@ def measure(args):
     sim = DECKS[deck].sim
     for s in range(n):
         sim(deck_list, cmd, dict(DEFAULT_CFG, turns=20, watch=frozenset(),
-                                 **POD_V4), 5000 + s)
+                                 **dict(POD_V4, **extra)), 5000 + s)
     return deck, c
 
 
@@ -73,9 +74,14 @@ def main():
                   if a.startswith("--decks=")), list(ACTIVE))
     out = next((a.split("=", 1)[1] for a in args if a.startswith("--out=")),
                None)
+    from diagnostics.run_shared_code_shift import parse_cfg
+    extra = next((parse_cfg(a.split("=", 1)[1]) for a in args
+                  if a.startswith("--cfg=")), {})
     with Pool() as pool:
-        res = dict(pool.imap_unordered(measure, [(d, n) for d in decks]))
-    lines = [f"Answers on re-armed clocks (§0z136), POD_V4, STAGED lists, "
+        res = dict(pool.imap_unordered(measure,
+                                       [(d, n, extra) for d in decks]))
+    lines = [f"Answers on re-armed clocks (§0z136), POD_V4 {extra or ''}, "
+             f"STAGED lists, "
              f"T20, N={n}, seeds 5000..{5000 + n - 1}", "",
              f"{'deck':11s} {'rearms':>7s} {'fresh':>7s} {'rd/rm':>6s} "
              f"{'moved0':>7s} {'rearmed':>8s} {'rd/rm':>6s} {'moved0':>7s} "

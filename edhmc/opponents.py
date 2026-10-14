@@ -160,6 +160,11 @@ class Opponent:
     piece_lands: list = field(default_factory=list)
     rebuild_pool: tuple = ()
     next_rebuild: int = 0
+    # A CLOCK THAT FIRED AND RE-ARMED (§0z137). `rearms` counts the times
+    # this opponent's clock eliminated another opponent and was re-armed;
+    # `rearm_routes` the routes pre-rolled for `rearm_rule="reland"`.
+    rearms: int = 0
+    rearm_routes: tuple = ()
 
     _pcache: object = None
 
@@ -373,6 +378,8 @@ ROUTE_PIECES = {
                (1, 3)),
 }
 THREAT_REBUILD_POOL = 32     # delays per opponent per game; cyclic past it
+# A clock re-arms only on eliminating ANOTHER opponent, and there are two.
+REARM_ROUTES = 2
 
 
 def _pick(roll: float, weights: dict) -> str:
@@ -406,10 +413,62 @@ def roll_threat_routes(cfg, seed, opps) -> None:
         early = int(whole) + (1 if r.random() < frac else 0)
         o.kill_turn = max(4, o.kill_turn - early)
         o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
+        # §0z137: the routes a re-armed clock is rebuilt on under
+        # `rearm_rule="reland"` -- the same kind (the same deck), its pieces
+        # rolled afresh. Rolled after everything above, so nothing above
+        # moves, and rolled whatever the rule, so the rule moves nothing else.
+        o.rearm_routes = tuple(
+            tuple(ThreatPiece(_pick(r.random(), w), r.randint(1, tmax),
+                              r.randint(1, mvmax), r.randint(lo, hi))
+                  for w in slots)
+            for _ in range(REARM_ROUTES))
 
 
 def pod_threats_on(g) -> bool:
     return bool(g.cfg.get("pod_threats", False))
+
+
+# WHAT A RE-ARMED CLOCK'S ROUTE IS (§0z136, §0z137). When a clock eliminates
+# another opponent, `resolve_clocks` re-arms it `clock_rearm` rounds on. The
+# rule for its route is a judgement with no data, so it is a knob:
+#   "keep"            its pieces stay where they were, all out (the original
+#                     reading): an answer there buys only what the rebuild
+#                     plus the piece's lead reaches past the re-armed kill,
+#                     about half a fresh answer's worth
+#   "reland"          the route is rebuilt: a pre-rolled route of the same
+#                     kind whose pieces land `lead` before the re-armed kill,
+#                     as a fresh route's do -- the army that just won is not
+#                     the one the next kill needs
+#   "prefer_unfired"  the pieces stay out, and the pilot aims at an opponent
+#                     whose clock has not fired before one whose has
+REARM_RULES = ("keep", "reland", "prefer_unfired")
+
+
+def rearm_rule(g) -> str:
+    """The rule for a re-armed clock's route (§0z137), checked: a misspelt
+    rule would otherwise read as "keep" and measure nothing."""
+    rule = g.cfg.get("rearm_rule", "keep")
+    if rule not in REARM_RULES:
+        raise ValueError(f"rearm_rule {rule!r} is not one of {REARM_RULES}")
+    return rule
+
+
+def rearm_route(g, o) -> None:
+    """`o`'s clock has just been re-armed to `o.kill_turn`. Under
+    `rearm_rule="reland"` its route is rebuilt on the next pre-rolled one,
+    each piece landing `lead` rounds before the new kill."""
+    o.rearms += 1
+    if not pod_threats_on(g) or rearm_rule(g) != "reland" or not o.rearm_routes:
+        return
+    o.pieces = o.rearm_routes[(o.rearms - 1) % len(o.rearm_routes)]
+    o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
+
+
+def unfired_first(g, o) -> bool:
+    """The aim's leading key: under `rearm_rule="prefer_unfired"` an
+    opponent whose clock has never fired outranks one whose has; under the
+    other rules every opponent ties here, so the aim is as it was."""
+    return rearm_rule(g) != "prefer_unfired" or o.rearms == 0
 
 
 def present_pieces(g, o) -> list:
@@ -536,14 +595,15 @@ def answer_target(g, reach: Reach):
     """(opponent, piece index) the pilot aims this answer at, or None. The
     opponent with the most pieces OUT -- the route closest to complete, as
     the table sees it -- then the higher bracket, then seat order; within
-    them the first piece this answer can hit."""
+    them the first piece this answer can hit. Under `rearm_rule=
+    "prefer_unfired"`, an unfired clock before all of those (§0z137)."""
     best, key = None, None
     for i, o in enumerate(g.opponents):
         present = present_pieces(g, o)
         ok = [k for k in present if hits(reach, o.pieces[k])]
         if not ok:
             continue
-        kk = (len(present), o.bracket, -i)
+        kk = (unfired_first(g, o), len(present), o.bracket, -i)
         if key is None or kk > key:
             best, key = (o, ok[0]), kk
     return best
@@ -1153,7 +1213,8 @@ def end_step_answers(g) -> int:
         for _ in range(reach.n):
             pick = max(((o, k) for o, k in targets
                         if o.piece_lands[k] <= pod_turn(g)),
-                       key=lambda ok: (sum(1 for x in ok[0].piece_lands
+                       key=lambda ok: (unfired_first(g, ok[0]),
+                                       sum(1 for x in ok[0].piece_lands
                                            if x <= pod_turn(g)),
                                        ok[0].bracket), default=None)
             if pick is None:
@@ -3181,6 +3242,7 @@ def resolve_clocks(g):
             # make you safe for the rest of the game.
             opp.clock_fired = False
             opp.kill_turn = pod_turn(g) + g.cfg.get("clock_rearm", 4)
+            rearm_route(g, opp)        # §0z137: what its route is now
     _check_eliminations(g)
 
 

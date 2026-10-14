@@ -3,6 +3,7 @@
 
     python -m diagnostics.fit_threat_clock                  # N=1500, shifts 0..3
     python -m diagnostics.fit_threat_clock --n=3000 --shifts=1.5,2,2.5
+    python -m diagnostics.fit_threat_clock --cfg=rearm_rule=reland   (§0z137)
 
 THE TARGET, the owner's (2026-10-13): with the POD_V4 candidate on --
 `pod_bodies` and `pod_threats` -- the mean T20 win rate over the ACTIVE decks
@@ -29,12 +30,14 @@ POD_V4 = dict(pod_bodies=True, pod_threats=True)
 
 
 def measure(args):
-    deck, shift, n = args
+    deck, shift, n, cfg = args
     from edhmc.pending import build_pending
     from edhmc.experiment import DEFAULT_CFG
     deck_list, cmd = build_pending(deck)
     sim = REGISTRY[deck].sim
-    extra = {} if shift is None else dict(POD_V4, threat_clock_shift=shift)
+    # `--cfg` knobs go on the candidate pod only: the target is today's.
+    extra = ({} if shift is None
+             else dict(POD_V4, threat_clock_shift=shift, **cfg))
     w10, w20, turns = [], [], []
     for s in range(n):
         r = sim(deck_list, cmd, dict(DEFAULT_CFG, turns=20,
@@ -51,12 +54,16 @@ def main():
     n = next((int(a.split("=")[1]) for a in args if a.startswith("--n=")), N)
     shifts = next((tuple(float(x) for x in a.split("=")[1].split(","))
                    for a in args if a.startswith("--shifts=")), SHIFTS)
+    from diagnostics.run_shared_code_shift import parse_cfg
+    cfg = next((parse_cfg(a.split("=", 1)[1]) for a in args
+                if a.startswith("--cfg=")), {})
     decks = list(ACTIVE)
-    jobs = [(d, s, n) for d in decks for s in (None,) + shifts]
+    jobs = [(d, s, n, cfg) for d in decks for s in (None,) + shifts]
     with Pool() as pool:
         res = dict(pool.imap_unordered(measure, jobs))
     target = np.mean([res[(d, None)][1].mean() for d in decks])
-    print(f"POD_V4 candidate {POD_V4}, N={n} per deck, staged lists, "
+    print(f"POD_V4 candidate {dict(POD_V4, **cfg)}, N={n} per deck, "
+          f"staged lists, "
           f"seeds 5000..{5000 + n - 1}")
     print(f"target: mean T20 win rate of the off pod over {len(decks)} "
           f"active decks = {target:.4f}\n")
