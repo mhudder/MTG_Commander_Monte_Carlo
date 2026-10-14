@@ -190,7 +190,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
 | [0z136](#0z136) | FIXED | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). Answers on re-armed clocks bought half as much: settled in §0z137 |
 | [0z137](#0z137) | DECIDED | **`rearm_rule`**: `reland` (+0.005 to +0.008 at T20, four decks) is in POD_V4 with shift 2.05; `prefer_unfired` refuted. `check_unchanged_decks --old-at` refuses a stale worktree |
-| [0z138](#0z138) | BUILT | **Item 24's last four route answers**, read only under `pod_threats`: Damn's single-target mode, the voting answers, the attack taxes, the wipe gate reading routes. Bit-identical off; measurement in progress |
+| [0z138](#0z138) | MEASURED | **Item 24's last four answers** in POD_V4: Damn single-target +0.007 to +0.010 at T20, tivit's taxes +0.047 (knob-bound), votes +0.007, gate +0.004 lorehold. Shift re-fitted to 2.3 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12419,7 +12419,7 @@ says nothing about tests written another way.
 
 <a id="0z138"></a>
 
-## 0z138. BUILT -- item 24's last four route answers: Damn's single-target mode, the voting answers, the attack taxes, the wipe gate reading routes
+## 0z138. MEASURED -- item 24's last four route answers: Damn's single-target mode, the voting answers, the attack taxes, the wipe gate reading routes
 
 **2026-10-14**, at the owner's request, with no rebuild until every POD_V4
 change is in. All four are read only under `pod_threats`, so today's pod is
@@ -12471,8 +12471,57 @@ table this change does not otherwise touch (`test_metrics_and_render` C
 caught the first attempt). **Re-label all four, and Damn, at the POD_V4
 rebuild.**
 
-**The measurement is in progress** (`diagnostics/run_route_answers.py`, N=
-15,000 paired, and `fit_threat_clock`). Its results go here.
+### What each is worth
+
+**Paired, N=15,000** (`diagnostics/run_route_answers.py`,
+`results/route_answers_20261014.txt`; POD_V4 at shift 2.05, staged lists,
+seeds 5000-19999). Each cell is the full pod minus the pod with that piece
+off; a deck that does not hold the card is not run for it.
+
+| deck | Damn | votes | taxes | gate | all four |
+|---|---|---|---|---|---|
+| rendmaw | -- | -- | -- | +0.0005 ±0.0009 | +0.0005 ±0.0009 |
+| lorehold | -- | -- | -- | **+0.0042 ±0.0015** | **+0.0042 ±0.0015** |
+| karlov | **+0.0095 ±0.0023** | -- | -- | +0.0006 ±0.0010 | **+0.0102 ±0.0025** |
+| tivit | **+0.0089 ±0.0024** | **+0.0067 ±0.0033** | **+0.0466 ±0.0034** | +0.0007 ±0.0008 | **+0.0618 ±0.0050** |
+| shilgengar | **+0.0069 ±0.0023** | -- | -- | **+0.0013 ±0.0007** | **+0.0086 ±0.0024** |
+| azusa | -- | -- | -- | -- | +0.0000 ±0.0000 |
+
+T20 above. At T10 every cell is within ±0.003 except tivit's taxes
+(+0.0079) and votes (**-0.0053 ±0.0023**). Azusa holds none of the cards and
+no sweeper, and its all-off arm is exactly zero, as it must be.
+
+**The votes cost at T10, and Vault 11 is why** (a split on tivit, N=15,000,
+same seeds; the script was a one-off): with Vault 11 never destroying your
+creature, the votes are worth +0.0102 more at T10 and +0.0086 more at T20.
+Under the default `opp_vote_policy="adversarial"` the three opponents vote
+as a bloc for your most-wanted creature, outvote or tie you, and it dies --
+early, when Vault 11 lands. **Say the knob out loud**: that is the
+pessimistic bound, and this card's number swings on it. Holding Council's
+Judgment while nothing is out is worth +0.0033 at T10 and +0.0059 at T20
+against casting it on priority.
+
+**The taxes are knob-bound.** `attack_tax_deflect` against its 0.5: 0.25
+moves tivit -0.0227 ±0.0024 at T20, 0.75 +0.0155 ±0.0020 -- the taxes are
+worth about +0.024 to +0.062, and the number has no data. Most of it is the
+chip damage, not the kill: in a 400-game smoke run the kill was deflected 6
+times. **Say the knob out loud with every tivit number under POD_V4.**
+
+**The gate weight moves little.** `wipe_gate_piece_weight` 2.0 against 1.0
+is +0.0008 to +0.0015 at T20 in five decks (significant in four), and 0.5
+is -0.0001 to -0.0015. Weighting pieces more is slightly better and the
+peak is not found; 1.0 stays, and the sweep is the evidence if the owner
+wants it raised.
+
+### The clock re-fit
+
+The four answers raise the pod's mean T20 win rate, so the kill comes
+sooner to hold it (`diagnostics/fit_threat_clock`, N=2,000, shifts
+1.75-2.65, `results/pod_v4_clock_fit_answers_20261014.txt`): at 2.05 the
+mean is +0.0150 over the target, at 2.35 -0.0022; **fitted 2.31**.
+`experiment.POD_V4` carries **2.3**. Checked on fresh seeds
+(`--n=3000 --shifts=2.3`, `results/pod_v4_clock_check_answers_20261014.txt`):
+mean T20 0.4243 against a target of 0.4234.
 
 ## How to read an ablation table
 

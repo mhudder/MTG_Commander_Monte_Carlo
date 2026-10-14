@@ -144,7 +144,7 @@ What is closed and where it went:
       threats both on, and every deck's answers are then worth +0.04 to
       +0.11. That pod is `experiment.POD_V4`, a candidate: adopting it is
       the owner's call, with a rebuild of every table, `KNOWN_BLIND`
-      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.05 since §0z137 (2.0 from §0z133 to §0z137).
+      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.3 since §0z138 (2.05 from §0z137, 2.0 from §0z133).
       **SETTLED (§0z136, §0z137; the owner, 2026-10-14): answers on a
       re-armed clock.** A clock that eliminates another opponent re-armed
       with its pieces all still out, and 18-29% of every deck's piece
@@ -153,9 +153,14 @@ What is closed and where it went:
       lorehold and azusa inside their bars, unexplained) and is in POD_V4
       with the shift re-fitted to 2.05; "prefer_unfired" was refuted.
       **THE OWNER, 2026-10-14: no rebuild until every POD_V4 change is
-      in** -- one rebuild for POD_V4 and item 25. Not done: attack taxes,
-      Damn's single-target mode, the voting answers, the wipe gate
-      reading routes. Originally: each kill
+      in** -- one rebuild for POD_V4 and item 25. **THE LAST FOUR ARE IN
+      (§0z138)**, all under `pod_threats`: Damn's single-target mode
+      (+0.007 to +0.010 at T20), the voting answers (tivit +0.007; Vault 11
+      costs at T10 under the adversarial vote), the attack taxes (tivit
+      +0.047, bound to `attack_tax_deflect`, no data), the wipe gate
+      reading routes (lorehold +0.004). Shift re-fitted to 2.3. At the
+      rebuild, re-label the Prisons, Council's Judgment, Vault 11 and
+      Damn in `tools/ablation.py`. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind
       (combat, combo, drain); removing a piece pushes `kill_turn` back by a
       pre-rolled rebuild delay; the route kind decides which answers work

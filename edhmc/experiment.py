@@ -165,17 +165,21 @@ POD_V3 = dict(POD_V2, archetypes=True)
 # timing re-fitted so the mean T20 win rate over the active decks equals this
 # pod's (`diagnostics/fit_threat_clock.py`, the owner's target, 2026-10-13):
 # 1.89 rounds earlier on the pod as §0z132 found it, 1.97 once §0z133 stopped
-# eliminated opponents acting -- 2.0, and 2.05 with "reland" below. Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
+# eliminated opponents acting -- 2.0, 2.05 with "reland" and 2.3 with §0z138 below. Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
 # rebuild of every table; until then every number in the project is this pod's.
 # A RE-ARMED CLOCK'S ROUTE IS REBUILT (§0z136, §0z137, the owner, 2026-10-14):
 # under "keep" its pieces stayed out, and a fifth to a quarter of your answers
 # landed there and bought half as much. "reland" lifts four decks +0.005 to
 # +0.008 at T20, and the fit under it is 2.05 (keep's was 1.94).
+# ITEM 24'S LAST FOUR ANSWERS (§0z138) -- Damn's single-target mode, the
+# voting answers, the attack taxes, the wipe gate reading routes -- are read
+# under `pod_threats` and so are in this pod by default; they raise the mean
+# T20 win rate, and the fit with them is 2.31 -- 2.3 here.
 POD_V4 = {
     "pod_bodies": True,
     "pod_threats": True,
     "rearm_rule": "reland",
-    "threat_clock_shift": 2.05,
+    "threat_clock_shift": 2.3,
     # Change 3 (§0z134): instants cast on the pod's turn from held mana. It
     # moves the six-deck mean about +0.005 at T20, inside the fit's own
     # noise, so the shift above was not re-fitted for it.
