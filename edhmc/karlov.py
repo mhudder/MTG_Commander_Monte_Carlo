@@ -127,6 +127,7 @@ class KarlovGame(BaseGame):
         self.in_draw_step = False  # Exemplar of Light, once a turn
         self.wind_crystal_used = False       # The Wind Crystal taps to activate
         self.jitte_on = None                 # Umezawa's Jitte's holder (item 24)
+        self.jitte_bound = None              # ... and the Jitte it holds (§0z136)
         self.jitte_counters = 0
 
         cfg.setdefault("shroud_sources",
@@ -1661,6 +1662,31 @@ def jitte_perm(g):
                 None)
 
 
+def jitte_holder(g):
+    """The creature the Jitte is equipped to, or None.
+
+    AN ATTACHMENT IS TO ONE JITTE OBJECT (§0z136). A Jitte that leaves the
+    battlefield and comes back -- the pod's artifact removal, then Sun Titan
+    (mana value 2) -- is a new object with no relation to its previous
+    existence (CR 400.7): unattached, no counters. The first version kept
+    only the holder, so a returned Jitte rode the old holder free of its
+    equip cost and took counters off its next attack. A holder that left
+    the battlefield is gone the same way. `jitte_stale_holder=True` restores
+    the old reading."""
+    holder = getattr(g, "jitte_on", None)
+    jp = jitte_perm(g)
+    if holder is None or jp is None:
+        return None
+    if (not g.cfg.get("jitte_stale_holder", False)
+            and (getattr(g, "jitte_bound", None) is not jp
+                 or not any(p is holder for p in g.board))):
+        g.jitte_on = None
+        g.jitte_bound = None
+        g.jitte_counters = 0
+        return None
+    return holder
+
+
 def jitte_equip(g):
     """UMEZAWA'S JITTE (item 24; was KNOWN_BLIND), verified 2026-10-13:
     "Whenever equipped creature deals combat damage, put two charge counters
@@ -1677,9 +1703,10 @@ def jitte_equip(g):
     jp = jitte_perm(g)
     if jp is None:
         g.jitte_on = None
+        g.jitte_bound = None
         g.jitte_counters = 0
         return
-    holder = g.jitte_on
+    holder = jitte_holder(g)
     if holder is not None and any(p is holder for p in g.board) \
             and may_attack(g, holder):
         return
@@ -1693,6 +1720,7 @@ def jitte_equip(g):
     if not pay_cost(g, {"gen": 2}):
         return
     g.jitte_on = target
+    g.jitte_bound = jp
     g.m["jitte_equips"] += 1
 
 
@@ -1703,8 +1731,8 @@ def jitte_combat(g, attackers):
     life", one lifegain EVENT each -- in this deck an event is worth more
     than +2/+2 on one attacker. The pump and the -1/-1 are not taken; the
     -1/-1 aims at the pod's creatures, a count (§4). PARTLY MODELLED."""
-    holder = getattr(g, "jitte_on", None)
-    if holder is None or jitte_perm(g) is None:
+    holder = jitte_holder(g)
+    if holder is None:
         return
     if (any(p is holder for p in attackers) and g.power_of(holder) > 0
             and OPP.living(g)):

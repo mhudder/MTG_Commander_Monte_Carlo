@@ -3,7 +3,7 @@
 code, not for want of a model.
 
     python -m tests.test_karlov_change0
-    python -m tests.test_karlov_change0 --mutate   # 11 mutations
+    python -m tests.test_karlov_change0 --mutate   # 12 mutations
 
     Sun Titan {4}{W}{W} 6/6   (Scryfall, every text verified 2026-10-13)
     Vigilance / Whenever this creature enters or attacks, you may return
@@ -39,6 +39,9 @@ CASES
   M  the Jitte is equipped on the attacker, for {2}
   N  the holder attacks: two counters, both spent as two 2-life events
   O  a holder that did not attack gets no counters
+  P  a Jitte that left and came back is a NEW object (CR 400.7, §0z136):
+     the old holder attacks and the new Jitte gets no counters
+  Q  ... and equipping the new Jitte pays {2} again
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   sun_titan_pick finds nothing             -> A, C, D, E, F
@@ -49,9 +52,15 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   may_attack lets Soulmender attack        -> I
   Reclamation ignores its life floor       -> K
   Reclamation's recast window ignores the card's cost   -> L
-  jitte_combat does nothing                -> N
+  jitte_combat does nothing                -> N, P   (P added after the
+                                       run, §0z14: written as N alone, but
+                                       P also reads that the stale holder
+                                       is cleared, which `jitte_combat`'s
+                                       call to `jitte_holder` does)
   jitte_combat credits a holder that stayed home        -> O
-  jitte_equip does nothing                 -> M, N
+  jitte_equip does nothing                 -> M, N, Q
+  jitte_holder keeps the old holder        -> P, Q    (§0z136; written
+                                                       before the run)
 
 UNMUTATED, and written down (§0z15): the attack half of Sun Titan (E) has no
 seam of its own -- it calls the same `sun_titan` the enter half does, so the
@@ -232,9 +241,34 @@ def run_cases():
 
     g = kgame(jitte, body)
     g.jitte_on = g.board[1]
+    g.jitte_bound = g.board[0]        # equipped from THIS Jitte (§0z136)
     K.jitte_combat(g, [])
     check("O a holder that stayed home gets nothing",
           (g.m["jitte_counters"], g.jitte_counters), (0, 0))
+
+    # The pod destroys the Jitte; Sun Titan returns it. A new object.
+    def returned_jitte(**cfg):
+        g = kgame(jitte, body, *lands(4), **cfg)
+        K.jitte_equip(g)
+        holder = g.jitte_on
+        for p in g.board:
+            if p.card.is_land:
+                p.tapped = False
+        g.board.remove(K.jitte_perm(g))
+        g.board.append(EN.Permanent(card=jitte, sick=False))
+        return g, holder
+
+    g, holder = returned_jitte()
+    K.jitte_combat(g, [holder])
+    check("P a returned Jitte is not on the old holder: no counters",
+          (g.m["jitte_counters"], g.jitte_on), (0, None))
+
+    g, holder = returned_jitte()
+    K.jitte_equip(g)
+    check("Q ... and equipping it again pays {2}",
+          (g.m["jitte_equips"], g.jitte_on is holder,
+           sum(1 for p in g.board if p.card.is_land and p.tapped)),
+          (2, True, 2))
 
     return set(FAIL)
 
@@ -251,6 +285,10 @@ def main() -> int:
     real_pick = K.sun_titan_pick
     real_recl = K.reclamation_step
     real_jcombat = K.jitte_combat
+
+    def stale_holder(g):          # the first version: the holder alone
+        holder = getattr(g, "jitte_on", None)
+        return holder if K.jitte_perm(g) is not None else None
 
     def no_cap(graveyard, exclude=()):
         pool = [c for c in graveyard if c.is_permanent]
@@ -293,11 +331,13 @@ def main() -> int:
         "Reclamation's recast window ignores the card's cost":
             ({"L"}, K, "reclamation_step", no_recast_check),
         "jitte_combat does nothing":
-            ({"N"}, K, "jitte_combat", lambda g, attackers: None),
+            ({"N", "P"}, K, "jitte_combat", lambda g, attackers: None),
         "jitte_combat credits a holder that stayed home":
             ({"O"}, K, "jitte_combat", credit_home),
         "jitte_equip does nothing":
-            ({"M", "N"}, K, "jitte_equip", lambda g: None),
+            ({"M", "N", "Q"}, K, "jitte_equip", lambda g: None),
+        "jitte_holder keeps the old holder":
+            ({"P", "Q"}, K, "jitte_holder", stale_holder),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():

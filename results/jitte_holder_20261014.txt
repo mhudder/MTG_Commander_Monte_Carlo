@@ -1,0 +1,24 @@
+Umezawa's Jitte's holder bound to one Jitte object (§0z136): karlov, STAGED list,
+N=15000 paired, both legs in one tree at the commit that adds it:
+  old = --cfg=jitte_stale_holder=True, new = the default.
+  python -m diagnostics.run_shared_code_shift --decks=karlov --cfg=jitte_stale_holder=True --out=old.json
+  python -m diagnostics.run_shared_code_shift --decks=karlov --out=new.json
+  python -m diagnostics.run_shared_code_shift --diff old.json new.json
+
+deck            metric               old       new   new-old                95% CI
+karlov@T10      won               0.2367    0.2366   -0.0001   [ -0.0002,  +0.0001]
+karlov@T10      damage           43.8964   43.8955   -0.0009   [ -0.0021,  +0.0004]
+karlov@T10      final_life       45.1186   45.1136   -0.0051   [ -0.0144,  +0.0043]
+karlov@T10      cards_drawn      10.5171   10.5172   +0.0001   [ -0.0001,  +0.0002]
+karlov@T10      stranded_mv     128.0641  128.0658   +0.0017   [ -0.0017,  +0.0051]
+karlov@T10      turns_played      9.4274    9.4275   +0.0001   [ -0.0001,  +0.0002]
+                seeds whose result changed         1 of 15000
+
+karlov@T20      won               0.5149    0.5149   +0.0000   [ +0.0000,  +0.0000]
+karlov@T20      damage           59.8923   59.8920   -0.0003   [ -0.0010,  +0.0004]
+karlov@T20      final_life       42.6272   42.6217   -0.0055   [ -0.0159,  +0.0049]
+karlov@T20      cards_drawn      13.1453   13.1459   +0.0006   [ -0.0005,  +0.0017]
+karlov@T20      stranded_mv     146.3557  146.3739   +0.0182   [ -0.0175,  +0.0539]
+karlov@T20      turns_played     11.1580   11.1586   +0.0006   [ -0.0005,  +0.0017]
+                seeds whose result changed         0 of 15000
+

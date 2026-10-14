@@ -188,6 +188,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z133](#0z133) | FIXED | Eliminated opponents kept taking turns: removal, wraths and counterspells from the dead, and lorehold windows on their turns. Fixed by default; T20 karlov +0.022 ... lorehold -0.005; every table needs a rebuild |
 | [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
 | [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
+| [0z136](#0z136) | FIXED / OPEN | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). OPEN for POD_V4: 18-29% of answers go to a re-armed clock and buy half as much |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12171,6 +12172,99 @@ Both are already in queue item 25's rebuild.
 `tests/test_change0_finish.py`: 11 cases, 8 mutations, every set written
 before its run and exact. `test_triage` and `test_blind_labels` pass with the
 two cards moved to PARTLY_MODELLED.
+
+<a id="0z136"></a>
+
+## 0z136. A review of item 24: Umezawa's Jitte kept its holder across leaving play (FIXED); answers spent on re-armed clocks (OPEN, for POD_V4)
+
+**2026-10-14**, a code review of item 24's seven commits (§0z129-§0z135) at
+the owner's request: the live changes first (§0z133 and change 0), then the
+switched-off pod (changes 1-3). No correctness bug in either. Two findings.
+
+### 1. FIXED -- a returned Jitte rode its old holder
+
+`karlov.jitte_equip` and `jitte_combat` (§0z129) remembered the creature the
+Jitte was on, not the Jitte. A Jitte that leaves the battlefield and comes
+back -- the pod's artifact removal, then Sun Titan (it is mana value 2) -- is
+a new object (CR 400.7): unattached. The old code read it as still on the
+old holder, so it was never re-equipped (the {2} unpaid) and took counters
+off that creature's next attack. Found by reading.
+
+**The fix** is `karlov.jitte_holder`: an attachment is to the Jitte
+PERMANENT it was equipped from (`jitte_bound`), and a holder no longer on
+the battlefield is gone the same way. `jitte_stale_holder=True` restores the
+old reading. **What it moved** (`results/jitte_holder_20261014.txt`, karlov's
+staged list, N=15,000 paired, both legs in one tree): one seed's result
+changed at T10 and none at T20; every metric inside its interval. Rare, as
+expected -- it needs the Jitte destroyed and returned while its holder lives.
+`check_unchanged_decks` against a worktree at `0148892` (module lists, 400
+seeds): rendmaw, lorehold, tivit, shilgengar and azusa BIT-IDENTICAL; karlov
+moved on `mana_spent` alone (+0.02 a game, the equip paid again); and with
+`--cfg=jitte_stale_holder=True` all six are BIT-IDENTICAL, so the knob is
+the old code.
+Karlov's cache is already SUSPECT and in queue item 25's rebuild; no other
+deck reads the code. `tests/test_karlov_change0.py` cases P and Q, and one
+mutation (`jitte_holder` keeps the old holder -> P, Q). One expected set was
+wrong on the first run and is corrected in the docstring as a transcript
+(§0z14): disabling `jitte_combat` also breaks P, which reads that the stale
+holder is cleared.
+
+### 2. OPEN, FOR THE POD_V4 DECISION -- answers on a re-armed clock
+
+When an opponent's clock eliminates ANOTHER opponent, `resolve_clocks`
+re-arms it `clock_rearm` (4) rounds on and leaves its route's pieces where
+they were: all out. `answer_target` aims at the opponent with the most
+pieces out, so a re-armed route draws answers, and a removal there moves the
+kill only when the rebuild plus the piece's lead reaches past the re-armed
+kill turn. Measured on POD_V4 (`diagnostics/run_rearm_answers.py`,
+`results/rearm_answers_20261014.txt`, staged lists, T20, N=3,000; a count,
+nothing switched):
+
+| deck | re-arms a game | answers to re-armed routes | rounds moved per removal, fresh / re-armed | removals that moved nothing, fresh / re-armed |
+|---|---|---|---|---|
+| rendmaw | 0.46 | 25% | 2.14 / 1.15 | 7% / 44% |
+| lorehold | 0.36 | 25% | 2.18 / 0.98 | 10% / 47% |
+| karlov | 0.36 | 18% | 2.03 / 0.98 | 8% / 47% |
+| tivit | 0.36 | 21% | 1.97 / 0.95 | 11% / 51% |
+| shilgengar | 0.41 | 20% | 1.95 / 1.00 | 12% / 49% |
+| azusa | 0.35 | 29% | 2.23 / 1.16 | 6% / 43% |
+
+A fifth to over a quarter of every deck's piece removals buy about half
+what a removal on a fresh route does, and about half of them buy nothing.
+**It is not plainly wrong**: the army that just killed someone is still on
+the table, and a pilot who can see it would aim there too. What makes the
+removal weak is `clock_rearm`, a number with no data that predates routes
+(it was written so that surviving one clock did not make you safe). But it
+understates every answer card under POD_V4, and it moves the fit
+(`threat_clock_shift`) that POD_V4's mean win rate rests on, so it is
+settled BEFORE the POD_V4 rebuild, not after. The candidates, unmeasured:
+re-land the route's pieces at the re-arm (a new route, rolled from the
+opponent's own stream), or have the pilot prefer an opponent whose clock has
+not fired. Queued with POD_V4 (queue item 24, the owner, 2026-10-14).
+
+### Read and found sound (so the next review need not repeat it)
+
+- **§0z133**: every loop over `g.opponents` either skips the dead or means
+  every seat (eliminations, the pod's wrath, which kills only the living);
+  the per-seat roll index is kept, so CRN holds.
+- **Angel of Suffering**: only DAMAGE reaches `damage_you` (painlands,
+  Talismans, Ancient Tomb, Midnight Reaper, the pod's combat); the horizon
+  lands and fetches pay life. The mill comes off the top (`library[-1]`).
+- **azusa's phantom-mana fix** removes mana only from lands that make none:
+  on the staged list, the five fetchlands and Eye of Ugin (already skipped
+  by name).
+- **Change 2's answers**: every one of the 27 census clauses reads to the
+  right reach. Latent: `answer_reach`'s toughness regex wants "+N/-N", so a
+  "-N/-N" clause would read as any toughness; no current answer has one.
+- **Change 3's mana**: every engine untaps at the start of its own turn, so
+  each `response_pay` spends only what was really left untapped.
+- **Minor, left as they are**: Deathreap Ritual's stand-in roll is drawn
+  only when no death was modelled, so its one stream can desynchronise
+  between branches (precision, not correctness); dying chump blockers are
+  the weakest bodies whether or not they could block a flier; Soulmender
+  taps after `end_step`, so Enlightened Confidant (not in the list) would
+  not see its life; Bloodghast returns on a land played in the land step,
+  not on one Sun Titan returns.
 
 ## How to read an ablation table
 

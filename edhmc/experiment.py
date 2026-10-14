@@ -167,6 +167,9 @@ POD_V3 = dict(POD_V2, archetypes=True)
 # 1.89 rounds earlier on the pod as §0z132 found it, 1.97 once §0z133 stopped
 # eliminated opponents acting -- 2.0. Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
 # rebuild of every table; until then every number in the project is this pod's.
+# OPEN BEFORE ADOPTING (§0z136): a re-armed clock keeps its pieces out, so a
+# fifth to a quarter of your answers land there and buy half as much. The
+# rule chosen for it moves the fit above.
 POD_V4 = {
     "pod_bodies": True,
     "pod_threats": True,

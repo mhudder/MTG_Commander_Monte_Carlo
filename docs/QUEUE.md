@@ -144,7 +144,14 @@ What is closed and where it went:
       threats both on, and every deck's answers are then worth +0.04 to
       +0.11. That pod is `experiment.POD_V4`, a candidate: adopting it is
       the owner's call, with a rebuild of every table, `KNOWN_BLIND`
-      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.0 since §0z133 (re-fitted on the fixed pod). Not done: attack taxes,
+      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.0 since §0z133 (re-fitted on the fixed pod).
+      **SETTLE FIRST, BEFORE ADOPTING (§0z136, the owner, 2026-10-14):
+      answers on a re-armed clock.** A clock that eliminates another
+      opponent re-arms with its pieces all still out, and 18-29% of every
+      deck's piece removals go there and buy about half as much (1 round,
+      not 2; half of them nothing). Choose a rule -- re-land the route at
+      the re-arm, or a pilot that prefers an unfired clock -- measure it,
+      and re-fit `threat_clock_shift` on it. Not done: attack taxes,
       Damn's single-target mode, the voting answers, the wipe gate
       reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind
