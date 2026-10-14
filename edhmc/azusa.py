@@ -589,6 +589,17 @@ class AzusaGame(BaseGame):
 
     # -- land animation ----------------------------------------------------
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        units = self.available_mana()
+        idx = can_pay(cost, units)
+        if idx is None or dry:
+            return idx is not None
+        spend(self, idx, units)
+        return True
+
     def animate_lands(self, power, toughness, *, targets, haste=False,
                       trample=False, indestructible=False, reach=False,
                       through_pod_round=False, source=""):

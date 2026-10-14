@@ -1503,6 +1503,17 @@ class Game(BaseGame):
 
     # -- tokens --------------------------------------------------------------
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        units = rendmaw_mana(self)
+        idx = can_pay(cost, units)
+        if idx is None or dry:
+            return idx is not None
+        spend(self, idx, units)
+        return True
+
     def add_ritual_mana(self, n: int) -> None:
         """Culling Ritual's "{B} or {G} for each permanent destroyed this
         way", into the pool until the phase ends (§0z118). The optional

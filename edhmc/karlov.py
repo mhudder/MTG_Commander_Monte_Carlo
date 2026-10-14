@@ -186,6 +186,14 @@ class KarlovGame(BaseGame):
 
     # -- helpers -------------------------------------------------------------
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        if dry:
+            return can_pay(cost, available_mana(self)) is not None
+        return pay_cost(self, cost)
+
     def power_of(self, perm):
         base = perm.card.power + perm.counters
         if perm.card is self.commander:

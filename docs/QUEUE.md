@@ -152,7 +152,12 @@ What is closed and where it went:
       About half the blind list. **The rebuild delay is a number nobody has
       data for**: it ships as a swept knob, said out loud with every result
       it moves.
-    - **3. Holding mana up through the pod's turn**: a response window in
+    - **3. Holding mana up through the pod's turn** -- **BUILT, OFF
+      (§0z134)**: `pod_responses`, bit-identical off, and part of POD_V4.
+      Counterspells, protection and instant answers cast on the pod's turn
+      from real held mana; tivit's counters are cards now (+0.029 at T20);
+      holding mana back ("hold") loses in every deck. No deck runs a flash
+      creature. Originally: a response window in
       `pod_phase` and an end-step cast for whatever was held. Counterspells
       (with 2), protection in response (`try_protect` is the seed), flash.
       It charges a counterspell its real cost: tempo.

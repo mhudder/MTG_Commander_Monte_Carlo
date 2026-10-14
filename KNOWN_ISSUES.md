@@ -186,6 +186,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z131](#0z131) | BUILT | **Item 24, change 2**: opponent kills as routes of removable pieces, behind `pod_threats`, OFF and bit-identical; ON lifts T20 win +0.038 to +0.082, all via fewer clock losses; rebuild delay is the knob |
 | [0z132](#0z132) | BUILT | Change 1's gaps closed (blockers die, cost-aware pod blocking, deathtouch, Deathreap, Pygmy Kavu); kill timing re-fitted 1.9 rounds earlier: `POD_V4` holds mean win, answers worth +0.04 to +0.11 |
 | [0z133](#0z133) | FIXED | Eliminated opponents kept taking turns: removal, wraths and counterspells from the dead, and lorehold windows on their turns. Fixed by default; T20 karlov +0.022 ... lorehold -0.005; every table needs a rebuild |
+| [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12025,6 +12026,87 @@ tivit +0.015, lorehold -0.029, karlov -0.047, azusa -0.058.
 `tests/test_dead_opponents.py`: 6 cases, each run under both rules, 3
 mutations whose sets were written before the run and were exact. `validate`
 +0.00 on every metric with the fix as the default; 82 test modules pass.
+
+<a id="0z134"></a>
+
+## 0z134. BUILT — item 24's change 3: holding mana up through the pod's turn, behind `pod_responses` (OFF)
+
+**2026-10-14.** Until now an instant was a sorcery: every engine cast it in
+its main phase or not at all. Tivit's four counterspells were cast into
+nothing; a protection spell was cast into nothing whenever mana was spare, so
+it was often gone by the pod's wrath, and when it was still in hand
+`try_protect` asked a 60% roll and four lands instead of the mana; and a route
+piece that lands and wins in one round of the pod's turns (§0z131's lead 0)
+could not be answered at all.
+
+### The model
+
+| what | where | rule |
+|---|---|---|
+| pure responses held | `pure_response`, `hold_answer` | a counterspell (`_removal.COUNTERS`, GENERATED from Scryfall: Counterspell, Dovin's Veto, An Offer You Can't Refuse, Muddle the Mixture -- all tivit's) or a protection spell with nothing else modelled is never cast in a main phase. Boros Charm's 4 damage keeps it a main-phase card |
+| real held mana | `response_pay` on all seven engines | a held card is cast on the pod's turn only if what you left untapped pays it -- each engine's own payment; lorehold's is its off-turn float, the pool its own windows spend. The roll and the four lands are gone |
+| the pod's removal and wraths | `respond_to_event`, from `try_protect` | a protection spell that answers the event, else a counterspell: a spot removal only when its target is worth one (`response_threat`, 4.0), artifact removal and wraths always. A countered wrath never resolves -- nobody's creatures die, where phasing out still lets the pod's die |
+| a piece being cast | `respond_to_pieces`, before `resolve_clocks` | by an opponent GOING OFF (its kill fires this round, as the table can see): counter it, or answer it with a held instant. The case only a response reaches |
+| the end of the pod's round | `end_step_answers` | a held instant answer at a piece that is out, with whatever is still untapped |
+| tempo | `response_reserve` | "leftover" (default) spends only what the main phase left; "hold" keeps the cheapest held response castable (`reserve_holds`) |
+
+**No deck runs a flash creature** (a Scryfall pass over every nonland in the
+seven lists), so flash has no consumer and is not built.
+
+### Two things the first measurement caught
+
+1. **A TIMING BUG IN CHANGE 2.** `remove_threat_piece` counted a rebuild from
+   `pod_turn`, the round in progress. A removal at the end of the pod's turn
+   and one in your next main phase both happen before the pod's next turns,
+   but the first came back a round sooner. Invisible until something removed
+   pieces on the pod's turn: responses, and lorehold's opponent-turn miracles
+   under `pod_threats`. Fixed by `next_pod_round` (the pod's round is open
+   from `pod_phase` until your next turn). POD_V4's fit is unmoved: 0.4232
+   against 0.4233.
+2. **THE GREEDY PIECE WINDOW COST SHILGENGAR.** Answering every piece as it
+   landed cost it -0.018 ±0.012 on POD_V4 (-0.0145 after the timing fix,
+   `results/pod_responses_greedy_20261014.txt`): the answer went on the first
+   piece of a route far from firing, and delayed clocks that would have taken
+   out another opponent first. A real pilot keeps instant removal for an
+   opponent going off. `response_pieces="all"` keeps the greedy rule.
+
+### Measured (`diagnostics/run_pod_responses.py`, `results/pod_responses_20261014.txt`)
+
+N=2,000 paired, staged lists, T20; "cards worth" blanks every pure response
+and instant answer TOGETHER (§0z27) with responses on.
+
+| deck | today's pod: responses | POD_V4: responses | POD_V4: "hold" reserve | POD_V4: response cards worth |
+|---|---|---|---|---|
+| tivit | **+0.029 ±0.012** | **+0.020 ±0.012** | **-0.038** | **+0.068 ±0.017** |
+| lorehold | +0.002 | **+0.014 ±0.012** | **-0.025** | **+0.062 ±0.018** |
+| rendmaw | -0.002 | +0.002 | **-0.058** | **+0.057 ±0.016** |
+| karlov | 0.000 | +0.002 | **-0.047** | **+0.057 ±0.016** |
+| shilgengar | -0.001 | -0.009 ±0.010 | **-0.059** | **+0.079 ±0.019** |
+| azusa | 0.000 | 0.000 | **-0.033** | **+0.035 ±0.012** |
+
+Tivit's gain is its counterspells finally being cards: 0.28 of the pod's
+removal spells countered a game. **Holding mana back loses everywhere** --
+§0t's lesson again: the reserve buys responses and pays for them in tempo.
+The default is "leftover", and "hold" is kept to be measured, not used.
+On POD_V4 most of the work is the end of the round (0.06-0.33 answers a
+game); a piece answered as it lands is rare (0.00-0.02), as it should be.
+
+**POD_V4 now carries `pod_responses`.** It moves the six-deck mean about
++0.005, inside the fit's noise; the 2.0 shift was not re-fitted for it.
+
+**OFF is bit-identical** against `d8f650a` (every staged list, seeds
+5000..6999 and again 7000..7399 after the last two fixes, every numeric key).
+
+### Gates
+
+`tests/test_pod_responses.py`: 11 cases, 9 mutations; two sets were too
+narrow on the first run and are corrected as a transcript (§0z14).
+
+**NOT DONE.** A response is not a CAST for your own payoffs (prowess, Sai);
+the pod does not counter your response; An Offer You Can't Refuse's two
+Treasures for the pod are nothing; the pod's counterspells still roll as
+before (`countered`), not against your held mana. Change 4 (selection and
+tutors) is the last of item 24.
 
 ## How to read an ablation table
 

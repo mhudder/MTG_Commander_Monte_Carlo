@@ -85,6 +85,15 @@ RUN_BY = {
     'trostani': ['Acidic Slime', 'Angel of Sanctions', 'Aura Shards', 'Beast Within', "Elspeth, Sun's Champion", 'Path to Exile', 'Selesnya Eulogist', 'Sundering Growth', 'Swords to Plowshares', 'Wrath of God'],
 }
 
+# name -> (what it counters, the clause): spell, noncreature or
+# instant_sorcery (§0z134)
+COUNTERS = {
+    "An Offer You Can't Refuse": ('noncreature', 'counter target noncreature spell.'),
+    'Counterspell': ('spell', 'counter target spell.'),
+    "Dovin's Veto": ('noncreature', 'counter target noncreature spell.'),
+    'Muddle the Mixture': ('instant_sorcery', 'counter target instant or sorcery spell.'),
+}
+
 # every nonland name the census read
 SCANNED = {
     'Abundance',

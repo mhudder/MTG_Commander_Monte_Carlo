@@ -1432,6 +1432,10 @@ KNOWN_BLIND = {
         "An Offer You Can't Refuse", "Path to Exile", "Swords to Plowshares",
         "Counterspell", "Dovin's Veto", "Muddle the Mixture", "Void Rend",
         "Trap the Trespassers",
+        # The four counterspells are cast on the pod's turn under
+        # `pod_responses` (item 24 change 3, §0z134) -- against its removal,
+        # its wraths and its route pieces -- and the answers above under
+        # `pod_threats`. The labels are the DEFAULT pod's, which has neither.
         # (Council's Judgment left for PARTLY_MODELLED on 2026-09-29, §0z78:
         # its vote is cast and the vote payoffs see it.)
         # THE FIVE SWEEPERS LEFT THIS SET ON 2026-09-12. They were grouped

@@ -1,0 +1,69 @@
+(response_pieces="all": every landing piece answered -- the first policy, superseded by "going_off", §0z134)
+pod_responses (item 24, change 3), STAGED lists, N=2000 paired, seeds 5000..6999
+
+rendmaw on today: off won T10 0.0530 T20 0.2625
+   responses, leftover   T10 -0.0010 ±0.0028    T20 -0.0015 ±0.0064 
+   responses, hold       T10 -0.0090 ±0.0054*   T20 -0.0245 ±0.0133*
+   response cards worth  T10 +0.0075 ±0.0045*   T20 +0.0110 ±0.0109*
+   per game (leftover)   protect 0.07  counter_removal 0.00  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+rendmaw on POD_V4: off won T10 0.0925 T20 0.3330
+   responses, leftover   T10 -0.0035 ±0.0040    T20 +0.0010 ±0.0064 
+   responses, hold       T10 -0.0285 ±0.0090*   T20 -0.0620 ±0.0186*
+   response cards worth  T10 +0.0040 ±0.0071    T20 +0.0560 ±0.0159*
+   per game (leftover)   protect 0.05  counter_removal 0.00  counter_piece 0.00  answer_piece 0.10  end_step 0.01
+
+lorehold on today: off won T10 0.2235 T20 0.4600
+   responses, leftover   T10 -0.0010 ±0.0082    T20 +0.0020 ±0.0094 
+   responses, hold       T10 -0.0285 ±0.0130*   T20 -0.0420 ±0.0161*
+   response cards worth  T10 +0.0105 ±0.0111    T20 +0.0235 ±0.0131*
+   per game (leftover)   protect 0.08  counter_removal 0.00  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+lorehold on POD_V4: off won T10 0.2285 T20 0.4375
+   responses, leftover   T10 +0.0030 ±0.0091    T20 +0.0140 ±0.0122*
+   responses, hold       T10 -0.0335 ±0.0137*   T20 -0.0265 ±0.0186*
+   response cards worth  T10 +0.0270 ±0.0132*   T20 +0.0625 ±0.0182*
+   per game (leftover)   protect 0.08  counter_removal 0.00  counter_piece 0.00  answer_piece 0.10  end_step 0.02
+
+karlov on today: off won T10 0.2430 T20 0.5355
+   responses, leftover   T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000 
+   responses, hold       T10 -0.0135 ±0.0081*   T20 -0.0190 ±0.0125*
+   response cards worth  T10 +0.0055 ±0.0045*   T20 +0.0090 ±0.0088*
+   per game (leftover)   protect 0.00  counter_removal 0.00  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+karlov on POD_V4: off won T10 0.2470 T20 0.4890
+   responses, leftover   T10 -0.0010 ±0.0020    T20 +0.0025 ±0.0061 
+   responses, hold       T10 -0.0525 ±0.0121*   T20 -0.0475 ±0.0178*
+   response cards worth  T10 +0.0095 ±0.0074*   T20 +0.0580 ±0.0157*
+   per game (leftover)   protect 0.00  counter_removal 0.00  counter_piece 0.00  answer_piece 0.16  end_step 0.00
+
+tivit on today: off won T10 0.2505 T20 0.4610
+   responses, leftover   T10 +0.0215 ±0.0090*   T20 +0.0290 ±0.0119*
+   responses, hold       T10 -0.0020 ±0.0126    T20 -0.0150 ±0.0170 
+   response cards worth  T10 +0.0230 ±0.0097*   T20 +0.0355 ±0.0136*
+   per game (leftover)   protect 0.00  counter_removal 0.28  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+tivit on POD_V4: off won T10 0.2670 T20 0.4755
+   responses, leftover   T10 +0.0135 ±0.0089*   T20 +0.0245 ±0.0126*
+   responses, hold       T10 -0.0150 ±0.0146*   T20 -0.0250 ±0.0191*
+   response cards worth  T10 +0.0325 ±0.0124*   T20 +0.0720 ±0.0179*
+   per game (leftover)   protect 0.00  counter_removal 0.20  counter_piece 0.16  answer_piece 0.18  end_step 0.03
+
+shilgengar on today: off won T10 0.0155 T20 0.2780
+   responses, leftover   T10 -0.0015 ±0.0017    T20 -0.0005 ±0.0070 
+   responses, hold       T10 -0.0055 ±0.0035*   T20 -0.0425 ±0.0150*
+   response cards worth  T10 +0.0010 ±0.0014    T20 +0.0085 ±0.0098 
+   per game (leftover)   protect 0.12  counter_removal 0.00  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+shilgengar on POD_V4: off won T10 0.0305 T20 0.3195
+   responses, leftover   T10 -0.0010 ±0.0031    T20 -0.0145 ±0.0107*
+   responses, hold       T10 -0.0100 ±0.0057*   T20 -0.0630 ±0.0189*
+   response cards worth  T10 +0.0020 ±0.0046    T20 +0.0735 ±0.0186*
+   per game (leftover)   protect 0.11  counter_removal 0.00  counter_piece 0.00  answer_piece 0.33  end_step 0.03
+
+azusa on today: off won T10 0.2960 T20 0.5425
+   responses, leftover   T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000 
+   responses, hold       T10 -0.0190 ±0.0088*   T20 -0.0180 ±0.0113*
+   response cards worth  T10 +0.0045 ±0.0049    T20 +0.0060 ±0.0069 
+   per game (leftover)   protect 0.00  counter_removal 0.00  counter_piece 0.00  answer_piece 0.00  end_step 0.00
+azusa on POD_V4: off won T10 0.2815 T20 0.4845
+   responses, leftover   T10 +0.0010 ±0.0024    T20 -0.0005 ±0.0038 
+   responses, hold       T10 -0.0400 ±0.0110*   T20 -0.0315 ±0.0142*
+   response cards worth  T10 +0.0130 ±0.0072*   T20 +0.0340 ±0.0114*
+   per game (leftover)   protect 0.00  counter_removal 0.00  counter_piece 0.00  answer_piece 0.06  end_step 0.00
+

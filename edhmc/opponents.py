@@ -421,16 +421,28 @@ def present_pieces(g, o) -> list:
     return [k for k, lands in enumerate(o.piece_lands) if lands < t]
 
 
+def next_pod_round(g) -> int:
+    """The pod round a removal happens BEFORE (§0z134). In your turn that
+    is this turn's round, `pod_turn`; once the pod's round has opened --
+    a response on their turn, or lorehold's windows after it -- it is the
+    next one. Removing a piece at the end of their turn and in your next
+    main phase are the same thing to the pod, and before this both read
+    `pod_turn`, so the first came back a round sooner."""
+    opened = getattr(g, "pod_round_of", None)
+    return pod_turn(g) + (1 if opened is not None and opened == g.turn else 0)
+
+
 def remove_threat_piece(g, o, k) -> int:
     """Piece k of `o` leaves the battlefield. It is replayed `d` rounds on
-    (pre-rolled, 1..`threat_rebuild_max`): d=1 is the pod's very next turns.
+    (pre-rolled, 1..`threat_rebuild_max`): d=1 is the pod's very next turns
+    (`next_pod_round`).
     The kill needs it back for its `lead`, so `kill_turn` becomes at least
     its return plus its lead. Returns the rounds the kill moved (0 when the
     clock was far enough out that the rebuild fits inside it)."""
     pool = o.rebuild_pool
     d = pool[o.next_rebuild % len(pool)]
     o.next_rebuild += 1
-    lands = pod_turn(g) + d - 1
+    lands = next_pod_round(g) + d - 1
     o.piece_lands[k] = lands
     g.m["threat_pieces_removed"] += 1
     moved = max(0, lands + o.pieces[k].lead - o.kill_turn)
@@ -567,7 +579,18 @@ def hold_answer(g, card) -> bool:
     A creature that answers on entering is a body too and is cast as one.
     Off under `pod_threats=False`, so the main phases are untouched there;
     `threat_hold=False` is the naive pilot, which fires on priority: about
-    two thirds of the held pilot's worth (§0z131)."""
+    two thirds of the held pilot's worth (§0z131).
+
+    UNDER `pod_responses` (change 3, §0z134) it also holds every PURE
+    RESPONSE -- a counterspell or a protection spell with nothing else
+    modelled, cast only in a response window -- and, with `response_reserve`
+    "hold", any card whose cost would leave the cheapest held response
+    unpaid (`reserve_holds`)."""
+    if responses_on(g):
+        if pure_response(g, card):
+            return True
+        if reserve_holds(g, card):
+            return True
     if not pod_threats_on(g) or not g.cfg.get("threat_hold", True):
         return False
     if "wipe" in card.tags or not ({"Instant", "Sorcery"} & card.types):
@@ -922,6 +945,8 @@ def try_protect(g, roll: float, event=None, victim=None):
                 and not is_creature_now(g, victim)):
             return None
         return how
+    if responses_on(g):                      # change 3, §0z134
+        return respond_to_event(g, event, victim, answers)
     held = [(c, answers(c)) for c in g.hand]
     held = [(c, how) for c, how in held if how is not None]
     if not held:
@@ -956,6 +981,219 @@ def event_indestructible(g, on: bool):
 
 
 # ---------------------------------------------------------------------------
+# Holding mana up through the pod's turn (item 24, change 3)
+# ---------------------------------------------------------------------------
+# Until this change, an instant was a sorcery: every engine cast it in its
+# main phase or not at all. A counterspell was cast into nothing (tivit's four
+# were bodies), a protection spell was cast into nothing whenever mana was
+# spare -- so it was often gone by the time the pod's wrath came -- and when
+# it was still in hand `try_protect` asked a 60% roll (`hold_up_rate`) and
+# four lands instead of the mana. And a threat piece that lands and wins in
+# one round of the pod's turns (§0z131's lead 0) could not be answered.
+#
+# Under `pod_responses` (OFF):
+#   * PURE RESPONSES are held: never cast in a main phase (`hold_answer`).
+#   * MANA IS REAL: a held card is cast on the pod's turn only if what you
+#     left untapped pays for it -- each engine's own `response_pay`. The
+#     roll and the four lands are gone.
+#   * THREE WINDOWS. The pod's removal and wraths aimed at you
+#     (`respond_to_event`, from `try_protect`): a protection spell, or a
+#     counterspell. A route piece as it is cast (`respond_to_pieces`, before
+#     the clocks): a counterspell that can counter it, or an instant answer
+#     that can hit it. And the end of the pod's round (`end_step_answers`):
+#     a held instant answer at a piece that is out, with what is left.
+#   * TEMPO: `response_reserve`. "leftover" (the default) spends only what
+#     the main phase did not; "hold" keeps the cheapest held response
+#     castable (`reserve_holds`). §0t is why both are measured: a reserve
+#     that casts more of the card it holds for can still lose games.
+#
+# NOT MODELLED, floors: a response is not a CAST for your own payoffs
+# (prowess, Sai, magecraft); the pod does not counter your response; An Offer
+# You Can't Refuse's two Treasures for the pod are nothing (the pod has no
+# mana); no deck runs a flash creature, so flash has no consumer.
+def responses_on(g) -> bool:
+    return bool(g.cfg.get("pod_responses", False))
+
+
+_PURE_FIELDS = ("pod_damage", "drain", "lifegain", "tokens", "treasures",
+                "script", "discards", "miracle_cost")
+
+
+def pure_response(g, card) -> bool:
+    """A card whose ONLY modelled use is a response: a counterspell
+    (`_removal.COUNTERS`, generated), or a protection spell this engine
+    lists with nothing else modelled -- Boros Charm's 4 damage keeps it a
+    main-phase card. Pure responses are never cast in a main phase."""
+    if card.name in _removal.COUNTERS:
+        return True
+    names = g.cfg.get("protection_cards", ("Heroic Intervention",))
+    if card.name not in names or card.name not in PROTECTION:
+        return False
+    return all(not getattr(card, f, None) for f in _PURE_FIELDS)
+
+
+def counter_hits(card_name, spell: str) -> bool:
+    """Can this counterspell counter a spell of this kind? `spell` is
+    "instant_sorcery" (the pod's removal and wraths) or a route piece's
+    permanent type."""
+    what = _removal.COUNTERS.get(card_name, (None,))[0]
+    if what == "spell":
+        return True
+    if what == "noncreature":
+        return spell != "Creature"
+    if what == "instant_sorcery":
+        return spell == "instant_sorcery"
+    return False
+
+
+def _cast_response(g, card, kind) -> bool:
+    """Pay for `card` from held mana and put it in the graveyard (or exile).
+    False, and nothing moves, if the mana is not there."""
+    pay = getattr(g, "response_pay", None)
+    if pay is None or not pay(dict(card.cost)):
+        return False
+    g.hand.remove(card)
+    if not PROTECTION.get(card.name, {}).get("exile"):
+        g.graveyard.append(card)
+    g.m["responses_cast"] += 1
+    g.m[f"responses_{kind}"] += 1
+    return True
+
+
+def _by_cost(cards):
+    return sorted(cards, key=lambda c: (c.mv, c.name))
+
+
+def respond_to_event(g, event, victim, protect_how):
+    """`try_protect` under `pod_responses`: the pod's removal (`event` spot
+    or ae) or wrath is on the stack, aimed at you. A protection spell that
+    answers it, else a counterspell -- a spot removal only when its target
+    is worth one (`response_threat`, 4.0: the pod's own `counter_threshold`),
+    an artifact removal or a wrath always. Cheapest first, a blank before an
+    indestructible grant. Paid from held mana; None if nothing could be.
+    A counterspell returns "countered", not "blank": a countered wrath never
+    resolves, where a phased-out board only saves yours."""
+    shield = [(c, protect_how(c)) for c in g.hand]
+    shield = [(c, how) for c, how in shield if how is not None]
+    for c, how in sorted(shield, key=lambda ch: (ch[1] != "blank", ch[0].mv)):
+        if _cast_response(g, c, "protect"):
+            g.m["protected"] += 1
+            if how == "indestructible":
+                g.m["protected_indestructible"] += 1
+            return how
+    if (event == "spot" and victim is not None
+            and threat_of(g, victim) < g.cfg.get("response_threat", 4.0)):
+        return None
+    for c in _by_cost(c for c in g.hand
+                      if counter_hits(c.name, "instant_sorcery")):
+        if _cast_response(g, c, "counter_removal"):
+            g.m["protected"] += 1
+            return "countered"
+    return None
+
+
+def respond_to_pieces(g) -> int:
+    """A route piece is being cast on the pod's turn (it lands this pod
+    turn) BY AN OPPONENT WHO IS GOING OFF -- whose kill fires this round, as
+    the table can see -- so counter it, or answer it with a held instant once
+    it resolves, before `resolve_clocks`. This is the case only a response
+    can reach: a piece that lands and wins in one round (lead 0). Cheapest
+    response first.
+
+    ONLY THEN (§0z134). The first version answered every landing piece, and
+    on POD_V4 it cost shilgengar 0.015 at T20: the answer went on the first
+    piece of a route far from firing -- and delayed clocks that would have
+    taken out another opponent first -- instead of on the one that mattered.
+    A piece that is not about to win is left to your main phase and the end
+    of the round (`end_step_answers`), which aim as `answer_target` aims.
+    `response_pieces="all"` is the greedy version."""
+    if not (responses_on(g) and pod_threats_on(g)) or g.result is not None:
+        return 0
+    t, n = pod_turn(g), 0
+    greedy = g.cfg.get("response_pieces", "going_off") == "all"
+    for o in living(g):
+        if not greedy and o.kill_turn > t:
+            continue
+        for k, lands in enumerate(o.piece_lands):
+            if lands != t:
+                continue
+            piece = o.pieces[k]
+            options = [c for c in g.hand
+                       if counter_hits(c.name, piece.type)
+                       or ("Instant" in c.types and c.name in ANSWERS
+                           and hits(ANSWERS[c.name], piece))]
+            for c in _by_cost(options):
+                kind = ("counter_piece" if c.name in _removal.COUNTERS
+                        else "answer_piece")
+                if _cast_response(g, c, kind):
+                    remove_threat_piece(g, o, k)
+                    n += 1
+                    break
+    return n
+
+
+def end_step_answers(g) -> int:
+    """At the end of the pod's round, a held instant answer is cast at a
+    piece that is out, with whatever mana is still untapped -- the mana a
+    sorcery-speed pilot would have wasted. Aimed as `answer_target` aims."""
+    if not (responses_on(g) and pod_threats_on(g)) or g.result is not None:
+        return 0
+    n = 0
+    for c in _by_cost([c for c in g.hand if "Instant" in c.types
+                       and c.name in ANSWERS and "wipe" not in c.tags]):
+        reach = ANSWERS[c.name]
+        # present_pieces reads "landed on an EARLIER pod turn"; at the end
+        # of the round a piece that landed this turn is out as well.
+        targets = [(o, k) for o in living(g)
+                   for k, lands in enumerate(o.piece_lands)
+                   if lands <= pod_turn(g) and hits(reach, o.pieces[k])]
+        if not targets or not _cast_response(g, c, "end_step"):
+            continue
+        done = 0
+        for _ in range(reach.n):
+            pick = max(((o, k) for o, k in targets
+                        if o.piece_lands[k] <= pod_turn(g)),
+                       key=lambda ok: (sum(1 for x in ok[0].piece_lands
+                                           if x <= pod_turn(g)),
+                                       ok[0].bracket), default=None)
+            if pick is None:
+                break
+            remove_threat_piece(g, *pick)
+            done += 1
+        n += done
+    return n
+
+
+def _add_costs(a, b):
+    out = dict(a)
+    for k, v in b.items():
+        out[k] = out.get(k, 0) + v
+    return out
+
+
+def reserve_holds(g, card) -> bool:
+    """`response_reserve="hold"`: the pilot will not cast `card` if paying
+    for it would leave the cheapest held response unpaid -- the tempo a
+    counterspell really costs. Not when that response could not be paid
+    anyway, so a reserve never holds for nothing. "leftover" (the default)
+    never holds. The card's printed cost, before any reduction: a floor on
+    what the main phase can afford beside the reserve."""
+    if g.cfg.get("response_reserve", "leftover") != "hold" or card.is_land:
+        return False
+    pay = getattr(g, "response_pay", None)
+    if pay is None:
+        return False
+    held = [c for c in g.hand if c is not card and (
+        pure_response(g, c) or ("Instant" in c.types and c.name in ANSWERS))]
+    if not held:
+        return False
+    keep = _by_cost(held)[0]
+    if not pay(dict(keep.cost), dry=True, now=True):
+        return False
+    return not pay(_add_costs(card.cost, keep.cost), dry=True, now=True)
+
+
+# ---------------------------------------------------------------------------
 # Interaction events
 # ---------------------------------------------------------------------------
 
@@ -974,7 +1212,7 @@ def spot_removal(g, opp, others, rolls):
     if mother_protects(g, victim):        # her {T}, §0z118
         return
     how = try_protect(g, rolls[5], "spot", victim)
-    if how == "blank":
+    if how in ("blank", "countered"):
         return
     # Optional protocol hook (§0z77): the pod's spot removal is a spell, and
     # "becomes the target of a spell" is a trigger condition -- Goldspan
@@ -1001,7 +1239,7 @@ def ae_removal(g, opp, others, rolls):
     if not targets:
         return
     how = try_protect(g, rolls[5], "ae")
-    if how == "blank":
+    if how in ("blank", "countered"):
         return
     sweeper = (opp.bracket >= 3 and rolls[4] < 0.20)
     with event_indestructible(g, how == "indestructible"):
@@ -1024,6 +1262,11 @@ def board_wipe(g, opp, rolls):
     if rolls[2] >= opp.p["wipe"] * width_mult:
         return
     how = try_protect(g, rolls[5], "wipe")
+    if how == "countered":
+        # A COUNTERED wrath never resolves (§0z134): unlike phasing out
+        # (below), nobody's creatures die, the pod's included.
+        g.m["wipes_countered"] += 1
+        return
     if how == "blank":
         if g.cfg.get("protect_events", True):
             # Phasing out (Teferi's Protection, Perch Protection) saves YOUR
@@ -2712,8 +2955,10 @@ def pod_phase(g, before_act=None):
     The `watch` accounting -- was the card under test removed this round --
     is the same in every engine and lives here for that reason.
     """
+    g.pod_round_of = g.turn            # the pod's round is open, §0z134
     monarch_end_step(g)
     incidental_damage(g)
+    respond_to_pieces(g)               # change 3: before a kill can fire
     resolve_clocks(g)
     if g.result is not None:
         return
@@ -2722,6 +2967,7 @@ def pod_phase(g, before_act=None):
     watch = g.cfg.get("watch", ())
     before = {p.card.name for p in g.board if p.card.name in watch}
     opponents_act(g)
+    end_step_answers(g)                # change 3: what was held, at the end
     after = {p.card.name for p in g.board if p.card.name in watch}
     for _ in before - after:
         g.m["test_card_answered"] += 1

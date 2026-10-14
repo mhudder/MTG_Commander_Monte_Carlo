@@ -228,6 +228,16 @@ class ShilgengarGame(BaseGame):
 
     # -- helpers ---------------------------------------------------------
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        if dry:
+            pool = (available_mana(self)
+                    + [self.ANY] * self.spendable_treasures())
+            return can_pay(cost, pool) is not None
+        return self.pay(cost)
+
     def is_angel(self, perm):
         return "angel" in perm.card.tags
 

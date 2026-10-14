@@ -147,6 +147,14 @@ class TivitGame(BaseGame):
     # and every number in that batch had to be restated.
     URZA_CONSTRUCT = "Construct token"
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        if dry:
+            return can_pay(cost, mana_units(self)) is not None
+        return pay(self, cost)
+
     def power_of(self, perm):
         if perm.card.name == self.URZA_CONSTRUCT:
             return perm.card.power + perm.counters + self.artifact_count()

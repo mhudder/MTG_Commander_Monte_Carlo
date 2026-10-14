@@ -69,6 +69,27 @@ class LoreholdGame(BaseGame):
             self.m["treasures_made"] += 1
             self.m["goldspan_target_treasures"] += 1
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        # Lorehold's off-turn mana is the FLOAT its own windows spend from,
+        # and this pays the way they do (`miracle_window`'s off-turn branch):
+        # float first, then Treasures, each unit any of R, W or C.
+        if now:                    # in YOUR main phase: the live pool
+            return can_pay(cost, mana_units(self)) is not None
+        units = [frozenset({"R", "W", "C"})] * (self.float_mana + self.treasures)
+        if can_pay(cost, units) is None:
+            return False
+        if dry:
+            return True
+        need = sum(cost.values())
+        from_float = min(need, self.float_mana)
+        self.float_mana -= from_float
+        self.treasures -= (need - from_float)
+        self.m["mana_spent"] += need
+        return True
+
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
         # engine's defaults, and doing that to the CALLER'S dict let the

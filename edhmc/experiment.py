@@ -158,9 +158,10 @@ POD_V2 = {
 # average difficulty — see opponents.ARCHETYPES.
 POD_V3 = dict(POD_V2, archetypes=True)
 
-# POD_V4 -- A CANDIDATE, NOT THE DEFAULT (§0z130, §0z131, §0z132). Item 24's
-# changes 1 and 2: the pod's creatures as bodies that die (and block only when
-# it matters), and its kills as routes your answers can delay -- with the kill
+# POD_V4 -- A CANDIDATE, NOT THE DEFAULT (§0z130, §0z131, §0z132, §0z134).
+# Item 24's changes 1-3: the pod's creatures as bodies that die (and block only
+# when it matters), its kills as routes your answers can delay, and your
+# instants cast on its turn from the mana you held -- with the kill
 # timing re-fitted so the mean T20 win rate over the active decks equals this
 # pod's (`diagnostics/fit_threat_clock.py`, the owner's target, 2026-10-13):
 # 1.89 rounds earlier on the pod as §0z132 found it, 1.97 once §0z133 stopped
@@ -170,6 +171,10 @@ POD_V4 = {
     "pod_bodies": True,
     "pod_threats": True,
     "threat_clock_shift": 2.0,
+    # Change 3 (§0z134): instants cast on the pod's turn from held mana. It
+    # moves the six-deck mean about +0.005 at T20, inside the fit's own
+    # noise, so the shift above was not re-fitted for it.
+    "pod_responses": True,
 }
 
 # The pod as it stood before 2026-09-04, kept so any earlier number in the

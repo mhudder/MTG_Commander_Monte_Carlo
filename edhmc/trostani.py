@@ -310,6 +310,12 @@ class TrostaniGame(BaseGame):
 
     # -- characteristics ------------------------------------------------------
 
+    def response_pay(self, cost, dry=False, now=False) -> bool:
+        """Pay `cost` with the mana you held up through the pod's turn
+        (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
+        whether it could be paid. ONLY called under `pod_responses`."""
+        return self.can_afford(cost) if dry else self.pay(cost)
+
     def creatures(self):
         return [p for p in self.board if OPP.is_creature_now(self, p)]
 
