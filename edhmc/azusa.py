@@ -129,7 +129,8 @@ from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finis
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng)
+                          crn_shuffle, make_rng, seal_rng,
+                          tutor_take, sylvan_library, abundance_draw)
 from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
@@ -1734,6 +1735,76 @@ class AzusaGame(BaseGame):
         self.shuffle_library()
         self.land_entered(forest, played=False)
 
+    # -- item 24 change 4: the shared want order's azusa inputs --------------
+
+    def lands_wanted(self, lands_in_hand):
+        """A land is wanted while the hand holds fewer than this turn's land
+        drops: Azusa plays three, and every land is a landfall trigger, so
+        the shared default (one land, a cap of seven) would understate it."""
+        return lands_in_hand < self.land_drops_for_turn()
+
+    def land_rank(self, card):
+        """Which land a search takes: a FETCH first (two landfall triggers
+        and a land in the graveyard for one drop, §0z113's measured pair),
+        then one that makes GREEN, then one that enters untapped. DERIVED
+        from the card, not a name list. Blind to the utility lands' own
+        abilities -- Eye of Ugin's search, Nykthos's devotion mana -- which a
+        pilot might fetch first: a floor on both search cards."""
+        return (2.0 * (card.script in FETCH_SCRIPTS)
+                + 1.0 * ("G" in card.produces)
+                + 0.5 * (not card.tapped))
+
+    def draw(self, n=1):
+        """ABUNDANCE replaces every draw while it is out (`engine.
+        abundance_draw`); otherwise the shared draw."""
+        if not self.has("Abundance"):
+            return super().draw(n)
+        for _ in range(int(n)):
+            abundance_draw(self)
+
+    def sylvan_scrying(self):
+        """SYLVAN SCRYING (item 24 change 4; was KNOWN_BLIND), verified
+        against Scryfall 2026-10-14: "Search your library for a land card,
+        reveal it, put it into your hand, then shuffle." The land is
+        `land_rank`'s."""
+        pick = tutor_take(self, [c for c in self.library if c.is_land],
+                          "sylvan_scrying")
+        if pick is not None:
+            self.hand.append(pick)
+
+    def crop_rotation(self):
+        """CROP ROTATION (item 24 change 4; was KNOWN_BLIND), verified
+        against Scryfall 2026-10-14: "As an additional cost to cast this
+        spell, sacrifice a land. Search your library for a land card, put
+        that card onto the battlefield, then shuffle."
+
+        THE SACRIFICE is the land a pilot misses least: a TAPPED one (its mana
+        is already spent -- the {G} may come from the land itself), then the
+        lowest `land_rank`. It dies as a land (`land_died`: the graveyard,
+        Titania). THE FIND is `land_rank`'s, onto the battlefield untapped
+        unless it enters tapped; it is a landfall trigger, and a fetch found
+        this way is cracked at once, as `land_step` cracks a played one.
+        Taken at resolution, not as the cost -- a countered Crop Rotation
+        here keeps its land (a pod counter is rare). The removal half
+        (Strip Mine, Dust Bowl) is blind (§4)."""
+        lands = [p for p in self.board if p.card.is_land
+                 and not p.is_token]
+        if not lands:
+            return
+        sac = min(lands, key=lambda p: (not p.tapped, p.card.is_creature,
+                                        self.land_rank(p.card)))
+        self.board.remove(sac)
+        self.land_died(sac.card)
+        self.m["crop_rotation_sacrificed"] += 1
+        pick = tutor_take(self, [c for c in self.library if c.is_land],
+                          "crop_rotation")
+        if pick is None:
+            return
+        self.make_permanent(pick, sick=False, tapped=bool(pick.tapped))
+        self.land_entered(pick, played=False)
+        if pick.script in FETCH_SCRIPTS:
+            self.crack_fetch(pick)
+
     def land_drops_for_turn(self):
         n = 1
         if self.commander_cast:
@@ -2154,6 +2225,10 @@ class AzusaGame(BaseGame):
             self.awaken_the_woods(card.x_pips)
         elif script == "archdruid_charm":
             self.archdruids_charm()
+        elif card.name == "Sylvan Scrying":
+            self.sylvan_scrying()
+        elif card.name == "Crop Rotation":
+            self.crop_rotation()
 
         if not card.is_permanent:
             if (script == "green_sun"
@@ -3800,7 +3875,11 @@ def take_turn(g):
     # where the pod's round is, at the bottom of this function.
     g.verdant_kraken_tokens(1)
 
+    before = len(g.hand)
     g.draw(1)
+    # SYLVAN LIBRARY (item 24 change 4; was KNOWN_BLIND): the draw step's
+    # two more, the shared rule. No-ops without the card.
+    sylvan_library(g, before)
     # ENABLERS BEFORE DROPS. Azusa's own +2, Exploration, Oracle, and every
     # landfall payoff have to be on the battlefield before the land drops are
     # spent, or they contribute nothing on the turn they arrive.

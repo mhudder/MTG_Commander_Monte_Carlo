@@ -179,7 +179,15 @@ What is closed and where it went:
       It charges a counterspell its real cost: tempo.
     - **4. A shared "which card do I want next"** for selection and tutors
       (Sylvan Library, Sensei's Divining Top, Abundance, Enlightened Tutor,
-      Gamble, Sylvan Scrying, Crop Rotation). Your side only.
+      Gamble, Sylvan Scrying, Crop Rotation). Your side only. **BUILT
+      (§0z139)**: `engine.want_key` (an engine's tier, a land while short,
+      castable next turn, then priority) and its primitives; all seven live
+      (Sylvan Library and Abundance SCRIPTED, five PARTLY_MODELLED). The
+      owner, 2026-10-14: blind cards only; Top {1} once a turn, and
+      lorehold's Top costs {1} too. Karlov, lorehold and azusa moved; all
+      three are in the POD_V4 rebuild already. Measured: karlov's
+      Enlightened Tutor +0.024 ±0.009 at T20 (the combo half on top),
+      Sylvan Library +0.011, the rest a few tenths or nothing.
 
     Not proposed: opponent hands and graveyards (Rhystic Study is a social
     knob however it is built). **Changes 1-3 touch `opponents.py`, which is

@@ -569,6 +569,14 @@ SCRIPTED_SHILGENGAR = {
 # to a note that does not exist is worse than no note, because it stops the
 # next reader looking. The call-out now exists, in DYNAMIC_PT_LANDS.)
 SCRIPTED_AZUSA = {
+    # Item 24's change 4 (§0z139), both every clause: SYLVAN LIBRARY draws
+    # two more in the draw step and keeps the better of the two least wanted
+    # for 4 life while life stays at `library_life_floor` (20), the rest back
+    # on top (`engine.sylvan_library`); ABUNDANCE replaces every draw with a
+    # land or a nonland, the want order's choice, and saves you from an
+    # empty library (`engine.abundance_draw`). Both pick by the shared want
+    # order, a pilot's judgement said in engine.py.
+    "Sylvan Library", "Abundance",
     # Quirion Ranger (item 24, 2026-10-13): "Return a Forest you control to
     # its owner's hand" is the card here -- the Forest is replayed with a
     # spare land drop (`AzusaGame.quirion_ranger_bounce`), a tapped one
@@ -791,6 +799,19 @@ PARTLY_MODELLED = {
             "cast this turn does not swing. A floor.",
     },
     "karlov": {
+        # Item 24's change 4 (§0z139).
+        "Sensei's Divining Top":
+            "MODELLED: '{1}: look at the top three, put them back in any "
+            "order' ONCE A TURN before the draw (the owner's policy), paid from "
+            "mana left up through the pod's turn or else in the upkeep, in the "
+            "shared want order (the missing combo half first). NOT: '{T}: "
+            "draw a card, then put this on top', and no second spin after a "
+            "shuffle. A floor.",
+        "Enlightened Tutor":
+            "MODELLED: an artifact or enchantment put on top, the shared want "
+            "order's pick -- the missing half of the Exquisite Blood loop "
+            "first, else priority. NOT: the answer a pilot fetches for the "
+            "TABLE, whose permanents are a count (§4). A floor.",
         "Umezawa's Jitte":
             "MODELLED (item 24): equip {2} at the end of the first main "
             "phase, two charge counters whenever the holder attacks (it "
@@ -889,6 +910,18 @@ PARTLY_MODELLED = {
             "graveyard to your hand'. A floor.",
     },
     "azusa": {
+        # Item 24's change 4 (§0z139).
+        "Sylvan Scrying":
+            "MODELLED: a land to hand, `AzusaGame.land_rank`'s: a fetch, then "
+            "green, then untapped. NOT: the utility lands' own abilities as a "
+            "reason to fetch them (Eye of Ugin's search, Nykthos's mana), or "
+            "Strip Mine / Wasteland for the pod's lands (§4). A floor.",
+        "Crop Rotation":
+            "MODELLED: a tapped land sacrificed (a land death: the graveyard, "
+            "Titania) for `land_rank`'s land onto the battlefield, a fetch "
+            "cracked at once -- two or three landfall triggers for {G}. NOT: "
+            "fetching a utility land for its ability, or a land that answers "
+            "the table (§4); the sacrifice is taken at resolution. A floor.",
         "Storm Cauldron":
             "MODELLED (§0z135): your extra land drop, and every land tapped "
             "for mana returning to hand to be replayed by the drops left -- "
@@ -975,6 +1008,13 @@ PARTLY_MODELLED = {
             "(§4). A floor.",
     },
     "lorehold": {
+        # Item 24's change 4 (§0z139).
+        "Gamble":
+            "MODELLED: any card to hand by the shared want order, then a "
+            "random discard among the whole hand (the card found included) "
+            "that fires the discard triggers; cast holding `gamble_min_hand` "
+            "(2) other cards. NOT: the answer a pilot fetches for the TABLE "
+            "(§4), or a miracle target set up for the next window. A floor.",
         # The owner's second batch, 2026-10-09.
         "Furygale Flocking":
             "MODELLED: {1} less per instant and sorcery in the graveyard, on "
@@ -1414,7 +1454,7 @@ KNOWN_BLIND = {
         'Bolt Bend',
         'Call Forth the Tempest',
         'Chaos Warp',
-        'Gamble',
+        # (Gamble left 2026-10-14 for PARTLY_MODELLED, item 24's change 4.)
         'Generous Gift',
         'Hexing Squelcher',
         'Path to Exile',
@@ -1426,12 +1466,12 @@ KNOWN_BLIND = {
     },
     "karlov": {
         'Anguished Unmaking',
-        'Enlightened Tutor',
         'Fracture',
         'Path to Exile',
         'Return to Dust',
-        "Sensei's Divining Top",
         'Swords to Plowshares',
+        # (Enlightened Tutor and Sensei's Divining Top left 2026-10-14 for
+        # PARTLY_MODELLED, item 24's change 4.)
         # (Sun Titan, Soulmender, Phyrexian Reclamation and Umezawa's Jitte
         # left on 2026-10-13: implemented, item 24's change 0.)
     },
@@ -1482,7 +1522,10 @@ KNOWN_BLIND = {
         # removal / land destruction aimed at opponents -- this project
         # tracks no opponent land or permanent objects at all, only an
         # aggregate creature count and a life total
-        "Terastodon", "Beast Within", "Krosan Grip", "Crop Rotation",
+        "Terastodon", "Beast Within", "Krosan Grip",
+        # (Crop Rotation left 2026-10-14 for PARTLY_MODELLED, item 24's
+        # change 4: its land search is modelled, its land-destruction
+        # targets are not.)
         # (Nissa, Worldwaker was here, on the grounds that nothing in this
         # project tracks planeswalker loyalty. It does now -- see
         # PLANESWALKERS in edhmc/azusa.py -- so she is SCRIPTED as of
@@ -1491,9 +1534,9 @@ KNOWN_BLIND = {
         # neither of which this model tracks at that granularity
         "Mind's Eye", "Memory Jar",
         # (Storm Cauldron left 2026-10-14 for PARTLY_MODELLED, §0z135.)
-        # modelled as the non-greedy "reveal 3, keep 1, pay no life" line,
-        # which is close to a real blank in this engine
-        "Sylvan Library",
+        # (Sylvan Library left 2026-10-14 for SCRIPTED, item 24's change 4.
+        # Its old reason -- "modelled as reveal 3, keep 1, pay no life" --
+        # described no code in this engine.)
         # symmetric mana-color-lock with no clear implementation path in an
         # abstracted mana model, and situational even in paper play. ITEM 24
         # (2026-10-13) looked again: on YOUR side it is close to nothing in a
@@ -1506,14 +1549,14 @@ KNOWN_BLIND = {
         # about automating (see "the greedy policy is the largest source of
         # model error")
         "Greater Good",
-        # replaces every draw() call across the engine with a choice; too
-        # much retrofitting for the many independent draw sources in this list
-        "Abundance",
+        # (Abundance left 2026-10-14 for SCRIPTED, item 24's change 4. Its
+        # reason -- "replaces every draw() call ... too much retrofitting" --
+        # was a claim with a date on it (§0z13): every draw has gone through
+        # one `draw` since §0z32, so one override replaces them all.)
         # (Quirion Ranger left 2026-10-13: its COST is the payoff -- a
         # Forest back to hand is a spare land drop replayed, item 24.)
-        # a plain land tutor to hand with no clear "best" target among 19
-        # distinct utility lands
-        "Sylvan Scrying",
+        # (Sylvan Scrying left 2026-10-14 for PARTLY_MODELLED, item 24's
+        # change 4: `AzusaGame.land_rank` is the "best" target.)
         # (Oblivion Stone was here, a fate-counter wipe the engine never
         # played; the owner cut it for Ancient Greenwarden, 2026-09-30, §0z88.)
     },

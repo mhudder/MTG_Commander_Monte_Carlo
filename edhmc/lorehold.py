@@ -33,7 +33,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng)
+                          crn_shuffle, make_rng, seal_rng, tutor_take)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
 
@@ -136,6 +136,10 @@ class LoreholdGame(BaseGame):
         self.monument_used = set()
         self.last_paid = 0
         self.tutor_log = []
+        # Sensei's Divining Top (item 24 change 4): the ids of the top three
+        # as the pilot last ordered them, so a spin is not paid again for
+        # cards already in the pilot's order.
+        self.top_known = ()
         self.made_token_this_turn = False
         self.beast_active = False
         # Rebound (702.88a): cards cast from hand and exiled, each cast free
@@ -685,13 +689,49 @@ def set_top(g, pool=None, upkeep_free=False):
     return None
 
 
-def sort_top_three(g):
-    """Sensei's Divining Top: rearrange the top three, best miracle on top."""
+def sort_top_three(g, off_turn=False):
+    """Sensei's Divining Top: "{1}: Look at the top three cards of your
+    library, then put them back in any order." Best miracle on top.
+
+    IT COSTS {1} SINCE ITEM 24's CHANGE 4 (the owner, 2026-10-14: "also
+    change lorehold so it costs 1 as well"). It was free, every window.
+    Now a spin is paid -- from `float_mana` off your turn (never a Treasure:
+    those pay the miracle), from `float_mana` or the board on your turn, as
+    `set_top` pays its activations -- and only when the window could still
+    pay a miracle after it (`1 + miracle_need`), since the order is a
+    miracle order. A spin is SKIPPED, unpaid, when the top three are the
+    cards the pilot already ordered (`top_known`): you know them. The {T}
+    draw ability is not modelled (a floor). `lorehold_top_cost=0` restores
+    the free sort exactly."""
     if not g.has("Sensei's Divining Top") or len(g.library) < 3:
         return
+    cost = g.cfg.get("lorehold_top_cost", 1)
+    if cost:
+        known = tuple(id(c) for c in g.library[-3:])
+        if known == g.top_known:
+            return
+        need = cost + miracle_need(g)
+        if off_turn:
+            if g.float_mana < cost or g.float_mana + g.treasures < need:
+                g.m["top_unpaid"] += 1
+                return
+            g.float_mana -= cost
+        else:
+            units = mana_units(g)
+            if g.float_mana + len(units) < need:
+                g.m["top_unpaid"] += 1
+                return
+            if g.float_mana >= cost:
+                g.float_mana -= cost
+            elif pay(g, {"gen": cost}, units) is None:
+                g.m["top_unpaid"] += 1
+                return
+        g.m["top_spins"] += 1
     top3 = [g.library.pop() for _ in range(3)]
     top3.sort(key=lambda c: miracle_value(g, c))     # best ends up last = on top
     g.library.extend(top3)
+    if cost:
+        g.top_known = tuple(id(c) for c in g.library[-3:])
 
 
 def verge_rangers_filter(g):
@@ -726,7 +766,7 @@ def miracle_window(g, off_turn=False):
     Returns (card_drawn, was_miracled) so callers can trace whether the card
     they deliberately put on top is the one that got cast.
     """
-    sort_top_three(g)
+    sort_top_three(g, off_turn=off_turn)
     verge_rangers_filter(g)
     card = g.draw_card()
     if card is None:
@@ -839,6 +879,13 @@ def pilot_may_cast(g, card) -> bool:
     if card.script == "profound_journey" and reanimation_target(g) is None:
         return False
     if card.script == "seminar" and seminar_target(g) is None:
+        return False
+    # GAMBLE's discard is at random among the hand, the card it finds
+    # included: with no other card it discards the card it found. The pilot
+    # casts it holding `gamble_min_hand` (2) others -- a judgement; the found
+    # card is then lost at most one time in three (item 24 change 4).
+    if card.name == "Gamble" and sum(
+            1 for c in g.hand if c is not card) < g.cfg.get("gamble_min_hand", 2):
         return False
     n = spell_draws(g, card)
     return n == 0 or draw_is_safe(g, n)
@@ -1218,10 +1265,38 @@ def discard_cards(g, n) -> int:
     return done
 
 
+def gamble(g) -> None:
+    """GAMBLE (item 24 change 4; was KNOWN_BLIND), verified against Scryfall
+    2026-10-14: "Search your library for a card, put that card into your
+    hand, discard a card at random, then shuffle."
+
+    The card is the shared want order's (`engine.tutor_take`) -- NOT
+    lorehold's miracle value, which orders the TOP of the library; this one
+    goes to hand. The discard is random among the whole hand, the card just
+    found included, on its own CRN stream, and it fires the discard
+    triggers (Monument to Endurance) like any other. The shuffle is taken
+    with the search: nothing here reads the order between the two. Copies
+    search too. The pilot casts it only with `gamble_min_hand` other cards
+    in hand (`pilot_may_cast`)."""
+    pick = tutor_take(g, list(g.library), "gamble")
+    if pick is not None:
+        g.hand.append(pick)
+    if not g.hand:
+        return
+    lost = g.hand.pop(crn_randrange(g, "gamble_discard", len(g.hand)))
+    g.graveyard.append(lost)
+    discard_triggers(g, 1)
+    g.m["spell_discards"] += 1
+    if lost is pick:
+        g.m["gamble_lost_pick"] += 1
+
+
 def apply_spell_effects(g, card, is_copy=False, was_cast=True,
                         from_hand=False):
     """The on-resolution half of a spell: damage, tokens, treasures, draw."""
     sc = card.script
+    if card.name == "Gamble":
+        gamble(g)
     if sc in ("treasures", "draw2_treasure"):
         g.treasures += card.treasures
         g.m["treasures_made"] += card.treasures

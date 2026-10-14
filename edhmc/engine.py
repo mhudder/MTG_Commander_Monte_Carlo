@@ -1215,6 +1215,23 @@ class BaseGame:
     # built and pinned FIRST and the cards come to a tested mechanism.
     monarch = False
 
+    # ITEM 24 CHANGE 4: an engine's two inputs to the shared want order
+    # (`engine.want_key`). An engine overrides these; it never writes its own
+    # order.
+    def want_tier(self, card) -> int:
+        """> 0 for a card that completes what the deck is built around."""
+        return 0
+
+    def lands_wanted(self, lands_in_hand: int):
+        """True/False if this engine knows whether a land is wanted; None
+        for the shared default (`engine.lands_short`)."""
+        return None
+
+    def land_rank(self, card) -> float:
+        """Which land, among lands: larger is wanted more. 0 everywhere a
+        deck has not said -- the first land found then wins."""
+        return 0.0
+
     def has(self, name: str) -> bool:
         return name in self.board.names
 
@@ -3806,6 +3823,224 @@ def sun_titan_pick(graveyard, exclude=()) -> Optional[Card]:
     if not pool:
         return None
     return max(pool, key=lambda c: (not c.is_land, c.priority, c.mv))
+
+
+# ----------------------------------------------------------------------------
+# WHICH CARD DO I WANT NEXT (item 24's change 4)
+# ----------------------------------------------------------------------------
+#
+# One answer for every selection and tutor effect, so a fourth engine does not
+# write a fourth rule (§0u; trostani's `tutor_pick`, lorehold's tutor orders
+# and karlov's Ranger picks each said it their own way). It is a PILOT'S
+# ordering, a judgement, and it is said out loud here once:
+#
+#   1. the engine's own TIER (`BaseGame.want_tier`): a card that completes
+#      something the deck is built around -- karlov's missing combo half.
+#      0 everywhere else, so the rest of the order decides.
+#   2. a LAND while the pilot is short of one (`BaseGame.lands_wanted`): no
+#      land in hand and fewer than `want_land_target` (7) on the battlefield.
+#   3. a spell castable next turn (mana value <= `mana_next_turn`), then
+#   4. one that is not, then
+#   5. a land the pilot is NOT short of -- the flood draw, last.
+#   Within a band: the deck's own `priority`, then mana value -- trostani's
+#   `tutor_pick` order, which is the deck's statement of what matters most.
+#   Among lands, the engine's `BaseGame.land_rank`.
+#
+# What it does NOT know: the table (§4: the pod's permanents are a count, so
+# a tutor for an answer is blind) and colours (a mono-colour list does not
+# care; a two-colour one is understated). Lorehold's miracle value and
+# trostani's own rules are NOT routed here: the owner, 2026-10-14, "blind
+# cards only".
+
+def lands_on_battlefield(g) -> int:
+    return sum(1 for p in g.board if p.card.is_land)
+
+
+def lands_short(g, lands_in_hand: int) -> bool:
+    """Is a land the card the pilot wants? The engine's own answer when it has
+    one (`lands_wanted`), else: none in hand and fewer than
+    `want_land_target` on the battlefield (7, a judgement: no list here
+    curves past seven mana from lands)."""
+    hook = getattr(g, "lands_wanted", None)
+    if hook is not None:
+        ans = hook(lands_in_hand)
+        if ans is not None:
+            return ans
+    return (lands_in_hand == 0
+            and lands_on_battlefield(g) < g.cfg.get("want_land_target", 7))
+
+
+def mana_next_turn(g, lands_in_hand: int) -> int:
+    """A pilot's estimate of next turn's mana: every mana-producing permanent
+    once, plus a land drop if a land is in hand. Not the engine's payment
+    model -- a ranking key only, so a fixed-cost estimate is enough."""
+    n = 0
+    for p in g.board:
+        c = p.card
+        if c.is_land:
+            n += 1 if c.produces else 0
+        elif c.mana_ability:
+            n += int(c.mana_ability[0])
+    return n + (1 if lands_in_hand else 0)
+
+
+def want_key(g, card, lands_in_hand: int, mana: int) -> tuple:
+    """The sort key: larger is wanted more. See the block comment above."""
+    hook = getattr(g, "want_tier", None)
+    tier = hook(card) if hook is not None else 0
+    if card.is_land:
+        rank = g.land_rank(card) if hasattr(g, "land_rank") else 0.0
+        return (tier, 3 if lands_short(g, lands_in_hand) else 0, rank, 0)
+    return (tier, 2 if card.mv <= mana else 1, card.priority, card.mv)
+
+
+def want_order(g, cards) -> list:
+    """`cards` best first, as a pilot would take them one at a time: after
+    each land taken, the next land is wanted less. The hand counts toward
+    the land need EXCEPT the cards being ranked, so cards already drawn this
+    turn (Sylvan Library) are not counted twice."""
+    rest = list(cards)
+    lands = sum(1 for c in g.hand if c.is_land
+                and not any(c is x for x in rest))
+    out = []
+    while rest:
+        mana = mana_next_turn(g, lands)
+        best = max(rest, key=lambda c: want_key(g, c, lands, mana))
+        out.append(best)
+        rest = [c for c in rest if c is not best]
+        if best.is_land:
+            lands += 1
+    return out
+
+
+def want_best(g, pool):
+    """The single card a tutor takes from `pool`, or None."""
+    if not pool:
+        return None
+    lands = sum(1 for c in g.hand if c.is_land)
+    mana = mana_next_turn(g, lands)
+    return max(pool, key=lambda c: want_key(g, c, lands, mana))
+
+
+def stack_top(g, n: int) -> list:
+    """Look at the top `n` cards and put them back in the order a pilot wants
+    to draw them, the best on top. Returns that order, best first. The
+    library's top is its END (`draw` pops it)."""
+    k = min(n, len(g.library))
+    if k <= 0:
+        return []
+    top = g.library[-k:]
+    del g.library[-k:]
+    order = want_order(g, top)
+    g.library.extend(reversed(order))
+    return order
+
+
+def tutor_take(g, pool, stream: str):
+    """Search the library: take the wanted card of `pool` out of it and
+    shuffle (its own CRN stream, §0z17). Returns the card for the caller to
+    put where its text says -- hand, top, or battlefield -- or None, in
+    which case the library is still shuffled (701.19: a search shuffles
+    whether or not it finds)."""
+    pick = want_best(g, pool)
+    if pick is not None:
+        at = next(i for i, c in enumerate(g.library) if c is pick)
+        g.library.pop(at)
+    crn_shuffle(g, stream, g.library)
+    if pick is not None:
+        g.m["tutored"] += 1
+    return pick
+
+
+def sylvan_library(g, since: int) -> None:
+    """SYLVAN LIBRARY, verified against Scryfall 2026-10-14: "At the
+    beginning of your draw step, you may draw two additional cards. If you
+    do, choose two cards in your hand drawn this turn. For each of those
+    cards, pay 4 life or put the card on top of your library."
+
+    Called right after the draw step's draw; `since` is the length of the
+    hand BEFORE that draw, so `hand[since:]` is what was drawn this turn.
+    The two chosen are the two least wanted; the better of them is kept for 4
+    life first, while life stays at or above `library_life_floor` (20,
+    trostani's knob and trostani's rule), and the rest go back on top with
+    the better one drawn first. The draw is OPTIONAL, so it is declined when
+    it would deck the pilot (§0z42). Trostani keeps its own copy (the owner,
+    2026-10-14: blind cards only); this is the same rule with the shared
+    want order in place of trostani's land-as-priority-5 key."""
+    if not g.has("Sylvan Library") or g.result is not None:
+        return
+    if not draw_is_safe(g, 2):
+        return
+    g.draw(2)
+    if g.result is not None:
+        return
+    # "Cards drawn this turn": a card ABUNDANCE put in hand was not drawn
+    # (its ruling), so it is never chosen -- with both out, nothing goes
+    # back. Fewer than two drawn: choose what there is.
+    not_drawn = g.__dict__.get("abundance_ids", ())
+    drawn = [c for c in g.hand[since:] if id(c) not in not_drawn]
+    if not drawn:
+        g.m["library_none_drawn"] += 1
+        return
+    chosen = want_order(g, drawn)[-2:]          # better first
+    floor = g.cfg.get("library_life_floor", 20)
+    back = []
+    for c in chosen:
+        if g.your_life - 4 >= floor:
+            g.your_life -= 4
+            g.m["library_life_paid"] += 4
+            g.m["library_kept"] += 1
+        else:
+            back.append(c)
+    for c in reversed(back):                    # the better one ends on top
+        at = next(i for i, x in enumerate(g.hand) if x is c)
+        g.library.append(g.hand.pop(at))
+    g.m["library_put_back"] += len(back)
+
+
+def abundance_draw(g) -> None:
+    """ABUNDANCE, verified against Scryfall 2026-10-14: "If you would draw a
+    card, you may instead choose land or nonland and reveal cards from the
+    top of your library until you reveal a card of the chosen kind. Put that
+    card into your hand and put all other cards revealed this way on the
+    bottom of your library in any order."
+
+    One replaced draw (the rulings: each draw of a multi-card draw is
+    replaced separately). The kind is the want order's: land while
+    `lands_short`, else nonland -- and the other kind when the library holds
+    none of the chosen one. Every draw is replaced: when the top card is
+    already the chosen kind the result is the plain draw.
+
+    THE RULING THAT MATTERS: "Abundance can prevent you from losing the game
+    for being unable to draw a card." It replaces the draw, so a pilot with
+    an empty library reveals nothing, gets nothing and does NOT lose (no
+    draw was attempted, 704.5b) -- `abundance_empty_saves` counts it.
+    Nothing that triggers on a draw triggers (also a ruling); no card in the
+    list triggers on one. The card still counts in `cards_drawn`, which
+    measures cards a draw instruction put in hand."""
+    lib = g.library
+    if not lib:
+        g.m["abundance_empty_saves"] += 1
+        return
+    lands = sum(1 for c in g.hand if c.is_land)
+    want_land = lands_short(g, lands)
+    if not any(c.is_land == want_land for c in lib):
+        want_land = not want_land
+    revealed = []
+    while lib:
+        c = lib.pop()
+        if c.is_land == want_land:
+            g.hand.append(c)
+            # Not DRAWN, for Sylvan Library's "cards drawn this turn". Ids
+            # are stable for the game (`begin_game`, §0z98).
+            g.__dict__.setdefault("abundance_ids", set()).add(id(c))
+            break
+        revealed.append(c)
+    lib[0:0] = revealed                         # bottom; order immaterial
+    g.m["cards_drawn"] += 1
+    g.m["abundance_draws"] += 1
+    g.m["abundance_lands" if want_land else "abundance_nonlands"] += 1
+    g.m["abundance_bottomed"] += len(revealed)
 
 
 def pearl_collector_lifelink(g, pay, has_lifelink) -> None:

@@ -177,13 +177,18 @@ to all seven.
 copy per engine. **Since §0z32 there is a base class**, `engine.BaseGame`, and the
 methods whose six copies were identical or differed only by omission live on
 it once: `has`, `count`, `draw` (karlov overrides for Alhammarret's
-Archive), `deal_pod_damage`, `opening_hand`; and `engine.finish(g)` is the
+Archive, azusa for Abundance), `deal_pod_damage`, `opening_hand`; and `engine.finish(g)` is the
 tail of `simulate()` that assembled the output dict six times. What is still
 per engine and meant to be: `__init__`, `power_of`/`toughness_of`,
 `on_creature_death`, `make_permanent`, `gain_life`, and `take_turn`. **A rule that lives in a method drifts; a rule that lives in a function
 does not** (§0u, §0z30). The mulligan (`engine.london_mulligan`) and the pod
 order (`opponents.pod_phase`) were per-engine copies that disagreed and are one
-function each now. **Known drift today**: the `turns` default when no cfg
+function each now. So is **which card a pilot wants next** (§0z139):
+selection and tutors call `engine.want_order` / `want_best` (`stack_top`,
+`tutor_take`, `sylvan_library`, `abundance_draw`), and an engine says what
+it knows only through three `BaseGame` hooks -- `want_tier` (karlov: the
+missing combo half), `lands_wanted` and `land_rank` (azusa). Lorehold's
+miracle orders and trostani's tutors predate it and keep their own rules. **Known drift today**: the `turns` default when no cfg
 supplies one is 10 in three places and 20 in four (`simulate`, `make_pod`);
 every harness passes it explicitly, and `docs/KNOBS.md` says so.
 
@@ -249,7 +254,8 @@ findings in `CLAUDE.md` and are not repeated here.
 - **A draw off an empty library is a LOSS (§0z42), and whether a draw is a
   choice is the CARD's to say.** Every draw goes through `BaseGame.draw`,
   karlov's Archive override or lorehold's `draw_card`, and each calls
-  `engine.drew_from_empty`. A new draw that the card text makes optional (a
+  `engine.drew_from_empty` -- except a draw ABUNDANCE replaces (azusa's
+  override), which is not a draw and so cannot lose (its ruling). A new draw that the card text makes optional (a
   "may", an activation, a mode, a spell the pilot need not cast) must ask
   `engine.draw_is_safe` first -- or the pilot decks itself in the games it
   is winning, which is what the rule alone did to azusa and lorehold. A

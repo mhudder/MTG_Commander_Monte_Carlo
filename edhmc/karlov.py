@@ -45,7 +45,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           pearl_collector_trigger, pearl_collector_lifelink,
                           perpetual_lifelink, enter_land, after_land_enters,
                           vault_of_the_archangel, vault_active,
-                          sun_titan_pick)
+                          sun_titan_pick, stack_top, tutor_take)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -182,10 +182,32 @@ class KarlovGame(BaseGame):
             "sun_titan_returns": 0, "soulmender_taps": 0,
             "reclamation_returns": 0, "reclamation_life_paid": 0,
             "jitte_equips": 0, "jitte_counters": 0, "jitte_life_events": 0,
+            # Item 24, change 4: selection and tutors.
+            "top_spins": 0, "top_spins_upkeep": 0, "tutored": 0,
         })
+        self.top_turn = 0
         self.damage_by_turn = []
 
     # -- helpers -------------------------------------------------------------
+
+    def want_tier(self, card) -> int:
+        """ITEM 24 CHANGE 4: the want order's tier for this deck. 2 for the
+        missing half of the loop -- Exquisite Blood (or Conqueror) when a
+        partner is on the battlefield or in hand and no Blood is, or a
+        partner (COMBO_B, and DRAIN_ON_GAIN while `exquisite_drain_loop`)
+        when a Blood is and no partner is. A half with neither present is
+        tier 0: its `priority` (9.5 for Blood and Bond) already ranks it."""
+        held = [p.card.name for p in self.board] + [c.name for c in self.hand]
+        partners = COMBO_B + (DRAIN_ON_GAIN
+                              if self.cfg.get("exquisite_drain_loop", True)
+                              else ())
+        have_a = any(n in COMBO_A_CARDS for n in held)
+        have_b = any(n in partners for n in held)
+        if card.name in COMBO_A_CARDS:
+            return 2 if have_b and not have_a else 0
+        if card.name in partners:
+            return 2 if have_a and not have_b else 0
+        return 0
 
     def response_pay(self, cost, dry=False, now=False) -> bool:
         """Pay `cost` with the mana you held up through the pod's turn
@@ -1442,6 +1464,8 @@ def resolve(g, card):
         gain_life(g, total)
     if card.script == "draw2":
         g.draw(2)
+    if card.name == "Enlightened Tutor":
+        enlightened_tutor(g)
 
     if card.is_permanent:
         enter_permanent(g, card)
@@ -1464,6 +1488,49 @@ def resolve(g, card):
         check_combo(g)
     else:
         g.graveyard.append(card)
+
+
+def enlightened_tutor(g):
+    """ENLIGHTENED TUTOR (item 24 change 4; was KNOWN_BLIND here), verified
+    against Scryfall 2026-10-14: "Search your library for an artifact or
+    enchantment card, reveal it, then shuffle and put that card on top."
+
+    The pick is the shared want order (`engine.want_best`), whose karlov tier
+    is the missing half of the loop (`KarlovGame.want_tier`); otherwise the
+    deck's priority, which puts Exquisite Blood and Sanguine Bond first. It
+    costs the next draw, which is the card's real price. NOT modelled: the
+    answer a pilot would fetch for the TABLE (§4), so a floor."""
+    pool = [c for c in g.library
+            if c.types & {"Artifact", "Enchantment"} and not c.is_land]
+    pick = tutor_take(g, pool, "enlightened_tutor")
+    if pick is not None:
+        g.library.append(pick)
+
+
+def top_spin(g, where: str) -> None:
+    """SENSEI'S DIVINING TOP (item 24 change 4; was KNOWN_BLIND here),
+    verified against Scryfall 2026-10-14: "{1}: Look at the top three cards
+    of your library, then put them back in any order."
+
+    THE POLICY, the owner's (2026-10-14): ONCE A TURN, for {1}, before the
+    draw step. `where="left_up"` is the pod's end step, paid from mana left
+    untapped through the pod's turn (called before the untap); `"upkeep"` is
+    the fallback when nothing was left up, paid from this turn's mana and
+    before Dark Confidant reveals. The order is the shared want order
+    (`engine.stack_top`). NOT modelled: "{T}: Draw a card, then put this
+    artifact on top" -- a floor.
+    """
+    if not g.has("Sensei's Divining Top") or g.top_turn == g.turn:
+        return
+    if len(g.library) < 2 or g.result is not None:
+        return
+    if not pay_cost(g, {"gen": 1}):
+        return
+    g.top_turn = g.turn
+    stack_top(g, 3)
+    g.m["top_spins"] += 1
+    if where == "upkeep":
+        g.m["top_spins_upkeep"] += 1
 
 
 def enter_permanent(g, card):
@@ -1774,12 +1841,14 @@ def take_turn(g):
     g.in_draw_step = False
     g.wind_crystal_used = False
     g.life_gained_this_turn = 0.0
+    top_spin(g, "left_up")         # the pod's end step: mana left up
     for p in g.board:
         p.tapped = False
         p.sick = False
     g.land_drops = 1
     g.land_drops_used = 0
 
+    top_spin(g, "upkeep")          # else this turn's mana, before Confidant
     upkeep(g)
     if g.result is not None:
         return

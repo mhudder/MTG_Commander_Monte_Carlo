@@ -191,6 +191,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z136](#0z136) | FIXED | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). Answers on re-armed clocks bought half as much: settled in §0z137 |
 | [0z137](#0z137) | DECIDED | **`rearm_rule`**: `reland` (+0.005 to +0.008 at T20, four decks) is in POD_V4 with shift 2.05; `prefer_unfired` refuted. `check_unchanged_decks --old-at` refuses a stale worktree |
 | [0z138](#0z138) | MEASURED | **Item 24's last four answers** in POD_V4: Damn single-target +0.007 to +0.010 at T20, tivit's taxes +0.047 (knob-bound), votes +0.007, gate +0.004 lorehold. Shift re-fitted to 2.3 |
+| [0z139](#0z139) | BUILT | **Item 24 change 4**: one want order for selection and tutors; seven blind cards live. **Enlightened Tutor +0.024 at T20** (karlov's combo half), Sylvan Library +0.011; Abundance, Top nothing |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12522,6 +12523,103 @@ mean is +0.0150 over the target, at 2.35 -0.0022; **fitted 2.31**.
 `experiment.POD_V4` carries **2.3**. Checked on fresh seeds
 (`--n=3000 --shifts=2.3`, `results/pod_v4_clock_check_answers_20261014.txt`):
 mean T20 0.4243 against a target of 0.4234.
+
+<a id="0z139"></a>
+## 0z139. BUILT -- item 24's change 4: one "which card do I want next" for selection and tutors
+
+**2026-10-14.** Every text re-read on Scryfall on the day (Abundance's
+rulings too). The owner's choices, the same day: **blind cards only** (lorehold's
+miracle orders and trostani's tutors keep their rules); Sylvan Library on
+**trostani's life rule, the floor swept**; Top **{1} once a turn**, and
+**lorehold's Top costs {1} too**.
+
+### The order (`engine.want_key`, said once)
+
+1. the engine's **tier** (`BaseGame.want_tier`): karlov's missing combo half
+   -- Exquisite Blood when a partner is held and no Blood, or a partner when
+   a Blood is and no partner; 0 everywhere else;
+2. a **land while short** (`lands_short`): none in hand and fewer than
+   `want_land_target` (7) on the battlefield -- azusa's own answer is "fewer
+   in hand than this turn's land drops" (`lands_wanted`);
+3. a spell **castable next turn** (`mana_next_turn`: mana permanents, plus a
+   drop if a land is in hand), then 4. one that is not, then 5. a land the
+   pilot is not short of;
+   within a band the deck's `priority`, then mana value (trostani's
+   `tutor_pick`); among lands the engine's `land_rank` (azusa: fetch, then
+   green, then untapped -- derived, not a name list).
+
+It knows nothing of the table (§4) or colours. Primitives: `want_order`,
+`want_best`, `stack_top`, `tutor_take` (its own CRN stream per card),
+`sylvan_library`, `abundance_draw`.
+
+| card | deck | where | label |
+|---|---|---|---|
+| Sensei's Divining Top | karlov | `karlov.top_spin`: {1} once a turn, from mana left up through the pod's turn, else in the upkeep (before Dark Confidant); `stack_top(3)` | PARTLY (no {T} draw) |
+| Enlightened Tutor | karlov | `karlov.enlightened_tutor`: `tutor_take`, on top | PARTLY (the table's answers, §4) |
+| Gamble | lorehold | `lorehold.gamble`: `tutor_take` to hand, a random discard of the whole hand (CRN); cast only holding `gamble_min_hand` (2) others | PARTLY |
+| Sylvan Library | azusa | `engine.sylvan_library` after the draw step: the better of the two least wanted kept for 4 life at or above `library_life_floor` (20), the rest back, better on top | SCRIPTED |
+| Abundance | azusa | `AzusaGame.draw` -> `engine.abundance_draw`: land while short, else nonland; the rest bottomed; **an empty library loses nothing** (its ruling); a card it puts in hand was not DRAWN, so Sylvan Library never sends it back | SCRIPTED |
+| Sylvan Scrying | azusa | `AzusaGame.sylvan_scrying`: `land_rank`'s land to hand | PARTLY (utility lands' abilities) |
+| Crop Rotation | azusa | `AzusaGame.crop_rotation`: a tapped land (not a creature) sacrificed, `land_rank`'s land onto the battlefield, a fetch cracked | PARTLY |
+
+**Lorehold's Top** (`sort_top_three`) pays {1} per spin -- from float off
+your turn (never a Treasure), from float or the board on it -- only when
+{1} plus a miracle can be paid, and not again for a top three it already
+ordered (`top_known`). `lorehold_top_cost=0` restores the free sort exactly.
+
+**Two old reasons were claims with a date on them (§0z13).** Abundance's
+("too much retrofitting for the many independent draw sources") has been
+false since §0z32 put every draw through one `draw`; Sylvan Library's ("modelled
+as reveal 3, keep 1, pay no life") described no code in azusa at all.
+
+### What moved, and only that
+
+`check_unchanged_decks` against `f534777` (400 seeds, every staged list):
+rendmaw, tivit and shilgengar **BIT-IDENTICAL**; lorehold, karlov and azusa
+moved, as they should (trostani suspended). All three are already in the one
+POD_V4 rebuild. The three tables were **re-rendered** from their caches for
+the labels (§0z123's precedent): only the seven rows moved section, and
+**their numbers are the blind cards' until the rebuild**.
+
+### Measured
+
+`diagnostics/run_change4.py`, `results/change4_20261014.txt`: each card
+against ablation's blank in its own slot, N=3,000 paired, the staged lists,
+seeds 5000.. (the driver reproduces `run_card_vs_blank` to the digit at
+N=100). `*` is significant.
+
+| card | deck | today T10 | today T20 | POD_V4 T10 | POD_V4 T20 | mechanism, a game |
+|---|---|---|---|---|---|---|
+| **Enlightened Tutor** | karlov | **+0.0373 ±0.0079** | **+0.0237 ±0.0086** | **+0.0290 ±0.0075** | **+0.0177 ±0.0081** | 0.19 tutors; combo_assembled +0.029, drain_loop_wins +0.020; wins 4.2 turns sooner |
+| Sensei's Divining Top | karlov | +0.0033 ±0.0047 | +0.0037 ±0.0063 | +0.0023 ±0.0046 | -0.0033 ±0.0064 | 0.89 spins (0.45 from the upkeep) |
+| Gamble | lorehold | **+0.0107 ±0.0077** | +0.0050 ±0.0092 | **+0.0120 ±0.0074** | +0.0080 ±0.0096 | 0.26 tutors; the found card discarded 0.05 |
+| **Sylvan Library** | azusa | **+0.0130 ±0.0062** | **+0.0110 ±0.0072** | **+0.0170 ±0.0062** | **+0.0180 ±0.0071** | +1.26 cards drawn; 0.36 kept for 1.42 life, 0.79 back |
+| Abundance | azusa | **+0.0053 ±0.0051** | -0.0010 ±0.0063 | +0.0003 ±0.0049 | -0.0033 ±0.0065 | 1.08 replaced draws (0.39 land, 0.69 nonland); cards_drawn +0.09 |
+| Sylvan Scrying | azusa | **+0.0110 ±0.0064** | +0.0083 ±0.0085 | +0.0040 ±0.0063 | +0.0053 ±0.0078 | fetches_cracked +0.28, landfall +0.67 |
+| Crop Rotation | azusa | **+0.0107 ±0.0073** | +0.0077 ±0.0093 | **+0.0097 ±0.0068** | **+0.0110 ±0.0088** | 0.29 cast; fetches_cracked +0.38, landfall +0.79 |
+
+**Enlightened Tutor is the one large row, and it is the mechanism the tier
+was written for**: the missing half of the Exquisite Blood loop, on top.
+Under blindness it read +0.0001. Each of the other six is a few tenths of a
+point -- but no longer a blank by construction. **Abundance does nothing for
+the win rate**: it replaces about one draw a game, and choosing land or
+nonland in a deck whose lands are half its spells buys selection the win
+rate does not see (§0t's shape). **Karlov's Top** spins under once a game --
+cast late, and often with no mana left up -- and is inside its bars.
+
+**The knobs, said out loud.** `library_life_floor` (Sylvan Library, today's
+pod, the card against its blank at each floor): 12 is +0.0130 ±0.0064 /
++0.0063 ±0.0076, 20 is +0.0130 / +0.0110, 40 (never pay) +0.0023 ±0.0053 /
++0.0040 ±0.0070. Paying life is most of the card and 20 sits at the top of
+three overlapping bars; 20 stays. **Lorehold's Top at {1} against the old
+free sort** (the staged list both legs): -0.0040 ±0.0057 at T10, -0.0023
+±0.0073 at T20 -- the owner's cost is real and does not move the deck
+measurably. `want_land_target` (7) and `gamble_min_hand` (2) were not swept.
+
+### Gates
+
+`tests/test_change4_selection.py`: 14 cases, 9 mutations, every set written
+before its run and exact on the first.
 
 ## How to read an ablation table
 
