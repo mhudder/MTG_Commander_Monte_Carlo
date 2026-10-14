@@ -149,9 +149,14 @@ What is closed and where it went:
       answers on a re-armed clock.** A clock that eliminates another
       opponent re-arms with its pieces all still out, and 18-29% of every
       deck's piece removals go there and buy about half as much (1 round,
-      not 2; half of them nothing). Choose a rule -- re-land the route at
-      the re-arm, or a pilot that prefers an unfired clock -- measure it,
-      and re-fit `threat_clock_shift` on it. Not done: attack taxes,
+      not 2; half of them nothing). **BOTH RULES BUILT AND MEASURED
+      (§0z137)**, behind `rearm_rule` (default "keep", bit-identical):
+      "reland" lifts rendmaw, karlov, tivit and shilgengar +0.005 to
+      +0.008 at T20 (lorehold and azusa inside their bars, unexplained) and
+      re-fits the shift to 2.05 (keep 1.94); "prefer_unfired" barely moves
+      the aim and costs a little -- refuted. **The owner's call: adopt
+      "reland" in POD_V4, with shift 2.05 or 2.0** (inside the fit's
+      resolution). Not done: attack taxes,
       Damn's single-target mode, the voting answers, the wipe gate
       reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind

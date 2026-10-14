@@ -168,8 +168,9 @@ POD_V3 = dict(POD_V2, archetypes=True)
 # eliminated opponents acting -- 2.0. Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
 # rebuild of every table; until then every number in the project is this pod's.
 # OPEN BEFORE ADOPTING (§0z136): a re-armed clock keeps its pieces out, so a
-# fifth to a quarter of your answers land there and buy half as much. The
-# rule chosen for it moves the fit above.
+# fifth to a quarter of your answers land there and buy half as much. MEASURED
+# (§0z137): `rearm_rule="reland"` fixes it (+0.005 to +0.008 at T20 in four
+# decks) and re-fits the shift to 2.05; adding it here is the owner's call.
 POD_V4 = {
     "pod_bodies": True,
     "pod_threats": True,

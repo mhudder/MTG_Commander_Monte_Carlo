@@ -1,0 +1,55 @@
+rearm_rule (§0z137): POD_V4 , STAGED lists, N=15000 paired, seeds 5000..19999
+
+win: the rule's win rate (its difference from keep); worth: every spot answer blanked together, full minus blank (its difference from keep's worth). * = outside its 95% interval.
+
+rendmaw
+   keep            T10  win 0.0909   worth +0.0081 ±0.0024*
+   keep            T20  win 0.3300   worth +0.0469 ±0.0055*
+   reland          T10  win 0.0913   worth +0.0085 ±0.0024*   | vs keep: win +0.0004 ±0.0005    worth +0.0004 ±0.0005 
+   reland          T20  win 0.3352   worth +0.0519 ±0.0056*   | vs keep: win +0.0052 ±0.0019*   worth +0.0049 ±0.0020*
+   prefer_unfired  T10  win 0.0908   worth +0.0081 ±0.0024*   | vs keep: win -0.0001 ±0.0001    worth -0.0001 ±0.0001 
+   prefer_unfired  T20  win 0.3293   worth +0.0463 ±0.0055*   | vs keep: win -0.0007 ±0.0007    worth -0.0007 ±0.0007 
+
+lorehold
+   keep            T10  win 0.2164   worth +0.0432 ±0.0045*
+   keep            T20  win 0.4370   worth +0.0779 ±0.0062*
+   reland          T10  win 0.2161   worth +0.0431 ±0.0045*   | vs keep: win -0.0003 ±0.0006    worth -0.0001 ±0.0007 
+   reland          T20  win 0.4370   worth +0.0789 ±0.0063*   | vs keep: win +0.0000 ±0.0018    worth +0.0009 ±0.0019 
+   prefer_unfired  T10  win 0.2163   worth +0.0431 ±0.0045*   | vs keep: win -0.0001 ±0.0001    worth -0.0001 ±0.0001 
+   prefer_unfired  T20  win 0.4365   worth +0.0775 ±0.0062*   | vs keep: win -0.0005 ±0.0007    worth -0.0005 ±0.0007 
+
+karlov
+   keep            T10  win 0.2471   worth +0.0124 ±0.0028*
+   keep            T20  win 0.4845   worth +0.0572 ±0.0056*
+   reland          T10  win 0.2477   worth +0.0129 ±0.0028*   | vs keep: win +0.0005 ±0.0005*   worth +0.0005 ±0.0005*
+   reland          T20  win 0.4905   worth +0.0635 ±0.0057*   | vs keep: win +0.0061 ±0.0019*   worth +0.0063 ±0.0019*
+   prefer_unfired  T10  win 0.2472   worth +0.0125 ±0.0028*   | vs keep: win +0.0001 ±0.0001    worth +0.0001 ±0.0001 
+   prefer_unfired  T20  win 0.4840   worth +0.0567 ±0.0056*   | vs keep: win -0.0005 ±0.0008    worth -0.0005 ±0.0008 
+
+tivit
+   keep            T10  win 0.2763   worth +0.0148 ±0.0035*
+   keep            T20  win 0.4870   worth +0.0501 ±0.0055*
+   reland          T10  win 0.2767   worth +0.0148 ±0.0035*   | vs keep: win +0.0003 ±0.0007    worth +0.0000 ±0.0007 
+   reland          T20  win 0.4923   worth +0.0554 ±0.0055*   | vs keep: win +0.0053 ±0.0022*   worth +0.0053 ±0.0023*
+   prefer_unfired  T10  win 0.2761   worth +0.0146 ±0.0035*   | vs keep: win -0.0002 ±0.0002    worth -0.0002 ±0.0002 
+   prefer_unfired  T20  win 0.4864   worth +0.0495 ±0.0055*   | vs keep: win -0.0006 ±0.0008    worth -0.0006 ±0.0008 
+
+shilgengar
+   keep            T10  win 0.0351   worth +0.0061 ±0.0021*
+   keep            T20  win 0.3328   worth +0.1017 ±0.0074*
+   reland          T10  win 0.0354   worth +0.0063 ±0.0021*   | vs keep: win +0.0003 ±0.0005    worth +0.0003 ±0.0005 
+   reland          T20  win 0.3409   worth +0.1097 ±0.0075*   | vs keep: win +0.0081 ±0.0026*   worth +0.0081 ±0.0026*
+   prefer_unfired  T10  win 0.0350   worth +0.0059 ±0.0021*   | vs keep: win -0.0001 ±0.0002    worth -0.0001 ±0.0002 
+   prefer_unfired  T20  win 0.3309   worth +0.0998 ±0.0074*   | vs keep: win -0.0019 ±0.0011*   worth -0.0019 ±0.0011*
+
+azusa
+   keep            T10  win 0.2789   worth +0.0222 ±0.0031*
+   keep            T20  win 0.4822   worth +0.0555 ±0.0051*
+   reland          T10  win 0.2789   worth +0.0222 ±0.0031*   | vs keep: win +0.0000 ±0.0004    worth +0.0000 ±0.0004 
+   reland          T20  win 0.4831   worth +0.0564 ±0.0052*   | vs keep: win +0.0009 ±0.0015    worth +0.0009 ±0.0015 
+   prefer_unfired  T10  win 0.2787   worth +0.0221 ±0.0031*   | vs keep: win -0.0001 ±0.0002    worth -0.0001 ±0.0002 
+   prefer_unfired  T20  win 0.4809   worth +0.0543 ±0.0051*   | vs keep: win -0.0013 ±0.0008*   worth -0.0013 ±0.0008*
+
+mean T20 win, keep            0.4256
+mean T20 win, reland          0.4298
+mean T20 win, prefer_unfired  0.4247

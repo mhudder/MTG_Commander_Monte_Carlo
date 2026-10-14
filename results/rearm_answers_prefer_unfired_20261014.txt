@@ -1,0 +1,12 @@
+Answers on re-armed clocks (§0z136), POD_V4 {'rearm_rule': 'prefer_unfired'}, STAGED lists, T20, N=3000, seeds 5000..7999
+
+deck         rearms   fresh  rd/rm  moved0  rearmed  rd/rm  moved0  share
+              /game   /game                   /game                rearmd
+rendmaw        0.46    0.32   2.15      7%     0.10   1.15     43%    24%
+lorehold       0.36    0.45   2.18     10%     0.14   0.96     48%    24%
+karlov         0.36    0.41   2.03      8%     0.08   0.96     48%    17%
+tivit          0.36    0.60   1.97     11%     0.15   0.91     53%    20%
+shilgengar     0.41    1.02   1.95     12%     0.23   0.99     50%    19%
+azusa          0.35    0.26   2.23      6%     0.10   1.12     44%    27%
+
+rd/rm: rounds the kill moved per removal; moved0: the share of removals that moved it not at all; share rearmd: the removals that went to a re-armed route.

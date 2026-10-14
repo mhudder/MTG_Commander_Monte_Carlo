@@ -189,7 +189,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
 | [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
 | [0z136](#0z136) | FIXED / OPEN | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). OPEN for POD_V4: 18-29% of answers go to a re-armed clock and buy half as much |
-| [0z137](#0z137) | BUILT | **`rearm_rule`**: what a re-armed clock's route is under `pod_threats` -- `keep` (as it was, the default), `reland` or `prefer_unfired`. Bit-identical as `keep`; measurement in progress |
+| [0z137](#0z137) | MEASURED | **`rearm_rule`** (§0z136's re-armed clocks): `reland` +0.005 to +0.008 at T20 in four decks, shift 2.05; `prefer_unfired` refuted. The owner's call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12269,7 +12269,7 @@ not fired. Queued with POD_V4 (queue item 24, the owner, 2026-10-14).
 
 <a id="0z137"></a>
 
-## 0z137. BUILT -- `rearm_rule`: what a re-armed clock's route is (§0z136's open half)
+## 0z137. MEASURED -- `rearm_rule`: what a re-armed clock's route is (§0z136's open half)
 
 **2026-10-14**, at the owner's request: build both candidates §0z136 named
 behind one knob, and measure them against the original reading.
@@ -12296,9 +12296,80 @@ the knob. `tests/test_rearm_rule.py`: 8 cases, 5 mutations; the expected sets
 were written before the run and the corrections are recorded in its docstring
 as a transcript (§0z14).
 
-**The measurement is in progress** (`diagnostics/run_rearm_rule.py`, N=15,000
-paired; `run_rearm_answers --cfg=rearm_rule=...`; `fit_threat_clock
---cfg=rearm_rule=...`). Its results go here.
+### What it moved
+
+**Paired, N=15,000** (`diagnostics/run_rearm_rule.py`,
+`results/rearm_rule_20261014.txt`; POD_V4 at shift 2.0, staged lists, seeds
+5000-19999). "worth" is every spot answer blanked together, full minus
+blank, as `run_answer_worth` measures it. Each cell is the rule minus `keep`:
+
+| deck | `reland` T20 win | `reland` T20 worth | `prefer_unfired` T20 win | `keep` worth |
+|---|---|---|---|---|
+| rendmaw | **+0.0052 ±0.0019** | **+0.0049 ±0.0020** | -0.0007 ±0.0007 | +0.0469 |
+| lorehold | +0.0000 ±0.0018 | +0.0009 ±0.0019 | -0.0005 ±0.0007 | +0.0779 |
+| karlov | **+0.0061 ±0.0019** | **+0.0063 ±0.0019** | -0.0005 ±0.0008 | +0.0572 |
+| tivit | **+0.0053 ±0.0022** | **+0.0053 ±0.0023** | -0.0006 ±0.0008 | +0.0501 |
+| shilgengar | **+0.0081 ±0.0026** | **+0.0081 ±0.0026** | **-0.0019 ±0.0011** | +0.1017 |
+| azusa | +0.0009 ±0.0015 | +0.0009 ±0.0015 | **-0.0013 ±0.0008** | +0.0555 |
+
+At T10 every cell is within ±0.0006: re-arms come late. The mean T20 win
+rate is 0.4256 (keep), 0.4298 (reland), 0.4247 (prefer_unfired). The win
+and worth columns agree because with every answer blanked the rule has
+nothing to act on: the re-arm moves only through your answers.
+
+**What the answers buy** (`run_rearm_answers --cfg=rearm_rule=...`, N=3,000,
+`results/rearm_answers_reland_20261014.txt`,
+`results/rearm_answers_prefer_unfired_20261014.txt`; §0z136's table is
+`keep`):
+
+- **`reland`**: an answer on a re-armed route buys what a fresh one does
+  (1.93-2.14 rounds, 4-12% buy nothing; it was 0.95-1.16 and 43-51%), and
+  fewer answers go there (13-19% from 18-29%), because a rebuilt route's
+  pieces are not out until they land.
+- **`prefer_unfired`** barely moves the aim: 17-27% still go to re-armed
+  routes, at the same half-worth. When an answer is cast, the re-armed
+  route is usually the only one with a piece out (an unfired route's
+  pieces land `lead` 1-3 rounds before its kill). Where it does redirect,
+  it loses a little: the re-armed clock is 4 rounds out, and an unfired one
+  is usually further. **So the pilot's aim was never the defect; the slack
+  in the re-armed route was.**
+
+**Why lorehold and azusa do not move is NOT EXPLAINED.** The counts do not
+separate them: under `reland`, lorehold and karlov both make 0.07 removals a
+game on re-armed routes, and karlov moves +0.006 while lorehold moves 0.000.
+Something about which games those removals fall in differs, and nothing here
+measures it. It is a gap in this section, not a property of the rule.
+
+**The clock fit, per rule** (`diagnostics/fit_threat_clock --cfg=
+rearm_rule=...`, N=2,000, shifts 1.5-3.0, the same seeds;
+`results/pod_v4_clock_fit_keep_20261014.txt`,
+`results/pod_v4_clock_fit_reland_20261014.txt`,
+`results/pod_v4_clock_fit_prefer_unfired_20261014.txt`). The target has moved
+to 0.4271 since §0z133's 0.4233 (change 0's finish and the Jitte fix):
+
+| rule | mean T20 at 2.0 | fitted shift |
+|---|---|---|
+| keep | 0.4252 | 1.94 |
+| reland | 0.4296 | 2.05 |
+| prefer_unfired | 0.4244 | 1.92 |
+
+The fit omits `pod_responses`, as §0z132 and §0z133's did (it moves the mean
+about +0.005, inside the fit's noise). Reland's +0.0044 at 2.0 agrees with
+the paired +0.0042 above; about 0.04 a round of shift, so it needs a tenth
+of a round more. **All three fits sit within about 0.1 round of 2.0**, which
+is about the fit's resolution at N=2,000.
+
+### The decision (the owner's)
+
+- **Recommended: `reland`, with `threat_clock_shift` 2.05** (or 2.0: the
+  difference is inside the fit's resolution). It removes the slack where it
+  comes from, makes every answer buy what its rebuild delay says, and moves
+  no deck down. It is still a judgement: a route rebuilt from scratch
+  forgets the army that won, which `keep` remembered.
+- **`prefer_unfired` is refuted** as a fix: it does not change where answers
+  go, and where it does, it costs win rate.
+- `keep` remains the default until POD_V4 is adopted. Either way the knob
+  moves nothing in today's pod, and no cache or table needs touching for it.
 
 ## How to read an ablation table
 
