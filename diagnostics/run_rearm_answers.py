@@ -4,7 +4,10 @@ already fired and been RE-ARMED, and what they buy (§0z136).
     python -m diagnostics.run_rearm_answers               # N=3000, POD_V4
     python -m diagnostics.run_rearm_answers --n=600 --decks=rendmaw,tivit
     python -m diagnostics.run_rearm_answers --out=results/x.txt
-    python -m diagnostics.run_rearm_answers --cfg=rearm_rule=reland   (§0z137)
+    python -m diagnostics.run_rearm_answers --cfg=rearm_rule=keep   (§0z136's)
+
+POD_V4 rebuilds a re-armed route since §0z137 (`rearm_rule="reland"`), so the
+plain run measures that; `--cfg=rearm_rule=keep` is the pod §0z136 counted.
 
 When an opponent's clock eliminates ANOTHER opponent, `resolve_clocks`
 re-arms it `clock_rearm` (4) rounds on -- and leaves its route's pieces

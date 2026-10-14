@@ -26,7 +26,9 @@ from edhmc.registry import ACTIVE, DECKS as REGISTRY
 
 N = 1500
 SHIFTS = (0.0, 1.0, 2.0, 3.0)
-POD_V4 = dict(pod_bodies=True, pod_threats=True)
+# experiment.POD_V4 less its shift (swept here) and `pod_responses` (inside
+# the fit's noise, §0z134). `rearm_rule` is in it since §0z137.
+POD_V4 = dict(pod_bodies=True, pod_threats=True, rearm_rule="reland")
 
 
 def measure(args):

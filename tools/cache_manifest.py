@@ -499,7 +499,8 @@ def main():
         "git worktree add ../edhmc_at <built_commit>",
         "python -m tools.check_unchanged_decks --out=new.json",
         "(cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)",
-        "python -m tools.check_unchanged_decks --diff old.json new.json",
+        "python -m tools.check_unchanged_decks --diff old.json new.json "
+        "--old-at=<built_commit>",
         "python -m tools.cache_manifest --verified <deck> \"what you ran and "
         "what it showed\"",
         "python -m tools.cache_manifest --write",

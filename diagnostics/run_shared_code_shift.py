@@ -15,7 +15,11 @@ so the per-deck difference is paired and its CI is the honest one.
     git worktree add ../edhmc_old <commit>
     (cd ../edhmc_old && python -m diagnostics.run_shared_code_shift --out=old.json)
     python -m diagnostics.run_shared_code_shift --out=new.json
-    python -m diagnostics.run_shared_code_shift --diff old.json new.json
+    python -m diagnostics.run_shared_code_shift --diff old.json new.json --old-at=<commit>
+
+Each `--out` records the tree it ran in, and `--old-at` refuses a stale old
+side, exactly as `tools/check_unchanged_decks.py` does (§0z137): a worktree
+left by an earlier session is not replaced by `git worktree add`.
 
 `--n=` (default 15000) and `--decks=a,b` narrow it. `--cfg=k=v,k=v` sets
 knobs on this leg only, so a change that ships behind a knob can be
@@ -33,6 +37,7 @@ from multiprocessing import Pool
 import numpy as np
 
 from edhmc.registry import DECKS as REGISTRY
+from tools import check_unchanged_decks as CU
 
 N = 15000
 DECKS = tuple(REGISTRY)
@@ -72,9 +77,17 @@ def measure_one(args):
     return f"{deck}@T{turns}", rows
 
 
-def diff(old_path, new_path):
+def diff(old_path, new_path, old_at=None):
+    """Print the paired diff; return why the pair is not a valid
+    comparison (empty when it is), as `check_unchanged_decks.diff` does."""
     old = json.load(open(old_path))
     new = json.load(open(new_path))
+    old_p, new_p = old.pop(CU.PROVENANCE, None), new.pop(CU.PROVENANCE, None)
+    print(f"old: {CU.describe(old_p)}\nnew: {CU.describe(new_p)}")
+    problems = CU.check_sides(old_p, new_p, old_at)
+    for why in problems:
+        print(f"!!! NOT A VALID COMPARISON: {why}")
+    print()
     print(f"{'deck':<16}{'metric':<14}{'old':>10}{'new':>10}"
           f"{'new-old':>10}{'95% CI':>22}")
     for key in old:
@@ -92,14 +105,16 @@ def diff(old_path, new_path):
         moved = int(np.sum(np.array(old[key]['won']) != np.array(new[key]['won'])))
         print(f"{'':<16}{'seeds whose result changed':<30}{moved:>6} of {n}")
         print()
+    return problems
 
 
 def main():
     args = sys.argv[1:]
     if "--diff" in args:
         i = args.index("--diff")
-        diff(args[i + 1], args[i + 2])
-        return 0
+        old_at = next((CU.resolve(a.split("=", 1)[1]) for a in args
+                       if a.startswith("--old-at=")), None)
+        return 2 if diff(args[i + 1], args[i + 2], old_at) else 0
     n = next((int(a.split("=")[1]) for a in args if a.startswith("--n=")), N)
     decks = next((a.split("=")[1].split(",") for a in args
                   if a.startswith("--decks=")), list(DECKS))
@@ -110,6 +125,7 @@ def main():
     jobs = [(d, t, n, extra) for d in decks for t in HORIZONS]
     with Pool() as pool:
         res = dict(pool.imap_unordered(measure_one, jobs))
+    res[CU.PROVENANCE] = CU.provenance(n, list(HORIZONS), extra)
     json.dump(res, open(out, "w"))
     print(f"wrote {out}")
     return 0

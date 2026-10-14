@@ -144,19 +144,16 @@ What is closed and where it went:
       threats both on, and every deck's answers are then worth +0.04 to
       +0.11. That pod is `experiment.POD_V4`, a candidate: adopting it is
       the owner's call, with a rebuild of every table, `KNOWN_BLIND`
-      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.0 since §0z133 (re-fitted on the fixed pod).
-      **SETTLE FIRST, BEFORE ADOPTING (§0z136, the owner, 2026-10-14):
-      answers on a re-armed clock.** A clock that eliminates another
-      opponent re-arms with its pieces all still out, and 18-29% of every
-      deck's piece removals go there and buy about half as much (1 round,
-      not 2; half of them nothing). **BOTH RULES BUILT AND MEASURED
-      (§0z137)**, behind `rearm_rule` (default "keep", bit-identical):
-      "reland" lifts rendmaw, karlov, tivit and shilgengar +0.005 to
-      +0.008 at T20 (lorehold and azusa inside their bars, unexplained) and
-      re-fits the shift to 2.05 (keep 1.94); "prefer_unfired" barely moves
-      the aim and costs a little -- refuted. **The owner's call: adopt
-      "reland" in POD_V4, with shift 2.05 or 2.0** (inside the fit's
-      resolution). Not done: attack taxes,
+      re-read and `tools.triage` taught `ANSWERS`. Its shift is 2.05 since §0z137 (2.0 from §0z133 to §0z137).
+      **SETTLED (§0z136, §0z137; the owner, 2026-10-14): answers on a
+      re-armed clock.** A clock that eliminates another opponent re-armed
+      with its pieces all still out, and 18-29% of every deck's piece
+      removals went there and bought about half as much. `rearm_rule`
+      "reland" rebuilds the route (+0.005 to +0.008 at T20 in four decks;
+      lorehold and azusa inside their bars, unexplained) and is in POD_V4
+      with the shift re-fitted to 2.05; "prefer_unfired" was refuted.
+      **THE OWNER, 2026-10-14: no rebuild until every POD_V4 change is
+      in** -- one rebuild for POD_V4 and item 25. Not done: attack taxes,
       Damn's single-target mode, the voting answers, the wipe gate
       reading routes. Originally: each kill
       route is pre-rolled pieces (type, landing turn) and a route kind

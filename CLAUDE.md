@@ -98,7 +98,7 @@ SUSPECT cache:
 git worktree add ../edhmc_at <ref>          # HEAD, or the cache's built_commit
 python -m tools.check_unchanged_decks --out=new.json
 (cd ../edhmc_at && python -m tools.check_unchanged_decks --out=old.json)
-python -m tools.check_unchanged_decks --diff old.json new.json
+python -m tools.check_unchanged_decks --diff old.json new.json --old-at=<ref>
 python -m tools.cache_manifest --verified <deck> "what you ran and what it showed"
 ```
 
@@ -253,6 +253,11 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   Read `$?` only from a command that was not piped.
 - **A tool that says it reproduces another tool's number must reproduce it**
   (§0z35). Make reproducing the baseline one of its rows.
+- **A comparison names both of its sides** (§0z137). `git worktree add`
+  does not replace a worktree an earlier session left, so a diff can be
+  against the wrong commit: `--diff --old-at=<ref>` refuses one. A test that
+  compares two rules drives both legs through the same steps; a leg moved by
+  hand compares the setups, not the rules.
 - **A citation that resolves can still be wrong** (§0z127). A queue item is
   "item 0c", never "§0c": the same spelling in two namespaces sent the
   common-baseline rule's citations to an unrelated section, and every check

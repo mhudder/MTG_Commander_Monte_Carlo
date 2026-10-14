@@ -188,8 +188,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z133](#0z133) | FIXED | Eliminated opponents kept taking turns: removal, wraths and counterspells from the dead, and lorehold windows on their turns. Fixed by default; T20 karlov +0.022 ... lorehold -0.005; every table needs a rebuild |
 | [0z134](#0z134) | BUILT | **Item 24, change 3**: instants on the pod's turn from real held mana, behind `pod_responses`, OFF and bit-identical; tivit's counters live (+0.029); holding mana back loses; a change-2 timing bug fixed |
 | [0z135](#0z135) | BUILT | **Item 24, change 0 finished**: Storm Cauldron and Angel of Suffering (+0.032 T20) built; Sun Titan and Midnight Reaper one rule each; azusa's fetches made 1.3 phantom mana a game |
-| [0z136](#0z136) | FIXED / OPEN | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). OPEN for POD_V4: 18-29% of answers go to a re-armed clock and buy half as much |
-| [0z137](#0z137) | MEASURED | **`rearm_rule`** (§0z136's re-armed clocks): `reland` +0.005 to +0.008 at T20 in four decks, shift 2.05; `prefer_unfired` refuted. The owner's call |
+| [0z136](#0z136) | FIXED | A review of item 24: Jitte kept its holder across leaving play (fixed; 1 karlov game in 15,000). Answers on re-armed clocks bought half as much: settled in §0z137 |
+| [0z137](#0z137) | DECIDED | **`rearm_rule`**: `reland` (+0.005 to +0.008 at T20, four decks) is in POD_V4 with shift 2.05; `prefer_unfired` refuted. `check_unchanged_decks --old-at` refuses a stale worktree |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12212,6 +12212,8 @@ holder is cleared.
 
 ### 2. OPEN, FOR THE POD_V4 DECISION -- answers on a re-armed clock
 
+**SETTLED IN §0z137**: `rearm_rule="reland"`, in POD_V4 since 2026-10-14.
+
 When an opponent's clock eliminates ANOTHER opponent, `resolve_clocks`
 re-arms it `clock_rearm` (4) rounds on and leaves its route's pieces where
 they were: all out. `answer_target` aims at the opponent with the most
@@ -12269,7 +12271,7 @@ not fired. Queued with POD_V4 (queue item 24, the owner, 2026-10-14).
 
 <a id="0z137"></a>
 
-## 0z137. MEASURED -- `rearm_rule`: what a re-armed clock's route is (§0z136's open half)
+## 0z137. DECIDED -- `rearm_rule`: what a re-armed clock's route is (§0z136's open half)
 
 **2026-10-14**, at the owner's request: build both candidates §0z136 named
 behind one knob, and measure them against the original reading.
@@ -12370,6 +12372,49 @@ is about the fit's resolution at N=2,000.
   go, and where it does, it costs win rate.
 - `keep` remains the default until POD_V4 is adopted. Either way the knob
   moves nothing in today's pod, and no cache or table needs touching for it.
+
+**DECIDED (the owner, 2026-10-14): `reland`, with shift 2.05**, both now in
+`experiment.POD_V4`; the fit's own candidate (`fit_threat_clock.POD_V4`)
+carries `reland` too. Checked on fresh seeds (`fit_threat_clock --n=3000
+--shifts=2.05`, `results/pod_v4_clock_check_20261014.txt`): mean T20 0.4231
+against a target of 0.4234. POD_V4 is still a candidate, not the default:
+the owner is holding the rebuild until every POD_V4 change is in.
+`run_rearm_answers` measures POD_V4's rule now; `--cfg=rearm_rule=keep`
+reproduces §0z136's count.
+
+### Two findings about the checks, not the model
+
+**1. A stale worktree read as six decks MOVED.** The bit-identity check
+above was first run against `../edhmc_at`, which an earlier session had left
+at `11c802d`. The recipe's `git worktree add ../edhmc_at <ref>` fails when the
+directory exists (the run had silenced its error), so the old side was
+measured at `11c802d` and every deck read MOVED, about a change nobody made.
+Nothing in the output said which commit either side was. Had the stale tree
+happened to agree, it would have read BIT-IDENTICAL instead, and that is the
+dangerous case: `--verified` is written from that output.
+**Fixed**: `check_unchanged_decks --out` records the tree it ran in
+(`_provenance`: commit, uncommitted changes, N, turns, `--cfg`); `--diff`
+prints both sides; and `--diff ... --old-at=<ref>` exits 2 unless the old
+side was measured at exactly that commit, clean, at the new side's N and
+turns. `diagnostics/run_shared_code_shift.py`, the other worktree-then-diff
+tool, does the same through the same functions. The recipe in CLAUDE.md,
+`cache_manifest`'s (and so `docs/ABLATION_CACHES.md`) and the session-close
+skill carry `--old-at`. Reproduced: the old tree put back at `11c802d`,
+`--old-at=HEAD` refuses it (it predates provenance, so it records no
+commit). `tests/test_check_unchanged.py`: 7 cases, 5 mutations, exact sets
+written before the run. **Blind to**: a file written before this commit
+records nothing, so `--old-at` refuses it and only a re-measurement passes;
+and a cache's `built_commit` is still whatever the person typed.
+
+**2. A test leg moved by hand compared setups, not rules.** Case D of
+`tests/test_rearm_rule.py` first set `g.turn = 9` in the `reland` leg only,
+and at turn 9 a KEPT route's answer buys 2 rounds too, so the case passed
+while two re-arm mutations went through it. The mutation run caught it; the
+transcript is in the test's docstring. A grep for the same shape (a loop over
+named rules with a branch on the rule that moves state) across `tests/`
+found one other hit, `test_destroy_share`'s four events, which are four
+setups on purpose, not one setup under two rules. The grep is a heuristic and
+says nothing about tests written another way.
 
 ## How to read an ablation table
 
