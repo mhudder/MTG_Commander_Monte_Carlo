@@ -1188,15 +1188,15 @@ def main_phase(g):
         for c in g.hand:
             if c.is_land:
                 continue
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
+            if not OPP.own_wipe_castable(g, c):     # §0z138
                 continue
             if OPP.hold_answer(g, c):      # item 24, change 2
                 continue
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-            mode = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c)),
-                               units)
+            mode = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c),
+                                                     units), units)
             if mode is not None:
                 options.append((c, mode[2]))
                 mode_cost[id(c)] = mode[0]

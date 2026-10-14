@@ -1462,6 +1462,9 @@ KNOWN_BLIND = {
         # score that IS evidence, labelled as if it were not.
         # Ward {3}, and an attack tax, cannot be expressed against an opponent
         # model whose combat is a damage share rather than declared attackers.
+        # Under `pod_threats` the tax turns a combat route's kill and part of
+        # the pod's chip damage elsewhere (§0z138); the label is the default
+        # pod's, which has no routes.
         "Ghostly Prison", "Propaganda",
         # BLIND DESPITE HAVING ENGINE CODE -- the engine acts on both, and
         # neither row is a floor, so neither can be PARTLY MODELLED. Each

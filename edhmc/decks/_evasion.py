@@ -523,6 +523,14 @@ DEFENDER = {
     'Sylvan Caryatid',
 }
 
+# ATTACK TAXES: "creatures can't attack you unless their controller
+# pays {N} for each creature ..." -> N. Read by `opponents.attack_tax_through`
+# under `pod_threats` (§0z138).
+ATTACK_TAX = {
+    'Ghostly Prison': 2,
+    'Propaganda': 2,
+}
+
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
 # alike. `check_docs` compares it with the cards the deck modules construct
 # TODAY and fails on any difference: a card added without re-running this

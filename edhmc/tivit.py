@@ -32,10 +32,14 @@ WHAT IS DELIBERATELY NOT MODELLED, so no one reads a zero as a verdict:
   * Opponents' permanents, as everywhere else in this project. Every targeted
     removal spell in the list ablates to ~0 for that reason and is in
     KNOWN_BLIND, not because the cards are bad.
-  * The choice of WHICH permanent a vote exiles (Council's Judgment).
-  * Ward {3}, Ghostly Prison and Propaganda as attack taxes -- the opponent
-    model's combat is a share, not a set of declared attackers, so a tax on
-    attacking cannot be expressed. Both Prisons are `fog`-tagged and blind.
+  * The choice of WHICH permanent a vote exiles (Council's Judgment), and
+    Vault 11's votes -- except under `pod_threats`, where both vote on a
+    route piece (§0z138).
+  * Ward {3}, and Ghostly Prison and Propaganda as attack taxes -- the
+    opponent model's combat is a share, not a set of declared attackers.
+    Under `pod_threats` a combat route's kill is an attack, and the Prisons
+    tax it and the pod's chip damage (`opponents.attack_tax_through`,
+    §0z138). Both Prisons are `fog`-tagged, a tag nothing reads.
   * Illusion of Choice's card draw is modelled; its vote control is the point
     and IS modelled (see voting.vote_control).
 
@@ -687,7 +691,7 @@ def main_phase(g):
         for c in g.hand:
             if c.is_land:
                 continue
-            if "wipe" in c.tags and not OPP.should_cast_own_wipe(g, c):
+            if not OPP.own_wipe_castable(g, c):     # §0z138
                 continue
             if OPP.hold_answer(g, c):      # item 24, change 2
                 continue
@@ -707,8 +711,8 @@ def main_phase(g):
             # pool is only different when a Powerstone is untapped.
             pool = (mana_units(g, True) if "Artifact" in c.types
                     and untapped_powerstones(g) else units)
-            _m = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c)),
-                             pool)
+            _m = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c),
+                                                   pool), pool)
             if _m is not None:
                 options.append((c, _m[2], _m[0]))
         if not options:
@@ -719,7 +723,8 @@ def main_phase(g):
         card = lookahead_pick(
             g, options, units, lambda it: (it[0].priority, it[0].mv),
             cost_of=lambda it: it[2], pay_of=lambda it: it[1])[0]
-        if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card)),
+        if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card),
+                                         units),
                    powerstones="Artifact" in card.types):
             return
         g.hand.remove(card)
@@ -814,6 +819,8 @@ def resolve(g, card):
         V.dilemma(g, "capital")
     elif s == "trial" and g.cfg.get("saga_chapters", True):
         pass              # its vote is chapter IV, three draw steps away (§0z83)
+    elif s == "councils_judgment" and OPP.vote_answers_on(g):
+        V.judgment(g)                       # §0z138: the vote exiles a piece
     elif s in ("bite", "split_decision", "trial", "councils_judgment"):
         V.council(g)
     elif s == "magister":
@@ -987,7 +994,11 @@ def saga_step(g):
         chapter = entry[1]
         votes, final = SAGA_CHAPTERS[perm.card.name]
         if chapter in votes:
-            V.council(g)
+            if (perm.card.name in OPP.VOTE_ANSWERS
+                    and OPP.vote_answers_on(g)):
+                V.dilemma_vault(g, perm.card.name)       # §0z138
+            else:
+                V.council(g)
             g.m["saga_votes"] += 1
             if g.result is not None:
                 return

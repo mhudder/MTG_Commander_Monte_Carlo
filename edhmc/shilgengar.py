@@ -1057,13 +1057,13 @@ class ShilgengarGame(BaseGame):
             for c in self.hand:
                 if c.is_land:
                     continue
-                if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
+                if not OPP.own_wipe_castable(self, c):     # §0z138
                     continue
                 if OPP.hold_answer(self, c):      # item 24, change 2
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
                 _m = choose_mode(c, OPP.wipe_mode_cost(
-                    self, c, self.herald_cost(c)), pool)
+                    self, c, self.herald_cost(c), pool), pool)
                 pay = None if _m is None else _m[2]
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs

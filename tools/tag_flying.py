@@ -495,6 +495,18 @@ def main():
                 if n in creatures and "Defender" in c.get("keywords", [])
                 and "loses defender" not in (c.get("oracle_text") or "").lower()}
 
+    # ATTACK TAXES, 2026-10-14 (§0z138): "Creatures can't attack you unless
+    # their controller pays {N} for each creature they control that's
+    # attacking you" (Ghostly Prison, Propaganda). name -> N. Read by
+    # `opponents.attack_tax_through` under `pod_threats`.
+    attack_tax = {}
+    for n, c in cards.items():
+        m = re.search(r"can't attack you unless their controller pays "
+                      r"\{(\d+)\} for each creature",
+                      (c.get("oracle_text") or "").lower())
+        if m:
+            attack_tax[n] = int(m.group(1))
+
     land_rules = {}
     for n, c in cards.items():
         if n in everything and everything[n].is_land:
@@ -577,6 +589,10 @@ def main():
     print(f"\nDEFENDER ({len(defender)}) -- can't attack:")
     for n in sorted(defender):
         print(f"    {n}")
+
+    print(f"\nATTACK TAX ({len(attack_tax)}) -- {{N}} per attacker:")
+    for n in sorted(attack_tax):
+        print(f"    {n:42} {attack_tax[n]}")
 
     print(f"\nLAND RULES ({len(land_rules)}) -- entering, tapping and life, "
           f"from the oracle text:")
@@ -735,6 +751,13 @@ def main():
                      "(§0z125).\nDEFENDER = {\n")
             for n in sorted(defender):
                 fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# ATTACK TAXES: \"creatures can't attack you unless "
+                     "their controller\n# pays {N} for each creature ...\" "
+                     "-> N. Read by `opponents.attack_tax_through`\n"
+                     "# under `pod_threats` (§0z138).\nATTACK_TAX = {\n")
+            for n in sorted(attack_tax):
+                fh.write(f"    {n!r}: {attack_tax[n]},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"

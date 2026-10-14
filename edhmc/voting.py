@@ -128,13 +128,10 @@ def dilemma(g, label="tivit"):
     return mine, theirs
 
 
-def council(g, tie_goes_to_you=False) -> bool:
-    """WILL OF THE COUNCIL: one outcome. Returns True if YOUR choice happens.
-
-    Most of these cards list your preferred mode second and resolve ties in
-    the second mode's favour, but not all -- pass `tie_goes_to_you` per card
-    rather than assuming.
-    """
+def council_votes(g):
+    """WILL OF THE COUNCIL's tally: (votes with you, votes against you). The
+    draws, metrics and vote payoffs `council` has always made, without the
+    verdict -- the voting answers (§0z138) need the counts."""
     mine, theirs = my_votes(g), opp_votes(g)
     if vote_control(g):
         against = 0
@@ -143,10 +140,73 @@ def council(g, tie_goes_to_you=False) -> bool:
     mine += theirs - against
     g.m["votes_cast"] += mine + against
     g.m["councils"] += 1
+    return mine, against
+
+
+def council(g, tie_goes_to_you=False) -> bool:
+    """WILL OF THE COUNCIL: one outcome. Returns True if YOUR choice happens.
+
+    Most of these cards list your preferred mode second and resolve ties in
+    the second mode's favour, but not all -- pass `tie_goes_to_you` per card
+    rather than assuming.
+    """
+    mine, against = council_votes(g)
     won = mine > against or (mine == against and tie_goes_to_you)
     g.m["councils_won"] += int(won)
     _vote_payoffs(g, against)
     return won
+
+
+# THE VOTING ANSWERS (item 24, §0z138), under `opponents.vote_answers_on`.
+# Both exile/destroy "each <object> with the most votes OR TIED for most
+# votes", so a tie takes your pick too. An opponent voting against you votes
+# for something other than your pick -- `_opp_picks_against`, the same
+# per-policy draw every council makes, so `opp_vote_policy` decides these as
+# it decides the others (say it out loud).
+
+def judgment(g, name="Council's Judgment") -> bool:
+    """"Each player votes for a nonland permanent you don't control. Exile
+    each permanent with the most votes or tied for most votes." You vote for
+    the piece `answer_target` would aim at; it is exiled unless the votes
+    against outnumber yours. Votes against cannot reach YOUR permanents."""
+    mine, against = council_votes(g)
+    won = mine >= against
+    g.m["councils_won"] += int(won)
+    g.m["threat_answers_cast"] += 1
+    pick = OPP.answer_target(g, OPP.VOTE_ANSWERS[name])
+    _vote_payoffs(g, against)
+    if not won or pick is None:
+        g.m["threat_answers_whiffed"] += 1
+        return False
+    OPP.remove_threat_piece(g, *pick)
+    g.m["vote_answers_won"] += 1
+    return True
+
+
+def dilemma_vault(g, name="Vault 11: Voter's Dilemma") -> bool:
+    """Vault 11, chapters II and III: "Each player secretly votes for up to
+    one creature ... destroy each creature with the most votes or tied for
+    most votes." You vote for a creature piece; the votes against you go on
+    YOUR creature the table most wants gone (`threat_of`, a destroyable one).
+    More votes against than for: yours dies and the piece lives. A tie: both
+    die. Returns whether the piece died."""
+    mine, against = council_votes(g)
+    g.m["councils_won"] += int(mine > against)
+    pick = OPP.answer_target(g, OPP.VOTE_ANSWERS[name])
+    _vote_payoffs(g, against)
+    took = False
+    if mine >= against and pick is not None:
+        OPP.remove_threat_piece(g, *pick)
+        g.m["vote_answers_won"] += 1
+        took = True
+    if against and against >= mine:
+        mine_c = [p for p in g.board if OPP.is_creature_now(g, p)
+                  and not OPP.is_hardy(g, p)]
+        if mine_c:
+            victim = max(mine_c, key=lambda p: OPP.threat_of(g, p))
+            if OPP.destroy(g, victim, destroys=True):
+                g.m["vault_votes_lost_creature"] += 1
+    return took
 
 
 def tempting_offer(g) -> int:

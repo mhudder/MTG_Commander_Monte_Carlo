@@ -31,6 +31,7 @@ from dataclasses import dataclass, field
 # GENERATED from Scryfall by tools.removal_census: the destroy share per
 # kind of pod answer (§0z87). In every cache fingerprint.
 from edhmc.decks import _removal
+from edhmc.decks import _evasion
 
 # Per-opponent, per-turn probabilities, once that opponent has mana (turn >= 3).
 # Calibration target for a mixed pod over turns 3-10: roughly 4 spot removal
@@ -527,9 +528,25 @@ ANSWER_NOT_MODELLED = {
     "Selesnya Eulogist": "exiles a creature CARD from a graveyard",
     "Capital Punishment": "an edict: the opponent chooses, never the piece",
     "Tyrant's Choice": "an edict: the opponent chooses, never the piece",
-    "Council's Judgment": "a vote (edhmc.voting), not wired",
-    "Vault 11: Voter's Dilemma": "a vote (edhmc.voting), not wired",
 }
+
+# THE VOTING ANSWERS (item 24, §0z138): "each permanent / each creature with
+# the most votes or tied for most votes". Not a target, so not `answer_reach`:
+# what the vote can hit is the "each <type>" in the census clause, and who
+# wins it is `edhmc.voting` (tivit resolves them; `vote_answers=False` is the
+# vote with no effect, as before). Council's Judgment's vote is for "a
+# nonland permanent you don't control" -- every piece type is nonland.
+VOTE_ANSWER_NAMES = ("Council's Judgment", "Vault 11: Voter's Dilemma")
+
+
+def vote_reach(clause: str) -> Reach:
+    c = clause.lower()
+    m = re.search(r"each (permanent|creature) with the most votes", c)
+    if not m:
+        raise ValueError(f"no 'each <type> with the most votes' in {clause!r}")
+    types = (frozenset(PIECE_TYPES) if m.group(1) == "permanent"
+             else frozenset({"Creature"}))
+    return Reach(types, 1, 99, 0)
 
 PIECE_TYPES = ("Creature", "Artifact", "Enchantment", "Planeswalker")
 Reach = namedtuple("Reach", "types n max_toughness min_mv")
@@ -566,7 +583,8 @@ def answer_reach(clause: str) -> Reach:
 def _derive_answers() -> dict:
     out = {}
     for name, (kind, _cls, clause) in _removal.INTERACTION.items():
-        if kind != "spot" or name in ANSWER_NOT_MODELLED:
+        if (kind != "spot" or name in ANSWER_NOT_MODELLED
+                or name in VOTE_ANSWER_NAMES):
             continue
         try:
             out[name] = answer_reach(clause)
@@ -583,6 +601,12 @@ def _derive_answers() -> dict:
 
 
 ANSWERS = _derive_answers()
+VOTE_ANSWERS = {name: vote_reach(_removal.INTERACTION[name][2])
+                for name in VOTE_ANSWER_NAMES}
+
+
+def vote_answers_on(g) -> bool:
+    return pod_threats_on(g) and bool(g.cfg.get("vote_answers", True))
 
 
 def hits(reach: Reach, piece: ThreatPiece) -> bool:
@@ -615,9 +639,18 @@ def answer_pod_threat(g, card) -> int:
     spell going on the stack (§0z30), when the spell was NOT countered. A
     `wipe`-tagged card is not answered here: it resolves through
     `resolve_own_wipe`, and `wipe_threat_pieces` takes its share."""
-    if not pod_threats_on(g) or "wipe" in card.tags:
+    if not pod_threats_on(g):
         return 0
-    reach = ANSWERS.get(card.name)
+    if "wipe" in card.tags:
+        # §0z138: an overload card cast for its printed cost is a spot
+        # answer, and its wrath half must not resolve after it.
+        if not cast_single(g, card):
+            return 0
+        reach = SINGLE_TARGET[card.name]
+        g.single_mode, g.single_cast = None, card
+        g.m["single_target_casts"] += 1
+    else:
+        reach = ANSWERS.get(card.name)
     if reach is None:
         return 0
     done = 0
@@ -656,17 +689,19 @@ def hold_answer(g, card) -> bool:
     if "wipe" in card.tags or not ({"Instant", "Sorcery"} & card.types):
         return False
     reach = ANSWERS.get(card.name)
+    if reach is None and vote_answers_on(g):
+        reach = VOTE_ANSWERS.get(card.name)       # §0z138: Council's Judgment
     return reach is not None and answer_target(g, reach) is None
 
 
-def wipe_threat_pieces(g, card, scope=None) -> int:
-    """Your sweeper takes the pieces its scope reaches (`OWN_WIPE_SCOPE`, the
-    rule `resolve_own_wipe` applies to your board and theirs): every scope
-    reaches creatures, toughness and mana value as change 1 reads them;
-    "nonland" reaches everything, "artifacts_creatures" artifacts too, "mv2"
-    any piece of mana value 2 or less. `scope` overrides the card's."""
-    if not pod_threats_on(g):
-        return 0
+def wipe_takes(g, card, scope=None) -> list:
+    """(opponent, piece index) for every piece out that this sweeper's scope
+    reaches (`OWN_WIPE_SCOPE`, the rule `resolve_own_wipe` applies to your
+    board and theirs): every scope reaches creatures, toughness and mana
+    value as change 1 reads them; "nonland" reaches everything,
+    "artifacts_creatures" artifacts too, "mv2" any piece of mana value 2 or
+    less. `scope` overrides the card's. The one list the sweeper removes and
+    the wipe gate prices (§0z138)."""
     scope = scope if scope is not None else own_wipe_scope(g, card)
     x = gyre_x(g) if scope == "damage_x" else None
 
@@ -683,7 +718,7 @@ def wipe_threat_pieces(g, card, scope=None) -> int:
             return p.toughness <= 2
         return True
 
-    n = 0
+    out = []
     for o in living(g):
         present = present_pieces(g, o)
         dying = [k for k in present if dies(o.pieces[k])]
@@ -692,11 +727,36 @@ def wipe_threat_pieces(g, card, scope=None) -> int:
             if dying:
                 keep = max(dying, key=lambda k: o.pieces[k].toughness)
                 dying = [k for k in dying if k != keep]
-        for k in dying:
-            remove_threat_piece(g, o, k)
-            n += 1
+        out += [(o, k) for k in dying]
+    return out
+
+
+def wipe_threat_pieces(g, card, scope=None) -> int:
+    """Your sweeper takes the pieces its scope reaches (`wipe_takes`)."""
+    if not pod_threats_on(g):
+        return 0
+    n = 0
+    for o, k in wipe_takes(g, card, scope):
+        remove_threat_piece(g, o, k)
+        n += 1
     g.m["threat_wipe_pieces"] += n
     return n
+
+
+def gate_pieces(g, card, measure) -> float:
+    """What the pieces this sweeper would take add to THEIR side of the wipe
+    gate (§0z138), in the gate's own units: each piece counts as one more of
+    its opponent's creatures -- a body under "count", that opponent's power
+    otherwise -- times `wipe_gate_piece_weight` (1.0, a judgement: a piece
+    removal delays a kill about two rounds, which no creature-count can
+    price exactly). 0 off `pod_threats` or with `wipe_gate_pieces=False`,
+    the gate that never saw a route."""
+    if not pod_threats_on(g) or not g.cfg.get("wipe_gate_pieces", True):
+        return 0.0
+    w = g.cfg.get("wipe_gate_piece_weight", 1.0)
+    if measure == "count":
+        return w * len(wipe_takes(g, card))
+    return w * sum(o.p.get("power", 1.0) for o, _k in wipe_takes(g, card))
 
 
 # ---------------------------------------------------------------------------
@@ -1384,19 +1444,80 @@ GRANTS_INDESTRUCTIBLE = {"Avacyn, Angel of Hope"}
 OVERLOAD_WIPES = {"Damn": {"gen": 2, "W": 2}}
 
 
-def wipe_mode_cost(g, card, base):
+def wipe_mode_cost(g, card, base, units=None):
     """What a `wipe`-tagged card costs when it is cast AS the wipe: its
-    overload for an `OVERLOAD_WIPES` card, otherwise `base`, unchanged."""
-    if (card.name in OVERLOAD_WIPES and "wipe" in card.tags
+    overload for an `OVERLOAD_WIPES` card, otherwise `base`, unchanged.
+
+    UNDER `pod_threats` (§0z138) an overload card is priced at `base` -- its
+    single-target mode -- when that mode is ready and either the wipe gate
+    refuses the wrath or the overload cannot be paid from `units`: a pilot
+    with {B}{B} and a creature piece out does not sit on Damn for four turns
+    waiting to afford the wrath. The choice is noted on the game
+    (`g.single_mode`) and read back when the spell resolves (`cast_single`),
+    so the mode the cast was priced at is the mode it resolves in."""
+    if not (card.name in OVERLOAD_WIPES and "wipe" in card.tags
             and g.cfg.get("damn_overload", True)):
-        return dict(OVERLOAD_WIPES[card.name])
-    return base
+        return base
+    over = dict(OVERLOAD_WIPES[card.name])
+    single = single_target_ready(g, card) and (
+        not should_cast_own_wipe(g, card)
+        or (units is not None and _can_pay(over, units) is None))
+    if single:
+        g.single_mode = card
+    elif getattr(g, "single_mode", None) is card:
+        g.single_mode = None
+    return base if single else over
+
+
+def _can_pay(cost, units):
+    from edhmc.engine import can_pay
+    return can_pay(cost, units)
 
 
 def overload_only(g, card) -> bool:
     """Is this card a wipe only when overloaded? A cast that pays some other
     cost (life, nothing) gets the single-target mode instead."""
     return card.name in OVERLOAD_WIPES and g.cfg.get("damn_overload", True)
+
+
+# THE OTHER MODE, UNDER `pod_threats` (item 24, §0z138). Without it, Damn
+# for {B}{B} is "destroy target creature" against a pod whose creatures are a
+# count, so the main phases cast it only as the wrath. Under `pod_threats` a
+# creature PIECE is a target: when the wipe gate refuses the wrath and a piece
+# the printed mode can hit is out, the pilot casts it for its printed cost as
+# a spot answer. Its reach is derived from the census clause, as every other
+# answer's is. `overload_single_target=False` is the wrath-only pilot.
+# NOT through Bolas's Citadel: that dig still holds a Damn on top (§0z118),
+# so a Citadel-revealed Damn is the one cast this does not reach.
+SINGLE_TARGET = {name: answer_reach(_removal.INTERACTION[name][2])
+                 for name in OVERLOAD_WIPES}
+
+
+def single_target_ready(g, card) -> bool:
+    """Is the single-target mode of this overload card castable as an answer
+    right now: `pod_threats` on, the knob on, and a piece it can hit out?"""
+    if (card.name not in SINGLE_TARGET or not overload_only(g, card)
+            or not pod_threats_on(g)
+            or not g.cfg.get("overload_single_target", True)):
+        return False
+    return answer_target(g, SINGLE_TARGET[card.name]) is not None
+
+
+def cast_single(g, card) -> bool:
+    """Is THIS cast of `card` its single-target mode -- the mode
+    `wipe_mode_cost` priced it at, and still ready? A pilot behind on board
+    who can pay the overload takes the wrath, which also takes the pieces
+    its scope reaches (`wipe_takes`)."""
+    return (getattr(g, "single_mode", None) is card
+            and single_target_ready(g, card))
+
+
+def own_wipe_castable(g, card) -> bool:
+    """The main phases' gate for a `wipe`-tagged card: the wipe gate agrees,
+    or (§0z138) its single-target mode is ready. Any other card passes."""
+    if "wipe" not in card.tags:
+        return True
+    return should_cast_own_wipe(g, card) or single_target_ready(g, card)
 
 
 # YOUR OWN SWEEPERS, classified by whether INDESTRUCTIBLE stops them. Each
@@ -3158,8 +3279,11 @@ def incidental_damage(g):
         share = monarch_attack_share(g, share)
         # An aggro deck's creatures hit harder than a control deck's.
         from edhmc.engine import damage_you            # Angel, §0z135
+        # §0z138: the attack taxes turn part of the swing elsewhere (1.0
+        # off `pod_threats` or with no tax out, so nothing else moves).
         g.your_life -= damage_you(
-            g, opp.creatures * rate * share * opp.p.get("power", 1.0))
+            g, opp.creatures * rate * share * opp.p.get("power", 1.0)
+            * attack_tax_through(g))
         # GATED ON HOLDING THE CROWN, which is what keeps this change worth
         # ZERO to all six decks: nothing grants the monarch yet, so the roll is
         # never consumed and no existing stream can shift. `crn_random` is
@@ -3188,6 +3312,45 @@ def incidental_damage(g):
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
         g.m["loss_route"] = 1          # ground down on life
+
+
+# ATTACK TAXES (item 24, §0z138). Ghostly Prison and Propaganda: "Creatures
+# can't attack you unless their controller pays {2} for each creature they
+# control that's attacking you" (`_evasion.ATTACK_TAX`, generated). Without
+# routes the pod's kill was a roll, not a combat, and nothing could be taxed.
+# Under `pod_threats` a COMBAT route's kill is an attack: when it would pick
+# you, it goes to another living opponent instead with probability
+# 1 - `attack_tax_through`, and the pod's chip damage at you -- also combat --
+# is scaled by the same number. A drain or combo route is not an attack and
+# pays nothing. The pod has no mana model, so whether an attacker pays is a
+# judgement with no data: `attack_tax_deflect` (0.5), the chance one {2} of
+# tax per attacker turns an attack elsewhere, compounding per {2}. Say it out
+# loud with every result it moves. With nobody else left, they pay.
+def attack_tax_through(g) -> float:
+    """The share of the pod's attacks at you that the taxes let through:
+    1.0 off `pod_threats` or with no tax on your battlefield."""
+    if not pod_threats_on(g):
+        return 1.0
+    tax = sum(_evasion.ATTACK_TAX.get(p.card.name, 0) for p in g.board)
+    if not tax:
+        return 1.0
+    d = g.cfg.get("attack_tax_deflect", 0.5)
+    return (1.0 - d) ** (tax / 2.0)
+
+
+def tax_deflects(g, i, opp, others) -> bool:
+    """Does the tax turn opponent i's COMBAT kill away from you? Rolled on
+    its own addressed stream (§0z17), only when a tax is out."""
+    if opp.route != "combat" or not others:
+        return False
+    through = attack_tax_through(g)
+    if through >= 1.0:
+        return False
+    from edhmc.engine import crn_random
+    if crn_random(g, f"attack_tax{i}") < through:
+        return False
+    g.m["attack_tax_deflected"] += 1
+    return True
 
 
 def angel_prevents_kill(g, opp) -> bool:
@@ -3225,9 +3388,11 @@ def resolve_clocks(g):
         opp.clock_fired = True      # a clock resolves once, not every turn
         others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
         share = your_share(g, opp, others)
-        if rolls_t[i][6] < share and angel_prevents_kill(g, opp):
+        at_you = (rolls_t[i][6] < share
+                  and not tax_deflects(g, i, opp, others))      # §0z138
+        if at_you and angel_prevents_kill(g, opp):
             continue                   # §0z135: damage, prevented and milled
-        if rolls_t[i][6] < share:
+        if at_you:
             g.result = "loss"          # you were the biggest threat
             g.m["loss_route"] = 2      # an opponent's clock picked YOU
             g.your_life = 0.0
@@ -3310,6 +3475,7 @@ def should_cast_own_wipe(g, card=None) -> bool:
         theirs = sum((o.creatures - (pod_left_for_gate(g, card, o)
                                      if measure == "cost" else 0.0))
                      * o.p.get("power", 1.0) for o in living(g))
+    theirs += gate_pieces(g, card, measure)          # §0z138: the routes
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
 
 
@@ -3350,6 +3516,9 @@ def resolve_own_wipe(g, spare_own=False, card=None):
     `own_wipe_indestructible=False` restores the old kill-everything path, and
     is what any table published before 2026-09-11 reproduces with.
     """
+    if card is not None and getattr(g, "single_cast", None) is card:
+        g.single_cast = None         # §0z138: cast as "destroy target creature"
+        return
     wipe_threat_pieces(g, card)                  # item 24, change 2
     pod_killed = 0.0
     for o in living(g):
