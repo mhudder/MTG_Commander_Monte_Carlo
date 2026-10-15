@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0020.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0027.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -25,176 +25,176 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Lyra Dawnbringer                      +1.45+-0.10         +2.58+-0.19        +0.0281+-0.0032      both
-Sol Ring                              +2.29+-0.15         +2.26+-0.19        +0.0125+-0.0029      both
-Archangel of Thune                    +1.43+-0.11         +2.24+-0.19        +0.0251+-0.0033      both
-Righteous Valkyrie                    +0.97+-0.08         +1.47+-0.14        +0.0147+-0.0027      both
-Kokusho, the Evening Star             +1.20+-0.08         +1.45+-0.13        +0.0087+-0.0025      both
-Emeria's Call // Emeria, Shattered Skyclave        +0.92+-0.10         +1.45+-0.17        +0.0115+-0.0028      both
-Lyra, Archangel of Dawn               +1.30+-0.09         +1.36+-0.13        +0.0110+-0.0027      both
-Talisman of Hierarchy                 +1.08+-0.10         +1.33+-0.15        +0.0095+-0.0026      both
-Fellwar Stone                         +1.13+-0.10         +1.32+-0.15        +0.0085+-0.0026      both
-Orzhov Signet                         +1.02+-0.10         +1.21+-0.15        +0.0083+-0.0026      both
-Arcane Signet                         +1.03+-0.10         +1.20+-0.15        +0.0075+-0.0026      both
-Avacyn, Angel of Hope                 +0.58+-0.07         +1.15+-0.12        +0.0143+-0.0026      both
-Herald of War                         +0.74+-0.06         +1.13+-0.11        +0.0104+-0.0024      both
-Requiem Angel                         +0.77+-0.06         +1.10+-0.10        +0.0059+-0.0023      both
-Resplendent Angel                     +1.05+-0.08         +1.09+-0.13        +0.0092+-0.0026      both
-Marble Diamond                        +0.85+-0.09         +1.07+-0.15        +0.0061+-0.0024      both
-Mind Stone                            +0.97+-0.09         +1.04+-0.14        +0.0045+-0.0024      both
-Massacre Wurm                         +0.55+-0.06         +1.01+-0.14        +0.0239+-0.0030      both
-Smothering Tithe                      +0.81+-0.09         +0.96+-0.15        +0.0067+-0.0027      both
-Giada, Font of Hope                   +0.90+-0.07         +0.88+-0.11        +0.0059+-0.0023      both
-Twilight Shepherd                     +0.48+-0.05         +0.88+-0.09        +0.0087+-0.0023      both
-Zulaport Cutthroat                    +0.80+-0.06         +0.86+-0.09        +0.0047+-0.0018      both
-Bishop of Wings                       +0.25+-0.04         +0.73+-0.10        +0.0105+-0.0021      both
-Youthful Valkyrie                     +0.62+-0.05         +0.73+-0.09        +0.0047+-0.0020      both
-Teferi's Protection                   +0.59+-0.06         +0.72+-0.10        +0.0045+-0.0017      both
-Phyrexian Arena                       +0.48+-0.08         +0.71+-0.15        +0.0083+-0.0027      both
-Emeria Shepherd                       +0.33+-0.04         +0.67+-0.08        +0.0066+-0.0018      both
-Elesh Norn, Grand Cenobite            +0.40+-0.05         +0.66+-0.11        +0.0080+-0.0024      both
-Wayfarer's Bauble                     +0.56+-0.07         +0.62+-0.12        +0.0031+-0.0022      both
-Voldaren Bloodcaster // Bloodbat Summoner        +0.60+-0.05         +0.62+-0.08        +0.0023+-0.0018      both
-Speaker of the Heavens                +0.23+-0.05         +0.55+-0.09        +0.0068+-0.0018      both
-Midnight Reaper                       +0.29+-0.05         +0.45+-0.11        +0.0045+-0.0024      both
-Flawless Maneuver                     +0.28+-0.05         +0.43+-0.09        +0.0028+-0.0016      both
-Grim Haruspex                         +0.26+-0.05         +0.40+-0.11        +0.0038+-0.0023      both
-Reya Dawnbringer                      +0.12+-0.02         +0.39+-0.06        +0.0051+-0.0015      both
-Priest of Fell Rites                  +0.29+-0.04         +0.32+-0.08        +0.0025+-0.0017      both
-Sun Titan                             +0.19+-0.03         +0.26+-0.08        +0.0023+-0.0018      both
-Bloodghast                            +0.21+-0.04         +0.19+-0.08        +0.0013+-0.0018       dmg
-Blood Artist                          +0.04+-0.04         +0.18+-0.08        +0.0023+-0.0017      both
-Black Market Connections              +0.40+-0.08         +0.17+-0.15        +0.0042+-0.0027      both
-Pitiless Plunderer                    +0.04+-0.04         +0.12+-0.09        +0.0009+-0.0020       dmg
-Dark Prophecy                         +0.05+-0.03         +0.04+-0.08        +0.0006+-0.0018        --
-Cartel Aristocrat                     +0.05+-0.03         -0.04+-0.05        -0.0004+-0.0012        --
-Viscera Seer                          -0.10+-0.03         -0.13+-0.05        +0.0001+-0.0010       dmg
-Skullclamp                            -0.05+-0.03         -0.13+-0.07        -0.0016+-0.0014      both
+Sol Ring                              +2.26+-0.17         +2.04+-0.21        +0.0113+-0.0035      both
+Lyra Dawnbringer                      +1.08+-0.10         +1.54+-0.17        +0.0218+-0.0033      both
+Archangel of Thune                    +1.17+-0.11         +1.49+-0.18        +0.0208+-0.0034      both
+Fellwar Stone                         +1.07+-0.11         +1.31+-0.18        +0.0107+-0.0031      both
+Emeria's Call // Emeria, Shattered Skyclave        +0.85+-0.11         +1.29+-0.18        +0.0121+-0.0033      both
+Massacre Wurm                         +1.15+-0.08         +1.28+-0.14        +0.0105+-0.0028      both
+Orzhov Signet                         +1.09+-0.11         +1.23+-0.18        +0.0097+-0.0031      both
+Talisman of Hierarchy                 +1.07+-0.11         +1.19+-0.18        +0.0085+-0.0031      both
+Marble Diamond                        +0.86+-0.11         +1.01+-0.17        +0.0063+-0.0029      both
+Mind Stone                            +0.95+-0.10         +1.00+-0.17        +0.0064+-0.0030      both
+Arcane Signet                         +1.01+-0.11         +0.99+-0.17        +0.0042+-0.0030      both
+Smothering Tithe                      +0.83+-0.11         +0.94+-0.18        +0.0093+-0.0031      both
+Righteous Valkyrie                    +0.66+-0.09         +0.86+-0.14        +0.0117+-0.0030      both
+Kokusho, the Evening Star             +0.95+-0.08         +0.85+-0.13        +0.0039+-0.0027      both
+Requiem Angel                         +0.62+-0.06         +0.76+-0.10        +0.0082+-0.0024      both
+Herald of War                         +0.56+-0.07         +0.75+-0.12        +0.0086+-0.0026      both
+Teferi's Protection                   +0.50+-0.07         +0.69+-0.13        +0.0047+-0.0024      both
+Lyra, Archangel of Dawn               +0.94+-0.09         +0.65+-0.14        +0.0033+-0.0028      both
+Wayfarer's Bauble                     +0.61+-0.09         +0.64+-0.15        +0.0029+-0.0028      both
+Zulaport Cutthroat                    +0.64+-0.06         +0.61+-0.10        +0.0030+-0.0020      both
+Giada, Font of Hope                   +0.62+-0.07         +0.60+-0.12        +0.0050+-0.0024      both
+Avacyn, Angel of Hope                 +0.48+-0.07         +0.60+-0.12        +0.0083+-0.0026      both
+Midnight Reaper                       +0.59+-0.07         +0.60+-0.13        +0.0027+-0.0028       dmg
+Twilight Shepherd                     +0.43+-0.05         +0.59+-0.10        +0.0043+-0.0025      both
+Grim Haruspex                         +0.57+-0.07         +0.58+-0.13        +0.0038+-0.0027      both
+Resplendent Angel                     +0.68+-0.08         +0.52+-0.13        +0.0050+-0.0027      both
+Flawless Maneuver                     +0.33+-0.07         +0.46+-0.12        +0.0041+-0.0023      both
+Bishop of Wings                       +0.24+-0.05         +0.46+-0.10        +0.0079+-0.0021      both
+Elesh Norn, Grand Cenobite            +0.49+-0.06         +0.44+-0.12        +0.0052+-0.0026      both
+Sun Titan                             +0.37+-0.05         +0.40+-0.09        +0.0036+-0.0021      both
+Speaker of the Heavens                +0.20+-0.06         +0.38+-0.09        +0.0052+-0.0019      both
+Phyrexian Arena                       +0.35+-0.09         +0.37+-0.17        +0.0039+-0.0031      both
+Bloodghast                            +0.42+-0.05         +0.34+-0.11        +0.0022+-0.0023       dmg
+Emeria Shepherd                       +0.25+-0.04         +0.31+-0.08        +0.0022+-0.0019      both
+Youthful Valkyrie                     +0.31+-0.05         +0.31+-0.10        +0.0045+-0.0022      both
+Priest of Fell Rites                  +0.40+-0.05         +0.27+-0.10        -0.0003+-0.0021       dmg
+Reya Dawnbringer                      +0.11+-0.02         +0.22+-0.06        +0.0035+-0.0017      both
+Voldaren Bloodcaster // Bloodbat Summoner        +0.31+-0.05         +0.20+-0.08        +0.0012+-0.0019       dmg
+Blood Artist                          +0.06+-0.06         +0.18+-0.10        +0.0045+-0.0020      both
+Pitiless Plunderer                    -0.01+-0.04         +0.14+-0.11        +0.0028+-0.0023      both
+Cartel Aristocrat                     +0.20+-0.04         +0.13+-0.07        -0.0007+-0.0015       dmg
+Black Market Connections              +0.25+-0.09         +0.02+-0.17        +0.0012+-0.0031        --
+Dark Prophecy                         +0.04+-0.04         +0.00+-0.10        +0.0003+-0.0021        --
+Skullclamp                            -0.07+-0.04         -0.06+-0.07        -0.0012+-0.0015        --
+Viscera Seer                          -0.15+-0.04         -0.16+-0.07        -0.0010+-0.0013       dmg
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Serra's Emissary                      +1.15+-0.09         +2.50+-0.18        +0.0284+-0.0031      both
+Angel of Suffering                    +1.19+-0.12         +1.84+-0.18        +0.0233+-0.0034      both
+      MODELLED (§0z135): every point of damage dealt to you -- the pod's combat,
+      painlands, Midnight Reaper -- prevented, and twice it milled
+      (`engine.damage_you`); under `pod_threats` a combat route's kill too -- the
+      default pod since §0z140. NOT: a combo or drain route's kill, which is not
+      damage, nor life LOSS and life payments. A floor.
+Serra's Emissary                      +0.74+-0.07         +1.40+-0.15        +0.0227+-0.0030      both
       MODELLED: the 7/7 flier, and protection from the chosen card type as
       `emissary_type` 'Creature' (§0z84): the pod's creatures cannot block yours
       and their chip damage does not reach you. NOT: the pod's kill clocks, which
       are rolls rather than combats (§4) -- protection from creatures would stop a
       combat kill and the model cannot tell which clock is one. A floor.
-Agadeem's Awakening // Agadeem, the Undercrypt        +0.76+-0.09         +1.25+-0.16        +0.0087+-0.0027      both
+Damn                                  +0.18+-0.08         +1.37+-0.16        +0.0193+-0.0031      both
+      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
+      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
+      refuses the wrath or the overload cannot be paid. Your half of the wrath is
+      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
+      can hit. The cost is modelled, the benefit an estimate.
+Agadeem's Awakening // Agadeem, the Undercrypt        +0.86+-0.11         +1.32+-0.19        +0.0120+-0.0032      both
       MODELLED: the back face, played as a land. NOT: the front face's X-spell
       mass reanimation, largely redundant here with Shilgengar's own ultimate and
       the deck's other recursion. A floor.
-Wrath of God                          +0.17+-0.05         +0.95+-0.12        +0.0075+-0.0021      both
+Generous Gift                         +0.41+-0.07         +1.24+-0.15        +0.0142+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Path to Exile                         +0.30+-0.06         +1.20+-0.15        +0.0109+-0.0028      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Swords to Plowshares                  +0.29+-0.07         +1.15+-0.16        +0.0095+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Anguished Unmaking                    +0.42+-0.07         +1.14+-0.15        +0.0107+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Vindicate                             +0.42+-0.07         +1.09+-0.15        +0.0124+-0.0029      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Utter End                             +0.45+-0.08         +1.09+-0.15        +0.0109+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Wrath of God                          +0.08+-0.07         +1.00+-0.15        +0.0125+-0.0028      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Angel of Suffering                    +0.71+-0.06         +0.90+-0.10        +0.0067+-0.0022      both
-      MODELLED (§0z135): every point of damage dealt to you -- the pod's combat,
-      painlands, Midnight Reaper -- prevented, and twice it milled
-      (`engine.damage_you`); under `pod_threats` a combat route's kill too -- the
-      default pod since §0z140. NOT: a combo or drain route's kill, which is not
-      damage, nor life LOSS and life payments. A floor.
-Damn                                  +0.11+-0.05         +0.75+-0.11        +0.0069+-0.0019      both
-      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
-      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
-      refuses the wrath or the overload cannot be paid. Your half of the wrath is
-      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
-      can hit. The cost is modelled, the benefit an estimate.
-Angelic Arbiter                       +0.32+-0.04         +0.68+-0.09        +0.0073+-0.0020      both
+Mortify                               +0.33+-0.07         +0.96+-0.15        +0.0105+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Despark                               +0.31+-0.06         +0.86+-0.14        +0.0082+-0.0027      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Angel of Despair                      +0.34+-0.05         +0.83+-0.11        +0.0119+-0.0026      both
+      MODELLED: the 5/5 flier. NOT: 'When this creature enters, destroy target
+      permanent' -- no opposing permanent (§4). A floor.
+Angel of the Ruins                    +0.32+-0.05         +0.65+-0.11        +0.0067+-0.0023      both
+      MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
+      artifacts and/or enchantments (no opposing permanent, §4), nor Plainscycling
+      {2}, which would turn a seven-drop in a short game into a land. A floor.
+Angelic Arbiter                       +0.28+-0.04         +0.42+-0.09        +0.0048+-0.0022      both
       MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell this turn
       can't attack; each who attacked can't cast spells' -- the pod's attacks and
       spells are rates, not per-opponent turn records. A restriction on the pod
       only helps you. A floor.
-Angel of Serenity                     +0.36+-0.04         +0.64+-0.08        +0.0057+-0.0019      both
+Angel of Serenity                     +0.27+-0.04         +0.38+-0.08        +0.0040+-0.0020      both
       MODELLED: the 5/6 flier. NOT: 'exile up to three other target creatures from
       the battlefield and/or creature cards from graveyards' -- no opposing
       creature to exile (§4), and the own-graveyard trick (exile three, get them
       back to hand when it leaves) is not taken. A floor.
-Angel of Despair                      +0.32+-0.04         +0.60+-0.08        +0.0053+-0.0019      both
-      MODELLED: the 5/5 flier. NOT: 'When this creature enters, destroy target
-      permanent' -- no opposing permanent (§4). A floor.
-Angel of the Ruins                    +0.29+-0.03         +0.54+-0.08        +0.0053+-0.0018      both
-      MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
-      artifacts and/or enchantments (no opposing permanent, §4), nor Plainscycling
-      {2}, which would turn a seven-drop in a short game into a land. A floor.
-Utter End                             +0.19+-0.03         +0.28+-0.07        +0.0013+-0.0014       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Anguished Unmaking                    +0.16+-0.04         +0.27+-0.07        +0.0019+-0.0013      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Malakir Rebirth // Malakir Mire        +0.20+-0.07         +0.27+-0.12        +0.0011+-0.0018       dmg
-      MODELLED: the back face, played as a land. NOT: the front face's 'you lose 2
-      life; until end of turn, that creature gains "when this creature dies,
-      return it to the battlefield"' -- there is no removal-in-response window to
-      react in. A floor.
-Revel in Riches                       +0.18+-0.03         +0.26+-0.07        +0.0033+-0.0016      both
+Revel in Riches                       +0.22+-0.05         +0.15+-0.11        +0.0031+-0.0023      both
       MODELLED: the alt-win, ten or more Treasures at your upkeep, off Treasures
       the rest of the deck makes (Smothering Tithe, in every win traced). MISSING:
       'whenever a creature an opponent controls dies, create a Treasure' -- the
       pod's creatures are a count, not deaths (§4). A FLOOR, and a knob result:
       Tithe's Treasures assume no opponent ever pays its {2}. Left KNOWN_BLIND
       until §0z115.
-Vindicate                             +0.15+-0.03         +0.20+-0.06        +0.0018+-0.0012      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Mortify                               +0.15+-0.03         +0.19+-0.06        +0.0013+-0.0012      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Despark                               +0.12+-0.03         +0.16+-0.06        +0.0018+-0.0011      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Generous Gift                         +0.14+-0.03         +0.15+-0.06        +0.0004+-0.0012       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Path to Exile                         +0.05+-0.02         +0.06+-0.04        +0.0003+-0.0007       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Swords to Plowshares                  +0.04+-0.02         +0.05+-0.03        -0.0001+-0.0007       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
+Malakir Rebirth // Malakir Mire        +0.14+-0.08         +0.14+-0.14        +0.0010+-0.0022       dmg
+      MODELLED: the back face, played as a land. NOT: the front face's 'you lose 2
+      life; until end of turn, that creature gains "when this creature dies,
+      return it to the battlefield"' -- there is no removal-in-response window to
+      react in. A floor.
