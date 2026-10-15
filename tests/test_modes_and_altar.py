@@ -196,6 +196,7 @@ def run_mutations():
     saved = {n: getattr(E, n) for n in
              ("castable_modes", "altar_enable", "altar_fodder")}
     ok = True
+    bad = 0
     for label, patch, want in MUTATIONS:
         for n, f in saved.items():
             setattr(E, n, f)
@@ -208,9 +209,15 @@ def run_mutations():
             print(f"    OK - exactly {sorted(want)} failed")
         else:
             ok = False
+            bad += 1
             print(f"    !!! UNEXPECTED - got {sorted(got)}")
     for n, f in saved.items():
         setattr(E, n, f)
+    # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+    # module's LAST "N passed, M failed" line, and without this one it read
+    # the mutated run's own failures and called the exit code dishonest.
+    print(f"{len(MUTATIONS) - bad} passed, {bad} failed "
+          f"({len(MUTATIONS)} mutations, exact sets)")
     if not ok:
         raise SystemExit("FAIL: a mutation did not behave as specified.")
     print("PASS - every clause is independently pinned.")

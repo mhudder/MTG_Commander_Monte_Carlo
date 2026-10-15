@@ -171,9 +171,17 @@ def main():
                   "on the fix failed. The two that did NOT are the tap order "
                   "(lands before dorks) and the coloured pip itself, which "
                   "the old rule got right and this change preserves.")
+            # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+            # module's LAST "N passed, M failed" line, and without this one it read
+            # the mutated run's own failures and called the exit code dishonest.
+            print("  1 passed, 0 failed (1 mutation, exact set)")
             return 0
         print(f"  MUTATION CHECK FAILED\n    expected {sorted(expected)}\n"
               f"    actual   {sorted(actual)}")
+        # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+        # module's LAST "N passed, M failed" line, and without this one it read
+        # the mutated run's own failures and called the exit code dishonest.
+        print("  0 passed, 1 failed (1 mutation, exact set)")
         return 1
     return 1 if FAIL else 0
 

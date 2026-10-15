@@ -316,12 +316,20 @@ def main():
         if actual_fail == expected_fail:
             print("  MUTATION CHECK OK -- exactly the cases that depend on the "
                   "mutated code failed, and nothing else did.")
+            # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+            # module's LAST "N passed, M failed" line, and without this one it read
+            # the mutated run's own failures and called the exit code dishonest.
+            print("  1 passed, 0 failed (1 mutation, exact set)")
             return 0
         print(f"  MUTATION CHECK FAILED\n"
               f"    expected to fail: {sorted(expected_fail)}\n"
               f"    actually failed : {sorted(actual_fail)}\n"
               f"    unexpected      : {sorted(actual_fail - expected_fail)}\n"
               f"    did not fail    : {sorted(expected_fail - actual_fail)}")
+        # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+        # module's LAST "N passed, M failed" line, and without this one it read
+        # the mutated run's own failures and called the exit code dishonest.
+        print("  0 passed, 1 failed (1 mutation, exact set)")
         return 1
     return 1 if FAIL else 0
 

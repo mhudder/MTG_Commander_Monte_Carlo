@@ -293,6 +293,7 @@ def run_mutations():
     saved_art = E.Game.artifact_died
     L._HAS = L.LoreholdGame.has
     ok = True
+    bad = 0
     for label, patch, want in MUTATIONS:
         L.invoke_calamity, L.SELF_EXILING, L.LoreholdGame.has = \
             saved[0], set(saved[1]), saved[2]
@@ -306,10 +307,16 @@ def run_mutations():
             print(f"    OK - exactly {sorted(want)} failed")
         else:
             ok = False
+            bad += 1
             print(f"    !!! UNEXPECTED - got {sorted(got)}")
     L.invoke_calamity, L.SELF_EXILING, L.LoreholdGame.has = \
         saved[0], set(saved[1]), saved[2]
     E.Game.artifact_died = saved_art
+    # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+    # module's LAST "N passed, M failed" line, and without this one it read
+    # the mutated run's own failures and called the exit code dishonest.
+    print(f"{len(MUTATIONS) - bad} passed, {bad} failed "
+          f"({len(MUTATIONS)} mutations, exact sets)")
     if not ok:
         raise SystemExit("FAIL: a mutation did not behave as specified.")
     print("PASS - every clause is independently pinned.")

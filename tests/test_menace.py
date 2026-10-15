@@ -138,13 +138,19 @@ def main() -> int:
     # Items carry a third element, the attacker's key, and `blocked` collects
     # the keys blocked (§0z65, commander damage). Both mutations keep that
     # contract so they change only the rule they name.
-    def chump_no_cost(items, budget, blocked=None):
+    # `need` since §0z132 (`opponents.chump`'s fourth argument, a cost-aware
+    # pod's "stop chumping once safe"). The stand-ins took three arguments
+    # and every mutation here raised TypeError until §0z141; `need` is None
+    # on this file's pod (POD_PRE_V4), and is passed through or honoured.
+    def chump_no_cost(items, budget, blocked=None, need=None):
         return real_chump([(it[0], 1) + tuple(it[2:]) for it in items],
-                          budget, blocked)
+                          budget, blocked, need)
 
-    def chump_biggest_first(items, budget, blocked=None):
+    def chump_biggest_first(items, budget, blocked=None, need=None):
         stopped, used = 0.0, 0
         for it in sorted(items, key=lambda it: it[0], reverse=True):
+            if need is not None and stopped >= need:
+                break
             if used + it[1] <= budget:
                 used += it[1]
                 stopped += it[0]

@@ -170,8 +170,10 @@ def main() -> int:
             ("commander_damage_lethal", "chump", "commander_hit",
              "_check_eliminations")}
 
-    def chump_silent(items, budget, blocked=None):
-        return real["chump"](items, budget)
+    # `need` is `chump`'s fourth argument since §0z132; this stand-in took
+    # three and raised TypeError until §0z141.
+    def chump_silent(items, budget, blocked=None, need=None):
+        return real["chump"](items, budget, None, need)
 
     def every_attacker(g, through):
         if not g.cfg.get("commander_damage", True):

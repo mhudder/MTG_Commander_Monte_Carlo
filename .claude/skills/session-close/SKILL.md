@@ -52,6 +52,7 @@ change.
 ```bash
 python -m tools.check_docs     # must pass
 python -m tests                # must pass; `python -m tests -k <name>` for one module
+python -m tests --mutate       # must pass: every mutation set still exact (§0z141)
 python -m edhmc.pending        # 100 cards / singleton-legal / commander distinct
 python -m tools.validate       # +0.00 on every metric of every engine, if you touched an engine
 ```
@@ -61,6 +62,13 @@ fails if any fails. It was added after a test that pinned The Great Henge
 failed for three commits with nobody running it -- a test that is not run
 does not exist. If you touched an engine, run it; if you touched a shared
 hook, run it twice (§0z28).
+
+`python -m tests --mutate` is the same runner over every module's mutation
+mode. It sat in no gate for a month and never passed in that time (§0z141):
+ten modules printed no closing tally, and three mutation stand-ins kept a
+signature `opponents.chump` had outgrown, so every mutation in them raised.
+A mutation stand-in is a copy of a function's signature -- when you change a
+shared function's signature, this is the run that finds its copies.
 
 `check_docs` verifies that every `§` cited from code resolves, that every
 documented command exists, that each generated doc was actually regenerated,

@@ -193,6 +193,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z138](#0z138) | MEASURED | **Item 24's last four answers** in POD_V4: Damn single-target +0.007 to +0.010 at T20, tivit's taxes +0.047 (knob-bound), votes +0.007, gate +0.004 lorehold. Shift re-fitted to 2.3 |
 | [0z139](#0z139) | BUILT | **Item 24 change 4**: one want order for selection and tutors; seven blind cards live. **Enlightened Tutor +0.024 at T20** (karlov's combo half), Sylvan Library +0.011; Abundance, Top nothing |
 | [0z140](#0z140) | DECIDED | **POD_V4 is the default pod**; 39 blind cards PARTLY now; six tables rebuilt (58 min wall): answers up 0.006-0.021, slow engines down 0.003-0.016, Exquisite Blood up |
+| [0z141](#0z141) | FIXED | **`python -m tests --mutate` had never passed**: three `chump` stand-ins kept a pre-§0z132 signature; ten modules printed no closing tally. All 86 pass; it is a closing gate now |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12734,6 +12735,49 @@ T20 win rate moved by more than the wider of its two bars):
 number in the ledger predates POD_V4; a swap whose either side is an answer
 or a slow engine may have moved by more than its bar. Re-measure them before
 the next deck decision (queue item 26).
+
+<a id="0z141"></a>
+## 0z141. FIXED -- `python -m tests --mutate` had never passed: 13 modules, two defects, and no gate ran it
+
+**2026-10-15, the owner: "Fix 13 stale test mutation modes"** (found running
+the suite for §0z140; the same 13 failed at `d245b3b`). Every mutation SET was
+right; the harness around it was not. No expected set was changed.
+
+**Three modules raised `TypeError` in every `chump` mutation**
+(`test_commander_damage`, `test_engine_gaps`, `test_menace`).
+`opponents.chump` gained a fourth argument, `need`, in §0z132 (`9c6baed`, the
+cost-aware pod), and the mutations' stand-ins kept the three-argument
+signature, so the real caller's `chump(items, budget, blocked, need)` raised
+before any case ran. Each stand-in now takes `need` and passes it on
+(`chump_biggest_first`, a reimplementation, honours it). Run again, all 14
+mutations in the three break exactly their original sets.
+
+**Ten modules were honest and judged dishonest** (`test_ashaya`,
+`test_azusa_batch3`, `test_azusa_batch4`, `test_azusa_candidates`,
+`test_combat_split`, `test_lorehold_0f_0i`, `test_mana_colour`,
+`test_modes_and_altar`, `test_pod_damage_and_wipes`, `test_recursion`). Each
+mutation mode ran to "OK, exactly these failed" and exited 0 -- but
+`tests/__main__.py` reads a module's LAST "N passed, M failed" line, and these
+printed none after the mutated run's own "8 passed, 1 failed", so the runner
+called the exit code dishonest. All ten predate the runner (written
+2026-09-10 to 09-15; the runner and its cross-check 2026-09-17), so the
+suite has failed on them since the day it existed. Each now prints the
+closing tally the runner reads -- "1 passed, 0 failed (1 mutation, exact
+set)", or the count over its list -- on both the success and the failure
+path; the cross-check itself is unchanged.
+
+**The check can still fail** (proved, then reverted): one name added to
+`test_azusa_candidates`' expected set -> `[FAIL] 0 passed, 1 failed (exit 1)`;
+one of `test_ashaya`'s sets pointed at a case that does not exist ->
+`[FAIL] 2 passed, 1 failed (exit 1)`.
+
+**Why a month.** `python -m tests` runs the plain modes; `--mutate` was in
+CLAUDE.md's command list and in no gate -- not the closing protocol, not
+the rebuild skill. §0z28's lesson in a new place: a check that is not run
+does not exist, and a mutation stand-in is a copy of a signature, which is
+exactly what drifts when nobody runs it. `python -m tests --mutate` is now in
+the closing checklists (CLAUDE.md and the session-close skill): **all 86
+modules pass**.
 
 ## How to read an ablation table
 

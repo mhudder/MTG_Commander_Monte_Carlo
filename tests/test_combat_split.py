@@ -202,6 +202,10 @@ def main():
         print(f"    UNEXPECTED  {n}  <- broke for a reason other than insurance")
     ok = not missing and not extra
     print(f"  -> {'OK' if ok else 'THE CHECK ITSELF IS WRONG'}")
+    # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+    # module's LAST "N passed, M failed" line, and without this one it read
+    # the mutated run's own failures and called the exit code dishonest.
+    print(f"  {int(ok)} passed, {int(not ok)} failed (1 mutation, exact set)")
     return 0 if ok else 1
 
 

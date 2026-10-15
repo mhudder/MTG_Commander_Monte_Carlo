@@ -250,8 +250,9 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   is** (§0z15). When you write an exemption, write down what it is blind to.
 - **Write the mutation expectation before you run it** (§0z11, §0z14). An
   expected set written after the output is a transcript, not a test.
-- **A test that is not run does not exist** (§0z28). Run `python -m tests`.
-  Read `$?` only from a command that was not piped.
+- **A test that is not run does not exist** (§0z28). Run `python -m tests`
+  AND `--mutate`: a mutation stand-in copies a signature, and nothing ran
+  them for a month (§0z141). Read `$?` only from a command that was not piped.
 - **A tool that says it reproduces another tool's number must reproduce it**
   (§0z35). Make reproducing the baseline one of its rows.
 - **A comparison names both of its sides** (§0z137). `git worktree add`
@@ -342,6 +343,7 @@ python -m tools.status --write          # always
 python -m tools.check_docs              # must pass
 python -m edhmc.pending                 # legality on every deck
 python -m tests                         # must pass
+python -m tests --mutate                # must pass
 ```
 
 **What goes where.** A measurement goes in `KNOWN_ISSUES.md` under a new `§`.

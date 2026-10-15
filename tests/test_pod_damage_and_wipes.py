@@ -341,10 +341,18 @@ def main():
                   "three-opponent rows, single-target drain, and the three "
                   "sweepers that get around indestructible: all three were "
                   "already killing the right thing, for the wrong reason.")
+            # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+            # module's LAST "N passed, M failed" line, and without this one it read
+            # the mutated run's own failures and called the exit code dishonest.
+            print("  1 passed, 0 failed (1 mutation, exact set)")
             return 0
         print(f"  MUTATION CHECK FAILED\n"
               f"    only in expected: {sorted(expected - actual)}\n"
               f"    only in actual:   {sorted(actual - expected)}")
+        # The closing tally `python -m tests --mutate` reads (§0z141): it takes a
+        # module's LAST "N passed, M failed" line, and without this one it read
+        # the mutated run's own failures and called the exit code dishonest.
+        print("  0 passed, 1 failed (1 mutation, exact set)")
         return 1
     return 1 if FAIL else 0
 

@@ -262,8 +262,10 @@ def main() -> int:
              (OPP, "trample_of", lambda g, p: False), {}),
         "chump ignores what a trampler's block stops":
             ({"J", "K", "L", "N"},
-             (OPP, "chump", lambda items, budget, blocked=None: real_chump(
-                 [it[:4] for it in items], budget, blocked)), {}),
+             # `need`: chump's fourth argument since §0z132 (§0z141).
+             (OPP, "chump", lambda items, budget, blocked=None, need=None:
+              real_chump([it[:4] for it in items], budget, blocked, need)),
+             {}),
     }
     bad = 0
     for label, (want, patch, cfg) in muts.items():
