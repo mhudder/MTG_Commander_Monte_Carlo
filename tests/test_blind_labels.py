@@ -22,8 +22,11 @@ named "deck card". It FAILS when
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   Rhystic Study's reason is deleted              -> tivit Rhystic Study
   Village Rites is put back in KNOWN_BLIND       -> rendmaw Village Rites
-  Propaganda (inert: a tag nothing reads, §0z12)
-    is given a BLIND_BUT_LIVE reason             -> tivit Propaganda
+  Trap the Trespassers (inert: it plays as its
+    blank) is given a BLIND_BUT_LIVE reason      -> tivit Trap the Trespassers
+  (Propaganda was this mutation's inert card until §0z140 made POD_V4 the
+  default, under which the attack tax is read: live, so PARTLY_MODELLED. The
+  new card and its set were written before the run.)
 
 What this cannot see: a KNOWN_BLIND card the engine acts on only past the
 40 seeds, or only at another horizon. The back-test used the same 40.
@@ -88,15 +91,15 @@ def main() -> int:
         blind["rendmaw"].add("Village Rites")
 
     def propaganda_live():
-        live["tivit"]["Propaganda"] = "a reason for a card nothing reads"
+        live["tivit"]["Trap the Trespassers"] = "a reason for a card nothing reads"
 
     muts = {
         "Rhystic Study's reason is deleted":
             ({"tivit Rhystic Study"}, drop_rhystic),
         "Village Rites is put back in KNOWN_BLIND":
             ({"rendmaw Village Rites"}, rites_back),
-        "Propaganda is given a BLIND_BUT_LIVE reason":
-            ({"tivit Propaganda"}, propaganda_live),
+        "Trap the Trespassers is given a BLIND_BUT_LIVE reason":
+            ({"tivit Trap the Trespassers"}, propaganda_live),
     }
     bad = 0
     for label, (want, apply) in muts.items():

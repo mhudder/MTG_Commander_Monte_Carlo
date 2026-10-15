@@ -22,7 +22,9 @@ CASES
      called BLIND is classified SCRIPTED or PARTLY
   B  karlov's Exquisite Blood, which has no script and is dispatched by name
      (§0z25's shape): SEEN, through `named`
-  C  tivit's Counterspell: BLIND
+  C  lorehold's Bolt Bend (it redirects the pod's spells, §4): BLIND. Until
+     §0z140 this was tivit's Counterspell, which POD_V4 casts on the pod's
+     turn -- SEEN now, case M
   D  lorehold's Hexing Squelcher (its text is ward and "can't be countered",
      the pod's spells, §4): BODY. Until 2026-10-13 this was karlov's Sun
      Titan, which item 24 implemented there (§0z129), and then rendmaw's
@@ -39,6 +41,9 @@ CASES
   J  ... and one whose clause is not in its oracle text
   K  ... DEFERRED with no machinery named is refused
   L  ... BLIND quoting its own clause, and DEFERRED naming machinery, pass
+  M  the pod's channels (§0z140, POD_V4 the default): tivit's Counterspell
+     SEEN through `response`, Swords to Plowshares through `answer`,
+     Ghostly Prison through `tax`
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the named channel is ignored                    -> A, B
@@ -47,6 +52,8 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   every clause with "target" is blind             -> G
   the matched blank drops the body                -> A
   the ledger's triage check does nothing           -> I, J, K
+  (added with M, before its run)
+  the pod's channels are ignored                  -> A, M
 
 UNMUTATED (§0z15): C and E are the positive BLIND cases the mutations are
 measured against; H pins a bug fixed inline in `smoke`, which has no seam.
@@ -81,8 +88,9 @@ def run_cases():
           (T.structural_verdict(card("karlov", "Exquisite Blood"), "karlov"),
            "named" in T.structural_channels(card("karlov", "Exquisite Blood"),
                                             "karlov")), ("SEEN", True))
-    check("C tivit's Counterspell: BLIND",
-          T.structural_verdict(card("tivit", "Counterspell"), "tivit"), "BLIND")
+    check("C lorehold's Bolt Bend: BLIND",
+          T.structural_verdict(card("lorehold", "Bolt Bend"), "lorehold"),
+          "BLIND")
     check("D lorehold's Hexing Squelcher: BODY",
           T.structural_verdict(card("lorehold", "Hexing Squelcher"),
                                "lorehold"),
@@ -123,6 +131,10 @@ def run_cases():
     check("L well-formed BLIND and DEFERRED pass",
           (refused(triage="BLIND", triage_clauses=("Counter target spell.",)),
            refused(triage="DEFERRED", triage_note="a stack")), (False, False))
+    check("M the pod's channels: response, answer, tax",
+          [T.structural_channels(card("tivit", n), "tivit")[-1:]
+           for n in ("Counterspell", "Swords to Plowshares", "Ghostly Prison")],
+          [["response"], ["answer"], ["tax"]])
     return set(FAIL)
 
 
@@ -137,7 +149,7 @@ def main() -> int:
     import edhmc.pending as P
     real = {n: getattr(T, n) for n in
             ("named_in_engine", "structural_channels", "text_screen",
-             "matched_blank", "BLIND_CLAUSES")}
+             "matched_blank", "BLIND_CLAUSES", "pod_channels")}
     real["check_triage"] = P.check_triage
 
     def no_body(c, deck_name):
@@ -168,6 +180,8 @@ def main() -> int:
             ({"A"}, "matched_blank", bodiless_blank),
         "the ledger's triage check does nothing":
             ({"I", "J", "K"}, "check_triage", lambda pr: None),
+        "the pod's channels are ignored":
+            ({"A", "M"}, "pod_channels", lambda c: []),
     }
     bad = 0
     for label, (want, name, fn) in muts.items():

@@ -86,7 +86,11 @@ from edhmc import azusa as AZ
 from edhmc import lorehold as LO
 from edhmc.decks import (shilgengar_v1, karlov_v2, tivit_v1, azusa_v1,
                          rendmaw_v12, lorehold_v17)
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_V4
+
+# Written on the pod before §0z140 and pinning that pod's mechanism: the
+# old pod named, so POD_V4 becoming the default does not move it.
+DEFAULT_CFG = dict(DEFAULT_CFG, **POD_PRE_V4)
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []

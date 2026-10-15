@@ -85,6 +85,22 @@ Ulamog, the Infinite Gyre             +0.58+-0.08         +0.94+-0.12        +0.
       MISSING: the cast trigger 'destroy target permanent' (an opponent's
       permanent, BLIND under §4) and the graveyard shuffle Kozilek also has.
       Indestructible and annihilator (approximated) are modelled.
+Beast Within                          +0.34+-0.11         +0.36+-0.13        +0.0026+-0.0021      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Krosan Grip                           +0.31+-0.10         +0.33+-0.13        +0.0039+-0.0020      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Bane of Progress                      +0.26+-0.11         +0.30+-0.14        +0.0021+-0.0024       dmg
       The wipe destroys only YOUR OWN artifacts and enchantments, because
       opponents own no permanent objects in this project (§4). Its negative score
@@ -96,6 +112,14 @@ Storm Cauldron                        +0.44+-0.12         +0.28+-0.15        +0.
       more landfall a drop. NOT: the pod's half (their lands bounce too and they
       get the drop; the pod has no mana, §4), which slows them -- a floor. Pilot
       rules: token lands and Ashaya creature-lands are not tapped under it.
+Terastodon                            +0.28+-0.08         +0.26+-0.10        +0.0029+-0.0018      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Sylvan Scrying                        +0.16+-0.08         +0.17+-0.09        +0.0021+-0.0014      both
       MODELLED: a land to hand, `AzusaGame.land_rank`'s: a fetch, then green, then
       untapped. NOT: the utility lands' own abilities as a reason to fetch them
@@ -114,8 +138,5 @@ MODEL-BLIND — a low score is evidence about the MODEL, not the card
 card                                    damage T10          damage T20             win rate    signal
 Memory Jar                            +0.47+-0.11         +0.42+-0.14        +0.0035+-0.0024      both
 Greater Good                          +0.48+-0.11         +0.38+-0.14        +0.0049+-0.0023      both
-Beast Within                          +0.34+-0.11         +0.36+-0.13        +0.0026+-0.0021      both
 Mind's Eye                            +0.38+-0.12         +0.36+-0.14        +0.0037+-0.0023      both
-Krosan Grip                           +0.31+-0.10         +0.33+-0.13        +0.0039+-0.0020      both
-Terastodon                            +0.28+-0.08         +0.26+-0.10        +0.0029+-0.0018      both
 Hall of Gemstone                      +0.25+-0.10         +0.16+-0.13        +0.0020+-0.0021       dmg

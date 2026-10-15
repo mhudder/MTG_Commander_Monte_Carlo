@@ -23,7 +23,7 @@ CASES
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets. Each drops one branch of the
 check and must break exactly the cases that branch decides:
   the blind branch never refuses       -> B and C
-  the acknowledgement is ignored       -> A and C
+  the acknowledgement is ignored       -> C only (A and C until 2026-10-13)
   unclassified is treated as evaluated -> D only
   a land is treated as unclassified    -> A and E
 
@@ -34,6 +34,14 @@ Swamp), so ignoring the acknowledgement or misreading a land refuses the
 real ledger too; and C asserts the acknowledgement is PRINTED, which needs
 the blind branch that the first mutation removes. Corrected before the
 second run; a set edited to match the output would be a transcript.
+
+A AND C BECAME C ONLY ON 2026-10-13, AND NOBODY NOTICED UNTIL §0z140. A broke
+because the live ledger held an acknowledged blind cut; Soulmender was it, and
+item 24's change 0 implemented Soulmender (§0z129), so the live ledger has no
+acknowledged blind cut and ignoring the acknowledgement no longer refuses it.
+`python -m tests` does not run `--mutate`, so the stale set sat for two days;
+found running this file's mutations for §0z140 (it fails identically at
+d245b3b) and corrected with the reason, not to the output.
 """
 import sys
 
@@ -62,17 +70,22 @@ def outcome(changes, candidates=()):
         return "refused", str(exc)
 
 
-def a_blind_karlov_card():
-    """A KNOWN_BLIND karlov card that is in the module list and not staged."""
+# AZUSA SINCE §0z140: karlov has no KNOWN_BLIND card left once POD_V4 made
+# its removal live, and the cases need one.
+BLIND_DECK = "azusa"
+
+
+def a_blind_card():
+    """A KNOWN_BLIND card of BLIND_DECK in its module list, not staged."""
     import tools.ablation as AB
-    module, _ = P.DECKS["karlov"]
+    module, _ = P.DECKS[BLIND_DECK]
     deck, _ = module.build()
-    staged_out = {c.remove for c in P.CHANGES if c.deck == "karlov"}
+    staged_out = {c.remove for c in P.CHANGES if c.deck == BLIND_DECK}
     for c in deck:
-        if (c.name in AB.KNOWN_BLIND["karlov"] and not c.is_land
+        if (c.name in AB.KNOWN_BLIND[BLIND_DECK] and not c.is_land
                 and c.name not in staged_out):
             return c.name
-    raise SystemExit("no unstaged KNOWN_BLIND karlov card to test with")
+    raise SystemExit(f"no unstaged KNOWN_BLIND {BLIND_DECK} card to test with")
 
 
 def run_cases(classify):
@@ -88,13 +101,13 @@ def run_cases(classify):
                   any(k in ln for k in ("MODEL-EVALUATED", "MODEL-BLIND",
                                         "PARTLY MODELLED", "LAND"))
                   for ln in lines))
-        blind = a_blind_karlov_card()
-        fake = Change(deck="karlov", remove=blind, add="X", staged="today",
+        blind = a_blind_card()
+        fake = Change(deck=BLIND_DECK, remove=blind, add="X", staged="today",
                       rationale="test")
         status, text = outcome([fake])
         check("B a blind cut with no acknowledgement is refused",
               status == "refused" and "MODEL-BLIND" in text)
-        acked = Change(deck="karlov", remove=blind, add="X", staged="today",
+        acked = Change(deck=BLIND_DECK, remove=blind, add="X", staged="today",
                        rationale="test", cut_unmeasured="because reasons")
         status, lines = outcome([acked])
         check("C the same cut, acknowledged, passes and prints why",
@@ -155,7 +168,7 @@ def main() -> int:
     }
     expected = {
         "the blind branch never refuses": {"B", "C"},
-        "the acknowledgement is ignored": {"A", "C"},
+        "the acknowledgement is ignored": {"C"},
         "unclassified is treated as evaluated": {"D"},
         "a land is treated as unclassified": {"A", "E"},
     }

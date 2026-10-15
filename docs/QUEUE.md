@@ -29,7 +29,8 @@ What is closed and where it went:
     later": until the rebuild the six caches read SUSPECT, `check_docs`
     fails on that one check, and every table describes the old pod. Use the
     parallel-rebuild skill. Never clear them with `--verified`: the numbers
-    moved. If POD_V4 is adopted first, one rebuild covers both.
+    moved. If POD_V4 is adopted first, one rebuild covers both. **POD_V4 WAS
+    ADOPTED 2026-10-15 (§0z140)** and this rebuild is running on it.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10
@@ -193,4 +194,6 @@ What is closed and where it went:
     knob however it is built). **Changes 1-3 touch `opponents.py`, which is
     in every fingerprint**: each goes in behind a knob that reproduces the
     current pod bit-for-bit, and is switched on as a POD_V4
-    (`experiment.py`) with one parallel rebuild of every table.
+    (`experiment.py`) with one parallel rebuild of every table. **ADOPTED
+    2026-10-15 (§0z140)**: POD_V4 is the default pod (`opponents.POD_DEFAULTS`);
+    `experiment.POD_PRE_V4` is the old one.

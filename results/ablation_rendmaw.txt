@@ -88,13 +88,58 @@ Hagra Mauling                         +0.73+-0.10         +0.93+-0.15        +0.
 Toxic Deluge                          +0.20+-0.05         +0.37+-0.09        +0.0027+-0.0019      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Culling Ritual                        +0.22+-0.05         +0.33+-0.09        +0.0027+-0.0019      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
+Eyeblight's Ending                    +0.27+-0.04         +0.29+-0.07        +0.0044+-0.0017      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Beast Within                          +0.16+-0.04         +0.22+-0.06        +0.0009+-0.0013       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Assassin's Trophy                     +0.08+-0.03         +0.15+-0.05        +0.0010+-0.0012       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Nameless Inversion                    +0.14+-0.03         +0.14+-0.06        +0.0017+-0.0015      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Pygmy Kavu                            +0.09+-0.04         +0.11+-0.06        +0.0009+-0.0016       dmg
+      MODELLED (§0z132; the default pod since §0z140): the body, and a card for
+      each black creature the pod's bodies hold. Their colour is
+      `pod_black_share`, a judgement: the row reads that knob.
+Deathreap Ritual                      +0.02+-0.02         -0.03+-0.04        +0.0002+-0.0010        --
+      MODELLED (§0z132; the default pod since §0z140): a card at each of the four
+      end steps in which a creature died, the pod's bodies included. NOT: the pod
+      killing its own creatures, which is the `opp_death_rate` knob -- a judgement
+      on that side.
 Shigeki, Jukai Visionary              -0.22+-0.05         -0.25+-0.08        +0.0020+-0.0021       dmg
       MODELLED: the 1/3, which stays home, and '{1}{G}, {T}, return Shigeki to
       hand: reveal four, a land onto the battlefield tapped, the rest to the
@@ -113,13 +158,7 @@ Massacre Wurm                         +0.42+-0.05         +0.89+-0.10        +0.
       creatures), and 'whenever a creature an opponent controls dies, that player
       loses 2 life' is missing (understates). The one-sided-wipe rule in
       symmetric_wipes' note keeps it here.
-Eyeblight's Ending                    +0.27+-0.04         +0.29+-0.07        +0.0044+-0.0017      both
-Beast Within                          +0.16+-0.04         +0.22+-0.06        +0.0009+-0.0013       dmg
-Assassin's Trophy                     +0.08+-0.03         +0.15+-0.05        +0.0010+-0.0012       dmg
-Nameless Inversion                    +0.14+-0.03         +0.14+-0.06        +0.0017+-0.0015      both
 Reap                                  +0.09+-0.03         +0.13+-0.05        +0.0011+-0.0013       dmg
 Bow of Nylea                          +0.17+-0.04         +0.11+-0.06        +0.0019+-0.0017      both
-Pygmy Kavu                            +0.09+-0.04         +0.11+-0.06        +0.0009+-0.0016       dmg
 Lignify                               +0.10+-0.04         +0.04+-0.07        +0.0016+-0.0017        --
 Haywire Mite                          +0.09+-0.03         +0.02+-0.05        +0.0026+-0.0013       win
-Deathreap Ritual                      +0.02+-0.02         -0.03+-0.04        +0.0002+-0.0010        --

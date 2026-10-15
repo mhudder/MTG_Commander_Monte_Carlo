@@ -192,6 +192,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z137](#0z137) | DECIDED | **`rearm_rule`**: `reland` (+0.005 to +0.008 at T20, four decks) is in POD_V4 with shift 2.05; `prefer_unfired` refuted. `check_unchanged_decks --old-at` refuses a stale worktree |
 | [0z138](#0z138) | MEASURED | **Item 24's last four answers** in POD_V4: Damn single-target +0.007 to +0.010 at T20, tivit's taxes +0.047 (knob-bound), votes +0.007, gate +0.004 lorehold. Shift re-fitted to 2.3 |
 | [0z139](#0z139) | BUILT | **Item 24 change 4**: one want order for selection and tutors; seven blind cards live. **Enlightened Tutor +0.024 at T20** (karlov's combo half), Sylvan Library +0.011; Abundance, Top nothing |
+| [0z140](#0z140) | DECIDED | **POD_V4 is the default pod** (`opponents.POD_DEFAULTS`); 39 KNOWN_BLIND cards are PARTLY now (route answers, counters, taxes); triage and KNOBS read the pod; the six tables rebuilt on it |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12620,6 +12621,70 @@ measurably. `want_land_target` (7) and `gamble_min_hand` (2) were not swept.
 
 `tests/test_change4_selection.py`: 14 cases, 9 mutations, every set written
 before its run and exact on the first.
+
+<a id="0z140"></a>
+## 0z140. DECIDED -- POD_V4 is the default pod, and every active table is rebuilt on it
+
+**2026-10-15, the owner: "run the POD_V4 rebuild now".** Item 24's changes
+1-3 (§0z130-§0z134), the re-armed route rule (§0z137), the last four answers
+(§0z138) and the re-fitted kill timing (shift 2.3) are the default pod. One
+parallel rebuild of the six active tables covers it and queue item 25
+(§0z133's eliminated opponents).
+
+### The switch, in one place
+
+The five knobs are read only in `opponents.py`, each through `pod_knob(cfg,
+name)` against one dict, `opponents.POD_DEFAULTS` -- so the default is said
+once (§0u). `experiment.POD_V4` is a copy of it (a no-op now);
+`experiment.POD_PRE_V4` is the old pod. **Proved exact** before anything
+else moved, all six active decks, 150 staged-list seeds, every numeric
+output: the new default plays IDENTICALLY to `d245b3b` with POD_V4 named, and
+`POD_PRE_V4` IDENTICALLY to `d245b3b`'s default.
+
+### What the adoption had to carry with it
+
+* **39 KNOWN_BLIND cards left** (`test_blind_labels`: each plays unlike its
+  matched blank under POD_V4). 32 removal spells are route answers, tivit's
+  four counterspells are responses, its two attack taxes are taxes, and
+  rendmaw's Deathreap Ritual and Pygmy Kavu read the pod's bodies. Each is
+  PARTLY_MODELLED with one of four shared reasons (`_POD_V4_PARTLY` in
+  `tools/ablation.py`), each naming its knob: `threat_rebuild_max`,
+  `attack_tax_deflect`, `opp_death_rate`, `pod_black_share`. **18 stay
+  blind**, each proved identical to its blank. karlov and shilgengar have
+  none left.
+* **A bug the relabel made, caught by `test_pending_cuts`**: a `KNOWN_BLIND`
+  entry whose braces held only comments is an empty DICT, not a set, and
+  `check_scripted_coverage` cannot intersect it. Both empty entries are
+  `set()`.
+* **Council's Judgment, Vault 11, Angel of Suffering, the symmetric wipes and
+  Damn** carry reasons for the pod they now play on (the re-label §0z138
+  deferred to this rebuild).
+* **`tools.triage` reads the pod's channels** (`pod_channels`: `answer`,
+  `response`, `tax`) -- the cards the pod reads by name from GENERATED sets,
+  which `named` could not see. Its acceptance test failed on all 30 until it
+  did. `test_triage` gains case M and a mutation, written before their run.
+* **`tools.knobs` reads `pod_knob`**: the five knobs vanished from
+  KNOBS.md the moment their defaults moved into a dict -- §0z15's blind spot,
+  in the registry whose missing name means "no such knob".
+* **Eleven tests pinned the old pod's mechanisms** (blocking as a count,
+  menace, trample, Rogue's Passage, commander damage through blockers, the
+  pod_threats and rearm_rule OFF legs). Each now names `POD_PRE_V4`, so it
+  pins exactly what it was written for. The mechanisms carry into POD_V4:
+  the same `opponents.chump` charges menace two blockers and lets trample
+  through; a cost-aware defender stops chumping once it is safe
+  (`pod_chump_floor`), which is what moved those cases.
+* **A stale mutation set** in `test_pending_cuts` ("the acknowledgement is
+  ignored" -> A and C) has read C alone since change 0 implemented
+  Soulmender, the live ledger's one acknowledged blind cut (2026-10-13). It
+  fails identically at `d245b3b`; `python -m tests` does not run mutations.
+  Corrected, with the reason.
+
+The seven tables were re-rendered from their caches for the labels before the
+rebuild (a rendering change, numbers unchanged); the rebuild replaces them.
+
+### The rebuild
+
+To follow.
 
 ## How to read an ablation table
 

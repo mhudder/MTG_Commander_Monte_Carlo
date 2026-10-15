@@ -148,6 +148,24 @@ def _is_cfg_get(node: ast.AST) -> bool:
             or (isinstance(recv, ast.Name) and recv.id == "cfg"))
 
 
+def _pod_knob_read(node: ast.AST):
+    """A read through `opponents.pod_knob(cfg, "name")` (§0z140): the five
+    POD_V4 knobs, whose defaults live in ONE dict, `opponents.POD_DEFAULTS`.
+    Returns (name, default) or None. Without this the five vanished from
+    KNOBS.md the moment POD_V4 became the default -- §0z15's blind spot, in
+    the registry whose absence of a name means the knob does not exist."""
+    if not (isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "pod_knob"
+            and len(node.args) == 2
+            and isinstance(node.args[1], ast.Constant)
+            and isinstance(node.args[1].value, str)):
+        return None
+    from edhmc.opponents import POD_DEFAULTS
+    name = node.args[1].value
+    return name, repr(POD_DEFAULTS[name])
+
+
 def _nearest_section(lines: list[str], call_line: int, func_line: int) -> str:
     """The last section id cited above the call, inside the enclosing function.
 
@@ -182,10 +200,15 @@ def scan_file(path: str) -> list[Read]:
 
     out: list[Read] = []
     for node in ast.walk(tree):
-        if not _is_cfg_get(node):
+        pod = _pod_knob_read(node)
+        if pod is not None:
+            name, default = pod
+        elif _is_cfg_get(node):
+            name = node.args[0].value
+            default = (ast.unparse(node.args[1]) if len(node.args) > 1
+                       else "<none>")
+        else:
             continue
-        name = node.args[0].value
-        default = ast.unparse(node.args[1]) if len(node.args) > 1 else "<none>"
         func, func_line = owner.get(node.lineno, ("<module>", 1))
         out.append(Read(name, default, path, node.lineno, func,
                         _nearest_section(lines, node.lineno, func_line)))

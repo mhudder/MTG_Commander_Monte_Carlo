@@ -80,7 +80,11 @@ from edhmc.decks import rendmaw_v12 as RM
 from edhmc.decks import tivit_v1 as TM
 from edhmc.decks import karlov_v2 as KM
 from edhmc.decks import lorehold_v17 as LM
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_V4
+
+# Written on the pod before §0z140 and pinning that pod's mechanism: the
+# old pod named, so POD_V4 becoming the default does not move it.
+DEFAULT_CFG = dict(DEFAULT_CFG, **POD_PRE_V4)
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []

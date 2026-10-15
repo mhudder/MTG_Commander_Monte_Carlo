@@ -129,8 +129,9 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 - **Win rate is the objective; damage, `mv_cheated` and every mechanism
   counter are proxies**, and they disagree with it more often than you'd
   expect. Follow win rate. (§0t: a reserve that casts more miracles loses games.)
-- **Half of every deck is invisible to this model.** Opponents' boards are an
-  abstract number, so removal, counterspells and wraths score as inert bodies.
+- **Part of every deck is invisible to this model.** The pod's boards are
+  bodies and kill routes, not permanents (§0z140): removal and counterspells
+  act on routes through a delay nobody has data for (`threat_rebuild_max`).
   **MODEL-BLIND means "not measured", never a cut list**; a row at exactly
   ±0.0000 is a blind card proved blind.
 - **A significant row is not evidence the engine sees the card** (§0z66). A dead
@@ -357,8 +358,9 @@ belongs under its `§`.
   swapped, shuffled on the same seed, so nearly all variance cancels in the
   difference. `tools.validate` prints the factor.
 - **Opponents have a win condition.** Three opponents each draw a kill turn
-  from a bracket-calibrated range, and targeting is threat-weighted, so being
-  ahead draws the kill. Games end on their own around turn 12, so `turns=20`
+  from a bracket-calibrated range, built from route pieces your answers can
+  delay (§0z140), and targeting is threat-weighted, so being ahead draws the
+  kill. Games end on their own around turn 12, so `turns=20`
   is a safety valve. Opponent randomness is pre-rolled so it cannot break CRN.
   **The pod acts in one order for every engine** (`opponents.pod_phase`: chip
   damage, clocks, removal; §0z30).

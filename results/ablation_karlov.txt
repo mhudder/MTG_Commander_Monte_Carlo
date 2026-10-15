@@ -96,28 +96,77 @@ Umezawa's Jitte                       +0.57+-0.08         +0.69+-0.12        +0.
 Damnation                             +0.29+-0.08         +0.37+-0.11        +0.0037+-0.0023      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Farewell                              +0.16+-0.06         +0.28+-0.09        +0.0039+-0.0019      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Austere Command                       +0.18+-0.06         +0.26+-0.08        +0.0009+-0.0018       dmg
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Toxic Deluge                          -0.00+-0.08         +0.26+-0.12        +0.0050+-0.0022      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
+Anguished Unmaking                    +0.27+-0.07         +0.25+-0.09        +0.0029+-0.0018      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Return to Dust                        +0.26+-0.06         +0.24+-0.09        +0.0015+-0.0018       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Damn                                  +0.04+-0.06         +0.11+-0.09        -0.0009+-0.0018       dmg
-      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
-      honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
+      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
+      refuses the wrath or the overload cannot be paid. Your half of the wrath is
+      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
+      can hit. The cost is modelled, the benefit an estimate.
+Fracture                              +0.11+-0.05         +0.07+-0.07        +0.0006+-0.0015       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Path to Exile                         +0.04+-0.04         +0.04+-0.05        +0.0011+-0.0011       win
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Swords to Plowshares                  +0.03+-0.04         +0.02+-0.06        +0.0006+-0.0010        --
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Enlightened Tutor                     +0.03+-0.03         +0.02+-0.05        +0.0001+-0.0009        --
       MODELLED: an artifact or enchantment put on top, the shared want order's
       pick -- the missing half of the Exquisite Blood loop first, else priority.
@@ -137,13 +186,3 @@ Bloodthirsty Conqueror                -1.92+-0.19         -4.11+-0.29        +0.
       event. The 5/5 flying body is modelled. NOT: deathtouch, which nothing in
       the blocking model reads (a chump blocker dies either way; only Ohran
       Frostfang makes the pod block less). A floor by that. §0z26, §0z90.
-
-====================================================================================
-MODEL-BLIND — a low score is evidence about the MODEL, not the card
-====================================================================================
-card                                    damage T10          damage T20             win rate    signal
-Anguished Unmaking                    +0.27+-0.07         +0.25+-0.09        +0.0029+-0.0018      both
-Return to Dust                        +0.26+-0.06         +0.24+-0.09        +0.0015+-0.0018       dmg
-Fracture                              +0.11+-0.05         +0.07+-0.07        +0.0006+-0.0015       dmg
-Path to Exile                         +0.04+-0.04         +0.04+-0.05        +0.0011+-0.0011       win
-Swords to Plowshares                  +0.03+-0.04         +0.02+-0.06        +0.0006+-0.0010        --

@@ -105,8 +105,10 @@ Blade of Selves                       +0.76+-0.11         +0.73+-0.16        -0.
 Wrath of God                          +0.34+-0.10         +0.62+-0.18        +0.0020+-0.0026       dmg
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Angel of Sanctions                    +0.38+-0.08         +0.55+-0.14        +0.0037+-0.0023      both
       MODELLED: the 3/4 flier and embalm {5}{W} (a token copy, which Trostani and
       the doublers see). NOT: the ETB exile of an opposing nonland permanent (§4).
@@ -125,21 +127,49 @@ Greater Good                          +0.27+-0.10         +0.41+-0.17        +0.
       turn, with two cards or fewer in hand, on a body the library can afford.
       NOT: the instant-speed sacrifice in response to removal, which is where the
       card is best. A floor.
+Acidic Slime                          +0.33+-0.10         +0.37+-0.14        +0.0021+-0.0022       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Mimic Vat                             +0.23+-0.08         +0.32+-0.14        +0.0019+-0.0023       dmg
       MODELLED: imprinting YOUR nontoken creatures as they die and the {3},{T}
       hasty copy, exiled at the end step. NOT: imprinting the pod's creatures,
       which die as a number (§4). A floor.
+Beast Within                          +0.20+-0.09         +0.16+-0.13        -0.0003+-0.0020       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Swords to Plowshares                  +0.12+-0.07         +0.06+-0.09        -0.0005+-0.0013        --
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Lightning Greaves                     +0.13+-0.08         +0.05+-0.14        -0.0003+-0.0021        --
       MODELLED: shroud on Trostani (`shroud_sources`). NOT: haste -- the Greaves
       never move off the commander, so a Soul of Eternity cast this turn does not
       swing. A floor.
+Path to Exile                         +0.04+-0.06         -0.00+-0.10        -0.0001+-0.0014        --
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Acidic Slime                          +0.33+-0.10         +0.37+-0.14        +0.0021+-0.0022       dmg
-Beast Within                          +0.20+-0.09         +0.16+-0.13        -0.0003+-0.0020       dmg
 Aura Shards                           +0.19+-0.10         +0.09+-0.15        -0.0021+-0.0022        --
-Swords to Plowshares                  +0.12+-0.07         +0.06+-0.09        -0.0005+-0.0013        --
-Path to Exile                         +0.04+-0.06         -0.00+-0.10        -0.0001+-0.0014        --

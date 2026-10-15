@@ -40,7 +40,11 @@ from edhmc import engine as EN
 from edhmc import karlov as KA
 from edhmc import opponents as OPP
 from edhmc.decks import karlov_v2
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_V4
+
+# Written on the pod before §0z140 and pinning that pod's mechanism: the
+# old pod named, so POD_V4 becoming the default does not move it.
+DEFAULT_CFG = dict(DEFAULT_CFG, **POD_PRE_V4)
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []

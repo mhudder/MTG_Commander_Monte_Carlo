@@ -133,6 +133,34 @@ def structural_channels(card: Card, deck_name: str) -> list[str]:
         ch.append("named")
     if len(card.types) >= 2:
         ch.append("types")
+    ch += pod_channels(card)
+    return ch
+
+
+def pod_channels(card: Card) -> list[str]:
+    """THE POD'S CHANNELS (§0z140: POD_V4 is the default). The pod reads
+    these cards BY NAME from GENERATED sets, never from an engine file, so
+    `named` cannot see them -- which is how every removal spell read BLIND
+    once the pod's routes made it live:
+        answer    a route answer (`opponents.ANSWERS`, derived from the
+                  removal census, and `VOTE_ANSWERS`), under `pod_threats`
+        response  a counterspell (`_removal.COUNTERS`), cast on the pod's
+                  turn under `pod_responses`
+        tax       an attack tax (`_evasion.ATTACK_TAX`), read by a combat
+                  route under `pod_threats`
+    Each is read from the DEFAULT pod (`opponents.POD_DEFAULTS`), the pod
+    the tables measure."""
+    from edhmc import opponents as OPP
+    from edhmc.decks import _evasion, _removal
+    on = OPP.POD_DEFAULTS
+    ch = []
+    if on["pod_threats"] and (card.name in OPP.ANSWERS
+                              or card.name in OPP.VOTE_ANSWERS):
+        ch.append("answer")
+    if on["pod_responses"] and card.name in _removal.COUNTERS:
+        ch.append("response")
+    if on["pod_threats"] and card.name in _evasion.ATTACK_TAX:
+        ch.append("tax")
     return ch
 
 

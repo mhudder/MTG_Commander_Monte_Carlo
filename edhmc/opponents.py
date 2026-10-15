@@ -228,9 +228,9 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
              for _ in range(turns)]
     counter_rolls = [[[r.random() for _ in opps] for _ in range(N_COUNTER_SLOTS)]
                      for _ in range(turns)]
-    if cfg.get("pod_bodies", False):
+    if pod_knob(cfg, "pod_bodies"):
         roll_body_pools(cfg, seed, opps)
-    if cfg.get("pod_threats", False):          # item 24, change 2: §0z131
+    if pod_knob(cfg, "pod_threats"):           # item 24, change 2: §0z131
         roll_threat_routes(cfg, seed, opps)
     return opps, rolls, counter_rolls
 
@@ -280,8 +280,26 @@ def roll_body_pools(cfg, seed, opps) -> None:
                             for t, mv in pool)
 
 
+# POD_V4 IS THE DEFAULT POD (§0z140, the owner, 2026-10-15). Item 24's
+# changes 1-3 and their re-fitted kill timing, read in ONE place: every read
+# of these five knobs goes through `pod_knob`, so the default cannot be said
+# twice (§0u). `experiment.POD_PRE_V4` restores the pod every table before
+# §0z140 measured; `experiment.POD_V4` is this dict, a no-op now.
+POD_DEFAULTS = {
+    "pod_bodies": True,
+    "pod_threats": True,
+    "rearm_rule": "reland",
+    "threat_clock_shift": 2.3,
+    "pod_responses": True,
+}
+
+
+def pod_knob(cfg, name):
+    return cfg.get(name, POD_DEFAULTS[name])
+
+
 def pod_bodies_on(g) -> bool:
-    return bool(g.cfg.get("pod_bodies", False))
+    return bool(pod_knob(g.cfg, "pod_bodies"))
 
 
 def pod_bodies(g, o) -> list:
@@ -410,7 +428,7 @@ def roll_threat_routes(cfg, seed, opps) -> None:
         # THE RETUNE (§0z132): a kill that can be delayed has to come sooner
         # for the pod to stay as strong. `threat_clock_shift` rounds earlier,
         # its fraction rolled LAST from this stream so nothing above moves.
-        whole, frac = divmod(float(cfg.get("threat_clock_shift", 0.0)), 1.0)
+        whole, frac = divmod(float(pod_knob(cfg, "threat_clock_shift")), 1.0)
         early = int(whole) + (1 if r.random() < frac else 0)
         o.kill_turn = max(4, o.kill_turn - early)
         o.piece_lands = [o.kill_turn - p.lead for p in o.pieces]
@@ -426,7 +444,7 @@ def roll_threat_routes(cfg, seed, opps) -> None:
 
 
 def pod_threats_on(g) -> bool:
-    return bool(g.cfg.get("pod_threats", False))
+    return bool(pod_knob(g.cfg, "pod_threats"))
 
 
 # WHAT A RE-ARMED CLOCK'S ROUTE IS (§0z136, §0z137). When a clock eliminates
@@ -448,7 +466,7 @@ REARM_RULES = ("keep", "reland", "prefer_unfired")
 def rearm_rule(g) -> str:
     """The rule for a re-armed clock's route (§0z137), checked: a misspelt
     rule would otherwise read as "keep" and measure nothing."""
-    rule = g.cfg.get("rearm_rule", "keep")
+    rule = pod_knob(g.cfg, "rearm_rule")
     if rule not in REARM_RULES:
         raise ValueError(f"rearm_rule {rule!r} is not one of {REARM_RULES}")
     return rule
@@ -1132,7 +1150,7 @@ def event_indestructible(g, on: bool):
 # You Can't Refuse's two Treasures for the pod are nothing (the pod has no
 # mana); no deck runs a flash creature, so flash has no consumer.
 def responses_on(g) -> bool:
-    return bool(g.cfg.get("pod_responses", False))
+    return bool(pod_knob(g.cfg, "pod_responses"))
 
 
 _PURE_FIELDS = ("pod_damage", "drain", "lifegain", "tokens", "treasures",

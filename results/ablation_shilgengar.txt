@@ -89,19 +89,22 @@ Agadeem's Awakening // Agadeem, the Undercrypt        +0.76+-0.09         +1.25+
 Wrath of God                          +0.17+-0.05         +0.95+-0.12        +0.0075+-0.0021      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
 Angel of Suffering                    +0.71+-0.06         +0.90+-0.10        +0.0067+-0.0022      both
       MODELLED (§0z135): every point of damage dealt to you -- the pod's combat,
       painlands, Midnight Reaper -- prevented, and twice it milled
-      (`engine.damage_you`); under `pod_threats` a combat route's kill too. NOT,
-      on the default pod: a kill aimed at you is a roll of no known kind and is
-      not prevented -- a prevented kill cannot be worse than a loss, so a floor.
+      (`engine.damage_you`); under `pod_threats` a combat route's kill too -- the
+      default pod since §0z140. NOT: a combo or drain route's kill, which is not
+      damage, nor life LOSS and life payments. A floor.
 Damn                                  +0.11+-0.05         +0.75+-0.11        +0.0069+-0.0019      both
-      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
-      honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4). The COST is
-      modelled and the BENEFIT is an estimate.
+      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
+      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
+      refuses the wrath or the overload cannot be paid. Your half of the wrath is
+      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
+      can hit. The cost is modelled, the benefit an estimate.
 Angelic Arbiter                       +0.32+-0.04         +0.68+-0.09        +0.0073+-0.0020      both
       MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell this turn
       can't attack; each who attacked can't cast spells' -- the pod's attacks and
@@ -119,6 +122,22 @@ Angel of the Ruins                    +0.29+-0.03         +0.54+-0.08        +0.
       MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
       artifacts and/or enchantments (no opposing permanent, §4), nor Plainscycling
       {2}, which would turn a seven-drop in a short game into a land. A floor.
+Utter End                             +0.19+-0.03         +0.28+-0.07        +0.0013+-0.0014       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Anguished Unmaking                    +0.16+-0.04         +0.27+-0.07        +0.0019+-0.0013      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Malakir Rebirth // Malakir Mire        +0.20+-0.07         +0.27+-0.12        +0.0011+-0.0018       dmg
       MODELLED: the back face, played as a land. NOT: the front face's 'you lose 2
       life; until end of turn, that creature gains "when this creature dies,
@@ -131,16 +150,51 @@ Revel in Riches                       +0.18+-0.03         +0.26+-0.07        +0.
       pod's creatures are a count, not deaths (§4). A FLOOR, and a knob result:
       Tithe's Treasures assume no opponent ever pays its {2}. Left KNOWN_BLIND
       until §0z115.
-
-====================================================================================
-MODEL-BLIND — a low score is evidence about the MODEL, not the card
-====================================================================================
-card                                    damage T10          damage T20             win rate    signal
-Utter End                             +0.19+-0.03         +0.28+-0.07        +0.0013+-0.0014       dmg
-Anguished Unmaking                    +0.16+-0.04         +0.27+-0.07        +0.0019+-0.0013      both
 Vindicate                             +0.15+-0.03         +0.20+-0.06        +0.0018+-0.0012      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Mortify                               +0.15+-0.03         +0.19+-0.06        +0.0013+-0.0012      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Despark                               +0.12+-0.03         +0.16+-0.06        +0.0018+-0.0011      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Generous Gift                         +0.14+-0.03         +0.15+-0.06        +0.0004+-0.0012       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Path to Exile                         +0.05+-0.02         +0.06+-0.04        +0.0003+-0.0007       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
 Swords to Plowshares                  +0.04+-0.02         +0.05+-0.03        -0.0001+-0.0007       dmg
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.

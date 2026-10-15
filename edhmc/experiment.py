@@ -158,15 +158,18 @@ POD_V2 = {
 # average difficulty — see opponents.ARCHETYPES.
 POD_V3 = dict(POD_V2, archetypes=True)
 
-# POD_V4 -- A CANDIDATE, NOT THE DEFAULT (§0z130, §0z131, §0z132, §0z134).
-# Item 24's changes 1-3: the pod's creatures as bodies that die (and block only
+# POD_V4 -- THE DEFAULT POD SINCE §0z140 (the owner, 2026-10-15). Its values
+# live in `opponents.POD_DEFAULTS`, read in one place; this dict is a copy of
+# that one, so `dict(DEFAULT_CFG, **POD_V4)` changes nothing now, and
+# `POD_PRE_V4` below reproduces every number from before §0z140. The history
+# (§0z130, §0z131, §0z132, §0z134): item 24's changes 1-3: the pod's creatures as bodies that die (and block only
 # when it matters), its kills as routes your answers can delay, and your
 # instants cast on its turn from the mana you held -- with the kill
 # timing re-fitted so the mean T20 win rate over the active decks equals this
 # pod's (`diagnostics/fit_threat_clock.py`, the owner's target, 2026-10-13):
 # 1.89 rounds earlier on the pod as §0z132 found it, 1.97 once §0z133 stopped
-# eliminated opponents acting -- 2.0, 2.05 with "reland" and 2.3 with §0z138 below. Adopting it means `dict(DEFAULT_CFG, **POD_V4)` and a
-# rebuild of every table; until then every number in the project is this pod's.
+# eliminated opponents acting -- 2.0, 2.05 with "reland" and 2.3 with §0z138 below. Adopted with one parallel
+# rebuild of every active table (§0z140).
 # A RE-ARMED CLOCK'S ROUTE IS REBUILT (§0z136, §0z137, the owner, 2026-10-14):
 # under "keep" its pieces stayed out, and a fifth to a quarter of your answers
 # landed there and bought half as much. "reland" lifts four decks +0.005 to
@@ -175,15 +178,20 @@ POD_V3 = dict(POD_V2, archetypes=True)
 # voting answers, the attack taxes, the wipe gate reading routes -- are read
 # under `pod_threats` and so are in this pod by default; they raise the mean
 # T20 win rate, and the fit with them is 2.31 -- 2.3 here.
-POD_V4 = {
-    "pod_bodies": True,
-    "pod_threats": True,
-    "rearm_rule": "reland",
-    "threat_clock_shift": 2.3,
-    # Change 3 (§0z134): instants cast on the pod's turn from held mana. It
-    # moves the six-deck mean about +0.005 at T20, inside the fit's own
-    # noise, so the shift above was not re-fitted for it.
-    "pod_responses": True,
+# Change 3 (§0z134), instants cast on the pod's turn from held mana, moves the
+# six-deck mean about +0.005 at T20, inside the fit's own noise, so the shift
+# was not re-fitted for it.
+from edhmc.opponents import POD_DEFAULTS as _POD_DEFAULTS   # noqa: E402
+POD_V4 = dict(_POD_DEFAULTS)
+
+# The pod before §0z140: no bodies, no routes, no responses. Every table and
+# every number in KNOWN_ISSUES dated before 2026-10-15 is this pod's.
+POD_PRE_V4 = {
+    "pod_bodies": False,
+    "pod_threats": False,
+    "rearm_rule": "keep",
+    "threat_clock_shift": 0.0,
+    "pod_responses": False,
 }
 
 # The pod as it stood before 2026-09-04, kept so any earlier number in the

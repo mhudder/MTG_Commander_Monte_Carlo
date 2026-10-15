@@ -990,16 +990,20 @@ PARTLY_MODELLED = {
             "owned by the voter', which needs opposing permanents to steal "
             "(§4). Understates, and badly. A floor.",
         "Council's Judgment":
-            "MODELLED: the vote. NOT: 'exile each permanent with the most "
-            "votes' -- no nonland permanent you don't control exists to vote "
-            "for (§4). A floor.",
+            "MODELLED: the vote, and since POD_V4 is the default (§0z138, "
+            "§0z140) its exile: the route piece `answer_target` aims at goes "
+            "unless the votes against outnumber yours, held while none is out. "
+            "Who wins is `opp_vote_policy`. NOT: a permanent that is not a "
+            "route piece (§4). A floor.",
         # --- rewritten §0z83: the votes are on their real chapters now ---
         "Vault 11: Voter's Dilemma":
             "MODELLED: chapter I's 1/1 Human Soldier per opponent, and the "
             "votes of chapters II and III on the draw steps they fall on "
-            "(`saga_step`), then the sacrifice. NOT: either vote's effect -- "
-            "destroy the most-voted creature, or everyone draws -- because "
-            "the pod has no creature to vote for (§4). A floor.",
+            "(`saga_step`), then the sacrifice; since POD_V4 is the default "
+            "(§0z138, §0z140) each vote destroys a creature route piece -- or, "
+            "outvoted or tied, YOUR most-wanted creature (the adversarial "
+            "`opp_vote_policy`). NOT: the draw mode. Knob-bound: it costs at "
+            "T10 under the adversarial vote.",
         "Trial of a Time Lord":
             "MODELLED: the chapter IV vote, on the third draw step after it "
             "enters (`saga_step`), then the sacrifice. NOT: chapters I-III's "
@@ -1093,9 +1097,9 @@ PARTLY_MODELLED = {
             "MODELLED (§0z135): every point of damage dealt to you -- the "
             "pod's combat, painlands, Midnight Reaper -- prevented, and twice "
             "it milled (`engine.damage_you`); under `pod_threats` a combat "
-            "route's kill too. NOT, on the default pod: a kill aimed at you "
-            "is a roll of no known kind and is not prevented -- a prevented "
-            "kill cannot be worse than a loss, so a floor.",
+            "route's kill too -- the default pod since §0z140. NOT: a combo "
+            "or drain route's kill, which is not damage, nor life LOSS and "
+            "life payments. A floor.",
         "Revel in Riches":
             "MODELLED: the alt-win, ten or more Treasures at your upkeep, off "
             "Treasures the rest of the deck makes (Smothering Tithe, in every "
@@ -1146,6 +1150,81 @@ PARTLY_MODELLED = {
             "there is no removal-in-response window to react in. A floor.",
     },
 }
+
+
+# POD_V4 IS THE DEFAULT POD (§0z140), and these cards left KNOWN_BLIND with it.
+# One reason per mechanism, so the 39 rows say one thing each way (§0u).
+ROUTE_ANSWER_REASON = (
+    "MODELLED (§0z131; the default pod since §0z140): an answer to a kill "
+    "ROUTE. It removes a piece of an opponent's route of a kind its text can "
+    "hit (`opponents.ANSWERS`, derived from the removal census), which "
+    "pushes that kill back by a pre-rolled rebuild delay, and it is held "
+    "until such a piece is out. NOT: the pod's other permanents, which are "
+    "a count (§4). The delay is `threat_rebuild_max` (3), a judgement with "
+    "no data that moves every answer's row by about a third either way.")
+COUNTER_REASON = (
+    "MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn "
+    "from mana held up, against its removal, its wraths and its route "
+    "pieces, at its real cost and tempo. NOT: the pod's other spells (draw, "
+    "ramp, the rest of its hand), which are not objects (§4). A floor.")
+ATTACK_TAX_REASON = (
+    "MODELLED (§0z138; the default pod since §0z140): the tax turns a combat "
+    "route's kill, and part of the pod's chip damage, toward another living "
+    "opponent. NOT: declared attacks -- the pod's combat is a damage share "
+    "(§4). Bound to `attack_tax_deflect` (0.5), a judgement with no data "
+    "that moves tivit's taxes by about a third either way.")
+_R, _C, _T = ROUTE_ANSWER_REASON, COUNTER_REASON, ATTACK_TAX_REASON
+_POD_V4_PARTLY = {
+    "rendmaw": {
+        "Nameless Inversion": _R, "Assassin's Trophy": _R,
+        "Beast Within": _R, "Eyeblight's Ending": _R,
+        "Deathreap Ritual":
+            "MODELLED (§0z132; the default pod since §0z140): a card at each "
+            "of the four end steps in which a creature died, the pod's "
+            "bodies included. NOT: the pod killing its own creatures, which "
+            "is the `opp_death_rate` knob -- a judgement on that side.",
+        "Pygmy Kavu":
+            "MODELLED (§0z132; the default pod since §0z140): the body, and a "
+            "card for each black creature the pod's bodies hold. Their colour "
+            "is `pod_black_share`, a judgement: the row reads that knob.",
+    },
+    "lorehold": {n: _R for n in ("Swords to Plowshares", "Path to Exile",
+                                 "Chaos Warp", "Generous Gift")},
+    "karlov": {n: _R for n in ("Swords to Plowshares", "Path to Exile",
+                               "Anguished Unmaking", "Fracture",
+                               "Return to Dust")},
+    "tivit": {
+        "Path to Exile": _R, "Swords to Plowshares": _R, "Void Rend": _R,
+        "Counterspell": _C, "Dovin's Veto": _C, "Muddle the Mixture": _C,
+        "An Offer You Can't Refuse": _C,
+        "Ghostly Prison": _T, "Propaganda": _T,
+    },
+    "shilgengar": {n: _R for n in ("Path to Exile", "Swords to Plowshares",
+                                   "Anguished Unmaking", "Generous Gift",
+                                   "Despark", "Vindicate", "Mortify",
+                                   "Utter End")},
+    "azusa": {n: _R for n in ("Terastodon", "Krosan Grip", "Beast Within")},
+    # Suspended: its table is re-rendered for the label, its numbers stay
+    # the old pod's until it is rebuilt.
+    "trostani": {n: _R for n in ("Acidic Slime", "Swords to Plowshares",
+                                 "Path to Exile", "Beast Within")},
+}
+for _deck, _rows in _POD_V4_PARTLY.items():
+    assert not set(_rows) & set(PARTLY_MODELLED.get(_deck, {})), _deck
+    PARTLY_MODELLED.setdefault(_deck, {}).update(_rows)
+
+# DAMN was never blind -- it is a symmetric wipe, derived -- but its
+# single-target mode is read only under routes (§0z138), so it carries its
+# own reason now that routes are the default; a hand-written entry wins over
+# the derived one (`partly_for`).
+for _deck in ("karlov", "shilgengar", "tivit"):
+    PARTLY_MODELLED[_deck].setdefault("Damn", (
+        "SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a "
+        "SPOT ANSWER: priced at {B}{B} against a creature route piece when "
+        "the wipe gate refuses the wrath or the overload cannot be paid. "
+        "Your half of the wrath is faithful; the pod's half zeroes a count "
+        "(§4) and takes the route pieces it can hit. The cost is modelled, "
+        "the benefit an estimate."))
 # ---------------------------------------------------------------------------
 # A SYMMETRIC WIPE IS PARTLY MODELLED BY CONSTRUCTION (2026-09-12)
 # ---------------------------------------------------------------------------
@@ -1173,8 +1252,10 @@ PARTLY_MODELLED = {
 SYMMETRIC_WIPE_REASON = (
     "SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(), "
     "honouring indestructible from this card's oracle text, §0z10); the "
-    "opponents' half only zeroes an abstract creature count (§4). The COST is "
-    "modelled and the BENEFIT is an estimate."
+    "opponents' half only zeroes an abstract creature count (§4) and, since "
+    "POD_V4 is the default (§0z140), takes the route pieces it can hit, which "
+    "the wipe gate counts (§0z138). The COST is modelled and the BENEFIT is "
+    "an estimate."
 )
 
 # Cards carrying `wipe` that are NOT symmetric wipes, with the reason each is
@@ -1405,23 +1486,26 @@ def ablation_stream(run, todo, procs):
 # Cards deliberately left out of the SCRIPTED set: the engine does NOT
 # implement their text and a low score is evidence about the model. Listing
 # them explicitly is what lets the assertion below be strict.
+#
+# 39 CARDS LEFT ON 2026-10-15, WHEN POD_V4 BECAME THE DEFAULT POD (§0z140).
+# Every one plays unlike its matched blank under it (`test_blind_labels`), so
+# each is PARTLY_MODELLED now, with its reason in `_POD_V4_PARTLY`: the
+# removal that answers a kill route, tivit's counterspells and attack taxes,
+# and rendmaw's two readers of the pod's bodies. A comment below that
+# introduced one of them describes the old pod; the ones still here passed
+# the same test.
 KNOWN_BLIND = {
     "trostani": {
         # removal -- the pod's permanents are a count (§4)
-        "Swords to Plowshares", "Path to Exile", "Beast Within",
         # "Whenever a creature you control enters, you may destroy target
         # artifact or enchantment" -- the pod's. No body.
         "Aura Shards",
         # a 2/2 body (deathtouch is inert against chump blocks) whose ETB
         # destroys the pod's artifact, enchantment or land (§4)
-        "Acidic Slime",
     },
     "rendmaw": {
-        "Assassin's Trophy",
-        'Beast Within',
         # Biotransference left 2026-10-07: implemented (§0z117).
         'Bow of Nylea',
-        "Eyeblight's Ending",
         'Haywire Mite',
         'Lignify',
         'Massacre Wurm',
@@ -1441,40 +1525,29 @@ KNOWN_BLIND = {
         # and hears the pod's deaths; the pod killing its own creatures is
         # still the `opp_death_rate` knob, so it would be PARTLY MODELLED
         # there. The label is the default pod's, which is what the tables use.
-        'Deathreap Ritual',
-        'Nameless Inversion',
         # Pygmy Kavu: "draw a card for each black creature your opponents
         # control". Under `pod_bodies` the bodies have a colour
         # (`pod_black_share`, a judgement) and `engine.pygmy_kavu` draws
         # (§0z132); on the default pod they have none, so it is a body.
-        'Pygmy Kavu',
         'Reap',
     },
     "lorehold": {
         'Bolt Bend',
         'Call Forth the Tempest',
-        'Chaos Warp',
         # (Gamble left 2026-10-14 for PARTLY_MODELLED, item 24's change 4.)
-        'Generous Gift',
         'Hexing Squelcher',
-        'Path to Exile',
         'Perch Protection',
         'Sejiri Shelter',
         # (Improvisation Capstone and Restoration Seminar left 2026-10-13:
         # both effects and paradigm implemented, item 24.)
-        'Swords to Plowshares',
     },
-    "karlov": {
-        'Anguished Unmaking',
-        'Fracture',
-        'Path to Exile',
-        'Return to Dust',
-        'Swords to Plowshares',
-        # (Enlightened Tutor and Sensei's Divining Top left 2026-10-14 for
-        # PARTLY_MODELLED, item 24's change 4.)
-        # (Sun Titan, Soulmender, Phyrexian Reclamation and Umezawa's Jitte
-        # left on 2026-10-13: implemented, item 24's change 0.)
-    },
+    # EMPTY SINCE §0z140, and `set()`, not `{}`: braces holding only comments
+    # are an empty DICT, which `check_scripted_coverage` cannot intersect.
+    # (Enlightened Tutor and Sensei's Divining Top left 2026-10-14 for
+    # PARTLY_MODELLED, item 24's change 4; Sun Titan, Soulmender, Phyrexian
+    # Reclamation and Umezawa's Jitte on 2026-10-13, change 0; its five
+    # removal spells on 2026-10-15, POD_V4.)
+    "karlov": set(),
     # Explicitly blind, with the reason. check_scripted_coverage() raises if a
     # nonland card is in neither set, which is the guard against the 2026-09-04
     # labelling bug -- but nothing can CHECK that a classification is TRUE, so
@@ -1483,8 +1556,6 @@ KNOWN_BLIND = {
         # Opponents' boards are a blocker count, so nothing that removes a
         # permanent can be evaluated at all. This is the deepest limitation in the
         # project and it puts a third of this list here.
-        "An Offer You Can't Refuse", "Path to Exile", "Swords to Plowshares",
-        "Counterspell", "Dovin's Veto", "Muddle the Mixture", "Void Rend",
         "Trap the Trespassers",
         # The four counterspells are cast on the pod's turn under
         # `pod_responses` (item 24 change 3, §0z134) -- against its removal,
@@ -1505,7 +1576,6 @@ KNOWN_BLIND = {
         # Under `pod_threats` the tax turns a combat route's kill and part of
         # the pod's chip damage elsewhere (§0z138); the label is the default
         # pod's, which has no routes.
-        "Ghostly Prison", "Propaganda",
         # BLIND DESPITE HAVING ENGINE CODE -- the engine acts on both, and
         # neither row is a floor, so neither can be PARTLY MODELLED. Each
         # carries its reason in BLIND_BUT_LIVE below.
@@ -1522,7 +1592,6 @@ KNOWN_BLIND = {
         # removal / land destruction aimed at opponents -- this project
         # tracks no opponent land or permanent objects at all, only an
         # aggregate creature count and a life total
-        "Terastodon", "Beast Within", "Krosan Grip",
         # (Crop Rotation left 2026-10-14 for PARTLY_MODELLED, item 24's
         # change 4: its land search is modelled, its land-destruction
         # targets are not.)
@@ -1560,40 +1629,41 @@ KNOWN_BLIND = {
         # (Oblivion Stone was here, a fate-counter wipe the engine never
         # played; the owner cut it for Ancient Greenwarden, 2026-09-30, §0z88.)
     },
-    "shilgengar": {
-        # removal -- opponents' boards are a blocker count, so none of it has
-        # a legal target. Same limitation as every other deck in this project.
-        # (The three removal ANGELS left on 2026-09-29, §0z78: each is a
-        # modelled flying body, so they are PARTLY MODELLED now.)
-        "Path to Exile", "Swords to Plowshares", "Anguished Unmaking",
-        "Generous Gift", "Despark", "Vindicate", "Mortify", "Utter End",
-        # HALF implemented, and the half that works is NOT the obvious one.
-        # Its Treasure-generation clause needs opponents' creatures to die as
-        # discrete events, which nothing in this model tracks -- but its
-        # ALTERNATE WIN (ten Treasures at upkeep) is live, and it fires off
-        # Treasures other cards made. Measured 2026-09-07 at N=15,000 it is
-        # +0.0063 +-0.0019 win rate, which is why it is the one card in this
-        # deck's blind table that is not near zero. Traced: it resolves in
-        # 12.1% of games, wins via the alt-win in 0.83% of ALL games, and in
-        # 33 of 33 of those wins SMOTHERING TITHE WAS ON THE BATTLEFIELD.
-        # THAT MAKES IT A KNOB RESULT: `shilgengar.upkeep` gives Tithe one
-        # Treasure per living opponent per turn on the assumption that
-        # opponents never pay the {2}. Make them pay sometimes and this line
-        # gets much worse. Do not read the +0.0063 as a fact about the card.
-        # MOVED TO PARTLY_MODELLED 2026-10-06 (§0z115): the 40 label seeds
-        # reach its alt-win under some engines and not others, so the label
-        # test flipped with every land change. The clause is modelled; that
-        # is PARTLY, said once.
-        # (Angel of Suffering left 2026-10-14 for PARTLY_MODELLED, §0z135.)
-        # (Bloodghast left 2026-10-13: its landfall recursion and haste are
-        # modelled, item 24 -- "not worth the engine complexity" was the
-        # reason it sat here.)
-        # (Herald of War, Angelic Arbiter, Twilight Shepherd, Serra's
-        # Emissary, and the two MDFCs Agadeem's Awakening and Malakir Rebirth
-        # left on 2026-09-29, §0z78: each has a modelled body or land face
-        # and every missing clause understates -- PARTLY MODELLED, with the
-        # clauses named there. Angel of Suffering stays, in BLIND_BUT_LIVE.)
-    },
+    # EMPTY SINCE §0z140 -- `set()`, not `{}` (see karlov's). The comments
+    # are the record of what left and why.
+    # removal -- opponents' boards are a blocker count, so none of it has
+    # a legal target. Same limitation as every other deck in this project.
+    # (The eight removal spells left on 2026-10-15: POD_V4's routes,
+    # §0z140.)
+    # (The three removal ANGELS left on 2026-09-29, §0z78: each is a
+    # modelled flying body, so they are PARTLY MODELLED now.)
+    # HALF implemented, and the half that works is NOT the obvious one.
+    # Its Treasure-generation clause needs opponents' creatures to die as
+    # discrete events, which nothing in this model tracks -- but its
+    # ALTERNATE WIN (ten Treasures at upkeep) is live, and it fires off
+    # Treasures other cards made. Measured 2026-09-07 at N=15,000 it is
+    # +0.0063 +-0.0019 win rate, which is why it is the one card in this
+    # deck's blind table that is not near zero. Traced: it resolves in
+    # 12.1% of games, wins via the alt-win in 0.83% of ALL games, and in
+    # 33 of 33 of those wins SMOTHERING TITHE WAS ON THE BATTLEFIELD.
+    # THAT MAKES IT A KNOB RESULT: `shilgengar.upkeep` gives Tithe one
+    # Treasure per living opponent per turn on the assumption that
+    # opponents never pay the {2}. Make them pay sometimes and this line
+    # gets much worse. Do not read the +0.0063 as a fact about the card.
+    # MOVED TO PARTLY_MODELLED 2026-10-06 (§0z115): the 40 label seeds
+    # reach its alt-win under some engines and not others, so the label
+    # test flipped with every land change. The clause is modelled; that
+    # is PARTLY, said once.
+    # (Angel of Suffering left 2026-10-14 for PARTLY_MODELLED, §0z135.)
+    # (Bloodghast left 2026-10-13: its landfall recursion and haste are
+    # modelled, item 24 -- "not worth the engine complexity" was the
+    # reason it sat here.)
+    # (Herald of War, Angelic Arbiter, Twilight Shepherd, Serra's
+    # Emissary, and the two MDFCs Agadeem's Awakening and Malakir Rebirth
+    # left on 2026-09-29, §0z78: each has a modelled body or land face
+    # and every missing clause understates -- PARTLY MODELLED, with the
+    # clauses named there. Angel of Suffering stays, in BLIND_BUT_LIVE.)
+    "shilgengar": set(),
 }
 
 
