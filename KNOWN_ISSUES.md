@@ -195,6 +195,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z140](#0z140) | DECIDED | **POD_V4 is the default pod**; 39 blind cards PARTLY now; six tables rebuilt (58 min wall): answers up 0.006-0.021, slow engines down 0.003-0.016, Exquisite Blood up |
 | [0z141](#0z141) | FIXED | **`python -m tests --mutate` had never passed**: three `chump` stand-ins kept a pre-§0z132 signature; ten modules printed no closing tally. All 86 pass; it is a closing gate now |
 | [0z142](#0z142) | MEASURED | **Lorehold's four staged swaps hold on POD_V4** (item 26): all significant at T10 and T20; the pod moved Sunbird's -0.0105 and Caldera -0.0053, Gyre +0.0053, Dilemma inside its bar |
+| [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), the owner's call; Bolas's Citadel T20 only |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12824,6 +12825,62 @@ significant at both horizons. It is `dilemma_choice` 'snitch', the default;
 
 Each Change's `reverified` carries its line. Item 26 is open for the other
 five decks' eight staged swaps.
+
+<a id="0z143"></a>
+## 0z143. MEASURED -- item 26's other eight staged swaps on POD_V4: seven stand, Anointed Procession does not hold at T20
+
+**2026-10-15, the owner: "go ahead and do all the other swaps"**, after
+lorehold's four (§0z142). Same method: each swap in context, N=15,000 paired,
+seeds 5000.., Python 3.13.12 / numpy 2.4.6, `diagnostics/run_restage.py`
+(gains `K_noAvatar`, for karlov's swap staged 2026-10-12), and the same arms
+on `POD_PRE_V4` at the same commit with `--pod=pre_v4`.
+`results/restage_item26_20261015.txt`. `*` = significant:
+
+| swap | T10 | T20 | T20 on POD_PRE_V4 | the pod's move, T20 | last recorded, T20 |
+|---|---|---|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0391 ±0.0035 * | **+0.0319 ±0.0036 *** | +0.0365 | -0.0045 ±0.0042 * | +0.0421 (§0z129, 3.11) |
+| karlov -Swamp +Bolas's Citadel | +0.0008 ±0.0033 | **+0.0048 ±0.0038 *** | +0.0091 | -0.0043 ±0.0047 | +0.0131 (§0z119) |
+| karlov -Daxos +South Wind Avatar | +0.0139 ±0.0025 * | **+0.0118 ±0.0030 *** | +0.0159 | -0.0041 ±0.0038 * | +0.0187 (staged) |
+| tivit -Plains +Anointed Procession | +0.0087 ±0.0043 * | **+0.0007 ±0.0049** | +0.0087 | -0.0079 ±0.0061 * | +0.0081 (§0z119) |
+| azusa -Perilous Forays +Ka-Zar | +0.0049 ±0.0026 * | **+0.0067 ±0.0033 *** | +0.0121 | -0.0054 ±0.0043 * | +0.0115 (§0z119) |
+| azusa -Forest +Fabled Passage | +0.0072 ±0.0040 * | **+0.0091 ±0.0049 *** | +0.0115 | -0.0025 ±0.0062 | +0.0117 (§0z119) |
+| azusa -Forest +Evolving Wilds | +0.0071 ±0.0041 * | **+0.0105 ±0.0050 *** | +0.0051 | +0.0054 ±0.0062 | +0.0063 (§0z119) |
+| azusa both fetches, one change | +0.0157 ±0.0052 * | **+0.0191 ±0.0062 *** | +0.0190 | +0.0001 ±0.0077 | +0.0257 (§0z119) |
+| shilgengar -Vampiric Rites +Lyra | +0.0042 ±0.0012 * | **+0.0094 ±0.0032 *** | +0.0146 | -0.0052 ±0.0041 * | +0.0141 (§0z119) |
+
+**Seven stand at both horizons, Bolas's Citadel at T20 only.** The pod
+shaved 0.004-0.005 at T20 off four of them; the fetches did not move.
+
+**Anointed Procession no longer holds at T20**: +0.0007 ±0.0049, inside its
+bar, and still +0.0087 at T10. It was already marginal there (+0.0081
+±0.0050 on 2026-10-07, and +0.0087 on the old pod today), and POD_V4 took
+-0.0079 ±0.0061 off it. **It is NOT unstaged**: as with Goldspan in §0z104,
+a staging the numbers have overtaken is the owner's to keep or withdraw, and
+unstaging moves tivit's baseline, so its table would need a rebuild (§0z27).
+It is also a LAND cut (36 lands to 35), which the harness flatters.
+
+**Why it moved, partly explained** (mechanism counters, N=3,000 per arm,
+T20). It is not the response window: `responses_cast` differs by -0.018 a
+game between the two arms. It is game length: on POD_V4 tivit's games are
+about 0.4 turns shorter (10.87 turns played against 11.29), and a doubler
+compounds. Over the old pod Procession adds 22.7 artifacts and 5.7 artifact
+drain a game; over POD_V4, 20.0 and 2.9. The T10 number, before compounding
+pays, barely moved (-0.0026 ±0.0042). That is a mechanism consistent with
+the number, not a proof of all of it.
+
+**Bolas's Citadel** is T20 only, as at §0z81. Most of its fall from +0.0131
+is NOT the pod (+0.0091 on the old pod at this commit; the pod's move is
+inside its bar). It is the engine and the list since 2026-10-07: South Wind
+Avatar staged, Soulmender modelled (§0z129), and §0z139's selection change
+moved karlov. Also a land cut.
+
+**Bloodthirsty Conqueror** stays the largest staged swap in the project,
++0.0319 at T20. Its fall from +0.0421 is a third the pod and the rest the
+engine since §0z129 (measured then on 3.11).
+
+Each Change's `reverified` carries its line. With §0z142, **item 26 has
+measured all twelve staged swaps**: eleven stand, and Anointed Procession
+waits on the owner.
 
 ## How to read an ablation table
 

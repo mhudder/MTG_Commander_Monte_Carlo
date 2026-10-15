@@ -29,10 +29,13 @@ What is closed and where it went:
     on either side may have moved by more than its bar. Re-measure each
     staged swap in context, N=15,000 paired, record the recheck in its
     ledger entry, and unstage any that no longer holds.
-    **LOREHOLD DONE (§0z142, 2026-10-15)**: all four stand, significant at
-    both horizons; `diagnostics/run_restage.py --pod=pre_v4` measures each
-    swap's move across the adoption at one commit. Left: karlov 3, azusa 3,
-    tivit 1, shilgengar 1.
+    **ALL TWELVE MEASURED (2026-10-15)**: lorehold's four (§0z142) and the
+    other eight (§0z143); `diagnostics/run_restage.py --pod=pre_v4` measures
+    each swap's move across the adoption at one commit. Eleven stand
+    (Bolas's Citadel at T20 only). **LEFT: THE OWNER'S CALL ON tivit
+    -Plains +Anointed Procession**, inside its bar at T20 (+0.0007 ±0.0049,
+    +0.0087 at T10). Unstaging it moves tivit's baseline and needs a rebuild
+    of its table.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10

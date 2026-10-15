@@ -169,7 +169,7 @@ CHANGES: list[Change] = [
             "simpler than a real pilot's, so a land cut is the kind of change "
             "this harness flatters. Committing needs the .xlsx and the module "
             "to move with the ledger -- tivit has all three legs."),
-        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0120 +-0.0040 at T10, +0.0081 +-0.0050 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + (
+        reverified="RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0087 +-0.0043 at T10 (significant), +0.0007 +-0.0049 at T20 -- INSIDE ITS BAR AT T20. THE STAGING NO LONGER HOLDS AT BOTH HORIZONS, and it is the owner's to keep or withdraw: unstaging moves tivit's baseline, so its table would need a rebuild (§0z27). The pod alone moved it -0.0026 +-0.0042 at T10 and -0.0079 +-0.0061 at T20 (POD_PRE_V4 at the same commit: +0.0113 / +0.0087, the T20 barely significant, as it was on 2026-10-07). A LAND CUT, which the harness flatters. Partly explained: POD_V4's games are 0.4 turns shorter, and the doubler's extra artifacts fall from 22.7 to 20.0 a game; not the response window (§0z143). results/restage_item26_20261015.txt (§0z143)." + 'RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0120 +-0.0040 at T10, +0.0081 +-0.0050 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + (
             "NOT RE-MEASURED, AND THIS CARD'S OWN PRIORITY IS ONE OF THE MOVES "
             "(2026-09-25, §0z44). The owner adopted tivit's four priority moves"
             ' -- Anointed Procession 8 -> 10 among them, with Mirkwood Bats 8 -'

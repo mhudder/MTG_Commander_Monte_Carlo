@@ -17,6 +17,7 @@ the deck's other staged changes are present on both sides.
   K               karlov as staged (-Soulmender +Conqueror, -Swamp +Citadel)
   K_noConq        ... with the Conqueror swap undone (Soulmender back)
   K_noCit         ... with the Citadel swap undone (Swamp back)
+  K_noAvatar      ... with South Wind Avatar undone (Daxos back; staged 2026-10-12)
   K_bootsConq     the Conqueror in Swiftfoot Boots' slot instead (Soulmender kept)
   T / T_noProc    tivit as staged / with Anointed Procession undone (Plains back)
   A / A_noKaZar   azusa as staged / with Ka-Zar undone (Perilous Forays back)
@@ -38,7 +39,8 @@ the deck's other staged changes are present on both sides.
 `--report` prints every STAGED swap as "staged minus undone", which is the
 number each Change's `reverified` records. The last four arms were added on
 2026-09-29 so that all eight staged swaps are covered (§0z80); L_noGyre and
-L_noDilemma on 2026-10-15 for lorehold's two later stagings (item 26).
+L_noDilemma on 2026-10-15 for lorehold's two later stagings, and K_noAvatar
+for karlov's (item 26).
 """
 import os
 import sys
@@ -54,6 +56,8 @@ ARMS = {
     "K": ("karlov", []),
     "K_noConq": ("karlov", [("Bloodthirsty Conqueror", ("module", "Soulmender"))]),
     "K_noCit": ("karlov", [("Bolas's Citadel", ("module", "Swamp"))]),
+    "K_noAvatar": ("karlov", [("South Wind Avatar",
+                               ("module", "Daxos, Blessed by the Sun"))]),
     "K_bootsConq": ("karlov", [("Bloodthirsty Conqueror", ("module", "Soulmender")),
                                ("Swiftfoot Boots", ("pending", "Bloodthirsty Conqueror"))]),
     "T": ("tivit", []),
@@ -81,6 +85,7 @@ ARMS = {
 STAGED = (
     ("karlov  -Soulmender +Bloodthirsty Conqueror", "K", "K_noConq"),
     ("karlov  -Swamp +Bolas's Citadel", "K", "K_noCit"),
+    ("karlov  -Daxos, Blessed by the Sun +South Wind Avatar", "K", "K_noAvatar"),
     ("tivit   -Plains +Anointed Procession", "T", "T_noProc"),
     ("azusa   -Perilous Forays +Ka-Zar of the Savage Land", "A", "A_noKaZar"),
     ("azusa   -Forest +Fabled Passage", "A", "A_noPassage"),

@@ -136,7 +136,7 @@ CHANGES: list[Change] = [
             "releases 2026-10-02; the card was implemented from preview text. "
             "Re-fetch its oracle text from Scryfall on release, and re-measure "
             "if a word has changed, BEFORE this is committed."),
-        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0029 +-0.0009 at T10, +0.0141 +-0.0028 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0026 +-0.0008 at T10, +0.0124 +-0.0028 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
+        reverified="RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0042 +-0.0012 at T10, +0.0094 +-0.0032 at T20. Significant at both; the staging stands. The pod alone moved it -0.0001 +-0.0012 at T10 and -0.0052 +-0.0041 at T20 (POD_PRE_V4 at the same commit: +0.0043 / +0.0146). results/restage_item26_20261015.txt (§0z143)." + 'RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0029 +-0.0009 at T10, +0.0141 +-0.0028 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0026 +-0.0008 at T10, +0.0124 +-0.0028 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81).",
     ),
 ]
 
