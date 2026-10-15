@@ -14,28 +14,13 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c and 25 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25 and 26 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
   2026-10-10".
 
 ---
-
-26. **RE-MEASURE THE STAGED SWAPS ON POD_V4** (queued 2026-10-15, §0z140).
-    Every SIMULATED and STAGED number in the ledger was measured on the pod
-    before POD_V4 became the default. Answers rose 0.006-0.021 at T20 and
-    slow engines fell 0.003-0.016, so a swap with an answer or a slow engine
-    on either side may have moved by more than its bar. Re-measure each
-    staged swap in context, N=15,000 paired, record the recheck in its
-    ledger entry, and unstage any that no longer holds.
-    **ALL TWELVE MEASURED (2026-10-15)**: lorehold's four (§0z142) and the
-    other eight (§0z143); `diagnostics/run_restage.py --pod=pre_v4` measures
-    each swap's move across the adoption at one commit. Eleven stand
-    (Bolas's Citadel at T20 only). **LEFT: THE OWNER'S CALL ON tivit
-    -Plains +Anointed Procession**, inside its bar at T20 (+0.0007 ±0.0049,
-    +0.0087 at T10). Unstaging it moves tivit's baseline and needs a rebuild
-    of its table.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10

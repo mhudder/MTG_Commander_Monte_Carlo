@@ -195,7 +195,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z140](#0z140) | DECIDED | **POD_V4 is the default pod**; 39 blind cards PARTLY now; six tables rebuilt (58 min wall): answers up 0.006-0.021, slow engines down 0.003-0.016, Exquisite Blood up |
 | [0z141](#0z141) | FIXED | **`python -m tests --mutate` had never passed**: three `chump` stand-ins kept a pre-§0z132 signature; ten modules printed no closing tally. All 86 pass; it is a closing gate now |
 | [0z142](#0z142) | MEASURED | **Lorehold's four staged swaps hold on POD_V4** (item 26): all significant at T10 and T20; the pod moved Sunbird's -0.0105 and Caldera -0.0053, Gyre +0.0053, Dilemma inside its bar |
-| [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), the owner's call; Bolas's Citadel T20 only |
+| [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), kept by the owner; Bolas's Citadel T20 only |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12858,6 +12858,8 @@ bar, and still +0.0087 at T10. It was already marginal there (+0.0081
 a staging the numbers have overtaken is the owner's to keep or withdraw, and
 unstaging moves tivit's baseline, so its table would need a rebuild (§0z27).
 It is also a LAND cut (36 lands to 35), which the harness flatters.
+**THE OWNER, 2026-10-15: "keep Anointed Procession for now."** It stays
+staged on its T10 number.
 
 **Why it moved, partly explained** (mechanism counters, N=3,000 per arm,
 T20). It is not the response window: `responses_cast` differs by -0.018 a
@@ -12880,7 +12882,7 @@ engine since §0z129 (measured then on 3.11).
 
 Each Change's `reverified` carries its line. With §0z142, **item 26 has
 measured all twelve staged swaps**: eleven stand, and Anointed Procession
-waits on the owner.
+is kept by the owner's decision. Item 26 is closed.
 
 ## How to read an ablation table
 

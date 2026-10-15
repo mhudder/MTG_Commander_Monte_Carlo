@@ -2790,3 +2790,23 @@ minutes wall, every active cache CURRENT.
     parallel-rebuild skill. Never clear them with `--verified`: the numbers
     moved. If POD_V4 is adopted first, one rebuild covers both. **POD_V4 WAS
     ADOPTED 2026-10-15 (§0z140)** and this rebuild is running on it.
+
+Closed by re-measuring every staged swap on POD_V4 (§0z142, §0z143) and the
+owner's decision on the one that fell inside its bar.
+
+26. **RE-MEASURE THE STAGED SWAPS ON POD_V4** (queued 2026-10-15, §0z140).
+    Every SIMULATED and STAGED number in the ledger was measured on the pod
+    before POD_V4 became the default. Answers rose 0.006-0.021 at T20 and
+    slow engines fell 0.003-0.016, so a swap with an answer or a slow engine
+    on either side may have moved by more than its bar. Re-measure each
+    staged swap in context, N=15,000 paired, record the recheck in its
+    ledger entry, and unstage any that no longer holds.
+    **ALL TWELVE MEASURED (2026-10-15)**: lorehold's four (§0z142) and the
+    other eight (§0z143); `diagnostics/run_restage.py --pod=pre_v4` measures
+    each swap's move across the adoption at one commit. Eleven stand
+    (Bolas's Citadel at T20 only). **LEFT: THE OWNER'S CALL ON tivit
+    -Plains +Anointed Procession**, inside its bar at T20 (+0.0007 ±0.0049,
+    +0.0087 at T10). Unstaging it moves tivit's baseline and needs a rebuild
+    of its table.
+    **CLOSED 2026-10-15**: the owner kept Anointed Procession ("keep
+    Anointed Procession for now").
