@@ -29,6 +29,10 @@ What is closed and where it went:
     on either side may have moved by more than its bar. Re-measure each
     staged swap in context, N=15,000 paired, record the recheck in its
     ledger entry, and unstage any that no longer holds.
+    **LOREHOLD DONE (§0z142, 2026-10-15)**: all four stand, significant at
+    both horizons; `diagnostics/run_restage.py --pod=pre_v4` measures each
+    swap's move across the adoption at one commit. Left: karlov 3, azusa 3,
+    tivit 1, shilgengar 1.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10

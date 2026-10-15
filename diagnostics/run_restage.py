@@ -3,6 +3,10 @@
 
     python -m diagnostics.run_restage 15000 OUTDIR [ARM ...]
     python -m diagnostics.run_restage --report OUTDIR
+    python -m diagnostics.run_restage --pod=pre_v4 15000 OUTDIR [ARM ...]
+
+`--pod=pre_v4` plays every arm on `experiment.POD_PRE_V4`, the pod before
+§0z140, so a swap's move across the adoption is measured at one commit.
 
 Each arm is `build_pending(deck)` with some slots rewritten, run for N games
 at T10 and T20 on seeds 5000..; per-seed columns go to OUTDIR/<arm>_T<h>.npy
@@ -25,13 +29,16 @@ the deck's other staged changes are present on both sides.
   L_gold_grv      -Lightning Greaves +Goldspan Dragon
   L_noCaldera     lorehold with Caldera Pyremaw undone (Penance back)
   L_noSunbird     ... with Sunbird's Invocation undone (Scroll Rack back)
+  L_noGyre        ... with Immolating Gyre undone (Boros Charm back)
+  L_noDilemma     ... with Prisoner's Dilemma undone (Ruby Medallion back)
   (L_noGold was the Goldspan swap undone; that swap was WITHDRAWN 2026-10-05,
    §0z105, so `L` has the Act and L_gold_act - L is the withdrawn swap.)
   S / S_noLyra    shilgengar as staged / with Lyra undone (Vampiric Rites back)
 
 `--report` prints every STAGED swap as "staged minus undone", which is the
 number each Change's `reverified` records. The last four arms were added on
-2026-09-29 so that all eight staged swaps are covered (§0z80).
+2026-09-29 so that all eight staged swaps are covered (§0z80); L_noGyre and
+L_noDilemma on 2026-10-15 for lorehold's two later stagings (item 26).
 """
 import os
 import sys
@@ -63,6 +70,8 @@ ARMS = {
     "L_gold_grv": ("lorehold", [("Lightning Greaves", ("lh", "GOLDSPAN_DRAGON"))]),
     "L_noCaldera": ("lorehold", [("Caldera Pyremaw", ("module", "Penance"))]),
     "L_noSunbird": ("lorehold", [("Sunbird's Invocation", ("module", "Scroll Rack"))]),
+    "L_noGyre": ("lorehold", [("Immolating Gyre", ("module", "Boros Charm"))]),
+    "L_noDilemma": ("lorehold", [("Prisoner's Dilemma", ("module", "Ruby Medallion"))]),
     "S": ("shilgengar", []),
     "S_noLyra": ("shilgengar", [("Lyra, Archangel of Dawn",
                                  ("module", "Vampiric Rites"))]),
@@ -79,6 +88,8 @@ STAGED = (
     ("azusa   both fetches, as one change", "A", "A_noFetches"),
     ("lorehold -Penance +Caldera Pyremaw", "L", "L_noCaldera"),
     ("lorehold -Scroll Rack +Sunbird's Invocation", "L", "L_noSunbird"),
+    ("lorehold -Boros Charm +Immolating Gyre", "L", "L_noGyre"),
+    ("lorehold -Ruby Medallion +Prisoner's Dilemma", "L", "L_noDilemma"),
     # -Blasphemous Act +Goldspan Dragon was WITHDRAWN 2026-10-05 (§0z105).
     ("shilgengar -Vampiric Rites +Lyra, Archangel of Dawn", "S", "S_noLyra"),
 )
@@ -135,11 +146,13 @@ def build(arm):
 
 
 def job(a):
-    arm, turns, lo, hi = a
+    arm, turns, lo, hi, pod = a
     from edhmc.registry import DECKS as R
-    from edhmc.experiment import DEFAULT_CFG
+    from edhmc import experiment as X
     deck_name, deck, cmd = build(arm)
-    cfg = dict(DEFAULT_CFG, turns=turns, watch=frozenset())
+    cfg = dict(X.DEFAULT_CFG, turns=turns, watch=frozenset())
+    if pod == "pre_v4":
+        cfg.update(X.POD_PRE_V4)
     return [[float(R[deck_name].sim(deck, cmd, cfg, 5000 + s).get(m, 0)) for m in MET]
             for s in range(lo, hi)]
 
@@ -148,18 +161,23 @@ if __name__ == "__main__":
     if sys.argv[1] == "--report":
         report(sys.argv[2])
         sys.exit(0)
-    n, outdir = int(sys.argv[1]), sys.argv[2]
-    arms = sys.argv[3:] or list(ARMS)
+    args = sys.argv[1:]
+    pod = None
+    if args[0].startswith("--pod="):
+        pod = args.pop(0).split("=", 1)[1]
+        assert pod == "pre_v4", f"unknown pod {pod!r}"
+    n, outdir = int(args[0]), args[1]
+    arms = args[2:] or list(ARMS)
     for a in arms:
         build(a)                       # fail fast on a bad arm
     os.makedirs(outdir, exist_ok=True)
     CH = 8
-    tasks = [(a, t, k * n // CH, (k + 1) * n // CH)
+    tasks = [(a, t, k * n // CH, (k + 1) * n // CH, pod)
              for a in arms for t in (10, 20) for k in range(CH)]
     with Pool(4, maxtasksperchild=1) as p:
         res = p.map(job, tasks, chunksize=1)
     cols = {}
-    for (a, t, _, _), r in zip(tasks, res):
+    for (a, t, _, _, _), r in zip(tasks, res):
         cols.setdefault((a, t), []).extend(r)
     for (a, t), rows in cols.items():
         np.save(os.path.join(outdir, f"{a}_T{t}.npy"), np.array(rows, float))

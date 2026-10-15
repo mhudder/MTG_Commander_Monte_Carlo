@@ -1,0 +1,23 @@
+Lorehold's four staged swaps re-measured on POD_V4 (§0z140), 2026-10-15, queue item 26 (§0z142).
+N=15,000 paired, seeds 5000.., python 3.13.12 / numpy 2.4.6 (the tables' interpreter), at 389e0d3 plus run_restage's two new arms.
+diagnostics/run_restage.py arms L L_noCaldera L_noSunbird L_noGyre L_noDilemma; staged minus undone (in context: the other three staged swaps on both sides).
+
+== POD_V4, the default pod ==
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0173 +-0.0031*  T20 +0.0261 +-0.0040*  dmgT20 +2.69 +-0.25
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0130 +-0.0035*  T20 +0.0222 +-0.0045*  dmgT20 +2.23 +-0.27
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0049 +-0.0027*  T20 +0.0191 +-0.0037*  dmgT20 +0.60 +-0.18
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0158 +-0.0034*  T20 +0.0201 +-0.0044*  dmgT20 +3.27 +-0.25
+
+== POD_PRE_V4, the same arms and seeds, same commit (--pod=pre_v4) ==
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0197 +-0.0031*  T20 +0.0314 +-0.0040*  dmgT20 +3.12 +-0.27
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0181 +-0.0035*  T20 +0.0327 +-0.0045*  dmgT20 +2.69 +-0.29
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0063 +-0.0026*  T20 +0.0137 +-0.0035*  dmgT20 +0.44 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0168 +-0.0034*  T20 +0.0252 +-0.0043*  dmgT20 +3.98 +-0.26
+
+== The pod's effect on each swap: (V4 swap) - (PRE_V4 swap), paired per seed, win rate ==
+lorehold -Penance +Caldera Pyremaw                    T10 -0.0024 +-0.0032   T20 -0.0053 +-0.0049*
+lorehold -Scroll Rack +Sunbird's Invocation           T10 -0.0051 +-0.0034*  T20 -0.0105 +-0.0055*
+lorehold -Boros Charm +Immolating Gyre                T10 -0.0015 +-0.0030   T20 +0.0053 +-0.0047*
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 -0.0010 +-0.0038   T20 -0.0051 +-0.0056 
+the staged list's own win rate at T10: POD_V4 0.2142, POD_PRE_V4 0.2204
+the staged list's own win rate at T20: POD_V4 0.4292, POD_PRE_V4 0.4464

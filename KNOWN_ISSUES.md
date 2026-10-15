@@ -194,6 +194,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z139](#0z139) | BUILT | **Item 24 change 4**: one want order for selection and tutors; seven blind cards live. **Enlightened Tutor +0.024 at T20** (karlov's combo half), Sylvan Library +0.011; Abundance, Top nothing |
 | [0z140](#0z140) | DECIDED | **POD_V4 is the default pod**; 39 blind cards PARTLY now; six tables rebuilt (58 min wall): answers up 0.006-0.021, slow engines down 0.003-0.016, Exquisite Blood up |
 | [0z141](#0z141) | FIXED | **`python -m tests --mutate` had never passed**: three `chump` stand-ins kept a pre-§0z132 signature; ten modules printed no closing tally. All 86 pass; it is a closing gate now |
+| [0z142](#0z142) | MEASURED | **Lorehold's four staged swaps hold on POD_V4** (item 26): all significant at T10 and T20; the pod moved Sunbird's -0.0105 and Caldera -0.0053, Gyre +0.0053, Dilemma inside its bar |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12778,6 +12779,51 @@ does not exist, and a mutation stand-in is a copy of a signature, which is
 exactly what drifts when nobody runs it. `python -m tests --mutate` is now in
 the closing checklists (CLAUDE.md and the session-close skill): **all 86
 modules pass**.
+
+<a id="0z142"></a>
+## 0z142. MEASURED -- lorehold's four staged swaps, re-measured on POD_V4: all four stand
+
+**2026-10-15, the owner: "start item 26 with lorehold's staged swaps".** Each
+swap IN CONTEXT (the staged list, against it with that one swap undone, so the
+other three are on both sides), N=15,000 paired, seeds 5000.., Python 3.13.12 /
+numpy 2.4.6, `diagnostics/run_restage.py`, which gains `L_noGyre` and
+`L_noDilemma` (the two stagings after §0z119's re-check) and `--pod=pre_v4`:
+the same arms and seeds on `experiment.POD_PRE_V4`, so what the adoption
+alone did to a swap is a paired difference at one commit, not a comparison
+with a number measured on another engine and another list.
+`results/restage_lorehold_20261015.txt`. `*` = significant:
+
+| swap | T10 | T20 | T20 on POD_PRE_V4 | the pod's move, T20 | last recorded, T20 |
+|---|---|---|---|---|---|
+| -Penance +Caldera Pyremaw | +0.0173 ±0.0031 * | **+0.0261 ±0.0040 *** | +0.0314 | -0.0053 ±0.0049 * | +0.0246 (§0z119) |
+| -Scroll Rack +Sunbird's Invocation | +0.0130 ±0.0035 * | **+0.0222 ±0.0045 *** | +0.0327 | -0.0105 ±0.0055 * | +0.0231 (§0z119) |
+| -Boros Charm +Immolating Gyre | +0.0049 ±0.0027 * | **+0.0191 ±0.0037 *** | +0.0137 | +0.0053 ±0.0047 * | +0.0167 (staged) |
+| -Ruby Medallion +Prisoner's Dilemma | +0.0158 ±0.0034 * | **+0.0201 ±0.0044 *** | +0.0252 | -0.0051 ±0.0056 | +0.0295 (staged) |
+
+**Every staging stands**: significant at both horizons, each on its own bar.
+None was unstaged.
+
+**The pod moved them the way item 26 said it would.** The two engine pieces
+lost (Sunbird's Invocation and Caldera Pyremaw pay off over a long game, and
+POD_V4 ends lorehold's games sooner: the staged list's own T20 win rate is
+0.4292 on POD_V4 against 0.4464 on the old pod). Immolating Gyre, an answer,
+gained: under `pod_threats` a sweeper removes route pieces and under
+`pod_bodies` it kills bodies. Its price is still `gyre_full_x` (6), now the
+top of the bodies' toughness range (`opponents.roll_body_pools`), so **the
+Gyre's number rests on that knob as it did before**, said again here. The
+Dilemma's move is inside its bar.
+
+**Prisoner's Dilemma is the one whose staged number is out of date by more
+than a bar** (+0.0295 staged, +0.0201 now), and neither half explains it
+alone: the pod accounts for -0.0051 ±0.0056, and the rest is the list and
+the engine since 2026-10-09 (Furygale Flocking, Profound Journey and the Gyre
+are in the list now and were not then; §0z139's selection change moved
+lorehold). The number a decision rests on is the new one, and it is
+significant at both horizons. It is `dilemma_choice` 'snitch', the default;
+'silence' (the floor) was not re-run.
+
+Each Change's `reverified` carries its line. Item 26 is open for the other
+five decks' eight staged swaps.
 
 ## How to read an ablation table
 

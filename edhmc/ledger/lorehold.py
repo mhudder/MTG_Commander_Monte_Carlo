@@ -320,6 +320,7 @@ CHANGES: list[Change] = [
         rationale="STAGED BY THE OWNER 2026-10-10, the third cut. A one-sided sweeper whose X is the graveyard Lorehold fills, usually a full wipe of the pod's boards (§0z124). The cut was the owner's: +0.0019 +-0.0016 at T20.",
         evidence="REAL SWAP -Boros Charm +Immolating Gyre, N=15,000 paired, seeds 5000.., the staged list (with -Ruby Medallion +Prisoner's Dilemma): +0.0035 +-0.0021 (significant) at T10 and +0.0167 +-0.0035 (significant) at T20. results/lorehold_big_spells_h2h_20261010.txt (diagnostics/run_lorehold_big_spells.py --h2h).",
         notes="TWO CAVEATS ON THE CUT, both making the swap a CEILING: Boros Charm's damage mode is spread as 4/3 to each opponent instead of 4 to one (a known engine defect, queued separately), so its row is understated; and its indestructible mode is a protection spell (`PROTECTION`), which the pod's abstract removal sees only in part. THE ADD RESTS ON A KNOB: `gyre_full_x` (6), a judgement about the pod's toughness -- over a blank the row held from +0.0131 to +0.0218 across 3..12. THE THREE TOGETHER (§0p), the package staged 2026-10-10, against the same base: +0.0471 +-0.0046 at T10 and +0.0773 +-0.0064 at T20 (results/lorehold_big_spells_package_20261010.txt) -- additive at T10 (+0.0469 summed), somewhat below the sum at T20 (+0.0847): three cards competing for the same miracle windows. REBUILD: staging changes `build_pending`, so lorehold's cache stays SUSPECT until its table is rebuilt (§0z27) -- the rebuild already deferred for Prisoner's Dilemma covers this too. §0z124.",
+        reverified="RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0049 +-0.0027 at T10, +0.0191 +-0.0037 at T20. Significant at both; the staging stands. The pod alone moved it +0.0053 +-0.0047 at T20 (POD_PRE_V4 at the same commit: +0.0137): an answer, which POD_V4 lets hit route pieces and kill bodies. `gyre_full_x` (6) still prices it: under `pod_bodies` it is the top of the bodies' toughness range. results/restage_lorehold_20261015.txt (§0z142).",
     ),
     Change(
         deck="lorehold", remove="Ruby Medallion", add="Prisoner's Dilemma",
@@ -349,6 +350,15 @@ CHANGES: list[Change] = [
             "and Enlightened Tutor (+0.0332, a ceiling since §0z123), stay in "
             "SIMULATED. Not committed: the deck module and the .xlsx are "
             "untouched."),
+        reverified=(
+            "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, "
+            "N=15,000 paired, python 3.13, 'snitch': +0.0158 +-0.0034 at T10, "
+            "+0.0201 +-0.0044 at T20. Significant at both; the staging stands. "
+            "Below the staged +0.0295 at T20 by more than a bar, but neither "
+            "half alone is: the pod moved it -0.0051 +-0.0056 (POD_PRE_V4 at "
+            "the same commit: +0.0252), and the list it is measured in gained "
+            "Furygale Flocking, Profound Journey and Immolating Gyre since. "
+            "results/restage_lorehold_20261015.txt (§0z142)."),
     ),
     Change(
         deck="lorehold",
@@ -460,7 +470,7 @@ CHANGES: list[Change] = [
             "the top-setter logic: -0.0075 +-0.0058 win rate, signal 'win', a "
             "third top-setter."
         ),
-        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0104 +-0.0023 at T10, +0.0246 +-0.0037 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0083 +-0.0025 at T10, +0.0269 +-0.0038 at T20. results/restage_20261005.txt. ' + (
+        reverified='RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0173 +-0.0031 at T10, +0.0261 +-0.0040 at T20. Significant at both; the staging stands. The pod alone moved it -0.0053 +-0.0049 at T20 (the same arms on POD_PRE_V4 at the same commit: +0.0314) -- a slow engine piece, as item 26 predicted. results/restage_lorehold_20261015.txt (§0z142). ' + 'RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0104 +-0.0023 at T10, +0.0246 +-0.0037 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0083 +-0.0025 at T10, +0.0269 +-0.0038 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v). Re-run as the SAME 2x2 factorial at the "
             "same N=30,000 per cell and the same seeds as the 2026-09-06 "
@@ -540,7 +550,7 @@ CHANGES: list[Change] = [
             "LESS (-0.98) but wins less (+0.0045 / +0.0128), so this is the "
             "better of the two measured options."
         ),
-        reverified='RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0073 +-0.0025 at T10, +0.0231 +-0.0041 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0051 +-0.0027 at T10, +0.0233 +-0.0042 at T20. results/restage_20261005.txt. ' + (
+        reverified='RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0130 +-0.0035 at T10, +0.0222 +-0.0045 at T20. Significant at both; the staging stands. The pod alone moved it -0.0105 +-0.0055 at T20, the largest of the four (POD_PRE_V4 at the same commit: +0.0327) -- a slow engine piece, as item 26 predicted. results/restage_lorehold_20261015.txt (§0z142). ' + 'RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0073 +-0.0025 at T10, +0.0231 +-0.0041 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + 'RE-MEASURED 2026-10-05 after §0z104 (the wipe gate asked at every optional cast site), in context, N=15,000 paired: +0.0051 +-0.0027 at T10, +0.0233 +-0.0042 at T20. results/restage_20261005.txt. ' + (
             "RE-VERIFIED 2026-09-05 after the top-setter policy fixes and the Galvanoth ordering fix. 6,000 paired games: win rate +0.0010 [-0.0017, +0.0037] at 10 turns and +0.0193 [+0.0133, +0.0253] at 20; damage +1.17 and +3.02; mv_cheated +1.20 and +3.20. The 20-turn result has been stable and significant across every engine version tried (+0.0215, +0.0108, +0.0173, +0.0182, +0.0193); the 10-turn result has been inside its bar since evasion landed. A long-horizon call, and the best-supported of the three staged changes. Scroll Rack is a TOP-SETTER, and the top-setter plan is the weakest part of this deck's construction. "
             "RE-VERIFIED AGAIN 2026-09-09 on the post-combat-split engine "
             "(KNOWN_ISSUES.md §0v), same 2x2 factorial, same N=30,000 and "
