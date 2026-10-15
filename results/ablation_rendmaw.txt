@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0022.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0024.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -25,122 +25,122 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Tendershoot Dryad                     +1.14+-0.11         +1.66+-0.15        +0.0217+-0.0028      both
-Sol Ring                              +2.01+-0.16         +1.65+-0.18        +0.0150+-0.0032      both
-Bitterblossom                         +1.45+-0.12         +1.64+-0.16        +0.0118+-0.0028      both
-Grave Titan                           +0.93+-0.09         +1.62+-0.14        +0.0158+-0.0027      both
-March of the World Ooze               +1.19+-0.11         +1.46+-0.14        +0.0127+-0.0030      both
-Ohran Frostfang                       +1.04+-0.10         +1.45+-0.14        +0.0221+-0.0030      both
-Beastmaster Ascension                 +1.07+-0.13         +1.27+-0.15        +0.0205+-0.0032      both
-Verdurous Gearhulk                    +0.98+-0.10         +1.07+-0.13        +0.0025+-0.0028       dmg
-Twitching Doll                        +0.88+-0.12         +0.93+-0.15        +0.0084+-0.0029      both
-Whip of Erebos                        +0.29+-0.05         +0.92+-0.12        +0.0160+-0.0026      both
-Golgari Signet                        +0.92+-0.12         +0.90+-0.15        +0.0095+-0.0028      both
-Arcane Signet                         +0.90+-0.12         +0.88+-0.15        +0.0100+-0.0028      both
-Overlord of the Hauntwoods            +0.68+-0.10         +0.81+-0.13        +0.0112+-0.0028      both
-The Meathook Massacre                 +0.64+-0.06         +0.80+-0.09        +0.0045+-0.0020      both
-Biotransference                       +0.48+-0.06         +0.78+-0.10        +0.0071+-0.0022      both
-Coat of Arms                          +0.47+-0.10         +0.77+-0.13        +0.0111+-0.0028      both
-Grist, the Hunger Tide                +0.42+-0.08         +0.76+-0.12        +0.0091+-0.0026      both
-Arasta of the Endless Web             +0.51+-0.06         +0.70+-0.08        +0.0071+-0.0020      both
-Solemn Simulacrum                     +0.62+-0.10         +0.66+-0.13        +0.0106+-0.0029      both
-Gloomshrieker                         +0.39+-0.05         +0.56+-0.08        +0.0079+-0.0021      both
-Foundry Inspector                     +0.52+-0.07         +0.50+-0.10        +0.0050+-0.0023      both
-Ophiomancer                           +0.34+-0.06         +0.49+-0.10        +0.0026+-0.0023      both
-Heroic Intervention                   +0.40+-0.06         +0.48+-0.08        +0.0046+-0.0016      both
-Woe Strider                           +0.35+-0.04         +0.47+-0.07        +0.0024+-0.0016      both
-Midnight Reaper                       +0.35+-0.04         +0.47+-0.09        +0.0047+-0.0022      both
-Scrap Trawler                         +0.29+-0.04         +0.41+-0.08        +0.0062+-0.0021      both
-Filigree Familiar                     +0.26+-0.04         +0.38+-0.08        +0.0055+-0.0022      both
-Sakura-Tribe Elder                    +0.37+-0.12         +0.30+-0.16        +0.0063+-0.0032      both
-Blood Artist                          +0.11+-0.05         +0.30+-0.08        +0.0045+-0.0020      both
-Overwhelming Stampede                 +0.27+-0.09         +0.29+-0.13        +0.0022+-0.0028       dmg
-Junk Diver                            +0.19+-0.04         +0.28+-0.07        +0.0042+-0.0019      both
-Burnished Hart                        +0.17+-0.05         +0.18+-0.09        +0.0041+-0.0022      both
-The Great Henge                       +0.03+-0.06         +0.13+-0.10        +0.0035+-0.0025      both
-Myr Retriever                         +0.11+-0.03         +0.13+-0.06        +0.0033+-0.0018      both
-Metallic Mimic                        +0.16+-0.06         +0.11+-0.09        +0.0019+-0.0021       dmg
-Roaming Throne                        +0.16+-0.07         +0.09+-0.10        +0.0046+-0.0025       win
-Village Rites                         -0.02+-0.07         +0.08+-0.11        +0.0048+-0.0026       win
-Dryad of the Ilysian Grove            +0.15+-0.08         +0.06+-0.11        +0.0018+-0.0024        --
-Primal Vigor                          -0.01+-0.05         +0.06+-0.09        +0.0097+-0.0024       win
-Idol of Oblivion                      -0.01+-0.06         +0.03+-0.10        +0.0041+-0.0022       win
-Palladium Myr                         +0.08+-0.07         -0.01+-0.10        +0.0007+-0.0022        --
-Copper Myr                            -0.00+-0.07         -0.04+-0.10        +0.0027+-0.0021       win
-Ashnod's Altar                        +0.01+-0.03         -0.05+-0.05        -0.0015+-0.0013       win
-Leaden Myr                            -0.07+-0.07         -0.08+-0.09        +0.0029+-0.0019       win
-Dockside Chef                         -0.05+-0.04         -0.10+-0.07        +0.0017+-0.0018       dmg
-Steel Overseer                        +0.02+-0.06         -0.10+-0.09        +0.0019+-0.0021       dmg
-Enduring Vitality                     +0.00+-0.07         -0.11+-0.10        +0.0003+-0.0024       dmg
-Erebos, Bleak-Hearted                 -0.14+-0.05         -0.23+-0.10        +0.0028+-0.0024      both
-Ornithopter of Paradise               -0.26+-0.08         -0.24+-0.10        +0.0005+-0.0021       dmg
+Sol Ring                              +2.16+-0.17         +1.61+-0.18        +0.0178+-0.0035      both
+Verdurous Gearhulk                    +1.06+-0.10         +0.90+-0.13        +0.0037+-0.0030      both
+March of the World Ooze               +1.07+-0.10         +0.86+-0.13        +0.0065+-0.0031      both
+Grave Titan                           +0.75+-0.09         +0.78+-0.11        +0.0085+-0.0027      both
+Bitterblossom                         +1.00+-0.11         +0.77+-0.13        +0.0046+-0.0029      both
+Golgari Signet                        +0.93+-0.12         +0.75+-0.15        +0.0107+-0.0032      both
+Arcane Signet                         +0.86+-0.12         +0.74+-0.15        +0.0083+-0.0032      both
+Tendershoot Dryad                     +0.75+-0.09         +0.73+-0.10        +0.0117+-0.0024      both
+Solemn Simulacrum                     +0.63+-0.10         +0.55+-0.12        +0.0079+-0.0029      both
+Foundry Inspector                     +0.67+-0.08         +0.52+-0.10        +0.0060+-0.0025      both
+Twitching Doll                        +0.62+-0.12         +0.49+-0.14        +0.0097+-0.0031      both
+Beastmaster Ascension                 +0.54+-0.11         +0.49+-0.13        +0.0134+-0.0032      both
+Whip of Erebos                        +0.27+-0.05         +0.43+-0.10        +0.0099+-0.0025      both
+Woe Strider                           +0.41+-0.05         +0.41+-0.07        +0.0029+-0.0019      both
+Coat of Arms                          +0.47+-0.11         +0.40+-0.13        +0.0081+-0.0030      both
+The Meathook Massacre                 +0.44+-0.06         +0.40+-0.08        +0.0063+-0.0021      both
+Ophiomancer                           +0.35+-0.07         +0.38+-0.10        +0.0016+-0.0024       dmg
+Overlord of the Hauntwoods            +0.59+-0.10         +0.36+-0.13        +0.0084+-0.0030      both
+Arasta of the Endless Web             +0.42+-0.06         +0.34+-0.07        +0.0049+-0.0020      both
+Heroic Intervention                   +0.30+-0.06         +0.34+-0.08        +0.0034+-0.0021      both
+Biotransference                       +0.37+-0.05         +0.32+-0.08        +0.0048+-0.0021      both
+Scrap Trawler                         +0.35+-0.05         +0.31+-0.08        +0.0058+-0.0022      both
+Ohran Frostfang                       +0.40+-0.07         +0.27+-0.09        +0.0072+-0.0026      both
+Metallic Mimic                        +0.33+-0.07         +0.26+-0.09        +0.0003+-0.0023       dmg
+Filigree Familiar                     +0.27+-0.05         +0.24+-0.08        +0.0045+-0.0022      both
+Grist, the Hunger Tide                +0.26+-0.08         +0.23+-0.11        +0.0061+-0.0026      both
+Midnight Reaper                       +0.37+-0.05         +0.22+-0.09        +0.0010+-0.0023       dmg
+Gloomshrieker                         +0.32+-0.05         +0.21+-0.07        +0.0039+-0.0022      both
+Roaming Throne                        +0.37+-0.07         +0.18+-0.10        +0.0043+-0.0026      both
+Blood Artist                          +0.09+-0.06         +0.17+-0.08        +0.0051+-0.0022      both
+Sakura-Tribe Elder                    +0.37+-0.12         +0.13+-0.15        +0.0059+-0.0032       win
+Burnished Hart                        +0.18+-0.06         +0.09+-0.09        +0.0014+-0.0022       dmg
+Palladium Myr                         +0.11+-0.08         +0.08+-0.09        +0.0005+-0.0023        --
+Junk Diver                            +0.15+-0.04         +0.08+-0.06        +0.0009+-0.0018       dmg
+Myr Retriever                         +0.13+-0.04         +0.05+-0.06        +0.0031+-0.0018       win
+Enduring Vitality                     +0.09+-0.08         +0.01+-0.10        -0.0007+-0.0026        --
+Leaden Myr                            -0.00+-0.07         -0.04+-0.09        +0.0019+-0.0021        --
+Village Rites                         -0.04+-0.07         -0.04+-0.10        +0.0025+-0.0027        --
+Overwhelming Stampede                 +0.02+-0.10         -0.04+-0.12        +0.0019+-0.0029        --
+Dryad of the Ilysian Grove            +0.14+-0.09         -0.05+-0.11        -0.0013+-0.0026        --
+Copper Myr                            -0.01+-0.07         -0.05+-0.09        +0.0009+-0.0022        --
+Ashnod's Altar                        -0.01+-0.04         -0.08+-0.06        -0.0007+-0.0014       dmg
+Dockside Chef                         -0.02+-0.04         -0.08+-0.06        -0.0007+-0.0019       dmg
+Steel Overseer                        +0.07+-0.07         -0.08+-0.10        +0.0021+-0.0025        --
+The Great Henge                       -0.06+-0.07         -0.10+-0.09        +0.0009+-0.0025       dmg
+Primal Vigor                          -0.02+-0.05         -0.15+-0.08        +0.0013+-0.0021       dmg
+Idol of Oblivion                      -0.06+-0.07         -0.18+-0.09        -0.0009+-0.0022       dmg
+Ornithopter of Paradise               -0.36+-0.08         -0.28+-0.10        +0.0031+-0.0023      both
+Erebos, Bleak-Hearted                 -0.16+-0.06         -0.34+-0.09        -0.0012+-0.0023       dmg
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Hagra Mauling                         +0.73+-0.10         +0.93+-0.15        +0.0073+-0.0027      both
+Assassin's Trophy                     +0.38+-0.07         +1.11+-0.13        +0.0155+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Beast Within                          +0.31+-0.06         +0.88+-0.12        +0.0121+-0.0028      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Hagra Mauling                         +0.75+-0.11         +0.84+-0.15        +0.0094+-0.0032      both
       MODELLED: the back face, Hagra Broodpit (enters tapped, {T}: add {B}),
       played when the engine needs a land. NOT: the front face's 'Destroy target
       creature', which has no target in an opponent model whose creatures are a
       count (§4). A floor.
-Toxic Deluge                          +0.20+-0.05         +0.37+-0.09        +0.0027+-0.0019      both
+Eyeblight's Ending                    +0.37+-0.07         +0.73+-0.11        +0.0095+-0.0027      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Nameless Inversion                    +0.23+-0.06         +0.62+-0.10        +0.0095+-0.0025      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Toxic Deluge                          +0.16+-0.06         +0.43+-0.09        +0.0063+-0.0023      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Culling Ritual                        +0.22+-0.05         +0.33+-0.09        +0.0027+-0.0019      both
+Culling Ritual                        +0.27+-0.06         +0.34+-0.09        +0.0021+-0.0022       dmg
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Eyeblight's Ending                    +0.27+-0.04         +0.29+-0.07        +0.0044+-0.0017      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Beast Within                          +0.16+-0.04         +0.22+-0.06        +0.0009+-0.0013       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Assassin's Trophy                     +0.08+-0.03         +0.15+-0.05        +0.0010+-0.0012       dmg
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Nameless Inversion                    +0.14+-0.03         +0.14+-0.06        +0.0017+-0.0015      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Pygmy Kavu                            +0.09+-0.04         +0.11+-0.06        +0.0009+-0.0016       dmg
-      MODELLED (§0z132; the default pod since §0z140): the body, and a card for
-      each black creature the pod's bodies hold. Their colour is
-      `pod_black_share`, a judgement: the row reads that knob.
-Deathreap Ritual                      +0.02+-0.02         -0.03+-0.04        +0.0002+-0.0010        --
+Deathreap Ritual                      +0.33+-0.06         +0.23+-0.10        +0.0082+-0.0026      both
       MODELLED (§0z132; the default pod since §0z140): a card at each of the four
       end steps in which a creature died, the pod's bodies included. NOT: the pod
       killing its own creatures, which is the `opp_death_rate` knob -- a judgement
       on that side.
-Shigeki, Jukai Visionary              -0.22+-0.05         -0.25+-0.08        +0.0020+-0.0021       dmg
+Pygmy Kavu                            +0.18+-0.06         +0.12+-0.08        +0.0033+-0.0022      both
+      MODELLED (§0z132; the default pod since §0z140): the body, and a card for
+      each black creature the pod's bodies hold. Their colour is
+      `pod_black_share`, a judgement: the row reads that knob.
+Shigeki, Jukai Visionary              -0.23+-0.06         -0.29+-0.08        +0.0039+-0.0022      both
       MODELLED: the 1/3, which stays home, and '{1}{G}, {T}, return Shigeki to
       hand: reveal four, a land onto the battlefield tapped, the rest to the
       graveyard' at the end step, while the library holds more than
@@ -151,14 +151,14 @@ Shigeki, Jukai Visionary              -0.22+-0.05         -0.25+-0.08        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Massacre Wurm                         +0.42+-0.05         +0.89+-0.10        +0.0173+-0.0026      both
+Massacre Wurm                         +0.44+-0.06         +0.63+-0.09        +0.0101+-0.0023      both
       The engine acts on it and the row is still not evidence: the 6/5 body is
       modelled, the ETB '-2/-2 to creatures your opponents control' is a one-sided
       wipe that ZEROES the pod's creature count (overstates against big
       creatures), and 'whenever a creature an opponent controls dies, that player
       loses 2 life' is missing (understates). The one-sided-wipe rule in
       symmetric_wipes' note keeps it here.
-Reap                                  +0.09+-0.03         +0.13+-0.05        +0.0011+-0.0013       dmg
-Bow of Nylea                          +0.17+-0.04         +0.11+-0.06        +0.0019+-0.0017      both
-Lignify                               +0.10+-0.04         +0.04+-0.07        +0.0016+-0.0017        --
-Haywire Mite                          +0.09+-0.03         +0.02+-0.05        +0.0026+-0.0013       win
+Reap                                  +0.08+-0.04         +0.13+-0.06        +0.0013+-0.0015       dmg
+Haywire Mite                          +0.12+-0.04         +0.10+-0.04        +0.0040+-0.0014      both
+Bow of Nylea                          +0.17+-0.04         +0.09+-0.06        +0.0019+-0.0018      both
+Lignify                               +0.13+-0.05         +0.08+-0.07        +0.0017+-0.0017       dmg
