@@ -192,7 +192,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z137](#0z137) | DECIDED | **`rearm_rule`**: `reland` (+0.005 to +0.008 at T20, four decks) is in POD_V4 with shift 2.05; `prefer_unfired` refuted. `check_unchanged_decks --old-at` refuses a stale worktree |
 | [0z138](#0z138) | MEASURED | **Item 24's last four answers** in POD_V4: Damn single-target +0.007 to +0.010 at T20, tivit's taxes +0.047 (knob-bound), votes +0.007, gate +0.004 lorehold. Shift re-fitted to 2.3 |
 | [0z139](#0z139) | BUILT | **Item 24 change 4**: one want order for selection and tutors; seven blind cards live. **Enlightened Tutor +0.024 at T20** (karlov's combo half), Sylvan Library +0.011; Abundance, Top nothing |
-| [0z140](#0z140) | DECIDED | **POD_V4 is the default pod** (`opponents.POD_DEFAULTS`); 39 KNOWN_BLIND cards are PARTLY now (route answers, counters, taxes); triage and KNOBS read the pod; the six tables rebuilt on it |
+| [0z140](#0z140) | DECIDED | **POD_V4 is the default pod**; 39 blind cards PARTLY now; six tables rebuilt (58 min wall): answers up 0.006-0.021, slow engines down 0.003-0.016, Exquisite Blood up |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12684,7 +12684,56 @@ rebuild (a rendering change, numbers unchanged); the rebuild replaces them.
 
 ### The rebuild
 
-To follow.
+**One parallel rebuild at `ca89b23`, six legs, 2026-10-15**: shilgengar
+01:43, karlov 01:44, rendmaw and tivit 01:46, lorehold 01:51, azusa 02:22 UTC
+-- **58 minutes wall**, the slowest leg (launched 01:24). Every leg on Python
+3.13.16, numpy 2.4.6. The coordinator ran 3.11.15, so the close-out ran on a
+3.13.12 venv with the same pins (§0z119): `tools.repro_row` reproduced karlov's
+Enlightened Tutor and tivit's Counterspell **IDENTICALLY** first. Shards merged;
+every active cache CURRENT; `check_docs` green. Item 25 (§0z133's eliminated
+opponents) is closed with it. trostani is suspended and was not rebuilt; its
+table stays the old pod's, re-rendered for the labels.
+
+**What moved** (`results/pod_v4_rebuild_diffs_20261015.txt`: every row whose
+T20 win rate moved by more than the wider of its two bars):
+
+| deck | rows | moved | up | down | noise floor |
+|---|---|---|---|---|---|
+| rendmaw | 64 | 31 | 9 | 22 | ±0.0024 |
+| lorehold | 65 | 28 | 7 | 21 | ±0.0033 |
+| karlov | 64 | 43 | 9 | 34 | ±0.0025 |
+| tivit | 65 | 35 | 15 | 20 | ±0.0029 |
+| shilgengar | 64 | 30 | 14 | 16 | ±0.0027 |
+| azusa | 58 | 37 | 8 | 29 | ±0.0032 |
+
+**Two directions, one mechanism each.**
+* **Answers went UP**, from blind to evidence: every route answer now
+  measures +0.006 to +0.016 at T20 (karlov's Swords +0.0157, Path +0.0131;
+  shilgengar's Generous Gift +0.0142, Vindicate +0.0124; rendmaw's Assassin's
+  Trophy +0.0155; azusa's Beast Within +0.0162), tivit's taxes most of all
+  (Ghostly Prison +0.0204, Propaganda +0.0213 -- bound to
+  `attack_tax_deflect`, said with every number), the counterspells +0.005 to
+  +0.006, Damn +0.010 to +0.019 in three decks, shilgengar's Angel of
+  Suffering +0.0233 (it prevents a combat route's kill). Change 4's cards
+  read as change 4 measured them: karlov's Enlightened Tutor +0.0196,
+  azusa's Sylvan Library +0.0103, Abundance inside its bars.
+* **Threats and engines went DOWN**, 0.003 to 0.016 each: the kill comes 2.3
+  rounds sooner (§0z132's re-fit), so a card that pays off late has fewer
+  turns to pay off in, and answers that each delay a kill are worth some of
+  what a faster clock of your own was. Biggest: karlov's Bloodthirsty
+  Conqueror -0.016, azusa's Horn of Greed -0.016, rendmaw's Ohran Frostfang
+  -0.015, tivit's Time Sieve -0.015, shilgengar's Massacre Wurm -0.013. Nearly
+  all stay significant; a handful fall inside their bars (karlov's Lurrus and
+  Ranger of Eos, rendmaw's Primal Vigor and Idol of Oblivion, azusa's Seer's
+  Sundial).
+* **One goes the other way, and it is the mechanism**: karlov's Exquisite
+  Blood +0.0447 -> +0.0553. A combo that wins on the turn it assembles beats
+  a sooner kill; a faster pod is worth more to it, not less.
+
+**Staged swaps were measured on the old pod.** Every SIMULATED/STAGED
+number in the ledger predates POD_V4; a swap whose either side is an answer
+or a slow engine may have moved by more than its bar. Re-measure them before
+the next deck decision (queue item 26).
 
 ## How to read an ablation table
 

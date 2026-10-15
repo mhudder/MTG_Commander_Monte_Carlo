@@ -2775,3 +2775,18 @@ the `Read offset=/limit=` that reads the same lines, and `--card NAME`, every
 def around a line naming a card (§0z25). `tests/test_where.py` checks the
 ranges against the source text, not the tree: every def line indexed, every
 range starting on its first decorator and ending on its last body line.
+
+## Queued items closed 2026-10-15 — moved from `docs/QUEUE.md`
+
+Closed by the POD_V4 parallel rebuild at `ca89b23` (§0z140): six legs, 58
+minutes wall, every active cache CURRENT.
+
+25. **REBUILD THE SIX ACTIVE TABLES** (queued 2026-10-13). §0z133 made
+    eliminated opponents stop acting, as the default, and moved every deck
+    at T20 (karlov +0.022, azusa +0.021, rendmaw +0.019, shilgengar +0.014,
+    tivit +0.004, lorehold -0.005). The owner chose "default now, rebuild
+    later": until the rebuild the six caches read SUSPECT, `check_docs`
+    fails on that one check, and every table describes the old pod. Use the
+    parallel-rebuild skill. Never clear them with `--verified`: the numbers
+    moved. If POD_V4 is adopted first, one rebuild covers both. **POD_V4 WAS
+    ADOPTED 2026-10-15 (§0z140)** and this rebuild is running on it.

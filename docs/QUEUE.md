@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23 and 0c are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c and 25 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -22,15 +22,13 @@ What is closed and where it went:
 
 ---
 
-25. **REBUILD THE SIX ACTIVE TABLES** (queued 2026-10-13). §0z133 made
-    eliminated opponents stop acting, as the default, and moved every deck
-    at T20 (karlov +0.022, azusa +0.021, rendmaw +0.019, shilgengar +0.014,
-    tivit +0.004, lorehold -0.005). The owner chose "default now, rebuild
-    later": until the rebuild the six caches read SUSPECT, `check_docs`
-    fails on that one check, and every table describes the old pod. Use the
-    parallel-rebuild skill. Never clear them with `--verified`: the numbers
-    moved. If POD_V4 is adopted first, one rebuild covers both. **POD_V4 WAS
-    ADOPTED 2026-10-15 (§0z140)** and this rebuild is running on it.
+26. **RE-MEASURE THE STAGED SWAPS ON POD_V4** (queued 2026-10-15, §0z140).
+    Every SIMULATED and STAGED number in the ledger was measured on the pod
+    before POD_V4 became the default. Answers rose 0.006-0.021 at T20 and
+    slow engines fell 0.003-0.016, so a swap with an answer or a slow engine
+    on either side may have moved by more than its bar. Re-measure each
+    staged swap in context, N=15,000 paired, record the recheck in its
+    ledger entry, and unstage any that no longer holds.
 
 20b. **TWO ARE NOW STAGED, ON HEAD-TO-HEAD EVIDENCE** (2026-09-16).
     `-Soulmender +Bloodthirsty Conqueror` (karlov, **+0.0257 ±0.0028 at T10

@@ -1,0 +1,210 @@
+rendmaw: 64 rows, 31 moved beyond the wider bar
+  Ohran Frostfang                    +0.0221±0.0030 both -> +0.0072±0.0026 both  (-0.0149) MODEL-EVALUATED
+  Tendershoot Dryad                  +0.0217±0.0028 both -> +0.0117±0.0024 both  (-0.0100) MODEL-EVALUATED
+  Primal Vigor                       +0.0097±0.0024  win -> +0.0013±0.0021  dmg  (-0.0084) MODEL-EVALUATED
+  Grave Titan                        +0.0158±0.0027 both -> +0.0085±0.0027 both  (-0.0073) MODEL-EVALUATED
+  Bitterblossom                      +0.0118±0.0028 both -> +0.0046±0.0029 both  (-0.0072) MODEL-EVALUATED
+  Massacre Wurm                      +0.0173±0.0026 both -> +0.0101±0.0023 both  (-0.0072) MODEL-BLIND
+  Beastmaster Ascension              +0.0205±0.0032 both -> +0.0134±0.0032 both  (-0.0071) MODEL-EVALUATED
+  March of the World Ooze            +0.0127±0.0030 both -> +0.0065±0.0031 both  (-0.0062) MODEL-EVALUATED
+  Whip of Erebos                     +0.0160±0.0026 both -> +0.0099±0.0025 both  (-0.0061) MODEL-EVALUATED
+  Idol of Oblivion                   +0.0041±0.0022  win -> -0.0009±0.0022  dmg  (-0.0050) MODEL-EVALUATED
+  Gloomshrieker                      +0.0079±0.0021 both -> +0.0039±0.0022 both  (-0.0040) MODEL-EVALUATED
+  Erebos, Bleak-Hearted              +0.0028±0.0024 both -> -0.0012±0.0023  dmg  (-0.0040) MODEL-EVALUATED
+  Midnight Reaper                    +0.0047±0.0022 both -> +0.0010±0.0023  dmg  (-0.0037) MODEL-EVALUATED
+  Junk Diver                         +0.0042±0.0019 both -> +0.0009±0.0018  dmg  (-0.0033) MODEL-EVALUATED
+  Dryad of the Ilysian Grove         +0.0018±0.0024   -- -> -0.0013±0.0026   --  (-0.0031) MODEL-EVALUATED
+  Coat of Arms                       +0.0111±0.0028 both -> +0.0081±0.0030 both  (-0.0030) MODEL-EVALUATED
+  Grist, the Hunger Tide             +0.0091±0.0026 both -> +0.0061±0.0026 both  (-0.0030) MODEL-EVALUATED
+  Burnished Hart                     +0.0041±0.0022 both -> +0.0014±0.0022  dmg  (-0.0027) MODEL-EVALUATED
+  The Great Henge                    +0.0035±0.0025 both -> +0.0009±0.0025  dmg  (-0.0026) MODEL-EVALUATED
+  Dockside Chef                      +0.0017±0.0018  dmg -> -0.0007±0.0019  dmg  (-0.0024) MODEL-EVALUATED
+  Biotransference                    +0.0071±0.0022 both -> +0.0048±0.0021 both  (-0.0023) MODEL-EVALUATED
+  Arasta of the Endless Web          +0.0071±0.0020 both -> +0.0049±0.0020 both  (-0.0022) MODEL-EVALUATED
+  Haywire Mite                       +0.0026±0.0013  win -> +0.0040±0.0014 both  (+0.0014) MODEL-BLIND
+  Pygmy Kavu                         +0.0009±0.0016  dmg -> +0.0033±0.0022 both  (+0.0024) PARTLY
+  Ornithopter of Paradise            +0.0005±0.0021  dmg -> +0.0031±0.0023 both  (+0.0026) MODEL-EVALUATED
+  Toxic Deluge                       +0.0027±0.0019 both -> +0.0063±0.0023 both  (+0.0036) PARTLY
+  Eyeblight's Ending                 +0.0044±0.0017 both -> +0.0095±0.0027 both  (+0.0051) PARTLY
+  Nameless Inversion                 +0.0017±0.0015 both -> +0.0095±0.0025 both  (+0.0078) PARTLY
+  Deathreap Ritual                   +0.0002±0.0010   -- -> +0.0082±0.0026 both  (+0.0080) PARTLY
+  Beast Within                       +0.0009±0.0013  dmg -> +0.0121±0.0028 both  (+0.0112) PARTLY
+  Assassin's Trophy                  +0.0010±0.0012  dmg -> +0.0155±0.0030 both  (+0.0145) PARTLY
+lorehold: 65 rows, 28 moved beyond the wider bar
+  Restoration Seminar                +0.0333±0.0033 both -> +0.0223±0.0032 both  (-0.0110) MODEL-EVALUATED
+  Improvisation Capstone             +0.0404±0.0036 both -> +0.0325±0.0034 both  (-0.0079) MODEL-EVALUATED
+  Unexpected Windfall                +0.0185±0.0036 both -> +0.0107±0.0036 both  (-0.0078) MODEL-EVALUATED
+  Profound Journey                   +0.0223±0.0030 both -> +0.0151±0.0029 both  (-0.0072) MODEL-EVALUATED
+  Arcane Bombardment                 +0.0151±0.0039 both -> +0.0083±0.0039 both  (-0.0068) MODEL-EVALUATED
+  Furygale Flocking                  +0.0415±0.0043 both -> +0.0348±0.0042 both  (-0.0067) PARTLY
+  Apex of Power                      +0.0298±0.0033 both -> +0.0232±0.0033 both  (-0.0066) MODEL-EVALUATED
+  Thrill of Possibility              +0.0188±0.0039 both -> +0.0129±0.0040 both  (-0.0059) MODEL-EVALUATED
+  Sunbird's Invocation               +0.0130±0.0040 both -> +0.0072±0.0040 both  (-0.0058) MODEL-EVALUATED
+  Faithless Looting                  +0.0091±0.0044 both -> +0.0035±0.0043  dmg  (-0.0056) MODEL-EVALUATED
+  Land Tax                           +0.0257±0.0039 both -> +0.0203±0.0038 both  (-0.0054) MODEL-EVALUATED
+  Prisoner's Dilemma                 +0.0251±0.0032 both -> +0.0197±0.0031 both  (-0.0054) MODEL-EVALUATED
+  Victory Chimes                     +0.0132±0.0037 both -> +0.0091±0.0037 both  (-0.0041) MODEL-EVALUATED
+  Bender's Waterskin                 +0.0139±0.0038 both -> +0.0099±0.0037 both  (-0.0040) MODEL-EVALUATED
+  Double Vision                      +0.0083±0.0034 both -> +0.0044±0.0035 both  (-0.0039) MODEL-EVALUATED
+  Storm Herd                         +0.0273±0.0033 both -> +0.0237±0.0032 both  (-0.0036) MODEL-EVALUATED
+  Mizzix's Mastery                   +0.0129±0.0033 both -> +0.0093±0.0033 both  (-0.0036) MODEL-EVALUATED
+  Caldera Pyremaw                    +0.0125±0.0027 both -> +0.0096±0.0027 both  (-0.0029) MODEL-EVALUATED
+  Mother of Runes                    +0.0073±0.0023 both -> +0.0047±0.0024  win  (-0.0026) MODEL-EVALUATED
+  Goliath Daydreamer                 +0.0066±0.0022 both -> +0.0041±0.0021 both  (-0.0025) MODEL-EVALUATED
+  Perch Protection                   +0.0050±0.0019 both -> +0.0031±0.0017 both  (-0.0019) MODEL-BLIND
+  Gamble                             +0.0018±0.0011  win -> +0.0071±0.0042 both  (+0.0053) PARTLY
+  Volcanic Vision                    +0.0075±0.0023 both -> +0.0150±0.0027 both  (+0.0075) PARTLY
+  Dawn's Truce                       +0.0006±0.0017  dmg -> +0.0096±0.0030 both  (+0.0090) MODEL-EVALUATED
+  Path to Exile                      +0.0017±0.0013 both -> +0.0112±0.0034 both  (+0.0095) PARTLY
+  Chaos Warp                         +0.0009±0.0016  dmg -> +0.0109±0.0031 both  (+0.0100) PARTLY
+  Swords to Plowshares               -0.0004±0.0013   -- -> +0.0111±0.0033 both  (+0.0115) PARTLY
+  Generous Gift                      +0.0009±0.0017   -- -> +0.0140±0.0032 both  (+0.0131) PARTLY
+karlov: 64 rows, 43 moved beyond the wider bar
+  Bloodthirsty Conqueror             +0.0532±0.0038 both -> +0.0374±0.0035 both  (-0.0158) PARTLY
+  Felidar Sovereign                  +0.0294±0.0032 both -> +0.0203±0.0028 both  (-0.0091) MODEL-EVALUATED
+  Sorin, Solemn Visitor              +0.0212±0.0031 both -> +0.0124±0.0029 both  (-0.0088) MODEL-EVALUATED
+  Sorin, Vengeful Bloodlord          +0.0190±0.0027 both -> +0.0105±0.0023 both  (-0.0085) MODEL-EVALUATED
+  Bolas's Citadel                    +0.0252±0.0031 both -> +0.0179±0.0028 both  (-0.0073) MODEL-EVALUATED
+  Archangel of Thune                 +0.0189±0.0031 both -> +0.0119±0.0027 both  (-0.0070) MODEL-EVALUATED
+  Lurrus of the Dream-Den            +0.0077±0.0025 both -> +0.0011±0.0025  dmg  (-0.0066) MODEL-EVALUATED
+  Ranger of Eos                      +0.0081±0.0030 both -> +0.0017±0.0027  dmg  (-0.0064) MODEL-EVALUATED
+  Dawn of Hope                       +0.0045±0.0026  win -> -0.0016±0.0025  dmg  (-0.0061) MODEL-EVALUATED
+  Soul's Attendant                   +0.0107±0.0032 both -> +0.0050±0.0032 both  (-0.0057) MODEL-EVALUATED
+  Well of Lost Dreams                +0.0104±0.0028  win -> +0.0049±0.0025 both  (-0.0055) MODEL-EVALUATED
+  Cliffhaven Vampire                 +0.0179±0.0027 both -> +0.0125±0.0025 both  (-0.0054) MODEL-EVALUATED
+  Phyrexian Arena                    +0.0130±0.0027 both -> +0.0077±0.0026  win  (-0.0053) MODEL-EVALUATED
+  Exemplar of Light                  +0.0117±0.0028 both -> +0.0065±0.0028 both  (-0.0052) MODEL-EVALUATED
+  Benevolent Offering                +0.0103±0.0026 both -> +0.0051±0.0025 both  (-0.0052) MODEL-EVALUATED
+  Enduring Tenacity                  +0.0230±0.0033 both -> +0.0178±0.0031 both  (-0.0052) MODEL-EVALUATED
+  Land Tax                           +0.0124±0.0029 both -> +0.0073±0.0029 both  (-0.0051) MODEL-EVALUATED
+  Vito, Thorn of the Dusk Rose       +0.0214±0.0032 both -> +0.0164±0.0031  win  (-0.0050) MODEL-EVALUATED
+  Phyrexian Reclamation              +0.0071±0.0022 both -> +0.0023±0.0021  win  (-0.0048) MODEL-EVALUATED
+  Starscape Cleric                   +0.0266±0.0032 both -> +0.0218±0.0032 both  (-0.0048) MODEL-EVALUATED
+  Blind Obedience                    +0.0051±0.0024 both -> +0.0007±0.0024  dmg  (-0.0044) MODEL-EVALUATED
+  Auriok Champion                    +0.0071±0.0026 both -> +0.0030±0.0026 both  (-0.0041) MODEL-EVALUATED
+  Sun Titan                          +0.0069±0.0020 both -> +0.0028±0.0018 both  (-0.0041) MODEL-EVALUATED
+  Aetherflux Reservoir               +0.0105±0.0025 both -> +0.0069±0.0023 both  (-0.0036) MODEL-EVALUATED
+  South Wind Avatar                  +0.0201±0.0029 both -> +0.0165±0.0027 both  (-0.0036) PARTLY
+  Voice of the Blessed               +0.0051±0.0021 both -> +0.0016±0.0019  dmg  (-0.0035) MODEL-EVALUATED
+  Necropotence                       +0.0105±0.0028 both -> +0.0071±0.0028  win  (-0.0034) MODEL-EVALUATED
+  Kambal, Consul of Allocation       +0.0049±0.0024 both -> +0.0017±0.0023  dmg  (-0.0032) MODEL-EVALUATED
+  Umezawa's Jitte                    +0.0049±0.0024 both -> +0.0018±0.0023  dmg  (-0.0031) PARTLY
+  Vizkopa Guildmage                  +0.0045±0.0022 both -> +0.0015±0.0023  dmg  (-0.0030) MODEL-EVALUATED
+  Marauding Blight-Priest            +0.0189±0.0028 both -> +0.0161±0.0027 both  (-0.0028) MODEL-EVALUATED
+  Cosmos Elixir                      +0.0099±0.0024 both -> +0.0073±0.0021 both  (-0.0026) MODEL-EVALUATED
+  Fountain of Renewal                +0.0031±0.0021 both -> +0.0005±0.0021  dmg  (-0.0026) MODEL-EVALUATED
+  Debt to the Deathless              +0.0057±0.0019 both -> +0.0035±0.0016 both  (-0.0022) MODEL-EVALUATED
+  Swiftfoot Boots                    -0.0057±0.0023 both -> -0.0027±0.0022 both  (+0.0030) MODEL-EVALUATED
+  Return to Dust                     +0.0015±0.0018  dmg -> +0.0081±0.0024 both  (+0.0066) PARTLY
+  Fracture                           +0.0006±0.0015  dmg -> +0.0075±0.0027 both  (+0.0069) PARTLY
+  Anguished Unmaking                 +0.0029±0.0018 both -> +0.0119±0.0028 both  (+0.0090) PARTLY
+  Exquisite Blood                    +0.0447±0.0038 both -> +0.0553±0.0044 both  (+0.0106) MODEL-EVALUATED
+  Damn                               -0.0009±0.0018  dmg -> +0.0104±0.0028 both  (+0.0113) PARTLY
+  Path to Exile                      +0.0011±0.0011  win -> +0.0131±0.0031 both  (+0.0120) PARTLY
+  Swords to Plowshares               +0.0006±0.0010   -- -> +0.0157±0.0030 both  (+0.0151) PARTLY
+  Enlightened Tutor                  +0.0001±0.0009   -- -> +0.0196±0.0037 both  (+0.0195) PARTLY
+tivit: 65 rows, 35 moved beyond the wider bar
+  Time Sieve                         +0.0459±0.0038 both -> +0.0313±0.0034 both  (-0.0146) MODEL-EVALUATED
+  Mirkwood Bats                      +0.0425±0.0043 both -> +0.0291±0.0040 both  (-0.0134) MODEL-EVALUATED
+  Idyllic Tutor                      +0.0159±0.0031 both -> +0.0077±0.0031  win  (-0.0082) MODEL-EVALUATED
+  Deadeye Navigator                  +0.0225±0.0031 both -> +0.0143±0.0029 both  (-0.0082) MODEL-EVALUATED
+  Anointed Procession                +0.0295±0.0046 both -> +0.0215±0.0045 both  (-0.0080) MODEL-EVALUATED
+  Mechanized Production              +0.0229±0.0031 both -> +0.0149±0.0029 both  (-0.0080) MODEL-EVALUATED
+  Nadier's Nightblade                +0.0165±0.0028 both -> +0.0085±0.0025 both  (-0.0080) MODEL-EVALUATED
+  Displacer Kitten                   +0.0157±0.0031 both -> +0.0091±0.0029 both  (-0.0066) MODEL-EVALUATED
+  Conjurer's Closet                  +0.0126±0.0025 both -> +0.0071±0.0024 both  (-0.0055) MODEL-EVALUATED
+  Expropriate                        +0.0259±0.0028 both -> +0.0208±0.0026 both  (-0.0051) PARTLY
+  Torment of Hailfire                +0.0163±0.0030 both -> +0.0115±0.0027 both  (-0.0048) MODEL-BLIND
+  Sadistic Shell Game                +0.0128±0.0026 both -> +0.0085±0.0027 both  (-0.0043) MODEL-EVALUATED
+  Vault 11: Voter's Dilemma          +0.0091±0.0026 both -> +0.0049±0.0030 both  (-0.0042) PARTLY
+  Custodi Squire                     +0.0075±0.0028 both -> +0.0033±0.0026 both  (-0.0042) MODEL-EVALUATED
+  Plea for Power                     +0.0177±0.0031 both -> +0.0137±0.0030 both  (-0.0040) MODEL-EVALUATED
+  Tempting Contract                  +0.0238±0.0034 both -> +0.0200±0.0034 both  (-0.0038) MODEL-EVALUATED
+  Demonic Tutor                      +0.0224±0.0034 both -> +0.0189±0.0034 both  (-0.0035) MODEL-EVALUATED
+  Promise of Loyalty                 +0.0115±0.0029 both -> +0.0080±0.0028 both  (-0.0035) PARTLY
+  Tamiyo's Journal                   +0.0035±0.0019 both -> +0.0006±0.0020  dmg  (-0.0029) MODEL-EVALUATED
+  Tyrant's Choice                    +0.0054±0.0019 both -> +0.0025±0.0019 both  (-0.0029) MODEL-EVALUATED
+  Magister of Worth                  -0.0028±0.0030  dmg -> +0.0007±0.0030   --  (+0.0035) PARTLY
+  Counterspell                       +0.0015±0.0016  dmg -> +0.0053±0.0026 both  (+0.0038) PARTLY
+  Revel in Riches                    +0.0069±0.0019 both -> +0.0109±0.0024 both  (+0.0040) MODEL-EVALUATED
+  Muddle the Mixture                 +0.0014±0.0017  dmg -> +0.0061±0.0025 both  (+0.0047) PARTLY
+  Dovin's Veto                       +0.0007±0.0016   -- -> +0.0062±0.0026 both  (+0.0055) PARTLY
+  Coercive Portal                    -0.0038±0.0035  win -> +0.0019±0.0035   --  (+0.0057) MODEL-EVALUATED
+  An Offer You Can't Refuse          -0.0003±0.0012   -- -> +0.0058±0.0027 both  (+0.0061) PARTLY
+  Trial of a Time Lord               +0.0010±0.0018  dmg -> +0.0072±0.0025 both  (+0.0062) PARTLY
+  Damn                               +0.0105±0.0027 both -> +0.0193±0.0033 both  (+0.0088) PARTLY
+  Swords to Plowshares               +0.0009±0.0012   -- -> +0.0112±0.0031 both  (+0.0103) PARTLY
+  Path to Exile                      +0.0009±0.0012  dmg -> +0.0116±0.0032 both  (+0.0107) PARTLY
+  Council's Judgment                 +0.0014±0.0018  dmg -> +0.0125±0.0029 both  (+0.0111) PARTLY
+  Void Rend                          +0.0019±0.0020  dmg -> +0.0179±0.0032 both  (+0.0160) PARTLY
+  Propaganda                         -0.0002±0.0016   -- -> +0.0213±0.0029 both  (+0.0215) PARTLY
+  Ghostly Prison                     -0.0023±0.0017  win -> +0.0204±0.0028 both  (+0.0227) PARTLY
+shilgengar: 64 rows, 30 moved beyond the wider bar
+  Massacre Wurm                      +0.0239±0.0030 both -> +0.0105±0.0028 both  (-0.0134) MODEL-EVALUATED
+  Lyra, Archangel of Dawn            +0.0110±0.0027 both -> +0.0033±0.0028 both  (-0.0077) MODEL-EVALUATED
+  Lyra Dawnbringer                   +0.0281±0.0032 both -> +0.0218±0.0033 both  (-0.0063) MODEL-EVALUATED
+  Avacyn, Angel of Hope              +0.0143±0.0026 both -> +0.0083±0.0026 both  (-0.0060) MODEL-EVALUATED
+  Serra's Emissary                   +0.0284±0.0031 both -> +0.0227±0.0030 both  (-0.0057) PARTLY
+  Kokusho, the Evening Star          +0.0087±0.0025 both -> +0.0039±0.0027 both  (-0.0048) MODEL-EVALUATED
+  Phyrexian Arena                    +0.0083±0.0027 both -> +0.0039±0.0031 both  (-0.0044) MODEL-EVALUATED
+  Emeria Shepherd                    +0.0066±0.0018 both -> +0.0022±0.0019 both  (-0.0044) MODEL-EVALUATED
+  Twilight Shepherd                  +0.0087±0.0023 both -> +0.0043±0.0025 both  (-0.0044) MODEL-EVALUATED
+  Archangel of Thune                 +0.0251±0.0033 both -> +0.0208±0.0034 both  (-0.0043) MODEL-EVALUATED
+  Resplendent Angel                  +0.0092±0.0026 both -> +0.0050±0.0027 both  (-0.0042) MODEL-EVALUATED
+  Arcane Signet                      +0.0075±0.0026 both -> +0.0042±0.0030 both  (-0.0033) MODEL-EVALUATED
+  Elesh Norn, Grand Cenobite         +0.0080±0.0024 both -> +0.0052±0.0026 both  (-0.0028) MODEL-EVALUATED
+  Priest of Fell Rites               +0.0025±0.0017 both -> -0.0003±0.0021  dmg  (-0.0028) MODEL-EVALUATED
+  Bishop of Wings                    +0.0105±0.0021 both -> +0.0079±0.0021 both  (-0.0026) MODEL-EVALUATED
+  Angelic Arbiter                    +0.0073±0.0020 both -> +0.0048±0.0022 both  (-0.0025) PARTLY
+  Blood Artist                       +0.0023±0.0017 both -> +0.0045±0.0020 both  (+0.0022) MODEL-EVALUATED
+  Agadeem's Awakening // Agadeem, the Undercrypt +0.0087±0.0027 both -> +0.0120±0.0032 both  (+0.0033) PARTLY
+  Wrath of God                       +0.0075±0.0021 both -> +0.0125±0.0028 both  (+0.0050) PARTLY
+  Despark                            +0.0018±0.0011 both -> +0.0082±0.0027 both  (+0.0064) PARTLY
+  Angel of Despair                   +0.0053±0.0019 both -> +0.0119±0.0026 both  (+0.0066) PARTLY
+  Anguished Unmaking                 +0.0019±0.0013 both -> +0.0107±0.0030 both  (+0.0088) PARTLY
+  Mortify                            +0.0013±0.0012 both -> +0.0105±0.0030 both  (+0.0092) PARTLY
+  Swords to Plowshares               -0.0001±0.0007  dmg -> +0.0095±0.0030 both  (+0.0096) PARTLY
+  Utter End                          +0.0013±0.0014  dmg -> +0.0109±0.0030 both  (+0.0096) PARTLY
+  Path to Exile                      +0.0003±0.0007  dmg -> +0.0109±0.0028 both  (+0.0106) PARTLY
+  Vindicate                          +0.0018±0.0012 both -> +0.0124±0.0029 both  (+0.0106) PARTLY
+  Damn                               +0.0069±0.0019 both -> +0.0193±0.0031 both  (+0.0124) PARTLY
+  Generous Gift                      +0.0004±0.0012  dmg -> +0.0142±0.0030 both  (+0.0138) PARTLY
+  Angel of Suffering                 +0.0067±0.0022 both -> +0.0233±0.0034 both  (+0.0166) PARTLY
+azusa: 58 rows, 37 moved beyond the wider bar
+  Horn of Greed                      +0.0327±0.0039 both -> +0.0172±0.0036 both  (-0.0155) MODEL-EVALUATED
+  Seer's Sundial                     +0.0133±0.0035 both -> +0.0003±0.0034  dmg  (-0.0130) MODEL-EVALUATED
+  Kozilek, Butcher of Truth          +0.0261±0.0034 both -> +0.0159±0.0030 both  (-0.0102) PARTLY
+  Scute Swarm                        +0.0437±0.0042 both -> +0.0337±0.0040 both  (-0.0100) MODEL-EVALUATED
+  Harmonize                          +0.0175±0.0031 both -> +0.0084±0.0029 both  (-0.0091) MODEL-EVALUATED
+  Rampaging Baloths                  +0.0279±0.0039 both -> +0.0195±0.0037 both  (-0.0084) MODEL-EVALUATED
+  Mole Man, Moloid Master            +0.0348±0.0041 both -> +0.0265±0.0039 both  (-0.0083) MODEL-EVALUATED
+  Mossborn Hydra                     +0.0274±0.0040 both -> +0.0195±0.0040 both  (-0.0079) MODEL-EVALUATED
+  Avenger of Zendikar                +0.0309±0.0039 both -> +0.0233±0.0035 both  (-0.0076) MODEL-EVALUATED
+  Ancient Greenwarden                +0.0229±0.0041 both -> +0.0154±0.0038 both  (-0.0075) MODEL-EVALUATED
+  Animist's Awakening                +0.0163±0.0031 both -> +0.0089±0.0029 both  (-0.0074) MODEL-EVALUATED
+  Genesis Wave                       +0.0208±0.0031 both -> +0.0135±0.0028 both  (-0.0073) MODEL-EVALUATED
+  Nissa, Vastwood Seer // Nissa, Sage Animist +0.0232±0.0039 both -> +0.0160±0.0037 both  (-0.0072) MODEL-EVALUATED
+  Ka-Zar of the Savage Land          +0.0105±0.0033 both -> +0.0038±0.0033 both  (-0.0067) MODEL-EVALUATED
+  Abundance                          +0.0055±0.0023 both -> -0.0012±0.0029   --  (-0.0067) MODEL-EVALUATED
+  Kodama's Reach                     +0.0135±0.0033 both -> +0.0069±0.0032 both  (-0.0066) MODEL-EVALUATED
+  Eternal Witness                    +0.0073±0.0027 both -> +0.0015±0.0026  dmg  (-0.0058) MODEL-EVALUATED
+  Momentous Fall                     +0.0088±0.0025 both -> +0.0031±0.0024 both  (-0.0057) MODEL-EVALUATED
+  Traveling Chocobo                  +0.0173±0.0037 both -> +0.0118±0.0036 both  (-0.0055) MODEL-EVALUATED
+  Tireless Tracker                   +0.0191±0.0036 both -> +0.0137±0.0035 both  (-0.0054) MODEL-EVALUATED
+  Seek the Horizon                   +0.0109±0.0029 both -> +0.0058±0.0027 both  (-0.0051) MODEL-EVALUATED
+  Courser of Kruphix                 +0.0139±0.0035 both -> +0.0091±0.0035 both  (-0.0048) MODEL-EVALUATED
+  Realms Uncharted                   +0.0114±0.0031 both -> +0.0067±0.0029 both  (-0.0047) MODEL-EVALUATED
+  Cultivate                          +0.0133±0.0033 both -> +0.0086±0.0032 both  (-0.0047) MODEL-EVALUATED
+  Augur of Autumn                    +0.0122±0.0037 both -> +0.0082±0.0035 both  (-0.0040) MODEL-EVALUATED
+  Quirion Ranger                     +0.0112±0.0028 both -> +0.0072±0.0027 both  (-0.0040) MODEL-EVALUATED
+  Crucible of Worlds                 +0.0132±0.0036 both -> +0.0095±0.0034 both  (-0.0037) MODEL-EVALUATED
+  Woodland Bellower                  +0.0106±0.0029 both -> +0.0072±0.0026 both  (-0.0034) MODEL-EVALUATED
+  Nylea's Intervention               +0.0095±0.0028 both -> +0.0063±0.0026 both  (-0.0032) MODEL-EVALUATED
+  Terastodon                         +0.0029±0.0018 both -> +0.0057±0.0020 both  (+0.0028) PARTLY
+  Exploration                        +0.0022±0.0030  dmg -> +0.0063±0.0032 both  (+0.0041) MODEL-EVALUATED
+  Krosan Grip                        +0.0039±0.0020 both -> +0.0102±0.0029 both  (+0.0063) PARTLY
+  Crop Rotation                      -0.0003±0.0012   -- -> +0.0081±0.0038 both  (+0.0084) PARTLY
+  Sylvan Scrying                     +0.0021±0.0014 both -> +0.0105±0.0036 both  (+0.0084) PARTLY
+  Sylvan Library                     +0.0017±0.0019   -- -> +0.0103±0.0034 both  (+0.0086) MODEL-EVALUATED
+  Ulamog, the Infinite Gyre          +0.0100±0.0024 both -> +0.0214±0.0028 both  (+0.0114) PARTLY
+  Beast Within                       +0.0026±0.0021 both -> +0.0162±0.0032 both  (+0.0136) PARTLY
