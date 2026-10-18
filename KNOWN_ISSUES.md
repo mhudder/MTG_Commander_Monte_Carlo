@@ -196,6 +196,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z141](#0z141) | FIXED | **`python -m tests --mutate` had never passed**: three `chump` stand-ins kept a pre-§0z132 signature; ten modules printed no closing tally. All 86 pass; it is a closing gate now |
 | [0z142](#0z142) | MEASURED | **Lorehold's four staged swaps hold on POD_V4** (item 26): all significant at T10 and T20; the pod moved Sunbird's -0.0105 and Caldera -0.0053, Gyre +0.0053, Dilemma inside its bar |
 | [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), kept by the owner; Bolas's Citadel T20 only |
+| [0z144](#0z144) | BUILT | **The pod's body pool is rolled lazily**: a game fields 2.5 of 96 bodies per opponent; `make_pod` 0.76 -> 0.36 ms, about 5% a game; every game bit-identical (7 decks x 3,000, staged lists) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12883,6 +12884,53 @@ engine since §0z129 (measured then on 3.11).
 Each Change's `reverified` carries its line. With §0z142, **item 26 has
 measured all twelve staged swaps**: eleven stand, and Anointed Procession
 is kept by the owner's decision. Item 26 is closed.
+
+<a id="0z144"></a>
+## 0z144. BUILT -- the pod's body pool is rolled lazily: the same bodies, about 5% faster a game
+
+**2026-10-18, the owner: runtime work under POD_V4, starting with the body
+pool.** Profiled at `db6d8ee`, Python 3.13.16, every deck's staged list at
+T20: POD_V4's extra cost per game is almost all the pod's PRE-ROLLED
+randomness, not its new logic -- `hold_answer`, `pure_response`,
+`present_pieces` and the rest of the response and route code are about 1%
+together. `make_pod` took **0.76 ms on POD_V4 against 0.16 on POD_PRE_V4**,
+and 0.46 of it was `roll_body_pools`: 96 bodies per opponent, two `randint`s
+and a `random()` each, rolled before turn 1.
+
+**A game fields 2.5 of them per opponent on average** (18 at most, 1,800
+games over six decks). So `Opponent.body_pool` is now a `BodyPool`, which
+rolls body k the first time it is read and reads like the tuple it replaced
+(`len`, indexing, iteration, `==`). Each body comes from the same two streams
+in the same order as before -- toughness then mana value from the first, the
+black roll from the second -- and the streams belong to that opponent alone,
+so drawing them as they are needed draws exactly what the eager roll drew.
+
+**Bit-identical, checked, not argued:**
+
+- every game's FULL output dict (the T10 snapshot included), 3,000 seeds
+  from 5000 for each of the seven decks, on `build_pending`'s lists (the
+  lists the caches measured, §0z126), against a worktree at `db6d8ee`:
+  **21,000 of 21,000 identical**;
+- `check_unchanged_decks --include-suspended --old-at=db6d8ee` at N=400:
+  BIT-IDENTICAL on all eight metrics for all seven decks;
+- `tools.validate` prints +0.00 everywhere; `python -m tests` and
+  `--mutate` pass;
+- `tests/test_pod_bodies.py` case X pins the lazy pool body for body
+  against the eager roll (kept in the test as `eager_pool`), at three seeds
+  and two cfgs, read out of order and cyclically past the end; two
+  mutations, written before the run, break exactly X.
+
+**Measured:** `make_pod` 0.76 -> **0.36 ms**. A whole game, six active decks
+interleaved old/new four times (this machine's runs vary by about 5%):
+**8.41 -> 8.01 ms**, about 5%.
+
+**What is left in `make_pod`** is `roll_threat_routes` (0.14 ms) and the
+grid. The routes cannot be lazy the same way: the clock-shift fraction is
+drawn from the route stream AFTER the 32-entry `rebuild_pool`, which a game
+reads 6 deep at most, so every draw before it has to be made.
+
+Every cache's fingerprint moved (`opponents.py` is in all of them); each is
+recorded VERIFIED on the evidence above.
 
 ## How to read an ablation table
 

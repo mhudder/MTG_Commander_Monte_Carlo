@@ -26,6 +26,7 @@ import random
 import re
 from contextlib import contextmanager
 from collections import namedtuple
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 # GENERATED from Scryfall by tools.removal_census: the destroy share per
@@ -148,9 +149,10 @@ class Opponent:
     # THE POD'S CREATURES AS BODIES (item 24, change 1; `pod_bodies`, OFF).
     # `creatures` stays the one COUNT every existing reader uses; `bodies`
     # is the floor of it as objects, reconciled on read (`pod_bodies`), and
-    # `body_pool` the pre-rolled sequence they are drawn from in order.
+    # `body_pool` the sequence they are drawn from in order (a `BodyPool`,
+    # rolled as it is read: §0z144; a test may set a plain tuple).
     bodies: list = field(default_factory=list)
-    body_pool: tuple = ()
+    body_pool: Sequence = ()
     next_body: int = 0
     # THE KILL AS A ROUTE OF PIECES (item 24, change 2; `pod_threats`, OFF).
     # `route` is its kind, `pieces` the pre-rolled ThreatPieces it needs,
@@ -253,31 +255,76 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
 # the SAME creature answers every question -- a Massacre Wurm and a Gyre see
 # one board -- and that each death is an event.
 #
-# CRN. Each opponent's pool is pre-rolled from its own stream, and the k-th
+# CRN. Each opponent's pool is rolled from its own stream, and the k-th
 # body that opponent ever fields is the same body on both branches. Nothing
 # here touches `make_pod`'s stream, so `pod_bodies=False` plays every game
 # bit-for-bit as before.
+#
+# THE POOL IS ROLLED LAZILY (§0z144), body k when it is first asked for. A
+# game fields 2.5 bodies per opponent on average (18 at most, over 1,800
+# games of six decks), and rolling all 96 up front was most of POD_V4's extra
+# cost per game. Each body is drawn from the same two streams in the same
+# order the eager roll used -- toughness then mana value from the first, the
+# black roll from the second -- so body k is the body it always was, and
+# `tests/test_pod_bodies.py` case X pins it against the eager roll.
 PodBody = namedtuple("PodBody", "toughness mv black", defaults=(False,))
 POD_BODY_POOL = 96       # bodies per opponent per game; drawn cyclically past it
+
+
+class BodyPool(Sequence):
+    """One opponent's `POD_BODY_POOL` bodies, each rolled the first time it
+    is read (§0z144). Reads like the tuple it replaced -- `len`, indexing,
+    iteration, `==` -- so `pod_bodies` and every test that sets a tuple pool
+    by hand work unchanged."""
+    __slots__ = ("_r", "_rb", "_tmax", "_mvmax", "_black", "_drawn")
+
+    def __init__(self, seed, i, tmax, mvmax, black):
+        self._r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
+        # BLACK, for Pygmy Kavu (§0z132): from a SECOND stream, so toughness
+        # and mana value are the bodies change 1 rolled, unchanged. Each body
+        # is black with `pod_black_share` (0.25) -- A JUDGEMENT: black is in
+        # a bit under half of Commander decks, and not every creature in
+        # them is black.
+        self._rb = random.Random((seed * 1000003) ^ (0xB1AC4 + 7919 * i))
+        self._tmax, self._mvmax, self._black = tmax, mvmax, black
+        self._drawn = []
+
+    def __len__(self):
+        return POD_BODY_POOL
+
+    def __getitem__(self, k):
+        if isinstance(k, slice):
+            return tuple(self[j] for j in range(*k.indices(POD_BODY_POOL)))
+        if k < 0:
+            k += POD_BODY_POOL
+        if not 0 <= k < POD_BODY_POOL:
+            raise IndexError(k)
+        drawn = self._drawn
+        while len(drawn) <= k:
+            r = self._r
+            t = r.randint(1, self._tmax)
+            mv = r.randint(1, self._mvmax)
+            drawn.append(PodBody(t, mv, self._rb.random() < self._black))
+        return drawn[k]
+
+    def __eq__(self, other):
+        if not isinstance(other, Sequence):
+            return NotImplemented
+        return tuple(self) == tuple(other)
+
+    __hash__ = None
+
+    def __repr__(self):
+        return f"BodyPool({len(self._drawn)} of {POD_BODY_POOL} rolled)"
 
 
 def roll_body_pools(cfg, seed, opps) -> None:
     tmax = max(1, int(cfg.get("gyre_full_x", 6)))
     share = cfg.get("culling_pod_share", 0.5)
     mvmax = max(1, int(round(2 / share))) if share > 0 else 1
+    black = cfg.get("pod_black_share", 0.25)
     for i, o in enumerate(opps):
-        r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
-        pool = [(r.randint(1, tmax), r.randint(1, mvmax))
-                for _ in range(POD_BODY_POOL)]
-        # BLACK, for Pygmy Kavu (§0z132): from a SECOND stream, so toughness
-        # and mana value are the bodies change 1 rolled, unchanged. Each body
-        # is black with `pod_black_share` (0.25) -- A JUDGEMENT: black is in
-        # a bit under half of Commander decks, and not every creature in
-        # them is black.
-        rb = random.Random((seed * 1000003) ^ (0xB1AC4 + 7919 * i))
-        black = cfg.get("pod_black_share", 0.25)
-        o.body_pool = tuple(PodBody(t, mv, rb.random() < black)
-                            for t, mv in pool)
+        o.body_pool = BodyPool(seed, i, tmax, mvmax, black)
 
 
 # POD_V4 IS THE DEFAULT POD (§0z140, the owner, 2026-10-15). Item 24's

@@ -3,7 +3,7 @@
 default).
 
     python -m tests.test_pod_bodies
-    python -m tests.test_pod_bodies --mutate   # 8 mutations, exact sets
+    python -m tests.test_pod_bodies --mutate   # 17 mutations, exact sets
 
 Each opponent's creatures stay the COUNT every existing reader uses; under
 `pod_bodies` they are also pre-rolled bodies with a toughness and a mana
@@ -57,6 +57,13 @@ CASES
   V  Pygmy Kavu draws one per BLACK body; off bodies, nothing
   W  pod_blocker_deaths=False: the same blocks as Q, no deaths
 
+  -- added with the lazy pool (§0z144, 2026-10-18) --
+  X  the pool is rolled as it is read, and body for body it is the pool the
+     eager roll made (`eager_pool`, the code before §0z144, kept here as the
+     reference): three seeds, two cfgs, every index, read out of order, and
+     cyclically past the end through `pod_bodies`; nothing is rolled until
+     a body is asked for
+
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   kill_pod_bodies never tells the hook           -> D, F, I, K, L, N, O*, U**
   every own sweeper kills every body             -> E, F, G, H, O*
@@ -79,12 +86,18 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   opponents' end steps are unheard               -> U
   a pod death is not a death at the table        -> U
   Pygmy Kavu counts every body, not black ones   -> V
+  (§0z144, written before their run)
+  the lazy pool rolls mana value before toughness -> X
+  the lazy pool rolls black from the first stream -> X
   ** U WAS ADDED WITHOUT EXTENDING THE FIRST SET, which then broke U too:
     right, because Deathreap's count of deaths at the table hears pod deaths
     through the same hook. A transcript, not a prediction (§0z14).
 
 UNMUTATED (§0z15): A and B are properties of `roll_body_pools`, read by the
-plain run; J is the OFF path.
+plain run; J is the OFF path. X's "nothing is rolled until read" reads the
+pool's private list, so it is blind to a pool that rolls eagerly into some
+other attribute: what it pins is the bodies, and the speed is a measurement
+(§0z144), not a test.
 """
 import random
 import sys
@@ -135,6 +148,20 @@ def ready(g, creatures=(4.0, 0.0, 0.0), pool=POOL):
         o.life, o.creatures = 40.0, n
         o.body_pool, o.bodies, o.next_body = pool, [], 0
     return g
+
+
+def eager_pool(cfg, seed, i):
+    """The pool as `roll_body_pools` rolled it before §0z144: all of it, up
+    front. The reference case X compares the lazy pool with."""
+    tmax = max(1, int(cfg.get("gyre_full_x", 6)))
+    share = cfg.get("culling_pod_share", 0.5)
+    mvmax = max(1, int(round(2 / share))) if share > 0 else 1
+    r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
+    pool = [(r.randint(1, tmax), r.randint(1, mvmax))
+            for _ in range(OPP.POD_BODY_POOL)]
+    rb = random.Random((seed * 1000003) ^ (0xB1AC4 + 7919 * i))
+    black = cfg.get("pod_black_share", 0.25)
+    return tuple(B(t, mv, rb.random() < black) for t, mv in pool)
 
 
 def rgame(**cfg):
@@ -388,6 +415,28 @@ def run_cases():
     check("W pod_blocker_deaths=False: the same blocks, no deaths",
           (dealt, len(OPP.pod_bodies(g, o))), (0.0, 4))
 
+    same, unrolled = True, True
+    for xcfg in (dict(cfg, pod_bodies=True),
+                 dict(cfg, pod_bodies=True, gyre_full_x=9,
+                      culling_pod_share=0.25, pod_black_share=0.6)):
+        for seed in (1, 77, 5003):
+            opps = OPP.make_pod(xcfg, seed)[0]
+            unrolled &= all(not o.body_pool._drawn for o in opps)
+            for i, o in enumerate(opps):
+                ref = eager_pool(xcfg, seed, i)
+                if i == 1:              # out of order: the last body first
+                    same &= o.body_pool[OPP.POD_BODY_POOL - 1] == ref[-1]
+                same &= tuple(o.body_pool) == ref and o.body_pool == ref
+            g = rgame(**xcfg)
+            o = g.opponents[2]
+            o.body_pool, o.bodies, o.next_body = opps[2].body_pool, [], 0
+            o.creatures = OPP.POD_BODY_POOL + 5.0
+            same &= (OPP.pod_bodies(g, o)
+                     == list(eager_pool(xcfg, seed, 2)) + list(
+                         eager_pool(xcfg, seed, 2)[:5]))
+    check("X the lazy pool is the eager roll, body for body; nothing rolled "
+          "until read", (same, unrolled), (True, True))
+
     return set(FAIL)
 
 
@@ -468,6 +517,24 @@ def main() -> int:
         g.m["kavu_draws"] += g.m["cards_drawn"] - before
         return n
 
+    real_body = OPP.BodyPool.__getitem__
+
+    def mv_first(self, k):
+        drawn = self._drawn
+        while len(drawn) <= k:
+            mv = self._r.randint(1, self._mvmax)
+            t = self._r.randint(1, self._tmax)
+            drawn.append(B(t, mv, self._rb.random() < self._black))
+        return real_body(self, k)
+
+    def black_from_first(self, k):
+        drawn = self._drawn
+        while len(drawn) <= k:
+            t = self._r.randint(1, self._tmax)
+            mv = self._r.randint(1, self._mvmax)
+            drawn.append(B(t, mv, self._r.random() < self._black))
+        return real_body(self, k)
+
     muts = {
         "kill_pod_bodies never tells the hook":
             ({"D", "F", "I", "K", "L", "N", "O", "U"}, OPP, "kill_pod_bodies",
@@ -504,6 +571,10 @@ def main() -> int:
             ({"U"}, EN.Game, "on_pod_creature_deaths", uncounted),
         "Pygmy Kavu counts every body":
             ({"V"}, EN, "pygmy_kavu", every_kavu),
+        "the lazy pool rolls mana value before toughness":
+            ({"X"}, OPP.BodyPool, "__getitem__", mv_first),
+        "the lazy pool rolls black from the first stream":
+            ({"X"}, OPP.BodyPool, "__getitem__", black_from_first),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():

@@ -438,7 +438,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "b0222bb23203474d",
+        "utc": "2026-10-18T01:28:07Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "5a53e7e5b64b2b69",
@@ -814,7 +821,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "8550f3fe7c5efac2",
+        "utc": "2026-10-18T01:28:07Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "67e86cd212949124",
@@ -1197,7 +1211,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "5f4c5cabc9aacb0d",
+        "utc": "2026-10-18T01:28:07Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "99d399cb51df353f",
@@ -1558,7 +1579,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "ad0021761f631310",
+        "utc": "2026-10-18T01:28:06Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "6b9a231171d0f44d",
@@ -1961,7 +1989,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "4737bf806e24fa8b",
+        "utc": "2026-10-18T01:28:07Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "571097fbb54f1406",
@@ -2309,7 +2344,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "db6d8ee",
+        "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
+        "fingerprint": "7dda9d4456258196",
+        "utc": "2026-10-18T01:28:07Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

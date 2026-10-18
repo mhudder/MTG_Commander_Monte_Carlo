@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `6438478`.
+Generated at `db6d8ee`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,23 +86,29 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `e4c7d609cfda370d` | `ca89b23` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `5a53e7e5b64b2b69` | `ca89b23` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `67e86cd212949124` | `ca89b23` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `99d399cb51df353f` | `ca89b23` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `6b9a231171d0f44d` | `ca89b23` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `571097fbb54f1406` | `ca89b23` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `e4c7d609cfda370d` | `ca89b23` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `5a53e7e5b64b2b69` | `ca89b23` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `67e86cd212949124` | `ca89b23` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `99d399cb51df353f` | `ca89b23` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `6b9a231171d0f44d` | `ca89b23` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `571097fbb54f1406` | `ca89b23` | **VERIFIED** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `e4c7d609cfda370d`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `5a53e7e5b64b2b69`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `67e86cd212949124`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `99d399cb51df353f`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `6b9a231171d0f44d`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `571097fbb54f1406`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `5acdf68d8af2068a`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `e4c7d609cfda370d`; fingerprint has since moved to `b0222bb23203474d` and was CHECKED at `db6d8ee` (2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `b0222bb23203474d` (`db6d8ee`, 2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `5a53e7e5b64b2b69`; fingerprint has since moved to `8550f3fe7c5efac2` and was CHECKED at `db6d8ee` (2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `8550f3fe7c5efac2` (`db6d8ee`, 2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `67e86cd212949124`; fingerprint has since moved to `5f4c5cabc9aacb0d` and was CHECKED at `db6d8ee` (2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `5f4c5cabc9aacb0d` (`db6d8ee`, 2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `99d399cb51df353f`; fingerprint has since moved to `ad0021761f631310` and was CHECKED at `db6d8ee` (2026-10-18T01:28:06Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `ad0021761f631310` (`db6d8ee`, 2026-10-18T01:28:06Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `6b9a231171d0f44d`; fingerprint has since moved to `4737bf806e24fa8b` and was CHECKED at `db6d8ee` (2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `4737bf806e24fa8b` (`db6d8ee`, 2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `571097fbb54f1406`; fingerprint has since moved to `7dda9d4456258196` and was CHECKED at `db6d8ee` (2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+  - verified at `7dda9d4456258196` (`db6d8ee`, 2026-10-18T01:28:07Z): 2026-10-18, §0z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `9de3441fa91b2ec7`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 
