@@ -197,6 +197,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z142](#0z142) | MEASURED | **Lorehold's four staged swaps hold on POD_V4** (item 26): all significant at T10 and T20; the pod moved Sunbird's -0.0105 and Caldera -0.0053, Gyre +0.0053, Dilemma inside its bar |
 | [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), kept by the owner; Bolas's Citadel T20 only |
 | [0z144](#0z144) | BUILT | **The pod's body pool is rolled lazily**: a game fields 2.5 of 96 bodies per opponent; `make_pod` 0.76 -> 0.36 ms, about 5% a game; every game bit-identical (7 decks x 3,000, staged lists) |
+| [0z145](#0z145) | BUILT | **Ablation skips the games a blank cannot change**: bit-identical (rendmaw's committed N=15,000 cache 64/64; every deck at N=1,000); 1.10x (azusa) to 2.3x (rendmaw) faster -- azusa's library scans read every card's name |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -12931,6 +12932,83 @@ reads 6 deep at most, so every draw before it has to be made.
 
 Every cache's fingerprint moved (`opponents.py` is in all of them); each is
 recorded VERIFIED on the evidence above.
+
+<a id="0z145"></a>
+## 0z145. BUILT -- ablation plays only the games a blank can change: the same tables, 1.1x to 2.3x faster
+
+**2026-10-18, the owner: runtime work, the second item.** A game is a
+deterministic function of what it reads. Blanking a card swaps one library
+object for another, so a game that never read a FIELD on which the card and
+its blank differ reads the same values at the same points, takes the same
+path, and IS the baseline game, to the last bit. `tools/ablation.py` now
+plays the baseline once with `tracking_reads` (every `Card` attribute read
+recorded per game per slot, `Card.__getattribute__` replaced for that pass
+only) and, for each card, plays only the games where `differs_mask(card,
+blank)` meets what the baseline read; the other rows are copied from the
+baseline. A non-field name that is not Card's own property or method
+(`__dict__`, `__getstate__`, `__deepcopy__`) and any write count as UNSAFE,
+which every card differs on. One skipped game in `ABLATE_AUDIT` (50) is
+played anyway and must match the baseline on every metric at every horizon,
+or the run stops. `ABLATE_SKIP=0` plays every game. Neither knob is in the
+cache key: neither changes a number.
+
+**What it is blind to** (§0z15, written into the code): state about a card
+that outlives its game -- a module-level cache keyed by card or name, filled
+in one game and read in a later one without touching the card -- and
+`id()`-keyed state whose ORDER decides play. Audited 2026-10-18: neither
+exists in `edhmc/` (the only module-level memo, trostani's `_MINIONS`, is
+keyed by an int; no engine writes a Card's attributes; token copies go
+through `dataclasses.replace`, which reads `name`). The audit games guard
+what the audit could miss.
+
+**Bit-identical, checked:**
+
+- **rendmaw end to end at N=15,000**, horizons 10 and 20, skip on, audit 50:
+  **64 of 64 rows identical** to the committed cache (built at `ca89b23`) --
+  the table this change would have printed is the committed one;
+- skip against `ABLATE_SKIP=0`, every card, both horizons, N=1,000, all seven
+  decks: **identical on every row**;
+- `tests/test_ablation_skip.py`: tracking is passive, skipping equals playing
+  for the most- and least-skipped card of four decks, the hook's rules, the
+  mask, the audit catching reads that lie; four mutations, written before
+  the run, break exactly their sets (one set was corrected BEFORE the first
+  run, and says why).
+
+**Measured** (N=1,000, 65 cards, four cores, `ablation_stream`):
+
+| deck | every game | skip | speedup | games played per card | their share of game time |
+|---|---|---|---|---|---|
+| rendmaw | 108 s | 46 s | 2.33x | 27% | 30% |
+| karlov | 98 s | 47 s | 2.09x | 41% | 45% |
+| shilgengar | 110 s | 61 s | 1.79x | 52% | 54% |
+| tivit | 120 s | 72 s | 1.68x | 52% | 59% |
+| trostani | 133 s | 102 s | 1.31x | | |
+| lorehold | 130 s | 102 s | 1.28x | 67% | 73% |
+| azusa | 240 s | 219 s | 1.10x | 74% | 85% |
+
+The tracked baseline costs 1.6x-2.8x a plain one, once per table. The games a
+card leaves alone are the SHORT ones, so the time saved is less than the games
+saved. Rendmaw's 2.33x was measured while tests ran on the same cores; its
+shares predict 3.1x, and at N=15,000 on three cores it took 714 s against an
+estimated 33 minutes playing every game.
+
+**Why azusa gains least** (`diagnostics`-style probe, 200 games): 60% of its
+(game, card) pairs are first made unplayable-to-skip by a read of `name`, and
+most are library SCANS, not cards in hand -- `next(c for c in self.library if
+c.name == "Forest")` in `crack_fetch` (21%) and in `resolve`'s Cultivate
+family (9%), and `list.remove`, whose `==` reads the name of every card ahead
+of the one removed (8%). Another 12% are `is_creature` / `is_permanent` on
+library cards, which read `types` -- a field a noncreature's Sorcery blank
+differs on even when the property's VALUE is the same. With the scans checking
+`is_land` first, removal reading less, and properties compared by value, a
+probe puts azusa at 37% of games played instead of 69%. Lorehold's blockers
+are different and were not looked at.
+
+The parallel rebuild's wall time is its slowest deck's, which is azusa's, so
+until azusa's scans change this is a speedup for single-deck runs.
+
+Every cache's fingerprint moved (`tools/ablation.py` is in all of them);
+the six active caches are recorded VERIFIED on the evidence above.
 
 ## How to read an ablation table
 

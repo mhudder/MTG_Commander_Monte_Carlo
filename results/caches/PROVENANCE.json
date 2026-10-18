@@ -444,6 +444,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "b0222bb23203474d",
         "utc": "2026-10-18T01:28:07Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "5d5f1378739d84e9",
+        "utc": "2026-10-18T02:58:16Z"
       }
     ]
   },
@@ -827,6 +833,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "8550f3fe7c5efac2",
         "utc": "2026-10-18T01:28:07Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "ddbe908a1c22899e",
+        "utc": "2026-10-18T02:58:15Z"
       }
     ]
   },
@@ -1217,6 +1229,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "5f4c5cabc9aacb0d",
         "utc": "2026-10-18T01:28:07Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "cc7bf0a266d983ae",
+        "utc": "2026-10-18T02:58:15Z"
       }
     ]
   },
@@ -1585,6 +1603,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "ad0021761f631310",
         "utc": "2026-10-18T01:28:06Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "ddb0dbe60e1b9eae",
+        "utc": "2026-10-18T02:58:15Z"
       }
     ]
   },
@@ -1995,6 +2019,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "4737bf806e24fa8b",
         "utc": "2026-10-18T01:28:07Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "62e7a9e0e0a49e96",
+        "utc": "2026-10-18T02:58:16Z"
       }
     ]
   },
@@ -2350,6 +2380,12 @@
         "evidence": "2026-10-18, \u00a70z144 (lazy pod body pool, opponents.py only): against a worktree at db6d8ee, Python 3.13.16, every game's full output dict incl. the T10 snapshot on build_pending's list (the list this cache measured), seeds 5000..7999 at T20: 3,000 of 3,000 identical; check_unchanged_decks --old-at=db6d8ee N=400 BIT-IDENTICAL on all 8 metrics; validate +0.00.",
         "fingerprint": "7dda9d4456258196",
         "utc": "2026-10-18T01:28:07Z"
+      },
+      {
+        "commit": "b1e8da9",
+        "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
+        "fingerprint": "60fb2aa77342d2d0",
+        "utc": "2026-10-18T02:58:16Z"
       }
     ]
   },

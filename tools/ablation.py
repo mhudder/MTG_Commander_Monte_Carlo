@@ -51,6 +51,14 @@ Two things make this fast, and NEITHER changes a single simulated game.
    `ABLATE_PROCS=1` forces the old single-process path, which is the one to
    use when debugging and which writes the identical cache.
 
+3. A GAME THE BLANK CANNOT CHANGE IS NOT PLAYED AGAIN (§0z145). The baseline
+   records, per game, which fields of each library card the game READ. If
+   none of them differs between the card and its blank, the blanked game
+   reads the same values at the same points and is the same game, so its row
+   is the baseline's row. Only the other games are simulated, plus one
+   skipped game in `ABLATE_AUDIT` (50), which is played anyway and must come
+   back identical or the run stops. `ABLATE_SKIP=0` plays every game.
+
 VERIFIED OUTPUT-IDENTICAL. Both changes are pure scheduling: the same seeds
 feed the same engines and the arrays are subtracted in the same order, so the
 numbers are bit-for-bit what the serial code produced. The check that matters
@@ -62,7 +70,9 @@ import os
 import sys
 import textwrap
 import time
-from dataclasses import dataclass
+import zlib
+from contextlib import contextmanager
+from dataclasses import dataclass, fields
 from multiprocessing import Pool, cpu_count
 
 import numpy as np
@@ -114,6 +124,14 @@ class Run:
     # running each horizon separately -- `tests/test_horizon_prefix.py` --
     # so it is NOT in the cache key. ABLATE_PREFIX=0 runs them separately.
     prefix: bool = True
+    # SKIP THE GAMES THE BLANK CANNOT CHANGE (§0z145). Bit-identical to
+    # playing them -- the skipped games are the baseline's games, read for
+    # read -- so it is NOT in the cache key either. ABLATE_SKIP=0 plays
+    # every game. `audit`: one skipped game in this many is played anyway
+    # and compared with the baseline, every metric at every horizon; a
+    # difference stops the run. 0 audits nothing.
+    skip: bool = True
+    audit: int = 50
 
     @property
     def sim(self):
@@ -159,7 +177,9 @@ def parse_args(argv) -> Run:
                 if len(argv) > 2 else (20,))
     return Run(deck, n, horizons,
                os.environ.get("BLANK_KEEPS_TYPES", "0") == "1",
-               os.environ.get("ABLATE_PREFIX", "1") == "1")
+               os.environ.get("ABLATE_PREFIX", "1") == "1",
+               os.environ.get("ABLATE_SKIP", "1") == "1",
+               int(os.environ.get("ABLATE_AUDIT", "50")))
 METRIC_SETS = {name: spec.metrics for name, spec in DECKS.items()}
 
 # Cards whose actual text the engine implements. Everything else is a body.
@@ -1350,19 +1370,130 @@ def columns_all(run, deck, commander, lo, hi):
     alone: a T10 game costs ~75% of a T20 one, so T10+T20 goes from ~1.75
     T20-games to 1.0.
     """
+    return play(run, deck, commander, range(lo, hi))
+
+
+def play(run, deck, commander, idx, reads=None):
+    """{horizon: columns} for the games at seeds `5000 + i`, i in `idx`, in
+    that order: `columns_all` over any list of seeds.
+
+    `reads`, when a list, gets one row per game: for each slot of `deck`, the
+    `read_mask` of what the game read of that card (§0z145) -- OR'd over the
+    horizons when they are played separately."""
+    idx = list(idx)
     top = max(run.horizons)
     rest = tuple(t for t in run.horizons if t != top)
     if not run.prefix or not rest:
-        return {t: columns(run, deck, commander, t, lo, hi)
-                for t in run.horizons}
+        out, masks = {}, None
+        for t in run.horizons:
+            cfg = dict(DEFAULT_CFG, turns=t, watch=frozenset())
+            seen = [] if reads is not None else None
+            rows = _games(run, deck, commander, cfg, idx, seen)
+            out[t] = {m: np.array([r[m] for r in rows], float)
+                      for m in run.metrics}
+            if seen is not None:
+                masks = seen if masks is None else [
+                    [a | b for a, b in zip(x, y)] for x, y in zip(masks, seen)]
+        if reads is not None:
+            reads.extend(masks)
+        return out
     cfg = dict(DEFAULT_CFG, turns=top, watch=frozenset(), snapshot_rounds=rest)
-    rows = [run.sim(deck, commander, cfg, 5000 + i) for i in range(lo, hi)]
+    rows = _games(run, deck, commander, cfg, idx, reads)
     out = {top: {m: np.array([r[m] for r in rows], float)
                  for m in run.metrics}}
     for t in rest:
         out[t] = {m: np.array([r["at_rounds"][t][m] for r in rows], float)
                   for m in run.metrics}
     return out
+
+
+def _games(run, deck, commander, cfg, idx, reads):
+    if reads is None:
+        return [run.sim(deck, commander, cfg, 5000 + i) for i in idx]
+    slots = [id(c) for c in deck]
+    rows = []
+    with tracking_reads() as seen:
+        for i in idx:
+            seen.clear()
+            rows.append(run.sim(deck, commander, cfg, 5000 + i))
+            reads.append([seen.get(k, 0) for k in slots])
+    return rows
+
+
+# ---------------------------------------------------------------------------
+# Which games a blank cannot change (§0z145)
+# ---------------------------------------------------------------------------
+# A game is a deterministic function of what it reads. Blanking a card swaps
+# one object in the library for another; if the game never READ a field on
+# which the two differ, every read it made returns the same value on the
+# blank, the game takes the same path, and the blanked game IS the baseline
+# game -- the same row, to the last bit. So the baseline records what each
+# card's fields were read for, and `ablate` plays only the games where a
+# differing field was read.
+#
+# WHAT COUNTS AS A READ. Every attribute access on a Card goes through
+# `Card.__getattribute__`, which `tracking_reads` replaces for the baseline
+# only: a FIELD sets its bit; a property or method defined on Card itself
+# (`mv`, `is_creature`, the dataclass `__eq__`...) sets nothing, because the
+# fields IT reads go through the same hook; `__class__` sets nothing, because
+# the blank is a Card too. ANY OTHER NAME -- `__dict__`, `__getstate__`,
+# `__deepcopy__`, an attribute set on a card mid-game -- sets UNSAFE, which
+# every card differs on, and so does any write. `dataclasses.replace` (a
+# token copy) reads every field and so reads `name`.
+#
+# WHAT IT IS BLIND TO, written down (§0z15): state about a card that outlives
+# its game -- a module-level cache keyed by card or by name, filled in one
+# game and read in the next without touching the card -- and anything keyed
+# on `id(card)` whose ORDER, not membership, decides play. Neither exists in
+# edhmc today (audited 2026-10-18). The audit games are the guard: one
+# skipped game in `run.audit` is played anyway and must match.
+CARD_FIELDS = tuple(f.name for f in fields(Card))
+_FIELD_BIT = {name: 1 << k for k, name in enumerate(CARD_FIELDS)}
+UNSAFE = 1 << len(CARD_FIELDS)
+_NEUTRAL = frozenset(
+    {name for name, v in vars(Card).items()
+     if name not in _FIELD_BIT and (callable(v) or isinstance(v, property))}
+    | {"__class__"})
+
+
+@contextmanager
+def tracking_reads():
+    """While open, every Card records what is read of it: yields the
+    {id(card): read_mask} dict, which the caller clears between games."""
+    seen = {}
+    ga = object.__getattribute__
+    sa = object.__setattr__
+
+    def getattribute(self, name):
+        bit = _FIELD_BIT.get(name)
+        if bit is None:
+            bit = 0 if name in _NEUTRAL else UNSAFE
+        if bit:
+            k = id(self)
+            seen[k] = seen.get(k, 0) | bit
+        return ga(self, name)
+
+    def setattr_(self, name, value):
+        k = id(self)
+        seen[k] = seen.get(k, 0) | UNSAFE
+        sa(self, name, value)
+
+    Card.__getattribute__ = getattribute
+    Card.__setattr__ = setattr_
+    try:
+        yield seen
+    finally:
+        del Card.__getattribute__
+        del Card.__setattr__
+
+
+def differs_mask(card, blank) -> int:
+    """The fields on which `card` and its `blank` differ, plus UNSAFE."""
+    mask = UNSAFE
+    for name, bit in _FIELD_BIT.items():
+        if getattr(card, name) != getattr(blank, name):
+            mask |= bit
+    return mask
 
 
 def paired(run, keep, drop):
@@ -1382,20 +1513,64 @@ def blanked(run, deck, card_name):
     return deck_b
 
 
-def ablate(run, deck, commander, card_name, baseline=None):
+def ablate(run, deck, commander, card_name, baseline=None, reads=None):
     """Returns {horizon: {metric: (mean_diff, ci)}}.
 
     `baseline` is {turns: metric columns for the UNMODIFIED deck}. Passing it
     is what saves half the work; omitting it measures the baseline here, which
     is what the old code did for every card in turn.
+
+    `reads` is the baseline's read masks, one row per game and one column per
+    slot of `deck` (§0z145). Passing it with `baseline` plays only the games
+    the blank can change; the rest are the baseline's rows.
     """
     deck_b = blanked(run, deck, card_name)
     if baseline is None:
         baseline = columns_all(run, deck, commander, 0, run.n)
-    drop = columns_all(run, deck_b, commander, 0, run.n)
+        reads = None
+    if reads is None:
+        drop = columns_all(run, deck_b, commander, 0, run.n)
+    else:
+        drop = skipping_columns(run, deck, deck_b, commander, card_name,
+                                baseline, reads)
     return {str(t): paired(run, baseline[t], drop[t]) for t in run.horizons}
 
 
+def skipping_columns(run, deck, deck_b, commander, card_name, baseline,
+                     reads):
+    """`columns_all(run, deck_b, ...)` over every seed, playing only the games
+    whose baseline read a field the blank differs on (§0z145), plus the audit
+    games. The other rows are the baseline's."""
+    slot = next(i for i, c in enumerate(deck) if c.name == card_name)
+    must = (reads[:, slot] & differs_mask(deck[slot], deck_b[slot])) != 0
+    play_idx = np.flatnonzero(must)
+    audit = np.empty(0, dtype=play_idx.dtype)
+    if run.audit:
+        # Which skipped games are audited is fixed per card, so a rerun
+        # audits the same ones.
+        k = zlib.crc32(card_name.encode()) % run.audit
+        seeds = np.arange(len(must))
+        audit = np.flatnonzero(~must & (seeds % run.audit == k))
+    idx = np.concatenate([play_idx, audit])
+    got = play(run, deck_b, commander, idx.tolist())
+    n_play = len(play_idx)
+    out = {}
+    for t in run.horizons:
+        out[t] = {}
+        for m in run.metrics:
+            col = baseline[t][m].copy()
+            col[play_idx] = got[t][m][:n_play]
+            if len(audit) and not np.array_equal(got[t][m][n_play:],
+                                                  baseline[t][m][audit]):
+                bad = audit[got[t][m][n_play:] != baseline[t][m][audit]]
+                raise RuntimeError(
+                    f"ABLATION SKIP UNSOUND (§0z145): blanking {card_name!r} "
+                    f"changed game(s) at seed(s) {[5000 + int(i) for i in bad[:5]]} "
+                    f"({m} at T{t}) that read no field the blank differs on. "
+                    f"Something reads a card without touching it -- find it; "
+                    f"ABLATE_SKIP=0 plays every game meanwhile.")
+            out[t][m] = col
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -1409,7 +1584,7 @@ def ablate(run, deck, commander, card_name, baseline=None):
 _W = {}
 
 
-def _worker_init(run, baseline):
+def _worker_init(run, baseline, reads=None):
     # The run's parameters arrive as ONE OBJECT, the same one the parent
     # parsed, so a worker cannot measure a different deck or sample size than
     # the parent asked for. (Until 2026-09-17 they were module globals derived
@@ -1418,17 +1593,23 @@ def _worker_init(run, baseline):
     _W["run"] = run
     _W["deck"], _W["commander"] = build_pending(run.deck)
     _W["baseline"] = baseline
+    _W["reads"] = reads
 
 
 def _baseline_chunk(args):
-    """A slice of the untouched deck's games, for every horizon."""
+    """A slice of the untouched deck's games, for every horizon, and with
+    `run.skip` what each game read of each card (§0z145)."""
     lo, hi = args
-    return lo, columns_all(_W["run"], _W["deck"], _W["commander"], lo, hi)
+    run = _W["run"]
+    reads = [] if run.skip else None
+    cols = play(run, _W["deck"], _W["commander"], range(lo, hi), reads)
+    return lo, cols, (np.array(reads, dtype=np.int64).reshape(hi - lo, -1)
+                      if reads is not None else None)
 
 
 def _ablate_card(name):
     return name, ablate(_W["run"], _W["deck"], _W["commander"], name,
-                        _W["baseline"])
+                        _W["baseline"], _W["reads"])
 
 
 def _chunks(n, parts):
@@ -1444,7 +1625,8 @@ def _chunks(n, parts):
 
 
 def measure_baseline(run, pool, procs):
-    """The untouched deck, once per horizon, split over the pool.
+    """The untouched deck, once per horizon, split over the pool, and the
+    read masks (None without `run.skip`).
 
     Concatenating the slices reproduces the single-process array exactly —
     seeds 5000..5000+N-1 in order, one float64 per game — so every downstream
@@ -1452,14 +1634,19 @@ def measure_baseline(run, pool, procs):
     """
     slices = _chunks(run.n, procs)
     parts = {t: {} for t in run.horizons}
+    masks = {}
     runner = (pool.imap_unordered(_baseline_chunk, slices) if pool
               else map(_baseline_chunk, slices))
-    for lo, by_t in runner:
+    for lo, by_t, reads in runner:
         for t, cols in by_t.items():
             parts[t][lo] = cols
-    return {t: {m: np.concatenate([parts[t][lo][m] for lo, _ in slices])
-                for m in run.metrics}
-            for t in run.horizons}
+        masks[lo] = reads
+    baseline = {t: {m: np.concatenate([parts[t][lo][m] for lo, _ in slices])
+                    for m in run.metrics}
+                for t in run.horizons}
+    reads = (np.concatenate([masks[lo] for lo, _ in slices])
+             if run.skip else None)
+    return baseline, reads
 
 
 def ablation_stream(run, todo, procs):
@@ -1471,15 +1658,15 @@ def ablation_stream(run, todo, procs):
     """
     if procs == 1:
         _worker_init(run, None)
-        _W["baseline"] = measure_baseline(run, None, 1)
+        _W["baseline"], _W["reads"] = measure_baseline(run, None, 1)
         for name in todo:
             yield _ablate_card(name)
         return
 
     with Pool(procs, initializer=_worker_init, initargs=(run, None)) as scout:
-        baseline = measure_baseline(run, scout, procs)
+        baseline, reads = measure_baseline(run, scout, procs)
     with Pool(procs, initializer=_worker_init,
-              initargs=(run, baseline)) as work:
+              initargs=(run, baseline, reads)) as work:
         yield from work.imap_unordered(_ablate_card, todo)
 
 
