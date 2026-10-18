@@ -450,6 +450,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "5d5f1378739d84e9",
         "utc": "2026-10-18T02:58:16Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "24a784c263839f70",
+        "utc": "2026-10-18T04:29:31Z"
       }
     ]
   },
@@ -839,6 +845,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "ddbe908a1c22899e",
         "utc": "2026-10-18T02:58:15Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "efe0a33d210eabb1",
+        "utc": "2026-10-18T04:29:31Z"
       }
     ]
   },
@@ -1235,6 +1247,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "cc7bf0a266d983ae",
         "utc": "2026-10-18T02:58:15Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "13406c47236f0c39",
+        "utc": "2026-10-18T04:29:30Z"
       }
     ]
   },
@@ -1609,6 +1627,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "ddb0dbe60e1b9eae",
         "utc": "2026-10-18T02:58:15Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "ecf45bbceb22a707",
+        "utc": "2026-10-18T04:29:30Z"
       }
     ]
   },
@@ -2025,6 +2049,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "62e7a9e0e0a49e96",
         "utc": "2026-10-18T02:58:16Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "141b93e398340be4",
+        "utc": "2026-10-18T04:29:31Z"
       }
     ]
   },
@@ -2386,6 +2416,12 @@
         "evidence": "2026-10-18, \u00a70z145 (tools/ablation.py: skip the games a blank cannot change; no simulation code touched). Skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000 on build_pending's list: identical on every row (and rendmaw end to end at N=15,000: 64 of 64 rows identical to its committed cache). With ABLATE_SKIP=0 the path is the old one (tests/test_ablation_skip case A: play() equals columns_all()).",
         "fingerprint": "60fb2aa77342d2d0",
         "utc": "2026-10-18T02:58:16Z"
+      },
+      {
+        "commit": "a81f739",
+        "evidence": "2026-10-18, \u00a70z146 (azusa.py: library searches test is_land first; engine.remove_card replaces azusa's library.remove; tools/ablation.py compares Card properties by value). Against a worktree at a81f739: every game's full output on build_pending's list, seeds 5000..7999 at T20, 3,000 of 3,000 identical; check_unchanged_decks --old-at=a81f739 BIT-IDENTICAL. Ablation skip against ABLATE_SKIP=0, every card of this deck at both horizons, N=1,000: identical on every row. Azusa end to end at N=15,000: 58 of 58 rows identical to its committed cache.",
+        "fingerprint": "456c4a1276350897",
+        "utc": "2026-10-18T04:29:31Z"
       }
     ]
   },

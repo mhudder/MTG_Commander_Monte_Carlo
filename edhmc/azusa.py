@@ -130,7 +130,8 @@ from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finis
                           hand_colour_demand, engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
-                          tutor_take, sylvan_library, abundance_draw)
+                          tutor_take, sylvan_library, abundance_draw,
+                          remove_card)
 from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
@@ -968,7 +969,7 @@ class AzusaGame(BaseGame):
             basic = next((c for c in self.library
                           if c.is_land and c.name == "Forest"), None)
             if basic is not None:
-                self.library.remove(basic)
+                remove_card(self.library, basic)
                 self.make_permanent(basic, tapped=True)
                 self.m["shaper_lands"] += 1
                 self.land_entered(basic, played=False)
@@ -1712,10 +1713,16 @@ class AzusaGame(BaseGame):
         self.board.remove(next(p for p in self.board
                                if p.card is fetchland_card))
         self.land_died(fetchland_card)
-        forest = next((c for c in self.library if c.name == "Forest"), None)
+        # `is_land` FIRST in every library search for a land by name (§0z146):
+        # only a land can be a Forest (205.3i: land types are on lands), so
+        # the answer is the same, and the nonlands passed read only a field
+        # their ablation blank shares -- a name read made the game
+        # unskippable for every card above the first Forest (§0z145).
+        forest = next((c for c in self.library
+                       if c.is_land and c.name == "Forest"), None)
         if forest is None:
             return
-        self.library.remove(forest)
+        remove_card(self.library, forest)
         # TAPPED for Terramorphic Expanse and Evolving Wilds; Fabled Passage
         # untaps it "if you control four or more lands" (§0z113).
         enters_tapped = (fetchland_card.name == "Terramorphic Expanse"
@@ -2156,17 +2163,17 @@ class AzusaGame(BaseGame):
                 "journey_of_discovery": 2, "realms_uncharted": 2}[script]
             to_battlefield = 1 if script == "cultivate" else 0
             for _ in range(to_battlefield):
-                land = next((c for c in self.library if c.name == "Forest"), None)
+                land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
                 if land is None:
                     break
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
             for _ in range(n - to_battlefield):
-                land = next((c for c in self.library if c.name == "Forest"), None)
+                land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
                 if land is None:
                     break
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.hand.append(land)
         elif script == "green_sun":
             self.tutor_creature(3)
@@ -2190,10 +2197,10 @@ class AzusaGame(BaseGame):
             self.wave(4, lands_only=True)
         elif script == "nylea_land":
             for _ in range(3):
-                land = next((c for c in self.library if c.name == "Forest"), None)
+                land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
                 if land is None:
                     break
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.hand.append(land)
         elif script == "rude_awakening":
             self.rude_awakening()
@@ -2277,9 +2284,9 @@ class AzusaGame(BaseGame):
         elif card.name == "Woodland Bellower":
             self.tutor_creature(3, nonlegendary_only=True)
         elif card.name == "Nissa, Vastwood Seer // Nissa, Sage Animist":
-            land = next((c for c in self.library if c.name == "Forest"), None)
+            land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
             if land is not None:
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.hand.append(land)
         elif card.name == "Titania, Protector of Argoth":
             pool = [c for c in self.graveyard if c.is_land]
@@ -2467,10 +2474,10 @@ class AzusaGame(BaseGame):
             if perm is not None and perm.card.name == "Yavimaya Elder":
                 for _ in range(2):
                     land = next((c for c in self.library
-                                if c.name == "Forest"), None)
+                                if c.is_land and c.name == "Forest"), None)
                     if land is None:
                         break
-                    self.library.remove(land)
+                    remove_card(self.library, land)
                     self.hand.append(land)
 
     def tutor_creature(self, max_mv, nonlegendary_only=False,
@@ -2497,7 +2504,7 @@ class AzusaGame(BaseGame):
             self.graveyard.remove(best)
             self.m["finale_from_yard"] += 1
         else:
-            self.library.remove(best)
+            remove_card(self.library, best)
         perm = self.make_permanent(best, sick=True)
         self.ascended = self.ascended or len(self.board) >= 10
         return perm
@@ -2513,7 +2520,7 @@ class AzusaGame(BaseGame):
                 land = next((c for c in self.library if c.is_land), None)
                 if land is None:
                     break
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
                 put += 1
@@ -2530,7 +2537,7 @@ class AzusaGame(BaseGame):
         # a card this loop still holds a reference to and was about to
         # `remove()`. Found 2026-09-07 by the first full-size ablation run.
         for c in pool:
-            self.library.remove(c)
+            remove_card(self.library, c)
         for c in pool:
             self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
             if c.is_land:
@@ -2695,9 +2702,9 @@ class AzusaGame(BaseGame):
         if mode == "auto":
             mode = "land" if any(self.has(n) for n in LAND_ENABLERS) else "creature"
         if mode == "land":
-            land = next((c for c in self.library if c.name == "Forest"), None)
+            land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
             if land is not None:
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.make_permanent(land, tapped=True)
                 self.m["charm_lands"] += 1
                 self.shuffle_library()      # "Then shuffle."
@@ -2711,7 +2718,7 @@ class AzusaGame(BaseGame):
             self.shuffle_library()
             return
         best = max(pool, key=lambda c: c.mv)
-        self.library.remove(best)
+        remove_card(self.library, best)
         self.hand.append(best)
         self.m["charm_creatures"] += 1
         self.shuffle_library()
@@ -2746,9 +2753,9 @@ class AzusaGame(BaseGame):
             pay = can_pay({"gen": 2}, units)
             if pay is None:
                 continue
-            target = next((c for c in self.library if c.script == "fetch"), None)
+            target = next((c for c in self.library if c.is_land and c.script == "fetch"), None)
             if target is None:
-                target = next((c for c in self.library if c.name == "Forest"),
+                target = next((c for c in self.library if c.is_land and c.name == "Forest"),
                               None)
             if target is None:
                 continue
@@ -2756,7 +2763,7 @@ class AzusaGame(BaseGame):
             self.m["mana_spent"] += 2
             self.board.remove(pm)
             self.graveyard.append(pm.card)
-            self.library.remove(target)
+            remove_card(self.library, target)
             self.hand.append(target)
             self.shuffle_library()
             self.m["map_cracked"] += 1
@@ -3266,13 +3273,13 @@ class AzusaGame(BaseGame):
         """
         if perm.counters >= 7:
             perm.counters -= 7
-            basics = [c for c in self.library if c.name == "Forest"]
+            basics = [c for c in self.library if c.is_land and c.name == "Forest"]
             # EVERY CARD LEAVES THE LIBRARY BEFORE ANY OF THEM ENTERS. A
             # landfall trigger can draw (Horn of Greed) or tutor, and popping
             # the library out from under this loop is the exact crash that
             # took down Genesis Wave on 2026-09-07.
             for c in basics:
-                self.library.remove(c)
+                remove_card(self.library, c)
             got = []
             for c in basics:
                 got.append(self.make_permanent(c, sick=True))
@@ -3335,12 +3342,12 @@ class AzusaGame(BaseGame):
         """
         if perm.counters >= 8:
             perm.counters -= 8
-            forests = [c for c in self.library if c.name in FOREST]
+            forests = [c for c in self.library if c.is_land and c.name in FOREST]
             # Out of the library FIRST, then onto the battlefield -- the
             # Genesis Wave crash of 2026-09-07, and Worldwaker's -7 above,
             # for the same reason: a landfall trigger can draw.
             for c in forests:
-                self.library.remove(c)
+                remove_card(self.library, c)
             for c in forests:
                 self.make_permanent(c, sick=True, tapped=True)
                 self.land_entered(c, played=False)
@@ -3447,7 +3454,7 @@ class AzusaGame(BaseGame):
         spend(self, pay, units)
         self.m["mana_spent"] += 7
         pick = min(targets, key=lambda c: (c.mv, c.name))
-        self.library.remove(pick)
+        remove_card(self.library, pick)
         self.hand.append(pick)
         self.shuffle_library()
         self.m["eye_tutors"] += 1
@@ -3574,7 +3581,7 @@ class AzusaGame(BaseGame):
             for p in fodder[:2]:
                 units = self.available_mana()
                 pay = can_pay({"gen": 1}, units)
-                land = next((c for c in self.library if c.name == "Forest"), None)
+                land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
                 if pay is None or land is None:
                     break
                 spend(self, pay, units)
@@ -3582,7 +3589,7 @@ class AzusaGame(BaseGame):
                 self.board.remove(p)
                 self.m["creatures_sacrificed"] += 1
                 self.on_creature_death(1, p)
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
         self.myriad_landscape_step()
@@ -3653,7 +3660,7 @@ class AzusaGame(BaseGame):
         for pm in [p for p in self.board if p.card.script == "myriad"]:
             if pm.tapped or pm not in self.board:
                 continue
-            if not any(c.name == "Forest" for c in self.library):
+            if not any(c.is_land and c.name == "Forest" for c in self.library):
                 return
             pm.tapped = True                 # {T} is in the cost
             units = self.available_mana()
@@ -3667,11 +3674,11 @@ class AzusaGame(BaseGame):
             self.land_died(pm.card)
             found = []
             for _ in range(2):
-                forest = next((c for c in self.library if c.name == "Forest"),
+                forest = next((c for c in self.library if c.is_land and c.name == "Forest"),
                               None)
                 if forest is None:
                     break
-                self.library.remove(forest)
+                remove_card(self.library, forest)
                 self.make_permanent(forest, sick=False, tapped=True)
                 found.append(forest)
             self.shuffle_library()           # "...then shuffle", before landfall
@@ -3705,7 +3712,7 @@ class AzusaGame(BaseGame):
         for pm in list(self.board):
             if pm.card.name != "Lander token" or pm.tapped:
                 continue
-            forest = next((c for c in self.library if c.name == "Forest"), None)
+            forest = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
             if forest is None:
                 break
             units = self.available_mana()
@@ -3715,7 +3722,7 @@ class AzusaGame(BaseGame):
             spend(self, pay, units)
             self.m["mana_spent"] += 2
             self.board.remove(pm)
-            self.library.remove(forest)
+            remove_card(self.library, forest)
             self.make_permanent(forest, tapped=True)
             self.shuffle_library()
             self.m["landers_cracked"] += 1

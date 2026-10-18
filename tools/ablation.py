@@ -1433,26 +1433,37 @@ def _games(run, deck, commander, cfg, idx, reads):
 #
 # WHAT COUNTS AS A READ. Every attribute access on a Card goes through
 # `Card.__getattribute__`, which `tracking_reads` replaces for the baseline
-# only: a FIELD sets its bit; a property or method defined on Card itself
-# (`mv`, `is_creature`, the dataclass `__eq__`...) sets nothing, because the
-# fields IT reads go through the same hook; `__class__` sets nothing, because
-# the blank is a Card too. ANY OTHER NAME -- `__dict__`, `__getstate__`,
+# only: a FIELD sets its bit; a method defined on Card itself (the dataclass
+# `__eq__`, `__repr__`...) sets nothing, because the fields IT reads go
+# through the same hook; `__class__` sets nothing, because the blank is a
+# Card too. A PROPERTY sets its OWN bit and nothing for the fields it reads
+# (§0z146): `differs_mask` compares the property's VALUE on card and blank,
+# so `is_creature` asked of a noncreature in the library, whose Sorcery
+# blank has other `types` but the same answer, no longer forces the game to
+# be played. ANY OTHER NAME -- `__dict__`, `__getstate__`,
 # `__deepcopy__`, an attribute set on a card mid-game -- sets UNSAFE, which
 # every card differs on, and so does any write. `dataclasses.replace` (a
 # token copy) reads every field and so reads `name`.
 #
 # WHAT IT IS BLIND TO, written down (§0z15): state about a card that outlives
 # its game -- a module-level cache keyed by card or by name, filled in one
-# game and read in the next without touching the card -- and anything keyed
+# game and read in the next without touching the card -- a Card PROPERTY
+# whose value is not a pure function of its own card's fields (each of
+# today's five is: `mv`, `free_mv`, `multitype`, `is_creature`,
+# `is_permanent`) -- and anything keyed
 # on `id(card)` whose ORDER, not membership, decides play. Neither exists in
 # edhmc today (audited 2026-10-18). The audit games are the guard: one
 # skipped game in `run.audit` is played anyway and must match.
 CARD_FIELDS = tuple(f.name for f in fields(Card))
+CARD_PROPS = tuple(name for name, v in vars(Card).items()
+                   if isinstance(v, property))
 _FIELD_BIT = {name: 1 << k for k, name in enumerate(CARD_FIELDS)}
-UNSAFE = 1 << len(CARD_FIELDS)
+_PROP_BIT = {name: 1 << (len(CARD_FIELDS) + k)
+             for k, name in enumerate(CARD_PROPS)}
+UNSAFE = 1 << (len(CARD_FIELDS) + len(CARD_PROPS))
 _NEUTRAL = frozenset(
     {name for name, v in vars(Card).items()
-     if name not in _FIELD_BIT and (callable(v) or isinstance(v, property))}
+     if name not in _FIELD_BIT and callable(v)}
     | {"__class__"})
 
 
@@ -1463,8 +1474,20 @@ def tracking_reads():
     seen = {}
     ga = object.__getattribute__
     sa = object.__setattr__
+    inside = [0]                  # > 0 while a property is being evaluated
 
     def getattribute(self, name):
+        if inside[0]:
+            return ga(self, name)
+        pbit = _PROP_BIT.get(name)
+        if pbit is not None:
+            k = id(self)
+            seen[k] = seen.get(k, 0) | pbit
+            inside[0] += 1
+            try:
+                return ga(self, name)
+            finally:
+                inside[0] -= 1
         bit = _FIELD_BIT.get(name)
         if bit is None:
             bit = 0 if name in _NEUTRAL else UNSAFE
@@ -1488,11 +1511,13 @@ def tracking_reads():
 
 
 def differs_mask(card, blank) -> int:
-    """The fields on which `card` and its `blank` differ, plus UNSAFE."""
+    """The fields and properties on which `card` and its `blank` differ, plus
+    UNSAFE."""
     mask = UNSAFE
-    for name, bit in _FIELD_BIT.items():
-        if getattr(card, name) != getattr(blank, name):
-            mask |= bit
+    for table in (_FIELD_BIT, _PROP_BIT):
+        for name, bit in table.items():
+            if getattr(card, name) != getattr(blank, name):
+                mask |= bit
     return mask
 
 

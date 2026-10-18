@@ -198,6 +198,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z143](#0z143) | MEASURED | **Item 26's other eight staged swaps on POD_V4**: seven hold; **Anointed Procession is inside its bar at T20** (+0.0007), kept by the owner; Bolas's Citadel T20 only |
 | [0z144](#0z144) | BUILT | **The pod's body pool is rolled lazily**: a game fields 2.5 of 96 bodies per opponent; `make_pod` 0.76 -> 0.36 ms, about 5% a game; every game bit-identical (7 decks x 3,000, staged lists) |
 | [0z145](#0z145) | BUILT | **Ablation skips the games a blank cannot change**: bit-identical (rendmaw's committed N=15,000 cache 64/64; every deck at N=1,000); 1.10x (azusa) to 2.3x (rendmaw) faster -- azusa's library scans read every card's name |
+| [0z146](#0z146) | BUILT | **Azusa's skip blockers removed**: Forest searches test `is_land` first, `engine.remove_card`, properties by value; azusa's ablation 1.10x -> 1.64x, trostani 1.63x; bit-identical (azusa's full cache 58/58) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13009,6 +13010,75 @@ until azusa's scans change this is a speedup for single-deck runs.
 
 Every cache's fingerprint moved (`tools/ablation.py` is in all of them);
 the six active caches are recorded VERIFIED on the evidence above.
+
+<a id="0z146"></a>
+## 0z146. BUILT -- azusa's skip blockers removed: the same games, azusa's ablation 1.10x -> 1.64x
+
+**2026-10-18, the owner: "do the azusa fixes"**, after §0z145 found azusa
+skipping least. A probe of the FIRST read that makes a (game, card) pair
+unskippable put 60% of azusa's on `name` and 12% on `types`, and most of
+them on cards still in the LIBRARY. Three changes, each bit-identical:
+
+1. **Every azusa library search for a land by name tests `is_land` first**
+   (`c.is_land and c.name == "Forest"`, `... in FOREST`, `c.script ==
+   "fetch"`: fourteen sites, `crack_fetch` the largest at 21%). Only a land
+   can match -- a Forest is a land type (205.3i), and `script="fetch"` is set
+   only by azusa's `L()` -- so the answer is unchanged, and a nonland passed
+   on the way reads only a field its blank shares.
+2. **`engine.remove_card(cards, card)`** replaces azusa's nineteen
+   `self.library.remove(...)`. `list.remove` takes the first element that IS
+   the card or EQUALS it, and a Card's dataclass `==` reads `name` first on
+   every card ahead of it. Equal cards share `is_land` and `cost`, so testing
+   those first rules out the rest without reading `name`, and the element
+   removed is the same one -- duplicates included (two equal basic Forests:
+   `tests/test_ablation_skip.py` case G, 300 shuffled lists).
+3. **Card properties are compared by VALUE** (`tools/ablation.py`): `mv`,
+   `free_mv`, `multitype`, `is_creature`, `is_permanent` each record their
+   own bit and nothing for the fields they read, and `differs_mask` compares
+   the property on card and blank. `is_creature` asked of an Instant in the
+   library -- its Sorcery blank has other `types`, the same answer -- no
+   longer forces the game to be played. Blind to a property that is not a
+   pure function of its own card's fields (each of the five is), and written
+   into the code's list of what the skip cannot see.
+
+**Bit-identical, checked:**
+
+- every game's full output, 3,000 seeds x 7 decks on `build_pending`'s
+  lists, against a worktree at `a81f739`: **21,000 of 21,000 identical**;
+  `check_unchanged_decks --include-suspended --old-at=a81f739`:
+  BIT-IDENTICAL, all seven decks;
+- **azusa end to end at N=15,000**, all three changes, skip on: **58 of 58
+  rows identical** to its committed cache (built at `ca89b23`), 2,464 s on
+  four cores; and rendmaw's 64 of 64 from §0z145 stand on the old tracking;
+- skip against `ABLATE_SKIP=0`, every card, both horizons, N=1,000, all seven
+  decks: identical on every row;
+- `tests/test_ablation_skip.py` gains case G and two mutations (properties
+  untracked -> C, D; `remove_card` matching on `is_land` and `cost` alone ->
+  G), each set written before its run.
+
+**Measured** (N=1,000, four cores, idle machine; §0z145's figures in brackets):
+
+| deck | every game | skip | speedup |
+|---|---|---|---|
+| rendmaw | 98 s | 34 s | **2.93x** (2.33x, measured under load) |
+| karlov | 93 s | 45 s | 2.07x (2.09x) |
+| shilgengar | 106 s | 59 s | 1.79x (1.79x) |
+| tivit | 118 s | 66 s | 1.77x (1.68x) |
+| **azusa** | 229 s | 140 s | **1.64x** (1.10x) |
+| trostani | 130 s | 80 s | 1.63x (1.31x) |
+| lorehold | 119 s | 94 s | 1.27x (1.28x) |
+
+Azusa's unskippable share fell from 73% to 34% (150 games), and what is left
+is mostly cards in HAND (`main_phase`'s `c.name not in LAND_ENABLERS`,
+20%) -- a floor, not a scan. Azusa is still the slowest table (about 35-41
+minutes at N=15,000 on four cores, against about 60 playing every game), so
+its next gain is the cost of a game, not the skip. Lorehold's blockers are
+`list.remove`'s `==` (20%), a name read in `take_turn` (11%), `want_key`'s
+`priority` (10%, a real read: Top and scry look at the cards) and
+`miracle_value`'s `types` (6%): item 27.
+
+Every cache's fingerprint moved (`engine.py`, `tools/ablation.py`); the six
+active caches are recorded VERIFIED on the evidence above.
 
 ## How to read an ablation table
 

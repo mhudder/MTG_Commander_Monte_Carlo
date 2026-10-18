@@ -3936,6 +3936,27 @@ def stack_top(g, n: int) -> list:
     return order
 
 
+def remove_card(cards: list, card) -> None:
+    """`cards.remove(card)`, EXACTLY, reading less of the cards it passes
+    (§0z146).
+
+    `list.remove` takes the first element that IS `card` or EQUALS it, and a
+    Card's dataclass `==` compares every field, `name` first, of every card
+    ahead of the one removed -- so removing a land from the library read the
+    name of every card above it, which is what makes an ablation unable to
+    skip the game (§0z145). Two equal cards have the same `is_land` and the
+    same `cost`, so testing those first rules out a card that is not equal
+    without reading any field a blank differs on, and the element removed is
+    the element `list.remove` removed: the first that is `card` or equals it.
+    """
+    land, cost = card.is_land, card.cost
+    for i, c in enumerate(cards):
+        if c is card or (c.is_land == land and c.cost == cost and c == card):
+            del cards[i]
+            return
+    raise ValueError("remove_card(cards, card): card not in cards")
+
+
 def tutor_take(g, pool, stream: str):
     """Search the library: take the wanted card of `pool` out of it and
     shuffle (its own CRN stream, §0z17). Returns the card for the caller to

@@ -2,7 +2,7 @@
 """Ablation plays only the games a blank can change (§0z145).
 
     python -m tests.test_ablation_skip
-    python -m tests.test_ablation_skip --mutate   # 4 mutations, exact sets
+    python -m tests.test_ablation_skip --mutate   # 6 mutations, exact sets
 
 The baseline records what each game read of each library card; a game that
 read no field on which the card and its blank differ is the baseline's game,
@@ -18,15 +18,23 @@ CASES
      rendmaw, lorehold, azusa and tivit, `skipping_columns` (no audit) equals
      `columns_all` of the blanked deck on every metric at T10 and T20, 60
      seeds -- and each skipped at least one game, so the case is not vacuous
-  C  the hook: a field read sets its bit; a property (`mv`) sets the bit of
-     the field it reads (`cost`) and none of its own; `__dict__` and a write
-     set UNSAFE; the hook is gone after the block, and after one that raised
+  C  the hook: a field read sets its bit; a property (`mv`) sets its OWN bit
+     and not the bit of the field it reads (`cost`, §0z146); `__dict__` and
+     a write set UNSAFE; the hook is gone after the block, and after one
+     that raised
   D  `differs_mask`: a creature's blank differs on `name` and `priority`, not
-     on `cost`; every mask carries UNSAFE
+     on `cost`; every mask carries UNSAFE; and properties by VALUE (§0z146):
+     an Instant's Sorcery blank differs on `types` but not on `is_creature`;
+     an Artifact Creature's Creature blank differs on `types` and
+     `multitype`, not on `is_creature`
   E  the audit catches a lie: reads claiming a card was never touched, with
      every skipped game audited, raise instead of returning
   F  `ablate` with the read masks returns what `ablate` without them returns
      (rendmaw, the most-read card, default audit)
+  G  `engine.remove_card` is `list.remove`: over 300 shuffled lists holding
+     value-EQUAL copies (two basic Forests, two equal nonlands), removing
+     each card in turn leaves the same objects in the same order, and a card
+     not in the list raises ValueError (§0z146)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the hook records no field reads                -> B, C, D, F
@@ -36,6 +44,10 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   `__dict__` counts as neutral                    -> C
   `differs_mask` leaves out UNSAFE                -> D
   `differs_mask` is 0: no game is played          -> B, D, F
+  (§0z146, written before its run)
+  properties are not tracked by value (no _PROP_BIT) -> C, D
+  `remove_card` removes the first card with the same is_land and cost
+                                                 -> G
 
 UNMUTATED (§0z15): A is the neighbour -- tracking must change no game. E is
 the guard the mutations would hide behind if B and F audited, which is why B
@@ -78,6 +90,11 @@ def baseline_with_reads(run, cards, cmd, n):
 def bit_of(name):
     """A field's bit from `CARD_FIELDS`, not from the table under test."""
     return 1 << AB.CARD_FIELDS.index(name)
+
+
+def prop_bit_of(name):
+    """A property's bit from `CARD_PROPS`, likewise."""
+    return 1 << (len(AB.CARD_FIELDS) + AB.CARD_PROPS.index(name))
 
 
 def run_cases():
@@ -145,7 +162,7 @@ def run_cases():
     gone_after_raise = ("__getattribute__" not in vars(EN.Card)
                         and "__setattr__" not in vars(EN.Card))
     check("C the hook: fields, properties, __dict__, writes, removal",
-          (field_bit == bit_of("power"), prop_bits == bit_of("cost"),
+          (field_bit == bit_of("power"), prop_bits == prop_bit_of("mv"),
            bool(dict_bits & AB.UNSAFE), bool(write_bits & AB.UNSAFE),
            gone, gone_after_raise),
           (True, True, True, True, True, True))
@@ -154,10 +171,21 @@ def run_cases():
     creature = next(c for c in cards if c.is_creature and not c.is_land)
     mask = AB.differs_mask(creature, AB.blank_like(creature,
                                                     repl_priority(cards)))
-    check("D differs_mask: name and priority, not cost; UNSAFE always",
+    instant = EN.Card(name="Probe Instant", types=frozenset({"Instant"}),
+                      cost={"R": 1})
+    artcre = EN.Card(name="Probe Golem",
+                     types=frozenset({"Artifact", "Creature"}),
+                     cost={"gen": 2}, power=1, toughness=1)
+    mi = AB.differs_mask(instant, AB.blank_like(instant, 3.0))
+    ma = AB.differs_mask(artcre, AB.blank_like(artcre, 3.0))
+    check("D differs_mask: fields, UNSAFE always, properties by value",
           (bool(mask & bit_of("name")), bool(mask & bit_of("priority")),
-           bool(mask & bit_of("cost")), bool(mask & AB.UNSAFE)),
-          (True, creature.priority != repl_priority(cards), False, True))
+           bool(mask & bit_of("cost")), bool(mask & AB.UNSAFE),
+           bool(mi & bit_of("types")), bool(mi & prop_bit_of("is_creature")),
+           bool(ma & bit_of("types")), bool(ma & prop_bit_of("multitype")),
+           bool(ma & prop_bit_of("is_creature"))),
+          (True, creature.priority != repl_priority(cards), False, True,
+           True, False, True, True, False))
 
     run, base, reads = results["rendmaw"]
     slot = int(np.argmax((reads != 0).sum(axis=0)))
@@ -180,6 +208,38 @@ def run_cases():
         with_reads = "raised"
     check("F ablate with reads equals ablate without",
           with_reads == AB.ablate(full, cards, cmd, name, base), True)
+    import random as _random
+    rng = _random.Random(146)
+
+    def protos():
+        f = dict(name="Forest", types=frozenset({"Land"}), is_land=True,
+                 produces=frozenset("G"))
+        b = dict(name="Bear", types=frozenset({"Creature"}), cost={"G": 2},
+                 power=2, toughness=2)
+        return [EN.Card(**f), EN.Card(**f), EN.Card(**b), EN.Card(**b),
+                EN.Card(name="Elk", types=frozenset({"Creature"}),
+                        cost={"G": 2}, power=3, toughness=3),
+                EN.Card(name="Rite", types=frozenset({"Sorcery"}),
+                        cost={"G": 2}),
+                EN.Card(name="Plains", types=frozenset({"Land"}),
+                        is_land=True, produces=frozenset("W"))]
+
+    same = True
+    for _ in range(300):
+        cards = protos()
+        rng.shuffle(cards)
+        for target in list(cards):
+            a, b = list(cards), list(cards)
+            a.remove(target)
+            EN.remove_card(b, target)
+            same &= [id(c) for c in a] == [id(c) for c in b]
+    try:
+        EN.remove_card(protos()[:2], protos()[4])
+        raised = False
+    except ValueError:
+        raised = True
+    check("G remove_card is list.remove, duplicates included", (same, raised),
+          (True, True))
     return set(FAIL)
 
 
@@ -195,6 +255,14 @@ def main() -> int:
     real_bits = AB._FIELD_BIT
     real_mask = AB.differs_mask
 
+    def first_same_cost(cards, card):
+        for i, c in enumerate(cards):
+            if c is card or (c.is_land == card.is_land
+                             and c.cost == card.cost):
+                del cards[i]
+                return
+        raise ValueError("not in list")
+
     def no_unsafe(card, blank):
         return real_mask(card, blank) & ~AB.UNSAFE
 
@@ -208,16 +276,22 @@ def main() -> int:
             ({"D"}, "differs_mask", no_unsafe),
         "`differs_mask` is 0: no game is played":
             ({"B", "D", "F"}, "differs_mask", lambda card, blank: 0),
+        "properties are not tracked by value":
+            ({"C", "D"}, "_PROP_BIT", {}),
+        "`remove_card` removes the first card with the same is_land and cost":
+            ({"G"}, EN, "remove_card", first_same_cost),
     }
     bad = 0
-    for label, (want, name, value) in muts.items():
+    for label, spec in muts.items():
+        want, owner, name, value = (spec if len(spec) == 4
+                                    else (spec[0], AB) + tuple(spec[1:]))
         print(f"-- {label}")
-        orig = getattr(AB, name)
-        setattr(AB, name, value)
+        orig = getattr(owner, name)
+        setattr(owner, name, value)
         try:
             broke = run_cases()
         finally:
-            setattr(AB, name, orig)
+            setattr(owner, name, orig)
         ok = broke == want
         bad += (not ok)
         print(f"   broke {sorted(broke) or 'nothing'}  expected "

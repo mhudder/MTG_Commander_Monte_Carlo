@@ -187,3 +187,23 @@ What is closed and where it went:
     (`experiment.py`) with one parallel rebuild of every table. **ADOPTED
     2026-10-15 (§0z140)**: POD_V4 is the default pod (`opponents.POD_DEFAULTS`);
     `experiment.POD_PRE_V4` is the old one.
+
+
+27. **RUNTIME: AZUSA'S COST PER GAME, AND LOREHOLD'S SKIP BLOCKERS** (queued
+    2026-10-18, §0z145, §0z146). The ablation skip now plays a third of
+    azusa's games, so azusa -- the slowest table, and the parallel
+    rebuild's wall time -- gains next from a cheaper GAME (about 12 ms
+    against about 7 for the other decks). A cProfile of 300 games (profiler
+    shares, inflated for small calls): `main_phase` runs about four times a
+    turn and is half the game; inside it `available_mana` (azusa's own,
+    with `hand_colour_demand`) is rebuilt about 2.7 times per call and
+    `choose_mode`/`can_pay` asks every card in hand on every pass
+    (`_can_pay` about 20%, `available_mana` about 15%); `land_entered` ->
+    `_landfall_payoffs` is about 11%, a cascade of some thirty
+    `self.count(name)` lookups and `make_tokens` calls per landfall, most
+    with a count of 0; the snapshot's `copy.deepcopy` of the metrics dict
+    about 2%. Lorehold skips least (1.27x): `list.remove`'s `==` (20% of its
+    pairs; `engine.remove_card` is the drop-in), a `name` read in
+    `take_turn` (11%), `miracle_value`'s `types` (6%). Every change is
+    bit-identical or it is not this item.
+
