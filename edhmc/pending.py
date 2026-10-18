@@ -78,6 +78,7 @@ SIMULATED -> STAGED -> COMMITTED, with WITHDRAWN beside STAGED.
 
 from __future__ import annotations
 
+import re
 import sys
 
 from edhmc.experiment import _swap_many
@@ -599,13 +600,17 @@ def check_alt_cost_coverage():
     # DERIVED from the registry (2026-10-01): the hand-written six-engine
     # dict this replaced refused the seventh deck's first hybrid card.
     engines = {name: spec.engine_module for name, spec in REGISTRY.items()}
+    # `choose_mode_cost` is the same choice without the payment (§0z147),
+    # and reads `alt_costs` through the same `castable_modes`.
     readers = {name for name, mod in engines.items()
-               if "choose_mode(" in inspect.getsource(mod)}
+               if re.search(r"\bchoose_mode(_cost)?\(",
+                            inspect.getsource(mod))}
     missing = set(engines) - readers
     if missing:
         raise AssertionError(
             f"edhmc/pending.py: {sorted(missing)} do not call "
-            f"engine.choose_mode, so any card with `alt_costs` in those decks "
+            f"engine.choose_mode (or choose_mode_cost), so any card with "
+            f"`alt_costs` in those decks "
             f"would be cast at its printed cost silently. §1b / §0z20.")
 
     for deck_name, (module, _catalog) in DECKS.items():

@@ -199,6 +199,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z144](#0z144) | BUILT | **The pod's body pool is rolled lazily**: a game fields 2.5 of 96 bodies per opponent; `make_pod` 0.76 -> 0.36 ms, about 5% a game; every game bit-identical (7 decks x 3,000, staged lists) |
 | [0z145](#0z145) | BUILT | **Ablation skips the games a blank cannot change**: bit-identical (rendmaw's committed N=15,000 cache 64/64; every deck at N=1,000); 1.10x (azusa) to 2.3x (rendmaw) faster -- azusa's library scans read every card's name |
 | [0z146](#0z146) | BUILT | **Azusa's skip blockers removed**: Forest searches test `is_land` first, `engine.remove_card`, properties by value; azusa's ablation 1.10x -> 1.64x, trostani 1.63x; bit-identical (azusa's full cache 58/58) |
+| [0z147](#0z147) | BUILT | **Azusa prices only the card it casts**: `engine.can_afford` and `choose_mode_cost`; an azusa game 22% faster, its ablation 1.46x (2.8x with the skip); every game bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13079,6 +13080,80 @@ its next gain is the cost of a game, not the skip. Lorehold's blockers are
 
 Every cache's fingerprint moved (`engine.py`, `tools/ablation.py`); the six
 active caches are recorded VERIFIED on the evidence above.
+
+<a id="0z147"></a>
+## 0z147. BUILT -- azusa prices only the card it casts: a game 22% faster, its table 1.46x
+
+**2026-10-18, the owner: queue item 27, azusa's cost per game.** Sampled with
+py-spy (1,500 games, imports excluded), `engine._can_pay` was about a THIRD of
+an azusa game, nearly all of it `main_phase` asking `choose_mode` of every
+card in hand on every pass. `choose_mode` built each affordable card's
+payment -- the supply snapshot, a key per unit, a sort -- and the pick then
+read `rank` alone: with `cast_lookahead` off (the default) only the chosen
+card's payment is ever used.
+
+**Four bit-identical changes:**
+
+1. **`engine.can_afford(cost, units)`** answers `can_pay(...) is not None`
+   from `_can_pay`'s coloured phase and its one count (`afford_only`): the
+   generic assignment after them cannot fail once the count passes. And when
+   NO unit makes two of the colours a cost needs -- every azusa payment but a
+   rare dual -- the greedy colour phase cannot take a unit another colour
+   wanted, so each colour succeeds exactly when enough units make it: counted
+   instead of played. A unit making two needed colours falls through to the
+   greedy, which is the only case where the greedy decides.
+2. **`engine.choose_mode_cost`**: `choose_mode`'s choice without any payment,
+   ranking modes by the same `mode_key`. `choose_mode` itself is unchanged in
+   shape (pricing each mode in one pass is the cheaper shape when the payment
+   is wanted: an earlier draft that made it choose-then-price slowed rendmaw
+   and trostani about 7% in two interleaved rounds, and was reverted).
+3. **Azusa's `main_phase` prices lazily**: an option carries no payment, and
+   `pay_of` builds the chosen card's -- from the mode and pool it was found
+   affordable in -- on first use, so `lookahead_pick` under `cast_lookahead`
+   reads exactly what it read. Nykthos, Crystal Vein and the other
+   `can_pay(...) is None` tests ask `can_afford` (eight sites).
+4. **Two hoists in azusa**: `units + self.creature_mana` is skipped when the
+   restricted pool is empty (`ManaUnits + []` is the same pool: units,
+   owners, weights, flags), and `available_mana` counts lands only for
+   Temple of the False God, its one reader.
+
+`pending.check_alt_cost_coverage` accepts `choose_mode_cost` as a reader of
+`alt_costs` (it goes through the same `castable_modes`); it refused azusa
+until it did, which is the check working.
+
+**Bit-identical, checked:** every game's full output, 3,000 seeds x 7 decks on
+`build_pending`'s lists, against a worktree at `78df734`: **21,000 of 21,000
+identical**, after the last change; `check_unchanged_decks --include-suspended
+--old-at=78df734` BIT-IDENTICAL on all seven. `tests/test_payment_shortcuts.py`:
+`can_afford` against `can_pay` on 20,000 random pools (duals, five-colour and
+empty units, shared owners, both flags), the greedy-decides case, 5,000 random
+multi-mode cards against `choose_mode` as it was, and `ManaUnits + []`. Three
+mutations; one predicted set was short (the off-by-one also broke B, whose pool
+sits on the boundary: a transcript), and one stand-in was replaced before its
+second run because it was not the defect it named -- both written into the
+test.
+
+**Measured** (Python 3.13, process time, old and new interleaved):
+
+- an azusa game, seeds 5000-5999, four rounds: **12.78 -> 9.96 ms** (-22%);
+- azusa's ablation, skip mode, N=1,000, four cores: **121 s -> 83 s
+  (1.46x)** -- more than the game's 22% because the games the skip still
+  plays are the long, big-board ones, where pricing a hand costs most.
+  Against every game played on the code before §0z145 (229 s), 2.8x;
+- the other six decks: inside this machine's noise (about 5%), either sign.
+
+**What is left** (the same profile, after): `available_mana` about 17% of a
+game (a third of it from `main_phase`'s once-per-pass rebuild, the rest
+spread: `add`, `hand_colour_demand`, `creature_land_mana`); the chosen card's
+payment about 6%; `_landfall_payoffs` about 18%, most of it Springheart
+Nantuko's per-landfall payment and Scute Swarm's tokens -- Scute doubles
+once six lands are out, to the 90-permanent cap, so some azusa games carry
+very large boards and every loop over the board pays for it. That is the
+model's cost, not overhead. The same lazy pricing would serve every engine's
+`main_phase` (`_can_pay` is 15-20% of each deck's game): not done here.
+
+Every cache's fingerprint moved (`engine.py`, `azusa.py`, `pending.py`); the
+six active caches are recorded VERIFIED on the evidence above.
 
 ## How to read an ablation table
 

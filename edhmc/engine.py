@@ -713,6 +713,20 @@ class Payment(list):
     __slots__ = ("cost", "charged")
 
 
+def can_afford(cost: dict, units: list[frozenset]) -> bool:
+    """`can_pay(cost, units) is not None`, EXACTLY, without building the
+    payment (§0z147).
+
+    Whether a cost can be paid is decided by `_can_pay`'s coloured pips and
+    one count; the generic assignment after them -- the supply snapshot, the
+    per-unit keys, the sort -- never fails once that count passes, and it
+    is most of the solver's work. A `main_phase` asks it of every card in
+    hand on every pass and casts one, so a caller that needs only the yes
+    or no asks this, and prices the card it actually casts with `can_pay`.
+    """
+    return _can_pay(cost, units, afford_only=True) is not None
+
+
 def can_pay(cost: dict, units: list[frozenset],
             weights: Optional[list] = None) -> Optional[list[int]]:
     """`_can_pay`, with its answer wrapped as a `Payment` (§0z115)."""
@@ -726,7 +740,8 @@ def can_pay(cost: dict, units: list[frozenset],
 
 
 def _can_pay(cost: dict, units: list[frozenset],
-             weights: Optional[list] = None) -> Optional[list[int]]:
+             weights: Optional[list] = None,
+             afford_only: bool = False) -> Optional[list[int]]:
     """Greedy-with-fallback payment solver.
 
     `units` is a list of colour-sets, one entry per available mana. Returns the
@@ -762,6 +777,40 @@ def _can_pay(cost: dict, units: list[frozenset],
     # also have rejected -- they never pay a pip from nothing.
     if sum(cost.values()) > len(units):
         return None
+
+    # "CAN IT BE PAID" WITHOUT THE GREEDY, WHEN THE GREEDY CANNOT MATTER
+    # (§0z147). The coloured loop below fails a colour only when no unit left
+    # can make it, and a unit is taken only by a pip of a colour it makes. If
+    # no unit makes TWO of the colours this cost needs, no pip can take a unit
+    # another colour wanted, so each colour succeeds exactly when enough
+    # units make it -- and what is left for generic is the rest. That is the
+    # loop's answer, counted instead of played; a unit making two needed
+    # colours (a dual paying a two-colour cost) falls through to the loop.
+    # The placeholder returned is not a payment: only `can_afford` asks.
+    if afford_only:
+        pips = [(c, cost[c]) for c in ("W", "U", "B", "R", "G", "C")
+                if cost.get(c, 0) > 0]
+        have = dict.fromkeys([c for c, _ in pips], 0)
+        shared = False
+        for u in units:
+            hit = None
+            for c, _ in pips:
+                if c in u:
+                    if hit is not None:
+                        shared = True
+                        break
+                    hit = c
+            if shared:
+                break
+            if hit is not None:
+                have[hit] += 1
+        if not shared:
+            taken = 0
+            for c, n in pips:
+                if have[c] < n:
+                    return None
+                taken += n
+            return None if cost.get("gen", 0) > len(units) - taken else []
 
     remaining = list(range(len(units)))
     used: list[int] = []
@@ -821,6 +870,10 @@ def _can_pay(cost: dict, units: list[frozenset],
     gen = cost.get("gen", 0)
     if gen > len(remaining):
         return None
+    # Every path below pays `gen` from `remaining` and cannot fail, so the
+    # answer to "can it be paid" is settled here (`can_afford`, §0z147).
+    if afford_only:
+        return used
 
     if legacy:
         # The pre-2026-09-11 generic rule: least flexible leftovers.
@@ -1006,10 +1059,31 @@ def choose_mode(card: Card, base_cost: dict, units):
         pay = can_pay(cost, units)
         if pay is None:
             continue
-        key = (pref, -sum(cost.values()))
+        key = mode_key(cost, pref)
         if best is None or key > best[0]:
             best = (key, cost, tag, pay)
     return None if best is None else (best[1], best[2], best[3])
+
+
+def mode_key(cost: dict, pref: float) -> tuple:
+    """How affordable modes rank: preference, then the cheapest. ONE key for
+    `choose_mode` and `choose_mode_cost`, so the two cannot rank apart."""
+    return (pref, -sum(cost.values()))
+
+
+def choose_mode_cost(card: Card, base_cost: dict, units):
+    """`choose_mode` without the payment: (cost, tag) of the mode it would
+    choose, or None (§0z147). For a caller that prices only the card it
+    casts; `choose_mode` keeps pricing every mode in one pass, which is the
+    cheaper shape when the payment is wanted."""
+    best = None
+    for cost, tag, pref in castable_modes(card, base_cost):
+        if not can_afford(cost, units):
+            continue
+        key = mode_key(cost, pref)
+        if best is None or key > best[0]:
+            best = (key, cost, tag)
+    return None if best is None else (best[1], best[2])
 
 
 def engine_cfg(cfg: dict) -> dict:

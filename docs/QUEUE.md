@@ -190,7 +190,11 @@ What is closed and where it went:
 
 
 27. **RUNTIME: AZUSA'S COST PER GAME, AND LOREHOLD'S SKIP BLOCKERS** (queued
-    2026-10-18, §0z145, §0z146). The ablation skip now plays a third of
+    2026-10-18, §0z145, §0z146). **AZUSA'S PRICING DONE (§0z147)**: it
+    prices only the card it casts; a game 22% faster, its table 1.46x.
+    What is left of azusa is below as it was profiled before that, and in
+    §0z147 as it stands after; the same lazy pricing would serve every
+    engine's `main_phase`. Lorehold's blockers are untouched. The ablation skip now plays a third of
     azusa's games, so azusa -- the slowest table, and the parallel
     rebuild's wall time -- gains next from a cheaper GAME (about 12 ms
     against about 7 for the other decks). A cProfile of 300 games (profiler

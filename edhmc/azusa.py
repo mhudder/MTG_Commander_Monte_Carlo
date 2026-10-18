@@ -128,6 +128,7 @@ import re
 from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
+                          choose_mode_cost, can_afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           tutor_take, sylvan_library, abundance_draw,
@@ -1041,7 +1042,8 @@ class AzusaGame(BaseGame):
             owners.extend([owner] * n)
             weights.extend([(rank, want, power)] * n)
 
-        n_lands = sum(1 for p in self.board if p.card.is_land)
+        # Counted only for Temple of the False God, its one reader, and once.
+        n_lands = None
         # NISSA, WHO SHAKES THE WORLD: "Whenever you tap a Forest for mana, add
         # an additional {G}." A STATIC ability, not a loyalty one, so it is
         # live from the moment she resolves and has nothing to do with
@@ -1074,6 +1076,8 @@ class AzusaGame(BaseGame):
                     # it made one {C} below five here, which the card cannot
                     # (§0z115). `land_only_if` restores that.
                     below = 0 if self.cfg.get("land_only_if", True) else 1
+                    if n_lands is None:
+                        n_lands = sum(1 for q in self.board if q.card.is_land)
                     add(frozenset({"C"}), 2 if n_lands >= 5 else below, p)
                 elif c.name == "Eye of Ugin":
                     pass   # no mana ability on the current oracle text
@@ -2439,7 +2443,7 @@ class AzusaGame(BaseGame):
             if c.is_land:
                 continue
             cost = self.cost_of(c)
-            if can_pay(cost, units) is None and can_pay(cost, after) is not None:
+            if not can_afford(cost, units) and can_afford(cost, after):
                 return True
         return False
 
@@ -3001,8 +3005,8 @@ class AzusaGame(BaseGame):
         left = [u for i, u in enumerate(units) if i not in used]
         extra = [frozenset({"G"})] * 6
         unlocks = any(
-            c.is_creature and can_pay(self.cost_of(c), units) is None
-            and can_pay(self.cost_of(c), left + extra) is not None
+            c.is_creature and not can_afford(self.cost_of(c), units)
+            and can_afford(self.cost_of(c), left + extra)
             for c in self.hand)
         if not unlocks:
             return False
@@ -3056,8 +3060,8 @@ class AzusaGame(BaseGame):
         left = [u for i, u in enumerate(rest) if i not in used]
         extra = [frozenset({"G"})] * d
         unlocks = any(
-            not c.is_land and can_pay(self.cost_of(c), units) is None
-            and can_pay(self.cost_of(c), left + extra) is not None
+            not c.is_land and not can_afford(self.cost_of(c), units)
+            and can_afford(self.cost_of(c), left + extra)
             for c in self.hand)
         if not unlocks:
             return False
@@ -3117,8 +3121,25 @@ class AzusaGame(BaseGame):
                 units = self.available_mana()
             n_real = len(units)
 
+            # ONLY THE CARD CAST IS PRICED (§0z147). Every castable card is an
+            # option, but the pick reads `rank` alone -- and `lookahead_pick`
+            # reads payments only with `cast_lookahead` on -- so an option
+            # carries None for its payment and `pay_of` builds it on first
+            # use, from the mode and pool the option was found affordable in.
+            # A third of this engine's time was payments built and discarded.
             options = []
             mode_cost = {}
+            pools = {}
+            pays = {}
+
+            def pay_of(it):
+                if it[1] is not None:
+                    return it[1]
+                k = id(it[0])
+                if k not in pays:
+                    pays[k] = can_pay(mode_cost[k], pools[k])
+                return pays[k]
+
             for c in self.hand:
                 if c.is_land:
                     continue
@@ -3135,14 +3156,18 @@ class AzusaGame(BaseGame):
                 # abilities of creatures", so the restricted pool is offered to
                 # creatures and to nothing else. It sits AFTER the real units,
                 # which is what lets the payment below tell the two apart.
-                pool = units + self.creature_mana if c.is_creature else units
+                # `units + []` is a copy of `units`, so an empty restricted
+                # pool is skipped rather than copied for every creature.
+                pool = (units + self.creature_mana
+                        if c.is_creature and self.creature_mana else units)
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-                _m = choose_mode(c, self.cost_of(c), pool)
+                _m = choose_mode_cost(c, self.cost_of(c), pool)
                 if _m is not None:
-                    options.append((c, _m[2]))
+                    options.append((c, None))
                     mode_cost[id(c)] = _m[0]
+                    pools[id(c)] = pool
             if not enablers_only and self.library and (self.has("Augur of Autumn")):
                 top = self.library[-1]
                 if top.is_creature and self._coven():
@@ -3157,12 +3182,13 @@ class AzusaGame(BaseGame):
             # Castle Garenbrig's restricted mana is offered to creatures only,
             # so with any of it floating this turn falls back to greedy.
             if self.creature_mana:
-                card, pay = max(options, key=rank)
+                pick = max(options, key=rank)
             else:
-                card, pay = lookahead_pick(
+                pick = lookahead_pick(
                     self, options, units, rank,
                     cost_of=lambda it: mode_cost[id(it[0])],
-                    pay_of=lambda it: it[1])
+                    pay_of=pay_of)
+            card, pay = pick[0], pay_of(pick)
             # Only the REAL units tap a permanent. Anything the payment took
             # from Castle Garenbrig's pool is mana that has already been paid
             # for -- charging it to the lands as well would tap four of them to
@@ -3639,8 +3665,8 @@ class AzusaGame(BaseGame):
             return False
         rest = [u for u, o in zip(units, units.owners) if o is not vein]
         extra = rest + [frozenset({"C"})] * 2
-        if not any(not c.is_land and can_pay(self.cost_of(c), units) is None
-                   and can_pay(self.cost_of(c), extra) is not None
+        if not any(not c.is_land and not can_afford(self.cost_of(c), units)
+                   and can_afford(self.cost_of(c), extra)
                    for c in self.hand):
             return False
         self.board.remove(vein)
