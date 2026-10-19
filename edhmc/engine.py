@@ -572,7 +572,7 @@ def london_mulligan(g) -> None:
     for _ in range(mulls):
         if g.hand:
             worst = max(g.hand, key=lambda c: (not c.is_land, c.mv))
-            g.hand.remove(worst)
+            remove_card(g.hand, worst)
             g.library.insert(0, worst)
 
 
@@ -1887,7 +1887,7 @@ class Game(BaseGame):
             if not pool:
                 return
             best = max(pool, key=lambda c: c.mv)
-            self.graveyard.remove(best)
+            remove_card(self.graveyard, best)
             self.hand.append(best)
             self.m["artifacts_returned"] += 1
             self.m[tag] = self.m.get(tag, 0) + 1
@@ -2543,7 +2543,7 @@ def crack_land_fetch(g, perm, rule) -> None:
         g.your_life -= life
         g.m["life_lost_to_own_cards"] += life
         g.m["fetch_life"] += life
-    g.library.remove(pick)
+    remove_card(g.library, pick)
     tapped = True if mode in ("tapped", "untap4") else None
     found = enter_land(g, pick, tapped=tapped)
     if mode == "untap4" and sum(1 for p in g.board if p.card.is_land) >= 4:
@@ -2752,7 +2752,7 @@ def play_land(g: Game):
         return (len(prod - have), not tapped, len(prod), c.multitype)
 
     best = max(lands, key=score)
-    g.hand.remove(best)
+    remove_card(g.hand, best)
     prod, tapped = face(best)
     if not best.is_land:                      # played as its land face
         best = Card(name=best.name + " (land)", types=frozenset({"Land"}),
@@ -3053,7 +3053,7 @@ def main_phase(g: Game, precombat: bool = False):
         if alt_tag == "graveyard":
             wickerfolk_additional_costs(g, card)     # §0z125
         else:
-            g.hand.remove(card)
+            remove_card(g.hand, card)
 
         idx = g.spells_this_turn
         g.spells_this_turn += 1
@@ -3429,7 +3429,7 @@ def run_etb(g: Game, perm: Permanent):
                               "Planeswalker", "Land", "Battle"}]
         if pool:
             best = max(pool, key=lambda c: (not c.is_land, c.priority, c.mv))
-            g.graveyard.remove(best)
+            remove_card(g.graveyard, best)
             g.hand.append(best)
             g.m["gloomshrieker_returns"] += 1
     if perm.card.name == "Filigree Familiar" and g.cfg.get("familiar_text", True):
@@ -3613,7 +3613,7 @@ def activations(g: Game):
                 g.board.remove(victim)
                 g.on_creature_death(1, victim)
                 best = max(pool, key=lambda c: c.power)
-                g.graveyard.remove(best)
+                remove_card(g.graveyard, best)
                 perm = Permanent(card=best, sick=True,
                                  base_p=best.power, base_t=best.toughness)
                 g.board.append(perm)
@@ -3960,12 +3960,40 @@ def mana_next_turn(g, lands_in_hand: int) -> int:
 
 def want_key(g, card, lands_in_hand: int, mana: int) -> tuple:
     """The sort key: larger is wanted more. See the block comment above."""
+    return want_band(g, card, lands_in_hand, mana) + want_within(g, card)
+
+
+def want_band(g, card, lands_in_hand: int, mana: int) -> tuple:
+    """`want_key`'s head: the tier, then the band. A land's band (3 or 0)
+    never equals a spell's (2 or 1)."""
     hook = getattr(g, "want_tier", None)
     tier = hook(card) if hook is not None else 0
     if card.is_land:
-        rank = g.land_rank(card) if hasattr(g, "land_rank") else 0.0
-        return (tier, 3 if lands_short(g, lands_in_hand) else 0, rank, 0)
-    return (tier, 2 if card.mv <= mana else 1, card.priority, card.mv)
+        return (tier, 3 if lands_short(g, lands_in_hand) else 0)
+    return (tier, 2 if card.mv <= mana else 1)
+
+
+def want_within(g, card) -> tuple:
+    """`want_key`'s tail, which ranks cards inside one band: the land rank,
+    or the deck's `priority` and then mana value."""
+    if card.is_land:
+        return (g.land_rank(card) if hasattr(g, "land_rank") else 0.0, 0)
+    return (card.priority, card.mv)
+
+
+def want_max(g, cards, lands_in_hand: int, mana: int):
+    """`max(cards, key=want_key)`, the same card, reading `want_within` only
+    for the cards tied in the best band (§0z148). The key is head + tail and
+    tuples compare head first, so a card outside the best band loses
+    whatever its tail; inside it, `max` keeps the first of equal keys as it
+    did over the whole list. Why it matters: Gamble ranks the whole library,
+    and every `priority` it read was a game the ablation could not skip."""
+    bands = [want_band(g, c, lands_in_hand, mana) for c in cards]
+    top = max(bands)
+    tied = [c for c, b in zip(cards, bands) if b == top]
+    if len(tied) == 1:
+        return tied[0]
+    return max(tied, key=lambda c: want_within(g, c))
 
 
 def want_order(g, cards) -> list:
@@ -3979,7 +4007,7 @@ def want_order(g, cards) -> list:
     out = []
     while rest:
         mana = mana_next_turn(g, lands)
-        best = max(rest, key=lambda c: want_key(g, c, lands, mana))
+        best = want_max(g, rest, lands, mana)
         out.append(best)
         rest = [c for c in rest if c is not best]
         if best.is_land:
@@ -3993,7 +4021,7 @@ def want_best(g, pool):
         return None
     lands = sum(1 for c in g.hand if c.is_land)
     mana = mana_next_turn(g, lands)
-    return max(pool, key=lambda c: want_key(g, c, lands, mana))
+    return want_max(g, pool, lands, mana)
 
 
 def stack_top(g, n: int) -> list:
@@ -4200,7 +4228,7 @@ def fetch_basics(g, n: int) -> int:
         pick = min(pool, key=lambda c: (min((sources(col) for col in
                                              c.produces), default=99),
                                         c.name))
-        g.library.remove(pick)
+        remove_card(g.library, pick)
         g.board.append(Permanent(card=pick, tapped=True, sick=True))
         got += 1
     crn_shuffle(g, "fetch_basics", g.library)
@@ -4393,7 +4421,7 @@ def village_rites(g, units) -> None:
         chaff = [p for p in g.board if p.is_token and p.card.is_creature]
         if chaff and pay_from(g, units, {"B": 1}):
             rites = next(c for c in g.hand if c.name == "Village Rites")
-            g.hand.remove(rites)
+            remove_card(g.hand, rites)
             g.board.remove(chaff[0])
             g.on_creature_death(1)
             g.graveyard.append(rites)
@@ -4534,7 +4562,7 @@ def wickerfolk_additional_costs(g, card) -> None:
     """The cast from the graveyard: the card leaves the graveyard, 2 life is
     paid (§0i: a life cost is charged) and a creature token is sacrificed --
     a death, so Blood Artist and the Meathook see it."""
-    g.graveyard.remove(card)
+    remove_card(g.graveyard, card)
     g.your_life -= 2
     g.m["wickerfolk_life_paid"] += 2
     victim = wickerfolk_fodder(g)

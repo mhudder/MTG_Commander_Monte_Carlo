@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (charge_coloured_pain, vault_of_the_archangel,
+from edhmc.engine import (remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode,
@@ -873,7 +873,7 @@ class ShilgengarGame(BaseGame):
         # argued -- but the interleaved form is the shape that crashed the
         # Azusa engine's Genesis Wave on 2026-09-07.
         for card in pool:
-            self.graveyard.remove(card)
+            remove_card(self.graveyard, card)
         for card in pool:
             perm = self.make_permanent(card, sick=True)
             # "...with a finality counter on it." Marked here, enforced in
@@ -1088,7 +1088,7 @@ class ShilgengarGame(BaseGame):
                 self.treasures -= used
                 self.m["treasures_spent"] += used
             self.m["mana_spent"] += len(pay)
-            self.hand.remove(card)
+            remove_card(self.hand, card)
             idx = self.spells_this_turn
             self.spells_this_turn += 1
             if OPP.countered(self, card, idx):
@@ -1121,7 +1121,7 @@ class ShilgengarGame(BaseGame):
                           and not p.sick), None)
             if pool and priest is not None:
                 best = max(pool, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 self.your_life -= 3
                 self.sacrifice(priest, to_shilgengar=False)
                 perm = self.make_permanent(best, sick=True)
@@ -1135,14 +1135,15 @@ class ShilgengarGame(BaseGame):
         # handled here rather than in resolve(), a turn or more after casting
         # in the model just as it would be at a real table.
         if self.has("Wayfarer's Bauble"):
-            basics = [c for c in self.library if c.name in ("Swamp", "Plains")]
+            basics = [c for c in self.library
+                      if c.is_land and c.name in ("Swamp", "Plains")]
             bauble = next((p for p in self.board
                           if p.card.name == "Wayfarer's Bauble"), None)
             if basics and bauble is not None and self.pay({"gen": 2},
                                                           count_mana_spent=2):
                 self.board.remove(bauble)
                 land = basics[0]
-                self.library.remove(land)
+                remove_card(self.library, land)
                 self.make_permanent(land, sick=False, tapped=True)
 
         self.aristocrats_step()
@@ -1221,7 +1222,7 @@ class ShilgengarGame(BaseGame):
             if not pool:
                 continue
             best = max(pool, key=lambda c: c.mv)
-            self.graveyard.remove(best)
+            remove_card(self.graveyard, best)
             back = self.make_permanent(best, sick=True)
             self.creature_entered(back)
             self.m["seluma_returns"] += 1
@@ -1232,7 +1233,7 @@ class ShilgengarGame(BaseGame):
         best = sun_titan_pick(self.graveyard, exclude=self.finality)
         if best is None:
             return
-        self.graveyard.remove(best)
+        remove_card(self.graveyard, best)
         perm = self.make_permanent(best, sick=True)
         if perm.card.is_creature:
             self.creature_entered(perm)
@@ -1265,7 +1266,7 @@ class ShilgengarGame(BaseGame):
             pool = self.yard_creatures()
             if pool:
                 best = max(pool, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 perm = self.make_permanent(best, sick=True)
                 if perm.card.is_creature:
                     self.creature_entered(perm)
@@ -1323,7 +1324,7 @@ class ShilgengarGame(BaseGame):
                    and id(c) not in self.finality]
             if pool:
                 best = max(pool, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 perm = self.make_permanent(best, sick=True)
                 if perm.card.is_creature:
                     self.creature_entered(perm)
@@ -1344,7 +1345,7 @@ class ShilgengarGame(BaseGame):
         "Can't block" is inert: your creatures never block here."""
         for card in [c for c in self.yard_creatures()
                      if c.name == "Bloodghast"]:
-            self.graveyard.remove(card)
+            remove_card(self.graveyard, card)
             perm = self.make_permanent(card, sick=True)
             self.creature_entered(perm)
             self.m["bloodghast_returns"] += 1

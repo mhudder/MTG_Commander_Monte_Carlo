@@ -33,7 +33,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng, tutor_take)
+                          crn_shuffle, make_rng, seal_rng, tutor_take, remove_card)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
 
@@ -474,7 +474,7 @@ def artist_rummage(g):
         if not g.hand or not draw_is_safe(g, 1):
             return
         card = rummage_discard_choice(g)
-        g.hand.remove(card)
+        remove_card(g.hand, card)
         g.graveyard.append(card)
         _draw_into_hand(g, 1)
         g.m["artist_rummages"] += 1
@@ -680,7 +680,7 @@ def set_top(g, pool=None, upkeep_free=False):
                 pay(g, {"gen": cost}, units)
             else:
                 continue
-        g.hand.remove(best)
+        remove_card(g.hand, best)
         g.library.append(best)
         g.m["settop_placed"] += 1
         g.m[f"settop_by_{name.split()[0].lower()}"] =             g.m.get(f"settop_by_{name.split()[0].lower()}", 0) + 1
@@ -1117,7 +1117,7 @@ def arcane_bombardment(g):
             if "Instant" in c.types or "Sorcery" in c.types]
     if pool:
         picked = pool[crn_randrange(g, "bombardment", len(pool))]
-        g.graveyard.remove(picked)
+        remove_card(g.graveyard, picked)
         g.bombardment_exiled.append(picked)
 
     for card in list(g.bombardment_exiled):
@@ -1170,7 +1170,7 @@ def radiant_scrollwielder(g):
     if not pool:
         return
     picked = pool[crn_randrange(g, "scrollwielder", len(pool))]
-    g.graveyard.remove(picked)               # exiled, cast or not
+    remove_card(g.graveyard, picked)               # exiled, cast or not
     g.m["scrollwielder_exiles"] += 1
 
     units = mana_units(g)
@@ -1256,7 +1256,7 @@ def discard_cards(g, n) -> int:
         if not g.hand:
             break
         worst = rummage_discard_choice(g)
-        g.hand.remove(worst)
+        remove_card(g.hand, worst)
         g.graveyard.append(worst)
         done += 1
     if done:
@@ -1444,7 +1444,8 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         # next draw, which is why the choice is state-dependent rather than
         # just "take the best card".
         pool = [x for x in g.library
-                if ("Artifact" in x.types or "Enchantment" in x.types)
+                if x.is_permanent
+                and ("Artifact" in x.types or "Enchantment" in x.types)
                 and not x.is_land]
         shortlist = g.cfg.get("tutor_targets", ())
         cands = [x for x in pool if x.name in shortlist] or pool
@@ -1472,7 +1473,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
                 pick = min(cands, key=lambda x: (order.index(x.name)
                                                  if x.name in order else 99,
                                                  -x.mv))
-            g.library.remove(pick)
+            remove_card(g.library, pick)
             g.library.append(pick)          # on top
             g.tutor_log.append((g.turn, pick.name,
                                 sum(1 for p in g.board if p.card.is_land),
@@ -1490,7 +1491,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         if g.last_paid < 9 and pool:
             pool = [max(pool, key=lambda x: x.mv)]   # single target
         for x in pool:
-            g.graveyard.remove(x)          # exiled whether or not it is cast
+            remove_card(g.graveyard, x)          # exiled whether or not it is cast
             if not pilot_may_cast(g, x):
                 continue                   # "you MAY cast the copy" (item 17)
             g.m["mastery_copies"] += 1
@@ -1874,7 +1875,7 @@ def profound_journey(g):
     if pick is None:
         g.m["journey_fizzled"] += 1
         return
-    g.graveyard.remove(pick)
+    remove_card(g.graveyard, pick)
     g.m["journey_returns"] += 1
     g.m["journey_mv"] += pick.mv
     if pick.is_land:
@@ -1936,7 +1937,7 @@ def exile_flashback(g, card):
     prove the check can fail, which a bare `if` inside the loop did not allow.
     """
     if card in g.graveyard:
-        g.graveyard.remove(card)
+        remove_card(g.graveyard, card)
         g.m["flashback_exiled"] += 1
 
 
@@ -1975,7 +1976,7 @@ def past_in_flames(g, self_card=None, cap=None):
                      if can_pay(reduce_cost(g, c), units) is not None), None)
         if best is None:
             break
-        g.graveyard.remove(best)
+        remove_card(g.graveyard, best)
         paid = pay(g, reduce_cost(g, best), units) or 0
         g.m["flashback_casts"] += 1
         g.m["flashback_mv"] += best.free_mv
@@ -2067,7 +2068,7 @@ def restoration_seminar(g):
     if pick is None:
         g.m["seminar_fizzled"] += 1
         return
-    g.graveyard.remove(pick)
+    remove_card(g.graveyard, pick)
     g.m["seminar_returns"] += 1
     g.m["seminar_mv"] += pick.mv
     enters_battlefield(g, pick)
@@ -2399,7 +2400,7 @@ def regrow_best_spell(g):
     if not pool:
         return None
     best = max(pool, key=lambda c: c.free_mv)
-    g.graveyard.remove(best)
+    remove_card(g.graveyard, best)
     g.hand.append(best)
     return best
 
@@ -2427,7 +2428,7 @@ def dawning_archaic_attack(g):
     best = dawning_archaic_pick(g)
     if best is None:
         return
-    g.graveyard.remove(best)
+    remove_card(g.graveyard, best)
     g.m["free_casts"] += 1
     g.m["archaic_casts"] += 1
     cast_free(g, best, exile=True)
@@ -2491,11 +2492,11 @@ def underworld_breach(g):
             return
         card, cost = max(options, key=lambda it: (it[0].priority, it[0].mv))
         paid = pay(g, cost, units)
-        g.graveyard.remove(card)
+        remove_card(g.graveyard, card)
         g.m["escape_casts"] += 1
         # exile three OTHER cards from the graveyard
         for c in [x for x in g.graveyard if not x.is_land][:3]:
-            g.graveyard.remove(c)
+            remove_card(g.graveyard, c)
         resolve_spell(g, card, paid, from_hand=False)
 
 
@@ -2685,7 +2686,7 @@ def _main_phase(g, reserve=0):
             # FLASHBACK: off the graveyard, and EXILED whenever it leaves the
             # stack -- countered or resolved (702.34a). Not from hand, so no
             # Sunbird's Invocation and no Goliath dream.
-            g.graveyard.remove(card)
+            remove_card(g.graveyard, card)
             g.m["native_flashback_casts"] += 1
             if card.name in g.cfg.get("watch", ()):
                 g.m["test_card_flashbacks"] += 1
@@ -2696,7 +2697,7 @@ def _main_phase(g, reserve=0):
             resolve_spell(g, card, paid, from_hand=False)
             exile_flashback(g, card)
             continue
-        g.hand.remove(card)
+        remove_card(g.hand, card)
         if OPP.countered(g, card, idx):
             g.m["countered"] += 1
             g.graveyard.append(card)
@@ -2784,7 +2785,7 @@ def draw_land_windows(g):
     def sanitarium_discard(land):
         if land.card.name == "Geier Reach Sanitarium" and g.hand:
             worst = rummage_discard_choice(g)
-            g.hand.remove(worst)
+            remove_card(g.hand, worst)
             g.graveyard.append(worst)
             discard_triggers(g, 1)
 
@@ -2846,16 +2847,16 @@ def opponent_upkeep_windows(g):
             afford = (g.float_mana + g.treasures) >= miracle_need(g, best)
             if afford and miracle_value(g, best) > 0:
                 worst = best
-                g.hand.remove(worst)
+                remove_card(g.hand, worst)
                 g.library.append(worst)
                 leng_card = worst
                 g.m["leng_to_top"] += 1
                 g.m["leng_mv_to_top"] += worst.mv
             else:
-                g.hand.remove(worst)
+                remove_card(g.hand, worst)
                 g.graveyard.append(worst)
         else:
-            g.hand.remove(worst)
+            remove_card(g.hand, worst)
             g.graveyard.append(worst)
         # Library of Leng redirects where the card goes, but it is still a
         # discard, so Monument to Endurance still triggers either way.
@@ -2930,9 +2931,10 @@ def take_turn(g):
     if g.has("Land Tax"):
         my_lands = sum(1 for p in g.board if p.card.is_land)
         if my_lands < min(g.turn, 10):
-            basics = [x for x in g.library if x.name == "Plains"][:3]
+            basics = [x for x in g.library
+                      if x.is_land and x.name == "Plains"][:3]
             for b in basics:
-                g.library.remove(b)
+                remove_card(g.library, b)
                 g.hand.append(b)
             g.m["land_tax_fetches"] += len(basics)
 

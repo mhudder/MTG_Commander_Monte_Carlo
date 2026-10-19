@@ -37,7 +37,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -855,9 +855,10 @@ def upkeep(g):
         my_lands = sum(1 for p in g.board if p.card.is_land)
         opp_lands = min(g.turn, g.cfg.get("opp_land_plateau", 8))
         if opp_lands > my_lands:
-            basics = [x for x in g.library if x.name in ("Plains", "Swamp")][:3]
+            basics = [x for x in g.library
+                      if x.is_land and x.name in ("Plains", "Swamp")][:3]
             for b in basics:
-                g.library.remove(b)
+                remove_card(g.library, b)
                 g.hand.append(b)
     # Felidar Sovereign: win at upkeep with 40+ life
     if g.has("Felidar Sovereign") and g.your_life >= 40 and g.result is None:
@@ -989,7 +990,7 @@ def ranger_of_eos_etb(g):
     """
     picks = ranger_of_eos_pick(g)
     for c in picks:
-        g.library.remove(c)
+        remove_card(g.library, c)
         g.hand.append(c)
     g.m["ranger_tutored"] += len(picks)
     crn_shuffle(g, "ranger_of_eos", g.library)
@@ -1235,7 +1236,7 @@ def main_phase(g):
         spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
         if any(c is card for c in g.hand):
-            g.hand.remove(card)
+            remove_card(g.hand, card)
         else:                        # Lurrus's permission, spent (§0z84)
             at = next(i for i, c in enumerate(g.graveyard) if c is card)
             g.graveyard.pop(at)
@@ -1501,7 +1502,8 @@ def enlightened_tutor(g):
     costs the next draw, which is the card's real price. NOT modelled: the
     answer a pilot would fetch for the TABLE (§4), so a floor."""
     pool = [c for c in g.library
-            if c.types & {"Artifact", "Enchantment"} and not c.is_land]
+            if c.is_permanent and c.types & {"Artifact", "Enchantment"}
+            and not c.is_land]
     pick = tutor_take(g, pool, "enlightened_tutor")
     if pick is not None:
         g.library.append(pick)

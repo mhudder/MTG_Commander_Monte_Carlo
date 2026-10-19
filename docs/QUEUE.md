@@ -194,8 +194,14 @@ What is closed and where it went:
     prices only the card it casts; a game 22% faster, its table 1.46x.
     What is left of azusa is below as it was profiled before that, and in
     §0z147 as it stands after; the same lazy pricing would serve every
-    engine's `main_phase`. Lorehold's blockers are untouched. The ablation skip now plays a third of
-    azusa's games, so azusa -- the slowest table, and the parallel
+    engine's `main_phase`. **LOREHOLD'S BLOCKERS DONE (§0z148)**, with
+    karlov's, shilgengar's and tivit's: unskippable pairs 68% -> 47%, 40% ->
+    24%, 39% -> 21%, 50% -> 42%; ablations 1.36x, 1.46x, 1.97x and 1.17x
+    faster, every row identical. What is left in every deck is mostly cards
+    in hand, a floor (trostani's library scans wait while it is SUSPENDED).
+    What is left of this item is the cost of a GAME. The ablation skip
+    now plays a third of azusa's games, so azusa -- the slowest table, and
+    the parallel
     rebuild's wall time -- gains next from a cheaper GAME (about 12 ms
     against about 7 for the other decks). A cProfile of 300 games (profiler
     shares, inflated for small calls): `main_phase` runs about four times a
@@ -206,8 +212,5 @@ What is closed and where it went:
     `_landfall_payoffs` is about 11%, a cascade of some thirty
     `self.count(name)` lookups and `make_tokens` calls per landfall, most
     with a count of 0; the snapshot's `copy.deepcopy` of the metrics dict
-    about 2%. Lorehold skips least (1.27x): `list.remove`'s `==` (20% of its
-    pairs; `engine.remove_card` is the drop-in), a `name` read in
-    `take_turn` (11%), `miracle_value`'s `types` (6%). Every change is
-    bit-identical or it is not this item.
+    about 2%. Every change is bit-identical or it is not this item.
 

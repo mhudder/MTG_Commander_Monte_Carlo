@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -727,7 +727,7 @@ def main_phase(g):
                                          units),
                    powerstones="Artifact" in card.types):
             return
-        g.hand.remove(card)
+        remove_card(g.hand, card)
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         if OPP.countered(g, card, idx):
@@ -783,7 +783,7 @@ def resolve(g, card):
     elif s == "tutor":
         _tutor(g, lambda c: True)
     elif s == "tutor_ench":
-        _tutor(g, lambda c: "Enchantment" in c.types)
+        _tutor(g, lambda c: c.is_permanent and "Enchantment" in c.types)
     elif s == "plea":
         # Will of the council: an extra turn, or draw three.
         if V.council(g):
@@ -852,7 +852,7 @@ def resolve(g, card):
             g.m["magister_wipes"] += 1
         else:
             for c in [x for x in g.graveyard if x.is_creature]:
-                g.graveyard.remove(c)
+                remove_card(g.graveyard, c)
                 g.board.append(Permanent(card=c, sick=True))
                 g.m["magister_returns"] += 1
     elif s == "shell_game":
@@ -899,7 +899,7 @@ def resolve(g, card):
                 if c.types & {"Artifact", "Creature", "Enchantment"}]
         if pool:
             best = max(pool, key=lambda c: c.priority)
-            g.graveyard.remove(best)
+            remove_card(g.graveyard, best)
             g.hand.append(best)
     elif s == "lieutenants":
         _mine, theirs = V.dilemma(g, "lieutenants")
@@ -1013,7 +1013,7 @@ def _tutor(g, pred):
     if not pool:
         return
     best = max(pool, key=lambda c: c.priority)
-    g.library.remove(best)
+    remove_card(g.library, best)
     g.hand.append(best)
 
 
@@ -1455,7 +1455,7 @@ def walker_step(g) -> None:
             if pool:
                 pick = next((c for c in pool if c.name == "Time Sieve"),
                             max(pool, key=lambda c: c.priority))
-                g.library.remove(pick)
+                remove_card(g.library, pick)
                 crn_shuffle(g, "dyfed_search", g.library)
                 perm.counters -= 6
                 g.m["dyfed_tutors"] += 1

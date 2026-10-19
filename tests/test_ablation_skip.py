@@ -2,7 +2,7 @@
 """Ablation plays only the games a blank can change (§0z145).
 
     python -m tests.test_ablation_skip
-    python -m tests.test_ablation_skip --mutate   # 6 mutations, exact sets
+    python -m tests.test_ablation_skip --mutate   # 8 mutations, exact sets
 
 The baseline records what each game read of each library card; a game that
 read no field on which the card and its blank differ is the baseline's game,
@@ -35,6 +35,13 @@ CASES
      value-EQUAL copies (two basic Forests, two equal nonlands), removing
      each card in turn leaves the same objects in the same order, and a card
      not in the list raises ValueError (§0z146)
+  H  `engine.want_max` is `max(cards, key=want_key)`, the same OBJECT, on
+     2,000 random pools of lands and spells with tied tiers, bands,
+     priorities and mana values, lands short and not (§0z148)
+  I  `want_max` reads no `priority` outside the best band: with lands short
+     a land is taken and no spell's priority is read; with two castable
+     spells and an uncastable one, the castable two are read and the
+     uncastable one is not (§0z148)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the hook records no field reads                -> B, C, D, F
@@ -48,6 +55,18 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   properties are not tracked by value (no _PROP_BIT) -> C, D
   `remove_card` removes the first card with the same is_land and cost
                                                  -> G
+  (§0z148, both written before their run)
+  `want_max` keeps the LAST of the tied cards     -> H
+  `want_max` reads every card's tail (the plain max over `want_key`)
+                                                 -> I
+
+  The first run of these broke two sets more than written. "No field reads"
+  broke I as well, rightly: I sees `priority` through the same hook, and
+  its set was not updated when I was added -- a transcript, not a
+  prediction (§0z14). And the first stand-in for "the last of the tied"
+  ranked every card by the full `want_key`, so it ALSO read every tail and
+  broke I: it was not the defect it named. Replaced by one that reads tails
+  inside the band only, and H written before its run.
 
 UNMUTATED (§0z15): A is the neighbour -- tracking must change no game. E is
 the guard the mutations would hide behind if B and F audited, which is why B
@@ -240,6 +259,61 @@ def run_cases():
         raised = True
     check("G remove_card is list.remove, duplicates included", (same, raised),
           (True, True))
+
+    class Pilot:
+        """The three hooks `want_key` asks, nothing else."""
+        board, hand, cfg = [], [], {}
+
+        def __init__(self, tiers=None, ranks=None, short=None):
+            self.tiers, self.ranks, self.short = tiers or {}, ranks or {}, short
+
+        def want_tier(self, c):
+            return self.tiers.get(id(c), 0)
+
+        def lands_wanted(self, n):
+            return self.short
+
+        def land_rank(self, c):
+            return self.ranks.get(id(c), 0.0)
+
+    def spell(name, mv, priority):
+        return EN.Card(name=name, types=frozenset({"Sorcery"}),
+                       cost={"gen": mv}, priority=priority)
+
+    def land(name):
+        return EN.Card(name=name, types=frozenset({"Land"}), is_land=True,
+                       produces=frozenset("G"))
+
+    rng = _random.Random(148)
+    same = True
+    for _ in range(2000):
+        pool = [land(f"L{k}") if rng.random() < 0.3
+                else spell(f"S{k}", rng.randrange(0, 5),
+                           rng.choice((1.0, 2.0, 2.0, 3.0)))
+                for k in range(rng.randrange(1, 11))]
+        g = Pilot({id(c): 1 for c in pool if rng.random() < 0.15},
+                  {id(c): rng.choice((0.0, 0.5, 1.0)) for c in pool},
+                  rng.random() < 0.5)
+        lands, mana = rng.randrange(0, 3), rng.randrange(0, 5)
+        want = max(pool, key=lambda c: EN.want_key(g, c, lands, mana))
+        same &= EN.want_max(g, pool, lands, mana) is want
+    check("H want_max is max over want_key, the same card", same, True)
+
+    prio = bit_of("priority")
+    forest, bear, elk, big = (land("Forest"), spell("Bear", 2, 3.0),
+                              spell("Elk", 2, 2.0), spell("Big", 7, 9.0))
+    with AB.tracking_reads() as seen:
+        took_land = EN.want_max(Pilot(short=True), [bear, forest, big],
+                                0, 3) is forest
+        short_reads = [seen.get(id(c), 0) & prio for c in (bear, big)]
+        seen.clear()
+        took_bear = EN.want_max(Pilot(short=False), [big, elk, forest, bear],
+                                1, 3) is bear
+        band_reads = [bool(seen.get(id(c), 0) & prio)
+                      for c in (bear, elk, big)]
+    check("I want_max reads priority only inside the best band",
+          (took_land, short_reads, took_bear, band_reads),
+          (True, [0, 0], True, [True, True, False]))
     return set(FAIL)
 
 
@@ -263,12 +337,21 @@ def main() -> int:
                 return
         raise ValueError("not in list")
 
+    def last_tied(g, cards, lands, mana):
+        bands = [EN.want_band(g, c, lands, mana) for c in cards]
+        tied = [c for c, b in zip(cards, bands) if b == max(bands)]
+        best = max(EN.want_within(g, c) for c in tied)
+        return [c for c in tied if EN.want_within(g, c) == best][-1]
+
+    def plain_max(g, cards, lands, mana):
+        return max(cards, key=lambda c: EN.want_key(g, c, lands, mana))
+
     def no_unsafe(card, blank):
         return real_mask(card, blank) & ~AB.UNSAFE
 
     muts = {
         "the hook records no field reads":
-            ({"B", "C", "D", "F"}, "_FIELD_BIT",
+            ({"B", "C", "D", "F", "I"}, "_FIELD_BIT",
              {k: 0 for k in real_bits}),
         "`__dict__` counts as neutral":
             ({"C"}, "_NEUTRAL", real_neutral | {"__dict__"}),
@@ -280,6 +363,10 @@ def main() -> int:
             ({"C", "D"}, "_PROP_BIT", {}),
         "`remove_card` removes the first card with the same is_land and cost":
             ({"G"}, EN, "remove_card", first_same_cost),
+        "`want_max` keeps the last of the tied cards":
+            ({"H"}, EN, "want_max", last_tied),
+        "`want_max` reads every card's tail":
+            ({"I"}, EN, "want_max", plain_max),
     }
     bad = 0
     for label, spec in muts.items():

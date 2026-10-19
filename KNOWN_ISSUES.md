@@ -200,6 +200,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z145](#0z145) | BUILT | **Ablation skips the games a blank cannot change**: bit-identical (rendmaw's committed N=15,000 cache 64/64; every deck at N=1,000); 1.10x (azusa) to 2.3x (rendmaw) faster -- azusa's library scans read every card's name |
 | [0z146](#0z146) | BUILT | **Azusa's skip blockers removed**: Forest searches test `is_land` first, `engine.remove_card`, properties by value; azusa's ablation 1.10x -> 1.64x, trostani 1.63x; bit-identical (azusa's full cache 58/58) |
 | [0z147](#0z147) | BUILT | **Azusa prices only the card it casts**: `engine.can_afford` and `choose_mode_cost`; an azusa game 22% faster, its ablation 1.46x (2.8x with the skip); every game bit-identical |
+| [0z148](#0z148) | BUILT | **Lorehold's skip blockers removed**, and karlov's, shilgengar's, tivit's: `remove_card`, `is_land`/`is_permanent` gates, `want_max`; ablations 1.17x-1.97x faster, every row and game bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13154,6 +13155,111 @@ model's cost, not overhead. The same lazy pricing would serve every engine's
 
 Every cache's fingerprint moved (`engine.py`, `azusa.py`, `pending.py`); the
 six active caches are recorded VERIFIED on the evidence above.
+
+<a id="0z148"></a>
+
+## 0z148. BUILT -- lorehold's skip blockers removed, and three other decks': the same games, fewer of them played
+
+**2026-10-19, the owner: "work on item 27"**, whose first open half was
+lorehold, the deck the ablation skip (§0z145) helped least. A probe of the
+FIRST read that makes each (game, card) pair unskippable, with the zone the
+card was in when it was read (150 games, seeds 5000-5149, T20 with the T10
+snapshot), put lorehold at **67.7% of pairs unskippable**, 63% of them first
+blocked on a card still in the LIBRARY:
+
+| first blocking read | share |
+|---|---|
+| `list.remove`'s `==` in `engine.crack_land_fetch` (every card above the fetched land) | 18.0% |
+| Land Tax's `x.name == "Plains"` over the whole library | 16.5% |
+| `want_key`'s `priority`, from Gamble ranking the whole library (`tutor_take`) | 15.4% |
+| `pure_response`'s `name`, a card in HAND | 8.3% |
+| Enlightened Tutor's pool, `types` of every library card | 7.9% |
+| the miracle window's reads of the card just drawn (`types`, `script`, `tags`) | ~17% |
+| `list.remove`'s `==` elsewhere (tutor, play_land, mulligan, upkeep discards) | ~11% |
+
+§0z146 named a fourth blocker, `want_key`'s `priority` "a real read: Top and
+scry look at the cards". Most of it was not Top but GAMBLE, which ranks the
+whole library and so read every card's priority, including cards a band
+already ruled out.
+
+**Four bit-identical changes:**
+
+1. **`engine.remove_card` replaces every `.remove` on a library, hand or
+   graveyard** in `engine.py` (10), `lorehold.py` (22), `karlov.py` (3),
+   `shilgengar.py` (9) and `tivit.py` (5). It removes the element
+   `list.remove` removes (§0z146, `tests/test_ablation_skip.py` case G).
+   Azusa's were done in §0z146; trostani's are untouched (SUSPENDED).
+2. **A basic-land search tests `is_land` first**: lorehold's and karlov's
+   Land Tax, shilgengar's Wayfarer's Bauble. Only a land is named Plains or
+   Swamp.
+3. **An artifact-or-enchantment pool tests `is_permanent` first**:
+   lorehold's and karlov's Enlightened Tutor, tivit's `tutor_ench`. Both
+   types are permanent types, so the answer is unchanged. `is_permanent` is
+   compared by VALUE (§0z146): an Instant's Sorcery blank gives the same
+   answer, so an instant or sorcery in the library is no longer read.
+   A noncreature permanent's blank is a Sorcery, so that read is real.
+4. **`engine.want_max`** is `max(cards, key=want_key)` reading the tail
+   (`priority`, then mana value; or a land's rank) only for the cards tied
+   in the best BAND (tier, then land-short / castable / not / flood).
+   `want_key` is now `want_band + want_within`, one rule in two halves;
+   `want_best` and `want_order` call `want_max`. Tuples compare head first,
+   so a card outside the best band loses whatever its tail, and inside it
+   `max` keeps the first of equal keys, as it did.
+
+**After** (the same probe):
+
+| deck | unskippable before | after | what is left |
+|---|---|---|---|
+| lorehold | 67.7% | **46.7%** | cards in hand (`hold_answer`), the card drawn in a miracle window, Gamble's castable band |
+| karlov | 39.8% | **23.6%** | hand (`pure_response`, 62% of what is left); Enlightened Tutor's noncreature permanents |
+| shilgengar | 39.1% | **21.2%** | hand, 94% |
+| tivit | 49.5% | **42.3%** | the generic tutor ranks every nonland card by `priority` (a real read); hand |
+| rendmaw | 20.5% | 20.5% | hand, 98% -- a floor |
+| azusa | 33.9% | 33.9% | hand, 82% (§0z146) |
+
+What is left is a FLOOR, checked: with lorehold's miracle-window, hand and
+`pilot_may_cast` reads all ignored, its share moves only 46.7% -> 46.5%,
+because each of those cards is read again by the next thing that plays it.
+A card that is drawn is played. Trostani's are library scans (`tutor_pick`,
+`x_plan`, its tutor's pool), left while it is SUSPENDED.
+
+**Bit-identical, checked:**
+
+- every game's FULL output, 3,000 seeds x 7 decks on `build_pending`'s
+  lists, T20 with the T10 snapshot, against a worktree at `b06bcdd`:
+  **21,000 of 21,000 identical**. The comparison can fail: `want_max` keeping
+  the LAST of tied cards moved 148 lorehold, 116 karlov and 1,112 azusa
+  games of 3,000;
+- `check_unchanged_decks --include-suspended --old-at=b06bcdd`:
+  BIT-IDENTICAL on all seven decks;
+- `tests/test_ablation_skip.py` gains H (`want_max` returns the same OBJECT
+  as `max` over `want_key`, 2,000 random pools with tied bands, priorities
+  and mana values) and I (no `priority` read outside the best band), and
+  two mutations. Their first run broke one set more than written for two of
+  them, and the docstring says which and why. One was an old mutation whose
+  set was not updated for I. The other was a stand-in that was not its
+  defect.
+
+**Measured** (each deck's ablation in skip mode, N=1,000, horizons 10 and 20,
+four cores, Python 3.11, `ablation_stream` alone so no cache is written; old
+at `b06bcdd` then new, one run each, on an otherwise idle machine whose
+noise is about 5%):
+
+| deck | old | new | speedup | rows |
+|---|---|---|---|---|
+| lorehold | 73.6 s | 54.0 s | **1.36x** | 65 of 65 identical |
+| karlov | 34.2 s | 23.4 s | **1.46x** | 64 of 64 identical |
+| shilgengar | 46.5 s | 23.6 s | **1.97x** | 64 of 64 identical |
+| tivit | 54.9 s | 46.9 s | **1.17x** | 65 of 65 identical |
+
+Every row the new code printed is the row the old code printed, to the
+last bit, at every horizon and metric. The skip audit (one skipped game in
+50 played anyway) passed in every run. Rendmaw and azusa are unchanged: their
+blockers were already hand reads.
+
+Every cache's fingerprint moved (`engine.py`, `lorehold.py`, `karlov.py`,
+`shilgengar.py`, `tivit.py`); the six active caches are recorded VERIFIED on
+the evidence above.
 
 ## How to read an ablation table
 
