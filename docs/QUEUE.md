@@ -199,10 +199,19 @@ What is closed and where it went:
     24%, 39% -> 21%, 50% -> 42%; ablations 1.36x, 1.46x, 1.97x and 1.17x
     faster, every row identical. What is left in every deck is mostly cards
     in hand, a floor (trostani's library scans wait while it is SUSPENDED).
-    What is left of this item is the cost of a GAME. The ablation skip
-    now plays a third of azusa's games, so azusa -- the slowest table, and
-    the parallel
-    rebuild's wall time -- gains next from a cheaper GAME (about 12 ms
+    **THE COST OF A GAME DONE (§0z149)**: every active engine's main phase
+    prices only the card it casts (`engine.lazy_pay_of`), `Board` finds a
+    permanent by name before `==`, `is_creature_now` no longer imports per
+    call; games 7-21% faster, ablations 1.06x-1.24x, every game and row
+    bit-identical. **What is left**:
+    azusa's landfall (Springheart's payment, Scute's boards), which is the
+    model's cost; trostani's library scans and main phase, while SUSPENDED;
+    and `_can_pay` sorting every unit to take one or two (a few percent, in
+    the solver every deck shares). The owner's call whether that closes it.
+    What follows is the item as it was profiled before §0z147. The
+    ablation skip now plays a third of azusa's games, so azusa -- the
+    slowest table, and the parallel rebuild's wall time -- gains next from
+    a cheaper GAME (about 12 ms
     against about 7 for the other decks). A cProfile of 300 games (profiler
     shares, inflated for small calls): `main_phase` runs about four times a
     turn and is half the game; inside it `available_mana` (azusa's own,

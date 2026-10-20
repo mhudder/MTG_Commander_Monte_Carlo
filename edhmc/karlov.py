@@ -38,7 +38,7 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, run_etb, engine_cfg, choose_mode,
+                          spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -1218,21 +1218,24 @@ def main_phase(g):
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
-            mode = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c),
-                                                     units), units)
+            # Only the card cast is priced (§0z149).
+            mode = choose_mode_cost(c, OPP.wipe_mode_cost(
+                g, c, reduce_cost(g, c), units), units)
             if mode is not None:
-                options.append((c, mode[2]))
+                options.append((c, None))
                 mode_cost[id(c)] = mode[0]
         for c in lurrus_pool(g):
-            mode = choose_mode(c, reduce_cost(g, c), units)
+            mode = choose_mode_cost(c, reduce_cost(g, c), units)
             if mode is not None:
-                options.append((c, mode[2]))
+                options.append((c, None))
                 mode_cost[id(c)] = mode[0]
         if not options:
             break
-        card, pay = lookahead_pick(          # item 18; greedy unless enabled
+        pay_of = lazy_pay_of(mode_cost, units)
+        pick = lookahead_pick(               # item 18; greedy unless enabled
             g, options, units, lambda it: (it[0].priority, it[0].mv),
-            cost_of=lambda it: mode_cost[id(it[0])], pay_of=lambda it: it[1])
+            cost_of=lambda it: mode_cost[id(it[0])], pay_of=pay_of)
+        card, pay = pick[0], pay_of(pick)
         spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
         if any(c is card for c in g.hand):

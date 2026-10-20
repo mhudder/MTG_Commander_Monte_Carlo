@@ -138,7 +138,8 @@ import random
 from edhmc.engine import (remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, engine_cfg, choose_mode,
+                          spend, play_land, engine_cfg, choose_mode_cost,
+                          lazy_pay_of, can_afford as afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, thomil_step, lord_of_the_pit_card,
@@ -796,8 +797,7 @@ class ShilgengarGame(BaseGame):
     def can_afford(self, cost):
         """Affordability INCLUDING Treasures, without spending anything."""
         units = available_mana(self)
-        return can_pay(cost, units
-                       + [self.ANY] * self.spendable_treasures()) is not None
+        return afford(cost, units + [self.ANY] * self.spendable_treasures())
 
     def ult_reserve(self):
         """Mana to hold back through the main phase for the ultimate.
@@ -1062,24 +1062,27 @@ class ShilgengarGame(BaseGame):
                 if OPP.hold_answer(self, c):      # item 24, change 2
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
-                _m = choose_mode(c, OPP.wipe_mode_cost(
+                # Only the card cast is priced (§0z149).
+                _m = choose_mode_cost(c, OPP.wipe_mode_cost(
                     self, c, self.herald_cost(c), pool), pool)
-                pay = None if _m is None else _m[2]
                 # THE RESERVE COUNTS THE WHOLE POOL, Treasures included: what
                 # it exists to protect is the three mana the ultimate needs
                 # after combat, and a Treasure pays that as well as a land
                 # does. Reading it off `units` alone would hold lands back
                 # while a pile of Treasures sat unspent beside them, which is
                 # the policy artefact §0t warned about rather than a cost.
-                if pay is not None and len(pool) - len(pay) >= reserve:
-                    options.append((c, pay))
+                # A payment spends one unit per mana of its cost.
+                if (_m is not None
+                        and len(pool) - sum(_m[0].values()) >= reserve):
+                    options.append((c, None))
                     mode_cost[id(c)] = _m[0]
             if not options:
                 break
-            card, pay = lookahead_pick(      # item 18; greedy unless enabled
+            pay_of = lazy_pay_of(mode_cost, pool)
+            pick = lookahead_pick(           # item 18; greedy unless enabled
                 self, options, pool, lambda it: (it[0].priority, it[0].mv),
-                cost_of=lambda it: mode_cost[id(it[0])],
-                pay_of=lambda it: it[1])
+                cost_of=lambda it: mode_cost[id(it[0])], pay_of=pay_of)
+            card, pay = pick[0], pay_of(pick)
             real = [i for i in pay if i < n_real]
             used = len(pay) - len(real)
             spend(self, real, units)

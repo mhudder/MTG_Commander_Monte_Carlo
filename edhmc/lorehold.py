@@ -31,7 +31,7 @@ import random
 
 from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
-                          engine_cfg, choose_mode,
+                          engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng, tutor_take, remove_card)
 from edhmc import opponents as OPP
@@ -2639,6 +2639,7 @@ def _main_phase(g, reserve=0):
 
         n_lands = sum(1 for p in g.board if p.card.is_land)
         options = []
+        mode_cost = {}
         for c in g.hand:
             if c.is_land or hold_for_miracle(g, c):
                 continue
@@ -2661,12 +2662,15 @@ def _main_phase(g, reserve=0):
             # Mizzix's Mastery's overload now respects the mana RESERVE like
             # every other cost, where the old special case was applied after
             # the reserve check and could spend straight through it.
-            mode = choose_mode(c, reduce_cost(g, c), units)
+            # Only the card cast is priced (§0z149). A payment spends one
+            # unit per mana of its cost, so the reserve reads the cost.
+            mode = choose_mode_cost(c, reduce_cost(g, c), units)
             if mode is None:
                 continue
-            cost, _tag, idx = mode
-            if len(units) - len(idx) >= reserve:
-                options.append((c, cost, idx))
+            cost, _tag = mode
+            if len(units) - sum(cost.values()) >= reserve:
+                options.append((c, cost, None))
+                mode_cost[id(c)] = cost
         # A card's own flashback, from the graveyard (2026-10-09). The pool
         # is recomputed every pass, as Past in Flames' is (§0z19).
         flashed = flashback_options(g, units, reserve)
@@ -2675,10 +2679,11 @@ def _main_phase(g, reserve=0):
             break
 
         # item 18: greedy unless `cast_lookahead`. The third element is the
-        # payment `choose_mode` proved, which is what the lookahead reads.
+        # payment, built only when the lookahead reads it (§0z149).
         card, cost, _ = lookahead_pick(
             g, options, units, lambda it: (it[0].priority, it[0].mv),
-            cost_of=lambda it: it[1], pay_of=lambda it: it[2])
+            cost_of=lambda it: it[1],
+            pay_of=lazy_pay_of(mode_cost, units, slot=2))
         idx = g.spells_this_turn
         g.spells_this_turn += 1
         paid = pay(g, cost, units)

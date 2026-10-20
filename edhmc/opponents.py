@@ -871,15 +871,25 @@ def is_creature_now(g, perm) -> bool:
     worse than no switch. One correction, one knob.
 
     The import is deferred because `engine` imports this module, not the other
-    way round. It is a `sys.modules` lookup after the first call, and this is
-    not one of the hot paths — `has()` is.
+    way round. It used to run on every call, on the claim that this was not a
+    hot path; measured (§0z149), the import statement was 0.8 of the call's
+    1.15 microseconds, and the call is about 6% of a game -- every board scan
+    in this module asks it. The MODULE is kept after the first call and the
+    function read off it each time, so a mutation that replaces
+    `engine.is_battlefield_creature` is still the function called.
     """
     if not perm.card.is_creature:
         return False
     if not g.cfg.get("pod_reads_battlefield_creatures", True):
         return True                      # the pre-fix reading: the type line
-    from edhmc.engine import is_battlefield_creature
-    return is_battlefield_creature(g, perm)
+    global _ENGINE
+    if _ENGINE is None:
+        import edhmc.engine
+        _ENGINE = edhmc.engine
+    return _ENGINE.is_battlefield_creature(g, perm)
+
+
+_ENGINE = None          # edhmc.engine, once `is_creature_now` has needed it
 
 
 def threat_of(g, perm) -> float:
@@ -3525,7 +3535,6 @@ def should_cast_own_wipe(g, card=None) -> bool:
         mine = sum(1 for p in g.board if is_creature_now(g, p))
         theirs = sum(o.creatures for o in living(g))
     else:
-        dying = [p for p in g.board if is_creature_now(g, p)]
         if measure == "cost":
             # What THIS sweeper takes (§0z118): Culling Ritual spares the
             # commander, Promise of Loyalty keeps one creature a side.
@@ -3536,6 +3545,10 @@ def should_cast_own_wipe(g, card=None) -> bool:
             elif (wipe_destroys(card)
                   and g.cfg.get("own_wipe_indestructible", True)):
                 dying = [p for p in dying if not is_hardy(g, p)]
+        else:
+            # The whole board, built only where it is read (§0z149): under
+            # "cost" it was built and thrown away on every call.
+            dying = [p for p in g.board if is_creature_now(g, p)]
         mine = sum(max(0, g.power_of(p)) for p in dying)
         theirs = sum((o.creatures - (pod_left_for_gate(g, card, o)
                                      if measure == "cost" else 0.0))

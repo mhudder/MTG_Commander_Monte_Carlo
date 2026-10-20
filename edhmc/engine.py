@@ -234,9 +234,34 @@ class Board(list):
         self._add(perm)
 
     def remove(self, perm):
-        i = super().index(perm)
+        i = self._find(perm)
+        if i < 0:
+            raise ValueError("Board.remove(x): x not in board")
         self._drop(super().__getitem__(i))
         super().__delitem__(i)
+
+    def __contains__(self, perm):
+        return self._find(perm) >= 0
+
+    def _find(self, perm) -> int:
+        """`list.index`'s answer (-1 for absent), reading less (§0z149). It
+        takes the first entry that IS `perm` or EQUALS it, and a Permanent's
+        dataclass `==` compares every field, its Card's included, of every
+        entry ahead of the one found -- on an azusa board of Scute Swarm
+        tokens, most of `crack_fetch`'s time. Equal permanents hold equal
+        cards, and equal cards have equal names, so a different name rules an
+        entry out before `==` is asked; the entry found is the one `index`
+        found. Anything that is not a Permanent gets the list's own scan."""
+        if not isinstance(perm, Permanent):
+            try:
+                return super().index(perm)
+            except ValueError:
+                return -1
+        name = perm.card.name
+        for i, q in enumerate(list.__iter__(self)):
+            if q is perm or (q.card.name == name and q == perm):
+                return i
+        return -1
 
     def extend(self, it):
         for p in it:
@@ -1084,6 +1109,30 @@ def choose_mode_cost(card: Card, base_cost: dict, units):
         if best is None or key > best[0]:
             best = (key, cost, tag)
     return None if best is None else (best[1], best[2])
+
+
+def lazy_pay_of(mode_cost: dict, pool, pools: Optional[dict] = None,
+                slot: int = 1):
+    """A `pay_of` for a main phase that prices only the card it casts
+    (§0z149; azusa's since §0z147). An option is `(card, pay, ...)`, or its
+    payment sits at `slot`; one whose payment is None is priced on first
+    use, once, from `mode_cost[id(card)]`
+    against the pool it was found affordable in -- `pools[id(card)]`, else
+    `pool` -- and one that carries a payment returns it. It is the payment
+    `choose_mode` would have built: `choose_mode_cost` picks `choose_mode`'s
+    mode (`tests/test_payment_shortcuts.py` C) and `can_pay` is a function of
+    the cost and the pool, so the pool must not change between the two."""
+    pays = {}
+
+    def pay_of(it):
+        if it[slot] is not None:
+            return it[slot]
+        k = id(it[0])
+        if k not in pays:
+            pays[k] = can_pay(mode_cost[k],
+                              pools[k] if pools and k in pools else pool)
+        return pays[k]
+    return pay_of
 
 
 def engine_cfg(cfg: dict) -> dict:
@@ -2661,6 +2710,7 @@ def available_mana(g: Game) -> list[frozenset]:
     any_color = frozenset({"B", "G", "C"})
     all_lands_any = g.has("Dryad of the Ilysian Grove")
     demand = hand_colour_demand(g)
+    wants: dict = {}            # per colour set: twenty Forests ask once
 
     def add(src, n, owner):
         # (tap order, how badly the hand wants this source's colours, power).
@@ -2668,7 +2718,10 @@ def available_mana(g: Game) -> list[frozenset]:
         # creature -- and the hand's demand breaks ties inside a tier, so the
         # last source of a colour something in hand needs is spent last.
         rank, power = tap_reluctance(g, owner)
-        want = max((demand.get(c, 0) for c in src), default=0)
+        want = wants.get(src)
+        if want is None:
+            want = wants[src] = max((demand.get(c, 0) for c in src),
+                                    default=0)
         units.extend([src] * n)
         owners.extend([owner] * n)
         weights.extend([(rank, want, power)] * n)
@@ -3016,10 +3069,12 @@ def main_phase(g: Game, precombat: bool = False):
             # A card is not one cost: Impending deploys Overlord of the
             # Hauntwoods for {1}{G}{G} instead of {3}{G}{G}, at the price of
             # it being a noncreature enchantment for four turns.
-            mode = choose_mode(c, cost_after_reduction(g, c), units)
+            # Only the card cast is priced (§0z149): the option carries None
+            # and `pay_of` builds the payment of the one picked.
+            mode = choose_mode_cost(c, cost_after_reduction(g, c), units)
             if mode is not None:
-                _cost, tag, pay = mode
-                options.append((c, pay, tag))
+                _cost, tag = mode
+                options.append((c, None, tag))
                 mode_cost[id(c)] = _cost
         if not precombat:
             wicker = wickerfolk_option(g, units)        # §0z125
@@ -3042,13 +3097,14 @@ def main_phase(g: Game, precombat: bool = False):
 
         # An Altar-enabled pick has no mode cost to price, so the lookahead
         # sits that iteration out.
+        pay_of = lazy_pay_of(mode_cost, units)
         if all(id(it[0]) in mode_cost for it in options):
-            card, pay, alt_tag = lookahead_pick(
+            pick = lookahead_pick(
                 g, options, units, rank,
-                cost_of=lambda it: mode_cost[id(it[0])],
-                pay_of=lambda it: it[1])
+                cost_of=lambda it: mode_cost[id(it[0])], pay_of=pay_of)
         else:
-            card, pay, alt_tag = max(options, key=rank)
+            pick = max(options, key=rank)
+        card, alt_tag, pay = pick[0], pick[2], pay_of(pick)
         spend(g, pay, units)
         if alt_tag == "graveyard":
             wickerfolk_additional_costs(g, card)     # §0z125

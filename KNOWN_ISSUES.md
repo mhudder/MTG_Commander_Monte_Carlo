@@ -201,6 +201,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z146](#0z146) | BUILT | **Azusa's skip blockers removed**: Forest searches test `is_land` first, `engine.remove_card`, properties by value; azusa's ablation 1.10x -> 1.64x, trostani 1.63x; bit-identical (azusa's full cache 58/58) |
 | [0z147](#0z147) | BUILT | **Azusa prices only the card it casts**: `engine.can_afford` and `choose_mode_cost`; an azusa game 22% faster, its ablation 1.46x (2.8x with the skip); every game bit-identical |
 | [0z148](#0z148) | BUILT | **Lorehold's skip blockers removed**, and karlov's, shilgengar's, tivit's: `remove_card`, `is_land`/`is_permanent` gates, `want_max`; ablations 1.17x-1.97x faster, every row and game bit-identical |
+| [0z149](#0z149) | BUILT | **The cost of a game**: every main phase prices only the card it casts (`lazy_pay_of`), `Board` finds by name before `==`, `is_creature_now`'s import hoisted; games 7-21% faster, every game bit-identical |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13260,6 +13261,120 @@ blockers were already hand reads.
 Every cache's fingerprint moved (`engine.py`, `lorehold.py`, `karlov.py`,
 `shilgengar.py`, `tivit.py`); the six active caches are recorded VERIFIED on
 the evidence above.
+
+<a id="0z149"></a>
+
+## 0z149. BUILT -- the cost of a game: 7% to 21% off every deck's game, every game the same
+
+**2026-10-20, the owner: "do the per-game cost next"**, queue item 27's other
+half. Profiled with py-spy (1,500 games a deck, seeds 5000-6499, T20 with the
+T10 snapshot, 500 Hz), the costs every deck shared were:
+
+| where | share of a game |
+|---|---|
+| `choose_mode` in the main phase: every affordable card in hand priced, one payment used | 7-12% (every deck but azusa, §0z147) |
+| `opponents.is_creature_now`, under every board scan in the pod | 5-6% |
+| `should_cast_own_wipe`: a whole-board creature list built, then discarded under "cost" | 1-2% |
+| `available_mana`'s `add`: the hand's demand re-read for every land | 2-3% |
+| tivit's `affordable`: a full payment built for a yes or no | 9% |
+| azusa's `Board.remove` and `in board`: the dataclass `==` on every permanent ahead | 3-5% |
+
+**Six bit-identical changes:**
+
+1. **`engine.lazy_pay_of`**, azusa's pay-on-first-use (§0z147) as one shared
+   function: an option carries None for its payment, and the one picked (or
+   the ones the lookahead reads) is priced from the mode `choose_mode_cost`
+   chose, against the pool it was found affordable in. Rendmaw, lorehold,
+   karlov, tivit and shilgengar's main phases use it. Lorehold's and
+   shilgengar's mana reserve read `len(payment)`, which is
+   `sum(cost.values())`: a payment spends one unit per mana of its cost, and
+   every cost in the seven lists has only the seven mana keys (checked). The
+   pool is not changed between pricing and paying anywhere; `altar_enable`
+   extends it only when there are no other options, and its pick carries its
+   own payment. Trostani is untouched (SUSPENDED).
+2. **Tivit's `affordable` and shilgengar's `can_afford` ask
+   `engine.can_afford`**, which is `can_pay(...) is not None` exactly
+   (§0z147).
+3. **`Board._find`** serves `remove`, `__contains__` and the old
+   `list.index`: the first entry that IS the permanent or EQUALS it, with a
+   different card NAME ruling an entry out before the dataclass `==` runs.
+   Equal permanents hold equal cards, and equal cards have equal names, so
+   the same entry is found, duplicates included. Anything that is not a
+   Permanent gets the list's own scan. Every engine's `p in g.board` goes
+   through it.
+4. **`opponents.is_creature_now` keeps the engine MODULE** after its first
+   call instead of running `from edhmc.engine import ...` every time. The
+   docstring said this was "not one of the hot paths". Measured, the import
+   statement was 0.79 of the call's 1.15 microseconds; the call now takes
+   0.42. The function is read off the module per call, so a mutation that
+   replaces `engine.is_battlefield_creature` still reaches it.
+5. **`should_cast_own_wipe` builds the whole-board list only under the
+   measures that read it** ("count", "power"); under "cost", the default, it
+   was built and replaced on the next line.
+6. **`available_mana` memoises the hand's demand per colour set**, as
+   `_can_pay` already memoises scarcity: twenty Forests ask once. And
+   azusa's last eleven `.remove` calls on its hand and graveyard go through
+   `engine.remove_card` (§0z146 did its library).
+
+**Bit-identical, checked:**
+
+- every game's FULL output, 3,000 seeds x 7 decks on `build_pending`'s
+  lists, T20 with the T10 snapshot, against a clean worktree at `370abdb`:
+  **21,000 of 21,000 identical**;
+- `check_unchanged_decks --include-suspended --old-at=370abdb`:
+  BIT-IDENTICAL on all seven decks;
+- `tests/test_game_cost.py` (new): A `lazy_pay_of` is `choose_mode`'s
+  payment on 3,000 random cards and pools, at either slot, in the option's
+  own pool; B `Board._find` is `list.index` over 300 boards of equal but
+  distinct permanents; C `is_creature_now` reads the engine's function at
+  call time. Three mutations, each set written before its run and each
+  breaking exactly its case. The second one CRASHED in B on its first run
+  instead of failing it, and B now records that as a disagreement.
+
+**Measured, a game** (process time per game, the minimum of three rounds of
+800 games; old at `370abdb` and new run side by side, so both carry the same
+load):
+
+| deck | old | new | change |
+|---|---|---|---|
+| rendmaw | 6.55 ms | 5.50 ms | -16% |
+| lorehold | 7.41 ms | 6.55 ms | -12% |
+| karlov | 5.91 ms | 5.39 ms | -9% |
+| tivit | 7.02 ms | 5.56 ms | -21% |
+| shilgengar | 6.45 ms | 5.87 ms | -9% |
+| azusa | 11.96 ms | 11.15 ms | -7% |
+
+**Measured, an ablation** (skip mode, N=1,000, horizons 10 and 20, four
+cores, `ablation_stream` alone so no cache is written; old at `370abdb`, then
+new, one run each):
+
+| deck | old | new | speedup | rows |
+|---|---|---|---|---|
+| rendmaw | 30.7 s | 26.5 s | **1.16x** | 64 of 64 identical |
+| lorehold | 70.3 s | 65.6 s | **1.07x** | 65 of 65 identical |
+| karlov | 32.1 s | 30.2 s | **1.06x** | 64 of 64 identical |
+| tivit | 63.4 s | 51.2 s | **1.24x** | 65 of 65 identical |
+| shilgengar | 30.6 s | 28.0 s | **1.09x** | 64 of 64 identical |
+| azusa | 109.6 s | 94.2 s | **1.16x** | 58 of 58 identical |
+
+The ablation gains less than the game, because the baseline's tracked pass
+(`tracking_reads`) and the pool's start-up do not shrink with it. **Read the
+ratios, not the seconds.** This machine runs the same code at different
+speeds on different days: §0z148's NEW lorehold was 54.0 s, and the same code
+here is the OLD side at 70.3 s.
+
+**What is left.** Azusa is still about twice any other deck. Two thirds of
+what remains is landfall: Springheart Nantuko builds the pool and pays {1}{G}
+on every landfall (about 7% of a game, a real payment), Scute Swarm's tokens
+(4%), and the boards Scute builds, which every loop over the board pays for.
+That is the model's cost, not overhead (§0z147). One idea was not taken:
+`_can_pay`'s generic step sorts every remaining unit to take one or two, and
+a `min` over `(owner_free, static, index)` would pick the same units without
+the sort. It is a few percent, and it changes the shared solver every deck
+relies on.
+
+Every cache's fingerprint moved (`engine.py`, `opponents.py` and five
+engines); the six active caches are recorded VERIFIED on the evidence above.
 
 ## How to read an ablation table
 

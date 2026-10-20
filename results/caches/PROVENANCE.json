@@ -468,6 +468,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "b7c4818521d9b0fb",
         "utc": "2026-10-19T13:41:17Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "47e7ec99d2d5e763",
+        "utc": "2026-10-20T18:32:57Z"
       }
     ]
   },
@@ -875,6 +881,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "74e80f8e6b133741",
         "utc": "2026-10-19T13:41:16Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "de3d2b466f2151e8",
+        "utc": "2026-10-20T18:32:56Z"
       }
     ]
   },
@@ -1289,6 +1301,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "6055a1b415259157",
         "utc": "2026-10-19T13:41:16Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "4b0cd2d434728a19",
+        "utc": "2026-10-20T18:32:56Z"
       }
     ]
   },
@@ -1681,6 +1699,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "93f31e0a8028fa31",
         "utc": "2026-10-19T13:41:16Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "23965850116c9737",
+        "utc": "2026-10-20T18:32:55Z"
       }
     ]
   },
@@ -2115,6 +2139,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "1032721ecb517f75",
         "utc": "2026-10-19T13:41:17Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "5c4668e6e7da2941",
+        "utc": "2026-10-20T18:32:56Z"
       }
     ]
   },
@@ -2494,6 +2524,12 @@
         "evidence": "2026-10-19, \u00a70z148 (engine.remove_card at every zone remove in engine, lorehold, karlov, shilgengar, tivit; is_land / is_permanent gates on library searches; engine.want_max). Against a worktree at b06bcdd: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=b06bcdd BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "dd31f544b4e599fe",
         "utc": "2026-10-19T13:41:16Z"
+      },
+      {
+        "commit": "370abdb",
+        "evidence": "2026-10-20, \u00a70z149 (engine.lazy_pay_of in every active main phase; Board._find; is_creature_now keeps the engine module; should_cast_own_wipe's dead list; available_mana memoises demand; azusa's hand/graveyard remove_card). Against a clean worktree at 370abdb: every game's full output on build_pending's list, seeds 5000..7999 at T20 with the T10 snapshot, 3,000 of 3,000 identical; check_unchanged_decks --include-suspended --old-at=370abdb BIT-IDENTICAL on all 8 metrics; ablation at N=1,000, every row identical.",
+        "fingerprint": "0e88e96f5068df24",
+        "utc": "2026-10-20T18:32:56Z"
       }
     ]
   },

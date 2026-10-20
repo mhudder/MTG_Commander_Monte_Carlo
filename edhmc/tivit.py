@@ -52,7 +52,8 @@ from __future__ import annotations
 import random
 
 from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
-                          engine_cfg, choose_mode,
+                          engine_cfg, choose_mode_cost, lazy_pay_of,
+                          can_afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, walker_ready, walker_dies_at_zero)
@@ -485,7 +486,7 @@ def pay(g, cost, powerstones: bool = False) -> bool:
 
 
 def affordable(g, cost, powerstones: bool = False) -> bool:
-    return can_pay(cost, mana_units(g, powerstones)) is not None
+    return can_afford(cost, mana_units(g, powerstones))
 
 
 # ---------------------------------------------------------------------------
@@ -687,6 +688,8 @@ def main_phase(g):
                 continue
 
         options = []
+        pools = {}
+        mode_cost = {}
         units = mana_units(g)
         for c in g.hand:
             if c.is_land:
@@ -711,18 +714,22 @@ def main_phase(g):
             # pool is only different when a Powerstone is untapped.
             pool = (mana_units(g, True) if "Artifact" in c.types
                     and untapped_powerstones(g) else units)
-            _m = choose_mode(c, OPP.wipe_mode_cost(g, c, reduce_cost(g, c),
-                                                   pool), pool)
+            # Only the lookahead reads an option's payment (§0z149).
+            _m = choose_mode_cost(c, OPP.wipe_mode_cost(
+                g, c, reduce_cost(g, c), pool), pool)
             if _m is not None:
-                options.append((c, _m[2], _m[0]))
+                options.append((c, None, _m[0]))
+                mode_cost[id(c)] = _m[0]
+                pools[id(c)] = pool
         if not options:
             return
         # item 18: greedy unless `cast_lookahead`. Tivit's own `pay` makes
-        # the payment below; the one `choose_mode` proved is what the
-        # lookahead reads, the same pool every option was priced against.
+        # the payment below; the one the lookahead reads is built on demand
+        # from the pool each option was found affordable in (§0z149).
         card = lookahead_pick(
             g, options, units, lambda it: (it[0].priority, it[0].mv),
-            cost_of=lambda it: it[2], pay_of=lambda it: it[1])[0]
+            cost_of=lambda it: it[2],
+            pay_of=lazy_pay_of(mode_cost, units, pools))[0]
         if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card),
                                          units),
                    powerstones="Artifact" in card.types):

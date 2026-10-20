@@ -2023,11 +2023,11 @@ class AzusaGame(BaseGame):
                 break
             self.m[f"lands_from_{zone}"] += 1
             if zone == "hand":
-                self.hand.remove(card)
+                remove_card(self.hand, card)
             elif zone == "library":
                 self.library.pop()
             else:
-                self.graveyard.remove(card)
+                remove_card(self.graveyard, card)
             self.land_drops_used += 1
             self.m["lands_played"] += 1
             # A LAND IS DEPLOYED HERE AND NEVER GOES THROUGH resolve(), so the
@@ -2129,7 +2129,7 @@ class AzusaGame(BaseGame):
         elif script == "regrowth1":
             if self.graveyard:
                 best = max(self.graveyard, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 self.hand.append(best)
         elif script == "splendid_reclamation":
             # "Return all land cards from your graveyard to the battlefield
@@ -2152,14 +2152,14 @@ class AzusaGame(BaseGame):
             for c in pool:
                 if c not in self.graveyard:
                     continue
-                self.graveyard.remove(c)
+                remove_card(self.graveyard, c)
                 self.make_permanent(c, tapped=True)
                 self.land_entered(c, played=False)
                 self.m["reclaimed_lands"] += 1
         elif script == "loam":
             pool = [c for c in self.graveyard if c.is_land][:3]
             for c in pool:
-                self.graveyard.remove(c)
+                remove_card(self.graveyard, c)
                 self.hand.append(c)
         elif script in ("cultivate", "seek_horizon", "journey_of_discovery",
                         "realms_uncharted"):
@@ -2283,7 +2283,7 @@ class AzusaGame(BaseGame):
         elif card.name == "Eternal Witness":
             if self.graveyard:
                 best = max(self.graveyard, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 self.hand.append(best)
         elif card.name == "Woodland Bellower":
             self.tutor_creature(3, nonlegendary_only=True)
@@ -2296,7 +2296,7 @@ class AzusaGame(BaseGame):
             pool = [c for c in self.graveyard if c.is_land]
             if pool:
                 best = max(pool, key=lambda c: c.mv)
-                self.graveyard.remove(best)
+                remove_card(self.graveyard, best)
                 self.make_permanent(best, sick=False)
                 self.land_entered(best, played=False)
         elif card.name == "Bane of Progress":
@@ -2355,7 +2355,7 @@ class AzusaGame(BaseGame):
                 land = next((c for c in self.hand if c.is_land), None)
                 if land is None:
                     break
-                self.hand.remove(land)
+                remove_card(self.hand, land)
                 self.make_permanent(land, tapped=True)
                 self.m["colossus_lands"] += 1
                 self.land_entered(land, played=False)
@@ -2505,7 +2505,7 @@ class AzusaGame(BaseGame):
             return
         best, zone = max(pool, key=lambda it: (it[0].mv, it[1] == "graveyard"))
         if zone == "graveyard":
-            self.graveyard.remove(best)
+            remove_card(self.graveyard, best)
             self.m["finale_from_yard"] += 1
         else:
             remove_card(self.library, best)
@@ -3205,7 +3205,7 @@ class AzusaGame(BaseGame):
             if from_top:
                 self.library.pop()
             else:
-                self.hand.remove(card)
+                remove_card(self.hand, card)
             idx = self.spells_this_turn
             self.spells_this_turn += 1
             if card.is_creature:
@@ -3648,7 +3648,7 @@ class AzusaGame(BaseGame):
                                         c.name != "Forest", c.name))
         self.board.remove(field)
         self.land_died(field.card)
-        self.graveyard.remove(pick)
+        remove_card(self.graveyard, pick)
         self.hand.append(pick)
         self.m["petrified_returns"] += 1
 

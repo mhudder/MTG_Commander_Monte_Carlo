@@ -274,6 +274,12 @@ findings in `CLAUDE.md` and are not repeated here.
   for commander damage (§0z65). A replacement `chump` (a mutation, a
   diagnostic) must keep both, or commander damage reads a different block
   than the damage total did.
+- **A main-phase option carries no payment** (§0z149; azusa since
+  §0z147). `choose_mode_cost` finds the card affordable and
+  `engine.lazy_pay_of` builds the payment of the one picked, from the pool
+  it was found affordable in -- so nothing may change that pool between the
+  option loop and the cast. A reserve that read `len(payment)` reads
+  `sum(cost.values())`, the same number.
 - **`engine_cfg` copies the cfg** because five engines `setdefault` their own
   knobs into it; construct games on a fresh `dict(DEFAULT_CFG, …)` and never
   share one dict across engines.
