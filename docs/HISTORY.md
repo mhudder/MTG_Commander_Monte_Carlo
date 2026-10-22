@@ -2810,3 +2810,47 @@ owner's decision on the one that fell inside its bar.
     of its table.
     **CLOSED 2026-10-15**: the owner kept Anointed Procession ("keep
     Anointed Procession for now").
+
+## Queued items closed 2026-10-22 — moved from `docs/QUEUE.md`
+
+Closed by §0z147, §0z148 and §0z149: azusa's pricing, the ablation skip's
+blockers in four decks, and the cost of a game in every active engine. Every
+change bit-identical, every game and every ablation row checked.
+
+27. **RUNTIME: AZUSA'S COST PER GAME, AND LOREHOLD'S SKIP BLOCKERS** (queued
+    2026-10-18, §0z145, §0z146). **AZUSA'S PRICING DONE (§0z147)**: it
+    prices only the card it casts; a game 22% faster, its table 1.46x.
+    What is left of azusa is below as it was profiled before that, and in
+    §0z147 as it stands after; the same lazy pricing would serve every
+    engine's `main_phase`. **LOREHOLD'S BLOCKERS DONE (§0z148)**, with
+    karlov's, shilgengar's and tivit's: unskippable pairs 68% -> 47%, 40% ->
+    24%, 39% -> 21%, 50% -> 42%; ablations 1.36x, 1.46x, 1.97x and 1.17x
+    faster, every row identical. What is left in every deck is mostly cards
+    in hand, a floor (trostani's library scans wait while it is SUSPENDED).
+    **THE COST OF A GAME DONE (§0z149)**: every active engine's main phase
+    prices only the card it casts (`engine.lazy_pay_of`), `Board` finds a
+    permanent by name before `==`, `is_creature_now` no longer imports per
+    call; games 7-21% faster, ablations 1.06x-1.24x, every game and row
+    bit-identical. **What is left**:
+    azusa's landfall (Springheart's payment, Scute's boards), which is the
+    model's cost; trostani's library scans and main phase, while SUSPENDED;
+    and `_can_pay` sorting every unit to take one or two (a few percent, in
+    the solver every deck shares). The owner's call whether that closes it.
+    What follows is the item as it was profiled before §0z147. The
+    ablation skip now plays a third of azusa's games, so azusa -- the
+    slowest table, and the parallel rebuild's wall time -- gains next from
+    a cheaper GAME (about 12 ms
+    against about 7 for the other decks). A cProfile of 300 games (profiler
+    shares, inflated for small calls): `main_phase` runs about four times a
+    turn and is half the game; inside it `available_mana` (azusa's own,
+    with `hand_colour_demand`) is rebuilt about 2.7 times per call and
+    `choose_mode`/`can_pay` asks every card in hand on every pass
+    (`_can_pay` about 20%, `available_mana` about 15%); `land_entered` ->
+    `_landfall_payoffs` is about 11%, a cascade of some thirty
+    `self.count(name)` lookups and `make_tokens` calls per landfall, most
+    with a count of 0; the snapshot's `copy.deepcopy` of the metrics dict
+    about 2%. Every change is bit-identical or it is not this item.
+    **CLOSED 2026-10-22** by the owner ("close item 27"), with what is left
+    as §0z149 states it: azusa's landfall (Springheart's payment, Scute's
+    boards) is the model's cost; trostani's scans and main phase wait while
+    it is SUSPENDED; `_can_pay`'s sort-to-take-one was not taken.
