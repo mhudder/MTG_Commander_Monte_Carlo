@@ -1,0 +1,23 @@
+rendmaw: 64 rows, 1 moved beyond the wider bar (1 up, 0 down)
+  Coat of Arms                       +0.0089±0.0030 both -> +0.0136±0.0031 both  (+0.0047) MODEL-EVALUATED
+lorehold: 65 rows, 3 moved beyond the wider bar (2 up, 1 down)
+  Blasphemous Act                    +0.0094±0.0032 FLIP -> +0.0177±0.0039 FLIP  (+0.0083) PARTLY
+  Rise of the Eldrazi                +0.0371±0.0035 both -> +0.0427±0.0037 both  (+0.0056) MODEL-EVALUATED
+  Volcanic Vision                    +0.0157±0.0027 both -> +0.0129±0.0027 both  (-0.0028) PARTLY
+karlov: 64 rows, 1 moved beyond the wider bar (1 up, 0 down)
+  Sorin, Vengeful Bloodlord          +0.0107±0.0023 both -> +0.0135±0.0026 both  (+0.0028) MODEL-EVALUATED
+tivit: 65 rows, 2 moved beyond the wider bar (1 up, 1 down)
+  Tyrant's Choice                    +0.0027±0.0019 both -> +0.0075±0.0021 both  (+0.0048) MODEL-EVALUATED
+  Messenger Jays                     +0.0087±0.0029 both -> +0.0050±0.0030 both  (-0.0037) MODEL-EVALUATED
+shilgengar: 64 rows, 0 moved beyond the wider bar (0 up, 0 down)
+azusa: 58 rows, 10 moved beyond the wider bar (7 up, 3 down)
+  Momentous Fall                     +0.0035±0.0025 both -> +0.0104±0.0030 both  (+0.0069) MODEL-EVALUATED
+  Exploration                        +0.0065±0.0032 both -> +0.0021±0.0033  dmg  (-0.0044) MODEL-EVALUATED
+  Seer's Sundial                     +0.0005±0.0034  dmg -> -0.0035±0.0035 both  (-0.0040) MODEL-EVALUATED
+  Ramunap Excavator                  +0.0113±0.0035 both -> +0.0151±0.0036 both  (+0.0038) MODEL-EVALUATED
+  Realms Uncharted                   +0.0069±0.0029 both -> +0.0107±0.0033 both  (+0.0038) MODEL-EVALUATED
+  Seek the Horizon                   +0.0060±0.0028 both -> +0.0094±0.0030 both  (+0.0034) MODEL-EVALUATED
+  Chord of Calling                   +0.0070±0.0022 both -> +0.0037±0.0025 both  (-0.0033) MODEL-EVALUATED
+  Regrowth                           +0.0041±0.0027 both -> +0.0073±0.0028 both  (+0.0032) MODEL-EVALUATED
+  Woodland Bellower                  +0.0063±0.0026 both -> +0.0094±0.0028 both  (+0.0031) MODEL-EVALUATED
+  Memory Jar                         +0.0013±0.0024  dmg -> +0.0039±0.0025 both  (+0.0026) MODEL-BLIND

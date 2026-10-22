@@ -206,6 +206,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z151](#0z151) | FIXED | **§0z116's remainder**: "can't be countered", cast triggers on countered spells, Pathways, two life costs, one Land Tax and one Tithe, Elesh Norn, Kalitas, Sorin's +1/+0; two generator blind spots. Every fix a switch |
 | [0z152](#0z152) | REBUILT | **§0z151's parallel rebuild**, six tables at `418490f` (tivit at `5efcb70`, Time Sieve 11), 21 min wall: 9 rows moved beyond their bars, each one a fix's own card -- Elesh Norn +0.0182 |
 | [0z153](#0z153) | FIXED | **Queue item 5's last lines**: §0z116's one-liners in six engines, lorehold's extra turn as a whole turn, the Reservoir at instant speed, Sorin's loyalty; eight owner calls. Every fix a switch |
+| [0z154](#0z154) | REBUILT | **§0z153's parallel rebuild**, six tables at `c7a1e02`, 30 min wall: 17 rows moved beyond their bars, azusa's ten around Realms Uncharted's binned lands and the new search shuffles |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13724,6 +13725,48 @@ whose creature deaths make Treasures, so the pile is bigger when it is
 read. And azusa's shuffle row is wide (±0.0066) because a shuffle re-orders
 the whole library and breaks the pairing on everything after it -- noise,
 not an effect.
+
+<a id="0z154"></a>
+
+## 0z154. REBUILT -- §0z153's batch in every active table
+
+One parallel rebuild (`.claude/skills/parallel-rebuild`), six legs launched
+14:47 UTC at `c7a1e02`: rendmaw 14:52, shilgengar 14:54, karlov 14:55, tivit
+14:58, lorehold 15:11, azusa 15:17 -- **30 minutes wall** (azusa's games
+are dearer with the shuffles and Realms Uncharted). Every leg on Python
+3.13.16, numpy 2.4.6; the close-out on a matching venv, where
+`tools.repro_row` reproduced azusa's Momentous Fall and lorehold's
+Blasphemous Act IDENTICALLY first. Shards merged; every active cache
+CURRENT. trostani is SUSPENDED and was not rebuilt.
+
+**What moved** (`results/rebuild_diffs_20261022b.txt`, T20 win rate beyond
+the wider of the two bars): 17 of 380 rows.
+
+| deck | card | before | after | why |
+|---|---|---|---|---|
+| lorehold | Blasphemous Act | +0.0094 | **+0.0177** | it counts the pod's creatures (§0z153: +0.0088) |
+| lorehold | Rise of the Eldrazi | +0.0371 | **+0.0427** | its extra turn is a whole turn, before the pod |
+| lorehold | Volcanic Vision | +0.0157 | **+0.0129** | not traced |
+| rendmaw | Coat of Arms | +0.0089 | **+0.0136** | every shared type, not attacking Birds |
+| karlov | Sorin, Vengeful Bloodlord | +0.0107 | **+0.0135** | its loyalty abilities |
+| tivit | Tyrant's Choice | +0.0027 | **+0.0075** | the death mode |
+| tivit | Messenger Jays | +0.0087 | **+0.0050** | its discards |
+| azusa | Momentous Fall | +0.0035 | **+0.0104** | the biggest safe sacrifice |
+| azusa | Realms Uncharted | +0.0069 | **+0.0107** | four lands, two kept |
+| azusa | Ramunap Excavator | +0.0113 | **+0.0151** | Realms' two binned lands are its to play |
+| azusa | Regrowth | +0.0041 | **+0.0073** | ... and its to return |
+| azusa | Seek the Horizon | +0.0060 | **+0.0094** | not traced |
+| azusa | Woodland Bellower | +0.0063 | **+0.0094** | not traced |
+| azusa | Chord of Calling | +0.0070 | **+0.0037** | not traced |
+| azusa | Exploration | +0.0065 | **+0.0021** | not traced |
+| azusa | Seer's Sundial | +0.0005 | **-0.0035** | not traced |
+| azusa | Memory Jar (MODEL-BLIND) | +0.0013 | **+0.0039** | a blind row: §0z66, not evidence |
+
+**The rows marked "not traced" all sit around azusa's library
+order**, which every search now reshuffles (§0z153's `search_shuffle`,
+inside its own bar at ±0.0066): a search that kept a known top card, or a
+card that reads the top, moved. That is a mechanism, not a measurement --
+none of the five was measured alone. shilgengar: no row moved.
 
 ## How to read an ablation table
 
