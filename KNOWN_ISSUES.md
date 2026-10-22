@@ -204,6 +204,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z149](#0z149) | BUILT | **The cost of a game**: every main phase prices only the card it casts (`lazy_pay_of`), `Board` finds by name before `==`, `is_creature_now`'s import hoisted; games 7-21% faster, every game bit-identical |
 | [0z150](#0z150) | DECIDED | **Time Sieve 9 → 11 re-measured on POD_V4, and ADOPTED** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. Adopted 2026-10-22 |
 | [0z151](#0z151) | FIXED | **§0z116's remainder**: "can't be countered", cast triggers on countered spells, Pathways, two life costs, one Land Tax and one Tithe, Elesh Norn, Kalitas, Sorin's +1/+0; two generator blind spots. Every fix a switch |
+| [0z152](#0z152) | REBUILT | **§0z151's parallel rebuild**, six tables at `418490f` (tivit at `5efcb70`, Time Sieve 11), 21 min wall: 9 rows moved beyond their bars, each one a fix's own card -- Elesh Norn +0.0182 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13561,6 +13562,50 @@ moves by nothing**: Void Rend and Dovin's Veto are below
 `counter_threshold`, so the table never tried, and its countered Kitten
 blinks are rare. The batch is not the sum of its rows: the fixes share
 games.
+
+<a id="0z152"></a>
+
+## 0z152. REBUILT -- §0z151's batch and Time Sieve 11 in every active table
+
+**2026-10-22, the owner's call** ("shared + per-card batch", then the
+rebuild). One parallel rebuild (`.claude/skills/parallel-rebuild`), six legs
+launched 02:12 UTC at `418490f`: rendmaw 02:17, shilgengar 02:18, karlov
+02:19, lorehold 02:25, azusa 02:33 -- **21 minutes wall**, against §0z140's
+58 (the ablation skip and the cheaper game, §0z145-§0z149). The owner then
+adopted Time Sieve at 11 (§0z150), which moves tivit's fingerprint alone;
+tivit's leg was relaunched at `5efcb70` (02:25-02:39) and its `418490f`
+table superseded. Every leg on Python 3.13.16, numpy 2.4.6; the close-out ran
+on a 3.13.16 venv with the same pins (§0z119), and `tools.repro_row`
+reproduced tivit's Time Sieve and shilgengar's Elesh Norn IDENTICALLY first.
+Shards merged; every active cache CURRENT; `check_docs` green. trostani is
+SUSPENDED and was not rebuilt.
+
+**What moved** (`results/rebuild_diffs_20261022.txt`: every row whose T20
+win rate moved by more than the wider of its two bars). Nine of 380 rows,
+and each is a card the batch touched or the priority it changed:
+
+| deck | card | before | after | why |
+|---|---|---|---|---|
+| shilgengar | Elesh Norn | +0.0052 | **+0.0234** | her -2/-2 and the commander's +2/+2; §0z151 measured +0.0181 |
+| lorehold | Rise of the Eldrazi | +0.0315 | **+0.0371** | "can't be countered": threat 9, the table's favourite target |
+| lorehold | Hexing Squelcher | +0.0000 | **+0.0042** | its two "can't be countered" clauses, blind until now |
+| karlov | Sorin, Solemn Visitor | +0.0124 | **+0.0171** | the +1/+0 |
+| karlov | Kalitas | +0.0026 | **+0.0051** | the replacement's Zombies |
+| karlov | Voice of the Blessed | +0.0016 | **+0.0036** | more lifegain events: the Reservoir on countered spells and the commander |
+| tivit | Time Sieve | +0.0313 | **+0.0375** | priority 11 |
+| tivit | Demonic Tutor | +0.0189 | **+0.0252** | the shared want order reads priority, so it finds the Sieve sooner |
+| tivit | Mirkwood Bats | +0.0291 | **+0.0221** | cast later, behind the Sieve |
+
+**rendmaw and azusa: no row moved beyond its bar**, though both baselines
+moved (+0.0056 and +0.0019 at T20, §0z151). Rendmaw's Massacre Wurm and Bow
+of Nylea changed label, not number. Noise floors: rendmaw ±0.0024, lorehold
+±0.0032, karlov ±0.0025, tivit ±0.0028, shilgengar ±0.0027, azusa ±0.0032.
+
+**Staged swaps were measured before §0z151, and two touch it**: lorehold's
+`+Sunbird's Invocation` and `+Caldera Pyremaw` are cast triggers, which now
+fire on a countered spell too (and karlov's `+Bolas's Citadel` digs through
+`countered`). The tables measure the staged lists, so these rows ARE current;
+the head-to-head swap numbers in the ledger are not re-measured here.
 
 ## How to read an ablation table
 

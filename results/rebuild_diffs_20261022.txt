@@ -1,0 +1,15 @@
+rendmaw: 64 rows, 0 moved beyond the wider bar (0 up, 0 down)
+lorehold: 65 rows, 2 moved beyond the wider bar (2 up, 0 down)
+  Rise of the Eldrazi                +0.0315±0.0033 both -> +0.0371±0.0035 both  (+0.0056) MODEL-EVALUATED
+  Hexing Squelcher                   +0.0000±0.0017  dmg -> +0.0042±0.0023 both  (+0.0042) PARTLY
+karlov: 64 rows, 3 moved beyond the wider bar (3 up, 0 down)
+  Sorin, Solemn Visitor              +0.0124±0.0029 both -> +0.0171±0.0030 both  (+0.0047) MODEL-EVALUATED
+  Kalitas, Traitor of Ghet           +0.0026±0.0015 both -> +0.0051±0.0019 both  (+0.0025) PARTLY
+  Voice of the Blessed               +0.0016±0.0019  dmg -> +0.0036±0.0019 both  (+0.0020) MODEL-EVALUATED
+tivit: 65 rows, 3 moved beyond the wider bar (2 up, 1 down)
+  Mirkwood Bats                      +0.0291±0.0040 both -> +0.0221±0.0034 both  (-0.0070) MODEL-EVALUATED
+  Demonic Tutor                      +0.0189±0.0034 both -> +0.0252±0.0034 both  (+0.0063) MODEL-EVALUATED
+  Time Sieve                         +0.0313±0.0034 both -> +0.0375±0.0046 both  (+0.0062) MODEL-EVALUATED
+shilgengar: 64 rows, 1 moved beyond the wider bar (1 up, 0 down)
+  Elesh Norn, Grand Cenobite         +0.0052±0.0026 both -> +0.0234±0.0033 both  (+0.0182) MODEL-EVALUATED
+azusa: 58 rows, 0 moved beyond the wider bar (0 up, 0 down)
