@@ -10163,7 +10163,7 @@ ability; `fetch_waits` now gives it none, in every engine.
 > | rendmaw's Massacre Wurm | read like shilgengar's since POD_V4 (item 24); **relabelled SCRIPTED §0z151**, and shilgengar's ETB takes route pieces as rendmaw's does |
 > | Biotransference, Midnight Reaper, Gamble, Bloodghast, Crop Rotation, Storm Cauldron blind though visible | **FIXED** by §0z117 and item 24 (§0z129, §0z135, §0z139) |
 > | Hexing Squelcher blind though visible | **FIXED §0z151** ("can't be countered"); PARTLY_MODELLED (ward) |
-> | Haywire Mite, Bow of Nylea | still KNOWN_BLIND: their activated answers are `ANSWER_NOT_MODELLED`; Bow's attacking deathtouch **FIXED §0z151** |
+> | Haywire Mite, Bow of Nylea | their activated answers are `ANSWER_NOT_MODELLED`; Haywire Mite still KNOWN_BLIND; Bow's attacking deathtouch **FIXED §0z151**, PARTLY_MODELLED |
 > | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
 > | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
 > | Extra turns: tivit vs lorehold | OPEN |
@@ -13482,8 +13482,9 @@ metric of every engine.
   (`wurm_route_pieces`, `opponents.minus_two_pod`), as rendmaw's did.
 * **Bow of Nylea's "attacking creatures you control have deathtouch"**,
   Ohran Frostfang's exact words, read by `deathtouch_of` now too
-  (`bow_deathtouch`). It stays KNOWN_BLIND: still identical to its blank on
-  the label test's 40 seeds, because a chump blocker dies without it.
+  (`bow_deathtouch`). PARTLY_MODELLED now: identical to its blank on the
+  label test's 40 seeds (a chump blocker dies without deathtouch), but not
+  at 15,000 -- +0.0004 ±0.0004 at T20.
 
 ### Per card
 
@@ -13508,8 +13509,8 @@ metric of every engine.
 
 ### Labels
 
-Massacre Wurm (rendmaw) SCRIPTED; Hexing Squelcher and Kalitas
-PARTLY_MODELLED. The three tables were re-rendered from their caches for the
+Massacre Wurm (rendmaw) SCRIPTED; Hexing Squelcher, Kalitas and Bow of
+Nylea PARTLY_MODELLED. The three tables were re-rendered from their caches for the
 labels (numbers unchanged). `test_triage`'s case D used the Squelcher as its
 pure body; no blind creature is left in any deck, so D and the new case N
 (the matched blank keeps the body, which A could no longer see) use a
@@ -13517,8 +13518,47 @@ constructed card.
 
 ### What each fix is worth
 
-Measured with `diagnostics/run_oracle_remainder.py` at N=15,000, paired: the
-run was in progress when this was committed, and its table follows.
+`diagnostics/run_oracle_remainder.py`, N=15,000, staged lists, seeds 5000..,
+paired at one commit: every switch on, minus that one off
+(`results/oracle_remainder_20261022.txt`). Win rate; * outside its bar.
+
+| deck | fix | T10 | T20 |
+|---|---|---|---|
+| shilgengar | **Elesh Norn** (`norn_text`) | **+0.0025 ±0.0010** | **+0.0181 ±0.0025** |
+| shilgengar | Toxic/Unmaking life (`spell_life_costs`) | +0.0000 ±0.0002 | **-0.0041 ±0.0011** |
+| shilgengar | Wurm takes route pieces | -0.0002 ±0.0004 | **+0.0022 ±0.0012** |
+| shilgengar | Tithe, one rule | IDENTICAL | IDENTICAL |
+| shilgengar | **the batch** | **+0.0026 ±0.0012** | **+0.0150 ±0.0032** |
+| lorehold | **can't be countered** (Cavern on Lorehold) | **+0.0116 ±0.0021** | **+0.0116 ±0.0027** |
+| lorehold | Land Tax, one rule | **+0.0053 ±0.0035** | +0.0005 ±0.0037 |
+| lorehold | Tithe, one rule | **+0.0033 ±0.0018** | **+0.0027 ±0.0021** |
+| lorehold | cast triggers on a countered spell | **+0.0021 ±0.0014** | +0.0011 ±0.0018 |
+| lorehold | **the batch** | **+0.0203 ±0.0044** | **+0.0162 ±0.0052** |
+| karlov | Sorin's +1/+0 | **+0.0029 ±0.0011** | **+0.0029 ±0.0014** |
+| karlov | Kalitas | **+0.0019 ±0.0009** | **+0.0019 ±0.0012** |
+| karlov | Land Tax, one rule | +0.0017 ±0.0027 | **+0.0034 ±0.0030** |
+| karlov | can't be countered | **+0.0017 ±0.0009** | +0.0004 ±0.0013 |
+| karlov | life costs | **-0.0005 ±0.0003** | **-0.0013 ±0.0007** |
+| karlov | **the batch** | **+0.0080 ±0.0032** | **+0.0059 ±0.0040** |
+| rendmaw | can't be countered | **+0.0015 ±0.0007** | **+0.0047 ±0.0017** |
+| rendmaw | cast triggers on a countered spell | **+0.0020 ±0.0008** | **+0.0027 ±0.0012** |
+| rendmaw | Bow's deathtouch | +0.0000 ±0.0000 | **+0.0004 ±0.0004** |
+| rendmaw | **the batch** | **+0.0029 ±0.0013** | **+0.0056 ±0.0025** |
+| azusa | can't be countered (the batch) | **+0.0021 ±0.0010** | **+0.0019 ±0.0014** |
+| tivit | the batch | -0.0001 ±0.0006 | -0.0001 ±0.0006 |
+
+Inside their bars everywhere: Pathways (-0.0002 to -0.0011: the dual
+flattered, as expected), karlov's countered and commander cast triggers.
+
+**What carries it.** Elesh Norn's -2/-2 kills 0.49 of the pod's bodies a
+game and ends route pieces; her row was a 7-mana anthem with no
+commander. Cavern of Souls is most of "can't be countered": the commander
+is the spell the table counters, and lorehold's is cast and recast
+(`counters_shielded` 0.15 a game there, 0.04-0.05 elsewhere). **Tivit
+moves by nothing**: Void Rend and Dovin's Veto are below
+`counter_threshold`, so the table never tried, and its countered Kitten
+blinks are rare. The batch is not the sum of its rows: the fixes share
+games.
 
 ## How to read an ablation table
 

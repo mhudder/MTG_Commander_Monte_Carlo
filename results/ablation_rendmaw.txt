@@ -141,6 +141,11 @@ Pygmy Kavu                            +0.18+-0.06         +0.12+-0.08        +0.
       MODELLED (§0z132; the default pod since §0z140): the body, and a card for
       each black creature the pod's bodies hold. Their colour is
       `pod_black_share`, a judgement: the row reads that knob.
+Bow of Nylea                          +0.17+-0.04         +0.09+-0.06        +0.0019+-0.0018      both
+      MODELLED: 'Attacking creatures you control have deathtouch'
+      (`opponents.deathtouch_of`) -- worth +0.0004 ±0.0004 at T20, since a chump
+      blocker dies without it. NOT: the four {1}{G}, {T} modes (a counter, 2 to a
+      flier, 3 life, four cards back under the library). A floor.
 Shigeki, Jukai Visionary              -0.23+-0.06         -0.29+-0.08        +0.0039+-0.0022      both
       MODELLED: the 1/3, which stays home, and '{1}{G}, {T}, return Shigeki to
       hand: reveal four, a land onto the battlefield tapped, the rest to the
@@ -154,5 +159,4 @@ MODEL-BLIND — a low score is evidence about the MODEL, not the card
 card                                    damage T10          damage T20             win rate    signal
 Reap                                  +0.08+-0.04         +0.13+-0.06        +0.0013+-0.0015       dmg
 Haywire Mite                          +0.12+-0.04         +0.10+-0.04        +0.0040+-0.0014      both
-Bow of Nylea                          +0.17+-0.04         +0.09+-0.06        +0.0019+-0.0018      both
 Lignify                               +0.13+-0.05         +0.08+-0.07        +0.0017+-0.0017       dmg

@@ -1,0 +1,55 @@
+# §0z151, each fix's worth: python -m diagnostics.run_oracle_remainder 15000 OUTDIR (rendmaw re-run with bow_deathtouch)
+# at 5f7a3a7 (rendmaw) / ac068b9 + Bow-free code (other decks: their games do not read Bow), python 3.11.17, numpy 2.4.6, 2026-10-22
+# each row: every switch on minus that one off, staged lists, seeds 5000.., paired; T10 read off the T20 game (snapshot_rounds)
+
+§0z151: each fix = every switch on, minus that switch off (win rate, paired, 95% CI; * = outside its bar)
+
+rendmaw  (N=15000)
+  batch (all off)            T10 +0.0029 ±0.0013*   T20 +0.0056 ±0.0025*
+  uncounterable              T10 +0.0015 ±0.0007*   T20 +0.0047 ±0.0017*
+  cast_triggers_countered    T10 +0.0020 ±0.0008*   T20 +0.0027 ±0.0012*
+  modal_land_face            T10 -0.0005 ±0.0009    T20 -0.0009 ±0.0015 
+  spell_life_costs           T10 +0.0000 ±0.0000    T20 -0.0008 ±0.0005*
+  bow_deathtouch             T10 +0.0000 ±0.0000    T20 +0.0004 ±0.0004*
+  mechanism, a game (all on):  countered 0.650  counters_shielded 0.053  life_lost_to_own_cards 1.821  treasures_made 0.156  modal_land_faces 0.217  deluge_life_paid 0.155
+
+lorehold  (N=15000)
+  batch (all off)            T10 +0.0203 ±0.0044*   T20 +0.0162 ±0.0052*
+  uncounterable              T10 +0.0116 ±0.0021*   T20 +0.0116 ±0.0027*
+  cast_triggers_countered    T10 +0.0021 ±0.0014*   T20 +0.0011 ±0.0018 
+  modal_land_face            T10 -0.0007 ±0.0013    T20 -0.0002 ±0.0016 
+  land_tax_shared            T10 +0.0053 ±0.0035*   T20 +0.0005 ±0.0037 
+  tithe_shared               T10 +0.0033 ±0.0018*   T20 +0.0027 ±0.0021*
+  mechanism, a game (all on):  countered 0.667  counters_shielded 0.147  life_lost_to_own_cards 2.597  land_tax_fetches 1.310  treasures_made 4.400  modal_land_faces 0.272
+
+karlov  (N=15000)
+  batch (all off)            T10 +0.0080 ±0.0032*   T20 +0.0059 ±0.0040*
+  uncounterable              T10 +0.0017 ±0.0009*   T20 +0.0004 ±0.0013 
+  cast_triggers_countered    T10 +0.0004 ±0.0006    T20 -0.0007 ±0.0011 
+  commander_cast_triggers    T10 +0.0002 ±0.0008    T20 -0.0001 ±0.0012 
+  spell_life_costs           T10 -0.0005 ±0.0003*   T20 -0.0013 ±0.0007*
+  land_tax_shared            T10 +0.0017 ±0.0027    T20 +0.0034 ±0.0030*
+  kalitas_text               T10 +0.0019 ±0.0009*   T20 +0.0019 ±0.0012*
+  sorin_power                T10 +0.0029 ±0.0011*   T20 +0.0029 ±0.0014*
+  mechanism, a game (all on):  countered 0.881  counters_shielded 0.049  life_lost_to_own_cards 1.576  kalitas_zombies 0.218  land_tax_fetches 1.216  deluge_life_paid 0.211
+
+tivit  (N=15000)
+  batch (all off)            T10 -0.0001 ±0.0006    T20 -0.0001 ±0.0006 
+  uncounterable              T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000    IDENTICAL
+  cast_triggers_countered    T10 -0.0001 ±0.0006    T20 -0.0001 ±0.0006 
+  mechanism, a game (all on):  countered 0.953  life_lost_to_own_cards 1.319  treasures_made 42.311
+
+shilgengar  (N=15000)
+  batch (all off)            T10 +0.0026 ±0.0012*   T20 +0.0150 ±0.0032*
+  modal_land_face            T10 +0.0003 ±0.0005    T20 -0.0011 ±0.0014 
+  spell_life_costs           T10 +0.0000 ±0.0002    T20 -0.0041 ±0.0011*
+  tithe_shared               T10 +0.0000 ±0.0000    T20 +0.0000 ±0.0000    IDENTICAL
+  wurm_route_pieces          T10 -0.0002 ±0.0004    T20 +0.0022 ±0.0012*
+  norn_text                  T10 +0.0025 ±0.0010*   T20 +0.0181 ±0.0025*
+  mechanism, a game (all on):  countered 0.859  life_lost_to_own_cards 3.259  norn_kills 0.494  treasures_made 2.001  modal_land_faces 0.214
+
+azusa  (N=15000)
+  batch (all off)            T10 +0.0021 ±0.0010*   T20 +0.0019 ±0.0014*
+  uncounterable              T10 +0.0021 ±0.0010*   T20 +0.0019 ±0.0014*
+  mechanism, a game (all on):  countered 0.997  counters_shielded 0.044  life_lost_to_own_cards 2.437
+

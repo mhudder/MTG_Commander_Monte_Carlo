@@ -50,4 +50,8 @@ What is closed and where it went:
     (§0z111) and is back at 8.5. **Trostani's rebuild is deferred.**
 
 5.  Remaining per-deck gaps are in the STATUS block of each
-    `docs/ORACLE_AUDIT_*.md`.
+    `docs/ORACLE_AUDIT_*.md`, and in §0z116's own STATUS block: its
+    remainder was re-verified and fixed in §0z151 (2026-10-22), leaving
+    the extra-turn rule (tivit vs lorehold), karlov's Reservoir kill only
+    at upkeep, both Sorins' other abilities, and the "smaller departures"
+    one-liners, not re-verified.

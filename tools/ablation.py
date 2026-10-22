@@ -906,6 +906,13 @@ PARTLY_MODELLED = {
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
     },
     "rendmaw": {
+        # §0z151: its first line is Ohran Frostfang's, and is read now.
+        "Bow of Nylea":
+            "MODELLED: 'Attacking creatures you control have deathtouch' "
+            "(`opponents.deathtouch_of`) -- worth +0.0004 ±0.0004 at T20, "
+            "since a chump blocker dies without it. NOT: the four {1}{G}, "
+            "{T} modes (a counter, 2 to a flier, 3 life, four cards back "
+            "under the library). A floor.",
         # The owner's multi-type batch, 2026-10-10 (§0z125). Candidates.
         "H.E.R.B.I.E., Lovable Robot":
             "MODELLED: the 1/1 flier, {T}: Add {C} (a summoning-sick mana "
@@ -1742,7 +1749,7 @@ KNOWN_BLIND = {
     },
     "rendmaw": {
         # Biotransference left 2026-10-07: implemented (§0z117).
-        'Bow of Nylea',
+        # (Bow of Nylea left 2026-10-22 for PARTLY_MODELLED, §0z151.)
         'Haywire Mite',
         'Lignify',
         # (Massacre Wurm left 2026-10-22 for SCRIPTED, §0z151.)
