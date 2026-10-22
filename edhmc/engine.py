@@ -29,7 +29,7 @@ from typing import Callable, Optional
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
 from edhmc.decks._evasion import LAND_RULES, LAND_TYPES, MODAL_LANDS
-from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER
+from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER, CREATURE_SUBTYPES
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -1962,7 +1962,13 @@ class Game(BaseGame):
             base = 6
         else:
             base = perm.base_t if perm.is_token else perm.card.toughness
-        return base + perm.counters + swarmweaver_bonus(self, perm)
+        t = base + perm.counters + swarmweaver_bonus(self, perm)
+        # Beastmaster Ascension: "+5/+5" -- the toughness half was missing
+        # (§0z153, with the quest counters).
+        if (self.has("Beastmaster Ascension") and self.beast_active
+                and self.cfg.get("beast_quest", True)):
+            t += 5
+        return t
 
     # -- Rendmaw -------------------------------------------------------------
 
@@ -3049,8 +3055,14 @@ def main_phase(g: Game, precombat: bool = False):
                 davvol_trigger(g, perm)                      # §0z74
                 g.commander_cast = True
                 g.m["spells_cast"] += 1
-                g.make_tokens(1, 2, 2, "Bird", tapped=True)   # ETB
-                g.give_opponents_birds(1)                     # each player
+                # ROAMING THRONE doubles this trigger as it does the play
+                # trigger (§0z153, `throne_etb`): "a triggered ability of
+                # another creature you control of the chosen type".
+                n = 1 + (sum(1 for p in g.board
+                             if p.card.name == "Roaming Throne")
+                         if g.cfg.get("throne_etb", True) else 0)
+                g.make_tokens(n, 2, 2, "Bird", tapped=True)   # ETB
+                g.give_opponents_birds(n)                     # each player
                 continue
 
         options = []
@@ -3455,7 +3467,16 @@ def run_etb(g: Game, perm: Permanent):
     elif s == "overlord":
         make_everywhere(g)
     elif s == "gearhulk":
-        for p in g.board:
+        # "Distribute four +1/+1 counters among any number of target creatures
+        # you control." THE OWNER'S POLICY (2026-10-22, §0z153,
+        # `gearhulk_best`): all four on the best attacker -- a flier first,
+        # then the biggest. They went on the first creature in board order.
+        mine = [p for p in g.board if p.card.is_creature]
+        if g.cfg.get("gearhulk_best", True) and mine:
+            best = max(mine, key=lambda p: (OPP.flying_of(g, p),
+                                            g.power_of(p)))
+            best.counters += plus_counters(g, 4)
+        for p in ([] if g.cfg.get("gearhulk_best", True) else g.board):
             if p.card.is_creature:
                 p.counters += plus_counters(g, 4)
                 break
@@ -3594,7 +3615,15 @@ def upkeep(g: Game):
                 g.your_life -= 1
                 g.m["life_lost_to_own_cards"] += 1
         elif s == "ophiomancer":
-            if not any(x.is_token and x.card.name.startswith("Snake") for x in g.board):
+            # "if you control no Snakes": ANY Snake -- Sakura-Tribe Elder and
+            # Shigeki are Snakes by their type line (§0z153, `snake_types`).
+            if g.cfg.get("snake_types", True):
+                snakes = any("Snake" in creature_types(g, x) for x in g.board
+                             if is_battlefield_creature(g, x))
+            else:
+                snakes = any(x.is_token and x.card.name.startswith("Snake")
+                             for x in g.board)
+            if not snakes:
                 g.make_tokens(1, 1, 1, "Snake")
         elif s == "tendershoot":
             # "At the beginning of EACH upkeep, create a 1/1 Saproling." That
@@ -3767,6 +3796,7 @@ PLANESWALKER_LOYALTY = {
     "Venser, Visionary Traveler": 4,
     "Dyfed, the Guiding Hand": 4,
     "Elspeth, Sun's Champion": 4,          # trostani, 2026-10-01
+    "Sorin, Vengeful Bloodlord": 4,        # karlov, §0z153
 }
 
 # WHAT A DECK'S ENGINE MUST CONTAIN for a walker above to be ACTIVATED there,
@@ -3780,6 +3810,7 @@ WALKER_READERS = {
     "Venser, Visionary Traveler": '"Venser, Visionary Traveler"',
     "Dyfed, the Guiding Hand": '"Dyfed, the Guiding Hand"',
     "Elspeth, Sun's Champion": '"Elspeth, Sun\'s Champion"',
+    "Sorin, Vengeful Bloodlord": "sorin_bloodlord_step(",
 }
 
 
@@ -4835,6 +4866,39 @@ def make_everywhere(g: Game):
         is_token=g.cfg.get("everywhere_is_token", True)))
 
 
+def creature_types(g, perm) -> set:
+    """A creature's creature types (§0z153): a card's from its type line
+    (`_evasion.CREATURE_SUBTYPES`, generated), a token's from its name ("Bird
+    token" is a Bird), and Ooze for each of yours while March of the World
+    Ooze says "and are Oozes in addition to their other types"."""
+    c = perm.card
+    if perm.is_token:
+        kinds = set(c.name.replace(" token", "").split()) - {"Token"}
+    else:
+        kinds = set(CREATURE_SUBTYPES.get(c.name, ()))
+    if g.has("March of the World Ooze"):
+        kinds.add("Ooze")
+    return kinds
+
+
+def coat_bonus(g, perm) -> int:
+    """COAT OF ARMS: "Each creature gets +1/+1 for each other creature on the
+    battlefield that shares at least one creature type with it" (§0z153,
+    `coat_types`). Every creature of yours that shares a type, attacking or
+    not -- it counted attacking Birds only -- and the Birds Rendmaw gave the
+    pod, which are Birds. THE POD'S OWN CREATURES SHARE NO TYPE (the owner,
+    2026-10-22): they have none in this model."""
+    mine = creature_types(g, perm)
+    if not mine:
+        return 0
+    n = sum(1 for q in g.board if q is not perm
+            and is_battlefield_creature(g, q)
+            and mine & creature_types(g, q))
+    if "Bird" in mine:
+        n += sum(o.goaded_birds for o in OPP.living(g))
+    return n
+
+
 def combat(g: Game):
     herbie_surveil(g)        # "at the beginning of combat on your turn", §0z125
     # DEFENDER (702.3b) is the generated `_evasion.DEFENDER` (§0z125). No card
@@ -4846,7 +4910,18 @@ def combat(g: Game):
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
-    g.beast_active = (g.has("Beastmaster Ascension") and len(attackers) >= 7)
+    if g.cfg.get("beast_quest", True):
+        # "Whenever a creature you control attacks, you may put a quest
+        # counter" -- the counters STAY (§0z153); the old rule wanted seven
+        # attackers in one combat.
+        for p in g.board:
+            if p.card.name == "Beastmaster Ascension":
+                p.quest = getattr(p, "quest", 0) + len(attackers)
+        g.beast_active = any(getattr(p, "quest", 0) >= 7 for p in g.board
+                             if p.card.name == "Beastmaster Ascension")
+    else:
+        g.beast_active = (g.has("Beastmaster Ascension")
+                          and len(attackers) >= 7)
 
     attack_triggers(g, attackers)
     enters_attacking(g, attackers)          # Boulder, myriad: §0z125
@@ -4861,13 +4936,19 @@ def combat(g: Game):
     # Birds is pumped by (your other Birds + every Bird they were handed).
     # Note this is symmetric: their Birds get the same bonus, which
     # goaded_combat does not currently price in.
-    if g.has("Coat of Arms"):
+    if g.has("Coat of Arms") and g.cfg.get("coat_types", True):
+        dmg += sum(coat_bonus(g, p) for p in attackers) * g.count("Coat of Arms")
+    elif g.has("Coat of Arms"):
         birds = sum(1 for p in attackers if "Bird" in p.card.name)
         opp_birds = sum(o.goaded_birds for o in OPP.living(g))
         dmg += birds * max(0, birds - 1 + opp_birds)
 
-    # Ohran Frostfang: draw on connect
-    if g.has("Ohran Frostfang"):
+    # Ohran Frostfang: draw on connect. Since §0z153 (`frostfang_connect`)
+    # one card per attacker that DEALT combat damage to a player, read off
+    # `combat_hits` below; it drew per attacker, capped at five, before blocks.
+    frostfang_hits = (g.has("Ohran Frostfang")
+                      and g.cfg.get("frostfang_connect", True))
+    if g.has("Ohran Frostfang") and not frostfang_hits:
         g.draw(min(len(attackers), 5))
 
     # opponents block: chump the biggest attackers first. `scale` carries the
@@ -4908,7 +4989,13 @@ def combat(g: Game):
     # mattered. When derived_blocking is off there is no blocking model to
     # divide, so the flat haircut above is passed through as a lump.
     if combat_scale is not None:
+        if frostfang_hits:
+            g.combat_hits = []
         dmg = OPP.combat_damage(g, attackers, scale=combat_scale)
+        if frostfang_hits:
+            g.draw(len(g.combat_hits) * g.count("Ohran Frostfang"))
+            g.m["frostfang_draws"] += len(g.combat_hits)
+            g.combat_hits = None
     else:
         # derived_blocking=False is the legacy flat-haircut pod. It models no
         # blockers per defender, so there is nothing for the split to plan

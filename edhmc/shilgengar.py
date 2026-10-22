@@ -138,7 +138,7 @@ import random
 from edhmc.engine import (remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures,
+                          spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
                           lazy_pay_of, can_afford as afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -1216,7 +1216,11 @@ class ShilgengarGame(BaseGame):
         vault_of_the_archangel(self, attackers, lambda c: self.pay(c))
 
         for p in attackers:
-            p.tapped = True
+            # Speaker of the Heavens has VIGILANCE, read by name for its {T}
+            # (§0z153, `speaker_taps`); nothing else here reads tapping.
+            if not (p.card.name == "Speaker of the Heavens"
+                    and self.cfg.get("speaker_taps", True)):
+                p.tapped = True
             # Herald of War: "Whenever this creature attacks, put a +1/+1
             # counter on it." (§0z84)
             if p.card.name == "Herald of War" and self.cfg.get("herald_text", True):
@@ -1268,6 +1272,15 @@ class ShilgengarGame(BaseGame):
         self.m["single_reanimations"] += 1
 
     def upkeep(self):
+        # REVEL IN RICHES: "At the beginning of your upkeep, if you control
+        # ten or more Treasures, you win the game." (§0z153; it was checked
+        # at the end of your turn.) The pile has to survive the pod's round.
+        if (self.cfg.get("revel_at_upkeep", True) and self.has("Revel in Riches")
+                and self.treasures >= 10 and self.result is None):
+            self.result = "win"
+            self.m["turn_won"] = self.turn
+            self.m["win_route"] = 2
+            return
         # Lord of the Pit (Thomil's -5, §0z74): mandatory, first.
         lord_of_the_pit_upkeep(self, lambda p: self.sacrifice(p))
         # Elesh Norn's -2/-2 is static: what the pod cast since your last turn
@@ -1318,11 +1331,45 @@ class ShilgengarGame(BaseGame):
         # counted correctly.
         if self.has("Resplendent Angel") and self.life_gained_this_turn >= 5:
             self.make_angel_tokens(1)
-        if self.has("Speaker of the Heavens") and self._life_threshold():
+        self.gain_mark = self.m["life_gained"]      # Resplendent, §0z153
+        if (self.has("Speaker of the Heavens") and self._life_threshold()
+                and not self.cfg.get("speaker_taps", True)):
             self.make_angel_tokens(1)
         # THE LANDS' END-STEP ABILITIES, on the mana the turn left (§0z115).
         castle_locthwain(self, lambda c: self.pay(c))
         self.castle_ardenvale()
+
+    def speaker_step(self):
+        """SPEAKER OF THE HEAVENS: "{T}: Create a 4/4 white Angel creature
+        token with flying. Activate only if you have at least 7 life more than
+        your starting life total and only as a sorcery." (§0z153,
+        `speaker_taps`.) In the second main phase -- the last sorcery-speed
+        moment, after combat's lifelink -- once per untapped Speaker that is
+        not summoning sick. It made an Angel at the end step, untapped,
+        sick or not, once however many Speakers."""
+        if not self.cfg.get("speaker_taps", True) or not self._life_threshold():
+            return
+        for p in self.board:
+            if (p.card.name == "Speaker of the Heavens" and not p.tapped
+                    and not p.sick):
+                p.tapped = True
+                self.make_angel_tokens(1)
+                self.m["speaker_angels"] += 1
+
+    def pod_end_step(self, i):
+        """An opponent's END STEP (`opponents.opponents_act`, under
+        `pod_bodies`). RESPLENDENT ANGEL: "At the beginning of EACH end step,
+        if you gained 5 or more life this turn" -- that opponent's turn
+        counts too (§0z153, `resplendent_each_end`): the life gained since the
+        previous end step, yours or theirs."""
+        if not self.cfg.get("resplendent_each_end", True):
+            return
+        gained = self.m["life_gained"] - getattr(self, "gain_mark", 0.0)
+        self.gain_mark = self.m["life_gained"]
+        if gained >= 5:
+            for _ in range(self.count("Resplendent Angel")):
+                self.make_angel_tokens(1)
+                self.m["resplendent_pod_angels"] += 1
 
     def castle_ardenvale(self):
         """CASTLE ARDENVALE: "{2}{W}{W}, {T}: Create a 1/1 white Human
@@ -1361,7 +1408,17 @@ class ShilgengarGame(BaseGame):
             # when possible, since this deck always prefers the body.
             pool = [c for c in self.graveyard if c.is_permanent and not c.is_land
                    and id(c) not in self.finality]
-            if pool:
+            # The battlefield only if THAT land is a Plains (§0z153,
+            # `shepherd_plains`): a land that entered this step with the type.
+            plains = any(p.card.is_land and id(p) not in lands_before
+                         and "Plains" in land_types(p.card)
+                         for p in self.board)
+            if pool and self.cfg.get("shepherd_plains", True) and not plains:
+                best = max(pool, key=lambda c: c.mv)
+                remove_card(self.graveyard, best)
+                self.hand.append(best)
+                self.m["shepherd_to_hand"] += 1
+            elif pool:
                 best = max(pool, key=lambda c: c.mv)
                 remove_card(self.graveyard, best)
                 perm = self.make_permanent(best, sick=True)
@@ -1436,13 +1493,16 @@ def take_turn(g):
     if g.result is not None:
         return
     g.walker_step()
+    g.speaker_step()                     # sorcery speed, §0z153
     g.pearl_sink()
     g.end_step()
 
     # Revel in Riches — its OWN Treasure generation is model-blind (needs
     # opponents' creatures to die as discrete events), but Treasures from
-    # every other source still count toward the alternate win.
-    if g.has("Revel in Riches") and g.treasures >= 10 and g.result is None:
+    # every other source still count toward the alternate win. "At the
+    # beginning of your UPKEEP" since §0z153 (`revel_at_upkeep`, in `upkeep`).
+    if (g.has("Revel in Riches") and g.treasures >= 10 and g.result is None
+            and not g.cfg.get("revel_at_upkeep", True)):
         g.result = "win"
         g.m["turn_won"] = g.turn
         g.m["win_route"] = 2

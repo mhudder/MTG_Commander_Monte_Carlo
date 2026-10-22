@@ -181,6 +181,15 @@ class FloatingMana:
         self.tapped = False
 
 
+class TreasureMana(FloatingMana):
+    """A TREASURE TOKEN as one point of mana (§0z153, `provisioner_treasure`):
+    "{T}, Sacrifice this token: Add one mana of any color." Spent, it is
+    sacrificed (`tapped`, and gone at the next untap); unspent, it is still on
+    the battlefield next turn -- a `FloatingMana` emptied with the turn."""
+
+    __slots__ = ()
+
+
 def is_forest(card) -> bool:
     """Does this card have the Forest subtype? (305.6 gives it "{T}: Add {G}".)"""
     return card.name in FOREST or card.name in FOREST_TOKENS
@@ -973,6 +982,7 @@ class AzusaGame(BaseGame):
                 remove_card(self.library, basic)
                 self.make_permanent(basic, tapped=True)
                 self.m["shaper_lands"] += 1
+                self.searched()
                 self.land_entered(basic, played=False)
 
         # ASHAYA: A NONTOKEN CREATURE ENTERING IS A LAND ENTERING, AND THAT
@@ -1431,9 +1441,12 @@ class AzusaGame(BaseGame):
             # "create a Food or a Treasure token" -- modelled as the
             # Treasure mode (immediately useful mana), the same
             # single-more-useful-mode simplification the deck's other choose-
-            # one lands effects make.
+            # one lands effects make. A Treasure TOKEN, kept until spent
+            # (§0z153); it emptied with the turn like floating mana.
+            kind = (TreasureMana if self.cfg.get("provisioner_treasure", True)
+                    else FloatingMana)
             self.bonus_mana.append(
-                FloatingMana(frozenset({"W", "U", "B", "R", "G", "C"})))
+                kind(frozenset({"W", "U", "B", "R", "G", "C"})))
         self.clues = getattr(self, "clues", 0) + self.count("Tireless Tracker")
         if self.count("Nissa, Vastwood Seer // Nissa, Sage Animist"):
             # "Whenever a land you control enters, IF YOU CONTROL SEVEN OR
@@ -1772,6 +1785,59 @@ class AzusaGame(BaseGame):
             return super().draw(n)
         for _ in range(int(n)):
             abundance_draw(self)
+
+    def searched(self):
+        """"... then shuffle." (§0z153, `search_shuffle`.) Every spell and
+        ability here that searches the library says it; the fetches and four
+        other searches shuffled and Cultivate, Seek the Horizon, Journey of
+        Discovery, Nylea's Intervention, Nissa's ETB, Simulacrum Shaper,
+        Yavimaya Elder, Perilous Forays and the creature tutors did not -- in
+        the deck with five ways to know its top card."""
+        if self.cfg.get("search_shuffle", True):
+            self.shuffle_library()
+
+    def realms_value(self, card) -> float:
+        """What a land is worth to find with Realms Uncharted: `land_rank`
+        (a fetch, green, untapped) and the synergies the owner named
+        (2026-10-22) that this engine models -- Eye of Ugin and Eldrazi Temple
+        while an Eldrazi is still to cast and the game is late (six lands
+        out), Nykthos once green devotion pays for it."""
+        v = self.land_rank(card)
+        late = (sum(1 for p in self.board if p.card.is_land)
+                >= self.cfg.get("realms_late_lands", 6))
+        eldrazi = any(c.name in ("Kozilek, Butcher of Truth",
+                                 "Ulamog, the Infinite Gyre")
+                      for c in self.hand + self.library)
+        if card.name in ("Eye of Ugin", "Eldrazi Temple") and eldrazi and late:
+            v += 2.5
+        if (card.name == "Nykthos, Shrine to Nyx"
+                and devotion(self, "G") >= 3):
+            v += 1.5
+        return v
+
+    def realms_uncharted(self):
+        """REALMS UNCHARTED: "Search your library for up to four land cards
+        with different names and reveal them. An opponent chooses two of
+        those cards. Put the chosen cards into your graveyard and the rest
+        into your hand. Then shuffle." (§0z153, `realms_text`; it was two
+        Forests to hand.) You take the four `realms_value` ranks highest, of
+        different names -- also the best reply to the opponent, who bins the
+        two you value most (the owner, 2026-10-22); you keep the other two."""
+        lands, seen = [], set()
+        for c in sorted((c for c in self.library if c.is_land),
+                        key=self.realms_value, reverse=True):
+            if c.name not in seen:
+                seen.add(c.name)
+                lands.append(c)
+            if len(lands) == 4:
+                break
+        for c in lands:
+            remove_card(self.library, c)
+        ranked = sorted(lands, key=self.realms_value, reverse=True)
+        self.graveyard.extend(ranked[:2])
+        self.hand.extend(ranked[2:])
+        self.m["realms_binned"] += len(ranked[:2])
+        self.searched()
 
     def sylvan_scrying(self):
         """SYLVAN SCRYING (item 24 change 4; was KNOWN_BLIND), verified
@@ -2161,6 +2227,9 @@ class AzusaGame(BaseGame):
             for c in pool:
                 remove_card(self.graveyard, c)
                 self.hand.append(c)
+        elif (script == "realms_uncharted"
+              and self.cfg.get("realms_text", True)):
+            self.realms_uncharted()
         elif script in ("cultivate", "seek_horizon", "journey_of_discovery",
                         "realms_uncharted"):
             n = {"cultivate": 2, "seek_horizon": 3,
@@ -2179,6 +2248,7 @@ class AzusaGame(BaseGame):
                     break
                 remove_card(self.library, land)
                 self.hand.append(land)
+            self.searched()                  # "... then shuffle."
         elif script == "green_sun":
             self.tutor_creature(3)
         elif script == "chord_of_calling":
@@ -2206,6 +2276,7 @@ class AzusaGame(BaseGame):
                     break
                 remove_card(self.library, land)
                 self.hand.append(land)
+            self.searched()
         elif script == "rude_awakening":
             self.rude_awakening()
         elif script == "sylvan_awakening":
@@ -2292,6 +2363,7 @@ class AzusaGame(BaseGame):
             if land is not None:
                 remove_card(self.library, land)
                 self.hand.append(land)
+            self.searched()
         elif card.name == "Titania, Protector of Argoth":
             pool = [c for c in self.graveyard if c.is_land]
             if pool:
@@ -2483,6 +2555,7 @@ class AzusaGame(BaseGame):
                         break
                     remove_card(self.library, land)
                     self.hand.append(land)
+                self.searched()
 
     def tutor_creature(self, max_mv, nonlegendary_only=False,
                        include_graveyard=False):
@@ -2509,6 +2582,7 @@ class AzusaGame(BaseGame):
             self.m["finale_from_yard"] += 1
         else:
             remove_card(self.library, best)
+            self.searched()          # Chord, Zenith, Bellower, Finale
         perm = self.make_permanent(best, sick=True)
         self.ascended = self.ascended or len(self.board) >= 10
         return perm
@@ -2950,12 +3024,34 @@ class AzusaGame(BaseGame):
                 and self.cfg.get("kozilek_cast_draw", True)):
             return 4                 # "When you cast this spell, draw four"
         if card.script == "momentous_fall":
+            if self.cfg.get("momentous_biggest", True):
+                victim = self.momentous_victim()
+                return self.power_of(victim) if victim is not None else 0
             fodder = self._sac_fodder()
             return min((self.power_of(p) for p in fodder), default=0)
         return 0
 
+    def momentous_victim(self):
+        """MOMENTOUS FALL's sacrifice -- "draw cards equal to the sacrificed
+        creature's power, then gain life equal to its toughness". THE OWNER'S
+        POLICY (2026-10-22, §0z153, `momentous_biggest`): the non-commander,
+        non-land creature with the highest power whose draw is still safe
+        (`draw_is_safe`, §0z42's standing rule); none safe, the smallest. It
+        was the smallest summoning-ready token."""
+        pool = [p for p in self.board if p.card.is_creature
+                and not p.card.is_land and p.card is not self.commander]
+        if not pool:
+            return None
+        safe = [p for p in pool if draw_is_safe(self, self.power_of(p))]
+        return (max(safe, key=self.power_of) if safe
+                else min(pool, key=self.power_of))
+
     def sac_for_value(self, momentous=False):
-        fodder = self._sac_fodder()
+        if momentous and self.cfg.get("momentous_biggest", True):
+            victim = self.momentous_victim()
+            fodder = [victim] if victim is not None else []
+        else:
+            fodder = self._sac_fodder()
         if not fodder:
             return
         victim = min(fodder, key=self.power_of)
@@ -3617,6 +3713,7 @@ class AzusaGame(BaseGame):
                 self.on_creature_death(1, p)
                 remove_card(self.library, land)
                 self.make_permanent(land, sick=False, tapped=True)
+                self.searched()              # before the landfall it causes
                 self.land_entered(land, played=False)
         self.myriad_landscape_step()
         self.petrified_field_step()
@@ -3886,7 +3983,9 @@ def take_turn(g):
     g.eot_haste = {}                    # Godmaw's haste, §0z101
     # Castle Garenbrig's pool empties with the turn, like any unspent mana.
     g.creature_mana = []
-    g.bonus_mana = []
+    # Floating mana empties with the turn; an unspent Treasure stays (§0z153).
+    g.bonus_mana = [f for f in g.bonus_mana if isinstance(f, TreasureMana)
+                    and not f.tapped]
     # "the second time this ability has resolved THIS TURN" (Nissa, Resurgent
     # Animist). A per-turn counter, so it resets with the turn.
     g.animist_resolutions = 0

@@ -168,7 +168,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z113](#0z113) | MEASURED | **Land candidates for six decks** (17 lands, each for a basic): azusa's fetches +0.0165 to +0.0188 at T20, Field of the Dead +0.0098, rendmaw's Gaea's Cradle +0.0104; the rest blanks or horizon-dependent. None staged |
 | [0z114](#0z114) | FIXED | **Eye of Ugin's tutor and Kozilek's cast draw were missing** (azusa): **+0.0224 ±0.0033 at T20**. **Fabled Passage and Evolving Wilds STAGED** for two Forests, the owner's choice: +0.0257 / +0.0237 |
 | [0z115](#0z115) | FIXED | **Lands play by their own text**: entry, pain and fetch rules generated from Scryfall into `LAND_RULES`, a dozen lands fixed -- **Vault of the Archangel was free lifelink, worth 0.028**. Every deck loses 0.007–0.032 |
-| [0z116](#0z116) | OPEN | **Oracle re-audit of all seven decks: data clean, thirteen modelled behaviours contradict the text** (Kokusho uncoded, Biotransference missing, lorehold's discards unpaid, …). 1-13 fixed in §0z117/§0z118; the rest open |
+| [0z116](#0z116) | PARTLY RESOLVED | **Oracle re-audit of all seven decks: data clean, thirteen modelled behaviours contradict the text** (Kokusho uncoded, Biotransference missing, …). 1-13 fixed in §0z117/§0z118, the rest in §0z151/§0z153; trostani's line waits |
 | [0z117](#0z117) | FIXED | **§0z116's top five**: Kokusho's drain (+0.0056), Biotransference (+0.0081), lorehold's discards paid (**they had flattered it by 0.034**), Angel/Cleric tags from Scryfall, Coercive Portal's real carnage |
 | [0z118](#0z118) | FIXED | **§0z116's items 6-13**: Kambal had flattered tivit by 0.015; Damn was a {B}{B} wrath; protection answers what its text answers -- **Mother of Runes +0.007 to karlov**, and **karlov wins +0.0054 with no SHROUD** |
 | [0z119](#0z119) | REBUILT | **All seven tables rebuilt at bd9e7ae**; every sign flip is a fix's own card. **The interpreter matters**: 3.11 plays one game in 15,000 differently from 3.13 (`tools/repro_row.py`). All nine staged swaps significant |
@@ -205,6 +205,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z150](#0z150) | DECIDED | **Time Sieve 9 → 11 re-measured on POD_V4, and ADOPTED** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. Adopted 2026-10-22 |
 | [0z151](#0z151) | FIXED | **§0z116's remainder**: "can't be countered", cast triggers on countered spells, Pathways, two life costs, one Land Tax and one Tithe, Elesh Norn, Kalitas, Sorin's +1/+0; two generator blind spots. Every fix a switch |
 | [0z152](#0z152) | REBUILT | **§0z151's parallel rebuild**, six tables at `418490f` (tivit at `5efcb70`, Time Sieve 11), 21 min wall: 9 rows moved beyond their bars, each one a fix's own card -- Elesh Norn +0.0182 |
+| [0z153](#0z153) | FIXED | **Queue item 5's last lines**: §0z116's one-liners in six engines, lorehold's extra turn as a whole turn, the Reservoir at instant speed, Sorin's loyalty; eight owner calls. Every fix a switch |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10150,15 +10151,17 @@ ability; `fetch_waits` now gives it none, in every engine.
   re-measured on this engine at the same time (§0z81's restage).
 * `tests/test_land_rules.py`: 26 cases, 14 mutations, exact sets.
 
-## 0z116. OPEN — oracle re-audit of all seven decks: the data is clean, thirteen behaviours are not the text
+## 0z116. PARTLY RESOLVED — oracle re-audit of all seven decks: the data is clean, thirteen behaviours are not the text
 
-> **STATUS 2026-10-22, re-verified against the code (§0z151).** Items 1-13
-> were fixed in §0z117/§0z118. Of the unnumbered remainder below:
+> **STATUS 2026-10-22, re-verified against the code (§0z151, §0z153).**
+> Items 1-13 were fixed in §0z117/§0z118. Of the unnumbered remainder below
+> **only trostani's Sylvan Library is open**, and it waits while trostani is
+> SUSPENDED:
 >
 > | line | state |
 > |---|---|
 > | Kalitas: no code reads the name | **FIXED §0z151** -- its replacement on the pod's deaths; PARTLY_MODELLED (the sacrifice ability) |
-> | both Sorins' missing clauses | Solemn Visitor's +1/+0 **FIXED §0z151**; the -2 token and both ultimates open, in `WALKERS_WITHOUT_LOYALTY`; karlov.py's false "no planeswalker" note corrected |
+> | both Sorins' missing clauses | Solemn Visitor's +1/+0 **FIXED §0z151**; Vengeful Bloodlord's loyalty, +2 and -X **FIXED §0z153**; Solemn Visitor's -2 and -6 never used, the owner's policy; karlov.py's false "no planeswalker" note corrected |
 > | Elesh Norn's -2/-2, and +2/+2 skipping the commander | **FIXED §0z151** (`norn_text`) |
 > | Torment of Hailfire, Rhystic Study BLIND with code | settled before this: `BLIND_BUT_LIVE`, each with its reason |
 > | rendmaw's Massacre Wurm | read like shilgengar's since POD_V4 (item 24); **relabelled SCRIPTED §0z151**, and shilgengar's ETB takes route pieces as rendmaw's does |
@@ -10167,13 +10170,13 @@ ability; `fetch_waits` now gives it none, in every engine.
 > | Haywire Mite, Bow of Nylea | their activated answers are `ANSWER_NOT_MODELLED`; Haywire Mite still KNOWN_BLIND; Bow's attacking deathtouch **FIXED §0z151**, PARTLY_MODELLED |
 > | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
 > | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
-> | Extra turns: tivit vs lorehold | OPEN |
-> | Aetherflux Reservoir: trostani on cast, karlov on resolution | **FIXED §0z151**: karlov's fires on cast, countered or not, and for the commander; its pay-50 still only at upkeep (OPEN) |
+> | Extra turns: tivit vs lorehold | **FIXED §0z153**: lorehold's is a whole turn before the pod, as tivit's |
+> | Aetherflux Reservoir: trostani on cast, karlov on resolution | **FIXED §0z151**: karlov's fires on cast, countered or not, and for the commander; its pay-50 at every lifegain since §0z153 |
 > | "can't be countered" exists nowhere | **FIXED §0z151** |
 > | Pathways modelled as duals | **FIXED §0z151** |
 > | cast triggers skip countered spells | **FIXED §0z151**, in lorehold and tivit too |
 > | Anguished Unmaking's 3 life, Toxic Deluge's X | **FIXED §0z151** |
-> | "Smaller departures, one line each" | OPEN, not re-verified |
+> | "Smaller departures, one line each" | **FIXED §0z153**, every line, eight by the owner's call; karlov's Konrad and Blood Artist on your wipes' kills were fixed by item 24's bodies (§0z132); lorehold's Top {1} by §0z139. trostani's Sylvan Library waits (SUSPENDED) |
 
 Every card in the seven built lists, plus the staged additions (589 distinct
 names), fetched from `api.scryfall.com/cards/collection` on 2026-10-07, and
@@ -13606,6 +13609,94 @@ of Nylea changed label, not number. Noise floors: rendmaw ±0.0024, lorehold
 fire on a countered spell too (and karlov's `+Bolas's Citadel` digs through
 `countered`). The tables measure the staged lists, so these rows ARE current;
 the head-to-head swap numbers in the ledger are not re-measured here.
+
+<a id="0z153"></a>
+
+## 0z153. FIXED -- queue item 5's last lines: §0z116's one-liners, lorehold's extra turns, the Reservoir, the Sorins
+
+**2026-10-22, the owner: "if just implemented, please go ahead".** Each line
+was re-read against the code and its oracle text (Scryfall, the same day).
+Most were rules to implement; **eight needed a judgement, and the owner made
+each** (below, "the owner's call"). Every fix has a switch whose False is the
+old code: `check_unchanged_decks --cfg=<all 25 False>` is BIT-IDENTICAL to
+`c794002` on all seven decks. `tests/test_oracle_departures.py` pins 28 cases
+with 25 mutations, exact sets.
+
+### Rules, implemented
+
+* **lorehold's extra turn is a whole turn, before the pod** (CR 500.7,
+  `extra_turn_full`): `take_turn` is `your_turn` and the pod's round, and an
+  extra turn is `your_turn` again -- untap, upkeep, draw, land drop -- with
+  `extra_turns_taken` keeping the pod's clock in rounds (§0z86). It came
+  after the pod acted, with no upkeep, draw step or land drop. Smothering
+  Tithe's and Monologue Tax's per-round Treasures stand in for the POD's
+  draws and spells, so an extra turn does not pay them.
+* **karlov**: Aetherflux Reservoir's 50 at every lifegain event, not only at
+  upkeep (`reservoir_any_time`; the policy, fire at 51, is unchanged);
+  extort paid with {W} or {B}, not Sol Ring's {C} (`extort_hybrid`); Syr
+  Konrad's other two clauses -- a creature card put into a graveyard from
+  anywhere but the battlefield, or leaving yours (`konrad_text`: countered
+  spells, mills, Lurrus, Sun Titan, Reclamation, Sorin's -X).
+* **rendmaw**: Beastmaster Ascension's quest counters stay, and its +5/+5
+  has its toughness (`beast_quest`); Ophiomancer sees Sakura-Tribe Elder and
+  Shigeki, both Snakes (`snake_types`); Ohran Frostfang draws per attacker
+  that connects, through `combat_hits` (`frostfang_connect`); Roaming Throne
+  doubles Rendmaw's ETB as it did the play trigger (`throne_etb`); Coat of
+  Arms counts every creature of yours that shares a type, attacking or not,
+  Oozes under March of the World Ooze (`coat_types`, `engine.creature_types`).
+* **lorehold**: Blasphemous Act counts the pod's creatures, not a flat 3
+  (`act_pod_count`).
+* **tivit**: Revel in Riches and Mechanized Production win at the upkeep,
+  not mid-turn (`alt_win_at_upkeep`); Lieutenants of the Guard and Messenger
+  Jays keep their counters (`dilemma_counters`); Jays discards one per card
+  drawn (`jays_discard`, trostani's discard rule).
+* **shilgengar**: Revel in Riches at the upkeep, not the end step
+  (`revel_at_upkeep`); Emeria Shepherd to the battlefield only off a Plains,
+  else to hand (`shepherd_plains`); Resplendent Angel at each opponent's end
+  step too (`resplendent_each_end`, through `pod_end_step`); Speaker of the
+  Heavens taps, not while sick, at sorcery speed in the second main phase,
+  and its vigilance is read by name (`speaker_taps`).
+* **azusa**: every library search shuffles (`search_shuffle`: Cultivate,
+  Seek the Horizon, Journey of Discovery, Nylea's Intervention, Nissa's ETB,
+  Simulacrum Shaper, Yavimaya Elder, Perilous Forays, the creature tutors);
+  Tireless Provisioner's Treasure is a token that stays until spent
+  (`provisioner_treasure`, `TreasureMana`).
+
+### The owner's calls (2026-10-22)
+
+* **Momentous Fall** sacrifices the biggest non-commander creature whose
+  draw is safe (`momentous_biggest`; §0z42's rule bounds it).
+* **Verdurous Gearhulk** puts all four counters on the best attacker, a
+  flier first (`gearhulk_best`).
+* **Syr Konrad's {1}{B} mill** on the mana left at the end of your turn,
+  while the library is not run down (`konrad_text`). Each opponent's milled
+  card is a creature with probability `pod_creature_card_share` (0.33) -- A
+  JUDGEMENT, NOT A CENSUS, needed to implement the call.
+* **Sorin, Vengeful Bloodlord** has loyalty (4): -X for the best creature
+  card below its loyalty, else +2 at an opponent (`sorin_loyalty`). **Sorin,
+  Solemn Visitor**: +1 every turn, as read since §0z151; -2 and -6 never.
+* **Tyrant's Choice**: an opponent with a creature votes death, and death
+  sacrifices each opponent's smallest creature; it did nothing before
+  (`tyrant_death`).
+* **Realms Uncharted** finds four lands of different names by
+  `realms_value` -- `land_rank` (a fetch first, for landfall) plus Eye of
+  Ugin and Eldrazi Temple late with an Eldrazi to cast, and Nykthos on green
+  devotion, the synergies the owner asked for that this engine models; the
+  opponent bins the two you value most (`realms_text`).
+* **Smothering Tithe** on draws you force: Reforge the Soul's seven,
+  Mikokoro's and Geier Reach Sanitarium's one, each a Treasure, the pod
+  paying for none (`tithe_forced_draws`).
+* **Coat of Arms**: the pod's creatures share no type with yours.
+
+### Two old tests pinned the old policies
+
+`test_decking` J read Momentous Fall's draw off the smallest token, and
+`test_oracle_batch` J looked for Gearhulk's counters on the first creature.
+Each now pins its mechanism under the new policy -- the sacrifice resolution
+makes, and Primal Vigor's doubling summed over the board -- and both
+mutation runs stay exact.
+
+### What each fix is worth
 
 ## How to read an ablation table
 

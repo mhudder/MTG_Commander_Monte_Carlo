@@ -238,7 +238,10 @@ def run_cases():
     hulk = EN.Permanent(card=card("rendmaw", "Verdurous Gearhulk"), sick=True)
     g.board.append(hulk)
     EN.run_etb(g, hulk)
-    check("J ... and Verdurous Gearhulk's four", perm(g, "Bear").counters, 8)
+    # Summed: where the four go is a policy (`gearhulk_best`, §0z153 -- the
+    # best attacker, here the Gearhulk itself), and this case pins Vigor.
+    check("J ... and Verdurous Gearhulk's four",
+          sum(p.counters for p in g.board), 8)
 
     # -- 10: each sweeper destroys what its text says -------------------------
     rendmaw = LISTS["rendmaw"][1]

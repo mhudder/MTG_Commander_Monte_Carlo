@@ -45,7 +45,8 @@ from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, 
                           pearl_collector_trigger, pearl_collector_lifelink,
                           perpetual_lifelink, enter_land, after_land_enters,
                           vault_of_the_archangel, vault_active,
-                          sun_titan_pick, stack_top, tutor_take, land_tax)
+                          sun_titan_pick, stack_top, tutor_take, land_tax,
+                          walker_ready, draw_is_safe, enter_loyalty)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -545,6 +546,106 @@ def pay_generic(g, want):
     return paid
 
 
+def pay_extort(g) -> bool:
+    """EXTORT's {W/B}: one white OR one black mana (§0z153, `extort_hybrid`).
+    It was paid from any source -- Sol Ring, a Treasure's colourless -- as
+    generic. A hybrid pip is its colours as alternatives (CR 107.4e)."""
+    if not g.cfg.get("extort_hybrid", True):
+        return pay_generic(g, 1) == 1
+    for col in ("W", "B"):
+        units = available_mana(g)
+        idx = can_pay({col: 1}, units)
+        if idx is not None:
+            spend_lg(g, idx, units)
+            return True
+    return False
+
+
+def konrad_card(g, card) -> None:
+    """SYR KONRAD, THE GRIM's other two clauses (§0z153, `konrad_text`):
+    "Whenever another creature dies, OR A CREATURE CARD IS PUT INTO A
+    GRAVEYARD FROM ANYWHERE OTHER THAN THE BATTLEFIELD, OR A CREATURE CARD
+    LEAVES YOUR GRAVEYARD, Syr Konrad deals 1 damage to each opponent." The
+    death clause is read in `on_creature_death` and the pod's hook; this is
+    the rest, called where karlov moves such a card: a countered creature
+    spell, a creature milled, and one cast or returned out of your graveyard
+    (Lurrus, Sun Titan, Phyrexian Reclamation, Sorin's -X)."""
+    if not card.is_creature or not g.cfg.get("konrad_text", True):
+        return
+    for _ in range(g.count("Syr Konrad, the Grim")):
+        g.m["damage"] += OPP.damage_each(g, 1)
+        g.m["konrad_card_triggers"] += 1
+
+
+def konrad_mill(g) -> None:
+    """SYR KONRAD: "{1}{B}: Each player mills a card." THE OWNER'S POLICY
+    (2026-10-22): on the mana left at the end of your turn, as often as it
+    pays, while the library is not run down (`draw_is_safe`, §0z42 -- a mill
+    is not a draw, but the pilot who stops drawing stops milling too).
+
+    Your card is real; each opponent's is a creature card with probability
+    `pod_creature_card_share` (0.33) -- A JUDGEMENT, NOT A CENSUS: about a
+    third of a Commander deck's cards are creatures. Each is a Konrad trigger
+    and one CRN draw (`konrad_mill`)."""
+    if not g.cfg.get("konrad_text", True) or not g.has("Syr Konrad, the Grim"):
+        return
+    share = g.cfg.get("pod_creature_card_share", 0.33)
+    while draw_is_safe(g, 1) and pay_cost(g, {"gen": 1, "B": 1}):
+        g.m["konrad_mills"] += 1
+        top = g.library.pop()
+        g.graveyard.append(top)
+        konrad_card(g, top)
+        for _ in OPP.living(g):
+            if crn_random(g, "konrad_mill") < share:
+                konrad_card(g, KONRAD_POD_CREATURE)
+        if g.result is not None:
+            return
+
+
+# The pod's milled creature card: what `konrad_card` reads of it.
+KONRAD_POD_CREATURE = Card(name="(a pod creature card)",
+                           types=frozenset({"Creature"}))
+
+
+def sorin_bloodlord_step(g) -> None:
+    """SORIN, VENGEFUL BLOODLORD, loyalty 4 (Scryfall, 2026-10-22):
+
+        +2: Sorin deals 1 damage to target player or planeswalker.
+        -X: Return target creature card with mana value X from your
+            graveyard to the battlefield. That creature is a Vampire in
+            addition to its other types.
+
+    THE OWNER'S POLICY (2026-10-22): the -X when a creature card in the
+    graveyard is worth it -- the pick `engine.sun_titan_pick` makes, among
+    mana value BELOW the loyalty so Sorin survives -- else the +2 at an
+    opponent. Once a turn (`walker_ready`). The static ("during your turn ...
+    lifelink") is read by name in `combat`, as before. `sorin_loyalty`."""
+    if not g.cfg.get("sorin_loyalty", True):
+        return
+    for perm in [p for p in g.board
+                 if p.card.name == "Sorin, Vengeful Bloodlord"]:
+        if not walker_ready(g, perm):
+            continue
+        pool = [c for c in g.graveyard
+                if c.is_creature and c.mv < perm.counters]
+        card = sun_titan_pick(pool) if pool else None
+        if card is not None:
+            perm.counters -= int(card.mv)
+            at = next(i for i, c in enumerate(g.graveyard) if c is card)
+            g.graveyard.pop(at)
+            konrad_card(g, card)
+            enter_permanent(g, card)
+            g.m["sorin_reanimations"] += 1
+            check_combo(g)
+        else:
+            perm.counters += 2
+            dealt = OPP.damage_single(g, 1)
+            g.m["damage"] += dealt
+            g.m["sorin_pings"] += 1
+        if g.result is not None:
+            return
+
+
 def devotion_white(g):
     """Devotion to white: {W} pips among the mana costs of permanents you
     control. Karlov himself is {W}{B} and counts for one; Lurrus's two
@@ -581,6 +682,26 @@ def is_creature_now(g, card):
 
 
 def gain_life(g, amount, _depth=0):
+    """One lifegain EVENT (`_gain_life`), then AETHERFLUX RESERVOIR's "Pay 50
+    life: This artifact deals 50 damage to any target" -- an activated
+    ability, usable whenever you hold priority, so it is checked as the life
+    arrives rather than once at upkeep (§0z153, `reservoir_any_time`). The
+    policy is the upkeep one, unchanged: fire at 51 or more."""
+    _gain_life(g, amount, _depth)
+    if g.cfg.get("reservoir_any_time", True):
+        aetherflux_fire(g)
+
+
+def aetherflux_fire(g):
+    """Aetherflux Reservoir's 50, when you have 51 or more life."""
+    if g.has("Aetherflux Reservoir") and g.your_life >= 51 and g.result is None:
+        g.your_life -= 50
+        g.m["damage"] += OPP.damage_single(g, 50)
+        if g.result is None and len(OPP.living(g)) == 0:
+            g.m["win_route"] = 4
+
+
+def _gain_life(g, amount, _depth=0):
     """One lifegain EVENT. Amount matters for some payoffs, the event itself
     matters for more of them."""
     if amount <= 0 or _depth > 3:
@@ -888,12 +1009,9 @@ def upkeep(g):
         g.result = "win"
         g.m["turn_won"] = g.turn
         g.m["win_route"] = 3
-    # Aetherflux Reservoir: 50 life, deal 50
-    if g.has("Aetherflux Reservoir") and g.your_life >= 51 and g.result is None:
-        g.your_life -= 50
-        g.m["damage"] += OPP.damage_single(g, 50)
-        if g.result is None and len(OPP.living(g)) == 0:
-            g.m["win_route"] = 4
+    # Aetherflux Reservoir: 50 life, deal 50 (and at every lifegain since
+    # §0z153; this upkeep check is the old timing and a backstop).
+    aetherflux_fire(g)
 
 
 def necropotence_cards(g) -> int:
@@ -1271,6 +1389,7 @@ def main_phase(g):
         else:                        # Lurrus's permission, spent (§0z84)
             at = next(i for i, c in enumerate(g.graveyard) if c is card)
             g.graveyard.pop(at)
+            konrad_card(g, card)     # it left your graveyard (§0z153)
             g.lurrus_turn = g.turn
             g.m["lurrus_casts"] += 1
         idx = g.spells_this_turn
@@ -1282,6 +1401,7 @@ def main_phase(g):
                 g.m["test_card_countered"] += 1
                 g.m["test_card_answered"] += 1
             countered_cast_triggers(g, card)
+            konrad_card(g, card)     # from the stack, §0z153
             continue
         resolve(g, card)
         if g.result is not None:
@@ -1428,6 +1548,7 @@ def citadel_step(g):
                 g.m["test_card_countered"] += 1
                 g.m["test_card_answered"] += 1
             countered_cast_triggers(g, top)
+            konrad_card(g, top)      # from the stack, §0z153
             continue
         resolve(g, top)
         if g.result is not None:
@@ -1470,7 +1591,7 @@ def cast_triggers(g, card):
     # opponent loses 1 life and you gain that much." Once per SOURCE per spell,
     # so two extorters on the battlefield is two triggers and two payments.
     for _ in range(g.count("Blind Obedience") + g.count("Crypt Ghast")):
-        if pay_generic(g, 1) != 1:
+        if not pay_extort(g):
             break
         n = len(OPP.living(g))
         dealt = OPP.damage_each(g, 1)
@@ -1592,6 +1713,8 @@ def enter_permanent(g, card):
     `resolve`. Extracted from `resolve` for Sun Titan (item 24) -- the cast
     path runs exactly the calls it ran before."""
     perm = Permanent(card=card, sick=not card.haste)
+    if g.cfg.get("sorin_loyalty", True):
+        enter_loyalty(perm)          # Vengeful Bloodlord, §0z153
     g.board.append(perm)
     if is_creature_now(g, card):
         creature_entered(g, mine=True, entering=perm)
@@ -1618,6 +1741,7 @@ def sun_titan(g):
         return
     at = next(i for i, c in enumerate(g.graveyard) if c is card)
     g.graveyard.pop(at)
+    konrad_card(g, card)                   # §0z153
     g.m["sun_titan_returns"] += 1
     if card.is_land:
         perm = enter_land(g, card)
@@ -1771,6 +1895,7 @@ def reclamation_step(g, recast: bool):
         g.m["reclamation_life_paid"] += 2
         at = next(i for i, c in enumerate(g.graveyard) if c is card)
         g.hand.append(g.graveyard.pop(at))
+        konrad_card(g, card)               # §0z153
         g.m["reclamation_returns"] += 1
         if recast:
             return                 # one, to be cast now
@@ -1917,6 +2042,9 @@ def take_turn(g):
     # rather than left there blocking the dig. No-ops without the Citadel.
     citadel_land_step(g)
     play_land(g)
+    sorin_bloodlord_step(g)        # loyalty, sorcery speed (§0z153)
+    if g.result is not None:
+        return
     main_phase(g)
     # AFTER the free casts and BEFORE combat: you spend mana first because it
     # costs no life, then dig with the Citadel, then attack with whatever the
@@ -1940,6 +2068,9 @@ def take_turn(g):
                              lambda p: has_lifelink(g, p))
 
     necropotence_step(g)
+    konrad_mill(g)                 # the mana the turn left (§0z153)
+    if g.result is not None:
+        return
     end_step(g)
     if g.result is not None:
         return

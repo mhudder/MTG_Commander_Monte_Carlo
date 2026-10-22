@@ -51,8 +51,11 @@ What is closed and where it went:
     is all that is left of this item.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
-    `docs/ORACLE_AUDIT_*.md`, and in §0z116's own STATUS block: its
-    remainder was re-verified and fixed in §0z151 (2026-10-22), leaving
-    the extra-turn rule (tivit vs lorehold), karlov's Reservoir kill only
-    at upkeep, both Sorins' other abilities, and the "smaller departures"
-    one-liners, not re-verified.
+    `docs/ORACLE_AUDIT_*.md`. **§0z116's list is done** (§0z151, §0z153,
+    2026-10-22) but for trostani's Sylvan Library, which waits with the
+    deck (SUSPENDED). What is left: **Karlov's own "{W}{B}, Remove six
+    +1/+1 counters: Exile target creature"** -- MODEL-BLIND by design while
+    the pod's creatures were a number, MODELABLE since POD_V4 gave them
+    bodies and route pieces, and it needs an activation policy (when to
+    spend six counters, on what), which is the owner's call; and trostani's
+    open gaps, SUSPENDED.

@@ -626,12 +626,16 @@ def convert_the_pile(g):
     Checked in the order a pilot would take: the two alternate wins first
     because they need no combat, then the drains, then extra turns.
     """
-    if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
-        g.win(ROUTE_REVEL)
-        return
-    if g.has("Mechanized Production") and g.tokens["Treasure"] >= 8:
-        g.win(ROUTE_MECHANIZED)
-        return
+    # Both alternate wins say "At the beginning of YOUR UPKEEP" (§0z153,
+    # `alt_win_at_upkeep`): a pile made mid-turn wins at your next upkeep, if
+    # it survives the pod's round, which `upkeep` checks. They won here, at once.
+    if not g.cfg.get("alt_win_at_upkeep", True):
+        if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
+            g.win(ROUTE_REVEL)
+            return
+        if g.has("Mechanized Production") and g.tokens["Treasure"] >= 8:
+            g.win(ROUTE_MECHANIZED)
+            return
     drains = ("Marionette Master", "Disciple of the Vault", "Mirkwood Bats",
               "Nadier's Nightblade", "Kambal, Profiteering Mayor")
     if any(g.has(x) for x in drains):
@@ -814,6 +818,8 @@ def resolve(g, card):
         mine, _theirs = V.dilemma(g, "expropriate")
         g.extra_turns += mine
         g.m["extra_turns"] += mine
+    elif s == "tyrants_choice" and g.cfg.get("tyrant_death", True):
+        tyrants_choice(g)
     elif s == "tyrants_choice":
         if not V.council(g):
             # A POD TOTAL, like every other deal_pod_damage caller: 4 life from
@@ -917,11 +923,22 @@ def resolve(g, card):
             remove_card(g.graveyard, best)
             g.hand.append(best)
     elif s == "lieutenants":
-        _mine, theirs = V.dilemma(g, "lieutenants")
+        mine, theirs = V.dilemma(g, "lieutenants")
         g.make_tokens(theirs, 1, 1, "Soldier")
+        # "Put a +1/+1 counter on this creature for each strength vote" --
+        # kept since §0z153 (`dilemma_counters`), on the permanent below.
+        if g.cfg.get("dilemma_counters", True):
+            g.entering_counters = mine
     elif s == "jays":
-        _mine, theirs = V.dilemma(g, "jays")
+        mine, theirs = V.dilemma(g, "jays")
         g.draw(theirs)
+        if g.cfg.get("dilemma_counters", True):
+            g.entering_counters = mine       # "for each feather vote"
+        # "For each card drawn this way, discard a card" (§0z153,
+        # `jays_discard`), by trostani's pick: surplus lands once six are
+        # out, else the lowest-priority spell.
+        if g.cfg.get("jays_discard", True):
+            discard_worst(g, theirs)
     elif s == "ephemerate":
         # "Exile target creature you control, then return it. REBOUND." One {W}
         # is two dilemmas, a turn apart.
@@ -970,6 +987,8 @@ def resolve(g, card):
     if card.is_permanent:
         perm = Permanent(card=card, sick=not card.haste)
         enter_loyalty(perm)          # Venser / Dyfed (§0z74)
+        perm.counters += getattr(g, "entering_counters", 0)   # §0z153
+        g.entering_counters = 0
         g.board.append(perm)
         if card.name in SAGA_CHAPTERS and g.cfg.get("saga_chapters", True):
             # "As this Saga enters ... add a lore counter": chapter I. The
@@ -980,6 +999,53 @@ def resolve(g, card):
         run_etb(g, perm)
     elif not card.is_land:
         g.graveyard.append(card)
+
+
+def discard_worst(g, n) -> None:
+    """Discard `n`: surplus lands once six are out, else the lowest-priority
+    spell -- trostani's `discard` rule, the one pilot's pick in this repo."""
+    lands = sum(1 for p in g.board if p.card.is_land)
+    for _ in range(min(int(n), len(g.hand))):
+        worst = min(g.hand, key=lambda c: (
+            (c.priority if not c.is_land else (9 if lands < 6 else -1)),
+            c.mv))
+        remove_card(g.hand, worst)
+        g.graveyard.append(worst)
+        g.m["discarded"] += 1
+
+
+def tyrants_choice(g) -> None:
+    """TYRANT'S CHOICE: "Will of the council -- Starting with you, each player
+    votes for death or torture. If death gets more votes, each opponent
+    sacrifices a creature of their choice. If torture gets more votes or the
+    vote is tied, each opponent loses 4 life." (§0z153, `tyrant_death`.)
+
+    You vote torture with every vote you have. THE POD, the owner's call
+    (2026-10-22): an opponent with a creature votes death -- a sacrifice
+    costs it less than 4 life -- and one without votes torture; Illusion of
+    Choice gives you their votes. Death SACRIFICES each opponent's smallest
+    creature (`kill_pod_count`); it used to do nothing, and the pod always
+    took the 4 life."""
+    mine, theirs = V.my_votes(g), OPP.living(g)
+    if V.vote_control(g):
+        death = 0
+    else:
+        death = sum(1 for o in theirs if o.creatures >= 1)
+    torture = mine + len(theirs) - death
+    g.m["votes_cast"] += torture + death
+    g.m["councils"] += 1
+    won = torture >= death                   # a tie is torture
+    g.m["councils_won"] += int(won)
+    V._vote_payoffs(g, death)
+    if won:
+        g.deal_pod_damage(4.0 * OPP.pod_size(g))
+        return
+    g.m["tyrant_sacrifices"] += 1
+    for o in OPP.living(g):
+        if OPP.pod_bodies_on(g):
+            OPP.kill_pod_count(g, o, 1, biggest=False)
+        else:
+            o.creatures = max(0.0, o.creatures - 1)
 
 
 # SAGAS WITH A VOTE (§0z83): "As this Saga enters and after your draw step,

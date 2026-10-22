@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `4145db0`.
+Generated at `c794002`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,23 +86,23 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `d34fd53397fff077` | `418490f` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `ef7322e8d3ce2bb6` | `418490f` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `3ac71b2730860c58` | `418490f` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `2131bd843090790c` | `418490f` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `75f79df33d426821` | `418490f` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `be551a087a6e0f81` | `5efcb70` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `d34fd53397fff077` | `418490f` | **SUSPECT** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `ef7322e8d3ce2bb6` | `418490f` | **SUSPECT** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `3ac71b2730860c58` | `418490f` | **SUSPECT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `2131bd843090790c` | `418490f` | **SUSPECT** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `75f79df33d426821` | `418490f` | **SUSPECT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `be551a087a6e0f81` | `5efcb70` | **SUSPECT** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `d34fd53397fff077`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `ef7322e8d3ce2bb6`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `3ac71b2730860c58`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `2131bd843090790c`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `75f79df33d426821`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `be551a087a6e0f81`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `0b143bc8268438e1`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `d34fd53397fff077`, live is `01c2fc11e978988e`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `418490f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `ef7322e8d3ce2bb6`, live is `1137a48f5734f60b`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `418490f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `3ac71b2730860c58`, live is `e8c6e2aaddcc1708`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `418490f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `2131bd843090790c`, live is `474e579c5983f9d5`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `418490f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `75f79df33d426821`, live is `58132f5743e1ca9f`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `418490f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `be551a087a6e0f81`, live is `6ca132eddbb6c08a`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `5efcb70`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `ec903b1a2e845361`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

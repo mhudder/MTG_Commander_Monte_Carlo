@@ -527,7 +527,12 @@ def reduce_cost(g, card, miracle=False, flashback=False):
         red += sum(1 for c in g.graveyard
                    if "Instant" in c.types or "Sorcery" in c.types)
     if card.name == "Blasphemous Act":
-        red += min(9, sum(1 for p in g.board if p.card.is_creature) + 3)
+        # "{1} less for each creature on the battlefield" -- the pod's too.
+        # Their creatures were a flat 3; since §0z153 (`act_pod_count`) they
+        # are counted: the pod's creatures are a number in every pod.
+        theirs = (int(sum(o.creatures for o in OPP.living(g)) + 1e-9)
+                  if g.cfg.get("act_pod_count", True) else 3)
+        red += min(9, sum(1 for p in g.board if p.card.is_creature) + theirs)
     red += self_reduction(g, card)
     cost["gen"] = max(0, cost.get("gen", 0) - red)
     return cost
@@ -1507,6 +1512,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         g.graveyard.extend(g.hand)
         g.hand = []
         _draw_into_hand(g, 7)
+        tithe_forced_draws(g, 7)             # "EACH player ... draws seven"
     elif sc == "borrowed_knowledge":
         # "Choose one — • Discard your hand, then draw cards equal to the
         #  number of cards in TARGET OPPONENT'S HAND. • Discard your hand,
@@ -2785,6 +2791,19 @@ def combat(g):
 DRAW_LANDS = ("Mikokoro, Center of the Sea", "Geier Reach Sanitarium")
 
 
+def tithe_forced_draws(g, n) -> None:
+    """SMOTHERING TITHE on draws YOU make the pod take -- Reforge the Soul's
+    seven, Mikokoro's and Geier Reach Sanitarium's one (§0z153,
+    `tithe_forced_draws`). Each is a trigger, and the pod pays for none of
+    them -- the owner's call (2026-10-22), the same assumption the round's
+    own Treasures make (`engine.tithe_treasures`)."""
+    if g.has("Smothering Tithe") and g.cfg.get("tithe_forced_draws", True):
+        k = int(n) * len(OPP.living(g))
+        g.treasures += k
+        g.m["treasures_made"] += k
+        g.m["tithe_forced_treasures"] += k
+
+
 def draw_land_windows(g):
     """MIKOKORO, CENTER OF THE SEA: "{2}, {T}: Each player draws a card."
     GEIER REACH SANITARIUM: "{2}, {T}: Each player draws a card, then
@@ -2811,6 +2830,7 @@ def draw_land_windows(g):
     def activate(land):
         g.float_mana -= 3
         g.m["draw_land_activations"] += 1
+        tithe_forced_draws(g, 1)             # "EACH player draws a card"
 
     def sanitarium_discard(land):
         if land.card.name == "Geier Reach Sanitarium" and g.hand:
@@ -2932,7 +2952,12 @@ def opponent_upkeep_windows(g):
                 g.m["leng_mv_miracled"] += leng_card.mv
 
 
-def take_turn(g):
+def your_turn(g, extra=False):
+    """Your turn, untap to end step -- everything `take_turn` does before the
+    pod's round. An EXTRA turn (§0z153) is this whole turn again: untap,
+    upkeep, draw, land drop. What is skipped on one is what stands in for the
+    POD'S round rather than your upkeep: Smothering Tithe's and Monologue
+    Tax's per-round Treasures. Returns the mana held for the windows."""
     g.turn += 1
     g.turn_ended = False               # Ultima, §0z118
     g.precombat = True
@@ -2970,15 +2995,18 @@ def take_turn(g):
                 g.hand.append(b)
             g.m["land_tax_fetches"] += len(basics)
 
-    # Smothering Tithe / Monologue Tax upkeep value
-    if g.cfg.get("tithe_shared", True):
+    # Smothering Tithe / Monologue Tax upkeep value -- the POD's draws and
+    # spells over a round, so not on an extra turn, which has no round.
+    if extra:
+        pass
+    elif g.cfg.get("tithe_shared", True):
         n = tithe_treasures(g)                       # §0z151
         g.treasures += n
         g.m["treasures_made"] += n
     elif g.has("Smothering Tithe"):
         g.treasures += 2
         g.m["treasures_made"] += 2
-    if g.has("Monologue Tax"):
+    if g.has("Monologue Tax") and not extra:
         n = g.cfg.get("monologue_tax_rate", 2)   # 3 opponents, 2nd spell each
         g.treasures += n
         g.m["treasures_made"] += n
@@ -3079,13 +3107,29 @@ def take_turn(g):
                           and p.card.name in DRAW_LANDS]
     g.m["mana_floated"] += g.float_mana
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+    return held
+
+
+def take_turn(g):
+    held = your_turn(g)
+    if g.cfg.get("extra_turn_full", True):
+        # CR 500.7: an extra turn is added DIRECTLY AFTER the turn that made
+        # it -- before the pod's round -- and it is a whole turn. It used to
+        # come after the pod acted, with no upkeep, draw step or land drop
+        # (the loop below, `extra_turn_full=False`); tivit always took it this
+        # way (§0z116). `g.turn` advances, so `extra_turns_taken` keeps the
+        # pod's clock in rounds (`pod_turn`, §0z86).
+        while g.m["extra_turns"] > 0 and g.result is None:
+            g.m["extra_turns"] -= 1
+            g.m["extra_turns_taken"] += 1
+            held = your_turn(g, extra=True)
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
         if g.result is not None:
             return
 
-    while g.m["extra_turns"] > 0:
+    while g.m["extra_turns"] > 0:            # extra_turn_full=False only
         g.m["extra_turns"] -= 1
         for p in g.board:
             p.tapped = False

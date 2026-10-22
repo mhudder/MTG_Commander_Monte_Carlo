@@ -35,7 +35,8 @@ CASES
   H  azusa: `horn_doubled_legacy=True` reproduces the old triple draw
   I  azusa: a land drop under Horn is declined one card from empty, and
      taken from a full library
-  J  azusa: `draws_on_resolve` reads Momentous Fall off its smallest fodder
+  J  azusa: `draws_on_resolve` reads Momentous Fall off the creature it will
+     sacrifice -- the biggest safe one since §0z153 (the smallest before)
   K  lorehold: `pilot_may_cast` refuses a wheel off a short library
   L  lorehold: `spell_draws` equals what `apply_spell_effects` ACTUALLY draws,
      for every scripted card in the list -- derived, so a new draw script
@@ -205,8 +206,10 @@ def run_cases():
         # through make_permanent: azusa's power_of reads `base_p`, which only
         # the engine's own constructor sets
         g.make_permanent(c, sick=False, is_token=True)
-    check("J draws_on_resolve(Momentous Fall) is the smallest fodder's power",
-          g.draws_on_resolve(card_named(AZM, "Momentous Fall")), 4)
+    # The creature resolution will sacrifice: the biggest whose draw is safe
+    # since the owner's policy of §0z153 (the smallest token before it).
+    check("J draws_on_resolve(Momentous Fall) is the sacrifice's power",
+          g.draws_on_resolve(card_named(AZM, "Momentous Fall")), 9)
 
     # ---- K: the lorehold cast guard ------------------------------------
     wheel = EN.Card(name="a wheel", types=frozenset({"Sorcery"}),

@@ -628,7 +628,8 @@ def check_alt_cost_coverage():
                         f"(cost, tag, preference).")
 
 
-# Planeswalkers modelled BY NAME, as statics, with no loyalty (§0z74). Each
+# Planeswalkers modelled BY NAME, as statics, with no loyalty (§0z74). (Sorin,
+# Vengeful Bloodlord left 2026-10-22: loyalty and both abilities, §0z153.) Each
 # was found by the first run of `check_loyalty_coverage`; each is a FLOOR or an
 # approximation for the reason given, and none was listed anywhere before.
 WALKERS_WITHOUT_LOYALTY = {
@@ -636,14 +637,10 @@ WALKERS_WITHOUT_LOYALTY = {
         "rendmaw: a 1/1 Insect creature everywhere but the battlefield "
         "(engine.STACK_ONLY_CREATURES); its upkeep Insect is scripted; its "
         "loyalty abilities are not modelled."),
-    "Sorin, Vengeful Bloodlord": (
-        "karlov: its static ('during your turn, creatures and planeswalkers "
-        "you control have lifelink') is read by name in karlov.combat; its +2 "
-        "and -X are not modelled, a floor."),
     "Sorin, Solemn Visitor": (
         "karlov: its +1 -- team lifelink in karlov.combat and +1/+0 in "
         "power_of (§0z151) -- is read by name as though it stood every turn; "
-        "the -2 Vampire token and the -6 emblem are not modelled."),
+        "the -2 and the -6 are never used, the owner's policy (§0z153)."),
 }
 
 
