@@ -138,7 +138,7 @@ import random
 from edhmc.engine import (remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
-                          spend, play_land, engine_cfg, choose_mode_cost,
+                          spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures,
                           lazy_pay_of, can_afford as afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -246,6 +246,13 @@ class ShilgengarGame(BaseGame):
     def power_of(self, perm):
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
+        # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
+        # commander is one (§0z151, `norn_text`).
+        if self.has("Elesh Norn, Grand Cenobite") \
+                and perm.card.name != "Elesh Norn, Grand Cenobite" \
+                and perm.card is self.commander \
+                and self.cfg.get("norn_text", True):
+            p += 2
         if perm.card is not self.commander:
             if self.has("Elesh Norn, Grand Cenobite") \
                     and perm.card.name != "Elesh Norn, Grand Cenobite":
@@ -260,6 +267,13 @@ class ShilgengarGame(BaseGame):
     def toughness_of(self, perm):
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
+        # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
+        # commander is one (§0z151, `norn_text`).
+        if self.has("Elesh Norn, Grand Cenobite") \
+                and perm.card.name != "Elesh Norn, Grand Cenobite" \
+                and perm.card is self.commander \
+                and self.cfg.get("norn_text", True):
+            t += 2
         if perm.card is not self.commander:
             if self.has("Elesh Norn, Grand Cenobite") \
                     and perm.card.name != "Elesh Norn, Grand Cenobite":
@@ -333,6 +347,13 @@ class ShilgengarGame(BaseGame):
                          base_p=card.power, base_t=card.toughness)
         enter_loyalty(perm)          # Thomil (§0z74); a no-op for the rest
         self.board.append(perm)
+        if (card.name == "Elesh Norn, Grand Cenobite"
+                and self.cfg.get("norn_text", True)):
+            # "Creatures your opponents control get -2/-2" (§0z151): a STATIC,
+            # so what it kills dies as she enters -- cast or reanimated, which
+            # is why it is here -- and again at each of your upkeeps for what
+            # the pod cast meanwhile (`upkeep`).
+            self.m["norn_kills"] += OPP.minus_two_pod(self, card)
         return perm
 
     def giada_counters(self, card) -> int:
@@ -992,7 +1013,11 @@ class ShilgengarGame(BaseGame):
             # body of toughness 2 or less, and the drain is paid by
             # `on_pod_creature_deaths` -- the same hook a pod wrath reaches,
             # which the card's "whenever" also covers. Off, the share above.
-            for o in (OPP.living(self) if OPP.pod_bodies_on(self) else ()):
+            if OPP.pod_bodies_on(self) and self.cfg.get("wurm_route_pieces",
+                                                         True):
+                OPP.minus_two_pod(self, card)        # rendmaw's rule, §0z151
+            for o in (OPP.living(self) if OPP.pod_bodies_on(self)
+                      and not self.cfg.get("wurm_route_pieces", True) else ()):
                 OPP.kill_pod_bodies(self, o, lambda b: b.toughness <= 2)
             for o in ([] if OPP.pod_bodies_on(self) else OPP.living(self)):
                 killed = min(o.creatures, o.creatures * share + 1)
@@ -1245,6 +1270,13 @@ class ShilgengarGame(BaseGame):
     def upkeep(self):
         # Lord of the Pit (Thomil's -5, §0z74): mandatory, first.
         lord_of_the_pit_upkeep(self, lambda p: self.sacrifice(p))
+        # Elesh Norn's -2/-2 is static: what the pod cast since your last turn
+        # died as it entered (§0z151). Read here, the first point you look.
+        if self.has("Elesh Norn, Grand Cenobite") \
+                and self.cfg.get("norn_text", True):
+            norn = next(p.card for p in self.board
+                        if p.card.name == "Elesh Norn, Grand Cenobite")
+            self.m["norn_kills"] += OPP.minus_two_pod(self, norn)
         if self.has("Phyrexian Arena"):
             self.draw(1)
             self.your_life -= 1
@@ -1255,7 +1287,11 @@ class ShilgengarGame(BaseGame):
             # three. Said out loud: this undercounts the card's ceiling.
             self.draw(1)
             self.your_life -= 2
-        if self.has("Smothering Tithe"):
+        if self.cfg.get("tithe_shared", True):
+            n = tithe_treasures(self)                    # §0z151
+            self.treasures += n
+            self.m["treasures_made"] += n
+        elif self.has("Smothering Tithe"):
             # "whenever an opponent draws a card, they may pay {2}; if they
             # don't, you create a Treasure." Approximated as one Treasure per
             # living opponent per round and no RNG (opponents nearly always

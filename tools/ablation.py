@@ -192,6 +192,14 @@ SCRIPTED_RENDMAW = {
     # code while shilgengar modelled it; `engine.midnight_reaper`, look-back,
     # nontoken deaths only.
     "Midnight Reaper",
+    # Massacre Wurm (§0z151): KNOWN_BLIND and BLIND_BUT_LIVE here, SCRIPTED in
+    # shilgengar -- §0z116's "same card, two engines". Under POD_V4 both
+    # engines read it the same way: the ETB's -2/-2 kills the pod's bodies of
+    # toughness 2 or less and the route pieces it reaches (`minus_2`), and
+    # each death drains its controller 2 (`on_pod_creature_deaths`). Its old
+    # reason described the count pod. Cast in 17 of 400 games; the 40-seed
+    # identity test never drew it.
+    "Massacre Wurm",
     # --- scripted LANDS, classified since 2026-09-12 ---
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
@@ -429,7 +437,9 @@ SCRIPTED_KARLOV = {
     "Sol Ring", "Orzhov Signet", "Pristine Talisman", "Land Tax",
     "Phyrexian Arena", "Mother of Runes",
     "Swiftfoot Boots", "Sorin, Vengeful Bloodlord",
-    "Sorin, Solemn Visitor", "Kalitas, Traitor of Ghet",
+    "Sorin, Solemn Visitor",
+    # (Kalitas left 2026-10-22 for PARTLY_MODELLED, §0z151: SCRIPTED while no
+    # code read its name, §0z116.)
     # Added to the deck in v2, 2026-09-04. All three have their full text in
     # karlov.py: Starscape Cleric's "each opponent loses 1" and its Offspring
     # token copy, Enduring Tenacity's Sanguine Bond trigger AND its
@@ -819,6 +829,14 @@ PARTLY_MODELLED = {
             "cast this turn does not swing. A floor.",
     },
     "karlov": {
+        # §0z151.
+        "Kalitas, Traitor of Ghet":
+            "MODELLED: the 3/4 lifelink body, and under POD_V4 the "
+            "replacement -- a pod creature that would die is exiled and you "
+            "get a 2/2 Zombie, so karlov's death triggers do not hear it "
+            "(every pod body read as nontoken, an overstatement). NOT: "
+            "'{2}{B}, sacrifice another Vampire or Zombie: two +1/+1 "
+            "counters'. A floor on that half.",
         # Item 24's change 4 (§0z139).
         "Sensei's Divining Top":
             "MODELLED: '{1}: look at the top three, put them back in any "
@@ -1032,6 +1050,13 @@ PARTLY_MODELLED = {
             "(§4). A floor.",
     },
     "lorehold": {
+        # §0z151: "can't be countered" exists since 2026-10-22.
+        "Hexing Squelcher":
+            "MODELLED: 'This spell can't be countered' and 'Spells you "
+            "control can't be countered' (`opponents.uncounterable`): the "
+            "table keeps its counterspell for a spell it can counter. NOT: "
+            "ward (pay 2 life) on it and your other creatures -- the pod's "
+            "spot removal pays no cost (§4). A floor.",
         # Item 24's change 4 (§0z139).
         "Gamble":
             "MODELLED: any card to hand by the shared want order, then a "
@@ -1266,9 +1291,9 @@ for _deck in ("karlov", "shilgengar", "tivit"):
 # for a hand-maintained name set is derivation, so the category now follows the
 # tag that makes the card a wipe in the first place.
 #
-# ONESIDED WIPES ARE EXCLUDED and stay KNOWN_BLIND: `spare_own=True` skips the
-# half that is faithful, so a one-sided wipe is ALL abstraction and a high
-# score means no more than a low one. Massacre Wurm (rendmaw) is the only one.
+# ONESIDED WIPES ARE EXCLUDED: `spare_own=True` skips the half that is
+# faithful. Massacre Wurm is the only one, and it is SCRIPTED in both decks
+# that run it since POD_V4 gave the pod bodies for its -2/-2 (§0z151).
 SYMMETRIC_WIPE_REASON = (
     "SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(), "
     "honouring indestructible from this card's oracle text, §0z10); the "
@@ -1720,7 +1745,7 @@ KNOWN_BLIND = {
         'Bow of Nylea',
         'Haywire Mite',
         'Lignify',
-        'Massacre Wurm',
+        # (Massacre Wurm left 2026-10-22 for SCRIPTED, §0z151.)
         # (Midnight Reaper left 2026-10-13: implemented, item 24.)
         # Deathreap Ritual joined 2026-10-08, by the owner's rule (§0z121):
         # "At the beginning of EACH end step, if a creature died this turn"
@@ -1747,7 +1772,7 @@ KNOWN_BLIND = {
         'Bolt Bend',
         'Call Forth the Tempest',
         # (Gamble left 2026-10-14 for PARTLY_MODELLED, item 24's change 4.)
-        'Hexing Squelcher',
+        # (Hexing Squelcher left 2026-10-22 for PARTLY_MODELLED, §0z151.)
         'Perch Protection',
         'Sejiri Shelter',
         # (Improvisation Capstone and Restoration Seminar left 2026-10-13:
@@ -1895,16 +1920,7 @@ KNOWN_BLIND = {
 # acts on that is not listed here, and on a card listed here the engine no
 # longer acts on. The reason is printed under the card's row.
 BLIND_BUT_LIVE = {
-    "rendmaw": {
-        "Massacre Wurm":
-            "The engine acts on it and the row is still not evidence: the "
-            "6/5 body is modelled, the ETB '-2/-2 to creatures your "
-            "opponents control' is a one-sided wipe that ZEROES the pod's "
-            "creature count (overstates against big creatures), and 'whenever "
-            "a creature an opponent controls dies, that player loses 2 life' "
-            "is missing (understates). The one-sided-wipe rule in "
-            "symmetric_wipes' note keeps it here.",
-    },
+    # rendmaw's Massacre Wurm left 2026-10-22 for SCRIPTED (§0z151).
     "lorehold": {
         "Sejiri Shelter":
             "Played as its land face, and held up in `protection_cards`, "

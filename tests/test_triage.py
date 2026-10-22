@@ -25,11 +25,12 @@ CASES
   C  lorehold's Bolt Bend (it redirects the pod's spells, §4): BLIND. Until
      §0z140 this was tivit's Counterspell, which POD_V4 casts on the pod's
      turn -- SEEN now, case M
-  D  lorehold's Hexing Squelcher (its text is ward and "can't be countered",
-     the pod's spells, §4): BODY. Until 2026-10-13 this was karlov's Sun
-     Titan, which item 24 implemented there (§0z129), and then rendmaw's
-     Pygmy Kavu, which §0z132 implemented under `pod_bodies` -- both are
-     SEEN now, through their names
+  D  a constructed 3/3 creature no engine names: BODY. Until 2026-10-13
+     this was karlov's Sun Titan, which item 24 implemented there (§0z129),
+     then rendmaw's Pygmy Kavu, which §0z132 implemented under `pod_bodies`,
+     then lorehold's Hexing Squelcher, whose "can't be countered" §0z151
+     implemented -- all three SEEN now, through their names. No KNOWN_BLIND
+     card in any deck is a creature after §0z151, so the case is built
   E  text "Counter target spell." on an Instant: BLIND, the clause named
   F  the same clause on a CREATURE: REVIEW -- a body is always visible
   G  "Return target creature card from your graveyard to the battlefield."
@@ -44,13 +45,19 @@ CASES
   M  the pod's channels (§0z140, POD_V4 the default): tivit's Counterspell
      SEEN through `response`, Swords to Plowshares through `answer`,
      Ghostly Prison through `tax`
+  N  a constructed body in lorehold's Hexing Squelcher slot plays
+     identically to its matched blank, 15 seeds (§0z151). A's population
+     held one BODY card, the Squelcher; §0z151 made it SEEN, and A could no
+     longer see a blank that drops the body. N is the body A lost
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the named channel is ignored                    -> A, B
   the body channel is ignored                     -> D
   the text screen ignores a body                  -> F
   every clause with "target" is blind             -> G
-  the matched blank drops the body                -> A
+  the matched blank drops the body                -> N (A until §0z151,
+                                                     whose population no
+                                                     longer holds a BODY card)
   the ledger's triage check does nothing           -> I, J, K
   (added with M, before its run)
   the pod's channels are ignored                  -> A, M
@@ -61,6 +68,7 @@ measured against; H pins a bug fixed inline in `smoke`, which has no seam.
 import sys
 
 import tools.triage as T
+from edhmc.engine import Card
 from edhmc.pending import build_pending
 
 MUTATE = "--mutate" in sys.argv
@@ -91,10 +99,10 @@ def run_cases():
     check("C lorehold's Bolt Bend: BLIND",
           T.structural_verdict(card("lorehold", "Bolt Bend"), "lorehold"),
           "BLIND")
-    check("D lorehold's Hexing Squelcher: BODY",
-          T.structural_verdict(card("lorehold", "Hexing Squelcher"),
-                               "lorehold"),
-          "BODY")
+    body = Card(name="Triage Test Body", types=frozenset({"Creature"}),
+                power=3, toughness=3, cost={"gen": 3})
+    check("D a creature no engine names: BODY",
+          T.structural_verdict(body, "lorehold"), "BODY")
     e = T.text_screen("Counter target spell.", "Instant")
     check("E 'Counter target spell.' on an Instant: BLIND, clause named",
           (e["verdict"], e["blind_clauses"]),
@@ -135,7 +143,31 @@ def run_cases():
           [T.structural_channels(card("tivit", n), "tivit")[-1:]
            for n in ("Counterspell", "Swords to Plowshares", "Ghostly Prison")],
           [["response"], ["answer"], ["tax"]])
+    check("N a constructed body plays identically to its matched blank",
+          body_plays_identically(), True)
     return set(FAIL)
+
+
+def body_plays_identically() -> bool:
+    """`plays_identically`'s comparison, for a BODY card no deck holds."""
+    from edhmc.experiment import DEFAULT_CFG
+    from edhmc.registry import DECKS as REG
+    deck, cmd = build_pending("lorehold")
+    i = next(k for k, c in enumerate(deck) if c.name == "Hexing Squelcher")
+    sq = deck[i]
+    body = Card(name="Triage Test Body", types=sq.types, cost=dict(sq.cost),
+                power=sq.power, toughness=sq.toughness, priority=sq.priority,
+                threat=sq.threat)
+    a, b = list(deck), list(deck)
+    a[i], b[i] = body, T.matched_blank(body)
+    sim = REG["lorehold"].sim
+    for s in range(5000, 5015):
+        ra = sim(a, cmd, dict(DEFAULT_CFG, turns=20), s)
+        rb = sim(b, cmd, dict(DEFAULT_CFG, turns=20), s)
+        if any(isinstance(v, (int, float)) and v != rb.get(k)
+               for k, v in ra.items()):
+            return False
+    return True
 
 
 def main() -> int:
@@ -177,7 +209,7 @@ def main() -> int:
             ({"G"}, "BLIND_CLAUSES",
              real["BLIND_CLAUSES"] + (("any target", r"\btarget\b"),)),
         "the matched blank drops the body":
-            ({"A"}, "matched_blank", bodiless_blank),
+            ({"N"}, "matched_blank", bodiless_blank),
         "the ledger's triage check does nothing":
             ({"I", "J", "K"}, "check_triage", lambda pr: None),
         "the pod's channels are ignored":

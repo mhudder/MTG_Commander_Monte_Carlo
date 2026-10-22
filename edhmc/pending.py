@@ -641,9 +641,9 @@ WALKERS_WITHOUT_LOYALTY = {
         "you control have lifelink') is read by name in karlov.combat; its +2 "
         "and -X are not modelled, a floor."),
     "Sorin, Solemn Visitor": (
-        "karlov: its +1's team lifelink is read by name in karlov.combat as "
-        "though it stood every turn; the +1/+0 and the -2 Vampire token are "
-        "not modelled."),
+        "karlov: its +1 -- team lifelink in karlov.combat and +1/+0 in "
+        "power_of (§0z151) -- is read by name as though it stood every turn; "
+        "the -2 Vampire token and the -6 emblem are not modelled."),
 }
 
 

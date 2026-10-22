@@ -56,7 +56,6 @@ Fountain of Renewal                   +0.55+-0.08         +0.43+-0.10        +0.
 Ranger of Eos                         +0.52+-0.10         +0.43+-0.13        +0.0017+-0.0027       dmg
 Land Tax                              +0.49+-0.12         +0.41+-0.16        +0.0073+-0.0029      both
 Pristine Talisman                     +0.50+-0.09         +0.39+-0.12        +0.0035+-0.0024      both
-Kalitas, Traitor of Ghet              +0.33+-0.05         +0.34+-0.07        +0.0026+-0.0015      both
 Cosmos Elixir                         +0.35+-0.08         +0.33+-0.10        +0.0073+-0.0021      both
 Ajani's Mantra                        +0.35+-0.06         +0.32+-0.09        +0.0025+-0.0019      both
 Sun Titan                             +0.24+-0.05         +0.30+-0.08        +0.0028+-0.0018      both
@@ -139,6 +138,12 @@ Damnation                             +0.18+-0.08         +0.35+-0.11        +0.
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
+Kalitas, Traitor of Ghet              +0.33+-0.05         +0.34+-0.07        +0.0026+-0.0015      both
+      MODELLED: the 3/4 lifelink body, and under POD_V4 the replacement -- a pod
+      creature that would die is exiled and you get a 2/2 Zombie, so karlov's
+      death triggers do not hear it (every pod body read as nontoken, an
+      overstatement). NOT: '{2}{B}, sacrifice another Vampire or Zombie: two +1/+1
+      counters'. A floor on that half.
 Umezawa's Jitte                       +0.39+-0.08         +0.31+-0.10        +0.0018+-0.0023       dmg
       MODELLED (item 24): equip {2} at the end of the first main phase, two charge
       counters whenever the holder attacks (it deals combat damage to a player or

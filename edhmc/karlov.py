@@ -45,7 +45,7 @@ from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, 
                           pearl_collector_trigger, pearl_collector_lifelink,
                           perpetual_lifelink, enter_land, after_land_enters,
                           vault_of_the_archangel, vault_active,
-                          sun_titan_pick, stack_top, tutor_take)
+                          sun_titan_pick, stack_top, tutor_take, land_tax)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -225,6 +225,13 @@ class KarlovGame(BaseGame):
         # has flying." A 1/1 for {W} is a 6/6 for most of a game this deck wins.
         if perm.card.name == "Serra Ascendant" and self.your_life >= 30:
             base += 5
+        # SORIN, SOLEMN VISITOR's +1: "Until your next turn, creatures you
+        # control get +1/+0 and gain lifelink." `combat` reads its lifelink as
+        # though the +1 is used every turn (WALKERS_WITHOUT_LOYALTY); the
+        # +1/+0 is the same activation, read the same way (§0z151).
+        if self.has("Sorin, Solemn Visitor") \
+                and self.cfg.get("sorin_power", True):
+            base += 1
         return base
 
     def toughness_of(self, perm):
@@ -316,7 +323,20 @@ class KarlovGame(BaseGame):
                                 damage to each opponent" -- any player's.
           Slaughter Specialist  "Whenever a creature an opponent controls
                                 dies, put a +1/+1 counter on this creature"
-                                (catalog; the clause its PARTLY note names)."""
+                                (catalog; the clause its PARTLY note names).
+
+        KALITAS, TRAITOR OF GHET (§0z151, `kalitas_text`): "If a nontoken
+        creature an opponent controls would die, instead exile that card and
+        create a 2/2 black Zombie creature token." A REPLACEMENT: the
+        creature never dies, so none of the triggers above hear it, and you
+        get a Zombie each. THE POD'S BODIES CARRY NO TOKEN FLAG, so every one
+        is read as nontoken -- an overstatement against a token-heavy pod,
+        said out loud. Off `pod_bodies` there are no deaths to replace."""
+        if self.has("Kalitas, Traitor of Ghet") \
+                and self.cfg.get("kalitas_text", True):
+            self.make_tokens(int(n), 2, 2, "Zombie")
+            self.m["kalitas_zombies"] += int(n)
+            return
         for _ in range(int(n)):
             for _ in range(self.count("Blood Artist")):
                 drain(self, 1)
@@ -748,10 +768,11 @@ def creature_entered(g, mine=True, entering=None):
     # `others()` is what reads the clause rather than `count()`.
     #
     # THE PLANESWALKER HALF IS DEAD IN THIS DECK, said out loud rather than
-    # left as a silent floor: karlov's list holds no planeswalker and this
-    # engine has no loyalty at all (azusa is the engine that does). If a
-    # planeswalker is ever added here, this line is one of the places that has
-    # to learn about it.
+    # left as a silent floor: this engine has no loyalty at all (azusa is the
+    # engine that does), so karlov's two Sorins -- modelled by name as
+    # statics, `pending.WALKERS_WITHOUT_LOYALTY` -- never "enter" as
+    # planeswalkers here. (This note used to say the list held none; §0z116.)
+    # If loyalty ever comes to this engine, this line has to learn about it.
     #
     # Its second ability -- "{1}, {T}, Discard a card: another target creature
     # or planeswalker you control gains hexproof until end of turn" -- is NOT
@@ -842,7 +863,9 @@ def upkeep(g):
         if g.cfg.get("charge_life_costs", True):
             g.your_life -= 1
             g.m["life_lost_to_own_cards"] += 1
-    if g.has("Land Tax"):
+    if g.cfg.get("land_tax_shared", True):
+        land_tax(g)                                  # §0z151
+    elif g.has("Land Tax"):
         # "if an opponent controls more lands than you" — the condition was
         # missing entirely, so this fetched three basics every upkeep.
         #
@@ -1196,10 +1219,15 @@ def main_phase(g):
                 g.spells_this_turn += 1
                 spend_lg(g, can_pay(ccost, units), units)
                 g.m["mana_spent"] += sum(ccost.values())
+                cmd_triggers = g.cfg.get("commander_cast_triggers", True)
                 if OPP.countered(g, g.commander, idx):
                     g.m["countered"] += 1
                     g.commander_tax += 2
+                    if cmd_triggers:
+                        countered_cast_triggers(g, g.commander)
                     continue
+                if cmd_triggers:
+                    cast_triggers(g, g.commander)
                 g.board.append(Permanent(card=g.commander, sick=True))
                 g.commander_cast = True
                 g.karlov_counters = 0
@@ -1253,6 +1281,7 @@ def main_phase(g):
             if card.name in g.cfg.get("watch", ()):
                 g.m["test_card_countered"] += 1
                 g.m["test_card_answered"] += 1
+            countered_cast_triggers(g, card)
             continue
         resolve(g, card)
         if g.result is not None:
@@ -1398,6 +1427,7 @@ def citadel_step(g):
             if top.name in g.cfg.get("watch", ()):
                 g.m["test_card_countered"] += 1
                 g.m["test_card_answered"] += 1
+            countered_cast_triggers(g, top)
             continue
         resolve(g, top)
         if g.result is not None:
@@ -1422,12 +1452,14 @@ def citadel_step(g):
     return did
 
 
-def resolve(g, card):
-    g.m["spells_cast"] += 1
-    if card.name in g.cfg.get("watch", ()):
-        g.m["cast_test_card"] = 1
-        g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
+def cast_triggers(g, card):
+    """Everything in this deck that says "whenever you cast a spell".
 
+    A CAST trigger, so it fires whether or not the spell is then countered
+    (§0z151, `cast_triggers_countered`), and for the commander too, which is a
+    spell (`commander_cast_triggers`). Until §0z151 both lived in `resolve`,
+    so a countered spell and the commander set off neither.
+    """
     # Aetherflux Reservoir: "whenever you cast a spell, you gain 1 life for
     # each spell you've cast this turn." This is the card's actual engine and
     # was missing entirely — only the pay-50 kill was modelled.
@@ -1446,6 +1478,21 @@ def resolve(g, card):
         g.m["drain_damage"] += dealt
         g.m["extort_triggers"] += 1
         gain_life(g, n)
+
+
+def countered_cast_triggers(g, card):
+    """A countered spell was still cast (§0z151)."""
+    if g.cfg.get("cast_triggers_countered", True):
+        cast_triggers(g, card)
+
+
+def resolve(g, card):
+    g.m["spells_cast"] += 1
+    if card.name in g.cfg.get("watch", ()):
+        g.m["cast_test_card"] = 1
+        g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
+
+    cast_triggers(g, card)
 
     if "wipe" in card.tags:
         OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)

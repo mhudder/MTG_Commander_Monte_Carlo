@@ -33,7 +33,8 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
-                          crn_shuffle, make_rng, seal_rng, tutor_take, remove_card)
+                          crn_shuffle, make_rng, seal_rng, tutor_take, remove_card,
+                          land_tax, tithe_treasures)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
 
@@ -823,6 +824,7 @@ def miracle_window(g, off_turn=False):
         if card.name in g.cfg.get("watch", ()):
             g.m["test_card_countered"] += 1
             g.m["test_card_answered"] += 1
+        countered_cast_triggers(g, card)
         return card, False
 
     g.m["miracles_cast"] += 1
@@ -2253,11 +2255,7 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
     else:
         g.graveyard.append(card)
 
-    # Storm-Kiln Artist: a Treasure per instant/sorcery
-    if ("Instant" in card.types or "Sorcery" in card.types) and \
-            g.has("Storm-Kiln Artist"):
-        g.treasures += 1
-        g.m["treasures_made"] += 1
+    storm_kiln(g, card)
 
     # Sunbird's Invocation fires on cast, but the reveal is resolved here so
     # that the triggering spell has already been put onto the battlefield or
@@ -2265,6 +2263,31 @@ def resolve_spell(g, card, paid, from_hand=True, exile=False, cheated=None):
     if from_hand and g.has("Sunbird's Invocation") \
             and card.name != "Sunbird's Invocation":
         sunbird(g, card)          # it is not on the battlefield for its own cast
+
+
+def storm_kiln(g, card):
+    """Storm-Kiln Artist: a Treasure per instant/sorcery cast (magecraft)."""
+    if ("Instant" in card.types or "Sorcery" in card.types) and \
+            g.has("Storm-Kiln Artist"):
+        g.treasures += 1
+        g.m["treasures_made"] += 1
+
+
+def countered_cast_triggers(g, card, from_hand=True):
+    """A countered spell was still CAST (§0z151, `cast_triggers_countered`).
+
+    Every "whenever you cast" in this deck lives in `resolve_spell`'s path --
+    `on_cast_triggers`, Storm-Kiln Artist's magecraft, Sunbird's Invocation's
+    "from your hand" -- so until §0z151 a countered spell set off none of
+    them. A copy is never countered here, so `is_copy` is always False.
+    """
+    if not g.cfg.get("cast_triggers_countered", True):
+        return
+    on_cast_triggers(g, card)
+    storm_kiln(g, card)
+    if from_hand and g.has("Sunbird's Invocation") \
+            and card.name != "Sunbird's Invocation":
+        sunbird(g, card)
 
 
 # "Exile <self>." Both cards say it, and it matters here: a card that exiles
@@ -2698,6 +2721,7 @@ def _main_phase(g, reserve=0):
             if OPP.countered(g, card, idx):
                 g.m["countered"] += 1
                 g.m["flashback_exiled"] += 1
+                countered_cast_triggers(g, card, from_hand=False)
                 continue
             resolve_spell(g, card, paid, from_hand=False)
             exile_flashback(g, card)
@@ -2709,6 +2733,7 @@ def _main_phase(g, reserve=0):
             if card.name in g.cfg.get("watch", ()):
                 g.m["test_card_countered"] += 1
                 g.m["test_card_answered"] += 1
+            countered_cast_triggers(g, card)
             continue
         resolve_spell(g, card, paid)
 
@@ -2933,7 +2958,9 @@ def take_turn(g):
     # Plains to hand. Two effects, both of which matter here: it fixes land
     # drops, and it fills the hand -- and an empty hand is what starves
     # Lorehold's rummage, which supplies three of the four miracle windows.
-    if g.has("Land Tax"):
+    if g.cfg.get("land_tax_shared", True):
+        land_tax(g)                                  # §0z151
+    elif g.has("Land Tax"):
         my_lands = sum(1 for p in g.board if p.card.is_land)
         if my_lands < min(g.turn, 10):
             basics = [x for x in g.library
@@ -2944,7 +2971,11 @@ def take_turn(g):
             g.m["land_tax_fetches"] += len(basics)
 
     # Smothering Tithe / Monologue Tax upkeep value
-    if g.has("Smothering Tithe"):
+    if g.cfg.get("tithe_shared", True):
+        n = tithe_treasures(g)                       # §0z151
+        g.treasures += n
+        g.m["treasures_made"] += n
+    elif g.has("Smothering Tithe"):
         g.treasures += 2
         g.m["treasures_made"] += 2
     if g.has("Monologue Tax"):

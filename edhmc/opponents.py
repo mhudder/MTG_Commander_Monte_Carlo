@@ -1816,6 +1816,21 @@ def own_wipe_body_rule(g, card):
     return None
 
 
+def minus_two_pod(g, card) -> int:
+    """"Creatures your opponents control get -2/-2" -- Massacre Wurm's ETB in
+    shilgengar and Elesh Norn's static (§0z151). Under `pod_bodies` the bodies
+    of toughness 2 or less die, each a death event, and the creature route
+    pieces it reaches go (`wipe_threat_pieces`, scope "minus_2") -- the rule
+    rendmaw's Wurm already got through `resolve_own_wipe`. The survivors'
+    smaller toughness is not modelled. Off `pod_bodies`, nothing: each caller
+    keeps its own count rule. Returns the bodies killed."""
+    if not pod_bodies_on(g):
+        return 0
+    wipe_threat_pieces(g, card, scope="minus_2")
+    return sum(kill_pod_bodies(g, o, lambda b: b.toughness <= 2)
+               for o in living(g))
+
+
 def own_wipe_pod_kill(g, card, o) -> float:
     """Resolve your sweeper against one opponent under `pod_bodies`. Returns
     how many of their creatures died."""
@@ -2130,6 +2145,50 @@ def counter_threat(g, card) -> float:
     return threat
 
 
+def uncounterable(g, card) -> bool:
+    """Can this spell be countered? (§0z151; `uncounterable`, default True.)
+
+    Three sources, every one from its text. The card's own "This spell can't
+    be countered." (`_evasion.UNCOUNTERABLE`, generated: Dovin's Veto, Void
+    Rend, Rise of the Eldrazi, Hexing Squelcher); Hexing Squelcher's "Spells
+    you control can't be countered" while it is on the battlefield; and
+    Cavern of Souls' coloured mana, `cavern_covers`. Asked only of a spell the
+    table would want countered (`counter_threshold`), so Cavern is spent on
+    the spell at risk, which is the pilot's choice to make.
+    """
+    if not g.cfg.get("uncounterable", True):
+        return False
+    if card.name in _evasion.UNCOUNTERABLE or g.has("Hexing Squelcher"):
+        return True
+    return cavern_covers(g, card)
+
+
+def cavern_covers(g, card) -> bool:
+    """Cavern of Souls: "{T}: Add one mana of any color. Spend this mana only
+    to cast a creature spell of the chosen type, and that spell can't be
+    countered."
+
+    TWO POLICIES, said out loud. The chosen type is the COMMANDER's (any of
+    its subtypes, `_evasion.CREATURE_SUBTYPES`): in these six decks the
+    commander is the creature cast most, taxed and recast, and no deck is
+    tribal enough that another type covers more of its threats. And Cavern
+    covers ONE spell a turn, the first at-risk creature spell of that type,
+    whatever the solver tapped it for earlier: the mana half is modelled as
+    an unrestricted coloured land in four decks and {C} in trostani, and
+    nothing records which land paid for what. Lorehold's extra turns do not
+    advance `g.turn`, so Cavern does not untap for them here.
+    """
+    if not card.is_creature or not g.has("Cavern of Souls"):
+        return False
+    if getattr(g, "cavern_turn", None) == g.turn:
+        return False
+    named = set(_evasion.CREATURE_SUBTYPES.get(g.commander.name, ()))
+    if not named & set(_evasion.CREATURE_SUBTYPES.get(card.name, ())):
+        return False
+    g.cavern_turn = g.turn
+    return True
+
+
 def countered(g, card, spell_index: int) -> bool:
     """Checked as the spell goes on the stack.
 
@@ -2145,7 +2204,44 @@ def countered(g, card, spell_index: int) -> bool:
     if _countered(g, card, spell_index):
         return True
     answer_pod_threat(g, card)
+    spell_life_loss(g, card)
     return False
+
+
+def spell_life_loss(g, card) -> None:
+    """"You lose N life." on the instant or sorcery that resolves
+    (`_evasion.SPELL_LIFE_LOSS`, generated: Anguished Unmaking 3, Malakir
+    Rebirth 2). §0i's rule: a life drawback is a real cost, and uncharged it
+    makes the card's row a ceiling (§0z151, `spell_life_costs`)."""
+    n = _evasion.SPELL_LIFE_LOSS.get(card.name)
+    if n and g.cfg.get("spell_life_costs", True):
+        g.your_life -= n
+        g.m["life_lost_to_own_cards"] += n
+
+
+def deluge_x(g) -> int:
+    """TOXIC DELUGE: "As an additional cost to cast this spell, pay X life.
+    All creatures get -X/-X until end of turn." X is the toughness of the
+    toughest creature it kills -- and `resolve_own_wipe` kills every creature
+    on both sides, so X is the toughest of all of them (§0z151).
+
+    WHAT THIS DOES NOT SEE, said out loud: a pilot can pay less and keep a
+    big creature of their own, and the wipe gate does not price the life.
+    Under `pod_bodies` the pod's side is its bodies' toughness and its
+    creature route pieces'; without, its creatures have no toughness and
+    `deluge_pod_toughness` (4) stands in -- A JUDGEMENT, NOT A CENSUS."""
+    x = 0
+    for p in g.board:
+        if is_creature_now(g, p):
+            x = max(x, int(g.toughness_of(p)))
+    for o in living(g):
+        if pod_bodies_on(g):
+            x = max([x] + [b.toughness for b in pod_bodies(g, o)])
+            x = max([x] + [o.pieces[k].toughness for k in present_pieces(g, o)
+                           if o.pieces[k].type == "Creature"])
+        elif o.creatures >= 1:
+            x = max(x, int(g.cfg.get("deluge_pod_toughness", 4)))
+    return x
 
 
 def _countered(g, card, spell_index: int) -> bool:
@@ -2155,6 +2251,7 @@ def _countered(g, card, spell_index: int) -> bool:
     if threat < g.cfg.get("counter_threshold", 4.0):
         return False
 
+    shielded = uncounterable(g, card)
     rolls = g.counter_rolls[min(pod_turn(g), len(g.counter_rolls) - 1)][spell_index]
     mana_gate = min(1.0, (pod_turn(g) - 2) / 4.0)
     old = dead_act(g)
@@ -2163,6 +2260,11 @@ def _countered(g, card, spell_index: int) -> bool:
             continue
         p = opp.p["counter"] * mana_gate * min(1.0, threat / 9.0)
         if rolls[i] < p:
+            if shielded:
+                # The table does not spend a counterspell on a spell that
+                # can't be countered: it keeps it for the next one.
+                g.m["counters_shielded"] += 1
+                return False
             opp.counters_left -= 1      # counterspells are a finite resource
             # An opponent has just cast a spell ON YOUR TURN -- the only
             # opponent spell this model places there: removal and wipes
@@ -3597,6 +3699,12 @@ def resolve_own_wipe(g, spare_own=False, card=None):
     if card is not None and getattr(g, "single_cast", None) is card:
         g.single_cast = None         # §0z138: cast as "destroy target creature"
         return
+    if (card is not None and card.name == "Toxic Deluge"
+            and g.cfg.get("spell_life_costs", True)):
+        x = deluge_x(g)                          # paid as it is cast, §0z151
+        g.your_life -= x
+        g.m["life_lost_to_own_cards"] += x
+        g.m["deluge_life_paid"] += x
     wipe_threat_pieces(g, card)                  # item 24, change 2
     pod_killed = 0.0
     for o in living(g):

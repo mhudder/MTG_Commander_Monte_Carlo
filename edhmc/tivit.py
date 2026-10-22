@@ -740,6 +740,14 @@ def main_phase(g):
         if OPP.countered(g, card, idx):
             g.m["countered"] += 1
             g.graveyard.append(card)
+            # Displacer Kitten's trigger is on CAST (§0z151): a countered
+            # noncreature spell still blinks Tivit.
+            if (g.cfg.get("cast_triggers_countered", True)
+                    and g.has("Displacer Kitten")
+                    and "Creature" not in card.types):
+                blink_tivit(g, "Displacer Kitten")
+                if g.result is not None:
+                    return
             continue
         g.m["spells_cast"] += 1
         # SAI, MASTER THOPTERIST: "Whenever you cast an ARTIFACT SPELL, create

@@ -33,6 +33,7 @@ Bitterblossom                         +1.00+-0.11         +0.77+-0.13        +0.
 Golgari Signet                        +0.93+-0.12         +0.75+-0.15        +0.0107+-0.0032      both
 Arcane Signet                         +0.86+-0.12         +0.74+-0.15        +0.0083+-0.0032      both
 Tendershoot Dryad                     +0.75+-0.09         +0.73+-0.10        +0.0117+-0.0024      both
+Massacre Wurm                         +0.44+-0.06         +0.63+-0.09        +0.0101+-0.0023      both
 Solemn Simulacrum                     +0.63+-0.10         +0.55+-0.12        +0.0079+-0.0029      both
 Foundry Inspector                     +0.67+-0.08         +0.52+-0.10        +0.0060+-0.0025      both
 Twitching Doll                        +0.62+-0.12         +0.49+-0.14        +0.0097+-0.0031      both
@@ -151,13 +152,6 @@ Shigeki, Jukai Visionary              -0.23+-0.06         -0.29+-0.08        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Massacre Wurm                         +0.44+-0.06         +0.63+-0.09        +0.0101+-0.0023      both
-      The engine acts on it and the row is still not evidence: the 6/5 body is
-      modelled, the ETB '-2/-2 to creatures your opponents control' is a one-sided
-      wipe that ZEROES the pod's creature count (overstates against big
-      creatures), and 'whenever a creature an opponent controls dies, that player
-      loses 2 life' is missing (understates). The one-sided-wipe rule in
-      symmetric_wipes' note keeps it here.
 Reap                                  +0.08+-0.04         +0.13+-0.06        +0.0013+-0.0015       dmg
 Haywire Mite                          +0.12+-0.04         +0.10+-0.04        +0.0040+-0.0014      both
 Bow of Nylea                          +0.17+-0.04         +0.09+-0.06        +0.0019+-0.0018      both

@@ -23,12 +23,12 @@ from __future__ import annotations
 import hashlib
 import copy
 import random
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace as _replace
 from typing import Callable, Optional
 
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
-from edhmc.decks._evasion import LAND_RULES, LAND_TYPES
+from edhmc.decks._evasion import LAND_RULES, LAND_TYPES, MODAL_LANDS
 from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER
 
 COLORS = ("W", "U", "B", "R", "G", "C")
@@ -2517,10 +2517,37 @@ def land_enters_tapped(g, card, preview: bool = False) -> bool:
     raise ValueError(f"unknown land rule {rule!r} for {card.name}")
 
 
+def modal_land_face(g, card) -> Card:
+    """A Pathway is a modal double-faced card with a land on each face: "you
+    choose a face as you play it" and it taps for THAT face's colour alone
+    (§0z151, `modal_land_face`; `_evasion.MODAL_LANDS`, generated). The deck
+    modules carry both colours because Scryfall's `produced_mana` lists both.
+
+    THE PILOT'S CHOICE, said out loud: the colour none of your lands makes
+    yet, then the one the nonland cards in hand ask for more, then the one
+    with fewer sources. The chosen face is a new `Card` with one colour and
+    the same name, as `play_land`'s MDFC land face is; bounced to hand, it
+    comes back as that face.
+    """
+    if (card.name not in MODAL_LANDS or len(card.produces) < 2
+            or not g.cfg.get("modal_land_face", True)):
+        return card
+    sources = {c: sum(1 for p in g.board
+                      if p.card.is_land and c in p.card.produces)
+               for c in card.produces}
+    demand = {c: sum(h.cost.get(c, 0) for h in g.hand if not h.is_land)
+              for c in card.produces}
+    col = min(sorted(card.produces),
+              key=lambda c: (sources[c] > 0, -demand[c], sources[c]))
+    g.m["modal_land_faces"] += 1
+    return _replace(card, produces=frozenset({col}))
+
+
 def enter_land(g, card, tapped=None) -> "Permanent":
     """Put a land onto the battlefield by its own entry rule (or `tapped`,
     when the effect that puts it there says so). The caller runs its
     engine's hooks, then `after_land_enters`."""
+    card = modal_land_face(g, card)
     t = land_enters_tapped(g, card) if tapped is None else tapped
     perm = Permanent(card=card, tapped=t, sick=True,
                      base_p=card.power, base_t=card.toughness)
@@ -3122,6 +3149,10 @@ def main_phase(g: Game, precombat: bool = False):
             if card.name in g.cfg.get("watch", ()):
                 g.m["test_card_answered"] += 1
                 g.m["test_card_countered"] += 1
+            # "Whenever you PLAY a card": casting it is playing it, so the
+            # Bird comes whether or not the spell resolves (§0z151).
+            if g.cfg.get("cast_triggers_countered", True):
+                g.play_card_trigger(card)
             continue
 
         g.m["spells_cast"] += 1
@@ -3931,6 +3962,60 @@ def midnight_reaper(g, n, perm) -> None:
         g.m["reaper_life_lost"] += lost
         g.draw(1)
         g.m["reaper_draws"] += 1
+
+
+def land_tax(g) -> int:
+    """LAND TAX, one rule for karlov and lorehold (§0z151, `land_tax_shared`):
+    "At the beginning of your upkeep, if an opponent controls more lands than
+    you, you may search your library for up to three basic land cards, reveal
+    them, put them into your hand, then shuffle."
+
+    The pod has no lands, so the best opponent's count is one a round on the
+    POD'S clock, plateauing at `opp_land_plateau` (8) -- karlov's assumption,
+    which Polluted Bonds reads too. The two copies disagreed: lorehold's
+    plateau was 10, it took only Plains in a deck that runs Mountains, and
+    neither shuffled. ANY basic now, each pick the colour your lands and hand
+    make least of; and the shuffle, through its own CRN stream (§0z17), which
+    costs a stacked top in the deck built on one. Returns how many it found.
+    """
+    if not g.has("Land Tax"):
+        return 0
+    mine = sum(1 for p in g.board if p.card.is_land)
+    if min(OPP.pod_turn(g), g.cfg.get("opp_land_plateau", 8)) <= mine:
+        return 0
+    have = {}
+    for c in [p.card for p in g.board] + list(g.hand):
+        if c.is_land:
+            for col in c.produces:
+                have[col] = have.get(col, 0) + 1
+    pool = [c for c in g.library if c.name in BASIC_NAMES]
+    found = []
+    while pool and len(found) < 3:
+        best = min(pool, key=lambda c: min((have.get(col, 0)
+                                            for col in c.produces), default=99))
+        pool = [c for c in pool if c is not best]
+        found.append(best)
+        for col in best.produces:
+            have[col] = have.get(col, 0) + 1
+    for b in found:
+        remove_card(g.library, b)
+        g.hand.append(b)
+    crn_shuffle(g, "land_tax", g.library)
+    g.m["land_tax_fetches"] += len(found)
+    return len(found)
+
+
+def tithe_treasures(g) -> int:
+    """SMOTHERING TITHE, one rule for lorehold and shilgengar (§0z151,
+    `tithe_shared`): "Whenever an opponent draws a card, that player may pay
+    {2}. If the player doesn't, you create a Treasure token." One Treasure per
+    LIVING opponent per round -- each draws for their turn and declines to
+    pay (shilgengar's reading; the pod's draws are not modelled). Lorehold's
+    copy made a flat 2 whoever was alive. Returns how many to make; the
+    caller adds them its own way."""
+    if not g.has("Smothering Tithe"):
+        return 0
+    return len(OPP.living(g))
 
 
 def sun_titan_pick(graveyard, exclude=()) -> Optional[Card]:

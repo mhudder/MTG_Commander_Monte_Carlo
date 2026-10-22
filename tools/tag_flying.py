@@ -141,6 +141,14 @@ def scryfall_collection(names):
                 print(f"  NOT FOUND: {miss}", file=sys.stderr)
             else:
                 found[miss["name"]] = card
+    # The other half of the same trap (§0z151): a double-faced card asked for
+    # by its FRONT name ("Darkbore Pathway") comes back under the combined
+    # one, so every `n in everything` test missed it and it was in no
+    # generated set at all. Key each card by the name it was asked for too.
+    for card in list(found.values()):
+        front = card["name"].split(" // ")[0]
+        if front in names and front not in found:
+            found[front] = card
     return found
 
 
@@ -154,9 +162,11 @@ def subtypes(card):
     matches Forest Bear and how "Human" matches "Human Soldier tokens" in
     oracle text.
     """
-    lines = [card.get("type_line") or ""]
-    for face in card.get("card_faces", []) or []:
-        lines.append(face.get("type_line") or "")
+    # The FACES when there are any: the combined line ("Creature — Djinn Monk
+    # // Land") puts "//" and the back face's card type in the subtype half.
+    faces = card.get("card_faces", []) or []
+    lines = ([face.get("type_line") or "" for face in faces] if faces
+             else [card.get("type_line") or ""])
     out = set()
     for line in lines:
         if "—" in line:
@@ -507,6 +517,53 @@ def main():
         if m:
             attack_tax[n] = int(m.group(1))
 
+    # UNCOUNTERABLE, 2026-10-22 (§0z151): the card's OWN "This spell can't be
+    # countered." Read by `opponents.uncounterable`. A GRANT is not here --
+    # Hexing Squelcher's "Spells you control can't be countered" and Cavern
+    # of Souls' mana are a permanent's statics, read by name there.
+    uncounterable = {n for n, c in cards.items() if n in everything
+                     and re.search(r"^this spell can't be countered\.",
+                                   land_oracle(c).lower(), re.M)}
+
+    # CREATURE SUBTYPES, 2026-10-22 (§0z151): Cavern of Souls names a creature
+    # type, and `opponents.cavern_covers` asks whether a creature spell shares
+    # one with the commander. From the type line, never by hand (§0z4). A
+    # changeling has every type and no subtype list says so: it raises, so
+    # the first one forces a rule rather than reading as typeless.
+    creature_subtypes = {n: tuple(sorted(subtypes(c)))
+                         for n, c in cards.items() if n in creatures}
+    changelings = sorted(n for n in creature_subtypes
+                         if "Changeling" in cards[n].get("keywords", []))
+    if changelings:
+        raise SystemExit(f"tag_flying: changeling creature(s) {changelings}: "
+                         "CREATURE_SUBTYPES cannot say 'every type'; give "
+                         "opponents.cavern_covers a rule first")
+
+    # SPELL LIFE LOSS, 2026-10-22 (§0z151): an instant or sorcery whose own
+    # text says "You lose N life." (Anguished Unmaking) -> N. The front face
+    # only: a modal card cast as its back face is a land. Read by
+    # `opponents.countered` on the cast that resolves; an ADDITIONAL COST
+    # ("pay X life", Toxic Deluge) is not here, it is paid where X is known.
+    spell_life_loss = {}
+    for n, c in cards.items():
+        face = (c.get("card_faces") or [c])[0]
+        if n in everything and re.search(r"\b(Instant|Sorcery)\b",
+                                         face.get("type_line") or ""):
+            m = re.search(r"\byou lose (\d+) life\.",
+                          (face.get("oracle_text") or "").lower())
+            if m:
+                spell_life_loss[n] = int(m.group(1))
+
+    # MODAL LANDS, 2026-10-22 (§0z151): a modal double-faced card with a land
+    # on BOTH faces (the Pathways). You choose one face as you play it and it
+    # taps for that face's colour only; Scryfall's `produced_mana` lists both,
+    # which is how the module came to carry both. Read by `engine.enter_land`.
+    modal_lands = {n for n, c in cards.items()
+                   if n in everything and everything[n].is_land
+                   and c.get("layout") == "modal_dfc"
+                   and all("Land" in (f.get("type_line") or "")
+                           for f in c.get("card_faces") or [{}])}
+
     land_rules = {}
     for n, c in cards.items():
         if n in everything and everything[n].is_land:
@@ -758,6 +815,34 @@ def main():
                      "# under `pod_threats` (§0z138).\nATTACK_TAX = {\n")
             for n in sorted(attack_tax):
                 fh.write(f"    {n!r}: {attack_tax[n]},\n")
+            fh.write("}\n")
+            fh.write("\n# SPELL LIFE LOSS: an instant or sorcery's own \"You "
+                     "lose N life.\" -> N.\n# Charged by `opponents.countered` "
+                     "when the spell is not countered\n# (§0z151).\n"
+                     "SPELL_LIFE_LOSS = {\n")
+            for n in sorted(spell_life_loss):
+                fh.write(f"    {n!r}: {spell_life_loss[n]},\n")
+            fh.write("}\n")
+            fh.write("\n# MODAL LANDS: a land on both faces of a modal "
+                     "double-faced card. One face\n# is chosen as it is "
+                     "played; read by `engine.enter_land` (§0z151).\n"
+                     "MODAL_LANDS = {\n")
+            for n in sorted(modal_lands):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# UNCOUNTERABLE: \"This spell can't be countered.\" -- "
+                     "the card's own\n# clause, not a grant. Read by "
+                     "`opponents.uncounterable` (§0z151).\n"
+                     "UNCOUNTERABLE = {\n")
+            for n in sorted(uncounterable):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# CREATURE SUBTYPES, from the type line's subtype half. "
+                     "Read by\n# `opponents.cavern_covers`: Cavern of Souls "
+                     "names the commander's type\n# (§0z151).\n"
+                     "CREATURE_SUBTYPES = {\n")
+            for n in sorted(creature_subtypes):
+                fh.write(f"    {n!r}: {creature_subtypes[n]!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"

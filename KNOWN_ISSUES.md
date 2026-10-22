@@ -203,6 +203,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z148](#0z148) | BUILT | **Lorehold's skip blockers removed**, and karlov's, shilgengar's, tivit's: `remove_card`, `is_land`/`is_permanent` gates, `want_max`; ablations 1.17x-1.97x faster, every row and game bit-identical |
 | [0z149](#0z149) | BUILT | **The cost of a game**: every main phase prices only the card it casts (`lazy_pay_of`), `Board` finds by name before `==`, `is_creature_now`'s import hoisted; games 7-21% faster, every game bit-identical |
 | [0z150](#0z150) | MEASURED | **Time Sieve 9 → 11 re-measured on POD_V4** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. The owner's call |
+| [0z151](#0z151) | FIXED | **§0z116's remainder**: "can't be countered", cast triggers on countered spells, Pathways, two life costs, one Land Tax and one Tithe, Elesh Norn, Kalitas, Sorin's +1/+0; two generator blind spots. Every fix a switch |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10150,6 +10151,29 @@ ability; `fetch_waits` now gives it none, in every engine.
 
 ## 0z116. OPEN — oracle re-audit of all seven decks: the data is clean, thirteen behaviours are not the text
 
+> **STATUS 2026-10-22, re-verified against the code (§0z151).** Items 1-13
+> were fixed in §0z117/§0z118. Of the unnumbered remainder below:
+>
+> | line | state |
+> |---|---|
+> | Kalitas: no code reads the name | **FIXED §0z151** -- its replacement on the pod's deaths; PARTLY_MODELLED (the sacrifice ability) |
+> | both Sorins' missing clauses | Solemn Visitor's +1/+0 **FIXED §0z151**; the -2 token and both ultimates open, in `WALKERS_WITHOUT_LOYALTY`; karlov.py's false "no planeswalker" note corrected |
+> | Elesh Norn's -2/-2, and +2/+2 skipping the commander | **FIXED §0z151** (`norn_text`) |
+> | Torment of Hailfire, Rhystic Study BLIND with code | settled before this: `BLIND_BUT_LIVE`, each with its reason |
+> | rendmaw's Massacre Wurm | read like shilgengar's since POD_V4 (item 24); **relabelled SCRIPTED §0z151**, and shilgengar's ETB takes route pieces as rendmaw's does |
+> | Biotransference, Midnight Reaper, Gamble, Bloodghast, Crop Rotation, Storm Cauldron blind though visible | **FIXED** by §0z117 and item 24 (§0z129, §0z135, §0z139) |
+> | Hexing Squelcher blind though visible | **FIXED §0z151** ("can't be countered"); PARTLY_MODELLED (ward) |
+> | Haywire Mite, Bow of Nylea | still KNOWN_BLIND: their activated answers are `ANSWER_NOT_MODELLED`; Bow's attacking deathtouch (Ohran Frostfang's words, which `deathtouch_of` reads) OPEN |
+> | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
+> | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
+> | Extra turns: tivit vs lorehold | OPEN |
+> | Aetherflux Reservoir: trostani on cast, karlov on resolution | **FIXED §0z151**: karlov's fires on cast, countered or not, and for the commander; its pay-50 still only at upkeep (OPEN) |
+> | "can't be countered" exists nowhere | **FIXED §0z151** |
+> | Pathways modelled as duals | **FIXED §0z151** |
+> | cast triggers skip countered spells | **FIXED §0z151**, in lorehold and tivit too |
+> | Anguished Unmaking's 3 life, Toxic Deluge's X | **FIXED §0z151** |
+> | "Smaller departures, one line each" | OPEN, not re-verified |
+
 Every card in the seven built lists, plus the staged additions (589 distinct
 names), fetched from `api.scryfall.com/cards/collection` on 2026-10-07, and
 every engine read against the oracle text it claims to implement. Each
@@ -13402,6 +13426,95 @@ sooner, so a card that pays off late has fewer turns to pay off in. Damage
 at T20 falls 0.52 ±0.23 while win rate rises -- win rate is the objective
 (§0t). **Adopting 11 is still the owner's call**; it moves tivit's baseline
 and needs its table rebuilt.
+
+<a id="0z151"></a>
+
+## 0z151. FIXED -- §0z116's remainder: the rules nobody read, the cards done two ways, three missing clauses
+
+**2026-10-22, the owner: "shared + per-card batch", then a parallel
+rebuild.** §0z116's unnumbered lines were re-verified against the code first
+(its STATUS block); what was still open is fixed here. Oracle text for every
+card in every built and staged list was re-fetched from Scryfall the same
+day. **Every fix has a switch whose False is the old code**, checked by
+`check_unchanged_decks --cfg=<all eleven False>`: all seven decks
+BIT-IDENTICAL to `2dc1809`. `tests/test_oracle_remainder.py` pins nineteen
+cases with eleven mutations, exact sets. `tools.validate`: +0.00 on every
+metric of every engine.
+
+### Shared rules
+
+* **"Can't be countered"** (`uncounterable`). `opponents.uncounterable`, asked
+  in `_countered` of a spell the table wants countered: the card's own clause
+  (`_evasion.UNCOUNTERABLE`, generated: Dovin's Veto, Void Rend, Rise of the
+  Eldrazi, Hexing Squelcher), Hexing Squelcher's static, and **Cavern of
+  Souls** -- two policies said in `cavern_covers`: it names the COMMANDER's
+  type (`_evasion.CREATURE_SUBTYPES`, generated) and covers one at-risk spell
+  a turn. The table keeps a counterspell it cannot use (`counters_shielded`).
+* **Cast triggers fire on a countered spell** (`cast_triggers_countered`):
+  karlov's Reservoir and extort (now `karlov.cast_triggers`), rendmaw's play
+  trigger, lorehold's `on_cast_triggers`, Storm-Kiln Artist and Sunbird's
+  Invocation, tivit's Displacer Kitten. Lorehold's and tivit's were not on
+  §0z116's list; the same grep found them. **Karlov's commander is a spell**
+  (`commander_cast_triggers`): it set off neither Reservoir nor extort.
+* **Pathways are one face** (`modal_land_face`): `engine.enter_land` picks
+  the colour your lands lack, then the one your hand asks for more.
+* **Life costs** (`spell_life_costs`): "You lose N life" on an instant or
+  sorcery that resolves (`_evasion.SPELL_LIFE_LOSS`, generated: Anguished
+  Unmaking 3, Malakir Rebirth 2) and **Toxic Deluge's X** (`deluge_x`: the
+  toughest creature it kills, both sides, since it resolves as a full wipe;
+  `deluge_pod_toughness` 4 off `pod_bodies`). Not seen: paying less to keep a
+  big creature, and the wipe gate does not price the life.
+
+### One rule where there were two (§0u)
+
+* **Land Tax** (`land_tax_shared`, `engine.land_tax`): lorehold plateaued the
+  pod's lands at 10 and took Plains only in a deck with Mountains; karlov at
+  8. Now `opp_land_plateau` (8) on the pod's clock, any basic, each pick the
+  colour you have least of, **and the "then shuffle" neither copy did**.
+* **Smothering Tithe** (`tithe_shared`, `engine.tithe_treasures`): a Treasure
+  per living opponent per round, shilgengar's reading; lorehold's was a flat 2.
+  Shilgengar is unchanged by it.
+* **Massacre Wurm**: under POD_V4 rendmaw and shilgengar already read it the
+  same way, and rendmaw's label (KNOWN_BLIND, BLIND_BUT_LIVE with a reason
+  written for the count pod) was the defect: SCRIPTED now. It is cast in 17
+  of 400 rendmaw games; the 40-seed identity test never drew it. Shilgengar's
+  ETB now also takes the creature route pieces its -2/-2 reaches
+  (`wurm_route_pieces`, `opponents.minus_two_pod`), as rendmaw's did.
+
+### Per card
+
+* **Elesh Norn** (`norn_text`): +2/+2 to the commander too; "creatures your
+  opponents control get -2/-2" kills the pod's toughness-2 bodies and route
+  pieces as she enters, cast or reanimated (`make_permanent`), and at each of
+  your upkeeps.
+* **Kalitas** (`kalitas_text`): the pod's dying creatures are exiled and you
+  get a 2/2 Zombie each; karlov's death triggers do not hear them. Every pod
+  body is read as nontoken. PARTLY_MODELLED now (the sacrifice ability).
+* **Sorin, Solemn Visitor** (`sorin_power`): the +1's +1/+0, read every turn
+  as its lifelink already was.
+
+### Two generator blind spots, found on the way (§0z15)
+
+* `tag_flying.scryfall_collection` keyed a double-faced card asked for by
+  its FRONT name (Darkbore Pathway) under the combined name, so it was in
+  no generated set. Aliased; no existing set changed.
+* `tag_flying.subtypes` read the combined type line, so "Creature — Djinn
+  Monk // Land" gave "//" and "Land" as subtypes. Faces only now; no
+  existing set changed.
+
+### Labels
+
+Massacre Wurm (rendmaw) SCRIPTED; Hexing Squelcher and Kalitas
+PARTLY_MODELLED. The three tables were re-rendered from their caches for the
+labels (numbers unchanged). `test_triage`'s case D used the Squelcher as its
+pure body; no blind creature is left in any deck, so D and the new case N
+(the matched blank keeps the body, which A could no longer see) use a
+constructed card.
+
+### What each fix is worth
+
+Measured with `diagnostics/run_oracle_remainder.py` at N=15,000, paired: the
+run was in progress when this was committed, and its table follows.
 
 ## How to read an ablation table
 
