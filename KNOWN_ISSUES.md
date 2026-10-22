@@ -202,6 +202,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z147](#0z147) | BUILT | **Azusa prices only the card it casts**: `engine.can_afford` and `choose_mode_cost`; an azusa game 22% faster, its ablation 1.46x (2.8x with the skip); every game bit-identical |
 | [0z148](#0z148) | BUILT | **Lorehold's skip blockers removed**, and karlov's, shilgengar's, tivit's: `remove_card`, `is_land`/`is_permanent` gates, `want_max`; ablations 1.17x-1.97x faster, every row and game bit-identical |
 | [0z149](#0z149) | BUILT | **The cost of a game**: every main phase prices only the card it casts (`lazy_pay_of`), `Board` finds by name before `==`, `is_creature_now`'s import hoisted; games 7-21% faster, every game bit-identical |
+| [0z150](#0z150) | MEASURED | **Time Sieve 9 → 11 re-measured on POD_V4** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. The owner's call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13375,6 +13376,32 @@ relies on.
 
 Every cache's fingerprint moved (`engine.py`, `opponents.py` and five
 engines); the six active caches are recorded VERIFIED on the evidence above.
+
+<a id="0z150"></a>
+
+## 0z150. MEASURED -- Time Sieve 9 → 11 on POD_V4: still significant at both horizons, smaller at T20
+
+**2026-10-22, the owner: "re-measure it".** Queue item 18's last open
+adoption decision was measured in §0z86 on the pod before POD_V4, and
+§0z140's rebuild moved Time Sieve's own row by -0.015 at T20, so the old
+number could no longer carry a decision. Same diagnostic, same arms, the
+current default pod: `diagnostics/run_sieve_horizon.py 15000 OUTDIR P9_new
+P11_new`, tivit's staged list, seeds 5000.., paired
+(`results/sieve_pod_v4_20261022.txt`):
+
+| Time Sieve 9 → 11 | T10 | T20 |
+|---|---|---|
+| pre-V4 pod (§0z86) | **+0.0218 ±0.0034** | **+0.0151 ±0.0036** |
+| POD_V4 (now) | **+0.0225 ±0.0034** | **+0.0064 ±0.0034** |
+
+**The mechanism is the same one**: at 11 the Sieve is activated 0.29-0.35
+more times a game and tivit takes 0.26-0.30 more extra turns, which costs
+the pod 0.07-0.09 rounds. At T20 it is worth less than half what it was,
+which is §0z140's shape for every slow engine: the kill comes 2.3 rounds
+sooner, so a card that pays off late has fewer turns to pay off in. Damage
+at T20 falls 0.52 ±0.23 while win rate rises -- win rate is the objective
+(§0t). **Adopting 11 is still the owner's call**; it moves tivit's baseline
+and needs its table rebuilt.
 
 ## How to read an ablation table
 

@@ -1,0 +1,11 @@
+# Time Sieve 9 -> 11 on POD_V4 (queue item 18), at d66b6a8, python 3.11.17, 2026-10-22
+# python -m diagnostics.run_sieve_horizon 15000 OUTDIR P9_new P11_new
+# tivit's staged list, seeds 5000.., paired; the _new arms are the current default pod (POD_V4)
+# The same arms measured +0.0218 ±0.0034 (T10) / +0.0151 ±0.0036 (T20) on the pre-V4 pod (§0z86).
+
+metric                 T10 P9          T10 P11-P9   T20 P9          T20 P11-P9
+won                    0.2754     +0.0225 ±0.0034*   0.5375     +0.0064 ±0.0034*
+damage                53.6569     +0.0109 ±0.2411   67.9960     -0.5218 ±0.2303*
+extra_turns_taken      0.4432     +0.2606 ±0.0194*   0.5633     +0.2956 ±0.0203*
+sieve_activations      0.3566     +0.2925 ±0.0202*   0.4293     +0.3450 ±0.0214*
+pod_rounds             8.8603     -0.0692 ±0.0090*   9.8940     -0.0939 ±0.0157*
