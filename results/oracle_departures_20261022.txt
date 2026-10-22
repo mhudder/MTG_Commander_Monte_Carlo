@@ -1,0 +1,55 @@
+# §0z153, each fix's worth: python -m diagnostics.run_oracle_remainder 15000 OUTDIR --batch=0z153
+# at 05ae74d's code (uncommitted then, identical engine files), python 3.11.17, numpy 2.4.6, 2026-10-22
+# each row: every switch on minus that one off, staged lists, seeds 5000.., paired; T10 read off the T20 game
+
+§0z153: each fix = every switch on, minus that switch off (win rate, paired, 95% CI; * = outside its bar)
+
+rendmaw  (N=15000)
+  batch (all off)            T10 +0.0116 ±0.0022*   T20 +0.0082 ±0.0033*
+  gearhulk_best              T10 +0.0010 ±0.0009*   T20 -0.0013 ±0.0015 
+  snake_types                T10 -0.0001 ±0.0001    T20 +0.0003 ±0.0003 
+  throne_etb                 T10 +0.0017 ±0.0007*   T20 +0.0017 ±0.0011*
+  beast_quest                T10 +0.0029 ±0.0013*   T20 +0.0019 ±0.0021 
+  coat_types                 T10 +0.0050 ±0.0012*   T20 +0.0053 ±0.0015*
+  frostfang_connect          T10 +0.0013 ±0.0008*   T20 +0.0007 ±0.0012 
+  mechanism, a game (all on):  frostfang_draws 1.505
+
+lorehold  (N=15000)
+  batch (all off)            T10 +0.0079 ±0.0030*   T20 +0.0153 ±0.0038*
+  extra_turn_full            T10 +0.0047 ±0.0022*   T20 +0.0046 ±0.0023*
+  act_pod_count              T10 +0.0005 ±0.0020    T20 +0.0088 ±0.0029*
+  tithe_forced_draws         T10 +0.0028 ±0.0010*   T20 +0.0014 ±0.0010*
+  mechanism, a game (all on):  extra_turns_taken 0.169  tithe_forced_treasures 0.460
+
+karlov  (N=15000)
+  batch (all off)            T10 +0.0079 ±0.0021*   T20 +0.0053 ±0.0029*
+  reservoir_any_time         T10 +0.0054 ±0.0017*   T20 +0.0023 ±0.0019*
+  extort_hybrid              T10 -0.0009 ±0.0007*   T20 -0.0008 ±0.0011 
+  konrad_text                T10 +0.0003 ±0.0008    T20 +0.0005 ±0.0013 
+  sorin_loyalty              T10 +0.0032 ±0.0010*   T20 +0.0031 ±0.0015*
+  mechanism, a game (all on):  konrad_card_triggers 0.155  konrad_mills 0.157  sorin_reanimations 0.061
+
+tivit  (N=15000)
+  batch (all off)            T10 -0.0007 ±0.0019    T20 -0.0007 ±0.0027 
+  alt_win_at_upkeep          T10 -0.0017 ±0.0007*   T20 -0.0013 ±0.0006*
+  dilemma_counters           T10 +0.0006 ±0.0008    T20 -0.0001 ±0.0012 
+  jays_discard               T10 -0.0011 ±0.0013    T20 -0.0046 ±0.0020*
+  tyrant_death               T10 +0.0011 ±0.0011*   T20 +0.0046 ±0.0014*
+  mechanism, a game (all on):  extra_turns_taken 0.862  tyrant_sacrifices 0.089
+
+shilgengar  (N=15000)
+  batch (all off)            T10 +0.0025 ±0.0011*   T20 +0.0010 ±0.0014 
+  speaker_taps               T10 -0.0003 ±0.0003*   T20 +0.0000 ±0.0005 
+  resplendent_each_end       T10 +0.0001 ±0.0001    T20 +0.0001 ±0.0003 
+  revel_at_upkeep            T10 +0.0027 ±0.0010*   T20 +0.0015 ±0.0007*
+  shepherd_plains            T10 -0.0001 ±0.0002    T20 -0.0007 ±0.0010 
+  mechanism, a game (all on):  speaker_angels 0.054  resplendent_pod_angels 0.003
+
+azusa  (N=15000)
+  batch (all off)            T10 +0.0125 ±0.0056*   T20 +0.0136 ±0.0068*
+  provisioner_treasure       T10 +0.0019 ±0.0014*   T20 +0.0015 ±0.0018 
+  momentous_biggest          T10 +0.0058 ±0.0017*   T20 +0.0062 ±0.0022*
+  realms_text                T10 +0.0041 ±0.0022*   T20 +0.0035 ±0.0028*
+  search_shuffle             T10 +0.0009 ±0.0055    T20 +0.0032 ±0.0066 
+  mechanism, a game (all on):  realms_binned 0.375  library_shuffles 7.355
+

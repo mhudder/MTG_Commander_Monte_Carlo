@@ -13698,6 +13698,33 @@ mutation runs stay exact.
 
 ### What each fix is worth
 
+`diagnostics/run_oracle_remainder.py --batch=0z153`, N=15,000, staged lists,
+seeds 5000.., paired at one commit: every switch on, minus that one off
+(`results/oracle_departures_20261022.txt`). Win rate, T10 / T20; **bold**
+outside its bar.
+
+| deck | the batch | its largest parts |
+|---|---|---|
+| azusa | **+0.0125 / +0.0136** | Momentous Fall's biggest **+0.0058 / +0.0062**; Realms Uncharted **+0.0041 / +0.0035**; Provisioner's Treasure **+0.0019** / +0.0015 |
+| lorehold | **+0.0079 / +0.0153** | Blasphemous Act's count +0.0005 / **+0.0088**; the whole extra turn **+0.0047 / +0.0046**; Tithe on forced draws **+0.0028 / +0.0014** |
+| rendmaw | **+0.0116 / +0.0082** | Coat of Arms' types **+0.0050 / +0.0053**; Beastmaster's counters **+0.0029** / +0.0019; Roaming Throne's ETB **+0.0017 / +0.0017** |
+| karlov | **+0.0079 / +0.0053** | the Reservoir at instant speed **+0.0054 / +0.0023**; Sorin's loyalty **+0.0032 / +0.0031** |
+| shilgengar | **+0.0025** / +0.0010 | Revel in Riches at upkeep **+0.0027 / +0.0015** |
+| tivit | -0.0007 / -0.0007 | Tyrant's Choice's death **+0.0011 / +0.0046** against Jays' discards -0.0011 / **-0.0046** and the upkeep wins **-0.0017 / -0.0013** |
+
+**Costs where the text is a cost**: Messenger Jays' discards, the alternate
+wins that now wait for an upkeep the pile must survive, extort that Sol Ring
+cannot pay (**-0.0009** / -0.0008). Inside their bars: Konrad's clauses and
+mill (0.16 triggers, 0.16 mills a game), Ophiomancer, Emeria Shepherd,
+Resplendent Angel (0.003 Angels a game on the pod's turns), Speaker.
+
+**Two that read the other way from their first look.** Revel in Riches at
+the upkeep is a GAIN in shilgengar: the check moved past the pod's round,
+whose creature deaths make Treasures, so the pile is bigger when it is
+read. And azusa's shuffle row is wide (±0.0066) because a shuffle re-orders
+the whole library and breaks the pairing on everything after it -- noise,
+not an effect.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not
