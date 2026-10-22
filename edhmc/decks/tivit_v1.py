@@ -153,8 +153,8 @@ PAYOFFS = [
     C("Disciple of the Vault", "Creature", {"B": 1}, 1, 1, priority=7,
       threat=6.5, tags=("artifact_drain",)),
     # {T}, sac five artifacts: take an extra turn.
-    C("Time Sieve", "Artifact", {"U": 1, "B": 1}, priority=9, threat=8.5,
-      script="time_sieve"),
+    C("Time Sieve", "Artifact", {"U": 1, "B": 1}, priority=11, threat=8.5,
+      script="time_sieve"),  # §0z86/§0z150: priority 9 -> 11, adopted 2026-10-22
     # "If you would create a Clue, Food, or Treasure token, instead create one
     # of each." Triples every token this deck makes.
     C("Academy Manufactor", "Artifact/Creature", {"gen": 3}, 1, 3,

@@ -43,11 +43,12 @@ What is closed and where it went:
     owner, like the two above. **RE-MEASURED ON POD_V4 (§0z150,
     2026-10-22)**: +0.0225 ±0.0034 at T10 and **+0.0064 ±0.0034 at T20**,
     still significant at both and smaller at T20, as POD_V4's sooner kill
-    made every slow engine. Still the owner's call. **Trostani, the seventh deck, is swept too
+    made every slow engine. **ADOPTED 2026-10-22.** **Trostani, the seventh deck, is swept too
     (§0z110)**: five moves, every one raising a token or populate engine,
     joint +0.0129 / +0.0519 -- tivit's shape, **ADOPTED 2026-10-05**,
     except Bramble Sovereign, which loses at T10 given the other four
-    (§0z111) and is back at 8.5. **Trostani's rebuild is deferred.**
+    (§0z111) and is back at 8.5. **Trostani's rebuild is deferred**, and
+    is all that is left of this item.
 
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`, and in §0z116's own STATUS block: its

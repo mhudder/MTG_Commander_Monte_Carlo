@@ -202,7 +202,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z147](#0z147) | BUILT | **Azusa prices only the card it casts**: `engine.can_afford` and `choose_mode_cost`; an azusa game 22% faster, its ablation 1.46x (2.8x with the skip); every game bit-identical |
 | [0z148](#0z148) | BUILT | **Lorehold's skip blockers removed**, and karlov's, shilgengar's, tivit's: `remove_card`, `is_land`/`is_permanent` gates, `want_max`; ablations 1.17x-1.97x faster, every row and game bit-identical |
 | [0z149](#0z149) | BUILT | **The cost of a game**: every main phase prices only the card it casts (`lazy_pay_of`), `Board` finds by name before `==`, `is_creature_now`'s import hoisted; games 7-21% faster, every game bit-identical |
-| [0z150](#0z150) | MEASURED | **Time Sieve 9 → 11 re-measured on POD_V4** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. The owner's call |
+| [0z150](#0z150) | DECIDED | **Time Sieve 9 → 11 re-measured on POD_V4, and ADOPTED** (item 18): +0.0225 ±0.0034 at T10, +0.0064 ±0.0034 at T20 -- significant at both, T20 down from +0.0151 as the sooner kill made every slow engine. Adopted 2026-10-22 |
 | [0z151](#0z151) | FIXED | **§0z116's remainder**: "can't be countered", cast triggers on countered spells, Pathways, two life costs, one Land Tax and one Tithe, Elesh Norn, Kalitas, Sorin's +1/+0; two generator blind spots. Every fix a switch |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -13403,7 +13403,7 @@ engines); the six active caches are recorded VERIFIED on the evidence above.
 
 <a id="0z150"></a>
 
-## 0z150. MEASURED -- Time Sieve 9 → 11 on POD_V4: still significant at both horizons, smaller at T20
+## 0z150. DECIDED -- Time Sieve 9 → 11 on POD_V4: still significant at both horizons, smaller at T20, adopted
 
 **2026-10-22, the owner: "re-measure it".** Queue item 18's last open
 adoption decision was measured in §0z86 on the pod before POD_V4, and
@@ -13424,8 +13424,10 @@ the pod 0.07-0.09 rounds. At T20 it is worth less than half what it was,
 which is §0z140's shape for every slow engine: the kill comes 2.3 rounds
 sooner, so a card that pays off late has fewer turns to pay off in. Damage
 at T20 falls 0.52 ±0.23 while win rate rises -- win rate is the objective
-(§0t). **Adopting 11 is still the owner's call**; it moves tivit's baseline
-and needs its table rebuilt.
+(§0t). **ADOPTED, the owner, 2026-10-22** ("adopt Time Sieve at 11"):
+`tivit_v1.py`, priority 11. It moves tivit's fingerprint alone, so tivit's
+leg of §0z151's rebuild was stopped and relaunched on the commit carrying
+it; the other five legs stand.
 
 <a id="0z151"></a>
 
