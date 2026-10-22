@@ -2,7 +2,7 @@
 """Pin §0z116's remainder, fixed in §0z151.
 
     python -m tests.test_oracle_remainder
-    python -m tests.test_oracle_remainder --mutate   # 11 mutations, exact sets
+    python -m tests.test_oracle_remainder --mutate   # 12 mutations, exact sets
 
 On the default pod (POD_V4). A counterspell is FORCED where a case needs one:
 `counter_threshold` 0, every counter roll 0, and each opponent holding
@@ -35,6 +35,8 @@ CASES
   R  karlov: with Kalitas out, the pod's dying creatures become Zombies for
      you and Blood Artist does not hear them
   S  karlov: Sorin, Solemn Visitor gives your creatures +1/+0
+  T  rendmaw: with Bow of Nylea out an attacker has deathtouch, as with
+     Ohran Frostfang (the same words)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   uncounterable=False            -> A, B, C
@@ -48,6 +50,7 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   norn_text=False                -> P, Q
   kalitas_text=False             -> R
   sorin_power=False              -> S
+  bow_deathtouch=False           -> T
 
 UNMUTATED (§0z15): D is the positive control C is measured against -- a
 creature of another type is countered whether or not Cavern is read.
@@ -286,6 +289,10 @@ def run_cases():
     g = fresh("karlov", board=[card("karlov", "Sorin, Solemn Visitor"),
                                body("Bear")])
     check("S Sorin, Solemn Visitor: +1/+0", g.power_of(perm(g, "Bear")), 3)
+    g = fresh("rendmaw", board=[card("rendmaw", "Bow of Nylea"),
+                                body("Bear")])
+    check("T Bow of Nylea: an attacker has deathtouch",
+          OPP.deathtouch_of(g, perm(g, "Bear")), True)
     return set(FAIL)
 
 
@@ -307,6 +314,7 @@ def main() -> int:
         ({"norn_text": False}, {"P", "Q"}),
         ({"kalitas_text": False}, {"R"}),
         ({"sorin_power": False}, {"S"}),
+        ({"bow_deathtouch": False}, {"T"}),
     ]
     print("MUTATION RUN -- exact sets\n")
     bad = 0

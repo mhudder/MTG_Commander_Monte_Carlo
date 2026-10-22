@@ -21,12 +21,12 @@ sys.path.insert(0, os.getcwd())
 KNOBS = ("uncounterable", "cast_triggers_countered", "commander_cast_triggers",
          "modal_land_face", "spell_life_costs", "land_tax_shared",
          "tithe_shared", "wurm_route_pieces", "norn_text", "kalitas_text",
-         "sorin_power")
+         "sorin_power", "bow_deathtouch")
 # The decks each switch can move -- the cards it reads are in their lists.
 # shilgengar's Tithe was already the shared rule: its arm is a zero check.
 TOUCHES = {
     "rendmaw": ("uncounterable", "cast_triggers_countered", "modal_land_face",
-                "spell_life_costs"),
+                "spell_life_costs", "bow_deathtouch"),
     "lorehold": ("uncounterable", "cast_triggers_countered", "modal_land_face",
                  "land_tax_shared", "tithe_shared"),
     "karlov": ("uncounterable", "cast_triggers_countered",

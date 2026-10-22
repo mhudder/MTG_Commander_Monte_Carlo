@@ -2420,8 +2420,9 @@ def deathtouch_of(g, perm) -> bool:
     Unconditional deathtouch is the generated DEATHTOUCH set (trample's rule:
     creatures, grants excluded). The rest is state, each named:
 
-      * Ohran Frostfang: "Attacking creatures you control have deathtouch."
-        Read only for attackers, which is the only place this is asked.
+      * Ohran Frostfang and Bow of Nylea: "Attacking creatures you control
+        have deathtouch." Read only for attackers, which is the only place
+        this is asked.
       * trostani's "Phyrexian Wurm token (deathtouch)", a token by name.
 
     A FLOOR: rendmaw's Wurmcoil Engine makes two tokens both named "Wurm",
@@ -2429,8 +2430,11 @@ def deathtouch_of(g, perm) -> bool:
     is read as deathtouch."""
     from edhmc.decks._evasion import DEATHTOUCH
     name = perm.card.name
+    # Bow of Nylea's first line is Ohran Frostfang's, word for word (§0z151,
+    # `bow_deathtouch`; §0z116 found the one read and the other not).
     return (name in DEATHTOUCH or name == "Phyrexian Wurm token (deathtouch)"
-            or g.has("Ohran Frostfang"))
+            or g.has("Ohran Frostfang")
+            or (g.has("Bow of Nylea") and g.cfg.get("bow_deathtouch", True)))
 
 
 def pod_blocker_deaths(g, o, blocked) -> int:

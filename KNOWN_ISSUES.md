@@ -10163,7 +10163,7 @@ ability; `fetch_waits` now gives it none, in every engine.
 > | rendmaw's Massacre Wurm | read like shilgengar's since POD_V4 (item 24); **relabelled SCRIPTED §0z151**, and shilgengar's ETB takes route pieces as rendmaw's does |
 > | Biotransference, Midnight Reaper, Gamble, Bloodghast, Crop Rotation, Storm Cauldron blind though visible | **FIXED** by §0z117 and item 24 (§0z129, §0z135, §0z139) |
 > | Hexing Squelcher blind though visible | **FIXED §0z151** ("can't be countered"); PARTLY_MODELLED (ward) |
-> | Haywire Mite, Bow of Nylea | still KNOWN_BLIND: their activated answers are `ANSWER_NOT_MODELLED`; Bow's attacking deathtouch (Ohran Frostfang's words, which `deathtouch_of` reads) OPEN |
+> | Haywire Mite, Bow of Nylea | still KNOWN_BLIND: their activated answers are `ANSWER_NOT_MODELLED`; Bow's attacking deathtouch **FIXED §0z151** |
 > | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
 > | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
 > | Extra turns: tivit vs lorehold | OPEN |
@@ -13436,9 +13436,9 @@ rebuild.** §0z116's unnumbered lines were re-verified against the code first
 (its STATUS block); what was still open is fixed here. Oracle text for every
 card in every built and staged list was re-fetched from Scryfall the same
 day. **Every fix has a switch whose False is the old code**, checked by
-`check_unchanged_decks --cfg=<all eleven False>`: all seven decks
-BIT-IDENTICAL to `2dc1809`. `tests/test_oracle_remainder.py` pins nineteen
-cases with eleven mutations, exact sets. `tools.validate`: +0.00 on every
+`check_unchanged_decks --cfg=<every switch False>`: all seven decks
+BIT-IDENTICAL to `2dc1809`. `tests/test_oracle_remainder.py` pins twenty
+cases with twelve mutations, exact sets. `tools.validate`: +0.00 on every
 metric of every engine.
 
 ### Shared rules
@@ -13480,6 +13480,10 @@ metric of every engine.
   of 400 rendmaw games; the 40-seed identity test never drew it. Shilgengar's
   ETB now also takes the creature route pieces its -2/-2 reaches
   (`wurm_route_pieces`, `opponents.minus_two_pod`), as rendmaw's did.
+* **Bow of Nylea's "attacking creatures you control have deathtouch"**,
+  Ohran Frostfang's exact words, read by `deathtouch_of` now too
+  (`bow_deathtouch`). It stays KNOWN_BLIND: still identical to its blank on
+  the label test's 40 seeds, because a chump blocker dies without it.
 
 ### Per card
 
