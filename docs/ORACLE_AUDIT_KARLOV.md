@@ -17,7 +17,7 @@
 > | Lurrus's hybrid pips | **FIXED** — `alt_costs`, and devotion reads hybrid pips (§0z52) |
 > | Necropotence modelled as `draw2` | **FIXED** — skips the draw step and pays life for cards at the end step (§0z57); the amount is a policy, `necro_hand_target` / `necro_life_floor`, put to the owner |
 > | Benevolent Offering's Spirit tokens and per-creature scaling | **FIXED** — both sentences, three flying Spirits each way, 2 life per creature (§0z56) |
-> | Karlov's own six-counter exile ability | open, and MODEL-BLIND by design: opponents' creatures are a number |
+> | Karlov's own six-counter exile ability | **IMPLEMENTED 2026-10-23 (§0z155)**, the owner's policy: `karlov.karlov_exile_step`, at the end of the pod's round on {W}{B} left untapped, at a creature route piece (`opponents.end_step_target`). Modelable since POD_V4 gave the pod's creatures route pieces |
 > | Daxos's toughness fixed at 4 rather than tracking devotion | **CLOSED 2026-09-27 (§0z72)**: `karlov.daxos_toughness` reads `engine.devotion(g, "W")`, now the one hybrid-aware devotion rule. **Still INERT, and measured so**: karlov's baseline is bit-identical, because nothing in `karlov.py` or `opponents.py` reads toughness. It is built for the day something does. |
 >
 > The "Evasion is unmodelled" section below is SUPERSEDED: fliers have been

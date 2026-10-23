@@ -14,9 +14,9 @@ Sanguine Bond's word for word — so `karlov.COMBO_LOOP` knows about it. The
 cost of the package is mana: stranded_mv +5.56 at ten turns, from a land cut
 and two cheap cards replaced by a two- and a four-drop.
 
-    Karlov of the Ghost Council  {1}{W}{B}  2/2
+    Karlov of the Ghost Council  {W}{B}  2/2
       Whenever you gain life, put two +1/+1 counters on Karlov.
-      Remove six +1/+1 counters from Karlov: exile target creature.
+      {W}{B}, Remove six +1/+1 counters from Karlov: Exile target creature.
 
 Costs are hand-authored and were verified against Scryfall oracle text on
 2026-09-03; see ORACLE_AUDIT_KARLOV.md.

@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `8da716f`.
+Generated at `3b2b593`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,23 +86,28 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `01c2fc11e978988e` | `c7a1e02` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `1137a48f5734f60b` | `c7a1e02` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e8c6e2aaddcc1708` | `c7a1e02` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `474e579c5983f9d5` | `c7a1e02` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `58132f5743e1ca9f` | `c7a1e02` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `6ca132eddbb6c08a` | `c7a1e02` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `01c2fc11e978988e` | `c7a1e02` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `1137a48f5734f60b` | `c7a1e02` | **SUSPECT** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e8c6e2aaddcc1708` | `c7a1e02` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `474e579c5983f9d5` | `c7a1e02` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `58132f5743e1ca9f` | `c7a1e02` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `6ca132eddbb6c08a` | `c7a1e02` | **VERIFIED** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `01c2fc11e978988e`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `1137a48f5734f60b`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `e8c6e2aaddcc1708`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `474e579c5983f9d5`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `58132f5743e1ca9f`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `6ca132eddbb6c08a`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `ec903b1a2e845361`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `01c2fc11e978988e`; fingerprint has since moved to `126aa4daf8f136ef` and was CHECKED at `3b2b593` (2026-10-23T00:17:46Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+  - verified at `126aa4daf8f136ef` (`3b2b593`, 2026-10-23T00:17:46Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `1137a48f5734f60b`, live is `0f68c7cd33afdf6c`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `c7a1e02`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `e8c6e2aaddcc1708`; fingerprint has since moved to `0f55d5ec32444898` and was CHECKED at `3b2b593` (2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+  - verified at `0f55d5ec32444898` (`3b2b593`, 2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `474e579c5983f9d5`; fingerprint has since moved to `ff490c5498d6c2c0` and was CHECKED at `3b2b593` (2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+  - verified at `ff490c5498d6c2c0` (`3b2b593`, 2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `58132f5743e1ca9f`; fingerprint has since moved to `cd90197b6ced279e` and was CHECKED at `3b2b593` (2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+  - verified at `cd90197b6ced279e` (`3b2b593`, 2026-10-23T00:17:45Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `6ca132eddbb6c08a`; fingerprint has since moved to `0d108a2c93022a79` and was CHECKED at `3b2b593` (2026-10-23T00:17:46Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.
+  - verified at `0d108a2c93022a79` (`3b2b593`, 2026-10-23T00:17:46Z): 2026-10-23, §0z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `12fe71473d7a2772`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

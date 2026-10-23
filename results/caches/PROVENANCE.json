@@ -489,7 +489,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3b2b593",
+        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+        "fingerprint": "126aa4daf8f136ef",
+        "utc": "2026-10-23T00:17:46Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "1137a48f5734f60b",
@@ -1350,7 +1357,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3b2b593",
+        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+        "fingerprint": "0f55d5ec32444898",
+        "utc": "2026-10-23T00:17:45Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "474e579c5983f9d5",
@@ -1762,7 +1776,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3b2b593",
+        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+        "fingerprint": "ff490c5498d6c2c0",
+        "utc": "2026-10-23T00:17:45Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "58132f5743e1ca9f",
@@ -2216,7 +2237,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3b2b593",
+        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+        "fingerprint": "cd90197b6ced279e",
+        "utc": "2026-10-23T00:17:45Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "6ca132eddbb6c08a",
@@ -2615,7 +2643,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3b2b593",
+        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.",
+        "fingerprint": "0d108a2c93022a79",
+        "utc": "2026-10-23T00:17:46Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

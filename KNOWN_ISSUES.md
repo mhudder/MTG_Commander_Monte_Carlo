@@ -207,6 +207,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z152](#0z152) | REBUILT | **§0z151's parallel rebuild**, six tables at `418490f` (tivit at `5efcb70`, Time Sieve 11), 21 min wall: 9 rows moved beyond their bars, each one a fix's own card -- Elesh Norn +0.0182 |
 | [0z153](#0z153) | FIXED | **Queue item 5's last lines**: §0z116's one-liners in six engines, lorehold's extra turn as a whole turn, the Reservoir at instant speed, Sorin's loyalty; eight owner calls. Every fix a switch |
 | [0z154](#0z154) | REBUILT | **§0z153's parallel rebuild**, six tables at `c7a1e02`, 30 min wall: 17 rows moved beyond their bars, azusa's ten around Realms Uncharted's binned lands and the new search shuffles |
+| [0z155](#0z155) | IMPLEMENTED | **Karlov's own six-counter exile**, the owner's policy: end of the pod's round, {W}{B} left over, a creature route piece. +0.0032 / **+0.0305** at T20 from 0.24 exiles a game; a reserve costs |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13767,6 +13768,86 @@ order**, which every search now reshuffles (§0z153's `search_shuffle`,
 inside its own bar at ±0.0066): a search that kept a known top card, or a
 card that reads the top, moved. That is a mechanism, not a measurement --
 none of the five was measured alone. shilgengar: no row moved.
+
+
+<a id="0z155"></a>
+
+## 0z155. IMPLEMENTED -- Karlov's own "{W}{B}, Remove six +1/+1 counters: Exile target creature"
+
+**2026-10-23, the owner: "go ahead with your suggested Karlov policy".** The
+last karlov line of queue item 5. MODEL-BLIND by design while the pod's
+creatures were a number; modelable since POD_V4 gave them route pieces
+(§0z140). Oracle text re-read from Scryfall the same day: {W}{B}, 2/2, the
+ability costs {W}{B} as well as the counters. (`decks/karlov_v2.py`'s note
+had it {1}{W}{B} with a free activation -- a docstring only; the card's
+data was right.)
+
+### The policy (`karlov.karlov_exile_step`, switch `karlov_exile`)
+
+* **When**: at the end of the pod's round, after `pod_phase` -- the window
+  the held instants use (`end_step_answers`, §0z134), and after them.
+* **Mana**: {W}{B} the turn LEFT untapped. Nothing holds it back: Syr
+  Konrad's mill, Reclamation, Gingerbrute and the other end-of-turn sinks
+  spend theirs first.
+* **Target**: a creature route piece that is out, aimed by
+  `opponents.end_step_target` -- the held instants' own aim, factored out of
+  `end_step_answers` so the two cannot drift (§0z30). Never a blocker.
+* **As often as** counters, mana and targets last. `karlov_exile_keep` (0)
+  is a counter reserve kept for combat.
+* **The cost is charged**: six counters are six power `power_of` no longer
+  adds.
+
+### What it is worth
+
+`diagnostics/run_oracle_remainder.py --batch=0z155`, N=15,000, the staged
+list, seeds 5000.., paired at one commit
+(`results/karlov_exile_20261023.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| the exile, on minus off | **+0.0032 ±0.0014** | **+0.0305 ±0.0032** |
+
+0.24 exiles a game. **The whole gain is in the games where it fires**: the
+13,138 games with no exile are identical on and off, game for game. With
+one exile (1,061 games) the opponents' kills move 3.96 rounds against 1.90,
+and T20 win rate is 0.707 against 0.589; two exiles 0.829 against 0.500.
+Each exile is about two rounds of an opponent's clock -- **the size rides on
+`threat_rebuild_max`**, how long an answered piece takes to come back, a
+judgement with no data (§0z140). T10 is small because the counters come late.
+
+**What limits it is mana.** Instrumented over 600 games: Karlov is out with
+six or more counters at 2.07 ends of round a game; a creature piece is out
+at 0.89 of them, and {W}{B} is still untapped at only 0.20 of those. A pilot
+who holds {W}{B} back for it is the obvious next policy, and is NOT
+measured.
+
+**The reserve costs** (`diagnostics/run_karlov_exile_keep.py`, the same
+games): keeping 6 counters -0.0005 ±0.0007 / **-0.0060 ±0.0018**, keeping 12
+-0.0007 ±0.0010 / **-0.0117 ±0.0023**. The default, 0, is the best of the
+three. Its arm reproduces the batch runner's "all" arm exactly (§0z35).
+
+### The shared code, checked (§0z30, §0z126)
+
+`end_step_target` moved `opponents.py`, so every deck's fingerprint moved.
+`check_unchanged_decks --n=2000` against a worktree at `3b2b593`: five decks
+BIT-IDENTICAL, karlov MOVED (+0.040 won); with `--cfg=karlov_exile=False`
+all six BIT-IDENTICAL. The STAGED lists the caches measured, every output
+key, 2,000 seeds: rendmaw, lorehold, shilgengar and azusa IDENTICAL on every
+key. **tivit moved on one key in one game**: `threat_pieces_removed`, seed
+3642. Paying Void Rend's {B} at the end of the round sacrificed three
+Treasures; Nadier's Nightblade drained opponent 2 from 3 to 0; the old loop's
+target list, built before the payment, then "removed" a piece from a player
+no longer in the game. `end_step_target` reads the living opponents at the
+pick -- §0z19's snapshot shape, and CR 800.4a's answer. Won, damage and every
+other key identical. Those five caches are VERIFIED on this evidence;
+karlov's is rebuilt.
+
+### Pinned
+
+`tests/test_karlov_exile.py`: seven cases, three mutations written before
+the run, exact sets -- the switch, the reserve, and `end_step_target`
+replaced by `answer_target` (a piece that landed this round is out at its
+end).
 
 ## How to read an ablation table
 

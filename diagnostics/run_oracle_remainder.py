@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """What each fix in a batch of oracle fixes is worth, deck by deck: §0z151
-(§0z116's remainder) and §0z153 (queue item 5's last lines).
+(§0z116's remainder), §0z153 (queue item 5's last lines) and §0z155
+(Karlov's own exile).
 
-    python -m diagnostics.run_oracle_remainder 15000 OUTDIR [DECK ...] [--batch=0z153]
-    python -m diagnostics.run_oracle_remainder --report OUTDIR [--batch=0z153]
+    python -m diagnostics.run_oracle_remainder 15000 OUTDIR [DECK ...] [--batch=0z155]
+    python -m diagnostics.run_oracle_remainder --report OUTDIR [--batch=0z155]
 
 `--batch` is 0z151 when omitted. Every fix ships behind a switch whose False
 is the old code, bit for bit (`check_unchanged_decks --cfg`). So each fix is
@@ -77,6 +78,14 @@ BATCHES = {
                 "tithe_forced_treasures", "tyrant_sacrifices",
                 "speaker_angels", "resplendent_pod_angels", "realms_binned",
                 "library_shuffles"),
+    },
+    # Karlov's own exile, the owner's policy (§0z155). One switch, so
+    # "none" and "-karlov_exile" are the same arm, measured twice.
+    "0z155": {
+        "knobs": ("karlov_exile",),
+        "touches": {"karlov": ("karlov_exile",)},
+        "met": ("won", "damage", "karlov_exiles", "threat_pieces_removed",
+                "threat_rounds_delayed", "combat_damage"),
     },
 }
 CH = 8

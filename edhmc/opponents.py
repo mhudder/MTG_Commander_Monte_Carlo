@@ -1327,31 +1327,38 @@ def respond_to_pieces(g) -> int:
     return n
 
 
+def end_step_target(g, reach: Reach):
+    """(opponent, piece index) an answer at the END of the pod's round aims
+    at, or None: `answer_target`'s order, read at that moment.
+    `present_pieces` reads "landed on an EARLIER pod turn"; at the end of the
+    round a piece that landed this turn is out as well. One function for
+    every end-of-round answer -- the held instants here and Karlov's own
+    exile (`karlov.karlov_exile_step`, §0z155) -- so the two cannot drift."""
+    t = pod_turn(g)
+    return max(((o, k) for o in living(g)
+                for k, lands in enumerate(o.piece_lands)
+                if lands <= t and hits(reach, o.pieces[k])),
+               key=lambda ok: (unfired_first(g, ok[0]),
+                               sum(1 for x in ok[0].piece_lands if x <= t),
+                               ok[0].bracket), default=None)
+
+
 def end_step_answers(g) -> int:
     """At the end of the pod's round, a held instant answer is cast at a
     piece that is out, with whatever mana is still untapped -- the mana a
-    sorcery-speed pilot would have wasted. Aimed as `answer_target` aims."""
+    sorcery-speed pilot would have wasted. Aimed by `end_step_target`."""
     if not (responses_on(g) and pod_threats_on(g)) or g.result is not None:
         return 0
     n = 0
     for c in _by_cost([c for c in g.hand if "Instant" in c.types
                        and c.name in ANSWERS and "wipe" not in c.tags]):
         reach = ANSWERS[c.name]
-        # present_pieces reads "landed on an EARLIER pod turn"; at the end
-        # of the round a piece that landed this turn is out as well.
-        targets = [(o, k) for o in living(g)
-                   for k, lands in enumerate(o.piece_lands)
-                   if lands <= pod_turn(g) and hits(reach, o.pieces[k])]
-        if not targets or not _cast_response(g, c, "end_step"):
+        if end_step_target(g, reach) is None \
+                or not _cast_response(g, c, "end_step"):
             continue
         done = 0
         for _ in range(reach.n):
-            pick = max(((o, k) for o, k in targets
-                        if o.piece_lands[k] <= pod_turn(g)),
-                       key=lambda ok: (unfired_first(g, ok[0]),
-                                       sum(1 for x in ok[0].piece_lands
-                                           if x <= pod_turn(g)),
-                                       ok[0].bracket), default=None)
+            pick = end_step_target(g, reach)
             if pick is None:
                 break
             remove_threat_piece(g, *pick)

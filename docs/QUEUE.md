@@ -53,9 +53,8 @@ What is closed and where it went:
 5.  Remaining per-deck gaps are in the STATUS block of each
     `docs/ORACLE_AUDIT_*.md`. **§0z116's list is done** (§0z151, §0z153,
     2026-10-22) but for trostani's Sylvan Library, which waits with the
-    deck (SUSPENDED). What is left: **Karlov's own "{W}{B}, Remove six
-    +1/+1 counters: Exile target creature"** -- MODEL-BLIND by design while
-    the pod's creatures were a number, MODELABLE since POD_V4 gave them
-    bodies and route pieces, and it needs an activation policy (when to
-    spend six counters, on what), which is the owner's call; and trostani's
-    open gaps, SUSPENDED.
+    deck (SUSPENDED). **Karlov's own "{W}{B}, Remove six +1/+1 counters:
+    Exile target creature" is IMPLEMENTED** (§0z155, 2026-10-23) on the
+    owner's policy: at the end of the pod's round, on {W}{B} the turn left
+    untapped, at a creature route piece. What is left: trostani's open
+    gaps, SUSPENDED with the deck -- all that remains of this item.

@@ -3,7 +3,8 @@ edhmc.karlov — a lifegain/drain engine for Karlov of the Ghost Council.
 
     Karlov of the Ghost Council  {W}{B}  2/2
       Whenever you gain life, put two +1/+1 counters on Karlov.
-      {W}{B}, Remove six +1/+1 counters: exile target creature.  [NOT MODELLED]
+      {W}{B}, Remove six +1/+1 counters: exile target creature.
+                                        [a route piece, §0z155]
 
 THE CENTRAL MODELLING FACT
 --------------------------
@@ -148,7 +149,8 @@ class KarlovGame(BaseGame):
             "lifegain_triggers": 0, "life_gained": 0.0,
             # 2026-09-16 proposals (§0z26).
             "archive_life_doubled": 0.0, "archive_extra_draws": 0,
-            "karlov_counters": 0, "cards_drawn": 0, "spells_cast": 0,
+            "karlov_counters": 0, "karlov_exiles": 0,      # §0z155
+            "cards_drawn": 0, "spells_cast": 0,
             "mana_spent": 0, "mana_floated": 0, "stranded_mv": 0,
             "turn_lethal": 99, "turn_won": 99, "combo_assembled": 0,
             "removal_eaten": 0, "ae_removal_eaten": 0, "wipes_suffered": 0,
@@ -575,6 +577,41 @@ def konrad_card(g, card) -> None:
     for _ in range(g.count("Syr Konrad, the Grim")):
         g.m["damage"] += OPP.damage_each(g, 1)
         g.m["konrad_card_triggers"] += 1
+
+
+KARLOV_EXILE = OPP.answer_reach("exile target creature")
+
+
+def karlov_exile_step(g) -> int:
+    """KARLOV: "{W}{B}, Remove six +1/+1 counters: Exile target creature."
+    THE OWNER'S POLICY (2026-10-23, §0z155): at the end of the pod's round,
+    with {W}{B} left untapped from your turn, at a creature route piece that
+    is out, aimed by `opponents.end_step_target` -- the held instants'
+    window and aim, after they have had it. As often as counters, mana and
+    targets last. `karlov_exile_keep` (0) is a counter reserve kept for
+    combat, a knob so it can be swept.
+
+    The cost is charged: six counters are six power `power_of` no longer
+    adds. What it is blind to: the pod's blockers (`bodies`) are never its
+    target, and the mana is what the turn LEFT -- Syr Konrad's mill and the
+    other end-of-turn sinks spend theirs first, and nothing holds {W}{B}
+    back for it. MODEL-BLIND under `pod_threats=False`, where there is no
+    piece to exile."""
+    if (not g.cfg.get("karlov_exile", True) or g.result is not None
+            or not OPP.pod_threats_on(g)
+            or not g.has("Karlov of the Ghost Council")):
+        return 0
+    keep = g.cfg.get("karlov_exile_keep", 0)
+    n = 0
+    while g.karlov_counters >= 6 + keep:
+        pick = OPP.end_step_target(g, KARLOV_EXILE)
+        if pick is None or not pay_cost(g, {"W": 1, "B": 1}):
+            break
+        g.karlov_counters -= 6
+        OPP.remove_threat_piece(g, *pick)
+        g.m["karlov_exiles"] += 1
+        n += 1
+    return n
 
 
 def konrad_mill(g) -> None:
@@ -2103,6 +2140,7 @@ def take_turn(g):
         # One order for six engines (§0z30): damage, clocks, THEN removal.
         # This engine ran removal first until 2026-09-17.
         OPP.pod_phase(g, before_act=opponent_activity)
+        karlov_exile_step(g)       # the end of the pod's round (§0z155)
 
 
 def simulate(deck, commander, cfg, seed):

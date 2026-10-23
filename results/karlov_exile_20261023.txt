@@ -1,0 +1,20 @@
+§0z155: each fix = every switch on, minus that switch off (win rate, paired, 95% CI; * = outside its bar)
+
+karlov  (N=15000)
+  batch (all off)            T10 +0.0032 ±0.0014*   T20 +0.0305 ±0.0032*
+  karlov_exile               T10 +0.0032 ±0.0014*   T20 +0.0305 ±0.0032*
+  mechanism, a game (all on):  karlov_exiles 0.240  threat_pieces_removed 0.756  threat_rounds_delayed 1.466  combat_damage 37.778
+
+
+Where the gain lives (all on vs karlov_exile off, the same 15,000 games, T20 won):
+  0 exiles:  13138 games  won 0.510 vs 0.510 (+0.000)  rounds delayed 0.91 vs 0.91
+  1 exiles:   1061 games  won 0.707 vs 0.589 (+0.118)  rounds delayed 3.96 vs 1.90
+  2 exiles:    410 games  won 0.829 vs 0.500 (+0.329)  rounds delayed 5.75 vs 2.01
+  3 exiles:    173 games  won 0.844 vs 0.405 (+0.439)  rounds delayed 7.32 vs 2.33
+
+The reserve, python -m diagnostics.run_karlov_exile_keep 15000:
+keep= 0: exiles/game 0.240  won T10 0.2885  T20 0.5414
+keep= 6: exiles/game 0.182  won T10 0.2879  T20 0.5354
+keep=12: exiles/game 0.134  won T10 0.2877  T20 0.5297
+keep=6 minus keep=0:  T10 -0.0005 ±0.0007    T20 -0.0060 ±0.0018*
+keep=12 minus keep=0:  T10 -0.0007 ±0.0010    T20 -0.0117 ±0.0023*
