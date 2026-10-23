@@ -25,61 +25,61 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Serra Ascendant                       +1.82+-0.15         +1.41+-0.15        +0.0043+-0.0029      both
-Kambal, Consul of Allocation          +1.51+-0.12         +1.26+-0.13        +0.0025+-0.0024      both
-Starscape Cleric                      +1.66+-0.16         +1.19+-0.17        +0.0200+-0.0032      both
-Sorin, Solemn Visitor                 +1.33+-0.13         +1.16+-0.15        +0.0178+-0.0031      both
-Sorin, Vengeful Bloodlord             +1.10+-0.11         +1.04+-0.13        +0.0135+-0.0026      both
-Soul's Attendant                      +1.16+-0.14         +0.98+-0.16        +0.0052+-0.0032      both
-Soul Warden                           +1.25+-0.15         +0.97+-0.17        +0.0067+-0.0033      both
-Archangel of Thune                    +0.95+-0.11         +0.91+-0.13        +0.0111+-0.0027      both
-Orzhov Signet                         +0.95+-0.16         +0.89+-0.18        +0.0123+-0.0031      both
-Benevolent Offering                   +0.82+-0.10         +0.87+-0.12        +0.0048+-0.0025      both
-Marauding Blight-Priest               +1.19+-0.13         +0.77+-0.14        +0.0138+-0.0027      both
-Drana's Emissary                      +0.85+-0.08         +0.76+-0.09        +0.0021+-0.0021      both
-Suture Priest                         +0.84+-0.10         +0.76+-0.13        +0.0007+-0.0026       dmg
-Authority of the Consuls              +0.96+-0.12         +0.74+-0.14        +0.0045+-0.0026      both
-Syr Konrad, the Grim                  +0.73+-0.09         +0.70+-0.10        +0.0021+-0.0020      both
-Sol Ring                              +0.76+-0.18         +0.66+-0.22        +0.0112+-0.0039      both
-Debt to the Deathless                 +0.68+-0.07         +0.64+-0.07        +0.0034+-0.0016      both
-Blind Obedience                       +0.68+-0.10         +0.63+-0.13        -0.0011+-0.0026       dmg
-Sunscorch Regent                      +0.60+-0.08         +0.59+-0.10        +0.0071+-0.0021      both
-Land Tax                              +0.70+-0.16         +0.53+-0.20        +0.0098+-0.0032      both
-Bolas's Citadel                       +0.67+-0.13         +0.52+-0.15        +0.0181+-0.0028      both
-Elas il-Kor, Sadistic Pilgrim         +0.62+-0.10         +0.51+-0.12        +0.0002+-0.0025       dmg
-Aetherflux Reservoir                  +0.75+-0.10         +0.51+-0.12        +0.0084+-0.0027      both
-Voice of the Blessed                  +0.56+-0.07         +0.51+-0.08        +0.0029+-0.0019      both
-Exemplar of Light                     +0.57+-0.10         +0.50+-0.13        +0.0080+-0.0028      both
-Auriok Champion                       +0.61+-0.12         +0.50+-0.13        +0.0040+-0.0027      both
-Fountain of Renewal                   +0.60+-0.09         +0.50+-0.10        +0.0018+-0.0022       dmg
-Lurrus of the Dream-Den               +0.57+-0.09         +0.47+-0.12        +0.0013+-0.0025       dmg
-Cliffhaven Vampire                    +0.80+-0.11         +0.45+-0.13        +0.0121+-0.0025      both
-Ranger of Eos                         +0.48+-0.11         +0.40+-0.13        +0.0012+-0.0026       dmg
-Pristine Talisman                     +0.49+-0.08         +0.39+-0.11        +0.0038+-0.0024      both
-Cosmos Elixir                         +0.38+-0.08         +0.33+-0.11        +0.0062+-0.0023      both
-Ajani's Mantra                        +0.35+-0.07         +0.29+-0.08        +0.0013+-0.0020       dmg
-Sun Titan                             +0.25+-0.06         +0.28+-0.08        +0.0022+-0.0018      both
-Swiftfoot Boots                       +0.16+-0.08         +0.18+-0.10        -0.0015+-0.0022       dmg
-Enduring Tenacity                     +0.63+-0.13         +0.17+-0.16        +0.0165+-0.0031      both
-Vito, Thorn of the Dusk Rose          +0.44+-0.14         +0.15+-0.17        +0.0160+-0.0031       win
-Phyrexian Arena                       +0.26+-0.09         +0.11+-0.12        +0.0077+-0.0025       win
-Blood Artist                          +0.09+-0.09         +0.10+-0.12        +0.0027+-0.0024       win
-Sanguine Bond                         +0.31+-0.12         +0.08+-0.15        +0.0115+-0.0030       win
-Phyrexian Reclamation                 +0.01+-0.06         +0.02+-0.10        +0.0016+-0.0022        --
-Necropotence                          +0.04+-0.11         -0.08+-0.14        +0.0048+-0.0028       win
-Mother of Runes                       -0.15+-0.10         -0.11+-0.12        +0.0029+-0.0024       win
-Dawn of Hope                          -0.16+-0.08         -0.23+-0.11        -0.0001+-0.0025       dmg
-Well of Lost Dreams                   -0.19+-0.09         -0.33+-0.12        +0.0039+-0.0025      both
-Vizkopa Guildmage                     -0.29+-0.09         -0.40+-0.12        +0.0018+-0.0023       dmg
-Felidar Sovereign                     -0.82+-0.12         -1.54+-0.16        +0.0192+-0.0027      both
-Exquisite Blood                       -3.39+-0.23         -4.98+-0.30        +0.0543+-0.0043      both
+Serra Ascendant                       +1.86+-0.15         +1.38+-0.16        +0.0036+-0.0029      both
+Kambal, Consul of Allocation          +1.55+-0.12         +1.27+-0.14        +0.0028+-0.0025      both
+Sorin, Solemn Visitor                 +1.34+-0.13         +1.09+-0.15        +0.0141+-0.0030      both
+Starscape Cleric                      +1.67+-0.16         +1.06+-0.18        +0.0180+-0.0031      both
+Sorin, Vengeful Bloodlord             +1.11+-0.11         +1.02+-0.13        +0.0131+-0.0025      both
+Orzhov Signet                         +0.98+-0.16         +1.01+-0.19        +0.0147+-0.0031      both
+Soul's Attendant                      +1.18+-0.14         +1.01+-0.17        +0.0063+-0.0033      both
+Soul Warden                           +1.27+-0.15         +0.98+-0.17        +0.0073+-0.0033      both
+Benevolent Offering                   +0.84+-0.10         +0.88+-0.12        +0.0044+-0.0025      both
+Archangel of Thune                    +0.94+-0.11         +0.84+-0.13        +0.0089+-0.0027      both
+Authority of the Consuls              +0.98+-0.12         +0.82+-0.14        +0.0059+-0.0027      both
+Drana's Emissary                      +0.87+-0.08         +0.77+-0.09        +0.0022+-0.0021      both
+Sol Ring                              +0.77+-0.18         +0.73+-0.23        +0.0127+-0.0039      both
+Suture Priest                         +0.84+-0.10         +0.71+-0.14        +0.0011+-0.0026       dmg
+Marauding Blight-Priest               +1.20+-0.13         +0.65+-0.14        +0.0117+-0.0026      both
+Sunscorch Regent                      +0.63+-0.08         +0.63+-0.10        +0.0075+-0.0021      both
+Blind Obedience                       +0.69+-0.10         +0.61+-0.13        -0.0019+-0.0026       dmg
+Debt to the Deathless                 +0.67+-0.07         +0.61+-0.08        +0.0037+-0.0016      both
+Syr Konrad, the Grim                  +0.70+-0.09         +0.56+-0.11        -0.0009+-0.0022       dmg
+Auriok Champion                       +0.64+-0.12         +0.56+-0.14        +0.0049+-0.0027      both
+Elas il-Kor, Sadistic Pilgrim         +0.63+-0.10         +0.54+-0.12        +0.0007+-0.0025       dmg
+Fountain of Renewal                   +0.62+-0.09         +0.52+-0.11        +0.0021+-0.0023       dmg
+Voice of the Blessed                  +0.56+-0.07         +0.50+-0.08        +0.0027+-0.0019      both
+Land Tax                              +0.70+-0.17         +0.49+-0.20        +0.0097+-0.0032      both
+Bolas's Citadel                       +0.66+-0.13         +0.43+-0.15        +0.0162+-0.0028      both
+Lurrus of the Dream-Den               +0.57+-0.09         +0.43+-0.13        +0.0009+-0.0025       dmg
+Exemplar of Light                     +0.58+-0.10         +0.43+-0.13        +0.0055+-0.0027      both
+Aetherflux Reservoir                  +0.72+-0.10         +0.42+-0.12        +0.0056+-0.0027      both
+Pristine Talisman                     +0.49+-0.09         +0.41+-0.12        +0.0040+-0.0024      both
+Ranger of Eos                         +0.47+-0.10         +0.36+-0.13        +0.0008+-0.0026       dmg
+Cliffhaven Vampire                    +0.80+-0.11         +0.35+-0.13        +0.0104+-0.0024      both
+Sun Titan                             +0.27+-0.06         +0.34+-0.09        +0.0039+-0.0018      both
+Ajani's Mantra                        +0.36+-0.07         +0.31+-0.09        +0.0015+-0.0020       dmg
+Cosmos Elixir                         +0.38+-0.08         +0.29+-0.12        +0.0055+-0.0023      both
+Swiftfoot Boots                       +0.15+-0.08         +0.22+-0.11        -0.0002+-0.0022       dmg
+Blood Artist                          +0.10+-0.09         +0.08+-0.12        +0.0021+-0.0024        --
+Enduring Tenacity                     +0.62+-0.13         +0.07+-0.16        +0.0134+-0.0031       win
+Vito, Thorn of the Dusk Rose          +0.45+-0.14         +0.06+-0.17        +0.0134+-0.0030       win
+Phyrexian Arena                       +0.24+-0.09         +0.05+-0.13        +0.0065+-0.0026       win
+Phyrexian Reclamation                 +0.03+-0.06         -0.03+-0.10        +0.0007+-0.0022        --
+Sanguine Bond                         +0.30+-0.12         -0.04+-0.15        +0.0097+-0.0030       win
+Mother of Runes                       -0.14+-0.10         -0.04+-0.12        +0.0055+-0.0025       win
+Necropotence                          +0.04+-0.11         -0.17+-0.14        +0.0023+-0.0027       dmg
+Dawn of Hope                          -0.18+-0.08         -0.41+-0.12        -0.0048+-0.0026      both
+Vizkopa Guildmage                     -0.29+-0.09         -0.42+-0.12        +0.0013+-0.0023       dmg
+Well of Lost Dreams                   -0.21+-0.09         -0.48+-0.12        +0.0001+-0.0025       dmg
+Felidar Sovereign                     -0.86+-0.12         -1.72+-0.18        +0.0165+-0.0026      both
+Exquisite Blood                       -3.42+-0.24         -5.20+-0.31        +0.0518+-0.0042      both
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Path to Exile                         +0.34+-0.09         +0.86+-0.14        +0.0117+-0.0031      both
+Swords to Plowshares                  +0.32+-0.09         +0.79+-0.14        +0.0123+-0.0029      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -87,7 +87,7 @@ Path to Exile                         +0.34+-0.09         +0.86+-0.14        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-Swords to Plowshares                  +0.36+-0.09         +0.85+-0.14        +0.0135+-0.0029      both
+Path to Exile                         +0.30+-0.09         +0.78+-0.14        +0.0116+-0.0030      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -95,13 +95,13 @@ Swords to Plowshares                  +0.36+-0.09         +0.85+-0.14        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-South Wind Avatar                     +1.26+-0.13         +0.84+-0.14        +0.0163+-0.0027      both
+South Wind Avatar                     +1.26+-0.13         +0.70+-0.14        +0.0147+-0.0026      both
       MODELLED: 'whenever you gain life, each opponent loses 1 life' (a
       DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) and 'whenever
       another creature you control dies, you gain life equal to its toughness', on
       the 3/4. NOT: deathtouch, which nothing in the blocking model reads --
       Bloodthirsty Conqueror's gap. A floor by that.
-Anguished Unmaking                    +0.41+-0.08         +0.73+-0.13        +0.0109+-0.0028      both
+Anguished Unmaking                    +0.41+-0.08         +0.67+-0.13        +0.0099+-0.0027      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -109,7 +109,7 @@ Anguished Unmaking                    +0.41+-0.08         +0.73+-0.13        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-Fracture                              +0.31+-0.08         +0.67+-0.12        +0.0092+-0.0027      both
+Fracture                              +0.30+-0.08         +0.62+-0.12        +0.0086+-0.0026      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -117,13 +117,13 @@ Fracture                              +0.31+-0.08         +0.67+-0.12        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-Damn                                  +0.17+-0.08         +0.57+-0.13        +0.0079+-0.0027      both
+Damn                                  +0.14+-0.08         +0.53+-0.13        +0.0079+-0.0027      both
       SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
       ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
       refuses the wrath or the overload cannot be paid. Your half of the wrath is
       faithful; the pod's half zeroes a count (§4) and takes the route pieces it
       can hit. The cost is modelled, the benefit an estimate.
-Return to Dust                        +0.36+-0.07         +0.47+-0.11        +0.0067+-0.0024      both
+Return to Dust                        +0.37+-0.07         +0.46+-0.11        +0.0072+-0.0024      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -131,59 +131,59 @@ Return to Dust                        +0.36+-0.07         +0.47+-0.11        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-Kalitas, Traitor of Ghet              +0.50+-0.06         +0.46+-0.08        +0.0051+-0.0019      both
+Kalitas, Traitor of Ghet              +0.50+-0.06         +0.46+-0.08        +0.0049+-0.0019      both
       MODELLED: the 3/4 lifelink body, and under POD_V4 the replacement -- a pod
       creature that would die is exiled and you get a 2/2 Zombie, so karlov's
       death triggers do not hear it (every pod body read as nontoken, an
       overstatement). NOT: '{2}{B}, sacrifice another Vampire or Zombie: two +1/+1
       counters'. A floor on that half.
-Damnation                             +0.26+-0.08         +0.37+-0.11        +0.0022+-0.0023       dmg
+Damnation                             +0.28+-0.08         +0.41+-0.12        +0.0038+-0.0024      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Farewell                              +0.25+-0.07         +0.36+-0.10        +0.0039+-0.0020      both
+Farewell                              +0.25+-0.07         +0.40+-0.10        +0.0057+-0.0021      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Umezawa's Jitte                       +0.41+-0.09         +0.28+-0.11        +0.0017+-0.0023       dmg
+Austere Command                       +0.19+-0.07         +0.29+-0.09        +0.0046+-0.0019      both
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
+Umezawa's Jitte                       +0.41+-0.09         +0.26+-0.12        +0.0015+-0.0024       dmg
       MODELLED (item 24): equip {2} at the end of the first main phase, two charge
       counters whenever the holder attacks (it deals combat damage to a player or
       to the pod's chump blocker), and every counter spent at once on 'you gain 2
       life', one lifegain EVENT each. NOT: the +2/+2 mode (a policy choice -- an
       event is worth more here) and the -1/-1 mode, whose targets are the pod's
       creatures, a count (§4). A floor.
-Austere Command                       +0.18+-0.06         +0.26+-0.09        +0.0035+-0.0019      both
+Toxic Deluge                          +0.00+-0.09         +0.22+-0.13        +0.0026+-0.0026      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Toxic Deluge                          -0.01+-0.09         +0.21+-0.12        +0.0027+-0.0025      both
-      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
-      honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
-Sensei's Divining Top                 -0.31+-0.13         -0.33+-0.16        -0.0013+-0.0030       dmg
+Sensei's Divining Top                 -0.32+-0.13         -0.36+-0.17        -0.0019+-0.0031       dmg
       MODELLED: '{1}: look at the top three, put them back in any order' ONCE A
       TURN before the draw (the owner's policy), paid from mana left up through
       the pod's turn or else in the upkeep, in the shared want order (the missing
       combo half first). NOT: '{T}: draw a card, then put this on top', and no
       second spin after a shuffle. A floor.
-Enlightened Tutor                     -1.25+-0.19         -1.82+-0.23        +0.0163+-0.0037      both
+Enlightened Tutor                     -1.25+-0.19         -1.85+-0.24        +0.0143+-0.0036      both
       MODELLED: an artifact or enchantment put on top, the shared want order's
       pick -- the missing half of the Exquisite Blood loop first, else priority.
       NOT: the answer a pilot fetches for the TABLE, whose permanents are a count
       (§4). A floor.
-Bloodthirsty Conqueror                -1.97+-0.18         -3.24+-0.24        +0.0366+-0.0035      both
+Bloodthirsty Conqueror                -1.98+-0.19         -3.40+-0.25        +0.0340+-0.0034      both
       Exquisite Blood's text word for word, and since §0z90 BOTH halves of it are
       modelled for both cards: the loop with Sanguine Bond, Vito, Enduring
       Tenacity and (new) the three 'each opponent loses 1' drains, and the general
