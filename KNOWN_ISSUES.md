@@ -208,6 +208,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z153](#0z153) | FIXED | **Queue item 5's last lines**: §0z116's one-liners in six engines, lorehold's extra turn as a whole turn, the Reservoir at instant speed, Sorin's loyalty; eight owner calls. Every fix a switch |
 | [0z154](#0z154) | REBUILT | **§0z153's parallel rebuild**, six tables at `c7a1e02`, 30 min wall: 17 rows moved beyond their bars, azusa's ten around Realms Uncharted's binned lands and the new search shuffles |
 | [0z155](#0z155) | IMPLEMENTED | **Karlov's own six-counter exile**, the owner's policy: end of the pod's round, {W}{B} left over, a creature route piece. +0.0032 / **+0.0305** at T20 from 0.24 exiles a game; a reserve costs |
+| [0z156](#0z156) | REBUILT | **Karlov's table rebuilt for §0z155** at `081a1e0`, 7m12s: 7 of 64 rows moved, 6 down -- Dawn of Hope, Well of Lost Dreams and Syr Konrad spend the {W}{B} the exile wants |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13788,7 +13789,8 @@ data was right.)
   the held instants use (`end_step_answers`, §0z134), and after them.
 * **Mana**: {W}{B} the turn LEFT untapped. Nothing holds it back: Syr
   Konrad's mill, Reclamation, Gingerbrute and the other end-of-turn sinks
-  spend theirs first.
+  spend theirs first, and Dawn of Hope's and Well of Lost Dreams' draws
+  are paid from it at every lifegain on the pod's turn (§0z156).
 * **Target**: a creature route piece that is out, aimed by
   `opponents.end_step_target` -- the held instants' own aim, factored out of
   `end_step_answers` so the two cannot drift (§0z30). Never a blocker.
@@ -13848,6 +13850,47 @@ karlov's is rebuilt.
 the run, exact sets -- the switch, the reserve, and `end_step_target`
 replaced by `answer_target` (a piece that landed this round is out at its
 end).
+
+
+<a id="0z156"></a>
+
+## 0z156. REBUILT -- karlov's table, for §0z155's exile
+
+One deck, serial, in this session: `tools/rebuild_deck.sh karlov 081a1e0`
+on Python 3.13.16 / numpy 2.4.6 (the other tables' interpreter), **7m12s**.
+`tools.repro_row` reproduced Dawn of Hope IDENTICALLY. Every active cache
+CURRENT; the other five were VERIFIED in §0z155, trostani SUSPENDED.
+
+**What moved** (`results/rebuild_diffs_20261023.txt`, T20 win rate beyond
+the wider of the two bars): 7 of 64 rows, noise floor ±0.0026 unchanged.
+
+| card | before | after | why |
+|---|---|---|---|
+| Dawn of Hope | -0.0001 | **-0.0048** | its {2} draw is paid at every lifegain, the pod's turn included, from the mana held for the exile |
+| Well of Lost Dreams | +0.0039 | **+0.0001** | its {X} draws (X at most 2, `_gain_life`), the same |
+| Sorin, Solemn Visitor | +0.0178 | **+0.0141** | not traced |
+| Enduring Tenacity | +0.0165 | **+0.0134** | another way to end the game: redundancy (§0z27) |
+| Syr Konrad, the Grim | +0.0021 | **-0.0009** | its {1}{B} mill takes the {B} (§0z153) |
+| Aetherflux Reservoir | +0.0084 | **+0.0056** | as Enduring Tenacity |
+| Mother of Runes | +0.0029 | **+0.0055** | it keeps Karlov alive to activate |
+
+**The mana half is measured, not argued.** The same staged list, each
+card blanked, 6,000 paired seeds: exiles a game go from 0.252 to 0.281
+without Dawn of Hope, 0.282 without Well of Lost Dreams and 0.274 without
+Syr Konrad (each ±0.007-0.008, outside its bar), and the mana left unspent
+rises 0.43-0.68 a game. **Without Mother of Runes they FALL**, to 0.225:
+the one card whose row rose is the one that makes more exiles. Enduring
+Tenacity (+0.020) and the Reservoir (+0.011) raise the count too, by
+another road -- without them the games run longer -- which is the
+redundancy reading, not a mechanism traced card by card. Sorin's +0.008 is
+inside its bar.
+
+**A pilot who holds {W}{B} back for Karlov** (§0z155's unmeasured policy)
+would move exactly these rows again: Dawn of Hope's negative row is a
+claim about THIS policy, under which `_gain_life` pays every "you may
+pay" draw before the end of the round. (Its {3}{W} Soldier is not
+modelled in this engine.) It is not a cut
+list until that policy is measured.
 
 ## How to read an ablation table
 
