@@ -210,6 +210,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z155](#0z155) | IMPLEMENTED | **Karlov's own six-counter exile**, the owner's policy: end of the pod's round, {W}{B} left over, a creature route piece. +0.0032 / **+0.0305** at T20 from 0.24 exiles a game; a reserve costs |
 | [0z156](#0z156) | REBUILT | **Karlov's table rebuilt for §0z155** at `081a1e0`, 7m12s: 7 of 64 rows moved, 6 down -- Dawn of Hope, Well of Lost Dreams and Syr Konrad spend the {W}{B} the exile wants |
 | [0z157](#0z157) | IMPLEMENTED | **Five cards from the owner's Reality Fracture / Star Trek review**, one per deck: Crusher, Avacyn of Horror, Captain Pike, Mr. Spock, Join the Collective. Pinned, smoked; the wipe gate prices returned bodies |
+| [0z158](#0z158) | FIXED | **Azusa's land animations held targets by bare id**, safe only under the central hold; `test_id_reuse --mutate` flaked on it 1 run in 6. Targets hold their lands now; case G pins it |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13951,10 +13952,51 @@ that evidence. `validate` +0.00 everywhere.
 **Unrelated, found on the way**: `tests.test_id_reuse --mutate` fails about
 one run in six ON THE UNCHANGED TREE ("the central hold is off" also breaks
 D, azusa) -- with the hold off, whether an id is reused depends on
-allocation, which is §0z100's warning about the test itself.
+allocation, which is §0z100's warning about the test itself. **Traced in
+§0z158**: an azusa id key without a local hold, which the test was right to
+catch.
 
 **Next**: a candidate row per card at N=15,000, then a head-to-head against
 a named cut whose row is evidence.
+
+
+<a id="0z158"></a>
+
+## 0z158. FIXED -- azusa's land animations held their targets by bare id; `test_id_reuse --mutate` was flaky because of it
+
+§0z157 found `python -m tests.test_id_reuse --mutate` failing about one run
+in six on an unchanged tree: under "the central hold is off", case D (the
+same seeds replayed after 5,000 other allocations give identical output)
+also broke, always on azusa.
+
+**D was right.** `AzusaGame.animate_lands` kept each animation's targets as
+`{id(p) for p in targets}` -- a bare set of ids, held alive by nothing but
+`engine.begin_game`'s central hold (§0z100). With the hold off, a dead
+animated land's id could go to the next permanent allocated, which then
+inherited the animation (`animation_of` answers `id(perm) in targets`). It
+is §0z98's bug, in the one id-keyed map in azusa without a local hold
+(`eot_pt`, `eot_haste` and `pw_used` all store the permanent).
+
+**The fix** is the local hold the others have: `targets` is
+`{id(p): p}`. No game moves while the central hold is on --
+`check_unchanged_decks` against `1c0a4fe`, N=400, BIT-IDENTICAL on all six,
+and azusa's staged list on seeds 5000..6999 in both trees, every numeric
+output key hashed per seed: 0 of 2,000 differ. Azusa's cache is VERIFIED on
+that.
+
+**The test.** Case G asks, by weak reference, that an animation hold the
+land it targets; a fourth mutation ("... and azusa's animations keep bare
+ids", -> E, F, G, written before the run) takes that hold away. The first
+three mutations then held D in 20 runs of 20. **Under the fourth, D broke in
+4 of 20** -- the original flake reproduced on demand, which is the evidence
+for the diagnosis -- so D is not run under that one mutation: its result
+there is the allocator's choice by construction, and asserting either
+outcome would be a coin flip written down as a test. 20 consecutive
+`--mutate` runs pass.
+
+**The lesson is §0z98's, unchanged**: an id used as a key must hold its
+object. The central hold made every such key safe, which is why this one
+was invisible until a mutation removed it.
 
 ## How to read an ablation table
 

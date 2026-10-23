@@ -2,7 +2,7 @@
 """An `id(permanent)` used as a key must not outlive its permanent (§0z98).
 
     python -m tests.test_id_reuse
-    python -m tests.test_id_reuse --mutate   # 3 mutations, exact sets
+    python -m tests.test_id_reuse --mutate   # 4 mutations, exact sets
 
 CPython hands a freed object's id to the next object of the same size, so
 state keyed on `id(perm)` that is not cleared when the permanent leaves is
@@ -27,7 +27,8 @@ CASES
   E  the CENTRAL hold: a Permanent made after `begin_game()` is still alive
      after every reference to it is dropped
   F  the same for a Card
-  A, B, E and F ask "is it alive" by weak reference, not "was its id
+  G  azusa's land animation holds the lands it targets (§0z158)
+  A, B, E, F and G ask "is it alive" by weak reference, not "was its id
   reused": reuse is the allocator's choice, and a case that waits for it
   passed once with the hold switched off.
 
@@ -35,11 +36,27 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the central hold is off                            -> E, F
   ... and trostani holds nothing                     -> A, E, F
   ... and walker_ready keeps a bare id               -> B, E, F
-  (A and B pass with the central hold off: their local holds still work.)
+  ... and azusa's animations keep bare ids           -> E, F, G   (D not run)
+  (A, B and G pass with the central hold off: their local holds still work.)
 
 UNMUTATED (§0z15): C is structural and D is the neighbour; D cannot be made to
 fail on demand, since whether an id is reused inside a game depends on the
 allocator, which is the whole problem.
+
+D WAS FLAKY UNDER THE FIRST MUTATION (§0z158): about one run in six it broke
+too, on azusa. That was D doing its job -- azusa's `animate_lands` kept its
+targets as a bare set of ids, held by nothing but the central hold, so with
+the hold off a dead animated land's id could go to a new permanent. The
+targets hold their permanents now, G pins it, and the fourth mutation is
+the one that takes that hold away. D's expectation (it passes) was not
+widened; the engine was fixed so that the expectation is true: 20 runs of
+the first three mutations, D held every time.
+
+UNDER THE FOURTH, D IS NOT RUN. That mutation puts the bare ids back, and D
+broke in 4 of 20 runs of it -- the original flake, on demand, which is the
+evidence the diagnosis is right. Its outcome there is the allocator's
+choice by construction, so asserting either result would be a coin flip
+written down as a test. It is not asked; E, F and G are.
 """
 import gc
 import sys
@@ -72,7 +89,7 @@ def trostani_game():
     return g, {c.name: c for c in deck}
 
 
-def run_cases():
+def run_cases(neighbour=True):
     PASS.clear()
     FAIL.clear()
 
@@ -116,7 +133,7 @@ def run_cases():
           a.pw_used.get(id(w)) is w, True)
 
     bad = []
-    for deck_name in DECKS:
+    for deck_name in (DECKS if neighbour else ()):
         cards, cmd = build_pending(deck_name)
         sim = DECKS[deck_name].sim
         cfg = dict(DEFAULT_CFG, turns=20)
@@ -127,7 +144,10 @@ def run_cases():
                   for s in reversed(range(5000, 5020))][::-1]
         if first != second:
             bad.append(deck_name)
-    check("D every deck replays identically after other allocations", bad, [])
+    if neighbour:
+        check("D every deck replays identically after other allocations",
+              bad, [])
+    cards, cmd = build_pending(list(DECKS)[-1])   # E's card, as before
 
     card = cards[0]
     EN.begin_game()
@@ -144,6 +164,20 @@ def run_cases():
     del c
     gc.collect()
     check("F the engine holds a freed Card until the next game",
+          ref() is not None, True)
+
+    deck, cmd = azusa_v1.build()
+    a = AzusaGame(list(deck), cmd, dict(DEFAULT_CFG, turns=20), 1)
+    a.board = Board()
+    forest = next(c for c in deck if c.is_land)
+    land = Permanent(card=forest)
+    a.board.append(land)
+    a.animate_lands(2, 2, targets=[land])
+    ref = weakref.ref(land)
+    a.board.remove(land)
+    del land
+    gc.collect()
+    check("G azusa's animation holds the lands it targets",
           ref() is not None, True)
     return set(FAIL)
 
@@ -173,6 +207,14 @@ def main() -> int:
     def no_hold(self):
         pass
 
+    real_animate = AzusaGame.animate_lands
+
+    def animate_bare(self, *a, **k):
+        real_animate(self, *a, **k)
+        if self.animations:
+            last = self.animations[-1]
+            last["targets"] = {i: None for i in last["targets"]}
+
     central = [(EN.Permanent, "__post_init__", no_hold),
                (EN.Card, "__post_init__", no_hold)]
     muts = {
@@ -182,7 +224,12 @@ def main() -> int:
             central + [(T.TrostaniGame, "make_permanent", make_unheld)]),
         "... and walker_ready keeps a bare id": (
             {"B", "E", "F"}, central + [(EN, "walker_ready", bare_ready)]),
+        "... and azusa's animations keep bare ids": (
+            {"E", "F", "G"},
+            central + [(AzusaGame, "animate_lands", animate_bare)]),
     }
+    # The one mutation under which D's result is the allocator's (docstring).
+    no_neighbour = {"... and azusa's animations keep bare ids"}
     bad = 0
     for label, (want, patches) in muts.items():
         print(f"-- {label}")
@@ -190,7 +237,7 @@ def main() -> int:
         for o, n, fn in patches:
             setattr(o, n, fn)
         try:
-            broke = run_cases()
+            broke = run_cases(neighbour=label not in no_neighbour)
         finally:
             for o, n, real in saved:
                 setattr(o, n, real)

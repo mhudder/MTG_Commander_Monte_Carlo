@@ -629,9 +629,13 @@ class AzusaGame(BaseGame):
 
         `targets` is the set of land permanents the effect applies to, CAPTURED
         BY THE CALLER AT RESOLUTION -- see point 1 of the module docstring. It
-        is held by `id()` rather than by object because `Permanent` is an
+        is keyed by `id()` rather than by object because `Permanent` is an
         unfrozen dataclass and therefore unhashable, and because two Forests
-        compare equal field-for-field.
+        compare equal field-for-field -- and the VALUE is the permanent, so
+        the id cannot outlive it (§0z98). It was a bare set of ids, safe only
+        under `engine.begin_game`'s central hold (§0z100): with that hold off,
+        a dead animated land's id went to the next permanent allocated, which
+        inherited the animation (§0z158).
         """
         if not targets or self.cfg.get("land_animation", "full") != "full":
             return
@@ -645,7 +649,7 @@ class AzusaGame(BaseGame):
             "trample": trample, "indestructible": indestructible,
             "reach": reach, "through_pod_round": through_pod_round,
             "expires_turn": self.turn, "source": source,
-            "targets": {id(p) for p in targets},
+            "targets": {id(p): p for p in targets},
         })
         self.m["lands_animated"] += len(targets)
 

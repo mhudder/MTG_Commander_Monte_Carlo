@@ -501,6 +501,12 @@
         "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
         "fingerprint": "b809b6b969a8d9bd",
         "utc": "2026-10-23T01:43:11Z"
+      },
+      {
+        "commit": "1c0a4fe",
+        "evidence": "2026-10-23, \u00a70z158 (animate_lands' targets hold their permanents): check_unchanged_decks HEAD 1c0a4fe vs the working tree, N=400, BIT-IDENTICAL on all six; azusa's STAGED list (build_pending) on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 differ.",
+        "fingerprint": "d16d7b8f39a1b6f5",
+        "utc": "2026-10-23T01:53:53Z"
       }
     ]
   },
