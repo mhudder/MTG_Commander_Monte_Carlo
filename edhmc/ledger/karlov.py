@@ -462,6 +462,17 @@ MEASURED: list[Candidate] = [
                  "`orchard_idle_tap` does not matter (-0.0045 against "
                  "-0.0049)."),
     ),
+    Candidate(
+        deck='karlov',
+        card='Dr. Beverly Crusher',
+        measured='2026-10-23',
+        win_rate='CANDIDATE ROW in Swiftfoot Boots\' slot (karlov3/4\'s), value over a blank of the same cost, N=15,000 paired, seeds 80000..94999: +0.0088 +-0.0022 at T10 and +0.0072 +-0.0029 at T20, significant at both; damage +1.30 +-0.12 / +1.17 +-0.14.',
+        signal='both',
+        rationale="Star Trek (§0z157): every 'whenever you gain life' trigger of a permanent fires an additional time -- Karlov's counters, Thune, the DRAIN_ON_GAIN and COMBO_LOOP cards, Well and Dawn. Smoke: 1.36 doubled events a game, Karlov +2.0 counters.",
+        evidence='results/candidates_karlov5.txt, results/candidates_karlov5_t10.txt (python -m tools.candidates karlov5 --n=15000 [--turns=10]); smoke in results/smoke_star_trek_20261023.txt',
+        limits="A CANDIDATE ROW, NOT A SWAP (§0e): the cut is undecided. Doubling Well of Lost Dreams' and Dawn of Hope's 'you may pay' draws spends more of the {W}{B} §0z155's exile wants (§0z156) -- the row carries that cost.",
+        verdict="Significant at both horizons. Earns a head-to-head against a named cut whose row is evidence.",
+    ),
 ]
 
 
@@ -1082,6 +1093,7 @@ PROPOSED: list[Proposal] = [
         rationale="Doubles every 'whenever you gain life' trigger of a permanent: Karlov's own two counters (four per event), Archangel of Thune, Voice of the Blessed, Heliod, Exemplar of Light, every DRAIN_ON_GAIN and COMBO_LOOP card (Sanguine Bond, Vito, Cliffhaven, Blight-Priest, Starscape Cleric), Well of Lost Dreams and Dawn of Hope. The deck's whole engine is lifegain EVENTS, and this doubles what each event triggers without touching the amount.",
         implement="karlov._gain_life: the trigger block runs 1 + count(Crusher) times; the replacement effects above it (Wind Crystal, Archive, Selenia) are not triggers and stay once, and `lifegain_triggers` still counts one EVENT. Crusher's own counter is one of the doubled triggers. Knob `crusher_text`. A 3-mana 2/2 body otherwise.",
         triage='LIVE',
+        rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

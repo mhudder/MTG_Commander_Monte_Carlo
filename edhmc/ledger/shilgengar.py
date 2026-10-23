@@ -111,6 +111,17 @@ MEASURED: list[Candidate] = [
         limits='Every clause modelled; 1.5 damage a game.',
         verdict='+0.0012 at T10 (significant, tiny) and nothing at T20. A blank in practice. OWNER DEFERRED 2026-10-06: a valid card, but outside the price range of the casual table the owner plays at -- a judgement about the table, not about the number.',
     ),
+    Candidate(
+        deck='shilgengar',
+        card='Avacyn, Angel of Horror',
+        measured='2026-10-23',
+        win_rate='CANDIDATE ROW in Skullclamp\'s slot (the MBC batch\'s), value over a blank of the same cost, N=15,000 paired, seeds 80000..94999: +0.0041 +-0.0011 at T10 and +0.0132 +-0.0028 at T20, significant at both; damage +0.79 +-0.09 / +1.07 +-0.14.',
+        signal='both',
+        rationale="Reality Fracture Commander (§0z157): an 8/8 flying Angel; nontoken creatures that die return at the next end step, and `avacyn_feed` sacrifices the returning board to Shilgengar after combat. Smoke: 1.1 returns a game, Blood 8.6 vs 4.0. Cast in 12% of games by T20 (an eight-drop).",
+        evidence='results/candidates_shilgengar1.txt, results/candidates_shilgengar1_t10.txt (python -m tools.candidates shilgengar1 --n=15000 [--turns=10]); smoke in results/smoke_star_trek_20261023.txt',
+        limits="PARTLY: deathtouch not read; a returned Massacre Wurm, Sun Titan or Twilight Shepherd fires no ETB (every return path's floor). A FLOOR by both. The row also carries the `avacyn_feed` POLICY (say it: `avacyn_feed=False` is the card without it).",
+        verdict="Significant at both horizons. Earns a head-to-head against a named cut whose row is evidence.",
+    ),
 ]
 
 
@@ -254,6 +265,7 @@ PROPOSED: list[Proposal] = [
         rationale="An Angel, and a repeating engine with Shilgengar's first ability: feed a nontoken Angel for Blood equal to its toughness after combat and it comes back at the end step, so the Blood, the death triggers (Blood Artist, Zulaport, Midnight Reaper, Kokusho's drain) and the ETBs repeat every turn at no card cost.",
         implement="shilgengar: a death of a nontoken creature you control with Avacyn watching (look-back, she sees her own) queues the CARD; the next end step -- yours (`end_step`) or an opponent's (`pod_end_step`) -- returns it if it is still in the graveyard (§0z19: the ultimate may have taken it). POLICY, knob `avacyn_feed`: after the second main phase, with Avacyn out and a free outlet (Shilgengar, Viscera Seer, Cartel Aristocrat), sacrifice every nontoken creature that would return, Avacyn last. BLIND: deathtouch (the pod's blockers are a count).",
         triage='LIVE',
+        rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

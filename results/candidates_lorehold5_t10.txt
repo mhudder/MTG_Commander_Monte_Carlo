@@ -1,0 +1,4 @@
+
+LOREHOLD candidates — value over a blank of the same cost (10 turns, n=15,000 paired)
+  card                          MV          damage          win rate      mv_cheated  P(deploy)
+  Join the Collective            7     +0.50+-0.13     -0.0012+-0.0023     -0.88+-0.15       0.078

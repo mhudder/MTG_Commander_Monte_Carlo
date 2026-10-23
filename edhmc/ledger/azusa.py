@@ -1081,6 +1081,17 @@ MEASURED: list[Candidate] = [
         limits='Every clause modelled. 2.97 Zombies a game. Name diversity is read from the list as built: azusa has 21 Forests, so seven names come from its nonbasics.',
         verdict="Significant at both horizons (+0.0098 at T20) but half the fetches'. Damage +0.79 at T20 says the Zombies attack.",
     ),
+    Candidate(
+        deck='azusa',
+        card='Captain Pike, Fullness of Time',
+        measured='2026-10-23',
+        win_rate='CANDIDATE ROW in Sylvan Library\'s slot (azusa3-6\'s), value over a blank of the same cost, N=15,000 paired, seeds 80000..94999: +0.0046 +-0.0027 at T10 (significant) and +0.0031 +-0.0034 at T20 (inside its bar); damage +0.68 +-0.19 / +0.58 +-0.21, significant at both; lands played +0.07 +-0.03 / +0.04 +-0.04.',
+        signal='dmg',
+        rationale="Star Trek (§0z157): play lands from the top of the library and a */* of differently named lands, for three mana.",
+        evidence='results/candidates_azusa7.txt, results/candidates_azusa7_t10.txt (python -m tools.candidates azusa7 --n=15000 [--turns=10]); smoke in results/smoke_star_trek_20261023.txt',
+        limits="REDUNDANT (§0z27): Courser of Kruphix, Augur of Autumn, Oracle of Mul Daya and Ka-Zar already grant the top, so leave-one-out understates him -- the land counters barely move (+0.04 lands at T20). A package ablation of the five top-grants is the measurement that would see him.",
+        verdict="Damage significant at both horizons, win rate only at T10: at T20 NOT MEASURED, not bad. Not a head-to-head candidate on this row alone; measure the top-access package first.",
+    ),
 ]
 
 
@@ -1582,6 +1593,7 @@ PROPOSED: list[Proposal] = [
         rationale="Top-of-library land plays for three mana, the zone grant Courser of Kruphix, Augur of Autumn and Oracle of Mul Daya are already paid for -- with Azusa's three drops a turn, each land off the top is a card the hand keeps. The body scales with the deck's spread of land names.",
         implement="azusa.top_access gains Pike (and LAND_ENABLERS, so he deploys before the drops). The */* is a new name set, DYNAMIC_PT_NAMED_LANDS, read by power_of/toughness_of from `named_land_count` (distinct names among lands and Ashaya's creature-lands) and covered by check_dynamic_pt_coverage. 'Look at the top card any time' is information the pilot already acts on. Redundant with the four top-access cards in the list: leave-one-out will understate it (§0z27).",
         triage='LIVE',
+        rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

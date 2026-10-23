@@ -310,6 +310,17 @@ MEASURED: list[Candidate] = [
         limits="THE KNOB IS A JUDGEMENT: the pod's creatures have no toughness (§4), so X kills min(1, X / gyre_full_x) of each board. Planeswalkers are §4.",
         verdict="The owner asked how strong it is: significant at both horizons and at every setting of the knob that prices it, with X large enough (about 8) that it is usually a full one-sided wipe. A long-horizon card -- most of its value is at T20, when the pod's boards have grown. STAGED 2026-10-10 against Boros Charm (CHANGES); the other head-to-heads are in SIMULATED.",
     ),
+    Candidate(
+        deck='lorehold',
+        card='Join the Collective',
+        measured='2026-10-23',
+        win_rate='CANDIDATE ROW in Pinnacle Monk\'s slot (lorehold2/4\'s), value over a blank of the same cost, N=15,000 paired, seeds 80000..94999: -0.0012 +-0.0023 at T10 (inside its bar) and +0.0118 +-0.0031 at T20 (significant); damage +0.50 +-0.13 / +1.07 +-0.16, significant at both; mv_cheated -0.88 / -0.89.',
+        signal='both',
+        rationale="Star Trek Commander (§0z157): destroy all creatures and make a 1/1 Borg for each nonartifact creature destroyed, miracled for {2}. Cast in 8.8% of games by T20; 1.25 Borgs a game in the smoke.",
+        evidence='results/candidates_lorehold5.txt, results/candidates_lorehold5_t10.txt (python -m tools.candidates lorehold5 --n=15000 [--turns=10]); smoke in results/smoke_star_trek_20261023.txt',
+        limits="CEILING: the pod's creatures have no types (§4), so all count as nonartifact, for X and for the wipe gate's refund (`opponents.wipe_refund`, `wipe_gate_refund`). A symmetric wipe, PARTLY by construction. mv_cheated FALLS 0.9: drawn as the turn's first card and held by the gate, it spends the miracle window -- a real cost, charged.",
+        verdict="Win rate significant at T20 only; damage at both. A late-game card, like every wipe in this list. Earns a head-to-head; AT STAGING it goes into opponents.WIPE_DESTROYS.",
+    ),
 ]
 
 
@@ -971,6 +982,7 @@ PROPOSED: list[Proposal] = [
         rationale="A seven-mana sorcery that Lorehold miracles for {2}: Farewell's wipe that rebuilds you a board out of everyone's creatures, the pod's included.",
         implement="lorehold: tagged ('wipe',) with script 'join_collective', so it takes the wipe gate and `resolve_own_wipe`: a destroy, which is `wipe_destroys`' default for an unclassified card, so indestructible survives. AT STAGING it goes into opponents.WIPE_DESTROYS with its clause -- `test_wipe_coverage` refuses a wipe-tagged card in a live list without one; left out now so a candidate does not move every deck's fingerprint. X is read around the wipe: your nonartifact creatures that left plus the pod's creatures killed, rounded down (Culling Ritual's rule). CEILING: the pod's creatures are a count with no types (§4), so every one is taken as nonartifact. The tokens are 1/1s; their artifact type is read by nothing in lorehold. FLOOR: the wipe gate does not price the tokens.",
         triage='LIVE',
+        rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

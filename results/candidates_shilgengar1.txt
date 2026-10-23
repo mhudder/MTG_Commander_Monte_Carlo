@@ -1,0 +1,4 @@
+
+SHILGENGAR candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  Avacyn, Angel of Horror        8     +1.07+-0.14     +0.0132+-0.0028      0.120

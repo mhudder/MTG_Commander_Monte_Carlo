@@ -1,0 +1,4 @@
+
+KARLOV candidates — value over a blank of the same cost (10 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  Dr. Beverly Crusher            3     +1.30+-0.12     +0.0088+-0.0022      0.152

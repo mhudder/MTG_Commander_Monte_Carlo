@@ -123,6 +123,17 @@ MEASURED: list[Candidate] = [
         limits='Every clause modelled. A POLICY: cracked at the end step for >= `vault_min_treasures` (4); 0.01 cracks a game. At vault_min_treasures=2: 0.03 cracks, +0.0005 +-0.0019 at T20.',
         verdict='A blank: tivit spends its mana, so the Vault is nearly always a colourless land in place of a coloured one.',
     ),
+    Candidate(
+        deck='tivit',
+        card='Mr. Spock, Science Officer',
+        measured='2026-10-23',
+        win_rate='CANDIDATE ROW in a Plains slot (tivit1\'s: value over a blank in a LAND slot, both legs at 35 lands), N=15,000 paired, seeds 80000..94999: +0.0137 +-0.0025 at T10 and +0.0107 +-0.0030 at T20, significant at both; damage +1.17 +-0.17 / +1.02 +-0.18.',
+        signal='both',
+        rationale="Star Trek (§0z157): every draw is two -- the draw step, Clues, Rhystic Study, Memnarch. Smoke: 1.06 extra draws a game, cards drawn +0.8.",
+        evidence='results/candidates_tivit2.txt, results/candidates_tivit2_t10.txt (python -m tools.candidates tivit2 --n=15000 [--turns=10]); smoke in results/smoke_star_trek_20261023.txt',
+        limits="A LAND-SLOT ROW (tivit1's caveat): both legs are a land short. Decking is charged; with Spock out the pilot holds optional draws above `decking_reserve` (`spock_draw_safe`), a policy tivit's optional draws do not otherwise have.",
+        verdict="Significant at both horizons. Earns a head-to-head against a named nonland cut whose row is evidence.",
+    ),
 ]
 
 
@@ -313,6 +324,7 @@ PROPOSED: list[Proposal] = [
         rationale="Every Clue Tivit's evidence votes make, Rhystic Study, Messenger Jays, Memnarch and the draw step all draw double. Card flow is what tivit's priority sweep said it wanted (§0z43: card draw above its token engines).",
         implement="TivitGame.draw: each card drawn is two while Spock is out (a replacement, so the draw step too); `spock_extra_draws`. DECKING IS REAL: the doubled mandatory draws can deck you and `drew_from_empty` charges it. tivit's optional draws (cracking a Clue, Rhystic Study) do not consult `draw_is_safe` today; with Spock out they do, at the doubled count (§0z42). Knob `spock_text`.",
         triage='LIVE',
+        rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

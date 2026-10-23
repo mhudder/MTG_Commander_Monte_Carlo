@@ -211,6 +211,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z156](#0z156) | REBUILT | **Karlov's table rebuilt for §0z155** at `081a1e0`, 7m12s: 7 of 64 rows moved, 6 down -- Dawn of Hope, Well of Lost Dreams and Syr Konrad spend the {W}{B} the exile wants |
 | [0z157](#0z157) | IMPLEMENTED | **Five cards from the owner's Reality Fracture / Star Trek review**, one per deck: Crusher, Avacyn of Horror, Captain Pike, Mr. Spock, Join the Collective. Pinned, smoked; the wipe gate prices returned bodies |
 | [0z158](#0z158) | FIXED | **Azusa's land animations held targets by bare id**, safe only under the central hold; `test_id_reuse --mutate` flaked on it 1 run in 6. Targets hold their lands now; case G pins it |
+| [0z159](#0z159) | MEASURED | **Candidate rows for §0z157's five** at N=15,000: Crusher, Avacyn of Horror and Spock significant at T10 and T20, Join the Collective at T20; Pike damage only (redundant top grants) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13956,8 +13957,8 @@ allocation, which is §0z100's warning about the test itself. **Traced in
 §0z158**: an azusa id key without a local hold, which the test was right to
 catch.
 
-**Next**: a candidate row per card at N=15,000, then a head-to-head against
-a named cut whose row is evidence.
+**Next**: a candidate row per card at N=15,000 (done, §0z159), then a
+head-to-head against a named cut whose row is evidence.
 
 
 <a id="0z158"></a>
@@ -13997,6 +13998,44 @@ outcome would be a coin flip written down as a test. 20 consecutive
 **The lesson is §0z98's, unchanged**: an id used as a key must hold its
 object. The central hold made every such key safe, which is why this one
 was invisible until a mutation removed it.
+
+
+<a id="0z159"></a>
+
+## 0z159. MEASURED -- candidate rows for §0z157's five cards
+
+`python -m tools.candidates <batch> --n=15000 [--turns=10]`, value over a
+blank of the same cost at the deck's median priority, seeds 80000..94999,
+each in the slot that deck's last batch used (`karlov5`, `lorehold5`,
+`azusa7`, `tivit2`, `shilgengar1`). Win rate with 95% bars; damage is the
+proxy. **A candidate row is not a swap (§0e)** and these seeds are not the
+tables', so no row here ranks against a table row.
+
+| deck | card | slot | T10 win | T20 win | damage T10 / T20 | signal |
+|---|---|---|---|---|---|---|
+| karlov | Dr. Beverly Crusher | Swiftfoot Boots | **+0.0088 ±0.0022** | **+0.0072 ±0.0029** | +1.30 / +1.17 | both |
+| shilgengar | Avacyn, Angel of Horror | Skullclamp | **+0.0041 ±0.0011** | **+0.0132 ±0.0028** | +0.79 / +1.07 | both |
+| tivit | Mr. Spock | a Plains | **+0.0137 ±0.0025** | **+0.0107 ±0.0030** | +1.17 / +1.02 | both |
+| lorehold | Join the Collective | Pinnacle Monk | -0.0012 ±0.0023 | **+0.0118 ±0.0031** | +0.50 / +1.07 | both at T20 |
+| azusa | Captain Pike | Sylvan Library | **+0.0046 ±0.0027** | +0.0031 ±0.0034 | +0.68 / +0.58 | dmg |
+
+**What each number is.** Crusher and Spock are early engines and are
+largest at T10. Avacyn is an eight-drop cast by T20 in 12% of games, so her
+T10 row is small and tight and her T20 row is the card. Join the
+Collective is a wipe: nothing at T10, significant at T20, and its
+`mv_cheated` falls 0.9 at both -- drawn as the turn's first card and held by
+the gate, it spends the miracle window. Pike moves lands played by +0.07 /
++0.04: four cards in the list already grant the top (§0z27), so his T20
+row is NOT MEASURED, not bad; a package ablation of the five grants is what
+would see him.
+
+**Knobs said out loud**: Avacyn's row carries `avacyn_feed` (on); Join the
+Collective's carries `wipe_gate_refund` (on) and the pod-has-no-types
+ceiling (§4); Spock's carries `spock_draw_safe`. Tivit's row is in a LAND
+slot, tivit1's caveat: both legs are a land short.
+
+**Next**: a head-to-head per card against a named cut whose row is evidence
+(the four with `both`), and for Pike a package ablation first.
 
 ## How to read an ablation table
 

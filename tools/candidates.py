@@ -66,6 +66,13 @@ from edhmc.decks.azusa_v1 import (GREENSLEEVES, ANCIENT_GREENWARDEN,
 from edhmc.decks.azusa_v1 import BATCH4_CANDIDATES
 from edhmc.decks.azusa_v1 import (BATCH6_CANDIDATES, ZENDIKARS_ROIL,
                                   SAPLING_NURSERY as _NURSERY)
+# The owner's Reality Fracture / Star Trek review, 2026-10-23 (§0z157).
+from edhmc.decks.karlov_v2 import KARLOV_2026_10_23
+from edhmc.decks.shilgengar_v1 import FRC_CANDIDATES as SHIL_FRC
+from edhmc.decks.azusa_v1 import STAR_TREK_CANDIDATES as AZUSA_TRK
+from edhmc.decks.tivit_v1 import STAR_TREK_CANDIDATES as TIVIT_TRK
+from edhmc.decks.lorehold_v17 import STAR_TREK_CANDIDATES as LOREHOLD_TRK
+shilgengar_sim = REGISTRY["shilgengar"].sim
 
 N = 6000
 
@@ -306,6 +313,21 @@ DECKS = {
     "karlov1": ("KARLOV", "karlov", karlov_sim, 10, "Soulmender",
                 (HELIOD_SUN_CROWNED, EXEMPLAR_OF_LIGHT, GUIDE_OF_SOULS,
                  ENDURING_TENACITY, STARSCAPE_CLERIC, THE_WIND_CRYSTAL)),
+    # THE OWNER'S REALITY FRACTURE / STAR TREK REVIEW, 2026-10-23 (§0z157),
+    # one card per deck, each in the slot that deck's last batch used, so the
+    # rows share those baselines: Swiftfoot Boots (karlov3/4), Pinnacle Monk
+    # (lorehold2/4), Sylvan Library (azusa3-6), a Plains (tivit1 -- read it
+    # as "value over a blank in a land slot", tivit1's caveat). Shilgengar
+    # has no batch here before this one; Skullclamp is the slot its MBC
+    # candidates were measured against (results/mbc_batch.txt), a `--` row.
+    "karlov5": ("KARLOV", "karlov", karlov_sim, 20, "Swiftfoot Boots",
+                KARLOV_2026_10_23),
+    "lorehold5": ("LOREHOLD", "lorehold", lorehold_sim, 20, "Pinnacle Monk",
+                  LOREHOLD_TRK),
+    "azusa7": ("AZUSA", "azusa", azusa_sim, 20, "Sylvan Library", AZUSA_TRK),
+    "tivit2": ("TIVIT", "tivit", tivit_sim, 20, "Plains", TIVIT_TRK),
+    "shilgengar1": ("SHILGENGAR", "shilgengar", shilgengar_sim, 20,
+                    "Skullclamp", SHIL_FRC),
 }
 
 OLD = {

@@ -1,0 +1,4 @@
+
+TIVIT candidates — value over a blank of the same cost (20 turns, n=15,000 paired)
+  card                          MV          damage          win rate  P(deploy)
+  Mr. Spock, Science Officer     4     +1.02+-0.18     +0.0107+-0.0030      0.200
