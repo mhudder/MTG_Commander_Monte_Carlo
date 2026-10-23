@@ -467,3 +467,14 @@ SLAUGHTER_SPECIALIST = C("Slaughter Specialist", "Creature", {"gen": 1, "B": 1},
 
 KARLOV_2026_10_12 = (SOUTH_WIND_AVATAR, EPICURE_OF_BLOOD, POLLUTED_BONDS,
                      SLAUGHTER_SPECIALIST)
+
+
+# STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+# api.scryfall.com, recorded verbatim on the Proposal in edhmc/ledger/karlov.py.
+# "If you gaining life causes a triggered ability of a permanent you control
+# to trigger, that ability triggers an additional time. Whenever you gain
+# life, put a +1/+1 counter on Dr. Crusher." karlov._gain_life, by name.
+DR_BEVERLY_CRUSHER = C("Dr. Beverly Crusher", "Creature", {"gen": 2, "W": 1},
+                       2, 2, priority=8.0)
+
+KARLOV_2026_10_23 = (DR_BEVERLY_CRUSHER,)

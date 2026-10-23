@@ -3647,6 +3647,7 @@ def should_cast_own_wipe(g, card=None) -> bool:
     if measure == "count":
         mine = sum(1 for p in g.board if is_creature_now(g, p))
         theirs = sum(o.creatures for o in living(g))
+        dying = [p for p in g.board if is_creature_now(g, p)]
     else:
         if measure == "cost":
             # What THIS sweeper takes (§0z118): Culling Ritual spares the
@@ -3667,7 +3668,35 @@ def should_cast_own_wipe(g, card=None) -> bool:
                                      if measure == "cost" else 0.0))
                      * o.p.get("power", 1.0) for o in living(g))
     theirs += gate_pieces(g, card, measure)          # §0z138: the routes
+    mine = max(0.0, mine - wipe_refund(g, card, dying))
     return theirs > mine * g.cfg.get("wipe_threshold", 1.4) + 1
+
+
+# SWEEPERS THAT GIVE BODIES BACK, and each body's power. JOIN THE COLLECTIVE
+# (lorehold candidate, 2026-10-23): "Destroy all creatures. Create X 1/1
+# colorless Borg artifact creature tokens, where X is the number of
+# nonartifact creatures destroyed this way."
+WIPE_REFUNDS = {"Join the Collective": 1}
+
+
+def wipe_refund(g, card, dying) -> float:
+    """What a sweeper in WIPE_REFUNDS hands back, in the gate's own unit:
+    one body each (or its power, under "power" and "cost") for your
+    nonartifact creatures in `dying` and the pod's creatures it kills. The
+    gate prices a wipe by what it takes from YOU; a wipe that rebuilds you a
+    board out of everyone's creatures costs only the difference, and pricing
+    it as Farewell asserts the tokens do nothing (CLAUDE.md, "policy").
+    The pod's creatures are all taken as nonartifact -- the card's own
+    ceiling (§4). `wipe_gate_refund=False` restores the plain gate; zero for
+    every other sweeper, so no list card's gate moves."""
+    if (card is None or card.name not in WIPE_REFUNDS
+            or not g.cfg.get("wipe_gate_refund", True)):
+        return 0.0
+    mine = sum(1 for p in dying if "Artifact" not in p.card.types)
+    pod = sum(o.creatures - pod_left_for_gate(g, card, o) for o in living(g))
+    each = 1 if g.cfg.get("wipe_gate_measure", "cost") == "count" \
+        else WIPE_REFUNDS[card.name]
+    return (mine + int(pod + 1e-9)) * each
 
 
 def resolve_own_wipe(g, spare_own=False, card=None):

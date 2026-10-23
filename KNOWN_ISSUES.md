@@ -209,6 +209,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z154](#0z154) | REBUILT | **§0z153's parallel rebuild**, six tables at `c7a1e02`, 30 min wall: 17 rows moved beyond their bars, azusa's ten around Realms Uncharted's binned lands and the new search shuffles |
 | [0z155](#0z155) | IMPLEMENTED | **Karlov's own six-counter exile**, the owner's policy: end of the pod's round, {W}{B} left over, a creature route piece. +0.0032 / **+0.0305** at T20 from 0.24 exiles a game; a reserve costs |
 | [0z156](#0z156) | REBUILT | **Karlov's table rebuilt for §0z155** at `081a1e0`, 7m12s: 7 of 64 rows moved, 6 down -- Dawn of Hope, Well of Lost Dreams and Syr Konrad spend the {W}{B} the exile wants |
+| [0z157](#0z157) | IMPLEMENTED | **Five cards from the owner's Reality Fracture / Star Trek review**, one per deck: Crusher, Avacyn of Horror, Captain Pike, Mr. Spock, Join the Collective. Pinned, smoked; the wipe gate prices returned bodies |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -13891,6 +13892,69 @@ claim about THIS policy, under which `_gain_life` pays every "you may
 pay" draw before the end of the round. (Its {3}{W} Soldier is not
 modelled in this engine.) It is not a cut
 list until that policy is measured.
+
+
+<a id="0z157"></a>
+
+## 0z157. IMPLEMENTED -- five cards from the owner's Reality Fracture / Star Trek review, one per deck
+
+The owner asked for promising cards from Reality Fracture (`fra`, `frc`) and
+Star Trek (`trk`, `trc`): 616 cards read from api.scryfall.com, 485 in a
+deck's colours and new to the repo (`tools.card_known`). Five chosen, each a
+`Proposal` with verified text (2026-10-23), `triage="LIVE"` (the text screen
+reads all five REVIEW: no blind clause), defined, implemented, pinned by
+`tests/test_star_trek_batch.py` (20 cases, 9 mutations, every expected set
+written before its run) and smoked at N=1,000
+(`results/smoke_star_trek_20261023.txt`). **No candidate row and no
+head-to-head yet**; nothing is staged.
+
+| deck | card | what the engine does | smoke: its own counter |
+|---|---|---|---|
+| karlov | Dr. Beverly Crusher | `_gain_life`'s triggers run once more per Crusher (`_lifegain_triggers`); replacements and the EVENT count stay once | `crusher_doubled_events` 1.36 a game, `karlov_counters` +2.0 |
+| shilgengar | Avacyn, Angel of Horror | a nontoken death she watches queues the card; the next end step (yours or `pod_end_step`) returns it if still in the yard; `avacyn_feed` | `avacyn_returns` 1.11, `blood_made` 8.6 vs 4.0 |
+| azusa | Captain Pike | `top_access`; */* of `named_land_count` (DYNAMIC_PT_NAMED_LANDS, in `check_dynamic_pt_coverage`) | `lands_from_library` +0.29, `lands_from_hand` -0.24 |
+| tivit | Mr. Spock | `TivitGame.draw` doubles every draw; `spock_draw_safe` guards the Clue and Rhystic draws with him out | `spock_extra_draws` 1.06, `cards_drawn` +0.8 |
+| lorehold | Join the Collective | `resolve_own_wipe`, then X 1/1 Borgs (`join_the_collective`) | `collective_borgs` 1.25, cast in 9.3% of games |
+
+**Policies, said out loud.** `avacyn_feed` (on): after the second main
+phase, with Avacyn out and a free outlet, every nontoken creature that will
+return is sacrificed, Avacyn last -- Blood, death triggers and the bodies
+back before the pod's turn; counters the bodies carried are not priced.
+`spock_draw_safe`: tivit's optional draws (a Clue, Rhystic Study) never
+asked `draw_is_safe` (§0z42), and still do not WITHOUT Spock, so no game
+without him moved; with him they ask at the doubled count.
+
+**The wipe gate priced Join the Collective as Farewell.** The first smoke
+cast it in 3.9% of games: `should_cast_own_wipe` weighs what a sweeper takes
+from you and nothing it gives back, which asserts the Borgs do nothing.
+`opponents.wipe_refund` (`WIPE_REFUNDS`, knob `wipe_gate_refund`) takes the
+bodies it returns off "mine"; zero for every other card. With it, 9.3%.
+Case U pins it. **The ceiling**: the pod's creatures have no types (§4), so
+every one counts as nonartifact for X and for the refund. **Not yet in
+`WIPE_DESTROYS`**: `wipe_destroys`' default is right for "destroy all
+creatures", and `test_wipe_coverage` will demand the entry at staging.
+
+**Floors and gaps.** Avacyn: deathtouch is not read; a returned Massacre
+Wurm, Sun Titan or Twilight Shepherd fires no ETB -- the floor every return
+path in shilgengar shares (the ultimate's too), since those ETBs live in
+`resolve`. Pike: leave-one-out will understate him -- four cards in the
+list already grant the top (§0z27). Pike's smoke read `won` 0.497 vs 0.512
+(z -2.1, one of ~60 counters at N=1,000): not a finding at this N, but the
+candidate row should be read for it.
+
+**No list moved.** `check_unchanged_decks` HEAD `76d1e34` vs the tree, N=400,
+BIT-IDENTICAL on all six; and every staged list (`build_pending`) on seeds
+5000..6999 in both trees, every numeric output key hashed per seed: 0 of
+2,000 differ in each deck (§0z126's floor). The six caches are VERIFIED on
+that evidence. `validate` +0.00 everywhere.
+
+**Unrelated, found on the way**: `tests.test_id_reuse --mutate` fails about
+one run in six ON THE UNCHANGED TREE ("the central hold is off" also breaks
+D, azusa) -- with the hold off, whether an id is reused depends on
+allocation, which is §0z100's warning about the test itself.
+
+**Next**: a candidate row per card at N=15,000, then a head-to-head against
+a named cut whose row is evidence.
 
 ## How to read an ablation table
 

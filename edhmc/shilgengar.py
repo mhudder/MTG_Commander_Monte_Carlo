@@ -191,6 +191,9 @@ class ShilgengarGame(BaseGame):
         # Shepherds that have persisted once.
         self.to_yard_this_turn: set[int] = set()
         self.persisted: dict = {}
+        # Avacyn, Angel of Horror (candidate, 2026-10-23): the cards her
+        # trigger returns "at the beginning of the next end step".
+        self.avacyn_queue: list = []
 
         cfg.setdefault("shroud_sources", ())
         cfg.setdefault("protection_cards",
@@ -428,6 +431,7 @@ class ShilgengarGame(BaseGame):
         if (perm is not None and perm.card.name == "Selenia, the Cursed Heart"
                 and not perm.is_token and id(perm.card) not in self.finality):
             OPP.curse_opponent(self)
+        self.avacyn_died(perm)
         # KOKUSHO, THE EVENING STAR (§0z117): "When Kokusho dies, each
         # opponent loses 5 life. You gain life equal to the life lost this
         # way." It was SCRIPTED and nothing read its name (§0z116 item 1).
@@ -514,6 +518,77 @@ class ShilgengarGame(BaseGame):
             self.gain_life(amount)
         else:
             self.your_life += amount
+
+    def avacyn_died(self, perm):
+        """AVACYN, ANGEL OF HORROR (candidate, 2026-10-23): "Whenever Avacyn
+        or another nontoken creature you control dies, return that card to
+        the battlefield under your control at the beginning of the next end
+        step." Look-back (CR 603.10a): she sees her own death and the deaths
+        in her wipe. One return per card however many Avacyns watch -- the
+        second trigger finds the card gone. The commander goes to the command
+        zone, not the graveyard, so it has no card here to return. A finality
+        creature is exiled and never reaches this method."""
+        if (perm is None or perm.is_token or perm.card is self.commander
+                or not self.cfg.get("avacyn_text", True)
+                or not OPP.watching(self, "Avacyn, Angel of Horror", perm)):
+            return
+        if not any(c is perm.card for c in self.avacyn_queue):
+            self.avacyn_queue.append(perm.card)
+            self.m["avacyn_triggers"] += 1
+
+    def avacyn_returns(self):
+        """The beginning of an end step -- yours (`end_step`) or an
+        opponent's (`pod_end_step`), whichever comes first: every queued card
+        STILL IN THE GRAVEYARD returns (§0z19 -- Shilgengar's ultimate or
+        Sun Titan may have taken it meanwhile, and then the trigger does
+        nothing). Through `make_permanent` and `creature_entered`, the path
+        the ultimate's returns take, so the same ETBs fire and the same ones
+        do not (Massacre Wurm's, Sun Titan's and Twilight Shepherd's fire on
+        a CAST only, in `resolve` -- a floor every return path here shares).
+        No finality counter: Avacyn's text gives none."""
+        queue, self.avacyn_queue = self.avacyn_queue, []
+        for card in queue:
+            if not any(c is card for c in self.graveyard):
+                self.m["avacyn_fizzled"] += 1
+                continue
+            remove_card(self.graveyard, card)
+            perm = self.make_permanent(card, sick=True)
+            if perm.card.is_creature:
+                self.creature_entered(perm)
+            self.m["avacyn_returns"] += 1
+
+    def avacyn_feed(self):
+        """THE AVACYN LINE, A POLICY SAID OUT LOUD (`avacyn_feed`, default
+        on). After the second main phase -- every attacker has attacked --
+        with Avacyn out and a FREE outlet (Shilgengar, Viscera Seer, Cartel
+        Aristocrat), sacrifice every nontoken creature her trigger will
+        bring back at this end step: Shilgengar makes Blood (toughness for
+        an Angel), every death trigger fires, and the bodies are back before
+        the pod's turn. Avacyn herself goes last, so she watches the rest.
+        Not fed: tokens and finality creatures (they do not return) and the
+        commander (it cannot be fed to itself). What a body loses -- its
+        +1/+1 counters, Herald of War's included -- is not priced."""
+        if (not self.cfg.get("avacyn_feed", True)
+                or not self.cfg.get("avacyn_text", True)
+                or not self.has("Avacyn, Angel of Horror")):
+            return
+        free = self.commander_cast or self.has("Viscera Seer") \
+            or self.has("Cartel Aristocrat")
+        if not free:
+            return
+        fodder = [p for p in self.board
+                  if p.card.is_creature and not p.is_token
+                  and p.card is not self.commander
+                  and id(p.card) not in self.finality]
+        fodder.sort(key=lambda p: p.card.name == "Avacyn, Angel of Horror")
+        for p in fodder:
+            if p not in self.board:
+                continue                     # §0z19: a trigger moved it
+            if not any(q.card.name == "Avacyn, Angel of Horror"
+                       for q in self.board):
+                break                        # nobody is watching any more
+            self.sacrifice(p, to_shilgengar=self.commander_cast)
+            self.m["avacyn_fed"] += 1
 
     def exiled_instead_of_dying(self, perm) -> bool:
         """"...with a FINALITY counter on it." CR 122.1b / the counter's
@@ -1325,6 +1400,7 @@ class ShilgengarGame(BaseGame):
                 self.m["single_reanimations"] += 1
 
     def end_step(self):
+        self.avacyn_returns()
         # Resplendent Angel / Speaker of the Heavens both key off "gained 5+
         # life this turn" / "7+ over starting life", checked once here rather
         # than at every gain_life() call so a turn with several small gains is
@@ -1362,6 +1438,7 @@ class ShilgengarGame(BaseGame):
         if you gained 5 or more life this turn" -- that opponent's turn
         counts too (§0z153, `resplendent_each_end`): the life gained since the
         previous end step, yours or theirs."""
+        self.avacyn_returns()
         if not self.cfg.get("resplendent_each_end", True):
             return
         gained = self.m["life_gained"] - getattr(self, "gain_mark", 0.0)
@@ -1495,6 +1572,7 @@ def take_turn(g):
     g.walker_step()
     g.speaker_step()                     # sorcery speed, §0z153
     g.pearl_sink()
+    g.avacyn_feed()                      # a policy, `avacyn_feed`
     g.end_step()
 
     # Revel in Riches — its OWN Treasure generation is model-blind (needs

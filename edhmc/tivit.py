@@ -56,7 +56,8 @@ from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, 
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
-                          enter_loyalty, walker_ready, walker_dies_at_zero)
+                          enter_loyalty, walker_ready, walker_dies_at_zero,
+                          draw_is_safe)
 from edhmc import opponents as OPP
 from edhmc import voting as V
 
@@ -159,6 +160,22 @@ class TivitGame(BaseGame):
         if dry:
             return can_pay(cost, mana_units(self)) is not None
         return pay(self, cost)
+
+    def draw(self, n=1):
+        """MR. SPOCK, SCIENCE OFFICER (candidate, 2026-10-23): "If you would
+        draw a card, draw two cards instead." A replacement on EVERY draw --
+        the draw step, a Clue, Rhystic Study, Memnarch -- so it lives here,
+        on the one path all of them take. Legendary, so one Spock. The
+        doubled draws can deck you, and `drew_from_empty` charges it (§0z42);
+        the OPTIONAL draws ask `spock_draw_safe` first. `spock_text=False`
+        is the 2/4 blank."""
+        if self.cfg.get("spock_text", True) and self.has(SPOCK):
+            before = self.m["cards_drawn"]
+            super().draw(2 * int(n))
+            self.m["spock_extra_draws"] += max(
+                0, self.m["cards_drawn"] - before - int(n))
+            return
+        super().draw(n)
 
     def power_of(self, perm):
         if perm.card.name == self.URZA_CONSTRUCT:
@@ -542,6 +559,21 @@ def venser_counters(g) -> None:
             g.m["venser_counters"] += 2
 
 
+SPOCK = "Mr. Spock, Science Officer"
+
+
+def spock_draw_safe(g, n=1) -> bool:
+    """An OPTIONAL draw of `n` with Mr. Spock out is a draw of 2n, and the
+    pilot does not take it into the last `decking_reserve` cards
+    (`engine.draw_is_safe`, §0z42). tivit's optional draws -- a Clue, Rhystic
+    Study -- did not ask before Spock and still do not without him: that
+    policy is the deck's, unchanged, so every game without Spock plays as it
+    did. With him the doubling makes the question real."""
+    if not (g.cfg.get("spock_text", True) and g.has(SPOCK)):
+        return True
+    return draw_is_safe(g, 2 * n)
+
+
 def crack_clues(g, want=1) -> int:
     """"{2}, Sacrifice this artifact: Draw a card." Cracked only with spare
     mana, and the sacrifice is itself a payoff via Nadier's / Mirkwood /
@@ -549,6 +581,8 @@ def crack_clues(g, want=1) -> int:
     drawn = 0
     for _ in range(int(want)):
         if g.tokens["Clue"] <= 0 or not affordable(g, {"gen": 2}, True):
+            break
+        if not spock_draw_safe(g, 1):
             break
         if not pay(g, {"gen": 2}, powerstones=True):   # an ability, §0z74
             break
@@ -1170,7 +1204,9 @@ def upkeep(g):
     if g.has("Rhystic Study"):
         # "...unless that player pays {1}." Modelled as a flat rate, because
         # whether a table pays is a social fact this model has no way to see.
-        g.draw(int(g.cfg.get("rhystic_rate", 1)))
+        n = int(g.cfg.get("rhystic_rate", 1))
+        if spock_draw_safe(g, n):            # "you MAY draw a card"
+            g.draw(n)
     if g.has("Coercive Portal"):
         # Will of the council: draw, or sacrifice it and destroy all nonland
         # permanents. Ties go to HOMAGE, the draw -- which is the mode you

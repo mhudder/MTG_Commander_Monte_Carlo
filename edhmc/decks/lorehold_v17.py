@@ -474,3 +474,15 @@ LIGHTNING_GREAVES = C("Lightning Greaves", "Artifact", {"gen": 2},
 BATCH_2026_10_09_SPELLS = (FURYGALE_FLOCKING, SEARING_WIND, EXPLOSIVE_WELCOME,
                            GIDEONS_PHALANX, RAPHAELS_TECHNIQUE,
                            IMMOLATING_GYRE, PROFOUND_JOURNEY)
+
+
+# STAR TREK COMMANDER, 2026-10-23 (the owner's set review). Oracle text from
+# api.scryfall.com, recorded verbatim on the Proposal in
+# edhmc/ledger/lorehold.py.
+# {5}{W}{W} sorcery. "Destroy all creatures. Create X 1/1 colorless Borg
+# artifact creature tokens, where X is the number of nonartifact creatures
+# destroyed this way." Miracle {2} off the commander. The wipe is
+# `resolve_own_wipe` (a destroy); the Borgs are `lorehold.join_the_collective`.
+JOIN_THE_COLLECTIVE = C("Join the Collective", "Sorcery", {"gen": 5, "W": 2},
+                        priority=4, tags=("wipe",), script="join_collective")
+STAR_TREK_CANDIDATES = (JOIN_THE_COLLECTIVE,)

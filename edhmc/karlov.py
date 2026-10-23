@@ -775,6 +775,27 @@ def _gain_life(g, amount, _depth=0):
     g.m["life_gained"] += amount
     g.m["lifegain_triggers"] += 1
 
+    # DR. BEVERLY CRUSHER (candidate, 2026-10-23): "If you gaining life causes
+    # a triggered ability of a permanent you control to trigger, that ability
+    # triggers an additional time." Everything below is such a trigger --
+    # Karlov's, each board payoff's, Well of Lost Dreams' and Dawn of Hope's
+    # -- so the whole block runs once more per Crusher. The REPLACEMENTS above
+    # (Wind Crystal, Archive, Selenia) are not triggers and apply once, and
+    # `lifegain_triggers` still counts one EVENT. `crusher_text=False` is the
+    # 2/2 blank.
+    reps = 1
+    if g.cfg.get("crusher_text", True):
+        reps += g.count("Dr. Beverly Crusher")
+    if reps > 1:
+        g.m["crusher_doubled_events"] += 1
+    for _ in range(reps):
+        if _lifegain_triggers(g, amount):
+            return
+
+
+def _lifegain_triggers(g, amount) -> bool:
+    """The "whenever you gain life" triggers of one lifegain event, once.
+    True when one of them ended the game (a drain loop)."""
     if g.commander_cast:
         g.karlov_counters += 2
         g.m["karlov_counters"] = max(g.m["karlov_counters"], g.karlov_counters)
@@ -793,7 +814,7 @@ def _gain_life(g, amount, _depth=0):
             # large ones.
             if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
                 win_by_drain_loop(g)
-                return
+                return True
             g.m["damage"] += OPP.damage_each(g, 1)
         elif n in ("Marauding Blight-Priest", "Starscape Cleric"):
             # Starscape Cleric: "whenever you gain life, each opponent loses 1
@@ -802,7 +823,7 @@ def _gain_life(g, amount, _depth=0):
             # same and this loop counts both.
             if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
                 win_by_drain_loop(g)
-                return
+                return True
             g.m["damage"] += OPP.damage_each(g, 1)
         elif n in ("South Wind Avatar", "Epicure of Blood"):
             # Candidates, 2026-10-12 (§0z128): "Whenever you gain life, each
@@ -810,7 +831,7 @@ def _gain_life(g, amount, _depth=0):
             # own branch only so each card's counter says it fired.
             if has_combo_a(g) and drain_loop_partner(g) and g.result is None:
                 win_by_drain_loop(g)
-                return
+                return True
             g.m["damage"] += OPP.damage_each(g, 1)
             g.m["southwind_drains" if n == "South Wind Avatar"
                 else "epicure_drains"] += 1
@@ -835,7 +856,12 @@ def _gain_life(g, amount, _depth=0):
                 g.result = "win"
                 g.m["turn_won"] = g.turn
                 g.m["win_route"] = 2
-                return
+                return True
+        elif n == "Dr. Beverly Crusher":
+            # "Whenever you gain life, put a +1/+1 counter on Dr. Crusher" --
+            # itself one of the triggers her first sentence doubles.
+            p.counters += 1
+            g.m["crusher_counters"] += 1
     # Both of these are "you MAY PAY" effects. They were free before, which is
     # why they rank so highly on the ablation table.
     if g.has("Well of Lost Dreams"):
@@ -846,6 +872,7 @@ def _gain_life(g, amount, _depth=0):
         # "you may pay {2}. If you do, draw a card."
         if pay_generic(g, 2) == 2:
             g.draw(1)
+    return False
 
 
 def win_by_drain_loop(g) -> None:

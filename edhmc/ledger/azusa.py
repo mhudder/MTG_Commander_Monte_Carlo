@@ -1572,6 +1572,17 @@ PROPOSED: list[Proposal] = [
         triage='LIVE',
         rejected='MEASURED 2026-10-06 and PROMOTED: the Candidate in MEASURED carries the number (§0z113). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+    # api.scryfall.com the same day.
+    Proposal(
+        deck='azusa', card='Captain Pike, Fullness of Time', cost='{1}{G}{G}',
+        identity='G', type_line='Legendary Creature — Human Officer Scout',
+        oracle="Strange new worlds — Captain Pike's power and toughness are each equal to the number of differently named lands you control.\nYou may look at the top card of your library any time.\nYou may play lands from the top of your library.",
+        verified='2026-10-23',
+        rationale="Top-of-library land plays for three mana, the zone grant Courser of Kruphix, Augur of Autumn and Oracle of Mul Daya are already paid for -- with Azusa's three drops a turn, each land off the top is a card the hand keeps. The body scales with the deck's spread of land names.",
+        implement="azusa.top_access gains Pike (and LAND_ENABLERS, so he deploys before the drops). The */* is a new name set, DYNAMIC_PT_NAMED_LANDS, read by power_of/toughness_of from `named_land_count` (distinct names among lands and Ashaya's creature-lands) and covered by check_dynamic_pt_coverage. 'Look at the top card any time' is information the pilot already acts on. Redundant with the four top-access cards in the list: leave-one-out will understate it (§0z27).",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -1632,4 +1643,6 @@ CATALOG = (azusa_v1, {
     "Bristly Bill, Spine Sower": azusa_v1.BRISTLY_BILL,
     "Glacier Godmaw": azusa_v1.GLACIER_GODMAW,
     # LAND CANDIDATES, 2026-10-06 (§0z113).
-    **{c.name: c for c in azusa_v1.LAND_CANDIDATES}})
+    **{c.name: c for c in azusa_v1.LAND_CANDIDATES},
+    # STAR TREK, 2026-10-23 (the owner's set review).
+    "Captain Pike, Fullness of Time": azusa_v1.CAPTAIN_PIKE})

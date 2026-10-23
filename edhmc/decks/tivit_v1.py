@@ -407,3 +407,11 @@ MBC_CANDIDATES = (VENSER_VISIONARY_TRAVELER, DYFED_THE_GUIDING_HAND)
 TREASURE_VAULT = L("Treasure Vault", "C", types="Artifact/Land",
                    tags=("artifact_land",))
 LAND_CANDIDATES = (TREASURE_VAULT,)
+
+# ---------------------------------------------------------------------------
+# STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+# api.scryfall.com, recorded verbatim on the Proposal in edhmc/ledger/tivit.py.
+# "If you would draw a card, draw two cards instead." `TivitGame.draw`.
+MR_SPOCK = C("Mr. Spock, Science Officer", "Creature", {"gen": 2, "U": 2},
+             2, 4, priority=8, threat=8.0)
+STAR_TREK_CANDIDATES = (MR_SPOCK,)

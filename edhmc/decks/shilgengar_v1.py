@@ -341,3 +341,18 @@ SCOURED_BARRENS = L("Scoured Barrens", "WB", tapped=True, lifegain=1)
 # "{T}: Add {C}{C}. This land deals 2 damage to you."
 ANCIENT_TOMB = L("Ancient Tomb", "C")
 LAND_CANDIDATES = (SCOURED_BARRENS, ANCIENT_TOMB)
+
+
+# REALITY FRACTURE COMMANDER, 2026-10-23 (the owner's set review). Oracle text
+# from api.scryfall.com, recorded verbatim on the Proposal in
+# edhmc/ledger/shilgengar.py.
+# "{5}{B}{B}{B} 8/8 Flying, deathtouch. Whenever Avacyn or another nontoken
+# creature you control dies, return that card to the battlefield under your
+# control at the beginning of the next end step."
+# An Angel, so fed to Shilgengar she is eight Blood -- and comes back.
+# `ShilgengarGame.avacyn_died` / `avacyn_returns` / `avacyn_feed`.
+AVACYN_ANGEL_OF_HORROR = C("Avacyn, Angel of Horror", "Creature",
+                           {"gen": 5, "B": 3}, 8, 8, priority=8.5,
+                           threat=9.0)
+
+FRC_CANDIDATES = (AVACYN_ANGEL_OF_HORROR,)

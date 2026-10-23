@@ -247,6 +247,14 @@ DYNAMIC_PT_LANDS = frozenset({
     "Cultivator Colossus",
 })
 
+# Cards printed */* equal to the number of DIFFERENTLY NAMED lands you control
+# (`named_land_count`) -- DYNAMIC_PT_LANDS' shape with a different count, so
+# the same check covers it (`check_dynamic_pt_coverage`). Captain Pike
+# (candidate, 2026-10-23): "Strange new worlds -- Captain Pike's power and
+# toughness are each equal to the number of differently named lands you
+# control."
+DYNAMIC_PT_NAMED_LANDS = frozenset({"Captain Pike, Fullness of Time"})
+
 # Cards printed 0/0 that "enter with N +1/+1 counters". Applied in
 # `make_permanent`, so EVERY way the card arrives gets them -- cast, tutored,
 # Genesis Wave, a Springheart token copy (the copy copies the replacement
@@ -294,6 +302,8 @@ LAND_ENABLERS = frozenset({
     "Courser of Kruphix", "Augur of Autumn",
     "Crucible of Worlds", "Ramunap Excavator",
     "Lotus Cobra", "Horn of Greed", "Seer's Sundial",
+    # Star Trek candidate, 2026-10-23: lands from the top (`top_access`).
+    "Captain Pike, Fullness of Time",
     "Tireless Provisioner", "Tireless Tracker",
     "Scute Swarm", "Rampaging Baloths", "Avenger of Zendikar",
     "Titania, Protector of Argoth",
@@ -785,6 +795,13 @@ class AzusaGame(BaseGame):
         return (sum(1 for p in self.board if p.card.is_land)
                 + len(self.creature_lands()))
 
+    def named_land_count(self) -> int:
+        """DIFFERENTLY NAMED lands you control (Captain Pike's "strange new
+        worlds"): `land_count`'s permanents, each name once -- five Forests
+        are one. Ashaya's creature-lands count by their own names."""
+        return len({p.card.name for p in self.board if p.card.is_land}
+                   | {p.card.name for p in self.creature_lands()})
+
     def counts_as_creature(self, perm):
         """Is this permanent a creature RIGHT NOW?
 
@@ -858,6 +875,8 @@ class AzusaGame(BaseGame):
             # was silently discarded. Nothing in the committed list put one
             # there; Bristly Bill and Dancing from Dark to Dawn would (§0z101).
             base = self.land_count()
+        elif perm.card.name in DYNAMIC_PT_NAMED_LANDS:
+            base = self.named_land_count()
         p = base + perm.counters
         p += self._pump(perm) + self._eot(perm, 1)
         return p
@@ -870,6 +889,8 @@ class AzusaGame(BaseGame):
         base = perm.base_t if perm.is_token else perm.card.toughness
         if perm.card.name in DYNAMIC_PT_LANDS:
             base = self.land_count()
+        elif perm.card.name in DYNAMIC_PT_NAMED_LANDS:
+            base = self.named_land_count()
         t = base + perm.counters
         t += self._pump(perm) + self._eot(perm, 2)
         return t
@@ -1987,6 +2008,9 @@ class AzusaGame(BaseGame):
                 # a FIFTH source of the same boolean -- which is the redundancy
                 # Ka-Zar's own entry was staged in spite of (§0z3).
                 or self.has("Traveling Chocobo")
+                # Captain Pike (candidate, 2026-10-23): "You may play lands
+                # from the top of your library." The same boolean again.
+                or self.has("Captain Pike, Fullness of Time")
                 or (self.has("Case of the Locked Hothouse")
                     and self.hothouse_solved))
 
@@ -4202,7 +4226,10 @@ def check_dynamic_pt_coverage():
                     for v in [getattr(azusa_v1, a)]
                     if type(v).__name__ == "Card"]
     known |= {c.name for c in module_cards}
-    unknown = DYNAMIC_PT_LANDS - known
+    # DYNAMIC_PT_NAMED_LANDS (Captain Pike, 2026-10-23) is the same shape
+    # with a different count, so every clause below covers it too.
+    dynamic = DYNAMIC_PT_LANDS | DYNAMIC_PT_NAMED_LANDS
+    unknown = dynamic - known
     if unknown:
         raise AssertionError(
             "edhmc/azusa.py: DYNAMIC_PT_LANDS names no card in the deck or "
@@ -4217,7 +4244,7 @@ def check_dynamic_pt_coverage():
     # LAND_ENABLERS by a sed whose anchor matched both blocks, and it was
     # MEASURED as a */* before anyone noticed. §0z3.
     wrong_pt = {c.name for c in module_cards
-                if c.name in DYNAMIC_PT_LANDS and c.is_creature
+                if c.name in dynamic and c.is_creature
                 and (c.power, c.toughness) != (0, 0)}
     if wrong_pt:
         raise AssertionError(
@@ -4232,7 +4259,7 @@ def check_dynamic_pt_coverage():
     # A 0/0 that ENTERS WITH COUNTERS (Mossborn Hydra) is not stranded -- but
     # only if the name in ENTERS_WITH_COUNTERS is a real card, checked below,
     # or a misspelling would exempt nothing and silence the check (§0z101).
-    stranded = zero_pt - DYNAMIC_PT_LANDS - set(ENTERS_WITH_COUNTERS)
+    stranded = zero_pt - dynamic - set(ENTERS_WITH_COUNTERS)
     unknown_ewc = set(ENTERS_WITH_COUNTERS) - known
     if unknown_ewc:
         raise AssertionError(

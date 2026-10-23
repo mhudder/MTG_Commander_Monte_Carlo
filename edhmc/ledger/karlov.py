@@ -1072,6 +1072,17 @@ PROPOSED: list[Proposal] = [
                   "carries the number (§0z128). Closed rather than deleted so the "
                   "verified oracle text stays where it was written."),
     ),
+    # STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+    # api.scryfall.com the same day.
+    Proposal(
+        deck='karlov', card='Dr. Beverly Crusher', cost='{2}{W}',
+        identity='W', type_line='Legendary Creature — Human Doctor',
+        oracle='If you gaining life causes a triggered ability of a permanent you control to trigger, that ability triggers an additional time.\nWhenever you gain life, put a +1/+1 counter on Dr. Crusher.',
+        verified='2026-10-23',
+        rationale="Doubles every 'whenever you gain life' trigger of a permanent: Karlov's own two counters (four per event), Archangel of Thune, Voice of the Blessed, Heliod, Exemplar of Light, every DRAIN_ON_GAIN and COMBO_LOOP card (Sanguine Bond, Vito, Cliffhaven, Blight-Priest, Starscape Cleric), Well of Lost Dreams and Dawn of Hope. The deck's whole engine is lifegain EVENTS, and this doubles what each event triggers without touching the amount.",
+        implement="karlov._gain_life: the trigger block runs 1 + count(Crusher) times; the replacement effects above it (Wind Crystal, Archive, Selenia) are not triggers and stay once, and `lifegain_triggers` still counts one EVENT. Crusher's own counter is one of the doubled triggers. Knob `crusher_text`. A 3-mana 2/2 body otherwise.",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -1101,4 +1112,6 @@ CATALOG = (karlov_v2, {
     "Epicure of Blood": karlov_v2.EPICURE_OF_BLOOD,
     "Polluted Bonds": karlov_v2.POLLUTED_BONDS,
     "Forbidden Orchard": karlov_v2.FORBIDDEN_ORCHARD,
-    "Slaughter Specialist": karlov_v2.SLAUGHTER_SPECIALIST})
+    "Slaughter Specialist": karlov_v2.SLAUGHTER_SPECIALIST,
+    # STAR TREK, 2026-10-23 (the owner's set review).
+    "Dr. Beverly Crusher": karlov_v2.DR_BEVERLY_CRUSHER})

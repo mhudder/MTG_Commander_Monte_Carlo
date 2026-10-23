@@ -1,0 +1,171 @@
+# Smoke runs, the owner's Reality Fracture / Star Trek review, 2026-10-23 (§0z157).
+# python -m tools.triage --smoke <deck> <card> --n 1000 --slot <slot>, at the working tree that became the §0z157 commit.
+# Lorehold's FIRST run is the plain wipe gate; the second has opponents.wipe_refund.
+
+## karlov
+Dr. Beverly Crusher in karlov, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.166   (games it was cast in)
+   crusher_doubled_events            1.360 vs blank      0.000   z +8.2
+   crusher_counters                  2.706 vs blank      0.000   z +8.2
+   karlov_counters                  24.128 vs blank     22.092   z +6.8
+   final_board_power                39.579 vs blank     34.995   z +5.4
+   pod_blockers_killed               2.000 vs blank      1.890   z +4.2
+   combat_damage                    38.816 vs blank     38.089   z +3.9
+   damage                           62.067 vs blank     61.073   z +3.8
+   raw_damage                       44.818 vs blank     43.556   z +3.5
+   mana_floated                     11.546 vs blank     11.802   z -2.8
+   turns_played                      9.986 vs blank     10.038   z -2.7
+   threat_answers_cast               0.312 vs blank      0.326   z -2.7
+   lifegain_triggers                18.188 vs blank     18.449   z -2.6
+   drain_damage                      5.763 vs blank      5.912   z -2.5
+   wipes_suffered                    0.355 vs blank      0.361   z -2.5
+   life_lost_to_own_cards            1.501 vs blank      1.535   z -2.4
+   life_gained                      54.045 vs blank     51.702   z +2.3
+   spells_cast                       8.123 vs blank      8.170   z -2.2
+   combat_kills                      0.701 vs blank      0.680   z +2.1
+   tutored                           0.166 vs blank      0.172   z -2.1
+   crn_draws                         2.025 vs blank      2.070   z -2.1
+   opponents_killed                  1.497 vs blank      1.477   z +2.1
+   mana_spent                       72.540 vs blank     73.047   z -2.1
+   final_life                       40.935 vs blank     39.109   z +1.9
+   stranded_mv                     135.453 vs blank    136.053   z -1.8
+
+## shil
+Avacyn, Angel of Horror in shilgengar, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.125   (games it was cast in)
+   avacyn_triggers                   1.158 vs blank      0.000   z +9.1
+   avacyn_fed                        1.032 vs blank      0.000   z +9.0
+   avacyn_returns                    1.112 vs blank      0.000   z +9.0
+   creatures_sacrificed              2.082 vs blank      1.119   z +8.7
+   blood_made                        8.562 vs blank      3.952   z +8.5
+   angels_fed                        0.485 vs blank      0.530   z -6.1
+   cards_fed                         0.637 vs blank      0.722   z -5.9
+   drain_damage                      3.747 vs blank      3.394   z +4.5
+   lifegain_triggers                 6.201 vs blank      5.822   z +4.1
+   turns_played                     11.145 vs blank     11.214   z -3.9
+   mana_floated                     15.217 vs blank     15.540   z -3.8
+   damage                           63.948 vs blank     62.944   z +3.7
+   spirit_tokens_made                0.355 vs blank      0.267   z +3.6
+   reaper_draws                      0.449 vs blank      0.351   z +3.5
+   avacyn_fizzled                    0.040 vs blank      0.000   z +3.5
+   reaper_life_lost                  0.398 vs blank      0.315   z +3.4
+   mana_spent                       95.853 vs blank     96.727   z -3.1
+   kokusho_drain                     0.857 vs blank      0.699   z +2.9
+   angel_tokens_made                 0.280 vs blank      0.262   z +2.8
+   combat_damage                    60.201 vs blank     59.550   z +2.7
+   emissary_prevented_turns          0.303 vs blank      0.324   z -2.6
+   shepherd_returns                  0.039 vs blank      0.020   z +2.6
+   giada_counters                    2.247 vs blank      1.689   z +2.6
+   lands_entered_tapped_by_rule      0.351 vs blank      0.357   z -2.5
+
+## azusa
+Captain Pike, Fullness of Time in azusa, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.264   (games it was cast in)
+   lands_from_library                2.966 vs blank      2.676   z +7.1
+   lands_from_hand                   9.441 vs blank      9.684   z -4.5
+   pod_blockers_killed               0.854 vs blank      0.794   z +3.2
+   lands_animated                    3.245 vs blank      2.836   z +2.9
+   turns_played                      9.652 vs blank      9.718   z -2.8
+   attack_targets                    6.456 vs blank      6.522   z -2.7
+   opponents_killed                  1.900 vs blank      1.931   z -2.2
+   petrified_returns                 0.062 vs blank      0.072   z -2.1
+   lost                              0.503 vs blank      0.488   z +2.1
+   won                               0.497 vs blank      0.512   z -2.1
+   loss_route                        0.914 vs blank      0.886   z +2.0
+   reroll_fetches                    2.303 vs blank      2.207   z +1.9
+   animated_attacks                  0.457 vs blank      0.409   z +1.8
+   ashaya_land_deaths                0.163 vs blank      0.134   z +1.7
+   animated_damage                   3.585 vs blank      2.053   z +1.7
+   animated_blocker_turns            2.096 vs blank      1.981   z +1.4
+   quirion_bounces                   0.438 vs blank      0.454   z -1.4
+   lands_from_graveyard              4.267 vs blank      4.370   z -1.3
+   library_kept                      0.397 vs blank      0.383   z +1.3
+   library_life_paid                 1.588 vs blank      1.532   z +1.3
+   threat_rounds_delayed             0.631 vs blank      0.658   z -1.3
+   combat_kills                      1.539 vs blank      1.555   z -1.3
+   gsz_shuffled                      0.253 vs blank      0.243   z +1.2
+   commander_aimed                   0.012 vs blank      0.015   z -1.1
+
+## tivit
+Mr. Spock, Science Officer in tivit, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.209   (games it was cast in)
+   spock_extra_draws                 1.059 vs blank      0.000   z +11.9
+   cards_drawn                      19.506 vs blank     18.710   z +7.7
+   drain_damage                     36.497 vs blank     34.585   z +5.5
+   stranded_mv                     158.985 vs blank    157.021   z +4.2
+   spells_cast                      14.171 vs blank     13.908   z +4.1
+   damage                           68.986 vs blank     67.419   z +3.8
+   final_board_power                12.940 vs blank     12.587   z +3.6
+   life_lost_to_own_cards            1.434 vs blank      1.398   z +3.6
+   shock_life                        1.434 vs blank      1.398   z +3.6
+   win_route                         1.598 vs blank      1.504   z +3.4
+   clues_cracked                     4.810 vs blank      4.972   z -3.4
+   attack_targets                    5.761 vs blank      5.852   z -3.4
+   pod_rounds                        9.907 vs blank      9.988   z -3.1
+   turns_played                     11.148 vs blank     11.234   z -3.1
+   commander_aimed                   0.143 vs blank      0.156   z -2.5
+   commander_damage_kills            0.087 vs blank      0.096   z -2.5
+   turn_lethal                      56.751 vs blank     58.151   z -2.3
+   countered                         0.967 vs blank      0.953   z +2.2
+   final_life                       11.970 vs blank     11.664   z +2.1
+   won                               0.589 vs blank      0.575   z +2.1
+   combat_kills                      0.644 vs blank      0.667   z -1.9
+   portal_tokens_destroyed           0.833 vs blank      0.685   z +1.9
+   tivit_combat_triggers             2.305 vs blank      2.340   z -1.9
+   lost                              0.410 vs blank      0.422   z -1.8
+
+## lorehold
+Join the Collective in lorehold, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.039   (games it was cast in)
+   test_card_drawn_turn             75.518 vs blank     99.000   z -18.3
+   miracle_rate                      0.126 vs blank      0.131   z -6.3
+   collective_borgs                  0.504 vs blank      0.000   z +6.0
+   miracle_hits                      2.422 vs blank      2.530   z -5.8
+   miracles_cast                     2.422 vs blank      2.530   z -5.8
+   own_wipes_cast                    0.366 vs blank      0.333   z +5.1
+   pod_bodies_killed                 6.774 vs blank      6.482   z +5.0
+   combat_damage                    48.680 vs blank     47.431   z +4.1
+   stranded_mv                     205.808 vs blank    203.947   z +4.1
+   raw_damage                       58.409 vs blank     56.549   z +3.9
+   reserve_lost_commander            0.477 vs blank      0.458   z +3.2
+   damage                           71.194 vs blank     70.346   z +3.2
+   removal_eaten                     0.945 vs blank      0.926   z +3.1
+   total_mv_cast                    62.877 vs blank     64.644   z -3.1
+   reserve_held                      6.538 vs blank      6.628   z -3.1
+   reserve_turns                     3.269 vs blank      3.314   z -3.1
+   mv_cheated                       35.767 vs blank     37.116   z -3.1
+   sunbird_mv                        1.896 vs blank      2.089   z -3.1
+   treasures_made                    4.573 vs blank      4.821   z -3.0
+   leng_mv_to_top                    3.027 vs blank      2.824   z +2.9
+   discover_exiled                   0.095 vs blank      0.110   z -2.9
+   combat_kills                      1.104 vs blank      1.075   z +2.8
+   commander_damage_kills            0.185 vs blank      0.195   z -2.7
+   discover_casts                    0.214 vs blank      0.232   z -2.7
+
+## lorehold2
+Join the Collective in lorehold, N=1000, every counter that moved (|z| sorted):
+   P(cast)                           0.093   (games it was cast in)
+   test_card_drawn_turn             77.799 vs blank     99.000   z -17.1
+   own_wipes_cast                    0.421 vs blank      0.333   z +9.0
+   collective_borgs                  1.252 vs blank      0.000   z +8.9
+   miracle_rate                      0.125 vs blank      0.131   z -6.9
+   pod_bodies_killed                 6.942 vs blank      6.482   z +6.9
+   miracle_hits                      2.409 vs blank      2.530   z -5.8
+   miracles_cast                     2.409 vs blank      2.530   z -5.8
+   combat_damage                    49.342 vs blank     47.431   z +5.7
+   stranded_mv                     206.591 vs blank    203.947   z +5.6
+   reserve_held                      6.440 vs blank      6.628   z -5.2
+   reserve_turns                     3.220 vs blank      3.314   z -5.2
+   reserve_lost_commander            0.500 vs blank      0.458   z +5.1
+   spell_damage                     21.745 vs blank     22.915   z -4.2
+   raw_damage                       58.828 vs blank     56.549   z +4.1
+   treasures_made                    4.509 vs blank      4.821   z -3.5
+   turns_played                     10.307 vs blank     10.245   z +3.4
+   combat_kills                      1.113 vs blank      1.075   z +3.3
+   mother_lode_treasures             1.174 vs blank      1.335   z -3.3
+   sunbird_mv                        1.823 vs blank      2.089   z -3.3
+   total_mv_cast                    62.590 vs blank     64.644   z -3.3
+   attack_targets                    6.089 vs blank      6.023   z +3.2
+   commander_damage_kills            0.181 vs blank      0.195   z -3.1
+   mv_cheated                       35.597 vs blank     37.116   z -3.0
+   free_casts                        1.209 vs blank      1.307   z -3.0

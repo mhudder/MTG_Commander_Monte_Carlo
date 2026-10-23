@@ -851,6 +851,20 @@ LAND_CANDIDATES = (VERDANT_CATACOMBS, MISTY_RAINFOREST, PRISMATIC_VISTA,
                    FIELD_OF_THE_DEAD)
 
 
+# STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+# api.scryfall.com, recorded verbatim on the Proposal in edhmc/ledger/azusa.py.
+# "Strange new worlds -- Captain Pike's power and toughness are each equal to
+# the number of differently named lands you control. You may look at the top
+# card of your library any time. You may play lands from the top of your
+# library." */* -- defined 0/0; azusa.DYNAMIC_PT_NAMED_LANDS supplies the
+# count, and `top_access` the zone.
+CAPTAIN_PIKE = C("Captain Pike, Fullness of Time", "Creature",
+                 {"gen": 1, "G": 2}, 0, 0, priority=8.5, threat=6.0,
+                 tags=("Legendary",))
+
+STAR_TREK_CANDIDATES = (CAPTAIN_PIKE,)
+
+
 def _check_inline_copies():
     """The list's committed batch-6 cards and the catalog's constants are ONE
     card written twice each (the list cannot reference a constant defined

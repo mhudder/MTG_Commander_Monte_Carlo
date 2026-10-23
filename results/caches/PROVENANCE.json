@@ -495,6 +495,12 @@
         "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
         "fingerprint": "126aa4daf8f136ef",
         "utc": "2026-10-23T00:17:46Z"
+      },
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "b809b6b969a8d9bd",
+        "utc": "2026-10-23T01:43:11Z"
       }
     ]
   },
@@ -930,7 +936,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "6497237b04a98a1a",
+        "utc": "2026-10-23T01:43:10Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "e8c6e2aaddcc1708",
@@ -1370,6 +1383,12 @@
         "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
         "fingerprint": "0f55d5ec32444898",
         "utc": "2026-10-23T00:17:45Z"
+      },
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "c9a504231baa8b39",
+        "utc": "2026-10-23T01:43:10Z"
       }
     ]
   },
@@ -1789,6 +1808,12 @@
         "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
         "fingerprint": "ff490c5498d6c2c0",
         "utc": "2026-10-23T00:17:45Z"
+      },
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "6caf52d33362be7b",
+        "utc": "2026-10-23T01:43:10Z"
       }
     ]
   },
@@ -2250,6 +2275,12 @@
         "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
         "fingerprint": "cd90197b6ced279e",
         "utc": "2026-10-23T00:17:45Z"
+      },
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "fef8e4c2f306fedf",
+        "utc": "2026-10-23T01:43:10Z"
       }
     ]
   },
@@ -2656,6 +2687,12 @@
         "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.",
         "fingerprint": "0d108a2c93022a79",
         "utc": "2026-10-23T00:17:46Z"
+      },
+      {
+        "commit": "76d1e34",
+        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+        "fingerprint": "3174ed1cef90a19f",
+        "utc": "2026-10-23T01:43:10Z"
       }
     ]
   },

@@ -303,6 +303,17 @@ PROPOSED: list[Proposal] = [
         triage='DEFERRED',
         triage_note=('Needs Saga lore counters added after the draw step, a chapter-II activation creating a 0/0 Construct whose power counts artifacts, a chapter-III tutor for a {0}/{1} artifact, and the sacrifice after III. tivit has saga lore (§0z83) but none of the rest; measured after the cheaper lands.'),
     ),
+    # STAR TREK, 2026-10-23 (the owner's set review). Oracle text from
+    # api.scryfall.com the same day.
+    Proposal(
+        deck='tivit', card='Mr. Spock, Science Officer', cost='{2}{U}{U}',
+        identity='U', type_line='Legendary Creature — Vulcan Human Scientist',
+        oracle='If you would draw a card, draw two cards instead.',
+        verified='2026-10-23',
+        rationale="Every Clue Tivit's evidence votes make, Rhystic Study, Messenger Jays, Memnarch and the draw step all draw double. Card flow is what tivit's priority sweep said it wanted (§0z43: card draw above its token engines).",
+        implement="TivitGame.draw: each card drawn is two while Spock is out (a replacement, so the draw step too); `spock_extra_draws`. DECKING IS REAL: the doubled mandatory draws can deck you and `drew_from_empty` charges it. tivit's optional draws (cracking a Clue, Rhystic Study) do not consult `draw_is_safe` today; with Spock out they do, at the doubled count (§0z42). Knob `spock_text`.",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -319,4 +330,6 @@ CATALOG = (tivit_v1, {
     "Venser, Visionary Traveler": tivit_v1.VENSER_VISIONARY_TRAVELER,
     "Dyfed, the Guiding Hand": tivit_v1.DYFED_THE_GUIDING_HAND,
     # LAND CANDIDATES, 2026-10-06 (§0z113).
-    "Treasure Vault": tivit_v1.TREASURE_VAULT})
+    "Treasure Vault": tivit_v1.TREASURE_VAULT,
+    # STAR TREK, 2026-10-23 (the owner's set review).
+    "Mr. Spock, Science Officer": tivit_v1.MR_SPOCK})

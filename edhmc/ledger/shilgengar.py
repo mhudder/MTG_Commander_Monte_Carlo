@@ -244,6 +244,17 @@ PROPOSED: list[Proposal] = [
         triage='LIVE',
         rejected='MEASURED 2026-10-06 and PROMOTED: the Candidate in MEASURED carries the number (§0z113). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # REALITY FRACTURE COMMANDER, 2026-10-23 (the owner's set review). Oracle
+    # text from api.scryfall.com the same day.
+    Proposal(
+        deck='shilgengar', card='Avacyn, Angel of Horror', cost='{5}{B}{B}{B}',
+        identity='B', type_line='Legendary Creature — Angel',
+        oracle='Flying, deathtouch\nWhenever Avacyn or another nontoken creature you control dies, return that card to the battlefield under your control at the beginning of the next end step.',
+        verified='2026-10-23',
+        rationale="An Angel, and a repeating engine with Shilgengar's first ability: feed a nontoken Angel for Blood equal to its toughness after combat and it comes back at the end step, so the Blood, the death triggers (Blood Artist, Zulaport, Midnight Reaper, Kokusho's drain) and the ETBs repeat every turn at no card cost.",
+        implement="shilgengar: a death of a nontoken creature you control with Avacyn watching (look-back, she sees her own) queues the CARD; the next end step -- yours (`end_step`) or an opponent's (`pod_end_step`) -- returns it if it is still in the graveyard (§0z19: the ultimate may have taken it). POLICY, knob `avacyn_feed`: after the second main phase, with Avacyn out and a free outlet (Shilgengar, Viscera Seer, Cartel Aristocrat), sacrifice every nontoken creature that would return, Avacyn last. BLIND: deathtouch (the pod's blockers are a count).",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -262,4 +273,6 @@ CATALOG = (shilgengar_v1, {
     "Pearl Collector": shilgengar_v1.PEARL_COLLECTOR,
     # LAND CANDIDATES, 2026-10-06 (§0z113).
     "Scoured Barrens": shilgengar_v1.SCOURED_BARRENS,
-    "Ancient Tomb": shilgengar_v1.ANCIENT_TOMB})
+    "Ancient Tomb": shilgengar_v1.ANCIENT_TOMB,
+    # REALITY FRACTURE COMMANDER, 2026-10-23 (the owner's set review).
+    "Avacyn, Angel of Horror": shilgengar_v1.AVACYN_ANGEL_OF_HORROR})

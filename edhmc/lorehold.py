@@ -940,6 +940,39 @@ def magistrate_upkeep(g) -> None:
             g.m["magistrate_copies"] += 1
 
 
+def collective_before(g):
+    """JOIN THE COLLECTIVE (candidate, 2026-10-23), read BEFORE its wipe:
+    your nonartifact creatures, and the pod's creature count. A snapshot is
+    right here and only here -- X is "destroyed THIS WAY", the wipe's own
+    victims, and the wipe is one event (§0z19's live-zone rule is about
+    effects that cause more effects, and nothing resolves in between)."""
+    mine = [p for p in g.board if OPP.is_creature_now(g, p)
+            and "Artifact" not in p.card.types]
+    return mine, sum(o.creatures for o in OPP.living(g))
+
+
+def join_the_collective(g, before):
+    """"Create X 1/1 colorless Borg artifact creature tokens, where X is the
+    number of nonartifact creatures destroyed this way." Yours: the snapshot's
+    creatures no longer on the battlefield (an indestructible one survived,
+    and is not counted). The pod's: what its count lost, rounded down -- the
+    rule Culling Ritual's mana uses. A CEILING on the pod's half: their
+    creatures are a count with no types (§4), so every one is taken as
+    nonartifact. The Borgs are 1/1 creature tokens; their artifact type is
+    read by nothing in this engine. `collective_text=False` is a plain
+    wrath."""
+    if not g.cfg.get("collective_text", True):
+        return
+    mine, pod_before = before
+    on_board = {id(p) for p in g.board}
+    x = sum(1 for p in mine if id(p) not in on_board)
+    x += int(max(0.0, pod_before - sum(o.creatures for o in OPP.living(g)))
+             + 1e-9)
+    if x > 0:
+        make_tokens(g, x, 1, 1, "Borg")
+    g.m["collective_borgs"] += x
+
+
 def make_tokens(g, n, power, toughness, name="token"):
     from edhmc.decks._evasion import FLYING_TOKENS
     for _ in range(int(n)):
@@ -1548,7 +1581,10 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         else:
             _draw_into_hand(g, 2)      # the pre-2026-09-11 `draw2` stand-in
     if "wipe" in card.tags:
+        borg = collective_before(g) if sc == "join_collective" else None
         OPP.resolve_own_wipe(g, spare_own="onesided" in card.tags, card=card)
+        if borg is not None:
+            join_the_collective(g, borg)
         # ULTIMA: "... End the turn." Every remaining step of the turn is
         # skipped -- combat, the second main phase, the end step's casts --
         # so the pilot casts it after combat (`main_phase`). §0z118;

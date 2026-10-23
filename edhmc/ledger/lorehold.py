@@ -961,6 +961,17 @@ PROPOSED: list[Proposal] = [
         prepared='tests/test_lorehold_big_spells.py',
         rejected='MEASURED 2026-10-09 and PROMOTED: the Candidate in MEASURED carries the number (§0z124). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # STAR TREK COMMANDER, 2026-10-23 (the owner's set review). Oracle text
+    # from api.scryfall.com the same day.
+    Proposal(
+        deck='lorehold', card='Join the Collective', cost='{5}{W}{W}',
+        identity='W', type_line='Sorcery',
+        oracle='Destroy all creatures. Create X 1/1 colorless Borg artifact creature tokens, where X is the number of nonartifact creatures destroyed this way.',
+        verified='2026-10-23',
+        rationale="A seven-mana sorcery that Lorehold miracles for {2}: Farewell's wipe that rebuilds you a board out of everyone's creatures, the pod's included.",
+        implement="lorehold: tagged ('wipe',) with script 'join_collective', so it takes the wipe gate and `resolve_own_wipe`: a destroy, which is `wipe_destroys`' default for an unclassified card, so indestructible survives. AT STAGING it goes into opponents.WIPE_DESTROYS with its clause -- `test_wipe_coverage` refuses a wipe-tagged card in a live list without one; left out now so a candidate does not move every deck's fingerprint. X is read around the wipe: your nonartifact creatures that left plus the pod's creatures killed, rounded down (Culling Ritual's rule). CEILING: the pod's creatures are a count with no types (§4), so every one is taken as nonartifact. The tokens are 1/1s; their artifact type is read by nothing in lorehold. FLOOR: the wipe gate does not price the tokens.",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -994,4 +1005,6 @@ CATALOG = (lorehold_v17, {
     **{c.name: c for c in lorehold_v17.BATCH_2026_10_09_SPELLS
        if c.name not in ("Furygale Flocking", "Profound Journey")},
     "Verge Rangers": lorehold_v17.VERGE_RANGERS,
-    "Lightning Greaves": lorehold_v17.LIGHTNING_GREAVES})
+    "Lightning Greaves": lorehold_v17.LIGHTNING_GREAVES,
+    # STAR TREK COMMANDER, 2026-10-23 (the owner's set review).
+    "Join the Collective": lorehold_v17.JOIN_THE_COLLECTIVE})

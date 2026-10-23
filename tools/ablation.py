@@ -472,6 +472,10 @@ SCRIPTED_KARLOV = {
     # return, in two windows and above `reclamation_life_floor`. Vigilance
     # is inert: nothing here reads your untapped creatures on the pod's turn.
     "Sun Titan", "Soulmender", "Phyrexian Reclamation",
+    # Dr. Beverly Crusher (candidate, 2026-10-23): every "whenever you gain
+    # life" trigger of a permanent fires an additional time, her own counter
+    # included (`karlov._gain_life`); the 2/2 body. Nothing else to model.
+    "Dr. Beverly Crusher",
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -530,6 +534,10 @@ SCRIPTED_TIVIT = {
     "Sol Ring", "Arcane Signet", "Azorius Signet", "Dimir Signet",
     "Orzhov Signet", "Model of Unity", "Monologue Tax",
     "Tamiyo's Journal", "Demonic Tutor", "Idyllic Tutor",
+    # Mr. Spock (candidate, 2026-10-23): every draw is two
+    # (`TivitGame.draw`), decking charged, optional draws guarded
+    # (`spock_draw_safe`). The 2/4 body. Every clause.
+    "Mr. Spock, Science Officer",
     # --- protection the opponent model respects ---
     "Lightning Greaves",
 }
@@ -607,6 +615,11 @@ SCRIPTED_AZUSA = {
     # empty library (`engine.abundance_draw`). Both pick by the shared want
     # order, a pilot's judgement said in engine.py.
     "Sylvan Library", "Abundance",
+    # Captain Pike (candidate, 2026-10-23): "play lands from the top of your
+    # library" (`top_access`) and the */* of differently named lands
+    # (`named_land_count`). "Look at the top card any time" is information
+    # the pilot already acts on. Every clause.
+    "Captain Pike, Fullness of Time",
     # Quirion Ranger (item 24, 2026-10-13): "Return a Forest you control to
     # its owner's hand" is the card here -- the Forest is replayed with a
     # spare land drop (`AzusaGame.quirion_ranger_bounce`), a tapped one
@@ -1098,6 +1111,15 @@ PARTLY_MODELLED = {
             "gate. THE KNOB: the pod's creatures have no toughness (§4), so "
             "X kills the share min(1, X / `gyre_full_x`) of each board "
             "(gyre_full_x 6, a judgement). Planeswalkers: §4.",
+        # Candidate, 2026-10-23 (the owner's Star Trek review). A symmetric
+        # wipe, so PARTLY anyway; this names the clause more exactly.
+        "Join the Collective":
+            "MODELLED: 'destroy all creatures' through `resolve_own_wipe` and "
+            "the wipe gate, and X 1/1 Borg tokens for the nonartifact "
+            "creatures it destroyed (`join_the_collective`). CEILING: the "
+            "pod's creatures have no types (§4), so all are taken as "
+            "nonartifact. FLOOR: the wipe gate prices the wipe, not the "
+            "tokens it leaves you. The symmetric-wipe caveat stands.",
         # The owner, 2026-10-09 (§0z123): "a difficult card to model, as there
         # are so many options depending on opponents board states".
         "Enlightened Tutor":
@@ -1180,6 +1202,16 @@ PARTLY_MODELLED = {
             "MODELLED: the 5/5 flier. NOT: 'When this creature enters, "
             "destroy target permanent' -- no opposing permanent (§4). A "
             "floor.",
+        # Candidate, 2026-10-23 (the owner's Reality Fracture review).
+        "Avacyn, Angel of Horror":
+            "MODELLED: the 8/8 flying Angel, and 'whenever Avacyn or another "
+            "nontoken creature you control dies, return that card ... at the "
+            "beginning of the next end step' (`avacyn_died`, "
+            "`avacyn_returns`), with the feed line `avacyn_feed` -- a "
+            "POLICY. NOT: deathtouch, which nothing in the blocking model "
+            "reads; and a returned Massacre Wurm, Sun Titan or Twilight "
+            "Shepherd fires no ETB, the floor every return path in this "
+            "engine shares. A floor by both.",
         "Angel of the Ruins":
             "MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile "
             "of up to two artifacts and/or enchantments (no opposing "
