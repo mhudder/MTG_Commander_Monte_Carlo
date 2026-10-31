@@ -58,3 +58,34 @@ What is closed and where it went:
     owner's policy: at the end of the pod's round, on {W}{B} the turn left
     untapped, at a creature route piece. What is left: trostani's open
     gaps, SUSPENDED with the deck -- all that remains of this item.
+
+28. **PAUSED BY THE OWNER, 2026-10-31: the five Reality Fracture / Star
+    Trek candidates** (§0z157, §0z159). Done: each implemented, pinned
+    (`tests/test_star_trek_batch.py`), smoked, and measured as a candidate
+    row at N=15,000, T10 and T20 -- a Candidate in each deck's MEASURED,
+    its Proposal closed. **Nothing is staged and no list moved**; every
+    cache is VERIFIED. Left, in order, when the owner picks it back up:
+    - **A head-to-head against a named cut** for the four whose rows read
+      `both`: Dr. Beverly Crusher (karlov; Swiftfoot Boots, which the owner
+      kept on 2026-09-26 for shroud), Avacyn, Angel of Horror (shilgengar;
+      Skullclamp or Dark Prophecy), Mr. Spock (tivit; Tamiyo's Journal) and
+      Join the Collective (lorehold; Pinnacle Monk). The cuts are
+      PROPOSALS, not decisions; the owner names them. One paired `run_ab`
+      each, N=15,000, both horizons, in the shape of
+      `diagnostics/run_karlov_conqueror.py`.
+    - **Captain Pike (azusa): a package ablation first.** His T20 row is
+      inside its bar because four cards already grant the top (Courser of
+      Kruphix, Augur of Autumn, Oracle of Mul Daya, Ka-Zar), so
+      `ablate([...])` the five grants together before any swap (§0z27).
+    - **At staging**: Join the Collective goes into
+      `opponents.WIPE_DESTROYS` with its clause (`test_wipe_coverage`
+      requires it), and a staged deck's table is rebuilt (§0z27).
+    - **Knobs each row carries**, to say out loud at the decision:
+      `avacyn_feed`, `wipe_gate_refund`, and Spock's `spock_draw_safe`.
+    - **Not done, and not part of this item**: the other cards §0z157's
+      review read as promising (Bio-Asset Allocator, Traxos, Captain
+      Janeway for rendmaw; Hexhaven Battalion, Currency Converter, Tomik for
+      lorehold; Yoshimaru, Niv-Mizzet, Ob Nixilis for karlov; Constable
+      Odo, Flickering Hound for tivit; Overlord of the Mistmoors, Khan for
+      shilgengar; Benjamin Sisko, Omnath, Marwyn, Fblthp for azusa) are
+      unrecorded ideas, not Proposals: none has verified text in a ledger.

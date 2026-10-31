@@ -14036,6 +14036,7 @@ slot, tivit1's caveat: both legs are a land short.
 
 **Next**: a head-to-head per card against a named cut whose row is evidence
 (the four with `both`), and for Pike a package ablation first.
+**PAUSED by the owner 2026-10-31**: queue item 28 holds the resume steps.
 
 ## How to read an ablation table
 
