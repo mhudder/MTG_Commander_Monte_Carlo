@@ -1,0 +1,17 @@
+Lorehold's miracle and Top policy (§0z164): N=15,000 paired, seeds 5000.., the staged list, python 3.11.17
+row = arm minus 'base' (today's defaults); * = 95% CI excludes 0
+
+own        T10 -0.0028 +-0.0018*  T20 -0.0011 +-0.0022   miracles T20 -0.021  spins -0.340
+pod        T10 +0.0010 +-0.0029   T20 -0.0010 +-0.0036   miracles T20 -0.071  spins -0.910
+never      T10 -0.0032 +-0.0029*  T20 -0.0040 +-0.0037*  miracles T20 -0.094  spins -1.280
+afford     T10 +0.0018 +-0.0023   T20 +0.0009 +-0.0030   miracles T20 +0.002  spins +0.007
+afford_own T10 -0.0010 +-0.0024   T20 -0.0007 +-0.0032   miracles T20 -0.026  spins -0.341
+afford_pod T10 +0.0013 +-0.0029   T20 +0.0002 +-0.0036   miracles T20 -0.071  spins -0.907
+R0         T10 +0.0133 +-0.0055*  T20 +0.0076 +-0.0064*  miracles T20 -0.335  spins -0.081
+R1         T10 +0.0034 +-0.0044   T20 +0.0036 +-0.0052   miracles T20 -0.166  spins -0.041
+R3         T10 -0.0176 +-0.0042*  T20 -0.0095 +-0.0050*  miracles T20 +0.094  spins +0.053
+R4         T10 -0.0276 +-0.0051*  T20 -0.0174 +-0.0062*  miracles T20 +0.182  spins +0.091
+Rneed      T10 +0.0004 +-0.0009   T20 -0.0001 +-0.0010   miracles T20 -0.005  spins -0.004
+H1         T10 -0.0010 +-0.0010*  T20 -0.0009 +-0.0012   miracles T20 +0.009  spins +0.001
+H5         T10 +0.0012 +-0.0010*  T20 +0.0022 +-0.0012*  miracles T20 -0.009  spins -0.002
+H99        T10 +0.0046 +-0.0015*  T20 +0.0051 +-0.0017*  miracles T20 -0.033  spins -0.012

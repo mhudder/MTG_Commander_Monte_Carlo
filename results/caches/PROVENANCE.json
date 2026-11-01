@@ -1457,6 +1457,12 @@
         "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "5d987085ab9be1bf",
         "utc": "2026-11-01T12:16:29Z"
+      },
+      {
+        "commit": "8c00c5d",
+        "evidence": "2026-11-01, \u00a70z164: lorehold's Top spin / order knobs, miracle_reserve 'known', the reserve and hold read through turn_knob, and miracle_need reading a non-instant's own miracle cost (no such card in the list), defaults reproducing today's games. check_unchanged_decks HEAD 8c00c5d vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and lorehold's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "cfed5226881bc587",
+        "utc": "2026-11-01T13:39:08Z"
       }
     ]
   },

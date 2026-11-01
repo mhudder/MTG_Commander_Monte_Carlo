@@ -216,6 +216,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z161](#0z161) | MEASURED | **The Citadel's floor that reads the pod's clock**: stop at the chip damage the table can deal next round, +1 or +2. Beats floor 10 at both horizons; the optimal stop moves with the chip |
 | [0z162](#0z162) | MEASURED | **Necropotence's policy, forked**: the floor hardly binds (clock floor nil over games); **with Reliquary Tower, buy past 7**: +0.0016 / +0.0012. Max hand size is unmodelled everywhere |
 | [0z163](#0z163) | MEASURED | **Sylvan Library's floor, forked: 20 is already optimal**, and every clock floor loses (-0.0107 at T20). Azusa gains 5 life a game, so 4 life paid is gone for good |
+| [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. Not adopted |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14466,6 +14467,94 @@ long the life stays gone.**
 **Nothing adopted; no default moved.** Azusa's cache is VERIFIED on the
 bit-identity above. Knob to say out loud with Sylvan Library's row:
 `library_life_floor` (20).
+
+<a id="0z164"></a>
+
+## 0z164. MEASURED -- lorehold's miracles and Sensei's Top, forked: Top is right, the miracle reserve and the hold are not
+
+**The owner, 2026-11-01**: "go ahead with lorehold's miracles and Sensei's
+Top" -- the fourth card through §0z160-§0z163's method, and the deck whose
+engine is the top of its library. The pilot's decisions, each now read
+through `engine.turn_knob` so a fork can set it on one round:
+
+- `lorehold_top_spin` (new): when Top's {1} spin is used -- "every" window
+  (today), "own" draw step, "pod" windows, "never".
+- `lorehold_top_order` (new): "value" (today: the best miracle on top,
+  payable or not) or "afford" (the best one THIS window can pay for; none
+  payable -> the least wanted on top, the best second).
+- `miracle_reserve` (2): mana the main phase leaves for the pod's windows
+  (§0t); new mode **"known"** holds only for a miracle you can see coming
+  (a top card from Top's last sort, or Library of Leng with one in hand).
+- `hold_min_value` (3): decline to hardcast a spell worth this much as a
+  miracle (`hold_for_miracle`).
+
+Defaults reproduce today's games: every staged list, every key, 2,500
+seeds, identical to `8c00c5d`. `tests/test_lorehold_top.py` pins A-F.
+
+**Found on the way: `miracle_need` ignored a card's own miracle cost.** For a
+card that is not an instant or sorcery, `miracle_window` pays its printed
+miracle cost and `miracle_value` prices it, but `miracle_need` returned
+Lorehold's {2} -- so the reserve, the top-setters and Top's order all
+under-read it. LATENT: the list's only printed miracle is Reforge the Soul,
+a sorcery, so nothing moved (bit-identical above); a miracle creature would
+have. Fixed, pinned by F; the test's first run caught it (A and B failed
+unmutated, and the fault was the engine's).
+
+### What is in play
+
+Top is on the battlefield in 23% of games and spins 1.2 times a game, 0.54
+spins a game going unpaid (the {1} competes with the miracle's mana); 17.9
+miracle windows and 2.5 miracles a game. The top-setters never fire in the
+staged list (Penance was cut), so `set_top_gate` was not forked.
+
+### Forks and whole game
+
+`diagnostics/run_lorehold_miracles.py`: **28,591 turns** beginning with Top
+out (30,000 seeds) and **32,060** beginning with Lorehold out (10,000),
+each replayed with the knobs on that round only (`base` reproduces the
+baseline on every turn); and every arm on every turn, N=15,000, the leaders
+at **N=60,000**. `results/lorehold_top_forks.txt`,
+`lorehold_reserve_forks.txt`, `lorehold_miracle_policies.txt`,
+`lorehold_miracle_policies_n60k.txt`, `lorehold_reserve_known_n60k.txt`.
+Win rate minus today's policy:
+
+| policy | one round, T20 | whole game T10 | whole game T20 |
+|---|---|---|---|
+| Top: spin your draw step only / the pod's only | -0.0013 / -0.0033 | -0.0028 * / +0.0010 | -0.0011 / -0.0010 |
+| **Top: never spin** | -0.0047 * | -0.0032 * | **-0.0040 *** |
+| Top: "afford" order | -0.0006 | +0.0018 | +0.0009 |
+| reserve 0 / 1 (N=15,000) | +0.0011 / -0.0000 | +0.0133 * / +0.0034 | +0.0076 * / +0.0036 |
+| reserve 3 / 4 | -0.0026 * / -0.0048 * | -0.0176 * / -0.0276 * | -0.0095 * / -0.0174 * |
+| reserve "need" | +0.0000 | +0.0004 | -0.0001 |
+| hold threshold 1 / 5 | -0.0002 / +0.0005 * | -0.0010 * / +0.0012 * | -0.0009 / +0.0022 * |
+| **reserve 0** (N=60,000) | | **+0.0120 ±0.0027 *** | **+0.0059 ±0.0032 *** |
+| **never hold** (N=60,000) | +0.0014 * | **+0.0043 ±0.0007 *** | **+0.0050 ±0.0009 *** |
+| **reserve 0 + never hold** (N=60,000) | | **+0.0166 ±0.0028 *** | **+0.0109 ±0.0032 *** |
+| "known" reserve + never hold, minus reserve 0 + never hold (60,000) | | +0.0003 ±0.0009 | +0.0003 ±0.0010 |
+
+**Top is played right**: spinning before every window is best, never
+spinning loses 0.004, and "afford" changes nothing -- with the list's cards
+every miracle a spin can be paid for costs {2}, so the order only differs
+on ties. **The miracle reserve and the hold are wrong, in the direction §0t
+found**: every reserve above 0 loses, monotonically, and so does holding a
+spell back for a miracle at any threshold. Their gains add (+0.0120 and
++0.0043 at T10; +0.0166 together). Holding only for a miracle you can SEE
+coming ("known") is level with holding nothing: knowing the top is a
+miracle does not pay for the mana either.
+
+**THE MECHANISM** (6,000 paired games, T20, today's policy against reserve 0
++ never hold): the reserve sat unused on 1.5 turns a game and wasted 3.0
+mana; without it the pilot spends **+6.5 mana a game**, floats 5.4 less,
+casts **0.43 more spells** for **0.43 fewer miracles**, deals +1.3 damage, and
+ends the game 0.12 turns sooner. **Mana cheated, the deck's proxy, does not
+move (-0.06 ±0.84)**: the miracles given up are paid for in hardcasts. A
+spell cast on your own turn is tempo the pod's clock (POD_V4, §0z140)
+rewards; a miracle saved for a window that may not come is not.
+
+**Not adopted**: `miracle_reserve` 0 and `hold_min_value` 99 move lorehold's
+baseline, so they are the owner's call and the table is rebuilt with them
+(queue item 31). Knobs to say out loud with lorehold's rows:
+`miracle_reserve`, `hold_min_value`.
 
 ## How to read an ablation table
 

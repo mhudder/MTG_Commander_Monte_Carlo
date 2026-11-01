@@ -1,0 +1,39 @@
+Lorehold, the top policy on ONE round (turn_cfg), 30,000 seeds from 5000, T20, python 3.11.17
+28,591 turns beginning with Sensei's Divining Top on the battlefield. base (today's policy, replayed) reproduces the baseline on every turn: YES
+lands on the battlefield median 5; hand median 5
+cells: P(win) minus base, paired by seed and turn; * = 95% CI excludes 0
+
+OVERALL
+  base         +0.0000  0.0000 
+  own          -0.0013  0.0016 
+  pod          -0.0033  0.0043 
+  never        -0.0047  0.0044*
+  afford       -0.0006  0.0030 
+  afford_own   -0.0024  0.0031 
+  afford_pod   -0.0034  0.0044 
+
+BY LANDS ON THE BATTLEFIELD AT THE TURN'S START  (x1000; [best] by point estimate)
+  bin        turns P(win)        base        own        pod      never     afford afford_own afford_pod
+  0-3         5138  0.389       +0.0       +0.0       +6.6       +6.6       +1.8       +2.1    [ +6.8] 
+  3-5         7157  0.393       +0.0       -1.5       +3.6       +2.8       -1.8       -5.7    [ +4.5] 
+  5-7         6614  0.515    [ +0.0]       -2.6       -4.7       -5.7       -0.8       -4.5       -5.7 
+  7-9         5870  0.602    [ +0.0]       -0.7      -10.1*     -13.3*      -1.0       -1.4      -10.7*
+  9-12        3551  0.697    [ +0.0]       -1.4      -16.1*     -18.0*      -0.6       -0.8      -16.1*
+  12+          261  0.839       +0.0       +0.0      -26.8*     -26.8*   [ +3.8]       +3.8      -26.8*
+
+BY THE TURN  (x1000; [best] by point estimate)
+  bin        turns P(win)        base        own        pod      never     afford afford_own afford_pod
+  0-4         4344  0.419       +0.0       +0.0       +7.4    [ +7.6]       +2.1       +2.1       +7.6 
+  4-6         5070  0.417       +0.0       +1.0       +1.0       +0.8       -1.8       -3.2    [ +1.4] 
+  6-8         5676  0.460       +0.0       -2.1       +1.2       +1.2    [ +2.3]       -1.8       +0.7 
+  8-10        5857  0.538    [ +0.0]       -3.8       -8.7      -13.5*      -5.8       -9.6*      -8.5 
+  10-13       5817  0.610       +0.0       -0.9       -9.3*     -11.9*   [ +0.7]       +0.5      -10.5*
+  13+         1827  0.661       +0.0       -1.6      -18.1*     -15.9*   [ +0.5]       +0.0      -17.0*
+
+BEST BY LANDS BIN, CHOSEN ON EVEN SEEDS, MEASURED ON ODD (minus base)
+  0-3        picked never       on odd seeds +0.0069 +-0.0124
+  3-5        picked afford_pod  on odd seeds +0.0075 +-0.0149
+  5-7        picked base        on odd seeds +0.0000 +-0.0000
+  7-9        picked own         on odd seeds -0.0024 +-0.0056
+  9-12       picked base        on odd seeds +0.0000 +-0.0000
+  12+        picked base        on odd seeds +0.0000 +-0.0000

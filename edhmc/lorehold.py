@@ -34,7 +34,7 @@ from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_emp
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng, tutor_take, remove_card,
-                          land_tax, tithe_treasures)
+                          land_tax, tithe_treasures, turn_knob)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
 
@@ -608,6 +608,16 @@ def miracle_need(g, card=None) -> int:
     """
     if g.has("Molecule Man"):
         return 0
+    if (card is not None and card.miracle_cost
+            and "Instant" not in card.types and "Sorcery" not in card.types):
+        # ITS OWN MIRACLE COST, which is what `miracle_window` pays for a
+        # card that is not an instant or sorcery -- and `miracle_value`
+        # prices. This returned Lorehold's {2} for it until §0z164, so every
+        # affordability check before the window under-read such a card. No
+        # card in the list is one today (Reforge the Soul is a sorcery), so
+        # nothing moved; a miracle creature would have.
+        return max(0, sum(card.miracle_cost.values())
+                   - miracle_reduction(g, card))
     need = 2
     need -= miracle_reduction(g, card) if card is not None else \
         (1 if artist_level(g) >= 2 else 0)
@@ -708,8 +718,23 @@ def sort_top_three(g, off_turn=False):
     miracle order. A spin is SKIPPED, unpaid, when the top three are the
     cards the pilot already ordered (`top_known`): you know them. The {T}
     draw ability is not modelled (a floor). `lorehold_top_cost=0` restores
-    the free sort exactly."""
+    the free sort exactly.
+
+    THE PILOT'S TWO TOP DECISIONS, switches since §0z164 (the defaults are
+    the policy above, exactly):
+      `lorehold_top_spin`  WHEN: "every" window (default), "own" (your draw
+                           step only), "pod" (the pod's windows only), "never".
+      `lorehold_top_order` WHAT GOES ON TOP: "value" (default) -- the best
+                           miracle, whether or not this window can pay for
+                           it; "afford" -- the best miracle THIS window can
+                           pay for, and when it can pay for none, the least
+                           wanted card on top and the best miracle second,
+                           saved for a window that can."""
     if not g.has("Sensei's Divining Top") or len(g.library) < 3:
+        return
+    when = turn_knob(g, "lorehold_top_spin", "every")
+    if when == "never" or (when == "own" and off_turn) or (
+            when == "pod" and not off_turn):
         return
     cost = g.cfg.get("lorehold_top_cost", 1)
     if cost:
@@ -734,8 +759,23 @@ def sort_top_three(g, off_turn=False):
                 return
         g.m["top_spins"] += 1
     top3 = [g.library.pop() for _ in range(3)]
-    top3.sort(key=lambda c: miracle_value(g, c))     # best ends up last = on top
-    g.library.extend(top3)
+    if turn_knob(g, "lorehold_top_order", "value") == "afford":
+        # The pool THIS window pays from, after the spin: the pod's windows
+        # pay from float and Treasures, yours from the board as well.
+        pool = (g.float_mana + g.treasures if off_turn
+                else g.float_mana + len(mana_units(g)) + g.treasures)
+        ok = [c for c in top3 if miracle_value(g, c) > 0
+              and miracle_need(g, c) <= pool]
+        first = (max(ok, key=lambda c: miracle_value(g, c)) if ok
+                 else min(top3, key=lambda c: miracle_value(g, c)))
+        rest = sorted((c for c in top3 if c is not first),
+                      key=lambda c: miracle_value(g, c))
+        g.library.extend(rest)
+        g.library.append(first)                    # on top
+        g.m["top_afford_saved"] += not ok
+    else:
+        top3.sort(key=lambda c: miracle_value(g, c))  # best ends up last = on top
+        g.library.extend(top3)
     if cost:
         g.top_known = tuple(id(c) for c in g.library[-3:])
 
@@ -2576,13 +2616,13 @@ def hold_for_miracle(g, card):
     """
     if not (g.commander_cast or g.has("Molecule Man")):
         return False
-    if len(g.hand) > g.cfg.get("hand_cap", 7):
+    if len(g.hand) > turn_knob(g, "hand_cap", 7):
         return False                       # hand is clogged, just cast it
     can_set_top = g.has("Library of Leng") or any(
         g.has(n) for n in TOP_SETTERS if n != "Library of Leng")
     if not can_set_top:
         return False
-    if miracle_value(g, card) < g.cfg.get("hold_min_value", 3.0):
+    if miracle_value(g, card) < turn_knob(g, "hold_min_value", 3.0):
         return False
     return True
 
@@ -2609,9 +2649,26 @@ def reserve_for(g) -> int:
     """
     if not g.commander_cast:
         return 0
-    want = g.cfg.get("miracle_reserve", 2)
+    want = turn_knob(g, "miracle_reserve", 2)
     if want == "need":
         want = miracle_need(g)
+    elif want == "known":
+        # §0z164: HOLD ONLY FOR A MIRACLE YOU CAN SEE COMING. Sensei's
+        # Divining Top's last sort is known order, so a top card from it is
+        # known; Library of Leng puts the best miracle from hand on top in
+        # the pod's first window. Either way hold exactly what that card's
+        # miracle costs; with neither, hold nothing (reserve 0 measured best
+        # of the constants).
+        top = g.library[-1] if g.library else None
+        if (top is not None and g.has("Sensei's Divining Top")
+                and g.top_known and id(top) in g.top_known
+                and miracle_value(g, top) > 0):
+            return miracle_need(g, top)
+        if g.has("Library of Leng"):
+            best = max(g.hand, key=lambda c: miracle_value(g, c), default=None)
+            if best is not None and miracle_value(g, best) > 0:
+                return miracle_need(g, best)
+        return 0
     return want
 
 

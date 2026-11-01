@@ -128,7 +128,8 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 
 - **Win rate is the objective; damage, `mv_cheated` and every mechanism
   counter are proxies**, and they disagree with it more often than you'd
-  expect. Follow win rate. (§0t: a reserve that casts more miracles loses games.)
+  expect. Follow win rate. (§0t, §0z164: a reserve that casts more miracles
+  loses games; the best reserve measured is none.)
 - **Part of every deck is invisible to this model.** The pod's boards are
   bodies and kill routes, not permanents (§0z140): removal and counterspells
   act on routes through a delay nobody has data for (`threat_rebuild_max`).

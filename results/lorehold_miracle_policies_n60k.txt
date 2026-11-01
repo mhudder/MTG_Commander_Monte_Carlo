@@ -1,0 +1,6 @@
+Lorehold's miracle and Top policy (§0z164): N=60,000 paired, seeds 5000.., the staged list, python 3.11.17
+row = arm minus 'base' (today's defaults); * = 95% CI excludes 0
+
+R0         T10 +0.0120 +-0.0027*  T20 +0.0059 +-0.0032*  miracles T20 -0.349  spins -0.088
+H99        T10 +0.0043 +-0.0007*  T20 +0.0050 +-0.0009*  miracles T20 -0.032  spins -0.009
+R0_H99     T10 +0.0166 +-0.0028*  T20 +0.0109 +-0.0032*  miracles T20 -0.409  spins -0.102

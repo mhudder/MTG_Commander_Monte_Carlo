@@ -124,3 +124,12 @@ What is closed and where it went:
     at the tables' N before deciding (§0z30: its size is not guessable); it
     moves every baseline, so it is a batched rebuild.
 
+31. **Lorehold's miracle policy (§0z164), an owner call.** Measured at
+    N=60,000: hold NO miracle mana (`miracle_reserve` 0) and NEVER decline a
+    hardcast to wait for a miracle (`hold_min_value` 99) -- together +0.0166
+    ±0.0028 / +0.0109 ±0.0032 at T10 / T20; each alone significant at both.
+    Sensei's Top is already played right. Adopting moves lorehold's baseline:
+    rebuild its table with it (`DECKS=lorehold ./tools/regen_tables.sh` on
+    Python 3.13.16 / numpy 2.4.6), and re-measure lorehold's four staged
+    swaps (`diagnostics/run_restage.py`), several of which are miracle cards.
+
