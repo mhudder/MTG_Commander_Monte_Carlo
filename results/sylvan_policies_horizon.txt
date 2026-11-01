@@ -1,0 +1,6 @@
+Sylvan Library's policy (azusa, §0z163): N=15,000 paired, seeds 5000.., the staged list, python 3.11.17
+row = arm minus 'base' (today's defaults); * = 95% CI excludes 0
+
+clock3r1  T10 -0.0007 +-0.0018   T20 -0.0025 +-0.0023*  library_kept T20 +0.188
+clock6r1  T10 -0.0046 +-0.0021*  T20 -0.0009 +-0.0024   library_kept T20 -0.054
+clock8r1  T10 -0.0077 +-0.0023*  T20 -0.0017 +-0.0026   library_kept T20 -0.172

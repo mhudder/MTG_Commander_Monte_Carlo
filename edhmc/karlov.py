@@ -48,7 +48,7 @@ from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, 
                           vault_of_the_archangel, vault_active,
                           sun_titan_pick, stack_top, tutor_take, land_tax,
                           walker_ready, draw_is_safe, enter_loyalty,
-                          want_order)
+                          want_order, turn_knob)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -1564,19 +1564,6 @@ def citadel_land_step(g):
 
 CITADEL = "Bolas's Citadel"
 TOP = "Sensei's Divining Top"
-
-
-def turn_knob(g, name, default):
-    """A policy knob, read through `turn_cfg` -- a DIAGNOSTIC pair (turn,
-    {knob: value}) that sets those knobs on that one turn and no other
-    (§0z161; `citadel_turn_cfg` until §0z162 made it serve Necropotence
-    too). It is how the fork diagnostics ask "on THIS turn, which policy was
-    best?": the same seed replayed, identical up to the turn the policy
-    differs on. Unset, this is `cfg.get`."""
-    over = g.cfg.get("turn_cfg")
-    if over is not None and g.turn == over[0] and name in over[1]:
-        return over[1][name]
-    return g.cfg.get(name, default)
 
 
 def citadel_allin_now(g) -> bool:

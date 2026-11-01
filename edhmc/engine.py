@@ -4247,6 +4247,35 @@ def tutor_take(g, pool, stream: str):
     return pick
 
 
+def turn_knob(g, name, default):
+    """A policy knob, read through `turn_cfg` -- a DIAGNOSTIC pair (turn,
+    {knob: value}) that sets those knobs on that one turn and no other
+    (§0z161; `citadel_turn_cfg` until §0z162 made it serve Necropotence,
+    and here since §0z163 so it serves every engine). It is how the fork
+    diagnostics ask "on THIS turn, which policy was best?": the same seed
+    replayed, identical up to the turn the policy differs on. Unset, this
+    is `cfg.get`."""
+    over = g.cfg.get("turn_cfg")
+    if over is not None and g.turn == over[0] and name in over[1]:
+        return over[1][name]
+    return g.cfg.get(name, default)
+
+
+def library_floor(g) -> float:
+    """The life Sylvan Library's payments keep, by `library_floor_mode`
+    (§0z163): "fixed" (the default) is `library_life_floor` (20); "clock"
+    is the pod's clock, `opponents.clock_floor` -- `library_clock_mult` (1)
+    x the next `library_clock_rounds` (1) rounds' visible chip +
+    `library_clock_pad` (1) -- the same function the Citadel and
+    Necropotence read (§0z161, §0z162)."""
+    if turn_knob(g, "library_floor_mode", "fixed") == "clock":
+        return OPP.clock_floor(
+            g, pad=turn_knob(g, "library_clock_pad", 1.0),
+            mult=turn_knob(g, "library_clock_mult", 1.0),
+            rounds=int(turn_knob(g, "library_clock_rounds", 1)))
+    return turn_knob(g, "library_life_floor", 20)
+
+
 def sylvan_library(g, since: int) -> None:
     """SYLVAN LIBRARY, verified against Scryfall 2026-10-14: "At the
     beginning of your draw step, you may draw two additional cards. If you
@@ -4278,10 +4307,14 @@ def sylvan_library(g, since: int) -> None:
         g.m["library_none_drawn"] += 1
         return
     chosen = want_order(g, drawn)[-2:]          # better first
-    floor = g.cfg.get("library_life_floor", 20)
+    floor = library_floor(g)                    # §0z163
+    # `library_pay_max` (2): how many of the two the pilot will pay for in
+    # one draw step, whatever the floor allows -- the policy's second axis.
+    cap = turn_knob(g, "library_pay_max", 2)
     back = []
     for c in chosen:
-        if g.your_life - 4 >= floor:
+        if cap > 0 and g.your_life - 4 >= floor:
+            cap -= 1
             g.your_life -= 4
             g.m["library_life_paid"] += 4
             g.m["library_kept"] += 1

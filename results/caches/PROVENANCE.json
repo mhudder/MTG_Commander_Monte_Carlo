@@ -525,6 +525,12 @@
         "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "948319c7dd24b3ef",
         "utc": "2026-11-01T03:42:21Z"
+      },
+      {
+        "commit": "9e92710",
+        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "ebb7938a3eacba15",
+        "utc": "2026-11-01T12:16:30Z"
       }
     ]
   },
@@ -1445,6 +1451,12 @@
         "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "d38d5be6f0dea473",
         "utc": "2026-11-01T03:42:20Z"
+      },
+      {
+        "commit": "9e92710",
+        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "5d987085ab9be1bf",
+        "utc": "2026-11-01T12:16:29Z"
       }
     ]
   },
@@ -1888,6 +1900,12 @@
         "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "7adfc45acd4ee633",
         "utc": "2026-11-01T03:42:20Z"
+      },
+      {
+        "commit": "9e92710",
+        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "f62db0f4b88391c8",
+        "utc": "2026-11-01T12:16:29Z"
       }
     ]
   },
@@ -2373,6 +2391,12 @@
         "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "0440db686c4ae5c7",
         "utc": "2026-11-01T03:42:21Z"
+      },
+      {
+        "commit": "9e92710",
+        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "bf683c1a2efc2ff2",
+        "utc": "2026-11-01T12:16:29Z"
       }
     ]
   },
@@ -2803,6 +2827,12 @@
         "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "e60c3caca1f749f1",
         "utc": "2026-11-01T03:42:20Z"
+      },
+      {
+        "commit": "9e92710",
+        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "a0feecde3e64215f",
+        "utc": "2026-11-01T12:16:29Z"
       }
     ]
   },

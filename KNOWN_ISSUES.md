@@ -215,6 +215,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z160](#0z160) | MEASURED | **Bolas's Citadel's dig to its text**: both main phases, the pod's turn, X = 0, ways past the top; swap +0.0100 / +0.0083. **Going to 1 for the win loses** below ~50 life |
 | [0z161](#0z161) | MEASURED | **The Citadel's floor that reads the pod's clock**: stop at the chip damage the table can deal next round, +1 or +2. Beats floor 10 at both horizons; the optimal stop moves with the chip |
 | [0z162](#0z162) | MEASURED | **Necropotence's policy, forked**: the floor hardly binds (clock floor nil over games); **with Reliquary Tower, buy past 7**: +0.0016 / +0.0012. Max hand size is unmodelled everywhere |
+| [0z163](#0z163) | MEASURED | **Sylvan Library's floor, forked: 20 is already optimal**, and every clock floor loses (-0.0107 at T20). Azusa gains 5 life a game, so 4 life paid is gone for good |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14390,6 +14391,81 @@ Tower hold more than seven cards**, 3.5 over on average (57,186 end steps,
 6,000 games) -- cards a real pilot would discard. Every draw engine is
 flattered by it, and so is every "draw more" policy, Necropotence's target
 included (it is the one place the rule was standing in). Queue item 30.
+
+<a id="0z163"></a>
+
+## 0z163. MEASURED -- Sylvan Library's floor, forked: 20 is right, and the clock floor is a karlov answer
+
+**The owner, 2026-11-01**: "Great, go ahead with sylvain library" -- the
+third card through §0z160-§0z162's method. "At the beginning of your draw
+step, you may draw two additional cards. If you do, choose two cards in
+your hand drawn this turn. For each of those cards, pay 4 life or put the
+card on top of your library." `engine.sylvan_library` (azusa's; trostani,
+SUSPENDED, keeps its own copy): the two least wanted are chosen, the better
+is kept first while life stays at or above `library_life_floor` (20), and
+the rest go back on top -- **drawn again over the next turns, so 4 life buys
+a card now, not a card.**
+
+### What binds
+
+**The floor, this time**: on 60% of azusa's Sylvan Library draw steps it
+paid for nothing because of 20, and on 8% for one (3,152 in 6,000 games).
+Median life at the choice 21; chip on the table median 2.6 -- a pad-1
+clock floor would sit near 4. Azusa is a life-poor deck: **5.4 life gained
+a game against karlov's 53.8**, final life 13 against 41, and chip damage
+takes 20% of its losses (595 of 2,985).
+
+### What changed (switches; the defaults reproduce the old policy)
+
+`engine.library_floor` (`library_floor_mode` "fixed" | "clock",
+`library_clock_pad` / `_mult` / `_rounds`, through `opponents.clock_floor`)
+and `library_pay_max` (2). `turn_knob` moved from karlov to the engine, so
+`turn_cfg` reaches every engine. Every deck's staged list, every key, 2,500
+seeds: identical to `9e92710`. `tests/test_sylvan_policy.py` pins A-E.
+
+### Forks and whole game
+
+`diagnostics/run_sylvan_policy.py`: 20,000 seeds, **10,849 Sylvan Library
+draw steps**, each replayed under every arm on that turn only (L20
+reproduces the baseline on every turn), T20; and every arm on every turn,
+N=15,000 paired. `results/sylvan_forks.txt`, `sylvan_forks_horizon.txt`,
+`sylvan_policies.txt`, `sylvan_policies_horizon.txt`:
+
+| policy | one turn, T20 | whole game T10 | whole game T20 |
+|---|---|---|---|
+| fixed 4 / 8 / 12 | -0.0320 * / -0.0181 * / -0.0038 | -- / -0.0015 / -0.0004 | -- / **-0.0060 *** / -0.0030 * |
+| **fixed 16** | -0.0007 ±0.0035 | +0.0003 ±0.0015 | +0.0001 ±0.0019 |
+| **fixed 20 (today)** | 0 | 0 | 0 |
+| fixed 24 / 30 | -0.0041 * / -0.0062 * | -0.0040 * / -- | -0.0015 / -- |
+| never pay | -0.0116 * | **-0.0120 *** | -0.0055 * |
+| pay for at most one | -0.0048 * | -0.0027 * | +0.0001 |
+| clock + 1 / + 4 / + 8 | -0.0285 * / -0.0179 * / -0.0053 * | -0.0038 * / -0.0019 / -0.0003 | **-0.0107 *** / -0.0057 * / -0.0023 * |
+| two / three rounds' clock + 1 | -0.0142 * / -0.0046 | -0.0015 / -0.0007 | -0.0052 * / -0.0025 * |
+| six / eight rounds' clock + 1 | -0.0045 / -0.0072 * | -0.0046 * / -0.0077 * | -0.0009 / -0.0017 |
+| twice the clock + 1 | -0.0162 * | -0.0019 | -0.0067 * |
+
+**ANSWER: Sylvan Library's policy is already right -- pay 4 life for the
+better card while life stays at or above 20 (16 is level), and nothing
+tried beats it.** Paying is right (never paying loses 0.012 at T10); paying
+below about 16 loses, and loses most at 10-20 life (-0.10 a turn at 10-15
+for a floor of 4).
+
+**WHY THE CLOCK FLOOR FAILS HERE AND WON IN KARLOV, and it is the finding.**
+The one-round clock prices a life point at what the next swing takes. That
+is right when life comes back: karlov gains ~54 a game, so the next swing
+is the only one a payment has to survive. Azusa gains 5: every 4 life paid
+is gone for the rest of the game, and the clock reads one round of it.
+**THE PREDICTION, WRITTEN BEFORE THE RUN: a clock that reads the rest of
+the game, 6-8 rounds, should land level with fixed 20** (2.6 chip x ~7.6
+rounds left is ~20). At T20 it does -- six rounds -0.0009 ±0.0024, eight
+-0.0017 ±0.0026 -- and it does not beat 20, and costs at T10 (-0.0046,
+-0.0077): eight rounds of the pod's creature growth, compounding to its cap,
+over-prices the early game. **The right horizon for a life floor is how
+long the life stays gone.**
+
+**Nothing adopted; no default moved.** Azusa's cache is VERIFIED on the
+bit-identity above. Knob to say out loud with Sylvan Library's row:
+`library_life_floor` (20).
 
 ## How to read an ablation table
 
