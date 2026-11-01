@@ -3425,7 +3425,6 @@ def incidental_damage(g):
         g.m["emissary_prevented_turns"] += 1   # §0z84
         return
     rate = g.cfg.get("incidental_rate", 0.45)
-    mode = g.cfg.get("combat_targeting", "threat")
     # THE CROWN RIDES THIS SAME PATH, on purpose (2026-09-22). "A creature
     # deals combat damage to you" has no object-level answer here -- the
     # opponents' boards are a float count (§4) -- so the crown is lost on the
@@ -3447,8 +3446,6 @@ def incidental_damage(g):
         if not opp.alive:
             continue
         others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
-        share = (combat_share(g, opp, others) if mode == "open"
-                 else your_share(g, opp, others))
         # THE CROWN IS A REASON TO ATTACK YOU THAT YOUR BOARD CANNOT DETER
         # (owner's correction, 2026-09-22). The first cut of this mechanic only
         # modelled the crown being LOST to the pod's EXISTING attack pattern,
@@ -3470,14 +3467,10 @@ def incidental_damage(g):
         # A FLOOR RATHER THAN A MULTIPLIER, because a multiplier scales the very
         # deterrence being overridden: 3x of 0.238 and 3x of 0.714 move apart,
         # where the incentive at a real table does not care what you have.
-        share = monarch_attack_share(g, share)
-        # An aggro deck's creatures hit harder than a control deck's.
+        # (`monarch_attack_share`, inside `chip_share`.)
+        share = chip_share(g, opp, others)
         from edhmc.engine import damage_you            # Angel, §0z135
-        # §0z138: the attack taxes turn part of the swing elsewhere (1.0
-        # off `pod_threats` or with no tax out, so nothing else moves).
-        g.your_life -= damage_you(
-            g, opp.creatures * rate * share * opp.p.get("power", 1.0)
-            * attack_tax_through(g))
+        g.your_life -= damage_you(g, chip_amount(g, opp, share))
         # GATED ON HOLDING THE CROWN, which is what keeps this change worth
         # ZERO to all six decks: nothing grants the monarch yet, so the roll is
         # never consumed and no existing stream can shift. `crn_random` is
@@ -3506,6 +3499,58 @@ def incidental_damage(g):
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
         g.m["loss_route"] = 1          # ground down on life
+
+
+def chip_share(g, opp, others) -> float:
+    """The share of opponent `opp`'s chip damage aimed at you: threat-weighted
+    (`your_share`) or by how open you are (`combat_share`, `combat_targeting`
+    "open"), floored for the crown (`monarch_attack_share`). ONE function for
+    `incidental_damage` and for the pilot who reads it (`predicted_chip`), so
+    the two cannot drift (§0z30)."""
+    mode = g.cfg.get("combat_targeting", "threat")
+    share = (combat_share(g, opp, others) if mode == "open"
+             else your_share(g, opp, others))
+    return monarch_attack_share(g, share)
+
+
+def chip_amount(g, opp, share, creatures=None) -> float:
+    """What `opp`'s swing deals you before prevention: its creatures, the
+    share at you, `incidental_rate`, its archetype's power, and the attack
+    taxes' through-rate (§0z138; 1.0 off `pod_threats` or with no tax out).
+    `creatures` asks about a board other than today's (`predicted_chip`)."""
+    rate = g.cfg.get("incidental_rate", 0.45)
+    n = opp.creatures if creatures is None else creatures
+    return n * rate * share * opp.p.get("power", 1.0) * attack_tax_through(g)
+
+
+def predicted_chip(g, rounds: int = 1) -> float:
+    """THE POD'S CLOCK AS A PILOT READS IT (§0z161): the chip damage the
+    next `rounds` rounds would deal you if nothing changed -- every living
+    opponent's creatures, your share of their attention as your board stands
+    now, and their power, all of which are on the table. Each later round
+    adds the creatures `opponents_act` grows (0.7 x the archetype's `board`,
+    capped at 7). Prevention is not counted (Angel of Suffering mills
+    instead), so this is what an unprotected life total must cover.
+
+    WHAT IT CANNOT SEE, said out loud: a clock that picks you ends the game
+    at any life total (`resolve_clocks`), so no floor guards against it;
+    and your share moves with your board, which the dig itself grows."""
+    if g.result is not None or protected_from_creatures(g):
+        return 0.0
+    t0 = pod_turn(g)
+    first = g.cfg.get("first_attack_turn", 3)
+    total = 0.0
+    for r in range(rounds):
+        if t0 + r < first:
+            continue
+        for i, opp in enumerate(g.opponents):
+            if not opp.alive:
+                continue
+            others = [o for j, o in enumerate(g.opponents)
+                      if j != i and o.alive]
+            n = min(7.0, opp.creatures + 0.7 * opp.p["board"] * r)
+            total += chip_amount(g, opp, chip_share(g, opp, others), n)
+    return total
 
 
 # ATTACK TAXES (item 24, §0z138). Ghostly Prison and Propaganda: "Creatures

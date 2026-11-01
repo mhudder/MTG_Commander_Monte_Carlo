@@ -2,7 +2,7 @@
 """Pin Bolas's Citadel's dig (§0z160).
 
     python -m tests.test_citadel_dig
-    python -m tests.test_citadel_dig --mutate   # 6 mutations, exact sets
+    python -m tests.test_citadel_dig --mutate   # 7 mutations, exact sets
 
 CASES
   A  X = 0 (CR 107.3b): Debt to the Deathless costs 4 life off the top, not 7
@@ -20,6 +20,11 @@ CASES
   K  all-in digs to 1: at 12 life, three 4-drops -- value casts 0, all-in 2
   L  Top's spin puts the castable spell above the lands when no drop is left
   M  the dig stops `decking_reserve` cards from the bottom (§0z42)
+  N  the pod's clock as the pilot reads it (`predicted_chip`) is exactly the
+     chip damage the pod then deals on that board (§0z161: one function)
+  O  the clock floor is that chip damage plus the pad, and the dig stops
+     there rather than at 10
+  P  `citadel_turn_cfg` sets a knob on its own turn and no other
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   citadel_x0=False             -> A, B, C
@@ -28,16 +33,20 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   citadel_pod_instants=False   -> I
   citadel_spin=False           -> L
   citadel_decking_guard=False  -> D, M
+  citadel_floor_mode="fixed"   -> O
 
 UNMUTATED (§0z15): G is the old dig's own stop and holds with every knob
 off; J holds when the window is off too (nothing is cast either way); K is
-the policy read, not a mechanism with a switch. D is in the guard's set
+the policy read, not a mechanism with a switch; N is an identity between
+two readers of one function, and P a diagnostic switch, both unmutated.
+D is in the guard's set
 because its library is short enough that the guard is what ends it.
 """
 import sys
 
 import edhmc.engine as EN
 import edhmc.karlov as K
+import edhmc.opponents as OPP
 from edhmc.experiment import DEFAULT_CFG
 from edhmc.pending import build_pending
 
@@ -179,6 +188,30 @@ def run_cases():
     K.citadel_step(g)
     check("M the dig stops decking_reserve cards from the bottom",
           (len(g.library), g.m["citadel_stop_library"]), (5, 1))
+
+    def clocked(life, **kw):
+        """Turn 5 (the pod attacks from round 3) with three boards of 4."""
+        g = fresh(life=life, **kw)
+        g.turn = 5
+        for o in g.opponents:
+            o.creatures = 4.0
+        return g
+    g = clocked(40.0)
+    want = OPP.predicted_chip(g, 1)
+    OPP.incidental_damage(g)
+    check("N predicted chip is the chip the pod deals",
+          (want > 0, round(40.0 - g.your_life, 9)), (True, round(want, 9)))
+
+    g = clocked(40.0, citadel_floor_mode="clock", citadel_clock_pad=1.0)
+    chip = OPP.predicted_chip(g, 1)
+    check("O the clock floor is the chip on the table plus the pad",
+          round(K.citadel_value_floor(g), 9), round(chip + 1.0, 9))
+
+    g = fresh(citadel_turn_cfg=(3, {"citadel_life_floor": 2.0}))
+    on2 = K.citadel_value_floor(g)
+    g.turn = 3
+    check("P citadel_turn_cfg is its own turn only",
+          (on2, K.citadel_value_floor(g)), (10.0, 2.0))
     return set(FAIL)
 
 
@@ -195,6 +228,7 @@ def main() -> int:
         ({"citadel_pod_instants": False}, {"I"}),
         ({"citadel_spin": False}, {"L"}),
         ({"citadel_decking_guard": False}, {"D", "M"}),
+        ({"citadel_floor_mode": "fixed"}, {"O"}),
     ]
     print("MUTATION RUN -- exact sets\n")
     bad = 0

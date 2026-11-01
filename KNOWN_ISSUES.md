@@ -213,6 +213,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z158](#0z158) | FIXED | **Azusa's land animations held targets by bare id**, safe only under the central hold; `test_id_reuse --mutate` flaked on it 1 run in 6. Targets hold their lands now; case G pins it |
 | [0z159](#0z159) | MEASURED | **Candidate rows for §0z157's five** at N=15,000: Crusher, Avacyn of Horror and Spock significant at T10 and T20, Join the Collective at T20; Pike damage only (redundant top grants) |
 | [0z160](#0z160) | MEASURED | **Bolas's Citadel's dig to its text**: both main phases, the pod's turn, X = 0, ways past the top; swap +0.0100 / +0.0083. **Going to 1 for the win loses** below ~50 life |
+| [0z161](#0z161) | MEASURED | **The Citadel's floor that reads the pod's clock**: stop at the chip damage the table can deal next round, +1 or +2. Beats floor 10 at both horizons; the optimal stop moves with the chip |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14167,6 +14168,124 @@ the bit-identity above. (Tivit's staged list differs between `c7a1e02` and
 HEAD on three of those 2,500 seeds, in `threat_pieces_removed` and
 `threat_rounds_delayed` only: §0z155's stale-target fix, which that section
 records and accepted; HEAD against this tree is identical.)
+
+<a id="0z161"></a>
+
+## 0z161. MEASURED -- the Citadel's floor that reads the pod's clock, and the optimal place to stop
+
+**The owner, 2026-11-01**: "try a floor that reads the pod's clock. Also I'm
+curious if you can get an 'optimal' life range to stop (if one exists)."
+Queue item 29's second line.
+
+### What a life total can protect against
+
+Two ways the pod takes this deck's games, and only one of them reads life.
+**A clock that picks you ends the game at any life total** (`resolve_clocks`
+sets `your_life = 0`): 86% of karlov's losses (2,302 of 2,676 in 6,000
+games; 89 of 100 in games the Citadel saw). **Chip damage is the rest**,
+and it is not a roll: each living opponent's creatures x `incidental_rate`
+x your share of its attention x its archetype's power x the attack taxes'
+through-rate -- every input on the table. The pod does not aim at low life
+(`your_share` reads board threat only); a real pod piling on the player at 1
+is NOT modelled, which flatters every low floor here.
+
+### The clock floor
+
+`opponents.chip_share` / `chip_amount`: the formula, factored out of
+`incidental_damage` so that the pod and the pilot read ONE function
+(§0z30); `predicted_chip(g, rounds)` sums it over the next rounds, adding
+the creatures `opponents_act` grows. Bit-identical: every deck's staged list,
+every output key, 2,500 seeds, HEAD `91dabd9` against the tree; and
+`check_unchanged_decks` N=400 on all six. Karlov's
+`citadel_floor_mode="clock"` floors the dig at `citadel_clock_mult` (1) x
+the next `citadel_clock_rounds` (1) rounds' chip + `citadel_clock_pad`,
+never below `citadel_clock_min` (1), recomputed for every card the dig takes
+-- the dig grows your board, and your share with it. The default stays
+"fixed" (10). `citadel_turn_cfg` = (turn, {knobs}) sets knobs on one turn
+only, for the forks. `tests/test_citadel_dig.py` N-P pin it: the predicted
+chip IS the chip the pod deals; mutation `citadel_floor_mode="fixed"`
+breaks O alone.
+
+At the dig the table shows a median of **3.3** chip for the next round (10th
+/ 90th / 99th percentile 0.4 / 7.7 / 11.1), so a pad-1 clock floor sits near
+4 -- well under the fixed 10.
+
+### The optimal stop
+
+`diagnostics/run_citadel_allin.py floors`, 120,000 seeds, **25,169 turns**
+with the Citadel out, each replayed under 18 floors on that turn only (F10,
+today's policy, reproduces the baseline on every turn). Win rate at T20
+minus F10, `results/citadel_floors.txt`:
+
+| floor on that turn | diff | won THAT turn |
+|---|---|---|
+| fixed 1 | -0.0103 ±0.0026 * | 0.146 |
+| fixed 3 | -0.0040 ±0.0023 * | 0.140 |
+| fixed 5 | -0.0006 ±0.0020 | 0.134 |
+| **fixed 7** | **+0.0022 ±0.0016 *** | 0.129 |
+| fixed 10 (today) | 0 | 0.121 |
+| fixed 13 / 20 / 40 | -0.0045 / -0.0139 / -0.0358 * | 0.115 / 0.099 / 0.056 |
+| **clock + 1** | **+0.0057 ±0.0018 *** | 0.136 |
+| **clock + 2** | **+0.0058 ±0.0017 *** | 0.133 |
+| clock + 4 / + 7 / + 10 | +0.0019 / -0.0020 / -0.0059 * | 0.128 / 0.120 / 0.113 |
+| two rounds' clock + 1 / + 4 | +0.0010 ±0.0017 / -0.0026 * | 0.126 / 0.118 |
+
+**Against fixed floors the curve has an interior maximum, at about 7**, with
+5-10 a plateau: below it the dig wins more turns outright and loses more
+games to the next swing; above it, it leaves cards on top it could have
+paid for. **The clock floor beats the best fixed floor by 2.6 times**, and
+reading the table by the chip on it says why -- the best fixed floor MOVES
+WITH THE CHIP, and sits about two above it every time:
+
+| chip on the table | 0-1 | 1-2 | 2-3 | 3-4 | 4-6 | 6-8 | 8+ |
+|---|---|---|---|---|---|---|---|
+| best fixed floor | 1 (+0.013 *) | 3 (+0.009 *) | 3 (+0.010 *) | 7 (+0.003) | 7 (+0.002) | 10 | 10 |
+| clock + 2 | +0.011 * | +0.010 * | +0.010 * | +0.005 * | +0.005 * | -0.001 | -0.001 |
+
+By the life the turn began at, a clock floor is the point-estimate best in
+seven of nine bins (+1 or +2 in six, two rounds' + 1 at 40-50), significant
+in six; chosen on even seeds and measured on odd ones
+(the pick does not grade itself), the pick holds at 0-10 (+0.014 ±0.012),
+10-15 (+0.019 ±0.017), 30-40 (+0.0065 ±0.0035) and 40-50 (+0.0039 ±0.0029),
+and is inside its bar elsewhere. Above 50 life nothing matters much: the
+floor seldom binds.
+
+**ANSWER: the optimal place to stop is not a life total, it is a margin --
+the chip damage the table can visibly deal you next round, plus one or two.**
+On a quiet table that means digging to 1-3; facing 6+ it means stopping
+near 10. The fixed equivalent is about 7. Going to 1 regardless (§0z160) is
+the bottom row of the same curve. Two rounds of clock is too cautious: you
+gain life between them.
+
+### Whole game
+
+`policies`, the floor on every turn, N=15,000 paired
+(`results/citadel_clock_policies.txt`) and the three leaders at **N=60,000**
+(`results/citadel_clock_policies_n60k.txt`), minus floor 10:
+
+| arm | T10 | T20 |
+|---|---|---|
+| **clock + 1** (N=60,000) | **+0.0018 ±0.0004 *** | **+0.0007 ±0.0004 *** |
+| **clock + 2** (N=60,000) | **+0.0015 ±0.0004 *** | **+0.0006 ±0.0004 *** |
+| fixed 7 (N=60,000) | +0.0008 ±0.0004 * | +0.0001 ±0.0004 |
+| fixed 1 / 3 / 5 / 13 | +0.0015 / +0.0014 / +0.0017 / -0.0016 * | -0.0021 * / -0.0011 * / 0.0000 / -0.0009 * |
+| clock + 4 / + 7 / + 10 | +0.0010 * / 0.0000 / -0.0015 * | -0.0001 / -0.0005 / -0.0014 * |
+
+**The clock floor is the first floor policy to beat 10 at both horizons.**
+The whole-game number is small because the Citadel is on the battlefield in
+about 9% of games and digs 0.21 turns a game: +0.0058 a turn x 0.21 is the
++0.001 the forks predict, and the +0.0007 measured. The N=15,000 rows of
+the same arms are inside their bars at T20; it took 60,000 to see it.
+
+**Not adopted: the default is still "fixed" 10.** Adopting clock + 1 or + 2
+moves karlov's baseline (the Citadel is staged), so its table is rebuilt
+with it -- an owner call (item 29). Knobs to say out loud with any Citadel
+number: `citadel_floor_mode`, `citadel_clock_pad`, and `incidental_rate`,
+which IS the clock this floor reads.
+
+**Caches**: `opponents.py` and `karlov.py` moved, and every default game is
+bit-identical (above), so every cache is VERIFIED on that evidence; no table
+moved.
 
 ## How to read an ablation table
 

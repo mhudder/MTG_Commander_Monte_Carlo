@@ -96,10 +96,12 @@ What is closed and where it went:
     (`citadel_life_floor` 10, `citadel_allin` "never"). Left, in order:
     - **An owner call**: floor 5 is +0.0017 ±0.0010 at T10 and level at
       T20 against 10. Adopting it moves karlov's baseline (a rebuild).
-    - **A floor that reads the pod's clock**: the one policy that could
-      change "never" -- keep the life the table can visibly deal next round,
-      spend the rest. Measure it with `diagnostics/run_citadel_allin.py`
-      as a new arm and in the forks.
+    - **A floor that reads the pod's clock: MEASURED (§0z161, 2026-11-01)**
+      and better than every fixed floor -- stop at the chip the table can
+      deal next round + 1 or 2: +0.0018 / +0.0007 at T10 / T20, N=60,000,
+      significant at both. **An owner call to adopt** (`citadel_floor_mode`
+      "clock", `citadel_clock_pad` 1 or 2); it replaces the floor-5 line
+      above, and either moves karlov's baseline (a rebuild).
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.

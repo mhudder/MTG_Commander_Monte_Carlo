@@ -1532,6 +1532,18 @@ CITADEL = "Bolas's Citadel"
 TOP = "Sensei's Divining Top"
 
 
+def citadel_knob(g, name, default):
+    """A Citadel policy knob, read through `citadel_turn_cfg` -- a DIAGNOSTIC
+    pair (turn, {knob: value}) that sets those knobs on that one turn and no
+    other (§0z161). It is how `diagnostics/run_citadel_allin.py floors` asks
+    "on THIS turn, which floor was best?": the same seed replayed, identical
+    up to the turn the policy differs on. Unset, this is `cfg.get`."""
+    over = g.cfg.get("citadel_turn_cfg")
+    if over is not None and g.turn == over[0] and name in over[1]:
+        return over[1][name]
+    return g.cfg.get(name, default)
+
+
 def citadel_allin_now(g) -> bool:
     """Is this YOUR turn's dig the all-in one (§0z160, condition 4)?
 
@@ -1559,24 +1571,50 @@ def citadel_allin_now(g) -> bool:
     t = g.cfg.get("citadel_allin_turn")
     if t is not None:
         return g.turn == t
-    pol = g.cfg.get("citadel_allin", "never")
+    pol = citadel_knob(g, "citadel_allin", "never")
     if pol == "never":
         return False
     if pol == "always":
         return True
-    life_ok = g.turn_life >= g.cfg.get("citadel_allin_life", 0)
+    life_ok = g.turn_life >= citadel_knob(g, "citadel_allin_life", 0)
     if pol == "life":
         return life_ok
     if pol == "outs":
-        return life_ok and citadel_outs(g) >= g.cfg.get("citadel_allin_outs", 1)
+        return life_ok and citadel_outs(g) >= citadel_knob(
+            g, "citadel_allin_outs", 1)
     raise ValueError(f"citadel_allin: unknown policy {pol!r}")
 
 
-def citadel_floor(g) -> float:
-    """The life YOUR turn's dig keeps: what it is LEFT with, not what it pays."""
-    if citadel_allin_now(g):
-        return g.cfg.get("citadel_allin_floor", 1.0)
-    return g.cfg.get("citadel_life_floor", 10.0)
+def citadel_value_floor(g) -> float:
+    """The VALUE dig's floor, by `citadel_floor_mode` (§0z161):
+
+      "fixed"  `citadel_life_floor` (10), whatever the table holds
+      "clock"  THE POD'S CLOCK: `citadel_clock_mult` (1) x the chip damage
+               the next `citadel_clock_rounds` (1) rounds would deal you
+               (`opponents.predicted_chip`, every input on the table), plus
+               `citadel_clock_pad` (1), and never below `citadel_clock_min`
+               (1). Pad 1 is "survive the swing I can see, by one".
+
+    Recomputed for every card the dig takes, because the share of the pod's
+    swing aimed at you grows with your board, and the dig grows it."""
+    mode = citadel_knob(g, "citadel_floor_mode", "fixed")
+    if mode == "fixed":
+        return citadel_knob(g, "citadel_life_floor", 10.0)
+    if mode == "clock":
+        chip = OPP.predicted_chip(
+            g, int(citadel_knob(g, "citadel_clock_rounds", 1)))
+        return max(citadel_knob(g, "citadel_clock_min", 1.0),
+                   citadel_knob(g, "citadel_clock_mult", 1.0) * chip
+                   + citadel_knob(g, "citadel_clock_pad", 1.0))
+    raise ValueError(f"citadel_floor_mode: unknown mode {mode!r}")
+
+
+def citadel_floor(g, allin=None) -> float:
+    """The life YOUR turn's dig keeps: what it is LEFT with, not what it pays.
+    `allin` is the dig's decision, taken once at its start; None asks."""
+    if citadel_allin_now(g) if allin is None else allin:
+        return citadel_knob(g, "citadel_allin_floor", 1.0)
+    return citadel_value_floor(g)
 
 
 def citadel_outs(g) -> int:
@@ -1852,11 +1890,12 @@ def citadel_step(g):
     """
     if not g.has(CITADEL):
         return False
-    floor = citadel_floor(g)
     allin = citadel_allin_now(g)
+    floor = citadel_floor(g, allin)
     did = False
     citadel_spin(g, floor)
     while g.library and g.result is None:
+        floor = citadel_floor(g, allin)    # the clock floor moves (§0z161)
         # A CARD TAKEN OFF THE TOP LEAVES THE LIBRARY AS A DRAW DOES, and
         # the next draw step from an empty one loses (§0z42). With Top
         # looping, the dig can now get there; the pilot stops where every
@@ -1977,7 +2016,7 @@ def citadel_pod_window(g, when: str) -> int:
     An answer with nothing to hit is LEFT ON TOP: you draw it and hold it,
     which is what the hand does. No lands (not your turn) and no skips (a
     land drawn next turn is not a loss). The floor is the value dig's,
-    `citadel_life_floor`: going to 1 is a decision about winning on YOUR
+    `citadel_value_floor`: going to 1 is a decision about winning on YOUR
     turn, and an instant on theirs does not win. A response is cast, so its
     cast triggers fire (Aetherflux counts the spells of THIS turn, the
     pod's); the pod does not counter a response, as `respond_to_pieces`'
@@ -1986,9 +2025,9 @@ def citadel_pod_window(g, when: str) -> int:
     if (not g.cfg.get("citadel_pod_instants", True) or g.result is not None
             or not g.has(CITADEL)):
         return 0
-    floor = g.cfg.get("citadel_life_floor", 10.0)
     n = 0
     while g.library and g.result is None and draw_is_safe(g, 1):
+        floor = citadel_value_floor(g)
         top = g.library[-1]
         if "Instant" not in top.types or "wipe" in top.tags:
             break

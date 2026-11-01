@@ -4,6 +4,7 @@ owner's question -- AT WHAT LIFE IS DIGGING TO 1 FOR THE WIN WORTH IT?
 
     python -m diagnostics.run_citadel_allin policies N OUT.txt [ARM ...]
     python -m diagnostics.run_citadel_allin forks N OUT.txt
+    python -m diagnostics.run_citadel_allin floors N OUT.txt   (§0z161)
 
 `policies`: every arm is `build_pending("karlov")` (Citadel staged) with
 some knobs set, N paired games at T10 and T20 on seeds 5000.., and every
@@ -22,6 +23,18 @@ all-in on it, today's policy after it. The paired difference is what going
 to 1 on THAT turn, at THAT life, is worth to the game -- binned by life and
 by outs. No deepcopy: the engines key state on `id()`, so a copied game
 does not reproduce (checked: 57 of 200 diverged); a replay does, exactly.
+
+`floors` (§0z161): THE OPTIMAL STOP. The same replay, but each dig turn is
+played under every floor in `FLOOR_ARMS` -- fixed floors from 1 to 40, and
+the clock floor (`citadel_floor_mode="clock"`: the chip damage the pod can
+visibly deal next round, plus a pad) -- set on THAT turn only through
+`citadel_turn_cfg`. The F10 arm is today's policy replayed, so it must
+reproduce the baseline on every turn, and the run says whether it did
+(§0z35). Each cell is a paired difference against it, binned by the life the
+turn began at and by the chip damage on the table. "Best by bin" is chosen
+on the even seeds and REPORTED on the odd ones, so the pick does not grade
+itself (the winner's curse of taking the max of 17 noisy cells).
+`CITADEL_RAW=path.npy` keeps the per-turn array.
 
 Win rate is the objective (CLAUDE.md); `won` at T20 for the forks, because
 the cost of going to 1 lands on the pod's NEXT turns.
@@ -67,6 +80,33 @@ ARMS = {
     "outs1_life20": {"citadel_allin": "outs", "citadel_allin_outs": 1,
                      "citadel_allin_life": 20.0},
 }
+# the clock floor, whole-game (§0z161), and the fixed floors between
+ARMS.update({
+    "floor1": {"citadel_life_floor": 1.0},
+    "floor3": {"citadel_life_floor": 3.0},
+    "floor7": {"citadel_life_floor": 7.0},
+    "floor13": {"citadel_life_floor": 13.0},
+    "clock1": {"citadel_floor_mode": "clock", "citadel_clock_pad": 1.0},
+    "clock2": {"citadel_floor_mode": "clock", "citadel_clock_pad": 2.0},
+    "clock4": {"citadel_floor_mode": "clock", "citadel_clock_pad": 4.0},
+    "clock7": {"citadel_floor_mode": "clock", "citadel_clock_pad": 7.0},
+    "clock10": {"citadel_floor_mode": "clock", "citadel_clock_pad": 10.0},
+    "clock2r_1": {"citadel_floor_mode": "clock", "citadel_clock_rounds": 2,
+                  "citadel_clock_pad": 1.0},
+    "clock2r_4": {"citadel_floor_mode": "clock", "citadel_clock_rounds": 2,
+                  "citadel_clock_pad": 4.0},
+})
+
+FLOOR_ARMS = (
+    [(f"F{f:g}", {"citadel_floor_mode": "fixed", "citadel_life_floor": float(f)})
+     for f in (1, 3, 5, 7, 10, 13, 16, 20, 25, 30, 40)]
+    + [(f"clk+{p:g}", {"citadel_floor_mode": "clock",
+                       "citadel_clock_pad": float(p)})
+       for p in (1, 2, 4, 7, 10)]
+    + [(f"clk2r+{p:g}", {"citadel_floor_mode": "clock",
+                         "citadel_clock_rounds": 2,
+                         "citadel_clock_pad": float(p)})
+       for p in (1, 4)])
 MET = ("won", "damage", "citadel_casts", "citadel_life_spent", "final_life")
 SEED0 = 5000
 CHUNK = 500
@@ -241,6 +281,118 @@ def forks(n, out):
         f.write(text + "\n")
 
 
+def _floors_job(args):
+    lo, hi = args
+    from edhmc import karlov as K
+    from edhmc import opponents as OPP
+    real = K.citadel_step
+    log = []
+
+    def spy(g):
+        if g.has(K.CITADEL) and (not log or log[-1][0] != g.turn):
+            log.append((g.turn, g.turn_life, g.your_life,
+                        OPP.predicted_chip(g, 1), OPP.predicted_chip(g, 2)))
+        return real(g)
+    deck, cmd = _DECKS["staged"], _DECKS["cmd"]
+    cfg = _cfg({}, 20)
+    rows = []
+    for s in range(lo, hi):
+        log.clear()
+        K.citadel_step = spy
+        try:
+            base = K.simulate(deck, cmd, cfg, s)
+        finally:
+            K.citadel_step = real
+        for turn, tl, life, c1, c2 in list(log):
+            row = [s, turn, tl, life, c1, c2, base["won"],
+                   float(base["won"] and base["turn_won"] == turn)]
+            for _, knobs in FLOOR_ARMS:
+                alt = K.simulate(deck, cmd,
+                                 dict(cfg, citadel_turn_cfg=(turn, knobs)), s)
+                row += [alt["won"], float(alt["won"] and alt["turn_won"] == turn)]
+            rows.append(row)
+    return rows
+
+
+def floors(n, out):
+    jobs = [(lo, min(lo + CHUNK, SEED0 + n))
+            for lo in range(SEED0, SEED0 + n, CHUNK)]
+    rows = []
+    with Pool(initializer=_init) as pool:
+        for r in pool.imap_unordered(_floors_job, jobs):
+            rows.extend(r)
+    a = np.array(rows, dtype=float)
+    if os.environ.get("CITADEL_RAW"):
+        np.save(os.environ["CITADEL_RAW"], a)
+    names = [nm for nm, _ in FLOOR_ARMS]
+    won = {nm: a[:, 8 + 2 * k] for k, nm in enumerate(names)}
+    wtt = {nm: a[:, 9 + 2 * k] for k, nm in enumerate(names)}
+    base, base_wtt = a[:, 6], a[:, 7]
+    same = bool((won["F10"] == base).all() and (wtt["F10"] == base_wtt).all())
+    lines = [f"Bolas's Citadel, the floor on ONE turn (citadel_turn_cfg), "
+             f"{n:,} seeds from {SEED0}, T20, python {sys.version.split()[0]}",
+             f"{len(a):,} dig turns with the Citadel out. F10 (today's policy, "
+             f"replayed) reproduces the baseline on every turn: "
+             f"{'YES' if same else 'NO -- the comparison is broken'}",
+             "cells: P(win) of that floor on that turn minus F10, x1000, "
+             "paired by seed and turn", ""]
+
+    def cell(m, nm):
+        d = won[nm][m] - base[m]
+        return d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(max(2, m.sum()))
+
+    lines.append("OVERALL")
+    lines.append(f"  {'floor':<9}{'diff':>9}{'+-':>8}   won THAT turn")
+    for nm in names:
+        mu, ci = cell(np.ones(len(a), bool), nm)
+        lines.append(f"  {nm:<9}{mu:>+9.4f}{ci:>8.4f}{'*' if abs(mu) > ci else ' '}"
+                     f"  {wtt[nm].mean():.3f}")
+    lines.append(f"  (F10 won THAT turn {base_wtt.mean():.3f}; "
+                 f"P(win) {base.mean():.3f})")
+    lines.append("")
+
+    def grid(title, col, edges):
+        lines.append(title + "  (diff x1000; * = 95% CI excludes 0; "
+                     "[best] by point estimate)")
+        lines.append(f"  {'bin':<12}{'turns':>6}{'P(win)':>7} "
+                     + "".join(f"{nm:>8}" for nm in names))
+        for lo, hi in zip(edges, edges[1:]):
+            m = (a[:, col] >= lo) & (a[:, col] < hi)
+            if m.sum() < 30:
+                continue
+            cells = [cell(m, nm) for nm in names]
+            best = max(range(len(names)), key=lambda k: cells[k][0])
+            txt = "".join(
+                f"{1000 * mu:>+7.1f}{'*' if abs(mu) > ci else ' '}"
+                if k != best else f"[{1000 * mu:>+5.1f}]{'*' if abs(mu) > ci else ' '}"
+                for k, (mu, ci) in enumerate(cells))
+            lab = f"{lo:g}-{hi:g}" if hi < 1e9 else f"{lo:g}+"
+            lines.append(f"  {lab:<12}{int(m.sum()):>6}{base[m].mean():>7.3f} "
+                         + txt)
+        lines.append("")
+
+    grid("BY THE LIFE THE TURN BEGAN AT", 2, [0, 10, 15, 20, 25, 30, 40, 50,
+                                             70, 1e9])
+    grid("BY THE CHIP DAMAGE ON THE TABLE (next round)", 4,
+         [0, 1, 2, 3, 4, 6, 8, 1e9])
+
+    lines.append("BEST BY LIFE BIN, CHOSEN ON EVEN SEEDS, MEASURED ON ODD "
+                 "(minus F10)")
+    even, odd = a[:, 0] % 2 == 0, a[:, 0] % 2 == 1
+    edges = [0, 10, 15, 20, 25, 30, 40, 50, 70, 1e9]
+    for lo, hi in zip(edges, edges[1:]):
+        m = (a[:, 2] >= lo) & (a[:, 2] < hi)
+        pick = max(names, key=lambda nm: cell(m & even, nm)[0])
+        mu, ci = cell(m & odd, pick)
+        lab = f"{lo:g}-{hi:g}" if hi < 1e9 else f"{lo:g}+"
+        lines.append(f"  {lab:<12} picked {pick:<8} on odd seeds "
+                     f"{mu:+.4f} +-{ci:.4f}{'*' if abs(mu) > ci else ''}")
+    text = "\n".join(lines)
+    print(text)
+    with open(out, "w") as f:
+        f.write(text + "\n")
+
+
 def main():
     mode, n, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     if mode == "policies":
@@ -251,6 +403,8 @@ def main():
         policies(n, out, arms)
     elif mode == "forks":
         forks(n, out)
+    elif mode == "floors":
+        floors(n, out)
     else:
         raise SystemExit(__doc__)
 

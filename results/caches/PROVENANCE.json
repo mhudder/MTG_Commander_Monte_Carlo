@@ -513,6 +513,12 @@
         "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "61cba8ed074d34c8",
         "utc": "2026-10-31T23:59:35Z"
+      },
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "02aefada813c4009",
+        "utc": "2026-11-01T01:08:11Z"
       }
     ]
   },
@@ -962,7 +968,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "59df776dafa59c38",
+        "utc": "2026-11-01T01:08:11Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "e8c6e2aaddcc1708",
@@ -1414,6 +1427,12 @@
         "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "fcdb42a7695346d6",
         "utc": "2026-10-31T23:59:34Z"
+      },
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "23e2e6bc0f4536f0",
+        "utc": "2026-11-01T01:08:10Z"
       }
     ]
   },
@@ -1845,6 +1864,12 @@
         "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "3db6bc60dc9edbaf",
         "utc": "2026-10-31T23:59:34Z"
+      },
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "266deaa40f15d5db",
+        "utc": "2026-11-01T01:08:10Z"
       }
     ]
   },
@@ -2318,6 +2343,12 @@
         "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "3f485ef9040e525c",
         "utc": "2026-10-31T23:59:35Z"
+      },
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "ff5da73186d3d2cb",
+        "utc": "2026-11-01T01:08:10Z"
       }
     ]
   },
@@ -2736,6 +2767,12 @@
         "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "69a29d9a97c13b76",
         "utc": "2026-10-31T23:59:35Z"
+      },
+      {
+        "commit": "91dabd9",
+        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "b677d4b5b62b0413",
+        "utc": "2026-11-01T01:08:10Z"
       }
     ]
   },

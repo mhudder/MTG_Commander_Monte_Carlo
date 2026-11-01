@@ -1,0 +1,30 @@
+Bolas's Citadel's dig (§0z160): N=15,000 paired, seeds 5000.., karlov as staged, python 3.11.17
+row = arm minus 'new' unless named; * = 95% CI excludes 0
+
+floor1 - new                                      T10 +0.0015 +-0.0012*  T20 -0.0021 +-0.0013*  dmgT20 -0.21 +-0.09  lifeSpentT20 +0.15
+floor3 - new                                      T10 +0.0014 +-0.0011*  T20 -0.0011 +-0.0011*  dmgT20 -0.11 +-0.08  lifeSpentT20 +0.13
+floor5 - new                                      T10 +0.0017 +-0.0010*  T20 +0.0000 +-0.0010   dmgT20 -0.01 +-0.07  lifeSpentT20 +0.09
+floor7 - new                                      T10 +0.0013 +-0.0008*  T20 +0.0004 +-0.0008   dmgT20 +0.03 +-0.06  lifeSpentT20 +0.06
+floor13 - new                                     T10 -0.0016 +-0.0008*  T20 -0.0009 +-0.0008*  dmgT20 -0.04 +-0.06  lifeSpentT20 -0.08
+clock1 - new                                      T10 +0.0021 +-0.0009*  T20 +0.0004 +-0.0009   dmgT20 -0.02 +-0.07  lifeSpentT20 +0.10
+clock2 - new                                      T10 +0.0018 +-0.0009*  T20 +0.0005 +-0.0008   dmgT20 +0.02 +-0.06  lifeSpentT20 +0.08
+clock4 - new                                      T10 +0.0010 +-0.0008*  T20 -0.0001 +-0.0008   dmgT20 -0.00 +-0.06  lifeSpentT20 +0.03
+clock7 - new                                      T10 +0.0000 +-0.0008   T20 -0.0005 +-0.0008   dmgT20 +0.02 +-0.05  lifeSpentT20 -0.03
+clock10 - new                                     T10 -0.0015 +-0.0008*  T20 -0.0014 +-0.0008*  dmgT20 -0.06 +-0.06  lifeSpentT20 -0.12
+clock2r_1 - new                                   T10 +0.0005 +-0.0009   T20 -0.0007 +-0.0008   dmgT20 -0.03 +-0.06  lifeSpentT20 -0.01
+clock2r_4 - new                                   T10 -0.0009 +-0.0010   T20 -0.0008 +-0.0009   dmgT20 +0.00 +-0.07  lifeSpentT20 -0.09
+
+absolute, T20: arm  won  citadel_casts  citadel_life_spent
+  new           0.5479  0.680  1.70
+  floor1        0.5458  0.726  1.86
+  floor3        0.5467  0.723  1.84
+  floor5        0.5479  0.707  1.80
+  floor7        0.5483  0.699  1.77
+  floor13       0.5469  0.647  1.62
+  clock1        0.5483  0.709  1.80
+  clock2        0.5483  0.707  1.79
+  clock4        0.5478  0.688  1.73
+  clock7        0.5473  0.671  1.68
+  clock10       0.5465  0.629  1.58
+  clock2r_1     0.5472  0.677  1.70
+  clock2r_4     0.5471  0.636  1.61
