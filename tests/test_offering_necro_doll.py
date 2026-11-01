@@ -31,7 +31,9 @@ CASES
   E  Necropotence, hand 3, life 40: buys 4 cards, pays 4 life
   F  life 12, empty hand: buys 2 -- the 10-life floor (the owner's, 2026-09-26;
      it was 20 and this case read "life 22")
-  G  a one-card library: buys 1
+  G  a six-card library: buys 1 -- the library caps the buy, less the
+     `decking_reserve` of 5 it keeps since §0z162 (a one-card library
+     bought 1 before the guard)
   H  the cards are not DRAWN (`cards_drawn` does not move)
   I  with Necropotence out the draw step is skipped
   J  a Doll tapped for mana by `spend` gets a nest counter
@@ -156,9 +158,9 @@ def run_cases():
     g = kgame(kcard("Necropotence"), life=12.0)
     K.necropotence_step(g)
     check("F life 12, empty hand: 2 cards (the floor)", len(g.hand), 2)
-    g = kgame(kcard("Necropotence"), lib=1)
+    g = kgame(kcard("Necropotence"), lib=6)
     K.necropotence_step(g)
-    check("G a one-card library: 1 card", len(g.hand), 1)
+    check("G a six-card library: 1 card (5 kept back)", len(g.hand), 1)
     g = kgame(kcard("Necropotence"))
     K.necropotence_step(g)
     check("H the cards are not drawn", g.m["cards_drawn"], 0)
@@ -201,7 +203,11 @@ def main() -> int:
         return max(OPP.living(g), key=lambda o: OPP.opponent_threat(o, g.turn))
 
     def no_floor(g):
-        return max(0, min(7 - len(g.hand), int(g.your_life), len(g.library)))
+        # The life floor dropped and NOTHING else: the decking reserve
+        # stays, as the real buy keeps it since §0z162 (§0z141: a stand-in
+        # that copies a signature must copy all of it but the mutation).
+        return max(0, min(7 - len(g.hand), int(g.your_life),
+                          len(g.library) - 5))
 
     def sac_any(g):
         for p in [q for q in g.board if q.card.name == "Twitching Doll"]:

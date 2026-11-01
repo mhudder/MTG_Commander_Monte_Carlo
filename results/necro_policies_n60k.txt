@@ -1,0 +1,7 @@
+Necropotence's policy (§0z162): N=60,000 paired, seeds 5000.., karlov as staged, python 3.11.17
+row = arm minus 'base' (today's defaults); * = 95% CI excludes 0
+
+clock1      T10 +0.0000 +-0.0001   T20 +0.0002 +-0.0002   necro_cards T20 +0.008
+tower20     T10 +0.0016 +-0.0004*  T20 +0.0012 +-0.0005*  necro_cards T20 +0.219
+tower99     T10 +0.0017 +-0.0005*  T20 +0.0013 +-0.0005*  necro_cards T20 +0.558
+tower20_clock1T10 +0.0016 +-0.0004*  T20 +0.0012 +-0.0005*  necro_cards T20 +0.236

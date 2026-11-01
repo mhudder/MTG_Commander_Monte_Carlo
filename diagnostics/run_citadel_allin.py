@@ -29,7 +29,7 @@ does not reproduce (checked: 57 of 200 diverged); a replay does, exactly.
 played under every floor in `FLOOR_ARMS` -- fixed floors from 1 to 40, and
 the clock floor (`citadel_floor_mode="clock"`: the chip damage the pod can
 visibly deal next round, plus a pad) -- set on THAT turn only through
-`citadel_turn_cfg`. The `BASE_ARM` is today's policy replayed (F10 when
+`turn_cfg` (`citadel_turn_cfg` until §0z162). The `BASE_ARM` is today's policy replayed (F10 when
 §0z161 ran, clk+1 since it was adopted), so it must reproduce the baseline
 on every turn, and the run says whether it did
 (§0z35). Each cell is a paired difference against it, binned by the life the
@@ -315,7 +315,7 @@ def _floors_job(args):
                    float(base["won"] and base["turn_won"] == turn)]
             for _, knobs in FLOOR_ARMS:
                 alt = K.simulate(deck, cmd,
-                                 dict(cfg, citadel_turn_cfg=(turn, knobs)), s)
+                                 dict(cfg, turn_cfg=(turn, knobs)), s)
                 row += [alt["won"], float(alt["won"] and alt["turn_won"] == turn)]
             rows.append(row)
     return rows
@@ -337,7 +337,7 @@ def floors(n, out):
     base, base_wtt = a[:, 6], a[:, 7]
     b = BASE_ARM
     same = bool((won[b] == base).all() and (wtt[b] == base_wtt).all())
-    lines = [f"Bolas's Citadel, the floor on ONE turn (citadel_turn_cfg), "
+    lines = [f"Bolas's Citadel, the floor on ONE turn (turn_cfg), "
              f"{n:,} seeds from {SEED0}, T20, python {sys.version.split()[0]}",
              f"{len(a):,} dig turns with the Citadel out. {b} (today's policy, "
              f"replayed) reproduces the baseline on every turn: "

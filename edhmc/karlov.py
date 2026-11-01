@@ -1093,18 +1093,52 @@ def upkeep(g):
     aetherflux_fire(g)
 
 
+def necro_floor(g) -> float:
+    """The life Necropotence's buy keeps, by `necro_floor_mode` (§0z162):
+    "fixed" (the default) is `necro_life_floor` (10); "clock" is the pod's
+    clock, `opponents.clock_floor` with `necro_clock_pad` (1), the same
+    function and the same reading as Bolas's Citadel's floor (§0z161)."""
+    if turn_knob(g, "necro_floor_mode", "fixed") == "clock":
+        return OPP.clock_floor(g, pad=turn_knob(g, "necro_clock_pad", 1.0))
+    return turn_knob(g, "necro_life_floor", 10)
+
+
+def necro_target(g) -> int:
+    """The hand Necropotence's buy fills to. `necro_hand_target` (7) IS THE
+    MAXIMUM HAND SIZE: the cards arrive at the beginning of the end step,
+    before cleanup, and a card bought past seven is discarded there (CR
+    514.1) -- and exiled, by Necropotence's own clause. This engine has no
+    maximum hand size (CR 402.2 is unmodelled in every deck), so the target
+    is where the rule lives for this card. RELIQUARY TOWER, in this list,
+    says "You have no maximum hand size", and then the target is a choice:
+    `necro_tower_target` (default: the same 7) while it is on the
+    battlefield (§0z162)."""
+    if g.has("Reliquary Tower"):
+        t = turn_knob(g, "necro_tower_target", None)
+        if t is not None:
+            return int(t)
+    return int(turn_knob(g, "necro_hand_target", 7))
+
+
 def necropotence_cards(g) -> int:
     """How many cards the pilot buys with Necropotence this turn: enough to
-    fill the hand to `necro_hand_target` (7), never paying below
-    `necro_life_floor` (10) life, and never more than the library holds.
+    fill the hand to `necro_target` (7), never paying below `necro_floor`
+    (10) life, and never more than the library holds.
     THE POLICY, CONFIRMED BY THE OWNER 2026-09-26 (§0z57): "like Bolas's
     Citadel, the card is at its best played to the extremes". The first
     default was a 20-life floor; 10 measured +0.0023 +-0.0011 better at T20,
     and 30 and a 5-card target both measured worse."""
-    target = g.cfg.get("necro_hand_target", 7)
-    floor = g.cfg.get("necro_life_floor", 10)
-    return max(0, min(target - len(g.hand), int(g.your_life - floor),
-                      len(g.library)))
+    target = necro_target(g)
+    floor = necro_floor(g)
+    # THE BUY EMPTIES THE LIBRARY AS DRAWS DO, and the next mandatory draw
+    # from an empty one loses (§0z42). With Reliquary Tower and a high
+    # target it got there: 7 decked games in 12,000 at no target (§0z162).
+    # It stops `decking_reserve` cards from the bottom, as every optional
+    # draw does; `necro_decking_guard=False` is the buy that never asked.
+    stock = len(g.library)
+    if g.cfg.get("necro_decking_guard", True):
+        stock -= g.cfg.get("decking_reserve", 5)
+    return max(0, min(target - len(g.hand), int(g.your_life - floor), stock))
 
 
 def necropotence_step(g):
@@ -1532,13 +1566,14 @@ CITADEL = "Bolas's Citadel"
 TOP = "Sensei's Divining Top"
 
 
-def citadel_knob(g, name, default):
-    """A Citadel policy knob, read through `citadel_turn_cfg` -- a DIAGNOSTIC
-    pair (turn, {knob: value}) that sets those knobs on that one turn and no
-    other (§0z161). It is how `diagnostics/run_citadel_allin.py floors` asks
-    "on THIS turn, which floor was best?": the same seed replayed, identical
-    up to the turn the policy differs on. Unset, this is `cfg.get`."""
-    over = g.cfg.get("citadel_turn_cfg")
+def turn_knob(g, name, default):
+    """A policy knob, read through `turn_cfg` -- a DIAGNOSTIC pair (turn,
+    {knob: value}) that sets those knobs on that one turn and no other
+    (§0z161; `citadel_turn_cfg` until §0z162 made it serve Necropotence
+    too). It is how the fork diagnostics ask "on THIS turn, which policy was
+    best?": the same seed replayed, identical up to the turn the policy
+    differs on. Unset, this is `cfg.get`."""
+    over = g.cfg.get("turn_cfg")
     if over is not None and g.turn == over[0] and name in over[1]:
         return over[1][name]
     return g.cfg.get(name, default)
@@ -1571,16 +1606,16 @@ def citadel_allin_now(g) -> bool:
     t = g.cfg.get("citadel_allin_turn")
     if t is not None:
         return g.turn == t
-    pol = citadel_knob(g, "citadel_allin", "never")
+    pol = turn_knob(g, "citadel_allin", "never")
     if pol == "never":
         return False
     if pol == "always":
         return True
-    life_ok = g.turn_life >= citadel_knob(g, "citadel_allin_life", 0)
+    life_ok = g.turn_life >= turn_knob(g, "citadel_allin_life", 0)
     if pol == "life":
         return life_ok
     if pol == "outs":
-        return life_ok and citadel_outs(g) >= citadel_knob(
+        return life_ok and citadel_outs(g) >= turn_knob(
             g, "citadel_allin_outs", 1)
     raise ValueError(f"citadel_allin: unknown policy {pol!r}")
 
@@ -1600,15 +1635,15 @@ def citadel_value_floor(g) -> float:
 
     Recomputed for every card the dig takes, because the share of the pod's
     swing aimed at you grows with your board, and the dig grows it."""
-    mode = citadel_knob(g, "citadel_floor_mode", "clock")
+    mode = turn_knob(g, "citadel_floor_mode", "clock")
     if mode == "fixed":
-        return citadel_knob(g, "citadel_life_floor", 10.0)
+        return turn_knob(g, "citadel_life_floor", 10.0)
     if mode == "clock":
-        chip = OPP.predicted_chip(
-            g, int(citadel_knob(g, "citadel_clock_rounds", 1)))
-        return max(citadel_knob(g, "citadel_clock_min", 1.0),
-                   citadel_knob(g, "citadel_clock_mult", 1.0) * chip
-                   + citadel_knob(g, "citadel_clock_pad", 1.0))
+        return OPP.clock_floor(
+            g, pad=turn_knob(g, "citadel_clock_pad", 1.0),
+            mult=turn_knob(g, "citadel_clock_mult", 1.0),
+            rounds=int(turn_knob(g, "citadel_clock_rounds", 1)),
+            minimum=turn_knob(g, "citadel_clock_min", 1.0))
     raise ValueError(f"citadel_floor_mode: unknown mode {mode!r}")
 
 
@@ -1616,7 +1651,7 @@ def citadel_floor(g, allin=None) -> float:
     """The life YOUR turn's dig keeps: what it is LEFT with, not what it pays.
     `allin` is the dig's decision, taken once at its start; None asks."""
     if citadel_allin_now(g) if allin is None else allin:
-        return citadel_knob(g, "citadel_allin_floor", 1.0)
+        return turn_knob(g, "citadel_allin_floor", 1.0)
     return citadel_value_floor(g)
 
 

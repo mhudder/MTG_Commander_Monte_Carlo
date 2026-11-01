@@ -105,6 +105,22 @@ What is closed and where it went:
       re-measure the -Swamp +Citadel swap on the clock floor
       (`diagnostics/run_citadel_allin.py policies 15000 ... new noCit`)
       into its ledger entry. Never clear it with `--verified`.
+    - **Necropotence with Reliquary Tower (§0z162), an owner call to batch
+      with the rebuild above**: buy past seven while the Tower is out
+      (`necro_tower_target` 99, bounded by the floor and the decking
+      reserve; 20 is the same): +0.0017 / +0.0013 at T10 / T20, N=60,000.
+      The clock floor adds nothing for this card over a game.
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.
+
+30. **Maximum hand size is unmodelled in every engine** (CR 402.2, 514.1;
+    found in §0z162). Nothing discards to seven at cleanup, so every draw
+    engine and every "draw more" policy is flattered: 7.9% of karlov's end
+    steps without Reliquary Tower hold more than seven, 3.5 over on average.
+    A shared cleanup step in each engine's turn (which cards to discard is a
+    pilot's choice: the want order's worst), Reliquary Tower and its kin
+    lifting it, Necropotence's exile clause live. Measure the shift per deck
+    at the tables' N before deciding (§0z30: its size is not guessable); it
+    moves every baseline, so it is a batched rebuild.
+

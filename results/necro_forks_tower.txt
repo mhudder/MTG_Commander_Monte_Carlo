@@ -1,0 +1,67 @@
+Necropotence, the policy on ONE turn (turn_cfg), 60,000 seeds from 5000, T20, python 3.11.17
+20,459 Necropotence turns (3,075 with Reliquary Tower out). N10 (today's policy, replayed) reproduces the baseline on every turn: YES
+bought on the base: mean 1.96 cards; hand before the buy median 5; life median 36.3; chip on the table median 3.5
+cells: P(win) minus N10, paired by seed and turn; * = 95% CI excludes 0
+
+OVERALL (the Tower targets on Tower turns only)
+  N10       +0.0000  0.0000   (n=20,459)
+  TT9       +0.0189  0.0098*  (n=3,075)
+  TT11      +0.0293  0.0118*  (n=3,075)
+  TT14      +0.0520  0.0131*  (n=3,075)
+  TT20      +0.0618  0.0146*  (n=3,075)
+  TT30      +0.0686  0.0153*  (n=3,075)
+  TT99      +0.0715  0.0154*  (n=3,075)
+
+BY LIFE AT THE BUY  (x1000; [best] by point estimate)
+  bin        turns P(win)      N10
+  0-15        1966  0.414 [ +0.0] 
+  15-20       1048  0.459 [ +0.0] 
+  20-25       1492  0.499 [ +0.0] 
+  25-30       2103  0.529 [ +0.0] 
+  30-40       6031  0.573 [ +0.0] 
+  40-60       5163  0.593 [ +0.0] 
+  60+         2648  0.659 [ +0.0] 
+
+BY THE CHIP ON THE TABLE  (x1000; [best] by point estimate)
+  bin        turns P(win)      N10
+  0-1         3056  0.514 [ +0.0] 
+  1-2         2841  0.575 [ +0.0] 
+  2-4         5768  0.592 [ +0.0] 
+  4-6         4410  0.582 [ +0.0] 
+  6+          4384  0.509 [ +0.0] 
+
+BY HAND SIZE BEFORE THE BUY  (x1000; [best] by point estimate)
+  bin        turns P(win)      N10
+  0-3         2018  0.612 [ +0.0] 
+  3-4         1955  0.612 [ +0.0] 
+  4-5         3635  0.610 [ +0.0] 
+  5-6         4582  0.592 [ +0.0] 
+  6-7         3891  0.505 [ +0.0] 
+  7+          4378  0.478 [ +0.0] 
+
+RELIQUARY TOWER OUT: THE TARGET, BY LIFE AT THE BUY  (x1000; [best] by point estimate)
+  bin        turns P(win)      N10     TT9    TT11    TT14    TT20    TT30    TT99
+  0-15         392  0.485    +0.0    +0.0 [ +7.7]    +7.7    +7.7    +7.7    +7.7 
+  15-20        194  0.510    +0.0   +15.5   +10.3 [+30.9]   +30.9   +30.9   +30.9 
+  20-25        266  0.429    +0.0   +41.4   +52.6*  +56.4*[+71.4]*  +67.7*  +67.7*
+  25-30        335  0.490    +0.0    -6.0   +26.9 [+62.7]*  +26.9   +20.9   +23.9 
+  30-40        729  0.543    +0.0   +16.5   +24.7   +64.5*[+94.7]*  +89.2*  +90.5*
+  40-60        679  0.548    +0.0   +28.0*  +42.7*  +61.9*  +81.0* +106.0*[+109.0]*
+  60+          479  0.635    +0.0   +31.3*  +31.3*  +54.3*  +60.5*  +83.5*[+93.9]*
+
+RELIQUARY TOWER OUT: THE TARGET, BY THE CHIP ON THE TABLE  (x1000; [best] by point estimate)
+  bin        turns P(win)      N10     TT9    TT11    TT14    TT20    TT30    TT99
+  0-1          563  0.503    +0.0   +12.4   +24.9   +30.2*  +71.0*  +90.6*[+95.9]*
+  1-2          444  0.534    +0.0   +24.8*  +15.8   +45.0*  +58.6*  +69.8*[+83.3]*
+  2-4          871  0.560    +0.0   +25.3*  +36.7*  +81.5* +104.5*[+117.1]* +112.5*
+  4-6          617  0.549    +0.0   +35.7*  +58.3*  +74.6*  +66.5*  +69.7*[+82.7]*
+  6+           580  0.503    +0.0    -6.9    +1.7 [+10.3]   -13.8   -27.6   -34.5 
+
+BEST BY LIFE BIN, CHOSEN ON EVEN SEEDS, MEASURED ON ODD (minus N10)
+  0-15       picked N10     on odd seeds +0.0000 +-0.0000
+  15-20      picked N10     on odd seeds +0.0000 +-0.0000
+  20-25      picked N10     on odd seeds +0.0000 +-0.0000
+  25-30      picked N10     on odd seeds +0.0000 +-0.0000
+  30-40      picked N10     on odd seeds +0.0000 +-0.0000
+  40-60      picked N10     on odd seeds +0.0000 +-0.0000
+  60+        picked N10     on odd seeds +0.0000 +-0.0000

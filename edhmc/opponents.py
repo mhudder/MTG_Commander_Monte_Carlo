@@ -3553,6 +3553,18 @@ def predicted_chip(g, rounds: int = 1) -> float:
     return total
 
 
+def clock_floor(g, pad: float = 1.0, mult: float = 1.0, rounds: int = 1,
+                minimum: float = 1.0) -> float:
+    """THE LIFE A PILOT KEEPS when paying life for value, read off the pod's
+    clock (§0z161, §0z162): `mult` x the chip damage the next `rounds` rounds
+    would deal you (`predicted_chip`) + `pad`, never below `minimum`. ONE
+    function for every card that pays life down to a floor -- Bolas's
+    Citadel's dig and Necropotence so far -- so their floors cannot drift
+    (§0z30). A clock that picks you ends the game at any life total, so this
+    guards the chip and nothing else."""
+    return max(minimum, mult * predicted_chip(g, rounds) + pad)
+
+
 # ATTACK TAXES (item 24, §0z138). Ghostly Prison and Propaganda: "Creatures
 # can't attack you unless their controller pays {2} for each creature they
 # control that's attacking you" (`_evasion.ATTACK_TAX`, generated). Without

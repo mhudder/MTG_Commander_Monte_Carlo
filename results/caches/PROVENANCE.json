@@ -519,6 +519,12 @@
         "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "02aefada813c4009",
         "utc": "2026-11-01T01:08:11Z"
+      },
+      {
+        "commit": "09c7245",
+        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "948319c7dd24b3ef",
+        "utc": "2026-11-01T03:42:21Z"
       }
     ]
   },
@@ -1433,6 +1439,12 @@
         "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "23e2e6bc0f4536f0",
         "utc": "2026-11-01T01:08:10Z"
+      },
+      {
+        "commit": "09c7245",
+        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "d38d5be6f0dea473",
+        "utc": "2026-11-01T03:42:20Z"
       }
     ]
   },
@@ -1870,6 +1882,12 @@
         "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "266deaa40f15d5db",
         "utc": "2026-11-01T01:08:10Z"
+      },
+      {
+        "commit": "09c7245",
+        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "7adfc45acd4ee633",
+        "utc": "2026-11-01T03:42:20Z"
       }
     ]
   },
@@ -2349,6 +2367,12 @@
         "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "ff5da73186d3d2cb",
         "utc": "2026-11-01T01:08:10Z"
+      },
+      {
+        "commit": "09c7245",
+        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "0440db686c4ae5c7",
+        "utc": "2026-11-01T03:42:21Z"
       }
     ]
   },
@@ -2773,6 +2797,12 @@
         "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "b677d4b5b62b0413",
         "utc": "2026-11-01T01:08:10Z"
+      },
+      {
+        "commit": "09c7245",
+        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+        "fingerprint": "e60c3caca1f749f1",
+        "utc": "2026-11-01T03:42:20Z"
       }
     ]
   },

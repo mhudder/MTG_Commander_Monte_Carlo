@@ -24,7 +24,7 @@ CASES
      chip damage the pod then deals on that board (§0z161: one function)
   O  the clock floor is that chip damage plus the pad, and the dig stops
      there rather than at 10
-  P  `citadel_turn_cfg` sets a knob on its own turn and no other
+  P  `turn_cfg` sets a knob on its own turn and no other
   Q  the default floor is the clock (adopted 2026-11-01): on a quiet
      table (turn 2, no chip) a 12-life value dig casts two 4-drops
 
@@ -213,10 +213,10 @@ def run_cases():
     check("O the clock floor is the chip on the table plus the pad",
           round(K.citadel_value_floor(g), 9), round(chip + 1.0, 9))
 
-    g = fresh(citadel_turn_cfg=(3, {"citadel_life_floor": 2.0}))
+    g = fresh(turn_cfg=(3, {"citadel_life_floor": 2.0}))
     on2 = K.citadel_value_floor(g)
     g.turn = 3
-    check("P citadel_turn_cfg is its own turn only",
+    check("P turn_cfg is its own turn only",
           (on2, K.citadel_value_floor(g)), (10.0, 2.0))
 
     g = fresh(library=[spell(i) for i in range(10)]

@@ -214,6 +214,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z159](#0z159) | MEASURED | **Candidate rows for §0z157's five** at N=15,000: Crusher, Avacyn of Horror and Spock significant at T10 and T20, Join the Collective at T20; Pike damage only (redundant top grants) |
 | [0z160](#0z160) | MEASURED | **Bolas's Citadel's dig to its text**: both main phases, the pod's turn, X = 0, ways past the top; swap +0.0100 / +0.0083. **Going to 1 for the win loses** below ~50 life |
 | [0z161](#0z161) | MEASURED | **The Citadel's floor that reads the pod's clock**: stop at the chip damage the table can deal next round, +1 or +2. Beats floor 10 at both horizons; the optimal stop moves with the chip |
+| [0z162](#0z162) | MEASURED | **Necropotence's policy, forked**: the floor hardly binds (clock floor nil over games); **with Reliquary Tower, buy past 7**: +0.0016 / +0.0012. Max hand size is unmodelled everywhere |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14201,7 +14202,7 @@ every output key, 2,500 seeds, HEAD `91dabd9` against the tree; and
 the next `citadel_clock_rounds` (1) rounds' chip + `citadel_clock_pad`,
 never below `citadel_clock_min` (1), recomputed for every card the dig takes
 -- the dig grows your board, and your share with it. The default stays
-"fixed" (10). `citadel_turn_cfg` = (turn, {knobs}) sets knobs on one turn
+"fixed" (10). `citadel_turn_cfg` (renamed `turn_cfg` in §0z162) = (turn, {knobs}) sets knobs on one turn
 only, for the forks. `tests/test_citadel_dig.py` N-P pin it: the predicted
 chip IS the chip the pod deals; mutation `citadel_floor_mode="fixed"`
 breaks O alone.
@@ -14292,6 +14293,103 @@ which IS the clock this floor reads.
 **Caches**: `opponents.py` and `karlov.py` moved, and every default game was
 bit-identical (above), so every cache was VERIFIED on that evidence. The
 adoption then moved karlov's alone (above).
+
+<a id="0z162"></a>
+
+## 0z162. MEASURED -- Necropotence's policy, forked: the lever is the hand, not the life
+
+**The owner, 2026-11-01**: "yes, start with Necropotence" -- the first card
+after the Citadel to get §0z160/§0z161's analysis. "Pay 1 life: Exile the top
+card of your library face down. Put that card into your hand at the
+beginning of your next end step." The pilot pays after the last main phase
+(`karlov.necropotence_step`) for `necropotence_cards`: up to the hand target
+(`necro_target`, 7), never below the floor (`necro_floor`, 10), §0z57's
+policy.
+
+### What binds
+
+**The hand target, on 93% of Necropotence turns** (2,030 of 2,175 in 6,000
+games); life on 7%. Median life at the buy 36, hand 5, two cards bought.
+Like the Citadel (§0z160), the knob written as a floor is not the one that
+decides. **The target of 7 is the rules' maximum hand size**: the cards
+arrive at the beginning of the end step, before cleanup, and a card past
+seven is discarded there (CR 514.1) -- and exiled, by the card's own clause.
+**Reliquary Tower is in this list** ("You have no maximum hand size"), and
+with it the target is a choice nobody had made.
+
+### What changed (each a switch; the defaults reproduce the old buy)
+
+- `opponents.clock_floor`: the clock floor as ONE function, now read by
+  the Citadel and Necropotence alike (§0z30); `turn_knob` / `turn_cfg` is
+  §0z161's one-turn override made general (`citadel_turn_cfg` renamed).
+  Every deck's staged list, every key, 2,500 seeds: identical to `09c7245`.
+- `necro_floor_mode` ("fixed" | "clock", `necro_clock_pad`), and
+  `necro_tower_target` (default: the same 7) while the Tower is out.
+- **`necro_decking_guard`** (on): the buy stops `decking_reserve` cards from
+  the bottom, as every optional draw does (§0z42). Found by this analysis:
+  with the Tower and no target, 7 games in 12,000 decked. On the default buy
+  it changes 0 of 12,000 games. `test_offering_necro_doll`'s case G pinned
+  the old cap ("a one-card library buys 1"); it is now a six-card library
+  buying 1, and its "ignores the floor" stand-in keeps the reserve (§0z141).
+- `tests/test_necro_policy.py` pins A-E; its first mutation run caught a
+  case missing from the written set (E reads the floor too), and says so.
+
+### The forks
+
+`diagnostics/run_necro_policy.py forks`, 60,000 seeds, **20,459
+Necropotence turns** (3,075 with the Tower out), each replayed under every
+arm on that turn only; N10 (today's policy) reproduces the baseline on every
+turn. Win rate at T20 minus N10, `results/necro_forks.txt` and
+`results/necro_forks_tower.txt`:
+
+| on that turn | diff |
+|---|---|
+| fixed floor 1 / 5 / 7 | -0.0051 * / -0.0022 * / -0.0011 * |
+| fixed floor 13 / 20 / 25 | -0.0003 / -0.0013 / -0.0037 * |
+| **clock floor + 1 / + 2** | **+0.0011 ±0.0008 * / +0.0011 ±0.0007 *** |
+| target 0 (no buy) / 5 / 6 | **-0.0161** * / -0.0090 * / -0.0058 * |
+| **Tower out, target 9 / 14 / 20 / 30 / none** | +0.019 / +0.052 / +0.062 / +0.069 / **+0.072 ±0.015** (all *) |
+
+**The floor**: 10 is the best FIXED floor, and the clock floor's gain is
+all at life under 15 (+0.0107 there, +0.015 on odd seeds when picked on
+even), where it buys on a quiet table and stops against a big one -- the
+Citadel's mechanism, rarely engaged. **The hand**: fewer than seven always
+loses, and one turn of the card is worth 0.016. **With the Tower out, more
+is better all the way to no target**, bounded by the floor and the decking
+reserve -- except facing 6+ chip, where every target above 14 loses (-0.034
+at none, inside its bar): the life spent then is life the next swings take.
+
+### Whole game
+
+`policies`, N=15,000 (`results/necro_policies.txt`,
+`results/necro_policies_tower.txt`) and the leaders at **N=60,000**
+(`results/necro_policies_n60k.txt`), minus today's defaults:
+
+| arm | T10 | T20 |
+|---|---|---|
+| clock floor + 1 (60,000) | +0.0000 ±0.0001 | +0.0002 ±0.0002 |
+| **Tower: target 20** (60,000) | **+0.0016 ±0.0004 *** | **+0.0012 ±0.0005 *** |
+| **Tower: no target** (60,000) | **+0.0017 ±0.0005 *** | **+0.0013 ±0.0005 *** |
+| Tower 20 + clock floor (60,000) | +0.0016 ±0.0004 * | +0.0012 ±0.0005 * |
+| fixed floor 1 / 5 / 7 / 13 / 20 | -0.0010 * / -0.0004 * / -0.0003 * / -0.0002 / -0.0007 * | -0.0015 * / -0.0005 / -0.0003 / -0.0002 / -0.0001 |
+| target 5 / 6 | -0.0054 * / -0.0025 * | -0.0034 * / -0.0023 * |
+
+**ANSWER: Necropotence's policy is right everywhere but one place -- with
+Reliquary Tower out, the pilot should buy past seven, as far as the floor
+and the decking reserve allow.** Twenty and "no target" are the same within
+their bars at both horizons. The clock floor is real per turn and nothing
+over a game: this card's buy is almost never life-bound. **Not adopted**:
+`necro_tower_target` moves karlov's baseline, so it is the owner's call and
+belongs with the karlov rebuild already queued (item 29).
+
+### Found on the way, and not this card's: no maximum hand size anywhere
+
+**CR 402.2 / 514.1 are unmodelled in every engine**: the hand is never
+discarded to seven at cleanup. In karlov, **7.9% of end steps without the
+Tower hold more than seven cards**, 3.5 over on average (57,186 end steps,
+6,000 games) -- cards a real pilot would discard. Every draw engine is
+flattered by it, and so is every "draw more" policy, Necropotence's target
+included (it is the one place the rule was standing in). Queue item 30.
 
 ## How to read an ablation table
 
