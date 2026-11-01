@@ -1569,8 +1569,8 @@ def overload_only(g, card) -> bool:
 # the printed mode can hit is out, the pilot casts it for its printed cost as
 # a spot answer. Its reach is derived from the census clause, as every other
 # answer's is. `overload_single_target=False` is the wrath-only pilot.
-# NOT through Bolas's Citadel: that dig still holds a Damn on top (§0z118),
-# so a Citadel-revealed Damn is the one cast this does not reach.
+# Through Bolas's Citadel too since §0z160 (`karlov.citadel_dead`): off the
+# top Damn cannot be overloaded, so it is this mode or nothing.
 SINGLE_TARGET = {name: answer_reach(_removal.INTERACTION[name][2])
                  for name in OVERLOAD_WIPES}
 
@@ -3329,6 +3329,12 @@ def pod_phase(g, before_act=None):
     monarch_end_step(g)
     incidental_damage(g)
     respond_to_pieces(g)               # change 3: before a kill can fire
+    # An engine's own response from somewhere other than the hand, in the
+    # same window (optional): karlov's answer on top of the library, cast
+    # through Bolas's Citadel (§0z160). Other engines have none.
+    window = getattr(g, "pod_pieces_window", None)
+    if window is not None:
+        window()
     resolve_clocks(g)
     if g.result is not None:
         return

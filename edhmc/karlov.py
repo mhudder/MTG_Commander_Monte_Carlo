@@ -47,7 +47,8 @@ from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, 
                           perpetual_lifelink, enter_land, after_land_enters,
                           vault_of_the_archangel, vault_active,
                           sun_titan_pick, stack_top, tutor_take, land_tax,
-                          walker_ready, draw_is_safe, enter_loyalty)
+                          walker_ready, draw_is_safe, enter_loyalty,
+                          want_order)
 from edhmc import opponents as OPP
 
 # "Whenever an opponent loses life, you gain that much life." TWO cards carry
@@ -176,6 +177,13 @@ class KarlovGame(BaseGame):
             # only exists when it fires raises KeyError on the paired read.
             "citadel_casts": 0, "citadel_life_spent": 0.0,
             "citadel_lands": 0, "citadel_drains": 0,
+            # §0z160: the windows, the ways past the top, and X = 0.
+            "citadel_skips_top": 0, "citadel_skips_necro": 0,
+            "citadel_skips_konrad": 0, "citadel_spins": 0,
+            "citadel_pod_casts": 0, "citadel_wipe_held": 0,
+            "citadel_x0_held": 0, "debt_x0": 0, "citadel_skips_tutor": 0,
+            "citadel_stop_land": 0, "citadel_stop_floor": 0,
+            "citadel_stop_library": 0,
             # Candidates, 2026-10-12 (§0z128).
             "southwind_drains": 0, "southwind_death_gains": 0,
             "epicure_drains": 0, "bonds_triggers": 0,
@@ -189,6 +197,13 @@ class KarlovGame(BaseGame):
             "top_spins": 0, "top_spins_upkeep": 0, "tutored": 0,
         })
         self.top_turn = 0
+        # Bolas's Citadel (§0z160): the life this turn began at (the all-in
+        # policy reads it), the spells cast on the pod's turn (Aetherflux and
+        # the counter roll's slot), and Necropotence's face-down cards, which
+        # reach your hand at the beginning of your next end step.
+        self.turn_life = 0.0
+        self.pod_spells = 0
+        self.necro_exiled = []
         self.damage_by_turn = []
 
     # -- helpers -------------------------------------------------------------
@@ -211,6 +226,13 @@ class KarlovGame(BaseGame):
         if card.name in partners:
             return 2 if have_a and not have_b else 0
         return 0
+
+    def pod_pieces_window(self) -> None:
+        """`opponents.pod_phase`'s optional hook, right after
+        `respond_to_pieces`: an answer on top of the library, cast through
+        Bolas's Citadel at a piece landing for an opponent going off
+        (§0z160, `citadel_pod_window`). No-op without the Citadel."""
+        citadel_pod_window(self, "pieces")
 
     def response_pay(self, cost, dry=False, now=False) -> bool:
         """Pay `cost` with the mana you held up through the pod's turn
@@ -626,15 +648,8 @@ def konrad_mill(g) -> None:
     and one CRN draw (`konrad_mill`)."""
     if not g.cfg.get("konrad_text", True) or not g.has("Syr Konrad, the Grim"):
         return
-    share = g.cfg.get("pod_creature_card_share", 0.33)
     while draw_is_safe(g, 1) and pay_cost(g, {"gen": 1, "B": 1}):
-        g.m["konrad_mills"] += 1
-        top = g.library.pop()
-        g.graveyard.append(top)
-        konrad_card(g, top)
-        for _ in OPP.living(g):
-            if crn_random(g, "konrad_mill") < share:
-                konrad_card(g, KONRAD_POD_CREATURE)
+        konrad_mill_one(g)
         if g.result is not None:
             return
 
@@ -1311,6 +1326,12 @@ def gingerbrute_sacrifices(g):
 
 def end_step(g):
     """Beginning of your end step."""
+    # NECROPOTENCE: "Put that card into your hand at the beginning of your
+    # next end step" -- the cards Bolas's Citadel's dig exiled to get past
+    # the top (`citadel_skip`). Empty without the Citadel.
+    if g.necro_exiled:
+        g.hand.extend(g.necro_exiled)
+        g.necro_exiled.clear()
     # Cosmos Elixir: "draw a card if your life total is greater than your
     # starting life total. OTHERWISE, you gain 2 life." Previously this fired
     # in upkeep, keyed off lifegain_triggers > 0 rather than the life total,
@@ -1507,61 +1528,353 @@ def citadel_land_step(g):
         after_land_enters(g, perm)
 
 
+CITADEL = "Bolas's Citadel"
+TOP = "Sensei's Divining Top"
+
+
+def citadel_allin_now(g) -> bool:
+    """Is this YOUR turn's dig the all-in one (§0z160, condition 4)?
+
+    THE POLICY IS THE CARD, so every knob here is said out loud whenever the
+    Citadel's number is quoted:
+
+      citadel_allin       "never" (default) | "always" | "life" | "outs"
+      citadel_allin_life  "life"/"outs": only when this turn BEGAN at this
+                          much life or more (0)
+      citadel_allin_outs  "outs": only when the library holds at least this
+                          many one-card wins, `citadel_outs` (1)
+      citadel_allin_turn  DIAGNOSTIC: all-in on this one turn and no other,
+                          whatever `citadel_allin` says. It is how
+                          `diagnostics/run_citadel_allin.py` asks "at THIS life,
+                          on THIS board, is going to 1 worth it?" -- the same
+                          seed replayed, so the games are identical up to the
+                          turn the policy differs on.
+
+    All-in means the dig runs to `citadel_allin_floor` (1) instead of
+    `citadel_life_floor` (10), and that it will cast a card it would
+    otherwise stop at -- Debt to the Deathless for nothing, an answer with no
+    target, and with `citadel_allin_wipes` your own sweeper -- to see the
+    card under it. The life read is the turn's START (`g.turn_life`), so the
+    decision does not flip half way down the dig."""
+    t = g.cfg.get("citadel_allin_turn")
+    if t is not None:
+        return g.turn == t
+    pol = g.cfg.get("citadel_allin", "never")
+    if pol == "never":
+        return False
+    if pol == "always":
+        return True
+    life_ok = g.turn_life >= g.cfg.get("citadel_allin_life", 0)
+    if pol == "life":
+        return life_ok
+    if pol == "outs":
+        return life_ok and citadel_outs(g) >= g.cfg.get("citadel_allin_outs", 1)
+    raise ValueError(f"citadel_allin: unknown policy {pol!r}")
+
+
+def citadel_floor(g) -> float:
+    """The life YOUR turn's dig keeps: what it is LEFT with, not what it pays."""
+    if citadel_allin_now(g):
+        return g.cfg.get("citadel_allin_floor", 1.0)
+    return g.cfg.get("citadel_life_floor", 10.0)
+
+
+def citadel_outs(g) -> int:
+    """How many cards in the library win THIS TURN on their own: the missing
+    half of a loop whose other half is on the battlefield (COMBO_A_CARDS with
+    COMBO_B or DRAIN_ON_GAIN), plus Enlightened Tutor when the missing half
+    is an enchantment or artifact it can put on top for the dig.
+
+    FAIR KNOWLEDGE, and only that: the pilot knows the library's CONTENTS --
+    the list minus every card they have seen -- but not its order. Counting
+    is fair; asking where the cards sit would not be. A DRAIN_ON_GAIN half
+    needs a lifegain event after it lands, which this deck makes constantly
+    (Soul Warden sees it enter); Vizkopa needs {1}{W}{B}. Both are counted,
+    so this is a pilot's count, not a proof of a win."""
+    drain = g.cfg.get("exquisite_drain_loop", True)
+    partners = COMBO_B + (DRAIN_ON_GAIN if drain else ())
+    have_a = has_combo_a(g)
+    have_b = any(g.has(x) for x in partners)
+    if have_a == have_b:
+        return 0                     # neither half, or the loop is already out
+    want = set(partners) if have_a else set(COMBO_A_CARDS)
+    hits = [c for c in g.library if c.name in want]
+    n = len(hits)
+    if any(c.types & {"Artifact", "Enchantment"} for c in hits) and any(
+            c.name == "Enlightened Tutor" for c in g.library):
+        n += 1
+    return n
+
+
+def citadel_cost(g, card) -> float:
+    """The life the Citadel charges: the card's mana value WITH X = 0.
+
+    CR 107.3b: a spell with {X} in its mana cost, cast "while paying neither
+    its mana cost nor an alternative cost that includes X" has X = 0, and
+    the Citadel's own Scryfall ruling says so in as many words (2019-05-03:
+    "you must choose 0 as the value of X"). Life equal to mana value is an
+    alternative cost that does not include X. So `free_mv`, and Debt to the
+    Deathless costs 4 life and drains 0. Until §0z160 this charged `mv` -- 7
+    -- and resolved Debt at X = 3: an 18-point drain for 7 life that the card
+    cannot make. `citadel_x0=False` restores that."""
+    if g.cfg.get("citadel_x0", True):
+        return card.free_mv
+    return float(card.mv)
+
+
+def citadel_dead(g, card):
+    """Why the dig would rather NOT cast `card` off the top, or None:
+
+      "wipe"  your own sweeper the wipe gate refuses (§0z104), or an overload
+              card whose single-target mode has nothing to hit (§0z118) --
+              off the top it cannot be overloaded, the life is the
+              alternative cost (the Citadel's ruling: no second one)
+      "x0"    a card whose whole effect is its X, which is 0 here
+      "held"  an answer the main phase would hold: nothing it hits is out
+              (`OPP.hold_answer`). Asked only with `citadel_skip` on, since
+              without a way past it the dig casts it, as it always did.
+
+    A Damn whose single-target mode IS ready is not dead: it is cast for 2
+    life as "destroy target creature" (`citadel_damn_single`), the mode the
+    main phase has cast since §0z138 and the dig could not reach."""
+    if "wipe" in card.tags:
+        if (g.cfg.get("citadel_damn_single", True) and OPP.overload_only(g, card)
+                and OPP.single_target_ready(g, card)):
+            g.single_mode = card
+            return None
+        if (g.cfg.get("wipe_gate_all_casts", True)
+                and not OPP.should_cast_own_wipe(g, card)):
+            return "wipe"
+        if OPP.overload_only(g, card):
+            return "wipe"
+        return None
+    if card.x_pips and g.cfg.get("citadel_x0", True):
+        return "x0"
+    if g.cfg.get("citadel_skip", True) and OPP.hold_answer(g, card):
+        return "held"
+    return None
+
+
+def konrad_mill_one(g) -> None:
+    """One activation of Syr Konrad's "{1}{B}: Each player mills a card.",
+    already paid for: your top card, then each opponent's (`konrad_mill`)."""
+    g.m["konrad_mills"] += 1
+    top = g.library.pop()
+    g.graveyard.append(top)
+    konrad_card(g, top)
+    share = g.cfg.get("pod_creature_card_share", 0.33)
+    for _ in OPP.living(g):
+        if crn_random(g, "konrad_mill") < share:
+            konrad_card(g, KONRAD_POD_CREATURE)
+
+
+def top_perm(g):
+    """An untapped Sensei's Divining Top, or None."""
+    return next((p for p in g.board
+                 if p.card.name == TOP and not p.tapped), None)
+
+
+def citadel_skip(g, floor: float) -> bool:
+    """GET PAST THE TOP CARD without casting it (§0z160, condition 5). A land
+    with no land drop, a card the floor cannot pay for, or a dead one
+    (`citadel_dead`) stopped the dig; with these it does not have to.
+    Cheapest way first, and each is one card's text:
+
+      SENSEI'S DIVINING TOP  "{T}: Draw a card, then put this artifact on top
+          of its owner's library." The blocker goes to HAND; Top is now on top
+          and the dig casts it again for 1 life (MV 1) -- untapped, an
+          artifact, so it can do it again. The Citadel's oldest line: your
+          library for one life a card, and every recast is a spell cast
+          (Aetherflux Reservoir). Main phase only, because recasting an
+          artifact is sorcery speed, and only when the floor has the 1 life
+          for that recast.
+      NECROPOTENCE  "Pay 1 life: Exile the top card of your library face
+          down. Put that card into your hand at the beginning of your next
+          end step." To hand at the end step (`g.necro_exiled`).
+      SYR KONRAD  "{1}{B}: Each player mills a card." Mana, not life, but the
+          card is gone.
+      ENLIGHTENED TUTOR, from hand for {W}: its search SHUFFLES, so the
+          blocker leaves the top, and it puts the wanted artifact or
+          enchantment there for the dig.
+
+    Optional, so `draw_is_safe` (§0z42) guards each, as it guards every
+    optional draw and Konrad's own mill. `citadel_skip=False` is the old dig,
+    which stopped."""
+    if not g.cfg.get("citadel_skip", True) or len(g.library) < 2:
+        return False
+    if not draw_is_safe(g, 1):
+        return False
+    top = top_perm(g)
+    if top is not None and g.your_life - 1 >= floor:
+        top.tapped = True
+        g.draw(1)
+        g.board.remove(top)
+        g.library.append(top.card)
+        g.m["citadel_skips_top"] += 1
+        return True
+    if g.has("Necropotence") and g.your_life - 1 >= floor:
+        g.necro_exiled.append(g.library.pop())
+        g.your_life -= 1
+        g.m["necro_life_paid"] += 1
+        g.m["citadel_skips_necro"] += 1
+        return True
+    if (g.cfg.get("konrad_text", True) and g.has("Syr Konrad, the Grim")
+            and pay_cost(g, {"gen": 1, "B": 1})):
+        konrad_mill_one(g)
+        g.m["citadel_skips_konrad"] += 1
+        return True
+    tutor = next((c for c in g.hand if c.name == "Enlightened Tutor"), None)
+    if tutor is not None and pay_cost(g, reduce_cost(g, tutor)):
+        # "Search your library for an artifact or enchantment card, reveal
+        # it, then shuffle and put that card on top." The shuffle takes the
+        # blocker off the top and the card it puts there is the one the
+        # want order asks for -- the missing half of a loop first
+        # (`KarlovGame.want_tier`). Cast from hand, so it is a spell like any
+        # other: counterable, and a cast trigger.
+        remove_card(g.hand, tutor)
+        g.m["mana_spent"] += sum(reduce_cost(g, tutor).values())
+        idx = g.spells_this_turn
+        g.spells_this_turn += 1
+        g.m["citadel_skips_tutor"] += 1
+        if OPP.countered(g, tutor, idx):
+            g.m["countered"] += 1
+            g.graveyard.append(tutor)
+            countered_cast_triggers(g, tutor)
+            konrad_card(g, tutor)
+            return True
+        resolve(g, tutor)
+        return True
+    return False
+
+
+def citadel_spin(g, floor: float) -> bool:
+    """SENSEI'S DIVINING TOP for the dig: "{1}: Look at the top three cards
+    of your library, then put them back in any order." Once per dig, on
+    mana the main phase left, BEFORE the first card is taken.
+
+    The order is the dig's, not the draw step's (`engine.stack_top` orders
+    for the draw): the shared want order, then stably by what the dig can
+    use -- one land first while a land drop is left, then the spells the
+    floor can pay for, then those it cannot, then the dead and the second
+    land. A card on top the dig cannot take ends it or costs a skip, so the
+    order is worth life. `citadel_spin=False` is the old dig."""
+    if (not g.cfg.get("citadel_spin", True) or top_perm(g) is None
+            or len(g.library) < 2 or not pay_cost(g, {"gen": 1})):
+        return False
+    k = min(3, len(g.library))
+    cards = g.library[-k:]
+    del g.library[-k:]
+    land_ok = g.land_drops_used < g.land_drops
+    land_first = []
+
+    def bucket(c):
+        if c.is_land:
+            if land_ok and not land_first:
+                land_first.append(c)
+                return 0
+            return 3
+        if g.your_life - citadel_cost(g, c) < floor:
+            return 2
+        return 1
+    order = sorted(want_order(g, cards), key=bucket)
+    g.library.extend(reversed(order))
+    g.m["citadel_spins"] += 1
+    return True
+
+
+def citadel_cast(g, top, cost: float, idx=None) -> None:
+    """Cast the top card for `cost` life: the ONE cast path off the top, for
+    your main phases and the pod's turn. `idx` is the counter roll's slot
+    (the pod's turn passes its own); None takes the next of your turn's.
+    THE SPELL IS STILL COUNTERABLE: it is cast, so it goes through
+    `OPP.countered` like any other."""
+    g.library.pop()
+    g.your_life -= cost
+    g.m["citadel_life_spent"] += cost
+    g.m["citadel_casts"] += 1
+    if idx is None:
+        idx = g.spells_this_turn
+        g.spells_this_turn += 1
+    if OPP.countered(g, top, idx):
+        g.m["countered"] += 1
+        g.graveyard.append(top)
+        if top.name in g.cfg.get("watch", ()):
+            g.m["test_card_countered"] += 1
+            g.m["test_card_answered"] += 1
+        countered_cast_triggers(g, top)
+        konrad_card(g, top)      # from the stack, §0z153
+        return
+    resolve(g, top, x0=bool(top.x_pips) and g.cfg.get("citadel_x0", True))
+
+
 def citadel_step(g):
-    """Bolas's Citadel: play off the TOP of the library, paying LIFE.
+    """Bolas's Citadel: play off the TOP of the library, paying LIFE. One
+    pass of YOUR main phase's dig; `citadel_main` repeats it.
 
     "You may play lands and cast spells from the top of your library. If you
     cast a spell this way, pay life equal to its mana value rather than pay
     its mana cost."
 
     THE POLICY IS THE CARD, and it is a judgement call rather than a
-    measurement — say `citadel_life_floor` out loud whenever this card's
-    number is quoted. The way the Citadel is actually piloted is to spend
-    LARGE amounts of life digging toward a combo or a board the table cannot
-    beat, not to cast one cheap spell and stop. A conservative floor would
-    assert the card is a value engine, which is the same class of error as
-    the four POLICY corrections in CLAUDE.md — each of them a decision about
-    piloting, written down as conservatism, that amounted to asserting a card
-    does nothing. So the default digs until life would drop to 10.
+    measurement -- say the floor out loud whenever this card's number is
+    quoted (`citadel_floor`: 10 by default, `citadel_allin` for the dig that
+    goes to 1). The way the Citadel is actually piloted is to spend LARGE
+    amounts of life digging toward a combo or a board the table cannot beat,
+    not to cast one cheap spell and stop. A conservative floor would assert
+    the card is a value engine, which is the class of error of every POLICY
+    correction in CLAUDE.md.
 
     This is the deck that can afford it: karlov gains 55.9 life a game and its
     life-share of losses is the lowest of the three measured (0.20). Life here
-    is a RESOURCE, and since §0z7/§0i it is a real one — life costs are
+    is a RESOURCE, and since §0z7/§0i it is a real one -- life costs are
     charged, so the dig is priced rather than free.
 
-    Three things are faithful and worth stating:
+    Faithful, and worth stating:
 
-      LIBRARY ORDER IS FORCED. You cannot reorder the top, so this casts in
-      the order the shuffle produced and STOPS at the first card it will not
-      pay for. It does not scan ahead for the combo piece.
-      IT PAYS MANA VALUE, NOT COST. `Card.free_mv` is the wrong quantity here
-      (it subtracts X); the card says mana value, so `mv` is right.
-      THE SPELL IS STILL COUNTERABLE. It is cast, not put onto the
-      battlefield, so it goes through `OPP.countered` like any other.
+      LIBRARY ORDER IS FORCED. You cannot reorder the top except with a card
+      that says so (Sensei's Divining Top, `citadel_spin`), so this casts in
+      the order the shuffle produced. What stops it -- a land with no land
+      drop, a card the floor cannot pay, a dead card -- it gets past only
+      with a card that says it can (`citadel_skip`), else it STOPS. It never
+      scans ahead for the combo piece.
+      IT PAYS MANA VALUE WITH X = 0 (`citadel_cost`, CR 107.3b).
+      THE SPELL IS STILL COUNTERABLE (`citadel_cast`).
 
-    **IT WAS CALLED A CEILING FOR QUEUED ITEM 17, AND THAT IS NOW MEASURED
-    AND FALSE** (§0z42, 2026-09-22). Decking loses now, and on the staged
-    karlov list, Citadel in, the rule changed NOTHING: N=15,000 games at each
-    of T10 and T20, identical game for game on every metric with and without
-    it. The dig stops at a land it cannot play and at the life floor long
-    before the library runs out, and these games end around turn 12. The
-    Citadel's number stands as measured.
+    **IT WAS CALLED A CEILING FOR QUEUED ITEM 17, AND THAT WAS MEASURED AND
+    FALSE** (§0z42, 2026-09-22): decking loses, and the dig stopped at a land
+    or the floor long before the library ran out. Every way past the top this
+    adds is an OPTIONAL draw or mill, so `draw_is_safe` guards it.
 
     Returns True if it did anything, so the caller can run `main_phase` again
     for what the dig unlocked. Returns False instantly when the card is not on
-    the battlefield, which is what keeps every Citadel-less game — and so
-    every other deck and every existing karlov number — bit-identical.
+    the battlefield, which is what keeps every Citadel-less game -- and so
+    every other deck and every Citadel-less karlov number -- bit-identical.
     """
-    if not g.has("Bolas's Citadel"):
+    if not g.has(CITADEL):
         return False
-    floor = g.cfg.get("citadel_life_floor", 10.0)
+    floor = citadel_floor(g)
+    allin = citadel_allin_now(g)
     did = False
+    citadel_spin(g, floor)
     while g.library and g.result is None:
+        # A CARD TAKEN OFF THE TOP LEAVES THE LIBRARY AS A DRAW DOES, and
+        # the next draw step from an empty one loses (§0z42). With Top
+        # looping, the dig can now get there; the pilot stops where every
+        # optional draw stops, `decking_reserve` cards from the bottom.
+        # `citadel_decking_guard=False` is the dig that never asked.
+        if (g.cfg.get("citadel_decking_guard", True)
+                and not draw_is_safe(g, 1)):
+            g.m["citadel_stop_library"] += 1
+            break
         top = g.library[-1]
         if top.is_land:
             # "You may play LANDS ... from the top" — it uses the land drop,
             # so it competes with the land already played from hand.
             if g.land_drops_used >= g.land_drops:
+                if citadel_skip(g, floor):
+                    did = True
+                    continue
+                g.m["citadel_stop_land"] += 1
                 break
             g.library.pop()
             perm = enter_land(g, top)      # its own entry rule (§0z115)
@@ -1577,44 +1890,37 @@ def citadel_step(g):
             after_land_enters(g, perm)
             did = True
             continue
-        cost = float(top.mv)
+        cost = citadel_cost(g, top)
         # The floor is a floor on what you are LEFT with, not on what you pay.
         if g.your_life - cost < floor:
+            if citadel_skip(g, floor):
+                did = True
+                continue
+            g.m["citadel_stop_floor"] += 1
             break
         # YOUR OWN SWEEPER IS A CHOICE (§0z104): "you MAY cast spells from
-        # the top". The main phase asks the wipe gate and this dig did not,
-        # so a Damn on top wiped a board the pilot was winning with -- 38 of
-        # this deck's 439 own wipes. A wipe the gate refuses STOPS the dig,
-        # as an unplayable land does: the order is forced.
-        # `wipe_gate_all_casts=False` restores the old dig.
-        if ("wipe" in top.tags and g.cfg.get("wipe_gate_all_casts", True)
-                and not OPP.should_cast_own_wipe(g, top)):
-            g.m["citadel_wipe_held"] += 1
-            break
-        # Life INSTEAD of the mana cost is an alternative cost, and so is
-        # overload: off the top, Damn is "destroy target creature" -- blind
-        # here -- so the pilot keeps the wrath to draw rather than spend it
-        # as a 1-for-1 this model cannot see (§0z118).
-        if "wipe" in top.tags and OPP.overload_only(g, top):
-            g.m["citadel_wipe_held"] += 1
-            break
-        g.library.pop()
-        g.your_life -= cost
-        g.m["citadel_life_spent"] += cost
-        g.m["citadel_casts"] += 1
+        # the top". A Damn on top once wiped a board the pilot was winning
+        # with -- 38 of this deck's 439 own wipes. A wipe the gate refuses
+        # STOPS the dig unless something gets past it. Off the top Damn is
+        # "destroy target creature" (the life is its alternative cost, so no
+        # overload, §0z118), cast as that when it has a target.
+        why = citadel_dead(g, top)
+        if why is not None:
+            if citadel_skip(g, floor):
+                g.single_mode = None
+                did = True
+                continue
+            if why == "wipe" and not (allin and g.cfg.get("citadel_allin_wipes",
+                                                          False)):
+                g.m["citadel_wipe_held"] += 1
+                break
+            if why == "x0" and not allin:
+                g.m["citadel_x0_held"] += 1
+                break
+            # "held", or all-in: cast it anyway to see the card under it.
+            g.m[f"citadel_dead_cast_{why}"] += 1
+        citadel_cast(g, top, cost)
         did = True
-        idx = g.spells_this_turn
-        g.spells_this_turn += 1
-        if OPP.countered(g, top, idx):
-            g.m["countered"] += 1
-            g.graveyard.append(top)
-            if top.name in g.cfg.get("watch", ()):
-                g.m["test_card_countered"] += 1
-                g.m["test_card_answered"] += 1
-            countered_cast_triggers(g, top)
-            konrad_card(g, top)      # from the stack, §0z153
-            continue
-        resolve(g, top)
         if g.result is not None:
             return did
     # "{T}, Sacrifice ten nonland permanents: Each opponent loses 10 life."
@@ -1624,7 +1930,7 @@ def citadel_step(g):
     # "I am about to lose anyway". The 10 is per opponent, so the pod total is
     # 10 * pod_size and `deal_pod_damage` divides it back out (§0z9).
     citadel = next((p for p in g.board
-                    if p.card.name == "Bolas's Citadel" and not p.tapped), None)
+                    if p.card.name == CITADEL and not p.tapped), None)
     if citadel is not None and g.result is None:
         fodder = [p for p in g.board if not p.card.is_land]
         alive = OPP.living(g)
@@ -1635,6 +1941,119 @@ def citadel_step(g):
             g.deal_pod_damage(10.0 * OPP.pod_size(g), each=True)
             g.m["citadel_drains"] += 1
     return did
+
+
+def citadel_main(g) -> None:
+    """The dig and the main phase, AS OFTEN AS EITHER UNLOCKS THE OTHER
+    (§0z160, condition 1). The dig can put a land on the battlefield (mana),
+    a card in hand (Top), a tutor's target on top; the main phase can put a
+    card on top (Enlightened Tutor) or spend the mana a spin wanted. One
+    pass each, as before §0z160, left the second half on the table.
+    `citadel_main_loop=False` is the one pass. No-ops without the Citadel."""
+    while citadel_step(g):
+        main_phase(g)
+        if g.result is not None or not g.cfg.get("citadel_main_loop", True):
+            return
+
+
+def citadel_pod_window(g, when: str) -> int:
+    """INSTANTS OFF THE TOP ON THE POD'S TURN (§0z160, condition 2). The
+    Citadel's permission has no timing of its own -- "You must follow the
+    normal timing permissions and restrictions of the cards you play from
+    your library" (Scryfall ruling, 2019-05-03) -- so an instant on top can
+    be cast whenever an instant can. Until §0z160 the dig ran in your main
+    phase only, which made every instant on top wait for your turn.
+
+    `when` is the window, and each matches the hand's (`opponents.py`):
+
+      "pieces"  a route piece is landing for an opponent who is GOING OFF
+                this round (`respond_to_pieces`'s window, before the clocks
+                fire): an answer on top that hits it is cast at it.
+      "end"     the end of the pod's round (`end_step_answers`'s): an answer
+                on top is cast at a piece that is out (`end_step_target`'s
+                aim); any other instant on top -- Enlightened Tutor, Benevolent
+                Offering -- is cast for its own sake.
+
+    An answer with nothing to hit is LEFT ON TOP: you draw it and hold it,
+    which is what the hand does. No lands (not your turn) and no skips (a
+    land drawn next turn is not a loss). The floor is the value dig's,
+    `citadel_life_floor`: going to 1 is a decision about winning on YOUR
+    turn, and an instant on theirs does not win. A response is cast, so its
+    cast triggers fire (Aetherflux counts the spells of THIS turn, the
+    pod's); the pod does not counter a response, as `respond_to_pieces`'
+    own responses are not countered. `citadel_pod_instants=False` is the old
+    main-phase-only dig."""
+    if (not g.cfg.get("citadel_pod_instants", True) or g.result is not None
+            or not g.has(CITADEL)):
+        return 0
+    floor = g.cfg.get("citadel_life_floor", 10.0)
+    n = 0
+    while g.library and g.result is None and draw_is_safe(g, 1):
+        top = g.library[-1]
+        if "Instant" not in top.types or "wipe" in top.tags:
+            break
+        cost = citadel_cost(g, top)
+        if g.your_life - cost < floor:
+            break
+        reach = OPP.ANSWERS.get(top.name)
+        if reach is None:
+            if when != "end":
+                break
+            own = g.spells_this_turn
+            g.pod_spells += 1
+            g.spells_this_turn = g.pod_spells   # Aetherflux: THIS turn
+            try:
+                citadel_cast(g, top, cost, idx=own + g.pod_spells - 1)
+            finally:
+                g.spells_this_turn = own
+            g.m["citadel_pod_casts"] += 1
+            n += 1
+            continue
+        if not (OPP.responses_on(g) and OPP.pod_threats_on(g)):
+            break
+        if when == "pieces":
+            def aim():
+                return citadel_piece_target(g, reach)
+        else:
+            def aim():
+                return OPP.end_step_target(g, reach)
+        if aim() is None:
+            break
+        g.library.pop()
+        g.your_life -= cost
+        g.m["citadel_life_spent"] += cost
+        g.m["citadel_casts"] += 1
+        g.m["citadel_pod_casts"] += 1
+        g.m[f"citadel_pod_answers_{when}"] += 1
+        own = g.spells_this_turn
+        g.pod_spells += 1
+        g.spells_this_turn = g.pod_spells
+        try:
+            cast_triggers(g, top)
+        finally:
+            g.spells_this_turn = own
+        OPP.spell_life_loss(g, top)
+        g.graveyard.append(top)
+        for _ in range(reach.n):
+            pick = aim()
+            if pick is None:
+                break
+            OPP.remove_threat_piece(g, *pick)
+        n += 1
+    return n
+
+
+def citadel_piece_target(g, reach):
+    """`respond_to_pieces`' aim, for one answer: a piece landing THIS pod
+    turn for an opponent whose kill fires this round, that `reach` hits."""
+    t = OPP.pod_turn(g)
+    for o in OPP.living(g):
+        if o.kill_turn > t:
+            continue
+        for k, lands in enumerate(o.piece_lands):
+            if lands == t and OPP.hits(reach, o.pieces[k]):
+                return o, k
+    return None
 
 
 def cast_triggers(g, card):
@@ -1671,7 +2090,9 @@ def countered_cast_triggers(g, card):
         cast_triggers(g, card)
 
 
-def resolve(g, card):
+def resolve(g, card, x0=False):
+    """`x0`: the spell was cast with X = 0 (CR 107.3b) -- Bolas's Citadel's
+    life is an alternative cost that does not include X (`citadel_cost`)."""
     g.m["spells_cast"] += 1
     if card.name in g.cfg.get("watch", ()):
         g.m["cast_test_card"] = 1
@@ -1687,7 +2108,11 @@ def resolve(g, card):
         drain(g, card.drain)
     if card.script == "benevolent_offering":
         benevolent_offering(g)
-    if card.script == "debt":
+    if card.script == "debt" and x0:
+        # X = 0: each opponent loses 0 and you gain 0, which is NO lifegain
+        # event (CR 119.9) -- nothing for Karlov or a drain to see.
+        g.m["debt_x0"] += 1
+    elif card.script == "debt":
         # "Each opponent loses two times X life. You gain life equal to the
         # life lost this way." With X=3 that is 6 per opponent, and the life
         # gain is ONE event for the total — not one event per opponent. The
@@ -2082,6 +2507,7 @@ def take_turn(g):
     g.in_draw_step = False
     g.wind_crystal_used = False
     g.life_gained_this_turn = 0.0
+    g.turn_life = g.your_life      # the Citadel's all-in policy reads it
     top_spin(g, "left_up")         # the pod's end step: mana left up
     for p in g.board:
         p.tapped = False
@@ -2112,11 +2538,10 @@ def take_turn(g):
     main_phase(g)
     # AFTER the free casts and BEFORE combat: you spend mana first because it
     # costs no life, then dig with the Citadel, then attack with whatever the
-    # dig put on the board. The second `main_phase` only runs if the dig
-    # actually cast something, so a game without the Citadel takes exactly the
-    # calls it always did and reproduces to the digit.
-    if citadel_step(g):
-        main_phase(g)
+    # dig put on the board. `main_phase` runs again only when the dig did
+    # something, so a game without the Citadel takes exactly the calls it
+    # always did and reproduces to the digit.
+    citadel_main(g)
     if g.result is not None:
         return
     jitte_equip(g)                 # sorcery speed: the end of main phase 1
@@ -2127,6 +2552,13 @@ def take_turn(g):
     main_phase(g)
     if g.result is not None:
         return
+    # THE SECOND MAIN PHASE DIGS TOO (§0z160, condition 1): combat's lifelink
+    # and Karlov's triggers are life the first dig did not have. No-op
+    # without the Citadel; `citadel_main2=False` is the one dig a turn.
+    if g.cfg.get("citadel_main2", True):
+        citadel_main(g)
+        if g.result is not None:
+            return
     # Pearl Collector's lifelink sink, on mana the second main did not want.
     pearl_collector_lifelink(g, lambda c: pay_cost(g, c),
                              lambda p: has_lifelink(g, p))
@@ -2166,8 +2598,10 @@ def take_turn(g):
     if g.cfg.get("opponents", True):
         # One order for six engines (§0z30): damage, clocks, THEN removal.
         # This engine ran removal first until 2026-09-17.
+        g.pod_spells = 0
         OPP.pod_phase(g, before_act=opponent_activity)
         karlov_exile_step(g)       # the end of the pod's round (§0z155)
+        citadel_pod_window(g, "end")   # instants off the top (§0z160)
 
 
 def simulate(deck, commander, cfg, seed):

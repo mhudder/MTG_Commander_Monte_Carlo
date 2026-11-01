@@ -212,6 +212,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z157](#0z157) | IMPLEMENTED | **Five cards from the owner's Reality Fracture / Star Trek review**, one per deck: Crusher, Avacyn of Horror, Captain Pike, Mr. Spock, Join the Collective. Pinned, smoked; the wipe gate prices returned bodies |
 | [0z158](#0z158) | FIXED | **Azusa's land animations held targets by bare id**, safe only under the central hold; `test_id_reuse --mutate` flaked on it 1 run in 6. Targets hold their lands now; case G pins it |
 | [0z159](#0z159) | MEASURED | **Candidate rows for §0z157's five** at N=15,000: Crusher, Avacyn of Horror and Spock significant at T10 and T20, Join the Collective at T20; Pike damage only (redundant top grants) |
+| [0z160](#0z160) | MEASURED | **Bolas's Citadel's dig to its text**: both main phases, the pod's turn, X = 0, ways past the top; swap +0.0100 / +0.0083. **Going to 1 for the win loses** below ~50 life |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14037,6 +14038,135 @@ slot, tivit1's caveat: both legs are a land short.
 **Next**: a head-to-head per card against a named cut whose row is evidence
 (the four with `both`), and for Pike a package ablation first.
 **PAUSED by the owner 2026-10-31**: queue item 28 holds the resume steps.
+
+<a id="0z160"></a>
+
+## 0z160. MEASURED -- Bolas's Citadel's dig, rebuilt to the card's text; and digging to 1 for the win does not pay
+
+**The owner, 2026-10-31**: "evaluate at what life value playing the card and
+digging as much as possible by paying life is worth it to win the game
+outright, even by going to 1 life. This requires aggressive use of both the
+life total, and options to manipulate the top deck, even casting
+instants/sorceries in unfavourable or neutral conditions." Five gaps named
+at the start of the session, each now a switch (`docs/KNOBS.md`):
+
+| # | gap | now | switch, old value |
+|---|---|---|---|
+| 1 | the dig ran once, before combat | `karlov.citadel_main`: both main phases, repeated while the dig and the main phase unlock each other | `citadel_main2`, `citadel_main_loop` = False |
+| 2 | no instants off the top on the pod's turn | `citadel_pod_window`: an answer at a piece landing for an opponent going off (a new optional hook, `pod_pieces_window`, after `respond_to_pieces`), and at the end of the round an answer at a piece that is out or any other instant | `citadel_pod_instants` = False |
+| 3 | **Debt to the Deathless cost 7 life and drained 6 each** | **CR 107.3b and the Citadel's own Scryfall ruling ("you must choose 0 as the value of X")**: life equal to mana value is an alternative cost that does not include X, so X = 0. `citadel_cost` charges `free_mv` (4), `resolve(x0=True)` drains 0 and gains 0, which is no lifegain event (CR 119.9). The value dig stops at it; all-in casts it to see the next card | `citadel_x0` = False |
+| 5 | nothing got past the top | `citadel_skip`, cheapest first: **Sensei's Divining Top**'s "{T}: Draw a card, then put this artifact on top" (the blocker to hand, Top recast for 1 life, main phase only), **Necropotence**'s pay 1 life (to hand at your next end step, `g.necro_exiled`), **Syr Konrad**'s {1}{B} mill, **Enlightened Tutor** from hand (its search shuffles). `citadel_spin`: Top's {1} orders the top three for the dig. Damn off the top is its single-target mode when that has a target (`citadel_damn_single`) -- no overload, the life is the alternative cost | `citadel_skip`, `citadel_spin`, `citadel_damn_single` = False |
+| 4 | one fixed floor | `citadel_allin_now`: `citadel_allin` "never" / "always" / "life" / "outs", to `citadel_allin_floor` (1); `citadel_allin_wipes` casts your own refused sweeper; `citadel_allin_turn` is the diagnostic's one-turn switch | defaults keep the old floor |
+
+Also new: **`citadel_decking_guard`** (on). With Top looping, the dig can
+reach the bottom of the library, and the next draw step loses (§0z42); it
+stops `decking_reserve` cards from the bottom, as every optional draw does.
+It moved nothing measurable (row `-guard`, 0.0000).
+
+**Every switch off is the old dig, bit for bit**: 2,000 staged karlov games at
+T20 against HEAD `5741c50`, every output key identical but the two new stop
+counters. Citadel-less games take the old path, and the other five decks'
+staged lists are identical on every key over 2,500 seeds against HEAD (Python
+3.13.16 / numpy 2.4.6). `tests/test_citadel_dig.py` pins A-M; its six
+mutations break exactly the sets written before the run.
+
+### What the dig is worth now
+
+`diagnostics/run_citadel_allin.py policies`, N=15,000 paired, seeds 5000..,
+the staged list, Python 3.11.17 (paired differences; the interpreter moves
+about one game in 15,000, §0z119). `results/citadel_allin_policies.txt`.
+`*` = significant:
+
+| row | T10 | T20 |
+|---|---|---|
+| **new dig - old dig** | **+0.0083 ±0.0016 *** | **+0.0065 ±0.0015 *** |
+| **-Swamp +Citadel, the new dig** | **+0.0100 ±0.0038 *** | **+0.0083 ±0.0042 *** |
+| -Swamp +Citadel, the old dig | +0.0017 ±0.0036 | +0.0019 ±0.0041 |
+| without the skips (Top, Necro, Konrad, Tutor) | -0.0054 ±0.0013 * | -0.0038 ±0.0012 * |
+| without the second main phase | -0.0027 ±0.0010 * | -0.0015 ±0.0007 * |
+| without X = 0 (Debt at X = 3 again) | +0.0010 ±0.0005 * | +0.0005 ±0.0005 * |
+| without Damn's single-target mode | -0.0001 ±0.0003 | -0.0005 ±0.0004 * |
+| without the spin, the loop, the pod's turn, the guard | 0.0000 | 0.0000 |
+
+**The staged swap was inside its bars at both horizons on the old dig** (it
+read +0.0008 / +0.0048 on 3.13 in §0z143), and the card's text is what moved
+it. The skips are most of it, because of what stops the dig: per game,
+**a land with no land drop 0.32, the floor 0.09, a refused wipe 0.05, Debt
+0.01** (`citadel_stop_*`, 6,000 games) -- **68% of stops are a land**. X = 0
+is a correction AGAINST the card (the old reading drained 18 for 7 life).
+The pod's-turn window is real and almost never has work: the main phases dig
+through any instant on top first, so the round ends with a blocker there --
+three instants on top in 112 pod rounds with the Citadel out.
+
+### The owner's question: at what life is going to 1 worth it?
+
+**The floor**: 5 is +0.0017 ±0.0010 at T10 and 0.0000 at T20 against 10; 15
+and 20 cost at both (-0.0023 and -0.0039 at T20). **All-in** ("always", to 1)
+is +0.0027 ±0.0013 at T10 and **-0.0015 ±0.0013 at T20**; "life" at 20, 30,
+40, 60 and "outs" at 1 or 2 are the same shape or smaller, and none is
+significant above zero at T20. Casting your own refused wipe to dig on adds
+nothing (-0.0017).
+
+**THE DECISION WHERE IT IS MADE** (`forks`, 60,000 seeds, 12,689 turns with the
+Citadel out, `results/citadel_allin_forks.txt`): each seed replayed with
+all-in on ONE turn, identical before it, the value dig after it. Win rate at
+T20, all-in minus value, paired:
+
+| turn began at | turns | P(win), value | all-in - value | won THAT turn: value / all-in |
+|---|---|---|---|---|
+| 0-9 | 1,191 | 0.673 | **-0.0521 ±0.0231** | 0.081 / 0.134 |
+| 10-19 | 1,626 | ~0.76 | -0.022 / -0.025 | ~0.10 / ~0.17 |
+| 20-29 | 2,293 | ~0.79 | -0.009 / **-0.016** | ~0.11 / ~0.14 |
+| 30-39 | 3,259 | 0.808 | -0.0034 ±0.0055 | 0.114 / 0.133 |
+| 40-49 | 1,855 | 0.844 | **-0.0059 ±0.0059** | 0.127 / 0.137 |
+| 50-69 | 1,342 | 0.849 | **+0.0060 ±0.0046** | 0.173 / 0.181 |
+| 70+ | 1,123 | 0.906 | +0.0009 ±0.0030 | 0.158 / 0.162 |
+| all | 12,689 | 0.804 | **-0.0113 ±0.0038** | 0.121 / 0.147 |
+
+(The 10-19 and 20-29 rows are two five-life bins each; the file has them.)
+**Going to 1 does win more games ON THE TURN** -- 14.7% of Citadel turns
+against 12.1% -- **and loses more games overall**, at every life below 50.
+The mechanism is the base rate: on the value dig this deck goes on to win
+80% of the games it has the Citadel out in, so an all-in that misses spends
+the life that was carrying a won game into the pod's next turn. With outs in
+the library (`citadel_outs`, a pilot's count of one-card wins) it is WORSE,
+not better (-0.041 at one out): those are exactly the games the value dig
+wins anyway. At 50+ the floor rarely binds and all-in mostly means casting
+the card the value dig stops at (Debt at X = 0); that is the one significant
+gain, +0.006.
+
+**ANSWER: in this model there is no life total at which digging to 1 for the
+outright win is worth it, except the high one (50-69) where the floor hardly
+binds anyway.** What limits the Citadel is the top of the library, not the
+life total: two thirds of digs stop at a land, and the only fix is a card
+that gets past it. **Defaults are unchanged** (`citadel_life_floor` 10,
+`citadel_allin` "never"); floor 5 is level at T20 and is the owner's to
+choose. Say both knobs out loud when quoting the Citadel's number.
+
+### Not modelled, and what would change the answer
+
+- **The pod's clock is not read.** The floor does not know whether the table
+  can deal 10 next round; a floor set from the pod's visible threat is the
+  natural next policy, and it is the only one that could change "never".
+- **Enlightened Tutor is not held for the Citadel**: the main phase casts it
+  on priority before the dig, so its skip fired 0 times. Ranger of Eos's and
+  Land Tax's shuffles are not used to clear a land on top.
+- **The sac-ten drain is still lethal-only**, a floor on that half.
+- Dawn of Hope and Well of Lost Dreams draw on lifegain as before; their draw
+  is not aimed at a land on top.
+
+**Caches**: karlov's baseline moved (the Citadel is staged), so its table is
+REBUILT -- `./tools/regen_tables.sh`, Python 3.13.16 / numpy 2.4.6 (the
+tables' interpreter), 7m12s; `repro_row` IDENTICAL on the Citadel. **One of
+64 rows moved beyond the wider bar: Bolas's Citadel, +0.0162 ±0.0028 ->
++0.0226 ±0.0029** against a blank. Two labels crossed at the floor:
+Necropotence `dmg` -> `both` (+0.0023 -> +0.0035, and it is now a way past
+the top) and Drana's Emissary `both` -> `dmg` (+0.0022 -> +0.0020).
+`opponents.py` gained an optional hook, so the other five are VERIFIED on
+the bit-identity above. (Tivit's staged list differs between `c7a1e02` and
+HEAD on three of those 2,500 seeds, in `threat_pieces_removed` and
+`threat_rounds_delayed` only: §0z155's stale-target fix, which that section
+records and accepted; HEAD against this tree is identical.)
 
 ## How to read an ablation table
 

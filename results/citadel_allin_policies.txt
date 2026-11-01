@@ -1,0 +1,51 @@
+Bolas's Citadel's dig (§0z160): N=15,000 paired, seeds 5000.., karlov as staged, python 3.11.17
+row = arm minus 'new' unless named; * = 95% CI excludes 0
+
+new - old  (the §0z160 dig vs the one before)     T10 +0.0083 +-0.0016*  T20 +0.0065 +-0.0015*  dmgT20 -0.10 +-0.10  lifeSpentT20 +0.56
+new - noCit  (-Swamp +Citadel, the new dig)       T10 +0.0100 +-0.0038*  T20 +0.0083 +-0.0042*  dmgT20 -0.29 +-0.26  lifeSpentT20 +1.70
+old - noCit  (-Swamp +Citadel, the old dig)       T10 +0.0017 +-0.0036   T20 +0.0019 +-0.0041   dmgT20 -0.18 +-0.25  lifeSpentT20 +1.15
+-x0 - new                                         T10 +0.0010 +-0.0005*  T20 +0.0005 +-0.0005*  dmgT20 +0.08 +-0.04  lifeSpentT20 +0.08
+-skip - new                                       T10 -0.0054 +-0.0013*  T20 -0.0038 +-0.0012*  dmgT20 +0.10 +-0.08  lifeSpentT20 -0.50
+-spin - new                                       T10 +0.0000 +-0.0000   T20 +0.0001 +-0.0003   dmgT20 +0.00 +-0.02  lifeSpentT20 -0.00
+-damn - new                                       T10 -0.0001 +-0.0003   T20 -0.0005 +-0.0004*  dmgT20 -0.04 +-0.02  lifeSpentT20 -0.02
+-loop - new                                       T10 -0.0001 +-0.0001   T20 -0.0001 +-0.0001   dmgT20 -0.00 +-0.02  lifeSpentT20 -0.00
+-main2 - new                                      T10 -0.0027 +-0.0010*  T20 -0.0015 +-0.0007*  dmgT20 +0.01 +-0.04  lifeSpentT20 -0.10
+-pod - new                                        T10 -0.0001 +-0.0002   T20 +0.0000 +-0.0000   dmgT20 -0.00 +-0.01  lifeSpentT20 -0.00
+-guard - new                                      T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   dmgT20 +0.00 +-0.00  lifeSpentT20 +0.00
+floor5 - new                                      T10 +0.0017 +-0.0010*  T20 +0.0000 +-0.0010   dmgT20 -0.01 +-0.07  lifeSpentT20 +0.09
+floor15 - new                                     T10 -0.0015 +-0.0009*  T20 -0.0023 +-0.0009*  dmgT20 -0.06 +-0.07  lifeSpentT20 -0.15
+floor20 - new                                     T10 -0.0053 +-0.0013*  T20 -0.0039 +-0.0012*  dmgT20 -0.01 +-0.09  lifeSpentT20 -0.32
+always - new                                      T10 +0.0027 +-0.0013*  T20 -0.0015 +-0.0013*  dmgT20 -0.21 +-0.09  lifeSpentT20 +0.20
+always_wipes - new                                T10 +0.0010 +-0.0016   T20 -0.0017 +-0.0016*  dmgT20 -0.24 +-0.11  lifeSpentT20 +0.40
+life20 - new                                      T10 +0.0014 +-0.0011*  T20 -0.0008 +-0.0010   dmgT20 -0.14 +-0.07  lifeSpentT20 +0.11
+life30 - new                                      T10 +0.0009 +-0.0008*  T20 +0.0001 +-0.0007   dmgT20 -0.07 +-0.06  lifeSpentT20 +0.07
+life40 - new                                      T10 +0.0005 +-0.0005   T20 +0.0001 +-0.0004   dmgT20 -0.03 +-0.03  lifeSpentT20 +0.04
+life60 - new                                      T10 +0.0002 +-0.0002   T20 +0.0001 +-0.0001   dmgT20 -0.01 +-0.01  lifeSpentT20 +0.01
+outs1 - new                                       T10 +0.0019 +-0.0012*  T20 -0.0019 +-0.0012*  dmgT20 -0.19 +-0.08  lifeSpentT20 +0.16
+outs2 - new                                       T10 +0.0015 +-0.0012*  T20 -0.0014 +-0.0011*  dmgT20 -0.19 +-0.08  lifeSpentT20 +0.14
+outs1_life20 - new                                T10 +0.0004 +-0.0010   T20 -0.0012 +-0.0009*  dmgT20 -0.13 +-0.07  lifeSpentT20 +0.09
+
+absolute, T20: arm  won  citadel_casts  citadel_life_spent
+  new           0.5479  0.680  1.70
+  old           0.5414  0.391  1.15
+  noCit         0.5395  0.000  0.00
+  -x0           0.5484  0.690  1.78
+  -skip         0.5441  0.419  1.20
+  -spin         0.5480  0.678  1.70
+  -damn         0.5473  0.672  1.69
+  -loop         0.5478  0.677  1.70
+  -main2        0.5463  0.635  1.61
+  -pod          0.5479  0.678  1.70
+  -guard        0.5479  0.680  1.70
+  floor5        0.5479  0.707  1.80
+  floor15       0.5456  0.620  1.56
+  floor20       0.5439  0.553  1.38
+  always        0.5464  0.739  1.90
+  always_wipes  0.5461  0.803  2.11
+  life20        0.5471  0.704  1.81
+  life30        0.5480  0.696  1.77
+  life40        0.5479  0.691  1.74
+  life60        0.5479  0.684  1.72
+  outs1         0.5460  0.735  1.87
+  outs2         0.5465  0.727  1.84
+  outs1_life20  0.5467  0.708  1.79

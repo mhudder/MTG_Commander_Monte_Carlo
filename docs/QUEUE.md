@@ -89,3 +89,17 @@ What is closed and where it went:
       Odo, Flickering Hound for tivit; Overlord of the Mistmoors, Khan for
       shilgengar; Benjamin Sisko, Omnath, Marwyn, Fblthp for azusa) are
       unrecorded ideas, not Proposals: none has verified text in a ledger.
+
+29. **Bolas's Citadel, after §0z160 (2026-10-31).** The dig follows the
+    card's text and is measured; digging to 1 for the win measured WORSE at
+    T20 at every policy tried, so the defaults are unchanged
+    (`citadel_life_floor` 10, `citadel_allin` "never"). Left, in order:
+    - **An owner call**: floor 5 is +0.0017 ±0.0010 at T10 and level at
+      T20 against 10. Adopting it moves karlov's baseline (a rebuild).
+    - **A floor that reads the pod's clock**: the one policy that could
+      change "never" -- keep the life the table can visibly deal next round,
+      spend the rest. Measure it with `diagnostics/run_citadel_allin.py`
+      as a new arm and in the forks.
+    - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
+      times: the main phase casts it first), and use Ranger of Eos's and
+      Land Tax's shuffles on a land on top. Two thirds of digs stop at one.

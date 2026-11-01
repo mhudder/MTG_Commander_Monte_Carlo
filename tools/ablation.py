@@ -413,12 +413,11 @@ SCRIPTED_KARLOV = {
     # (`karlov.lurrus_pool`). Companion does not apply in the 99.
     "Lurrus of the Dream-Den",
     # Bolas's Citadel (staged 2026-09-12). `karlov.citadel_step` plays lands
-    # and casts spells off the top paying LIFE = mana value, in forced library
-    # order, and `citadel_land_step` spends the land drop on a land on top so
-    # it does not block the dig. The sac-ten drain is implemented lethal-only,
-    # which is a floor on that half. It used to be called a CEILING for
-    # queued item 17 (nothing lost to decking); decking loses now and the
-    # karlov baseline did not move with it, so that caveat is closed (§0z42).
+    # and casts spells off the top paying LIFE = mana value with X = 0, in
+    # forced library order, in both main phases; Top, Necropotence, Konrad
+    # and Enlightened Tutor get past a card it cannot take; an instant on top
+    # is cast on the pod's turn (§0z160). `citadel_land_step` spends the land
+    # drop on a land on top. The sac-ten drain is lethal-only, a floor.
     "Bolas's Citadel",
     # lifegain engines
     "Soul Warden", "Soul's Attendant", "Suture Priest", "Auriok Champion",
