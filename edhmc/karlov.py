@@ -1588,16 +1588,19 @@ def citadel_allin_now(g) -> bool:
 def citadel_value_floor(g) -> float:
     """The VALUE dig's floor, by `citadel_floor_mode` (§0z161):
 
-      "fixed"  `citadel_life_floor` (10), whatever the table holds
-      "clock"  THE POD'S CLOCK: `citadel_clock_mult` (1) x the chip damage
+      "clock"  THE DEFAULT, ADOPTED BY THE OWNER 2026-11-01 (§0z161).
+               THE POD'S CLOCK: `citadel_clock_mult` (1) x the chip damage
                the next `citadel_clock_rounds` (1) rounds would deal you
                (`opponents.predicted_chip`, every input on the table), plus
                `citadel_clock_pad` (1), and never below `citadel_clock_min`
                (1). Pad 1 is "survive the swing I can see, by one".
+      "fixed"  `citadel_life_floor` (10), whatever the table holds: the
+               floor before §0z161, and what every Citadel number published
+               before 2026-11-01 was measured with.
 
     Recomputed for every card the dig takes, because the share of the pod's
     swing aimed at you grows with your board, and the dig grows it."""
-    mode = citadel_knob(g, "citadel_floor_mode", "fixed")
+    mode = citadel_knob(g, "citadel_floor_mode", "clock")
     if mode == "fixed":
         return citadel_knob(g, "citadel_life_floor", 10.0)
     if mode == "clock":

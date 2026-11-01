@@ -25,6 +25,8 @@ CASES
   O  the clock floor is that chip damage plus the pad, and the dig stops
      there rather than at 10
   P  `citadel_turn_cfg` sets a knob on its own turn and no other
+  Q  the default floor is the clock (adopted 2026-11-01): on a quiet
+     table (turn 2, no chip) a 12-life value dig casts two 4-drops
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   citadel_x0=False             -> A, B, C
@@ -33,7 +35,7 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   citadel_pod_instants=False   -> I
   citadel_spin=False           -> L
   citadel_decking_guard=False  -> D, M
-  citadel_floor_mode="fixed"   -> O
+  citadel_floor_mode="fixed"   -> O, Q
 
 UNMUTATED (§0z15): G is the old dig's own stop and holds with every knob
 off; J holds when the window is off too (nothing is cast either way); K is
@@ -77,9 +79,13 @@ def land(i, produces="C"):
                    is_land=True, produces=frozenset(produces))
 
 
-def fresh(board=(), library=(), life=40.0, **kw):
+def fresh(board=(), library=(), life=40.0, default_floor=False, **kw):
     """A karlov game on turn 2 (`pod_turn` < 3: nothing is countered), the
-    land drop spent, the Citadel on the battlefield."""
+    land drop spent, the Citadel on the battlefield. The mechanism cases
+    were written against a FIXED floor of 10, so that is pinned here unless
+    a case asks for the default (`default_floor`, case Q) or its own mode."""
+    if not default_floor:
+        kw.setdefault("citadel_floor_mode", "fixed")
     cfg = dict(DEFAULT_CFG, turns=20, opponents=False, **{**kw, **CFG})
     g = K.KarlovGame(list(DECK), CMD, cfg, 1)
     g.board = EN.Board()
@@ -212,6 +218,13 @@ def run_cases():
     g.turn = 3
     check("P citadel_turn_cfg is its own turn only",
           (on2, K.citadel_value_floor(g)), (10.0, 2.0))
+
+    g = fresh(library=[spell(i) for i in range(10)]
+              + [spell(90 + i, mv=4) for i in range(3)], life=12.0,
+              default_floor=True)
+    K.citadel_step(g)
+    check("Q the default floor is the clock: a quiet table digs to 4",
+          (g.m["citadel_casts"], g.your_life), (2, 4.0))
     return set(FAIL)
 
 
@@ -228,7 +241,7 @@ def main() -> int:
         ({"citadel_pod_instants": False}, {"I"}),
         ({"citadel_spin": False}, {"L"}),
         ({"citadel_decking_guard": False}, {"D", "M"}),
-        ({"citadel_floor_mode": "fixed"}, {"O"}),
+        ({"citadel_floor_mode": "fixed"}, {"O", "Q"}),
     ]
     print("MUTATION RUN -- exact sets\n")
     bad = 0

@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `91dabd9` from 32 engine sources.
+Derived at `ab19d07` from 32 engine sources.
 
 **337 knobs, 498 call sites.**
 
@@ -31,7 +31,7 @@ costs a written justification.
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:4121` in `simulate()`
   - `10` at `edhmc/engine.py:5131` in `simulate()`
-  - `20` at `edhmc/karlov.py:2653` in `simulate()`
+  - `20` at `edhmc/karlov.py:2656` in `simulate()`
   - `10` at `edhmc/lorehold.py:3204` in `simulate()`
   - `10` at `edhmc/opponents.py:228` in `make_pod()`
   - `20` at `edhmc/shilgengar.py:1602` in `simulate()`
@@ -85,16 +85,16 @@ show up first.
 | `castle_ardenvale` | `True` | 1 | `edhmc/shilgengar.py:1456` | §0z115 | **no** | yes |
 | `charge_life_costs` | `True` | 9 | `edhmc/azusa.py:1747` | §0z115 | yes | yes |
 | `citadel_allin_turn` | `<none>` | 1 | `edhmc/karlov.py:1571` | §0z160 | yes | yes |
-| `citadel_allin_wipes` | `False` | 1 | `edhmc/karlov.py:1952` | §0z118 | yes | yes |
-| `citadel_damn_single` | `True` | 1 | `edhmc/karlov.py:1679` | §0z138 | yes | yes |
-| `citadel_decking_guard` | `True` | 1 | `edhmc/karlov.py:1904` | §0z42 | yes | yes |
-| `citadel_main2` | `True` | 1 | `edhmc/karlov.py:2597` | §0z160 | yes | yes |
-| `citadel_main_loop` | `True` | 1 | `edhmc/karlov.py:1994` | §0z160 | yes | yes |
-| `citadel_pod_instants` | `True` | 1 | `edhmc/karlov.py:2025` | §0z160 | yes | yes |
-| `citadel_skip` | `True` | 2 | `edhmc/karlov.py:1691` | §0z138 | yes | yes |
-| `citadel_spin` | `True` | 1 | `edhmc/karlov.py:1799` |  | yes | yes |
+| `citadel_allin_wipes` | `False` | 1 | `edhmc/karlov.py:1955` | §0z118 | yes | yes |
+| `citadel_damn_single` | `True` | 1 | `edhmc/karlov.py:1682` | §0z138 | yes | yes |
+| `citadel_decking_guard` | `True` | 1 | `edhmc/karlov.py:1907` | §0z42 | yes | yes |
+| `citadel_main2` | `True` | 1 | `edhmc/karlov.py:2600` | §0z160 | yes | yes |
+| `citadel_main_loop` | `True` | 1 | `edhmc/karlov.py:1997` | §0z160 | yes | yes |
+| `citadel_pod_instants` | `True` | 1 | `edhmc/karlov.py:2028` | §0z160 | yes | yes |
+| `citadel_skip` | `True` | 2 | `edhmc/karlov.py:1694` | §0z138 | yes | yes |
+| `citadel_spin` | `True` | 1 | `edhmc/karlov.py:1802` |  | yes | yes |
 | `citadel_turn_cfg` | `<none>` | 1 | `edhmc/karlov.py:1541` | §0z161 | yes | yes |
-| `citadel_x0` | `True` | 3 | `edhmc/karlov.py:1658` | §0z138 | yes | yes |
+| `citadel_x0` | `True` | 3 | `edhmc/karlov.py:1661` | §0z138 | yes | yes |
 | `clamp_cap` | `4` | 1 | `edhmc/engine.py:3658` |  | **no** | **never** |
 | `clock_rearm` | `4` | 1 | `edhmc/opponents.py:3648` | §0z135 | yes | yes |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:200` |  | yes | yes |
@@ -192,7 +192,7 @@ show up first.
 | `incidental_rate` | `0.45` | 2 | `edhmc/opponents.py:3427` | §0z138 | yes | yes |
 | `invoke_mv_cap` | `6` | 1 | `edhmc/lorehold.py:2369` |  | **no** | yes |
 | `jays_discard` | `True` | 1 | `edhmc/tivit.py:974` | §0z153 | yes | yes |
-| `jitte_stale_holder` | `False` | 1 | `edhmc/karlov.py:2452` | §0z136 | yes | **never** |
+| `jitte_stale_holder` | `False` | 1 | `edhmc/karlov.py:2455` | §0z136 | yes | **never** |
 | `kalitas_text` | `True` | 1 | `edhmc/karlov.py:361` | §0z151 | yes | yes |
 | `kambal_batch` | `True` | 1 | `edhmc/tivit.py:308` | §0z118 | yes | yes |
 | `karlov_exile` | `True` | 1 | `edhmc/karlov.py:622` | §0z155 | yes | yes |
@@ -271,7 +271,7 @@ show up first.
 | `pod_brackets` | `(2, 3, 4)` | 1 | `edhmc/opponents.py:194` |  | yes | yes |
 | `pod_chump_floor` | `10` | 1 | `edhmc/opponents.py:2646` | §0z132 | yes | **never** |
 | `pod_clock_rounds` | `True` | 1 | `edhmc/opponents.py:933` | §0z86 | yes | yes |
-| `pod_creature_card_share` | `0.33` | 1 | `edhmc/karlov.py:1703` |  | yes | **never** |
+| `pod_creature_card_share` | `0.33` | 1 | `edhmc/karlov.py:1706` |  | yes | **never** |
 | `pod_damage_full_pod` | `True` | 1 | `edhmc/opponents.py:2963` | §0u | yes | yes |
 | `pod_grid_rounds` | `20` | 1 | `edhmc/opponents.py:228` | §0z93 | yes | yes |
 | `pod_reads_battlefield_creatures` | `True` | 1 | `edhmc/opponents.py:883` | §0z149 | yes | yes |
@@ -291,7 +291,7 @@ show up first.
 | `realms_text` | `True` | 1 | `edhmc/azusa.py:2259` | §0z19 | yes | yes |
 | `rearm_rule` | `'reland'` | 1 | `edhmc/opponents.py:516` | §0z137 | yes | yes |
 | `rebound` | `True` | 1 | `edhmc/lorehold.py:2265` |  | yes | yes |
-| `reclamation_life_floor` | `10` | 1 | `edhmc/karlov.py:2407` |  | yes | yes |
+| `reclamation_life_floor` | `10` | 1 | `edhmc/karlov.py:2410` |  | yes | yes |
 | `reservoir_any_time` | `True` | 1 | `edhmc/karlov.py:743` | §0z153 | yes | yes |
 | `reservoir_floor` | `15` | 1 | `edhmc/trostani.py:1499` |  | yes | **never** |
 | `resplendent_each_end` | `True` | 1 | `edhmc/shilgengar.py:1442` | §0z153 | yes | yes |
@@ -328,7 +328,7 @@ show up first.
 | `solemn_text` | `True` | 3 | `edhmc/engine.py:1788` | §0z133 | yes | yes |
 | `sorin_loyalty` | `True` | 2 | `edhmc/karlov.py:675` |  | yes | yes |
 | `sorin_power` | `True` | 1 | `edhmc/karlov.py:258` | §0z151 | yes | yes |
-| `soulmender_tap` | `True` | 2 | `edhmc/karlov.py:2367` |  | yes | yes |
+| `soulmender_tap` | `True` | 2 | `edhmc/karlov.py:2370` |  | yes | yes |
 | `speaker_taps` | `True` | 3 | `edhmc/shilgengar.py:1297` | §0z153 | yes | yes |
 | `spell_life_costs` | `True` | 2 | `edhmc/opponents.py:2224` | §0z138 | yes | yes |
 | `spock_text` | `True` | 2 | `edhmc/tivit.py:172` | §0z42 | **no** | yes |
@@ -374,7 +374,7 @@ show up first.
 | `wickerfolk_gy` | `True` | 1 | `edhmc/engine.py:4719` |  | yes | yes |
 | `wickerfolk_life_floor` | `10` | 1 | `edhmc/engine.py:4724` |  | yes | yes |
 | `wildspeaker_mode` | `'auto'` | 1 | `edhmc/azusa.py:2988` |  | **no** | yes |
-| `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1683` | §0z104 | yes | yes |
+| `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1686` | §0z104 | yes | yes |
 | `wipe_gate_measure` | `'cost'` | 2 | `edhmc/opponents.py:3697` | §0z106 | yes | yes |
 | `wipe_gate_piece_weight` | `1.0` | 1 | `edhmc/opponents.py:821` | §0z138 | yes | yes |
 | `wipe_gate_pieces` | `True` | 1 | `edhmc/opponents.py:819` | §0z138 | yes | yes |

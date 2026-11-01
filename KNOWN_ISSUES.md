@@ -14277,15 +14277,21 @@ about 9% of games and digs 0.21 turns a game: +0.0058 a turn x 0.21 is the
 +0.001 the forks predict, and the +0.0007 measured. The N=15,000 rows of
 the same arms are inside their bars at T20; it took 60,000 to see it.
 
-**Not adopted: the default is still "fixed" 10.** Adopting clock + 1 or + 2
-moves karlov's baseline (the Citadel is staged), so its table is rebuilt
-with it -- an owner call (item 29). Knobs to say out loud with any Citadel
+**ADOPTED BY THE OWNER, 2026-11-01: "yes, adopt the clock but keep the
+rebuild as a queued item, dont do it quite yet."** The default is now
+`citadel_floor_mode` "clock", `citadel_clock_pad` 1; "fixed" restores the
+floor of 10 every Citadel number before 2026-11-01 was measured on.
+Karlov's baseline moved (the Citadel is staged), so **karlov's table and
+cache are STALE BY DESIGN until the rebuild queued in item 29**, and
+`check_docs` fails on that one cache until then -- accepted. The Citadel
+swap's ledger numbers are floor-10 numbers. `tests/test_citadel_dig.py`'s
+mechanism cases pin "fixed" explicitly; Q pins the default. Knobs to say out loud with any Citadel
 number: `citadel_floor_mode`, `citadel_clock_pad`, and `incidental_rate`,
 which IS the clock this floor reads.
 
-**Caches**: `opponents.py` and `karlov.py` moved, and every default game is
-bit-identical (above), so every cache is VERIFIED on that evidence; no table
-moved.
+**Caches**: `opponents.py` and `karlov.py` moved, and every default game was
+bit-identical (above), so every cache was VERIFIED on that evidence. The
+adoption then moved karlov's alone (above).
 
 ## How to read an ablation table
 

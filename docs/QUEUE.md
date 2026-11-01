@@ -90,18 +90,21 @@ What is closed and where it went:
       shilgengar; Benjamin Sisko, Omnath, Marwyn, Fblthp for azusa) are
       unrecorded ideas, not Proposals: none has verified text in a ledger.
 
-29. **Bolas's Citadel, after §0z160 (2026-10-31).** The dig follows the
-    card's text and is measured; digging to 1 for the win measured WORSE at
-    T20 at every policy tried, so the defaults are unchanged
-    (`citadel_life_floor` 10, `citadel_allin` "never"). Left, in order:
-    - **An owner call**: floor 5 is +0.0017 ±0.0010 at T10 and level at
-      T20 against 10. Adopting it moves karlov's baseline (a rebuild).
-    - **A floor that reads the pod's clock: MEASURED (§0z161, 2026-11-01)**
-      and better than every fixed floor -- stop at the chip the table can
-      deal next round + 1 or 2: +0.0018 / +0.0007 at T10 / T20, N=60,000,
-      significant at both. **An owner call to adopt** (`citadel_floor_mode`
-      "clock", `citadel_clock_pad` 1 or 2); it replaces the floor-5 line
-      above, and either moves karlov's baseline (a rebuild).
+29. **Bolas's Citadel, after §0z160 and §0z161.** The dig follows the
+    card's text (§0z160); digging to 1 for the win measured worse at T20 at
+    every policy tried. **The clock floor is ADOPTED** (§0z161, the owner,
+    2026-11-01): the dig stops at the chip damage the pod can visibly deal
+    next round + 1 (`citadel_floor_mode` "clock", `citadel_clock_pad` 1),
+    +0.0018 / +0.0007 at T10 / T20 over floor 10, N=60,000. Left, in order:
+    - **THE KARLOV REBUILD, DEFERRED BY THE OWNER** ("keep the rebuild as a
+      queued item, dont do it quite yet"). The adoption moved karlov's
+      baseline, so its cache is STALE BY DESIGN and `check_docs` fails on
+      it until this runs. `DECKS=karlov ./tools/regen_tables.sh` on Python
+      3.13.16 / numpy 2.4.6 (the parallel-rebuild skill's venv recipe),
+      about 7 minutes; then `repro_row` a row, `--note` the cache, and
+      re-measure the -Swamp +Citadel swap on the clock floor
+      (`diagnostics/run_citadel_allin.py policies 15000 ... new noCit`)
+      into its ledger entry. Never clear it with `--verified`.
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.

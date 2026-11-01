@@ -15,7 +15,8 @@ before it), and the CARD under each dig, "new" - "noCit" and "old" - "noCit"
 both digs, so one noCit arm serves both).
 
 `forks`: THE DECISION ITSELF, asked where it is made. Each seed is played
-once on today's policy (the value dig, floor 10), and every turn whose dig
+once on today's policy (the value dig; floor 10 when these forks were run,
+the clock floor since 2026-11-01, §0z161), and every turn whose dig
 found the Citadel on the battlefield is logged with the life the turn BEGAN
 at and the outs the library held (`karlov.citadel_outs`). Then the same seed
 is replayed with `citadel_allin_turn` set to that turn: identical up to it,
@@ -28,8 +29,9 @@ does not reproduce (checked: 57 of 200 diverged); a replay does, exactly.
 played under every floor in `FLOOR_ARMS` -- fixed floors from 1 to 40, and
 the clock floor (`citadel_floor_mode="clock"`: the chip damage the pod can
 visibly deal next round, plus a pad) -- set on THAT turn only through
-`citadel_turn_cfg`. The F10 arm is today's policy replayed, so it must
-reproduce the baseline on every turn, and the run says whether it did
+`citadel_turn_cfg`. The `BASE_ARM` is today's policy replayed (F10 when
+§0z161 ran, clk+1 since it was adopted), so it must reproduce the baseline
+on every turn, and the run says whether it did
 (§0z35). Each cell is a paired difference against it, binned by the life the
 turn began at and by the chip damage on the table. "Best by bin" is chosen
 on the even seeds and REPORTED on the odd ones, so the pick does not grade
@@ -50,7 +52,7 @@ sys.path.insert(0, os.getcwd())
 OLD = {"citadel_x0": False, "citadel_skip": False, "citadel_spin": False,
        "citadel_damn_single": False, "citadel_main_loop": False,
        "citadel_main2": False, "citadel_pod_instants": False,
-       "citadel_decking_guard": False}
+       "citadel_decking_guard": False, "citadel_floor_mode": "fixed"}
 
 ARMS = {
     "new": {},
@@ -66,9 +68,9 @@ ARMS = {
     "-pod": {"citadel_pod_instants": False},
     "-guard": {"citadel_decking_guard": False},
     # condition 4: the floor and the all-in policies
-    "floor5": {"citadel_life_floor": 5.0},
-    "floor15": {"citadel_life_floor": 15.0},
-    "floor20": {"citadel_life_floor": 20.0},
+    "floor5": {"citadel_floor_mode": "fixed", "citadel_life_floor": 5.0},
+    "floor15": {"citadel_floor_mode": "fixed", "citadel_life_floor": 15.0},
+    "floor20": {"citadel_floor_mode": "fixed", "citadel_life_floor": 20.0},
     "always": {"citadel_allin": "always"},
     "always_wipes": {"citadel_allin": "always", "citadel_allin_wipes": True},
     "life20": {"citadel_allin": "life", "citadel_allin_life": 20.0},
@@ -82,10 +84,11 @@ ARMS = {
 }
 # the clock floor, whole-game (§0z161), and the fixed floors between
 ARMS.update({
-    "floor1": {"citadel_life_floor": 1.0},
-    "floor3": {"citadel_life_floor": 3.0},
-    "floor7": {"citadel_life_floor": 7.0},
-    "floor13": {"citadel_life_floor": 13.0},
+    "fixed10": {"citadel_floor_mode": "fixed"},   # the floor before 2026-11-01
+    "floor1": {"citadel_floor_mode": "fixed", "citadel_life_floor": 1.0},
+    "floor3": {"citadel_floor_mode": "fixed", "citadel_life_floor": 3.0},
+    "floor7": {"citadel_floor_mode": "fixed", "citadel_life_floor": 7.0},
+    "floor13": {"citadel_floor_mode": "fixed", "citadel_life_floor": 13.0},
     "clock1": {"citadel_floor_mode": "clock", "citadel_clock_pad": 1.0},
     "clock2": {"citadel_floor_mode": "clock", "citadel_clock_pad": 2.0},
     "clock4": {"citadel_floor_mode": "clock", "citadel_clock_pad": 4.0},
@@ -107,6 +110,10 @@ FLOOR_ARMS = (
                          "citadel_clock_rounds": 2,
                          "citadel_clock_pad": float(p)})
        for p in (1, 4)])
+# The FLOOR_ARMS entry that is today's default policy, replayed: the floors'
+# baseline, which must reproduce the unmodified game on every turn (§0z35).
+# "F10" when results/citadel_floors.txt was run; clk+1 since 2026-11-01.
+BASE_ARM = "clk+1"
 MET = ("won", "damage", "citadel_casts", "citadel_life_spent", "final_life")
 SEED0 = 5000
 CHUNK = 500
@@ -233,8 +240,8 @@ def forks(n, out):
     # columns: seed turn turn_life life_at_dig outs won_base won_allin
     #          spent_base spent_allin won_this_turn_base won_this_turn_allin
     moved = a[:, 8] != a[:, 7]
-    lines = [f"Bolas's Citadel, all-in on ONE turn vs today's value dig "
-             f"(floor 10), {n:,} seeds from {SEED0}, T20, python "
+    lines = [f"Bolas's Citadel, all-in on ONE turn vs today's value dig, "
+             f"{n:,} seeds from {SEED0}, T20, python "
              f"{sys.version.split()[0]}",
              f"{len(a):,} dig turns with the Citadel out; the all-in dig "
              f"spent different life on {int(moved.sum()):,} of them",
@@ -328,13 +335,14 @@ def floors(n, out):
     won = {nm: a[:, 8 + 2 * k] for k, nm in enumerate(names)}
     wtt = {nm: a[:, 9 + 2 * k] for k, nm in enumerate(names)}
     base, base_wtt = a[:, 6], a[:, 7]
-    same = bool((won["F10"] == base).all() and (wtt["F10"] == base_wtt).all())
+    b = BASE_ARM
+    same = bool((won[b] == base).all() and (wtt[b] == base_wtt).all())
     lines = [f"Bolas's Citadel, the floor on ONE turn (citadel_turn_cfg), "
              f"{n:,} seeds from {SEED0}, T20, python {sys.version.split()[0]}",
-             f"{len(a):,} dig turns with the Citadel out. F10 (today's policy, "
+             f"{len(a):,} dig turns with the Citadel out. {b} (today's policy, "
              f"replayed) reproduces the baseline on every turn: "
              f"{'YES' if same else 'NO -- the comparison is broken'}",
-             "cells: P(win) of that floor on that turn minus F10, x1000, "
+             f"cells: P(win) of that floor on that turn minus {b}, x1000, "
              "paired by seed and turn", ""]
 
     def cell(m, nm):
@@ -347,7 +355,7 @@ def floors(n, out):
         mu, ci = cell(np.ones(len(a), bool), nm)
         lines.append(f"  {nm:<9}{mu:>+9.4f}{ci:>8.4f}{'*' if abs(mu) > ci else ' '}"
                      f"  {wtt[nm].mean():.3f}")
-    lines.append(f"  (F10 won THAT turn {base_wtt.mean():.3f}; "
+    lines.append(f"  ({b} won THAT turn {base_wtt.mean():.3f}; "
                  f"P(win) {base.mean():.3f})")
     lines.append("")
 
@@ -377,7 +385,7 @@ def floors(n, out):
          [0, 1, 2, 3, 4, 6, 8, 1e9])
 
     lines.append("BEST BY LIFE BIN, CHOSEN ON EVEN SEEDS, MEASURED ON ODD "
-                 "(minus F10)")
+                 f"(minus {b})")
     even, odd = a[:, 0] % 2 == 0, a[:, 0] % 2 == 1
     edges = [0, 10, 15, 20, 25, 30, 40, 50, 70, 1e9]
     for lo, hi in zip(edges, edges[1:]):
