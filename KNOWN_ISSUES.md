@@ -217,6 +217,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z162](#0z162) | MEASURED | **Necropotence's policy, forked**: the floor hardly binds (clock floor nil over games); **with Reliquary Tower, buy past 7**: +0.0016 / +0.0012. Max hand size is unmodelled everywhere |
 | [0z163](#0z163) | MEASURED | **Sylvan Library's floor, forked: 20 is already optimal**, and every clock floor loses (-0.0107 at T20). Azusa gains 5 life a game, so 4 life paid is gone for good |
 | [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. Not adopted |
+| [0z165](#0z165) | MEASURED | **Every main-phase deferral, derived and counted** (`tools.deferrals`, a traced census): lorehold's miracle hold binds 0.30 card-turns a game and **48% of the cards it holds die in hand**, 19% are miracled |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14555,6 +14556,111 @@ rewards; a miracle saved for a window that may not come is not.
 baseline, so they are the owner's call and the table is rebuilt with them
 (queue item 31). Knobs to say out loud with lorehold's rows:
 `miracle_reserve`, `hold_min_value`.
+
+<a id="0z165"></a>
+
+## 0z165. MEASURED -- every main-phase deferral, derived and counted: where the pilot waits, and what the wait bought
+
+**The owner, 2026-11-02**, on §0z164's miracle hold: "this is VERY
+optimistic and not representative of a real player. The pilot in this
+condition may be declining to cast a game changing spell ... this type of
+thinking should be the exception rather than the norm." The protocol agreed
+with the owner: a deferral is a bet, and a pilot acts unless a measured
+payoff says wait. This section is its read-only first step -- WHERE the
+pilots wait and HOW OFTEN it changes what they cast. No default, knob,
+engine line or table moved.
+
+### The inventory (`python -m tools.deferrals`)
+
+Derived from the source (§0q): in every function that picks a cast through
+`engine.lookahead_pick`, every `if ...: continue` in the hand loop that
+never reads `options`; in every engine function with a `reserve` parameter,
+every `if` that compares against it. **38 sites in seven engines**, each
+classified in `CLASSES` with a reason and its §: NOT_A_CHOICE, SAFETY,
+ROUTED, WASTE_GUARD, SAME_TURN, JUDGEMENT, SPECULATIVE. `--check` fails on an
+unclassified site or a classification naming none; `tests/test_deferrals.py`
+pins it, six mutations exact. Its first run caught the scanner's own fault:
+a veto that counts before it continues (Proft) traced its counter line, not
+its `continue`.
+
+**Blind to** (written in the tool): casts outside the main phases' option
+loops (`altar_enable`, tutors, free casts), activated abilities a knob holds
+back (`altar_keep`, `*_keep`, `vault_hold`), life floors (§0z160-§0z163 forked
+those), and the pod's-turn responses (`response_reserve`, "leftover").
+
+### The census (`diagnostics/run_deferral_census.py`)
+
+A `sys.settrace` hook watches the inventory's exact lines: a veto's
+`continue`, a reserve's `if`, re-read with `reserve` = 0 so a reserve's count
+is exact. **Every traced game was compared, whole output dict, with the same
+seed untraced: identical in all 30,000** (5,000 a deck, six decks, T20,
+python 3.11.17). Per site, card-turns a game: **held**, **fits** (mana value
+within the pool: a proxy that ignores colours and reductions), **shadowed**
+(a later veto stops the card too), **JOINT** (would change the pass only
+together with that later veto), **BINDING** (fits, not shadowed, and
+outranked what the main phase cast instead, or nothing was cast) -- and the
+**fate** of each card on its first binding turn. `results/
+deferral_census_20261102.txt`.
+
+The speculative holds and the two bets the protocol is about:
+
+| site | category | binding a game | games | fate of the held card |
+|---|---|---|---|---|
+| lorehold `miracle_reserve` (main phase) | SPECULATIVE | 1.50 | 59.5% | 21% cast later (1.3 turns), 23% still in hand at the end, 41% discarded (31% to Lorehold's own rummage), **0.9% miracled** |
+| lorehold `hold_for_miracle` | SPECULATIVE | 0.30 (+0.18 joint) | 11.5% | **49% still in hand at the end**, 19% miracled, 15% discarded |
+| lorehold reserve on flashback | SPECULATIVE | 0.25 | 18.6% | 54% flashed back later (1.7 turns), 42% never |
+| lorehold `mdfc_land_floor` | SPECULATIVE | **0.00** (0.12 joint) | 0.5% | inert alone: `hold_answer` or the wipe gate holds every card it holds |
+| shilgengar `shilgengar_ult_reserve` | SAME_TURN | 0.40 | 19.6% | **51% still in hand at the end**, 48% cast later (1.5 turns) |
+
+**Fates are resolved once**: a card that leaves the hand is provisional
+until a cast or a miracle follows, and otherwise is read where it ends the
+game -- a Library of Leng card drawn back unmiracled counts as back in hand.
+
+**What the hold buys is what §0z164 measured it to buy.** The cards
+`hold_for_miracle` keeps are the deck's top end -- Approach of the Second
+Sun, Invoke Calamity, Prisoner's Dilemma, Hit the Mother Lode, Profound
+Journey -- and for every one it gets miracled, 2.5 are still in hand when the
+game ends. The reserve's top end is the same: Furygale Flocking and Approach
+first, and 41% of what it holds is discarded before it is cast. That is the
+owner's reading, counted: the pilot is declining a game-changing spell for a
+miracle that rarely comes. (A count, not a win rate: §0z164's forks are the
+win-rate evidence, and they agree.)
+
+**Shilgengar's ultimate reserve is the one hold outside lorehold the census
+flags.** It is SAME_TURN by construction (§0t: spent or released in the
+turn), yet half the cards it held were never cast -- the ultimate took the
+mana. §0t confirmed its default before pod v3 and POD_V4 (§0z140); it has
+not been forked since.
+
+### The rest
+
+- **WASTE_GUARD `hold_answer`** binds most (tivit 6.44, shilgengar 3.57,
+  karlov 1.59, lorehold 1.59, rendmaw 1.11, azusa 0.60 a game): a removal
+  spell with nothing to hit, or a counterspell kept for the pod's turn.
+  20-34% of the cards it holds are cast as responses; 18-61% are still in
+  hand when the game ends.
+  Measured as a gain (§0z131, §0z134); not the protocol's subject.
+- **JUDGEMENT, the wipe gate**: 66-95% of the sweepers it holds are still in
+  hand at the end -- by design, you do not wrath a board you are winning
+  (§0z104, §0z106). **In lorehold the main-phase gate is redundant**: every
+  card it holds is held again by `pilot_may_cast`, which asks the same gate
+  for every optional cast (§0z104); it is shadowed 2.84 card-turns of 2.84.
+- **SAME_TURN, the pre-passes**: rendmaw casts only pumps before combat
+  (23.8 binding a game) and azusa only land enablers before its lands
+  (15.1). Their binding counts overstate a cost: the card waits for a later
+  phase of the same turn, and "nothing cast" is the pass's purpose. 79% of
+  rendmaw's held cards are cast later, half of those the same turn; 20% are
+  still in hand at the end, which the census cannot pin on the pre-pass
+  rather than on the cards cast after combat. Whether removal belongs before
+  combat (to clear blockers) is a real piloting question it cannot answer.
+- **SAFETY**: `pilot_may_cast` (lorehold, 0.04) and azusa's decking guard
+  (0.03). Lorehold's is also a no-legal-target gate and Gamble's
+  `gamble_min_hand`, now said in its class.
+
+**Next** (queue item 32): fork shilgengar's ultimate reserve on POD_V4 by
+§0z160's method; extend the inventory to the activated-ability holds it is
+blind to; the owner's decision on lorehold's two holds is queue item 31,
+and this section is evidence for it, not a measurement of win rate.
 
 ## How to read an ablation table
 

@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `8c00c5d` from 32 engine sources.
+Derived at `afd1e49` from 32 engine sources.
 
 **333 knobs, 494 call sites.**
 
@@ -204,7 +204,7 @@ show up first.
 | `land_creature_sick` | `True` | 1 | `edhmc/azusa.py:765` | §0z135 | yes | yes |
 | `land_etb_rules` | `True` | 1 | `edhmc/engine.py:2479` | §0z115 | yes | yes |
 | `land_fetch` | `True` | 3 | `edhmc/azusa.py:1746` | §0z115 | yes | yes |
-| `land_floor` | `8` | 1 | `edhmc/lorehold.py:448` | §0z30 | **no** | **never** |
+| `land_floor` | `8` | 1 | `edhmc/lorehold.py:448` | §0z30 | yes | **never** |
 | `land_only_if` | `True` | 3 | `edhmc/azusa.py:1113` | §0z115 | **no** | yes |
 | `land_outlets` | `True` | 1 | `edhmc/shilgengar.py:649` | §0z115 | **no** | yes |
 | `land_pays_own_activation` | `False` | 1 | `edhmc/azusa.py:3678` | §0z135 | yes | yes |
@@ -221,7 +221,7 @@ show up first.
 | `magistrate_token_cap` | `512` | 1 | `edhmc/lorehold.py:967` |  | **no** | **never** |
 | `mana_colour_legacy` | `False` | 3 | `edhmc/azusa.py:1158` | §0z37 | yes | yes |
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:1159` | §0z37 | yes | yes |
-| `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:2822` | §0z118 | **no** | **never** |
+| `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:2822` | §0z118 | yes | **never** |
 | `modal_land_face` | `True` | 1 | `edhmc/engine.py:2539` | §0z151 | yes | yes |
 | `moloid_mill_floor` | `10` | 1 | `edhmc/azusa.py:3975` | §0z42 | yes | **never** |
 | `momentous_biggest` | `True` | 2 | `edhmc/azusa.py:3055` |  | yes | yes |
@@ -418,12 +418,12 @@ nobody has tested.
 
 ## The knobs no document mentions
 
-**64 of 333.** Not an error — most knobs are
+**62 of 333.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `angel_of_suffering`, `avacyn_text`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `collective_text`, `combat_defender`, `combo_cap`, `crusher_text`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `high_market`, `invoke_mv_cap`, `karoo_bounce`, `land_floor`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `mdfc_land_floor`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
+`altar_mana`, `angel_of_suffering`, `avacyn_text`, `block_rate`, `castle_ardenvale`, `clamp_cap`, `collective_text`, `combat_defender`, `combo_cap`, `crusher_text`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `derived_blocking`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `high_market`, `invoke_mv_cap`, `karoo_bounce`, `land_only_if`, `land_outlets`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 

@@ -2816,6 +2816,29 @@ CLAUDE.md gained one lesson: a life floor is a margin over what the pod
 takes before the life comes back, and the knob written as a floor is often
 not what binds.
 
+## 2026-11-02: the deferral protocol, read-only first (§0z165)
+
+Reading §0z164's miracle hold back, the owner: "this is VERY optimistic and
+not representative of a real player ... this type of thinking should be the
+exception rather than the norm." The session proposed a protocol -- a
+deferral is a bet, the default is to act, and a hold earns its place by a
+measured payoff -- and the owner asked for its read-only first step.
+
+- `tools/deferrals.py` derives every main-phase veto and reserve from the
+  source and classifies each; `--check` and `tests/test_deferrals.py` (six
+  mutations) hold it. Its first test run found the scanner tracing Proft's
+  counter line instead of its `continue`.
+- `diagnostics/run_deferral_census.py` counts, per site, how often the hold
+  changed what was cast and what became of the card, through `sys.settrace`,
+  with every traced game compared to its untraced twin. Two attribution
+  faults were found on the way and fixed before the numbers were written:
+  a card credited to the first of two vetoes (now "shadowed" and "joint"),
+  and a Library of Leng card read as discarded when it was drawn back.
+- What it found: lorehold's miracle hold keeps the deck's top end and about
+  half of what it keeps dies in hand; lorehold's main-phase wipe gate is
+  redundant with `pilot_may_cast`; shilgengar's ultimate reserve is the one
+  hold outside lorehold worth forking. Queue item 32 holds the rest.
+
 ## Queued items closed 2026-10-15 — moved from `docs/QUEUE.md`
 
 Closed by the POD_V4 parallel rebuild at `ca89b23` (§0z140): six legs, 58

@@ -54,6 +54,8 @@ SECTION = re.compile(r"§[0-9][0-9a-z]*")
 
 # Where a knob may be SET rather than read. Used only for the "swept" column.
 CALLER_DIRS = ("tools", "diagnostics", "tests")
+# Files under CALLER_DIRS that NAME knobs and set none (see _caller_paths).
+NAME_ONLY = ("tools/deferrals.py",)
 
 # A knob read with two different defaults is normally the §0u drift shape and
 # `--check` fails on it. An entry here says the split is KNOWN AND DELIBERATE,
@@ -260,8 +262,15 @@ def _caller_paths() -> list[str]:
     every legacy switch in `LEGACY` and would otherwise report each as
     swept. (It did, for one regeneration, 2026-09-17: fifteen knobs read as
     flipped by a dict that describes them. A checker's own registry is not
-    a caller -- the `SELF` exclusion `check_docs.py` already makes.)"""
+    a caller -- the `SELF` exclusion `check_docs.py` already makes.)
+
+    `tools/deferrals.py` is excluded for the same reason: its `CLASSES` keys
+    QUOTE the engines' conditions, `g.cfg.get('mdfc_land_floor', 5)` among
+    them, and set nothing. Blind to: a knob set only in a NAME_ONLY file
+    reads as never swept, which is true of both."""
     self_path = os.path.normpath(os.path.abspath(__file__))
+    name_only = {self_path} | {
+        os.path.normpath(os.path.abspath(p)) for p in NAME_ONLY}
     out = []
     for d in CALLER_DIRS:
         if not os.path.isdir(d):
@@ -270,7 +279,7 @@ def _caller_paths() -> list[str]:
             for f in sorted(files):
                 if f.endswith((".py", ".sh")):
                     p = os.path.join(root, f)
-                    if os.path.normpath(os.path.abspath(p)) == self_path:
+                    if os.path.normpath(os.path.abspath(p)) in name_only:
                         continue
                     out.append(p)
     return sorted(out)

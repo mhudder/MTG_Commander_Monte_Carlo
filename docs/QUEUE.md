@@ -135,4 +135,29 @@ What is closed and where it went:
     rebuild its table with it (`DECKS=lorehold ./tools/regen_tables.sh` on
     Python 3.13.16 / numpy 2.4.6), and re-measure lorehold's four staged
     swaps (`diagnostics/run_restage.py`), several of which are miracle cards.
+    **What the holds buy, counted (§0z165)**: of the cards `hold_for_miracle`
+    keeps, about half are still in hand when the game ends and a fifth are
+    miracled; the reserve's keep Furygale Flocking and Approach of the
+    Second Sun first.
 
+
+32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is
+    a bet: the pilot acts unless a measured payoff says wait. Done, read-only:
+    the inventory (`python -m tools.deferrals`, 38 main-phase sites in seven
+    engines, derived and classified, `--check` and `tests/test_deferrals.py`
+    hold it) and the census (`diagnostics/run_deferral_census.py`: how often
+    each site changes what is cast, and what became of the card held; every
+    traced game identical to its untraced twin). Nothing moved. Left, in order:
+    - **Lorehold's two holds are queue item 31**, the owner's decision; the
+      census is evidence for it (most cards the miracle hold keeps die in hand).
+    - **Fork shilgengar's ultimate reserve on POD_V4** by §0z160's method
+      (`shilgengar_ult_reserve` through `turn_knob`, a `turns`-replay
+      diagnostic, bit-identity first). §0t confirmed 3 before pod v3; half the
+      cards it holds are never cast.
+    - **Extend the inventory to what it is blind to**: activated abilities a
+      knob holds back (`altar_keep`, `karlov_exile_keep`, `gingerbrute_keep`,
+      `zuran_keep`, `vault_hold`) and casts outside the main phases'
+      option loops (`engine.altar_enable`, tutors). Derived, as the first part
+      is, with its check.
+    - **Then the CLAUDE.md lesson**, once a second deck's hold is measured:
+      a deferral is a bet, and the default is to act.

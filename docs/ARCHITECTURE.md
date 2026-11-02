@@ -28,12 +28,12 @@ code and want to know what else it touches.
    ─ removal_census.py    the fifth: classifies every answer and wipe in every list
                           from Scryfall into decks/_removal.py (§0z87)
    ─ audit_cards.py       every card against Scryfall
-   ─ card_known.py        is a card already in a list, catalog, candidates batch,
-                          the ledger or an engine? DERIVED: candidates.py names
-                          constants, so grepping it for a card name cannot work
+   ─ card_known.py        is a card already in a list, catalog, candidates batch, the
+                          ledger or an engine? DERIVED (candidates.py names constants)
    ─ triage.py            can the engine SEE a card (tier 0), does its counter fire
                           (tier 2, --smoke)? A blind card must play IDENTICALLY to a
                           matched blank under CRN (§0z66)
+   ─ deferrals.py         where a main phase holds a spell back (§0z165)
    ─ compare_decks.py / fit_pod.py / tutor_policy.py / build_tivit_xlsx.py   older one-purpose tools
    ─ regen_tables.sh      every deck's table at the common N, in series
    ─ rebuild_deck.sh      ONE deck's table, as one leg of a parallel rebuild: checks
