@@ -256,3 +256,34 @@ and check the MECHANISM COUNTERS (`blood_made`, `landfall_triggers`,
 `pw_activations`) rather than the win rate: a mechanism that fires zero times
 is unmistakable where a win rate 0.03 too low is not. `CLAUDE.md` lists every
 policy correction on record, each with its `§`.
+
+## Measuring a piloting decision: fork it where it is made
+
+A policy that fires on a few turns of a few games (a life floor, a reserve,
+how many cards to buy) is too dilute to tune from whole-game runs alone. The
+method from §0z160 onward measures the decision itself:
+
+1. **Play each seed once on today's policy**, logging every turn the decision
+   comes up, with what the pilot could see then (life, the chip damage on the
+   table, the hand).
+2. **Replay the same seed with the knob changed on that one turn only**
+   (`turn_cfg` = (turn, {knob: value}), read through `engine.turn_knob`). The
+   two games are identical up to that turn, so the difference is paired.
+   Never deep-copy a game to fork it: the engines key state on `id()`, and a
+   copy does not reproduce the original. A replay does, exactly.
+3. **Check the fork can reproduce itself**: today's policy, replayed through
+   the same switch, must match the baseline on every turn. Each diagnostic
+   prints whether it did.
+4. **Bin by what the pilot can see**, pick the best policy per bin on even
+   seeds and report it on odd ones, so the pick does not grade itself.
+5. **Confirm the leaders over whole games**, paired, both horizons, and at a
+   larger N when the decision is rare.
+
+`diagnostics/run_citadel_allin.py`, `run_necro_policy.py`,
+`run_sylvan_policy.py` and `run_lorehold_miracles.py` are the worked
+examples. Two things they found are worth knowing before you write the next
+one: the knob written as a floor is often not the one that binds (look at
+what stopped the decision first), and a policy can be right in one deck and
+wrong in another for a reason the numbers explain -- a life floor that reads
+the next swing wins in a deck that gains life back and loses in one that
+does not.

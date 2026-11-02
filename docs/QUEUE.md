@@ -97,7 +97,7 @@ What is closed and where it went:
     next round + 1 (`citadel_floor_mode` "clock", `citadel_clock_pad` 1),
     +0.0018 / +0.0007 at T10 / T20 over floor 10, N=60,000. Left, in order:
     - **THE KARLOV REBUILD, DEFERRED BY THE OWNER** ("keep the rebuild as a
-      queued item, dont do it quite yet"). The adoption moved karlov's
+      queued item, dont do it quite yet"; still held 2026-11-02). The adoption moved karlov's
       baseline, so its cache is STALE BY DESIGN and `check_docs` fails on
       it until this runs. `DECKS=karlov ./tools/regen_tables.sh` on Python
       3.13.16 / numpy 2.4.6 (the parallel-rebuild skill's venv recipe),
@@ -106,7 +106,8 @@ What is closed and where it went:
       (`diagnostics/run_citadel_allin.py policies 15000 ... new noCit`)
       into its ledger entry. Never clear it with `--verified`.
     - **Necropotence with Reliquary Tower (§0z162), an owner call to batch
-      with the rebuild above**: buy past seven while the Tower is out
+      with the rebuild above, HELD by the owner 2026-11-02** ("hold the
+      decision for now"): buy past seven while the Tower is out
       (`necro_tower_target` 99, bounded by the floor and the decking
       reserve; 20 is the same): +0.0017 / +0.0013 at T10 / T20, N=60,000.
       The clock floor adds nothing for this card over a game.
@@ -124,7 +125,9 @@ What is closed and where it went:
     at the tables' N before deciding (§0z30: its size is not guessable); it
     moves every baseline, so it is a batched rebuild.
 
-31. **Lorehold's miracle policy (§0z164), an owner call.** Measured at
+31. **Lorehold's miracle policy (§0z164), an owner call, HELD by the owner
+    2026-11-02** ("hold the decision for now"). Nothing is adopted and
+    lorehold's cache is VERIFIED; adopting is what moves it. Measured at
     N=60,000: hold NO miracle mana (`miracle_reserve` 0) and NEVER decline a
     hardcast to wait for a miracle (`hold_min_value` 99) -- together +0.0166
     ±0.0028 / +0.0109 ±0.0032 at T10 / T20; each alone significant at both.

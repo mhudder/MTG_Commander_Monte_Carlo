@@ -2776,6 +2776,46 @@ def around a line naming a card (§0z25). `tests/test_where.py` checks the
 ranges against the source text, not the tree: every def line indexed, every
 range starting on its first decorator and ending on its last body line.
 
+## 2026-10-31 to 2026-11-02: piloting decisions, forked one turn at a time (§0z160-§0z164)
+
+The owner asked first about Bolas's Citadel ("at what life value ... is it
+worth it to win the game outright, even by going to 1 life"), then for the
+same analysis on Necropotence, Sylvan Library, and lorehold's miracles with
+Sensei's Top. Five sections, one method.
+
+- **§0z160**: the Citadel's dig rebuilt to its text -- both main phases, the
+  pod's turn, X = 0 (CR 107.3b; Debt to the Deathless had been draining 18 for
+  7 life), Top / Necropotence / Konrad / Enlightened Tutor past the top. The
+  staged swap moved from inside its bars to significant at both horizons, and
+  digging to 1 for the win lost at every policy tried. Karlov's table rebuilt.
+- **§0z161**: a floor that reads the pod's clock (`opponents.clock_floor`,
+  next round's visible chip + 1) beat every fixed floor; ADOPTED by the owner
+  as the Citadel's default, the karlov rebuild DEFERRED (queue item 29).
+- **§0z162**: Necropotence's floor hardly binds; the lever is the hand
+  target, and with Reliquary Tower out buying past seven wins. A decking
+  guard on the buy, and an engine-wide gap: no maximum hand size anywhere
+  (queue item 30). The Tower change HELD by the owner (item 29).
+- **§0z163**: Sylvan Library's floor of 20 is already right, and every clock
+  floor loses -- azusa gains almost no life, so life paid stays gone. A
+  prediction written before the run (a clock reading the rest of the game
+  lands level with 20) held at T20. Nothing adopted.
+- **§0z164**: lorehold's Top is played right; holding miracle mana and
+  holding spells for miracles both lose (§0t with its full sign). HELD by
+  the owner (queue item 31). A latent `miracle_need` gap fixed on the way.
+
+**How**: `engine.turn_knob` / `turn_cfg` sets a knob on one turn only, so a
+seed replayed with it is identical up to that turn -- a paired fork of the
+decision where it is made. A deep copy of a game does NOT reproduce it (the
+engines key state on `id()`; 57 of 200 diverged), so every fork is a replay.
+Each diagnostic (`run_citadel_allin`, `run_necro_policy`, `run_sylvan_policy`,
+`run_lorehold_miracles`) checks that today's policy replayed reproduces the
+baseline on every turn, picks "best by bin" on even seeds and reports it on
+odd ones, and confirms leaders over whole games at N=60,000. Every default
+was proved bit-identical on every staged list before anything was measured.
+CLAUDE.md gained one lesson: a life floor is a margin over what the pod
+takes before the life comes back, and the knob written as a floor is often
+not what binds.
+
 ## Queued items closed 2026-10-15 — moved from `docs/QUEUE.md`
 
 Closed by the POD_V4 parallel rebuild at `ca89b23` (§0z140): six legs, 58

@@ -164,7 +164,9 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   back** (§0z161, §0z163): the next visible swing (`opponents.clock_floor`)
   in a deck that gains life, the rest of the game in one that does not. And
   the knob written as a floor is often not what binds (§0z160, §0z162):
-  fork the decision one turn at a time before tuning it.
+  fork the decision one turn at a time before tuning it -- replay the seed
+  with `turn_cfg` (`engine.turn_knob`), never a deep copy of the game, which
+  does not reproduce (id-keyed state).
 - **N is part of a table's identity**: in the cache key, the header and one
   variable in `regen_tables.sh`. Change it in one place only and you silently
   replace the tables with less precise ones. N=15,000 is the knee.
