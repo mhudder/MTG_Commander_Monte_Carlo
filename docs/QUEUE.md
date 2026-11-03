@@ -96,15 +96,9 @@ What is closed and where it went:
     2026-11-01): the dig stops at the chip damage the pod can visibly deal
     next round + 1 (`citadel_floor_mode` "clock", `citadel_clock_pad` 1),
     +0.0018 / +0.0007 at T10 / T20 over floor 10, N=60,000. Left, in order:
-    - **THE KARLOV REBUILD, DEFERRED BY THE OWNER** ("keep the rebuild as a
-      queued item, dont do it quite yet"; still held 2026-11-02). The adoption moved karlov's
-      baseline, so its cache is STALE BY DESIGN and `check_docs` fails on
-      it until this runs. `DECKS=karlov ./tools/regen_tables.sh` on Python
-      3.13.16 / numpy 2.4.6 (the parallel-rebuild skill's venv recipe),
-      about 7 minutes; then `repro_row` a row, `--note` the cache, and
-      re-measure the -Swamp +Citadel swap on the clock floor
-      (`diagnostics/run_citadel_allin.py policies 15000 ... new noCit`)
-      into its ledger entry. Never clear it with `--verified`.
+    - **The karlov rebuild is DONE** (the owner, 2026-11-03; §0z169): 0 rows
+      moved, the cache CURRENT, the Citadel swap +0.0121 / +0.0088 on the
+      clock floor, all three staged swaps standing.
     - **Necropotence with Reliquary Tower (§0z162), an owner call to batch
       with the rebuild above, HELD by the owner 2026-11-02** ("hold the
       decision for now"): buy past seven while the Tower is out

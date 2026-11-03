@@ -2854,6 +2854,15 @@ hold and the float fix, and kept the rummage: one rebuild of lorehold's
 table on python 3.13.16, five rows beyond their bars, and the four staged
 swaps re-measured, all standing (§0z168).
 
+## 2026-11-03: karlov's deferred rebuild (§0z169)
+
+The owner released queue item 29's rebuild, held since the clock floor was
+adopted (§0z161). On python 3.13.16 it moved no row beyond its bar, which is
+what a +0.0007 whole-game change should do to a leave-one-out table, and it
+turned `check_docs` green for the first time since 2026-11-01. The three
+staged karlov swaps were re-measured and stand; the Citadel's, on the clock
+floor, did not shrink.
+
 ## Queued items closed 2026-11-03 — moved from `docs/QUEUE.md`
 
 Closed by the owner, 2026-11-03: "adopt the reserve, hold and float fix; keep the rummage." `miracle_reserve` 0, `hold_min_value` 99 and `float_board_only` are lorehold's defaults; `rummage_pick` stays "miracle"; the table rebuilt and the staged swaps re-measured (§0z168).

@@ -221,6 +221,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z166](#0z166) | MEASURED | **Lorehold's rummage pitches its engines**: every permanent scores -1, so ~1 priority-8.5+ card a game goes before a cheap spell; keeping them +0.0155 at T10, flat at T20. **Treasures counted twice off-turn** (106.4 too) |
 | [0z167](#0z167) | MEASURED | **Lorehold's rummage pick, forked: no rule wins at both horizons.** By priority +0.0163 at T10, level at T20, and -0.0058 at T20 with no holds (N=60,000): pitched permanents feed Seminar and Journey |
 | [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
+| [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14888,6 +14889,38 @@ Change's `reverified` records it.
 
 Knobs to say out loud with lorehold's rows from here: `miracle_reserve`,
 `hold_min_value`, `float_board_only`, `rummage_pick`, `land_floor`.
+
+<a id="0z169"></a>
+
+## 0z169. REBUILT -- karlov's table on the clock floor: nothing moved, and the Citadel swap holds at both horizons
+
+**The owner, 2026-11-03**: "go ahead with the karlov rebuild" -- queue item
+29's first line, deferred since §0z161 adopted the Citadel's clock floor.
+
+`DECKS=karlov ./tools/regen_tables.sh`, python 3.13.16 / numpy 2.4.6,
+8m33s; `repro_row` IDENTICAL on Bolas's Citadel. **0 of 64 rows moved
+beyond the wider of their two bars, and no label changed**: the Citadel's
+own row +0.0226 -> +0.0231, Necropotence +0.0035 -> +0.0037. The floor is
+worth +0.0018 / +0.0007 to the whole game (§0z161, N=60,000), below any
+row's resolution, so this is the expected null. The cache is CURRENT again
+and `check_docs` is fully green.
+
+The three staged swaps, in context, N=15,000 paired (`diagnostics/
+run_restage.py`, `results/restage_karlov_20261103.txt`):
+
+| swap | T10 | T20 | against the last measurement |
+|---|---|---|---|
+| -Soulmender +Bloodthirsty Conqueror | +0.0392 ±0.0035 | +0.0276 ±0.0035 | T20 -0.0043 from 2026-10-15, just beyond the wider bar |
+| -Swamp +Bolas's Citadel | +0.0121 ±0.0039 | +0.0088 ±0.0042 | +0.0100 / +0.0083 on floor 10 (2026-10-31): did not shrink |
+| -Daxos +South Wind Avatar | +0.0140 ±0.0025 | +0.0112 ±0.0030 | inside both bars |
+
+All stand. The Citadel swap measured through `diagnostics/run_citadel_allin.py
+policies ... new noCit` (`results/citadel_swap_clockfloor_20261103.txt`), the
+command item 29 named, and through the restage agrees to the last digit.
+The Conqueror's T20 fall spans three engine changes since its last
+measurement (§0z155, §0z160, §0z161) and is not attributed among them.
+Item 29 stays open for its two held lines: Necropotence's Tower target and
+holding Enlightened Tutor under the Citadel.
 
 ## How to read an ablation table
 

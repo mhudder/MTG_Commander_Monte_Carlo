@@ -1,0 +1,8 @@
+Bolas's Citadel's dig (§0z160): N=15,000 paired, seeds 5000.., karlov as staged, python 3.13.16
+row = arm minus 'new' unless named; * = 95% CI excludes 0
+
+new - noCit  (-Swamp +Citadel, the new dig)       T10 +0.0121 +-0.0039*  T20 +0.0088 +-0.0042*  dmgT20 -0.31 +-0.26  lifeSpentT20 +1.80
+
+absolute, T20: arm  won  citadel_casts  citadel_life_spent
+  new           0.5483  0.709  1.80
+  noCit         0.5395  0.000  0.00

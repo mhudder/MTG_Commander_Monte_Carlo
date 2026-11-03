@@ -1,0 +1,3 @@
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0392 +-0.0035*  T20 +0.0276 +-0.0035*  dmgT20 -4.24 +-0.28
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0121 +-0.0039*  T20 +0.0088 +-0.0042*  dmgT20 -0.31 +-0.26
+karlov  -Daxos, Blessed by the Sun +South Wind Avatar T10 +0.0140 +-0.0025*  T20 +0.0112 +-0.0030*  dmgT20 +0.37 +-0.17
