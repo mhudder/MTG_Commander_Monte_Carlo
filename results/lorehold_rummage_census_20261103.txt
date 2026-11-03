@@ -1,0 +1,80 @@
+Lorehold's rummage (§0z166): 5,000 games a policy, seeds 5000.., T20, the staged list, python 3.11.17
+
+== today (the defaults)
+   wrapped games identical to bare, whole output: YES
+   per game:
+       1.862  artist: discard
+       0.632  artist: discard -> a land
+       0.505  artist: discard -> a land, with 8+ lands out
+       0.127  artist: discard -> a land, with <8 lands out
+       0.605  artist: discard -> a permanent (no miracle)
+       0.175  artist: discard -> a spell worth 2-3
+       0.306  artist: discard -> a spell worth 4+
+       0.145  artist: discard -> a spell worth <= 1 as a miracle
+       0.188  artist: discard -> nonland of priority 8.5+
+       0.580  artist: discard -> nonland the pilot ranked ABOVE another in hand
+       0.514  artist: discard -> nonland, a land kept (under land_floor)
+       7.394  pod rummages taken
+       8.006  pod windows, Lorehold out
+       0.243  pod/Leng: draw miracled
+       1.211  pod/discard: draw miracled
+       0.372  pod: Library of Leng, best miracle to the top
+       7.022  pod: discard
+       1.399  pod: discard -> a land
+       0.809  pod: discard -> a land, with 8+ lands out
+       0.590  pod: discard -> a land, with <8 lands out
+       2.834  pod: discard -> a permanent (no miracle)
+       0.924  pod: discard -> a spell worth 2-3
+       1.342  pod: discard -> a spell worth 4+
+       0.522  pod: discard -> a spell worth <= 1 as a miracle
+       1.078  pod: discard -> nonland of priority 8.5+
+       2.585  pod: discard -> nonland the pilot ranked ABOVE another in hand
+       3.633  pod: discard -> nonland, a land kept (under land_floor)
+   the off-turn float, per end of turn:
+       2.623  float total
+       0.412  float from Treasures (counted twice)
+       0.007  float from Apex / Welcome mana (106.4)
+       11.8%  ends with a Treasure
+        0.2%  ends with Apex mana left
+   win 0.4680; miracles 2.521; Leng to top 0.372, miracled 0.239
+   nonland cards given up, per game (6.85): Arcane Bombardment 0.204, Sunbird's Invocation 0.199, Caldera Pyremaw 0.166, Path to Exile 0.164, Goliath Daydreamer 0.164, Swords to Plowshares 0.161, Ultima 0.158, Dawn's Truce 0.158, The Dawning Archaic 0.157, Double Vision 0.153, Sejiri Shelter 0.139, Promise of Loyalty 0.138
+
+== R0H99 {'miracle_reserve': 0, 'hold_min_value': 99.0}
+   wrapped games identical to bare, whole output: YES
+   per game:
+       1.965  artist: discard
+       0.672  artist: discard -> a land
+       0.535  artist: discard -> a land, with 8+ lands out
+       0.137  artist: discard -> a land, with <8 lands out
+       0.620  artist: discard -> a permanent (no miracle)
+       0.194  artist: discard -> a spell worth 2-3
+       0.325  artist: discard -> a spell worth 4+
+       0.154  artist: discard -> a spell worth <= 1 as a miracle
+       0.191  artist: discard -> nonland of priority 8.5+
+       0.571  artist: discard -> nonland the pilot ranked ABOVE another in hand
+       0.520  artist: discard -> nonland, a land kept (under land_floor)
+       7.124  pod rummages taken
+       7.748  pod windows, Lorehold out
+       0.160  pod/Leng: draw miracled
+       0.894  pod/discard: draw miracled
+       0.249  pod: Library of Leng, best miracle to the top
+       6.875  pod: discard
+       1.344  pod: discard -> a land
+       0.760  pod: discard -> a land, with 8+ lands out
+       0.585  pod: discard -> a land, with <8 lands out
+       2.707  pod: discard -> a permanent (no miracle)
+       0.919  pod: discard -> a spell worth 2-3
+       1.354  pod: discard -> a spell worth 4+
+       0.550  pod: discard -> a spell worth <= 1 as a miracle
+       1.012  pod: discard -> nonland of priority 8.5+
+       2.441  pod: discard -> nonland the pilot ranked ABOVE another in hand
+       3.575  pod: discard -> nonland, a land kept (under land_floor)
+   the off-turn float, per end of turn:
+       2.114  float total
+       0.332  float from Treasures (counted twice)
+       0.006  float from Apex / Welcome mana (106.4)
+        9.9%  ends with a Treasure
+        0.3%  ends with Apex mana left
+   win 0.4780; miracles 2.099; Leng to top 0.249, miracled 0.156
+   nonland cards given up, per game (6.82): Arcane Bombardment 0.188, Sunbird's Invocation 0.185, Swords to Plowshares 0.168, Dawn's Truce 0.168, Goliath Daydreamer 0.165, Path to Exile 0.165, Caldera Pyremaw 0.163, Ultima 0.159, The Dawning Archaic 0.153, Sejiri Shelter 0.144, Promise of Loyalty 0.142, Farewell 0.141
+

@@ -218,6 +218,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z163](#0z163) | MEASURED | **Sylvan Library's floor, forked: 20 is already optimal**, and every clock floor loses (-0.0107 at T20). Azusa gains 5 life a game, so 4 life paid is gone for good |
 | [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. Not adopted |
 | [0z165](#0z165) | MEASURED | **Every main-phase deferral, derived and counted** (`tools.deferrals`, a traced census): lorehold's miracle hold binds 0.30 card-turns a game and **48% of the cards it holds die in hand**, 19% are miracled |
+| [0z166](#0z166) | MEASURED | **Lorehold's rummage pitches its engines**: every permanent scores -1, so ~1 priority-8.5+ card a game goes before a cheap spell; keeping them +0.0155 at T10, flat at T20. **Treasures counted twice off-turn** (106.4 too) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14661,6 +14662,83 @@ not been forked since.
 §0z160's method; extend the inventory to the activated-ability holds it is
 blind to; the owner's decision on lorehold's two holds is queue item 31,
 and this section is evidence for it, not a measurement of win rate.
+
+<a id="0z166"></a>
+
+## 0z166. MEASURED -- lorehold's rummage pitches its engines, and the off-turn float counts Treasures twice
+
+**The owner, 2026-11-03**: "before removing lorehold's holds ... Lorehold
+would not hold up any mana for miracles intentionally, the only time it
+would have miracle mana is if it was unable to spend mana during its turn,
+or lands/artifacts untap during other main phases?" and "how often is it
+using the discard ability to cycle through low power cards?"
+`diagnostics/run_lorehold_rummage.py`; seeds 5000.., the staged list,
+python 3.11.17.
+
+### The off-turn mana, read from the code
+
+With `miracle_reserve` 0 and `hold_min_value` 99 the pilot holds nothing on
+purpose. The pod's windows are paid from (a) what the main phase could not
+spend -- nothing castable, or a card a veto holds (§0z165) -- which
+`your_turn` floats as `g.float_mana`; (b) Victory Chimes and Bender's
+Waterskin (`cross_turn`), +1 each on every opponent's untap step; (c)
+Treasures, which the main phase spends last, so they survive whenever the
+lands cover the turn; Smothering Tithe makes more on the pod's turns. Top
+and Library of Leng still play off what is there.
+
+**Two defects in (a), one line** (`g.float_mana = len(mana_units(g))`):
+`mana_units` is board + Apex + Treasures, so **every Treasure is in the
+float AND in `g.treasures`**, and every off-turn payment adds the two -- and,
+the float spent first, a Treasure that paid survives. And **Apex of Power's
+and Explosive Welcome's unspent mana floats into the pod's turns**, which
+CR 106.4 empties at the end of the step. Size: 11.8% of turns end with a
+Treasure, 0.41 phantom mana an end of turn; Apex 0.2% of turns.
+
+Corrected in the diagnostic (float = the board's untapped units), paired,
+N=15,000 (`results/lorehold_float_fix_20261103.txt`): today's policy
+-0.0007 / -0.0011 (inside the bars); §0z164's policy **-0.0030 / -0.0039**,
+significant -- it leans on leftover mana more. **§0z164's change survives**:
++0.0185 / +0.0135 on today's float, **+0.0163 / +0.0108** on the corrected
+one, T10 / T20, both significant. NOT FIXED in the engine: it moves
+lorehold's baseline, so it rides queue item 31's rebuild.
+
+### The rummage, counted (5,000 games, wrapped games identical to bare)
+
+`results/lorehold_rummage_census_20261103.txt`. Per game, today's policy:
+8.0 pod windows with Lorehold out, **7.4 rummages taken** (it is never
+declined for the hand's quality; only an empty hand or an unsafe draw
+skips it), 0.37 of them Library of Leng's best-miracle-to-top, 7.0 real
+discards, plus 1.9 from Artist's Talent. The pod discard's draw is
+miracled 17% of the time.
+
+**What is given up** (`rummage_discard_choice`: the lowest MIRACLE VALUE,
+lands spared under `land_floor` 8): 1.4 lands, **2.8 permanents**, 0.5
+spells worth <= 1 as a miracle, 0.9 worth 2-3, 1.3 worth 4+. Every
+permanent without a miracle cost is -1, so it goes first, whatever it is:
+**1.08 a game are priority 8.5+** (Arcane Bombardment, Sunbird's
+Invocation, The Dawning Archaic, Goliath Daydreamer, Double Vision lead
+the list), and 2.6 a game are a nonland the pilot itself ranks above another
+nonland in hand. A tie among -1 cards (a land against a permanent past 8
+lands) falls to hand order. **The answer to the owner: it is not cycling
+low-power cards; it is cycling the deck's non-miracle engines first.**
+
+### Other picks, paired (N=30,000; `results/lorehold_rummage_pick_20261103.txt`)
+
+Today's rule rewritten through the same swap reproduces today's games on
+every metric. Rule minus today's, win rate:
+
+| rule | today's policy T10 / T20 | §0z164's policy T10 / T20 |
+|---|---|---|
+| `priority`: the lowest cast priority | **+0.0155 ±0.0043** / +0.0016 | **+0.0097 ±0.0046** / -0.0051 |
+| `guard`: today's, never an 8.5+ permanent | **+0.0106 ±0.0036** / +0.0023 | **+0.0065 ±0.0040** / -0.0034 |
+| `mv`: the lowest mana value | **+0.0038 ±0.0029** / +0.0035 | **+0.0062 ±0.0032** / +0.0032 |
+
+Keeping the engines wins games decided by turn 10 and is level at turn 20.
+Every alternative casts FEWER miracles (-0.05 to -0.11 a game) and wins
+more early: the miracle count and win rate disagree again (§0t, §0z164).
+The T20 null is not explained here -- a fork of the pick (§0z160's method)
+is the way to ask which hands it matters in. Knob to say out loud with
+lorehold's rows: `land_floor`.
 
 ## How to read an ablation table
 

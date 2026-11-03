@@ -139,6 +139,13 @@ What is closed and where it went:
     keeps, about half are still in hand when the game ends and a fifth are
     miracled; the reserve's keep Furygale Flocking and Approach of the
     Second Sun first.
+    **Two more for the same batch (§0z166)**, both moving lorehold's
+    baseline: the off-turn float counts every Treasure twice and carries
+    Apex / Explosive Welcome mana past CR 106.4 (an engine defect; §0z164's
+    change survives its fix, +0.0163 / +0.0108); and the rummage discards by
+    miracle value, so it pitches non-miracle engines first -- discarding by
+    cast priority is +0.0155 ±0.0043 at T10, level at T20, N=30,000. A fork
+    of the pick should come before choosing a rule.
 
 
 32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is
