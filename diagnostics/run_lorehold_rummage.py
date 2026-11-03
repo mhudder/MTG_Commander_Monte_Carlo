@@ -4,6 +4,7 @@
     python -m diagnostics.run_lorehold_rummage census N OUT.txt
     python -m diagnostics.run_lorehold_rummage float N OUT.txt
     python -m diagnostics.run_lorehold_rummage pick N OUT.txt
+    python -m diagnostics.run_lorehold_rummage forks N OUT.txt
 
 The owner, 2026-11-03: "how often is it using the discard ability to cycle
 through low power cards?" Lorehold: "At the beginning of each opponent's
@@ -44,6 +45,14 @@ land rule (lands spared below `land_floor`); only the key changes:
             card can go
 Today's rule is also run REWRITTEN through the same swap, and must reproduce
 today's games on every metric (§0z35), or the run says so.
+
+`forks` -- the same rules on ONE round (§0z167, §0z160's method), through
+the engine's own `rummage_pick` knob and `turn_cfg`: every turn that begins
+with Lorehold or Artist's Talent out, replayed under each rule on that round
+only (your turn's Artist rummages and the pod's rummages after it). `base`
+replayed must reproduce the baseline on every turn. Binned by whether the
+hand holds a priority 8.5+ permanent -- the case the rules disagree on --
+by the turn and by lands; "best by bin" picked on even seeds, read on odd.
 """
 import os
 import sys
@@ -410,14 +419,153 @@ def pick_ab(n, out):
     return 0 if same else 1
 
 
+# --------------------------------------------------------------------------
+# forks: the pick on ONE round (§0z167), the §0z160 method
+# --------------------------------------------------------------------------
+FORK_ARMS = (("base", None), ("priority", "priority"), ("mv", "mv"),
+             ("guard", "guard"))
+
+
+def _won_by(r):
+    """(won by round 10, won by round 20) from one T20 game. Exact: every T10
+    win is the same seed's T20 win with at most ten rounds played, extra
+    turns not counted (§0z86) -- checked on 1,000 seeds, 0 mismatches."""
+    w = bool(r["won"])
+    rounds = r["turns_played"] - r.get("extra_turns_taken", 0)
+    return float(w and rounds <= 10), float(w)
+
+
+def _fork_job(args):
+    pol, lo, hi = args
+    from edhmc import lorehold as L
+    real = L.take_turn
+    log = []
+
+    def spy(g):
+        if g.result is None and (g.commander_cast
+                                 or g.has("Artist's Talent")):
+            hand = [c for c in g.hand if not c.is_land]
+            engine = any(c.priority >= 8.5 and L.miracle_value(g, c) < 0
+                         for c in hand)
+            log.append((g.turn + 1,
+                        sum(1 for p in g.board if p.card.is_land),
+                        len(g.hand), int(engine)))
+        return real(g)
+    cfg = _cfg(POLICIES[pol], 20)
+    rows = []
+    for s in range(lo, hi):
+        log.clear()
+        L.take_turn = spy
+        try:
+            base = L.simulate(_D["deck"], _D["cmd"], dict(cfg), s)
+        finally:
+            L.take_turn = real
+        b10, b20 = _won_by(base)
+        for turn, lands, hand, engine in list(log):
+            row = [s, turn, lands, hand, engine, b10, b20]
+            for _nm, rule in FORK_ARMS:
+                knobs = {} if rule is None else {"rummage_pick": rule}
+                alt = L.simulate(_D["deck"], _D["cmd"],
+                                 dict(cfg, turn_cfg=(turn, knobs)), s)
+                row.extend(_won_by(alt))
+            rows.append(row)
+    return pol, rows
+
+
+def forks(n, out):
+    jobs = [(p, lo, min(lo + CHUNK, SEED0 + n)) for p in POLICIES
+            for lo in range(SEED0, SEED0 + n, CHUNK)]
+    rows = {p: [] for p in POLICIES}
+    with Pool(initializer=_init) as pool:
+        for p, r in pool.imap_unordered(_fork_job, jobs):
+            rows[p].extend(r)
+    names = [nm for nm, _ in FORK_ARMS]
+    lines = [f"Lorehold's rummage pick on ONE round (turn_cfg, §0z167): {n:,} "
+             f"seeds a policy from {SEED0}, the staged list, python "
+             f"{sys.version.split()[0]}",
+             "every turn beginning with Lorehold or Artist's Talent out, "
+             "replayed with `rummage_pick` set on that round only; one T20 "
+             "game per replay gives both horizons (won by round 10, won by "
+             "round 20). Cells: P(win) minus base, paired by seed and turn, "
+             "x1000 in the grids; * = 95% CI excludes 0", ""]
+    ok = True
+    for pol in POLICIES:
+        a = np.array(rows[pol], dtype=float)
+        b10, b20 = a[:, 5], a[:, 6]
+        arm = {nm: (a[:, 7 + 2 * k], a[:, 8 + 2 * k])
+               for k, nm in enumerate(names)}
+        same = bool((arm["base"][0] == b10).all()
+                    and (arm["base"][1] == b20).all())
+        ok &= same
+        lines.append(f"== {pol} {POLICIES[pol] or '(the defaults)'}: "
+                     f"{len(a):,} turns; base replayed reproduces the "
+                     f"baseline on every turn: {'YES' if same else 'NO'}")
+
+        def cell(m, nm, h):
+            if m.sum() < 2:
+                return 0.0, 0.0
+            d = arm[nm][h][m] - (b10, b20)[h][m]
+            return d.mean(), 1.96 * d.std(ddof=1) / np.sqrt(m.sum())
+        allm = np.ones(len(a), bool)
+        lines.append("  OVERALL            T10                 T20")
+        for nm in names[1:]:
+            c10, c20 = cell(allm, nm, 0), cell(allm, nm, 1)
+            lines.append(
+                f"  {nm:<10}" + "".join(
+                    f"{mu:>+10.4f} {ci:.4f}{'*' if abs(mu) > ci else ' '}"
+                    for mu, ci in (c10, c20)))
+
+        def grid(title, col, edges, h):
+            lines.append(f"  {title}, T{10 if h == 0 else 20}")
+            lines.append(f"    {'bin':<9}{'turns':>7}{'P(win)':>7}"
+                         + "".join(f"{nm:>11}" for nm in names[1:]))
+            for lo, hi in zip(edges, edges[1:]):
+                m = (a[:, col] >= lo) & (a[:, col] < hi)
+                if m.sum() < 30:
+                    continue
+                cells = [cell(m, nm, h) for nm in names[1:]]
+                txt = "".join(f"{1000 * mu:>+10.1f}{'*' if abs(mu) > ci else ' '}"
+                              for mu, ci in cells)
+                lab = f"{lo:g}-{hi:g}" if hi < 1e9 else f"{lo:g}+"
+                lines.append(f"    {lab:<9}{int(m.sum()):>7}"
+                             f"{(b10, b20)[h][m].mean():>7.3f}" + txt)
+        for h in (0, 1):
+            grid("BY: HAND HOLDS A PRIORITY 8.5+ PERMANENT (0 no, 1 yes)",
+                 4, [0, 1, 2], h)
+            grid("BY THE TURN", 1, [0, 4, 6, 8, 10, 13, 1e9], h)
+            grid("BY LANDS OUT", 2, [0, 5, 7, 9, 1e9], h)
+        lines.append("  BEST BY (engine in hand x turn bin), CHOSEN ON EVEN "
+                     "SEEDS, MEASURED ON ODD, T20 and T10")
+        even, odd = a[:, 0] % 2 == 0, a[:, 0] % 2 == 1
+        for e in (0, 1):
+            for lo, hi in ((0, 6), (6, 9), (9, 1e9)):
+                m = (a[:, 4] == e) & (a[:, 1] >= lo) & (a[:, 1] < hi)
+                if m.sum() < 30:
+                    continue
+                pick = max(names, key=lambda nm: cell(m & even, nm, 1)[0]
+                           if nm != "base" else 0.0)
+                (m10, c10), (m20, c20) = cell(m & odd, pick, 0), cell(m & odd, pick, 1)
+                lab = f"turn {lo:g}-{hi:g}" if hi < 1e9 else f"turn {lo:g}+"
+                lines.append(
+                    f"    engine {e} {lab:<10} picked {pick:<9} odd seeds "
+                    f"T10 {m10:+.4f} +-{c10:.4f}{'*' if abs(m10) > c10 else ' '} "
+                    f"T20 {m20:+.4f} +-{c20:.4f}{'*' if abs(m20) > c20 else ''}")
+        lines.append("")
+    text = "\n".join(lines)
+    print(text)
+    with open(out, "w", encoding="utf-8") as fh:
+        fh.write(text + "\n")
+    return 0 if ok else 1
+
+
 def main(argv):
-    modes = {"census": census, "float": float_ab, "pick": pick_ab}
+    modes = {"census": census, "float": float_ab, "pick": pick_ab,
+             "forks": forks}
     if len(argv) < 3 or argv[0] not in modes:
         print(__doc__)
         return 2
     n, out = int(argv[1]), argv[2]
     return modes[argv[0]](n, out)
-
 
 
 if __name__ == "__main__":

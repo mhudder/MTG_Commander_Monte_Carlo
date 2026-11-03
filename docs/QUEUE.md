@@ -144,8 +144,13 @@ What is closed and where it went:
     Apex / Explosive Welcome mana past CR 106.4 (an engine defect; §0z164's
     change survives its fix, +0.0163 / +0.0108); and the rummage discards by
     miracle value, so it pitches non-miracle engines first -- discarding by
-    cast priority is +0.0155 ±0.0043 at T10, level at T20, N=30,000. A fork
-    of the pick should come before choosing a rule.
+    cast priority is +0.0155 ±0.0043 at T10, level at T20, N=30,000.
+    **Forked (§0z167)**: no rule wins at both horizons -- the permanents the
+    rummage pitches feed Restoration Seminar and Profound Journey -- and
+    under §0z164's no-hold policy priority and guard LOSE at T20 (-0.0058,
+    -0.0043, N=60,000). Keep the default unless the owner wants the T10
+    trade; `rummage_pick` "mv" is the only rule never negative (+0.0032 /
+    +0.0054 at T10, level at T20).
 
 
 32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is

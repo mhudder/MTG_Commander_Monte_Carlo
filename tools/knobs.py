@@ -168,6 +168,22 @@ def _pod_knob_read(node: ast.AST):
     return name, repr(POD_DEFAULTS[name])
 
 
+def _turn_knob_read(node: ast.AST):
+    """A read through `engine.turn_knob(g, "name", default)` (§0z161-§0z167):
+    a policy knob a fork can set on one turn. Returns (name, default) or
+    None. Without this every knob behind it -- the Citadel's, Necropotence's,
+    lorehold's reserve, hold, Top and rummage -- was missing from KNOBS.md
+    from the session that moved it there (found 2026-11-03, §0z167)."""
+    if not (isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "turn_knob"
+            and len(node.args) == 3
+            and isinstance(node.args[1], ast.Constant)
+            and isinstance(node.args[1].value, str)):
+        return None
+    return node.args[1].value, ast.unparse(node.args[2])
+
+
 def _nearest_section(lines: list[str], call_line: int, func_line: int) -> str:
     """The last section id cited above the call, inside the enclosing function.
 
@@ -202,7 +218,7 @@ def scan_file(path: str) -> list[Read]:
 
     out: list[Read] = []
     for node in ast.walk(tree):
-        pod = _pod_knob_read(node)
+        pod = _pod_knob_read(node) or _turn_knob_read(node)
         if pod is not None:
             name, default = pod
         elif _is_cfg_get(node):

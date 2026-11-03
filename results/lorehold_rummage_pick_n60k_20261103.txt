@@ -1,0 +1,12 @@
+Lorehold's rummage pick (§0z166): N=60,000 paired, seeds 5000.., the staged list, python 3.11.17
+today's rule rewritten through the swap reproduces today's games, every metric: YES
+row = rule minus today's (miracle); * = 95% CI excludes 0
+
+today (the defaults)
+  priority  T10 +0.0163 +-0.0030*   T20 +0.0009 +-0.0036    miracles T20 -0.0776 +-0.0113*
+  mv        T10 +0.0032 +-0.0021*   T20 +0.0012 +-0.0025    miracles T20 -0.0455 +-0.0078*
+  guard     T10 +0.0096 +-0.0025*   T20 +0.0013 +-0.0031    miracles T20 -0.0447 +-0.0094*
+R0H99 {'miracle_reserve': 0, 'hold_min_value': 99.0}
+  priority  T10 +0.0124 +-0.0033*   T20 -0.0058 +-0.0038*   miracles T20 -0.1025 +-0.0111*
+  mv        T10 +0.0054 +-0.0023*   T20 +0.0010 +-0.0027    miracles T20 -0.0584 +-0.0078*
+  guard     T10 +0.0068 +-0.0028*   T20 -0.0043 +-0.0032*   miracles T20 -0.0938 +-0.0094*

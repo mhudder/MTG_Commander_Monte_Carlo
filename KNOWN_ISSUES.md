@@ -219,6 +219,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. Not adopted |
 | [0z165](#0z165) | MEASURED | **Every main-phase deferral, derived and counted** (`tools.deferrals`, a traced census): lorehold's miracle hold binds 0.30 card-turns a game and **48% of the cards it holds die in hand**, 19% are miracled |
 | [0z166](#0z166) | MEASURED | **Lorehold's rummage pitches its engines**: every permanent scores -1, so ~1 priority-8.5+ card a game goes before a cheap spell; keeping them +0.0155 at T10, flat at T20. **Treasures counted twice off-turn** (106.4 too) |
+| [0z167](#0z167) | MEASURED | **Lorehold's rummage pick, forked: no rule wins at both horizons.** By priority +0.0163 at T10, level at T20, and -0.0058 at T20 with no holds (N=60,000): pitched permanents feed Seminar and Journey |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14739,6 +14740,84 @@ more early: the miracle count and win rate disagree again (§0t, §0z164).
 The T20 null is not explained here -- a fork of the pick (§0z160's method)
 is the way to ask which hands it matters in. Knob to say out loud with
 lorehold's rows: `land_floor`.
+
+<a id="0z167"></a>
+
+## 0z167. MEASURED -- lorehold's rummage pick, forked: the engines it pitches come back, and no rule wins at both horizons
+
+**The owner, 2026-11-03**: "go ahead and test the design choice by turn" --
+§0z166's discard rules through §0z160's method.
+
+**The knob.** `rummage_discard_choice` reads `rummage_pick` through
+`turn_knob`: "miracle" (the default, today's lowest miracle value),
+"priority", "mv", "guard" (`rummage_guard` 8.5). Every rule keeps the land
+rule (`land_floor`). The default is today's games: `check_unchanged_decks`
+HEAD 79d0401 against the working tree, N=400, python 3.11.17, BIT-IDENTICAL
+on all 8 metrics of all six decks; lorehold's staged list on seeds
+5000..7499 in both trees, T10 and T20, every output key hashed per seed: 0
+of 2,500 differ. The three other rules reproduce §0z166's diagnostic swaps
+game for game (150 seeds each). `tests/test_lorehold_rummage.py` pins A-H,
+three mutations exact.
+
+**One horizon from one game.** Every T10 win is the same seed's T20 win
+with at most ten rounds played, extra turns not counted: 0 mismatches in
+1,000 seeds. So a fork replays a T20 game once and reads both, and a
+T10-only gain means **wins that come sooner, not more of them**.
+
+### The forks (`diagnostics/run_lorehold_rummage.py forks`)
+
+Every turn beginning with Lorehold or Artist's Talent out, replayed with
+the rule set on that round only: 71,877 turns (20,000 seeds) under today's
+policy and 70,242 under §0z164's (`miracle_reserve` 0, `hold_min_value`
+99); `base` replayed reproduces the baseline on every turn in both.
+`results/lorehold_rummage_forks_20261103.txt`. Today's policy, rule minus
+today's, one round:
+
+| rule | T10 | T20 |
+|---|---|---|
+| priority | **+0.0021 ±0.0011** | +0.0007 ±0.0013 |
+| mv | +0.0004 ±0.0006 | +0.0006 ±0.0007 |
+| guard | **+0.0015 ±0.0008** | +0.0009 ±0.0009 |
+
+The gain is early (turns 4-8, under seven lands) and **in turns whose hand
+holds NO priority 8.5+ permanent**. With one in hand, keeping it ("guard")
+LOSES at T20, -0.0033 a round. Under §0z164's policy nothing gains: priority
+-0.0014 ±0.0014 at T20, and "best by bin" picked on even seeds is level or
+worse on odd ones in every bin.
+
+### The whole game, N=60,000 (`results/lorehold_rummage_pick_n60k_20261103.txt`)
+
+| rule | today's policy T10 / T20 | §0z164's policy T10 / T20 |
+|---|---|---|
+| priority | **+0.0163 ±0.0030** / +0.0009 ±0.0036 | **+0.0124 ±0.0033** / **-0.0058 ±0.0038** |
+| guard | **+0.0096 ±0.0025** / +0.0013 ±0.0031 | **+0.0068 ±0.0028** / **-0.0043 ±0.0032** |
+| mv | **+0.0032 ±0.0021** / +0.0012 ±0.0025 | **+0.0054 ±0.0023** / +0.0010 ±0.0027 |
+
+**THE MECHANISM** (3,000 paired games, T20, today's policy, rule minus
+today's): keeping the engines casts them -- Sunbird's Invocation +0.15 a
+game under either rule -- but the graveyard loses the big permanents the
+deck reanimates: Restoration Seminar -0.10 ±0.04 returns and -0.45 mana
+value, Profound Journey -0.06 ±0.03 and -0.39 (priority). **The rummage
+pitching a 6-drop permanent is half a setup for Seminar and Journey**, and
+the two effects cancel over a whole game; the engines kept come online
+sooner, so the early wins move and the late ones do not. Under §0z164's
+policy the pilot already casts more on its own turn, the reanimation loss
+is not paid back, and priority and guard lose at T20.
+
+**Read**: §0z166's "it pitches its engines" was true, and the cost it
+implied was not. No rule beats today's at both horizons. "mv" is never
+negative and gains only early (+0.0032 / +0.0054 at T10). The pick is a
+trade between winning sooner (T10) and winning as often (T20), and which
+horizon to optimise is the owner's call. Knobs to say out loud with
+lorehold's rows: `rummage_pick`, `land_floor`.
+
+**Found on the way: `docs/KNOBS.md` never listed a knob read through
+`turn_knob`.** `tools/knobs.py` matched `cfg.get` and `pod_knob` only, so 27
+knobs -- every Citadel, Necropotence, Sylvan Library, miracle reserve, hold,
+Top and rummage knob, from §0z161 on -- were absent from the registry whose
+promise is that an absent name does not exist (§0q's shape, a third time).
+`_turn_knob_read` registers them; `tests/test_knob_reads.py` checks all three
+read shapes against a grep of the source, three mutations exact.
 
 ## How to read an ablation table
 

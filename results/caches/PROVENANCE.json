@@ -1463,6 +1463,12 @@
         "evidence": "2026-11-01, \u00a70z164: lorehold's Top spin / order knobs, miracle_reserve 'known', the reserve and hold read through turn_knob, and miracle_need reading a non-instant's own miracle cost (no such card in the list), defaults reproducing today's games. check_unchanged_decks HEAD 8c00c5d vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and lorehold's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
         "fingerprint": "cfed5226881bc587",
         "utc": "2026-11-01T13:39:08Z"
+      },
+      {
+        "commit": "79d0401",
+        "evidence": "2026-11-03, \u00a70z167: lorehold's rummage_discard_choice reads rummage_pick through turn_knob (miracle, priority, mv, guard; rummage_guard 8.5), the default returning today's expression. check_unchanged_decks HEAD 79d0401 vs the working tree, N=400, python 3.11.17: BIT-IDENTICAL on all 8 metrics, all six decks; and lorehold's STAGED list (build_pending) played on seeds 5000..7499 in both trees at T10 and T20, every output key hashed per seed: 0 of 2,500 differ at either horizon.",
+        "fingerprint": "65c56e4e50df8d1c",
+        "utc": "2026-11-03T16:10:23Z"
       }
     ]
   },

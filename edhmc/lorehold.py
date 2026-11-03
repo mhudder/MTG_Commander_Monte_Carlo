@@ -449,6 +449,28 @@ def rummage_discard_choice(g):
         nonlands = [c for c in g.hand if not c.is_land]
         if nonlands:
             pool = nonlands
+    # §0z166-§0z167: THE KEY IS A POLICY, read through `turn_knob` so a fork
+    # can set it on one round. "miracle" (the default) is the lowest miracle
+    # value -- every permanent without a miracle cost is -1, so an engine
+    # (Arcane Bombardment, Sunbird's Invocation) goes before a cheap spell
+    # and a tie among -1 cards falls to hand order. "priority": the lowest
+    # cast priority, the pilot's own ranking. "mv": the lowest mana value.
+    # "guard": the default, but never a permanent of `rummage_guard` (8.5)
+    # priority or more while another card can go. The land rule above is
+    # every rule's.
+    rule = turn_knob(g, "rummage_pick", "miracle")
+    if rule == "priority":
+        return min(pool, key=lambda c: (c.priority, miracle_value(g, c)))
+    if rule == "mv":
+        return min(pool, key=lambda c: (c.mv, miracle_value(g, c)))
+    if rule == "guard":
+        bar = g.cfg.get("rummage_guard", 8.5)
+        keep = [c for c in pool if c.is_land or c.priority < bar
+                or miracle_value(g, c) >= 0]
+        pool = keep or pool
+    elif rule != "miracle":
+        raise ValueError(f"rummage_pick {rule!r}: miracle, priority, mv, "
+                         "guard")
     return min(pool, key=lambda c: miracle_value(g, c))
 
 
