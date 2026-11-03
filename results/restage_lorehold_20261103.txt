@@ -1,0 +1,4 @@
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0181 +-0.0032*  T20 +0.0243 +-0.0040*  dmgT20 +2.75 +-0.26
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0173 +-0.0038*  T20 +0.0225 +-0.0047*  dmgT20 +2.09 +-0.29
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0048 +-0.0029*  T20 +0.0177 +-0.0037*  dmgT20 +0.51 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0162 +-0.0039*  T20 +0.0135 +-0.0046*  dmgT20 +3.37 +-0.26

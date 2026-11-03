@@ -2644,7 +2644,11 @@ def hold_for_miracle(g, card):
         g.has(n) for n in TOP_SETTERS if n != "Library of Leng")
     if not can_set_top:
         return False
-    if miracle_value(g, card) < turn_knob(g, "hold_min_value", 3.0):
+    # ADOPTED 2026-11-03 (§0z164, §0z168): never hold. A threshold of 3
+    # kept the deck's top end in hand for a miracle that, of every card it
+    # held, about half never cast (§0z165); every threshold lost to none.
+    # `hold_min_value=3.0` restores the old pilot.
+    if miracle_value(g, card) < turn_knob(g, "hold_min_value", 99.0):
         return False
     return True
 
@@ -2652,8 +2656,11 @@ def hold_for_miracle(g, card):
 def reserve_for(g) -> int:
     """How much mana to leave untapped for the off-turn miracle windows.
 
-    `cfg["miracle_reserve"]` is a CONSTANT 2 by default, and 2 is the miracle
-    cost off a bare Lorehold. But the cost is not always 2: `miracle_need`
+    ADOPTED 2026-11-03 (§0z164, §0z168): `miracle_reserve` is 0 by default --
+    every reserve above 0 lost, monotonically, and the main phase now spends
+    what it can and floats only what it could not. `miracle_reserve=2`
+    restores the old constant, which was the miracle cost off a bare
+    Lorehold. But the cost is not always 2: `miracle_need`
     reads the board, and it is 1 with Artist's Talent at level 2 and 0 with
     Molecule Man. So the constant OVER-HOLDS whenever either is on the battlefield --
     the main phase declines to cast a spell to protect mana the miracle will
@@ -2671,7 +2678,7 @@ def reserve_for(g) -> int:
     """
     if not g.commander_cast:
         return 0
-    want = turn_knob(g, "miracle_reserve", 2)
+    want = turn_knob(g, "miracle_reserve", 0)
     if want == "need":
         want = miracle_need(g)
     elif want == "known":
@@ -3215,7 +3222,7 @@ def your_turn(g, extra=False):
     if _w and g.m["test_card_drawn_turn"] == 99 and             any(c.name in _w for c in g.hand):
         g.m["test_card_drawn_turn"] = g.turn
 
-    g.float_mana = len(mana_units(g))
+    g.float_mana = end_of_turn_float(g)
     # The draw lands left untapped are counted in that float; they untap on
     # your untap step, so each is one activation a round (§0z115).
     g.draw_lands_ready = [p for p in g.board if not p.tapped
@@ -3223,6 +3230,21 @@ def your_turn(g, extra=False):
     g.m["mana_floated"] += g.float_mana
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
     return held
+
+
+def end_of_turn_float(g) -> int:
+    """The mana your turn leaves for the pod's turns: the BOARD'S untapped
+    units (§0z166, §0z168). It was `len(mana_units(g))`, which is board +
+    Apex + Treasures: every Treasure was then in the float AND in
+    `g.treasures`, which each pod-turn payment adds again (and, the float
+    spent first, a Treasure that paid survived), and Apex of Power's or
+    Explosive Welcome's unspent mana outlived its step (CR 106.4: a mana pool
+    empties at the end of each step). Treasures stay in `g.treasures`, where
+    the pod's windows already read them. `float_board_only=False` restores
+    the old float."""
+    if g.cfg.get("float_board_only", True):
+        return len(available_mana(g))
+    return len(mana_units(g))
 
 
 def take_turn(g):

@@ -121,10 +121,10 @@ CLASSES: dict[str, tuple[str, str]] = {
         "WASTE_GUARD", "a one-shot blink with no Tivit to blink"),
     # --- lorehold -----------------------------------------------------------
     "lorehold._main_phase | c.is_land or hold_for_miracle(g, c)": (
-        "SPECULATIVE", "hold_for_miracle: a spell worth `hold_min_value` (3) "
-        "as a miracle waits for Library of Leng to put it on top; never "
-        "holding measured +0.0043 / +0.0050 (§0z164). The census skips "
-        "the land half"),
+        "SPECULATIVE", "hold_for_miracle: a spell worth `hold_min_value` as "
+        "a miracle waits for Library of Leng to put it on top. OFF since "
+        "2026-11-03 (99, the owner; was 3): never holding measured +0.0043 / "
+        "+0.0050 (§0z164, §0z168). The census skips the land half"),
     "lorehold._main_phase | c.land_face and n_lands < g.cfg.get('mdfc_land_floor', 5)": (
         "SPECULATIVE", "an MDFC is kept for its land face while under "
         "`mdfc_land_floor` (5) lands, even with the land drop used; "
@@ -144,9 +144,9 @@ CLASSES: dict[str, tuple[str, str]] = {
     "lorehold._main_phase | mode is None": (
         "NOT_A_CHOICE", "no mode of the card pays"),
     "lorehold._main_phase | len(units) - sum(cost.values()) >= reserve": (
-        "SPECULATIVE", "miracle_reserve (2): mana kept for the pod's miracle "
-        "windows past the end step; reserve 0 measured +0.0120 / +0.0059 "
-        "(§0t, §0z164)"),
+        "SPECULATIVE", "miracle_reserve: mana kept for the pod's miracle "
+        "windows past the end step. 0 since 2026-11-03 (the owner; was 2): "
+        "reserve 0 measured +0.0120 / +0.0059 (§0t, §0z164, §0z168)"),
     "lorehold.flashback_options | idx is not None and len(units) - len(idx) >= reserve": (
         "SPECULATIVE", "the same miracle reserve, on a card's own flashback "
         "(§0z164)"),

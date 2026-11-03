@@ -2839,6 +2839,52 @@ measured payoff -- and the owner asked for its read-only first step.
   redundant with `pilot_may_cast`; shilgengar's ultimate reserve is the one
   hold outside lorehold worth forking. Queue item 32 holds the rest.
 
+## 2026-11-03: lorehold's rummage and float, then the miracle policy adopted (§0z166-§0z168)
+
+The owner asked whether, with no reserve, lorehold would hold miracle mana
+only by accident, and how often its rummage cycles low-power cards. Reading
+the off-turn float found it counted every Treasure twice and kept Apex
+mana past its step (§0z166). The rummage turned out to pitch the deck's
+non-miracle engines first -- but forked one round at a time (§0z167) no
+other rule won at both horizons, because the permanents it pitches feed
+Restoration Seminar and Profound Journey. The same session found that
+`docs/KNOBS.md` had never listed a knob read through `turn_knob` (27 since
+§0z161) and fixed the scanner. The owner then adopted no reserve, never
+hold and the float fix, and kept the rummage: one rebuild of lorehold's
+table on python 3.13.16, five rows beyond their bars, and the four staged
+swaps re-measured, all standing (§0z168).
+
+## Queued items closed 2026-11-03 — moved from `docs/QUEUE.md`
+
+Closed by the owner, 2026-11-03: "adopt the reserve, hold and float fix; keep the rummage." `miracle_reserve` 0, `hold_min_value` 99 and `float_board_only` are lorehold's defaults; `rummage_pick` stays "miracle"; the table rebuilt and the staged swaps re-measured (§0z168).
+
+31. **Lorehold's miracle policy (§0z164), an owner call, HELD by the owner
+    2026-11-02** ("hold the decision for now"). Nothing is adopted and
+    lorehold's cache is VERIFIED; adopting is what moves it. Measured at
+    N=60,000: hold NO miracle mana (`miracle_reserve` 0) and NEVER decline a
+    hardcast to wait for a miracle (`hold_min_value` 99) -- together +0.0166
+    ±0.0028 / +0.0109 ±0.0032 at T10 / T20; each alone significant at both.
+    Sensei's Top is already played right. Adopting moves lorehold's baseline:
+    rebuild its table with it (`DECKS=lorehold ./tools/regen_tables.sh` on
+    Python 3.13.16 / numpy 2.4.6), and re-measure lorehold's four staged
+    swaps (`diagnostics/run_restage.py`), several of which are miracle cards.
+    **What the holds buy, counted (§0z165)**: of the cards `hold_for_miracle`
+    keeps, about half are still in hand when the game ends and a fifth are
+    miracled; the reserve's keep Furygale Flocking and Approach of the
+    Second Sun first.
+    **Two more for the same batch (§0z166)**, both moving lorehold's
+    baseline: the off-turn float counts every Treasure twice and carries
+    Apex / Explosive Welcome mana past CR 106.4 (an engine defect; §0z164's
+    change survives its fix, +0.0163 / +0.0108); and the rummage discards by
+    miracle value, so it pitches non-miracle engines first -- discarding by
+    cast priority is +0.0155 ±0.0043 at T10, level at T20, N=30,000.
+    **Forked (§0z167)**: no rule wins at both horizons -- the permanents the
+    rummage pitches feed Restoration Seminar and Profound Journey -- and
+    under §0z164's no-hold policy priority and guard LOSE at T20 (-0.0058,
+    -0.0043, N=60,000). Keep the default unless the owner wants the T10
+    trade; `rummage_pick` "mv" is the only rule never negative (+0.0032 /
+    +0.0054 at T10, level at T20).
+
 ## Queued items closed 2026-10-15 — moved from `docs/QUEUE.md`
 
 Closed by the POD_V4 parallel rebuild at `ca89b23` (§0z140): six legs, 58

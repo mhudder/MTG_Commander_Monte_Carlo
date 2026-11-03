@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b and 24 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24 and 31 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -125,34 +125,6 @@ What is closed and where it went:
     at the tables' N before deciding (§0z30: its size is not guessable); it
     moves every baseline, so it is a batched rebuild.
 
-31. **Lorehold's miracle policy (§0z164), an owner call, HELD by the owner
-    2026-11-02** ("hold the decision for now"). Nothing is adopted and
-    lorehold's cache is VERIFIED; adopting is what moves it. Measured at
-    N=60,000: hold NO miracle mana (`miracle_reserve` 0) and NEVER decline a
-    hardcast to wait for a miracle (`hold_min_value` 99) -- together +0.0166
-    ±0.0028 / +0.0109 ±0.0032 at T10 / T20; each alone significant at both.
-    Sensei's Top is already played right. Adopting moves lorehold's baseline:
-    rebuild its table with it (`DECKS=lorehold ./tools/regen_tables.sh` on
-    Python 3.13.16 / numpy 2.4.6), and re-measure lorehold's four staged
-    swaps (`diagnostics/run_restage.py`), several of which are miracle cards.
-    **What the holds buy, counted (§0z165)**: of the cards `hold_for_miracle`
-    keeps, about half are still in hand when the game ends and a fifth are
-    miracled; the reserve's keep Furygale Flocking and Approach of the
-    Second Sun first.
-    **Two more for the same batch (§0z166)**, both moving lorehold's
-    baseline: the off-turn float counts every Treasure twice and carries
-    Apex / Explosive Welcome mana past CR 106.4 (an engine defect; §0z164's
-    change survives its fix, +0.0163 / +0.0108); and the rummage discards by
-    miracle value, so it pitches non-miracle engines first -- discarding by
-    cast priority is +0.0155 ±0.0043 at T10, level at T20, N=30,000.
-    **Forked (§0z167)**: no rule wins at both horizons -- the permanents the
-    rummage pitches feed Restoration Seminar and Profound Journey -- and
-    under §0z164's no-hold policy priority and guard LOSE at T20 (-0.0058,
-    -0.0043, N=60,000). Keep the default unless the owner wants the T10
-    trade; `rummage_pick` "mv" is the only rule never negative (+0.0032 /
-    +0.0054 at T10, level at T20).
-
-
 32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is
     a bet: the pilot acts unless a measured payoff says wait. Done, read-only:
     the inventory (`python -m tools.deferrals`, 38 main-phase sites in seven
@@ -160,8 +132,8 @@ What is closed and where it went:
     hold it) and the census (`diagnostics/run_deferral_census.py`: how often
     each site changes what is cast, and what became of the card held; every
     traced game identical to its untraced twin). Nothing moved. Left, in order:
-    - **Lorehold's two holds are queue item 31**, the owner's decision; the
-      census is evidence for it (most cards the miracle hold keeps die in hand).
+    - **Lorehold's two holds are gone**: ADOPTED by the owner 2026-11-03
+      with the float fix (item 31, closed; §0z168).
     - **Fork shilgengar's ultimate reserve on POD_V4** by §0z160's method
       (`shilgengar_ult_reserve` through `turn_knob`, a `turns`-replay
       diagnostic, bit-identity first). §0t confirmed 3 before pod v3; half the

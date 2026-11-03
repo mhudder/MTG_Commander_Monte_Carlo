@@ -216,10 +216,11 @@ Each row is a headline and its key number, at most 250 characters
 | [0z161](#0z161) | MEASURED | **The Citadel's floor that reads the pod's clock**: stop at the chip damage the table can deal next round, +1 or +2. Beats floor 10 at both horizons; the optimal stop moves with the chip |
 | [0z162](#0z162) | MEASURED | **Necropotence's policy, forked**: the floor hardly binds (clock floor nil over games); **with Reliquary Tower, buy past 7**: +0.0016 / +0.0012. Max hand size is unmodelled everywhere |
 | [0z163](#0z163) | MEASURED | **Sylvan Library's floor, forked: 20 is already optimal**, and every clock floor loses (-0.0107 at T20). Azusa gains 5 life a game, so 4 life paid is gone for good |
-| [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. Not adopted |
+| [0z164](#0z164) | MEASURED | **Lorehold's miracles and Top, forked**: Top is played right; **hold no miracle mana and never hold a spell for a miracle**: +0.0166 / +0.0109, N=60,000. ADOPTED 2026-11-03 (§0z168) |
 | [0z165](#0z165) | MEASURED | **Every main-phase deferral, derived and counted** (`tools.deferrals`, a traced census): lorehold's miracle hold binds 0.30 card-turns a game and **48% of the cards it holds die in hand**, 19% are miracled |
 | [0z166](#0z166) | MEASURED | **Lorehold's rummage pitches its engines**: every permanent scores -1, so ~1 priority-8.5+ card a game goes before a cheap spell; keeping them +0.0155 at T10, flat at T20. **Treasures counted twice off-turn** (106.4 too) |
 | [0z167](#0z167) | MEASURED | **Lorehold's rummage pick, forked: no rule wins at both horizons.** By priority +0.0163 at T10, level at T20, and -0.0058 at T20 with no holds (N=60,000): pitched permanents feed Seminar and Journey |
+| [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14556,7 +14557,8 @@ rewards; a miracle saved for a window that may not come is not.
 
 **Not adopted**: `miracle_reserve` 0 and `hold_min_value` 99 move lorehold's
 baseline, so they are the owner's call and the table is rebuilt with them
-(queue item 31). Knobs to say out loud with lorehold's rows:
+(queue item 31). **ADOPTED BY THE OWNER 2026-11-03** with §0z166's float fix; the
+table rebuilt (§0z168). Knobs to say out loud with lorehold's rows:
 `miracle_reserve`, `hold_min_value`.
 
 <a id="0z165"></a>
@@ -14818,6 +14820,74 @@ Top and rummage knob, from §0z161 on -- were absent from the registry whose
 promise is that an absent name does not exist (§0q's shape, a third time).
 `_turn_knob_read` registers them; `tests/test_knob_reads.py` checks all three
 read shapes against a grep of the source, three mutations exact.
+
+<a id="0z168"></a>
+
+## 0z168. REBUILT -- lorehold's miracle policy adopted: no reserve, never hold, the float fixed; the rummage kept
+
+**The owner, 2026-11-03**: "adopt the reserve, hold and float fix; keep the
+rummage." Queue item 31 closed (moved to `docs/HISTORY.md`).
+
+### What changed in `edhmc/lorehold.py`
+
+| knob | was | now | evidence | the old pilot |
+|---|---|---|---|---|
+| `miracle_reserve` | 2 | **0** | §0t, §0z164 | `miracle_reserve=2` |
+| `hold_min_value` | 3.0 | **99.0** (never hold) | §0z164, §0z165 | `hold_min_value=3.0` |
+| `float_board_only` | -- | **True** | §0z166 | `float_board_only=False` |
+| `rummage_pick` | "miracle" | "miracle" (kept) | §0z166, §0z167 | -- |
+
+The float is now `end_of_turn_float(g)`: the board's untapped units, so a
+Treasure is counted once (in `g.treasures`) and Apex of Power's or Explosive
+Welcome's unspent mana empties with its step (CR 106.4). **The engine's fix
+is §0z166's diagnostic correction**: 1,500 seeds under the old policy, every
+game identical but for the `mana_floated` counter, which now reads the true
+float -- so §0z164's and §0z166's measurements are of the code adopted:
++0.0163 ±0.0056 / +0.0108 ±0.0065 at T10 / T20 for the policy on the fixed
+float (§0z166, N=15,000). `tests/test_lorehold_float.py` pins the float, both
+defaults and the switches back, three mutations exact.
+
+### The table, rebuilt (`results/ablation_lorehold.txt`)
+
+`DECKS=lorehold ./tools/regen_tables.sh`, python 3.13.16 / numpy 2.4.6,
+15m03s; `repro_row` IDENTICAL on Library of Leng. **5 of 65 rows moved
+beyond the wider of their two bars** (win rate, T20), and they are the
+cards the holds kept in hand:
+
+| card | old | new |
+|---|---|---|
+| Hit the Mother Lode | +0.0117 | **+0.0183** |
+| Rise of the Eldrazi | +0.0427 | +0.0472 |
+| Big Score | +0.0108 | +0.0149 |
+| Volcanic Vision | +0.0129 | +0.0160 |
+| Monument to Endurance | +0.0131 | **+0.0092** |
+
+Hit the Mother Lode was on `hold_for_miracle`'s list of cards held (§0z165)
+and Big Score on the reserve's; both are cast now. The off-turn untappers,
+Victory Chimes (+0.0066 -> +0.0099) and Bender's Waterskin (+0.0058 ->
++0.0095), rose to the edge of their bars: with nothing held, they are where
+the pod's-turn miracle mana comes from. Library of Leng and Sensei's Top stay
+inside theirs. Three labels crossed at the floor (Artist's Talent win ->
+both, Blasphemous Act FLIP -> both, Pinnacle Monk dmg -> both); no
+significant row changed sign.
+
+### The four staged swaps, in context (`results/restage_lorehold_20261103.txt`)
+
+N=15,000 paired, python 3.13.16, staged minus undone:
+
+| swap | T10 | T20 | against 2026-10-15 |
+|---|---|---|---|
+| -Penance +Caldera Pyremaw | +0.0181 ±0.0032 | +0.0243 ±0.0040 | inside both bars |
+| -Scroll Rack +Sunbird's Invocation | +0.0173 ±0.0038 | +0.0225 ±0.0047 | T10 +0.0043, inside |
+| -Boros Charm +Immolating Gyre | +0.0048 ±0.0029 | +0.0177 ±0.0037 | inside both bars |
+| -Ruby Medallion +Prisoner's Dilemma | +0.0162 ±0.0039 | **+0.0135 ±0.0046** | **T20 -0.0066, beyond** |
+
+All four stand, significant at both horizons. Prisoner's Dilemma, a
+five-mana sorcery, is miracled less once nothing holds for a miracle. Each
+Change's `reverified` records it.
+
+Knobs to say out loud with lorehold's rows from here: `miracle_reserve`,
+`hold_min_value`, `float_board_only`, `rummage_pick`, `land_floor`.
 
 ## How to read an ablation table
 
