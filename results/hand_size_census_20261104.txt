@@ -1,0 +1,14 @@
+§0z171 cleanup census: N=3,000 games a deck, T20, the staged list, seeds 5000.., python 3.11.17
+
+rendmaw     turns over seven 0.28 a game (2.6% of 10.6 turns); discards 0.73 a game (lands 0.34, spells' mana value 1.2); Necropotence exiled 0.00; games with any 17.2%
+            most discarded (a game): Forest 0.07, Swamp 0.07, Culling Ritual 0.03, Toxic Deluge 0.03, Heroic Intervention 0.02, Eyeblight's Ending 0.02, Beast Within 0.02, Nameless Inversion 0.02, Pygmy Kavu 0.02, Assassin's Trophy 0.02
+lorehold    turns over seven 0.42 a game (4.1% of 10.2 turns); discards 0.80 a game (lands 0.21, spells' mana value 2.9); Necropotence exiled 0.00; games with any 19.9%
+            most discarded (a game): Plains 0.09, Mountain 0.08, Caldera Pyremaw 0.02, Arcane Bombardment 0.02, Double Vision 0.02, Sunbird's Invocation 0.02, Path to Exile 0.02, Goliath Daydreamer 0.02, Pinnacle Monk 0.01, Ultima 0.01
+karlov      turns over seven 0.44 a game (4.4% of 10.0 turns); discards 0.79 a game (lands 0.60, spells' mana value 0.8); Necropotence exiled 0.07; games with any 18.5%
+            most discarded (a game): Swamp 0.29, Plains 0.22, Farewell 0.02, Sun Titan 0.01, Damnation 0.01, Benevolent Offering 0.01, Fracture 0.01, Austere Command 0.01, Return to Dust 0.01, Toxic Deluge 0.01
+tivit       turns over seven 0.31 a game (2.8% of 11.0 turns); discards 0.37 a game (lands 0.13, spells' mana value 1.1); Necropotence exiled 0.00; games with any 18.9%
+            most discarded (a game): Island 0.02, Plains 0.02, Swamp 0.02, Promise of Loyalty 0.02, Capital Punishment 0.02, Sadistic Shell Game 0.02, Farewell 0.01, Magister of Worth 0.01, Bite of the Black Rose 0.01, Council's Judgment 0.01
+shilgengar  turns over seven 0.13 a game (1.2% of 11.2 turns); discards 0.19 a game (lands 0.06, spells' mana value 0.6); Necropotence exiled 0.00; games with any 9.3%
+            most discarded (a game): Swamp 0.02, Flawless Maneuver 0.01, Teferi's Protection 0.01, Angel of the Ruins 0.01, Plains 0.01, Twilight Shepherd 0.01, Reya Dawnbringer 0.01, Angel of Despair 0.01, Revel in Riches 0.01, Damn 0.01
+azusa       turns over seven 0.65 a game (6.7% of 9.7 turns); discards 2.57 a game (lands 0.97, spells' mana value 7.0); Necropotence exiled 0.00; games with any 34.6%
+            most discarded (a game): Forest 0.39, Beast Within 0.08, Krosan Grip 0.08, Abundance 0.08, Hall of Gemstone 0.08, Greater Good 0.08, Memory Jar 0.07, Mind's Eye 0.07, Storm Cauldron 0.07, Nylea's Intervention 0.06

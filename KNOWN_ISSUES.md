@@ -223,7 +223,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
 | [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
 | [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
-| [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), in every engine; Reliquary Tower and Library of Leng lift it, Necropotence exiles; rule off is bit-identical. Shift and rebuild pending |
+| [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar (its reanimation pays it back) |
 | [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
@@ -15015,10 +15015,73 @@ key hashed per game, 2,500 seeds at T20, all seven decks: 0 of 17,500 games
 differ from HEAD `d4a8a0a` (python 3.11.17). `tests/test_hand_size.py` pins
 A-I; its four mutations break exactly the sets written before the run.
 
-**Measurements pending** (this section is completed as they land): the shift
-per deck at N=15,000 (§0z30), a census of what is discarded, and the
-mechanism counters it moves. Every active deck's baseline moves, so every
-cache is SUSPECT by design until the batched rebuild.
+**Found on its first run: `remove_card` is `list.remove`.** It takes the
+FIRST EQUAL card, so with two Forests in hand the chosen Forest stayed in the
+hand and also went to the graveyard (azusa, seed 6244, which crashed the first
+shift run in `want_order`). The cleanup step removes the object it chose
+(`engine.remove_exact`, test case J). A zone census (an object in two zones at
+a pod round, 1,000 games a deck, rule on and off) then reads 0 for hand +
+graveyard everywhere; an older battlefield + graveyard anomaly in azusa (13
+games in 1,000) and trostani, unchanged by the rule, is queue item 30's
+successor, **item 33**.
+
+**And a pilot defect it uncovered, §0z172**: the first shift had rendmaw and
+shilgengar WINNING more under forced discard. The loop it was breaking --
+a karoo returning itself every turn -- is fixed there, and the shift below is
+measured with that fix in BOTH legs.
+
+### What the rule moves (N=15,000 paired, the tables' N, python 3.11.17)
+
+`diagnostics/run_shared_code_shift.py`, rule off minus rule on, both legs on
+§0z172's guard, `results/hand_size_shift_20261104.txt`. Win rate:
+
+| deck | T10 | T20 | seeds whose result changed (T20) |
+|---|---|---|---|
+| rendmaw | -0.0011 [-0.0019, -0.0004] * | **-0.0039 [-0.0055, -0.0022] *** | 164 |
+| lorehold | **-0.0057 [-0.0084, -0.0029] *** | **-0.0039 [-0.0071, -0.0008] *** | 573 |
+| karlov | +0.0003 [-0.0010, +0.0016] | +0.0007 [-0.0012, +0.0026] | 210 |
+| tivit | -0.0024 [-0.0036, -0.0012] * | **-0.0051 [-0.0068, -0.0033] *** | 180 |
+| shilgengar | -0.0003 [-0.0006, +0.0001] | +0.0008 [-0.0007, +0.0023] | 124 |
+| azusa | -0.0013 [-0.0028, +0.0002] | -0.0013 [-0.0034, +0.0009] | 263 |
+
+**Every deck the rule moves, it moves DOWN, and none by more than about half
+a point** -- the size of a mid-table card row. `stranded_mv` falls in every
+deck (-2.6 to -10.6 a game at T20): those were the cards a real pilot would
+have discarded.
+
+### What is discarded (`diagnostics/run_hand_size.py census`, 3,000 games a deck, T20)
+
+`results/hand_size_census_20261104.txt`. Per game:
+
+| deck | turns over 7 | discards | lands | most often |
+|---|---|---|---|---|
+| azusa | 0.65 (6.7%) | **2.57** | 0.97 | Forest 0.39; then Beast Within, Krosan Grip, Abundance, Hall of Gemstone, Greater Good |
+| lorehold | 0.42 (4.1%) | 0.80 | 0.21 | basics; Caldera Pyremaw, Arcane Bombardment, Double Vision, Sunbird's Invocation (the rummage's pick: permanents first, §0z166) |
+| karlov | 0.44 (4.4%) | 0.79 | 0.60 | Swamp 0.29, Plains 0.22; Necropotence exiled 0.07 |
+| rendmaw | 0.28 (2.6%) | 0.73 | 0.34 | basics; then removal (Culling Ritual, Toxic Deluge) |
+| tivit | 0.31 (2.8%) | 0.37 | 0.13 | answers and council spells |
+| shilgengar | 0.13 (1.2%) | 0.19 | 0.06 | protection, then Angels |
+
+### The graveyard, as the owner asked
+
+The discards land where every recursion card looks, and the counters show it
+(rule on minus off, 6,000 paired games, T20, `diagnostics/run_hand_size.py
+keys`): shilgengar's reanimations rise -- `shilgengar_reanimated` +0.048
+±0.024 a game, `single_reanimations` +0.013 ±0.006, `shilgengar_ults` +0.008
+±0.004 -- and rendmaw's Gloomshrieker returns +0.006 ±0.002. **That is why
+shilgengar alone is level** (+0.0008 at T20): a deck that reanimates gets back
+part of what it discards. The pilot does not discard FOR the graveyard -- the
+want order keeps the best seven, it does not ask which discard a reanimation
+target would rather be -- so this is a floor on the synergy, and a pilot who
+pitches a fatty to Reya would do better.
+
+**Not modelled**: Library of Leng's "you may put it on top instead" applies to
+discards an EFFECT causes, not the game rule (and Leng lifts the maximum
+anyway); madness and "whenever you discard" beyond Monument and Necropotence
+appear in no list (Scryfall scan of every listed card, 2026-11-04).
+
+Every active deck's baseline moves, so every cache is SUSPECT by design until
+the batched rebuild.
 
 <a id="0z172"></a>
 
@@ -15049,7 +15112,20 @@ every deck, every output key, 2,500 seeds: identical to `d4a8a0a`. The guard
 alone changes 104 / 69 / 83 of 2,500 games in those three decks and 0 in the
 other four. `tests/test_karoo_drop.py` pins A-D, one mutation exact.
 
-**What it is worth**: measured with §0z171's shift, below it (pending).
+**What it is worth** (N=15,000 paired, cleanup step off in both legs,
+`results/karoo_guard_shift_20261104.txt`), win rate:
+
+| deck | T10 | T20 |
+|---|---|---|
+| **rendmaw** (Golgari Rot Farm) | +0.0049 [+0.0037, +0.0060] * | **+0.0115 [+0.0095, +0.0135] *** |
+| **shilgengar** (Orzhov Basilica) | +0.0013 [+0.0007, +0.0019] * | **+0.0098 [+0.0080, +0.0116] *** |
+| **lorehold** (Boros Garrison) | +0.0044 [+0.0032, +0.0056] * | **+0.0059 [+0.0042, +0.0075] *** |
+| karlov, tivit, azusa | 0.0000, every seed identical | 0.0000 |
+
+A full point for rendmaw, from one land's drop. **The policy lesson again**
+(CLAUDE.md, "the biggest corrections were POLICY"): the karoo's row in its
+table read as an ordinary land, and the tell was a counter
+(`karoo_bounces`) moving the wrong way under an unrelated change.
 
 ## How to read an ablation table
 
