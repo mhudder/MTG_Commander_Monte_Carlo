@@ -4255,7 +4255,7 @@ def cleanup_step(g, pick=None, after=None) -> int:
         gone = want_order(g, g.hand)[cap:] if pick is None else ()
         for i in range(n):
             card = gone[i] if pick is None else pick(g)
-            remove_card(g.hand, card)
+            remove_exact(g.hand, card)
             put_discarded(g, card)
             if card.is_land:
                 g.m["cleanup_lands"] += 1
@@ -4303,6 +4303,20 @@ def remove_card(cards: list, card) -> None:
             del cards[i]
             return
     raise ValueError("remove_card(cards, card): card not in cards")
+
+
+def remove_exact(cards: list, card) -> None:
+    """Remove THIS object from `cards`, by identity -- for code that moves a
+    card it CHOSE to another zone. `remove_card` is `list.remove`, which takes
+    the FIRST EQUAL card: with two Forests in hand it took the other one, and
+    the chosen Forest was then in the hand AND the graveyard (azusa, seed
+    6244, the cleanup step's first run, §0z171). `remove_card` keeps
+    `list.remove`'s choice because old games depend on it (§0z146)."""
+    for i, c in enumerate(cards):
+        if c is card:
+            del cards[i]
+            return
+    raise ValueError("remove_exact(cards, card): card not in cards")
 
 
 def tutor_take(g, pool, stream: str):

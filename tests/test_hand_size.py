@@ -2,7 +2,7 @@
 """Pin the cleanup step: discard to seven at the end of your turn (§0z171).
 
     python -m tests.test_hand_size
-    python -m tests.test_hand_size --mutate   # 4 mutations, exact sets
+    python -m tests.test_hand_size --mutate   # 5 mutations, exact sets
 
 CR 514.1: "the active player discards down to their maximum hand size", seven
 by CR 402.2. No engine did it before 2026-11-04 (queue item 30, found in
@@ -24,6 +24,9 @@ CASES
   G `hand_size_rule=False` restores the old games: nothing is discarded
   H every engine calls `cleanup_step` in a played game (each module's own
     reference, counted)
+  J two EQUAL cards in hand (two Swamps, distinct objects): the one discarded
+    is the one that leaves the hand -- no object ends in hand AND graveyard
+    (`remove_exact`; `remove_card` took the first equal one, §0z171)
   I the generator reads the text: "You have no maximum hand size." is True,
     Ultima's reminder text is not a static, and any other text about the
     maximum RAISES (`tag_flying.no_max_hand_size`) -- and the generated set
@@ -34,6 +37,7 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   NO_MAX_HAND_SIZE emptied             -> C, D
   put_discarded ignores Necropotence   -> E
   cleanup_repeat_max 1 (cfg)           -> F
+  remove_exact is remove_card          -> J
 
 UNMUTATED (§0z15): G is the switch itself. H is blind to WHERE in the turn the
 call sits -- that it follows the end step and precedes the pod's round is read
@@ -152,6 +156,17 @@ def run_cases():
     check("H every engine calls cleanup_step in a played game",
           sorted(d for d in DECKS if calls.get(d, 0) > 0), sorted(DECKS))
 
+    import copy
+    g = karlov(hand_n=6)
+    swamp = next(c for c in KDECK if c.name == "Swamp")
+    a, b = copy.copy(swamp), copy.copy(swamp)
+    g.hand = [a] + g.hand + [b]
+    EN.cleanup_step(g)
+    gy = {id(c) for c in g.graveyard}
+    check("J two equal cards: the one discarded is the one that leaves",
+          (len(g.hand) + len(g.graveyard),
+           sum(1 for c in g.hand if id(c) in gy)), (8, 0))
+
     raised = False
     try:
         no_max_hand_size("X", "Your maximum hand size is increased by one.")
@@ -180,13 +195,16 @@ def main():
         g.graveyard.append(card)
 
     real_set = EN.NO_MAX_HAND_SIZE
+    real_exact = EN.remove_exact
     muts = [("hand_size_rule False", {"A", "B", "E", "F"},
              {"hand_size_rule": False}, None),
             ("NO_MAX_HAND_SIZE emptied", {"C", "D"}, {},
              ("NO_MAX_HAND_SIZE", frozenset())),
             ("put_discarded ignores Necropotence", {"E"}, {},
              ("put_discarded", put_ignores_necro)),
-            ("cleanup_repeat_max 1", {"F"}, {"cleanup_repeat_max": 1}, None)]
+            ("cleanup_repeat_max 1", {"F"}, {"cleanup_repeat_max": 1}, None),
+            ("remove_exact is remove_card", {"J"}, {},
+             ("remove_exact", EN.remove_card))]
     bad = 0
     for label, want, cfg, patch in muts:
         print(f"-- {label}")
@@ -200,6 +218,7 @@ def main():
             CFG.clear()
             EN.put_discarded = real_put
             EN.NO_MAX_HAND_SIZE = real_set
+            EN.remove_exact = real_exact
         ok = broke == want
         bad += (not ok)
         print(f"   broke {sorted(broke) or 'nothing'}  expected "
