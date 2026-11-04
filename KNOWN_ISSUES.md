@@ -224,6 +224,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
 | [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
 | [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), in every engine; Reliquary Tower and Library of Leng lift it, Necropotence exiles; rule off is bit-identical. Shift and rebuild pending |
+| [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15018,6 +15019,37 @@ A-I; its four mutations break exactly the sets written before the run.
 per deck at N=15,000 (§0z30), a census of what is discarded, and the
 mechanism counters it moves. Every active deck's baseline moves, so every
 cache is SUSPECT by design until the batched rebuild.
+
+<a id="0z172"></a>
+
+## 0z172. FIXED -- a karoo played on an empty battlefield returned itself, turn after turn
+
+Found by §0z171's first shift run: forced discarding made **rendmaw and
+shilgengar win MORE** (+0.0031 and +0.0040 at T20, N=15,000), which a rule
+that only removes cards cannot do by itself. The every-key diff
+(`diagnostics/run_hand_size.py keys`) had one counter falling hard,
+`karoo_bounces` (-0.25 a game in rendmaw, -0.15 in shilgengar).
+
+**The defect is a pilot's, in `engine.play_land`.** Its score ranks a land
+by the colours it adds first. On an empty battlefield a two-colour karoo
+(Golgari Rot Farm: "When this land enters, return a land you control to its
+owner's hand") beats every basic, enters, returns ITSELF -- the only land it
+can -- and wins the next turn's drop the same way. In 2,000 rendmaw games with
+the cleanup step off: **887 Rot Farm entries, 567 of them returning itself**.
+The cleanup step broke the loop by discarding the Rot Farm out of a full hand
+(105 discards), and that was the "gain".
+
+**The fix**: while no land is on the battlefield, a karoo is not the drop if
+another land is in hand (`karoo_needs_land`, default True; False restores the
+loop). Alone in hand it is still played -- the drop has no other use, and its
+landfall trigger is real. Three lists run a karoo through `play_land`:
+rendmaw (Golgari Rot Farm), lorehold (Boros Garrison), shilgengar (Orzhov
+Basilica); trostani has its own karoo code and is SUSPENDED. Both switches off,
+every deck, every output key, 2,500 seeds: identical to `d4a8a0a`. The guard
+alone changes 104 / 69 / 83 of 2,500 games in those three decks and 0 in the
+other four. `tests/test_karoo_drop.py` pins A-D, one mutation exact.
+
+**What it is worth**: measured with §0z171's shift, below it (pending).
 
 ## How to read an ablation table
 

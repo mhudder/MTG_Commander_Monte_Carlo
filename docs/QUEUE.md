@@ -139,3 +139,14 @@ What is closed and where it went:
       is, with its check.
     - **Then the CLAUDE.md lesson**, once a second deck's hold is measured:
       a deferral is a bet, and the default is to act.
+
+33. **A card on the battlefield AND in the graveyard at once (§0z171's zone
+    census).** At a pod round, the same Card object sits in `g.board` (as
+    `p.card`) and in `g.graveyard`: azusa 13 games in 1,000, trostani 1-2
+    (and once battlefield + hand), the other five decks 0, with or without
+    the cleanup step. Many token permanents sharing ONE token Card is by
+    design and not this. Likely the shape §0z171 fixed in its own code:
+    moving a CHOSEN card with `engine.remove_card` (first EQUAL card, not that
+    object) -- `engine.remove_exact` is the identity version. Find the sites,
+    fix, prove the census reads 0, measure the shift (§0z30). Trostani is
+    SUSPENDED: fix shared code it needs, do not re-measure it.

@@ -2824,6 +2824,21 @@ def play_land(g: Game):
         lands = lands + mdfc
     if not lands:
         return
+    # A KAROO NEEDS A LAND TO RETURN (§0z172). "When this land enters, return
+    # a land you control to its owner's hand": with no other land on the
+    # battlefield it returns ITSELF, and the drop bought nothing. The score
+    # below ranks new colours first, so on an empty board a two-colour karoo
+    # beat every basic -- and came back to hand, and won the next turn's drop
+    # the same way: in rendmaw, 567 of Golgari Rot Farm's 887 entries in 2,000
+    # games returned itself. No pilot plays it there while another land is in
+    # hand. Found because the cleanup step (§0z171) discarded the looping Rot
+    # Farm and the deck won MORE. `karoo_needs_land=False` restores the loop.
+    if (g.cfg.get("karoo_needs_land", True)
+            and not any(p.card.is_land for p in g.board)):
+        rest = [c for c in lands
+                if not LAND_RULES.get(c.name, {}).get("karoo")]
+        if rest:
+            lands = rest
     have = set()
     for p in g.board:
         if p.card.is_land:
