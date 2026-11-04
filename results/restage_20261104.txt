@@ -1,0 +1,12 @@
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0389 +-0.0035*  T20 +0.0281 +-0.0035*  dmgT20 -4.29 +-0.28
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0123 +-0.0039*  T20 +0.0084 +-0.0042*  dmgT20 -0.30 +-0.26
+karlov  -Daxos, Blessed by the Sun +South Wind Avatar T10 +0.0139 +-0.0025*  T20 +0.0109 +-0.0030*  dmgT20 +0.36 +-0.17
+tivit   -Plains +Anointed Procession                  T10 +0.0049 +-0.0040*  T20 -0.0021 +-0.0046   dmgT20 -2.49 +-0.33
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0065 +-0.0027*  T20 +0.0069 +-0.0034*  dmgT20 +0.99 +-0.21
+azusa   -Forest +Fabled Passage                       T10 +0.0088 +-0.0044*  T20 +0.0115 +-0.0053*  dmgT20 +0.68 +-0.33
+azusa   -Forest +Evolving Wilds                       T10 +0.0057 +-0.0045*  T20 +0.0093 +-0.0053*  dmgT20 +0.41 +-0.34
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0193 +-0.0033*  T20 +0.0251 +-0.0040*  dmgT20 +2.82 +-0.26
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0168 +-0.0038*  T20 +0.0238 +-0.0047*  dmgT20 +2.16 +-0.29
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0057 +-0.0029*  T20 +0.0195 +-0.0038*  dmgT20 +0.58 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0145 +-0.0039*  T20 +0.0113 +-0.0046*  dmgT20 +3.50 +-0.27
+shilgengar -Vampiric Rites +Lyra, Archangel of Dawn   T10 +0.0043 +-0.0013*  T20 +0.0096 +-0.0032*  dmgT20 +1.26 +-0.17
