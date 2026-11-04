@@ -3,7 +3,7 @@
 to buy -- the §0z160/§0z161 method, applied to the Citadel's neighbour.
 
     python -m diagnostics.run_necro_policy forks N OUT.txt [ARM ...]
-    python -m diagnostics.run_necro_policy policies N OUT.txt [ARM ...]
+    python -m diagnostics.run_necro_policy policies N OUT.txt [ARM ...] [--seed0=S]
 
 "Pay 1 life: Exile the top card of your library face down. Put that card
 into your hand at the beginning of your next end step." The pilot pays after
@@ -250,6 +250,12 @@ def policies(n, out, arms):
 
 
 def main():
+    # `--seed0=S` (§0z171): measure on seeds that chose nothing (§0z170).
+    global SEED0
+    for a in list(sys.argv):
+        if a.startswith("--seed0="):
+            SEED0 = int(a.split("=", 1)[1])
+            sys.argv.remove(a)
     mode, n, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     if mode == "forks":
         forks(n, out, sys.argv[4:] or None)

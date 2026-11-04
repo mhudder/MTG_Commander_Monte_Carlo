@@ -30,6 +30,7 @@ from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
 from edhmc.decks._evasion import LAND_RULES, LAND_TYPES, MODAL_LANDS
 from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER, CREATURE_SUBTYPES
+from edhmc.decks._evasion import NO_MAX_HAND_SIZE
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -4196,6 +4197,79 @@ def want_best(g, pool):
     return want_max(g, pool, lands, mana)
 
 
+# THE CLEANUP STEP (§0z171; queue item 30, found in §0z162). CR 514.1: "the
+# active player discards down to their maximum hand size", which is seven
+# (CR 402.2) unless an effect says otherwise. NO ENGINE DID THIS until
+# 2026-11-04: in karlov 7.9% of end steps without Reliquary Tower ended over
+# seven, 3.5 cards over on average, and every draw engine and every "draw
+# more" policy was flattered by the cards a real pilot would have discarded.
+# ONE function, called by every engine at the end of each of its own turns
+# (an extra turn has a cleanup step too), never on the pod's turns: only the
+# active player discards. `hand_size_rule=False` restores the old games.
+
+def max_hand_size(g):
+    """Your maximum hand size now, or None for no maximum: seven (CR 402.2,
+    `max_hand_size`), lifted by a permanent whose own text says "You have no
+    maximum hand size" (`_evasion.NO_MAX_HAND_SIZE`, generated from Scryfall:
+    Reliquary Tower, Library of Leng)."""
+    if any(n in NO_MAX_HAND_SIZE for n in g.board.names):
+        return None
+    return int(g.cfg.get("max_hand_size", 7))         # CR 402.2, §0z171
+
+
+def put_discarded(g, card) -> None:
+    """A discarded card goes to the GRAVEYARD -- where every reanimation,
+    regrowth, flashback, delirium and "cards in your graveyard" count already
+    looks -- unless Necropotence is out: "Whenever you discard a card, exile
+    that card from your graveyard." The trigger resolves before anything can
+    use the card, so the card simply never stays."""
+    if g.has("Necropotence"):
+        g.m["necro_discard_exiled"] += 1
+        return
+    g.graveyard.append(card)
+
+
+def cleanup_step(g, pick=None, after=None) -> int:
+    """CR 514.1: discard down to `max_hand_size`; returns the cards discarded.
+
+    Which cards go is the pilot's choice. By default the hand is ranked by
+    the shared want order (`want_order`, §0z139: the engine's `want_tier`,
+    `lands_wanted` and `land_rank` hooks included) and the tail past the
+    maximum goes -- keep the best seven. An engine that already has ONE
+    discard policy passes it as `pick(g) -> card`, taken one at a time
+    (lorehold's rummage pick, §0z166), so a deck does not discard two ways.
+    `after(g, n)` fires the engine's "whenever you discard" triggers
+    (Monument to Endurance). CR 514.3a: if anything triggered, there is
+    another cleanup step -- so a trigger that DRAWS can put the hand over
+    again, and the loop asks again, `cleanup_repeat_max` times at most."""
+    if not g.cfg.get("hand_size_rule", True):         # §0z171
+        return 0
+    total = 0
+    for _ in range(int(g.cfg.get("cleanup_repeat_max", 8))):   # §0z171
+        if g.result is not None:
+            break
+        cap = max_hand_size(g)
+        if cap is None or len(g.hand) <= cap:
+            break
+        n = len(g.hand) - cap
+        gone = want_order(g, g.hand)[cap:] if pick is None else ()
+        for i in range(n):
+            card = gone[i] if pick is None else pick(g)
+            remove_card(g.hand, card)
+            put_discarded(g, card)
+            if card.is_land:
+                g.m["cleanup_lands"] += 1
+            else:
+                g.m["cleanup_mv"] += card.mv
+        total += n
+        if after is not None:
+            after(g, n)
+    if total:
+        g.m["cleanup_discards"] += total
+        g.m["cleanup_turns"] += 1
+    return total
+
+
 def stack_top(g, n: int) -> list:
     """Look at the top `n` cards and put them back in the order a pilot wants
     to draw them, the best on top. Returns that order, best first. The
@@ -5098,6 +5172,7 @@ def take_turn(g: Game):
     twitching_doll_nest(g)          # after the float metric: it is not spent
 
     deathreap_end_step(g)           # your end step, under pod_bodies
+    cleanup_step(g)                 # discard to seven, CR 514.1, §0z171
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30

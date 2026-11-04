@@ -125,7 +125,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           choose_mode_cost, can_afford,
@@ -4107,6 +4107,7 @@ def take_turn(g):
     g.verdant_kraken_tokens(3)
 
     g.cauldron_flush()             # §0z135: before the pod's turn
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
 

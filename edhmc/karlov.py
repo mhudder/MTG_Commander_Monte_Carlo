@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -2658,6 +2658,7 @@ def take_turn(g):
     orchard_idle_tap(g)
     if g.result is not None:
         return
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
 
     if g.cfg.get("opponents", True):
         # One order for six engines (§0z30): damage, clocks, THEN removal.

@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
@@ -3229,6 +3229,10 @@ def your_turn(g, extra=False):
                           and p.card.name in DRAW_LANDS]
     g.m["mana_floated"] += g.float_mana
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+    # Discard to seven (CR 514.1, §0z171), every turn of yours, extra turns
+    # included: the rummage's pick (ONE discard policy, §0z166), Monument to
+    # Endurance firing on each card. Library of Leng lifts the maximum.
+    cleanup_step(g, pick=rummage_discard_choice, after=discard_triggers)
     return held
 
 

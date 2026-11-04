@@ -130,7 +130,7 @@ from __future__ import annotations
 
 import dataclasses
 
-from edhmc.engine import (begin_game, BaseGame, Board, Card, Permanent, Metrics,
+from edhmc.engine import (cleanup_step, begin_game, BaseGame, Board, Card, Permanent, Metrics,
                           sun_titan_pick,
                           Snapshots, finish, lookahead_pick, can_pay,
                           available_mana as shared_available_mana, spend,
@@ -1852,6 +1852,7 @@ def take_turn(g):
     g.m["mana_floated"] += len(g.available_mana())
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
     if g.result is None:
         g.seedborn_turns()
     if g.result is None and g.cfg.get("opponents", True):

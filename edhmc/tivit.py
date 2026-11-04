@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -1737,6 +1737,7 @@ def take_turn(g, extra=False):
     # advances on an extra turn -- so each extra turn brought every kill one
     # pod round CLOSER. Every pod timer now reads `opponents.pod_turn(g)`,
     # your turns minus these extra ones (`pod_clock_rounds`).
+    cleanup_step(g)        # discard to seven, CR 514.1, §0z171: every turn
     skip = extra and g.cfg.get("extra_turns_skip_opponents", True)
     if g.cfg.get("opponents", True) and not skip:
         g.m["pod_rounds"] += 1
