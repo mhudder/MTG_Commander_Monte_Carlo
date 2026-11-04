@@ -4267,7 +4267,24 @@ def cleanup_step(g, pick=None, after=None) -> int:
         if cap is None or len(g.hand) <= cap:
             break
         n = len(g.hand) - cap
-        gone = want_order(g, g.hand)[cap:] if pick is None else ()
+        gone = ()
+        if pick is None:
+            order = want_order(g, g.hand)
+            gone = order[cap:]
+            if len(order) < len(g.hand):
+                # ONE OBJECT TWICE IN THE HAND -- a defect upstream, never a
+                # game state (`want_order` ranks objects, so it drops the
+                # second copy). Discard the extra copies too, and count it,
+                # so the defect is seen rather than crashing here: the
+                # `remove_card` stand-in in test_ablation_skip's mutations
+                # makes exactly this hand.
+                seen, extra = set(), []
+                for c in g.hand:
+                    if id(c) in seen:
+                        extra.append(c)
+                    seen.add(id(c))
+                gone = gone + extra
+                g.m["cleanup_aliased"] += 1
         for i in range(n):
             card = gone[i] if pick is None else pick(g)
             remove_exact(g.hand, card)
