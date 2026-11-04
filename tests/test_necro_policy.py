@@ -12,10 +12,12 @@ CASES
      its decking reserve (7 cards, 5 kept: 2)
   E  the Citadel's clock floor and Necropotence's are ONE function: same
      board, same pad, same number
+  F  the ADOPTED default (§0z173): with the Tower out the target is 99 (no
+     target; the floor and the decking reserve stop the buy), without it 7
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   necro_floor_mode="fixed"   -> A, E
-  necro_tower_target=None    -> C
+  necro_tower_target=None    -> C, F
 
 E WAS MISSING FROM THE FIRST WRITTEN SET, and the first mutation run said so:
 E reads Necropotence's floor in clock mode, so forcing "fixed" reaches it
@@ -98,6 +100,9 @@ def run_cases():
               necro_floor_mode="clock", necro_clock_pad=3.0)
     check("E the Citadel's clock floor and Necropotence's are one function",
           K.citadel_value_floor(g), K.necro_floor(g))
+    check("F the adopted default: no target with the Tower, 7 without",
+          (K.necro_target(fresh(board=[tower])), K.necro_target(fresh())),
+          (99, 7))
     return set(FAIL)
 
 
@@ -109,7 +114,7 @@ def main() -> int:
         return 1 if FAIL else 0
     mutations = [
         ({"necro_floor_mode": "fixed"}, {"A", "E"}),
-        ({"necro_tower_target": None}, {"C"}),
+        ({"necro_tower_target": None}, {"C", "F"}),
     ]
     print("MUTATION RUN -- exact sets\n")
     bad = 0

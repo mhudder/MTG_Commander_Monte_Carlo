@@ -99,12 +99,9 @@ What is closed and where it went:
     - **The karlov rebuild is DONE** (the owner, 2026-11-03; §0z169): 0 rows
       moved, the cache CURRENT, the Citadel swap +0.0121 / +0.0088 on the
       clock floor, all three staged swaps standing.
-    - **Necropotence with Reliquary Tower (§0z162), an owner call to batch
-      with the rebuild above, HELD by the owner 2026-11-02** ("hold the
-      decision for now"): buy past seven while the Tower is out
-      (`necro_tower_target` 99, bounded by the floor and the decking
-      reserve; 20 is the same): +0.0017 / +0.0013 at T10 / T20, N=60,000.
-      The clock floor adds nothing for this card over a game.
+    - **Necropotence with Reliquary Tower is ADOPTED** (the owner,
+      2026-11-04, §0z173): `necro_tower_target` 99, re-measured out of
+      sample on the cleanup step, +0.0024 / +0.0011.
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.

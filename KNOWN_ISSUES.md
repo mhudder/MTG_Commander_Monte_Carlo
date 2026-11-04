@@ -225,6 +225,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
 | [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar (its reanimation pays it back) |
 | [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
+| [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15126,6 +15127,53 @@ A full point for rendmaw, from one land's drop. **The policy lesson again**
 (CLAUDE.md, "the biggest corrections were POLICY"): the karoo's row in its
 table read as an ordinary land, and the tell was a counter
 (`karoo_bounces`) moving the wrong way under an unrelated change.
+
+<a id="0z173"></a>
+
+## 0z173. DECIDED -- Necropotence's Tower target adopted, Sylvan Library's floor kept: both re-measured on the cleanup step, out of sample
+
+**The owner, 2026-11-04**: "If the necropotence and sylvan library changes are
+valid, please adopt those as well." Both were measured (§0z162, §0z163) on an
+engine with no maximum hand size, on seeds 5000.. that also picked them
+(§0z170's warning). Re-measured on the cleanup step (§0z171) and the karoo
+guard (§0z172), on seeds 800000.. (`--seed0`, new in both harnesses), python
+3.11.17. Arm minus today's defaults, 95% CI:
+
+**Necropotence** (`run_necro_policy policies`, N=60,000,
+`results/necro_policies_handsize_20261104.txt`):
+
+| arm | T10 | T20 | recorded (§0z162) |
+|---|---|---|---|
+| Tower out: no target (`necro_tower_target` 99) | **+0.0024 ±0.0005 *** | **+0.0011 ±0.0005 *** | +0.0017 / +0.0013 |
+| Tower out: target 20 | +0.0020 ±0.0004 * | +0.0011 ±0.0005 * | +0.0016 / +0.0012 |
+| clock floor + 1 | +0.0000 ±0.0001 | +0.0001 ±0.0002 | +0.0000 / +0.0002 |
+
+**Valid, and ADOPTED**: with Reliquary Tower out the buy has no hand target;
+the life floor (10) and the decking reserve stop it. Without the Tower the
+target is 7, which is now the rule itself -- a card bought past seven is
+discarded at cleanup and exiled by Necropotence's own clause. `necro_tower_target`
+None restores the cap of 7. `tests/test_necro_policy.py` F pins the default.
+The clock floor stays off: nothing over a game, again.
+
+**Sylvan Library** (azusa, `run_sylvan_policy policies`, N=15,000,
+`results/sylvan_policies_handsize_20261104.txt`):
+
+| arm | T10 | T20 |
+|---|---|---|
+| floor 16 | +0.0019 ±0.0016 * | +0.0003 ±0.0019 |
+| floor 24 | -0.0019 ±0.0019 * | -0.0006 ±0.0022 |
+| never pay | -0.0125 ±0.0025 * | -0.0057 ±0.0029 * |
+| pay for at most one | -0.0031 ±0.0022 * | -0.0005 ±0.0025 |
+| clock + 1 | -0.0035 ±0.0022 * | **-0.0099 ±0.0027 *** |
+| six rounds' clock + 1 | -0.0033 ±0.0021 * | +0.0003 ±0.0025 |
+
+**§0z163's answer holds, so there is nothing to adopt**: pay 4 life for the
+better card down to 20. Floor 16 edges it at T10 only, on the edge of its bar,
+and is level at T20 -- the same "16 is level" §0z163 found; no arm beats 20 at
+both horizons, and every clock floor still loses. `library_life_floor` stays
+20.
+
+Karlov's baseline moves with the adoption, inside the batched rebuild.
 
 ## How to read an ablation table
 

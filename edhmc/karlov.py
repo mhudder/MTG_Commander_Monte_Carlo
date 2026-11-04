@@ -1107,14 +1107,16 @@ def necro_target(g) -> int:
     """The hand Necropotence's buy fills to. `necro_hand_target` (7) IS THE
     MAXIMUM HAND SIZE: the cards arrive at the beginning of the end step,
     before cleanup, and a card bought past seven is discarded there (CR
-    514.1) -- and exiled, by Necropotence's own clause. This engine has no
-    maximum hand size (CR 402.2 is unmodelled in every deck), so the target
-    is where the rule lives for this card. RELIQUARY TOWER, in this list,
-    says "You have no maximum hand size", and then the target is a choice:
-    `necro_tower_target` (default: the same 7) while it is on the
-    battlefield (§0z162)."""
+    514.1, `engine.cleanup_step` since §0z171) -- and exiled, by
+    Necropotence's own clause. RELIQUARY TOWER, in this list, says "You have
+    no maximum hand size", and then the target is a choice:
+    `necro_tower_target` while it is on the battlefield. ADOPTED 2026-11-04
+    (the owner: "if the necropotence ... changes are valid, please adopt";
+    §0z162, re-measured out of sample on the cleanup step in §0z173): 99, no
+    target -- the buy stops at the floor and the decking reserve. None
+    restores the old cap of 7."""
     if g.has("Reliquary Tower"):
-        t = turn_knob(g, "necro_tower_target", None)
+        t = turn_knob(g, "necro_tower_target", 99)
         if t is not None:
             return int(t)
     return int(turn_knob(g, "necro_hand_target", 7))
