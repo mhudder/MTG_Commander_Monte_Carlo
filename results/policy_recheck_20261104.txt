@@ -1,0 +1,16 @@
+§0z170: the adopted policies of §0z160-§0z168, out of sample (diagnostics/run_policy_recheck.py)
+HEAD cd35547, python 3.11.17 / numpy 2.4.6, 2026-11-04. Rows: new minus arm, 95% CI, * excludes 0.
+
+lorehold N=60000 seeds 800000.. python 3.11.17  352s
+  new - old      T10 win 0.2546 new-old +0.0126 +-0.0028*   T20 win 0.4716 new-old +0.0057 +-0.0033*
+
+karlov N=60000 seeds 800000.. python 3.11.17  431s
+  new - old      T10 win 0.3079 new-old +0.0114 +-0.0009*   T20 win 0.5529 new-old +0.0073 +-0.0008*
+  new - fixed10  T10 win 0.3079 new-fixed10 +0.0013 +-0.0004*   T20 win 0.5529 new-fixed10 +0.0006 +-0.0004*
+
+# --chip-sigma: the pod's actual swing x mean-1 lognormal(sigma); the pilot reads the mean
+karlov CHIP_SIGMA=0.5 N=60000 seeds 800000.. python 3.11.17  308s
+  new - fixed10  T10 win 0.3078 new-fixed10 +0.0013 +-0.0004*   T20 win 0.5508 new-fixed10 +0.0004 +-0.0004*
+
+karlov CHIP_SIGMA=1.0 N=60000 seeds 800000.. python 3.11.17  296s
+  new - fixed10  T10 win 0.3055 new-fixed10 +0.0014 +-0.0004*   T20 win 0.5438 new-fixed10 +0.0004 +-0.0005 

@@ -222,6 +222,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z167](#0z167) | MEASURED | **Lorehold's rummage pick, forked: no rule wins at both horizons.** By priority +0.0163 at T10, level at T20, and -0.0058 at T20 with no holds (N=60,000): pitched permanents feed Seminar and Journey |
 | [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
 | [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
+| [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -14921,6 +14922,61 @@ The Conqueror's T20 fall spans three engine changes since its last
 measurement (§0z155, §0z160, §0z161) and is not attributed among them.
 Item 29 stays open for its two held lines: Necropotence's Tower target and
 holding Enlightened Tutor under the Citadel.
+
+<a id="0z170"></a>
+
+## 0z170. MEASURED -- the adopted policies of §0z160-§0z168, out of sample: all hold, lorehold's at half size, and the clock floor is not an oracle's
+
+**The owner, 2026-11-04**: "please review the simulation repo, would like to
+evaluate the effect of recent changes made." Every policy adopted since
+§0z160 was picked among many arms on seeds 5000.., and the winner of a field
+is graded by the seeds that picked it. `diagnostics/run_policy_recheck.py`
+plays the adopted defaults against the pilot before them on seeds 800000..,
+which chose nothing: N=60,000 paired, the staged list, HEAD `cd35547`,
+python 3.11.17. `results/policy_recheck_20261104.txt`. New minus arm:
+
+| comparison | T10 | T20 | recorded (seeds 5000..) |
+|---|---|---|---|
+| lorehold: §0z168's pilot - the one before (`miracle_reserve` 2, `hold_min_value` 3, the double-counted float) | **+0.0126 ±0.0028** | **+0.0057 ±0.0033** | +0.0163 / +0.0108 (§0z166, N=15,000); +0.0166 / +0.0109 (§0z164, N=60,000, old float) |
+| karlov: §0z160's dig on the clock floor - the old dig on floor 10 | **+0.0114 ±0.0009** | **+0.0073 ±0.0008** | +0.0083 / +0.0065 (dig) + +0.0018 / +0.0007 (floor) |
+| karlov: the clock floor - fixed 10, the dig held | **+0.0013 ±0.0004** | **+0.0006 ±0.0004** | +0.0018 / +0.0007 (§0z161, N=60,000) |
+
+**Karlov replicates.** **Lorehold's change holds at both horizons at about
+half its recorded T20 size**: +0.0057 against +0.0108, a difference inside the
+two bars combined, but the recorded figure was the best of nine arms read on
+the seeds that ranked them. Quote +0.006 at T20, not +0.011. The four staged
+lorehold swaps were re-measured on the adopted pilot (§0z168) and are not
+moved by this.
+
+### Is the clock floor an oracle?
+
+Chip damage is a formula, not a roll (§0z161), and `predicted_chip` reads the
+same `chip_amount` the pod deals -- `test_citadel_dig` N pins that they are
+equal. A pilot who knows the next swing to the point is not a pilot. So the
+pod's ACTUAL swing was given a mean-1 lognormal spread (`--chip-sigma`, one
+CRN-addressed draw per pod turn and opponent, installed in each worker's
+initializer), with the pilot still reading the mean:
+
+| spread on the pod's swing | T10 | T20 | P(win) T20 |
+|---|---|---|---|
+| none (the model) | +0.0013 ±0.0004 * | +0.0006 ±0.0004 * | 0.5529 |
+| sigma 0.5 (CV about 0.53) | +0.0013 ±0.0004 * | +0.0004 ±0.0004 * | 0.5508 |
+| sigma 1.0 (CV about 1.3) | +0.0014 ±0.0004 * | +0.0004 ±0.0005 | 0.5438 |
+
+The patch applied (the baseline falls by 0.009 at sigma 1). **The floor's
+T10 gain does not lean on exact foresight; its T20 gain, already small, is
+inside its bar once the swing is noisy.** It stays the default. Still
+unmeasured and still flattering low floors: a pod that piles onto a player at
+1-3 life (§0z161's own caveat).
+
+### The rest of the review
+
+- `python -m tools.validate`: +0.00 on all 21 metrics of every engine;
+  `python -m tests`: 103 modules pass; `check_docs` and `pending` clean.
+- `docs/STATUS.md` was derived at `9eb3237`, one commit before §0z169, and
+  still called karlov's table uncommitted; regenerated with this section.
+- **The largest open bias is queue item 30, not any of these policies**: no
+  engine discards to seven at cleanup (§0z162).
 
 ## How to read an ablation table
 
