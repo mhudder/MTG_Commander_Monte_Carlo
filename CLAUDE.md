@@ -139,6 +139,8 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   card cast late beats a median-priority blank. Ask for identity, not
   significance: `tools.triage` checks whether a card plays seed-for-seed
   identically to a matching blank.
+- **The winner of many arms is graded by the seeds that picked it.** Re-measure
+  an adopted policy on fresh seeds (`--seed0`) before quoting its size (§0z170).
 - **Ignore anything inside its own error bars** (`signal` reads `--`). The top
   of a table is a SET, not a ranking.
 - **§0e: never rank two rows measured against a common baseline.** Put one card
@@ -184,11 +186,15 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   (§0z58), +1/+1 counters stacked on one body (§0z101), the wipe gate asked
   in the main phase only (§0z104) and counting bodies (§0z106), Havengul Lab
   in the upkeep (§0z112), Vault of the Archangel free (§0z115), and Mother of
-  Runes as a shroud (§0z118). None of them showed in an ablation table. **The
+  Runes as a shroud (§0z118), and a karoo played onto an empty
+  battlefield (§0z172). None of them showed in an ablation table. **The
   tell is a card whose text says it should be central and whose row says it
   is ordinary.** Suspect the engine before the card. Check the MECHANISM
   COUNTERS (`blood_made`, `landfall_triggers`, `opponents_killed`): a
   mechanism that fires zero times is unmistakable.
+- **A rule that only takes options away cannot make a deck win more.** When
+  it does, it is breaking a misplay elsewhere: diff every output key and read
+  the counter that moved against the grain (§0z172).
 - **A rule that makes a new outcome possible turns every old policy into a
   claim about it** (§0z42). When a fix makes a loss or a win possible that was
   not, measure the naive pilot as well as the rule.

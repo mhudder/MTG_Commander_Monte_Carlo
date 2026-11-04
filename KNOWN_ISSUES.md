@@ -226,6 +226,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar; the graveyard synergy it feeds is small |
 | [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
 | [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
+| [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15178,6 +15179,49 @@ both horizons, and every clock floor still loses. `library_life_floor` stays
 20.
 
 Karlov's baseline moves with the adoption, inside the batched rebuild.
+
+<a id="0z174"></a>
+
+## 0z174. REBUILT -- six tables for the cleanup step, the karoo guard and the Tower target: nothing moved beyond its bar
+
+The batched rebuild for §0z171 (cleanup step), §0z172 (karoo guard) and
+§0z173 (Necropotence's Tower target), at `75a0852`: six parallel legs (§0z94),
+every leg on python 3.13.18 / numpy 2.4.6, launched 17:49 and the slowest
+(azusa) pushed 18:18 -- **29 minutes wall**. The coordinator reproduced rows
+IDENTICAL under 3.13.16 (`repro_row` karlov Bolas's Citadel, lorehold Library
+of Leng). Trostani is SUSPENDED and was not rebuilt.
+
+**0 of 380 rows moved beyond the wider of their two bars** (win rate, T20,
+`results/rebuild_diffs_20261104.txt`); 13 labels crossed at the floor, and no
+significant row changed sign. The cards the rule should reach moved the way
+it predicts, inside their bars: Necropotence +0.0037 -> +0.0063 (the Tower
+target), Monument to Endurance +0.0092 -> +0.0118 (it fires on cleanup
+discards), Sylvan Library +0.0092 -> +0.0095. That is the expected scale: the
+rule moves a whole deck by at most 0.005 (§0z171), and a leave-one-out row
+reads one card's share of it.
+
+**The twelve staged swaps, in context** (`diagnostics/run_restage.py`,
+N=15,000 paired, python 3.13.16, `results/restage_20261104.txt`):
+
+| swap | T10 | T20 |
+|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0389 ±0.0035 | +0.0281 ±0.0035 |
+| karlov -Swamp +Bolas's Citadel | +0.0123 ±0.0039 | +0.0084 ±0.0042 |
+| karlov -Daxos +South Wind Avatar | +0.0139 ±0.0025 | +0.0109 ±0.0030 |
+| **tivit -Plains +Anointed Procession** | +0.0049 ±0.0040 | **-0.0021 ±0.0046** |
+| azusa -Perilous Forays +Ka-Zar | +0.0065 ±0.0027 | +0.0069 ±0.0034 |
+| azusa -Forest +Fabled Passage | +0.0088 ±0.0044 | +0.0115 ±0.0053 |
+| azusa -Forest +Evolving Wilds | +0.0057 ±0.0045 | +0.0093 ±0.0053 |
+| lorehold -Penance +Caldera Pyremaw | +0.0193 ±0.0033 | +0.0251 ±0.0040 |
+| lorehold -Scroll Rack +Sunbird's Invocation | +0.0168 ±0.0038 | +0.0238 ±0.0047 |
+| lorehold -Boros Charm +Immolating Gyre | +0.0057 ±0.0029 | +0.0195 ±0.0038 |
+| lorehold -Ruby Medallion +Prisoner's Dilemma | +0.0145 ±0.0039 | +0.0113 ±0.0046 |
+| shilgengar -Vampiric Rites +Lyra | +0.0043 ±0.0013 | +0.0096 ±0.0032 |
+
+Eleven stand, significant at both horizons. **Anointed Procession is still
+inside its T20 bar**, as on 2026-10-15 (+0.0007) when the owner kept it on its
+T10 number; the decision stays the owner's. Each Change's `reverified`
+records these. `check_docs` is fully green: every active cache CURRENT.
 
 ## How to read an ablation table
 

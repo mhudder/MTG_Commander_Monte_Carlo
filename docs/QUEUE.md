@@ -106,16 +106,6 @@ What is closed and where it went:
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.
 
-30. **Maximum hand size is unmodelled in every engine** (CR 402.2, 514.1;
-    found in §0z162). Nothing discards to seven at cleanup, so every draw
-    engine and every "draw more" policy is flattered: 7.9% of karlov's end
-    steps without Reliquary Tower hold more than seven, 3.5 over on average.
-    A shared cleanup step in each engine's turn (which cards to discard is a
-    pilot's choice: the want order's worst), Reliquary Tower and its kin
-    lifting it, Necropotence's exile clause live. Measure the shift per deck
-    at the tables' N before deciding (§0z30: its size is not guessable); it
-    moves every baseline, so it is a batched rebuild.
-
 32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is
     a bet: the pilot acts unless a measured payoff says wait. Done, read-only:
     the inventory (`python -m tools.deferrals`, 38 main-phase sites in seven
