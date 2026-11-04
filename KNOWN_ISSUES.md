@@ -223,7 +223,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
 | [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
 | [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
-| [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar (its reanimation pays it back) |
+| [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar; the graveyard synergy it feeds is small |
 | [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
 | [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
@@ -15065,16 +15065,20 @@ have discarded.
 
 ### The graveyard, as the owner asked
 
-The discards land where every recursion card looks, and the counters show it
-(rule on minus off, 6,000 paired games, T20, `diagnostics/run_hand_size.py
-keys`): shilgengar's reanimations rise -- `shilgengar_reanimated` +0.048
-±0.024 a game, `single_reanimations` +0.013 ±0.006, `shilgengar_ults` +0.008
-±0.004 -- and rendmaw's Gloomshrieker returns +0.006 ±0.002. **That is why
-shilgengar alone is level** (+0.0008 at T20): a deck that reanimates gets back
-part of what it discards. The pilot does not discard FOR the graveyard -- the
-want order keeps the best seven, it does not ask which discard a reanimation
-target would rather be -- so this is a floor on the synergy, and a pilot who
-pitches a fatty to Reya would do better.
+The discards land where every recursion card looks. **What that buys is
+small** (rule on minus off, 6,000 paired games, T20, karoo guard in both legs,
+`diagnostics/run_hand_size.py keys`, `results/hand_size_keys_20261104.txt`):
+the only graveyard counter that moves is shilgengar's `single_reanimations`,
++0.0043 ±0.0037 a game; rendmaw's Gloomshrieker, Reap and Whip, lorehold's
+Seminar and Journey, azusa's lands-from-the-graveyard do not move beyond their
+bars. **A first run without the karoo guard read +0.048 shilgengar
+reanimations a game, and that was §0z172's loop, not the discards** -- the
+reason this section measures with the guard in both legs. Shilgengar is level
+because it seldom holds eight (0.19 discards a game), not because its
+reanimation pays the discards back. The pilot does not discard FOR the
+graveyard -- the want order keeps the best seven, it does not ask which
+creature a reanimation would rather find there -- so this is a floor on the
+synergy: a pilot who pitches a fatty to Reya Dawnbringer would do better.
 
 **Not modelled**: Library of Leng's "you may put it on top instead" applies to
 discards an EFFECT causes, not the game rule (and Leng lifts the maximum
