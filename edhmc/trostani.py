@@ -610,6 +610,12 @@ class TrostaniGame(BaseGame):
         if card.name in LEGENDARY and self.has(card.name):
             self.m["legend_rule_declined"] += 1
             return []
+        # THE TOKEN'S OWN CARD (§0z175): Bramble Sovereign's copy shared the
+        # entering creature's Card OBJECT, so when that creature died or was
+        # bounced its card sat in the graveyard (or hand) while the token held
+        # it. `token_copy_own_card=False` restores the sharing.
+        if self.cfg.get("token_copy_own_card", True):
+            card = dataclasses.replace(card)
         return self.create_tokens(card, n, **kw)
 
     def token_value(self, perm) -> float:

@@ -121,6 +121,7 @@ below) so no card here cares what type another one is.
 
 from __future__ import annotations
 
+import dataclasses
 import inspect
 import random
 import re
@@ -1639,7 +1640,15 @@ class AzusaGame(BaseGame):
             if pay is not None:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
-                tok = self.make_permanent(host.card, sick=True, is_token=True)
+                # THE TOKEN'S OWN CARD (§0z175): `host.card` itself made the
+                # token share the host's Card OBJECT, so when the host died its
+                # card went to the graveyard while the token still held it --
+                # one object in two zones. A copy has the copiable values
+                # (707.2), not the object. `token_copy_own_card=False` shares.
+                card = (dataclasses.replace(host.card)
+                        if self.cfg.get("token_copy_own_card", True)
+                        else host.card)
+                tok = self.make_permanent(card, sick=True, is_token=True)
                 self.m["springheart_copies"] += 1
                 # THE COPY'S ETB FIRES. Queued item 16: `make_permanent` does
                 # not run the ETB dispatch that `resolve` does, so a copy of

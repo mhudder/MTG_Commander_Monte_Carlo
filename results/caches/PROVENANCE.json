@@ -539,7 +539,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3bcdc34",
+        "evidence": "\u00a70z175 (token copies get their own Card): every output key hashed per game, azusa staged list (build_pending), 15,000 seeds at T20 against a worktree at 3bcdc34 (the cache's built commit is 75a0852; 3bcdc34 changed no engine file since): 0 of 15,000 differ; check_unchanged_decks N=400 BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "90f5af0924e7c94a",
+        "utc": "2026-11-05T15:33:48Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "22fc0ded12db8749",

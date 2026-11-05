@@ -227,6 +227,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
 | [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
 | [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
+| [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15222,6 +15223,49 @@ Eleven stand, significant at both horizons. **Anointed Procession is still
 inside its T20 bar**, as on 2026-10-15 (+0.0007) when the owner kept it on its
 T10 number; the decision stays the owner's. Each Change's `reverified`
 records these. `check_docs` is fully green: every active cache CURRENT.
+
+<a id="0z175"></a>
+
+## 0z175. FIXED -- a token copy shared its original's Card object: one object in two zones, latent
+
+Queue item 33, from §0z171's zone census: at a pod round the same Card OBJECT
+sat on the battlefield (as a permanent's `p.card`) and in the graveyard, in
+azusa and trostani only. `diagnostics/diag_zone_census.py` is that census as
+a tool: every pod round, every zone, by `id()`; battlefield + battlefield is
+many tokens sharing one token Card, by design, and not counted.
+
+**The cause was not §0z171's `remove_card` hazard.** A seed trace (azusa
+5097) stopped in `opponents.destroy`: Tireless Tracker died, its card went to
+the graveyard, and a token on the battlefield still held that object. Two
+sites built a token copy FROM THE ORIGINAL'S CARD, where a copy has the
+original's copiable values (CR 707.2), not its object:
+
+- **azusa, `springheart_landfall`**: `make_permanent(host.card, is_token=True)`
+  -- Lotus Cobra, Tireless Tracker, Courser of Kruphix, Scute Swarm, Mossborn
+  Hydra, Rampaging Baloths;
+- **trostani, `copy_token`** (Bramble Sovereign, populate, Mimic Vat): Wurmcoil
+  Engine, Soul of Eternity, Seedborn Muse, Sakura-Tribe Elder (whose card was
+  once in the HAND while its copy stayed out), Nesting Dovehawk.
+
+Every other token in the seven engines is built from a fresh `Card(...)` --
+myriad, Ballistic Boulder, Starscape Cleric's offspring -- or copies a TOKEN
+(lorehold's Magistrate), and a token never reaches a graveyard.
+
+**The fix**: both sites give the token `dataclasses.replace(card)`, an equal
+card with its own identity (`token_copy_own_card`, default True; False
+restores the sharing). Census, 3,000 games a deck, T20
+(`results/zone_census_20261105.txt`): **9 games in each of azusa and trostani
+before, 0 in all seven decks after.**
+
+**It changed no game measured.** Every deck, every output key, 2,500 seeds:
+the switch off AND the fix on are both identical to HEAD `3bcdc34`; azusa at
+the table's N, 15,000 seeds at T20 (T10 is a prefix of the same games): 0
+differ. `check_unchanged_decks` N=400: all six active decks BIT-IDENTICAL. So
+it was a hazard, not an error yet -- the duplicated object never met code that
+asks "is this the same card" (a reanimation of the card while its copy is out,
+`perm.card is g.commander` if a copy were ever of the commander). Azusa's
+cache is VERIFIED on that evidence; trostani's is SUSPENDED and was not
+re-measured. `tests/test_token_copy.py` pins A-D, one mutation exact.
 
 ## How to read an ablation table
 

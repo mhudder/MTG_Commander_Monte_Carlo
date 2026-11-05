@@ -2881,6 +2881,23 @@ Tower target was adopted out of sample and Sylvan Library's floor kept
 (§0z173); the six tables rebuilt in 29 minutes wall and moved no row beyond
 its bar (§0z174).
 
+## Queued items closed 2026-11-05 — moved from `docs/QUEUE.md`
+
+Closed by §0z175: a token copy now has its own Card in azusa's Springheart
+and trostani's `copy_token`; the zone census reads 0 in every deck, and no
+game measured changed.
+
+33. **A card on the battlefield AND in the graveyard at once (§0z171's zone
+    census).** At a pod round, the same Card object sits in `g.board` (as
+    `p.card`) and in `g.graveyard`: azusa 13 games in 1,000, trostani 1-2
+    (and once battlefield + hand), the other five decks 0, with or without
+    the cleanup step. Many token permanents sharing ONE token Card is by
+    design and not this. Likely the shape §0z171 fixed in its own code:
+    moving a CHOSEN card with `engine.remove_card` (first EQUAL card, not that
+    object) -- `engine.remove_exact` is the identity version. Find the sites,
+    fix, prove the census reads 0, measure the shift (§0z30). Trostani is
+    SUSPENDED: fix shared code it needs, do not re-measure it.
+
 ## Queued items closed 2026-11-04 — moved from `docs/QUEUE.md`
 
 Closed by §0z171 (the cleanup step in every engine), measured per deck at
