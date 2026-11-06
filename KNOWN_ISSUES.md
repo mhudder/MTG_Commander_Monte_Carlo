@@ -228,7 +228,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
 | [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
 | [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
-| [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7): the opponents' removal and kill clocks acted between your turn and the turns it bought. Before the pod now (`extra_turns_before_pod`): **+0.0291 / +0.0381** at T10 / T20; §0z116's "as tivit's" was wrong |
+| [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15301,13 +15301,14 @@ active decks BIT-IDENTICAL. With it on, only tivit moves (+0.045 win rate at
 N=400). `tools.validate`: +0.00 on every metric of every engine.
 
 **The measurement** (`diagnostics/run_tivit_extra_order.py`, the staged list
-both legs, N=15,000 paired, seeds 5000..19999, today's pod,
-`results/tivit_extra_order_20261106.txt`):
+both legs, N=15,000 paired, seeds 5000..19999, today's pod, python 3.13.16 /
+numpy 2.4.6, `results/tivit_extra_order_20261106.txt`; the same run on 3.11
+gave the same two headline figures):
 
 | | T10 | T20 |
 |---|---|---|
 | before the pod minus after it | **+0.0291 ±0.0030** | **+0.0381 ±0.0034** |
-| in the 4,751 games (31.7%) where either leg takes an extra turn | +0.0920 ±0.0091 | +0.1202 ±0.0104 |
+| in the 4,751 games (31.7%) where either leg takes an extra turn | +0.0920 ±0.0091 | +0.1204 ±0.0104 |
 
 **The identity check holds**: the two orders differ only in a round with an
 extra turn, and of the 10,249 games where neither leg takes one, **0 differ**
@@ -15331,6 +15332,34 @@ the extra turn sits in the games tivit is closing out. The old order gave the
 pod a full round -- a kill clock, a wipe -- at exactly that point. Lorehold
 takes one in 13% of its games, **0.17 a game**, and its same fix was +0.0047
 / +0.0046 (§0z153).
+
+**The table, rebuilt** (`DECKS=tivit ./tools/regen_tables.sh` at `3d8d93b`,
+python 3.13.16 / numpy 2.4.6 -- the tables' interpreter, §0z119:
+`repro_row` reproduces karlov's Bolas's Citadel and tivit's Time Sieve
+IDENTICAL; `results/rebuild_diff_tivit_20261106.txt`). **5 of 65 rows moved
+beyond the wider of their two bars**, every one the way the rule says:
+
+| card | win rate T20 before | after |
+|---|---|---|
+| Time Sieve | +0.0407 ±0.0046 | **+0.0674 ±0.0050** |
+| Demonic Tutor | +0.0255 ±0.0034 | **+0.0374 ±0.0037** |
+| Expropriate | +0.0189 ±0.0024 | **+0.0261 ±0.0027** |
+| Mirkwood Bats | +0.0223 ±0.0034 | +0.0175 ±0.0032 |
+| Torment of Hailfire | +0.0095 ±0.0025 | +0.0067 ±0.0024 |
+
+The extra-turn cards rise, and the tutor that finds them; two drains fall,
+since a game the extra turns now close is a game a drain is needed in less.
+Five labels changed inside their bars; **Coercive Portal reads `win` at
+-0.0039** (it was `--` at -0.0013) -- a negative row is a redundancy signal
+before it is a cut (§0z36), and the deck decision is the owner's. A first
+build on the container's default python 3.11.17 was discarded for the
+interpreter; it agreed with the 3.13 table to ±0.0001 on every row.
+
+**The staged swap** (`diagnostics.run_restage`, in context, N=15,000,
+`results/restage_20261106.txt`): **-Plains +Anointed Procession +0.0043
+±0.0040 at T10, -0.0043 ±0.0045 at T20** -- still inside its T20 bar, as at
+§0z174 (-0.0021), and the owner's decision, as then. Its `reverified` records
+it.
 
 `tests/test_extra_turn_order.py` pins A-G with three mutations, exact sets.
 Its first two mutation runs failed on the TEST, not the engine (a stand-in

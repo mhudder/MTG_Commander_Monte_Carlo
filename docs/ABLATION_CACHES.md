@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `3bcdc34`.
+Generated at `3d8d93b`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -91,7 +91,7 @@ the fingerprint above mean anything.
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `7bbdb648028e5afc` | `75a0852` | **CURRENT** |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `c03c220b37c5c936` | `75a0852` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `81e54e49f2841eee` | `75a0852` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `c79679fac3265503` | `75a0852` | **CURRENT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `45a05b87d584facb` | `3d8d93b` | **CURRENT** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
@@ -102,7 +102,7 @@ the fingerprint above mean anything.
 - **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `7bbdb648028e5afc`, which is live.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `c03c220b37c5c936`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `81e54e49f2841eee`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `c79679fac3265503`, which is live.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `45a05b87d584facb`, which is live.
 - **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `c4af5d177a336f35`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
