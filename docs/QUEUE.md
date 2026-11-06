@@ -163,3 +163,22 @@ What is closed and where it went:
 
     If the push is refused again, the permissions still have not reached
     the session. Leave the branches and tell the owner.
+
+    **Second attempt, 2026-11-06: refused again, for a different reason.**
+    The five tips still matched the table and the annotated tags were in the
+    clone, each pointing at its tip. The tag push got HTTP 403 with
+    `ERR push contains a ref outside refs/heads/*; only branch updates are
+    permitted.`, and the response had no `X-Github-Request-Id`, so the
+    session's git proxy refused it, not GitHub. The widened permission covers
+    every branch but no tags. That makes the ordering rule matter more: a
+    branch delete would probably succeed now while its tag cannot be saved.
+    Nothing was deleted. Ways to finish, for the owner to pick:
+    - Create the five tags on github.com (Releases, "Choose a tag", type
+      the `archive/...` name, target the branch; that makes a lightweight
+      tag, which is enough to keep the commits), then let a session check
+      them and delete the branches.
+    - Widen the session's git permission to `refs/tags/*` too, then rerun
+      this item as written.
+    - Archive them as branches instead (`archive/<branch>` under
+      `refs/heads/`, which the proxy allows). Agents could still pull these,
+      but the name says what they are.
