@@ -126,3 +126,40 @@ What is closed and where it went:
       is, with its check.
     - **Then the CLAUDE.md lesson**, once a second deck's hold is measured:
       a deferral is a bet, and the default is to act.
+
+34. **Archive, then delete, the five pre-restart branches (the owner,
+    2026-11-06).** `main`'s history was restarted on 2026-10-09 (root
+    `5bc742a`). These five branches predate that and have a different root
+    (`35f58f4`), so they share no history with `main`. They were found
+    because the owner suspected an agent had pulled one of them, and they are
+    still there to be pulled. Every one is superseded: its `KNOWN_ISSUES.md`
+    stops at §0z15 or earlier.
+
+    | branch | tip | tag to create |
+    |---|---|---|
+    | `combat-split-and-bounded-damage` | `d158724` | `archive/combat-split-and-bounded-damage` |
+    | `fix/engine-batch-0z9-0z15` | `fe9d4af` | `archive/fix/engine-batch-0z9-0z15` |
+    | `perf/ablation-runtime-and-n15000` | `9a33cba` | `archive/perf/ablation-runtime-and-n15000` |
+    | `pod-model-v3-and-candidate-evaluation` | `d6a40bd` | `archive/pod-model-v3-and-candidate-evaluation` |
+    | `reverify-oracle-2026-09-05` | `a207dad` | `archive/reverify-oracle-2026-09-05` |
+
+    The session that found them made the tags and could not push them: its
+    git proxy allowed pushes to its own branch only (HTTP 403 from the
+    proxy, not from GitHub). The owner has since widened the permissions,
+    which reach new sessions. The owner has no machine of their own to run
+    git on, so a session does this. **Order matters: a deleted branch whose
+    tag never reached GitHub is gone.**
+    - Check first that each tip in the table is still the branch's tip
+      (`git rev-parse origin/<branch>`). If one moved, stop and ask the owner.
+    - Create each tag as an annotated tag (`git tag -a archive/<branch>
+      origin/<branch>`) and push them (`git push origin
+      'refs/tags/archive/*:refs/tags/archive/*'`).
+    - Confirm all five tags are on GitHub and point at the tips in the table
+      (`git ls-remote --tags origin 'archive/*'`; read the `^{}` lines).
+    - Only then delete the branches (`git push origin --delete <branch> ...`)
+      and confirm with `git ls-remote --heads origin` that only `main` and
+      the working branch are left.
+    - Close this item to `docs/HISTORY.md`.
+
+    If the push is refused again, the permissions still have not reached
+    the session. Leave the branches and tell the owner.
