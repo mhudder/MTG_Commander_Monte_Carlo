@@ -228,6 +228,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
 | [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
 | [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
+| [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7): the opponents' removal and kill clocks acted between your turn and the turns it bought. Before the pod now (`extra_turns_before_pod`): **+0.0291 / +0.0381** at T10 / T20; §0z116's "as tivit's" was wrong |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10192,7 +10193,7 @@ ability; `fetch_waits` now gives it none, in every engine.
 > | Haywire Mite, Bow of Nylea | their activated answers are `ANSWER_NOT_MODELLED`; Haywire Mite still KNOWN_BLIND; Bow's attacking deathtouch **FIXED §0z151**, PARTLY_MODELLED |
 > | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
 > | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
-> | Extra turns: tivit vs lorehold | **FIXED §0z153**: lorehold's is a whole turn before the pod, as tivit's |
+> | Extra turns: tivit vs lorehold | **FIXED §0z153**: lorehold's is a whole turn before the pod, as tivit's -- **which was not**: tivit's came after the pod until §0z176 |
 > | Aetherflux Reservoir: trostani on cast, karlov on resolution | **FIXED §0z151**: karlov's fires on cast, countered or not, and for the commander; its pay-50 at every lifegain since §0z153 |
 > | "can't be countered" exists nowhere | **FIXED §0z151** |
 > | Pathways modelled as duals | **FIXED §0z151** |
@@ -15266,6 +15267,75 @@ asks "is this the same card" (a reanimation of the card while its copy is out,
 `perm.card is g.commander` if a copy were ever of the commander). Azusa's
 cache is VERIFIED on that evidence; trostani's is SUSPENDED and was not
 re-measured. `tests/test_token_copy.py` pins A-D, one mutation exact.
+
+<a id="0z176"></a>
+
+## 0z176. FIXED -- tivit took its extra turns after the pod's round
+
+**2026-11-06, the owner: "go for tivit first"**, from a read of every engine's
+turn structure against the rules. CR 500.7: "Some effects can give a player
+extra turns. They do this by adding the turns directly after the specified
+turn." Tivit's `take_turn` ended with the pod's round (`OPP.pod_phase`), and
+`simulate` called `take_extra_turns` after it -- so the opponents' chip
+damage, kill clocks, removal and wipes all acted between your turn and the
+turns it had just bought, on the board you left before them. Lorehold was
+fixed for exactly this in §0z153 (`extra_turn_full`). **§0z116's table said
+lorehold's was now "a whole turn before the pod, as tivit's", and tivit's was
+not**: a whole turn, yes, and after the pod. The claim cited a section, the
+section resolved, and every check passed (§0z127's shape). Its row is
+corrected in place.
+
+**The fix.** The round is one function, `tivit.play_round`: your turn, the
+extra turns it bought (the chain, `take_extra_turns`, unchanged), then
+`pod_round` -- one pod round per round, on the board the LAST extra turn left.
+`simulate`, `tests/test_time_sieve.py`'s driver and
+`diagnostics/diag_time_sieve.py` all call it; each had its own copy of the
+loop, which is how a loop drifts (§0z30). `extra_turns_before_pod` (default
+True) is the switch; False is the old order, run by the same code.
+`extra_turns_skip_opponents=False`, §0z86's legacy "an extra turn buys the pod
+a round", still works under either order.
+
+**The switch off is the old engine.** `check_unchanged_decks
+--cfg=extra_turns_before_pod=False` against HEAD `618335f`, N=400: all six
+active decks BIT-IDENTICAL. With it on, only tivit moves (+0.045 win rate at
+N=400). `tools.validate`: +0.00 on every metric of every engine.
+
+**The measurement** (`diagnostics/run_tivit_extra_order.py`, the staged list
+both legs, N=15,000 paired, seeds 5000..19999, today's pod,
+`results/tivit_extra_order_20261106.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| before the pod minus after it | **+0.0291 ±0.0030** | **+0.0381 ±0.0034** |
+| in the 4,751 games (31.7%) where either leg takes an extra turn | +0.0920 ±0.0091 | +0.1202 ±0.0104 |
+
+**The identity check holds**: the two orders differ only in a round with an
+extra turn, and of the 10,249 games where neither leg takes one, **0 differ**
+on any output key. So the whole move is in the games the rule reaches. Its
+mechanism counters move the way the rule says: `lost` -0.0381 (the clocks no
+longer fire between your turn and its extras), `removal_eaten` -0.047 and
+`ae_removal_eaten` -0.024, `final_life` +1.57, `extra_turns_taken` +0.145
+(Time Sieve's chain survives to keep going: `sieve_chain_max` up),
+`pod_rounds` -0.31 (games end sooner). **One counter moved against the grain
+at the smoke run's N=400 and not at 15,000**: `token_drain` fell 189 -> 157
+on 400 seeds, and one seed (5193: 9,624 in the old leg, 0 in the new, both
+won) carried most of it -- it is an uncapped POD TOTAL, so a winning turn's
+overkill lands in it whole. At N=15,000 it RISES, 61.9 -> 65.3. Overkill, not
+a misplay; win rate is the objective (§0t).
+
+**Why it is this large.** On the new engine, 2,000 games of the staged list
+at T20: tivit takes an extra turn in **32% of its games, 1.06 a game**
+(Plea for Power, Expropriate, Time Sieve's chain), and wins **0.92 of
+those against 0.44 of the rest** -- a correlation, not a cause, but it says
+the extra turn sits in the games tivit is closing out. The old order gave the
+pod a full round -- a kill clock, a wipe -- at exactly that point. Lorehold
+takes one in 13% of its games, **0.17 a game**, and its same fix was +0.0047
+/ +0.0046 (§0z153).
+
+`tests/test_extra_turn_order.py` pins A-G with three mutations, exact sets.
+Its first two mutation runs failed on the TEST, not the engine (a stand-in
+that ran the pod twice, then a win set after the turn instead of during it);
+the docstring says how, and the expected sets are as first written.
 
 ## How to read an ablation table
 

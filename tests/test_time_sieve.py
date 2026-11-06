@@ -66,11 +66,7 @@ def drive(g):
     budget = g.cfg["turns"]
     played = 0
     while played < budget and g.result is None:
-        T.take_turn(g)
-        played += 1
-        if g.result is not None:
-            break
-        played = T.take_extra_turns(g, played, budget)
+        played = T.play_round(g, played, budget)
     return played
 
 
