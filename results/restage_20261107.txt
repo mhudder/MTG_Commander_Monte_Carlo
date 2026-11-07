@@ -1,0 +1,6 @@
+§0z177: azusa's staged swaps re-measured in context on the pool-empties engine (be72033), N=15,000 paired, seeds 5000.., python 3.13.16 / numpy 2.4.6 (diagnostics.run_restage 15000 OUT A A_noKaZar A_noPassage A_noWilds; --report)
+Only azusa's four arms were measured in this run; the output directory held 2026-11-04 arm files for the other decks, so their report rows are left out here (they are in results/restage_20261104.txt).
+
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0066 +-0.0028*  T20 +0.0072 +-0.0034*  dmgT20 +0.99 +-0.21
+azusa   -Forest +Fabled Passage                       T10 +0.0079 +-0.0044*  T20 +0.0100 +-0.0053*  dmgT20 +0.60 +-0.33
+azusa   -Forest +Evolving Wilds                       T10 +0.0047 +-0.0044*  T20 +0.0089 +-0.0053*  dmgT20 +0.42 +-0.34

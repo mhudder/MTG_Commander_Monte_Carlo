@@ -15459,6 +15459,21 @@ cannot pay it. The same session's rule-number finding is still open too:
 `engine.py` and `lorehold.py` cite 500.4 for mana emptying, which is 500.5 in
 the 2026-08-07 rules.
 
+**The table, rebuilt** (`DECKS=azusa ./tools/regen_tables.sh` at `be72033`,
+python 3.13.16 / numpy 2.4.6; `repro_row` azusa Lotus Cobra IDENTICAL;
+`results/rebuild_diff_azusa_20261107.txt`): **0 of 58 rows moved beyond the
+wider of their two bars**, one label changed (Greater Good `dmg` -> `both`),
+and the largest moves are a thousandth: Lotus Cobra -0.0007, whose mana is
+what empties, Courser of Kruphix +0.0010. That is the expected scale for a
+baseline that moved -0.0011.
+
+**The three staged swaps stand** (`diagnostics.run_restage`, in context,
+N=15,000, `results/restage_20261107.txt`): -Perilous Forays +Ka-Zar +0.0066
+±0.0028 / +0.0072 ±0.0034; -Forest +Fabled Passage +0.0079 ±0.0044 / +0.0100
+±0.0053; -Forest +Evolving Wilds +0.0047 ±0.0044 / +0.0089 ±0.0053 -- all
+significant at both horizons, Evolving Wilds at T10 by 0.0003. Each Change's
+`reverified` records them.
+
 `tests/test_pool_empties.py` pins A-J with three mutations, exact sets; its
 first mutation run failed on the TEST twice (a stand-in that rewrote the empty
 instead of running it, and a case that asserted more than its label), and the

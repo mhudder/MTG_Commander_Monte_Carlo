@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `3d8d93b`.
+Generated at `be72033`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,7 +86,7 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `4e8d6df8b2d5ef11` | `75a0852` | **VERIFIED** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `657eb48b79647c4f` | `1b6fa2b` | **CURRENT** |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `22fc0ded12db8749` | `75a0852` | **CURRENT** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `7bbdb648028e5afc` | `75a0852` | **CURRENT** |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `c03c220b37c5c936` | `75a0852` | **CURRENT** |
@@ -96,8 +96,7 @@ the fingerprint above mean anything.
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `4e8d6df8b2d5ef11`; fingerprint has since moved to `90f5af0924e7c94a` and was CHECKED at `3bcdc34` (2026-11-05T15:33:48Z): §0z175 (token copies get their own Card): every output key hashed per game, azusa staged list (build_pending), 15,000 seeds at T20 against a worktree at 3bcdc34 (the cache's built commit is 75a0852; 3bcdc34 changed no engine file since): 0 of 15,000 differ; check_unchanged_decks N=400 BIT-IDENTICAL on all 8 metrics.
-  - verified at `90f5af0924e7c94a` (`3bcdc34`, 2026-11-05T15:33:48Z): §0z175 (token copies get their own Card): every output key hashed per game, azusa staged list (build_pending), 15,000 seeds at T20 against a worktree at 3bcdc34 (the cache's built commit is 75a0852; 3bcdc34 changed no engine file since): 0 of 15,000 differ; check_unchanged_decks N=400 BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `657eb48b79647c4f`, which is live.
 - **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `22fc0ded12db8749`, which is live.
 - **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `7bbdb648028e5afc`, which is live.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `c03c220b37c5c936`, which is live.
