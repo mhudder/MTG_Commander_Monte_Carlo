@@ -2,7 +2,7 @@
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
 
-NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0027.
+NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0028.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
 
@@ -25,163 +25,163 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Mirkwood Bats                         +3.81+-0.25         +3.21+-0.24        +0.0175+-0.0032      both
-Time Sieve                            +4.68+-0.37         +2.98+-0.34        +0.0674+-0.0050      both
-Sol Ring                              +3.28+-0.29         +2.72+-0.28        +0.0239+-0.0037      both
-Demonic Tutor                         +3.12+-0.27         +2.17+-0.24        +0.0374+-0.0037      both
-Marionette Master                     +2.34+-0.18         +2.12+-0.17        +0.0107+-0.0027      both
-Tempt with Bunnies                    +2.02+-0.21         +2.12+-0.23        +0.0189+-0.0033      both
-Master of Ceremonies                  +2.35+-0.22         +2.03+-0.22        +0.0195+-0.0031      both
-Orzhov Signet                         +1.93+-0.23         +1.80+-0.24        +0.0140+-0.0033      both
-Nadier's Nightblade                   +2.17+-0.16         +1.77+-0.15        +0.0060+-0.0023      both
-Azorius Signet                        +1.92+-0.25         +1.75+-0.25        +0.0166+-0.0034      both
-Monologue Tax                         +2.29+-0.25         +1.71+-0.25        +0.0217+-0.0033      both
-Dimir Signet                          +1.90+-0.23         +1.69+-0.24        +0.0134+-0.0033      both
-Arcane Signet                         +1.85+-0.24         +1.56+-0.24        +0.0130+-0.0033      both
-Tempting Contract                     +2.03+-0.24         +1.55+-0.24        +0.0205+-0.0033      both
-Kambal, Profiteering Mayor            +1.56+-0.17         +1.43+-0.18        +0.0065+-0.0029      both
-Grudge Keeper                         +1.76+-0.14         +1.39+-0.14        +0.0031+-0.0024      both
-Plea for Power                        +1.44+-0.19         +1.33+-0.19        +0.0145+-0.0030      both
-Model of Unity                        +1.29+-0.20         +1.15+-0.20        +0.0089+-0.0030      both
-Tyrant's Choice                       +1.07+-0.11         +1.13+-0.12        +0.0061+-0.0020      both
-Disciple of the Vault                 +1.08+-0.12         +0.95+-0.12        +0.0043+-0.0020      both
-Cyberdrive Awakener                   +1.08+-0.11         +0.93+-0.13        +0.0032+-0.0024      both
-Illusion of Choice                    +0.82+-0.19         +0.74+-0.20        +0.0099+-0.0031      both
-Lightning Greaves                     +0.81+-0.16         +0.71+-0.17        +0.0063+-0.0027      both
-Lieutenants of the Guard              +0.74+-0.14         +0.70+-0.15        +0.0036+-0.0026      both
-Ephemerate                            +0.71+-0.16         +0.67+-0.17        +0.0071+-0.0027      both
-Sadistic Shell Game                   +0.45+-0.13         +0.60+-0.15        +0.0071+-0.0026      both
-Messenger Jays                        +0.84+-0.16         +0.59+-0.17        +0.0047+-0.0030      both
-Custodi Squire                        +0.62+-0.13         +0.49+-0.15        +0.0045+-0.0026      both
-Displacer Kitten                      +0.69+-0.16         +0.48+-0.16        +0.0085+-0.0027      both
-Deadeye Navigator                     +0.76+-0.15         +0.45+-0.15        +0.0097+-0.0026      both
-Teleportation Circle                  +0.55+-0.15         +0.23+-0.17        +0.0085+-0.0025      both
-Academy Manufactor                    +0.45+-0.18         +0.19+-0.18        +0.0079+-0.0029      both
-Tamiyo's Journal                      +0.26+-0.10         +0.19+-0.11        +0.0008+-0.0020       dmg
-Conjurer's Closet                     +0.40+-0.12         +0.11+-0.13        +0.0053+-0.0024       win
-Ballot Broker                         +0.22+-0.16         +0.08+-0.17        +0.0037+-0.0028       win
-Soulherder                            +0.21+-0.16         +0.04+-0.16        +0.0054+-0.0027       win
-Brago's Representative                +0.26+-0.16         +0.02+-0.16        +0.0047+-0.0026       win
-Coercive Portal                       -1.65+-0.22         -0.19+-0.23        -0.0039+-0.0034       win
-Idyllic Tutor                         -0.02+-0.17         -0.23+-0.19        +0.0065+-0.0029      both
-Anointed Procession                   -0.08+-0.26         -0.59+-0.26        +0.0173+-0.0040      both
-Revel in Riches                       -1.00+-0.17         -1.73+-0.20        +0.0084+-0.0022      both
-Mechanized Production                 -0.93+-0.22         -1.88+-0.25        +0.0123+-0.0027      both
+Mirkwood Bats                         +3.79+-0.25         +3.21+-0.24        +0.0179+-0.0032      both
+Time Sieve                            +4.70+-0.37         +3.13+-0.34        +0.0683+-0.0050      both
+Sol Ring                              +3.28+-0.29         +2.76+-0.28        +0.0259+-0.0037      both
+Demonic Tutor                         +3.13+-0.27         +2.29+-0.25        +0.0391+-0.0038      both
+Tempt with Bunnies                    +2.02+-0.21         +2.15+-0.23        +0.0201+-0.0033      both
+Marionette Master                     +2.31+-0.18         +2.10+-0.17        +0.0113+-0.0028      both
+Master of Ceremonies                  +2.33+-0.22         +2.05+-0.22        +0.0195+-0.0031      both
+Orzhov Signet                         +1.95+-0.24         +1.85+-0.24        +0.0147+-0.0033      both
+Nadier's Nightblade                   +2.18+-0.16         +1.81+-0.15        +0.0070+-0.0024      both
+Azorius Signet                        +1.93+-0.24         +1.78+-0.25        +0.0161+-0.0034      both
+Dimir Signet                          +1.90+-0.23         +1.76+-0.23        +0.0158+-0.0033      both
+Monologue Tax                         +2.26+-0.25         +1.71+-0.24        +0.0215+-0.0033      both
+Tempting Contract                     +2.09+-0.24         +1.63+-0.24        +0.0208+-0.0033      both
+Arcane Signet                         +1.86+-0.24         +1.56+-0.24        +0.0135+-0.0033      both
+Kambal, Profiteering Mayor            +1.53+-0.17         +1.45+-0.18        +0.0069+-0.0028      both
+Plea for Power                        +1.44+-0.19         +1.36+-0.19        +0.0151+-0.0030      both
+Grudge Keeper                         +1.70+-0.14         +1.32+-0.14        +0.0019+-0.0024       dmg
+Tyrant's Choice                       +1.09+-0.11         +1.15+-0.12        +0.0062+-0.0021      both
+Model of Unity                        +1.26+-0.20         +1.15+-0.21        +0.0093+-0.0030      both
+Cyberdrive Awakener                   +1.07+-0.11         +0.96+-0.13        +0.0049+-0.0024      both
+Disciple of the Vault                 +1.07+-0.12         +0.94+-0.12        +0.0048+-0.0020      both
+Illusion of Choice                    +0.83+-0.19         +0.76+-0.20        +0.0101+-0.0031      both
+Lightning Greaves                     +0.81+-0.16         +0.74+-0.17        +0.0069+-0.0028      both
+Ephemerate                            +0.71+-0.16         +0.70+-0.17        +0.0081+-0.0027      both
+Lieutenants of the Guard              +0.75+-0.14         +0.70+-0.15        +0.0041+-0.0026      both
+Sadistic Shell Game                   +0.45+-0.13         +0.58+-0.15        +0.0077+-0.0026      both
+Custodi Squire                        +0.64+-0.13         +0.54+-0.15        +0.0055+-0.0027      both
+Messenger Jays                        +0.81+-0.16         +0.54+-0.17        +0.0030+-0.0029      both
+Deadeye Navigator                     +0.74+-0.15         +0.49+-0.15        +0.0111+-0.0026      both
+Displacer Kitten                      +0.69+-0.16         +0.46+-0.16        +0.0084+-0.0027      both
+Academy Manufactor                    +0.47+-0.18         +0.23+-0.18        +0.0087+-0.0028      both
+Tamiyo's Journal                      +0.26+-0.10         +0.20+-0.11        +0.0010+-0.0020       dmg
+Teleportation Circle                  +0.54+-0.15         +0.19+-0.17        +0.0077+-0.0025      both
+Ballot Broker                         +0.28+-0.16         +0.14+-0.16        +0.0047+-0.0028       win
+Conjurer's Closet                     +0.40+-0.12         +0.13+-0.13        +0.0060+-0.0023       win
+Brago's Representative                +0.24+-0.16         +0.03+-0.16        +0.0053+-0.0026       win
+Soulherder                            +0.20+-0.16         +0.03+-0.16        +0.0063+-0.0026       win
+Idyllic Tutor                         +0.01+-0.17         -0.10+-0.19        +0.0085+-0.0029       win
+Coercive Portal                       -1.59+-0.22         -0.12+-0.23        -0.0037+-0.0034       win
+Anointed Procession                   -0.05+-0.25         -0.49+-0.26        +0.0183+-0.0039      both
+Revel in Riches                       -0.96+-0.17         -1.66+-0.20        +0.0082+-0.0022      both
+Mechanized Production                 -0.94+-0.22         -1.89+-0.25        +0.0114+-0.0027      both
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Expropriate                           +1.39+-0.14         +1.29+-0.14        +0.0261+-0.0027      both
+Expropriate                           +1.39+-0.14         +1.34+-0.14        +0.0269+-0.0028      both
       MODELLED: an extra turn per time vote -- the half that wins games. NOT: 'for
       each money vote, gain control of a permanent owned by the voter', which
       needs opposing permanents to steal (§4). Understates, and badly. A floor.
-Void Rend                             +0.50+-0.15         +1.08+-0.18        +0.0136+-0.0031      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Swords to Plowshares                  +0.50+-0.14         +1.06+-0.17        +0.0111+-0.0031      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Path to Exile                         +0.48+-0.13         +1.03+-0.18        +0.0090+-0.0031      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Propaganda                            +0.43+-0.12         +1.02+-0.16        +0.0185+-0.0028      both
+Propaganda                            +0.50+-0.12         +1.14+-0.17        +0.0201+-0.0028      both
       MODELLED (§0z138; the default pod since §0z140): the tax turns a combat
       route's kill, and part of the pod's chip damage, toward another living
       opponent. NOT: declared attacks -- the pod's combat is a damage share (§4).
       Bound to `attack_tax_deflect` (0.5), a judgement with no data that moves
       tivit's taxes by about a third either way.
-Ghostly Prison                        +0.36+-0.13         +1.00+-0.17        +0.0173+-0.0027      both
+Void Rend                             +0.49+-0.15         +1.08+-0.18        +0.0130+-0.0031      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Swords to Plowshares                  +0.51+-0.13         +1.07+-0.17        +0.0119+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Ghostly Prison                        +0.38+-0.13         +1.02+-0.17        +0.0172+-0.0027      both
       MODELLED (§0z138; the default pod since §0z140): the tax turns a combat
       route's kill, and part of the pod's chip damage, toward another living
       opponent. NOT: declared attacks -- the pod's combat is a damage share (§4).
       Bound to `attack_tax_deflect` (0.5), a judgement with no data that moves
       tivit's taxes by about a third either way.
-Damn                                  +0.11+-0.16         +0.96+-0.19        +0.0152+-0.0031      both
+Path to Exile                         +0.47+-0.13         +1.00+-0.17        +0.0091+-0.0030      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Damn                                  +0.14+-0.16         +1.00+-0.19        +0.0160+-0.0031      both
       SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
       ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
       refuses the wrath or the overload cannot be paid. Your half of the wrath is
       faithful; the pod's half zeroes a count (§4) and takes the route pieces it
       can hit. The cost is modelled, the benefit an estimate.
-Council's Judgment                    +0.39+-0.14         +0.60+-0.16        +0.0089+-0.0028      both
-      MODELLED: the vote, and since POD_V4 is the default (§0z138, §0z140) its
-      exile: the route piece `answer_target` aims at goes unless the votes against
-      outnumber yours, held while none is out. Who wins is `opp_vote_policy`. NOT:
-      a permanent that is not a route piece (§4). A floor.
-An Offer You Can't Refuse             +0.74+-0.14         +0.58+-0.16        +0.0046+-0.0027      both
-      MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
-      mana held up, against its removal, its wraths and its route pieces, at its
-      real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
-      its hand), which are not objects (§4). A floor.
-Trial of a Time Lord                  +0.33+-0.12         +0.57+-0.15        +0.0055+-0.0025      both
+Trial of a Time Lord                  +0.34+-0.12         +0.61+-0.15        +0.0059+-0.0025      both
       MODELLED: the chapter IV vote, on the third draw step after it enters
       (`saga_step`), then the sacrifice. NOT: chapters I-III's 'exile target
       nontoken creature an opponent controls', nor the vote's effect on those
       cards -- the pod's creatures are a count (§4). A floor.
-Muddle the Mixture                    +0.52+-0.15         +0.53+-0.16        +0.0058+-0.0025      both
-      MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
-      mana held up, against its removal, its wraths and its route pieces, at its
-      real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
-      its hand), which are not objects (§4). A floor.
-Promise of Loyalty                    +0.20+-0.14         +0.50+-0.16        +0.0094+-0.0028      both
+Council's Judgment                    +0.37+-0.13         +0.56+-0.16        +0.0087+-0.0028      both
+      MODELLED: the vote, and since POD_V4 is the default (§0z138, §0z140) its
+      exile: the route piece `answer_target` aims at goes unless the votes against
+      outnumber yours, held while none is out. Who wins is `opp_vote_policy`. NOT:
+      a permanent that is not a route piece (§4). A floor.
+Promise of Loyalty                    +0.26+-0.14         +0.55+-0.17        +0.0096+-0.0028      both
       'Each player puts a vow counter on a creature they control and SACRIFICES
       THE REST': each player keeps one (§0z118 -- until then the model kept none).
       Missing: the vow, 'can't attack you', on the creature each opponent keeps --
       their creatures are a count and chip damage still reads it, so a FLOOR.
       Sacrifice gets around indestructible: WIPE_IGNORES_INDESTRUCTIBLE.
-Counterspell                          +0.42+-0.14         +0.50+-0.15        +0.0050+-0.0026      both
+Muddle the Mixture                    +0.51+-0.14         +0.55+-0.16        +0.0067+-0.0025      both
       MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
       mana held up, against its removal, its wraths and its route pieces, at its
       real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
       its hand), which are not objects (§4). A floor.
-Dovin's Veto                          +0.35+-0.13         +0.41+-0.16        +0.0042+-0.0027      both
+An Offer You Can't Refuse             +0.75+-0.14         +0.53+-0.16        +0.0045+-0.0027      both
       MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
       mana held up, against its removal, its wraths and its route pieces, at its
       real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
       its hand), which are not objects (§4). A floor.
-Capital Punishment                    +0.24+-0.09         +0.36+-0.11        +0.0040+-0.0019      both
-      MODELLED: the council's dilemma vote. NOT: 'each opponent sacrifices a
-      creature for each death vote and discards a card for each taxes vote' -- the
-      pod has no creature objects and no hand (§4). A floor.
-Farewell                              +0.08+-0.13         +0.35+-0.15        +0.0087+-0.0026      both
+Counterspell                          +0.43+-0.14         +0.50+-0.16        +0.0060+-0.0026      both
+      MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
+      mana held up, against its removal, its wraths and its route pieces, at its
+      real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
+      its hand), which are not objects (§4). A floor.
+Dovin's Veto                          +0.35+-0.13         +0.44+-0.16        +0.0055+-0.0027      both
+      MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
+      mana held up, against its removal, its wraths and its route pieces, at its
+      real cost and tempo. NOT: the pod's other spells (draw, ramp, the rest of
+      its hand), which are not objects (§4). A floor.
+Farewell                              +0.09+-0.13         +0.40+-0.15        +0.0099+-0.0026      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
-Bite of the Black Rose                +0.26+-0.12         +0.24+-0.13        +0.0012+-0.0023       dmg
+Capital Punishment                    +0.27+-0.09         +0.38+-0.11        +0.0038+-0.0020      both
+      MODELLED: the council's dilemma vote. NOT: 'each opponent sacrifices a
+      creature for each death vote and discards a card for each taxes vote' -- the
+      pod has no creature objects and no hand (§4). A floor.
+Bite of the Black Rose                +0.28+-0.12         +0.27+-0.13        +0.0015+-0.0023       dmg
       MODELLED: the vote. NOT: sickness ('creatures your opponents control get
       -2/-2') or psychosis ('each opponent discards two cards') -- the pod's
       creatures are a count with no toughness, and it has no hand (§4). A floor.
-Split Decision                        +0.18+-0.09         +0.22+-0.10        +0.0031+-0.0016      both
-      MODELLED: the will-of-the-council vote. NOT: countering or copying the
-      target instant or sorcery -- the pod casts no spell on your turn for it to
-      target, beyond the one counterspell `march_elephant` models. A floor.
-Vault 11: Voter's Dilemma             -0.22+-0.16         +0.20+-0.17        -0.0017+-0.0030      FLIP
+Vault 11: Voter's Dilemma             -0.20+-0.16         +0.23+-0.17        -0.0013+-0.0030      FLIP
       MODELLED: chapter I's 1/1 Human Soldier per opponent, and the votes of
       chapters II and III on the draw steps they fall on (`saga_step`), then the
       sacrifice; since POD_V4 is the default (§0z138, §0z140) each vote destroys a
       creature route piece -- or, outvoted or tied, YOUR most-wanted creature (the
       adversarial `opp_vote_policy`). NOT: the draw mode. Knob-bound: it costs at
       T10 under the adversarial vote.
-Magister of Worth                     -0.17+-0.13         +0.13+-0.15        +0.0007+-0.0028        --
+Split Decision                        +0.17+-0.09         +0.21+-0.10        +0.0029+-0.0016      both
+      MODELLED: the will-of-the-council vote. NOT: countering or copying the
+      target instant or sorcery -- the pod casts no spell on your turn for it to
+      target, beyond the one counterspell `march_elephant` models. A floor.
+Magister of Worth                     -0.14+-0.13         +0.20+-0.15        +0.0021+-0.0028      FLIP
       The CONDEMNATION half is implemented (2026-09-12): a symmetric wipe that
       spares only itself, conditional on the council vote. GRACE -- 'EACH PLAYER
       returns each creature card from their graveyard to the battlefield' -- is
@@ -193,11 +193,11 @@ Magister of Worth                     -0.17+-0.13         +0.13+-0.15        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Torment of Hailfire                   +2.72+-0.18         +2.49+-0.16        +0.0067+-0.0024      both
+Torment of Hailfire                   +2.69+-0.18         +2.48+-0.16        +0.0069+-0.0024      both
       X is fixed at 6 and every opponent takes the life branch, because the pod
       has neither a hand nor permanents to give up (§4). A CEILING -- a real
       opponent pays with cards for a while.
-Rhystic Study                         +1.52+-0.21         +1.30+-0.21        +0.0145+-0.0031      both
+Rhystic Study                         +1.54+-0.21         +1.35+-0.21        +0.0141+-0.0031      both
       'Unless that player pays {1}' is a social fact this model cannot see: it
       draws a flat `rhystic_rate` a round. The row is that knob, not the card.
-Trap the Trespassers                  +0.21+-0.12         +0.21+-0.13        +0.0017+-0.0022       dmg
+Trap the Trespassers                  +0.19+-0.12         +0.23+-0.14        +0.0016+-0.0022       dmg
