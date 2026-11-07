@@ -31,7 +31,8 @@ list (`build_pending`, the list the tables are measured on):
   C  at most three reshuffles, every seed                  (the fifth hand)
   D  the four-hand path is actually reached                (or A-C prove nothing)
   E  a hand of one land and one MDFC is a keep             (the MDFC rule)
-  F  the pod phase runs damage, clocks, removal, in that order
+  F  the pod phase runs damage, clocks, removal, in that order -- the old
+     round, `pod_seat_turns=False`; the seat order is test_pod_seat_turns
   G  no engine calls the three pod functions itself        (the order is written once)
 
 MUTATIONS, WRITTEN BEFORE THE RUN. Each restores one old copy into all six
@@ -265,7 +266,11 @@ def run_cases(mulligan_fn, keep_fn, pod_fn):
         OPP.resolve_clocks = lambda g: order.append("clocks")
         OPP.opponents_act = lambda g: order.append("removal")
         deck, cmd = build_pending("karlov")
-        g = KV.KarlovGame(deck, cmd, dict(DEFAULT_CFG, watch=frozenset()), 1)
+        # THE OLD ROUND, by name: since §0z179 the default is three turns in
+        # seat order (`pod_seat_turns`, pinned by test_pod_seat_turns), and
+        # this case pins the round-by-kind order that `False` keeps.
+        g = KV.KarlovGame(deck, cmd, dict(DEFAULT_CFG, watch=frozenset(),
+                                          pod_seat_turns=False), 1)
         g.opening_hand()
         g.turn = 5
         pod_fn(g, before_act=lambda g: order.append("activity"))

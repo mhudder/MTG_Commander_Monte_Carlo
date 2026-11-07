@@ -231,6 +231,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
 | [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
 | [0z178](#0z178) | FIXED | **Apex of Power made ten from ANY cast, not only from the hand, and its pool lasted the turn**: -0.0036 / -0.0043, nearly all the hand clause. And the rule cited for mana emptying was 500.4; it is 106.4 / 500.5 |
+| [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**, not chip-then-clocks-then-removal: -0.0048 to -0.0132 at T20 in every deck; half is growth after removal, half opponents acting before a later seat kills them |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15589,6 +15590,92 @@ above" names the wrong entry for two of the four.
 `tests/test_lorehold_0f_0i.py`'s Apex case called `apply_spell_effects` with
 its default `from_hand=False` and expected ten; it names the hand cast it
 meant now.
+
+<a id="0z179"></a>
+
+## 0z179. IMPLEMENTED -- the pod's round as three turns, in seat order
+
+**2026-11-07, the owner: "do the opponents' turn structure next"**, the last
+of the turn-structure findings (§0z176-§0z178). Three decisions were the
+owner's, asked before any code: the shared turn first and each engine's
+stand-ins moved onto it afterwards, each measured; an opponent's kill in its
+main phase BEFORE its own removal; one parallel rebuild at the end (§0z94).
+
+### What the round was
+
+`opponents.pod_phase` (§0z30) ran the three opponents' round by KIND: every
+opponent's chip damage (`incidental_damage`), every route piece's response
+(`respond_to_pieces`), every clock (`resolve_clocks`), then each opponent's
+board growth and removal with its end step (`opponents_act`), then the goaded
+Birds, then the held answers. No opponent's turn was ever a unit: the third
+seat attacked before the first seat's wrath, and every kill fired before any
+removal -- so an opponent a later seat would kill this round never acted.
+
+### The skeleton (`pod_seat_turns`, default True)
+
+`_pod_seat_round`: each opponent who takes a turn (`dead_act`) takes it whole,
+in seat order --
+
+- **main 1**: its pieces land and you respond (`respond_to_pieces(seat=i)`),
+  its kill if due (`resolve_clock_seat`), then its wrath, spot and A/E
+  removal (`opponent_removal`, from pod turn 3);
+- **combat**: its chip damage at you (`chip_damage_seat`) and its goaded
+  Birds (`goaded_combat(seat=i)`), from the board it STARTED the turn with;
+- **main 2**: its board grows (`grow_board`) -- what it casts this turn is
+  summoning-sick, so it does not attack;
+- **end**: its end step (`pod_end_step_hook`, under `pod_bodies`);
+
+and the round closes with the held answers. `g.pod_seat` names the seat
+whose turn it is. Each round-level function is now a loop over the per-seat
+helper it shares with the seat order (`_chip_seat`, `_clock_seat`,
+`opponent_removal`, `grow_board`), so the rule is written once; the tests
+that call them directly are unchanged. Two hooks stay once a round, in the
+first acting seat's main phase, where the old round ran them relative to the
+kills: karlov's `pod_pieces_window` (its Citadel aim reads every seat's
+pieces) and `before_act` (karlov's `opponent_activity`).
+
+**`pod_seat_turns=False` is the old round, to the game**: every deck's staged
+list, seeds 5000..7499, every output key hashed, against a fresh worktree at
+`a8d9167`: 0 of 2,500 differ in all seven decks. With the default, 78-89% of
+games differ. `tools.validate`: +0.00 on all 21 metrics. `python -m tests`
+and `--mutate`: every module passes.
+
+### What it does (`diagnostics/run_knob_ab.py`, N=15,000 paired, python 3.13.16)
+
+| deck | T10 | T20 | `removal_eaten` | `wipes_suffered` |
+|---|---|---|---|---|
+| rendmaw | -0.0021 ±0.0018 | **-0.0132 ±0.0036** | +0.048 | +0.021 |
+| lorehold | -0.0047 ±0.0015 | -0.0081 ±0.0026 | +0.035 | +0.018 |
+| karlov | -0.0045 ±0.0018 | -0.0062 ±0.0028 | +0.040 | +0.014 |
+| tivit | -0.0040 ±0.0015 | -0.0048 ±0.0025 | +0.027 | +0.013 |
+| shilgengar | -0.0013 ±0.0013 | -0.0081 ±0.0033 | +0.043 | +0.019 |
+| azusa | -0.0041 ±0.0015 | -0.0059 ±0.0026 | +0.051 | +0.023 |
+
+`results/pod_seat_turns_<deck>_20261107.txt`. Every deck loses a little, and
+the same way: more removal and more wraths reach your board (A/E removal
++3-5% too). **Two causes, each measured:**
+
+1. **Growth after removal.** The old round grew each opponent's board before
+   its removal; the seat order grows it in main 2. A removal decision that
+   reads the pod's boards sees smaller ones, and your share of its threat is
+   larger. `pod_seat_grow="start"` grows the board as each turn begins:
+   about HALF the extra removal goes (karlov `removal_eaten` +0.027 rather
+   than +0.040, rendmaw +0.017 rather than +0.048) -- and win rate falls
+   much further, **-0.0280 (karlov) and -0.0523 (rendmaw) at T20**, because
+   the creatures cast this turn then attack: `final_life` -3.4 and -2.1.
+   Summoning sickness is a rule; main 2 is the default.
+2. **Opponents act before a later seat kills them.** In the old round every
+   kill resolved before anyone's removal, so an opponent killed by the third
+   seat never cast its own. In seat order it takes its turn first. Counted
+   (2,000 games): removal turns taken by an opponent who is dead by the end
+   of that round, **0.26 a game in karlov (0.02 in the old round), 0.53 in
+   rendmaw (0.18)**. Structural, and right.
+
+`tests/test_pod_seat_turns.py` pins A-I with three mutations, exact sets; its
+first runs failed on the TEST three times (a lambda bound to the previous
+case's log, an attribute read that crashed instead of failing, a turn-start
+board overwritten by the later step), and its docstring says how.
+`tests/test_mulligan_and_pod_order.py`'s case F pins the old round by name.
 
 ## How to read an ablation table
 

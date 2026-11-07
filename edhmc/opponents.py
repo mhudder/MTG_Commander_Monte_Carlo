@@ -1287,7 +1287,7 @@ def respond_to_event(g, event, victim, protect_how):
     return None
 
 
-def respond_to_pieces(g) -> int:
+def respond_to_pieces(g, seat=None) -> int:
     """A route piece is being cast on the pod's turn (it lands this pod
     turn) BY AN OPPONENT WHO IS GOING OFF -- whose kill fires this round, as
     the table can see -- so counter it, or answer it with a held instant once
@@ -1301,12 +1301,16 @@ def respond_to_pieces(g) -> int:
     taken out another opponent first -- instead of on the one that mattered.
     A piece that is not about to win is left to your main phase and the end
     of the round (`end_step_answers`), which aim as `answer_target` aims.
-    `response_pieces="all"` is the greedy version."""
+    `response_pieces="all"` is the greedy version. `seat` limits it to one
+    opponent's pieces -- that opponent's main phase, under `pod_seat_turns`
+    (§0z179)."""
     if not (responses_on(g) and pod_threats_on(g)) or g.result is not None:
         return 0
     t, n = pod_turn(g), 0
     greedy = g.cfg.get("response_pieces", "going_off") == "all"
     for o in living(g):
+        if seat is not None and o is not g.opponents[seat]:
+            continue
         if not greedy and o.kill_turn > t:
             continue
         for k, lands in enumerate(o.piece_lands):
@@ -2088,24 +2092,42 @@ def opponents_act(g):
     for i, opp in enumerate(g.opponents):
         if not old and not opp.alive:
             continue                      # an eliminated player has no turn
-        opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
+        grow_board(opp)
         if pod_turn(g) < 3:
             continue
-        others = [o for j, o in enumerate(g.opponents)
-                  if j != i and (old or o.alive)]
-        r = rolls_t[i]
-        board_wipe(g, opp, r)
-        spot_removal(g, opp, others, r)
-        ae_removal(g, opp, others, r)
-        # That opponent's END STEP, an event only under `pod_bodies`, where
-        # a death on their turn is one (§0z132; rendmaw's Deathreap Ritual).
-        end = getattr(g, "pod_end_step", None)
-        if end is not None and opp.alive and pod_bodies_on(g):
-            end(i)
+        opponent_removal(g, i, rolls_t, old)
+        pod_end_step_hook(g, i)
     goaded_combat(g)
 
 
-def goaded_combat(g):
+def grow_board(opp) -> None:
+    """An opponent develops its board: 0.7 of its archetype's `board` a turn,
+    capped at seven bodies' worth."""
+    opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
+
+
+def opponent_removal(g, i, rolls_t, old) -> None:
+    """Opponent `i`'s wrath, spot removal and artifact/enchantment removal,
+    on its pre-rolled row (`opponents_act`'s, and since §0z179 that
+    opponent's main phase under `pod_seat_turns`)."""
+    opp = g.opponents[i]
+    others = [o for j, o in enumerate(g.opponents)
+              if j != i and (old or o.alive)]
+    r = rolls_t[i]
+    board_wipe(g, opp, r)
+    spot_removal(g, opp, others, r)
+    ae_removal(g, opp, others, r)
+
+
+def pod_end_step_hook(g, i) -> None:
+    """That opponent's END STEP, an event only under `pod_bodies`, where a
+    death on their turn is one (§0z132; rendmaw's Deathreap Ritual)."""
+    end = getattr(g, "pod_end_step", None)
+    if end is not None and g.opponents[i].alive and pod_bodies_on(g):
+        end(i)
+
+
+def goaded_combat(g, seat=None):
     """Rendmaw's Birds are goaded, and YOU are the goader.
 
     Goad reads "attacks each combat if able and attacks a player other than
@@ -2117,8 +2139,11 @@ def goaded_combat(g):
     Blocking is deliberately light: the Birds fly, and most of what the
     opponent model abstracts into `creatures` does not. `goad_block_share`
     is the fraction of a defender's board assumed able to catch a flier.
+    `seat` limits it to one attacker -- that opponent's combat step, under
+    `pod_seat_turns` (§0z179).
     """
-    birds = [o for o in living(g) if o.goaded_birds > 0]
+    birds = [o for o in living(g) if o.goaded_birds > 0
+             and (seat is None or o is g.opponents[seat])]
     if not birds:
         return
     share = g.cfg.get("goad_block_share", 0.30)
@@ -3327,6 +3352,9 @@ def pod_phase(g, before_act=None):
     """
     g.pod_round_of = g.turn            # the pod's round is open, §0z134
     monarch_end_step(g)
+    if g.cfg.get("pod_seat_turns", True):          # §0z179
+        _pod_seat_round(g, before_act)
+        return
     incidental_damage(g)
     respond_to_pieces(g)               # change 3: before a kill can fire
     # An engine's own response from somewhere other than the hand, in the
@@ -3344,6 +3372,92 @@ def pod_phase(g, before_act=None):
     before = {p.card.name for p in g.board if p.card.name in watch}
     opponents_act(g)
     end_step_answers(g)                # change 3: what was held, at the end
+    after = {p.card.name for p in g.board if p.card.name in watch}
+    for _ in before - after:
+        g.m["test_card_answered"] += 1
+        g.m["test_card_removed"] += 1
+
+
+def _pod_seat_round(g, before_act=None) -> None:
+    """THE POD'S ROUND AS THREE TURNS, IN SEAT ORDER (§0z179; the owner,
+    2026-11-07). `pod_phase`'s old round was ordered by KIND -- every
+    opponent's chip damage, then every clock, then every opponent's removal --
+    so no opponent's turn was ever a unit: the third seat's attack landed
+    before the first seat's wrath, and every kill fired before any removal.
+    Each opponent who takes a turn (`dead_act`) now takes it whole:
+
+      main 1   its route pieces land (`respond_to_pieces`, that seat's), its
+               kill if due (`resolve_clock_seat`, before its own removal --
+               the owner's call), then its wrath / spot / A-E removal
+               (`opponent_removal`, from pod turn 3)
+      combat   its chip damage at you (`chip_damage_seat`) and its goaded
+               Birds (`goaded_combat`), from the board it STARTED the turn
+               with: what it casts this turn is summoning-sick
+      main 2   its board grows (`grow_board`); `pod_seat_grow="start"`
+               grows it as the turn begins instead, before its kill and
+               removal -- where the old round grew it relative to removal
+      end      its end step (`pod_end_step_hook`, under `pod_bodies`)
+
+    and the round closes with the held answers (`end_step_answers`), the end
+    of the last seat's turn. `g.pod_seat` names the seat whose turn it is
+    (None outside the round). TWO ROUND-LEVEL HOOKS STAY ONCE PER ROUND, in
+    the first acting seat's main phase where the old round ran them relative
+    to the kills: karlov's `pod_pieces_window` (its Citadel aim reads every
+    seat's pieces) and `before_act` (karlov's `opponent_activity`, scaled by
+    the living count). Their per-seat versions, and each engine's other
+    stand-ins for an opponent's step (azusa's and karlov's three upkeeps,
+    lorehold's windows), are §0z179's later parts. Every roll is the
+    pre-rolled grid's, so CRN holds. `pod_seat_turns=False` is the old round."""
+    old = dead_act(g)
+    rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
+    watch = g.cfg.get("watch", ())
+    before = {p.card.name for p in g.board if p.card.name in watch}
+    first = True
+    try:
+        for i, opp in enumerate(g.opponents):
+            if g.result is not None:
+                break
+            if not old and not opp.alive:
+                continue                  # an eliminated player has no turn
+            g.pod_seat = i
+            grow_first = g.cfg.get("pod_seat_grow", "main2") == "start"
+            if grow_first:
+                grow_board(opp)               # before its kill and removal
+            # -- main phase 1 ---------------------------------------------------
+            respond_to_pieces(g, seat=i)
+            if first:
+                window = getattr(g, "pod_pieces_window", None)
+                if window is not None:
+                    window()
+            resolve_clock_seat(g, i)
+            if g.result is not None:
+                break
+            if first and before_act is not None:
+                before_act(g)
+                if g.result is not None:
+                    break
+            first = False
+            if pod_turn(g) >= 3 and (old or opp.alive):
+                opponent_removal(g, i, rolls_t, old)
+            if g.result is not None:
+                break
+            # -- combat ---------------------------------------------------------
+            chip_damage_seat(g, i)
+            if g.result is not None:
+                break
+            goaded_combat(g, seat=i)
+            if g.result is not None:
+                break
+            # -- main phase 2, end step -----------------------------------------
+            if not grow_first:
+                grow_board(opp)
+            if pod_turn(g) >= 3:
+                pod_end_step_hook(g, i)
+    finally:
+        g.pod_seat = None
+    if g.result is not None:
+        return
+    end_step_answers(g)                # the end of the last seat's turn
     after = {p.card.name for p in g.board if p.card.name in watch}
     for _ in before - after:
         g.m["test_card_answered"] += 1
@@ -3445,60 +3559,99 @@ def incidental_damage(g):
     for i, opp in enumerate(g.opponents):
         if not opp.alive:
             continue
-        others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
-        # THE CROWN IS A REASON TO ATTACK YOU THAT YOUR BOARD CANNOT DETER
-        # (owner's correction, 2026-09-22). The first cut of this mechanic only
-        # modelled the crown being LOST to the pod's EXISTING attack pattern,
-        # and at a real table anyone who can profitably swing at the monarch
-        # does, because taking the crown is worth too much to pass up.
-        #
-        # WHICH SHARE THIS CORRECTS, said precisely because the first version of
-        # this comment named the wrong function. The default `combat_targeting`
-        # is "open", so the share above is `combat_share`, weighted by how OPEN
-        # each player is (`1/(1+blockers)`) rather than by threat -- §0v already
-        # established that threat-weighting combat was backwards, because a wide
-        # board is a deterrent and not a magnet. That is right for ordinary
-        # combat and WRONG FOR THE MONARCH: the crown is the prize, so a wide
-        # board stops deterring. Measured at `creatures=4` each:
-        # `combat_share` is 0.714 on an empty board, 0.385 at three creatures
-        # and 0.238 at seven -- so this floor barely moves an empty board and
-        # TRIPLES the share of a developed one, which is the case it exists for.
-        #
-        # A FLOOR RATHER THAN A MULTIPLIER, because a multiplier scales the very
-        # deterrence being overridden: 3x of 0.238 and 3x of 0.714 move apart,
-        # where the incentive at a real table does not care what you have.
-        # (`monarch_attack_share`, inside `chip_share`.)
-        share = chip_share(g, opp, others)
-        from edhmc.engine import damage_you            # Angel, §0z135
-        g.your_life -= damage_you(g, chip_amount(g, opp, share))
-        # GATED ON HOLDING THE CROWN, which is what keeps this change worth
-        # ZERO to all six decks: nothing grants the monarch yet, so the roll is
-        # never consumed and no existing stream can shift. `crn_random` is
-        # index-addressed per name (§0z17), so even once a card does grant it,
-        # a new stream cannot move an old one.
-        # AND THE SAME FLOORED SHARE SHORTENS THE REIGN, which is why these
-        # two effects are one number and not two knobs. More of their swing
-        # aimed at you is both more damage taken AND a better chance one of
-        # them connects and takes the crown. The counterbalance is mechanical
-        # rather than tuned: `share` above is the floored value.
-        if g.monarch and (opp.creatures + opp.goaded_birds) > 0:
-            from edhmc.engine import crn_random
-            if crn_random(g, f"monarch{i}") < min(1.0, share * loss_scale):
-                g.monarch = False
-                g.m["monarch_lost"] += 1
-                # THE CROWN CHANGING HANDS DOES NOT END THE ROUND (§0z97).
-                # This was a `break`, so every opponent seated after the one
-                # who took the crown dealt no chip damage that round -- found
-                # by trostani's test T, whose per-opponent sum disagreed on
-                # monarch boards (§0z96). The crown roll above is gated on
-                # `g.monarch`, so the later opponents cannot take it again;
-                # they only swing. `crown_loss_ends_chip=True` is the old
-                # loop, kept so the fix can be measured against it.
-                if g.cfg.get("crown_loss_ends_chip", False):
-                    break
+        if (_chip_seat(g, i, loss_scale)
+                and g.cfg.get("crown_loss_ends_chip", False)):
+            break
+    _chip_loss(g)
+
+
+def _chip_seat(g, i, loss_scale) -> bool:
+    """ONE opponent's chip damage at you, and the crown roll that rides it --
+    `incidental_damage`'s loop body, so the round (`pod_seat_turns=False`) and
+    the opponent's own combat step (`chip_damage_seat`) run one rule (§0z179).
+    True when the crown changed hands."""
+    opp = g.opponents[i]
+    others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
+    # THE CROWN IS A REASON TO ATTACK YOU THAT YOUR BOARD CANNOT DETER
+    # (owner's correction, 2026-09-22). The first cut of this mechanic only
+    # modelled the crown being LOST to the pod's EXISTING attack pattern,
+    # and at a real table anyone who can profitably swing at the monarch
+    # does, because taking the crown is worth too much to pass up.
+    #
+    # WHICH SHARE THIS CORRECTS, said precisely because the first version of
+    # this comment named the wrong function. The default `combat_targeting`
+    # is "open", so the share above is `combat_share`, weighted by how OPEN
+    # each player is (`1/(1+blockers)`) rather than by threat -- §0v already
+    # established that threat-weighting combat was backwards, because a wide
+    # board is a deterrent and not a magnet. That is right for ordinary
+    # combat and WRONG FOR THE MONARCH: the crown is the prize, so a wide
+    # board stops deterring. Measured at `creatures=4` each:
+    # `combat_share` is 0.714 on an empty board, 0.385 at three creatures
+    # and 0.238 at seven -- so this floor barely moves an empty board and
+    # TRIPLES the share of a developed one, which is the case it exists for.
+    #
+    # A FLOOR RATHER THAN A MULTIPLIER, because a multiplier scales the very
+    # deterrence being overridden: 3x of 0.238 and 3x of 0.714 move apart,
+    # where the incentive at a real table does not care what you have.
+    # (`monarch_attack_share`, inside `chip_share`.)
+    share = chip_share(g, opp, others)
+    from edhmc.engine import damage_you            # Angel, §0z135
+    g.your_life -= damage_you(g, chip_amount(g, opp, share))
+    # GATED ON HOLDING THE CROWN, which is what keeps this change worth
+    # ZERO to all six decks: nothing grants the monarch yet, so the roll is
+    # never consumed and no existing stream can shift. `crn_random` is
+    # index-addressed per name (§0z17), so even once a card does grant it,
+    # a new stream cannot move an old one.
+    # AND THE SAME FLOORED SHARE SHORTENS THE REIGN, which is why these
+    # two effects are one number and not two knobs. More of their swing
+    # aimed at you is both more damage taken AND a better chance one of
+    # them connects and takes the crown. The counterbalance is mechanical
+    # rather than tuned: `share` above is the floored value.
+    if g.monarch and (opp.creatures + opp.goaded_birds) > 0:
+        from edhmc.engine import crn_random
+        if crn_random(g, f"monarch{i}") < min(1.0, share * loss_scale):
+            g.monarch = False
+            g.m["monarch_lost"] += 1
+            # THE CROWN CHANGING HANDS DOES NOT END THE ROUND (§0z97).
+            # This was a `break`, so every opponent seated after the one
+            # who took the crown dealt no chip damage that round -- found
+            # by trostani's test T, whose per-opponent sum disagreed on
+            # monarch boards (§0z96). The crown roll above is gated on
+            # `g.monarch`, so the later opponents cannot take it again;
+            # they only swing. `crown_loss_ends_chip=True` is the old
+            # loop, kept so the fix can be measured against it.
+            return True
+    return False
+
+
+def _chip_loss(g) -> None:
     if g.your_life <= 0 and g.result is None:
         g.result = "loss"
         g.m["loss_route"] = 1          # ground down on life
+
+
+def chip_damage_seat(g, i) -> None:
+    """Opponent `i`'s COMBAT STEP at you (§0z179, `pod_seat_turns`): the chip
+    `incidental_damage` deals, from this one opponent, on its own turn -- so
+    an earlier seat's wipe has already cleared your blockers, or the crown
+    has already moved. The same gates: none before `first_attack_turn`, none
+    through Serra's Emissary (counted per opponent's turn here, a turn being
+    what `emissary_prevented_turns` names). `crown_loss_ends_chip` keeps its
+    meaning: once the crown moves, no later seat chips that round."""
+    if g.result is not None or pod_turn(g) < g.cfg.get("first_attack_turn", 3):
+        return
+    if not g.opponents[i].alive:
+        return
+    if protected_from_creatures(g):
+        g.m["emissary_prevented_turns"] += 1   # §0z84
+        return
+    ends = g.cfg.get("crown_loss_ends_chip", False)
+    if ends and getattr(g, "pod_chip_ended", None) == g.turn:
+        return
+    rate = g.cfg.get("incidental_rate", 0.45)
+    if _chip_seat(g, i, g.cfg.get("monarch_loss_scale", rate)) and ends:
+        g.pod_chip_ended = g.turn
+    _chip_loss(g)
 
 
 def chip_share(g, opp, others) -> float:
@@ -3632,34 +3785,56 @@ def resolve_clocks(g):
     if g.result is not None:
         return
     rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
-    for i, opp in enumerate(g.opponents):
-        if (not opp.alive or opp.clock_fired or pod_turn(g) < opp.kill_turn
-                or g.result is not None):
-            continue
-        opp.clock_fired = True      # a clock resolves once, not every turn
-        others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
-        share = your_share(g, opp, others)
-        at_you = (rolls_t[i][6] < share
-                  and not tax_deflects(g, i, opp, others))      # §0z138
-        if at_you and angel_prevents_kill(g, opp):
-            continue                   # §0z135: damage, prevented and milled
-        if at_you:
-            g.result = "loss"          # you were the biggest threat
-            g.m["loss_route"] = 2      # an opponent's clock picked YOU
-            g.your_life = 0.0
+    for i in range(len(g.opponents)):
+        if _clock_seat(g, i, rolls_t):
             return
-        if others:
-            victim = max(others, key=lambda o: opponent_threat(o, pod_turn(g)))
-            victim.alive = False
-            victim.life = 0.0
-            victim.creatures = 0.0
-            # An opponent who just eliminated somebody has not stopped being a
-            # problem. Re-arm their clock so surviving one resolution does not
-            # make you safe for the rest of the game.
-            opp.clock_fired = False
-            opp.kill_turn = pod_turn(g) + g.cfg.get("clock_rearm", 4)
-            rearm_route(g, opp)        # §0z137: what its route is now
     _check_eliminations(g)
+
+
+def resolve_clock_seat(g, i) -> None:
+    """Opponent `i`'s kill, if it is due, in that opponent's main phase
+    (§0z179, `pod_seat_turns`): `resolve_clocks`'s rule for one seat, before
+    that opponent's removal (the owner's choice, 2026-11-07: the kill reads
+    your board as the earlier seats left it, not as its own wipe leaves it)."""
+    if g.result is not None:
+        return
+    rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
+    if _clock_seat(g, i, rolls_t):
+        return
+    _check_eliminations(g)
+
+
+def _clock_seat(g, i, rolls_t) -> bool:
+    """One opponent's clock (`resolve_clocks`'s loop body). True when it
+    killed YOU, which ends the round."""
+    opp = g.opponents[i]
+    if (not opp.alive or opp.clock_fired or pod_turn(g) < opp.kill_turn
+            or g.result is not None):
+        return False
+    opp.clock_fired = True      # a clock resolves once, not every turn
+    others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
+    share = your_share(g, opp, others)
+    at_you = (rolls_t[i][6] < share
+              and not tax_deflects(g, i, opp, others))      # §0z138
+    if at_you and angel_prevents_kill(g, opp):
+        return False               # §0z135: damage, prevented and milled
+    if at_you:
+        g.result = "loss"          # you were the biggest threat
+        g.m["loss_route"] = 2      # an opponent's clock picked YOU
+        g.your_life = 0.0
+        return True
+    if others:
+        victim = max(others, key=lambda o: opponent_threat(o, pod_turn(g)))
+        victim.alive = False
+        victim.life = 0.0
+        victim.creatures = 0.0
+        # An opponent who just eliminated somebody has not stopped being a
+        # problem. Re-arm their clock so surviving one resolution does not
+        # make you safe for the rest of the game.
+        opp.clock_fired = False
+        opp.kill_turn = pod_turn(g) + g.cfg.get("clock_rearm", 4)
+        rearm_route(g, opp)        # §0z137: what its route is now
+    return False
 
 
 
