@@ -229,6 +229,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
 | [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
 | [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
+| [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15365,6 +15366,105 @@ it.
 Its first two mutation runs failed on the TEST, not the engine (a stand-in
 that ran the pod twice, then a win set after the turn instead of during it);
 the docstring says how, and the expected sets are as first written.
+
+<a id="0z177"></a>
+
+## 0z177. FIXED -- azusa's floating mana lasted the turn: it empties at each phase's end now
+
+**2026-11-07, the owner: "do the azusa mana bug next"**, the second of the
+turn-structure findings that produced §0z176. CR 500.5 (2026-08-07 rules):
+"As a step or phase ends ... any unspent mana left in a player's mana pool
+empties." Azusa keeps two pools that are not on the battlefield --
+`bonus_mana` (Lotus Cobra, Nissa, Resurgent Animist, Nykthos, Crystal Vein;
+and Tireless Provisioner's Treasures, which are permanents) and
+`creature_mana` (Castle Garenbrig's six {G}) -- and both were cleared only at
+the start of the next turn. Oracle text verified against Scryfall the same
+day: every one of the five is mana that empties; none says otherwise. So:
+
+- **within your turn**, main phase 1's leftover paid for combat and for the
+  second main phase -- the land step, `activations`, the cards the first
+  main could not afford;
+- **into the pod's turn**: `response_pay` reads `available_mana()`, which
+  offered main phase 2's unspent floating mana to every instant-speed
+  response on the opponents' turns (§0z134).
+
+Rendmaw has always emptied its own pool between steps (`engine.empty_mana_pool`,
+Davvol's {B}); azusa never did.
+
+**The fix, two parts.**
+
+1. **The rule** (`azusa_pool_empties`, default True):
+   `AzusaGame.empty_mana_pool(where)` at the end of main phase 1 (after
+   `precombat_step`, which spends "the mana the main phase left"), at the
+   end of combat, and at the end of main phase 2. Upkeep and the draw step
+   make no floating mana in this engine. Treasures keep. What it empties is
+   counted -- `floating_mana_lost`, by boundary (`floating_lost_main1`,
+   `_combat`, `_main2`) and Castle's part (`castle_mana_lost`).
+2. **The pilot** (`azusa_floating_first`, default True; inert without the
+   rule): a pilot pays with mana that is about to vanish before tapping a
+   land that keeps. Floating units were weighted `(9, 0, 0)` -- spent LAST,
+   behind every land -- which was harmless while they lasted the turn, and
+   is the wrong order once they do not. They are `(-1, 0, 0)` now, ahead of a
+   land (rank 0) wherever the solver's earlier keys tie: a Lotus Cobra {G}
+   against a Forest. A Treasure keeps `(9, 0, 0)`. **This is a policy, and
+   mine, said out loud**: it was adopted on the dominance argument and the
+   measurement below, and `azusa_floating_first=False` reverts it. It does
+   NOT reach Nissa's point -- a six-colour unit sorts behind a Forest on the
+   solver's colour keys before the weight is read; that would need a change
+   to `engine._can_pay` and every deck's fingerprint, for a share of 0.66
+   points a game.
+
+**Both switches off are the old engine.** `check_unchanged_decks
+--cfg=azusa_pool_empties=False` against HEAD `1b6fa2b`, N=400: all six
+active decks BIT-IDENTICAL; with the defaults only azusa moves.
+`tools.validate`: +0.00 on all 21 metrics.
+
+**The measurement** (`diagnostics/run_knob_ab.py`, new, the staged list both
+legs, N=15,000 paired, seeds 5000..19999, python 3.13.16 / numpy 2.4.6; it
+reproduces §0z176's `run_tivit_extra_order` figure for figure on tivit):
+
+| arm | T10 | T20 | file |
+|---|---|---|---|
+| the rule alone, old payment order | **-0.0023 ±0.0012** | **-0.0023 ±0.0014** | `results/azusa_pool_rule_only_20261107.txt` |
+| floating first, given the rule | +0.0013 ±0.0011 | +0.0012 ±0.0012 | `results/azusa_floating_first_20261107.txt` |
+| **both, the new default, against HEAD** | **-0.0011 ±0.0013** | **-0.0011 ±0.0015** | `results/azusa_pool_empties_20261107.txt` |
+
+**The identity check holds for the rule alone**: a game in which the rule
+never empties an unspent point is played identically by a pool that never
+empties (by induction over the boundaries), and of the 11,805 such games,
+**0 differ**. It is NOT claimed for the payment order, which taps different
+lands in a game that loses no mana: 160 games differ there and 328 in the
+combined arm, and the tool prints them as not claimed (`--no-identity`).
+
+**Where the mana goes.** With the rule alone, 7.59 points a game are emptied
+-- **6.25 at the end of main phase 1, 1.34 at the end of main 2, none at
+combat, none of it Castle's** -- and `mana_spent` falls only 1.34. Most of it
+was never going to be spent: landfall mana made after the hand ran out of
+anything to cast, carried by the old pool to an untap that cleared it
+anyway. Spending it first recovers 0.66 points of it and +0.40 `mana_spent`;
+what is left is the deferral this engine already makes on purpose --
+`activations` (Clues, Cryptic Caves, Eye of Ugin) waits for after combat "so
+that its mana is spare" (`precombat_step`'s docstring). A rule that makes a
+new loss possible turns that policy into a claim about it (§0z42): with
+floating mana that empties, a pilot would crack a Clue with main 1's leftover.
+**Not done here**; it is the next question if the 0.001 is worth chasing.
+Responses on the pod's turn: `responses_cast` -0.0021 a game.
+
+**Latent, not fixed**: Nissa, Resurgent Animist's point and Tireless
+Provisioner's Treasure are `frozenset({"W", "U", "B", "R", "G", "C"})`, and
+"one mana of any color" is not colourless (CR 105.1, 106.1). No card in the
+built list has a {C} pip, so nothing pays wrongly today; a candidate that
+has one (Kozilek, the Great Distortion's {C}{C}) would be paid by mana that
+cannot pay it. The same session's rule-number finding is still open too:
+`engine.py` and `lorehold.py` cite 500.4 for mana emptying, which is 500.5 in
+the 2026-08-07 rules.
+
+`tests/test_pool_empties.py` pins A-J with three mutations, exact sets; its
+first mutation run failed on the TEST twice (a stand-in that rewrote the empty
+instead of running it, and a case that asserted more than its label), and the
+docstring says how. `tests/test_floating_mana.py` case E now names the old
+payment order it needs: it asks whether `spend` consumes only what it was
+assigned, and the solver assigns the floating point first since this fix.
 
 ## How to read an ablation table
 
