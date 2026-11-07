@@ -3386,10 +3386,13 @@ def _pod_seat_round(g, before_act=None) -> None:
     before the first seat's wrath, and every kill fired before any removal.
     Each opponent who takes a turn (`dead_act`) now takes it whole:
 
+      upkeep   the engine's `g.pod_upkeep(i)`, if it has one: what YOU do
+               at the beginning of that opponent's upkeep
       main 1   its route pieces land (`respond_to_pieces`, that seat's), its
                kill if due (`resolve_clock_seat`, before its own removal --
-               the owner's call), then its wrath / spot / A-E removal
-               (`opponent_removal`, from pod turn 3)
+               the owner's call), the engine's `g.pod_main(i)` if it has one,
+               then its wrath / spot / A-E removal (`opponent_removal`, from
+               pod turn 3)
       combat   its chip damage at you (`chip_damage_seat`) and its goaded
                Birds (`goaded_combat`), from the board it STARTED the turn
                with: what it casts this turn is summoning-sick
@@ -3400,14 +3403,14 @@ def _pod_seat_round(g, before_act=None) -> None:
 
     and the round closes with the held answers (`end_step_answers`), the end
     of the last seat's turn. `g.pod_seat` names the seat whose turn it is
-    (None outside the round). TWO ROUND-LEVEL HOOKS STAY ONCE PER ROUND, in
-    the first acting seat's main phase where the old round ran them relative
-    to the kills: karlov's `pod_pieces_window` (its Citadel aim reads every
-    seat's pieces) and `before_act` (karlov's `opponent_activity`, scaled by
-    the living count). Their per-seat versions, and each engine's other
-    stand-ins for an opponent's step (azusa's and karlov's three upkeeps,
-    lorehold's windows), are §0z179's later parts. Every roll is the
-    pre-rolled grid's, so CRN holds. `pod_seat_turns=False` is the old round."""
+    (None outside the round). TWO ROUND-LEVEL HOOKS run once a round, in
+    the first acting seat's main phase, where the old round ran them relative
+    to the kills: `pod_pieces_window` and `before_act` -- unless the engine
+    runs them per seat (`g.pod_pieces_per_seat`, and its activity through
+    `pod_main`), as karlov does since §0z179. The engines' own steps for an
+    opponent's turn hang on `g.pod_upkeep(i)` and `g.pod_main(i)`, both
+    optional. Every roll is the pre-rolled grid's, so CRN holds.
+    `pod_seat_turns=False` is the old round."""
     old = dead_act(g)
     rolls_t = g.opp_rolls[min(pod_turn(g), len(g.opp_rolls) - 1)]
     watch = g.cfg.get("watch", ())
@@ -3420,12 +3423,19 @@ def _pod_seat_round(g, before_act=None) -> None:
             if not old and not opp.alive:
                 continue                  # an eliminated player has no turn
             g.pod_seat = i
+            # -- upkeep: the engine's own "at the beginning of each opponent's
+            # upkeep" (optional; lorehold's windows, §0z179) ------------------
+            upkeep = getattr(g, "pod_upkeep", None)
+            if upkeep is not None:
+                upkeep(i)
+                if g.result is not None:
+                    break
             grow_first = g.cfg.get("pod_seat_grow", "main2") == "start"
             if grow_first:
                 grow_board(opp)               # before its kill and removal
             # -- main phase 1 ---------------------------------------------------
             respond_to_pieces(g, seat=i)
-            if first:
+            if first or getattr(g, "pod_pieces_per_seat", False):
                 window = getattr(g, "pod_pieces_window", None)
                 if window is not None:
                     window()
@@ -3437,6 +3447,13 @@ def _pod_seat_round(g, before_act=None) -> None:
                 if g.result is not None:
                     break
             first = False
+            # The engine's own model of what THIS opponent does in its main
+            # phase (optional; karlov's `seat_activity`, §0z179).
+            main = getattr(g, "pod_main", None)
+            if main is not None:
+                main(i)
+                if g.result is not None:
+                    break
             if pod_turn(g) >= 3 and (old or opp.alive):
                 opponent_removal(g, i, rolls_t, old)
             if g.result is not None:

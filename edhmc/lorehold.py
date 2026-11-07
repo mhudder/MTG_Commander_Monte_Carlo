@@ -70,6 +70,27 @@ class LoreholdGame(BaseGame):
             self.m["treasures_made"] += 1
             self.m["goldspan_target_treasures"] += 1
 
+    def pod_upkeep(self, i: int) -> None:
+        """`opponents._pod_seat_round`'s hook: the beginning of opponent `i`'s
+        upkeep (§0z179). Lorehold's "At the beginning of each opponent's
+        upkeep, you may discard a card. If you do, draw a card" -- or, with
+        Lorehold not out, a draw land's draw (`draw_land_window`) -- opens a
+        miracle window HERE, before that opponent's kill and removal. They
+        opened after the whole round, so a wrath miracled on an opponent's
+        upkeep could not stop that opponent's kill. `lorehold_seat_upkeeps`
+        False keeps them after the round."""
+        if not seat_upkeeps(self):
+            return
+        if self.commander_cast:
+            rummage_window(self, sum(1 for p in self.board
+                                     if "cross_turn" in p.card.tags))
+        elif self.cfg.get("draw_lands", True):
+            ready = _draw_lands_ready(self)
+            land = ready[0] if ready else None
+            if draw_land_window(self, ready):   # it taps `land`, once a round
+                self.draw_lands_ready = [p for p in self.draw_lands_ready
+                                         if p is not land]
+
     def response_pay(self, cost, dry=False, now=False) -> bool:
         """Pay `cost` with the mana you held up through the pod's turn
         (item 24 change 3, §0z134; `opponents.respond`). `dry` only asks
@@ -2958,43 +2979,58 @@ def draw_land_windows(g):
         (the Sanitarium) on what the windows left, after the round.
     The opponents' draws are blind (§4). The Sanitarium's discard is the
     rummage's pick, to the graveyard (Artist's Talent's rule)."""
-    ready = [p for p in getattr(g, "draw_lands_ready", ())
-             if p in g.board and p.card.name in DRAW_LANDS]
+    ready = _draw_lands_ready(g)
     if not ready or not g.cfg.get("draw_lands", True) or g.result is not None:
         return
-
-    def activate(land):
-        g.float_mana -= 3
-        g.m["draw_land_activations"] += 1
-        tithe_forced_draws(g, 1)             # "EACH player draws a card"
-
-    def sanitarium_discard(land):
-        if land.card.name == "Geier Reach Sanitarium" and g.hand:
-            worst = rummage_discard_choice(g)
-            remove_card(g.hand, worst)
-            g.graveyard.append(worst)
-            discard_triggers(g, 1)
-
     if not g.commander_cast:
         for _ in OPP.acting(g):          # each opponent's TURN, §0z133
-            if (not ready or g.float_mana < 3 or not draw_is_safe(g, 1)
-                    or g.result is not None):
+            if not draw_land_window(g, ready):
                 break
-            land = ready.pop(0)
-            activate(land)
-            g.spells_this_turn = 0
-            g.noncreature_this_turn = 0
-            _drawn, cast = miracle_window(g, off_turn=True)
-            g.m["draw_land_windows"] += 1
-            g.m["draw_land_miracles"] += cast
-            sanitarium_discard(land)
         return
     for land in ready:
         if g.float_mana < 3 or not draw_is_safe(g, 1) or g.result is not None:
             break
-        activate(land)
+        _draw_land_activate(g)
         _draw_into_hand(g, 1)
-        sanitarium_discard(land)
+        _sanitarium_discard(g, land)
+
+
+def _draw_lands_ready(g) -> list:
+    return [p for p in getattr(g, "draw_lands_ready", ())
+            if p in g.board and p.card.name in DRAW_LANDS]
+
+
+def _draw_land_activate(g) -> None:
+    g.float_mana -= 3
+    g.m["draw_land_activations"] += 1
+    tithe_forced_draws(g, 1)             # "EACH player draws a card"
+
+
+def _sanitarium_discard(g, land) -> None:
+    if land.card.name == "Geier Reach Sanitarium" and g.hand:
+        worst = rummage_discard_choice(g)
+        remove_card(g.hand, worst)
+        g.graveyard.append(worst)
+        discard_triggers(g, 1)
+
+
+def draw_land_window(g, ready) -> bool:
+    """ONE opponent's upkeep, Lorehold not out: a draw land's draw is that
+    turn's first, so a miracle window (`draw_land_windows`' loop body, and
+    since §0z179 that opponent's upkeep under `lorehold_seat_upkeeps`).
+    `ready` is consumed. False when no window could open."""
+    if (not ready or g.float_mana < 3 or not draw_is_safe(g, 1)
+            or g.result is not None):
+        return False
+    land = ready.pop(0)
+    _draw_land_activate(g)
+    g.spells_this_turn = 0
+    g.noncreature_this_turn = 0
+    _drawn, cast = miracle_window(g, off_turn=True)
+    g.m["draw_land_windows"] += 1
+    g.m["draw_land_miracles"] += cast
+    _sanitarium_discard(g, land)
+    return True
 
 
 def opponent_upkeep_windows(g):
@@ -3003,89 +3039,96 @@ def opponent_upkeep_windows(g):
         return
     cross_turn = sum(1 for p in g.board if "cross_turn" in p.card.tags)
     for _ in OPP.acting(g):          # each opponent's TURN, §0z133
-        g.float_mana += cross_turn      # these untap on every untap step
-        # "you MAY discard a card. If you do, draw a card" -- declined when
-        # the draw would deck you (queued item 17). Conservative in one case:
-        # with Library of Leng the discarded card can go on top and be drawn
-        # straight back, which is library-neutral; the pilot here passes on
-        # that too.
-        if not g.hand or not draw_is_safe(g, 1):
-            continue
-        # Discard the worst card (the pick lives in one function, which
-        # Artist's Talent's rummage shares).
-        worst = rummage_discard_choice(g)
-        leng_card = None
-        if g.has("Library of Leng"):
-            # Discard the BEST miracle target instead: it goes on top and we
-            # immediately draw it. This is the deck's core loop.
-            #
-            # BUT ONLY IF THE MIRACLE IS AFFORDABLE. The rummage discards a
-            # card either way, so the choice is between two real plays:
-            #   affordable  -> bin the best card, draw it back, miracle it for
-            #                  {2}. Card-neutral and cheats its full cost.
-            #   not         -> bin the WORST card to the graveyard and draw a
-            #                  fresh one. That is a genuine upgrade.
-            # Redirecting to the top when you cannot pay gets the worst of
-            # both: you keep a card you already had and draw nothing new.
-            # There was no gate here at all, which is most of why placements
-            # were being made that could not be cast.
-            best = max(g.hand, key=lambda c: miracle_value(g, c))
-            afford = (g.float_mana + g.treasures) >= miracle_need(g, best)
-            if afford and miracle_value(g, best) > 0:
-                worst = best
-                remove_card(g.hand, worst)
-                g.library.append(worst)
-                leng_card = worst
-                g.m["leng_to_top"] += 1
-                g.m["leng_mv_to_top"] += worst.mv
-            else:
-                remove_card(g.hand, worst)
-                g.graveyard.append(worst)
+        rummage_window(g, cross_turn)
+
+
+def rummage_window(g, cross_turn) -> None:
+    """ONE opponent's upkeep with Lorehold out: the rummage and its miracle
+    window (`opponent_upkeep_windows`' loop body, and since §0z179 that
+    opponent's upkeep itself under `lorehold_seat_upkeeps`)."""
+    g.float_mana += cross_turn      # these untap on every untap step
+    # "you MAY discard a card. If you do, draw a card" -- declined when
+    # the draw would deck you (queued item 17). Conservative in one case:
+    # with Library of Leng the discarded card can go on top and be drawn
+    # straight back, which is library-neutral; the pilot here passes on
+    # that too.
+    if not g.hand or not draw_is_safe(g, 1):
+        return
+    # Discard the worst card (the pick lives in one function, which
+    # Artist's Talent's rummage shares).
+    worst = rummage_discard_choice(g)
+    leng_card = None
+    if g.has("Library of Leng"):
+        # Discard the BEST miracle target instead: it goes on top and we
+        # immediately draw it. This is the deck's core loop.
+        #
+        # BUT ONLY IF THE MIRACLE IS AFFORDABLE. The rummage discards a
+        # card either way, so the choice is between two real plays:
+        #   affordable  -> bin the best card, draw it back, miracle it for
+        #                  {2}. Card-neutral and cheats its full cost.
+        #   not         -> bin the WORST card to the graveyard and draw a
+        #                  fresh one. That is a genuine upgrade.
+        # Redirecting to the top when you cannot pay gets the worst of
+        # both: you keep a card you already had and draw nothing new.
+        # There was no gate here at all, which is most of why placements
+        # were being made that could not be cast.
+        best = max(g.hand, key=lambda c: miracle_value(g, c))
+        afford = (g.float_mana + g.treasures) >= miracle_need(g, best)
+        if afford and miracle_value(g, best) > 0:
+            worst = best
+            remove_card(g.hand, worst)
+            g.library.append(worst)
+            leng_card = worst
+            g.m["leng_to_top"] += 1
+            g.m["leng_mv_to_top"] += worst.mv
         else:
             remove_card(g.hand, worst)
             g.graveyard.append(worst)
-        # Library of Leng redirects where the card goes, but it is still a
-        # discard, so Monument to Endurance still triggers either way.
-        g.monument_used = set()          # a new turn = the modes reset
-        g.spells_this_turn = 0
-        g.noncreature_this_turn = 0
-        g.bombardment_fired_this_turn = False   # a new turn = a new trigger
-        g.dv_fired_this_turn = False
-        # A free top-setter can be used before EACH draw event, and Lorehold's
-        # rummage supplies three extra ones per round on opponents' turns.
-        # BUG FIXED 2026-09-05. `set_top` was called unconditionally, and it
-        # appends ANOTHER card from hand on top of the library — burying the
-        # card Library of Leng had just put there and consuming the draw on
-        # the second-best target instead of the best. Measured at 26% of all
-        # Leng placements. Two effects were competing for one slot and the
-        # engine ran both blindly; no pilot would ever bury their own setup.
-        # A top-setter is only wanted when Leng did NOT place something.
-        st_card = (set_top(g, pool=g.float_mana + g.treasures)
-                   if leng_card is None else None)
-        if leng_card is not None and (not g.library or g.library[-1] is not leng_card):
-            g.m["leng_buried"] += 1
-        drawn, cast = miracle_window(g, off_turn=True)
-        if st_card is not None:
-            g.m["settop_drawn"] += (drawn is st_card)
-            g.m["settop_miracled"] += (drawn is st_card and cast)
-        # TRIGGER ORDER, FIXED 2026-09-05. Monument to Endurance's discard
-        # trigger used to resolve BEFORE the miracle window, and its "draw"
-        # mode pops the top of the library — which is exactly where Library of
-        # Leng had just put the card you intended to miracle. Measured: with
-        # Monument on the battlefield, 78% of Leng placements were buried and
-        # Leng miracles fell from 1.98 a game to 0.57. The deck was
-        # cannibalising its own core loop.
-        #
-        # Both triggers are yours (Lorehold's "draw a card" and Monument's
-        # "whenever you discard"), so YOU choose the order. A pilot resolves
-        # Lorehold's draw first, takes the miracle, and lets Monument draw the
-        # next card afterwards. That is what this now does.
-        discard_triggers(g, 1)
-        if leng_card is not None and drawn is leng_card:
-            g.m["leng_drawn"] += 1
-            if cast:
-                g.m["leng_miracled"] += 1
-                g.m["leng_mv_miracled"] += leng_card.mv
+    else:
+        remove_card(g.hand, worst)
+        g.graveyard.append(worst)
+    # Library of Leng redirects where the card goes, but it is still a
+    # discard, so Monument to Endurance still triggers either way.
+    g.monument_used = set()          # a new turn = the modes reset
+    g.spells_this_turn = 0
+    g.noncreature_this_turn = 0
+    g.bombardment_fired_this_turn = False   # a new turn = a new trigger
+    g.dv_fired_this_turn = False
+    # A free top-setter can be used before EACH draw event, and Lorehold's
+    # rummage supplies three extra ones per round on opponents' turns.
+    # BUG FIXED 2026-09-05. `set_top` was called unconditionally, and it
+    # appends ANOTHER card from hand on top of the library — burying the
+    # card Library of Leng had just put there and consuming the draw on
+    # the second-best target instead of the best. Measured at 26% of all
+    # Leng placements. Two effects were competing for one slot and the
+    # engine ran both blindly; no pilot would ever bury their own setup.
+    # A top-setter is only wanted when Leng did NOT place something.
+    st_card = (set_top(g, pool=g.float_mana + g.treasures)
+               if leng_card is None else None)
+    if leng_card is not None and (not g.library or g.library[-1] is not leng_card):
+        g.m["leng_buried"] += 1
+    drawn, cast = miracle_window(g, off_turn=True)
+    if st_card is not None:
+        g.m["settop_drawn"] += (drawn is st_card)
+        g.m["settop_miracled"] += (drawn is st_card and cast)
+    # TRIGGER ORDER, FIXED 2026-09-05. Monument to Endurance's discard
+    # trigger used to resolve BEFORE the miracle window, and its "draw"
+    # mode pops the top of the library — which is exactly where Library of
+    # Leng had just put the card you intended to miracle. Measured: with
+    # Monument on the battlefield, 78% of Leng placements were buried and
+    # Leng miracles fell from 1.98 a game to 0.57. The deck was
+    # cannibalising its own core loop.
+    #
+    # Both triggers are yours (Lorehold's "draw a card" and Monument's
+    # "whenever you discard"), so YOU choose the order. A pilot resolves
+    # Lorehold's draw first, takes the miracle, and lets Monument draw the
+    # next card afterwards. That is what this now does.
+    discard_triggers(g, 1)
+    if leng_card is not None and drawn is leng_card:
+        g.m["leng_drawn"] += 1
+        if cast:
+            g.m["leng_miracled"] += 1
+            g.m["leng_mv_miracled"] += leng_card.mv
 
 
 def empty_pool(g, where: str) -> None:
@@ -3289,6 +3332,15 @@ def end_of_turn_float(g) -> int:
     return len(mana_units(g))
 
 
+def seat_upkeeps(g) -> bool:
+    """Do lorehold's opponent-upkeep windows open INSIDE the pod's round, one
+    at each opponent's upkeep (§0z179, `lorehold_seat_upkeeps`)? Only under
+    the seat order: the old round has no opponent's upkeep to open them in,
+    and they ran after it."""
+    return (g.cfg.get("opponents", True) and g.cfg.get("pod_seat_turns", True)
+            and g.cfg.get("lorehold_seat_upkeeps", True))
+
+
 def take_turn(g):
     held = your_turn(g)
     if g.cfg.get("extra_turn_full", True):
@@ -3303,6 +3355,13 @@ def take_turn(g):
             g.m["extra_turns_taken"] += 1
             held = your_turn(g, extra=True)
 
+    # THE WINDOWS OPEN ON EACH OPPONENT'S UPKEEP (§0z179): under the seat
+    # order they run inside the pod's round (`LoreholdGame.pod_upkeep`),
+    # before that opponent's kill and removal, and the reserve check below
+    # counts from here.
+    seat_up = seat_upkeeps(g)
+    if seat_up:
+        _before = g.m["miracles_cast"]
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
         if g.result is not None:
@@ -3326,9 +3385,12 @@ def take_turn(g):
     # WAS THE RESERVE WORTH HOLDING? The windows it is held for open AFTER
     # `opponents_act`, so a Lorehold answered in between takes them with it and
     # the mana was declined for nothing. Counted rather than argued.
-    _before = g.m["miracles_cast"]
-    opponent_upkeep_windows(g)
-    draw_land_windows(g)
+    if not seat_up:
+        _before = g.m["miracles_cast"]
+        opponent_upkeep_windows(g)
+        draw_land_windows(g)
+    elif g.commander_cast:
+        draw_land_windows(g)          # its plain draws, after the round
     if held:
         if g.m["miracles_cast"] == _before:
             g.m["reserve_unused_turns"] += 1

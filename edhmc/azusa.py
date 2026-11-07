@@ -561,6 +561,7 @@ class AzusaGame(BaseGame):
             "floating_lost_main1": 0,   # ... the end of main phase 1
             "floating_lost_combat": 0,  # ... the end of combat
             "floating_lost_main2": 0,   # ... the end of main phase 2
+            "floating_lost_pod_upkeep": 0,  # ... an opponent's upkeep (§0z179)
             "castle_mana_lost": 0,      # ... of it, Castle Garenbrig's {G}
             "wildspeaker_draws": 0,     # cards actually drawn off the draw mode
             "wildspeaker_asked": 0,     # ... and what it asked for. The gap is
@@ -2771,6 +2772,15 @@ class AzusaGame(BaseGame):
             return self.counts_as_creature(perm)
         return self.ashaya_lands() and self.is_creature_land(perm)
 
+    def pod_upkeep(self, i: int) -> None:
+        """Opponent `i`'s upkeep (§0z179): Verdant Kraken's "at the beginning
+        of EACH PLAYER'S upkeep" -- one token, at that upkeep, and its
+        landfall's floating mana (Lotus Cobra) empties when the step does
+        (CR 500.5, `empty_mana_pool`, §0z177)."""
+        if azusa_seat_upkeeps(self):
+            self.verdant_kraken_tokens(1)
+            self.empty_mana_pool("pod_upkeep")
+
     def verdant_kraken_tokens(self, upkeeps: int):
         """Verdant Kraken: "At the beginning of EACH PLAYER'S upkeep, you
         create a 3/3 green Forest Tentacle land creature token. (It has
@@ -4061,6 +4071,15 @@ class AzusaGame(BaseGame):
             self.m["turn_lethal"] = self.turn
 
 
+def azusa_seat_upkeeps(g) -> bool:
+    """Do the pod's upkeep triggers (Verdant Kraken) run AT each opponent's
+    upkeep, one per opponent who takes a turn (§0z179, `azusa_seat_upkeeps`)?
+    Only under the seat order. The old round made three a round, before it,
+    however many opponents were left."""
+    return (g.cfg.get("opponents", True) and g.cfg.get("pod_seat_turns", True)
+            and g.cfg.get("azusa_seat_upkeeps", True))
+
+
 def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
@@ -4166,7 +4185,8 @@ def take_turn(g):
     # bodies in `board_threat` drawing removal and clocks at you. That is a
     # real cost of the card and the model does see it; putting them after
     # `pod_phase` would have made three 3/3s a round free.
-    g.verdant_kraken_tokens(3)
+    if not azusa_seat_upkeeps(g):
+        g.verdant_kraken_tokens(3)     # each opponent's own, under §0z179
 
     g.cauldron_flush()             # §0z135: before the pod's turn
     cleanup_step(g)                # discard to seven, CR 514.1, §0z171

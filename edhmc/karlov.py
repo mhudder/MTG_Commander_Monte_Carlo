@@ -227,6 +227,26 @@ class KarlovGame(BaseGame):
             return 2 if have_a and not have_b else 0
         return 0
 
+    @property
+    def pod_pieces_per_seat(self) -> bool:
+        """Run `pod_pieces_window` in EVERY seat's main phase, aimed at that
+        seat's pieces (`citadel_piece_target`), not once a round (§0z179)."""
+        return seat_pod(self)
+
+    def pod_upkeep(self, i: int) -> None:
+        """Opponent `i`'s upkeep (§0z179): Ginger, Queen of Sweets' "at the
+        beginning of EACH upkeep, if you're the monarch" -- one token, while
+        you still hold the crown, where the old round made three before the
+        pod could take it."""
+        if seat_pod(self):
+            gingerbrute_tokens(self, 1)
+
+    def pod_main(self, i: int) -> None:
+        """Opponent `i`'s main phase (§0z179): its land drop, creatures and
+        spells, which this deck taxes (`seat_activity`)."""
+        if seat_pod(self):
+            seat_activity(self, i)
+
     def pod_pieces_window(self) -> None:
         """`opponents.pod_phase`'s optional hook, right after
         `respond_to_pieces`: an answer on top of the library, cast through
@@ -525,7 +545,7 @@ def orchard_idle_tap(g):
                 return
 
 
-def polluted_bonds(g):
+def polluted_bonds(g, only=None):
     """POLLUTED BONDS (candidate, 2026-10-12, §0z128): "Whenever a land an
     opponent controls enters, that player loses 2 life and you gain 2 life."
 
@@ -540,6 +560,8 @@ def polluted_bonds(g):
     if OPP.pod_turn(g) > g.cfg.get("opp_land_plateau", 8):
         return
     for o in list(OPP.living(g)):
+        if only is not None and o is not only:
+            continue                   # one opponent's own drop, §0z179
         for _ in range(g.count("Polluted Bonds")):
             if g.result is not None or o not in OPP.living(g):
                 break
@@ -1014,16 +1036,56 @@ def opponent_activity(g):
 
     spells = int(round(g.cfg.get("opp_spells_per_turn", 1.2) * len(OPP.living(g))))
     for _ in range(spells):
-        if (g.has("Kambal, Consul of Allocation")
-                and crn_random(g, "kambal") < 0.55):
-            drain(g, 2)
-        if g.has("Sunscorch Regent"):
-            # "put a +1/+1 counter on this creature AND you gain 1 life" — the
-            # counter was missing, so a 4/3 that should grow all game did not.
-            for p in g.board:
-                if p.card.name == "Sunscorch Regent":
-                    p.counters += 1
-            gain_life(g, 1)
+        _opponent_spell(g)
+
+
+def _opponent_spell(g) -> None:
+    """One spell an opponent casts, and what this deck taxes on it."""
+    if (g.has("Kambal, Consul of Allocation")
+            and crn_random(g, "kambal") < 0.55):
+        drain(g, 2)
+    if g.has("Sunscorch Regent"):
+        # "put a +1/+1 counter on this creature AND you gain 1 life" — the
+        # counter was missing, so a 4/3 that should grow all game did not.
+        for p in g.board:
+            if p.card.name == "Sunscorch Regent":
+                p.counters += 1
+        gain_life(g, 1)
+
+
+def seat_pod(g) -> bool:
+    """Do karlov's stand-ins for the pod's turns run PER OPPONENT, inside its
+    own turn (§0z179, `karlov_seat_pod`)? Only under the seat order."""
+    return (g.cfg.get("opponents", True) and g.cfg.get("pod_seat_turns", True)
+            and g.cfg.get("karlov_seat_pod", True))
+
+
+def seat_activity(g, i) -> None:
+    """`opponent_activity` for ONE opponent, in its own main phase (§0z179):
+    its land drop (Polluted Bonds) and its share of the round's creatures and
+    spells. THE ROUND'S TOTALS ARE THE OLD ONES -- rounded once at the first
+    seat over the opponents living then, and spread across the seats in
+    order (seat k takes floor((k+1)T/n) - floor(kT/n)) -- because rounding
+    per seat turns 0.7 creatures an opponent into one each, three a round
+    where the old round made two."""
+    polluted_bonds(g, only=g.opponents[i])
+    if g.result is not None:
+        return
+    plan = getattr(g, "activity_plan", None)
+    if plan is None or plan[0] != g.turn:
+        n = len(OPP.living(g))
+        plan = [g.turn, n, 0,
+                int(round(g.cfg.get("opp_creatures_per_turn", 0.7) * n)),
+                int(round(g.cfg.get("opp_spells_per_turn", 1.2) * n))]
+        g.activity_plan = plan
+    _turn, n, k, creatures, spells = plan
+    if k >= n:
+        return
+    plan[2] = k + 1
+    for _ in range((k + 1) * creatures // n - k * creatures // n):
+        creature_entered(g, mine=False)
+    for _ in range((k + 1) * spells // n - k * spells // n):
+        _opponent_spell(g)
 
 
 def upkeep(g):
@@ -2113,7 +2175,10 @@ def citadel_piece_target(g, reach):
     """`respond_to_pieces`' aim, for one answer: a piece landing THIS pod
     turn for an opponent whose kill fires this round, that `reach` hits."""
     t = OPP.pod_turn(g)
+    seat = getattr(g, "pod_seat", None)
     for o in OPP.living(g):
+        if seat is not None and seat_pod(g) and o is not g.opponents[seat]:
+            continue                  # that seat's turn: its pieces only
         if o.kill_turn > t:
             continue
         for k, lands in enumerate(o.piece_lands):
@@ -2651,7 +2716,8 @@ def take_turn(g):
     # GINGER: the pod's three upkeeps. Taken here, where the pod's round is,
     # and BEFORE pod_phase can take the crown -- see gingerbrute_tokens for
     # why that makes the count a ceiling.
-    gingerbrute_tokens(g, 3)
+    if not seat_pod(g):
+        gingerbrute_tokens(g, 3)       # each opponent's own, under §0z179
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
@@ -2666,7 +2732,8 @@ def take_turn(g):
         # One order for six engines (§0z30): damage, clocks, THEN removal.
         # This engine ran removal first until 2026-09-17.
         g.pod_spells = 0
-        OPP.pod_phase(g, before_act=opponent_activity)
+        OPP.pod_phase(g, before_act=None if seat_pod(g)
+                      else opponent_activity)
         karlov_exile_step(g)       # the end of the pod's round (§0z155)
         citadel_pod_window(g, "end")   # instants off the top (§0z160)
 

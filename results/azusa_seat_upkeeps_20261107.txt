@@ -1,0 +1,9 @@
+azusa: azusa_seat_upkeeps=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.13.16 / numpy 2.4.6
+
+   won T10  +0.0000 ±0.0000 
+   won T20  +0.0000 ±0.0000 
+
+   games where kraken_tokens,floating_lost_pod_upkeep > 0 in either leg: 0 of 15000 (0.0%)
+   IDENTITY: of the 15000 games with kraken_tokens,floating_lost_pod_upkeep = 0 in both legs, 0 differ (must be 0)
+
+   every numeric output that moved (mean A, mean B, A - B):

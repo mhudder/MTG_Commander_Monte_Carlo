@@ -120,13 +120,11 @@ Read this before changing code: what else a change touches.
    named effect). The pod's rolls were pre-generated in `make_pod` from a
    separate stream seeded identically for both branches.
 4. `take_turn` runs the engine's own phase order; at the end of your turn
-   `opponents.pod_phase` runs, ONCE for every engine: chip damage
-   (`incidental_damage`), then every clock that is due (`resolve_clocks`),
-   then — if you are still in the game — the removal round
-   (`opponents_act`). An engine with its own model of what opponents do on
-   their turns (karlov's `opponent_activity`) passes it as `before_act`.
-   `tests/test_mulligan_and_pod_order.py` fails if an engine calls the three
-   parts itself (§0z30).
+   `opponents.pod_phase` runs, ONCE for every engine (§0z30): each opponent
+   takes its turn whole, in seat order (§0z179) -- upkeep, main 1
+   (pieces, kill, removal), combat (chip damage), main 2 (growth), end.
+   `tests/test_mulligan_and_pod_order.py` fails if an engine calls the
+   parts itself.
 5. `simulate` returns the metrics dict; `analyse` bootstraps the paired
    difference per metric. `won` is the objective; everything else is a proxy.
 
@@ -147,8 +145,9 @@ the game object and discovers optional behaviour with `hasattr`:
 | `g.counts_as_creature(perm)` (optional) | an engine whose lands can be creatures says so here |
 | `g.known_win` (optional, read with `getattr`) | the name of a card whose next resolution wins and which the table has seen -- lorehold's Approach of the Second Sun. `known_win_share` floors your share of the pod's attention at `known_win_focus`, and `countered` treats a recast as maximum threat (§0z62) |
 | `countered(g, card, idx)`, `hold_answer(g, card)` | `countered` is the ONE place every engine reports a cast, so it is also where a spell that was NOT countered resolves its answer to the pod (`answer_pod_threat`, item 24 change 2, a no-op unless `pod_threats`, §0z131). A new cast path that skips `countered` skips the answer too -- and, since §0z151, the spell's own "you lose N life" (`spell_life_loss`) and the "can't be countered" rule (`uncounterable`: the card's own clause, Hexing Squelcher, Cavern of Souls on the commander's type once a turn). `hold_answer` sits beside `should_cast_own_wipe` in each engine's main-phase option filter: a pure answer (instant or sorcery) waits while nothing it can hit is out. Not asked at the Citadel dig, lorehold's miracle trigger or rendmaw's precombat pump pass, where holding is not the pilot's choice |
-| `g.pod_pieces_window()` (optional) | after `respond_to_pieces`: a response from outside the hand. Only karlov's: an answer on top, through Bolas's Citadel (§0z160) |
-| `g.pod_end_step(i)` (optional), `g.on_pod_creature_deaths(o, n)` (optional) | under `pod_bodies` only: opponent `i`'s END STEP, called by `opponents_act` after that opponent acts (rendmaw: Deathreap Ritual, §0z132), and `n` of opponent `o`'s creatures died -- bodies (`kill_pod_bodies`) or goaded Birds that chump-blocked (`pod_blocker_deaths`). Chump blockers die only at resolution in `combat_damage`, never in a dry run of `damage_through`, and under the cost-aware pod (`pod_block_policy`, `pod_chump_floor`) a defender blocks only enough to stay above the floor |
+| `g.pod_seat`, `g.pod_upkeep(i)`, `g.pod_main(i)` (optional) | the seat whose turn it is; an engine's own step in opponent `i`'s upkeep and main phase (§0z179) |
+| `g.pod_pieces_window()` (optional) | after `respond_to_pieces`: a response from outside the hand. Only karlov's: an answer on top, through Bolas's Citadel (§0z160); per seat if `g.pod_pieces_per_seat` |
+| `g.pod_end_step(i)` (optional), `g.on_pod_creature_deaths(o, n)` (optional) | under `pod_bodies` only: opponent `i`'s END STEP (rendmaw: Deathreap Ritual, §0z132), and `n` of opponent `o`'s creatures died -- bodies (`kill_pod_bodies`) or goaded Birds that chump-blocked (`pod_blocker_deaths`). Chump blockers die only at resolution in `combat_damage`, never in a dry run of `damage_through`, and under the cost-aware pod (`pod_block_policy`, `pod_chump_floor`) a defender blocks only enough to stay above the floor |
 | `g.response_pay(cost, dry=False, now=False)` (all seven) | under `pod_responses` only (item 24 change 3, §0z134): pay `cost` from the mana you left untapped through the pod's turn -- each engine's own payment (lorehold's off-turn FLOAT, the pool its own windows spend from). `dry` asks only; `now` asks about YOUR main phase (lorehold reads its live pool there). `opponents.respond_to_event`, `respond_to_pieces`, `end_step_answers` and the `reserve_holds` policy call it. A new engine that omits it gets no responses, silently: `getattr` returns None |
 | `engine.damage_you(g, n)`, `g.land_tapped_for_mana(p)` (optional) | `damage_you` is THE rule for damage dealt to you (§0z135): every site that DEALS damage -- the pod's combat, painlands, Ancient Tomb, Midnight Reaper, a combat route's kill -- subtracts what it returns; Angel of Suffering returns 0 and mills. Life LOSS and life PAYMENTS do not go through it. A new damage site that writes `your_life -=` directly is a replacement with a hole in it (§0z4's shape). `land_tapped_for_mana` is called by `on_mana_tap`; azusa queues Storm Cauldron's returns there and resolves them at its next decision (`cauldron_flush`), never mid-payment |
 | `g.opponent_cast_on_your_turn(i)` (optional) | opponent `i` just cast a spell during your turn -- called from `countered()`, the only such spell the model has. Rendmaw defines it for March of the World Ooze (§0z47); `tests/test_march_elephant.py` fails if another engine grows one |

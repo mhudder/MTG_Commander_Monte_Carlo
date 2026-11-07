@@ -19,6 +19,8 @@ because Awaken the Woods' token had all four and three of them were gaps that
 had to be closed before that card could be measured at all:
 
   A  four tokens a round, one at your upkeep and three at the pod's
+  J  the same four under the OLD round (`azusa_seat_upkeeps=False`), the
+     pod's three in one call (§0z179)
   B  each one is a LANDFALL trigger (this deck's entire payoff surface)
   C  they are FORESTS, so `is_forest` says yes and they tap for {G}
   D  they are SICK the turn they arrive (302.6) and live the turn after
@@ -35,9 +37,17 @@ creature dies, draw a card."
      cards sharing `make_permanent`'s hook still work (§0z28's indentation)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  verdant_kraken_tokens ignores any count but 1  -> A and B
+  verdant_kraken_tokens ignores any count but 1  -> J and B
   the token is not a Forest                      -> C only
   the Shaper's ETB does not fetch                -> F and G
+
+§0z179 MOVED THE FIRST MUTATION'S TARGET. Under the seat order the pod's three
+tokens are three calls of `verdant_kraken_tokens(1)`, one at each opponent's
+upkeep (`AzusaGame.pod_upkeep`), so "ignores any count but 1" no longer
+reaches A -- a check that had stopped mattering. Case J pins the old round
+(`azusa_seat_upkeeps=False`, the pod's three in ONE call), which the mutation
+still reaches; the seat path is pinned by test_seat_hooks. Its set is J and B
+now, written before this run.
 
 TWO OF THE THREE EXPECTATIONS WERE WRONG ON THE FIRST RUN and both errors are
 kept here, because the house rule is that a set edited to match the output is a
@@ -91,6 +101,14 @@ def run_cases():
     g.make_permanent(M.VERDANT_KRAKEN, sick=False)
     AZ.take_turn(g)
     check("A four Forest Tentacles a round (1 upkeep + 3 pod)",
+          g.m["kraken_tokens"], 4)
+
+    # ---- J: the old round, the pod's three in one call --------------------
+    g = AzusaGame(*M.build(), dict(DEFAULT_CFG, turns=20,
+                                   azusa_seat_upkeeps=False), 1234)
+    g.make_permanent(M.VERDANT_KRAKEN, sick=False)
+    AZ.take_turn(g)
+    check("J the old round: four as well, the pod's three in one call",
           g.m["kraken_tokens"], 4)
 
     # ---- B: each token is a landfall trigger ------------------------------
@@ -187,7 +205,7 @@ def main() -> int:
     real_forests = AZ.FOREST_TOKENS
     real_make = AZ.AzusaGame.make_permanent
     expected = {
-        "verdant_kraken_tokens ignores any count but 1": {"A", "B"},
+        "verdant_kraken_tokens ignores any count but 1": {"J", "B"},
         "the token is not a Forest": {"C"},
         "the Shaper's ETB does not fetch": {"F", "G"},
     }

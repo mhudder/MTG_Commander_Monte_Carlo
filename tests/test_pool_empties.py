@@ -24,6 +24,8 @@ CASES
   F  after the end of main 2, a response on the pod's turn cannot pay with
      main 2's floating mana (`response_pay`, dry)
   G  a real turn empties the pool three times, in order: main1, combat, main2
+     -- and, since §0z179, once at each opponent's upkeep in the pod's round
+     (`AzusaGame.pod_upkeep`: a Verdant Kraken token's landfall mana)
   H  one Forest and one floating {G}, paying {G}: the floating point pays and
      the Forest stays untapped
   I  NEIGHBOUR: `azusa_floating_first=False` taps the Forest and keeps the
@@ -151,7 +153,7 @@ def run_cases():
     g.empty_mana_pool = record
     AZ.take_turn(g)
     check("G a turn empties the pool at main1, combat, main2, in order",
-          seen, ["main1", "combat", "main2"])
+          seen, ["main1", "combat", "main2"] + ["pod_upkeep"] * 3)
 
     g = fresh(points=1, lands=1)
     pay(g, {"G": 1})

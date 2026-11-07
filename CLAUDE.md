@@ -378,8 +378,8 @@ belongs under its `§`.
   delay (§0z140), and targeting is threat-weighted, so being ahead draws the
   kill. Games end on their own around turn 12, so `turns=20`
   is a safety valve. Opponent randomness is pre-rolled so it cannot break CRN.
-  **The pod acts in one order for every engine** (`opponents.pod_phase`: chip
-  damage, clocks, removal; §0z30).
+  **The pod acts in one order for every engine** (`opponents.pod_phase`,
+  §0z30): each opponent's turn whole, in seat order (§0z179).
 - **Combat is declared at the pod**, split across defenders by A PILOT'S rule,
   not an optimiser's. A defender is taken on only if the attack is still lethal
   after they remove its biggest unblocked attacker (§0v).

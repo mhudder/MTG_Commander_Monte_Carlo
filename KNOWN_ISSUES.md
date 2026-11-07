@@ -231,7 +231,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
 | [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
 | [0z178](#0z178) | FIXED | **Apex of Power made ten from ANY cast, not only from the hand, and its pool lasted the turn**: -0.0036 / -0.0043, nearly all the hand clause. And the rule cited for mana emptying was 500.4; it is 106.4 / 500.5 |
-| [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**, not chip-then-clocks-then-removal: -0.0048 to -0.0132 at T20 in every deck; half is growth after removal, half opponents acting before a later seat kills them |
+| [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**: -0.005 to -0.013 at T20 per deck (removal before growth; seats act before a later kill). Lorehold's upkeep windows moved in: +0.0416 alone, +0.0335 in all |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15670,6 +15670,49 @@ the same way: more removal and more wraths reach your board (A/E removal
    (2,000 games): removal turns taken by an opponent who is dead by the end
    of that round, **0.26 a game in karlov (0.02 in the old round), 0.53 in
    rendmaw (0.18)**. Structural, and right.
+
+### The engines' stand-ins, moved onto the seats
+
+Two optional hooks, `g.pod_upkeep(i)` (the start of opponent `i`'s upkeep)
+and `g.pod_main(i)` (its main phase, after its kill, before its removal),
+and `g.pod_pieces_per_seat`. Each engine's move has its own switch, inert
+under the old round; all three off (or `pod_seat_turns=False`) reproduce the
+skeleton's commit `e199ec7` game for game (0 of 2,500 differ, every deck,
+every output key -- azusa once its new counter is left out of the hash).
+
+| engine | what moved | switch | T10 | T20 | file |
+|---|---|---|---|---|---|
+| lorehold | Lorehold's "at the beginning of each opponent's upkeep" rummage, and a draw land's draw without her: the window opens AT that upkeep, before that opponent's kill and removal, not after the whole round | `lorehold_seat_upkeeps` | **+0.0366 ±0.0055** | **+0.0416 ±0.0070** | `results/lorehold_seat_upkeeps_20261107.txt` |
+| karlov | `opponent_activity` per seat (`seat_activity`: its land drop for Polluted Bonds, and the round's OLD creature and spell totals spread across the seats, since rounding per seat would make three creatures a round of two); Ginger at each upkeep while you are the monarch; the Citadel's piece window in every seat's main phase, aimed at that seat's pieces | `karlov_seat_pod` | +0.0005 ±0.0012 | +0.0035 ±0.0017 | `results/karlov_seat_pod_20261107.txt` |
+| azusa | Verdant Kraken: one token at each opponent's upkeep (three were made before the round, whoever was left), and its landfall's floating mana empties with the step | `azusa_seat_upkeeps` | 0 | 0 | `results/azusa_seat_upkeeps_20261107.txt` |
+
+**Lorehold's is the large one, and it is more windows, not better ones**
+(2,000 games): rummage upkeeps **7.96 -> 10.29 a game**, miracles per window
+0.144 -> 0.148. The text owes them: an opponent's upkeep comes before its
+removal can take Lorehold off the battlefield and before a later seat's kill
+eliminates it, and the old windows, opened after the round, lost both.
+`miracles_cast` +0.36 a game, `mv_cheated` +4.3, `lost` -0.041. **Azusa's
+changes nothing measured**: Verdant Kraken is not in the built list (0 of
+15,000 games make a token), so the move matters for when it is. Karlov's
+Ginger and Polluted Bonds are not in its list either; what moved there is
+the activity's timing (Kambal, Sunscorch Regent) and the Citadel window.
+
+**All of §0z179 against the old engine** (`pod_seat_turns` on and off, the
+migrations with it): lorehold **+0.0319 ±0.0056 / +0.0335 ±0.0071**, karlov
+-0.0041 ±0.0018 / -0.0027 ±0.0028 (`results/pod_seat_all_<deck>_20261107.txt`);
+the other four are the skeleton's rows above.
+
+**Not moved, and why**: trostani's Seedborn Muse turns and Luminarch rolls
+(the deck is SUSPENDED); the per-round Treasures that stand for the pod's
+draws and spells (Smothering Tithe, Monologue Tax: taken at your upkeep, a
+count, not a timing); karlov's six-counter exile and the Citadel's end-step
+window (`karlov_exile_step`, `citadel_pod_window("end")`), which are the end
+of the round, now the last seat's end step.
+
+`tests/test_lorehold_seat_upkeeps.py` (A-E, two mutations) and
+`tests/test_seat_hooks.py` (A-G, three mutations; its third expected set was
+wrong before the first run and is corrected, the docstring says how) pin the
+three moves.
 
 `tests/test_pod_seat_turns.py` pins A-I with three mutations, exact sets; its
 first runs failed on the TEST three times (a lambda bound to the previous
