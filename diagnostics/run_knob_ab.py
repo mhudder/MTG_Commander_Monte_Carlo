@@ -24,6 +24,10 @@ changes a game without touching REACH, such as §0z177's payment order, which
 taps different lands in a game that loses no mana. The count is still
 printed, labelled as not claimed, and the exit status ignores it.
 
+KNOB and REACH may each be a comma-separated list: every knob is True in A
+and False in B, and a game is reached if ANY of the counters is above 0 --
+for two fixes measured together (§0z178).
+
 `--cfg=k=v,...` sets knobs on BOTH legs (values parsed as Python literals,
 else kept as strings): §0z177's rule measured with the old payment order is
 `--cfg=azusa_floating_first=False`.
@@ -51,7 +55,9 @@ def _play(job):
         for on in (True, False):
             r = sim(deck, cmd, dict(DEFAULT_CFG, turns=20,
                                     snapshot_rounds=(10,), watch=frozenset(),
-                                    **{**base, knob: on}), 5000 + s)
+                                    **{**base, **{k: on for k in
+                                                  knob.split(",")}}),
+                    5000 + s)
             nums = {k: float(v) for k, v in r.items()
                     if isinstance(v, (int, float)) and not isinstance(v, bool)}
             nums["won T10"] = float(r["at_rounds"][10]["won"])
@@ -95,7 +101,9 @@ def main():
         star = "*" if hw > 0 and abs(dd.mean()) > hw else " "
         lines.append(f"   {k}  {dd.mean():+.4f} ±{hw:.4f}{star}")
 
-    hit = [a.get(reach, 0) > 0 or b.get(reach, 0) > 0 for a, b in pairs]
+    reaches = reach.split(",")
+    hit = [any(a.get(r, 0) > 0 or b.get(r, 0) > 0 for r in reaches)
+           for a, b in pairs]
     none = [p for p, h in zip(pairs, hit) if not h]
     broken = sum(1 for a, b in none if a != b)
     lines += ["",

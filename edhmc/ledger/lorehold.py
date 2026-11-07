@@ -279,7 +279,7 @@ MEASURED: list[Candidate] = [
         win_rate='+0.0038 +-0.0016 at T20, +0.0018 +-0.0008 at T10',
         signal="both",
         rationale='Eight damage split over two opponents and {R}{R}{R}, for {2}.',
-        evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. welcome_resolved +0.21, welcome_mana_added +0.16 (the red mana survives only a main-phase resolution, 500.4) at T20. AGAINST SEARING WIND IN THE SAME SLOT, paired: -0.0017 +-0.0018 at T20, -0.0009 +-0.0010 at T10 -- inside the bar; damage -0.14 +-0.06 (significant).",
+        evidence="diagnostics/run_lorehold_big_spells.py, results/lorehold_big_spells_20261009.txt: N=15,000 paired, seeds 80000.., the staged list, the card in Pinnacle Monk's slot against a blank of its cost, one T20 game per seed with T10 read off it. The T20 row IS `python -m tools.candidates lorehold4 --n=15000` (results/candidates_lorehold4.txt), reproduced to the last digit. §0z124. welcome_resolved +0.21, welcome_mana_added +0.16 (the red mana survives only a main-phase resolution, 500.5; cited as 500.4 until §0z178) at T20. AGAINST SEARING WIND IN THE SAME SLOT, paired: -0.0017 +-0.0018 at T20, -0.0009 +-0.0010 at T10 -- inside the bar; damage -0.14 +-0.06 (significant).",
         limits='Every modelled clause. With one opponent left the 3 has no player to hit (§4).',
         verdict="The owner's 'weaker Searing Wind' is right by MECHANISM (less damage, significantly) and unresolved by win rate: the paired difference is inside its bar at both horizons.",
     ),
@@ -899,7 +899,7 @@ PROPOSED: list[Proposal] = [
                    "ways against ten to one player, and three red mana."),
         implement=("MODELLED: 5 and 3 to two DIFFERENT opponents, the two closest to dying, the 3 on the lower when 3 kills "
                    "it; with one opponent left the 3 has no player to hit (a creature, §4). The {R}{R}{R} empties between "
-                   "steps (500.4), so it is added only when the spell resolves in a MAIN PHASE -- a hardcast or a free cast "
+                   "steps (500.5; cited as 500.4 until §0z178), so it is added only when the spell resolves in a MAIN PHASE -- a hardcast or a free cast "
                    "there -- and is lost from a miracle in the draw step or an opponent's upkeep, which is almost always."),
         triage='LIVE',
         prepared='tests/test_lorehold_big_spells.py',

@@ -230,6 +230,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
 | [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
 | [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
+| [0z178](#0z178) | FIXED | **Apex of Power made ten from ANY cast, not only from the hand, and its pool lasted the turn**: -0.0036 / -0.0043, nearly all the hand clause. And the rule cited for mana emptying was 500.4; it is 106.4 / 500.5 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -11109,7 +11110,7 @@ existed. Oracle text is verbatim on each Proposal in `edhmc/pending.py`.
 | rebound (702.88a) | `_evasion.REBOUND`, generated from Scryfall keywords by `tag_flying`; `resolve_spell` exiles, `rebound_upkeep` casts | Profound Journey (and Ephemerate, in no lorehold list) |
 | a chosen burn target | `opponents.damage_single(target=)`, `deal_pod_damage(target=)` | Explosive Welcome's two targets must differ |
 | a scaled one-sided sweeper | `OWN_WIPE_SCOPE` "damage_x", `opponents.gyre_share`, `WIPE_DESTROYS` | Immolating Gyre |
-| mana from a resolving spell | `g.in_main`; Explosive Welcome's {R}{R}{R} into Apex's pool only in a main phase | 500.4: mana empties between steps |
+| mana from a resolving spell | `g.in_main`; Explosive Welcome's {R}{R}{R} into Apex's pool only in a main phase | 500.5 (cited as 500.4 until §0z178): mana empties between steps |
 
 `check_unchanged_decks`: all seven decks **bit-identical** against 2852268,
 and the five active non-lorehold decks against bd9e7ae, their caches'
@@ -15455,9 +15456,9 @@ Provisioner's Treasure are `frozenset({"W", "U", "B", "R", "G", "C"})`, and
 "one mana of any color" is not colourless (CR 105.1, 106.1). No card in the
 built list has a {C} pip, so nothing pays wrongly today; a candidate that
 has one (Kozilek, the Great Distortion's {C}{C}) would be paid by mana that
-cannot pay it. The same session's rule-number finding is still open too:
-`engine.py` and `lorehold.py` cite 500.4 for mana emptying, which is 500.5 in
-the 2026-08-07 rules.
+cannot pay it. The same session's rule-number finding was open too: `engine.py` and
+`lorehold.py` cited 500.4 for mana emptying, which is 500.5 in the 2026-08-07
+rules -- fixed in §0z178.
 
 **The table, rebuilt** (`DECKS=azusa ./tools/regen_tables.sh` at `be72033`,
 python 3.13.16 / numpy 2.4.6; `repro_row` azusa Lotus Cobra IDENTICAL;
@@ -15480,6 +15481,94 @@ instead of running it, and a case that asserted more than its label), and the
 docstring says how. `tests/test_floating_mana.py` case E now names the old
 payment order it needs: it asks whether `spend` consumes only what it was
 assigned, and the solver assigns the floating point first since this fix.
+
+<a id="0z178"></a>
+
+## 0z178. FIXED -- Apex of Power's ten: only from the hand, and only for the phase; and the rule cited for mana emptying
+
+**2026-11-07, the owner: "do the 500.4 citation and Apex fix next"**, the
+last two of the turn-structure findings (§0z176, §0z177).
+
+### The citation
+
+Seven places cited **CR 500.4** for "mana empties between steps": `engine.py`'s
+`empty_mana_pool`, two in `lorehold.py`, a comment in `tools/ablation.py`,
+`tests/test_lorehold_big_spells.py`'s case G, two ledger strings
+(`edhmc/ledger/lorehold.py`) and §0z116's table. In the 2026-08-07 rules
+500.4 is "As a step or phase BEGINS, ... effects that last until that step
+expire". The pool rule is **106.4** ("Each player's mana pool empties at the
+end of each step and phase") and **500.5** (when: "As a step or phase ends
+... any unspent mana ... empties"). Each now reads "106.4, 500.5" or "500.5",
+marked "cited as 500.4 until §0z178". It resolved -- 500.4 exists -- and was
+wrong, §0z127's shape for a rule number. Nothing checks a rule citation's
+TEXT; `docs/COMP_RULES.md` is where one would go.
+
+`engine.py` and `ablation.py` are in every cache's fingerprint, so the
+comment moved them all. **Rendmaw, karlov, tivit, shilgengar and azusa are
+VERIFIED**: `check_unchanged_decks` against a fresh worktree at `addc490`,
+where each was CURRENT, N=400, BIT-IDENTICAL; and every deck's STAGED list on
+seeds 5000..7499, every output key per seed hashed, in both trees: **0 of
+2,500 differ** for all seven decks with the new switches off, and for every
+deck but lorehold with them on.
+
+### Apex of Power's pool, and its hand clause
+
+"Exile the top seven cards of your library. Until end of turn, you may cast
+spells from among them. If this spell was cast from your hand, add ten mana
+of any one color." (Scryfall, 2026-11-07.) Two defects, one found while
+measuring the other:
+
+1. **THE POOL LASTED THE TURN** (`lorehold_pool_empties`, default True).
+   `g.apex_mana` -- Apex's ten and Explosive Welcome's {R}{R}{R} -- was reset
+   only at the next untap, "generous, and said out loud" in the docstring.
+   `lorehold.empty_pool(g, where)` empties it at the end of the upkeep, the
+   draw step, main phase 1, combat and main phase 2 (after Underworld
+   Breach, which spends main 2's leftover), counted as `apex_mana_lost` and
+   by boundary. The pod's turns pay from the float and Treasures, never from
+   this pool (`response_pay`, `miracle_window`'s off-turn branch), so an Apex
+   miracled on an opponent's upkeep strands its leftover until your untap
+   either way; it buys nothing in between, and no boundary is added there.
+2. **THE HAND CLAUSE WAS READ AS "NOT A COPY"** (`apex_from_hand`, default
+   True). `apply_spell_effects` had the cast's zone (`from_hand`, which
+   rebound, recursion and Sunbird's Invocation already read) and did not
+   pass it, so every cast from elsewhere made ten: Galvanoth's upkeep cast
+   off the top, The Dawning Archaic's and Goliath Daydreamer's attack
+   triggers, discover, Sunbird's Invocation, Paradigm, rebound, Past in
+   Flames, Underworld Breach. Such a cast still exiles the seven and may
+   cast from them -- the copy path already did exactly that -- and now adds
+   nothing, counted as `apex_not_from_hand`. A miracle IS cast from the
+   hand, and keeps its ten. **Found from a counter**: the pool rule alone
+   emptied mana at the end of COMBAT (0.065 a game), where a sorcery cannot
+   be cast from hand; with the hand clause, combat's figure is 0.
+
+Both switches off are the old engine: 0 of 2,500 games differ per deck,
+above.
+
+**The measurement** (`diagnostics/run_knob_ab.py`, which takes several knobs
+and counters now; the staged list both legs, N=15,000 paired, seeds
+5000..19999, python 3.13.16 / numpy 2.4.6):
+
+| arm | T10 | T20 | file |
+|---|---|---|---|
+| the hand clause alone (pool as it was) | **-0.0034 ±0.0012** | **-0.0040 ±0.0012** | `results/lorehold_apex_from_hand_20261107.txt` |
+| the pool alone (every cast makes ten) | -0.0001 ±0.0004 | -0.0005 ±0.0005 | `results/lorehold_pool_empties_20261107.txt` |
+| **both, the new default, against HEAD** | **-0.0036 ±0.0012** | **-0.0043 ±0.0013** | `results/lorehold_apex_both_20261107.txt` |
+
+**The identity check holds in all three**: a game in which no non-hand Apex
+is cast and nothing is emptied is played identically by the old engine, and
+0 differ in each (13,819 games for both together). The hand clause reaches
+6.1% of games and moves -0.0656 ±0.0194 inside them at T20. Its counters:
+`apex_mana_made` 1.89 -> 1.25 a game (a third of Apex's mana was from casts
+that make none), `apex_casts` -0.104, `apex_stranded` +0.110 (the seven
+exiled with nothing to cast them), `mana_spent` -0.45, `mv_cheated` -0.16.
+The pool alone empties 0.13 a game; with the hand clause 0.06, at the draw
+step (an Apex drawn and miracled for {2} through Lorehold's grant, its unspent
+ten dying with the step) and main phase 1.
+
+`tests/test_lorehold_apex_pool.py` pins A-I with two mutations, exact sets.
+`tests/test_lorehold_0f_0i.py`'s Apex case called `apply_spell_effects` with
+its default `from_hand=False` and expected ten; it names the hand cast it
+meant now.
 
 ## How to read an ablation table
 

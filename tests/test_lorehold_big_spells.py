@@ -17,7 +17,7 @@ CASES
   D  SEARING WIND: 10 to the opponent closest to dying, nobody else
   E  EXPLOSIVE WELCOME: 5 to the lowest, 3 to the NEXT -- two targets
   F  Welcome, the lowest on 3: the 3 kills them and the 5 goes to the next
-  G  Welcome's {R}{R}{R}: kept in a main phase, lost outside one (500.4)
+  G  Welcome's {R}{R}{R}: kept in a main phase, lost outside one (500.5)
   H  GIDEON'S PHALANX: four 2/2 Knights, not flying; spell mastery counted
   I  RAPHAEL'S TECHNIQUE: the hand of three to the graveyard, seven drawn
   J  IMMOLATING GYRE, X = 3, `gyre_full_x` 6: half of each pod board dies,

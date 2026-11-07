@@ -151,8 +151,9 @@ class LoreholdGame(BaseGame):
         self.paradigm = {}
         # True while `main_phase` runs: mana added by a resolving spell
         # (Explosive Welcome) survives only inside the step that made it
-        # (500.4), and the main phase is the only step this engine casts in
-        # with mana it did not hold over.
+        # (CR 106.4, 500.5; cited as 500.4 until §0z178), and the main phase
+        # is the only step this engine casts in with mana it did not hold
+        # over.
         self.in_main = False
 
         cfg.setdefault("shroud_sources",
@@ -1429,7 +1430,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         _draw_into_hand(g, 4)
     elif sc == "apex":
         if g.cfg.get("apex_ten_mana", True):
-            apex_of_power(g, is_copy=is_copy)
+            apex_of_power(g, is_copy=is_copy, from_hand=from_hand)
         else:
             _draw_into_hand(g, 4)       # the pre-2026-09-12 `draw4` stand-in
     elif sc == "mother_lode" and not g.cfg.get("mother_lode_discover", True):
@@ -1719,7 +1720,7 @@ def discover(g, x: int):
     return hit
 
 
-def apex_of_power(g, is_copy=False):
+def apex_of_power(g, is_copy=False, from_hand=True):
     """Apex of Power — modelled as `draw4`, which is not what it does.
 
     "Exile the top seven cards of your library. Until end of turn, you may
@@ -1739,19 +1740,31 @@ def apex_of_power(g, is_copy=False):
     "If this spell was cast from your hand" is why `is_copy` is read: an
     Arcane Bombardment or Mizzix's Mastery copy exiles the seven and gets NO
     mana, which is most of why copying this card is worse than casting it.
+    AND WHY `from_hand` IS (§0z178, `apex_from_hand`; Scryfall 2026-11-07):
+    a cast from anywhere else -- Galvanoth's upkeep cast off the top, an
+    attack trigger's (The Dawning Archaic, Goliath Daydreamer), discover,
+    Sunbird's Invocation, Paradigm, rebound, Past in Flames, Underworld
+    Breach -- is a cast, so it exiles the seven, and is not from the hand, so
+    it adds nothing. Only `is_copy` was read until then, and every one of
+    those casts made ten. A miracle is cast from the hand, and keeps them.
 
-    The mana lasts the turn rather than emptying at end of step. Generous, and
-    said out loud -- in practice every one of these casts happens in the same
-    main phase, so the two only differ for a pilot who would have wasted it.
+    THE MANA EMPTIES WITH ITS STEP OR PHASE (CR 106.4, 500.5; §0z178,
+    `empty_pool`). It lasted the turn until then -- "generous, and said out
+    loud": the ten made in main phase 1 paid for main phase 2, and the ten
+    made by a free cast in the upkeep (Galvanoth, rebound) paid for the main
+    phase. `lorehold_pool_empties=False` is that pool.
     """
     exiled = [g.library.pop() for _ in range(min(7, len(g.library)))]
     g.m["apex_exiled"] += len(exiled)
 
-    if not is_copy:
+    hand_rule = g.cfg.get("apex_from_hand", True)              # §0z178
+    if not is_copy and (from_hand or not hand_rule):
         want = {c: sum(x.cost.get(c, 0) for x in exiled) for c in ("R", "W")}
         g.apex_color = max(("R", "W"), key=lambda c: want[c])
         g.apex_mana += 10
         g.m["apex_mana_made"] += 10
+    elif not is_copy:
+        g.m["apex_not_from_hand"] += 1     # cast, not from hand: no ten
 
     # Cast what the pool can afford, best first. Whatever is left stays exiled.
     pool = [c for c in exiled if not c.is_land]
@@ -1904,11 +1917,12 @@ def explosive_welcome(g):
     one opponent left the second target is a creature (§4) and does nothing
     here. One hit each, so Talent and Scrollwielder read both.
 
-    THE MANA EMPTIES BETWEEN STEPS (500.4), so {R}{R}{R} is added only when
-    the spell resolves in a MAIN PHASE (`g.in_main`) -- a hardcast, or a free
-    cast there -- into the one-colour pool Apex of Power uses, which lasts
-    the turn (Apex's documented generosity). From a miracle in the draw step
-    or an opponent's upkeep it is lost, and counted (`welcome_mana_lost`)."""
+    THE MANA EMPTIES BETWEEN STEPS (CR 106.4, 500.5; cited as 500.4 until
+    §0z178), so {R}{R}{R} is added only when the spell resolves in a MAIN
+    PHASE (`g.in_main`) -- a hardcast, or a free cast there -- into the
+    one-colour pool Apex of Power uses, which empties with the phase
+    (`empty_pool`, §0z178). From a miracle in the draw step or an opponent's
+    upkeep it is lost, and counted (`welcome_mana_lost`)."""
     g.m["welcome_resolved"] += 1
     alive = sorted(OPP.living(g), key=lambda o: o.life)
     if alive:
@@ -3074,6 +3088,25 @@ def opponent_upkeep_windows(g):
                 g.m["leng_mv_miracled"] += leng_card.mv
 
 
+def empty_pool(g, where: str) -> None:
+    """CR 106.4: "Each player's mana pool empties at the end of each step and
+    phase" (500.5 says when). Lorehold's one pool that is not a permanent is
+    Apex of Power's ten and Explosive Welcome's {R}{R}{R} (`g.apex_mana`), and
+    it lasted the turn: reset only at the next untap (§0z178). Emptied now at
+    the end of the upkeep, the draw step, main phase 1, combat, and main
+    phase 2 (after Underworld Breach, which spends main 2's leftover).
+    Treasures are permanents and keep; the board's untapped lands are the
+    pod-turn float (`end_of_turn_float`, §0z168), not a pool. What empties is
+    counted, `apex_mana_lost` and by boundary. `lorehold_pool_empties=False`
+    is the old pool."""
+    if not g.cfg.get("lorehold_pool_empties", True):       # §0z178
+        return
+    if g.apex_mana:
+        g.m["apex_mana_lost"] += g.apex_mana
+        g.m[f"apex_lost_{where}"] += g.apex_mana
+        g.apex_mana = 0
+
+
 def your_turn(g, extra=False):
     """Your turn, untap to end step -- everything `take_turn` does before the
     pod's round. An EXTRA turn (§0z153) is this whole turn again: untap,
@@ -3171,6 +3204,7 @@ def your_turn(g, extra=False):
             cast_free(g, top)
 
     radiant_scrollwielder(g)
+    empty_pool(g, "upkeep")            # §0z178: a free Apex's ten end here
 
     g.before_draw_step = False
     if g.turn_ended:
@@ -3187,6 +3221,7 @@ def your_turn(g, extra=False):
         if st_card is not None:
             g.m["settop_drawn"] += (drawn is st_card)
             g.m["settop_miracled"] += (drawn is st_card and cast)
+    empty_pool(g, "draw")              # the end of the draw step
     held = 0
     if not g.turn_ended:
         paradigm_step(g)               # "each of your first main phases"
@@ -3198,8 +3233,10 @@ def your_turn(g, extra=False):
             g.m["reserve_held"] += held
             g.m["reserve_overheld"] += max(0, held - miracle_need(g))
         main_phase(g, reserve=held)
+    empty_pool(g, "main1")             # the end of main phase 1
     if not g.turn_ended:
         combat(g)
+    empty_pool(g, "combat")            # the end of combat
     g.precombat = False
     # Re-read rather than cached: the precombat phase can deploy the very
     # cards that change the miracle cost (Artist's Talent, Molecule Man).
@@ -3210,6 +3247,7 @@ def your_turn(g, extra=False):
         main_phase(g, reserve=reserve_for(g))
 
     underworld_breach(g)
+    empty_pool(g, "main2")             # the end of main phase 2
     # "At the beginning of the end step, sacrifice this enchantment." Note this
     # is EACH end step, so a Breach that resolves on your turn is gone before
     # the opponents' miracle windows ever open.

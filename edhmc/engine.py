@@ -2230,7 +2230,8 @@ def davvol_trigger(g, perm) -> None:
 
 
 def empty_mana_pool(g) -> None:
-    """Mana empties between steps and phases (500.4). Only Davvol's {B} ever
+    """Mana empties between steps and phases (CR 106.4, 500.5; cited as 500.4
+    until §0z178). Only Davvol's {B} ever
     sits in rendmaw's pool, so this is a no-op in every other game."""
     lost = getattr(g, "davvol_float", 0)
     if lost:

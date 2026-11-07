@@ -390,7 +390,7 @@ SCRIPTED_LOREHOLD = {
     "Dragon's Rage Channeler",
     # The owner's second batch, 2026-10-09. Searing Wind: 10 to the opponent
     # closest to dying. Explosive Welcome: 5 and 3 to two DIFFERENT
-    # opponents, and {R}{R}{R} kept only in a main phase (500.4). Profound
+    # opponents, and {R}{R}{R} kept only in a main phase (500.5). Profound
     # Journey: the best permanent card from the graveyard through
     # `enters_battlefield`, and rebound read from Scryfall. "Any target"'s
     # creature and planeswalker halves are §4, unused rather than missing.

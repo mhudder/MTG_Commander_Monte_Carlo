@@ -183,7 +183,10 @@ def test_apex_of_power():
     print("\nApex of Power: seven exiled, ten mana of one colour")
     g = game()
     lib = len(g.library)
-    L.apply_spell_effects(g, APEX)
+    # FROM THE HAND, said explicitly: `apply_spell_effects` defaults to
+    # from_hand=False, and since §0z178 a cast from anywhere else makes no
+    # mana (the card's "if this spell was cast from your hand").
+    L.apply_spell_effects(g, APEX, from_hand=True)
     check("it exiles seven off the top", lib - len(g.library) >= 7, True)
     check("...and adds ten mana", g.m.get("apex_mana_made", 0), 10)
     check("the colour is ONE colour, not a wildcard", g.apex_color in ("R", "W"), True)
