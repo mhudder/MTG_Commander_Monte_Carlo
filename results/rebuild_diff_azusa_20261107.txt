@@ -1,0 +1,7 @@
+§0z177: azusa's table rebuilt at be72033 (floating mana empties at each phase's end, spent first), python 3.13.16 / numpy 2.4.6, against the table it replaced (§0z174 rebuild, python 3.13.18 / numpy 2.4.6)
+A row MOVED if |new - old| win rate (T20) exceeds the wider of its two 95% CI half-widths.
+
+== azusa: 58 rows (58 before; only-old [], only-new []), 0 moved beyond the wider bar; 1 other label changes
+   label Greater Good                         dmg -> both  (+0.0023 -> +0.0027)
+   largest falls: Ramunap Excavator -0.0009, Genesis Wave -0.0008, Lotus Cobra -0.0007, Cultivate -0.0006
+   largest rises: Ka-Zar of the Savage Land +0.0005, Nissa, Vastwood Seer // Nissa, Sage Animist +0.0005, Nylea's Intervention +0.0006, Courser of Kruphix +0.0010

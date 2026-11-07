@@ -4,7 +4,7 @@ card -- the §0z160-§0z162 method on the third card that pays life down to
 a floor.
 
     python -m diagnostics.run_sylvan_policy forks N OUT.txt
-    python -m diagnostics.run_sylvan_policy policies N OUT.txt [ARM ...]
+    python -m diagnostics.run_sylvan_policy policies N OUT.txt [ARM ...] [--seed0=S]
 
 "At the beginning of your draw step, you may draw two additional cards. If
 you do, choose two cards in your hand drawn this turn. For each of those
@@ -233,6 +233,12 @@ def policies(n, out, arms):
 
 
 def main():
+    # `--seed0=S` (§0z171): measure on seeds that chose nothing (§0z170).
+    global SEED0
+    for a in list(sys.argv):
+        if a.startswith("--seed0="):
+            SEED0 = int(a.split("=", 1)[1])
+            sys.argv.remove(a)
     mode, n, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     if mode == "forks":
         forks(n, out, sys.argv[4:] or None)

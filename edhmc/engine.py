@@ -30,6 +30,7 @@ from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLYING_TOKENS, FOREST as _FOREST
 from edhmc.decks._evasion import LAND_RULES, LAND_TYPES, MODAL_LANDS
 from edhmc.decks._evasion import DEFENDER, INSECT_SPIDER, CREATURE_SUBTYPES
+from edhmc.decks._evasion import NO_MAX_HAND_SIZE
 
 COLORS = ("W", "U", "B", "R", "G", "C")
 
@@ -2823,6 +2824,21 @@ def play_land(g: Game):
         lands = lands + mdfc
     if not lands:
         return
+    # A KAROO NEEDS A LAND TO RETURN (§0z172). "When this land enters, return
+    # a land you control to its owner's hand": with no other land on the
+    # battlefield it returns ITSELF, and the drop bought nothing. The score
+    # below ranks new colours first, so on an empty board a two-colour karoo
+    # beat every basic -- and came back to hand, and won the next turn's drop
+    # the same way: in rendmaw, 567 of Golgari Rot Farm's 887 entries in 2,000
+    # games returned itself. No pilot plays it there while another land is in
+    # hand. Found because the cleanup step (§0z171) discarded the looping Rot
+    # Farm and the deck won MORE. `karoo_needs_land=False` restores the loop.
+    if (g.cfg.get("karoo_needs_land", True)
+            and not any(p.card.is_land for p in g.board)):
+        rest = [c for c in lands
+                if not LAND_RULES.get(c.name, {}).get("karoo")]
+        if rest:
+            lands = rest
     have = set()
     for p in g.board:
         if p.card.is_land:
@@ -4196,6 +4212,96 @@ def want_best(g, pool):
     return want_max(g, pool, lands, mana)
 
 
+# THE CLEANUP STEP (§0z171; queue item 30, found in §0z162). CR 514.1: "the
+# active player discards down to their maximum hand size", which is seven
+# (CR 402.2) unless an effect says otherwise. NO ENGINE DID THIS until
+# 2026-11-04: in karlov 7.9% of end steps without Reliquary Tower ended over
+# seven, 3.5 cards over on average, and every draw engine and every "draw
+# more" policy was flattered by the cards a real pilot would have discarded.
+# ONE function, called by every engine at the end of each of its own turns
+# (an extra turn has a cleanup step too), never on the pod's turns: only the
+# active player discards. `hand_size_rule=False` restores the old games.
+
+def max_hand_size(g):
+    """Your maximum hand size now, or None for no maximum: seven (CR 402.2,
+    `max_hand_size`), lifted by a permanent whose own text says "You have no
+    maximum hand size" (`_evasion.NO_MAX_HAND_SIZE`, generated from Scryfall:
+    Reliquary Tower, Library of Leng)."""
+    if any(n in NO_MAX_HAND_SIZE for n in g.board.names):
+        return None
+    return int(g.cfg.get("max_hand_size", 7))         # CR 402.2, §0z171
+
+
+def put_discarded(g, card) -> None:
+    """A discarded card goes to the GRAVEYARD -- where every reanimation,
+    regrowth, flashback, delirium and "cards in your graveyard" count already
+    looks -- unless Necropotence is out: "Whenever you discard a card, exile
+    that card from your graveyard." The trigger resolves before anything can
+    use the card, so the card simply never stays."""
+    if g.has("Necropotence"):
+        g.m["necro_discard_exiled"] += 1
+        return
+    g.graveyard.append(card)
+
+
+def cleanup_step(g, pick=None, after=None) -> int:
+    """CR 514.1: discard down to `max_hand_size`; returns the cards discarded.
+
+    Which cards go is the pilot's choice. By default the hand is ranked by
+    the shared want order (`want_order`, §0z139: the engine's `want_tier`,
+    `lands_wanted` and `land_rank` hooks included) and the tail past the
+    maximum goes -- keep the best seven. An engine that already has ONE
+    discard policy passes it as `pick(g) -> card`, taken one at a time
+    (lorehold's rummage pick, §0z166), so a deck does not discard two ways.
+    `after(g, n)` fires the engine's "whenever you discard" triggers
+    (Monument to Endurance). CR 514.3a: if anything triggered, there is
+    another cleanup step -- so a trigger that DRAWS can put the hand over
+    again, and the loop asks again, `cleanup_repeat_max` times at most."""
+    if not g.cfg.get("hand_size_rule", True):         # §0z171
+        return 0
+    total = 0
+    for _ in range(int(g.cfg.get("cleanup_repeat_max", 8))):   # §0z171
+        if g.result is not None:
+            break
+        cap = max_hand_size(g)
+        if cap is None or len(g.hand) <= cap:
+            break
+        n = len(g.hand) - cap
+        gone = ()
+        if pick is None:
+            order = want_order(g, g.hand)
+            gone = order[cap:]
+            if len(order) < len(g.hand):
+                # ONE OBJECT TWICE IN THE HAND -- a defect upstream, never a
+                # game state (`want_order` ranks objects, so it drops the
+                # second copy). Discard the extra copies too, and count it,
+                # so the defect is seen rather than crashing here: the
+                # `remove_card` stand-in in test_ablation_skip's mutations
+                # makes exactly this hand.
+                seen, extra = set(), []
+                for c in g.hand:
+                    if id(c) in seen:
+                        extra.append(c)
+                    seen.add(id(c))
+                gone = gone + extra
+                g.m["cleanup_aliased"] += 1
+        for i in range(n):
+            card = gone[i] if pick is None else pick(g)
+            remove_exact(g.hand, card)
+            put_discarded(g, card)
+            if card.is_land:
+                g.m["cleanup_lands"] += 1
+            else:
+                g.m["cleanup_mv"] += card.mv
+        total += n
+        if after is not None:
+            after(g, n)
+    if total:
+        g.m["cleanup_discards"] += total
+        g.m["cleanup_turns"] += 1
+    return total
+
+
 def stack_top(g, n: int) -> list:
     """Look at the top `n` cards and put them back in the order a pilot wants
     to draw them, the best on top. Returns that order, best first. The
@@ -4229,6 +4335,20 @@ def remove_card(cards: list, card) -> None:
             del cards[i]
             return
     raise ValueError("remove_card(cards, card): card not in cards")
+
+
+def remove_exact(cards: list, card) -> None:
+    """Remove THIS object from `cards`, by identity -- for code that moves a
+    card it CHOSE to another zone. `remove_card` is `list.remove`, which takes
+    the FIRST EQUAL card: with two Forests in hand it took the other one, and
+    the chosen Forest was then in the hand AND the graveyard (azusa, seed
+    6244, the cleanup step's first run, §0z171). `remove_card` keeps
+    `list.remove`'s choice because old games depend on it (§0z146)."""
+    for i, c in enumerate(cards):
+        if c is card:
+            del cards[i]
+            return
+    raise ValueError("remove_exact(cards, card): card not in cards")
 
 
 def tutor_take(g, pool, stream: str):
@@ -5098,6 +5218,7 @@ def take_turn(g: Game):
     twitching_doll_nest(g)          # after the float metric: it is not spent
 
     deathreap_end_step(g)           # your end step, under pod_bodies
+    cleanup_step(g)                 # discard to seven, CR 514.1, §0z171
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30

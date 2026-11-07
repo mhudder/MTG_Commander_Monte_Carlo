@@ -7,8 +7,7 @@ claims about the tree is checked by `python -m tools.check_docs`: every
 module under `edhmc/` and `tools/` must be named here, so a file cannot be
 added without this map saying where it sits.
 
-Read `HANDOFF.md` first if you are new; read this when you are about to change
-code and want to know what else it touches.
+Read this before changing code: what else a change touches.
 
 ---
 
@@ -250,8 +249,7 @@ findings in `CLAUDE.md` and are not repeated here.
 
 - **`check_unchanged_decks` compares BASELINES.** A card that is not in the
   built list is invisible to it, so it can certify a cache while a candidate's
-  implementation is broken. It answers "did the deck move", not "is the card
-  right". The card's own test answers that.
+  implementation is broken. The card's own test answers that.
 - **A draw off an empty library is a LOSS (§0z42), and whether a draw is a
   choice is the CARD's to say.** Every draw goes through `BaseGame.draw`,
   karlov's Archive override or lorehold's `draw_card`, and each calls
@@ -262,6 +260,8 @@ findings in `CLAUDE.md` and are not repeated here.
   is winning, which is what the rule alone did to azusa and lorehold. A
   mandatory draw must NOT ask. Popping the library without drawing (exile,
   mill, reveal, "put it into your hand") is not a draw and does not lose.
+- **Each of your turns ends in `engine.cleanup_step`** (discard to seven,
+  §0z171): a new turn path must call it.
 - **A mana unit that is POPPED rather than passed to `spend` is never
   tapped.** Rendmaw's Treasures (§0z64) are units whose owner, a
   `TreasureMana`, sacrifices the token when `spend` taps it. Skullclamp's

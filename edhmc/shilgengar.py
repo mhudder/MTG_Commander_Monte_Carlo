@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (remove_card, charge_coloured_pain, vault_of_the_archangel,
+from edhmc.engine import (cleanup_step, remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
@@ -1587,6 +1587,7 @@ def take_turn(g):
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
 
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30

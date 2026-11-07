@@ -566,6 +566,13 @@ UNCOUNTERABLE = {
     'Void Rend',
 }
 
+# NO_MAX_HAND_SIZE: "You have no maximum hand size." (CR 402.2), the card's
+# own static. Read by `engine.max_hand_size` at the cleanup step (§0z171).
+NO_MAX_HAND_SIZE = {
+    'Library of Leng',
+    'Reliquary Tower',
+}
+
 # CREATURE SUBTYPES, from the type line's subtype half. Read by
 # `opponents.cavern_covers`: Cavern of Souls names the commander's type
 # (§0z151).

@@ -2863,6 +2863,56 @@ turned `check_docs` green for the first time since 2026-11-01. The three
 staged karlov swaps were re-measured and stand; the Citadel's, on the clock
 floor, did not shrink.
 
+## 2026-11-04: the review, then the cleanup step (§0z170-§0z174)
+
+The owner asked for a review of the recent changes. Re-measured on seeds
+nobody had chosen with (§0z170), every adopted policy of §0z160-§0z168 held,
+lorehold's at half its recorded T20 size -- the winner of a field graded by the
+seeds that picked it. The review's largest open bias was queue item 30, and
+the owner called it: "please model the discard step". The cleanup step went
+into every engine (§0z171); its first run crashed on an aliasing defect in its
+own removal (two equal Forests), and its first shift had two decks WINNING more
+under forced discard -- which a rule that only removes cards cannot do. The
+every-key diff named `karoo_bounces`, and behind it a land drop that played a
+karoo onto an empty battlefield turn after turn (§0z172): a full point for
+rendmaw, the session's largest number, from a defect nothing had looked at.
+With it fixed, the rule costs about 0.004 in the decks it moves. Necropotence's
+Tower target was adopted out of sample and Sylvan Library's floor kept
+(§0z173); the six tables rebuilt in 29 minutes wall and moved no row beyond
+its bar (§0z174).
+
+## Queued items closed 2026-11-05 — moved from `docs/QUEUE.md`
+
+Closed by §0z175: a token copy now has its own Card in azusa's Springheart
+and trostani's `copy_token`; the zone census reads 0 in every deck, and no
+game measured changed.
+
+33. **A card on the battlefield AND in the graveyard at once (§0z171's zone
+    census).** At a pod round, the same Card object sits in `g.board` (as
+    `p.card`) and in `g.graveyard`: azusa 13 games in 1,000, trostani 1-2
+    (and once battlefield + hand), the other five decks 0, with or without
+    the cleanup step. Many token permanents sharing ONE token Card is by
+    design and not this. Likely the shape §0z171 fixed in its own code:
+    moving a CHOSEN card with `engine.remove_card` (first EQUAL card, not that
+    object) -- `engine.remove_exact` is the identity version. Find the sites,
+    fix, prove the census reads 0, measure the shift (§0z30). Trostani is
+    SUSPENDED: fix shared code it needs, do not re-measure it.
+
+## Queued items closed 2026-11-04 — moved from `docs/QUEUE.md`
+
+Closed by §0z171 (the cleanup step in every engine), measured per deck at
+N=15,000, and §0z174's rebuild.
+
+30. **Maximum hand size is unmodelled in every engine** (CR 402.2, 514.1;
+    found in §0z162). Nothing discards to seven at cleanup, so every draw
+    engine and every "draw more" policy is flattered: 7.9% of karlov's end
+    steps without Reliquary Tower hold more than seven, 3.5 over on average.
+    A shared cleanup step in each engine's turn (which cards to discard is a
+    pilot's choice: the want order's worst), Reliquary Tower and its kin
+    lifting it, Necropotence's exile clause live. Measure the shift per deck
+    at the tables' N before deciding (§0z30: its size is not guessable); it
+    moves every baseline, so it is a batched rebuild.
+
 ## Queued items closed 2026-11-03 — moved from `docs/QUEUE.md`
 
 Closed by the owner, 2026-11-03: "adopt the reserve, hold and float fix; keep the rummage." `miracle_reserve` 0, `hold_min_value` 99 and `float_board_only` are lorehold's defaults; `rummage_pick` stays "miracle"; the table rebuilt and the staged swaps re-measured (§0z168).

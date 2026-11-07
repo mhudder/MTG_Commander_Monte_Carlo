@@ -299,6 +299,22 @@ def classify_land(text: str) -> dict:
 _PIP = re.compile(r"\{([^}]+)\}")
 
 
+def no_max_hand_size(name: str, oracle: str) -> bool:
+    """True if `oracle` says "You have no maximum hand size." (CR 402.2),
+    False if it says nothing about the maximum, and RAISES on any other text
+    about it -- "increased by", "reduced by", "is N" -- so a hand size this
+    repo cannot read is a flagged gap, never a silent seven (§0z171).
+    Reminder text is stripped first: Ultima's "discards down to their maximum
+    hand size" explains End the turn and is not a static."""
+    text = re.sub(r"\([^)]*\)", "", oracle).lower()
+    if "maximum hand size" not in text:
+        return False
+    if re.search(r"^you have no maximum hand size\.$", text, re.M):
+        return True
+    raise ValueError(f"{name}: maximum hand size text this generator "
+                     f"cannot read: {text!r} (§0z171)")
+
+
 def flashback_cost(text: str):
     """The cost on a card's own "Flashback {..}" line, as a C() cost dict, or
     None when the card has no such line (it only GRANTS flashback). Raises on
@@ -524,6 +540,16 @@ def main():
     uncounterable = {n for n, c in cards.items() if n in everything
                      and re.search(r"^this spell can't be countered\.",
                                    land_oracle(c).lower(), re.M)}
+
+    # NO MAXIMUM HAND SIZE, 2026-11-04 (§0z171): "You have no maximum hand
+    # size." (CR 402.2) -- Reliquary Tower, Library of Leng. Read by
+    # `engine.max_hand_size`, which the cleanup step asks (CR 514.1). Reminder
+    # text is stripped first (Ultima's "discards down to their maximum hand
+    # size" explains End the turn, it is not a static), and ANY other text
+    # about the maximum -- "increased by", "reduced by", "is N" -- RAISES:
+    # a hand size this repo cannot read is a flagged gap, never a silent 7.
+    no_max_hand = {n for n, c in cards.items()
+                   if n in everything and no_max_hand_size(n, land_oracle(c))}
 
     # CREATURE SUBTYPES, 2026-10-22 (§0z151): Cavern of Souls names a creature
     # type, and `opponents.cavern_covers` asks whether a creature spell shares
@@ -835,6 +861,13 @@ def main():
                      "`opponents.uncounterable` (§0z151).\n"
                      "UNCOUNTERABLE = {\n")
             for n in sorted(uncounterable):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# NO_MAX_HAND_SIZE: \"You have no maximum hand size.\" "
+                     "(CR 402.2), the card's\n# own static. Read by "
+                     "`engine.max_hand_size` at the cleanup step (§0z171).\n"
+                     "NO_MAX_HAND_SIZE = {\n")
+            for n in sorted(no_max_hand):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# CREATURE SUBTYPES, from the type line's subtype half. "

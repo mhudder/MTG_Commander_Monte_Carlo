@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "01c2fc11e978988e",
-    "built_commit": "c7a1e02",
-    "built_utc": "2026-10-22T14:53:50Z",
+    "built_at": "657eb48b79647c4f",
+    "built_commit": "1b6fa2b",
+    "built_utc": "2026-11-07T01:15:01Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -487,57 +487,78 @@
         "built_utc": "2026-10-22T02:16:24Z",
         "deck": "azusa",
         "verified": []
+      },
+      {
+        "built_at": "01c2fc11e978988e",
+        "built_commit": "c7a1e02",
+        "built_utc": "2026-10-22T14:53:50Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "3b2b593",
+            "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+            "fingerprint": "126aa4daf8f136ef",
+            "utc": "2026-10-23T00:17:46Z"
+          },
+          {
+            "commit": "76d1e34",
+            "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+            "fingerprint": "b809b6b969a8d9bd",
+            "utc": "2026-10-23T01:43:11Z"
+          },
+          {
+            "commit": "1c0a4fe",
+            "evidence": "2026-10-23, \u00a70z158 (animate_lands' targets hold their permanents): check_unchanged_decks HEAD 1c0a4fe vs the working tree, N=400, BIT-IDENTICAL on all six; azusa's STAGED list (build_pending) on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 differ.",
+            "fingerprint": "d16d7b8f39a1b6f5",
+            "utc": "2026-10-23T01:53:53Z"
+          },
+          {
+            "commit": "5741c50",
+            "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "61cba8ed074d34c8",
+            "utc": "2026-10-31T23:59:35Z"
+          },
+          {
+            "commit": "91dabd9",
+            "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "02aefada813c4009",
+            "utc": "2026-11-01T01:08:11Z"
+          },
+          {
+            "commit": "09c7245",
+            "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "948319c7dd24b3ef",
+            "utc": "2026-11-01T03:42:21Z"
+          },
+          {
+            "commit": "9e92710",
+            "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "ebb7938a3eacba15",
+            "utc": "2026-11-01T12:16:30Z"
+          }
+        ]
+      },
+      {
+        "built_at": "4e8d6df8b2d5ef11",
+        "built_commit": "75a0852",
+        "built_utc": "2026-11-04T17:54:39Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "3bcdc34",
+            "evidence": "\u00a70z175 (token copies get their own Card): every output key hashed per game, azusa staged list (build_pending), 15,000 seeds at T20 against a worktree at 3bcdc34 (the cache's built commit is 75a0852; 3bcdc34 changed no engine file since): 0 of 15,000 differ; check_unchanged_decks N=400 BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "90f5af0924e7c94a",
+            "utc": "2026-11-05T15:33:48Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3b2b593",
-        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
-        "fingerprint": "126aa4daf8f136ef",
-        "utc": "2026-10-23T00:17:46Z"
-      },
-      {
-        "commit": "76d1e34",
-        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
-        "fingerprint": "b809b6b969a8d9bd",
-        "utc": "2026-10-23T01:43:11Z"
-      },
-      {
-        "commit": "1c0a4fe",
-        "evidence": "2026-10-23, \u00a70z158 (animate_lands' targets hold their permanents): check_unchanged_decks HEAD 1c0a4fe vs the working tree, N=400, BIT-IDENTICAL on all six; azusa's STAGED list (build_pending) on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 differ.",
-        "fingerprint": "d16d7b8f39a1b6f5",
-        "utc": "2026-10-23T01:53:53Z"
-      },
-      {
-        "commit": "5741c50",
-        "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "61cba8ed074d34c8",
-        "utc": "2026-10-31T23:59:35Z"
-      },
-      {
-        "commit": "91dabd9",
-        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "02aefada813c4009",
-        "utc": "2026-11-01T01:08:11Z"
-      },
-      {
-        "commit": "09c7245",
-        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "948319c7dd24b3ef",
-        "utc": "2026-11-01T03:42:21Z"
-      },
-      {
-        "commit": "9e92710",
-        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "ebb7938a3eacba15",
-        "utc": "2026-11-01T12:16:30Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "c993e3f962872093",
-    "built_commit": "9eb3237",
-    "built_utc": "2026-11-03T20:52:10Z",
+    "built_at": "22fc0ded12db8749",
+    "built_commit": "75a0852",
+    "built_utc": "2026-11-04T17:52:30Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -992,14 +1013,21 @@
             "utc": "2026-11-01T01:08:11Z"
           }
         ]
+      },
+      {
+        "built_at": "c993e3f962872093",
+        "built_commit": "9eb3237",
+        "built_utc": "2026-11-03T20:52:10Z",
+        "deck": "karlov",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "a475466f9c513d40",
-    "built_commit": "0c86289",
-    "built_utc": "2026-11-03T19:32:44Z",
+    "built_at": "7bbdb648028e5afc",
+    "built_commit": "75a0852",
+    "built_utc": "2026-11-04T17:52:48Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1482,14 +1510,21 @@
             "utc": "2026-11-03T16:10:23Z"
           }
         ]
+      },
+      {
+        "built_at": "a475466f9c513d40",
+        "built_commit": "0c86289",
+        "built_utc": "2026-11-03T19:32:44Z",
+        "deck": "lorehold",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "474e579c5983f9d5",
-    "built_commit": "c7a1e02",
-    "built_utc": "2026-10-22T14:48:58Z",
+    "built_at": "c03c220b37c5c936",
+    "built_commit": "75a0852",
+    "built_utc": "2026-11-04T17:51:32Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -1894,51 +1929,58 @@
         "built_utc": "2026-10-22T02:14:15Z",
         "deck": "rendmaw",
         "verified": []
+      },
+      {
+        "built_at": "474e579c5983f9d5",
+        "built_commit": "c7a1e02",
+        "built_utc": "2026-10-22T14:48:58Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "3b2b593",
+            "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+            "fingerprint": "ff490c5498d6c2c0",
+            "utc": "2026-10-23T00:17:45Z"
+          },
+          {
+            "commit": "76d1e34",
+            "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+            "fingerprint": "6caf52d33362be7b",
+            "utc": "2026-10-23T01:43:10Z"
+          },
+          {
+            "commit": "5741c50",
+            "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "3db6bc60dc9edbaf",
+            "utc": "2026-10-31T23:59:34Z"
+          },
+          {
+            "commit": "91dabd9",
+            "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "266deaa40f15d5db",
+            "utc": "2026-11-01T01:08:10Z"
+          },
+          {
+            "commit": "09c7245",
+            "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "7adfc45acd4ee633",
+            "utc": "2026-11-01T03:42:20Z"
+          },
+          {
+            "commit": "9e92710",
+            "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "f62db0f4b88391c8",
+            "utc": "2026-11-01T12:16:29Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3b2b593",
-        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
-        "fingerprint": "ff490c5498d6c2c0",
-        "utc": "2026-10-23T00:17:45Z"
-      },
-      {
-        "commit": "76d1e34",
-        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
-        "fingerprint": "6caf52d33362be7b",
-        "utc": "2026-10-23T01:43:10Z"
-      },
-      {
-        "commit": "5741c50",
-        "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "3db6bc60dc9edbaf",
-        "utc": "2026-10-31T23:59:34Z"
-      },
-      {
-        "commit": "91dabd9",
-        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "266deaa40f15d5db",
-        "utc": "2026-11-01T01:08:10Z"
-      },
-      {
-        "commit": "09c7245",
-        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "7adfc45acd4ee633",
-        "utc": "2026-11-01T03:42:20Z"
-      },
-      {
-        "commit": "9e92710",
-        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "f62db0f4b88391c8",
-        "utc": "2026-11-01T12:16:29Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "58132f5743e1ca9f",
-    "built_commit": "c7a1e02",
-    "built_utc": "2026-10-22T14:49:11Z",
+    "built_at": "81e54e49f2841eee",
+    "built_commit": "75a0852",
+    "built_utc": "2026-11-04T17:51:40Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -2385,51 +2427,58 @@
         "built_utc": "2026-10-22T02:14:07Z",
         "deck": "shilgengar",
         "verified": []
+      },
+      {
+        "built_at": "58132f5743e1ca9f",
+        "built_commit": "c7a1e02",
+        "built_utc": "2026-10-22T14:49:11Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "3b2b593",
+            "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
+            "fingerprint": "cd90197b6ced279e",
+            "utc": "2026-10-23T00:17:45Z"
+          },
+          {
+            "commit": "76d1e34",
+            "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+            "fingerprint": "fef8e4c2f306fedf",
+            "utc": "2026-10-23T01:43:10Z"
+          },
+          {
+            "commit": "5741c50",
+            "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "3f485ef9040e525c",
+            "utc": "2026-10-31T23:59:35Z"
+          },
+          {
+            "commit": "91dabd9",
+            "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "ff5da73186d3d2cb",
+            "utc": "2026-11-01T01:08:10Z"
+          },
+          {
+            "commit": "09c7245",
+            "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "0440db686c4ae5c7",
+            "utc": "2026-11-01T03:42:21Z"
+          },
+          {
+            "commit": "9e92710",
+            "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "bf683c1a2efc2ff2",
+            "utc": "2026-11-01T12:16:29Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3b2b593",
-        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list (build_pending), every numeric output key, 2,000 seeds, both trees: IDENTICAL on every key.",
-        "fingerprint": "cd90197b6ced279e",
-        "utc": "2026-10-23T00:17:45Z"
-      },
-      {
-        "commit": "76d1e34",
-        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
-        "fingerprint": "fef8e4c2f306fedf",
-        "utc": "2026-10-23T01:43:10Z"
-      },
-      {
-        "commit": "5741c50",
-        "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "3f485ef9040e525c",
-        "utc": "2026-10-31T23:59:35Z"
-      },
-      {
-        "commit": "91dabd9",
-        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "ff5da73186d3d2cb",
-        "utc": "2026-11-01T01:08:10Z"
-      },
-      {
-        "commit": "09c7245",
-        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "0440db686c4ae5c7",
-        "utc": "2026-11-01T03:42:21Z"
-      },
-      {
-        "commit": "9e92710",
-        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "bf683c1a2efc2ff2",
-        "utc": "2026-11-01T12:16:29Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "6ca132eddbb6c08a",
-    "built_commit": "c7a1e02",
-    "built_utc": "2026-10-22T14:49:36Z",
+    "built_at": "45a05b87d584facb",
+    "built_commit": "3d8d93b",
+    "built_utc": "2026-11-06T22:57:40Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -2821,46 +2870,67 @@
         "built_utc": "2026-10-22T02:27:18Z",
         "deck": "tivit",
         "verified": []
+      },
+      {
+        "built_at": "6ca132eddbb6c08a",
+        "built_commit": "c7a1e02",
+        "built_utc": "2026-10-22T14:49:36Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "3b2b593",
+            "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.",
+            "fingerprint": "0d108a2c93022a79",
+            "utc": "2026-10-23T00:17:46Z"
+          },
+          {
+            "commit": "76d1e34",
+            "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
+            "fingerprint": "3174ed1cef90a19f",
+            "utc": "2026-10-23T01:43:10Z"
+          },
+          {
+            "commit": "5741c50",
+            "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "69a29d9a97c13b76",
+            "utc": "2026-10-31T23:59:35Z"
+          },
+          {
+            "commit": "91dabd9",
+            "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "b677d4b5b62b0413",
+            "utc": "2026-11-01T01:08:10Z"
+          },
+          {
+            "commit": "09c7245",
+            "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "e60c3caca1f749f1",
+            "utc": "2026-11-01T03:42:20Z"
+          },
+          {
+            "commit": "9e92710",
+            "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
+            "fingerprint": "a0feecde3e64215f",
+            "utc": "2026-11-01T12:16:29Z"
+          }
+        ]
+      },
+      {
+        "built_at": "c79679fac3265503",
+        "built_commit": "75a0852",
+        "built_utc": "2026-11-04T17:51:09Z",
+        "deck": "tivit",
+        "verified": []
+      },
+      {
+        "built_at": "45a05b87d584facb",
+        "built_commit": "618335f",
+        "built_utc": "2026-11-06T22:46:36Z",
+        "deck": "tivit",
+        "verified": []
       }
     ],
-    "verified": [
-      {
-        "commit": "3b2b593",
-        "evidence": "2026-10-23, \u00a70z155: opponents.py gained end_step_target, factored out of end_step_answers. check_unchanged_decks --n=2000 vs a worktree at 3b2b593: BIT-IDENTICAL on all 8 metrics. The STAGED list, every numeric output key, 2,000 seeds: identical but threat_pieces_removed in ONE game (seed 3642, 2 -> 1): Void Rend's payment drained an opponent to 0 through Nadier's Nightblade, and the old loop's stale target list removed a piece from a player no longer in the game. Won, damage and every other key identical; nothing reads a dead opponent's pieces.",
-        "fingerprint": "0d108a2c93022a79",
-        "utc": "2026-10-23T00:17:46Z"
-      },
-      {
-        "commit": "76d1e34",
-        "evidence": "2026-10-23, the Star Trek / Reality Fracture batch (five candidates, one per deck, none in any list; opponents.wipe_refund is zero for every list card): check_unchanged_decks HEAD 76d1e34 vs the working tree, N=400, BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..6999 in both trees, every numeric output key hashed per seed: 0 of 2,000 seeds differ (\u00a70z126's floor).",
-        "fingerprint": "3174ed1cef90a19f",
-        "utc": "2026-10-23T01:43:10Z"
-      },
-      {
-        "commit": "5741c50",
-        "evidence": "2026-10-31, \u00a70z160: opponents.py gained one optional getattr hook (pod_pieces_window), defined only by karlov. check_unchanged_decks c7a1e02 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in HEAD 5741c50 and the working tree, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "69a29d9a97c13b76",
-        "utc": "2026-10-31T23:59:35Z"
-      },
-      {
-        "commit": "91dabd9",
-        "evidence": "2026-11-01, \u00a70z161: opponents.incidental_damage's chip formula factored into chip_share / chip_amount (+ predicted_chip, read only by karlov's opt-in clock floor), karlov's citadel_floor_mode / citadel_turn_cfg, default off. check_unchanged_decks HEAD 91dabd9 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics, all six decks; and every deck's STAGED list (build_pending, trostani too) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "b677d4b5b62b0413",
-        "utc": "2026-11-01T01:08:10Z"
-      },
-      {
-        "commit": "09c7245",
-        "evidence": "2026-11-01, \u00a70z162: opponents.clock_floor added (a pure function over predicted_chip, read only by karlov), karlov's turn_knob / Necropotence policy knobs, defaults reproducing the old buy. check_unchanged_decks HEAD 09c7245 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "e60c3caca1f749f1",
-        "utc": "2026-11-01T03:42:20Z"
-      },
-      {
-        "commit": "9e92710",
-        "evidence": "2026-11-01, \u00a70z163: engine.turn_knob (moved from karlov), engine.library_floor and library_pay_max for Sylvan Library, defaults reproducing the old policy. check_unchanged_decks HEAD 9e92710 vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed: 0 of 2,500 differ.",
-        "fingerprint": "a0feecde3e64215f",
-        "utc": "2026-11-01T12:16:29Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

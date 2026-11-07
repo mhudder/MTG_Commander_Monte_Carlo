@@ -1,0 +1,54 @@
+§0z171 rule on minus rule off, paired, N=6,000, T20, seeds 5000.., python 3.11.17; every numeric key whose 95% CI excludes 0, and `won`
+
+== rendmaw
+  attack_triggers                    off     0.429  on-off   -0.0043 +-0.0038 *
+  basics_fetched                     off     0.507  on-off   +0.0035 +-0.0033 *
+  cleanup_discards                   off     0.000  on-off   +0.7787 +-0.0665 *
+  cleanup_lands                      off     0.000  on-off   +0.3613 +-0.0334 *
+  cleanup_mv                         off     0.000  on-off   +1.3018 +-0.1204 *
+  cleanup_turns                      off     0.000  on-off   +0.2938 +-0.0191 *
+  crn_draws                          off     1.518  on-off   +0.0128 +-0.0117 *
+  doll_nest_counters                 off     0.435  on-off   +0.0027 +-0.0026 *
+  final_board_power                  off    41.711  on-off   -0.6070 +-0.2651 *
+  hart_sacrifices                    off     0.068  on-off   +0.0013 +-0.0012 *
+  kavu_draws                         off     0.151  on-off   -0.0020 +-0.0018 *
+  lands_entered_tapped_by_rule       off     0.197  on-off   +0.0032 +-0.0020 *
+  mana_spent                         off    45.062  on-off   -0.1145 +-0.0616 *
+  modal_land_faces                   off     0.215  on-off   -0.0037 +-0.0022 *
+  pod_birds_killed                   off     2.355  on-off   -0.0218 +-0.0147 *
+  raw_damage                         off    73.753  on-off   -0.3367 +-0.2509 *
+  rendmaw_triggers                   off     2.690  on-off   -0.0338 +-0.0169 *
+  responses_end_step                 off     0.113  on-off   +0.0018 +-0.0014 *
+  shock_life                         off     0.404  on-off   -0.0040 +-0.0032 *
+  spells_cast                        off    11.251  on-off   -0.0218 +-0.0158 *
+  stranded_mv                        off   133.139  on-off   -2.6357 +-0.3229 *
+  tokens_made                        off     8.767  on-off   -0.0532 +-0.0256 *
+  turns_played                       off    10.621  on-off   +0.0092 +-0.0066 *
+  village_rites_cast                 off     0.172  on-off   -0.0045 +-0.0022 *
+  won                                off     0.351  on-off   -0.0027 +-0.0028
+
+== shilgengar
+  ae_removal_eaten                   off     0.450  on-off   -0.0033 +-0.0031 *
+  angel_tokens_made                  off     0.255  on-off   -0.0042 +-0.0033 *
+  cards_fed                          off     0.766  on-off   +0.0060 +-0.0054 *
+  cleanup_discards                   off     0.000  on-off   +0.1932 +-0.0200 *
+  cleanup_lands                      off     0.000  on-off   +0.0595 +-0.0098 *
+  cleanup_mv                         off     0.000  on-off   +0.6462 +-0.0743 *
+  cleanup_turns                      off     0.000  on-off   +0.1382 +-0.0126 *
+  countered                          off     0.867  on-off   -0.0035 +-0.0022 *
+  crn_draws                          off     0.425  on-off   -0.0023 +-0.0015 *
+  fetch_life                         off     0.425  on-off   -0.0023 +-0.0015 *
+  fetches_cracked                    off     0.425  on-off   -0.0023 +-0.0015 *
+  life_lost_to_own_cards             off     3.290  on-off   -0.0120 +-0.0076 *
+  mana_floated                       off    15.459  on-off   +0.0453 +-0.0260 *
+  mana_spent                         off    98.994  on-off   -0.3308 +-0.1493 *
+  own_wipes_cast                     off     0.126  on-off   -0.0015 +-0.0013 *
+  painland_life                      off     1.325  on-off   -0.0075 +-0.0043 *
+  pod_bodies_killed                  off     5.957  on-off   -0.0223 +-0.0166 *
+  single_reanimations                off     0.366  on-off   +0.0043 +-0.0037 *
+  stranded_mv                        off   172.850  on-off   -2.3777 +-0.3689 *
+  threat_pieces_removed              off     1.429  on-off   -0.0078 +-0.0062 *
+  threat_rounds_delayed              off     2.716  on-off   -0.0145 +-0.0122 *
+  threat_wipe_pieces                 off     0.182  on-off   -0.0032 +-0.0026 *
+  won                                off     0.374  on-off   +0.0007 +-0.0021
+

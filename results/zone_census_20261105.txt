@@ -1,0 +1,8 @@
+zone census: N=3,000 games a deck, T20, seeds 5000.., cfg {}, python 3.11.17
+  rendmaw     games with an object in two zones:     0    
+  lorehold    games with an object in two zones:     0    
+  karlov      games with an object in two zones:     0    
+  tivit       games with an object in two zones:     0    
+  shilgengar  games with an object in two zones:     0    
+  azusa       games with an object in two zones:     0    
+  trostani    games with an object in two zones:     0    

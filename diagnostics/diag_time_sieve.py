@@ -77,15 +77,11 @@ def forced(flags, lands=6, turns=20):
     for c in [x for x in DECK if x.is_land][:lands]:
         g.board.append(Permanent(card=c, sick=False))
 
-    # Calls tivit.take_extra_turns rather than reimplementing it, so this
+    # Calls tivit.play_round rather than reimplementing it, so this
     # diagnostic cannot drift from the engine it is diagnosing.
     played = 0
     while played < turns and g.result is None:
-        T.take_turn(g)
-        played += 1
-        if g.result is not None:
-            break
-        played = T.take_extra_turns(g, played, turns)
+        played = T.play_round(g, played, turns)
     return g
 
 

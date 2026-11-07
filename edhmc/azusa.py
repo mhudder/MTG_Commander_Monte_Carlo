@@ -121,11 +121,12 @@ below) so no card here cares what type another one is.
 
 from __future__ import annotations
 
+import dataclasses
 import inspect
 import random
 import re
 
-from edhmc.engine import (backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           choose_mode_cost, can_afford,
@@ -171,7 +172,8 @@ class FloatingMana:
     that would have been §0u's shape for the fourth time.
 
     Not a `Permanent`: it is never on the battlefield, is not a land, dies to
-    nothing, and is cleared with the turn like the unspent mana it represents.
+    nothing, and empties at the end of each step and phase like the unspent
+    mana it represents (`AzusaGame.empty_mana_pool`, CR 500.5, §0z177).
     """
 
     __slots__ = ("colours", "tapped")
@@ -469,7 +471,7 @@ class AzusaGame(BaseGame):
         cfg.setdefault("combat_split", True)
         # FloatingMana, not frozensets, since §0z37 -- each point needs
         # somewhere to record that it was spent. Cleared with the turn.
-        self.bonus_mana: list = []              # Lotus Cobra, this turn only
+        self.bonus_mana: list = []              # Lotus Cobra: this PHASE only
         # "IF THIS IS THE SECOND TIME this ability has resolved THIS TURN" --
         # Nissa, Resurgent Animist. Resolutions, not land drops, so a doubler
         # reaches the second one on the first land. Reset in take_turn.
@@ -554,6 +556,12 @@ class AzusaGame(BaseGame):
             "war_room_draws": 0,
             "castle_activations": 0,    # Castle Garenbrig's six {G}, made
             "castle_mana_spent": 0,     # ... and actually spent on a creature
+            "floating_mana_lost": 0,    # unspent pool emptied at a step's end
+                                        # (CR 500.5, §0z177), and where:
+            "floating_lost_main1": 0,   # ... the end of main phase 1
+            "floating_lost_combat": 0,  # ... the end of combat
+            "floating_lost_main2": 0,   # ... the end of main phase 2
+            "castle_mana_lost": 0,      # ... of it, Castle Garenbrig's {G}
             "wildspeaker_draws": 0,     # cards actually drawn off the draw mode
             "wildspeaker_asked": 0,     # ... and what it asked for. The gap is
                                         # the library running out, and it is
@@ -825,6 +833,38 @@ class AzusaGame(BaseGame):
         """
         return perm.card.is_creature or (perm.card.is_land
                                          and self.animation_of(perm) is not None)
+
+    def empty_mana_pool(self, where: str) -> None:
+        """CR 500.5: "As a step or phase ends ... any unspent mana left in a
+        player's mana pool empties." (§0z177.) Lotus Cobra's, Nissa,
+        Resurgent Animist's, Nykthos's and Crystal Vein's mana (`bonus_mana`)
+        and Castle Garenbrig's six {G} (`creature_mana`) were cleared only at
+        the start of the next turn, so the first main phase's leftover paid
+        for combat's and the second main phase's activations -- and the
+        second main phase's paid for responses on the pod's turn, which read
+        `available_mana` (`response_pay`). A TREASURE is a permanent, not
+        mana, and stays (`TreasureMana`, §0z153).
+
+        Called at the end of the first main phase (after `precombat_step`,
+        which spends "the mana the main phase left"), at the end of combat
+        and at the end of the second main phase. Upkeep and the draw step
+        make no floating mana in this engine, so no call is needed there.
+        `azusa_pool_empties=False` is the old pool, kept for the turn."""
+        if not self.cfg.get("azusa_pool_empties", True):   # §0z177
+            return
+        kept, lost = [], 0
+        for f in self.bonus_mana:
+            if isinstance(f, TreasureMana):
+                kept.append(f)
+            elif not f.tapped:
+                lost += 1
+        self.bonus_mana = kept
+        if self.creature_mana:
+            lost += len(self.creature_mana)
+            self.m["castle_mana_lost"] += len(self.creature_mana)
+            self.creature_mana = []
+        self.m["floating_mana_lost"] += lost
+        self.m[f"floating_lost_{where}"] += lost
 
     def expire_animations(self, end_of_turn=False):
         """`end_of_turn` drops the "until end of turn" effects, before the pod
@@ -1148,12 +1188,23 @@ class AzusaGame(BaseGame):
         # floating mana. Its owner is a FloatingMana rather than a permanent,
         # so `spend` consumes it by the same tap it uses for a land (§0z37),
         # and a point already spent this turn is simply not offered again.
+        #
+        # SPENT FIRST, since it empties at the end of the phase (§0z177): a
+        # pilot pays with the mana that is about to vanish before tapping a
+        # land that keeps until the next phase. Rank -1 sorts it ahead of every
+        # land (rank 0) wherever the solver's earlier keys tie -- a Lotus
+        # Cobra {G} against a Forest. A TREASURE keeps, so it keeps the old
+        # (9, 0, 0): spent last, a one-shot permanent. `azusa_floating_first`
+        # False is the old order, in which floating mana was spent LAST.
+        first = (self.cfg.get("azusa_floating_first", True)
+                 and self.cfg.get("azusa_pool_empties", True))
         for f in self.bonus_mana:
             if f.tapped:
                 continue
             units.append(f.colours)
             owners.append(f)
-            weights.append((9, 0, 0))
+            weights.append((-1, 0, 0) if first and not isinstance(f, TreasureMana)
+                           else (9, 0, 0))
         return ManaUnits(units, owners, weights,
                          legacy=self.cfg.get('mana_colour_legacy', False),
                          surplus=self.cfg.get('mana_surplus', True))
@@ -1639,7 +1690,15 @@ class AzusaGame(BaseGame):
             if pay is not None:
                 spend(self, pay, units)
                 self.m["mana_spent"] += 2
-                tok = self.make_permanent(host.card, sick=True, is_token=True)
+                # THE TOKEN'S OWN CARD (§0z175): `host.card` itself made the
+                # token share the host's Card OBJECT, so when the host died its
+                # card went to the graveyard while the token still held it --
+                # one object in two zones. A copy has the copiable values
+                # (707.2), not the object. `token_copy_own_card=False` shares.
+                card = (dataclasses.replace(host.card)
+                        if self.cfg.get("token_copy_own_card", True)
+                        else host.card)
+                tok = self.make_permanent(card, sick=True, is_token=True)
                 self.m["springheart_copies"] += 1
                 # THE COPY'S ETB FIRES. Queued item 16: `make_permanent` does
                 # not run the ETB dispatch that `resolve` does, so a copy of
@@ -3159,8 +3218,8 @@ class AzusaGame(BaseGame):
         SOMETHING -- a card in hand uncastable on the real mana and castable
         on what is left after the {2} plus the devotion mana -- and only at
         devotion 4 or more, below which tapping it for {C} is as good. The
-        mana is unrestricted, so it floats in `bonus_mana` (§0z37) for the
-        rest of the turn. Conservative in Castle's way: never fired to cast a
+        mana is unrestricted, so it floats in `bonus_mana` (§0z37) until the
+        phase ends (§0z177). Conservative in Castle's way: never fired to cast a
         second spell beside one already affordable."""
         if not self.cfg.get("nykthos_devotion", True):
             return False
@@ -4054,7 +4113,9 @@ def take_turn(g):
     # lands. `pw_used` makes this a no-op for one that already has.
     g.planeswalker_step()
     g.precombat_step()                  # Landers, Bristly Bill (§0z101)
+    g.empty_mana_pool("main1")          # the end of main phase 1, §0z177
     g.combat()
+    g.empty_mana_pool("combat")         # the end of combat
     g.activations()
     # A SECOND LAND STEP, mirroring engine.py's two `play_land` calls: drops
     # granted or unlocked by something cast after the first one (a Wayward
@@ -4064,6 +4125,7 @@ def take_turn(g):
     g.main_phase()
     if g.result is not None:
         return
+    g.empty_mana_pool("main2")     # the end of main phase 2: none for the pod
 
     # THE GREAT HENGE's second half: "{T}: Add {G}{G}. You gain 2 life."
     # The mana is a `mana_ability` and needs no code. The LIFE is taken HERE,
@@ -4107,6 +4169,7 @@ def take_turn(g):
     g.verdant_kraken_tokens(3)
 
     g.cauldron_flush()             # §0z135: before the pod's turn
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
     if g.cfg.get("opponents", True):
         OPP.pod_phase(g)           # one order for six engines, §0z30
 

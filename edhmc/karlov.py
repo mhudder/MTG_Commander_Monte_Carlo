@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -1107,14 +1107,16 @@ def necro_target(g) -> int:
     """The hand Necropotence's buy fills to. `necro_hand_target` (7) IS THE
     MAXIMUM HAND SIZE: the cards arrive at the beginning of the end step,
     before cleanup, and a card bought past seven is discarded there (CR
-    514.1) -- and exiled, by Necropotence's own clause. This engine has no
-    maximum hand size (CR 402.2 is unmodelled in every deck), so the target
-    is where the rule lives for this card. RELIQUARY TOWER, in this list,
-    says "You have no maximum hand size", and then the target is a choice:
-    `necro_tower_target` (default: the same 7) while it is on the
-    battlefield (§0z162)."""
+    514.1, `engine.cleanup_step` since §0z171) -- and exiled, by
+    Necropotence's own clause. RELIQUARY TOWER, in this list, says "You have
+    no maximum hand size", and then the target is a choice:
+    `necro_tower_target` while it is on the battlefield. ADOPTED 2026-11-04
+    (the owner: "if the necropotence ... changes are valid, please adopt";
+    §0z162, re-measured out of sample on the cleanup step in §0z173): 99, no
+    target -- the buy stops at the floor and the decking reserve. None
+    restores the old cap of 7."""
     if g.has("Reliquary Tower"):
-        t = turn_knob(g, "necro_tower_target", None)
+        t = turn_knob(g, "necro_tower_target", 99)
         if t is not None:
             return int(t)
     return int(turn_knob(g, "necro_hand_target", 7))
@@ -2658,6 +2660,7 @@ def take_turn(g):
     orchard_idle_tap(g)
     if g.result is not None:
         return
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
 
     if g.cfg.get("opponents", True):
         # One order for six engines (§0z30): damage, clocks, THEN removal.

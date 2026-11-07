@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -1737,12 +1737,44 @@ def take_turn(g, extra=False):
     # advances on an extra turn -- so each extra turn brought every kill one
     # pod round CLOSER. Every pod timer now reads `opponents.pod_turn(g)`,
     # your turns minus these extra ones (`pod_clock_rounds`).
-    skip = extra and g.cfg.get("extra_turns_skip_opponents", True)
-    if g.cfg.get("opponents", True) and not skip:
+    cleanup_step(g)        # discard to seven, CR 514.1, §0z171: every turn
+    if extra:
+        if not g.cfg.get("extra_turns_skip_opponents", True):
+            pod_round(g)   # the legacy rule: an extra turn bought a pod round
+    elif not g.cfg.get("extra_turns_before_pod", True):
+        pod_round(g)       # the legacy order: the pod, THEN your extra turns
+
+
+def pod_round(g):
+    """The three opponents' turns, as the one block every engine runs (§0z30):
+    damage, clocks, THEN removal. This engine ran removal first until
+    2026-09-17."""
+    if g.cfg.get("opponents", True):
         g.m["pod_rounds"] += 1
-        # One order for six engines (§0z30): damage, clocks, THEN removal.
-        # This engine ran removal first until 2026-09-17.
         OPP.pod_phase(g)
+
+
+def play_round(g, played, budget):
+    """One round: your turn, the extra turns it bought, then the pod's round.
+    Returns the new horizon count. `simulate`, `test_time_sieve` and
+    `diag_time_sieve` all drive the game through this, so the order lives in
+    one place (§0z30's lesson).
+
+    CR 500.7: an extra turn is added DIRECTLY AFTER the turn that made it, so
+    the opponents act after the whole chain, on the board the LAST extra turn
+    left (§0z176). Until `extra_turns_before_pod` the pod's round came between
+    your turn and its extra turns -- its removal and its kill clocks got a
+    look at your board before the turns you had just bought. Lorehold was
+    fixed for the same thing in §0z153 (`extra_turn_full`); §0z116's table
+    said this engine already took them this way, and it did not."""
+    take_turn(g)
+    played += 1
+    if g.result is not None:
+        return played
+    played = take_extra_turns(g, played, budget)
+    if g.result is None and g.cfg.get("extra_turns_before_pod", True):
+        pod_round(g)
+    return played
 
 
 def take_extra_turns(g, played, budget):
@@ -1814,11 +1846,7 @@ def simulate(deck, commander, cfg, seed):
     played = 0
     snaps = Snapshots(cfg)                 # §0z93
     while played < budget and g.result is None:
-        take_turn(g)
-        played += 1
-        if g.result is not None:
-            break
-        played = take_extra_turns(g, played, budget)
+        played = play_round(g, played, budget)
         # A round ends after its extra turns. Under the legacy horizon
         # (`horizon_counts="turns"`) `played` can jump past a snapshot
         # round, and `attach` then raises rather than guess.

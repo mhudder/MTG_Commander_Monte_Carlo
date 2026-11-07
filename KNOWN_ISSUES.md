@@ -222,6 +222,14 @@ Each row is a headline and its key number, at most 250 characters
 | [0z167](#0z167) | MEASURED | **Lorehold's rummage pick, forked: no rule wins at both horizons.** By priority +0.0163 at T10, level at T20, and -0.0058 at T20 with no holds (N=60,000): pitched permanents feed Seminar and Journey |
 | [0z168](#0z168) | REBUILT | **Lorehold's miracle policy ADOPTED by the owner**: no reserve, never hold, the off-turn float fixed; rummage kept. Table rebuilt (5 rows beyond their bars); the four staged swaps hold at both horizons |
 | [0z169](#0z169) | REBUILT | **Karlov's table rebuilt on the clock floor** (queue item 29): 0 of 64 rows beyond their bars; the Citadel swap +0.0121 / +0.0088 at T10 / T20, all three staged swaps standing |
+| [0z170](#0z170) | MEASURED | **§0z160-§0z168's adopted policies, out of sample**: lorehold's +0.0126 / +0.0057 (half §0z168's T20), karlov's dig +0.0114 / +0.0073; the clock floor survives a noisy pod at T10, +0.0004 at T20 |
+| [0z171](#0z171) | IMPLEMENTED | **The cleanup step: discard to seven** (CR 514.1; queue item 30), every engine: -0.004 to -0.005 at T20 in rendmaw, lorehold, tivit; level in karlov, azusa, shilgengar; the graveyard synergy it feeds is small |
+| [0z172](#0z172) | FIXED | **A karoo played on an empty battlefield returned itself, every turn**: 567 of Golgari Rot Farm's 887 entries in 2,000 rendmaw games; `play_land` now holds it while another land is in hand. Found through §0z171 |
+| [0z173](#0z173) | DECIDED | **Necropotence's Tower target ADOPTED (99), Sylvan Library's floor kept (20)**, both re-measured out of sample on the cleanup step: +0.0024 / +0.0011 for the Tower target; nothing beats 20 at both horizons |
+| [0z174](#0z174) | REBUILT | **Six tables rebuilt for §0z171-§0z173** (parallel, 29 min wall): 0 of 380 rows beyond their bars; 11 of 12 staged swaps stand at both horizons, Anointed Procession still inside its T20 bar |
+| [0z175](#0z175) | FIXED | **A token copy shared its original's Card object** (azusa's Springheart, trostani's copy_token): one object in two zones in 9 of 3,000 games each; latent, 0 of 15,000 azusa games changed. Queue item 33 |
+| [0z176](#0z176) | FIXED | **Tivit took its extra turns AFTER the pod's round** (CR 500.7). Before it now: **+0.0291 / +0.0381** at T10 / T20; table rebuilt, Time Sieve +0.0407 -> +0.0674; §0z116's "as tivit's" was wrong |
+| [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10186,7 +10194,7 @@ ability; `fetch_waits` now gives it none, in every engine.
 > | Haywire Mite, Bow of Nylea | their activated answers are `ANSWER_NOT_MODELLED`; Haywire Mite still KNOWN_BLIND; Bow's attacking deathtouch **FIXED §0z151**, PARTLY_MODELLED |
 > | Sun Titan, Sylvan Library, Midnight Reaper two ways | **FIXED** by item 24 |
 > | Land Tax, Smothering Tithe two ways | **FIXED §0z151**: one rule each |
-> | Extra turns: tivit vs lorehold | **FIXED §0z153**: lorehold's is a whole turn before the pod, as tivit's |
+> | Extra turns: tivit vs lorehold | **FIXED §0z153**: lorehold's is a whole turn before the pod, as tivit's -- **which was not**: tivit's came after the pod until §0z176 |
 > | Aetherflux Reservoir: trostani on cast, karlov on resolution | **FIXED §0z151**: karlov's fires on cast, countered or not, and for the commander; its pay-50 at every lifegain since §0z153 |
 > | "can't be countered" exists nowhere | **FIXED §0z151** |
 > | Pathways modelled as duals | **FIXED §0z151** |
@@ -14921,6 +14929,557 @@ The Conqueror's T20 fall spans three engine changes since its last
 measurement (§0z155, §0z160, §0z161) and is not attributed among them.
 Item 29 stays open for its two held lines: Necropotence's Tower target and
 holding Enlightened Tutor under the Citadel.
+
+<a id="0z170"></a>
+
+## 0z170. MEASURED -- the adopted policies of §0z160-§0z168, out of sample: all hold, lorehold's at half size, and the clock floor is not an oracle's
+
+**The owner, 2026-11-04**: "please review the simulation repo, would like to
+evaluate the effect of recent changes made." Every policy adopted since
+§0z160 was picked among many arms on seeds 5000.., and the winner of a field
+is graded by the seeds that picked it. `diagnostics/run_policy_recheck.py`
+plays the adopted defaults against the pilot before them on seeds 800000..,
+which chose nothing: N=60,000 paired, the staged list, HEAD `cd35547`,
+python 3.11.17. `results/policy_recheck_20261104.txt`. New minus arm:
+
+| comparison | T10 | T20 | recorded (seeds 5000..) |
+|---|---|---|---|
+| lorehold: §0z168's pilot - the one before (`miracle_reserve` 2, `hold_min_value` 3, the double-counted float) | **+0.0126 ±0.0028** | **+0.0057 ±0.0033** | +0.0163 / +0.0108 (§0z166, N=15,000); +0.0166 / +0.0109 (§0z164, N=60,000, old float) |
+| karlov: §0z160's dig on the clock floor - the old dig on floor 10 | **+0.0114 ±0.0009** | **+0.0073 ±0.0008** | +0.0083 / +0.0065 (dig) + +0.0018 / +0.0007 (floor) |
+| karlov: the clock floor - fixed 10, the dig held | **+0.0013 ±0.0004** | **+0.0006 ±0.0004** | +0.0018 / +0.0007 (§0z161, N=60,000) |
+
+**Karlov replicates.** **Lorehold's change holds at both horizons at about
+half its recorded T20 size**: +0.0057 against +0.0108, a difference inside the
+two bars combined, but the recorded figure was the best of nine arms read on
+the seeds that ranked them. Quote +0.006 at T20, not +0.011. The four staged
+lorehold swaps were re-measured on the adopted pilot (§0z168) and are not
+moved by this.
+
+### Is the clock floor an oracle?
+
+Chip damage is a formula, not a roll (§0z161), and `predicted_chip` reads the
+same `chip_amount` the pod deals -- `test_citadel_dig` N pins that they are
+equal. A pilot who knows the next swing to the point is not a pilot. So the
+pod's ACTUAL swing was given a mean-1 lognormal spread (`--chip-sigma`, one
+CRN-addressed draw per pod turn and opponent, installed in each worker's
+initializer), with the pilot still reading the mean:
+
+| spread on the pod's swing | T10 | T20 | P(win) T20 |
+|---|---|---|---|
+| none (the model) | +0.0013 ±0.0004 * | +0.0006 ±0.0004 * | 0.5529 |
+| sigma 0.5 (CV about 0.53) | +0.0013 ±0.0004 * | +0.0004 ±0.0004 * | 0.5508 |
+| sigma 1.0 (CV about 1.3) | +0.0014 ±0.0004 * | +0.0004 ±0.0005 | 0.5438 |
+
+The patch applied (the baseline falls by 0.009 at sigma 1). **The floor's
+T10 gain does not lean on exact foresight; its T20 gain, already small, is
+inside its bar once the swing is noisy.** It stays the default. Still
+unmeasured and still flattering low floors: a pod that piles onto a player at
+1-3 life (§0z161's own caveat).
+
+### The rest of the review
+
+- `python -m tools.validate`: +0.00 on all 21 metrics of every engine;
+  `python -m tests`: 103 modules pass; `check_docs` and `pending` clean.
+- `docs/STATUS.md` was derived at `9eb3237`, one commit before §0z169, and
+  still called karlov's table uncommitted; regenerated with this section.
+- **The largest open bias is queue item 30, not any of these policies**: no
+  engine discards to seven at cleanup (§0z162).
+
+<a id="0z171"></a>
+
+## 0z171. IMPLEMENTED -- the cleanup step: every engine discards to seven
+
+**The owner, 2026-11-04**: "please model the discard step, this will also
+affect graveyard recursion or synergy cards." Queue item 30, found in
+§0z162: CR 514.1 ("the active player discards down to their maximum hand
+size", seven by CR 402.2) was unmodelled in every engine.
+
+**The rule, once** (`engine.cleanup_step`), called by every engine at the end
+of each of its own turns -- lorehold's and tivit's extra turns included, the
+pod's turns never (only the active player discards):
+
+- **The maximum** is `max_hand_size` (7), lifted by a permanent whose own text
+  says "You have no maximum hand size": `_evasion.NO_MAX_HAND_SIZE`,
+  GENERATED by `tools.tag_flying` from Scryfall (Reliquary Tower, in five
+  lists; Library of Leng). `tag_flying.no_max_hand_size` strips reminder text
+  (Ultima's) and RAISES on any other text about the maximum.
+- **The pick**: the shared want order's tail (`want_order`, §0z139, with each
+  engine's `want_tier` / `lands_wanted` / `land_rank`) -- keep the best seven.
+  Lorehold passes its one discard policy, the rummage's pick (§0z166), so the
+  deck does not discard two ways, and Monument to Endurance fires on each card.
+- **Where it goes**: the graveyard (`put_discarded`), where every reanimation,
+  regrowth, flashback, delirium and "cards in your graveyard" reader already
+  looks -- unless Necropotence is out, which exiles it.
+- **CR 514.3a**: a trigger during cleanup means another cleanup step, so a
+  Monument draw that puts the hand over seven again is discarded again
+  (`cleanup_repeat_max`, 8).
+- `hand_size_rule=False` restores the old games.
+
+**Bit-identity**: with the rule off, every deck's staged list, every output
+key hashed per game, 2,500 seeds at T20, all seven decks: 0 of 17,500 games
+differ from HEAD `d4a8a0a` (python 3.11.17). `tests/test_hand_size.py` pins
+A-I; its four mutations break exactly the sets written before the run.
+
+**Found on its first run: `remove_card` is `list.remove`.** It takes the
+FIRST EQUAL card, so with two Forests in hand the chosen Forest stayed in the
+hand and also went to the graveyard (azusa, seed 6244, which crashed the first
+shift run in `want_order`). The cleanup step removes the object it chose
+(`engine.remove_exact`, test case J). A zone census (an object in two zones at
+a pod round, 1,000 games a deck, rule on and off) then reads 0 for hand +
+graveyard everywhere; an older battlefield + graveyard anomaly in azusa (13
+games in 1,000) and trostani, unchanged by the rule, is queue item 30's
+successor, **item 33**.
+
+**And a pilot defect it uncovered, §0z172**: the first shift had rendmaw and
+shilgengar WINNING more under forced discard. The loop it was breaking --
+a karoo returning itself every turn -- is fixed there, and the shift below is
+measured with that fix in BOTH legs.
+
+### What the rule moves (N=15,000 paired, the tables' N, python 3.11.17)
+
+`diagnostics/run_shared_code_shift.py`, rule off minus rule on, both legs on
+§0z172's guard, `results/hand_size_shift_20261104.txt`. Win rate:
+
+| deck | T10 | T20 | seeds whose result changed (T20) |
+|---|---|---|---|
+| rendmaw | -0.0011 [-0.0019, -0.0004] * | **-0.0039 [-0.0055, -0.0022] *** | 164 |
+| lorehold | **-0.0057 [-0.0084, -0.0029] *** | **-0.0039 [-0.0071, -0.0008] *** | 573 |
+| karlov | +0.0003 [-0.0010, +0.0016] | +0.0007 [-0.0012, +0.0026] | 210 |
+| tivit | -0.0024 [-0.0036, -0.0012] * | **-0.0051 [-0.0068, -0.0033] *** | 180 |
+| shilgengar | -0.0003 [-0.0006, +0.0001] | +0.0008 [-0.0007, +0.0023] | 124 |
+| azusa | -0.0013 [-0.0028, +0.0002] | -0.0013 [-0.0034, +0.0009] | 263 |
+
+**Every deck the rule moves, it moves DOWN, and none by more than about half
+a point** -- the size of a mid-table card row. `stranded_mv` falls in every
+deck (-2.6 to -10.6 a game at T20): those were the cards a real pilot would
+have discarded.
+
+### What is discarded (`diagnostics/run_hand_size.py census`, 3,000 games a deck, T20)
+
+`results/hand_size_census_20261104.txt`. Per game:
+
+| deck | turns over 7 | discards | lands | most often |
+|---|---|---|---|---|
+| azusa | 0.65 (6.7%) | **2.57** | 0.97 | Forest 0.39; then Beast Within, Krosan Grip, Abundance, Hall of Gemstone, Greater Good |
+| lorehold | 0.42 (4.1%) | 0.80 | 0.21 | basics; Caldera Pyremaw, Arcane Bombardment, Double Vision, Sunbird's Invocation (the rummage's pick: permanents first, §0z166) |
+| karlov | 0.44 (4.4%) | 0.79 | 0.60 | Swamp 0.29, Plains 0.22; Necropotence exiled 0.07 |
+| rendmaw | 0.28 (2.6%) | 0.73 | 0.34 | basics; then removal (Culling Ritual, Toxic Deluge) |
+| tivit | 0.31 (2.8%) | 0.37 | 0.13 | answers and council spells |
+| shilgengar | 0.13 (1.2%) | 0.19 | 0.06 | protection, then Angels |
+
+### The graveyard, as the owner asked
+
+The discards land where every recursion card looks. **What that buys is
+small** (rule on minus off, 6,000 paired games, T20, karoo guard in both legs,
+`diagnostics/run_hand_size.py keys`, `results/hand_size_keys_20261104.txt`):
+the only graveyard counter that moves is shilgengar's `single_reanimations`,
++0.0043 ±0.0037 a game; rendmaw's Gloomshrieker, Reap and Whip, lorehold's
+Seminar and Journey, azusa's lands-from-the-graveyard do not move beyond their
+bars. **A first run without the karoo guard read +0.048 shilgengar
+reanimations a game, and that was §0z172's loop, not the discards** -- the
+reason this section measures with the guard in both legs. Shilgengar is level
+because it seldom holds eight (0.19 discards a game), not because its
+reanimation pays the discards back. The pilot does not discard FOR the
+graveyard -- the want order keeps the best seven, it does not ask which
+creature a reanimation would rather find there -- so this is a floor on the
+synergy: a pilot who pitches a fatty to Reya Dawnbringer would do better.
+
+**Not modelled**: Library of Leng's "you may put it on top instead" applies to
+discards an EFFECT causes, not the game rule (and Leng lifts the maximum
+anyway); madness and "whenever you discard" beyond Monument and Necropotence
+appear in no list (Scryfall scan of every listed card, 2026-11-04).
+
+Every active deck's baseline moves, so every cache is SUSPECT by design until
+the batched rebuild.
+
+<a id="0z172"></a>
+
+## 0z172. FIXED -- a karoo played on an empty battlefield returned itself, turn after turn
+
+Found by §0z171's first shift run: forced discarding made **rendmaw and
+shilgengar win MORE** (+0.0031 and +0.0040 at T20, N=15,000), which a rule
+that only removes cards cannot do by itself. The every-key diff
+(`diagnostics/run_hand_size.py keys`) had one counter falling hard,
+`karoo_bounces` (-0.25 a game in rendmaw, -0.15 in shilgengar).
+
+**The defect is a pilot's, in `engine.play_land`.** Its score ranks a land
+by the colours it adds first. On an empty battlefield a two-colour karoo
+(Golgari Rot Farm: "When this land enters, return a land you control to its
+owner's hand") beats every basic, enters, returns ITSELF -- the only land it
+can -- and wins the next turn's drop the same way. In 2,000 rendmaw games with
+the cleanup step off: **887 Rot Farm entries, 567 of them returning itself**.
+The cleanup step broke the loop by discarding the Rot Farm out of a full hand
+(105 discards), and that was the "gain".
+
+**The fix**: while no land is on the battlefield, a karoo is not the drop if
+another land is in hand (`karoo_needs_land`, default True; False restores the
+loop). Alone in hand it is still played -- the drop has no other use, and its
+landfall trigger is real. Three lists run a karoo through `play_land`:
+rendmaw (Golgari Rot Farm), lorehold (Boros Garrison), shilgengar (Orzhov
+Basilica); trostani has its own karoo code and is SUSPENDED. Both switches off,
+every deck, every output key, 2,500 seeds: identical to `d4a8a0a`. The guard
+alone changes 104 / 69 / 83 of 2,500 games in those three decks and 0 in the
+other four. `tests/test_karoo_drop.py` pins A-D, one mutation exact.
+
+**What it is worth** (N=15,000 paired, cleanup step off in both legs,
+`results/karoo_guard_shift_20261104.txt`), win rate:
+
+| deck | T10 | T20 |
+|---|---|---|
+| **rendmaw** (Golgari Rot Farm) | +0.0049 [+0.0037, +0.0060] * | **+0.0115 [+0.0095, +0.0135] *** |
+| **shilgengar** (Orzhov Basilica) | +0.0013 [+0.0007, +0.0019] * | **+0.0098 [+0.0080, +0.0116] *** |
+| **lorehold** (Boros Garrison) | +0.0044 [+0.0032, +0.0056] * | **+0.0059 [+0.0042, +0.0075] *** |
+| karlov, tivit, azusa | 0.0000, every seed identical | 0.0000 |
+
+A full point for rendmaw, from one land's drop. **The policy lesson again**
+(CLAUDE.md, "the biggest corrections were POLICY"): the karoo's row in its
+table read as an ordinary land, and the tell was a counter
+(`karoo_bounces`) moving the wrong way under an unrelated change.
+
+<a id="0z173"></a>
+
+## 0z173. DECIDED -- Necropotence's Tower target adopted, Sylvan Library's floor kept: both re-measured on the cleanup step, out of sample
+
+**The owner, 2026-11-04**: "If the necropotence and sylvan library changes are
+valid, please adopt those as well." Both were measured (§0z162, §0z163) on an
+engine with no maximum hand size, on seeds 5000.. that also picked them
+(§0z170's warning). Re-measured on the cleanup step (§0z171) and the karoo
+guard (§0z172), on seeds 800000.. (`--seed0`, new in both harnesses), python
+3.11.17. Arm minus today's defaults, 95% CI:
+
+**Necropotence** (`run_necro_policy policies`, N=60,000,
+`results/necro_policies_handsize_20261104.txt`):
+
+| arm | T10 | T20 | recorded (§0z162) |
+|---|---|---|---|
+| Tower out: no target (`necro_tower_target` 99) | **+0.0024 ±0.0005 *** | **+0.0011 ±0.0005 *** | +0.0017 / +0.0013 |
+| Tower out: target 20 | +0.0020 ±0.0004 * | +0.0011 ±0.0005 * | +0.0016 / +0.0012 |
+| clock floor + 1 | +0.0000 ±0.0001 | +0.0001 ±0.0002 | +0.0000 / +0.0002 |
+
+**Valid, and ADOPTED**: with Reliquary Tower out the buy has no hand target;
+the life floor (10) and the decking reserve stop it. Without the Tower the
+target is 7, which is now the rule itself -- a card bought past seven is
+discarded at cleanup and exiled by Necropotence's own clause. `necro_tower_target`
+None restores the cap of 7. `tests/test_necro_policy.py` F pins the default.
+The clock floor stays off: nothing over a game, again.
+
+**Sylvan Library** (azusa, `run_sylvan_policy policies`, N=15,000,
+`results/sylvan_policies_handsize_20261104.txt`):
+
+| arm | T10 | T20 |
+|---|---|---|
+| floor 16 | +0.0019 ±0.0016 * | +0.0003 ±0.0019 |
+| floor 24 | -0.0019 ±0.0019 * | -0.0006 ±0.0022 |
+| never pay | -0.0125 ±0.0025 * | -0.0057 ±0.0029 * |
+| pay for at most one | -0.0031 ±0.0022 * | -0.0005 ±0.0025 |
+| clock + 1 | -0.0035 ±0.0022 * | **-0.0099 ±0.0027 *** |
+| six rounds' clock + 1 | -0.0033 ±0.0021 * | +0.0003 ±0.0025 |
+
+**§0z163's answer holds, so there is nothing to adopt**: pay 4 life for the
+better card down to 20. Floor 16 edges it at T10 only, on the edge of its bar,
+and is level at T20 -- the same "16 is level" §0z163 found; no arm beats 20 at
+both horizons, and every clock floor still loses. `library_life_floor` stays
+20.
+
+Karlov's baseline moves with the adoption, inside the batched rebuild.
+
+<a id="0z174"></a>
+
+## 0z174. REBUILT -- six tables for the cleanup step, the karoo guard and the Tower target: nothing moved beyond its bar
+
+The batched rebuild for §0z171 (cleanup step), §0z172 (karoo guard) and
+§0z173 (Necropotence's Tower target), at `75a0852`: six parallel legs (§0z94),
+every leg on python 3.13.18 / numpy 2.4.6, launched 17:49 and the slowest
+(azusa) pushed 18:18 -- **29 minutes wall**. The coordinator reproduced rows
+IDENTICAL under 3.13.16 (`repro_row` karlov Bolas's Citadel, lorehold Library
+of Leng). Trostani is SUSPENDED and was not rebuilt.
+
+**0 of 380 rows moved beyond the wider of their two bars** (win rate, T20,
+`results/rebuild_diffs_20261104.txt`); 13 labels crossed at the floor, and no
+significant row changed sign. The cards the rule should reach moved the way
+it predicts, inside their bars: Necropotence +0.0037 -> +0.0063 (the Tower
+target), Monument to Endurance +0.0092 -> +0.0118 (it fires on cleanup
+discards), Sylvan Library +0.0092 -> +0.0095. That is the expected scale: the
+rule moves a whole deck by at most 0.005 (§0z171), and a leave-one-out row
+reads one card's share of it.
+
+**The twelve staged swaps, in context** (`diagnostics/run_restage.py`,
+N=15,000 paired, python 3.13.16, `results/restage_20261104.txt`):
+
+| swap | T10 | T20 |
+|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0389 ±0.0035 | +0.0281 ±0.0035 |
+| karlov -Swamp +Bolas's Citadel | +0.0123 ±0.0039 | +0.0084 ±0.0042 |
+| karlov -Daxos +South Wind Avatar | +0.0139 ±0.0025 | +0.0109 ±0.0030 |
+| **tivit -Plains +Anointed Procession** | +0.0049 ±0.0040 | **-0.0021 ±0.0046** |
+| azusa -Perilous Forays +Ka-Zar | +0.0065 ±0.0027 | +0.0069 ±0.0034 |
+| azusa -Forest +Fabled Passage | +0.0088 ±0.0044 | +0.0115 ±0.0053 |
+| azusa -Forest +Evolving Wilds | +0.0057 ±0.0045 | +0.0093 ±0.0053 |
+| lorehold -Penance +Caldera Pyremaw | +0.0193 ±0.0033 | +0.0251 ±0.0040 |
+| lorehold -Scroll Rack +Sunbird's Invocation | +0.0168 ±0.0038 | +0.0238 ±0.0047 |
+| lorehold -Boros Charm +Immolating Gyre | +0.0057 ±0.0029 | +0.0195 ±0.0038 |
+| lorehold -Ruby Medallion +Prisoner's Dilemma | +0.0145 ±0.0039 | +0.0113 ±0.0046 |
+| shilgengar -Vampiric Rites +Lyra | +0.0043 ±0.0013 | +0.0096 ±0.0032 |
+
+Eleven stand, significant at both horizons. **Anointed Procession is still
+inside its T20 bar**, as on 2026-10-15 (+0.0007) when the owner kept it on its
+T10 number; the decision stays the owner's. Each Change's `reverified`
+records these. `check_docs` is fully green: every active cache CURRENT.
+
+<a id="0z175"></a>
+
+## 0z175. FIXED -- a token copy shared its original's Card object: one object in two zones, latent
+
+Queue item 33, from §0z171's zone census: at a pod round the same Card OBJECT
+sat on the battlefield (as a permanent's `p.card`) and in the graveyard, in
+azusa and trostani only. `diagnostics/diag_zone_census.py` is that census as
+a tool: every pod round, every zone, by `id()`; battlefield + battlefield is
+many tokens sharing one token Card, by design, and not counted.
+
+**The cause was not §0z171's `remove_card` hazard.** A seed trace (azusa
+5097) stopped in `opponents.destroy`: Tireless Tracker died, its card went to
+the graveyard, and a token on the battlefield still held that object. Two
+sites built a token copy FROM THE ORIGINAL'S CARD, where a copy has the
+original's copiable values (CR 707.2), not its object:
+
+- **azusa, `springheart_landfall`**: `make_permanent(host.card, is_token=True)`
+  -- Lotus Cobra, Tireless Tracker, Courser of Kruphix, Scute Swarm, Mossborn
+  Hydra, Rampaging Baloths;
+- **trostani, `copy_token`** (Bramble Sovereign, populate, Mimic Vat): Wurmcoil
+  Engine, Soul of Eternity, Seedborn Muse, Sakura-Tribe Elder (whose card was
+  once in the HAND while its copy stayed out), Nesting Dovehawk.
+
+Every other token in the seven engines is built from a fresh `Card(...)` --
+myriad, Ballistic Boulder, Starscape Cleric's offspring -- or copies a TOKEN
+(lorehold's Magistrate), and a token never reaches a graveyard.
+
+**The fix**: both sites give the token `dataclasses.replace(card)`, an equal
+card with its own identity (`token_copy_own_card`, default True; False
+restores the sharing). Census, 3,000 games a deck, T20
+(`results/zone_census_20261105.txt`): **9 games in each of azusa and trostani
+before, 0 in all seven decks after.**
+
+**It changed no game measured.** Every deck, every output key, 2,500 seeds:
+the switch off AND the fix on are both identical to HEAD `3bcdc34`; azusa at
+the table's N, 15,000 seeds at T20 (T10 is a prefix of the same games): 0
+differ. `check_unchanged_decks` N=400: all six active decks BIT-IDENTICAL. So
+it was a hazard, not an error yet -- the duplicated object never met code that
+asks "is this the same card" (a reanimation of the card while its copy is out,
+`perm.card is g.commander` if a copy were ever of the commander). Azusa's
+cache is VERIFIED on that evidence; trostani's is SUSPENDED and was not
+re-measured. `tests/test_token_copy.py` pins A-D, one mutation exact.
+
+<a id="0z176"></a>
+
+## 0z176. FIXED -- tivit took its extra turns after the pod's round
+
+**2026-11-06, the owner: "go for tivit first"**, from a read of every engine's
+turn structure against the rules. CR 500.7: "Some effects can give a player
+extra turns. They do this by adding the turns directly after the specified
+turn." Tivit's `take_turn` ended with the pod's round (`OPP.pod_phase`), and
+`simulate` called `take_extra_turns` after it -- so the opponents' chip
+damage, kill clocks, removal and wipes all acted between your turn and the
+turns it had just bought, on the board you left before them. Lorehold was
+fixed for exactly this in §0z153 (`extra_turn_full`). **§0z116's table said
+lorehold's was now "a whole turn before the pod, as tivit's", and tivit's was
+not**: a whole turn, yes, and after the pod. The claim cited a section, the
+section resolved, and every check passed (§0z127's shape). Its row is
+corrected in place.
+
+**The fix.** The round is one function, `tivit.play_round`: your turn, the
+extra turns it bought (the chain, `take_extra_turns`, unchanged), then
+`pod_round` -- one pod round per round, on the board the LAST extra turn left.
+`simulate`, `tests/test_time_sieve.py`'s driver and
+`diagnostics/diag_time_sieve.py` all call it; each had its own copy of the
+loop, which is how a loop drifts (§0z30). `extra_turns_before_pod` (default
+True) is the switch; False is the old order, run by the same code.
+`extra_turns_skip_opponents=False`, §0z86's legacy "an extra turn buys the pod
+a round", still works under either order.
+
+**The switch off is the old engine.** `check_unchanged_decks
+--cfg=extra_turns_before_pod=False` against HEAD `618335f`, N=400: all six
+active decks BIT-IDENTICAL. With it on, only tivit moves (+0.045 win rate at
+N=400). `tools.validate`: +0.00 on every metric of every engine.
+
+**The measurement** (`diagnostics/run_tivit_extra_order.py`, the staged list
+both legs, N=15,000 paired, seeds 5000..19999, today's pod, python 3.13.16 /
+numpy 2.4.6, `results/tivit_extra_order_20261106.txt`; the same run on 3.11
+gave the same two headline figures):
+
+| | T10 | T20 |
+|---|---|---|
+| before the pod minus after it | **+0.0291 ±0.0030** | **+0.0381 ±0.0034** |
+| in the 4,751 games (31.7%) where either leg takes an extra turn | +0.0920 ±0.0091 | +0.1204 ±0.0104 |
+
+**The identity check holds**: the two orders differ only in a round with an
+extra turn, and of the 10,249 games where neither leg takes one, **0 differ**
+on any output key. So the whole move is in the games the rule reaches. Its
+mechanism counters move the way the rule says: `lost` -0.0381 (the clocks no
+longer fire between your turn and its extras), `removal_eaten` -0.047 and
+`ae_removal_eaten` -0.024, `final_life` +1.57, `extra_turns_taken` +0.145
+(Time Sieve's chain survives to keep going: `sieve_chain_max` up),
+`pod_rounds` -0.31 (games end sooner). **One counter moved against the grain
+at the smoke run's N=400 and not at 15,000**: `token_drain` fell 189 -> 157
+on 400 seeds, and one seed (5193: 9,624 in the old leg, 0 in the new, both
+won) carried most of it -- it is an uncapped POD TOTAL, so a winning turn's
+overkill lands in it whole. At N=15,000 it RISES, 61.9 -> 65.3. Overkill, not
+a misplay; win rate is the objective (§0t).
+
+**Why it is this large.** On the new engine, 2,000 games of the staged list
+at T20: tivit takes an extra turn in **32% of its games, 1.06 a game**
+(Plea for Power, Expropriate, Time Sieve's chain), and wins **0.92 of
+those against 0.44 of the rest** -- a correlation, not a cause, but it says
+the extra turn sits in the games tivit is closing out. The old order gave the
+pod a full round -- a kill clock, a wipe -- at exactly that point. Lorehold
+takes one in 13% of its games, **0.17 a game**, and its same fix was +0.0047
+/ +0.0046 (§0z153).
+
+**The table, rebuilt** (`DECKS=tivit ./tools/regen_tables.sh` at `3d8d93b`,
+python 3.13.16 / numpy 2.4.6 -- the tables' interpreter, §0z119:
+`repro_row` reproduces karlov's Bolas's Citadel and tivit's Time Sieve
+IDENTICAL; `results/rebuild_diff_tivit_20261106.txt`). **5 of 65 rows moved
+beyond the wider of their two bars**, every one the way the rule says:
+
+| card | win rate T20 before | after |
+|---|---|---|
+| Time Sieve | +0.0407 ±0.0046 | **+0.0674 ±0.0050** |
+| Demonic Tutor | +0.0255 ±0.0034 | **+0.0374 ±0.0037** |
+| Expropriate | +0.0189 ±0.0024 | **+0.0261 ±0.0027** |
+| Mirkwood Bats | +0.0223 ±0.0034 | +0.0175 ±0.0032 |
+| Torment of Hailfire | +0.0095 ±0.0025 | +0.0067 ±0.0024 |
+
+The extra-turn cards rise, and the tutor that finds them; two drains fall,
+since a game the extra turns now close is a game a drain is needed in less.
+Five labels changed inside their bars; **Coercive Portal reads `win` at
+-0.0039** (it was `--` at -0.0013) -- a negative row is a redundancy signal
+before it is a cut (§0z36), and the deck decision is the owner's. A first
+build on the container's default python 3.11.17 was discarded for the
+interpreter; it agreed with the 3.13 table to ±0.0001 on every row.
+
+**The staged swap** (`diagnostics.run_restage`, in context, N=15,000,
+`results/restage_20261106.txt`): **-Plains +Anointed Procession +0.0043
+±0.0040 at T10, -0.0043 ±0.0045 at T20** -- still inside its T20 bar, as at
+§0z174 (-0.0021), and the owner's decision, as then. Its `reverified` records
+it.
+
+`tests/test_extra_turn_order.py` pins A-G with three mutations, exact sets.
+Its first two mutation runs failed on the TEST, not the engine (a stand-in
+that ran the pod twice, then a win set after the turn instead of during it);
+the docstring says how, and the expected sets are as first written.
+
+<a id="0z177"></a>
+
+## 0z177. FIXED -- azusa's floating mana lasted the turn: it empties at each phase's end now
+
+**2026-11-07, the owner: "do the azusa mana bug next"**, the second of the
+turn-structure findings that produced §0z176. CR 500.5 (2026-08-07 rules):
+"As a step or phase ends ... any unspent mana left in a player's mana pool
+empties." Azusa keeps two pools that are not on the battlefield --
+`bonus_mana` (Lotus Cobra, Nissa, Resurgent Animist, Nykthos, Crystal Vein;
+and Tireless Provisioner's Treasures, which are permanents) and
+`creature_mana` (Castle Garenbrig's six {G}) -- and both were cleared only at
+the start of the next turn. Oracle text verified against Scryfall the same
+day: every one of the five is mana that empties; none says otherwise. So:
+
+- **within your turn**, main phase 1's leftover paid for combat and for the
+  second main phase -- the land step, `activations`, the cards the first
+  main could not afford;
+- **into the pod's turn**: `response_pay` reads `available_mana()`, which
+  offered main phase 2's unspent floating mana to every instant-speed
+  response on the opponents' turns (§0z134).
+
+Rendmaw has always emptied its own pool between steps (`engine.empty_mana_pool`,
+Davvol's {B}); azusa never did.
+
+**The fix, two parts.**
+
+1. **The rule** (`azusa_pool_empties`, default True):
+   `AzusaGame.empty_mana_pool(where)` at the end of main phase 1 (after
+   `precombat_step`, which spends "the mana the main phase left"), at the
+   end of combat, and at the end of main phase 2. Upkeep and the draw step
+   make no floating mana in this engine. Treasures keep. What it empties is
+   counted -- `floating_mana_lost`, by boundary (`floating_lost_main1`,
+   `_combat`, `_main2`) and Castle's part (`castle_mana_lost`).
+2. **The pilot** (`azusa_floating_first`, default True; inert without the
+   rule): a pilot pays with mana that is about to vanish before tapping a
+   land that keeps. Floating units were weighted `(9, 0, 0)` -- spent LAST,
+   behind every land -- which was harmless while they lasted the turn, and
+   is the wrong order once they do not. They are `(-1, 0, 0)` now, ahead of a
+   land (rank 0) wherever the solver's earlier keys tie: a Lotus Cobra {G}
+   against a Forest. A Treasure keeps `(9, 0, 0)`. **This is a policy, and
+   mine, said out loud**: it was adopted on the dominance argument and the
+   measurement below, and `azusa_floating_first=False` reverts it. It does
+   NOT reach Nissa's point -- a six-colour unit sorts behind a Forest on the
+   solver's colour keys before the weight is read; that would need a change
+   to `engine._can_pay` and every deck's fingerprint, for a share of 0.66
+   points a game.
+
+**Both switches off are the old engine.** `check_unchanged_decks
+--cfg=azusa_pool_empties=False` against HEAD `1b6fa2b`, N=400: all six
+active decks BIT-IDENTICAL; with the defaults only azusa moves.
+`tools.validate`: +0.00 on all 21 metrics.
+
+**The measurement** (`diagnostics/run_knob_ab.py`, new, the staged list both
+legs, N=15,000 paired, seeds 5000..19999, python 3.13.16 / numpy 2.4.6; it
+reproduces §0z176's `run_tivit_extra_order` figure for figure on tivit):
+
+| arm | T10 | T20 | file |
+|---|---|---|---|
+| the rule alone, old payment order | **-0.0023 ±0.0012** | **-0.0023 ±0.0014** | `results/azusa_pool_rule_only_20261107.txt` |
+| floating first, given the rule | +0.0013 ±0.0011 | +0.0012 ±0.0012 | `results/azusa_floating_first_20261107.txt` |
+| **both, the new default, against HEAD** | **-0.0011 ±0.0013** | **-0.0011 ±0.0015** | `results/azusa_pool_empties_20261107.txt` |
+
+**The identity check holds for the rule alone**: a game in which the rule
+never empties an unspent point is played identically by a pool that never
+empties (by induction over the boundaries), and of the 11,805 such games,
+**0 differ**. It is NOT claimed for the payment order, which taps different
+lands in a game that loses no mana: 160 games differ there and 328 in the
+combined arm, and the tool prints them as not claimed (`--no-identity`).
+
+**Where the mana goes.** With the rule alone, 7.59 points a game are emptied
+-- **6.25 at the end of main phase 1, 1.34 at the end of main 2, none at
+combat, none of it Castle's** -- and `mana_spent` falls only 1.34. Most of it
+was never going to be spent: landfall mana made after the hand ran out of
+anything to cast, carried by the old pool to an untap that cleared it
+anyway. Spending it first recovers 0.66 points of it and +0.40 `mana_spent`;
+what is left is the deferral this engine already makes on purpose --
+`activations` (Clues, Cryptic Caves, Eye of Ugin) waits for after combat "so
+that its mana is spare" (`precombat_step`'s docstring). A rule that makes a
+new loss possible turns that policy into a claim about it (§0z42): with
+floating mana that empties, a pilot would crack a Clue with main 1's leftover.
+**Not done here**; it is the next question if the 0.001 is worth chasing.
+Responses on the pod's turn: `responses_cast` -0.0021 a game.
+
+**Latent, not fixed**: Nissa, Resurgent Animist's point and Tireless
+Provisioner's Treasure are `frozenset({"W", "U", "B", "R", "G", "C"})`, and
+"one mana of any color" is not colourless (CR 105.1, 106.1). No card in the
+built list has a {C} pip, so nothing pays wrongly today; a candidate that
+has one (Kozilek, the Great Distortion's {C}{C}) would be paid by mana that
+cannot pay it. The same session's rule-number finding is still open too:
+`engine.py` and `lorehold.py` cite 500.4 for mana emptying, which is 500.5 in
+the 2026-08-07 rules.
+
+**The table, rebuilt** (`DECKS=azusa ./tools/regen_tables.sh` at `be72033`,
+python 3.13.16 / numpy 2.4.6; `repro_row` azusa Lotus Cobra IDENTICAL;
+`results/rebuild_diff_azusa_20261107.txt`): **0 of 58 rows moved beyond the
+wider of their two bars**, one label changed (Greater Good `dmg` -> `both`),
+and the largest moves are a thousandth: Lotus Cobra -0.0007, whose mana is
+what empties, Courser of Kruphix +0.0010. That is the expected scale for a
+baseline that moved -0.0011.
+
+**The three staged swaps stand** (`diagnostics.run_restage`, in context,
+N=15,000, `results/restage_20261107.txt`): -Perilous Forays +Ka-Zar +0.0066
+±0.0028 / +0.0072 ±0.0034; -Forest +Fabled Passage +0.0079 ±0.0044 / +0.0100
+±0.0053; -Forest +Evolving Wilds +0.0047 ±0.0044 / +0.0089 ±0.0053 -- all
+significant at both horizons, Evolving Wilds at T10 by 0.0003. Each Change's
+`reverified` records them.
+
+`tests/test_pool_empties.py` pins A-J with three mutations, exact sets; its
+first mutation run failed on the TEST twice (a stand-in that rewrote the empty
+instead of running it, and a case that asserted more than its label), and the
+docstring says how. `tests/test_floating_mana.py` case E now names the old
+payment order it needs: it asks whether `spend` consumes only what it was
+assigned, and the solver assigns the floating point first since this fix.
 
 ## How to read an ablation table
 

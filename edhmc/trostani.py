@@ -130,7 +130,7 @@ from __future__ import annotations
 
 import dataclasses
 
-from edhmc.engine import (begin_game, BaseGame, Board, Card, Permanent, Metrics,
+from edhmc.engine import (cleanup_step, begin_game, BaseGame, Board, Card, Permanent, Metrics,
                           sun_titan_pick,
                           Snapshots, finish, lookahead_pick, can_pay,
                           available_mana as shared_available_mana, spend,
@@ -610,6 +610,12 @@ class TrostaniGame(BaseGame):
         if card.name in LEGENDARY and self.has(card.name):
             self.m["legend_rule_declined"] += 1
             return []
+        # THE TOKEN'S OWN CARD (§0z175): Bramble Sovereign's copy shared the
+        # entering creature's Card OBJECT, so when that creature died or was
+        # bounced its card sat in the graveyard (or hand) while the token held
+        # it. `token_copy_own_card=False` restores the sharing.
+        if self.cfg.get("token_copy_own_card", True):
+            card = dataclasses.replace(card)
         return self.create_tokens(card, n, **kw)
 
     def token_value(self, perm) -> float:
@@ -1852,6 +1858,7 @@ def take_turn(g):
     g.m["mana_floated"] += len(g.available_mana())
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)
 
+    cleanup_step(g)                # discard to seven, CR 514.1, §0z171
     if g.result is None:
         g.seedborn_turns()
     if g.result is None and g.cfg.get("opponents", True):

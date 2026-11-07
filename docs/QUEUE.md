@@ -99,25 +99,12 @@ What is closed and where it went:
     - **The karlov rebuild is DONE** (the owner, 2026-11-03; §0z169): 0 rows
       moved, the cache CURRENT, the Citadel swap +0.0121 / +0.0088 on the
       clock floor, all three staged swaps standing.
-    - **Necropotence with Reliquary Tower (§0z162), an owner call to batch
-      with the rebuild above, HELD by the owner 2026-11-02** ("hold the
-      decision for now"): buy past seven while the Tower is out
-      (`necro_tower_target` 99, bounded by the floor and the decking
-      reserve; 20 is the same): +0.0017 / +0.0013 at T10 / T20, N=60,000.
-      The clock floor adds nothing for this card over a game.
+    - **Necropotence with Reliquary Tower is ADOPTED** (the owner,
+      2026-11-04, §0z173): `necro_tower_target` 99, re-measured out of
+      sample on the cleanup step, +0.0024 / +0.0011.
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.
-
-30. **Maximum hand size is unmodelled in every engine** (CR 402.2, 514.1;
-    found in §0z162). Nothing discards to seven at cleanup, so every draw
-    engine and every "draw more" policy is flattered: 7.9% of karlov's end
-    steps without Reliquary Tower hold more than seven, 3.5 over on average.
-    A shared cleanup step in each engine's turn (which cards to discard is a
-    pilot's choice: the want order's worst), Reliquary Tower and its kin
-    lifting it, Necropotence's exile clause live. Measure the shift per deck
-    at the tables' N before deciding (§0z30: its size is not guessable); it
-    moves every baseline, so it is a batched rebuild.
 
 32. **The deferral protocol (the owner, 2026-11-02; §0z165).** A deferral is
     a bet: the pilot acts unless a measured payoff says wait. Done, read-only:
@@ -139,3 +126,57 @@ What is closed and where it went:
       is, with its check.
     - **Then the CLAUDE.md lesson**, once a second deck's hold is measured:
       a deferral is a bet, and the default is to act.
+
+34. **Archive, then delete, the five pre-restart branches (the owner,
+    2026-11-06).** `main`'s history was restarted on 2026-10-09 (root
+    `5bc742a`). These five branches predate that and have a different root
+    (`35f58f4`), so they share no history with `main`. They were found
+    because the owner suspected an agent had pulled one of them, and they are
+    still there to be pulled. Every one is superseded: its `KNOWN_ISSUES.md`
+    stops at §0z15 or earlier.
+
+    | branch | tip | tag to create |
+    |---|---|---|
+    | `combat-split-and-bounded-damage` | `d158724` | `archive/combat-split-and-bounded-damage` |
+    | `fix/engine-batch-0z9-0z15` | `fe9d4af` | `archive/fix/engine-batch-0z9-0z15` |
+    | `perf/ablation-runtime-and-n15000` | `9a33cba` | `archive/perf/ablation-runtime-and-n15000` |
+    | `pod-model-v3-and-candidate-evaluation` | `d6a40bd` | `archive/pod-model-v3-and-candidate-evaluation` |
+    | `reverify-oracle-2026-09-05` | `a207dad` | `archive/reverify-oracle-2026-09-05` |
+
+    The session that found them made the tags and could not push them: its
+    git proxy allowed pushes to its own branch only (HTTP 403 from the
+    proxy, not from GitHub). The owner has since widened the permissions,
+    which reach new sessions. The owner has no machine of their own to run
+    git on, so a session does this. **Order matters: a deleted branch whose
+    tag never reached GitHub is gone.**
+    - Check first that each tip in the table is still the branch's tip
+      (`git rev-parse origin/<branch>`). If one moved, stop and ask the owner.
+    - Create each tag as an annotated tag (`git tag -a archive/<branch>
+      origin/<branch>`) and push them (`git push origin
+      'refs/tags/archive/*:refs/tags/archive/*'`).
+    - Confirm all five tags are on GitHub and point at the tips in the table
+      (`git ls-remote --tags origin 'archive/*'`; read the `^{}` lines).
+    - Only then delete the branches (`git push origin --delete <branch> ...`)
+      and confirm with `git ls-remote --heads origin` that only `main` and
+      the working branch are left.
+    - Close this item to `docs/HISTORY.md`.
+
+    If the push is refused again, the permissions still have not reached
+    the session. Leave the branches and tell the owner.
+
+    **Second attempt, 2026-11-06: the archive is done; the deletes are the
+    owner's.** The five tips still matched the table. The tag push was
+    refused by the session's git proxy (HTTP 403, `ERR push contains a ref
+    outside refs/heads/*; only branch updates are permitted.`), so the owner
+    chose to archive them as branches instead. Each is now on GitHub as
+    `archive/<branch>` (for example `archive/fix/engine-batch-0z9-0z15`),
+    checked with `git ls-remote --heads origin` to point at the tip in the
+    table. The local annotated tags were not pushed and are not needed.
+    Deleting the five originals was then refused too (`ERR branch deletion
+    is not allowed.`), and the GitHub tools in a session have no branch
+    delete. **What is left is the owner's, on github.com**: open the
+    repository's Branches page and delete the five ORIGINAL names in the
+    table, NOT the `archive/...` ones. After that, `git ls-remote --heads
+    origin` should list `main`, the working branch and the five `archive/`
+    branches only, and this item closes to `docs/HISTORY.md`. Agents can
+    still pull an `archive/` branch, but the name says what it is.

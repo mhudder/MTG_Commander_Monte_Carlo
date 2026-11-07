@@ -55,9 +55,9 @@ def check(label, got, want):
           + ("" if ok else f"   got {got!r}, want {want!r}"))
 
 
-def fresh(points=0, lands=0):
+def fresh(points=0, lands=0, **cfg):
     deck, cmd = M.build()
-    g = AzusaGame(deck, cmd, dict(DEFAULT_CFG, turns=20), 1234)
+    g = AzusaGame(deck, cmd, dict(DEFAULT_CFG, turns=20, **cfg), 1234)
     g.board = EN.Board()
     g.bonus_mana = [AZ.FloatingMana(frozenset({"G"})) for _ in range(points)]
     for i in range(lands):
@@ -113,7 +113,11 @@ def run_cases():
           len(g.bonus_mana), 0)
 
     # ---- E: a land payment does not consume floating mana -----------------
-    g = fresh(points=1, lands=2)
+    # The OLD payment order, in which the solver chose the two lands: since
+    # §0z177 it spends a floating point FIRST (`azusa_floating_first`), and
+    # the question here is whether `spend` consumes only what it was ASSIGNED,
+    # whichever units those are.
+    g = fresh(points=1, lands=2, azusa_floating_first=False)
     units = g.available_mana()
     # pay {G}{G}: two lands can cover it, and a correct `spend` taps the two
     # lands it was assigned rather than reaching into the floating pool.

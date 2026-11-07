@@ -1,0 +1,3 @@
+§0z176: tivit's staged swap re-measured in context on the extra-turns-before-the-pod engine (3d8d93b), N=15,000 paired, seeds 5000.., python 3.13.16 / numpy 2.4.6 (diagnostics.run_restage 15000 OUT T T_noProc; --report)
+
+tivit   -Plains +Anointed Procession                  T10 +0.0043 +-0.0040*  T20 -0.0043 +-0.0045   dmgT20 -2.66 +-0.34
