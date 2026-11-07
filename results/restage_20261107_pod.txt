@@ -1,0 +1,14 @@
+§0z179: every staged swap re-measured in context on the seat-turn engine (b7f3788), N=15,000 paired, seeds 5000.., python 3.13.16 / numpy 2.4.6 (diagnostics.run_restage 15000 OUT <all 17 arms>, into an empty OUT; --report)
+
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0387 +-0.0035*  T20 +0.0283 +-0.0035*  dmgT20 -4.20 +-0.28
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0125 +-0.0039*  T20 +0.0091 +-0.0042*  dmgT20 -0.22 +-0.26
+karlov  -Daxos, Blessed by the Sun +South Wind Avatar T10 +0.0137 +-0.0026*  T20 +0.0116 +-0.0030*  dmgT20 +0.39 +-0.17
+tivit   -Plains +Anointed Procession                  T10 +0.0047 +-0.0039*  T20 -0.0011 +-0.0044   dmgT20 -2.51 +-0.34
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0070 +-0.0027*  T20 +0.0066 +-0.0035*  dmgT20 +1.01 +-0.21
+azusa   -Forest +Fabled Passage                       T10 +0.0076 +-0.0044*  T20 +0.0099 +-0.0054*  dmgT20 +0.59 +-0.33
+azusa   -Forest +Evolving Wilds                       T10 +0.0048 +-0.0044*  T20 +0.0093 +-0.0053*  dmgT20 +0.43 +-0.34
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0231 +-0.0034*  T20 +0.0269 +-0.0041*  dmgT20 +2.73 +-0.27
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0206 +-0.0040*  T20 +0.0267 +-0.0048*  dmgT20 +2.12 +-0.30
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0063 +-0.0030*  T20 +0.0231 +-0.0040*  dmgT20 +0.95 +-0.20
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0143 +-0.0041*  T20 +0.0133 +-0.0048*  dmgT20 +3.65 +-0.28
+shilgengar -Vampiric Rites +Lyra, Archangel of Dawn   T10 +0.0038 +-0.0013*  T20 +0.0090 +-0.0032*  dmgT20 +1.29 +-0.17

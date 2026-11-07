@@ -232,6 +232,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z177](#0z177) | FIXED | **Azusa's floating mana lasted the turn** (CR 500.5): main 1's paid for main 2, main 2's for the pod's turn. Emptied per phase, and spent first: -0.0011 / -0.0011, inside the bars; the rule alone -0.0023 |
 | [0z178](#0z178) | FIXED | **Apex of Power made ten from ANY cast, not only from the hand, and its pool lasted the turn**: -0.0036 / -0.0043, nearly all the hand clause. And the rule cited for mana emptying was 500.4; it is 106.4 / 500.5 |
 | [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**: -0.005 to -0.013 at T20 per deck (removal before growth; seats act before a later kill). Lorehold's upkeep windows moved in: +0.0416 alone, +0.0335 in all |
+| [0z180](#0z180) | REBUILT | **Six tables rebuilt for §0z179** (parallel, 12.7 min wall): lorehold 11 rows up beyond their bars, all miracle payoffs; rendmaw 1; the rest 0. 11 of 12 staged swaps stand at both horizons |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15719,6 +15720,60 @@ first runs failed on the TEST three times (a lambda bound to the previous
 case's log, an attribute read that crashed instead of failing, a turn-start
 board overwritten by the later step), and its docstring says how.
 `tests/test_mulligan_and_pod_order.py`'s case F pins the old round by name.
+
+<a id="0z180"></a>
+
+## 0z180. REBUILT -- six tables for the pod's round as seat turns
+
+The batched rebuild §0z179 called for, the owner's choice of method (§0z94):
+six parallel legs at `b7f3788`, every leg on python 3.13.18 / numpy 2.4.6
+(pins `numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), launched 20:13:25 and
+the slowest (azusa) pushed 20:26:08 -- **12.7 minutes wall**. The coordinator
+reproduced rows IDENTICAL under 3.13.16 (`repro_row` lorehold Apex of Power,
+rendmaw Sol Ring). Every active cache is CURRENT; trostani is SUSPENDED and
+was not rebuilt.
+
+**What moved beyond the wider of a row's two bars** (win rate, T20,
+`results/rebuild_diffs_20261107.txt`):
+
+| deck | rows moved | which |
+|---|---|---|
+| lorehold | **11 of 65, all up** | Sunbird's Invocation +0.0080 -> +0.0151, Library of Leng +0.0011 -> +0.0073 (`--` -> `both`), Restoration Seminar +0.0232 -> +0.0297, Immolating Gyre +0.0203 -> +0.0253, Gamble, Rise of the Eldrazi, Improvisation Capstone, Smothering Tithe, Mizzix's Mastery, Dawn's Truce, Profound Journey |
+| rendmaw | 1 of 64 | Biotransference +0.0043 -> +0.0019 |
+| karlov, tivit, shilgengar, azusa | 0 | labels changed at the floor only |
+
+**Lorehold's are the windows' rows**, as §0z179 predicts: 29% more
+opponent-upkeep miracle windows make every card that pays off a miracle, a
+card on top, or a rummage worth more -- Library of Leng is the rummage's
+redirect to the top, and went from unmeasurable to `both`. Elsewhere the seat
+order moved each deck's baseline by -0.005 to -0.013 (§0z179) and its rows by
+a thousandth or two: the change is to what the pod does, not to what any one
+card does.
+
+**The twelve staged swaps, in context, on the new engine**
+(`diagnostics.run_restage`, all 17 arms, N=15,000, into an empty output
+directory, `results/restage_20261107_pod.txt`):
+
+| swap | T10 | T20 |
+|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0387 ±0.0035 | +0.0283 ±0.0035 |
+| karlov -Swamp +Bolas's Citadel | +0.0125 ±0.0039 | +0.0091 ±0.0042 |
+| karlov -Daxos +South Wind Avatar | +0.0137 ±0.0026 | +0.0116 ±0.0030 |
+| **tivit -Plains +Anointed Procession** | +0.0047 ±0.0039 | **-0.0011 ±0.0044** |
+| azusa -Perilous Forays +Ka-Zar | +0.0070 ±0.0027 | +0.0066 ±0.0035 |
+| azusa -Forest +Fabled Passage | +0.0076 ±0.0044 | +0.0099 ±0.0054 |
+| azusa -Forest +Evolving Wilds | +0.0048 ±0.0044 | +0.0093 ±0.0053 |
+| lorehold -Penance +Caldera Pyremaw | +0.0231 ±0.0034 | +0.0269 ±0.0041 |
+| lorehold -Scroll Rack +Sunbird's Invocation | +0.0206 ±0.0040 | +0.0267 ±0.0048 |
+| lorehold -Boros Charm +Immolating Gyre | +0.0063 ±0.0030 | +0.0231 ±0.0040 |
+| lorehold -Ruby Medallion +Prisoner's Dilemma | +0.0143 ±0.0041 | +0.0133 ±0.0048 |
+| shilgengar -Vampiric Rites +Lyra | +0.0038 ±0.0013 | +0.0090 ±0.0032 |
+
+Eleven stand, significant at both horizons. **Anointed Procession is inside
+its T20 bar again**, as at §0z174, §0z176 and on 2026-10-15; the decision is
+the owner's, as it was. Each Change's `reverified` records these, placed by
+the ledger's syntax tree.
+
 
 ## How to read an ablation table
 

@@ -1,0 +1,59 @@
+§0z179: six tables rebuilt at b7f3788 in parallel (python 3.13.18 / numpy 2.4.6 legs), against the tables they replaced (as at b7f3788)
+A row MOVED if |new - old| win rate (T20) exceeds the wider of its two 95% CI half-widths.
+
+== rendmaw: 64 rows (64 before; only-old [], only-new []), 1 moved beyond the wider bar; 9 other label changes
+   MOVED Biotransference                      +0.0043+-0.0021 -> +0.0019+-0.0020  (both -> dmg)
+   label Bow of Nylea                         dmg -> both  (+0.0016 -> +0.0023)
+   label Burnished Hart                       both -> dmg  (+0.0035 -> +0.0021)
+   label Culling Ritual                       dmg -> both  (+0.0021 -> +0.0031)
+   label Junk Diver                           dmg -> both  (+0.0015 -> +0.0029)
+   label Leaden Myr                           win -> --  (+0.0023 -> +0.0015)
+   label Myr Retriever                        win -> both  (+0.0029 -> +0.0027)
+   label Primal Vigor                         dmg -> both  (+0.0016 -> +0.0023)
+   label Pygmy Kavu                           both -> dmg  (+0.0025 -> +0.0021)
+   label Steel Overseer                       dmg -> both  (+0.0022 -> +0.0025)
+   largest falls: Biotransference -0.0024, Burnished Hart -0.0014, Foundry Inspector -0.0011, Overlord of the Hauntwoods -0.0011
+   largest rises: Tendershoot Dryad +0.0016, Blood Artist +0.0018, Coat of Arms +0.0019, Sol Ring +0.0020
+== lorehold: 65 rows (65 before; only-old [], only-new []), 11 moved beyond the wider bar; 6 other label changes
+   MOVED Dawn's Truce                         +0.0084+-0.0029 -> +0.0119+-0.0031  (both -> both)
+   MOVED Gamble                               +0.0036+-0.0043 -> +0.0081+-0.0044  (dmg -> both)
+   MOVED Immolating Gyre                      +0.0203+-0.0029 -> +0.0253+-0.0031  (both -> both)
+   MOVED Improvisation Capstone               +0.0319+-0.0034 -> +0.0361+-0.0036  (both -> both)
+   MOVED Library of Leng                      +0.0011+-0.0037 -> +0.0073+-0.0040  (-- -> both)
+   MOVED Mizzix's Mastery                     +0.0094+-0.0032 -> +0.0133+-0.0034  (both -> both)
+   MOVED Profound Journey                     +0.0155+-0.0029 -> +0.0188+-0.0031  (both -> both)
+   MOVED Restoration Seminar                  +0.0232+-0.0031 -> +0.0297+-0.0032  (both -> both)
+   MOVED Rise of the Eldrazi                  +0.0488+-0.0038 -> +0.0533+-0.0039  (both -> both)
+   MOVED Smothering Tithe                     +0.0070+-0.0039 -> +0.0111+-0.0040  (both -> both)
+   MOVED Sunbird's Invocation                 +0.0080+-0.0042 -> +0.0151+-0.0043  (both -> both)
+   label Approach of the Second Sun           dmg -> both  (+0.0010 -> +0.0037)
+   label Artist's Talent                      dmg -> both  (+0.0035 -> +0.0073)
+   label Bolt Bend                            dmg -> both  (+0.0019 -> +0.0031)
+   label Enlightened Tutor                    dmg -> --  (+0.0005 -> -0.0001)
+   label Mother of Runes                      win -> --  (+0.0028 -> +0.0019)
+   label Soulfire Eruption                    both -> dmg  (+0.0032 -> +0.0028)
+   largest falls: Path to Exile -0.0020, Invoke Calamity -0.0019, Caldera Pyremaw -0.0014, Sensei's Divining Top -0.0014
+   largest rises: Immolating Gyre +0.0050, Library of Leng +0.0062, Restoration Seminar +0.0065, Sunbird's Invocation +0.0071
+== karlov: 64 rows (64 before; only-old [], only-new []), 0 moved beyond the wider bar; 6 other label changes
+   label Blind Obedience                      dmg -> both  (-0.0018 -> -0.0035)
+   label Drana's Emissary                     dmg -> both  (+0.0021 -> +0.0025)
+   label Fountain of Renewal                  dmg -> both  (+0.0015 -> +0.0027)
+   label Kambal, Consul of Allocation         both -> dmg  (+0.0027 -> +0.0025)
+   label Vizkopa Guildmage                    dmg -> both  (+0.0007 -> +0.0029)
+   label Voice of the Blessed                 both -> dmg  (+0.0020 -> +0.0015)
+   largest falls: Blind Obedience -0.0017, Suture Priest -0.0013, Enlightened Tutor -0.0012, Authority of the Consuls -0.0010
+   largest rises: Enduring Tenacity +0.0014, Auriok Champion +0.0016, Path to Exile +0.0018, Vizkopa Guildmage +0.0022
+== tivit: 65 rows (65 before; only-old [], only-new []), 0 moved beyond the wider bar; 3 other label changes
+   label Grudge Keeper                        both -> dmg  (+0.0031 -> +0.0019)
+   label Idyllic Tutor                        both -> win  (+0.0065 -> +0.0085)
+   label Magister of Worth                    -- -> FLIP  (+0.0007 -> +0.0021)
+   largest falls: Messenger Jays -0.0017, Grudge Keeper -0.0012, Mechanized Production -0.0009, Teleportation Circle -0.0008
+   largest rises: Demonic Tutor +0.0017, Sol Ring +0.0020, Idyllic Tutor +0.0020, Dimir Signet +0.0024
+== shilgengar: 64 rows (64 before; only-old [], only-new []), 0 moved beyond the wider bar; 0 other label changes
+
+   largest falls: Emeria's Call // Emeria, Shattered Skyclave -0.0018, Angel of Suffering -0.0015, Marble Diamond -0.0014, Black Market Connections -0.0013
+   largest rises: Massacre Wurm +0.0013, Anguished Unmaking +0.0016, Path to Exile +0.0018, Orzhov Signet +0.0022
+== azusa: 58 rows (58 before; only-old [], only-new []), 0 moved beyond the wider bar; 1 other label changes
+   label Exploration                          dmg -> both  (+0.0024 -> +0.0034)
+   largest falls: Sylvan Library -0.0017, Ka-Zar of the Savage Land -0.0010, Seer's Sundial -0.0009, Titania, Protector of Argoth -0.0008
+   largest rises: Mole Man, Moloid Master +0.0012, Courser of Kruphix +0.0013, Traveling Chocobo +0.0014, Ancient Greenwarden +0.0021
