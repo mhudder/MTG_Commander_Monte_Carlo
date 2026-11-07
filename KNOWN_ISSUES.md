@@ -15565,6 +15565,26 @@ The pool alone empties 0.13 a game; with the hand clause 0.06, at the draw
 step (an Apex drawn and miracled for {2} through Lorehold's grant, its unspent
 ten dying with the step) and main phase 1.
 
+**The table, rebuilt** (`DECKS=lorehold ./tools/regen_tables.sh`, from the
+working tree that is `b674c66`, python 3.13.16 / numpy 2.4.6; `repro_row`
+lorehold Apex of Power IDENTICAL; `results/rebuild_diff_lorehold_20261107.txt`):
+**1 of 65 rows moved beyond the wider of its two bars, and it is Apex of
+Power, +0.0233 ±0.0033 -> +0.0191 ±0.0032.** The next falls are the cards
+whose free casts of it made ten -- The Dawning Archaic -0.0016, Improvisation
+Capstone -0.0010 -- and Sol Ring -0.0020, inside their bars. Two labels
+changed at the floor (Bolt Bend `both` -> `dmg`, Soulfire Eruption `dmg` ->
+`both`).
+
+**The four staged swaps stand** (`diagnostics.run_restage`, in context,
+N=15,000, into an EMPTY output directory, `results/restage_20261107_lorehold.txt`):
+-Penance +Caldera Pyremaw +0.0200 / +0.0261; -Scroll Rack +Sunbird's
+Invocation +0.0158 / +0.0231 (down a thousandth: its free Apex no longer makes
+ten); -Boros Charm +Immolating Gyre +0.0059 / +0.0201; -Ruby Medallion
++Prisoner's Dilemma +0.0147 / +0.0113 -- all significant at both horizons.
+Each Change's `reverified` records them, placed by the ledger's syntax tree:
+a field's position in a `Change(...)` is not fixed, so "the nearest `add=`
+above" names the wrong entry for two of the four.
+
 `tests/test_lorehold_apex_pool.py` pins A-I with two mutations, exact sets.
 `tests/test_lorehold_0f_0i.py`'s Apex case called `apply_spell_effects` with
 its default `from_hand=False` and expected ten; it names the hand cast it

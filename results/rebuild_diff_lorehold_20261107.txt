@@ -1,0 +1,9 @@
+§0z178: lorehold's table rebuilt at b674c66 (Apex's ten only from the hand; its pool empties per phase), python 3.13.16 / numpy 2.4.6, against the table it replaced (§0z174 rebuild, python 3.13.18 / numpy 2.4.6)
+A row MOVED if |new - old| win rate (T20) exceeds the wider of its two 95% CI half-widths.
+
+== lorehold: 65 rows (65 before; only-old [], only-new []), 1 moved beyond the wider bar; 2 other label changes
+   MOVED Apex of Power                        +0.0233+-0.0033 -> +0.0191+-0.0032  (both -> both)
+   label Bolt Bend                            both -> dmg  (+0.0020 -> +0.0019)
+   label Soulfire Eruption                    dmg -> both  (+0.0029 -> +0.0032)
+   largest falls: Apex of Power -0.0042, Sol Ring -0.0020, The Dawning Archaic -0.0016, Improvisation Capstone -0.0010
+   largest rises: Arcane Bombardment +0.0007, Caldera Pyremaw +0.0009, Path to Exile +0.0010, Sensei's Divining Top +0.0010

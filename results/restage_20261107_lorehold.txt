@@ -1,0 +1,6 @@
+§0z178: lorehold's staged swaps re-measured in context on the Apex-fixed engine (b674c66), N=15,000 paired, seeds 5000.., python 3.13.16 / numpy 2.4.6 (diagnostics.run_restage 15000 OUT L L_noCaldera L_noSunbird L_noGyre L_noDilemma, into an empty OUT; --report)
+
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0200 +-0.0033*  T20 +0.0261 +-0.0040*  dmgT20 +2.83 +-0.26
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0158 +-0.0037*  T20 +0.0231 +-0.0047*  dmgT20 +2.14 +-0.29
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0059 +-0.0029*  T20 +0.0201 +-0.0038*  dmgT20 +0.60 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0147 +-0.0039*  T20 +0.0113 +-0.0047*  dmgT20 +3.53 +-0.27

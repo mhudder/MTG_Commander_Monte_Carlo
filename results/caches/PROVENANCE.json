@@ -553,7 +553,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "addc490",
+        "evidence": "2026-11-07, \u00a70z178: the 500.4 -> 500.5 rule citation corrected in engine.py's empty_mana_pool docstring and a tools/ablation.py comment (both in every fingerprint), and lorehold.py's Apex fixes (lorehold only). At addc490 this cache was CURRENT. check_unchanged_decks addc490 (a fresh worktree) vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck, both with the defaults and with lorehold_pool_empties=False; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed hashed: 0 of 2,500 differ.",
+        "fingerprint": "a4effaede3d7a520",
+        "utc": "2026-11-07T02:07:58Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "22fc0ded12db8749",
@@ -1022,12 +1029,19 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "addc490",
+        "evidence": "2026-11-07, \u00a70z178: the 500.4 -> 500.5 rule citation corrected in engine.py's empty_mana_pool docstring and a tools/ablation.py comment (both in every fingerprint), and lorehold.py's Apex fixes (lorehold only). At addc490 this cache was CURRENT. check_unchanged_decks addc490 (a fresh worktree) vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck, both with the defaults and with lorehold_pool_empties=False; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed hashed: 0 of 2,500 differ.",
+        "fingerprint": "b37d5f09cdccf120",
+        "utc": "2026-11-07T02:07:57Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "7bbdb648028e5afc",
-    "built_commit": "75a0852",
-    "built_utc": "2026-11-04T17:52:48Z",
+    "built_at": "f62527f2df3b3372",
+    "built_commit": "addc490",
+    "built_utc": "2026-11-07T02:09:21Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1517,6 +1531,13 @@
         "built_utc": "2026-11-03T19:32:44Z",
         "deck": "lorehold",
         "verified": []
+      },
+      {
+        "built_at": "7bbdb648028e5afc",
+        "built_commit": "75a0852",
+        "built_utc": "2026-11-04T17:52:48Z",
+        "deck": "lorehold",
+        "verified": []
       }
     ],
     "verified": []
@@ -1975,7 +1996,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "addc490",
+        "evidence": "2026-11-07, \u00a70z178: the 500.4 -> 500.5 rule citation corrected in engine.py's empty_mana_pool docstring and a tools/ablation.py comment (both in every fingerprint), and lorehold.py's Apex fixes (lorehold only). At addc490 this cache was CURRENT. check_unchanged_decks addc490 (a fresh worktree) vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck, both with the defaults and with lorehold_pool_empties=False; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed hashed: 0 of 2,500 differ.",
+        "fingerprint": "b0ffa72380083d6d",
+        "utc": "2026-11-07T02:07:57Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "81e54e49f2841eee",
@@ -2473,7 +2501,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "addc490",
+        "evidence": "2026-11-07, \u00a70z178: the 500.4 -> 500.5 rule citation corrected in engine.py's empty_mana_pool docstring and a tools/ablation.py comment (both in every fingerprint), and lorehold.py's Apex fixes (lorehold only). At addc490 this cache was CURRENT. check_unchanged_decks addc490 (a fresh worktree) vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck, both with the defaults and with lorehold_pool_empties=False; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed hashed: 0 of 2,500 differ.",
+        "fingerprint": "f2582e2c0268358e",
+        "utc": "2026-11-07T02:07:57Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "45a05b87d584facb",
@@ -2930,7 +2965,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "addc490",
+        "evidence": "2026-11-07, \u00a70z178: the 500.4 -> 500.5 rule citation corrected in engine.py's empty_mana_pool docstring and a tools/ablation.py comment (both in every fingerprint), and lorehold.py's Apex fixes (lorehold only). At addc490 this cache was CURRENT. check_unchanged_decks addc490 (a fresh worktree) vs the working tree, N=400, python 3.13.16: BIT-IDENTICAL on all 8 metrics for this deck, both with the defaults and with lorehold_pool_empties=False; and every deck's STAGED list (build_pending) played on seeds 5000..7499 in both trees, every output key per seed hashed: 0 of 2,500 differ.",
+        "fingerprint": "9b520b81d8d57c75",
+        "utc": "2026-11-07T02:07:57Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",
