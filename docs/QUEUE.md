@@ -214,6 +214,10 @@ What is closed and where it went:
     - **§0z185 (2026-11-08) adds rendmaw**: its seat upkeeps moved its
       games. ALL SIX active decks are now SUSPECT; this is a full parallel
       rebuild.
+    - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
+      any single engine fix, item 36 included. One batch rebuild of every
+      active table once all the engine work is done; until then the six
+      SUSPECT caches and `check_docs`' one failing check are expected.
     - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
       the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
       leg of `.claude/skills/parallel-rebuild`; then diff against the table it
@@ -236,8 +240,10 @@ What is closed and where it went:
       swing does not need blocking), measured against attacking with all.
       A rule that makes a new loss possible turns the old policy into a
       claim about it (§0z42).
-    - Re-read `incidental_rate`'s calibration against the new count, then one
-      parallel rebuild of every active table.
+    - Re-read `incidental_rate`'s calibration against the new count.
+    - **DO NOT REBUILD AFTER THIS ITEM** (the owner, 2026-11-08): "will do a
+      batch rebuild once all the engine work is done". The tables stay
+      SUSPECT until then; item 35 is that batch.
 
 37. **The smaller turn-structure findings of §0z184 (2, 6-10; 3-5 are
     fixed, §0z185)**, none of
