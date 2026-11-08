@@ -1,0 +1,49 @@
+Bolas's Citadel, the floor on ONE turn (turn_cfg), 120,000 seeds from 5000, T20, python 3.11.17
+24,835 dig turns with the Citadel out. clk+1 (today's policy, replayed) reproduces the baseline on every turn: YES
+cells: P(win) of that floor on that turn minus clk+1, x1000, paired by seed and turn
+
+OVERALL
+  floor         diff      +-   won THAT turn
+  clk+0      -0.0004  0.0010   0.132
+  clk+0.5    +0.0000  0.0007   0.131
+  clk+1      +0.0000  0.0000   0.130
+  clk+1.5    -0.0002  0.0008   0.129
+  clk+2      -0.0010  0.0011   0.127
+  clk+3      -0.0026  0.0013*  0.125
+  clk+4      -0.0040  0.0014*  0.122
+  F7         -0.0016  0.0015*  0.124
+  F10        -0.0041  0.0016*  0.117
+  (clk+1 won THAT turn 0.130; P(win) 0.802)
+
+BY THE LIFE THE TURN BEGAN AT  (diff x1000; * = 95% CI excludes 0; [best] by point estimate)
+  bin          turns P(win)    clk+0 clk+0.5   clk+1 clk+1.5   clk+2   clk+3   clk+4      F7     F10
+  0-10          3099  0.679    -1.3 [ +1.3]    +0.0    +0.0    -1.9    -8.4*  -11.3*   -8.4*  -15.2*
+  10-15         1133  0.718    +1.8    +1.8    +0.0    -1.8    +0.0    -6.2   -10.6 [ +7.1]    -0.9 
+  15-20         1485  0.772    -1.3    +0.0    +0.0    -1.3    -6.1    -7.4   -13.5*[ +1.3]    -4.0 
+  20-25         2122  0.778    +0.5    +0.5    +0.0 [ +3.3]    +0.5    -1.9    -5.2    +2.8    -5.2 
+  25-30         2705  0.801    -1.5    -2.2 [ +0.0]    -2.2    -2.6    -2.6    -1.8    -3.0    -2.2 
+  30-40         6453  0.819    -0.3    -0.3 [ +0.0]    -0.2    -0.5    -0.9    -1.5*   -1.9*   -2.9*
+  40-50         3360  0.838    +0.0 [ +0.3]    +0.0    -0.3    -0.3    -0.6    -1.8    -2.1*   -2.4*
+  50-70         2505  0.861 [ +0.0]    +0.0    +0.0    -0.4    -0.4    -0.8    -0.4    -0.8    -2.0*
+  70+           1973  0.897 [ +0.0]    +0.0    +0.0    +0.0    +0.0    +0.0    +0.0    +0.0    +0.0 
+
+BY THE CHIP DAMAGE ON THE TABLE (next round)  (diff x1000; * = 95% CI excludes 0; [best] by point estimate)
+  bin          turns P(win)    clk+0 clk+0.5   clk+1 clk+1.5   clk+2   clk+3   clk+4      F7     F10
+  0-1           3966  0.807 [ +3.3]*   +2.3*   +0.0    +0.8    -0.8    -1.5    -2.8    -2.8    -4.5 
+  1-2           2833  0.822    -3.9*   -2.5 [ +0.0]    -1.1    -2.5    -5.6*   -9.2*   -9.9*  -13.1*
+  2-3           2550  0.822    -2.0    -1.6    +0.0 [ +0.4]    +0.0    -0.4    +0.0    -3.1    -5.5*
+  3-4           2338  0.828 [ +0.4]    +0.4    +0.0    +0.4    +0.0    -0.4    -2.1    -0.4    -4.3 
+  4-6           5172  0.831    -0.4    -0.2 [ +0.0]    -0.6    -1.4    -2.1    -3.1*   -3.3*   -3.3*
+  6-8           4213  0.802    -2.4 [ +0.2]    +0.0    -0.7    +0.0    -2.1    -4.5*   +0.2    -3.8*
+  8+            3763  0.710    +1.3    +0.3    +0.0    -0.5    -2.4    -5.6*   -6.1*[ +6.6]*   +2.4 
+
+BEST BY LIFE BIN, CHOSEN ON EVEN SEEDS, MEASURED ON ODD (minus clk+1)
+  0-10         picked clk+0.5  on odd seeds -0.0012 +-0.0042
+  10-15        picked F7       on odd seeds +0.0018 +-0.0202
+  15-20        picked F7       on odd seeds +0.0013 +-0.0116
+  20-25        picked clk+1.5  on odd seeds +0.0047 +-0.0061
+  25-30        picked clk+1    on odd seeds +0.0000 +-0.0000
+  30-40        picked clk+1.5  on odd seeds -0.0006 +-0.0012
+  40-50        picked clk+2    on odd seeds -0.0012 +-0.0016
+  50-70        picked clk+0    on odd seeds +0.0000 +-0.0000
+  70+          picked clk+0    on odd seeds +0.0000 +-0.0000

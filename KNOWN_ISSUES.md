@@ -242,6 +242,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z187](#0z187) | FIXED | **§0z184 findings 2, 10; §0z182's leftover**: "until end of turn" ends at YOUR cleanup (514.2), +0.0005 / +0.0006 rendmaw, +0.0003 / +0.0011 azusa; a main-2 land drop, inside the bars; tivit's sick mana, latent |
 | [0z188](#0z188) | FIXED | **Beastmaster Ascension's +5/+5 is static** (611.3a): on at seven quest counters, not only from declare-attackers to your untap; +0.0003 ±0.0003 / +0.0001 ±0.0003, the hold-back keeps fewer home |
 | [0z189](#0z189) | FIXED | **The crack-back read before combat taps your coming attack** (karlov's Citadel floor, §0z186's leftover): 3.06 -> 4.18 life a read; -0.0002 / -0.0003, inside the bars; the floor's pad was tuned on the old read |
+| [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16551,6 +16552,68 @@ less life (`citadel_life_spent` -0.022) and takes fewer cards
 - `tests/test_planned_crack_back.py` pins A-J with five mutations, exact
   sets, written before the first run; all five broke what was written.
 - Karlov's games moved: its cache stays SUSPECT for queue item 35's rebuild.
+
+<a id="0z190"></a>
+
+## 0z190. MEASURED -- the Citadel's clock pad, re-forked on the corrected crack-back: pad 1 stands
+
+**2026-11-08, the owner: "re-fork citadel_clock_pad on the corrected
+crack-back"**, §0z189's "What it leaves" and queue item 29. The question:
+`citadel_clock_pad` 1 was adopted (§0z161) on a main-1 crack-back read about
+1.1 life low, so is a smaller pad now right?
+
+**Method: §0z161's.** `diagnostics/run_citadel_allin.py pads` (a new mode:
+`floors` with `PAD_ARMS`, leaving `FLOOR_ARMS` as
+`results/citadel_floors.txt` ran it). Karlov's staged list, 120,000 seeds
+from 5000, T20, python 3.11.17, today's engine (§0z186's untapped blockers
+and hold-back, `incidental_rate` 0.78, §0z189's planned crack-back -- the
+2026-11-01 fork had none of the three). Each seed is played once on today's
+policy, and every turn whose dig found the Citadel out is replayed under each
+arm ON THAT TURN ONLY (`turn_cfg`). **24,835 dig turns; clk+1, today's
+policy replayed, reproduces the baseline on every turn** (§0z35).
+`results/citadel_pads_20261108.txt`. P(win) at T20 minus clk+1:
+
+| floor on that turn | diff | won THAT turn |
+|---|---|---|
+| clock + 0 | -0.0004 ±0.0010 | 0.132 |
+| clock + 0.5 | +0.0000 ±0.0007 | 0.131 |
+| **clock + 1 (today)** | 0 | 0.130 |
+| clock + 1.5 | -0.0002 ±0.0008 | 0.129 |
+| clock + 2 | -0.0010 ±0.0011 | 0.127 |
+| clock + 3 | **-0.0026 ±0.0013** | 0.125 |
+| clock + 4 | **-0.0040 ±0.0014** | 0.122 |
+| fixed 7 | **-0.0016 ±0.0015** | 0.124 |
+| fixed 10 | **-0.0041 ±0.0016** | 0.117 |
+
+**ANSWER: pad 1 stays.** Pads 0 to 1.5 are a plateau -- every one inside its
+bar against pad 1 -- and from 2 up each step of pad costs win rate, pads 3
+and 4 significantly. A smaller pad wins its own turn a little more often
+(0.132 at pad 0) and gives it back on the pod's next swing, as §0z161's curve
+did. **The top did not move.** The shoulder may have: on the 2026-11-01
+engine pad 2 tied pad 1 (+0.0001), and today it is 0.0010 behind -- inside
+its bar, and three things changed in between (§0z186's rule, its
+`incidental_rate`, §0z189), so the shift is not §0z189's alone and is not
+established. The fixed floors stay behind the clock floor (fixed 10 -0.0041,
+fixed 7 -0.0016).
+
+**By bin** (the file's two grids): no pad other than 1 is best in more than
+two of nine life bins, and the bins' winners do not agree with each other or
+with the chip bins (pad 0 is +0.0033 at 0-1 chip and -0.0039 at 1-2). The
+even-seed picks, measured on the odd seeds, are all inside their bars
+(largest +0.0047 ±0.0061, 20-25 life). There is no conditional rule here
+either.
+
+**Not run, and why**: the whole-game arms. The Citadel digs about 0.2 turns
+a game (§0z161), so a per-turn difference of 0.0004 -- the largest of the
+plateau -- is about 0.0001 a game, under the ±0.0004 that N=60,000 resolved
+in §0z161. The fork is the measurement with the power. Nothing is adopted,
+so §0z170's out-of-sample re-measure has no winner to grade; the
+even/odd split above is this run's own holdout.
+
+**Nothing changes**: no default moved, no game moved, no cache is touched
+by this section. The knobs to say out loud with any Citadel number stay
+`citadel_floor_mode`, `citadel_clock_pad` and `incidental_rate` (§0z161),
+and now `crack_back_planned` (§0z189).
 
 ## How to read an ablation table
 

@@ -102,9 +102,8 @@ What is closed and where it went:
     - **Necropotence with Reliquary Tower is ADOPTED** (the owner,
       2026-11-04, §0z173): `necro_tower_target` 99, re-measured out of
       sample on the cleanup step, +0.0024 / +0.0011.
-    - **Re-fork `citadel_clock_pad` on the corrected crack-back** (§0z189):
-      the pad was adopted on a main-1 read about 1.1 life low. A winner
-      needs §0z170's out-of-sample re-measure.
+    - **The pad re-fork on the corrected crack-back is DONE** (§0z190): pad 1
+      is still the top; 0-1.5 a plateau, 3 and 4 lose. Nothing changed.
     - **Hold Enlightened Tutor while the Citadel is out** (its skip fired 0
       times: the main phase casts it first), and use Ranger of Eos's and
       Land Tax's shuffles on a land on top. Two thirds of digs stop at one.

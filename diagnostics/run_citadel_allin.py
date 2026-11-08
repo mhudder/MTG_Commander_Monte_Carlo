@@ -5,6 +5,10 @@ owner's question -- AT WHAT LIFE IS DIGGING TO 1 FOR THE WIN WORTH IT?
     python -m diagnostics.run_citadel_allin policies N OUT.txt [ARM ...]
     python -m diagnostics.run_citadel_allin forks N OUT.txt
     python -m diagnostics.run_citadel_allin floors N OUT.txt   (§0z161)
+    python -m diagnostics.run_citadel_allin pads N OUT.txt     (§0z190)
+
+    --seed0=S (any mode, last argument) starts the seeds at S instead of
+    5000: the out-of-sample re-measure of a picked arm (§0z170).
 
 `policies`: every arm is `build_pending("karlov")` (Citadel staged) with
 some knobs set, N paired games at T10 and T20 on seeds 5000.., and every
@@ -37,6 +41,11 @@ turn began at and by the chip damage on the table. "Best by bin" is chosen
 on the even seeds and REPORTED on the odd ones, so the pick does not grade
 itself (the winner's curse of taking the max of 17 noisy cells).
 `CITADEL_RAW=path.npy` keeps the per-turn array.
+
+`pads` (§0z190): `floors` with `PAD_ARMS` -- the clock floor's pad from 0 to
+4, around today's 1, and two fixed floors for reference -- re-forked on the
+crack-back read with the coming attack tapped (§0z189). `FLOOR_ARMS` is
+left as `results/citadel_floors.txt` ran it.
 
 Win rate is the objective (CLAUDE.md); `won` at T20 for the forks, because
 the cost of going to 1 lands on the pod's NEXT turns.
@@ -110,6 +119,19 @@ FLOOR_ARMS = (
                          "citadel_clock_rounds": 2,
                          "citadel_clock_pad": float(p)})
        for p in (1, 4)])
+# §0z190: the pad re-fork on the corrected crack-back (§0z189).
+PAD_ARMS = (
+    [(f"clk+{p:g}", {"citadel_floor_mode": "clock",
+                     "citadel_clock_pad": float(p)})
+     for p in (0, 0.5, 1, 1.5, 2, 3, 4)]
+    + [(f"F{f:g}", {"citadel_floor_mode": "fixed",
+                    "citadel_life_floor": float(f)}) for f in (7, 10)])
+ARMS.update({
+    "clock0": {"citadel_floor_mode": "clock", "citadel_clock_pad": 0.0},
+    "clock0_5": {"citadel_floor_mode": "clock", "citadel_clock_pad": 0.5},
+    "clock1_5": {"citadel_floor_mode": "clock", "citadel_clock_pad": 1.5},
+    "clock3": {"citadel_floor_mode": "clock", "citadel_clock_pad": 3.0},
+})
 # The FLOOR_ARMS entry that is today's default policy, replayed: the floors'
 # baseline, which must reproduce the unmodified game on every turn (§0z35).
 # "F10" when results/citadel_floors.txt was run; clk+1 since 2026-11-01.
@@ -289,7 +311,7 @@ def forks(n, out):
 
 
 def _floors_job(args):
-    lo, hi = args
+    lo, hi, arms = args
     from edhmc import karlov as K
     from edhmc import opponents as OPP
     real = K.citadel_step
@@ -313,7 +335,7 @@ def _floors_job(args):
         for turn, tl, life, c1, c2 in list(log):
             row = [s, turn, tl, life, c1, c2, base["won"],
                    float(base["won"] and base["turn_won"] == turn)]
-            for _, knobs in FLOOR_ARMS:
+            for _, knobs in arms:
                 alt = K.simulate(deck, cmd,
                                  dict(cfg, turn_cfg=(turn, knobs)), s)
                 row += [alt["won"], float(alt["won"] and alt["turn_won"] == turn)]
@@ -321,8 +343,8 @@ def _floors_job(args):
     return rows
 
 
-def floors(n, out):
-    jobs = [(lo, min(lo + CHUNK, SEED0 + n))
+def floors(n, out, arms=FLOOR_ARMS):
+    jobs = [(lo, min(lo + CHUNK, SEED0 + n), arms)
             for lo in range(SEED0, SEED0 + n, CHUNK)]
     rows = []
     with Pool(initializer=_init) as pool:
@@ -331,7 +353,7 @@ def floors(n, out):
     a = np.array(rows, dtype=float)
     if os.environ.get("CITADEL_RAW"):
         np.save(os.environ["CITADEL_RAW"], a)
-    names = [nm for nm, _ in FLOOR_ARMS]
+    names = [nm for nm, _ in arms]
     won = {nm: a[:, 8 + 2 * k] for k, nm in enumerate(names)}
     wtt = {nm: a[:, 9 + 2 * k] for k, nm in enumerate(names)}
     base, base_wtt = a[:, 6], a[:, 7]
@@ -402,6 +424,9 @@ def floors(n, out):
 
 
 def main():
+    global SEED0
+    if sys.argv[-1].startswith("--seed0="):
+        SEED0 = int(sys.argv.pop().split("=", 1)[1])
     mode, n, out = sys.argv[1], int(sys.argv[2]), sys.argv[3]
     if mode == "policies":
         arms = sys.argv[4:] or list(ARMS)
@@ -413,6 +438,8 @@ def main():
         forks(n, out)
     elif mode == "floors":
         floors(n, out)
+    elif mode == "pads":
+        floors(n, out, PAD_ARMS)
     else:
         raise SystemExit(__doc__)
 
