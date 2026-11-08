@@ -1064,12 +1064,12 @@ def join_the_collective(g, before):
     g.m["collective_borgs"] += x
 
 
-def make_tokens(g, n, power, toughness, name="token"):
+def make_tokens(g, n, power, toughness, name="token", vigilance=False):
     from edhmc.decks._evasion import FLYING_TOKENS
     for _ in range(int(n)):
         tok = Card(name=f"{name} token", types=frozenset({"Creature"}),
                    power=power, toughness=toughness,
-                   flying=name in FLYING_TOKENS)
+                   flying=name in FLYING_TOKENS, vigilance=vigilance)
         g.board.append(Permanent(card=tok, sick=True, is_token=True))
 
 
@@ -1979,15 +1979,15 @@ def gideons_phalanx(g):
     and/or sorcery cards in your graveyard, creatures you control gain
     indestructible until end of turn."
 
-    The Knights are modelled. VIGILANCE IS INERT HERE, said rather than
-    built: nothing in this pod reads whether your creatures are tapped.
+    The Knights are modelled, with vigilance: an untapped Knight still
+    blocks on the pod's turns (§0z186; it was inert until then).
     SPELL MASTERY IS NOT MODELLED: its indestructible matters only cast in
     response to a wrath, and the pod's removal is one round at the end of
     your turn that no miracle window overlaps -- as a protection spell it
     would need a `PROTECTION` entry that pays seven mana, which
     `try_protect` cannot express. Counted when it WOULD have applied
     (`phalanx_mastery`), so the floor has a size."""
-    make_tokens(g, 4, 2, 2, "Knight")
+    make_tokens(g, 4, 2, 2, "Knight", vigilance=True)     # §0z186
     g.m["phalanx_knights"] += 4
     if sum(1 for c in g.graveyard
            if "Instant" in c.types or "Sorcery" in c.types) >= 2:
@@ -2916,6 +2916,7 @@ def combat(g):
     attackers = [p for p in g.board
                  if p.card.is_creature and not p.tapped and not p.sick
                  and not OPP.holds_back(g, p)]
+    attackers = OPP.hold_back(g, attackers)  # blockers for the pod, §0z186
 
     # The Dawning Archaic: on attack, cast a free instant/sorcery from the yard
     if any(p.card.name == "The Dawning Archaic" for p in attackers):
@@ -2933,7 +2934,8 @@ def combat(g):
     prowess = sum(1 for p in attackers
                   if p.card.name in ("Monastery Mentor", "Monk token"))
     for p in attackers:
-        p.tapped = True
+        if OPP.taps_to_attack(g, p):         # vigilance, §0z186
+            p.tapped = True
     OPP.mother_attack(g, attackers)          # `mother_use="attack"`, §0z118
     # One attack at the whole pod; `dmg` comes back bounded at what could have
     # mattered. Prowess is a flat lump on the swing rather than per-attacker

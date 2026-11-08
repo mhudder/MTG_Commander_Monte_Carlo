@@ -226,21 +226,15 @@ What is closed and where it went:
       rebuild if one is coming.
 
 36. **Your tapped creatures block on the pod's turns (§0z184, finding 1; the
-    owner, 2026-11-08).** `opponents.combat_share` counts every creature you
-    control as a blocker, tapped or not, and about 70% of them are tapped as
-    the pod's round begins in four decks. The decision is the owner's,
-    because `incidental_rate` was calibrated with the old count and the fix
-    moves every deck's table. When it is taken, in order:
-    - Count untapped creatures only, behind a switch whose False is the old
-      engine (identity on every deck), and measure each deck at N=15,000.
-    - Make tivit's `combat` tap its attackers, and read vigilance from
-      Scryfall (a generated set, never hand-tagged) so a vigilant attacker
-      stays untapped.
-    - Then the pilot: a hold-back rule (attack only with what the pod's next
-      swing does not need blocking), measured against attacking with all.
-      A rule that makes a new loss possible turns the old policy into a
-      claim about it (§0z42).
-    - Re-read `incidental_rate`'s calibration against the new count.
+    owner, 2026-11-08). DONE but for one decision (§0z186).** The rule
+    (`untapped_blockers`), vigilance from Scryfall (`_evasion.VIGILANCE`),
+    tivit's attackers tapping and the hold-back pilot (`hold_back`
+    "lethal", adopted) are in; every deck loses 0.041-0.105 at T20 to the
+    rule and the pilot wins back up to 0.005. **Left, the owner's: the
+    calibration.** `diagnostics/fit_pod_knob.py` puts the mean T20 win rate
+    back at the old pod's with `incidental_rate` 0.776 (0.8 also restores
+    the mean game length, 10.42 against 10.43); the default stays 1.0 until
+    the owner adopts it or names another target.
     - **DO NOT REBUILD AFTER THIS ITEM** (the owner, 2026-11-08): "will do a
       batch rebuild once all the engine work is done". The tables stay
       SUSPECT until then; item 35 is that batch.

@@ -238,6 +238,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
 | [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
 | [0z185](#0z185) | FIXED | **§0z184's findings 3-5**: the pod's end steps on pod turns 1-2 (0.1% of games); rendmaw's Tendershoot / Ophiomancer at each opponent's upkeep, **+0.0044 / +0.0036**; lorehold's Chimes / Waterskin one mana an opponent's turn, -0.0004 / -0.0021 |
+| [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**. A hold-back pilot gains back +0.0007 to +0.0053; `incidental_rate` 0.78 restores the mean (owner's call) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16006,7 +16007,7 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    being tapped for yours, is plausibly what `block_share` (0.60) already
    stands for. **`incidental_rate` (1.0, pod v3) was calibrated with this in
    place**, so a fix moves the pod model for every deck and every table: the
-   owner's decision (queue item 36).
+   owner's decision (queue item 36). Fixed in §0z186.
 2. **"UNTIL END OF TURN" OUTLASTS THE CLEANUP STEP** (514.2). Azusa's
    `eot_pt` (Glacier Godmaw, Racetrack Bird), `craterhoof_bonus` and
    `wildspeaker_bonus`, and rendmaw's `stampede_bonus` (Overwhelming
@@ -16145,6 +16146,138 @@ and failed on fix 3, as it should: its want is the new rule now (three end
 steps, still no removal), and a new neighbour J holds the old reading under
 `pod_end_steps_early=False`. Its three mutation sets were predicted
 unchanged before the re-run and are.
+
+<a id="0z186"></a>
+
+## 0z186. FIXED -- your tapped creatures do not block on the pod's turns; vigilance; the hold-back
+
+**2026-11-08, the owner: "now fix #1"** -- §0z184's finding 1, queue item 36,
+in the order the item gave, and with the owner's note on it: **no rebuild**
+after this; one batch rebuild once all the engine work is done (item 35).
+
+### The rule (`untapped_blockers`, default True)
+
+- `opponents.your_creatures` -- the blockers `combat_share` aims the pod's
+  attacks by -- counts your UNTAPPED creatures only (509.1a; yours untap only
+  in your untap step, 502.3). What it leaves out is counted,
+  `tapped_not_blocking`.
+- **Vigilance** (702.20b): `opponents.vigilant(g, perm)` -- the generated
+  `_evasion.VIGILANCE` (`tools.tag_flying`, Scryfall's keywords array,
+  unconditional, grants excluded: Archon of Valor's Reach, Avacyn, Angel of
+  Hope, Elesh Norn, Grand Cenobite, Enduring Vitality, Felidar Sovereign,
+  Giada, Font of Hope, Speaker of the Heavens, Sun Titan, Twilight Shepherd);
+  a token made with it (`Card.vigilance`: Resplendent Angel's Angels, Gideon's
+  Phalanx's Knights, each from its oracle text); Voice of the Blessed at four
+  counters, as `flying_of` reads it; and an engine's grant
+  (`grants_vigilance`: azusa's Glacier Godmaw, `eot_vigilance`). Every
+  engine's attack taps through `opponents.taps_to_attack`; shilgengar's
+  Speaker-by-name rule (§0z153) is the switch-off path only.
+- **Tivit's attackers tap.** Its `combat` never tapped them.
+
+`untapped_blockers=False` is the old engine: every deck's staged list, seeds
+5000..7499, T20, every output key hashed, against a fresh worktree at
+`ee3dceb`: **0 of 2,500 differ in all seven decks.** `tools.validate`:
++0.00 on all 21 metrics.
+
+**The rule alone** (`diagnostics/run_knob_ab.py DECK untapped_blockers
+tapped_not_blocking,vigilant_attacks --cfg=hold_back=False`, the staged list
+both legs, N=15,000 paired, seeds 5000..19999, python 3.13.16 / numpy 2.4.6,
+`results/untapped_blockers_<deck>_20261108.txt`; the identity check holds in
+every deck, 0 differ among the 40 to 1,151 games it never reaches):
+
+| deck | T10 | T20 | `tapped_not_blocking` a game |
+|---|---|---|---|
+| rendmaw | -0.0270 ±0.0028 | **-0.1051 ±0.0052** | 53.9 |
+| tivit | -0.0222 ±0.0024 | **-0.0658 ±0.0040** | 18.6 |
+| azusa | -0.0233 ±0.0025 | **-0.0623 ±0.0040** | 50.1 |
+| shilgengar | +0.0001 ±0.0016 | **-0.0594 ±0.0045** | 25.4 |
+| lorehold | -0.0257 ±0.0026 | **-0.0584 ±0.0039** | 24.4 |
+| karlov | -0.0145 ±0.0023 | **-0.0406 ±0.0036** | 30.1 |
+
+(The count is summed over every `combat_share` read, one a seat a round and
+the pilots' predictions.) The mechanism is the one the rule names: more of
+the pod's swing finds you, so `combat_damage` you take rises and
+`final_life` falls (shilgengar -3.8, azusa -3.1), `lost` up 0.06, games
+shorter (shilgengar -0.57 turns). Rendmaw, which goes widest and attacks with
+all of it, loses most; karlov, the life-gain deck, least. Shilgengar's T10
+is flat because it wins almost nothing by round 10 either way (0.05).
+
+### The pilot (`hold_back`, default "lethal"; `opponents.hold_back`)
+
+A rule that makes a new loss possible turns the old policy into a claim
+about it (§0z42): attacking with everything now has a defensive price. The
+pilot's rule, said out loud: **if the pod's next round (`predicted_chip`,
+read with the would-be attackers tapped) would take you to `hold_back_pad`
+(0) life or below, keep the WEAKEST non-vigilant attackers home, one at a
+time, until it would not; if no number kept home saves you, or the swing's
+damage through covers every living opponent's life, attack with
+everything.** Every engine calls it once its attackers are chosen, before any
+attack trigger (azusa after its animated lands join). The prediction's
+writes to the metrics and the tapped flags are put back, so asking changes
+nothing (pinned, case K). Trostani (SUSPENDED) does not call it.
+
+**Given the rule** (`run_knob_ab DECK hold_back held_back`, A "lethal" minus
+B "none", `results/hold_back_<deck>_20261108.txt`; identity 0 differ in
+every deck):
+
+| deck | T10 | T20 | kept home a game | games reached |
+|---|---|---|---|---|
+| tivit | **+0.0033 ±0.0012** | **+0.0053 ±0.0015** | 0.23 | 10.3% |
+| lorehold | **+0.0020 ±0.0010** | **+0.0037 ±0.0012** | 0.22 | 9.7% |
+| azusa | **+0.0009 ±0.0007** | **+0.0018 ±0.0009** | 0.27 | 8.8% |
+| shilgengar | -0.0003 ±0.0005 | **+0.0017 ±0.0014** | 0.30 | 14.3% |
+| rendmaw | -0.0004 ±0.0010 | +0.0013 ±0.0014 | 0.71 | 22.3% |
+| karlov | +0.0003 ±0.0009 | +0.0007 ±0.0011 | 0.14 | 6.4% |
+
+None loses; four gain at T20. One arm against the old pilot, declared
+before the run -- not the winner of a sweep -- so §0z170's out-of-sample
+re-measure does not apply; a sweep of `hold_back_pad` would need it.
+**Adopted as the default.** It recovers a twentieth of what the rule costs:
+most of the rule's loss is not a misplay but the price of a wide board that
+taps to attack.
+
+### The calibration (`diagnostics/fit_pod_knob.py`, the owner's rule since §0z140)
+
+`incidental_rate` (1.0, pod v3, chosen 2026-09-04 to keep the then win rates
+and game length) was set with tapped creatures blocking. The target, as
+§0z140's: the mean T20 win rate over the six active decks equals the old
+pod's. `fit_pod_knob incidental_rate 0.5,...,1.0 --target=untapped_blockers=False`,
+N=1,500 a deck, staged lists, seeds 5000..6499
+(`results/fit_incidental_rate_20261108.txt`):
+
+| | mean T20 win rate | mean turns |
+|---|---|---|
+| the old pod (target) | 0.4688 | 10.43 |
+| the new rule and pilot, `incidental_rate` 1.0 | 0.4090 | 10.10 |
+| ... 0.9 | 0.4359 | 10.26 |
+| ... 0.8 | 0.4630 | 10.42 |
+| ... 0.7 | 0.4876 | 10.55 |
+
+**The crossing is 0.776**, and at 0.8 the mean game length (10.42) is the old
+pod's too -- the Command Zone's 10.29 is the only anchored figure (the
+POD_V2 note in `edhmc/experiment.py`). **Not adopted here: the owner's decision**, as §0z140's shift
+was. Until it is taken the default stays 1.0, every deck's absolute win rate
+is about 0.06 lower than on the old pod, and paired differences are measured
+on a harder pod than the tables'.
+
+### What it leaves
+
+- `predicted_chip` read in a MAIN PHASE (karlov's Citadel and Necropotence
+  floors, `clock_floor`) counts creatures that will attack and tap later
+  that turn as blockers -- an under-read of the crack-back, said here rather
+  than fixed.
+- Every active deck's games moved: all six caches stay SUSPECT for item 35's
+  batch rebuild, which the owner holds until the engine work is done.
+- `tests/test_untapped_blockers.py` pins A-K with five mutations, exact sets;
+  its docstring records three corrections to the TEST after the first runs
+  (case I's setup, the fourth mutation's set, the fifth's stand-in).
+- **`tests/test_azusa_batch6.py` case Z** read Kozilek's `tapped` as the
+  proof that a creature Glacier Godmaw hasted attacked. Godmaw's text grants
+  vigilance too, read now, so it attacks untapped: Z reads `godmaw_hasted`
+  and expects `tapped` False. Its "Godmaw resolves FIRST" mutation's
+  stand-in copied the Godmaw loop from before this section and granted no
+  vigilance, so it broke Z for a reason that is not the order (§0z141's
+  shape); it grants it now, and its set is as written.
 
 ## How to read an ablation table
 

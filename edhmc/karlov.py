@@ -2376,6 +2376,7 @@ def combat(g):
     if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
         g.m["heliod_animated"] += 1
     attackers = [p for p in g.board if may_attack(g, p)]
+    attackers = OPP.hold_back(g, attackers)    # blockers for the pod, §0z186
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
@@ -2427,7 +2428,8 @@ def combat(g):
     # damage -- it was read as free, permanent team lifelink (§0z115).
     vault_of_the_archangel(g, attackers, lambda c: pay_cost(g, c))
     for p in attackers:
-        p.tapped = True
+        if OPP.taps_to_attack(g, p):       # vigilance, §0z186
+            p.tapped = True
     OPP.rogues_passage(g, attackers, lambda c: pay_cost(g, c))   # §0z107
     OPP.mother_attack(g, attackers)                              # §0z118
     # One attack at the whole pod; `dmg` comes back bounded at what could have

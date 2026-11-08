@@ -445,6 +445,7 @@ class AzusaGame(BaseGame):
         # game anyway (§0z98, §0z100). Reset with the turn, like the bonus.
         self.eot_pt: dict = {}
         self.eot_haste: dict = {}
+        self.eot_vigilance: dict = {}   # Godmaw's vigilance, §0z186
         self.creature_mana: list[frozenset] = []   # Castle Garenbrig's six {G}
         self.animations: list[dict] = []   # live land-animation effects
         # walkers already activated this turn, id -> the walker, HELD so the
@@ -1340,15 +1341,15 @@ class AzusaGame(BaseGame):
                 continue
             for _ in range(reps):
                 # "Creatures you control get +1/+1 and gain vigilance and haste
-                # until end of turn." VIGILANCE IS NOT MODELLED and cannot
-                # matter: `opponents.your_creatures` counts a tapped attacker
-                # as a blocker, so not tapping changes nothing here.
+                # until end of turn." Vigilance is read since §0z186
+                # (`grants_vigilance`): a tapped creature no longer blocks.
                 for p in self.board:
                     if not self.counts_as_creature(p):
                         continue
                     self.add_eot(p, 1, 1)
                     if p.sick and id(p) not in self.eot_haste:
                         self.eot_haste[id(p)] = p
+                    self.eot_vigilance[id(p)] = p
                 self.m["godmaw_pumps"] += 1
 
     def counter_target(self):
@@ -4019,6 +4020,11 @@ class AzusaGame(BaseGame):
             self.m["bristly_activations"] += 1
             self.m["bristly_counters_added"] += total
 
+    def grants_vigilance(self, perm) -> bool:
+        """`opponents.vigilant`'s engine hook: Glacier Godmaw's "gain
+        vigilance ... until end of turn" this turn (§0z186)."""
+        return id(perm) in self.eot_vigilance
+
     def combat(self):
         # GLACIER GODMAW's haste (§0z101): a creature that was sick when one of
         # its triggers resolved this turn may attack. `eot_haste` holds only
@@ -4058,6 +4064,13 @@ class AzusaGame(BaseGame):
                 continue
             attackers.append(p)
             n_animated += 1
+        # BLOCKERS FOR THE POD (§0z186), once the animated lands are in the
+        # attack; `n_animated` counts the ones still sent.
+        if not self.legacy_animation:
+            sent = OPP.hold_back(self, attackers)
+            if len(sent) < len(attackers):
+                n_animated = sum(1 for p in sent if not p.card.is_creature)
+                attackers = sent
         if n_animated:
             self.m["animated_attacks"] += n_animated
             # What the animation was WORTH this combat, defined as its
@@ -4114,7 +4127,8 @@ class AzusaGame(BaseGame):
         # unbounded total for anyone who wants it.
         dmg = OPP.combat_damage(self, attackers)
         for p in attackers:
-            p.tapped = True
+            if OPP.taps_to_attack(self, p):     # vigilance, §0z186
+                p.tapped = True
         self.m["damage"] += dmg
         self.m["combat_damage"] += dmg
         self.damage_by_turn.append(dmg)
@@ -4138,6 +4152,7 @@ def take_turn(g):
     g.wildspeaker_bonus = 0
     g.eot_pt = {}                       # Godmaw / Racetrack Bird pumps
     g.eot_haste = {}                    # Godmaw's haste, §0z101
+    g.eot_vigilance = {}                # Godmaw's vigilance, §0z186
     # Castle Garenbrig's pool empties with the turn, like any unspent mana.
     g.creature_mana = []
     # Floating mana empties with the turn; an unspent Treasure stays (§0z153).

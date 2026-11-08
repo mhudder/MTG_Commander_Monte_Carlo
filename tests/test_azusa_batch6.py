@@ -44,7 +44,9 @@ CASES
   W  Glacier Godmaw's ETB makes a Lander token
   X  a Lander is cracked precombat: a tapped Forest, a landfall, no Lander
   Y  Godmaw's pump and haste reach the tokens the same land made
-  Z  a sick creature Godmaw hasted attacks
+  Z  a sick creature Godmaw hasted attacks -- and, Godmaw's vigilance read
+     since §0z186, attacks UNTAPPED; until then this case read `tapped` as
+     the proof it attacked, and `godmaw_hasted` is that proof now
   AA a +1/+1 counter on a */* card adds to its land count
   AB the land-enabler check reads `_landfall_payoffs` now
   AC the 0/0 check accepts Mossborn Hydra (it enters with a counter)
@@ -357,8 +359,8 @@ def run_cases():
     koz = put(g, named("Kozilek, Butcher of Truth"), sick=True)
     landfall(g, 1)
     g.combat()
-    check("Z a sick creature Godmaw hasted attacks",
-          (koz.tapped, g.m["godmaw_hasted"]), (True, 1))
+    check("Z a sick creature Godmaw hasted attacks, untapped (vigilance)",
+          (koz.tapped, g.m["godmaw_hasted"]), (False, 1))
 
     # ---- the engine fixes the batch depends on ----------------------------
     g = fresh()
@@ -426,6 +428,9 @@ def godmaw_first_payoffs(self, card, played=False, birds=()):
                 self.add_eot(p, 1, 1)
                 if p.sick:
                     self.eot_haste[id(p)] = p
+                # The engine's grant since §0z186; the stand-in differs from
+                # it in ORDER only (§0z141), so it grants vigilance too.
+                self.eot_vigilance[id(p)] = p
     return REAL_PAYOFFS(self, card, played, birds)
 
 

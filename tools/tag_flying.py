@@ -520,6 +520,16 @@ def main():
     defender = {n for n, c in cards.items()
                 if n in creatures and "Defender" in c.get("keywords", [])
                 and "loses defender" not in (c.get("oracle_text") or "").lower()}
+    # VIGILANCE, 2026-11-08 (§0z186): "Attacking doesn't cause this creature
+    # to tap" (702.20b), read by `opponents.vigilant` now that a tapped
+    # creature cannot block on the pod's turns. Trample's rule exactly:
+    # creatures, unconditional, grants excluded -- Glacier Godmaw's "gain
+    # vigilance and haste until end of turn" and Voice of the Blessed's "as
+    # long as ... it has flying and vigilance" are read by their engines.
+    vigilance = {n for n, c in cards.items()
+                 if n in creatures and "Vigilance" in c.get("keywords", [])
+                 and not re.search(r"(gains?|have|has)[^.]*vigilance",
+                                   (c.get("oracle_text") or "").lower())}
 
     # ATTACK TAXES, 2026-10-14 (§0z138): "Creatures can't attack you unless
     # their controller pays {N} for each creature they control that's
@@ -671,6 +681,10 @@ def main():
 
     print(f"\nDEFENDER ({len(defender)}) -- can't attack:")
     for n in sorted(defender):
+        print(f"    {n}")
+
+    print(f"\nVIGILANCE ({len(vigilance)}) -- attacks without tapping:")
+    for n in sorted(vigilance):
         print(f"    {n}")
 
     print(f"\nATTACK TAX ({len(attack_tax)}) -- {{N}} per attacker:")
@@ -833,6 +847,12 @@ def main():
                      "(702.3b: can't\n# attack). Read by rendmaw's `combat` "
                      "(§0z125).\nDEFENDER = {\n")
             for n in sorted(defender):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# VIGILANCE: creatures with the keyword, unconditional "
+                     "(702.20b: attacking\n# doesn't tap them). Read by "
+                     "`opponents.vigilant` (§0z186).\nVIGILANCE = {\n")
+            for n in sorted(vigilance):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# ATTACK TAXES: \"creatures can't attack you unless "

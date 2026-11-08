@@ -533,6 +533,20 @@ DEFENDER = {
     'Sylvan Caryatid',
 }
 
+# VIGILANCE: creatures with the keyword, unconditional (702.20b: attacking
+# doesn't tap them). Read by `opponents.vigilant` (§0z186).
+VIGILANCE = {
+    "Archon of Valor's Reach",
+    'Avacyn, Angel of Hope',
+    'Elesh Norn, Grand Cenobite',
+    'Enduring Vitality',
+    'Felidar Sovereign',
+    'Giada, Font of Hope',
+    'Speaker of the Heavens',
+    'Sun Titan',
+    'Twilight Shepherd',
+}
+
 # ATTACK TAXES: "creatures can't attack you unless their controller
 # pays {N} for each creature ..." -> N. Read by `opponents.attack_tax_through`
 # under `pod_threats` (§0z138).

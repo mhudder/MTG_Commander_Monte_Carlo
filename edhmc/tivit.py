@@ -1401,9 +1401,16 @@ def havengul_end_step(g):
 def combat(g):
     attackers = [p for p in g.board
                  if p.card.is_creature and not p.tapped and not p.sick]
+    attackers = OPP.hold_back(g, attackers)    # blockers for the pod, §0z186
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
+    # DECLARED ATTACKERS TAP (508.1f). This engine never tapped them, which
+    # nothing read until a tapped creature stopped blocking (§0z186).
+    if OPP.untapped_blockers(g):
+        for p in attackers:
+            if OPP.taps_to_attack(g, p):
+                p.tapped = True
     # MEMNARCH'S ATTACK TRIGGER: "Whenever Memnarch attacks, draw a card for
     # each artifact you control." It triggers on DECLARATION, not on damage, so
     # it fires here -- before `combat_damage` and regardless of what gets

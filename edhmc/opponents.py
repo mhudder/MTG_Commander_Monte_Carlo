@@ -3307,8 +3307,110 @@ def your_creatures(g) -> int:
     """
     ask = getattr(g, "counts_as_creature", None)
     if ask is None:
-        return sum(1 for p in g.board if is_creature_now(g, p))
-    return sum(1 for p in g.board if ask(p))
+        mine = [p for p in g.board if is_creature_now(g, p)]
+    else:
+        mine = [p for p in g.board if ask(p)]
+    if not untapped_blockers(g):
+        return len(mine)
+    # ONLY AN UNTAPPED CREATURE BLOCKS (509.1a), and yours untap only in YOUR
+    # untap step (502.3), so an attacker that tapped (508.1f) is no blocker
+    # through the whole pod's round (§0z184 finding 1, §0z186).
+    up = sum(1 for p in mine if not p.tapped)
+    if up < len(mine):
+        g.m["tapped_not_blocking"] += len(mine) - up
+    return up
+
+
+def untapped_blockers(g) -> bool:
+    """§0z186 (`untapped_blockers`, default True): your blockers on the pod's
+    turns are your UNTAPPED creatures, a vigilant attacker does not tap, and
+    tivit's attackers tap. False is the old engine, in which a tapped
+    creature blocked and only Speaker of the Heavens' vigilance was read."""
+    return g.cfg.get("untapped_blockers", True)
+
+
+def vigilant(g, perm) -> bool:
+    """Does this permanent have vigilance right now (702.20b)? The generated
+    `_evasion.VIGILANCE` (Scryfall's keywords, never by hand), a token made
+    with it (`Card.vigilance`), Voice of the Blessed's "as long as this
+    creature has four or more +1/+1 counters on it, it has flying and
+    vigilance" (as `flying_of` reads it), or an engine's until-end-of-turn
+    grant (`g.grants_vigilance(perm)`: azusa's Glacier Godmaw)."""
+    from edhmc.decks._evasion import VIGILANCE
+    c = perm.card
+    if c.name in VIGILANCE or getattr(c, "vigilance", False):
+        return True
+    if c.name == "Voice of the Blessed":
+        return perm.counters >= 4
+    grant = getattr(g, "grants_vigilance", None)
+    return bool(grant is not None and grant(perm))
+
+
+def taps_to_attack(g, perm) -> bool:
+    """Does declaring this attacker tap it (508.1f)? Yes, unless the rule is
+    on and it has vigilance. Every engine's attack taps through this."""
+    if untapped_blockers(g) and vigilant(g, perm):
+        g.m["vigilant_attacks"] += 1
+        return False
+    return True
+
+
+def hold_back(g, attackers) -> list:
+    """THE PILOT'S HOLD-BACK (§0z186, `hold_back`): the attackers to SEND.
+
+    Once a tapped creature stops blocking (`untapped_blockers`), attacking
+    with everything has a price: every creature that taps is one fewer
+    blocker in `combat_share` through the pod's whole round. The rule, a
+    pilot's and not an optimiser's (§0v's shape):
+
+      "lethal" (the default)  if the pod's next round (`predicted_chip`, read
+          with these attackers tapped) would take you to `hold_back_pad` life
+          or below, keep the WEAKEST non-vigilant attackers home, one at a
+          time, until it would not -- and if no number kept home saves you,
+          attack with everything. Never from a swing whose damage through
+          (`damage_through`) covers every living opponent's life.
+      "none"  attack with everything: the old pilot.
+
+    Off the rule, or with the pod off, it is "none". A creature kept home is
+    counted (`held_back`, `hold_back_turns`). Every count the prediction
+    writes is put back, so asking changes nothing."""
+    mode = g.cfg.get("hold_back", "lethal")
+    mode = {True: "lethal", False: "none"}.get(mode, mode)   # run_knob_ab
+    if (mode == "none" or not untapped_blockers(g) or not attackers
+            or not g.cfg.get("opponents", True) or g.result is not None):
+        return attackers
+    living_life = sum(o.life for o in living(g))
+    if living_life <= 0 or damage_through(g, attackers) >= living_life:
+        return attackers
+    pad = g.cfg.get("hold_back_pad", 0.0)
+    life = g.your_life
+
+    def crack(send):
+        snap = dict(g.m)
+        saved = [(p, p.tapped) for p in send]
+        for p in send:
+            if not vigilant(g, p):
+                p.tapped = True
+        try:
+            return predicted_chip(g)
+        finally:
+            for p, t in saved:
+                p.tapped = t
+            g.m.clear()
+            g.m.update(snap)
+
+    if life - crack(attackers) > pad:
+        return attackers
+    home = []
+    for p in sorted((q for q in attackers if not vigilant(g, q)),
+                    key=g.power_of):
+        home.append(p)
+        send = [q for q in attackers if not any(q is h for h in home)]
+        if life - crack(send) > pad:
+            g.m["held_back"] += len(home)
+            g.m["hold_back_turns"] += 1
+            return send
+    return attackers
 
 
 def combat_share(g, opp, others) -> float:

@@ -390,7 +390,7 @@ class ShilgengarGame(BaseGame):
             self.make_permanent(tok, sick=True, is_token=True)
             self.m["spirit_tokens_made"] += 1
 
-    def make_angel_tokens(self, n=1, vigilance=True):
+    def make_angel_tokens(self, n=1, vigilance=False):
         """4/4 white Angel(/Warrior) tokens with flying — Resplendent Angel,
         Speaker of the Heavens, and Emeria's Call all make this exact body.
         Tagged "angel" so Righteous Valkyrie / Giada / Youthful Valkyrie /
@@ -398,7 +398,8 @@ class ShilgengarGame(BaseGame):
         for _ in range(n):
             p, t = ANGEL_TOKEN_STATS
             tok = Card(name="Angel token", types=frozenset({"Creature"}),
-                       power=p, toughness=t, flying=True, tags=frozenset({"angel"}))
+                       power=p, toughness=t, flying=True, vigilance=vigilance,
+                       tags=frozenset({"angel"}))
             counters = 0
             if (self.has("Giada, Font of Hope")
                     and not self.cfg.get("giada_text", True)):
@@ -1279,6 +1280,7 @@ class ShilgengarGame(BaseGame):
                     self.m["bloodghast_hasty"] += 1
         attackers = [p for p in self.board if p.card.is_creature
                     and not p.tapped and not p.sick]
+        attackers = OPP.hold_back(self, attackers)   # for the pod, §0z186
         if not attackers:
             self.damage_by_turn.append(0.0)
             return
@@ -1291,10 +1293,15 @@ class ShilgengarGame(BaseGame):
         vault_of_the_archangel(self, attackers, lambda c: self.pay(c))
 
         for p in attackers:
-            # Speaker of the Heavens has VIGILANCE, read by name for its {T}
-            # (§0z153, `speaker_taps`); nothing else here reads tapping.
-            if not (p.card.name == "Speaker of the Heavens"
-                    and self.cfg.get("speaker_taps", True)):
+            # VIGILANCE (§0z186): every vigilant attacker stays untapped, and
+            # an untapped creature blocks on the pod's turns. Before it, only
+            # Speaker of the Heavens' was read, by name, for its {T} (§0z153,
+            # `speaker_taps`), and that is still the old engine's rule.
+            if OPP.untapped_blockers(self):
+                if OPP.taps_to_attack(self, p):
+                    p.tapped = True
+            elif not (p.card.name == "Speaker of the Heavens"
+                      and self.cfg.get("speaker_taps", True)):
                 p.tapped = True
             # Herald of War: "Whenever this creature attacks, put a +1/+1
             # counter on it." (§0z84)
@@ -1406,7 +1413,8 @@ class ShilgengarGame(BaseGame):
         # than at every gain_life() call so a turn with several small gains is
         # counted correctly.
         if self.has("Resplendent Angel") and self.life_gained_this_turn >= 5:
-            self.make_angel_tokens(1)
+            # "a 4/4 white Angel creature token with flying and vigilance"
+            self.make_angel_tokens(1, vigilance=True)
         self.gain_mark = self.m["life_gained"]      # Resplendent, §0z153
         if (self.has("Speaker of the Heavens") and self._life_threshold()
                 and not self.cfg.get("speaker_taps", True)):
@@ -1448,7 +1456,7 @@ class ShilgengarGame(BaseGame):
         self.gain_mark = self.m["life_gained"]
         if gained >= 5:
             for _ in range(self.count("Resplendent Angel")):
-                self.make_angel_tokens(1)
+                self.make_angel_tokens(1, vigilance=True)      # §0z186
                 self.m["resplendent_pod_angels"] += 1
 
     def castle_ardenvale(self):

@@ -85,6 +85,8 @@ class Card:
     indestructible: bool = False
     haste: bool = False
     flying: bool = False      # set from decks/_evasion.py, never by hand
+    vigilance: bool = False   # TOKENS only, set where the text makes them
+                              # (cards: `_evasion.VIGILANCE`, §0z186)
     x_pips: int = 0           # generic pips that are actually {X}
     # ((cost, "tag") | (cost, "tag", preference), ...) -- the OTHER ways this
     # card can be cast. See engine.choose_mode; KNOWN_ISSUES §1b.
@@ -5135,6 +5137,7 @@ def combat(g: Game):
                  if is_battlefield_creature(g, p) and not p.tapped and not p.sick
                  and p.card.name not in DEFENDER
                  and not doll_stays_home(g, p) and not shigeki_stays_home(g, p)]
+    attackers = OPP.hold_back(g, attackers)   # blockers for the pod, §0z186
     if not attackers:
         g.damage_by_turn.append(0.0)
         return
@@ -5212,7 +5215,8 @@ def combat(g: Game):
             g.m["lifelinked"] += g.power_of(p)
 
     for p in attackers:
-        p.tapped = True
+        if OPP.taps_to_attack(g, p):       # vigilance, §0z186
+            p.tapped = True
     # One attack at the whole pod; `dmg` comes back BOUNDED at what could have
     # mattered. When derived_blocking is off there is no blocking model to
     # divide, so the flat haircut above is passed through as a lump.
