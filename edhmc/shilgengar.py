@@ -1438,6 +1438,9 @@ class ShilgengarGame(BaseGame):
         if you gained 5 or more life this turn" -- that opponent's turn
         counts too (§0z153, `resplendent_each_end`): the life gained since the
         previous end step, yours or theirs."""
+        if OPP.pod_turn(self) < 3 and (self.avacyn_queue
+                                       or self.has("Resplendent Angel")):
+            self.m["early_end_step_acts"] += 1       # §0z185's reach
         self.avacyn_returns()
         if not self.cfg.get("resplendent_each_end", True):
             return

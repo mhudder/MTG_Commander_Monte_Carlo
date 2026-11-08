@@ -2094,6 +2094,8 @@ def opponents_act(g):
             continue                      # an eliminated player has no turn
         grow_board(opp)
         if pod_turn(g) < 3:
+            if g.cfg.get("pod_end_steps_early", True):     # §0z185
+                pod_end_step_hook(g, i)
             continue
         opponent_removal(g, i, rolls_t, old)
         pod_end_step_hook(g, i)
@@ -3468,7 +3470,10 @@ def _pod_seat_round(g, before_act=None) -> None:
             # -- main phase 2, end step -----------------------------------------
             if not grow_first:
                 grow_board(opp)
-            if pod_turn(g) >= 3:
+            # THE END STEP IS EVERY TURN'S (§0z184 finding 3, §0z185). It sat
+            # under removal's pod-turn-3 gate, so the pod's first two rounds
+            # had no end steps. `pod_end_steps_early=False` restores the gate.
+            if pod_turn(g) >= 3 or g.cfg.get("pod_end_steps_early", True):
                 pod_end_step_hook(g, i)
     finally:
         g.pod_seat = None

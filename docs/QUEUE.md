@@ -182,8 +182,8 @@ What is closed and where it went:
     still pull an `archive/` branch, but the name says what it is.
 
 35. **Rebuild tivit's table for the withdrawn Anointed Procession,
-    lorehold's, karlov's and shilgengar's for §0z182, and azusa's for
-    §0z183 (the
+    lorehold's, karlov's and shilgengar's for §0z182, azusa's for §0z183
+    and rendmaw's for §0z185 (the
     owner, 2026-11-08: "do not rebuild tivit, save it as a to do"; §0z181).**
     -Plains +Anointed Procession is WITHDRAWN (`edhmc/ledger/tivit.py`), so
     `build_pending("tivit")` plays Plains again and the table at `b7f3788`
@@ -211,6 +211,9 @@ What is closed and where it went:
       games (inside its bars), so azusa's cache is SUSPECT too. FIVE decks:
       lorehold, karlov, tivit, shilgengar, azusa. Rendmaw's alone is
       VERIFIED.
+    - **§0z185 (2026-11-08) adds rendmaw**: its seat upkeeps moved its
+      games. ALL SIX active decks are now SUSPECT; this is a full parallel
+      rebuild.
     - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
       the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
       leg of `.claude/skills/parallel-rebuild`; then diff against the table it
@@ -236,7 +239,8 @@ What is closed and where it went:
     - Re-read `incidental_rate`'s calibration against the new count, then one
       parallel rebuild of every active table.
 
-37. **The smaller turn-structure findings of §0z184 (2, 6-10)**, none of
+37. **The smaller turn-structure findings of §0z184 (2, 6-10; 3-5 are
+    fixed, §0z185)**, none of
     them urgent. In the order a session would take them: "until end of turn"
     pumps ended at cleanup (2: azusa's `eot_pt`, `craterhoof_bonus`,
     `wildspeaker_bonus`, rendmaw's `stampede_bonus`; 1.4% of azusa's threat);

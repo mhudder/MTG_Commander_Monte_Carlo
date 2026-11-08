@@ -26,7 +26,11 @@ CASES
   G  NEIGHBOUR: `pod_seat_grow="start"` grows the board first, before its
      pieces and its kill
   H  `g.pod_seat` names the seat whose step is running, and is None after
-  I  before pod turn 3: boards grow, and no removal or end step runs
+  I  before pod turn 3: boards grow, no removal runs, and each seat has its
+     end step (§0z185; until then this case pinned NO end step -- the gate
+     §0z184's finding 3 was about -- and its want changed with the rule)
+  J  NEIGHBOUR: `pod_end_steps_early=False` is the old gate: no end step
+     before pod turn 3
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   pod_seat_turns=False everywhere        -> A, B, E, F, G, H
@@ -196,9 +200,15 @@ def run_cases():
 
     g = game(turn=2)
     log, _, _ = run_round(g)
-    check("I before pod turn 3: boards grow, no removal or end step",
+    check("I before pod turn 3: boards grow, no removal, three end steps",
           (sum(x.startswith("grow") for x in log),
-           any(x.startswith(("removal", "end")) for x in log)), (3, False))
+           any(x.startswith("removal") for x in log),
+           sum(x.startswith("end") for x in log)), (3, False, 3))
+
+    g = game(turn=2, pod_end_steps_early=False)
+    log, _, _ = run_round(g)
+    check("J pod_end_steps_early=False: no end step before pod turn 3",
+          any(x.startswith(("removal", "end")) for x in log), False)
     return set(FAIL)
 
 

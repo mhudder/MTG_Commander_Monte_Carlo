@@ -82,9 +82,16 @@ class LoreholdGame(BaseGame):
         if not seat_upkeeps(self):
             return
         if self.commander_cast:
-            rummage_window(self, sum(1 for p in self.board
-                                     if "cross_turn" in p.card.tags))
-        elif self.cfg.get("draw_lands", True):
+            rummage_window(self, cross_turn_count(self))
+            return
+        if cross_turn_untaps(self):
+            # Their untap step comes before this upkeep: one mana each, with
+            # Lorehold not out too (§0z185). `rummage_window` adds it above.
+            n = cross_turn_count(self)
+            if n:
+                self.float_mana += n
+                self.m["cross_turn_mana_no_lorehold"] += n
+        if self.cfg.get("draw_lands", True):
             ready = _draw_lands_ready(self)
             land = ready[0] if ready else None
             if draw_land_window(self, ready):   # it taps `land`, once a round
@@ -3336,8 +3343,36 @@ def end_of_turn_float(g) -> int:
     the pod's windows already read them. `float_board_only=False` restores
     the old float."""
     if g.cfg.get("float_board_only", True):
-        return len(available_mana(g))
+        units = available_mana(g)
+        if cross_turn_untaps(g):
+            # A `cross_turn` artifact's mana is the pod's turns' own (§0z185):
+            # one in EACH opponent's turn, added at its upkeep, so it is not
+            # in the float as well, untapped or not.
+            kept = sum(1 for o in units.owners
+                       if "cross_turn" not in getattr(getattr(o, "card", None),
+                                                      "tags", ()))
+            if kept < len(units):
+                g.m["cross_turn_float_excluded"] += len(units) - kept
+            return kept
+        return len(units)
     return len(mana_units(g))
+
+
+def cross_turn_count(g) -> int:
+    """Victory Chimes and Bender's Waterskin on the battlefield: "Untap this
+    artifact during each other player's untap step." (the `cross_turn` tag)."""
+    return sum(1 for p in g.board if "cross_turn" in p.card.tags)
+
+
+def cross_turn_untaps(g) -> bool:
+    """Does a `cross_turn` artifact give exactly ONE mana in each opponent's
+    turn, whether or not Lorehold is out (§0z184 finding 5, §0z185;
+    `cross_turn_untaps`)? Before, only Lorehold's rummage windows added it
+    (`rummage_window`), and the float at the end of your turn counted it too
+    when it was left untapped -- one mana too many there, none at all with
+    Lorehold not out. Only under the seat order, where each opponent's upkeep
+    is a step to add it in."""
+    return seat_upkeeps(g) and g.cfg.get("cross_turn_untaps", True)
 
 
 def seat_upkeeps(g) -> bool:

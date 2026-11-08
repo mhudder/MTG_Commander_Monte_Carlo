@@ -1845,6 +1845,21 @@ class Game(BaseGame):
         `pod_bodies` only (§0z132)."""
         deathreap_end_step(self, i)
 
+    def pod_upkeep(self, i: int) -> None:
+        """Opponent `i`'s upkeep (`opponents._pod_seat_round`, §0z179):
+        rendmaw's two "at the beginning of EACH upkeep" cards, each copy in
+        board order as `upkeep` takes them (§0z185, `rendmaw_seat_upkeeps`).
+        A token made here is summoning-sick until your untap step."""
+        if not rendmaw_seat_upkeeps(self):
+            return
+        for p in list(self.board):
+            s = p.card.script
+            if s == "tendershoot":
+                tendershoot_saprolings(self, 1)
+                self.m["seat_saprolings"] += 1
+            elif s == "ophiomancer" and ophiomancer_snake(self):
+                self.m["seat_snakes"] += 1
+
     def on_pod_creature_deaths(self, o, n: int) -> None:
         """`n` of opponent `o`'s creatures died -- an event only under
         `pod_bodies` (item 24, change 1; `opponents.kill_pod_bodies`). Three
@@ -3630,6 +3645,43 @@ def steel_overseer(g) -> None:
                 p.counters += plus_counters(g, 1)
 
 
+def rendmaw_seat_upkeeps(g) -> bool:
+    """Do rendmaw's "at the beginning of EACH upkeep" cards (Tendershoot
+    Dryad, Ophiomancer) trigger AT each opponent's upkeep, inside the pod's
+    seat round (§0z184 finding 4, §0z185; `rendmaw_seat_upkeeps`)? Only under
+    the seat order; the old round has no opponent upkeeps to hang them on."""
+    return (g.cfg.get("opponents", True) and g.cfg.get("pod_seat_turns", True)
+            and g.cfg.get("rendmaw_seat_upkeeps", True))
+
+
+def ophiomancer_snake(g) -> bool:
+    """Ophiomancer: "At the beginning of each upkeep, if you control no
+    Snakes, create a 1/1 black Snake creature token with deathtouch."
+    "Snakes" is ANY Snake -- Sakura-Tribe Elder and Shigeki are Snakes by
+    their type line (§0z153, `snake_types`). True when one was made."""
+    if g.cfg.get("snake_types", True):
+        snakes = any("Snake" in creature_types(g, x) for x in g.board
+                     if is_battlefield_creature(g, x))
+    else:
+        snakes = any(x.is_token and x.card.name.startswith("Snake")
+                     for x in g.board)
+    if not snakes:
+        g.make_tokens(1, 1, 1, "Snake")
+    return not snakes
+
+
+def tendershoot_saprolings(g, n) -> None:
+    """Tendershoot Dryad's upkeep trigger, `n` times at once: `n` 1/1
+    Saprolings. Ascend then gives Saprolings +2/+2 (city's blessing at ten
+    permanents); it does NOT double the count, which is what an old
+    `2 if >=10 else 1` was doing."""
+    g.make_tokens(n, 1, 1, "Saproling")
+    if len(g.board) >= 10:            # city's blessing
+        for q in g.board:
+            if q.is_token and q.card.name.startswith("Saproling"):
+                q.counters = max(q.counters, 2)
+
+
 def upkeep(g: Game):
     # Lord of the Pit (Thomil's -5, §0z74): mandatory, first.
     lord_of_the_pit_upkeep(g, lambda p: rendmaw_sacrifice(g, p))
@@ -3664,28 +3716,18 @@ def upkeep(g: Game):
                 g.your_life -= 1
                 g.m["life_lost_to_own_cards"] += 1
         elif s == "ophiomancer":
-            # "if you control no Snakes": ANY Snake -- Sakura-Tribe Elder and
-            # Shigeki are Snakes by their type line (§0z153, `snake_types`).
-            if g.cfg.get("snake_types", True):
-                snakes = any("Snake" in creature_types(g, x) for x in g.board
-                             if is_battlefield_creature(g, x))
-            else:
-                snakes = any(x.is_token and x.card.name.startswith("Snake")
-                             for x in g.board)
-            if not snakes:
-                g.make_tokens(1, 1, 1, "Snake")
+            ophiomancer_snake(g)
         elif s == "tendershoot":
             # "At the beginning of EACH upkeep, create a 1/1 Saproling." That
-            # is one per player per round, not one per round — this loop runs
-            # only on your turn, so it stands in for the whole round.
-            # Ascend then gives Saprolings +2/+2; it does NOT double the count,
-            # which is what the old `2 if >=10 else 1` was doing.
-            n_upkeeps = 1 + len(OPP.living(g))
-            g.make_tokens(n_upkeeps, 1, 1, "Saproling")
-            if len(g.board) >= 10:            # city's blessing
-                for q in g.board:
-                    if q.is_token and q.card.name.startswith("Saproling"):
-                        q.counters = max(q.counters, 2)
+            # is one per player per round. Under the seat order each
+            # opponent's is taken AT its upkeep (`Game.pod_upkeep`, §0z185);
+            # the old round took the whole round's here, on your turn.
+            if rendmaw_seat_upkeeps(g):
+                n_upkeeps = 1
+                g.m["tendershoot_own_upkeeps"] += 1      # §0z185's reach
+            else:
+                n_upkeeps = 1 + len(OPP.living(g))
+            tendershoot_saprolings(g, n_upkeeps)
         elif s == "grist":
             g.make_tokens(1, 1, 1, "Insect")
     # Arasta: opponents cast instants/sorceries at some rate. Counterspells
@@ -5277,6 +5319,9 @@ def deathreap_end_step(g, opp_index=None) -> None:
     added to events), and it is why the card is PARTLY MODELLED, not
     evaluated. Off `pod_bodies` this does nothing: `activations` keeps the
     old reading."""
+    if (opp_index is not None and OPP.pod_turn(g) < 3
+            and (g.has("Deathreap Ritual") or g.table_deaths != g.deaths_mark)):
+        g.m["early_end_step_acts"] += 1         # §0z185's reach
     if not OPP.pod_bodies_on(g) or not g.has("Deathreap Ritual"):
         g.deaths_mark = g.table_deaths
         return

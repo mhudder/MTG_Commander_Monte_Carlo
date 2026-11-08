@@ -237,6 +237,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z182](#0z182) | FIXED | **Four engines played their land only before main phase 1** (CR 305.1, 505.6b): a land drawn later waited a turn. `engine.late_land_drop`: **tivit +0.0063 / +0.0058, lorehold +0.0024 / +0.0029**, karlov +0.0015 at T20, shilgengar 0 |
 | [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
 | [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
+| [0z185](#0z185) | FIXED | **§0z184's findings 3-5**: the pod's end steps on pod turns 1-2 (0.1% of games); rendmaw's Tendershoot / Ophiomancer at each opponent's upkeep, **+0.0044 / +0.0036**; lorehold's Chimes / Waterskin one mana an opponent's turn, -0.0004 / -0.0021 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16017,7 +16018,7 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    `pod_end_step_hook` sits after the `pod_turn(g) >= 3` gate that belongs to
    removal, in the seat round and in `opponents_act` alike, so Deathreap
    Ritual's draw, Resplendent Angel's Angel and Avacyn, Angel of Horror's
-   return miss six end steps a game. Being fixed (the owner, 2026-11-08).
+   return miss six end steps a game. Fixed in §0z185.
 4. **RENDMAW'S "EACH UPKEEP" CARDS ARE NOT ON THE SEATS** (§0z179 moved
    lorehold's, karlov's and azusa's). Tendershoot Dryad ("At the beginning of
    each upkeep, create a 1/1 green Saproling") makes `1 + living opponents`
@@ -16025,11 +16026,11 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    blessing before their time, a ceiling. Ophiomancer ("At the beginning of
    each upkeep, if you control no Snakes, create a 1/1 black Snake ... with
    deathtouch") is taken at your upkeep only, so a Snake sacrificed on your
-   turn never returns on the pod's -- a floor. Being fixed (the owner, 2026-11-08).
+   turn never returns on the pod's -- a floor. Fixed in §0z185.
 5. **LOREHOLD'S CHIMES AND WATERSKIN UNTAP ONLY WITH LOREHOLD OUT.** "Untap
    this artifact during each other player's untap step." `rummage_window`
    adds the `cross_turn` units to the float; `draw_land_window`, the window
-   when Lorehold is not out, does not. Being fixed (the owner, 2026-11-08).
+   when Lorehold is not out, does not. Fixed in §0z185.
 6. **NO FIRST STRIKE OR DOUBLE STRIKE** (510.4), in any engine. Inert today
    -- no attacker of yours ever dies to a blocker here -- so Lyra
    Dawnbringer's first strike changes nothing; Sunhome, Fortress of the
@@ -16052,6 +16053,98 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    difference.
 10. **LATENT: tivit's `mana_units` does not ask summoning sickness** of a
     creature with a mana ability (302.6). No such creature is in its list.
+
+<a id="0z185"></a>
+
+## 0z185. FIXED -- §0z184's findings 3, 4 and 5
+
+**2026-11-08, the owner: "record them, then fix 3, 4 and 5".** Each behind
+its own switch, default True; every switch False reproduces `16f33f5`:
+every deck's staged list, seeds 5000..7499, T20, every output key hashed,
+**0 of 2,500 differ in all seven decks**. With the defaults rendmaw (639),
+lorehold (891) and shilgengar (1) move; karlov, tivit, azusa and trostani do
+not. `tools.validate`: +0.00 on every metric. Measured with
+`diagnostics/run_knob_ab.py`, the staged list both legs, N=15,000 paired,
+seeds 5000..19999, python 3.13.16 / numpy 2.4.6; the identity check holds in
+every arm (0 differ among the games the counters name as unreached).
+
+### 3. The pod's end steps on pod turns 1 and 2 (`pod_end_steps_early`)
+
+`pod_end_step_hook` runs on every pod turn, in the seat round and in the old
+`opponents_act` alike; it had sat under removal's pod-turn-3 gate. The reach
+counter, `early_end_step_acts`, is written by the engines' own hooks
+(`engine.deathreap_end_step`, `ShilgengarGame.pod_end_step`), not by a list
+of names in `opponents.py` (§0q): an early end step with Deathreap Ritual
+out or a death to move its mark, or with Avacyn's queue holding a card or
+Resplendent Angel out.
+
+| deck | T10 | T20 | games reached | file |
+|---|---|---|---|---|
+| rendmaw | +0.0000 ±0.0000 | +0.0001 ±0.0001 | 8 (0.1%) | `results/pod_end_steps_early_rendmaw_20261108.txt` |
+| shilgengar | +0.0000 ±0.0000 | +0.0000 ±0.0000 | 14 (0.1%) | `results/pod_end_steps_early_shilgengar_20261108.txt` |
+
+A rule, not a number: those cards are rarely out in the first two rounds.
+
+### 4. Rendmaw's "each upkeep" cards at each opponent's upkeep (`rendmaw_seat_upkeeps`)
+
+`Game.pod_upkeep(i)` (§0z179's hook, which rendmaw did not have): each
+Tendershoot Dryad makes one Saproling and each Ophiomancer checks for a
+Snake, at that opponent's upkeep. Your own upkeep makes one Saproling, not
+`1 + living opponents`. Both bodies of the old `upkeep` branches are
+functions now (`tendershoot_saprolings`, `ophiomancer_snake`), called from
+both places. Only under the seat order (`rendmaw_seat_upkeeps(g)`).
+
+| | T10 | T20 | file |
+|---|---|---|---|
+| rendmaw | **+0.0044 ±0.0014** | **+0.0036 ±0.0020** | `results/rendmaw_seat_upkeeps_20261108.txt` |
+| in the 3,933 games reached (26.2%) | +0.0168 ±0.0053 | +0.0137 ±0.0078 | |
+
+`seat_saprolings` 0.51 a game, `seat_snakes` 0.17 (Ophiomancer's new
+Snakes: a Snake sacrificed on your turn comes back on the pod's), and
+`tokens_made` +0.08. Tendershoot's three Saprolings now arrive one at a time
+through the pod's round instead of all at your upkeep -- a round later as
+fodder (`cards_drawn` -0.05, `deathreap_draws` -0.006, `mana_spent` -0.17)
+-- so the two move in opposite directions and the sum is up: `lost` -0.0036,
+`final_life` +0.07. **Not split** between the two cards; a token made on the
+pod's turn is also an untapped blocker in `combat_share` (§0z184 finding 1),
+which this does not correct for.
+
+`results/turn_fixes_rendmaw_20261108.txt` is 3 and 4 together on rendmaw:
++0.0044 ±0.0014 / +0.0037 ±0.0020.
+
+### 5. Victory Chimes and Bender's Waterskin, one mana in each opponent's turn (`cross_turn_untaps`)
+
+"Untap this artifact during each other player's untap step" gives exactly
+one mana per opponent's turn. Writing the fix found the second half: with
+Lorehold out, `rummage_window` added one per opponent's upkeep, AND
+`end_of_turn_float` counted the artifact again if your turn left it
+untapped -- four a round for three opponents. Now the float leaves them out
+(`cross_turn_float_excluded`, 0.93 a game) and every opponent's upkeep adds
+one each, with Lorehold out (`rummage_window`, unchanged) or not
+(`LoreholdGame.pod_upkeep`, `cross_turn_mana_no_lorehold`, 1.13 a game).
+Only under the seat order.
+
+| | T10 | T20 | file |
+|---|---|---|---|
+| lorehold | -0.0004 ±0.0015 | **-0.0021 ±0.0017** | `results/cross_turn_untaps_lorehold_20261108.txt` |
+| in the 5,404 games reached (36.0%) | -0.0011 ±0.0041 | -0.0057 ±0.0048 | |
+
+**It loses, and it should**: the larger half takes away mana the old float
+counted twice (`mana_floated` -0.94, `miracles_cast` -0.015), and the
+smaller half adds mana where there was none (`responses_cast` +0.010,
+`draw_land_windows` +0.002). Win rate follows the corrected mana; the old
+number was a ceiling.
+
+### What it leaves
+
+Rendmaw's games moved, so its cache is SUSPECT, and queue item 35's rebuild
+is now every active deck. `tests/test_turn_fixes.py` pins A-J with five
+mutations, exact sets, written before the first run. **`tests/test_pod_seat_turns.py`'s
+case I pinned the old gate** ("no removal or end step" before pod turn 3)
+and failed on fix 3, as it should: its want is the new rule now (three end
+steps, still no removal), and a new neighbour J holds the old reading under
+`pod_end_steps_early=False`. Its three mutation sets were predicted
+unchanged before the re-run and are.
 
 ## How to read an ablation table
 

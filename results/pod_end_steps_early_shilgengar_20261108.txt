@@ -1,0 +1,12 @@
+shilgengar: pod_end_steps_early=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.13.16 / numpy 2.4.6
+
+   won T10  +0.0000 ±0.0000 
+   won T20  +0.0000 ±0.0000 
+
+   games where early_end_step_acts > 0 in either leg: 14 of 15000 (0.1%)
+   IDENTITY: of the 14986 games with early_end_step_acts = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0000 ±0.0000
+   in those games, won T20  +0.0000 ±0.0000
+
+   every numeric output that moved (mean A, mean B, A - B):
+   early_end_step_acts                0.0028     0.0000  +0.0028
