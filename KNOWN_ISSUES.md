@@ -235,6 +235,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z180](#0z180) | REBUILT | **Six tables rebuilt for §0z179** (parallel, 12.7 min wall): lorehold 11 rows up beyond their bars, all miracle payoffs; rendmaw 1; the rest 0. 11 of 12 staged swaps stand at both horizons |
 | [0z181](#0z181) | DECIDED | **-Plains +Anointed Procession WITHDRAWN by the owner**: inside its T20 bar at every re-measure since 2026-10-15. Tivit's table rebuild deferred to queue item 35; its cache reads SUSPECT until then |
 | [0z182](#0z182) | FIXED | **Four engines played their land only before main phase 1** (CR 305.1, 505.6b): a land drawn later waited a turn. `engine.late_land_drop`: **tivit +0.0063 / +0.0058, lorehold +0.0024 / +0.0029**, karlov +0.0015 at T20, shilgengar 0 |
+| [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15884,6 +15885,67 @@ which now covers all four). Rendmaw's and azusa's are VERIFIED on the two
 checks above. `tests/test_late_land_drop.py` pins A-H with six mutations,
 exact sets, written before the first run: one per engine's call sites, so
 deleting any one engine's wiring is caught.
+
+<a id="0z183"></a>
+
+## 0z183. MEASURED -- azusa's floating mana pays its activations before it empties
+
+**2026-11-08, the owner: "do the azusa clue item next"** -- the question
+§0z177 left: "with floating mana that empties, a pilot would crack a Clue
+with main 1's leftover". Azusa's `activations` (Eye of Ugin, then Clues, then
+the rest) runs after combat, "so that its mana is spare", while the floating
+mana main phase 1 left -- Lotus Cobra, Nissa, Resurgent Animist, Nykthos,
+Crystal Vein -- empties at the end of main 1 (CR 500.5, §0z177). In this list
+the only activations that matter are Tireless Tracker's Clues and Eye of
+Ugin; Cryptic Caves and War Room are not in it.
+
+**The rule** (`AzusaGame.floating_sink`, `azusa_floating_sink`, default True;
+inert without `azusa_pool_empties`). `empty_mana_pool` calls it first, at
+each boundary where the pool empties (the end of main 1, of combat, of main
+2, and Verdant Kraken's opponent upkeep). It pays Eye of Ugin's {7}, then
+Clues' {2} each, from the FLOATING mana ONLY (`floating_units`): never a
+land, never a Treasure (which keeps), never Castle Garenbrig's
+creature-only {G}. Both are abilities, legal at any of those boundaries.
+The Clue loop moved out of `activations` into `crack_clues`, which both
+call; `eye_of_ugin_step` takes the pool it pays from. **The policy, said out
+loud**: an activation it makes is one the old pilot made later with mana that
+keeps, or never made because the mana was gone; the card is drawn a step
+earlier, before combat. It holds nothing back for anything else: once the
+main phase has passed on that mana, nothing else can spend it.
+
+**The switch off is the old engine**: every deck's staged list, seeds
+5000..7499, T20, every output key hashed, against a fresh worktree at
+`23daf6b`: 0 of 2,500 differ in all seven decks. With the default, only
+azusa moves (69 of 2,500). `tools.validate`: +0.00 on every metric.
+
+**The measurement** (`diagnostics/run_knob_ab.py azusa azusa_floating_sink
+floating_clues,floating_eye_tutors`, the staged list both legs, N=15,000
+paired, seeds 5000..19999, python 3.13.16 / numpy 2.4.6,
+`results/azusa_floating_sink_20261108.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| floating sink on minus off | +0.0004 ±0.0005 | +0.0001 ±0.0006 |
+| in the 393 games (2.6%) it reaches | +0.0153 ±0.0186 | +0.0025 ±0.0229 |
+
+**Inside both bars.** The identity check holds: of the 14,607 games where it
+cracks nothing in either leg, **0 differ**. It cracks 0.32 Clues a game
+(0.27 at the end of main 1, 0.05 at the end of main 2) and fetches with
+Eye 0.007 times; `floating_mana_lost` -0.32 and `mana_spent` +0.33, so the
+mana it saves is mana that was emptying, as the rule says. **Why so little**:
+the Clues it cracks are mostly ones `activations` would crack anyway a step
+later with land mana, so what it buys is that land mana for main phase 2 --
+and azusa ends its turns with mana and cards left over (`stranded_mv` 178,
+`cleanup_discards` 2.6 a game, up 0.03 here: the extra card often goes to
+the cleanup step). The 0.001 §0z177 guessed was about right.
+
+**Kept ON by default**, the dominance argument §0z177 used for
+`azusa_floating_first`: it spends only mana that would vanish. That moves
+azusa's games, so its cache is SUSPECT again and joins queue item 35's
+rebuild; `azusa_floating_sink=False` is the old engine if the owner would
+rather not. `tests/test_floating_sink.py` pins A-H with three mutations,
+exact sets (B's and C's setups were corrected before the first run, so the
+pool mutations can reach them; its docstring says how).
 
 ## How to read an ablation table
 

@@ -853,6 +853,7 @@ class AzusaGame(BaseGame):
         `azusa_pool_empties=False` is the old pool, kept for the turn."""
         if not self.cfg.get("azusa_pool_empties", True):   # §0z177
             return
+        self.floating_sink(where)                          # §0z183
         kept, lost = [], 0
         for f in self.bonus_mana:
             if isinstance(f, TreasureMana):
@@ -866,6 +867,44 @@ class AzusaGame(BaseGame):
             self.creature_mana = []
         self.m["floating_mana_lost"] += lost
         self.m[f"floating_lost_{where}"] += lost
+
+    def floating_units(self):
+        """The floating mana that is about to empty, alone, as a ManaUnits:
+        the untapped `FloatingMana` points of `available_mana()` (Lotus
+        Cobra, Nissa, Resurgent Animist, Nykthos, Crystal Vein). Not a
+        TREASURE, which keeps, and not Castle Garenbrig's `creature_mana`,
+        which only creature spells and creatures' abilities may spend."""
+        u = self.available_mana()
+        idx = [i for i, o in enumerate(u.owners)
+               if type(o) is FloatingMana and not o.tapped]
+        return ManaUnits([u[i] for i in idx], [u.owners[i] for i in idx],
+                         [u.weights[i] for i in idx], legacy=u.legacy,
+                         surplus=u.surplus)
+
+    def floating_sink(self, where: str) -> None:
+        """The pool is about to empty (CR 500.5): spend what floats on the
+        activations that would otherwise wait for it (§0z183, the question
+        §0z177 left). Eye of Ugin first, then Clues, the order `activations`
+        uses -- and paid from the FLOATING mana ONLY, never a land or a
+        Treasure, so it spends nothing that would have survived the step:
+        an activation it makes is one the old pilot made later with mana
+        that keeps, or never made because the mana was gone. Both are
+        abilities, not spells, so they are legal at any of the boundaries
+        `empty_mana_pool` is called at, the pod's upkeep included.
+
+        THE POLICY, said out loud: it cracks a Clue BEFORE combat, so the
+        card is drawn a step earlier than `activations` would draw it, and
+        holds nothing back for anything else -- there is nothing else this
+        mana can pay for once the main phase has passed on it.
+        `azusa_floating_sink=False` is §0z177's engine."""
+        if not self.cfg.get("azusa_floating_sink", True):
+            return
+        if not any(type(f) is FloatingMana and not f.tapped
+                   for f in self.bonus_mana):
+            return
+        self.eye_of_ugin_step(units_of=self.floating_units)
+        if getattr(self, "clues", 0) > 0:
+            self.crack_clues(self.floating_units(), where=where)
 
     def expire_animations(self, end_of_turn=False):
         """`end_of_turn` drops the "until end of turn" effects, before the pod
@@ -3633,7 +3672,7 @@ class AzusaGame(BaseGame):
             # should see this.
             self.hand.append(top)
 
-    def eye_of_ugin_step(self):
+    def eye_of_ugin_step(self, units_of=None):
         """EYE OF UGIN: "{7}, {T}: Search your library for a colorless
         creature card, reveal it, put it into your hand, then shuffle."
         (Scryfall, 2026-10-06; §0z114.) It was not implemented at all: the
@@ -3665,7 +3704,7 @@ class AzusaGame(BaseGame):
         if not targets:
             return
         eye.tapped = True                    # {T} is in the cost
-        units = self.available_mana()
+        units = (units_of or self.available_mana)()
         pay = can_pay({"gen": 7}, units)
         if pay is None:
             eye.tapped = False
@@ -3677,10 +3716,15 @@ class AzusaGame(BaseGame):
         self.hand.append(pick)
         self.shuffle_library()
         self.m["eye_tutors"] += 1
+        if units_of is not None:
+            self.m["floating_eye_tutors"] += 1       # `floating_sink`, §0z183
 
-    def activations(self):
-        self.eye_of_ugin_step()
-        units = self.available_mana()
+    def crack_clues(self, units, where=None):
+        """Clue: "{2}, Sacrifice this artifact: Draw a card." Cracked while
+        `units` pays {2} and a draw is safe (a Clue is optional), each one a
+        counter on Tireless Tracker. `units` is computed once by the caller
+        and spent from in place. `where` names a pool-emptying boundary when
+        `floating_sink` is the caller (§0z183), and is counted."""
         clues = getattr(self, "clues", 0)
         while clues > 0 and draw_is_safe(self, 1):   # a Clue is optional
             pay = can_pay({"gen": 2}, units)
@@ -3690,12 +3734,19 @@ class AzusaGame(BaseGame):
             self.m["mana_spent"] += 2
             self.draw(1)
             clues -= 1
+            if where is not None:
+                self.m["floating_clues"] += 1
+                self.m[f"floating_clues_{where}"] += 1
             if self.has("Tireless Tracker"):
                 for p in self.board:
                     if p.card.name == "Tireless Tracker":
                         p.counters += 1
                         break
         self.clues = clues
+
+    def activations(self):
+        self.eye_of_ugin_step()
+        self.crack_clues(self.available_mana())
 
         # CRYPTIC CAVES: "{1}, {T}, Sacrifice this land: Draw a card.
         # Activate only if you control five or more lands."

@@ -181,8 +181,9 @@ What is closed and where it went:
     branches only, and this item closes to `docs/HISTORY.md`. Agents can
     still pull an `archive/` branch, but the name says what it is.
 
-35. **Rebuild tivit's table for the withdrawn Anointed Procession, and
-    lorehold's, karlov's and shilgengar's for §0z182 (the
+35. **Rebuild tivit's table for the withdrawn Anointed Procession,
+    lorehold's, karlov's and shilgengar's for §0z182, and azusa's for
+    §0z183 (the
     owner, 2026-11-08: "do not rebuild tivit, save it as a to do"; §0z181).**
     -Plains +Anointed Procession is WITHDRAWN (`edhmc/ledger/tivit.py`), so
     `build_pending("tivit")` plays Plains again and the table at `b7f3788`
@@ -206,6 +207,10 @@ What is closed and where it went:
       the other three tables still re-render from their caches. Rebuild all
       four at once, by the parallel-rebuild skill (one leg per deck), at the
       commit that carries §0z182.
+    - **§0z183 (2026-11-08) adds azusa**: its floating sink moved azusa's
+      games (inside its bars), so azusa's cache is SUSPECT too. FIVE decks:
+      lorehold, karlov, tivit, shilgengar, azusa. Rendmaw's alone is
+      VERIFIED.
     - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
       the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
       leg of `.claude/skills/parallel-rebuild`; then diff against the table it

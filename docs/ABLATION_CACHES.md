@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `727be8c`.
+Generated at `23daf6b`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,7 +86,7 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `96a298f21bc698ec` | `b7f3788` | **VERIFIED** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `96a298f21bc698ec` | `b7f3788` | **SUSPECT** |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `67e0a8b2e2efc5b0` | `b7f3788` | **SUSPECT** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e3a4535152fa6cc5` | `b7f3788` | **SUSPECT** |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `915c36e76f7a9e2e` | `b7f3788` | **VERIFIED** |
@@ -96,7 +96,7 @@ the fingerprint above mean anything.
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `96a298f21bc698ec`; fingerprint has since moved to `0e1daef87eb2b344` and was CHECKED at `727be8c` (2026-11-08T01:51:27Z): §0z182 (engine.late_land_drop added; azusa never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `96a298f21bc698ec`, live is `448665f8dd33a6e4`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `b7f3788`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `0e1daef87eb2b344` (`727be8c`, 2026-11-08T01:51:27Z): §0z182 (engine.late_land_drop added; azusa never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults
 - **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `67e0a8b2e2efc5b0`, live is `eb68519dcc6ff9d0`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `b7f3788`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 - **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `e3a4535152fa6cc5`, live is `bcbfa1a14974963e`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `b7f3788`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
