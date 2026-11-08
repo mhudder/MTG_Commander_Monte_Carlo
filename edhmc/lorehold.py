@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_drop, begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
@@ -3276,11 +3276,15 @@ def your_turn(g, extra=False):
             g.m["reserve_held"] += held
             g.m["reserve_overheld"] += max(0, held - miracle_need(g))
         main_phase(g, reserve=held)
+        if late_land_drop(g):          # a land drawn in main 1, §0z182
+            main_phase(g, reserve=reserve_for(g))
     empty_pool(g, "main1")             # the end of main phase 1
     if not g.turn_ended:
         combat(g)
     empty_pool(g, "combat")            # the end of combat
     g.precombat = False
+    if not g.turn_ended:
+        late_land_drop(g)              # main 2 begins: combat's draws
     # Re-read rather than cached: the precombat phase can deploy the very
     # cards that change the miracle cost (Artist's Talent, Molecule Man).
     main_phase(g, reserve=reserve_for(g))
@@ -3288,8 +3292,12 @@ def your_turn(g, extra=False):
     # make a spell affordable that was not a moment ago.
     if not g.turn_ended and artist_level_up(g, reserve=reserve_for(g)):
         main_phase(g, reserve=reserve_for(g))
+    if not g.turn_ended and late_land_drop(g):    # a land drawn in main 2
+        main_phase(g, reserve=reserve_for(g))
 
     underworld_breach(g)
+    if not g.turn_ended:
+        late_land_drop(g)              # the Breach's draws: mana held up
     empty_pool(g, "main2")             # the end of main phase 2
     # "At the beginning of the end step, sacrifice this enchantment." Note this
     # is EACH end step, so a Breach that resolves on your turn is gone before

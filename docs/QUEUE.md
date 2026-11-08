@@ -181,7 +181,8 @@ What is closed and where it went:
     branches only, and this item closes to `docs/HISTORY.md`. Agents can
     still pull an `archive/` branch, but the name says what it is.
 
-35. **Rebuild tivit's table for the withdrawn Anointed Procession (the
+35. **Rebuild tivit's table for the withdrawn Anointed Procession, and
+    lorehold's, karlov's and shilgengar's for §0z182 (the
     owner, 2026-11-08: "do not rebuild tivit, save it as a to do"; §0z181).**
     -Plains +Anointed Procession is WITHDRAWN (`edhmc/ledger/tivit.py`), so
     `build_pending("tivit")` plays Plains again and the table at `b7f3788`
@@ -196,6 +197,15 @@ What is closed and where it went:
     - tivit's rows are measured with Anointed Procession in the deck and
       Plains out; read them as such, and do not quote Anointed Procession's
       row as a candidate value for the list as it stands.
+    - **§0z182 (2026-11-08) widens it to FOUR decks**: the land drop in
+      either main phase moved lorehold's, karlov's, tivit's and shilgengar's
+      games, so their caches read SUSPECT (an ENGINE-induced SUSPECT whose
+      games differ: `--verified` cannot clear it either). Rendmaw's and
+      azusa's are VERIFIED. `check_docs` fails on the four until the
+      rebuild; `test_metrics_and_render` C still fails on tivit only, since
+      the other three tables still re-render from their caches. Rebuild all
+      four at once, by the parallel-rebuild skill (one leg per deck), at the
+      commit that carries §0z182.
     - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
       the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
       leg of `.claude/skills/parallel-rebuild`; then diff against the table it

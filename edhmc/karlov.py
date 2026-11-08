@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -2673,6 +2673,11 @@ def take_turn(g):
     # something, so a game without the Citadel takes exactly the calls it
     # always did and reproduces to the digit.
     citadel_main(g)
+    # A LAND DRAWN IN MAIN 1 (§0z182), after the dig: the Citadel plays a land
+    # off the top with the same drop, so the hand's waits for it.
+    if late_land_drop(g):
+        main_phase(g)
+        citadel_main(g)
     if g.result is not None:
         return
     jitte_equip(g)                 # sorcery speed: the end of main phase 1
@@ -2680,6 +2685,8 @@ def take_turn(g):
     # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
     pearl_collector_trigger(g, g.life_gained_this_turn)
     reclamation_step(g, recast=True)
+    if not g.has("Bolas's Citadel"):
+        late_land_drop(g)          # main 2 begins: combat's draws, §0z182
     main_phase(g)
     if g.result is not None:
         return
@@ -2688,6 +2695,12 @@ def take_turn(g):
     # without the Citadel; `citadel_main2=False` is the one dig a turn.
     if g.cfg.get("citadel_main2", True):
         citadel_main(g)
+        if g.result is not None:
+            return
+    if late_land_drop(g):          # a land drawn in main 2, after the dig
+        main_phase(g)
+        if g.cfg.get("citadel_main2", True):
+            citadel_main(g)
         if g.result is not None:
             return
     # Pearl Collector's lifelink sink, on mana the second main did not want.

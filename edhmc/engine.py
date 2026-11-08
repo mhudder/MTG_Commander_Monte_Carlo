@@ -2871,6 +2871,38 @@ def play_land(g: Game):
     after_land_enters(g, perm)
 
 
+def late_land_drop(g, step=None) -> bool:
+    """A land drop taken LATER in the turn than the land step (§0z182).
+
+    CR 305.1 / 505.6b: you may play a land in EITHER main phase, whenever you
+    have priority, the stack is empty and a drop is left. Four engines
+    (lorehold, karlov, tivit, shilgengar) took their one drop before main
+    phase 1 and never again, so a land DRAWN after it -- a cantrip, a
+    rummage, Skullclamp, a combat trigger -- waited a whole turn with the
+    drop unused. Rendmaw and azusa already had a second land step after
+    combat.
+
+    Called at the end of a main phase, and at the start of main phase 2. It
+    plays a land only if a drop is unused and a land (or a land face) is in
+    hand, through the engine's own land step (`step`, default `play_land`:
+    shilgengar's runs its landfall), and returns whether one was played, so
+    the caller re-runs the main phase on the new mana. When it returns False
+    nothing has changed, which is the identity `run_knob_ab` checks on
+    `late_land_drops`. `late_land_drop=False` is the old engine."""
+    if not g.cfg.get("late_land_drop", True):                  # §0z182
+        return False
+    if g.result is not None or g.land_drops_used >= g.land_drops:
+        return False
+    if not any(c.is_land or c.land_face for c in g.hand):
+        return False
+    before = g.land_drops_used
+    (step or play_land)(g)
+    if g.land_drops_used == before:
+        return False
+    g.m["late_land_drops"] += 1
+    return True
+
+
 def altar_fodder(g: Game, units=None) -> list:
     """Creatures Ashnod's Altar is allowed to eat, in board order.
 

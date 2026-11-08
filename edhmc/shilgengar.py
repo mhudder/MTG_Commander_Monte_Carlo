@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, remove_card, charge_coloured_pain, vault_of_the_archangel,
+from edhmc.engine import (cleanup_step, late_land_drop, remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
@@ -1559,6 +1559,8 @@ def take_turn(g):
     g.draw(1)
     g.land_step()
     g.main_phase(reserve=g.ult_reserve())
+    if late_land_drop(g, ShilgengarGame.land_step):   # drawn in main 1, §0z182
+        g.main_phase(reserve=g.ult_reserve())
     if g.result is not None:
         return
     g.walker_step()
@@ -1566,7 +1568,10 @@ def take_turn(g):
     g.activations()
     # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
     pearl_collector_trigger(g, g.life_gained_this_turn)
+    late_land_drop(g, ShilgengarGame.land_step)       # main 2 begins
     g.main_phase()
+    if late_land_drop(g, ShilgengarGame.land_step):   # drawn in main 2
+        g.main_phase()
     if g.result is not None:
         return
     g.walker_step()

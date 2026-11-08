@@ -567,7 +567,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "727be8c",
+        "evidence": "\u00a70z182 (engine.late_land_drop added; azusa never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
+        "fingerprint": "0e1daef87eb2b344",
+        "utc": "2026-11-08T01:51:27Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "67e0a8b2e2efc5b0",
@@ -2031,7 +2038,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "727be8c",
+        "evidence": "\u00a70z182 (engine.late_land_drop added; rendmaw never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
+        "fingerprint": "e7e3d512fb4ff7f8",
+        "utc": "2026-11-08T01:51:27Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "3a1ad6afa592141a",

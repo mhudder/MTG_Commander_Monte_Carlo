@@ -234,6 +234,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**: -0.005 to -0.013 at T20 per deck (removal before growth; seats act before a later kill). Lorehold's upkeep windows moved in: +0.0416 alone, +0.0335 in all |
 | [0z180](#0z180) | REBUILT | **Six tables rebuilt for §0z179** (parallel, 12.7 min wall): lorehold 11 rows up beyond their bars, all miracle payoffs; rendmaw 1; the rest 0. 11 of 12 staged swaps stand at both horizons |
 | [0z181](#0z181) | DECIDED | **-Plains +Anointed Procession WITHDRAWN by the owner**: inside its T20 bar at every re-measure since 2026-10-15. Tivit's table rebuild deferred to queue item 35; its cache reads SUSPECT until then |
+| [0z182](#0z182) | FIXED | **Four engines played their land only before main phase 1** (CR 305.1, 505.6b): a land drawn later waited a turn. `engine.late_land_drop`: **tivit +0.0063 / +0.0058, lorehold +0.0024 / +0.0029**, karlov +0.0015 at T20, shilgengar 0 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15798,6 +15799,91 @@ by the owner's choice: a staging-induced SUSPECT is cleared by a rebuild
 only, never `--verified`. `python -m tests` fails one case on it too,
 `test_metrics_and_render` C for tivit, plain and `--mutate`; every other
 module passes. **Queue item 35** is the rebuild.
+
+<a id="0z182"></a>
+
+## 0z182. FIXED -- a land drop in either main phase, not only before main phase 1
+
+**2026-11-08, the owner: "do the main phase 2 land drop first"**, after a read
+of the engines' turns for what the turn-structure findings (§0z176-§0z179)
+left. CR 505.6b: "During either main phase, the active player may play one
+land card from their hand if the stack is empty, if the player has priority,
+and if they haven't played a land this turn" (and 305.1, 305.2 for the
+count).
+**Lorehold, karlov, tivit and shilgengar took their one drop before main
+phase 1 and never again**, so a land DRAWN after it -- a cantrip, a rummage,
+Skullclamp, a Clue cracked, a combat trigger -- sat in hand with the drop
+unused until the next turn. Rendmaw and azusa already had a second land step
+after combat (`engine.take_turn`'s second `play_land`, azusa's second
+`land_step`), and are not touched.
+
+**The fix.** One function, `engine.late_land_drop(g, step=None)`
+(`late_land_drop`, default True): if a drop is left and a land (or a land
+face) is in hand, play it through the engine's own land step (`play_land`;
+shilgengar's `land_step`, which runs Bloodghast's and Emeria Shepherd's
+landfall), count it (`late_land_drops`) and return True, and the caller runs
+the main phase again on the new mana. Each of the four calls it at the end of
+main 1, as main 2 begins (combat's draws) and at the end of main 2; tivit
+once more after `activations` (Clues are cracked there), lorehold once more
+after Underworld Breach (no main phase follows; the land is untapped mana
+held up for the opponents' miracle windows). **Karlov's Citadel keeps the
+drop**: Bolas's Citadel plays a land off the top with the same drop
+(`citadel_land_step`, `citadel_step`), so karlov's main-1 call comes after
+`citadel_main` and its main-2 call before the main phase is skipped while the
+Citadel is out -- the hand's land waits for the dig, as the land step already
+made it. A rule written once, in a function, so the four cannot drift (§0z30).
+
+**The switch off is the old engine.** Every deck's staged list, seeds
+5000..7499, T20, every output key of every game hashed, against a fresh
+worktree at `727be8c`: with `late_land_drop=False`, **0 of 2,500 differ in
+all seven decks**. With the default, rendmaw, azusa and trostani are 0 of
+2,500 too (they never call it); lorehold 368, karlov 150, tivit 893,
+shilgengar 94 differ. `check_unchanged_decks` (N=400, against `727be8c`):
+rendmaw and azusa BIT-IDENTICAL, the four MOVED. `tools.validate`: +0.00 on
+every metric of every engine.
+
+**The measurement** (`diagnostics/run_knob_ab.py DECK late_land_drop
+late_land_drops`, the staged list both legs, N=15,000 paired, seeds
+5000..19999, python 3.13.16 / numpy 2.4.6,
+`results/late_land_drop_<deck>_20261108.txt`):
+
+| deck | T10 | T20 | late drops a game | games reached | in those, T20 |
+|---|---|---|---|---|---|
+| tivit | **+0.0063 ±0.0019** | **+0.0058 ±0.0027** | 0.477 | 34.7% | +0.0167 ±0.0078 |
+| lorehold | **+0.0024 ±0.0018** | **+0.0029 ±0.0026** | 0.168 | 15.1% | +0.0195 ±0.0172 |
+| karlov | +0.0005 ±0.0007 | **+0.0015 ±0.0011** | 0.071 | 5.8% | +0.0254 ±0.0186 |
+| shilgengar | +0.0001 ±0.0003 | +0.0000 ±0.0008 | 0.043 | 4.1% | +0.0000 ±0.0204 |
+
+**The identity check holds in all four**: a game in which no late land is
+played is played identically by the old engine (the function changes nothing
+when it returns False, and the main phase is re-run only when it returns
+True), and of the games with `late_land_drops` = 0 in both legs, **0 differ**
+on any output key (9,793 tivit, 12,742 lorehold, 14,133 karlov, 14,378
+shilgengar). A rule that only ADDS an option should not lose, and none does.
+
+**Its counters move with the grain.** `mana_spent` +0.70 (tivit), +0.45
+(lorehold), +0.14 (karlov), +0.07 (shilgengar); `cleanup_discards` down in
+all four (tivit -0.045, `cleanup_lands` -0.027: the cleanup step was
+discarding the land the turn could not play); `stranded_mv` down in tivit and
+lorehold; `lost` down in three. **Tivit gains the most because it draws the
+most after its land step**: Clues cracked after main 2 (`clues_cracked` 4.9 a
+game) are its largest source, which is why its extra call sits after
+`activations`; `token_drain` +1.9 and `artifacts_made` +1.0 are the extra mana
+put into its engines. Shilgengar plays a late land in 4% of its games and is
+flat.
+
+**Not done here**: rendmaw's and azusa's second land step runs once, after
+combat, so a land drawn in THEIR main 2 still waits (0.05 and 0.03 a game in
+a read-only count of 400 games). They could call `late_land_drop` at the end
+of main 2; it is not part of this change, so their caches stay valid.
+Trostani (SUSPENDED) has one land step before main 1, like the four did.
+
+**The tables**: lorehold's, karlov's, tivit's and shilgengar's caches are
+SUSPECT -- their games moved, so only a rebuild clears them (queue item 35,
+which now covers all four). Rendmaw's and azusa's are VERIFIED on the two
+checks above. `tests/test_late_land_drop.py` pins A-H with six mutations,
+exact sets, written before the first run: one per engine's call sites, so
+deleting any one engine's wiring is caught.
 
 ## How to read an ablation table
 

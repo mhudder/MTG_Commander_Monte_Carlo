@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -1703,13 +1703,20 @@ def take_turn(g, extra=False):
         return
     play_land(g)
     main_phase(g)
+    if late_land_drop(g):              # a land drawn in main 1, §0z182
+        main_phase(g)
     if g.result is not None:
         return
     combat(g)
+    late_land_drop(g)                  # main 2 begins: combat's draws
     main_phase(g)
+    if late_land_drop(g):              # a land drawn in main 2
+        main_phase(g)
     if g.result is not None:
         return
     activations(g)
+    if late_land_drop(g):              # a Clue's land, still main 2
+        main_phase(g)
     if g.result is not None:
         return
     end_step(g)
