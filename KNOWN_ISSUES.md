@@ -239,6 +239,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
 | [0z185](#0z185) | FIXED | **§0z184's findings 3-5**: the pod's end steps on pod turns 1-2 (0.1% of games); rendmaw's Tendershoot / Ophiomancer at each opponent's upkeep, **+0.0044 / +0.0036**; lorehold's Chimes / Waterskin one mana an opponent's turn, -0.0004 / -0.0021 |
 | [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**; a hold-back pilot +0.0007 to +0.0053; `incidental_rate` 0.78 ADOPTED, the mean held out of sample |
+| [0z187](#0z187) | FIXED | **§0z184 findings 2, 10; §0z182's leftover**: "until end of turn" ends at YOUR cleanup (514.2), +0.0005 / +0.0006 rendmaw, +0.0003 / +0.0011 azusa; a main-2 land drop, inside the bars; tivit's sick mana, latent |
+| [0z188](#0z188) | FIXED | **Beastmaster Ascension's +5/+5 is static** (611.3a): on at seven quest counters, not only from declare-attackers to your untap; +0.0003 ±0.0003 / +0.0001 ±0.0003, the hold-back keeps fewer home |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16014,7 +16016,7 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    Stampede), are reset at the next untap, so `power_of` carries them
    through the pod's round, and `board_threat` -- the pod's removal aim --
    reads it. Small: 24.9 against 24.7 (rendmaw), 3,996 against 3,940 (azusa,
-   1.4%) with the pumps zeroed.
+   1.4%) with the pumps zeroed. Fixed in §0z187.
 3. **THE POD'S END STEPS ARE SKIPPED ON POD TURNS 1 AND 2.**
    `pod_end_step_hook` sits after the `pod_turn(g) >= 3` gate that belongs to
    removal, in the seat round and in `opponents_act` alike, so Deathreap
@@ -16054,6 +16056,7 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
    difference.
 10. **LATENT: tivit's `mana_units` does not ask summoning sickness** of a
     creature with a mana ability (302.6). No such creature is in its list.
+    Guarded in §0z187.
 
 <a id="0z185"></a>
 
@@ -16108,7 +16111,10 @@ fodder (`cards_drawn` -0.05, `deathreap_draws` -0.006, `mana_spent` -0.17)
 -- so the two move in opposite directions and the sum is up: `lost` -0.0036,
 `final_life` +0.07. **Not split** between the two cards; a token made on the
 pod's turn is also an untapped blocker in `combat_share` (§0z184 finding 1),
-which this does not correct for.
+which this does not correct for. **That is the rule, not an error (§0z187)**: a
+token made at an opponent's upkeep exists before that opponent's combat, and
+summoning sickness stops attacking and {T} abilities (302.6), never blocking
+(509.1a). Under §0z186 it is counted untapped, which is right; do not "fix" it.
 
 `results/turn_fixes_rendmaw_20261108.txt` is 3 and 4 together on rendmaw:
 +0.0044 ±0.0014 / +0.0037 ±0.0020.
@@ -16302,6 +16308,173 @@ is gentler and better aimed.
   stand-in copied the Godmaw loop from before this section and granted no
   vigilance, so it broke Z for a reason that is not the order (§0z141's
   shape); it grants it now, and its set is as written.
+
+<a id="0z187"></a>
+
+## 0z187. FIXED -- §0z184's findings 2 and 10, and §0z182's leftover
+
+**2026-11-08, the owner: "do 1-4"**, after a review of §0z182-§0z186
+against CR 500-514 (`docs/MagicCompRules_20260807.txt`). Each fix is behind
+its own switch, default True. **All four switches False reproduce
+`fe00061`**: every deck's staged list, seeds 5000..7499, T20, every output
+key hashed (the three new counters left out), against a fresh worktree at
+`fe00061`, **0 of 2,500 differ in all seven decks**. With the defaults
+rendmaw (208) and azusa (229) move; lorehold, karlov, tivit, shilgengar and
+trostani do not. `tools.validate`: +0.00 on every metric of every engine.
+Measured with `diagnostics/run_knob_ab.py`, the staged list both legs,
+N=15,000 paired, seeds 5000..19999, the other new switches at their
+defaults, **python 3.11.17** / numpy 2.4.6 (this session's interpreter; the
+tables' is 3.13, §0z119 -- these are paired differences, not table rows).
+§0z188, Beastmaster Ascension, was found in the same review and is its own
+section.
+
+### 1. "Until end of turn" ends in your cleanup step (`eot_at_cleanup`; §0z184 finding 2)
+
+CR 514.2: in the cleanup step "all 'until end of turn' and 'this turn'
+effects end". Rendmaw's `stampede_bonus` (Overwhelming Stampede) and azusa's
+`craterhoof_bonus`, `wildspeaker_bonus`, `eot_pt` (Glacier Godmaw, Racetrack
+Bird), `eot_haste` and `eot_vigilance` were reset at the start of your NEXT
+turn, so `power_of` -- and `board_threat`, the pod's removal aim -- carried
+them through the pod's round. Now `engine.end_turn_effects`, called by
+`cleanup_step` after 514.1's discard, ends every name in
+`engine.EOT_EFFECTS`; every engine calls `cleanup_step`, so the rule lives
+in one function (§0z30). Its reach, `eot_ended_at_cleanup`, counts a live
+effect ended there. Trample (`opponents.is_trample`) and vigilance
+(`opponents.vigilant`) read the same state, but only in your own combat,
+which is over by then.
+
+| deck | T10 | T20 | games reached | file |
+|---|---|---|---|---|
+| rendmaw | **+0.0005 ±0.0004** | +0.0006 ±0.0006 | 2,282 (15.2%) | `results/eot_at_cleanup_rendmaw_20261108.txt` |
+| azusa | +0.0003 ±0.0003 | **+0.0011 ±0.0006** | 1,654 (11.0%) | `results/eot_at_cleanup_azusa_20261108.txt` |
+
+The identity holds in both (0 differ among the 12,718 and 13,346 games with
+nothing to end). **The mechanism is the one the rule names**: the pod aims
+less removal at a board that is no longer pumped -- `removal_eaten` -0.0037
+(rendmaw), -0.0021 (azusa) -- and `final_board_power` falls 1.95 in rendmaw,
+a game that ends in the pod's round no longer counting a Stampede. Small, as
+§0z184 predicted from the threat (1.4% of azusa's).
+
+`EOT_EFFECTS` is a hand-kept set (§0q): `tests/test_cleanup_and_static.py`
+case I checks every name in it is an attribute some engine sets, so a rename
+cannot leave it stale. **It is blind to a NEW until-end-of-turn pump that is
+not entered there.**
+
+### 2. A land drop at the end of main 2 for rendmaw and azusa (`late_land_main2`; §0z182's "Not done here")
+
+§0z182 gave the other four engines a land drop in either main phase (CR
+505.6b) and left these two, whose second land step runs as main 2 BEGINS: a
+land drawn IN main 2 waited a turn. Rendmaw calls `late_land_drop` after
+Thomil's step, the last of its main 2; azusa runs its own `land_step` (hand,
+the library's top and the graveyard are all its zones) -- only when a drop
+is left and a land is playable, so the call plays a land or does nothing,
+and never asks Quirion Ranger for a bounce that would be a new play rather
+than a land drawn. Either re-runs the main phase when a land was played.
+`late_land_drop=False` turns this off too.
+
+| deck | T10 | T20 | late drops a game | games reached | file |
+|---|---|---|---|---|---|
+| rendmaw | **+0.0006 ±0.0005** | +0.0005 ±0.0007 | 0.050 | 672 (4.5%) | `results/late_land_main2_rendmaw_20261108.txt` |
+| azusa | +0.0009 ±0.0012 | +0.0006 ±0.0016 | 0.078 | 1,112 (7.4%) | `results/late_land_main2_azusa_20261108.txt` |
+
+Both inside their bars at T20, as §0z182's read-only count (0.05 and 0.03 a
+game) said they would be; a rule that only adds an option, and neither leg
+loses. The counters move with the grain: `cleanup_lands` -0.006 / -0.011
+(the cleanup step was discarding the land the turn could not play),
+`mana_spent` +0.05 / +0.60, azusa's `landfall_triggers` +0.10.
+Azusa's `floating_mana_lost` rises 0.72: landfall mana made at the end of
+main 2 has nothing left to pay for.
+
+**Rendmaw's identity holds (0 of 14,328). Azusa's does not, and every
+difference is a counter.** Of the 13,888 games with no late drop, 28 differ,
+and a scan of all of them names the keys: `reroll_fetches` in all 28 (and
+its copy in the T10 snapshot in 18), `animated_blocker_turns` in one. No
+game's result, length, damage or life moves. The two are counting quirks of
+azusa's own land step, which the extra call reaches:
+- `choose_land` counts `reroll_fetches` when it PICKS a graveyard fetch, and
+  `land_step` can then decline to play it (Horn of Greed's draw check), so a
+  fetch that is never cracked is counted. A counter defect, pre-existing; not
+  fixed here (it would move the old engine's output).
+- `playable_lands` runs `cauldron_flush` (§0z135), so the gate returns Storm
+  Cauldron's lands to hand before the end-of-turn `animated_blocker_turns`
+  count instead of at the flush before the pod's turn; the board the pod sees
+  is the same.
+
+### 3. Tivit's sick mana creatures (`tivit_sick_mana`; §0z184 finding 10)
+
+CR 302.6: a creature's {T} ability waits until you have controlled it
+continuously since your most recent turn began. `tivit.mana_units` now
+leaves out a sick CREATURE's `mana_ability` (`sick_mana_skipped`); an
+artifact's is offered as before. **Latent**: no creature in tivit's list has
+a mana ability, and the switch alone moves 0 of 2,500 games in every deck.
+It is there for the first one staged.
+
+### What it leaves
+
+- Rendmaw's and azusa's games moved again; queue item 35's six-deck
+  rebuild covers them, and nothing else moved.
+- `tests/test_cleanup_and_static.py` pins A-P with eight mutations, exact
+  sets, written before the first run; all eight broke what was written.
+- **Read, not fixed** (the same review): the crack-back read in a MAIN PHASE
+  (§0z186's "What it leaves": karlov's Citadel and Necropotence floors count
+  creatures that will attack later as blockers); `hold_back_pad` is 0, so the
+  hold-back protects against dying only, and a sweep of it needs §0z170's
+  out-of-sample re-measure; azusa's Quirion Ranger docstring still says "your
+  creatures never block", which §0z186 made false -- its untap of an attacker
+  after combat is a blocker now, an unmodelled payoff.
+- §0z185's note that a token made at an opponent's upkeep is "an untapped
+  blocker ... which this does not correct for" is the rule, not an error, and
+  is marked so there.
+
+<a id="0z188"></a>
+
+## 0z188. FIXED -- Beastmaster Ascension's +5/+5 is a static ability
+
+**Found 2026-11-08** reading §0z184-§0z186's turn steps against the rules,
+recorded and fixed at the owner's word ("do 1-4 and record the Beastmaster
+finding"). Scryfall, the same day: "Whenever a creature you control attacks,
+you may put a quest counter on this enchantment. As long as this enchantment
+has seven or more quest counters on it, creatures you control get +5/+5."
+
+**The second sentence is a static ability** (CR 611.3a: "A continuous effect
+generated by a static ability isn't 'locked in'; it applies at any given
+moment to whatever its text indicates"). Since §0z153 the counters stay, so
+from the seventh counter on, the +5/+5 is on at every moment. The engine
+held it in a flag, `beast_active`, which `engine.take_turn` cleared in every
+untap step and `combat` set again only once attackers were declared. So the
+bonus was OFF:
+- in **every main phase 1** of a turn with seven counters;
+- in **the hold-back's lethal check** (§0z186): `OPP.hold_back` runs just
+  before `combat` recomputes the flag, so `damage_through` read every
+  attacker 5 power short, and could keep creatures home from a swing that was
+  lethal;
+- through **a whole pod round after a turn with no attack** -- a read-only
+  count of 400 rendmaw games (seeds 5000..5399, T20): 101 pod rounds began
+  with an Ascension at seven counters, and in 10 of them the bonus was off.
+
+**The fix.** `Game.beast_on()` reads the counters whenever power or
+toughness is asked for. `beast_static=False` restores the flag; under
+`beast_quest=False` (the old rule, seven attackers in one combat, power
+only) the flag is all there is. The reach is `beast_armed_combats`, a
+combat that leaves an Ascension at seven counters, counted in both legs:
+before the seventh counter the flag and the counters agree.
+
+| | T10 | T20 | file |
+|---|---|---|---|
+| rendmaw | **+0.0003 ±0.0003** | +0.0001 ±0.0003 | `results/beast_static_rendmaw_20261108.txt` |
+| in the 1,776 games reached (11.8%) | +0.0023 ±0.0022 | +0.0006 ±0.0029 | |
+
+The identity holds: 0 of the 13,224 games that never arm the Ascension
+differ. The switch alone moves 19 of 2,500 rendmaw games and no other deck's.
+**The mechanism is the hold-back's**: `held_back` -0.0073 a game and
+`hold_back_turns` -0.0011 (the lethal check now sees the +5/+5), `raw_damage`
++0.15. It is small because by the seventh counter rendmaw is usually winning
+or already lost. Beastmaster Ascension's row in rendmaw's table was measured
+with the flag, so it is a FLOOR until item 35's rebuild.
+
+**What it leaves**: the hold-back's choice of who stays home does not
+count the quest counter a held-back creature would have added; nor does any
+pilot rule read the counters as a reason to attack.
 
 ## How to read an ablation table
 

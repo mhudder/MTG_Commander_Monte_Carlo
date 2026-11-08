@@ -1,0 +1,78 @@
+rendmaw: beast_static=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.17 / numpy 2.4.6
+
+   won T10  +0.0003 ±0.0003*
+   won T20  +0.0001 ±0.0003 
+
+   games where beast_armed_combats > 0 in either leg: 1776 of 15000 (11.8%)
+   IDENTITY: of the 13224 games with beast_armed_combats = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0023 ±0.0022
+   in those games, won T20  +0.0006 ±0.0029
+
+   every numeric output that moved (mean A, mean B, A - B):
+   ae_removal_eaten                   0.6412     0.6411  +0.0001
+   artist_pod_drains                  0.3146     0.3140  +0.0006
+   attack_targets                     7.2000     7.1999  +0.0001
+   attack_triggers                    0.3957     0.3959  -0.0002
+   basics_fetched                     0.4949     0.4950  -0.0001
+   beast_armed_combats                0.2848     0.2849  -0.0001
+   cards_drawn                       14.2035    14.2066  -0.0031
+   cleanup_discards                   0.6548     0.6549  -0.0001
+   cleanup_mv                         1.0979     1.0981  -0.0003
+   cleanup_turns                      0.2663     0.2663  -0.0001
+   combat_kills                       0.9967     0.9965  +0.0002
+   countered                          0.6585     0.6584  +0.0001
+   crn_draws                          1.4874     1.4875  -0.0001
+   damage                            57.6010    57.5821  +0.0189
+   deluge_life_paid                   0.1533     0.1537  -0.0004
+   drain_damage                       1.5566     1.5567  -0.0001
+   elder_sacrifices                   0.2050     0.2051  -0.0001
+   erebos_creature_turns              0.0392     0.0391  +0.0001
+   erebos_draws                       0.2277     0.2278  -0.0001
+   erebos_life_paid                   0.4555     0.4556  -0.0001
+   familiar_life                      0.2959     0.2960  -0.0001
+   final_board_power                 35.9252    35.9159  +0.0093
+   final_life                         7.6698     7.6629  +0.0069
+   frostfang_draws                    1.3848     1.3860  -0.0012
+   held_back                          0.4721     0.4795  -0.0073
+   hold_back_turns                    0.1528     0.1539  -0.0011
+   karoo_bounces                      0.1987     0.1988  -0.0001
+   kavu_draws                         0.1446     0.1445  +0.0001
+   late_land_drops                    0.0498     0.0499  -0.0001
+   life_lost_to_own_cards             1.7452     1.7459  -0.0007
+   lifelinked                         5.0397     5.0313  +0.0083
+   locthwain_draws                    0.0343     0.0345  -0.0001
+   loss_route                         1.1717     1.1718  -0.0001
+   lost                               0.6937     0.6937  -0.0001
+   mana_floated                      10.9308    10.9312  -0.0004
+   mana_spent                        44.0120    44.0196  -0.0076
+   march_elephants                    0.0192     0.0193  -0.0001
+   meathook_pod_gains                 0.2727     0.2729  -0.0002
+   opponents_killed                   1.6611     1.6611  -0.0001
+   own_wipes_cast                     0.0420     0.0421  -0.0001
+   pod_birds_killed                   2.1517     2.1504  +0.0013
+   pod_blockers_killed                0.5773     0.5772  +0.0001
+   pod_bodies_killed                  4.2997     4.3003  -0.0005
+   raw_damage                        68.3400    68.1899  +0.1501
+   reaper_draws                       0.2361     0.2363  -0.0001
+   reaper_life_lost                   0.2361     0.2363  -0.0001
+   rendmaw_triggers                   2.4955     2.4959  -0.0004
+   responses_cast                     0.1629     0.1630  -0.0001
+   responses_end_step                 0.1067     0.1068  -0.0001
+   seat_saprolings                    0.4989     0.4993  -0.0003
+   seat_snakes                        0.1710     0.1711  -0.0001
+   shigeki_digs                       0.1155     0.1155  +0.0001
+   spells_cast                       10.9494    10.9509  -0.0015
+   stranded_mv                      127.6541   127.6658  -0.0117
+   tapped_not_blocking               58.4084    58.4093  -0.0009
+   tendershoot_own_upkeeps            0.1821     0.1823  -0.0002
+   threat_answers_cast                0.2389     0.2389  -0.0001
+   threat_pieces_removed              0.3685     0.3687  -0.0002
+   threat_rounds_delayed              0.7823     0.7827  -0.0004
+   threat_wipe_pieces                 0.0319     0.0320  -0.0001
+   tokens_made                        8.4264     8.4289  -0.0025
+   turn_lethal                       72.3741    72.3806  -0.0065
+   turns_played                      10.4273    10.4281  -0.0007
+   vigilant_attacks                   0.3757     0.3755  +0.0002
+   village_rites_cast                 0.1635     0.1635  -0.0001
+   wipes_suffered                     0.4731     0.4732  -0.0001
+   won                                0.3053     0.3053  +0.0001

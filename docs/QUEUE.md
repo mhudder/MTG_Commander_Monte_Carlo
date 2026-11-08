@@ -214,6 +214,9 @@ What is closed and where it went:
     - **§0z185 (2026-11-08) adds rendmaw**: its seat upkeeps moved its
       games. ALL SIX active decks are now SUSPECT; this is a full parallel
       rebuild.
+    - **§0z187 and §0z188 (2026-11-08)** moved rendmaw's and azusa's games
+      again (until end of turn at cleanup, the main-2 land drop, Beastmaster
+      Ascension's static); nothing else. Still the same six-deck rebuild.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
       any single engine fix, item 36 included. One batch rebuild of every
       active table once all the engine work is done; until then the six
@@ -225,14 +228,12 @@ What is closed and where it went:
       green, and close this item to `docs/HISTORY.md`. Batch it with the next
       rebuild if one is coming.
 
-37. **The smaller turn-structure findings of §0z184 (2, 6-10; 3-5 are
-    fixed, §0z185)**, none of
-    them urgent. In the order a session would take them: "until end of turn"
-    pumps ended at cleanup (2: azusa's `eot_pt`, `craterhoof_bonus`,
-    `wildspeaker_bonus`, rendmaw's `stampede_bonus`; 1.4% of azusa's threat);
+37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
+    §0z185; 2 and 10, §0z187)**, none of
+    them urgent. In the order a session would take them:
     Memory Jar and Bloodbat Summoner (8); shilgengar's `activations` inside
     main 2 and Black Market Connections at the first main phase (7); first
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers; the seat you take (9), which is a model decision to
-    write down, not a bug; and tivit's sick mana creatures (10), latent.
+    write down, not a bug.
 

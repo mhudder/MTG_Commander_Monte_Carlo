@@ -1,0 +1,107 @@
+rendmaw: eot_at_cleanup=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.17 / numpy 2.4.6
+
+   won T10  +0.0005 ±0.0004*
+   won T20  +0.0006 ±0.0006*
+
+   games where eot_ended_at_cleanup > 0 in either leg: 2282 of 15000 (15.2%)
+   IDENTITY: of the 12718 games with eot_ended_at_cleanup = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0031 ±0.0026
+   in those games, won T20  +0.0039 ±0.0039
+
+   every numeric output that moved (mean A, mean B, A - B):
+   ae_removal_eaten                   0.6412     0.6418  -0.0006
+   altar_mana_made                    0.1612     0.1609  +0.0003
+   altar_sacrifices                   0.0806     0.0805  +0.0001
+   artifacts_returned                 0.1102     0.1103  -0.0001
+   artist_pod_drains                  0.3146     0.3148  -0.0002
+   attack_targets                     7.2000     7.1954  +0.0046
+   basics_fetched                     0.4949     0.4947  +0.0002
+   beast_armed_combats                0.2848     0.2844  +0.0004
+   biotransference_necrons            0.3271     0.3271  +0.0001
+   cards_drawn                       14.2035    14.1987  +0.0048
+   chef_activations                   0.1331     0.1325  +0.0006
+   cleanup_discards                   0.6548     0.6543  +0.0005
+   cleanup_lands                      0.3056     0.3051  +0.0005
+   cleanup_mv                         1.0979     1.0981  -0.0002
+   coloured_taps_paid                 0.2479     0.2476  +0.0003
+   combat_kills                       0.9967     0.9957  +0.0011
+   commander_aimed                    0.0049     0.0047  +0.0001
+   commander_damage_kills             0.0009     0.0009  +0.0001
+   countered                          0.6585     0.6584  +0.0001
+   counters_shielded                  0.0527     0.0529  -0.0001
+   crn_draws                          1.4874     1.4867  +0.0007
+   culling_mana                       0.0773     0.0771  +0.0002
+   culling_mana_spent                 0.0328     0.0327  +0.0001
+   damage                            57.6010    57.5432  +0.0578
+   deluge_life_paid                   0.1533     0.1541  -0.0008
+   doll_nest_counters                 0.4197     0.4193  +0.0004
+   doll_sacrifices                    0.0895     0.0892  +0.0003
+   doll_spiders                       0.2684     0.2676  +0.0008
+   drain_damage                       1.5566     1.5577  -0.0011
+   eot_ended_at_cleanup               0.1521     0.0000  +0.1521
+   erebos_draws                       0.2277     0.2273  +0.0004
+   erebos_life_paid                   0.4555     0.4547  +0.0008
+   familiar_draws                     0.0391     0.0392  -0.0001
+   final_board_power                 35.9252    37.8757  -1.9505
+   final_life                         7.6698     7.6557  +0.0140
+   finality_exiled                    0.0420     0.0418  +0.0002
+   frostfang_draws                    1.3848     1.3843  +0.0005
+   gloomshrieker_returns              0.0973     0.0972  +0.0001
+   hart_sacrifices                    0.0667     0.0667  +0.0001
+   held_back                          0.4721     0.4733  -0.0011
+   high_market_sacs                   0.0279     0.0279  -0.0001
+   hold_back_turns                    0.1528     0.1531  -0.0003
+   impending_casts                    0.0855     0.0854  +0.0001
+   karoo_bounces                      0.1987     0.1987  +0.0001
+   kavu_draws                         0.1446     0.1447  -0.0001
+   late_land_drops                    0.0498     0.0497  +0.0001
+   life_lost_to_own_cards             1.7452     1.7446  +0.0006
+   lifelinked                         5.0397     5.0330  +0.0067
+   loss_route                         1.1717     1.1732  -0.0015
+   lost                               0.6937     0.6943  -0.0006
+   mana_floated                      10.9308    10.9292  +0.0016
+   mana_spent                        44.0120    43.9941  +0.0179
+   meathook_pod_gains                 0.2727     0.2727  +0.0001
+   modal_land_faces                   0.2123     0.2122  +0.0001
+   opponents_killed                   1.6611     1.6587  +0.0023
+   overseer_activations               0.4946     0.4940  +0.0006
+   own_wipes_cast                     0.0420     0.0421  -0.0001
+   painland_life                      0.2479     0.2476  +0.0003
+   pod_birds_killed                   2.1517     2.1495  +0.0022
+   pod_blockers_killed                0.5773     0.5759  +0.0014
+   pod_bodies_killed                  4.2997     4.3008  -0.0011
+   protected                          0.0525     0.0525  -0.0001
+   protected_indestructible           0.0131     0.0131  -0.0001
+   raw_damage                        68.3400    68.2816  +0.0584
+   reaper_draws                       0.2361     0.2359  +0.0003
+   reaper_life_lost                   0.2361     0.2359  +0.0003
+   removal_eaten                      1.2261     1.2297  -0.0037
+   rendmaw_triggers                   2.4955     2.4933  +0.0022
+   responses_cast                     0.1629     0.1631  -0.0001
+   responses_end_step                 0.1067     0.1068  -0.0001
+   responses_protect                  0.0525     0.0525  -0.0001
+   seat_saprolings                    0.4989     0.4977  +0.0013
+   seat_snakes                        0.1710     0.1706  +0.0004
+   shock_life                         0.3811     0.3812  -0.0001
+   solemn_death_draws                 0.0427     0.0431  -0.0004
+   spells_cast                       10.9494    10.9458  +0.0036
+   stranded_mv                      127.6541   127.6330  +0.0211
+   tapped_not_blocking               58.4084    58.3482  +0.0602
+   tendershoot_own_upkeeps            0.1821     0.1820  +0.0001
+   threat_answers_cast                0.2389     0.2385  +0.0004
+   threat_pieces_removed              0.3685     0.3683  +0.0002
+   threat_rounds_delayed              0.7823     0.7820  +0.0003
+   threat_wipe_pieces                 0.0319     0.0321  -0.0001
+   tokens_made                        8.4264     8.4179  +0.0085
+   trawler_returns                    0.0405     0.0405  -0.0001
+   treasures_made                     0.1407     0.1401  +0.0007
+   treasures_spent                    0.0336     0.0330  +0.0006
+   turn_lethal                       72.3741    72.4209  -0.0467
+   turns_played                      10.4273    10.4247  +0.0026
+   vault_activations                  0.0299     0.0298  +0.0001
+   vigilant_attacks                   0.3757     0.3745  +0.0012
+   village_rites_cast                 0.1635     0.1634  +0.0001
+   whip_exiled                        0.1235     0.1240  -0.0005
+   whip_returns                       0.1494     0.1498  -0.0004
+   wipes_suffered                     0.4731     0.4731  -0.0001
+   won                                0.3053     0.3047  +0.0006

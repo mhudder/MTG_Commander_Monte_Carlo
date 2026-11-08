@@ -449,6 +449,14 @@ def mana_units(g, powerstones: bool = False) -> list[frozenset]:
         if c.is_land:
             units.append(frozenset(c.produces))
         elif c.mana_ability:
+            # CR 302.6: a CREATURE's {T} ability waits until you have
+            # controlled it since your most recent turn began (§0z184 finding
+            # 10, §0z187). Latent: no creature in tivit's list has a mana
+            # ability, so `tivit_sick_mana=False` plays every game the same.
+            if (p.sick and c.is_creature
+                    and g.cfg.get("tivit_sick_mana", True)):
+                g.m["sick_mana_skipped"] += 1
+                continue
             amt, colors = c.mana_ability
             units.extend([colors] * amt)
     # POWERSTONES (Dyfed, §0z74): "{T}: Add {C}. This mana can't be spent to

@@ -126,7 +126,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (cleanup_step, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           choose_mode_cost, can_afford,
@@ -4210,6 +4210,28 @@ def take_turn(g):
     g.main_phase()
     if g.result is not None:
         return
+    # A LAND DRAWN IN MAIN 2 (§0z187, `late_land_main2`): the land step above
+    # ran as main 2 began. Azusa's land step reads its own zones (hand, the
+    # library's top, the graveyard), so it is asked directly rather than
+    # through `late_land_drop`'s hand-only gate -- but ONLY when a drop is left
+    # and a land is playable, so this call plays a land or does nothing: with
+    # none, `land_step` would ask Quirion Ranger for a bounce, a new play
+    # rather than a land drawn in main 2. The main phase re-runs only when a
+    # land was played. Not bit-identical when it plays nothing (§0z187): two
+    # COUNTERS can move -- `reroll_fetches`, counted when `choose_land` picks
+    # a fetch that Horn of Greed's check then declines, and
+    # `animated_blocker_turns`, when `playable_lands` flushes Storm
+    # Cauldron's returns before that end-of-turn count instead of after.
+    if (late_land_main2(g) and g.cfg.get("late_land_drop", True)
+            and g.land_drops_used < g.land_drops_for_turn()
+            and g.playable_lands()):
+        before = g.land_drops_used
+        g.land_step()
+        if g.land_drops_used > before:
+            g.m["late_land_drops"] += 1
+            g.main_phase()
+            if g.result is not None:
+                return
     g.empty_mana_pool("main2")     # the end of main phase 2: none for the pod
 
     # THE GREAT HENGE's second half: "{T}: Add {G}{G}. You gain 2 life."

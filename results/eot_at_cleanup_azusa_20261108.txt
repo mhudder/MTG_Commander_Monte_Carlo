@@ -1,0 +1,106 @@
+azusa: eot_at_cleanup=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.17 / numpy 2.4.6
+
+   won T10  +0.0003 ±0.0003 
+   won T20  +0.0011 ±0.0006*
+
+   games where eot_ended_at_cleanup > 0 in either leg: 1654 of 15000 (11.0%)
+   IDENTITY: of the 13346 games with eot_ended_at_cleanup = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0030 ±0.0031
+   in those games, won T20  +0.0103 ±0.0054
+
+   every numeric output that moved (mean A, mean B, A - B):
+   abundance_bottomed                 0.9082     0.9075  +0.0007
+   abundance_draws                    0.8744     0.8727  +0.0017
+   abundance_lands                    0.3402     0.3407  -0.0005
+   abundance_nonlands                 0.5342     0.5320  +0.0022
+   ae_removal_eaten                   0.3493     0.3506  -0.0013
+   animated_attacks                   0.4333     0.4333  +0.0001
+   animated_blocker_turns             1.7622     1.7613  +0.0009
+   animated_damage                    9.8885     9.8904  -0.0019
+   ashaya_land_deaths                 0.1471     0.1470  +0.0001
+   ashaya_landfall                    0.8767     0.8755  +0.0013
+   attack_targets                     6.5323     6.5307  +0.0016
+   cards_drawn                       19.5569    19.5305  +0.0264
+   cauldron_returns                   1.2321     1.2295  +0.0026
+   caves_cracked                      0.2075     0.2077  -0.0002
+   cleanup_discards                   2.5310     2.5223  +0.0087
+   cleanup_lands                      1.0074     1.0029  +0.0045
+   cleanup_mv                         6.6651     6.6470  +0.0181
+   cleanup_turns                      0.6398     0.6387  +0.0011
+   combat_damage                     71.0323    70.9895  +0.0429
+   combat_kills                       1.5164     1.5148  +0.0016
+   commander_aimed                    0.0151     0.0150  +0.0001
+   countered                          0.9999     0.9998  +0.0001
+   counters_shielded                  0.0475     0.0474  +0.0001
+   creatures_sacrificed               0.1188     0.1187  +0.0001
+   crn_draws                          8.0276     8.0213  +0.0063
+   crop_rotation_sacrificed           0.2560     0.2557  +0.0003
+   crystal_vein_sacs                  0.1870     0.1869  +0.0001
+   damage                            71.0323    70.9895  +0.0429
+   eot_ended_at_cleanup               0.1132     0.0000  +0.1132
+   eye_tutors                         0.1050     0.1049  +0.0001
+   fetch_life                         2.5391     2.5366  +0.0025
+   fetches_cracked                    5.2891     5.2848  +0.0043
+   final_board_power              91092.1631 91017.9911  +74.1720
+   final_life                        12.9915    12.9617  +0.0298
+   floating_clues                     0.3187     0.3196  -0.0009
+   floating_clues_main1               0.2628     0.2627  +0.0001
+   floating_clues_main2               0.0559     0.0569  -0.0011
+   floating_eye_tutors                0.0073     0.0071  +0.0001
+   floating_lost_main1                5.3924     5.4273  -0.0349
+   floating_lost_main2                1.6513     1.6523  -0.0010
+   floating_mana_lost                 7.0437     7.0797  -0.0359
+   gsz_shuffled                       0.2288     0.2285  +0.0003
+   held_back                          0.1411     0.1410  +0.0001
+   hold_back_turns                    0.0481     0.0481  +0.0001
+   landfall_ability_resolutions      30.5840    30.5555  +0.0285
+   landfall_triggers                 24.4635    24.4496  +0.0139
+   lands_animated                     2.9998     2.9975  +0.0023
+   lands_from_graveyard               4.5255     4.5193  +0.0062
+   lands_from_hand                    9.6867     9.6877  -0.0009
+   lands_from_library                 2.5989     2.5967  +0.0022
+   lands_played                      16.6619    16.6546  +0.0073
+   late_land_drops                    0.0863     0.0861  +0.0002
+   library_kept                       0.3650     0.3649  +0.0001
+   library_life_paid                  1.4600     1.4597  +0.0003
+   library_put_back                   0.6929     0.6921  +0.0007
+   library_shuffles                   7.3251     7.3196  +0.0055
+   life_gained                        5.7981     5.7884  +0.0097
+   life_lost_to_own_cards             2.5391     2.5366  +0.0025
+   loss_route                         0.9060     0.9082  -0.0022
+   lost                               0.5110     0.5121  -0.0011
+   mana_floated                      19.2515    19.2372  +0.0143
+   mana_spent                       142.9329   142.7969  +0.1359
+   moloid_mill_lands                  0.2111     0.2111  -0.0001
+   moloid_mills                       0.6668     0.6671  -0.0003
+   moloids_made                       5.1155     5.1100  +0.0055
+   mossborn_doublings                 4.1606     4.1533  +0.0073
+   nissa_transforms                   0.2273     0.2273  +0.0001
+   nykthos_activations                0.1191     0.1190  +0.0001
+   nykthos_mana                       0.8147     0.8143  +0.0004
+   opponents_killed                   1.8902     1.8877  +0.0025
+   petrified_returns                  0.0709     0.0711  -0.0001
+   pod_blockers_killed                0.7886     0.7880  +0.0006
+   pod_bodies_killed                  4.4734     4.4721  +0.0013
+   pw_activations                     0.6941     0.6933  +0.0007
+   quirion_bounces                    0.4751     0.4750  +0.0001
+   quirion_tapped_bounces             0.3282     0.3281  +0.0001
+   raw_damage                     74409.7823 74320.6743  +89.1080
+   removal_eaten                      1.2944     1.2965  -0.0021
+   reroll_fetches                     2.1533     2.1489  +0.0043
+   responses_cast                     0.0542     0.0543  -0.0001
+   responses_end_step                 0.0514     0.0515  -0.0001
+   scute_swarms_made                 11.4990    11.4866  +0.0124
+   springheart_bestowed               0.1375     0.1373  +0.0001
+   springheart_copies                 1.2042     1.2015  +0.0027
+   springheart_etbs                   1.2042     1.2015  +0.0027
+   springheart_legend_dies            0.0304     0.0309  -0.0005
+   stranded_mv                      178.3571   178.3175  +0.0396
+   tapped_not_blocking               52.2389    52.2249  +0.0139
+   threat_answers_whiffed             0.1535     0.1534  +0.0001
+   threat_pieces_removed              0.2978     0.2980  -0.0002
+   threat_rounds_delayed              0.6481     0.6487  -0.0007
+   tokens_made                      129.3183   129.0538  +0.2645
+   turns_played                       9.7477     9.7459  +0.0018
+   tutored                            0.4611     0.4604  +0.0007
+   won                                0.4885     0.4874  +0.0011

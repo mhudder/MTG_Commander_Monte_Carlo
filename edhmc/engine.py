@@ -1971,9 +1971,27 @@ class Game(BaseGame):
         else:
             base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters + self.stampede_bonus + swarmweaver_bonus(self, perm)
-        if self.has("Beastmaster Ascension") and self.beast_active:
+        if self.beast_on():
             p += 5
         return p
+
+    def beast_on(self) -> bool:
+        """Is Beastmaster Ascension's +5/+5 on RIGHT NOW? "As long as this
+        enchantment has seven or more quest counters on it, creatures you
+        control get +5/+5" is a STATIC ability (CR 611.3a): it applies
+        whenever the counters are there, which since §0z153 is every moment
+        after the seventh. `beast_active`, the old flag, was cleared in every
+        untap step and set again only once attackers were declared, so main
+        phase 1, the hold-back's lethal check (§0z186) and a pod round after a
+        turn with no attack all read the board 5/5 short (§0z188).
+        `beast_static=False` restores the flag."""
+        if not self.has("Beastmaster Ascension"):
+            return False
+        if (self.cfg.get("beast_quest", True)
+                and self.cfg.get("beast_static", True)):          # §0z188
+            return any(getattr(p, "quest", 0) >= 7 for p in self.board
+                       if p.card.name == "Beastmaster Ascension")
+        return self.beast_active
 
     def toughness_of(self, perm: Permanent) -> int:
         if self.has("March of the World Ooze"):
@@ -1983,8 +2001,7 @@ class Game(BaseGame):
         t = base + perm.counters + swarmweaver_bonus(self, perm)
         # Beastmaster Ascension: "+5/+5" -- the toughness half was missing
         # (§0z153, with the quest counters).
-        if (self.has("Beastmaster Ascension") and self.beast_active
-                and self.cfg.get("beast_quest", True)):
+        if self.beast_on() and self.cfg.get("beast_quest", True):
             t += 5
         return t
 
@@ -2918,6 +2935,16 @@ def late_land_drop(g, step=None) -> bool:
         return False
     g.m["late_land_drops"] += 1
     return True
+
+
+def late_land_main2(g) -> bool:
+    """Do rendmaw and azusa take a land drop at the END of main phase 2
+    (§0z187)? Their second land step runs as main 2 begins, so a land drawn
+    IN main 2 -- a cantrip, Skullclamp, a Clue -- waited a turn, as the
+    other four engines' did before §0z182. `late_land_main2=False` is the old
+    engine; `late_land_drop=False` turns this off too, as it does every late
+    drop."""
+    return bool(g.cfg.get("late_land_main2", True))           # §0z187
 
 
 def altar_fodder(g: Game, units=None) -> list:
@@ -4321,7 +4348,47 @@ def put_discarded(g, card) -> None:
     g.graveyard.append(card)
 
 
+# "UNTIL END OF TURN" ENDS IN THE CLEANUP STEP (CR 514.2; §0z184 finding 2,
+# §0z187). The engines' whole-board and per-permanent pumps were reset at the
+# start of your NEXT turn, so they lasted through the pod's round, where
+# `power_of` -- and `board_threat`, the pod's removal aim -- read them. The
+# names are a hand-kept set (§0q), so `tests/test_cleanup_and_static.py` case I
+# checks each is an attribute some engine sets: a renamed pump leaves no stale
+# entry. It is BLIND to a NEW until-end-of-turn pump that is not entered here;
+# whoever implements one adds its name, and the azusa/rendmaw cases show how.
+EOT_EFFECTS = (
+    "stampede_bonus",       # rendmaw: Overwhelming Stampede
+    "craterhoof_bonus",     # azusa: Craterhoof Behemoth
+    "wildspeaker_bonus",    # azusa: Return of the Wildspeaker
+    "eot_pt",               # azusa: Glacier Godmaw, Racetrack Bird
+    "eot_haste",            # azusa: Glacier Godmaw
+    "eot_vigilance",        # azusa: Glacier Godmaw (§0z186)
+)
+
+
+def end_turn_effects(g) -> None:
+    """CR 514.2: "all 'until end of turn' and 'this turn' effects end" -- in
+    YOUR cleanup step, before the pod's turns. `eot_at_cleanup=False` is the
+    old engine, which ended them at the start of your next turn. Counted when
+    one was live (`eot_ended_at_cleanup`): a game that never has one at
+    cleanup is played identically by the old engine."""
+    if not g.cfg.get("eot_at_cleanup", True):                    # §0z187
+        return
+    for name in EOT_EFFECTS:
+        v = getattr(g, name, None)
+        if not v:
+            continue
+        g.m["eot_ended_at_cleanup"] += 1
+        setattr(g, name, {} if isinstance(v, dict) else 0)
+
+
 def cleanup_step(g, pick=None, after=None) -> int:
+    total = _discard_to_hand_size(g, pick, after)
+    end_turn_effects(g)                     # CR 514.2, after 514.1's discard
+    return total
+
+
+def _discard_to_hand_size(g, pick=None, after=None) -> int:
     """CR 514.1: discard down to `max_hand_size`; returns the cards discarded.
 
     Which cards go is the pilot's choice. By default the hand is ranked by
@@ -5150,6 +5217,11 @@ def combat(g: Game):
                 p.quest = getattr(p, "quest", 0) + len(attackers)
         g.beast_active = any(getattr(p, "quest", 0) >= 7 for p in g.board
                              if p.card.name == "Beastmaster Ascension")
+        # The reach of §0z188's static reading: before an Ascension's seventh
+        # counter the flag and the counters agree, so a game that never gets
+        # here plays identically with `beast_static` on or off.
+        if g.beast_active:
+            g.m["beast_armed_combats"] += 1
     else:
         g.beast_active = (g.has("Beastmaster Ascension")
                           and len(attackers) >= 7)
@@ -5281,6 +5353,8 @@ def take_turn(g: Game):
     thomil_step(                    # Thomil, sorcery speed (§0z74)
         g, make_zombie=lambda: g.make_tokens(1, 2, 2, "Zombie"),
         make_lord=lambda: rendmaw_token(g, lord_of_the_pit_card))
+    if late_land_main2(g) and late_land_drop(g):   # drawn in main 2, §0z187
+        main_phase(g)
     empty_mana_pool(g)
     end_step_outlets(g)             # draw outlets on leftover mana, §0z73
     boulder_end_step(g)             # Ballistic Boulder is sacrificed, §0z125
