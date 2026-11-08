@@ -233,6 +233,16 @@ class KarlovGame(BaseGame):
         seat's pieces (`citadel_piece_target`), not once a round (§0z179)."""
         return seat_pod(self)
 
+    # YOUR COMBAT, READ BEFORE IT (§0z189). `combat` starts from this list and
+    # sets `combat_declared` before its hold-back, and the untap step clears
+    # it, so `opponents.planned_attack` reads main phase 1's crack-back with
+    # these attackers tapped -- the board the pod's turns will see.
+    combat_declared = True
+
+    def planned_attackers(self) -> list:
+        """The creatures `combat` would attack with, before the hold-back."""
+        return [p for p in self.board if may_attack(self, p)]
+
     def pod_upkeep(self, i: int) -> None:
         """Opponent `i`'s upkeep (§0z179): Ginger, Queen of Sweets' "at the
         beginning of EACH upkeep, if you're the monarch" -- one token, while
@@ -2373,9 +2383,10 @@ def sun_titan(g):
 
 
 def combat(g):
+    g.combat_declared = True           # main 1's planned read ends, §0z189
     if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
         g.m["heliod_animated"] += 1
-    attackers = [p for p in g.board if may_attack(g, p)]
+    attackers = g.planned_attackers()
     attackers = OPP.hold_back(g, attackers)    # blockers for the pod, §0z186
     if not attackers:
         g.damage_by_turn.append(0.0)
@@ -2641,6 +2652,7 @@ def take_turn(g):
     g.wind_crystal_used = False
     g.life_gained_this_turn = 0.0
     g.turn_life = g.your_life      # the Citadel's all-in policy reads it
+    g.combat_declared = False      # your combat is still to come, §0z189
     top_spin(g, "left_up")         # the pod's end step: mana left up
     for p in g.board:
         p.tapped = False

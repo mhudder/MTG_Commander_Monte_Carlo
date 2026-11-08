@@ -3800,7 +3800,66 @@ def chip_amount(g, opp, share, creatures=None) -> float:
     return n * rate * share * opp.p.get("power", 1.0) * attack_tax_through(g)
 
 
+def planned_attack(g):
+    """The creatures YOUR coming combat will tap, read before it (§0z189),
+    or None when there is no such reading to make.
+
+    The pod's turns read your board as your turn LEFT it (§0z186): an
+    attacker tapped in combat does not block. A pilot who reads the pod's
+    clock in main phase 1 -- Bolas's Citadel's dig floor (§0z161), the first
+    reader -- must read it with the attack it is about to make, or every
+    creature that will tap counts as a blocker and the floor is too low.
+
+    The attack is the engine's own: its `planned_attackers()` (the same
+    list its `combat` starts from), then `hold_back` (§0z186), exactly as
+    combat will choose, less the vigilant. None -- the old reading -- when
+    the engine has no such hook, when its combat this turn has begun
+    (`combat_declared`, which the engine sets before `hold_back`, so the
+    hold-back's own prediction is never read twice), during the pod's
+    round, when tapped creatures block anyway (`untapped_blockers=False`),
+    or with `crack_back_planned=False`. Every count the planning writes is
+    put back."""
+    hook = getattr(g, "planned_attackers", None)
+    if (hook is None or getattr(g, "combat_declared", True)
+            or getattr(g, "pod_seat", None) is not None
+            or not untapped_blockers(g)
+            or getattr(g, "_planning_attack", False)
+            or not g.cfg.get("crack_back_planned", True)):          # §0z189
+        return None
+    snap = dict(g.m)
+    g._planning_attack = True
+    try:
+        send = hold_back(g, hook())
+    finally:
+        g._planning_attack = False
+        g.m.clear()
+        g.m.update(snap)
+    return [p for p in send if not p.tapped and not vigilant(g, p)]
+
+
 def predicted_chip(g, rounds: int = 1) -> float:
+    """`_predicted_chip`, read with your planned attack tapped when it is read
+    before your combat (`planned_attack`, §0z189). When one is planned, the
+    tapped flags and every count the reading writes are put back, and
+    `crack_back_planned` counts it."""
+    send = planned_attack(g)
+    if not send:
+        return _predicted_chip(g, rounds)
+    snap = dict(g.m)
+    saved = [(p, p.tapped) for p in send]
+    for p in send:
+        p.tapped = True
+    try:
+        return _predicted_chip(g, rounds)
+    finally:
+        for p, t in saved:
+            p.tapped = t
+        g.m.clear()
+        g.m.update(snap)
+        g.m["crack_back_planned"] += 1
+
+
+def _predicted_chip(g, rounds: int = 1) -> float:
     """THE POD'S CLOCK AS A PILOT READS IT (§0z161): the chip damage the
     next `rounds` rounds would deal you if nothing changed -- every living
     opponent's creatures, your share of their attention as your board stands

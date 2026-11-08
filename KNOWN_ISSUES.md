@@ -241,6 +241,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**; a hold-back pilot +0.0007 to +0.0053; `incidental_rate` 0.78 ADOPTED, the mean held out of sample |
 | [0z187](#0z187) | FIXED | **§0z184 findings 2, 10; §0z182's leftover**: "until end of turn" ends at YOUR cleanup (514.2), +0.0005 / +0.0006 rendmaw, +0.0003 / +0.0011 azusa; a main-2 land drop, inside the bars; tivit's sick mana, latent |
 | [0z188](#0z188) | FIXED | **Beastmaster Ascension's +5/+5 is static** (611.3a): on at seven quest counters, not only from declare-attackers to your untap; +0.0003 ±0.0003 / +0.0001 ±0.0003, the hold-back keeps fewer home |
+| [0z189](#0z189) | FIXED | **The crack-back read before combat taps your coming attack** (karlov's Citadel floor, §0z186's leftover): 3.06 -> 4.18 life a read; -0.0002 / -0.0003, inside the bars; the floor's pad was tuned on the old read |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16294,7 +16295,7 @@ is gentler and better aimed.
 - `predicted_chip` read in a MAIN PHASE (karlov's Citadel and Necropotence
   floors, `clock_floor`) counts creatures that will attack and tap later
   that turn as blockers -- an under-read of the crack-back, said here rather
-  than fixed.
+  than fixed. Fixed in §0z189.
 - Every active deck's games moved: all six caches stay SUSPECT for item 35's
   batch rebuild, which the owner holds until the engine work is done. Queue
   item 36 is closed (`docs/HISTORY.md`, "Queued items closed 2026-11-08").
@@ -16417,7 +16418,8 @@ It is there for the first one staged.
   sets, written before the first run; all eight broke what was written.
 - **Read, not fixed** (the same review): the crack-back read in a MAIN PHASE
   (§0z186's "What it leaves": karlov's Citadel and Necropotence floors count
-  creatures that will attack later as blockers); `hold_back_pad` is 0, so the
+  creatures that will attack later as blockers; fixed in §0z189);
+  `hold_back_pad` is 0, so the
   hold-back protects against dying only, and a sweep of it needs §0z170's
   out-of-sample re-measure; azusa's Quirion Ranger docstring still says "your
   creatures never block", which §0z186 made false -- its untap of an attacker
@@ -16475,6 +16477,80 @@ with the flag, so it is a FLOOR until item 35's rebuild.
 **What it leaves**: the hold-back's choice of who stays home does not
 count the quest counter a held-back creature would have added; nor does any
 pilot rule read the counters as a reason to attack.
+
+<a id="0z189"></a>
+
+## 0z189. FIXED -- the crack-back read before your combat taps the attack you are about to make
+
+**2026-11-08, the owner: "fix the crack-back under-read in main phase 1"**,
+§0z186's "What it leaves" and §0z187's "Read, not fixed".
+
+**The under-read.** Since §0z186 the pod's turns read your board as your
+turn LEFT it: an attacker tapped in combat (508.1f) does not block (509.1a)
+until your next untap step (502.3). `opponents.predicted_chip` -- the pod's
+next swing as a pilot reads it, and `clock_floor`'s input -- reads the board
+as it stands. Read in MAIN PHASE 1, every creature about to attack is still
+untapped, so it counted as a blocker, your share of the pod's swing read
+low, and so did every floor built on it. **The reader that is on by default
+is karlov's Bolas's Citadel** (`citadel_floor_mode` "clock", §0z161), whose
+main-1 dig (`citadel_main`, before `combat`) is most of its digging.
+Necropotence's (`necro_floor_mode`) and Sylvan Library's
+(`library_floor_mode`) clock floors default to "fixed"; Necropotence's is
+read after combat anyway.
+
+**The fix** (`crack_back_planned`, default True; `opponents.planned_attack`).
+Read before your combat, `predicted_chip` taps the attack you are about to
+make, reads, and puts every tapped flag and count back. The attack is the
+engine's own: `KarlovGame.planned_attackers()` -- the list `karlov.combat`
+now starts from, so the two cannot drift (§0z30) -- then `hold_back`
+(§0z186) as combat will run it, less the vigilant, who stay blockers.
+`combat_declared` says "before your combat": the untap step clears it and
+`combat` sets it first thing, before its hold-back, so the hold-back's own
+prediction is never planned twice (and planning is guarded against reading
+itself). The planned read is skipped -- the old read -- during the pod's
+round, for an engine with no `planned_attackers` (the other five), and
+under `untapped_blockers=False`. Counted, `crack_back_planned`, one a read.
+
+**The switch off is the old engine**: every deck's staged list, seeds
+5000..7499, T20, every output key hashed (the new counter left out), against
+a fresh worktree at `a21e473`: **0 of 2,500 differ in all seven decks**.
+With the default, karlov moves 35 of 2,500 and no other deck moves.
+`tools.validate`: +0.00 on all 21 metrics.
+
+**How large the under-read was** (read-only, karlov's staged list, 2,000
+games, T20, seeds 5000..6999, python 3.11.17): 2,942 planned reads, 3.04
+attackers each, and the chip read **3.06 life the old way, 4.18 with the
+attack tapped** -- the floor sat about 1.1 life low, a third of it.
+
+**The measurement** (`diagnostics/run_knob_ab.py karlov crack_back_planned
+crack_back_planned`, the staged list both legs, N=15,000 paired, seeds
+5000..19999, python 3.11.17 / numpy 2.4.6,
+`results/crack_back_planned_karlov_20261108.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| karlov | -0.0002 ±0.0005 | -0.0003 ±0.0005 |
+| in the 1,467 games reached (9.8%) | -0.0020 ±0.0048 | -0.0027 ±0.0053 |
+
+Inside its bars at both horizons. The identity holds: 0 of the 13,533 games
+with no planned read differ. **The mechanism is the one the rule names**:
+the dig stops at the floor more often (`citadel_stop_floor` +0.0052), pays
+less life (`citadel_life_spent` -0.022) and takes fewer cards
+(`citadel_casts` -0.0068).
+
+**What it leaves.**
+- **The floor's pad was chosen on the under-read** (§0z5): `citadel_clock_pad`
+  1 and the "clock" mode itself were adopted (§0z161) with a crack-back
+  read about 1.1 life low before combat, so "survive the swing I can see, by
+  one" was nearer "by none" in main 1. Re-forking the pad on the corrected
+  read is queue item 29's, and a winner of that sweep needs §0z170's
+  out-of-sample re-measure.
+- Azusa's and trostani's Sylvan Library read the clock in the DRAW step
+  under `library_floor_mode` "clock" (not the default); they have no
+  `planned_attackers`, so that reading is still the old one.
+- `tests/test_planned_crack_back.py` pins A-J with five mutations, exact
+  sets, written before the first run; all five broke what was written.
+- Karlov's games moved: its cache stays SUSPECT for queue item 35's rebuild.
 
 ## How to read an ablation table
 
