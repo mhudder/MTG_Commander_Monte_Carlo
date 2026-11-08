@@ -238,7 +238,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
 | [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
 | [0z185](#0z185) | FIXED | **§0z184's findings 3-5**: the pod's end steps on pod turns 1-2 (0.1% of games); rendmaw's Tendershoot / Ophiomancer at each opponent's upkeep, **+0.0044 / +0.0036**; lorehold's Chimes / Waterskin one mana an opponent's turn, -0.0004 / -0.0021 |
-| [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**. A hold-back pilot gains back +0.0007 to +0.0053; `incidental_rate` 0.78 restores the mean (owner's call) |
+| [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**; a hold-back pilot +0.0007 to +0.0053; `incidental_rate` 0.78 ADOPTED, the mean held out of sample |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16255,10 +16255,33 @@ N=1,500 a deck, staged lists, seeds 5000..6499
 
 **The crossing is 0.776**, and at 0.8 the mean game length (10.42) is the old
 pod's too -- the Command Zone's 10.29 is the only anchored figure (the
-POD_V2 note in `edhmc/experiment.py`). **Not adopted here: the owner's decision**, as §0z140's shift
-was. Until it is taken the default stays 1.0, every deck's absolute win rate
-is about 0.06 lower than on the old pod, and paired differences are measured
-on a harder pod than the tables'.
+POD_V2 note in `edhmc/experiment.py`).
+
+**ADOPTED: `incidental_rate` 0.78** (the owner, 2026-11-08: "adopt 0.78"),
+in `DEFAULT_CFG`; `incidental_rate=1.0` is the engine before it, 0 of 2,500
+games differing in all seven decks against `4062f5c`. `monarch_loss_scale`
+defaults to the rate, so the crown is harder to lose by the same factor --
+the fit varied the rate with that in it. POD_V2 keeps 1.0, its date's value.
+**Out of sample** (`fit_pod_knob incidental_rate 0.78 --n=3000
+--seed0=20000 --target=untapped_blockers=False,incidental_rate=1.0`, seeds
+20000..22999, `results/incidental_rate_078_oos_20261108.txt`; §0z170, since
+the value was chosen on seeds 5000..6499):
+
+| deck | old pod T20 | new pod T20 | difference |
+|---|---|---|---|
+| rendmaw | 0.3333 | 0.2993 | **-0.0340 ±0.0087** |
+| azusa | 0.4903 | 0.4783 | **-0.0120 ±0.0055** |
+| karlov | 0.5350 | 0.5343 | -0.0007 ±0.0047 |
+| shilgengar | 0.3557 | 0.3587 | +0.0030 ±0.0071 |
+| lorehold | 0.4907 | 0.4993 | **+0.0087 ±0.0054** |
+| tivit | 0.5760 | 0.5870 | **+0.0110 ±0.0063** |
+| **mean** | **0.4635** | **0.4595** | -0.0040; 10.48 -> 10.49 turns |
+
+The mean holds to 0.004 on fresh seeds and the game length to 0.01 turns.
+What moves is each deck's share of it, as the rule says it should: rendmaw,
+which attacks wide and leaves nothing back, pays for it; tivit and lorehold,
+which do not live by combat, are a little better off on a pod whose swing
+is gentler and better aimed.
 
 ### What it leaves
 
@@ -16267,7 +16290,8 @@ on a harder pod than the tables'.
   that turn as blockers -- an under-read of the crack-back, said here rather
   than fixed.
 - Every active deck's games moved: all six caches stay SUSPECT for item 35's
-  batch rebuild, which the owner holds until the engine work is done.
+  batch rebuild, which the owner holds until the engine work is done. Queue
+  item 36 is closed (`docs/HISTORY.md`, "Queued items closed 2026-11-08").
 - `tests/test_untapped_blockers.py` pins A-K with five mutations, exact sets;
   its docstring records three corrections to the TEST after the first runs
   (case I's setup, the fourth mutation's set, the fifth's stand-in).

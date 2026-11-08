@@ -1,0 +1,13 @@
+fit incidental_rate over [0.78]: target pod DEFAULT_CFG + {'untapped_blockers': False, 'incidental_rate': 1.0}, candidates + {}; N=3000 a deck, staged lists, seeds 20000..22999, python 3.13.16
+target: mean T20 win rate over 6 active decks = 0.4635; mean turns 10.48
+
+deck        target T10     T20  turns | incidental_rate=0.78   T20 (diff ±)
+rendmaw         0.1083  0.3333  10.60 | 0.2993 (-0.0340 ±0.0087)
+lorehold        0.2813  0.4907  10.08 | 0.4993 (+0.0087 ±0.0054)
+karlov          0.2987  0.5350  10.12 | 0.5343 (-0.0007 ±0.0047)
+tivit           0.3160  0.5760  11.14 | 0.5870 (+0.0110 ±0.0063)
+shilgengar      0.0383  0.3557  11.22 | 0.3587 (+0.0030 ±0.0071)
+azusa           0.3183  0.4903   9.75 | 0.4783 (-0.0120 ±0.0055)
+
+mean T20: incidental_rate=0.78: 0.4595 (10.49 turns)
+crossing: not bracketed by these values

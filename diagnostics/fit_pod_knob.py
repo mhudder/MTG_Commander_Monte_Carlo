@@ -3,6 +3,7 @@
 
     python -m diagnostics.fit_pod_knob KNOB V1,V2,... [--n=1500]
                                        [--target=k=v,...] [--cand=k=v,...]
+                                       [--seed0=5000]
 
 e.g. `python -m diagnostics.fit_pod_knob incidental_rate 0.6,0.8,1.0
 --target=untapped_blockers=False` (§0z186). `fit_threat_clock` is the same
@@ -18,7 +19,9 @@ pod is `DEFAULT_CFG` plus `--target`; each candidate is `DEFAULT_CFG` plus
 from the target is paired. Prints each deck's T10 and T20 win rate and mean
 turns for the target and every value, the means, and the value where the
 mean T20 crosses the target, interpolated linearly between the two values
-that bracket it.
+that bracket it. `--seed0` starts the seed block elsewhere: the value a
+fit chose is graded by the seeds that chose it, so re-measure it on fresh
+ones before quoting its size (§0z170).
 """
 import ast
 import os
@@ -42,7 +45,7 @@ def parse(text):
 
 
 def measure(args):
-    deck, label, extra, n = args
+    deck, label, extra, n, seed0 = args
     from edhmc.experiment import DEFAULT_CFG
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS
@@ -51,7 +54,7 @@ def measure(args):
     w10, w20, turns = [], [], []
     for s in range(n):
         r = sim(lst, cmd, dict(DEFAULT_CFG, turns=20, snapshot_rounds=(10,),
-                               watch=frozenset(), **extra), 5000 + s)
+                               watch=frozenset(), **extra), seed0 + s)
         w10.append(float(r["at_rounds"][10]["won"]))
         w20.append(float(r["won"]))
         turns.append(float(r.get("turns_played", 0)))
@@ -68,12 +71,13 @@ def main() -> int:
     knob = pos[0]
     values = [ast.literal_eval(v) for v in pos[1].split(",")]
     n = int(opts.get("--n", 1500))
+    seed0 = int(opts.get("--seed0", 5000))
     target_cfg = parse(opts.get("--target"))
     cand_cfg = parse(opts.get("--cand"))
     from edhmc.registry import ACTIVE
     decks = list(ACTIVE)
-    jobs = [(d, None, target_cfg, n) for d in decks]
-    jobs += [(d, v, dict(cand_cfg, **{knob: v}), n)
+    jobs = [(d, None, target_cfg, n, seed0) for d in decks]
+    jobs += [(d, v, dict(cand_cfg, **{knob: v}), n, seed0)
              for d in decks for v in values]
     with Pool(4) as pool:
         res = dict(pool.imap_unordered(measure, jobs))
@@ -81,7 +85,7 @@ def main() -> int:
     py = sys.version.split()[0]
     print(f"fit {knob} over {values}: target pod DEFAULT_CFG + {target_cfg}, "
           f"candidates + {cand_cfg}; N={n} a deck, staged lists, seeds "
-          f"5000..{5000 + n - 1}, python {py}")
+          f"{seed0}..{seed0 + n - 1}, python {py}")
     print(f"target: mean T20 win rate over {len(decks)} active decks = "
           f"{target:.4f}; mean turns "
           f"{np.mean([res[(d, None)][2].mean() for d in decks]):.2f}\n")

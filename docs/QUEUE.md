@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24 and 31 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31 and 36 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -224,20 +224,6 @@ What is closed and where it went:
       replaces, `cache_manifest --write`, `status --write`, `check_docs`
       green, and close this item to `docs/HISTORY.md`. Batch it with the next
       rebuild if one is coming.
-
-36. **Your tapped creatures block on the pod's turns (§0z184, finding 1; the
-    owner, 2026-11-08). DONE but for one decision (§0z186).** The rule
-    (`untapped_blockers`), vigilance from Scryfall (`_evasion.VIGILANCE`),
-    tivit's attackers tapping and the hold-back pilot (`hold_back`
-    "lethal", adopted) are in; every deck loses 0.041-0.105 at T20 to the
-    rule and the pilot wins back up to 0.005. **Left, the owner's: the
-    calibration.** `diagnostics/fit_pod_knob.py` puts the mean T20 win rate
-    back at the old pod's with `incidental_rate` 0.776 (0.8 also restores
-    the mean game length, 10.42 against 10.43); the default stays 1.0 until
-    the owner adopts it or names another target.
-    - **DO NOT REBUILD AFTER THIS ITEM** (the owner, 2026-11-08): "will do a
-      batch rebuild once all the engine work is done". The tables stay
-      SUSPECT until then; item 35 is that batch.
 
 37. **The smaller turn-structure findings of §0z184 (2, 6-10; 3-5 are
     fixed, §0z185)**, none of

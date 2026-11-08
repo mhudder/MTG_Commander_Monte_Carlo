@@ -2881,6 +2881,46 @@ Tower target was adopted out of sample and Sylvan Library's floor kept
 (§0z173); the six tables rebuilt in 29 minutes wall and moved no row beyond
 its bar (§0z174).
 
+## 2026-11-08: the turn's phases against the rules, then the tapped blocker (§0z182-§0z186)
+
+The owner asked to continue the phase work of §0z176-§0z179. Four engines
+took their land drop before main phase 1 only; a drop in either main phase
+(§0z182) was worth +0.006 to tivit, which draws most after its land step, and
+less elsewhere. Azusa's floating mana now pays for its Clues and Eye of
+Ugin before it empties (§0z183): right, and inside its bars, the 0.001 that
+§0z177 guessed. Then the owner asked for a review of every player's turn
+against CR 500-514 (§0z184): the step order was sound, and ten things were
+not. Three small ones were fixed at once (§0z185) -- the pod's end steps on
+its first two turns, rendmaw's "each upkeep" cards at the opponents'
+upkeeps (+0.004), and lorehold's cross-turn artifacts, whose fix LOST
+0.002 because the old float had counted their mana twice. The largest was
+that a creature which tapped to attack still blocked on the pod's turns:
+fixed (§0z186), it costs every deck 0.04 to 0.10 at T20, a hold-back pilot
+wins back up to 0.005, and `incidental_rate` 0.78 puts the mean T20 win
+rate back where it was, out of sample to 0.004 -- rendmaw paying most for
+attacking wide. By the owner's instruction nothing was rebuilt: all six
+tables wait for one batch rebuild once the engine work is done (item 35).
+
+## Queued items closed 2026-11-08 — moved from `docs/QUEUE.md`
+
+Item 36 closed the same day it was queued: the rule, vigilance, tivit's
+taps and the hold-back pilot (§0z186), and the calibration adopted by the
+owner ("adopt 0.78"), held out of sample. Moved verbatim:
+
+36. **Your tapped creatures block on the pod's turns (§0z184, finding 1; the
+    owner, 2026-11-08). DONE but for one decision (§0z186).** The rule
+    (`untapped_blockers`), vigilance from Scryfall (`_evasion.VIGILANCE`),
+    tivit's attackers tapping and the hold-back pilot (`hold_back`
+    "lethal", adopted) are in; every deck loses 0.041-0.105 at T20 to the
+    rule and the pilot wins back up to 0.005. **Left, the owner's: the
+    calibration.** `diagnostics/fit_pod_knob.py` puts the mean T20 win rate
+    back at the old pod's with `incidental_rate` 0.776 (0.8 also restores
+    the mean game length, 10.42 against 10.43); the default stays 1.0 until
+    the owner adopts it or names another target.
+    - **DO NOT REBUILD AFTER THIS ITEM** (the owner, 2026-11-08): "will do a
+      batch rebuild once all the engine work is done". The tables stay
+      SUSPECT until then; item 35 is that batch.
+
 ## Queued items closed 2026-11-05 — moved from `docs/QUEUE.md`
 
 Closed by §0z175: a token copy now has its own Card in azusa's Springheart

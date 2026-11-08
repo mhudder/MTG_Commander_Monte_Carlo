@@ -198,6 +198,10 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 - **A rule that makes a new outcome possible turns every old policy into a
   claim about it** (§0z42). When a fix makes a loss or a win possible that was
   not, measure the naive pilot as well as the rule.
+- **The pod's turns read your board as your turn left it** (§0z184,
+  §0z186): a creature that tapped to attack does not block there. Counting it
+  made attacking with everything free; once a choice costs something on the
+  pod's turn, the pilot needs a rule for it too (the hold-back).
 - **A policy written while a bug was open does not fix itself when the bug
   does** (§0z5). After closing an engine gap, re-read the hand-written policies
   written while it was open: host rankings, priority orders, reserve sizes.

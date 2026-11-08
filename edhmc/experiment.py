@@ -89,7 +89,12 @@ DEFAULT_CFG = {
     # lifelink and any life cost unevaluable. See CANDIDATES_2026-09-04.md.
     # `POD_V1` below restores the previous pod exactly.
     "combat_targeting": "open",   # creatures hit whoever cannot block
-    "incidental_rate": 1.0,       # was 0.45
+    # 0.78 since §0z186 (the owner, 2026-11-08): once a tapped creature stopped
+    # blocking (`untapped_blockers`), this is the rate at which the mean T20
+    # win rate over the active decks is the old pod's (`fit_pod_knob`, the
+    # §0z140 rule). It was 1.0 from pod v2 (2026-09-04) and 0.45 before.
+    # `monarch_loss_scale` defaults to it. `incidental_rate=1.0` is the old.
+    "incidental_rate": 0.78,
     "clock_shift": 2,             # the deus ex machina arrives later
     "archetypes": True,           # aggro / midrange / control / combo pods
 
@@ -121,9 +126,11 @@ DEFAULT_CFG = {
 # ---------------------------------------------------------------------------
 # Pod v2 — combat that actually kills (2026-09-04)
 # ---------------------------------------------------------------------------
-# No longer opt-in: DEFAULT_CFG has carried these values (and POD_V3's
-# archetypes) since 2026-09-04, so `dict(DEFAULT_CFG, **POD_V2)` changes
-# nothing. To reproduce a number from before that date, use POD_V1 below.
+# No longer opt-in: DEFAULT_CFG carried these values (and POD_V3's
+# archetypes) from 2026-09-04, so `dict(DEFAULT_CFG, **POD_V2)` changed
+# nothing -- until §0z186 set `incidental_rate` 0.78, which POD_V2 does not
+# carry: it stays 1.0, the value its date's numbers were measured at. To
+# reproduce a number from before 2026-09-04, use POD_V1 below.
 #
 #   combat_targeting="open"  creatures swing at the player who cannot block,
 #                            not at the scariest board (see opponents.combat_share)
