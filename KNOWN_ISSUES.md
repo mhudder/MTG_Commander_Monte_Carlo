@@ -233,6 +233,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z178](#0z178) | FIXED | **Apex of Power made ten from ANY cast, not only from the hand, and its pool lasted the turn**: -0.0036 / -0.0043, nearly all the hand clause. And the rule cited for mana emptying was 500.4; it is 106.4 / 500.5 |
 | [0z179](#0z179) | IMPLEMENTED | **The pod's round as three turns in seat order**: -0.005 to -0.013 at T20 per deck (removal before growth; seats act before a later kill). Lorehold's upkeep windows moved in: +0.0416 alone, +0.0335 in all |
 | [0z180](#0z180) | REBUILT | **Six tables rebuilt for §0z179** (parallel, 12.7 min wall): lorehold 11 rows up beyond their bars, all miracle payoffs; rendmaw 1; the rest 0. 11 of 12 staged swaps stand at both horizons |
+| [0z181](#0z181) | DECIDED | **-Plains +Anointed Procession WITHDRAWN by the owner**: inside its T20 bar at every re-measure since 2026-10-15. Tivit's table rebuild deferred to queue item 35; its cache reads SUSPECT until then |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15774,6 +15775,29 @@ its T20 bar again**, as at §0z174, §0z176 and on 2026-10-15; the decision is
 the owner's, as it was. Each Change's `reverified` records these, placed by
 the ledger's syntax tree.
 
+
+<a id="0z181"></a>
+
+## 0z181. DECIDED -- -Plains +Anointed Procession withdrawn; tivit's rebuild deferred
+
+**The owner, 2026-11-08: "withdraw Anointed Procession"**, then "do not
+rebuild tivit, save it as a to do action". The swap was staged 2026-09-16 and
+kept by the owner on its T10 number on 2026-10-15, when POD_V4 put its T20
+inside its bar. It never came back out: +0.0007 (§0z143), -0.0021 (§0z174),
+-0.0043 (§0z176), and **-0.0011 ±0.0044 at T20 on the seat-turn pod (§0z180)**,
+with T10 still significant (+0.0047 ±0.0039) and T20 damage significantly
+negative every time (-2.5 a game). A land cut, which the harness flatters.
+The entry moves from tivit's `CHANGES` to `WITHDRAWN` with the owner's
+reason and what re-staging would have to answer; only the ledger leg moves
+(a staged swap never reached the deck module).
+
+**What it leaves**: `build_pending("tivit")` plays Plains again, so the
+table rebuilt at `b7f3788` (§0z180) describes the list WITH Anointed
+Procession. Its cache reads SUSPECT, and `check_docs` fails on that one check,
+by the owner's choice: a staging-induced SUSPECT is cleared by a rebuild
+only, never `--verified`. `python -m tests` fails one case on it too,
+`test_metrics_and_render` C for tivit, plain and `--mutate`; every other
+module passes. **Queue item 35** is the rebuild.
 
 ## How to read an ablation table
 

@@ -138,6 +138,10 @@ MEASURED: list[Candidate] = [
 
 
 CHANGES: list[Change] = [
+]
+
+
+WITHDRAWN: list[Change] = [
     Change(
         deck="tivit", remove="Plains", add="Anointed Procession",
         staged="2026-09-16",
@@ -192,11 +196,19 @@ CHANGES: list[Change] = [
             '-measure before commit.'
             " RE-MEASURED 2026-09-26 ON THE REBUILT BASELINE (§0z63), after §0z44 moved its own priority to 10: +0.0145 +-0.0036 at T10, +0.0191 +-0.0052 at T20 -- larger than every earlier measurement. The staging stands. results/restage_20260926.txt."
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0151 +-0.0036 at T10, +0.0181 +-0.0052 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
+        withdrawn=(
+            "WITHDRAWN BY THE OWNER 2026-11-08 (§0z181): Plains stays. Not "
+            "refuted at T10 -- the swap is still +0.0047 +-0.0039 there -- but "
+            "the T20 number is inside its bar at every re-measure since "
+            "2026-10-15: +0.0007 (POD_V4, §0z143), -0.0021 (§0z174), -0.0043 "
+            "(§0z176), -0.0011 +-0.0044 on the seat-turn pod (§0z180), and its "
+            "T20 damage is significantly NEGATIVE each time (-2.5 a game). The "
+            "owner kept it on its T10 number on 2026-10-15 and withdraws it now. "
+            "A land cut, which the harness flatters. WHAT RE-STAGING WOULD HAVE "
+            "TO ANSWER: a T20 head-to-head significant on the current pod, and "
+            "why the doubler's extra artifacts no longer turn into damage late."),
     ),
 ]
-
-
-WITHDRAWN: list[Change] = []
 
 
 SIMULATED: list[Simulated] = [

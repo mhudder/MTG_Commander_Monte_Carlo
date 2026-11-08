@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `185cf0a`.
+Generated at `0f5ef33`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -91,7 +91,7 @@ the fingerprint above mean anything.
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `e3a4535152fa6cc5` | `b7f3788` | **CURRENT** |
 | `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `915c36e76f7a9e2e` | `b7f3788` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `3a1ad6afa592141a` | `b7f3788` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `995e3517e1bdc845` | `b7f3788` | **CURRENT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 65 | `995e3517e1bdc845` | `b7f3788` | **SUSPECT** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
@@ -101,7 +101,7 @@ the fingerprint above mean anything.
 - **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `e3a4535152fa6cc5`, which is live.
 - **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `915c36e76f7a9e2e`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `3a1ad6afa592141a`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `995e3517e1bdc845`, which is live.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `995e3517e1bdc845`, live is `17c75521da9445e8`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `b7f3788`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 - **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `e7f838603870ebee`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
@@ -117,7 +117,7 @@ the fingerprint above mean anything.
 - **shilgengar** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/shilgengar_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/shilgengar.py`, `staged:shilgengar`
   - `staged:shilgengar` is `-Vampiric Rites +Lyra, Archangel of Dawn`
 - **tivit** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/tivit_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/tivit.py`, `edhmc/voting.py`, `staged:tivit`
-  - `staged:tivit` is `-Plains +Anointed Procession`
+  - `staged:tivit` is **empty** — nothing staged for this deck, so the baseline is the module's own list
 - **trostani** — `ablation.py`, `edhmc/decks/_evasion.py`, `edhmc/decks/_removal.py`, `edhmc/decks/trostani_v1.py`, `edhmc/engine.py`, `edhmc/experiment.py`, `edhmc/opponents.py`, `edhmc/trostani.py`, `staged:trostani`
   - `staged:trostani` is **empty** — nothing staged for this deck, so the baseline is the module's own list
 

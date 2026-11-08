@@ -180,3 +180,25 @@ What is closed and where it went:
     origin` should list `main`, the working branch and the five `archive/`
     branches only, and this item closes to `docs/HISTORY.md`. Agents can
     still pull an `archive/` branch, but the name says what it is.
+
+35. **Rebuild tivit's table for the withdrawn Anointed Procession (the
+    owner, 2026-11-08: "do not rebuild tivit, save it as a to do"; §0z181).**
+    -Plains +Anointed Procession is WITHDRAWN (`edhmc/ledger/tivit.py`), so
+    `build_pending("tivit")` plays Plains again and the table at `b7f3788`
+    describes a list that is no longer the baseline. Until this runs:
+    - tivit's cache reads **SUSPECT** and `check_docs` fails on that one
+      check. It is a STAGING-induced SUSPECT, so it is never cleared with
+      `--verified` (CLAUDE.md, Caches): only a rebuild clears it.
+    - `python -m tests` fails one case for the same reason,
+      `test_metrics_and_render` C for tivit (its committed table no longer
+      re-renders from the cache against the current list), in plain and
+      `--mutate` mode. Every other module passes.
+    - tivit's rows are measured with Anointed Procession in the deck and
+      Plains out; read them as such, and do not quote Anointed Procession's
+      row as a candidate value for the list as it stands.
+    - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
+      the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
+      leg of `.claude/skills/parallel-rebuild`; then diff against the table it
+      replaces, `cache_manifest --write`, `status --write`, `check_docs`
+      green, and close this item to `docs/HISTORY.md`. Batch it with the next
+      rebuild if one is coming.
