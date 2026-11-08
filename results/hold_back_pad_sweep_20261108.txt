@@ -1,0 +1,51 @@
+hold_back_pad: each value minus hold_back_pad=0.0, paired, the staged lists, N=15,000 a deck, seeds 5000..19999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0; reach `held_back` a game, value leg / base leg
+
+rendmaw
+  hold_back_pad=2.0     T10 -0.0009 +-0.0009   T20 +0.0010 +-0.0015   held_back 0.550 / 0.472  turns +0.000
+  hold_back_pad=5.0     T10 -0.0013 +-0.0013*  T20 +0.0009 +-0.0021   held_back 0.627 / 0.472  turns -0.014
+  hold_back_pad=10.0    T10 -0.0004 +-0.0015   T20 +0.0051 +-0.0023*  held_back 0.757 / 0.472  turns +0.008
+  hold_back_pad=15.0    T10 -0.0015 +-0.0018   T20 +0.0053 +-0.0028*  held_back 0.879 / 0.472  turns +0.006
+  hold_back_pad=20.0    T10 -0.0001 +-0.0018   T20 +0.0057 +-0.0029*  held_back 0.959 / 0.472  turns +0.000
+
+lorehold
+  hold_back_pad=2.0     T10 -0.0003 +-0.0008   T20 +0.0005 +-0.0012   held_back 0.152 / 0.131  turns -0.004
+  hold_back_pad=5.0     T10 -0.0011 +-0.0009*  T20 -0.0007 +-0.0014   held_back 0.187 / 0.131  turns -0.016
+  hold_back_pad=10.0    T10 -0.0007 +-0.0011   T20 +0.0011 +-0.0016   held_back 0.267 / 0.131  turns -0.003
+  hold_back_pad=15.0    T10 -0.0024 +-0.0014*  T20 -0.0024 +-0.0019*  held_back 0.342 / 0.131  turns -0.008
+  hold_back_pad=20.0    T10 -0.0021 +-0.0015*  T20 -0.0010 +-0.0021   held_back 0.451 / 0.131  turns -0.007
+
+karlov
+  hold_back_pad=2.0     T10 -0.0004 +-0.0007   T20 +0.0000 +-0.0010   held_back 0.071 / 0.066  turns -0.003
+  hold_back_pad=5.0     T10 +0.0001 +-0.0008   T20 +0.0003 +-0.0011   held_back 0.079 / 0.066  turns -0.005
+  hold_back_pad=10.0    T10 +0.0000 +-0.0007   T20 -0.0001 +-0.0011   held_back 0.112 / 0.066  turns -0.002
+  hold_back_pad=15.0    T10 -0.0001 +-0.0009   T20 +0.0011 +-0.0012   held_back 0.160 / 0.066  turns +0.001
+  hold_back_pad=20.0    T10 -0.0008 +-0.0010   T20 +0.0012 +-0.0013   held_back 0.212 / 0.066  turns +0.005
+
+tivit
+  hold_back_pad=2.0     T10 -0.0011 +-0.0009*  T20 -0.0014 +-0.0013*  held_back 0.164 / 0.150  turns -0.015
+  hold_back_pad=5.0     T10 -0.0024 +-0.0011*  T20 -0.0017 +-0.0015*  held_back 0.190 / 0.150  turns -0.030
+  hold_back_pad=10.0    T10 -0.0019 +-0.0011*  T20 +0.0000 +-0.0016   held_back 0.242 / 0.150  turns -0.012
+  hold_back_pad=15.0    T10 -0.0023 +-0.0013*  T20 -0.0023 +-0.0017*  held_back 0.286 / 0.150  turns -0.021
+  hold_back_pad=20.0    T10 -0.0033 +-0.0014*  T20 -0.0024 +-0.0018*  held_back 0.361 / 0.150  turns -0.016
+
+shilgengar
+  hold_back_pad=2.0     T10 -0.0001 +-0.0003   T20 -0.0002 +-0.0013   held_back 0.226 / 0.203  turns -0.016
+  hold_back_pad=5.0     T10 +0.0001 +-0.0005   T20 -0.0016 +-0.0015*  held_back 0.250 / 0.203  turns -0.034
+  hold_back_pad=10.0    T10 -0.0002 +-0.0005   T20 +0.0006 +-0.0017   held_back 0.317 / 0.203  turns -0.016
+  hold_back_pad=15.0    T10 -0.0005 +-0.0006   T20 +0.0005 +-0.0018   held_back 0.353 / 0.203  turns -0.018
+  hold_back_pad=20.0    T10 -0.0007 +-0.0007   T20 -0.0002 +-0.0020   held_back 0.405 / 0.203  turns -0.011
+
+azusa
+  hold_back_pad=2.0     T10 +0.0003 +-0.0007   T20 -0.0002 +-0.0010   held_back 0.169 / 0.141  turns -0.006
+  hold_back_pad=5.0     T10 +0.0005 +-0.0008   T20 +0.0010 +-0.0012   held_back 0.214 / 0.141  turns -0.009
+  hold_back_pad=10.0    T10 -0.0003 +-0.0008   T20 +0.0000 +-0.0013   held_back 0.288 / 0.141  turns -0.004
+  hold_back_pad=15.0    T10 -0.0010 +-0.0010   T20 -0.0004 +-0.0014   held_back 0.381 / 0.141  turns -0.006
+  hold_back_pad=20.0    T10 -0.0016 +-0.0012*  T20 -0.0010 +-0.0015   held_back 0.486 / 0.141  turns -0.006
+
+MEAN OVER 6 DECKS (each deck's paired difference, averaged; variances add)
+  hold_back_pad=2.0     T10 -0.0004 +-0.0003*  T20 -0.0001 +-0.0005 
+  hold_back_pad=5.0     T10 -0.0007 +-0.0004*  T20 -0.0003 +-0.0006 
+  hold_back_pad=10.0    T10 -0.0006 +-0.0004*  T20 +0.0011 +-0.0007*
+  hold_back_pad=15.0    T10 -0.0013 +-0.0005*  T20 +0.0003 +-0.0008 
+  hold_back_pad=20.0    T10 -0.0014 +-0.0005*  T20 +0.0004 +-0.0008 

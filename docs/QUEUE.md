@@ -241,3 +241,11 @@ What is closed and where it went:
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
 
+
+38. **`hold_back_pad`: an adoption decision for the owner (§0z191).** Swept
+    on six decks and the pick re-measured on fresh seeds (40000..54999): pad
+    10 is +0.0010 ±0.0007 at T20 and -0.0005 ±0.0004 at T10 against today's
+    0, a horizon trade carried by rendmaw (+0.0036) and azusa (+0.0022), with
+    tivit paying at T10. Leave it, adopt 10 for every deck, or measure a
+    per-deck pad (rendmaw and azusa at 10) on its own out-of-sample block
+    first. Any adoption moves every active deck's games: item 35's rebuild.

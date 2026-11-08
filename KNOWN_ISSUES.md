@@ -243,6 +243,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z188](#0z188) | FIXED | **Beastmaster Ascension's +5/+5 is static** (611.3a): on at seven quest counters, not only from declare-attackers to your untap; +0.0003 ±0.0003 / +0.0001 ±0.0003, the hold-back keeps fewer home |
 | [0z189](#0z189) | FIXED | **The crack-back read before combat taps your coming attack** (karlov's Citadel floor, §0z186's leftover): 3.06 -> 4.18 life a read; -0.0002 / -0.0003, inside the bars; the floor's pad was tuned on the old read |
 | [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
+| [0z191](#0z191) | MEASURED | **`hold_back_pad` swept, pick re-measured out of sample**: pad 10 is +0.0010 at T20 and -0.0005 at T10 on fresh seeds, both significant; rendmaw and azusa gain, tivit loses. The owner's call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16239,7 +16240,8 @@ every deck):
 
 None loses; four gain at T20. One arm against the old pilot, declared
 before the run -- not the winner of a sweep -- so §0z170's out-of-sample
-re-measure does not apply; a sweep of `hold_back_pad` would need it.
+re-measure does not apply; a sweep of `hold_back_pad` would need it
+(done in §0z191).
 **Adopted as the default.** It recovers a twentieth of what the rule costs:
 most of the rule's loss is not a misplay but the price of a wide board that
 taps to attack.
@@ -16420,9 +16422,9 @@ It is there for the first one staged.
 - **Read, not fixed** (the same review): the crack-back read in a MAIN PHASE
   (§0z186's "What it leaves": karlov's Citadel and Necropotence floors count
   creatures that will attack later as blockers; fixed in §0z189);
-  `hold_back_pad` is 0, so the
-  hold-back protects against dying only, and a sweep of it needs §0z170's
-  out-of-sample re-measure; azusa's Quirion Ranger docstring still says "your
+  `hold_back_pad` is 0, so the hold-back protects against dying only, and a
+  sweep of it needs §0z170's out-of-sample re-measure (done in §0z191);
+  azusa's Quirion Ranger docstring still says "your
   creatures never block", which §0z186 made false -- its untap of an attacker
   after combat is a blocker now, an unmodelled payoff.
 - §0z185's note that a token made at an opponent's upkeep is "an untapped
@@ -16614,6 +16616,80 @@ even/odd split above is this run's own holdout.
 by this section. The knobs to say out loud with any Citadel number stay
 `citadel_floor_mode`, `citadel_clock_pad` and `incidental_rate` (§0z161),
 and now `crack_back_planned` (§0z189).
+
+<a id="0z191"></a>
+
+## 0z191. MEASURED -- `hold_back_pad` swept, the pick re-measured out of sample: a T20 gain bought with T10
+
+**2026-11-08, the owner: "sweep hold_back_pad with an out-of-sample
+re-measure"**, §0z186's and §0z187's open item. §0z186's hold-back keeps the
+weakest attackers home only when the pod's next round would take you to
+`hold_back_pad` (0) life or below: it guards against dying, nothing else.
+Life decides games (§0i), so a pad above 0 trades damage dealt now for life
+kept.
+
+**The tool**: `diagnostics/run_knob_sweep.py` (new): one numeric knob at
+several values, each paired by seed against a base value on every active
+deck's staged list, T20 with T10 off the same game, per deck and as the
+mean over the decks (independent, so their variances add); `--seed0` for
+the out-of-sample block.
+
+**The rule, written before the first run**: arms 0 (today), 2, 5, 10, 15,
+20; N=15,000 a deck, seeds 5000..19999; the pick is the value with the
+highest MEAN T20 difference over the six decks, the smallest pad among any
+within the pick's own error bar; the pick alone is then re-measured against
+0 on seeds 40000..54999, nobody's before, and only that number is quoted
+(§0z170). Python 3.11.17 / numpy 2.4.6.
+
+**In sample** (`results/hold_back_pad_sweep_20261108.txt`), the mean over
+six decks minus pad 0:
+
+| pad | T10 | T20 |
+|---|---|---|
+| 2 | **-0.0004 ±0.0003** | -0.0001 ±0.0005 |
+| 5 | **-0.0007 ±0.0004** | -0.0003 ±0.0006 |
+| **10** | **-0.0006 ±0.0004** | **+0.0011 ±0.0007** |
+| 15 | **-0.0013 ±0.0005** | +0.0003 ±0.0008 |
+| 20 | **-0.0014 ±0.0005** | +0.0004 ±0.0008 |
+
+The rule picks **10**: no other value is within its bar of +0.0011. Read
+honestly the T20 curve is not monotone (5 below 0, 10 above, 15 back down),
+which is the shape noise makes, and so the re-measure decides.
+
+**Out of sample** (`results/hold_back_pad_10_oos_20261108.txt`, seeds
+40000..54999), pad 10 minus pad 0:
+
+| deck | T10 | T20 | `held_back` a game (10 / 0) |
+|---|---|---|---|
+| rendmaw | -0.0005 ±0.0014 | **+0.0036 ±0.0022** | 0.72 / 0.48 |
+| azusa | +0.0007 ±0.0008 | **+0.0022 ±0.0013** | 0.27 / 0.15 |
+| karlov | -0.0005 ±0.0008 | +0.0007 ±0.0011 | 0.11 / 0.07 |
+| shilgengar | -0.0003 ±0.0006 | +0.0006 ±0.0017 | 0.30 / 0.20 |
+| lorehold | -0.0011 ±0.0012 | +0.0001 ±0.0017 | 0.27 / 0.14 |
+| tivit | **-0.0015 ±0.0011** | -0.0013 ±0.0016 | 0.24 / 0.14 |
+| **mean** | **-0.0005 ±0.0004** | **+0.0010 ±0.0007** | |
+
+**It holds**: +0.0010 at T20 on fresh seeds against +0.0011 in sample, and
+the T10 cost with it (-0.0005 against -0.0006). The pick was not the
+seeds' doing. **What it is, said plainly: a horizon trade.** Keeping more
+blockers home (the hold-back fires about twice as often) loses a little
+pressure early and survives more pod rounds late, so it costs at T10 and
+pays at T20. The gain is mostly rendmaw's, the deck that goes widest and
+loses most to the crack-back (§0z186, -0.105 from the rule), and azusa's;
+tivit, which does not win by combat, pays at T10 in both blocks
+(-0.0019, -0.0015) and gains nothing at T20.
+
+**Not adopted: the owner's decision.** The default stays 0. The choices, as
+measured: (a) leave it; (b) adopt 10 for every deck, +0.0010 at T20 and
+-0.0005 at T10 on average; (c) a per-deck pad -- rendmaw and azusa at 10,
+the rest at 0 -- which these numbers suggest but did not test: choosing
+which decks get it is a second selection on the same seeds, so it would need
+its own out-of-sample block before it could be quoted. Whichever is taken,
+every active deck's games move, and item 35's rebuild covers it.
+
+**Knobs to say out loud with any hold-back number**: `hold_back_pad`,
+`hold_back` ("lethal"), `untapped_blockers`, `incidental_rate` (0.78, which
+sets the crack-back the pad is measured against).
 
 ## How to read an ablation table
 
