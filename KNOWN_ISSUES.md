@@ -236,6 +236,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z181](#0z181) | DECIDED | **-Plains +Anointed Procession WITHDRAWN by the owner**: inside its T20 bar at every re-measure since 2026-10-15. Tivit's table rebuild deferred to queue item 35; its cache reads SUSPECT until then |
 | [0z182](#0z182) | FIXED | **Four engines played their land only before main phase 1** (CR 305.1, 505.6b): a land drawn later waited a turn. `engine.late_land_drop`: **tivit +0.0063 / +0.0058, lorehold +0.0024 / +0.0029**, karlov +0.0015 at T20, shilgengar 0 |
 | [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
+| [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -15946,6 +15947,111 @@ rebuild; `azusa_floating_sink=False` is the old engine if the owner would
 rather not. `tests/test_floating_sink.py` pins A-H with three mutations,
 exact sets (B's and C's setups were corrected before the first run, so the
 pool mutations can reach them; its docstring says how).
+
+<a id="0z184"></a>
+
+## 0z184. OPEN -- every turn's steps against CR 500-514: what is missing or wrong
+
+**2026-11-08, the owner: "a relatively detailed review of the stages of each
+player's turn"**, then "record them". The rules are section 5 of
+`docs/MagicCompRules_20260807.txt` (500-514). Read against `take_turn` (and
+lorehold's `your_turn`) in all six active engines and against the pod's seat
+turn (`opponents._pod_seat_round`, §0z179), and every card in the six staged
+lists against Scryfall the same day (449 names, 448 fetched; the one miss is
+a split name), searched for text that names a step or phase. Trostani is
+SUSPENDED and was not read.
+
+**What is right**, step by step: the untap step untaps everything and clears
+summoning sickness (no card in the lists says "doesn't untap"; Victory Chimes
+and Bender's Waterskin, which untap on the OTHER players' untap steps, are
+the `cross_turn` tag); upkeep triggers are taken in each engine's `upkeep`;
+every engine draws on its first turn, which 103.8c requires in multiplayer;
+Necropotence's skip and Sylvan Library are the draw step's; sagas get their
+lore counter after the draw step (tivit, 505.4); the land drop is in either
+main phase since §0z182 (trostani excepted); the mana pool empties between
+steps where an engine has one (rendmaw, azusa since §0z177, lorehold since
+§0z178; karlov, tivit and shilgengar pay from permanents and keep none);
+the cleanup step discards to seven (§0z171) and repeats on a trigger
+(514.3a); extra turns come before the pod (§0z153, §0z176). The pod's turn
+has an upkeep hook, main 1 (pieces, kill, removal), combat (chip damage, from
+the board it started with), main 2 (growth, summoning-sick) and an end step.
+
+**The findings, most important first.** Numbers for 1 and 2 are
+`diagnostics/diag_turn_review.py` (read-only, 400 games a deck, T20, seeds
+5000.., the staged list, python 3.11.17; `results/turn_review_20261108.txt`).
+
+1. **YOUR TAPPED CREATURES BLOCK ON THE POD'S TURNS.** CR 508.1f taps an
+   attacker; 509.1a lets only an untapped creature block; 502.3 untaps it
+   only in YOUR untap step. `opponents.combat_share` aims each opponent's
+   attack by `1 / (1 + blockers)` with blockers = `your_creatures(g)`, which
+   counts tapped creatures. As the pod's round begins:
+
+   | deck | creatures | untapped | share at you, as modelled | untapped only |
+   |---|---|---|---|---|
+   | rendmaw | 4.16 | 1.07 | 0.405 | 0.536 |
+   | lorehold | 2.22 | 0.66 | 0.468 | 0.558 |
+   | karlov | 2.08 | 0.72 | 0.445 | 0.541 |
+   | shilgengar | 2.42 | 0.91 | 0.457 | 0.547 |
+   | azusa | 10.04 | 7.04 | 0.389 | 0.473 |
+   | tivit | 1.56 | 1.56 | 0.473 | 0.473 |
+
+   (The share is the first living seat's.) So an all-out attack costs no
+   defence, and no engine has a policy for holding blockers back. Three
+   pieces go with it: **tivit's `combat` never taps its attackers** (the
+   other five do); **vigilance is read nowhere** but Speaker of the Heavens,
+   by name (§0z153's `speaker_taps`) -- shilgengar's Angels, Felidar
+   Sovereign, Voice of the Blessed, Sun Titan and Enduring Vitality all tap;
+   and the other direction, the pod's creatures that attacked on their turn
+   being tapped for yours, is plausibly what `block_share` (0.60) already
+   stands for. **`incidental_rate` (1.0, pod v3) was calibrated with this in
+   place**, so a fix moves the pod model for every deck and every table: the
+   owner's decision (queue item 36).
+2. **"UNTIL END OF TURN" OUTLASTS THE CLEANUP STEP** (514.2). Azusa's
+   `eot_pt` (Glacier Godmaw, Racetrack Bird), `craterhoof_bonus` and
+   `wildspeaker_bonus`, and rendmaw's `stampede_bonus` (Overwhelming
+   Stampede), are reset at the next untap, so `power_of` carries them
+   through the pod's round, and `board_threat` -- the pod's removal aim --
+   reads it. Small: 24.9 against 24.7 (rendmaw), 3,996 against 3,940 (azusa,
+   1.4%) with the pumps zeroed.
+3. **THE POD'S END STEPS ARE SKIPPED ON POD TURNS 1 AND 2.**
+   `pod_end_step_hook` sits after the `pod_turn(g) >= 3` gate that belongs to
+   removal, in the seat round and in `opponents_act` alike, so Deathreap
+   Ritual's draw, Resplendent Angel's Angel and Avacyn, Angel of Horror's
+   return miss six end steps a game. Being fixed (the owner, 2026-11-08).
+4. **RENDMAW'S "EACH UPKEEP" CARDS ARE NOT ON THE SEATS** (§0z179 moved
+   lorehold's, karlov's and azusa's). Tendershoot Dryad ("At the beginning of
+   each upkeep, create a 1/1 green Saproling") makes `1 + living opponents`
+   Saprolings at YOUR upkeep, three of them a round early -- fodder and city's
+   blessing before their time, a ceiling. Ophiomancer ("At the beginning of
+   each upkeep, if you control no Snakes, create a 1/1 black Snake ... with
+   deathtouch") is taken at your upkeep only, so a Snake sacrificed on your
+   turn never returns on the pod's -- a floor. Being fixed (the owner, 2026-11-08).
+5. **LOREHOLD'S CHIMES AND WATERSKIN UNTAP ONLY WITH LOREHOLD OUT.** "Untap
+   this artifact during each other player's untap step." `rummage_window`
+   adds the `cross_turn` units to the float; `draw_land_window`, the window
+   when Lorehold is not out, does not. Being fixed (the owner, 2026-11-08).
+6. **NO FIRST STRIKE OR DOUBLE STRIKE** (510.4), in any engine. Inert today
+   -- no attacker of yours ever dies to a blocker here -- so Lyra
+   Dawnbringer's first strike changes nothing; Sunhome, Fortress of the
+   Legion's "{2}{R}{W}, {T}: Target creature gains double strike" is not
+   implemented.
+7. **TWO TIMING SLIPS, both negligible.** Shilgengar's `activations` (Priest
+   of Fell Rites, "Activate only as a sorcery"; Skullclamp's equip) runs
+   between combat and Pearl Collector's "beginning of your second main
+   phase", which is still combat. Black Market Connections ("At the
+   beginning of your first main phase") is taken in the upkeep.
+8. **CARD-LEVEL STEP CLAUSES NOT MODELLED.** Memory Jar (azusa) is not
+   implemented at all, its "at the beginning of the next end step" return
+   with it; Voldaren Bloodcaster's back face, Bloodbat Summoner ("At the
+   beginning of combat on your turn, up to one target Blood token ... becomes
+   a 2/2 black Bat creature with flying and haste"), is read only as a
+   sacrifice payoff; Hall of Gemstone does nothing, which a mono-green deck
+   cannot tell.
+9. **YOU ALWAYS TAKE THE GAME'S FIRST TURN**, seat 0 of four, written down
+   nowhere until here. It moves absolute win rates more than any paired
+   difference.
+10. **LATENT: tivit's `mana_units` does not ask summoning sickness** of a
+    creature with a mana ability (302.6). No such creature is in its list.
 
 ## How to read an ablation table
 

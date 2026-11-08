@@ -1,0 +1,9 @@
+your board as the pod's round begins: N=400 a deck, T20, seeds 5000.., the staged list, python 3.11.17
+
+deck        rounds creatures  untapped  share all  share unt    threat    no eot
+rendmaw      10.37      4.16      1.07      0.405      0.536      24.9      24.7
+lorehold      9.49      2.22      0.66      0.468      0.558      19.2      19.2
+karlov        9.46      2.08      0.72      0.445      0.541      32.8      32.8
+tivit         9.75      1.56      1.56      0.473      0.473      19.8      19.8
+shilgengar   10.93      2.42      0.91      0.457      0.547      29.2      29.2
+azusa         9.31     10.04      7.04      0.389      0.473    3996.5    3939.5

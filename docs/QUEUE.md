@@ -217,3 +217,32 @@ What is closed and where it went:
       replaces, `cache_manifest --write`, `status --write`, `check_docs`
       green, and close this item to `docs/HISTORY.md`. Batch it with the next
       rebuild if one is coming.
+
+36. **Your tapped creatures block on the pod's turns (§0z184, finding 1; the
+    owner, 2026-11-08).** `opponents.combat_share` counts every creature you
+    control as a blocker, tapped or not, and about 70% of them are tapped as
+    the pod's round begins in four decks. The decision is the owner's,
+    because `incidental_rate` was calibrated with the old count and the fix
+    moves every deck's table. When it is taken, in order:
+    - Count untapped creatures only, behind a switch whose False is the old
+      engine (identity on every deck), and measure each deck at N=15,000.
+    - Make tivit's `combat` tap its attackers, and read vigilance from
+      Scryfall (a generated set, never hand-tagged) so a vigilant attacker
+      stays untapped.
+    - Then the pilot: a hold-back rule (attack only with what the pod's next
+      swing does not need blocking), measured against attacking with all.
+      A rule that makes a new loss possible turns the old policy into a
+      claim about it (§0z42).
+    - Re-read `incidental_rate`'s calibration against the new count, then one
+      parallel rebuild of every active table.
+
+37. **The smaller turn-structure findings of §0z184 (2, 6-10)**, none of
+    them urgent. In the order a session would take them: "until end of turn"
+    pumps ended at cleanup (2: azusa's `eot_pt`, `craterhoof_bonus`,
+    `wildspeaker_bonus`, rendmaw's `stampede_bonus`; 1.4% of azusa's threat);
+    Memory Jar and Bloodbat Summoner (8); shilgengar's `activations` inside
+    main 2 and Black Market Connections at the first main phase (7); first
+    and double strike, with Sunhome (6), which waits on attackers that can
+    die to blockers; the seat you take (9), which is a model decision to
+    write down, not a bug; and tivit's sick mana creatures (10), latent.
+
