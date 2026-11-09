@@ -21,7 +21,8 @@ CASES
   E  the read puts back the tapped flags and every count, and counts itself
      (`crack_back_planned` +1)
   F  the planned attack is the hold-back's: with a lethal crack-back the
-     weakest attacker stays home and is not tapped for the read
+     weakest attacker stays home and is not tapped for the read (at
+     `hold_back_pad=0`, whose thresholds its life total sits between)
   G  NEIGHBOUR: `untapped_blockers=False`: no planned attack
   H  NEIGHBOUR: an engine with no hook (rendmaw): no planned attack
   I  karlov's combat sets `combat_declared` before its hold-back
@@ -99,7 +100,7 @@ def lethal_split():
     """Two attackers (power 1 and 5) and a life total between the crack-back
     with both tapped and with only the strong one tapped."""
     one, five = body(1, name="One"), body(5, name="Five")
-    g = game(one, five, crack_back_planned=False)
+    g = game(one, five, crack_back_planned=False, hold_back_pad=0.0)
 
     def tapped(*ps):
         for p in ps:
@@ -110,7 +111,7 @@ def lethal_split():
             for p in ps:
                 p.tapped = False
     life = (tapped(one, five) + tapped(five)) / 2.0
-    g = game(one, five)
+    g = game(one, five, hold_back_pad=0.0)     # pad 0's thresholds, §0z191
     g.your_life = life
     return g, one, five
 

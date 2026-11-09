@@ -3364,12 +3364,17 @@ def hold_back(g, attackers) -> list:
     pilot's and not an optimiser's (§0v's shape):
 
       "lethal" (the default)  if the pod's next round (`predicted_chip`, read
-          with these attackers tapped) would take you to `hold_back_pad` life
-          or below, keep the WEAKEST non-vigilant attackers home, one at a
+          with these attackers tapped) would take you to `hold_back_pad` (10)
+          life or below, keep the WEAKEST non-vigilant attackers home, one at a
           time, until it would not -- and if no number kept home saves you,
           attack with everything. Never from a swing whose damage through
           (`damage_through`) covers every living opponent's life.
       "none"  attack with everything: the old pilot.
+
+    THE PAD IS 10 (§0z191, ADOPTED BY THE OWNER 2026-11-09): swept on six
+    decks and re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10
+    against 0, the lethal-only pilot §0z186 adopted; `hold_back_pad=0`
+    restores it.
 
     Off the rule, or with the pod off, it is "none". A creature kept home is
     counted (`held_back`, `hold_back_turns`). Every count the prediction
@@ -3382,7 +3387,7 @@ def hold_back(g, attackers) -> list:
     living_life = sum(o.life for o in living(g))
     if living_life <= 0 or damage_through(g, attackers) >= living_life:
         return attackers
-    pad = g.cfg.get("hold_back_pad", 0.0)
+    pad = g.cfg.get("hold_back_pad", 10.0)                       # §0z191
     life = g.your_life
 
     def crack(send):

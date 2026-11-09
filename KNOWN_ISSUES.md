@@ -243,7 +243,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z188](#0z188) | FIXED | **Beastmaster Ascension's +5/+5 is static** (611.3a): on at seven quest counters, not only from declare-attackers to your untap; +0.0003 ±0.0003 / +0.0001 ±0.0003, the hold-back keeps fewer home |
 | [0z189](#0z189) | FIXED | **The crack-back read before combat taps your coming attack** (karlov's Citadel floor, §0z186's leftover): 3.06 -> 4.18 life a read; -0.0002 / -0.0003, inside the bars; the floor's pad was tuned on the old read |
 | [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
-| [0z191](#0z191) | MEASURED | **`hold_back_pad` swept, pick re-measured out of sample**: pad 10 is +0.0010 at T20 and -0.0005 at T10 on fresh seeds, both significant; rendmaw and azusa gain, tivit loses. The owner's call |
+| [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16619,7 +16619,7 @@ and now `crack_back_planned` (§0z189).
 
 <a id="0z191"></a>
 
-## 0z191. MEASURED -- `hold_back_pad` swept, the pick re-measured out of sample: a T20 gain bought with T10
+## 0z191. DECIDED -- `hold_back_pad` swept, the pick re-measured out of sample, pad 10 ADOPTED: a T20 gain bought with T10
 
 **2026-11-08, the owner: "sweep hold_back_pad with an out-of-sample
 re-measure"**, §0z186's and §0z187's open item. §0z186's hold-back keeps the
@@ -16679,13 +16679,33 @@ loses most to the crack-back (§0z186, -0.105 from the rule), and azusa's;
 tivit, which does not win by combat, pays at T10 in both blocks
 (-0.0019, -0.0015) and gains nothing at T20.
 
-**Not adopted: the owner's decision.** The default stays 0. The choices, as
-measured: (a) leave it; (b) adopt 10 for every deck, +0.0010 at T20 and
--0.0005 at T10 on average; (c) a per-deck pad -- rendmaw and azusa at 10,
-the rest at 0 -- which these numbers suggest but did not test: choosing
-which decks get it is a second selection on the same seeds, so it would need
-its own out-of-sample block before it could be quoted. Whichever is taken,
-every active deck's games move, and item 35's rebuild covers it.
+**ADOPTED BY THE OWNER, 2026-11-09: "Adopt pad 10 for every deck ... Do
+not rebuild any decks yet."** Of the three choices put (leave 0; 10 for
+every deck; a per-deck pad, which would have needed its own out-of-sample
+block), the second. `opponents.hold_back` reads `hold_back_pad` 10 by
+default; **`hold_back_pad=0` is the engine before it**: every deck's staged
+list, seeds 5000..7499, T20, every output key hashed, against a fresh
+worktree at `1738734`, **0 of 2,500 differ in all seven decks**. With the
+default, rendmaw 741, shilgengar 530, tivit 395, lorehold 337, azusa 300 and
+karlov 196 of 2,500 move; trostani (SUSPENDED), which does not call the
+hold-back, does not. `tools.validate`: +0.00 on all 21 metrics.
+
+**Tivit pays for it, and that was known when it was adopted**: -0.0015 at
+T10 out of sample, nothing back at T20. The one-value-for-every-deck choice
+is the owner's, said here so that tivit's next T10 number is read with it.
+
+**Tests.** `tests/test_untapped_blockers.py` G-K built their life totals
+between pad 0's thresholds, so they broke on the new default, as they should
+have; `lethal_game` pins `hold_back_pad=0` now (they are §0z186's mechanism),
+and a new case L pins the adopted pad -- at 10 the weakest stays home from a
+crack-back that would leave you at 10 or less, at 0 all three go. A sixth
+mutation, `hold_back_pad=0` everywhere, breaks L alone; L's place in the
+other five sets was written before the run, and all six broke as written.
+`tests/test_planned_crack_back.py` F pins pad 0 for the same reason.
+
+**No rebuild** (the owner): every active deck's games moved, and queue item
+35's batch rebuild covers them with everything else. Queue item 38 is
+closed (`docs/HISTORY.md`, "Queued items closed 2026-11-09").
 
 **Knobs to say out loud with any hold-back number**: `hold_back_pad`,
 `hold_back` ("lethal"), `untapped_blockers`, `incidental_rate` (0.78, which

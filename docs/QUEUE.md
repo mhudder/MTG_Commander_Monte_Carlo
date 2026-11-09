@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31 and 36 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36 and 38 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -221,6 +221,9 @@ What is closed and where it went:
       Ascension's static); nothing else. Still the same six-deck rebuild.
     - **§0z189 (2026-11-08)** moved karlov's (the Citadel's floor read with the
       coming attack tapped); nothing else.
+    - **§0z191 (2026-11-09)**: `hold_back_pad` 10, ADOPTED by the owner, moved
+      every active deck's games. "Do not rebuild any decks yet": the same
+      six-deck batch.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
       any single engine fix, item 36 included. One batch rebuild of every
       active table once all the engine work is done; until then the six
@@ -240,12 +243,3 @@ What is closed and where it went:
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
-
-
-38. **`hold_back_pad`: an adoption decision for the owner (§0z191).** Swept
-    on six decks and the pick re-measured on fresh seeds (40000..54999): pad
-    10 is +0.0010 ±0.0007 at T20 and -0.0005 ±0.0004 at T10 against today's
-    0, a horizon trade carried by rendmaw (+0.0036) and azusa (+0.0022), with
-    tivit paying at T10. Leave it, adopt 10 for every deck, or measure a
-    per-deck pad (rendmaw and azusa at 10) on its own out-of-sample block
-    first. Any adoption moves every active deck's games: item 35's rebuild.

@@ -4,7 +4,7 @@ turns; vigilance keeps an attacker untapped; tivit's attackers tap; and the
 pilot holds blockers back from a crack-back that would kill.
 
     python -m tests.test_untapped_blockers
-    python -m tests.test_untapped_blockers --mutate   # 5 mutations, exact sets
+    python -m tests.test_untapped_blockers --mutate   # 6 mutations, exact sets
 
 `opponents.combat_share` aims each opponent's attack by 1 / (1 + blockers),
 and its blockers were every creature you control. CR 508.1f taps an
@@ -29,14 +29,28 @@ CASES
   J  NEIGHBOUR: `hold_back=False` sends everything into a lethal crack-back
   K  asking changes nothing: the metrics and every tapped flag are as they
      were, but for `held_back` and `hold_back_turns`
+  L  THE ADOPTED PAD (§0z191): with `hold_back_pad` at its default, 10, a
+     crack-back that would leave you at 10 or less holds the weakest home;
+     pad 0 sends all three into the same table
+
+G-K are §0z186's mechanism at `hold_back_pad=0` (their life totals sit
+between pad 0's thresholds), so `lethal_game` pins it; L alone reads the
+default.
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  untapped_blockers=False everywhere            -> A, D, E, G, K
+  untapped_blockers=False everywhere            -> A, D, E, G, K, L
   vigilant() is always False                    -> C, D
-  hold_back=False everywhere                    -> G, K
-  your_creatures counts tapped ones too         -> A, G, K  (K added after
-                                                   the first run; below)
-  hold_back keeps the STRONGEST home first      -> G
+  hold_back=False everywhere                    -> G, K, L
+  your_creatures counts tapped ones too         -> A, G, K, L  (K added
+                                                   after the first run;
+                                                   below)
+  hold_back keeps the STRONGEST home first      -> G, L
+  hold_back_pad=0 everywhere                    -> L
+
+L AND THE SIXTH MUTATION WERE ADDED WITH §0z191 (2026-11-09), their sets
+written before that run: L breaks under every mutation that stops the
+hold-back firing (the first, third and fourth), under the fifth because its
+stand-in reads pad 0 as §0z186's did, and under the sixth by construction.
 
 THE FIRST RUN FAILED I, AND THE TEST WAS WRONG: its opponents held seven
 creatures each, which chump the whole swing, so `damage_through` never
@@ -129,7 +143,9 @@ def crack(g, send):
 
 def lethal_game(**kw):
     """Three attackers (power 1, 2, 5) and a life total between the crack-back
-    with all three tapped and with only the weakest one tapped."""
+    with all three tapped and with only the weakest one tapped -- pad 0's
+    thresholds, so the pad is pinned at 0 (§0z191 adopted 10)."""
+    kw.setdefault("hold_back_pad", 0.0)
     g = game(**kw)
     bodies = [body(1, name="One"), body(2, name="Two"), body(5, name="Five")]
     g.board.extend(bodies)
@@ -211,6 +227,20 @@ def run_cases():
     check("K asking changes nothing but the hold-back's own counts",
           (after == before, [p.tapped for p in g.board] == taps,
            g.m["held_back"], g.m["hold_back_turns"]), (True, True, 1, 1))
+
+    def pad_table(**kw):
+        g = game(**kw)
+        bodies = [body(1, name="One"), body(2, name="Two"),
+                  body(5, name="Five")]
+        g.board.extend(bodies)
+        g.your_life = (crack(g, bodies) + crack(g, bodies[1:])) / 2.0 + 10.0
+        return g, bodies
+    g, bodies = pad_table()
+    names = sorted(p.card.name for p in OPP.hold_back(g, list(bodies)))
+    g0, bodies0 = pad_table(hold_back_pad=0.0)
+    check("L the default pad, 10: the weakest stays home; pad 0 sends all",
+          (names, len(OPP.hold_back(g0, list(bodies0)))),
+          (["Five", "Two"], 3))
     return set(FAIL)
 
 
@@ -257,15 +287,19 @@ def main() -> int:
     print("MUTATION RUN -- exact sets\n")
     muts = {
         "untapped_blockers=False everywhere":
-            ({"A", "D", "E", "G", "K"}, None, {"untapped_blockers": False}),
+            ({"A", "D", "E", "G", "K", "L"}, None,
+             {"untapped_blockers": False}),
         "vigilant() is always False":
             ({"C", "D"}, (OPP, "vigilant", lambda g, p: False), {}),
         "hold_back=False everywhere":
-            ({"G", "K"}, None, {"hold_back": False}),
+            ({"G", "K", "L"}, None, {"hold_back": False}),
         "your_creatures counts tapped ones too":
-            ({"A", "G", "K"}, (OPP, "your_creatures", _counts_tapped), {}),
+            ({"A", "G", "K", "L"}, (OPP, "your_creatures", _counts_tapped),
+             {}),
         "hold_back keeps the STRONGEST home first":
-            ({"G"}, (OPP, "hold_back", _strongest_first), {}),
+            ({"G", "L"}, (OPP, "hold_back", _strongest_first), {}),
+        "hold_back_pad=0 everywhere":
+            ({"L"}, None, {"hold_back_pad": 0.0}),
     }
     bad = 0
     for label, (want, patch, extra) in muts.items():

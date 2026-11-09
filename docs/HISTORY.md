@@ -2901,6 +2901,20 @@ rate back where it was, out of sample to 0.004 -- rendmaw paying most for
 attacking wide. By the owner's instruction nothing was rebuilt: all six
 tables wait for one batch rebuild once the engine work is done (item 35).
 
+## Queued items closed 2026-11-09 — moved from `docs/QUEUE.md`
+
+Item 38 closed the day after it was queued: the owner adopted pad 10 for
+every deck ("Adopt pad 10 for every deck ... Do not rebuild any decks
+yet"), §0z191. Moved verbatim:
+
+38. **`hold_back_pad`: an adoption decision for the owner (§0z191).** Swept
+    on six decks and the pick re-measured on fresh seeds (40000..54999): pad
+    10 is +0.0010 ±0.0007 at T20 and -0.0005 ±0.0004 at T10 against today's
+    0, a horizon trade carried by rendmaw (+0.0036) and azusa (+0.0022), with
+    tivit paying at T10. Leave it, adopt 10 for every deck, or measure a
+    per-deck pad (rendmaw and azusa at 10) on its own out-of-sample block
+    first. Any adoption moves every active deck's games: item 35's rebuild.
+
 ## Queued items closed 2026-11-08 — moved from `docs/QUEUE.md`
 
 Item 36 closed the same day it was queued: the rule, vigilance, tivit's
