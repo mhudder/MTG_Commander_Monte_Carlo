@@ -300,7 +300,55 @@ def phase_list():
                       f"T20 {fmt(v['T20'])}   T10 {fmt(v['T10'])}{both}")
         total += len(by_card)
         print()
-    print(f"{total} cards on the list across {len(ACTIVE)} decks.")
+    print(f"{total} cards on the list across {len(ACTIVE)} decks.\n")
+    return phase_strict(scr, con)
+
+
+def phase_strict(scr, con):
+    """Queue item 39's own wording: the cards whose ROW moves by more than
+    its own bar -- the T20 win-rate CI half-width in the deck's committed
+    ablation cache -- under a CONFIRMED move. The commander has no row (it is
+    never ablated) and every row is measured against it, so it is listed
+    apart. The caches are whatever is on disk (SUSPECT ones included, item
+    35): a bar is a property of N and the deck, and moves little with an
+    engine fix."""
+    import tools.ablation as AB
+    print("STRICT: confirmed moves larger than the row's own T20 bar in the "
+          "table\n")
+    total = 0
+    for d in ACTIVE:
+        deck, cmd = build_pending(d)
+        with open(AB.Run(d, 15000, (10, 20)).cache) as fh:
+            res = json.load(fh)
+        thr = {c.name: c.threat for c in deck if c.threat}
+        thr[cmd.name] = cmd.threat
+        hits = []
+        for (dd, arm), v in con.items():
+            s = scr[(dd, arm)]["T20"]
+            if dd != d or not (v["T20"]["sig"] and np.sign(v["T20"]["win"])
+                               == np.sign(s["win"])):
+                continue
+            name, dlt = card_arm(arm)
+            w = v["T20"]["win"]
+            if name == cmd.name:
+                hits.append((name, dlt, w, "commander: no row; every row is "
+                             "measured against it"))
+            elif name in res and abs(w) > res[name]["20"]["won"][1]:
+                row, bar = res[name]["20"]["won"]
+                flip = (" SIGN" if abs(row) <= bar or np.sign(row + w)
+                        != np.sign(row) else "")
+                hits.append((name, dlt, w, f"row {row:+.4f} +-{bar:.4f}"
+                             f"{flip}"))
+        cards = {h[0] for h in hits} - {cmd.name}
+        total += len(cards)
+        print(f"== {d}: {len(cards)} rows beyond their bar")
+        for name, dlt, w, note in sorted(hits, key=lambda h: -abs(h[2])):
+            print(f"  {name:<44} {thr[name]:g}->{max(FLOOR, thr[name] + dlt):g}"
+                  f"  {w:+.4f}   {note}")
+        print()
+    print(f"{total} non-commander rows beyond their own bar across "
+          f"{len(ACTIVE)} decks, plus every commander. SIGN: the row is "
+          f"inside its bar, or the move would carry it across zero.")
     return 0
 
 

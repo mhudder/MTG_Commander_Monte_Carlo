@@ -1,0 +1,166 @@
+threat sweep, `list`: a move is CONFIRMED when its confirm-block T20 bar excludes zero with its screen sign (rule in the module docstring). Delta 3, floor 0.1.
+
+== rendmaw: 12 of 30 carriers on the list, 60 moves screened, 17 confirmed-phase
+  Rendmaw, Creaking Nest (commander)           9->12  T20  -0.0068 +-0.0022 * chg  1447   T10  -0.0028 +-0.0013 * chg  1447 BOTH
+  Rendmaw, Creaking Nest (commander)           9->6  T20  +0.0124 +-0.0044 * chg  6146   T10  +0.0007 +-0.0027   chg  6146 BOTH
+  Coat of Arms                                 8->11  T20  -0.0061 +-0.0017 * chg   765   T10  -0.0059 +-0.0013 * chg   765 BOTH
+  Coat of Arms                                 8->5  T20  +0.0045 +-0.0015 * chg   589   T10  +0.0037 +-0.0009 * chg   589 BOTH
+  Beastmaster Ascension                        6->3  T20  +0.0057 +-0.0018 * chg   793   T10  +0.0035 +-0.0011 * chg   793
+  Grist, the Hunger Tide                       6.5->3.5  T20  +0.0036 +-0.0015 * chg   735   T10  +0.0006 +-0.0007   chg   735
+  Tendershoot Dryad                            6.5->3.5  T20  +0.0031 +-0.0013 * chg   342   T10  +0.0025 +-0.0009 * chg   342
+  March of the World Ooze                      9->6  T20  +0.0025 +-0.0016 * chg   762   T10  +0.0020 +-0.0009 * chg   762
+  Ohran Frostfang                              7->10  T20  -0.0018 +-0.0012 * chg   621   T10  -0.0017 +-0.0009 * chg   621 BOTH
+  Ohran Frostfang                              7->4  T20  +0.0024 +-0.0010 * chg   275   T10  +0.0013 +-0.0006 * chg   275 BOTH
+  Blood Artist                                 5.5->8.5  T20  -0.0019 +-0.0012 * chg   535   T10  +0.0000 +-0.0006   chg   535 BOTH
+  Blood Artist                                 5.5->2.5  T20  +0.0015 +-0.0010 * chg   431   T10  +0.0006 +-0.0005 * chg   431 BOTH
+  Arasta of the Endless Web                    4->1  T20  +0.0017 +-0.0008 * chg   212   T10  +0.0006 +-0.0005 * chg   212
+  Sol Ring                                     4->1  T20  +0.0016 +-0.0012 * chg   421   T10  +0.0012 +-0.0007 * chg   421
+  Metallic Mimic                               5->2  T20  +0.0013 +-0.0011 * chg   468   T10  +0.0003 +-0.0005   chg   468
+  The Meathook Massacre                        6.5->3.5  T20  +0.0010 +-0.0008 * chg   331   T10  +0.0001 +-0.0002   chg   331
+
+== lorehold: 9 of 34 carriers on the list, 68 moves screened, 14 confirmed-phase
+  Lorehold, the Historian (commander)          9->12  T20  -0.0109 +-0.0021 * chg   729   T10  -0.0060 +-0.0014 * chg   729 BOTH
+  Lorehold, the Historian (commander)          9->6  T20  +0.0281 +-0.0052 * chg  5899   T10  +0.0269 +-0.0041 * chg  5899 BOTH
+  Monument to Endurance                        5->8  T20  -0.0047 +-0.0016 * chg   596   T10  -0.0030 +-0.0013 * chg   596 BOTH
+  Monument to Endurance                        5->2  T20  +0.0043 +-0.0015 * chg   463   T10  +0.0033 +-0.0013 * chg   463 BOTH
+  Sol Ring                                     4->7  T20  -0.0023 +-0.0020 * chg  1052   T10  -0.0042 +-0.0017 * chg  1052
+  Bender's Waterskin                           4.5->1.5  T20  +0.0021 +-0.0014 * chg   470   T10  +0.0019 +-0.0011 * chg   470
+  Arcane Bombardment                           8.5->5.5  T20  +0.0019 +-0.0011 * chg   517   T10  +0.0005 +-0.0008   chg   517
+  Improvisation Capstone                       7->10  T20  -0.0018 +-0.0007 * chg    84   T10  -0.0013 +-0.0006 * chg    84
+  Caldera Pyremaw                              8.5->5.5  T20  +0.0012 +-0.0009 * chg   252   T10  +0.0014 +-0.0007 * chg   252
+  Apex of Power                                8.5->5.5  T20  +0.0011 +-0.0007 * chg    93   T10  +0.0009 +-0.0006 * chg    93
+  Invoke Calamity                              6->3  T20  +0.0011 +-0.0007 * chg   207   T10  +0.0008 +-0.0006 * chg   207
+
+== karlov: 19 of 52 carriers on the list, 104 moves screened, 26 confirmed-phase
+  Exquisite Blood                              9->12  T20  -0.0022 +-0.0013 * chg   437   T10  -0.0049 +-0.0013 * chg   437 BOTH
+  Exquisite Blood                              9->6  T20  +0.0081 +-0.0016 * chg   510   T10  +0.0084 +-0.0015 * chg   510 BOTH
+  Soul Warden                                  6.5->9.5  T20  +0.0065 +-0.0024 * chg  1640   T10  +0.0051 +-0.0019 * chg  1640
+  Dawn of Hope                                 6->9  T20  +0.0047 +-0.0017 * chg   756   T10  +0.0027 +-0.0010 * chg   756
+  Well of Lost Dreams                          7.5->10.5  T20  +0.0045 +-0.0017 * chg   795   T10  +0.0027 +-0.0014 * chg   795
+  Felidar Sovereign                            8->11  T20  -0.0038 +-0.0014 * chg   428   T10  -0.0060 +-0.0014 * chg   428 BOTH
+  Felidar Sovereign                            8->5  T20  +0.0029 +-0.0009 * chg   165   T10  +0.0025 +-0.0008 * chg   165 BOTH
+  Karlov of the Ghost Council (commander)      9->12  T20  -0.0038 +-0.0021 * chg  1218   T10  -0.0030 +-0.0016 * chg  1218
+  Necropotence                                 8->11  T20  +0.0035 +-0.0017 * chg   710   T10  +0.0033 +-0.0013 * chg   710
+  Bolas's Citadel                              8.5->11.5  T20  -0.0019 +-0.0010 * chg   312   T10  -0.0020 +-0.0009 * chg   312 BOTH
+  Bolas's Citadel                              8.5->5.5  T20  +0.0035 +-0.0011 * chg   252   T10  +0.0031 +-0.0009 * chg   252 BOTH
+  Bloodthirsty Conqueror                       8->11  T20  -0.0017 +-0.0011 * chg   310   T10  -0.0031 +-0.0010 * chg   310 BOTH
+  Bloodthirsty Conqueror                       8->5  T20  +0.0032 +-0.0010 * chg   225   T10  +0.0043 +-0.0011 * chg   225 BOTH
+  Blind Obedience                              6->9  T20  +0.0029 +-0.0018 * chg   891   T10  +0.0033 +-0.0012 * chg   891
+  Sol Ring                                     4->1  T20  +0.0029 +-0.0013 * chg   407   T10  +0.0021 +-0.0009 * chg   407
+  Soul's Attendant                             6.5->3.5  T20  +0.0021 +-0.0014 * chg   491   T10  +0.0021 +-0.0010 * chg   491
+  Phyrexian Reclamation                        4.5->1.5  T20  +0.0020 +-0.0010 * chg   329   T10  +0.0007 +-0.0006 * chg   329
+  Vito, Thorn of the Dusk Rose                 8.5->5.5  T20  +0.0019 +-0.0011 * chg   450   T10  +0.0013 +-0.0009 * chg   450
+  Aetherflux Reservoir                         8.5->11.5  T20  +0.0018 +-0.0014 * chg   546   T10  +0.0001 +-0.0009   chg   546
+  Kambal, Consul of Allocation                 7->4  T20  +0.0018 +-0.0010 * chg   228   T10  +0.0003 +-0.0006   chg   228
+  Cliffhaven Vampire                           7.5->4.5  T20  +0.0013 +-0.0010 * chg   248   T10  +0.0015 +-0.0007 * chg   248
+  Sun Titan                                    7->10  T20  +0.0008 +-0.0007 * chg   222   T10  -0.0001 +-0.0004   chg   222
+  Kalitas, Traitor of Ghet                     7.5->4.5  T20  +0.0008 +-0.0007 * chg   200   T10  +0.0002 +-0.0003   chg   200
+
+== tivit: 15 of 42 carriers on the list, 84 moves screened, 25 confirmed-phase
+  Tivit, Seller of Secrets (commander)         9.5->12.5  T20  -0.0063 +-0.0014 * chg   429   T10  -0.0027 +-0.0010 * chg   429 BOTH
+  Tivit, Seller of Secrets (commander)         9.5->6.5  T20  +0.0262 +-0.0041 * chg  4645   T10  +0.0183 +-0.0034 * chg  4645 BOTH
+  Time Sieve                                   8.5->11.5  T20  -0.0049 +-0.0014 * chg   433   T10  -0.0062 +-0.0015 * chg   433 BOTH
+  Time Sieve                                   8.5->5.5  T20  +0.0155 +-0.0022 * chg  1211   T10  +0.0254 +-0.0026 * chg  1211 BOTH
+  Tempting Contract                            6->3  T20  +0.0036 +-0.0016 * chg   648   T10  +0.0033 +-0.0013 * chg   648
+  Master of Ceremonies                         7->4  T20  +0.0033 +-0.0013 * chg   388   T10  +0.0027 +-0.0011 * chg   388
+  Sol Ring                                     4->1  T20  +0.0029 +-0.0012 * chg   403   T10  +0.0030 +-0.0010 * chg   403
+  Teleportation Circle                         6.5->3.5  T20  +0.0029 +-0.0017 * chg   913   T10  +0.0027 +-0.0011 * chg   913
+  Monologue Tax                                6->9  T20  -0.0029 +-0.0017 * chg   924   T10  -0.0032 +-0.0014 * chg   924
+  Lightning Greaves                            4->1  T20  +0.0027 +-0.0013 * chg   487   T10  +0.0010 +-0.0009 * chg   487
+  Mirkwood Bats                                7.5->10.5  T20  -0.0021 +-0.0016 * chg   736   T10  -0.0037 +-0.0015 * chg   736 BOTH
+  Mirkwood Bats                                7.5->4.5  T20  +0.0027 +-0.0012 * chg   497   T10  +0.0045 +-0.0012 * chg   497 BOTH
+  Kambal, Profiteering Mayor                   8->5  T20  +0.0025 +-0.0013 * chg   634   T10  +0.0015 +-0.0010 * chg   634
+  Marionette Master                            8->5  T20  +0.0021 +-0.0011 * chg   282   T10  +0.0014 +-0.0007 * chg   282
+  Model of Unity                               5->8  T20  -0.0019 +-0.0016 * chg   718   T10  -0.0003 +-0.0010   chg   718 BOTH
+  Model of Unity                               5->2  T20  +0.0014 +-0.0012 * chg   454   T10  +0.0013 +-0.0008 * chg   454 BOTH
+  Propaganda                                   5.5->2.5  T20  +0.0018 +-0.0011 * chg   479   T10  -0.0001 +-0.0006   chg   479
+  Conjurer's Closet                            6->3  T20  +0.0014 +-0.0013 * chg   516   T10  +0.0014 +-0.0008 * chg   516
+  Cyberdrive Awakener                          7.5->10.5  T20  +0.0010 +-0.0010 * chg   454   T10  +0.0014 +-0.0008 * chg   454
+
+== shilgengar: 9 of 48 carriers on the list, 96 moves screened, 16 confirmed-phase
+  Shilgengar, Sire of Famine (commander)       8.5->11.5  T20  -0.0122 +-0.0031 * chg  2700   T10  -0.0012 +-0.0012   chg  2700 BOTH
+  Shilgengar, Sire of Famine (commander)       8.5->5.5  T20  +0.0296 +-0.0056 * chg  7711   T10  +0.0075 +-0.0020 * chg  7711 BOTH
+  Black Market Connections                     6.5->9.5  T20  +0.0043 +-0.0021 * chg  1222   T10  +0.0013 +-0.0008 * chg  1222
+  Kokusho, the Evening Star                    8.5->11.5  T20  +0.0039 +-0.0016 * chg   863   T10  +0.0011 +-0.0007 * chg   863 BOTH
+  Kokusho, the Evening Star                    8.5->5.5  T20  -0.0029 +-0.0015 * chg   542   T10  +0.0000 +-0.0003   chg   542 BOTH
+  Archangel of Thune                           8->11  T20  -0.0036 +-0.0017 * chg  1034   T10  -0.0003 +-0.0008   chg  1034
+  Lyra Dawnbringer                             8->11  T20  -0.0035 +-0.0017 * chg   999   T10  -0.0007 +-0.0006 * chg   999 BOTH
+  Lyra Dawnbringer                             8->5  T20  +0.0028 +-0.0012 * chg   366   T10  +0.0007 +-0.0005 * chg   366 BOTH
+  Zulaport Cutthroat                           6->9  T20  +0.0031 +-0.0019 * chg  1322   T10  +0.0018 +-0.0007 * chg  1322
+  Righteous Valkyrie                           6.5->9.5  T20  +0.0027 +-0.0020 * chg  1315   T10  +0.0007 +-0.0008   chg  1315
+  Serra's Emissary                             8.5->11.5  T20  -0.0023 +-0.0015 * chg   585   T10  -0.0001 +-0.0006   chg   585 BOTH
+  Serra's Emissary                             8.5->5.5  T20  +0.0014 +-0.0011 * chg   284   T10  +0.0003 +-0.0004   chg   284 BOTH
+  Revel in Riches                              5.5->2.5  T20  +0.0017 +-0.0008 * chg   267   T10  +0.0010 +-0.0005 * chg   267
+
+== azusa: 13 of 56 carriers on the list, 112 moves screened, 19 confirmed-phase
+  Mossborn Hydra                               6->9  T20  -0.0121 +-0.0026 * chg  1517   T10  -0.0153 +-0.0023 * chg  1517 BOTH
+  Mossborn Hydra                               6->3  T20  +0.0044 +-0.0014 * chg   432   T10  +0.0054 +-0.0012 * chg   432 BOTH
+  Avenger of Zendikar                          9->6  T20  +0.0056 +-0.0017 * chg   889   T10  +0.0063 +-0.0015 * chg   889
+  Scute Swarm                                  6->3  T20  +0.0055 +-0.0014 * chg   448   T10  +0.0056 +-0.0013 * chg   448
+  Greensleeves, Maro-Sorcerer                  8.5->5.5  T20  +0.0031 +-0.0017 * chg  1122   T10  +0.0029 +-0.0014 * chg  1122
+  Mole Man, Moloid Master                      5->2  T20  +0.0030 +-0.0013 * chg   359   T10  +0.0028 +-0.0010 * chg   359
+  Horn of Greed                                5->2  T20  +0.0027 +-0.0014 * chg   511   T10  +0.0021 +-0.0010 * chg   511
+  Courser of Kruphix                           6->3  T20  +0.0025 +-0.0014 * chg   662   T10  +0.0011 +-0.0011   chg   662
+  Tireless Provisioner                         6.5->3.5  T20  +0.0024 +-0.0014 * chg   519   T10  +0.0017 +-0.0011 * chg   519
+  Rampaging Baloths                            8->11  T20  -0.0023 +-0.0016 * chg  1382   T10  -0.0024 +-0.0013 * chg  1382
+  Augur of Autumn                              6->3  T20  +0.0018 +-0.0013 * chg   439   T10  +0.0017 +-0.0010 * chg   439
+  Sol Ring                                     4->1  T20  +0.0017 +-0.0012 * chg   363   T10  +0.0015 +-0.0007 * chg   363
+  Green Sun's Zenith                           5->2  T20  +0.0012 +-0.0009 * chg   191   T10  +0.0007 +-0.0007 * chg   191
+  Quirion Ranger                               3.5->0.5  T20  +0.0012 +-0.0008 * chg   146   T10  +0.0011 +-0.0006 * chg   146
+
+77 cards on the list across 6 decks.
+
+STRICT: confirmed moves larger than the row's own T20 bar in the table
+
+== rendmaw: 4 rows beyond their bar
+  Rendmaw, Creaking Nest                       9->6  +0.0124   commander: no row; every row is measured against it
+  Rendmaw, Creaking Nest                       9->12  -0.0068   commander: no row; every row is measured against it
+  Coat of Arms                                 8->11  -0.0061   row +0.0164 +-0.0032
+  Beastmaster Ascension                        6->3  +0.0057   row +0.0157 +-0.0034
+  Coat of Arms                                 8->5  +0.0045   row +0.0164 +-0.0032
+  Grist, the Hunger Tide                       6.5->3.5  +0.0036   row +0.0069 +-0.0027
+  Tendershoot Dryad                            6.5->3.5  +0.0031   row +0.0131 +-0.0024
+
+== lorehold: 1 rows beyond their bar
+  Lorehold, the Historian                      9->6  +0.0281   commander: no row; every row is measured against it
+  Lorehold, the Historian                      9->12  -0.0109   commander: no row; every row is measured against it
+  Monument to Endurance                        5->8  -0.0047   row +0.0157 +-0.0040
+  Monument to Endurance                        5->2  +0.0043   row +0.0157 +-0.0040
+
+== karlov: 8 rows beyond their bar
+  Exquisite Blood                              9->6  +0.0081   row +0.0502 +-0.0042
+  Soul Warden                                  6.5->9.5  +0.0065   row +0.0073 +-0.0033
+  Dawn of Hope                                 6->9  +0.0047   row -0.0037 +-0.0026 SIGN
+  Well of Lost Dreams                          7.5->10.5  +0.0045   row +0.0011 +-0.0025 SIGN
+  Felidar Sovereign                            8->11  -0.0038   row +0.0158 +-0.0026
+  Karlov of the Ghost Council                  9->12  -0.0038   commander: no row; every row is measured against it
+  Necropotence                                 8->11  +0.0035   row +0.0074 +-0.0027
+  Bolas's Citadel                              8.5->5.5  +0.0035   row +0.0231 +-0.0030
+  Blind Obedience                              6->9  +0.0029   row -0.0035 +-0.0027
+  Felidar Sovereign                            8->5  +0.0029   row +0.0158 +-0.0026
+
+== tivit: 4 rows beyond their bar
+  Tivit, Seller of Secrets                     9.5->6.5  +0.0262   commander: no row; every row is measured against it
+  Time Sieve                                   8.5->5.5  +0.0155   row +0.0683 +-0.0050
+  Tivit, Seller of Secrets                     9.5->12.5  -0.0063   commander: no row; every row is measured against it
+  Tempting Contract                            6->3  +0.0036   row +0.0208 +-0.0033
+  Master of Ceremonies                         7->4  +0.0033   row +0.0195 +-0.0031
+  Teleportation Circle                         6.5->3.5  +0.0029   row +0.0077 +-0.0025
+
+== shilgengar: 5 rows beyond their bar
+  Shilgengar, Sire of Famine                   8.5->5.5  +0.0296   commander: no row; every row is measured against it
+  Shilgengar, Sire of Famine                   8.5->11.5  -0.0122   commander: no row; every row is measured against it
+  Black Market Connections                     6.5->9.5  +0.0043   row -0.0004 +-0.0032 SIGN
+  Kokusho, the Evening Star                    8.5->11.5  +0.0039   row +0.0044 +-0.0027
+  Archangel of Thune                           8->11  -0.0036   row +0.0214 +-0.0034
+  Lyra Dawnbringer                             8->11  -0.0035   row +0.0218 +-0.0034
+  Zulaport Cutthroat                           6->9  +0.0031   row +0.0037 +-0.0021
+  Kokusho, the Evening Star                    8.5->5.5  -0.0029   row +0.0044 +-0.0027
+
+== azusa: 3 rows beyond their bar
+  Mossborn Hydra                               6->9  -0.0121   row +0.0200 +-0.0040
+  Avenger of Zendikar                          9->6  +0.0056   row +0.0223 +-0.0036
+  Scute Swarm                                  6->3  +0.0055   row +0.0356 +-0.0040
+  Mossborn Hydra                               6->3  +0.0044   row +0.0200 +-0.0040
+
+25 non-commander rows beyond their own bar across 6 decks, plus every commander. SIGN: the row is inside its bar, or the move would carry it across zero.

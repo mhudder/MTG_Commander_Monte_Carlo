@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36 and 38 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38 and 43 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -244,30 +244,21 @@ What is closed and where it went:
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
 
-39. **Which rows rest on their `threat` number (§0z192, finding 2; the core
-    review, 2026-11-11). FIRST of the review's five.** Scaling every
-    hand-typed `threat` in a list by 0.5 is +0.07 to +0.10 win rate, and one
-    karlov card's number moved by 3 is up to +0.0107 ±0.0042 -- a median
-    row's size -- while most single cards sit inside the bar at N=3,000.
-    Nobody has asked the question of every card.
-    - **This is NOT a tuning sweep.** `threat` says how the TABLE sees a
-      card; it is not the pilot's to choose, and lower always wins more.
-      Never adopt a threat because it scored better (item 18 could do that
-      for `priority`, which a pilot does choose).
-    - **Measure**: `diagnostics/run_priority_sweep.py` is the shape (screen
-      at N=5,000, confirm survivors at N=15,000 on a DISJOINT seed block,
-      §0z170) with `threat` moved ±3 in place of `priority` ±2, every card
-      with a hand-typed number, every active deck, T20 with T10 off the
-      same game. `diag_core_review threat` is the two-row version. Write
-      the survivor rule before the first run.
-    - **Deliver**: the list of cards whose row moves by more than its own
-      bar when its threat moves by 3 -- those rows are a fact about a typed
-      constant (§0j's wording) -- and a proposal the owner can decide: a
-      note under each such row, as PARTLY rows carry theirs, or a derived
-      rule in place of the typed numbers (`opponents.threat_of` already
-      derives 0.0). Either moves every baseline: batch it with item 35.
-    - **Prior**: §0j's `+threat` blank moved 27 of 28 rows barely, on the pod
-      before §0z140. Expect a short list; Exquisite Blood is on it.
+39. **Which rows rest on their `threat`: MEASURED (§0z194, 2026-11-11);
+    what is left is the owner's.** 96 of 524 single-card ±3 moves confirmed
+    on fresh seeds; **25 rows move past their own table bar**, three could
+    change sign (karlov's Dawn of Hope and Well of Lost Dreams, shilgengar's
+    Black Market Connections), and every commander's -3 is worth +0.012 to
+    +0.030. `threat` also picks which permanent the pod's removal hits, so a
+    higher number can WIN more (a lightning rod). The list is
+    `python -m diagnostics.run_threat_sweep list`.
+    - **The owner decides**: (1) a note under each of the 25 rows, as PARTLY
+      rows carry theirs (a rendering change; rides item 35's rebuild with
+      item 40) -- the recommendation; or (2) a derived rule for `threat`,
+      which must serve both the share and the removal target and moves
+      every baseline (a parallel rebuild; after item 41 is decided).
+    - **Never adopt a threat because it scored better**: `threat` is how the
+      table sees a card, not the pilot's choice.
 
 40. **Sort each table by win rate, the objective (§0z192, finding 5).**
     `tools/ablation.py`'s `render_table` orders every section by damage at
@@ -302,33 +293,11 @@ What is closed and where it went:
       `docs/STATUS.md` (derived -- `ablation.py` measures the baseline and
       does not keep it in the cache today), so the drift is visible.
 
-42. **One cast-ranking rule for seven main phases (§0z192, finding 3;
-    §0u, §0z30).** `(priority, mv)` is written out in azusa, karlov,
-    lorehold (twice), shilgengar, tivit and trostani; rendmaw's `rank` adds
-    +3 to a `ramp` card through turn 5 and is the only one that does.
-    - **The tag is already typed where nothing reads it**: 7 lorehold, 7
-      tivit and 1 karlov card carry `ramp` beside rendmaw's 16, and
-      `engine.main_phase` is its only reader. Before it goes live anywhere,
-      re-read the oracle text of every card carrying it (§0z12).
-    - **Measure the difference nobody decided**, at the tables' N
-      (`diagnostics/run_shared_code_shift.py`'s method): rendmaw without
-      the bonus, and lorehold, tivit and karlov with it.
-    - **Then** one `engine.cast_rank(g, card)` that every main phase
-      calls, with the bonus a knob whose default per deck is whatever the
-      measurement and the owner say; bit-identical on every output key
-      before any default moves (§0z32), `tools.validate` at `+0.00`.
-    - Low urgency. Not the whole main phase: the option filters differ for
-      reasons (wipes, holds, Lurrus, the graveyard cast) and stay.
-
-43. **Pin the floors §0z192 found holding.** Two facts that would be loud
-    if a pod change broke them and that nothing checks today:
-    a do-nothing list (every nonland a blank sorcery) wins under 0.06 and
-    loses over 0.90 at T20 in every active deck; and a real list's mean
-    `your_share` when a clock fires with three opponents alive sits in
-    0.25 to 0.40. `diagnostics/diag_core_review.py anatomy` computes both.
-    - A new `tests/test_model_floors.py` at a few hundred seeds a deck,
-      bands wide enough for that N, with a `--mutate` mode whose expected
-      failures are written BEFORE it is run (§0z11): `threat_of` returning
-      0, and the clock aimed at you always, should each break exactly the
-      case that names it.
-    - Small; any session. It is the review's sanity check made permanent.
+42. **One cast rule: BUILT (§0z193, 2026-11-11); one default is the
+    owner's.** Every main phase ranks through `engine.cast_rank`,
+    bit-identical on 28,000 games. The `ramp` bonus (`ramp_rank_bonus`;
+    rendmaw 3, the rest 0, as before) is a null out of sample in all three
+    decks carrying the tag: rendmaw without it +0.0011 ±0.0033, tivit with it
+    +0.0018 ±0.0027 at T20. Left: keep the per-deck defaults (nothing moves),
+    or set rendmaw to 0 for one rule everywhere (rendmaw's games move,
+    inside its bar: item 35's batch).

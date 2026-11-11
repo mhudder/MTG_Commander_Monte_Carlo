@@ -246,6 +246,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
 | [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
 | [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Defaults unchanged |
+| [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat also steers removal: a lightning rod |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16921,6 +16922,116 @@ moves rendmaw's games (item 35's batch).
 
 **Knobs to say out loud**: `ramp_rank_bonus`, `ramp_rank_turns`, and
 `cast_lookahead` (off), which reads the same rank.
+
+<a id="0z194"></a>
+
+## 0z194. MEASURED -- which rows rest on their `threat`: 25 rows and every commander, and `threat` is a lightning rod as well as a share
+
+**Queue item 39** (§0z192, finding 2). `diagnostics/run_threat_sweep.py`,
+its survivor rule written in its docstring before the first run: every
+card in each active deck's staged list with a hand-typed `threat`, the
+commander included (262 cards, 524 moves), moved +3 and -3 alone (-3
+floored at 0.1, since 0.0 hands the card to `threat_of`'s derivation;
+three cards sit at 3.0). Screen N=5,000, seeds 100000.., T20 with T10 off
+the same game; every T20 survivor confirmed at N=15,000 on the disjoint
+block 105000..; CONFIRMED = the confirm block's T20 bar excludes zero with
+the screen's sign. The NOOP arm (every carrier replaced by a fresh copy,
+threat unchanged) changed **0 games in all six decks** in both phases, and
+`--mutate` makes it fire. `results/threat_screen.txt`,
+`results/threat_confirm.txt`, `results/threat_list.txt`.
+
+**This is not a tuning sweep, and nothing in it is a move to make.**
+`threat` says how the table sees a card; lower always wins more, so a
+negative move "winning" is the model working, not a better number.
+
+### The counts
+
+| deck | carriers | screen survivors | confirmed moves | cards on the list | rows beyond their own bar |
+|---|---|---|---|---|---|
+| rendmaw | 30 | 17 of 60 | 16 | 12 | 4 |
+| lorehold | 34 | 14 of 68 | 11 | 9 | 1 |
+| karlov | 52 | 26 of 104 | 23 | 19 | 8 |
+| tivit | 42 | 25 of 84 | 19 | 15 | 4 |
+| shilgengar | 48 | 16 of 96 | 13 | 9 | 5 |
+| azusa | 56 | 19 of 112 | 14 | 13 | 3 |
+| **all** | **262** | **117 of 524** | **96** | **77** | **25** |
+
+117 survivors where chance gives ~26, and 96 of them confirmed on fresh
+seeds where chance would pass ~6: **§0z192's "expect a short list" prior was
+wrong.** A threat move is detectable for 77 of 262 cards. Most of those
+moves are small -- 0.001 to 0.003, against a table bar of ±0.002 to
+±0.005 -- because a paired threat move changes few games (a few hundred in
+15,000), so its own bar is tight. **The question the item asked is the
+stricter one, and its answer is 25 rows** (`list`'s STRICT section):
+
+- rendmaw: Coat of Arms (both ways), Beastmaster Ascension, Grist,
+  Tendershoot Dryad. lorehold: Monument to Endurance (both ways).
+- karlov: Exquisite Blood (-3: +0.0081 against a ±0.0042 bar), Soul Warden,
+  Dawn of Hope, Well of Lost Dreams, Felidar Sovereign (both ways),
+  Necropotence, Bolas's Citadel, Blind Obedience.
+- tivit: Time Sieve (-3: +0.0155 against ±0.0050, the largest card),
+  Tempting Contract, Master of Ceremonies, Teleportation Circle.
+- shilgengar: Black Market Connections, Kokusho (both ways, opposite signs
+  to the rest), Archangel of Thune, Lyra Dawnbringer, Zulaport Cutthroat.
+- azusa: Mossborn Hydra (+3: -0.0121 against ±0.0040), Avenger of Zendikar,
+  Scute Swarm.
+
+**Three of them could change sign** (`SIGN`): karlov's Dawn of Hope (row
+-0.0037, +3 moves it +0.0047) and Well of Lost Dreams (+0.0011, +0.0045),
+and shilgengar's Black Market Connections (-0.0004, +0.0043). Those three
+rows are a fact about a typed constant (§0j's wording) more than about the
+card.
+
+**Every commander is on the list, both ways, and is the largest lever in
+every deck**: -3 is +0.0124 (rendmaw), +0.0281 (lorehold), +0.0262 (tivit),
++0.0296 (shilgengar) at T20; +3 is -0.0038 to -0.0122. Karlov's -3 and
+azusa's both ways did not survive the screen. The commander has no row,
+but every row in its table is measured with it on the battlefield, so its
+number is part of every baseline -- the same shape as finding 2's whole-list
+scale, one card wide.
+
+### `threat` is a lightning rod as well as a share
+
+Twelve confirmed moves go the "wrong" way: MORE threat, MORE wins -- karlov's
+Soul Warden, Dawn of Hope, Well of Lost Dreams, Necropotence, Blind
+Obedience, Aetherflux Reservoir and Sun Titan, shilgengar's Black Market
+Connections, Kokusho, Zulaport Cutthroat and Righteous Valkyrie, tivit's
+Cyberdrive Awakener. `threat_of` is read twice: summed into
+`board_threat` (your share of the pod's aim, where more always hurts) and,
+per permanent, to pick which of your permanents the pod's spot removal
+hits. A card raised above its neighbours draws that removal away from them.
+**Checked, not argued** (3,000 paired seeds, 110000..): with Dawn of Hope at
++3 it is removed in 5.6% of games against 2.1%, and with Black Market
+Connections at +3 in 12.4% against 7.4%, while `removal_eaten` -- the
+removal you take in total -- moves +0.008 and -0.000. The removal went to
+the card and away from something else. So a typed threat decides not only
+how much the pod aims at you but WHICH of your cards it spends its answers
+on, and a cheap engine scored above the commander protects the commander.
+
+### The proposal, for the owner (nothing is changed)
+
+1. **A note under each of the 25 rows**, as PARTLY rows carry theirs:
+   "moves ±x when its threat moves 3 (§0z194)", with SIGN on the three. A
+   rendering change: no game moves, but `tools/ablation.py` is in every
+   fingerprint, so it rides item 35's rebuild with item 40. The cheap,
+   honest one. **The recommendation.**
+2. **A derived rule** in place of the typed numbers (`threat_of` already
+   derives a 0.0). It would have to serve BOTH readers above -- the share
+   and the removal target -- and the commander's number moves every row of
+   its table, so it is a modelling project with its own calibration, and
+   it moves every baseline (a parallel rebuild, and the pod's fit, item 41).
+   Not before the owner has decided item 41.
+
+Either way, a row on the list should be read with its threat said out loud,
+as a knob is.
+
+**Blind to** (§0z15): each card is moved ALONE, so two high-threat cards
+that draw the aim together are not seen as a pair; finding 2's whole-list
+scale is the other end, and the two bracket it.
+
+**Knobs to say out loud**: every card's `threat`, the commander's above
+all; `threat_clock_shift` (2.3), `known_win_focus`, `counter_threshold`
+(4.0), the other readers.
 
 ## How to read an ablation table
 

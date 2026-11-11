@@ -2919,6 +2919,26 @@ win 0.31 to 0.62 at a table of four, and the tables sort by the proxy.
 `diagnostics/diag_core_review.py` prints every number; queue items 39-43
 are what it leaves, behind item 35's rebuild.
 
+## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
+
+Item 43 closed the day it was queued: `tests/test_model_floors.py` pins the
+floors §0z192 found holding (4 cases, every active deck; plain 4 of 4,
+`--mutate` 2 of 2 with both expected sets written before the run and right
+on the first). Moved verbatim:
+
+43. **Pin the floors §0z192 found holding.** Two facts that would be loud
+    if a pod change broke them and that nothing checks today:
+    a do-nothing list (every nonland a blank sorcery) wins under 0.06 and
+    loses over 0.90 at T20 in every active deck; and a real list's mean
+    `your_share` when a clock fires with three opponents alive sits in
+    0.25 to 0.40. `diagnostics/diag_core_review.py anatomy` computes both.
+    - A new `tests/test_model_floors.py` at a few hundred seeds a deck,
+      bands wide enough for that N, with a `--mutate` mode whose expected
+      failures are written BEFORE it is run (§0z11): `threat_of` returning
+      0, and the clock aimed at you always, should each break exactly the
+      case that names it.
+    - Small; any session. It is the review's sanity check made permanent.
+
 ## Queued items closed 2026-11-09 — moved from `docs/QUEUE.md`
 
 Item 38 closed the day after it was queued: the owner adopted pad 10 for
