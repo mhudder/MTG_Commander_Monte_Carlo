@@ -244,6 +244,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z189](#0z189) | FIXED | **The crack-back read before combat taps your coming attack** (karlov's Citadel floor, §0z186's leftover): 3.06 -> 4.18 life a read; -0.0002 / -0.0003, inside the bars; the floor's pad was tuned on the old read |
 | [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
 | [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
+| [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16710,6 +16711,154 @@ closed (`docs/HISTORY.md`, "Queued items closed 2026-11-09").
 **Knobs to say out loud with any hold-back number**: `hold_back_pad`,
 `hold_back` ("lethal"), `untapped_blockers`, `incidental_rate` (0.78, which
 sets the crack-back the pad is measured against).
+
+<a id="0z192"></a>
+
+## 0z192. MEASURED -- a review of the core: what decides a game here, and how much of a win rate is `threat`
+
+**2026-11-11, the owner: "begin a review of the core functionality of the
+repo, particularly the engines which dictate player actions and card
+evaluations ... what the strengths and weaknesses are"**, changing nothing.
+Read: `experiment.py`, `engine.py`'s turn, main phase and combat, karlov's
+main phase beside it, `opponents.py`'s threat, share, clocks and counters,
+`tools/ablation.py`'s blank, statistic and renderer. Measured with
+`diagnostics/diag_core_review.py` (new, read-only; staged lists, T20,
+`DEFAULT_CFG`, seeds 5000..), whose three parts print every number below.
+
+**The verdict.** The measuring machinery is the strong half: a paired
+difference this repo reports can be trusted as a difference. The weak half
+is what it is a difference IN: a win rate decided mostly by the pod's clock,
+read through two hand-typed numbers on every card.
+
+### What holds
+
+- **Common random numbers.** `tools.validate` at this commit: `+0.00` on
+  every metric of all seven engines, the game RNG sealed after the opening
+  hand, corr(A,B) 0.94, worth about 17x the games.
+- **The model says what it cannot see**: every row is evaluated, partly
+  modelled or blind, and the reason prints under the row.
+- **The floors hold** (`anatomy`, the "nothing" leg: every nonland a
+  do-nothing sorcery). Such a deck wins 0.000 to 0.047 -- its commander's
+  wins, which every engine still casts -- and loses 0.917 to 0.964.
+- **The threat scale is centred.** When a clock fires with three opponents
+  alive, a real deck's `your_share` averages 0.30 to 0.36 against the 1/3 of
+  a board no scarier than its rivals'; the do-nothing deck's is 0.06 to 0.12.
+
+### 1. The pod's clock decides most games
+
+`anatomy`, N=1,500 a deck:
+
+| deck | win | losses by clock | by life | eliminations by a rival's clock | wins with one |
+|---|---|---|---|---|---|
+| rendmaw | 0.313 | 0.69 | 0.31 | 0.28 | 0.63 |
+| lorehold | 0.501 | 0.78 | 0.21 | 0.19 | 0.38 |
+| karlov | 0.547 | 0.88 | 0.12 | 0.23 | 0.36 |
+| tivit | 0.615 | 0.65 | 0.35 | 0.22 | 0.39 |
+| shilgengar | 0.355 | 0.64 | 0.34 | 0.25 | 0.58 |
+| azusa | 0.480 | 0.77 | 0.23 | 0.20 | 0.37 |
+
+Two thirds to seven eighths of losses are a pre-rolled kill turn aimed by
+one roll against `your_share`, and a third to two thirds of wins had another
+opponent's clock remove an opponent for you. A card reaches that outcome
+three ways -- winning before the clock, moving the share, and answering a
+route piece through a delay nobody has data for (`threat_rebuild_max`,
+§0z140) -- so a win-rate row is a statement about those three before it is
+one about the card's text. Not a defect to fix: the frame every row is read
+in, sized.
+
+### 2. `threat` is typed by hand and is a first-order lever; one card's is not
+
+`threat`, N=3,000 paired games a row. Every explicit `Card.threat` in the
+list scaled (a derived 0.0 is not moved):
+
+| deck | base win | x0.5 | x1.5 |
+|---|---|---|---|
+| karlov | 0.551 | +0.0943 ±0.0141 | -0.0393 ±0.0105 |
+| rendmaw | 0.314 | +0.0727 ±0.0125 | -0.0340 ±0.0087 |
+| tivit | 0.605 | +0.0983 ±0.0139 | -0.0577 ±0.0109 |
+| azusa | 0.484 | +0.0877 ±0.0146 | -0.0467 ±0.0110 |
+
+One karlov card's threat moved by 3, the other 98 as staged:
+
+| card (threat) | -3 | +3 |
+|---|---|---|
+| Exquisite Blood (9.0) | **+0.0107 ±0.0042** | **-0.0050 ±0.0033** |
+| Sol Ring (4.0) | **+0.0040 ±0.0028** | -0.0027 ±0.0038 |
+| Dawn of Hope (6.0) | +0.0000 ±0.0033 | **+0.0073 ±0.0039** |
+| Blind Obedience (6.0) | -0.0007 ±0.0031 | +0.0033 ±0.0043 |
+| Soul Warden (6.5) | +0.0023 ±0.0028 | +0.0017 ±0.0054 |
+
+The SCALE is worth more than any card in any table, and the pod's fit
+absorbs it (finding 4). ONE card's number is mostly inside this N's bar,
+which agrees with §0j's `+threat` channel on the pod before §0z140; where it
+is not, it is the size of a median row (0.004 to 0.012, `rows`). Four of ten
+cells clear their bar where chance gives one in twenty; Dawn of Hope's sign
+(more threat, more wins) is either that chance or a lightning rod, and this
+N cannot say which. **`threat` is not a pilot's choice, so it is never tuned
+toward win rate** -- x0.5 wins more in every deck, and a sweep read that way
+drives every number to zero. `priority` was swept (§0z44, §0z110) because a
+pilot may choose it; what `threat` needs is a statement of which ROWS rest
+on it (queue item 39).
+
+### 3. The cast rule is one line, written seven times
+
+Every engine's main phase is its own loop and casts
+`max(options, key=(priority, mv))`: the lambda appears in azusa, karlov,
+lorehold (twice), shilgengar, tivit and trostani, and rendmaw's adds +3 to a
+`ramp` card through turn 5, which no other engine does -- while 7 lorehold,
+7 tivit and 1 karlov card carry the `ramp` tag and nothing reads it there
+(§0z12's shape). Nobody decided that difference (§0u, §0z30); §0z44's
+harness noted the bonus and left it alone. Queue item 42.
+
+### 4. The pod is fitted to this project's own past
+
+§0z140's rule re-fits the kill timing so the mean T20 win rate over the
+active decks equals the previous pod's. The decks now win 0.31 to 0.62, mean
+0.47, at a table of four; the first calibration ("RESOLVED -- opponents now
+have a win condition", above) put rendmaw at 0.307 and lorehold at 0.253 and
+called 0.25 the baseline. The lists changed too, so not all of that is the
+model -- but every pilot fix since has lifted your side and the pod's
+strength is whatever the last fit preserved. Whether a row's size, or its
+sign, depends on where the baseline sits is unmeasured. Queue item 41.
+
+### 5. A table screens; it does not rank -- and it is sorted by the proxy
+
+`rows`, the caches on disk: 45 to 59 of each table's 58 to 65 win-rate rows
+clear their own bar (324 of 380), 322 survive Benjamini-Hochberg at 5%, and
+4 are negative. Multiple comparisons are not the problem; the baseline is.
+A row is the card against nothing, so nearly every card beats it, and the
+middle of a table is closer together than its ±0.003 floor (§0e already
+forbids ranking it). Separately, `render_table` sorts each section by damage
+at T20 -- the proxy -- so karlov's largest win-rate row, Exquisite Blood at
++0.0502, prints last in its section. Queue item 40.
+
+### 6. Knobs
+
+About 540 `cfg.get` sites and 400 rows in `docs/KNOBS.md`. Each keeps an old
+number reproducible, which is why it is there; most legacy branches are
+exercised by one test and never together. Said, not queued.
+
+### The checks, as found
+
+At `5b42949`, python 3.11: `tools.validate` clean; `python -m tests` 117 of
+118 modules and `--mutate` 115 of 116, the one failure in each
+`test_metrics_and_render` (tivit's table still prints the withdrawn
+Anointed Procession row); `check_docs` 19 of 20, six SUSPECT caches. All
+are queue item 35's, as that item says. So no table describes the engine at
+this commit, and `rows` above reads those tables.
+
+### What it leaves
+
+Queue items 39 (which rows rest on their `threat`), 40 (tables sorted by win
+rate), 41 (what the pod is calibrated to), 42 (one cast rule), 43 (the
+floors as a pinned test), in that order; item 35's rebuild comes before any
+of them is adopted. **No engine, deck, ledger or knob changed**: one new
+diagnostic and the docs.
+
+**Knobs to say out loud with any number here**: `threat_clock_shift` (2.3)
+and `clock_shift`, which set how many games the clock decides;
+`incidental_rate` (0.78), the life route's share; `known_win_focus` and
+`counter_threshold` (4.0), the other readers of `threat`.
 
 ## How to read an ablation table
 

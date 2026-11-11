@@ -243,3 +243,92 @@ What is closed and where it went:
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
+
+39. **Which rows rest on their `threat` number (§0z192, finding 2; the core
+    review, 2026-11-11). FIRST of the review's five.** Scaling every
+    hand-typed `threat` in a list by 0.5 is +0.07 to +0.10 win rate, and one
+    karlov card's number moved by 3 is up to +0.0107 ±0.0042 -- a median
+    row's size -- while most single cards sit inside the bar at N=3,000.
+    Nobody has asked the question of every card.
+    - **This is NOT a tuning sweep.** `threat` says how the TABLE sees a
+      card; it is not the pilot's to choose, and lower always wins more.
+      Never adopt a threat because it scored better (item 18 could do that
+      for `priority`, which a pilot does choose).
+    - **Measure**: `diagnostics/run_priority_sweep.py` is the shape (screen
+      at N=5,000, confirm survivors at N=15,000 on a DISJOINT seed block,
+      §0z170) with `threat` moved ±3 in place of `priority` ±2, every card
+      with a hand-typed number, every active deck, T20 with T10 off the
+      same game. `diag_core_review threat` is the two-row version. Write
+      the survivor rule before the first run.
+    - **Deliver**: the list of cards whose row moves by more than its own
+      bar when its threat moves by 3 -- those rows are a fact about a typed
+      constant (§0j's wording) -- and a proposal the owner can decide: a
+      note under each such row, as PARTLY rows carry theirs, or a derived
+      rule in place of the typed numbers (`opponents.threat_of` already
+      derives 0.0). Either moves every baseline: batch it with item 35.
+    - **Prior**: §0j's `+threat` blank moved 27 of 28 rows barely, on the pod
+      before §0z140. Expect a short list; Exquisite Blood is on it.
+
+40. **Sort each table by win rate, the objective (§0z192, finding 5).**
+    `tools/ablation.py`'s `render_table` orders every section by damage at
+    T20, so karlov's largest win-rate row prints last in its section and a
+    reader takes the proxy's order for a ranking. Sort by the last
+    horizon's `won`, keep the damage columns, and say in the header that
+    the order is not a ranking inside the noise floor (§0e).
+    - It is a RENDERING change: no game moves. Re-render every table from
+      its cache and diff -- only row order may change -- and
+      `tests/test_metrics_and_render.py` case C is that check.
+    - `tools/ablation.py` is in every cache fingerprint, so every cache
+      reads SUSPECT after it (they do today, item 35). Do it in the same
+      batch as item 35's rebuild, not before; the owner's call whether the
+      order changes at all.
+
+41. **What is the pod calibrated to? (§0z192, finding 4.) AN OWNER
+    DECISION, with one measurement to inform it.** Since §0z140 the kill
+    timing is re-fitted to keep the mean T20 win rate where the previous
+    pod had it; the active decks now win 0.31 to 0.62, mean 0.47, at a
+    table of four, against 0.25 to 0.31 at the first calibration.
+    - **Measure first**: do a row's size and sign depend on the baseline?
+      Take the staged swaps and each deck's five largest and five smallest
+      evaluated rows, and re-measure them paired with `threat_clock_shift`
+      moved until the mean win rate is near 0.30
+      (`diagnostics/fit_threat_clock.py` finds the value,
+      `diagnostics/run_knob_sweep.py` is the paired harness; N=15,000,
+      both horizons). Count sign changes and rows that leave their bar.
+    - **Then the owner decides** between keeping the fit rule (and writing
+      down that absolute win rates are not comparable across decks or
+      dates), or a fixed target. A new target is a parallel rebuild.
+    - Cheap and separate: print each deck's baseline win rate in
+      `docs/STATUS.md` (derived -- `ablation.py` measures the baseline and
+      does not keep it in the cache today), so the drift is visible.
+
+42. **One cast-ranking rule for seven main phases (§0z192, finding 3;
+    §0u, §0z30).** `(priority, mv)` is written out in azusa, karlov,
+    lorehold (twice), shilgengar, tivit and trostani; rendmaw's `rank` adds
+    +3 to a `ramp` card through turn 5 and is the only one that does.
+    - **The tag is already typed where nothing reads it**: 7 lorehold, 7
+      tivit and 1 karlov card carry `ramp` beside rendmaw's 16, and
+      `engine.main_phase` is its only reader. Before it goes live anywhere,
+      re-read the oracle text of every card carrying it (§0z12).
+    - **Measure the difference nobody decided**, at the tables' N
+      (`diagnostics/run_shared_code_shift.py`'s method): rendmaw without
+      the bonus, and lorehold, tivit and karlov with it.
+    - **Then** one `engine.cast_rank(g, card)` that every main phase
+      calls, with the bonus a knob whose default per deck is whatever the
+      measurement and the owner say; bit-identical on every output key
+      before any default moves (§0z32), `tools.validate` at `+0.00`.
+    - Low urgency. Not the whole main phase: the option filters differ for
+      reasons (wipes, holds, Lurrus, the graveyard cast) and stay.
+
+43. **Pin the floors §0z192 found holding.** Two facts that would be loud
+    if a pod change broke them and that nothing checks today:
+    a do-nothing list (every nonland a blank sorcery) wins under 0.06 and
+    loses over 0.90 at T20 in every active deck; and a real list's mean
+    `your_share` when a clock fires with three opponents alive sits in
+    0.25 to 0.40. `diagnostics/diag_core_review.py anatomy` computes both.
+    - A new `tests/test_model_floors.py` at a few hundred seeds a deck,
+      bands wide enough for that N, with a `--mutate` mode whose expected
+      failures are written BEFORE it is run (§0z11): `threat_of` returning
+      0, and the clock aimed at you always, should each break exactly the
+      case that names it.
+    - Small; any session. It is the review's sanity check made permanent.

@@ -2901,6 +2901,24 @@ rate back where it was, out of sample to 0.004 -- rendmaw paying most for
 attacking wide. By the owner's instruction nothing was rebuilt: all six
 tables wait for one batch rebuild once the engine work is done (item 35).
 
+## 2026-11-11: a review of the core, changing nothing (§0z192)
+
+The owner asked for a review of the core -- the engines that decide a
+pilot's actions and a card's evaluation -- with nothing changed, then for it
+to be written down with tasks for the next session. The measuring machinery
+held: `validate` at `+0.00`, the RNG sealed, a do-nothing list losing 92 to
+96% of its games, and a real list drawing about its fair third of the pod's
+attention when a clock fires. What the review sized is the frame the rows
+are read in: two thirds to seven eighths of losses are the pod's clock, a
+third to two thirds of wins had a rival's clock remove an opponent, and
+scaling every hand-typed `threat` by half is worth +0.07 to +0.10 win rate,
+more than any card in any table, while one card's number mostly sits inside
+its bar. Smaller: the cast rule is one line written seven times with a ramp
+bonus only rendmaw reads, the pod is fitted to its own past so the decks
+win 0.31 to 0.62 at a table of four, and the tables sort by the proxy.
+`diagnostics/diag_core_review.py` prints every number; queue items 39-43
+are what it leaves, behind item 35's rebuild.
+
 ## Queued items closed 2026-11-09 — moved from `docs/QUEUE.md`
 
 Item 38 closed the day after it was queued: the owner adopted pad 10 for
