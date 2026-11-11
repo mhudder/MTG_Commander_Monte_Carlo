@@ -15286,6 +15286,23 @@ asks "is this the same card" (a reanimation of the card while its copy is out,
 cache is VERIFIED on that evidence; trostani's is SUSPENDED and was not
 re-measured. `tests/test_token_copy.py` pins A-D, one mutation exact.
 
+**Re-checked at `5b42949` (python 3.13.18), 47 commits later**, when the
+brief came round again: census, 1,000 games a deck, seeds 5000..5999, T20:
+0 in all seven decks. With `token_copy_own_card=False` the brief's numbers
+return exactly, cleanup rule on or off: azusa 13 battlefield+graveyard pod
+rounds (in 2 games; Tireless Tracker 7, Lotus Cobra 6), trostani 3 games
+(Wurmcoil Engine twice in the graveyard, Sakura-Tribe Elder once in the hand).
+So "13 games" was 13 pod rounds. **`remove_card` taking another equal object
+is not live anywhere either**: a probe that wraps every module's binding and
+flags a call whose removed element `is not` the card passed (1,773 calls in
+50 azusa games; it fires on a hand-built two-Forest list) reads 0 games in
+1,000 in all seven decks. Each pick is the first maximal element of the list
+it removes from, which is the element `list.remove` takes. The fix still moves
+nothing: azusa, 15,000 seeds, `run_shared_code_shift --cfg=token_copy_own_card=False`
+against the default: 0 of 15,000 seeds differ at T10 and T20, +0.0000 on
+every metric (the knob leg verified to read `False`, not the string).
+`tests.test_token_copy` and its mutation pass.
+
 <a id="0z176"></a>
 
 ## 0z176. FIXED -- tivit took its extra turns after the pod's round
