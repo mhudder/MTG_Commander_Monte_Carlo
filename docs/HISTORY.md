@@ -2919,6 +2919,28 @@ win 0.31 to 0.62 at a table of four, and the tables sort by the proxy.
 `diagnostics/diag_core_review.py` prints every number; queue items 39-43
 are what it leaves, behind item 35's rebuild.
 
+## 2026-11-11: the core review's queue items 39-43 (§0z193-§0z195)
+
+The owner: "work on the queued items, 39 to 43". In the order the review
+left them:
+
+- **39** (§0z194): every hand-typed `threat` moved ±3, alone. 96 of 524
+  moves confirmed on fresh seeds; 25 rows move past their own bar, and every
+  commander's number is the largest lever in its deck. `threat` turned out
+  to steer the pod's removal as well as its aim, so a higher number can win
+  more. The owner chose the notes under the rows; tivit's four wait for item
+  35. Closed.
+- **40**: not started -- the owner's call, and it rides item 35's rebuild.
+- **41** (§0z195): at a 0.29 baseline instead of 0.47 no row flips and
+  every row shrinks to ~0.4. The rule is the owner's.
+- **42** (§0z193): one `engine.cast_rank`, bit-identical on 28,000 games;
+  the ramp bonus is a null out of sample. One default is the owner's.
+- **43**: `tests/test_model_floors.py`. Closed.
+
+`tools.validate` +0.00 on all seven engines after the cast-rule change.
+A container restart killed item 41's first run; it was re-run whole. The
+other session's §0z175 re-check (`965cb74`, docs only) was merged in.
+
 ## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
 
 Item 39 closed the same day: measured (§0z194), and the owner chose the
