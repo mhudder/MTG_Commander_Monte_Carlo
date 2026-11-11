@@ -2943,6 +2943,33 @@ other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
 ## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
 
+Items 41 and 42 closed the same day on the owner's word: "keep the fit
+rule for item 41, and set the ramp bonus for each deck the same (0)"
+(§0z195, §0z193). Item 41's cheap half moved to item 35. Moved verbatim:
+
+41. **What is the pod calibrated to? MEASURED (§0z195, 2026-11-11); the
+    rule is the owner's.** At `threat_clock_shift` 7.5 the mean T20 win
+    rate falls from 0.47 to 0.29: 0 of 71 rows flip, every staged swap stays
+    positive (azusa's Ka-Zar and Evolving Wilds fall inside their bars),
+    order inside a deck holds (Spearman 0.76-0.97), and rows shrink to a
+    median 0.39 of their size. Sol Ring shrinks most, UNEXPLAINED.
+    - **The owner decides**: keep the fit rule and write down that sizes and
+      absolute win rates are not comparable across decks or calibrations
+      (no rebuild; the recommendation), or a fixed target (a parallel
+      rebuild, and ~4x the games to hold today's resolution).
+    - Cheap and separate, riding item 35's rebuild: print each deck's
+      baseline win rate in `docs/STATUS.md` (`ablation.py` must keep the
+      baseline in its cache first).
+
+42. **One cast rule: BUILT (§0z193, 2026-11-11); one default is the
+    owner's.** Every main phase ranks through `engine.cast_rank`,
+    bit-identical on 28,000 games. The `ramp` bonus (`ramp_rank_bonus`;
+    rendmaw 3, the rest 0, as before) is a null out of sample in all three
+    decks carrying the tag: rendmaw without it +0.0011 ±0.0033, tivit with it
+    +0.0018 ±0.0027 at T20. Left: keep the per-deck defaults (nothing moves),
+    or set rendmaw to 0 for one rule everywhere (rendmaw's games move,
+    inside its bar: item 35's batch).
+
 Item 39 closed the same day: measured (§0z194), and the owner chose the
 first proposal, "add the notes under the 25 rows"; the notes are rendered
 in five tables and tivit's four wait for item 35's rebuild. Moved verbatim:

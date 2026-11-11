@@ -105,6 +105,7 @@ LEGACY = {
     "own_wipe_indestructible": "indestructible creatures dying to their owner's wipe",
     "pod_damage_full_pod": "pod damage divided by the living count instead of the full pod",
     "pod_reads_battlefield_creatures": "the pod reading creature TYPE LINES instead of the battlefield",
+    "ramp_rank_bonus": "rendmaw's +3 cast rank for a `ramp` card through turn 5 (pre-§0z193)",
     "sieve_taps": "Time Sieve not tapping the artifacts it sacrifices (pre-§0m)",
     "tivit_sweepers": "tivit's wipe tags dormant (pre-§0z12)",
 }

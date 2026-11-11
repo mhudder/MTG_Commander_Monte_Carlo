@@ -3073,26 +3073,22 @@ def pool_after(units, pay_idx) -> "ManaUnits":
                      getattr(units, "surplus", True))
 
 
-def cast_rank(g, card, ramp_bonus: float = 0.0) -> tuple:
+def cast_rank(g, card) -> tuple:
     """THE CAST RULE every main phase ranks its options by (queue item 42,
-    §0z192 finding 3): the deck's `priority`, then mana value -- plus
-    `ramp_bonus` on a card tagged `ramp` through turn `ramp_rank_turns`.
+    §0z192 finding 3, §0z193): the deck's `priority`, then mana value.
 
     It was one line written out seven times (§0u, §0z30), and rendmaw's copy
     alone added +3 to a `ramp` card through turn 5 while lorehold's and
-    tivit's `ramp` tags went unread (§0z12's shape). The bonus is now the
-    knob `ramp_rank_bonus`: None, the default, means each engine's own
-    `ramp_bonus` -- 3.0 for rendmaw, 0.0 everywhere else, which is what each
-    copy did -- and a number sets it for every engine at once, which is how
-    the difference nobody decided is measured. `ramp_rank_turns` (5) is
-    rendmaw's turn limit, read against `g.turn` as its copy did.
+    tivit's `ramp` tags went unread (§0z12's shape). Measured, the bonus is a
+    null in all three decks that carry the tag (§0z193), and THE OWNER SET
+    IT TO 0 FOR EVERY DECK (2026-11-11): one rule. `ramp_rank_bonus` is the
+    legacy switch -- 3 restores rendmaw's old ranking (and gives it to any
+    engine run with it) -- and `ramp_rank_turns` (5) its turn limit, read
+    against `g.turn` as rendmaw's copy read it.
 
     The option FILTERS stay per engine (wipes, holds, Lurrus, the graveyard
-    cast); only the ranking is shared. With the bonus 0.0 the key is exactly
-    the old `(priority, mv)`."""
-    bonus = g.cfg.get("ramp_rank_bonus", None)
-    if bonus is None:
-        bonus = ramp_bonus
+    cast); only the ranking is shared."""
+    bonus = g.cfg.get("ramp_rank_bonus", 0.0)
     if (bonus and "ramp" in card.tags
             and g.turn <= g.cfg.get("ramp_rank_turns", 5)):
         return (card.priority + bonus, card.mv)
@@ -3248,8 +3244,8 @@ def main_phase(g: Game, precombat: bool = False):
                 break
             options.append(picked)
 
-        def rank(item):                 # item 42: rendmaw's +3 ramp bonus
-            return cast_rank(g, item[0], ramp_bonus=3.0)
+        def rank(item):                 # item 42 / §0z193: one cast rule
+            return cast_rank(g, item[0])
 
         # An Altar-enabled pick has no mode cost to price, so the lookahead
         # sits that iteration out.

@@ -245,9 +245,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
 | [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
 | [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
-| [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Defaults unchanged |
+| [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Set to 0 everywhere |
 | [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
-| [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39 of their size; order holds (Spearman 0.93) |
+| [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16938,6 +16938,17 @@ and no table needs this. Whether to unify them is the owner's: setting
 rendmaw to 0 makes one rule for seven decks at a cost inside its bar, and
 moves rendmaw's games (item 35's batch).
 
+**THE OWNER SET THE BONUS TO 0 FOR EVERY DECK, 2026-11-11** ("set the ramp
+bonus for each deck the same (0)"). `cast_rank` lost its per-engine
+`ramp_bonus` argument; `ramp_rank_bonus` (default 0.0) is now a LEGACY
+switch in `tools/knobs.py`. Checked on every output key, 2,000 seeds, T20,
+module and staged lists, against `504a8ad`: the other six decks (trostani
+included) differ in 0 games; rendmaw differs in 451 of 2,000, and with
+`ramp_rank_bonus=3` in 0 -- the switch reproduces the old rule exactly.
+The size of the move is the measurement above: +0.0011 ±0.0033 at T20 out of
+sample, inside its bar. `tools.validate` +0.00 on all seven engines.
+Rendmaw's games moved, so its table rides item 35's rebuild.
+
 **Knobs to say out loud**: `ramp_rank_bonus`, `ramp_rank_turns`, and
 `cast_lookahead` (off), which reads the same rank.
 
@@ -17139,6 +17150,13 @@ Item 41 offers two rules. What this says about each:
 The cheap separate half of item 41 (each deck's baseline win rate printed in
 `docs/STATUS.md`) needs `tools/ablation.py` to keep the baseline in its
 cache, so it rides item 35's rebuild.
+
+**THE OWNER KEPT THE FIT RULE, 2026-11-11.** So, standing: **a row's SIGN,
+and the order of rows inside a deck, are evidence across calibrations; its
+SIZE, and any absolute win rate, are facts about the pod's fit at the date
+the table was built**, and are not compared across decks or dates. Promoted
+to `CLAUDE.md` ("What the numbers mean"). The baseline win rate in
+`docs/STATUS.md` rides item 35's rebuild.
 
 **Blind to** (§0z15): one lever moved the baseline. A pod made stronger by
 its removal or by `incidental_rate` (the life route) is not the same pod,

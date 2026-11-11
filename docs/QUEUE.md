@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39 and 43 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39, 41, 42 and 43 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -228,6 +228,10 @@ What is closed and where it went:
       tables; tivit's four (Time Sieve, Tempting Contract, Master of
       Ceremonies, Teleportation Circle) appear when its table is rebuilt.
       `tools/ablation.py` moved, so every fingerprint did; nothing else.
+    - **§0z193 (2026-11-11)**: the cast rule's ramp bonus set to 0 everywhere
+      (the owner) moved rendmaw's games; nothing else.
+    - **Ride this rebuild (item 41, closed)**: keep each deck's baseline
+      win rate in the ablation cache and print it in `docs/STATUS.md`.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
       any single engine fix, item 36 included. One batch rebuild of every
       active table once all the engine work is done; until then the six
@@ -261,26 +265,3 @@ What is closed and where it went:
       reads SUSPECT after it (they do today, item 35). Do it in the same
       batch as item 35's rebuild, not before; the owner's call whether the
       order changes at all.
-
-41. **What is the pod calibrated to? MEASURED (§0z195, 2026-11-11); the
-    rule is the owner's.** At `threat_clock_shift` 7.5 the mean T20 win
-    rate falls from 0.47 to 0.29: 0 of 71 rows flip, every staged swap stays
-    positive (azusa's Ka-Zar and Evolving Wilds fall inside their bars),
-    order inside a deck holds (Spearman 0.76-0.97), and rows shrink to a
-    median 0.39 of their size. Sol Ring shrinks most, UNEXPLAINED.
-    - **The owner decides**: keep the fit rule and write down that sizes and
-      absolute win rates are not comparable across decks or calibrations
-      (no rebuild; the recommendation), or a fixed target (a parallel
-      rebuild, and ~4x the games to hold today's resolution).
-    - Cheap and separate, riding item 35's rebuild: print each deck's
-      baseline win rate in `docs/STATUS.md` (`ablation.py` must keep the
-      baseline in its cache first).
-
-42. **One cast rule: BUILT (§0z193, 2026-11-11); one default is the
-    owner's.** Every main phase ranks through `engine.cast_rank`,
-    bit-identical on 28,000 games. The `ramp` bonus (`ramp_rank_bonus`;
-    rendmaw 3, the rest 0, as before) is a null out of sample in all three
-    decks carrying the tag: rendmaw without it +0.0011 ±0.0033, tivit with it
-    +0.0018 ±0.0027 at T20. Left: keep the per-deck defaults (nothing moves),
-    or set rendmaw to 0 for one rule everywhere (rendmaw's games move,
-    inside its bar: item 35's batch).

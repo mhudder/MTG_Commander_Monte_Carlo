@@ -172,6 +172,11 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 - **N is part of a table's identity**: in the cache key, the header and one
   variable in `regen_tables.sh`. Change it in one place only and you silently
   replace the tables with less precise ones. N=15,000 is the knee.
+- **A row's size is a fact about the pod's fit; its sign is not** (§0z195).
+  The pod is re-fitted to hold the mean win rate, and at a 0.29 baseline
+  instead of 0.47 every row shrank to ~0.4 and none flipped. Compare signs
+  and order inside a deck across decks or dates, never sizes or absolute
+  win rates.
 - **The interpreter is part of a table's identity too** (§0z119). A tool that
   must reproduce a cached number exactly runs on the interpreter that built it.
   `tools.repro_row` is the check.
