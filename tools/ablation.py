@@ -1737,8 +1737,25 @@ def measure_baseline(run, pool, procs):
     return baseline, reads
 
 
+# THE BASELINE'S OWN NUMBERS, kept in the cache under a reserved key (queue
+# item 41, §0z195): the unmodified list's mean win rate and damage per horizon,
+# so a table can say what its rows are measured against and `docs/STATUS.md`
+# can show the pod's fit drifting. Its value has no per-horizon (diff, ci)
+# rows, so a reader that walks `results.values()` for `["20"]["won"]` skips
+# it; `cache_manifest` leaves it out of its card count. Parenthesised so no
+# card can be named it.
+BASELINE_KEY = "(baseline)"
+
+
+def baseline_record(baseline) -> dict:
+    """{"won": {"10": mean, ...}, "damage": {...}} from `measure_baseline`."""
+    return {m: {str(t): float(np.mean(baseline[t][m])) for t in baseline}
+            for m in ("won", "damage") if all(m in baseline[t] for t in baseline)}
+
+
 def ablation_stream(run, todo, procs):
-    """Yield (card, {horizon: {metric: (diff, ci)}}) in completion order.
+    """Yield (card, {horizon: {metric: (diff, ci)}}) in completion order,
+    preceded by (BASELINE_KEY, `baseline_record`) once the baseline is in.
 
     One pool measures the baseline; a second carries it to every worker in an
     initializer, so it crosses the process boundary once per worker rather than
@@ -1747,12 +1764,14 @@ def ablation_stream(run, todo, procs):
     if procs == 1:
         _worker_init(run, None)
         _W["baseline"], _W["reads"] = measure_baseline(run, None, 1)
+        yield BASELINE_KEY, baseline_record(_W["baseline"])
         for name in todo:
             yield _ablate_card(name)
         return
 
     with Pool(procs, initializer=_worker_init, initargs=(run, None)) as scout:
         baseline, reads = measure_baseline(run, scout, procs)
+    yield BASELINE_KEY, baseline_record(baseline)
     with Pool(procs, initializer=_worker_init,
               initargs=(run, baseline, reads)) as work:
         yield from work.imap_unordered(_ablate_card, todo)
@@ -2152,9 +2171,11 @@ def main(argv=None):
         try:
             for name, cell in stream:
                 results[name] = cell
+                if name == BASELINE_KEY:   # recorded with the first card's save
+                    continue
                 save()
-                print(f"  done {len(results)}/{len(nonlands)}: {name}",
-                      file=sys.stderr)
+                print(f"  done {len(results) - (BASELINE_KEY in results)}/"
+                      f"{len(nonlands)}: {name}", file=sys.stderr)
                 if time.time() - t0 > budget:
                     break
         finally:
@@ -2223,9 +2244,18 @@ def render_table(run, results, nonlands, partly) -> str:
     # to carry the warning in prose. A table should describe its own precision.
     floor = float(np.median([results[n][str(HORIZONS[-1])]["won"][1]
                              for n in nonlands]))
+    # The baseline's win rate, when the cache recorded it (§0z195): a row's
+    # size is a fact about this number, its sign is not. A cache built before
+    # the key existed prints nothing here, so its table re-renders unchanged.
+    base = results.get(BASELINE_KEY, {}).get("won")
+    base_line = ("" if not base else
+                 "\nBASELINE: the list as staged wins " + ", ".join(
+                     f"{base[str(h)]:.4f} at T{h}" for h in HORIZONS
+                     if str(h) in base)
+                 + ". Row SIZES are relative to it; signs carry (§0z195).")
     print(f"""
 Horizons: {HORIZONS}.  N = {N:,} paired games per card, seeds 5000..{5000 + N - 1}.
-All figures are paired differences with 95% CIs.
+All figures are paired differences with 95% CIs.{base_line}
 
 NOISE FLOOR: the median win-rate CI half-width over this deck is +-{floor:.4f}.
 Two cards closer together than that are not ranked by this table, however their

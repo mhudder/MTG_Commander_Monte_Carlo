@@ -17164,7 +17164,15 @@ and the order of rows inside a deck, are evidence across calibrations; its
 SIZE, and any absolute win rate, are facts about the pod's fit at the date
 the table was built**, and are not compared across decks or dates. Promoted
 to `CLAUDE.md` ("What the numbers mean"). The baseline win rate in
-`docs/STATUS.md` rides item 35's rebuild.
+`docs/STATUS.md` rides item 35's rebuild: **built 2026-11-11, before it**.
+`ablation_stream` yields the baseline's mean win rate and damage per horizon
+under the reserved cache key `(baseline)`; `render_table` prints a
+`BASELINE:` header line when the cache has it (a cache without it re-renders
+unchanged); `tools.status` reads it into a `baseline` column;
+`cache_manifest` leaves it out of its card count. `tests/test_baseline_record.py`
+pins the chain (4 cases, 3 mutations, exact sets right on the first run),
+and a 40-game smoke run of `tools.ablation` wrote the key and printed the
+line.
 
 **Blind to** (§0z15): one lever moved the baseline. A pod made stronger by
 its removal or by `incidental_rate` (the life route) is not the same pod,

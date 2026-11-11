@@ -232,8 +232,8 @@ What is closed and where it went:
       (the owner) moved rendmaw's games; nothing else.
     - **Item 40 (closed, 2026-11-11)**: six tables (trostani's included) are sorted by win rate;
       tivit's is re-sorted when it is rebuilt.
-    - **Ride this rebuild (item 41, closed)**: keep each deck's baseline
-      win rate in the ablation cache and print it in `docs/STATUS.md`.
+    - **Item 41's half is BUILT** (§0z195): a rebuilt cache keeps the
+      baseline under `(baseline)`, its table prints it, STATUS shows it.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
       any single engine fix, item 36 included. One batch rebuild of every
       active table once all the engine work is done; until then the six

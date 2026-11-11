@@ -46,6 +46,9 @@ NUMBER_WORDS = {5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
 
 RE_N = re.compile(r"N\s*=\s*([\d,]+)\s+paired games")
 RE_HORIZ = re.compile(r"Horizons:\s*\(([^)]*)\)")
+# The baseline's win rate at the LAST horizon, from the table header that
+# `ablation.render_table` writes when the cache recorded it (§0z195).
+RE_BASE = re.compile(r"BASELINE: the list as staged wins .*?([\d.]+) at T\d+\.")
 RE_FLOOR = re.compile(r"median win-rate CI half-width over this deck is "
                       r"\+-([\d.]*\d)")
 RE_SEEDS = re.compile(r"seeds\s+([\d.]+\.\.[\d]+)")
@@ -91,7 +94,7 @@ class Table:
         self.deck = deck
         self.path = os.path.join(RESULTS, f"ablation_{deck}.txt")
         self.exists = os.path.isfile(self.path)
-        self.n = self.horizons = self.floor = self.seeds = ""
+        self.n = self.horizons = self.floor = self.seeds = self.base = ""
         self.rows: dict[str, int] = {}
         self.date = ""
         self.dirty = False
@@ -103,7 +106,8 @@ class Table:
             body = fh.read()
         lines = body.splitlines()
         for rx, attr in ((RE_N, "n"), (RE_HORIZ, "horizons"),
-                         (RE_FLOOR, "floor"), (RE_SEEDS, "seeds")):
+                         (RE_FLOOR, "floor"), (RE_SEEDS, "seeds"),
+                         (RE_BASE, "base")):
             m = rx.search(body)
             if m:
                 setattr(self, attr, m.group(1).strip())
@@ -296,18 +300,23 @@ def render() -> str:
     w("`rows` counts the printed card rows, split by category. A MODEL-BLIND")
     w("row is **not measured**, never a cut candidate.")
     w("")
-    w("| deck | table | N | horizons | noise floor | rows (eval/partial/blind) | last commit |")
-    w("|---|---|---|---|---|---|---|")
+    w("`baseline` is the staged list's own win rate at the last horizon, as")
+    w("the table records it: a row's size is relative to it and moves with the")
+    w("pod's fit, its sign does not (§0z195).")
+    w("")
+    w("| deck | table | N | horizons | baseline | noise floor | rows (eval/partial/blind) | last commit |")
+    w("|---|---|---|---|---|---|---|---|")
     for d in DECKS:
         t = tables[d]
         if not t.exists:
-            w(f"| {d} | **MISSING** | — | — | — | — | — |")
+            w(f"| {d} | **MISSING** | — | — | — | — | — | — |")
             continue
         r = t.rows
         split = "/".join(str(r.get(s, 0)) for s in SECTIONS)
         flag = " *(uncommitted edits)*" if t.dirty else ""
         w(f"| {d} | `{os.path.basename(t.path)}` | {t.n} | {t.horizons} | "
-          f"±{t.floor} | {split} = {t.total} | {t.date}{flag} |")
+          f"{t.base or '—'} | ±{t.floor} | {split} = {t.total} | "
+          f"{t.date}{flag} |")
     w("")
     tot = sum(t.total for t in tables.values() if t.exists)
     w(f"**{tot} rows across {n_word} tables.**")

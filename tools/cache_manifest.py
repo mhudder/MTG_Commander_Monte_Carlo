@@ -442,7 +442,8 @@ def main():
             continue
         fp, files = fingerprint(deck)
         with open(os.path.join(CACHE_DIR, name), encoding="utf-8") as fh:
-            n_cards = len(json.load(fh))
+            n_cards = len([k for k in json.load(fh)
+                           if k != "(baseline)"])    # ablation.BASELINE_KEY
         rows.append((name, deck, body, fp, n_cards, files))
 
     lines = [
