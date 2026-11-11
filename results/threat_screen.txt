@@ -1,0 +1,553 @@
+threat sweep, phase `screen`. N=5,000 paired per arm, seeds 100000..104999, T20 with T10 off the same game, delta 3 (floor 0.1), staged lists. A leg shared per deck.
+524 arms across 6 deck(s), plus BASE and NOOP per deck.
+
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP rendmaw     games changed: 0   OK
+  NOOP lorehold    games changed: 0   OK
+  NOOP karlov      games changed: 0   OK
+  NOOP tivit       games changed: 0   OK
+  NOOP shilgengar  games changed: 0   OK
+  NOOP azusa       games changed: 0   OK
+
+== rendmaw   (base won T20 0.3032, T10 0.1040)
+  Rendmaw, Creaking Nest 9->6                          T20  +0.0132 +-0.0076 * chg  2015   T10  +0.0006 +-0.0049   chg  2015
+  Beastmaster Ascension 6->3                           T20  +0.0106 +-0.0034 * chg   257   T10  +0.0052 +-0.0022 * chg   257
+  Rendmaw, Creaking Nest 9->12                         T20  -0.0070 +-0.0040 * chg   490   T10  -0.0024 +-0.0022 * chg   490
+  Coat of Arms 8->11                                   T20  -0.0060 +-0.0030 * chg   268   T10  -0.0052 +-0.0021 * chg   268
+  Grist, the Hunger Tide 6.5->3.5                      T20  +0.0048 +-0.0029 * chg   253   T10  +0.0006 +-0.0013   chg   253
+  March of the World Ooze 9->6                         T20  +0.0044 +-0.0028 * chg   241   T10  +0.0030 +-0.0019 * chg   241
+  Coat of Arms 8->5                                    T20  +0.0042 +-0.0025 * chg   204   T10  +0.0040 +-0.0017 * chg   204
+  Blood Artist 5.5->8.5                                T20  -0.0032 +-0.0021 * chg   159   T10  -0.0006 +-0.0014   chg   159
+  Beastmaster Ascension 6->9                           T20  -0.0030 +-0.0030   chg   325   T10  -0.0058 +-0.0023 * chg   325
+  Ohran Frostfang 7->10                                T20  -0.0030 +-0.0023 * chg   178   T10  -0.0024 +-0.0015 * chg   178
+  Blood Artist 5.5->2.5                                T20  +0.0028 +-0.0018 * chg   178   T10  +0.0008 +-0.0009   chg   178
+  Biotransference 6->3                                 T20  +0.0026 +-0.0020 * chg   159   T10  +0.0008 +-0.0007 * chg   159
+  The Great Henge 9.5->6.5                             T20  -0.0026 +-0.0026   chg   325   T10  -0.0012 +-0.0014   chg   325
+  Arasta of the Endless Web 4->1                       T20  +0.0024 +-0.0015 * chg    88   T10  +0.0004 +-0.0005   chg    88
+  Tendershoot Dryad 6.5->3.5                           T20  +0.0024 +-0.0021 * chg   121   T10  +0.0018 +-0.0013 * chg   121
+  Enduring Vitality 7->10                              T20  +0.0022 +-0.0028   chg   311   T10  +0.0008 +-0.0014   chg   311
+  Enduring Vitality 7->4                               T20  +0.0022 +-0.0023   chg   170   T10  +0.0006 +-0.0012   chg   170
+  Idol of Oblivion 5->2                                T20  +0.0022 +-0.0023   chg   193   T10  +0.0000 +-0.0006   chg   193
+  Metallic Mimic 5->2                                  T20  +0.0022 +-0.0018 * chg   134   T10  +0.0002 +-0.0008   chg   134
+  Roaming Throne 6->3                                  T20  +0.0022 +-0.0023   chg   187   T10  +0.0018 +-0.0013 * chg   187
+  Sol Ring 4->1                                        T20  +0.0022 +-0.0020 * chg   147   T10  +0.0018 +-0.0013 * chg   147
+  Idol of Oblivion 5->8                                T20  +0.0020 +-0.0024   chg   257   T10  +0.0008 +-0.0009   chg   257
+  Ohran Frostfang 7->4                                 T20  +0.0018 +-0.0015 * chg    71   T10  +0.0010 +-0.0009 * chg    71
+  Overlord of the Hauntwoods 7.5->4.5                  T20  +0.0018 +-0.0020   chg   164   T10  +0.0006 +-0.0012   chg   164
+  Tendershoot Dryad 6.5->9.5                           T20  -0.0018 +-0.0020   chg   188   T10  -0.0012 +-0.0012   chg   188
+  The Meathook Massacre 6.5->3.5                       T20  +0.0018 +-0.0015 * chg   142   T10  +0.0002 +-0.0007   chg   142
+  Erebos, Bleak-Hearted 6->9                           T20  +0.0016 +-0.0024   chg   237   T10  +0.0016 +-0.0013 * chg   237
+  Grist, the Hunger Tide 6.5->9.5                      T20  -0.0016 +-0.0026   chg   323   T10  +0.0004 +-0.0016   chg   323
+  Ashnod's Altar 4.5->7.5                              T20  +0.0014 +-0.0019   chg   209   T10  +0.0002 +-0.0007   chg   209
+  Metallic Mimic 5->8                                  T20  +0.0014 +-0.0019   chg   198   T10  +0.0010 +-0.0013   chg   198
+  Midnight Reaper 4.5->7.5                             T20  +0.0014 +-0.0020   chg   144   T10  +0.0004 +-0.0005   chg   144
+  Roaming Throne 6->9                                  T20  -0.0014 +-0.0023   chg   243   T10  +0.0008 +-0.0016   chg   243
+  Whip of Erebos 5->2                                  T20  +0.0014 +-0.0016   chg    83   T10  -0.0002 +-0.0003   chg    83
+  Ophiomancer 5.5->2.5                                 T20  +0.0012 +-0.0017   chg   149   T10  +0.0004 +-0.0009   chg   149
+  Deathreap Ritual 4.5->7.5                            T20  +0.0010 +-0.0022   chg   162   T10  -0.0008 +-0.0012   chg   162
+  Overlord of the Hauntwoods 7.5->10.5                 T20  +0.0010 +-0.0028   chg   319   T10  +0.0012 +-0.0016   chg   319
+  Primal Vigor 8.5->11.5                               T20  +0.0010 +-0.0018   chg   217   T10  +0.0004 +-0.0010   chg   217
+  Bitterblossom 6.5->9.5                               T20  +0.0008 +-0.0028   chg   357   T10  +0.0012 +-0.0020   chg   357
+  Bitterblossom 6.5->3.5                               T20  +0.0008 +-0.0029   chg   322   T10  -0.0002 +-0.0017   chg   322
+  Dryad of the Ilysian Grove 5.5->2.5                  T20  -0.0008 +-0.0022   chg   175   T10  +0.0014 +-0.0012 * chg   175
+  Massacre Wurm 6->9                                   T20  -0.0008 +-0.0009   chg    36   T10  -0.0002 +-0.0003   chg    36
+  Whip of Erebos 5->8                                  T20  -0.0008 +-0.0018   chg   112   T10  -0.0002 +-0.0006   chg   112
+  Ashnod's Altar 4.5->1.5                              T20  +0.0006 +-0.0018   chg   142   T10  +0.0006 +-0.0007   chg   142
+  Erebos, Bleak-Hearted 6->3                           T20  -0.0006 +-0.0020   chg   163   T10  +0.0002 +-0.0007   chg   163
+  Primal Vigor 8.5->5.5                                T20  -0.0006 +-0.0016   chg   121   T10  +0.0002 +-0.0008   chg   121
+  Steel Overseer 5.5->2.5                              T20  +0.0006 +-0.0020   chg   167   T10  +0.0004 +-0.0010   chg   167
+  The Meathook Massacre 6.5->9.5                       T20  +0.0006 +-0.0022   chg   168   T10  -0.0004 +-0.0008   chg   168
+  Midnight Reaper 4.5->1.5                             T20  +0.0004 +-0.0016   chg   103   T10  +0.0004 +-0.0005   chg   103
+  Ophiomancer 5.5->8.5                                 T20  +0.0004 +-0.0020   chg   175   T10  +0.0006 +-0.0009   chg   175
+  Sol Ring 4->7                                        T20  -0.0004 +-0.0025   chg   241   T10  -0.0004 +-0.0014   chg   241
+  Steel Overseer 5.5->8.5                              T20  -0.0004 +-0.0022   chg   200   T10  +0.0002 +-0.0008   chg   200
+  Arasta of the Endless Web 4->7                       T20  -0.0002 +-0.0016   chg   101   T10  +0.0002 +-0.0007   chg   101
+  Biotransference 6->9                                 T20  +0.0002 +-0.0021   chg   176   T10  +0.0008 +-0.0012   chg   176
+  Deathreap Ritual 4.5->1.5                            T20  +0.0002 +-0.0016   chg    89   T10  +0.0010 +-0.0009 * chg    89
+  Dryad of the Ilysian Grove 5.5->8.5                  T20  -0.0002 +-0.0022   chg   198   T10  +0.0004 +-0.0011   chg   198
+  Grave Titan 8.5->11.5                                T20  +0.0002 +-0.0020   chg   132   T10  +0.0002 +-0.0010   chg   132
+  Grave Titan 8.5->5.5                                 T20  -0.0002 +-0.0017   chg    93   T10  +0.0002 +-0.0009   chg    93
+  March of the World Ooze 9->12                        T20  -0.0002 +-0.0017   chg    97   T10  -0.0014 +-0.0013 * chg    97
+  The Great Henge 9.5->12.5                            T20  -0.0002 +-0.0009   chg    15   T10  +0.0004 +-0.0005   chg    15
+  Massacre Wurm 6->3                                   T20  +0.0000 +-0.0010   chg    31   T10  +0.0004 +-0.0008   chg    31
+  -> 17 of 60 moves exclude zero at T20; ~3.0 expected by chance alone.
+
+== lorehold   (base won T20 0.5090, T10 0.2854)
+  Lorehold, the Historian 9->6                         T20  +0.0198 +-0.0086 * chg  1913   T10  +0.0286 +-0.0072 * chg  1913
+  Lorehold, the Historian 9->12                        T20  -0.0082 +-0.0035 * chg   241   T10  -0.0028 +-0.0022 * chg   241
+  Bender's Waterskin 4.5->1.5                          T20  +0.0048 +-0.0025 * chg   156   T10  +0.0044 +-0.0023 * chg   156
+  Sol Ring 4->7                                        T20  -0.0038 +-0.0032 * chg   341   T10  -0.0034 +-0.0026 * chg   341
+  Monument to Endurance 5->8                           T20  -0.0036 +-0.0028 * chg   190   T10  -0.0020 +-0.0019 * chg   190
+  Artist's Talent 7->4                                 T20  +0.0032 +-0.0034   chg   268   T10  +0.0026 +-0.0026   chg   268
+  Storm-Kiln Artist 7->10                              T20  +0.0030 +-0.0029 * chg   239   T10  +0.0020 +-0.0023   chg   239
+  Bender's Waterskin 4.5->7.5                          T20  -0.0028 +-0.0028   chg   216   T10  -0.0018 +-0.0018   chg   216
+  Arcane Bombardment 8.5->5.5                          T20  +0.0026 +-0.0024 * chg   186   T10  +0.0022 +-0.0016 * chg   186
+  Land Tax 5.5->8.5                                    T20  -0.0026 +-0.0034   chg   301   T10  -0.0006 +-0.0032   chg   301
+  Monument to Endurance 5->2                           T20  +0.0024 +-0.0023 * chg   154   T10  +0.0022 +-0.0018 * chg   154
+  Mother of Runes 6->9                                 T20  -0.0024 +-0.0025   chg   184   T10  +0.0008 +-0.0019   chg   184
+  Sol Ring 4->1                                        T20  +0.0024 +-0.0028   chg   219   T10  +0.0036 +-0.0021 * chg   219
+  Guttersnipe 6.5->3.5                                 T20  +0.0022 +-0.0019 * chg   163   T10  +0.0022 +-0.0016 * chg   163
+  The Dawning Archaic 8.5->11.5                        T20  -0.0022 +-0.0021   chg   178   T10  -0.0032 +-0.0019 * chg   178
+  Caldera Pyremaw 8.5->5.5                             T20  +0.0020 +-0.0015 * chg    76   T10  +0.0018 +-0.0013 * chg    76
+  Library of Leng 7->10                                T20  +0.0020 +-0.0042   chg   576   T10  +0.0028 +-0.0033   chg   576
+  Longshot, Rebel Bowman 7.5->10.5                     T20  -0.0020 +-0.0026   chg   230   T10  -0.0016 +-0.0024   chg   230
+  Apex of Power 8.5->5.5                               T20  +0.0014 +-0.0011 * chg    34   T10  +0.0012 +-0.0012   chg    34
+  Invoke Calamity 6->3                                 T20  +0.0014 +-0.0013 * chg    62   T10  +0.0004 +-0.0012   chg    62
+  Smothering Tithe 8.5->5.5                            T20  -0.0014 +-0.0025   chg   238   T10  +0.0014 +-0.0021   chg   238
+  Longshot, Rebel Bowman 7.5->4.5                      T20  +0.0012 +-0.0020   chg   112   T10  +0.0024 +-0.0019 * chg   112
+  Sensei's Divining Top 6.5->9.5                       T20  +0.0012 +-0.0044   chg   568   T10  +0.0044 +-0.0032 * chg   568
+  Victory Chimes 4.5->7.5                              T20  -0.0012 +-0.0028   chg   198   T10  -0.0010 +-0.0019   chg   198
+  Victory Chimes 4.5->1.5                              T20  +0.0012 +-0.0022   chg   144   T10  +0.0018 +-0.0016 * chg   144
+  Library of Leng 7->4                                 T20  -0.0010 +-0.0030   chg   300   T10  +0.0000 +-0.0025   chg   300
+  Storm-Kiln Artist 7->4                               T20  +0.0010 +-0.0013   chg    89   T10  +0.0002 +-0.0012   chg    89
+  The Dawning Archaic 8.5->5.5                         T20  +0.0010 +-0.0015   chg    82   T10  +0.0012 +-0.0011 * chg    82
+  Ultima 6->9                                          T20  -0.0010 +-0.0009 * chg    14   T10  +0.0000 +-0.0000   chg    14
+  Caldera Pyremaw 8.5->11.5                            T20  -0.0008 +-0.0017   chg   156   T10  -0.0012 +-0.0013   chg   156
+  Dragon's Rage Channeler 3.5->0.5                     T20  +0.0008 +-0.0018   chg    85   T10  +0.0014 +-0.0012 * chg    85
+  Improvisation Capstone 7->10                         T20  -0.0008 +-0.0007 * chg    12   T10  -0.0002 +-0.0007   chg    12
+  Restoration Seminar 7.5->4.5                         T20  +0.0008 +-0.0011   chg    29   T10  +0.0006 +-0.0007   chg    29
+  Sunbird's Invocation 8.5->5.5                        T20  +0.0008 +-0.0018   chg   145   T10  +0.0002 +-0.0014   chg   145
+  Guttersnipe 6.5->9.5                                 T20  -0.0006 +-0.0030   chg   299   T10  +0.0004 +-0.0024   chg   299
+  Improvisation Capstone 7->4                          T20  +0.0006 +-0.0009   chg    29   T10  +0.0016 +-0.0011 * chg    29
+  Land Tax 5.5->2.5                                    T20  +0.0006 +-0.0031   chg   219   T10  -0.0004 +-0.0023   chg   219
+  Monastery Mentor 7.5->10.5                           T20  -0.0006 +-0.0030   chg   282   T10  -0.0012 +-0.0030   chg   282
+  Sensei's Divining Top 6.5->3.5                       T20  +0.0006 +-0.0032   chg   308   T10  +0.0006 +-0.0019   chg   308
+  Smothering Tithe 8.5->11.5                           T20  +0.0006 +-0.0028   chg   320   T10  +0.0016 +-0.0024   chg   320
+  Sunbird's Invocation 8.5->11.5                       T20  -0.0006 +-0.0024   chg   204   T10  +0.0014 +-0.0022   chg   204
+  Approach of the Second Sun 8->11                     T20  -0.0004 +-0.0008   chg    17   T10  -0.0006 +-0.0009   chg    17
+  Double Vision 8->5                                   T20  +0.0004 +-0.0019   chg   110   T10  +0.0014 +-0.0013 * chg   110
+  Dragon's Rage Channeler 3.5->6.5                     T20  -0.0004 +-0.0024   chg   183   T10  +0.0002 +-0.0016   chg   183
+  Goliath Daydreamer 6->9                              T20  -0.0004 +-0.0018   chg   131   T10  -0.0008 +-0.0014   chg   131
+  Mother of Runes 6->3                                 T20  +0.0004 +-0.0022   chg   174   T10  +0.0000 +-0.0018   chg   174
+  Restoration Seminar 7.5->10.5                        T20  -0.0004 +-0.0005   chg    11   T10  -0.0004 +-0.0005   chg    11
+  Soulfire Eruption 8->11                              T20  -0.0004 +-0.0005   chg     9   T10  +0.0000 +-0.0006   chg     9
+  Volcanic Vision 6.5->3.5                             T20  +0.0004 +-0.0012   chg    56   T10  +0.0002 +-0.0008   chg    56
+  Apex of Power 8.5->11.5                              T20  -0.0002 +-0.0003   chg     3   T10  +0.0000 +-0.0000   chg     3
+  Approach of the Second Sun 8->5                      T20  -0.0002 +-0.0007   chg    27   T10  +0.0008 +-0.0009   chg    27
+  Artist's Talent 7->10                                T20  +0.0002 +-0.0038   chg   452   T10  +0.0026 +-0.0030   chg   452
+  Call Forth the Tempest 7->10                         T20  -0.0002 +-0.0003   chg    30   T10  +0.0000 +-0.0000   chg    30
+  Call Forth the Tempest 7->4                          T20  +0.0002 +-0.0003   chg    29   T10  +0.0000 +-0.0000   chg    29
+  Double Vision 8->11                                  T20  +0.0002 +-0.0022   chg   260   T10  +0.0024 +-0.0016 * chg   260
+  Goliath Daydreamer 6->3                              T20  +0.0002 +-0.0012   chg    64   T10  +0.0004 +-0.0008   chg    64
+  Invoke Calamity 6->9                                 T20  +0.0002 +-0.0003   chg    30   T10  +0.0000 +-0.0000   chg    30
+  Mizzix's Mastery 7.5->4.5                            T20  -0.0002 +-0.0012   chg    55   T10  -0.0004 +-0.0010   chg    55
+  Soulfire Eruption 8->5                               T20  +0.0002 +-0.0006   chg    28   T10  -0.0002 +-0.0003   chg    28
+  Storm Herd 8.5->5.5                                  T20  -0.0002 +-0.0012   chg    39   T10  +0.0012 +-0.0011 * chg    39
+  Volcanic Vision 6.5->9.5                             T20  -0.0002 +-0.0007   chg    15   T10  -0.0002 +-0.0003   chg    15
+  Arcane Bombardment 8.5->11.5                         T20  +0.0000 +-0.0024   chg   224   T10  -0.0004 +-0.0018   chg   224
+  Mizzix's Mastery 7.5->10.5                           T20  +0.0000 +-0.0008   chg    31   T10  -0.0004 +-0.0005   chg    31
+  Monastery Mentor 7.5->4.5                            T20  +0.0000 +-0.0019   chg   149   T10  +0.0006 +-0.0017   chg   149
+  Rise of the Eldrazi 9->12                            T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Rise of the Eldrazi 9->6                             T20  +0.0000 +-0.0000   chg    26   T10  +0.0000 +-0.0000   chg    26
+  Storm Herd 8.5->11.5                                 T20  +0.0000 +-0.0006   chg     4   T10  +0.0000 +-0.0000   chg     4
+  Ultima 6->3                                          T20  +0.0000 +-0.0010   chg    20   T10  -0.0004 +-0.0005   chg    20
+  -> 14 of 68 moves exclude zero at T20; ~3.4 expected by chance alone.
+
+== karlov   (base won T20 0.5492, T10 0.3058)
+  Exquisite Blood 9->6                                 T20  +0.0078 +-0.0028 * chg   169   T10  +0.0088 +-0.0029 * chg   169
+  Karlov of the Ghost Council 9->12                    T20  -0.0072 +-0.0039 * chg   411   T10  -0.0054 +-0.0029 * chg   411
+  Sol Ring 4->1                                        T20  +0.0048 +-0.0022 * chg   127   T10  +0.0028 +-0.0018 * chg   127
+  Soul Warden 6.5->9.5                                 T20  +0.0048 +-0.0042 * chg   550   T10  +0.0052 +-0.0034 * chg   550
+  Dawn of Hope 6->9                                    T20  +0.0046 +-0.0028 * chg   251   T10  +0.0034 +-0.0021 * chg   251
+  Felidar Sovereign 8->11                              T20  -0.0046 +-0.0025 * chg   147   T10  -0.0066 +-0.0024 * chg   147
+  Well of Lost Dreams 7.5->10.5                        T20  +0.0044 +-0.0032 * chg   307   T10  +0.0020 +-0.0024   chg   307
+  Bloodthirsty Conqueror 8->5                          T20  +0.0040 +-0.0020 * chg    77   T10  +0.0058 +-0.0022 * chg    77
+  Blind Obedience 6->9                                 T20  +0.0036 +-0.0030 * chg   334   T10  +0.0024 +-0.0021 * chg   334
+  Blood Artist 7->10                                   T20  +0.0036 +-0.0035   chg   381   T10  +0.0066 +-0.0031 * chg   381
+  Bolas's Citadel 8.5->11.5                            T20  -0.0036 +-0.0020 * chg   118   T10  -0.0024 +-0.0021 * chg   118
+  Fountain of Renewal 5->8                             T20  -0.0036 +-0.0026 * chg   257   T10  +0.0002 +-0.0017   chg   257
+  Land Tax 5.5->8.5                                    T20  -0.0036 +-0.0030 * chg   224   T10  -0.0022 +-0.0024   chg   224
+  Phyrexian Reclamation 4.5->1.5                       T20  +0.0036 +-0.0023 * chg   131   T10  +0.0004 +-0.0011   chg   131
+  Soul's Attendant 6.5->9.5                            T20  +0.0036 +-0.0042   chg   550   T10  +0.0044 +-0.0033 * chg   550
+  Soul's Attendant 6.5->3.5                            T20  +0.0036 +-0.0023 * chg   162   T10  +0.0022 +-0.0015 * chg   162
+  Aetherflux Reservoir 8.5->11.5                       T20  +0.0034 +-0.0025 * chg   176   T10  +0.0002 +-0.0019   chg   176
+  Bolas's Citadel 8.5->5.5                             T20  +0.0034 +-0.0019 * chg    82   T10  +0.0032 +-0.0017 * chg    82
+  Karlov of the Ghost Council 9->6                     T20  -0.0032 +-0.0111   chg  3035   T10  -0.0222 +-0.0091 * chg  3035
+  Bloodthirsty Conqueror 8->11                         T20  -0.0032 +-0.0023 * chg   128   T10  -0.0040 +-0.0021 * chg   128
+  Sorin, Vengeful Bloodlord 7.5->10.5                  T20  -0.0030 +-0.0027 * chg   208   T10  -0.0026 +-0.0020 * chg   208
+  Necropotence 8->11                                   T20  +0.0028 +-0.0023 * chg   260   T10  +0.0038 +-0.0023 * chg   260
+  Vito, Thorn of the Dusk Rose 8.5->11.5               T20  -0.0028 +-0.0032   chg   310   T10  -0.0050 +-0.0028 * chg   310
+  Vito, Thorn of the Dusk Rose 8.5->5.5                T20  +0.0028 +-0.0017 * chg   132   T10  +0.0024 +-0.0018 * chg   132
+  Marauding Blight-Priest 7.5->10.5                    T20  -0.0026 +-0.0028   chg   284   T10  -0.0034 +-0.0021 * chg   284
+  Suture Priest 6.5->9.5                               T20  +0.0026 +-0.0034   chg   403   T10  +0.0028 +-0.0028   chg   403
+  Vizkopa Guildmage 7.5->10.5                          T20  +0.0026 +-0.0029   chg   310   T10  +0.0034 +-0.0024 * chg   310
+  Exquisite Blood 9->12                                T20  -0.0024 +-0.0023 * chg   154   T10  -0.0052 +-0.0023 * chg   154
+  Sol Ring 4->7                                        T20  -0.0024 +-0.0032   chg   295   T10  -0.0022 +-0.0020 * chg   295
+  Felidar Sovereign 8->5                               T20  +0.0022 +-0.0015 * chg    49   T10  +0.0028 +-0.0015 * chg    49
+  Kambal, Consul of Allocation 7->4                    T20  +0.0022 +-0.0018 * chg    80   T10  +0.0018 +-0.0014 * chg    80
+  Cliffhaven Vampire 7.5->4.5                          T20  +0.0020 +-0.0015 * chg    74   T10  +0.0006 +-0.0012   chg    74
+  Sun Titan 7->10                                      T20  +0.0020 +-0.0013 * chg    72   T10  +0.0000 +-0.0010   chg    72
+  Kalitas, Traitor of Ghet 7.5->4.5                    T20  +0.0018 +-0.0015 * chg    63   T10  +0.0010 +-0.0011   chg    63
+  Sanguine Bond 9->6                                   T20  +0.0018 +-0.0028   chg   244   T10  +0.0014 +-0.0022   chg   244
+  Sensei's Divining Top 5.5->2.5                       T20  +0.0018 +-0.0024   chg   178   T10  +0.0002 +-0.0018   chg   178
+  Umezawa's Jitte 7->4                                 T20  +0.0018 +-0.0022   chg   167   T10  -0.0006 +-0.0012   chg   167
+  Cosmos Elixir 6->3                                   T20  +0.0016 +-0.0018   chg    90   T10  +0.0002 +-0.0009   chg    90
+  Drana's Emissary 6.5->9.5                            T20  +0.0016 +-0.0023   chg   239   T10  +0.0004 +-0.0020   chg   239
+  Enduring Tenacity 8.5->11.5                          T20  +0.0016 +-0.0026   chg   265   T10  -0.0006 +-0.0022   chg   265
+  Exemplar of Light 7.5->10.5                          T20  -0.0016 +-0.0024   chg   233   T10  -0.0008 +-0.0020   chg   233
+  Sensei's Divining Top 5.5->8.5                       T20  +0.0016 +-0.0032   chg   269   T10  +0.0006 +-0.0019   chg   269
+  Serra Ascendant 7->4                                 T20  +0.0016 +-0.0017   chg   110   T10  +0.0014 +-0.0013 * chg   110
+  Sorin, Solemn Visitor 7->4                           T20  +0.0016 +-0.0019   chg    79   T10  +0.0006 +-0.0007   chg    79
+  South Wind Avatar 7.5->4.5                           T20  +0.0016 +-0.0018   chg    84   T10  +0.0020 +-0.0012 * chg    84
+  Starscape Cleric 7->10                               T20  +0.0016 +-0.0028   chg   340   T10  -0.0032 +-0.0029 * chg   340
+  Blind Obedience 6->3                                 T20  +0.0014 +-0.0024   chg   190   T10  +0.0002 +-0.0012   chg   190
+  Elas il-Kor, Sadistic Pilgrim 7->10                  T20  +0.0014 +-0.0032   chg   354   T10  +0.0002 +-0.0025   chg   354
+  Enduring Tenacity 8.5->5.5                           T20  +0.0014 +-0.0022   chg   180   T10  +0.0004 +-0.0016   chg   180
+  Pristine Talisman 5->8                               T20  +0.0014 +-0.0023   chg   162   T10  -0.0002 +-0.0014   chg   162
+  Sanguine Bond 9->12                                  T20  -0.0014 +-0.0024   chg   166   T10  -0.0006 +-0.0020   chg   166
+  Serra Ascendant 7->10                                T20  +0.0014 +-0.0036   chg   392   T10  -0.0014 +-0.0032   chg   392
+  Well of Lost Dreams 7.5->4.5                         T20  +0.0014 +-0.0020   chg   141   T10  -0.0004 +-0.0015   chg   141
+  Authority of the Consuls 6->9                        T20  -0.0012 +-0.0030   chg   384   T10  +0.0018 +-0.0022   chg   384
+  Cliffhaven Vampire 7.5->10.5                         T20  -0.0012 +-0.0028   chg   214   T10  -0.0018 +-0.0023   chg   214
+  Cosmos Elixir 6->9                                   T20  -0.0012 +-0.0020   chg   159   T10  +0.0014 +-0.0014   chg   159
+  Elas il-Kor, Sadistic Pilgrim 7->4                   T20  +0.0012 +-0.0017   chg    88   T10  +0.0014 +-0.0013 * chg    88
+  Soul Warden 6.5->3.5                                 T20  +0.0012 +-0.0016   chg   153   T10  +0.0004 +-0.0008   chg   153
+  Ajani's Mantra 4.5->1.5                              T20  +0.0010 +-0.0016   chg    85   T10  +0.0002 +-0.0009   chg    85
+  Archangel of Thune 8.5->5.5                          T20  +0.0010 +-0.0015   chg    69   T10  +0.0016 +-0.0015 * chg    69
+  Blood Artist 7->4                                    T20  +0.0010 +-0.0014   chg   108   T10  +0.0006 +-0.0008   chg   108
+  Lurrus of the Dream-Den 6->3                         T20  +0.0010 +-0.0012   chg    87   T10  +0.0000 +-0.0014   chg    87
+  Mother of Runes 6->3                                 T20  +0.0010 +-0.0017   chg   103   T10  +0.0008 +-0.0007 * chg   103
+  Ranger of Eos 5.5->2.5                               T20  +0.0010 +-0.0011   chg    33   T10  +0.0006 +-0.0009   chg    33
+  Vizkopa Guildmage 7.5->4.5                           T20  +0.0010 +-0.0018   chg   115   T10  +0.0006 +-0.0013   chg   115
+  Lurrus of the Dream-Den 6->9                         T20  +0.0008 +-0.0016   chg   160   T10  +0.0006 +-0.0016   chg   160
+  Phyrexian Arena 6.5->9.5                             T20  +0.0008 +-0.0031   chg   285   T10  +0.0018 +-0.0026   chg   285
+  Sorin, Solemn Visitor 7->10                          T20  +0.0008 +-0.0031   chg   329   T10  -0.0014 +-0.0026   chg   329
+  South Wind Avatar 7.5->10.5                          T20  +0.0008 +-0.0022   chg   215   T10  -0.0040 +-0.0023 * chg   215
+  Starscape Cleric 7->4                                T20  +0.0008 +-0.0018   chg   105   T10  +0.0006 +-0.0016   chg   105
+  Syr Konrad, the Grim 7->10                           T20  -0.0008 +-0.0018   chg   124   T10  +0.0002 +-0.0006   chg   124
+  Voice of the Blessed 7->10                           T20  +0.0008 +-0.0023   chg   228   T10  +0.0014 +-0.0019   chg   228
+  Authority of the Consuls 6->3                        T20  +0.0006 +-0.0026   chg   212   T10  +0.0012 +-0.0016   chg   212
+  Kambal, Consul of Allocation 7->10                   T20  +0.0006 +-0.0028   chg   287   T10  +0.0012 +-0.0023   chg   287
+  Land Tax 5.5->2.5                                    T20  +0.0006 +-0.0020   chg   135   T10  +0.0016 +-0.0016   chg   135
+  Phyrexian Arena 6.5->3.5                             T20  +0.0006 +-0.0022   chg   139   T10  +0.0008 +-0.0015   chg   139
+  Pristine Talisman 5->2                               T20  +0.0006 +-0.0016   chg   105   T10  +0.0010 +-0.0013   chg   105
+  Sorin, Vengeful Bloodlord 7.5->4.5                   T20  +0.0006 +-0.0013   chg    61   T10  +0.0010 +-0.0011   chg    61
+  Suture Priest 6.5->3.5                               T20  +0.0006 +-0.0020   chg   131   T10  +0.0010 +-0.0016   chg   131
+  Archangel of Thune 8.5->11.5                         T20  -0.0004 +-0.0022   chg   180   T10  -0.0018 +-0.0020   chg   180
+  Auriok Champion 7->10                                T20  -0.0004 +-0.0031   chg   313   T10  +0.0014 +-0.0024   chg   313
+  Auriok Champion 7->4                                 T20  +0.0004 +-0.0015   chg    90   T10  +0.0010 +-0.0013   chg    90
+  Drana's Emissary 6.5->3.5                            T20  +0.0004 +-0.0014   chg    94   T10  +0.0006 +-0.0007   chg    94
+  Exemplar of Light 7.5->4.5                           T20  +0.0004 +-0.0014   chg    65   T10  +0.0008 +-0.0009   chg    65
+  Mother of Runes 6->9                                 T20  -0.0004 +-0.0019   chg   133   T10  +0.0006 +-0.0013   chg   133
+  Necropotence 8->5                                    T20  -0.0004 +-0.0020   chg   154   T10  +0.0000 +-0.0016   chg   154
+  Sun Titan 7->4                                       T20  -0.0004 +-0.0005   chg    10   T10  +0.0000 +-0.0000   chg    10
+  Syr Konrad, the Grim 7->4                            T20  +0.0004 +-0.0008   chg    26   T10  +0.0002 +-0.0007   chg    26
+  Voice of the Blessed 7->4                            T20  +0.0004 +-0.0012   chg    55   T10  +0.0004 +-0.0010   chg    55
+  Aetherflux Reservoir 8.5->5.5                        T20  -0.0002 +-0.0020   chg   133   T10  +0.0008 +-0.0012   chg   133
+  Ajani's Mantra 4.5->7.5                              T20  -0.0002 +-0.0020   chg   175   T10  +0.0002 +-0.0013   chg   175
+  Dawn of Hope 6->3                                    T20  +0.0002 +-0.0020   chg   151   T10  +0.0002 +-0.0013   chg   151
+  Debt to the Deathless 8->11                          T20  -0.0002 +-0.0003   chg     3   T10  +0.0000 +-0.0000   chg     3
+  Fountain of Renewal 5->2                             T20  -0.0002 +-0.0018   chg   138   T10  +0.0008 +-0.0011   chg   138
+  Marauding Blight-Priest 7.5->4.5                     T20  +0.0002 +-0.0015   chg   119   T10  +0.0012 +-0.0014   chg   119
+  Phyrexian Reclamation 4.5->7.5                       T20  -0.0002 +-0.0026   chg   208   T10  +0.0008 +-0.0015   chg   208
+  Ranger of Eos 5.5->8.5                               T20  -0.0002 +-0.0012   chg    49   T10  +0.0008 +-0.0011   chg    49
+  Sunscorch Regent 7->10                               T20  -0.0002 +-0.0020   chg   115   T10  +0.0006 +-0.0016   chg   115
+  Swiftfoot Boots 4.5->7.5                             T20  +0.0002 +-0.0026   chg   268   T10  +0.0016 +-0.0017   chg   268
+  Umezawa's Jitte 7->10                                T20  +0.0002 +-0.0029   chg   329   T10  +0.0016 +-0.0024   chg   329
+  Debt to the Deathless 8->5                           T20  +0.0000 +-0.0008   chg    14   T10  +0.0000 +-0.0000   chg    14
+  Kalitas, Traitor of Ghet 7.5->10.5                   T20  +0.0000 +-0.0021   chg   203   T10  +0.0014 +-0.0018   chg   203
+  Sunscorch Regent 7->4                                T20  +0.0000 +-0.0010   chg    26   T10  +0.0004 +-0.0008   chg    26
+  Swiftfoot Boots 4.5->1.5                             T20  +0.0000 +-0.0018   chg   115   T10  -0.0008 +-0.0009   chg   115
+  -> 26 of 104 moves exclude zero at T20; ~5.2 expected by chance alone.
+
+== tivit   (base won T20 0.5840, T10 0.3296)
+  Tivit, Seller of Secrets 9.5->6.5                    T20  +0.0284 +-0.0075 * chg  1559   T10  +0.0188 +-0.0065 * chg  1559
+  Time Sieve 8.5->5.5                                  T20  +0.0158 +-0.0039 * chg   383   T10  +0.0234 +-0.0043 * chg   383
+  Tivit, Seller of Secrets 9.5->12.5                   T20  -0.0068 +-0.0026 * chg   142   T10  -0.0022 +-0.0017 * chg   142
+  Mirkwood Bats 7.5->10.5                              T20  -0.0046 +-0.0031 * chg   288   T10  -0.0036 +-0.0028 * chg   288
+  Tempting Contract 6->3                               T20  +0.0042 +-0.0027 * chg   208   T10  +0.0052 +-0.0023 * chg   208
+  Disciple of the Vault 6.5->9.5                       T20  +0.0040 +-0.0027 * chg   254   T10  +0.0036 +-0.0028 * chg   254
+  Mirkwood Bats 7.5->4.5                               T20  +0.0040 +-0.0026 * chg   202   T10  +0.0066 +-0.0025 * chg   202
+  Master of Ceremonies 7->4                            T20  +0.0038 +-0.0025 * chg   149   T10  +0.0038 +-0.0021 * chg   149
+  Monologue Tax 6->9                                   T20  -0.0038 +-0.0033 * chg   321   T10  -0.0022 +-0.0026   chg   321
+  Propaganda 5.5->2.5                                  T20  +0.0038 +-0.0023 * chg   157   T10  -0.0008 +-0.0013   chg   157
+  Time Sieve 8.5->11.5                                 T20  -0.0038 +-0.0025 * chg   129   T10  -0.0058 +-0.0025 * chg   129
+  Teleportation Circle 6.5->9.5                        T20  +0.0036 +-0.0030 * chg   319   T10  +0.0016 +-0.0026   chg   319
+  Model of Unity 5->8                                  T20  -0.0034 +-0.0027 * chg   222   T10  -0.0004 +-0.0018   chg   222
+  Lightning Greaves 4->1                               T20  +0.0030 +-0.0025 * chg   173   T10  +0.0006 +-0.0018   chg   173
+  Rhystic Study 8.5->11.5                              T20  +0.0030 +-0.0029 * chg   255   T10  +0.0044 +-0.0026 * chg   255
+  Teleportation Circle 6.5->3.5                        T20  +0.0030 +-0.0028 * chg   305   T10  +0.0004 +-0.0021   chg   305
+  Grudge Keeper 6.5->9.5                               T20  +0.0026 +-0.0030   chg   283   T10  +0.0032 +-0.0026 * chg   283
+  Kambal, Profiteering Mayor 8->5                      T20  +0.0026 +-0.0025 * chg   201   T10  -0.0004 +-0.0017   chg   201
+  Conjurer's Closet 6->3                               T20  +0.0024 +-0.0022 * chg   155   T10  +0.0020 +-0.0017 * chg   155
+  Marionette Master 8->5                               T20  +0.0024 +-0.0019 * chg    99   T10  +0.0004 +-0.0009   chg    99
+  Model of Unity 5->2                                  T20  +0.0024 +-0.0021 * chg   160   T10  +0.0006 +-0.0016   chg   160
+  Monologue Tax 6->3                                   T20  +0.0024 +-0.0031   chg   258   T10  +0.0058 +-0.0026 * chg   258
+  Ballot Broker 6->3                                   T20  +0.0022 +-0.0021 * chg   159   T10  +0.0018 +-0.0017 * chg   159
+  Brago's Representative 6->9                          T20  +0.0022 +-0.0024   chg   223   T10  +0.0034 +-0.0023 * chg   223
+  Disciple of the Vault 6.5->3.5                       T20  +0.0022 +-0.0023   chg   207   T10  -0.0006 +-0.0018   chg   207
+  Ghostly Prison 5.5->2.5                              T20  +0.0022 +-0.0022   chg   163   T10  +0.0008 +-0.0016   chg   163
+  Academy Manufactor 8->5                              T20  +0.0020 +-0.0026   chg   244   T10  +0.0016 +-0.0019   chg   244
+  Cyberdrive Awakener 7.5->10.5                        T20  +0.0020 +-0.0017 * chg   147   T10  +0.0016 +-0.0014 * chg   147
+  Sol Ring 4->1                                        T20  +0.0020 +-0.0017 * chg   112   T10  +0.0020 +-0.0017 * chg   112
+  Brago's Representative 6->3                          T20  +0.0018 +-0.0027   chg   190   T10  +0.0014 +-0.0017   chg   190
+  Mechanized Production 7.5->10.5                      T20  +0.0018 +-0.0027   chg   243   T10  +0.0016 +-0.0022   chg   243
+  Propaganda 5.5->8.5                                  T20  -0.0018 +-0.0028   chg   250   T10  +0.0026 +-0.0015 * chg   250
+  Revel in Riches 8->5                                 T20  +0.0018 +-0.0023   chg   176   T10  +0.0008 +-0.0018   chg   176
+  Trial of a Time Lord 6->9                            T20  +0.0018 +-0.0021   chg   190   T10  +0.0022 +-0.0016 * chg   190
+  Deadeye Navigator 8.5->5.5                           T20  +0.0016 +-0.0018   chg   108   T10  +0.0002 +-0.0013   chg   108
+  Kambal, Profiteering Mayor 8->11                     T20  +0.0016 +-0.0021   chg   233   T10  +0.0026 +-0.0021 * chg   233
+  Nadier's Nightblade 6.5->9.5                         T20  +0.0016 +-0.0025   chg   225   T10  +0.0016 +-0.0022   chg   225
+  Split Decision 4->7                                  T20  +0.0016 +-0.0011 * chg    38   T10  +0.0004 +-0.0005   chg    38
+  Tamiyo's Journal 6->3                                T20  +0.0016 +-0.0017   chg   141   T10  +0.0006 +-0.0012   chg   141
+  Vault 11: Voter's Dilemma 6->9                       T20  +0.0016 +-0.0022   chg   138   T10  +0.0010 +-0.0016   chg   138
+  Ghostly Prison 5.5->8.5                              T20  -0.0014 +-0.0027   chg   257   T10  +0.0014 +-0.0016   chg   257
+  Plea for Power 7->4                                  T20  +0.0014 +-0.0012 * chg    42   T10  +0.0012 +-0.0009 * chg    42
+  Soulherder 7.5->4.5                                  T20  +0.0014 +-0.0020   chg   161   T10  +0.0030 +-0.0015 * chg   161
+  Custodi Squire 5->8                                  T20  -0.0012 +-0.0014   chg   106   T10  -0.0004 +-0.0008   chg   106
+  Rhystic Study 8.5->5.5                               T20  +0.0012 +-0.0035   chg   340   T10  +0.0000 +-0.0025   chg   340
+  Sol Ring 4->7                                        T20  -0.0012 +-0.0027   chg   235   T10  -0.0016 +-0.0020   chg   235
+  Displacer Kitten 8->11                               T20  -0.0010 +-0.0024   chg   236   T10  -0.0006 +-0.0022   chg   236
+  Grudge Keeper 6.5->3.5                               T20  -0.0010 +-0.0022   chg   214   T10  +0.0002 +-0.0016   chg   214
+  Lightning Greaves 4->7                               T20  +0.0010 +-0.0030   chg   293   T10  +0.0002 +-0.0020   chg   293
+  Mechanized Production 7.5->4.5                       T20  +0.0010 +-0.0022   chg   137   T10  +0.0018 +-0.0017 * chg   137
+  Nadier's Nightblade 6.5->3.5                         T20  +0.0010 +-0.0020   chg   170   T10  +0.0024 +-0.0017 * chg   170
+  Vault 11: Voter's Dilemma 6->3                       T20  -0.0010 +-0.0016   chg   116   T10  -0.0020 +-0.0013 * chg   116
+  Ballot Broker 6->9                                   T20  +0.0008 +-0.0026   chg   244   T10  +0.0002 +-0.0018   chg   244
+  Cyberdrive Awakener 7.5->4.5                         T20  +0.0008 +-0.0009   chg    82   T10  +0.0008 +-0.0009   chg    82
+  Illusion of Choice 5->2                              T20  -0.0008 +-0.0012   chg    54   T10  +0.0000 +-0.0008   chg    54
+  Messenger Jays 4.5->7.5                              T20  -0.0008 +-0.0012   chg    70   T10  -0.0002 +-0.0003   chg    70
+  Conjurer's Closet 6->9                               T20  -0.0006 +-0.0022   chg   205   T10  -0.0008 +-0.0019   chg   205
+  Lieutenants of the Guard 5->8                        T20  -0.0006 +-0.0012   chg    80   T10  -0.0002 +-0.0003   chg    80
+  Revel in Riches 8->11                                T20  +0.0006 +-0.0028   chg   224   T10  -0.0010 +-0.0022   chg   224
+  Soulherder 7.5->10.5                                 T20  +0.0006 +-0.0024   chg   245   T10  +0.0024 +-0.0023 * chg   245
+  Tempt with Bunnies 5->2                              T20  -0.0006 +-0.0014   chg    56   T10  +0.0004 +-0.0010   chg    56
+  Trial of a Time Lord 6->3                            T20  +0.0006 +-0.0016   chg   148   T10  +0.0002 +-0.0010   chg   148
+  Coercive Portal 6.5->9.5                             T20  -0.0004 +-0.0020   chg   122   T10  +0.0012 +-0.0011 * chg   122
+  Custodi Squire 5->2                                  T20  +0.0004 +-0.0018   chg    78   T10  +0.0002 +-0.0014   chg    78
+  Displacer Kitten 8->5                                T20  +0.0004 +-0.0024   chg   192   T10  +0.0008 +-0.0016   chg   192
+  Expropriate 9.5->6.5                                 T20  +0.0004 +-0.0008   chg    18   T10  +0.0010 +-0.0011   chg    18
+  Magister of Worth 6->3                               T20  +0.0004 +-0.0010   chg    51   T10  +0.0002 +-0.0003   chg    51
+  Master of Ceremonies 7->10                           T20  -0.0004 +-0.0028   chg   291   T10  +0.0004 +-0.0028   chg   291
+  Plea for Power 7->10                                 T20  -0.0004 +-0.0010   chg    33   T10  -0.0004 +-0.0008   chg    33
+  Tamiyo's Journal 6->9                                T20  -0.0004 +-0.0023   chg   208   T10  +0.0018 +-0.0017 * chg   208
+  Tempt with Bunnies 5->8                              T20  -0.0004 +-0.0010   chg    41   T10  -0.0004 +-0.0008   chg    41
+  Academy Manufactor 8->11                             T20  -0.0002 +-0.0024   chg   203   T10  -0.0004 +-0.0018   chg   203
+  Deadeye Navigator 8.5->11.5                          T20  -0.0002 +-0.0020   chg   141   T10  -0.0004 +-0.0017   chg   141
+  Illusion of Choice 5->8                              T20  +0.0002 +-0.0013   chg    39   T10  +0.0002 +-0.0006   chg    39
+  Lieutenants of the Guard 5->2                        T20  +0.0002 +-0.0012   chg    65   T10  +0.0000 +-0.0006   chg    65
+  Magister of Worth 6->9                               T20  +0.0002 +-0.0016   chg   107   T10  +0.0008 +-0.0011   chg   107
+  Messenger Jays 4.5->1.5                              T20  +0.0002 +-0.0015   chg    78   T10  +0.0008 +-0.0009   chg    78
+  Split Decision 4->1                                  T20  -0.0002 +-0.0008   chg    50   T10  -0.0006 +-0.0007   chg    50
+  Tempting Contract 6->9                               T20  +0.0002 +-0.0028   chg   256   T10  -0.0004 +-0.0024   chg   256
+  Coercive Portal 6.5->3.5                             T20  +0.0000 +-0.0026   chg   135   T10  -0.0044 +-0.0019 * chg   135
+  Expropriate 9.5->12.5                                T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Marionette Master 8->11                              T20  +0.0000 +-0.0023   chg   140   T10  -0.0020 +-0.0021   chg   140
+  Torment of Hailfire 9->12                            T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Torment of Hailfire 9->6                             T20  +0.0000 +-0.0010   chg    26   T10  +0.0010 +-0.0010   chg    26
+  -> 25 of 84 moves exclude zero at T20; ~4.2 expected by chance alone.
+
+== shilgengar   (base won T20 0.3600, T10 0.0428)
+  Shilgengar, Sire of Famine 8.5->5.5                  T20  +0.0212 +-0.0094 * chg  2560   T10  +0.0070 +-0.0037 * chg  2560
+  Shilgengar, Sire of Famine 8.5->11.5                 T20  -0.0134 +-0.0053 * chg   936   T10  -0.0028 +-0.0018 * chg   936
+  Black Market Connections 6.5->9.5                    T20  +0.0052 +-0.0042 * chg   436   T10  +0.0016 +-0.0016   chg   436
+  Kokusho, the Evening Star 8.5->11.5                  T20  +0.0046 +-0.0024 * chg   273   T10  +0.0014 +-0.0011 * chg   273
+  Blood Artist 6->9                                    T20  +0.0042 +-0.0032 * chg   422   T10  +0.0012 +-0.0014   chg   422
+  Kokusho, the Evening Star 8.5->5.5                   T20  -0.0040 +-0.0022 * chg   171   T10  -0.0004 +-0.0008   chg   171
+  Lyra Dawnbringer 8->11                               T20  -0.0040 +-0.0030 * chg   353   T10  -0.0002 +-0.0014   chg   353
+  Righteous Valkyrie 6.5->9.5                          T20  +0.0040 +-0.0033 * chg   455   T10  +0.0002 +-0.0017   chg   455
+  Zulaport Cutthroat 6->9                              T20  +0.0040 +-0.0033 * chg   426   T10  +0.0016 +-0.0013 * chg   426
+  Midnight Reaper 6->9                                 T20  +0.0036 +-0.0039   chg   413   T10  +0.0008 +-0.0016   chg   413
+  Serra's Emissary 8.5->11.5                           T20  -0.0036 +-0.0023 * chg   210   T10  +0.0000 +-0.0008   chg   210
+  Archangel of Thune 8->11                             T20  -0.0034 +-0.0030 * chg   353   T10  -0.0008 +-0.0014   chg   353
+  Lyra, Archangel of Dawn 7->10                        T20  +0.0034 +-0.0032 * chg   408   T10  +0.0002 +-0.0014   chg   408
+  Lyra Dawnbringer 8->5                                T20  +0.0032 +-0.0020 * chg   129   T10  +0.0004 +-0.0008   chg   129
+  Phyrexian Arena 6->9                                 T20  -0.0032 +-0.0040   chg   420   T10  -0.0004 +-0.0016   chg   420
+  Phyrexian Arena 6->3                                 T20  +0.0028 +-0.0028   chg   241   T10  +0.0006 +-0.0010   chg   241
+  Sun Titan 7.5->10.5                                  T20  +0.0028 +-0.0026 * chg   275   T10  +0.0010 +-0.0010   chg   275
+  Angel of Suffering 6.5->9.5                          T20  -0.0026 +-0.0031   chg   221   T10  -0.0016 +-0.0013 * chg   221
+  Serra's Emissary 8.5->5.5                            T20  +0.0024 +-0.0020 * chg   113   T10  +0.0000 +-0.0000   chg   113
+  Bishop of Wings 5->8                                 T20  -0.0022 +-0.0024   chg   189   T10  -0.0010 +-0.0008 * chg   189
+  Black Market Connections 6.5->3.5                    T20  +0.0022 +-0.0033   chg   292   T10  +0.0010 +-0.0009 * chg   292
+  Resplendent Angel 7->10                              T20  +0.0022 +-0.0032   chg   376   T10  +0.0018 +-0.0016 * chg   376
+  Angel of Suffering 6.5->3.5                          T20  +0.0020 +-0.0021   chg    94   T10  +0.0012 +-0.0009 * chg    94
+  Blood Artist 6->3                                    T20  +0.0020 +-0.0021   chg   192   T10  +0.0002 +-0.0007   chg   192
+  Pitiless Plunderer 5.5->8.5                          T20  +0.0018 +-0.0025   chg   265   T10  -0.0002 +-0.0007   chg   265
+  Herald of War 6->3                                   T20  +0.0016 +-0.0016   chg    88   T10  +0.0004 +-0.0005   chg    88
+  Lyra, Archangel of Dawn 7->4                         T20  -0.0016 +-0.0021   chg   198   T10  +0.0006 +-0.0007   chg   198
+  Midnight Reaper 6->3                                 T20  +0.0016 +-0.0018   chg   144   T10  +0.0006 +-0.0009   chg   144
+  Revel in Riches 5.5->2.5                             T20  +0.0016 +-0.0014 * chg    80   T10  +0.0006 +-0.0009   chg    80
+  Skullclamp 5->8                                      T20  +0.0016 +-0.0027   chg   302   T10  +0.0004 +-0.0008   chg   302
+  Smothering Tithe 7.5->4.5                            T20  +0.0016 +-0.0030   chg   226   T10  +0.0010 +-0.0011   chg   226
+  Sol Ring 4->7                                        T20  -0.0016 +-0.0026   chg   242   T10  -0.0006 +-0.0010   chg   242
+  Twilight Shepherd 7->10                              T20  +0.0016 +-0.0024   chg   199   T10  +0.0002 +-0.0008   chg   199
+  Dark Prophecy 6.5->3.5                               T20  +0.0014 +-0.0021   chg   194   T10  +0.0000 +-0.0006   chg   194
+  Revel in Riches 5.5->8.5                             T20  +0.0014 +-0.0021   chg   161   T10  +0.0002 +-0.0003   chg   161
+  Speaker of the Heavens 4->7                          T20  -0.0014 +-0.0025   chg   191   T10  -0.0002 +-0.0010   chg   191
+  Speaker of the Heavens 4->1                          T20  +0.0014 +-0.0017   chg    98   T10  +0.0002 +-0.0003   chg    98
+  Angel of Serenity 7.5->10.5                          T20  +0.0012 +-0.0017   chg   161   T10  +0.0000 +-0.0006   chg   161
+  Angelic Arbiter 8->11                                T20  +0.0012 +-0.0016   chg   157   T10  +0.0004 +-0.0008   chg   157
+  Grim Haruspex 6->9                                   T20  +0.0012 +-0.0032   chg   386   T10  +0.0008 +-0.0012   chg   386
+  Righteous Valkyrie 6.5->3.5                          T20  +0.0012 +-0.0024   chg   250   T10  +0.0000 +-0.0006   chg   250
+  Wayfarer's Bauble 3->6                               T20  -0.0012 +-0.0018   chg   112   T10  -0.0006 +-0.0007   chg   112
+  Angel of the Ruins 7->4                              T20  +0.0010 +-0.0010   chg    51   T10  +0.0004 +-0.0005   chg    51
+  Bishop of Wings 5->2                                 T20  -0.0010 +-0.0017   chg   105   T10  +0.0004 +-0.0005   chg   105
+  Dark Prophecy 6.5->9.5                               T20  -0.0010 +-0.0031   chg   328   T10  +0.0008 +-0.0007 * chg   328
+  Priest of Fell Rites 5->2                            T20  +0.0010 +-0.0013   chg   101   T10  +0.0002 +-0.0003   chg   101
+  Sun Titan 7.5->4.5                                   T20  +0.0010 +-0.0018   chg    88   T10  +0.0000 +-0.0000   chg    88
+  Angel of Despair 7.5->10.5                           T20  +0.0008 +-0.0018   chg   164   T10  +0.0000 +-0.0006   chg   164
+  Archangel of Thune 8->5                              T20  +0.0008 +-0.0021   chg   132   T10  +0.0008 +-0.0007 * chg   132
+  Avacyn, Angel of Hope 9.5->6.5                       T20  +0.0008 +-0.0022   chg   185   T10  -0.0004 +-0.0008   chg   185
+  Bloodghast 4->7                                      T20  -0.0008 +-0.0022   chg   173   T10  +0.0002 +-0.0003   chg   173
+  Grim Haruspex 6->3                                   T20  +0.0008 +-0.0024   chg   168   T10  -0.0002 +-0.0006   chg   168
+  Herald of War 6->9                                   T20  -0.0008 +-0.0028   chg   259   T10  +0.0006 +-0.0007   chg   259
+  Massacre Wurm 9->6                                   T20  +0.0008 +-0.0030   chg   319   T10  -0.0002 +-0.0010   chg   319
+  Requiem Angel 7->4                                   T20  +0.0008 +-0.0014   chg    81   T10  +0.0000 +-0.0000   chg    81
+  Youthful Valkyrie 4.5->1.5                           T20  +0.0008 +-0.0017   chg   102   T10  +0.0002 +-0.0003   chg   102
+  Emeria Shepherd 7.5->10.5                            T20  +0.0006 +-0.0018   chg   199   T10  -0.0002 +-0.0008   chg   199
+  Emeria's Call // Emeria, Shattered Skyclave 6.5->3.5 T20  +0.0006 +-0.0007   chg     7   T10  +0.0002 +-0.0003   chg     7
+  Massacre Wurm 9->12                                  T20  -0.0006 +-0.0009   chg    47   T10  +0.0000 +-0.0000   chg    47
+  Reya Dawnbringer 8->11                               T20  -0.0006 +-0.0014   chg    91   T10  -0.0002 +-0.0003   chg    91
+  Viscera Seer 4->7                                    T20  -0.0006 +-0.0023   chg   194   T10  +0.0000 +-0.0008   chg   194
+  Voldaren Bloodcaster // Bloodbat Summoner 5->8       T20  +0.0006 +-0.0022   chg   228   T10  +0.0000 +-0.0000   chg   228
+  Zulaport Cutthroat 6->3                              T20  +0.0006 +-0.0017   chg   173   T10  +0.0004 +-0.0008   chg   173
+  Angelic Arbiter 8->5                                 T20  -0.0004 +-0.0012   chg    40   T10  +0.0002 +-0.0003   chg    40
+  Avacyn, Angel of Hope 9.5->12.5                      T20  -0.0004 +-0.0005   chg     7   T10  +0.0000 +-0.0000   chg     7
+  Emeria Shepherd 7.5->4.5                             T20  +0.0004 +-0.0008   chg    46   T10  +0.0000 +-0.0000   chg    46
+  Giada, Font of Hope 6->9                             T20  -0.0004 +-0.0032   chg   410   T10  +0.0010 +-0.0017   chg   410
+  Giada, Font of Hope 6->3                             T20  +0.0004 +-0.0022   chg   177   T10  +0.0010 +-0.0011   chg   177
+  Pitiless Plunderer 5.5->2.5                          T20  -0.0004 +-0.0014   chg   121   T10  +0.0002 +-0.0003   chg   121
+  Requiem Angel 7->10                                  T20  +0.0004 +-0.0019   chg   257   T10  +0.0002 +-0.0007   chg   257
+  Sol Ring 4->1                                        T20  -0.0004 +-0.0024   chg   157   T10  +0.0002 +-0.0003   chg   157
+  Wayfarer's Bauble 3->0.1                             T20  +0.0004 +-0.0012   chg    54   T10  +0.0002 +-0.0007   chg    54
+  Youthful Valkyrie 4.5->7.5                           T20  -0.0004 +-0.0024   chg   177   T10  -0.0002 +-0.0006   chg   177
+  Agadeem's Awakening // Agadeem, the Undercrypt 6->3  T20  -0.0002 +-0.0003   chg    12   T10  +0.0000 +-0.0000   chg    12
+  Angel of Despair 7.5->4.5                            T20  -0.0002 +-0.0010   chg    35   T10  +0.0002 +-0.0003   chg    35
+  Angel of the Ruins 7->10                             T20  +0.0002 +-0.0016   chg   156   T10  +0.0004 +-0.0008   chg   156
+  Cartel Aristocrat 5->2                               T20  +0.0002 +-0.0016   chg   120   T10  -0.0002 +-0.0003   chg   120
+  Elesh Norn, Grand Cenobite 9->12                     T20  -0.0002 +-0.0006   chg    40   T10  -0.0002 +-0.0003   chg    40
+  Elesh Norn, Grand Cenobite 9->6                      T20  +0.0002 +-0.0024   chg   283   T10  -0.0004 +-0.0010   chg   283
+  Emeria's Call // Emeria, Shattered Skyclave 6.5->9.5 T20  -0.0002 +-0.0003   chg     3   T10  +0.0000 +-0.0000   chg     3
+  Resplendent Angel 7->4                               T20  -0.0002 +-0.0019   chg   173   T10  +0.0000 +-0.0006   chg   173
+  Reya Dawnbringer 8->5                                T20  +0.0002 +-0.0007   chg    20   T10  +0.0000 +-0.0000   chg    20
+  Skullclamp 5->2                                      T20  +0.0002 +-0.0016   chg   185   T10  +0.0006 +-0.0007   chg   185
+  Smothering Tithe 7.5->10.5                           T20  +0.0002 +-0.0033   chg   391   T10  +0.0012 +-0.0014   chg   391
+  Twilight Shepherd 7->4                               T20  +0.0002 +-0.0012   chg    63   T10  +0.0002 +-0.0003   chg    63
+  Viscera Seer 4->1                                    T20  +0.0002 +-0.0013   chg   120   T10  +0.0006 +-0.0009   chg   120
+  Voldaren Bloodcaster // Bloodbat Summoner 5->2       T20  -0.0002 +-0.0016   chg   147   T10  +0.0000 +-0.0000   chg   147
+  Agadeem's Awakening // Agadeem, the Undercrypt 6->9  T20  +0.0000 +-0.0000   chg     2   T10  +0.0000 +-0.0000   chg     2
+  Angel of Serenity 7.5->4.5                           T20  +0.0000 +-0.0006   chg    34   T10  +0.0000 +-0.0000   chg    34
+  Bloodghast 4->1                                      T20  +0.0000 +-0.0014   chg   101   T10  +0.0000 +-0.0000   chg   101
+  Cartel Aristocrat 5->8                               T20  +0.0000 +-0.0018   chg   173   T10  -0.0004 +-0.0005   chg   173
+  Flawless Maneuver 4->7                               T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Flawless Maneuver 4->1                               T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Priest of Fell Rites 5->8                            T20  +0.0000 +-0.0016   chg   175   T10  -0.0002 +-0.0006   chg   175
+  Teferi's Protection 6->9                             T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Teferi's Protection 6->3                             T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  -> 16 of 96 moves exclude zero at T20; ~4.8 expected by chance alone.
+
+== azusa   (base won T20 0.4892, T10 0.3224)
+  Mossborn Hydra 6->9                                  T20  -0.0132 +-0.0046 * chg   518   T10  -0.0180 +-0.0043 * chg   518
+  Azusa, Lost but Seeking 8->5                         T20  +0.0056 +-0.0099   chg  2667   T10  +0.0060 +-0.0080   chg  2667
+  Mole Man, Moloid Master 5->2                         T20  +0.0054 +-0.0022 * chg   123   T10  +0.0046 +-0.0019 * chg   123
+  Mossborn Hydra 6->3                                  T20  +0.0052 +-0.0027 * chg   170   T10  +0.0056 +-0.0024 * chg   170
+  Azusa, Lost but Seeking 8->11                        T20  -0.0044 +-0.0068   chg  1747   T10  -0.0014 +-0.0053   chg  1747
+  Scute Swarm 6->3                                     T20  +0.0042 +-0.0023 * chg   138   T10  +0.0038 +-0.0020 * chg   138
+  Oracle of Mul Daya 7.5->10.5                         T20  -0.0038 +-0.0033 * chg   577   T10  -0.0008 +-0.0026   chg   577
+  Greensleeves, Maro-Sorcerer 8.5->5.5                 T20  +0.0036 +-0.0030 * chg   343   T10  +0.0034 +-0.0025 * chg   343
+  Horn of Greed 5->2                                   T20  +0.0036 +-0.0025 * chg   160   T10  +0.0018 +-0.0020   chg   160
+  Sol Ring 4->1                                        T20  +0.0036 +-0.0021 * chg   111   T10  +0.0014 +-0.0016   chg   111
+  Avenger of Zendikar 9->6                             T20  +0.0034 +-0.0028 * chg   304   T10  +0.0040 +-0.0023 * chg   304
+  Rampaging Baloths 8->11                              T20  -0.0034 +-0.0033 * chg   492   T10  -0.0038 +-0.0027 * chg   492
+  Tireless Provisioner 6.5->3.5                        T20  +0.0034 +-0.0023 * chg   180   T10  +0.0038 +-0.0019 * chg   180
+  Augur of Autumn 6->3                                 T20  +0.0032 +-0.0020 * chg   163   T10  +0.0022 +-0.0015 * chg   163
+  Courser of Kruphix 6->3                              T20  +0.0032 +-0.0026 * chg   218   T10  +0.0008 +-0.0015   chg   218
+  Sylvan Library 6->9                                  T20  +0.0032 +-0.0033   chg   404   T10  +0.0040 +-0.0028 * chg   404
+  Nissa, Vastwood Seer // Nissa, Sage Animist 6.5->3.5 T20  +0.0026 +-0.0023 * chg   117   T10  +0.0020 +-0.0015 * chg   117
+  Tireless Tracker 6.5->9.5                            T20  -0.0024 +-0.0031   chg   492   T10  -0.0040 +-0.0028 * chg   492
+  Ka-Zar of the Savage Land 6.5->9.5                   T20  +0.0022 +-0.0033   chg   409   T10  +0.0014 +-0.0027   chg   409
+  Tireless Provisioner 6.5->9.5                        T20  -0.0022 +-0.0037   chg   537   T10  -0.0020 +-0.0028   chg   537
+  Scute Swarm 6->9                                     T20  -0.0020 +-0.0035   chg   498   T10  +0.0004 +-0.0031   chg   498
+  Exploration 6->9                                     T20  +0.0018 +-0.0038   chg   556   T10  +0.0028 +-0.0030   chg   556
+  Exploration 6->3                                     T20  -0.0018 +-0.0026   chg   283   T10  -0.0012 +-0.0017   chg   283
+  Green Sun's Zenith 5->2                              T20  +0.0018 +-0.0017 * chg    71   T10  +0.0024 +-0.0013 * chg    71
+  Quirion Ranger 3.5->0.5                              T20  +0.0018 +-0.0013 * chg    56   T10  +0.0010 +-0.0010   chg    56
+  Ulamog, the Infinite Gyre 9.5->6.5                   T20  +0.0018 +-0.0021   chg   217   T10  +0.0000 +-0.0014   chg   217
+  Abundance 5->8                                       T20  +0.0016 +-0.0018   chg   124   T10  -0.0002 +-0.0008   chg   124
+  Ashaya, Soul of the Wild 8->11                       T20  -0.0016 +-0.0023   chg   273   T10  -0.0014 +-0.0020   chg   273
+  Crucible of Worlds 6->9                              T20  +0.0016 +-0.0031   chg   439   T10  -0.0004 +-0.0026   chg   439
+  Seek the Horizon 4->1                                T20  +0.0016 +-0.0013 * chg    54   T10  +0.0010 +-0.0012   chg    54
+  Springheart Nantuko 5->8                             T20  -0.0016 +-0.0034   chg   391   T10  -0.0004 +-0.0028   chg   391
+  Storm Cauldron 6.5->9.5                              T20  +0.0016 +-0.0018   chg   144   T10  +0.0002 +-0.0010   chg   144
+  Harmonize 5.5->2.5                                   T20  +0.0014 +-0.0015   chg    58   T10  +0.0008 +-0.0009   chg    58
+  Ka-Zar of the Savage Land 6.5->3.5                   T20  +0.0014 +-0.0020   chg   150   T10  +0.0012 +-0.0016   chg   150
+  Kozilek, Butcher of Truth 9.5->6.5                   T20  +0.0014 +-0.0017   chg   211   T10  +0.0012 +-0.0014   chg   211
+  Quirion Ranger 3.5->6.5                              T20  -0.0014 +-0.0022   chg   164   T10  +0.0000 +-0.0016   chg   164
+  Titania, Protector of Argoth 7.5->4.5                T20  +0.0014 +-0.0018   chg    84   T10  +0.0002 +-0.0010   chg    84
+  Woodland Bellower 7->10                              T20  +0.0014 +-0.0022   chg   330   T10  -0.0002 +-0.0016   chg   330
+  Augur of Autumn 6->9                                 T20  +0.0012 +-0.0035   chg   478   T10  +0.0022 +-0.0025   chg   478
+  Memory Jar 5->2                                      T20  +0.0012 +-0.0011 * chg    66   T10  +0.0002 +-0.0007   chg    66
+  Oracle of Mul Daya 7.5->4.5                          T20  +0.0012 +-0.0020   chg   122   T10  +0.0012 +-0.0015   chg   122
+  Rampaging Baloths 8->5                               T20  +0.0012 +-0.0020   chg   128   T10  +0.0008 +-0.0014   chg   128
+  Sol Ring 4->7                                        T20  -0.0012 +-0.0028   chg   294   T10  -0.0006 +-0.0018   chg   294
+  Terastodon 8.5->5.5                                  T20  +0.0012 +-0.0013   chg   105   T10  +0.0006 +-0.0009   chg   105
+  Courser of Kruphix 6->9                              T20  -0.0010 +-0.0032   chg   471   T10  +0.0022 +-0.0028   chg   471
+  Lotus Cobra 6.5->9.5                                 T20  +0.0010 +-0.0037   chg   537   T10  +0.0018 +-0.0030   chg   537
+  Mind's Eye 5.5->8.5                                  T20  +0.0010 +-0.0016   chg   129   T10  +0.0006 +-0.0009   chg   129
+  Nissa, Vastwood Seer // Nissa, Sage Animist 6.5->9.5 T20  -0.0010 +-0.0022   chg   150   T10  +0.0010 +-0.0020   chg   150
+  Seer's Sundial 5->2                                  T20  -0.0010 +-0.0022   chg   109   T10  +0.0002 +-0.0014   chg   109
+  Springheart Nantuko 5->2                             T20  +0.0010 +-0.0019   chg   149   T10  +0.0002 +-0.0014   chg   149
+  Traveling Chocobo 6.5->9.5                           T20  -0.0010 +-0.0035   chg   510   T10  -0.0016 +-0.0030   chg   510
+  Crucible of Worlds 6->3                              T20  +0.0008 +-0.0024   chg   213   T10  +0.0008 +-0.0018   chg   213
+  Eternal Witness 5->8                                 T20  +0.0008 +-0.0018   chg   122   T10  +0.0006 +-0.0012   chg   122
+  Genesis Wave 7.5->4.5                                T20  +0.0008 +-0.0009   chg    24   T10  +0.0008 +-0.0007 * chg    24
+  Greater Good 6->9                                    T20  +0.0008 +-0.0016   chg   177   T10  +0.0004 +-0.0012   chg   177
+  Harmonize 5.5->8.5                                   T20  -0.0008 +-0.0011   chg    33   T10  -0.0004 +-0.0010   chg    33
+  Horn of Greed 5->8                                   T20  +0.0008 +-0.0026   chg   293   T10  -0.0016 +-0.0018   chg   293
+  Regrowth 4->1                                        T20  +0.0008 +-0.0009   chg    52   T10  +0.0004 +-0.0005   chg    52
+  Sylvan Awakening 6.5->3.5                            T20  -0.0008 +-0.0008 * chg    92   T10  -0.0008 +-0.0008 * chg    92
+  Ashaya, Soul of the Wild 8->5                        T20  +0.0006 +-0.0018   chg    98   T10  +0.0014 +-0.0015   chg    98
+  Bane of Progress 7->10                               T20  +0.0006 +-0.0018   chg   278   T10  +0.0018 +-0.0015 * chg   278
+  Crop Rotation 3->6                                   T20  -0.0006 +-0.0018   chg    66   T10  +0.0000 +-0.0008   chg    66
+  Genesis Wave 7.5->10.5                               T20  +0.0006 +-0.0007   chg    11   T10  +0.0002 +-0.0007   chg    11
+  Lotus Cobra 6.5->3.5                                 T20  -0.0006 +-0.0024   chg   177   T10  +0.0004 +-0.0022   chg   177
+  Mind's Eye 5.5->2.5                                  T20  +0.0006 +-0.0010   chg    48   T10  +0.0002 +-0.0003   chg    48
+  Mole Man, Moloid Master 5->8                         T20  -0.0006 +-0.0022   chg   180   T10  -0.0022 +-0.0018 * chg   180
+  Ramunap Excavator 5.5->8.5                           T20  -0.0006 +-0.0034   chg   453   T10  -0.0014 +-0.0028   chg   453
+  Ramunap Excavator 5.5->2.5                           T20  +0.0006 +-0.0019   chg   117   T10  +0.0014 +-0.0015   chg   117
+  Sylvan Scrying 4->7                                  T20  +0.0006 +-0.0012   chg    32   T10  -0.0004 +-0.0008   chg    32
+  Animist's Awakening 5->8                             T20  -0.0004 +-0.0008   chg    33   T10  -0.0008 +-0.0007 * chg    33
+  Avenger of Zendikar 9->12                            T20  -0.0004 +-0.0008   chg    47   T10  +0.0000 +-0.0006   chg    47
+  Bane of Progress 7->4                                T20  +0.0004 +-0.0010   chg    22   T10  +0.0002 +-0.0007   chg    22
+  Craterhoof Behemoth 9->6                             T20  -0.0004 +-0.0023   chg   207   T10  +0.0010 +-0.0015   chg   207
+  Cultivate 4->7                                       T20  -0.0004 +-0.0016   chg    53   T10  -0.0014 +-0.0013 * chg    53
+  Green Sun's Zenith 5->8                              T20  -0.0004 +-0.0010   chg    32   T10  -0.0006 +-0.0009   chg    32
+  Journey of Discovery 4->1                            T20  +0.0004 +-0.0014   chg    44   T10  +0.0002 +-0.0009   chg    44
+  Kozilek, Butcher of Truth 9.5->12.5                  T20  -0.0004 +-0.0005   chg    33   T10  -0.0002 +-0.0003   chg    33
+  Memory Jar 5->8                                      T20  -0.0004 +-0.0014   chg   116   T10  -0.0002 +-0.0007   chg   116
+  Sylvan Scrying 4->1                                  T20  -0.0004 +-0.0012   chg    45   T10  +0.0000 +-0.0010   chg    45
+  Terastodon 8.5->11.5                                 T20  -0.0004 +-0.0005   chg    65   T10  +0.0000 +-0.0006   chg    65
+  Tireless Tracker 6.5->3.5                            T20  +0.0004 +-0.0020   chg   172   T10  +0.0006 +-0.0013   chg   172
+  Abundance 5->2                                       T20  +0.0002 +-0.0009   chg    53   T10  +0.0000 +-0.0006   chg    53
+  Ancient Greenwarden 8.5->5.5                         T20  +0.0002 +-0.0030   chg   432   T10  +0.0030 +-0.0028 * chg   432
+  Animist's Awakening 5->2                             T20  +0.0002 +-0.0013   chg    59   T10  +0.0012 +-0.0012   chg    59
+  Craterhoof Behemoth 9->12                            T20  +0.0002 +-0.0006   chg    45   T10  -0.0002 +-0.0003   chg    45
+  Cultivate 4->1                                       T20  -0.0002 +-0.0016   chg    67   T10  +0.0006 +-0.0012   chg    67
+  Eternal Witness 5->2                                 T20  +0.0002 +-0.0016   chg    81   T10  +0.0004 +-0.0012   chg    81
+  Greater Good 6->3                                    T20  -0.0002 +-0.0007   chg    64   T10  -0.0002 +-0.0003   chg    64
+  Greensleeves, Maro-Sorcerer 8.5->11.5                T20  -0.0002 +-0.0008   chg    99   T10  -0.0002 +-0.0007   chg    99
+  Hall of Gemstone 3->6                                T20  +0.0002 +-0.0007   chg    87   T10  +0.0000 +-0.0000   chg    87
+  Journey of Discovery 4->7                            T20  +0.0002 +-0.0012   chg    33   T10  +0.0000 +-0.0008   chg    33
+  Kodama's Reach 4->7                                  T20  +0.0002 +-0.0016   chg    50   T10  -0.0004 +-0.0010   chg    50
+  Momentous Fall 5->2                                  T20  +0.0002 +-0.0010   chg    46   T10  -0.0006 +-0.0009   chg    46
+  Nylea's Intervention 4->7                            T20  -0.0002 +-0.0009   chg    25   T10  -0.0004 +-0.0005   chg    25
+  Nylea's Intervention 4->1                            T20  -0.0002 +-0.0008   chg    34   T10  +0.0000 +-0.0008   chg    34
+  Regrowth 4->7                                        T20  -0.0002 +-0.0008   chg    25   T10  +0.0006 +-0.0007   chg    25
+  Seek the Horizon 4->7                                T20  -0.0002 +-0.0013   chg    34   T10  -0.0004 +-0.0008   chg    34
+  Sylvan Awakening 6.5->9.5                            T20  +0.0002 +-0.0008   chg    39   T10  +0.0000 +-0.0000   chg    39
+  Sylvan Library 6->3                                  T20  +0.0002 +-0.0024   chg   213   T10  +0.0012 +-0.0020   chg   213
+  Ulamog, the Infinite Gyre 9.5->12.5                  T20  +0.0002 +-0.0008   chg    36   T10  -0.0002 +-0.0006   chg    36
+  Woodland Bellower 7->4                               T20  +0.0002 +-0.0010   chg    36   T10  +0.0004 +-0.0008   chg    36
+  Ancient Greenwarden 8.5->11.5                        T20  +0.0000 +-0.0014   chg   166   T10  -0.0008 +-0.0009   chg   166
+  Chord of Calling 6->9                                T20  +0.0000 +-0.0012   chg    28   T10  -0.0008 +-0.0010   chg    28
+  Chord of Calling 6->3                                T20  +0.0000 +-0.0010   chg    54   T10  +0.0006 +-0.0009   chg    54
+  Crop Rotation 3->0.1                                 T20  +0.0000 +-0.0000   chg     0   T10  +0.0000 +-0.0000   chg     0
+  Hall of Gemstone 3->0.1                              T20  +0.0000 +-0.0006   chg    23   T10  +0.0000 +-0.0000   chg    23
+  Kodama's Reach 4->1                                  T20  +0.0000 +-0.0011   chg    62   T10  +0.0004 +-0.0010   chg    62
+  Momentous Fall 5->8                                  T20  +0.0000 +-0.0008   chg    23   T10  +0.0002 +-0.0003   chg    23
+  Seer's Sundial 5->8                                  T20  +0.0000 +-0.0028   chg   249   T10  +0.0008 +-0.0018   chg   249
+  Storm Cauldron 6.5->3.5                              T20  +0.0000 +-0.0015   chg   125   T10  +0.0002 +-0.0008   chg   125
+  Titania, Protector of Argoth 7.5->10.5               T20  +0.0000 +-0.0028   chg   382   T10  +0.0004 +-0.0022   chg   382
+  Traveling Chocobo 6.5->3.5                           T20  +0.0000 +-0.0020   chg   165   T10  +0.0004 +-0.0017   chg   165
+  -> 19 of 112 moves exclude zero at T20; ~5.6 expected by chance alone.
+

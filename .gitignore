@@ -73,6 +73,7 @@ results/.fra_progress
 results/.priority_sweep/
 # run_threat_sweep.py's, the same shape (queue item 39).
 results/.threat_sweep/
+results/.threat_*.log
 
 # A results file still being WRITTEN by a running job, renamed out of the
 # `*.txt` namespace so tools.status does not count it and a commit cannot pick
