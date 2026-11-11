@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38 and 43 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39 and 43 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -224,6 +224,10 @@ What is closed and where it went:
     - **§0z191 (2026-11-09)**: `hold_back_pad` 10, ADOPTED by the owner, moved
       every active deck's games. "Do not rebuild any decks yet": the same
       six-deck batch.
+    - **§0z194 (2026-11-11)**: the THREAT-SENSITIVE notes are rendered in five
+      tables; tivit's four (Time Sieve, Tempting Contract, Master of
+      Ceremonies, Teleportation Circle) appear when its table is rebuilt.
+      `tools/ablation.py` moved, so every fingerprint did; nothing else.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
       any single engine fix, item 36 included. One batch rebuild of every
       active table once all the engine work is done; until then the six
@@ -243,22 +247,6 @@ What is closed and where it went:
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
-
-39. **Which rows rest on their `threat`: MEASURED (§0z194, 2026-11-11);
-    what is left is the owner's.** 96 of 524 single-card ±3 moves confirmed
-    on fresh seeds; **25 rows move past their own table bar**, three could
-    change sign (karlov's Dawn of Hope and Well of Lost Dreams, shilgengar's
-    Black Market Connections), and every commander's -3 is worth +0.012 to
-    +0.030. `threat` also picks which permanent the pod's removal hits, so a
-    higher number can WIN more (a lightning rod). The list is
-    `python -m diagnostics.run_threat_sweep list`.
-    - **The owner decides**: (1) a note under each of the 25 rows, as PARTLY
-      rows carry theirs (a rendering change; rides item 35's rebuild with
-      item 40) -- the recommendation; or (2) a derived rule for `threat`,
-      which must serve both the share and the removal target and moves
-      every baseline (a parallel rebuild; after item 41 is decided).
-    - **Never adopt a threat because it scored better**: `threat` is how the
-      table sees a card, not the pilot's choice.
 
 40. **Sort each table by win rate, the objective (§0z192, finding 5).**
     `tools/ablation.py`'s `render_table` orders every section by damage at

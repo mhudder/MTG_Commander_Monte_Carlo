@@ -30,6 +30,9 @@ Kambal, Consul of Allocation          +1.53+-0.13         +1.23+-0.14        +0.
 Sorin, Solemn Visitor                 +1.36+-0.14         +1.12+-0.15        +0.0150+-0.0030      both
 Soul's Attendant                      +1.25+-0.15         +1.07+-0.18        +0.0064+-0.0033      both
 Soul Warden                           +1.35+-0.16         +1.07+-0.18        +0.0073+-0.0033      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
+      moves it +0.0065 (T20 win rate, N=15,000 paired).
 Starscape Cleric                      +1.66+-0.16         +1.05+-0.18        +0.0182+-0.0031      both
 Sorin, Vengeful Bloodlord             +1.09+-0.11         +1.03+-0.13        +0.0129+-0.0025      both
 Orzhov Signet                         +1.03+-0.16         +1.00+-0.19        +0.0161+-0.0031      both
@@ -43,6 +46,9 @@ Sol Ring                              +0.78+-0.19         +0.64+-0.23        +0.
 Sunscorch Regent                      +0.61+-0.09         +0.60+-0.10        +0.0067+-0.0021      both
 Auriok Champion                       +0.67+-0.12         +0.59+-0.15        +0.0060+-0.0027      both
 Blind Obedience                       +0.70+-0.10         +0.59+-0.14        -0.0035+-0.0027      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
+      it +0.0029 (T20 win rate, N=15,000 paired).
 Syr Konrad, the Grim                  +0.71+-0.09         +0.57+-0.11        +0.0006+-0.0022       dmg
 Debt to the Deathless                 +0.61+-0.07         +0.56+-0.08        +0.0034+-0.0016      both
 Land Tax                              +0.70+-0.17         +0.51+-0.21        +0.0105+-0.0032      both
@@ -56,6 +62,10 @@ Cliffhaven Vampire                    +0.83+-0.12         +0.39+-0.13        +0.
 Exemplar of Light                     +0.57+-0.11         +0.38+-0.13        +0.0049+-0.0026      both
 Ranger of Eos                         +0.49+-0.11         +0.36+-0.14        +0.0010+-0.0026       dmg
 Bolas's Citadel                       +0.77+-0.15         +0.36+-0.17        +0.0231+-0.0030      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8.5 -> 5.5
+      moves it +0.0035; 8.5 -> 11.5 moves it -0.0019 (T20 win rate, N=15,000
+      paired).
 Sun Titan                             +0.27+-0.06         +0.30+-0.09        +0.0039+-0.0018      both
 Cosmos Elixir                         +0.38+-0.08         +0.29+-0.11        +0.0060+-0.0023      both
 Ajani's Mantra                        +0.38+-0.07         +0.28+-0.09        +0.0009+-0.0020       dmg
@@ -68,11 +78,28 @@ Phyrexian Reclamation                 +0.04+-0.07         +0.00+-0.11        +0.
 Mother of Runes                       -0.11+-0.10         -0.01+-0.13        +0.0065+-0.0025       win
 Sanguine Bond                         +0.32+-0.13         -0.04+-0.16        +0.0093+-0.0030       win
 Necropotence                          +0.04+-0.13         -0.35+-0.16        +0.0074+-0.0027      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8 -> 11
+      moves it +0.0035 (T20 win rate, N=15,000 paired).
 Vizkopa Guildmage                     -0.30+-0.09         -0.36+-0.12        +0.0029+-0.0023      both
 Dawn of Hope                          -0.16+-0.08         -0.36+-0.12        -0.0037+-0.0026      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
+      it +0.0047 (T20 win rate, N=15,000 paired). The move could carry it across
+      zero.
 Well of Lost Dreams                   -0.19+-0.09         -0.43+-0.12        +0.0011+-0.0025       dmg
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 7.5 -> 10.5
+      moves it +0.0045 (T20 win rate, N=15,000 paired). The move could carry it
+      across zero.
 Felidar Sovereign                     -0.75+-0.12         -1.51+-0.17        +0.0158+-0.0026      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
+      it +0.0029; 8 -> 11 moves it -0.0038 (T20 win rate, N=15,000 paired).
 Exquisite Blood                       -3.77+-0.25         -5.71+-0.32        +0.0502+-0.0042      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
+      it +0.0081; 9 -> 12 moves it -0.0022 (T20 win rate, N=15,000 paired).
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.

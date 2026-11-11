@@ -28,8 +28,14 @@ card                                    damage T10          damage T20          
 Sol Ring                              +2.35+-0.17         +2.14+-0.22        +0.0129+-0.0036      both
 Elesh Norn, Grand Cenobite            +1.08+-0.09         +1.75+-0.17        +0.0225+-0.0033      both
 Lyra Dawnbringer                      +1.11+-0.10         +1.67+-0.18        +0.0218+-0.0034      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
+      it +0.0028; 8 -> 11 moves it -0.0035 (T20 win rate, N=15,000 paired).
 Massacre Wurm                         +1.22+-0.09         +1.61+-0.15        +0.0142+-0.0030      both
 Archangel of Thune                    +1.22+-0.11         +1.59+-0.18        +0.0214+-0.0034      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8 -> 11
+      moves it -0.0036 (T20 win rate, N=15,000 paired).
 Fellwar Stone                         +1.12+-0.11         +1.31+-0.18        +0.0101+-0.0031      both
 Orzhov Signet                         +1.16+-0.12         +1.29+-0.19        +0.0119+-0.0031      both
 Emeria's Call // Emeria, Shattered Skyclave        +0.82+-0.11         +1.22+-0.18        +0.0104+-0.0033      both
@@ -40,12 +46,19 @@ Smothering Tithe                      +0.88+-0.11         +1.03+-0.19        +0.
 Mind Stone                            +0.97+-0.11         +1.01+-0.17        +0.0075+-0.0030      both
 Righteous Valkyrie                    +0.68+-0.09         +0.92+-0.15        +0.0130+-0.0029      both
 Kokusho, the Evening Star             +0.94+-0.08         +0.89+-0.13        +0.0044+-0.0027      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8.5 -> 5.5
+      moves it -0.0029; 8.5 -> 11.5 moves it +0.0039 (T20 win rate, N=15,000
+      paired).
 Wayfarer's Bauble                     +0.66+-0.09         +0.74+-0.16        +0.0051+-0.0029      both
 Lyra, Archangel of Dawn               +0.93+-0.09         +0.72+-0.14        +0.0033+-0.0028      both
 Teferi's Protection                   +0.52+-0.07         +0.71+-0.14        +0.0053+-0.0025      both
 Herald of War                         +0.57+-0.07         +0.70+-0.12        +0.0097+-0.0026      both
 Requiem Angel                         +0.61+-0.06         +0.69+-0.10        +0.0071+-0.0024      both
 Zulaport Cutthroat                    +0.67+-0.06         +0.69+-0.10        +0.0037+-0.0021      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
+      it +0.0031 (T20 win rate, N=15,000 paired).
 Grim Haruspex                         +0.57+-0.07         +0.68+-0.13        +0.0055+-0.0027      both
 Twilight Shepherd                     +0.44+-0.05         +0.61+-0.11        +0.0049+-0.0024      both
 Midnight Reaper                       +0.61+-0.07         +0.61+-0.14        +0.0040+-0.0029      both
@@ -68,6 +81,10 @@ Pitiless Plunderer                    +0.01+-0.05         +0.14+-0.12        +0.
 Cartel Aristocrat                     +0.20+-0.04         +0.12+-0.07        -0.0004+-0.0015       dmg
 Dark Prophecy                         +0.03+-0.04         +0.04+-0.10        +0.0007+-0.0022        --
 Black Market Connections              +0.24+-0.10         -0.06+-0.18        -0.0004+-0.0032        --
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
+      moves it +0.0043 (T20 win rate, N=15,000 paired). The move could carry it
+      across zero.
 Skullclamp                            -0.08+-0.04         -0.08+-0.08        -0.0014+-0.0016        --
 Viscera Seer                          -0.16+-0.04         -0.20+-0.07        -0.0017+-0.0012      both
 

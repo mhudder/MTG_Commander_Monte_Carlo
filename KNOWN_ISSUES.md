@@ -246,7 +246,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
 | [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
 | [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Defaults unchanged |
-| [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat also steers removal: a lightning rod |
+| [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17041,6 +17041,22 @@ on, and a cheap engine scored above the commander protects the commander.
 
 Either way, a row on the list should be read with its threat said out loud,
 as a knob is.
+
+**THE OWNER CHOSE (1), 2026-11-11: "add the notes under the 25 rows".**
+`run_threat_sweep list --write` generates `tools/_threat_notes.py` (each note
+records the threat it was measured at), `ablation.render_table` prints it
+under the row as `THREAT-SENSITIVE (§0z194)`, and `tests/test_threat_notes.py`
+fails when a noted card leaves its staged list or its threat moves (4 cases;
+3 mutations, exact sets written before the run, right on the first). A
+RENDERING change, so five tables were re-rendered from their caches and
+diffed: 69 lines added, every one a note line, no row changed. **Tivit's
+four notes (Time Sieve, Tempting Contract, Master of Ceremonies,
+Teleportation Circle) wait for item 35's rebuild**: its committed table
+cannot be re-rendered today (it still prints the withdrawn Anointed
+Procession, §0z181), and re-rendering it would drop that row while every
+other row was still measured with the card in the deck. `tools/ablation.py`
+is in every cache fingerprint; the six caches were SUSPECT before and are
+still, and only item 35's rebuild clears them.
 
 **Blind to** (§0z15): each card is moved ALONE, so two high-threat cards
 that draw the aim together are not seen as a pair; finding 2's whole-list

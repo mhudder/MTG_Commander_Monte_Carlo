@@ -39,6 +39,9 @@ Victory Chimes                        +1.59+-0.24         +1.40+-0.24        +0.
 Profound Journey                      +1.55+-0.16         +1.34+-0.16        +0.0188+-0.0031      both
 Reforge the Soul                      +1.36+-0.20         +1.32+-0.21        +0.0246+-0.0039      both
 Monument to Endurance                 +1.50+-0.22         +1.32+-0.23        +0.0157+-0.0040      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 5 -> 2 moves
+      it +0.0043; 5 -> 8 moves it -0.0047 (T20 win rate, N=15,000 paired).
 Olórin's Searing Light                +1.13+-0.11         +1.27+-0.12        +0.0108+-0.0024      both
 Big Score                             +1.36+-0.20         +1.19+-0.21        +0.0175+-0.0039      both
 Bender's Waterskin                    +1.54+-0.23         +1.18+-0.24        +0.0119+-0.0040      both

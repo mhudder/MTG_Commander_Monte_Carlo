@@ -2280,7 +2280,31 @@ list of names to ablate() to score a package together.""")
             elif n in BLIND_BUT_LIVE.get(run.deck, {}):
                 for line in textwrap.wrap(BLIND_BUT_LIVE[run.deck][n], 76):
                     print(f"      {line}")
+            note = threat_note(run.deck, n)
+            if note:
+                for line in textwrap.wrap(note, 76):
+                    print(f"      {line}")
     return "".join(out)
+
+
+def threat_note(deck_name, card_name):
+    """The line printed under a row that rests on its typed `threat`
+    (§0z194, the owner's choice of 2026-11-11 for queue item 39), from the
+    GENERATED `tools/_threat_notes.py`; "" for every other row. A note
+    names the number it was measured at, so a reader can see when it no
+    longer matches the deck (`tests/test_threat_notes.py` fails then)."""
+    from tools._threat_notes import THREAT_NOTES
+    e = THREAT_NOTES.get(deck_name, {}).get(card_name)
+    if e is None:
+        return ""
+    t = e["threat"]
+    moves = "; ".join(f"{t:g} -> {t + d:g} moves it {w:+.4f}"
+                      for d, w in e["moves"])
+    tail = (" The move could carry it across zero." if e["sign"] else "")
+    return (f"THREAT-SENSITIVE (§0z194): this row rests partly on the card's "
+            f"hand-typed threat, which is how the table sees it, not the "
+            f"pilot's choice. {moves} (T20 win rate, N=15,000 "
+            f"paired).{tail}")
 
 
 if __name__ == "__main__":

@@ -2921,6 +2921,26 @@ are what it leaves, behind item 35's rebuild.
 
 ## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
 
+Item 39 closed the same day: measured (§0z194), and the owner chose the
+first proposal, "add the notes under the 25 rows"; the notes are rendered
+in five tables and tivit's four wait for item 35's rebuild. Moved verbatim:
+
+39. **Which rows rest on their `threat`: MEASURED (§0z194, 2026-11-11);
+    what is left is the owner's.** 96 of 524 single-card ±3 moves confirmed
+    on fresh seeds; **25 rows move past their own table bar**, three could
+    change sign (karlov's Dawn of Hope and Well of Lost Dreams, shilgengar's
+    Black Market Connections), and every commander's -3 is worth +0.012 to
+    +0.030. `threat` also picks which permanent the pod's removal hits, so a
+    higher number can WIN more (a lightning rod). The list is
+    `python -m diagnostics.run_threat_sweep list`.
+    - **The owner decides**: (1) a note under each of the 25 rows, as PARTLY
+      rows carry theirs (a rendering change; rides item 35's rebuild with
+      item 40) -- the recommendation; or (2) a derived rule for `threat`,
+      which must serve both the share and the removal target and moves
+      every baseline (a parallel rebuild; after item 41 is decided).
+    - **Never adopt a threat because it scored better**: `threat` is how the
+      table sees a card, not the pilot's choice.
+
 Item 43 closed the day it was queued: `tests/test_model_floors.py` pins the
 floors §0z192 found holding (4 cases, every active deck; plain 4 of 4,
 `--mutate` 2 of 2 with both expected sets written before the run and right

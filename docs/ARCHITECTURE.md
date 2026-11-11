@@ -42,8 +42,8 @@ Read this before changing code: what else a change touches.
    ─ issue.py             one KNOWN_ISSUES section by id, or --find over the index
    ─ where.py             one def's lines or source, a module's outline, or every
                           def naming a card -- from the syntax tree, per call
-   ─ _generated.py        shared helper: git ref, the provenance mask the checks compare
-                          with, and implements_mutate (read by tests and STATUS.md)
+   ─ _generated.py        git ref, provenance mask, implements_mutate (tests, STATUS.md)
+   ─ _threat_notes.py     GENERATED (run_threat_sweep list --write): §0z194's row notes
 
    diagnostics/           one-question harnesses: diag_* measure a MECHANISM, run_* measure a CHANGE
    tests/                 tests that pin a claimed mechanism; `python -m tests` runs them all

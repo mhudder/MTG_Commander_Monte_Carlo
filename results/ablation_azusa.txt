@@ -27,10 +27,19 @@ MODEL-EVALUATED — a low score is evidence about the card
 card                                    damage T10          damage T20             win rate    signal
 Mole Man, Moloid Master               +3.10+-0.25         +2.61+-0.25        +0.0275+-0.0040      both
 Scute Swarm                           +2.98+-0.26         +2.53+-0.26        +0.0356+-0.0040      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 3 moves
+      it +0.0055 (T20 win rate, N=15,000 paired).
 Mossborn Hydra                        +2.98+-0.25         +2.09+-0.24        +0.0200+-0.0040      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 3 moves
+      it +0.0044; 6 -> 9 moves it -0.0121 (T20 win rate, N=15,000 paired).
 Sol Ring                              +2.36+-0.25         +1.94+-0.25        +0.0139+-0.0036      both
 Rampaging Baloths                     +2.24+-0.21         +1.92+-0.22        +0.0217+-0.0038      both
 Avenger of Zendikar                   +2.19+-0.21         +1.87+-0.21        +0.0223+-0.0036      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
+      it +0.0056 (T20 win rate, N=15,000 paired).
 Craterhoof Behemoth                   +1.98+-0.16         +1.53+-0.16        +0.0163+-0.0031      both
 Nissa, Vastwood Seer // Nissa, Sage Animist        +1.53+-0.22         +1.50+-0.24        +0.0189+-0.0039      both
 Ancient Greenwarden                   +1.70+-0.20         +1.43+-0.22        +0.0208+-0.0040      both
