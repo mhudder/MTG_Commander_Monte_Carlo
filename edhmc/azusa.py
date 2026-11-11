@@ -126,7 +126,7 @@ import inspect
 import random
 import re
 
-from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_game, Snapshots, BaseGame, finish, draw_is_safe, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, devotion, ManaUnits, tap_reluctance,
                           hand_colour_demand, engine_cfg, choose_mode,
                           choose_mode_cost, can_afford,
@@ -3410,7 +3410,7 @@ class AzusaGame(BaseGame):
                         mode_cost[id(top)] = self.cost_of(top)
             if not options:
                 break
-            rank = lambda it: (it[0].priority, it[0].mv)
+            rank = lambda it: cast_rank(self, it[0])   # item 42
             # item 18's lookahead prices every option against ONE pool, and
             # Castle Garenbrig's restricted mana is offered to creatures only,
             # so with any of it floating this turn falls back to greedy.

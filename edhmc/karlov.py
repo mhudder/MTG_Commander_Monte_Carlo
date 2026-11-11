@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -1572,7 +1572,7 @@ def main_phase(g):
             break
         pay_of = lazy_pay_of(mode_cost, units)
         pick = lookahead_pick(               # item 18; greedy unless enabled
-            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            g, options, units, lambda it: cast_rank(g, it[0]),   # item 42
             cost_of=lambda it: mode_cost[id(it[0])], pay_of=pay_of)
         card, pay = pick[0], pay_of(pick)
         spend_lg(g, pay, units)

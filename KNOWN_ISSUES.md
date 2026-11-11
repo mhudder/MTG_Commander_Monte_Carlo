@@ -245,6 +245,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z190](#0z190) | MEASURED | **The Citadel's clock pad re-forked on the corrected crack-back** (§0z189): pad 1 still the best; 0-1.5 a plateau, 3 and 4 lose (-0.0026 / -0.0040 a turn). Nothing changes |
 | [0z191](#0z191) | DECIDED | **`hold_back_pad` 10 ADOPTED** (the owner, 2026-11-09): swept on six decks, re-measured on fresh seeds, +0.0010 at T20 and -0.0005 at T10; rendmaw and azusa gain, tivit pays at T10 |
 | [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
+| [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Defaults unchanged |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -16859,6 +16860,67 @@ diagnostic and the docs.
 and `clock_shift`, which set how many games the clock decides;
 `incidental_rate` (0.78), the life route's share; `known_win_focus` and
 `counter_threshold` (4.0), the other readers of `threat`.
+
+<a id="0z193"></a>
+
+## 0z193. BUILT -- one cast rule for seven main phases (`engine.cast_rank`); the ramp bonus nobody decided is a null
+
+**Queue item 42** (§0z192, finding 3). Every engine's main phase ranked its
+options by `(priority, mv)`, written out in azusa, karlov, lorehold (twice:
+the main phase and the escape cast), shilgengar, tivit and trostani, while
+rendmaw's copy added +3 to a `ramp` card through turn 5. Now every one of
+them calls `engine.cast_rank(g, card, ramp_bonus=...)`. The option FILTERS
+stay per engine (wipes, holds, Lurrus, the graveyard cast); only the
+ranking is shared.
+
+**The knob.** `ramp_rank_bonus`, default None: each engine's own
+`ramp_bonus`, which is 3.0 for rendmaw and 0.0 everywhere else -- what each
+copy did. A number sets it for every engine at once. `ramp_rank_turns` (5)
+is rendmaw's turn limit, read against `g.turn` as its copy read it.
+
+**Bit-identical, checked on every output key.** A per-game hash of the
+whole output dict, seeds 7000..8999, T20, all SEVEN decks (trostani
+included), module and staged lists: 0 of 28,000 games differ against a
+worktree at `38f5852`. `run_knob_sweep`'s own identity arms agree: the value
+equal to a deck's old default (rendmaw 3, lorehold 0, tivit 0) moves
++0.0000 ±0.0000 at both horizons.
+
+**The tag, re-read before it went live anywhere (§0z12).** In the STAGED
+lists `ramp` is carried by 15 rendmaw, 6 lorehold and 7 tivit cards, and by
+no karlov, shilgengar or azusa card. §0z192's counts (16, 7, 7, 1) were
+source-text counts: karlov's one tag is on Crypt Ghast, a candidate, and
+lorehold's seventh on Ruby Medallion, staged out. Scryfall's text, read
+2026-11-11, for all 24: each is a mana rock or mana creature, a land fetch
+(Burnished Hart, Sakura-Tribe Elder, Solemn Simulacrum), an extra land drop
+(Dryad of the Ilysian Grove), a land maker (Overlord of the Hauntwoods), or
+The Great Henge's {G}{G}. **One judgement, said out loud**: tivit's
+Monologue Tax makes a Treasure only when an opponent casts their second
+spell in a turn. It is ramp, but not the turn-two rock the bonus was written
+for.
+
+**The difference nobody decided** (`diagnostics/run_knob_sweep.py
+ramp_rank_bonus None 0,3`, staged lists, N=15,000, T20 with T10 off the same
+game; `results/ramp_rank_bonus.txt`, `results/ramp_rank_bonus_oos.txt`):
+
+| deck | move | seeds 5000.. T10 | T20 | seeds 40000.. T10 | T20 |
+|---|---|---|---|---|---|
+| rendmaw | bonus 3 -> 0 | +0.0021 ±0.0024 | +0.0021 ±0.0034 | +0.0009 ±0.0022 | +0.0011 ±0.0033 |
+| lorehold | bonus 0 -> 3 | -0.0004 ±0.0022 | -0.0008 ±0.0024 | -- | -- |
+| tivit | bonus 0 -> 3 | **+0.0054 ±0.0026** | **+0.0037 ±0.0027** | +0.0015 ±0.0025 | +0.0018 ±0.0027 |
+
+Tivit's gain was significant on the seeds that found it and shrank inside
+its bar on a fresh block: §0z170 again. Every cell is inside ±0.003 out of
+sample. So **the bonus does not matter** in any deck that carries the tag:
+taking it from rendmaw costs nothing measurable, and giving it to lorehold
+or tivit buys nothing measurable.
+
+**The defaults stay as they were** (rendmaw 3, the rest 0), so no game moved
+and no table needs this. Whether to unify them is the owner's: setting
+rendmaw to 0 makes one rule for seven decks at a cost inside its bar, and
+moves rendmaw's games (item 35's batch).
+
+**Knobs to say out loud**: `ramp_rank_bonus`, `ramp_rank_turns`, and
+`cast_lookahead` (off), which reads the same rank.
 
 ## How to read an ablation table
 

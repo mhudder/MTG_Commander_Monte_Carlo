@@ -137,7 +137,7 @@ import random
 
 from edhmc.engine import (cleanup_step, late_land_drop, remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
-                          vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+                          vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
                           lazy_pay_of, can_afford as afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -1181,7 +1181,7 @@ class ShilgengarGame(BaseGame):
                 break
             pay_of = lazy_pay_of(mode_cost, pool)
             pick = lookahead_pick(           # item 18; greedy unless enabled
-                self, options, pool, lambda it: (it[0].priority, it[0].mv),
+                self, options, pool, lambda it: cast_rank(self, it[0]),  # item 42
                 cost_of=lambda it: mode_cost[id(it[0])], pay_of=pay_of)
             card, pay = pick[0], pay_of(pick)
             real = [i for i in pay if i < n_real]

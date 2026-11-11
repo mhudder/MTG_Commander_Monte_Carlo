@@ -51,7 +51,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -773,7 +773,7 @@ def main_phase(g):
         # the payment below; the one the lookahead reads is built on demand
         # from the pool each option was found affordable in (§0z149).
         card = lookahead_pick(
-            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            g, options, units, lambda it: cast_rank(g, it[0]),   # item 42
             cost_of=lambda it: it[2],
             pay_of=lazy_pay_of(mode_cost, units, pools))[0]
         if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card),

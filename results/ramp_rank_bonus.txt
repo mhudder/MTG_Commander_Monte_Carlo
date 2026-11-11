@@ -1,0 +1,18 @@
+ramp_rank_bonus: each value minus ramp_rank_bonus=None, paired, the staged lists, N=15,000 a deck, seeds 5000..19999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0
+
+rendmaw
+  ramp_rank_bonus=0       T10 +0.0021 +-0.0024   T20 +0.0021 +-0.0034   turns +0.004
+  ramp_rank_bonus=3       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+
+lorehold
+  ramp_rank_bonus=0       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  ramp_rank_bonus=3       T10 -0.0004 +-0.0022   T20 -0.0008 +-0.0024   turns -0.001
+
+tivit
+  ramp_rank_bonus=0       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  ramp_rank_bonus=3       T10 +0.0054 +-0.0026*  T20 +0.0037 +-0.0027*  turns -0.017
+
+MEAN OVER 3 DECKS (each deck's paired difference, averaged; variances add)
+  ramp_rank_bonus=0       T10 +0.0007 +-0.0008   T20 +0.0007 +-0.0011 
+  ramp_rank_bonus=3       T10 +0.0017 +-0.0011*  T20 +0.0010 +-0.0012 

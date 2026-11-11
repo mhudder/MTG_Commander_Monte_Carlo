@@ -132,7 +132,7 @@ import dataclasses
 
 from edhmc.engine import (cleanup_step, begin_game, BaseGame, Board, Card, Permanent, Metrics,
                           sun_titan_pick,
-                          Snapshots, finish, lookahead_pick, can_pay,
+                          Snapshots, finish, lookahead_pick, cast_rank, can_pay,
                           available_mana as shared_available_mana, spend,
                           engine_cfg, choose_mode, CRNStreams, crn_shuffle,
                           crn_random,
@@ -1130,7 +1130,7 @@ class TrostaniGame(BaseGame):
             if not options:
                 break
             card, pay = lookahead_pick(
-                self, options, pool, lambda it: (it[0].priority, it[0].mv),
+                self, options, pool, lambda it: cast_rank(self, it[0]),  # item 42
                 cost_of=lambda it: mode_cost[id(it[0])],
                 pay_of=lambda it: it[1])
             self.pay_from(mode_cost[id(card)], pool, pay)

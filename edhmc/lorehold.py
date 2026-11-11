@@ -29,7 +29,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cleanup_step, late_land_drop, begin_game, Snapshots, BaseGame, finish, drew_from_empty, draw_is_safe, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, coloured_tap_life, enter_land, after_land_enters,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
@@ -2659,7 +2659,7 @@ def underworld_breach(g):
                 options.append((c, cost))
         if not options:
             return
-        card, cost = max(options, key=lambda it: (it[0].priority, it[0].mv))
+        card, cost = max(options, key=lambda it: cast_rank(g, it[0]))  # item 42
         paid = pay(g, cost, units)
         remove_card(g.graveyard, card)
         g.m["escape_casts"] += 1
@@ -2874,7 +2874,7 @@ def _main_phase(g, reserve=0):
         # item 18: greedy unless `cast_lookahead`. The third element is the
         # payment, built only when the lookahead reads it (§0z149).
         card, cost, _ = lookahead_pick(
-            g, options, units, lambda it: (it[0].priority, it[0].mv),
+            g, options, units, lambda it: cast_rank(g, it[0]),   # item 42
             cost_of=lambda it: it[1],
             pay_of=lazy_pay_of(mode_cost, units, slot=2))
         idx = g.spells_this_turn
