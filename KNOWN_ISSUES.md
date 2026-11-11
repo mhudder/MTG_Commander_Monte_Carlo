@@ -248,6 +248,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Set to 0 everywhere |
 | [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
 | [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
+| [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17180,6 +17181,65 @@ and rows that answer route pieces may scale differently under it.
 
 **Knobs to say out loud**: `threat_clock_shift` (2.3), the kill-turn floor
 (4), `incidental_rate` (0.78), `clock_rearm` (4).
+
+<a id="0z196"></a>
+
+## 0z196. REBUILT -- six tables at 63d20e7 (queue item 35): 22 rows past their old bar, none flips
+
+**The owner called it 2026-11-11 ("go ahead and rebuild")**, after queue
+items 39-43. One parallel rebuild (`.claude/skills/parallel-rebuild`), six
+legs, all at `63d20e7`, every leg on python 3.13.18 / numpy 2.4.6 with the
+pins `numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`. The coordinator ran on
+3.13.16 with the same pins after `tools.repro_row` read shilgengar's Viscera
+Seer and tivit's Time Sieve back IDENTICAL (§0z119). **Wall time 18.5 min**
+(azusa, the slowest leg; shilgengar and rendmaw took ~5.5).
+
+**What the tables now carry**: `hold_back_pad` 10 (§0z191), every turn fix of
+§0z182-§0z190, one cast rule with no ramp bonus (§0z193), tivit with Plains
+back and Anointed Procession out (§0z181), the THREAT-SENSITIVE notes
+(§0z194, all 25, tivit's four now printed), rows sorted by win rate (§0z192
+finding 5), and each table's BASELINE line (§0z195).
+
+**Gates, all green for the first time since §0z182**: `check_docs` 20 of 20
+(every active cache CURRENT), `python -m tests` 121 of 121 and `--mutate` 119
+of 119, `tools.validate` +0.00 on all 21 metrics of seven engines,
+`edhmc.pending` legal on every deck.
+
+**Baselines (T20)**: rendmaw 0.3125, lorehold 0.5150, karlov 0.5503, tivit
+0.5924, shilgengar 0.3628, azusa 0.4884.
+
+### What moved, against the tables it replaced (`63d20e7`'s)
+
+Rows whose T20 win rate moved by more than the OLD row's bar; **no row
+changed sign while significant on both sides.**
+
+| deck | moved | the rows |
+|---|---|---|
+| rendmaw | 4 | Assassin's Trophy +0.0153 -> +0.0115; Tendershoot Dryad +0.0131 -> +0.0163; Ornithopter of Paradise +0.0029 -> -0.0001 (`both` -> `dmg`); Arasta of the Endless Web +0.0036 -> +0.0060 |
+| lorehold | 2 | Mother of Runes +0.0019 -> +0.0061 (`--` -> `both`); Mizzix's Mastery +0.0133 -> +0.0170 |
+| karlov | 0 | -- |
+| tivit | 12 | Time Sieve +0.0683 -> +0.0786; Kambal, Profiteering Mayor +0.0069 -> +0.0153; Tempt with Bunnies +0.0201 -> +0.0143; Mirkwood Bats +0.0179 -> +0.0221; Coercive Portal -0.0037 -> +0.0003 (`win` -> `--`); Marionette Master +0.0113 -> +0.0149; Messenger Jays, Void Rend, Ephemerate, Academy Manufactor, Ghostly Prison, Tyrant's Choice each +0.0023 to +0.0032 |
+| shilgengar | 3 | Giada, Font of Hope +0.0042 -> +0.0086; Path to Exile +0.0140 -> +0.0107; Speaker of the Heavens +0.0060 -> +0.0085 |
+| azusa | 1 | Sylvan Awakening +0.0041 -> +0.0025 |
+
+Signal changes without a move past the bar: rendmaw 12 (Steel Overseer,
+Copper Myr and Ashnod's Altar fell to `--`; Village Rites and Leaden Myr
+rose to `win`), lorehold 4, karlov 6, tivit 10 (Magister of Worth and Vault 11
+lost their FLIP), shilgengar 3, azusa 0.
+
+**Tivit moved most, and it is two changes at once**: Anointed Procession left
+the list (a token doubler, so every token maker's row was measured beside it)
+and every engine fix since 2026-11-07 landed. The token rows rising
+(Kambal, Marionette Master, Academy Manufactor) and Tempt with Bunnies
+falling fit the first; this rebuild does not separate them, and says so.
+Rendmaw's ramp-tagged rows moving (Ornithopter of Paradise down, Copper Myr
+and Leaden Myr changing signal) fits the cast rule's ramp bonus leaving
+(§0z193), but rendmaw's seat upkeeps and until-end-of-turn fixes (§0z185,
+§0z187, §0z188) landed in the same rebuild, so that too is a fit, not a
+separation.
+
+**Read the sizes against the baselines above, not against older tables**
+(§0z195): every row is relative to its deck's fit at this commit.
 
 ## How to read an ablation table
 

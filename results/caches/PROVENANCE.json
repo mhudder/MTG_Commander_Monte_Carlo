@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "96a298f21bc698ec",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:15:42Z",
+    "built_at": "2e1102acd8f063cd",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:57:59Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -565,21 +565,28 @@
             "utc": "2026-11-07T02:07:58Z"
           }
         ]
+      },
+      {
+        "built_at": "96a298f21bc698ec",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:15:42Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "727be8c",
+            "evidence": "\u00a70z182 (engine.late_land_drop added; azusa never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
+            "fingerprint": "0e1daef87eb2b344",
+            "utc": "2026-11-08T01:51:27Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "727be8c",
-        "evidence": "\u00a70z182 (engine.late_land_drop added; azusa never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
-        "fingerprint": "0e1daef87eb2b344",
-        "utc": "2026-11-08T01:51:27Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "67e0a8b2e2efc5b0",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:14:40Z",
+    "built_at": "4ad75ecce4e4708b",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:56:44Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1055,14 +1062,21 @@
             "utc": "2026-11-07T02:07:57Z"
           }
         ]
+      },
+      {
+        "built_at": "67e0a8b2e2efc5b0",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:14:40Z",
+        "deck": "karlov",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "e3a4535152fa6cc5",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:15:19Z",
+    "built_at": "f8a3b0970ecf46af",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:57:13Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1566,14 +1580,21 @@
         "built_utc": "2026-11-07T02:09:21Z",
         "deck": "lorehold",
         "verified": []
+      },
+      {
+        "built_at": "e3a4535152fa6cc5",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:15:19Z",
+        "deck": "lorehold",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "915c36e76f7a9e2e",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:14:33Z",
+    "built_at": "6ce8bc6a5c089692",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:56:21Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2036,21 +2057,28 @@
             "utc": "2026-11-07T02:07:57Z"
           }
         ]
+      },
+      {
+        "built_at": "915c36e76f7a9e2e",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:14:33Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "727be8c",
+            "evidence": "\u00a70z182 (engine.late_land_drop added; rendmaw never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
+            "fingerprint": "e7e3d512fb4ff7f8",
+            "utc": "2026-11-08T01:51:27Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "727be8c",
-        "evidence": "\u00a70z182 (engine.late_land_drop added; rendmaw never calls it): check_unchanged_decks N=400 against a clean worktree at 727be8c BIT-IDENTICAL; the staged list, seeds 5000..7499, T20, every output key hashed per game, 0 of 2,500 differ with the defaults",
-        "fingerprint": "e7e3d512fb4ff7f8",
-        "utc": "2026-11-08T01:51:27Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "3a1ad6afa592141a",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:14:50Z",
+    "built_at": "eab0b61d59c8bf93",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:56:22Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -2555,14 +2583,21 @@
             "utc": "2026-11-07T02:07:57Z"
           }
         ]
+      },
+      {
+        "built_at": "3a1ad6afa592141a",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:14:50Z",
+        "deck": "shilgengar",
+        "verified": []
       }
     ],
     "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "995e3517e1bdc845",
-    "built_commit": "b7f3788",
-    "built_utc": "2026-11-07T20:14:53Z",
+    "built_at": "b1c22f182bd24afb",
+    "built_commit": "63d20e7",
+    "built_utc": "2026-11-11T21:56:19Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -3026,6 +3061,13 @@
             "utc": "2026-11-07T02:07:57Z"
           }
         ]
+      },
+      {
+        "built_at": "995e3517e1bdc845",
+        "built_commit": "b7f3788",
+        "built_utc": "2026-11-07T20:14:53Z",
+        "deck": "tivit",
+        "verified": []
       }
     ],
     "verified": []

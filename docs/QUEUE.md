@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39, 40, 41, 42 and 43 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42 and 43 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -182,68 +182,6 @@ What is closed and where it went:
     origin` should list `main`, the working branch and the five `archive/`
     branches only, and this item closes to `docs/HISTORY.md`. Agents can
     still pull an `archive/` branch, but the name says what it is.
-
-35. **Rebuild tivit's table for the withdrawn Anointed Procession,
-    lorehold's, karlov's and shilgengar's for §0z182, azusa's for §0z183
-    and rendmaw's for §0z185 (the
-    owner, 2026-11-08: "do not rebuild tivit, save it as a to do"; §0z181).**
-    -Plains +Anointed Procession is WITHDRAWN (`edhmc/ledger/tivit.py`), so
-    `build_pending("tivit")` plays Plains again and the table at `b7f3788`
-    describes a list that is no longer the baseline. Until this runs:
-    - tivit's cache reads **SUSPECT** and `check_docs` fails on that one
-      check. It is a STAGING-induced SUSPECT, so it is never cleared with
-      `--verified` (CLAUDE.md, Caches): only a rebuild clears it.
-    - `python -m tests` fails one case for the same reason,
-      `test_metrics_and_render` C for tivit (its committed table no longer
-      re-renders from the cache against the current list), in plain and
-      `--mutate` mode. Every other module passes.
-    - tivit's rows are measured with Anointed Procession in the deck and
-      Plains out; read them as such, and do not quote Anointed Procession's
-      row as a candidate value for the list as it stands.
-    - **§0z182 (2026-11-08) widens it to FOUR decks**: the land drop in
-      either main phase moved lorehold's, karlov's, tivit's and shilgengar's
-      games, so their caches read SUSPECT (an ENGINE-induced SUSPECT whose
-      games differ: `--verified` cannot clear it either). Rendmaw's and
-      azusa's are VERIFIED. `check_docs` fails on the four until the
-      rebuild; `test_metrics_and_render` C still fails on tivit only, since
-      the other three tables still re-render from their caches. Rebuild all
-      four at once, by the parallel-rebuild skill (one leg per deck), at the
-      commit that carries §0z182.
-    - **§0z183 (2026-11-08) adds azusa**: its floating sink moved azusa's
-      games (inside its bars), so azusa's cache is SUSPECT too. FIVE decks:
-      lorehold, karlov, tivit, shilgengar, azusa. Rendmaw's alone is
-      VERIFIED.
-    - **§0z185 (2026-11-08) adds rendmaw**: its seat upkeeps moved its
-      games. ALL SIX active decks are now SUSPECT; this is a full parallel
-      rebuild.
-    - **§0z187 and §0z188 (2026-11-08)** moved rendmaw's and azusa's games
-      again (until end of turn at cleanup, the main-2 land drop, Beastmaster
-      Ascension's static); nothing else. Still the same six-deck rebuild.
-    - **§0z189 (2026-11-08)** moved karlov's (the Citadel's floor read with the
-      coming attack tapped); nothing else.
-    - **§0z191 (2026-11-09)**: `hold_back_pad` 10, ADOPTED by the owner, moved
-      every active deck's games. "Do not rebuild any decks yet": the same
-      six-deck batch.
-    - **§0z194 (2026-11-11)**: the THREAT-SENSITIVE notes are rendered in five
-      tables; tivit's four (Time Sieve, Tempting Contract, Master of
-      Ceremonies, Teleportation Circle) appear when its table is rebuilt.
-      `tools/ablation.py` moved, so every fingerprint did; nothing else.
-    - **§0z193 (2026-11-11)**: the cast rule's ramp bonus set to 0 everywhere
-      (the owner) moved rendmaw's games; nothing else.
-    - **Item 40 (closed, 2026-11-11)**: six tables (trostani's included) are sorted by win rate;
-      tivit's is re-sorted when it is rebuilt.
-    - **Item 41's half is BUILT** (§0z195): a rebuilt cache keeps the
-      baseline under `(baseline)`, its table prints it, STATUS shows it.
-    - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
-      any single engine fix, item 36 included. One batch rebuild of every
-      active table once all the engine work is done; until then the six
-      SUSPECT caches and `check_docs`' one failing check are expected.
-    - **To run it**: `DECKS=tivit ./tools/regen_tables.sh` on python 3.13 with
-      the tables' pins (`numpy==2.4.6 scipy==1.18.1 openpyxl==3.1.5`), or one
-      leg of `.claude/skills/parallel-rebuild`; then diff against the table it
-      replaces, `cache_manifest --write`, `status --write`, `check_docs`
-      green, and close this item to `docs/HISTORY.md`. Batch it with the next
-      rebuild if one is coming.
 
 37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
     §0z185; 2 and 10, §0z187)**, none of
