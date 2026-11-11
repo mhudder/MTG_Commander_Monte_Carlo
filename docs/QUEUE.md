@@ -262,24 +262,19 @@ What is closed and where it went:
       batch as item 35's rebuild, not before; the owner's call whether the
       order changes at all.
 
-41. **What is the pod calibrated to? (§0z192, finding 4.) AN OWNER
-    DECISION, with one measurement to inform it.** Since §0z140 the kill
-    timing is re-fitted to keep the mean T20 win rate where the previous
-    pod had it; the active decks now win 0.31 to 0.62, mean 0.47, at a
-    table of four, against 0.25 to 0.31 at the first calibration.
-    - **Measure first**: do a row's size and sign depend on the baseline?
-      Take the staged swaps and each deck's five largest and five smallest
-      evaluated rows, and re-measure them paired with `threat_clock_shift`
-      moved until the mean win rate is near 0.30
-      (`diagnostics/fit_threat_clock.py` finds the value,
-      `diagnostics/run_knob_sweep.py` is the paired harness; N=15,000,
-      both horizons). Count sign changes and rows that leave their bar.
-    - **Then the owner decides** between keeping the fit rule (and writing
-      down that absolute win rates are not comparable across decks or
-      dates), or a fixed target. A new target is a parallel rebuild.
-    - Cheap and separate: print each deck's baseline win rate in
-      `docs/STATUS.md` (derived -- `ablation.py` measures the baseline and
-      does not keep it in the cache today), so the drift is visible.
+41. **What is the pod calibrated to? MEASURED (§0z195, 2026-11-11); the
+    rule is the owner's.** At `threat_clock_shift` 7.5 the mean T20 win
+    rate falls from 0.47 to 0.29: 0 of 71 rows flip, every staged swap stays
+    positive (azusa's Ka-Zar and Evolving Wilds fall inside their bars),
+    order inside a deck holds (Spearman 0.76-0.97), and rows shrink to a
+    median 0.39 of their size. Sol Ring shrinks most, UNEXPLAINED.
+    - **The owner decides**: keep the fit rule and write down that sizes and
+      absolute win rates are not comparable across decks or calibrations
+      (no rebuild; the recommendation), or a fixed target (a parallel
+      rebuild, and ~4x the games to hold today's resolution).
+    - Cheap and separate, riding item 35's rebuild: print each deck's
+      baseline win rate in `docs/STATUS.md` (`ablation.py` must keep the
+      baseline in its cache first).
 
 42. **One cast rule: BUILT (§0z193, 2026-11-11); one default is the
     owner's.** Every main phase ranks through `engine.cast_rank`,

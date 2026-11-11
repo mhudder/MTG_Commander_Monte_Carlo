@@ -247,6 +247,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z192](#0z192) | MEASURED | **A review of the core** (`diag_core_review`): 64-88% of losses are the pod's clock, 36-63% of wins had a rival's clock remove an opponent; every `threat` x0.5 is +0.07 to +0.10 win. The machinery holds. Queue items 39-43. |
 | [0z193](#0z193) | BUILT | **One cast rule** (`engine.cast_rank`, item 42), bit-identical on 28,000 games; rendmaw's +3 `ramp` bonus is a null out of sample in all three decks carrying the tag (±0.003). Defaults unchanged |
 | [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
+| [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39 of their size; order holds (Spearman 0.93) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17065,6 +17066,86 @@ scale is the other end, and the two bracket it.
 **Knobs to say out loud**: every card's `threat`, the commander's above
 all; `threat_clock_shift` (2.3), `known_win_focus`, `counter_threshold`
 (4.0), the other readers.
+
+<a id="0z195"></a>
+
+## 0z195. MEASURED -- a stronger pod shrinks every row to ~0.4 of its size and flips none
+
+**Queue item 41** (§0z192, finding 4): does a row's size or sign depend on
+where the baseline win rate sits? `diagnostics/run_baseline_dependence.py`
+(rule and counts written in its docstring before the run;
+`results/baseline_dependence.txt`). Per active deck, on the staged list:
+each STAGED swap (staged minus the list with that one swap reverted) and the
+five largest and five smallest MODEL-EVALUATED rows of the committed cache,
+re-measured as the table measures them (`blank_like` at `repl_priority`).
+71 rows, each at `threat_clock_shift` 2.3 (the fitted pod) and 7.5, paired
+by seed, N=15,000, seeds 5000.., T20 with T10 off the same game.
+
+**7.5 is the shift that brings the mean near 0.30**, read off
+`run_knob_sweep threat_clock_shift 2.3 3.5,...,10` at N=1,000 (seeds
+60000..): the mean T20 win rate moved -0.138 at 6.5, -0.178 at 8 and -0.207
+at 10. The kill turn is floored at 4 (`roll_threat_routes`), so the shift
+saturates and T10 barely moves. Measured here, the six bases fell from a
+mean of 0.470 to **0.291**: rendmaw 0.311 -> 0.219, lorehold 0.515 ->
+0.325, karlov 0.550 -> 0.287, tivit 0.593 -> 0.394, shilgengar 0.363 ->
+0.237, azusa 0.488 -> 0.281.
+
+### What moved
+
+| | count |
+|---|---|
+| rows | 71 (11 staged swaps, 60 card rows) |
+| FLIP: significant at both pods, opposite signs | **0** |
+| LEAVES: significant at one pod only | 20 |
+| significant at the fitted pod | 54 |
+| strong / fitted T20 ratio over those 54 | **median 0.39** (quartiles 0.34 / 0.54) |
+| Spearman, fitted against strong, per deck | 0.76 (tivit) to 0.97 (karlov); pooled 0.93 |
+
+- **Signs hold.** No row changes sign while significant at both pods.
+  Every staged swap stays positive; 9 of 11 stay significant, and the two
+  that leave are azusa's (-Perilous Forays +Ka-Zar +0.0051 -> +0.0017, -Forest
+  +Evolving Wilds +0.0089 -> +0.0033).
+- **Sizes do not hold.** At a 0.29 baseline a row is about 0.4 of its size at
+  0.47 -- smaller than the baseline's own ratio (0.62), so the shrink is not
+  just "less room to win". The bars shrink less than the rows, so 14 of the
+  20 LEAVES are positive rows falling inside their bar; the other six are
+  small negative rows becoming significant (rendmaw's Erebos and Ashnod's
+  Altar, lorehold's Sensei's Divining Top, shilgengar's Cartel Aristocrat,
+  azusa's Seer's Sundial) or a null becoming positive (rendmaw's Overwhelming
+  Stampede, +0.0013 -> +0.0044).
+- **Order mostly holds** (Spearman above). The largest mover is Sol Ring,
+  which shrinks most in every deck that has it (rendmaw +0.0169 -> +0.0027,
+  lorehold +0.0218 -> +0.0035, tivit +0.0255 -> +0.0092). **That is
+  UNEXPLAINED**, and said so rather than argued: a faster pod should value
+  acceleration more, not less. Read Sol Ring's row as calibration-dependent
+  until a mechanism is found.
+
+### For the owner's decision (nothing is changed)
+
+Item 41 offers two rules. What this says about each:
+
+1. **Keep the fit rule**, and write down that absolute win rates and row
+   SIZES are not comparable across decks or across pod calibrations, while
+   signs and the order inside a deck mostly are. No rebuild. **The
+   recommendation**: what the tables are used for -- the sign of a swap,
+   which cards are the top set -- survived a move of the baseline from 0.47
+   to 0.29.
+2. **A fixed target** (say 0.30): every row shrinks to ~0.4 of its size and
+   its bar does not shrink with it, so at the tables' N fewer rows clear
+   their bar (20 of 71 changed status here, most of them into the bar);
+   the bars shrink to ~0.8, so holding today's resolution would need ~4x the games, (0.8 / 0.39) squared. A parallel rebuild
+   either way.
+
+The cheap separate half of item 41 (each deck's baseline win rate printed in
+`docs/STATUS.md`) needs `tools/ablation.py` to keep the baseline in its
+cache, so it rides item 35's rebuild.
+
+**Blind to** (§0z15): one lever moved the baseline. A pod made stronger by
+its removal or by `incidental_rate` (the life route) is not the same pod,
+and rows that answer route pieces may scale differently under it.
+
+**Knobs to say out loud**: `threat_clock_shift` (2.3), the kill-turn floor
+(4), `incidental_rate` (0.78), `clock_rearm` (4).
 
 ## How to read an ablation table
 
