@@ -2230,6 +2230,8 @@ All figures are paired differences with 95% CIs.
 NOISE FLOOR: the median win-rate CI half-width over this deck is +-{floor:.4f}.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
+Rows are listed by win rate at T{HORIZONS[-1]}, the objective; inside the noise
+floor that order is not a ranking (§0e).
 
   signal = both : the card beats its error bars on damage AND win rate
            dmg  : significant on damage only
@@ -2256,7 +2258,12 @@ list of names to ablate() to score a package together.""")
         if not group:
             continue
         last = str(HORIZONS[-1])
-        rows = sorted(group, key=lambda n: -results[n][last]["damage"][0])
+        # By WIN RATE at the last horizon, the objective (queue item 40,
+        # §0z192 finding 5, the owner 2026-11-11); damage only breaks ties.
+        # It was damage at T20 -- the proxy -- so a deck's largest win-rate
+        # row could print last in its section.
+        rows = sorted(group, key=lambda n: (-results[n][last]["won"][0],
+                                            -results[n][last]["damage"][0]))
         print(f"\n{'=' * 84}\n{title}\n{'=' * 84}")
         hz = [str(h) for h in HORIZONS]
         last = hz[-1]

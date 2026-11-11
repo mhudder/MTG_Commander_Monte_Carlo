@@ -2943,6 +2943,25 @@ other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
 ## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
 
+Item 40 closed the same day: the owner, "yes, sort by winrate"; six
+tables re-rendered (trostani's included), only the order and two header
+lines moved (§0z192).
+Moved verbatim:
+
+40. **Sort each table by win rate, the objective (§0z192, finding 5).**
+    `tools/ablation.py`'s `render_table` orders every section by damage at
+    T20, so karlov's largest win-rate row prints last in its section and a
+    reader takes the proxy's order for a ranking. Sort by the last
+    horizon's `won`, keep the damage columns, and say in the header that
+    the order is not a ranking inside the noise floor (§0e).
+    - It is a RENDERING change: no game moves. Re-render every table from
+      its cache and diff -- only row order may change -- and
+      `tests/test_metrics_and_render.py` case C is that check.
+    - `tools/ablation.py` is in every cache fingerprint, so every cache
+      reads SUSPECT after it (they do today, item 35). Do it in the same
+      batch as item 35's rebuild, not before; the owner's call whether the
+      order changes at all.
+
 Items 41 and 42 closed the same day on the owner's word: "keep the fit
 rule for item 41, and set the ramp bonus for each deck the same (0)"
 (§0z195, §0z193). Item 41's cheap half moved to item 35. Moved verbatim:

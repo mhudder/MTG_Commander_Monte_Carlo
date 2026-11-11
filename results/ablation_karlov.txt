@@ -5,6 +5,8 @@ All figures are paired differences with 95% CIs.
 NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0026.
 Two cards closer together than that are not ranked by this table, however their
 point estimates happen to fall. Halving it costs FOUR TIMES the games.
+Rows are listed by win rate at T20, the objective; inside the noise
+floor that order is not a ranking (§0e).
 
   signal = both : the card beats its error bars on damage AND win rate
            dmg  : significant on damage only
@@ -25,95 +27,101 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Serra Ascendant                       +1.84+-0.15         +1.37+-0.16        +0.0049+-0.0029      both
-Kambal, Consul of Allocation          +1.53+-0.13         +1.23+-0.14        +0.0025+-0.0025       dmg
-Sorin, Solemn Visitor                 +1.36+-0.14         +1.12+-0.15        +0.0150+-0.0030      both
-Soul's Attendant                      +1.25+-0.15         +1.07+-0.18        +0.0064+-0.0033      both
-Soul Warden                           +1.35+-0.16         +1.07+-0.18        +0.0073+-0.0033      both
+Exquisite Blood                       -3.77+-0.25         -5.71+-0.32        +0.0502+-0.0042      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
-      moves it +0.0065 (T20 win rate, N=15,000 paired).
-Starscape Cleric                      +1.66+-0.16         +1.05+-0.18        +0.0182+-0.0031      both
-Sorin, Vengeful Bloodlord             +1.09+-0.11         +1.03+-0.13        +0.0129+-0.0025      both
-Orzhov Signet                         +1.03+-0.16         +1.00+-0.19        +0.0161+-0.0031      both
-Benevolent Offering                   +0.86+-0.10         +0.89+-0.12        +0.0039+-0.0024      both
-Archangel of Thune                    +0.95+-0.12         +0.87+-0.14        +0.0091+-0.0026      both
-Drana's Emissary                      +0.85+-0.08         +0.76+-0.10        +0.0025+-0.0021      both
-Authority of the Consuls              +0.97+-0.12         +0.75+-0.15        +0.0040+-0.0026      both
-Suture Priest                         +0.88+-0.11         +0.73+-0.14        -0.0004+-0.0026       dmg
-Marauding Blight-Priest               +1.18+-0.13         +0.69+-0.14        +0.0112+-0.0025      both
-Sol Ring                              +0.78+-0.19         +0.64+-0.23        +0.0141+-0.0039      both
-Sunscorch Regent                      +0.61+-0.09         +0.60+-0.10        +0.0067+-0.0021      both
-Auriok Champion                       +0.67+-0.12         +0.59+-0.15        +0.0060+-0.0027      both
-Blind Obedience                       +0.70+-0.10         +0.59+-0.14        -0.0035+-0.0027      both
-      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
-      it +0.0029 (T20 win rate, N=15,000 paired).
-Syr Konrad, the Grim                  +0.71+-0.09         +0.57+-0.11        +0.0006+-0.0022       dmg
-Debt to the Deathless                 +0.61+-0.07         +0.56+-0.08        +0.0034+-0.0016      both
-Land Tax                              +0.70+-0.17         +0.51+-0.21        +0.0105+-0.0032      both
-Aetherflux Reservoir                  +0.78+-0.10         +0.51+-0.12        +0.0064+-0.0026      both
-Fountain of Renewal                   +0.58+-0.09         +0.50+-0.11        +0.0027+-0.0023      both
-Elas il-Kor, Sadistic Pilgrim         +0.64+-0.10         +0.50+-0.13        +0.0002+-0.0024       dmg
-Voice of the Blessed                  +0.52+-0.07         +0.45+-0.08        +0.0015+-0.0019       dmg
-Pristine Talisman                     +0.50+-0.09         +0.44+-0.12        +0.0057+-0.0024      both
-Lurrus of the Dream-Den               +0.59+-0.09         +0.42+-0.13        +0.0017+-0.0025       dmg
-Cliffhaven Vampire                    +0.83+-0.12         +0.39+-0.13        +0.0101+-0.0024      both
-Exemplar of Light                     +0.57+-0.11         +0.38+-0.13        +0.0049+-0.0026      both
-Ranger of Eos                         +0.49+-0.11         +0.36+-0.14        +0.0010+-0.0026       dmg
+      threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
+      it +0.0081; 9 -> 12 moves it -0.0022 (T20 win rate, N=15,000 paired).
 Bolas's Citadel                       +0.77+-0.15         +0.36+-0.17        +0.0231+-0.0030      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 8.5 -> 5.5
       moves it +0.0035; 8.5 -> 11.5 moves it -0.0019 (T20 win rate, N=15,000
       paired).
-Sun Titan                             +0.27+-0.06         +0.30+-0.09        +0.0039+-0.0018      both
-Cosmos Elixir                         +0.38+-0.08         +0.29+-0.11        +0.0060+-0.0023      both
-Ajani's Mantra                        +0.38+-0.07         +0.28+-0.09        +0.0009+-0.0020       dmg
-Swiftfoot Boots                       +0.13+-0.08         +0.18+-0.11        -0.0006+-0.0023       dmg
+Starscape Cleric                      +1.66+-0.16         +1.05+-0.18        +0.0182+-0.0031      both
+Orzhov Signet                         +1.03+-0.16         +1.00+-0.19        +0.0161+-0.0031      both
+Felidar Sovereign                     -0.75+-0.12         -1.51+-0.17        +0.0158+-0.0026      both
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
+      it +0.0029; 8 -> 11 moves it -0.0038 (T20 win rate, N=15,000 paired).
+Sorin, Solemn Visitor                 +1.36+-0.14         +1.12+-0.15        +0.0150+-0.0030      both
 Enduring Tenacity                     +0.65+-0.13         +0.14+-0.17        +0.0148+-0.0030       win
-Blood Artist                          +0.17+-0.09         +0.11+-0.12        +0.0011+-0.0024        --
 Vito, Thorn of the Dusk Rose          +0.51+-0.15         +0.09+-0.17        +0.0143+-0.0030       win
-Phyrexian Arena                       +0.26+-0.10         +0.08+-0.13        +0.0068+-0.0025       win
-Phyrexian Reclamation                 +0.04+-0.07         +0.00+-0.11        +0.0013+-0.0022        --
-Mother of Runes                       -0.11+-0.10         -0.01+-0.13        +0.0065+-0.0025       win
+Sol Ring                              +0.78+-0.19         +0.64+-0.23        +0.0141+-0.0039      both
+Sorin, Vengeful Bloodlord             +1.09+-0.11         +1.03+-0.13        +0.0129+-0.0025      both
+Marauding Blight-Priest               +1.18+-0.13         +0.69+-0.14        +0.0112+-0.0025      both
+Land Tax                              +0.70+-0.17         +0.51+-0.21        +0.0105+-0.0032      both
+Cliffhaven Vampire                    +0.83+-0.12         +0.39+-0.13        +0.0101+-0.0024      both
 Sanguine Bond                         +0.32+-0.13         -0.04+-0.16        +0.0093+-0.0030       win
+Archangel of Thune                    +0.95+-0.12         +0.87+-0.14        +0.0091+-0.0026      both
 Necropotence                          +0.04+-0.13         -0.35+-0.16        +0.0074+-0.0027      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 8 -> 11
       moves it +0.0035 (T20 win rate, N=15,000 paired).
-Vizkopa Guildmage                     -0.30+-0.09         -0.36+-0.12        +0.0029+-0.0023      both
-Dawn of Hope                          -0.16+-0.08         -0.36+-0.12        -0.0037+-0.0026      both
+Soul Warden                           +1.35+-0.16         +1.07+-0.18        +0.0073+-0.0033      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
-      it +0.0047 (T20 win rate, N=15,000 paired). The move could carry it across
-      zero.
+      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
+      moves it +0.0065 (T20 win rate, N=15,000 paired).
+Phyrexian Arena                       +0.26+-0.10         +0.08+-0.13        +0.0068+-0.0025       win
+Sunscorch Regent                      +0.61+-0.09         +0.60+-0.10        +0.0067+-0.0021      both
+Mother of Runes                       -0.11+-0.10         -0.01+-0.13        +0.0065+-0.0025       win
+Soul's Attendant                      +1.25+-0.15         +1.07+-0.18        +0.0064+-0.0033      both
+Aetherflux Reservoir                  +0.78+-0.10         +0.51+-0.12        +0.0064+-0.0026      both
+Auriok Champion                       +0.67+-0.12         +0.59+-0.15        +0.0060+-0.0027      both
+Cosmos Elixir                         +0.38+-0.08         +0.29+-0.11        +0.0060+-0.0023      both
+Pristine Talisman                     +0.50+-0.09         +0.44+-0.12        +0.0057+-0.0024      both
+Serra Ascendant                       +1.84+-0.15         +1.37+-0.16        +0.0049+-0.0029      both
+Exemplar of Light                     +0.57+-0.11         +0.38+-0.13        +0.0049+-0.0026      both
+Authority of the Consuls              +0.97+-0.12         +0.75+-0.15        +0.0040+-0.0026      both
+Benevolent Offering                   +0.86+-0.10         +0.89+-0.12        +0.0039+-0.0024      both
+Sun Titan                             +0.27+-0.06         +0.30+-0.09        +0.0039+-0.0018      both
+Debt to the Deathless                 +0.61+-0.07         +0.56+-0.08        +0.0034+-0.0016      both
+Vizkopa Guildmage                     -0.30+-0.09         -0.36+-0.12        +0.0029+-0.0023      both
+Fountain of Renewal                   +0.58+-0.09         +0.50+-0.11        +0.0027+-0.0023      both
+Drana's Emissary                      +0.85+-0.08         +0.76+-0.10        +0.0025+-0.0021      both
+Kambal, Consul of Allocation          +1.53+-0.13         +1.23+-0.14        +0.0025+-0.0025       dmg
+Lurrus of the Dream-Den               +0.59+-0.09         +0.42+-0.13        +0.0017+-0.0025       dmg
+Voice of the Blessed                  +0.52+-0.07         +0.45+-0.08        +0.0015+-0.0019       dmg
+Phyrexian Reclamation                 +0.04+-0.07         +0.00+-0.11        +0.0013+-0.0022        --
+Blood Artist                          +0.17+-0.09         +0.11+-0.12        +0.0011+-0.0024        --
 Well of Lost Dreams                   -0.19+-0.09         -0.43+-0.12        +0.0011+-0.0025       dmg
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 7.5 -> 10.5
       moves it +0.0045 (T20 win rate, N=15,000 paired). The move could carry it
       across zero.
-Felidar Sovereign                     -0.75+-0.12         -1.51+-0.17        +0.0158+-0.0026      both
+Ranger of Eos                         +0.49+-0.11         +0.36+-0.14        +0.0010+-0.0026       dmg
+Ajani's Mantra                        +0.38+-0.07         +0.28+-0.09        +0.0009+-0.0020       dmg
+Syr Konrad, the Grim                  +0.71+-0.09         +0.57+-0.11        +0.0006+-0.0022       dmg
+Elas il-Kor, Sadistic Pilgrim         +0.64+-0.10         +0.50+-0.13        +0.0002+-0.0024       dmg
+Suture Priest                         +0.88+-0.11         +0.73+-0.14        -0.0004+-0.0026       dmg
+Swiftfoot Boots                       +0.13+-0.08         +0.18+-0.11        -0.0006+-0.0023       dmg
+Blind Obedience                       +0.70+-0.10         +0.59+-0.14        -0.0035+-0.0027      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
-      it +0.0029; 8 -> 11 moves it -0.0038 (T20 win rate, N=15,000 paired).
-Exquisite Blood                       -3.77+-0.25         -5.71+-0.32        +0.0502+-0.0042      both
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
+      it +0.0029 (T20 win rate, N=15,000 paired).
+Dawn of Hope                          -0.16+-0.08         -0.36+-0.12        -0.0037+-0.0026      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
-      it +0.0081; 9 -> 12 moves it -0.0022 (T20 win rate, N=15,000 paired).
+      threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
+      it +0.0047 (T20 win rate, N=15,000 paired). The move could carry it across
+      zero.
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Swords to Plowshares                  +0.37+-0.09         +0.80+-0.14        +0.0129+-0.0029      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
+Bloodthirsty Conqueror                -2.18+-0.20         -3.62+-0.26        +0.0339+-0.0034      both
+      Exquisite Blood's text word for word, and since §0z90 BOTH halves of it are
+      modelled for both cards: the loop with Sanguine Bond, Vito, Enduring
+      Tenacity and (new) the three 'each opponent loses 1' drains, and the general
+      clause -- every opponent who loses life gains you that much, as a lifegain
+      event. The 5/5 flying body is modelled. NOT: deathtouch, which nothing in
+      the blocking model reads (a chump blocker dies either way; only Ohran
+      Frostfang makes the pod block less). A floor by that. §0z26, §0z90.
+South Wind Avatar                     +1.26+-0.13         +0.75+-0.14        +0.0145+-0.0026      both
+      MODELLED: 'whenever you gain life, each opponent loses 1 life' (a
+      DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) and 'whenever
+      another creature you control dies, you gain life equal to its toughness', on
+      the 3/4. NOT: deathtouch, which nothing in the blocking model reads --
+      Bloodthirsty Conqueror's gap. A floor by that.
 Path to Exile                         +0.31+-0.09         +0.75+-0.14        +0.0132+-0.0029      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
@@ -122,12 +130,19 @@ Path to Exile                         +0.31+-0.09         +0.75+-0.14        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
-South Wind Avatar                     +1.26+-0.13         +0.75+-0.14        +0.0145+-0.0026      both
-      MODELLED: 'whenever you gain life, each opponent loses 1 life' (a
-      DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) and 'whenever
-      another creature you control dies, you gain life equal to its toughness', on
-      the 3/4. NOT: deathtouch, which nothing in the blocking model reads --
-      Bloodthirsty Conqueror's gap. A floor by that.
+Swords to Plowshares                  +0.37+-0.09         +0.80+-0.14        +0.0129+-0.0029      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Enlightened Tutor                     -1.30+-0.20         -1.97+-0.24        +0.0121+-0.0036      both
+      MODELLED: an artifact or enchantment put on top, the shared want order's
+      pick -- the missing half of the Exquisite Blood loop first, else priority.
+      NOT: the answer a pilot fetches for the TABLE, whose permanents are a count
+      (§4). A floor.
 Anguished Unmaking                    +0.37+-0.09         +0.66+-0.13        +0.0097+-0.0027      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
@@ -136,7 +151,21 @@ Anguished Unmaking                    +0.37+-0.09         +0.66+-0.13        +0.
       is out. NOT: the pod's other permanents, which are a count (§4). The delay
       is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
+Damn                                  +0.11+-0.08         +0.47+-0.13        +0.0087+-0.0027      both
+      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
+      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
+      refuses the wrath or the overload cannot be paid. Your half of the wrath is
+      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
+      can hit. The cost is modelled, the benefit an estimate.
 Fracture                              +0.29+-0.08         +0.55+-0.12        +0.0083+-0.0026      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: the pod's other permanents, which are a count (§4). The delay
+      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Return to Dust                        +0.35+-0.08         +0.45+-0.11        +0.0081+-0.0023      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
@@ -150,27 +179,6 @@ Kalitas, Traitor of Ghet              +0.51+-0.07         +0.47+-0.08        +0.
       death triggers do not hear it (every pod body read as nontoken, an
       overstatement). NOT: '{2}{B}, sacrifice another Vampire or Zombie: two +1/+1
       counters'. A floor on that half.
-Damn                                  +0.11+-0.08         +0.47+-0.13        +0.0087+-0.0027      both
-      SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
-      ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
-      refuses the wrath or the overload cannot be paid. Your half of the wrath is
-      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
-      can hit. The cost is modelled, the benefit an estimate.
-Return to Dust                        +0.35+-0.08         +0.45+-0.11        +0.0081+-0.0023      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Damnation                             +0.26+-0.08         +0.39+-0.11        +0.0035+-0.0024      both
-      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
-      honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
 Farewell                              +0.23+-0.07         +0.36+-0.10        +0.0049+-0.0020      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
@@ -179,6 +187,13 @@ Farewell                              +0.23+-0.07         +0.36+-0.10        +0.
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
 Austere Command                       +0.20+-0.07         +0.28+-0.09        +0.0044+-0.0019      both
+      SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
+      honouring indestructible from this card's oracle text, §0z10); the
+      opponents' half only zeroes an abstract creature count (§4) and, since
+      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
+      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
+      estimate.
+Damnation                             +0.26+-0.08         +0.39+-0.11        +0.0035+-0.0024      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
       opponents' half only zeroes an abstract creature count (§4) and, since
@@ -205,16 +220,3 @@ Sensei's Divining Top                 -0.23+-0.14         -0.36+-0.18        +0.
       the pod's turn or else in the upkeep, in the shared want order (the missing
       combo half first). NOT: '{T}: draw a card, then put this on top', and no
       second spin after a shuffle. A floor.
-Enlightened Tutor                     -1.30+-0.20         -1.97+-0.24        +0.0121+-0.0036      both
-      MODELLED: an artifact or enchantment put on top, the shared want order's
-      pick -- the missing half of the Exquisite Blood loop first, else priority.
-      NOT: the answer a pilot fetches for the TABLE, whose permanents are a count
-      (§4). A floor.
-Bloodthirsty Conqueror                -2.18+-0.20         -3.62+-0.26        +0.0339+-0.0034      both
-      Exquisite Blood's text word for word, and since §0z90 BOTH halves of it are
-      modelled for both cards: the loop with Sanguine Bond, Vito, Enduring
-      Tenacity and (new) the three 'each opponent loses 1' drains, and the general
-      clause -- every opponent who loses life gains you that much, as a lifegain
-      event. The 5/5 flying body is modelled. NOT: deathtouch, which nothing in
-      the blocking model reads (a chump blocker dies either way; only Ohran
-      Frostfang makes the pod block less). A floor by that. §0z26, §0z90.

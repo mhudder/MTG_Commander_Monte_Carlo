@@ -16852,6 +16852,14 @@ forbids ranking it). Separately, `render_table` sorts each section by damage
 at T20 -- the proxy -- so karlov's largest win-rate row, Exquisite Blood at
 +0.0502, prints last in its section. Queue item 40.
 
+**DONE 2026-11-11 (the owner: "yes, sort by winrate").** `render_table`
+sorts each section by win rate at the last horizon, damage breaking ties,
+and the header says the order is not a ranking inside the noise floor. A
+rendering change: rendmaw, lorehold, karlov, shilgengar, azusa and the
+suspended trostani re-rendered from their caches (no game played), each keeping exactly its old lines (as a
+multiset) plus the two header lines, so only the order moved. Exquisite
+Blood now prints first. Tivit's table is re-sorted at item 35's rebuild.
+
 ### 6. Knobs
 
 About 540 `cfg.get` sites and 400 rows in `docs/KNOBS.md`. Each keeps an old

@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39, 41, 42 and 43 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 36, 38, 39, 40, 41, 42 and 43 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -230,6 +230,8 @@ What is closed and where it went:
       `tools/ablation.py` moved, so every fingerprint did; nothing else.
     - **§0z193 (2026-11-11)**: the cast rule's ramp bonus set to 0 everywhere
       (the owner) moved rendmaw's games; nothing else.
+    - **Item 40 (closed, 2026-11-11)**: six tables (trostani's included) are sorted by win rate;
+      tivit's is re-sorted when it is rebuilt.
     - **Ride this rebuild (item 41, closed)**: keep each deck's baseline
       win rate in the ablation cache and print it in `docs/STATUS.md`.
     - **WAIT FOR THE OWNER'S CALL** (the owner, 2026-11-08): no rebuild after
@@ -251,17 +253,3 @@ What is closed and where it went:
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers; the seat you take (9), which is a model decision to
     write down, not a bug.
-
-40. **Sort each table by win rate, the objective (§0z192, finding 5).**
-    `tools/ablation.py`'s `render_table` orders every section by damage at
-    T20, so karlov's largest win-rate row prints last in its section and a
-    reader takes the proxy's order for a ranking. Sort by the last
-    horizon's `won`, keep the damage columns, and say in the header that
-    the order is not a ranking inside the noise floor (§0e).
-    - It is a RENDERING change: no game moves. Re-render every table from
-      its cache and diff -- only row order may change -- and
-      `tests/test_metrics_and_render.py` case C is that check.
-    - `tools/ablation.py` is in every cache fingerprint, so every cache
-      reads SUSPECT after it (they do today, item 35). Do it in the same
-      batch as item 35's rebuild, not before; the owner's call whether the
-      order changes at all.
