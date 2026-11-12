@@ -20,6 +20,9 @@ What is closed and where it went:
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
   2026-10-10".
 
+**Order of work (the owner, 2026-11-12): item 44 first** -- §0z197's A1 and
+A2, tested step by step, with **no table rebuilt until that batch is done**.
+
 ---
 
 18. **BOTH HALVES ARE MEASURED; WHAT IS LEFT IS AN ADOPTION DECISION**
@@ -189,5 +192,80 @@ What is closed and where it went:
     Memory Jar and Bloodbat Summoner (8); shilgengar's `activations` inside
     main 2 and Black Market Connections at the first main phase (7); first
     and double strike, with Sunhome (6), which waits on attackers that can
-    die to blockers; the seat you take (9), which is a model decision to
+    die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
     write down, not a bug.
+
+44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
+    can die to blockers, and you block.** The combat half of §4, and the
+    largest revision since pod v3. One piece of work, A1 then A2, through
+    one combat resolution both directions share -- not two copies (§0u).
+
+    **TEST EACH CHANGE; DO NOT REBUILD THE TABLES DURING IT** -- not one
+    deck, not at the end of a step. "There is no point when there is so
+    much to do." The tables stay as built at `63d20e7` until the batch is
+    done and the owner calls a single rebuild. The protocol:
+
+    - Every rule lands behind a cfg switch that restores the old rule
+      exactly (every fix since §0z42 has), and **lands default OFF**. Off
+      is bit-identical by construction, so each deck's moved fingerprint is
+      cleared the usual way -- `check_unchanged_decks` against a worktree
+      at the cache's `built_commit`, then `cache_manifest --verified` -- and
+      `check_docs` stays green.
+    - Each step is TESTED, not tabled: a pinned mechanism test with its
+      mutation mode (written before it is run, §0z11), `python -m tests`
+      and `--mutate`, `tools.validate` +0.00, and a paired on/off run per
+      deck (N 6,000 or more, both horizons) reporting win rate, the baseline,
+      every output key that moved (§0z32) and the new mechanism counters
+      (attackers lost, blocks made, blockers lost, kills by block).
+    - The defaults flip TOGETHER at the end of the batch. Then the pod is
+      re-fitted once (the fit rule, §0z195; `incidental_rate` as in
+      §0z186), the policies written while the gap was open are re-read
+      (§0z5), and the owner calls one rebuild (`parallel-rebuild`).
+    - If a default is flipped mid-batch anyway, the caches it moves are
+      SUSPECT for a real reason: **never clear them with `--verified`**;
+      `check_docs` fails on them and each commit says so.
+
+    **Decisions that are the owner's, to be asked, not assumed**: the pod's
+    block rule once a block can trade (chump, trade or decline -- `chump`
+    is chump-only); YOUR block rule, a pilot's not an optimiser's (§0v);
+    which of the pod's bodies attack you and which the formula still
+    stands for (`chip_amount` covers opponents without bodies); and
+    whether the pod's attack becomes rolled rather than an expectation
+    (§0z170's spread).
+
+    **Knobs re-derived or retired by it**: `block_share`,
+    `flier_block_share`, `blocker_toughness`, `goad_block_share`,
+    `incidental_rate`, `combat_share`'s `1/(1+blockers)`, `hold_back` and
+    `hold_back_pad` (§0z186, §0z191), `attack_tax_deflect`.
+
+    **Text it makes live, to be pinned as it does**: first and double strike
+    (Lyra Dawnbringer, Sunhome -- §0z184 finding 6, which item 37 hands
+    here), an attacker's toughness and indestructibility, protection
+    (Auriok Champion, Greensleeves), reach (Arasta of the Endless Web,
+    Rendmaw, Ancient Greenwarden, Longshot, The Dawning Archaic),
+    deathtouch and lifelink on a block, Bloodghast's "can't block",
+    Sakura-Tribe Elder's chump-then-sacrifice, Ghostly Prison and
+    Propaganda as taxes on declared attackers, Mother of Runes' protection
+    on a blocker.
+
+45. **A3-A7 of §0z197: write down, then decide.** None is a bug to fix in
+    passing; each is a model decision nobody wrote down or made. A4 (rivals
+    never lose life to each other) was written down nowhere before §0z197.
+    A3 (the kill ignores your life and blockers) and A6 (the pod acts only
+    in its own main phase) bound every lifegain and every haste/ETB row.
+    A5 (walkers never attacked) follows A2 naturally -- the pod's declared
+    attack can name one. A7 has a concrete defect inside it: azusa's Chord
+    of Calling (fixed X=4, no convoke) against trostani's convoke and X
+    plan, the same card under two rules. After item 44.
+
+46. **C-E of §0z197: the cheap ones, no rebuild.** Woe Strider from
+    SCRIPTED to PARTLY_MODELLED in `tools/ablation.py` (a rendering change:
+    re-render from the cache and diff, CLAUDE.md "Match the check to what
+    moved"); the stale statements of D (`engine.py`'s docstring and its
+    combat lifelink comment, the deathtouch note under Bloodthirsty
+    Conqueror and South Wind Avatar, Guide of Souls); `haste` and
+    `lifelink` checked against Scryfall's keywords by `audit_cards` or
+    generated by `tag_flying` (E, with the check proved to fail, §0q); and
+    oracle audits for tivit, shilgengar and azusa. Ward, cycling, Woe
+    Strider's escape and Memory Jar (C and item 37) are card work for the
+    add-card skill. Any time; none waits on item 44.

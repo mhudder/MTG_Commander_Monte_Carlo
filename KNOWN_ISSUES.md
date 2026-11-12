@@ -249,6 +249,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
 | [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
 | [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
+| [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17240,6 +17241,178 @@ separation.
 
 **Read the sizes against the baselines above, not against older tables**
 (§0z195): every row is relative to its deck's fit at this commit.
+
+<a id="0z197"></a>
+
+## 0z197. OPEN -- a review of turns, phases and combat: what the model still simplifies
+
+**The owner, 2026-11-12**: "a more fundamental review of how the turns,
+phases, and mechanics are being implemented ... review and report", then
+"document these in the repo for future revision. We should do A1 and A2
+first". Read-only: the code at `727f5e0`, the six active engines and
+`opponents.py`, and the six STAGED lists (`build_pending`) against
+Scryfall's `keywords` the same day (647 cards, haste and lifelink checked;
+the keyword census over the staged lists). Trostani is SUSPENDED and was not
+read. **Nothing here is measured** unless a § is cited for the number.
+
+§0z184 read each turn's STEPS against CR 500-514 and those are now close to
+right (§0z185-§0z190). What is left is mostly how COMBAT and the POD'S TURN
+are represented, not the order of the steps. The letters are the review's;
+the queue items are 44 (A1, A2), 45 (A3-A7) and 46 (C-E).
+
+### A. Structural, every deck
+
+**A1. YOUR ATTACKERS NEVER DIE IN COMBAT.** The pod's blockers only absorb:
+`opponents.chump` picks which of your attackers are blocked and
+`damage_through` subtracts what they stop; no blocker's power is ever dealt
+back. Under `pod_bodies` (default on) the blockers HAVE power and toughness
+(`pod_blocker_deaths` kills them, deathtouch included), but the power is
+read nowhere. So attacking is free but for the crack-back the hold-back
+prices (§0z186, `hold_back_pad`), and `block_share` (0.6) chumps every
+combat -- "a rule written when a chump cost nothing", in its own docstring.
+Text that is inert because of it: first and double strike (Lyra
+Dawnbringer; Sunhome, Fortress of the Legion -- §0z184 finding 6), the
+toughness and indestructibility of an attacker, protection on an attacker
+(Auriok Champion, Greensleeves), and every "whenever this deals combat
+damage" whose attacker could have died first. §0z184 called first strike
+"inert today"; this is the reason it is.
+
+**A2. YOU NEVER BLOCK.** The pod's attack at you is a formula, not a
+combat: `chip_amount` = creatures x `incidental_rate` x share x the
+archetype's power x the taxes' through-rate, an expectation dealt every pod
+turn (§0z161, §0z170). Your untapped creatures only lower the share, by
+`combat_share`'s `1/(1+blockers)` (§0z186 made it count the untapped
+ones); they never block, never die and never kill an attacker. Inert
+because of it: reach (Arasta of the Endless Web, Rendmaw, Creaking Nest,
+Ancient Greenwarden, Longshot, Rebel Bowman, The Dawning Archaic), deathtouch
+and first strike on a blocker, lifelink on a block, Bloodghast's "can't
+block" (a drawback that costs nothing), Sakura-Tribe Elder's
+chump-then-sacrifice (`engine.sakura_tribe_elder` says so), and the attack
+taxes as taxes on DECLARED attackers (Ghostly Prison and Propaganda are a
+0.5 deflection knob, `attack_tax_deflect`). §0z170 gave the swing a
+lognormal spread for the clock floor only; "a pod that piles onto a player
+at 1-3 life" is still unmeasured, in its own words.
+
+**A1 and A2 are the combat half of §4** (the pod's boards are a count).
+They are one piece of work: once your attackers can die, the hold-back and
+the pod's block decision are each other's inputs, and once you can block,
+`combat_share`, `incidental_rate` and the hold-back are all re-derived.
+§0z186's much smaller change (tapped creatures stop blocking) moved T20 win
+rate by -0.041 to -0.105 per deck and re-fitted `incidental_rate`; expect
+this to move the pod's fit (§0z195) and every table.
+
+**A3. THE KILL IGNORES YOUR LIFE AND YOUR BLOCKERS.** Each opponent's kill
+is rolled at its kill turn and aimed by threat (`your_share`,
+`_clock_seat`): when it picks you, you lose at any life total and any
+board. The only exceptions are Angel of Suffering (`angel_prevents_kill`,
+combat routes only) and the attack taxes (`tax_deflects`). So life and
+blockers defend only against the chip losses -- 12-36% of losses by
+§0z192's count, 64-88% being the clock. Lifelink and lifegain rows are
+capped on defence by this, not by their text.
+
+**A4. RIVALS NEVER LOSE LIFE TO EACH OTHER.** An opponent's life goes down
+only from YOUR effects (`damage_each`, `damage_single`, `combat_damage`,
+`goaded_combat`); the other way out is a rival's clock eliminating them
+outright (`_clock_seat`'s `victim.life = 0.0`). The pod's chip damage
+that is not aimed at you goes nowhere. So every opponent sits at 40 until
+you hit them, which bears on every damage and drain card and on commander
+damage. **Not written down anywhere before this section** (searched:
+KNOWN_ISSUES, ARCHITECTURE, the opponents docstrings).
+
+**A5. YOUR PLANESWALKERS ARE NEVER ATTACKED.** Loyalty falls only to your
+own minus abilities and to removal (`engine.walker_ready`, the pod's
+combat never names a walker). In the staged lists: Sorin, Solemn Visitor
+and Sorin, Vengeful Bloodlord (karlov), Grist, the Hunger Tide (rendmaw).
+Their rows are ceilings by that.
+
+**A6. THE POD ACTS IN ITS OWN MAIN PHASE ONLY.** Its removal, wipes and A/E
+removal are `opponent_removal` in each seat's main 1 (§0z179); on YOUR turn
+the only interaction is a counterspell as you cast (`opponents.countered`).
+No removal in response to an attack, an ETB, an activation or a combo. A
+haste creature, an attack trigger and an ETB always get their first action.
+`combat_damage`'s assignment rule assumes the defender removes your biggest
+attacker -- a pilot's caution against a removal the pod never casts.
+
+**A7. X SPELLS HAVE A FIXED X.** Finale of Devastation and Genesis Wave at
+6 (azusa, "the project's X-spell convention"), Torment of Hailfire at 6
+(tivit), and azusa's Chord of Calling at X=4 for a flat {4}{G}{G}{G},
+with no convoke (`script="chord_of_calling"`, `tutor_creature(4)`).
+**Trostani implements Chord's convoke and plans its X**
+(`TrostaniGame.convoke_pool`, `x_plan`): the same card, two rules -- §0u's
+shape.
+
+### B. Still open from §0z184 (queue item 37)
+
+| finding | card / place | row at `63d20e7` (T20) |
+|---|---|---|
+| 7 | Black Market Connections (shilgengar) is taken in the upkeep, not "at the beginning of your first main phase" | +0.0008 ±0.0032 `--` |
+| 7 | shilgengar's `activations` (Priest of Fell Rites, "activate only as a sorcery"; Skullclamp's equip) run before Pearl Collector's "beginning of your second main phase" | -- |
+| 8 | Memory Jar (azusa) is not implemented at all | +0.0045 ±0.0025, MODEL-BLIND |
+| 8 | Voldaren Bloodcaster // Bloodbat Summoner (shilgengar): the back face is read only as a sacrifice payoff | +0.0018 ±0.0020 `dmg` |
+| 6 | first and double strike (Lyra Dawnbringer, Sunhome) -- waits on A1 | -- |
+| 9 | you always take the game's first turn (seat 0) -- a decision to write down | -- |
+
+### C. Card text not modelled, in the staged lists
+
+From the keyword census and the engines' own comments:
+
+- **Ward**: Tivit, Seller of Secrets' own ward {3} (`tivit.py`'s header
+  says so), Hexing Squelcher (PARTLY, its note says so), Roaming Throne
+  (rendmaw). The pod's spot removal pays no ward cost. Tivit's is the one
+  that matters: it guards the commander.
+- **Cycling**: Barren Moor and Secluded Steppe (karlov), Raffine's Tower
+  (tivit), Angel of the Ruins' plainscycling (shilgengar; its PARTLY note
+  names it). Floors.
+- **WOE STRIDER IS MIS-CLASSIFIED.** It is in `tools/ablation.py`'s
+  SCRIPTED set (MODEL-EVALUATED, "a low score is evidence about the card"),
+  but only its Goat is implemented (`engine.py`, `script="woe_strider"`):
+  "Sacrifice another creature: Scry 1" and escape are not (§0z118 item 9
+  already said the escape was missing). Its row, +0.0035
+  ±0.0018 `both`, is a floor read as evidence. It belongs in
+  PARTLY_MODELLED.
+- Already named in a note or a docstring, listed so they are in one place:
+  Priest of Fell Rites' unearth (shilgengar), Cyberdrive Awakener counting
+  summoning-sick tokens (tivit, a ceiling), Furygale Flocking's split
+  (lorehold, a slight ceiling).
+
+### D. Statements in the code that contradict the model
+
+- `edhmc/engine.py`'s module docstring (lines 4-14) lists "opponents'
+  removal, counterspells, blockers, board wipes" as NOT MODELLED. All four
+  are.
+- `engine.combat`'s lifelink comment (about lines 5286-5301): "100% of
+  losses in all three decks are opponent CLOCKS", "a lifelinking body's
+  defensive value here is nil", "MODEL-BLIND". Written before pod v3;
+  §0z192 has 12-36% of losses by life.
+- The PARTLY note printed under Bloodthirsty Conqueror and South Wind
+  Avatar (`tools/ablation.py`, "deathtouch, which nothing in the blocking
+  model reads") and `engine.vault_of_the_archangel`'s "Deathtouch is not
+  modelled": `pod_blocker_deaths` reads `deathtouch_of`, and `pod_bodies`
+  and `pod_blocker_deaths` are both on by default (§0z132). Deathtouch
+  kills a blocker; what is still true is A1 -- it never SAVES your attacker.
+- `karlov.combat`'s Guide of Souls comment, "nothing in damage_through
+  reads evasion": `flying_of` has since 2026-09-04. The card is not in the
+  list, so this is latent.
+- `docs/ORACLE_AUDIT_*.md` exist for karlov, lorehold, rendmaw (dated
+  2026-09-03) and trostani. **Tivit, shilgengar and azusa have none**;
+  §0z184's Scryfall pass searched only for text naming a step or phase.
+
+### E. Hand-typed keyword data with no check
+
+`Card.haste` and `Card.lifelink` are typed by hand in the deck modules;
+flying, menace, trample, deathtouch, vigilance, indestructible and the
+subtypes are generated by `tools/tag_flying.py`, and `tools/audit_cards`
+checks flying only. The census found **no wrong tag** among 647 cards
+(Lorehold, the Historian's haste is untagged and handled by name, `sick=False`
+in `lorehold.py`), so it is latent -- but it is §0q's shape: a hand list
+with no derivation and no check.
+
+### How the work is to be done (the owner, 2026-11-12)
+
+**A1 and A2 first; TEST each change, DO NOT REBUILD THE TABLES during it.**
+"There is no point when there is so much to do." The tables stay as built
+at `63d20e7` until the batch is done and the owner calls one rebuild. The
+protocol is in queue item 44.
 
 ## How to read an ablation table
 
