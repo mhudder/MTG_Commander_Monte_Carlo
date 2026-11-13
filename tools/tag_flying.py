@@ -541,6 +541,26 @@ def main():
                     and "First strike" in c.get("keywords", [])
                     and not re.search(r"(gains?|have|has)[^.]*first strike",
                                       (c.get("oracle_text") or "").lower())}
+    # REACH AND "CAN'T BLOCK", 2026-11-13 (§0z199, queue item 44 A2): once
+    # you block the pod's attacks (`you_block`), a creature with reach blocks
+    # a flier (702.17b) and one that "can't block" does not (Bloodghast).
+    # Reach by vigilance's rule (creatures, unconditional, grants excluded);
+    # "can't block" from the oracle text, unconditional -- "this creature
+    # can't block" or the card's own name, never "this turn" or "as long as".
+    reach = {n for n, c in cards.items()
+             if n in creatures and "Reach" in c.get("keywords", [])
+             and not re.search(r"(gains?|have|has)[^.]*reach",
+                               (c.get("oracle_text") or "").lower())}
+    cant_block = set()
+    for n, c in cards.items():
+        if n not in creatures:
+            continue
+        text = (c.get("oracle_text") or "").lower()
+        own = n.split(" // ")[0].split(",")[0].lower()
+        for m in re.finditer(r"(this creature|" + re.escape(own)
+                             + r") can't block([^.]*)\.", text):
+            if "this turn" not in m.group(2) and "as long as" not in m.group(2):
+                cant_block.add(n)
     double_strike = {n for n, c in cards.items()
                      if n in creatures
                      and "Double strike" in c.get("keywords", [])
@@ -705,6 +725,14 @@ def main():
 
     print(f"\nFIRST STRIKE ({len(first_strike)}):")
     for n in sorted(first_strike):
+        print(f"    {n}")
+
+    print(f"\nREACH ({len(reach)}):")
+    for n in sorted(reach):
+        print(f"    {n}")
+
+    print(f"\nCAN'T BLOCK ({len(cant_block)}):")
+    for n in sorted(cant_block):
         print(f"    {n}")
 
     print(f"\nDOUBLE STRIKE ({len(double_strike)}):")
@@ -886,6 +914,16 @@ def main():
                 fh.write(f"    {n!r},\n")
             fh.write("}\nDOUBLE_STRIKE = {\n")
             for n in sorted(double_strike):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# REACH and CAN'T BLOCK: creatures with the keyword, and "
+                     "creatures whose\n# own text says \"this creature can't "
+                     "block\", unconditional. Read by\n# `opponents.your_blockers` "
+                     "(§0z199).\nREACH = {\n")
+            for n in sorted(reach):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\nCANT_BLOCK = {\n")
+            for n in sorted(cant_block):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# ATTACK TAXES: \"creatures can't attack you unless "

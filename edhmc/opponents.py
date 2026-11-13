@@ -152,6 +152,11 @@ class Opponent:
     # `body_pool` the sequence they are drawn from in order (a `BodyPool`,
     # rolled as it is read: §0z144; a test may set a plain tuple).
     bodies: list = field(default_factory=list)
+    # A2 (§0z199, `you_block`): `body_tapped[k]` -- body k attacked on this
+    # opponent's turn and stays tapped until its next untap step (502.3), so
+    # it does not block on yours. Kept beside `bodies` by `pod_bodies` and
+    # `kill_pod_bodies`, the only two writers; a shorter list reads untapped.
+    body_tapped: list = field(default_factory=list)
     body_pool: Sequence = ()
     next_body: int = 0
     # THE KILL AS A ROUTE OF PIECES (item 24, change 2; `pod_threats`, OFF).
@@ -354,7 +359,8 @@ def roll_body_pools(cfg, seed, opps) -> None:
     mvmax = max(1, int(round(2 / share))) if share > 0 else 1
     black = cfg.get("pod_black_share", 0.25)
     combat = None
-    if cfg.get("attacker_deaths", False):                       # §0z198
+    if (cfg.get("attacker_deaths", False)                       # §0z198
+            or cfg.get("you_block", False)):                       # §0z199
         combat = (max(1, int(cfg.get("pod_body_power_max", tmax))),
                   cfg.get("pod_utility_share", 0.3),
                   max(0, int(cfg.get("pod_utility_power_max", 2))),
@@ -397,6 +403,7 @@ def pod_bodies(g, o) -> list:
         o.bodies.append(pool[o.next_body % len(pool)])
         o.next_body += 1
     del o.bodies[n:]
+    del o.body_tapped[n:]                     # §0z199: the flags follow
     return o.bodies
 
 
@@ -410,10 +417,13 @@ def kill_pod_bodies(g, o, dies=None) -> int:
     if dies is None:
         n = len(bodies)
         o.bodies = []
+        o.body_tapped = []
         o.creatures = 0.0
     else:
-        keep = [b for b in bodies if not dies(b)]
+        flags = [bool(dies(b)) for b in bodies]
+        keep = [b for b, f in zip(bodies, flags) if not f]
         n = len(bodies) - len(keep)
+        o.body_tapped = [t for t, f in zip(o.body_tapped, flags) if not f]
         o.bodies = keep
         o.creatures = max(0.0, o.creatures - n)
     if n:
@@ -2671,7 +2681,10 @@ def double_strike_of(g, perm) -> bool:
 
 _Atk = namedtuple("_Atk", "k perm power tough fly menace trample dt fs ds "
                           "hardy value must")
-_Blk = namedtuple("_Blk", "ref power tough reach utility value")
+# A blocker: `fs`, `hardy` and `dt` are YOUR blockers' first strike,
+# indestructible and deathtouch under A2 (§0z199); the pod's bodies have none.
+_Blk = namedtuple("_Blk", "ref power tough reach utility value fs hardy dt",
+                  defaults=(False, False, False))
 
 
 def attack_facts(g, perm, k, defender) -> "_Atk":
@@ -2692,9 +2705,16 @@ def available_blockers(g, defender):
     by itself here). A Bird's ref is ("bird", i); a body's, its index."""
     birds = int(defender.goaded_birds + 1e-9)
     out = [_Blk(("bird", i), 2, 2, True, False, 0.0) for i in range(birds)]
+    a2 = you_block_on(g)
     for i, b in enumerate(pod_bodies(g, defender)):
+        if a2 and body_tapped(defender, i):
+            continue                  # it attacked on its turn (§0z199)
         out.append(_Blk(i, b.power, b.toughness, b.reach, b.utility,
                         float(b.mv)))
+    if a2:
+        # A2 (§0z199): which bodies are tapped is a fact now, so every
+        # untapped one may block -- the cap stood in for it.
+        return out, len(out)
     share = g.cfg.get("block_share", 0.60)
     cap = int((defender.creatures + defender.goaded_birds) * share)
     return out, cap
@@ -2702,23 +2722,54 @@ def available_blockers(g, defender):
 
 def _blocker_dies(a, b) -> bool:
     """Does `a`'s damage kill blocker `b`, `b` alone in front of it?"""
-    return a.dt or b.tough <= a.power
+    return bool(_attacker_kills(a, [b]))
+
+
+def _blockers_first(a, blks) -> bool:
+    """Do first-striking blockers kill `a` before it deals its damage (510.4)?
+    Not an attacker that strikes first too: both deal in that step."""
+    if a.fs or a.hardy:
+        return False
+    first = [b for b in blks if b.fs]
+    return bool(first) and (any(b.dt and b.power > 0 for b in first)
+                            or sum(b.power for b in first) >= a.tough)
+
+
+def _dealers(a, blks):
+    """The blockers that deal `a` damage: all of them, unless `a` strikes
+    first, when those it kills in that step deal none (a first-striking
+    blocker deals in the same step, 510.4)."""
+    if not a.fs:
+        return list(blks)
+    killed = {id(r) for r in _first_strike_kills(a, blks)}
+    return [b for b in blks if b.fs or id(b.ref) not in killed]
 
 
 def _kills(a, blks) -> bool:
     """Do these blockers kill attacker `a`? A first striker kills what it can
-    first, and those deal nothing back (510.4)."""
+    first, and those deal nothing back (510.4); a deathtouch blocker that
+    deals damage kills (702.2b); an indestructible attacker lives."""
     if a.hardy:
         return False
-    return _damage_back(a, blks) >= a.tough
+    if _blockers_first(a, blks):
+        return True
+    dealers = _dealers(a, blks)
+    return (any(b.dt and b.power > 0 for b in dealers)
+            or _damage_back(a, blks) >= a.tough)
 
 
 def _damage_back(a, blks) -> int:
     """The damage `blks` deal attacker `a`, after its first-strike damage."""
-    if not a.fs:
-        return sum(b.power for b in blks)
-    killed = set(_first_strike_kills(a, blks))
-    return sum(b.power for b in blks if b.ref not in killed)
+    return sum(b.power for b in _dealers(a, blks))
+
+
+def _attacker_kills(a, blks):
+    """The blockers `a`'s damage kills: none if first-striking blockers kill
+    it first; an indestructible blocker takes its share and lives."""
+    if _blockers_first(a, blks):
+        return []
+    hardy = {id(b.ref) for b in blks if b.hardy}
+    return [r for r in _first_strike_kills(a, blks) if id(r) not in hardy]
 
 
 def _first_strike_kills(a, blks):
@@ -2747,23 +2798,29 @@ def _stops(a, blks) -> float:
     return float(a.power)
 
 
-def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
-                count=False):
+def plan_blocks(g, life, atk, blockers, cap, free_power=0.0,
+                count=False, floor=None, prefix="pod_block_"):
     """The defender's blocks: {attacker k: [blocker, ...]} by the order in
-    the A1 header. Reads the board and writes nothing but, with `count`, the
-    `pod_block_<kind>` counters -- a question asked of it changes nothing."""
+    the A1 header, for a defender at `life` -- an opponent (A1) or you (A2,
+    §0z199: the same rule, the owner's "same as 1"). Reads the board and
+    writes nothing but, with `count`, the `<prefix><kind>` counters -- a
+    question asked of it changes nothing. `floor` is the pressure floor
+    (`pod_chump_floor`, 10, by default)."""
     m = g.m
     asg, used = {}, set()
-    room = max(0.0, defender.life - g.cfg.get("pod_chump_floor", 10))
+    if floor is None:
+        floor = g.cfg.get("pod_chump_floor", 10)
+    room = max(0.0, life - floor)
+    pos = {id(b): n for n, b in enumerate(blockers)}
 
     def left():
         return cap - len(used)
 
     def take(a, blks, kind):
         asg[a.k] = list(blks)
-        used.update(b.ref for b in blks)
+        used.update(id(b) for b in blks)
         if count:
-            m[f"pod_block_{kind}"] += 1
+            m[f"{prefix}{kind}"] += 1
 
     # The damage still coming, kept as blocks are taken, so the pressure
     # steps below are linear in the attackers, not quadratic (azusa's boards
@@ -2779,10 +2836,10 @@ def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
 
     def cheapest(cands):
         return min(cands, key=lambda b: (b.value, b.power, b.tough,
-                                         str(b.ref)))
+                                         pos[id(b)]))
 
     def open_blockers(a, utility=False):
-        return [b for b in blockers if b.ref not in used
+        return [b for b in blockers if id(b) not in used
                 and (not a.fly or b.reach) and (utility or not b.utility)]
 
     # 0 -- a commander one hit from 21 (§0z67)
@@ -2797,8 +2854,8 @@ def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
                     and not _blocker_dies(a, b)] or cands
             take_and_track(a, [cheapest(best)], "must")
         else:
-            take_and_track(a, sorted(cands, key=lambda b: (b.value, b.power))
-                           [:2], "must")
+            take_and_track(a, sorted(cands, key=lambda b: (
+                b.value, b.power, pos[id(b)]))[:2], "must")
 
     single = sorted((a for a in atk if not a.menace),
                     key=lambda a: (-a.value, -a.power, a.k))
@@ -2807,7 +2864,7 @@ def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
     for kind, order in (("free", single), ("trade", single),
                         ("safe", by_power)):
         for a in order:
-            if left() < 1 or not any(b.ref not in used and not b.utility
+            if left() < 1 or not any(id(b) not in used and not b.utility
                                      for b in blockers):
                 break
             if a.k in asg:
@@ -2827,7 +2884,7 @@ def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
     # 4 -- pressure, 5 -- lethal: chump, the most stopped per blocker first
     order = sorted(atk, key=lambda a: (-(a.power / cost(a)), a.k))
     for kind, utility in (("chump", False), ("utility", True)):
-        limit = room if kind == "chump" else max(0.0, defender.life - 1e-9)
+        limit = room if kind == "chump" else max(0.0, life - 1e-9)
         for a in order:
             if coming[0] <= limit or left() < 1:
                 break
@@ -2835,13 +2892,13 @@ def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
                 continue
             cands = open_blockers(a, utility)
             if not cands:
-                if not any(b.ref not in used for b in blockers):
+                if not any(id(b) not in used for b in blockers):
                     break
                 continue
             if len(cands) < cost(a):
                 continue
             take_and_track(a, sorted(cands, key=lambda b: (
-                b.utility, b.value, b.power, str(b.ref)))[:cost(a)], kind)
+                b.utility, b.value, b.power, pos[id(b)]))[:cost(a)], kind)
     return asg
 
 
@@ -2862,7 +2919,7 @@ def _trade_through(g, attackers, defender, unblocked, assign, count=None):
         blockers, cap = [], 0             # Serra's Emissary (§0z84)
     else:
         blockers, cap = available_blockers(g, defender)
-    asg = plan_blocks(g, defender, atk, blockers, cap, free_power,
+    asg = plan_blocks(g, defender.life, atk, blockers, cap, free_power,
                       count=count)
     if assign is not None:                # the combat, or its preview
         assign.extend((a, asg[a.k]) for a in atk if a.k in asg)
@@ -2888,15 +2945,13 @@ def resolve_trades(g, defender, assigned) -> tuple:
     event for your side (603.10a, §0z76)."""
     birds_dead, dead_bodies, mine = 0, set(), []
     for a, blks in assigned:
-        if a.fs:
-            killed = set(_first_strike_kills(a, blks))
-            if a.ds:                       # its regular damage too (510.4)
-                rest = [b for b in blks if b.ref not in killed]
-                killed |= set(_first_strike_kills(a, rest))
-        else:
-            killed = set(_first_strike_kills(a, blks))
+        killed = {id(r) for r in _attacker_kills(a, blks)}
+        if a.ds and not _blockers_first(a, blks):    # its regular damage too
+            rest = [b for b in blks if id(b.ref) not in killed
+                    and not b.hardy]
+            killed |= {id(r) for r in _first_strike_kills(a, rest)}  # 510.4
         for b in blks:
-            if b.ref in killed:
+            if id(b.ref) in killed:
                 if isinstance(b.ref, tuple):
                     birds_dead += 1
                 else:
@@ -2927,6 +2982,249 @@ def resolve_trades(g, defender, assigned) -> tuple:
         if any(p.card is g.commander for p in mine):
             g.m["commander_died_in_combat"] += 1
     return n, died
+
+
+# ---------------------------------------------------------------------------
+# A2 -- YOU BLOCK; THE POD DECLARES ITS ATTACKS (§0z199, queue item 44;
+# `you_block`, OFF until the batch flips together)
+# ---------------------------------------------------------------------------
+# Until this, an opponent's attack at you was a formula -- `chip_amount`, an
+# expectation dealt every pod turn -- and your creatures only lowered its
+# share (§0z197 A2). Under the switch, on `pod_bodies`, each opponent's
+# combat step (`chip_damage_seat`) is a combat:
+#
+#   WHO ATTACKS.  Each of its untapped combat bodies (never a utility one)
+#     attacks with `pod_attack_rate`, at you with the share the formula
+#     used (`chip_share`: how open you are, the crown's floor), and past the
+#     attack taxes with their through-rate -- three CRN-addressed draws a
+#     body, always all three, so the streams stay aligned. A body that
+#     attacks someone else goes nowhere (A4: rivals' life is not yet
+#     modelled, said here). THE RATE'S DEFAULT IS A BRIDGE, not a judgement
+#     (`pod_attack_rate`): chosen each turn so the swing at you BEFORE your
+#     blocks is, in expectation, the formula's, and A2 measures the blocks,
+#     the deaths and the lumps -- not a recalibration (the pod is re-fitted
+#     once at the batch's end, item 44).
+#   WHAT IT SENDS.  The pod reads your blocks (`plan_blocks` from your side)
+#     and keeps home a body that would die at a loss -- the pilot's own
+#     `safe_attackers` rule, mirrored -- unless the attack kills you.
+#   YOUR BLOCKS.  The same `plan_blocks` (the owner: "same as 1"), with your
+#     untapped creatures that can block (not "can't block", the generated
+#     CANT_BLOCK); a flier only by a flier or reach (the generated REACH);
+#     your utility creatures -- the commander, a mana creature, an animated
+#     land, a creature kept home for its tap ability -- only at lethal; the
+#     pressure floor `your_chump_floor` (10); your creature valued at
+#     `threat_of`, theirs at its mana value, as A1.
+#   DAMAGE.  The unblocked bodies' power is dealt to you (`damage_you`:
+#     Angel of Suffering prevents it); combat damage to you takes the crown
+#     (an event now, not the old roll); your blockers die past their
+#     toughness (indestructible lives; first strike and deathtouch on YOUR
+#     blockers are read), through `destroy`; the bodies they kill die as
+#     events (`kill_pod_bodies`); a lifelink blocker gains its damage
+#     (`Card.lifelink`, Whip of Erebos). An attacking body taps and does not
+#     block on your turn (`body_tapped`; A1's `block_share` cap is replaced
+#     by that fact under this switch).
+#
+# The pod's bodies attack as fliers when they have the A1 `reach` flag (the
+# count's "fliers plus reach" share, so a ceiling on the pod's evasion), and
+# have no trample, deathtouch or first strike: a floor on the pod.
+# `predicted_chip`, the pilot's read of the next swing, keeps the formula:
+# by the bridge it is the swing's expectation before your blocks, so it
+# reads high -- a cautious pilot, said.
+
+def you_block_on(g) -> bool:
+    """A2's switch (§0z199). Needs `pod_bodies` (the attackers are bodies)."""
+    return bool(g.cfg.get("you_block", False)) and pod_bodies_on(g)
+
+
+def body_tapped(o, i) -> bool:
+    return i < len(o.body_tapped) and bool(o.body_tapped[i])
+
+
+def your_utility(g, perm) -> bool:
+    """A creature of yours that blocks only at lethal: the commander, a
+    creature that taps for mana, an animated land, or one kept home for its
+    tap ability (`holds_back`). A judgement, written once (§0z199)."""
+    c = perm.card
+    return (c is g.commander or bool(c.mana_ability) or c.is_land
+            or holds_back(g, perm))
+
+
+def your_blockers(g):
+    """Your creatures that can block right now, as `_Blk`s (ref: the
+    Permanent): untapped (509.1a), not "can't block" (CANT_BLOCK)."""
+    from edhmc.decks._evasion import CANT_BLOCK, DEATHTOUCH, REACH
+    ask = getattr(g, "counts_as_creature", None)
+    out = []
+    for p in g.board:
+        if not (ask(p) if ask is not None else is_creature_now(g, p)):
+            continue
+        n = p.card.name
+        if p.tapped or n in CANT_BLOCK:
+            continue
+        out.append(_Blk(p, g.power_of(p), g.toughness_of(p),
+                        flying_of(g, p) or n in REACH, your_utility(g, p),
+                        threat_of(g, p), first_strike_of(g, p),
+                        is_hardy(g, p), n in DEATHTOUCH))
+    return out
+
+
+def pod_attack_rate(g, opp, combat_power) -> float:
+    """P(an untapped combat body attacks this turn): `pod_attack_rate`, or
+    THE BRIDGE (§0z199): `incidental_rate` x `p["power"]` x the creature
+    COUNT / the summed power of the combat bodies, at most 1 -- so that,
+    turn by turn and given the bodies actually there, the swing aimed at
+    you before your blocks is in expectation the formula's
+    (`chip_amount`). The count is fractional and the bodies are its floor,
+    so a bridge on body averages would undershoot. Capped at 1 (a board of
+    few, weak bodies), where it falls short and `chip_formula_equiv` against
+    `pod_attack_offered` shows by how much."""
+    rate = g.cfg.get("pod_attack_rate")
+    if rate is not None:
+        return float(rate)
+    if combat_power <= 0:
+        return 0.0
+    return min(1.0, g.cfg.get("incidental_rate", 0.45)
+               * opp.p.get("power", 1.0) * opp.creatures / combat_power)
+
+
+def _body_facts(bodies, ks):
+    """The pod's attacking bodies as `_Atk`s (ref: ("body", k))."""
+    return [_Atk(k, ("body", k), bodies[k].power, bodies[k].toughness,
+                 bodies[k].reach, False, False, False, False, False, False,
+                 float(bodies[k].mv), False) for k in ks]
+
+
+def _your_lifelink(g, n) -> None:
+    """Life a lifelink blocker gains, through the engine's own life gain
+    where it has one (karlov's triggers count it)."""
+    if n <= 0:
+        return
+    gain = getattr(g, "gain_life", None)
+    if gain is None:
+        import sys as _sys
+        gain_fn = getattr(_sys.modules.get(type(g).__module__), "gain_life",
+                          None)
+        if gain_fn is not None:
+            gain_fn(g, n)
+            return
+        g.your_life += n
+        return
+    gain(n)
+
+
+def pod_safe_attack(g, sent, plan) -> list:
+    """THE POD'S READ OF YOUR BLOCKS (§0z199): of the bodies `sent`, keep
+    home any that `plan` (your blocks, from the board) would kill at a loss
+    -- dying and taking no blocker worth as much -- unless the attack kills
+    you. The pilot's `safe_attackers`, mirrored; up to three passes."""
+    for _ in range(3):
+        atk, asg = plan(sent)
+        if sum(a.power for a in atk if a.k not in asg) >= g.your_life:
+            break
+        waste = set()
+        for a in atk:
+            blks = asg.get(a.k)
+            if not blks or not _kills(a, blks):
+                continue
+            killed = {id(r) for r in _attacker_kills(a, blks)}
+            worth = max((b.value for b in blks if id(b.ref) in killed),
+                        default=-1.0)
+            if worth < a.value:
+                waste.add(a.k)
+        if not waste:
+            break
+        sent = [k for k in sent if k not in waste]
+    return sent
+
+
+def crown_on_combat_damage(g, dealt) -> None:
+    """"Whenever a creature deals combat damage to the monarch, its
+    controller becomes the monarch" (the monarch's rule): under A2 an event,
+    where the formula rolled it against the share (§0z199)."""
+    if dealt > 0 and g.monarch:
+        g.monarch = False
+        g.m["monarch_lost"] += 1
+
+
+def seat_attack(g, i) -> None:
+    """Opponent `i`'s combat step at you under A2 (§0z199): see the header."""
+    from edhmc.engine import crn_random, damage_you
+    opp = g.opponents[i]
+    bodies = pod_bodies(g, opp)
+    opp.body_tapped = [False] * len(bodies)      # its untap step (502.3)
+    others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
+    share = chip_share(g, opp, others)
+    through = attack_tax_through(g)
+    combat = [k for k, b in enumerate(bodies)
+              if not b.utility and b.power > 0]
+    rate = pod_attack_rate(g, opp, sum(bodies[k].power for k in combat))
+    # What the formula would have dealt this turn, before prevention: the
+    # bridge's target, counted beside what the rolls offered (§0z199).
+    g.m["chip_formula_equiv"] += chip_amount(g, opp, share)
+    sent = []
+    for k in combat:
+        r_attack = crn_random(g, f"pod_attack{i}")
+        r_aim = crn_random(g, f"pod_aim{i}")
+        r_tax = crn_random(g, f"pod_tax{i}")
+        if r_attack >= rate or r_aim >= share:
+            continue
+        if r_tax >= through:
+            g.m["pod_attackers_taxed"] += 1
+            continue
+        sent.append(k)
+    g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
+    if not sent:
+        return
+    blockers = your_blockers(g)
+    floor = g.cfg.get("your_chump_floor", 10)
+
+    def plan(ks, count=False):
+        atk = _body_facts(bodies, ks)
+        return atk, plan_blocks(g, g.your_life, atk, blockers, len(blockers),
+                                count=count, floor=floor,
+                                prefix="your_block_")
+
+    first = len(sent)
+    if g.cfg.get("pod_attack_safety", True):           # §0z199
+        sent = pod_safe_attack(g, sent, plan)
+    if first > len(sent):
+        g.m["pod_attackers_held"] += first - len(sent)
+    if not sent:
+        return
+    for k in sent:
+        opp.body_tapped[k] = True                 # attacking taps (508.1f)
+    atk, asg = plan(sent, count=True)
+    g.m["pod_attacks"] += len(sent)
+    dmg = float(sum(a.power for a in atk if a.k not in asg))
+    dead_bodies, mine, link = set(), [], 0
+    whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
+    for a in atk:
+        blks = asg.get(a.k)
+        if not blks:
+            continue
+        if _kills(a, blks):
+            dead_bodies.add(a.k)
+        mine.extend(_attacker_kills(a, blks))
+        for b in _dealers(a, blks):
+            if b.ref.card.lifelink or whip:
+                link += b.power
+    if dmg > 0:
+        dealt = damage_you(g, dmg)
+        g.your_life -= dealt
+        g.m["pod_attack_damage"] += dealt
+        crown_on_combat_damage(g, dealt)
+    _your_lifelink(g, link)
+    if mine:
+        died = 0
+        with simultaneous(g):
+            for p in mine:
+                if destroy(g, p, destroys=True):
+                    died += 1
+        g.m["your_blockers_died"] += died
+    if dead_bodies:
+        flags = iter([k in dead_bodies for k in range(len(bodies))])
+        g.m["pod_attackers_killed"] += kill_pod_bodies(
+            g, opp, lambda b: next(flags))
 
 
 def _blocker_counts(g, defender):
@@ -3774,8 +4072,8 @@ def preview_trades(g, attackers):
             # itself with it, read in the defender's own units (`mv`
             # against `threat_of`): a trade the defender chose is, by its
             # own rule, one it wins on value.
-            killed = set(_first_strike_kills(a, blks))
-            worth = max((b.value for b in blks if b.ref in killed),
+            killed = {id(r) for r in _attacker_kills(a, blks)}
+            worth = max((b.value for b in blks if id(b.ref) in killed),
                         default=-1.0)
             if worth < a.value:
                 wasted.add(id(a.perm))
@@ -4231,6 +4529,10 @@ def chip_damage_seat(g, i) -> None:
         return
     if protected_from_creatures(g):
         g.m["emissary_prevented_turns"] += 1   # §0z84
+        return
+    if you_block_on(g):                  # a combat, not a formula (§0z199)
+        seat_attack(g, i)
+        _chip_loss(g)
         return
     ends = g.cfg.get("crown_loss_ends_chip", False)
     if ends and getattr(g, "pod_chip_ended", None) == g.turn:

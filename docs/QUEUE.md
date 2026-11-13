@@ -198,16 +198,20 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
 
-    **STATUS 2026-11-13: A1 BUILT, OFF (§0z198)** -- `attacker_deaths`,
-    evaluated blocks, first and double strike, the pilot's
-    `safe_attackers`; OFF proved identical and the caches VERIFIED; ON
-    measured per deck. **Next: A2** (you block), then the batch flips its
-    defaults together. Left open by A1, for A2's work: the pilot's value
-    rule ignores lifelink (karlov), and which bodies may block is the
-    defender's choice under the `block_share` cap until tapped creatures
-    are a fact. The combat half of §4, and the
-    largest revision since pod v3. One piece of work, A1 then A2, through
-    one combat resolution both directions share -- not two copies (§0u).
+    **STATUS 2026-11-13: A1 AND A2 BUILT, BOTH OFF** -- A1 (§0z198):
+    `attacker_deaths`, evaluated blocks, first and double strike, the
+    pilot's `safe_attackers`. A2 (§0z199): `you_block`, the pod's combat
+    step a combat of bodies (the rate a bridge to the formula), the pod's
+    read of your blocks (`pod_safe_attack`), your blocks by the same rule,
+    tapped attackers that do not block, the crown an event. OFF proved
+    identical both times and the caches VERIFIED; ON measured per deck,
+    alone and together. **What is left before the defaults flip**, each the
+    owner's to order: A4 (rivals' life -- an attack aimed at a rival still
+    goes nowhere, decided by §0z199 as "next, behind its own switch"); the
+    pilot's value rule and lifelink (karlov, §0z198); the pod keeping
+    blockers home against your crack-back; `predicted_chip` read off the
+    bodies instead of the formula; then the flip, the re-fit (§0z195) and
+    one rebuild.
 
     **TEST EACH CHANGE; DO NOT REBUILD THE TABLES DURING IT** -- not one
     deck, not at the end of a step. "There is no point when there is so

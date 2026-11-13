@@ -556,6 +556,24 @@ FIRST_STRIKE = {
 DOUBLE_STRIKE = {
 }
 
+# REACH and CAN'T BLOCK: creatures with the keyword, and creatures whose
+# own text says "this creature can't block", unconditional. Read by
+# `opponents.your_blockers` (§0z199).
+REACH = {
+    'Ancient Greenwarden',
+    'Arasta of the Endless Web',
+    'Elfsworn Giant',
+    'Fire Navy Trebuchet',
+    'Longshot, Rebel Bowman',
+    'Rendmaw, Creaking Nest',
+    'The Dawning Archaic',
+    'Ulvenwald Hydra',
+}
+CANT_BLOCK = {
+    'Bloodghast',
+    'Starscape Cleric',
+}
+
 # ATTACK TAXES: "creatures can't attack you unless their controller
 # pays {N} for each creature ..." -> N. Read by `opponents.attack_tax_through`
 # under `pod_threats` (§0z138).

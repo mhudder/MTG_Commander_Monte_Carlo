@@ -251,6 +251,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
 | [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
 | [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44). ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045; the pilot alone is +0.028 to +0.126 |
+| [0z199](#0z199) | BUILT | **A2: you block; the pod declares its attacks** (`you_block`, OFF; item 44). Over A1, T20: +0.007 to +0.071 (the pod deals 57-87% of the formula); A1+A2 together -0.035 to +0.052; T10 down everywhere |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17565,6 +17566,171 @@ trade's worth read in the defender's units.
 (6), `pod_utility_power_max` (2), `flier_block_share` as reach (0.3),
 `block_share` as the blockers' cap (0.6), `pod_chump_floor` (10), and the
 value units (`mv` against `threat_of`). None has data; none is swept yet.
+
+<a id="0z199"></a>
+
+## 0z199. BUILT -- A2: you block; the pod declares its attacks (`you_block`, OFF)
+
+**Queue item 44, the owner, 2026-11-13: "go ahead and start on A2"**, after
+A1 (§0z198). §0z197 A2: until this, an opponent's attack at you was a
+formula, `chip_amount`, an expectation dealt every pod turn; your creatures
+only lowered its share and never blocked, died or killed anything.
+
+**Built behind one switch, `you_block`, default OFF**, item 44's protocol:
+OFF proved unchanged, every default of the batch flipped together at its
+end, the pod re-fitted once, one rebuild. **No table was rebuilt.**
+
+### What the switch does (`edhmc/opponents.py`, the A2 block)
+
+- **Each opponent's combat step is a combat** (`seat_attack`, from
+  `chip_damage_seat`). Each untapped combat body (never a utility one)
+  attacks with `pod_attack_rate`, at you with the share the formula used
+  (`chip_share`: how open you are, the crown's floor), past the attack
+  taxes with their through-rate: three CRN-addressed draws a body, always
+  all three. A body aimed elsewhere goes nowhere -- A4, rivals' life, is
+  still not modelled.
+- **The rate's default is a BRIDGE, not a judgement**: chosen each turn,
+  given the bodies there, so the swing at you BEFORE your blocks is the
+  formula's in expectation -- A2 measures blocks, deaths and lumps, not a
+  recalibration. The bodies are the count's floor and a rate is at most 1,
+  so the bodies offer somewhat less than the formula (`chip_formula_equiv`
+  against `pod_attack_offered`, below).
+- **The pod reads your blocks** (`pod_safe_attack`): it keeps home a body
+  your blocks would kill at a loss, unless the attack kills you after your
+  blocks -- the pilot's `safe_attackers`, mirrored. `pod_attack_safety=False`
+  sends what the rolls send. (The first test expected a lethal-before-blocks
+  attack to come into an untapped 6/6; the pod correctly kept it home, and
+  the test was wrong -- case D now pins both.)
+- **You block by the pod's own rule** (`plan_blocks` with `life` = yours;
+  the owner: "same as 1"): free kills, trades you win (your creature at
+  `threat_of`, theirs at mana value), safe blocks, chumps only below
+  `your_chump_floor` (10), and your utility creatures -- the commander, a
+  mana creature, an animated land, a creature kept home for its tap
+  ability -- only at lethal. Blockers: untapped (509.1a), not "can't block"
+  (the generated CANT_BLOCK: Bloodghast, Starscape Cleric), a flier only by
+  flying or reach (the generated REACH, eight creatures). Your first strike,
+  deathtouch and indestructible are read (`_blockers_first`, `_dealers`,
+  `_attacker_kills`: one two-sided exchange for A1 and A2, identical to
+  A1's on the pod's blockers).
+- **Damage and deaths**: the unblocked power through `damage_you` (Angel of
+  Suffering prevents it); combat damage to you takes the crown
+  (`crown_on_combat_damage`, an event where the formula rolled); your
+  blockers die through `destroy` as one simultaneous event; the bodies they
+  kill die as events; a lifelink blocker (`Card.lifelink`, Whip of Erebos)
+  gains its damage through the engine's own life gain (karlov's triggers
+  hear it).
+- **An attacking body taps** (508.1f) and stays tapped until its own untap
+  step: on your turn it does not block (`body_tapped`), and under this
+  switch A1's `block_share` cap is replaced by that fact.
+- What is still a floor or a ceiling, said: the pod's bodies have no
+  trample, deathtouch or first strike (a floor on the pod); a body with the
+  `reach` flag attacks as a flier (the count's "fliers plus reach" share, a
+  ceiling on its evasion); the pod keeps no blockers home against your
+  crack-back (a ceiling on its attack); `predicted_chip`, the pilot's read
+  of the next swing, is still the formula -- by the bridge, the swing's
+  expectation before your blocks, so it reads high (a cautious pilot).
+
+### Checks
+
+- **OFF is unchanged**: against `../edhmc_at_63d20e7`, `check_unchanged_decks`
+  BIT-IDENTICAL on all 8 metrics of six decks, and `build_pending` played
+  at seeds 5000..6999 with every output key hashed: identical, on the
+  final files. The six caches are VERIFIED with that note.
+- `tools.validate` +0.00 on all 21 metrics of seven engines, OFF and with
+  A1 and A2 both ON (the means moved -- rendmaw's damage 46.33 -> 28.14 --
+  so the patch applied, and CRN holds: every new draw is addressed).
+- `tests/test_you_block.py`, 16 cases and 10 mutations, every set exact as
+  written before the run; `tests/test_attacker_deaths.py`'s 12 and 7 still
+  exact through the two-sided rewrite; `python -m tests` and `--mutate`
+  pass.
+
+### A2 alone, on top of A1 (`you_block` ON minus OFF, both legs `attacker_deaths`)
+
+`diagnostics/run_knob_ab DECK you_block <counters> --n=15000 --no-identity
+--cfg=attacker_deaths=True`, the staged list both legs, seeds 5000..19999,
+python 3.11.17 / numpy 2.4.6. **The identity is NOT claimed, and cannot
+be**: a game in which no body ever attacks still differs, because the
+formula's fractional chip is no longer dealt and A1's cap is replaced. Per
+game, ON:
+
+| deck | T10 win | T20 win | formula / offered / dealt | pod held home | your blockers died | bodies you killed | final life (on / off) | your attackers died (on / off) |
+|---|---|---|---|---|---|---|---|---|
+| rendmaw | -0.0110 ±0.0029 | **+0.0453 ±0.0066** | 24.8 / 22.3 / 14.2 | 1.94 | 0.27 | 0.02 | 11.4 / 6.8 | 2.68 / 2.72 |
+| lorehold | +0.0035 ±0.0028 | **+0.0333 ±0.0046** | 20.4 / 17.3 / 15.0 | 0.54 | 0.13 | 0.04 | 14.0 / 10.8 | 0.53 / 0.51 |
+| karlov | +0.0101 ±0.0036 | **+0.0203 ±0.0053** | 24.1 / 21.6 / 17.4 | 1.23 | 0.13 | 0.06 | 34.3 / 30.2 | 0.30 / 0.46 |
+| tivit | +0.0011 ±0.0028 | **+0.0405 ±0.0045** | 20.9 / 18.2 / 15.3 | 0.53 | 0.19 | 0.05 | 17.5 / 13.8 | 0.50 / 0.60 |
+| shilgengar | -0.0027 ±0.0017 | **+0.0708 ±0.0059** | 27.4 / 24.7 / 15.2 | 2.30 | 0.27 | 0.12 | 32.2 / 25.9 | 0.27 / 0.31 |
+| azusa | -0.0327 ±0.0039 | **+0.0073 ±0.0050** | 17.9 / 15.8 / 11.8 | 1.11 | 0.11 | 0.03 | 16.4 / 13.5 | 3.06 / 2.18 |
+
+"Formula" is what `chip_amount` would have dealt (`chip_formula_equiv`),
+"offered" the power the rolls sent at you (`pod_attack_offered`, 85-91% of
+it: boards under one whole creature have no body, and the rate caps at 1),
+"dealt" what reached you after the pod's read and your blocks
+(`pod_attack_damage`, 57-87% of the formula). Files:
+`results/you_block_a2_<deck>_20261113.txt`.
+
+**Read**: at T20 every deck wins more, because the pod deals you less --
+3 to 6 more life at the end -- and at T10 the wide attackers lose a little
+(azusa -0.0327): under A2 the pod's untapped bodies are ALL blockers on
+your turn (`block_share`'s 60% cap is gone, and only a third to a half of
+them attacked), so more of your attackers die or stay home (azusa's deaths
+2.18 -> 3.06). Your blocks are mostly SAFE blocks and chumps under
+pressure, never trades: a trade you would win needs your creature worth no
+more than a body's mana value, and only tokens are (`threat_of` x 0.15).
+Free kills are rare because the pod reads them and keeps the body home (its
+1-2 held a game). **These are not table moves**: the pod deals less than
+the formula did, which the batch's re-fit corrects (§0z195, item 44).
+
+### A1 and A2 together, against the old pod (both ON minus both OFF)
+
+The batch so far, the same harness with `attacker_deaths,you_block`:
+
+| deck | T10 win | T20 win |
+|---|---|---|
+| rendmaw | -0.0691 ±0.0047 | **-0.0281 ±0.0085** |
+| lorehold | -0.0185 ±0.0038 | **+0.0152 ±0.0056** |
+| karlov | -0.0467 ±0.0049 | **-0.0354 ±0.0065** |
+| tivit | -0.0183 ±0.0039 | **+0.0414 ±0.0057** |
+| shilgengar | -0.0129 ±0.0024 | **+0.0521 ±0.0068** |
+| azusa | -0.0442 ±0.0045 | **+0.0118 ±0.0057** |
+
+Files: `results/combat_a1a2_<deck>_20261113.txt`. Every deck loses at T10
+(combat costs the attacker now) and the creature-light decks gain at T20
+(the pod's swing is smaller); before the re-fit, the SIGN of a deck's move
+says which side of the combat it lives on, and the size says nothing
+(§0z195).
+
+### The pod's read, measured alone (`pod_attack_safety` ON minus OFF, both switches ON)
+
+N=6,000 paired, the same harness. What the pod's caution costs YOU:
+
+| deck | T10 win | T20 win | bodies held home | bodies you killed (read / none) | your blockers died (read / none) |
+|---|---|---|---|---|---|
+| rendmaw | -0.0005 ±0.0026 | -0.0032 ±0.0064 | 1.93 | 0.02 / 1.48 | 0.28 / 0.94 |
+| lorehold | +0.0010 ±0.0022 | +0.0010 ±0.0032 | 0.53 | 0.04 / 0.46 | 0.12 / 0.25 |
+| karlov | -0.0053 ±0.0027 | **-0.0087 ±0.0042** | 1.24 | 0.06 / 0.97 | 0.14 / 0.17 |
+| tivit | -0.0015 ±0.0020 | +0.0000 ±0.0030 | 0.54 | 0.05 / 0.49 | 0.19 / 0.24 |
+| shilgengar | -0.0042 ±0.0020 | **-0.0118 ±0.0056** | 2.35 | 0.12 / 1.82 | 0.28 / 0.31 |
+| azusa | -0.0012 ±0.0022 | -0.0038 ±0.0035 | 1.10 | 0.03 / 0.96 | 0.12 / 0.25 |
+
+Files: `results/pod_read_a2_<deck>_20261113.txt`. **The read saves the
+pod's bodies (1-2 a game) and barely moves your win rate** -- inside its
+bar in four decks, -0.009 to -0.012 in the two whose blockers it stops
+feeding. That is A3 showing through, not a property of the read: the pod's
+kill is a roll that does not read its board (§0z197 A3), so the bodies it
+keeps matter only as blockers and as the next turn's attackers.
+**`pod_attack_safety` stays on under the switch.**
+
+**A4 is decided here as NEXT, behind its own switch** (the owner,
+2026-11-12: "decide it there"): a body aimed at a rival still goes
+nowhere. Making it take that rival's life moves every elimination the pod's
+clocks now make alone, and it is measured on its own, not folded into A2.
+
+**Knobs to say out loud**: `pod_attack_rate` (unset: the bridge),
+`your_chump_floor` (10), `pod_attack_safety` (on), and A1's
+`pod_utility_share`, `pod_body_power_max`, `pod_utility_power_max` and
+`flier_block_share` (which A2 also reads as the pod's fliers). Your utility
+creatures are a rule written once (`your_utility`), not a knob.
 
 ## How to read an ablation table
 

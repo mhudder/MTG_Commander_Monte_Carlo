@@ -587,6 +587,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "1b2c8682bdd39497",
         "utc": "2026-11-13T02:36:44Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "18d0d2a069ce01eb",
+        "utc": "2026-11-13T04:22:10Z"
       }
     ]
   },
@@ -1084,6 +1090,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "97f8d3c428bb3195",
         "utc": "2026-11-13T02:36:43Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "1d0ff10cbaf1a02e",
+        "utc": "2026-11-13T04:22:10Z"
       }
     ]
   },
@@ -1609,6 +1621,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "44baa2fb8140bfcf",
         "utc": "2026-11-13T02:36:43Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "1864a6a9e5dfc7d1",
+        "utc": "2026-11-13T04:22:10Z"
       }
     ]
   },
@@ -2100,6 +2118,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "4064c2dba866ff44",
         "utc": "2026-11-13T02:36:43Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "a7d133dfac9bb6d8",
+        "utc": "2026-11-13T04:22:09Z"
       }
     ]
   },
@@ -2626,6 +2650,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "4d8d12ef767220f0",
         "utc": "2026-11-13T02:36:44Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "e20a67eb8f7165ce",
+        "utc": "2026-11-13T04:22:10Z"
       }
     ]
   },
@@ -3111,6 +3141,12 @@
         "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "e6c4079ba6549266",
         "utc": "2026-11-13T02:36:43Z"
+      },
+      {
+        "commit": "7d4bc9f",
+        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "2edc525e0a6a599c",
+        "utc": "2026-11-13T04:22:10Z"
       }
     ]
   },
