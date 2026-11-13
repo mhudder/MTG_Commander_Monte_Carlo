@@ -17265,9 +17265,12 @@ the queue items are 44 (A1, A2), 45 (A3-A7) and 46 (C-E).
 **A1. YOUR ATTACKERS NEVER DIE IN COMBAT.** The pod's blockers only absorb:
 `opponents.chump` picks which of your attackers are blocked and
 `damage_through` subtracts what they stop; no blocker's power is ever dealt
-back. Under `pod_bodies` (default on) the blockers HAVE power and toughness
-(`pod_blocker_deaths` kills them, deathtouch included), but the power is
-read nowhere. So attacking is free but for the crack-back the hold-back
+back. Under `pod_bodies` (default on) a blocker is a body with a toughness
+and a mana value (`PodBody`; `pod_blocker_deaths` kills it, deathtouch
+included) but NO POWER: the pod's power is one per-archetype average,
+`p["power"]`, read by chip damage and the wipe gate and never by a block.
+(Corrected 2026-11-13: the first version of this section said the bodies
+had power.) So attacking is free but for the crack-back the hold-back
 prices (§0z186, `hold_back_pad`), and `block_share` (0.6) chumps every
 combat -- "a rule written when a chump cost nothing", in its own docstring.
 Text that is inert because of it: first and double strike (Lyra

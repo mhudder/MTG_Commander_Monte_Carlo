@@ -225,13 +225,52 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
       SUSPECT for a real reason: **never clear them with `--verified`**;
       `check_docs` fails on them and each commit says so.
 
-    **Decisions that are the owner's, to be asked, not assumed**: the pod's
-    block rule once a block can trade (chump, trade or decline -- `chump`
-    is chump-only); YOUR block rule, a pilot's not an optimiser's (§0v);
-    which of the pod's bodies attack you and which the formula still
-    stands for (`chip_amount` covers opponents without bodies); and
-    whether the pod's attack becomes rolled rather than an expectation
-    (§0z170's spread).
+    **THE OWNER'S DECISIONS (2026-11-13)**, asked on 2026-11-12:
+
+    1. *The pod's block rule*: each defender **evaluates the situation**
+       rather than following one fixed rule -- chump, trade or decline.
+    2. *Your block rule*: the same. "Utility creatures do not block
+       normally unless under large pressure."
+    3. *Which bodies attack, and how well the pod plays*: **the opponents
+       play as close to optimally as possible.**
+    4. *A roll or an expectation*: left to the session ("your call"). The
+       recommendation, adopted unless the owner overrides it: **the attack
+       becomes discrete by construction** -- real bodies attack, real
+       blocks, real damage -- rather than a lognormal spread laid over the
+       formula (§0z170's test device). Every new random draw is CRN-addressed
+       (§0z17), the old formula stays behind the switch, and the PILOT keeps
+       reading an expectation of the pod's next swing, never the swing
+       itself (§0z170: "a pilot who knows the next swing to the point is
+       not a pilot"). The cost to check: a wider noise floor, read off
+       `tools.validate`'s CRN factor before and after.
+
+    **What "optimal" means here, so it can be built and tested.** A
+    one-decision evaluation by each player, from the information that
+    player has -- the visible boards, life totals, commander damage and
+    each creature's value -- and never from hidden or pre-rolled state
+    (your hand and library, the kill turns, the CRN streams). Not a game
+    tree: azusa's boards reach thousands of creatures, so every decision
+    stays greedy or closed-form, O(n log n) at worst. A defender blocks
+    first to survive (lethal, commander damage included) at the least
+    value lost; otherwise only where the block is free (the blocker
+    lives) or a trade it wins on value; a utility creature blocks only
+    under pressure. An attacker is sent where it is not blocked at a loss
+    and its absence does not open its owner to a lethal crack-back. Any
+    tuned piece of either policy is re-measured on fresh seeds before its
+    size is quoted (§0z170).
+
+    **What the decisions require, each a new judgement to say out loud**:
+    the bodies need a POWER (they carry toughness, mana value and colour
+    today, `PodBody`) and a ROLE or value (utility vs combat), and so
+    distributions nobody has data for. Your side needs the same value per
+    creature (an engine, a mana creature, the commander). **Your pilot is
+    upgraded in the same work**: an optimal pod against a pilot that
+    attacks by a fixed rule measures the pilot's errors, not the cards
+    (§0z184's hold-back lesson, §0v). Expect the mean win rate to fall
+    and the pod to be re-fitted (§0z195: a stronger pod shrank every row
+    to ~0.4 and flipped none). And A4 sits inside A2: once the pod
+    declares attacks, an attack at a rival either takes that rival's life
+    (A4 resolved) or goes nowhere as today -- decide it there, not later.
 
     **Knobs re-derived or retired by it**: `block_share`,
     `flier_block_share`, `blocker_toughness`, `goad_block_share`,
