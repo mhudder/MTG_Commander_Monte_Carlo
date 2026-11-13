@@ -252,6 +252,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
 | [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44). ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045; the pilot alone is +0.028 to +0.126 |
 | [0z199](#0z199) | BUILT | **A2: you block; the pod declares its attacks** (`you_block`, OFF; item 44). Over A1, T20: +0.007 to +0.071 (the pod deals 57-87% of the formula); A1+A2 together -0.035 to +0.052; T10 down everywhere |
+| [0z200](#0z200) | BUILT | **A4: rivals lose life to each other** (`rival_combat`, OFF; item 44). Over A1+A2, T20 +0.025 to +0.044 on all six; A1+A2+A4 against the old pod -0.002 to +0.096: the pod the re-fit must strengthen |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17731,6 +17732,105 @@ clocks now make alone, and it is measured on its own, not folded into A2.
 `pod_utility_share`, `pod_body_power_max`, `pod_utility_power_max` and
 `flier_block_share` (which A2 also reads as the pod's fliers). Your utility
 creatures are a rule written once (`your_utility`), not a knob.
+
+<a id="0z200"></a>
+
+## 0z200. BUILT -- A4: rivals lose life to each other (`rival_combat`, OFF)
+
+**The owner, 2026-11-13: "go ahead and start on A4"**, after A1 (§0z198)
+and A2 (§0z199). §0z197 A4: an opponent's life fell only to YOUR effects;
+its only other exit was a rival's clock eliminating it outright, and the
+pod's attacks not aimed at you went nowhere -- written down nowhere before
+§0z197.
+
+**Built behind one switch, `rival_combat`, default OFF**, item 44's
+protocol. It rides A2's combat (`you_block`), so it needs that switch too.
+**No table was rebuilt.**
+
+### What the switch does (`edhmc/opponents.py`, the A4 block)
+
+- A body whose aim roll did NOT pick you attacks a RIVAL, chosen by how
+  open each is (`rival_target`, `combat_share`'s weights among the rest),
+  read off the same roll's remainder -- no new draw, so the streams A2
+  reads are unchanged.
+- The rival blocks with its untapped bodies and Birds by the pod's own rule
+  (`plan_blocks` at its life, `pod_chump_floor`); the attacker reads those
+  blocks first (`pod_safe_attack` at the rival's life) and keeps home what
+  would die at a loss.
+- The unblocked power is LIFE LOSS (CR 120.3a): `life_loss` (Selenia's
+  Curse doubles it), and "whenever an opponent loses life" hears it
+  (`lost_life`: karlov's Exquisite Blood and Bloodthirsty Conqueror -- the
+  rule, not a choice). Each side's dead bodies are events; a rival at 0 is
+  eliminated (`rival_combat_kills`).
+- `seat_attack` now kills the attacker's dead once, at the end, so the
+  body indices both halves read hold. **A1+A2 with A4 OFF play exactly as
+  at `54823bd`**: 800 staged games a deck, both switches on, every output
+  key hashed, identical on all six -- the restructure moved nothing.
+- Not modelled, said: commander damage between rivals, attack taxes on a
+  rival (yours tax attacks at you), any crown but yours.
+
+### Checks
+
+- OFF unchanged: against `../edhmc_at_63d20e7`, `check_unchanged_decks` 0
+  decks moved and `build_pending` over seeds 5000..6999, every output key
+  hashed, identical on all six, on the final files. Caches VERIFIED.
+- `tools.validate` +0.00 on all 21 metrics OFF and with A1, A2 and A4 ON
+  (the means moved off A2's, so the patch applied).
+- `tests/test_rival_combat.py`, 10 cases, 7 mutations, exact sets. **The
+  first run found two wrong cases, not wrong code**: E's kill counter read
+  `living`, which leaves out a player at 0 (the code's counter was fixed
+  to count `alive`), and K expected an attack the attacker's read rightly
+  refuses -- the same lesson as §0z199's case D: an evaluated pod does not
+  attack where it loses. `python -m tests` 124 of 124, `--mutate` 122 of
+  122.
+
+### A4 alone, over A1 and A2 (`rival_combat` ON minus OFF, both legs A1+A2)
+
+N=15,000 paired, seeds 5000..19999, T20 with T10 off the same game,
+python 3.11.17 / numpy 2.4.6, identity not claimed. Per game, ON:
+
+| deck | T10 win | T20 win | attacks at rivals | life they lost | held home | rivals killed in combat | opponents eliminated (on / off) | your combat kills (on / off) | your final life (on / off) |
+|---|---|---|---|---|---|---|---|---|---|
+| rendmaw | +0.0127 ±0.0027 | **+0.0343 ±0.0063** | 4.32 | 9.6 | 3.64 | 0.011 | 1.73 / 1.62 | 0.87 / 0.73 | 12.5 / 11.4 |
+| lorehold | +0.0227 ±0.0034 | **+0.0318 ±0.0050** | 2.86 | 7.1 | 1.27 | 0.017 | 2.02 / 1.94 | 1.13 / 1.07 | 14.7 / 14.0 |
+| karlov | +0.0198 ±0.0032 | **+0.0331 ±0.0051** | 4.09 | 10.1 | 2.21 | 0.025 | 1.40 / 1.27 | 0.47 / 0.37 | 36.5 / 34.3 |
+| tivit | +0.0171 ±0.0034 | **+0.0250 ±0.0048** | 3.62 | 9.0 | 1.81 | 0.017 | 2.04 / 1.96 | 0.76 / 0.69 | 17.9 / 17.5 |
+| shilgengar | +0.0097 ±0.0020 | **+0.0440 ±0.0063** | 4.48 | 10.9 | 2.32 | 0.035 | 1.89 / 1.76 | 1.35 / 1.21 | 32.8 / 32.2 |
+| azusa | +0.0447 ±0.0041 | **+0.0441 ±0.0051** | 4.65 | 11.5 | 2.41 | 0.035 | 2.01 / 1.91 | 1.57 / 1.47 | 17.4 / 16.4 |
+
+Files: `results/rival_combat_a4_<deck>_20261113.txt`.
+
+**Read**: the rivals lose 7-12 life a game to each other and almost never
+die of it alone (a rival starts at 40); what changes is that the opponent
+YOUR swing meets is lower, so your combat kills rise (rendmaw 0.73 ->
+0.87) and so does every elimination (+0.08 to +0.13 a game). Every deck
+gains at both horizons. Karlov's Exquisite Blood barely moves (2.27 ->
+2.24 gains a game): its hook hears the losses, and its row will say what
+that is worth after the re-fit, not before.
+
+### A1, A2 and A4 together, against the old pod
+
+The same harness with `attacker_deaths,you_block,rival_combat`:
+
+| deck | T10 win | T20 win |
+|---|---|---|
+| rendmaw | -0.0565 ±0.0048 | +0.0062 ±0.0086 |
+| lorehold | +0.0042 ±0.0042 | **+0.0470 ±0.0062** |
+| karlov | -0.0269 ±0.0048 | -0.0023 ±0.0065 |
+| tivit | -0.0012 ±0.0040 | **+0.0664 ±0.0061** |
+| shilgengar | -0.0032 ±0.0026 | **+0.0961 ±0.0074** |
+| azusa | +0.0005 ±0.0045 | **+0.0559 ±0.0061** |
+
+Files: `results/combat_a1a2a4_<deck>_20261113.txt`. With A4 the batch's
+pod is WEAKER than the old one at T20 on four decks: the attacks at you are
+smaller (§0z199) and the rivals now wear each other down. **This is the
+re-fit's job, not a finding about a deck**: §0z195's rule re-fits the
+kill timing to hold the mean win rate, and before it, only signs and
+order inside a deck are read.
+
+**Knobs to say out loud**: none new; A4 reads A2's (`pod_attack_rate`'s
+bridge, `pod_attack_safety`) and the pod's `pod_chump_floor` for a rival's
+blocks.
 
 ## How to read an ablation table
 

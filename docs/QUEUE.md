@@ -198,7 +198,9 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
 
-    **STATUS 2026-11-13: A1 AND A2 BUILT, BOTH OFF** -- A1 (§0z198):
+    **STATUS 2026-11-13: A1, A2 AND A4 BUILT, ALL OFF** (A4: §0z200,
+    `rival_combat` -- rivals lose life to each other; it came out of item
+    45 into this batch, the owner's call). A1 (§0z198):
     `attacker_deaths`, evaluated blocks, first and double strike, the
     pilot's `safe_attackers`. A2 (§0z199): `you_block`, the pod's combat
     step a combat of bodies (the rate a bridge to the formula), the pod's
@@ -206,9 +208,7 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     tapped attackers that do not block, the crown an event. OFF proved
     identical both times and the caches VERIFIED; ON measured per deck,
     alone and together. **What is left before the defaults flip**, each the
-    owner's to order: A4 (rivals' life -- an attack aimed at a rival still
-    goes nowhere, decided by §0z199 as "next, behind its own switch"); the
-    pilot's value rule and lifelink (karlov, §0z198); the pod keeping
+    owner's to order: the pilot's value rule and lifelink (karlov, §0z198); the pod keeping
     blockers home against your crack-back; `predicted_chip` read off the
     bodies instead of the formula; then the flip, the re-fit (§0z195) and
     one rebuild.
@@ -301,9 +301,8 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     on a blocker.
 
 45. **A3-A7 of §0z197: write down, then decide.** None is a bug to fix in
-    passing; each is a model decision nobody wrote down or made. A4 (rivals
-    never lose life to each other) was written down nowhere before §0z197.
-    A3 (the kill ignores your life and blockers) and A6 (the pod acts only
+    passing; each is a model decision nobody wrote down or made. **A4 is
+    BUILT, in item 44's batch (§0z200, `rival_combat`, OFF).** A3 (the kill ignores your life and blockers) and A6 (the pod acts only
     in its own main phase) bound every lifegain and every haste/ETB row.
     A5 (walkers never attacked) follows A2 naturally -- the pod's declared
     attack can name one. A7 has a concrete defect inside it: azusa's Chord

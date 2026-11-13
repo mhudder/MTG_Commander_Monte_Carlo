@@ -2998,8 +2998,8 @@ def resolve_trades(g, defender, assigned) -> tuple:
 #     used (`chip_share`: how open you are, the crown's floor), and past the
 #     attack taxes with their through-rate -- three CRN-addressed draws a
 #     body, always all three, so the streams stay aligned. A body that
-#     attacks someone else goes nowhere (A4: rivals' life is not yet
-#     modelled, said here). THE RATE'S DEFAULT IS A BRIDGE, not a judgement
+#     attacks someone else goes nowhere -- unless `rival_combat` (A4,
+#     §0z200), when it attacks that rival. THE RATE'S DEFAULT IS A BRIDGE, not a judgement
 #     (`pod_attack_rate`): chosen each turn so the swing at you BEFORE your
 #     blocks is, in expectation, the formula's, and A2 measures the blocks,
 #     the deaths and the lumps -- not a recalibration (the pod is re-fitted
@@ -3112,14 +3112,17 @@ def _your_lifelink(g, n) -> None:
     gain(n)
 
 
-def pod_safe_attack(g, sent, plan) -> list:
+def pod_safe_attack(g, sent, plan, life=None) -> list:
     """THE POD'S READ OF YOUR BLOCKS (§0z199): of the bodies `sent`, keep
-    home any that `plan` (your blocks, from the board) would kill at a loss
-    -- dying and taking no blocker worth as much -- unless the attack kills
-    you. The pilot's `safe_attackers`, mirrored; up to three passes."""
+    home any that `plan` (the defender's blocks, from the board) would kill
+    at a loss -- dying and taking no blocker worth as much -- unless the
+    attack kills the defender (you, or a rival at `life`, A4 §0z200). The
+    pilot's `safe_attackers`, mirrored; up to three passes."""
+    if life is None:
+        life = g.your_life
     for _ in range(3):
         atk, asg = plan(sent)
-        if sum(a.power for a in atk if a.k not in asg) >= g.your_life:
+        if sum(a.power for a in atk if a.k not in asg) >= life:
             break
         waste = set()
         for a in atk:
@@ -3146,9 +3149,49 @@ def crown_on_combat_damage(g, dealt) -> None:
         g.m["monarch_lost"] += 1
 
 
+# ---------------------------------------------------------------------------
+# A4 -- RIVALS LOSE LIFE TO EACH OTHER (§0z200, queue items 44/45;
+# `rival_combat`, OFF until the batch flips together)
+# ---------------------------------------------------------------------------
+# Until this an opponent's life fell only to YOUR effects, and the only other
+# way out was a rival's clock eliminating it outright (§0z197 A4): the pod's
+# attacks not aimed at you went nowhere. Under the switch, on A2's combat, a
+# body whose aim roll did not pick you attacks a RIVAL, chosen by how open
+# each is (`rival_target`, from the same roll's remainder: no new draw). That
+# rival blocks with its untapped bodies and Birds by the pod's own rule; the
+# attacker reads those blocks first; the unblocked power is LIFE LOSS (CR
+# 120.3a: Selenia's Curse doubles it, and karlov's "whenever an opponent
+# loses life" hears it, Exquisite Blood included -- the rule, not a choice);
+# each side's dead are events; a rival at 0 is eliminated, and the last
+# opponent standing loses to nobody but you. Not modelled, said: commander
+# damage between rivals, attack taxes on a rival (yours apply to you only),
+# and any crown but yours.
+
+def rival_combat_on(g) -> bool:
+    """A4's switch (§0z200, `rival_combat`): a body aimed at a rival attacks
+    that rival. Rides A2's combat, so it needs `you_block` too."""
+    return bool(g.cfg.get("rival_combat", False)) and you_block_on(g)
+
+
+def rival_target(g, others, u):
+    """The rival a body not aimed at you attacks: by how open each is,
+    `1 / (1 + creatures)` -- `combat_share`'s weights among the rest -- read
+    off the aim roll's remainder `u` in [0, 1), so A4 draws nothing new."""
+    w = [1.0 / (1.0 + o.creatures) for o in others]
+    total = sum(w)
+    acc = 0.0
+    for o, x in zip(others, w):
+        acc += x / total
+        if u < acc:
+            return o
+    return others[-1]
+
+
 def seat_attack(g, i) -> None:
-    """Opponent `i`'s combat step at you under A2 (§0z199): see the header."""
-    from edhmc.engine import crn_random, damage_you
+    """Opponent `i`'s combat step under A2 (§0z199), and A4's attacks at its
+    rivals (§0z200): see the headers. The attacker's bodies that die are
+    killed once, at the end, so the indices both halves read hold."""
+    from edhmc.engine import crn_random
     opp = g.opponents[i]
     bodies = pod_bodies(g, opp)
     opp.body_tapped = [False] * len(bodies)      # its untap step (502.3)
@@ -3161,20 +3204,49 @@ def seat_attack(g, i) -> None:
     # What the formula would have dealt this turn, before prevention: the
     # bridge's target, counted beside what the rolls offered (§0z199).
     g.m["chip_formula_equiv"] += chip_amount(g, opp, share)
-    sent = []
+    rivals = rival_combat_on(g) and bool(others) and share < 1.0
+    sent, at_rival = [], {}
     for k in combat:
         r_attack = crn_random(g, f"pod_attack{i}")
         r_aim = crn_random(g, f"pod_aim{i}")
         r_tax = crn_random(g, f"pod_tax{i}")
-        if r_attack >= rate or r_aim >= share:
+        if r_attack >= rate:
+            continue
+        if r_aim >= share:
+            if rivals:                                    # A4, §0z200
+                o = rival_target(g, others, (r_aim - share) / (1.0 - share))
+                at_rival.setdefault(id(o), (o, []))[1].append(k)
             continue
         if r_tax >= through:
             g.m["pod_attackers_taxed"] += 1
             continue
         sent.append(k)
     g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
-    if not sent:
-        return
+    dead = set()                       # the attacker's bodies that die
+    if sent:
+        _attack_you(g, opp, bodies, sent, dead)
+    rival_losses = []
+    for o, ks in at_rival.values():
+        loss = _attack_rival(g, opp, bodies, o, ks, dead)
+        if loss > 0:
+            rival_losses.append((o, loss))
+    if rival_losses:
+        # Counted on `alive`: `living` already leaves out a player at 0.
+        before = sum(1 for o in g.opponents if o.alive)
+        _check_eliminations(g)
+        g.m["rival_combat_kills"] += before - sum(
+            1 for o in g.opponents if o.alive)
+        lost_life(g, rival_losses)        # "whenever an opponent loses life"
+    if dead:
+        flags = iter([k in dead for k in range(len(bodies))])
+        g.m["pod_attackers_killed"] += kill_pod_bodies(
+            g, opp, lambda b: next(flags))
+
+
+def _attack_you(g, opp, bodies, sent, dead) -> None:
+    """A2's attack at you (§0z199), from `seat_attack`. Adds the attacker's
+    bodies your blocks kill to `dead`."""
+    from edhmc.engine import damage_you
     blockers = your_blockers(g)
     floor = g.cfg.get("your_chump_floor", 10)
 
@@ -3196,14 +3268,14 @@ def seat_attack(g, i) -> None:
     atk, asg = plan(sent, count=True)
     g.m["pod_attacks"] += len(sent)
     dmg = float(sum(a.power for a in atk if a.k not in asg))
-    dead_bodies, mine, link = set(), [], 0
+    mine, link = [], 0
     whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
     for a in atk:
         blks = asg.get(a.k)
         if not blks:
             continue
         if _kills(a, blks):
-            dead_bodies.add(a.k)
+            dead.add(a.k)
         mine.extend(_attacker_kills(a, blks))
         for b in _dealers(a, blks):
             if b.ref.card.lifelink or whip:
@@ -3221,10 +3293,63 @@ def seat_attack(g, i) -> None:
                 if destroy(g, p, destroys=True):
                     died += 1
         g.m["your_blockers_died"] += died
-    if dead_bodies:
-        flags = iter([k in dead_bodies for k in range(len(bodies))])
-        g.m["pod_attackers_killed"] += kill_pod_bodies(
-            g, opp, lambda b: next(flags))
+
+
+def _attack_rival(g, opp, bodies, rival, ks, dead) -> float:
+    """A4 (§0z200): `opp`'s bodies `ks` attack `rival`. The rival blocks
+    with its untapped bodies and Birds by the pod's own rule (`plan_blocks`
+    at its life, `pod_chump_floor`), the attacker reads those blocks first
+    (`pod_safe_attack`), the unblocked power is life loss (`life_loss`:
+    Selenia's Curse doubles it), and the bodies each side kills die as
+    events. Commander damage between rivals is not modelled. Returns the
+    life the rival lost; adds the attacker's dead to `dead`."""
+    blockers, _cap = available_blockers(g, rival)
+    floor = g.cfg.get("pod_chump_floor", 10)
+
+    def plan(sel, count=False):
+        atk = _body_facts(bodies, sel)
+        return atk, plan_blocks(g, rival.life, atk, blockers, len(blockers),
+                                count=count, floor=floor,
+                                prefix="rival_block_")
+
+    first = len(ks)
+    if g.cfg.get("pod_attack_safety", True):
+        ks = pod_safe_attack(g, ks, plan, life=rival.life)
+    if first > len(ks):
+        g.m["rival_attackers_held"] += first - len(ks)
+    if not ks:
+        return 0.0
+    for k in ks:
+        opp.body_tapped[k] = True
+    atk, asg = plan(ks, count=True)
+    g.m["rival_attacks"] += len(ks)
+    dmg = float(sum(a.power for a in atk if a.k not in asg))
+    birds_dead, their_dead = 0, set()
+    for a in atk:
+        blks = asg.get(a.k)
+        if not blks:
+            continue
+        if _kills(a, blks):
+            dead.add(a.k)
+        for r in _attacker_kills(a, blks):
+            if isinstance(r, tuple):
+                birds_dead += 1
+            else:
+                their_dead.add(r)
+    loss = life_loss(rival, dmg) if dmg > 0 else 0.0
+    rival.life -= loss
+    g.m["rival_attack_damage"] += loss
+    if birds_dead:
+        rival.goaded_birds = max(0.0, rival.goaded_birds - birds_dead)
+        hook = getattr(g, "on_pod_creature_deaths", None)
+        if hook is not None:
+            hook(rival, birds_dead)
+    if their_dead:
+        rb = pod_bodies(g, rival)
+        flags = iter([j in their_dead for j in range(len(rb))])
+        g.m["rival_bodies_killed"] += kill_pod_bodies(
+            g, rival, lambda b: next(flags))
+    return loss
 
 
 def _blocker_counts(g, defender):
