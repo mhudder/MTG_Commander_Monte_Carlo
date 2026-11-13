@@ -250,7 +250,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
 | [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
 | [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
-| [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44): evaluated blocks, first strike, a pilot that keeps home what dies at a loss. ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045 |
+| [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44). ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045; the pilot alone is +0.028 to +0.126 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17494,7 +17494,7 @@ table was rebuilt.**
 - `tests/test_attacker_deaths.py`, 12 cases and 7 mutations, every set
   exact as written before the run; `python -m tests` and `--mutate` pass.
 
-### What it does to the six decks (switch ON minus OFF)
+### What it does to the six decks (switch ON minus OFF, pilot included)
 
 `diagnostics/run_knob_ab DECK attacker_deaths <block counters> --n=15000
 --no-identity`, the staged list both legs, seeds 5000..19999, T20 with T10
@@ -17531,9 +17531,35 @@ life rises 12.9 -> 13.5 -- a fit, not traced; A2 makes those blockers real.
 re-fitted once at the end of the batch (§0z195: a stronger pod shrinks rows
 and flips none), and nothing is rebuilt until then (item 44).
 
-**Still to come in this section** (running at this commit): the pilot
-measured alone (`attack_safety` ON minus OFF, under the
-switch), which says whether `safe_attackers` pays for its caution.
+### The pilot, measured alone (`attack_safety` ON minus OFF, both legs ON)
+
+The same harness, `diagnostics/run_knob_ab DECK attack_safety
+attack_kept_safe --n=15000 --no-identity --cfg=attacker_deaths=True`:
+under A1, what `safe_attackers` is worth against the old pilot, which
+attacks into the new blocks with everything the hold-back sends. **§0z42's
+lesson: a rule that makes a new outcome possible (here, your attacker's
+death) is measured with the naive pilot as well as the rule.**
+
+| deck | T10 win | T20 win | attackers died (pilot / naive) | kept home | final life (pilot / naive) |
+|---|---|---|---|---|---|
+| rendmaw | +0.0143 ±0.0032 | **+0.0671 ±0.0067** | 2.70 / 7.08 | 18.7 | 6.8 / 4.2 |
+| lorehold | +0.0328 ±0.0041 | **+0.0349 ±0.0054** | 0.51 / 1.32 | 3.4 | 10.8 / 9.7 |
+| karlov | +0.0659 ±0.0051 | **+0.0966 ±0.0075** | 0.46 / 3.37 | 8.4 | 30.2 / 21.9 |
+| tivit | +0.0625 ±0.0047 | **+0.0767 ±0.0059** | 0.60 / 2.52 | 6.9 | 13.8 / 10.8 |
+| shilgengar | +0.0025 ±0.0018 | **+0.0276 ±0.0058** | 0.31 / 2.31 | 6.2 | 25.9 / 21.8 |
+| azusa | +0.1024 ±0.0058 | **+0.1259 ±0.0075** | 2.18 / 4.56 | 12.0 | 13.5 / 8.4 |
+
+Files: `results/attacker_deaths_pilot_<deck>_20261113.txt`.
+
+**The pilot pays on every deck at both horizons**, by more than A1 costs:
+without it the old pilot feeds 2.3 to 7.1 attackers a game into the new
+blocks, and every deck ends lower on life (fewer bodies home on the pod's
+turns, §0z186). Read the two tables together: A1 with the naive pilot
+would have cost rendmaw about -0.14 and azusa about -0.12 at T20, a measure
+of the pilot, not of the cards. **`attack_safety` stays ON under the
+switch.** It was written once and not tuned, so there is no winner of many
+arms to re-measure (§0z170); its known gap is lifelink (karlov) and a
+trade's worth read in the defender's units.
 
 **Knobs to say out loud**: `pod_utility_share` (0.3), `pod_body_power_max`
 (6), `pod_utility_power_max` (2), `flier_block_share` as reach (0.3),
