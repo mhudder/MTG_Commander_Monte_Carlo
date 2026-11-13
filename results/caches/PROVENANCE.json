@@ -599,6 +599,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "77513b77b4fd5555",
         "utc": "2026-11-13T14:02:05Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "fb1ae1aba31dc802",
+        "utc": "2026-11-13T15:22:58Z"
       }
     ]
   },
@@ -1108,6 +1114,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "7bacc2f0af6aed32",
         "utc": "2026-11-13T14:02:04Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "3dae3f0bbbac80ac",
+        "utc": "2026-11-13T15:22:57Z"
       }
     ]
   },
@@ -1645,6 +1657,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "ff9b3650b8770089",
         "utc": "2026-11-13T14:02:04Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "7213cc326d0c720d",
+        "utc": "2026-11-13T15:22:57Z"
       }
     ]
   },
@@ -2148,6 +2166,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "f1b4b4ce9c79fccb",
         "utc": "2026-11-13T14:02:04Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "ef0dc4ae9bc8cff1",
+        "utc": "2026-11-13T15:22:57Z"
       }
     ]
   },
@@ -2686,6 +2710,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "3641af65c8003fca",
         "utc": "2026-11-13T14:02:05Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "092d355b6ede0de1",
+        "utc": "2026-11-13T15:22:57Z"
       }
     ]
   },
@@ -3183,6 +3213,12 @@
         "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
         "fingerprint": "46f0d44f9162499e",
         "utc": "2026-11-13T14:02:05Z"
+      },
+      {
+        "commit": "f28e55d",
+        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "da5c88fe49cd3f04",
+        "utc": "2026-11-13T15:22:57Z"
       }
     ]
   },

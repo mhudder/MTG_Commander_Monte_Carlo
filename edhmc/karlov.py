@@ -239,6 +239,12 @@ class KarlovGame(BaseGame):
     # these attackers tapped -- the board the pod's turns will see.
     combat_declared = True
 
+    def lifelink_of(self, perm):
+        """The pilot's lifelink read (`opponents.lifelink_of`, §0z201): the
+        same test as `has_lifelink`, which combat applies minus its
+        one-turn grants."""
+        return has_lifelink(self, perm)
+
     def planned_attackers(self) -> list:
         """The creatures `combat` would attack with, before the hold-back."""
         return [p for p in self.board if may_attack(self, p)]

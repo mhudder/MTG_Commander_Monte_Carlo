@@ -3,7 +3,7 @@
 queue item 44; `attacker_deaths`, OFF until the batch flips together).
 
     python -m tests.test_attacker_deaths
-    python -m tests.test_attacker_deaths --mutate   # 7 mutations, exact sets
+    python -m tests.test_attacker_deaths --mutate   # 8 mutations, exact sets
 
 Under the switch, on `pod_bodies`, each defender EVALUATES its blocks
 (`opponents.plan_blocks`): a free kill, a trade it wins on value, a block
@@ -44,14 +44,23 @@ CASES
   L  the pool under the switch: toughness, mana value and black are the
      switch-off bodies, body for body; power, utility and reach in range
 
+  -- added with the lifelink pilot (§0z201, 2026-11-13) --
+  M  `pilot_life_value` 1: a doomed 3/3 lifelinker worth 2 is SENT (its 3
+     life is worth 3 >= 2); the same at 0 stays home, and a 3/3 without
+     lifelink at 1 stays home. Karlov's hook (`has_lifelink`) reads
+     Sorin, Vengeful Bloodlord's team lifelink on a vanilla creature
+
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   your attackers never die (`_kills` is False)     -> B, C, F, G, I, J, K
+                                                      (+ M, §0z201)
   first strike is never read                       -> G
   utility creatures block like any other           -> F
-  the defender trades down (every attacker worth 99) -> D
+  the defender trades down (every attacker worth 99) -> D (+ M, §0z201)
   a flier is blocked by anything                   -> I
-  the pilot sends everything                       -> J
+  the pilot sends everything                       -> J (+ M, §0z201)
   indestructible is ignored                        -> H
+  (§0z201, written before its run)
+  the pilot's life is never counted (`life_worth` 0) -> M
 
 UNMUTATED (§0z15): A is the OFF path, read by the plain run; L is a
 property of `roll_body_pools`. Neither is blind to a defect in the plan:
@@ -221,6 +230,30 @@ def run_cases():
     check("L under the switch the old fields are the old bodies; power ranged",
           (same, ranged), (True, True))
 
+    got = []
+    for value, link in ((1.0, True), (0.0, True), (1.0, False)):
+        g = rgame(pilot_life_value=value)
+        solo(g, [SIX])
+        a = attacker(g, 3, threat=2.0, lifelink=link)
+        got.append(len(OPP.hold_back(g, [a])))
+    import edhmc.karlov as K
+    from edhmc.decks import karlov_v2 as KM
+    kd, kc = KM.build()
+    kg = K.KarlovGame(list(kd), kc, dict(DEFAULT_CFG), 1)
+    kg.board = EN.Board()
+    plain = EN.Card(name="Vanilla", types=frozenset({"Creature"}),
+                    power=2, toughness=2)
+    vp = EN.Permanent(card=plain, sick=False, base_p=2, base_t=2)
+    kg.board.append(vp)
+    before = OPP.lifelink_of(kg, vp)
+    sorin = next(c for c in list(kd) + [v for v in vars(KM).values()
+                                        if isinstance(v, EN.Card)]
+                 if c.name == "Sorin, Vengeful Bloodlord")
+    kg.board.append(EN.Permanent(card=sorin, sick=False))
+    check("M a doomed lifelinker goes when its life is worth it; karlov's "
+          "hook reads Sorin",
+          (got, before, OPP.lifelink_of(kg, vp)), ([1, 0, 0], False, True))
+
     return set(FAIL)
 
 
@@ -240,20 +273,23 @@ def main() -> int:
 
     muts = {
         "your attackers never die":
-            ({"B", "C", "F", "G", "I", "J", "K"}, OPP, "_kills",
+            ({"B", "C", "F", "G", "I", "J", "K", "M"}, OPP, "_kills",
              lambda a, blks: False),
         "first strike is never read":
             ({"G"}, OPP, "first_strike_of", lambda g, p: False),
         "utility creatures block like any other":
             ({"F"}, OPP, "available_blockers", all_combat),
         "the defender trades down":
-            ({"D"}, OPP, "threat_of", lambda g, p: 99.0),
+            ({"D", "M"}, OPP, "threat_of", lambda g, p: 99.0),
         "a flier is blocked by anything":
             ({"I"}, OPP, "flying_of", lambda g, p: False),
         "the pilot sends everything":
-            ({"J"}, OPP, "safe_attackers", lambda g, attackers: attackers),
+            ({"J", "M"}, OPP, "safe_attackers",
+             lambda g, attackers: attackers),
         "indestructible is ignored":
             ({"H"}, OPP, "is_hardy", lambda g, p: False),
+        "the pilot's life is never counted":
+            ({"M"}, OPP, "life_worth", lambda g, a: 0.0),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():

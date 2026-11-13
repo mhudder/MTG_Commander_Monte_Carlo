@@ -1,0 +1,44 @@
+pilot_life_value: each value minus pilot_life_value=0, paired, the staged lists, N=6,000 a deck, seeds 5000..10999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0; reach `attack_kept_safe` a game, value leg / base leg
+
+rendmaw
+  pilot_life_value=0.25    T10 +0.0005 +-0.0010   T20 +0.0005 +-0.0028   attack_kept_safe 22.950 / 23.793  turns -0.005
+  pilot_life_value=0.5     T10 +0.0007 +-0.0010   T20 -0.0005 +-0.0029   attack_kept_safe 22.880 / 23.793  turns -0.008
+  pilot_life_value=1       T10 +0.0008 +-0.0013   T20 +0.0025 +-0.0034   attack_kept_safe 22.543 / 23.793  turns -0.013
+  pilot_life_value=2       T10 +0.0008 +-0.0012   T20 +0.0033 +-0.0038   attack_kept_safe 22.080 / 23.793  turns -0.020
+
+lorehold
+  pilot_life_value=0.25    T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 3.354 / 3.354  turns +0.000
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 3.354 / 3.354  turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 3.354 / 3.354  turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 3.354 / 3.354  turns +0.000
+
+karlov
+  pilot_life_value=0.25    T10 +0.0010 +-0.0016   T20 +0.0008 +-0.0020   attack_kept_safe 8.021 / 8.108  turns -0.007
+  pilot_life_value=0.5     T10 +0.0022 +-0.0028   T20 +0.0012 +-0.0037   attack_kept_safe 7.788 / 8.108  turns -0.016
+  pilot_life_value=1       T10 +0.0007 +-0.0035   T20 -0.0043 +-0.0047   attack_kept_safe 7.362 / 8.108  turns -0.014
+  pilot_life_value=2       T10 -0.0003 +-0.0040   T20 -0.0005 +-0.0053   attack_kept_safe 7.013 / 8.108  turns +0.006
+
+tivit
+  pilot_life_value=0.25    T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 6.843 / 6.843  turns +0.000
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 6.843 / 6.843  turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 6.843 / 6.843  turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 6.843 / 6.843  turns +0.000
+
+shilgengar
+  pilot_life_value=0.25    T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 6.061 / 6.062  turns -0.000
+  pilot_life_value=0.5     T10 -0.0002 +-0.0003   T20 -0.0002 +-0.0006   attack_kept_safe 6.058 / 6.062  turns +0.000
+  pilot_life_value=1       T10 -0.0002 +-0.0006   T20 -0.0002 +-0.0013   attack_kept_safe 5.993 / 6.062  turns -0.002
+  pilot_life_value=2       T10 -0.0002 +-0.0009   T20 -0.0002 +-0.0021   attack_kept_safe 5.904 / 6.062  turns -0.000
+
+azusa
+  pilot_life_value=0.25    T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 12.670 / 12.670  turns +0.000
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 12.670 / 12.670  turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 12.670 / 12.670  turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   attack_kept_safe 12.670 / 12.670  turns +0.000
+
+MEAN OVER 6 DECKS (each deck's paired difference, averaged; variances add)
+  pilot_life_value=0.25    T10 +0.0003 +-0.0003   T20 +0.0002 +-0.0006 
+  pilot_life_value=0.5     T10 +0.0004 +-0.0005   T20 +0.0001 +-0.0008 
+  pilot_life_value=1       T10 +0.0002 +-0.0006   T20 -0.0003 +-0.0010 
+  pilot_life_value=2       T10 +0.0001 +-0.0007   T20 +0.0004 +-0.0011 

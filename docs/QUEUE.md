@@ -208,10 +208,11 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     tapped attackers that do not block, the crown an event. OFF proved
     identical both times and the caches VERIFIED; ON measured per deck,
     alone and together. **What is left before the defaults flip**, each the
-    owner's to order: the pilot's value rule and lifelink (karlov, §0z198); the pod keeping
+    owner's to order: the pod keeping
     blockers home against your crack-back; `predicted_chip` read off the
     bodies instead of the formula; then the flip, the re-fit (§0z195) and
-    one rebuild.
+    one rebuild. The lifelink pilot was MEASURED and is a null (§0z201,
+    `pilot_life_value` stays 0; re-sweep after the flip).
 
     **TEST EACH CHANGE; DO NOT REBUILD THE TABLES DURING IT** -- not one
     deck, not at the end of a step. "There is no point when there is so

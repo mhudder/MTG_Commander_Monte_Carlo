@@ -253,6 +253,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44). ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045; the pilot alone is +0.028 to +0.126 |
 | [0z199](#0z199) | BUILT | **A2: you block; the pod declares its attacks** (`you_block`, OFF; item 44). Over A1, T20: +0.007 to +0.071 (the pod deals 57-87% of the formula); A1+A2 together -0.035 to +0.052; T10 down everywhere |
 | [0z200](#0z200) | BUILT | **A4: rivals lose life to each other** (`rival_combat`, OFF; item 44). Over A1+A2, T20 +0.025 to +0.044 on all six; A1+A2+A4 against the old pod -0.002 to +0.096: the pod the re-fit must strengthen |
+| [0z201](#0z201) | MEASURED | **The pilot counting a doomed lifelinker's life** (`pilot_life_value`, item 44): a null on all six decks at 0.25-2, inside every bar; §0z198's lifelink reading of karlov was wrong. Stays 0 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17524,7 +17525,8 @@ pays most -- rendmaw's Birds and tokens are 2/2s into bodies of toughness
 home. Karlov loses mostly to the pilot keeping its lifelinkers home (0.46
 deaths, 8.4 kept home, final life 39.2 -> 30.2): the pilot's value rule
 counts only the blockers an attacker kills, not the life a lifelinker gains
-on a block -- a judgement to revisit. Tivit at T20 does not move (it wins by
+on a block -- a judgement to revisit. (Revisited in §0z201: counting it is a null; the
+reading was wrong.) Tivit at T20 does not move (it wins by
 extra turns, not combat). Azusa GAINS at T20, just past its bar: the
 creatures the pilot keeps home (12.0 a game) are untapped on the pod's
 turns and lower its attack share at you (`combat_share`, §0z186), so final
@@ -17831,6 +17833,56 @@ order inside a deck are read.
 **Knobs to say out loud**: none new; A4 reads A2's (`pod_attack_rate`'s
 bridge, `pod_attack_safety`) and the pod's `pod_chump_floor` for a rival's
 blocks.
+
+<a id="0z201"></a>
+
+## 0z201. MEASURED -- the pilot counting a doomed lifelinker's life: a null on all six decks
+
+**The owner, 2026-11-13: "go ahead and start on the lifelink pilot fix"**
+-- the gap §0z198 left open: A1's pilot (`safe_attackers`) keeps home an
+attacker the pod would kill at a loss, judged only by the blockers it
+kills, and §0z198 read karlov's cost under A1 (8.4 creatures kept home a
+game, final life 39.2 -> 30.2) as its lifelinkers being kept home.
+
+**Built**: `opponents.lifelink_of` (the engine's own hook -- shilgengar's
+existing `lifelink_of`, and a new `KarlovGame.lifelink_of` returning its
+`has_lifelink`: the card, Pearl Collector, both Sorins, the Vault -- else
+the card or Whip of Erebos) and `life_worth`: a lifelinker that dies on a
+block still gains its damage (702.15b), so the trade test counts
+`pilot_life_value` x that damage beside the blockers it kills. One-combat
+grants paid after the hold-back (Wind Crystal, Heliod) are not seen; the
+pilot decides first. **Default 0, which is §0z198's pilot exactly**:
+`build_pending` over seeds 5000..6999, every key hashed, and
+`check_unchanged_decks` against `63d20e7` both identical on six decks;
+caches VERIFIED. `tests/test_attacker_deaths.py` case M (13 cases, 8
+mutations, every set exact as written before the run); `python -m tests`
+124 of 124; `tools.validate` +0.00 on 21 metrics.
+
+**The sweep** (`diagnostics/run_knob_sweep pilot_life_value 0
+0.25,0.5,1,2 --n=6000`, every arm paired against 0, with `attacker_deaths`,
+`you_block` and `rival_combat` ON in `DEFAULT_CFG`; seeds 5000..10999,
+python 3.11.17; `results/pilot_life_value_sweep_20261113.txt`):
+
+| deck | 0.25 (T20) | 0.5 | 1 | 2 | kept home, 2 against 0 |
+|---|---|---|---|---|---|
+| rendmaw | +0.0005 ±0.0028 | -0.0005 ±0.0029 | +0.0025 ±0.0034 | +0.0033 ±0.0038 | 22.1 / 23.8 |
+| karlov | +0.0008 ±0.0020 | +0.0012 ±0.0037 | -0.0043 ±0.0047 | -0.0005 ±0.0053 | 7.0 / 8.1 |
+| shilgengar | +0.0000 ±0.0000 | -0.0002 ±0.0006 | -0.0002 ±0.0013 | -0.0002 ±0.0021 | 5.9 / 6.1 |
+| lorehold, tivit, azusa | 0.0000 exactly | | | | unchanged |
+
+Every arm is inside its bar on every deck at both horizons (the T10 rows
+too, in the file); the mean over six decks is +0.0004 ±0.0011 at its
+largest. The three decks with no lifelinking attacker read exactly zero,
+as they must.
+
+**Read**: the pilot does send more lifelinkers (karlov's kept-home falls
+8.1 -> 7.0) and it wins nothing by it. **§0z198's reading of karlov was
+wrong**: its cost under A1 is not its lifelinkers being kept home -- the
+creatures it keeps home are the ones whose life is not worth the body, and
+the pilot was right to. **`pilot_life_value` stays 0** (no arm won, so
+there is no winner to re-measure on fresh seeds, §0z170). The knob and the
+hook stay, for a pod whose pressure the re-fit changes (item 44): re-run
+this sweep after the flip, not before.
 
 ## How to read an ablation table
 

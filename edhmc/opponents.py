@@ -4200,9 +4200,35 @@ def preview_trades(g, attackers):
             killed = {id(r) for r in _attacker_kills(a, blks)}
             worth = max((b.value for b in blks if id(b.ref) in killed),
                         default=-1.0)
-            if worth < a.value:
+            if worth + life_worth(g, a) < a.value:
                 wasted.add(id(a.perm))
     return wasted, kills
+
+
+def lifelink_of(g, perm) -> bool:
+    """Does this attacker of yours have lifelink as your combat will read
+    it? The engine's own `g.lifelink_of(perm)` where it has one (shilgengar:
+    the card, the Vault, Pearl Collector; karlov: `has_lifelink`, the card,
+    Pearl Collector and the team grants), else the card or Whip of Erebos.
+    One-combat grants paid after the hold-back (karlov's Wind Crystal and
+    Heliod) are not seen: the pilot decides first (§0z201)."""
+    hook = getattr(g, "lifelink_of", None)
+    if hook is not None:
+        return bool(hook(perm))
+    return bool(perm.card.lifelink
+                or (g.has("Whip of Erebos") and g.cfg.get("whip_text", True)))
+
+
+def life_worth(g, a) -> float:
+    """THE LIFE A DOOMED LIFELINKER STILL GAINS, in the pilot's value units
+    (§0z201, `pilot_life_value`, threat per life point): its damage is
+    dealt to its blockers and gains that much life (702.15b) even as it
+    dies, so the pilot's trade test counts it. 0 -- the default until the
+    sweep -- is the pilot of §0z198, which counted only the blockers."""
+    v = g.cfg.get("pilot_life_value", 0.0)
+    if v <= 0 or not lifelink_of(g, a.perm):
+        return 0.0
+    return v * a.power * (2 if a.ds else 1)
 
 
 def safe_attackers(g, attackers) -> list:
