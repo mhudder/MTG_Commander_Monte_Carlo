@@ -581,7 +581,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "1b2c8682bdd39497",
+        "utc": "2026-11-13T02:36:44Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "4ad75ecce4e4708b",
@@ -1071,7 +1078,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "97f8d3c428bb3195",
+        "utc": "2026-11-13T02:36:43Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "f8a3b0970ecf46af",
@@ -1589,7 +1603,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "44baa2fb8140bfcf",
+        "utc": "2026-11-13T02:36:43Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "6ce8bc6a5c089692",
@@ -2073,7 +2094,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "4064c2dba866ff44",
+        "utc": "2026-11-13T02:36:43Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "eab0b61d59c8bf93",
@@ -2592,7 +2620,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "4d8d12ef767220f0",
+        "utc": "2026-11-13T02:36:44Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "b1c22f182bd24afb",
@@ -3070,7 +3105,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "862cf6a",
+        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+        "fingerprint": "e6c4079ba6549266",
+        "utc": "2026-11-13T02:36:43Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

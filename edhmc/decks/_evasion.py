@@ -547,6 +547,15 @@ VIGILANCE = {
     'Twilight Shepherd',
 }
 
+# FIRST STRIKE / DOUBLE STRIKE: creatures with the keyword, unconditional
+# (510.4). Read by `opponents.first_strike_of` (§0z198).
+FIRST_STRIKE = {
+    'Lyra Dawnbringer',
+    'Verge Rangers',
+}
+DOUBLE_STRIKE = {
+}
+
 # ATTACK TAXES: "creatures can't attack you unless their controller
 # pays {N} for each creature ..." -> N. Read by `opponents.attack_tax_through`
 # under `pod_threats` (§0z138).

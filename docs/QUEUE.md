@@ -196,7 +196,16 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     write down, not a bug.
 
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
-    can die to blockers, and you block.** The combat half of §4, and the
+    can die to blockers, and you block.**
+
+    **STATUS 2026-11-13: A1 BUILT, OFF (§0z198)** -- `attacker_deaths`,
+    evaluated blocks, first and double strike, the pilot's
+    `safe_attackers`; OFF proved identical and the caches VERIFIED; ON
+    measured per deck. **Next: A2** (you block), then the batch flips its
+    defaults together. Left open by A1, for A2's work: the pilot's value
+    rule ignores lifelink (karlov), and which bodies may block is the
+    defender's choice under the `block_share` cap until tapped creatures
+    are a fact. The combat half of §4, and the
     largest revision since pod v3. One piece of work, A1 then A2, through
     one combat resolution both directions share -- not two copies (§0u).
 

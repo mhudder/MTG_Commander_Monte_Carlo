@@ -250,6 +250,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
 | [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
 | [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
+| [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44): evaluated blocks, first strike, a pilot that keeps home what dies at a loss. ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17416,6 +17417,128 @@ with no derivation and no check.
 "There is no point when there is so much to do." The tables stay as built
 at `63d20e7` until the batch is done and the owner calls one rebuild. The
 protocol is in queue item 44.
+
+<a id="0z198"></a>
+
+## 0z198. BUILT -- A1: your attackers can die to the pod's blockers (`attacker_deaths`, OFF)
+
+**Queue item 44, the owner, 2026-11-13: "go ahead and start on item 44, A1
+first"**, after the four decisions recorded there (each defender evaluates
+its blocks; your blocks the same; the opponents play as close to optimally
+as possible; the attack discrete by construction). §0z197 A1: until this, a
+block only absorbed (`chump`), and no blocker's power was ever dealt back.
+
+**Built behind one switch, `attacker_deaths`, default OFF** -- the protocol
+of item 44: land OFF, prove the OFF path unchanged, flip every default of
+the batch together at its end, then re-fit the pod and rebuild once. **No
+table was rebuilt.**
+
+### What the switch does (`edhmc/opponents.py`, the A1 block)
+
+- **The pod's bodies get a POWER, a UTILITY flag and REACH**
+  (`PodBody`, `BodyPool`), from a THIRD per-opponent stream, so toughness,
+  mana value and black are the bodies they always were. Three judgements,
+  no data, each a knob: `pod_utility_share` 0.3 (a mana creature, an
+  engine, a draw piece), whose power is 0..`pod_utility_power_max` (2); a
+  combat body's power uniform on 1..`pod_body_power_max` (6, toughness's
+  range); reach with `flier_block_share` (0.3), the share the count's rule
+  already used.
+- **Each defender evaluates its blocks** (`plan_blocks`), from the board
+  only, never a roll: a commander one hit from 21 first; then FREE KILLS
+  (kills and lives), TRADES it wins on value (body `mv` <= your attacker's
+  `threat_of`, a judgement), SAFE blocks (lives, stops the damage); chumps
+  only to stay above `pod_chump_floor` (10, §0z132's rule unchanged); and
+  utility creatures only when the swing is lethal -- the owner's "utility
+  creatures do not block normally unless under large pressure". Most
+  valuable attacker first, cheapest blocker that does the job. A menace
+  attacker is blocked only by two chumps (a double block that kills is not
+  searched: a floor on the pod). At most `(creatures + birds) x block_share`
+  bodies act, and the defender chooses which -- optimistic for it until A2
+  makes tapped creatures a fact.
+- **Combat damage** (510): a blocker's power is dealt back; your attacker
+  dies past its toughness unless indestructible, through `destroy`
+  (`destroys=True`: finality, death triggers, the commander to the command
+  zone with its tax), one simultaneous event (§0z76). First and double
+  strike (510.4, 702.4, 702.7) are the generated `FIRST_STRIKE` /
+  `DOUBLE_STRIKE` sets (`tools/tag_flying.py`, Scryfall keywords 2026-11-13:
+  Lyra Dawnbringer, Verge Rangers; no double striker). The pod's bodies have
+  no deathtouch, first strike or trample: a floor on the pod.
+- **The pilot is upgraded with it** (item 44: an optimal pod against a fixed
+  pilot measures the pilot): `safe_attackers`, the first step of
+  `hold_back`, keeps home an attacker the pod would kill AT A LOSS -- dying
+  and taking no blocker worth as much as itself -- unless sending it buys an
+  elimination. It reads the blocks the pod would make (`preview_trades`),
+  which are a function of the visible board, so it is not an oracle. The
+  first version kept home only attackers that killed nothing, and sent
+  Karlov into every trade the defender offered (0.98 commander deaths a
+  game on 100 games); a trade the defender chose is, by its own rule, one
+  it wins, so the pilot now refuses it. `attack_safety=False` sends
+  everything the hold-back sends.
+- **Off the switch, nothing moved**: `combat_damage`'s plan was split into
+  `_attack_groups` unchanged, and `damage_through`'s new `assign` is read
+  only under the switch.
+
+### Checks
+
+- **OFF is unchanged**: `check_unchanged_decks` against a worktree at
+  `63d20e7` (a NEW one, `../edhmc_at_63d20e7`: the `../edhmc_at` an earlier
+  session left is at `504a8ad`, §0z137's trap) BIT-IDENTICAL on all 8
+  metrics of six decks, and `build_pending` played at seeds 5000..6999, T20
+  with the T10 snapshot, every output key of every game hashed: identical
+  on all six, on the final files. The six caches are VERIFIED with that note.
+- `tools.validate` +0.00 on all 21 metrics of seven engines, OFF **and ON**
+  (`DEFAULT_CFG["attacker_deaths"]=True` in-process; the means moved --
+  rendmaw's damage 46.33 -> 30.38 -- so the patch applied, and the A/A
+  difference stayed 0: A1 reads no roll, and the bodies' new stream is
+  per opponent and indexed, so CRN holds).
+- `tests/test_attacker_deaths.py`, 12 cases and 7 mutations, every set
+  exact as written before the run; `python -m tests` and `--mutate` pass.
+
+### What it does to the six decks (switch ON minus OFF)
+
+`diagnostics/run_knob_ab DECK attacker_deaths <block counters> --n=15000
+--no-identity`, the staged list both legs, seeds 5000..19999, T20 with T10
+read off the same game, python 3.11.17 / numpy 2.4.6 (a paired run, both
+legs on one interpreter). **The identity is NOT claimed**: the old rule
+chumps under pressure without a counter, so a game can differ with no A1
+counter in either leg (rendmaw 10 of 512 such games, lorehold 96 of 4,350, azusa 27 of 1,061).
+Per game, A1 ON:
+
+| deck | T10 win | T20 win | attackers died | commander died | kept home | damage (on / off) |
+|---|---|---|---|---|---|---|
+| rendmaw | -0.0584 ±0.0045 | **-0.0745 ±0.0073** | 2.70 | 0.004 | 18.7 | 41.9 / 57.6 |
+| lorehold | -0.0221 ±0.0034 | **-0.0181 ±0.0045** | 0.51 | 0.024 | 3.4 | 73.3 / 76.5 |
+| karlov | -0.0568 ±0.0044 | **-0.0557 ±0.0060** | 0.46 | 0.072 | 8.4 | 49.5 / 61.6 |
+| tivit | -0.0194 ±0.0036 | +0.0009 ±0.0046 | 0.60 | 0.018 | 6.9 | 69.4 / 72.8 |
+| shilgengar | -0.0103 ±0.0020 | **-0.0187 ±0.0051** | 0.31 | 0.014 | 6.2 | 56.4 / 62.4 |
+| azusa | -0.0115 ±0.0034 | **+0.0045 ±0.0044** | 2.18 | 0.067 | 12.0 | 65.9 / 70.9 |
+
+Files: `results/attacker_deaths_a1_<deck>_20261113.txt`, every output key
+that moved.
+
+**Read**: the pod's blocks now cost you, and the deck that attacks most
+pays most -- rendmaw's Birds and tokens are 2/2s into bodies of toughness
+1-6 and power 1-6, and 2.7 of its attackers die a game while it keeps 18.7
+home. Karlov loses mostly to the pilot keeping its lifelinkers home (0.46
+deaths, 8.4 kept home, final life 39.2 -> 30.2): the pilot's value rule
+counts only the blockers an attacker kills, not the life a lifelinker gains
+on a block -- a judgement to revisit. Tivit at T20 does not move (it wins by
+extra turns, not combat). Azusa GAINS at T20, just past its bar: the
+creatures the pilot keeps home (12.0 a game) are untapped on the pod's
+turns and lower its attack share at you (`combat_share`, §0z186), so final
+life rises 12.9 -> 13.5 -- a fit, not traced; A2 makes those blockers real.
+**These are not table moves**: the pod is
+re-fitted once at the end of the batch (§0z195: a stronger pod shrinks rows
+and flips none), and nothing is rebuilt until then (item 44).
+
+**Still to come in this section** (running at this commit): the pilot
+measured alone (`attack_safety` ON minus OFF, under the
+switch), which says whether `safe_attackers` pays for its caution.
+
+**Knobs to say out loud**: `pod_utility_share` (0.3), `pod_body_power_max`
+(6), `pod_utility_power_max` (2), `flier_block_share` as reach (0.3),
+`block_share` as the blockers' cap (0.6), `pod_chump_floor` (10), and the
+value units (`mv` against `threat_of`). None has data; none is swept yet.
 
 ## How to read an ablation table
 

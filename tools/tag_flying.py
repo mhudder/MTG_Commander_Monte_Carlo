@@ -530,6 +530,22 @@ def main():
                  if n in creatures and "Vigilance" in c.get("keywords", [])
                  and not re.search(r"(gains?|have|has)[^.]*vigilance",
                                    (c.get("oracle_text") or "").lower())}
+    # FIRST STRIKE AND DOUBLE STRIKE, 2026-11-13 (§0z198, queue item 44
+    # A1): once your attacker can die to a blocker (`attacker_deaths`), a
+    # first striker that kills its blocker takes no damage back (510.4).
+    # Vigilance's rule exactly: creatures, unconditional, grants excluded
+    # (Sunhome's "{2}{R}{W}, {T}: Target creature gains double strike" is an
+    # ability of a land, not a fact about a creature).
+    first_strike = {n for n, c in cards.items()
+                    if n in creatures
+                    and "First strike" in c.get("keywords", [])
+                    and not re.search(r"(gains?|have|has)[^.]*first strike",
+                                      (c.get("oracle_text") or "").lower())}
+    double_strike = {n for n, c in cards.items()
+                     if n in creatures
+                     and "Double strike" in c.get("keywords", [])
+                     and not re.search(r"(gains?|have|has)[^.]*double strike",
+                                       (c.get("oracle_text") or "").lower())}
 
     # ATTACK TAXES, 2026-10-14 (§0z138): "Creatures can't attack you unless
     # their controller pays {N} for each creature they control that's
@@ -685,6 +701,14 @@ def main():
 
     print(f"\nVIGILANCE ({len(vigilance)}) -- attacks without tapping:")
     for n in sorted(vigilance):
+        print(f"    {n}")
+
+    print(f"\nFIRST STRIKE ({len(first_strike)}):")
+    for n in sorted(first_strike):
+        print(f"    {n}")
+
+    print(f"\nDOUBLE STRIKE ({len(double_strike)}):")
+    for n in sorted(double_strike):
         print(f"    {n}")
 
     print(f"\nATTACK TAX ({len(attack_tax)}) -- {{N}} per attacker:")
@@ -853,6 +877,15 @@ def main():
                      "(702.20b: attacking\n# doesn't tap them). Read by "
                      "`opponents.vigilant` (§0z186).\nVIGILANCE = {\n")
             for n in sorted(vigilance):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\n")
+            fh.write("\n# FIRST STRIKE / DOUBLE STRIKE: creatures with the "
+                     "keyword, unconditional\n# (510.4). Read by "
+                     "`opponents.first_strike_of` (§0z198).\nFIRST_STRIKE = {\n")
+            for n in sorted(first_strike):
+                fh.write(f"    {n!r},\n")
+            fh.write("}\nDOUBLE_STRIKE = {\n")
+            for n in sorted(double_strike):
                 fh.write(f"    {n!r},\n")
             fh.write("}\n")
             fh.write("\n# ATTACK TAXES: \"creatures can't attack you unless "

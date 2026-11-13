@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `8dc90a3`.
+Generated at `862cf6a`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,23 +86,29 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `2e1102acd8f063cd` | `63d20e7` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `4ad75ecce4e4708b` | `63d20e7` | **CURRENT** |
-| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `f8a3b0970ecf46af` | `63d20e7` | **CURRENT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `6ce8bc6a5c089692` | `63d20e7` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `eab0b61d59c8bf93` | `63d20e7` | **CURRENT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `b1c22f182bd24afb` | `63d20e7` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `2e1102acd8f063cd` | `63d20e7` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `4ad75ecce4e4708b` | `63d20e7` | **VERIFIED** |
+| `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `f8a3b0970ecf46af` | `63d20e7` | **VERIFIED** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `6ce8bc6a5c089692` | `63d20e7` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `eab0b61d59c8bf93` | `63d20e7` | **VERIFIED** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `b1c22f182bd24afb` | `63d20e7` | **VERIFIED** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `2e1102acd8f063cd`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `4ad75ecce4e4708b`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — CURRENT. built at `f8a3b0970ecf46af`, which is live.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `6ce8bc6a5c089692`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `eab0b61d59c8bf93`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `b1c22f182bd24afb`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `f88e14ff3d781d87`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `2e1102acd8f063cd`; fingerprint has since moved to `1b2c8682bdd39497` and was CHECKED at `862cf6a` (2026-11-13T02:36:44Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `1b2c8682bdd39497` (`862cf6a`, 2026-11-13T02:36:44Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `4ad75ecce4e4708b`; fingerprint has since moved to `97f8d3c428bb3195` and was CHECKED at `862cf6a` (2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `97f8d3c428bb3195` (`862cf6a`, 2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `f8a3b0970ecf46af`; fingerprint has since moved to `44baa2fb8140bfcf` and was CHECKED at `862cf6a` (2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `44baa2fb8140bfcf` (`862cf6a`, 2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `6ce8bc6a5c089692`; fingerprint has since moved to `4064c2dba866ff44` and was CHECKED at `862cf6a` (2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `4064c2dba866ff44` (`862cf6a`, 2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `eab0b61d59c8bf93`; fingerprint has since moved to `4d8d12ef767220f0` and was CHECKED at `862cf6a` (2026-11-13T02:36:44Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `4d8d12ef767220f0` (`862cf6a`, 2026-11-13T02:36:44Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `b1c22f182bd24afb`; fingerprint has since moved to `e6c4079ba6549266` and was CHECKED at `862cf6a` (2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+  - verified at `e6c4079ba6549266` (`862cf6a`, 2026-11-13T02:36:43Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `98062c0341bd9bbf`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

@@ -267,7 +267,13 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
 # order the eager roll used -- toughness then mana value from the first, the
 # black roll from the second -- so body k is the body it always was, and
 # `tests/test_pod_bodies.py` case X pins it against the eager roll.
-PodBody = namedtuple("PodBody", "toughness mv black", defaults=(False,))
+# POWER, UTILITY AND REACH (§0z198, queue item 44 A1; `attacker_deaths`, OFF):
+# rolled only when the pool is built with the switch on, from a THIRD stream,
+# so toughness, mana value and black are the bodies they always were and,
+# with the switch off, every body equals the three-field body it replaced
+# (the defaults below). See `BodyPool.__getitem__` for the judgements.
+PodBody = namedtuple("PodBody", "toughness mv black power utility reach",
+                     defaults=(False, 0, False, False))
 POD_BODY_POOL = 96       # bodies per opponent per game; drawn cyclically past it
 
 
@@ -276,9 +282,10 @@ class BodyPool(Sequence):
     is read (§0z144). Reads like the tuple it replaced -- `len`, indexing,
     iteration, `==` -- so `pod_bodies` and every test that sets a tuple pool
     by hand work unchanged."""
-    __slots__ = ("_r", "_rb", "_tmax", "_mvmax", "_black", "_drawn")
+    __slots__ = ("_r", "_rb", "_rc", "_combat", "_tmax", "_mvmax", "_black",
+                 "_drawn")
 
-    def __init__(self, seed, i, tmax, mvmax, black):
+    def __init__(self, seed, i, tmax, mvmax, black, combat=None):
         self._r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
         # BLACK, for Pygmy Kavu (§0z132): from a SECOND stream, so toughness
         # and mana value are the bodies change 1 rolled, unchanged. Each body
@@ -287,6 +294,12 @@ class BodyPool(Sequence):
         # them is black.
         self._rb = random.Random((seed * 1000003) ^ (0xB1AC4 + 7919 * i))
         self._tmax, self._mvmax, self._black = tmax, mvmax, black
+        # COMBAT, for A1 (§0z198): `(power_max, utility_share,
+        # utility_power_max, reach_share)` or None. A THIRD stream, so the
+        # first two -- and every body they made -- are untouched.
+        self._combat = combat
+        self._rc = (random.Random((seed * 1000003) ^ (0xC0BA7 + 7919 * i))
+                    if combat is not None else None)
         self._drawn = []
 
     def __len__(self):
@@ -304,7 +317,24 @@ class BodyPool(Sequence):
             r = self._r
             t = r.randint(1, self._tmax)
             mv = r.randint(1, self._mvmax)
-            drawn.append(PodBody(t, mv, self._rb.random() < self._black))
+            black = self._rb.random() < self._black
+            if self._combat is None:
+                drawn.append(PodBody(t, mv, black))
+                continue
+            # THREE JUDGEMENTS, no data (§0z198), each a knob: a body is a
+            # UTILITY creature (a mana creature, an engine, a draw piece)
+            # with `pod_utility_share` (0.3), and then has power 0..
+            # `pod_utility_power_max` (2); otherwise its power is uniform on
+            # 1..`pod_body_power_max` (6, toughness's range, so a combat
+            # body is as big as it is tough on average). It can block a
+            # flier with `flier_block_share` (0.3), the share the count's
+            # rule already used. Always three draws a body, in this order.
+            pmax, ushare, umax, rshare = self._combat
+            rc = self._rc
+            utility = rc.random() < ushare
+            power = rc.randint(0, umax) if utility else rc.randint(1, pmax)
+            drawn.append(PodBody(t, mv, black, power, utility,
+                                 rc.random() < rshare))
         return drawn[k]
 
     def __eq__(self, other):
@@ -323,8 +353,14 @@ def roll_body_pools(cfg, seed, opps) -> None:
     share = cfg.get("culling_pod_share", 0.5)
     mvmax = max(1, int(round(2 / share))) if share > 0 else 1
     black = cfg.get("pod_black_share", 0.25)
+    combat = None
+    if cfg.get("attacker_deaths", False):                       # §0z198
+        combat = (max(1, int(cfg.get("pod_body_power_max", tmax))),
+                  cfg.get("pod_utility_share", 0.3),
+                  max(0, int(cfg.get("pod_utility_power_max", 2))),
+                  cfg.get("flier_block_share", 0.30))
     for i, o in enumerate(opps):
-        o.body_pool = BodyPool(seed, i, tmax, mvmax, black)
+        o.body_pool = BodyPool(seed, i, tmax, mvmax, black, combat)
 
 
 # POD_V4 IS THE DEFAULT POD (§0z140, the owner, 2026-10-15). Item 24's
@@ -2573,6 +2609,326 @@ def chump(items, budget, blocked=None, need=None):
     return stopped, used
 
 
+# ---------------------------------------------------------------------------
+# A1 -- YOUR ATTACKERS CAN DIE TO BLOCKERS (§0z198, queue item 44;
+# `attacker_deaths`, OFF until the batch flips together)
+# ---------------------------------------------------------------------------
+# Until this, a block only ABSORBED: `chump` chose which of your attackers
+# were stopped, and no blocker ever dealt its power back (§0z197 A1). Under
+# the switch, and only on `pod_bodies` (the bodies carry the power), each
+# defender EVALUATES its blocks from what it can see (the owner, 2026-11-13:
+# "the opponents play as close to optimally as possible"), in this order:
+#
+#   0  a commander one hit from 21 is blocked first (`commander_must_block`),
+#      by anything, utility creatures included
+#   1  FREE KILLS: a blocker that kills the attacker and lives
+#   2  TRADES: a blocker that kills the attacker and dies, when it is worth
+#      no more than the attacker (`mv` against `threat_of`, a judgement)
+#   3  SAFE BLOCKS: a blocker that lives and stops the damage
+#   4  PRESSURE: chumps, the most damage stopped per blocker first, until the
+#      swing would leave the defender above `pod_chump_floor` (10) -- the
+#      cost-aware rule of §0z132, unchanged
+#   5  LETHAL: if the swing still kills, the utility creatures chump too
+#      ("utility creatures do not block normally unless under large
+#      pressure", the owner)
+#
+# Most valuable attacker first in 1-2, so a defender kills what it most wants
+# dead; the cheapest blocker that does the job, so it keeps the rest. Utility
+# creatures take no part in 1-4. A menace attacker is blocked only in 0, 4
+# and 5, by two (a double block that kills is not searched for: a floor on
+# the defender). At most `(creatures + birds) * block_share` blockers act --
+# the count's own cap, standing for the creatures tapped from attacking
+# someone else until A2 makes that a fact; WHICH of them block is the
+# defender's choice, which favours the defender (said, not hidden). Goaded
+# Birds are 2/2 fliers worth nothing to it. Every decision reads the board,
+# never a roll, so CRN cannot move.
+#
+# Combat damage (510): an unblocked attacker deals its power to the player;
+# a blocked trampler what its blockers cannot absorb. A first striker (the
+# generated FIRST_STRIKE, DOUBLE_STRIKE) deals its damage first and a blocker
+# it kills deals none back (510.4); a double striker deals it twice. Your
+# attacker dies to the blockers' total power past its toughness unless it is
+# indestructible (`destroy`, `destroys=True`). The pod's bodies have no
+# deathtouch, first strike or trample: a floor on the pod, said here.
+
+def trades_on(g) -> bool:
+    """A1's switch (§0z198): your attackers can die to the pod's blockers.
+    Needs `pod_bodies`, which carries the blockers' power."""
+    return bool(g.cfg.get("attacker_deaths", False)) and pod_bodies_on(g)
+
+
+def first_strike_of(g, perm) -> bool:
+    """First strike or double strike RIGHT NOW (510.4): the generated sets."""
+    from edhmc.decks import _evasion as EV
+    n = perm.card.name
+    return n in EV.FIRST_STRIKE or n in EV.DOUBLE_STRIKE
+
+
+def double_strike_of(g, perm) -> bool:
+    from edhmc.decks._evasion import DOUBLE_STRIKE
+    return perm.card.name in DOUBLE_STRIKE
+
+
+_Atk = namedtuple("_Atk", "k perm power tough fly menace trample dt fs ds "
+                          "hardy value must")
+_Blk = namedtuple("_Blk", "ref power tough reach utility value")
+
+
+def attack_facts(g, perm, k, defender) -> "_Atk":
+    """What a defender sees of one attacker -- read once, used by the plan
+    and by the resolution alike, so the two cannot disagree (§0u)."""
+    return _Atk(k, perm, g.power_of(perm), g.toughness_of(perm),
+                flying_of(g, perm), menace_of(g, perm), trample_of(g, perm),
+                deathtouch_of(g, perm), first_strike_of(g, perm),
+                double_strike_of(g, perm), is_hardy(g, perm),
+                threat_of(g, perm),
+                bool(commander_must_block(g, perm, defender)))
+
+
+def available_blockers(g, defender):
+    """(blockers, cap): the defender's Birds and bodies, and how many may
+    block -- the count's own `block_share` cap (`_blocker_counts`'s, without
+    Ohran Frostfang's halving: a defender that weighs deathtouch does that
+    by itself here). A Bird's ref is ("bird", i); a body's, its index."""
+    birds = int(defender.goaded_birds + 1e-9)
+    out = [_Blk(("bird", i), 2, 2, True, False, 0.0) for i in range(birds)]
+    for i, b in enumerate(pod_bodies(g, defender)):
+        out.append(_Blk(i, b.power, b.toughness, b.reach, b.utility,
+                        float(b.mv)))
+    share = g.cfg.get("block_share", 0.60)
+    cap = int((defender.creatures + defender.goaded_birds) * share)
+    return out, cap
+
+
+def _blocker_dies(a, b) -> bool:
+    """Does `a`'s damage kill blocker `b`, `b` alone in front of it?"""
+    return a.dt or b.tough <= a.power
+
+
+def _kills(a, blks) -> bool:
+    """Do these blockers kill attacker `a`? A first striker kills what it can
+    first, and those deal nothing back (510.4)."""
+    if a.hardy:
+        return False
+    return _damage_back(a, blks) >= a.tough
+
+
+def _damage_back(a, blks) -> int:
+    """The damage `blks` deal attacker `a`, after its first-strike damage."""
+    if not a.fs:
+        return sum(b.power for b in blks)
+    killed = set(_first_strike_kills(a, blks))
+    return sum(b.power for b in blks if b.ref not in killed)
+
+
+def _first_strike_kills(a, blks):
+    """The refs `a` kills with its damage, weakest blocker first."""
+    left, dead = a.power, []
+    for b in sorted(blks, key=lambda b: b.tough):
+        need = 1 if a.dt else b.tough
+        if left >= need and need > 0:
+            left -= need
+            dead.append(b.ref)
+    return dead
+
+
+def _absorb(a, blks) -> int:
+    """What blockers absorb of a trampler's damage (702.19c): lethal to each,
+    1 against deathtouch (702.2c)."""
+    return sum(1 if a.dt else b.tough for b in blks)
+
+
+def _stops(a, blks) -> float:
+    """The damage blocking `a` with `blks` keeps off the player."""
+    if not blks:
+        return 0.0
+    if a.trample:
+        return float(min(a.power, _absorb(a, blks)))
+    return float(a.power)
+
+
+def plan_blocks(g, defender, atk, blockers, cap, free_power=0.0,
+                count=False):
+    """The defender's blocks: {attacker k: [blocker, ...]} by the order in
+    the A1 header. Reads the board and writes nothing but, with `count`, the
+    `pod_block_<kind>` counters -- a question asked of it changes nothing."""
+    m = g.m
+    asg, used = {}, set()
+    room = max(0.0, defender.life - g.cfg.get("pod_chump_floor", 10))
+
+    def left():
+        return cap - len(used)
+
+    def take(a, blks, kind):
+        asg[a.k] = list(blks)
+        used.update(b.ref for b in blks)
+        if count:
+            m[f"pod_block_{kind}"] += 1
+
+    # The damage still coming, kept as blocks are taken, so the pressure
+    # steps below are linear in the attackers, not quadratic (azusa's boards
+    # reach thousands; §0z198).
+    coming = [free_power + sum(a.power for a in atk)]
+
+    def take_and_track(a, blks, kind):
+        take(a, blks, kind)
+        coming[0] -= _stops(a, blks)
+
+    def cost(a):
+        return 2 if a.menace else 1
+
+    def cheapest(cands):
+        return min(cands, key=lambda b: (b.value, b.power, b.tough,
+                                         str(b.ref)))
+
+    def open_blockers(a, utility=False):
+        return [b for b in blockers if b.ref not in used
+                and (not a.fly or b.reach) and (utility or not b.utility)]
+
+    # 0 -- a commander one hit from 21 (§0z67)
+    for a in atk:
+        if not a.must or a.k in asg or left() < cost(a):
+            continue
+        cands = open_blockers(a, utility=True)
+        if len(cands) < cost(a):
+            continue
+        if cost(a) == 1:
+            best = [b for b in cands if _kills(a, [b])
+                    and not _blocker_dies(a, b)] or cands
+            take_and_track(a, [cheapest(best)], "must")
+        else:
+            take_and_track(a, sorted(cands, key=lambda b: (b.value, b.power))
+                           [:2], "must")
+
+    single = sorted((a for a in atk if not a.menace),
+                    key=lambda a: (-a.value, -a.power, a.k))
+    by_power = sorted(single, key=lambda a: (-a.power, a.k))
+    # 1 -- free kills, 2 -- trades, 3 -- safe blocks
+    for kind, order in (("free", single), ("trade", single),
+                        ("safe", by_power)):
+        for a in order:
+            if left() < 1 or not any(b.ref not in used and not b.utility
+                                     for b in blockers):
+                break
+            if a.k in asg:
+                continue
+            cands = open_blockers(a)
+            if kind == "free":
+                cands = [b for b in cands
+                         if _kills(a, [b]) and not _blocker_dies(a, b)]
+            elif kind == "trade":
+                cands = [b for b in cands
+                         if _kills(a, [b]) and b.value <= a.value]
+            else:
+                cands = [b for b in cands if not _blocker_dies(a, b)]
+            if cands:
+                take_and_track(a, [cheapest(cands)], kind)
+
+    # 4 -- pressure, 5 -- lethal: chump, the most stopped per blocker first
+    order = sorted(atk, key=lambda a: (-(a.power / cost(a)), a.k))
+    for kind, utility in (("chump", False), ("utility", True)):
+        limit = room if kind == "chump" else max(0.0, defender.life - 1e-9)
+        for a in order:
+            if coming[0] <= limit or left() < 1:
+                break
+            if a.k in asg or left() < cost(a):
+                continue
+            cands = open_blockers(a, utility)
+            if not cands:
+                if not any(b.ref not in used for b in blockers):
+                    break
+                continue
+            if len(cands) < cost(a):
+                continue
+            take_and_track(a, sorted(cands, key=lambda b: (
+                b.utility, b.value, b.power, str(b.ref)))[:cost(a)], kind)
+    return asg
+
+
+def _trade_through(g, attackers, defender, unblocked, assign, count=None):
+    """`damage_through` under A1 (§0z198): the evaluated blocks. `count`
+    (default: whether `assign` was given) writes the block counters; the
+    pilot's preview collects the blocks without them."""
+    if count is None:
+        count = assign is not None
+    free = unblockable_ids(g)
+    free_power, atk = 0.0, []
+    for k, p in enumerate(attackers):
+        if id(p) in free:
+            free_power += g.power_of(p)
+            continue
+        atk.append(attack_facts(g, p, k, defender))
+    if protected_from_creatures(g):
+        blockers, cap = [], 0             # Serra's Emissary (§0z84)
+    else:
+        blockers, cap = available_blockers(g, defender)
+    asg = plan_blocks(g, defender, atk, blockers, cap, free_power,
+                      count=count)
+    if assign is not None:                # the combat, or its preview
+        assign.extend((a, asg[a.k]) for a in atk if a.k in asg)
+    if unblocked is not None:
+        unblocked.extend(p for k, p in enumerate(attackers)
+                         if k not in asg)
+    total = free_power
+    for a in atk:
+        hits = 2 if a.ds else 1
+        blks = asg.get(a.k)
+        if not blks:
+            total += a.power * hits
+        elif a.trample:
+            total += max(0.0, a.power - _absorb(a, blks)) + (
+                a.power * (hits - 1))
+    return float(total)
+
+
+def resolve_trades(g, defender, assigned) -> tuple:
+    """The deaths of one defender's blocks (§0z198), after the damage has
+    landed: its blockers that your attackers kill, and your attackers that
+    its blockers kill. Returns (pod deaths, your deaths). One simultaneous
+    event for your side (603.10a, §0z76)."""
+    birds_dead, dead_bodies, mine = 0, set(), []
+    for a, blks in assigned:
+        if a.fs:
+            killed = set(_first_strike_kills(a, blks))
+            if a.ds:                       # its regular damage too (510.4)
+                rest = [b for b in blks if b.ref not in killed]
+                killed |= set(_first_strike_kills(a, rest))
+        else:
+            killed = set(_first_strike_kills(a, blks))
+        for b in blks:
+            if b.ref in killed:
+                if isinstance(b.ref, tuple):
+                    birds_dead += 1
+                else:
+                    dead_bodies.add(b.ref)
+        if _kills(a, blks):
+            mine.append(a.perm)
+    n = 0
+    if birds_dead:
+        defender.goaded_birds = max(0.0, defender.goaded_birds - birds_dead)
+        g.m["pod_birds_killed"] += birds_dead
+        hook = getattr(g, "on_pod_creature_deaths", None)
+        if hook is not None:
+            hook(defender, birds_dead)
+        n += birds_dead
+    if dead_bodies:
+        bodies = pod_bodies(g, defender)
+        flags = iter([i in dead_bodies for i in range(len(bodies))])
+        k = kill_pod_bodies(g, defender, lambda b: next(flags))
+        g.m["pod_blockers_killed"] += k
+        n += k
+    died = 0
+    if mine:
+        with simultaneous(g):
+            for p in mine:
+                if destroy(g, p, destroys=True):
+                    died += 1
+        g.m["attackers_died"] += died
+        if any(p.card is g.commander for p in mine):
+            g.m["commander_died_in_combat"] += 1
+    return n, died
+
+
 def _blocker_counts(g, defender):
     """How many of `defender`'s creatures block, and how many can catch a flier.
 
@@ -2674,7 +3030,8 @@ def chump_need(g, defender, fly, ground, free_power):
     return max(0.0, total - room)
 
 
-def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
+def damage_through(g, attackers: list, defender=None, unblocked=None,
+                   assign=None) -> float:
     """Opponents chump-block your biggest attackers first — and CANNOT block
     your fliers with most of their board.
 
@@ -2697,6 +3054,11 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
 
     `unblocked`, when a list, is filled with the attackers that got through
     -- what `commander_hit` reads (§0z65).
+
+    `assign`, when a list, is filled with (attacker facts, blockers) for
+    every block -- what `resolve_trades` kills from, under A1 (§0z198,
+    `attacker_deaths`), which plans the blocks by `plan_blocks` instead of
+    `chump`. Only `combat_damage` passes it; every other caller asks.
     """
     if not attackers:
         return 0.0
@@ -2711,6 +3073,8 @@ def damage_through(g, attackers: list, defender=None, unblocked=None) -> float:
         # every seat under the old rule, as its comment there describes.
         pool = list(g.opponents) if dead_act(g) else (living(g) or g.opponents)
         defender = min(pool, key=lambda o: o.creatures + o.goaded_birds)
+    if trades_on(g):                                           # §0z198
+        return _trade_through(g, attackers, defender, unblocked, assign)
     n_block, n_fly = _blocker_counts(g, defender)
     if protected_from_creatures(g):
         n_block = n_fly = 0          # Serra's Emissary (§0z84)
@@ -3057,6 +3421,66 @@ def _check_eliminations(g):
         g.result = "win"
 
 
+def _attack_groups(g, attackers, scale=1.0, bonus=0.0):
+    """`combat_damage`'s assignment plan, split out (§0z198) so the pilot's
+    preview (`safe_attackers`) reads the split the combat will make: the
+    groups [[defender, its attackers], ...] and the aimed commander, or
+    (None, None) with nobody alive. Reads; writes nothing."""
+    alive = sorted(living(g), key=lambda o: o.life)
+    if not alive:
+        return None, None
+
+    # An AIMED commander (§0z67) is planned separately: out of the life-damage
+    # plan here, into its target's group below.
+    cmdr, aim = commander_target(g, attackers, alive)
+
+    # Ascending power, with prefix sums, so the test above is O(log n).
+    # `scale` multiplies each attacker here rather than the total afterwards,
+    # so the plan is drawn on the same numbers the resolution will produce.
+    pool = sorted((p for p in attackers if p is not cmdr), key=g.power_of)
+    pre = [0.0]
+    for p in pool:
+        pre.append(pre[-1] + g.power_of(p) * scale)
+    n = len(pool)
+
+    plan, i = [], 0
+    for slot, opp in enumerate(alive):
+        if i >= n:
+            break
+        b, _ = _blocker_counts(g, opp)
+        # The flat `bonus` lands on the first group, so that group needs that
+        # much less out of the attackers themselves.
+        need = opp.life - (bonus if slot == 0 else 0.0)
+        if need <= 0:
+            plan.append([opp, i, i])       # the lump alone is lethal
+            continue
+        # smallest j with pre[j] - pre[i] >= need; j is the index one PAST the
+        # last attacker that has to connect, so m - 1 = j - i and k = m + b.
+        j = bisect.bisect_left(pre, pre[i] + need, i, n + 1)
+        k = (j - i) + 1 + b
+        if j > n or i + k > n:
+            # Cannot secure this one. Chip them with everything left, which is
+            # where the old undivided swing went anyway.
+            plan.append([opp, i, n])
+            i = n
+            break
+        plan.append([opp, i, i + k])
+        i += k
+    if i < n and plan:
+        # Every living opponent is already covered and there is still board
+        # left over. It has to attack somebody; pile it on the last group.
+        plan[-1][2] = n
+
+    groups = [[opp, pool[lo:hi]] for opp, lo, hi in plan]
+    if cmdr is not None:
+        mine = next((grp for grp in groups if grp[0] is aim), None)
+        if mine is None:
+            groups.append([aim, [cmdr]])
+        else:
+            mine[1] = mine[1] + [cmdr]
+    return groups, cmdr
+
+
 def combat_damage(g, attackers: list, scale: float = 1.0,
                   bonus: float = 0.0) -> float:
     """One attack declared at the WHOLE POD, split across defenders.
@@ -3131,6 +3555,9 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     all-ground, so it is exact there) and a slight misjudgement otherwise —
     which resolves as a defender surviving at 1 life, a pilot's error rather
     than a rules error. Resolution always uses the real `damage_through`.
+    Under A1 (§0z198, `attacker_deaths`) the defender's blocks are
+    `plan_blocks`'s, not chumps from the top, so the plan is the same kind of
+    approximation of them, and the resolution is again exact.
 
     `cfg["combat_split"]` DEFAULTS TO TRUE as of 2026-09-08 and all six engines
     route their combat through here. Setting it False restores the old
@@ -3193,67 +3620,23 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
         g.m["attack_targets"] += (1 if dmg > 0 else 0)
         return dealt
 
-    alive = sorted(living(g), key=lambda o: o.life)
-    if not alive:
+    groups, cmdr = _attack_groups(g, attackers, scale, bonus)
+    if groups is None:
         return 0.0
-
-    # An AIMED commander (§0z67) is planned separately: out of the life-damage
-    # plan here, into its target's group below.
-    cmdr, aim = commander_target(g, attackers, alive)
-
-    # Ascending power, with prefix sums, so the test above is O(log n).
-    # `scale` multiplies each attacker here rather than the total afterwards,
-    # so the plan is drawn on the same numbers the resolution will produce.
-    pool = sorted((p for p in attackers if p is not cmdr), key=g.power_of)
-    pre = [0.0]
-    for p in pool:
-        pre.append(pre[-1] + g.power_of(p) * scale)
-    n = len(pool)
-
-    plan, i = [], 0
-    for slot, opp in enumerate(alive):
-        if i >= n:
-            break
-        b, _ = _blocker_counts(g, opp)
-        # The flat `bonus` lands on the first group, so that group needs that
-        # much less out of the attackers themselves.
-        need = opp.life - (bonus if slot == 0 else 0.0)
-        if need <= 0:
-            plan.append([opp, i, i])       # the lump alone is lethal
-            continue
-        # smallest j with pre[j] - pre[i] >= need; j is the index one PAST the
-        # last attacker that has to connect, so m - 1 = j - i and k = m + b.
-        j = bisect.bisect_left(pre, pre[i] + need, i, n + 1)
-        k = (j - i) + 1 + b
-        if j > n or i + k > n:
-            # Cannot secure this one. Chip them with everything left, which is
-            # where the old undivided swing went anyway.
-            plan.append([opp, i, n])
-            i = n
-            break
-        plan.append([opp, i, i + k])
-        i += k
-    if i < n and plan:
-        # Every living opponent is already covered and there is still board
-        # left over. It has to attack somebody; pile it on the last group.
-        plan[-1][2] = n
-
-    groups = [[opp, pool[lo:hi]] for opp, lo, hi in plan]
-    if cmdr is not None:
-        mine = next((grp for grp in groups if grp[0] is aim), None)
-        if mine is None:
-            groups.append([aim, [cmdr]])
-        else:
-            mine[1] = mine[1] + [cmdr]
 
     before_alive = len(living(g))
     effective, raw = 0.0, 0.0
     losses = []
     chumped = []          # (defender, the attackers it blocked), §0z132
+    trades = trades_on(g)
+    assigned = []         # (defender, its blocks), A1 (§0z198)
     for slot, (opp, group) in enumerate(groups):
         through = []
+        blocks = [] if trades else None
         dealt = damage_through(g, group, defender=opp,
-                               unblocked=through) * scale
+                               unblocked=through, assign=blocks) * scale
+        if trades:
+            assigned.append((opp, blocks))
         # 104.3j: the commander's unblocked power, from the same blocks
         # (§0z65). Before the `dealt <= 0` skip, though a commander that got
         # through has dealt something.
@@ -3281,8 +3664,18 @@ def combat_damage(g, attackers: list, scale: float = 1.0,
     # The blockers died in the same damage step; their death triggers resolve
     # with the rest, after it -- and a defender the swing killed has no board
     # left to die (`pod_wipe_board`'s rule). A no-op off `pod_bodies`.
-    for opp, blocked in chumped:
-        pod_blocker_deaths(g, opp, blocked)
+    if trades:
+        # A1 (§0z198): the blockers your attackers kill and the attackers
+        # theirs kill, from the same blocks the damage read. A defender the
+        # swing killed has no board left to die (`pod_wipe_board`'s rule),
+        # and its blocks killed nothing of yours: it was dead first only in
+        # the bookkeeping, so its blockers' damage still landed -- 510.2,
+        # all combat damage at once. Both sides resolve.
+        for opp, blocks in assigned:
+            resolve_trades(g, opp, blocks)
+    else:
+        for opp, blocked in chumped:
+            pod_blocker_deaths(g, opp, blocked)
     if pod_bodies_on(g):
         _check_eliminations(g)
     g.m["raw_damage"] += raw
@@ -3355,6 +3748,70 @@ def taps_to_attack(g, perm) -> bool:
     return True
 
 
+
+def preview_trades(g, attackers):
+    """THE PILOT'S READ OF THE BLOCKS (§0z198): the split `combat_damage`
+    would make (`_attack_groups`, at scale 1 -- the engines' Coat of Arms
+    and prowess terms are not in it, a pilot's approximation), each
+    defender's evaluated blocks, and from them (ids of attackers that would
+    die at a loss, opponents the swing would kill).
+    Writes nothing: a board the pilot can see, read the way the pod reads
+    it -- the pod's choices are a function of the board, so this is not an
+    oracle on anything hidden."""
+    groups, _cmdr = _attack_groups(g, attackers)
+    if groups is None:
+        return set(), 0
+    wasted, kills = set(), 0
+    for opp, group in groups:
+        blocks = []
+        dealt = _trade_through(g, group, opp, None, blocks, count=False)
+        if dealt >= opp.life:
+            kills += 1
+        for a, blks in blocks:
+            if not _kills(a, blks):
+                continue
+            # It dies. Worth it only if it takes a blocker worth at least
+            # itself with it, read in the defender's own units (`mv`
+            # against `threat_of`): a trade the defender chose is, by its
+            # own rule, one it wins on value.
+            killed = set(_first_strike_kills(a, blks))
+            worth = max((b.value for b in blks if b.ref in killed),
+                        default=-1.0)
+            if worth < a.value:
+                wasted.add(id(a.perm))
+    return wasted, kills
+
+
+def safe_attackers(g, attackers) -> list:
+    """THE PILOT'S RULE UNDER A1 (§0z198, `attack_safety`, on under the
+    switch): keep home an attacker the pod would kill at a loss -- one that
+    dies taking no blocker worth as much as itself (`preview_trades`) --
+    unless sending it buys an elimination the attack without it does not
+    make. Up to three passes,
+    because a defender that loses a target spends its blockers elsewhere.
+    The owner's rule (2026-11-13): the pilot is upgraded with the pod, or
+    the tables measure the pilot's errors (§0z184). Counted:
+    `attack_kept_safe` creatures, `attack_safety_turns` turns."""
+    if (not trades_on(g) or not g.cfg.get("attack_safety", True)  # §0z198
+            or not attackers or not g.cfg.get("opponents", True)):
+        return attackers
+    send = list(attackers)
+    kept = 0
+    for _ in range(3):
+        wasted, kills = preview_trades(g, send)
+        if not wasted:
+            break
+        cand = [p for p in send if id(p) not in wasted]
+        if preview_trades(g, cand)[1] < kills:
+            break                         # the doomed buy a kill: send them
+        kept += len(send) - len(cand)
+        send = cand
+    if kept:
+        g.m["attack_kept_safe"] += kept
+        g.m["attack_safety_turns"] += 1
+    return send
+
+
 def hold_back(g, attackers) -> list:
     """THE PILOT'S HOLD-BACK (§0z186, `hold_back`): the attackers to SEND.
 
@@ -3379,6 +3836,7 @@ def hold_back(g, attackers) -> list:
     Off the rule, or with the pod off, it is "none". A creature kept home is
     counted (`held_back`, `hold_back_turns`). Every count the prediction
     writes is put back, so asking changes nothing."""
+    attackers = safe_attackers(g, attackers)                     # §0z198
     mode = g.cfg.get("hold_back", "lethal")
     mode = {True: "lethal", False: "none"}.get(mode, mode)   # run_knob_ab
     if (mode == "none" or not untapped_blockers(g) or not attackers
