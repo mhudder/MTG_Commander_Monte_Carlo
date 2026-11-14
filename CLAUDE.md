@@ -210,6 +210,8 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
 - **A policy written while a bug was open does not fix itself when the bug
   does** (§0z5). After closing an engine gap, re-read the hand-written policies
   written while it was open: host rankings, priority orders, reserve sizes.
+  First prove which knobs the new model still reads (`run_knob_liveness`,
+  §0z205): a knob a rule change stranded still looks tuned.
 - **When six copies of one block disagree, the difference is a modelling
   decision nobody made, and its size is not guessable** (§0z30). Measure it at
   the tables' N (`diagnostics/run_shared_code_shift.py`). A rule that lives in a

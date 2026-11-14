@@ -209,8 +209,9 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     and `pod_blocker_deaths`; the split plan keeps the formula's blocker
     count (`split_blockers`). Azusa's `counter_target` is unreached by its
     list -- re-measure when Bristly Bill or Dancing from Dark to Dawn is
-    proposed. **Next: the one rebuild (`parallel-rebuild`), the owner's
-    call.**
+    proposed. **Next: the one rebuild (`parallel-rebuild`) -- HELD BY
+    THE OWNER, 2026-11-14 ("lets hold on the rebuild for now").** Until it
+    runs the six caches stay SUSPECT and `check_docs` fails on them.
 
     **STATUS 2026-11-14: FLIPPED AND RE-FITTED (§0z204).** A1, A2, A4 and
     the pod's hold-back are the default (`opponents.POD_DEFAULTS`;

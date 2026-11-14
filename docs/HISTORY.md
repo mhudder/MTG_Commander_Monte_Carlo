@@ -2901,6 +2901,44 @@ rate back where it was, out of sample to 0.004 -- rendmaw paying most for
 attacking wide. By the owner's instruction nothing was rebuilt: all six
 tables wait for one batch rebuild once the engine work is done (item 35).
 
+## 2026-11-12 to 2026-11-14: item 44 -- combat made real, flipped, re-fitted, re-read (§0z197-§0z205)
+
+The owner's order of work after §0z197's review of turns and combat: your
+attackers die to blockers and you block, built step by step behind
+switches that each restored the old rule exactly, with **no table rebuilt
+until the batch was done**. Each step was OFF-identical, tested with its
+mutation mode and measured on/off per deck:
+
+- **A1** (§0z198): your attackers can die; the pilot's `safe_attackers`
+  reads the blocks first, and pays on all six decks.
+- **A2** (§0z199): the pod's combat step is real bodies attacking at a
+  bridged rate; you block by the same evaluated rule.
+- **A4** (§0z200): rivals lose life to each other -- the batch's pod came
+  out WEAKER than the old one, the re-fit's job.
+- The lifelink pilot (§0z201) was a null; the pod's hold-back (§0z202)
+  worth at most 0.002; the pilot's read of the pod's bodies (§0z203) a
+  little at T20 on two decks.
+
+**The flip** (§0z204, 2026-11-14) moved the four switches into
+`POD_DEFAULTS`; `experiment.POD_PRE_COMBAT` plays the old pod exactly.
+**The re-fit**: `incidental_rate` 0.78 -> 1.45, chosen over the kill
+timing because it lands on the target out of sample and holds the game
+length too. The mean T20 held (0.470 -> 0.468); T10, not fitted, fell
+0.229 -> 0.213; the decks spread (shilgengar +0.052 to karlov -0.043);
+the CRN gain fell from ~15x to ~7x. `test_model_floors` failed on the
+flip alone -- the weak pod showing -- and passed once re-fitted.
+
+**The policy re-read** (§0z205) changed no default. A new liveness census
+(`diagnostics/run_knob_liveness.py`) found three knobs the flip retired.
+The split plan's blocker count, re-read to match the resolution, LOST
+0.0020: the coherent read over-insures against blocks the pod declines,
+so the formula's count stays. Every pilot policy's incumbent won its
+sweep; azusa's `counter_target` turned out unreached by its list.
+
+**The rebuild is held by the owner** (2026-11-14). Until it runs, the six
+caches are SUSPECT for a real reason and `check_docs` fails on them; the
+tables still describe the pre-flip pod at `63d20e7`.
+
 ## 2026-11-11: a review of the core, changing nothing (§0z192)
 
 The owner asked for a review of the core -- the engines that decide a
