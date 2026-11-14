@@ -208,8 +208,9 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     tapped attackers that do not block, the crown an event. OFF proved
     identical both times and the caches VERIFIED; ON measured per deck,
     alone and together. **What is left before the defaults flip**, each the
-    owner's to order: `predicted_chip` read off the bodies instead of the
-    formula; then the flip, the re-fit (§0z195) and one rebuild. The
+    owner's to call: the flip, the re-fit (§0z195) and one rebuild -- the
+    pre-flip list is DONE (`predicted_chip` reads the bodies under A2,
+    §0z203). The
     lifelink pilot was MEASURED and is a null (§0z201, `pilot_life_value`
     stays 0; re-sweep after the flip). The pod's hold-back is BUILT
     (§0z202, `pod_hold_back`, OFF), worth at most 0.002 to you, and

@@ -255,6 +255,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z200](#0z200) | BUILT | **A4: rivals lose life to each other** (`rival_combat`, OFF; item 44). Over A1+A2, T20 +0.025 to +0.044 on all six; A1+A2+A4 against the old pod -0.002 to +0.096: the pod the re-fit must strengthen |
 | [0z201](#0z201) | MEASURED | **The pilot counting a doomed lifelinker's life** (`pilot_life_value`, item 44): a null on all six decks at 0.25-2, inside every bar; §0z198's lifelink reading of karlov was wrong. Stays 0 |
 | [0z202](#0z202) | BUILT | **The pod's hold-back** (`pod_hold_back`, OFF; item 44): it keeps 0.1-0.5 bodies home a game against your crack-back; you lose at most 0.002 at T10, nothing at T20. Recommended for the flip at pad 10 |
+| [0z203](#0z203) | BUILT | **The pilot reads the pod's bodies under A2** (`predict_from_bodies`, item 44): each body's attack chance x what gets past your blocks. T20 +0.0023 lorehold, +0.0037 shilgengar, the rest inside. Pre-flip list done |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17950,6 +17951,71 @@ The pad is not tuned (no arm wins), so no winner to re-measure (§0z170).
 
 **Knobs to say out loud**: `pod_hold_back` (OFF), `pod_hold_back_pad`
 (unset: `hold_back_pad`, 10).
+
+<a id="0z203"></a>
+
+## 0z203. BUILT -- the pilot reads the pod's bodies, not the formula, under A2 (`predict_from_bodies`)
+
+**The owner, 2026-11-14: "go ahead and start on the predicted_chip fix"**
+-- the last gap §0z199 named before the flip: under A2 the pod's swing is
+its bodies, but `predicted_chip`, the pilot's read of the next swing, was
+still the formula (`chip_amount`), which by A2's bridge is the swing BEFORE
+your blocks, so it read high.
+
+**Built**: `_predicted_chip` dispatches, under A2 only, to
+`predicted_from_bodies` (`predict_from_bodies`, default ON; off A2 the
+formula, now `_formula_chip`, exactly as before). For each opponent's
+combat body (`combat_bodies`, the same set `seat_attack` uses): the chance
+it attacks you (`pod_attack_rate` x `chip_share` x the taxes' through-rate)
+x what it gets through if it attacked ALONE against your blocks as they
+stand (`plan_blocks`: 0 if you block it). An expectation, never a roll --
+the pilot knows the pod's habits, not its dice (§0z170). Later rounds scale
+this round by the pod's growth; an opponent with no body yet is read by
+the formula. Said out loud: it cannot see two attackers contending for one
+blocker (optimistic for you when several come), nor the pod's own read and
+hold-back (which only lower the swing: cautious). Its readers: the pilot's
+hold-back (`hold_back`'s crack-back) and the clock floors (`clock_floor`:
+Bolas's Citadel's dig, Necropotence).
+
+### Checks
+
+- OFF A2 identical to `63d20e7` (`build_pending` over 2,000 seeds hashed,
+  `check_unchanged_decks` 0 moved); caches VERIFIED. And with A1+A2+A4 and
+  the pod's hold-back ON but `predict_from_bodies` OFF, identical to
+  `91e7922` on 800 staged games a deck, every key: the refactor
+  (`_formula_chip`, `combat_bodies`) moved nothing, so the measurement's
+  OFF leg is the old read.
+- `tools.validate` +0.00 on 21 metrics OFF and with everything ON.
+- `tests/test_predicted_bodies.py`, 6 cases, 4 mutations, exact sets as
+  written before the run. `python -m tests` 126 of 126.
+
+### Measured (`predict_from_bodies` ON minus OFF, every leg A1+A2+A4 and `pod_hold_back`)
+
+N=15,000 paired, seeds 5000.., python 3.11.17, identity not claimed:
+
+| deck | T10 win | T20 win | held back (on / off) | hold-back turns (on / off) | final life (on / off) |
+|---|---|---|---|---|---|
+| rendmaw | -0.0003 ±0.0006 | +0.0007 ±0.0015 | 0.15 / 0.18 | 0.082 / 0.067 | 12.68 / 12.60 |
+| lorehold | +0.0003 ±0.0009 | **+0.0023 ±0.0016** | 0.11 / 0.15 | 0.090 / 0.067 | 14.85 / 14.80 |
+| karlov | +0.0004 ±0.0008 | -0.0001 ±0.0011 | 0.03 / 0.02 | 0.026 / 0.015 | 36.53 / 36.58 |
+| tivit | +0.0005 ±0.0007 | +0.0008 ±0.0013 | 0.08 / 0.07 | 0.065 / 0.047 | 18.07 / 18.03 |
+| shilgengar | +0.0001 ±0.0004 | **+0.0037 ±0.0019** | 0.11 / 0.14 | 0.093 / 0.081 | 33.08 / 32.94 |
+| azusa | -0.0002 ±0.0006 | +0.0004 ±0.0011 | 0.06 / 0.07 | 0.030 / 0.026 | 17.56 / 17.55 |
+
+Files: `results/predict_from_bodies_<deck>_20261114.txt`.
+
+**Read**: the hold-back now fires on more turns and keeps fewer creatures
+home each time -- it knows which of the pod's bodies your blockers already
+stop -- and that pays a little at T20 on two decks (lorehold +0.0023,
+shilgengar +0.0037), inside the bar on four. Karlov's Citadel digs a little
+deeper (0.79 -> 0.81 casts a game, 2.01 -> 2.07 life paid) for nothing.
+**`predict_from_bodies` stays ON under A2**: one rule written once, not the
+winner of many arms, so there is no winner to re-measure (§0z170).
+
+**Item 44's pre-flip list is done** with this: A1, A2, A4, the pod's
+hold-back and this read are built, each OFF or read only under A2;
+the lifelink pilot was a null. What is left is the flip, the re-fit
+(§0z195) and the one rebuild -- the owner's to call.
 
 ## How to read an ablation table
 

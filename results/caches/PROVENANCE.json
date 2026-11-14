@@ -611,6 +611,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "45488d5bf263288f",
         "utc": "2026-11-14T02:32:56Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "a0d2a2ac181b6797",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },
@@ -1132,6 +1138,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "7c654095f02af0eb",
         "utc": "2026-11-14T02:32:56Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "f17e4a5b175201e9",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },
@@ -1681,6 +1693,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "7af324301f152cee",
         "utc": "2026-11-14T02:32:56Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "7756bd1febfb3801",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },
@@ -2196,6 +2214,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "849e1537446b0d4b",
         "utc": "2026-11-14T02:32:55Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "30d359172504d1d1",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },
@@ -2746,6 +2770,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "fcc758f6385e774e",
         "utc": "2026-11-14T02:32:56Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "1850cccc6e150738",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },
@@ -3255,6 +3285,12 @@
         "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
         "fingerprint": "37fc04c0b691786d",
         "utc": "2026-11-14T02:32:56Z"
+      },
+      {
+        "commit": "91e7922",
+        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+        "fingerprint": "9d7fcac296030022",
+        "utc": "2026-11-14T03:06:59Z"
       }
     ]
   },

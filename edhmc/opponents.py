@@ -3266,8 +3266,7 @@ def seat_attack(g, i) -> None:
     others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
     share = chip_share(g, opp, others)
     through = attack_tax_through(g)
-    combat = [k for k, b in enumerate(bodies)
-              if not b.utility and b.power > 0]
+    combat = combat_bodies(bodies)
     rate = pod_attack_rate(g, opp, sum(bodies[k].power for k in combat))
     # What the formula would have dealt this turn, before prevention: the
     # bridge's target, counted beside what the rolls offered (§0z199).
@@ -4828,6 +4827,59 @@ def planned_attack(g):
     return [p for p in send if not p.tapped and not vigilant(g, p)]
 
 
+def combat_bodies(bodies) -> list:
+    """The bodies that attack at all under A2: never a utility one, never
+    one with no power (§0z199)."""
+    return [k for k, b in enumerate(bodies) if not b.utility and b.power > 0]
+
+
+def predicted_from_bodies(g, rounds: int = 1) -> float:
+    """THE POD'S NEXT SWING AS A PILOT READS IT UNDER A2 (§0z203,
+    `predict_from_bodies`): for each opponent's combat body, the chance it
+    attacks you (`pod_attack_rate` x `chip_share` x the taxes' through-rate)
+    times what it would get through if it attacked ALONE against your
+    blocks as they stand (`plan_blocks`: 0 if you block it). An
+    EXPECTATION, never a roll -- the pilot knows the pod's habits, not its
+    dice (§0z170). It cannot see two attackers contending for one blocker
+    (optimistic for you when several come at once), the pod's own read
+    and hold-back (which only lower the swing, so a cautious reading), or
+    bodies not yet on the table: later rounds scale this round's estimate
+    by the pod's growth, and an opponent with no body yet is read by the
+    formula. Prevention is not counted, as before."""
+    t0 = pod_turn(g)
+    first = g.cfg.get("first_attack_turn", 3)
+    blockers = your_blockers(g)
+    floor = g.cfg.get("your_chump_floor", 10)
+    through = attack_tax_through(g)
+    total = 0.0
+    for i, opp in enumerate(g.opponents):
+        if not opp.alive:
+            continue
+        others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
+        share = chip_share(g, opp, others)
+        bodies = pod_bodies(g, opp)
+        combat = combat_bodies(bodies)
+        p = pod_attack_rate(g, opp, sum(bodies[k].power for k in combat))
+        p *= share * through
+        est = 0.0
+        for k in combat:
+            atk = _body_facts(bodies, [k])
+            asg = plan_blocks(g, g.your_life, atk, blockers, len(blockers),
+                              floor=floor)
+            if k not in asg:
+                est += p * bodies[k].power
+        n0 = opp.creatures
+        for r in range(rounds):
+            if t0 + r < first:
+                continue
+            nr = min(7.0, n0 + 0.7 * opp.p["board"] * r)
+            if n0 >= 1.0:
+                total += est * nr / n0
+            else:
+                total += chip_amount(g, opp, share, nr)
+    return total
+
+
 def predicted_chip(g, rounds: int = 1) -> float:
     """`_predicted_chip`, read with your planned attack tapped when it is read
     before your combat (`planned_attack`, §0z189). When one is planned, the
@@ -4861,9 +4913,21 @@ def _predicted_chip(g, rounds: int = 1) -> float:
 
     WHAT IT CANNOT SEE, said out loud: a clock that picks you ends the game
     at any life total (`resolve_clocks`), so no floor guards against it;
-    and your share moves with your board, which the dig itself grows."""
+    and your share moves with your board, which the dig itself grows.
+
+    Under A2 (`you_block`) the swing is the pod's bodies, not the formula,
+    and the pilot reads THEM (`predicted_from_bodies`, §0z203); the formula
+    is `_formula_chip`, which it always was off A2."""
     if g.result is not None or protected_from_creatures(g):
         return 0.0
+    if you_block_on(g) and g.cfg.get("predict_from_bodies", True):
+        return predicted_from_bodies(g, rounds)
+    return _formula_chip(g, rounds)
+
+
+def _formula_chip(g, rounds: int = 1) -> float:
+    """`_predicted_chip`'s formula: `chip_amount` a round, over the
+    living, with the pod's growth on later rounds (§0z161)."""
     t0 = pod_turn(g)
     first = g.cfg.get("first_attack_turn", 3)
     total = 0.0
