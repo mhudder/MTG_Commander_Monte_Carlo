@@ -1,0 +1,37 @@
+pilot_life_value: each value minus pilot_life_value=0, paired, the staged lists, N=6,000 a deck, seeds 5000..10999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0
+
+rendmaw
+  pilot_life_value=0.5     T10 +0.0000 +-0.0012   T20 +0.0025 +-0.0028   turns -0.008
+  pilot_life_value=1       T10 +0.0002 +-0.0014   T20 +0.0037 +-0.0032*  turns -0.015
+  pilot_life_value=2       T10 +0.0015 +-0.0014*  T20 +0.0030 +-0.0035   turns -0.013
+
+lorehold
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+
+karlov
+  pilot_life_value=0.5     T10 +0.0012 +-0.0025   T20 +0.0010 +-0.0033   turns -0.009
+  pilot_life_value=1       T10 -0.0003 +-0.0032   T20 -0.0005 +-0.0046   turns +0.004
+  pilot_life_value=2       T10 +0.0003 +-0.0038   T20 -0.0002 +-0.0053   turns +0.014
+
+tivit
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+
+shilgengar
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 -0.0003 +-0.0005   turns +0.001
+  pilot_life_value=1       T10 +0.0003 +-0.0005   T20 -0.0007 +-0.0010   turns -0.001
+  pilot_life_value=2       T10 +0.0005 +-0.0010   T20 -0.0015 +-0.0022   turns +0.003
+
+azusa
+  pilot_life_value=0.5     T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=1       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+  pilot_life_value=2       T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+
+MEAN OVER 6 DECKS (each deck's paired difference, averaged; variances add)
+  pilot_life_value=0.5     T10 +0.0002 +-0.0005   T20 +0.0005 +-0.0007 
+  pilot_life_value=1       T10 +0.0000 +-0.0006   T20 +0.0004 +-0.0009 
+  pilot_life_value=2       T10 +0.0004 +-0.0007   T20 +0.0002 +-0.0011 

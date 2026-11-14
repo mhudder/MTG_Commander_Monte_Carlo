@@ -257,7 +257,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z202](#0z202) | BUILT | **The pod's hold-back** (`pod_hold_back`, OFF; item 44): it keeps 0.1-0.5 bodies home a game against your crack-back; you lose at most 0.002 at T10, nothing at T20. Recommended for the flip at pad 10 |
 | [0z203](#0z203) | BUILT | **The pilot reads the pod's bodies under A2** (`predict_from_bodies`, item 44): each body's attack chance x what gets past your blocks. T20 +0.0023 lorehold, +0.0037 shilgengar, the rest inside. Pre-flip list done |
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
-| [0z205](#0z205) | **IN PROGRESS** | **Item 44's policy re-read** (§0z5): three knobs retired by the flip; the split plan keeps the formula's blocker count (the coherent read loses 0.0020); pilot sweeps running |
+| [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18163,14 +18163,13 @@ now means (the bridge's rate, capped at 1 a body); `threat_clock_shift`
 
 <a id="0z205"></a>
 
-## 0z205. IN PROGRESS -- item 44's policy re-read after the flip (§0z5)
+## 0z205. MEASURED -- item 44's policy re-read after the flip: every incumbent holds (§0z5)
 
 **The owner, 2026-11-14: "go ahead and start on the policy re-read"**,
 after the flip and re-fit (§0z204). §0z5: a policy written while a gap was
 open does not fix itself when the gap closes. Every pilot rule below was
 written while your attackers could not die and you did not block. **No
-default has changed yet**; the pilot sweeps are running and this section is
-completed when they land.
+default changed**: every policy's incumbent wins on the new pod.
 
 ### 1. Which combat knobs the default pod still reads
 
@@ -18230,19 +18229,66 @@ stays live as the plan's knob. "share" is no better: reading the tapped
 state buys nothing measurable. `tests/test_plan_blockers.py`, 7 cases, 4
 mutations, exact sets as written before the run.
 
-### 3. The pilot's policies, swept on the new pod (RUNNING)
+### 3. The pilot's policies, swept on the new pod
 
-`diagnostics.run_knob_sweep`, N=6,000 a deck paired, seeds 5000..10999:
-`hold_back_pad` (10 against 0, 5, 15, 20), `your_chump_floor` (10 against
-0, 5, 15, 20), `pilot_life_value` (0 against 0.5, 1, 2; §0z201 asked for
-it after the flip), `attack_safety` and the `hold_back` mode (on against
-off). And two hand-written policies whose written reason was a formula-era
-claim, N=15,000 on their one deck: azusa's `counter_target` ("spread", §0z101:
-"the pod chump-blocks the BIGGEST attackers" -- under A1 it evaluates) and
-rendmaw's `doll_policy` ("nest", §0z58: tapping the Doll at end step "costs
-nothing" -- a tapped creature does not block on the pod's turns). A first
-`hold_back_pad` sweep ran on the code before the split's default was settled
-and is not quoted; every sweep was re-run on one code state.
+`diagnostics.run_knob_sweep`, paired against the default, N=6,000 a deck,
+seeds 5000..10999, T20 with T10 off the same game, every sweep run on one
+code state (the default identical to `3e7b6fb`). A first `hold_back_pad`
+sweep ran before the split's default was settled and is not quoted. Mean
+over the six decks, T20 (files `results/reread_<knob>_20261114.txt`):
+
+| policy (default) | arm | mean T20 minus the default | read |
+|---|---|---|---|
+| `hold_back_pad` (10, §0z191) | 0 / 5 / 15 / 20 | **-0.0057** / -0.0011 / **-0.0040** / **-0.0038** | 10 holds; 5 inside |
+| `your_chump_floor` (10, never swept) | 0 / 5 / 15 / 20 | **-0.0086** / **-0.0048** / **-0.0026** / **-0.0053** | 10 holds, at both sides |
+| `pilot_life_value` (0, §0z201) | 0.5 / 1 / 2 | +0.0005 / +0.0004 / +0.0002, every bar | a null again; stays 0 |
+| `attack_safety` (on, §0z198) | off | **-0.0847 ±0.0044** | the pilot's read of blocks pays most of all |
+| `hold_back` ("lethal", §0z186) | "none" | **-0.0072 ±0.0015** | holds |
+
+Bold: outside the 95% bar. Per deck, `attack_safety` off costs -0.040
+(shilgengar) to -0.124 (azusa), the attackers you lose a game rising
+1.9-9x (rendmaw 2.8 -> 6.8); `your_chump_floor` 0 costs most where you
+chump most (shilgengar -0.0185, rendmaw -0.0158). **No incumbent was the
+winner of many arms here, so there is no winner to re-measure (§0z170);
+nothing changes.**
+
+**The two hand-written policies**, N=15,000 on their one deck:
+
+- **rendmaw's Twitching Doll, `doll_policy` "nest" (§0z58)**: "attack"
+  minus "nest" -0.0009 ±0.0013 at T10, **-0.0033 ±0.0026 at T20**. The
+  written reason ("costs nothing") is false on the new pod -- the Doll
+  tapped at your end step does not block on the pod's turns -- and the nest
+  still wins. The policy stands; its reason is corrected here.
+- **azusa's `counter_target` "spread" (§0z101)**: "focus" minus "spread"
+  **exactly 0.0000 at both horizons, 15,000 games: UNREACHED, not
+  measured.** Neither Bristly Bill nor Dancing from Dark to Dawn is in
+  azusa's staged list (they were §0z101's candidates), and Mossborn Hydra
+  takes the counters under both rules. The policy's written reason ("the
+  pod chump-blocks the BIGGEST attackers", §0v) is a formula-era claim;
+  **re-measure it when either card is proposed**, not before.
+
+### What this closes, and what it does not
+
+- Item 44's list of knobs "re-derived or retired by it": `blocker_toughness`
+  RETIRED (dead on the new pod); `block_share` kept as the split plan's
+  knob (section 2); `flier_block_share` live as the body pool's flier share;
+  `goad_block_share` live, a pod-side count left inside A4 (section 1);
+  `incidental_rate` re-fitted (§0z204); `hold_back` and `hold_back_pad`
+  re-swept, unchanged; `attack_tax_deflect` stays (the pod has no mana);
+  `combat_share`'s `1/(1+blockers)` was not separately re-read -- it is the
+  formula's, read only off A2 and by the bridge's aim.
+- **Blind to** (§0z15): the POD's policies (`pod_chump_floor`,
+  `pod_hold_back_pad`, `pod_attack_safety`) are not pilot rules and were not
+  swept: the owner's decision 3 asks the pod to play as well as it can,
+  which would be a sweep for the value that LOWERS your win rate, and any
+  move re-opens the fit (§0z204). And the card priority tables (item 18)
+  were swept on the formula pod; the rebuild's rows are where a moved
+  priority would show first.
+- What is left of item 44: **the one rebuild**, the owner's call.
+
+**Knobs to say out loud**: none moved. `hold_back_pad` 10,
+`your_chump_floor` 10, `pilot_life_value` 0, `split_blockers` "formula"
+(`block_share` 0.6), `doll_policy` "nest".
 
 ## How to read an ablation table
 

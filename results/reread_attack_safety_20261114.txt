@@ -1,0 +1,23 @@
+attack_safety: each value minus attack_safety=True, paired, the staged lists, N=6,000 a deck, seeds 5000..10999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0; reach `attackers_died` a game, value leg / base leg
+
+rendmaw
+  attack_safety=False   T10 -0.0198 +-0.0058*  T20 -0.1040 +-0.0121*  attackers_died 6.753 / 2.766  turns -0.548
+
+lorehold
+  attack_safety=False   T10 -0.0360 +-0.0065*  T20 -0.0420 +-0.0082*  attackers_died 1.022 / 0.350  turns -0.021
+
+karlov
+  attack_safety=False   T10 -0.0742 +-0.0089*  T20 -0.1132 +-0.0120*  attackers_died 2.780 / 0.303  turns +0.155
+
+tivit
+  attack_safety=False   T10 -0.0603 +-0.0074*  T20 -0.0855 +-0.0094*  attackers_died 1.940 / 0.390  turns +0.141
+
+shilgengar
+  attack_safety=False   T10 -0.0022 +-0.0038   T20 -0.0398 +-0.0097*  attackers_died 1.961 / 0.235  turns -0.172
+
+azusa
+  attack_safety=False   T10 -0.1072 +-0.0098*  T20 -0.1235 +-0.0121*  attackers_died 3.780 / 1.895  turns +0.081
+
+MEAN OVER 6 DECKS (each deck's paired difference, averaged; variances add)
+  attack_safety=False   T10 -0.0499 +-0.0030*  T20 -0.0847 +-0.0044*

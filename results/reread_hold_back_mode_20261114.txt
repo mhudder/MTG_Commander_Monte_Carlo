@@ -1,0 +1,23 @@
+hold_back: each value minus hold_back='lethal', paired, the staged lists, N=6,000 a deck, seeds 5000..10999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0; reach `held_back` a game, value leg / base leg
+
+rendmaw
+  hold_back='none'  T10 +0.0000 +-0.0018   T20 -0.0102 +-0.0043*  held_back 0.000 / 0.575  turns -0.121
+
+lorehold
+  hold_back='none'  T10 -0.0023 +-0.0026   T20 -0.0077 +-0.0039*  held_back 0.000 / 0.316  turns -0.081
+
+karlov
+  hold_back='none'  T10 -0.0007 +-0.0012   T20 -0.0015 +-0.0026   held_back 0.000 / 0.157  turns -0.037
+
+tivit
+  hold_back='none'  T10 -0.0023 +-0.0024   T20 -0.0077 +-0.0037*  held_back 0.000 / 0.279  turns -0.092
+
+shilgengar
+  hold_back='none'  T10 +0.0005 +-0.0010   T20 -0.0130 +-0.0043*  held_back 0.000 / 0.392  turns -0.151
+
+azusa
+  hold_back='none'  T10 +0.0002 +-0.0013   T20 -0.0030 +-0.0026*  held_back 0.000 / 0.238  turns -0.034
+
+MEAN OVER 6 DECKS (each deck's paired difference, averaged; variances add)
+  hold_back='none'  T10 -0.0008 +-0.0007*  T20 -0.0072 +-0.0015*

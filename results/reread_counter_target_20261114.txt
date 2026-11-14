@@ -1,0 +1,8 @@
+counter_target: each value minus counter_target='spread', paired, the staged lists, N=15,000 a deck, seeds 5000..19999, T20 (T10 off the same game), python 3.11.17 / numpy 2.4.6
+95% CI; * = excludes 0
+
+azusa
+  counter_target='focus' T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000   turns +0.000
+
+MEAN OVER 1 DECKS (each deck's paired difference, averaged; variances add)
+  counter_target='focus' T10 +0.0000 +-0.0000   T20 +0.0000 +-0.0000 

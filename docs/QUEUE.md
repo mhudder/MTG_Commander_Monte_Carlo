@@ -23,8 +23,8 @@ What is closed and where it went:
 **Order of work (the owner, 2026-11-12): item 44 first** -- §0z197's A1 and
 A2, tested step by step, with **no table rebuilt until that batch is done**.
 **The batch's defaults are FLIPPED and the pod re-fitted (§0z204,
-2026-11-14)**; what is left of item 44 is the policy re-read and the one
-rebuild.
+2026-11-14), and the policy re-read is done (§0z205)**; what is left of item
+44 is the one rebuild.
 
 ---
 
@@ -201,12 +201,16 @@ rebuild.
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
 
-    **STATUS 2026-11-14, LATER: THE POLICY RE-READ IS UNDER WAY (§0z205).**
-    Done: the liveness census (three knobs retired by the flip) and the
-    split plan's blocker count (the formula kept). Running: the pilot
-    sweeps (`hold_back_pad`, `your_chump_floor`, `pilot_life_value`,
-    `attack_safety`, `hold_back`, azusa's `counter_target`, rendmaw's
-    `doll_policy`). Then the rebuild, the owner's call.
+    **STATUS 2026-11-14, LATER: THE POLICY RE-READ IS DONE (§0z205); ONLY
+    THE REBUILD IS LEFT.** No default changed: every pilot policy's
+    incumbent wins on the new pod (`hold_back_pad` 10, `your_chump_floor`
+    10, `pilot_life_value` 0, `attack_safety` and `hold_back` on, rendmaw's
+    Doll nest); the flip retired `blocker_toughness`, `pod_block_policy`
+    and `pod_blocker_deaths`; the split plan keeps the formula's blocker
+    count (`split_blockers`). Azusa's `counter_target` is unreached by its
+    list -- re-measure when Bristly Bill or Dancing from Dark to Dawn is
+    proposed. **Next: the one rebuild (`parallel-rebuild`), the owner's
+    call.**
 
     **STATUS 2026-11-14: FLIPPED AND RE-FITTED (§0z204).** A1, A2, A4 and
     the pod's hold-back are the default (`opponents.POD_DEFAULTS`;
