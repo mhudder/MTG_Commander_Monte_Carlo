@@ -217,7 +217,9 @@ def run_cases():
 
     same, ranged = True, True
     for seed in (1, 77, 5003):
-        off = OPP.make_pod(dict(DEFAULT_CFG, pod_bodies=True), seed)[0]
+        off = OPP.make_pod(dict(DEFAULT_CFG, pod_bodies=True,
+                                attacker_deaths=False, you_block=False),
+                           seed)[0]
         on = OPP.make_pod(dict(DEFAULT_CFG, pod_bodies=True,
                                attacker_deaths=True), seed)[0]
         for o_off, o_on in zip(off, on):

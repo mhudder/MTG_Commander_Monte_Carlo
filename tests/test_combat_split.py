@@ -21,6 +21,7 @@ import sys
 
 from edhmc.engine import Card, Metrics, Permanent
 from edhmc import opponents as OPP
+from edhmc.experiment import POD_PRE_COMBAT
 
 MUTATE = "--mutate" in sys.argv
 
@@ -29,7 +30,8 @@ class FakeGame:
     """The smallest object `combat_damage` actually reads."""
 
     def __init__(self, lives, blockers=0.0, split=True):
-        self.cfg = {"combat_split": split}
+        # the pre-flip pod, stated (§0z204): A1 evaluates blocks here
+        self.cfg = {"combat_split": split, **POD_PRE_COMBAT}
         self.opponents = [
             OPP.Opponent(bracket=3, has_blue=False, creatures=blockers,
                          life=float(l))

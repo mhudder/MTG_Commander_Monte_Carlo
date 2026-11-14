@@ -256,6 +256,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z201](#0z201) | MEASURED | **The pilot counting a doomed lifelinker's life** (`pilot_life_value`, item 44): a null on all six decks at 0.25-2, inside every bar; §0z198's lifelink reading of karlov was wrong. Stays 0 |
 | [0z202](#0z202) | BUILT | **The pod's hold-back** (`pod_hold_back`, OFF; item 44): it keeps 0.1-0.5 bodies home a game against your crack-back; you lose at most 0.002 at T10, nothing at T20. Recommended for the flip at pad 10 |
 | [0z203](#0z203) | BUILT | **The pilot reads the pod's bodies under A2** (`predict_from_bodies`, item 44): each body's attack chance x what gets past your blocks. T20 +0.0023 lorehold, +0.0037 shilgengar, the rest inside. Pre-flip list done |
+| [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18016,6 +18017,148 @@ winner of many arms, so there is no winner to re-measure (§0z170).
 hold-back and this read are built, each OFF or read only under A2;
 the lifelink pilot was a null. What is left is the flip, the re-fit
 (§0z195) and the one rebuild -- the owner's to call.
+
+<a id="0z204"></a>
+
+## 0z204. FLIPPED -- item 44's combat is the default, and the pod is re-fitted (`incidental_rate` 1.45)
+
+**The owner, 2026-11-14: "go ahead and start on the flip and re-fit"**,
+after the pre-flip list closed (§0z203). Item 44's protocol: the defaults
+flip TOGETHER, the pod is re-fitted ONCE by the fit rule (§0z195, §0z140),
+then one rebuild -- the owner's call. **No table was rebuilt.**
+
+### The flip
+
+`attacker_deaths` (A1, §0z198), `you_block` (A2, §0z199), `rival_combat`
+(A4, §0z200) and `pod_hold_back` (§0z202, pad 10 by `hold_back_pad`) moved
+into `opponents.POD_DEFAULTS`, read through `pod_knob` as POD_V4's knobs are
+(§0z140), so the default is said once. `predict_from_bodies` was already ON
+under A2 (§0z203); `pilot_life_value` stays 0 (§0z201).
+**`experiment.POD_PRE_COMBAT`** restores the pod every table before this
+section measured, the old rate included: `dict(DEFAULT_CFG, **POD_PRE_COMBAT)`
+played 800 staged games a deck identically to `af0af9c`, every output key
+hashed, on all six. And the new default played identically to `af0af9c`
+with the four switches set ON by hand: the flip is the switches, nothing
+else.
+
+### The re-fit
+
+The fit rule: the mean T20 win rate over the six active decks (staged
+lists) equals the old pod's. Both levers were swept on the same seeds
+(`diagnostics.fit_pod_knob`, N=3,000 a deck, seeds 5000..7999, target
+`POD_PRE_COMBAT`'s switches with the old rate 0.78; files
+`results/fit_combat_incidental_rate_20261114.txt`,
+`results/fit_combat_clock_shift_20261114.txt`):
+
+| lever | crossing | mean turns at it (old pod 10.51) |
+|---|---|---|
+| `incidental_rate` (0.78 today) | **1.453** | 10.51 at 1.5 |
+| `threat_clock_shift` (2.3 today) | 3.007 | 10.68 |
+
+**Out of sample** (§0z170: the value was chosen on the seeds above), N=3,000,
+seeds 20000..22999 (`results/fit_combat_incidental_rate_145_oos_20261114.txt`,
+`results/fit_combat_clock_shift_30_oos_20261114.txt`): **`incidental_rate`
+1.45 gives a mean T20 of 0.4616 against the old pod's 0.4612, and 10.49
+turns against 10.48**; the shift at 3.0 gives 0.4752 (+0.014) and 10.74.
+
+**ADOPTED: `incidental_rate` 1.45**, in `DEFAULT_CFG`. Why this lever: item
+44 named it (as §0z186 did), it holds the mean game length as well -- the
+one anchored figure (the Command Zone's 10.29, the POD_V2 note) -- and out
+of sample it lands on the target where the shift does not. Under A2 the rate
+reaches the game through ONE path, the bridge (`pod_attack_rate`), which
+sets how often a combat body attacks -- at you, and under A4 at rivals. It
+does NOT read as "the pod deals 1.45x": the rate is capped at 1 a body, and
+the bodies offered 0.77-0.82 of what the formula would have dealt
+(`pod_attack_offered` / `chip_formula_equiv`, table below). That cap is
+§0z199's undershoot, and it is most of why the rate had to rise this far.
+`monarch_loss_scale` defaults to the rate but is read only off A2.
+
+### What it moved (old pod `POD_PRE_COMBAT` against the new default)
+
+`diagnostics.run_shared_code_shift`, N=15,000 paired, seeds 5000..19999,
+python 3.11.17, both legs in one tree
+(`results/combat_flip_refit_shift_20261114.txt`):
+
+| deck | T10 win | T20 win | T20 damage | T20 final life | T20 turns |
+|---|---|---|---|---|---|
+| rendmaw | **-0.0491** | -0.0031 ±0.0084 | -18.8 | +2.4 | +0.76 |
+| lorehold | **-0.0107** | **-0.0293** | -12.1 | -0.6 | -0.31 |
+| karlov | **-0.0345** | **-0.0429** | -16.6 | -8.0 | +0.01 |
+| tivit | **-0.0186** | **-0.0205** | -13.6 | -0.6 | -0.19 |
+| shilgengar | **+0.0052** | **+0.0524** | -9.5 | +2.1 | +0.00 |
+| azusa | **+0.0148** | **+0.0306** | -14.8 | +1.3 | -0.04 |
+| **mean** | 0.2287 -> 0.2132 | **0.4702 -> 0.4680** | | | |
+
+Bold: outside the 95% bar. The fit holds T20's mean at the tables' N
+(-0.0022). **T10 is not fitted and falls by 0.016**, most on rendmaw: under
+A1 its attackers die (2.78 a game), and a deck that wins by its early
+swings is slowed. Damage falls on every deck (blocks, deaths, the pod's
+read): damage is a proxy, and this is the expected direction.
+
+**Every output key**, N=2,000 a deck, T20
+(`results/combat_flip_refit_keys_20261114.txt`, 886 deck-key pairs moved,
+most of them counters that are 0 on the old pod):
+
+| deck | your attackers died | your blockers died | pod attackers you killed | rival-on-rival damage | your combat kills | opponents killed | offered / formula |
+|---|---|---|---|---|---|---|---|
+| rendmaw | 2.78 | 0.85 | 0.46 | 16.6 | 1.02 -> 0.90 | 1.67 -> 1.73 | 0.82 |
+| lorehold | 0.33 | 0.28 | 0.32 | 12.0 | 1.15 -> 1.02 | 1.94 -> 1.82 | 0.77 |
+| karlov | 0.29 | 0.33 | 0.55 | 17.0 | 0.65 -> 0.50 | 1.49 -> 1.39 | 0.82 |
+| tivit | 0.39 | 0.40 | 0.47 | 15.0 | 0.78 -> 0.71 | 1.93 -> 1.88 | 0.79 |
+| shilgengar | 0.23 | 0.54 | 0.68 | 18.5 | 1.20 -> 1.25 | 1.64 -> 1.75 | 0.81 |
+| azusa | 1.83 | 0.29 | 0.51 | 19.5 | 1.52 -> 1.52 | 1.88 -> 1.94 | 0.79 |
+
+**Read**: the decks that block well and attack wide gain (shilgengar's
+blockers kill 0.68 of the pod's attackers a game; azusa's board is wide
+enough to keep attacking through deaths); the decks the old formula let
+attack freely lose (karlov, whose life is also 8 lower: the pod attacks at
+it more often at 1.45). **Per §0z195 only signs and order inside a deck are
+read across the flip**, never these sizes as a verdict on a deck: the
+spread is the model changing, and the rebuild is where it is read card by
+card.
+
+### Checks
+
+- `python -m tests` 126 of 126, `--mutate` 124 of 124. Six test modules
+  pinned rules that now live behind the switches and had relied on them
+  being OFF (`test_combat_split`, `test_planned_crack_back`, `test_pod_bodies`,
+  `test_untapped_blockers`, one case each of `test_attacker_deaths` and
+  `test_citadel_dig`): each now STATES the pre-flip pod (`PRE_COMBAT_CFG`,
+  `POD_PRE_COMBAT`), said in a comment, and every mutation set is unchanged.
+  `test_citadel_dig` N pins `predicted_chip` equal to the legacy whole-pod
+  chip (`incidental_damage`, reached only with `pod_seat_turns` False): it
+  held under A2 at 0.78 only because the bridge's cap did not bind; at 1.45
+  the bodies' expectation (11.99) sits below the formula (12.54) -- §0z199's
+  undershoot, not a defect. Case O runs on the default.
+- **`test_model_floors` A FAILED on the flip before the re-fit**, and that
+  was the pod's weakness showing: the do-nothing deck lost 0.863 (tivit) and
+  0.873 (shilgengar) against a floor of 0.88 -- games running to T20
+  undecided once rivals wear each other down. **It passes at 1.45**, with
+  no change to the test.
+- `tools.validate` +0.00 on all 21 metrics (`results/validate_combat_flip_20261114.txt`).
+  **The CRN factor falls**: corr(A,B) 0.9345 -> 0.8603, "worth ~15x" ->
+  "~7x" (the old pod measured the same day in a worktree at `af0af9c`). The
+  paired SE that the bars come from is 0.1114 -> 0.1230, about 10% wider:
+  expect the rebuilt tables' noise floors near 1.1x today's at N=15,000.
+  Item 44's recommendation 4 said to read this cost; it is that.
+- **All six caches are SUSPECT, for a real reason**: the baseline moved.
+  **Never clear them with `--verified`**; only the rebuild does.
+  `check_docs` fails on them until it runs, and this commit says so.
+
+### What is left of item 44
+
+1. **Re-read the policies written while the gap was open** (§0z5): every
+   pilot rule tuned while your attackers could not die and you did not block
+   -- the hold-back pad (`hold_back_pad`, §0z186, §0z191), the chump floor
+   (`your_chump_floor`), the Citadel's clock pad (§0z190), the reserves and
+   the knobs item 44 says the batch re-derives or retires (`block_share`,
+   `flier_block_share`, `blocker_toughness`, `goad_block_share`,
+   `attack_tax_deflect`) -- and re-sweep `pilot_life_value` (§0z201).
+2. **One rebuild** (`parallel-rebuild`), the owner's call.
+
+**Knobs to say out loud**: `incidental_rate` (1.45, the fit), and what it
+now means (the bridge's rate, capped at 1 a body); `threat_clock_shift`
+(2.3, unchanged); `pod_hold_back_pad` (unset: `hold_back_pad`, 10).
 
 ## How to read an ablation table
 

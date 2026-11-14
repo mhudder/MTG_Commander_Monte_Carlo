@@ -45,7 +45,12 @@ import edhmc.engine as E
 import edhmc.karlov as K
 import edhmc.opponents as OPP
 from edhmc.engine import Card, Permanent
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_COMBAT
+# The pre-flip pod, stated (§0z204): this file pins rules that live behind
+# item 44's switches; the default pod's combat is pinned in
+# test_attacker_deaths, test_you_block, test_rival_combat,
+# test_pod_hold_back and test_predicted_bodies.
+PRE_COMBAT_CFG = dict(DEFAULT_CFG, **POD_PRE_COMBAT)
 from edhmc.pending import build_pending
 
 MUTATE = "--mutate" in sys.argv
@@ -63,7 +68,7 @@ def check(label, got, want):
 
 
 def cfg(**kw):
-    return dict(DEFAULT_CFG, watch=frozenset(), **{**EXTRA_CFG, **kw})
+    return dict(PRE_COMBAT_CFG, watch=frozenset(), **{**EXTRA_CFG, **kw})
 
 
 def body(power=2, name="Bear", vigilance=False):

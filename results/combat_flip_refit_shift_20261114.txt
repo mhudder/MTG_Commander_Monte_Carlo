@@ -1,0 +1,100 @@
+old: af0af9c523f1 + UNCOMMITTED CHANGES  N=15000 turns=[10, 20]  cfg {'attacker_deaths': 'False', 'incidental_rate': '0.78', 'pod_hold_back': 'False', 'rival_combat': 'False', 'you_block': 'False'}
+new: af0af9c523f1 + UNCOMMITTED CHANGES  N=15000 turns=[10, 20]
+
+deck            metric               old       new   new-old                95% CI
+rendmaw@T10     won               0.1072    0.0581   -0.0491   [ -0.0539,  -0.0443] *
+rendmaw@T10     damage           45.8431   27.1954  -18.6477   [-18.9609, -18.3344] *
+rendmaw@T10     final_life       11.1275   14.4861   +3.3586   [ +3.1042,  +3.6131] *
+rendmaw@T10     cards_drawn      12.0721   12.1365   +0.0643   [ +0.0001,  +0.1286] *
+rendmaw@T10     stranded_mv     117.6843  115.2649   -2.4195   [ -2.6617,  -2.1773] *
+rendmaw@T10     turns_played      9.2783    9.3623   +0.0841   [ +0.0720,  +0.0962] *
+                seeds whose result changed      1388 of 15000
+
+rendmaw@T20     won               0.3125    0.3094   -0.0031   [ -0.0115,  +0.0052]
+rendmaw@T20     damage           57.6031   38.8365  -18.7666   [-19.1379, -18.3953] *
+rendmaw@T20     final_life        7.8435   10.2688   +2.4253   [ +1.9617,  +2.8888] *
+rendmaw@T20     cards_drawn      14.2636   15.8840   +1.6204   [ +1.5114,  +1.7294] *
+rendmaw@T20     stranded_mv     127.9479  128.5993   +0.6514   [ +0.2405,  +1.0623] *
+rendmaw@T20     turns_played     10.4394   11.2029   +0.7635   [ +0.7298,  +0.7971] *
+                seeds whose result changed      4091 of 15000
+
+lorehold@T10    won               0.2872    0.2765   -0.0107   [ -0.0154,  -0.0060] *
+lorehold@T10    damage           64.4624   54.5100   -9.9524   [-10.2399,  -9.6649] *
+lorehold@T10    final_life       14.0505   13.1788   -0.8717   [ -1.0109,  -0.7326] *
+lorehold@T10    cards_drawn      26.5803   25.5263   -1.0540   [ -1.1487,  -0.9593] *
+lorehold@T10    stranded_mv     171.5944  167.8467   -3.7477   [ -4.0553,  -3.4402] *
+lorehold@T10    turns_played      9.2029    8.9761   -0.2268   [ -0.2415,  -0.2121] *
+                seeds whose result changed      1291 of 15000
+
+lorehold@T20    won               0.5149    0.4855   -0.0293   [ -0.0360,  -0.0227] *
+lorehold@T20    damage           76.5160   64.4116  -12.1044   [-12.4584, -11.7504] *
+lorehold@T20    final_life       10.8351   10.2599   -0.5752   [ -0.7269,  -0.4235] *
+lorehold@T20    cards_drawn      30.0166   28.6855   -1.3311   [ -1.4636,  -1.1986] *
+lorehold@T20    stranded_mv     182.1007  177.0337   -5.0669   [ -5.5089,  -4.6250] *
+lorehold@T20    turns_played     10.1955    9.8883   -0.3071   [ -0.3333,  -0.2810] *
+                seeds whose result changed      2616 of 15000
+
+karlov@T10      won               0.2985    0.2640   -0.0345   [ -0.0394,  -0.0296] *
+karlov@T10      damage           50.6854   36.3101  -14.3752   [-14.6608, -14.0897] *
+karlov@T10      final_life       37.7358   31.5723   -6.1635   [ -6.7557,  -5.5712] *
+karlov@T10      cards_drawn       9.9809    9.8605   -0.1204   [ -0.1438,  -0.0970] *
+karlov@T10      stranded_mv     124.1207  122.8429   -1.2778   [ -1.5280,  -1.0276] *
+karlov@T10      turns_played      8.9564    8.8835   -0.0729   [ -0.0850,  -0.0608] *
+                seeds whose result changed      1424 of 15000
+
+tivit@T10       won               0.3250    0.3064   -0.0186   [ -0.0232,  -0.0140] *
+tivit@T10       damage           57.7991   47.1481  -10.6510   [-10.9606, -10.3414] *
+tivit@T10       final_life       16.3899   15.4746   -0.9153   [ -1.0560,  -0.7745] *
+tivit@T10       cards_drawn      15.6691   15.2480   -0.4211   [ -0.4701,  -0.3721] *
+tivit@T10       stranded_mv     140.4259  137.9533   -2.4727   [ -2.7339,  -2.2114] *
+tivit@T10       turns_played      9.8677    9.6981   -0.1696   [ -0.1888,  -0.1504] *
+                seeds whose result changed      1225 of 15000
+
+karlov@T20      won               0.5502    0.5073   -0.0429   [ -0.0498,  -0.0361] *
+karlov@T20      damage           61.6092   44.9902  -16.6190   [-16.9673, -16.2708] *
+karlov@T20      final_life       39.2307   31.2077   -8.0230   [ -8.9527,  -7.0933] *
+karlov@T20      cards_drawn      11.6692   11.6771   +0.0079   [ -0.0427,  +0.0586]
+karlov@T20      stranded_mv     135.3716  134.4815   -0.8901   [ -1.3356,  -0.4447] *
+karlov@T20      turns_played     10.1122   10.1219   +0.0097   [ -0.0189,  +0.0382]
+                seeds whose result changed      2768 of 15000
+
+tivit@T20       won               0.5925    0.5719   -0.0205   [ -0.0269,  -0.0141] *
+tivit@T20       damage           72.7577   59.1872  -13.5705   [-13.9408, -13.2001] *
+tivit@T20       final_life       13.2546   12.6401   -0.6144   [ -0.7709,  -0.4579] *
+tivit@T20       cards_drawn      19.0747   18.6160   -0.4587   [ -0.5413,  -0.3761] *
+tivit@T20       stranded_mv     154.2475  151.2588   -2.9887   [ -3.3965,  -2.5808] *
+tivit@T20       turns_played     11.3316   11.1390   -0.1926   [ -0.2257,  -0.1595] *
+                seeds whose result changed      2408 of 15000
+
+shilgengar@T10  won               0.0423    0.0475   +0.0052   [ +0.0022,  +0.0082] *
+shilgengar@T10  damage           41.4809   33.7836   -7.6973   [ -7.9152,  -7.4795] *
+shilgengar@T10  final_life       18.9879   20.6951   +1.7073   [ +1.0580,  +2.3566] *
+shilgengar@T10  cards_drawn      11.0163   11.0261   +0.0098   [ -0.0159,  +0.0355]
+shilgengar@T10  stranded_mv     153.0630  151.5887   -1.4743   [ -1.7207,  -1.2279] *
+shilgengar@T10  turns_played      9.4359    9.3518   -0.0841   [ -0.0961,  -0.0721] *
+                seeds whose result changed       514 of 15000
+
+shilgengar@T20  won               0.3626    0.4150   +0.0524   [ +0.0450,  +0.0598] *
+shilgengar@T20  damage           62.3580   52.9061   -9.4519   [ -9.8330,  -9.0707] *
+shilgengar@T20  final_life       25.4272   27.5502   +2.1230   [ +0.6400,  +3.6060] *
+shilgengar@T20  cards_drawn      13.4619   13.6579   +0.1961   [ +0.1398,  +0.2524] *
+shilgengar@T20  stranded_mv     168.7234  167.2595   -1.4639   [ -1.9223,  -1.0054] *
+shilgengar@T20  turns_played     11.2092   11.2141   +0.0049   [ -0.0264,  +0.0362]
+                seeds whose result changed      3274 of 15000
+
+azusa@T10       won               0.3117    0.3265   +0.0148   [ +0.0101,  +0.0195] *
+azusa@T10       damage           59.6092   46.2038  -13.4054   [-13.7127, -13.0981] *
+azusa@T10       final_life       15.4661   16.7084   +1.2423   [ +1.0295,  +1.4550] *
+azusa@T10       cards_drawn      16.6466   16.5567   -0.0899   [ -0.1809,  +0.0012]
+azusa@T10       stranded_mv     167.4080  166.0009   -1.4071   [ -1.7523,  -1.0619] *
+azusa@T10       turns_played      8.9264    8.8794   -0.0470   [ -0.0582,  -0.0358] *
+                seeds whose result changed      1270 of 15000
+
+azusa@T20       won               0.4883    0.5189   +0.0306   [ +0.0244,  +0.0368] *
+azusa@T20       damage           70.8773   56.0396  -14.8377   [-15.1997, -14.4758] *
+azusa@T20       final_life       12.9410   14.2391   +1.2981   [ +1.0194,  +1.5769] *
+azusa@T20       cards_drawn      19.5433   19.4559   -0.0874   [ -0.2165,  +0.0417]
+azusa@T20       stranded_mv     178.2547  176.4517   -1.8029   [ -2.3167,  -1.2892] *
+azusa@T20       turns_played      9.7445    9.7031   -0.0413   [ -0.0624,  -0.0202] *
+                seeds whose result changed      2237 of 15000
+

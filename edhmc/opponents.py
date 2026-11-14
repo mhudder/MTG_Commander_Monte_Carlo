@@ -359,8 +359,8 @@ def roll_body_pools(cfg, seed, opps) -> None:
     mvmax = max(1, int(round(2 / share))) if share > 0 else 1
     black = cfg.get("pod_black_share", 0.25)
     combat = None
-    if (cfg.get("attacker_deaths", False)                       # §0z198
-            or cfg.get("you_block", False)):                       # §0z199
+    if (pod_knob(cfg, "attacker_deaths")                        # §0z198
+            or pod_knob(cfg, "you_block")):                        # §0z199
         combat = (max(1, int(cfg.get("pod_body_power_max", tmax))),
                   cfg.get("pod_utility_share", 0.3),
                   max(0, int(cfg.get("pod_utility_power_max", 2))),
@@ -380,6 +380,17 @@ POD_DEFAULTS = {
     "rearm_rule": "reland",
     "threat_clock_shift": 2.3,
     "pod_responses": True,
+    # ITEM 44'S COMBAT, THE DEFAULT SINCE §0z204 (the owner, 2026-11-14: "go
+    # ahead and start on the flip and re-fit"). A1 your attackers die to the
+    # pod's blockers (§0z198), A2 you block and the pod declares its attacks
+    # (§0z199), A4 rivals lose life to each other (§0z200), and the pod keeps
+    # blockers home (§0z202) -- built OFF, flipped together.
+    # `experiment.POD_PRE_COMBAT` restores the pod every table before §0z204
+    # measured.
+    "attacker_deaths": True,
+    "you_block": True,
+    "rival_combat": True,
+    "pod_hold_back": True,
 }
 
 
@@ -2664,7 +2675,7 @@ def chump(items, budget, blocked=None, need=None):
 def trades_on(g) -> bool:
     """A1's switch (§0z198): your attackers can die to the pod's blockers.
     Needs `pod_bodies`, which carries the blockers' power."""
-    return bool(g.cfg.get("attacker_deaths", False)) and pod_bodies_on(g)
+    return bool(pod_knob(g.cfg, "attacker_deaths")) and pod_bodies_on(g)
 
 
 def first_strike_of(g, perm) -> bool:
@@ -3033,7 +3044,7 @@ def resolve_trades(g, defender, assigned) -> tuple:
 
 def you_block_on(g) -> bool:
     """A2's switch (§0z199). Needs `pod_bodies` (the attackers are bodies)."""
-    return bool(g.cfg.get("you_block", False)) and pod_bodies_on(g)
+    return bool(pod_knob(g.cfg, "you_block")) and pod_bodies_on(g)
 
 
 def body_tapped(o, i) -> bool:
@@ -3170,7 +3181,7 @@ def crown_on_combat_damage(g, dealt) -> None:
 def rival_combat_on(g) -> bool:
     """A4's switch (§0z200, `rival_combat`): a body aimed at a rival attacks
     that rival. Rides A2's combat, so it needs `you_block` too."""
-    return bool(g.cfg.get("rival_combat", False)) and you_block_on(g)
+    return bool(pod_knob(g.cfg, "rival_combat")) and you_block_on(g)
 
 
 def rival_target(g, others, u):
@@ -3205,7 +3216,7 @@ def rival_target(g, others, u):
 # (the tapped bodies).
 
 def pod_hold_back_on(g) -> bool:
-    return (bool(g.cfg.get("pod_hold_back", False)) and you_block_on(g)
+    return (bool(pod_knob(g.cfg, "pod_hold_back")) and you_block_on(g)
             and trades_on(g))
 
 

@@ -94,7 +94,14 @@ DEFAULT_CFG = {
     # win rate over the active decks is the old pod's (`fit_pod_knob`, the
     # §0z140 rule). It was 1.0 from pod v2 (2026-09-04) and 0.45 before.
     # `monarch_loss_scale` defaults to it. `incidental_rate=1.0` is the old.
-    "incidental_rate": 0.78,
+    # 1.45 since §0z204 (2026-11-14): item 44's combat (A1, A2, A4, the
+    # pod's hold-back) made the pod weaker, and under A2 this rate is the
+    # bridge that sets how often a body attacks (`pod_attack_rate`), at you
+    # and at rivals. Fitted by the same rule, crossing 1.453 on seeds
+    # 5000..7999; out of sample (20000..22999) mean T20 0.4616 against the
+    # old pod's 0.4612, 10.49 turns against 10.48. `POD_PRE_COMBAT` restores
+    # 0.78 with the switches.
+    "incidental_rate": 1.45,
     "clock_shift": 2,             # the deus ex machina arrives later
     "archetypes": True,           # aggro / midrange / control / combo pods
 
@@ -190,6 +197,20 @@ POD_V3 = dict(POD_V2, archetypes=True)
 # was not re-fitted for it.
 from edhmc.opponents import POD_DEFAULTS as _POD_DEFAULTS   # noqa: E402
 POD_V4 = dict(_POD_DEFAULTS)
+
+# The pod before §0z204: item 44's combat OFF -- your attackers never die,
+# you never block, the pod's attack at you is the formula (`chip_amount`),
+# rivals never lose life to each other, the pod keeps nothing home. Every
+# table built before §0z204 (the six at 63d20e7, trostani's at bd9e7ae) is
+# this pod's, and `dict(DEFAULT_CFG, **POD_PRE_COMBAT)` plays it exactly,
+# the re-fit's rate included (§0z204).
+POD_PRE_COMBAT = {
+    "attacker_deaths": False,
+    "you_block": False,
+    "rival_combat": False,
+    "pod_hold_back": False,
+    "incidental_rate": 0.78,
+}
 
 # The pod before §0z140: no bodies, no routes, no responses. Every table and
 # every number in KNOWN_ISSUES dated before 2026-10-15 is this pod's.

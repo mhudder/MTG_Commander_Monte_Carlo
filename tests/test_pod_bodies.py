@@ -113,7 +113,12 @@ from edhmc.decks import lorehold_v17 as LM
 from edhmc.decks import rendmaw_v12 as RM
 from edhmc.decks import shilgengar_v1 as SM
 from edhmc.decks import tivit_v1 as TM
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_COMBAT
+# The pre-flip pod, stated (§0z204): this file pins rules that live behind
+# item 44's switches; the default pod's combat is pinned in
+# test_attacker_deaths, test_you_block, test_rival_combat,
+# test_pod_hold_back and test_predicted_bodies.
+PRE_COMBAT_CFG = dict(DEFAULT_CFG, **POD_PRE_COMBAT)
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []
@@ -166,7 +171,7 @@ def eager_pool(cfg, seed, i):
 
 def rgame(**cfg):
     deck, cmd = RM.build()
-    return ready(EN.Game(list(deck), cmd, dict(DEFAULT_CFG,
+    return ready(EN.Game(list(deck), cmd, dict(PRE_COMBAT_CFG,
                                                **dict(dict(pod_bodies=True),
                                                       **cfg)),
                          random.Random(1), seed_for_pod=1))
@@ -184,7 +189,7 @@ def instant(i):
 def run_cases():
     global PASS, FAIL
     PASS, FAIL = [], []
-    cfg = dict(DEFAULT_CFG)
+    cfg = dict(PRE_COMBAT_CFG)
 
     a_off = OPP.make_pod(dict(cfg, pod_bodies=False), 77)
     a_on = OPP.make_pod(dict(cfg, pod_bodies=True), 77)
@@ -280,7 +285,7 @@ def run_cases():
     proc = find(TM, "Anointed Procession")
     deck, cmd = TM.build()
     g = ready(T.TivitGame(list(deck), cmd,
-                          dict(DEFAULT_CFG, pod_bodies=True), 1))
+                          dict(PRE_COMBAT_CFG, pod_bodies=True), 1))
     put(g, revel)
     put(g, proc)
     t0 = g.tokens["Treasure"]
@@ -290,7 +295,7 @@ def run_cases():
 
     deck, cmd = KM.build()
     g = ready(K.KarlovGame(list(deck), cmd,
-                           dict(DEFAULT_CFG, pod_bodies=True), 1))
+                           dict(PRE_COMBAT_CFG, pod_bodies=True), 1))
     put(g, find(KM, "Blood Artist"))
     OPP.kill_pod_bodies(g, g.opponents[0], lambda b: b.toughness == 1)
     check("L karlov Blood Artist drains for a pod death",
@@ -298,7 +303,7 @@ def run_cases():
 
     deck, cmd = LM.build()
     g = ready(L.LoreholdGame(list(deck), cmd,
-                             dict(DEFAULT_CFG, pod_bodies=True), 1))
+                             dict(PRE_COMBAT_CFG, pod_bodies=True), 1))
     four = EN.Card(name="Four", types=frozenset({"Sorcery"}), cost={"gen": 4})
     g.graveyard = [four]
     L.volcanic_vision(g)
@@ -307,7 +312,7 @@ def run_cases():
 
     deck, cmd = SM.build()
     g = ready(SH.ShilgengarGame(list(deck), cmd,
-                                dict(DEFAULT_CFG, pod_bodies=True), 1))
+                                dict(PRE_COMBAT_CFG, pod_bodies=True), 1))
     swurm = find(SM, "Massacre Wurm")
     g.resolve(swurm)
     o = g.opponents[0]

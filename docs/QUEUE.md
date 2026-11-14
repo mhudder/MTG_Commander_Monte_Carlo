@@ -22,6 +22,9 @@ What is closed and where it went:
 
 **Order of work (the owner, 2026-11-12): item 44 first** -- §0z197's A1 and
 A2, tested step by step, with **no table rebuilt until that batch is done**.
+**The batch's defaults are FLIPPED and the pod re-fitted (§0z204,
+2026-11-14)**; what is left of item 44 is the policy re-read and the one
+rebuild.
 
 ---
 
@@ -197,6 +200,18 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
 
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
+
+    **STATUS 2026-11-14: FLIPPED AND RE-FITTED (§0z204).** A1, A2, A4 and
+    the pod's hold-back are the default (`opponents.POD_DEFAULTS`;
+    `experiment.POD_PRE_COMBAT` restores the old pod exactly), and
+    `incidental_rate` is re-fitted 0.78 -> 1.45 (crossing 1.453; out of
+    sample mean T20 0.4616 against 0.4612, game length held). At N=15,000
+    the mean T20 is 0.4702 -> 0.4680; T10, not fitted, 0.229 -> 0.213. The
+    CRN factor fell (~15x -> ~7x; paired SE +10%). **All six caches are
+    SUSPECT for a real reason -- never `--verified`.** Left, in order:
+    (1) re-read the policies written while the gap was open (§0z5; the list
+    is in §0z204) and re-sweep `pilot_life_value`; (2) the one rebuild, the
+    owner's call.
 
     **STATUS 2026-11-13: A1, A2 AND A4 BUILT, ALL OFF** (A4: §0z200,
     `rival_combat` -- rivals lose life to each other; it came out of item

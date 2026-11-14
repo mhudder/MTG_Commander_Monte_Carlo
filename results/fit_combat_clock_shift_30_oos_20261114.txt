@@ -1,0 +1,13 @@
+fit threat_clock_shift over [3.0]: target pod DEFAULT_CFG + {'attacker_deaths': False, 'you_block': False, 'rival_combat': False, 'pod_hold_back': False}, candidates + {}; N=3000 a deck, staged lists, seeds 20000..22999, python 3.11.17
+target: mean T20 win rate over 6 active decks = 0.4612; mean turns 10.48
+
+deck        target T10     T20  turns | threat_clock_shift=3.0    T20 (diff ±)
+rendmaw         0.0980  0.3030  10.42 | 0.2960 (-0.0070 ±0.0214)
+lorehold        0.2810  0.5007  10.15 | 0.5157 (+0.0150 ±0.0190)
+karlov          0.2977  0.5337  10.15 | 0.4983 (-0.0353 ±0.0187)
+tivit           0.3180  0.5870  11.27 | 0.6380 (+0.0510 ±0.0185)
+shilgengar      0.0390  0.3603  11.23 | 0.4223 (+0.0620 ±0.0206)
+azusa           0.3160  0.4827   9.69 | 0.4807 (-0.0020 ±0.0192)
+
+mean T20: threat_clock_shift=3.0: 0.4752 (10.74 turns)
+crossing: not bracketed by these values

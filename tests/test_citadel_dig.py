@@ -49,7 +49,7 @@ import sys
 import edhmc.engine as EN
 import edhmc.karlov as K
 import edhmc.opponents as OPP
-from edhmc.experiment import DEFAULT_CFG
+from edhmc.experiment import DEFAULT_CFG, POD_PRE_COMBAT
 from edhmc.pending import build_pending
 
 MUTATE = "--mutate" in sys.argv
@@ -202,7 +202,12 @@ def run_cases():
         for o in g.opponents:
             o.creatures = 4.0
         return g
-    g = clocked(40.0)
+    # N pins the FORMULA path (`incidental_damage` is the legacy whole-pod
+    # chip, reached only with `pod_seat_turns` False), so it states the
+    # pre-flip pod (§0z204). Under A2 the read is the bodies', which sit
+    # below the formula once `pod_attack_rate`'s cap at 1 binds (§0z199).
+    # O holds on either pod and runs on the default.
+    g = clocked(40.0, **POD_PRE_COMBAT)
     want = OPP.predicted_chip(g, 1)
     OPP.incidental_damage(g)
     check("N predicted chip is the chip the pod deals",
