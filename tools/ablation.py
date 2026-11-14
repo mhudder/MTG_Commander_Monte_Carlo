@@ -212,7 +212,9 @@ SCRIPTED_RENDMAW = {
     "Overlord of the Hauntwoods", "Foundry Inspector",
     # token engines
     "Bitterblossom", "Ophiomancer", "Tendershoot Dryad", "Grist, the Hunger Tide",
-    "Grave Titan", "Woe Strider", "Arasta of the Endless Web",
+    # Woe Strider LEFT for PARTLY_MODELLED (§0z197 C, item 46): only its
+    # Goat is implemented.
+    "Grave Titan", "Arasta of the Endless Web",
     "Primal Vigor", "Metallic Mimic",
     # payoffs / draw / sac  (Skullclamp left the deck in v12)
     "Idol of Oblivion", "Steel Overseer", "Ohran Frostfang",
@@ -475,6 +477,18 @@ SCRIPTED_KARLOV = {
     # life" trigger of a permanent fires an additional time, her own counter
     # included (`karlov._gain_life`); the 2/2 body. Nothing else to model.
     "Dr. Beverly Crusher",
+    # Bloodthirsty Conqueror and South Wind Avatar LEFT PARTLY_MODELLED in
+    # item 46 (§0z197 D): the one clause each called missing, deathtouch, is
+    # read since the combat flip (§0z204) -- by the pod's block plan and its
+    # blockers' deaths when they attack (`_first_strike_kills`, `_absorb`)
+    # and by an attacker's death when they block (`_kills`, A2). Conqueror:
+    # flying, deathtouch, and Exquisite Blood's text word for word, both
+    # halves (§0z26, §0z90), heard from rival-on-rival life loss too under
+    # A4 (`lost_life`, §0z200). Avatar: deathtouch, a creature's death as
+    # life equal to its toughness, and "whenever you gain life, each
+    # opponent loses 1" (DRAIN_ON_GAIN, an Exquisite Blood loop partner).
+    # Their rows at 63d20e7 predate A2, when neither blocked: floors THERE.
+    "Bloodthirsty Conqueror", "South Wind Avatar",
 }
 
 # Written 2026-09-05 with the deck. Membership here is a CLAIM THAT THE ENGINE
@@ -551,7 +565,9 @@ SCRIPTED_SHILGENGAR = {
     # Bloodghast (item 24, 2026-10-13): landfall return from the graveyard,
     # haste while an opponent is at 10 or less, and aristocrats fodder when
     # a land in hand will bring it back (`bloodghast_fodder`, a policy).
-    # "Can't block" is inert: your creatures never block here.
+    # "Can't block" is read: `opponents.your_blockers` skips the generated
+    # CANT_BLOCK under A2 (§0z199). (It said "inert: your creatures never
+    # block here" until item 46, §0z197 D.)
     "Bloodghast",
     # Herald of War and Twilight Shepherd (both were PARTLY, §0z84). Herald:
     # the flier, its attack counter, and the Angel-and-Human discount per
@@ -890,24 +906,8 @@ PARTLY_MODELLED = {
             "crown, which makes the TOKEN COUNT a ceiling by at most two in "
             "the round it changes hands -- so the row is bounded on both "
             "sides and neither bound is tight.",
-        "Bloodthirsty Conqueror":
-            "Exquisite Blood's text word for word, and since §0z90 BOTH "
-            "halves of it are modelled for both cards: the loop with Sanguine "
-            "Bond, Vito, Enduring Tenacity and (new) the three 'each opponent "
-            "loses 1' drains, and the general clause -- every opponent who "
-            "loses life gains you that much, as a lifegain event. The 5/5 "
-            "flying body is modelled. NOT: deathtouch, which nothing in the "
-            "blocking model reads (a chump blocker dies either way; only "
-            "Ohran Frostfang makes the pod block less). A floor by that. "
-            "§0z26, §0z90.",
-        # Candidates, 2026-10-12 (§0z128).
-        "South Wind Avatar":
-            "MODELLED: 'whenever you gain life, each opponent loses 1 life' "
-            "(a DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) "
-            "and 'whenever another creature you control dies, you gain life "
-            "equal to its toughness', on the 3/4. NOT: deathtouch, which "
-            "nothing in the blocking model reads -- Bloodthirsty Conqueror's "
-            "gap. A floor by that.",
+        # Bloodthirsty Conqueror and South Wind Avatar moved to SCRIPTED in
+        # item 46 (§0z197 D): deathtouch, their one NOT, is read now.
         "Slaughter Specialist":
             "MODELLED: the 3/3, and 'each opponent creates a 1/1' on entering "
             "-- +1 to each opponent's creature count and three opponent "
@@ -918,6 +918,16 @@ PARTLY_MODELLED = {
         # LEFT KNOWN_BLIND 2026-09-29 (§0z78).
     },
     "rendmaw": {
+        # Moved from SCRIPTED (§0z197 C, queue item 46): its row was a floor
+        # printed under MODEL-EVALUATED, where a low score reads as evidence.
+        "Woe Strider":
+            "MODELLED: the 3/2 and 'When this creature enters, create a 0/1 "
+            "white Goat creature token' (`script=\"woe_strider\"`, "
+            "`engine.run_etb`). NOT: 'Sacrifice another creature: Scry 1' -- "
+            "a free, repeatable sacrifice outlet beside Ashnod's Altar for "
+            "Blood Artist and The Meathook Massacre, and a scry; nor escape "
+            "({3}{B}{B}, exile four other cards: cast from the graveyard with "
+            "two +1/+1 counters, §0z118 item 9). A floor by both.",
         # §0z151: its first line is Ohran Frostfang's, and is read now.
         "Bow of Nylea":
             "MODELLED: 'Attacking creatures you control have deathtouch' "
@@ -936,8 +946,9 @@ PARTLY_MODELLED = {
             "MODELLED: two 1/1 flying Insects on entering, and +1/+1 to every "
             "Insect and Spider you control under delirium (`swarmweaver_bonus`"
             ", the generated INSECT_SPIDER and the tokens by name). NOT: "
-            "deathtouch -- the pod's blockers are a count with no toughness "
-            "and your creatures never block (§4). A floor.",
+            "delirium's deathtouch for Insects and Spiders -- `deathtouch_of` "
+            "and `your_blockers` read the generated DEATHTOUCH set and two "
+            "grants by name, not this one. A floor.",
         "Dalek Squadron":
             "MODELLED: menace, and myriad -- a 3/3 menace copy per other "
             "living opponent, tapped and attacking, exiled after combat. NOT: "
@@ -1092,8 +1103,8 @@ PARTLY_MODELLED = {
             "`combat_damage` splits across the pod rather than going two at "
             "each player, so the split is the pilot's, a slight CEILING.",
         "Gideon's Phalanx":
-            "MODELLED: four 2/2 Knights. Vigilance is inert (nothing here "
-            "reads a tapped creature of yours). NOT: spell mastery's "
+            "MODELLED: four 2/2 Knights with vigilance: an attacking Knight "
+            "stays untapped to block (§0z186, A2). NOT: spell mastery's "
             "indestructible, which matters only cast in response to a wrath "
             "-- the pod's removal is a round no miracle window overlaps, and "
             "`try_protect` cannot hold up a seven-mana spell. A FLOOR; "
@@ -1207,10 +1218,10 @@ PARTLY_MODELLED = {
             "nontoken creature you control dies, return that card ... at the "
             "beginning of the next end step' (`avacyn_died`, "
             "`avacyn_returns`), with the feed line `avacyn_feed` -- a "
-            "POLICY. NOT: deathtouch, which nothing in the blocking model "
-            "reads; and a returned Massacre Wurm, Sun Titan or Twilight "
+            "POLICY, and flying and deathtouch, read in combat both ways "
+            "(§0z204). NOT: a returned Massacre Wurm, Sun Titan or Twilight "
             "Shepherd fires no ETB, the floor every return path in this "
-            "engine shares. A floor by both.",
+            "engine shares. A floor by that.",
         "Angel of the Ruins":
             "MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile "
             "of up to two artifacts and/or enchantments (no opposing "

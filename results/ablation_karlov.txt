@@ -32,6 +32,7 @@ Exquisite Blood                       -3.70+-0.25         -5.65+-0.32        +0.
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
       it +0.0081; 9 -> 12 moves it -0.0022 (T20 win rate, N=15,000 paired).
+Bloodthirsty Conqueror                -2.18+-0.20         -3.64+-0.26        +0.0349+-0.0034      both
 Bolas's Citadel                       +0.73+-0.15         +0.33+-0.17        +0.0233+-0.0030      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 8.5 -> 5.5
@@ -43,6 +44,7 @@ Felidar Sovereign                     -0.72+-0.12         -1.47+-0.17        +0.
       threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
       it +0.0029; 8 -> 11 moves it -0.0038 (T20 win rate, N=15,000 paired).
 Sorin, Solemn Visitor                 +1.37+-0.14         +1.19+-0.16        +0.0151+-0.0030      both
+South Wind Avatar                     +1.24+-0.13         +0.75+-0.14        +0.0148+-0.0026      both
 Enduring Tenacity                     +0.63+-0.13         +0.17+-0.17        +0.0147+-0.0030      both
 Vito, Thorn of the Dusk Rose          +0.52+-0.15         +0.12+-0.17        +0.0147+-0.0030       win
 Orzhov Signet                         +1.01+-0.16         +0.91+-0.19        +0.0141+-0.0031      both
@@ -109,20 +111,6 @@ PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Bloodthirsty Conqueror                -2.18+-0.20         -3.64+-0.26        +0.0349+-0.0034      both
-      Exquisite Blood's text word for word, and since §0z90 BOTH halves of it are
-      modelled for both cards: the loop with Sanguine Bond, Vito, Enduring
-      Tenacity and (new) the three 'each opponent loses 1' drains, and the general
-      clause -- every opponent who loses life gains you that much, as a lifegain
-      event. The 5/5 flying body is modelled. NOT: deathtouch, which nothing in
-      the blocking model reads (a chump blocker dies either way; only Ohran
-      Frostfang makes the pod block less). A floor by that. §0z26, §0z90.
-South Wind Avatar                     +1.24+-0.13         +0.75+-0.14        +0.0148+-0.0026      both
-      MODELLED: 'whenever you gain life, each opponent loses 1 life' (a
-      DRAIN_ON_GAIN card, so also an Exquisite Blood loop partner) and 'whenever
-      another creature you control dies, you gain life equal to its toughness', on
-      the 3/4. NOT: deathtouch, which nothing in the blocking model reads --
-      Bloodthirsty Conqueror's gap. A floor by that.
 Swords to Plowshares                  +0.35+-0.09         +0.78+-0.14        +0.0137+-0.0029      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit

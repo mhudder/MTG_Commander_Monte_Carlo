@@ -1069,10 +1069,13 @@ def commander_shrouded(g) -> bool:
 #   "attack"  In your combat, when an attacker would be chump-blocked, she
 #             gives the commander (or, failing that, the biggest blocked
 #             attacker) protection from the blockers' colour, so it cannot be
-#             blocked -- Rogue's Passage's mechanism (§0z107). The pod's
-#             blockers are a count that never dies, so the TRADE the owner
-#             describes is not modelled; the damage that connects is. She is
-#             then tapped through the pod's round and defends nothing.
+#             blocked -- Rogue's Passage's mechanism (§0z107). The TRADE the
+#             owner describes (protection after the block, so the blocker
+#             dies and yours lives) is not modelled: she acts before blocks,
+#             and the damage that connects is what she buys. (This said "the
+#             pod's blockers are a count that never dies"; they are bodies
+#             that die since §0z132, and your attacker can since §0z198.)
+#             She is then tapped through the pod's round and defends nothing.
 # Opponents who play around an untapped Mother are not modelled either.
 TAP_PROTECT = {"Mother of Runes"}
 

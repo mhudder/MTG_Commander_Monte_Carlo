@@ -1526,7 +1526,8 @@ class ShilgengarGame(BaseGame):
         taken: a recursive body is what this deck sacrifices. A Bloodghast
         returned by the ultimate carries a finality counter and is exiled
         instead of dying (§0z75), so it never reaches `yard_creatures`.
-        "Can't block" is inert: your creatures never block here."""
+        "Can't block" is read: `opponents.your_blockers` skips CANT_BLOCK
+        under A2 (§0z199; item 46 corrected "inert" here)."""
         for card in [c for c in self.yard_creatures()
                      if c.name == "Bloodghast"]:
             remove_card(self.graveyard, card)

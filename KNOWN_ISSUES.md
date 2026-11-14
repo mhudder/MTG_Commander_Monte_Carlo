@@ -258,6 +258,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z203](#0z203) | BUILT | **The pilot reads the pod's bodies under A2** (`predict_from_bodies`, item 44): each body's attack chance x what gets past your blocks. T20 +0.0023 lorehold, +0.0037 shilgengar, the rest inside. Pre-flip list done |
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
 | [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
+| [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17365,6 +17366,8 @@ shape.
 
 ### C. Card text not modelled, in the staged lists
 
+**Woe Strider's label: done in §0z206.** The card work below is open.
+
 From the keyword census and the engines' own comments:
 
 - **Ward**: Tivit, Seller of Secrets' own ward {3} (`tivit.py`'s header
@@ -17388,6 +17391,8 @@ From the keyword census and the engines' own comments:
 
 ### D. Statements in the code that contradict the model
 
+**Done in §0z206**, with the ones the flip (§0z204) added.
+
 - `edhmc/engine.py`'s module docstring (lines 4-14) lists "opponents'
   removal, counterspells, blockers, board wipes" as NOT MODELLED. All four
   are.
@@ -17409,6 +17414,8 @@ From the keyword census and the engines' own comments:
   §0z184's Scryfall pass searched only for text naming a step or phase.
 
 ### E. Hand-typed keyword data with no check
+
+**Done in §0z206**: a check in `audit_cards`, proved to fail.
 
 `Card.haste` and `Card.lifelink` are typed by hand in the deck modules;
 flying, menace, trample, deathtouch, vigilance, indestructible and the
@@ -18289,6 +18296,134 @@ nothing changes.**
 **Knobs to say out loud**: none moved. `hold_back_pad` 10,
 `your_chump_floor` 10, `pilot_life_value` 0, `split_blockers` "formula"
 (`block_share` 0.6), `doll_policy` "nest".
+
+<a id="0z206"></a>
+
+## 0z206. FIXED -- item 46's cheap half: a label, the stale statements, a keyword check
+
+**The owner, 2026-11-14: "I would like to work on item 46 this time."** The
+queue item is §0z197's C-E "the cheap ones, no rebuild". Read at `6607f16`,
+after item 44's flip (§0z204), which moved what several of D's statements
+mean. Oracle text re-fetched from Scryfall for every card named below. No
+number was measured: every change is a label, a comment or a check, and
+the decks play bit-identically (last section).
+
+### C. Woe Strider: SCRIPTED -> PARTLY_MODELLED
+
+Only its Goat is implemented (`engine.run_etb`, `script="woe_strider"`).
+"Sacrifice another creature: Scry 1" -- a free outlet beside Ashnod's Altar
+for Blood Artist and The Meathook Massacre -- and escape are not. The row,
++0.0035 ±0.0018 `both`, is a floor and now prints as one, with the reason.
+A RENDERING change (CLAUDE.md, "Match the check to what moved"):
+`results/ablation_rendmaw.txt` re-rendered from its cache reproduced the
+committed table byte for byte before the change, and after it the row moved
+from MODEL-EVALUATED to PARTLY with its reason and nothing else did.
+
+### D. The statements, and the ones the flip added
+
+D's list, each re-read against the code as it now is:
+
+- `engine.py`'s module docstring: rewritten. The pod's removal,
+  counterspells, blockers and wipes are modelled; combat runs both ways.
+- `engine.combat`'s lifelink comment ("100% of losses ... are CLOCKS",
+  "defensive value here is nil"): rewritten to what is true -- life
+  defends since pod v3 (12-36% of losses by life, §0z192), a lifelink
+  blocker gains under A2, and A3 caps it.
+- **Deathtouch is now read in full**, not just against chump blockers: the
+  pod's block plan and its blockers' deaths when you attack
+  (`_first_strike_kills`, trample's `_absorb`, 702.2b-c), and an attacker's
+  death when you block (`_kills`, A2). So **Bloodthirsty Conqueror and
+  South Wind Avatar** (karlov), whose one NOT clause was deathtouch, moved
+  to SCRIPTED. Conqueror's Exquisite Blood half hears rival-on-rival life
+  loss too under A4 (§0z200). Their rows were built at `63d20e7`, before
+  A2, when neither blocked -- floors THERE; the rebuild measures what the
+  label says. `results/ablation_karlov.txt` re-rendered from the cache:
+  the two rows moved sections, no number moved, and the other five active
+  tables re-render byte for byte.
+- Avacyn, Angel of Horror (shilgengar, candidate): deathtouch struck from
+  its NOT.
+- `engine.vault_of_the_archangel`'s "Deathtouch is not modelled": still
+  TRUE, for a new reason -- see the floors below. Its old reason ("the
+  pod's blockers are a count") was stale.
+- `karlov.combat`'s Guide of Souls comment: `flying_of` reads the tag and
+  named conditions, not a counter. Latent (not in the list).
+
+**The flip made "your creatures never block" false everywhere it was
+written**, which D could not list: it was written before A2. Corrected:
+Bloodghast's "can't block" (shilgengar's docstring and its SCRIPTED note --
+`your_blockers` skips CANT_BLOCK), Gideon's Phalanx's vigilance (lorehold,
+candidate; modelled since §0z186), Mother of Runes' attack mode (the pod's
+blockers "a count that never dies"), The Swarmweaver (`swarmweaver_bonus`
+and its PARTLY note), and four statements in `azusa.py` (below).
+`experiment.POD_PRE_COMBAT`'s note describes the old pod and is right.
+**Trostani is SUSPENDED and was not touched**: Archon of Valor's Reach's
+note ("vigilance is inert, since your creatures never block") and a
+KNOWN_BLIND comment are stale there.
+
+### Floors found, named, NOT fixed (each a behaviour change, so card work)
+
+Each is text that could not matter before the flip and can now, and that
+nothing reads:
+
+1. **Vault of the Archangel's deathtouch** (karlov, shilgengar):
+   `deathtouch_of` does not ask `vault_active`, so a Vault turn's blocked
+   attackers kill only by power.
+2. **An animated land's reach and indestructible** (azusa): Sylvan
+   Awakening's, carried in `animate_lands` and read by nothing but
+   `trample_of`. `is_hardy` and `your_blockers` ask the card's tags. Under
+   A1 such a land dies attacking into a block; under A2 it blocks (at
+   lethal only, `your_utility`) but never a flier.
+3. **Nissa, Who Shakes the World's emblem** (azusa): "Lands you control have
+   indestructible" was worth zero against the pod's removal (lands are
+   excluded) and is not in combat, where her +1's lands attack.
+4. **A token's reach** (azusa, Sapling Nursery's 3/4 Treefolk): REACH is
+   by card name.
+5. **The Swarmweaver's delirium deathtouch** (rendmaw, candidate).
+
+And one policy: Quirion Ranger's untap (azusa) is never spent to untap a
+creature that attacked so it can block.
+
+### E. Haste and lifelink against Scryfall's keywords
+
+`tools/audit_cards.py` checks `Card.haste` and `Card.lifelink` against the
+`keywords` array (`KEYWORD_TAGS`, `keyword_tag_errors`), permanents only --
+indestructible's rule, since `keywords` cannot tell "has" from "grants".
+**Blind to**, said in the code: a permanent that grants either keyword and
+lacks it would ERR (none in today's lists), and a conditional one reads as
+having it. Checking rather than generating: flying is the precedent (a
+hand-carried attribute, a generated set and the audit), and generating
+would rewrite every deck module for the same answer.
+
+The live audit, 733 card slots (612 names): **2 ERR, 9 WARN, 34 NOTE**, as
+before the change -- the two ERRs are trostani's X spells, the known false
+positives of §0z116's data audit. The one disagreement the check found is
+§0z197's: **Lorehold, the Historian is now tagged `haste=True`**
+(`lorehold_v17.py`), the commander being cast `sick=False` by name already.
+
+`tests/test_audit_keywords.py`: seven offline cases through
+`audit_cards.check` itself, Lorehold's commander as the module builds it
+among them, and three mutations written before the run, exact sets: haste
+dropped -> B, C; lifelink dropped -> D, E; the permanents rule removed -> F.
+
+### Checks
+
+- `tools.check_unchanged_decks` against a worktree at `6607f16`: **all six
+  active decks BIT-IDENTICAL on all 8 metrics at N=400 and again at
+  N=2,000** (§0z126) -- the comments, the labels and the Lorehold tag moved
+  no game. The caches stay SUSPECT for §0z204's reason (the baseline
+  moved), and only the rebuild clears them.
+
+### What is left of item 46
+
+The oracle audits of tivit, shilgengar and azusa -- **smaller than D makes
+them sound**: D is right that no `docs/ORACLE_AUDIT_*.md` exists for the
+three, but §0z116 (2026-10-07) read every engine, these three included,
+against the oracle text of all seven lists, and its findings are fixed
+(§0z117, §0z118, §0z151, §0z153). What no audit has read is each deck's
+cards added since 2026-10-07, and the text the flip made live (the floors
+above are that kind). And the card work for the add-card skill: ward,
+cycling, Woe Strider's sacrifice and escape, Memory Jar (C and item 37),
+and the five floors above.
 
 ## How to read an ablation table
 

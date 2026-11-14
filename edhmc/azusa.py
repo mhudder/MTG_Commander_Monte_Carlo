@@ -82,12 +82,17 @@ them are load-bearing and none of the four was true before:
      animation number here a FLOOR: a pilot who wanted the alpha strike would
      hold the mana back instead of casting the spell.
 
-INDESTRUCTIBLE AND REACH ARE CARRIED BUT CANNOT MATTER, and that is a fact
-about the pod rather than a gap in it. `spot_removal` and `board_wipe` both
-exclude lands, so nothing the pod does can kill an animated land; and this
-engine never blocks with your creatures, so reach does nothing either. Sylvan
-Awakening's indestructible clause is worth exactly zero here -- said out loud
-so its row is not read as a measurement of the whole card.
+INDESTRUCTIBLE AND REACH ARE CARRIED BUT NOT READ, AND SINCE THE COMBAT FLIP
+THEY CAN MATTER (§0z204; item 46, §0z197 D). `spot_removal` and `board_wipe`
+both exclude lands, so the pod's removal still cannot kill an animated land.
+Combat can: under A1 a blocked attacker dies (§0z198) and under A2 your
+untapped creatures block (§0z199), where an indestructible land lives and a
+reach land blocks a flier (an animated land blocks only at lethal,
+`your_utility`). Neither is read for an animation: `is_hardy` and
+`your_blockers` ask the card's tags and named grants, and only `trample_of`
+reads `animation_of`. So Sylvan Awakening's indestructible and reach are a
+FLOOR, not the zero this paragraph used to call them (it said "this engine
+never blocks with your creatures").
 
 PLANESWALKER LOYALTY, SCOPED TO THIS ENGINE
 --------------------------------------------
@@ -1464,10 +1469,12 @@ class AzusaGame(BaseGame):
                          "Badger")
         # Sapling Nursery: "Landfall -- whenever a land you control enters,
         # create a 3/4 green Treefolk creature token with reach." The reach is
-        # carried nowhere because this engine never blocks with your creatures
-        # (the module docstring says so for Sylvan Awakening); the 3/4 body is
-        # the whole of what is modelled, and it is the Rampaging Baloths shape
-        # one size down on power and one up on toughness.
+        # NOT READ: `your_blockers` reads the generated REACH set by card
+        # name, and a token is not in it -- a floor, since under A2 the 3/4
+        # blocks and a reach blocker could take a flier (§0z199; item 46
+        # corrected "this engine never blocks"). The 3/4 body is the rest,
+        # the Rampaging Baloths shape one size down on power and one up on
+        # toughness.
         self.make_tokens(self.count("Sapling Nursery"), 3, 4, "Treefolk")
         # --- 2026-10-03 sixth batch (§0z101). Each its OWN statement, none
         # nested in a neighbour's `if` -- §0z28's indentation. ---------------
@@ -2175,10 +2182,11 @@ class AzusaGame(BaseGame):
         else is playable, once a turn, returning a TAPPED Forest if there is
         one (the mana line), else an untapped one (landfall alone). Never a
         token (it would cease to exist) nor a creature-land (Ashaya's or an
-        animated one: a body). The untap itself is inert -- this list has no
-        creature with a {T} ability that pays, and your creatures never block
-        -- so the target is the Ranger. `quirion_bounce=False` is the old
-        blank."""
+        animated one: a body). The untap is spent on the Ranger: this list
+        has no creature with a {T} ability that pays. Untapping an attacker
+        to block on the pod's turn is not used, a floor since A2 lets your
+        untapped creatures block (§0z199; item 46 corrected "your creatures
+        never block"). `quirion_bounce=False` is the old blank."""
         if (not self.cfg.get("quirion_bounce", True)
                 or not self.has("Quirion Ranger")
                 or getattr(self, "quirion_turn", None) == self.turn):
@@ -3594,10 +3602,12 @@ class AzusaGame(BaseGame):
         the same way, with one difference that matters in this deck: these
         lands enter TAPPED, so they are mana next turn rather than this one --
         but every one of them is still a landfall trigger as it enters. The
-        emblem is not modelled and cannot matter: `spot_removal`, `ae_removal`
-        and `board_wipe` all exclude lands already, so "lands you control have
-        indestructible" is worth exactly zero here. Said out loud so the row is
-        not read as a measurement of the whole card.
+        emblem is not modelled: `spot_removal`, `ae_removal` and `board_wipe`
+        all exclude lands already, so against the pod's removal "lands you
+        control have indestructible" is worth zero. In combat it is not: an
+        animated land that attacks into a block can die since §0z198, and
+        the emblem would save it -- a floor (item 46, §0z197 D). Said out
+        loud so the row is not read as a measurement of the whole card.
         """
         if perm.counters >= 8:
             perm.counters -= 8

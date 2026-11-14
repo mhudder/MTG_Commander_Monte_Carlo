@@ -1,17 +1,27 @@
 """
 edhmc.engine — a Monte Carlo "goldfish+" engine for Commander decks.
 
-Scope, stated honestly:
+Scope, stated honestly (rewritten for queue item 46, §0z197 D: the old
+list called the pod's removal, counterspells, blockers and wipes unmodelled,
+and all four were):
   MODELLED   shuffling, mulligans, land drops, tapped/untapped lands, colour
              requirements (incl. {C}), mana rocks/dorks, cost reduction,
              a greedy casting policy, card draw, token generation, static
              anthems / P-T setters, per-turn engine activations, and combat
-             damage against an unblocking pod.
-  NOT MODELLED  opponents' removal, counterspells, blockers, board wipes,
-             politics, stack interaction, or your own tutoring/decision
-             skill. Damage numbers are therefore upper bounds. Use the
-             *paired difference* between two configurations, never the
-             absolute value.
+             both ways: the pod's bodies block your attackers and can kill
+             them (§0z198), and your untapped creatures block the attacks
+             the pod declares (§0z199).
+  THE POD    is `edhmc.opponents`, shared by every engine: three opponents
+             with kill clocks built from route pieces (§0z140), life, bodies
+             that attack you and each other (§0z200), removal and board
+             wipes in each seat's main phase, and counterspells as you cast.
+             docs/ARCHITECTURE.md has the protocol.
+  NOT MODELLED  the pod's permanents beyond bodies and route pieces, any
+             interaction outside its own main phase but a counterspell
+             (§0z197 A6), politics, the stack, and your own decision skill
+             beyond the written policies. Absolute numbers are a fact about
+             the model's fit (§0z195). Use the *paired difference* between
+             two configurations, never the absolute value.
 
 The engine is deliberately card-agnostic: a card is a bag of attributes plus
 an optional scripted hook. ~30 cards in a 100-card deck actually need scripts;
@@ -2680,8 +2690,12 @@ def vault_of_the_archangel(g, attackers, pay) -> bool:
     Activated before combat damage, on the mana the main phase left, when
     the attack's power reaches `vault_min_power` (3) -- below that the life
     is worth less than the four mana. Sets `vault_turn`, which the engines'
-    lifelink tests read. Deathtouch is not modelled: the pod's blockers are
-    a count (§4). `vault_paid=False` restores karlov's free lifelink."""
+    lifelink tests read. THE DEATHTOUCH HALF IS NOT READ: `opponents.
+    deathtouch_of` does not ask `vault_active`, so the pod's bodies that
+    block a Vault turn's attackers die only to power, as on any turn -- a
+    floor. (Its old reason, "the pod's blockers are a count (§4)", went
+    stale when `pod_bodies` gave them toughness, §0z132; §0z197 D.)
+    `vault_paid=False` restores karlov's free lifelink."""
     if not g.cfg.get("vault_paid", True):
         if any(p.card.name == "Vault of the Archangel" for p in g.board):
             g.vault_turn = g.turn
@@ -4981,9 +4995,12 @@ def swarmweaver_bonus(g, perm) -> int:
     """THE SWARMWEAVER: "Delirium -- As long as there are four or more card
     types among cards in your graveyard, Insects and Spiders you control get
     +1/+1 and have deathtouch." The +1/+1, read by `power_of` and
-    `toughness_of`. Legendary, so never more than one. Deathtouch is not
-    modelled: the pod's blockers are a count with no toughness, and your
-    creatures never block (§4). Delirium is the shared `opponents.delirium`."""
+    `toughness_of`. Legendary, so never more than one. THE DEATHTOUCH IS NOT
+    READ: `opponents.deathtouch_of` and `your_blockers` read the generated
+    DEATHTOUCH set and named grants, not this one -- a floor, since combat
+    reads deathtouch both ways (§0z204; this said "the pod's blockers are a
+    count" until item 46, §0z197 D). Delirium is the shared
+    `opponents.delirium`."""
     if not g.has("The Swarmweaver"):
         return 0
     name = perm.card.name
@@ -5286,19 +5303,13 @@ def combat(g: Game):
     # Lifelink, taken as the attacker's power: it pays out whether the damage
     # lands on a player or on a blocker.
     #
-    # DO NOT read this as survivability. Measured 2026-09-04: 100% of losses in
-    # all three decks are opponent CLOCKS (opponents.resolve_clocks), which are
-    # threat-weighted and do not read your life total at all.
-    #
-    # And this is BY DESIGN, not a close race. With the clocks disabled
-    # entirely, incidental_damage kills you in 0.4% of Rendmaw games and 0.6%
-    # of Lorehold games by turn 20 (2.9% by turn 30, 0.0% for Karlov). The
-    # opponents' board is a float capped at 7 that chips for
-    # `creatures * 0.45 * your_share` — it was never calibrated to kill anyone.
-    # The clock IS the abstraction standing in for "an opponent actually wins".
-    #
-    # So a lifelinking body's defensive value here is nil, and any card whose
-    # whole job is a bigger life total is MODEL-BLIND.
+    # The life DEFENDS. This comment used to say "100% of losses are opponent
+    # CLOCKS" and "a lifelinking body's defensive value here is nil" -- true
+    # of the pod measured 2026-09-04, superseded by pod v3, under which the
+    # pod's combat takes life and 12-36% of losses are by life (§0z192;
+    # §0z197 D). A lifelink BLOCKER gains its damage too, under A2
+    # (`opponents._your_lifelink`, §0z199). What still caps every life row
+    # is §0z197 A3: a rolled kill that picks you ignores your life total.
     # Whip of Erebos: "Creatures you control have lifelink." (§0z85)
     whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
     for p in attackers:

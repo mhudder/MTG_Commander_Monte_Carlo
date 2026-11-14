@@ -291,7 +291,8 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   passed.
 - **A note that says something is infeasible is a claim with a date on it**
   (§0z13). After an engine change of §0z8's size, grep the issues for
-  "cannot" and "not possible".
+  "cannot" and "not possible", and the code for "inert" and "never"
+  (§0z206: one flip made a dozen such notes false).
 - **A job count is not progress; a hung run looks slow** (§0z37). Check
   `ps -o etimes=,times=`: a hung worker's CPU time EQUALS its elapsed time. Give
   any sweep that fans out a per-job timeout.

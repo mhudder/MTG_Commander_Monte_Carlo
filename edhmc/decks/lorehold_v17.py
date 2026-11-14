@@ -50,8 +50,12 @@ def L(name, produces, tapped=False, types="Land", tags=()):
                 indestructible=name in INDESTRUCTIBLE)
 
 
+# "Flying, haste" (Scryfall). The haste was untagged until item 46 (§0z197
+# E) and still is read where the commander is cast (`sick=False` in
+# lorehold.py); the tag is the data `audit_cards` checks.
 COMMANDER = C("Lorehold, the Historian", "Creature",
-              {"gen": 3, "R": 1, "W": 1}, 5, 5, priority=10, threat=9.0)
+              {"gen": 3, "R": 1, "W": 1}, 5, 5, priority=10, threat=9.0,
+              haste=True)
 
 # ---------------------------------------------------------------------------
 # Artifacts (12)

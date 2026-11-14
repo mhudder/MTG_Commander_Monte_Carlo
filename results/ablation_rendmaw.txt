@@ -66,7 +66,6 @@ Sakura-Tribe Elder                    +0.27+-0.11         +0.19+-0.14        +0.
 Heroic Intervention                   +0.34+-0.07         +0.41+-0.09        +0.0045+-0.0020      both
 Village Rites                         +0.02+-0.07         +0.05+-0.11        +0.0039+-0.0026       win
 Burnished Hart                        +0.22+-0.05         +0.16+-0.07        +0.0036+-0.0020      both
-Woe Strider                           +0.48+-0.06         +0.51+-0.07        +0.0035+-0.0018      both
 Verdurous Gearhulk                    +0.88+-0.11         +0.82+-0.13        +0.0033+-0.0029      both
 Biotransference                       +0.38+-0.05         +0.34+-0.08        +0.0033+-0.0020      both
 Scrap Trawler                         +0.32+-0.05         +0.27+-0.08        +0.0033+-0.0021      both
@@ -158,6 +157,13 @@ Culling Ritual                        +0.30+-0.06         +0.41+-0.10        +0.
       POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
       wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
       estimate.
+Woe Strider                           +0.48+-0.06         +0.51+-0.07        +0.0035+-0.0018      both
+      MODELLED: the 3/2 and 'When this creature enters, create a 0/1 white Goat
+      creature token' (`script="woe_strider"`, `engine.run_etb`). NOT: 'Sacrifice
+      another creature: Scry 1' -- a free, repeatable sacrifice outlet beside
+      Ashnod's Altar for Blood Artist and The Meathook Massacre, and a scry; nor
+      escape ({3}{B}{B}, exile four other cards: cast from the graveyard with two
+      +1/+1 counters, §0z118 item 9). A floor by both.
 Bow of Nylea                          +0.20+-0.05         +0.13+-0.07        +0.0031+-0.0018      both
       MODELLED: 'Attacking creatures you control have deathtouch'
       (`opponents.deathtouch_of`) -- worth +0.0004 ±0.0004 at T20, since a chump

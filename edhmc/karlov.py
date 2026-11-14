@@ -2405,8 +2405,11 @@ def combat(g):
 
     # Guide of Souls: "Whenever you attack, you may pay {E}{E}{E}. When you do,
     # put two +1/+1 counters and a flying counter on target attacking creature."
-    # The flying counter is not modelled — nothing in damage_through reads
-    # evasion — so this is the counters only, and a floor.
+    # The flying counter is not modelled -- `opponents.flying_of` reads the
+    # card's tag and named conditions, not a counter -- so this is the
+    # counters only, and a floor. (It used to say "nothing in damage_through
+    # reads evasion", which `flying_of` ended 2026-09-04; §0z197 D. Latent:
+    # the card is not in the list.)
     if g.has("Guide of Souls") and g.energy >= 3:
         g.energy -= 3
         max(attackers, key=g.power_of).counters += 2
