@@ -3187,6 +3187,74 @@ def rival_target(g, others, u):
     return others[-1]
 
 
+# ---------------------------------------------------------------------------
+# THE POD'S HOLD-BACK (§0z202, queue item 44; `pod_hold_back`, OFF until the
+# batch flips together)
+# ---------------------------------------------------------------------------
+# Under A2 a body that attacks stays tapped through YOUR turn and does not
+# block (§0z199), so an opponent that sends everything is open to your
+# crack-back -- which nothing in the pod weighed. Under the switch, each
+# opponent asks first: with these bodies tapped, would your next attack
+# (`damage_through` against its untapped bodies, A1's evaluated blocks)
+# take it to `pod_hold_back_pad` or below? If so it keeps home its best
+# blockers -- toughest first, then strongest -- one at a time until it would
+# not; if no number kept home saves it, it attacks with everything. Your
+# pilot's rule (§0z186, `hold_back`), mirrored. It reads your WHOLE board as
+# your next attack, every creature untapped and unsick and none held home:
+# a worst case for the pod, said. Needs A1 (the blocks it reads) and A2
+# (the tapped bodies).
+
+def pod_hold_back_on(g) -> bool:
+    return (bool(g.cfg.get("pod_hold_back", False)) and you_block_on(g)
+            and trades_on(g))
+
+
+def your_next_attackers(g) -> list:
+    """Your creatures as your next combat could send them: on the
+    battlefield as creatures now, without defender (702.3b). Tapped and
+    summoning-sick ones untap and recover in your untap step."""
+    from edhmc.decks._evasion import DEFENDER
+    return [p for p in g.board if is_creature_now(g, p)
+            and p.card.name not in DEFENDER]
+
+
+def pod_crack_back(g, opp, bodies, tapped) -> float:
+    """The damage your next attack deals `opp` with its bodies `tapped`
+    tapped. Every flag it sets is put back, and it writes no counter."""
+    saved = list(opp.body_tapped)
+    for k in tapped:
+        opp.body_tapped[k] = True
+    try:
+        return damage_through(g, your_next_attackers(g), defender=opp)
+    finally:
+        opp.body_tapped = saved
+
+
+def pod_hold_back(g, opp, bodies, ks) -> set:
+    """The bodies of `ks` the opponent keeps home (§0z202): its best
+    blockers first, until your crack-back would leave it above the pad; none
+    if it is safe already, and none if nothing kept home saves it."""
+    pad = g.cfg.get("pod_hold_back_pad", g.cfg.get("hold_back_pad", 10.0))
+    if opp.life - pod_crack_back(g, opp, bodies, ks) > pad:
+        return set()
+    home = set()
+    for k in pod_keep_order(bodies, ks):
+        home.add(k)
+        if opp.life - pod_crack_back(
+                g, opp, bodies, [j for j in ks if j not in home]) > pad:
+            g.m["pod_held_back"] += len(home)
+            g.m["pod_hold_back_turns"] += 1
+            return home
+    return set()
+
+
+def pod_keep_order(bodies, ks) -> list:
+    """Which bodies the pod keeps home first: the best blockers -- the
+    toughest, then the strongest."""
+    return sorted(ks, key=lambda k: (-bodies[k].toughness, -bodies[k].power,
+                                     k))
+
+
 def seat_attack(g, i) -> None:
     """Opponent `i`'s combat step under A2 (§0z199), and A4's attacks at its
     rivals (§0z200): see the headers. The attacker's bodies that die are
@@ -3222,6 +3290,13 @@ def seat_attack(g, i) -> None:
             continue
         sent.append(k)
     g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
+    if pod_hold_back_on(g) and (sent or at_rival):        # §0z202
+        everyone = sent + [k for _o, ks in at_rival.values() for k in ks]
+        home = pod_hold_back(g, opp, bodies, everyone)
+        if home:
+            sent = [k for k in sent if k not in home]
+            for key, (o, ks) in list(at_rival.items()):
+                at_rival[key] = (o, [k for k in ks if k not in home])
     dead = set()                       # the attacker's bodies that die
     if sent:
         _attack_you(g, opp, bodies, sent, dead)

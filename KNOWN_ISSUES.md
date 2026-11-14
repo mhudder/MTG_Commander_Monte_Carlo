@@ -254,6 +254,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z199](#0z199) | BUILT | **A2: you block; the pod declares its attacks** (`you_block`, OFF; item 44). Over A1, T20: +0.007 to +0.071 (the pod deals 57-87% of the formula); A1+A2 together -0.035 to +0.052; T10 down everywhere |
 | [0z200](#0z200) | BUILT | **A4: rivals lose life to each other** (`rival_combat`, OFF; item 44). Over A1+A2, T20 +0.025 to +0.044 on all six; A1+A2+A4 against the old pod -0.002 to +0.096: the pod the re-fit must strengthen |
 | [0z201](#0z201) | MEASURED | **The pilot counting a doomed lifelinker's life** (`pilot_life_value`, item 44): a null on all six decks at 0.25-2, inside every bar; §0z198's lifelink reading of karlov was wrong. Stays 0 |
+| [0z202](#0z202) | BUILT | **The pod's hold-back** (`pod_hold_back`, OFF; item 44): it keeps 0.1-0.5 bodies home a game against your crack-back; you lose at most 0.002 at T10, nothing at T20. Recommended for the flip at pad 10 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -17883,6 +17884,72 @@ the pilot was right to. **`pilot_life_value` stays 0** (no arm won, so
 there is no winner to re-measure on fresh seeds, §0z170). The knob and the
 hook stay, for a pod whose pressure the re-fit changes (item 44): re-run
 this sweep after the flip, not before.
+
+<a id="0z202"></a>
+
+## 0z202. BUILT -- the pod's hold-back (`pod_hold_back`, OFF): it works, and it is worth about nothing
+
+**The owner, 2026-11-14: "go ahead and start on the pod hold-back"** -- the
+gap §0z199 named: under A2 a body that attacks stays tapped through your
+turn and does not block, and nothing in the pod weighed that.
+
+**Built behind `pod_hold_back`, default OFF** (item 44's protocol); it needs
+A1 (the blocks it reads) and A2 (the tapped bodies). No table rebuilt.
+
+### What the switch does (`edhmc/opponents.py`, the hold-back block)
+
+Before an opponent's bodies attack -- at you or, under A4, at a rival --
+it asks `pod_crack_back`: with those bodies tapped, what would your next
+attack deal it (`damage_through` against its untapped bodies, A1's
+evaluated blocks)? If that would take it to `pod_hold_back_pad` or below
+(unset: your own `hold_back_pad`, 10, §0z191), it keeps home its best
+blockers -- toughest first, then strongest (`pod_keep_order`) -- one at a
+time until it would not; if no number kept home saves it, it attacks with
+everything. Your pilot's rule (§0z186), mirrored. It reads your WHOLE
+board as your next attack, every creature untapped and unsick and none held
+home: a worst case for the pod, said. The read writes no counter and puts
+every flag back.
+
+### Checks
+
+- OFF identical to `63d20e7`: `build_pending` over seeds 5000..6999, every
+  output key hashed, and `check_unchanged_decks`, 0 decks moved; caches
+  VERIFIED.
+- `tools.validate` +0.00 on 21 metrics OFF and with A1, A2, A4 and the
+  hold-back ON (the means moved, so the patch applied).
+- `tests/test_pod_hold_back.py`, 5 cases, 4 mutations, every set exact as
+  written before the run. `python -m tests` 125 of 125.
+
+### Measured (`pod_hold_back` ON minus OFF, every leg A1+A2+A4)
+
+`diagnostics/run_knob_ab DECK pod_hold_back pod_held_back --no-identity
+--cfg=attacker_deaths=True,you_block=True,rival_combat=True`, seeds
+5000.., python 3.11.17. Pad 10 at N=15,000; pad 0 (lethal only) at 6,000.
+
+| deck | pad 10, T10 | pad 10, T20 | bodies kept home | attacks at you (on / off) | damage to you (on / off) | pad 0, T20 |
+|---|---|---|---|---|---|---|
+| rendmaw | -0.0017 ±0.0009 | -0.0006 ±0.0017 | 0.43 | 5.25 / 5.40 | 14.2 / 14.6 | -0.0033 ±0.0024 |
+| lorehold | -0.0012 ±0.0009 | +0.0009 ±0.0013 | 0.16 | 5.14 / 5.21 | 14.8 / 15.0 | -0.0008 ±0.0014 |
+| karlov | -0.0021 ±0.0012 | -0.0011 ±0.0018 | 0.46 | 5.61 / 5.79 | 17.0 / 17.5 | -0.0017 ±0.0018 |
+| tivit | -0.0007 ±0.0008 | +0.0009 ±0.0011 | 0.14 | 5.40 / 5.46 | 15.1 / 15.3 | -0.0008 ±0.0013 |
+| shilgengar | -0.0005 ±0.0005 | -0.0014 ±0.0015 | 0.31 | 5.67 / 5.76 | 15.1 / 15.3 | -0.0022 ±0.0018 |
+| azusa | -0.0016 ±0.0008 | -0.0002 ±0.0011 | 0.27 | 4.03 / 4.10 | 11.7 / 11.8 | -0.0020 ±0.0015 |
+
+Files: `results/pod_hold_back_<deck>_20261114.txt` and
+`results/pod_hold_back_pad0_<deck>_20261114.txt`.
+
+**Read**: the pod keeps 0.1-0.5 bodies home a game, attacks you a little
+less, and costs you at most 0.002 at T10 -- a pod playing a little better,
+inside its bar at T20 on every deck. Your combat kills do not move (0.87 /
+0.87 on rendmaw): **the pod is rarely killed by your crack-back in the
+first place**, so its blockers seldom decide its life -- A3 again (§0z197):
+the game turns on the clocks, not on whose board survives. **Recommended
+for the batch's flip at pad 10** (the opponents play as well as they can,
+the owner's decision 3, and it costs nothing to keep); pad 0 is no better.
+The pad is not tuned (no arm wins), so no winner to re-measure (§0z170).
+
+**Knobs to say out loud**: `pod_hold_back` (OFF), `pod_hold_back_pad`
+(unset: `hold_back_pad`, 10).
 
 ## How to read an ablation table
 
