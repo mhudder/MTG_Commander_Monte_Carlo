@@ -3929,6 +3929,33 @@ def _check_eliminations(g):
         g.result = "win"
 
 
+def plan_blockers(g, opp) -> int:
+    """How many of `opp`'s creatures the split plan insures against
+    (`_attack_groups`'s `b`), by `split_blockers` (§0z205):
+
+      "formula"   THE DEFAULT, the rule before §0z205: `_blocker_counts`,
+                  `block_share` of every creature, tapped or not, halved for
+                  Ohran Frostfang. Under A2 it plans against bodies that
+                  attacked and are tapped -- and it measured BEST.
+      "untapped"  under A1, `available_blockers`' count -- under A2 every
+                  untapped body and Bird -- and Serra's Emissary's 0, as the
+                  resolution reads. The coherent read, and the worst case:
+                  the pod's evaluated blocks decline most of those blocks,
+                  so it over-insures; -0.0020 at T20 (§0z205).
+      "share"     under A1, `block_share` of that untapped count.
+
+    Off A1 every mode is the formula's count."""
+    mode = g.cfg.get("split_blockers", "formula")
+    if mode != "formula" and trades_on(g):
+        if protected_from_creatures(g):
+            return 0
+        n = available_blockers(g, opp)[1]
+        if mode == "share":
+            n = int(n * g.cfg.get("block_share", 0.60))
+        return n
+    return _blocker_counts(g, opp)[0]
+
+
 def _attack_groups(g, attackers, scale=1.0, bonus=0.0):
     """`combat_damage`'s assignment plan, split out (§0z198) so the pilot's
     preview (`safe_attackers`) reads the split the combat will make: the
@@ -3955,7 +3982,7 @@ def _attack_groups(g, attackers, scale=1.0, bonus=0.0):
     for slot, opp in enumerate(alive):
         if i >= n:
             break
-        b, _ = _blocker_counts(g, opp)
+        b = plan_blockers(g, opp)
         # The flat `bonus` lands on the first group, so that group needs that
         # much less out of the attackers themselves.
         need = opp.life - (bonus if slot == 0 else 0.0)

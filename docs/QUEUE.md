@@ -201,6 +201,13 @@ rebuild.
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
 
+    **STATUS 2026-11-14, LATER: THE POLICY RE-READ IS UNDER WAY (§0z205).**
+    Done: the liveness census (three knobs retired by the flip) and the
+    split plan's blocker count (the formula kept). Running: the pilot
+    sweeps (`hold_back_pad`, `your_chump_floor`, `pilot_life_value`,
+    `attack_safety`, `hold_back`, azusa's `counter_target`, rendmaw's
+    `doll_policy`). Then the rebuild, the owner's call.
+
     **STATUS 2026-11-14: FLIPPED AND RE-FITTED (§0z204).** A1, A2, A4 and
     the pod's hold-back are the default (`opponents.POD_DEFAULTS`;
     `experiment.POD_PRE_COMBAT` restores the old pod exactly), and

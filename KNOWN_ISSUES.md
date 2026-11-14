@@ -257,6 +257,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z202](#0z202) | BUILT | **The pod's hold-back** (`pod_hold_back`, OFF; item 44): it keeps 0.1-0.5 bodies home a game against your crack-back; you lose at most 0.002 at T10, nothing at T20. Recommended for the flip at pad 10 |
 | [0z203](#0z203) | BUILT | **The pilot reads the pod's bodies under A2** (`predict_from_bodies`, item 44): each body's attack chance x what gets past your blocks. T20 +0.0023 lorehold, +0.0037 shilgengar, the rest inside. Pre-flip list done |
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
+| [0z205](#0z205) | **IN PROGRESS** | **Item 44's policy re-read** (§0z5): three knobs retired by the flip; the split plan keeps the formula's blocker count (the coherent read loses 0.0020); pilot sweeps running |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18159,6 +18160,89 @@ card.
 **Knobs to say out loud**: `incidental_rate` (1.45, the fit), and what it
 now means (the bridge's rate, capped at 1 a body); `threat_clock_shift`
 (2.3, unchanged); `pod_hold_back_pad` (unset: `hold_back_pad`, 10).
+
+<a id="0z205"></a>
+
+## 0z205. IN PROGRESS -- item 44's policy re-read after the flip (§0z5)
+
+**The owner, 2026-11-14: "go ahead and start on the policy re-read"**,
+after the flip and re-fit (§0z204). §0z5: a policy written while a gap was
+open does not fix itself when the gap closes. Every pilot rule below was
+written while your attackers could not die and you did not block. **No
+default has changed yet**; the pilot sweeps are running and this section is
+completed when they land.
+
+### 1. Which combat knobs the default pod still reads
+
+`diagnostics/run_knob_liveness.py` (new): each KNOB=V against unset, N=300
+staged games a deck, T20, seeds 5000..5299, on the new pod (`DEFAULT_CFG`)
+and the old (`+ POD_PRE_COMBAT`); a cell counts the games whose WHOLE
+output moved, and those whose result did. 37 knobs, each perturbed well
+off its default (`results/knob_liveness_combat_20261114.txt`). At this N,
+evidence about 1,800 games, not a proof (§0z126):
+
+- **Retired by the flip** (live on the old pod, 0 games moved on the new):
+  `blocker_toughness` (a trampler's blocker toughness, a count's stand-in;
+  A1's bodies have their own), `pod_block_policy` and `pod_blocker_deaths`
+  (A1's evaluated blocks replaced the pod's chump rule). And `block_share`
+  is read on the new pod by ONE thing, the split plan (section 2).
+- **Dead on both pods at this N** -- not the flip's doing: `block_rate`
+  (read only with `derived_blocking` False), `monarch_loss_scale`,
+  `monarch_attack_floor`, `crown_loss_ends_chip`, `gingerbrute_keep`,
+  `zuran_keep`.
+- **Read only by the new pod**: the pilot's `attack_safety`,
+  `your_chump_floor`, `pilot_life_value`; the pod's `pod_attack_safety`,
+  `pod_hold_back_pad`, `pod_utility_share`, `pod_body_power_max`,
+  `pod_utility_power_max`.
+- **Live on both, and more so on the new**: `hold_back_pad` (685 games
+  moved against 301), `flier_block_share` (also the body pool's flier
+  share now), `pod_chump_floor`, `untapped_blockers`, `combat_targeting`.
+- **Item 44 expected these to retire; they do not**: `goad_block_share`
+  (the pod's model of rendmaw's goaded Birds at a rival -- still a count
+  share although A4's rivals block with bodies: a pod-side mismatch, said,
+  rendmaw only, not fixed here) and `attack_tax_deflect` (whether the pod
+  pays a tax -- it has no mana model -- applied per body under A2; stays).
+
+### 2. The split plan's blocker count (`split_blockers`, the formula KEPT)
+
+`_attack_groups`, the pilot's split across defenders (§0v), takes a
+defender on with `k = m + 1 + b` attackers, `b` the blockers it insures
+against -- `_blocker_counts`, the formula's `block_share` of every
+creature, tapped or not. Under A1 the combat resolves against
+`available_blockers` instead (under A2 every untapped body and Bird): the
+plan and the resolution read two blocker sets, §0u's shape. Written as one
+function, `opponents.plan_blockers`, with three rules, measured at
+N=15,000 paired, seeds 5000..19999 (`results/split_blockers_20261114.txt`;
+`results/split_reads_bodies_20261114.txt` is the first, two-way run of
+the same question):
+
+| `split_blockers` minus "formula" | mean T10 | mean T20 |
+|---|---|---|
+| "untapped" (the resolution's count) | **-0.0008 ±0.0005** | **-0.0020 ±0.0006** (rendmaw -0.0109) |
+| "share" (`block_share` x the untapped) | -0.0002 ±0.0005 | +0.0003 ±0.0006 |
+
+**The coherent read is the worse pilot.** "untapped" insures against
+every body that COULD block, and the pod's evaluated blocks decline most
+of them, so it over-commits attackers to one defender; the formula's share
+sat nearer the blocks actually made. **"formula" stays the default**
+(identical to `3e7b6fb`, 400 staged games a deck hashed), and `block_share`
+stays live as the plan's knob. "share" is no better: reading the tapped
+state buys nothing measurable. `tests/test_plan_blockers.py`, 7 cases, 4
+mutations, exact sets as written before the run.
+
+### 3. The pilot's policies, swept on the new pod (RUNNING)
+
+`diagnostics.run_knob_sweep`, N=6,000 a deck paired, seeds 5000..10999:
+`hold_back_pad` (10 against 0, 5, 15, 20), `your_chump_floor` (10 against
+0, 5, 15, 20), `pilot_life_value` (0 against 0.5, 1, 2; §0z201 asked for
+it after the flip), `attack_safety` and the `hold_back` mode (on against
+off). And two hand-written policies whose written reason was a formula-era
+claim, N=15,000 on their one deck: azusa's `counter_target` ("spread", §0z101:
+"the pod chump-blocks the BIGGEST attackers" -- under A1 it evaluates) and
+rendmaw's `doll_policy` ("nest", §0z58: tapping the Doll at end step "costs
+nothing" -- a tapped creature does not block on the pod's turns). A first
+`hold_back_pad` sweep ran on the code before the split's default was settled
+and is not quoted; every sweep was re-run on one code state.
 
 ## How to read an ablation table
 
