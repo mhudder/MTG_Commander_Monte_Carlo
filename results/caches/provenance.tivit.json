@@ -1,8 +1,8 @@
 {
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "7ce9d40508291d8b",
-    "built_commit": "7fa63c3",
-    "built_utc": "2026-11-15T22:28:10Z",
+    "built_at": "bbb7539f3ecc9461",
+    "built_commit": "20efca7",
+    "built_utc": "2026-11-15T23:31:21Z",
     "deck": "tivit",
     "superseded": [
       {
