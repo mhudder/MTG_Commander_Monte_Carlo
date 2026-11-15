@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "2e1102acd8f063cd",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:57:59Z",
+    "built_at": "8ef0d831ba9be598",
+    "built_commit": "7fa63c3",
+    "built_utc": "2026-11-15T22:31:24Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -579,51 +579,58 @@
             "utc": "2026-11-08T01:51:27Z"
           }
         ]
+      },
+      {
+        "built_at": "2e1102acd8f063cd",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:57:59Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "1b2c8682bdd39497",
+            "utc": "2026-11-13T02:36:44Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "18d0d2a069ce01eb",
+            "utc": "2026-11-13T04:22:10Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "77513b77b4fd5555",
+            "utc": "2026-11-13T14:02:05Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "fb1ae1aba31dc802",
+            "utc": "2026-11-13T15:22:58Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "45488d5bf263288f",
+            "utc": "2026-11-14T02:32:56Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "a0d2a2ac181b6797",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "1b2c8682bdd39497",
-        "utc": "2026-11-13T02:36:44Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "18d0d2a069ce01eb",
-        "utc": "2026-11-13T04:22:10Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "77513b77b4fd5555",
-        "utc": "2026-11-13T14:02:05Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "fb1ae1aba31dc802",
-        "utc": "2026-11-13T15:22:58Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "45488d5bf263288f",
-        "utc": "2026-11-14T02:32:56Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "a0d2a2ac181b6797",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "4ad75ecce4e4708b",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:56:44Z",
+    "built_at": "50639d27c2c84171",
+    "built_commit": "7fa63c3",
+    "built_utc": "2026-11-15T22:28:17Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1106,51 +1113,58 @@
         "built_utc": "2026-11-07T20:14:40Z",
         "deck": "karlov",
         "verified": []
+      },
+      {
+        "built_at": "4ad75ecce4e4708b",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:56:44Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "97f8d3c428bb3195",
+            "utc": "2026-11-13T02:36:43Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "1d0ff10cbaf1a02e",
+            "utc": "2026-11-13T04:22:10Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "7bacc2f0af6aed32",
+            "utc": "2026-11-13T14:02:04Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "3dae3f0bbbac80ac",
+            "utc": "2026-11-13T15:22:57Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "7c654095f02af0eb",
+            "utc": "2026-11-14T02:32:56Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "f17e4a5b175201e9",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "97f8d3c428bb3195",
-        "utc": "2026-11-13T02:36:43Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "1d0ff10cbaf1a02e",
-        "utc": "2026-11-13T04:22:10Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "7bacc2f0af6aed32",
-        "utc": "2026-11-13T14:02:04Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "3dae3f0bbbac80ac",
-        "utc": "2026-11-13T15:22:57Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "7c654095f02af0eb",
-        "utc": "2026-11-14T02:32:56Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('karlov') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "f17e4a5b175201e9",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "f8a3b0970ecf46af",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:57:13Z",
+    "built_at": "ffc67ad8d45a958f",
+    "built_commit": "7fa63c3",
+    "built_utc": "2026-11-15T22:29:46Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1661,51 +1675,58 @@
         "built_utc": "2026-11-07T20:15:19Z",
         "deck": "lorehold",
         "verified": []
+      },
+      {
+        "built_at": "f8a3b0970ecf46af",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:57:13Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "44baa2fb8140bfcf",
+            "utc": "2026-11-13T02:36:43Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "1864a6a9e5dfc7d1",
+            "utc": "2026-11-13T04:22:10Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "ff9b3650b8770089",
+            "utc": "2026-11-13T14:02:04Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "7213cc326d0c720d",
+            "utc": "2026-11-13T15:22:57Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "7af324301f152cee",
+            "utc": "2026-11-14T02:32:56Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "7756bd1febfb3801",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "44baa2fb8140bfcf",
-        "utc": "2026-11-13T02:36:43Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "1864a6a9e5dfc7d1",
-        "utc": "2026-11-13T04:22:10Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "ff9b3650b8770089",
-        "utc": "2026-11-13T14:02:04Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "7213cc326d0c720d",
-        "utc": "2026-11-13T15:22:57Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "7af324301f152cee",
-        "utc": "2026-11-14T02:32:56Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('lorehold') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "7756bd1febfb3801",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "6ce8bc6a5c089692",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:56:21Z",
+    "built_at": "f3e2972bf08038a0",
+    "built_commit": "7fa63c3",
+    "built_utc": "2026-11-15T22:29:11Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2182,51 +2203,58 @@
             "utc": "2026-11-08T01:51:27Z"
           }
         ]
+      },
+      {
+        "built_at": "6ce8bc6a5c089692",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:56:21Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "4064c2dba866ff44",
+            "utc": "2026-11-13T02:36:43Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "a7d133dfac9bb6d8",
+            "utc": "2026-11-13T04:22:09Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "f1b4b4ce9c79fccb",
+            "utc": "2026-11-13T14:02:04Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "ef0dc4ae9bc8cff1",
+            "utc": "2026-11-13T15:22:57Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "849e1537446b0d4b",
+            "utc": "2026-11-14T02:32:55Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "30d359172504d1d1",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "4064c2dba866ff44",
-        "utc": "2026-11-13T02:36:43Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "a7d133dfac9bb6d8",
-        "utc": "2026-11-13T04:22:09Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "f1b4b4ce9c79fccb",
-        "utc": "2026-11-13T14:02:04Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "ef0dc4ae9bc8cff1",
-        "utc": "2026-11-13T15:22:57Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "849e1537446b0d4b",
-        "utc": "2026-11-14T02:32:55Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('rendmaw') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "30d359172504d1d1",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "eab0b61d59c8bf93",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:56:22Z",
+    "built_at": "94e20b2e3d051fe0",
+    "built_commit": "7fa63c3",
+    "built_utc": "2026-11-15T22:28:36Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -2738,51 +2766,58 @@
         "built_utc": "2026-11-07T20:14:50Z",
         "deck": "shilgengar",
         "verified": []
+      },
+      {
+        "built_at": "eab0b61d59c8bf93",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:56:22Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "4d8d12ef767220f0",
+            "utc": "2026-11-13T02:36:44Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "e20a67eb8f7165ce",
+            "utc": "2026-11-13T04:22:10Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "3641af65c8003fca",
+            "utc": "2026-11-13T14:02:05Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "092d355b6ede0de1",
+            "utc": "2026-11-13T15:22:57Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "fcc758f6385e774e",
+            "utc": "2026-11-14T02:32:56Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "1850cccc6e150738",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "4d8d12ef767220f0",
-        "utc": "2026-11-13T02:36:44Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "e20a67eb8f7165ce",
-        "utc": "2026-11-13T04:22:10Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "3641af65c8003fca",
-        "utc": "2026-11-13T14:02:05Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "092d355b6ede0de1",
-        "utc": "2026-11-13T15:22:57Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "fcc758f6385e774e",
-        "utc": "2026-11-14T02:32:56Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('shilgengar') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "1850cccc6e150738",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "b1c22f182bd24afb",
-    "built_commit": "63d20e7",
-    "built_utc": "2026-11-11T21:56:19Z",
+    "built_at": "bbb7539f3ecc9461",
+    "built_commit": "20efca7",
+    "built_utc": "2026-11-15T23:31:21Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -3253,46 +3288,53 @@
         "built_utc": "2026-11-07T20:14:53Z",
         "deck": "tivit",
         "verified": []
+      },
+      {
+        "built_at": "b1c22f182bd24afb",
+        "built_commit": "63d20e7",
+        "built_utc": "2026-11-11T21:56:19Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "862cf6a",
+            "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "e6c4079ba6549266",
+            "utc": "2026-11-13T02:36:43Z"
+          },
+          {
+            "commit": "7d4bc9f",
+            "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "2edc525e0a6a599c",
+            "utc": "2026-11-13T04:22:10Z"
+          },
+          {
+            "commit": "54823bd",
+            "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "46f0d44f9162499e",
+            "utc": "2026-11-13T14:02:05Z"
+          },
+          {
+            "commit": "f28e55d",
+            "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
+            "fingerprint": "da5c88fe49cd3f04",
+            "utc": "2026-11-13T15:22:57Z"
+          },
+          {
+            "commit": "c64df1a",
+            "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "37fc04c0b691786d",
+            "utc": "2026-11-14T02:32:56Z"
+          },
+          {
+            "commit": "91e7922",
+            "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
+            "fingerprint": "9d7fcac296030022",
+            "utc": "2026-11-14T03:06:59Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "862cf6a",
-        "evidence": "\u00a70z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "e6c4079ba6549266",
-        "utc": "2026-11-13T02:36:43Z"
-      },
-      {
-        "commit": "7d4bc9f",
-        "evidence": "\u00a70z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "2edc525e0a6a599c",
-        "utc": "2026-11-13T04:22:10Z"
-      },
-      {
-        "commit": "54823bd",
-        "evidence": "\u00a70z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "46f0d44f9162499e",
-        "utc": "2026-11-13T14:02:05Z"
-      },
-      {
-        "commit": "f28e55d",
-        "evidence": "\u00a70z201 (pilot_life_value, lifelink_of hooks; karlov gains KarlovGame.lifelink_of) lands at 0: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.",
-        "fingerprint": "da5c88fe49cd3f04",
-        "utc": "2026-11-13T15:22:57Z"
-      },
-      {
-        "commit": "c64df1a",
-        "evidence": "\u00a70z202 (pod_hold_back) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "37fc04c0b691786d",
-        "utc": "2026-11-14T02:32:56Z"
-      },
-      {
-        "commit": "91e7922",
-        "evidence": "\u00a70z203 (predict_from_bodies, read only under you_block) lands with A2 OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('tivit') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-14.",
-        "fingerprint": "9d7fcac296030022",
-        "utc": "2026-11-14T03:06:59Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

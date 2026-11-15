@@ -3012,6 +3012,217 @@ left them:
 A container restart killed item 41's first run; it was re-run whole. The
 other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
+## Queued items closed 2026-11-15 — moved from `docs/QUEUE.md`
+
+Closed 2026-11-15: item 47's batch done (§0z210-§0z216), and item 44's one rebuild run on the owner's call (§0z219). §0z217 and §0z218 (Tivit and Deadeye as a combo, the Clue dig) were added to the batch the same day, before tivit's leg.
+
+44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
+    can die to blockers, and you block.**
+
+    **STATUS 2026-11-14, LATER: THE POLICY RE-READ IS DONE (§0z205); ONLY
+    THE REBUILD IS LEFT.** No default changed: every pilot policy's
+    incumbent wins on the new pod (`hold_back_pad` 10, `your_chump_floor`
+    10, `pilot_life_value` 0, `attack_safety` and `hold_back` on, rendmaw's
+    Doll nest); the flip retired `blocker_toughness`, `pod_block_policy`
+    and `pod_blocker_deaths`; the split plan keeps the formula's blocker
+    count (`split_blockers`). Azusa's `counter_target` is unreached by its
+    list -- re-measure when Bristly Bill or Dancing from Dark to Dawn is
+    proposed. **Next: the one rebuild (`parallel-rebuild`) -- HELD BY
+    THE OWNER, 2026-11-14 ("lets hold on the rebuild for now").** Until it
+    runs the six caches stay SUSPECT and `check_docs` fails on them.
+
+    **STATUS 2026-11-14: FLIPPED AND RE-FITTED (§0z204).** A1, A2, A4 and
+    the pod's hold-back are the default (`opponents.POD_DEFAULTS`;
+    `experiment.POD_PRE_COMBAT` restores the old pod exactly), and
+    `incidental_rate` is re-fitted 0.78 -> 1.45 (crossing 1.453; out of
+    sample mean T20 0.4616 against 0.4612, game length held). At N=15,000
+    the mean T20 is 0.4702 -> 0.4680; T10, not fitted, 0.229 -> 0.213. The
+    CRN factor fell (~15x -> ~7x; paired SE +10%). **All six caches are
+    SUSPECT for a real reason -- never `--verified`.** Left, in order:
+    (1) re-read the policies written while the gap was open (§0z5; the list
+    is in §0z204) and re-sweep `pilot_life_value`; (2) the one rebuild, the
+    owner's call.
+
+    **STATUS 2026-11-13: A1, A2 AND A4 BUILT, ALL OFF** (A4: §0z200,
+    `rival_combat` -- rivals lose life to each other; it came out of item
+    45 into this batch, the owner's call). A1 (§0z198):
+    `attacker_deaths`, evaluated blocks, first and double strike, the
+    pilot's `safe_attackers`. A2 (§0z199): `you_block`, the pod's combat
+    step a combat of bodies (the rate a bridge to the formula), the pod's
+    read of your blocks (`pod_safe_attack`), your blocks by the same rule,
+    tapped attackers that do not block, the crown an event. OFF proved
+    identical both times and the caches VERIFIED; ON measured per deck,
+    alone and together. **What is left before the defaults flip**, each the
+    owner's to call: the flip, the re-fit (§0z195) and one rebuild -- the
+    pre-flip list is DONE (`predicted_chip` reads the bodies under A2,
+    §0z203). The
+    lifelink pilot was MEASURED and is a null (§0z201, `pilot_life_value`
+    stays 0; re-sweep after the flip). The pod's hold-back is BUILT
+    (§0z202, `pod_hold_back`, OFF), worth at most 0.002 to you, and
+    recommended for the flip at pad 10.
+
+    **TEST EACH CHANGE; DO NOT REBUILD THE TABLES DURING IT** -- not one
+    deck, not at the end of a step. "There is no point when there is so
+    much to do." The tables stay as built at `63d20e7` until the batch is
+    done and the owner calls a single rebuild. The protocol:
+
+    - Every rule lands behind a cfg switch that restores the old rule
+      exactly (every fix since §0z42 has), and **lands default OFF**. Off
+      is bit-identical by construction, so each deck's moved fingerprint is
+      cleared the usual way -- `check_unchanged_decks` against a worktree
+      at the cache's `built_commit`, then `cache_manifest --verified` -- and
+      `check_docs` stays green.
+    - Each step is TESTED, not tabled: a pinned mechanism test with its
+      mutation mode (written before it is run, §0z11), `python -m tests`
+      and `--mutate`, `tools.validate` +0.00, and a paired on/off run per
+      deck (N 6,000 or more, both horizons) reporting win rate, the baseline,
+      every output key that moved (§0z32) and the new mechanism counters
+      (attackers lost, blocks made, blockers lost, kills by block).
+    - The defaults flip TOGETHER at the end of the batch. Then the pod is
+      re-fitted once (the fit rule, §0z195; `incidental_rate` as in
+      §0z186), the policies written while the gap was open are re-read
+      (§0z5), and the owner calls one rebuild (`parallel-rebuild`).
+    - If a default is flipped mid-batch anyway, the caches it moves are
+      SUSPECT for a real reason: **never clear them with `--verified`**;
+      `check_docs` fails on them and each commit says so.
+
+    **THE OWNER'S DECISIONS (2026-11-13)**, asked on 2026-11-12:
+
+    1. *The pod's block rule*: each defender **evaluates the situation**
+       rather than following one fixed rule -- chump, trade or decline.
+    2. *Your block rule*: the same. "Utility creatures do not block
+       normally unless under large pressure."
+    3. *Which bodies attack, and how well the pod plays*: **the opponents
+       play as close to optimally as possible.**
+    4. *A roll or an expectation*: left to the session ("your call"). The
+       recommendation, adopted unless the owner overrides it: **the attack
+       becomes discrete by construction** -- real bodies attack, real
+       blocks, real damage -- rather than a lognormal spread laid over the
+       formula (§0z170's test device). Every new random draw is CRN-addressed
+       (§0z17), the old formula stays behind the switch, and the PILOT keeps
+       reading an expectation of the pod's next swing, never the swing
+       itself (§0z170: "a pilot who knows the next swing to the point is
+       not a pilot"). The cost to check: a wider noise floor, read off
+       `tools.validate`'s CRN factor before and after.
+
+    **What "optimal" means here, so it can be built and tested.** A
+    one-decision evaluation by each player, from the information that
+    player has -- the visible boards, life totals, commander damage and
+    each creature's value -- and never from hidden or pre-rolled state
+    (your hand and library, the kill turns, the CRN streams). Not a game
+    tree: azusa's boards reach thousands of creatures, so every decision
+    stays greedy or closed-form, O(n log n) at worst. A defender blocks
+    first to survive (lethal, commander damage included) at the least
+    value lost; otherwise only where the block is free (the blocker
+    lives) or a trade it wins on value; a utility creature blocks only
+    under pressure. An attacker is sent where it is not blocked at a loss
+    and its absence does not open its owner to a lethal crack-back. Any
+    tuned piece of either policy is re-measured on fresh seeds before its
+    size is quoted (§0z170).
+
+    **What the decisions require, each a new judgement to say out loud**:
+    the bodies need a POWER (they carry toughness, mana value and colour
+    today, `PodBody`) and a ROLE or value (utility vs combat), and so
+    distributions nobody has data for. Your side needs the same value per
+    creature (an engine, a mana creature, the commander). **Your pilot is
+    upgraded in the same work**: an optimal pod against a pilot that
+    attacks by a fixed rule measures the pilot's errors, not the cards
+    (§0z184's hold-back lesson, §0v). Expect the mean win rate to fall
+    and the pod to be re-fitted (§0z195: a stronger pod shrank every row
+    to ~0.4 and flipped none). And A4 sits inside A2: once the pod
+    declares attacks, an attack at a rival either takes that rival's life
+    (A4 resolved) or goes nowhere as today -- decide it there, not later.
+
+    **Knobs re-derived or retired by it**: `block_share`,
+    `flier_block_share`, `blocker_toughness`, `goad_block_share`,
+    `incidental_rate`, `combat_share`'s `1/(1+blockers)`, `hold_back` and
+    `hold_back_pad` (§0z186, §0z191), `attack_tax_deflect`.
+
+    **Text it makes live, to be pinned as it does**: first and double strike
+    (Lyra Dawnbringer, Sunhome -- §0z184 finding 6, which item 37 hands
+    here), an attacker's toughness and indestructibility, protection
+    (Auriok Champion, Greensleeves), reach (Arasta of the Endless Web,
+    Rendmaw, Ancient Greenwarden, Longshot, The Dawning Archaic),
+    deathtouch and lifelink on a block, Bloodghast's "can't block",
+    Sakura-Tribe Elder's chump-then-sacrifice, Ghostly Prison and
+    Propaganda as taxes on declared attackers, Mother of Runes' protection
+    on a blocker.
+
+47. **THE PRE-REBUILD BEHAVIOUR BATCH (order of work, step 1).** The
+    findings of the three oracle re-audits (§0z207, §0z208, §0z209) and of
+    §0z184 and §0z197 where the engine plays a card AGAINST its text and
+    the fix moves the deck's baseline. Collected from items 46, 37 and 45
+    so that one session can take them; those items keep the rest. The
+    numbers in brackets are each audit file's own
+    (`docs/ORACLE_AUDIT_<DECK>.md`), which has the code site and the text.
+    **Nothing here is measured**: a size below is the audit's reading of
+    the text, not a win rate.
+
+    In this order (largest reading of the text first, per deck):
+
+    - **azusa**: ~~Genesis Wave tutors the three biggest permanents in the
+      whole library where the text reveals the top X (1)~~ **DONE
+      2026-11-15 (§0z210)**: -0.0034 / -0.0039 at T10 / T20, the old
+      rule's tutor for the mana-value-6 creatures; the mill costs nothing
+      measurable. ~~Animist's
+      Awakening takes the first four lands anywhere where the text
+      averages 1.7 from the top four (2)~~ **DONE 2026-11-15 (§0z211)**:
+      -0.0059 / -0.0051, 1.3 lands a cast where the old rule took 4;
+      ~~a tutored or Waved creature fires no ETB -- `AzusaGame.etb` is
+      called by `resolve` and Springheart's copy only (3)~~ **DONE
+      2026-11-15 (§0z212)**: +0.0017 / +0.0042; ~~Chord of Calling at a
+      fixed X=4 with no convoke, against trostani's `convoke_pool` and
+      `x_plan` for the same card (8, §0z197 A7)~~ **DONE 2026-11-15
+      (§0z213)**: one shared rule, +0.0087 / +0.0049; ranking by size
+      instead of priority is a null. ~~Then azusa's four labels (6-9)~~
+      **DONE 2026-11-15**: items 6, 7, 9 to PARTLY, Tier 3's reasons
+      corrected, the table re-rendered. **Azusa's part of this batch is
+      done.**
+    - **tivit**: **DONE 2026-11-15 (§0z214)** -- items 2-6 and 8 below,
+      each behind its own switch, plus Nadier's Nightblade's life (found
+      re-reading the text); together -0.0063 / -0.0026. Was: Tempting
+      Contract makes `1 + takers` Treasures where the
+      card gives `takers` (2); Grudge Keeper puts all its damage on one
+      opponent where each voter loses 2 (3); `on_creature_death` is a
+      no-op, so Nadier's Nightblade, Disciple of the Vault and Marionette
+      Master never hear a creature die -- and creatures die in combat
+      since item 44 (8); `convert_the_pile` and Custodi Squire (4-6).
+    - **shilgengar**: **DONE 2026-11-15 (§0z215)** -- the five below, each
+      behind its own switch; every one a null on this list. Was: Requiem Angel tests the token's name, so Bloodghast
+      and Kokusho, both Spirits, each make a Spirit
+      (1; `_evasion.CREATURE_SUBTYPES` has the answer); the two landfall
+      rules in `land_step` (2); combat lifelink read after the counters
+      land (3); and item 37's timing pair -- Black Market Connections at
+      the first main phase, `activations` inside main 2.
+    - **DONE 2026-11-15 (§0z216), the owner's policy**: tivit's Lightning Greaves (1). Shroud
+      protects Tivit while five targeted blinks still target it. Whether
+      Greaves stays on Tivit (and the blinks lose their best target) or
+      comes off is a piloting policy; measure both and bring the numbers.
+
+    **How each fix lands** -- the form every fix since §0z42 has taken:
+
+    - Read the oracle text from Scryfall again; the audit is dated.
+    - A cfg switch that restores the old rule exactly, and the new rule
+      the default: the caches are already SUSPECT for a real reason, so
+      there is nothing to keep bit-identical for. Prove the switch OFF
+      plays the commit before it, every output key hashed (§0z32).
+    - A pinned mechanism test with its mutation mode, the expected set
+      written before the run (§0z11); `python -m tests` and `--mutate`.
+    - `tools.validate` at `+0.00`, before and after.
+    - A paired on/off run on the one deck, N 6,000 or more, T10 and T20:
+      win rate with its bar, every output key that moved, and the
+      mechanism counter that should move (§0z172). A fix that makes a new
+      outcome possible gets the naive pilot measured too (§0z42).
+    - A new `§` in `KNOWN_ISSUES.md` per deck with the numbers; the
+      audit file's STATUS block updated; `tools.knobs --write`.
+    - **No table is rebuilt** (item 44's protocol still holds), and no
+      cache is cleared with `--verified`.
+
+    Blind to (§0z15): rendmaw, lorehold and karlov were last audited on
+    2026-09-03, before POD_V4 and item 44. Tivit's list had not changed
+    either and its audit found 29 items. Re-auditing those three before
+    the rebuild is the owner's call; it is not in this batch.
+
 ## Queued items closed 2026-11-11 — moved from `docs/QUEUE.md`
 
 Item 35 closed the same day: the owner, "go ahead and rebuild". Six legs at

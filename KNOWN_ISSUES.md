@@ -271,6 +271,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`), -0.0017 / -0.0011 |
 | [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0079 |
 | [0z218](#0z218) | FIXED | **The Clue dig, and a capped loop that drains is infinite** (the owner, 2026-11-15, §0z217's remaining 13%): `pile_dig` +0.0063 / +0.0043; `capped_drain_wins` +0.0003 / +0.0002. Combo games are won 88%; the rest are mana-starved digs and early kills |
+| [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19236,6 +19237,67 @@ casting, and its counters say so). That return sat OUTSIDE the switch, in
 both legs of every paired run, so the identity check passed -- §0z137's
 lesson, a comparison names both its sides. It now returns only after a
 dig that ran a round.
+
+<a id="0z219"></a>
+
+## 0z219. REBUILT -- item 44's one rebuild: six tables on the flipped pod
+
+**The owner, 2026-11-15: "go ahead with 1 and 2 on the list"** -- after
+§0z216's Greaves policy (step 1), the rebuild held since 2026-11-14 (step 2,
+queue item 44). Parallel (`parallel-rebuild`), one cloud session per deck,
+pins `numpy==2.4.6 scipy==1.17.1 openpyxl==3.1.5`, every leg on python
+3.13.18. Five legs at `7fa63c3`; tivit at `20efca7`, because §0z217 and
+§0z218 changed `tivit.py` after the launch (its two earlier legs are
+superseded; no other deck's fingerprint reads `tivit.py`). Coordinated on
+python 3.13.16 (§0z119): `tools.repro_row` IDENTICAL on tivit's Deadeye
+Navigator and karlov's Felidar Sovereign. `--merge-shards` accepted all six;
+every active cache CURRENT, `check_docs` green on all 20 checks for the
+first time since §0z204's flip. **Wall time: 37 minutes**, the slowest leg
+(azusa); tivit's re-run 16.
+
+**Baselines (T20) and noise floors**, old table -> new:
+
+| deck | baseline | floor |
+|---|---|---|
+| rendmaw | 0.3125 -> 0.3098 | ±0.0023 -> ±0.0028 |
+| lorehold | 0.5150 -> 0.4855 | ±0.0035 -> ±0.0033 |
+| karlov | 0.5503 -> 0.5073 | ±0.0026 -> ±0.0026 |
+| tivit | 0.5924 -> 0.5797 | ±0.0029 -> ±0.0029 |
+| shilgengar | 0.3628 -> 0.4151 | ±0.0028 -> ±0.0029 |
+| azusa | 0.4884 -> 0.5191 | ±0.0032 -> ±0.0034 |
+
+The CRN factor fell ~15x -> ~7x at the flip (§0z204), but the floors barely
+widened: the tables are as readable as before (queue item 48's question).
+
+**What moved** (T20, beyond the wider of the two bars): rendmaw 29 of 64
+rows (21 up), lorehold 18 of 65 (16 down), karlov 10 of 64, tivit 18 of 64,
+shilgengar 21 of 64, azusa 11 of 58. **Not one row significant in both
+tables changed sign, in any deck** -- §0z195's reading of a re-fit pod: sizes
+move with the fit, order and sign do not. The largest movers each have a
+mechanism on record: Deadeye Navigator +0.0088 -> +0.0182 (§0z217's combo),
+Chord of Calling +0.0045 -> +0.0123 (§0z213), Black Market Connections
++0.0008 -> +0.0070 (§0z215's timing), Time Sieve +0.0786 -> +0.0633 and
+Rise of the Eldrazi +0.0547 -> +0.0463 (the flip's sooner kill, which
+shrinks every slow engine), Coat of Arms +0.0159 -> +0.0054 and March of
+the World Ooze +0.0081 -> +0.0208 (rendmaw's attackers now die to blocks:
+a lord's +1/+1 to many small bodies buys less than bigger bodies do).
+
+**The text item 44 made live** (its list; queue item 48's third bullet):
+Arasta +0.0060 -> +0.0089, Longshot +0.0173 -> +0.0137, Dawning Archaic
++0.0143 -> +0.0134, Auriok Champion +0.0059 -> +0.0031, Mother of Runes
+(karlov +0.0075 -> +0.0063, lorehold +0.0061 -> +0.0023), Ghostly Prison
++0.0199 -> +0.0153, Propaganda +0.0190 -> +0.0169, Lyra Dawnbringer
++0.0227 -> +0.0214, Ancient Greenwarden +0.0214 -> +0.0180, Greensleeves
++0.0107 -> +0.0137, Sakura-Tribe Elder +0.0046 -> +0.0047, Bloodghast
++0.0033 -> +0.0005. The flat rows were checked for a dead mechanism and
+none is: each is implemented by name (`engine.sakura_tribe_elder`'s chump,
+`opponents.first_strike_of`, `CANT_BLOCK`). Bloodghast losing its
+significance is the expected direction -- once you block, the creature
+that cannot block is the one that adds nothing there.
+
+Diffs: `tools`-less, a table parser run over `git show 00bf581:results/
+ablation_<deck>.txt` against the new file; the same comparison any session
+can rerun.
 
 ## How to read an ablation table
 
