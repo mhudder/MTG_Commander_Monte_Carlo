@@ -32,7 +32,9 @@ items below this section are in the order they were queued, not this one.
 
 1. **Item 47: the behaviour fixes that move a baseline, BEFORE the
    rebuild.** The only step with a deadline: after the rebuild each one
-   costs its deck a second rebuild.
+   costs its deck a second rebuild. **DONE 2026-11-15** for azusa
+   (§0z210-§0z213), tivit (§0z214) and shilgengar (§0z215); what is left of
+   item 47 is step 2's question.
 2. **Item 47's owner decision: where Lightning Greaves sits in tivit.**
    Ask; do not choose. It moves tivit's baseline, so it is asked before
    step 3.
@@ -224,8 +226,9 @@ cloud container has no scipy), `python -m edhmc.pending`, and
 37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
     §0z185; 2 and 10, §0z187)**, none of
     them urgent. In the order a session would take them:
-    Memory Jar and Bloodbat Summoner (8); shilgengar's `activations` inside
-    main 2 and Black Market Connections at the first main phase (7); first
+    Memory Jar and Bloodbat Summoner (8); ~~shilgengar's `activations` inside
+    main 2 and Black Market Connections at the first main phase (7)~~ DONE
+    2026-11-15 (§0z215), a null; first
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
     write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
@@ -434,7 +437,8 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       no-op, so Nadier's Nightblade, Disciple of the Vault and Marionette
       Master never hear a creature die -- and creatures die in combat
       since item 44 (8); `convert_the_pile` and Custodi Squire (4-6).
-    - **shilgengar**: Requiem Angel tests the token's name, so Bloodghast
+    - **shilgengar**: **DONE 2026-11-15 (§0z215)** -- the five below, each
+      behind its own switch; every one a null on this list. Was: Requiem Angel tests the token's name, so Bloodghast
       and Kokusho, both Spirits, each make a Spirit
       (1; `_evasion.CREATURE_SUBTYPES` has the answer); the two landfall
       rules in `land_step` (2); combat lifelink read after the counters

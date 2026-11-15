@@ -1,0 +1,27 @@
+shilgengar: bmc_main1=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.17 / numpy 2.4.6
+
+   won T10  +0.0000 ±0.0000 
+   won T20  +0.0000 ±0.0000 
+
+   games where bmc_turns > 0 in either leg: 2136 of 15000 (14.2%)
+   IDENTITY: of the 12864 games with bmc_turns = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0000 ±0.0000
+   in those games, won T20  +0.0000 ±0.0000
+
+   every numeric output that moved (mean A, mean B, A - B):
+   bloodghast_returns                 0.1227     0.1225  +0.0001
+   bmc_turns                          0.5926     0.5929  -0.0003
+   cards_drawn                       13.6548    13.6550  -0.0002
+   drew_from_empty                    0.0119     0.0114  +0.0005
+   final_board_power                 40.8023    40.7980  +0.0043
+   final_life                        25.2969    25.2949  +0.0021
+   landfall_lands                     8.0298     8.0295  +0.0003
+   life_gained                       24.9529    24.9511  +0.0018
+   life_lost_to_own_cards             3.2604     3.2601  +0.0003
+   lifegain_triggers                  5.4233     5.4230  +0.0003
+   mana_spent                        98.5758    98.5703  +0.0055
+   painland_life                      1.3397     1.3397  +0.0001
+   single_reanimations                0.3691     0.3691  +0.0001
+   threat_answers_cast                0.8931     0.8929  +0.0002
+   threat_pieces_removed              1.3636     1.3634  +0.0002
+   threat_rounds_delayed              2.5863     2.5857  +0.0007

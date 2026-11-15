@@ -259,11 +259,10 @@ Voldaren Bloodcaster // Bloodbat Summoner        +0.31+-0.05         +0.21+-0.09
       you control dies. NOT: the transform at five Blood, nor Bloodbat Summoner's
       Bat each combat (§0z184 finding 8, item 37; item 11). A floor.
 Black Market Connections              +0.23+-0.10         +0.02+-0.18        +0.0008+-0.0032        --
-      MODELLED: Buy Information alone -- draw a card, lose 2 life -- every upkeep.
-      NOT: 'choose one or more' (Sell Contraband's Treasure, Hire a Mercenary's
-      3/2), a POLICY that undercounts; and the trigger is 'at the beginning of
-      your first main phase', not the upkeep (§0z184 finding 7, item 37; item 10).
-      A floor.
+      MODELLED: Buy Information alone -- draw a card, lose 2 life -- at the
+      beginning of your first main phase, after the draw (§0z215; it was taken in
+      the upkeep). NOT: 'choose one or more' (Sell Contraband's Treasure, Hire a
+      Mercenary's 3/2), a POLICY that undercounts (item 10). A floor.
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
       moves it +0.0043 (T20 win rate, N=15,000 paired). The move could carry it

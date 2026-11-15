@@ -2689,6 +2689,12 @@ def enter_land(g, card, tapped=None) -> "Permanent":
     g.board.append(perm)
     if t and not card.tapped:
         g.m["lands_entered_tapped_by_rule"] += 1
+    # §0z215: an engine that reads landfall per land sets `land_entry_log`
+    # (shilgengar); every other engine has no such attribute and nothing
+    # here changes for it. A fetch is two entries, the fetch and its basic.
+    log = getattr(g, "land_entry_log", None)
+    if log is not None:
+        log.append(perm)
     return perm
 
 

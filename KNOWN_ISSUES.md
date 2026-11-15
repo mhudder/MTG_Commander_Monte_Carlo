@@ -267,6 +267,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
 | [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
+| [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18964,6 +18965,49 @@ counts its creature tokens without either death counter. Each has a
 counter now (`contract_upkeeps`, `portal_creature_tokens`), the switch off
 still hashes to `19d05ce`'s output, and the re-runs are clean, with the
 same win rates.
+
+<a id="0z215"></a>
+
+## 0z215. FIXED -- shilgengar's cards and steps by their text
+
+**The owner, 2026-11-15: "go ahead with shilgengar's fixes"** -- queue
+item 47's last deck, §0z208's behaviour items 1-3 and §0z184 finding 7's
+timing pair (item 37). Each behind its own switch; each False the old rule
+(`tests/test_shilgengar_text.py`, eight cases, six mutations exact):
+
+| switch | the old rule -> the text |
+|---|---|
+| `requiem_subtypes` | Requiem Angel's "non-Spirit" by the token's NAME, so Bloodghast and Kokusho made Spirits -> by the subtype, `_evasion.CREATURE_SUBTYPES` (§0z4) |
+| `landfall_each` | Bloodghast on any new land, Emeria Shepherd once on the land COUNT rising, neither on Wayfarer's Bauble's basic -> every land that entered is a landfall: Emeria once per land (a cracked fetch is two, each checked for Plains), the Bauble's basic included. `engine.enter_land` keeps an optional `land_entry_log`, which only shilgengar sets |
+| `lifelink_snapshot` | each lifelinker's power read after the earlier gains' Thune and Lyra counters -> every power read before the first gain (combat damage is simultaneous) |
+| `bmc_main1` | Black Market Connections in the upkeep -> at the first main phase, after the draw |
+| `main2_order` | the sorcery-speed activations before Pearl Collector's second-main trigger -> the trigger first |
+
+**Proved**: all five False, every deck BIT-IDENTICAL against `53cbaef` at
+2,000 seeds, and shilgengar's whole output (78 keys a game) hashed
+identical.
+
+**Measured**, `diagnostics/run_knob_ab.py`, the staged list, N=15,000
+paired, seeds 5000.., each switch on (A) against off (B):
+
+| switch | T10 | T20 | reached | identity |
+|---|---|---|---|---|
+| `requiem_subtypes` | -0.0001 ±0.0002 | -0.0003 ±0.0004 | 1.3% | 0 of 14,807 |
+| `landfall_each` | +0.0002 ±0.0002 | +0.0005 ±0.0008 | every game | -- |
+| `lifelink_snapshot` | -0.0001 ±0.0001 | -0.0001 ±0.0003 | 22.4% | 0 of 11,643 |
+| `bmc_main1` | +0.0000 ±0.0000 | +0.0000 ±0.0000 | 14.2% | 0 of 12,864 |
+| `main2_order` | 0 | 0 | none | 0 of 15,000 |
+| all five together | +0.0000 ±0.0003 | +0.0001 ±0.0009 | every game | -- |
+
+**Every one is a null, and each is what the reading said.** Each patch
+applied -- outputs move in every run (Emeria's returns and the Angels'
+counts under `landfall_each`, `angel_prevented` under the lifelink
+snapshot, `drew_from_empty` +0.0005 under Connections) -- but none moves a
+game's result outside its bar: a Requiem Angel sees a Spirit die in 1.3%
+of games; Connections' draw lands after the draw step instead of before
+it, the same two cards; and Pearl Collector is not in this list, so the
+reorder is inert here (no game conjured a Mox Pearl) and right for a list
+that holds it. The fixes stand as the text's, not as numbers.
 
 ## How to read an ablation table
 

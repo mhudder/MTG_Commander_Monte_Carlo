@@ -148,6 +148,7 @@ from edhmc.engine import (cleanup_step, late_land_drop, remove_card, charge_colo
                           counts_as_land_in_hand)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
+from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
 
@@ -186,6 +187,9 @@ class ShilgengarGame(BaseGame):
         # library, hand, graveyard or board for the whole game, so no id is
         # recycled underneath this.
         self.finality: set[int] = set()
+        # §0z215: every land that enters, from `engine.enter_land`; the land
+        # step reads its own slice of it. Kept whatever the switch.
+        self.land_entry_log = []
         # Twilight Shepherd (§0z84): ids of cards put into the graveyard from
         # the battlefield this turn (cleared by take_turn), and ids of
         # Shepherds that have persisted once.
@@ -383,6 +387,15 @@ class ShilgengarGame(BaseGame):
         self.creature_entered(perm)
         return perm
 
+    def is_spirit(self, perm) -> bool:
+        """REQUIEM ANGEL: "another NON-SPIRIT creature" (§0z215, §0z208 item
+        1). The name test missed the two Spirits by type line, Bloodghast
+        (Vampire Spirit, the deck's recurring fodder) and Kokusho (Dragon
+        Spirit). The subtype is data, `_evasion.CREATURE_SUBTYPES` (§0z4);
+        `requiem_subtypes=False` is the name test alone."""
+        return (self.cfg.get("requiem_subtypes", True)
+                and "Spirit" in CREATURE_SUBTYPES.get(perm.card.name, ()))
+
     def make_spirit_tokens(self, n=1):
         for _ in range(n):
             tok = Card(name="Spirit token", types=frozenset({"Creature"}),
@@ -474,9 +487,14 @@ class ShilgengarGame(BaseGame):
                     self, "Pitiless Plunderer", perm, another=True):
                 self.treasures += 1
                 self.m["treasures_made"] += 1
+            if perm is not None and "Spirit" in CREATURE_SUBTYPES.get(
+                    perm.card.name, ()) and OPP.watching(
+                    self, "Requiem Angel", perm, another=True):
+                self.m["requiem_spirits_seen"] += 1   # either rule: reach
             if perm is not None and OPP.watching(
                     self, "Requiem Angel", perm, another=True) and \
-                    perm.card.name != "Spirit token":
+                    perm.card.name != "Spirit token" and \
+                    not self.is_spirit(perm):
                 self.make_spirit_tokens(1)
             if perm is not None and perm.card.tags and "angel" in perm.card.tags \
                     and OPP.watching(self, "Bishop of Wings", perm):
@@ -1248,7 +1266,11 @@ class ShilgengarGame(BaseGame):
                 self.board.remove(bauble)
                 land = basics[0]
                 remove_card(self.library, land)
-                self.make_permanent(land, sick=False, tapped=True)
+                perm = self.make_permanent(land, sick=False, tapped=True)
+                # The basic ENTERS: a landfall (§0z215, §0z208 item 2).
+                if self.cfg.get("landfall_each", True):
+                    self.m["landfall_lands"] += 1
+                    self.landfall([perm])
 
         self.aristocrats_step()
         self.ultimate_line()
@@ -1318,9 +1340,7 @@ class ShilgengarGame(BaseGame):
         self.m["damage"] += dmg
         self.m["combat_damage"] += dmg
         self.damage_by_turn.append(dmg)
-        for p in attackers:
-            if self.lifelink_of(p):
-                self.gain_life(self.power_of(p))
+        self.combat_lifelink(attackers)
         if self.result is None and self.m["turn_lethal"] == 99 and not OPP.living(self):
             self.m["turn_lethal"] = self.turn
         # SELUMA, LIGHT OF AYSEN (§0z74): "Whenever Seluma deals combat damage
@@ -1375,7 +1395,12 @@ class ShilgengarGame(BaseGame):
         if self.has("Phyrexian Arena"):
             self.draw(1)
             self.your_life -= 1
-        if self.has("Black Market Connections"):
+        if self.has("Black Market Connections") \
+                and not self.cfg.get("bmc_main1", True):
+            # THE OLD TIMING (`bmc_main1=False`): in the upkeep. Its text is
+            # "at the beginning of your first main phase" (§0z215, §0z184
+            # finding 7): `black_market_step`, after the draw.
+            self.m["bmc_turns"] += 1                  # either rule: reach
             # "Choose one or more" -- approximated as always taking Buy
             # Information (draw a card, lose 2 life), the steady-value mode,
             # rather than trying to model the turn-by-turn choice among all
@@ -1405,6 +1430,34 @@ class ShilgengarGame(BaseGame):
                 if perm.card.is_creature:
                     self.creature_entered(perm)
                 self.m["single_reanimations"] += 1
+
+    def combat_lifelink(self, attackers):
+        """Combat damage is simultaneous (§0z215, §0z208 item 3): every
+        lifelinker gains the power it DEALT, read before the first gain puts
+        Archangel of Thune's and Lyra's counters on. One event each, as
+        Thune's ruling has it. `lifelink_snapshot=False` reads each power
+        after the earlier gains, as it did."""
+        if sum(1 for p in attackers if self.lifelink_of(p)) >= 2:
+            self.m["lifelink_combats"] += 1           # either rule: reach
+        if self.cfg.get("lifelink_snapshot", True):
+            for amount in [self.power_of(p) for p in attackers
+                           if self.lifelink_of(p)]:
+                self.gain_life(amount)
+        else:
+            for p in attackers:
+                if self.lifelink_of(p):
+                    self.gain_life(self.power_of(p))
+
+    def black_market_step(self):
+        """BLACK MARKET CONNECTIONS: "At the beginning of your FIRST MAIN
+        PHASE, choose one or more" -- after the draw step, before the land
+        drop (§0z215, §0z184 finding 7; it was taken in the upkeep). The
+        mode is still always Buy Information, said out loud as it was."""
+        if self.cfg.get("bmc_main1", True) \
+                and self.has("Black Market Connections"):
+            self.draw(1)
+            self.your_life -= 2
+            self.m["bmc_turns"] += 1                  # either rule: reach
 
     def end_step(self):
         self.avacyn_returns()
@@ -1479,7 +1532,48 @@ class ShilgengarGame(BaseGame):
             power=1, toughness=1))
         self.m["ardenvale_tokens"] += 1
 
+    def landfall(self, lands):
+        """EVERY LAND THAT ENTERED is a landfall (§0z215, §0z208 item 2):
+        Bloodghast's "may return" once if any did (the rest find it on the
+        battlefield), and Emeria Shepherd once PER LAND, each checking that
+        land for Plains. A cracked fetch is two lands, the fetch and its
+        basic; `land_entry_log` (`engine.enter_land`) holds them."""
+        if not lands:
+            return
+        self.bloodghast_landfall()
+        if self.has("Emeria Shepherd"):
+            for land in lands:
+                self.emeria_return("Plains" in land_types(land.card))
+
+    def emeria_return(self, plains):
+        """Emeria Shepherd's landfall: "return target nonland permanent card
+        from your graveyard to your hand; if that land is a Plains, you may
+        return that card to the battlefield instead." """
+        pool = [c for c in self.graveyard if c.is_permanent and not c.is_land
+               and id(c) not in self.finality]
+        if pool and self.cfg.get("shepherd_plains", True) and not plains:
+            best = max(pool, key=lambda c: c.mv)
+            remove_card(self.graveyard, best)
+            self.hand.append(best)
+            self.m["shepherd_to_hand"] += 1
+        elif pool:
+            best = max(pool, key=lambda c: c.mv)
+            remove_card(self.graveyard, best)
+            perm = self.make_permanent(best, sick=True)
+            if perm.card.is_creature:
+                self.creature_entered(perm)
+            self.m["single_reanimations"] += 1
+
     def land_step(self):
+        if self.cfg.get("landfall_each", True):              # §0z215
+            start = len(self.land_entry_log)
+            play_land(self)
+            entered = self.land_entry_log[start:]
+            self.m["landfall_lands"] += len(entered)
+            self.landfall(entered)
+            return
+        # THE OLD RULE (`landfall_each=False`): Bloodghast on any new land,
+        # Emeria once on the land COUNT rising -- §0u's shape in one method.
         before = sum(1 for p in self.board if p.card.is_land)
         lands_before = {id(p) for p in self.board if p.card.is_land}
         play_land(self)
@@ -1569,6 +1663,7 @@ def take_turn(g):
     if g.result is not None:
         return
     g.draw(1)
+    g.black_market_step()                # first main phase begins, §0z215
     g.land_step()
     g.main_phase(reserve=g.ult_reserve())
     if late_land_drop(g, ShilgengarGame.land_step):   # drawn in main 1, §0z182
@@ -1577,9 +1672,17 @@ def take_turn(g):
         return
     g.walker_step()
     g.combat()
-    g.activations()
-    # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74).
-    pearl_collector_trigger(g, g.life_gained_this_turn)
+    # "At the beginning of your SECOND MAIN PHASE" -- Pearl Collector (§0z74),
+    # and THEN the sorcery-speed activations (Priest of Fell Rites, the
+    # equips, the aristocrats step), which are main-phase actions: they ran
+    # before the trigger, in combat, so their life counted toward Pearl's 4
+    # (§0z215, §0z184 finding 7). `main2_order=False` is the old order.
+    if g.cfg.get("main2_order", True):
+        pearl_collector_trigger(g, g.life_gained_this_turn)
+        g.activations()
+    else:
+        g.activations()
+        pearl_collector_trigger(g, g.life_gained_this_turn)
     late_land_drop(g, ShilgengarGame.land_step)       # main 2 begins
     g.main_phase()
     if late_land_drop(g, ShilgengarGame.land_step):   # drawn in main 2

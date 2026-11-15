@@ -35,6 +35,8 @@ combat kills and does not (16).
 
 ### 1. Requiem Angel sees Spirits die
 
+> **FIXED 2026-11-15 (§0z215)**: `requiem_subtypes`=False restores the old rule; a null on this list.
+
     "Whenever another NON-SPIRIT creature you control dies, create a 1/1
     white Spirit creature token with flying."
 
@@ -48,6 +50,8 @@ holds the answer (§0z4's rule: subtypes are data).
 
 ### 2. Emeria Shepherd and Bloodghast read landfall two ways
 
+> **FIXED 2026-11-15 (§0z215)**: `landfall_each`=False restores the old rule; a null on this list.
+
 `land_step` fires Bloodghast when ANY new land entered ("not the count,
 which a karoo's bounce or a cracked fetch leaves unchanged", item 24) and,
 twenty lines on, Emeria Shepherd only when the land COUNT rose -- the rule
@@ -59,6 +63,8 @@ basic Wayfarer's Bauble puts in, which `activations` places with
 on both.
 
 ### 3. Combat lifelink is read after the counters it causes
+
+> **FIXED 2026-11-15 (§0z215)**: `lifelink_snapshot`=False restores the old rule; a null on this list.
 
 `combat` deals the damage, then gains life once per lifelinking attacker
 at `power_of(p)` -- read AFTER each earlier gain has put Archangel of

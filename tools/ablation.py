@@ -1399,11 +1399,10 @@ PARTLY_MODELLED = {
             "artifact: Draw a card' (item 9). A floor.",
         "Black Market Connections":
             "MODELLED: Buy Information alone -- draw a card, lose 2 life -- "
-            "every upkeep. NOT: 'choose one or more' (Sell Contraband's "
-            "Treasure, Hire a Mercenary's 3/2), a POLICY that undercounts; "
-            "and the trigger is 'at the beginning of your first main "
-            "phase', not the upkeep (§0z184 finding 7, item 37; item 10). A "
-            "floor.",
+            "at the beginning of your first main phase, after the draw "
+            "(§0z215; it was taken in the upkeep). NOT: 'choose one or more' "
+            "(Sell Contraband's Treasure, Hire a Mercenary's 3/2), a POLICY "
+            "that undercounts (item 10). A floor.",
         "Voldaren Bloodcaster // Bloodbat Summoner":
             "MODELLED: the flier, and a Blood token when it or another "
             "nontoken creature you control dies. NOT: the transform at five "
