@@ -259,6 +259,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
 | [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
 | [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
+| [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18424,6 +18425,59 @@ cards added since 2026-10-07, and the text the flip made live (the floors
 above are that kind). And the card work for the add-card skill: ward,
 cycling, Woe Strider's sacrifice and escape, Memory Jar (C and item 37),
 and the five floors above.
+
+<a id="0z207"></a>
+
+## 0z207. OPEN -- tivit's oracle re-audit: six behaviours against the text, eleven SCRIPTED labels too strong
+
+**The owner, 2026-11-15: "start the audit with tivit"** -- queue item 46's
+oracle audits, tivit first. The whole finding is
+**`docs/ORACLE_AUDIT_TIVIT.md`**: 67 entries (the staged list, nothing
+staged; the commander; the two scripted lands) read against the code at
+`1e69b49`, oracle text from Scryfall the same day. **Nothing is measured
+and nothing is fixed** (§0z116's form): it is the list, for the owner.
+
+Why it found anything: tivit's LIST has not changed since §0z116 (diffed
+against `98c1132`), but its engine's surroundings have -- item 24's bodies
+and routes, POD_V4, item 44's combat. The largest findings, numbered as
+in the file:
+
+- **1. Lightning Greaves' shroud and five TARGETED blinks at once.**
+  `commander_shrouded` protects Tivit for as long as Greaves exists, and
+  Ephemerate, Soulherder, Teleportation Circle, Conjurer's Closet and
+  Displacer Kitten all target -- which shroud forbids. Only Deadeye
+  Navigator's blink does not target. A ceiling on six cards; where
+  Greaves sits is a policy, the owner's.
+- **2. Tempting Contract: one Treasure too many every upkeep.** It calls
+  `voting.tempting_offer` (`1 + takers`, the tempting-offer rule); the card
+  gives `takers`. 2.5 a turn where the text gives 1.5 at the 0.5 rate.
+- **3. Grudge Keeper** puts `2 x votes_against` on the opponent closest to
+  dying (`damage_single`); the text has each voter lose 2.
+- **4-6.** `convert_the_pile` counts Kambal as a drain (it triggers on
+  entering) and so can discard the pile and skip Time Sieve; it sacrifices
+  Clues, Food and Powerstones for free; Custodi Squire ignores its vote.
+- **7. Kambal's first ability is implemented nowhere**, while four cards
+  hand the pod tokens. **8. `on_creature_death` is a no-op**, so Nadier's
+  Nightblade, Disciple of the Vault and Marionette Master never hear a
+  token or artifact creature die -- in combat since §0z198-§0z199 -- nor
+  the pod's artifact removal.
+- **9-15**: Soulherder's counters, Tamiyo's Journal's tutor, Havengul's
+  transform, Cyberdrive Awakener's flying static, Model of Unity's scry (a
+  counter nothing reads) are missing under SCRIPTED; Monologue Tax is a
+  flat rate labelled SCRIPTED where Rhystic Study, the same shape, is
+  BLIND; Mechanized Production is bounded both ways.
+- **16-22**: the PARTLY reasons of Bite of the Black Rose, Capital
+  Punishment, Trial of a Time Lord, Promise of Loyalty, Ghostly Prison and
+  Propaganda describe the count pod; each clause is now MODELABLE.
+- **23-29**: seven piloting choices nobody argued, Lieutenants of the
+  Guard's vote mapping first (the pod's "against" votes hand you tokens,
+  the better half in this deck).
+
+**What it means for the tables**: the eleven SCRIPTED cards' rows print
+under MODEL-EVALUATED, where a low score reads as evidence; per the file
+they are floors (or bounded both ways). Moving the labels is a rendering
+change (§0z206's Woe Strider recipe) and does not wait on the rebuild; the
+behaviour fixes do, and each moves tivit's baseline.
 
 ## How to read an ablation table
 

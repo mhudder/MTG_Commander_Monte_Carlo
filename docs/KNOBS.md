@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `6607f16` from 32 engine sources.
+Derived at `1e69b49` from 32 engine sources.
 
 **406 knobs, 607 call sites.**
 
@@ -121,7 +121,7 @@ show up first.
 | `combat_defender` | `'weakest'` | 1 | `edhmc/opponents.py:4140` | §0z198 | **no** | yes |
 | `combat_split` | `True` | 1 | `edhmc/opponents.py:4127` | §0z198 | yes | yes |
 | `combat_targeting` | `'threat'` | 2 | `edhmc/opponents.py:4818` | §0u | yes | yes |
-| `combo_cap` | `40` | 1 | `edhmc/tivit.py:647` |  | **no** | yes |
+| `combo_cap` | `40` | 1 | `edhmc/tivit.py:647` |  | yes | yes |
 | `commander_aim` | `'lethal'` | 1 | `edhmc/opponents.py:3716` | §0z67 | yes | yes |
 | `commander_block_aware` | `True` | 1 | `edhmc/opponents.py:3684` | §0z65 | yes | yes |
 | `commander_cast_triggers` | `True` | 1 | `edhmc/karlov.py:1539` |  | yes | yes |
@@ -273,7 +273,7 @@ show up first.
 | `monarch_loss_scale` | `rate` | 2 | `edhmc/opponents.py:4709` | §0u | yes | yes |
 | `monarch_start` | `False` | 1 | `edhmc/engine.py:1394` | §0z30 | yes | yes |
 | `monarch_start_turn` | `0` | 1 | `edhmc/opponents.py:4667` | §0z28 | yes | yes |
-| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:3217` | §0z112 | **no** | **never** |
+| `monologue_tax_rate` | `2` | 2 | `edhmc/lorehold.py:3217` | §0z112 | yes | **never** |
 | `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:1137` |  | **no** | yes |
 | `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1464` | §0z116 | yes | yes |
 | `mother_use` | `'defend'` | 2 | `edhmc/opponents.py:1102` |  | yes | yes |
@@ -401,7 +401,7 @@ show up first.
 | `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1329` | §0z49 | yes | yes |
 | `surveil_land_floor` | `6` | 2 | `edhmc/engine.py:5025` |  | **no** | **never** |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:1269` | §0z115 | yes | **never** |
-| `tempting_offer_rate` | `0.5` | 1 | `edhmc/voting.py:220` |  | **no** | **never** |
+| `tempting_offer_rate` | `0.5` | 1 | `edhmc/voting.py:220` |  | yes | **never** |
 | `thomil_lord_fodder` | `2` | 1 | `edhmc/engine.py:4062` |  | **no** | **never** |
 | `threat_clock_shift` | `2.3` | 1 | `edhmc/opponents.py:535` | §0z132 | yes | yes |
 | `threat_hold` | `True` | 1 | `edhmc/opponents.py:809` | §0z134 | yes | yes |
@@ -492,12 +492,12 @@ nobody has tested.
 
 ## The knobs no document mentions
 
-**64 of 406.** Not an error — most knobs are
+**61 of 406.** Not an error — most knobs are
 ordinary internals — but this is exactly the set the "say the knob out
 loud" rule cannot currently be applied to, because nobody reading the
 docs knows they exist.
 
-`altar_mana`, `angel_of_suffering`, `avacyn_text`, `castle_ardenvale`, `citadel_allin_life`, `citadel_allin_outs`, `clamp_cap`, `collective_text`, `combat_defender`, `combo_cap`, `crusher_text`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `invoke_mv_cap`, `land_only_if`, `land_outlets`, `library_clock_mult`, `library_clock_rounds`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `monologue_tax_rate`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `tempting_offer_rate`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
+`altar_mana`, `angel_of_suffering`, `avacyn_text`, `castle_ardenvale`, `citadel_allin_life`, `citadel_allin_outs`, `clamp_cap`, `collective_text`, `combat_defender`, `crusher_text`, `cryptic_caves_min_lands`, `crystal_vein`, `dawn_draws_per_turn`, `destroy_share_ae`, `destroy_share_wipe`, `draw_lands`, `eldrazi_temple`, `elspeth_ult`, `elspeth_ult_creatures`, `extra_turn_cap`, `furygale_reduction`, `hand_cap`, `high_market`, `invoke_mv_cap`, `land_only_if`, `land_outlets`, `library_clock_mult`, `library_clock_rounds`, `locthwain`, `locthwain_life_floor`, `locthwain_max_loss`, `magistrate_token_cap`, `monument_order`, `nykthos_devotion`, `on_the_draw`, `opp_avg_power`, `opp_creatures_per_turn`, `opp_spells_per_turn`, `opp_vote_selfish_agree`, `painland_life`, `pearl_lifelink_cap`, `petrified_field`, `protect_min`, `queen_soldier`, `realms_late_lands`, `scry_land_bottom`, `selenia_curse_target`, `shigeki_min_library`, `shilgengar_sac_policy`, `spock_text`, `starting_life`, `storm_cauldron`, `surveil_land_floor`, `thomil_lord_fodder`, `tutor_floor`, `tutor_targets`, `vault_paid`, `welcome_mana`, `wildspeaker_mode`, `wipe_response`, `zuran_max_sacs`
 
 ## The knobs nothing has ever set
 
