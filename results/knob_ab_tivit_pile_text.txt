@@ -1,0 +1,18 @@
+tivit: pile_text=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.17 / numpy 2.4.6
+
+   won T10  +0.0000 ±0.0000 
+   won T20  +0.0000 ±0.0000 
+
+   games where pile_converts > 0 in either leg: 754 of 15000 (5.0%)
+   IDENTITY: of the 14246 games with pile_converts = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0000 ±0.0000
+   in those games, won T20  +0.0000 ±0.0000
+
+   every numeric output that moved (mean A, mean B, A - B):
+   artifact_drain                     9.1080    12.1403  -3.0323
+   extra_turns                        1.3712     1.3619  +0.0093
+   final_artifacts                   30.0322    25.5107  +4.5215
+   final_life                        15.0500    16.2731  -1.2231
+   final_treasures                    6.8227     6.5075  +0.3152
+   nightblade_life                    3.0553     4.2784  -1.2231
+   token_drain                       35.9521    44.9313  -8.9792

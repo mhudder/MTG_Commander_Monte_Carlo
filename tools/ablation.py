@@ -1138,24 +1138,32 @@ PARTLY_MODELLED = {
             "a copy of it' -- nothing reads it, and Tempting Contract, Tempt "
             "with Bunnies, Master of Ceremonies and An Offer You Can't Refuse "
             "all hand the pod tokens (item 7). A floor.",
+        # Nightblade, Disciple and Marionette: item 8 FIXED 2026-11-15
+        # (§0z214) -- a creature token dying and an artifact reaching the
+        # graveyard are heard now. What stays partial is said per card.
         "Nadier's Nightblade":
-            "MODELLED: a Treasure, Clue, Food or Powerstone leaving "
-            "(`sacrifice_tokens`, Coercive Portal's carnage). NOT: a creature "
-            "TOKEN leaving -- dying in combat, to a wipe or to Promise of "
-            "Loyalty -- because `TivitGame.on_creature_death` is a no-op "
-            "(item 8). A floor.",
+            "MODELLED (§0z214): every token of yours leaving -- a Treasure, "
+            "Clue, Food or Powerstone sacrificed, a creature token dying in "
+            "combat, to a wipe or to Promise of Loyalty, every token of "
+            "Coercive Portal's carnage -- each opponent 1 AND you 1 (the life "
+            "was modelled nowhere before). APPROXIMATE: in a wipe each death "
+            "reads the Nightblade still on the battlefield, so one destroyed "
+            "earlier in the same event misses the tokens after it (CR "
+            "603.10a looks back), except in Portal's carnage. A floor.",
         "Disciple of the Vault":
-            "MODELLED: an artifact to the graveyard from tivit's own "
-            "sacrifices and Coercive Portal's carnage, as a 1/living share of "
-            "each opponent (`disciple_share`; the text targets ONE). NOT: an "
-            "artifact creature dying (`on_creature_death` is a no-op) or an "
-            "artifact the pod's removal destroys (items 8, 25). A floor.",
+            "MODELLED (§0z214): an artifact of yours put into a graveyard "
+            "from the battlefield -- tivit's sacrifices, Portal's carnage, an "
+            "artifact creature dying, a rock the pod's removal destroys -- as "
+            "a 1/living share of each opponent (`disciple_share`; the text "
+            "targets ONE, item 25). NOT: an OPPONENT's artifact (the text is "
+            "'an artifact'), the pod's artifact route pieces dying. A floor.",
         "Marionette Master":
-            "MODELLED: fabricate 3 as counters (a policy: never the Servos) "
-            "and 'target opponent loses life equal to this creature's power' "
-            "at a constant 4, at the opponent closest to dying, on tivit's "
-            "own sacrifices. NOT: an artifact creature dying, or an artifact "
-            "the pod's removal destroys (items 8, 24). A floor.",
+            "MODELLED (§0z214): 'target opponent loses life equal to this "
+            "creature's power' on every artifact of yours put into a "
+            "graveyard from the battlefield, at the opponent closest to "
+            "dying. APPROXIMATE: fabricate 3 is always counters (a policy: "
+            "never the three Servo artifacts, item 24) and the power a "
+            "constant 4. Bounded both ways.",
         "Soulherder":
             "MODELLED: the end-step blink of Tivit. NOT: 'whenever a creature "
             "is exiled from the battlefield, put a +1/+1 counter on this "

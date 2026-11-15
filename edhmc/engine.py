@@ -1476,8 +1476,10 @@ class BaseGame:
             self.monarch = True
             self.m["monarch_gained"] += 1
 
-    def deal_pod_damage(self, amount: float, each: bool = True):
-        """`each=True` means 'each opponent loses N' (amount is the pod total)."""
+    def deal_pod_damage(self, amount: float, each: bool = True, target=None):
+        """`each=True` means 'each opponent loses N' (amount is the pod total).
+        `target` names the opponent for `each=False` (`damage_single`'s);
+        None is the closest to dying, as it always was (§0z214)."""
         if amount <= 0:
             return
         # BOUNDED: record what could have mattered, not what was asked for --
@@ -1485,7 +1487,7 @@ class BaseGame:
         # the FULL POD, not the living count -- see OPP.pod_size.
         n = OPP.pod_size(self)
         dealt = (OPP.damage_each(self, amount / n) if each
-                 else OPP.damage_single(self, amount))
+                 else OPP.damage_single(self, amount, target))
         self.m["damage"] += dealt
         self.m["drain_damage"] += dealt
         if self.damage_by_turn:

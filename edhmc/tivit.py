@@ -57,7 +57,7 @@ from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, walker_ready, walker_dies_at_zero,
-                          draw_is_safe)
+                          draw_is_safe, is_artifact)
 from edhmc import opponents as OPP
 from edhmc import voting as V
 
@@ -227,13 +227,39 @@ class TivitGame(BaseGame):
         self.soldier_tokens += n
         on_tokens_created(self, n)
 
+    # §0z214: Coercive Portal's carnage counts its own deaths with a look-back
+    # (CR 603.10a), so the two hooks below stay quiet while it runs.
+    death_lookback = False
+
     def on_creature_death(self, n=1, perm=None):
-        # A NO-OP, AND A GAP (§0z207 item 8): it said "no death payoffs in
-        # this list", but Nadier's Nightblade (a token leaving), Disciple of
-        # the Vault and Marionette Master (an artifact to the graveyard) all
-        # read a creature of yours dying here -- in combat since §0z198 --
-        # and none hears it. Their rows are PARTLY_MODELLED for it.
-        pass
+        """A creature of yours died (`opponents.destroy`: combat, a wipe, a
+        removal). §0z214, closing §0z207 item 8: it was a no-op, so Nadier's
+        Nightblade never heard a creature TOKEN leave. Read per death, so in
+        a wipe a Nightblade destroyed earlier in the same event misses the
+        tokens after it -- a floor (603.10a looks back), except in Portal's
+        carnage, which counts the event whole. `tivit_death_triggers=False`
+        is the old no-op. A death reported with no permanent (a count) has
+        no identity to read, and is not heard."""
+        if (not self.cfg.get("tivit_death_triggers", True)
+                or self.death_lookback):
+            return
+        if perm is not None and perm.is_token:
+            creature_token_left(self, n)
+
+    def artifact_died(self, dead):
+        """A NONTOKEN permanent of yours reached the graveyard
+        (`opponents.destroy`). Disciple of the Vault and Marionette Master
+        read an artifact put into a graveyard from the battlefield -- an
+        artifact creature dying, or a rock the pod's removal destroys --
+        and heard only tivit's own sacrifices until §0z214 (§0z207 item 8).
+        The token piles are `sacrifice_tokens`'; an artifact creature is
+        heard here once, not again in `on_creature_death`. `destroy` finds
+        this by `hasattr`, as rendmaw's recursion; tivit had none, so with
+        the switch off it does nothing, as before."""
+        if (self.cfg.get("tivit_death_triggers", True)
+                and not self.death_lookback and is_artifact(self, dead)):
+            self.m["artifact_deaths_heard"] += 1
+            _artifacts_left(self, 1)
 
     def play_card_trigger(self, card):
         pass
@@ -337,6 +363,7 @@ def sacrifice_tokens(g, kind, n) -> int:
     per = 0.0
     if g.has("Nadier's Nightblade"):
         per += 1.0                     # "whenever a token you control leaves"
+        nightblade_life(g, n)
     if g.has("Mirkwood Bats"):
         per += 1.0                     # "create OR sacrifice a token"
     per += disciple_share(g)
@@ -360,6 +387,32 @@ def disciple_share(g) -> float:
     if not g.has("Disciple of the Vault"):
         return 0.0
     return 1.0 / max(1, len(OPP.living(g)))
+
+
+def nightblade_life(g, n) -> None:
+    """Nadier's Nightblade: "... each opponent loses 1 life AND YOU GAIN 1
+    LIFE." The gain was modelled nowhere (§0z214; found reading the oracle
+    text for §0z207's fixes): life decides games since pod v3, so it is
+    credited, 1 a token, on every path Nightblade hears.
+    `nightblade_life=False` is the old drain alone."""
+    if n > 0 and g.cfg.get("nightblade_life", True):
+        g.your_life += n
+        g.m["nightblade_life"] += n
+
+
+def creature_token_left(g, n) -> None:
+    """A creature TOKEN of yours left the battlefield by dying (§0z214):
+    Nadier's Nightblade, each opponent 1 and you 1. Mirkwood Bats reads a
+    SACRIFICE, not a death, and is not here."""
+    if not g.has("Nadier's Nightblade"):
+        return
+    dmg = 1.0 * n * OPP.pod_size(g)
+    g.deal_pod_damage(dmg)
+    g.m["token_drain"] += dmg
+    g.m["nightblade_creature_tokens"] += n
+    nightblade_life(g, n)
+    if g.result == "win":
+        g.m["win_route"] = ROUTE_DRAIN
 
 
 def artifact_left_drain(g, n) -> None:
@@ -683,15 +736,27 @@ def convert_the_pile(g):
         if g.has("Mechanized Production") and g.tokens["Treasure"] >= 8:
             g.win(ROUTE_MECHANIZED)
             return
+    # BY THE TEXT (§0z214, §0z207 items 4-5; `pile_text=False` is the old
+    # rule): Kambal is not a drain -- its triggers are on tokens ENTERING --
+    # so a pile with Kambal alone falls through to Time Sieve; and only a
+    # TREASURE sacrifices for free. A Clue is "{2}, Sacrifice", a Food "{2},
+    # {T}, Sacrifice", and a Powerstone has no sacrifice ability at all.
+    # Cracking Clues and Food with the Treasures' mana is not modelled: a
+    # floor, and a small one -- this runs at `combo_cap`, where the
+    # Treasures alone are usually lethal.
+    text = g.cfg.get("pile_text", True)
+    g.m["pile_converts"] += 1          # either rule: the A/B's reach
     drains = ("Marionette Master", "Disciple of the Vault", "Mirkwood Bats",
-              "Nadier's Nightblade", "Kambal, Profiteering Mayor")
+              "Nadier's Nightblade") + (() if text else
+                                        ("Kambal, Profiteering Mayor",))
     if any(g.has(x) for x in drains):
         # Sacrifice the pile. Each token leaving is a trigger.
         sacrifice_tokens(g, "Treasure", g.tokens["Treasure"])
-        sacrifice_tokens(g, "Clue", g.tokens["Clue"])
-        sacrifice_tokens(g, "Food", g.tokens["Food"])
-        sacrifice_tokens(g, "Powerstone", g.tokens["Powerstone"])
-        g.powerstones_tapped = 0
+        if not text:
+            sacrifice_tokens(g, "Clue", g.tokens["Clue"])
+            sacrifice_tokens(g, "Food", g.tokens["Food"])
+            sacrifice_tokens(g, "Powerstone", g.tokens["Powerstone"])
+            g.powerstones_tapped = 0
         if g.result != "win":
             return
         g.m["win_route"] = ROUTE_DRAIN
@@ -963,6 +1028,28 @@ def resolve(g, card):
         if not g.cfg.get("saga_chapters", True):
             V.council(g)
         g.make_tokens(len(OPP.living(g)), 1, 1, "Soldier")
+    elif s == "custodi" and g.cfg.get("custodi_vote", True):
+        # WILL OF THE COUNCIL BY ITS RESULT (§0z214, §0z207 item 6): "Return
+        # each card with the most votes or tied for most votes." You vote
+        # for your best card; a vote against you goes on your WORST (the
+        # adversarial reading). More votes for yours: yours; more against:
+        # the worst; a tie: both. `custodi_vote=False` is the old rule --
+        # the vote cast and its result ignored, the best card returned.
+        mine, against = V.council_votes(g)
+        g.m["councils_won"] += int(mine > against)
+        V._vote_payoffs(g, against)
+        pool = [c for c in g.graveyard
+                if c.types & {"Artifact", "Creature", "Enchantment"}]
+        if pool:
+            best = max(pool, key=lambda c: c.priority)
+            worst = min(pool, key=lambda c: c.priority)
+            back = ([best] if mine > against else
+                    [worst] if against > mine else
+                    [best] + ([worst] if worst is not best else []))
+            for c in back:
+                remove_card(g.graveyard, c)
+                g.hand.append(c)
+            g.m["custodi_returned"] += len(back)
     elif s == "custodi":
         V.council(g)
         pool = [c for c in g.graveyard
@@ -1200,7 +1287,14 @@ def upkeep(g):
         if affordable(g, {"gen": 4}) and pay(g, {"gen": 4}):
             make_token(g, "Clue")
     if g.has("Tempting Contract"):
-        make_token(g, "Treasure", V.tempting_offer(g))
+        # "For each opponent who does, you create a Treasure token" -- the
+        # takers, not a tempting offer's `1 + takers` (§0z214, §0z207 item
+        # 2). `tempting_contract_text=False` is the old count.
+        g.m["contract_upkeeps"] += 1   # either rule: the A/B's reach
+        n = V.tempting_offer(g)
+        if g.cfg.get("tempting_contract_text", True):
+            n -= 1
+        make_token(g, "Treasure", n)
     if g.has("Master of Ceremonies"):
         # "Each opponent chooses money, friends, or secrets. For each player
         # who chose X, you AND that player each get X." You MATCH them, so it
@@ -1272,13 +1366,27 @@ def coercive_carnage(g) -> None:
     nightblade = g.count("Nadier's Nightblade")
     gone = sum(1 for p in g.board if not p.card.is_land
                and "Artifact" in p.card.types)
-    OPP.resolve_own_wipe(g)
-    # The pod's noncreature pieces are nonland permanents too (item 24,
-    # change 2; a no-op unless `pod_threats`).
-    OPP.wipe_threat_pieces(g, None, scope="nonland")
-    for p in [p for p in g.board if not p.card.is_land
-              and not p.card.is_creature]:
-        OPP.destroy(g, p, destroys=True)
+    # §0z214: the event is counted here, whole, so the per-death hooks stay
+    # quiet through it; and the creature TOKENS that die in it are tokens
+    # leaving, which Nightblade hears (a no-op with the hooks off).
+    deaths = g.cfg.get("tivit_death_triggers", True)
+    tokens_before = sum(1 for p in g.board if p.is_token
+                        and OPP.is_creature_now(g, p))
+    g.death_lookback = True
+    try:
+        OPP.resolve_own_wipe(g)
+        # The pod's noncreature pieces are nonland permanents too (item 24,
+        # change 2; a no-op unless `pod_threats`).
+        OPP.wipe_threat_pieces(g, None, scope="nonland")
+        for p in [p for p in g.board if not p.card.is_land
+                  and not p.card.is_creature]:
+            OPP.destroy(g, p, destroys=True)
+    finally:
+        g.death_lookback = False
+    creature_tokens = (tokens_before - sum(1 for p in g.board if p.is_token
+                                           and OPP.is_creature_now(g, p))
+                       if deaths else 0)
+    g.m["portal_creature_tokens"] += creature_tokens     # the A/B's reach
     # Artifacts before minus artifacts after: an indestructible one stays.
     gone -= sum(1 for p in g.board if not p.card.is_land
                 and "Artifact" in p.card.types)
@@ -1294,10 +1402,11 @@ def coercive_carnage(g) -> None:
         dmg = 4.0 * n
         g.deal_pod_damage(dmg, each=False)
         g.m["artifact_drain"] += dmg
-    if piles and nightblade:
-        dmg = 1.0 * nightblade * piles * OPP.pod_size(g)
+    if (piles + creature_tokens) and nightblade:
+        dmg = 1.0 * nightblade * (piles + creature_tokens) * OPP.pod_size(g)
         g.deal_pod_damage(dmg)
         g.m["token_drain"] += dmg
+        nightblade_life(g, nightblade * (piles + creature_tokens))
     g.m["portal_tokens_destroyed"] += piles
     g.m["portal_carnage"] += 1
     if g.result == "win":

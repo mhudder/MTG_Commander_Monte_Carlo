@@ -266,6 +266,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
+| [0z214](#0z214) | OPEN | **Tivit's cards by their text** (item 47, §0z207 items 2-6, 8; Nightblade's life): six switches, each measured alone and together; in progress |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18895,6 +18896,59 @@ Awakening as its cut because it was then the next MODEL-EVALUATED row;
 §0z209 item 9's label moved it to PARTLY, so the entry now says why in
 `cut_unmeasured` (`pending` refuses a partly cut without one). The
 proposal is unchanged; another cut is the owner's.
+
+<a id="0z214"></a>
+
+## 0z214. OPEN (in progress) -- tivit's cards by their text
+
+**The owner, 2026-11-15: "go ahead with tivit's fixes"** -- queue item
+47's tivit batch, §0z207's behaviour items 2-6 and 8. Oracle text re-read
+from Scryfall the same day, which added one: **Nadier's Nightblade** --
+"each opponent loses 1 life AND YOU GAIN 1 LIFE" -- and the gain was
+modelled nowhere. Lightning Greaves (item 1) is the owner's and untouched.
+
+**The fixes**, each behind its own switch; each switch False is the old
+rule (`tests/test_tivit_text.py`, thirteen cases, seven mutations exact):
+
+| switch | card | the old rule -> the text |
+|---|---|---|
+| `tempting_contract_text` | Tempting Contract | `1 + takers` Treasures (a tempting offer's count) -> `takers` |
+| `grudge_each` | Grudge Keeper | `2 x votes against` at the opponent closest to dying -> 2 to each voter (seat order off the adversarial default) |
+| `tivit_death_triggers` | Nadier's Nightblade, Disciple of the Vault, Marionette Master | `on_creature_death` a no-op -> a creature token dying is heard (Nightblade), a nontoken artifact reaching the graveyard is heard (`artifact_died`: an artifact creature dying, a rock the pod destroys); Portal's carnage counts its own creature tokens, the per-death hooks quiet through it |
+| `nightblade_life` | Nadier's Nightblade | the drain alone -> you gain 1 a token, on every path |
+| `pile_text` | convert_the_pile | Kambal counted a drain, every pile sacrificed -> Kambal is no drain (it triggers on ENTERING), only Treasures sacrifice free |
+| `custodi_vote` | Custodi Squire | the vote ignored, your best card back -> the vote's result: yours, your worst (outvoted), or both (a tie) |
+
+`deal_pod_damage` takes a `target` for Grudge Keeper's per-voter loss
+(`damage_single` already did).
+
+**Proved**: with all six False, every deck BIT-IDENTICAL against `19d05ce`
+at 2,000 seeds, and tivit's whole output (80 keys a game) hashed identical.
+
+**Measured**, `diagnostics/run_knob_ab.py`, tivit's list, N=15,000 paired,
+seeds 5000.., each switch on (A) against off (B), the rest at default:
+
+| switch | T10 | T20 | identity |
+|---|---|---|---|
+| `grudge_each` | +0.0007 ±0.0016 | +0.0021 ±0.0019 | 0 of 12,364 |
+| `nightblade_life` | +0.0027 ±0.0009 | +0.0061 ±0.0014 | 0 of 12,438 |
+| `pile_text` | +0.0000 ±0.0000 | +0.0000 ±0.0000 | 0 of 14,246 |
+| `custodi_vote` | -0.0033 ±0.0011 | -0.0033 ±0.0018 | 0 of 12,916 |
+
+`pile_text` is a null in win rate, not a patch that failed to apply: the
+754 games that convert the pile move (`token_drain` -9.0, `artifact_drain`
+-3.0, `final_artifacts` +4.5, `extra_turns` +0.009, the Kambal-only pile
+reaching Time Sieve), but the pile is converted only at `combo_cap`, in
+games already won -- the audit's prediction.
+
+**IN PROGRESS**: `tempting_contract_text`, `tivit_death_triggers` and all
+six together. Their first runs (-0.0073 / -0.0075; +0.0006 / +0.0008;
+-0.0063 / -0.0026) failed the identity check, 154, 14 and 46 games, and
+the reach was the cause: `offers_taken` stays 0 in an upkeep nobody takes
+the Contract's offer, where the old rule still made a Treasure; and
+Portal's carnage counts its creature tokens without either counter. Both
+now have a counter (`contract_upkeeps`, `portal_creature_tokens`), and
+the three are re-run.
 
 ## How to read an ablation table
 

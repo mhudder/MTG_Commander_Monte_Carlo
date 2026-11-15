@@ -228,8 +228,21 @@ def _vote_payoffs(g, votes_against: int):
     """Cards that read the vote itself rather than its outcome."""
     if votes_against and g.has("Grudge Keeper"):
         # "Each opponent who voted for a choice you didn't vote for loses 2."
-        g.deal_pod_damage(2.0 * votes_against, each=False)
-        g.m["grudge_damage"] += 2.0 * votes_against
+        # EACH VOTER, 2 apiece (§0z214, §0z207 item 3): it was the whole
+        # `2 x votes_against` at the opponent closest to dying, so three
+        # voters took one player down by 6. A vote here is a count, not a
+        # voter, so the voters are the first `votes_against` living
+        # opponents in seat order -- every one of them under the default
+        # `opp_vote_policy` (adversarial), a convention under the others.
+        # `grudge_each=False` is the old rule.
+        if g.cfg.get("grudge_each", True):
+            voters = OPP.living(g)[:votes_against]
+            for o in voters:
+                g.deal_pod_damage(2.0, each=False, target=o)
+            g.m["grudge_damage"] += 2.0 * len(voters)
+        else:
+            g.deal_pod_damage(2.0 * votes_against, each=False)
+            g.m["grudge_damage"] += 2.0 * votes_against
     if g.has("Model of Unity"):
         # "You and each opponent who voted for a choice you voted for may
         # scry 2." Scry is modelled as a small draw-quality nudge, not a card.

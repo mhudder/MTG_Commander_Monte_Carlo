@@ -125,11 +125,11 @@ Kambal, Profiteering Mayor            +1.69+-0.18         +1.86+-0.19        +0.
       Contract, Tempt with Bunnies, Master of Ceremonies and An Offer You Can't
       Refuse all hand the pod tokens (item 7). A floor.
 Marionette Master                     +2.41+-0.18         +2.19+-0.18        +0.0149+-0.0030      both
-      MODELLED: fabricate 3 as counters (a policy: never the Servos) and 'target
-      opponent loses life equal to this creature's power' at a constant 4, at the
-      opponent closest to dying, on tivit's own sacrifices. NOT: an artifact
-      creature dying, or an artifact the pod's removal destroys (items 8, 24). A
-      floor.
+      MODELLED (§0z214): 'target opponent loses life equal to this creature's
+      power' on every artifact of yours put into a graveyard from the battlefield,
+      at the opponent closest to dying. APPROXIMATE: fabricate 3 is always
+      counters (a policy: never the three Servo artifacts, item 24) and the power
+      a constant 4. Bounded both ways.
 Swords to Plowshares                  +0.50+-0.13         +1.18+-0.18        +0.0127+-0.0031      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
@@ -178,10 +178,13 @@ Council's Judgment                    +0.41+-0.13         +0.56+-0.15        +0.
       outnumber yours, held while none is out. Who wins is `opp_vote_policy`. NOT:
       a permanent that is not a route piece (§4). A floor.
 Nadier's Nightblade                   +2.18+-0.16         +1.80+-0.16        +0.0080+-0.0025      both
-      MODELLED: a Treasure, Clue, Food or Powerstone leaving (`sacrifice_tokens`,
-      Coercive Portal's carnage). NOT: a creature TOKEN leaving -- dying in
-      combat, to a wipe or to Promise of Loyalty -- because
-      `TivitGame.on_creature_death` is a no-op (item 8). A floor.
+      MODELLED (§0z214): every token of yours leaving -- a Treasure, Clue, Food or
+      Powerstone sacrificed, a creature token dying in combat, to a wipe or to
+      Promise of Loyalty, every token of Coercive Portal's carnage -- each
+      opponent 1 AND you 1 (the life was modelled nowhere before). APPROXIMATE: in
+      a wipe each death reads the Nightblade still on the battlefield, so one
+      destroyed earlier in the same event misses the tokens after it (CR 603.10a
+      looks back), except in Portal's carnage. A floor.
 Muddle the Mixture                    +0.63+-0.15         +0.62+-0.15        +0.0076+-0.0026      both
       MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn from
       mana held up, against its removal, its wraths and its route pieces, at its
@@ -220,11 +223,12 @@ Cyberdrive Awakener                   +1.12+-0.10         +1.02+-0.12        +0.
       C) and skips the real noncreature artifacts it animates (a floor). Bounded
       both ways (item 12).
 Disciple of the Vault                 +1.03+-0.11         +0.92+-0.11        +0.0041+-0.0020      both
-      MODELLED: an artifact to the graveyard from tivit's own sacrifices and
-      Coercive Portal's carnage, as a 1/living share of each opponent
-      (`disciple_share`; the text targets ONE). NOT: an artifact creature dying
-      (`on_creature_death` is a no-op) or an artifact the pod's removal destroys
-      (items 8, 25). A floor.
+      MODELLED (§0z214): an artifact of yours put into a graveyard from the
+      battlefield -- tivit's sacrifices, Portal's carnage, an artifact creature
+      dying, a rock the pod's removal destroys -- as a 1/living share of each
+      opponent (`disciple_share`; the text targets ONE, item 25). NOT: an
+      OPPONENT's artifact (the text is 'an artifact'), the pod's artifact route
+      pieces dying. A floor.
 Magister of Worth                     -0.12+-0.12         +0.23+-0.14        +0.0034+-0.0029      both
       The CONDEMNATION half is implemented (2026-09-12): a symmetric wipe that
       spares only itself, conditional on the council vote. GRACE -- 'EACH PLAYER
