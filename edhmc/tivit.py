@@ -92,6 +92,7 @@ class TivitGame(BaseGame):
         self.illusion_active = False
         self.ephemerate_rebound = 0     # turn on which the rebound copy casts
         self.greaves_on_tivit = False   # §0z216: Greaves attached to Tivit
+        self.pile_digging = False       # §0z218: no dig inside a dig
         self.deadeye_paired = False
         self.cyberdrive_turn = -1       # turn Cyberdrive Awakener entered
         self.result = None
@@ -139,6 +140,8 @@ class TivitGame(BaseGame):
             "greaves_haste_withheld": 0, "greaves_blinks_refused": 0,
             "greaves_ephemerate_held": 0,
             "deadeye_breakeven_continues": 0,     # §0z217
+            "pile_digs": 0, "pile_dig_draws": 0,  # §0z218
+            "capped_drain_wins": 0,               # §0z218
             "tivit_triggers": 0, "extra_turns": 0,
             "sieve_activations": 0, "sieve_chain_max": 0, "sieve_real_fuel": 0,
             # `extra_turns` is turns GRANTED; these two are what was actually
@@ -797,13 +800,17 @@ def deadeye_loop(g):
         return
     cap = g.cfg.get("combo_cap", 40)
     n = 0
+    last_drop, last_kept = 0.0, False
     while n < cap and affordable(g, {"gen": 1, "U": 1}, True):
         before = g.tokens["Treasure"]
+        life0 = sum(o.life for o in OPP.living(g))
         if not pay(g, {"gen": 1, "U": 1}, powerstones=True):   # §0z74
             break
         blink_tivit(g, "Deadeye Navigator")
         g.m["deadeye_activations"] += 1
         n += 1
+        last_drop = life0 - sum(o.life for o in OPP.living(g))
+        last_kept = g.tokens["Treasure"] >= before
         # Stop when it stops paying for itself: a treadmill drains the pool
         # and there is no reason to keep going once we are not gaining.
         #
@@ -824,6 +831,18 @@ def deadeye_loop(g):
                 and not g.has("Academy Manufactor"):
             break
     g.m["combo_iterations"] += n
+    # A CAPPED LOOP THAT DRAINS EVERY ITERATION IS AN INFINITE DRAIN (§0z218,
+    # `capped_drain_wins`; False is the old rule). The cap stands for "as
+    # many as it takes"; a loop whose last activation cost no Treasures and
+    # took life from the pod -- Disciple of the Vault on the two Treasures
+    # it spends, Mirkwood Bats or Kambal on its tokens, Grudge Keeper on its
+    # votes -- would take all of it. Without this, 40 iterations of
+    # Disciple were 80 life against a pod of 120, and the combo lost.
+    if (n >= cap and g.result is None and last_kept and last_drop > 0
+            and g.cfg.get("capped_drain_wins", True)):
+        g.m["capped_drain_wins"] += 1
+        g.win(ROUTE_DRAIN)
+        return
     if n >= cap:
         convert_the_pile(g)
 
@@ -849,9 +868,9 @@ def convert_the_pile(g):
     # so a pile with Kambal alone falls through to Time Sieve; and only a
     # TREASURE sacrifices for free. A Clue is "{2}, Sacrifice", a Food "{2},
     # {T}, Sacrifice", and a Powerstone has no sacrifice ability at all.
-    # Cracking Clues and Food with the Treasures' mana is not modelled: a
-    # floor, and a small one -- this runs at `combo_cap`, where the
-    # Treasures alone are usually lethal.
+    # Cracking Clues with the Treasures' mana to FIND a payoff is
+    # `dig_the_pile` (§0z218), when nothing below converts; cracking them
+    # for the drain itself is not modelled (Treasures sacrifice for free).
     text = g.cfg.get("pile_text", True)
     g.m["pile_converts"] += 1          # either rule: the A/B's reach
     drains = ("Marionette Master", "Disciple of the Vault", "Mirkwood Bats",
@@ -872,6 +891,113 @@ def convert_the_pile(g):
     if g.has("Time Sieve"):
         g.extra_turns += 5
         g.m["extra_turns"] += 5
+        return
+    dig_the_pile(g)
+
+
+# §0z218: the cards that turn a capped Deadeye loop into a win -- the drains
+# (each token or artifact leaving), Kambal (each token entering), Grudge
+# Keeper (each vote), Time Sieve (five artifacts a turn), the two
+# alternate wins, and Torment of Hailfire. What the dig looks for.
+PILE_PAYOFFS = ("Marionette Master", "Disciple of the Vault", "Mirkwood Bats",
+                "Nadier's Nightblade", "Kambal, Profiteering Mayor",
+                "Grudge Keeper", "Time Sieve", "Revel in Riches",
+                "Mechanized Production", "Torment of Hailfire")
+LOOP_RESERVE = {"gen": 1, "U": 1}       # one Deadeye activation, {1}{U}
+
+
+def _payoff_castable(g) -> bool:
+    """A payoff in hand that can be cast with {1}{U} still kept back for
+    the loop that it needs."""
+    for c in g.hand:
+        if c.name not in PILE_PAYOFFS:
+            continue
+        cost = dict(reduce_cost(g, c))
+        for k, v in LOOP_RESERVE.items():
+            cost[k] = cost.get(k, 0) + v
+        if affordable(g, cost, "Artifact" in c.types):
+            return True
+    return False
+
+
+def dig_before_casting(g) -> bool:
+    """§0z218: with the combo on the battlefield and a Clue pile, the
+    turn's mana digs for a payoff BEFORE anything else is cast. True if
+    the dig ran."""
+    if (g.cfg.get("pile_dig", True) and not g.pile_digging
+            and g.tokens["Clue"] > 0 and g.has("Deadeye Navigator")
+            and g.has("Tivit, Seller of Secrets")):
+        before = g.m["pile_digs"]
+        dig_the_pile(g)
+        return g.m["pile_digs"] > before
+    return False
+
+
+def dig_the_pile(g) -> None:
+    """THE CLUE DIG (the owner, 2026-11-15, §0z218): a capped Deadeye loop
+    that converted nothing cracks the pile's Clues with its own mana, to
+    find a payoff, casts it, and loops again.
+
+    THE POLICY, SAID OUT LOUD. Crack one Clue at a time ({2}, `crack_clues`,
+    and only while `engine.draw_is_safe` -- a dig cracks far more Clues
+    than a turn's spare mana, so it asks where tivit's other Clue cracks
+    do not), keeping {1}{U} back for the
+    loop, until a payoff (`PILE_PAYOFFS`) is in hand and castable with that
+    reserve, or the mana or the Clues run out. Then the main phase casts
+    what it casts (greedy, as everywhere -- it may spend on other cards
+    first, a judgement), and with Tivit and Deadeye still out the loop runs
+    again: it reaches the cap and the payoff converts. A loop that GAINS
+    Treasures (a vote for bribery) is infinite mana, so the dig repeats --
+    at most `pile_dig_rounds` (3) times, the cap's stand-in for "as many as
+    it takes"; a mana-neutral loop (every pod vote evidence) has only the
+    mana it had, and one round is all it gets.
+
+    It runs twice a turn's worth: where a capped loop converted nothing
+    (`convert_the_pile`), and at the top of each main phase while Tivit,
+    Deadeye and a Clue pile are on the battlefield -- a pilot with the combo
+    out and no payoff spends the turn's mana digging before casting
+    anything else.
+
+    Not when the pile already wins: Revel in Riches with ten Treasures or
+    Mechanized Production with eight of a name win at the next upkeep, and
+    spending the Treasures would throw that away. `pile_dig=False` is the
+    old rule (§0z217's floor), exactly."""
+    if not g.cfg.get("pile_dig", True) or g.pile_digging:
+        return
+    if g.has("Revel in Riches") and g.tokens["Treasure"] >= 10:
+        return
+    if g.has("Mechanized Production") and max(g.tokens.values()) >= 8:
+        return
+    g.pile_digging = True
+    try:
+        for _ in range(g.cfg.get("pile_dig_rounds", 3)):
+            g.m["pile_digs"] += 1
+            while not _payoff_castable(g):
+                reserve = dict(LOOP_RESERVE)
+                reserve["gen"] += 2              # the crack, then the loop
+                if not affordable(g, reserve, True):
+                    break
+                if not draw_is_safe(g, 1):       # §0z42: never deck out
+                    break
+                if crack_clues(g, 1) == 0:
+                    break
+                g.m["pile_dig_draws"] += 1
+            main_phase(g)
+            if g.result is not None:
+                return
+            if not (g.has("Deadeye Navigator")
+                    and g.has("Tivit, Seller of Secrets")):
+                return
+            before = g.tokens["Treasure"]
+            iters = g.m["combo_iterations"]
+            deadeye_loop(g)                  # converts at the cap, no dig
+            if g.result is not None:
+                return
+            gained = g.tokens["Treasure"] > before
+            if not gained or g.m["combo_iterations"] == iters:
+                return
+    finally:
+        g.pile_digging = False
 
 
 # ---------------------------------------------------------------------------
@@ -889,6 +1015,10 @@ def main_phase(g):
     that the commander goes first once affordable -- every other card in the
     list is either a payoff for its trigger or a way to re-trigger it.
     """
+    # §0z218. Only a dig that RAN may end the phase: the old main phase
+    # kept casting after a win, and its counters say so.
+    if dig_before_casting(g) and g.result is not None:
+        return
     while True:
         greaves_step(g)                  # sorcery speed, §0z216
         if not g.commander_cast:

@@ -268,8 +268,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
 | [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
 | [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
-| [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`) |
-| [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0075 |
+| [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`), -0.0017 / -0.0011 |
+| [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0079 |
+| [0z218](#0z218) | FIXED | **The Clue dig, and a capped loop that drains is infinite** (the owner, 2026-11-15, §0z217's remaining 13%): `pile_dig` +0.0063 / +0.0043; `capped_drain_wins` +0.0003 / +0.0002. Combo games are won 88%; the rest are mana-starved digs and early kills |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19053,8 +19054,22 @@ the one blink that ignores Greaves. `tivit.TARGETED_BLINKS` is the six.
 
 Reach counters: `greaves_moved_off`, `greaves_shroud_withheld`,
 `greaves_haste_withheld`, `greaves_blinks_refused`,
-`greaves_ephemerate_held`. A smoke run (N=1,000) reached 10.5% of games and
-the other 895 were identical in both legs.
+`greaves_ephemerate_held`.
+
+**Measured**, `diagnostics/run_knob_ab.py`, tivit's list, N=15,000 paired,
+seeds 5000.. (`results/knob_ab_tivit_greaves_blink_policy.txt`), on the
+code with §0z217 and §0z218 in:
+
+| | T10 | T20 |
+|---|---|---|
+| policy on minus off | **-0.0017 ±0.0013** | -0.0011 ±0.0015 |
+| at `7fa63c3`, before §0z217-§0z218 | -0.0021 ±0.0012 | -0.0017 ±0.0016 |
+
+9.0% of games reached; IDENTITY 0 of the other 13,644. The ceiling comes
+down, as §0z207 read it: shroud and the blinks were both taken, and now a
+pilot gets one or the other -- haste withheld 0.08 a game, shroud withheld
+0.04, Greaves moved off 0.05. Small, because Greaves and a targeted blink
+together are rare (9%) and Tivit's removal is one route among many.
 
 **What follows is the section as it was written before the decision.**
 
@@ -19138,8 +19153,10 @@ seeds 5000.. (`results/knob_ab_tivit_deadeye_breakeven_loops.txt`):
 |---|---|---|
 | on minus off | **+0.0131 ±0.0018** | **+0.0075 ±0.0014** |
 | in the 10.1% of games it reaches | +0.1305 ±0.0171 | +0.0748 ±0.0134 |
+| re-measured with §0z218 in | **+0.0131 ±0.0018** | **+0.0079 ±0.0015** |
 
-IDENTITY: 0 of the 13,490 unreached games differ. Deadeye activations
+IDENTITY: 0 of the 13,490 unreached games differ (0 of 13,440 with
+§0z218 in, 10.4% reached). Deadeye activations
 3.4 -> 9.1 a game, pile conversions 0.07 -> 0.23, `token_drain` +10.
 
 **It is a combo, not an automatic win, and the gap is a floor.** Of 593
@@ -19152,7 +19169,73 @@ own docstring). By the rules, Tivit and Deadeye alone against a pod that
 votes evidence every time are infinite Clues and ETBs at zero net mana --
 not a win until a payoff is found; any vote for bribery makes the mana
 infinite, and the Clues then draw the library. Modelling that dig is the
-next step if the owner wants the remaining 13%.
+next step if the owner wants the remaining 13% -- **done, §0z218.**
+
+<a id="0z218"></a>
+
+## 0z218. FIXED -- the Clue dig, and a capped loop that drains every iteration is an infinite drain
+
+**The owner, 2026-11-15: "yes, model the Clue dig for the remaining
+13%"** (§0z217: 13% of the games where the Tivit-Deadeye combo ran were
+lost, every one at the cap with nothing converting).
+
+**Two rules, each behind its own switch** (False is the old rule;
+`tests/test_pile_dig.py`, six cases, five mutations exact):
+
+- **`pile_dig`** (`dig_the_pile`). A capped loop that converted nothing
+  cracks the pile's Clues with its own mana -- one at a time, keeping
+  {1}{U} back for the loop, and only while `engine.draw_is_safe` (a dig
+  cracks far more Clues than a turn's spare mana, so it asks where tivit's
+  other Clue cracks do not, §0z42) -- until a payoff (`PILE_PAYOFFS`: the
+  four drains, Kambal, Grudge Keeper, Time Sieve, the two alternate wins,
+  Torment of Hailfire) is in hand and castable with that reserve. The main
+  phase casts it, and the loop runs again. A loop that GAINS Treasures
+  digs again, at most `pile_dig_rounds` (3) times; a mana-neutral one gets
+  one round. It also runs at the top of each main phase while Tivit,
+  Deadeye and a Clue pile are out (`dig_before_casting`): a pilot with the
+  combo and no payoff spends the turn's mana digging before anything else.
+  Not when the pile already wins at the upkeep (Revel in Riches and ten
+  Treasures, Mechanized Production and eight of a name).
+- **`capped_drain_wins`**. Found while pinning the dig: with Disciple of
+  the Vault already out, each activation sacrifices two Treasures, so the
+  loop drains every iteration -- an infinite drain -- but `combo_cap`'s 40
+  iterations were 80 life against a pod of 120, and the combo did not
+  win. Now a capped loop whose last activation cost no Treasures and took
+  life from the pod wins (`ROUTE_DRAIN`, counter `capped_drain_wins`).
+
+**Measured**, `diagnostics/run_knob_ab.py`, tivit's list, N=15,000 paired,
+seeds 5000.., each switch against the other at its default:
+
+| switch | T10 | T20 | reached | identity |
+|---|---|---|---|---|
+| `pile_dig` | **+0.0063 ±0.0019** | **+0.0043 ±0.0019** | 15.7% | 0 of 12,650 |
+| `capped_drain_wins` | +0.0003 ±0.0003 | +0.0002 ±0.0002 | 0.5% | 0 of 14,929 |
+
+The capped drain is rare because Mirkwood Bats, Kambal and Grudge Keeper
+kill inside the 40 iterations already; Disciple and Marionette alone are
+the cases it closes.
+
+**What is left of the 13%, and why it is the rules, not the model.** Of
+621 combo games in 6,000 (seeds 5000..), 87.8% are won at T20 (87.4%
+before the dig). 74 of the 76 losses dug, and drew 2.5 cards on average:
+against a pod that votes evidence every time the loop is mana-neutral, so
+the dig has only the turn's lands and Treasures, at {2} a Clue -- two or
+three cards a turn. Most of the losses end on turns 7-12, before a payoff
+turns up. A first version that dug only at the cap (after the greedy main
+phases had spent the mana) drew 0.84 cards a loss and recovered under a
+point; digging first each main phase is what moved it.
+
+**The switches off are the old rules, proved against the old commit, and
+the paired runs could not have proved it.** With all four of this
+session's switches False (`greaves_blink_policy`,
+`deadeye_breakeven_loops`, `pile_dig`, `capped_drain_wins`), tivit's 400
+games at seeds 5000.. are identical, every numeric key, to `00bf581`'s.
+The first try was not: two seeds moved, because `main_phase` returned
+early on a game already won, which the old main phase did not (it went on
+casting, and its counters say so). That return sat OUTSIDE the switch, in
+both legs of every paired run, so the identity check passed -- §0z137's
+lesson, a comparison names both its sides. It now returns only after a
+dig that ran a round.
 
 ## How to read an ablation table
 
