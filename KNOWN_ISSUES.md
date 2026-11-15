@@ -262,7 +262,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
 | [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
 | [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
-| [0z210](#0z210) | OPEN | **Genesis Wave by its text** (item 47, §0z209 item 1): reveal the top six, keep every permanent of mv <= 6, mill the rest (`genesis_wave_reveal`, default). Costs azusa -0.0034 / -0.0039 at T10 / T20 against the old tutor, a ceiling; in progress |
+| [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18605,7 +18605,7 @@ behaviour fixes move azusa's baseline and belong before the rebuild.
 
 <a id="0z210"></a>
 
-## 0z210. OPEN (in progress) -- Genesis Wave by its text: the top six, not the library
+## 0z210. FIXED -- Genesis Wave by its text: the top six, not the library
 
 **The owner, 2026-11-15: "run the gates, then start on Genesis Wave"** --
 queue item 47's first fix, §0z209 item 1 (`docs/ORACLE_AUDIT_AZUSA.md`).
@@ -18642,26 +18642,50 @@ paired, seeds 5000.., the reveal (A) minus the old tutor (B):
 | guarded (the default) | -0.0034 ±0.0021 | -0.0039 ±0.0026 | 0.0003 | `results/knob_ab_azusa_genesis_wave_reveal.txt` |
 
 A Wave resolves in 16.3% of games, and there the guarded rule is -0.0208
-±0.0130 / -0.0241 ±0.0158. Per Wave it reveals 6.0, puts 4.4 (the audit's
+±0.0130 / -0.0241 ±0.0158. The identity check holds with the guard in the
+reach (`wave_casts,wave_guard_held`): of the 12,437 games where neither
+leg resolved or held a Wave, 0 differ. Reached that way, 17.1% of games,
+-0.0199 ±0.0124 / -0.0230 ±0.0151. Per Wave it reveals 6.0, puts 4.4 (the audit's
 reading of the list: 4.6) and mills 1.6, where the old rule put 3. The
 counters move with it: `landfall_triggers` +0.38 a game, `tokens_made`
 +6.2, `cards_drawn` +0.35. Win rate moves against them: `damage` -0.29,
 `opponents_killed` -0.0075. **Follow win rate** (§0t): more of the board
 is not more of the game.
 
-**IN PROGRESS.** The guarded run's identity check found ONE game of 12,551
-moved where no Wave resolved in either leg (the unguarded run: 0). The
-guard decides without a Wave resolving -- a held cast in A, a cast in B
-that was countered -- so the reach is now `wave_casts,wave_guard_held`,
-re-run. And why the text loses to the tutor is not yet shown:
-`diagnostics/diag_genesis_wave.py` reads it apart (the mill against the
-reveal, and how often the mill takes a permanent above the fixed X).
+**Why the text loses: the tutor's choice, not the mill**
+(`diagnostics/diag_genesis_wave.py`, `results/diag_genesis_wave.txt`,
+N=15,000, the same seeds). A third leg, a DIAGNOSTIC only, sends the cards
+the Wave does not keep to the library's bottom instead of the graveyard:
+
+| legs | T10 | T20 |
+|---|---|---|
+| text - tutor | -0.0034 ±0.0021 | -0.0039 ±0.0026 |
+| bottom - tutor | -0.0043 ±0.0022 | -0.0040 ±0.0026 |
+| text - bottom (the mill) | +0.0009 ±0.0013 | +0.0001 ±0.0016 |
+
+So the mill is worth nothing measurable, although 32.6% of Waves mill a
+permanent above the fixed X (Craterhoof 205 times in 2,592 Waves,
+Terastodon 198). What the old rule took is the whole difference: of 2,819
+tutor Waves, Woodland Bellower 1,585, Rampaging Baloths 1,584, Bane of
+Progress 1,561 and Ancient Greenwarden 1,545 -- three of the deck's four
+mana-value-6 creatures, nearly every time, and Greenwarden doubles every
+landfall after it. The reveal gets 2.4 lands and two cheaper permanents.
+The old number was a tutor for the deck's best creatures, as §0z209 read
+it; the text is a dig.
+
+The tutor leg resolved 2,819 Waves to the text's 2,592: the guard holds
+some, and Regrowth and Eternal Witness return the highest mana value in
+the graveyard, which a milled Kozilek (10) or Ulamog (11) outranks the
+Wave (9). In the real game a milled Eldrazi shuffles the graveyard back
+first (unmodelled, on record in §0z209), so that rebuy is a small
+CEILING the other way.
 
 **What this is NOT**: the old rule was a CEILING on the Wave's quality
 (§0z209), so a lower number is the text's, not a reason to keep the old
-rule. And the fixed X is now load-bearing: at X=6 the reveal mills
-Craterhoof, Avenger, Terastodon, Kozilek and Ulamog, where a pilot with
-the mana would cast it bigger (§0z197 A7). Kozilek's and Ulamog's "shuffle
+rule. And the fixed X matters more now than it did: X sets how many cards
+are revealed as well as their cap, and a pilot with the mana would cast
+it bigger (§0z197 A7) -- though the table above says the finishers it
+mills at X=6 are not where the loss is. Kozilek's and Ulamog's "shuffle
 your graveyard into your library" is unmodelled (on record, §0z209), so
 milling one is a FLOOR.
 

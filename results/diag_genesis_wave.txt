@@ -1,0 +1,19 @@
+azusa, staged list, N=15000 paired, seeds 5000..19999
+games where a Wave resolved in any leg: 2449 (16.3%)
+
+    text - tutor  all      T10 -0.0034 ±0.0021   T20 -0.0039 ±0.0026
+    text - tutor  reached  T10 -0.0208 ±0.0130   T20 -0.0241 ±0.0158
+  bottom - tutor  all      T10 -0.0043 ±0.0022   T20 -0.0040 ±0.0026
+  bottom - tutor  reached  T10 -0.0261 ±0.0132   T20 -0.0245 ±0.0157
+    text - bottom all      T10 +0.0009 ±0.0013   T20 +0.0001 ±0.0016
+    text - bottom reached  T10 +0.0053 ±0.0078   T20 +0.0004 ±0.0098
+  drew_from_empty, tutor: 0.0001 a game
+  drew_from_empty, text: 0.0003 a game
+  drew_from_empty, bottom: 0.0001 a game
+
+text leg: 2592 Waves resolved
+  per Wave: revealed 6.00, put 4.37, milled 1.62
+  share of Waves that milled a permanent of mv > 6 (Avenger of Zendikar, Craterhoof Behemoth, Kozilek, Butcher of Truth, Terastodon, Ulamog, the Infinite Gyre): 32.6%
+  most milled: Green Sun's Zenith 242, Sylvan Awakening 212, Kodama's Reach 206, Craterhoof Behemoth 205, Seek the Horizon 201, Journey of Discovery 199, Terastodon 198, Krosan Grip 196
+
+tutor leg: 2819 Waves; what it took: Woodland Bellower 1585, Rampaging Baloths 1584, Bane of Progress 1561, Ancient Greenwarden 1545, Greensleeves, Maro-Sorcerer 228, Storm Cauldron 222, Memory Jar 218, Titania, Protector of Argoth 213
