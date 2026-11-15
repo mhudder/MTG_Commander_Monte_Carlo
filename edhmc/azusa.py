@@ -267,6 +267,13 @@ DYNAMIC_PT_NAMED_LANDS = frozenset({"Captain Pike, Fullness of Time"})
 # Genesis Wave, a Springheart token copy (the copy copies the replacement
 # effect). A NAME SET, so `check_dynamic_pt_coverage` checks it: a 0/0 creature
 # in neither this set nor DYNAMIC_PT_LANDS is literally a 0/0. §0z101.
+def wave_keeps(card, x) -> bool:
+    """Genesis Wave's filter, "permanent cards with mana value X or less"
+    (§0z210). A function, not a line inside `wave`, so the rule lives in one
+    place and its test can move it."""
+    return card.is_permanent and card.mv <= x
+
+
 ENTERS_WITH_COUNTERS = {
     "Mossborn Hydra": 1,
 }
@@ -611,6 +618,11 @@ class AzusaGame(BaseGame):
             "moloids_made": 0,          # Mole Man: Moloid tokens
             "moloid_mills": 0,          # ... cards a Moloid milled
             "moloid_mill_lands": 0,     # ... of which lands
+            "wave_casts": 0,            # Genesis Wave resolved (either rule)
+            "wave_revealed": 0,         # ... cards revealed, by its text
+            "wave_put": 0,              # ... of which put onto the battlefield
+            "wave_milled": 0,           # ... and the rest, milled (§0z210)
+            "wave_guard_held": 0,       # ... a cast the decking guard declined
             "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
             "bristly_counters": 0,      # Bristly Bill: landfall counters
             "bristly_activations": 0,   # ... the {3}{G}{G} doubling
@@ -2727,7 +2739,24 @@ class AzusaGame(BaseGame):
         """Genesis Wave / Animist's Awakening, both fixed-X approximations —
         see the module docstring for why X-spells here use a hardcoded X
         rather than a dynamic one, the same convention `Debt to the
-        Deathless` and `Torment of Hailfire` already use elsewhere."""
+        Deathless` and `Torment of Hailfire` already use elsewhere.
+
+        GENESIS WAVE BY ITS TEXT (§0z210): "Reveal the top X cards of your
+        library. You may put any number of permanent cards with mana value X
+        or less from among them onto the battlefield. Then put all cards
+        revealed this way that weren't put onto the battlefield into your
+        graveyard." The top X, not the library; every permanent of mana
+        value X or less among them, not the best `count`; the rest MILLED.
+        "Any number" is a policy and the pilot takes all of them (no card
+        in the list is worse on the battlefield than in the graveyard while
+        a Waved creature fires no ETB -- §0z209 item 3, which is what would
+        make Bane of Progress a choice). `genesis_wave_reveal=False` is the
+        old rule exactly: the `count` highest-mana-value permanents of mana
+        value X or less from ANYWHERE in the library, nothing milled
+        (§0z209 item 1). No random draw: the reveal reads the library's top,
+        already shuffled on the game's own stream (§0z17)."""
+        if not lands_only:
+            self.m["wave_casts"] += 1
         if lands_only:
             put = 0
             for _ in range(x):
@@ -2738,6 +2767,23 @@ class AzusaGame(BaseGame):
                 self.make_permanent(land, sick=False, tapped=True)
                 self.land_entered(land, played=False)
                 put += 1
+            return
+        if self.cfg.get("genesis_wave_reveal", True):      # §0z210
+            revealed = [self.library.pop()
+                        for _ in range(min(x, len(self.library)))]
+            put = [c for c in revealed if wave_keeps(c, x)]
+            kept = {id(c) for c in put}
+            milled = [c for c in revealed if id(c) not in kept]
+            # Every revealed card has left the library before anything
+            # enters -- the 2026-09-07 crash below is why -- and the milled
+            # ones are in the graveyard before a trigger resolves, as they
+            # are when the spell finishes resolving (Ramunap Excavator and
+            # Crucible of Worlds can play a milled land at once).
+            self.graveyard.extend(milled)
+            self.m["wave_revealed"] += len(revealed)
+            self.m["wave_put"] += len(put)
+            self.m["wave_milled"] += len(milled)
+            self.wave_enter(put)
             return
         pool = sorted([c for c in self.library
                       if c.is_permanent and c.mv <= x],
@@ -2754,6 +2800,20 @@ class AzusaGame(BaseGame):
             remove_card(self.library, c)
         for c in pool:
             self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
+            if c.is_land:
+                self.land_entered(c, played=False)
+
+    def wave_enter(self, cards):
+        """Genesis Wave's permanents enter as ONE event, so every one of them
+        -- the newcomers included -- sees each land's landfall (CR 603.6a): a
+        Rampaging Baloths revealed below two lands makes two Beasts. All of
+        them onto the battlefield first, then each land's trigger. The old
+        rule's loop (`genesis_wave_reveal=False`) interleaves, and is left
+        as it was; it sorted lands, mana value 0, after every creature, so
+        it reached the same answer for the cards it took."""
+        for c in cards:
+            self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
+        for c in cards:
             if c.is_land:
                 self.land_entered(c, played=False)
 
@@ -3165,6 +3225,14 @@ class AzusaGame(BaseGame):
         """
         if card.script == "draw3":
             return 3
+        if (card.script == "genesis_wave"
+                and self.cfg.get("genesis_wave_reveal", True)):
+            # Not a draw, but the same cards leave the library: the reveal
+            # takes the top X whatever is kept (§0z210). Measured unguarded
+            # first -- the naive pilot (§0z42) -- `drew_from_empty` rose
+            # 0.0001 -> 0.0011 a game; the old rule took three at most and
+            # stays unguarded, as it was.
+            return card.x_pips
         if (card.name == "Kozilek, Butcher of Truth"
                 and self.cfg.get("kozilek_cast_draw", True)):
             return 4                 # "When you cast this spell, draw four"
@@ -3392,6 +3460,8 @@ class AzusaGame(BaseGame):
                     continue
                 n_draw = self.draws_on_resolve(c)
                 if n_draw and not draw_is_safe(self, n_draw):
+                    if c.script == "genesis_wave":
+                        self.m["wave_guard_held"] += 1     # §0z210
                     continue        # casting is optional; decking is a loss
                 # "Spend this mana only to cast CREATURE SPELLS or activate
                 # abilities of creatures", so the restricted pool is offered to

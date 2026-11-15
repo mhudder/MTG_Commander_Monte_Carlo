@@ -262,6 +262,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
 | [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
 | [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
+| [0z210](#0z210) | OPEN | **Genesis Wave by its text** (item 47, §0z209 item 1): reveal the top six, keep every permanent of mv <= 6, mill the rest (`genesis_wave_reveal`, default). Costs azusa -0.0034 / -0.0039 at T10 / T20 against the old tutor, a ceiling; in progress |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18601,6 +18602,68 @@ careful. The largest findings, numbered as in the file:
 
 As for tivit and shilgengar: the labels are a rendering change; the
 behaviour fixes move azusa's baseline and belong before the rebuild.
+
+<a id="0z210"></a>
+
+## 0z210. OPEN (in progress) -- Genesis Wave by its text: the top six, not the library
+
+**The owner, 2026-11-15: "run the gates, then start on Genesis Wave"** --
+queue item 47's first fix, §0z209 item 1 (`docs/ORACLE_AUDIT_AZUSA.md`).
+Oracle text re-read from Scryfall the same day: "Reveal the top X cards of
+your library. You may put any number of permanent cards with mana value X
+or less from among them onto the battlefield. Then put all cards revealed
+this way that weren't put onto the battlefield into your graveyard."
+
+**The rule** (`AzusaGame.wave`, `wave_keeps`, `wave_enter`):
+
+- The top six at the project's fixed X (`x_pips` 6), every permanent of
+  mana value 6 or less among them onto the battlefield, the rest MILLED.
+  "Any number" is a policy: all of them. It becomes a choice once a Waved
+  creature fires its ETB (§0z209 item 3; Bane of Progress).
+- The permanents enter as one event, so each sees every land's landfall
+  (CR 603.6a): all onto the battlefield, then each land's trigger.
+- The pilot's decking guard reads the reveal as six cards out of the
+  library (`draws_on_resolve`), so `draw_is_safe` holds the Wave below
+  `decking_reserve` + 6 cards. The old rule stays unguarded, as it was.
+- `genesis_wave_reveal=False` is the old rule exactly. Proved: every deck
+  BIT-IDENTICAL against `0cb5dfb` at 2,000 seeds
+  (`check_unchanged_decks --cfg=genesis_wave_reveal=False`), and azusa's
+  whole output, 134 keys a game, hashed identical over the same 2,000
+  games, before and after the guard.
+- Pinned by `tests/test_genesis_wave.py`, nine cases, three mutations exact.
+  No random draw: the reveal reads a library already shuffled (§0z17).
+
+**Measured**, `diagnostics/run_knob_ab.py`, azusa's staged list, N=15,000
+paired, seeds 5000.., the reveal (A) minus the old tutor (B):
+
+| pilot | T10 | T20 | `drew_from_empty` a game | file |
+|---|---|---|---|---|
+| unguarded (§0z42's naive pilot) | -0.0038 ±0.0021 | -0.0047 ±0.0026 | 0.0011 (B 0.0001) | `results/knob_ab_azusa_genesis_wave_reveal_naive.txt` |
+| guarded (the default) | -0.0034 ±0.0021 | -0.0039 ±0.0026 | 0.0003 | `results/knob_ab_azusa_genesis_wave_reveal.txt` |
+
+A Wave resolves in 16.3% of games, and there the guarded rule is -0.0208
+±0.0130 / -0.0241 ±0.0158. Per Wave it reveals 6.0, puts 4.4 (the audit's
+reading of the list: 4.6) and mills 1.6, where the old rule put 3. The
+counters move with it: `landfall_triggers` +0.38 a game, `tokens_made`
++6.2, `cards_drawn` +0.35. Win rate moves against them: `damage` -0.29,
+`opponents_killed` -0.0075. **Follow win rate** (§0t): more of the board
+is not more of the game.
+
+**IN PROGRESS.** The guarded run's identity check found ONE game of 12,551
+moved where no Wave resolved in either leg (the unguarded run: 0). The
+guard decides without a Wave resolving -- a held cast in A, a cast in B
+that was countered -- so the reach is now `wave_casts,wave_guard_held`,
+re-run. And why the text loses to the tutor is not yet shown:
+`diagnostics/diag_genesis_wave.py` reads it apart (the mill against the
+reveal, and how often the mill takes a permanent above the fixed X).
+
+**What this is NOT**: the old rule was a CEILING on the Wave's quality
+(§0z209), so a lower number is the text's, not a reason to keep the old
+rule. And the fixed X is now load-bearing: at X=6 the reveal mills
+Craterhoof, Avenger, Terastodon, Kozilek and Ulamog, where a pilot with
+the mana would cast it bigger (§0z197 A7). Kozilek's and Ulamog's "shuffle
+your graveyard into your library" is unmodelled (on record, §0z209), so
+milling one is a FLOOR.
 
 ## How to read an ablation table
 

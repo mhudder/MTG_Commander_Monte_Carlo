@@ -35,6 +35,10 @@ reasons are no longer true, and 6 piloting choices are unstated policy.**
 
 ### 1. Genesis Wave tutors the library instead of revealing its top
 
+> **FIXED 2026-11-15 (§0z210)**: the top six revealed, every permanent of
+> mana value 6 or less put in, the rest milled; `genesis_wave_reveal=False`
+> restores the old rule. Item 3 (no ETB) still holds for what it puts in.
+
     "Reveal the top X cards of your library. You may put any number of
     permanent cards with mana value X or less from among them onto the
     battlefield. Then put all cards revealed this way that weren't put onto
