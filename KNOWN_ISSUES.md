@@ -260,6 +260,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
 | [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
 | [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
+| [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18490,6 +18491,50 @@ reasons changed, and every numeric row is identical as a set; the other
 five active tables re-render byte for byte. Items 1-6 (Tempting Contract,
 Grudge Keeper, Custodi Squire, the Greaves blinks among them) stay
 SCRIPTED: a label cannot fix a ceiling.
+
+<a id="0z208"></a>
+
+## 0z208. OPEN -- shilgengar's oracle re-audit: three behaviours against the text, thirteen SCRIPTED labels too strong
+
+**The owner, 2026-11-15: "fix the labels, then audit shilgengar"** -- the
+second of queue item 46's audits. The whole finding is
+**`docs/ORACLE_AUDIT_SHILGENGAR.md`**: the staged list (one swap staged,
+-Vampiric Rites +Lyra, Archangel of Dawn), 65 entries and the lands the
+engine names, read against the code at `18be5f6`, oracle text from
+Scryfall the same day. **Nothing is measured and nothing is fixed.**
+
+The one card new since §0z116, Lyra, Archangel of Dawn, is right. The
+largest findings, numbered as in the file:
+
+- **1. Requiem Angel** ("another NON-SPIRIT creature") tests the token's
+  name, so Bloodghast (a Vampire Spirit, the deck's recurring fodder) and
+  Kokusho (a Dragon Spirit) each make a Spirit when they die. A ceiling;
+  `_evasion.CREATURE_SUBTYPES` holds the answer.
+- **2. Two landfall rules in `land_step`**: Bloodghast fires on any new
+  land, Emeria Shepherd on the land count rising, so Emeria misses a
+  cracked fetch's basic; neither sees Wayfarer's Bauble's land.
+- **3.** Combat lifelink is read at power after Archangel of Thune's and
+  Lyra's counters from the earlier lifelinkers landed. Small.
+- **4-15, thirteen SCRIPTED cards with a missing clause**: Viscera Seer's
+  scry (Woe Strider's gap), Cartel Aristocrat's protection, Priest of Fell
+  Rites' unearth, Resplendent Angel's pump, Giada's Angel mana, Mind
+  Stone's draw, Black Market Connections' modes, Voldaren Bloodcaster's
+  back face, Elesh Norn's -2/-2 on the bodies that survive it, Teferi's
+  Protection's round of protection, Flawless Maneuver's free cast, and
+  Massacre Wurm's and Sun Titan's ETBs on the deck's many returns.
+- **16-24, nine stale reasons**: **Serra's Emissary** says the model
+  "cannot tell which clock is one" -- since POD_V4 a combat route is one,
+  and Angel of Suffering already prevents it; Emissary's protection does
+  not. **Revel in Riches** says its Treasure-on-death clause is missing;
+  `on_pod_creature_deaths` implements it, and tivit labels the same card
+  SCRIPTED. Angel of Despair, of Serenity, of the Ruins, Angelic Arbiter
+  and Malakir Rebirth give reasons from the count pod; the derived wipe
+  and route-answer reasons are half true.
+- **25-29**: five piloting choices, every return picking the highest mana
+  value first.
+
+As for tivit (§0z207): moving the labels is a rendering change that does
+not wait on the rebuild; the behaviour fixes move shilgengar's baseline.
 
 ## How to read an ablation table
 
