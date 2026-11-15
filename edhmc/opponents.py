@@ -1050,7 +1050,11 @@ def commander_shrouded(g) -> bool:
     `protect_events=False` reads her as a shroud source again, the old rule.
     """
     keyed = g.cfg.get("protect_events", True)
-    return any(g.has(n) for n in g.cfg.get("shroud_sources", ())
+    # An engine that tracks WHERE its equipment is answers `shroud_attached`
+    # (tivit's Lightning Greaves, §0z216); every other reads presence.
+    attached = getattr(g, "shroud_attached", None)
+    return any(g.has(n) and (attached is None or attached(n))
+               for n in g.cfg.get("shroud_sources", ())
                if not (keyed and n in TAP_PROTECT))
 
 

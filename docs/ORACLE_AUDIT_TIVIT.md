@@ -38,6 +38,7 @@ upkeep (2), and Kambal's first ability (7).
 ### 1. Lightning Greaves' shroud and five TARGETED blinks, both at once
 
 > **HELD BY THE OWNER 2026-11-15 (§0z216)**: the owner's policy, written down, not measured.
+> **DECIDED AND BUILT 2026-11-15 (§0z216)**: Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`). Venser, Visionary Traveler's +1 is a sixth targeted blink this item missed.
 
     Lightning Greaves   "Equipped creature has haste and shroud. (It can't
                          be the target of spells or abilities.)"

@@ -119,6 +119,9 @@ CLASSES: dict[str, tuple[str, str]] = {
         "counterspells (§0z131, §0z134)"),
     "tivit.main_phase | 'blink' in c.tags and (not c.is_permanent) and (not g.has('Tivit, Seller of Secrets'))": (
         "WASTE_GUARD", "a one-shot blink with no Tivit to blink"),
+    "tivit.main_phase | 'blink' in c.tags and (not c.is_permanent) and (c.name in TARGETED_BLINKS) and greaves_rule(g) and g.greaves_on_tivit": (
+        "WASTE_GUARD", "a targeted one-shot blink while Greaves is stuck on "
+        "Tivit, no other creature to equip (§0z216)"),
     # --- lorehold -----------------------------------------------------------
     "lorehold._main_phase | c.is_land or hold_for_miracle(g, c)": (
         "SPECULATIVE", "hold_for_miracle: a spell worth `hold_min_value` as "

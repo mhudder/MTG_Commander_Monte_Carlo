@@ -268,7 +268,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
 | [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
 | [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
-| [0z216](#0z216) | OPEN | **Tivit's Lightning Greaves and five targeted blinks** (§0z207 item 1): shroud and the blinks both at once, a ceiling on six cards. The owner's policy; HELD 2026-11-15, nothing measured |
+| [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19012,7 +19012,50 @@ that holds it. The fixes stand as the text's, not as numbers.
 
 <a id="0z216"></a>
 
-## 0z216. OPEN -- tivit's Lightning Greaves and five targeted blinks: the owner's call, held
+## 0z216. IMPLEMENTED -- tivit's Lightning Greaves and six targeted blinks: the owner's policy
+
+**THE OWNER'S DECISION, 2026-11-15 (later the same day)**: "greaves should
+be equipped to tivit only when the deck has no blink abilities in play or
+in hand." Built as `greaves_blink_policy` (default True; False is the old
+rule, BIT-IDENTICAL against `00bf581` on every deck at 400 seeds), pinned by
+`tests/test_greaves_policy.py` (ten cases, five mutations exact).
+
+**The text, re-read from Scryfall 2026-11-15, found a SIXTH targeted
+blink**: Venser, Visionary Traveler's "+1: Exile up to one other TARGET
+permanent you control" (a measured candidate, not in the list). Deadeye
+Navigator's granted "{1}{U}: Exile this creature" does not target and is
+the one blink that ignores Greaves. `tivit.TARGETED_BLINKS` is the six.
+
+**How the policy reads, each judgement said out loud**:
+
+- "A blink ability in play or in hand" (`blink_pending`): one of the six on
+  the battlefield or in hand, or Ephemerate armed on its rebound -- the
+  exiled card casts in the upkeep, when Greaves cannot move. Deadeye is not
+  counted: its blink does not conflict with shroud.
+- Greaves moves only at sorcery speed (equip {0}; `greaves_step`, at each
+  pick of `main_phase` and through `activations`), never in the upkeep,
+  the end step or the pod's turns. Moving it OFF needs another creature to
+  equip ("Attach to target creature you control"); with none, it stays on
+  Tivit, and a targeted blink cannot choose Tivit -- the end-step blinks
+  and the rebound are refused, Venser's +1 exiles nothing, and Ephemerate
+  is not cast. Where Greaves goes instead is not modelled (its shroud on
+  that creature is a floor).
+- The pod's removal reads shroud only while Greaves is attached
+  (`TivitGame.shroud_attached`, which `opponents.commander_shrouded` asks
+  of any engine that defines it; the others read presence, unchanged).
+- Tivit cast from the command zone has haste only if the policy equips
+  Greaves as it lands.
+- Any blink returns a new object, so Greaves falls off (CR 400.7) and is
+  re-equipped at the next sorcery-speed point the policy allows -- after
+  Deadeye's loop, in the same main phase. A blinked Tivit's summoning
+  sickness is still not reset (§0z207 item 29, a small ceiling, unchanged).
+
+Reach counters: `greaves_moved_off`, `greaves_shroud_withheld`,
+`greaves_haste_withheld`, `greaves_blinks_refused`,
+`greaves_ephemerate_held`. A smoke run (N=1,000) reached 10.5% of games and
+the other 895 were identical in both legs.
+
+**What follows is the section as it was written before the decision.**
 
 **The owner, 2026-11-15: "hold off on that, write it to the known
 issues".** This is §0z207 item 1 (`docs/ORACLE_AUDIT_TIVIT.md`), the one

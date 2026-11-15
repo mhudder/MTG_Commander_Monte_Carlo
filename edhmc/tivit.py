@@ -89,6 +89,7 @@ class TivitGame(BaseGame):
         self.extra_turns = 0
         self.illusion_active = False
         self.ephemerate_rebound = 0     # turn on which the rebound copy casts
+        self.greaves_on_tivit = False   # §0z216: Greaves attached to Tivit
         self.deadeye_paired = False
         self.cyberdrive_turn = -1       # turn Cyberdrive Awakener entered
         self.result = None
@@ -131,6 +132,10 @@ class TivitGame(BaseGame):
             "memnarch_draws": 0,
             "treasures_spent": 0, "clues_cracked": 0,
             "blinks": 0, "deadeye_activations": 0, "combo_iterations": 0,
+            # §0z216, the owner's Greaves policy -- its reach counters
+            "greaves_moved_off": 0, "greaves_shroud_withheld": 0,
+            "greaves_haste_withheld": 0, "greaves_blinks_refused": 0,
+            "greaves_ephemerate_held": 0,
             "tivit_triggers": 0, "extra_turns": 0,
             "sieve_activations": 0, "sieve_chain_max": 0, "sieve_real_fuel": 0,
             # `extra_turns` is turns GRANTED; these two are what was actually
@@ -196,6 +201,18 @@ class TivitGame(BaseGame):
             if "Artifact" in p.card.types:
                 n += 1
         return n
+
+    def shroud_attached(self, name) -> bool:
+        """`opponents.commander_shrouded`'s question (§0z216): is this
+        shroud source on Tivit right now? The old rule: whenever it is on
+        the battlefield."""
+        if name != "Lightning Greaves" or not greaves_rule(self):
+            return True
+        if self.greaves_on_tivit and self.has("Tivit, Seller of Secrets"):
+            return True
+        if self.has("Tivit, Seller of Secrets"):
+            self.m["greaves_shroud_withheld"] += 1
+        return False
 
     def on_pod_creature_deaths(self, o, n):
         """The `opponents.kill_pod_bodies` hook (item 24, change 1)."""
@@ -594,10 +611,82 @@ def tivit_dilemma(g):
     make_token(g, "Clue", theirs)
 
 
+# §0z216. The six blinks whose text TARGETS (Scryfall, 2026-11-15): Lightning
+# Greaves' shroud stops each from choosing Tivit. Deadeye Navigator's granted
+# "{1}{U}: Exile this creature" does not target, and is not here.
+TARGETED_BLINKS = ("Ephemerate", "Soulherder", "Teleportation Circle",
+                   "Conjurer's Closet", "Displacer Kitten",
+                   "Venser, Visionary Traveler")
+
+
+def greaves_rule(g) -> bool:
+    """`greaves_blink_policy` (§0z216, the owner, 2026-11-15). False is the
+    old rule exactly: Greaves' shroud for as long as it is on the
+    battlefield, haste on the turn Tivit lands, and every blink still
+    targets Tivit -- both halves at once, a ceiling."""
+    return g.cfg.get("greaves_blink_policy", True)
+
+
+def greaves_blocks(g, source) -> bool:
+    """Greaves' shroud stops this blink from choosing Tivit (§0z216)."""
+    return (greaves_rule(g) and source in TARGETED_BLINKS
+            and g.greaves_on_tivit)
+
+
+def blink_pending(g) -> bool:
+    """A targeted blink in play, in hand, or armed on Ephemerate's rebound
+    -- "a blink ability in play or in hand", the owner's words. Rebound is
+    counted: the exiled card casts at the next upkeep, when Greaves cannot
+    be moved (equip is sorcery speed)."""
+    if g.ephemerate_rebound:
+        return True
+    if any(g.has(n) for n in TARGETED_BLINKS):
+        return True
+    return any(c.name in TARGETED_BLINKS for c in g.hand)
+
+
+def greaves_step(g) -> None:
+    """THE OWNER'S POLICY (§0z216): "greaves should be equipped to tivit
+    only when the deck has no blink abilities in play or in hand."
+
+    Called at the sorcery-speed points of your turn (each pick of
+    `main_phase`, `activations`): equip {0} is sorcery speed, so Greaves
+    does not move in the upkeep, the end step or the pod's turns. Moving it
+    OFF Tivit needs another creature you control to equip ("Attach to
+    target creature you control") -- with none, Greaves stays on Tivit and
+    the targeted blinks lose their target. Where it goes instead is not
+    modelled: its shroud on that creature is a floor."""
+    if not greaves_rule(g):
+        return
+    if not (g.has("Lightning Greaves")
+            and g.has("Tivit, Seller of Secrets")):
+        g.greaves_on_tivit = False
+        return
+    if not blink_pending(g):
+        g.greaves_on_tivit = True            # equip {0}
+    elif g.greaves_on_tivit and any(
+            OPP.is_creature_now(g, p) for p in g.board
+            if p.card is not g.commander):
+        g.greaves_on_tivit = False
+        g.m["greaves_moved_off"] += 1
+
+
 def blink_tivit(g, source):
-    """Exile and return Tivit: a fresh ETB, so a fresh dilemma."""
+    """Exile and return Tivit: a fresh ETB, so a fresh dilemma.
+
+    §0z216: under `greaves_blink_policy` a TARGETED blink cannot choose a
+    Tivit that Lightning Greaves is attached to (shroud), and any blink
+    returns a new object, so Greaves falls off (CR 301.5c, 400.7)."""
     if not g.has("Tivit, Seller of Secrets"):
         return False
+    if greaves_rule(g):
+        # Venser TARGETS at its +1 in `walker_step`; the end-step return
+        # does not target, so it is gated there, not here.
+        if (source != "Venser, Visionary Traveler"
+                and greaves_blocks(g, source)):
+            g.m["greaves_blinks_refused"] += 1
+            return False
+        g.greaves_on_tivit = False
     g.m["blinks"] += 1
     venser_counters(g)
     tivit_dilemma(g)
@@ -782,6 +871,7 @@ def main_phase(g):
     list is either a payoff for its trigger or a way to re-trigger it.
     """
     while True:
+        greaves_step(g)                  # sorcery speed, §0z216
         if not g.commander_cast:
             ccost = dict(g.commander.cost)
             ccost["gen"] = ccost.get("gen", 0) + g.commander_tax
@@ -793,8 +883,19 @@ def main_phase(g):
                     g.m["countered"] += 1
                     g.commander_tax += 2
                     continue
-                g.board.append(Permanent(card=g.commander,
-                                         sick=not g.has("Lightning Greaves")))
+                if greaves_rule(g):
+                    # §0z216: Greaves is equipped as Tivit lands only if
+                    # the policy allows it -- else no haste either.
+                    g.board.append(Permanent(card=g.commander, sick=True))
+                    g.greaves_on_tivit = False
+                    greaves_step(g)
+                    g.board[-1].sick = not g.greaves_on_tivit
+                    if g.has("Lightning Greaves") and not g.greaves_on_tivit:
+                        g.m["greaves_haste_withheld"] += 1
+                else:
+                    g.board.append(Permanent(
+                        card=g.commander,
+                        sick=not g.has("Lightning Greaves")))
                 venser_counters(g)       # cast from the command zone, §0z74
                 g.commander_cast = True
                 g.m["spells_cast"] += 1
@@ -822,6 +923,13 @@ def main_phase(g):
             # threw the card away on turn one.
             if "blink" in c.tags and not c.is_permanent \
                     and not g.has("Tivit, Seller of Secrets"):
+                continue
+            # §0z216: Greaves stuck on Tivit (no other creature to move it
+            # to) leaves a targeted one-shot blink no target worth a card.
+            if ("blink" in c.tags and not c.is_permanent
+                    and c.name in TARGETED_BLINKS and greaves_rule(g)
+                    and g.greaves_on_tivit):
+                g.m["greaves_ephemerate_held"] += 1
                 continue
             # §1b: every way the card can be cast, not just the printed
             # cost. No card in this list declares one today; the point is
@@ -1632,19 +1740,23 @@ def activations(g):
     block additionally gated on `commander_cast` rather than on Tivit being
     present, which would have thrown the card away after a wipe.
     """
+    greaves_step(g)                  # sorcery speed, §0z216
     deadeye_loop(g)
     if g.result is not None:
         return
+    greaves_step(g)                  # re-equip after Deadeye's blinks
 
     time_sieve(g)
     if g.result is not None:
         return
 
+    greaves_step(g)
     walker_step(g)                   # Dyfed / Venser, §0z74
     if g.result is not None:
         return
 
     crack_clues(g, 3)
+    greaves_step(g)                  # the last sorcery-speed point
 
 
 def make_powerstones(g, n) -> int:
@@ -1723,6 +1835,11 @@ def walker_step(g) -> None:
             continue
         perm.counters += 1
         if g.has("Tivit, Seller of Secrets") and not g.venser_return:
+            if greaves_blocks(g, "Venser, Visionary Traveler"):
+                g.m["greaves_blinks_refused"] += 1   # shroud: not a target
+                continue
+            if greaves_rule(g):
+                g.greaves_on_tivit = False       # exiled: Greaves falls off
             g.venser_return = True
             g.m["venser_exiles"] += 1
 

@@ -39,10 +39,12 @@ items below this section are in the order they were queued, not this one.
    Ask; do not choose. It moves tivit's baseline, so it is asked before
    step 3.
    **ASKED 2026-11-15 AND HELD BY THE OWNER ("hold off on that, write it
-   to the known issues")**: written down as §0z216, nothing measured. Do not
-   start it unasked.
+   to the known issues")**: written down as §0z216, nothing measured.
+   **DECIDED BY THE OWNER LATER THE SAME DAY AND BUILT (§0z216)**: "greaves
+   should be equipped to tivit only when the deck has no blink abilities in
+   play or in hand" -- `greaves_blink_policy`, the default.
 3. **Item 44's one rebuild** (`parallel-rebuild`). **HELD BY THE OWNER
-   since 2026-11-14: do not start it unasked.** Until it runs the six
+   since 2026-11-14; CALLED BY THE OWNER 2026-11-15**, after step 2. Until it runs the six
    caches are SUSPECT and `check_docs` fails on that one check, which is
    expected and is said in each commit. Never `--verified`.
 4. **Item 48: re-measure what was decided on the old pod**, on the
@@ -447,7 +449,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       rules in `land_step` (2); combat lifelink read after the counters
       land (3); and item 37's timing pair -- Black Market Connections at
       the first main phase, `activations` inside main 2.
-    - **THE OWNER'S, ask first**: tivit's Lightning Greaves (1). Shroud
+    - **DONE 2026-11-15 (§0z216), the owner's policy**: tivit's Lightning Greaves (1). Shroud
       protects Tivit while five targeted blinks still target it. Whether
       Greaves stays on Tivit (and the blinks lose their best target) or
       comes off is a piloting policy; measure both and bring the numbers.
