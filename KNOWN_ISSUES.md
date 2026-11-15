@@ -266,7 +266,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
-| [0z214](#0z214) | OPEN | **Tivit's cards by their text** (item 47, §0z207 items 2-6, 8; Nightblade's life): six switches, each measured alone and together; in progress |
+| [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18899,7 +18899,7 @@ proposal is unchanged; another cut is the owner's.
 
 <a id="0z214"></a>
 
-## 0z214. OPEN (in progress) -- tivit's cards by their text
+## 0z214. FIXED -- tivit's cards by their text
 
 **The owner, 2026-11-15: "go ahead with tivit's fixes"** -- queue item
 47's tivit batch, §0z207's behaviour items 2-6 and 8. Oracle text re-read
@@ -18930,10 +18930,25 @@ seeds 5000.., each switch on (A) against off (B), the rest at default:
 
 | switch | T10 | T20 | identity |
 |---|---|---|---|
+| `tempting_contract_text` | -0.0073 ±0.0022 | -0.0075 ±0.0026 | 0 of 12,275 |
 | `grudge_each` | +0.0007 ±0.0016 | +0.0021 ±0.0019 | 0 of 12,364 |
+| `tivit_death_triggers` | +0.0006 ±0.0006 | +0.0008 ±0.0008 | 0 of 9,254 |
 | `nightblade_life` | +0.0027 ±0.0009 | +0.0061 ±0.0014 | 0 of 12,438 |
 | `pile_text` | +0.0000 ±0.0000 | +0.0000 ±0.0000 | 0 of 14,246 |
 | `custodi_vote` | -0.0033 ±0.0011 | -0.0033 ±0.0018 | 0 of 12,916 |
+| **all six together** | **-0.0063 ±0.0030** | **-0.0026 ±0.0038** | 0 of 4,122 |
+
+The two ceilings come down, as §0z207 read them: the Contract's Treasure
+an upkeep (-0.0074 at both horizons; -0.040 in the 18% of games with the
+Contract out) and Custodi's best card handed back against the vote. The
+floors come up: Nightblade's life is the largest single fix in the batch
+(+0.0061 at T20, `final_life` +2.4 a game together), and the deaths now
+heard are worth little (`artifact_deaths_heard` 0.48 a game,
+`nightblade_creature_tokens` 0.06, Portal's tokens 0.04). Grudge Keeper
+spread across the voters is +0.0021 at T20, inside its bar at T10 --
+the same total loss, at three players rather than the one nearest dying.
+Together the batch is significant at T10 only; at T20 the floors and
+ceilings roughly cancel.
 
 `pile_text` is a null in win rate, not a patch that failed to apply: the
 754 games that convert the pile move (`token_drain` -9.0, `artifact_drain`
@@ -18941,14 +18956,14 @@ seeds 5000.., each switch on (A) against off (B), the rest at default:
 reaching Time Sieve), but the pile is converted only at `combo_cap`, in
 games already won -- the audit's prediction.
 
-**IN PROGRESS**: `tempting_contract_text`, `tivit_death_triggers` and all
-six together. Their first runs (-0.0073 / -0.0075; +0.0006 / +0.0008;
--0.0063 / -0.0026) failed the identity check, 154, 14 and 46 games, and
-the reach was the cause: `offers_taken` stays 0 in an upkeep nobody takes
-the Contract's offer, where the old rule still made a Treasure; and
-Portal's carnage counts its creature tokens without either counter. Both
-now have a counter (`contract_upkeeps`, `portal_creature_tokens`), and
-the three are re-run.
+**The identity check, first run**: the Contract, the death triggers and
+all six failed it (154, 14 and 46 games), and the REACH was the cause, not
+the rules: `offers_taken` stays 0 in an upkeep nobody takes the Contract's
+offer, where the old rule still made a Treasure, and Portal's carnage
+counts its creature tokens without either death counter. Each has a
+counter now (`contract_upkeeps`, `portal_creature_tokens`), the switch off
+still hashes to `19d05ce`'s output, and the re-runs are clean, with the
+same win rates.
 
 ## How to read an ablation table
 

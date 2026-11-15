@@ -425,7 +425,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       **DONE 2026-11-15**: items 6, 7, 9 to PARTLY, Tier 3's reasons
       corrected, the table re-rendered. **Azusa's part of this batch is
       done.**
-    - **tivit**: Tempting Contract makes `1 + takers` Treasures where the
+    - **tivit**: **DONE 2026-11-15 (§0z214)** -- items 2-6 and 8 below,
+      each behind its own switch, plus Nadier's Nightblade's life (found
+      re-reading the text); together -0.0063 / -0.0026. Was: Tempting
+      Contract makes `1 + takers` Treasures where the
       card gives `takers` (2); Grudge Keeper puts all its damage on one
       opponent where each voter loses 2 (3); `on_creature_death` is a
       no-op, so Nadier's Nightblade, Disciple of the Vault and Marionette

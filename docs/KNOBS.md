@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `19d05ce` from 32 engine sources.
+Derived at `526031e` from 32 engine sources.
 
 **416 knobs, 623 call sites.**
 

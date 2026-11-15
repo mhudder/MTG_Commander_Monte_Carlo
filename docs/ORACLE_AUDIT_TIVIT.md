@@ -58,6 +58,8 @@ gate `blink_tivit`'s targeted sources on it.
 
 ### 2. Tempting Contract makes one Treasure too many, every upkeep
 
+> **FIXED 2026-11-15 (§0z214)**: `tempting_contract_text`=False restores the old rule.
+
     "At the beginning of your upkeep, each opponent may create a Treasure
     token. For each opponent who does, you create a Treasure token."
 
@@ -71,6 +73,8 @@ SCRIPTED label claims the text.
 
 ### 3. Grudge Keeper's loss lands on one player
 
+> **FIXED 2026-11-15 (§0z214)**: `grudge_each`=False restores the old rule.
+
     "Whenever players finish voting, each opponent who voted for a choice
     you didn't vote for loses 2 life."
 
@@ -82,6 +86,8 @@ text would not: a ceiling on kills, a floor on spread damage.
 
 ### 4. Converting the pile counts Kambal as a drain
 
+> **FIXED 2026-11-15 (§0z214)**: `pile_text`=False restores the old rule.
+
 `convert_the_pile` sacrifices the whole pile when any of five "drains" is
 out, and Kambal, Profiteering Mayor is one of them. Kambal's triggers are
 on tokens ENTERING; `sacrifice_tokens` does not read it. With Kambal the
@@ -91,6 +97,8 @@ floor direction.
 
 ### 5. The pile is sacrificed for free
 
+> **FIXED 2026-11-15 (§0z214)**: `pile_text`=False restores the old rule.
+
 The same branch sacrifices every Clue, Food and Powerstone. Clue: "{2},
 Sacrifice this artifact: Draw a card." Food: "{2}, {T}, Sacrifice". A
 Powerstone has no sacrifice ability at all ("{T}: Add {C}. This mana can't
@@ -99,6 +107,8 @@ A CEILING, but a small one in practice: the branch runs only once the loop
 reached `combo_cap`, where the Treasures alone are usually lethal.
 
 ### 6. Custodi Squire ignores its own vote
+
+> **FIXED 2026-11-15 (§0z214)**: `custodi_vote`=False restores the old rule.
 
     "Will of the council — ... each player votes for an artifact, creature,
     or enchantment card in your graveyard. Return each card with the most
@@ -126,7 +136,8 @@ each card below the claim is false, and the row is a floor read as evidence.
    You Can't Refuse -- and each copy is a token you create (Kambal's second
    ability, Mirkwood Bats, Academy Manufactor and Anointed Procession on a
    Treasure). A floor, possibly a large one.
-8. **Nadier's Nightblade, Disciple of the Vault, Marionette Master** -- the
+8. **FIXED 2026-11-15 (§0z214, `tivit_death_triggers`)**; and Nightblade's
+   life, modelled nowhere, with it (`nightblade_life`). Was: **Nadier's Nightblade, Disciple of the Vault, Marionette Master** -- the
    deaths they never hear. `TivitGame.on_creature_death` is `pass` ("no
    death payoffs in this list"), and `opponents.destroy` reports every
    death of yours through it. So a creature TOKEN that dies in combat (A1,
