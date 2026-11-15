@@ -20,11 +20,43 @@ What is closed and where it went:
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
   2026-10-10".
 
-**Order of work (the owner, 2026-11-12): item 44 first** -- §0z197's A1 and
-A2, tested step by step, with **no table rebuilt until that batch is done**.
-**The batch's defaults are FLIPPED and the pod re-fitted (§0z204,
-2026-11-14), and the policy re-read is done (§0z205)**; what is left of item
-44 is the one rebuild.
+## Order of work
+
+**Start here.** Set on 2026-11-15, when the owner asked for both reviews
+(§0z192, §0z197) to be checked against the work since and the rest put in
+priority order. It replaces "item 44 first" (the owner, 2026-11-12): item
+44's batch is flipped, re-fitted and re-read (§0z204, §0z205), and only
+its rebuild is left. **The order is a recommendation the owner asked to
+have written down; each step that is the owner's to call says so.** The
+items below this section are in the order they were queued, not this one.
+
+1. **Item 47: the behaviour fixes that move a baseline, BEFORE the
+   rebuild.** The only step with a deadline: after the rebuild each one
+   costs its deck a second rebuild.
+2. **Item 47's owner decision: where Lightning Greaves sits in tivit.**
+   Ask; do not choose. It moves tivit's baseline, so it is asked before
+   step 3.
+3. **Item 44's one rebuild** (`parallel-rebuild`). **HELD BY THE OWNER
+   since 2026-11-14: do not start it unasked.** Until it runs the six
+   caches are SUSPECT and `check_docs` fails on that one check, which is
+   expected and is said in each commit. Never `--verified`.
+4. **Item 48: re-measure what was decided on the old pod**, on the
+   rebuilt tables.
+5. **Item 45: decide A3, then A6 and A5.** A3 is the largest limit left.
+6. **Card work that does not move a decision already made** (item 46's
+   list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
+   first, since it guards the commander. Any time; after step 3 each
+   staged card rebuilds its own deck (§0z27).
+7. **Item 49: the small cleanups.**
+8. **When the owner picks them back up**: item 28 (paused), item 29's
+   leftovers, item 32. Item 34's deletes are the owner's, on github.com.
+   Items 18 and 5 wait on trostani (SUSPENDED).
+
+**Before starting any step**, run the gates and compare with the last
+session's: `python -m tests` and `--mutate`, `python -m tools.validate`
+(`+0.00` on every metric; `pip install -r requirements.txt` first, a fresh
+cloud container has no scipy), `python -m edhmc.pending`, and
+`python -m tools.check_docs` (the cache check alone failing, see step 3).
 
 ---
 
@@ -196,7 +228,8 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     main 2 and Black Market Connections at the first main phase (7); first
     and double strike, with Sunhome (6), which waits on attackers that can
     die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
-    write down, not a bug.
+    write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
+    batch**, since it moves the baseline.
 
 44. **A1 AND A2 OF §0z197, FIRST (the owner, 2026-11-12): your attackers
     can die to blockers, and you block.**
@@ -337,7 +370,8 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     A5 (walkers never attacked) follows A2 naturally -- the pod's declared
     attack can name one. A7 has a concrete defect inside it: azusa's Chord
     of Calling (fixed X=4, no convoke) against trostani's convoke and X
-    plan, the same card under two rules. After item 44.
+    plan, the same card under two rules. After item 44. **Chord is in
+    item 47's batch; A3, A6 and A5 are step 5 of the order of work.**
 
 46. **C-E of §0z197: the cheap ones, no rebuild. THE CHEAP HALF IS DONE
     (§0z206, 2026-11-14)**: Woe Strider is PARTLY_MODELLED; D's stale
@@ -358,3 +392,99 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     deathtouch, an animated land's reach and indestructible, Nissa's
     emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any
     time; none waits on item 44.
+    **The behaviour findings are collected, in order, in item 47**
+    (2026-11-15), with azusa's labels; the card work stays here.
+
+47. **THE PRE-REBUILD BEHAVIOUR BATCH (order of work, step 1).** The
+    findings of the three oracle re-audits (§0z207, §0z208, §0z209) and of
+    §0z184 and §0z197 where the engine plays a card AGAINST its text and
+    the fix moves the deck's baseline. Collected from items 46, 37 and 45
+    so that one session can take them; those items keep the rest. The
+    numbers in brackets are each audit file's own
+    (`docs/ORACLE_AUDIT_<DECK>.md`), which has the code site and the text.
+    **Nothing here is measured**: a size below is the audit's reading of
+    the text, not a win rate.
+
+    In this order (largest reading of the text first, per deck):
+
+    - **azusa**: Genesis Wave tutors the three biggest permanents in the
+      whole library where the text reveals the top X (1); Animist's
+      Awakening takes the first four lands anywhere where the text
+      averages 1.7 from the top four (2); a tutored or Waved creature
+      fires no ETB -- `AzusaGame.etb` is called by `resolve` and
+      Springheart's copy only (3); Chord of Calling at a fixed X=4 with no
+      convoke, against trostani's `convoke_pool` and `x_plan` for the same
+      card (8, §0z197 A7; grep both engines, §0u). Then azusa's four
+      labels (6-9), a rendering change: tivit's and shilgengar's are done.
+    - **tivit**: Tempting Contract makes `1 + takers` Treasures where the
+      card gives `takers` (2); Grudge Keeper puts all its damage on one
+      opponent where each voter loses 2 (3); `on_creature_death` is a
+      no-op, so Nadier's Nightblade, Disciple of the Vault and Marionette
+      Master never hear a creature die -- and creatures die in combat
+      since item 44 (8); `convert_the_pile` and Custodi Squire (4-6).
+    - **shilgengar**: Requiem Angel tests the token's name, so Bloodghast
+      and Kokusho, both Spirits, each make a Spirit
+      (1; `_evasion.CREATURE_SUBTYPES` has the answer); the two landfall
+      rules in `land_step` (2); combat lifelink read after the counters
+      land (3); and item 37's timing pair -- Black Market Connections at
+      the first main phase, `activations` inside main 2.
+    - **THE OWNER'S, ask first**: tivit's Lightning Greaves (1). Shroud
+      protects Tivit while five targeted blinks still target it. Whether
+      Greaves stays on Tivit (and the blinks lose their best target) or
+      comes off is a piloting policy; measure both and bring the numbers.
+
+    **How each fix lands** -- the form every fix since §0z42 has taken:
+
+    - Read the oracle text from Scryfall again; the audit is dated.
+    - A cfg switch that restores the old rule exactly, and the new rule
+      the default: the caches are already SUSPECT for a real reason, so
+      there is nothing to keep bit-identical for. Prove the switch OFF
+      plays the commit before it, every output key hashed (§0z32).
+    - A pinned mechanism test with its mutation mode, the expected set
+      written before the run (§0z11); `python -m tests` and `--mutate`.
+    - `tools.validate` at `+0.00`, before and after.
+    - A paired on/off run on the one deck, N 6,000 or more, T10 and T20:
+      win rate with its bar, every output key that moved, and the
+      mechanism counter that should move (§0z172). A fix that makes a new
+      outcome possible gets the naive pilot measured too (§0z42).
+    - A new `§` in `KNOWN_ISSUES.md` per deck with the numbers; the
+      audit file's STATUS block updated; `tools.knobs --write`.
+    - **No table is rebuilt** (item 44's protocol still holds), and no
+      cache is cleared with `--verified`.
+
+    Blind to (§0z15): rendmaw, lorehold and karlov were last audited on
+    2026-09-03, before POD_V4 and item 44. Tivit's list had not changed
+    either and its audit found 29 items. Re-auditing those three before
+    the rebuild is the owner's call; it is not in this batch.
+
+48. **AFTER THE REBUILD: what was decided on the old pod (order of work,
+    step 4).** Every decision below was measured before item 44's flip
+    (§0z204), on a pod where attacking was free and nobody blocked.
+    - The eleven staged swaps (`python -m edhmc.pending`): one paired
+      `run_ab` each on the new default, N=15,000, both horizons, as §0z81
+      did after the last engine change of this size. A swap inside its
+      bar goes to the owner as that, not as a withdrawal.
+    - The adopted priority moves of item 18 (karlov, tivit, Time Sieve):
+      swept on the formula pod (§0z205 says so). Re-run
+      `diagnostics/run_priority_sweep.py` on fresh seeds (§0z170).
+    - Read the rebuilt tables for the cards item 44 made live (its "text
+      it makes live" list): a row that did not move is the tell of a
+      mechanism that does not fire (check the counters first).
+    - The noise floors: the CRN factor fell from ~15x to ~7x at the flip
+      (§0z204), so expect wider bars at the same N. If the floors are too
+      wide to read, that is a finding for the owner, not a reason to
+      change N in one place.
+
+49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205:
+    - `goad_block_share` is still a count share for rendmaw's goaded
+      Birds although rivals block with bodies since §0z200: the same
+      combat under two rules. Rendmaw only; moves its baseline, so it
+      joins item 47 if a session has room, else it costs a rebuild.
+    - Six knobs moved 0 games on both pods at N=300 (`block_rate`,
+      `monarch_loss_scale`, `monarch_attack_floor`, `crown_loss_ends_chip`,
+      `gingerbrute_keep`, `zuran_keep`) and three were retired by the flip
+      (`blocker_toughness`, `pod_block_policy`, `pod_blocker_deaths`).
+      300 games is not a proof (§0z126): confirm at 2,000+, then either
+      delete the dead branch or mark the knob in `docs/KNOBS.md`'s source.
+    - Azusa's `counter_target` is unreached by its list: re-measure when
+      Bristly Bill or Dancing from Dark to Dawn is proposed, not before.
