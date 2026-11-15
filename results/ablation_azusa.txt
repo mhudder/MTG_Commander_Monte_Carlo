@@ -65,11 +65,9 @@ Realms Uncharted                      +1.28+-0.19         +1.09+-0.21        +0.
 Animist's Awakening                   +1.03+-0.15         +0.97+-0.17        +0.0101+-0.0028      both
 Seek the Horizon                      +0.91+-0.16         +0.97+-0.19        +0.0095+-0.0031      both
 Quirion Ranger                        +1.00+-0.17         +0.90+-0.18        +0.0095+-0.0030      both
-Journey of Discovery                  +0.88+-0.17         +0.89+-0.19        +0.0087+-0.0032      both
 Crucible of Worlds                    +1.31+-0.21         +0.97+-0.22        +0.0085+-0.0034      both
 Regrowth                              +0.52+-0.17         +0.58+-0.18        +0.0083+-0.0029      both
 Kodama's Reach                        +1.04+-0.19         +0.89+-0.21        +0.0078+-0.0035      both
-Nylea's Intervention                  +0.74+-0.15         +0.78+-0.17        +0.0078+-0.0030      both
 Cultivate                             +0.97+-0.20         +0.91+-0.21        +0.0075+-0.0035      both
 Ashaya, Soul of the Wild              +0.63+-0.15         +0.65+-0.17        +0.0073+-0.0030      both
 Augur of Autumn                       +0.74+-0.20         +0.64+-0.22        +0.0066+-0.0037      both
@@ -79,7 +77,6 @@ Chord of Calling                      +0.47+-0.12         +0.52+-0.14        +0.
 Exploration                           +0.63+-0.20         +0.41+-0.21        +0.0037+-0.0033      both
 Titania, Protector of Argoth          +0.76+-0.16         +0.75+-0.18        +0.0035+-0.0031      both
 Eternal Witness                       +0.49+-0.13         +0.42+-0.15        +0.0033+-0.0028      both
-Sylvan Awakening                      +0.29+-0.06         +0.30+-0.07        +0.0025+-0.0014      both
 Abundance                             +0.27+-0.15         +0.08+-0.17        -0.0015+-0.0029        --
 Seer's Sundial                        -0.32+-0.19         -0.38+-0.21        -0.0029+-0.0035       dmg
 
@@ -89,14 +86,19 @@ Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
 Ulamog, the Infinite Gyre             +0.77+-0.10         +1.38+-0.15        +0.0204+-0.0029      both
-      MISSING: the cast trigger 'destroy target permanent' (an opponent's
-      permanent, BLIND under §4) and the graveyard shuffle Kozilek also has.
-      Indestructible and annihilator (approximated) are modelled.
+      MODELLED: indestructible; annihilator 4 as Kozilek's, the same
+      approximation. MISSING: the cast trigger 'destroy target permanent' --
+      MODELABLE since the pod's route pieces are permanents (POD_V4), as
+      shilgengar's Angel of Despair -- and the graveyard shuffle Kozilek also has.
+      A floor on both.
 Kozilek, Butcher of Truth             +1.08+-0.14         +1.25+-0.17        +0.0176+-0.0031      both
-      MISSING: 'When Kozilek is put into a graveyard from anywhere, its owner
-      shuffles their graveyard into their library' -- a death, mill or discard
-      puts it and the yard's lands in the graveyard to stay. Annihilator is an
-      abstract-count approximation (§4).
+      MODELLED: the cast draw; annihilator 4 as the defender's four smallest
+      BODIES sacrificed, each a death (`kill_pod_count`). APPROXIMATE: the
+      defender is the opponent on the least life, not the one attacked, and its
+      route pieces are never among the four. MISSING: 'When Kozilek is put into a
+      graveyard from anywhere, its owner shuffles their graveyard into their
+      library' -- a death, mill or discard puts it and the yard's lands in the
+      graveyard to stay (a Genesis Wave mills it since §0z210).
 Sylvan Scrying                        +1.39+-0.24         +1.40+-0.25        +0.0141+-0.0038      both
       MODELLED: a land to hand, `AzusaGame.land_rank`'s: a fetch, then green, then
       untapped. NOT: the utility lands' own abilities as a reason to fetch them
@@ -120,12 +122,22 @@ Krosan Grip                           +0.62+-0.15         +1.00+-0.18        +0.
       noncreature permanents beyond its routes, which are not objects (§4). The
       delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
+Journey of Discovery                  +0.88+-0.17         +0.89+-0.19        +0.0087+-0.0032      both
+      MODELLED: the first mode, two basic lands to hand. NOT: 'You may play up to
+      two additional lands this turn', nor entwine {2}{G} -- in a deck whose
+      engine is land drops, the mode an Azusa pilot casts it for (item 6). A
+      floor.
 Crop Rotation                         +1.05+-0.25         +0.81+-0.26        +0.0085+-0.0041      both
       MODELLED: a tapped land sacrificed (a land death: the graveyard, Titania)
       for `land_rank`'s land onto the battlefield, a fetch cracked at once -- two
       or three landfall triggers for {G}. NOT: fetching a utility land for its
       ability, or a land that answers the table (§4); the sacrifice is taken at
       resolution. A floor.
+Nylea's Intervention                  +0.74+-0.15         +0.78+-0.17        +0.0078+-0.0030      both
+      MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: 'up to X
+      LAND cards' (a utility land is one), nor the mode that deals twice X damage
+      to each creature with flying -- MODELABLE against the pod's flier bodies
+      since item 44 (item 7). A floor.
 Terastodon                            +0.44+-0.09         +0.67+-0.13        +0.0077+-0.0023      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
@@ -136,16 +148,23 @@ Terastodon                            +0.44+-0.09         +0.67+-0.13        +0.
       delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Bane of Progress                      +0.34+-0.12         +0.24+-0.13        +0.0041+-0.0024      both
-      The wipe destroys only YOUR OWN artifacts and enchantments, because
-      opponents own no permanent objects in this project (§4). Its negative score
-      is a ONE-SIDED WIPE WITH THE SIDEDNESS REMOVED -- the cost with none of the
-      benefit. §0z2.
+      MODELLED: the ETB destroys YOUR OWN artifacts and enchantments (and fires
+      when a tutor or Genesis Wave puts it in, §0z212). NOT: the pod's artifact
+      and enchantment route pieces -- MODELABLE since POD_V4, as Angel of the
+      Ruins -- nor your off-board Treasures, Clues and Food (§0z209 item 5). Its
+      score is the cost with none of the benefit, a ONE-SIDED WIPE WITH THE
+      SIDEDNESS MISSING. §0z2.
 Storm Cauldron                        +0.51+-0.14         +0.32+-0.17        +0.0027+-0.0029       dmg
       MODELLED (§0z135): your extra land drop, and every land tapped for mana
       returning to hand to be replayed by the drops left -- one more mana and one
       more landfall a drop. NOT: the pod's half (their lands bounce too and they
       get the drop; the pod has no mana, §4), which slows them -- a floor. Pilot
       rules: token lands and Ashaya creature-lands are not tapped under it.
+Sylvan Awakening                      +0.29+-0.06         +0.30+-0.07        +0.0025+-0.0014      both
+      MODELLED: your lands as 2/2 Elemental creatures with haste until your next
+      turn, through the pod's round. NOT: their reach and indestructible, carried
+      in `animate_lands` and read by nothing but `trample_of` (item 9, §0z206
+      floor 2). A floor.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card

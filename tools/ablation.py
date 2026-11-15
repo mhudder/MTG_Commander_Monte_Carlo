@@ -723,10 +723,15 @@ SCRIPTED_AZUSA = {
     # doubler does NOT reach Horn of Greed, which triggers on PLAYING a land
     # (§0z41), and until that fix it did.
     "Traveling Chocobo",
+    # Chord of Calling is the shared rule since §0z213 (`engine.convoke_pool`,
+    # `engine.x_plan`, as trostani plays it). What stays a floor: azusa's
+    # tokens carry no colour, so they convoke for {1} only, and the engine
+    # has no instant speed -- the same in both decks.
     "Green Sun's Zenith", "Chord of Calling",
-    # ramp / land tutors
-    "Cultivate", "Kodama's Reach", "Seek the Horizon", "Journey of Discovery",
-    "Realms Uncharted", "Nylea's Intervention",
+    # ramp / land tutors. Journey of Discovery and Nylea's Intervention LEFT
+    # for PARTLY_MODELLED on 2026-11-15 (§0z209 items 6 and 7).
+    "Cultivate", "Kodama's Reach", "Seek the Horizon",
+    "Realms Uncharted",
     "Regrowth", "Animist's Awakening", "Genesis Wave",
     # (Life from the Loam CUT 2026-10-03 for Mossborn Hydra)
     # counters that double per landfall, on a trampler -- all of it modelled
@@ -742,7 +747,8 @@ SCRIPTED_AZUSA = {
     # SYLVAN AWAKENING CAME BACK on 2026-09-30 when the owner moved
     # Greenwarden's cut to Oblivion Stone (§0z88); the other two scripts
     # remain in edhmc/azusa.py for diag_azusa_animation.py.
-    "Sylvan Awakening",
+    # SYLVAN AWAKENING LEFT for PARTLY_MODELLED on 2026-11-15 (§0z209 item 9):
+    # its reach and indestructible are carried and read by nothing.
     #
     # Nissa, Vastwood Seer // Sage Animist is NOT affected and stays: §0s found
     # the Nissas were never the animation story, and she is a top-five card.
@@ -1011,23 +1017,49 @@ PARTLY_MODELLED = {
             "(their lands bounce too and they get the drop; the pod has no "
             "mana, §4), which slows them -- a floor. Pilot rules: token lands "
             "and Ashaya creature-lands are not tapped under it.",
-        # §0z114. Annihilator 4 is approximated (an opponent's abstract
-        # creature count falls by four); Kozilek's cast draw is modelled.
+        # §0z114; the reasons corrected 2026-11-15 (§0z209 items 10-12):
+        # annihilator sacrifices bodies under `pod_bodies`, and the pod's
+        # route pieces are permanents since POD_V4.
         "Kozilek, Butcher of Truth":
+            "MODELLED: the cast draw; annihilator 4 as the defender's four "
+            "smallest BODIES sacrificed, each a death (`kill_pod_count`). "
+            "APPROXIMATE: the defender is the opponent on the least life, not "
+            "the one attacked, and its route pieces are never among the four. "
             "MISSING: 'When Kozilek is put into a graveyard from anywhere, its "
             "owner shuffles their graveyard into their library' -- a death, "
             "mill or discard puts it and the yard's lands in the graveyard to "
-            "stay. Annihilator is an abstract-count approximation (§4).",
+            "stay (a Genesis Wave mills it since §0z210).",
         "Ulamog, the Infinite Gyre":
-            "MISSING: the cast trigger 'destroy target permanent' (an "
-            "opponent's permanent, BLIND under §4) and the graveyard shuffle "
-            "Kozilek also has. Indestructible and annihilator (approximated) "
-            "are modelled.",
+            "MODELLED: indestructible; annihilator 4 as Kozilek's, the same "
+            "approximation. MISSING: the cast trigger 'destroy target "
+            "permanent' -- MODELABLE since the pod's route pieces are "
+            "permanents (POD_V4), as shilgengar's Angel of Despair -- and the "
+            "graveyard shuffle Kozilek also has. A floor on both.",
         "Bane of Progress":
-            "The wipe destroys only YOUR OWN artifacts and enchantments, "
-            "because opponents own no permanent objects in this project "
-            "(§4). Its negative score is a ONE-SIDED WIPE WITH THE SIDEDNESS "
-            "REMOVED -- the cost with none of the benefit. §0z2.",
+            "MODELLED: the ETB destroys YOUR OWN artifacts and enchantments "
+            "(and fires when a tutor or Genesis Wave puts it in, §0z212). NOT: "
+            "the pod's artifact and enchantment route pieces -- MODELABLE since "
+            "POD_V4, as Angel of the Ruins -- nor your off-board Treasures, "
+            "Clues and Food (§0z209 item 5). Its score is the cost with none "
+            "of the benefit, a ONE-SIDED WIPE WITH THE SIDEDNESS MISSING. §0z2.",
+        # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z209, whose
+        # item numbers these cite; docs/ORACLE_AUDIT_AZUSA.md). Each row
+        # printed under MODEL-EVALUATED while a clause was missing. ---
+        "Journey of Discovery":
+            "MODELLED: the first mode, two basic lands to hand. NOT: 'You may "
+            "play up to two additional lands this turn', nor entwine {2}{G} "
+            "-- in a deck whose engine is land drops, the mode an Azusa pilot "
+            "casts it for (item 6). A floor.",
+        "Nylea's Intervention":
+            "MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: "
+            "'up to X LAND cards' (a utility land is one), nor the mode that "
+            "deals twice X damage to each creature with flying -- MODELABLE "
+            "against the pod's flier bodies since item 44 (item 7). A floor.",
+        "Sylvan Awakening":
+            "MODELLED: your lands as 2/2 Elemental creatures with haste until "
+            "your next turn, through the pod's round. NOT: their reach and "
+            "indestructible, carried in `animate_lands` and read by nothing "
+            "but `trample_of` (item 9, §0z206 floor 2). A floor.",
     },
     "tivit": {
         "Promise of Loyalty":
@@ -2070,7 +2102,9 @@ KNOWN_BLIND = {
         # PLANESWALKERS in edhmc/azusa.py -- so she is SCRIPTED as of
         # 2026-09-07.)
         # reads an OPPONENT drawing a card / a symmetric hand-refill effect,
-        # neither of which this model tracks at that granularity
+        # neither of which this model tracks at that granularity. Mind's Eye
+        # is MODELABLE by Smothering Tithe's rate (`tithe_treasures`, §0z151)
+        # and not modelled (§0z209 item 14): blind is honest, not inevitable.
         "Mind's Eye", "Memory Jar",
         # (Storm Cauldron left 2026-10-14 for PARTLY_MODELLED, §0z135.)
         # (Sylvan Library left 2026-10-14 for SCRIPTED, item 24's change 4.

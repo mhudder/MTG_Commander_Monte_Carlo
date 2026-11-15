@@ -1875,7 +1875,8 @@ class AzusaGame(BaseGame):
         fetches a Forest -- this list has no other basic land type. Two
         landfall events: the fetch itself (already counted by the caller) and
         the Forest it finds. Terramorphic's fetched land enters TAPPED; the
-        two true fetches (paying 1 life, unmodelled) do not."""
+        two true fetches do not, and pay 1 life (charged, below; this said
+        "unmodelled" until §0z209 item 13)."""
         # A TRUE FETCH PAYS 1 LIFE (§0z115): "{T}, Pay 1 life, Sacrifice this
         # land" -- the number from its oracle text (`LAND_RULES`), behind
         # `land_fetch` and `charge_life_costs`. Never the last life point.

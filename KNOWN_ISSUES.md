@@ -265,7 +265,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
-| [0z213](#0z213) | OPEN | **Chord of Calling, one rule** (item 47, §0z197 A7): trostani's convoke and X plan moved into `engine`, azusa playing it the same (`chord_convoke`); in progress |
+| [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18815,7 +18815,7 @@ lifted, as §0z209 read it: the sign is the text's.
 
 <a id="0z213"></a>
 
-## 0z213. OPEN (in progress) -- Chord of Calling, one rule in every deck
+## 0z213. FIXED -- Chord of Calling, one rule in every deck
 
 **The owner, 2026-11-15: "chord should be played the same in all decks
 like trostani. If you see an optimization for how chord should be played
@@ -18854,9 +18854,47 @@ proved unchanged and not re-measured. Pinned by
 convoke for {1} only (lands pay the {G}{G}{G} in this deck); the engine
 has no instant speed, so Chord is cast in a main phase in both decks.
 
-**IN PROGRESS**: the paired on/off run on azusa (reach `chord_seen`,
-counted under either rule), and the ranking question
-(`diagnostics/diag_chord_rank.py`).
+**Measured**, `diagnostics/run_knob_ab.py`, azusa's staged list, N=15,000
+paired, seeds 5000.., the shared rule (A) minus the old (B)
+(`results/knob_ab_azusa_chord_convoke.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| all games | +0.0087 ±0.0028 | +0.0049 ±0.0034 |
+| the 29.6% with Chord in hand at a main phase | +0.0295 ±0.0093 | +0.0164 ±0.0113 |
+
+Identity: of the 10,562 games where no main phase held a Chord (under
+either rule), 0 differ. Chord resolves 0.27 times a game under the shared
+rule, at an X of 4.6 on average with 3.8 creatures convoking; it leaves
+the hand sooner (`chord_seen` 5.4 -> 3.8 main-phase passes a game, the old
+fixed seven mana waited longer). `damage` +0.66, `opponents_killed`
++0.012.
+
+**The ranking question -- the owner asked for any optimization -- is a
+null** (`diagnostics/diag_chord_rank.py`, `results/diag_chord_rank.txt`,
+N=15,000, the same seeds). The shared rule ranks by CAST priority, so of
+3,988 Chords it found Lotus Cobra 1,770 times (priority 9, mana value 2,
+whenever Craterhoof was out of reach) and Craterhoof 1,270. A diagnostic
+leg ranking by the biggest mana value the pool affords instead:
+
+| | T10 | T20 |
+|---|---|---|
+| biggest - priority, all games | -0.0011 ±0.0022 | -0.0009 ±0.0026 |
+| the 23.8% where a Chord resolved | -0.0050 ±0.0092 | -0.0034 ±0.0107 |
+
+Inside both bars. It trades the Cobras for Ulamog (891) and Kozilek (377),
+whose cast triggers a tutor never fires -- so the two rankings err in
+opposite directions and neither measurably wins. Not tried, and the
+owner's to call: a ranking by what the target does on the battlefield
+(a tutor value rather than a cast order), or Craterhoof only when it is
+lethal. Either is a policy, and per §0z170 one chosen among several arms
+is re-measured on fresh seeds before its size is quoted.
+
+**Ledger**: the azusa Candidate Nissa, Resurgent Animist proposed Sylvan
+Awakening as its cut because it was then the next MODEL-EVALUATED row;
+§0z209 item 9's label moved it to PARTLY, so the entry now says why in
+`cut_unmeasured` (`pending` refuses a partly cut without one). The
+proposal is unchanged; another cut is the owner's.
 
 ## How to read an ablation table
 

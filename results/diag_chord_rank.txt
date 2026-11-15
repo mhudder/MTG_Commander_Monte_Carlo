@@ -1,0 +1,29 @@
+azusa, staged list, N=15000 paired, seeds 5000..19999
+games where a Chord resolved in either leg: 3572 (23.8%)
+
+  biggest - priority  all      T10 -0.0011 ±0.0022   T20 -0.0009 ±0.0026
+  biggest - priority  reached  T10 -0.0050 ±0.0092   T20 -0.0034 ±0.0107
+
+priority: 3988 Chords resolved; what they found:
+   1770  Lotus Cobra
+   1270  Craterhoof Behemoth
+    232  Avenger of Zendikar
+    137  Ancient Greenwarden
+    127  Springheart Nantuko
+    117  Traveling Chocobo
+    112  Greensleeves, Maro-Sorcerer
+     84  Oracle of Mul Daya
+     23  Rampaging Baloths
+     15  Scute Swarm
+
+biggest: 3948 Chords resolved; what they found:
+    891  Ulamog, the Infinite Gyre
+    445  Lotus Cobra
+    421  Craterhoof Behemoth
+    421  Traveling Chocobo
+    377  Kozilek, Butcher of Truth
+    263  Oracle of Mul Daya
+    220  Greensleeves, Maro-Sorcerer
+    217  Ancient Greenwarden
+    198  Avenger of Zendikar
+    113  Terastodon

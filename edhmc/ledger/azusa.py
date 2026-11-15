@@ -863,6 +863,13 @@ MEASURED: list[Candidate] = [
             "only; Nissa has now lost one measured slot."
         ),
         proposed_cut="Sylvan Awakening",
+        cut_unmeasured=(
+            "Sylvan Awakening moved to PARTLY_MODELLED on 2026-11-15 (§0z209 "
+            "item 9: its lands' reach and indestructible are carried and read "
+            "by nothing), AFTER it was proposed here as the next "
+            "MODEL-EVALUATED row. Its row is a floor now, so a head-to-head "
+            "against it would be a CEILING for Nissa. The proposal is left as "
+            "it was; choosing another cut is the owner's."),
     ),
     Candidate(
         deck="azusa",

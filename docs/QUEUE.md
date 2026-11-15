@@ -417,10 +417,14 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       -0.0059 / -0.0051, 1.3 lands a cast where the old rule took 4;
       ~~a tutored or Waved creature fires no ETB -- `AzusaGame.etb` is
       called by `resolve` and Springheart's copy only (3)~~ **DONE
-      2026-11-15 (§0z212)**: +0.0017 / +0.0042; Chord of Calling at a fixed X=4 with no
-      convoke, against trostani's `convoke_pool` and `x_plan` for the same
-      card (8, §0z197 A7; grep both engines, §0u). Then azusa's four
-      labels (6-9), a rendering change: tivit's and shilgengar's are done.
+      2026-11-15 (§0z212)**: +0.0017 / +0.0042; ~~Chord of Calling at a
+      fixed X=4 with no convoke, against trostani's `convoke_pool` and
+      `x_plan` for the same card (8, §0z197 A7)~~ **DONE 2026-11-15
+      (§0z213)**: one shared rule, +0.0087 / +0.0049; ranking by size
+      instead of priority is a null. ~~Then azusa's four labels (6-9)~~
+      **DONE 2026-11-15**: items 6, 7, 9 to PARTLY, Tier 3's reasons
+      corrected, the table re-rendered. **Azusa's part of this batch is
+      done.**
     - **tivit**: Tempting Contract makes `1 + takers` Treasures where the
       card gives `takers` (2); Grudge Keeper puts all its damage on one
       opponent where each voter loses 2 (3); `on_creature_death` is a

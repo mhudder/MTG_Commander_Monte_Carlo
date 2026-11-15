@@ -110,6 +110,10 @@ cost.
 
 ## Tier 2 — SCRIPTED, with a clause nothing implements
 
+> **LABELS FIXED 2026-11-15**: items 6, 7 and 9 are PARTLY_MODELLED in
+> `tools/ablation.py`, each reason citing its item; item 8 is fixed
+> (§0z213). Tier 3's reasons 10-14 are corrected the same day.
+
 6. **Journey of Discovery** -- modelled as its first mode, two basics to
    hand. NOT: "You may play up to two additional lands this turn", nor
    entwine {2}{G} -- in a deck whose whole engine is land drops, the second
@@ -118,7 +122,8 @@ cost.
    A7). The text is "up to X LAND cards" (a utility land is one), and the
    other mode, "deals twice X damage to each creature with flying", is
    MODELABLE against the pod's flier bodies (A1, A2) and not modelled.
-8. **Chord of Calling** -- convoke and its X (fixed at 4, a flat
+8. **FIXED 2026-11-15 (§0z213)**: the shared rule, `engine.convoke_pool`
+   and `engine.x_plan`, as trostani. Was: **Chord of Calling** -- convoke and its X (fixed at 4, a flat
    {4}{G}{G}{G}): §0z197 A7's named defect, the same card under
    trostani's convoke and X plan. Plus item 3.
 9. **Sylvan Awakening** -- reach and indestructible are carried in
@@ -207,9 +212,9 @@ bounded as its label says; a number is the finding above.
 | Ashaya, Soul of the Wild | SCRIPTED | OK -- creature-lands enter and die as lands |
 | Augur of Autumn | SCRIPTED | OK -- lands from the top, coven creature casts |
 | Avenger of Zendikar | SCRIPTED | OK cast; Plant counters on landfall; 3 |
-| Bane of Progress | PARTLY | 5, 11 |
+| Bane of Progress | PARTLY | 5; 11 reason fixed |
 | Beast Within | PARTLY | OK (a route answer) |
-| Chord of Calling | SCRIPTED | 3, 8 |
+| Chord of Calling | SCRIPTED | 3, 8 fixed (§0z212, §0z213) |
 | Courser of Kruphix | SCRIPTED | OK |
 | Craterhoof Behemoth | SCRIPTED | 4 |
 | Crop Rotation | PARTLY | OK as labelled; Tier 2b |
@@ -226,19 +231,19 @@ bounded as its label says; a number is the finding above.
 | Hall of Gemstone | BLIND | OK as labelled |
 | Harmonize | SCRIPTED | OK |
 | Horn of Greed | SCRIPTED | OK -- on a land PLAYED, outside the doubled loop (§0z41); 20 |
-| Journey of Discovery | SCRIPTED | 6 |
+| Journey of Discovery | PARTLY (was SCRIPTED) | 6 |
 | Ka-Zar of the Savage Land | SCRIPTED | OK (new) -- lands from the top, Zabu |
 | Kodama's Reach | SCRIPTED | OK |
-| Kozilek, Butcher of Truth | PARTLY | 12, 17 |
+| Kozilek, Butcher of Truth | PARTLY | 17; 12 reason fixed |
 | Krosan Grip | PARTLY | OK (a route answer) |
 | Lotus Cobra | SCRIPTED | OK |
 | Memory Jar | BLIND | OK as labelled (item 37) |
-| Mind's Eye | BLIND | 14 |
+| Mind's Eye | BLIND | 14 noted in its comment |
 | Mole Man, Moloid Master | SCRIPTED | OK -- lands from the yard, Moloids, the mill a policy (§0z101) |
 | Momentous Fall | SCRIPTED | OK |
 | Mossborn Hydra | SCRIPTED | OK -- doubled last (`_landfall_last`) |
 | Nissa, Vastwood Seer // Nissa, Sage Animist | SCRIPTED | OK cast; flips at seven lands; 3, 18 |
-| Nylea's Intervention | SCRIPTED | 7 |
+| Nylea's Intervention | PARTLY (was SCRIPTED) | 7 |
 | Oracle of Mul Daya | SCRIPTED | OK |
 | Quirion Ranger | SCRIPTED | OK -- 19 |
 | Ramunap Excavator | SCRIPTED | OK |
@@ -251,7 +256,7 @@ bounded as its label says; a number is the finding above.
 | Sol Ring | SCRIPTED | OK |
 | Springheart Nantuko | SCRIPTED | OK -- bestow and copies, the copy's ETB (item 16) |
 | Storm Cauldron | PARTLY | OK as labelled |
-| Sylvan Awakening | SCRIPTED | 9 |
+| Sylvan Awakening | PARTLY (was SCRIPTED) | 9 |
 | Sylvan Library | SCRIPTED | OK -- the shared rule |
 | Sylvan Scrying | PARTLY | OK as labelled; Tier 2b |
 | Terastodon | PARTLY | OK (a route answer) |
@@ -260,7 +265,7 @@ bounded as its label says; a number is the finding above.
 | Tireless Tracker | SCRIPTED | OK -- a counter per Clue cracked |
 | Titania, Protector of Argoth | SCRIPTED | OK cast; every `land_died` a 5/3; 3; Tier 2b |
 | Traveling Chocobo | SCRIPTED | OK |
-| Ulamog, the Infinite Gyre | PARTLY | 10, 12 |
+| Ulamog, the Infinite Gyre | PARTLY | 10, 12 reasons fixed |
 | Windswept Heath | SCRIPTED | OK; 13 |
 | Wooded Foothills | SCRIPTED | OK; 13 |
 | Woodland Bellower | SCRIPTED | OK cast; its find fires its ETB since §0z212 (was 3) |
