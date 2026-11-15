@@ -285,6 +285,9 @@ Each was expensive to learn. The `§` has the evidence; `docs/archive/CLAUDE_202
   against the wrong commit: `--diff --old-at=<ref>` refuses one. A test that
   compares two rules drives both legs through the same steps; a leg moved by
   hand compares the setups, not the rules.
+- **A docstring that names a function's callers is a claim** (§0z209):
+  `etb()` listed six paths it was split out for, and two called it. Grep
+  the callers.
 - **A citation that resolves can still be wrong** (§0z127). A queue item is
   "item 0c", never "§0c": the same spelling in two namespaces sent the
   common-baseline rule's citations to an unrelated section, and every check

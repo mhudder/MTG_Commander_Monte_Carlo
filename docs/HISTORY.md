@@ -2901,6 +2901,39 @@ rate back where it was, out of sample to 0.004 -- rendmaw paying most for
 attacking wide. By the owner's instruction nothing was rebuilt: all six
 tables wait for one batch rebuild once the engine work is done (item 35).
 
+## 2026-11-14 to 2026-11-15: item 46 -- the cheap half, three oracle re-audits, the labels (§0z206-§0z209)
+
+The owner: "I would like to work on item 46", then the audits one deck at
+a time, each followed by "fix the labels". Nothing was measured and no
+game moved: every change was a label, a comment, a check or a document,
+proved by `check_unchanged_decks` (bit-identical on all six decks at 400
+and 2,000 seeds), by tivit's bytecode, and by re-rendering every table
+from its cache with every numeric row unchanged.
+
+**The cheap half** (§0z206): Woe Strider to PARTLY. §0z197 D's stale
+statements, and twice as many again that item 44's flip had made false --
+"your creatures never block" was written in a dozen places. Deathtouch is
+read in full since the flip, so Bloodthirsty Conqueror and South Wind
+Avatar became SCRIPTED. `audit_cards` checks the hand-typed `haste` and
+`lifelink` (`tests/test_audit_keywords.py`, three mutations, exact sets);
+the one disagreement was Lorehold, the Historian's haste, now tagged.
+
+**The audits** (`docs/ORACLE_AUDIT_TIVIT.md`, `_SHILGENGAR.md`,
+`_AZUSA.md`). §0z116 had read every engine against its text on 2026-10-07,
+and only four cards had arrived since, all right. What the audits found
+was the engine moving around unchanged lists: reasons written for the
+count pod, a death hook left a no-op, a docstring listing six callers of a
+function two of them called. The largest, open: Genesis Wave and Animist's
+Awakening digging the whole library instead of its top (azusa); Lightning
+Greaves' shroud beside five targeted blinks, and Tempting Contract's extra
+Treasure (tivit); Requiem Angel counting Spirits (shilgengar); tutored
+creatures firing no ETB (azusa). **The labels**: tivit's eleven SCRIPTED
+cards and shilgengar's thirteen moved to PARTLY, Revel in Riches to
+SCRIPTED; the shared wipe and route-answer reasons, rewritten, re-rendered
+all seven tables, trostani's included because `test_metrics_and_render`
+holds every table to its cache. Azusa's labels, and every behaviour fix,
+are the owner's to call -- before the rebuild is cheapest.
+
 ## 2026-11-12 to 2026-11-14: item 44 -- combat made real, flipped, re-fitted, re-read (§0z197-§0z205)
 
 The owner's order of work after §0z197's review of turns and combat: your
