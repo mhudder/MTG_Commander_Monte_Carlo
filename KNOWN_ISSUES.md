@@ -268,6 +268,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z213](#0z213) | FIXED | **Chord of Calling, one rule** (item 47): trostani's convoke and X plan shared, azusa on it. Azusa +0.0087 / +0.0049 at T10 / T20; ranking by size instead of priority is a null |
 | [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
 | [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
+| [0z216](#0z216) | OPEN | **Tivit's Lightning Greaves and five targeted blinks** (§0z207 item 1): shroud and the blinks both at once, a ceiling on six cards. The owner's policy; HELD 2026-11-15, nothing measured |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19008,6 +19009,57 @@ of games; Connections' draw lands after the draw step instead of before
 it, the same two cards; and Pearl Collector is not in this list, so the
 reorder is inert here (no game conjured a Mox Pearl) and right for a list
 that holds it. The fixes stand as the text's, not as numbers.
+
+<a id="0z216"></a>
+
+## 0z216. OPEN -- tivit's Lightning Greaves and five targeted blinks: the owner's call, held
+
+**The owner, 2026-11-15: "hold off on that, write it to the known
+issues".** This is §0z207 item 1 (`docs/ORACLE_AUDIT_TIVIT.md`), the one
+part of queue item 47 that is a decision rather than a fix, and the order
+of work puts it before the rebuild (step 2). It is written down here and
+NOT measured or changed.
+
+**The contradiction.** Lightning Greaves: "Equipped creature has haste and
+shroud. (It can't be the target of spells or abilities.)" Five of tivit's
+blinks TARGET:
+
+| card | the text |
+|---|---|
+| Ephemerate | "Exile TARGET creature you control, then return it" |
+| Soulherder | "you may exile another TARGET creature you control" |
+| Teleportation Circle | "exile up to one TARGET artifact or creature" |
+| Conjurer's Closet | "you may exile TARGET creature you control" |
+| Displacer Kitten | "exile up to one TARGET nonland permanent" |
+
+`opponents.commander_shrouded` makes Tivit an illegal target for the pod's
+removal for as long as Greaves is on the battlefield (`shroud_sources`,
+`TivitGame.__init__`), and `blink_tivit` blinks Tivit for all five
+regardless. Shroud stops YOUR targeted abilities too, so a pilot gets one
+or the other: Greaves on Tivit (the protection, and of the blinks only
+Deadeye Navigator's "{1}{U}: Exile this creature", which does not target),
+or Greaves moved off for its equip {0} at sorcery speed (the blinks, no
+shroud while it is off). The model takes both: **a CEILING on Lightning
+Greaves and on all five blink cards**, and every blink-driven Tivit dilemma
+they produce.
+
+**Why it is the owner's.** Where Greaves sits is a piloting policy, not a
+clause of either card. The plausible policies, none built:
+
+- Greaves stays on Tivit; the five targeted blinks cannot touch it.
+- Greaves comes off whenever a targeted blink is about to be used (equip
+  {0}, sorcery speed), and goes back after -- exposed to the pod's removal
+  in between, and only at sorcery speed (Ephemerate at instant speed
+  cannot have it moved first).
+- Greaves is equipped elsewhere, or never, and Tivit relies on ward {3}
+  (itself unmodelled, §0z197 C).
+
+**What a fix would be, when the owner calls it**: gate `blink_tivit`'s
+targeted sources on Greaves' position under a named policy, behind a
+switch that restores today's rule; measure the policies paired on tivit
+at N=15,000, both horizons, and re-measure the chosen one on fresh seeds
+before quoting its size (§0z170). It moves tivit's baseline, so it is
+cheapest before the rebuild -- which the owner is also holding.
 
 ## How to read an ablation table
 

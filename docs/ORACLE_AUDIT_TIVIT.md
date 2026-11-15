@@ -37,6 +37,8 @@ upkeep (2), and Kambal's first ability (7).
 
 ### 1. Lightning Greaves' shroud and five TARGETED blinks, both at once
 
+> **HELD BY THE OWNER 2026-11-15 (§0z216)**: the owner's policy, written down, not measured.
+
     Lightning Greaves   "Equipped creature has haste and shroud. (It can't
                          be the target of spells or abilities.)"
     Ephemerate          "Exile TARGET creature you control, then return it"

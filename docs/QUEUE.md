@@ -38,6 +38,9 @@ items below this section are in the order they were queued, not this one.
 2. **Item 47's owner decision: where Lightning Greaves sits in tivit.**
    Ask; do not choose. It moves tivit's baseline, so it is asked before
    step 3.
+   **ASKED 2026-11-15 AND HELD BY THE OWNER ("hold off on that, write it
+   to the known issues")**: written down as §0z216, nothing measured. Do not
+   start it unasked.
 3. **Item 44's one rebuild** (`parallel-rebuild`). **HELD BY THE OWNER
    since 2026-11-14: do not start it unasked.** Until it runs the six
    caches are SUSPECT and `check_docs` fails on that one check, which is
