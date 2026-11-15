@@ -264,7 +264,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
-| [0z212](#0z212) | OPEN | **A tutored or Waved creature fires its ETB** (item 47, §0z209 item 3), after the spell has left the stack (`tutor_etb`); in progress |
+| [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18749,7 +18749,7 @@ snapshot, are the only ones that differ (found by a one-leg search of all
 
 <a id="0z212"></a>
 
-## 0z212. OPEN (in progress) -- a tutored or Waved creature fires its ETB
+## 0z212. FIXED -- a tutored or Waved creature fires its ETB
 
 **The owner, 2026-11-15: "then do the tagged-creature ETB fix next"** --
 queue item 47's third fix, §0z209 item 3. `AzusaGame.etb`'s docstring said
@@ -18790,7 +18790,27 @@ the bestow branch reads it, as it already read `is_copy`. The first paired
 run (+0.0022 / +0.0043) included that error and is superseded.
 `tests/test_tutored_etb.py` case I pins it, a fourth mutation exact.
 
-**IN PROGRESS**: the paired run, again, on the corrected rule.
+**Measured**, `diagnostics/run_knob_ab.py`, azusa's staged list, N=15,000
+paired, seeds 5000.., the ETBs (A) minus none (B)
+(`results/knob_ab_azusa_tutor_etb.txt`), on the corrected rule:
+
+| | T10 | T20 |
+|---|---|---|
+| all games | +0.0017 ±0.0014 | +0.0042 ±0.0019 |
+| the 44.5% that queued an ETB | +0.0039 ±0.0032 | +0.0094 ±0.0043 |
+
+Identity: of the 8,327 games that queued none, 0 differ; and the switch
+off still hashes to `1091c1c`'s output after the `cast` fix. `tokens_made`
++2.2 a game, `damage` +0.25, `opponents_killed` +0.0064.
+
+**What fires** (the census, 3,000 games, before the `cast` fix; counts a
+game): 0.845 of the 1.006 queued are permanents with no ETB in the
+dispatch -- the Wave queues every nonland permanent it puts in, as the
+rules have each enter -- and the rest are Eternal Witness 0.055, Nissa,
+Vastwood Seer 0.038, Springheart 0.018 (no longer bestowed), Bane of
+Progress 0.018, Woodland Bellower 0.014, Ka-Zar 0.014, Titania 0.012.
+So about one ETB in six games, Witness's rebuy the largest. A FLOOR
+lifted, as §0z209 read it: the sign is the text's.
 
 ## How to read an ablation table
 

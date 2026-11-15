@@ -414,9 +414,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       measurable. ~~Animist's
       Awakening takes the first four lands anywhere where the text
       averages 1.7 from the top four (2)~~ **DONE 2026-11-15 (§0z211)**:
-      -0.0059 / -0.0051, 1.3 lands a cast where the old rule took 4; a tutored or Waved creature
-      fires no ETB -- `AzusaGame.etb` is called by `resolve` and
-      Springheart's copy only (3); Chord of Calling at a fixed X=4 with no
+      -0.0059 / -0.0051, 1.3 lands a cast where the old rule took 4;
+      ~~a tutored or Waved creature fires no ETB -- `AzusaGame.etb` is
+      called by `resolve` and Springheart's copy only (3)~~ **DONE
+      2026-11-15 (§0z212)**: +0.0017 / +0.0042; Chord of Calling at a fixed X=4 with no
       convoke, against trostani's `convoke_pool` and `x_plan` for the same
       card (8, §0z197 A7; grep both engines, §0u). Then azusa's four
       labels (6-9), a rendering change: tivit's and shilgengar's are done.

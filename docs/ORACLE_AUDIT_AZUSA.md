@@ -37,7 +37,7 @@ reasons are no longer true, and 6 piloting choices are unstated policy.**
 
 > **FIXED 2026-11-15 (§0z210)**: the top six revealed, every permanent of
 > mana value 6 or less put in, the rest milled; `genesis_wave_reveal=False`
-> restores the old rule. Item 3 (no ETB) still holds for what it puts in.
+> restores the old rule. What it puts in fires its ETB since §0z212 (item 3).
 
     "Reveal the top X cards of your library. You may put any number of
     permanent cards with mana value X or less from among them onto the
@@ -73,6 +73,10 @@ mastery's untap is not read. A CEILING, by roughly double; fixed X is
 §0z197 A7's convention.
 
 ### 3. A tutored or Waved creature fires no ETB
+
+> **FIXED 2026-11-15 (§0z212)**: `tutor_creature` and `wave_enter` queue
+> the ETB, fired once the spell has left the stack; `tutor_etb=False`
+> restores the old rule. A tutored Springheart is not bestowed.
 
 `AzusaGame.etb`'s docstring: split out of `resolve` "to close queued item
 16", because "`make_permanent` is reached from six other places
@@ -259,4 +263,4 @@ bounded as its label says; a number is the finding above.
 | Ulamog, the Infinite Gyre | PARTLY | 10, 12 |
 | Windswept Heath | SCRIPTED | OK; 13 |
 | Wooded Foothills | SCRIPTED | OK; 13 |
-| Woodland Bellower | SCRIPTED | OK cast; its find fires no ETB, 3 |
+| Woodland Bellower | SCRIPTED | OK cast; its find fires its ETB since §0z212 (was 3) |
