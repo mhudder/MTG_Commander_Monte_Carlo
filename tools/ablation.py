@@ -506,7 +506,8 @@ SCRIPTED_TIVIT = {
     # `check_scripted_coverage` used to skip every land, so a script on a
     # land was an unchecked claim. These are implemented; Rogue's Passage
     # was the one that was not, until §0z107 (`opponents.rogues_passage`).
-    "Havengul Laboratory // Havengul Mystery",   # tivit.resolve `havengul`
+    # Havengul Laboratory LEFT for PARTLY_MODELLED (§0z207 item 11): its
+    # transform is not modelled, as `havengul_end_step` says.
     # Rogue's Passage (§0z107): "{4}, {T}: Target creature can't be blocked
     # this turn." `opponents.rogues_passage`, before blocks; it was KNOWN_BLIND
     # with `script="rogues_passage"` naming a function nothing defined, and a
@@ -514,15 +515,18 @@ SCRIPTED_TIVIT = {
     # from what the main phase left, so a FLOOR on the card.
     "Rogue's Passage",
     # --- the artifact engine ---
-    # Every one of these is fully implemented in tivit.make_token /
-    # sacrifice_tokens / deadeye_loop.
+    # Implemented in tivit.make_token / sacrifice_tokens / deadeye_loop.
+    # SEVEN LEFT for PARTLY_MODELLED on 2026-11-15 (§0z207, the oracle
+    # re-audit): Mechanized Production, Disciple of the Vault, Marionette
+    # Master, Nadier's Nightblade, Kambal, Cyberdrive Awakener, Soulherder --
+    # each with a clause nothing implements; this comment used to say
+    # "every one of these is fully implemented".
     "Academy Manufactor",          # the Clue/Food/Treasure replacement
-    "Time Sieve", "Mechanized Production", "Revel in Riches",
-    "Disciple of the Vault", "Marionette Master", "Mirkwood Bats",
-    "Nadier's Nightblade", "Kambal, Profiteering Mayor",
-    "Cyberdrive Awakener",
+    "Time Sieve", "Revel in Riches", "Mirkwood Bats",
     # --- blink: each is a fresh Tivit ETB, which is a fresh dilemma ---
-    "Ephemerate", "Soulherder", "Displacer Kitten", "Teleportation Circle",
+    # (§0z207 item 1: four of these TARGET, which Lightning Greaves' shroud
+    # forbids; that is a behaviour defect, open, not a label.)
+    "Ephemerate", "Displacer Kitten", "Teleportation Circle",
     "Conjurer's Closet", "Deadeye Navigator",
     # --- sweepers, live since 2026-09-12 ---
     # `tivit.resolve` had no `wipe` branch, so these did nothing; they are
@@ -545,8 +549,9 @@ SCRIPTED_TIVIT = {
     "Messenger Jays", "Tyrant's Choice", "Custodi Squire",
     # --- mana and draw ---
     "Sol Ring", "Arcane Signet", "Azorius Signet", "Dimir Signet",
-    "Orzhov Signet", "Model of Unity", "Monologue Tax",
-    "Tamiyo's Journal", "Demonic Tutor", "Idyllic Tutor",
+    "Orzhov Signet", "Demonic Tutor", "Idyllic Tutor",
+    # Model of Unity, Monologue Tax and Tamiyo's Journal LEFT for
+    # PARTLY_MODELLED (§0z207 items 10, 13, 14).
     # Mr. Spock (candidate, 2026-10-23): every draw is two
     # (`TivitGame.draw`), decking charged, optional draws guarded
     # (`spock_draw_safe`). The 2/4 body. Every clause.
@@ -1020,9 +1025,10 @@ PARTLY_MODELLED = {
             "'Each player puts a vow counter on a creature they control and "
             "SACRIFICES THE REST': each player keeps one (§0z118 -- until "
             "then the model kept none). Missing: the vow, 'can't attack you', "
-            "on the creature each opponent keeps -- their creatures are a "
-            "count and chip damage still reads it, so a FLOOR. Sacrifice gets "
-            "around indestructible: WIPE_IGNORES_INDESTRUCTIBLE.",
+            "on the creature each opponent keeps -- the pod declares attacks "
+            "with bodies under A2 (§0z199), so the vow is MODELABLE and not "
+            "modelled: a FLOOR. Sacrifice gets around indestructible: "
+            "WIPE_IGNORES_INDESTRUCTIBLE.",
         "Magister of Worth":
             "The CONDEMNATION half is implemented (2026-09-12): a symmetric "
             "wipe that spares only itself, conditional on the council vote. "
@@ -1045,13 +1051,15 @@ PARTLY_MODELLED = {
         "Bite of the Black Rose":
             "MODELLED: the vote. NOT: sickness ('creatures your opponents "
             "control get -2/-2') or psychosis ('each opponent discards two "
-            "cards') -- the pod's creatures are a count with no toughness, "
-            "and it has no hand (§4). A floor.",
+            "cards'). Sickness is MODELABLE since the pod's creatures are "
+            "bodies with toughness (§0z132; Massacre Wurm's `minus_2`) and "
+            "is not modelled; the pod has no hand (§4). A floor.",
         "Capital Punishment":
             "MODELLED: the council's dilemma vote. NOT: 'each opponent "
             "sacrifices a creature for each death vote and discards a card "
-            "for each taxes vote' -- the pod has no creature objects and no "
-            "hand (§4). A floor.",
+            "for each taxes vote'. The sacrifice is MODELABLE (Tyrant's "
+            "Choice already makes one, `kill_pod_count`) and not modelled; "
+            "the pod has no hand (§4). A floor.",
         "Expropriate":
             "MODELLED: an extra turn per time vote -- the half that wins "
             "games. NOT: 'for each money vote, gain control of a permanent "
@@ -1076,8 +1084,76 @@ PARTLY_MODELLED = {
             "MODELLED: the chapter IV vote, on the third draw step after it "
             "enters (`saga_step`), then the sacrifice. NOT: chapters I-III's "
             "'exile target nontoken creature an opponent controls', nor the "
-            "vote's effect on those cards -- the pod's creatures are a count "
-            "(§4). A floor.",
+            "vote's effect on those cards -- MODELABLE since the pod's "
+            "creatures are bodies (§0z132), not modelled. A floor.",
+        # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z207, whose
+        # item numbers these cite; docs/ORACLE_AUDIT_TIVIT.md). Each row
+        # printed under MODEL-EVALUATED while a clause was missing. ---
+        "Kambal, Profiteering Mayor":
+            "MODELLED: 'whenever one or more tokens you control enter, each "
+            "opponent loses 1 life and you gain 1 life', once per batch "
+            "(§0z118). NOT: 'whenever one or more tokens your opponents "
+            "control enter, for each of them, create a tapped token that's "
+            "a copy of it' -- nothing reads it, and Tempting Contract, Tempt "
+            "with Bunnies, Master of Ceremonies and An Offer You Can't Refuse "
+            "all hand the pod tokens (item 7). A floor.",
+        "Nadier's Nightblade":
+            "MODELLED: a Treasure, Clue, Food or Powerstone leaving "
+            "(`sacrifice_tokens`, Coercive Portal's carnage). NOT: a creature "
+            "TOKEN leaving -- dying in combat, to a wipe or to Promise of "
+            "Loyalty -- because `TivitGame.on_creature_death` is a no-op "
+            "(item 8). A floor.",
+        "Disciple of the Vault":
+            "MODELLED: an artifact to the graveyard from tivit's own "
+            "sacrifices and Coercive Portal's carnage, as a 1/living share of "
+            "each opponent (`disciple_share`; the text targets ONE). NOT: an "
+            "artifact creature dying (`on_creature_death` is a no-op) or an "
+            "artifact the pod's removal destroys (items 8, 25). A floor.",
+        "Marionette Master":
+            "MODELLED: fabricate 3 as counters (a policy: never the Servos) "
+            "and 'target opponent loses life equal to this creature's power' "
+            "at a constant 4, at the opponent closest to dying, on tivit's "
+            "own sacrifices. NOT: an artifact creature dying, or an artifact "
+            "the pod's removal destroys (items 8, 24). A floor.",
+        "Soulherder":
+            "MODELLED: the end-step blink of Tivit. NOT: 'whenever a creature "
+            "is exiled from the battlefield, put a +1/+1 counter on this "
+            "creature' -- every blink in the deck is one (item 9). The blink "
+            "targets, which Lightning Greaves' shroud forbids (item 1, open). "
+            "A floor on the counters.",
+        "Cyberdrive Awakener":
+            "MODELLED: the flier, and the ETB burst on its turn as 4 power "
+            "per token in the piles. NOT: 'other artifact creatures you "
+            "control have flying' (no `flying_granted`); the burst counts "
+            "summoning-sick tokens (a ceiling, §0z197 C) and skips the real "
+            "noncreature artifacts it animates (a floor). Bounded both ways "
+            "(item 12).",
+        "Tamiyo's Journal":
+            "MODELLED: 'at the beginning of your upkeep, investigate'. NOT: "
+            "'{T}, Sacrifice three Clues: Search your library for a card' -- "
+            "the Clues are cracked for cards instead (item 10). A floor.",
+        "Model of Unity":
+            "MODELLED: '{T}: Add one mana of any color.' NOT: the scry 2 "
+            "after a vote -- `voting._vote_payoffs` counts `unity_scrys` and "
+            "nothing reads it (item 13). A floor.",
+        "Monologue Tax":
+            "MODELLED as a RATE: `monologue_tax_rate` (2) Treasures a round, "
+            "in your upkeep. 'Whenever an opponent casts their second spell "
+            "each turn' is a fact about the pod's casting this model does "
+            "not have -- Rhystic Study's shape, and that card is BLIND for "
+            "it. The row reads the knob (item 14).",
+        "Mechanized Production":
+            "MODELLED: a Treasure copy each upkeep and the win at eight "
+            "Treasures. The enchanted artifact is taken to be a Treasure "
+            "never spent (a ceiling: a spent one drops the Aura); eight Clues "
+            "or eight Food, which Academy Manufactor makes beside the "
+            "Treasures, do not win (a floor). Bounded both ways (item 15).",
+        "Havengul Laboratory // Havengul Mystery":
+            "MODELLED: '{4}, {T}: Investigate' at the end step on the mana the "
+            "turn left (§0z112). NOT: the transform after three Clues "
+            "sacrificed in a turn, so neither the Mystery's return of a "
+            "creature card nor its '{T}, Pay 1 life: Add {B}' (item 11). A "
+            "floor.",
     },
     "lorehold": {
         # §0z151: "can't be countered" exists since 2026-10-22.
@@ -1263,10 +1339,12 @@ COUNTER_REASON = (
     "ramp, the rest of its hand), which are not objects (§4). A floor.")
 ATTACK_TAX_REASON = (
     "MODELLED (§0z138; the default pod since §0z140): the tax turns a combat "
-    "route's kill, and part of the pod's chip damage, toward another living "
-    "opponent. NOT: declared attacks -- the pod's combat is a damage share "
-    "(§4). Bound to `attack_tax_deflect` (0.5), a judgement with no data "
-    "that moves tivit's taxes by about a third either way.")
+    "route's kill toward another living opponent, and since item 44's flip "
+    "(§0z204) it is a tax on each body the pod DECLARES at you (A2, "
+    "`seat_attack`): a taxed body stays home. NOT: the payment -- the pod "
+    "has no mana (§0z205), so whether it pays is `attack_tax_deflect` (0.5) "
+    "per {2}, a judgement with no data that moves tivit's taxes by about a "
+    "third either way.")
 _R, _C, _T = ROUTE_ANSWER_REASON, COUNTER_REASON, ATTACK_TAX_REASON
 _POD_V4_PARTLY = {
     "rendmaw": {

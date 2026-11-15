@@ -228,7 +228,12 @@ class TivitGame(BaseGame):
         on_tokens_created(self, n)
 
     def on_creature_death(self, n=1, perm=None):
-        pass                      # no death payoffs in this list
+        # A NO-OP, AND A GAP (§0z207 item 8): it said "no death payoffs in
+        # this list", but Nadier's Nightblade (a token leaving), Disciple of
+        # the Vault and Marionette Master (an artifact to the graveyard) all
+        # read a creature of yours dying here -- in combat since §0z198 --
+        # and none hears it. Their rows are PARTLY_MODELLED for it.
+        pass
 
     def play_card_trigger(self, card):
         pass
@@ -856,7 +861,8 @@ def resolve(g, card):
         # Council's dilemma: an extra turn per time vote, steal a permanent
         # per money vote. Stealing an opponent's permanent is not expressible
         # against a board that is a blocker count, so only the turns land --
-        # this UNDERSTATES the card, which is why it is in KNOWN_BLIND.
+        # this UNDERSTATES the card, which is why it is PARTLY_MODELLED
+        # (§0z207; this said KNOWN_BLIND).
         mine, _theirs = V.dilemma(g, "expropriate")
         g.extra_turns += mine
         g.m["extra_turns"] += mine
@@ -877,8 +883,9 @@ def resolve(g, card):
             # made the knob restore a third behaviour that never shipped.
             g.deal_pod_damage(4.0 * OPP.pod_size(g))
     elif s == "capital_punishment":
-        # Sacrifice and discard are both unmodelled against this opponent
-        # model; only the vote payoffs (Grudge Keeper) actually land.
+        # Sacrifice and discard are both unmodelled; only the vote payoffs
+        # (Grudge Keeper) land. The sacrifice is MODELABLE since the pod's
+        # creatures are bodies (Tyrant's Choice's `kill_pod_count`; §0z207).
         V.dilemma(g, "capital")
     elif s == "trial" and g.cfg.get("saga_chapters", True):
         pass              # its vote is chapter IV, three draw steps away (§0z83)

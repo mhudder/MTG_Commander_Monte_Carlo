@@ -18473,11 +18473,23 @@ in the file:
   Guard's vote mapping first (the pod's "against" votes hand you tokens,
   the better half in this deck).
 
-**What it means for the tables**: the eleven SCRIPTED cards' rows print
+**What it means for the tables**: the eleven SCRIPTED cards' rows printed
 under MODEL-EVALUATED, where a low score reads as evidence; per the file
-they are floors (or bounded both ways). Moving the labels is a rendering
-change (§0z206's Woe Strider recipe) and does not wait on the rebuild; the
-behaviour fixes do, and each moves tivit's baseline.
+they are floors (or bounded both ways). The behaviour fixes (items 1-6)
+are open and each moves tivit's baseline.
+
+**THE LABELS ARE FIXED (the owner, 2026-11-15: "fix the labels")**: the
+eleven are PARTLY_MODELLED in `tools/ablation.py`, each reason citing its
+item, and items 16-21's reasons say what is true (MODELABLE, not
+modelled; the attack taxes are a tax on declared bodies under A2, the
+payment the judgement). `tivit.py`'s Expropriate, Capital Punishment and
+`on_creature_death` comments corrected. A RENDERING change:
+`results/ablation_tivit.txt` re-rendered from its cache -- ten rows moved
+from MODEL-EVALUATED to PARTLY (Havengul is a land, with no row), the
+reasons changed, and every numeric row is identical as a set; the other
+five active tables re-render byte for byte. Items 1-6 (Tempting Contract,
+Grudge Keeper, Custodi Squire, the Greaves blinks among them) stay
+SCRIPTED: a label cannot fix a ceiling.
 
 ## How to read an ablation table
 

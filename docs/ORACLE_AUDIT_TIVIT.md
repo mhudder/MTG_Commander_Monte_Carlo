@@ -7,6 +7,10 @@
 > Scryfall's. **Nothing here is measured and nothing is fixed**: this is the
 > list, ordered by how much of a card the engine gets wrong, for the owner to
 > choose from (§0z116's form).
+>
+> **Tier 2's eleven labels and Tier 3's reasons were fixed the same day**
+> (the owner: "fix the labels"; §0z207). The `label` column below is the
+> label as audited. Tiers 1 and 4 are open.
 
 **Why a second audit.** §0z116 (2026-10-07) read every engine against the
 oracle text of all seven lists, and its findings are fixed. Tivit's list has
