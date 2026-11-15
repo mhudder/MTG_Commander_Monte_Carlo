@@ -18782,7 +18782,15 @@ policy, the same on every path.
 hashed identical. Pinned by `tests/test_tutored_etb.py`, eight cases,
 three mutations exact.
 
-**IN PROGRESS**: the paired on/off run on azusa, N=15,000.
+**Springheart is not bestowed when tutored.** A census of the queued ETBs
+by card (3,000 games) found Springheart Nantuko's bestow decision firing
+on a Chord's or Zenith's Springheart: bestow is an alternative cost, paid
+only by casting. `etb` takes `cast` now (`queue_etb` passes False), and
+the bestow branch reads it, as it already read `is_copy`. The first paired
+run (+0.0022 / +0.0043) included that error and is superseded.
+`tests/test_tutored_etb.py` case I pins it, a fourth mutation exact.
+
+**IN PROGRESS**: the paired run, again, on the corrected rule.
 
 ## How to read an ablation table
 

@@ -2364,12 +2364,12 @@ class AzusaGame(BaseGame):
         if self._resolving:
             self._etb_queue.append((card, perm))
         else:
-            self.etb(card, perm)
+            self.etb(card, perm, cast=False)
 
     def flush_etbs(self):
         while self._etb_queue:
             card, perm = self._etb_queue.pop(0)
-            self.etb(card, perm)
+            self.etb(card, perm, cast=False)
 
     def _resolve(self, card):
         if card.name in self.cfg.get("watch", ()):
@@ -2522,7 +2522,7 @@ class AzusaGame(BaseGame):
         self.ascended = self.ascended or len(self.board) >= 10
         self.etb(card, perm)
 
-    def etb(self, card, perm, is_copy=False):
+    def etb(self, card, perm, is_copy=False, cast=True):
         """Everything a permanent does AS IT ENTERS.
 
         SPLIT OUT OF resolve() ON 2026-09-10 to close queued item 16. It was
@@ -2537,9 +2537,12 @@ class AzusaGame(BaseGame):
         `tutor_etb`. Titania and Nissa's ultimates put LANDS in, which have
         no ETB here; they call `land_entered`.
 
-        `is_copy` marks a token copy of another permanent. It is passed to the
-        two ETBs that must NOT repeat on one -- see below -- and is otherwise
-        unused, because the whole point is that the rest of them do.
+        `is_copy` marks a token copy of another permanent, and `cast=False`
+        a permanent that was PUT onto the battlefield, not cast (`queue_etb`,
+        §0z212). One ETB reads them, Springheart's bestow -- an alternative
+        cost, paid only by casting -- and the rest fire either way, because
+        the whole point is that they do. (This said "two ETBs" until
+        §0z212; Springheart's is the only one.)
         """
         if card.name == "Avenger of Zendikar":
             n = sum(1 for p in self.board if p.card.is_land)
@@ -2587,7 +2590,7 @@ class AzusaGame(BaseGame):
                         power=2, toughness=2)
             self.make_permanent(zabu, sick=True, is_token=True)
             self.m["tokens_made"] += 1
-        elif card.name == "Springheart Nantuko" and not is_copy:
+        elif card.name == "Springheart Nantuko" and not is_copy and cast:
             # BESTOW OR NOT, decided as it resolves. Both modes cost {1}{G},
             # so there is no mana question -- only whether a host worth
             # copying is on the battlefield. If none is, it stays a 1/1
@@ -2599,7 +2602,9 @@ class AzusaGame(BaseGame):
             # creature and re-running the bestow decision would let a copy
             # re-attach. springheart_pick_host() already refuses Springheart
             # as a host, so this cannot arise today; it is guarded because the
-            # next copy effect will not know that.
+            # next copy effect will not know that. `cast`: a Springheart a
+            # tutor puts in was never cast, so it was never bestowed either
+            # (§0z212; the first census of tutored ETBs found it attaching).
             host = self.springheart_pick_host()
             if host is not None:
                 self.springheart_host = host

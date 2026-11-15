@@ -3,7 +3,7 @@
 fires its ETB, after the spell that put it there has finished.
 
     python -m tests.test_tutored_etb
-    python -m tests.test_tutored_etb --mutate   # 3 mutations, exact sets
+    python -m tests.test_tutored_etb --mutate   # 4 mutations, exact sets
 
 §0z209 item 3: `AzusaGame.etb` was split out of `resolve` so that every
 way a creature enters could fire it, and only `resolve` and Springheart's
@@ -33,11 +33,14 @@ CASES
   F  NEIGHBOUR: `tutor_etb=False`: Chord's Witness fires nothing
   G  NEIGHBOUR: Witness CAST from hand still returns the graveyard's best
   H  `tutor_etbs` counts the ETBs this rule fired: A's game, 1
+  I  Chord fetches Springheart Nantuko with a Scute Swarm on the board: it
+     enters as a creature, NOT bestowed -- bestow is paid by casting
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   tutor_etb=False everywhere                     -> A, B, C, D, E, H
   queue_etb fires at once (no deferral)          -> B, C, E
   wave_enter fires its ETBs before the landfall  -> D, E
+  queue_etb's ETB read as a cast (cast=True)     -> I
 
 UNMUTATED (§0z15): F and G are the neighbours, the switch and the cast
 path. A is reached by the switch alone: Green Sun's Zenith shuffles itself
@@ -160,12 +163,38 @@ def run_cases():
     g.resolve(s)
     check("G a cast Witness returns the graveyard's best", names(g.hand),
           ["Harmonize"])
+
+    g, s = setup("Chord of Calling", ["Sol Ring", "Springheart Nantuko"],
+                 graveyard=["Scute Swarm"])
+    swarm = take(g, "Scute Swarm")        # Chord searches the library only
+    g.board.append(EN.Permanent(card=swarm, sick=False))
+    g.resolve(s)
+    check("I a tutored Springheart is not bestowed",
+          (g.springheart_host, g.m["springheart_bestowed"],
+           "Springheart Nantuko" in names(g.board)),
+          (None, 0, True))
     return set(FAIL)
 
 
-def _at_once(self, card, perm):
+def _as_cast(self, card, perm):
     self.m["tutor_etbs"] += 1
-    self.etb(card, perm)
+    if self._resolving:
+        self._etb_queue.append((card, perm))
+    else:
+        self.etb(card, perm)
+
+
+def _flush_as_cast(self):
+    while self._etb_queue:
+        card, perm = self._etb_queue.pop(0)
+        self.etb(card, perm)
+
+
+def _at_once(self, card, perm):
+    """The timing alone: still not a cast (it copied the pre-`cast` call
+    first, and broke I too -- §0z141's stand-in that copies a signature)."""
+    self.m["tutor_etbs"] += 1
+    self.etb(card, perm, cast=False)
 
 
 def _etb_first(self, cards):
@@ -195,6 +224,8 @@ def main() -> int:
             ({"B", "C", "E"}, {"queue_etb": _at_once}, {}),
         "wave_enter fires its ETBs before the landfall":
             ({"D", "E"}, {"wave_enter": _etb_first}, {}),
+        "queue_etb's ETB read as a cast":
+            ({"I"}, {"queue_etb": _as_cast, "flush_etbs": _flush_as_cast}, {}),
     }
     bad = 0
     for label, (want, patch, cfg) in muts.items():
