@@ -26,8 +26,9 @@ BY_NAME = {c.name: c for c in DECK}
 START = 10
 
 
-def setup(extras):
-    g = TivitGame(DECK, CMD, dict(DEFAULT_CFG, turns=20, watch=frozenset()), 1)
+def setup(extras, **cfg):
+    g = TivitGame(DECK, CMD, dict(DEFAULT_CFG, turns=20, watch=frozenset(),
+                                  **cfg), 1)
     g.board.append(Permanent(card=CMD, sick=False))
     g.commander_cast = True
     g.board.append(Permanent(card=BY_NAME["Deadeye Navigator"], sick=False))
@@ -39,8 +40,9 @@ def setup(extras):
 
 # (extras, expect_self_sustaining, why)
 CASES = [
-    ([], False,
-     "2 votes x 1 kind = 2, and the activation costs 2. Exactly break even."),
+    ([], True,
+     "2 votes x 1 kind = 2, and the activation costs 2. Exactly break even, "
+     "plus the pod's votes as Clues and an ETB each: a combo (§0z217)."),
     (["Academy Manufactor"], True,
      "2 votes x 3 kinds = 6 Treasures for 2 mana."),
     (["Ballot Broker"], True,
@@ -76,6 +78,18 @@ def main():
             failures.append((label, expect, sustaining, why))
         if not sustaining and end > START:
             failures.append((label, "no profit when it stops", end, why))
+
+    # The old rule, `deadeye_breakeven_loops=False`: Tivit alone stops after
+    # one iteration, and only that row differs.
+    g = setup([], deadeye_breakeven_loops=False)
+    deadeye_loop(g)
+    old = (g.m["combo_iterations"], g.tokens["Treasure"])
+    print(f"  {'(Tivit alone), deadeye_breakeven_loops=False':<48}"
+          f"{old[0]:>7}{START:>6} ->{old[1]:<4} "
+          + ("stops" if old == (1, START) else "   <-- UNEXPECTED"))
+    if old != (1, START):
+        failures.append(("old rule", (1, START), old,
+                         "the break-even stop, restored by the switch"))
 
     print()
     for extras, _expect, why in CASES:

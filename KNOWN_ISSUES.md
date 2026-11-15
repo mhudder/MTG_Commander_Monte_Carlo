@@ -269,6 +269,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z214](#0z214) | FIXED | **Tivit's cards by their text** (item 47): six switches. Contract -0.0074, Custodi -0.0033, Nightblade's life +0.0061 at T20; together -0.0063 / -0.0026 |
 | [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
 | [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`) |
+| [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0075 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19103,6 +19104,55 @@ switch that restores today's rule; measure the policies paired on tivit
 at N=15,000, both horizons, and re-measure the chosen one on fresh seeds
 before quoting its size (§0z170). It moves tivit's baseline, so it is
 cheapest before the rebuild -- which the owner is also holding.
+
+<a id="0z217"></a>
+
+## 0z217. FIXED -- Tivit and Deadeye Navigator are a combo: break-even no longer stops the loop
+
+**The owner, 2026-11-15**, confirming §0z216's reading of Deadeye:
+"deadeye navigator is a 'combo' win with tivit out and should be seen as
+such."
+
+**The defect.** `deadeye_loop` stopped as soon as an activation did not
+GAIN Treasures (`<= before`, unless Academy Manufactor). Tivit alone is two
+of your votes -- yours and Tivit's "You may vote an additional time" -- so
+two Treasures against {1}{U}: exactly break-even, and the loop ran ONCE and
+stopped. But every activation also adds the pod's votes (Clues against an
+adversarial pod, Treasures for you otherwise), a fresh Tivit ETB, a vote for
+every vote payoff, and two Treasures sacrificed to pay -- a pilot with the
+two on the battlefield loops as far as it goes. A policy that asserted a
+combo does nothing (CLAUDE.md, "the biggest corrections were POLICY").
+
+**The fix**, `deadeye_breakeven_loops` (default True; False restores the
+`<=` stop exactly): only a loop that LOSES Treasures stops, so Tivit and
+Deadeye with {1}{U} run to `combo_cap` and the pile goes to
+`convert_the_pile`, as every gaining loop already did. Reach counter
+`deadeye_breakeven_continues`. `tests/test_tivit_combo.py`: Tivit alone is
+self-sustaining (40 iterations, 10 Treasures -> 10), and the switch off
+restores 1 iteration.
+
+**Measured**, `diagnostics/run_knob_ab.py`, tivit's list, N=15,000 paired,
+seeds 5000.. (`results/knob_ab_tivit_deadeye_breakeven_loops.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| on minus off | **+0.0131 ±0.0018** | **+0.0075 ±0.0014** |
+| in the 10.1% of games it reaches | +0.1305 ±0.0171 | +0.0748 ±0.0134 |
+
+IDENTITY: 0 of the 13,490 unreached games differ. Deadeye activations
+3.4 -> 9.1 a game, pile conversions 0.07 -> 0.23, `token_drain` +10.
+
+**It is a combo, not an automatic win, and the gap is a floor.** Of 593
+reached games in 6,000 (seeds 5000..), 87% are won at T20 (routes: drain
+393, combat 74, Mechanized Production 30, Revel in Riches 16, Torment 3).
+All 75 losses reached the cap and converted nothing that won: no drain
+payoff on the battlefield, and `convert_the_pile` does not crack the pile's
+Clues with its own Treasures to dig for one ("not modelled: a floor", its
+own docstring). By the rules, Tivit and Deadeye alone against a pod that
+votes evidence every time are infinite Clues and ETBs at zero net mana --
+not a win until a payoff is found; any vote for bribery makes the mana
+infinite, and the Clues then draw the library. Modelling that dig is the
+next step if the owner wants the remaining 13%.
 
 ## How to read an ablation table
 

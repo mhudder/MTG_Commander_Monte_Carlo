@@ -18,9 +18,11 @@ WHAT THIS DECK ACTUALLY DOES, and therefore what the engine has to model:
      artifacts, five of them Treasures.
   3. TREASURES PAY FOR THE BLINK THAT MAKES MORE TREASURES. Deadeye Navigator
      soulbound to Tivit is "{1}{U}: dilemma" -- two mana in, one dilemma out.
-     The loop pays for itself when (your votes) x (token kinds) > 2, and Tivit
-     alone is exactly 2 x 1 = 2: break even, and it stops. Either Academy
-     Manufactor (x3 kinds) OR one extra-vote creature (3 votes) tips it. See
+     The loop gains when (your votes) x (token kinds) > 2, and Tivit alone
+     is exactly 2 x 1 = 2: break even in Treasures, with the pod's votes as
+     Clues and an ETB each time -- a combo, run to the cap (§0z217; it
+     stopped there before). Academy Manufactor (x3 kinds) or one extra-vote
+     creature (3 votes) makes it gain mana as well. See
      deadeye_loop() for the measured numbers -- the two-route finding came out
      of the ablation and corrected what this file originally claimed.
   4. THE PILE CONVERTS. Time Sieve turns five artifacts into an extra turn;
@@ -136,6 +138,7 @@ class TivitGame(BaseGame):
             "greaves_moved_off": 0, "greaves_shroud_withheld": 0,
             "greaves_haste_withheld": 0, "greaves_blinks_refused": 0,
             "greaves_ephemerate_held": 0,
+            "deadeye_breakeven_continues": 0,     # §0z217
             "tivit_triggers": 0, "extra_turns": 0,
             "sieve_activations": 0, "sieve_chain_max": 0, "sieve_real_fuel": 0,
             # `extra_turns` is turns GRANTED; these two are what was actually
@@ -766,9 +769,10 @@ def deadeye_loop(g):
     ten-Treasure pool with no lands (diag_tivit_combo.py, and the unit check
     in test_tivit_combo.py):
 
-        Tivit + Deadeye alone        2 votes x 1 kind  = 2   1 iteration,
-                                     10 Treasures -> 10. EXACTLY break even,
-                                     and the loop stops on its own.
+        Tivit + Deadeye alone        2 votes x 1 kind  = 2   EXACTLY break
+                                     even, plus the pod's votes as Clues: a
+                                     combo (§0z217), run to the cap. Before
+                                     §0z217 it stopped after 1 iteration.
         + Academy Manufactor         2 votes x 3 kinds = 6   runs to the cap,
                                      10 -> 130.
         + Ballot Broker              3 votes x 1 kind  = 3   runs to the cap,
@@ -802,7 +806,22 @@ def deadeye_loop(g):
         n += 1
         # Stop when it stops paying for itself: a treadmill drains the pool
         # and there is no reason to keep going once we are not gaining.
-        if g.tokens["Treasure"] <= before and not g.has("Academy Manufactor"):
+        #
+        # BREAK-EVEN IS A COMBO, NOT A STOP (the owner, 2026-11-15, §0z217:
+        # "deadeye navigator is a 'combo' win with tivit out and should be
+        # seen as such"). Tivit alone is two votes for two Treasures against
+        # {1}{U}: mana-neutral, and each activation still adds the pod's votes
+        # as Clues and a fresh Tivit ETB, so a pilot loops it as far as it
+        # goes. Only a loop that LOSES Treasures stops.
+        # `deadeye_breakeven_loops=False` is the old rule (stop at <=).
+        if g.cfg.get("deadeye_breakeven_loops", True):
+            if g.tokens["Treasure"] < before:
+                break
+            if (g.tokens["Treasure"] == before
+                    and not g.has("Academy Manufactor")):
+                g.m["deadeye_breakeven_continues"] += 1   # the reach
+        elif g.tokens["Treasure"] <= before \
+                and not g.has("Academy Manufactor"):
             break
     g.m["combo_iterations"] += n
     if n >= cap:
