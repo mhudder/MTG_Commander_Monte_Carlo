@@ -447,6 +447,10 @@ class AzusaGame(BaseGame):
         self.hothouse_solved = False    # Case of the Locked Hothouse
         self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
+        # §0z212: the ETBs a tutor or Genesis Wave queues while a spell is
+        # resolving, fired by `resolve` once the spell has left the stack.
+        self._etb_queue = []
+        self._resolving = False
         self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
         # PER-PERMANENT until-end-of-turn effects (§0z101). Craterhoof's bonus
         # above is one number for the whole board, which is right for its text
@@ -626,6 +630,7 @@ class AzusaGame(BaseGame):
             "awakening_revealed": 0,    # Animist's Awakening: cards revealed
             "awakening_lands": 0,       # ... lands put onto the battlefield
             "awakening_mastery": 0,     # ... resolutions with spell mastery
+            "tutor_etbs": 0,            # ETBs of tutored / Waved creatures
             "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
             "bristly_counters": 0,      # Bristly Bill: landfall counters
             "bristly_activations": 0,   # ... the {3}{G}{G} doubling
@@ -2332,6 +2337,41 @@ class AzusaGame(BaseGame):
                 + len(self.creature_lands()))
 
     def resolve(self, card):
+        """Resolve a spell, then fire the ETBs it queued (§0z212).
+
+        A creature a tutor or Genesis Wave puts onto the battlefield triggers
+        as it enters, and the trigger resolves AFTER the spell that put it
+        there (CR 603.3) -- by then Chord, Finale or the Wave is in the
+        graveyard and Green Sun's Zenith is shuffled away, so a tutored
+        Eternal Witness can return the Chord that found it. `queue_etb` holds
+        them while `_resolving`; this fires them when the outermost
+        resolution ends."""
+        outer = self._resolving
+        self._resolving = True
+        try:
+            self._resolve(card)
+        finally:
+            self._resolving = outer
+        if not outer:
+            self.flush_etbs()
+
+    def queue_etb(self, card, perm):
+        """The ETB of a creature a tutor or Genesis Wave put in (§0z209 item
+        3): queued while a spell resolves, fired at once otherwise -- a
+        Woodland Bellower's own ETB tutoring from `flush_etbs`, or a
+        Springheart copy's from a landfall trigger."""
+        self.m["tutor_etbs"] += 1
+        if self._resolving:
+            self._etb_queue.append((card, perm))
+        else:
+            self.etb(card, perm)
+
+    def flush_etbs(self):
+        while self._etb_queue:
+            card, perm = self._etb_queue.pop(0)
+            self.etb(card, perm)
+
+    def _resolve(self, card):
         if card.name in self.cfg.get("watch", ()):
             self.m["cast_test_card"] = 1
             self.m["test_card_turn"] = min(self.m["test_card_turn"], self.turn)
@@ -2487,10 +2527,15 @@ class AzusaGame(BaseGame):
 
         SPLIT OUT OF resolve() ON 2026-09-10 to close queued item 16. It was
         inline, so the ONLY way to trigger an ETB was to cast the card from
-        hand -- and `make_permanent` is reached from six other places
-        (Springheart's token copy, Genesis Wave, Finale of Devastation, Green
-        Sun's Zenith, Chord of Calling, Woodland Bellower, Titania, Nissa's
-        ultimates). A copy of Avenger of Zendikar was a 5/5 with no Plants.
+        hand. A copy of Avenger of Zendikar was a 5/5 with no Plants.
+
+        WHO CALLS IT (§0z209 item 3, §0z212 -- this docstring used to list
+        six paths and two of them called it): `resolve` for a cast
+        permanent; Springheart's token copy; and `queue_etb`, which
+        `tutor_creature` (Green Sun's Zenith, Chord of Calling, Finale,
+        Woodland Bellower) and `wave_enter` (Genesis Wave) call, behind
+        `tutor_etb`. Titania and Nissa's ultimates put LANDS in, which have
+        no ETB here; they call `land_entered`.
 
         `is_copy` marks a token copy of another permanent. It is passed to the
         two ETBs that must NOT repeat on one -- see below -- and is otherwise
@@ -2736,6 +2781,8 @@ class AzusaGame(BaseGame):
             self.searched()          # Chord, Zenith, Bellower, Finale
         perm = self.make_permanent(best, sick=True)
         self.ascended = self.ascended or len(self.board) >= 10
+        if self.cfg.get("tutor_etb", True):                   # §0z212
+            self.queue_etb(best, perm)
         return perm
 
     def wave(self, x, count=None, lands_only=False):
@@ -2849,11 +2896,20 @@ class AzusaGame(BaseGame):
         rule's loop (`genesis_wave_reveal=False`) interleaves, and is left
         as it was; it sorted lands, mana value 0, after every creature, so
         it reached the same answer for the cards it took."""
-        for c in cards:
-            self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
+        perms = [(c, self.make_permanent(c, sick=not c.haste,
+                                         tapped=bool(c.tapped)))
+                 for c in cards]
         for c in cards:
             if c.is_land:
                 self.land_entered(c, played=False)
+        # §0z212: each creature's ETB, AFTER the lands' landfall -- a Zabu
+        # made by a Waved Ka-Zar did not exist when the lands entered, so it
+        # must not be on the board when `land_entered` reads it -- and
+        # queued, so it resolves once the Wave is in the graveyard.
+        if self.cfg.get("tutor_etb", True):
+            for c, p in perms:
+                if not c.is_land:
+                    self.queue_etb(c, p)
 
     def awaken_the_woods(self, x):
         """Awaken the Woods {X}{G}{G}: "Create X 1/1 green Forest Dryad LAND

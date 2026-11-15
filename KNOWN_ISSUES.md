@@ -264,6 +264,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
+| [0z212](#0z212) | OPEN | **A tutored or Waved creature fires its ETB** (item 47, §0z209 item 3), after the spell has left the stack (`tutor_etb`); in progress |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18745,6 +18746,43 @@ its stream (`crn_draws` 153 against 152). Played both ways the game is
 the same -- won, nine turns -- and those two keys, at T20 and in the T10
 snapshot, are the only ones that differ (found by a one-leg search of all
 15,000 seeds for an Awakening counter without a reveal: that seed alone).
+
+<a id="0z212"></a>
+
+## 0z212. OPEN (in progress) -- a tutored or Waved creature fires its ETB
+
+**The owner, 2026-11-15: "then do the tagged-creature ETB fix next"** --
+queue item 47's third fix, §0z209 item 3. `AzusaGame.etb`'s docstring said
+it was split out of `resolve` for six paths; two called it (a cast, and
+Springheart's copy). `tutor_creature` (Green Sun's Zenith, Chord of
+Calling, Finale of Devastation, Woodland Bellower) and `wave_enter`
+(Genesis Wave) put the creature in with `make_permanent` alone, so a
+tutored Eternal Witness returned nothing, a Waved Ka-Zar made no Zabu, a
+Finale's Bellower tutored nothing.
+
+**The rule**: each calls `queue_etb`. While a spell resolves the ETB is
+QUEUED, and `resolve` fires the queue once the spell has left the stack
+(CR 603.3: the trigger resolves after the spell that caused it), so a
+Witness tutored by Chord, Finale or the Wave can return that spell --
+Green Sun's Zenith shuffles itself away first. Outside a resolution (a
+Bellower's own ETB tutoring, a Springheart copy's from landfall) it fires
+at once. The Wave's ETBs come after its lands' landfall: a Zabu made by a
+Waved Ka-Zar did not exist when the lands entered. `tutor_etb=False` is
+the old rule exactly; the old Wave rule (`genesis_wave_reveal=False`)
+keeps its own loop and fires none. The docstring now names its callers.
+
+**Bane of Progress** fires too: its ETB destroys your own artifacts and
+enchantments, through a tutor or the Wave as it already did from hand.
+No pilot rule holds Bane back from either -- not the cast, not Finale's
+pick, not the Wave's "any number" -- and none is added here: an unstated
+policy, the same on every path.
+
+**Proved**: with `tutor_etb=False`, every deck BIT-IDENTICAL against
+`1091c1c` at 2,000 seeds, and azusa's whole output (142 keys a game)
+hashed identical. Pinned by `tests/test_tutored_etb.py`, eight cases,
+three mutations exact.
+
+**IN PROGRESS**: the paired on/off run on azusa, N=15,000.
 
 ## How to read an ablation table
 

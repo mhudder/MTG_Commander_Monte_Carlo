@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `2736b27`.
+Generated at `1091c1c`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -96,7 +96,7 @@ the fingerprint above mean anything.
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `2e1102acd8f063cd`, live is `9a557886d2b7cfb6`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `63d20e7`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `2e1102acd8f063cd`, live is `8b83e7e4e6ba6872`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `63d20e7`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `1b2c8682bdd39497` (`862cf6a`, 2026-11-13T02:36:44Z): §0z198 (A1, attacker_deaths) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') played at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
   - verified at `18d0d2a069ce01eb` (`7d4bc9f`, 2026-11-13T04:22:10Z): §0z199 (A2, you_block) lands OFF: check_unchanged_decks vs 63d20e7 BIT-IDENTICAL on all 8 metrics (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
   - verified at `77513b77b4fd5555` (`54823bd`, 2026-11-13T14:02:05Z): §0z200 (A4, rival_combat) lands OFF: check_unchanged_decks vs 63d20e7 0 decks moved (N=400), and build_pending('azusa') at seeds 5000..6999, T20 with T10 snapshot, every output key hashed: identical to 63d20e7's. 2026-11-13.
