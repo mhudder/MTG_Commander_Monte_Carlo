@@ -638,6 +638,77 @@ def crn_randrange(g, name: str, n: int) -> int:
     return g.crn.randrange(name, n)
 
 
+def colours_of(card: Card) -> frozenset:
+    """A card's colours: a token's from its `col_` tags, a card's from its
+    mana cost, hybrid spellings included (107.4e)."""
+    marked = {t[4:] for t in card.tags if t.startswith("col_")}
+    if marked or "token" in card.tags or "col_none" in card.tags:
+        return frozenset(c for c in marked if c != "none")
+    out = {c for c in "WUBRG" if card.cost.get(c)}
+    for entry in card.alt_costs:
+        if entry[1] == "hybrid":
+            out |= {c for c in "WUBRG" if entry[0].get(c)}
+    return frozenset(out)
+
+
+def convoke_pool(g, units, precombat):
+    """CHORD OF CALLING's convoke: "each creature you tap while casting
+    this spell pays for {1} or one mana of that creature's color".
+    Convoke is not a {T} ability, so a summoning-sick creature can pay.
+    Precombat only the SICK ones are offered -- the rest are about to
+    attack; after combat, every untapped creature. A mana creature is
+    left to its mana ability, which the shared pool already counts.
+
+    SHARED SINCE §0z213: trostani's method moved here unchanged and azusa
+    calls it too, so the card is one rule in both decks (§0u, §0z197 A7).
+    A land that is a creature (Dryad Arbor, an animated land) is left out
+    for the same reason as a mana creature: its mana is a land's, already
+    in `units`. Trostani's list holds none, so the guard cannot move it."""
+    extra, owners = [], []
+    for p in g.board:
+        if p.tapped or not OPP.is_creature_now(g, p):
+            continue
+        if p.card.mana_ability or p.card is g.commander or p.card.is_land:
+            continue
+        if precombat and not p.sick:
+            continue
+        extra.append(frozenset(colours_of(p.card) | {"C"}))
+        owners.append(p)
+    return ManaUnits(list(units) + extra, units.owners + owners,
+                     units.weights + [(9, 0, 0)] * len(extra),
+                     units.legacy, units.surplus)
+
+
+def x_plan(g, card, units):
+    """Chord of Calling and Green Sun's Zenith: the best creature whose
+    mana value X this pool affords. Returns (target, cost, pay) or None.
+    A target below `tutor_floor` (6) priority is not worth the card.
+
+    SHARED SINCE §0z213 (moved from trostani unchanged): azusa's Chord
+    calls it, with `convoke_pool`'s units. The ranking is the cards' CAST
+    priority, the order the pilot casts them from hand -- a judgement made
+    for trostani's list and read here as it stands."""
+    if card.name == "Chord of Calling":
+        base, pred = {"G": 3}, (lambda c: c.is_creature)
+    else:
+        base, pred = {"G": 1}, (lambda c: c.is_creature
+                                and "G" in colours_of(c))
+    pool = sorted((c for c in g.library if pred(c)),
+                  key=lambda c: (c.priority, c.mv), reverse=True)
+    floor = g.cfg.get("tutor_floor", 6)
+    for c in pool:
+        if c.priority < floor:
+            break
+        cost = dict(base)
+        x = int(c.free_mv)
+        if x:
+            cost["gen"] = x
+        pay = can_pay(cost, units)
+        if pay is not None:
+            return c, cost, pay
+    return None
+
+
 def spell_mastery(g) -> bool:
     """"Spell mastery -- If there are two or more instant and/or sorcery
     cards in your graveyard": ONE function for every card that reads it

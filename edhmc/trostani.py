@@ -139,7 +139,9 @@ from edhmc.engine import (cleanup_step, begin_game, BaseGame, Board, Card, Perma
                           make_rng, seal_rng, enter_loyalty, walker_ready,
                           walker_dies_at_zero, fetch_basics,
                           sakura_tribe_elder, coloured_tap_life, draw_is_safe,
-                          drew_from_empty, ManaUnits, BASIC_LANDS)
+                          drew_from_empty, ManaUnits, BASIC_LANDS,
+                          colours_of, convoke_pool as shared_convoke_pool,
+                          x_plan as shared_x_plan)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FOREST, PLAINS, LEGENDARY
 
@@ -206,19 +208,6 @@ def copy_card(card: Card, fixed=None, colours=None, no_cost=False) -> Card:
         kw["cost"] = {}
         kw["alt_costs"] = ()
     return dataclasses.replace(card, tags=frozenset(tags), **kw)
-
-
-def colours_of(card: Card) -> frozenset:
-    """A card's colours: a token's from its `col_` tags, a card's from its
-    mana cost, hybrid spellings included (107.4e)."""
-    marked = {t[4:] for t in card.tags if t.startswith("col_")}
-    if marked or "token" in card.tags or "col_none" in card.tags:
-        return frozenset(c for c in marked if c != "none")
-    out = {c for c in "WUBRG" if card.cost.get(c)}
-    for entry in card.alt_costs:
-        if entry[1] == "hybrid":
-            out |= {c for c in "WUBRG" if entry[0].get(c)}
-    return frozenset(out)
 
 
 # The cards whose ETB this engine resolves BY NAME (`TrostaniGame.etb`).
@@ -525,25 +514,9 @@ class TrostaniGame(BaseGame):
         return can_pay(cost, self.available_mana()) is not None
 
     def convoke_pool(self, units, precombat):
-        """CHORD OF CALLING's convoke: "each creature you tap while casting
-        this spell pays for {1} or one mana of that creature's color".
-        Convoke is not a {T} ability, so a summoning-sick creature can pay.
-        Precombat only the SICK ones are offered -- the rest are about to
-        attack; after combat, every untapped creature. A mana creature is
-        left to its mana ability, which the shared pool already counts."""
-        extra, owners = [], []
-        for p in self.board:
-            if p.tapped or not OPP.is_creature_now(self, p):
-                continue
-            if p.card.mana_ability or p.card is self.commander:
-                continue
-            if precombat and not p.sick:
-                continue
-            extra.append(frozenset(colours_of(p.card) | {"C"}))
-            owners.append(p)
-        return ManaUnits(list(units) + extra, units.owners + owners,
-                         units.weights + [(9, 0, 0)] * len(extra),
-                         units.legacy, units.surplus)
+        """Chord of Calling's convoke: `engine.convoke_pool`, shared with
+        azusa since §0z213 (moved, not changed)."""
+        return shared_convoke_pool(self, units, precombat)
 
     # -- tokens: the ONE path ----------------------------------------------
 
@@ -1042,28 +1015,9 @@ class TrostaniGame(BaseGame):
         return max(pool, key=lambda c: (c.priority, c.mv))
 
     def x_plan(self, card, units):
-        """Chord of Calling and Green Sun's Zenith: the best creature whose
-        mana value X this pool affords. Returns (target, cost, pay) or None.
-        A target below `tutor_floor` (6) priority is not worth the card."""
-        if card.name == "Chord of Calling":
-            base, pred = {"G": 3}, (lambda c: c.is_creature)
-        else:
-            base, pred = {"G": 1}, (lambda c: c.is_creature
-                                    and "G" in colours_of(c))
-        pool = sorted((c for c in self.library if pred(c)),
-                      key=lambda c: (c.priority, c.mv), reverse=True)
-        floor = self.cfg.get("tutor_floor", 6)
-        for c in pool:
-            if c.priority < floor:
-                break
-            cost = dict(base)
-            x = int(c.free_mv)
-            if x:
-                cost["gen"] = x
-            pay = can_pay(cost, units)
-            if pay is not None:
-                return c, cost, pay
-        return None
+        """Chord of Calling's and Green Sun's Zenith's X: `engine.x_plan`,
+        shared with azusa's Chord since §0z213 (moved, not changed)."""
+        return shared_x_plan(self, card, units)
 
     def on_cast(self, card):
         """"Whenever you cast a spell" -- Aetherflux Reservoir: "you gain 1

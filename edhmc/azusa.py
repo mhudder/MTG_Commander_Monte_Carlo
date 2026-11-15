@@ -138,7 +138,8 @@ from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_g
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           tutor_take, sylvan_library, abundance_draw,
-                          remove_card, spell_mastery)
+                          remove_card, spell_mastery, convoke_pool,
+                          x_plan)
 from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
@@ -451,6 +452,11 @@ class AzusaGame(BaseGame):
         # resolving, fired by `resolve` once the spell has left the stack.
         self._etb_queue = []
         self._resolving = False
+        # §0z213: the turn `combat` last ran, so a main phase knows whether
+        # it is before combat (convoke offers only the sick creatures then),
+        # and the Chord plan the cast chose, read as it resolves.
+        self.combat_turn = -1
+        self.chord_plan = None
         self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
         # PER-PERMANENT until-end-of-turn effects (§0z101). Craterhoof's bonus
         # above is one number for the whole board, which is right for its text
@@ -631,6 +637,10 @@ class AzusaGame(BaseGame):
             "awakening_lands": 0,       # ... lands put onto the battlefield
             "awakening_mastery": 0,     # ... resolutions with spell mastery
             "tutor_etbs": 0,            # ETBs of tutored / Waved creatures
+            "chord_seen": 0,            # main-phase passes with Chord in hand
+            "chord_casts": 0,           # Chord of Calling by the shared rule
+            "chord_x": 0,               # ... the X paid, summed
+            "chord_convoked": 0,        # ... creatures tapped for it
             "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
             "bristly_counters": 0,      # Bristly Bill: landfall counters
             "bristly_activations": 0,   # ... the {3}{G}{G} doubling
@@ -2443,7 +2453,10 @@ class AzusaGame(BaseGame):
         elif script == "green_sun":
             self.tutor_creature(3)
         elif script == "chord_of_calling":
-            self.tutor_creature(4)
+            if self.chord_plan is not None:
+                self.chord_resolve(self.chord_plan)
+            else:
+                self.tutor_creature(4)
         elif script == "finale":
             # Finale of Devastation {X}{G}{G}: "Search your library AND/OR
             # GRAVEYARD for a creature card with mana value X or less and put
@@ -2892,6 +2905,26 @@ class AzusaGame(BaseGame):
             self.make_permanent(c, sick=False, tapped=not mastery)
         for c in lands:
             self.land_entered(c, played=False)
+
+    def chord_resolve(self, plan):
+        """Chord of Calling by the shared plan (§0z213): "Search your library
+        for a creature card with mana value X or less, put it onto the
+        battlefield, then shuffle." X was paid for `plan`'s target, so the
+        target is the card searched for; if it has left the library since
+        the cast (nothing in this engine moves it in between), the biggest
+        creature X affords, as the old rule chose."""
+        target, cost = plan[0], plan[1]
+        self.m["chord_casts"] += 1
+        self.m["chord_x"] += cost.get("gen", 0)
+        if any(c is target for c in self.library):
+            remove_card(self.library, target)
+            self.searched()
+            perm = self.make_permanent(target, sick=True)
+            self.ascended = self.ascended or len(self.board) >= 10
+            if self.cfg.get("tutor_etb", True):
+                self.queue_etb(target, perm)
+            return
+        self.tutor_creature(cost.get("gen", 0))
 
     def wave_enter(self, cards):
         """Genesis Wave's permanents enter as ONE event, so every one of them
@@ -3539,6 +3572,21 @@ class AzusaGame(BaseGame):
             mode_cost = {}
             pools = {}
             pays = {}
+            # CHORD OF CALLING BY THE SHARED RULE (§0z213; §0z197 A7):
+            # convoke and an X chosen for the target, `engine.convoke_pool`
+            # and `engine.x_plan`, as trostani plays it. `chord_convoke=False`
+            # is the old rule exactly: a fixed {4}{G}{G}{G}, the biggest
+            # creature of mana value 4 or less.
+            chord_rule = self.cfg.get("chord_convoke", True)
+            cpool = None
+            plans = {}
+            chord_in_hand = any(c.name == "Chord of Calling"
+                                for c in self.hand)
+            if chord_in_hand:
+                self.m["chord_seen"] += 1    # either rule: the A/B's reach
+            if chord_rule and chord_in_hand:
+                cpool = convoke_pool(self, units,
+                                     self.combat_turn != self.turn)
 
             def pay_of(it):
                 if it[1] is not None:
@@ -3562,6 +3610,14 @@ class AzusaGame(BaseGame):
                     if c.script == "genesis_wave":
                         self.m["wave_guard_held"] += 1     # §0z210
                     continue        # casting is optional; decking is a loss
+                if chord_rule and c.name == "Chord of Calling":
+                    plan = x_plan(self, c, cpool)
+                    if plan is not None:
+                        plans[id(c)] = plan
+                        options.append((c, plan[2]))
+                        mode_cost[id(c)] = plan[1]
+                        pools[id(c)] = cpool
+                    continue
                 # "Spend this mana only to cast CREATURE SPELLS or activate
                 # abilities of creatures", so the restricted pool is offered to
                 # creatures and to nothing else. It sits AFTER the real units,
@@ -3599,6 +3655,27 @@ class AzusaGame(BaseGame):
                     cost_of=lambda it: mode_cost[id(it[0])],
                     pay_of=pay_of)
             card, pay = pick[0], pay_of(pick)
+            if id(card) in plans:
+                # Chord's payment is from the convoke pool: the real units
+                # first, the creatures after them (`spend` taps each owner).
+                spend(self, pay, cpool)
+                self.m["mana_spent"] += len(pay)
+                self.m["chord_convoked"] += sum(1 for i in pay
+                                                if i >= n_real)
+                remove_card(self.hand, card)
+                idx = self.spells_this_turn
+                self.spells_this_turn += 1
+                if OPP.countered(self, card, idx):
+                    self.m["countered"] += 1
+                    self.graveyard.append(card)
+                    if card.name in self.cfg.get("watch", ()):
+                        self.m["test_card_answered"] += 1
+                        self.m["test_card_countered"] += 1
+                    continue
+                self.chord_plan = plans[id(card)]
+                self.resolve(card)
+                self.chord_plan = None
+                continue
             # Only the REAL units tap a permanent. Anything the payment took
             # from Castle Garenbrig's pool is mana that has already been paid
             # for -- charging it to the lands as well would tap four of them to
@@ -4205,6 +4282,7 @@ class AzusaGame(BaseGame):
         return id(perm) in self.eot_vigilance
 
     def combat(self):
+        self.combat_turn = self.turn                         # §0z213
         # GLACIER GODMAW's haste (§0z101): a creature that was sick when one of
         # its triggers resolved this turn may attack. `eot_haste` holds only
         # those; nothing else grants a creature haste in this engine.

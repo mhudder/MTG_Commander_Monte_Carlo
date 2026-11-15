@@ -265,6 +265,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
+| [0z213](#0z213) | OPEN | **Chord of Calling, one rule** (item 47, §0z197 A7): trostani's convoke and X plan moved into `engine`, azusa playing it the same (`chord_convoke`); in progress |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18811,6 +18812,51 @@ Vastwood Seer 0.038, Springheart 0.018 (no longer bestowed), Bane of
 Progress 0.018, Woodland Bellower 0.014, Ka-Zar 0.014, Titania 0.012.
 So about one ETB in six games, Witness's rebuy the largest. A FLOOR
 lifted, as §0z209 read it: the sign is the text's.
+
+<a id="0z213"></a>
+
+## 0z213. OPEN (in progress) -- Chord of Calling, one rule in every deck
+
+**The owner, 2026-11-15: "chord should be played the same in all decks
+like trostani. If you see an optimization for how chord should be played
+let me know."** -- queue item 47's Chord, §0z197 A7, §0z209 item 8. Two
+decks hold the card. Trostani cast it with convoke and an X chosen for its
+target; azusa at a fixed {4}{G}{G}{G}, no convoke, the biggest creature of
+mana value 4 or less: the same card under two rules (§0u).
+
+**The rule, moved, not rewritten**: trostani's `convoke_pool` and `x_plan`
+are `engine.convoke_pool` and `engine.x_plan` now (with `colours_of`,
+which they read), and trostani's methods call them. Azusa's main phase
+calls them too (`chord_convoke`, default True):
+
+- Convoke: each untapped creature pays {1} or one mana of its colour,
+  before combat only the summoning-sick ones (the rest are about to
+  attack), never a mana creature or the commander -- and never a LAND
+  that is a creature (Dryad Arbor, an animated land), whose mana is
+  already a land's. That guard is new; trostani's list holds no land
+  creature, so it cannot move trostani. A main phase knows it is before
+  combat from `combat_turn`, set as `combat` runs.
+- X: the library's creatures ranked by cast priority then mana value; the
+  first the pool affords at or above `tutor_floor` (6). The cast pays
+  from the convoke pool (`spend` taps each convoking creature); the
+  resolution takes the planned target (`chord_resolve`), and its ETB is
+  queued like every tutor's (§0z212).
+- `chord_convoke=False` is azusa's old rule exactly.
+
+**Proved**: with `chord_convoke=False`, every deck BIT-IDENTICAL against
+`b52122a` at 2,000 seeds, trostani included (`--include-suspended`), and
+the whole output hashed identical: azusa's 143 keys a game switched off,
+trostani's 68 at its default (the move). Trostani is SUSPENDED, so it is
+proved unchanged and not re-measured. Pinned by
+`tests/test_chord_shared.py`, seven cases, four mutations exact.
+
+**Floors that stay**: azusa's tokens carry no colour tags, so they
+convoke for {1} only (lands pay the {G}{G}{G} in this deck); the engine
+has no instant speed, so Chord is cast in a main phase in both decks.
+
+**IN PROGRESS**: the paired on/off run on azusa (reach `chord_seen`,
+counted under either rule), and the ranking question
+(`diagnostics/diag_chord_rank.py`).
 
 ## How to read an ablation table
 
