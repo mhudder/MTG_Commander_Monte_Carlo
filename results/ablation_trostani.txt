@@ -122,16 +122,17 @@ Acidic Slime                          +0.33+-0.10         +0.37+-0.14        +0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Wrath of God                          +0.34+-0.10         +0.62+-0.18        +0.0020+-0.0026       dmg
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Mimic Vat                             +0.23+-0.08         +0.32+-0.14        +0.0019+-0.0023       dmg
       MODELLED: imprinting YOUR nontoken creatures as they die and the {3},{T}
       hasty copy, exiled at the end step. NOT: imprinting the pod's creatures,
@@ -146,16 +147,18 @@ Path to Exile                         +0.04+-0.06         -0.00+-0.10        -0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Beast Within                          +0.20+-0.09         +0.16+-0.13        -0.0003+-0.0020       dmg
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Lightning Greaves                     +0.13+-0.08         +0.05+-0.14        -0.0003+-0.0021        --
       MODELLED: shroud on Trostani (`shroud_sources`). NOT: haste -- the Greaves
@@ -166,8 +169,9 @@ Swords to Plowshares                  +0.12+-0.07         +0.06+-0.09        -0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 
 ====================================================================================

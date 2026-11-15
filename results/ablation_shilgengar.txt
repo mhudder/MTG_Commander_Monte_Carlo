@@ -32,12 +32,10 @@ Lyra Dawnbringer                      +1.15+-0.10         +1.75+-0.18        +0.
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 8 -> 5 moves
       it +0.0028; 8 -> 11 moves it -0.0035 (T20 win rate, N=15,000 paired).
-Elesh Norn, Grand Cenobite            +1.08+-0.09         +1.76+-0.17        +0.0219+-0.0033      both
 Archangel of Thune                    +1.21+-0.11         +1.64+-0.18        +0.0209+-0.0033      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 8 -> 11
       moves it -0.0036 (T20 win rate, N=15,000 paired).
-Massacre Wurm                         +1.22+-0.09         +1.66+-0.16        +0.0139+-0.0030      both
 Righteous Valkyrie                    +0.67+-0.09         +0.91+-0.15        +0.0130+-0.0029      both
 Sol Ring                              +2.34+-0.17         +2.14+-0.22        +0.0129+-0.0035      both
 Orzhov Signet                         +1.16+-0.12         +1.33+-0.19        +0.0120+-0.0032      both
@@ -47,13 +45,10 @@ Smothering Tithe                      +0.89+-0.11         +1.01+-0.19        +0.
 Avacyn, Angel of Hope                 +0.49+-0.07         +0.70+-0.12        +0.0097+-0.0026      both
 Herald of War                         +0.54+-0.07         +0.70+-0.12        +0.0088+-0.0025      both
 Fellwar Stone                         +1.10+-0.11         +1.22+-0.18        +0.0086+-0.0032      both
-Giada, Font of Hope                   +0.76+-0.07         +0.96+-0.13        +0.0086+-0.0025      both
 Speaker of the Heavens                +0.33+-0.07         +0.70+-0.12        +0.0085+-0.0022      both
 Talisman of Hierarchy                 +1.11+-0.11         +1.20+-0.18        +0.0077+-0.0032      both
-Mind Stone                            +0.98+-0.11         +1.02+-0.17        +0.0068+-0.0030      both
 Marble Diamond                        +0.91+-0.11         +1.05+-0.18        +0.0067+-0.0030      both
 Requiem Angel                         +0.59+-0.05         +0.69+-0.10        +0.0063+-0.0024      both
-Resplendent Angel                     +0.65+-0.08         +0.60+-0.14        +0.0063+-0.0027      both
 Arcane Signet                         +1.09+-0.12         +1.13+-0.18        +0.0061+-0.0031      both
 Grim Haruspex                         +0.54+-0.06         +0.70+-0.13        +0.0061+-0.0027      both
 Twilight Shepherd                     +0.45+-0.05         +0.69+-0.11        +0.0057+-0.0025      both
@@ -69,26 +64,15 @@ Emeria Shepherd                       +0.24+-0.04         +0.35+-0.08        +0.
 Youthful Valkyrie                     +0.32+-0.06         +0.33+-0.10        +0.0049+-0.0021      both
 Wayfarer's Bauble                     +0.64+-0.09         +0.65+-0.16        +0.0046+-0.0029      both
 Lyra, Archangel of Dawn               +0.90+-0.09         +0.78+-0.15        +0.0045+-0.0028      both
-Flawless Maneuver                     +0.33+-0.07         +0.50+-0.13        +0.0045+-0.0024      both
+Revel in Riches                       +0.19+-0.05         -0.03+-0.12        +0.0043+-0.0023       win
 Reya Dawnbringer                      +0.12+-0.03         +0.29+-0.07        +0.0042+-0.0016      both
 Zulaport Cutthroat                    +0.67+-0.06         +0.70+-0.10        +0.0041+-0.0021      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 6 -> 9 moves
       it +0.0031 (T20 win rate, N=15,000 paired).
-Teferi's Protection                   +0.47+-0.07         +0.63+-0.13        +0.0041+-0.0025      both
-Sun Titan                             +0.41+-0.05         +0.52+-0.09        +0.0041+-0.0022      both
 Bloodghast                            +0.44+-0.06         +0.39+-0.10        +0.0033+-0.0021      both
 Pitiless Plunderer                    +0.01+-0.05         +0.12+-0.12        +0.0032+-0.0024      both
-Priest of Fell Rites                  +0.40+-0.06         +0.35+-0.11        +0.0020+-0.0021       dmg
-Voldaren Bloodcaster // Bloodbat Summoner        +0.31+-0.05         +0.21+-0.09        +0.0018+-0.0020       dmg
-Black Market Connections              +0.23+-0.10         +0.02+-0.18        +0.0008+-0.0032        --
-      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
-      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
-      moves it +0.0043 (T20 win rate, N=15,000 paired). The move could carry it
-      across zero.
-Cartel Aristocrat                     +0.22+-0.04         +0.22+-0.07        +0.0007+-0.0015       dmg
 Dark Prophecy                         +0.05+-0.04         +0.03+-0.11        +0.0001+-0.0023        --
-Viscera Seer                          -0.15+-0.04         -0.16+-0.06        -0.0010+-0.0012       dmg
 Skullclamp                            -0.06+-0.04         -0.06+-0.08        -0.0019+-0.0016       win
 
 ====================================================================================
@@ -105,40 +89,59 @@ Angel of Suffering                    +1.28+-0.13         +1.97+-0.19        +0.
 Serra's Emissary                      +0.79+-0.08         +1.55+-0.16        +0.0229+-0.0030      both
       MODELLED: the 7/7 flier, and protection from the chosen card type as
       `emissary_type` 'Creature' (§0z84): the pod's creatures cannot block yours
-      and their chip damage does not reach you. NOT: the pod's kill clocks, which
-      are rolls rather than combats (§4) -- protection from creatures would stop a
-      combat kill and the model cannot tell which clock is one. A floor.
+      and their combat damage does not reach you. NOT: a COMBAT route's kill
+      (§0z140), which protection from creatures would stop -- the model tells that
+      route from the others, and Angel of Suffering already prevents it
+      (`angel_prevents_kill`), but Emissary does not (§0z208 item 16). A floor,
+      possibly a large one.
+Elesh Norn, Grand Cenobite            +1.08+-0.09         +1.76+-0.17        +0.0219+-0.0033      both
+      MODELLED: +2/+2 to your other creatures, the commander included (§0z151),
+      and -2/-2 killing the pod's bodies of toughness 2 or less as she enters and
+      at each upkeep (`minus_two_pod`). NOT: the -2/-2 on the bodies that survive
+      it, whose power and toughness every block and every attack at you reads
+      since A1 and A2 (item 12). A floor.
 Damn                                  +0.20+-0.08         +1.41+-0.17        +0.0201+-0.0032      both
       SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a SPOT
       ANSWER: priced at {B}{B} against a creature route piece when the wipe gate
       refuses the wrath or the overload cannot be paid. Your half of the wrath is
-      faithful; the pod's half zeroes a count (§4) and takes the route pieces it
-      can hit. The cost is modelled, the benefit an estimate.
+      faithful; the pod's half kills its bodies (§0z132) and takes the route
+      pieces it can hit, and its other permanents are not objects (§4). The cost
+      is modelled, the benefit an estimate.
+Massacre Wurm                         +1.22+-0.09         +1.66+-0.16        +0.0139+-0.0030      both
+      MODELLED, CAST: the -2/-2 killing the pod's bodies of toughness 2 or less
+      and the creature route pieces it reaches (`minus_two_pod`), and 2 life from
+      that player for each creature of theirs that dies
+      (`on_pod_creature_deaths`). NOT: its ETB when the deck RETURNS it -- Reya
+      Dawnbringer, Priest, Sun Titan, Emeria Shepherd, the ultimate (item 15). A
+      floor.
 Generous Gift                         +0.35+-0.07         +1.08+-0.15        +0.0129+-0.0030      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Angel of Despair                      +0.34+-0.05         +0.86+-0.12        +0.0127+-0.0026      both
       MODELLED: the 5/5 flier. NOT: 'When this creature enters, destroy target
-      permanent' -- no opposing permanent (§4). A floor.
+      permanent' -- Vindicate's text, and Vindicate is a route answer here
+      (`ANSWERS`): MODELABLE, not modelled (§0z208 item 18). A floor.
 Wrath of God                          +0.10+-0.07         +1.01+-0.16        +0.0124+-0.0028      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Anguished Unmaking                    +0.37+-0.07         +1.03+-0.15        +0.0122+-0.0031      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Agadeem's Awakening // Agadeem, the Undercrypt        +0.84+-0.11         +1.32+-0.19        +0.0119+-0.0033      both
       MODELLED: the back face, played as a land. NOT: the front face's X-spell
@@ -149,72 +152,126 @@ Mortify                               +0.32+-0.07         +0.92+-0.15        +0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Vindicate                             +0.40+-0.07         +1.02+-0.15        +0.0115+-0.0030      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Path to Exile                         +0.28+-0.06         +1.10+-0.15        +0.0107+-0.0029      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Utter End                             +0.40+-0.07         +0.97+-0.15        +0.0104+-0.0030      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Swords to Plowshares                  +0.26+-0.06         +0.99+-0.15        +0.0102+-0.0030      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Despark                               +0.29+-0.07         +0.81+-0.14        +0.0087+-0.0028      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
+Giada, Font of Hope                   +0.76+-0.07         +0.96+-0.13        +0.0086+-0.0025      both
+      MODELLED: the 2/2 flying vigilance body and the counters each other Angel
+      enters with (`giada_counters`, §0z118). NOT: '{T}: Add {W}. Spend this mana
+      only to cast an Angel spell' -- no mana ability in the deck module (item 8).
+      A floor.
+Mind Stone                            +0.98+-0.11         +1.02+-0.17        +0.0068+-0.0030      both
+      MODELLED: '{T}: Add {C}.' NOT: '{1}, {T}, Sacrifice this artifact: Draw a
+      card' (item 9). A floor.
 Angel of the Ruins                    +0.30+-0.05         +0.65+-0.11        +0.0064+-0.0023      both
       MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
-      artifacts and/or enchantments (no opposing permanent, §4), nor Plainscycling
-      {2}, which would turn a seven-drop in a short game into a land. A floor.
+      artifacts and/or enchantments -- MODELABLE against the pod's artifact and
+      enchantment route pieces, not modelled -- nor Plainscycling {2}, which would
+      turn a seven-drop in a short game into a land. A floor.
+Resplendent Angel                     +0.65+-0.08         +0.60+-0.14        +0.0063+-0.0027      both
+      MODELLED: the 3/3 flier, and the 4/4 flying vigilance Angel at EACH end step
+      after 5 life gained (§0z153). NOT: '{3}{W}{W}{W}: this creature gets +2/+2
+      and gains lifelink' (item 7). A floor.
 Angel of Serenity                     +0.29+-0.04         +0.46+-0.09        +0.0053+-0.0021      both
       MODELLED: the 5/6 flier. NOT: 'exile up to three other target creatures from
-      the battlefield and/or creature cards from graveyards' -- no opposing
-      creature to exile (§4), and the own-graveyard trick (exile three, get them
-      back to hand when it leaves) is not taken. A floor.
+      the battlefield and/or creature cards from graveyards' -- MODELABLE since
+      the pod's creatures are bodies and route pieces (§0z132, §0z140), not
+      modelled; nor the own-graveyard trick (exile three, get them back to hand
+      when it leaves). A floor.
 Angelic Arbiter                       +0.26+-0.04         +0.45+-0.09        +0.0047+-0.0022      both
       MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell this turn
-      can't attack; each who attacked can't cast spells' -- the pod's attacks and
-      spells are rates, not per-opponent turn records. A restriction on the pod
-      only helps you. A floor.
-Revel in Riches                       +0.19+-0.05         -0.03+-0.12        +0.0043+-0.0023       win
-      MODELLED: the alt-win, ten or more Treasures at your upkeep, off Treasures
-      the rest of the deck makes (Smothering Tithe, in every win traced). MISSING:
-      'whenever a creature an opponent controls dies, create a Treasure' -- the
-      pod's creatures are a count, not deaths (§4). A FLOOR, and a knob result:
-      Tithe's Treasures assume no opponent ever pays its {2}. Left KNOWN_BLIND
-      until §0z115.
+      can't attack; each who attacked can't cast spells'. Each seat declares its
+      attacks under A2 (`seat_attack`), but its spells are still a rate, not a
+      per-turn record, so neither half can be asked. A restriction on the pod only
+      helps you. A floor.
+Flawless Maneuver                     +0.33+-0.07         +0.50+-0.13        +0.0045+-0.0024      both
+      MODELLED: 'Creatures you control gain indestructible until end of turn'
+      against a spot removal or a wrath, cast from held mana. NOT: 'If you control
+      a commander, you may cast this spell without paying its mana cost' -- always
+      paid at {2}{W} (item 14). A floor.
+Teferi's Protection                   +0.47+-0.07         +0.63+-0.13        +0.0041+-0.0025      both
+      MODELLED: one of the pod's events blanked -- its spot removal, artifact
+      removal or wrath (`PROTECTION`), cast from held mana. NOT: 'until your next
+      turn, your life total can't change and you gain protection from everything',
+      the pod's whole round of combat, drains and kills (item 13). A floor.
+Sun Titan                             +0.41+-0.05         +0.52+-0.09        +0.0041+-0.0022      both
+      MODELLED, CAST AND ATTACKING: return a permanent card of mana value 3 or
+      less (the shared pick, §0z135). NOT: its ETB when the deck RETURNS it --
+      Reya Dawnbringer, Priest, Emeria Shepherd, the ultimate (item 15). A floor.
 Malakir Rebirth // Malakir Mire        +0.12+-0.08         +0.18+-0.14        +0.0028+-0.0025      both
       MODELLED: the back face, played as a land. NOT: the front face's 'you lose 2
       life; until end of turn, that creature gains "when this creature dies,
-      return it to the battlefield"' -- there is no removal-in-response window to
-      react in. A floor.
+      return it to the battlefield"' -- MODELABLE in the response window held mana
+      opens on the pod's turn (§0z134, `respond_to_event`), not modelled. A floor.
+Priest of Fell Rites                  +0.40+-0.06         +0.35+-0.11        +0.0020+-0.0021       dmg
+      MODELLED: '{T}, Pay 3 life, Sacrifice this creature: Return target creature
+      card from your graveyard to the battlefield', sorcery speed, above 10 life
+      (a floor nobody derived). NOT: unearth {3}{W}{B} (item 6, §0z197 C). A
+      floor.
+Voldaren Bloodcaster // Bloodbat Summoner        +0.31+-0.05         +0.21+-0.09        +0.0018+-0.0020       dmg
+      MODELLED: the flier, and a Blood token when it or another nontoken creature
+      you control dies. NOT: the transform at five Blood, nor Bloodbat Summoner's
+      Bat each combat (§0z184 finding 8, item 37; item 11). A floor.
+Black Market Connections              +0.23+-0.10         +0.02+-0.18        +0.0008+-0.0032        --
+      MODELLED: Buy Information alone -- draw a card, lose 2 life -- every upkeep.
+      NOT: 'choose one or more' (Sell Contraband's Treasure, Hire a Mercenary's
+      3/2), a POLICY that undercounts; and the trigger is 'at the beginning of
+      your first main phase', not the upkeep (§0z184 finding 7, item 37; item 10).
+      A floor.
+      THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
+      threat, which is how the table sees it, not the pilot's choice. 6.5 -> 9.5
+      moves it +0.0043 (T20 win rate, N=15,000 paired). The move could carry it
+      across zero.
+Cartel Aristocrat                     +0.22+-0.04         +0.22+-0.07        +0.0007+-0.0015       dmg
+      MODELLED: 'Sacrifice another creature' -- a free outlet. NOT: 'this creature
+      gains protection from the color of your choice until end of turn', from
+      removal or from a blocker (item 5). A floor.
+Viscera Seer                          -0.15+-0.04         -0.16+-0.06        -0.0010+-0.0012       dmg
+      MODELLED: 'Sacrifice a creature' -- a free outlet for the aristocrats step.
+      NOT: 'Scry 1' (item 4; Woe Strider's gap, §0z206). A floor.

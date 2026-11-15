@@ -107,16 +107,18 @@ Beast Within                          +0.84+-0.16         +1.33+-0.19        +0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Krosan Grip                           +0.62+-0.15         +1.00+-0.18        +0.0109+-0.0031      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Crop Rotation                         +1.05+-0.25         +0.81+-0.26        +0.0085+-0.0041      both
       MODELLED: a tapped land sacrificed (a land death: the graveyard, Titania)
@@ -129,8 +131,9 @@ Terastodon                            +0.44+-0.09         +0.67+-0.13        +0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Bane of Progress                      +0.34+-0.12         +0.24+-0.13        +0.0041+-0.0024      both
       The wipe destroys only YOUR OWN artifacts and enchantments, because

@@ -18536,6 +18536,23 @@ largest findings, numbered as in the file:
 As for tivit (§0z207): moving the labels is a rendering change that does
 not wait on the rebuild; the behaviour fixes move shilgengar's baseline.
 
+**THE LABELS ARE FIXED (the owner, 2026-11-15: "fix the labels")**: items
+4-15's thirteen cards are PARTLY_MODELLED, each reason citing its item;
+Revel in Riches is SCRIPTED (item 17); items 16 and 18-22's reasons say what
+is true. Items 23-24 were SHARED text, so they moved every deck's table:
+`SYMMETRIC_WIPE_REASON` and Damn's derived reason (the pod's half kills its
+bodies, it does not zero a count) and `ROUTE_ANSWER_REASON` (a body that is
+no route piece is what such an answer cannot reach). A RENDERING change:
+all six active tables re-rendered from their caches -- shilgengar's
+fourteen rows moved section, no row moved in the other five (reason text
+only), and every table's numeric rows are identical as a set. Items 1-3
+(Requiem Angel, the landfall rules, combat lifelink) stay SCRIPTED: a
+label cannot fix a ceiling. Trostani (SUSPENDED) prints the shared
+reasons too, and `test_metrics_and_render` C holds every committed table to
+its cache's render, so its table was re-rendered as well: byte-identical
+before this change, reason text only after, no row moved. A render, not a
+re-measure: nothing was run against it.
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not

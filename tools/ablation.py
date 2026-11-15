@@ -583,33 +583,42 @@ SCRIPTED_SHILGENGAR = {
     # NOTE: the commander itself is never in `deck` (build() returns it
     # separately), so it does not belong in this set -- same as every other
     # deck's commander.
+    # THIRTEEN LEFT for PARTLY_MODELLED on 2026-11-15 (§0z208, the oracle
+    # re-audit; docs/ORACLE_AUDIT_SHILGENGAR.md): Resplendent Angel, Giada,
+    # Elesh Norn, Voldaren Bloodcaster, Viscera Seer, Cartel Aristocrat,
+    # Priest of Fell Rites, Sun Titan, Massacre Wurm, Black Market
+    # Connections, Mind Stone, Flawless Maneuver, Teferi's Protection --
+    # each with a clause nothing implements.
     # Angels tribal
-    "Archangel of Thune", "Resplendent Angel", "Righteous Valkyrie",
-    # Staged 2026-09-26 (§0z69). PREVIEW TEXT, implemented in full --
-    # flying, and a +1/+1 counter on each Angel whenever you gain life --
-    # and pinned by tests/test_fra_batch2.py.
+    "Archangel of Thune", "Righteous Valkyrie",
+    # Staged 2026-09-26 (§0z69), from preview text; the printed text is
+    # the same (Scryfall, 2026-11-15, §0z208). Flying, and a +1/+1 counter
+    # on each Angel whenever you gain life; tests/test_fra_batch2.py.
     "Lyra, Archangel of Dawn",
-    "Bishop of Wings", "Giada, Font of Hope", "Youthful Valkyrie",
+    "Bishop of Wings", "Youthful Valkyrie",
     "Lyra Dawnbringer", "Speaker of the Heavens",
     "Emeria's Call // Emeria, Shattered Skyclave",
-    "Elesh Norn, Grand Cenobite", "Avacyn, Angel of Hope",
-    # aristocrats: death triggers and sac outlets
+    "Avacyn, Angel of Hope",
+    # aristocrats: death triggers and sac outlets. (Requiem Angel's
+    # non-Spirit test is wrong, §0z208 item 1: a behaviour defect, open.)
     "Blood Artist", "Zulaport Cutthroat", "Midnight Reaper", "Grim Haruspex",
     "Dark Prophecy", "Pitiless Plunderer", "Requiem Angel",
-    "Voldaren Bloodcaster // Bloodbat Summoner", "Viscera Seer",
-    "Cartel Aristocrat", "Vampiric Rites", "Skullclamp",
-    # reanimation
-    "Priest of Fell Rites", "Sun Titan", "Reya Dawnbringer",
-    "Emeria Shepherd",
-    # drain / removal on a body that is a REAL death trigger, not blank
-    "Kokusho, the Evening Star", "Massacre Wurm",
+    "Vampiric Rites", "Skullclamp",
+    # reanimation (Emeria Shepherd's landfall rule, §0z208 item 2, open)
+    "Reya Dawnbringer", "Emeria Shepherd",
+    # drain on a body that is a REAL death trigger, not blank
+    "Kokusho, the Evening Star",
+    # Revel in Riches CAME FROM PARTLY_MODELLED (§0z208 item 17): its reason
+    # called "whenever a creature an opponent controls dies, create a
+    # Treasure" missing, and `on_pod_creature_deaths` makes it. Every clause
+    # is modelled -- as tivit's, which was SCRIPTED all along. The row reads
+    # Smothering Tithe's knob, which is Tithe's.
+    "Revel in Riches",
     # mana and draw
-    "Smothering Tithe", "Black Market Connections", "Phyrexian Arena",
+    "Smothering Tithe", "Phyrexian Arena",
     "Sol Ring", "Arcane Signet", "Orzhov Signet", "Fellwar Stone",
-    "Mind Stone", "Marble Diamond", "Talisman of Hierarchy",
+    "Marble Diamond", "Talisman of Hierarchy",
     "Wayfarer's Bauble",
-    # protection the opponent model respects
-    "Flawless Maneuver", "Teferi's Protection",
     # The two wraths (Damn, Wrath of God) moved to PARTLY_MODELLED 2026-09-12:
     # symmetric wipes are derived into that category by symmetric_wipes().
 }
@@ -1260,13 +1269,7 @@ PARTLY_MODELLED = {
             "route's kill too -- the default pod since §0z140. NOT: a combo "
             "or drain route's kill, which is not damage, nor life LOSS and "
             "life payments. A floor.",
-        "Revel in Riches":
-            "MODELLED: the alt-win, ten or more Treasures at your upkeep, off "
-            "Treasures the rest of the deck makes (Smothering Tithe, in every "
-            "win traced). MISSING: 'whenever a creature an opponent controls "
-            "dies, create a Treasure' -- the pod's creatures are a count, not "
-            "deaths (§4). A FLOOR, and a knob result: Tithe's Treasures assume "
-            "no opponent ever pays its {2}. Left KNOWN_BLIND until §0z115.",
+        # Revel in Riches moved to SCRIPTED (§0z208 item 17).
         # --- LEFT KNOWN_BLIND 2026-09-29 (§0z78). Each is a modelled body
         # -- flying from decks/_evasion.py -- with an unmodelled ability that
         # helps you. (Herald of War and Twilight Shepherd went on to SCRIPTED
@@ -1274,20 +1277,24 @@ PARTLY_MODELLED = {
         "Serra's Emissary":
             "MODELLED: the 7/7 flier, and protection from the chosen card "
             "type as `emissary_type` 'Creature' (§0z84): the pod's creatures "
-            "cannot block yours and their chip damage does not reach you. "
-            "NOT: the pod's kill clocks, which are rolls rather than combats "
-            "(§4) -- protection from creatures would stop a combat kill and "
-            "the model cannot tell which clock is one. A floor.",
+            "cannot block yours and their combat damage does not reach you. "
+            "NOT: a COMBAT route's kill (§0z140), which protection from "
+            "creatures would stop -- the model tells that route from the "
+            "others, and Angel of Suffering already prevents it "
+            "(`angel_prevents_kill`), but Emissary does not (§0z208 item 16). "
+            "A floor, possibly a large one.",
         "Angel of Serenity":
             "MODELLED: the 5/6 flier. NOT: 'exile up to three other target "
             "creatures from the battlefield and/or creature cards from "
-            "graveyards' -- no opposing creature to exile (§4), and the "
+            "graveyards' -- MODELABLE since the pod's creatures are bodies "
+            "and route pieces (§0z132, §0z140), not modelled; nor the "
             "own-graveyard trick (exile three, get them back to hand when it "
-            "leaves) is not taken. A floor.",
+            "leaves). A floor.",
         "Angel of Despair":
             "MODELLED: the 5/5 flier. NOT: 'When this creature enters, "
-            "destroy target permanent' -- no opposing permanent (§4). A "
-            "floor.",
+            "destroy target permanent' -- Vindicate's text, and Vindicate is a "
+            "route answer here (`ANSWERS`): MODELABLE, not modelled (§0z208 "
+            "item 18). A floor.",
         # Candidate, 2026-10-23 (the owner's Reality Fracture review).
         "Avacyn, Angel of Horror":
             "MODELLED: the 8/8 flying Angel, and 'whenever Avacyn or another "
@@ -1300,14 +1307,17 @@ PARTLY_MODELLED = {
             "engine shares. A floor by that.",
         "Angel of the Ruins":
             "MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile "
-            "of up to two artifacts and/or enchantments (no opposing "
-            "permanent, §4), nor Plainscycling {2}, which would turn a "
-            "seven-drop in a short game into a land. A floor.",
+            "of up to two artifacts and/or enchantments -- MODELABLE against "
+            "the pod's artifact and enchantment route pieces, not modelled -- "
+            "nor Plainscycling {2}, which would turn a seven-drop in a short "
+            "game into a land. A floor.",
         "Angelic Arbiter":
             "MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell "
-            "this turn can't attack; each who attacked can't cast spells' -- "
-            "the pod's attacks and spells are rates, not per-opponent turn "
-            "records. A restriction on the pod only helps you. A floor.",
+            "this turn can't attack; each who attacked can't cast spells'. "
+            "Each seat declares its attacks under A2 (`seat_attack`), but "
+            "its spells are still a rate, not a per-turn record, so neither "
+            "half can be asked. A restriction on the pod only helps you. A "
+            "floor.",
         "Agadeem's Awakening // Agadeem, the Undercrypt":
             "MODELLED: the back face, played as a land. NOT: the front "
             "face's X-spell mass reanimation, largely redundant here with "
@@ -1317,7 +1327,79 @@ PARTLY_MODELLED = {
             "MODELLED: the back face, played as a land. NOT: the front "
             "face's 'you lose 2 life; until end of turn, that creature gains "
             "\"when this creature dies, return it to the battlefield\"' -- "
-            "there is no removal-in-response window to react in. A floor.",
+            "MODELABLE in the response window held mana opens on the pod's "
+            "turn (§0z134, `respond_to_event`), not modelled. A floor.",
+        # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z208, whose
+        # item numbers these cite; docs/ORACLE_AUDIT_SHILGENGAR.md). ---
+        "Viscera Seer":
+            "MODELLED: 'Sacrifice a creature' -- a free outlet for the "
+            "aristocrats step. NOT: 'Scry 1' (item 4; Woe Strider's gap, "
+            "§0z206). A floor.",
+        "Cartel Aristocrat":
+            "MODELLED: 'Sacrifice another creature' -- a free outlet. NOT: "
+            "'this creature gains protection from the color of your choice "
+            "until end of turn', from removal or from a blocker (item 5). A "
+            "floor.",
+        "Priest of Fell Rites":
+            "MODELLED: '{T}, Pay 3 life, Sacrifice this creature: Return "
+            "target creature card from your graveyard to the battlefield', "
+            "sorcery speed, above 10 life (a floor nobody derived). NOT: "
+            "unearth {3}{W}{B} (item 6, §0z197 C). A floor.",
+        "Resplendent Angel":
+            "MODELLED: the 3/3 flier, and the 4/4 flying vigilance Angel at "
+            "EACH end step after 5 life gained (§0z153). NOT: '{3}{W}{W}{W}: "
+            "this creature gets +2/+2 and gains lifelink' (item 7). A floor.",
+        "Giada, Font of Hope":
+            "MODELLED: the 2/2 flying vigilance body and the counters each "
+            "other Angel enters with (`giada_counters`, §0z118). NOT: '{T}: "
+            "Add {W}. Spend this mana only to cast an Angel spell' -- no mana "
+            "ability in the deck module (item 8). A floor.",
+        "Mind Stone":
+            "MODELLED: '{T}: Add {C}.' NOT: '{1}, {T}, Sacrifice this "
+            "artifact: Draw a card' (item 9). A floor.",
+        "Black Market Connections":
+            "MODELLED: Buy Information alone -- draw a card, lose 2 life -- "
+            "every upkeep. NOT: 'choose one or more' (Sell Contraband's "
+            "Treasure, Hire a Mercenary's 3/2), a POLICY that undercounts; "
+            "and the trigger is 'at the beginning of your first main "
+            "phase', not the upkeep (§0z184 finding 7, item 37; item 10). A "
+            "floor.",
+        "Voldaren Bloodcaster // Bloodbat Summoner":
+            "MODELLED: the flier, and a Blood token when it or another "
+            "nontoken creature you control dies. NOT: the transform at five "
+            "Blood, nor Bloodbat Summoner's Bat each combat (§0z184 finding "
+            "8, item 37; item 11). A floor.",
+        "Elesh Norn, Grand Cenobite":
+            "MODELLED: +2/+2 to your other creatures, the commander included "
+            "(§0z151), and -2/-2 killing the pod's bodies of toughness 2 or "
+            "less as she enters and at each upkeep (`minus_two_pod`). NOT: "
+            "the -2/-2 on the bodies that survive it, whose power and "
+            "toughness every block and every attack at you reads since A1 "
+            "and A2 (item 12). A floor.",
+        "Teferi's Protection":
+            "MODELLED: one of the pod's events blanked -- its spot removal, "
+            "artifact removal or wrath (`PROTECTION`), cast from held mana. "
+            "NOT: 'until your next turn, your life total can't change and "
+            "you gain protection from everything', the pod's whole round of "
+            "combat, drains and kills (item 13). A floor.",
+        "Flawless Maneuver":
+            "MODELLED: 'Creatures you control gain indestructible until end "
+            "of turn' against a spot removal or a wrath, cast from held "
+            "mana. NOT: 'If you control a commander, you may cast this spell "
+            "without paying its mana cost' -- always paid at {2}{W} (item "
+            "14). A floor.",
+        "Massacre Wurm":
+            "MODELLED, CAST: the -2/-2 killing the pod's bodies of toughness "
+            "2 or less and the creature route pieces it reaches "
+            "(`minus_two_pod`), and 2 life from that player for each "
+            "creature of theirs that dies (`on_pod_creature_deaths`). NOT: "
+            "its ETB when the deck RETURNS it -- Reya Dawnbringer, Priest, "
+            "Sun Titan, Emeria Shepherd, the ultimate (item 15). A floor.",
+        "Sun Titan":
+            "MODELLED, CAST AND ATTACKING: return a permanent card of mana "
+            "value 3 or less (the shared pick, §0z135). NOT: its ETB when "
+            "the deck RETURNS it -- Reya Dawnbringer, Priest, Emeria "
+            "Shepherd, the ultimate (item 15). A floor.",
     },
 }
 
@@ -1329,9 +1411,11 @@ ROUTE_ANSWER_REASON = (
     "ROUTE. It removes a piece of an opponent's route of a kind its text can "
     "hit (`opponents.ANSWERS`, derived from the removal census), which "
     "pushes that kill back by a pre-rolled rebuild delay, and it is held "
-    "until such a piece is out. NOT: the pod's other permanents, which are "
-    "a count (§4). The delay is `threat_rebuild_max` (3), a judgement with "
-    "no data that moves every answer's row by about a third either way.")
+    "until such a piece is out. NOT: a creature body that is no route "
+    "piece, nor the pod's noncreature permanents beyond its routes, which "
+    "are not objects (§4). The delay is `threat_rebuild_max` (3), a "
+    "judgement with no data that moves every answer's row by about a third "
+    "either way.")
 COUNTER_REASON = (
     "MODELLED (§0z134; the default pod since §0z140): cast on the pod's turn "
     "from mana held up, against its removal, its wraths and its route "
@@ -1394,9 +1478,10 @@ for _deck in ("karlov", "shilgengar", "tivit"):
         "SYMMETRIC WIPE, and since POD_V4 is the default (§0z138, §0z140) a "
         "SPOT ANSWER: priced at {B}{B} against a creature route piece when "
         "the wipe gate refuses the wrath or the overload cannot be paid. "
-        "Your half of the wrath is faithful; the pod's half zeroes a count "
-        "(§4) and takes the route pieces it can hit. The cost is modelled, "
-        "the benefit an estimate."))
+        "Your half of the wrath is faithful; the pod's half kills its bodies "
+        "(§0z132) and takes the route pieces it can hit, and its other "
+        "permanents are not objects (§4). The cost is modelled, the benefit "
+        "an estimate."))
 # ---------------------------------------------------------------------------
 # A SYMMETRIC WIPE IS PARTLY MODELLED BY CONSTRUCTION (2026-09-12)
 # ---------------------------------------------------------------------------
@@ -1419,15 +1504,17 @@ for _deck in ("karlov", "shilgengar", "tivit"):
 # tag that makes the card a wipe in the first place.
 #
 # ONESIDED WIPES ARE EXCLUDED: `spare_own=True` skips the half that is
-# faithful. Massacre Wurm is the only one, and it is SCRIPTED in both decks
-# that run it since POD_V4 gave the pod bodies for its -2/-2 (§0z151).
+# faithful. Massacre Wurm is the only one: SCRIPTED in rendmaw since POD_V4
+# gave the pod bodies for its -2/-2 (§0z151), PARTLY in shilgengar since
+# §0z208 (its ETB on the deck's returns).
 SYMMETRIC_WIPE_REASON = (
     "SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(), "
     "honouring indestructible from this card's oracle text, §0z10); the "
-    "opponents' half only zeroes an abstract creature count (§4) and, since "
-    "POD_V4 is the default (§0z140), takes the route pieces it can hit, which "
-    "the wipe gate counts (§0z138). The COST is modelled and the BENEFIT is "
-    "an estimate."
+    "opponents' half kills their bodies (§0z132, each a death the payoffs "
+    "hear) and, since POD_V4 is the default (§0z140), takes the route pieces "
+    "it can hit, which the wipe gate counts (§0z138) -- but their other "
+    "permanents are not objects (§4). The COST is modelled and the BENEFIT "
+    "is an estimate."
 )
 
 # Cards carrying `wipe` that are NOT symmetric wipes, with the reason each is

@@ -104,55 +104,58 @@ Volcanic Vision                       +0.96+-0.13         +1.12+-0.14        +0.
 Blasphemous Act                       -0.08+-0.21         +1.07+-0.23        +0.0196+-0.0040      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Generous Gift                         +0.74+-0.16         +1.10+-0.18        +0.0169+-0.0034      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Swords to Plowshares                  +0.57+-0.17         +0.82+-0.18        +0.0130+-0.0034      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Farewell                              -0.01+-0.14         +0.67+-0.17        +0.0127+-0.0031      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Chaos Warp                            +0.65+-0.16         +0.98+-0.18        +0.0116+-0.0033      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Promise of Loyalty                    +0.32+-0.12         +0.69+-0.15        +0.0111+-0.0029      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Ondu Inversion                        +0.41+-0.22         +0.79+-0.22        +0.0108+-0.0040      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Gamble                                +1.18+-0.28         +0.86+-0.27        +0.0092+-0.0044      both
       MODELLED: any card to hand by the shared want order, then a random discard
       among the whole hand (the card found included) that fires the discard
@@ -164,16 +167,17 @@ Path to Exile                         +0.45+-0.16         +0.65+-0.17        +0.
       It removes a piece of an opponent's route of a kind its text can hit
       (`opponents.ANSWERS`, derived from the removal census), which pushes that
       kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: the pod's other permanents, which are a count (§4). The delay
-      is `threat_rebuild_max` (3), a judgement with no data that moves every
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Ultima                                -0.08+-0.15         +0.44+-0.17        +0.0083+-0.0032      both
       SYMMETRIC WIPE. Your half is faithful (destroyed through destroy(),
       honouring indestructible from this card's oracle text, §0z10); the
-      opponents' half only zeroes an abstract creature count (§4) and, since
-      POD_V4 is the default (§0z140), takes the route pieces it can hit, which the
-      wipe gate counts (§0z138). The COST is modelled and the BENEFIT is an
-      estimate.
+      opponents' half kills their bodies (§0z132, each a death the payoffs hear)
+      and, since POD_V4 is the default (§0z140), takes the route pieces it can
+      hit, which the wipe gate counts (§0z138) -- but their other permanents are
+      not objects (§4). The COST is modelled and the BENEFIT is an estimate.
 Borrowed Knowledge                    +0.60+-0.20         +0.52+-0.21        +0.0072+-0.0037      both
       MODE 2 IS IMPLEMENTED as of 2026-09-11 ('discard your hand, then draw cards
       equal to the number of cards discarded this way'), including the discards,
