@@ -263,6 +263,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
 | [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
+| [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18688,6 +18689,62 @@ it bigger (§0z197 A7) -- though the table above says the finishers it
 mills at X=6 are not where the loss is. Kozilek's and Ulamog's "shuffle
 your graveyard into your library" is unmodelled (on record, §0z209), so
 milling one is a FLOOR.
+
+<a id="0z211"></a>
+
+## 0z211. FIXED -- Animist's Awakening by its text: the lands among the top four
+
+**The owner, 2026-11-15: "go ahead with Animist's Awakening"** -- queue
+item 47's second fix, §0z209 item 2. Oracle text re-read from Scryfall the
+same day: "Reveal the top X cards of your library. Put all land cards from
+among them onto the battlefield tapped and the rest on the bottom of your
+library in a random order. Spell mastery -- If there are two or more
+instant and/or sorcery cards in your graveyard, untap those lands."
+
+**The rule** (`AzusaGame.awakening_reveal`): the top four at the fixed X
+(`x_pips` 4); the lands among them onto the battlefield as one event, then
+each landfall (CR 603.6a); the rest under the library in place, shuffled on
+its own addressed stream `awakening_bottom` (§0z17); the lands untapped
+with spell mastery. The old rule took `next(c for c in self.library if
+c.is_land)` four times -- index 0 is the bottom, so the four DEEPEST lands
+-- always tapped. `animist_reveal=False` restores it exactly.
+
+**Spell mastery is one function now**, `engine.spell_mastery`: lorehold
+held the expression twice (Olórin's Searing Light, Gideon's Phalanx), and
+this would have been a third copy (§0u). Lorehold's two sites call it.
+
+**Proved**: with `animist_reveal=False`, every deck BIT-IDENTICAL against
+`2736b27` at 2,000 seeds (`check_unchanged_decks --cfg`), and the whole
+output hashed identical over the same 2,000 games -- azusa's 139 keys a
+game with the switch off, lorehold's 138 at its default (the refactor).
+Pinned by `tests/test_animist_awakening.py`, eleven cases, three mutations
+exact; `tests/test_genesis_wave.py`'s neighbour H now pins the old rule.
+
+**Measured**, `diagnostics/run_knob_ab.py`, azusa's staged list, N=15,000
+paired, seeds 5000.., the text (A) minus the old rule (B)
+(`results/knob_ab_azusa_animist_reveal.txt`):
+
+| | T10 | T20 |
+|---|---|---|
+| all games | -0.0059 ±0.0019 | -0.0051 ±0.0025 |
+| the 15.0% where an Awakening resolved | -0.0390 ±0.0124 | -0.0337 ±0.0166 |
+
+The mechanism is the count, as §0z209 read it: about 1.3 lands an
+Awakening (`awakening_lands` 0.208 a game over 0.623 cards revealed, four
+a cast), not the audit's 1.7 -- that was the full library's share, and
+azusa's library is thinner in lands by the time it has five mana -- where
+the old rule put four. Spell mastery untaps them in about 60% of casts.
+`landfall_triggers` -0.35 a game, `damage` -0.51, `opponents_killed`
+-0.0094.
+
+**The identity check reads 1 of 12,745, and it is a counter, not a game.**
+Seed 6163 (5000 + 1163): the Awakening resolves on an EMPTY library, so it
+reveals nothing and `awakening_revealed` stays 0, while spell mastery is
+still counted (`awakening_mastery` 1) and the empty bottom is shuffled on
+its stream (`crn_draws` 153 against 152). Played both ways the game is
+the same -- won, nine turns -- and those two keys, at T20 and in the T10
+snapshot, are the only ones that differ (found by a one-leg search of all
+15,000 seeds for an Awakening counter without a reveal: that seed alone).
 
 ## How to read an ablation table
 

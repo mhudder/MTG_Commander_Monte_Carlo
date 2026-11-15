@@ -35,8 +35,9 @@ Greenwarden (mv 6) is the seventh card.
   G  NEIGHBOUR: `genesis_wave_reveal=False` is the old rule: three
      permanents, every one mana value 6, nothing milled, the library three
      shorter
-  H  NEIGHBOUR: Animist's Awakening still takes four lands (its own fix,
-     item 47's next, is not this one)
+  H  NEIGHBOUR: the lands-only branch `wave` shares, at its old rule
+     (`animist_reveal=False`): Animist's Awakening takes four lands. Its
+     new rule is §0z211's, pinned in tests/test_animist_awakening.py
   I  the pilot's decking guard reads the reveal as six cards out of the
      library (`draws_on_resolve` 6, so `draw_is_safe` holds the Wave back
      below 11 cards); under the old rule, 0, as it was
@@ -153,10 +154,10 @@ def run_cases():
            sorted(c.name for c in g.graveyard), lib - len(g.library)),
           (3, True, ["Genesis Wave"], 3))
 
-    g = fresh()
+    g = fresh(animist_reveal=False)
     awaken = take(g, "Animist's Awakening")
     g.resolve(awaken)
-    check("H Animist's Awakening still takes four lands",
+    check("H the old Awakening rule still takes four lands",
           sum(1 for p in g.board if p.card.is_land), 4)
 
     g = fresh()

@@ -138,7 +138,7 @@ from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_g
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           tutor_take, sylvan_library, abundance_draw,
-                          remove_card)
+                          remove_card, spell_mastery)
 from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
@@ -623,6 +623,9 @@ class AzusaGame(BaseGame):
             "wave_put": 0,              # ... of which put onto the battlefield
             "wave_milled": 0,           # ... and the rest, milled (§0z210)
             "wave_guard_held": 0,       # ... a cast the decking guard declined
+            "awakening_revealed": 0,    # Animist's Awakening: cards revealed
+            "awakening_lands": 0,       # ... lands put onto the battlefield
+            "awakening_mastery": 0,     # ... resolutions with spell mastery
             "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
             "bristly_counters": 0,      # Bristly Bill: landfall counters
             "bristly_activations": 0,   # ... the {3}{G}{G} doubling
@@ -2758,6 +2761,9 @@ class AzusaGame(BaseGame):
         if not lands_only:
             self.m["wave_casts"] += 1
         if lands_only:
+            if self.cfg.get("animist_reveal", True):          # §0z211
+                self.awakening_reveal(x)
+                return
             put = 0
             for _ in range(x):
                 land = next((c for c in self.library if c.is_land), None)
@@ -2802,6 +2808,38 @@ class AzusaGame(BaseGame):
             self.make_permanent(c, sick=not c.haste, tapped=bool(c.tapped))
             if c.is_land:
                 self.land_entered(c, played=False)
+
+    def awakening_reveal(self, x):
+        """ANIMIST'S AWAKENING BY ITS TEXT (§0z211): "Reveal the top X cards
+        of your library. Put all land cards from among them onto the
+        battlefield tapped and the rest on the bottom of your library in a
+        random order. Spell mastery -- If there are two or more instant
+        and/or sorcery cards in your graveyard, untap those lands."
+
+        The lands AMONG the top X, not the first X lands anywhere -- the old
+        rule (`animist_reveal=False`) took `next(c for c in self.library if
+        c.is_land)` four times, and index 0 is the library's BOTTOM, so it
+        took the four deepest lands (§0z209 item 2). The rest go under the
+        library on their own addressed stream (§0z17), in place, so no
+        reference to `self.library` goes stale (§0z19). The lands enter as
+        one event (CR 603.6a): all of them first, then each landfall.
+        Spell mastery reads the graveyard on resolution (`spell_mastery`);
+        entering tapped and untapping at once is entering untapped here,
+        since nothing in this engine sees the lands between the two."""
+        revealed = [self.library.pop()
+                    for _ in range(min(x, len(self.library)))]
+        lands = [c for c in revealed if c.is_land]
+        rest = [c for c in revealed if not c.is_land]
+        crn_shuffle(self, "awakening_bottom", rest)
+        self.library[0:0] = rest
+        mastery = spell_mastery(self)
+        self.m["awakening_revealed"] += len(revealed)
+        self.m["awakening_lands"] += len(lands)
+        self.m["awakening_mastery"] += mastery
+        for c in lands:
+            self.make_permanent(c, sick=False, tapped=not mastery)
+        for c in lands:
+            self.land_entered(c, played=False)
 
     def wave_enter(self, cards):
         """Genesis Wave's permanents enter as ONE event, so every one of them

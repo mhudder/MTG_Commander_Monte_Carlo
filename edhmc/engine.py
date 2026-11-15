@@ -638,6 +638,16 @@ def crn_randrange(g, name: str, n: int) -> int:
     return g.crn.randrange(name, n)
 
 
+def spell_mastery(g) -> bool:
+    """"Spell mastery -- If there are two or more instant and/or sorcery
+    cards in your graveyard": ONE function for every card that reads it
+    (§0z211), where lorehold held two copies of the expression and azusa's
+    Animist's Awakening would have been a third (§0u). Read on resolution,
+    when the spell itself is on the stack and not yet in the graveyard."""
+    return sum(1 for c in g.graveyard
+               if "Instant" in c.types or "Sorcery" in c.types) >= 2
+
+
 def crn_shuffle(g, name: str, seq: list) -> None:
     if not g.cfg.get("crn_streams", True):
         g.rng.shuffle(seq)

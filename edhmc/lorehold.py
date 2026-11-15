@@ -34,7 +34,8 @@ from edhmc.engine import (cleanup_step, late_land_drop, begin_game, Snapshots, B
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng, tutor_take, remove_card,
-                          land_tax, tithe_treasures, turn_knob)
+                          land_tax, tithe_treasures, turn_knob,
+                          spell_mastery)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
 
@@ -1528,8 +1529,7 @@ def apply_spell_effects(g, card, is_copy=False, was_cast=True,
         # Spell mastery: with 2+ instants/sorceries in the graveyard it also
         # deals damage equal to each exiled creature's power. The opponent
         # model has no per-creature power, so use the pod's average body.
-        if sum(1 for c in g.graveyard
-               if "Instant" in c.types or "Sorcery" in c.types) >= 2:
+        if spell_mastery(g):
             # A POD TOTAL for `opp_avg_power` apiece. `pod_size`, not `living`:
             # deal_pod_damage divides by the same quantity, so building the
             # numerator from the other one is what made the tivit sites look
@@ -1989,8 +1989,7 @@ def gideons_phalanx(g):
     (`phalanx_mastery`), so the floor has a size."""
     make_tokens(g, 4, 2, 2, "Knight", vigilance=True)     # §0z186
     g.m["phalanx_knights"] += 4
-    if sum(1 for c in g.graveyard
-           if "Instant" in c.types or "Sorcery" in c.types) >= 2:
+    if spell_mastery(g):
         g.m["phalanx_mastery"] += 1
 
 

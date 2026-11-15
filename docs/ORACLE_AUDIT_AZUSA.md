@@ -56,6 +56,10 @@ the text at all. And the creatures it puts in fire no ETB (item 3).
 
 ### 2. Animist's Awakening takes the first four lands anywhere
 
+> **FIXED 2026-11-15 (§0z211)**: the lands among the top four, the rest
+> bottomed on their own stream, untapped with spell mastery;
+> `animist_reveal=False` restores the old rule.
+
     "Reveal the top X cards of your library. Put all land cards from among
     them onto the battlefield tapped and the rest on the bottom of your
     library in a random order. Spell mastery — If there are two or more

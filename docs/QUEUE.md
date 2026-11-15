@@ -411,9 +411,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       whole library where the text reveals the top X (1)~~ **DONE
       2026-11-15 (§0z210)**: -0.0034 / -0.0039 at T10 / T20, the old
       rule's tutor for the mana-value-6 creatures; the mill costs nothing
-      measurable. Animist's
+      measurable. ~~Animist's
       Awakening takes the first four lands anywhere where the text
-      averages 1.7 from the top four (2); a tutored or Waved creature
+      averages 1.7 from the top four (2)~~ **DONE 2026-11-15 (§0z211)**:
+      -0.0059 / -0.0051, 1.3 lands a cast where the old rule took 4; a tutored or Waved creature
       fires no ETB -- `AzusaGame.etb` is called by `resolve` and
       Springheart's copy only (3); Chord of Calling at a fixed X=4 with no
       convoke, against trostani's `convoke_pool` and `x_plan` for the same
