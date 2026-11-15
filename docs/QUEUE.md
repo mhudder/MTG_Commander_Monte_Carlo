@@ -345,12 +345,14 @@ A2, tested step by step, with **no table rebuilt until that batch is done**.
     never block"), and Bloodthirsty Conqueror and South Wind Avatar are
     SCRIPTED; `audit_cards` checks `haste` and `lifelink`, proved to fail
     (`tests/test_audit_keywords.py`). Every deck bit-identical at 2,000
-    seeds. **Left**: the oracle audit for azusa (TIVIT'S AND SHILGENGAR'S
-    ARE DONE, §0z207 and §0z208, `docs/ORACLE_AUDIT_TIVIT.md` and
-    `docs/ORACLE_AUDIT_SHILGENGAR.md`: their findings are the owner's to
-    choose from; tivit's labels are fixed), which §0z116 already covered to 2026-10-07 --
-    what is unread is the cards added since and the text the flip made
-    live; and card work for
+    seeds. **THE THREE ORACLE AUDITS ARE DONE (2026-11-15)**: tivit §0z207,
+    shilgengar §0z208, azusa §0z209 (`docs/ORACLE_AUDIT_*.md`); tivit's and
+    shilgengar's labels are fixed. **Left, the owner's to choose from**:
+    the audits' behaviour findings (each moves its deck's baseline, so
+    before the rebuild is cheapest) -- tivit's Greaves-and-blinks, Tempting
+    Contract, Grudge Keeper; shilgengar's Requiem Angel and landfall rule;
+    azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
+    azusa's labels; and card work for
     the add-card skill: ward, cycling, Woe Strider's sacrifice and escape,
     Memory Jar (C and item 37), and §0z206's five new floors (the Vault's
     deathtouch, an animated land's reach and indestructible, Nissa's

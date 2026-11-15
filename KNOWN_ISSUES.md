@@ -261,6 +261,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
 | [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
 | [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
+| [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -18552,6 +18553,54 @@ reasons too, and `test_metrics_and_render` C holds every committed table to
 its cache's render, so its table was re-rendered as well: byte-identical
 before this change, reason text only after, no row moved. A render, not a
 re-measure: nothing was run against it.
+
+<a id="0z209"></a>
+
+## 0z209. OPEN -- azusa's oracle re-audit: Genesis Wave and Animist's Awakening dig the whole library
+
+**The owner, 2026-11-15: "fix the labels, then audit azusa"** -- the last
+of queue item 46's audits. The whole finding is
+**`docs/ORACLE_AUDIT_AZUSA.md`**: the staged list (-Perilous Forays +Ka-Zar,
+two Forests for Fabled Passage and Evolving Wilds), 64 entries and the
+utility lands, read against the code at `1511c4e`, oracle text from
+Scryfall the same day. **Nothing is measured and nothing is fixed.**
+
+The three cards new since §0z116 are right, and the landfall core is
+careful. The largest findings, numbered as in the file:
+
+- **1. Genesis Wave** ("reveal the top X ... permanent cards with mana
+  value X or less from among them") is `wave(6, count=3)`: the three
+  biggest permanents of mana value 6 or less in the WHOLE library. The
+  text averages 4.6 permanents from six cards here (2.1 nonland, 2.5
+  lands) and mills the rest. A tutor in place of a dig: a ceiling on
+  quality, a floor on count and landfall.
+- **2. Animist's Awakening** takes the first four lands anywhere in the
+  library; the text averages 1.7 lands from the top four (41 lands in 99),
+  bottoms the rest, and untaps them with spell mastery. A ceiling by about
+  double.
+- **3. A tutored or Waved creature fires no ETB.** `AzusaGame.etb`'s
+  docstring says it was split out for the tutors, Genesis Wave, Bellower
+  and Titania; only `resolve` and Springheart's copy call it (item 16 was
+  the copy alone). Green Sun's Zenith's or Chord's Eternal Witness, the
+  Wave's Titania or Ka-Zar: no ETB. A floor.
+- **4-5.** Craterhoof's pump reaches creatures made after it; Bane of
+  Progress spares your off-board Treasures, Clues and Food. Small ceilings.
+- **6-9, four SCRIPTED cards partial**: Journey of Discovery without its
+  "play up to two additional lands" mode, Nylea's Intervention's flier
+  mode and any-land search, Chord of Calling's convoke (§0z197 A7),
+  Sylvan Awakening's reach and indestructible (§0z206).
+- **Tier 2b: eight utility lands have no code** -- Strip Mine, Wasteland,
+  Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin, Homeward Path,
+  Scavenger Grounds. Lands carry no label, so no table said it. The
+  land-destruction lands' SACRIFICE is a land death, Titania's 5/3 and a
+  replay through the deck's recursion, and that half is not the pod's.
+- **10-14, five stale reasons**: Ulamog's cast trigger and Bane of
+  Progress ("no opposing permanents" -- route pieces since POD_V4),
+  Kozilek's annihilator (bodies, not a count), `crack_fetch`'s "life
+  unmodelled" (charged), Mind's Eye (MODELABLE by Smothering Tithe's rate).
+
+As for tivit and shilgengar: the labels are a rendering change; the
+behaviour fixes move azusa's baseline and belong before the rebuild.
 
 ## How to read an ablation table
 
