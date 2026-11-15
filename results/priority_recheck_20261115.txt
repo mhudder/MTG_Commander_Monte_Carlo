@@ -1,0 +1,2 @@
+adopted priority moves, UNDONE against the list as it stands. N=15,000 paired, seeds 101234..116233, horizons (10, 20), staged lists (build_pending). Printed: ADOPTED minus UNDONE (positive = the adopted move still wins).
+

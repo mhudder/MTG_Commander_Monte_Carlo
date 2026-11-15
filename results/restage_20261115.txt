@@ -1,0 +1,13 @@
+Queue item 48 / §0z219: every staged swap re-measured in context on the flipped pod (code of 20efca7; the four decks' fingerprints are those of the rebuild), N=15,000 paired, seeds 5000.., python 3.11.17 / numpy 2.4.6 (diagnostics.run_restage 15000 OUT <15 arms>, into an empty OUT; --report)
+
+karlov  -Soulmender +Bloodthirsty Conqueror           T10 +0.0403 +-0.0035*  T20 +0.0326 +-0.0037*  dmgT20 -3.37 +-0.24
+karlov  -Swamp +Bolas's Citadel                       T10 +0.0120 +-0.0038*  T20 +0.0089 +-0.0043*  dmgT20 -0.19 +-0.24
+karlov  -Daxos, Blessed by the Sun +South Wind Avatar T10 +0.0107 +-0.0025*  T20 +0.0080 +-0.0031*  dmgT20 +0.57 +-0.15
+azusa   -Perilous Forays +Ka-Zar of the Savage Land   T10 +0.0077 +-0.0028*  T20 +0.0140 +-0.0035*  dmgT20 +1.49 +-0.20
+azusa   -Forest +Fabled Passage                       T10 +0.0081 +-0.0045*  T20 +0.0077 +-0.0053*  dmgT20 +0.64 +-0.32
+azusa   -Forest +Evolving Wilds                       T10 +0.0063 +-0.0046*  T20 +0.0089 +-0.0054*  dmgT20 +0.47 +-0.32
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0213 +-0.0035*  T20 +0.0233 +-0.0042*  dmgT20 +2.31 +-0.25
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0201 +-0.0040*  T20 +0.0233 +-0.0047*  dmgT20 +1.89 +-0.28
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0068 +-0.0030*  T20 +0.0188 +-0.0038*  dmgT20 +0.76 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0173 +-0.0040*  T20 +0.0153 +-0.0048*  dmgT20 +3.65 +-0.27
+shilgengar -Vampiric Rites +Lyra, Archangel of Dawn   T10 +0.0054 +-0.0014*  T20 +0.0117 +-0.0034*  dmgT20 +1.19 +-0.16
