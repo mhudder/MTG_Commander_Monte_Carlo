@@ -81,7 +81,10 @@ def check(label, got, want):
 
 
 def game(**cfg):
-    g = EN.Game(list(RDECK), RCMD, dict(DEFAULT_CFG, **cfg),
+    # held_answers off (§0z222): these cases pin each event's KIND, and
+    # A6 would hold the spot removal against a weak target instead.
+    g = EN.Game(list(RDECK), RCMD,
+                dict(DEFAULT_CFG, **dict(dict(held_answers=False), **cfg)),
                 random.Random(1), seed_for_pod=1)
     g.board = EN.Board()
     g.hand, g.graveyard = [], []

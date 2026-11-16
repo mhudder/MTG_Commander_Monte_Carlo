@@ -49,7 +49,10 @@ from edhmc.experiment import DEFAULT_CFG, POD_PRE_V4
 
 # Written on the pod before §0z140 and pinning that pod's mechanism: the
 # old pod named, so POD_V4 becoming the default does not move it.
-DEFAULT_CFG = dict(DEFAULT_CFG, **POD_PRE_V4)
+# And item 45 off (§0z222): the old pod held no answers and ended the game
+# on a kill, which these cases read.
+DEFAULT_CFG = dict(DEFAULT_CFG, **POD_PRE_V4, route_kills=False,
+                   pod_attacks_walkers=False, held_answers=False)
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []

@@ -391,6 +391,13 @@ POD_DEFAULTS = {
     "you_block": True,
     "rival_combat": True,
     "pod_hold_back": True,
+    # ITEM 45, THE DEFAULT SINCE §0z222 (the owner, 2026-11-16: "flip,
+    # re-fit, rebuild"). A3 route-aware kills, A5 the pod attacks your
+    # walkers, A6 held answers (hold only to gain) -- built OFF in §0z221,
+    # flipped together. `experiment.POD_PRE_ITEM45` restores the pod before.
+    "route_kills": True,
+    "pod_attacks_walkers": True,
+    "held_answers": True,
 }
 
 
@@ -2189,7 +2196,7 @@ def grow_board(opp) -> None:
 
 
 def held_answers_on(g) -> bool:
-    return bool(g.cfg.get("held_answers", False))
+    return bool(pod_knob(g.cfg, "held_answers"))
 
 
 def pod_holds_answer(g, opp, rolls) -> bool:
@@ -3522,7 +3529,7 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
     if first > len(sent):
         g.m["pod_attackers_held"] += first - len(sent)
     walker, at_walker = None, []
-    if g.cfg.get("pod_attacks_walkers", False):        # A5, §0z221
+    if pod_knob(g.cfg, "pod_attacks_walkers"):         # A5, §0z221
         sent, walker, at_walker = split_for_walker(g, bodies, sent, plan)
     if not sent and not at_walker:
         return
@@ -5380,7 +5387,7 @@ def _clock_seat(g, i, rolls_t) -> bool:
     share = your_share(g, opp, others)
     at_you = (rolls_t[i][6] < share
               and not tax_deflects(g, i, opp, others))      # §0z138
-    if (at_you and g.cfg.get("route_kills", False) and pod_threats_on(g)
+    if (at_you and pod_knob(g.cfg, "route_kills") and pod_threats_on(g)
             and getattr(opp, "route", None) in ("drain", "combat")):
         return route_kill(g, opp)  # §0z221, A3: life and blockers defend
     if at_you and angel_prevents_kill(g, opp):

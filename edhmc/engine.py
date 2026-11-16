@@ -4090,7 +4090,7 @@ def static_walker_plus(g, perm, printed) -> None:
     as though used every turn, so loyalty is the printed number on its first
     +1 and one more each turn after; Grist's extra counter for a milled Insect
     is not counted (a floor). Off, as before: no loyalty at all."""
-    if not g.cfg.get("pod_attacks_walkers", False):
+    if not OPP.pod_knob(g.cfg, "pod_attacks_walkers"):
         return
     if perm.counters <= 0:
         perm.counters = printed

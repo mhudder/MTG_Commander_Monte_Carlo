@@ -273,7 +273,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z218](#0z218) | FIXED | **The Clue dig; a capped draining loop wins** (the owner, 2026-11-15): `pile_dig` +0.0063 / +0.0043, `capped_drain_wins` +0.0003 / +0.0002; combo games won 88% |
 | [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
 | [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; tivit's §0z44 joint a null, KEPT by the owner |
-| [0z221](#0z221) | DECIDED | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. Building |
+| [0z221](#0z221) | BUILT | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. built, measured, flipped in §0z222 |
+| [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuild follows |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19584,6 +19585,53 @@ real attacks since item 44.
 moves karlov's and rendmaw's.** Built the item-44 way: each behind a
 switch that restores today's rule exactly, OFF until measured, and one
 rebuild at the end.
+
+<a id="0z222"></a>
+
+## 0z222. FLIPPED -- item 45 is the default, and the pod is re-fitted (`incidental_rate` 1.94)
+
+**The owner, 2026-11-16: "flip, re-fit, rebuild"**, with A6 to flip only if
+its rework earned it (it did, §0z221). Item 44's protocol (§0z204): the
+defaults flip together, the pod is re-fitted once by the fit rule (§0z195),
+then one rebuild.
+
+### The flip
+
+`route_kills` (A3), `pod_attacks_walkers` (A5) and `held_answers` (A6, hold
+only to gain) moved into `opponents.POD_DEFAULTS`, every read through
+`pod_knob`, so the default is said once. **`experiment.POD_PRE_ITEM45`**
+restores the pod of §0z219's tables, the old rate included:
+`dict(DEFAULT_CFG, **POD_PRE_ITEM45)` played 2,000 staged games a deck
+BIT-IDENTICALLY to `2950ecc` on all six. And the new default played
+BIT-IDENTICALLY to `2950ecc` with the three switches and the rate set by
+hand: the flip is the switches and the rate, nothing else.
+
+Three tests read the old pod as a fixture for another rule and now pin it
+in the case that needs it, each said in the file: `test_dead_opponents`
+(the old pod named), `test_destroy_share` (each event's kind; A6 would hold
+the spot removal), `test_route_answers` I (the attack tax's deflection;
+under A3 an undeflected combat kill is survived).
+
+### The re-fit
+
+The fit rule: the mean T20 win rate over the six active decks equals the old
+pod's. Both levers swept on the same seeds (`diagnostics.fit_pod_knob`,
+N=3,000 a deck, seeds 5000..7999, target `POD_PRE_ITEM45`'s switches at
+1.45; `results/fit_item45_incidental_rate_20261116.txt`,
+`results/fit_item45_clock_shift_20261116.txt`). The target is 0.4747 and
+10.52 turns; the flipped pod at 1.45 is 0.5114 and 10.69 turns.
+
+| lever | crossing | out of sample (20000..22999; target 0.4630, 10.47 turns) |
+|---|---|---|
+| `incidental_rate` (1.45 today) | **1.940** | **0.4597** (-0.0033), 10.27 turns |
+| `threat_clock_shift` (2.3 today) | 2.921 | 0.4775 (+0.0145), 10.42 turns |
+
+**ADOPTED: `incidental_rate` 1.94**, in `DEFAULT_CFG`, as at §0z204 and for
+the same reason: out of sample it lands on the target where the shift does
+not. **Its cost, said out loud: games are 0.2 turns shorter** (10.27 against
+10.47) -- the shift holds length better and misses the win rate by three
+times as much. The rate reaches the game through `pod_attack_rate`, how
+often a combat body attacks; capped at 1 a body, as before.
 
 ## How to read an ablation table
 

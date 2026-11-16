@@ -21,7 +21,8 @@ CASES
   D  `damage_you`: without the Angel the damage passes; with it nothing
      does and twice it is milled, fractions carried (0.6 + 0.6 mills 2)
   E  the pod's chip damage with the Angel out: life untouched, cards milled
-  F  a kill aimed at you: a COMBAT route's is prevented under `pod_threats`
+  F  (`route_kills` off, the old kill path, §0z222) a kill aimed at you: a
+     COMBAT route's is prevented under `pod_threats`
      (no loss, twice your life milled, the clock back next round); a combo
      route's is not; on the default pod it is not
   G  shilgengar's Sun Titan takes the shared pick: a higher-priority card
@@ -158,7 +159,11 @@ def run_cases():
 
     out = []
     for route, threats in (("combat", True), ("combo", True), (None, False)):
-        g = sgame(pod_threats=threats)
+        # route_kills off (§0z222): F pins §0z135's rule on the old kill
+        # path (`angel_prevents_kill`), which the default pod reaches no
+        # longer -- under A3 a combat kill is `route_kill`'s damage, and
+        # tests/test_route_kills.py F pins the Angel there.
+        g = sgame(pod_threats=threats, route_kills=False)
         put(g, angel)
         o = g.opponents[0]
         o.route, o.kill_turn, o.clock_fired = route, 6, False

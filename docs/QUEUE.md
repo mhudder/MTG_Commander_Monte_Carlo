@@ -53,7 +53,9 @@ items below this section are in the order they were queued, not this one.
    rebuilt tables. **DONE (§0z220)**; tivit's §0z44 priorities, a null now,
    KEPT by the owner 2026-11-16. Item 48 is closed.
 5. **Item 45: decide A3, then A6 and A5.** A3 is the largest limit left.
-   **DECIDED 2026-11-16 (§0z221)**: A3 first, then A5, then A6.
+   **DECIDED 2026-11-16 (§0z221)**: A3 first, then A5, then A6. **BUILT,
+   MEASURED AND FLIPPED (§0z222)**, A6 reworked to hold only to gain; the
+   pod re-fitted (`incidental_rate` 1.94); the rebuild follows.
 6. **Card work that does not move a decision already made** (item 46's
    list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
    first, since it guards the commander. Any time; after step 3 each

@@ -101,7 +101,14 @@ DEFAULT_CFG = {
     # 5000..7999; out of sample (20000..22999) mean T20 0.4616 against the
     # old pod's 0.4612, 10.49 turns against 10.48. `POD_PRE_COMBAT` restores
     # 0.78 with the switches.
-    "incidental_rate": 1.45,
+    # 1.94 since §0z222 (2026-11-16): item 45 (A3 route-aware kills, A5 the
+    # pod attacks walkers, A6 held answers) made the pod weaker -- a kill you
+    # survive is a round bought. Fitted by the same rule against the old pod:
+    # crossing 1.940 on seeds 5000..7999; out of sample (20000..22999) mean
+    # T20 0.4597 against the old pod's 0.4630, 10.27 turns against 10.47
+    # (`threat_clock_shift`'s 2.92 missed by +0.0145). `POD_PRE_ITEM45`
+    # restores 1.45 with the switches.
+    "incidental_rate": 1.94,
     "clock_shift": 2,             # the deus ex machina arrives later
     "archetypes": True,           # aggro / midrange / control / combo pods
 
@@ -210,6 +217,19 @@ POD_PRE_COMBAT = {
     "rival_combat": False,
     "pod_hold_back": False,
     "incidental_rate": 0.78,
+}
+
+# The pod before §0z222: item 45 OFF -- a clock that picks you ends the game
+# at any life and board (A3), your walkers are never attacked (A5), and the
+# pod's removal is cast in its own main phase only (A6). Every table built
+# before §0z222 (the six of §0z219) is this pod's, and
+# `dict(DEFAULT_CFG, **POD_PRE_ITEM45)` plays it exactly, the old rate
+# included.
+POD_PRE_ITEM45 = {
+    "route_kills": False,
+    "pod_attacks_walkers": False,
+    "held_answers": False,
+    "incidental_rate": 1.45,
 }
 
 # The pod before §0z140: no bodies, no routes, no responses. Every table and

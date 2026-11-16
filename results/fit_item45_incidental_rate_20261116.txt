@@ -1,0 +1,13 @@
+fit incidental_rate over [1.45, 1.7, 2.0, 2.4]: target pod DEFAULT_CFG + {'route_kills': False, 'pod_attacks_walkers': False, 'held_answers': False}, candidates + {}; N=3000 a deck, staged lists, seeds 5000..7999, python 3.11.17
+target: mean T20 win rate over 6 active decks = 0.4747; mean turns 10.52
+
+deck        target T10     T20  turns | incidental_rate=1.45   T20 (diff ±) | incidental_rate=1.7    T20 (diff ±) | incidental_rate=2.0    T20 (diff ±) | incidental_rate=2.4    T20 (diff ±)
+rendmaw         0.0627  0.3200  11.16 | 0.3747 (+0.0547 ±0.0095) | 0.3580 (+0.0380 ±0.0129) | 0.3417 (+0.0217 ±0.0142) | 0.3347 (+0.0147 ±0.0154)
+lorehold        0.2800  0.4817   9.90 | 0.4893 (+0.0077 ±0.0048) | 0.4667 (-0.0150 ±0.0095) | 0.4440 (-0.0377 ±0.0111) | 0.4213 (-0.0603 ±0.0127)
+karlov          0.2750  0.5150  10.12 | 0.5690 (+0.0540 ±0.0097) | 0.5470 (+0.0320 ±0.0127) | 0.5280 (+0.0130 ±0.0137) | 0.5100 (-0.0050 ±0.0147)
+tivit           0.3230  0.5900  11.03 | 0.5950 (+0.0050 ±0.0037) | 0.5697 (-0.0203 ±0.0094) | 0.5467 (-0.0433 ±0.0116) | 0.5107 (-0.0793 ±0.0131)
+shilgengar      0.0497  0.4170  11.26 | 0.4633 (+0.0463 ±0.0083) | 0.4417 (+0.0247 ±0.0126) | 0.4223 (+0.0053 ±0.0140) | 0.3977 (-0.0193 ±0.0152)
+azusa           0.3357  0.5247   9.68 | 0.5770 (+0.0523 ±0.0090) | 0.5567 (+0.0320 ±0.0119) | 0.5430 (+0.0183 ±0.0133) | 0.5190 (-0.0057 ±0.0142)
+
+mean T20: incidental_rate=1.45: 0.5114 (10.69 turns), incidental_rate=1.7: 0.4899 (10.48 turns), incidental_rate=2.0: 0.4709 (10.29 turns), incidental_rate=2.4: 0.4489 (10.09 turns)
+crossing: incidental_rate = 1.940

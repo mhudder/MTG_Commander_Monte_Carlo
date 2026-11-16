@@ -258,7 +258,9 @@ def run_cases():
     for d in (0.0, 1.0):
         # Your share of the clock is threat-weighted: a board with a threat
         # draws it (an empty one has share 0 and is never picked).
-        g = tgame(attack_tax_deflect=d)
+        # route_kills off (§0z222): I pins the TAX's deflection, and under
+        # A3 an undeflected combat kill is survived, not a loss.
+        g = tgame(attack_tax_deflect=d, route_kills=False)
         put(g, TM, "Ghostly Prison")
         body(g, 3, threat=10.0)
         o = g.opponents[0]
