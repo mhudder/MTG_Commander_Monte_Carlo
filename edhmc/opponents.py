@@ -5060,6 +5060,96 @@ def angel_prevents_kill(g, opp) -> bool:
     return True
 
 
+def kill_force(g, opp, size) -> list:
+    """A COMBAT kill's attackers (§0z221, A3): this opponent's own body pool,
+    read on past the bodies on its board, utility bodies skipped, until
+    their power reaches `size`. MORE OF THE SAME DECK -- a judgement, said
+    out loud: an overrun, a token army or a haste threat that resolves as the
+    kill, shaped like what that opponent plays. The pool is pre-rolled, so
+    reading ahead rolls nothing new (CRN, §0z17). The force is not left on
+    the battlefield after the kill (a floor on the pod: it rebuilds through
+    its own count as before)."""
+    pool = getattr(opp, "body_pool", None)
+    out, power, j = [], 0.0, 0
+    if not pool:
+        return out
+    start = getattr(opp, "next_body", 0)
+    while power < size and j < len(pool):
+        b = pool[(start + j) % len(pool)]
+        j += 1
+        if b.utility or b.power <= 0:
+            continue
+        out.append(b)
+        power += b.power
+    return out
+
+
+def route_kill(g, opp) -> bool:
+    """A3, ROUTE-AWARE KILLS (the owner, 2026-11-16, §0z221;
+    `route_kills`, False is the old rule exactly). An opponent's clock that
+    picks you resolves by its ROUTE (§0z140) instead of ending the game:
+
+      combo   unchanged -- a combo ignores life and blockers (not routed here)
+      drain   you LOSE `kill_size` (40) life -- loss, not damage: Angel of
+              Suffering does not stop it
+      combat  `kill_force`'s attackers, power `kill_size`, attack you through
+              your blocks (`plan_blocks`, your rule, as the pod's declared
+              attack) and the unblocked damage is DAMAGE (`damage_you`, so
+              Angel prevents and mills it, which `angel_prevents_kill` did for
+              the whole kill before)
+
+    `kill_size` 40 is a JUDGEMENT nobody has data for: the life a kill would
+    take from a player at the start. A kill you survive re-arms that clock one
+    round on, as the Angel's did. True when it killed you."""
+    from edhmc.engine import damage_you
+    size = float(g.cfg.get("kill_size", 40))
+    g.m["kills_routed"] += 1                 # the reach
+    if opp.route == "drain":
+        g.your_life -= size
+        g.m["kill_life_lost"] += size
+    else:
+        force = kill_force(g, opp, size)
+        atk = [_Atk(k, ("kill", k), b.power, b.toughness, False, False, False,
+                    False, False, False, False, float(b.mv), False)
+               for k, b in enumerate(force)]
+        blockers = your_blockers(g)
+        asg = plan_blocks(g, g.your_life, atk, blockers, len(blockers),
+                          count=True, floor=g.cfg.get("your_chump_floor", 10),
+                          prefix="kill_block_")
+        dmg = float(sum(a.power for a in atk if a.k not in asg))
+        mine, link = [], 0
+        whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
+        for a in atk:
+            blks = asg.get(a.k)
+            if not blks:
+                continue
+            mine.extend(_attacker_kills(a, blks))
+            for b in _dealers(a, blks):
+                if b.ref.card.lifelink or whip:
+                    link += b.power
+        g.m["kill_attackers"] += len(atk)
+        g.m["kill_blocked"] += len(asg)
+        if dmg > 0:
+            dealt = damage_you(g, dmg)
+            g.your_life -= dealt
+            g.m["kill_damage_taken"] += dealt
+        _your_lifelink(g, link)
+        if mine:
+            with simultaneous(g):
+                for p in mine:
+                    destroy(g, p, destroys=True)
+    if g.your_life <= 0:
+        g.result = "loss"
+        g.m["loss_route"] = 2      # an opponent's clock picked YOU
+        g.your_life = 0.0
+        return True
+    g.m["kills_survived"] += 1
+    g.m[f"kills_survived_{opp.route}"] += 1
+    opp.kill_turn = pod_turn(g) + 1
+    opp.clock_fired = False
+    return False
+
+
 def resolve_clocks(g):
     """Each opponent's own clock. When it comes due, that opponent eliminates
     somebody - and who it is, is THREAT-WEIGHTED. Being the strongest board at
@@ -5099,6 +5189,9 @@ def _clock_seat(g, i, rolls_t) -> bool:
     share = your_share(g, opp, others)
     at_you = (rolls_t[i][6] < share
               and not tax_deflects(g, i, opp, others))      # §0z138
+    if (at_you and g.cfg.get("route_kills", False) and pod_threats_on(g)
+            and getattr(opp, "route", None) in ("drain", "combat")):
+        return route_kill(g, opp)  # §0z221, A3: life and blockers defend
     if at_you and angel_prevents_kill(g, opp):
         return False               # §0z135: damage, prevented and milled
     if at_you:

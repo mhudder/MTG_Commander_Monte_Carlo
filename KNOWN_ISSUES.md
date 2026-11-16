@@ -19385,6 +19385,33 @@ today's pod (after §0z219's rebuild); the decisions are the owner's.
 
 ### A3 -- the kill ignores your life and your blockers
 
+**BUILT 2026-11-16, OFF** (`route_kills`; `opponents.route_kill`,
+`kill_force`; `tests/test_route_kills.py`, seven cases, three mutations
+exact -- one expectation, F's, corrected after the run and said so in the
+file: the old rule's Angel already prevented a combat kill). A drain kill
+takes `kill_size` (40) life; a combat kill is `kill_force` -- this
+opponent's own pre-rolled body pool read on past its board, utility bodies
+skipped, to power 40 -- attacking you through your blocks, its unblocked
+damage through `damage_you`; a combo kill is unchanged. Survived, the clock
+re-arms one round on. OFF is BIT-IDENTICAL against `09eaa59` on every deck
+(400 seeds). ON against OFF, `diagnostics/run_knob_ab.py`, each deck's staged
+list, N=6,000 paired, seeds 5000.. (`results/knob_ab_<deck>_route_kills.txt`;
+reach `kills_routed`, identity 0 in every deck):
+
+| deck | T10 | T20 | games reached |
+|---|---|---|---|
+| rendmaw | +0.0023 ±0.0012 | **+0.0537 ±0.0057** | 41.7% |
+| lorehold | +0.0032 ±0.0014 | **+0.0102 ±0.0025** | 21.1% |
+| karlov | +0.0107 ±0.0026 | **+0.0660 ±0.0063** | 24.9% |
+| tivit | +0.0012 ±0.0009 | **+0.0065 ±0.0020** | 14.8% |
+| shilgengar | +0.0028 ±0.0014 | **+0.0455 ±0.0055** | 26.8% |
+| azusa | +0.0205 ±0.0036 | **+0.0555 ±0.0058** | 25.1% |
+
+Mostly at T20: the clocks fire late, and a kill survived is a round
+bought. Karlov, the lifegain deck, gains most, as the census said it would;
+lorehold and tivit, which die least to the clock's routable kinds, least.
+The pod will be re-fitted when the three flip together (§0z195).
+
 `opponents._clock_seat`: on its kill turn each opponent's clock picks a
 target by threat (`your_share`); if it picks you, `g.your_life = 0.0` and
 the game is lost, at any life and any board. Angel of Suffering (combat

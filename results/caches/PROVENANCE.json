@@ -625,7 +625,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "1c45ecd1c3e271ee",
+        "utc": "2026-11-16T02:39:34Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "50639d27c2c84171",
@@ -1159,7 +1166,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "e6b6525db848a2eb",
+        "utc": "2026-11-16T02:39:34Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "ffc67ad8d45a958f",
@@ -1721,7 +1735,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "c9abb10649f4932a",
+        "utc": "2026-11-16T02:39:33Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "f3e2972bf08038a0",
@@ -2249,7 +2270,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "d7ecf5aebf455e97",
+        "utc": "2026-11-16T02:39:33Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "94e20b2e3d051fe0",
@@ -2812,7 +2840,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "1c68d191112af0df",
+        "utc": "2026-11-16T02:39:34Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "bbb7539f3ecc9461",
@@ -3334,7 +3369,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "09eaa59",
+        "evidence": "\u00a70z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "72b7e7f4cbe3d044",
+        "utc": "2026-11-16T02:39:34Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",
