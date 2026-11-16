@@ -274,7 +274,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
 | [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; tivit's §0z44 joint a null, KEPT by the owner |
 | [0z221](#0z221) | BUILT | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. built, measured, flipped in §0z222 |
-| [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuild follows |
+| [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuilt in §0z223 |
+| [0z223](#0z223) | REBUILT | **Item 45's rebuild**: six tables on the §0z222 pod, every cache CURRENT; no significant row changed sign; lifegain and lifelink rows up, as A3 predicts |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19632,6 +19633,48 @@ not. **Its cost, said out loud: games are 0.2 turns shorter** (10.27 against
 10.47) -- the shift holds length better and misses the win rate by three
 times as much. The rate reaches the game through `pod_attack_rate`, how
 often a combat body attacks; capped at 1 a body, as before.
+
+<a id="0z223"></a>
+
+## 0z223. REBUILT -- item 45's rebuild: six tables on the §0z222 pod
+
+**The owner, 2026-11-16: "flip, re-fit, rebuild".** Parallel, six legs at
+`e5b2f40`, every leg python 3.13.18 with the pins; coordinated on 3.13.16
+(§0z119): `tools.repro_row` IDENTICAL on azusa's Chord of Calling and
+karlov's Felidar Sovereign. `--merge-shards` accepted all six; every active
+cache CURRENT. Slowest leg azusa, about 65 minutes (launched 17:04, pushed
+after 17:50; the others 30-45).
+
+**Baselines (T20)**, §0z219's table -> this one: rendmaw 0.3098 -> 0.3367,
+lorehold 0.4855 -> 0.4502, karlov 0.5073 -> 0.5245, tivit 0.5797 ->
+0.5333, shilgengar 0.4151 -> 0.4183, azusa 0.5191 -> 0.5357 -- the
+re-fit holds the six-deck mean, and the decks that die to routable kills
+(rendmaw, karlov, azusa) gain on those that do not (lorehold, tivit). Noise
+floors ±0.0026-0.0032, unchanged.
+
+**What moved** (T20, beyond the wider of the two bars): rendmaw 19 of 64,
+lorehold 4 of 65, karlov 22 of 64, tivit 7 of 64, shilgengar 7 of 64, azusa
+14 of 58. **No row significant in both tables changed sign, in any deck**
+(§0z195). The largest movers each have a mechanism in §0z221:
+
+- **Life now defends (A3)**, so lifegain and lifelink rose: Whip of Erebos
+  +0.0087 -> +0.0241 (rendmaw), Lyra Dawnbringer +0.0214 -> +0.0356 and
+  Righteous Valkyrie +0.0110 -> +0.0175 (shilgengar), Archangel of Thune in
+  both decks (karlov +0.0116 -> +0.0175, shilgengar +0.0171 -> +0.0247),
+  Sorin, Solemn Visitor's team lifelink +0.0092 -> +0.0155 (karlov, though
+  it can now be attacked, A5), Benevolent Offering +0.0049 -> +0.0117.
+- **Life paid costs more**: Midnight Reaper's draw-for-life +0.0061 ->
+  +0.0011 (shilgengar, now inside its bar).
+- **Taxes stop real kills**: Ghostly Prison +0.0153 -> +0.0194, Propaganda
+  +0.0169 -> +0.0205 (tivit).
+- **A held answer at the loop (A6)**: karlov's Sanguine Bond +0.0091 ->
+  +0.0020, now inside its bar -- the combo is answered as it assembles.
+- **A slower kill pulls finishers down**: Craterhoof Behemoth +0.0189 ->
+  +0.0129, March of the World Ooze +0.0208 -> +0.0156, Rise of the Eldrazi
+  +0.0463 -> +0.0410.
+
+**The staged swaps on this pod**: §0z222, `results/restage_20261116.txt` --
+ten significant at both horizons; Bolas's Citadel's T20 is inside its bar.
 
 ## How to read an ablation table
 
