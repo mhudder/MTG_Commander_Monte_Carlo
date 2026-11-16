@@ -53,6 +53,7 @@ items below this section are in the order they were queued, not this one.
    rebuilt tables. **DONE (§0z220)**; tivit's §0z44 priorities, a null now,
    KEPT by the owner 2026-11-16. Item 48 is closed.
 5. **Item 45: decide A3, then A6 and A5.** A3 is the largest limit left.
+   **DECIDED 2026-11-16 (§0z221)**: A3 first, then A5, then A6.
 6. **Card work that does not move a decision already made** (item 46's
    list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
    first, since it guards the commander. Any time; after step 3 each
@@ -243,8 +244,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     batch**, since it moves the baseline.
 
 45. **A3-A7 of §0z197: write down, then decide.** **A3, A6 AND A5 ARE
-    WRITTEN DOWN (§0z221, 2026-11-16)**, with today's loss census and the
-    options for each; the decisions are the owner's. None is a bug to fix in
+    WRITTEN DOWN AND DECIDED (§0z221, 2026-11-16)**: route-aware kills
+    (A3), held answers (A6, after A3), the pod attacks walkers (A5). Built
+    the item-44 way -- each behind a switch, OFF until measured, the
+    defaults flipped together, the pod re-fitted, one rebuild. None is a bug to fix in
     passing; each is a model decision nobody wrote down or made. **A4 is
     BUILT, in item 44's batch (§0z200, `rival_combat`, OFF).** A3 (the kill ignores your life and blockers) and A6 (the pod acts only
     in its own main phase) bound every lifegain and every haste/ETB row.

@@ -273,7 +273,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z218](#0z218) | FIXED | **The Clue dig; a capped draining loop wins** (the owner, 2026-11-15): `pile_dig` +0.0063 / +0.0043, `capped_drain_wins` +0.0003 / +0.0002; combo games won 88% |
 | [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
 | [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; tivit's §0z44 joint a null, KEPT by the owner |
-| [0z221](#0z221) | OPEN | **Item 45 written down: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life (karlov killed at a median 39 life); the options for each, for the owner |
+| [0z221](#0z221) | DECIDED | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. Building |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19371,6 +19371,12 @@ fire; the floors are ±0.0026-0.0034, readable.
 <a id="0z221"></a>
 
 ## 0z221. OPEN -- queue item 45 written down: A3, A6 and A5, with today's numbers
+
+**THE OWNER'S DECISIONS, 2026-11-16, asked the same day: A3 ROUTE-AWARE
+KILLS, A6 HELD ANSWERS (built after A3), A5 THE POD ATTACKS WALKERS** --
+option 2 of each below, as recommended. Built the item-44 way: each
+behind a switch restoring today's rule exactly, OFF until measured, then
+the defaults flip together, the pod is re-fitted (§0z195) and one rebuild.
 
 **The owner, 2026-11-16: "move on to item 45."** Item 45's rule is
 "write down, then decide": each of §0z197's A3, A6 and A5 is a model
