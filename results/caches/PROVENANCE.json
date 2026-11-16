@@ -637,6 +637,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "faaaf3b86b9191ea",
         "utc": "2026-11-16T02:45:45Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "825e4bdc7e220746",
+        "utc": "2026-11-16T02:57:43Z"
       }
     ]
   },
@@ -1184,6 +1190,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "ead6c15934379bde",
         "utc": "2026-11-16T02:45:44Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "b98868a55125de6c",
+        "utc": "2026-11-16T02:57:42Z"
       }
     ]
   },
@@ -1759,6 +1771,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "0a90e9971b393a4c",
         "utc": "2026-11-16T02:45:44Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "854e06bc04b9418c",
+        "utc": "2026-11-16T02:57:42Z"
       }
     ]
   },
@@ -2300,6 +2318,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "1ec0769f40227736",
         "utc": "2026-11-16T02:45:44Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "eb29a7005ec26fb5",
+        "utc": "2026-11-16T02:57:42Z"
       }
     ]
   },
@@ -2876,6 +2900,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "146dfa9fb0e43eeb",
         "utc": "2026-11-16T02:45:44Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "065a024d7cd8c73f",
+        "utc": "2026-11-16T02:57:43Z"
       }
     ]
   },
@@ -3411,6 +3441,12 @@
         "evidence": "\u00a70z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "a3b63e836c914fb3",
         "utc": "2026-11-16T02:45:44Z"
+      },
+      {
+        "commit": "3b098a7",
+        "evidence": "\u00a70z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "5b51d6b7c675b842",
+        "utc": "2026-11-16T02:57:42Z"
       }
     ]
   },

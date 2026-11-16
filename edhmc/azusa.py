@@ -4283,6 +4283,7 @@ class AzusaGame(BaseGame):
         return id(perm) in self.eot_vigilance
 
     def combat(self):
+        OPP.held_answer_window(self, "combat")   # A6, §0z221: beginning of combat
         self.combat_turn = self.turn                         # §0z213
         # GLACIER GODMAW's haste (§0z101): a creature that was sick when one of
         # its triggers resolved this turn may attack. `eot_haste` holds only

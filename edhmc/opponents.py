@@ -1473,13 +1473,29 @@ def spot_removal(g, opp, others, rolls):
         return
     if rolls[3] >= your_share(g, opp, others):
         return                            # aimed at a rival instead
+    if pod_holds_answer(g, opp, rolls):   # A6, §0z221
+        return
+    _spot_at_you(g, rolls)
+
+
+def _spot_targets(g) -> list:
+    """What the pod's spot removal may target: your nonland, nontoken
+    permanents, less a shrouded commander."""
     targets = [p for p in g.board
                if not p.card.is_land and not p.is_token]
     if commander_shrouded(g):
         targets = [p for p in targets if p.card is not g.commander]
+    return targets
+
+
+def _spot_at_you(g, rolls, victim=None) -> None:
+    """The second half of `spot_removal`, at you: the victim is your most
+    threatening legal target unless a held answer (A6) names one."""
+    targets = _spot_targets(g)
     if not targets:
         return
-    victim = max(targets, key=lambda p: threat_of(g, p))
+    if victim is None or victim not in targets:
+        victim = max(targets, key=lambda p: threat_of(g, p))
     if mother_protects(g, victim):        # her {T}, §0z118
         return
     how = try_protect(g, rolls[5], "spot", victim)
@@ -2170,6 +2186,73 @@ def grow_board(opp) -> None:
     """An opponent develops its board: 0.7 of its archetype's `board` a turn,
     capped at seven bodies' worth."""
     opp.creatures = min(7.0, opp.creatures + 0.7 * opp.p["board"])
+
+
+def held_answers_on(g) -> bool:
+    return bool(g.cfg.get("held_answers", False))
+
+
+def pod_holds_answer(g, opp, rolls) -> bool:
+    """A6, HELD ANSWERS (the owner, 2026-11-16, §0z221; `held_answers`,
+    False is the old rule exactly). Spot removal that would be cast at you in
+    this opponent's main phase is HELD into your turn with
+    `held_answer_share` (0.5) -- A JUDGEMENT, no data: the share of the pod's
+    spot removal that is instant-speed and that a player keeps up. One held
+    answer an opponent; its row's protect and destroy rolls go with it, so the
+    answer is the same answer, cast later. Removal is moved, never added: what
+    is still held at your end step is cast then (`held_answer_window`)."""
+    if not held_answers_on(g) or getattr(opp, "held_rolls", None):
+        return False
+    from edhmc.engine import crn_random
+    i = g.opponents.index(opp)
+    if crn_random(g, f"held_answer{i}") >= g.cfg.get("held_answer_share", 0.5):
+        return False
+    opp.held_rolls = list(rolls)
+    targets = _spot_targets(g)
+    opp.held_threat = max((threat_of(g, p) for p in targets), default=0.0)
+    g.m["answers_held"] += 1
+    return True
+
+
+def held_answer_window(g, when, pieces=()) -> None:
+    """A6's windows on YOUR turn, for every opponent holding an answer:
+
+      "combo"   in response to a combo -- tivit's first Deadeye activation or
+                Time Sieve, karlov's loop assembling: at the most threatening
+                legal piece of `pieces`
+      "combat"  at your beginning of combat: only at a permanent that entered
+                THIS turn and out-threatens the best target there was when
+                the answer was held -- "your biggest new threat"; else it is
+                kept
+      "end"     your end step (the top of `pod_phase`): whatever is still
+                held, at your most threatening permanent
+
+    A held answer is the removal it was, at a later time and a better
+    target; it does nothing else."""
+    if not held_answers_on(g) or g.result is not None:
+        return
+    seen = getattr(g, "held_seen", None)
+    for opp in g.opponents:
+        rolls = getattr(opp, "held_rolls", None)
+        if not rolls or not opp.alive:
+            continue
+        targets = _spot_targets(g)
+        if when == "combo":
+            cands = [p for p in pieces if p in targets]
+        elif when == "combat":
+            cands = [p for p in targets if seen is not None
+                     and id(p) not in seen
+                     and threat_of(g, p) >= getattr(opp, "held_threat", 0.0)]
+        else:
+            cands = targets
+        if not cands:
+            continue
+        victim = max(cands, key=lambda p: threat_of(g, p))
+        opp.held_rolls = None
+        g.m[f"answers_spent_{when}"] += 1
+        _spot_at_you(g, rolls, victim=victim)
+        if g.result is not None:
+            return
 
 
 def opponent_removal(g, i, rolls_t, old) -> None:
@@ -4547,6 +4630,20 @@ def combat_share(g, opp, others) -> float:
 
 
 def pod_phase(g, before_act=None):
+    """`_pod_phase` with A6's two edges (§0z221): what an opponent still
+    holds is cast in your end step first, and the board your next turn starts
+    from is remembered after, so a held answer can tell a permanent that
+    entered this turn. Both are no-ops unless `held_answers`."""
+    if held_answers_on(g):
+        held_answer_window(g, "end")
+        if g.result is not None:
+            return
+    _pod_phase(g, before_act)
+    if held_answers_on(g):
+        g.held_seen = {id(p) for p in g.board}
+
+
+def _pod_phase(g, before_act=None):
     """The opponents' part of a turn, ONCE, for all six engines (§0z30).
 
     Order: chip damage, then every clock that is due, then -- if you are

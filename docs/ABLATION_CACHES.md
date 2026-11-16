@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `4543465`.
+Generated at `3b098a7`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -96,25 +96,31 @@ the fingerprint above mean anything.
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `8ef0d831ba9be598`; fingerprint has since moved to `faaaf3b86b9191ea` and was CHECKED at `4543465` (2026-11-16T02:45:45Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `8ef0d831ba9be598`; fingerprint has since moved to `825e4bdc7e220746` and was CHECKED at `3b098a7` (2026-11-16T02:57:43Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `1c45ecd1c3e271ee` (`09eaa59`, 2026-11-16T02:39:34Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `faaaf3b86b9191ea` (`4543465`, 2026-11-16T02:45:45Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `50639d27c2c84171`; fingerprint has since moved to `ead6c15934379bde` and was CHECKED at `4543465` (2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `825e4bdc7e220746` (`3b098a7`, 2026-11-16T02:57:43Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `50639d27c2c84171`; fingerprint has since moved to `b98868a55125de6c` and was CHECKED at `3b098a7` (2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `e6b6525db848a2eb` (`09eaa59`, 2026-11-16T02:39:34Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `ead6c15934379bde` (`4543465`, 2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `ffc67ad8d45a958f`; fingerprint has since moved to `0a90e9971b393a4c` and was CHECKED at `4543465` (2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `b98868a55125de6c` (`3b098a7`, 2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `ffc67ad8d45a958f`; fingerprint has since moved to `854e06bc04b9418c` and was CHECKED at `3b098a7` (2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `c9abb10649f4932a` (`09eaa59`, 2026-11-16T02:39:33Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `0a90e9971b393a4c` (`4543465`, 2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `f3e2972bf08038a0`; fingerprint has since moved to `1ec0769f40227736` and was CHECKED at `4543465` (2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `854e06bc04b9418c` (`3b098a7`, 2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `f3e2972bf08038a0`; fingerprint has since moved to `eb29a7005ec26fb5` and was CHECKED at `3b098a7` (2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `d7ecf5aebf455e97` (`09eaa59`, 2026-11-16T02:39:33Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `1ec0769f40227736` (`4543465`, 2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `94e20b2e3d051fe0`; fingerprint has since moved to `146dfa9fb0e43eeb` and was CHECKED at `4543465` (2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `eb29a7005ec26fb5` (`3b098a7`, 2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `94e20b2e3d051fe0`; fingerprint has since moved to `065a024d7cd8c73f` and was CHECKED at `3b098a7` (2026-11-16T02:57:43Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `1c68d191112af0df` (`09eaa59`, 2026-11-16T02:39:34Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `146dfa9fb0e43eeb` (`4543465`, 2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `bbb7539f3ecc9461`; fingerprint has since moved to `a3b63e836c914fb3` and was CHECKED at `4543465` (2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `065a024d7cd8c73f` (`3b098a7`, 2026-11-16T02:57:43Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `bbb7539f3ecc9461`; fingerprint has since moved to `5b51d6b7c675b842` and was CHECKED at `3b098a7` (2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
   - verified at `72b7e7f4cbe3d044` (`09eaa59`, 2026-11-16T02:39:34Z): §0z221 A3 built OFF (route_kills): check_unchanged_decks --n=2000 against a worktree at 09eaa59, where every cache was CURRENT -- BIT-IDENTICAL on all 8 metrics.
   - verified at `a3b63e836c914fb3` (`4543465`, 2026-11-16T02:45:44Z): §0z221 A5 built OFF (pod_attacks_walkers): check_unchanged_decks --n=2000 against a worktree at 4543465 -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `c4f2b9c5bcdbf67e`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+  - verified at `5b51d6b7c675b842` (`3b098a7`, 2026-11-16T02:57:42Z): §0z221 A6 built OFF (held_answers): check_unchanged_decks --n=2000 against a worktree at 3b098a7 -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `4877d83b436ad93c`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

@@ -1294,6 +1294,7 @@ class ShilgengarGame(BaseGame):
             make_lord=lambda: self.make_creature_token(lord_of_the_pit_card()))
 
     def combat(self):
+        OPP.held_answer_window(self, "combat")   # A6, §0z221: beginning of combat
         # BLOODGHAST's haste, read as combat begins (item 24).
         if self.bloodghast_hasty():
             for p in self.board:

@@ -2912,6 +2912,7 @@ def _main_phase(g, reserve=0):
 # ---------------------------------------------------------------------------
 
 def combat(g):
+    OPP.held_answer_window(g, "combat")   # A6, §0z221: beginning of combat
     attackers = [p for p in g.board
                  if p.card.is_creature and not p.tapped and not p.sick
                  and not OPP.holds_back(g, p)]

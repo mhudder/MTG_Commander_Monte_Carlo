@@ -1489,6 +1489,16 @@ def check_combo(g):
         units = available_mana(g)
         if can_pay({"gen": 1, "W": 1, "B": 1}, units) is not None:
             partner = True
+    if partner and OPP.held_answers_on(g):
+        # A6 (§0z221): the loop needs its first trigger, and a held answer
+        # goes in response at a piece. Re-check what is left after it.
+        OPP.held_answer_window(g, "combo", pieces=[
+            p for p in g.board if p.card.name in COMBO_A_CARDS
+            or p.card.name in COMBO_LOOP or p.card.name == "Vizkopa Guildmage"])
+        if not has_combo_a(g) or not (
+                any(g.has(x) for x in COMBO_LOOP)
+                or g.has("Vizkopa Guildmage")):
+            partner = False
     if partner:
         g.m["combo_assembled"] = 1
         g.result = "win"
@@ -2389,6 +2399,7 @@ def sun_titan(g):
 
 
 def combat(g):
+    OPP.held_answer_window(g, "combat")   # A6, §0z221: beginning of combat
     g.combat_declared = True           # main 1's planned read ends, §0z189
     if g.has("Heliod, Sun-Crowned") and devotion_white(g) >= 5:
         g.m["heliod_animated"] += 1

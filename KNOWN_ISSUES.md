@@ -19457,6 +19457,38 @@ Every lifegain, lifelink and blocker row is a FLOOR on defence by this.
 
 ### A6 -- the pod acts in its own main phase only
 
+**BUILT 2026-11-16, OFF -- AND IT MAKES THE POD WORSE** (`held_answers`,
+`held_answer_share` 0.5; `opponents.pod_holds_answer`, `held_answer_window`,
+the windows at each engine's `combat`, tivit's first Deadeye activation and
+Time Sieve, karlov's loop assembling, and the top of `pod_phase`;
+`tests/test_held_answers.py`, six cases, three mutations exact -- one
+expectation corrected after the run, said so in the file). OFF
+BIT-IDENTICAL against `3b098a7` on every deck at 2,000 seeds. ON against OFF,
+N=6,000 paired (`results/knob_ab_<deck>_held_answers.txt`):
+
+| deck | T10 | T20 | held / spent at combat / combo / end, a game | `removal_eaten` |
+|---|---|---|---|---|
+| rendmaw | +0.0025 ±0.0029 | +0.0075 ±0.0068 | 0.67 / 0.03 / 0 / 0.57 | -0.082 |
+| lorehold | -0.0003 ±0.0056 | +0.0068 ±0.0074 | 0.54 / 0.12 / 0 / 0.32 | -0.086 |
+| karlov | +0.0008 ±0.0058 | -0.0007 ±0.0079 | 0.75 / 0.15 / 0.01 / 0.50 | -0.074 |
+| tivit | +0.0050 ±0.0054 | +0.0078 ±0.0069 | 0.53 / 0.14 / 0.03 / 0.29 | -0.091 |
+| shilgengar | **+0.0053 ±0.0028** | **+0.0178 ±0.0076** | 0.70 / 0.19 / 0 / 0.42 | -0.088 |
+| azusa | **+0.0082 ±0.0057** | **+0.0083 ±0.0075** | 0.63 / 0.21 / 0 / 0.34 | -0.090 |
+
+**You win MORE with the pod holding answers, not less.** A held answer is
+cast a turn later on average (your end step, not the holder's main phase),
+and about 13% are never cast -- the holder is eliminated, or the game ends,
+first (`removal_eaten` falls 0.07-0.09 a game in every deck). The windows it
+was built for fire rarely: a new threat before combat 0.03-0.21 a game, a
+combo 0.01-0.03. As specified -- "moves removal from the pod's turn to
+yours rather than adding any" -- the rule makes the pod play worse, which
+contradicts the owner's standing rule for the pod (item 44: "the opponents
+play as close to optimally as possible"). **The identity check is not
+claimed**: the hold roll is a CRN draw, so `crn_draws` differs in games
+where nothing was held; a direct check (300 seeds, tivit and karlov) found
+`crn_draws` the ONLY key that differs in every such game. Brought to the
+owner before any flip.
+
 Its removal, wipes and artifact/enchantment removal are
 `opponent_removal` in each seat's main phase 1 (§0z179); on your turn the
 only interaction is a counterspell as you cast (`opponents.countered`).

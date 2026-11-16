@@ -5339,6 +5339,7 @@ def coat_bonus(g, perm) -> int:
 
 
 def combat(g: Game):
+    OPP.held_answer_window(g, "combat")   # A6, §0z221: beginning of combat
     herbie_surveil(g)        # "at the beginning of combat on your turn", §0z125
     # DEFENDER (702.3b) is the generated `_evasion.DEFENDER` (§0z125). No card
     # in the committed list has it, so the filter is the identity there.

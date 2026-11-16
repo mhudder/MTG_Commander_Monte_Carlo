@@ -809,6 +809,15 @@ def deadeye_loop(g):
         blink_tivit(g, "Deadeye Navigator")
         g.m["deadeye_activations"] += 1
         n += 1
+        if n == 1 and OPP.held_answers_on(g):
+            # A6 (§0z221): a held answer in response to the FIRST
+            # activation, which resolves; the loop stops if a piece dies.
+            OPP.held_answer_window(g, "combo", pieces=[
+                p for p in g.board if p.card.name in
+                ("Deadeye Navigator", "Tivit, Seller of Secrets")])
+            if not (g.has("Deadeye Navigator")
+                    and g.has("Tivit, Seller of Secrets")):
+                break
         last_drop = life0 - sum(o.life for o in OPP.living(g))
         last_kept = g.tokens["Treasure"] >= before
         # Stop when it stops paying for itself: a treadmill drains the pool
@@ -1780,6 +1789,7 @@ def havengul_end_step(g):
 
 
 def combat(g):
+    OPP.held_answer_window(g, "combat")   # A6, §0z221: beginning of combat
     attackers = [p for p in g.board
                  if p.card.is_creature and not p.tapped and not p.sick]
     attackers = OPP.hold_back(g, attackers)    # blockers for the pod, §0z186
@@ -2076,6 +2086,9 @@ def time_sieve(g):
     g.extra_turns += 1
     g.m["extra_turns"] += 1
     g.m["sieve_activations"] += 1
+    # A6 (§0z221): a held answer in response -- the extra turn is already
+    # paid for and comes; the Sieve is what it can stop next time.
+    OPP.held_answer_window(g, "combo", pieces=(sieve,))
 
 
 def take_turn(g, extra=False):
