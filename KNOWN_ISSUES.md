@@ -19642,8 +19642,8 @@ often a combat body attacks; capped at 1 a body, as before.
 `e5b2f40`, every leg python 3.13.18 with the pins; coordinated on 3.13.16
 (§0z119): `tools.repro_row` IDENTICAL on azusa's Chord of Calling and
 karlov's Felidar Sovereign. `--merge-shards` accepted all six; every active
-cache CURRENT. Slowest leg azusa, about 65 minutes (launched 17:04, pushed
-after 17:50; the others 30-45).
+cache CURRENT. Wall time 48 minutes, the slowest leg (azusa: launched
+17:04, pushed 17:52; the others 8-17 minutes).
 
 **Baselines (T20)**, §0z219's table -> this one: rendmaw 0.3098 -> 0.3367,
 lorehold 0.4855 -> 0.4502, karlov 0.5073 -> 0.5245, tivit 0.5797 ->
