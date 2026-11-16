@@ -267,7 +267,7 @@ text says, bounded as its label says; a number is the finding above.
 
 | card | label | verdict |
 |---|---|---|
-| Tivit, Seller of Secrets | commander | OK -- dilemma on ETB and on connecting (§0z91); extra vote. Ward {3} not modelled (§0z197 C). 1, 29 |
+| Tivit, Seller of Secrets | commander | OK -- dilemma on ETB and on connecting (§0z91); extra vote. Ward {3} modelled since §0z224 (`opponents.ward_choice`). 1, 29 |
 | Academy Manufactor | SCRIPTED | OK -- one of each, per token (`make_token`) |
 | An Offer You Can't Refuse | PARTLY | OK; its two Treasures go to the pod -- Kambal, 7 |
 | Arcane Signet | SCRIPTED | OK |

@@ -651,7 +651,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "0444688",
+        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+        "fingerprint": "924be315202b4417",
+        "utc": "2026-11-16T23:23:28Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "3c4dd4851bf8e7b1",
@@ -1211,7 +1218,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "0444688",
+        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+        "fingerprint": "d1d4fbc315af04a3",
+        "utc": "2026-11-16T23:23:28Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "e80afb7718e91eae",
@@ -2942,7 +2956,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "0444688",
+        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+        "fingerprint": "2a92b7d8bcef6c0d",
+        "utc": "2026-11-16T23:23:28Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "4fae046773f88d75",

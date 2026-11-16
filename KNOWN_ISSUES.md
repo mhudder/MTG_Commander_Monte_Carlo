@@ -276,6 +276,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z221](#0z221) | BUILT | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. built, measured, flipped in §0z222 |
 | [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuilt in §0z223 |
 | [0z223](#0z223) | REBUILT | **Item 45's rebuild**: six tables on the §0z222 pod, every cache CURRENT; no significant row changed sign; lifegain and lifelink rows up, as A3 predicts |
+| [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C, the owner, 2026-11-16): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; tivit +0.0052 / +0.0104 at `ward_pay_share` 0.5 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19674,7 +19675,56 @@ lorehold 4 of 65, karlov 22 of 64, tivit 7 of 64, shilgengar 7 of 64, azusa
   +0.0463 -> +0.0410.
 
 **The staged swaps on this pod**: §0z222, `results/restage_20261116.txt` --
-ten significant at both horizons; Bolas's Citadel's T20 is inside its bar.
+ten significant at both horizons; Bolas's Citadel's T20 is inside its bar -- **kept staged by the owner, 2026-11-16**.
+
+<a id="0z224"></a>
+
+## 0z224. FIXED -- ward against the pod's spot removal
+
+**The owner, 2026-11-16: "keep the Citadel staged, move on to tivit's
+ward"** (order of work step 6; §0z197 C: "The pod's spot removal pays no
+ward cost. Tivit's is the one that matters: it guards the commander").
+
+**The text, from Scryfall 2026-11-16**: Tivit, Seller of Secrets "Flying,
+ward {3}"; Roaming Throne (rendmaw) "Ward {2}"; Hexing Squelcher (lorehold)
+"Ward--Pay 2 life. ... Other creatures you control have 'Ward--Pay 2
+life.'" 702.21a: ward counters the spell or ability "unless that player
+pays".
+
+**The data is generated** (`tools.tag_flying --write`): `_evasion.WARD`,
+each permanent's own ward from Scryfall's keywords with its cost read from
+the text, a grant excluded, and a cost it cannot read RAISING -- the first
+run raised on Tivit's "Flying, ward {3}" (a ward on a keyword line), which
+the regex now reads. The set is exactly the three cards. The Squelcher's
+GRANT is read by name in `opponents.ward_of`.
+
+**The rule** (`opponents.ward_choice`, in `_spot_at_you`, so A6's held
+answers pay it too; `ward_text` False is the old rule): a MANA ward is
+paid with `ward_pay_share` (0.5) -- **A JUDGEMENT**, the pod's mana not
+being modelled; a pod that cannot pay aims at your best target without
+ward, as a player does before casting, and casts nothing if there is none.
+A LIFE ward is paid unless the life would kill the payer (then it re-aims);
+the loss is an opponent losing life (`lost_life`). Counterspells target a
+spell, and wipes target nothing: neither is affected.
+`tests/test_ward.py`, seven cases, two mutations exact.
+
+**Measured**, `diagnostics/run_knob_ab.py`, N=15,000 paired, seeds 5000..
+(`results/knob_ab_<deck>_ward_text.txt`; identity 0 in every deck):
+
+| deck | T10 | T20 | reached | a game |
+|---|---|---|---|---|
+| tivit | **+0.0052 ±0.0024** | **+0.0104 ±0.0030** | 32.0% | paid 0.22, re-aimed 0.22 |
+| rendmaw (Roaming Throne) | -0.0001 ±0.0002 | **+0.0009 ±0.0007** | 2.3% | paid 0.01, re-aimed 0.01 |
+| lorehold (Squelcher and its grant) | **+0.0005 ±0.0005** | **+0.0010 ±0.0007** | 6.0% | 0.15 life paid |
+
+**The knob, said out loud: `ward_pay_share` decides tivit's number.** At
+0.25 it is +0.0104 / +0.0169; at 0.75, +0.0035 / +0.0052. Every reading is
+significant and the same sign; the size is the pod's mana, which nobody
+has data for.
+
+**What moved**: with the rule on, rendmaw, lorehold and tivit move (2,000
+seeds against `0444688`) and karlov, shilgengar and azusa are BIT-IDENTICAL
+-- they have no ward card. The three moved decks' tables are rebuilt.
 
 ## How to read an ablation table
 

@@ -58,7 +58,8 @@ items below this section are in the order they were queued, not this one.
    pod re-fitted (`incidental_rate` 1.94); the rebuild follows.
 6. **Card work that does not move a decision already made** (item 46's
    list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
-   first, since it guards the commander. Any time; after step 3 each
+   first, since it guards the commander. **WARD DONE 2026-11-16 (§0z224)**,
+   all three ward cards. Any time; after step 3 each
    staged card rebuilds its own deck (§0z27).
 7. **Item 49: the small cleanups.**
 8. **When the owner picks them back up**: item 28 (paused), item 29's

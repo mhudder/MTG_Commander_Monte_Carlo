@@ -582,6 +582,14 @@ ATTACK_TAX = {
     'Propaganda': 2,
 }
 
+# WARD: a permanent's own ward -> its cost, N (generic mana) or
+# ("life", N). Read by `opponents.ward_of` (§0z224).
+WARD = {
+    'Hexing Squelcher': ('life', 2),
+    'Roaming Throne': 2,
+    'Tivit, Seller of Secrets': 3,
+}
+
 # SPELL LIFE LOSS: an instant or sorcery's own "You lose N life." -> N.
 # Charged by `opponents.countered` when the spell is not countered
 # (§0z151).

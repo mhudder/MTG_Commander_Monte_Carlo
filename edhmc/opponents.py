@@ -1482,7 +1482,60 @@ def spot_removal(g, opp, others, rolls):
         return                            # aimed at a rival instead
     if pod_holds_answer(g, opp, rolls):   # A6, §0z221
         return
-    _spot_at_you(g, rolls)
+    _spot_at_you(g, rolls, opp=opp)
+
+
+def ward_of(g, perm):
+    """A permanent's own ward (§0z224, `_evasion.WARD`, generated): N for
+    "Ward {N}", ("life", N) for "Ward--Pay N life", None without. `ward_text`
+    False is the old rule: the pod's removal paid no ward."""
+    if not g.cfg.get("ward_text", True):
+        return None
+    from edhmc.decks._evasion import WARD
+    own = WARD.get(perm.card.name)
+    if own is not None:
+        return own
+    # HEXING SQUELCHER'S GRANT, by name (a grant is not in the generated set):
+    # "Other creatures you control have 'Ward--Pay 2 life.'" (Scryfall,
+    # 2026-11-16).
+    if (perm.card.name != "Hexing Squelcher" and g.has("Hexing Squelcher")
+            and is_creature_now(g, perm)):
+        return ("life", 2)
+    return None
+
+
+def ward_choice(g, opp, victim, targets):
+    """WARD (702.21a: "Whenever this permanent becomes the target of a spell
+    or ability an opponent controls, counter it unless that player pays
+    [cost]"), for the pod's spot removal (§0z224; Tivit's ward {3}, Roaming
+    Throne's {2}, Hexing Squelcher's 2 life). The pod's mana is not modelled,
+    so whether it can pay a MANA ward is a roll: `ward_pay_share` (0.5) --
+    A JUDGEMENT, no data, said out loud. A pod that cannot pay does what a
+    player does before casting: aims at your best target WITHOUT ward instead,
+    and holds the removal if there is none. A LIFE ward is paid unless the
+    life would kill the payer (then it re-aims), and the loss is an opponent
+    losing life (`lost_life`). Returns the victim, or None to cast nothing."""
+    w = ward_of(g, victim)
+    if w is None:
+        return victim
+    if isinstance(w, tuple):
+        n = float(w[1])
+        if opp is not None and opp.life > n:
+            opp.life -= n
+            g.m["ward_life_paid"] += n
+            lost_life(g, [(opp, n)])
+            return victim
+    else:
+        from edhmc.engine import crn_random
+        if crn_random(g, "ward_pay") < g.cfg.get("ward_pay_share", 0.5):
+            g.m["ward_paid"] += 1
+            return victim
+    rest = [p for p in targets if p is not victim and ward_of(g, p) is None]
+    g.m["ward_redirects"] += 1
+    if not rest:
+        g.m["ward_answers_held_back"] += 1
+        return None
+    return max(rest, key=lambda p: threat_of(g, p))
 
 
 def _spot_targets(g) -> list:
@@ -1495,14 +1548,18 @@ def _spot_targets(g) -> list:
     return targets
 
 
-def _spot_at_you(g, rolls, victim=None) -> None:
+def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
     """The second half of `spot_removal`, at you: the victim is your most
-    threatening legal target unless a held answer (A6) names one."""
+    threatening legal target unless a held answer (A6) names one; a warded
+    victim is paid for or re-aimed (§0z224)."""
     targets = _spot_targets(g)
     if not targets:
         return
     if victim is None or victim not in targets:
         victim = max(targets, key=lambda p: threat_of(g, p))
+    victim = ward_choice(g, opp, victim, targets)
+    if victim is None:
+        return
     if mother_protects(g, victim):        # her {T}, §0z118
         return
     how = try_protect(g, rolls[5], "spot", victim)
@@ -2269,7 +2326,7 @@ def held_answer_window(g, when, pieces=()) -> None:
         victim = max(cands, key=lambda p: threat_of(g, p))
         opp.held_rolls = None
         g.m[f"answers_spent_{when}"] += 1
-        _spot_at_you(g, rolls, victim=victim)
+        _spot_at_you(g, rolls, victim=victim, opp=opp)
         if g.result is not None:
             return
 

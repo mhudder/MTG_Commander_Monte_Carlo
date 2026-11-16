@@ -37,7 +37,9 @@ WHAT IS DELIBERATELY NOT MODELLED, so no one reads a zero as a verdict:
   * The choice of WHICH permanent a vote exiles (Council's Judgment), and
     Vault 11's votes -- except under `pod_threats`, where both vote on a
     route piece (§0z138).
-  * Ward {3}, and Ghostly Prison and Propaganda as attack taxes -- the
+  * (Ward {3} IS modelled since §0z224: `opponents.ward_choice` -- the pod
+    pays it with `ward_pay_share`, else aims elsewhere.) Ghostly Prison and
+    Propaganda as attack taxes -- the
     opponent model's combat is a share, not a set of declared attackers.
     Under `pod_threats` a combat route's kill is an attack, and the Prisons
     tax it and the pod's chip damage (`opponents.attack_tax_through`,

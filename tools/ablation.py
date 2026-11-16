@@ -1209,9 +1209,11 @@ PARTLY_MODELLED = {
         "Hexing Squelcher":
             "MODELLED: 'This spell can't be countered' and 'Spells you "
             "control can't be countered' (`opponents.uncounterable`): the "
-            "table keeps its counterspell for a spell it can counter. NOT: "
-            "ward (pay 2 life) on it and your other creatures -- the pod's "
-            "spot removal pays no cost (§4). A floor.",
+            "table keeps its counterspell for a spell it can counter, and "
+            "ward -- pay 2 life on it and (its grant) your other creatures: "
+            "the pod's spot removal pays the life or aims elsewhere "
+            "(`opponents.ward_choice`, §0z224). NOT: a counterspell "
+            "aimed at a spell (§4). A floor.",
         # Item 24's change 4 (§0z139).
         "Gamble":
             "MODELLED: any card to hand by the shared want order, then a "

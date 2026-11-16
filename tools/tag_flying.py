@@ -579,6 +579,28 @@ def main():
         if m:
             attack_tax[n] = int(m.group(1))
 
+    # WARD, 2026-11-16 (§0z224): a permanent's OWN ward, from the keywords
+    # array, its cost from the text: "Ward {N}" -> N (generic mana), "Ward--Pay
+    # N life" -> ("life", N). A GRANT ("creatures you control have ward") is
+    # not here, as for the evasion keywords. A ward cost this repo cannot read
+    # RAISES: a flagged gap, never a silent zero. Read by `opponents.ward_of`.
+    ward = {}
+    for n, c in cards.items():
+        if n not in everything or "Ward" not in c.get("keywords", []):
+            continue
+        text = land_oracle(c)
+        m = re.search(r"(?:^|, )ward \{(\d+)\}", text, re.M | re.I)
+        if m:
+            ward[n] = int(m.group(1))
+            continue
+        m = re.search(r"(?:^|, )ward\u2014pay (\d+) life", text, re.M | re.I)
+        if m:
+            ward[n] = ("life", int(m.group(1)))
+            continue
+        if re.search(r"(have|has|gains?) ward", text.lower()):
+            continue                          # a grant, not its own ward
+        raise SystemExit(f"tag_flying: cannot read {n!r}'s ward: {text!r}")
+
     # UNCOUNTERABLE, 2026-10-22 (§0z151): the card's OWN "This spell can't be
     # countered." Read by `opponents.uncounterable`. A GRANT is not here --
     # Hexing Squelcher's "Spells you control can't be countered" and Cavern
@@ -932,6 +954,12 @@ def main():
                      "# under `pod_threats` (§0z138).\nATTACK_TAX = {\n")
             for n in sorted(attack_tax):
                 fh.write(f"    {n!r}: {attack_tax[n]},\n")
+            fh.write("}\n")
+            fh.write("\n# WARD: a permanent's own ward -> its cost, N (generic "
+                     "mana) or\n# (\"life\", N). Read by `opponents.ward_of` "
+                     "(§0z224).\nWARD = {\n")
+            for n in sorted(ward):
+                fh.write(f"    {n!r}: {ward[n]!r},\n")
             fh.write("}\n")
             fh.write("\n# SPELL LIFE LOSS: an instant or sorcery's own \"You "
                      "lose N life.\" -> N.\n# Charged by `opponents.countered` "
