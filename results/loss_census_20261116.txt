@@ -1,0 +1,8 @@
+§0z221: losses by route on today's pod (code of 8120c80), N=3,000 a deck, T20, seeds 5000.., python 3.11.17 (python -m diagnostics.run_loss_census 3000)
+
+rendmaw     won 0.320  losses: clock 84%, life 16%, other 0% | clock routes {'combo': 461, 'drain': 438, 'combat': 815} | your life at the kill: median 23, >=30 in 34% | your creatures median 8
+lorehold    won 0.482  losses: clock 61%, life 39%, other 0% | clock routes {'drain': 222, 'combat': 417, 'combo': 309} | your life at the kill: median 22, >=30 in 28% | your creatures median 3
+karlov      won 0.515  losses: clock 75%, life 24%, other 1% | clock routes {'combat': 473, 'drain': 273, 'combo': 343} | your life at the kill: median 39, >=30 in 69% | your creatures median 3
+tivit       won 0.590  losses: clock 56%, life 43%, other 0% | clock routes {'combo': 259, 'drain': 202, 'combat': 229} | your life at the kill: median 24, >=30 in 33% | your creatures median 2
+shilgengar  won 0.417  losses: clock 64%, life 33%, other 2% | clock routes {'drain': 297, 'combat': 474, 'combo': 355} | your life at the kill: median 27, >=30 in 45% | your creatures median 4
+azusa       won 0.525  losses: clock 74%, life 26%, other 0% | clock routes {'combat': 502, 'drain': 245, 'combo': 309} | your life at the kill: median 25, >=30 in 37% | your creatures median 6

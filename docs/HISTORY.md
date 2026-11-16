@@ -3012,6 +3012,33 @@ left them:
 A container restart killed item 41's first run; it was re-run whole. The
 other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
+## Queued items closed 2026-11-16 — moved from `docs/QUEUE.md`
+
+Closed 2026-11-16: every decision of the old pod re-measured on the new (§0z220); tivit's §0z44 priorities, a null now, kept by the owner ("keep tivit's priorities").
+
+48. **AFTER THE REBUILD: what was decided on the old pod (order of work,
+    step 4).** **DONE 2026-11-15 (§0z220), but for one owner decision**: all
+    eleven staged swaps stand at both horizons; Time Sieve 11 stands;
+    karlov's §0z44 pair is significant at T10 only; tivit's §0z44 joint
+    (Tempting Contract 8.5, Mirkwood Bats 10, Rhystic Study 7.5) is a null
+    on fresh seeds -- keep or revert is the owner's. The tables are
+    readable (§0z219). Every decision below was measured before item 44's flip
+    (§0z204), on a pod where attacking was free and nobody blocked.
+    - The eleven staged swaps (`python -m edhmc.pending`): one paired
+      `run_ab` each on the new default, N=15,000, both horizons, as §0z81
+      did after the last engine change of this size. A swap inside its
+      bar goes to the owner as that, not as a withdrawal.
+    - The adopted priority moves of item 18 (karlov, tivit, Time Sieve):
+      swept on the formula pod (§0z205 says so). Re-run
+      `diagnostics/run_priority_sweep.py` on fresh seeds (§0z170).
+    - Read the rebuilt tables for the cards item 44 made live (its "text
+      it makes live" list): a row that did not move is the tell of a
+      mechanism that does not fire (check the counters first).
+    - The noise floors: the CRN factor fell from ~15x to ~7x at the flip
+      (§0z204), so expect wider bars at the same N. If the floors are too
+      wide to read, that is a finding for the owner, not a reason to
+      change N in one place.
+
 ## Queued items closed 2026-11-15 — moved from `docs/QUEUE.md`
 
 Closed 2026-11-15: item 47's batch done (§0z210-§0z216), and item 44's one rebuild run on the owner's call (§0z219). §0z217 and §0z218 (Tivit and Deadeye as a combo, the Clue dig) were added to the batch the same day, before tivit's leg.

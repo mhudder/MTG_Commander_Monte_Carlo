@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44 and 47 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 47 and 48 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -50,8 +50,8 @@ items below this section are in the order they were queued, not this one.
    caches are SUSPECT and `check_docs` fails on that one check, which is
    expected and is said in each commit. Never `--verified`.
 4. **Item 48: re-measure what was decided on the old pod**, on the
-   rebuilt tables. **DONE 2026-11-15 (§0z220)**; one owner decision left:
-   tivit's §0z44 priority joint, a null now.
+   rebuilt tables. **DONE (§0z220)**; tivit's §0z44 priorities, a null now,
+   KEPT by the owner 2026-11-16. Item 48 is closed.
 5. **Item 45: decide A3, then A6 and A5.** A3 is the largest limit left.
 6. **Card work that does not move a decision already made** (item 46's
    list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
@@ -242,7 +242,9 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
     batch**, since it moves the baseline.
 
-45. **A3-A7 of §0z197: write down, then decide.** None is a bug to fix in
+45. **A3-A7 of §0z197: write down, then decide.** **A3, A6 AND A5 ARE
+    WRITTEN DOWN (§0z221, 2026-11-16)**, with today's loss census and the
+    options for each; the decisions are the owner's. None is a bug to fix in
     passing; each is a model decision nobody wrote down or made. **A4 is
     BUILT, in item 44's batch (§0z200, `rival_combat`, OFF).** A3 (the kill ignores your life and blockers) and A6 (the pod acts only
     in its own main phase) bound every lifegain and every haste/ETB row.
@@ -273,29 +275,6 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     time; none waits on item 44.
     **The behaviour findings are collected, in order, in item 47**
     (2026-11-15), with azusa's labels; the card work stays here.
-
-48. **AFTER THE REBUILD: what was decided on the old pod (order of work,
-    step 4).** **DONE 2026-11-15 (§0z220), but for one owner decision**: all
-    eleven staged swaps stand at both horizons; Time Sieve 11 stands;
-    karlov's §0z44 pair is significant at T10 only; tivit's §0z44 joint
-    (Tempting Contract 8.5, Mirkwood Bats 10, Rhystic Study 7.5) is a null
-    on fresh seeds -- keep or revert is the owner's. The tables are
-    readable (§0z219). Every decision below was measured before item 44's flip
-    (§0z204), on a pod where attacking was free and nobody blocked.
-    - The eleven staged swaps (`python -m edhmc.pending`): one paired
-      `run_ab` each on the new default, N=15,000, both horizons, as §0z81
-      did after the last engine change of this size. A swap inside its
-      bar goes to the owner as that, not as a withdrawal.
-    - The adopted priority moves of item 18 (karlov, tivit, Time Sieve):
-      swept on the formula pod (§0z205 says so). Re-run
-      `diagnostics/run_priority_sweep.py` on fresh seeds (§0z170).
-    - Read the rebuilt tables for the cards item 44 made live (its "text
-      it makes live" list): a row that did not move is the tell of a
-      mechanism that does not fire (check the counters first).
-    - The noise floors: the CRN factor fell from ~15x to ~7x at the flip
-      (§0z204), so expect wider bars at the same N. If the floors are too
-      wide to read, that is a finding for the owner, not a reason to
-      change N in one place.
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205:
     - `goad_block_share` is still a count share for rendmaw's goaded

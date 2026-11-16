@@ -272,7 +272,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0079 |
 | [0z218](#0z218) | FIXED | **The Clue dig; a capped draining loop wins** (the owner, 2026-11-15): `pile_dig` +0.0063 / +0.0043, `capped_drain_wins` +0.0003 / +0.0002; combo games won 88% |
 | [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
-| [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; **tivit's §0z44 joint a null** -- the owner's call |
+| [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; tivit's §0z44 joint a null, KEPT by the owner |
+| [0z221](#0z221) | OPEN | **Item 45 written down: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life (karlov killed at a median 39 life); the options for each, for the owner |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19355,8 +19356,8 @@ games in every cell).
   The engine moved under it three ways since: Tempting Contract lost its
   extra Treasure an upkeep (§0z214), Mirkwood Bats drains through the
   Deadeye combo whatever its rank (§0z217, §0z218), and the flip. Keeping
-  or reverting it is a tie on today's evidence; it is the owner's call,
-  and nothing changes until it is made.
+  or reverting it is a tie on today's evidence. **THE OWNER, 2026-11-16:
+  "keep tivit's priorities."** Nothing changes.
 
 Not re-run: item 18's full screen (760 arms, ~tens of CPU-hours), which
 asks a different question -- are there NEW moves -- and is the owner's to
@@ -19366,6 +19367,105 @@ order.
 
 In §0z219: no significant row changed sign; the cards item 44 made live
 fire; the floors are ±0.0026-0.0034, readable.
+
+<a id="0z221"></a>
+
+## 0z221. OPEN -- queue item 45 written down: A3, A6 and A5, with today's numbers
+
+**The owner, 2026-11-16: "move on to item 45."** Item 45's rule is
+"write down, then decide": each of §0z197's A3, A6 and A5 is a model
+decision nobody made, not a bug. This section writes each down against
+today's pod (after §0z219's rebuild); the decisions are the owner's.
+
+### A3 -- the kill ignores your life and your blockers
+
+`opponents._clock_seat`: on its kill turn each opponent's clock picks a
+target by threat (`your_share`); if it picks you, `g.your_life = 0.0` and
+the game is lost, at any life and any board. Angel of Suffering (combat
+routes, §0z135) and the attack taxes (§0z138) are the only exceptions.
+Each opponent's kill has had a ROUTE since §0z140 -- combat, drain or
+combo -- which only the Angel reads.
+
+**How each deck loses today** (`diagnostics/run_loss_census.py`, N=3,000 a
+deck, T20, `results/loss_census_20261116.txt`):
+
+| deck | won | losses to the clock | to life | clock kills: combat / drain / combo | your life when the clock kills you: median, share >= 30 |
+|---|---|---|---|---|---|
+| rendmaw | 0.320 | 84% | 16% | 815 / 438 / 461 | 23, 34% |
+| lorehold | 0.482 | 61% | 39% | 417 / 222 / 309 | 22, 28% |
+| karlov | 0.515 | 75% | 24% | 473 / 273 / 343 | **39, 69%** |
+| tivit | 0.590 | 56% | 43% | 229 / 202 / 259 | 24, 33% |
+| shilgengar | 0.417 | 64% | 33% | 474 / 297 / 355 | 27, 45% |
+| azusa | 0.525 | 74% | 26% | 502 / 245 / 309 | 25, 37% |
+
+**The clock is most of every deck's losses, and two thirds of it arrives
+by routes that life or blockers can stop by the rules** (combat and
+drain). Karlov, the lifegain deck, dies to the clock at a median 39 life:
+its life total is worth nothing against three quarters of its losses.
+Every lifegain, lifelink and blocker row is a FLOOR on defence by this.
+
+**The options:**
+
+1. **Keep it** -- the kill is a roll of no kind. Every lifegain and
+   blocker row stays a floor.
+2. **Route-aware kills (the recommendation).** A COMBO kill stays as it is
+   (a combo ignores life and blockers). A DRAIN kill is a loss of life of
+   a fixed size -- the life it would take from a player at the start, 40 --
+   so you survive it above 40 and the clock re-arms next round, as the
+   Angel's does. A COMBAT kill is a real attack through §0z199's combat:
+   the opponent's bodies plus a kill force sized to deal 40 to an open
+   board, against your blocks by your rule and your life. What it needs:
+   the kill's size, a judgement nobody has data for (40 is the starting
+   life, said out loud); the pod re-fitted (§0z195: more kills fail, the
+   mean win rate rises); and a rebuild of every table.
+3. **Drains only** -- option 2 for the drain route, combat kills left as a
+   roll. Cheaper (no combat sizing), and it covers lifegain but not
+   blockers.
+
+### A6 -- the pod acts in its own main phase only
+
+Its removal, wipes and artifact/enchantment removal are
+`opponent_removal` in each seat's main phase 1 (§0z179); on your turn the
+only interaction is a counterspell as you cast (`opponents.countered`).
+Nothing answers an attack, an ETB, an activation or a combo once it is on
+the battlefield -- the Deadeye loop (§0z217), Time Sieve's chain and every
+haste or ETB creature always get their first action. Those rows are
+ceilings by it.
+
+**The options:**
+
+1. **Keep it.**
+2. **A held answer (the recommendation, after A3).** An opponent with an
+   instant-speed answer left in its round holds it into your turn and
+   spends it on your biggest new threat: a combo's first activation, an
+   ETB worth more than the board, a lethal attack. The share of answers
+   held is a new knob nobody has data for; it moves removal from the pod's
+   turn to yours rather than adding any, so the pod's removal rates stay
+   fitted.
+3. **Combos only** -- option 2 for the activated loops (Deadeye, Time
+   Sieve, Necropotence-style engines), nothing else.
+
+### A5 -- your planeswalkers are never attacked
+
+Loyalty falls only to your own minus abilities and to removal; the pod's
+declared attack (§0z199) never names a walker. In the staged lists: Sorin,
+Solemn Visitor and Sorin, Vengeful Bloodlord (karlov), Grist, the Hunger
+Tide (rendmaw) -- their rows are ceilings. Cheap now: the pod declares
+real attacks since item 44.
+
+**The options:**
+
+1. **Keep it.**
+2. **The pod attacks a walker by the same evaluation as a player (the
+   recommendation)**: when its unblocked power reaches the walker's
+   loyalty and the bodies are not needed to kill you (`pod_safe_attack`'s
+   rule), a walker that out-threatens you is attacked. You block for it by
+   your rule. No new knob.
+
+**Each of A3 and A6 moves every deck's baseline and re-fits the pod; A5
+moves karlov's and rendmaw's.** Built the item-44 way: each behind a
+switch that restores today's rule exactly, OFF until measured, and one
+rebuild at the end.
 
 ## How to read an ablation table
 
