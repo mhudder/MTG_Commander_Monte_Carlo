@@ -1,0 +1,6 @@
+§0z224: lorehold's staged swaps re-measured in context with ward on (code of 3d978b8), N=15,000 paired, seeds 5000.., python 3.11.17 (diagnostics.run_restage 15000 OUT L L_noCaldera L_noSunbird L_noGyre L_noDilemma; --report)
+
+lorehold -Penance +Caldera Pyremaw                    T10 +0.0187 +-0.0034*  T20 +0.0231 +-0.0040*  dmgT20 +2.12 +-0.24
+lorehold -Scroll Rack +Sunbird's Invocation           T10 +0.0192 +-0.0039*  T20 +0.0223 +-0.0045*  dmgT20 +1.74 +-0.27
+lorehold -Boros Charm +Immolating Gyre                T10 +0.0069 +-0.0029*  T20 +0.0177 +-0.0037*  dmgT20 +0.72 +-0.19
+lorehold -Ruby Medallion +Prisoner's Dilemma          T10 +0.0183 +-0.0040*  T20 +0.0151 +-0.0046*  dmgT20 +3.46 +-0.26
