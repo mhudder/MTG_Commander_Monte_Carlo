@@ -50,7 +50,8 @@ items below this section are in the order they were queued, not this one.
    caches are SUSPECT and `check_docs` fails on that one check, which is
    expected and is said in each commit. Never `--verified`.
 4. **Item 48: re-measure what was decided on the old pod**, on the
-   rebuilt tables.
+   rebuilt tables. **DONE 2026-11-15 (§0z220)**; one owner decision left:
+   tivit's §0z44 priority joint, a null now.
 5. **Item 45: decide A3, then A6 and A5.** A3 is the largest limit left.
 6. **Card work that does not move a decision already made** (item 46's
    list, item 37's Memory Jar and Bloodbat Summoner): tivit's ward {3}
@@ -274,7 +275,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     (2026-11-15), with azusa's labels; the card work stays here.
 
 48. **AFTER THE REBUILD: what was decided on the old pod (order of work,
-    step 4).** Every decision below was measured before item 44's flip
+    step 4).** **DONE 2026-11-15 (§0z220), but for one owner decision**: all
+    eleven staged swaps stand at both horizons; Time Sieve 11 stands;
+    karlov's §0z44 pair is significant at T10 only; tivit's §0z44 joint
+    (Tempting Contract 8.5, Mirkwood Bats 10, Rhystic Study 7.5) is a null
+    on fresh seeds -- keep or revert is the owner's. The tables are
+    readable (§0z219). Every decision below was measured before item 44's flip
     (§0z204), on a pod where attacking was free and nobody blocked.
     - The eleven staged swaps (`python -m edhmc.pending`): one paired
       `run_ab` each on the new default, N=15,000, both horizons, as §0z81

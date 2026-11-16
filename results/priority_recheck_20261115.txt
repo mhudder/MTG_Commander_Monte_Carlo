@@ -1,2 +1,21 @@
 adopted priority moves, UNDONE against the list as it stands. N=15,000 paired, seeds 101234..116233, horizons (10, 20), staged lists (build_pending). Printed: ADOPTED minus UNDONE (positive = the adopted move still wins).
 
+THE TOOL'S OWN A/A CONTROL -- NOOP must change zero games:
+  NOOP karlov      T10  games changed: 0   OK
+  NOOP karlov      T20  games changed: 0   OK
+  NOOP tivit       T10  games changed: 0   OK
+  NOOP tivit       T20  games changed: 0   OK
+
+== karlov   (as listed: T10 won 0.2765, T20 won 0.5110)
+  §0z44 joint (Felidar Sovereign 9->7, Sorin 8->6)
+      now: Felidar Sovereign 9, Sorin, Solemn Visitor 8
+      T10  +0.0067 +-0.0026 * dmg  -0.58* chg  2312   T20  +0.0029 +-0.0030   dmg  -0.76* chg  2750
+
+== tivit   (as listed: T10 won 0.3245, T20 won 0.5775)
+  §0z44 joint (Tempting Contract 8.5->6.5, Mirkwood Bats 10->8, Rhystic Study 7.5->9.5)
+      now: Mirkwood Bats 10, Rhystic Study 7.5, Tempting Contract 8.5
+      T10  +0.0012 +-0.0031   dmg  +0.22  chg  4060   T20  -0.0009 +-0.0036   dmg  +0.00  chg  4584
+  §0z86/§0z150 Time Sieve 11->9
+      now: Time Sieve 11
+      T10  +0.0245 +-0.0038 * dmg  +0.34* chg  2884   T20  +0.0147 +-0.0036 * dmg  +0.10  chg  3358
+

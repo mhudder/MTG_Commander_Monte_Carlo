@@ -270,8 +270,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z215](#0z215) | FIXED | **Shilgengar by its text** (item 47, §0z208 items 1-3, §0z184 finding 7): five switches, every one a null on the list -- the ceilings and floors were as small as read |
 | [0z216](#0z216) | IMPLEMENTED | **Tivit's Lightning Greaves and six targeted blinks** (§0z207 item 1, Venser the sixth): the owner's policy, 2026-11-15 -- Greaves on Tivit only with no targeted blink in play, in hand or on rebound (`greaves_blink_policy`), -0.0017 / -0.0011 |
 | [0z217](#0z217) | FIXED | **Tivit + Deadeye Navigator is a combo** (the owner, 2026-11-15): the loop stopped at break-even after one blink; it runs to `combo_cap` now (`deadeye_breakeven_loops`), +0.0131 / +0.0079 |
-| [0z218](#0z218) | FIXED | **The Clue dig, and a capped loop that drains is infinite** (the owner, 2026-11-15, §0z217's remaining 13%): `pile_dig` +0.0063 / +0.0043; `capped_drain_wins` +0.0003 / +0.0002. Combo games are won 88%; the rest are mana-starved digs and early kills |
+| [0z218](#0z218) | FIXED | **The Clue dig; a capped draining loop wins** (the owner, 2026-11-15): `pile_dig` +0.0063 / +0.0043, `capped_drain_wins` +0.0003 / +0.0002; combo games won 88% |
 | [0z219](#0z219) | REBUILT | **Item 44's one rebuild** (the owner, 2026-11-15): six tables at N=15,000 on the flipped pod, every cache CURRENT; no significant row changed sign in any deck |
+| [0z220](#0z220) | MEASURED | **Queue item 48 on the new pod**: all eleven staged swaps stand; Time Sieve 11 stands; karlov's §0z44 pair T10 only; **tivit's §0z44 joint a null** -- the owner's call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19298,6 +19299,73 @@ that cannot block is the one that adds nothing there.
 Diffs: `tools`-less, a table parser run over `git show 00bf581:results/
 ablation_<deck>.txt` against the new file; the same comparison any session
 can rerun.
+
+<a id="0z220"></a>
+
+## 0z220. MEASURED -- queue item 48: what was decided on the old pod, re-measured on the new
+
+Every decision below was measured before item 44's flip (§0z204), on a pod
+where attacking was free and nobody blocked. Re-measured 2026-11-15 on the
+rebuild's code (§0z219), python 3.11.17.
+
+### The eleven staged swaps -- all stand
+
+`diagnostics/run_restage.py`, each swap in context (the staged list against
+it with that one swap undone), N=15,000 paired, seeds 5000..
+(`results/restage_20261115.txt`; each Change's `reverified` carries its
+line). Old = `results/restage_20261107_pod.txt`, the last pre-flip number.
+
+| swap | T10 | T20 | T20 before |
+|---|---|---|---|
+| karlov -Soulmender +Bloodthirsty Conqueror | +0.0403 ±0.0035 * | +0.0326 ±0.0037 * | +0.0283 |
+| karlov -Swamp +Bolas's Citadel | +0.0120 ±0.0038 * | +0.0089 ±0.0043 * | +0.0091 |
+| karlov -Daxos +South Wind Avatar | +0.0107 ±0.0025 * | +0.0080 ±0.0031 * | +0.0116 |
+| azusa -Perilous Forays +Ka-Zar | +0.0077 ±0.0028 * | +0.0140 ±0.0035 * | +0.0066 |
+| azusa -Forest +Fabled Passage | +0.0081 ±0.0045 * | +0.0077 ±0.0053 * | +0.0099 |
+| azusa -Forest +Evolving Wilds | +0.0063 ±0.0046 * | +0.0089 ±0.0054 * | +0.0093 |
+| lorehold -Penance +Caldera Pyremaw | +0.0213 ±0.0035 * | +0.0233 ±0.0042 * | +0.0269 |
+| lorehold -Scroll Rack +Sunbird's Invocation | +0.0201 ±0.0040 * | +0.0233 ±0.0047 * | +0.0267 |
+| lorehold -Boros Charm +Immolating Gyre | +0.0068 ±0.0030 * | +0.0188 ±0.0038 * | +0.0231 |
+| lorehold -Ruby Medallion +Prisoner's Dilemma | +0.0173 ±0.0040 * | +0.0153 ±0.0048 * | +0.0133 |
+| shilgengar -Vampiric Rites +Lyra, Archangel of Dawn | +0.0054 ±0.0014 * | +0.0117 ±0.0034 * | +0.0090 |
+
+**All eleven significant at both horizons, every sign unchanged.** Ka-Zar's
+T20 doubled (the flip made bodies matter, and Ka-Zar's are many); the
+lorehold four slid slightly, as the slower engine did under the sooner
+kill. No swap goes to the owner as "inside its bar".
+
+### The adopted priority moves (item 18) -- one is a null now
+
+`diagnostics/run_priority_recheck.py` (new): each adopted move UNDONE
+against the list as it stands, paired, N=15,000, seeds 101234.. -- a block
+none of item 18's tiers used (§0z170). Printed adopted minus undone
+(`results/priority_recheck_20261115.txt`; the tool's NOOP gate changed 0
+games in every cell).
+
+| move | T10 | T20 | when adopted |
+|---|---|---|---|
+| karlov: Felidar Sovereign 7->9, Sorin, Solemn Visitor 6->8 (§0z44) | **+0.0067 ±0.0026** | +0.0029 ±0.0030 | +0.0099 / +0.0091 |
+| tivit: Tempting Contract 6.5->8.5, Mirkwood Bats 8->10, Rhystic Study 9.5->7.5 (§0z44) | +0.0012 ±0.0031 | -0.0009 ±0.0036 | +0.0225 / +0.0211 |
+| tivit: Time Sieve 9->11 (§0z86, §0z150) | **+0.0245 ±0.0038** | **+0.0147 ±0.0036** | +0.0225 / +0.0064 |
+
+- **Time Sieve stands**, and is larger at T20 than when adopted.
+- **Karlov's pair shrank to T10 only** -- still the better ranking, by less.
+- **Tivit's §0z44 joint is a null at both horizons.** Not a reversal (the
+  undone order does no better), but the +0.02 it was adopted on is gone.
+  The engine moved under it three ways since: Tempting Contract lost its
+  extra Treasure an upkeep (§0z214), Mirkwood Bats drains through the
+  Deadeye combo whatever its rank (§0z217, §0z218), and the flip. Keeping
+  or reverting it is a tie on today's evidence; it is the owner's call,
+  and nothing changes until it is made.
+
+Not re-run: item 18's full screen (760 arms, ~tens of CPU-hours), which
+asks a different question -- are there NEW moves -- and is the owner's to
+order.
+
+### The rebuilt tables, and the noise floors
+
+In §0z219: no significant row changed sign; the cards item 44 made live
+fire; the floors are ±0.0026-0.0034, readable.
 
 ## How to read an ablation table
 
