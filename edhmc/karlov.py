@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (static_walker_plus, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -2687,6 +2687,9 @@ def take_turn(g):
     citadel_land_step(g)
     play_land(g)
     sorin_bloodlord_step(g)        # loyalty, sorcery speed (§0z153)
+    for perm in [p for p in g.board                       # A5, §0z221
+                 if p.card.name == "Sorin, Solemn Visitor"]:
+        static_walker_plus(g, perm, 4)
     if g.result is not None:
         return
     main_phase(g)

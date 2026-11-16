@@ -3335,6 +3335,79 @@ def seat_attack(g, i) -> None:
             g, opp, lambda b: next(flags))
 
 
+def your_walkers(g) -> list:
+    """Your planeswalkers on the battlefield with loyalty left."""
+    return [p for p in g.board
+            if "Planeswalker" in p.card.types and p.counters > 0]
+
+
+def split_for_walker(g, bodies, sent, plan):
+    """A5, THE POD ATTACKS YOUR PLANESWALKERS (the owner, 2026-11-16,
+    §0z221; `pod_attacks_walkers`, False is the old rule exactly). Of the
+    bodies attacking you, the pod sends the fewest -- biggest first -- whose
+    power reaches your most threatening walker's loyalty at that walker,
+    unless the attack at you is lethal as declared (then every body goes at
+    you: a pilot kills the player, not the walker). It is the same
+    evaluation as for a player -- "where is this body's damage worth most"
+    -- read the cheapest way: a walker it can kill is worth more than the
+    same damage to a player who survives it. Returns (at you, the walker,
+    at the walker)."""
+    walkers = your_walkers(g)
+    if not walkers or not sent:
+        return sent, None, []
+    atk, asg = plan(sent)
+    if sum(a.power for a in atk if a.k not in asg) >= g.your_life:
+        return sent, None, []
+    walker = max(walkers, key=lambda p: (threat_of(g, p), p.counters))
+    pick, power = [], 0
+    for k in sorted(sent, key=lambda k: -bodies[k].power):
+        if power >= walker.counters:
+            break
+        pick.append(k)
+        power += bodies[k].power
+    if power < walker.counters:
+        return sent, None, []
+    g.m["walker_attacks"] += 1
+    return [k for k in sent if k not in pick], walker, pick
+
+
+def _attack_walker(g, bodies, ks, walker, dead, used) -> None:
+    """A5's attack at one walker: your creatures not already blocking block
+    for it by your rule (`plan_blocks`, the walker's loyalty as the life it
+    defends, no chump floor), and the damage that gets through comes off its
+    loyalty -- damage to a walker, not to you, so no Angel and no life. At
+    0 it dies (704.5i)."""
+    from edhmc.engine import walker_dies_at_zero
+    atk = _body_facts(bodies, ks)
+    blockers = [b for b in your_blockers(g) if id(b.ref) not in used]
+    asg = plan_blocks(g, float(walker.counters), atk, blockers,
+                      len(blockers), count=True, floor=0,
+                      prefix="walker_block_")
+    dmg = int(sum(a.power for a in atk if a.k not in asg))
+    mine, link = [], 0
+    whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
+    for a in atk:
+        blks = asg.get(a.k)
+        if not blks:
+            continue
+        if _kills(a, blks):
+            dead.add(a.k)
+        mine.extend(_attacker_kills(a, blks))
+        for b in _dealers(a, blks):
+            if b.ref.card.lifelink or whip:
+                link += b.power
+    g.m["walker_damage"] += min(dmg, walker.counters)
+    walker.counters -= dmg
+    _your_lifelink(g, link)
+    if mine:
+        with simultaneous(g):
+            for p in mine:
+                destroy(g, p, destroys=True)
+    if walker.counters <= 0:
+        g.m["walkers_killed"] += 1
+        walker_dies_at_zero(g, walker)
+
+
 def _attack_you(g, opp, bodies, sent, dead) -> None:
     """A2's attack at you (§0z199), from `seat_attack`. Adds the attacker's
     bodies your blocks kill to `dead`."""
@@ -3353,11 +3426,18 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
         sent = pod_safe_attack(g, sent, plan)
     if first > len(sent):
         g.m["pod_attackers_held"] += first - len(sent)
-    if not sent:
+    walker, at_walker = None, []
+    if g.cfg.get("pod_attacks_walkers", False):        # A5, §0z221
+        sent, walker, at_walker = split_for_walker(g, bodies, sent, plan)
+    if not sent and not at_walker:
         return
-    for k in sent:
+    for k in sent + at_walker:
         opp.body_tapped[k] = True                 # attacking taps (508.1f)
+    if not sent:
+        _attack_walker(g, bodies, at_walker, walker, dead, set())
+        return
     atk, asg = plan(sent, count=True)
+    used = {id(b.ref) for blks in asg.values() for b in blks}
     g.m["pod_attacks"] += len(sent)
     dmg = float(sum(a.power for a in atk if a.k not in asg))
     mine, link = [], 0
@@ -3385,6 +3465,8 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
                 if destroy(g, p, destroys=True):
                     died += 1
         g.m["your_blockers_died"] += died
+    if at_walker:
+        _attack_walker(g, bodies, at_walker, walker, dead, used)
 
 
 def _attack_rival(g, opp, bodies, rival, ks, dead) -> float:

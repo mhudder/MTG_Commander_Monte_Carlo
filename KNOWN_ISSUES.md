@@ -19480,6 +19480,35 @@ ceilings by it.
 
 ### A5 -- your planeswalkers are never attacked
 
+**BUILT 2026-11-16, OFF** (`pod_attacks_walkers`; `opponents.split_for_walker`,
+`_attack_walker`, `engine.static_walker_plus`; `tests/test_walker_attacks.py`,
+six cases, three mutations exact). Of the bodies attacking you, the pod sends
+the fewest, biggest first, whose power reaches your most threatening
+walker's loyalty at it -- unless the attack at you is lethal as declared.
+Your creatures not already blocking block for it by `plan_blocks` (its
+loyalty as the life defended, no chump floor); the damage through comes off
+loyalty, and at 0 it dies. The two walkers modelled as statics (Grist,
+Sorin, Solemn Visitor; `pending.WALKERS_WITHOUT_LOYALTY`) get loyalty when
+the switch is on -- printed on the first +1, one more each turn, as their
++1 is already read -- so there is something to attack. **The text read
+from Scryfall 2026-11-16**: Sorin, Solemn Visitor loyalty 4, Grist 3.
+"A walker that out-threatens you" (option 2's wording above) is read as:
+a walker the pod can kill is worth more than the same damage to a player
+who survives it -- no threat comparison is made.
+
+OFF BIT-IDENTICAL against `4543465` on every deck at 2,000 seeds. ON against
+OFF, N=6,000 paired (`results/knob_ab_<deck>_pod_attacks_walkers.txt`; reach
+`walker_attacks`, `static_walker_loyalty`; identity 0):
+
+| deck | T10 | T20 | reached | walker attacks / killed a game |
+|---|---|---|---|---|
+| karlov | **-0.0068 ±0.0026** | **-0.0073 ±0.0036** | 18.4% | 0.21 / 0.08 |
+| rendmaw | -0.0003 ±0.0010 | +0.0005 ±0.0022 | 15.8% | 0.13 / 0.02 |
+
+Karlov's ceiling comes down (two Sorins; Vengeful Bloodlord's reanimation
+and pings stop when it dies). Rendmaw's Grist is rarely killed -- it climbs
+a loyalty a turn behind a wall of Insects -- and its row is a null.
+
 Loyalty falls only to your own minus abilities and to removal; the pod's
 declared attack (§0z199) never names a walker. In the staged lists: Sorin,
 Solemn Visitor and Sorin, Vengeful Bloodlord (karlov), Grist, the Hunger

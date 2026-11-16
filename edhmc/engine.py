@@ -3882,6 +3882,7 @@ def upkeep(g: Game):
             tendershoot_saprolings(g, n_upkeeps)
         elif s == "grist":
             g.make_tokens(1, 1, 1, "Insect")
+            static_walker_plus(g, p, 3)          # A5, §0z221
     # Arasta: opponents cast instants/sorceries at some rate. Counterspells
     # are NOT in this roll: they are real events, and reach Arasta through
     # `Game.opponent_cast_on_your_turn` (§0z47).
@@ -4080,6 +4081,21 @@ def walker_ready(g, perm) -> bool:
     used[id(perm)] = (perm, g.turn)
     g.m["pw_activations"] += 1
     return True
+
+
+def static_walker_plus(g, perm, printed) -> None:
+    """A5 (§0z221, `pod_attacks_walkers`): a walker modelled BY NAME as a
+    static (`pending.WALKERS_WITHOUT_LOYALTY` -- Grist, the Hunger Tide;
+    Sorin, Solemn Visitor) has loyalty to be attacked. Its +1 is already read
+    as though used every turn, so loyalty is the printed number on its first
+    +1 and one more each turn after; Grist's extra counter for a milled Insect
+    is not counted (a floor). Off, as before: no loyalty at all."""
+    if not g.cfg.get("pod_attacks_walkers", False):
+        return
+    if perm.counters <= 0:
+        perm.counters = printed
+    perm.counters += 1
+    g.m["static_walker_loyalty"] += 1     # the reach
 
 
 def walker_dies_at_zero(g, perm) -> None:
