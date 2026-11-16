@@ -19483,7 +19483,31 @@ was built for fire rarely: a new threat before combat 0.03-0.21 a game, a
 combo 0.01-0.03. As specified -- "moves removal from the pod's turn to
 yours rather than adding any" -- the rule makes the pod play worse, which
 contradicts the owner's standing rule for the pod (item 44: "the opponents
-play as close to optimally as possible"). **The identity check is not
+play as close to optimally as possible"). **THE OWNER, 2026-11-16, asked:
+"rework: hold only to gain"; and A3 and A5 (and A6 if the rework earns it)
+are to be flipped, the pod re-fitted, and the tables rebuilt.**
+
+**THE REWORK, 2026-11-16: hold only to gain** (`held_answer_bar` 6.0, a
+judgement -- the middle of the threat scale; None is the first build). An
+answer is held only when the best target it could hit now is BELOW the bar;
+a good target is answered in the holder's main phase, as before. Pinned by
+`tests/test_held_answers.py` G and its mutation (`held_answer_bar=None`
+breaks exactly G). ON against OFF, N=6,000 paired, bar 6
+(`results/knob_ab_<deck>_held_answers.txt`, overwritten):
+
+| deck | T10 | T20 | games held | held / not held (good target), a game | `removal_eaten` |
+|---|---|---|---|---|---|
+| rendmaw | -0.0003 ±0.0008 | -0.0028 ±0.0031 | 10.9% | 0.13 / 0.55 | -0.003 |
+| lorehold | **-0.0023 ±0.0020** | -0.0012 ±0.0026 | 5.9% | 0.07 / 0.47 | +0.007 |
+| karlov | +0.0000 ±0.0007 | -0.0012 ±0.0012 | 1.9% | 0.02 / 0.72 | -0.001 |
+| tivit | **-0.0007 ±0.0007** | -0.0012 ±0.0014 | 2.2% | 0.02 / 0.51 | -0.001 |
+| shilgengar | -0.0005 ±0.0007 | **-0.0023 ±0.0020** | 4.5% | 0.05 / 0.65 | -0.000 |
+| azusa | +0.0002 ±0.0006 | -0.0003 ±0.0011 | 1.2% | 0.01 / 0.63 | -0.001 |
+
+**The pod is now marginally STRONGER, never weaker**, and no removal is
+lost. The bar is not graded by these seeds: at 5 and at 7 (shilgengar,
+azusa) every row is the same sign and inside its bar, and 6 was set before
+any run. **It earns the flip**, by the owner's condition. **The identity check is not
 claimed**: the hold roll is a CRN draw, so `crn_draws` differs in games
 where nothing was held; a direct check (300 seeds, tivit and karlov) found
 `crn_draws` the ONLY key that differs in every such game. Brought to the

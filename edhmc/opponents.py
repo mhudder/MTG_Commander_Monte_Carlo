@@ -2207,9 +2207,21 @@ def pod_holds_answer(g, opp, rolls) -> bool:
     i = g.opponents.index(opp)
     if crn_random(g, f"held_answer{i}") >= g.cfg.get("held_answer_share", 0.5):
         return False
-    opp.held_rolls = list(rolls)
     targets = _spot_targets(g)
-    opp.held_threat = max((threat_of(g, p) for p in targets), default=0.0)
+    best = max((threat_of(g, p) for p in targets), default=0.0)
+    # HOLD ONLY TO GAIN (the owner, 2026-11-16, after the first build made
+    # the pod worse): an answer is held only when the best target it could
+    # hit now is WEAK -- below `held_answer_bar` (6.0, the middle of the
+    # threat scale; a judgement, no data). A good target is answered now, as
+    # before; holding is for waiting out a board with nothing worth it.
+    # `held_answer_bar` None is the first build's rule (hold whatever the
+    # board).
+    bar = g.cfg.get("held_answer_bar", 6.0)
+    if bar is not None and best >= bar:
+        g.m["answers_not_held_good_target"] += 1
+        return False
+    opp.held_rolls = list(rolls)
+    opp.held_threat = best
     g.m["answers_held"] += 1
     return True
 

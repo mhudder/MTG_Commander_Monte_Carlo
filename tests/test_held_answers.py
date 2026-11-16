@@ -3,7 +3,7 @@
 your turn and cast at your biggest new threat (`held_answers`).
 
     python -m tests.test_held_answers
-    python -m tests.test_held_answers --mutate   # 3 mutations, exact sets
+    python -m tests.test_held_answers --mutate   # 4 mutations, exact sets
 
 Each case: a shilgengar game, an empty battlefield but for the creatures a
 case puts there, `held_answer_share` 1 (every answer at you is held),
@@ -17,8 +17,11 @@ CASES
      it -- Old lives, the answer still held
   D  Old alive until the end window, which casts what is still held at
      the top threat: Old dies there
-  E  the combo window kills the piece it is given, not the top threat
+  E  held against Old; a Big 9-threat and a Piece enter: the combo window
+     kills the piece it is given, not the top threat
   F  NEIGHBOUR: `held_answers` False: the removal is cast at once, Old dies
+  G  HOLD ONLY TO GAIN: a 9-threat on the battlefield (the bar is 6) is
+     answered now, not held (Old is 4: every other case holds against it)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   held_answers=False                         -> A, B, C, D, E
@@ -28,8 +31,12 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
     pinned nothing; D now also asks that Old lived until the end window.)
   the combat window spends like the end step -> C
   the end window casts nothing               -> D
+  held_answer_bar=None (hold whatever)       -> G
+  (G and this mutation were added with the bar, 2026-11-16, before their
+  run.)
 
-UNMUTATED (§0z15): F is the old rule, which both readings share.
+UNMUTATED (§0z15): F is the old rule, which both readings share; G holds
+under the old rule too (cast at once).
 """
 import sys
 
@@ -111,9 +118,9 @@ def run_cases():
           (alive, old in g.board), (True, False))
 
     g, opp, others, rolls, old = game()
+    fire(g, opp, others, rolls)
     big = body("Big", 9.0)
     g.board.append(big)
-    fire(g, opp, others, rolls)
     piece = body("Piece", 1.0)
     g.board.append(piece)
     OPP.held_answer_window(g, "combo", pieces=[piece])
@@ -124,6 +131,13 @@ def run_cases():
     OPP.spot_removal(g, opp, others, rolls)
     check("F NEIGHBOUR: held_answers False: cast at once, Old dies",
           old in g.board, False)
+
+    g, opp, others, rolls, old = game()
+    good = body("Good", 9.0)
+    g.board.append(good)
+    OPP.spot_removal(g, opp, others, rolls)
+    check("G a target at or above the bar is answered now, not held",
+          (good in g.board, g.m["answers_held"]), (False, 0))
     return set(FAIL)
 
 
@@ -154,6 +168,7 @@ def main() -> int:
             (OPP, "held_answer_window", combat_as_end)]),
         "the end window casts nothing": ({"D"}, {}, [
             (OPP, "held_answer_window", end_does_nothing)]),
+        "held_answer_bar=None": ({"G"}, {"held_answer_bar": None}, []),
     }
     bad = 0
     for label, (want, cfg, patches) in muts.items():
