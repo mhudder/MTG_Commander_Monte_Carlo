@@ -20089,7 +20089,12 @@ the one it replaced, rows beyond the wider bar at T20: rendmaw none,
 shilgengar none, karlov none, azusa one -- **Memory Jar, +0.0047 +-0.0024 ->
 +0.0115 +-0.0028**, the card this is (a ceiling, §0z228). Woe Strider reads
 +0.0044 +-0.0023, Voldaren Bloodcaster +0.0011 +-0.0024. No significant
-sign flip in any deck.
+sign flip in any deck. The slowest leg, azusa, took about 40 minutes of wall time.
+
+**The staged swaps, re-measured at 5a00891** in context, N=15,000 paired,
+from a worktree (§0z226's lesson; `results/restage_20261117.txt`): all seven
+stand, each within its 2026-11-16 bar. Bolas's Citadel's T20 is inside its
+bar again (+0.0029 +-0.0041; T10 +0.0099 +-0.0037), kept staged by the owner.
 
 ## How to read an ablation table
 
