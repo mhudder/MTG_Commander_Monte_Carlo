@@ -19726,6 +19726,15 @@ has data for.
 seeds against `0444688`) and karlov, shilgengar and azusa are BIT-IDENTICAL
 -- they have no ward card. The three moved decks' tables are rebuilt.
 
+**REBUILT 2026-11-17**: parallel legs at `3d978b8` (tivit, rendmaw,
+lorehold), python 3.13.18 with the pins; `tools.repro_row` IDENTICAL on
+tivit's Ghostly Prison under 3.13.16; every active cache CURRENT. Baselines
+(T20): tivit 0.5333 -> 0.5437 (+0.0104, the ward's row), rendmaw 0.3367 ->
+0.3376, lorehold 0.4502 -> 0.4512. **No row in the three tables moved beyond
+the wider of its two bars.** Lorehold's four staged swaps re-measured with
+ward: all significant at both horizons, within 0.0002 of item 45's numbers
+(`results/restage_ward_20261116.txt`, each Change's `reverified`).
+
 ## How to read an ablation table
 
 Moved to **`docs/READING_TABLES.md`** on 2026-09-09 — it is methodology, not
