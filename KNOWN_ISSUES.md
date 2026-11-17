@@ -19923,6 +19923,11 @@ being spawned -- a mixed measurement, discarded. They are re-measured at
 §0z232's commit, from a worktree. (The lesson: a long run reads the files
 as its workers import them, so start it from a worktree or edit nothing.)
 
+**What the cycling rebuild moved**, each table against the one it replaced
+(rows beyond the wider bar at T20): karlov none, tivit none, shilgengar one
+-- **Angel of the Ruins, +0.0092 +-0.0023 -> +0.0147 +-0.0030**, the card
+whose plainscycling this is. No significant sign flip in any deck.
+
 <a id="0z227"></a>
 
 ## 0z227. FIXED -- Woe Strider: its escape, and a free outlet the pilot declines
@@ -20074,8 +20079,17 @@ mutations exact on the first run.
 
 **What moved, at 2,000 seeds against c9f18f4**: rendmaw (§0z227's escape),
 azusa (§0z228, §0z231), shilgengar (§0z229, §0z230) and karlov (§0z230);
-lorehold and tivit BIT-IDENTICAL. The four tables are rebuilt at this
-work's commit.
+lorehold and tivit BIT-IDENTICAL (VERIFIED).
+
+**Rebuilt at 5a00891**, one parallel leg per deck, python 3.13.18 / numpy
+2.4.6 on every leg; `tools.repro_row` IDENTICAL on that interpreter for one
+row a deck (azusa Memory Jar, shilgengar Voldaren Bloodcaster, rendmaw Woe
+Strider, karlov Bloodthirsty Conqueror). **What moved**, each table against
+the one it replaced, rows beyond the wider bar at T20: rendmaw none,
+shilgengar none, karlov none, azusa one -- **Memory Jar, +0.0047 +-0.0024 ->
++0.0115 +-0.0028**, the card this is (a ceiling, §0z228). Woe Strider reads
++0.0044 +-0.0023, Voldaren Bloodcaster +0.0011 +-0.0024. No significant
+sign flip in any deck.
 
 ## How to read an ablation table
 

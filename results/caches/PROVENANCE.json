@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "101d87850f912443",
-    "built_commit": "e5b2f40",
-    "built_utc": "2026-11-16T17:10:54Z",
+    "built_at": "559e56d1d7c38c4b",
+    "built_commit": "5a00891",
+    "built_utc": "2026-11-17T06:04:49Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -649,39 +649,46 @@
             "utc": "2026-11-16T02:57:43Z"
           }
         ]
+      },
+      {
+        "built_at": "101d87850f912443",
+        "built_commit": "e5b2f40",
+        "built_utc": "2026-11-16T17:10:54Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "0444688",
+            "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+            "fingerprint": "924be315202b4417",
+            "utc": "2026-11-16T23:23:28Z"
+          },
+          {
+            "commit": "c23a0bb",
+            "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "d3842d38db88b658",
+            "utc": "2026-11-17T01:47:26Z"
+          },
+          {
+            "commit": "b225ebe",
+            "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "27beb914ca0a015d",
+            "utc": "2026-11-17T02:28:56Z"
+          },
+          {
+            "commit": "a06def3",
+            "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+            "fingerprint": "a456b98fef1cb59b",
+            "utc": "2026-11-17T03:49:26Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "0444688",
-        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
-        "fingerprint": "924be315202b4417",
-        "utc": "2026-11-16T23:23:28Z"
-      },
-      {
-        "commit": "c23a0bb",
-        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "d3842d38db88b658",
-        "utc": "2026-11-17T01:47:26Z"
-      },
-      {
-        "commit": "b225ebe",
-        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "27beb914ca0a015d",
-        "utc": "2026-11-17T02:28:56Z"
-      },
-      {
-        "commit": "a06def3",
-        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
-        "fingerprint": "a456b98fef1cb59b",
-        "utc": "2026-11-17T03:49:26Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "eebe2992dedaeaa9",
-    "built_commit": "c9f18f4",
-    "built_utc": "2026-11-17T04:51:14Z",
+    "built_at": "d068976625f352f1",
+    "built_commit": "5a00891",
+    "built_utc": "2026-11-17T06:02:11Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1260,6 +1267,13 @@
             "utc": "2026-11-17T02:28:56Z"
           }
         ]
+      },
+      {
+        "built_at": "eebe2992dedaeaa9",
+        "built_commit": "c9f18f4",
+        "built_utc": "2026-11-17T04:51:14Z",
+        "deck": "karlov",
+        "verified": []
       }
     ],
     "verified": []
@@ -1885,9 +1899,9 @@
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "93ac06252b8017b8",
-    "built_commit": "15be856",
-    "built_utc": "2026-11-17T02:54:20Z",
+    "built_at": "232c1765fb4a9e66",
+    "built_commit": "5a00891",
+    "built_utc": "2026-11-17T06:01:51Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2448,21 +2462,28 @@
         "built_utc": "2026-11-16T23:50:17Z",
         "deck": "rendmaw",
         "verified": []
+      },
+      {
+        "built_at": "93ac06252b8017b8",
+        "built_commit": "15be856",
+        "built_utc": "2026-11-17T02:54:20Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "a06def3",
+            "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+            "fingerprint": "4478d04e308d51fa",
+            "utc": "2026-11-17T03:49:26Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "a06def3",
-        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
-        "fingerprint": "4478d04e308d51fa",
-        "utc": "2026-11-17T03:49:26Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "c2b70d4be821e3fc",
-    "built_commit": "c9f18f4",
-    "built_utc": "2026-11-17T04:50:48Z",
+    "built_at": "01392a48ca1fe693",
+    "built_commit": "5a00891",
+    "built_utc": "2026-11-17T06:02:07Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -3070,6 +3091,13 @@
             "utc": "2026-11-17T02:28:56Z"
           }
         ]
+      },
+      {
+        "built_at": "c2b70d4be821e3fc",
+        "built_commit": "c9f18f4",
+        "built_utc": "2026-11-17T04:50:48Z",
+        "deck": "shilgengar",
+        "verified": []
       }
     ],
     "verified": []
