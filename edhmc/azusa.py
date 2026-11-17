@@ -82,7 +82,10 @@ them are load-bearing and none of the four was true before:
      animation number here a FLOOR: a pilot who wanted the alpha strike would
      hold the mana back instead of casting the spell.
 
-INDESTRUCTIBLE AND REACH ARE CARRIED BUT NOT READ, AND SINCE THE COMBAT FLIP
+INDESTRUCTIBLE AND REACH ARE READ SINCE §0z231 (`indestructible_granted`,
+`reach_granted`; `animated_land_text=False` is the old rule). WHAT FOLLOWS
+IS THE OLD STATE, kept for its reasoning. INDESTRUCTIBLE AND REACH ARE
+CARRIED BUT NOT READ, AND SINCE THE COMBAT FLIP
 THEY CAN MATTER (§0z204; item 46, §0z197 D). `spot_removal` and `board_wipe`
 both exclude lands, so the pod's removal still cannot kill an animated land.
 Combat can: under A1 a blocked attacker dies (§0z198) and under A2 your
@@ -446,6 +449,9 @@ class AzusaGame(BaseGame):
         self.spells_this_turn = 0
         self.ascended = False           # Wayward Swordtooth's city's blessing
         self.hothouse_solved = False    # Case of the Locked Hothouse
+        self.jar_exiled = None          # Memory Jar's hand, §0z228
+        self.reach_tokens = set()       # Sapling Nursery's Treefolk, §0z231
+        self.nissa_emblem = False       # Nissa, Who Shakes the World's -8
         self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
         # §0z212: the ETBs a tutor or Genesis Wave queues while a spell is
@@ -713,6 +719,33 @@ class AzusaGame(BaseGame):
                                              or a["power"] > best["power"]):
                 best = a
         return best
+
+    def indestructible_granted(self, perm) -> bool:
+        """`opponents.indestructible_of`'s hook (§0z231, §0z206 floors 2 and
+        3): an animated land's "indestructible" (Sylvan Awakening), and
+        Nissa, Who Shakes the World's emblem, "Lands you control have
+        indestructible" -- which matters in combat, where an animated land
+        can die, and nowhere else (the pod's removal excludes lands).
+        `animated_land_text=False` is the old rule."""
+        if not self.cfg.get("animated_land_text", True):
+            return False
+        if self.nissa_emblem and perm.card.is_land:
+            return True
+        anim = self.animation_of(perm)
+        return bool(anim and anim.get("indestructible"))
+
+    def reach_granted(self, perm) -> bool:
+        """`opponents.reach_of`'s hook (§0z231, §0z206 floors 2 and 4): an
+        animated land's "reach" (Sylvan Awakening) and Sapling Nursery's
+        "3/4 green Treefolk creature token with reach". Under A2 a reach
+        blocker can take a flier. `animated_land_text=False` is the old
+        rule."""
+        if not self.cfg.get("animated_land_text", True):
+            return False
+        if id(perm) in self.reach_tokens:
+            return True
+        anim = self.animation_of(perm)
+        return bool(anim and anim.get("reach"))
 
     # -- Ashaya's second clause (queued 15, §0z18) -------------------------
 
@@ -1149,11 +1182,14 @@ class AzusaGame(BaseGame):
         return perm
 
     def make_tokens(self, n, p, t, subtype=""):
+        """Returns the permanents made (§0z231: Sapling Nursery's reach)."""
+        made = []
         for _ in range(int(n)):
             tok = Card(name=f"{subtype or 'Token'} token",
                        types=frozenset({"Creature"}), power=p, toughness=t)
-            self.make_permanent(tok, sick=True, is_token=True)
+            made.append(self.make_permanent(tok, sick=True, is_token=True))
             self.m["tokens_made"] += 1
+        return made
 
     def available_mana(self):
         # Returns a ManaUnits, like engine.available_mana: it carries the
@@ -1505,7 +1541,11 @@ class AzusaGame(BaseGame):
         # corrected "this engine never blocks"). The 3/4 body is the rest,
         # the Rampaging Baloths shape one size down on power and one up on
         # toughness.
-        self.make_tokens(self.count("Sapling Nursery"), 3, 4, "Treefolk")
+        made = self.make_tokens(self.count("Sapling Nursery"), 3, 4,
+                                "Treefolk")
+        # ...and its reach is read since §0z231 (`reach_granted`; the
+        # comment above is the old state).
+        self.reach_tokens.update(id(p) for p in made or ())
         # --- 2026-10-03 sixth batch (§0z101). Each its OWN statement, none
         # nested in a neighbour's `if` -- §0z28's indentation. ---------------
         # ELFSWORN GIANT: "create a 1/1 green Elf Warrior creature token."
@@ -3858,6 +3898,9 @@ class AzusaGame(BaseGame):
         """
         if perm.counters >= 8:
             perm.counters -= 8
+            # The emblem, read since §0z231 (`indestructible_granted`); the
+            # paragraph above is the old state.
+            self.nissa_emblem = True
             forests = [c for c in self.library if c.is_land and c.name in FOREST]
             # Out of the library FIRST, then onto the battlefield -- the
             # Genesis Wave crash of 2026-09-07, and Worldwaker's -7 above,
@@ -4404,6 +4447,54 @@ def azusa_seat_upkeeps(g) -> bool:
             and g.cfg.get("azusa_seat_upkeeps", True))
 
 
+MEMORY_JAR = "Memory Jar"
+
+
+def memory_jar_crack(g) -> None:
+    """MEMORY JAR (Scryfall 2026-11-17): "{T}, Sacrifice this artifact: Each
+    player exiles all cards from their hand face down and draws seven cards.
+    At the beginning of the next end step, each player discards their hand
+    and returns to their hand each card they exiled this way." §0z184 item 8,
+    §0z228.
+
+    WHEN is a pilot's rule, said out loud: after your draw step and before
+    the land step, so the seven feed the land drops and both main phases, on
+    a turn when the hand holds `memory_jar_hand` (2) cards or fewer -- a
+    weak hand, which seven new cards beat and which comes back at the end
+    step. Never when the seven would deck you (`draw_is_safe`). A Jar cast
+    this turn waits for the next: it is cracked here only. The artifact
+    needs no mana and has no summoning sickness (302.6 is creatures).
+
+    NOT MODELLED: the pod's half -- each opponent's seven for your turn,
+    with their instants in it. The pod holds no hand (§4), so the row is a
+    CEILING by that half. `memory_jar=False` is the old rule (the card
+    blank)."""
+    if not g.cfg.get("memory_jar", True) or g.jar_exiled is not None:
+        return
+    jar = next((p for p in g.board if p.card.name == MEMORY_JAR
+                and not p.tapped), None)
+    if jar is None or len(g.hand) > g.cfg.get("memory_jar_hand", 2):
+        return
+    if not draw_is_safe(g, 7):
+        return
+    g.board.remove(jar)
+    g.graveyard.append(jar.card)
+    g.jar_exiled, g.hand = g.hand, []
+    g.draw(7)
+    g.m["memory_jar_cracks"] += 1
+
+
+def memory_jar_return(g) -> None:
+    """Memory Jar's delayed trigger, at the beginning of your end step:
+    discard the hand (a land discarded is in the graveyard, where this deck
+    can play it), return the exiled cards."""
+    if g.jar_exiled is None:
+        return
+    g.m["memory_jar_discarded"] += len(g.hand)
+    g.graveyard.extend(g.hand)
+    g.hand, g.jar_exiled = g.jar_exiled, None
+
+
 def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
@@ -4443,6 +4534,7 @@ def take_turn(g):
     # SYLVAN LIBRARY (item 24 change 4; was KNOWN_BLIND): the draw step's
     # two more, the shared rule. No-ops without the card.
     sylvan_library(g, before)
+    memory_jar_crack(g)                 # §0z228: before the land drops
     # ENABLERS BEFORE DROPS. Azusa's own +2, Exploration, Oracle, and every
     # landfall payoff have to be on the battlefield before the land drops are
     # spent, or they contribute nothing on the turn they arrive.
@@ -4518,6 +4610,8 @@ def take_turn(g):
         if sum(1 for p in g.board if p.card.is_land) >= 7:
             g.hothouse_solved = True
             g.m["hothouse_solved_turn"] = g.turn
+
+    memory_jar_return(g)           # "at the beginning of the next end step"
 
     # END OF TURN. Rude Awakening's mode and Nissa's +1 stop here; Sylvan
     # Awakening's does not, which is the only reason its lands ever block.

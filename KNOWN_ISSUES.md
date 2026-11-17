@@ -279,6 +279,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; paid when the pod's turn covers the removal (3) plus the ward -- tivit +0.0051 / +0.0051 |
 | [0z225](#0z225) | FIXED | **Queue item 49's cleanups**: rendmaw's goaded Birds fight rivals as bodies (`goad_body_blocks`, +0.0383 / -0.0018); nine dead knobs confirmed at 12,000 games and marked (`tools/knobs.py` `DEAD_ON_DEFAULT`) |
 | [0z226](#0z226) | FIXED | **Cycling and landcycling** (§0z197 C): one shared rule, `engine.cycle_step`, the cards and costs generated; karlov +0.0019 at T10, shilgengar +0.0018 / +0.0055, tivit a null |
+| [0z227](#0z227) | FIXED | **Woe Strider**: its escape (a null) and its free outlet, which measured a cost under the Altar's death rule and is OFF; the Altar's rule queued (item 51) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -10532,7 +10533,8 @@ exact sets.
    through one `engine.plus_counters` at all six sites: Metallic Mimic, The
    Great Henge, Verdurous Gearhulk, Steel Overseer, Mycoloth's devour and
    Revitalizing Repast. Woe Strider's escape is not modelled at all, so it
-   has no counters to double.
+   has no counters to double. (**Superseded by §0z227**: the escape is
+   modelled, and its two counters go through `plus_counters`.)
 10. **Each sweeper destroys what its text says** (`own_wipe_scope`),
     through `own_wipe_victims` and `own_wipe_pod_left`, which the wipe gate's
     "cost" measure reads too. **Culling Ritual** takes nonland permanents of
@@ -18385,20 +18387,20 @@ KNOWN_BLIND comment are stale there.
 Each is text that could not matter before the flip and can now, and that
 nothing reads:
 
-1. **Vault of the Archangel's deathtouch** (karlov, shilgengar):
+1. **FIXED in §0z230.** **Vault of the Archangel's deathtouch** (karlov, shilgengar):
    `deathtouch_of` does not ask `vault_active`, so a Vault turn's blocked
    attackers kill only by power.
-2. **An animated land's reach and indestructible** (azusa): Sylvan
+2. **FIXED in §0z231.** **An animated land's reach and indestructible** (azusa): Sylvan
    Awakening's, carried in `animate_lands` and read by nothing but
    `trample_of`. `is_hardy` and `your_blockers` ask the card's tags. Under
    A1 such a land dies attacking into a block; under A2 it blocks (at
    lethal only, `your_utility`) but never a flier.
-3. **Nissa, Who Shakes the World's emblem** (azusa): "Lands you control have
+3. **FIXED in §0z231.** **Nissa, Who Shakes the World's emblem** (azusa): "Lands you control have
    indestructible" was worth zero against the pod's removal (lands are
    excluded) and is not in combat, where her +1's lands attack.
-4. **A token's reach** (azusa, Sapling Nursery's 3/4 Treefolk): REACH is
+4. **FIXED in §0z231.** **A token's reach** (azusa, Sapling Nursery's 3/4 Treefolk): REACH is
    by card name.
-5. **The Swarmweaver's delirium deathtouch** (rendmaw, candidate).
+5. **FIXED in §0z232.** **The Swarmweaver's delirium deathtouch** (rendmaw, candidate).
 
 And one policy: Quirion Ranger's untap (azusa) is never spent to untap a
 creature that attacked so it can block.
@@ -19904,6 +19906,63 @@ uncastable seven-drop a land. The Angel's plainscycling is the largest --
 it turns a dead card into a land drop in a short hand. Only karlov, tivit and
 shilgengar move (2,000 seeds against the commit before); their tables are
 rebuilt.
+
+**Rebuilt at c9f18f4**, one parallel leg per deck (python 3.13.18 / numpy
+2.4.6 on every leg; `tools.repro_row tivit "Deadeye Navigator"` IDENTICAL
+on that interpreter); the slowest leg, tivit, took about 17 minutes of wall
+time. Tivit's table stands. Karlov's and shilgengar's are superseded at once
+by §0z229-§0z230, which move them again. **The staged swaps were NOT
+re-measured here**: the run was started at c9f18f4 but read the working
+tree, which §0z229's and §0z230's code reached while its workers were still
+being spawned -- a mixed measurement, discarded. They are re-measured at
+§0z232's commit, from a worktree. (The lesson: a long run reads the files
+as its workers import them, so start it from a worktree or edit nothing.)
+
+<a id="0z227"></a>
+
+## 0z227. FIXED -- Woe Strider: its escape, and a free outlet the pilot declines
+
+**The owner, 2026-11-17: "move on to the card work, cycling first"**; Woe
+Strider is next in item 46's card work (§0z197 C, §0z206).
+
+**The text, Scryfall 2026-11-17**: "When this creature enters, create a 0/1
+white Goat creature token. Sacrifice another creature: Scry 1. Escape --
+{3}{B}{B}, Exile four other cards from your graveyard. This creature escapes
+with two +1/+1 counters on it." The Goat was modelled; the rest was not.
+
+**Escape** (`engine.woe_strider_escape_option`, `woe_strider_escape`): a
+postcombat main-phase option at the card's own rank, beside Wickerfolk
+Indomitable's graveyard cast (§0z125), for {3}{B}{B} and four other cards
+exiled -- noncreatures first, then the smallest creature, never Wickerfolk
+(`woe_escape_exiles`) -- and never while Proft, Sinister Mastermind in hand
+still needs its seven (`woe_spares_proft`). It enters with two +1/+1
+counters through `plus_counters` (Primal Vigor doubles them; §0z118 item 9's
+"not modelled at all" is superseded) and makes its Goat again.
+
+**The outlet** (`engine.woe_strider_outlet`): "Sacrifice another creature"
+lets `activations`' death step -- two tokens a turn beyond `altar_keep` (6),
+while Blood Artist or The Meathook Massacre is out -- run without Ashnod's
+Altar, under the Altar's own rule. The scry is not modelled (item 4).
+
+**Measured**, N=15,000 paired, seeds 5000.., rendmaw's staged list, identity
+0 in both (`results/knob_ab_rendmaw_woe_*.txt`):
+
+| switch | T10 | T20 | reached |
+|---|---|---|---|
+| `woe_strider_escape` | -0.0001 +-0.0001 | +0.0007 +-0.0011 | 3.7% |
+| `woe_strider_outlet` | -0.0001 +-0.0002 | **-0.0003 +-0.0003** | 0.9% |
+
+**The escape is a null and stays on** (the card's text, and the larger
+conditional figure, +0.020 +-0.031 at T20 in the games it reaches, points
+the right way). **The outlet is OFF BY DEFAULT**: at its bar's edge it costs,
+and final life falls (-0.018) -- the two tokens it eats are blockers since
+the flip (§0z219). Win rate is the objective; the best use measured is none,
+the reserve finding's shape (§0z164). Said out loud: the ALTAR's death step
+is the same rule, written when your creatures never blocked, and it has no
+switch -- **queue item 51** measures it. `tests/test_woe_strider.py`, six
+cases, three mutations exact (two corrections after the first run, said in
+the file: a helper counted "Goat" for "Goat token", and the Proft case and
+its mutation were confounded by Proft's own cast).
 
 ## How to read an ablation table
 

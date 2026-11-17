@@ -276,7 +276,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     Contract, Grudge Keeper; shilgengar's Requiem Angel and landfall rule;
     azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
     azusa's labels; and card work for
-    the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape,
+    the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape (DONE, §0z227),
     Memory Jar (C and item 37), and §0z206's five new floors (the Vault's
     deathtouch, an animated land's reach and indestructible, Nissa's
     emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any
@@ -326,3 +326,15 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       -- item 44's scale. Build it the item-44 way: every rule behind a
       switch, OFF until measured, flipped together, one re-fit, one rebuild.
     Not started. The owner's to schedule.
+
+51. **THE ALTAR'S DEATH STEP AFTER THE FLIP (§0z227).** `engine.activations`
+    feeds Ashnod's Altar two tokens a turn beyond `altar_keep` (6) while Blood
+    Artist or The Meathook Massacre is out, for the drains. The rule was
+    written when your creatures never blocked; since §0z219 a token is a
+    blocker on the pod's turns. Woe Strider's free outlet, run under the same
+    rule, measured -0.0003 +-0.0003 at T20 and lower final life, so it is
+    off by default. **Measure the Altar's step on and off** (it has no switch
+    yet: add one, the old rule the default until measured) and, if it costs,
+    look for the pilot's rule -- sacrifice only a token that is not needed to
+    block, or only for a lethal drain. Rendmaw only; a rebuild if the
+    default changes.

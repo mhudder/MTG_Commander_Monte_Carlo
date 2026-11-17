@@ -2779,11 +2779,10 @@ def vault_of_the_archangel(g, attackers, pay) -> bool:
     Activated before combat damage, on the mana the main phase left, when
     the attack's power reaches `vault_min_power` (3) -- below that the life
     is worth less than the four mana. Sets `vault_turn`, which the engines'
-    lifelink tests read. THE DEATHTOUCH HALF IS NOT READ: `opponents.
-    deathtouch_of` does not ask `vault_active`, so the pod's bodies that
-    block a Vault turn's attackers die only to power, as on any turn -- a
-    floor. (Its old reason, "the pod's blockers are a count (§4)", went
-    stale when `pod_bodies` gave them toughness, §0z132; §0z197 D.)
+    lifelink tests read, and since §0z230 `opponents.deathtouch_of` too: a
+    Vault turn's attackers kill what blocks them whatever its toughness
+    (`vault_deathtouch=False` is the old rule, where they killed only by
+    power -- §0z206's floor 1).
     `vault_paid=False` restores karlov's free lifelink."""
     if not g.cfg.get("vault_paid", True):
         if any(p.card.name == "Vault of the Archangel" for p in g.board):
@@ -3339,6 +3338,11 @@ def main_phase(g: Game, precombat: bool = False):
                 (c, pay, tag), _cost = wicker
                 options.append((c, pay, tag))
                 mode_cost[id(c)] = _cost
+            woe = woe_strider_escape_option(g, units)   # §0z227
+            if woe is not None:
+                (c, pay, tag), _cost = woe
+                options.append((c, pay, tag))
+                mode_cost[id(c)] = _cost
         if not options:
             # Nothing is castable on lands and rocks alone. THIS is where the
             # Altar belongs -- see altar_enable and KNOWN_ISSUES §3.
@@ -3363,6 +3367,8 @@ def main_phase(g: Game, precombat: bool = False):
         spend(g, pay, units)
         if alt_tag == "graveyard":
             wickerfolk_additional_costs(g, card)     # §0z125
+        elif alt_tag == "escape":
+            woe_strider_escape_costs(g, card)        # §0z227
         else:
             remove_card(g.hand, card)
 
@@ -3420,6 +3426,9 @@ def main_phase(g: Game, precombat: bool = False):
                   and g.cfg.get("battlefield_creature_types", True)):
                 perm.impending = NEVER
             enter_loyalty(perm)          # Thomil (§0z74); no-op otherwise
+            if alt_tag == "escape":
+                # "This creature escapes with two +1/+1 counters on it."
+                perm.counters += plus_counters(g, 2)
             g.board.append(perm)
             davvol_trigger(g, perm)      # §0z74
             run_etb(g, perm)
@@ -3988,15 +3997,18 @@ def activations(g: Game):
     # Altar produces arrives after the main phase in this engine and so cannot
     # be spent; modelling the cost without the benefit made it look like a bad
     # card, which was a bug in the model, not a finding about the card.
-    if g.has("Ashnod's Altar") and (g.has("Blood Artist")
-                                    or g.has("The Meathook Massacre")):
+    if (g.has("Ashnod's Altar") or woe_strider_outlet(g)) and (
+            g.has("Blood Artist") or g.has("The Meathook Massacre")):
         # `altar_fodder` is the shared definition of "which creatures are
         # expendable", also used by main_phase's mana step (§0z20). Called
         # with no `units` here because this path is post-main and taps
         # nothing: the selection is identical to what this block did inline.
+        woe_only = not g.has("Ashnod's Altar")
         for p in altar_fodder(g)[:2]:
             g.board.remove(p)
             g.on_creature_death(1)
+            if woe_only:
+                g.m["woe_strider_sacs"] += 1
 
     # Rendmaw's sacrifice outlets (§0z70/§0z73). With `sac_outlets_pay` on
     # they spend real mana, and WHEN is then a policy: "end" (the default)
@@ -5156,16 +5168,22 @@ def chef_and_backwoods(g, units) -> None:
 INSECT_SPIDER_TOKENS = ("Insect token", "Spider token")
 
 
+def swarmweaver_deathtouch(g, perm) -> bool:
+    """The Swarmweaver's delirium deathtouch for an Insect or Spider of
+    yours, attacking or blocking (§0z232). `swarmweaver_deathtouch=False` is
+    the old rule."""
+    return (g.cfg.get("swarmweaver_deathtouch", True)
+            and swarmweaver_bonus(g, perm) > 0)
+
+
 def swarmweaver_bonus(g, perm) -> int:
     """THE SWARMWEAVER: "Delirium -- As long as there are four or more card
     types among cards in your graveyard, Insects and Spiders you control get
     +1/+1 and have deathtouch." The +1/+1, read by `power_of` and
-    `toughness_of`. Legendary, so never more than one. THE DEATHTOUCH IS NOT
-    READ: `opponents.deathtouch_of` and `your_blockers` read the generated
-    DEATHTOUCH set and named grants, not this one -- a floor, since combat
-    reads deathtouch both ways (§0z204; this said "the pod's blockers are a
-    count" until item 46, §0z197 D). Delirium is the shared
-    `opponents.delirium`."""
+    `toughness_of`. Legendary, so never more than one. The deathtouch is
+    `swarmweaver_deathtouch`, read by `opponents.deathtouch_of` and
+    `your_blockers` since §0z232 (§0z206 floor 5; it was a floor). Delirium
+    is the shared `opponents.delirium`."""
     if not g.has("The Swarmweaver"):
         return 0
     name = perm.card.name
@@ -5227,6 +5245,81 @@ def wickerfolk_option(g, units):
         return None
     cost, _tag, pay = mode
     return (card, pay, "graveyard"), cost
+
+
+WOE_STRIDER = "Woe Strider"
+WOE_ESCAPE_COST = {"gen": 3, "B": 2}       # Escape--{3}{B}{B}
+WOE_ESCAPE_EXILE = 4                        # "Exile four other cards"
+
+
+def woe_strider_outlet(g) -> bool:
+    """WOE STRIDER: "Sacrifice another creature: Scry 1." (Scryfall
+    2026-11-17.) A FREE outlet, so the deaths Ashnod's Altar manufactures for
+    Blood Artist and The Meathook Massacre in `activations` need either card,
+    under the Altar's own rule (`altar_fodder`, two a turn): the outlet is
+    what lets the death happen, and the Altar's mana is not what that step
+    was for. The scry is not modelled (item 4), a floor. With the Altar out
+    nothing changes.
+
+    OFF BY DEFAULT, MEASURED (§0z227): on, it cost -0.0003 +-0.0003 at T20
+    (N=15,000) -- the two tokens it eats are blockers since the flip
+    (§0z219), and final life fell. The best use measured is none, so the
+    pilot declines it; `woe_strider_outlet=True` turns it on. The Altar's
+    death step is the same rule, written before your creatures blocked
+    (queue item 51)."""
+    return (g.cfg.get("woe_strider_outlet", False)
+            and any(p.card.name == WOE_STRIDER for p in g.board))
+
+
+def woe_escape_exiles(g, card) -> list:
+    """The four other graveyard cards escape exiles: the ones the graveyard
+    is least for -- noncreatures first (the cauldron and Priest return
+    creatures), then the smallest creature; never Wickerfolk Indomitable,
+    which casts itself from there. None if four cannot be found."""
+    pool = [c for c in g.graveyard if c is not card and c.name != WICKERFOLK]
+    if len(pool) < WOE_ESCAPE_EXILE:
+        return None
+    pool.sort(key=lambda c: (c.is_creature, c.power or 0))
+    return pool[:WOE_ESCAPE_EXILE]
+
+
+def woe_strider_escape_option(g, units):
+    """WOE STRIDER's escape: "You may cast this card from your graveyard for
+    its escape cost" -- {3}{B}{B} and four other cards exiled -- "This
+    creature escapes with two +1/+1 counters on it." A main-phase option at
+    the card's own rank, ((card, pay, "escape"), cost), or None, as
+    `wickerfolk_option` is. Its Goat comes again through `run_etb`. Never
+    while Proft, Sinister Mastermind in hand still needs its threshold (the
+    exile would take the graveyard further from seven).
+    `woe_strider_escape=False` is the old rule (§0z227)."""
+    if not g.cfg.get("woe_strider_escape", True):
+        return None
+    card = next((c for c in g.graveyard if c.name == WOE_STRIDER), None)
+    if card is None or woe_escape_exiles(g, card) is None:
+        return None
+    if woe_spares_proft(g):
+        return None
+    pay = can_pay(dict(WOE_ESCAPE_COST), units)
+    if pay is None:
+        return None
+    return (card, pay, "escape"), dict(WOE_ESCAPE_COST)
+
+
+def woe_spares_proft(g) -> bool:
+    """True when escaping would take the graveyard below the seven Proft,
+    Sinister Mastermind in hand needs (the escape removes five cards)."""
+    return (any(c.name == "Proft, Sinister Mastermind" for c in g.hand)
+            and len(g.graveyard) < PROFT_THRESHOLD + 1 + WOE_ESCAPE_EXILE)
+
+
+def woe_strider_escape_costs(g, card) -> None:
+    """The cast from the graveyard: the card leaves it, four others are
+    exiled."""
+    gone = woe_escape_exiles(g, card)
+    remove_card(g.graveyard, card)
+    for c in gone:                 # exiled: rendmaw keeps no exile zone
+        remove_card(g.graveyard, c)
+    g.m["woe_strider_escapes"] += 1
 
 
 def wickerfolk_additional_costs(g, card) -> None:

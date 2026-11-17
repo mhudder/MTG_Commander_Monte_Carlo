@@ -212,9 +212,12 @@ SCRIPTED_RENDMAW = {
     "Overlord of the Hauntwoods", "Foundry Inspector",
     # token engines
     "Bitterblossom", "Ophiomancer", "Tendershoot Dryad", "Grist, the Hunger Tide",
-    # Woe Strider LEFT for PARTLY_MODELLED (§0z197 C, item 46): only its
-    # Goat is implemented.
+    # Woe Strider LEFT for PARTLY_MODELLED (§0z197 C, item 46): its Goat,
+    # its free outlet and its escape are implemented (§0z227), its scry not.
     "Grave Titan", "Arasta of the Endless Web",
+    # The Swarmweaver (candidate) from PARTLY_MODELLED, §0z232: two flying
+    # Insects, delirium's +1/+1 and deathtouch, all read.
+    "The Swarmweaver",
     "Primal Vigor", "Metallic Mimic",
     # payoffs / draw / sac  (Skullclamp left the deck in v12)
     "Idol of Oblivion", "Steel Overseer", "Ohran Frostfang",
@@ -748,7 +751,10 @@ SCRIPTED_AZUSA = {
     # Greenwarden's cut to Oblivion Stone (§0z88); the other two scripts
     # remain in edhmc/azusa.py for diag_azusa_animation.py.
     # SYLVAN AWAKENING LEFT for PARTLY_MODELLED on 2026-11-15 (§0z209 item 9):
-    # its reach and indestructible are carried and read by nothing.
+    # its reach and indestructible are carried and read by nothing. BACK
+    # 2026-11-17 (§0z231): both are read (`indestructible_granted`,
+    # `reach_granted`), so every clause is.
+    "Sylvan Awakening",
     #
     # Nissa, Vastwood Seer // Sage Animist is NOT affected and stays: §0s found
     # the Nissas were never the animation story, and she is a top-five card.
@@ -943,11 +949,12 @@ PARTLY_MODELLED = {
         "Woe Strider":
             "MODELLED: the 3/2 and 'When this creature enters, create a 0/1 "
             "white Goat creature token' (`script=\"woe_strider\"`, "
-            "`engine.run_etb`). NOT: 'Sacrifice another creature: Scry 1' -- "
-            "a free, repeatable sacrifice outlet beside Ashnod's Altar for "
-            "Blood Artist and The Meathook Massacre, and a scry; nor escape "
+            "`engine.run_etb`); 'Sacrifice another creature' as a free outlet "
+            "beside Ashnod's Altar for Blood Artist and The Meathook Massacre "
+            "(`engine.woe_strider_outlet`, the Altar's rule); and escape "
             "({3}{B}{B}, exile four other cards: cast from the graveyard with "
-            "two +1/+1 counters, §0z118 item 9). A floor by both.",
+            "two +1/+1 counters, `engine.woe_strider_escape_option`, "
+            "§0z227). NOT: the scry (item 4). A floor.",
         # §0z151: its first line is Ohran Frostfang's, and is read now.
         "Bow of Nylea":
             "MODELLED: 'Attacking creatures you control have deathtouch' "
@@ -962,13 +969,8 @@ PARTLY_MODELLED = {
             "noncreature spell (`herbie_surveil`, lorehold's land-binning "
             "rule). NOT: '{1}, {T}: Add one mana of any color' -- a net-zero "
             "filter the payment solver cannot express. A floor on fixing.",
-        "The Swarmweaver":
-            "MODELLED: two 1/1 flying Insects on entering, and +1/+1 to every "
-            "Insect and Spider you control under delirium (`swarmweaver_bonus`"
-            ", the generated INSECT_SPIDER and the tokens by name). NOT: "
-            "delirium's deathtouch for Insects and Spiders -- `deathtouch_of` "
-            "and `your_blockers` read the generated DEATHTOUCH set and two "
-            "grants by name, not this one. A floor.",
+        # The Swarmweaver LEFT 2026-11-17 for SCRIPTED (§0z232): its
+        # delirium deathtouch, the one clause missing, is read both ways.
         "Dalek Squadron":
             "MODELLED: menace, and myriad -- a 3/3 menace copy per other "
             "living opponent, tapped and attacking, exiled after combat. NOT: "
@@ -1010,6 +1012,15 @@ PARTLY_MODELLED = {
             "cracked at once -- two or three landfall triggers for {G}. NOT: "
             "fetching a utility land for its ability, or a land that answers "
             "the table (§4); the sacrifice is taken at resolution. A floor.",
+        "Memory Jar":
+            "MODELLED (§0z228): {T}, sacrifice -- your hand exiled, seven "
+            "drawn after the draw step, before the land drops, when the hand "
+            "holds `memory_jar_hand` (2) or fewer and the draw cannot deck "
+            "you; at your end step the seven left are discarded (a land "
+            "there is playable from the graveyard) and the hand returns. NOT: "
+            "the pod's half -- each opponent's seven, with their instants, "
+            "for your turn (the pod holds no hand, §4). A CEILING by that "
+            "half, a floor by the crack's timing (never the turn it is cast).",
         "Storm Cauldron":
             "MODELLED (§0z135): your extra land drop, and every land tapped "
             "for mana returning to hand to be replayed by the drops left -- "
@@ -1055,11 +1066,6 @@ PARTLY_MODELLED = {
             "'up to X LAND cards' (a utility land is one), nor the mode that "
             "deals twice X damage to each creature with flying -- MODELABLE "
             "against the pod's flier bodies since item 44 (item 7). A floor.",
-        "Sylvan Awakening":
-            "MODELLED: your lands as 2/2 Elemental creatures with haste until "
-            "your next turn, through the pod's round. NOT: their reach and "
-            "indestructible, carried in `animate_lands` and read by nothing "
-            "but `trample_of` (item 9, §0z206 floor 2). A floor.",
     },
     "tivit": {
         "Promise of Loyalty":
@@ -1408,9 +1414,12 @@ PARTLY_MODELLED = {
             "that undercounts (item 10). A floor.",
         "Voldaren Bloodcaster // Bloodbat Summoner":
             "MODELLED: the flier, and a Blood token when it or another "
-            "nontoken creature you control dies. NOT: the transform at five "
-            "Blood, nor Bloodbat Summoner's Bat each combat (§0z184 finding "
-            "8, item 37; item 11). A floor.",
+            "nontoken creature you control dies; the transform at five Blood "
+            "to Bloodbat Summoner, a 3/3 flier, and its Bat each combat -- a "
+            "Blood token made a 2/2 flying, hasty Bat that is still Blood for "
+            "Shilgengar's ultimate (§0z229). NOT: the Blood token's own "
+            "'{1}, {T}, Discard a card, Sacrifice: Draw a card' (item 11). A "
+            "floor.",
         "Elesh Norn, Grand Cenobite":
             "MODELLED: +2/+2 to your other creatures, the commander included "
             "(§0z151), and -2/-2 killing the pod's bodies of toughness 2 or "
@@ -2115,7 +2124,8 @@ KNOWN_BLIND = {
         # neither of which this model tracks at that granularity. Mind's Eye
         # is MODELABLE by Smothering Tithe's rate (`tithe_treasures`, §0z151)
         # and not modelled (§0z209 item 14): blind is honest, not inevitable.
-        "Mind's Eye", "Memory Jar",
+        "Mind's Eye",
+        # (Memory Jar left 2026-11-17 for PARTLY_MODELLED, §0z228.)
         # (Storm Cauldron left 2026-10-14 for PARTLY_MODELLED, §0z135.)
         # (Sylvan Library left 2026-10-14 for SCRIPTED, item 24's change 4.
         # Its old reason -- "modelled as reveal 3, keep 1, pay no life" --

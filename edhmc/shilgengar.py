@@ -153,6 +153,18 @@ from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
 
 
+BLOODCASTER = "Voldaren Bloodcaster // Bloodbat Summoner"
+BLOODBAT_PT = (1, 2)          # the back face's 3/3 over the front's 2/1
+
+
+def bat_token():
+    """A Blood token animated by Bloodbat Summoner: an artifact and a 2/2
+    black Bat creature with flying (haste is `sick=False` as it is made).
+    A new Card each time: a token is one object (§0z112)."""
+    return Card(name="Bat token", types=frozenset({"Artifact", "Creature"}),
+                power=2, toughness=2, flying=True)
+
+
 class ShilgengarGame(BaseGame):
     def __init__(self, deck, commander, cfg, seed):
         # A PRIVATE copy: the cfg.setdefault block below stamps this
@@ -177,6 +189,8 @@ class ShilgengarGame(BaseGame):
         self.spells_this_turn = 0
         self.treasures = 0
         self.blood = 0
+        self.bloodbat_flipped = set()        # §0z229: transformed perms
+        self.blood_bats = set()              # §0z229: Blood that is a Bat
         self.life_gained_this_turn = 0.0     # Resplendent Angel / Speaker
         self.died_this_turn = 0              # diagnostics only
         self.marble_diamond_played = set()   # ids already handled as tapped
@@ -253,6 +267,8 @@ class ShilgengarGame(BaseGame):
     def power_of(self, perm):
         base = perm.base_p if perm.is_token else perm.card.power
         p = base + perm.counters
+        if id(perm) in self.bloodbat_flipped:
+            p += BLOODBAT_PT[0]           # the back face, 3/3 (§0z229)
         # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
         # commander is one (§0z151, `norn_text`).
         if self.has("Elesh Norn, Grand Cenobite") \
@@ -274,6 +290,8 @@ class ShilgengarGame(BaseGame):
     def toughness_of(self, perm):
         base = perm.base_t if perm.is_token else perm.card.toughness
         t = base + perm.counters
+        if id(perm) in self.bloodbat_flipped:
+            t += BLOODBAT_PT[1]
         # Elesh Norn: "OTHER creatures you control get +2/+2" -- the
         # commander is one (§0z151, `norn_text`).
         if self.has("Elesh Norn, Grand Cenobite") \
@@ -502,6 +520,7 @@ class ShilgengarGame(BaseGame):
             if nontoken and OPP.watching(self, "Voldaren Bloodcaster // Bloodbat Summoner", perm):
                 self.blood += 1
                 self.m["blood_made"] += 1
+                self.blood_created()
 
     def on_pod_creature_deaths(self, o, n):
         """`n` of opponent `o`'s creatures died -- an event only under
@@ -637,6 +656,7 @@ class ShilgengarGame(BaseGame):
             amt = self.toughness_of(perm) if self.is_angel(perm) else 1
             self.blood += amt
             self.m["blood_made"] += amt
+            self.blood_created()
         if exiled:
             self.m["finality_exiled"] += 1
             return
@@ -696,6 +716,42 @@ class ShilgengarGame(BaseGame):
                 self.draw(1)
                 self.sacrifice(p, to_shilgengar=False)
 
+    def blood_total(self) -> int:
+        """Blood tokens you control: the plain ones and Bloodbat Summoner's
+        Bats, which stay Blood tokens ("in addition to its other types")."""
+        if not self.blood_bats:
+            return self.blood
+        return self.blood + sum(1 for p in self.board
+                                if id(p) in self.blood_bats)
+
+    def blood_created(self) -> None:
+        """VOLDAREN BLOODCASTER (Scryfall 2026-11-17): "Whenever you create a
+        Blood token, if you control five or more Blood tokens, transform this
+        creature." Its back face, Bloodbat Summoner, is a 3/3 flier
+        (`BLOODBAT_PT` over the front's 2/1). `bloodbat=False` is the old
+        rule (§0z229)."""
+        if not self.cfg.get("bloodbat", True) or self.blood_total() < 5:
+            return
+        for p in self.board:
+            if p.card.name == BLOODCASTER and id(p) not in self.bloodbat_flipped:
+                self.bloodbat_flipped.add(id(p))
+                self.m["bloodbat_transforms"] += 1
+
+    def bloodbat_combat(self) -> None:
+        """BLOODBAT SUMMONER: "At the beginning of combat on your turn, up to
+        one target Blood token you control becomes a 2/2 black Bat creature
+        with flying and haste in addition to its other types." A pilot's rule,
+        said out loud: always one, while a plain Blood is left -- the Bat is
+        still Blood for Shilgengar's ultimate (`blood_total`), so animating
+        costs only the risk to the token. It attacks this combat (haste)."""
+        for p in [q for q in self.board if id(q) in self.bloodbat_flipped]:
+            if self.blood < 1:
+                return
+            self.blood -= 1
+            bat = self.make_permanent(bat_token(), sick=False, is_token=True)
+            self.blood_bats.add(id(bat))
+            self.m["bloodbat_bats"] += 1
+
     def ult_fodder(self):
         """Creatures that may legally be fed to Shilgengar, best first.
 
@@ -707,7 +763,9 @@ class ShilgengarGame(BaseGame):
         """
         return sorted(
             (p for p in self.board
-             if p.card.is_creature and p.card is not self.commander),
+             if p.card.is_creature and p.card is not self.commander
+             # a Bat is Blood already: fed, it nets nothing (§0z229)
+             and id(p) not in self.blood_bats),
             key=lambda p: (not self.returns_if_fed(p), -self.blood_yield(p)))
 
     def herald_cost(self, card):
@@ -797,9 +855,9 @@ class ShilgengarGame(BaseGame):
             return None
         if not self.commander_cast:
             return None
-        if not self.yard_creatures() and self.blood >= 6:
+        if not self.yard_creatures() and self.blood_total() >= 6:
             return None          # nothing to return; shilgengar_ultimate agrees
-        need = 6 - self.blood
+        need = 6 - self.blood_total()
         if need <= 0:
             return []
         chosen, gained = [], 0
@@ -969,7 +1027,7 @@ class ShilgengarGame(BaseGame):
         Hybrid pips modelled as 3 generic — this deck floods WB mana anyway,
         so the simplification almost never changes whether it is affordable.
         """
-        if not self.commander_cast or self.blood < 6:
+        if not self.commander_cast or self.blood_total() < 6:
             return
         pool = self.yard_creatures()
         if not pool:
@@ -977,7 +1035,13 @@ class ShilgengarGame(BaseGame):
         # Treasures may pay for this -- see pay() and queued item 13.
         if not self.pay({"gen": 3}, count_mana_spent=3):
             return
-        self.blood -= 6
+        plain = min(6, self.blood)
+        self.blood -= plain
+        # The rest is Bloodbat Summoner's Bats, which are still Blood tokens
+        # (§0z229): sacrificed, so each is a creature death too.
+        for bat in [q for q in self.board if id(q) in self.blood_bats][:6 - plain]:
+            self.sacrifice(bat, to_shilgengar=False)
+            self.m["bloodbat_bats_spent"] += 1
         self.m["blood_spent"] += 6
         # Out of the graveyard FIRST, then resolve the ETB triggers. "Return
         # EACH creature card from your graveyard to the battlefield" is one
@@ -1295,6 +1359,7 @@ class ShilgengarGame(BaseGame):
 
     def combat(self):
         OPP.held_answer_window(self, "combat")   # A6, §0z221: beginning of combat
+        self.bloodbat_combat()                   # §0z229
         # BLOODGHAST's haste, read as combat begins (item 24).
         if self.bloodghast_hasty():
             for p in self.board:

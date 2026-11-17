@@ -126,7 +126,7 @@ cost.
    and `engine.x_plan`, as trostani. Was: **Chord of Calling** -- convoke and its X (fixed at 4, a flat
    {4}{G}{G}{G}): §0z197 A7's named defect, the same card under
    trostani's convoke and X plan. Plus item 3.
-9. **Sylvan Awakening** -- reach and indestructible are carried in
+9. **(Read since §0z231, 2026-11-17: back to SCRIPTED.)** **Sylvan Awakening** -- reach and indestructible are carried in
    `animate_lands` and read by nothing but `trample_of` (§0z206 floor 2).
    The 2/2s, haste and the duration through the pod's round are modelled.
 
@@ -256,7 +256,7 @@ bounded as its label says; a number is the finding above.
 | Sol Ring | SCRIPTED | OK |
 | Springheart Nantuko | SCRIPTED | OK -- bestow and copies, the copy's ETB (item 16) |
 | Storm Cauldron | PARTLY | OK as labelled |
-| Sylvan Awakening | PARTLY (was SCRIPTED) | 9 |
+| Sylvan Awakening | PARTLY (was SCRIPTED); SCRIPTED again since §0z231 | 9 |
 | Sylvan Library | SCRIPTED | OK -- the shared rule |
 | Sylvan Scrying | PARTLY | OK as labelled; Tier 2b |
 | Terastodon | PARTLY | OK (a route answer) |

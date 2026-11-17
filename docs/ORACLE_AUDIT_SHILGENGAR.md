@@ -184,8 +184,9 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     what the pod takes before the life comes back).
 
 Already on record and not repeated: Vault of the Archangel's deathtouch
-(§0z206 floor 1); Black Market Connections' timing and Bloodcaster's back
-face (§0z184, item 37); Angel of Suffering against drain and combo kills.
+(§0z206 floor 1; read since §0z230); Black Market Connections' timing and
+Bloodcaster's back face (§0z184, item 37; the back face modelled since
+§0z229); Angel of Suffering against drain and combo kills.
 
 ---
 

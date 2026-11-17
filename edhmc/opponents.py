@@ -2762,6 +2762,10 @@ def deathtouch_of(g, perm) -> bool:
         have deathtouch." Read only for attackers, which is the only place
         this is asked.
       * trostani's "Phyrexian Wurm token (deathtouch)", a token by name.
+      * Vault of the Archangel: "Creatures you control gain deathtouch and
+        lifelink until end of turn", on a turn it was activated
+        (`engine.vault_active`, the lifelink tests' own reading; §0z206
+        floor 1, §0z230). `vault_deathtouch=False` is the old rule.
 
     A FLOOR: rendmaw's Wurmcoil Engine makes two tokens both named "Wurm",
     so the deathtouch one cannot be told from the lifelink one and neither
@@ -2772,7 +2776,19 @@ def deathtouch_of(g, perm) -> bool:
     # `bow_deathtouch`; §0z116 found the one read and the other not).
     return (name in DEATHTOUCH or name == "Phyrexian Wurm token (deathtouch)"
             or g.has("Ohran Frostfang")
-            or (g.has("Bow of Nylea") and g.cfg.get("bow_deathtouch", True)))
+            or (g.has("Bow of Nylea") and g.cfg.get("bow_deathtouch", True))
+            or (g.cfg.get("vault_deathtouch", True) and _vault_active(g))
+            or _swarmweaver_deathtouch(g, perm))
+
+
+def _swarmweaver_deathtouch(g, perm) -> bool:
+    from edhmc.engine import swarmweaver_deathtouch
+    return swarmweaver_deathtouch(g, perm)
+
+
+def _vault_active(g) -> bool:
+    from edhmc.engine import vault_active
+    return vault_active(g)
 
 
 def pod_blocker_deaths(g, o, blocked) -> int:
@@ -3307,6 +3323,20 @@ def your_utility(g, perm) -> bool:
             or holds_back(g, perm))
 
 
+def reach_of(g, perm) -> bool:
+    """Can this blocker of yours block a flier by REACH right now? The
+    generated REACH set, by card name; or, through the optional protocol
+    hook `g.reach_granted(perm)`, a reach the engine knows and a name cannot
+    carry -- azusa's animated lands and Sapling Nursery's Treefolk tokens
+    (§0z206 floors 2 and 4, §0z231). An engine without the hook is
+    untouched."""
+    from edhmc.decks._evasion import REACH
+    if perm.card.name in REACH:
+        return True
+    granted = getattr(g, "reach_granted", None)
+    return granted is not None and bool(granted(perm))
+
+
 def your_blockers(g):
     """Your creatures that can block right now, as `_Blk`s (ref: the
     Permanent): untapped (509.1a), not "can't block" (CANT_BLOCK)."""
@@ -3320,9 +3350,10 @@ def your_blockers(g):
         if p.tapped or n in CANT_BLOCK:
             continue
         out.append(_Blk(p, g.power_of(p), g.toughness_of(p),
-                        flying_of(g, p) or n in REACH, your_utility(g, p),
+                        flying_of(g, p) or reach_of(g, p), your_utility(g, p),
                         threat_of(g, p), first_strike_of(g, p),
-                        is_hardy(g, p), n in DEATHTOUCH))
+                        is_hardy(g, p),
+                        n in DEATHTOUCH or _swarmweaver_deathtouch(g, p)))
     return out
 
 
