@@ -1,7 +1,7 @@
 
 Horizons: (10, 20).  N = 15,000 paired games per card, seeds 5000..19999.
 All figures are paired differences with 95% CIs.
-BASELINE: the list as staged wins 0.3419 at T10, 0.5357 at T20. Row SIZES are relative to it; signs carry (§0z195).
+BASELINE: the list as staged wins 0.3479 at T10, 0.5429 at T20. Row SIZES are relative to it; signs carry (§0z195).
 
 NOISE FLOOR: the median win-rate CI half-width over this deck is +-0.0032.
 Two cards closer together than that are not ranked by this table, however their
@@ -28,65 +28,65 @@ list of names to ablate() to score a package together.
 MODEL-EVALUATED — a low score is evidence about the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Mole Man, Moloid Master               +3.18+-0.24         +3.09+-0.24        +0.0402+-0.0040      both
-Scute Swarm                           +2.60+-0.24         +2.30+-0.23        +0.0355+-0.0039      both
+Mole Man, Moloid Master               +3.20+-0.24         +3.09+-0.24        +0.0403+-0.0040      both
+Scute Swarm                           +2.59+-0.23         +2.27+-0.23        +0.0356+-0.0039      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 6 -> 3 moves
       it +0.0055 (T20 win rate, N=15,000 paired).
-Avenger of Zendikar                   +2.01+-0.19         +1.82+-0.18        +0.0224+-0.0033      both
+Avenger of Zendikar                   +2.02+-0.19         +1.82+-0.18        +0.0221+-0.0033      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 9 -> 6 moves
       it +0.0056 (T20 win rate, N=15,000 paired).
-Horn of Greed                         +1.47+-0.20         +1.49+-0.21        +0.0207+-0.0035      both
-Mossborn Hydra                        +3.04+-0.24         +2.48+-0.23        +0.0197+-0.0038      both
+Ancient Greenwarden                   +1.46+-0.18         +1.48+-0.20        +0.0192+-0.0035      both
+Horn of Greed                         +1.42+-0.20         +1.41+-0.20        +0.0192+-0.0035      both
+Mossborn Hydra                        +3.02+-0.24         +2.42+-0.23        +0.0182+-0.0037      both
       THREAT-SENSITIVE (§0z194): this row rests partly on the card's hand-typed
       threat, which is how the table sees it, not the pilot's choice. 6 -> 3 moves
       it +0.0044; 6 -> 9 moves it -0.0121 (T20 win rate, N=15,000 paired).
-Ancient Greenwarden                   +1.49+-0.18         +1.51+-0.20        +0.0191+-0.0035      both
-Rampaging Baloths                     +1.65+-0.18         +1.51+-0.19        +0.0181+-0.0034      both
-Momentous Fall                        +0.72+-0.15         +0.89+-0.16        +0.0179+-0.0030      both
-Nissa, Vastwood Seer // Nissa, Sage Animist        +1.00+-0.20         +1.22+-0.21        +0.0177+-0.0038      both
-Courser of Kruphix                    +0.71+-0.19         +0.89+-0.20        +0.0173+-0.0036      both
-Genesis Wave                          +1.00+-0.13         +1.08+-0.15        +0.0171+-0.0028      both
-Green Sun's Zenith                    +1.13+-0.16         +1.28+-0.18        +0.0171+-0.0032      both
-Springheart Nantuko                   +1.44+-0.17         +1.42+-0.18        +0.0167+-0.0034      both
-Greensleeves, Maro-Sorcerer           +1.64+-0.18         +1.56+-0.19        +0.0160+-0.0034      both
-Harmonize                             +1.03+-0.15         +1.13+-0.16        +0.0159+-0.0030      both
-Traveling Chocobo                     +1.47+-0.21         +1.33+-0.21        +0.0155+-0.0037      both
-Sol Ring                              +2.25+-0.23         +2.04+-0.24        +0.0147+-0.0036      both
-Tireless Tracker                      +1.00+-0.20         +0.97+-0.21        +0.0143+-0.0036      both
-Realms Uncharted                      +1.21+-0.17         +1.21+-0.18        +0.0134+-0.0032      both
-Ramunap Excavator                     +1.47+-0.20         +1.32+-0.21        +0.0133+-0.0036      both
-Craterhoof Behemoth                   +2.27+-0.17         +1.76+-0.17        +0.0129+-0.0034      both
-Crucible of Worlds                    +1.33+-0.19         +1.18+-0.20        +0.0126+-0.0032      both
-Augur of Autumn                       +0.68+-0.18         +0.75+-0.19        +0.0116+-0.0035      both
-Woodland Bellower                     +0.92+-0.14         +0.94+-0.15        +0.0115+-0.0028      both
-Ka-Zar of the Savage Land             +1.20+-0.17         +1.33+-0.19        +0.0114+-0.0033      both
-Seek the Horizon                      +0.82+-0.15         +0.85+-0.16        +0.0107+-0.0029      both
-Ashaya, Soul of the Wild              +0.85+-0.14         +0.92+-0.15        +0.0105+-0.0030      both
-Chord of Calling                      +1.05+-0.17         +0.92+-0.18        +0.0094+-0.0033      both
-Quirion Ranger                        +1.03+-0.18         +0.96+-0.18        +0.0093+-0.0033      both
-Kodama's Reach                        +0.89+-0.17         +0.89+-0.19        +0.0083+-0.0034      both
-Eternal Witness                       +0.59+-0.13         +0.60+-0.15        +0.0083+-0.0030      both
-Sylvan Library                        +1.37+-0.20         +1.08+-0.20        +0.0082+-0.0034      both
-Cultivate                             +0.85+-0.17         +0.91+-0.18        +0.0074+-0.0033      both
-Regrowth                              +0.45+-0.15         +0.53+-0.17        +0.0073+-0.0028      both
-Tireless Provisioner                  +0.73+-0.18         +0.63+-0.20        +0.0073+-0.0036      both
-Animist's Awakening                   +0.50+-0.13         +0.56+-0.14        +0.0063+-0.0028      both
-Titania, Protector of Argoth          +0.62+-0.15         +0.73+-0.17        +0.0063+-0.0031      both
-Exploration                           +0.59+-0.19         +0.49+-0.19        +0.0049+-0.0032      both
-Oracle of Mul Daya                    +0.42+-0.19         +0.38+-0.20        +0.0046+-0.0035      both
-Lotus Cobra                           +0.94+-0.23         +0.65+-0.23        +0.0024+-0.0042       dmg
-Seer's Sundial                        -0.29+-0.17         -0.24+-0.18        +0.0020+-0.0034       dmg
-Sylvan Awakening                      +0.26+-0.06         +0.21+-0.06        +0.0015+-0.0014      both
-Abundance                             +0.30+-0.13         +0.18+-0.15        -0.0013+-0.0028       dmg
+Nissa, Vastwood Seer // Nissa, Sage Animist        +1.03+-0.20         +1.24+-0.21        +0.0181+-0.0038      both
+Rampaging Baloths                     +1.63+-0.18         +1.50+-0.19        +0.0180+-0.0034      both
+Momentous Fall                        +0.71+-0.15         +0.88+-0.16        +0.0174+-0.0030      both
+Courser of Kruphix                    +0.72+-0.19         +0.88+-0.20        +0.0173+-0.0036      both
+Genesis Wave                          +1.02+-0.14         +1.07+-0.15        +0.0172+-0.0028      both
+Greensleeves, Maro-Sorcerer           +1.66+-0.18         +1.58+-0.19        +0.0169+-0.0034      both
+Springheart Nantuko                   +1.46+-0.17         +1.40+-0.19        +0.0166+-0.0034      both
+Green Sun's Zenith                    +1.12+-0.16         +1.25+-0.18        +0.0165+-0.0032      both
+Harmonize                             +1.02+-0.15         +1.10+-0.16        +0.0159+-0.0030      both
+Sol Ring                              +2.30+-0.23         +2.12+-0.23        +0.0158+-0.0036      both
+Traveling Chocobo                     +1.46+-0.21         +1.27+-0.21        +0.0143+-0.0037      both
+Ramunap Excavator                     +1.49+-0.20         +1.36+-0.21        +0.0137+-0.0036      both
+Tireless Tracker                      +0.98+-0.20         +0.93+-0.21        +0.0137+-0.0036      both
+Realms Uncharted                      +1.26+-0.18         +1.23+-0.19        +0.0128+-0.0032      both
+Craterhoof Behemoth                   +2.32+-0.17         +1.76+-0.17        +0.0127+-0.0034      both
+Crucible of Worlds                    +1.32+-0.19         +1.15+-0.20        +0.0120+-0.0032      both
+Augur of Autumn                       +0.75+-0.19         +0.77+-0.19        +0.0119+-0.0035      both
+Woodland Bellower                     +0.92+-0.14         +0.97+-0.15        +0.0118+-0.0028      both
+Ka-Zar of the Savage Land             +1.21+-0.17         +1.31+-0.19        +0.0112+-0.0034      both
+Seek the Horizon                      +0.82+-0.15         +0.85+-0.16        +0.0111+-0.0030      both
+Ashaya, Soul of the Wild              +0.89+-0.14         +0.93+-0.15        +0.0103+-0.0029      both
+Chord of Calling                      +1.11+-0.17         +0.96+-0.18        +0.0094+-0.0033      both
+Quirion Ranger                        +1.05+-0.18         +0.97+-0.18        +0.0093+-0.0033      both
+Kodama's Reach                        +0.90+-0.17         +0.90+-0.19        +0.0085+-0.0034      both
+Eternal Witness                       +0.58+-0.14         +0.59+-0.15        +0.0079+-0.0030      both
+Cultivate                             +0.86+-0.17         +0.91+-0.18        +0.0078+-0.0032      both
+Tireless Provisioner                  +0.76+-0.18         +0.65+-0.20        +0.0077+-0.0036      both
+Regrowth                              +0.43+-0.15         +0.50+-0.16        +0.0076+-0.0028      both
+Animist's Awakening                   +0.52+-0.13         +0.56+-0.14        +0.0070+-0.0028      both
+Sylvan Library                        +1.35+-0.20         +1.03+-0.20        +0.0069+-0.0033      both
+Titania, Protector of Argoth          +0.63+-0.15         +0.71+-0.17        +0.0064+-0.0031      both
+Exploration                           +0.64+-0.19         +0.52+-0.19        +0.0055+-0.0032      both
+Oracle of Mul Daya                    +0.37+-0.19         +0.36+-0.19        +0.0050+-0.0035      both
+Lotus Cobra                           +0.99+-0.23         +0.69+-0.23        +0.0027+-0.0042       dmg
+Sylvan Awakening                      +0.33+-0.07         +0.27+-0.07        +0.0018+-0.0014      both
+Seer's Sundial                        -0.33+-0.17         -0.30+-0.18        +0.0004+-0.0034       dmg
+Abundance                             +0.31+-0.13         +0.18+-0.15        -0.0011+-0.0029       dmg
 
 ====================================================================================
 PARTLY MODELLED — a HIGH score is evidence; a LOW score is NOT.
 Every gap below UNDERSTATES, so these rows are floors. NEVER CUT ON ONE.
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Kozilek, Butcher of Truth             +1.09+-0.13         +1.23+-0.15        +0.0187+-0.0029      both
+Kozilek, Butcher of Truth             +1.12+-0.13         +1.21+-0.15        +0.0181+-0.0029      both
       MODELLED: the cast draw; annihilator 4 as the defender's four smallest
       BODIES sacrificed, each a death (`kill_pod_count`). APPROXIMATE: the
       defender is the opponent on the least life, not the one attacked, and its
@@ -94,61 +94,18 @@ Kozilek, Butcher of Truth             +1.09+-0.13         +1.23+-0.15        +0.
       graveyard from anywhere, its owner shuffles their graveyard into their
       library' -- a death, mill or discard puts it and the yard's lands in the
       graveyard to stay (a Genesis Wave mills it since §0z210).
-Ulamog, the Infinite Gyre             +0.65+-0.09         +1.13+-0.13        +0.0159+-0.0026      both
+Ulamog, the Infinite Gyre             +0.65+-0.09         +1.15+-0.13        +0.0163+-0.0026      both
       MODELLED: indestructible; annihilator 4 as Kozilek's, the same
       approximation. MISSING: the cast trigger 'destroy target permanent' --
       MODELABLE since the pod's route pieces are permanents (POD_V4), as
       shilgengar's Angel of Despair -- and the graveyard shuffle Kozilek also has.
       A floor on both.
-Sylvan Scrying                        +1.40+-0.22         +1.22+-0.22        +0.0126+-0.0036      both
+Sylvan Scrying                        +1.42+-0.22         +1.25+-0.22        +0.0129+-0.0036      both
       MODELLED: a land to hand, `AzusaGame.land_rank`'s: a fetch, then green, then
       untapped. NOT: the utility lands' own abilities as a reason to fetch them
       (Eye of Ugin's search, Nykthos's mana), or Strip Mine / Wasteland for the
       pod's lands (§4). A floor.
-Beast Within                          +0.57+-0.13         +0.92+-0.15        +0.0109+-0.0028      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: a creature body that is no route piece, nor the pod's
-      noncreature permanents beyond its routes, which are not objects (§4). The
-      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Krosan Grip                           +0.54+-0.13         +0.78+-0.15        +0.0095+-0.0028      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: a creature body that is no route piece, nor the pod's
-      noncreature permanents beyond its routes, which are not objects (§4). The
-      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Journey of Discovery                  +0.72+-0.15         +0.75+-0.16        +0.0087+-0.0030      both
-      MODELLED: the first mode, two basic lands to hand. NOT: 'You may play up to
-      two additional lands this turn', nor entwine {2}{G} -- in a deck whose
-      engine is land drops, the mode an Azusa pilot casts it for (item 6). A
-      floor.
-Nylea's Intervention                  +0.68+-0.13         +0.75+-0.15        +0.0085+-0.0028      both
-      MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: 'up to X
-      LAND cards' (a utility land is one), nor the mode that deals twice X damage
-      to each creature with flying -- MODELABLE against the pod's flier bodies
-      since item 44 (item 7). A floor.
-Crop Rotation                         +1.07+-0.23         +0.86+-0.24        +0.0081+-0.0039      both
-      MODELLED: a tapped land sacrificed (a land death: the graveyard, Titania)
-      for `land_rank`'s land onto the battlefield, a fetch cracked at once -- two
-      or three landfall triggers for {G}. NOT: fetching a utility land for its
-      ability, or a land that answers the table (§4); the sacrifice is taken at
-      resolution. A floor.
-Terastodon                            +0.39+-0.08         +0.61+-0.11        +0.0077+-0.0022      both
-      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
-      It removes a piece of an opponent's route of a kind its text can hit
-      (`opponents.ANSWERS`, derived from the removal census), which pushes that
-      kill back by a pre-rolled rebuild delay, and it is held until such a piece
-      is out. NOT: a creature body that is no route piece, nor the pod's
-      noncreature permanents beyond its routes, which are not objects (§4). The
-      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
-      answer's row by about a third either way.
-Memory Jar                            +0.39+-0.11         +0.41+-0.13        +0.0047+-0.0024      both
+Memory Jar                            +0.74+-0.13         +0.82+-0.15        +0.0115+-0.0028      both
       MODELLED (§0z228): {T}, sacrifice -- your hand exiled, seven drawn after the
       draw step, before the land drops, when the hand holds `memory_jar_hand` (2)
       or fewer and the draw cannot deck you; at your end step the seven left are
@@ -156,13 +113,56 @@ Memory Jar                            +0.39+-0.11         +0.41+-0.13        +0.
       returns. NOT: the pod's half -- each opponent's seven, with their instants,
       for your turn (the pod holds no hand, §4). A CEILING by that half, a floor
       by the crack's timing (never the turn it is cast).
-Storm Cauldron                        +0.45+-0.13         +0.35+-0.15        +0.0038+-0.0029      both
+Beast Within                          +0.59+-0.13         +0.95+-0.15        +0.0115+-0.0028      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Krosan Grip                           +0.53+-0.13         +0.75+-0.15        +0.0091+-0.0028      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Nylea's Intervention                  +0.64+-0.13         +0.71+-0.15        +0.0085+-0.0028      both
+      MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: 'up to X
+      LAND cards' (a utility land is one), nor the mode that deals twice X damage
+      to each creature with flying -- MODELABLE against the pod's flier bodies
+      since item 44 (item 7). A floor.
+Crop Rotation                         +1.08+-0.23         +0.84+-0.24        +0.0084+-0.0039      both
+      MODELLED: a tapped land sacrificed (a land death: the graveyard, Titania)
+      for `land_rank`'s land onto the battlefield, a fetch cracked at once -- two
+      or three landfall triggers for {G}. NOT: fetching a utility land for its
+      ability, or a land that answers the table (§4); the sacrifice is taken at
+      resolution. A floor.
+Journey of Discovery                  +0.70+-0.15         +0.72+-0.16        +0.0084+-0.0030      both
+      MODELLED: the first mode, two basic lands to hand. NOT: 'You may play up to
+      two additional lands this turn', nor entwine {2}{G} -- in a deck whose
+      engine is land drops, the mode an Azusa pilot casts it for (item 6). A
+      floor.
+Terastodon                            +0.43+-0.09         +0.65+-0.11        +0.0080+-0.0022      both
+      MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
+      It removes a piece of an opponent's route of a kind its text can hit
+      (`opponents.ANSWERS`, derived from the removal census), which pushes that
+      kill back by a pre-rolled rebuild delay, and it is held until such a piece
+      is out. NOT: a creature body that is no route piece, nor the pod's
+      noncreature permanents beyond its routes, which are not objects (§4). The
+      delay is `threat_rebuild_max` (3), a judgement with no data that moves every
+      answer's row by about a third either way.
+Storm Cauldron                        +0.45+-0.13         +0.35+-0.15        +0.0039+-0.0029      both
       MODELLED (§0z135): your extra land drop, and every land tapped for mana
       returning to hand to be replayed by the drops left -- one more mana and one
       more landfall a drop. NOT: the pod's half (their lands bounce too and they
       get the drop; the pod has no mana, §4), which slows them -- a floor. Pilot
       rules: token lands and Ashaya creature-lands are not tapped under it.
-Bane of Progress                      +0.19+-0.11         +0.20+-0.13        +0.0019+-0.0025       dmg
+Bane of Progress                      +0.20+-0.11         +0.23+-0.13        +0.0023+-0.0024       dmg
       MODELLED: the ETB destroys YOUR OWN artifacts and enchantments (and fires
       when a tutor or Genesis Wave puts it in, §0z212). NOT: the pod's artifact
       and enchantment route pieces -- MODELABLE since POD_V4, as Angel of the
@@ -174,6 +174,6 @@ Bane of Progress                      +0.19+-0.11         +0.20+-0.13        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Mind's Eye                            +0.42+-0.11         +0.48+-0.13        +0.0048+-0.0024      both
-Greater Good                          +0.26+-0.11         +0.31+-0.13        +0.0028+-0.0024      both
-Hall of Gemstone                      +0.32+-0.11         +0.25+-0.13        +0.0013+-0.0023       dmg
+Mind's Eye                            +0.43+-0.11         +0.50+-0.13        +0.0049+-0.0024      both
+Greater Good                          +0.25+-0.11         +0.28+-0.13        +0.0022+-0.0024       dmg
+Hall of Gemstone                      +0.34+-0.11         +0.28+-0.13        +0.0018+-0.0023       dmg
