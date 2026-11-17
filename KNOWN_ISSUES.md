@@ -19774,6 +19774,9 @@ share of 0.5 was too low for a late game. The ward's value is now early:
 it keeps Tivit alive through the turns it is cast and starts working. With
 the rule, only tivit and rendmaw move (2,000 seeds against `c23a0bb`);
 lorehold (a life ward), karlov, shilgengar and azusa are BIT-IDENTICAL.
+**REBUILT 2026-11-17 at `15be856`** (with §0z225), python 3.13.18,
+`repro_row` IDENTICAL on Ghostly Prison: tivit's baseline 0.5437 -> 0.5384,
+the mana rule's -0.0053 against the share's; no row moved beyond its bar.
 
 <a id="0z225"></a>
 
@@ -19813,6 +19816,13 @@ the trades (3.5 a game, none before), the pod's later turns have fewer to
 lose to Rendmaw's other triggers (`pod_birds_killed` -2.8), and the game
 that would have been won late is won early or not at all. Only rendmaw
 moves (2,000 seeds against `b225ebe`); its table is rebuilt.
+**REBUILT 2026-11-17 at `15be856`**, python 3.13.18: baseline 0.3376 ->
+0.3353; 8 of 64 rows moved beyond the wider bar, no sign flip. Combat
+finishers rose (Beastmaster Ascension +0.0133 -> +0.0178, March of the
+World Ooze +0.0155 -> +0.0196: the Birds' damage lands sooner), and what
+reads the pod's creatures dying fell (Massacre Wurm +0.0162 -> +0.0121,
+Whip of Erebos +0.0242 -> +0.0207: the Birds die in combat now, before the
+Wurm is cast).
 
 ### Nine dead knobs, confirmed and marked
 

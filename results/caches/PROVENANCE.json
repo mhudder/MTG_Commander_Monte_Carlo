@@ -1860,9 +1860,9 @@
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "38fc171fbb2fcb01",
-    "built_commit": "3d978b8",
-    "built_utc": "2026-11-16T23:50:17Z",
+    "built_at": "93ac06252b8017b8",
+    "built_commit": "15be856",
+    "built_utc": "2026-11-17T02:54:20Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2414,6 +2414,13 @@
         "built_at": "ffe969c138f31a21",
         "built_commit": "e5b2f40",
         "built_utc": "2026-11-16T17:07:01Z",
+        "deck": "rendmaw",
+        "verified": []
+      },
+      {
+        "built_at": "38fc171fbb2fcb01",
+        "built_commit": "3d978b8",
+        "built_utc": "2026-11-16T23:50:17Z",
         "deck": "rendmaw",
         "verified": []
       }
@@ -3029,9 +3036,9 @@
     ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "e087bbe9f6d7a362",
-    "built_commit": "3d978b8",
-    "built_utc": "2026-11-16T23:49:05Z",
+    "built_at": "edfae0dabb2d780f",
+    "built_commit": "15be856",
+    "built_utc": "2026-11-17T02:53:14Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -3577,6 +3584,13 @@
         "built_at": "4fae046773f88d75",
         "built_commit": "e5b2f40",
         "built_utc": "2026-11-16T17:06:34Z",
+        "deck": "tivit",
+        "verified": []
+      },
+      {
+        "built_at": "e087bbe9f6d7a362",
+        "built_commit": "3d978b8",
+        "built_utc": "2026-11-16T23:49:05Z",
         "deck": "tivit",
         "verified": []
       }
