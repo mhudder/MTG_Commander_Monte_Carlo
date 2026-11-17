@@ -679,9 +679,9 @@
     ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "3c4dd4851bf8e7b1",
-    "built_commit": "e5b2f40",
-    "built_utc": "2026-11-16T17:07:00Z",
+    "built_at": "eebe2992dedaeaa9",
+    "built_commit": "c9f18f4",
+    "built_utc": "2026-11-17T04:51:14Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1234,28 +1234,35 @@
             "utc": "2026-11-16T02:57:42Z"
           }
         ]
+      },
+      {
+        "built_at": "3c4dd4851bf8e7b1",
+        "built_commit": "e5b2f40",
+        "built_utc": "2026-11-16T17:07:00Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "0444688",
+            "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+            "fingerprint": "d1d4fbc315af04a3",
+            "utc": "2026-11-16T23:23:28Z"
+          },
+          {
+            "commit": "c23a0bb",
+            "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "f38fff87f88852d2",
+            "utc": "2026-11-17T01:47:26Z"
+          },
+          {
+            "commit": "b225ebe",
+            "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "e90ef77be40d466d",
+            "utc": "2026-11-17T02:28:56Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "0444688",
-        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
-        "fingerprint": "d1d4fbc315af04a3",
-        "utc": "2026-11-16T23:23:28Z"
-      },
-      {
-        "commit": "c23a0bb",
-        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "f38fff87f88852d2",
-        "utc": "2026-11-17T01:47:26Z"
-      },
-      {
-        "commit": "b225ebe",
-        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "e90ef77be40d466d",
-        "utc": "2026-11-17T02:28:56Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "022a5f0fbcd885a8",
@@ -2447,9 +2454,9 @@
     ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "0f3a14a4f3097e2e",
-    "built_commit": "e5b2f40",
-    "built_utc": "2026-11-16T17:06:23Z",
+    "built_at": "c2b70d4be821e3fc",
+    "built_commit": "c9f18f4",
+    "built_utc": "2026-11-17T04:50:48Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -3031,33 +3038,40 @@
             "utc": "2026-11-16T02:57:43Z"
           }
         ]
+      },
+      {
+        "built_at": "0f3a14a4f3097e2e",
+        "built_commit": "e5b2f40",
+        "built_utc": "2026-11-16T17:06:23Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "0444688",
+            "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
+            "fingerprint": "2a92b7d8bcef6c0d",
+            "utc": "2026-11-16T23:23:28Z"
+          },
+          {
+            "commit": "c23a0bb",
+            "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "b6cea6039edeaf82",
+            "utc": "2026-11-17T01:47:26Z"
+          },
+          {
+            "commit": "b225ebe",
+            "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "843923281c859317",
+            "utc": "2026-11-17T02:28:56Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "0444688",
-        "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
-        "fingerprint": "2a92b7d8bcef6c0d",
-        "utc": "2026-11-16T23:23:28Z"
-      },
-      {
-        "commit": "c23a0bb",
-        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "b6cea6039edeaf82",
-        "utc": "2026-11-17T01:47:26Z"
-      },
-      {
-        "commit": "b225ebe",
-        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "843923281c859317",
-        "utc": "2026-11-17T02:28:56Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "edfae0dabb2d780f",
-    "built_commit": "15be856",
-    "built_utc": "2026-11-17T02:53:14Z",
+    "built_at": "aa3ce555f310a141",
+    "built_commit": "c9f18f4",
+    "built_utc": "2026-11-17T04:51:36Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -3610,6 +3624,13 @@
         "built_at": "e087bbe9f6d7a362",
         "built_commit": "3d978b8",
         "built_utc": "2026-11-16T23:49:05Z",
+        "deck": "tivit",
+        "verified": []
+      },
+      {
+        "built_at": "edfae0dabb2d780f",
+        "built_commit": "15be856",
+        "built_utc": "2026-11-17T02:53:14Z",
         "deck": "tivit",
         "verified": []
       }
