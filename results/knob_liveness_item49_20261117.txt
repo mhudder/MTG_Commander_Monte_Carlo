@@ -1,0 +1,13 @@
+knob liveness: N=2000 staged games a deck, T20, seeds 5000..6999, decks rendmaw,lorehold,karlov,tivit,shilgengar,azusa, python 3.11.18
+cells: games whose whole output moved / whose result moved, of 12000; per-deck output moves in brackets
+
+knob=value                             |                            new pod
+block_rate=0.6                         |    DEAD     0 /    0 [0 0 0 0 0 0]
+monarch_loss_scale=0.3                 |    DEAD     0 /    0 [0 0 0 0 0 0]
+monarch_attack_floor=0.4               |    DEAD     0 /    0 [0 0 0 0 0 0]
+crown_loss_ends_chip=True              |    DEAD     0 /    0 [0 0 0 0 0 0]
+gingerbrute_keep=0                     |    DEAD     0 /    0 [0 0 0 0 0 0]
+zuran_keep=3                           |    DEAD     0 /    0 [0 0 0 0 0 0]
+blocker_toughness=4                    |    DEAD     0 /    0 [0 0 0 0 0 0]
+pod_block_policy='all'                 |    DEAD     0 /    0 [0 0 0 0 0 0]
+pod_blocker_deaths=False               |    DEAD     0 /    0 [0 0 0 0 0 0]

@@ -284,7 +284,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     **The behaviour findings are collected, in order, in item 47**
     (2026-11-15), with azusa's labels; the card work stays here.
 
-49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205:
+49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
+    **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a
+    proposal: the goaded Birds fight as bodies, and the nine knobs are
+    confirmed dead at 12,000 games and marked in `tools/knobs.py`.
     - `goad_block_share` is still a count share for rendmaw's goaded
       Birds although rivals block with bodies since §0z200: the same
       combat under two rules. Rendmaw only; moves its baseline, so it

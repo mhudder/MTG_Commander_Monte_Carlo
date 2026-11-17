@@ -111,6 +111,37 @@ LEGACY = {
 }
 
 
+# DEAD ON TODAY'S POD -- knobs still READ by an engine that perturbing changes
+# no game on the default pod: 0 of 12,000 staged games moved (2,000 a deck,
+# six decks, T20; `diagnostics.run_knob_liveness`, queue item 49, §0z225).
+# Kept, not deleted: each either reproduces an older pod's tables exactly
+# (`experiment.POD_PRE_COMBAT`) or waits for a card no current list plays.
+# The value says which. `render()` raises if a name here is no longer read,
+# so the list cannot outlive its knobs (§0q). Blind to (§0z15): a knob read
+# one game in 12,000 passes the liveness run, and a candidate row that adds
+# the card makes a card knob live again.
+DEAD_ON_DEFAULT = {
+    "block_rate": "read only with `derived_blocking` False, the pod before "
+                  "pod v3's derived blocking",
+    "monarch_loss_scale": "read only off A2 (the formula pod, "
+                          "`POD_PRE_COMBAT`)",
+    "monarch_attack_floor": "read only off A2 (the formula pod, "
+                            "`POD_PRE_COMBAT`)",
+    "crown_loss_ends_chip": "read only off A2 (the formula pod, "
+                            "`POD_PRE_COMBAT`)",
+    "blocker_toughness": "retired by item 44's flip (§0z204); read only by "
+                         "`POD_PRE_COMBAT`",
+    "pod_block_policy": "retired by item 44's flip (§0z204); read only by "
+                        "`POD_PRE_COMBAT`",
+    "pod_blocker_deaths": "retired by item 44's flip (§0z204); read only by "
+                          "`POD_PRE_COMBAT`",
+    "gingerbrute_keep": "a card knob: Gingerbrute is in no current list "
+                        "(karlov's candidate block)",
+    "zuran_keep": "a card knob: Zuran Orb is in no current list (azusa's "
+                  "candidate block)",
+}
+
+
 class Read:
     """One `cfg.get("name", default)` call site."""
 
@@ -318,7 +349,8 @@ def render() -> str:
     docs_text = _text_of(_md_paths())
     calls_text = _text_of(_caller_paths())
     bad = conflicts(reads)
-    stale = sorted(n for n in LEGACY if n not in reads)
+    stale = sorted(n for n in list(LEGACY) + list(DEAD_ON_DEFAULT)
+                   if n not in reads)
     if stale:
         raise SystemExit(f"tools/knobs.py LEGACY names knobs no engine reads "
                          f"any more: {stale} -- remove them from LEGACY (the "
@@ -417,6 +449,22 @@ def render() -> str:
       f"{sum(1 for n in LEGACY if n not in calls_text)} of those have never "
       "been flipped by any run** — a switch nobody has flipped is a branch")
     w("nobody has tested.")
+    w("")
+
+    w("## Dead on today's pod")
+    w("")
+    w("Knobs an engine still reads that change NO game on the default pod: 0")
+    w("of 12,000 staged games moved when each was perturbed (2,000 a deck, T20,")
+    w("`diagnostics.run_knob_liveness`, §0z225). Kept, not deleted -- each")
+    w("reproduces an older pod's tables or waits for a card no list plays. The")
+    w("list is `tools/knobs.py`'s `DEAD_ON_DEFAULT`; the generator refuses to")
+    w("run if a name there is no longer read. A knob read one game in 12,000")
+    w("passes the liveness run (§0z126).")
+    w("")
+    w("| knob | default | why it is dead |")
+    w("|---|---|---|")
+    for name, why in sorted(DEAD_ON_DEFAULT.items()):
+        w(f"| `{name}` | `{reads[name][0].default}` | {why} |")
     w("")
 
     w("## The knobs no document mentions")

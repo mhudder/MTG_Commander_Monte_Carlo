@@ -2390,19 +2390,82 @@ def goaded_combat(g, seat=None):
     if not birds:
         return
     share = g.cfg.get("goad_block_share", 0.30)
+    bodies_rule = goad_body_blocks_on(g)
     losses = []
     for att in birds:
         targets = [o for o in living(g) if o is not att]
         if not targets:
             continue
         victim = min(targets, key=lambda o: o.life)
-        blocked = min(att.goaded_birds, (victim.creatures + victim.goaded_birds) * share)
-        through = max(0.0, att.goaded_birds - blocked)
-        loss = life_loss(victim, 2.0 * through)           # 2/2 bodies
+        if bodies_rule:
+            loss = _goaded_birds_attack(g, att, victim)
+        else:
+            blocked = min(att.goaded_birds,
+                          (victim.creatures + victim.goaded_birds) * share)
+            through = max(0.0, att.goaded_birds - blocked)
+            loss = life_loss(victim, 2.0 * through)       # 2/2 bodies
         victim.life -= loss
         losses.append((victim, loss))
     _check_eliminations(g)
     lost_life(g, losses)
+
+
+def goad_body_blocks_on(g) -> bool:
+    """§0z225 (queue item 49): the goaded Birds' attack at a rival is a
+    combat of bodies, as every rival-on-rival attack has been since A4
+    (§0z200), instead of `goad_block_share`'s count. On by default where
+    rivals fight with bodies (`rival_combat` and `you_block`);
+    `goad_body_blocks` False is the old count share exactly."""
+    return (g.cfg.get("goad_body_blocks", True) and rival_combat_on(g)
+            and you_block_on(g))
+
+
+def _goaded_birds_attack(g, att, victim) -> float:
+    """`att`'s goaded Birds -- 2/2 fliers it must send at a player other than
+    you -- attack `victim`, who blocks with its untapped bodies and its own
+    Birds by the pod's rule (`plan_blocks` at its life, `pod_chump_floor`;
+    only a flier or a body with reach can block a flier, 702.9b). The
+    unblocked Birds' power is life loss; the Birds and bodies each side kills
+    die. A Bird left over as a fraction of the expected count attacks
+    unblocked. Returns the life `victim` lost (the caller subtracts it)."""
+    n = int(att.goaded_birds + 1e-9)
+    frac = att.goaded_birds - n
+    atk = [_Atk(k, ("goad", k), 2, 2, True, False, False, False, False,
+                False, False, 0.0, False) for k in range(n)]
+    blockers, _cap = available_blockers(g, victim)
+    asg = plan_blocks(g, victim.life, atk, blockers, len(blockers), count=True,
+                      floor=g.cfg.get("pod_chump_floor", 10),
+                      prefix="goad_block_")
+    dmg = 2.0 * (sum(1 for a in atk if a.k not in asg) + frac)
+    attackers_dead, birds_dead, their_dead = 0, 0, set()
+    for a in atk:
+        blks = asg.get(a.k)
+        if not blks:
+            continue
+        if _kills(a, blks):
+            attackers_dead += 1
+        for r in _attacker_kills(a, blks):
+            if isinstance(r, tuple):
+                birds_dead += 1
+            else:
+                their_dead.add(r)
+    g.m["goad_birds_attacked"] += n
+    g.m["goad_birds_blocked"] += len(asg)
+    hook = getattr(g, "on_pod_creature_deaths", None)
+    if attackers_dead:
+        att.goaded_birds = max(0.0, att.goaded_birds - attackers_dead)
+        g.m["goad_birds_died"] += attackers_dead
+        if hook is not None:
+            hook(att, attackers_dead)
+    if birds_dead:
+        victim.goaded_birds = max(0.0, victim.goaded_birds - birds_dead)
+        if hook is not None:
+            hook(victim, birds_dead)
+    if their_dead:
+        vb = pod_bodies(g, victim)
+        flags = iter([j in their_dead for j in range(len(vb))])
+        kill_pod_bodies(g, victim, lambda b: next(flags))
+    return life_loss(victim, dmg) if dmg > 0 else 0.0
 
 
 # ---------------------------------------------------------------------------

@@ -663,6 +663,12 @@
         "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "d3842d38db88b658",
         "utc": "2026-11-17T01:47:26Z"
+      },
+      {
+        "commit": "b225ebe",
+        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "27beb914ca0a015d",
+        "utc": "2026-11-17T02:28:56Z"
       }
     ]
   },
@@ -1236,6 +1242,12 @@
         "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "f38fff87f88852d2",
         "utc": "2026-11-17T01:47:26Z"
+      },
+      {
+        "commit": "b225ebe",
+        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "e90ef77be40d466d",
+        "utc": "2026-11-17T02:28:56Z"
       }
     ]
   },
@@ -1838,6 +1850,12 @@
         "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "b582e61615ac9c6a",
         "utc": "2026-11-17T01:47:26Z"
+      },
+      {
+        "commit": "b225ebe",
+        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "475ac0eaec164817",
+        "utc": "2026-11-17T02:28:55Z"
       }
     ]
   },
@@ -3001,6 +3019,12 @@
         "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "b6cea6039edeaf82",
         "utc": "2026-11-17T01:47:26Z"
+      },
+      {
+        "commit": "b225ebe",
+        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "843923281c859317",
+        "utc": "2026-11-17T02:28:56Z"
       }
     ]
   },

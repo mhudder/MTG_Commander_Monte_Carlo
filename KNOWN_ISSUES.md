@@ -277,6 +277,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuilt in §0z223 |
 | [0z223](#0z223) | REBUILT | **Item 45's rebuild**: six tables on the §0z222 pod, every cache CURRENT; no significant row changed sign; lifegain and lifelink rows up, as A3 predicts |
 | [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; paid when the pod's turn covers the removal (3) plus the ward -- tivit +0.0051 / +0.0051 |
+| [0z225](#0z225) | FIXED | **Queue item 49's cleanups**: rendmaw's goaded Birds fight rivals as bodies (`goad_body_blocks`, +0.0383 / -0.0018); nine dead knobs confirmed at 12,000 games and marked (`tools/knobs.py` `DEAD_ON_DEFAULT`) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19773,6 +19774,72 @@ share of 0.5 was too low for a late game. The ward's value is now early:
 it keeps Tivit alive through the turns it is cast and starts working. With
 the rule, only tivit and rendmaw move (2,000 seeds against `c23a0bb`);
 lorehold (a life ward), karlov, shilgengar and azusa are BIT-IDENTICAL.
+
+<a id="0z225"></a>
+
+## 0z225. FIXED -- queue item 49's cleanups
+
+**The owner, 2026-11-17: "move on to item 49's cleanups."**
+
+### Rendmaw's goaded Birds fight rivals as bodies (`goad_body_blocks`)
+
+§0z205 found the goaded Birds' attack at a rival still a count share
+(`goad_block_share` 0.30 of the defender's whole board blocks them) although
+every other rival-on-rival attack has been a combat of bodies since A4
+(§0z200): the same combat under two rules. `opponents._goaded_birds_attack`
+now sends the Birds -- 2/2 fliers -- at the victim (the lowest rival, as
+before), who blocks with its untapped bodies and its own Birds by the pod's
+rule (`plan_blocks` at its life, `pod_chump_floor`, the blockers from
+`available_blockers`, as `_attack_rival`'s are). Only a flier or a body
+with reach can block a flier (702.9b; a body's reach is the pool's
+`flier_block_share` roll). Each side's dead die as events; a Bird left as a
+fraction of the expected count attacks unblocked. On wherever rivals fight
+with bodies (`rival_combat`, `you_block`); `goad_body_blocks` False is the
+count share exactly. `tests/test_goad_bodies.py`, four cases, two mutations
+exact.
+
+**Measured**, rendmaw, N=15,000 paired, seeds 5000..
+(`results/knob_ab_rendmaw_goad_body_blocks.txt`; identity 0):
+
+| T10 | T20 | Birds a game: attacked / blocked / died | your damage | turns |
+|---|---|---|---|---|
+| **+0.0383 ±0.0041** | -0.0018 ±0.0069 | 7.4 / 3.6 / 3.5 | +8.0 | -0.58 |
+
+**The mechanism is the flying rule.** The count let 30% of a rival's whole
+board block a flier; bodies let only its fliers and reach bodies, so more
+Birds connect -- your damage rises 8 a game, rivals die sooner, games are
+0.6 turns shorter: a T10 gain. At T20 it is even: the Birds now die in
+the trades (3.5 a game, none before), the pod's later turns have fewer to
+lose to Rendmaw's other triggers (`pod_birds_killed` -2.8), and the game
+that would have been won late is won early or not at all. Only rendmaw
+moves (2,000 seeds against `b225ebe`); its table is rebuilt.
+
+### Nine dead knobs, confirmed and marked
+
+§0z205 found six knobs that moved no game at N=300 and three the flip
+retired. `diagnostics.run_knob_liveness`, N=2,000 a deck, six decks, T20,
+today's pod, the same perturbations
+(`results/knob_liveness_item49_20261117.txt`): **all nine DEAD, 0 of 12,000
+games moved**: `block_rate`, `monarch_loss_scale`, `monarch_attack_floor`,
+`crown_loss_ends_chip`, `blocker_toughness`, `pod_block_policy`,
+`pod_blocker_deaths`, `gingerbrute_keep`, `zuran_keep`.
+
+**Marked, not deleted** (the queue's second option): each reproduces an
+older pod's tables exactly -- `block_rate` without derived blocking, the
+three monarch knobs off A2, the three retired by the flip under
+`POD_PRE_COMBAT` -- or waits for its card (Gingerbrute and Zuran Orb are in
+no current list, only candidate blocks). Deleting a legacy path would break
+`POD_PRE_COMBAT`'s exact reproduction. `tools/knobs.py`'s
+`DEAD_ON_DEFAULT` holds them with the reason; `docs/KNOBS.md` prints a
+section; the generator refuses a name no engine reads (§0q). **Blind to**
+(§0z15): a knob read one game in 12,000, and a candidate row that brings
+the card back.
+
+### Left in item 49
+
+Azusa's `counter_target`, unreached by its list: re-measured when Bristly
+Bill or Dancing from Dark to Dawn is proposed, as the item says, not
+before.
 
 ## How to read an ablation table
 
