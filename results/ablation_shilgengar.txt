@@ -261,8 +261,11 @@ Malakir Rebirth // Malakir Mire        +0.10+-0.08         +0.16+-0.13        +0
       opens on the pod's turn (§0z134, `respond_to_event`), not modelled. A floor.
 Voldaren Bloodcaster // Bloodbat Summoner        +0.22+-0.06         +0.17+-0.11        +0.0006+-0.0024       dmg
       MODELLED: the flier, and a Blood token when it or another nontoken creature
-      you control dies. NOT: the transform at five Blood, nor Bloodbat Summoner's
-      Bat each combat (§0z184 finding 8, item 37; item 11). A floor.
+      you control dies; the transform at five Blood to Bloodbat Summoner, a 3/3
+      flier, and its Bat each combat -- a Blood token made a 2/2 flying, hasty Bat
+      that is still Blood for Shilgengar's ultimate (§0z229). NOT: the Blood
+      token's own '{1}, {T}, Discard a card, Sacrifice: Draw a card' (item 11). A
+      floor.
 Priest of Fell Rites                  +0.29+-0.06         +0.22+-0.11        -0.0003+-0.0024       dmg
       MODELLED: '{T}, Pay 3 life, Sacrifice this creature: Return target creature
       card from your graveyard to the battlefield', sorcery speed, above 10 life

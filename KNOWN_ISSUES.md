@@ -280,6 +280,11 @@ Each row is a headline and its key number, at most 250 characters
 | [0z225](#0z225) | FIXED | **Queue item 49's cleanups**: rendmaw's goaded Birds fight rivals as bodies (`goad_body_blocks`, +0.0383 / -0.0018); nine dead knobs confirmed at 12,000 games and marked (`tools/knobs.py` `DEAD_ON_DEFAULT`) |
 | [0z226](#0z226) | FIXED | **Cycling and landcycling** (§0z197 C): one shared rule, `engine.cycle_step`, the cards and costs generated; karlov +0.0019 at T10, shilgengar +0.0018 / +0.0055, tivit a null |
 | [0z227](#0z227) | FIXED | **Woe Strider**: its escape (a null) and its free outlet, which measured a cost under the Altar's death rule and is OFF; the Altar's rule queued (item 51) |
+| [0z228](#0z228) | FIXED | **Memory Jar** (azusa): the hand exiled, seven drawn before the land drops, the seven discarded at the end step; +0.0058 / +0.0070, a CEILING by the pod's own seven |
+| [0z229](#0z229) | FIXED | **Bloodbat Summoner** (shilgengar): Voldaren Bloodcaster transforms at five Blood and animates a Blood a combat, still Blood for the ultimate; a null |
+| [0z230](#0z230) | FIXED | **Vault of the Archangel's deathtouch** (§0z206 floor 1), read by `deathtouch_of` on a Vault turn; karlov and shilgengar, a null |
+| [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
+| [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19963,6 +19968,114 @@ switch -- **queue item 51** measures it. `tests/test_woe_strider.py`, six
 cases, three mutations exact (two corrections after the first run, said in
 the file: a helper counted "Goat" for "Goat token", and the Proft case and
 its mutation were confounded by Proft's own cast).
+
+<a id="0z228"></a>
+
+## 0z228. FIXED -- Memory Jar (azusa)
+
+**The text, Scryfall 2026-11-17**: "{T}, Sacrifice this artifact: Each player
+exiles all cards from their hand face down and draws seven cards. At the
+beginning of the next end step, each player discards their hand and returns
+to their hand each card they exiled this way." §0z184 finding 8 and item 37
+called it "not implemented at all"; it was KNOWN_BLIND.
+
+**The rule** (`azusa.memory_jar_crack`, `memory_jar_return`; `memory_jar`
+False is the old rule, the card a blank). A pilot's judgement, said out
+loud: cracked after your draw step and before the land step, so the seven
+feed the land drops and both main phases, when the hand holds
+`memory_jar_hand` (2) cards or fewer and the seven cannot deck you
+(`draw_is_safe`); never the turn it is cast (a floor). At your end step the
+hand left is discarded -- a land there is playable from the graveyard in
+this deck -- and the exiled cards return. **NOT MODELLED: the pod's half**,
+each opponent's seven with their instants, for your turn: the pod holds no
+hand (§4). **The row is a CEILING by that half.** PARTLY_MODELLED now.
+
+**Measured**, N=15,000 paired, azusa's staged list, identity 0
+(`results/knob_ab_azusa_memory_jar.txt`): **+0.0058 +-0.0013 at T10, +0.0070
++-0.0017 at T20**, reached in 3.6% of games, +0.16 / +0.20 in those games;
+damage +0.42, final life +0.24. The largest of today's card work, and the
+one with an unmodelled cost to the pod's benefit. `tests/test_memory_jar.py`,
+five cases, three mutations exact on the first run.
+
+<a id="0z229"></a>
+
+## 0z229. FIXED -- Bloodbat Summoner (shilgengar)
+
+**The text, Scryfall 2026-11-17**: Voldaren Bloodcaster, "Whenever you create
+a Blood token, if you control five or more Blood tokens, transform this
+creature"; Bloodbat Summoner (3/3 flier), "At the beginning of combat on
+your turn, up to one target Blood token you control becomes a 2/2 black Bat
+creature with flying and haste in addition to its other types." §0z184
+finding 8: read only as a sacrifice payoff.
+
+**The rule** (`bloodbat` False is the old rule): `blood_created` after every
+Blood made transforms the Bloodcaster at five (`blood_total`, Bats
+included); the back face is +1/+2 by permanent (`BLOODBAT_PT`). At the
+beginning of combat one plain Blood becomes a Bat, a hasty 2/2 artifact
+creature flier -- always one while a plain Blood is left, a pilot's rule
+said out loud: **a Bat is still a Blood token**, so Shilgengar's ultimate
+counts it (`blood_total`) and pays with it last, a sacrifice and so a death;
+and a Bat is never fed to Shilgengar, which would net nothing. The Blood's
+own draw ability is not modelled (item 11).
+
+**Measured** (`results/knob_ab_shilgengar_bloodbat.txt`, identity 0): +0.0003
++-0.0005 / +0.0002 +-0.0008, reached in 5.5% -- **a null**: the transform
+needs five Blood unspent, and the ultimate spends Blood in sixes.
+`tests/test_bloodbat.py`, six cases, three mutations exact (one set
+corrected after the run, said in the file).
+
+<a id="0z230"></a>
+
+## 0z230. FIXED -- Vault of the Archangel's deathtouch (§0z206 floor 1)
+
+"Creatures you control gain deathtouch and lifelink until end of turn": the
+lifelink was read since §0z115, the deathtouch was not.
+`opponents.deathtouch_of` asks `engine.vault_active` now
+(`vault_deathtouch` False is the old rule) -- attackers only, as the Vault
+is activated before your combat damage and its effect ends with your turn,
+so your blockers on the pod's turns do not have it. **Measured**, identity 0:
+karlov +0.0000 +-0.0002 / +0.0001 +-0.0003 (4.6% reached), shilgengar
++0.0003 +-0.0004 / -0.0001 +-0.0005 (10.2%) -- **a null in both**: a Vault
+turn is usually one the attack was safe on. `tests/test_vault_deathtouch.py`,
+three cases, two mutations exact.
+
+<a id="0z231"></a>
+
+## 0z231. FIXED -- azusa's granted keywords (§0z206 floors 2-4)
+
+Each a keyword the engine knows and a card name cannot carry, read through
+optional protocol hooks so every other engine is untouched:
+`opponents.reach_of` (new; `your_blockers` calls it) asks
+`g.reach_granted(perm)`, and `indestructible_of` already asked
+`g.indestructible_granted(perm)` (trostani's hook). Azusa answers both
+(`animated_land_text` False is the old rule): an animation's "reach" and
+"indestructible" (Sylvan Awakening -- back to SCRIPTED, every clause read);
+Nissa, Who Shakes the World's emblem, "Lands you control have
+indestructible", set at her -8 (`nissa_emblem`; she is a candidate); and
+Sapling Nursery's Treefolk tokens' reach (`reach_tokens`; a candidate).
+**Measured** (`results/knob_ab_azusa_animated_land_text.txt`;
+`--no-identity`, since `lands_animated` is not the reach of every clause):
++0.0003 +-0.0005 / +0.0003 +-0.0007 -- **a null**: an Awakening's land
+blocks at lethal only (`your_utility`) and the pod's removal never touches
+lands.
+
+<a id="0z232"></a>
+
+## 0z232. FIXED -- The Swarmweaver's delirium deathtouch (§0z206 floor 5)
+
+"Insects and Spiders you control get +1/+1 and have deathtouch": the +1/+1
+was read (`swarmweaver_bonus`), the deathtouch was not.
+`engine.swarmweaver_deathtouch` (`swarmweaver_deathtouch` False is the old
+rule) is read by `deathtouch_of` for attackers and by `your_blockers` for
+blockers -- the static applies on every turn, unlike the Vault's. The card is
+a rendmaw CANDIDATE, so no list moves; its row is SCRIPTED now.
+`tests/test_granted_keywords.py` pins §0z231 and this, six cases, three
+mutations exact on the first run.
+
+**What moved, at 2,000 seeds against c9f18f4**: rendmaw (§0z227's escape),
+azusa (§0z228, §0z231), shilgengar (§0z229, §0z230) and karlov (§0z230);
+lorehold and tivit BIT-IDENTICAL. The four tables are rebuilt at this
+work's commit.
 
 ## How to read an ablation table
 

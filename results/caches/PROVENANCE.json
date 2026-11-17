@@ -1875,6 +1875,12 @@
         "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
         "fingerprint": "61d7e02e665da5a9",
         "utc": "2026-11-17T03:49:26Z"
+      },
+      {
+        "commit": "cb9b987",
+        "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
+        "fingerprint": "0884e01056e6cca9",
+        "utc": "2026-11-17T05:26:12Z"
       }
     ]
   },
@@ -3635,7 +3641,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "cb9b987",
+        "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
+        "fingerprint": "f36a072d7c40afed",
+        "utc": "2026-11-17T05:26:12Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

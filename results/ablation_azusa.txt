@@ -78,6 +78,7 @@ Exploration                           +0.59+-0.19         +0.49+-0.19        +0.
 Oracle of Mul Daya                    +0.42+-0.19         +0.38+-0.20        +0.0046+-0.0035      both
 Lotus Cobra                           +0.94+-0.23         +0.65+-0.23        +0.0024+-0.0042       dmg
 Seer's Sundial                        -0.29+-0.17         -0.24+-0.18        +0.0020+-0.0034       dmg
+Sylvan Awakening                      +0.26+-0.06         +0.21+-0.06        +0.0015+-0.0014      both
 Abundance                             +0.30+-0.13         +0.18+-0.15        -0.0013+-0.0028       dmg
 
 ====================================================================================
@@ -147,6 +148,14 @@ Terastodon                            +0.39+-0.08         +0.61+-0.11        +0.
       noncreature permanents beyond its routes, which are not objects (§4). The
       delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
+Memory Jar                            +0.39+-0.11         +0.41+-0.13        +0.0047+-0.0024      both
+      MODELLED (§0z228): {T}, sacrifice -- your hand exiled, seven drawn after the
+      draw step, before the land drops, when the hand holds `memory_jar_hand` (2)
+      or fewer and the draw cannot deck you; at your end step the seven left are
+      discarded (a land there is playable from the graveyard) and the hand
+      returns. NOT: the pod's half -- each opponent's seven, with their instants,
+      for your turn (the pod holds no hand, §4). A CEILING by that half, a floor
+      by the crack's timing (never the turn it is cast).
 Storm Cauldron                        +0.45+-0.13         +0.35+-0.15        +0.0038+-0.0029      both
       MODELLED (§0z135): your extra land drop, and every land tapped for mana
       returning to hand to be replayed by the drops left -- one more mana and one
@@ -160,17 +169,11 @@ Bane of Progress                      +0.19+-0.11         +0.20+-0.13        +0.
       Ruins -- nor your off-board Treasures, Clues and Food (§0z209 item 5). Its
       score is the cost with none of the benefit, a ONE-SIDED WIPE WITH THE
       SIDEDNESS MISSING. §0z2.
-Sylvan Awakening                      +0.26+-0.06         +0.21+-0.06        +0.0015+-0.0014      both
-      MODELLED: your lands as 2/2 Elemental creatures with haste until your next
-      turn, through the pod's round. NOT: their reach and indestructible, carried
-      in `animate_lands` and read by nothing but `trample_of` (item 9, §0z206
-      floor 2). A floor.
 
 ====================================================================================
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
 Mind's Eye                            +0.42+-0.11         +0.48+-0.13        +0.0048+-0.0024      both
-Memory Jar                            +0.39+-0.11         +0.41+-0.13        +0.0047+-0.0024      both
 Greater Good                          +0.26+-0.11         +0.31+-0.13        +0.0028+-0.0024      both
 Hall of Gemstone                      +0.32+-0.11         +0.25+-0.13        +0.0013+-0.0023       dmg

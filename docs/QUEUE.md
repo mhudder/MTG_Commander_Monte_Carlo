@@ -240,7 +240,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
 37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
     §0z185; 2 and 10, §0z187)**, none of
     them urgent. In the order a session would take them:
-    Memory Jar and Bloodbat Summoner (8); ~~shilgengar's `activations` inside
+    ~~Memory Jar and Bloodbat Summoner (8)~~ DONE 2026-11-17 (§0z228, §0z229); ~~shilgengar's `activations` inside
     main 2 and Black Market Connections at the first main phase (7)~~ DONE
     2026-11-15 (§0z215), a null; first
     and double strike, with Sunhome (6), which waits on attackers that can
@@ -277,7 +277,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
     azusa's labels; and card work for
     the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape (DONE, §0z227),
-    Memory Jar (C and item 37), and §0z206's five new floors (the Vault's
+    Memory Jar (C and item 37; DONE, §0z228), and §0z206's five new floors (DONE, §0z230-§0z232) (the Vault's
     deathtouch, an animated land's reach and indestructible, Nissa's
     emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any
     time; none waits on item 44.
