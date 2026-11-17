@@ -278,6 +278,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z223](#0z223) | REBUILT | **Item 45's rebuild**: six tables on the §0z222 pod, every cache CURRENT; no significant row changed sign; lifegain and lifelink rows up, as A3 predicts |
 | [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; paid when the pod's turn covers the removal (3) plus the ward -- tivit +0.0051 / +0.0051 |
 | [0z225](#0z225) | FIXED | **Queue item 49's cleanups**: rendmaw's goaded Birds fight rivals as bodies (`goad_body_blocks`, +0.0383 / -0.0018); nine dead knobs confirmed at 12,000 games and marked (`tools/knobs.py` `DEAD_ON_DEFAULT`) |
+| [0z226](#0z226) | FIXED | **Cycling and landcycling** (§0z197 C): one shared rule, `engine.cycle_step`, the cards and costs generated; karlov +0.0019 at T10, shilgengar +0.0018 / +0.0055, tivit a null |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19850,6 +19851,59 @@ the card back.
 Azusa's `counter_target`, unreached by its list: re-measured when Bristly
 Bill or Dancing from Dark to Dawn is proposed, as the item says, not
 before.
+
+<a id="0z226"></a>
+
+## 0z226. FIXED -- cycling and landcycling, one rule
+
+**The owner, 2026-11-17: "move on to the card work, cycling first"** (§0z197
+C: Barren Moor and Secluded Steppe in karlov, Raffine's Tower in tivit, and
+Angel of the Ruins' plainscycling in shilgengar -- "Floors").
+
+**The text, Scryfall 2026-11-17**: Barren Moor "Cycling {B}", Secluded
+Steppe "Cycling {W}", Raffine's Tower "Cycling {3}", Angel of the Ruins
+"Plainscycling {2} ({2}, Discard this card: Search your library for a Plains
+card, reveal it, put it into your hand, then shuffle.)" (702.29, 702.29e).
+
+**The data is generated** (`tools.tag_flying --write`): `_evasion.CYCLING`,
+name -> (kind, cost), from the keywords and the text -- a cost or a
+prefix it cannot read RAISES (the first run raised on "Plainscycling", a
+prefix rule written wrong, and was fixed); and `_evasion.LAND_SUBTYPES`,
+each land's subtypes, for "a Plains card". The set is the four cards and
+trostani's Scattered Groves (`{2}`, which its hand-typed `cycling2` tag
+also says).
+
+**The rule is one function, `engine.cycle_step(g, pay)`**, an end-of-turn
+mana sink each engine calls with its own payment on the mana the turn left
+(karlov after its Gingerbrute sink; tivit and shilgengar before the
+floated-mana metric). `cycling` False is the old rule. Two judgements, said
+out loud: a LAND is cycled once `cycle_land_floor` (6) lands are out -- the
+floor trostani's Scattered Groves rule already used -- and only when the
+draw cannot deck you (§0z42); a LANDCYCLER is cycled when the hand holds no
+land and it cannot be cast next turn anyway (lands + 1 below its mana value),
+for the land with the most types (a dual over a basic). **Trostani keeps
+its own copy of the rule while SUSPENDED**, written down in
+`pending.check_cycling_coverage` -- the check that refuses a cycling card in
+a deck whose engine never calls `cycle_step` (§0q; it failed on karlov
+before the call was added). `tests/test_cycling.py`, six cases, three
+mutations exact (one expectation corrected after the run, said so: the
+rule fetched Godless Shrine, a Plains Swamp, where the test expected a basic
+Plains).
+
+**Measured**, N=15,000 paired, seeds 5000..
+(`results/knob_ab_<deck>_cycling.txt`; identity 0 in every deck):
+
+| deck | T10 | T20 | reached | a game |
+|---|---|---|---|---|
+| karlov | **+0.0019 ±0.0010** | +0.0010 ±0.0015 | 6.5% | 0.07 cycled |
+| tivit | +0.0003 ±0.0008 | +0.0005 ±0.0008 | 3.6% | 0.04 cycled |
+| shilgengar | **+0.0018 ±0.0010** | **+0.0055 ±0.0023** | 7.0% | 0.07 landcycled |
+
+Small, as a mana sink is: a land drawn late is a card instead, and an
+uncastable seven-drop a land. The Angel's plainscycling is the largest --
+it turns a dead card into a land drop in a short hand. Only karlov, tivit and
+shilgengar move (2,000 seeds against the commit before); their tables are
+rebuilt.
 
 ## How to read an ablation table
 

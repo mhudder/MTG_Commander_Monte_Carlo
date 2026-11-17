@@ -148,7 +148,7 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     creatures are bodies (§0z132) and creature route pieces. MODELABLE.
 20. **Angel of the Ruins** -- its ETB exile of artifacts and enchantments:
     the pod's artifact and enchantment route pieces exist. MODELABLE.
-    Plainscycling is correctly NOT.
+    Plainscycling was NOT; it IS since §0z226 (`engine.cycle_step`).
 21. **Angelic Arbiter** -- "the pod's attacks and spells are rates": under
     A2 each seat declares its attacks (`seat_attack`). The spell half is
     still a rate.

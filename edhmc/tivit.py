@@ -55,7 +55,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -2134,6 +2134,8 @@ def take_turn(g, extra=False):
     end_step(g)
     if g.result is not None:
         return
+    # CYCLING on the mana the turn left (§0z226): Raffine's Tower.
+    cycle_step(g, lambda c: pay(g, c, powerstones=True))
 
     g.m["mana_floated"] += len(mana_units(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)

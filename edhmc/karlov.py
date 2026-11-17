@@ -38,7 +38,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (static_walker_plus, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
+from edhmc.engine import (cycle_step, static_walker_plus, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
@@ -2763,6 +2763,9 @@ def take_turn(g):
     gingerbrute_sacrifices(g)
     if g.result is not None:
         return
+    # CYCLING on the mana the turn left (§0z226): Barren Moor, Secluded
+    # Steppe.
+    cycle_step(g, lambda c: pay_cost(g, c))
     # GINGER: the pod's three upkeeps. Taken here, where the pod's round is,
     # and BEFORE pod_phase can take the crown -- see gingerbrute_tokens for
     # why that makes the count a ceiling.

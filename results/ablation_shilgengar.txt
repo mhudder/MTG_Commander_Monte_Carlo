@@ -190,10 +190,11 @@ Mortify                               +0.28+-0.06         +0.79+-0.13        +0.
       delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
 Angel of the Ruins                    +0.30+-0.05         +0.67+-0.10        +0.0092+-0.0023      both
-      MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile of up to two
-      artifacts and/or enchantments -- MODELABLE against the pod's artifact and
-      enchantment route pieces, not modelled -- nor Plainscycling {2}, which would
-      turn a seven-drop in a short game into a land. A floor.
+      MODELLED: the 5/7 flying artifact creature, and Plainscycling {2}
+      (`engine.cycle_step`, §0z226: cycled for a Plains card when the hand holds
+      no land and the Angel cannot be cast next turn). NOT: its ETB exile of up to
+      two artifacts and/or enchantments -- MODELABLE against the pod's artifact
+      and enchantment route pieces, not modelled. A floor.
 Swords to Plowshares                  +0.18+-0.05         +0.72+-0.12        +0.0087+-0.0028      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit

@@ -276,7 +276,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     Contract, Grudge Keeper; shilgengar's Requiem Angel and landfall rule;
     azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
     azusa's labels; and card work for
-    the add-card skill: ward, cycling, Woe Strider's sacrifice and escape,
+    the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape,
     Memory Jar (C and item 37), and §0z206's five new floors (the Vault's
     deathtouch, an animated land's reach and indestructible, Nissa's
     emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any

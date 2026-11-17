@@ -4098,6 +4098,66 @@ def static_walker_plus(g, perm, printed) -> None:
     g.m["static_walker_loyalty"] += 1     # the reach
 
 
+def cycle_step(g, pay) -> None:
+    """CYCLING AND LANDCYCLING (702.29; §0z226), one rule for every engine:
+    an end-of-turn mana sink, called with that engine's own `pay(cost) ->
+    bool` on the mana the turn left. The cards and costs are generated
+    (`_evasion.CYCLING`, from Scryfall). `cycling` False is the old rule:
+    nothing cycles.
+
+    THE POLICY, SAID OUT LOUD -- two judgements:
+      cycling (draw)  a LAND in hand is cycled once `cycle_land_floor` (6)
+                      lands are on the battlefield -- trostani's Scattered
+                      Groves rule, the floor it already used -- and only when
+                      the draw cannot deck you (`draw_is_safe`, §0z42).
+      landcycling     the card is cycled for its land when the hand holds no
+                      land and the card cannot be cast next turn anyway
+                      (lands on the battlefield + 1 below its mana value) --
+                      the seven-drop in a short hand, which Angel of the
+                      Ruins' PARTLY note named. The land comes from the
+                      library (`_evasion.LAND_SUBTYPES`, generated), revealed
+                      and shuffled; none left, nothing is paid.
+    Trostani keeps its own Scattered Groves rule while it is SUSPENDED."""
+    if not g.cfg.get("cycling", True):
+        return
+    from edhmc.decks._evasion import CYCLING, LAND_SUBTYPES
+    lands = sum(1 for p in g.board if p.card.is_land)
+    for c in [x for x in g.hand if x.name in CYCLING]:
+        if c not in g.hand:
+            continue
+        kind, cost = CYCLING[c.name]
+        if kind is None:
+            if not c.is_land or lands < g.cfg.get("cycle_land_floor", 6):
+                continue
+            if not draw_is_safe(g, 1) or not pay(dict(cost)):
+                continue
+            remove_card(g.hand, c)
+            g.graveyard.append(c)
+            g.draw(1)
+            g.m["cycled"] += 1
+            continue
+        if any(x.is_land for x in g.hand) or lands + 1 >= c.mv:
+            continue
+        pool = [x for x in g.library if x.is_land and (
+            kind in LAND_SUBTYPES.get(x.name, ())
+            or (kind == "basic land" and x.name in BASIC_LAND_NAMES))]
+        if not pool or not pay(dict(cost)):
+            continue
+        remove_card(g.hand, c)
+        g.graveyard.append(c)
+        # the land with the most types (a dual over a basic): what a pilot
+        # fetches, by the type line alone
+        pick = max(pool, key=lambda x: len(LAND_SUBTYPES.get(x.name, ())))
+        remove_card(g.library, pick)
+        g.hand.append(pick)
+        crn_shuffle(g, "landcycling", g.library)
+        g.m["landcycled"] += 1
+
+
+BASIC_LAND_NAMES = frozenset({"Plains", "Island", "Swamp", "Mountain",
+                              "Forest", "Wastes"})
+
+
 def walker_dies_at_zero(g, perm) -> None:
     """704.5i: a planeswalker with 0 loyalty goes to the graveyard."""
     if perm.counters <= 0 and perm in g.board:

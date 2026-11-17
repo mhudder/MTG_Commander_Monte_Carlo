@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `b17b204`.
+Generated at `a06def3`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -87,33 +87,36 @@ the fingerprint above mean anything.
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `101d87850f912443` | `e5b2f40` | **VERIFIED** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `3c4dd4851bf8e7b1` | `e5b2f40` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `3c4dd4851bf8e7b1` | `e5b2f40` | **SUSPECT** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `022a5f0fbcd885a8` | `3d978b8` | **VERIFIED** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `93ac06252b8017b8` | `15be856` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `0f3a14a4f3097e2e` | `e5b2f40` | **VERIFIED** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `edfae0dabb2d780f` | `15be856` | **CURRENT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `93ac06252b8017b8` | `15be856` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `0f3a14a4f3097e2e` | `e5b2f40` | **SUSPECT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `edfae0dabb2d780f` | `15be856` | **SUSPECT** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `101d87850f912443`; fingerprint has since moved to `27beb914ca0a015d` and was CHECKED at `b225ebe` (2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `101d87850f912443`; fingerprint has since moved to `a456b98fef1cb59b` and was CHECKED at `a06def3` (2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
   - verified at `924be315202b4417` (`0444688`, 2026-11-16T23:23:28Z): §0z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).
   - verified at `d3842d38db88b658` (`c23a0bb`, 2026-11-17T01:47:26Z): §0z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.
   - verified at `27beb914ca0a015d` (`b225ebe`, 2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `3c4dd4851bf8e7b1`; fingerprint has since moved to `e90ef77be40d466d` and was CHECKED at `b225ebe` (2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `a456b98fef1cb59b` (`a06def3`, 2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `3c4dd4851bf8e7b1`, live is `eebe2992dedaeaa9`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `e5b2f40`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `d1d4fbc315af04a3` (`0444688`, 2026-11-16T23:23:28Z): §0z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).
   - verified at `f38fff87f88852d2` (`c23a0bb`, 2026-11-17T01:47:26Z): §0z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.
   - verified at `e90ef77be40d466d` (`b225ebe`, 2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `022a5f0fbcd885a8`; fingerprint has since moved to `475ac0eaec164817` and was CHECKED at `b225ebe` (2026-11-17T02:28:55Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `022a5f0fbcd885a8`; fingerprint has since moved to `61d7e02e665da5a9` and was CHECKED at `a06def3` (2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
   - verified at `b582e61615ac9c6a` (`c23a0bb`, 2026-11-17T01:47:26Z): §0z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.
   - verified at `475ac0eaec164817` (`b225ebe`, 2026-11-17T02:28:55Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `93ac06252b8017b8`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `0f3a14a4f3097e2e`; fingerprint has since moved to `843923281c859317` and was CHECKED at `b225ebe` (2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
+  - verified at `61d7e02e665da5a9` (`a06def3`, 2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `93ac06252b8017b8`; fingerprint has since moved to `4478d04e308d51fa` and was CHECKED at `a06def3` (2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
+  - verified at `4478d04e308d51fa` (`a06def3`, 2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `0f3a14a4f3097e2e`, live is `c2b70d4be821e3fc`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `e5b2f40`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `2a92b7d8bcef6c0d` (`0444688`, 2026-11-16T23:23:28Z): §0z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).
   - verified at `b6cea6039edeaf82` (`c23a0bb`, 2026-11-17T01:47:26Z): §0z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.
   - verified at `843923281c859317` (`b225ebe`, 2026-11-17T02:28:56Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `edfae0dabb2d780f`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `0e26972c5f63167c`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `edfae0dabb2d780f`, live is `aa3ce555f310a141`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `15be856`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `265db7a6797e4aeb`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

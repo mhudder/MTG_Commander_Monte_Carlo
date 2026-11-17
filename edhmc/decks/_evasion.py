@@ -853,6 +853,46 @@ CREATURE_SUBTYPES = {
     'Zulaport Cutthroat': ('Ally', 'Human', 'Rogue'),
 }
 
+# LAND SUBTYPES: a land's subtypes from its type line. Read by
+# `engine.cycle_step` for landcycling (§0z226).
+LAND_SUBTYPES = {
+    'Canopy Vista': ('Forest', 'Plains'),
+    'Dryad Arbor': ('Dryad', 'Forest'),
+    'Elegant Parlor': ('Mountain', 'Plains'),
+    'Forest': ('Forest',),
+    'Godless Shrine': ('Plains', 'Swamp'),
+    'Hallowed Fountain': ('Island', 'Plains'),
+    'Island': ('Island',),
+    'Mountain': ('Mountain',),
+    'Overgrown Tomb': ('Forest', 'Swamp'),
+    'Plains': ('Plains',),
+    'Prairie Stream': ('Island', 'Plains'),
+    'Radiant Grove': ('Forest', 'Plains'),
+    "Raffine's Tower": ('Island', 'Plains', 'Swamp'),
+    'Sacred Foundry': ('Mountain', 'Plains'),
+    'Scattered Groves': ('Forest', 'Plains'),
+    'Scavenger Grounds': ('Desert',),
+    'Scene of the Crime': ('Clue',),
+    'Sunken Hollow': ('Island', 'Swamp'),
+    'Swamp': ('Swamp',),
+    'Temple Garden': ('Forest', 'Plains'),
+    'The Hunter Maze': ('Sphere',),
+    'Watery Grave': ('Island', 'Swamp'),
+    "Witch's Cottage": ('Swamp',),
+    'Woodland Chasm': ('Forest', 'Swamp'),
+}
+
+# CYCLING (702.29): name -> (kind, cost). kind None draws a card; a land
+# subtype or 'basic land' searches for one (702.29e). Read by
+# `engine.cycle_step` (§0z226).
+CYCLING = {
+    'Angel of the Ruins': ('Plains', {'gen': 2}),
+    'Barren Moor': (None, {'B': 1}),
+    "Raffine's Tower": (None, {'gen': 3}),
+    'Scattered Groves': (None, {'gen': 2}),
+    'Secluded Steppe': (None, {'W': 1}),
+}
+
 # EVERY CARD NAME THIS RUN SCANNED, deck members and module-level candidates
 # alike. `check_docs` compares it with the cards the deck modules construct
 # TODAY and fails on any difference: a card added without re-running this

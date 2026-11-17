@@ -135,7 +135,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cleanup_step, late_land_drop, remove_card, charge_coloured_pain, vault_of_the_archangel,
+from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card, charge_coloured_pain, vault_of_the_archangel,
                           damage_you, midnight_reaper, sun_titan_pick,
                           vault_active, castle_locthwain, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, engine_cfg, choose_mode_cost, tithe_treasures, land_types,
@@ -1705,6 +1705,10 @@ def take_turn(g):
         g.result = "win"
         g.m["turn_won"] = g.turn
         g.m["win_route"] = 2
+    # CYCLING on the mana the turn left (§0z226): Angel of the Ruins'
+    # plainscycling.
+    if g.result is None:
+        cycle_step(g, lambda c: g.pay(c))
 
     g.m["mana_floated"] += len(available_mana(g))
     g.m["stranded_mv"] += sum(c.mv for c in g.hand if not c.is_land)

@@ -710,6 +710,33 @@ check_alt_cost_coverage()
 check_loyalty_coverage()
 
 
+def check_cycling_coverage():
+    """Every card with cycling (`_evasion.CYCLING`, generated) is in a deck
+    whose engine calls `engine.cycle_step` (§0z226). §0q: without the call the
+    card's cycling silently does nothing and it scores as the land or creature
+    alone. Checked over every deck list and catalog, as the loyalty check is.
+    TROSTANI IS EXEMPT while SUSPENDED: its Scattered Groves has its own rule
+    (`TrostaniGame`'s mana sink) -- a second copy of the policy, said here
+    and in §0z226, to be unified when the deck returns."""
+    import inspect
+    from edhmc.decks._evasion import CYCLING
+    sources = {name: inspect.getsource(spec.engine_module)
+               for name, spec in REGISTRY.items()}
+    for deck_name, (module, catalog) in DECKS.items():
+        if deck_name == "trostani":
+            continue
+        deck, commander = module.build()
+        for card in list(deck) + [commander] + list(catalog.values()):
+            if card.name in CYCLING and "cycle_step(" not in sources[deck_name]:
+                raise AssertionError(
+                    f"edhmc/pending.py: {card.name!r} has cycling and is in "
+                    f"{deck_name}, whose engine never calls engine.cycle_step: "
+                    f"its cycling would do nothing (§0z226).")
+
+
+check_cycling_coverage()
+
+
 def pending_for(deck_name: str) -> list[Change]:
     return [c for c in CHANGES if c.deck == deck_name]
 

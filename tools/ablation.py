@@ -1348,11 +1348,12 @@ PARTLY_MODELLED = {
             "Shepherd fires no ETB, the floor every return path in this "
             "engine shares. A floor by that.",
         "Angel of the Ruins":
-            "MODELLED: the 5/7 flying artifact creature. NOT: its ETB exile "
-            "of up to two artifacts and/or enchantments -- MODELABLE against "
-            "the pod's artifact and enchantment route pieces, not modelled -- "
-            "nor Plainscycling {2}, which would turn a seven-drop in a short "
-            "game into a land. A floor.",
+            "MODELLED: the 5/7 flying artifact creature, and Plainscycling "
+            "{2} (`engine.cycle_step`, §0z226: cycled for a Plains card "
+            "when the hand holds no land and the Angel cannot be cast next "
+            "turn). NOT: its ETB exile of up to two artifacts and/or "
+            "enchantments -- MODELABLE against the pod's artifact and "
+            "enchantment route pieces, not modelled. A floor.",
         "Angelic Arbiter":
             "MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell "
             "this turn can't attack; each who attacked can't cast spells'. "

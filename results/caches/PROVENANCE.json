@@ -669,6 +669,12 @@
         "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "27beb914ca0a015d",
         "utc": "2026-11-17T02:28:56Z"
+      },
+      {
+        "commit": "a06def3",
+        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+        "fingerprint": "a456b98fef1cb59b",
+        "utc": "2026-11-17T03:49:26Z"
       }
     ]
   },
@@ -1856,6 +1862,12 @@
         "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
         "fingerprint": "475ac0eaec164817",
         "utc": "2026-11-17T02:28:55Z"
+      },
+      {
+        "commit": "a06def3",
+        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+        "fingerprint": "61d7e02e665da5a9",
+        "utc": "2026-11-17T03:49:26Z"
       }
     ]
   },
@@ -2425,7 +2437,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "a06def3",
+        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+        "fingerprint": "4478d04e308d51fa",
+        "utc": "2026-11-17T03:49:26Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "0f3a14a4f3097e2e",

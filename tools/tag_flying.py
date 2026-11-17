@@ -633,6 +633,50 @@ def main():
                          "CREATURE_SUBTYPES cannot say 'every type'; give "
                          "opponents.cavern_covers a rule first")
 
+    # LAND SUBTYPES, 2026-11-17 (§0z226): a land's subtypes from its type
+    # line (Plains, Island, ...), for landcycling's "search your library for a
+    # Plains card". Read by `engine.cycle_step`.
+    land_subtypes = {n: tuple(sorted(subtypes(c))) for n, c in cards.items()
+                     if n in everything and everything[n].is_land
+                     and subtypes(c)}
+
+    # CYCLING, 2026-11-17 (§0z226; 702.29): name -> (kind, cost). kind None
+    # is plain cycling (draw a card); a land subtype ("Plains") or "basic
+    # land" is landcycling (702.29e: search for that card). The cost from the
+    # text, {N} generic and {W}{U}{B}{R}{G}{C}; any cost this repo cannot
+    # read RAISES -- a flagged gap, never a silent free cycle.
+    cycling = {}
+    for n, c in cards.items():
+        if n not in everything or not any(
+                k.endswith("cycling") or k == "Cycling"
+                for k in c.get("keywords", [])):
+            continue
+        for m in re.finditer(r"^(?:(\w[\w ]*?))?cycling (\{[^ (]+\})",
+                             land_oracle(c), re.M | re.I):
+            prefix = (m.group(1) or "").strip()
+            cost = {}
+            for sym in re.findall(r"\{([^}]+)\}", m.group(2)):
+                if sym.isdigit():
+                    cost["gen"] = cost.get("gen", 0) + int(sym)
+                elif sym in ("W", "U", "B", "R", "G", "C"):
+                    cost[sym] = cost.get(sym, 0) + 1
+                else:
+                    raise SystemExit(f"tag_flying: cannot read {n!r}'s "
+                                     f"cycling cost {m.group(2)!r}")
+            if prefix == "":
+                kind = None
+            elif prefix.lower() == "basic land":
+                kind = "basic land"
+            elif re.fullmatch(r"[A-Z][a-z]+", prefix):
+                kind = prefix                  # a land type: Plainscycling
+            else:
+                raise SystemExit(f"tag_flying: cannot read {n!r}'s "
+                                 f"{prefix!r}cycling")
+            cycling[n] = (kind, cost)
+        if n not in cycling:
+            raise SystemExit(f"tag_flying: {n!r} has a cycling keyword and "
+                             f"no cycling cost this repo can read")
+
     # SPELL LIFE LOSS, 2026-10-22 (§0z151): an instant or sorcery whose own
     # text says "You lose N life." (Anguished Unmaking) -> N. The front face
     # only: a modal card cast as its back face is a land. Read by
@@ -995,6 +1039,19 @@ def main():
                      "CREATURE_SUBTYPES = {\n")
             for n in sorted(creature_subtypes):
                 fh.write(f"    {n!r}: {creature_subtypes[n]!r},\n")
+            fh.write("}\n")
+            fh.write("\n# LAND SUBTYPES: a land's subtypes from its type line. "
+                     "Read by\n# `engine.cycle_step` for landcycling "
+                     "(§0z226).\nLAND_SUBTYPES = {\n")
+            for n in sorted(land_subtypes):
+                fh.write(f"    {n!r}: {land_subtypes[n]!r},\n")
+            fh.write("}\n")
+            fh.write("\n# CYCLING (702.29): name -> (kind, cost). kind None "
+                     "draws a card; a land\n# subtype or 'basic land' "
+                     "searches for one (702.29e). Read by\n# "
+                     "`engine.cycle_step` (§0z226).\nCYCLING = {\n")
+            for n in sorted(cycling):
+                fh.write(f"    {n!r}: {cycling[n]!r},\n")
             fh.write("}\n")
             fh.write("\n# EVERY CARD NAME THIS RUN SCANNED, deck members and "
                      "module-level candidates\n"
