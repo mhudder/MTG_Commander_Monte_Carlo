@@ -62,6 +62,8 @@ items below this section are in the order they were queued, not this one.
    all three ward cards. Any time; after step 3 each
    staged card rebuilds its own deck (§0z27).
 7. **Item 49: the small cleanups.**
+7b. **Item 50: a real mana model for the pod** -- written down 2026-11-17,
+   the owner's to schedule; item-44 scale.
 8. **When the owner picks them back up**: item 28 (paused), item 29's
    leftovers, item 32. Item 34's deletes are the owner's, on github.com.
    Items 18 and 5 wait on trostani (SUSPENDED).
@@ -295,3 +297,29 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       delete the dead branch or mark the knob in `docs/KNOBS.md`'s source.
     - Azusa's `counter_target` is unreached by its list: re-measure when
       Bristly Bill or Dancing from Dark to Dawn is proposed, not before.
+
+50. **A REAL MANA MODEL FOR THE POD (the owner, 2026-11-17; §0z224).** The
+    pod has no mana. An `Opponent` is a life total, a creature count and its
+    bodies, a kill route and counterspells left -- no lands, no pool, no
+    hand. Its removal is a per-turn probability (`BRACKETS` `spot`, 0.10 to
+    0.24) from its turn 3; its counterspells are scaled by `(pod turn - 2) /
+    4`, a ramp; and ward is paid when its turn covers the removal's cost plus
+    the ward (`opponents.ward_payable`, from the same one-land-a-turn
+    reading, §0z224). Each is an assumption about mana standing in for mana.
+    **What it would take**, each a judgement to say out loud:
+    - Lands per opponent per turn, pre-rolled at `make_pod` (CRN, §0z17):
+      a land drop most turns and ramp by bracket and archetype.
+    - Mana SPENT, each turn, on what the pod already does: its bodies (they
+      carry a mana value), its route pieces, its removal and wipes (costs
+      from the census, `_removal`), and mana HELD open for instants -- the
+      counterspells and A6's held answers would then read held mana, not a
+      ramp or a roll.
+    - Then ward, counterspells, held answers and removal itself gate on real
+      spare mana: a pod that tapped out to develop cannot answer, and one
+      that held up mana developed less.
+    - **The cost**: the removal and counter rates are calibrated with no
+      mana limit, so gating them by mana changes how much interaction the
+      pod casts. The pod must be re-fitted (§0z195) and every table rebuilt
+      -- item 44's scale. Build it the item-44 way: every rule behind a
+      switch, OFF until measured, flipped together, one re-fit, one rebuild.
+    Not started. The owner's to schedule.

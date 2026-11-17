@@ -2,7 +2,7 @@
 """§0z224: ward against the pod's spot removal (`ward_text`).
 
     python -m tests.test_ward
-    python -m tests.test_ward --mutate   # 2 mutations, exact sets
+    python -m tests.test_ward --mutate   # 3 mutations, exact sets
 
 Each case fires opponent 0's spot removal at you (its row forced, A6's
 holding off) at a battlefield set by hand: Tivit, Seller of Secrets (ward
@@ -22,13 +22,23 @@ CASES
   F  NEIGHBOUR: `ward_text` False, share 0: Tivit dies, the old rule
   G  Squelcher's GRANT: another creature of yours, the top threat, has
      "Ward--Pay 2 life": the opponent pays 2 (38) and it dies
+  H  THE DEFAULT RULE, the pod's mana by its turn: pod turn 5, the removal
+     costs `SPOT_SPELL_MV` (3) and the ward 3 more -- unpaid, re-aimed: the
+     lesser dies, Tivit lives
+  I  pod turn 6: 3 + 3 is affordable, the ward is paid, Tivit dies
+  (A-C pin the first build's roll, `ward_pay_rule` "share".)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  ward_text=False                              -> B, C, D, E, G
-  (G added with the grant, before its run.)
-  an unpaid ward counters instead of re-aiming -> B, E
+  ward_text=False                              -> B, C, D, E, G, H
+  (G added with the grant, before its run. H CORRECTED AFTER ITS RUN, said
+  so: left out of this set by mistake -- with no ward Tivit dies at turn 5.)
+  an unpaid ward counters instead of re-aiming -> B, E, H
+  the removal spell costs nothing               -> H
+  (H, I and the last mutation added with the mana rule, 2026-11-17, before
+  their run; B, E's set gains H for the same reason.)
 
-UNMUTATED (§0z15): A and F are Tivit dying under both rules.
+UNMUTATED (§0z15): A and F are Tivit dying under both rules; I is the
+ward paid, which no mutation stops.
 """
 import sys
 
@@ -36,6 +46,7 @@ import edhmc.engine as EN
 import edhmc.lorehold as LH
 import edhmc.opponents as OPP
 import edhmc.tivit as TV
+from edhmc.decks import _removal as _REM
 from edhmc.decks import lorehold_v17 as LM
 from edhmc.decks import tivit_v1 as TM
 from edhmc.experiment import DEFAULT_CFG
@@ -70,10 +81,14 @@ def prep(g):
 
 
 def tivit(share, **cfg):
+    """`share` set: the first build's roll (`ward_pay_rule` "share"), which
+    A-C pin; `share` None: the default, the pod's mana by its turn (H, I)."""
     deck, cmd = TM.build()
+    rule = ({} if share is None
+            else dict(ward_pay_rule="share", ward_pay_share=share))
     g = TV.TivitGame(list(deck), cmd,
                      dict(DEFAULT_CFG, held_answers=False,
-                          ward_pay_share=share, **{**EXTRA_CFG, **cfg}), 1)
+                          **{**rule, **EXTRA_CFG, **cfg}), 1)
     opp, rolls = prep(g)
     t = EN.Permanent(card=cmd, sick=False)
     g.board.append(t)
@@ -138,6 +153,16 @@ def run_cases():
     check("G Squelcher's grant: 2 life paid for Big, which dies",
           (opp.life, big in g.board, q in g.board), (38.0, False, True))
 
+    for turn, want in ((5, (True, False)), (6, (False, True))):
+        g, opp, rolls, t = tivit(None)
+        g.turn = turn
+        low = lesser(g)
+        fire(g, opp, rolls)
+        check(("H pod turn 5, a 3-mana removal and ward {3} (6 > 5): "
+               "re-aimed" if turn == 5 else
+               "I pod turn 6 (3 + 3): the ward is paid, Tivit dies"),
+              (t in g.board, low in g.board), want)
+
     g, opp, rolls, t = tivit(0.0, ward_text=False)
     fire(g, opp, rolls)
     check("F NEIGHBOUR: ward_text False: Tivit dies", t in g.board, False)
@@ -160,10 +185,13 @@ def main() -> int:
         return None if got is not victim else got
 
     muts = {
-        "ward_text=False": ({"B", "C", "D", "E", "G"}, {"ward_text": False},
+        "ward_text=False": ({"B", "C", "D", "E", "G", "H"},
+                            {"ward_text": False},
                             []),
-        "an unpaid ward counters instead of re-aiming": ({"B", "E"}, {}, [
+        "an unpaid ward counters instead of re-aiming": ({"B", "E", "H"}, {}, [
             (OPP, "ward_choice", counter_not_reaim)]),
+        "the removal spell costs nothing": ({"H"}, {}, [
+            (_REM, "SPOT_SPELL_MV", 0.0)]),
     }
     bad = 0
     for label, (want, cfg, patches) in muts.items():

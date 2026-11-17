@@ -657,6 +657,12 @@
         "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
         "fingerprint": "924be315202b4417",
         "utc": "2026-11-16T23:23:28Z"
+      },
+      {
+        "commit": "c23a0bb",
+        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "d3842d38db88b658",
+        "utc": "2026-11-17T01:47:26Z"
       }
     ]
   },
@@ -1224,6 +1230,12 @@
         "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
         "fingerprint": "d1d4fbc315af04a3",
         "utc": "2026-11-16T23:23:28Z"
+      },
+      {
+        "commit": "c23a0bb",
+        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "f38fff87f88852d2",
+        "utc": "2026-11-17T01:47:26Z"
       }
     ]
   },
@@ -1820,7 +1832,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "c23a0bb",
+        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "b582e61615ac9c6a",
+        "utc": "2026-11-17T01:47:26Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "38fc171fbb2fcb01",
@@ -2976,6 +2995,12 @@
         "evidence": "\u00a70z224 ward (ward_text on, the default): check_unchanged_decks --n=2000 against a worktree at 0444688 -- BIT-IDENTICAL on all 8 metrics (no ward card in this deck).",
         "fingerprint": "2a92b7d8bcef6c0d",
         "utc": "2026-11-16T23:23:28Z"
+      },
+      {
+        "commit": "c23a0bb",
+        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+        "fingerprint": "b6cea6039edeaf82",
+        "utc": "2026-11-17T01:47:26Z"
       }
     ]
   },

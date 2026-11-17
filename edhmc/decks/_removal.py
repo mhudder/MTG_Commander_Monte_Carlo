@@ -12,6 +12,11 @@ DESTROY_SHARE_SPOT = 0.4600
 DESTROY_SHARE_WIPE = 0.5714
 DESTROY_SHARE_AE = 0.4600
 
+# the median mana value of the spot-removal SPELLS (instants and sorceries), 35 counted
+# once per deck that runs one: what the pod's spot removal costs, read by
+# `opponents.ward_choice` (§0z224)
+SPOT_SPELL_MV = 3.0
+
 # name -> (kind, class, the clause that decided it)
 INTERACTION = {
     'Acidic Slime': ('spot', 'destroy', ')\nwhen this creature enters, destroy target artifact, enchantment, or land.'),

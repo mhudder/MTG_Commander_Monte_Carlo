@@ -1504,13 +1504,33 @@ def ward_of(g, perm):
     return None
 
 
+def ward_payable(g, n) -> bool:
+    """Can the pod pay a MANA ward of `n` on top of its removal spell?
+
+    "mana" (the default, the owner, 2026-11-17, §0z224): the pod has no mana
+    model, so its mana is read the way the counterspell ramp reads it -- an
+    opponent on pod turn t has t mana, one land a turn -- and its removal
+    spell costs `_removal.SPOT_SPELL_MV` (3.0, generated: the median mana value
+    of the spot-removal spells in the six lists). It pays when t >= cost + n:
+    Tivit's ward {3} from the pod's turn 6, Roaming Throne's {2} from turn 5.
+    Deterministic; no roll. The same mana assumption the pod already makes,
+    not a second number -- and still an assumption: the pod's real mana is
+    queue item 50.
+    "share": the first build's rule, a roll against `ward_pay_share` (0.5)."""
+    if g.cfg.get("ward_pay_rule", "mana") == "share":
+        from edhmc.engine import crn_random
+        return crn_random(g, "ward_pay") < g.cfg.get("ward_pay_share", 0.5)
+    from edhmc.decks._removal import SPOT_SPELL_MV
+    return pod_turn(g) >= SPOT_SPELL_MV + n
+
+
 def ward_choice(g, opp, victim, targets):
     """WARD (702.21a: "Whenever this permanent becomes the target of a spell
     or ability an opponent controls, counter it unless that player pays
     [cost]"), for the pod's spot removal (§0z224; Tivit's ward {3}, Roaming
-    Throne's {2}, Hexing Squelcher's 2 life). The pod's mana is not modelled,
-    so whether it can pay a MANA ward is a roll: `ward_pay_share` (0.5) --
-    A JUDGEMENT, no data, said out loud. A pod that cannot pay does what a
+    Throne's {2}, Hexing Squelcher's 2 life). Whether the pod can pay a MANA
+    ward is `ward_payable` (its mana by its turn, §0z224). A pod that cannot
+    pay does what a
     player does before casting: aims at your best target WITHOUT ward instead,
     and holds the removal if there is none. A LIFE ward is paid unless the
     life would kill the payer (then it re-aims), and the loss is an opponent
@@ -1525,11 +1545,9 @@ def ward_choice(g, opp, victim, targets):
             g.m["ward_life_paid"] += n
             lost_life(g, [(opp, n)])
             return victim
-    else:
-        from edhmc.engine import crn_random
-        if crn_random(g, "ward_pay") < g.cfg.get("ward_pay_share", 0.5):
-            g.m["ward_paid"] += 1
-            return victim
+    elif ward_payable(g, w):
+        g.m["ward_paid"] += 1
+        return victim
     rest = [p for p in targets if p is not victim and ward_of(g, p) is None]
     g.m["ward_redirects"] += 1
     if not rest:

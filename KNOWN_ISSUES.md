@@ -276,7 +276,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z221](#0z221) | BUILT | **Item 45: A3, A6, A5** -- the clock is 56-84% of losses and ignores your life; the owner, 2026-11-16: route-aware kills, held answers, walkers attacked. built, measured, flipped in §0z222 |
 | [0z222](#0z222) | FLIPPED | **Item 45 is the default** (A3, A5, A6 reworked), and the pod re-fitted: `incidental_rate` 1.45 -> 1.94; rebuilt in §0z223 |
 | [0z223](#0z223) | REBUILT | **Item 45's rebuild**: six tables on the §0z222 pod, every cache CURRENT; no significant row changed sign; lifegain and lifelink rows up, as A3 predicts |
-| [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C, the owner, 2026-11-16): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; tivit +0.0052 / +0.0104 at `ward_pay_share` 0.5 |
+| [0z224](#0z224) | FIXED | **Ward against the pod's removal** (§0z197 C): Tivit's ward {3}, Roaming Throne's {2}, Hexing Squelcher's 2 life and its grant; paid when the pod's turn covers the removal (3) plus the ward -- tivit +0.0051 / +0.0051 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -19734,6 +19734,45 @@ tivit's Ghostly Prison under 3.13.16; every active cache CURRENT. Baselines
 the wider of its two bars.** Lorehold's four staged swaps re-measured with
 ward: all significant at both horizons, within 0.0002 of item 45's numbers
 (`results/restage_ward_20261116.txt`, each Change's `reverified`).
+
+### The pod's mana by its turn, not a share (the owner, 2026-11-17)
+
+**Asked**: "can the model not accurately determine if the opponent has
+enough spare mana ... Is ward_pay_share necessary, or is that a diagnostic
+tool?" It cannot: an `Opponent` has no lands, no pool and no hand, so the
+share stood in for state the model lacks -- and decided tivit's number
+(+0.0052 to +0.0169 across 0.75 to 0.25). **The owner: "do option 1, and
+write down option 2 in the queue"** (option 2 is queue item 50, a real mana
+model for the pod).
+
+**Option 1, `opponents.ward_payable`** (`ward_pay_rule` "mana", the default;
+"share" is the first build): the pod's mana read the way its counterspell
+ramp already reads it -- an opponent on pod turn t has t mana -- and its
+removal spell costs `_removal.SPOT_SPELL_MV`, **3.0, generated** by
+`tools.removal_census --write`: the median mana value of the spot-removal
+SPELLS (instants and sorceries) in the six lists, 35 counted once per deck
+that runs one (Swords and Path at 1, Beast Within and Chaos Warp at 3, Utter
+End at 4). A mana ward N is paid when t >= 3 + N: Tivit's {3} from the
+pod's turn 6, Roaming Throne's {2} from turn 5. Deterministic, no roll, and
+no number the pod did not already assume. `tests/test_ward.py` H and I pin
+it (nine cases, three mutations exact; one expectation corrected after the
+run, said so in the file).
+
+ON against OFF under the new rule, N=15,000 paired (python 3.11.18 -- the
+container's interpreter moved a patch level since the first measurement;
+identity 0):
+
+| deck | T10 | T20 | a game |
+|---|---|---|---|
+| tivit | **+0.0051 ±0.0020** | **+0.0051 ±0.0021** | paid 0.36, re-aimed 0.08 |
+| rendmaw | -0.0001 ±0.0003 | +0.0004 ±0.0007 | paid 0.02, re-aimed 0.01 |
+
+**Half the first build's T20 number**: most of the pod's removal lands after
+its turn 6, when 3 + 3 is affordable, so the ward is usually paid -- the
+share of 0.5 was too low for a late game. The ward's value is now early:
+it keeps Tivit alive through the turns it is cast and starts working. With
+the rule, only tivit and rendmaw move (2,000 seeds against `c23a0bb`);
+lorehold (a life ward), karlov, shilgengar and azusa are BIT-IDENTICAL.
 
 ## How to read an ablation table
 
