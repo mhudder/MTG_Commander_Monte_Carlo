@@ -411,6 +411,10 @@ POD_DEFAULTS = {
     # (§0z237): what it spends on its own turn, charged, not gated. Nothing
     # reads either in a game yet, so on or off every game plays the same.
     "pod_mana": False,
+    # Step 3 (§0z238): Ghostly Prison and Propaganda paid from that mana, by
+    # the owner's rule (an attacker is paid for when the damage it gets
+    # through is worth the mana; a lethal attack always, if it can).
+    "pod_tax_mana": False,
 }
 
 
@@ -3840,6 +3844,10 @@ def seat_attack(g, i) -> None:
     g.m["chip_formula_equiv"] += chip_amount(g, opp, share)
     rivals = rival_combat_on(g) and bool(others) and share < 1.0
     sent, at_rival = [], {}
+    tax = tax_per_attacker(g)
+    if tax > 0:
+        g.m["tax_on_attack"] += 1                         # §0z238's reach
+    by_mana = tax > 0 and tax_mana_on(g)
     for k in combat:
         r_attack = crn_random(g, f"pod_attack{i}")
         r_aim = crn_random(g, f"pod_aim{i}")
@@ -3851,11 +3859,12 @@ def seat_attack(g, i) -> None:
                 o = rival_target(g, others, (r_aim - share) / (1.0 - share))
                 at_rival.setdefault(id(o), (o, []))[1].append(k)
             continue
-        if r_tax >= through:
+        if not by_mana and r_tax >= through:
             g.m["pod_attackers_taxed"] += 1
             continue
         sent.append(k)
-    g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
+    if not by_mana:
+        g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
     if pod_hold_back_on(g) and (sent or at_rival):        # §0z202
         everyone = sent + [k for _o, ks in at_rival.values() for k in ks]
         home = pod_hold_back(g, opp, bodies, everyone)
@@ -3863,6 +3872,14 @@ def seat_attack(g, i) -> None:
             sent = [k for k in sent if k not in home]
             for key, (o, ks) in list(at_rival.items()):
                 at_rival[key] = (o, [k for k in ks if k not in home])
+    if by_mana and sent:                                  # §0z238, 508.1h-j
+        atks = _body_facts(bodies, sent)
+        values = attack_values(g, atks)
+        paid = set(taxed_attack(g, values, opp.mana_left, tax, atks))
+        g.m["pod_attackers_taxed"] += len(sent) - len(paid)
+        pod_spend(g, opp, tax * len(paid), "tax")
+        sent = [k for k in sent if k in paid]
+        g.m["pod_attack_offered"] += sum(bodies[k].power for k in sent)
     dead = set()                       # the attacker's bodies that die
     if sent:
         _attack_you(g, opp, bodies, sent, dead)
@@ -5556,9 +5573,18 @@ def predicted_from_bodies(g, rounds: int = 1) -> float:
         bodies = pod_bodies(g, opp)
         combat = combat_bodies(bodies)
         p = pod_attack_rate(g, opp, sum(bodies[k].power for k in combat))
-        p *= share * through
+        tax = tax_per_attacker(g) if tax_mana_on(g) else 0.0
+        p *= share * (1.0 if tax > 0 else through)
         est = 0.0
-        for k in combat:
+        if tax > 0:                                         # §0z238
+            # the pod's own rule, read against its mana on its next turn
+            row = pod_mana_row(g, opp)
+            atks = _body_facts(bodies, combat)
+            values = attack_values(g, atks)
+            paid = taxed_attack(g, values, row.spare if row else 0.0, tax,
+                                atks)
+            est = sum(p * values[k] for k in paid)
+        for k in ([] if tax > 0 else combat):
             atk = _body_facts(bodies, [k])
             asg = plan_blocks(g, g.your_life, atk, blockers, len(blockers),
                               floor=floor)
@@ -5672,8 +5698,159 @@ def attack_tax_through(g) -> float:
     tax = sum(_evasion.ATTACK_TAX.get(p.card.name, 0) for p in g.board)
     if not tax:
         return 1.0
+    note_tax_read(g)
     d = g.cfg.get("attack_tax_deflect", 0.5)
     return (1.0 - d) ** (tax / 2.0)
+
+
+# THE TAXES PAID FROM THE POD'S MANA (queue item 50, step 3, §0z238;
+# `pod_tax_mana`, with `pod_mana`). The owner, 2026-11-20: "Propaganda and
+# Ghostly Prison should be weighed against damage to be dealt (1 damage is
+# not worth the mana, 20 trample damage is, for example)." The cost is
+# paid as attackers are declared and locked in, no partial payment
+# (508.1h-j), from what main phase 1 left (`mana_left`). Each attacker aimed
+# at you is VALUED at the damage it would get through attacking alone
+# against your blocks as they stand (`plan_blocks`, as your pilot reads the
+# pod, §0z203) -- its power unblocked, a trampler's excess over its
+# blockers' toughness (702.19b), else 0. The pod pays:
+#   for the FEWEST strongest attackers whose damage covers your life, when
+#     it can afford them -- a lethal attack is always worth the mana;
+#   else for each attacker, strongest first, worth at least
+#     `tax_damage_per_mana` (1.0, A JUDGEMENT, no data: {2} buys 2 damage)
+#     times its tax, while its mana lasts.
+# An attacker not paid for does not attack you. A COMBAT kill is lethal by
+# construction: it pays for the lethal subset of its force or, if it
+# cannot, goes to another opponent ("deflect is fine", the owner) -- with
+# nobody else left, it pays what it can, as before.
+TAX_NEEDS_MANA = True     # an attacker is paid for only from mana_left
+TAX_KILL_DEFLECTS = True  # a kill that cannot pay goes to another opponent
+LETHAL_JOINT = True       # lethal is judged against your blocks of the GROUP
+
+
+def note_tax_read(g) -> None:
+    """A tax on your battlefield was READ, under either rule: the reach of
+    `pod_tax_mana` (§0z238). Kept on the game, not in `g.m`, because the
+    pilot's predictions read the tax inside calls that put `g.m` back
+    (`hold_back`, `predicted_chip`); `engine.finish` reports it."""
+    g.tax_reads = getattr(g, "tax_reads", 0) + 1
+
+
+def tax_per_attacker(g) -> float:
+    """The mana each creature attacking you costs its controller: {2} for
+    each Ghostly Prison and Propaganda on your battlefield."""
+    tax = float(sum(_evasion.ATTACK_TAX.get(p.card.name, 0) for p in g.board))
+    if tax:
+        note_tax_read(g)
+    return tax
+
+
+def tax_mana_on(g) -> bool:
+    return (bool(pod_knob(g.cfg, "pod_tax_mana")) and pod_mana_on(g)
+            and pod_threats_on(g))
+
+
+def _through(atk, blks, g) -> float:
+    """What attacker `atk` gets through `blks` (702.19b for trample)."""
+    if not blks:
+        return float(atk.power)
+    if atk.trample:
+        return max(0.0, float(atk.power)
+                   - sum(float(g.toughness_of(b.ref)) for b in blks))
+    return 0.0
+
+
+def attack_values(g, atks) -> dict:
+    """k -> the damage `_Atk` k would get through attacking you ALONE
+    against your blocks as they stand. Asks `plan_blocks` without counting,
+    so asking changes nothing."""
+    blockers = your_blockers(g)
+    floor = g.cfg.get("your_chump_floor", 10)
+    out = {}
+    for a in atks:
+        asg = plan_blocks(g, g.your_life, [a], blockers, len(blockers),
+                          floor=floor)
+        out[a.k] = _through(a, asg.get(a.k), g)
+    return out
+
+
+def lethal_subset(g, values: dict, atks=None):
+    """The fewest strongest attackers whose attack TOGETHER covers your
+    life, or None when even all of them do not. With `atks` (the `_Atk`s
+    the values are for), each prefix -- strongest alone first, then by power
+    -- is planned against your blocks as a GROUP (`plan_blocks`), which is
+    how the attack resolves: an attacker you would block alone gets through
+    once your blockers are used up, and two you would not block alone may
+    not both get through. Without `atks` there is nothing to block and the
+    values add. CORRECTED AFTER THE FIRST MEASUREMENT (§0z238): summing the
+    alone values made a "lethal" kill of 2.3 attackers that killed you in
+    10 of 41 games."""
+    if atks is None or not LETHAL_JOINT:
+        acc, out = 0.0, []
+        for k in sorted(values, key=lambda k: (-values[k], k)):
+            if values[k] <= 0:
+                break
+            out.append(k)
+            acc += values[k]
+            if acc >= g.your_life - 1e-9:
+                return out
+        return None
+    by_k = {a.k: a for a in atks}
+    blockers = your_blockers(g)
+    floor = g.cfg.get("your_chump_floor", 10)
+    group = []
+    for k in sorted(values, key=lambda k: (-values[k], -by_k[k].power, k)):
+        group.append(k)
+        grp = [by_k[j] for j in group]
+        asg = plan_blocks(g, g.your_life, grp, blockers, len(blockers),
+                          floor=floor)
+        if sum(_through(a, asg.get(a.k), g) for a in grp) \
+                >= g.your_life - 1e-9:
+            return group
+    return None
+
+
+def taxed_attack(g, values: dict, mana: float, tax: float,
+                 atks=None) -> list:
+    """The attackers the pod pays `tax` each for, from `mana` (the owner's
+    rule, above). `atks` lets the lethal test plan your blocks of the group
+    (`lethal_subset`)."""
+    afford = (int((mana + 1e-9) // tax) if tax > 0 and TAX_NEEDS_MANA
+              else len(values))
+    lethal = lethal_subset(g, values, atks)
+    if lethal is not None and len(lethal) <= afford:
+        return lethal
+    bar = g.cfg.get("tax_damage_per_mana", 1.0) * tax
+    order = sorted(values, key=lambda k: (-values[k], k))
+    return [k for k in order if values[k] > 0
+            and values[k] >= bar - 1e-9][:afford]
+
+
+def tax_kill(g, opp, others):
+    """A COMBAT kill aimed at you under a tax (`tax_mana_on`): (deflected,
+    the force it attacks with or None for its whole force)."""
+    size = float(g.cfg.get("kill_size", 40))
+    force = kill_force(g, opp, size)
+    tax = tax_per_attacker(g)
+    if not force or tax <= 0:
+        return False, None
+    atks = [_Atk(k, ("kill", k), b.power, b.toughness, False, False, False,
+                 False, False, False, False, float(b.mv), False)
+            for k, b in enumerate(force)]
+    values = attack_values(g, atks)
+    pick = lethal_subset(g, values, atks)
+    if pick is None:                       # not lethal even whole: all of it
+        pick = sorted(values, key=lambda k: (-values[k], -force[k].power, k))
+    cost = tax * len(pick)
+    others = others if TAX_KILL_DEFLECTS else []
+    if others and cost > opp.mana_left + 1e-9 and TAX_NEEDS_MANA:
+        g.m["attack_tax_deflected"] += 1
+        return True, None
+    if not others and TAX_NEEDS_MANA:      # nobody else: it pays what it can
+        pick = pick[:int((opp.mana_left + 1e-9) // tax)]
+        cost = tax * len(pick)
+    pod_spend(g, opp, cost, "tax")
+    g.m["tax_kills_paid"] += 1
+    return False, [force[k] for k in sorted(pick)]
 
 
 def tax_deflects(g, i, opp, others) -> bool:
@@ -5735,7 +5912,7 @@ def kill_force(g, opp, size) -> list:
     return out
 
 
-def route_kill(g, opp) -> bool:
+def route_kill(g, opp, force=None) -> bool:
     """A3, ROUTE-AWARE KILLS (the owner, 2026-11-16, §0z221;
     `route_kills`, False is the old rule exactly). An opponent's clock that
     picks you resolves by its ROUTE (§0z140) instead of ending the game:
@@ -5759,7 +5936,8 @@ def route_kill(g, opp) -> bool:
         g.your_life -= size
         g.m["kill_life_lost"] += size
     else:
-        force = kill_force(g, opp, size)
+        if force is None:                    # §0z238: a taxed kill's subset
+            force = kill_force(g, opp, size)
         atk = [_Atk(k, ("kill", k), b.power, b.toughness, False, False, False,
                     False, False, False, False, float(b.mv), False)
                for k, b in enumerate(force)]
@@ -5838,11 +6016,18 @@ def _clock_seat(g, i, rolls_t) -> bool:
     opp.clock_fired = True      # a clock resolves once, not every turn
     others = [o for j, o in enumerate(g.opponents) if j != i and o.alive]
     share = your_share(g, opp, others)
-    at_you = (rolls_t[i][6] < share
-              and not tax_deflects(g, i, opp, others))      # §0z138
+    force = None
+    if (rolls_t[i][6] < share and tax_mana_on(g)
+            and getattr(opp, "route", None) == "combat"
+            and tax_per_attacker(g) > 0):                    # §0z238
+        deflected, force = tax_kill(g, opp, others)
+        at_you = not deflected
+    else:
+        at_you = (rolls_t[i][6] < share
+                  and not tax_deflects(g, i, opp, others))  # §0z138
     if (at_you and pod_knob(g.cfg, "route_kills") and pod_threats_on(g)
             and getattr(opp, "route", None) in ("drain", "combat")):
-        return route_kill(g, opp)  # §0z221, A3: life and blockers defend
+        return route_kill(g, opp, force)  # §0z221, A3: life and blockers
     if at_you and angel_prevents_kill(g, opp):
         return False               # §0z135: damage, prevented and milled
     if at_you:

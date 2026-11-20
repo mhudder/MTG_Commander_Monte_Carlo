@@ -1590,6 +1590,8 @@ def finish(g) -> "Metrics":
                                    if OPP.is_creature_now(g, p))
     out["test_card_resolved"] = 1 if (out["cast_test_card"] and
                                       not out["test_card_answered"]) else 0
+    if getattr(g, "tax_reads", 0):         # §0z238: kept off g.m, see there
+        out["tax_reads"] = g.tax_reads
     return out
 
 

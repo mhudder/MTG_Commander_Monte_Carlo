@@ -347,7 +347,9 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     pod's library, mostly bodies on turns 1-4. Next: the first gate that
     reads `mana_left`: **the attack taxes first (the owner, 2026-11-20)**,
     a kill that cannot pay for its lethal attackers deflected ("deflect is
-    fine"); then the answers held for your turn (ward, counterspells, A6).
+    fine") -- **BUILT (§0z238)**, `pod_tax_mana` off; tivit a null at bar
+    1.0, the bar deciding the sign. Next: the answers held for your turn
+    (ward, counterspells, A6) read the mana the pod left untapped.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:

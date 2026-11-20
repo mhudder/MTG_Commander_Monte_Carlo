@@ -290,6 +290,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z235](#0z235) | BUILT | **Item 50's census: the pod's library and its answers' costs**, generated from the lists; 35 lands, 4 rocks, 1 land ramp; read by nothing yet |
 | [0z236](#0z236) | BUILT | **Item 50 step 1: the pod's library and land drops** (`pod_mana`, off); behind `t` mana from pod turn 5, 7.05 not 10 by turn 10; read by nothing yet |
 | [0z237](#0z237) | BUILT | **Item 50 step 2: what the pod spends on its own turn**, charged not gated; ~61 mana a game, ~11 overspent, most of it bodies on turns 1-4; read by nothing yet |
+| [0z238](#0z238) | BUILT | **Item 50 step 3: Ghostly Prison and Propaganda paid from the pod's mana**, the owner's rule; tivit a null at bar 1.0 (-0.0015), the bar decides the sign |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20516,6 +20517,79 @@ with `pod_mana` off AND on; every cache VERIFIED. `tools.validate`: `+0.00`
 on all 21 metrics, the game RNG sealed on every engine. `tests/test_pod_spending.py`, nine cases, four mutations
 exact on the first run, each a real seam (`charge_at_rival`, `charge_ward`,
 `POD_SPEND_CLAMP`, `ARRIVALS_BY_IDENTITY`).
+
+<a id="0z238"></a>
+
+## 0z238. BUILT -- Item 50, step 3: the attack taxes paid from the pod's mana
+
+**The owner, 2026-11-20: "do the attack taxes first", and on a kill that
+cannot pay, "deflect is fine".** Behind `pod_tax_mana` (False), live only
+with `pod_mana` and `pod_threats`. The rule is decision 6 of §0z234:
+"Propaganda and Ghostly Prison should be weighed against damage to be dealt
+(1 damage is not worth the mana, 20 trample damage is)."
+
+**The rule** (`opponents.taxed_attack`, `tax_kill`, read in `seat_attack`,
+`_clock_seat` and `predicted_from_bodies`). The cost -- {2} per attacker for
+each Ghostly Prison and Propaganda -- is paid as attackers are declared and
+locked in, no partial payment (508.1h-j), from what main phase 1 left
+(`mana_left`, §0z237). Each attacker aimed at you is valued at the damage it
+would get through attacking ALONE against your blocks (`attack_values`,
+`plan_blocks`): its power, a trampler's excess over its blockers' toughness
+(702.19b), else 0. The pod pays for the fewest strongest attackers whose
+attack TOGETHER is lethal, when it can afford them; else, strongest first,
+for each worth at least `tax_damage_per_mana` (1.0, A JUDGEMENT: {2} buys 2
+damage) times its tax, while its mana lasts. An attacker not paid for does
+not attack you. A COMBAT kill aimed at you pays for the lethal subset of its
+force and attacks with it, or -- if it cannot afford it -- goes to another
+opponent; with nobody else left it pays what it can. Your pilot's
+prediction (`predicted_from_bodies`) reads the same rule against the
+opponent's NEXT row's spare. Off the bodies model (`_formula_chip`) the old
+share stays, said out loud.
+
+**The first build was wrong, and the measurement said so.** Its lethal test
+summed each attacker's damage ALONE. At bar 1.0 tivit won MORE (+0.0053
++-0.0031 at T20) although the pod hit harder (+0.76 damage a game) -- a
+counter against the grain (§0z172). The kill's counters said why: a taxed
+kill paid for 2.3 attackers and killed you in 10 of 41 games, because two
+attackers each unblocked alone are not both unblocked together -- and
+where every attacker is blocked alone, it paid for none and swung with no
+force at all. **`lethal_subset` now plans your blocks of the GROUP**, adding
+the strongest attackers one at a time (`LETHAL_JOINT`): a paid kill killed
+you in 36 of 60 games after, the rest surviving on what the pod's plan
+cannot see (prevention, life gained before the attack). Test H4 and its
+mutation pin it.
+
+**Measured**, tivit (the only list with a tax), N=15,000 paired, seeds
+5000.., both legs `pod_mana` on, A `pod_tax_mana` on, identity 0 in every
+run (`results/knob_ab_tivit_pod_tax_mana_bar*.txt`):
+
+| `tax_damage_per_mana` | T10 | T20 | tax paid | attackers taxed (old 1.16) | pod damage at you (old 25.47) |
+|---|---|---|---|---|---|
+| 0.5 | -0.0011 +-0.0017 | **-0.0041 +-0.0030** | 2.29 | 0.94 | 26.36 |
+| **1.0** | -0.0004 +-0.0016 | -0.0015 +-0.0030 | 1.96 | 1.13 | 26.23 |
+| 2.0 | +0.0006 +-0.0015 | **+0.0093 +-0.0029** | 1.27 | 1.58 | 25.49 |
+
+**At the owner's bar, a null for tivit**: the pod pays about 2 mana a game,
+for the attackers worth it rather than a coin's worth of each, and hits
+about 0.8 harder; taxed kills go elsewhere a little more often (0.018 a game
+against 0.012) and, when paid, attack with the lethal few instead of the
+whole 40-power force. **The knob, said out loud: `tax_damage_per_mana`
+decides the sign** -- a stingier pod helps tivit, a freer one hurts. It is
+the owner's example made a number; nobody has data for it.
+
+**The reach** is `tax_reads`, every read of a tax under either rule, kept
+on the game and reported by `engine.finish`: the first reach
+(`tax_on_attack`, in `g.m`) missed 29 games, because the pilot's predictions
+read the tax inside calls that put `g.m` back (`hold_back`,
+`predicted_chip`). `tests/test_pod_tax.py`, ten cases, five mutations exact;
+H4, the `LETHAL_JOINT` mutation and H3 in "the mana ignored" were added with
+the group rule, said so in the file, before the re-run.
+
+**Whole game** (`check_unchanged_decks --n=2000` against `e282061`): both
+switches off, every deck BIT-IDENTICAL (caches VERIFIED); with `pod_mana`
+and `pod_tax_mana` on against `pod_mana` alone, only tivit moves (won
+-0.0020, two games in 2,000 -- the null above) and the five lists without a
+tax are BIT-IDENTICAL. `tools.validate`: `+0.00` on all 21 metrics.
 
 ## How to read an ablation table
 
