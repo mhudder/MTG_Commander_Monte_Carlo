@@ -701,6 +701,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "789b55861b04d191",
         "utc": "2026-11-20T22:03:08Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "18b304efc69e53b9",
+        "utc": "2026-11-20T22:52:50Z"
       }
     ]
   },
@@ -1313,6 +1319,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "b07a719c9dddafaa",
         "utc": "2026-11-20T22:03:08Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "62646a8d86df9363",
+        "utc": "2026-11-20T22:52:50Z"
       }
     ]
   },
@@ -1951,6 +1963,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "73e122d4268ff983",
         "utc": "2026-11-20T22:03:08Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "9dfa6b07aed90d14",
+        "utc": "2026-11-20T22:52:49Z"
       }
     ]
   },
@@ -2554,6 +2572,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "cf026d433999e4a8",
         "utc": "2026-11-20T22:03:07Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "1ef0ec57e3f1d2ac",
+        "utc": "2026-11-20T22:52:49Z"
       }
     ]
   },
@@ -3195,6 +3219,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "db94d7abf5cd4578",
         "utc": "2026-11-20T22:03:08Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "bb4066d0b9367486",
+        "utc": "2026-11-20T22:52:50Z"
       }
     ]
   },
@@ -3789,6 +3819,12 @@
         "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
         "fingerprint": "a45a5f8cc30de81e",
         "utc": "2026-11-20T22:03:08Z"
+      },
+      {
+        "commit": "486fb90",
+        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "9b4d38604171d96c",
+        "utc": "2026-11-20T22:52:50Z"
       }
     ]
   },

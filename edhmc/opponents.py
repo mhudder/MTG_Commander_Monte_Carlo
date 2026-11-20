@@ -176,6 +176,9 @@ class Opponent:
     # ITEM 50 (§0z236, `pod_mana`): this opponent's mana on each of its
     # turns, `PodMana` rows pre-rolled from its own library (`roll_pod_mana`).
     mana_rows: tuple = ()
+    # ITEM 50, step 2 (§0z237): the mana this opponent has untapped now --
+    # its row's `spare` at its untap step, less what it has spent since.
+    mana_left: float = 0.0
 
     _pcache: object = None
 
@@ -404,8 +407,9 @@ POD_DEFAULTS = {
     "pod_attacks_walkers": True,
     "held_answers": True,
     # ITEM 50, THE POD'S MANA (§0z234), built OFF, one rule at a time. Step 1
-    # (§0z236): each opponent's library and land drops, pre-rolled. Nothing
-    # reads them in a game yet, so on or off every game plays the same.
+    # (§0z236): each opponent's library and land drops, pre-rolled. Step 2
+    # (§0z237): what it spends on its own turn, charged, not gated. Nothing
+    # reads either in a game yet, so on or off every game plays the same.
     "pod_mana": False,
 }
 
@@ -719,6 +723,102 @@ def pod_mana_row(g, o, t=None):
         return None
     t = pod_turn(g) if t is None else t
     return rows[max(0, min(t, len(rows) - 1))]
+
+
+# ---------------------------------------------------------------------------
+# THE POD'S MANA, STEP 2: WHAT IT SPENDS ON ITS OWN TURN (§0z237)
+# ---------------------------------------------------------------------------
+# The owner, 2026-11-20 (decisions 3 and 4, §0z234; and "agreed, start the
+# spending step"): development is CHARGED, NOT GATED, in the turn's order --
+# main 1 its route piece, then its removal (at you OR a rival: the pod casts
+# it either way); combat its attack taxes (a later step); main 2 its bodies,
+# each at the mana value of the body that arrives. What is left untapped at
+# its end step is what it holds for your turn (502.3). Charged, not gated:
+# when the calibrated pod develops past its mana, `mana_left` stops at 0 and
+# the deficit is counted (`pod_overspent`), which is how far the pod's
+# schedule outruns its library. NOTHING READS `mana_left` YET: the gates are
+# the next steps, so a game plays the same with this on or off.
+def pod_untap(g, i) -> None:
+    """Opponent `i`'s untap step (502.3): its mana is its row's `spare` --
+    what its lands and rocks make this turn, less its ramp (§0z236)."""
+    if not pod_mana_on(g):
+        return
+    o = g.opponents[i]
+    row = pod_mana_row(g, o)
+    o.mana_left = row.spare if row is not None else 0.0
+
+
+POD_SPEND_CLAMP = True        # a deficit stops at 0: charged, not gated
+ARRIVALS_BY_IDENTITY = True   # a body costs ITS mana value, not the mean
+
+
+def pod_spend(g, o, amount: float, what: str) -> None:
+    """Charge opponent `o` `amount` mana for `what` (§0z237). Never gates:
+    a deficit is counted and `mana_left` stops at 0."""
+    if o is None or amount <= 0 or not pod_mana_on(g):
+        return
+    g.m[f"pod_spent_{what}"] += amount
+    left = o.mana_left - amount
+    if left < -1e-9 and POD_SPEND_CLAMP:
+        g.m["pod_overspent"] += -left
+        g.m[f"pod_overspent_{what}"] += -left
+        g.m["pod_overspend_events"] += 1
+        left = 0.0
+    o.mana_left = left
+
+
+def charge_pieces(g, o) -> None:
+    """The route pieces `o` plays this turn -- those whose `piece_lands` is
+    the pod's turn now -- at their mana values, before you can answer them
+    (`respond_to_pieces`): a piece answered as it lands was still cast."""
+    if not pod_mana_on(g) or not o.pieces:
+        return
+    t = pod_turn(g)
+    for k, lands in enumerate(o.piece_lands):
+        if lands == t:
+            pod_spend(g, o, float(o.pieces[k].mv), "piece")
+
+
+def _arrival_mvs(g, o, before: float) -> list:
+    """The mana values of the bodies that arrive as `o`'s count grows from
+    `before`: the bodies `pod_bodies` would reconcile into positions
+    floor(before)..floor(now)-1, read WITHOUT reconciling (the pool is
+    rolled by index, so reading body k changes nothing). With no pool, the
+    pool's mean, (1 + mvmax) / 2."""
+    n0, n1 = int(before + 1e-9), int(o.creatures + 1e-9)
+    if n1 <= n0:
+        return []
+    pool = o.body_pool
+    if not pool or not ARRIVALS_BY_IDENTITY:
+        share = g.cfg.get("culling_pod_share", 0.5)
+        mvmax = max(1, int(round(2 / share))) if share > 0 else 1
+        return [(1 + mvmax) / 2.0] * (n1 - n0)
+    have = len(o.bodies)
+    out = []
+    for p in range(n0, n1):
+        body = (o.bodies[p] if p < have
+                else pool[(o.next_body + p - have) % len(pool)])
+        out.append(float(body.mv))
+    return out
+
+
+def charge_at_rival(g, o, cost: float, what: str) -> None:
+    """Removal `o` casts at a RIVAL: the pod pays for it whoever it hits
+    (the owner, 2026-11-20, §0z237)."""
+    pod_spend(g, o, cost, what)
+
+
+def charge_ward(g, o, n: float) -> None:
+    """A MANA ward paid on top of the spell (702.21a, 601.2h)."""
+    pod_spend(g, o, n, "ward")
+
+
+def charge_growth(g, o, before: float) -> None:
+    """Main phase 2: `o`'s new bodies, each at its own mana value."""
+    if not pod_mana_on(g):
+        return
+    for mv in _arrival_mvs(g, o, before):
+        pod_spend(g, o, mv, "body")
 
 
 def pod_threats_on(g) -> bool:
@@ -1646,6 +1746,7 @@ def spot_removal(g, opp, others, rolls):
     if rolls[0] >= opp.p["spot"]:
         return
     if rolls[3] >= your_share(g, opp, others):
+        charge_at_rival(g, opp, _removal.SPOT_SPELL_MV, "spot")   # §0z237
         return                            # aimed at a rival instead
     if pod_holds_answer(g, opp, rolls):   # A6, §0z221
         return
@@ -1714,6 +1815,7 @@ def ward_choice(g, opp, victim, targets):
             return victim
     elif ward_payable(g, w):
         g.m["ward_paid"] += 1
+        charge_ward(g, opp, float(w))                        # §0z237
         return victim
     rest = [p for p in targets if p is not victim and ward_of(g, p) is None]
     g.m["ward_redirects"] += 1
@@ -1745,6 +1847,7 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
     victim = ward_choice(g, opp, victim, targets)
     if victim is None:
         return
+    pod_spend(g, opp, _removal.SPOT_SPELL_MV, "spot")       # §0z237
     if mother_protects(g, victim):        # her {T}, §0z118
         return
     how = try_protect(g, rolls[5], "spot", victim)
@@ -1767,13 +1870,16 @@ def ae_removal(g, opp, others, rolls):
     """Naturalize / Vandalblast effects, plus the occasional sweeper."""
     if rolls[1] >= opp.p["ae"]:
         return
+    from edhmc.decks._pod_mana import AE_SPELL_MV
     if rolls[3] >= your_share(g, opp, others):
+        charge_at_rival(g, opp, AE_SPELL_MV, "ae")           # §0z237
         return
     targets = [p for p in g.board
                if ("Artifact" in p.card.types or "Enchantment" in p.card.types)
                and not p.card.is_land and not p.is_token]
     if not targets:
         return
+    pod_spend(g, opp, AE_SPELL_MV, "ae")                     # §0z237
     how = try_protect(g, rolls[5], "ae")
     if how in ("blank", "countered"):
         return
@@ -1797,6 +1903,8 @@ def board_wipe(g, opp, rolls):
     width_mult = 1.0 + min(0.75, max(0, n - 4) * 0.08)
     if rolls[2] >= opp.p["wipe"] * width_mult:
         return
+    from edhmc.decks._pod_mana import WIPE_SPELL_MV
+    pod_spend(g, opp, WIPE_SPELL_MV, "wipe")                 # §0z237
     how = try_protect(g, rolls[5], "wipe")
     if how == "countered":
         # A COUNTERED wrath never resolves (§0z134): unlike phasing out
@@ -2421,7 +2529,10 @@ def opponents_act(g):
     for i, opp in enumerate(g.opponents):
         if not old and not opp.alive:
             continue                      # an eliminated player has no turn
+        pod_untap(g, i)                   # §0z237
+        grown_from = opp.creatures
         grow_board(opp)
+        charge_growth(g, opp, grown_from)
         if pod_turn(g) < 3:
             if g.cfg.get("pod_end_steps_early", True):     # §0z185
                 pod_end_step_hook(g, i)
@@ -5092,6 +5203,7 @@ def _pod_seat_round(g, before_act=None) -> None:
             if not old and not opp.alive:
                 continue                  # an eliminated player has no turn
             g.pod_seat = i
+            pod_untap(g, i)                   # 502.3; §0z237
             # -- upkeep: the engine's own "at the beginning of each opponent's
             # upkeep" (optional; lorehold's windows, §0z179) ------------------
             upkeep = getattr(g, "pod_upkeep", None)
@@ -5101,8 +5213,11 @@ def _pod_seat_round(g, before_act=None) -> None:
                     break
             grow_first = g.cfg.get("pod_seat_grow", "main2") == "start"
             if grow_first:
+                grown_from = opp.creatures
                 grow_board(opp)               # before its kill and removal
+                charge_growth(g, opp, grown_from)
             # -- main phase 1 ---------------------------------------------------
+            charge_pieces(g, opp)             # §0z237: cast before answered
             respond_to_pieces(g, seat=i)
             if first or getattr(g, "pod_pieces_per_seat", False):
                 window = getattr(g, "pod_pieces_window", None)
@@ -5136,7 +5251,9 @@ def _pod_seat_round(g, before_act=None) -> None:
                 break
             # -- main phase 2, end step -----------------------------------------
             if not grow_first:
+                grown_from = opp.creatures
                 grow_board(opp)
+                charge_growth(g, opp, grown_from)
             # THE END STEP IS EVERY TURN'S (§0z184 finding 3, §0z185). It sat
             # under removal's pod-turn-3 gate, so the pod's first two rounds
             # had no end steps. `pod_end_steps_early=False` restores the gate.

@@ -289,6 +289,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z234](#0z234) | DECIDED | **Item 50 written down: a real mana model for the pod** -- the rules it rests on, the owner's six decisions, a land counted early on your turn; nothing built |
 | [0z235](#0z235) | BUILT | **Item 50's census: the pod's library and its answers' costs**, generated from the lists; 35 lands, 4 rocks, 1 land ramp; read by nothing yet |
 | [0z236](#0z236) | BUILT | **Item 50 step 1: the pod's library and land drops** (`pod_mana`, off); behind `t` mana from pod turn 5, 7.05 not 10 by turn 10; read by nothing yet |
+| [0z237](#0z237) | BUILT | **Item 50 step 2: what the pod spends on its own turn**, charged not gated; ~61 mana a game, ~11 overspent, most of it bodies on turns 1-4; read by nothing yet |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20467,6 +20468,54 @@ VERIFIED on that evidence.
 mutation corrected after its first run, said so**: a stand-in `land_drops`
 shifted every row a turn and broke D and E too; every mutation is a real
 seam now, the expected sets unchanged.
+
+<a id="0z237"></a>
+
+## 0z237. BUILT -- Item 50, step 2: what the pod spends on its own turn
+
+**The owner, 2026-11-20: "agreed, start the spending step"**, on three
+judgements put to them: removal aimed at a rival costs mana too; a creature
+is charged when the count crosses a whole body, at THAT body's mana value;
+a deficit stops at 0 and is counted. Behind `pod_mana` (False), with §0z236.
+
+**The rule** (`opponents.pod_untap`, `pod_spend` and its callers): at each
+opponent's untap step (502.3) its `mana_left` is its row's `spare` -- its
+lands and rocks this turn, less its ramp. Then, in its turn's order
+(decision 4, mapped onto `_pod_seat_round`): main 1, the route pieces whose
+`piece_lands` is this turn, at their mana values, charged before
+`respond_to_pieces` (a piece answered as it lands was still cast); its
+removal -- a wipe that fires (`WIPE_SPELL_MV`, 4.5), spot removal at you or
+a rival (`SPOT_SPELL_MV`, 3), A/E removal at you or a rival
+(`AE_SPELL_MV`, 3), a paid mana ward on top (702.21a, 601.2h); main 2, each
+new body at its own mana value, read from the pool WITHOUT reconciling it
+(`_arrival_mvs`: the pool is rolled by index, so reading body k changes
+nothing). Removal it cannot cast -- no target at you, a ward it cannot pay
+and nothing else to aim at -- costs nothing; a held answer (A6) costs
+nothing on its own turn, since that mana is held. **Charged, not gated**:
+`mana_left` never goes below 0; the deficit is `pod_overspent`, by kind.
+**Nothing reads `mana_left` yet.** The attack taxes are a later step.
+
+**What it shows** (tivit's staged list, 300 games, the whole pod, per game):
+
+| creatures | route pieces | spot | A/E | wipes | ward | overspent |
+|---|---|---|---|---|---|---|
+| 35.2 | 8.5 | 10.4 | 3.9 | 1.8 | 1.3 | 11.0, in 5.8 turns |
+
+Rendmaw's is the same within a mana, but for the ward (0.05: Roaming
+Throne's {2} against Tivit's {3}). **Three-quarters of the overspend is
+bodies, and most of it is early**: by pod turn, 0.7 / 1.8 / 2.5 / 1.3 mana
+of the 11 on turns 1-4, under 1 a turn after turn 6. The calibrated board
+grows 0.7 x `board` a turn from turn 1 whatever the pod's lands, so its
+first creatures arrive before the mana to cast them -- the cost of the
+"charged, not gated" decision, measured. Gating development (queue item 52)
+is what would remove it.
+
+**CRN.** No new roll; the pool is read, not advanced.
+`check_unchanged_decks --n=2000` against `486fb90`: every deck BIT-IDENTICAL
+with `pod_mana` off AND on; every cache VERIFIED. `tools.validate`: `+0.00`
+on all 21 metrics, the game RNG sealed on every engine. `tests/test_pod_spending.py`, nine cases, four mutations
+exact on the first run, each a real seam (`charge_at_rival`, `charge_ward`,
+`POD_SPEND_CLAMP`, `ARRIVALS_BY_IDENTITY`).
 
 ## How to read an ablation table
 

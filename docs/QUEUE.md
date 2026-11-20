@@ -342,8 +342,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     Refuse) is a cost to charge. **THE LIBRARY IS BUILT (§0z236,
     2026-11-20)**, `pod_mana` off: land drops pre-rolled per opponent from
     its own stream, the owner's mulligan rule, ramp first; read by nothing
-    yet, every deck bit-identical on and off. Next: the spending on the
-    pod's own turn (decision 4's order) and the first gate that reads it.
+    yet, every deck bit-identical on and off. **THE SPENDING IS BUILT
+    (§0z237)**, charged not gated: about 61 mana a game, 11 of it beyond the
+    pod's library, mostly bodies on turns 1-4. Next: the first gate that
+    reads `mana_left`: **the attack taxes first (the owner, 2026-11-20)**,
+    a kill that cannot pay for its lethal attackers deflected ("deflect is
+    fine"); then the answers held for your turn (ward, counterspells, A6).
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:
