@@ -33,6 +33,9 @@ True and False: A gets the first, B the second, each parsed as a Python
 literal else kept as a string (§0z233: `altar_death_step`, four arms, each
 against the old rule "two" as B).
 
+`--seed0=S` starts the seeds at S instead of 5000: the fresh block an
+adopted rule is re-measured on (§0z170).
+
 `--cfg=k=v,...` sets knobs on BOTH legs (values parsed as Python literals,
 else kept as strings): §0z177's rule measured with the old payment order is
 `--cfg=azusa_floating_first=False`.
@@ -48,7 +51,7 @@ import numpy as np
 
 
 def _play(job):
-    deck_name, knob, base, seeds, values = job
+    deck_name, knob, base, seeds, values, seed0 = job
     from edhmc.experiment import DEFAULT_CFG
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS
@@ -62,7 +65,7 @@ def _play(job):
                                     snapshot_rounds=(10,), watch=frozenset(),
                                     **{**base, **{k: on for k in
                                                   knob.split(",")}}),
-                    5000 + s)
+                    seed0 + s)
             nums = {k: float(v) for k, v in r.items()
                     if isinstance(v, (int, float)) and not isinstance(v, bool)}
             nums["won T10"] = float(r["at_rounds"][10]["won"])
@@ -93,19 +96,21 @@ def main():
     for kv in filter(None, opts.get("--cfg", "").split(",")):
         k, v = kv.split("=", 1)
         base[k] = _literal(v)
+    seed0 = int(opts.get("--seed0", 5000))
     values = (True, False)
     if "--values" in opts:
         values = tuple(_literal(v) for v in opts["--values"].split(",", 1))
     out_path = opts.get("--out", f"results/knob_ab_{deck_name}_{knob}.txt")
     with Pool(4) as pool:
-        chunks = [(deck_name, knob, base, list(range(i, n, 16)), values)
+        chunks = [(deck_name, knob, base, list(range(i, n, 16)), values,
+                   seed0)
                   for i in range(16)]
         pairs = [p for part in pool.map(_play, chunks) for p in part]
 
     py = sys.version.split()[0]
     lines = [f"{deck_name}: {knob}={values[0]!r} (A) minus {values[1]!r} (B), "
              "the staged list "
-             f"both legs, N={n} paired, seeds 5000..{5000 + n - 1}, today's "
+             f"both legs, N={n} paired, seeds {seed0}..{seed0 + n - 1}, today's "
              f"pod, python {py} / numpy {np.__version__}"
              + (f", both legs {base}" if base else ""), ""]
     for k in ("won T10", "won T20"):
