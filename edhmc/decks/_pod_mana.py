@@ -7,9 +7,8 @@ shares (`_removal.py`). Lands and ramp from each deck's COMMITTED module
 list; costs from the lists the shares read. Ramp is mana rocks and land
 ramp only (the owner, 2026-11-20); a creature's mana is queue item 52.
 
-NOT YET READ BY ANY ENGINE, so it is in no cache fingerprint: add it to
-`tools/cache_manifest`'s shared files in the change that first reads
-it."""
+Read by `opponents.roll_pod_mana` (§0z236, `pod_mana`), and so in every
+cache fingerprint (`tools/cache_manifest`'s shared files)."""
 
 # the list size, the median over 7 decks
 POD_LIBRARY = 99

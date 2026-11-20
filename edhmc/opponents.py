@@ -173,6 +173,9 @@ class Opponent:
     # `rearm_routes` the routes pre-rolled for `rearm_rule="reland"`.
     rearms: int = 0
     rearm_routes: tuple = ()
+    # ITEM 50 (§0z236, `pod_mana`): this opponent's mana on each of its
+    # turns, `PodMana` rows pre-rolled from its own library (`roll_pod_mana`).
+    mana_rows: tuple = ()
 
     _pcache: object = None
 
@@ -239,6 +242,8 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
         roll_body_pools(cfg, seed, opps)
     if pod_knob(cfg, "pod_threats"):           # item 24, change 2: §0z131
         roll_threat_routes(cfg, seed, opps)
+    if pod_knob(cfg, "pod_mana"):              # item 50, step 1: §0z236
+        roll_pod_mana(cfg, seed, opps, turns)
     return opps, rolls, counter_rolls
 
 
@@ -398,6 +403,10 @@ POD_DEFAULTS = {
     "route_kills": True,
     "pod_attacks_walkers": True,
     "held_answers": True,
+    # ITEM 50, THE POD'S MANA (§0z234), built OFF, one rule at a time. Step 1
+    # (§0z236): each opponent's library and land drops, pre-rolled. Nothing
+    # reads them in a game yet, so on or off every game plays the same.
+    "pod_mana": False,
 }
 
 
@@ -552,6 +561,164 @@ def roll_threat_routes(cfg, seed, opps) -> None:
                               r.randint(1, mvmax), r.randint(lo, hi))
                   for w in slots)
             for _ in range(REARM_ROUTES))
+
+
+
+# ---------------------------------------------------------------------------
+# THE POD'S MANA, STEP 1: ITS LIBRARY AND LAND DROPS (queue item 50, §0z236)
+# ---------------------------------------------------------------------------
+# Each opponent draws from a library built from the census
+# (`decks/_pod_mana.py`, GENERATED from the seven lists, §0z235): 99 cards,
+# POD_LANDS lands, POD_ROCKS mana rocks, POD_LAND_RAMP land ramp, the rest
+# spells this model rolls instead of drawing (§0z234, out of scope: 402.2).
+# Everything below is the comprehensive rules (the .docx, §0z234):
+#
+#   seven cards (903.7); the owner's MULLIGAN RULE (2026-11-20): keep 2-5
+#     lands in the first seven, else the FREE mulligan (103.5c); after it
+#     keep any hand with at least 2 lands, else mulligan again, never below
+#     five cards -- each counted mulligan bottoms one card (103.5)
+#   a draw on EVERY turn, the first included (103.8c, 800.7)
+#   one land a turn, from hand, on its own turn (305.2, 305.3)
+#   everything untaps in its untap step (502.3)
+#   a mana rock taps the turn it is cast: 302.6 is a CREATURE rule
+#   a land-ramp land enters tapped (the census: every land ramp in the
+#     lists does), so it is mana from the next turn
+#
+# THE JUDGEMENTS, said out loud: RAMP FIRST -- a pilot casts ramp in main
+# phase 1 on the first turn it can, the cheapest first and a rock before a
+# land ramp of the same cost; and EVERY LAND FROM HAND ENTERS UNTAPPED (the
+# census does not read tapped lands yet: a CEILING on the pod's early mana).
+# The bottoming choice of a counted mulligan: lands if the hand holds more
+# than four, else spells.
+#
+# CRN (§0z17). Each opponent's library is shuffled from ITS OWN stream,
+# seeded from the game seed and its seat, and nothing here touches
+# `make_pod`'s stream: the k-th land an opponent draws is the same land in
+# both legs, and `pod_mana=False` plays every game as before. Nothing reads
+# the rows in a game yet; the gates that will are item 50's next steps.
+PodMana = namedtuple("PodMana", "lands rocks sources spare")
+POD_HAND = 7
+POD_MIN_HAND = 5
+POD_FREE_MULLIGANS = 1    # 103.5c: in multiplayer the first one is free
+POD_FIRST_DRAW = True     # 103.8c: in multiplayer the first turn draws too
+ROCK_TAPS_ON_CAST = True  # 302.6 is a creature rule: a rock taps at once
+RAMP_LAND_TAPPED = True   # every land ramp in the lists puts its land tapped
+
+
+def pod_library_template() -> list:
+    """The pod's 99 cards by kind, from the census, in a fixed order the
+    shuffle then permutes."""
+    from edhmc.decks import _pod_mana as M
+    if M.POD_EXTRA_DROPS:
+        raise ValueError("_pod_mana.POD_EXTRA_DROPS is nonzero and the pod's "
+                         "library does not read extra land drops yet")
+    n = M.POD_LIBRARY
+    lib = (["land"] * M.POD_LANDS + ["rock"] * M.POD_ROCKS
+           + ["ramp"] * M.POD_LAND_RAMP)
+    if len(lib) > n:
+        raise ValueError(f"the census puts {len(lib)} lands and ramp in a "
+                         f"{n}-card library")
+    return lib + ["other"] * (n - len(lib))
+
+
+def _bottom(hand: list, k: int) -> tuple:
+    """A counted mulligan's `k` cards to the bottom (103.5): lands if the
+    hand holds more than four, else spells -- the pilot's judgement."""
+    hand = list(hand)
+    out = []
+    for _ in range(k):
+        lands = [c for c in hand if c == "land"]
+        pick = ("land" if len(lands) > 4 else
+                next((c for c in ("other", "ramp", "rock") if c in hand),
+                     "land"))
+        hand.remove(pick)
+        out.append(pick)
+    return hand, out
+
+
+def opening_hand(r, template) -> tuple:
+    """(hand, library) under the owner's mulligan rule (2026-11-20), the
+    library in draw order. `r` shuffles."""
+    for k in range(0, POD_HAND - POD_MIN_HAND + 2):
+        lib = list(template)
+        r.shuffle(lib)
+        hand, rest = lib[:POD_HAND], lib[POD_HAND:]
+        counted = max(0, k - POD_FREE_MULLIGANS)  # 103.5c: the first is free
+        lands = hand.count("land")
+        last = POD_HAND - counted <= POD_MIN_HAND
+        keep = (2 <= lands <= 5) if k == 0 else (lands >= 2 or last)
+        if keep:
+            hand, bottom = _bottom(hand, counted)
+            return hand, rest + bottom
+    raise AssertionError("unreachable: the last hand is always kept")
+
+
+def land_drops(hand, library, rounds: int, costs) -> tuple:
+    """The opponent's mana on each of its turns 1..`rounds`: row t is
+    `PodMana(lands, rocks, sources, spare)` -- lands and rocks on its
+    battlefield at the end of turn t, the mana `sources` it has in main
+    phase 1 after its land drop, and the `spare` left after its ramp. Row 0
+    is before its first turn. `costs` is (rock mv, rock net, land-ramp
+    cost, land-ramp lands)."""
+    rock_mv, rock_net, ramp_cost, ramp_lands = costs
+    hand, library = list(hand), list(library)
+    lands, rocks = 0.0, 0
+    rows = [PodMana(0.0, 0, 0.0, 0.0)]
+    for t in range(rounds):
+        if library and (t or POD_FIRST_DRAW):    # 103.8c: every turn draws
+            hand.append(library.pop(0))
+        if "land" in hand:                       # 305.2: one land a turn
+            hand.remove("land")
+            lands += 1
+        sources = lands + rocks * rock_net
+        mana = sources
+        while True:                              # ramp first, cheapest first
+            opts = [(rock_mv, 0, "rock")] if "rock" in hand else []
+            if "ramp" in hand:
+                opts.append((ramp_cost, 1, "ramp"))
+            opts = [o for o in opts if o[0] <= mana + 1e-9]
+            if not opts:
+                break
+            cost, _, kind = min(opts)
+            hand.remove(kind)
+            mana -= cost
+            if kind == "rock":
+                rocks += 1
+                if ROCK_TAPS_ON_CAST:            # 302.6 is a creature rule
+                    mana += rock_net
+            else:
+                lands += ramp_lands              # enters tapped: next turn
+                if not RAMP_LAND_TAPPED:
+                    mana += ramp_lands
+        rows.append(PodMana(lands, rocks, sources, mana))
+    return tuple(rows)
+
+
+def roll_pod_mana(cfg, seed, opps, rounds: int) -> None:
+    """Each opponent's land drops (§0z236), from its own stream."""
+    from edhmc.decks import _pod_mana as M
+    template = pod_library_template()
+    costs = (M.ROCK_MV, M.ROCK_NET, M.LAND_RAMP_COST, M.LAND_RAMP_LANDS)
+    for i, o in enumerate(opps):
+        r = random.Random((seed * 1000003) ^ (0x3A9A1A + 7919 * i))
+        hand, library = opening_hand(r, template)
+        o.mana_rows = land_drops(hand, library, rounds, costs)
+
+
+def pod_mana_on(g) -> bool:
+    return bool(pod_knob(g.cfg, "pod_mana"))
+
+
+def pod_mana_row(g, o, t=None):
+    """Opponent `o`'s mana on its turn `t` (default the pod's turn now,
+    `pod_turn`): a `PodMana` row, the last one past the pre-rolled rounds.
+    None with `pod_mana` off. ON YOUR TURN t the opponent has had t-1 turns
+    (§0z234): a reader there asks for row t-1."""
+    rows = getattr(o, "mana_rows", ())
+    if not rows:
+        return None
+    t = pod_turn(g) if t is None else t
+    return rows[max(0, min(t, len(rows) - 1))]
 
 
 def pod_threats_on(g) -> bool:

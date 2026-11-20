@@ -695,6 +695,12 @@
         "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
         "fingerprint": "dcb2446ec6992fef",
         "utc": "2026-11-20T13:34:08Z"
+      },
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "789b55861b04d191",
+        "utc": "2026-11-20T22:03:08Z"
       }
     ]
   },
@@ -1301,6 +1307,12 @@
         "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
         "fingerprint": "34ec1b0a26017edc",
         "utc": "2026-11-20T13:34:08Z"
+      },
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "b07a719c9dddafaa",
+        "utc": "2026-11-20T22:03:08Z"
       }
     ]
   },
@@ -1933,6 +1945,12 @@
         "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
         "fingerprint": "9c09460a34946226",
         "utc": "2026-11-20T13:34:07Z"
+      },
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "73e122d4268ff983",
+        "utc": "2026-11-20T22:03:08Z"
       }
     ]
   },
@@ -2530,7 +2548,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "cf026d433999e4a8",
+        "utc": "2026-11-20T22:03:07Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "01392a48ca1fe693",
@@ -3164,6 +3189,12 @@
         "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
         "fingerprint": "407dc1389a66f740",
         "utc": "2026-11-20T13:34:08Z"
+      },
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "db94d7abf5cd4578",
+        "utc": "2026-11-20T22:03:08Z"
       }
     ]
   },
@@ -3752,6 +3783,12 @@
         "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
         "fingerprint": "945355cd32f6b4cb",
         "utc": "2026-11-20T13:34:08Z"
+      },
+      {
+        "commit": "9104946",
+        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+        "fingerprint": "a45a5f8cc30de81e",
+        "utc": "2026-11-20T22:03:08Z"
       }
     ]
   },

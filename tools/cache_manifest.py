@@ -43,8 +43,12 @@ CACHE_DIR = os.path.join("results", "caches")
 # kind of answer, generated from a census of the six lists, read by
 # `opponents.destroy`. Regenerating it moves every deck that holds an
 # indestructible permanent, so it is here from the day it was written.
+# decks/_pod_mana.py (§0z235) is the pod's library and its answers' costs,
+# read by `opponents.roll_pod_mana` since §0z236: here from that change, as
+# its own docstring promised.
 SHARED = ["edhmc/opponents.py", "edhmc/experiment.py", "edhmc/engine.py",
-          "edhmc/decks/_evasion.py", "edhmc/decks/_removal.py", "ablation.py"]
+          "edhmc/decks/_evasion.py", "edhmc/decks/_removal.py",
+          "edhmc/decks/_pod_mana.py", "ablation.py"]
 
 # Files that have MOVED on disk since the fingerprint scheme was introduced,
 # keyed by the name the hash still uses. `fingerprint()` hashes the KEY as well

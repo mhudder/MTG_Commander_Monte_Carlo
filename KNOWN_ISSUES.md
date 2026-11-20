@@ -288,6 +288,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z233](#0z233) | REBUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt, no row moved |
 | [0z234](#0z234) | DECIDED | **Item 50 written down: a real mana model for the pod** -- the rules it rests on, the owner's six decisions, a land counted early on your turn; nothing built |
 | [0z235](#0z235) | BUILT | **Item 50's census: the pod's library and its answers' costs**, generated from the lists; 35 lands, 4 rocks, 1 land ramp; read by nothing yet |
+| [0z236](#0z236) | BUILT | **Item 50 step 1: the pod's library and land drops** (`pod_mana`, off); behind `t` mana from pod turn 5, 7.05 not 10 by turn 10; read by nothing yet |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20410,6 +20411,62 @@ card whose oracle text changed on Scryfall -- only a rerun reads that.
 this check; a card staged without regenerating now breaks it AND
 `_removal.py`'s, since one command writes both (the expected set changed
 for that reason, written before the run).
+
+<a id="0z236"></a>
+
+## 0z236. BUILT -- Item 50, step 1: the pod's library and its land drops
+
+**The owner, 2026-11-20: "use that mulligan rule, start the library
+model."** `opponents.roll_pod_mana`, behind `pod_mana` (False): each
+opponent's library is the census's (§0z235) -- 99 cards, 35 lands, 4 rocks,
+1 land ramp, 59 spells this model rolls instead of drawing -- shuffled from
+ITS OWN stream, and its mana on each of its turns pre-rolled as `PodMana`
+rows (`lands`, `rocks`, `sources` in main phase 1 after its land drop,
+`spare` after its ramp). `pod_mana_row(g, o, t)` reads one. **Nothing in a
+game reads the rows yet**: the gates are item 50's next steps.
+
+**The rules it plays by** (the `.docx`, §0z234): seven cards (903.7); the
+owner's mulligan rule -- keep 2-5 lands in the first seven, else the FREE
+mulligan (103.5c), then keep any hand with at least 2 lands, never below
+five, each counted mulligan bottoming one card (103.5); a draw on every
+turn, the first included (103.8c, 800.7); one land a turn from hand
+(305.2); everything untaps in its untap step (502.3); a rock taps the turn
+it is cast, since 302.6 is a creature rule; a land-ramp land enters tapped,
+as every land ramp in the lists does. Each of those is a seam the test
+mutates (`POD_FREE_MULLIGANS`, `POD_FIRST_DRAW`, `ROCK_TAPS_ON_CAST`,
+`RAMP_LAND_TAPPED`).
+
+**The judgements, said out loud**: RAMP FIRST -- a pilot casts ramp in main
+phase 1 on the first turn it can, the cheapest first, a rock before a land
+ramp of the same cost; the bottoming choice (lands if the hand holds more
+than four, else spells); and **every land from hand enters untapped** -- the
+census does not read tapped lands yet, so the pod's early mana is a
+CEILING. All three opponents draw from the same library: the census is the
+lists', not a bracket's.
+
+**What it shows** (2,000 pods, opponent 1's mean `sources` on its turn t):
+
+| t | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 10 | 12 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| mana | 1.00 | 2.00 | 3.18 | 4.08 | 4.74 | 5.32 | 5.80 | 6.24 | 7.05 | 7.82 |
+
+Turns 1 and 2 are always on curve (the mulligan rule keeps two lands); the
+ramp puts turns 3 and 4 just above `t`; from turn 5 missed land drops put
+the pod BEHIND the `t` mana that `ward_payable` and the counterspell ramp
+read today -- 7.05 by turn 10, not 10. A 3-mana removal plus Tivit's ward
+{3} wants 6, which the mean pod reaches near its turn 7, not 6.
+
+**CRN.** Nothing touches `make_pod`'s stream (test B: the same opponents
+and grid on or off). `check_unchanged_decks --n=2000` against `9104946`:
+every deck BIT-IDENTICAL with `pod_mana` off AND on -- nothing reads the
+rows. `decks/_pod_mana.py` is in every fingerprint from this change
+(`tools/cache_manifest`'s `SHARED`), as its docstring promised; every cache
+VERIFIED on that evidence.
+
+`tests/test_pod_library.py`, ten cases, four mutations exact. **One
+mutation corrected after its first run, said so**: a stand-in `land_drops`
+shifted every row a turn and broke D and E too; every mutation is a real
+seam now, the expected sets unchanged.
 
 ## How to read an ablation table
 

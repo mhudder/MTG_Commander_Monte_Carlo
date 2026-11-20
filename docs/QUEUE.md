@@ -339,8 +339,11 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     yet, so in no fingerprint: the change that first reads it adds it to
     `tools/cache_manifest`'s shared files. Your removal that ramps the pod
     (`POD_GIFTS`: Path to Exile, Assassin's Trophy, An Offer You Can't
-    Refuse) is a cost to charge. Next: the library model -- land drops per
-    opponent per turn, pre-rolled from its own stream -- behind a switch.
+    Refuse) is a cost to charge. **THE LIBRARY IS BUILT (§0z236,
+    2026-11-20)**, `pod_mana` off: land drops pre-rolled per opponent from
+    its own stream, the owner's mulligan rule, ramp first; read by nothing
+    yet, every deck bit-identical on and off. Next: the spending on the
+    pod's own turn (decision 4's order) and the first gate that reads it.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:
