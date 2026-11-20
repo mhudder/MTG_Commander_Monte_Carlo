@@ -28,6 +28,11 @@ KNOB and REACH may each be a comma-separated list: every knob is True in A
 and False in B, and a game is reached if ANY of the counters is above 0 --
 for two fixes measured together (§0z178).
 
+`--values=A,B` compares two VALUES of one multi-valued knob instead of
+True and False: A gets the first, B the second, each parsed as a Python
+literal else kept as a string (§0z233: `altar_death_step`, four arms, each
+against the old rule "two" as B).
+
 `--cfg=k=v,...` sets knobs on BOTH legs (values parsed as Python literals,
 else kept as strings): §0z177's rule measured with the old payment order is
 `--cfg=azusa_floating_first=False`.
@@ -43,7 +48,7 @@ import numpy as np
 
 
 def _play(job):
-    deck_name, knob, base, seeds = job
+    deck_name, knob, base, seeds, values = job
     from edhmc.experiment import DEFAULT_CFG
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS
@@ -52,7 +57,7 @@ def _play(job):
     out = []
     for s in seeds:
         pair = []
-        for on in (True, False):
+        for on in values:
             r = sim(deck, cmd, dict(DEFAULT_CFG, turns=20,
                                     snapshot_rounds=(10,), watch=frozenset(),
                                     **{**base, **{k: on for k in
@@ -65,6 +70,13 @@ def _play(job):
             pair.append(nums)
         out.append(pair)
     return out
+
+
+def _literal(v):
+    try:
+        return ast.literal_eval(v)
+    except (ValueError, SyntaxError):
+        return v
 
 
 def main():
@@ -80,18 +92,19 @@ def main():
     base = {}
     for kv in filter(None, opts.get("--cfg", "").split(",")):
         k, v = kv.split("=", 1)
-        try:
-            base[k] = ast.literal_eval(v)
-        except (ValueError, SyntaxError):
-            base[k] = v
+        base[k] = _literal(v)
+    values = (True, False)
+    if "--values" in opts:
+        values = tuple(_literal(v) for v in opts["--values"].split(",", 1))
     out_path = opts.get("--out", f"results/knob_ab_{deck_name}_{knob}.txt")
     with Pool(4) as pool:
-        chunks = [(deck_name, knob, base, list(range(i, n, 16)))
+        chunks = [(deck_name, knob, base, list(range(i, n, 16)), values)
                   for i in range(16)]
         pairs = [p for part in pool.map(_play, chunks) for p in part]
 
     py = sys.version.split()[0]
-    lines = [f"{deck_name}: {knob}=True (A) minus False (B), the staged list "
+    lines = [f"{deck_name}: {knob}={values[0]!r} (A) minus {values[1]!r} (B), "
+             "the staged list "
              f"both legs, N={n} paired, seeds 5000..{5000 + n - 1}, today's "
              f"pod, python {py} / numpy {np.__version__}"
              + (f", both legs {base}" if base else ""), ""]

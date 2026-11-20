@@ -285,6 +285,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z230](#0z230) | FIXED | **Vault of the Archangel's deathtouch** (§0z206 floor 1), read by `deathtouch_of` on a Vault turn; karlov and shilgengar, a null |
 | [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
+| [0z233](#0z233) | BUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; every arm within 0.0003 of it, fresh seeds next |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20095,6 +20096,54 @@ sign flip in any deck. The slowest leg, azusa, took about 40 minutes of wall tim
 from a worktree (§0z226's lesson; `results/restage_20261117.txt`): all seven
 stand, each within its 2026-11-16 bar. Bolas's Citadel's T20 is inside its
 bar again (+0.0029 +-0.0041; T10 +0.0099 +-0.0037), kept staged by the owner.
+
+<a id="0z233"></a>
+
+## 0z233. BUILT -- Ashnod's Altar's death step after the flip (queue item 51)
+
+**The owner, 2026-11-20: "start with 51."** `engine.activations` fed Ashnod's
+Altar (or Woe Strider, §0z227) two tokens a turn beyond `altar_keep` (6)
+while Blood Artist or The Meathook Massacre was out, for the drains -- a rule
+written when your creatures never blocked. Since §0z219 a token is a blocker
+on the pod's turns, and Woe Strider's outlet under the same rule cost
+-0.0003 +-0.0003 at T20 (§0z227).
+
+**The switch** (`engine.altar_death_victims`, `altar_death_step`; the old
+rule `"two"` is the default until measured):
+
+- `"two"` -- the old rule exactly: `altar_fodder(g)[:2]`.
+- `"none"` -- no death step; the Altar's mana step (§0z20) is unchanged.
+- `"lethal"` -- only when the drains finish an opponent
+  (`death_step_lethal`): the fewest creature tokens that do, from all of
+  them, not only `altar_fodder`'s excess.
+- `"safe"` -- `"lethal"` first; else as many as `"two"` would take, tapped
+  first (`death_step_tokens`: a tapped token does not block on the pod's
+  turns, §0z184), each only while `predicted_chip` read without it leaves you
+  above `hold_back_pad` (10) -- the hold-back's test (§0z186).
+
+`death_step_sacs` counts the deaths and is the identity's REACH.
+`diagnostics/run_knob_ab` gained `--values=A,B` for a knob with more than two
+values. `tests/test_altar_death_step.py`, eight cases, four mutations exact on
+the first run.
+
+Only rendmaw plays the Altar; with the default, every deck is BIT-IDENTICAL
+at 2,000 seeds against `3c9afb5` (VERIFIED).
+
+**First measurement**, each arm against `"two"`, N=15,000 paired, seeds
+5000.., python 3.11.18, identity 0 in every arm
+(`results/knob_ab_rendmaw_altar_death_step_*.txt`):
+
+| arm | T10 | T20 | reached | final life |
+|---|---|---|---|---|
+| `"none"` | +0.0001 +-0.0002 | **+0.0003 +-0.0003** | 1.0% | +0.023 |
+| `"lethal"` | **+0.0003 +-0.0003** | +0.0001 +-0.0005 | 1.2% | -0.025 |
+| `"safe"` | **+0.0003 +-0.0003** | +0.0002 +-0.0004 | 1.2% | -0.026 |
+
+Every arm is at its bar's edge and three were read on one block of seeds,
+so none is a result yet (§0z170): **fresh seeds next**. The step is reached
+in about one game in a hundred (the Altar, a drain card and seven tokens at
+once), so whichever rule wins moves rendmaw's win rate by a few parts in ten
+thousand.
 
 ## How to read an ablation table
 

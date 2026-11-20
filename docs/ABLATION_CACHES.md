@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `7f2b9f8`.
+Generated at `3c9afb5`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,28 +86,34 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `559e56d1d7c38c4b` | `5a00891` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `d068976625f352f1` | `5a00891` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `559e56d1d7c38c4b` | `5a00891` | **VERIFIED** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `d068976625f352f1` | `5a00891` | **VERIFIED** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `022a5f0fbcd885a8` | `3d978b8` | **VERIFIED** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `232c1765fb4a9e66` | `5a00891` | **CURRENT** |
-| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `01392a48ca1fe693` | `5a00891` | **CURRENT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `232c1765fb4a9e66` | `5a00891` | **VERIFIED** |
+| `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `01392a48ca1fe693` | `5a00891` | **VERIFIED** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `aa3ce555f310a141` | `c9f18f4` | **VERIFIED** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `559e56d1d7c38c4b`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `d068976625f352f1`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `022a5f0fbcd885a8`; fingerprint has since moved to `0884e01056e6cca9` and was CHECKED at `cb9b987` (2026-11-17T05:26:12Z): §0z227-§0z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — VERIFIED. built at `559e56d1d7c38c4b`; fingerprint has since moved to `3bb4bd29f145e565` and was CHECKED at `3c9afb5` (2026-11-20T01:05:39Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+  - verified at `3bb4bd29f145e565` (`3c9afb5`, 2026-11-20T01:05:39Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `d068976625f352f1`; fingerprint has since moved to `2f6c641dcce06308` and was CHECKED at `3c9afb5` (2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+  - verified at `2f6c641dcce06308` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — VERIFIED. built at `022a5f0fbcd885a8`; fingerprint has since moved to `01071c46df54a6d5` and was CHECKED at `3c9afb5` (2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
   - verified at `b582e61615ac9c6a` (`c23a0bb`, 2026-11-17T01:47:26Z): §0z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.
   - verified at `475ac0eaec164817` (`b225ebe`, 2026-11-17T02:28:55Z): §0z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.
   - verified at `61d7e02e665da5a9` (`a06def3`, 2026-11-17T03:49:26Z): §0z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).
   - verified at `0884e01056e6cca9` (`cb9b987`, 2026-11-17T05:26:12Z): §0z227-§0z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `232c1765fb4a9e66`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — CURRENT. built at `01392a48ca1fe693`, which is live.
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `aa3ce555f310a141`; fingerprint has since moved to `f36a072d7c40afed` and was CHECKED at `cb9b987` (2026-11-17T05:26:12Z): §0z227-§0z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).
+  - verified at `01071c46df54a6d5` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — VERIFIED. built at `232c1765fb4a9e66`; fingerprint has since moved to `8e34c1a081ffe6be` and was CHECKED at `3c9afb5` (2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+  - verified at `8e34c1a081ffe6be` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `01392a48ca1fe693`; fingerprint has since moved to `a8f996a483abb3e8` and was CHECKED at `3c9afb5` (2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+  - verified at `a8f996a483abb3e8` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — VERIFIED. built at `aa3ce555f310a141`; fingerprint has since moved to `fe04c1f70dd7c4b6` and was CHECKED at `3c9afb5` (2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
   - verified at `f36a072d7c40afed` (`cb9b987`, 2026-11-17T05:26:12Z): §0z227-§0z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `98f83ebd35104383`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+  - verified at `fe04c1f70dd7c4b6` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `bdb92a2277a54dd3`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

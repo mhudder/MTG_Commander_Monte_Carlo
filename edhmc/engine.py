@@ -3076,6 +3076,89 @@ def altar_fodder(g: Game, units=None) -> list:
     return spare[:max(0, len(spare) - keep)]
 
 
+def _death_drains(g, k: int, o, lowest) -> float:
+    """What `k` deaths of your creatures cost opponent `o`, by
+    `on_creature_death`'s reading of the drains on the board now: 1 each
+    from The Meathook Massacre and Cauldron of Essence, and 1 from Blood
+    Artist at the opponent closest to dying (`lowest`), through
+    `life_loss`."""
+    each = sum(1 for p in g.board if p.card.name in
+               ("The Meathook Massacre", "Cauldron of Essence"))
+    single = sum(1 for p in g.board if p.card.name == "Blood Artist")
+    return OPP.life_loss(o, k * (each + (single if o is lowest else 0)))
+
+
+def death_step_lethal(g, pool) -> list:
+    """The fewest of `pool` whose deaths finish an opponent by the drains
+    alone (`_death_drains`), or [] when no number of them does."""
+    alive = OPP.living(g)
+    if not alive or not pool:
+        return []
+    lowest = min(alive, key=lambda o: o.life)
+    for k in range(1, len(pool) + 1):
+        if any(_death_drains(g, k, o, lowest) >= o.life for o in alive):
+            return pool[:k]
+    return []
+
+
+def death_step_tokens(g) -> list:
+    """Your creature tokens in the order the death step eats them: tapped
+    first (a tapped token does not block on the pod's turns, §0z184), then
+    the smallest. Its own function so a test can mutate the order."""
+    return sorted((p for p in g.board if p.is_token and p.card.is_creature),
+                  key=lambda p: (not p.tapped, g.power_of(p)))
+
+
+def altar_death_victims(g) -> list:
+    """THE DEATH STEP'S TOKENS (queue item 51, §0z233): which creatures
+    `activations` sacrifices to Ashnod's Altar (or Woe Strider) for Blood
+    Artist's and The Meathook Massacre's drains. `altar_death_step`:
+
+      "two"     the old rule: two of `altar_fodder` a turn, whatever they
+                are -- written when your creatures never blocked (§0z219).
+      "none"    no death step; the Altar's mana step (§0z20) is unchanged.
+      "lethal"  only when the drains finish an opponent: the fewest
+                creature tokens that do (`death_step_lethal`), from ALL your
+                tokens, not only `altar_fodder`'s excess -- a player removed
+                is a third of the pod's attacks gone.
+      "safe"    "lethal" first; else as many as "two" would take (two,
+                at most `altar_fodder`'s excess over `altar_keep`), but
+                chosen tapped first (a tapped token does not block on
+                the pod's turns, §0z184), each only while the pod's next
+                round read without it (`predicted_chip`) leaves you above
+                `hold_back_pad` (10) -- the hold-back's own test (§0z186).
+
+    Every count the prediction writes is put back, and the board is restored,
+    so asking changes nothing."""
+    mode = g.cfg.get("altar_death_step", "two")
+    if mode == "two":
+        return altar_fodder(g)[:2]
+    if mode == "none":
+        return []
+    tokens = death_step_tokens(g)
+    lethal = death_step_lethal(g, tokens)
+    if lethal or mode == "lethal":
+        return lethal
+    if mode != "safe":
+        raise ValueError(f"altar_death_step={mode!r}")
+    pad = g.cfg.get("hold_back_pad", 10.0)
+    chosen = []
+    for p in tokens[:min(2, len(altar_fodder(g)))]:
+        snap, board = dict(g.m), g.board
+        g.board = Board(q for q in board
+                        if q is not p and not any(q is c for c in chosen))
+        try:
+            ok = g.your_life - OPP.predicted_chip(g) > pad
+        finally:
+            g.board = board
+            g.m.clear()
+            g.m.update(snap)
+        if not ok:
+            break
+        chosen.append(p)
+    return chosen
+
+
 def altar_enable(g: Game, units, precombat: bool):
     """Ashnod's Altar: "Sacrifice a creature: Add {C}{C}." §3, closed §0z20.
 
@@ -4003,10 +4086,13 @@ def activations(g: Game):
         # expendable", also used by main_phase's mana step (§0z20). Called
         # with no `units` here because this path is post-main and taps
         # nothing: the selection is identical to what this block did inline.
+        # WHICH tokens is `altar_death_victims` (item 51, §0z233); "two" is
+        # the old rule exactly.
         woe_only = not g.has("Ashnod's Altar")
-        for p in altar_fodder(g)[:2]:
+        for p in altar_death_victims(g):
             g.board.remove(p)
             g.on_creature_death(1)
+            g.m["death_step_sacs"] += 1
             if woe_only:
                 g.m["woe_strider_sacs"] += 1
 

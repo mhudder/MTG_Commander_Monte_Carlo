@@ -683,7 +683,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "3bb4bd29f145e565",
+        "utc": "2026-11-20T01:05:39Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "d068976625f352f1",
@@ -1276,7 +1283,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "2f6c641dcce06308",
+        "utc": "2026-11-20T01:05:38Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "022a5f0fbcd885a8",
@@ -1895,6 +1909,12 @@
         "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
         "fingerprint": "0884e01056e6cca9",
         "utc": "2026-11-17T05:26:12Z"
+      },
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "01071c46df54a6d5",
+        "utc": "2026-11-20T01:05:38Z"
       }
     ]
   },
@@ -2478,7 +2498,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "8e34c1a081ffe6be",
+        "utc": "2026-11-20T01:05:38Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "01392a48ca1fe693",
@@ -3100,7 +3127,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "a8f996a483abb3e8",
+        "utc": "2026-11-20T01:05:38Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "aa3ce555f310a141",
@@ -3675,6 +3709,12 @@
         "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
         "fingerprint": "f36a072d7c40afed",
         "utc": "2026-11-17T05:26:12Z"
+      },
+      {
+        "commit": "3c9afb5",
+        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+        "fingerprint": "fe04c1f70dd7c4b6",
+        "utc": "2026-11-20T01:05:38Z"
       }
     ]
   },
