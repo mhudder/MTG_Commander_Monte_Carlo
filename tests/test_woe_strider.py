@@ -5,8 +5,9 @@
     python -m tests.test_woe_strider --mutate   # 3 mutations, exact sets
 
 Each case: a rendmaw game on a battlefield set by hand, with
-`woe_strider_outlet` True (its default is False since its measurement, said
-in `engine.woe_strider_outlet`; set here after the first run). The outlet cases
+`woe_strider_outlet` True (set here after the first run, when its default
+was False; it is True since §0z233, said in `engine.woe_strider_outlet`),
+and the death step's old rule, `altar_death_step` "two". The outlet cases
 call `activations` with Blood Artist out and eight Goat tokens (`altar_keep`
 6, so two are fodder); the escape cases put Woe Strider in the graveyard
 beside the cards a case names and five untapped Swamps out, and call
@@ -67,10 +68,14 @@ def take(zone, name):
 
 def game(**cfg):
     deck, cmd = RM.build()
-    # the outlet is OFF by default (measured, §0z227): these cases turn it
-    # on, and a mutation's cfg still wins over a case's
+    # the outlet is set on explicitly (its default was False until §0z233),
+    # and a mutation's cfg still wins over a case's
     g = EN.Game(list(deck), cmd,
-                {**DEFAULT_CFG, "woe_strider_outlet": True, **cfg,
+                {**DEFAULT_CFG, "woe_strider_outlet": True,
+                 # the death step's old rule, which case A pins the outlet
+                 # under (the default is "lethal" since §0z233; set after
+                 # the flip, no expectation changed)
+                 "altar_death_step": "two", **cfg,
                  **EXTRA_CFG},
                 random.Random(1), seed_for_pod=1)
     g.board = EN.Board()

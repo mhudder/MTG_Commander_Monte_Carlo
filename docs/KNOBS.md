@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `3c9afb5` from 32 engine sources.
+Derived at `61e75a1` from 32 engine sources.
 
 **447 knobs, 664 call sites.**
 
@@ -30,7 +30,7 @@ costs a written justification.
 
 - **`turns`**  — *acknowledged*
   - `20` at `edhmc/azusa.py:4645` in `simulate()`
-  - `10` at `edhmc/engine.py:5817` in `simulate()`
+  - `10` at `edhmc/engine.py:5824` in `simulate()`
   - `20` at `edhmc/karlov.py:2801` in `simulate()`
   - `10` at `edhmc/lorehold.py:3454` in `simulate()`
   - `10` at `edhmc/opponents.py:233` in `make_pod()`
@@ -51,10 +51,10 @@ show up first.
 |---|---|---|---|---|---|---|
 | `act_pod_count` | `True` | 1 | `edhmc/lorehold.py:586` | §0z153 | yes | yes |
 | `alt_win_at_upkeep` | `True` | 1 | `edhmc/tivit.py:870` | §0z153 | yes | yes |
-| `altar_death_step` | `'two'` | 1 | `edhmc/engine.py:3133` | §0z186 | yes | yes |
+| `altar_death_step` | `'lethal'` | 1 | `edhmc/engine.py:3140` | §0z233 | yes | yes |
 | `altar_keep` | `6` | 1 | `edhmc/engine.py:3071` | §0u | yes | yes |
-| `altar_mana` | `True` | 1 | `edhmc/engine.py:3183` | §3 | **no** | yes |
-| `angel_of_suffering` | `True` | 1 | `edhmc/engine.py:3541` | §0z42 | **no** | **never** |
+| `altar_mana` | `True` | 1 | `edhmc/engine.py:3190` | §3 | **no** | yes |
+| `angel_of_suffering` | `True` | 1 | `edhmc/engine.py:3548` | §0z42 | **no** | **never** |
 | `animated_land_text` | `True` | 2 | `edhmc/azusa.py:730` | §0z206 | yes | yes |
 | `animated_lands_block` | `True` | 1 | `edhmc/azusa.py:693` | §0z158 | yes | yes |
 | `animist_reveal` | `True` | 1 | `edhmc/azusa.py:2870` | §0z211 | yes | yes |
@@ -69,7 +69,7 @@ show up first.
 | `ashaya_lands` | `True` | 1 | `edhmc/azusa.py:488` | §0z98 | yes | yes |
 | `attack_safety` | `True` | 1 | `edhmc/opponents.py:4716` | §0z198 | yes | yes |
 | `attack_tax_deflect` | `0.5` | 1 | `edhmc/opponents.py:5391` |  | yes | yes |
-| `attack_triggers` | `True` | 1 | `edhmc/engine.py:5495` |  | yes | yes |
+| `attack_triggers` | `True` | 1 | `edhmc/engine.py:5502` |  | yes | yes |
 | `attacker_deaths` | `True` | 2 | `edhmc/opponents.py:362` | §0z198 | yes | yes |
 | `avacyn_feed` | `True` | 1 | `edhmc/shilgengar.py:609` |  | yes | yes |
 | `avacyn_text` | `True` | 2 | `edhmc/shilgengar.py:570` |  | **no** | **never** |
@@ -77,12 +77,12 @@ show up first.
 | `azusa_floating_sink` | `True` | 1 | `edhmc/azusa.py:969` | §0z177 | yes | yes |
 | `azusa_pool_empties` | `True` | 2 | `edhmc/azusa.py:923` | §0z177 | yes | yes |
 | `azusa_seat_upkeeps` | `True` | 1 | `edhmc/azusa.py:4447` | §0z179 | yes | yes |
-| `battlefield_creature_types` | `True` | 1 | `edhmc/engine.py:3509` | §0z92 | yes | yes |
+| `battlefield_creature_types` | `True` | 1 | `edhmc/engine.py:3516` | §0z92 | yes | yes |
 | `beacon_min_tax` | `4` | 1 | `edhmc/lorehold.py:2762` | §0z113 | yes | yes |
 | `beast_quest` | `True` | 3 | `edhmc/engine.py:2083` | §0z153 | yes | yes |
 | `beast_static` | `True` | 1 | `edhmc/engine.py:2084` | §0z188 | yes | yes |
 | `biotransference_text` | `True` | 1 | `edhmc/engine.py:179` | §0z116 | yes | yes |
-| `block_rate` | `0.3` | 2 | `edhmc/engine.py:5646` | §0z107 | yes | **never** |
+| `block_rate` | `0.3` | 2 | `edhmc/engine.py:5653` | §0z107 | yes | **never** |
 | `block_share` | `0.6` | 3 | `edhmc/opponents.py:2992` | §0z199 | yes | yes |
 | `blocker_toughness` | `2` | 1 | `edhmc/opponents.py:3954` | §0z92 | yes | yes |
 | `bloodbat` | `True` | 1 | `edhmc/shilgengar.py:733` | §0z229 | yes | yes |
@@ -94,8 +94,8 @@ show up first.
 | `bristly_min_counters` | `2` | 1 | `edhmc/azusa.py:4304` | §0z101 | yes | yes |
 | `capped_drain_wins` | `True` | 1 | `edhmc/tivit.py:853` | §0z218 | yes | yes |
 | `capstone_min_library` | `15` | 1 | `edhmc/lorehold.py:2262` | §0z42 | yes | yes |
-| `cast_lookahead` | `False` | 1 | `edhmc/engine.py:3312` | §0z43 | yes | yes |
-| `cast_triggers_countered` | `True` | 4 | `edhmc/engine.py:3471` | §0z151 | yes | yes |
+| `cast_lookahead` | `False` | 1 | `edhmc/engine.py:3319` | §0z43 | yes | yes |
+| `cast_triggers_countered` | `True` | 4 | `edhmc/engine.py:3478` | §0z151 | yes | yes |
 | `castle_ardenvale` | `True` | 1 | `edhmc/shilgengar.py:1586` | §0z115 | **no** | yes |
 | `charge_life_costs` | `True` | 9 | `edhmc/azusa.py:1925` | §0z115 | yes | yes |
 | `chord_convoke` | `True` | 1 | `edhmc/azusa.py:3621` | §0z197 | yes | yes |
@@ -119,11 +119,11 @@ show up first.
 | `citadel_skip` | `True` | 2 | `edhmc/karlov.py:1806` | §0z138 | yes | yes |
 | `citadel_spin` | `True` | 1 | `edhmc/karlov.py:1914` |  | yes | yes |
 | `citadel_x0` | `True` | 3 | `edhmc/karlov.py:1773` | §0z138 | yes | yes |
-| `clamp_cap` | `4` | 1 | `edhmc/engine.py:3994` |  | **no** | **never** |
-| `cleanup_repeat_max` | `8` | 1 | `edhmc/engine.py:4704` | §0z171 | yes | yes |
+| `clamp_cap` | `4` | 1 | `edhmc/engine.py:4001` |  | **no** | **never** |
+| `cleanup_repeat_max` | `8` | 1 | `edhmc/engine.py:4711` | §0z171 | yes | yes |
 | `clock_rearm` | `4` | 1 | `edhmc/opponents.py:5578` | §0z135 | yes | yes |
 | `clock_shift` | `0` | 1 | `edhmc/opponents.py:205` |  | yes | yes |
-| `coat_types` | `True` | 1 | `edhmc/engine.py:5624` | §0z125 | yes | yes |
+| `coat_types` | `True` | 1 | `edhmc/engine.py:5631` | §0z125 | yes | yes |
 | `collective_text` | `True` | 1 | `edhmc/lorehold.py:1056` | §4 | **no** | **never** |
 | `combat_defender` | `'weakest'` | 1 | `edhmc/opponents.py:4497` | §0z198 | **no** | yes |
 | `combat_split` | `True` | 1 | `edhmc/opponents.py:4484` | §0z198 | yes | yes |
@@ -147,8 +147,8 @@ show up first.
 | `crystal_vein` | `True` | 1 | `edhmc/azusa.py:4206` | §0z37 | **no** | yes |
 | `culling_pod_share` | `0.5` | 3 | `edhmc/opponents.py:358` |  | yes | yes |
 | `custodi_vote` | `True` | 1 | `edhmc/tivit.py:1299` | §0z83 | yes | yes |
-| `cycle_land_floor` | `6` | 1 | `edhmc/engine.py:4228` | §0z42 | yes | yes |
-| `cycling` | `True` | 1 | `edhmc/engine.py:4219` | §0z42 | yes | yes |
+| `cycle_land_floor` | `6` | 1 | `edhmc/engine.py:4235` | §0z42 | yes | yes |
+| `cycling` | `True` | 1 | `edhmc/engine.py:4226` | §0z42 | yes | yes |
 | `damn_overload` | `True` | 2 | `edhmc/opponents.py:1707` | §0z138 | yes | yes |
 | `dawn_draws_per_turn` | `4` | 1 | `edhmc/trostani.py:1251` |  | **no** | **never** |
 | `dead_opponents_act` | `False` | 1 | `edhmc/opponents.py:2240` | §0z133 | yes | yes |
@@ -158,7 +158,7 @@ show up first.
 | `decking_pilot` | `True` | 1 | `edhmc/engine.py:1566` | §0z42 | yes | yes |
 | `decking_reserve` | `5` | 2 | `edhmc/engine.py:1568` | §0z162 | yes | yes |
 | `deluge_pod_toughness` | `4` | 1 | `edhmc/opponents.py:2581` | §0z151 | yes | **never** |
-| `derived_blocking` | `True` | 2 | `edhmc/engine.py:5643` | §0z153 | yes | yes |
+| `derived_blocking` | `True` | 2 | `edhmc/engine.py:5650` | §0z153 | yes | yes |
 | `destroy_share` | `0.6` | 1 | `edhmc/opponents.py:2136` | §0z87 | yes | yes |
 | `destroy_share_ae` | `_removal.DESTROY_SHARE_AE` | 1 | `edhmc/opponents.py:2140` | §0z87 | **no** | **never** |
 | `destroy_share_split` | `True` | 1 | `edhmc/opponents.py:2135` | §0z87 | yes | yes |
@@ -168,21 +168,21 @@ show up first.
 | `dilemma_choice` | `'snitch'` | 1 | `edhmc/lorehold.py:1898` |  | yes | yes |
 | `dilemma_counters` | `True` | 2 | `edhmc/tivit.py:1334` | §0z153 | yes | yes |
 | `discard_text` | `True` | 2 | `edhmc/lorehold.py:1448` | §0z116 | yes | yes |
-| `doll_policy` | `'nest'` | 2 | `edhmc/engine.py:3608` | §0z58 | yes | yes |
-| `doll_sac_at` | `3` | 1 | `edhmc/engine.py:3646` | §0z58 | yes | yes |
+| `doll_policy` | `'nest'` | 2 | `edhmc/engine.py:3615` | §0z58 | yes | yes |
+| `doll_sac_at` | `3` | 1 | `edhmc/engine.py:3653` | §0z58 | yes | yes |
 | `draw_lands` | `True` | 2 | `edhmc/lorehold.py:95` | §0z185 | **no** | yes |
 | `drc_delirium_pt` | `True` | 1 | `edhmc/lorehold.py:317` | §0z83 | yes | yes |
-| `elder_fetch` | `True` | 1 | `edhmc/engine.py:5015` | §0z83 | yes | yes |
+| `elder_fetch` | `True` | 1 | `edhmc/engine.py:5022` | §0z83 | yes | yes |
 | `eldrazi_temple` | `True` | 1 | `edhmc/azusa.py:3504` | §0z115 | **no** | yes |
 | `elspeth_ult` | `True` | 1 | `edhmc/trostani.py:1439` |  | **no** | **never** |
 | `elspeth_ult_creatures` | `5` | 1 | `edhmc/trostani.py:1440` |  | **no** | **never** |
 | `emissary_type` | `'Creature'` | 1 | `edhmc/opponents.py:2666` | §4 | yes | yes |
-| `eot_at_cleanup` | `True` | 1 | `edhmc/engine.py:4672` | §0z187 | yes | yes |
+| `eot_at_cleanup` | `True` | 1 | `edhmc/engine.py:4679` | §0z187 | yes | yes |
 | `erebos_death_draw` | `True` | 2 | `edhmc/engine.py:1924` | §0i | yes | yes |
 | `erebos_life_floor` | `10` | 1 | `edhmc/engine.py:1927` | §0i | yes | yes |
 | `eulogist_opp_yard_turn` | `4` | 1 | `edhmc/trostani.py:1332` |  | yes | yes |
-| `everywhere_enters_tapped` | `True` | 1 | `edhmc/engine.py:5543` |  | yes | yes |
-| `everywhere_is_token` | `True` | 1 | `edhmc/engine.py:5544` |  | yes | **never** |
+| `everywhere_enters_tapped` | `True` | 1 | `edhmc/engine.py:5550` |  | yes | yes |
+| `everywhere_is_token` | `True` | 1 | `edhmc/engine.py:5551` |  | yes | **never** |
 | `exquisite_drain_loop` | `True` | 3 | `edhmc/karlov.py:92` | §0z90 | yes | yes |
 | `exquisite_general` | `True` | 1 | `edhmc/karlov.py:368` | §0z90 | yes | yes |
 | `extort_hybrid` | `True` | 1 | `edhmc/karlov.py:615` | §0z153 | yes | yes |
@@ -202,11 +202,11 @@ show up first.
 | `flashback_cap` | `6` | 1 | `edhmc/lorehold.py:2116` | §0u | yes | yes |
 | `flier_block_share` | `0.3` | 2 | `edhmc/opponents.py:367` | §0z199 | yes | yes |
 | `float_board_only` | `True` | 1 | `edhmc/lorehold.py:3347` | §0z168 | yes | yes |
-| `frostfang_connect` | `True` | 1 | `edhmc/engine.py:5635` | §0z153 | yes | yes |
+| `frostfang_connect` | `True` | 1 | `edhmc/engine.py:5642` | §0z153 | yes | yes |
 | `furygale_reduction` | `True` | 1 | `edhmc/lorehold.py:548` | §0u | **no** | **never** |
 | `gain_life_routed` | `True` | 1 | `edhmc/shilgengar.py:555` | §0z75 | yes | yes |
 | `gamble_min_hand` | `2` | 1 | `edhmc/lorehold.py:987` | §0z104 | yes | yes |
-| `gearhulk_best` | `True` | 2 | `edhmc/engine.py:3783` | §0z153 | yes | yes |
+| `gearhulk_best` | `True` | 2 | `edhmc/engine.py:3790` | §0z153 | yes | yes |
 | `genesis_wave_reveal` | `True` | 2 | `edhmc/azusa.py:2883` | §0z210 | yes | yes |
 | `giada_text` | `True` | 2 | `edhmc/shilgengar.py:368` |  | yes | yes |
 | `gingerbrute_keep` | `2` | 1 | `edhmc/karlov.py:1421` | §0z19 | yes | yes |
@@ -219,16 +219,16 @@ show up first.
 | `gsz_shuffle` | `True` | 1 | `edhmc/azusa.py:2562` | §0u | yes | yes |
 | `gyre_full_x` | `6` | 3 | `edhmc/opponents.py:357` | §4 | yes | yes |
 | `hand_cap` | `7` | 1 | `edhmc/lorehold.py:2682` |  | **no** | **never** |
-| `hand_size_rule` | `True` | 1 | `edhmc/engine.py:4701` | §0z171 | yes | yes |
-| `hart_fetch` | `True` | 1 | `edhmc/engine.py:5035` | §0z68 | yes | yes |
+| `hand_size_rule` | `True` | 1 | `edhmc/engine.py:4708` | §0z171 | yes | yes |
+| `hart_fetch` | `True` | 1 | `edhmc/engine.py:5042` | §0z68 | yes | yes |
 | `havengul_at` | `'end'` | 2 | `edhmc/tivit.py:1551` | §0z85 | yes | yes |
 | `held_answer_bar` | `6.0` | 1 | `edhmc/opponents.py:2301` | §0z221 | yes | yes |
 | `held_answer_share` | `0.5` | 1 | `edhmc/opponents.py:2290` | §0z221 | yes | yes |
 | `held_answers` | `True` | 1 | `edhmc/opponents.py:2274` |  | yes | yes |
 | `herald_text` | `True` | 2 | `edhmc/shilgengar.py:777` | §0z4 | yes | yes |
-| `high_market` | `True` | 1 | `edhmc/engine.py:5155` | §0z115 | **no** | yes |
+| `high_market` | `True` | 1 | `edhmc/engine.py:5162` | §0z115 | **no** | yes |
 | `hold_back` | `'lethal'` | 1 | `edhmc/opponents.py:4761` | §0z198 | yes | yes |
-| `hold_back_pad` | `10.0` | 3 | `edhmc/engine.py:3144` | §0z186 | yes | yes |
+| `hold_back_pad` | `10.0` | 3 | `edhmc/engine.py:3151` | §0z191 | yes | yes |
 | `hold_min_value` | `99.0` | 1 | `edhmc/lorehold.py:2692` | §0z165 | yes | yes |
 | `hold_up_rate` | `0.6` | 1 | `edhmc/opponents.py:1223` | §0z134 | yes | yes |
 | `horizon_counts` | `'rounds'` | 1 | `edhmc/tivit.py:2237` | §0z86 | yes | yes |
@@ -262,12 +262,12 @@ show up first.
 | `landfall_each` | `True` | 2 | `edhmc/shilgengar.py:1335` | §0z208 | yes | yes |
 | `late_land_drop` | `True` | 2 | `edhmc/azusa.py:4576` | §0z182 | yes | yes |
 | `late_land_main2` | `True` | 1 | `edhmc/engine.py:3049` | §0z187 | yes | yes |
-| `library_clock_mult` | `1.0` | 1 | `edhmc/engine.py:4835` | §0z162 | **no** | yes |
-| `library_clock_pad` | `1.0` | 1 | `edhmc/engine.py:4834` | §0z162 | yes | yes |
-| `library_clock_rounds` | `1` | 1 | `edhmc/engine.py:4836` | §0z162 | **no** | yes |
-| `library_floor_mode` | `'fixed'` | 1 | `edhmc/engine.py:4832` | §0z162 | yes | yes |
-| `library_life_floor` | `20` | 2 | `edhmc/engine.py:4837` | §0z162 | yes | yes |
-| `library_pay_max` | `2` | 1 | `edhmc/engine.py:4874` | §0z163 | yes | yes |
+| `library_clock_mult` | `1.0` | 1 | `edhmc/engine.py:4842` | §0z162 | **no** | yes |
+| `library_clock_pad` | `1.0` | 1 | `edhmc/engine.py:4841` | §0z162 | yes | yes |
+| `library_clock_rounds` | `1` | 1 | `edhmc/engine.py:4843` | §0z162 | **no** | yes |
+| `library_floor_mode` | `'fixed'` | 1 | `edhmc/engine.py:4839` | §0z162 | yes | yes |
+| `library_life_floor` | `20` | 2 | `edhmc/engine.py:4844` | §0z162 | yes | yes |
+| `library_pay_max` | `2` | 1 | `edhmc/engine.py:4881` | §0z163 | yes | yes |
 | `life_cap` | `1000000000.0` | 1 | `edhmc/trostani.py:456` |  | yes | **never** |
 | `lifelink_snapshot` | `True` | 1 | `edhmc/shilgengar.py:1508` | §0z208 | yes | yes |
 | `locthwain` | `True` | 1 | `edhmc/engine.py:2821` | §0z85 | **no** | yes |
@@ -285,7 +285,7 @@ show up first.
 | `main2_order` | `True` | 1 | `edhmc/shilgengar.py:1746` | §0z184 | yes | yes |
 | `mana_colour_legacy` | `False` | 3 | `edhmc/azusa.py:1321` | §0z177 | yes | yes |
 | `mana_surplus` | `True` | 2 | `edhmc/azusa.py:1322` | §0z177 | yes | yes |
-| `max_hand_size` | `7` | 1 | `edhmc/engine.py:4633` | §0z171 | yes | yes |
+| `max_hand_size` | `7` | 1 | `edhmc/engine.py:4640` | §0z171 | yes | yes |
 | `mdfc_land_floor` | `5` | 2 | `edhmc/engine.py:2960` | §0z118 | yes | **never** |
 | `memory_jar` | `True` | 1 | `edhmc/azusa.py:4472` | §4 | yes | yes |
 | `memory_jar_hand` | `2` | 1 | `edhmc/azusa.py:4476` | §4 | yes | yes |
@@ -301,7 +301,7 @@ show up first.
 | `monument_order` | `MONUMENT_MODES` | 1 | `edhmc/lorehold.py:1138` |  | **no** | yes |
 | `mother_lode_discover` | `True` | 1 | `edhmc/lorehold.py:1465` | §0z116 | yes | yes |
 | `mother_use` | `'defend'` | 2 | `edhmc/opponents.py:1113` |  | yes | yes |
-| `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:3821` | §0z133 | yes | **never** |
+| `mycoloth_devour` | `4` | 1 | `edhmc/engine.py:3828` | §0z133 | yes | **never** |
 | `native_flashback` | `True` | 1 | `edhmc/lorehold.py:2064` |  | yes | yes |
 | `necro_clock_pad` | `1.0` | 1 | `edhmc/karlov.py:1180` | §0z161 | yes | yes |
 | `necro_decking_guard` | `True` | 1 | `edhmc/karlov.py:1219` | §0z162 | yes | **never** |
@@ -312,24 +312,24 @@ show up first.
 | `nightblade_life` | `True` | 1 | `edhmc/tivit.py:423` | §0z207 | yes | yes |
 | `norn_text` | `True` | 4 | `edhmc/shilgengar.py:277` | §0z151 | yes | yes |
 | `nykthos_devotion` | `True` | 1 | `edhmc/azusa.py:3523` | §0z177 | **no** | yes |
-| `on_the_draw` | `True` | 1 | `edhmc/engine.py:5715` |  | **no** | **never** |
+| `on_the_draw` | `True` | 1 | `edhmc/engine.py:5722` |  | **no** | **never** |
 | `opp_avg_power` | `2.5` | 1 | `edhmc/lorehold.py:1537` | §0z116 | **no** | **never** |
 | `opp_creatures_per_turn` | `0.7` | 2 | `edhmc/karlov.py:1048` | §0z179 | **no** | **never** |
-| `opp_death_rate` | `0.55` | 2 | `edhmc/engine.py:4119` | §0z132 | yes | yes |
-| `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:3982` | §0z47 | yes | yes |
-| `opp_land_plateau` | `8` | 3 | `edhmc/engine.py:4432` | §0z151 | yes | yes |
+| `opp_death_rate` | `0.55` | 2 | `edhmc/engine.py:4126` | §0z132 | yes | yes |
+| `opp_instant_rate` | `0.8` | 2 | `edhmc/engine.py:3989` | §0z47 | yes | yes |
+| `opp_land_plateau` | `8` | 3 | `edhmc/engine.py:4439` | §0z151 | yes | yes |
 | `opp_spells_per_turn` | `1.2` | 2 | `edhmc/karlov.py:1053` | §0z179 | **no** | **never** |
 | `opp_vote_policy` | `'adversarial'` | 1 | `edhmc/voting.py:101` |  | yes | yes |
 | `opp_vote_selfish_agree` | `0.6` | 1 | `edhmc/voting.py:109` |  | **no** | **never** |
 | `opponents` | `True` | 13 | `edhmc/azusa.py:4446` | §0z171 | yes | yes |
 | `orchard_idle_tap` | `True` | 1 | `edhmc/karlov.py:551` | §0z128 | yes | yes |
 | `overload_single_target` | `True` | 1 | `edhmc/opponents.py:1749` |  | yes | yes |
-| `overseer_taps` | `True` | 2 | `edhmc/engine.py:3880` | §0z118 | yes | yes |
+| `overseer_taps` | `True` | 2 | `edhmc/engine.py:3887` | §0z118 | yes | yes |
 | `own_wipe_commander_returns` | `True` | 1 | `edhmc/opponents.py:5764` | §0z151 | yes | **never** |
 | `own_wipe_indestructible` | `True` | 2 | `edhmc/opponents.py:5641` | §0z118 | yes | yes |
 | `own_wipe_scope` | `True` | 3 | `edhmc/lorehold.py:1683` | §0z118 | yes | yes |
 | `painland_life` | `True` | 2 | `edhmc/engine.py:1351` | §0z115 | **no** | yes |
-| `pearl_lifelink_cap` | `2` | 1 | `edhmc/engine.py:4948` |  | **no** | **never** |
+| `pearl_lifelink_cap` | `2` | 1 | `edhmc/engine.py:4955` |  | **no** | **never** |
 | `petrified_field` | `True` | 1 | `edhmc/azusa.py:4182` | §0z115 | **no** | yes |
 | `pile_dig` | `True` | 2 | `edhmc/tivit.py:938` | §0z217 | yes | yes |
 | `pile_dig_rounds` | `3` | 1 | `edhmc/tivit.py:984` | §0z217 | yes | **never** |
@@ -372,14 +372,14 @@ show up first.
 | `provisioner_treasure` | `True` | 1 | `edhmc/azusa.py:1640` | §0z153 | yes | yes |
 | `queen_soldier` | `True` | 1 | `edhmc/trostani.py:548` |  | **no** | **never** |
 | `quirion_bounce` | `True` | 1 | `edhmc/azusa.py:2261` | §0z199 | yes | yes |
-| `ramp_rank_bonus` | `0.0` | 1 | `edhmc/engine.py:3276` | §0z193 | yes | **never** |
-| `ramp_rank_turns` | `5` | 1 | `edhmc/engine.py:3278` | §0z193 | yes | **never** |
+| `ramp_rank_bonus` | `0.0` | 1 | `edhmc/engine.py:3283` | §0z193 | yes | **never** |
+| `ramp_rank_turns` | `5` | 1 | `edhmc/engine.py:3285` | §0z193 | yes | **never** |
 | `realms_late_lands` | `6` | 1 | `edhmc/azusa.py:2010` |  | **no** | **never** |
 | `realms_text` | `True` | 1 | `edhmc/azusa.py:2473` | §0z19 | yes | yes |
 | `rearm_rule` | `'reland'` | 1 | `edhmc/opponents.py:580` | §0z137 | yes | yes |
 | `rebound` | `True` | 1 | `edhmc/lorehold.py:2368` |  | yes | yes |
 | `reclamation_life_floor` | `10` | 1 | `edhmc/karlov.py:2532` |  | yes | yes |
-| `rendmaw_seat_upkeeps` | `True` | 1 | `edhmc/engine.py:3898` | §0z185 | yes | yes |
+| `rendmaw_seat_upkeeps` | `True` | 1 | `edhmc/engine.py:3905` | §0z185 | yes | yes |
 | `requiem_subtypes` | `True` | 1 | `edhmc/shilgengar.py:414` | §0z4 | yes | yes |
 | `reservoir_any_time` | `True` | 1 | `edhmc/karlov.py:781` | §0z153 | yes | yes |
 | `reservoir_floor` | `15` | 1 | `edhmc/trostani.py:1459` |  | yes | **never** |
@@ -396,7 +396,7 @@ show up first.
 | `rummage_guard` | `8.5` | 1 | `edhmc/lorehold.py:497` | §0z167 | yes | yes |
 | `rummage_pick` | `'miracle'` | 1 | `edhmc/lorehold.py:491` | §0z167 | yes | yes |
 | `sac_outlets_pay` | `True` | 4 | `edhmc/engine.py:2506` | §0z70 | yes | yes |
-| `sac_outlets_timing` | `'end'` | 1 | `edhmc/engine.py:4971` | §0z73 | yes | yes |
+| `sac_outlets_timing` | `'end'` | 1 | `edhmc/engine.py:4978` | §0z73 | yes | yes |
 | `saga_chapters` | `True` | 3 | `edhmc/tivit.py:1223` | §0z153 | yes | yes |
 | `scry_land_bottom` | `5` | 1 | `edhmc/trostani.py:873` |  | **no** | **never** |
 | `search_shuffle` | `True` | 1 | `edhmc/azusa.py:1999` | §0z153 | yes | yes |
@@ -404,8 +404,8 @@ show up first.
 | `set_top_gate` | `0.0` | 1 | `edhmc/lorehold.py:736` |  | yes | **never** |
 | `shepherd_plains` | `True` | 2 | `edhmc/shilgengar.py:1620` | §0z153 | yes | yes |
 | `shepherd_text` | `True` | 2 | `edhmc/shilgengar.py:805` | §0z75 | yes | yes |
-| `shigeki_min_library` | `15` | 1 | `edhmc/engine.py:5065` | §0z42 | **no** | yes |
-| `shigeki_text` | `True` | 2 | `edhmc/engine.py:3618` | §0z42 | yes | yes |
+| `shigeki_min_library` | `15` | 1 | `edhmc/engine.py:5072` | §0z42 | **no** | yes |
+| `shigeki_text` | `True` | 2 | `edhmc/engine.py:3625` | §0z42 | yes | yes |
 | `shilgengar_sac_policy` | `'ultimate'` | 1 | `edhmc/shilgengar.py:854` |  | **no** | yes |
 | `shilgengar_ult_min_gain` | `1` | 1 | `edhmc/shilgengar.py:878` |  | yes | yes |
 | `shilgengar_ult_reserve` | `3` | 1 | `edhmc/shilgengar.py:995` | §0t | yes | yes |
@@ -416,7 +416,7 @@ show up first.
 | `sieve_real_fuel` | `'combo'` | 1 | `edhmc/tivit.py:476` | §0z71 | yes | yes |
 | `sieve_real_mv_cap` | `2` | 1 | `edhmc/tivit.py:481` | §0z71 | yes | yes |
 | `sieve_taps` | `True` | 1 | `edhmc/tivit.py:2066` |  | yes | yes |
-| `snake_types` | `True` | 1 | `edhmc/engine.py:3906` | §0z153 | yes | yes |
+| `snake_types` | `True` | 1 | `edhmc/engine.py:3913` | §0z153 | yes | yes |
 | `snapshot_rounds` | `()` | 1 | `edhmc/engine.py:1619` | §0z93 | yes | yes |
 | `solemn_text` | `True` | 3 | `edhmc/engine.py:1884` | §0z133 | yes | yes |
 | `sorin_loyalty` | `True` | 2 | `edhmc/karlov.py:713` |  | yes | yes |
@@ -430,16 +430,16 @@ show up first.
 | `starting_life` | `40` | 4 | `edhmc/karlov.py:1454` |  | **no** | yes |
 | `storm_cauldron` | `True` | 1 | `edhmc/azusa.py:2122` | §4 | **no** | yes |
 | `storm_herd_x` | `<none>` | 1 | `edhmc/lorehold.py:1330` | §0z49 | yes | yes |
-| `surveil_land_floor` | `6` | 2 | `edhmc/engine.py:5294` |  | **no** | **never** |
-| `swarmweaver_deathtouch` | `True` | 1 | `edhmc/engine.py:5261` | §0z232 | yes | yes |
+| `surveil_land_floor` | `6` | 2 | `edhmc/engine.py:5301` |  | **no** | **never** |
+| `swarmweaver_deathtouch` | `True` | 1 | `edhmc/engine.py:5268` | §0z232 | yes | yes |
 | `talisman_coloured_tap` | `True` | 1 | `edhmc/engine.py:1350` | §0z115 | yes | **never** |
 | `tempting_contract_text` | `True` | 1 | `edhmc/tivit.py:1563` | §0z207 | yes | yes |
 | `tempting_offer_rate` | `0.5` | 1 | `edhmc/voting.py:220` |  | yes | yes |
-| `thomil_lord_fodder` | `2` | 1 | `edhmc/engine.py:4325` |  | **no** | **never** |
+| `thomil_lord_fodder` | `2` | 1 | `edhmc/engine.py:4332` |  | **no** | **never** |
 | `threat_clock_shift` | `2.3` | 1 | `edhmc/opponents.py:542` | §0z132 | yes | yes |
 | `threat_hold` | `True` | 1 | `edhmc/opponents.py:816` | §0z134 | yes | yes |
 | `threat_rebuild_max` | `3` | 1 | `edhmc/opponents.py:528` | §0z131 | yes | yes |
-| `throne_etb` | `True` | 1 | `edhmc/engine.py:3363` | §0z153 | yes | yes |
+| `throne_etb` | `True` | 1 | `edhmc/engine.py:3370` | §0z153 | yes | yes |
 | `tithe_forced_draws` | `True` | 1 | `edhmc/lorehold.py:2966` | §0z153 | yes | yes |
 | `tithe_shared` | `True` | 2 | `edhmc/lorehold.py:3209` | §0z151 | yes | yes |
 | `tivit_death_triggers` | `True` | 3 | `edhmc/tivit.py:268` | §0z207 | yes | yes |
@@ -452,7 +452,7 @@ show up first.
 | `treasure_hoard` | `False` | 1 | `edhmc/shilgengar.py:935` |  | yes | **never** |
 | `treasures_as_mana` | `True` | 1 | `edhmc/shilgengar.py:933` |  | yes | yes |
 | `trostani_attacks` | `False` | 1 | `edhmc/trostani.py:1621` |  | yes | **never** |
-| `turn_cfg` | `<none>` | 1 | `edhmc/engine.py:4819` | §0z163 | yes | yes |
+| `turn_cfg` | `<none>` | 1 | `edhmc/engine.py:4826` | §0z163 | yes | yes |
 | `turns` | **conflicts** | 8 | `edhmc/azusa.py:4645` | §0z17 | yes | yes |
 | `tutor_etb` | `True` | 3 | `edhmc/azusa.py:2843` | §0z212 | yes | yes |
 | `tutor_floor` | `6` | 1 | `edhmc/engine.py:698` | §0z213 | yes | yes |
@@ -469,16 +469,16 @@ show up first.
 | `vault_paid` | `True` | 1 | `edhmc/engine.py:2787` | §0z206 | **no** | yes |
 | `vigor_counters` | `True` | 1 | `edhmc/engine.py:2253` | §0z118 | yes | yes |
 | `vote_answers` | `True` | 1 | `edhmc/opponents.py:738` |  | yes | yes |
-| `want_land_target` | `7` | 1 | `edhmc/engine.py:4533` |  | yes | **never** |
+| `want_land_target` | `7` | 1 | `edhmc/engine.py:4540` |  | yes | **never** |
 | `ward_pay_rule` | `'mana'` | 1 | `edhmc/opponents.py:1520` | §0z224 | yes | yes |
 | `ward_pay_share` | `0.5` | 1 | `edhmc/opponents.py:1522` | §0z224 | yes | yes |
 | `ward_text` | `True` | 1 | `edhmc/opponents.py:1492` | §0z224 | yes | yes |
 | `watch` | `()` | 21 | `edhmc/azusa.py:2312` | §0z115 | yes | yes |
 | `welcome_mana` | `True` | 1 | `edhmc/lorehold.py:1967` | §0z178 | **no** | yes |
-| `whip_reanimate` | `True` | 1 | `edhmc/engine.py:5098` | §0z73 | yes | yes |
-| `whip_text` | `True` | 6 | `edhmc/engine.py:5098` | §0z140 | yes | yes |
-| `wickerfolk_gy` | `True` | 1 | `edhmc/engine.py:5322` |  | yes | yes |
-| `wickerfolk_life_floor` | `10` | 1 | `edhmc/engine.py:5327` |  | yes | yes |
+| `whip_reanimate` | `True` | 1 | `edhmc/engine.py:5105` | §0z73 | yes | yes |
+| `whip_text` | `True` | 6 | `edhmc/engine.py:5105` | §0z140 | yes | yes |
+| `wickerfolk_gy` | `True` | 1 | `edhmc/engine.py:5329` |  | yes | yes |
+| `wickerfolk_life_floor` | `10` | 1 | `edhmc/engine.py:5334` |  | yes | yes |
 | `wildspeaker_mode` | `'auto'` | 1 | `edhmc/azusa.py:3338` |  | **no** | yes |
 | `wipe_gate_all_casts` | `True` | 7 | `edhmc/karlov.py:1798` | §0z104 | yes | yes |
 | `wipe_gate_measure` | `'cost'` | 2 | `edhmc/opponents.py:5627` | §0z106 | yes | yes |
@@ -487,8 +487,8 @@ show up first.
 | `wipe_gate_refund` | `True` | 1 | `edhmc/opponents.py:5674` | §4 | yes | yes |
 | `wipe_response` | `True` | 1 | `edhmc/trostani.py:371` |  | **no** | **never** |
 | `wipe_threshold` | `1.4` | 1 | `edhmc/opponents.py:5653` | §0z138 | yes | yes |
-| `woe_strider_escape` | `True` | 1 | `edhmc/engine.py:5381` | §0z227 | yes | yes |
-| `woe_strider_outlet` | `False` | 1 | `edhmc/engine.py:5356` | §0z219 | yes | yes |
+| `woe_strider_escape` | `True` | 1 | `edhmc/engine.py:5388` | §0z227 | yes | yes |
+| `woe_strider_outlet` | `True` | 1 | `edhmc/engine.py:5363` | §0z233 | yes | yes |
 | `wurm_kill_share` | `0.35` | 1 | `edhmc/shilgengar.py:1168` |  | yes | **never** |
 | `wurm_route_pieces` | `True` | 2 | `edhmc/shilgengar.py:1174` | §0z151 | yes | yes |
 | `you_block` | `True` | 2 | `edhmc/opponents.py:363` | §0z199 | yes | yes |

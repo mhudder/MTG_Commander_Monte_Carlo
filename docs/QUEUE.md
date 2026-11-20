@@ -341,5 +341,6 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     **BUILT AND MEASURED 2026-11-20 (§0z233)**: `altar_death_step`, four
     arms. On fresh seeds at N=60,000, `"lethal"` (sacrifice only when the
     drains finish an opponent) beats the old rule by +0.0003 / +0.0006 and
-    beats `"none"` and `"safe"`. **Left: the owner's adoption decision**; if
-    adopted, rendmaw's rebuild.
+    beats `"none"` and `"safe"`. **ADOPTED BY THE OWNER 2026-11-20**, with
+    Woe Strider's outlet turned on under it; rendmaw's rebuild follows, and
+    is all that is left of this item.

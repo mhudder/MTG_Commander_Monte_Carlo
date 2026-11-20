@@ -3115,9 +3115,11 @@ def altar_death_victims(g) -> list:
     Artist's and The Meathook Massacre's drains. `altar_death_step`:
 
       "two"     the old rule: two of `altar_fodder` a turn, whatever they
-                are -- written when your creatures never blocked (§0z219).
+                are -- written when your creatures never blocked (§0z219)
+                and measured to cost there.
       "none"    no death step; the Altar's mana step (§0z20) is unchanged.
-      "lethal"  only when the drains finish an opponent: the fewest
+      "lethal"  THE DEFAULT, ADOPTED BY THE OWNER 2026-11-20 (§0z233): only
+                when the drains finish an opponent: the fewest
                 creature tokens that do (`death_step_lethal`), from ALL your
                 tokens, not only `altar_fodder`'s excess -- a player removed
                 is a third of the pod's attacks gone.
@@ -3128,9 +3130,14 @@ def altar_death_victims(g) -> list:
                 round read without it (`predicted_chip`) leaves you above
                 `hold_back_pad` (10) -- the hold-back's own test (§0z186).
 
+    MEASURED (§0z233, N=60,000 on fresh seeds): "lethal" beats "two" by
+    +0.0003 / +0.0006 (T10/T20) and beats "none" and "safe" -- the old
+    rule's non-lethal sacrifices cost a blocker each, its lethal ones pay,
+    and the hold-back's guard does not make a non-lethal one worth it.
+
     Every count the prediction writes is put back, and the board is restored,
     so asking changes nothing."""
-    mode = g.cfg.get("altar_death_step", "two")
+    mode = g.cfg.get("altar_death_step", "lethal")
     if mode == "two":
         return altar_fodder(g)[:2]
     if mode == "none":
@@ -4086,8 +4093,8 @@ def activations(g: Game):
         # expendable", also used by main_phase's mana step (§0z20). Called
         # with no `units` here because this path is post-main and taps
         # nothing: the selection is identical to what this block did inline.
-        # WHICH tokens is `altar_death_victims` (item 51, §0z233); "two" is
-        # the old rule exactly.
+        # WHICH tokens is `altar_death_victims` (item 51, §0z233): "lethal"
+        # by default; "two" is the old rule exactly.
         woe_only = not g.has("Ashnod's Altar")
         for p in altar_death_victims(g):
             g.board.remove(p)
@@ -5342,18 +5349,18 @@ def woe_strider_outlet(g) -> bool:
     """WOE STRIDER: "Sacrifice another creature: Scry 1." (Scryfall
     2026-11-17.) A FREE outlet, so the deaths Ashnod's Altar manufactures for
     Blood Artist and The Meathook Massacre in `activations` need either card,
-    under the Altar's own rule (`altar_fodder`, two a turn): the outlet is
+    under the Altar's own rule (`altar_death_victims`, §0z233): the outlet is
     what lets the death happen, and the Altar's mana is not what that step
     was for. The scry is not modelled (item 4), a floor. With the Altar out
     nothing changes.
 
-    OFF BY DEFAULT, MEASURED (§0z227): on, it cost -0.0003 +-0.0003 at T20
-    (N=15,000) -- the two tokens it eats are blockers since the flip
-    (§0z219), and final life fell. The best use measured is none, so the
-    pilot declines it; `woe_strider_outlet=True` turns it on. The Altar's
-    death step is the same rule, written before your creatures blocked
-    (queue item 51)."""
-    return (g.cfg.get("woe_strider_outlet", False)
+    ON BY DEFAULT SINCE §0z233 (the owner, 2026-11-20). Under the death
+    step's old rule ("two") it cost -0.0003 +-0.0003 at T20 (§0z227): the
+    two tokens a turn it ate were blockers. Under "lethal", the rule adopted
+    in §0z233, it sacrifices only when the drains finish an opponent, and
+    on fresh seeds (N=60,000) it reads +0.0002 +-0.0001 / +0.0002 +-0.0002
+    (T10/T20). `woe_strider_outlet=False` is the pilot who declines it."""
+    return (g.cfg.get("woe_strider_outlet", True)
             and any(p.card.name == WOE_STRIDER for p in g.board))
 
 

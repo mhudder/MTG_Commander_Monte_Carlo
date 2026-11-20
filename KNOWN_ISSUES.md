@@ -285,7 +285,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z230](#0z230) | FIXED | **Vault of the Archangel's deathtouch** (§0z206 floor 1), read by `deathtouch_of` on a Vault turn; karlov and shilgengar, a null |
 | [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
-| [0z233](#0z233) | MEASURED | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; not adopted, the owner's call |
+| [0z233](#0z233) | DECIDED | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20099,7 +20099,7 @@ bar again (+0.0029 +-0.0041; T10 +0.0099 +-0.0037), kept staged by the owner.
 
 <a id="0z233"></a>
 
-## 0z233. MEASURED -- Ashnod's Altar's death step after the flip (queue item 51)
+## 0z233. DECIDED -- Ashnod's Altar's death step after the flip (queue item 51)
 
 **The owner, 2026-11-20: "start with 51."** `engine.activations` fed Ashnod's
 Altar (or Woe Strider, §0z227) two tokens a turn beyond `altar_keep` (6)
@@ -20169,9 +20169,24 @@ not only the excess over `altar_keep`. Even guarded by the hold-back's test,
 a non-lethal drain is not worth the body. The best non-lethal use measured
 is none, as with the miracle reserve (§0z164).
 
-**Not adopted.** The default is still `"two"`: changing it moves rendmaw's
-baseline and costs its rebuild, and adopting it is the owner's call. The
-size is +0.0006 at T20, measured on the seeds that did not pick it.
+**ADOPTED BY THE OWNER 2026-11-20 ("yes, adopt lethal and rebuild
+rendmaw")**: `altar_death_step` defaults to `"lethal"`; `"two"` is the old
+rule exactly. The size is +0.0006 at T20, measured on the seeds that did not
+pick it.
+
+**Woe Strider's outlet, re-read under the new rule** (§0z5: a policy written
+while the old rule stood). §0z227 turned it off because, under `"two"`, it
+ate two blockers a turn. Under `"lethal"` it sacrifices only to finish an
+opponent: on fresh seeds, N=60,000, seeds 100000.., **+0.0002 +-0.0001 /
++0.0002 +-0.0002** (T10/T20, each at its bar's edge), 0.4% of games reached,
+identity 0 (`results/knob_ab_rendmaw_woe_outlet_lethal_fresh.txt`); on the
+tables' seeds, N=15,000, +0.0003 +-0.0003 / -0.0001 +-0.0003, inside its bar
+(`..._woe_outlet_lethal.txt`). **TURNED ON BY THE OWNER 2026-11-20**, in the
+same rebuild: `woe_strider_outlet` defaults to True.
+
+**What moved, at 2,000 seeds against `61e75a1`**: rendmaw only (won
+-0.0010, two games); lorehold, karlov, tivit, shilgengar and azusa
+BIT-IDENTICAL (VERIFIED). Rendmaw's table is rebuilt.
 
 ## How to read an ablation table
 
