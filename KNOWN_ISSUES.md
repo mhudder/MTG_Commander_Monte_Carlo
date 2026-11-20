@@ -286,6 +286,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
 | [0z233](#0z233) | REBUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt, no row moved |
+| [0z234](#0z234) | DECIDED | **Item 50 written down: a real mana model for the pod** -- the rules it rests on, the owner's six decisions, a land counted early on your turn; nothing built |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20200,6 +20201,123 @@ is left of the row is the Altar's mana step (§0z20) and the card itself --
 a 3-mana artifact that is a blank on most turns -- not this rule. Rendmaw
 has nothing staged, so no swap is re-measured. Wall time about 16 minutes
 on four processes.
+
+<a id="0z234"></a>
+
+## 0z234. DECIDED -- Item 50 written down: a real mana model for the pod
+
+**The owner, 2026-11-20: "Let's start on item 50, review the steps before
+proceeding. Ensure your assumptions line up with the official magic rules in
+the word doc in the repo."** Reviewed against the code and
+`docs/MagicCompRules_20260807.docx`; every rule cited below was read from
+the `.docx` and is word for word the same in the `.txt` (35 rules compared,
+0 differ). **Nothing is built.** This section is the design and the
+decisions; queue item 50 is the work.
+
+### What stands in for the pod's mana today
+
+| the pod's | stand-in | where |
+|---|---|---|
+| spot, A/E and wipe removal | a per-turn probability from pod turn 3 (wipes from 5), no cost | `spot_removal`, `ae_removal`, `board_wipe` |
+| counterspells, on your turn | `counters_held` (1-2), rate x `(pod turn - 2) / 4` | `_countered` |
+| a mana ward | pod turn t is t mana, paid when t >= 3 + N | `ward_payable` (§0z224) |
+| A6's held answers | a roll (`held_answer_share` 0.5), no mana held | `pod_holds_answer` (§0z221) |
+| bodies | 0.7 x `board` a turn; each has a mana value 1-4, never paid | `grow_board`, `BodyPool` |
+| route pieces | land on `kill_turn - lead`; a mana value, never paid | `roll_threat_routes` |
+| Ghostly Prison, Propaganda (tivit) | `attack_tax_deflect` (0.5), a share of attacks turned away | `attack_tax_through`, `tax_deflects` |
+| Rhystic Study (tivit), Smothering Tithe (lorehold, shilgengar), Monologue Tax | flat rates: one draw a round; never pays; a second spell rate | the engines |
+
+### The rules, and what each one settles
+
+| rule | what it says | for the model |
+|---|---|---|
+| 305.1, 305.2, 305.3 | a land is played in your own main phase, normally one a turn; never on another player's turn | at most one land drop per opponent turn, plus ramp (305.2: "continuous effects may increase this number") |
+| 103.8c, 800.7 | in a multiplayer game other than Two-Headed Giant no player skips their first draw | every opponent draws on every turn, its first included |
+| 903.7, 103.5, 103.5c | 40 life and seven cards; in multiplayer the first mulligan is free | the opening hand and the mulligan, from a modelled library |
+| 106.4 | every mana pool empties at the end of each step and phase | no mana floats between turns: held mana is untapped sources |
+| 502.3 | a player's permanents untap in that player's untap step | what an opponent taps on its own turn stays tapped through every later seat's turn AND yours; what it taps on your turn is back at its next untap |
+| 302.6 | a creature's {T} ability needs it under control since its controller's turn began | a mana creature adds mana from its controller's next turn (out of this batch, below) |
+| 111.10a | a Treasure is "{T}, Sacrifice this token: Add one mana of any color" | one-shot mana |
+| 601.2f-h, 702.21a | a spell's whole cost is paid on casting; ward is a TRIGGER that counters it unless its controller then pays | ward needs spell cost plus ward cost untapped at once: §0z224's shape is right, `t` is not |
+| 117.1a | an instant any time with priority; anything else in your own main phase with the stack empty | removal cast on your turn is instant-speed; `held_answer_share` stays a judgement about that share, only its mana becomes real |
+| 508.1g-j | costs to attack are determined, "locked in", and paid as attackers are declared; no partial payment | Ghostly Prison's {2} a creature is paid in the pod's combat, from what main phase 1 left; an attacker not paid for does not attack |
+| 702.19b | trample assigns lethal damage to blockers, the rest to the player | the damage an attacker would get through is what its tax buys |
+| 903.8 | the commander tax | OUT OF SCOPE: the pod has no commander object |
+| 402.2, 514.1 | maximum hand size, the cleanup discard | OUT OF SCOPE: the pod's spells are rolled, not drawn into a hand |
+
+### A finding: on your turn the pod is read one land richer than it is
+
+`engine.take_turn` advances `g.turn` as your turn begins, and the pod's
+round runs at the same number. So on your turn t each opponent has had t-1
+turns -- at most t-1 lands (305.2) -- but every pod action on your turn
+reads `pod_turn(g)` = t. Two do: A6's held answers pay a ward through
+`ward_payable` (Tivit's {3} is paid a turn early by its own "one land a
+turn" reading), and the counterspell ramp. **Not fixed separately**: a real
+mana model fixes it by construction, and a separate fix would cost tivit's
+and rendmaw's tables a rebuild that item 50 pays anyway.
+
+### The owner's decisions (2026-11-20)
+
+1. **"Model the library, based on the decklists that should be fairly
+   straightforward."** Each opponent's land drops come from a pre-rolled
+   library, from its own stream (§0z17): 99 cards, seven drawn, the free
+   mulligan, a draw every turn, a land played when one is in hand. **Its
+   composition is GENERATED from the six lists** -- the land count and the
+   ramp count, the way `_removal.SPOT_SPELL_MV` is -- not typed. The lists
+   are your decks standing in for the pod's, the same proxy the census
+   already makes. The mulligan's keep rule is a judgement.
+2. **Ramp is mana rocks and land ramp only. "Leave those for later but
+   record that decision to revisit"**: mana creatures (302.6, bodies that
+   die to wipes and to your removal) are queue item 52.
+3. **Development is CHARGED, NOT GATED** (the owner: "agree with your
+   recommendations, also record this decision to revisit"): bodies and route
+   pieces arrive when they do today and their mana values are spent; the
+   shortfall falls on the answers. The kill turns do not move, so the
+   calibration moves least. The full budget -- holding mana up delays
+   development, and so the kills -- is queue item 52.
+4. **The spending order, agreed**: route piece, removal at you, bodies, the
+   rest held up; a blue opponent with a counterspell left keeps its cost up
+   before bodies. **Mapped onto the pod's turn as it is played**
+   (`_pod_seat_round`, §0z179): main 1 is the route piece and removal; combat
+   is the attack taxes (508.1h-j); main 2 is the bodies (they are cast there
+   today, which is why they are summoning-sick); what is untapped at its end
+   step is held for your turn (502.3). So **a tax is paid before bodies**:
+   that follows from the turn's phases, not from a new choice.
+5. **"Yes, scale them back"**: the removal and counterspell rates stand
+   today for drawing the card AND having the mana. Gated by mana they are
+   scaled back to the pod's documented target (about four spot removal
+   spells and one wipe a game, `BRACKETS`' header), and then the pod is
+   re-fitted to hold the mean win rate (§0z195).
+6. **"Tax in this batch. In general Rhystic Study, Smothering Tithe, and
+   Monologue Tax are low priority. Propaganda and Ghostly Prison should be
+   weighed against damage to be dealt (1 damage is not worth the mana, 20
+   trample damage is, for example)."** Ghostly Prison and Propaganda are in
+   this batch: the pod pays an attacker's {2} when the damage it would get
+   through -- after your blocks (`plan_blocks`), its trample counted
+   (702.19b) -- is worth that much of its mana, and always for an attack
+   that is lethal. The damage-per-mana bar is a judgement, said out loud
+   when it is built. Rhystic Study, Smothering Tithe and Monologue Tax are
+   low priority and wait, in queue item 52.
+
+### The judgements, each a knob, none with data
+
+The mulligan's keep rule; the damage-per-mana bar for a tax; a blue
+opponent's choice to hold its counterspell; the re-fit's scale factors.
+**Generated, not judged**: lands and ramp per list (the census), the mana
+values of wipes, A/E removal and counterspells (extending
+`tools.removal_census`; `SPOT_SPELL_MV` is 3 today).
+
+### The build, the item-44 way
+
+Every rule behind a switch, off until measured: the land library; the
+spending; the gates (removal and wipes on their cost; ward on spell plus
+ward; counterspells and held answers on what was left untapped; the taxes on
+damage per mana). Each pinned by a test whose mutation set is written before
+it runs, and `tools.validate` at `+0.00`. Each measured with `run_knob_ab`
+and its identity; then flipped together, the rates scaled back, the pod
+re-fitted, the stranded knobs found (`run_knob_liveness`, §0z205) -- the
+counterspell ramp, `ward_pay_rule`, the turn-3 gates -- every table rebuilt
+(`parallel-rebuild`), and the staged swaps re-measured.
 
 ## How to read an ablation table
 

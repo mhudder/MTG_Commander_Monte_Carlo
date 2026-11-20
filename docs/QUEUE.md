@@ -62,8 +62,9 @@ items below this section are in the order they were queued, not this one.
    all three ward cards. Any time; after step 3 each
    staged card rebuilds its own deck (§0z27).
 7. **Item 49: the small cleanups.**
-7b. **Item 50: a real mana model for the pod** -- written down 2026-11-17,
-   the owner's to schedule; item-44 scale.
+7b. **Item 50: a real mana model for the pod** -- written down 2026-11-17;
+   **STARTED BY THE OWNER 2026-11-20**, reviewed and decided (§0z234);
+   item-44 scale. Item 52 is what it left for later.
 8. **When the owner picks them back up**: item 28 (paused), item 29's
    leftovers, item 32. Item 34's deletes are the owner's, on github.com.
    Items 18 and 5 wait on trostani (SUSPENDED).
@@ -326,3 +327,24 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       -- item 44's scale. Build it the item-44 way: every rule behind a
       switch, OFF until measured, flipped together, one re-fit, one rebuild.
     Not started. The owner's to schedule.
+    **STARTED AND WRITTEN DOWN 2026-11-20 (§0z234)**: reviewed against the
+    comprehensive rules (the `.docx`), the six decisions made by the owner --
+    a library generated from the decklists; rocks and land ramp only;
+    development charged, not gated; route piece, removal, bodies, the rest
+    held; the rates scaled back and the pod re-fitted; Ghostly Prison and
+    Propaganda weighed against the damage they buy. What the owner left for
+    later is item 52. Next: the census (generated costs, lands and ramp),
+    then each rule behind a switch.
+
+52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
+    2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:
+    - **Mana creatures** ("leave those for later but record that decision
+      to revisit"): a pod body that taps for mana from its controller's next
+      turn (302.6), dies to wipes and to your removal, and so ties the
+      pod's mana to its board.
+    - **Development gated by mana** ("also record this decision to
+      revisit"): the full budget, where holding mana up delays bodies and
+      route pieces, and so moves the kill turns -- a second re-fit.
+    - **Rhystic Study, Smothering Tithe, Monologue Tax** ("low priority"):
+      each pays or not from the pod's spare mana instead of a flat rate.
+    None starts before item 50 is flipped and rebuilt.

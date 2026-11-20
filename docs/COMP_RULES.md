@@ -41,6 +41,11 @@ to.
 | **613.1d** | type-changing effects are **layer 4**; P/T-setting is layer 7 | §0z — Ashaya's two clauses interact |
 | **702.12b** | an indestructible permanent isn't destroyed by lethal damage and **ignores the state-based action that checks for it** (704.5g) | §0z10, closed — confirms the fix |
 | **704.5j** | the legend rule puts the extras into their **owners' graveyards** | §0z5, closed — confirms the fix |
+| **305.2, 305.3** | normally one land a turn, and never on another player's turn | queued item **50** (§0z234) -- the pod's land drops |
+| **103.8c, 103.5c** | in multiplayer no player skips their first draw; the first mulligan is free | queued item **50** (§0z234) -- the pod's library |
+| **106.4, 502.3** | mana pools empty at the end of each step and phase; a player's permanents untap in their own untap step | queued item **50** (§0z234) -- held mana is untapped sources, and what the pod taps on its turn stays tapped through yours |
+| **702.21a, 601.2h** | ward is a trigger that counters unless its controller pays, after the spell's own cost is paid | queued item **50** (§0z224, §0z234) -- spell plus ward, untapped at once |
+| **508.1h-j** | costs to attack are locked in and paid as attackers are declared, no partial payment | queued item **50** (§0z234) -- Ghostly Prison and Propaganda |
 
 ### 104.3j — commander damage, MODELLED since §0z65
 
