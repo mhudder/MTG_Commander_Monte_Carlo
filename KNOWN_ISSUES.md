@@ -285,7 +285,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z230](#0z230) | FIXED | **Vault of the Archangel's deathtouch** (§0z206 floor 1), read by `deathtouch_of` on a Vault turn; karlov and shilgengar, a null |
 | [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
-| [0z233](#0z233) | DECIDED | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt |
+| [0z233](#0z233) | REBUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt, no row moved |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20099,7 +20099,7 @@ bar again (+0.0029 +-0.0041; T10 +0.0099 +-0.0037), kept staged by the owner.
 
 <a id="0z233"></a>
 
-## 0z233. DECIDED -- Ashnod's Altar's death step after the flip (queue item 51)
+## 0z233. REBUILT -- Ashnod's Altar's death step after the flip (queue item 51)
 
 **The owner, 2026-11-20: "start with 51."** `engine.activations` fed Ashnod's
 Altar (or Woe Strider, §0z227) two tokens a turn beyond `altar_keep` (6)
@@ -20187,6 +20187,19 @@ same rebuild: `woe_strider_outlet` defaults to True.
 **What moved, at 2,000 seeds against `61e75a1`**: rendmaw only (won
 -0.0010, two games); lorehold, karlov, tivit, shilgengar and azusa
 BIT-IDENTICAL (VERIFIED). Rendmaw's table is rebuilt.
+
+**REBUILT 2026-11-20 at `bc70579`**, serially (one deck), python 3.13.18 /
+numpy 2.4.6 -- the last rebuild's interpreter; `tools.repro_row` IDENTICAL on
+Woe Strider. Baseline 0.1009 -> 0.1015 at T10, 0.3361 at T20 unchanged.
+**No row moved beyond the wider of its two bars, and no significant sign
+flipped**: Blood Artist +0.0131 -> +0.0130, The Meathook Massacre +0.0071 ->
++0.0072, Woe Strider +0.0044 -> +0.0043, all +-0.0023 to +-0.0028. **Said
+out loud: Ashnod's Altar still reads -0.0016 +-0.0015** (was -0.0017), at
+its bar's edge. The death step now fires only to finish a player, so what
+is left of the row is the Altar's mana step (§0z20) and the card itself --
+a 3-mana artifact that is a blank on most turns -- not this rule. Rendmaw
+has nothing staged, so no swap is re-measured. Wall time about 16 minutes
+on four processes.
 
 ## How to read an ablation table
 

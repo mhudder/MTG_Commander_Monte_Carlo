@@ -1937,9 +1937,9 @@
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "232c1765fb4a9e66",
-    "built_commit": "5a00891",
-    "built_utc": "2026-11-17T06:01:51Z",
+    "built_at": "f9319f79612b03c8",
+    "built_commit": "bc70579",
+    "built_utc": "2026-11-20T13:49:46Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2514,16 +2514,23 @@
             "utc": "2026-11-17T03:49:26Z"
           }
         ]
+      },
+      {
+        "built_at": "232c1765fb4a9e66",
+        "built_commit": "5a00891",
+        "built_utc": "2026-11-17T06:01:51Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "8e34c1a081ffe6be",
+            "utc": "2026-11-20T01:05:38Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "8e34c1a081ffe6be",
-        "utc": "2026-11-20T01:05:38Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "01392a48ca1fe693",

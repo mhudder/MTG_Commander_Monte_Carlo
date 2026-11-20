@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 47 and 48 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48 and 51 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -326,21 +326,3 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       -- item 44's scale. Build it the item-44 way: every rule behind a
       switch, OFF until measured, flipped together, one re-fit, one rebuild.
     Not started. The owner's to schedule.
-
-51. **THE ALTAR'S DEATH STEP AFTER THE FLIP (§0z227).** `engine.activations`
-    feeds Ashnod's Altar two tokens a turn beyond `altar_keep` (6) while Blood
-    Artist or The Meathook Massacre is out, for the drains. The rule was
-    written when your creatures never blocked; since §0z219 a token is a
-    blocker on the pod's turns. Woe Strider's free outlet, run under the same
-    rule, measured -0.0003 +-0.0003 at T20 and lower final life, so it is
-    off by default. **Measure the Altar's step on and off** (it has no switch
-    yet: add one, the old rule the default until measured) and, if it costs,
-    look for the pilot's rule -- sacrifice only a token that is not needed to
-    block, or only for a lethal drain. Rendmaw only; a rebuild if the
-    default changes.
-    **BUILT AND MEASURED 2026-11-20 (§0z233)**: `altar_death_step`, four
-    arms. On fresh seeds at N=60,000, `"lethal"` (sacrifice only when the
-    drains finish an opponent) beats the old rule by +0.0003 / +0.0006 and
-    beats `"none"` and `"safe"`. **ADOPTED BY THE OWNER 2026-11-20**, with
-    Woe Strider's outlet turned on under it; rendmaw's rebuild follows, and
-    is all that is left of this item.

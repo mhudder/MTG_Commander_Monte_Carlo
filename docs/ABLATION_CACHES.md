@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `61e75a1`.
+Generated at `bc70579`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -89,7 +89,7 @@ the fingerprint above mean anything.
 | `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `559e56d1d7c38c4b` | `5a00891` | **VERIFIED** |
 | `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `d068976625f352f1` | `5a00891` | **VERIFIED** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `022a5f0fbcd885a8` | `3d978b8` | **VERIFIED** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `232c1765fb4a9e66` | `5a00891` | **SUSPECT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `f9319f79612b03c8` | `bc70579` | **CURRENT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `01392a48ca1fe693` | `5a00891` | **VERIFIED** |
 | `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `aa3ce555f310a141` | `c9f18f4` | **VERIFIED** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
@@ -109,8 +109,7 @@ the fingerprint above mean anything.
   - verified at `0884e01056e6cca9` (`cb9b987`, 2026-11-17T05:26:12Z): §0z227-§0z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).
   - verified at `01071c46df54a6d5` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
   - verified at `9c09460a34946226` (`61e75a1`, 2026-11-20T13:34:07Z): 2026-11-20, §0z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `232c1765fb4a9e66`, live is `f9319f79612b03c8`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `5a00891`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
-  - verified at `8e34c1a081ffe6be` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `f9319f79612b03c8`, which is live.
 - **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — VERIFIED. built at `01392a48ca1fe693`; fingerprint has since moved to `407dc1389a66f740` and was CHECKED at `61e75a1` (2026-11-20T13:34:08Z): 2026-11-20, §0z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics
   - verified at `a8f996a483abb3e8` (`3c9afb5`, 2026-11-20T01:05:38Z): 2026-11-20, §0z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list
   - verified at `407dc1389a66f740` (`61e75a1`, 2026-11-20T13:34:08Z): 2026-11-20, §0z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics

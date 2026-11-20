@@ -3012,6 +3012,31 @@ left them:
 A container restart killed item 41's first run; it was re-run whole. The
 other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
+## Queued items closed 2026-11-20 — moved from `docs/QUEUE.md`
+
+Closed 2026-11-20: the death step is "lethal", adopted by the owner with Woe
+Strider's outlet turned on under it, and rendmaw rebuilt at `bc70579` on
+python 3.13.18 (§0z233): no row beyond the wider bar, no sign flip,
+`tools.repro_row` IDENTICAL. Moved verbatim:
+
+51. **THE ALTAR'S DEATH STEP AFTER THE FLIP (§0z227).** `engine.activations`
+    feeds Ashnod's Altar two tokens a turn beyond `altar_keep` (6) while Blood
+    Artist or The Meathook Massacre is out, for the drains. The rule was
+    written when your creatures never blocked; since §0z219 a token is a
+    blocker on the pod's turns. Woe Strider's free outlet, run under the same
+    rule, measured -0.0003 +-0.0003 at T20 and lower final life, so it is
+    off by default. **Measure the Altar's step on and off** (it has no switch
+    yet: add one, the old rule the default until measured) and, if it costs,
+    look for the pilot's rule -- sacrifice only a token that is not needed to
+    block, or only for a lethal drain. Rendmaw only; a rebuild if the
+    default changes.
+    **BUILT AND MEASURED 2026-11-20 (§0z233)**: `altar_death_step`, four
+    arms. On fresh seeds at N=60,000, `"lethal"` (sacrifice only when the
+    drains finish an opponent) beats the old rule by +0.0003 / +0.0006 and
+    beats `"none"` and `"safe"`. **ADOPTED BY THE OWNER 2026-11-20**, with
+    Woe Strider's outlet turned on under it; rendmaw's rebuild follows, and
+    is all that is left of this item.
+
 ## Queued items closed 2026-11-16 — moved from `docs/QUEUE.md`
 
 Closed 2026-11-16: every decision of the old pod re-measured on the new (§0z220); tivit's §0z44 priorities, a null now, kept by the owner ("keep tivit's priorities").
