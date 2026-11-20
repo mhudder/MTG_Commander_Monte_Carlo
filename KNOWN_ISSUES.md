@@ -285,7 +285,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z230](#0z230) | FIXED | **Vault of the Archangel's deathtouch** (§0z206 floor 1), read by `deathtouch_of` on a Vault turn; karlov and shilgengar, a null |
 | [0z231](#0z231) | FIXED | **Azusa's granted keywords** (§0z206 floors 2-4): an animated land's reach and indestructible, Nissa's emblem, Sapling Nursery's Treefolk's reach; a null |
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
-| [0z233](#0z233) | BUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; every arm within 0.0003 of it, fresh seeds next |
+| [0z233](#0z233) | MEASURED | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; not adopted, the owner's call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20099,7 +20099,7 @@ bar again (+0.0029 +-0.0041; T10 +0.0099 +-0.0037), kept staged by the owner.
 
 <a id="0z233"></a>
 
-## 0z233. BUILT -- Ashnod's Altar's death step after the flip (queue item 51)
+## 0z233. MEASURED -- Ashnod's Altar's death step after the flip (queue item 51)
 
 **The owner, 2026-11-20: "start with 51."** `engine.activations` fed Ashnod's
 Altar (or Woe Strider, §0z227) two tokens a turn beyond `altar_keep` (6)
@@ -20140,10 +20140,38 @@ at 2,000 seeds against `3c9afb5` (VERIFIED).
 | `"safe"` | **+0.0003 +-0.0003** | +0.0002 +-0.0004 | 1.2% | -0.026 |
 
 Every arm is at its bar's edge and three were read on one block of seeds,
-so none is a result yet (§0z170): **fresh seeds next**. The step is reached
-in about one game in a hundred (the Altar, a drain card and seven tokens at
-once), so whichever rule wins moves rendmaw's win rate by a few parts in ten
-thousand.
+so none is a result yet (§0z170). The step is reached in about one game in
+a hundred (the Altar, a drain card and seven tokens at once), so whichever
+rule wins moves rendmaw's win rate by a few parts in ten thousand.
+
+**Re-measured on fresh seeds**, N=60,000 paired, seeds 100000..159999
+(`--seed0`), every pair one `run_knob_ab` call (§0e), identity 0 in all six
+(`results/knob_ab_rendmaw_altar_death_step_*_fresh.txt`):
+
+| A vs B | T10 | T20 | reached | in those games, T20 |
+|---|---|---|---|---|
+| `"none"` vs `"two"` | +0.0001 +-0.0001 | **+0.0003 +-0.0002** | 0.9% | +0.028 +-0.017 |
+| `"lethal"` vs `"two"` | **+0.0003 +-0.0002** | **+0.0006 +-0.0003** | 1.1% | +0.051 +-0.024 |
+| `"safe"` vs `"two"` | **+0.0003 +-0.0002** | **+0.0004 +-0.0003** | 1.1% | +0.040 +-0.023 |
+| `"lethal"` vs `"none"` | **+0.0003 +-0.0002** | **+0.0003 +-0.0002** | 0.5% | +0.069 +-0.049 |
+| `"safe"` vs `"none"` | **+0.0003 +-0.0002** | +0.0002 +-0.0003 | 1.0% | +0.018 +-0.024 |
+| `"safe"` vs `"lethal"` | -0.0000 +-0.0001 | **-0.0001 +-0.0001** | 1.0% | -0.013 +-0.013 |
+
+**`"lethal"` is the rule.** It beats the old rule and `"none"` at both
+horizons, and `"safe"` -- lethal plus the guarded non-lethal sacrifices --
+is no better than lethal alone and at T20 a hair worse. **The mechanism is
+the two halves of the old rule.** Its non-lethal sacrifices cost: `"none"`
+beats `"two"` at T20 on both seed blocks, with final life +0.022 -- the two
+tokens a turn were blockers (§0z219), as Woe Strider's outlet found
+(§0z227). Its lethal ones pay: `"lethal"` over `"none"` is the drain that
+finishes a player, +0.069 a game where it fires, and it may eat any token,
+not only the excess over `altar_keep`. Even guarded by the hold-back's test,
+a non-lethal drain is not worth the body. The best non-lethal use measured
+is none, as with the miracle reserve (§0z164).
+
+**Not adopted.** The default is still `"two"`: changing it moves rendmaw's
+baseline and costs its rebuild, and adopting it is the owner's call. The
+size is +0.0006 at T20, measured on the seeds that did not pick it.
 
 ## How to read an ablation table
 

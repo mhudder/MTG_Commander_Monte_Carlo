@@ -338,3 +338,8 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     look for the pilot's rule -- sacrifice only a token that is not needed to
     block, or only for a lethal drain. Rendmaw only; a rebuild if the
     default changes.
+    **BUILT AND MEASURED 2026-11-20 (§0z233)**: `altar_death_step`, four
+    arms. On fresh seeds at N=60,000, `"lethal"` (sacrifice only when the
+    drains finish an opponent) beats the old rule by +0.0003 / +0.0006 and
+    beats `"none"` and `"safe"`. **Left: the owner's adoption decision**; if
+    adopted, rendmaw's rebuild.
