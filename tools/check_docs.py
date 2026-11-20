@@ -491,6 +491,50 @@ def check_removal_current(live: set[str], scanned: set[str]) -> Result:
                      "(needs Scryfall)" if bits else ""))
 
 
+def pod_mana_sets():
+    """(committed module lists today, `_pod_mana.MODULE_LISTS`) -- the lists
+    the pod's land and ramp counts were read from (§0z235)."""
+    from tools.removal_census import module_lists
+    try:
+        from edhmc.decks import _pod_mana
+    except ImportError:
+        return module_lists(), {}
+    return module_lists(), dict(getattr(_pod_mana, "MODULE_LISTS", {}))
+
+
+def check_pod_mana_current(mod_live: dict, mod_file: dict, rlive: set[str],
+                           pscanned: set[str]) -> Result:
+    """decks/_pod_mana.py was regenerated after the last deck change.
+
+    The pod's library (§0z235) counts each COMMITTED list's lands and ramp,
+    and its answers' costs read the module-or-staged lists. A card committed
+    to a deck, or staged, without `removal_census --write` is a land count
+    or a cost the pod does not see. Both halves are compared without the
+    network: the module lists name for name, the staged names against the
+    file's SCANNED. BLIND TO (§0z15): a card whose oracle text changed on
+    Scryfall -- only a rerun reads that."""
+    name = "decks/_pod_mana.py was regenerated after the last deck change"
+    if not mod_file:
+        return Result(name, False, "no MODULE_LISTS -- run "
+                      "`python -m tools.removal_census --write`")
+    bits = [f"{d}'s committed list changed" for d in sorted(set(mod_live)
+            | set(mod_file)) if mod_live.get(d) != mod_file.get(d)]
+    if rlive != pscanned:
+        bits.append("the staged or module names changed since the costs "
+                    "were read")
+    return Result(name, not bits, "; ".join(bits)
+                  + ("  -- run `python -m tools.removal_census --write` "
+                     "(needs Scryfall)" if bits else ""))
+
+
+def pod_mana_scanned() -> set[str]:
+    try:
+        from edhmc.decks import _pod_mana
+    except ImportError:
+        return set()
+    return set(getattr(_pod_mana, "SCANNED", ()))
+
+
 def check_architecture_names_modules(docs: dict[str, str]) -> Result:
     """Every module under edhmc/ and tools/ is named in docs/ARCHITECTURE.md.
 
@@ -661,9 +705,12 @@ def run_all() -> list[Result]:
     docs = live_docs()
     live, scanned = evasion_sets()
     rlive, rscanned = removal_sets()
+    mlive, mfile = pod_mana_sets()
+    pscanned = pod_mana_scanned()
     results = [
         check_evasion_current(live, scanned),
         check_removal_current(rlive, rscanned),
+        check_pod_mana_current(mlive, mfile, rlive, pscanned),
         check_sections_resolve(code_text, issues),
         check_doc_sections_resolve(docs, issues),
         check_index_matches_headings(issues),
@@ -782,20 +829,29 @@ EXPECTED = {
     "a card is added to a deck and _evasion.py is not regenerated":
         {"decks/_evasion.py was regenerated after the last deck change"},
     "a card is staged and _removal.py is not regenerated":
-        {"decks/_removal.py was regenerated after the last deck change"},
+        {"decks/_removal.py was regenerated after the last deck change",
+         "decks/_pod_mana.py was regenerated after the last deck change"},
+    "a land is committed to a deck and _pod_mana.py is not regenerated":
+        {"decks/_pod_mana.py was regenerated after the last deck change"},
     "the vocabulary doc drops a state the ledger implements":
         {"docs/LEDGER_STATES.md names every state the ledger implements"},
 }
 
-# Mutations of the two coverage-set pairs, evasion then removal:
-# (live, scanned, rlive, rscanned) -> the same four.
+# Mutations of the coverage sets, evasion then removal then the pod's mana:
+# (live, scanned, rlive, rscanned, mlive) -> the same five. A staged card
+# reaches both census files, since one command writes both (§0z235).
 SET_MUTATIONS = {
     "a card is added to a deck and _evasion.py is not regenerated":
-        lambda live, scanned, rl, rs: (live | {"Not A Real Card"}, scanned,
-                                       rl, rs),
+        lambda live, scanned, rl, rs, ml: (live | {"Not A Real Card"},
+                                           scanned, rl, rs, ml),
     "a card is staged and _removal.py is not regenerated":
-        lambda live, scanned, rl, rs: (live, scanned,
-                                       rl | {"Not A Real Card"}, rs),
+        lambda live, scanned, rl, rs, ml: (live, scanned,
+                                           rl | {"Not A Real Card"}, rs, ml),
+    "a land is committed to a deck and _pod_mana.py is not regenerated":
+        lambda live, scanned, rl, rs, ml: (
+            live, scanned, rl, rs,
+            {d: (ns + ["Not A Real Land"] if d == "rendmaw" else ns)
+             for d, ns in ml.items()}),
 }
 
 
@@ -805,19 +861,23 @@ def mutate() -> int:
     docs = live_docs()
     live, scanned = evasion_sets()
     rlive, rscanned = removal_sets()
+    mlive, mfile = pod_mana_sets()
+    pscanned = pod_mana_scanned()
     states = ledger_states()
 
     failures = 0
     for label in list(MUTATIONS) + list(SET_MUTATIONS):
         if label in MUTATIONS:
             c, i, d = MUTATIONS[label](code_text, issues, docs)
-            lv, sc, rl, rs = live, scanned, rlive, rscanned
+            lv, sc, rl, rs, ml = live, scanned, rlive, rscanned, mlive
         else:
             c, i, d = code_text, issues, docs
-            lv, sc, rl, rs = SET_MUTATIONS[label](live, scanned, rlive, rscanned)
+            lv, sc, rl, rs, ml = SET_MUTATIONS[label](live, scanned, rlive,
+                                                      rscanned, mlive)
         results = [
             check_evasion_current(lv, sc),
             check_removal_current(rl, rs),
+            check_pod_mana_current(ml, mfile, rl, pscanned),
             check_sections_resolve(c, i),
             check_doc_sections_resolve(d, i),
             check_index_matches_headings(i),

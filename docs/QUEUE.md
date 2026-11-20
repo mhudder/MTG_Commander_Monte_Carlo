@@ -333,8 +333,14 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     development charged, not gated; route piece, removal, bodies, the rest
     held; the rates scaled back and the pod re-fitted; Ghostly Prison and
     Propaganda weighed against the damage they buy. What the owner left for
-    later is item 52. Next: the census (generated costs, lands and ramp),
-    then each rule behind a switch.
+    later is item 52. **THE CENSUS IS DONE (§0z235, 2026-11-20)**:
+    `edhmc/decks/_pod_mana.py`, generated -- 35 lands of 99, 4 rocks, 1 land
+    ramp; wipes 4.5, A/E 3.0, counterspells 2.0 (thin). Read by no engine
+    yet, so in no fingerprint: the change that first reads it adds it to
+    `tools/cache_manifest`'s shared files. Your removal that ramps the pod
+    (`POD_GIFTS`: Path to Exile, Assassin's Trophy, An Offer You Can't
+    Refuse) is a cost to charge. Next: the library model -- land drops per
+    opponent per turn, pre-rolled from its own stream -- behind a switch.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:

@@ -287,6 +287,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z232](#0z232) | FIXED | **The Swarmweaver's delirium deathtouch** (§0z206 floor 5), both ways; a rendmaw candidate, no list moves |
 | [0z233](#0z233) | REBUILT | **Ashnod's Altar's death step after the flip** (queue item 51): `altar_death_step`, four arms, the old rule the default; "lethal" best on fresh seeds, +0.0003/+0.0006; ADOPTED, with Woe Strider's outlet on; rendmaw rebuilt, no row moved |
 | [0z234](#0z234) | DECIDED | **Item 50 written down: a real mana model for the pod** -- the rules it rests on, the owner's six decisions, a land counted early on your turn; nothing built |
+| [0z235](#0z235) | BUILT | **Item 50's census: the pod's library and its answers' costs**, generated from the lists; 35 lands, 4 rocks, 1 land ramp; read by nothing yet |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20318,6 +20319,97 @@ and its identity; then flipped together, the rates scaled back, the pod
 re-fitted, the stranded knobs found (`run_knob_liveness`, §0z205) -- the
 counterspell ramp, `ward_pay_rule`, the turn-3 gates -- every table rebuilt
 (`parallel-rebuild`), and the staged swaps re-measured.
+
+<a id="0z235"></a>
+
+## 0z235. BUILT -- Item 50's census: the pod's library and what its answers cost
+
+**The owner, 2026-11-20: "yes, start the census."** Queue item 50's first
+step (§0z234): the data the pod's mana model will read, GENERATED from the
+lists, not typed. `tools.removal_census --write` now writes
+`edhmc/decks/_pod_mana.py` beside `_removal.py` (which it rewrote
+byte-identical, so no deck's fingerprint moved). **No engine reads the new
+file yet**, so it is in no cache fingerprint; the change that first reads it
+adds it to `tools/cache_manifest`'s shared files, said in its docstring.
+
+**Which lists.** Lands and ramp come from each deck's COMMITTED module list
+(the 99 the commander leads) -- not the staged one, so staging a land swap in
+one deck does not move every deck's pod (§0z126's hazard). The costs read the
+module-or-staged lists, `SPOT_SPELL_MV`'s rule (§0z224). All seven lists are
+read, trostani's (SUSPENDED) included, as `_removal.py`'s census reads them.
+
+**The pod's library** (Scryfall, 2026-11-20):
+
+| | rendmaw, lorehold, karlov, tivit, shilgengar, azusa, trostani | median |
+|---|---|---|
+| lands | 35, 34, 36, 35, 35, 41, 38 | **35** of 99 |
+| mana rocks | 4, 5, 3, 6, 7, 1, 3 | **4**: mana value 2, one mana a turn net |
+| land ramp | 3, 0, 0, 0, 1, 2, 4 | **1**: cost 3, one land, tapped |
+| extra land drops | 0, 0, 0, 0, 0, 1, 0 | **0** |
+
+**What the answers cost** (instants and sorceries, once per deck that runs
+one; X spells left out, Scryfall counting X as 0; an overloaded wipe at its
+overload -- Damn at 4 in its three decks, not 2): wipes **4.5** (20
+counted; Blasphemous Act at its printed 9, though a full table makes it
+cheaper -- the median absorbs it); A/E removal **3.0** -- four counted
+(median 2.5), under the census's own rule that a kind with fewer than 10
+takes what contains it, as `DESTROY_SHARE_AE` does; counterspells **2.0**
+from four -- **THIN, said out loud**: no kind contains a counterspell, so
+nothing to fall back to. Spot removal stays `_removal.SPOT_SPELL_MV`, 3.0.
+
+**The classifier** (`removal_census.classify_ramp`). Every card whose text
+reads like mana (`RAMP_CANDIDATE`) is read by a named rule or the census
+RAISES naming it -- §0z115's rule for lands, applied to ramp. On the first
+run nothing raised: 62 candidates in the committed lists, and the staged
+lists' Treasure makers. The buckets:
+
+- **rock**: a noncreature artifact or enchantment with a repeatable
+  `{T}: Add` whose cost has no sacrifice; net mana is what it adds less any
+  generic activation cost (a Signet is 1). Flags: `tapped` (Marble Diamond),
+  `untaps_each_turn` -- **Bender's Waterskin untaps in each other player's
+  untap step**, an exception to 502.3 the model will have to read.
+- **land**: a land put onto the battlefield from the library -- Cultivate,
+  Kodama's Reach, Wayfarer's Bauble, and creatures that FETCH (Solemn
+  Simulacrum, Sakura-Tribe Elder, Burnished Hart, Farhaven Elf, Ulvenwald
+  Hydra): the land stays when the creature dies, so it is land ramp, not a
+  mana creature. Cost is mana value plus any activation.
+- **drop**: a noncreature "play an additional land" (Exploration).
+- **not ramp**, each with its reason: anything whose mana leaves with a
+  CREATURE -- a creature's `{T}: Add`, Dryad of the Ilysian Grove's and
+  Oracle of Mul Daya's extra land -- **queue item 52** (decision 2); Treasure
+  (one-shot, 111.10a); rituals; Ashnod's Altar (a sacrifice outlet); Crop
+  Rotation (sacrifices a land: net zero); Storm Cauldron (symmetric, and
+  bounces lands); Mirari's Wake and Lotus Cobra (triggers on lands);
+  Hall of Gemstone (fixing); the reveal-a-land cards (Animist's Awakening,
+  Nissa, Shigeki); Perilous Forays (a repeatable outlet); Journey of
+  Discovery (modal, one turn).
+
+**A finding for the engine step: your removal ramps the pod.** `POD_GIFTS`
+lists your cards whose text hands the TARGET'S CONTROLLER mana: Path to
+Exile and Assassin's Trophy ("its controller may search their library for a
+basic land card, put it onto the battlefield") and An Offer You Can't Refuse
+("its controller creates two Treasure tokens"). Today the pod has no mana,
+so the drawback is free; under item 50 it is a land or two Treasure for the
+opponent it hits -- a cost to charge, the life-loss rule's shape (§0i).
+
+**Pinned** by `tests/test_mana_census.py`: sixteen cases on fixed oracle
+text, no network, four mutations exact. **Its first run found a hole in the
+census, not in the case**: "Add mana equal to ..." did not match
+`RAMP_CANDIDATE`, so such a rock was read as not mana at all -- silently,
+where the classifier exists to raise. The candidate now reads "add mana"
+and "add an amount"; nothing in the lists changed bucket.
+
+**The judgements this does NOT make**: the mulligan's keep rule, and every
+other judgement §0z234 lists, belong to the library model itself.
+
+**The check** (`check_docs`, `check_pod_mana_current`): the file's
+`MODULE_LISTS` against the committed lists, name for name, and its `SCANNED`
+against the module-or-staged names, both without the network. BLIND TO a
+card whose oracle text changed on Scryfall -- only a rerun reads that.
+`check_docs --mutate`: a land committed without regenerating breaks exactly
+this check; a card staged without regenerating now breaks it AND
+`_removal.py`'s, since one command writes both (the expected set changed
+for that reason, written before the run).
 
 ## How to read an ablation table
 

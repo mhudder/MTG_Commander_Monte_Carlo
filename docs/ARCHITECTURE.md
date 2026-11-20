@@ -25,7 +25,7 @@ Read this before changing code: what else a change touches.
    ─ status.py / knobs.py / cache_manifest.py / tag_flying.py   the four GENERATORS (--write);
                           status.py writes STATUS.md, COMMANDS.md, RESULTS.md
    ─ removal_census.py    the fifth: classifies every answer and wipe in every list
-                          from Scryfall into decks/_removal.py (§0z87)
+                          from Scryfall into decks/_removal.py (§0z87) and _pod_mana.py
    ─ audit_cards.py       every card against Scryfall
    ─ card_known.py        is a card already in a list, catalog, candidates batch, the
                           ledger or an engine? DERIVED (candidates.py names constants)
@@ -98,6 +98,7 @@ Read this before changing code: what else a change touches.
                           of answer (spot, wipe, ae), which prices indestructible (§0z87).
                           Both files are in every cache fingerprint and carry a SCANNED set
                           that check_docs compares with the current lists
+   edhmc/decks/_pod_mana.py GENERATED likewise: the pod's library and answer costs (§0z235)
 
    results/               every table and harness output; results/caches/ holds the ablation
                           caches and PROVENANCE.json (built-at fingerprints, stamped by ablation.py)
