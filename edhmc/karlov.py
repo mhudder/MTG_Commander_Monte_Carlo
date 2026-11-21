@@ -2193,6 +2193,7 @@ def citadel_pod_window(g, when: str) -> int:
             if pick is None:
                 break
             OPP.remove_threat_piece(g, *pick)
+            OPP.pod_gift(g, pick[0], top.name)             # §0z241
         n += 1
     return n
 

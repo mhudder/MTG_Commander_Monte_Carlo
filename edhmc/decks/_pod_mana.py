@@ -129,11 +129,12 @@ NOT_RAMP = {
 }
 
 # YOUR cards that hand the pod mana -- its controller searches for a
-# land, or makes Treasure: name -> clause. For the engine (§0z235).
+# land, or makes Treasure: name -> (kind, amount, tapped, clause),
+# read by `opponents.pod_gift` (§0z235, §0z241)
 POD_GIFTS = {
-    "An Offer You Can't Refuse": 'its controller creates two treasure',
-    "Assassin's Trophy": 'its controller may search their library for a basic land',
-    'Path to Exile': 'its controller may search their library for a basic land',
+    "An Offer You Can't Refuse": ('treasure', 2, False, 'its controller creates two treasure'),
+    "Assassin's Trophy": ('land', 1, False, 'its controller may search their library for a basic land card, put it onto the battlefield'),
+    'Path to Exile': ('land', 1, True, 'its controller may search their library for a basic land card, put that card onto the battlefield tapped'),
 }
 
 # deck -> every card in its committed module list (`check_docs`)

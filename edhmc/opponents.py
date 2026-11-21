@@ -179,6 +179,10 @@ class Opponent:
     # ITEM 50, step 2 (§0z237): the mana this opponent has untapped now --
     # its row's `spare` at its untap step, less what it has spent since.
     mana_left: float = 0.0
+    # §0z241 (`pod_gifts`): lands your removal handed it (each a source on
+    # every later turn) and the Treasures it holds (one-shot, 111.10a).
+    gift_lands: float = 0.0
+    treasures: float = 0.0
 
     _pcache: object = None
 
@@ -422,6 +426,10 @@ POD_DEFAULTS = {
     # Step 5 (§0z240): its OWN-turn removal and wipes are cast only when it
     # has their cost untapped -- the last gate before the flip.
     "pod_removal_mana": False,
+    # Step 6 (§0z241): your removal that hands the pod mana -- Path to
+    # Exile's and Assassin's Trophy's basic land, An Offer You Can't
+    # Refuse's two Treasures -- gives it to the opponent it hit.
+    "pod_gifts": False,
 }
 
 
@@ -751,12 +759,50 @@ def pod_mana_row(g, o, t=None):
 # the next steps, so a game plays the same with this on or off.
 def pod_untap(g, i) -> None:
     """Opponent `i`'s untap step (502.3): its mana is its row's `spare` --
-    what its lands and rocks make this turn, less its ramp (§0z236)."""
+    what its lands and rocks make this turn, less its ramp (§0z236) -- plus
+    the lands your removal gave it and the Treasures it still holds
+    (§0z241). A Treasure is spent LAST, so the ones kept are the mana it
+    left unspent, up to how many it had."""
     if not pod_mana_on(g):
         return
     o = g.opponents[i]
     row = pod_mana_row(g, o)
-    o.mana_left = row.spare if row is not None else 0.0
+    o.treasures = (min(o.treasures, max(0.0, o.mana_left)) if TREASURE_KEPT
+                   else 0.0)
+    o.mana_left = ((row.spare if row is not None else 0.0) + o.gift_lands
+                   + o.treasures)
+
+
+GIFT_LAND_TAPPED_READ = True   # §0z241: Path's land is tapped, Trophy's not
+TREASURE_KEPT = True           # §0z241: an unspent Treasure stays
+GIFTS_GIVEN = True             # §0z241: a gift due is given (the seam)
+
+
+def pod_gift(g, o, card_name: str) -> None:
+    """Your `card_name` resolved against opponent `o`: the mana its text
+    hands `o` (`_pod_mana.POD_GIFTS`, generated, §0z241). A basic land is a
+    source from its next untap, and at once if untapped on `o`'s own turn;
+    Treasure is mana at once and kept until spent. Counted
+    (`pod_gifts_due`) whenever `pod_mana` is on, so a measurement reads
+    the reach in both legs; given only with `pod_gifts`."""
+    from edhmc.decks._pod_mana import POD_GIFTS
+    gift = POD_GIFTS.get(card_name)
+    if o is None or gift is None or not pod_mana_on(g):
+        return
+    g.m["pod_gifts_due"] += 1
+    if not pod_knob(g.cfg, "pod_gifts") or not GIFTS_GIVEN:
+        return
+    kind, n, tapped, _clause = gift
+    g.m[f"pod_gift_{kind}"] += n
+    if kind == "land":
+        o.gift_lands += n
+        seat = getattr(g, "pod_seat", None)
+        if ((not tapped or not GIFT_LAND_TAPPED_READ) and seat is not None
+                and g.opponents[seat] is o):
+            o.mana_left += n
+    else:
+        o.treasures += n
+        o.mana_left += n
 
 
 POD_SPEND_CLAMP = True        # a deficit stops at 0: charged, not gated
@@ -1115,6 +1161,7 @@ def answer_pod_threat(g, card) -> int:
         if pick is None:
             break
         remove_threat_piece(g, *pick)
+        pod_gift(g, pick[0], card.name)                 # §0z241
         done += 1
     g.m["threat_answers_cast"] += 1
     if not done:
@@ -1681,6 +1728,7 @@ def respond_to_event(g, event, victim, protect_how):
                       if counter_hits(c.name, "instant_sorcery")):
         if _cast_response(g, c, "counter_removal"):
             g.m["protected"] += 1
+            pod_gift(g, getattr(g, "event_caster", None), c.name)  # §0z241
             return "countered"
     return None
 
@@ -1724,6 +1772,7 @@ def respond_to_pieces(g, seat=None) -> int:
                         else "answer_piece")
                 if _cast_response(g, c, kind):
                     remove_threat_piece(g, o, k)
+                    pod_gift(g, o, c.name)                  # §0z241
                     n += 1
                     break
     return n
@@ -1764,6 +1813,7 @@ def end_step_answers(g) -> int:
             if pick is None:
                 break
             remove_threat_piece(g, *pick)
+            pod_gift(g, pick[0], c.name)                    # §0z241
             done += 1
         n += done
     return n
@@ -1919,6 +1969,7 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
     pod_spend(g, opp, _removal.SPOT_SPELL_MV, "spot")       # §0z237
     if mother_protects(g, victim):        # her {T}, §0z118
         return
+    g.event_caster = opp                               # §0z241
     how = try_protect(g, rolls[5], "spot", victim)
     if how in ("blank", "countered"):
         return
@@ -1952,6 +2003,7 @@ def ae_removal(g, opp, others, rolls):
     if not can_cast(g, opp, AE_SPELL_MV, "ae", AE_READS_MANA):   # §0z240
         return
     pod_spend(g, opp, AE_SPELL_MV, "ae")                     # §0z237
+    g.event_caster = opp                               # §0z241
     how = try_protect(g, rolls[5], "ae")
     if how in ("blank", "countered"):
         return
@@ -1979,6 +2031,7 @@ def board_wipe(g, opp, rolls):
     if not can_cast(g, opp, WIPE_SPELL_MV, "wipe", WIPE_READS_MANA):
         return                                               # §0z240
     pod_spend(g, opp, WIPE_SPELL_MV, "wipe")                 # §0z237
+    g.event_caster = opp                               # §0z241
     how = try_protect(g, rolls[5], "wipe")
     if how == "countered":
         # A COUNTERED wrath never resolves (§0z134): unlike phasing out

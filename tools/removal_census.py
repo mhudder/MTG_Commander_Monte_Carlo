@@ -412,6 +412,25 @@ def classify_ramp(name: str, type_line: str, text: str, mv: float):
                      f"reads it: {text[:160]!r}")
 
 
+def read_gift(name: str, text: str) -> tuple:
+    """(kind, amount, tapped, clause) of a card that hands the TARGET'S
+    CONTROLLER mana (§0z241): "land" -- a basic onto the battlefield, tapped
+    or not -- or "treasure", how many. Raises on a gift it cannot read."""
+    low = text.lower()
+    m = re.search(r"its controller may search their library for a basic "
+                  r"land card, put (it|that card) onto the battlefield"
+                  r"( tapped)?", low)
+    if m:
+        return ("land", 1, bool(m.group(2)), m.group(0)[:120])
+    m = re.search(r"its controller creates (a|an|one|two|three) treasure",
+                  low)
+    if m:
+        n = {"a": 1, "an": 1}.get(m.group(1)) or WORDS[m.group(1)]
+        return ("treasure", n, False, m.group(0)[:120])
+    raise ValueError(f"mana census: cannot read {name!r}'s gift: "
+                     f"{text[:160]!r}")
+
+
 def module_lists():
     """deck -> every card name in its COMMITTED MODULE list (the 99), lands
     included. Needs no network, so `check_docs` compares it with
@@ -452,7 +471,7 @@ def mana_census(oracle, table, counters, per_deck):
         if hit[0] == "not":
             not_ramp[n] = hit[1:]
             if hit[1] == "gift":
-                gifts[n] = hit[2]
+                gifts[n] = read_gift(n, oracle_of(card))
         else:
             ramp[n] = hit
     by_deck = {d: sorted(n for n in mod[d] if n in ramp) for d in DECKS}
@@ -572,10 +591,11 @@ def render_mana(mc, per_deck):
         lines.append(f"    {n!r}: ({r!r}, {clause!r}),")
     lines += ["}", "",
               "# YOUR cards that hand the pod mana -- its controller searches for a",
-              "# land, or makes Treasure: name -> clause. For the engine (§0z235).",
+              "# land, or makes Treasure: name -> (kind, amount, tapped, clause),",
+              "# read by `opponents.pod_gift` (§0z235, §0z241)",
               "POD_GIFTS = {"]
-    for n, clause in sorted(mc["gifts"].items()):
-        lines.append(f"    {n!r}: {clause!r},")
+    for n, g in sorted(mc["gifts"].items()):
+        lines.append(f"    {n!r}: {g!r},")
     lines += ["}", "",
               "# deck -> every card in its committed module list (`check_docs`)",
               "MODULE_LISTS = {"]

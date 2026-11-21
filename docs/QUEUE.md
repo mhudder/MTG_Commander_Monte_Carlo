@@ -354,9 +354,13 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     counterspells that come earlier. **THE OWN-TURN REMOVAL GATE IS BUILT
     (§0z240)**, `pod_removal_mana` off: every deck gains +0.011 to +0.036 at
     T10 because the pod casts a third fewer wipes -- the double-counted
-    mana decision 5 rescales. Left before the flip: your removal that ramps
-    the pod (`POD_GIFTS`), then decision 5's rescale to the documented
-    interaction counts, the re-fit, the stranded knobs, one rebuild.
+    mana decision 5 rescales. **YOUR REMOVAL THAT RAMPS THE POD IS BUILT
+    (§0z241)**, `pod_gifts` off: tivit -0.0013 at T20, three more decks
+    -0.0001 to -0.0006. **Every rule is built; what is left is the flip**:
+    every item-50 switch on together, decision 5's rescale to the
+    documented interaction counts, the re-fit (§0z195), the stranded knobs
+    (`run_knob_liveness`, §0z205), one rebuild (`parallel-rebuild`), the
+    staged swaps re-measured.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:

@@ -293,6 +293,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z238](#0z238) | BUILT | **Item 50 step 3: Ghostly Prison and Propaganda paid from the pod's mana**, the owner's rule; tivit a null at bar 1.0 (-0.0015), the bar decides the sign |
 | [0z239](#0z239) | BUILT | **Item 50 step 4: the pod's answers on your turn read its mana** (`pod_answer_mana`, off); +0.004 to +0.010 on four decks, azusa -0.0040 at T10 from earlier counterspells |
 | [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
+| [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20710,6 +20711,61 @@ switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
 `+0.00` on all 21 metrics. `tests/test_pod_removal_mana.py`, six cases,
 three mutations exact on the first run (`WIPE_READS_MANA`,
 `SPOT_READS_MANA`, `AE_READS_MANA`).
+
+<a id="0z241"></a>
+
+## 0z241. BUILT -- Item 50, step 6: your removal that hands the pod mana
+
+**The owner, 2026-11-21: "yes, go ahead with step 1"** (the last piece
+before the flip; §0z235 found it). Behind `pod_gifts` (False), live only
+with `pod_mana`. `opponents.pod_gift` gives the opponent your card hit what
+its text hands it (`_pod_mana.POD_GIFTS`, generated; the census now reads
+each gift's kind, amount and whether its land is tapped, and raises on a
+gift it cannot read):
+
+- **Path to Exile**: "its controller may search their library for a basic
+  land card, put that card onto the battlefield TAPPED" -- a source from
+  its next untap (`gift_lands`).
+- **Assassin's Trophy**: the same, UNTAPPED -- a mana at once if it
+  resolves on that opponent's own turn, else from its next untap.
+- **An Offer You Can't Refuse**: "its controller creates two Treasure
+  tokens" -- the caster of the spell you countered, two one-shot mana at
+  once (111.10a), kept until spent and spent LAST (`pod_untap` keeps the
+  ones its unspent mana covers).
+
+"May" is always taken: a pilot does. Wired at every path your answers reach
+the pod: `answer_pod_threat` (your main phase), `respond_to_pieces`,
+`end_step_answers`, Karlov's Bolas's Citadel casts (`karlov.py`), and your
+counterspell at the pod's own removal or wipe (`respond_to_event`, which
+now knows the caster: `g.event_caster`, set where the pod casts it). **A
+simplification, said out loud**: the basic it fetches is not taken out of
+its pre-rolled library (§0z236), so its later land drops are a land too
+generous -- a ceiling on the gift's cost, by about a land in 35.
+
+**Measured**, N=15,000 paired, seeds 5000.., both legs with every other
+item-50 switch on, A `pod_gifts` on, the reach `pod_gifts_due` (counted in
+both legs), **identity 0 in every deck**
+(`results/knob_ab_<deck>_pod_gifts.txt`); azusa runs none of the three:
+
+| deck | T10 | T20 | games reached |
+|---|---|---|---|
+| tivit (Path, An Offer) | **-0.0011 +-0.0007** | **-0.0013 +-0.0011** | 19.9% |
+| karlov (Path) | -0.0003 +-0.0004 | **-0.0006 +-0.0005** | 10.4% |
+| rendmaw (Trophy) | -0.0001 +-0.0002 | **-0.0005 +-0.0003** | 11.0% |
+| shilgengar (Path) | -0.0002 +-0.0002 | -0.0004 +-0.0006 | 13.5% |
+| lorehold (Path) | +0.0000 +-0.0000 | -0.0001 +-0.0003 | 5.4% |
+
+**A real drawback, and a small one**, every sign the way the text says: the
+pod a gift reaches counters, removes and wipes a little more (tivit: 0.0025
+more counterspells, 0.0028 more removal a game). Each card's table row
+carried it free until now; these are what it costs, before the flip.
+
+**Whole game**: `check_unchanged_decks --n=2000` against `39d7db0`, the
+switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
+`+0.00` on all 21 metrics. `tests/test_pod_gifts.py`, seven cases, three
+mutations exact; one mutation corrected after its first run, said so in
+the file (a no-op stub also removed the "due" count; it is the
+`GIFTS_GIVEN` seam now).
 
 ## How to read an ablation table
 
