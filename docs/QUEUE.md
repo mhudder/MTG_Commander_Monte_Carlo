@@ -351,10 +351,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     1.0, the bar deciding the sign. **THE ANSWERS ON YOUR TURN ARE BUILT
     (§0z239)**, `pod_answer_mana` off: counterspells, held answers and ward
     read the mana left untapped; four decks gain, azusa loses at T10 to
-    counterspells that come earlier. Left before the flip: gating the pod's
-    OWN-turn removal and wipes on their cost, your removal that ramps the
-    pod (`POD_GIFTS`), then decision 5's rescale, the re-fit, the stranded
-    knobs, one rebuild.
+    counterspells that come earlier. **THE OWN-TURN REMOVAL GATE IS BUILT
+    (§0z240)**, `pod_removal_mana` off: every deck gains +0.011 to +0.036 at
+    T10 because the pod casts a third fewer wipes -- the double-counted
+    mana decision 5 rescales. Left before the flip: your removal that ramps
+    the pod (`POD_GIFTS`), then decision 5's rescale to the documented
+    interaction counts, the re-fit, the stranded knobs, one rebuild.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:

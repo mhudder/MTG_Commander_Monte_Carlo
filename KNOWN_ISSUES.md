@@ -292,6 +292,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z237](#0z237) | BUILT | **Item 50 step 2: what the pod spends on its own turn**, charged not gated; ~61 mana a game, ~11 overspent, most of it bodies on turns 1-4; read by nothing yet |
 | [0z238](#0z238) | BUILT | **Item 50 step 3: Ghostly Prison and Propaganda paid from the pod's mana**, the owner's rule; tivit a null at bar 1.0 (-0.0015), the bar decides the sign |
 | [0z239](#0z239) | BUILT | **Item 50 step 4: the pod's answers on your turn read its mana** (`pod_answer_mana`, off); +0.004 to +0.010 on four decks, azusa -0.0040 at T10 from earlier counterspells |
+| [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20655,6 +20656,60 @@ switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
 `+0.00` on all 21 metrics. `tests/test_pod_answers.py`, eight cases, four
 mutations exact on the first run, each a real seam (`WARD_READS_MANA`,
 `COUNTER_READS_MANA`, `HELD_READS_MANA`, `KEEP_ANSWER_UP`).
+
+<a id="0z240"></a>
+
+## 0z240. BUILT -- Item 50, step 5: the pod's own-turn removal needs its cost
+
+**The owner, 2026-11-21: "yes, go ahead with step 1"** (the last gate before
+the flip). Behind `pod_removal_mana` (False), live only with `pod_mana`. On
+its own turn the pod casts a wipe (`WIPE_SPELL_MV`, 4.5 -- a median, so in
+practice 5), spot removal (3) or A/E removal (3), at you or at a rival, only
+with that much untapped (`opponents.can_cast`, after main phase 1's route
+piece). Removal it cannot pay for is not cast and not re-aimed. A roll that
+finds it SHORT is counted in both legs (`removal_short_<kind>`) and cast
+anyway with the gate off -- the measurement's reach.
+
+**Measured**, N=15,000 paired, seeds 5000.., both legs with every other
+item-50 switch on (`pod_mana`, `pod_answer_mana`, `pod_tax_mana`: the state
+this gate is flipped into), A `pod_removal_mana` on; **identity 0 in every
+deck** (`results/knob_ab_<deck>_pod_removal_mana.txt`):
+
+| deck | T10 | T20 | games reached |
+|---|---|---|---|
+| rendmaw | **+0.0195 +-0.0026** | **+0.0213 +-0.0042** | 51% |
+| lorehold | **+0.0201 +-0.0033** | **+0.0112 +-0.0040** | 48% |
+| karlov | **+0.0219 +-0.0031** | **+0.0131 +-0.0040** | 49% |
+| tivit | **+0.0168 +-0.0030** | **+0.0035 +-0.0035** | 49% |
+| shilgengar | **+0.0110 +-0.0021** | **+0.0081 +-0.0041** | 52% |
+| azusa | **+0.0355 +-0.0037** | **+0.0185 +-0.0041** | 48% |
+
+**The mechanism, from the counters** (rendmaw / tivit / azusa, a game):
+wipes you suffer 0.43 -> 0.30 / 0.30 -> 0.20 / 0.40 -> 0.27, about a THIRD
+fewer; spot removal eaten 1.18 -> 1.06 / 0.86 -> 0.75 / 1.19 -> 1.06; A/E
+0.64 -> 0.53 / 0.34 -> 0.25 / 0.31 -> 0.26; the pod's spending on removal
+falls by a third. Wipes are hit hardest because they cost most: a wipe
+rolled from `first_wipe_turn` (5) needs 5 mana, which the mean pod reaches
+near its turn 6 (§0z236), and spot removal from pod turn 3 needs 3, which
+it has from turn 3 only when it has not spent on a route piece. Games are
+0.17-0.21 turns shorter and you end on more life.
+
+**This is the effect decision 5 exists for, not a finding about the decks.**
+The pod's removal and wipe rates (`BRACKETS` `spot`, `wipe`, `ae`) were
+calibrated with no mana limit -- each rate stands for drawing the card AND
+having the mana. Gated by mana they count the mana half twice, and the pod's
+interaction falls by up to a third. The owner's decision 5 (§0z234): scale
+the rates back to the documented target (about four spot removal spells
+and one wipe a game, `BRACKETS`' header) and re-fit the pod to hold the
+mean win rate (§0z195). **Until that is done, none of these numbers is a
+result about a card or a deck**: every table still runs the pod without
+mana.
+
+**Whole game**: `check_unchanged_decks --n=2000` against `dee645b`, the
+switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
+`+0.00` on all 21 metrics. `tests/test_pod_removal_mana.py`, six cases,
+three mutations exact on the first run (`WIPE_READS_MANA`,
+`SPOT_READS_MANA`, `AE_READS_MANA`).
 
 ## How to read an ablation table
 

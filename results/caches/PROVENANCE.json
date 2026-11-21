@@ -719,6 +719,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "0b4cbc1ef7971c71",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "0a66bc929ee55b0e",
+        "utc": "2026-11-21T02:25:16Z"
       }
     ]
   },
@@ -1349,6 +1355,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "40e735c17d6b5a73",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "211fd254d18f1f70",
+        "utc": "2026-11-21T02:25:16Z"
       }
     ]
   },
@@ -2005,6 +2017,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "37cbc3295ad10cea",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "d38e788500d95f75",
+        "utc": "2026-11-21T02:25:15Z"
       }
     ]
   },
@@ -2626,6 +2644,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "7cf7bf6da5879bd7",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "fd3e259eb9822500",
+        "utc": "2026-11-21T02:25:15Z"
       }
     ]
   },
@@ -3285,6 +3309,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "1f4bf688dcd0c609",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "356610f3c7e504ce",
+        "utc": "2026-11-21T02:25:16Z"
       }
     ]
   },
@@ -3897,6 +3927,12 @@
         "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "df5067c48f3ca65a",
         "utc": "2026-11-21T00:53:18Z"
+      },
+      {
+        "commit": "dee645b",
+        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "3f12c9e2259484ef",
+        "utc": "2026-11-21T02:25:16Z"
       }
     ]
   },

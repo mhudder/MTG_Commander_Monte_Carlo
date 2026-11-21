@@ -419,6 +419,9 @@ POD_DEFAULTS = {
     # held answers (A6), the ward they pay -- read the mana it left untapped
     # at the end of its own turn (502.3), not a ramp or its turn number.
     "pod_answer_mana": False,
+    # Step 5 (§0z240): its OWN-turn removal and wipes are cast only when it
+    # has their cost untapped -- the last gate before the flip.
+    "pod_removal_mana": False,
 }
 
 
@@ -761,7 +764,30 @@ WARD_READS_MANA = True        # §0z239: a ward is paid from mana left
 COUNTER_READS_MANA = True     # §0z239: a counterspell needs its cost left
 HELD_READS_MANA = True        # §0z239: a held answer needs its cost left
 KEEP_ANSWER_UP = True         # §0z239: decision 4's hold-up before bodies
+WIPE_READS_MANA = True        # §0z240: a wipe needs its cost untapped
+SPOT_READS_MANA = True        # §0z240: so does spot removal
+AE_READS_MANA = True          # §0z240: and artifact/enchantment removal
 ARRIVALS_BY_IDENTITY = True   # a body costs ITS mana value, not the mean
+
+
+def removal_mana_on(g) -> bool:
+    return bool(pod_knob(g.cfg, "pod_removal_mana")) and pod_mana_on(g)
+
+
+def can_cast(g, o, cost: float, what: str, seam: bool = True) -> bool:
+    """May `o` cast removal of `cost` now (§0z240)? Where it is SHORT, that
+    is counted (`removal_short_<what>`) whether or not the gate is on, so
+    the gate's reach is read in both legs of a measurement; with the gate
+    off -- or `o` unknown, or `pod_mana` off -- it casts anyway, as before."""
+    if o is None or not pod_mana_on(g):
+        return True
+    if o.mana_left >= cost - 1e-9:
+        return True
+    g.m[f"removal_short_{what}"] += 1
+    if removal_mana_on(g) and seam:
+        g.m[f"removal_unpaid_{what}"] += 1
+        return False
+    return True
 
 
 def answer_mana_on(g) -> bool:
@@ -1780,7 +1806,9 @@ def spot_removal(g, opp, others, rolls):
     if rolls[0] >= opp.p["spot"]:
         return
     if rolls[3] >= your_share(g, opp, others):
-        charge_at_rival(g, opp, _removal.SPOT_SPELL_MV, "spot")   # §0z237
+        if can_cast(g, opp, _removal.SPOT_SPELL_MV, "spot",
+                    SPOT_READS_MANA):                         # §0z240
+            charge_at_rival(g, opp, _removal.SPOT_SPELL_MV, "spot")
         return                            # aimed at a rival instead
     if pod_holds_answer(g, opp, rolls):   # A6, §0z221
         return
@@ -1880,6 +1908,9 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
     targets = _spot_targets(g)
     if not targets:
         return
+    if not can_cast(g, opp, _removal.SPOT_SPELL_MV, "spot",
+                    SPOT_READS_MANA):                         # §0z240
+        return
     if victim is None or victim not in targets:
         victim = max(targets, key=lambda p: threat_of(g, p))
     victim = ward_choice(g, opp, victim, targets)
@@ -1910,12 +1941,15 @@ def ae_removal(g, opp, others, rolls):
         return
     from edhmc.decks._pod_mana import AE_SPELL_MV
     if rolls[3] >= your_share(g, opp, others):
-        charge_at_rival(g, opp, AE_SPELL_MV, "ae")           # §0z237
+        if can_cast(g, opp, AE_SPELL_MV, "ae", AE_READS_MANA):   # §0z240
+            charge_at_rival(g, opp, AE_SPELL_MV, "ae")       # §0z237
         return
     targets = [p for p in g.board
                if ("Artifact" in p.card.types or "Enchantment" in p.card.types)
                and not p.card.is_land and not p.is_token]
     if not targets:
+        return
+    if not can_cast(g, opp, AE_SPELL_MV, "ae", AE_READS_MANA):   # §0z240
         return
     pod_spend(g, opp, AE_SPELL_MV, "ae")                     # §0z237
     how = try_protect(g, rolls[5], "ae")
@@ -1942,6 +1976,8 @@ def board_wipe(g, opp, rolls):
     if rolls[2] >= opp.p["wipe"] * width_mult:
         return
     from edhmc.decks._pod_mana import WIPE_SPELL_MV
+    if not can_cast(g, opp, WIPE_SPELL_MV, "wipe", WIPE_READS_MANA):
+        return                                               # §0z240
     pod_spend(g, opp, WIPE_SPELL_MV, "wipe")                 # §0z237
     how = try_protect(g, rolls[5], "wipe")
     if how == "countered":
