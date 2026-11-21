@@ -415,6 +415,10 @@ POD_DEFAULTS = {
     # the owner's rule (an attacker is paid for when the damage it gets
     # through is worth the mana; a lethal attack always, if it can).
     "pod_tax_mana": False,
+    # Step 4 (§0z239): the answers it casts on YOUR turn -- counterspells,
+    # held answers (A6), the ward they pay -- read the mana it left untapped
+    # at the end of its own turn (502.3), not a ramp or its turn number.
+    "pod_answer_mana": False,
 }
 
 
@@ -753,21 +757,46 @@ def pod_untap(g, i) -> None:
 
 
 POD_SPEND_CLAMP = True        # a deficit stops at 0: charged, not gated
+WARD_READS_MANA = True        # §0z239: a ward is paid from mana left
+COUNTER_READS_MANA = True     # §0z239: a counterspell needs its cost left
+HELD_READS_MANA = True        # §0z239: a held answer needs its cost left
+KEEP_ANSWER_UP = True         # §0z239: decision 4's hold-up before bodies
 ARRIVALS_BY_IDENTITY = True   # a body costs ITS mana value, not the mean
 
 
-def pod_spend(g, o, amount: float, what: str) -> None:
+def answer_mana_on(g) -> bool:
+    return bool(pod_knob(g.cfg, "pod_answer_mana")) and pod_mana_on(g)
+
+
+def answer_reserve(g, o) -> float:
+    """What `o` keeps up for YOUR turn before its bodies (§0z239): a
+    counterspell's cost while it has one left -- decision 4, "a blue
+    opponent with a counterspell left keeps its cost up before bodies" --
+    and a held answer's cost while it holds one, the same reading of what
+    holding is. 0 off `pod_answer_mana`."""
+    if not answer_mana_on(g) or not KEEP_ANSWER_UP:
+        return 0.0
+    from edhmc.decks._pod_mana import COUNTER_SPELL_MV
+    keep = COUNTER_SPELL_MV if o.counters_left > 0 else 0.0
+    if getattr(o, "held_rolls", None):
+        keep += _removal.SPOT_SPELL_MV
+    return keep
+
+
+def pod_spend(g, o, amount: float, what: str, floor: float = 0.0) -> None:
     """Charge opponent `o` `amount` mana for `what` (§0z237). Never gates:
-    a deficit is counted and `mana_left` stops at 0."""
+    a deficit is counted and `mana_left` stops at `floor` -- 0, or the
+    mana it keeps up for your turn (`answer_reserve`, §0z239)."""
     if o is None or amount <= 0 or not pod_mana_on(g):
         return
     g.m[f"pod_spent_{what}"] += amount
+    floor = min(floor, o.mana_left)
     left = o.mana_left - amount
-    if left < -1e-9 and POD_SPEND_CLAMP:
-        g.m["pod_overspent"] += -left
-        g.m[f"pod_overspent_{what}"] += -left
+    if left < floor - 1e-9 and POD_SPEND_CLAMP:
+        g.m["pod_overspent"] += floor - left
+        g.m[f"pod_overspent_{what}"] += floor - left
         g.m["pod_overspend_events"] += 1
-        left = 0.0
+        left = floor
     o.mana_left = left
 
 
@@ -821,8 +850,9 @@ def charge_growth(g, o, before: float) -> None:
     """Main phase 2: `o`'s new bodies, each at its own mana value."""
     if not pod_mana_on(g):
         return
+    keep = answer_reserve(g, o)
     for mv in _arrival_mvs(g, o, before):
-        pod_spend(g, o, mv, "body")
+        pod_spend(g, o, mv, "body", floor=keep)
 
 
 def pod_threats_on(g) -> bool:
@@ -1776,7 +1806,7 @@ def ward_of(g, perm):
     return None
 
 
-def ward_payable(g, n) -> bool:
+def ward_payable(g, n, opp=None) -> bool:
     """Can the pod pay a MANA ward of `n` on top of its removal spell?
 
     "mana" (the default, the owner, 2026-11-17, §0z224): the pod has no mana
@@ -1793,6 +1823,10 @@ def ward_payable(g, n) -> bool:
         from edhmc.engine import crn_random
         return crn_random(g, "ward_pay") < g.cfg.get("ward_pay_share", 0.5)
     from edhmc.decks._removal import SPOT_SPELL_MV
+    if opp is not None and answer_mana_on(g) and WARD_READS_MANA:
+        # §0z239: the spell and the ward, from what it has untapped NOW --
+        # on your turn, what it left at the end of its own (502.3)
+        return opp.mana_left >= SPOT_SPELL_MV + n - 1e-9
     return pod_turn(g) >= SPOT_SPELL_MV + n
 
 
@@ -1817,7 +1851,7 @@ def ward_choice(g, opp, victim, targets):
             g.m["ward_life_paid"] += n
             lost_life(g, [(opp, n)])
             return victim
-    elif ward_payable(g, w):
+    elif ward_payable(g, w, opp):
         g.m["ward_paid"] += 1
         charge_ward(g, opp, float(w))                        # §0z237
         return victim
@@ -2624,6 +2658,13 @@ def held_answer_window(g, when, pieces=()) -> None:
         if not cands:
             continue
         victim = max(cands, key=lambda p: threat_of(g, p))
+        if (answer_mana_on(g) and HELD_READS_MANA
+                and opp.mana_left < _removal.SPOT_SPELL_MV - 1e-9):
+            # §0z239: it tapped below the answer's cost on its own turn, and
+            # nothing untaps before its next (502.3): the answer is not cast
+            opp.held_rolls = None
+            g.m["answers_held_unpaid"] += 1
+            continue
         opp.held_rolls = None
         g.m[f"answers_spent_{when}"] += 1
         _spot_at_you(g, rolls, victim=victim, opp=opp)
@@ -2865,7 +2906,8 @@ def deluge_x(g) -> int:
 
 
 def _countered(g, card, spell_index: int) -> bool:
-    if pod_turn(g) < 3 or spell_index >= N_COUNTER_SLOTS:
+    by_mana = answer_mana_on(g) and COUNTER_READS_MANA       # §0z239
+    if (pod_turn(g) < 3 and not by_mana) or spell_index >= N_COUNTER_SLOTS:
         return False
     threat = counter_threat(g, card)
     if threat < g.cfg.get("counter_threshold", 4.0):
@@ -2874,9 +2916,16 @@ def _countered(g, card, spell_index: int) -> bool:
     shielded = uncounterable(g, card)
     rolls = g.counter_rolls[min(pod_turn(g), len(g.counter_rolls) - 1)][spell_index]
     mana_gate = min(1.0, (pod_turn(g) - 2) / 4.0)
+    from edhmc.decks._pod_mana import COUNTER_SPELL_MV
+    if by_mana:
+        # §0z239: the ramp stood in for mana; under the switch the mana it
+        # left untapped decides, below
+        mana_gate = 1.0
     old = dead_act(g)
     for i, opp in enumerate(g.opponents):
         if opp.counters_left <= 0 or not (old or opp.alive):
+            continue
+        if by_mana and opp.mana_left < COUNTER_SPELL_MV - 1e-9:
             continue
         p = opp.p["counter"] * mana_gate * min(1.0, threat / 9.0)
         if rolls[i] < p:
@@ -2886,6 +2935,7 @@ def _countered(g, card, spell_index: int) -> bool:
                 g.m["counters_shielded"] += 1
                 return False
             opp.counters_left -= 1      # counterspells are a finite resource
+            pod_spend(g, opp, COUNTER_SPELL_MV, "counter")      # §0z239
             # An opponent has just cast a spell ON YOUR TURN -- the only
             # opponent spell this model places there: removal and wipes
             # happen in `opponents_act`, which is the opponents' own turns.

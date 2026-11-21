@@ -291,6 +291,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z236](#0z236) | BUILT | **Item 50 step 1: the pod's library and land drops** (`pod_mana`, off); behind `t` mana from pod turn 5, 7.05 not 10 by turn 10; read by nothing yet |
 | [0z237](#0z237) | BUILT | **Item 50 step 2: what the pod spends on its own turn**, charged not gated; ~61 mana a game, ~11 overspent, most of it bodies on turns 1-4; read by nothing yet |
 | [0z238](#0z238) | BUILT | **Item 50 step 3: Ghostly Prison and Propaganda paid from the pod's mana**, the owner's rule; tivit a null at bar 1.0 (-0.0015), the bar decides the sign |
+| [0z239](#0z239) | BUILT | **Item 50 step 4: the pod's answers on your turn read its mana** (`pod_answer_mana`, off); +0.004 to +0.010 on four decks, azusa -0.0040 at T10 from earlier counterspells |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20590,6 +20591,70 @@ switches off, every deck BIT-IDENTICAL (caches VERIFIED); with `pod_mana`
 and `pod_tax_mana` on against `pod_mana` alone, only tivit moves (won
 -0.0020, two games in 2,000 -- the null above) and the five lists without a
 tax are BIT-IDENTICAL. `tools.validate`: `+0.00` on all 21 metrics.
+
+<a id="0z239"></a>
+
+## 0z239. BUILT -- Item 50, step 4: the pod's answers on your turn read its mana
+
+**The owner, 2026-11-21: "Yes, go ahead."** Behind `pod_answer_mana`
+(False), live only with `pod_mana`. Everything the pod casts on YOUR turn
+reads the mana it left untapped at the end of its own (502.3: nothing of
+its untaps before its next untap step), so **§0z234's extra land on your
+turn is gone by construction** -- on your turn t it has what its turn t-1
+left.
+
+**The rules** (`opponents._countered`, `held_answer_window`,
+`ward_payable`, `answer_reserve`):
+
+- A COUNTERSPELL is cast only with `COUNTER_SPELL_MV` (2.0, the census)
+  left, and charged. The `(pod turn - 2) / 4` ramp and the turn-3 gate stood
+  in for mana; under the switch the mana decides (the gate is 1.0).
+- A HELD ANSWER (A6) is cast on your turn only with `SPOT_SPELL_MV` (3)
+  left. One it cannot pay for is not cast: `answers_held_unpaid`. A6's
+  "moved, never added" now has an exception: a held answer can be LOST.
+- A MANA WARD is paid when the spell plus the ward is untapped now -- on
+  its own turn, what main phase 1 left; on yours, what its turn left. It
+  replaces §0z224's `t >= 3 + N` wherever `ward_choice` names the opponent.
+- DECISION 4's hold-up: a blue opponent with a counterspell left keeps its
+  cost up before its bodies (`answer_reserve`, a floor on `pod_spend`); the
+  bodies still arrive, the part they cannot take is counted overspent. **A
+  reading the owner did not make, said out loud**: an opponent HOLDING an
+  answer keeps that answer's 3 up the same way, since holding is keeping
+  the mana.
+
+**Measured**, N=15,000 paired, seeds 5000.., both legs `pod_mana` on, A
+`pod_answer_mana` on (`results/knob_ab_<deck>_pod_answer_mana.txt`;
+`--no-identity`: the rule reads every game an opponent holds a counterspell,
+61% of azusa's, so there is no game outside it to hold identical):
+
+| deck | T10 | T20 |
+|---|---|---|
+| rendmaw | +0.0007 +-0.0020 | +0.0031 +-0.0035 |
+| lorehold | **+0.0047 +-0.0033** | **+0.0048 +-0.0040** |
+| karlov | **+0.0034 +-0.0033** | **+0.0053 +-0.0039** |
+| tivit | **+0.0097 +-0.0041** | **+0.0101 +-0.0048** |
+| shilgengar | -0.0004 +-0.0017 | **+0.0041 +-0.0039** |
+| azusa | **-0.0040 +-0.0038** | -0.0021 +-0.0045 |
+
+**Five decks gain**, the way an answer that costs real mana should:
+tivit most, through its ward {3} -- paid 0.43 times a game, now 0.27, and
+re-aimed 0.25 times, not 0.09 (300 games). **Azusa loses at T10, against the
+grain (§0z172), and the counters say why: the counterspells moved EARLIER.**
+By your turn (1,500 games): turn 3 0.035 -> 0.099 a game, turn 4 0.089 ->
+0.109, then fewer from turn 5 (0.144 -> 0.129, 0.168 -> 0.124 ...), 0.04
+fewer in all. An opponent has two lands by its turn 2 (§0z236), so on your
+turn 3 it can pay at the FULL rate where the ramp allowed a quarter -- on
+azusa's ramp turns. That is real mana, not a defect; the rate itself
+(`opp.p["counter"]`) was calibrated with the ramp inside it, and decision 5
+scales it back at the flip. **And the old rule overspent**: in the off leg
+the pod cast counterspells it could not pay for, 0.72 mana a game
+(`pod_overspent_counter`).
+
+**Whole game**: `check_unchanged_decks --n=2000` against `f0ef67f`, the
+switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
+`+0.00` on all 21 metrics. `tests/test_pod_answers.py`, eight cases, four
+mutations exact on the first run, each a real seam (`WARD_READS_MANA`,
+`COUNTER_READS_MANA`, `HELD_READS_MANA`, `KEEP_ANSWER_UP`).
 
 ## How to read an ablation table
 

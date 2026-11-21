@@ -348,8 +348,13 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     reads `mana_left`: **the attack taxes first (the owner, 2026-11-20)**,
     a kill that cannot pay for its lethal attackers deflected ("deflect is
     fine") -- **BUILT (§0z238)**, `pod_tax_mana` off; tivit a null at bar
-    1.0, the bar deciding the sign. Next: the answers held for your turn
-    (ward, counterspells, A6) read the mana the pod left untapped.
+    1.0, the bar deciding the sign. **THE ANSWERS ON YOUR TURN ARE BUILT
+    (§0z239)**, `pod_answer_mana` off: counterspells, held answers and ward
+    read the mana left untapped; four decks gain, azusa loses at T10 to
+    counterspells that come earlier. Left before the flip: gating the pod's
+    OWN-turn removal and wipes on their cost, your removal that ramps the
+    pod (`POD_GIFTS`), then decision 5's rescale, the re-fit, the stranded
+    knobs, one rebuild.
 
 52. **AFTER ITEM 50: THE DECISIONS RECORDED TO REVISIT (the owner,
     2026-11-20; §0z234).** Each was left out of item 50's batch on purpose:

@@ -713,6 +713,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "27941edda87b62f5",
         "utc": "2026-11-20T23:41:02Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "0b4cbc1ef7971c71",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
@@ -1337,6 +1343,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "4334b131b2d2aea7",
         "utc": "2026-11-20T23:41:01Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "40e735c17d6b5a73",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
@@ -1987,6 +1999,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "05dc8b84cf8a9f9e",
         "utc": "2026-11-20T23:41:01Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "37cbc3295ad10cea",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
@@ -2602,6 +2620,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "b6bb017035963553",
         "utc": "2026-11-20T23:41:01Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "7cf7bf6da5879bd7",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
@@ -3255,6 +3279,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "4f95001c1eb1c36d",
         "utc": "2026-11-20T23:41:02Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "1f4bf688dcd0c609",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
@@ -3861,6 +3891,12 @@
         "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
         "fingerprint": "526ff1993873da35",
         "utc": "2026-11-20T23:41:01Z"
+      },
+      {
+        "commit": "f0ef67f",
+        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+        "fingerprint": "df5067c48f3ca65a",
+        "utc": "2026-11-21T00:53:18Z"
       }
     ]
   },
