@@ -2,6 +2,7 @@
 """How much of the pod's interaction reaches the table, per game (§0z242).
 
     python -m diagnostics.run_pod_interaction [--n=2000] [--out=PATH]
+        [--pods=today,mana] [--scale=spot:1.16,ae:1.37,wipe:1.48,counter:1.04]
 
 For queue item 50's flip (decision 5, §0z234): the pod's spot removal, A/E
 removal, wipes and counterspells CAST, whole pod, per game -- in all and on
@@ -18,6 +19,10 @@ A cast is a call to `opponents.pod_spend` for that kind, counted by a spy
 installed in each worker (§0u: a monkeypatch in the parent does not reach a
 fresh worker); a removal the gates stop is never charged, so is not
 counted. Each kind's charge is one cast whatever it costs.
+
+`--pods` runs some of the pods; `--scale` sets `pod_rate_scale` on the
+"mana" pod -- the rescale's fixed point is found by running it, comparing
+with today's counts and adjusting (§0z242).
 """
 import sys
 from collections import defaultdict
@@ -52,7 +57,7 @@ def _init():
 
 
 def _play(job):
-    deck_name, pod, seeds = job
+    deck_name, pod, seeds, scale = job
     from edhmc.experiment import DEFAULT_CFG
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS
@@ -62,7 +67,10 @@ def _play(job):
     turns = 0.0
     for s in seeds:
         r = sim(deck, cmd, dict(DEFAULT_CFG, turns=20, snapshot_rounds=(10,),
-                                watch=frozenset(), **PODS[pod]), 5000 + s)
+                                watch=frozenset(), **PODS[pod],
+                                **({"pod_rate_scale": scale}
+                                   if scale and pod == "mana" else {})),
+                5000 + s)
         turns += r["turns_played"]
     return dict(TALLY), turns
 
@@ -72,18 +80,22 @@ def main() -> int:
             if "=" in a}
     n = int(opts.get("--n", 2000))
     out_path = opts.get("--out", "results/pod_interaction.txt")
+    pods = [p for p in opts.get("--pods", ",".join(PODS)).split(",") if p]
+    scale = {k: float(v) for k, v in (kv.split(":") for kv in
+             opts.get("--scale", "").split(",") if kv)} or None
     from edhmc.registry import ACTIVE
     lines = [f"the pod's interaction CAST per game, whole pod, N={n} a deck "
              f"and pod, seeds 5000..{5000 + n - 1}; 'today' is pod_mana "
-             "alone (the pod every table runs), 'mana' every item-50 switch",
+             "alone (the pod every table runs), 'mana' every item-50 switch"
+             + (f", 'mana' scaled {scale}" if scale else ""),
              "", f"{'deck':<11} {'pod':<6} {'turns':>5}  "
              + "  ".join(f"{k + ' all':>9} {k + ' 3-10':>9}" for k in KINDS)]
-    grand = {p: defaultdict(float) for p in PODS}
+    grand = {p: defaultdict(float) for p in pods}
     with Pool(4, initializer=_init) as pool:
         for deck in ACTIVE:
-            for pod in PODS:
-                parts = pool.map(_play, [(deck, pod, list(range(i, n, 16)))
-                                         for i in range(16)])
+            for pod in pods:
+                parts = pool.map(_play, [(deck, pod, list(range(i, n, 16)),
+                                          scale) for i in range(16)])
                 tally, turns = defaultdict(float), 0.0
                 for t, tp in parts:
                     turns += tp
@@ -99,12 +111,12 @@ def main() -> int:
                 print(lines[-1], flush=True)
     d = len(ACTIVE) * n
     lines += ["", "every deck together, per game:"]
-    for pod in PODS:
+    for pod in pods:
         lines.append(f"  {pod:<6} " + "  ".join(
             f"{k} {grand[pod][(k, 'all')] / d:.2f} "
             f"({grand[pod][(k, '3-10')] / d:.2f} in 3-10)" for k in KINDS))
     lines += ["", "by pod turn, every deck together (cast per game):"]
-    for pod in PODS:
+    for pod in pods:
         for k in KINDS:
             lines.append(f"  {pod:<6} {k:<8}" + " ".join(
                 f"{grand[pod][(k, t)] / d:5.2f}" for t in range(1, 15)))

@@ -294,7 +294,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z239](#0z239) | BUILT | **Item 50 step 4: the pod's answers on your turn read its mana** (`pod_answer_mana`, off); +0.004 to +0.010 on four decks, azusa -0.0040 at T10 from earlier counterspells |
 | [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
-| [0z242](#0z242) | MEASURED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes in turns 3-10, NOT the header's ~4 / ~1; the gates cost 14% / 34% |
+| [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20770,7 +20770,7 @@ the file (a no-op stub also removed the "due" count; it is the
 
 <a id="0z242"></a>
 
-## 0z242. MEASURED -- How much of the pod's interaction reaches the table
+## 0z242. DECIDED -- How much of the pod's interaction reaches the table
 
 **The owner, 2026-11-21: "yes, measure the interaction counts"** -- the
 first step of item 50's flip: decision 5 (§0z234) scales the pod's rates
@@ -20813,6 +20813,34 @@ later. And scaling up spends more mana, which gates a little more: the
 factor is a fixed point to iterate, not one division. The factors that
 restore TODAY'S counts in turns 3-10 are about spot x1.16, A/E x1.37,
 wipes x1.48, counterspells x1.04 before that iteration.
+
+**DECIDED BY THE OWNER 2026-11-21: the rescale restores TODAY'S counts**,
+not the header's ~4 / ~1 -- the interaction every table and the §0z195 fit
+rest on; only its timing moves. The header comment is corrected with the
+rescale's code.
+
+**THE RESCALE IS FITTED** (`opponents.pod_rate`, the `pod_rate_scale` knob:
+{kind: factor}, read only under `pod_mana`; None, the default, scales
+nothing). Two iterations of `run_pod_interaction --pods=mana --scale=...`,
+N=2,000 a deck, every item-50 switch on, against today's counts in pod turns
+3-10 (`results/pod_interaction_fit1.txt`, `..._fit2.txt`):
+
+| factors (spot / A/E / wipe / counter) | spot | A/E | wipes | counterspells |
+|---|---|---|---|---|
+| today, the target | 3.04 | 1.07 | 0.34 | 0.72 |
+| 1.16 / 1.37 / 1.48 / 1.04 | 3.07 | 1.04 | 0.35 | 0.71 |
+| **1.15 / 1.41 / 1.44 / 1.05** | **3.05** | **1.07** | **0.34** | **0.71** |
+
+**The fixed point is spot x1.15, A/E x1.41, wipes x1.44, counterspells
+x1.05**: every count within the measurement's second decimal. **The timing
+is not restored, as said above**: the rescaled pod's wipes are 0.06 on pod
+turn 5 against today's 0.08, and 0.04 against 0.03 by turn 10 -- the early
+rounds thinner, the late ones thicker; the counterspells come earlier
+(0.09 on your turn 3 against 0.03). `tests/test_pod_rate.py`, three cases,
+one mutation exact. The flip sets this scale with the switches.
+`check_unchanged_decks --n=2000` against `204d0e9` with the default (no
+scale): every deck BIT-IDENTICAL (caches VERIFIED); `tools.validate`
+`+0.00` on all 21 metrics.
 
 ## How to read an ablation table
 

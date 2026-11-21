@@ -35,9 +35,14 @@ from edhmc.decks import _removal
 from edhmc.decks import _evasion
 
 # Per-opponent, per-turn probabilities, once that opponent has mana (turn >= 3).
-# Calibration target for a mixed pod over turns 3-10: roughly 4 spot removal
-# spells and ~1 board wipe reaching the table per game, which is what a
-# 10-turn game of mixed-bracket Commander tends to produce.
+# CORRECTED 2026-11-21 (§0z242): this said "roughly 4 spot removal spells and
+# ~1 board wipe reaching the table per game" over turns 3-10, the target the
+# rates were first set to. MEASURED, the pod every table runs casts 3.0 spot
+# removal, 1.1 A/E removal, 0.34 wipes and 0.72 counterspells a game in pod
+# turns 3-10 (`diagnostics/run_pod_interaction.py`): spot runs its design,
+# 0.50 a round, and falls as games end; wipes are a third of the old claim.
+# The pod has been re-fitted to the tables since (§0z195). Under item 50's
+# mana model the rates are scaled to keep THOSE counts (`pod_rate`).
 # `clock` is the turn range in which this opponent threatens to eliminate a
 # player. Calibrated from bracket descriptions and then corrected against the
 # pod actually being played: the top seat here behaves like a 3.5, not a true
@@ -726,6 +731,21 @@ def roll_pod_mana(cfg, seed, opps, rounds: int) -> None:
         r = random.Random((seed * 1000003) ^ (0x3A9A1A + 7919 * i))
         hand, library = opening_hand(r, template)
         o.mana_rows = land_drops(hand, library, rounds, costs)
+
+
+def pod_rate(g, opp, kind: str) -> float:
+    """Opponent `opp`'s per-turn rate of `kind` (spot, ae, wipe, counter):
+    its bracket-and-archetype rate, scaled under the mana model by
+    `pod_rate_scale` -- {kind: factor}, None (the default) for none.
+    DECISION 5 (§0z234, §0z242): the rates stood for drawing the card AND
+    having the mana; gated by real mana they count the mana half twice, so
+    they are scaled to restore the interaction today's pod casts (the
+    owner, 2026-11-21: "today's counts")."""
+    rate = opp.p[kind]
+    scale = g.cfg.get("pod_rate_scale")
+    if scale and pod_mana_on(g):
+        rate *= scale.get(kind, 1.0)
+    return rate
 
 
 def pod_mana_on(g) -> bool:
@@ -1853,7 +1873,7 @@ def reserve_holds(g, card) -> bool:
 # ---------------------------------------------------------------------------
 
 def spot_removal(g, opp, others, rolls):
-    if rolls[0] >= opp.p["spot"]:
+    if rolls[0] >= pod_rate(g, opp, "spot"):
         return
     if rolls[3] >= your_share(g, opp, others):
         if can_cast(g, opp, _removal.SPOT_SPELL_MV, "spot",
@@ -1988,7 +2008,7 @@ def _spot_at_you(g, rolls, victim=None, opp=None) -> None:
 
 def ae_removal(g, opp, others, rolls):
     """Naturalize / Vandalblast effects, plus the occasional sweeper."""
-    if rolls[1] >= opp.p["ae"]:
+    if rolls[1] >= pod_rate(g, opp, "ae"):
         return
     from edhmc.decks._pod_mana import AE_SPELL_MV
     if rolls[3] >= your_share(g, opp, others):
@@ -2025,7 +2045,7 @@ def board_wipe(g, opp, rolls):
         return
     n = sum(1 for p in g.board if is_creature_now(g, p))
     width_mult = 1.0 + min(0.75, max(0, n - 4) * 0.08)
-    if rolls[2] >= opp.p["wipe"] * width_mult:
+    if rolls[2] >= pod_rate(g, opp, "wipe") * width_mult:
         return
     from edhmc.decks._pod_mana import WIPE_SPELL_MV
     if not can_cast(g, opp, WIPE_SPELL_MV, "wipe", WIPE_READS_MANA):
@@ -3016,7 +3036,7 @@ def _countered(g, card, spell_index: int) -> bool:
             continue
         if by_mana and opp.mana_left < COUNTER_SPELL_MV - 1e-9:
             continue
-        p = opp.p["counter"] * mana_gate * min(1.0, threat / 9.0)
+        p = pod_rate(g, opp, "counter") * mana_gate * min(1.0, threat / 9.0)
         if rolls[i] < p:
             if shielded:
                 # The table does not spend a counterspell on a spell that

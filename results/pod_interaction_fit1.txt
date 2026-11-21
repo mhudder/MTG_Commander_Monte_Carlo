@@ -1,0 +1,19 @@
+the pod's interaction CAST per game, whole pod, N=2000 a deck and pod, seeds 5000..6999; 'today' is pod_mana alone (the pod every table runs), 'mana' every item-50 switch, 'mana' scaled {'spot': 1.16, 'ae': 1.37, 'wipe': 1.48, 'counter': 1.04}
+
+deck        pod    turns   spot all spot 3-10     ae all   ae 3-10   wipe all wipe 3-10  counter all counter 3-10
+rendmaw     mana   10.52       3.40      3.12       1.28      1.16       0.45      0.39       0.59      0.54
+lorehold    mana    9.63       3.14      2.97       1.10      1.03       0.37      0.34       0.63      0.58
+karlov      mana   10.07       3.32      3.03       1.14      1.02       0.39      0.33       0.84      0.78
+tivit       mana   10.54       3.23      2.97       1.14      1.04       0.36      0.32       0.82      0.76
+shilgengar  mana   10.84       3.68      3.32       1.23      1.09       0.44      0.37       0.79      0.71
+azusa       mana    9.51       3.16      2.98       1.00      0.93       0.40      0.36       0.92      0.88
+
+every deck together, per game:
+  mana   spot 3.32 (3.07 in 3-10)  ae 1.15 (1.04 in 3-10)  wipe 0.40 (0.35 in 3-10)  counter 0.77 (0.71 in 3-10)
+
+by pod turn, every deck together (cast per game):
+  mana   spot     0.00  0.00  0.47  0.52  0.51  0.47  0.38  0.33  0.23  0.15  0.10  0.07  0.03  0.02
+  mana   ae       0.00  0.00  0.14  0.17  0.16  0.16  0.15  0.12  0.08  0.06  0.04  0.03  0.02  0.01
+  mana   wipe     0.00  0.00  0.00  0.00  0.06  0.09  0.07  0.06  0.04  0.04  0.02  0.01  0.01  0.01
+  mana   counter  0.00  0.00  0.09  0.08  0.11  0.11  0.11  0.09  0.07  0.05  0.03  0.02  0.01  0.00
+           (pod turns 1..14)

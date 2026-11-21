@@ -731,6 +731,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "92f35a7656ec96ee",
         "utc": "2026-11-21T03:09:10Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "49791a64d98cedf5",
+        "utc": "2026-11-21T17:43:46Z"
       }
     ]
   },
@@ -1373,6 +1379,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "70fcd27eab85a741",
         "utc": "2026-11-21T03:09:10Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "a7dd674a6109d7b2",
+        "utc": "2026-11-21T17:43:46Z"
       }
     ]
   },
@@ -2041,6 +2053,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "e35862f8f743db18",
         "utc": "2026-11-21T03:09:09Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "09cfba8511ca4348",
+        "utc": "2026-11-21T17:43:45Z"
       }
     ]
   },
@@ -2674,6 +2692,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "ccc5fcd517650491",
         "utc": "2026-11-21T03:09:09Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "508c991297107b2c",
+        "utc": "2026-11-21T17:43:45Z"
       }
     ]
   },
@@ -3345,6 +3369,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "e5eafb198f4352eb",
         "utc": "2026-11-21T03:09:10Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "64fb192ccb38c3fc",
+        "utc": "2026-11-21T17:43:46Z"
       }
     ]
   },
@@ -3969,6 +3999,12 @@
         "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
         "fingerprint": "6d394b21a02bbcf8",
         "utc": "2026-11-21T03:09:10Z"
+      },
+      {
+        "commit": "204d0e9",
+        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+        "fingerprint": "eb6f9718818a68dc",
+        "utc": "2026-11-21T17:43:46Z"
       }
     ]
   },

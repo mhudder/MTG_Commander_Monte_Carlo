@@ -356,7 +356,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     T10 because the pod casts a third fewer wipes -- the double-counted
     mana decision 5 rescales. **YOUR REMOVAL THAT RAMPS THE POD IS BUILT
     (§0z241)**, `pod_gifts` off: tivit -0.0013 at T20, three more decks
-    -0.0001 to -0.0006. **Every rule is built; what is left is the flip**:
+    -0.0001 to -0.0006. **The interaction is measured (§0z242)** and the
+    owner chose the rescale's target: TODAY'S counts (spot 3.0, A/E 1.1,
+    wipes 0.34, counterspells 0.72 a game in pod turns 3-10). **FITTED**:
+    `pod_rate_scale` spot 1.15, A/E 1.41, wipes 1.44, counterspells 1.05
+    restores them (§0z242).
+    **Every rule is built; what is left is the flip**:
     every item-50 switch on together, decision 5's rescale to the
     documented interaction counts, the re-fit (§0z195), the stranded knobs
     (`run_knob_liveness`, §0z205), one rebuild (`parallel-rebuild`), the
