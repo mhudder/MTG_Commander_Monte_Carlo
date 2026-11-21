@@ -295,6 +295,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
 | [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
+| [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, rates rescaled; the re-fit and the stranded knobs in progress; every table to rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20841,6 +20842,51 @@ one mutation exact. The flip sets this scale with the switches.
 `check_unchanged_decks --n=2000` against `204d0e9` with the default (no
 scale): every deck BIT-IDENTICAL (caches VERIFIED); `tools.validate`
 `+0.00` on all 21 metrics.
+
+<a id="0z243"></a>
+
+## 0z243. FLIPPED -- Item 50: the pod's mana is the default
+
+**The owner, 2026-11-21: "Go ahead with 1 to 3. Make sure you tell me
+before rebuilding."** Step 1, the flip: every item-50 switch defaults on
+(`pod_mana`, `pod_answer_mana`, `pod_tax_mana`, `pod_removal_mana`,
+`pod_gifts`) with the fitted rescale (`opponents.POD_RATE_SCALE`: spot 1.15,
+A/E 1.41, wipes 1.44, counterspells 1.05, §0z242). **`experiment.
+POD_PRE_ITEM50` restores the pod before**, the old rate included:
+`check_unchanged_decks --n=2000` against `24b5e95` with it, every deck
+BIT-IDENTICAL.
+
+**Tests.** Sixteen modules failed on the flip, each because it sets up a
+pod event by hand on opponents holding no mana, so the new gates stopped
+the event the test is about. Thirteen pin mechanisms that are not the mana
+model -- `test_dead_opponents`, `death_lookback`, `destroy_share`,
+`held_answers`, `known_win`, `march_elephant`, `oracle_batch`,
+`oracle_remainder` (and through it `oracle_departures`), `pod_responses`,
+`pod_threats`, `route_answers`, `target_and_vault`, `ward` -- and name the
+old pod (`POD_PRE_ITEM50`), said in each file, no expectation changed: the
+§0z222 practice. Two are the mana model's own, whose OFF case read the new
+default: `test_pod_library` B names `pod_mana=False`, `test_pod_rate` C
+names `pod_rate_scale=None`.
+
+### The re-fit (step 2)
+
+The fit rule (§0z195): the mean T20 win rate over the six active decks
+equals the old pod's. `diagnostics.fit_pod_knob incidental_rate`, N=3,000 a
+deck, seeds 5000..7999, target `POD_PRE_ITEM50`
+(`results/fit_item50_incidental_rate_20261121.txt`): the target is 0.4779
+and 10.22 turns.
+
+| `incidental_rate` | mean T20 | turns |
+|---|---|---|
+| 1.6 | 0.4944 | 10.45 |
+| **1.94 (today)** | **0.4664** | 10.19 |
+| 2.3 | 0.4478 | 9.99 |
+| 2.7 | 0.4319 | 9.83 |
+
+**Crossing 1.800.** The flipped pod at today's rate is STRONGER than the old
+one (-0.0115), against the expectation that gates which only take options
+from the pod weaken it -- the mechanism is being read (§0z172), and the
+crossing re-measured on fresh seeds, before it is adopted.
 
 ## How to read an ablation table
 

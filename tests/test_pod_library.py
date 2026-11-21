@@ -94,7 +94,9 @@ def run_cases():
           (len(t), t.count("land"), t.count("rock"), t.count("ramp")),
           (M.POD_LIBRARY, M.POD_LANDS, M.POD_ROCKS, M.POD_LAND_RAMP))
 
-    off = O.make_pod(dict(DEFAULT_CFG, turns=20), 77)
+    # `pod_mana` named off: it is the default since §0z243 (set after the
+    # flip, no expectation changed)
+    off = O.make_pod(dict(DEFAULT_CFG, turns=20, pod_mana=False), 77)
     on = O.make_pod(dict(DEFAULT_CFG, turns=20, pod_mana=True), 77)
     again = O.make_pod(dict(DEFAULT_CFG, turns=20, pod_mana=True), 77)
     check("B CRN: the same pod and grid on or off, the same rows again",

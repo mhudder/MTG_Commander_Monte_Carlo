@@ -51,6 +51,14 @@ import edhmc.engine as EN
 import edhmc.opponents as OPP
 from edhmc.decks import rendmaw_v12 as M
 from edhmc.experiment import DEFAULT_CFG
+
+# §0z243: THE POD BEFORE ITEM 50'S FLIP, NAMED. This file pins a mechanism
+# that is not the pod's mana, on opponents set up by hand with none; under
+# the flipped pod its event would be gated by that mana instead. Set after
+# the flip, no expectation changed; the mana model's own tests are
+# tests/test_pod_*.py.
+from edhmc.experiment import POD_PRE_ITEM50 as _PRE_ITEM50  # noqa: E402
+DEFAULT_CFG = dict(DEFAULT_CFG, **_PRE_ITEM50)
 from edhmc.registry import DECKS as REGISTRY
 
 MUTATE = "--mutate" in sys.argv

@@ -232,6 +232,23 @@ POD_PRE_ITEM45 = {
     "incidental_rate": 1.45,
 }
 
+# The pod before §0z243: item 50 OFF -- the pod has no mana: its removal,
+# wipes and counterspells are rolled at rates that stood for the card and
+# the mana together, a ward is paid from the pod's turn number, Ghostly
+# Prison and Propaganda turn away a share of attackers, and your removal
+# hands it nothing. Every table built before §0z243 is this pod's, and
+# `dict(DEFAULT_CFG, **POD_PRE_ITEM50)` plays it exactly, the old rate
+# included.
+POD_PRE_ITEM50 = {
+    "pod_mana": False,
+    "pod_answer_mana": False,
+    "pod_tax_mana": False,
+    "pod_removal_mana": False,
+    "pod_gifts": False,
+    "pod_rate_scale": None,
+    "incidental_rate": 1.94,
+}
+
 # The pod before §0z140: no bodies, no routes, no responses. Every table and
 # every number in KNOWN_ISSUES dated before 2026-10-15 is this pod's.
 POD_PRE_V4 = {

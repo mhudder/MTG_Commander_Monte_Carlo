@@ -415,26 +415,29 @@ POD_DEFAULTS = {
     "route_kills": True,
     "pod_attacks_walkers": True,
     "held_answers": True,
-    # ITEM 50, THE POD'S MANA (§0z234), built OFF, one rule at a time. Step 1
-    # (§0z236): each opponent's library and land drops, pre-rolled. Step 2
-    # (§0z237): what it spends on its own turn, charged, not gated. Nothing
-    # reads either in a game yet, so on or off every game plays the same.
-    "pod_mana": False,
+    # ITEM 50, THE POD'S MANA, THE DEFAULT SINCE §0z243 (the owner,
+    # 2026-11-21: "go ahead with 1 to 3": flip, re-fit, stranded knobs) --
+    # built OFF one rule at a time (§0z236-§0z241), flipped together with the
+    # rates rescaled (`POD_RATE_SCALE`, §0z242). `experiment.POD_PRE_ITEM50`
+    # restores the pod before. Step 1 (§0z236): each opponent's library and
+    # land drops. Step 2 (§0z237): what it spends on its own turn, charged,
+    # not gated.
+    "pod_mana": True,
     # Step 3 (§0z238): Ghostly Prison and Propaganda paid from that mana, by
     # the owner's rule (an attacker is paid for when the damage it gets
     # through is worth the mana; a lethal attack always, if it can).
-    "pod_tax_mana": False,
+    "pod_tax_mana": True,
     # Step 4 (§0z239): the answers it casts on YOUR turn -- counterspells,
     # held answers (A6), the ward they pay -- read the mana it left untapped
     # at the end of its own turn (502.3), not a ramp or its turn number.
-    "pod_answer_mana": False,
+    "pod_answer_mana": True,
     # Step 5 (§0z240): its OWN-turn removal and wipes are cast only when it
     # has their cost untapped -- the last gate before the flip.
-    "pod_removal_mana": False,
+    "pod_removal_mana": True,
     # Step 6 (§0z241): your removal that hands the pod mana -- Path to
     # Exile's and Assassin's Trophy's basic land, An Offer You Can't
     # Refuse's two Treasures -- gives it to the opponent it hit.
-    "pod_gifts": False,
+    "pod_gifts": True,
 }
 
 
@@ -733,16 +736,23 @@ def roll_pod_mana(cfg, seed, opps, rounds: int) -> None:
         o.mana_rows = land_drops(hand, library, rounds, costs)
 
 
+# THE RESCALE (§0z242), fitted to keep today's interaction under the mana
+# model: spot removal, A/E removal, wipes and counterspells cast in pod turns
+# 3-10 per game (3.05 / 1.07 / 0.34 / 0.71 against 3.04 / 1.07 / 0.34 / 0.72).
+POD_RATE_SCALE = {"spot": 1.15, "ae": 1.41, "wipe": 1.44, "counter": 1.05}
+
+
 def pod_rate(g, opp, kind: str) -> float:
     """Opponent `opp`'s per-turn rate of `kind` (spot, ae, wipe, counter):
     its bracket-and-archetype rate, scaled under the mana model by
-    `pod_rate_scale` -- {kind: factor}, None (the default) for none.
+    `pod_rate_scale` -- {kind: factor}, `POD_RATE_SCALE` by default since
+    the flip (§0z243), None for none.
     DECISION 5 (§0z234, §0z242): the rates stood for drawing the card AND
     having the mana; gated by real mana they count the mana half twice, so
     they are scaled to restore the interaction today's pod casts (the
     owner, 2026-11-21: "today's counts")."""
     rate = opp.p[kind]
-    scale = g.cfg.get("pod_rate_scale")
+    scale = g.cfg.get("pod_rate_scale", POD_RATE_SCALE)
     if scale and pod_mana_on(g):
         rate *= scale.get(kind, 1.0)
     return rate

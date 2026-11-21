@@ -4,6 +4,7 @@
     python -m diagnostics.run_knob_liveness KNOB=V [KNOB=V ...] [--n=300]
                                             [--seed0=5000] [--decks=a,b]
                                             [--pods=new,old]
+                                            [--old=POD_PRE_COMBAT]
 
 For each KNOB=V (V read as a Python literal) and each pod -- "new" is
 `DEFAULT_CFG`, "old" is `DEFAULT_CFG` + `experiment.POD_PRE_COMBAT` (the pod
@@ -20,6 +21,10 @@ with bodies, so every knob written for the formula -- `block_share`,
 `flier_block_share`, `blocker_toughness` and the rest -- may have stopped
 mattering. `KNOBS.md` says where a knob is READ; only playing the games
 says whether the read still reaches anything.
+
+`--old=NAME` names the `experiment` preset the "old" pod is (default
+`POD_PRE_COMBAT`, as every earlier call ran): `POD_PRE_ITEM50` for item 50's
+flip (§0z243).
 """
 import ast
 import hashlib
@@ -39,14 +44,14 @@ def _lit(v):
 
 
 def _digests(args):
-    deck, pod, extra, n, seed0 = args
+    deck, pod, extra, n, seed0, old = args
     from edhmc import experiment
     from edhmc.pending import build_pending
     from edhmc.registry import DECKS
     lst, cmd = build_pending(deck)
     base = dict(experiment.DEFAULT_CFG, turns=20, watch=frozenset())
     if pod == "old":
-        base.update(experiment.POD_PRE_COMBAT)
+        base.update(getattr(experiment, old))
     base.update(extra)
     out = []
     for s in range(seed0, seed0 + n):
@@ -68,15 +73,18 @@ def main() -> int:
     n = int(opts.get("--n", 300))
     seed0 = int(opts.get("--seed0", 5000))
     pods = opts.get("--pods", "new,old").split(",")
+    old = opts.get("--old", "POD_PRE_COMBAT")
     from edhmc.registry import ACTIVE
     decks = opts["--decks"].split(",") if "--decks" in opts else list(ACTIVE)
     arms = [{}] + [{k: v} for k, v in knobs]
-    jobs = [(d, p, a, n, seed0) for d in decks for p in pods for a in arms]
+    jobs = [(d, p, a, n, seed0, old) for d in decks for p in pods
+            for a in arms]
     with Pool() as pool:
         res = dict(pool.imap_unordered(_digests, jobs))
     py = sys.version.split()[0]
     print(f"knob liveness: N={n} staged games a deck, T20, seeds "
-          f"{seed0}..{seed0 + n - 1}, decks {','.join(decks)}, python {py}")
+          f"{seed0}..{seed0 + n - 1}, decks {','.join(decks)}, python {py}"
+          + (f", old pod {old}" if "old" in pods else ""))
     print("cells: games whose whole output moved / whose result moved, "
           f"of {n * len(decks)}; per-deck output moves in brackets\n")
     head = f"{'knob=value':38s}" + "".join(f" | {p + ' pod':>34s}"

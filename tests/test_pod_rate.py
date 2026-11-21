@@ -54,7 +54,9 @@ def run_cases():
           (o.p["spot"] * 1.15, o.p["wipe"]))
     g, o = game(pod_mana=False, pod_rate_scale={"spot": 1.15})
     check("B pod_mana off: unchanged", O.pod_rate(g, o, "spot"), o.p["spot"])
-    g, o = game(pod_mana=True)
+    # "no scale" named: the default is POD_RATE_SCALE since §0z243 (set
+    # after the flip, no expectation changed)
+    g, o = game(pod_mana=True, pod_rate_scale=None)
     check("C no scale: unchanged", O.pod_rate(g, o, "spot"), o.p["spot"])
     return set(FAIL)
 

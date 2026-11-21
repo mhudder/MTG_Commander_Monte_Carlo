@@ -1,0 +1,13 @@
+fit incidental_rate over [1.8]: target pod DEFAULT_CFG + {'pod_mana': False, 'pod_answer_mana': False, 'pod_tax_mana': False, 'pod_removal_mana': False, 'pod_gifts': False, 'pod_rate_scale': None, 'incidental_rate': 1.94}, candidates + {}; N=3000 a deck, staged lists, seeds 20000..22999, python 3.11.18
+target: mean T20 win rate over 6 active decks = 0.4624; mean turns 10.16
+
+deck        target T10     T20  turns | incidental_rate=1.8    T20 (diff ±)
+rendmaw         0.0997  0.3290  10.52 | 0.3303 (+0.0013 ±0.0148)
+lorehold        0.2597  0.4410   9.49 | 0.4517 (+0.0107 ±0.0149)
+karlov          0.2670  0.5163  10.21 | 0.5240 (+0.0077 ±0.0144)
+tivit           0.3113  0.5320  10.47 | 0.5480 (+0.0160 ±0.0150)
+shilgengar      0.0590  0.4137  10.80 | 0.4103 (-0.0033 ±0.0149)
+azusa           0.3550  0.5423   9.47 | 0.5477 (+0.0053 ±0.0151)
+
+mean T20: incidental_rate=1.8: 0.4687 (10.26 turns)
+crossing: not bracketed by these values
