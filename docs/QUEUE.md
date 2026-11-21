@@ -361,7 +361,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     wipes 0.34, counterspells 0.72 a game in pod turns 3-10). **FITTED**:
     `pod_rate_scale` spot 1.15, A/E 1.41, wipes 1.44, counterspells 1.05
     restores them (§0z242).
-    **Every rule is built; what is left is the flip**:
+    **FLIPPED, RE-FITTED AND READ (§0z243, 2026-11-21)**: every switch on
+    with the rescale; `incidental_rate` 1.80 (out of sample +0.0063 against
+    the old pod); `attack_tax_deflect` and `ward_pay_share` stranded,
+    marked. **Left: the rebuild, the owner's call** ("make sure you tell me
+    before rebuilding"), then the staged swaps re-measured.
+    The plan as it was written:
     every item-50 switch on together, decision 5's rescale to the
     documented interaction counts, the re-fit (§0z195), the stranded knobs
     (`run_knob_liveness`, §0z205), one rebuild (`parallel-rebuild`), the

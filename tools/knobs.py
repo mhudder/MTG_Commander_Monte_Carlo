@@ -129,6 +129,16 @@ DEAD_ON_DEFAULT = {
                             "`POD_PRE_COMBAT`)",
     "crown_loss_ends_chip": "read only off A2 (the formula pod, "
                             "`POD_PRE_COMBAT`)",
+    "attack_tax_deflect": "stranded by item 50's flip (§0z243): the taxes "
+                          "are paid from the pod's mana (§0z238); still "
+                          "read by the formula chip (`chip_formula_equiv`, "
+                          "a counter) and the prediction for an opponent "
+                          "with no body yet -- 578 of 2,000 tivit games' "
+                          "outputs move at 0.1 or 0.9, no result; "
+                          "`POD_PRE_ITEM50` reads it",
+    "ward_pay_share": "read only under `ward_pay_rule='share'`, the first "
+                      "ward build (§0z224); dead by construction on both "
+                      "pods",
     "blocker_toughness": "retired by item 44's flip (§0z204); read only by "
                          "`POD_PRE_COMBAT`",
     "pod_block_policy": "retired by item 44's flip (§0z204); read only by "

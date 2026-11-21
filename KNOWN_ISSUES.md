@@ -295,7 +295,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
 | [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
-| [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, rates rescaled; the re-fit and the stranded knobs in progress; every table to rebuild |
+| [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, re-fitted (`incidental_rate` 1.80), two knobs stranded; every table to rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20885,8 +20885,60 @@ and 10.22 turns.
 
 **Crossing 1.800.** The flipped pod at today's rate is STRONGER than the old
 one (-0.0115), against the expectation that gates which only take options
-from the pod weaken it -- the mechanism is being read (§0z172), and the
-crossing re-measured on fresh seeds, before it is adopted.
+from the pod weaken it.
+
+**The mechanism** (§0z172: every output key, the flipped pod against the
+old at the same rate, N=6,000; `results/flip_item50_diff_{rendmaw,azusa}.
+txt`): more of the pod's interaction lands ON YOU. Rendmaw: A/E removal
+eaten 0.648 -> 0.743 a game (+15%), spot 1.202 -> 1.230, wipes 0.434 ->
+0.448, the pod's attacks at you 9.70 -> 9.86 and 0.42 more damage, final
+life -0.76; azusa the same shape. The rescale restores the pod's TOTAL
+casts (§0z242), and the gates cut early ones -- early, before you are the
+biggest threat, most removal is aimed at RIVALS -- so the scale adds back
+casts evenly across a game whose later rounds aim more at you. Equal
+interaction, more of it pointed at you: decision 5's target (total counts)
+meeting mana's timing. Not a defect; the re-fit gives the strength back.
+
+**Out of sample** (`diagnostics.fit_pod_knob incidental_rate 1.8
+--seed0=20000`, N=3,000 a deck; `results/fit_item50_incidental_rate_oos_
+20261121.txt`): the old pod 0.4624 and 10.16 turns, the flipped pod at 1.80
+0.4687 and 10.26 -- **+0.0063, at the edge of that mean's noise** (about
++-0.006 over six decks at this N; §0z222's adopted miss was -0.0033).
+**ADOPTED: `incidental_rate` 1.80**, in `DEFAULT_CFG`, by the fit rule as at
+§0z204 and §0z222; `POD_PRE_ITEM50` restores 1.94. The rate is how often a
+pod body attacks (`pod_attack_rate`): the pod attacks a little less to give
+back what its better-aimed removal took. Said out loud: the miss leaves the
+flipped pod about 0.006 weaker than the old on average, and games 0.1 turns
+longer.
+
+### The stranded knobs (step 3)
+
+`diagnostics.run_knob_liveness` (now `--old=PRESET`), N=300 a deck, both
+pods, the old one `POD_PRE_ITEM50` (`results/knob_liveness_item50_n300.
+txt`): the controls are LIVE as they should be -- `held_answer_share` (822
+games' outputs moved), `first_wipe_turn` (442), `counter_threshold` (46),
+`tax_damage_per_mana` (52 on the new pod, 0 on the old) -- and two knobs
+written for the pod without mana are not:
+
+- **`attack_tax_deflect`** (0.5, §0z138): the taxes are paid from the pod's
+  mana now (§0z238). It is still READ, by the formula chip
+  (`chip_formula_equiv`, a counter) and by the prediction for an opponent
+  with no body yet (`predicted_from_bodies` falls back to the formula, tax
+  share included) -- at N=2,000 tivit games, 578 outputs move at 0.1 or 0.9
+  and **no result** (`results/knob_liveness_item50_tax_n2000.txt`).
+  STRANDED: marked in `tools/knobs.py`'s `DEAD_ON_DEFAULT`.
+- **`ward_pay_share`** (0.5): read only under `ward_pay_rule='share'`, the
+  first ward build (§0z224) -- dead by construction on both pods, marked.
+
+`ward_pay_rule` itself stays live: its `'share'` branch still runs ahead of
+the mana. The counterspell ramp `(pod turn - 2) / 4` and the turn-3 gate are
+code, not knobs: under the flip they are read only with
+`pod_answer_mana=False`.
+
+**Left for item 50: the rebuild** -- every active table, the owner's call,
+then the staged swaps re-measured. Until it runs the six caches are
+SUSPECT and `check_docs` fails on that one check, expected and said in
+each commit. Never `--verified`.
 
 ## How to read an ablation table
 

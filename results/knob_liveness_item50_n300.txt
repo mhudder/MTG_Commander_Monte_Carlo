@@ -1,0 +1,11 @@
+knob liveness: N=300 staged games a deck, T20, seeds 5000..5299, decks rendmaw,lorehold,karlov,tivit,shilgengar,azusa, python 3.11.18, old pod POD_PRE_ITEM50
+cells: games whose whole output moved / whose result moved, of 1800; per-deck output moves in brackets
+
+knob=value                             |                            new pod |                            old pod
+attack_tax_deflect=0.9                 |   live    84 /    0 [0 0 0 84 0 0] |   live    91 /    7 [0 0 0 91 0 0]
+ward_pay_share=0.9                     |    DEAD     0 /    0 [0 0 0 0 0 0] |    DEAD     0 /    0 [0 0 0 0 0 0]
+ward_pay_rule='share'                  |  live   118 /   12 [5 0 0 113 0 0] |  live   119 /    6 [9 0 0 110 0 0]
+held_answer_share=0.9                  | live   822 /   11 [130 128 152 117 149 146] | live   766 /   11 [120 115 147 109 143 132]
+first_wipe_turn=7                      | live   442 /   91 [79 74 68 70 73 78] | live   297 /  105 [53 48 46 48 50 52]
+counter_threshold=2.0                  |   live    46 /   11 [9 23 1 4 6 3] |  live    55 /   11 [15 30 1 2 3 4]
+tax_damage_per_mana=3.0                |   live    52 /    8 [0 0 0 52 0 0] |    DEAD     0 /    0 [0 0 0 0 0 0]

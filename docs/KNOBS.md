@@ -7,7 +7,7 @@ be renamed without this file changing. That is §0q's rule (a
 hand-maintained name set is a claim, and claims rot) applied to
 configuration.
 
-Derived at `24b5e95` from 33 engine sources.
+Derived at `9182f91` from 33 engine sources.
 
 **454 knobs, 676 call sites.**
 
@@ -550,6 +550,7 @@ passes the liveness run (§0z126).
 
 | knob | default | why it is dead |
 |---|---|---|
+| `attack_tax_deflect` | `0.5` | stranded by item 50's flip (§0z243): the taxes are paid from the pod's mana (§0z238); still read by the formula chip (`chip_formula_equiv`, a counter) and the prediction for an opponent with no body yet -- 578 of 2,000 tivit games' outputs move at 0.1 or 0.9, no result; `POD_PRE_ITEM50` reads it |
 | `block_rate` | `0.3` | read only with `derived_blocking` False, the pod before pod v3's derived blocking |
 | `blocker_toughness` | `2` | retired by item 44's flip (§0z204); read only by `POD_PRE_COMBAT` |
 | `crown_loss_ends_chip` | `False` | read only off A2 (the formula pod, `POD_PRE_COMBAT`) |
@@ -558,6 +559,7 @@ passes the liveness run (§0z126).
 | `monarch_loss_scale` | `rate` | read only off A2 (the formula pod, `POD_PRE_COMBAT`) |
 | `pod_block_policy` | `'cost'` | retired by item 44's flip (§0z204); read only by `POD_PRE_COMBAT` |
 | `pod_blocker_deaths` | `True` | retired by item 44's flip (§0z204); read only by `POD_PRE_COMBAT` |
+| `ward_pay_share` | `0.5` | read only under `ward_pay_rule='share'`, the first ward build (§0z224); dead by construction on both pods |
 | `zuran_keep` | `6` | a card knob: Zuran Orb is in no current list (azusa's candidate block) |
 
 ## The knobs no document mentions

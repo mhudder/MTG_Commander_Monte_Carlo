@@ -108,7 +108,14 @@ DEFAULT_CFG = {
     # T20 0.4597 against the old pod's 0.4630, 10.27 turns against 10.47
     # (`threat_clock_shift`'s 2.92 missed by +0.0145). `POD_PRE_ITEM45`
     # restores 1.45 with the switches.
-    "incidental_rate": 1.94,
+    # 1.80 since §0z243 (2026-11-21): item 50 (the pod's mana) made the pod
+    # STRONGER at the same rate -- the rescale restores its total casts, and
+    # the gates cut early ones, mostly at rivals, so more land on you
+    # later. Fitted by the same rule against the old pod: crossing 1.800 on
+    # seeds 5000..7999; out of sample (20000..22999) mean T20 0.4687 against
+    # the old pod's 0.4624 (+0.0063, the edge of that mean's noise), 10.26
+    # turns against 10.16. `POD_PRE_ITEM50` restores 1.94 with the switches.
+    "incidental_rate": 1.80,
     "clock_shift": 2,             # the deus ex machina arrives later
     "archetypes": True,           # aggro / midrange / control / combo pods
 
