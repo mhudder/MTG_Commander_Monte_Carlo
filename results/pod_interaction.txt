@@ -1,0 +1,30 @@
+the pod's interaction CAST per game, whole pod, N=2000 a deck and pod, seeds 5000..6999; 'today' is pod_mana alone (the pod every table runs), 'mana' every item-50 switch
+
+deck        pod    turns   spot all spot 3-10     ae all   ae 3-10   wipe all wipe 3-10  counter all counter 3-10
+rendmaw     today  10.48       3.37      3.11       1.26      1.16       0.42      0.37       0.60      0.55
+rendmaw     mana   10.30       2.87      2.67       0.93      0.86       0.29      0.26       0.55      0.52
+lorehold    today   9.57       3.09      2.94       1.11      1.05       0.35      0.32       0.64      0.60
+lorehold    mana    9.45       2.65      2.54       0.81      0.77       0.24      0.22       0.61      0.57
+karlov      today  10.05       3.25      2.98       1.13      1.03       0.36      0.32       0.84      0.78
+karlov      mana    9.81       2.78      2.58       0.82      0.75       0.24      0.21       0.82      0.76
+tivit       today  10.65       3.20      2.97       1.16      1.07       0.35      0.31       0.85      0.78
+tivit       mana   10.37       2.72      2.54       0.83      0.77       0.22      0.20       0.81      0.75
+shilgengar  today  10.82       3.63      3.31       1.26      1.15       0.41      0.35       0.79      0.71
+shilgengar  mana   10.62       3.12      2.86       0.91      0.83       0.28      0.24       0.76      0.69
+azusa       today   9.48       3.09      2.94       1.01      0.95       0.38      0.34       0.94      0.90
+azusa       mana    9.28       2.64      2.53       0.73      0.69       0.25      0.23       0.91      0.87
+
+every deck together, per game:
+  today  spot 3.27 (3.04 in 3-10)  ae 1.15 (1.07 in 3-10)  wipe 0.38 (0.34 in 3-10)  counter 0.78 (0.72 in 3-10)
+  mana   spot 2.80 (2.62 in 3-10)  ae 0.84 (0.78 in 3-10)  wipe 0.25 (0.23 in 3-10)  counter 0.74 (0.69 in 3-10)
+
+by pod turn, every deck together (cast per game):
+  today  spot     0.00  0.00  0.50  0.50  0.50  0.48  0.37  0.32  0.23  0.15  0.10  0.06  0.03  0.02
+  today  ae       0.00  0.00  0.18  0.18  0.17  0.16  0.14  0.11  0.08  0.05  0.04  0.02  0.01  0.01
+  today  wipe     0.00  0.00  0.00  0.00  0.08  0.08  0.06  0.05  0.04  0.03  0.02  0.01  0.01  0.00
+  today  counter  0.00  0.00  0.03  0.06  0.12  0.14  0.14  0.11  0.08  0.05  0.03  0.01  0.01  0.00
+  mana   spot     0.00  0.00  0.40  0.45  0.44  0.42  0.32  0.27  0.19  0.12  0.08  0.05  0.02  0.01
+  mana   ae       0.00  0.00  0.11  0.13  0.12  0.12  0.11  0.09  0.06  0.04  0.03  0.01  0.01  0.01
+  mana   wipe     0.00  0.00  0.00  0.00  0.04  0.06  0.04  0.04  0.03  0.02  0.01  0.01  0.00  0.00
+  mana   counter  0.00  0.00  0.08  0.08  0.11  0.11  0.11  0.09  0.06  0.04  0.02  0.01  0.01  0.00
+           (pod turns 1..14)

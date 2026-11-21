@@ -294,6 +294,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z239](#0z239) | BUILT | **Item 50 step 4: the pod's answers on your turn read its mana** (`pod_answer_mana`, off); +0.004 to +0.010 on four decks, azusa -0.0040 at T10 from earlier counterspells |
 | [0z240](#0z240) | BUILT | **Item 50 step 5: the pod's own-turn removal needs its cost** (`pod_removal_mana`, off); +0.011 to +0.036 at T10 on every deck, a third fewer wipes -- decision 5's rescale is what answers it |
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
+| [0z242](#0z242) | MEASURED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes in turns 3-10, NOT the header's ~4 / ~1; the gates cost 14% / 34% |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20766,6 +20767,52 @@ switch off, every deck BIT-IDENTICAL (caches VERIFIED). `tools.validate`:
 mutations exact; one mutation corrected after its first run, said so in
 the file (a no-op stub also removed the "due" count; it is the
 `GIFTS_GIVEN` seam now).
+
+<a id="0z242"></a>
+
+## 0z242. MEASURED -- How much of the pod's interaction reaches the table
+
+**The owner, 2026-11-21: "yes, measure the interaction counts"** -- the
+first step of item 50's flip: decision 5 (§0z234) scales the pod's rates
+back "to the documented target (about four spot removal spells and one wipe
+a game, `BRACKETS`' header)". `diagnostics/run_pod_interaction.py` counts
+the pod's CASTS -- each a charge in `pod_spend`, counted by a spy in every
+worker -- whole pod, per game, all six active decks' staged lists, N=2,000 a
+deck, seeds 5000.., under two pods: **today** (`pod_mana` alone, which
+charges and gates nothing: the pod every table runs, §0z237) and **mana**
+(every item-50 switch on, before any rescale). `results/pod_interaction.txt`:
+
+| per game, every deck | spot | A/E | wipes | counterspells |
+|---|---|---|---|---|
+| today, all turns | 3.27 | 1.15 | 0.38 | 0.78 |
+| today, pod turns 3-10 | **3.04** | 1.07 | **0.34** | 0.72 |
+| mana, pod turns 3-10 | 2.62 | 0.78 | 0.23 | 0.69 |
+| the gates' cost | -14% | -27% | -34% | -5% |
+
+**Today's pod does not meet the header's target.** `BRACKETS` says "roughly
+4 spot removal spells and ~1 board wipe reaching the table per game" over
+turns 3-10. Spot removal starts at exactly its design, 0.50 a round on pod
+turns 3-6 (0.10 + 0.16 + 0.24, one roll an opponent), and falls away as
+opponents die and games end (10.4 rounds on average): 3.0 in the window.
+Wipes run 0.08 a round from `first_wipe_turn` (5), a THIRD of the header's
+one. The pod has been re-fitted to the tables since the header was written
+(§0z195's `incidental_rate`), and nothing re-derived the comment: a claim
+that rotted (§0q). By deck, spot in 3-10 runs 2.5 (tivit, mana) to 3.3
+(shilgengar, today); azusa's games are a round shorter (9.5).
+
+**The gates take more from what costs more, and early.** By pod turn, spot
+falls 0.50 -> 0.40 on turn 3 and about 0.05 a turn after; A/E 0.18 -> 0.11
+on turn 3; wipes 0.08 -> 0.04 on turn 5, the turn the mean pod is a land
+short of a 4.5 (§0z236). Counterspells move EARLIER (0.03 -> 0.08 on your
+turn 3, fewer from turn 5), §0z239's shift, and lose 5% in all.
+
+**What a rescale can and cannot do.** A multiplier on a rate restores its
+COUNT; it cannot restore its TIMING -- a wipe the pod cannot afford on turn
+5 is not cast whatever the rate, so a rescaled pod casts the same number
+later. And scaling up spends more mana, which gates a little more: the
+factor is a fixed point to iterate, not one division. The factors that
+restore TODAY'S counts in turns 3-10 are about spot x1.16, A/E x1.37,
+wipes x1.48, counterspells x1.04 before that iteration.
 
 ## How to read an ablation table
 
