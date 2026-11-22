@@ -20,7 +20,10 @@ named "deck card". It FAILS when
     (the reason rotted).
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
-  Rhystic Study's reason is deleted              -> tivit Rhystic Study
+  Torment of Hailfire's reason is deleted        -> tivit Torment of Hailfire
+  (Rhystic Study was this mutation's card until §0z246 made it read the
+  pod's casting: PARTLY_MODELLED, out of KNOWN_BLIND. The new card and its
+  set were written before the run.)
   Village Rites is put back in KNOWN_BLIND       -> rendmaw Village Rites
   Trap the Trespassers (inert: it plays as its
     blank) is given a BLIND_BUT_LIVE reason      -> tivit Trap the Trespassers
@@ -84,8 +87,8 @@ def main() -> int:
     print("MUTATION RUN -- exact sets\n")
     live, blind = AB.BLIND_BUT_LIVE, AB.KNOWN_BLIND
 
-    def drop_rhystic():
-        del live["tivit"]["Rhystic Study"]
+    def drop_torment():
+        del live["tivit"]["Torment of Hailfire"]
 
     def rites_back():
         blind["rendmaw"].add("Village Rites")
@@ -94,8 +97,8 @@ def main() -> int:
         live["tivit"]["Trap the Trespassers"] = "a reason for a card nothing reads"
 
     muts = {
-        "Rhystic Study's reason is deleted":
-            ({"tivit Rhystic Study"}, drop_rhystic),
+        "Torment of Hailfire's reason is deleted":
+            ({"tivit Torment of Hailfire"}, drop_torment),
         "Village Rites is put back in KNOWN_BLIND":
             ({"rendmaw Village Rites"}, rites_back),
         "Trap the Trespassers is given a BLIND_BUT_LIVE reason":
