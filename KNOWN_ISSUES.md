@@ -21431,7 +21431,30 @@ mana a game and move little.
 
 **Not flipped.** A gap of this size is ten times any re-fit made before
 (item 50's was -0.0115, §0z243), and which lever closes it is a model
-decision: the owner's. The six-deck measurements follow.
+decision: the owner's.
+
+### The six decks (`diagnostics.fit_pod_knob`, N=1,500 a deck, staged lists, seeds 5000..6499)
+
+| pod | mean T20 | turns | file |
+|---|---|---|---|
+| today's | 0.4834 | 10.27 | |
+| mana creatures alone | 0.4802 (-0.0032, inside every deck's bar) | 10.29 | `results/fit_item52_mana_creatures_20261122.txt` |
+| the gate alone | **0.5977 (+0.1143)**, every deck +0.09 to +0.14 | 10.97 | `results/fit_item52_develop_gated_20261122.txt` |
+
+**The usual lever cannot close it.** `incidental_rate` (how often a pod
+body attacks), both switches on: 1.8 -> 0.5950, 2.6 -> 0.5818, 3.4 -> 0.5752,
+4.2 -> 0.5729 (`results/fit_item52_incidental_rate_20261122.txt`): it
+SATURATES near 0.57 -- with smaller boards there is less to attack with.
+
+**`threat_clock_shift` can** (how many rounds sooner the kills come, 2.3
+today, §0z132), both switches on: 2.3 -> 0.5950, 3.3 -> 0.5501, 4.3 -> 0.5132,
+5.3 -> 0.4698 (`results/fit_item52_threat_clock_shift_20261122.txt`):
+**crossing 4.985**, kills about 2.7 rounds sooner, games about half a turn
+shorter (9.6-10.1 turns against 10.27). **The decks do not move together**:
+at 5.3 azusa -0.051, karlov and shilgengar -0.029, rendmaw -0.008, lorehold
++0.012, tivit +0.024 -- a pod that kills sooner instead of building boards
+it could not pay for. Not re-measured on fresh seeds (§0z170): a fit value
+to quote needs that.
 
 ## How to read an ablation table
 

@@ -1,0 +1,13 @@
+fit incidental_rate over [1.8, 2.6, 3.4, 4.2]: target pod DEFAULT_CFG + {}, candidates + {'pod_mana_creatures': True, 'pod_develop_gated': True}; N=1500 a deck, staged lists, seeds 5000..6499, python 3.13.18
+target: mean T20 win rate over 6 active decks = 0.4834; mean turns 10.27
+
+deck        target T10     T20  turns | incidental_rate=1.8    T20 (diff ±) | incidental_rate=2.6    T20 (diff ±) | incidental_rate=3.4    T20 (diff ±) | incidental_rate=4.2    T20 (diff ±)
+rendmaw         0.1067  0.3413  10.57 | 0.4380 (+0.0967 ±0.0262) | 0.4340 (+0.0927 ±0.0263) | 0.4353 (+0.0940 ±0.0265) | 0.4300 (+0.0887 ±0.0266)
+lorehold        0.2640  0.4600   9.69 | 0.5913 (+0.1313 ±0.0260) | 0.5767 (+0.1167 ±0.0258) | 0.5693 (+0.1093 ±0.0256) | 0.5667 (+0.1067 ±0.0257)
+karlov          0.2740  0.5460  10.13 | 0.6473 (+0.1013 ±0.0238) | 0.6447 (+0.0987 ±0.0239) | 0.6467 (+0.1007 ±0.0238) | 0.6453 (+0.0993 ±0.0242)
+tivit           0.3167  0.5473  10.68 | 0.6833 (+0.1360 ±0.0243) | 0.6567 (+0.1093 ±0.0240) | 0.6433 (+0.0960 ±0.0240) | 0.6420 (+0.0947 ±0.0242)
+shilgengar      0.0593  0.4467  10.95 | 0.5607 (+0.1140 ±0.0255) | 0.5373 (+0.0907 ±0.0256) | 0.5253 (+0.0787 ±0.0254) | 0.5213 (+0.0747 ±0.0253)
+azusa           0.3447  0.5593   9.62 | 0.6493 (+0.0900 ±0.0227) | 0.6413 (+0.0820 ±0.0233) | 0.6313 (+0.0720 ±0.0235) | 0.6320 (+0.0727 ±0.0236)
+
+mean T20: incidental_rate=1.8: 0.5950 (10.97 turns), incidental_rate=2.6: 0.5818 (10.78 turns), incidental_rate=3.4: 0.5752 (10.69 turns), incidental_rate=4.2: 0.5729 (10.65 turns)
+crossing: not bracketed by these values

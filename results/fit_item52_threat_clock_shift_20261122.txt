@@ -1,0 +1,13 @@
+fit threat_clock_shift over [2.3, 3.3, 4.3, 5.3]: target pod DEFAULT_CFG + {}, candidates + {'pod_mana_creatures': True, 'pod_develop_gated': True}; N=1500 a deck, staged lists, seeds 5000..6499, python 3.13.18
+target: mean T20 win rate over 6 active decks = 0.4834; mean turns 10.27
+
+deck        target T10     T20  turns | threat_clock_shift=2.3    T20 (diff ±) | threat_clock_shift=3.3    T20 (diff ±) | threat_clock_shift=4.3    T20 (diff ±) | threat_clock_shift=5.3    T20 (diff ±)
+rendmaw         0.1067  0.3413  10.57 | 0.4380 (+0.0967 ±0.0262) | 0.3913 (+0.0500 ±0.0296) | 0.3467 (+0.0053 ±0.0300) | 0.3333 (-0.0080 ±0.0307)
+lorehold        0.2640  0.4600   9.69 | 0.5913 (+0.1313 ±0.0260) | 0.5507 (+0.0907 ±0.0296) | 0.4993 (+0.0393 ±0.0311) | 0.4720 (+0.0120 ±0.0319)
+karlov          0.2740  0.5460  10.13 | 0.6473 (+0.1013 ±0.0238) | 0.6200 (+0.0740 ±0.0276) | 0.5880 (+0.0420 ±0.0294) | 0.5167 (-0.0293 ±0.0306)
+tivit           0.3167  0.5473  10.68 | 0.6833 (+0.1360 ±0.0243) | 0.6507 (+0.1033 ±0.0283) | 0.6207 (+0.0733 ±0.0297) | 0.5713 (+0.0240 ±0.0309)
+shilgengar      0.0593  0.4467  10.95 | 0.5607 (+0.1140 ±0.0255) | 0.4987 (+0.0520 ±0.0309) | 0.4533 (+0.0067 ±0.0310) | 0.4173 (-0.0293 ±0.0316)
+azusa           0.3447  0.5593   9.62 | 0.6493 (+0.0900 ±0.0227) | 0.5893 (+0.0300 ±0.0286) | 0.5713 (+0.0120 ±0.0296) | 0.5080 (-0.0513 ±0.0302)
+
+mean T20: threat_clock_shift=2.3: 0.5950 (10.97 turns), threat_clock_shift=3.3: 0.5501 (10.50 turns), threat_clock_shift=4.3: 0.5132 (10.07 turns), threat_clock_shift=5.3: 0.4698 (9.61 turns)
+crossing: threat_clock_shift = 4.985
