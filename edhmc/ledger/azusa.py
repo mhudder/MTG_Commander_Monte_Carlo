@@ -1273,6 +1273,30 @@ SIMULATED: list[Simulated] = [
         result='REAL SWAP -Wayward Swordtooth +Glacier Godmaw, N=15,000 paired: +0.0228 +-0.0030 (significant) at T10 and +0.0265 +-0.0042 (significant) at T20; damage +2.34 +-0.26.',
         notes='17 summoning-sick creatures a game attack because of its haste -- the landfall tokens made this turn. The Lander is a footnote (0.14 cracked a game). A seven-drop, so P(cast) is the lowest of the seven (0.260).',
     ),
+    Simulated(
+        deck='azusa', remove='Ka-Zar of the Savage Land', add='Hexhaven Invigorator',
+        measured='2026-11-22', source='results/azusa_hexhaven_slots_20261122.txt',
+        result=('REAL SWAP -Ka-Zar of the Savage Land +Hexhaven Invigorator, N=15,000 paired, seeds 5000..19999, one run of five lists: -0.0027 +-0.0028 (inside its bar) at T10 and -0.0044 +-0.0033 (significant) at T20.'),
+        notes=('The owner asked to replace the weakest of Ka-Zar, Springheart, Greensleeves and Chocobo with it. THE LEAST COSTLY OF THE FOUR, AND STILL A LOSS. Ka-Zar is the weakest of the four cards: Head to head on the same seeds (positive = Ka-Zar the weaker): vs Springheart +0.0097 +-0.0041 * at T10, +0.0060 +-0.0047 * at T20; vs Traveling Chocobo +0.0093 +-0.0042 *, +0.0049 +-0.0047 *; vs Greensleeves +0.0065 +-0.0039 *, +0.0019 +-0.0044 (inside). Ka-Zar is itself STAGED, not committed. §0z249. Hexhaven is PARTLY: its trigger fires 0.08 times a game (the pod rarely attacks into a 6/6 and its spells are abstract).'),
+    ),
+    Simulated(
+        deck='azusa', remove='Springheart Nantuko', add='Hexhaven Invigorator',
+        measured='2026-11-22', source='results/azusa_hexhaven_slots_20261122.txt',
+        result=('REAL SWAP -Springheart Nantuko +Hexhaven Invigorator, N=15,000 paired, seeds 5000..19999, one run of five lists: -0.0124 +-0.0033 at T10 and -0.0104 +-0.0037 at T20, significant at both.'),
+        notes=('The owner asked to replace the weakest of Ka-Zar, Springheart, Greensleeves and Chocobo with it. §0z249. Hexhaven is PARTLY: its trigger fires 0.08 times a game (the pod rarely attacks into a 6/6 and its spells are abstract).'),
+    ),
+    Simulated(
+        deck='azusa', remove='Greensleeves, Maro-Sorcerer', add='Hexhaven Invigorator',
+        measured='2026-11-22', source='results/azusa_hexhaven_slots_20261122.txt',
+        result=('REAL SWAP -Greensleeves, Maro-Sorcerer +Hexhaven Invigorator, N=15,000 paired, seeds 5000..19999, one run of five lists: -0.0091 +-0.0030 at T10 and -0.0063 +-0.0033 at T20, significant at both.'),
+        notes=('The owner asked to replace the weakest of Ka-Zar, Springheart, Greensleeves and Chocobo with it. §0z249. Hexhaven is PARTLY: its trigger fires 0.08 times a game (the pod rarely attacks into a 6/6 and its spells are abstract).'),
+    ),
+    Simulated(
+        deck='azusa', remove='Traveling Chocobo', add='Hexhaven Invigorator',
+        measured='2026-11-22', source='results/azusa_hexhaven_slots_20261122.txt',
+        result=('REAL SWAP -Traveling Chocobo +Hexhaven Invigorator, N=15,000 paired, seeds 5000..19999, one run of five lists: -0.0120 +-0.0034 at T10 and -0.0093 +-0.0038 at T20, significant at both.'),
+        notes=('The owner asked to replace the weakest of Ka-Zar, Springheart, Greensleeves and Chocobo with it. §0z249. Hexhaven is PARTLY: its trigger fires 0.08 times a game (the pod rarely attacks into a 6/6 and its spells are abstract).'),
+    ),
 ]
 
 
@@ -1612,6 +1636,7 @@ PROPOSED: list[Proposal] = [
         rationale="The owner's pick for the weakest of Ka-Zar, Springheart Nantuko, Greensleeves and Traveling Chocobo's slots. A 6/6 vigilance for four that attacks without leaving the pod's turn unblocked (§0z184), and every point of damage it is dealt -- a block on it, or its block of a pod attacker -- is a land onto the battlefield: a landfall trigger each, in the deck whose every payoff reads `land_entered`.",
         implement="§0z249. The 6/6 and vigilance are the generated body (tag_flying). The trigger: `opponents.damage_to_attacker` / `damage_to_blockers` give the damage each of your creatures is dealt in the pod's combat model -- your attacks (`resolve_trades`), the pod's attacks at you (`_attack_you`) and at your walkers (`_attack_walker`) -- and call the engine's optional `on_your_creature_damaged(perm, n)` once the deaths are done. Azusa's fetches the top `land_rank` lands (Realms Uncharted's order), onto the battlefield tapped, shuffles, then each landfall. 'You may' and 'up to' are a pilot's: stopped where the decking guard would (`draw_is_safe`). PARTLY: damage from the pod's spells and wipes (a burn spell, Blasphemous Act) is abstract removal (§4), and the pod's blocks do not know the trigger -- a real opponent declines to block it, so the combat half is a CEILING.",
         triage='LIVE',
+        rejected='MEASURED 2026-11-22 and PROMOTED: the four head-to-heads (one paired run, its slot in each of Ka-Zar, Springheart, Greensleeves and Chocobo) are in SIMULATED (§0z249); every one loses at T20. Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
 ]
 

@@ -301,7 +301,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
 | [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021 at T20 -- those four ON; Agadeem +0.0013, Animist, Nylea, Green Sun OFF |
-| [0z249](#0z249) | BUILT | **Hexhaven Invigorator (azusa), the owner's proposal**: its damage trigger read from the pod's combat; one paired run into Ka-Zar's, Springheart's, Greensleeves' and Chocobo's slots -- the swap is the owner's |
+| [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21634,7 +21634,7 @@ off, so no knob's reach moved; said, not measured.
 
 <a id="0z249"></a>
 
-## 0z249. BUILT -- Hexhaven Invigorator (azusa): the damage trigger, and the four cuts head to head
+## 0z249. MEASURED -- Hexhaven Invigorator (azusa): the damage trigger, and the four cuts head to head
 
 **The owner, 2026-11-22**: "Of the following cards in Azusa, which one was
 the weakest?" (Greensleeves, Ka-Zar, Mole Man, Mossborn Hydra, Springheart,
@@ -21687,9 +21687,52 @@ the pod attacks less (7.07 -> 6.84 a game) and holds more back.
 
 ### Measured
 
-Pending: `diagnostics/run_azusa_hexhaven.py`, N=15,000, the four swaps
-and the six cut-against-cut differences on the same seeds
-(`results/azusa_hexhaven_slots_20261122.txt`).
+`diagnostics/run_azusa_hexhaven.py`, N=15,000, seeds 5000..19999: five
+lists on the same seeds -- the staged list, and Hexhaven in each cut's
+exact position (`results/azusa_hexhaven_slots_20261122.txt`). Base: 0.3517
+at T10, 0.5547 at T20.
+
+**Which card is the weakest** (leg minus leg: the same replacement, so
+the difference is the two cuts head to head; positive = the first card is
+the weaker -- cutting it costs less):
+
+| | T10 | T20 |
+|---|---|---|
+| Ka-Zar vs Springheart Nantuko | **+0.0097 ±0.0041** | **+0.0060 ±0.0047** |
+| Ka-Zar vs Traveling Chocobo | **+0.0093 ±0.0042** | **+0.0049 ±0.0047** |
+| Ka-Zar vs Greensleeves | **+0.0065 ±0.0039** | +0.0019 ±0.0044 |
+| Springheart vs Greensleeves | -0.0033 ±0.0043 | -0.0041 ±0.0048 |
+| Springheart vs Chocobo | -0.0004 ±0.0045 | -0.0011 ±0.0050 |
+| Greensleeves vs Chocobo | +0.0029 ±0.0042 | +0.0031 ±0.0048 |
+
+**Ka-Zar of the Savage Land is the weakest of the four**: below
+Springheart and Chocobo at both horizons, below Greensleeves at T10 (inside
+at T20). The other three are not ranked against each other. (Ka-Zar is
+itself STAGED, not committed: its slot was Perilous Forays'.)
+
+**And Hexhaven loses in every slot**:
+
+| swap | T10 | T20 | landfall a game |
+|---|---|---|---|
+| -Ka-Zar +Hexhaven | -0.0027 ±0.0028 | **-0.0044 ±0.0033** | +0.25 |
+| -Greensleeves +Hexhaven | **-0.0091 ±0.0030** | **-0.0063 ±0.0033** | +0.56 |
+| -Traveling Chocobo +Hexhaven | **-0.0120 ±0.0034** | **-0.0093 ±0.0038** | +0.19 |
+| -Springheart Nantuko +Hexhaven | **-0.0124 ±0.0033** | **-0.0104 ±0.0037** | +0.38 |
+
+Damage falls 0.4-0.7 a game in each. **The trigger is almost never
+reached**: 0.08 triggers, 0.24 damage and 0.23 lands a game in every slot
+-- the pod holds its attacks back from a 6/6 (`pod_attack_safety`), and
+blocks a 6/6 attacker rarely. What is left is a four-mana 6/6 vigilance in
+a deck whose creature slots each do something on entering or every turn.
+**The number is generous already, not harsh**: the pod's blocks do not
+know the trigger (a ceiling); only the pod's spells are blind (a floor
+on a 6/6 that a burn spell or Blasphemous Act would trigger, and that
+removal kills before it is dealt damage at all). The knob it swings on,
+said out loud: `pod_attack_safety` -- with it off the pod attacks into
+the 6/6 and feeds the trigger; how much that is worth was not measured.
+
+**Nothing staged.** Four Simulated entries, the Proposal closed; whether
+to stage anything is the owner's.
 
 ## How to read an ablation table
 

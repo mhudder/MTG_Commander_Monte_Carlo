@@ -1,0 +1,57 @@
+azusa: Hexhaven Invigorator into four slots. N=15,000 paired, seeds 5000.., base = build_pending('azusa'), the new card in each cut's exact position.
+* = the 95% CI excludes zero.
+
+THE SWAPS (leg minus base; positive = the swap wins more):
+  -Ka-Zar of the Savage Land +Hexhaven Invigorator
+      won10                 -0.0027 ±0.0028
+      won20                 -0.0044 ±0.0033*
+      damage20              -0.4190 ±0.1728*
+      landfall_triggers20   +0.2514 ±0.0698*
+      lands_played20        -0.0223 ±0.0374
+  -Springheart Nantuko +Hexhaven Invigorator
+      won10                 -0.0124 ±0.0033*
+      won20                 -0.0104 ±0.0037*
+      damage20              -0.6909 ±0.2099*
+      landfall_triggers20   +0.3753 ±0.0849*
+      lands_played20        +0.1217 ±0.0423*
+  -Greensleeves, Maro-Sorcerer +Hexhaven Invigorator
+      won10                 -0.0091 ±0.0030*
+      won20                 -0.0063 ±0.0033*
+      damage20              -0.6115 ±0.1845*
+      landfall_triggers20   +0.5586 ±0.0761*
+      lands_played20        +0.1980 ±0.0385*
+  -Traveling Chocobo +Hexhaven Invigorator
+      won10                 -0.0120 ±0.0034*
+      won20                 -0.0093 ±0.0038*
+      damage20              -0.6515 ±0.2233*
+      landfall_triggers20   +0.1883 ±0.0887*
+      lands_played20        -0.0331 ±0.0460
+
+THE CUTS HEAD TO HEAD (leg Y minus leg X = keep X's card, cut Y's, against keep Y's, cut X's;
+positive = X's card is the WEAKER of the two -- cutting it costs less):
+  Ka-Zar of the Savage Land  vs  Springheart Nantuko
+      won10                 +0.0097 ±0.0041*
+      won20                 +0.0060 ±0.0047*
+  Ka-Zar of the Savage Land  vs  Greensleeves, Maro-Sorcerer
+      won10                 +0.0065 ±0.0039*
+      won20                 +0.0019 ±0.0044
+  Ka-Zar of the Savage Land  vs  Traveling Chocobo
+      won10                 +0.0093 ±0.0042*
+      won20                 +0.0049 ±0.0047*
+  Springheart Nantuko  vs  Greensleeves, Maro-Sorcerer
+      won10                 -0.0033 ±0.0043
+      won20                 -0.0041 ±0.0048
+  Springheart Nantuko  vs  Traveling Chocobo
+      won10                 -0.0004 ±0.0045
+      won20                 -0.0011 ±0.0050
+  Greensleeves, Maro-Sorcerer  vs  Traveling Chocobo
+      won10                 +0.0029 ±0.0042
+      won20                 +0.0031 ±0.0048
+
+  Hexhaven Invigorator's own counters, T20, means per game:
+      in Ka-Zar of the Savage Land's slot: hexhaven_triggers 0.078  hexhaven_damage 0.237  hexhaven_lands 0.227
+      in Springheart Nantuko's slot: hexhaven_triggers 0.078  hexhaven_damage 0.236  hexhaven_lands 0.227
+      in Greensleeves, Maro-Sorcerer's slot: hexhaven_triggers 0.086  hexhaven_damage 0.246  hexhaven_lands 0.238
+      in Traveling Chocobo's slot: hexhaven_triggers 0.078  hexhaven_damage 0.232  hexhaven_lands 0.225
+
+  base win rate: T10 0.3517, T20 0.5547
