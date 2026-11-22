@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "559e56d1d7c38c4b",
-    "built_commit": "5a00891",
-    "built_utc": "2026-11-17T06:04:49Z",
+    "built_at": "dc6fe95b60ff12f2",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:17:16Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -681,69 +681,76 @@
             "utc": "2026-11-17T03:49:26Z"
           }
         ]
+      },
+      {
+        "built_at": "559e56d1d7c38c4b",
+        "built_commit": "5a00891",
+        "built_utc": "2026-11-17T06:04:49Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "3bb4bd29f145e565",
+            "utc": "2026-11-20T01:05:39Z"
+          },
+          {
+            "commit": "61e75a1",
+            "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
+            "fingerprint": "dcb2446ec6992fef",
+            "utc": "2026-11-20T13:34:08Z"
+          },
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "789b55861b04d191",
+            "utc": "2026-11-20T22:03:08Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "18b304efc69e53b9",
+            "utc": "2026-11-20T22:52:50Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "27941edda87b62f5",
+            "utc": "2026-11-20T23:41:02Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "0b4cbc1ef7971c71",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "0a66bc929ee55b0e",
+            "utc": "2026-11-21T02:25:16Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "92f35a7656ec96ee",
+            "utc": "2026-11-21T03:09:10Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "49791a64d98cedf5",
+            "utc": "2026-11-21T17:43:46Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "3bb4bd29f145e565",
-        "utc": "2026-11-20T01:05:39Z"
-      },
-      {
-        "commit": "61e75a1",
-        "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
-        "fingerprint": "dcb2446ec6992fef",
-        "utc": "2026-11-20T13:34:08Z"
-      },
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "789b55861b04d191",
-        "utc": "2026-11-20T22:03:08Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "18b304efc69e53b9",
-        "utc": "2026-11-20T22:52:50Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "27941edda87b62f5",
-        "utc": "2026-11-20T23:41:02Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "0b4cbc1ef7971c71",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "0a66bc929ee55b0e",
-        "utc": "2026-11-21T02:25:16Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "92f35a7656ec96ee",
-        "utc": "2026-11-21T03:09:10Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "49791a64d98cedf5",
-        "utc": "2026-11-21T17:43:46Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "d068976625f352f1",
-    "built_commit": "5a00891",
-    "built_utc": "2026-11-17T06:02:11Z",
+    "built_at": "efd275d1cf31f76e",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:12:40Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1329,69 +1336,76 @@
         "built_utc": "2026-11-17T04:51:14Z",
         "deck": "karlov",
         "verified": []
+      },
+      {
+        "built_at": "d068976625f352f1",
+        "built_commit": "5a00891",
+        "built_utc": "2026-11-17T06:02:11Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "2f6c641dcce06308",
+            "utc": "2026-11-20T01:05:38Z"
+          },
+          {
+            "commit": "61e75a1",
+            "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
+            "fingerprint": "34ec1b0a26017edc",
+            "utc": "2026-11-20T13:34:08Z"
+          },
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "b07a719c9dddafaa",
+            "utc": "2026-11-20T22:03:08Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "62646a8d86df9363",
+            "utc": "2026-11-20T22:52:50Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "4334b131b2d2aea7",
+            "utc": "2026-11-20T23:41:01Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "40e735c17d6b5a73",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "211fd254d18f1f70",
+            "utc": "2026-11-21T02:25:16Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "70fcd27eab85a741",
+            "utc": "2026-11-21T03:09:10Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "a7dd674a6109d7b2",
+            "utc": "2026-11-21T17:43:46Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "2f6c641dcce06308",
-        "utc": "2026-11-20T01:05:38Z"
-      },
-      {
-        "commit": "61e75a1",
-        "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
-        "fingerprint": "34ec1b0a26017edc",
-        "utc": "2026-11-20T13:34:08Z"
-      },
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "b07a719c9dddafaa",
-        "utc": "2026-11-20T22:03:08Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "62646a8d86df9363",
-        "utc": "2026-11-20T22:52:50Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "4334b131b2d2aea7",
-        "utc": "2026-11-20T23:41:01Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "40e735c17d6b5a73",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "211fd254d18f1f70",
-        "utc": "2026-11-21T02:25:16Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "70fcd27eab85a741",
-        "utc": "2026-11-21T03:09:10Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "a7dd674a6109d7b2",
-        "utc": "2026-11-21T17:43:46Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
-    "built_at": "022a5f0fbcd885a8",
-    "built_commit": "3d978b8",
-    "built_utc": "2026-11-16T23:50:00Z",
+    "built_at": "8b7fe7cbffe26ea7",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:12:42Z",
     "deck": "lorehold",
     "superseded": [
       {
@@ -1979,93 +1993,100 @@
         "built_utc": "2026-11-16T17:07:00Z",
         "deck": "lorehold",
         "verified": []
+      },
+      {
+        "built_at": "022a5f0fbcd885a8",
+        "built_commit": "3d978b8",
+        "built_utc": "2026-11-16T23:50:00Z",
+        "deck": "lorehold",
+        "verified": [
+          {
+            "commit": "c23a0bb",
+            "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "b582e61615ac9c6a",
+            "utc": "2026-11-17T01:47:26Z"
+          },
+          {
+            "commit": "b225ebe",
+            "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
+            "fingerprint": "475ac0eaec164817",
+            "utc": "2026-11-17T02:28:55Z"
+          },
+          {
+            "commit": "a06def3",
+            "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
+            "fingerprint": "61d7e02e665da5a9",
+            "utc": "2026-11-17T03:49:26Z"
+          },
+          {
+            "commit": "cb9b987",
+            "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
+            "fingerprint": "0884e01056e6cca9",
+            "utc": "2026-11-17T05:26:12Z"
+          },
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "01071c46df54a6d5",
+            "utc": "2026-11-20T01:05:38Z"
+          },
+          {
+            "commit": "61e75a1",
+            "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
+            "fingerprint": "9c09460a34946226",
+            "utc": "2026-11-20T13:34:07Z"
+          },
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "73e122d4268ff983",
+            "utc": "2026-11-20T22:03:08Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "9dfa6b07aed90d14",
+            "utc": "2026-11-20T22:52:49Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "05dc8b84cf8a9f9e",
+            "utc": "2026-11-20T23:41:01Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "37cbc3295ad10cea",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "d38e788500d95f75",
+            "utc": "2026-11-21T02:25:15Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "e35862f8f743db18",
+            "utc": "2026-11-21T03:09:09Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "09cfba8511ca4348",
+            "utc": "2026-11-21T17:43:45Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "c23a0bb",
-        "evidence": "\u00a70z224 the mana rule for ward (ward_payable) and the generated SPOT_SPELL_MV: check_unchanged_decks --n=2000 against a worktree at c23a0bb -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "b582e61615ac9c6a",
-        "utc": "2026-11-17T01:47:26Z"
-      },
-      {
-        "commit": "b225ebe",
-        "evidence": "\u00a70z225 goaded Birds as bodies and the DEAD_ON_DEFAULT table: check_unchanged_decks --n=2000 against a worktree at b225ebe -- BIT-IDENTICAL on all 8 metrics.",
-        "fingerprint": "475ac0eaec164817",
-        "utc": "2026-11-17T02:28:55Z"
-      },
-      {
-        "commit": "a06def3",
-        "evidence": "\u00a70z226 cycling (engine.cycle_step, CYCLING and LAND_SUBTYPES generated): check_unchanged_decks --n=2000 against a worktree at a06def3 -- BIT-IDENTICAL on all 8 metrics (no cycling card in this deck).",
-        "fingerprint": "61d7e02e665da5a9",
-        "utc": "2026-11-17T03:49:26Z"
-      },
-      {
-        "commit": "cb9b987",
-        "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
-        "fingerprint": "0884e01056e6cca9",
-        "utc": "2026-11-17T05:26:12Z"
-      },
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "01071c46df54a6d5",
-        "utc": "2026-11-20T01:05:38Z"
-      },
-      {
-        "commit": "61e75a1",
-        "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
-        "fingerprint": "9c09460a34946226",
-        "utc": "2026-11-20T13:34:07Z"
-      },
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "73e122d4268ff983",
-        "utc": "2026-11-20T22:03:08Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "9dfa6b07aed90d14",
-        "utc": "2026-11-20T22:52:49Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "05dc8b84cf8a9f9e",
-        "utc": "2026-11-20T23:41:01Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "37cbc3295ad10cea",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "d38e788500d95f75",
-        "utc": "2026-11-21T02:25:15Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "e35862f8f743db18",
-        "utc": "2026-11-21T03:09:09Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "09cfba8511ca4348",
-        "utc": "2026-11-21T17:43:45Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "f9319f79612b03c8",
-    "built_commit": "bc70579",
-    "built_utc": "2026-11-20T13:49:46Z",
+    "built_at": "ae229ad72c87e1b4",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:13:11Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2654,57 +2675,64 @@
             "utc": "2026-11-20T01:05:38Z"
           }
         ]
+      },
+      {
+        "built_at": "f9319f79612b03c8",
+        "built_commit": "bc70579",
+        "built_utc": "2026-11-20T13:49:46Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "cf026d433999e4a8",
+            "utc": "2026-11-20T22:03:07Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "1ef0ec57e3f1d2ac",
+            "utc": "2026-11-20T22:52:49Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "b6bb017035963553",
+            "utc": "2026-11-20T23:41:01Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "7cf7bf6da5879bd7",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "fd3e259eb9822500",
+            "utc": "2026-11-21T02:25:15Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "ccc5fcd517650491",
+            "utc": "2026-11-21T03:09:09Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "508c991297107b2c",
+            "utc": "2026-11-21T17:43:45Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "cf026d433999e4a8",
-        "utc": "2026-11-20T22:03:07Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "1ef0ec57e3f1d2ac",
-        "utc": "2026-11-20T22:52:49Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "b6bb017035963553",
-        "utc": "2026-11-20T23:41:01Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "7cf7bf6da5879bd7",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "fd3e259eb9822500",
-        "utc": "2026-11-21T02:25:15Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "ccc5fcd517650491",
-        "utc": "2026-11-21T03:09:09Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "508c991297107b2c",
-        "utc": "2026-11-21T17:43:45Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
-    "built_at": "01392a48ca1fe693",
-    "built_commit": "5a00891",
-    "built_utc": "2026-11-17T06:02:07Z",
+    "built_at": "af5e7632010a237f",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:12:12Z",
     "deck": "shilgengar",
     "superseded": [
       {
@@ -3319,69 +3347,76 @@
         "built_utc": "2026-11-17T04:50:48Z",
         "deck": "shilgengar",
         "verified": []
+      },
+      {
+        "built_at": "01392a48ca1fe693",
+        "built_commit": "5a00891",
+        "built_utc": "2026-11-17T06:02:07Z",
+        "deck": "shilgengar",
+        "verified": [
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "a8f996a483abb3e8",
+            "utc": "2026-11-20T01:05:38Z"
+          },
+          {
+            "commit": "61e75a1",
+            "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
+            "fingerprint": "407dc1389a66f740",
+            "utc": "2026-11-20T13:34:08Z"
+          },
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "db94d7abf5cd4578",
+            "utc": "2026-11-20T22:03:08Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "bb4066d0b9367486",
+            "utc": "2026-11-20T22:52:50Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "4f95001c1eb1c36d",
+            "utc": "2026-11-20T23:41:02Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "1f4bf688dcd0c609",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "356610f3c7e504ce",
+            "utc": "2026-11-21T02:25:16Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "e5eafb198f4352eb",
+            "utc": "2026-11-21T03:09:10Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "64fb192ccb38c3fc",
+            "utc": "2026-11-21T17:43:46Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "a8f996a483abb3e8",
-        "utc": "2026-11-20T01:05:38Z"
-      },
-      {
-        "commit": "61e75a1",
-        "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
-        "fingerprint": "407dc1389a66f740",
-        "utc": "2026-11-20T13:34:08Z"
-      },
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "db94d7abf5cd4578",
-        "utc": "2026-11-20T22:03:08Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "bb4066d0b9367486",
-        "utc": "2026-11-20T22:52:50Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "4f95001c1eb1c36d",
-        "utc": "2026-11-20T23:41:02Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "1f4bf688dcd0c609",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "356610f3c7e504ce",
-        "utc": "2026-11-21T02:25:16Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "e5eafb198f4352eb",
-        "utc": "2026-11-21T03:09:10Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "64fb192ccb38c3fc",
-        "utc": "2026-11-21T17:43:46Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "aa3ce555f310a141",
-    "built_commit": "c9f18f4",
-    "built_utc": "2026-11-17T04:51:36Z",
+    "built_at": "80df5a1fd8aa63ef",
+    "built_commit": "120cc9a",
+    "built_utc": "2026-11-22T01:12:01Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -3943,70 +3978,77 @@
         "built_utc": "2026-11-17T02:53:14Z",
         "deck": "tivit",
         "verified": []
+      },
+      {
+        "built_at": "aa3ce555f310a141",
+        "built_commit": "c9f18f4",
+        "built_utc": "2026-11-17T04:51:36Z",
+        "deck": "tivit",
+        "verified": [
+          {
+            "commit": "cb9b987",
+            "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
+            "fingerprint": "f36a072d7c40afed",
+            "utc": "2026-11-17T05:26:12Z"
+          },
+          {
+            "commit": "3c9afb5",
+            "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
+            "fingerprint": "fe04c1f70dd7c4b6",
+            "utc": "2026-11-20T01:05:38Z"
+          },
+          {
+            "commit": "61e75a1",
+            "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
+            "fingerprint": "945355cd32f6b4cb",
+            "utc": "2026-11-20T13:34:08Z"
+          },
+          {
+            "commit": "9104946",
+            "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "a45a5f8cc30de81e",
+            "utc": "2026-11-20T22:03:08Z"
+          },
+          {
+            "commit": "486fb90",
+            "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
+            "fingerprint": "9b4d38604171d96c",
+            "utc": "2026-11-20T22:52:50Z"
+          },
+          {
+            "commit": "e282061",
+            "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
+            "fingerprint": "526ff1993873da35",
+            "utc": "2026-11-20T23:41:01Z"
+          },
+          {
+            "commit": "f0ef67f",
+            "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "df5067c48f3ca65a",
+            "utc": "2026-11-21T00:53:18Z"
+          },
+          {
+            "commit": "dee645b",
+            "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "3f12c9e2259484ef",
+            "utc": "2026-11-21T02:25:16Z"
+          },
+          {
+            "commit": "39d7db0",
+            "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
+            "fingerprint": "6d394b21a02bbcf8",
+            "utc": "2026-11-21T03:09:10Z"
+          },
+          {
+            "commit": "204d0e9",
+            "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
+            "fingerprint": "eb6f9718818a68dc",
+            "utc": "2026-11-21T17:43:46Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "cb9b987",
-        "evidence": "\u00a70z227-\u00a70z232 (Woe Strider, Memory Jar, Bloodbat, Vault and Swarmweaver deathtouch, azusa's granted keywords): check_unchanged_decks --n=2000 against a worktree at c9f18f4 -- BIT-IDENTICAL on all 8 metrics (no card or rule of the change in this deck).",
-        "fingerprint": "f36a072d7c40afed",
-        "utc": "2026-11-17T05:26:12Z"
-      },
-      {
-        "commit": "3c9afb5",
-        "evidence": "2026-11-20, \u00a70z233 (altar_death_step, default 'two' = the old rule): check_unchanged_decks --n=2000 against a clean worktree at 3c9afb5, BIT-IDENTICAL on all 8 metrics; only engine code moved, no baseline list",
-        "fingerprint": "fe04c1f70dd7c4b6",
-        "utc": "2026-11-20T01:05:38Z"
-      },
-      {
-        "commit": "61e75a1",
-        "evidence": "2026-11-20, \u00a70z233 adopted (altar_death_step 'lethal', woe_strider_outlet True; rendmaw-only rules): check_unchanged_decks --n=2000 against a clean worktree at 61e75a1, BIT-IDENTICAL on all 8 metrics",
-        "fingerprint": "945355cd32f6b4cb",
-        "utc": "2026-11-20T13:34:08Z"
-      },
-      {
-        "commit": "9104946",
-        "evidence": "2026-11-20, \u00a70z236 (opponents.roll_pod_mana behind pod_mana, off; decks/_pod_mana.py into the shared fingerprint): check_unchanged_decks --n=2000 against a clean worktree at 9104946, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "a45a5f8cc30de81e",
-        "utc": "2026-11-20T22:03:08Z"
-      },
-      {
-        "commit": "486fb90",
-        "evidence": "2026-11-20, \u00a70z237 (the pod's own-turn spending behind pod_mana, off): check_unchanged_decks --n=2000 against a clean worktree at 486fb90, BIT-IDENTICAL on all 8 metrics with pod_mana off AND with --cfg=pod_mana=True; no baseline list moved",
-        "fingerprint": "9b4d38604171d96c",
-        "utc": "2026-11-20T22:52:50Z"
-      },
-      {
-        "commit": "e282061",
-        "evidence": "2026-11-20, \u00a70z238 (attack taxes from the pod's mana behind pod_tax_mana, off; tax_reads in engine.finish): check_unchanged_decks --n=2000 against a clean worktree at e282061, BIT-IDENTICAL on all 8 metrics with both switches off; no baseline list moved",
-        "fingerprint": "526ff1993873da35",
-        "utc": "2026-11-20T23:41:01Z"
-      },
-      {
-        "commit": "f0ef67f",
-        "evidence": "2026-11-21, \u00a70z239 (the pod's your-turn answers read its mana, behind pod_answer_mana, off): check_unchanged_decks --n=2000 against a clean worktree at f0ef67f, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "df5067c48f3ca65a",
-        "utc": "2026-11-21T00:53:18Z"
-      },
-      {
-        "commit": "dee645b",
-        "evidence": "2026-11-21, \u00a70z240 (the pod's own-turn removal gated on its cost, behind pod_removal_mana, off): check_unchanged_decks --n=2000 against a clean worktree at dee645b, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "3f12c9e2259484ef",
-        "utc": "2026-11-21T02:25:16Z"
-      },
-      {
-        "commit": "39d7db0",
-        "evidence": "2026-11-21, \u00a70z241 (your removal's gifts to the pod behind pod_gifts, off; POD_GIFTS gains kind, amount, tapped): check_unchanged_decks --n=2000 against a clean worktree at 39d7db0, BIT-IDENTICAL on all 8 metrics with the switch off; no baseline list moved",
-        "fingerprint": "6d394b21a02bbcf8",
-        "utc": "2026-11-21T03:09:10Z"
-      },
-      {
-        "commit": "204d0e9",
-        "evidence": "2026-11-21, \u00a70z242 (pod_rate and the pod_rate_scale knob, default None; the BRACKETS header corrected): check_unchanged_decks --n=2000 against a clean worktree at 204d0e9, BIT-IDENTICAL on all 8 metrics; no baseline list moved",
-        "fingerprint": "eb6f9718818a68dc",
-        "utc": "2026-11-21T17:43:46Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",

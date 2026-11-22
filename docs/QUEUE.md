@@ -64,7 +64,9 @@ items below this section are in the order they were queued, not this one.
 7. **Item 49: the small cleanups.**
 7b. **Item 50: a real mana model for the pod** -- written down 2026-11-17;
    **STARTED BY THE OWNER 2026-11-20**, reviewed and decided (§0z234);
-   item-44 scale. Item 52 is what it left for later.
+   item-44 scale. Item 52 is what it left for later. **FLIPPED (§0z243)
+   AND REBUILT (§0z244, 2026-11-22)**; the staged swaps' re-measure is
+   left.
 8. **When the owner picks them back up**: item 28 (paused), item 29's
    leftovers, item 32. Item 34's deletes are the owner's, on github.com.
    Items 18 and 5 wait on trostani (SUSPENDED).
@@ -366,6 +368,11 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     the old pod); `attack_tax_deflect` and `ward_pay_share` stranded,
     marked. **Left: the rebuild, the owner's call** ("make sure you tell me
     before rebuilding"), then the staged swaps re-measured.
+    **REBUILT (§0z244, 2026-11-22)**, the owner: "Yes, go ahead with the
+    parallel rebuild" -- six tables at `120cc9a`, every active cache
+    CURRENT, `check_docs` green; every baseline up +0.002 to +0.011, 37 of
+    379 rows moved beyond their bars, no sign flips. **Left: the staged
+    swaps re-measured** on the rebuilt tables, the owner's to call.
     The plan as it was written:
     every item-50 switch on together, decision 5's rescale to the
     documented interaction counts, the re-fit (§0z195), the stranded knobs

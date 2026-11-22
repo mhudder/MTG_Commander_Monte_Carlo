@@ -296,6 +296,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
 | [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
 | [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, re-fitted (`incidental_rate` 1.80), two knobs stranded; every table to rebuild |
+| [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, 37 of 379 rows moved, no sign flips; the staged swaps next |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20939,6 +20940,83 @@ code, not knobs: under the flip they are read only with
 then the staged swaps re-measured. Until it runs the six caches are
 SUSPECT and `check_docs` fails on that one check, expected and said in
 each commit. Never `--verified`.
+
+<a id="0z244"></a>
+
+## 0z244. REBUILT -- item 50's rebuild: six tables on the pod with mana
+
+**The owner, 2026-11-22: "Yes, go ahead with the parallel rebuild"** --
+the rebuild §0z243 left as the owner's call. Parallel (`parallel-rebuild`),
+one cloud session per active deck, all six legs at `120cc9a`, pins
+`numpy==2.4.6 scipy==1.17.1 openpyxl==3.1.5`, every leg's `Interpreter:`
+line python 3.13.18, numpy 2.4.6. Coordinated on python 3.13.18 (§0z119;
+this container's default is 3.11.18): `tools.repro_row` IDENTICAL on
+tivit's Time Sieve and karlov's Voice of the Blessed. `--merge-shards`
+accepted all six; every active cache CURRENT; `check_docs` green on all 21
+checks, `python -m tests` 156/156, `tools.validate` +0.00 on all 21 metrics
+with the game RNG sealed, every deck legal -- all under 3.13.18. **Wall
+time: 52 minutes**, the slowest leg (azusa, 01:10 -> 02:02 UTC); the
+fastest, shilgengar, 9.
+
+**Baselines and noise floors**, the table before (the pod without mana,
+§0z222's fit) -> after (the flipped pod at `incidental_rate` 1.80):
+
+| deck | baseline T10 | baseline T20 | floor |
+|---|---|---|---|
+| rendmaw | 0.1015 -> 0.0993 | 0.3361 -> 0.3393 | ±0.0027 -> ±0.0027 |
+| lorehold | 0.2673 -> 0.2671 | 0.4512 -> 0.4607 | ±0.0032 -> ±0.0033 |
+| karlov | 0.2648 -> 0.2665 | 0.5256 -> 0.5329 | ±0.0026 -> ±0.0026 |
+| tivit | 0.3091 -> 0.3177 | 0.5389 -> 0.5499 | ±0.0029 -> ±0.0028 |
+| shilgengar | 0.0581 -> 0.0568 | 0.4239 -> 0.4301 | ±0.0028 -> ±0.0028 |
+| azusa | 0.3479 -> 0.3449 | 0.5429 -> 0.5453 | ±0.0032 -> ±0.0033 |
+
+Every T20 baseline rose, by +0.0024 to +0.0110 (mean +0.0066): §0z243's
+out-of-sample reading of the re-fit -- the flipped pod about 0.006 weaker
+than the old on average -- seen again on the tables' own seeds
+(5000..19999). The floors did not widen.
+
+**What moved** (T20, beyond the wider of the two bars;
+`results/rebuild_item50_table_diff_20261122.txt`): rendmaw 5 of 64 rows (4
+up), lorehold 6 of 65 (4 up), karlov 6 of 64 (5 up), tivit 11 of 64 (1 up),
+shilgengar 5 of 64 (4 up), azusa 4 of 58 (0 up) -- 37 of 379, against
+§0z219's 107 at the last pod change. **Not one row significant in both
+tables changed sign, in any deck** (§0z195). No row entered or left a
+table.
+
+The largest movers, with what is and is not traced:
+- **tivit, 10 of 11 down**: Orzhov Signet +0.0211 -> +0.0168, Path to Exile
+  +0.0121 -> +0.0079, Idyllic Tutor +0.0051 -> +0.0012 (both -> dmg),
+  Tyrant's Choice, Damn, Tempting Contract, Trial of a Time Lord, Master of
+  Ceremonies, Displacer Kitten, Lieutenants of the Guard each -0.0026 to
+  -0.0039; Sadistic Shell Game the one up (+0.0084 -> +0.0113). Path's
+  fall has a mechanism on record -- it hands the pod a land now
+  (`pod_gifts`, §0z241: tivit's Path and An Offer together -0.0013 at
+  T20) -- but that is a third of it. The rest is NOT TRACED: tivit's
+  baseline rose most (+0.0110), and the shape (removal, tutors, mana and
+  engines all buying a little less) reads as a pod
+  that develops before it answers, so a deck already winning more gains
+  less from each card. That is a hypothesis, not a measurement.
+- **rendmaw**: Biotransference +0.0059 -> +0.0101, Heroic Intervention
+  +0.0051 -> +0.0083, Ophiomancer +0.0069 -> +0.0039. Heroic Intervention
+  rising fits §0z243's diff (more of the pod's removal and wipes now land
+  on you); not measured past that.
+- **lorehold**: Storm-Kiln Artist -0.0029 -> +0.0023 (win -> dmg: the old
+  row was significant on win rate, the new one is not, so no sign flip
+  between significant rows), Emeria's Call +0.0210 -> +0.0169, Ultima
+  +0.0061 -> +0.0102, Storm Herd +0.0274 -> +0.0311. Not traced.
+- **karlov**: Voice of the Blessed +0.0066 -> +0.0102, Cliffhaven Vampire,
+  Sunscorch Regent and Necropotence up about +0.003, Toxic Deluge +0.0099 ->
+  +0.0068, Phyrexian Reclamation -- -> both. Not traced.
+- **shilgengar**: Angel of Despair +0.0115 -> +0.0147, Malakir Rebirth dmg
+  -> both, Priest of Fell Rites, Viscera Seer; Voldaren Bloodcaster the one
+  down (dmg -> dmg). Not traced.
+- **azusa, all 4 down**: Ancient Greenwarden +0.0192 -> +0.0156, Momentous
+  Fall, Storm Cauldron (both -> dmg) and Memory Jar. Not traced.
+
+None of these is a decision, and none is a cut list: they are the sizes a
+re-fitted pod gives, and §0z195 says sizes move with the fit. **Left for
+item 50: the staged swaps re-measured** on these tables (the eleven in the
+ledger), the next step and the owner's to call.
 
 ## How to read an ablation table
 

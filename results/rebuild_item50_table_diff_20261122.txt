@@ -1,0 +1,58 @@
+Item 50's rebuild (§0z244): each table as it stood at 120cc9a (git show 120cc9a:results/ablation_<deck>.txt, the pre-flip pod) against the table rebuilt at 120cc9a.
+T20 win rate; a row 'moved' when the change exceeds the wider of its two bars. The 12 largest movers per deck.
+
+== rendmaw: baseline T20 0.3361 -> 0.3393 (T10 0.1015 -> 0.0993); floor +-0.0027 -> +-0.0027; rows 64 -> 64
+   moved beyond the wider bar: 5 of 64 (4 up)
+     Biotransference                        +0.0059+-0.0022 -> +0.0101+-0.0024  (+0.0042)  both->both
+     Heroic Intervention                    +0.0051+-0.0022 -> +0.0083+-0.0023  (+0.0032)  both->both
+     Copper Myr                             -0.0019+-0.0027 -> +0.0011+-0.0028  (+0.0030)  dmg->dmg
+     Ophiomancer                            +0.0069+-0.0027 -> +0.0039+-0.0027  (-0.0030)  both->both
+     Ashnod's Altar                         -0.0016+-0.0015 -> +0.0011+-0.0016  (+0.0027)  both->--
+   sign flips among rows significant in both: none
+== lorehold: baseline T20 0.4512 -> 0.4607 (T10 0.2673 -> 0.2671); floor +-0.0032 -> +-0.0033; rows 65 -> 65
+   moved beyond the wider bar: 6 of 65 (4 up)
+     Storm-Kiln Artist                      -0.0029+-0.0027 -> +0.0023+-0.0027  (+0.0052)  win->dmg
+     Emeria's Call                          +0.0210+-0.0035 -> +0.0169+-0.0035  (-0.0041)  both->both
+     Ultima                                 +0.0061+-0.0030 -> +0.0102+-0.0031  (+0.0041)  both->both
+     Storm Herd                             +0.0274+-0.0032 -> +0.0311+-0.0033  (+0.0037)  both->both
+     Olórin's Searing Light                 +0.0144+-0.0026 -> +0.0171+-0.0027  (+0.0027)  both->both
+     Perch Protection                       +0.0051+-0.0019 -> +0.0031+-0.0018  (-0.0020)  both->both
+   sign flips among rows significant in both: none
+== karlov: baseline T20 0.5256 -> 0.5329 (T10 0.2648 -> 0.2665); floor +-0.0026 -> +-0.0026; rows 64 -> 64
+   moved beyond the wider bar: 6 of 64 (5 up)
+     Voice of the Blessed                   +0.0066+-0.0021 -> +0.0102+-0.0022  (+0.0036)  both->both
+     Cliffhaven Vampire                     +0.0054+-0.0025 -> +0.0089+-0.0026  (+0.0035)  both->both
+     Sunscorch Regent                       +0.0082+-0.0022 -> +0.0115+-0.0023  (+0.0033)  both->both
+     Toxic Deluge                           +0.0099+-0.0025 -> +0.0068+-0.0025  (-0.0031)  both->both
+     Necropotence                           +0.0039+-0.0028 -> +0.0068+-0.0026  (+0.0029)  both->both
+     Phyrexian Reclamation                  +0.0017+-0.0021 -> +0.0041+-0.0022  (+0.0024)  --->both
+   sign flips among rows significant in both: none
+== tivit: baseline T20 0.5389 -> 0.5499 (T10 0.3091 -> 0.3177); floor +-0.0029 -> +-0.0028; rows 64 -> 64
+   moved beyond the wider bar: 11 of 64 (1 up)
+     Orzhov Signet                          +0.0211+-0.0034 -> +0.0168+-0.0033  (-0.0043)  both->both
+     Path to Exile                          +0.0121+-0.0029 -> +0.0079+-0.0029  (-0.0042)  both->both
+     Idyllic Tutor                          +0.0051+-0.0029 -> +0.0012+-0.0028  (-0.0039)  both->dmg
+     Tyrant's Choice                        +0.0104+-0.0025 -> +0.0065+-0.0024  (-0.0039)  both->both
+     Damn                                   +0.0183+-0.0031 -> +0.0146+-0.0031  (-0.0037)  both->both
+     Tempting Contract                      +0.0127+-0.0031 -> +0.0091+-0.0030  (-0.0036)  both->both
+     Trial of a Time Lord                   +0.0057+-0.0023 -> +0.0022+-0.0022  (-0.0035)  both->both
+     Master of Ceremonies                   +0.0225+-0.0032 -> +0.0190+-0.0032  (-0.0035)  both->both
+     Displacer Kitten                       +0.0071+-0.0028 -> +0.0042+-0.0028  (-0.0029)  both->both
+     Sadistic Shell Game                    +0.0084+-0.0026 -> +0.0113+-0.0026  (+0.0029)  both->both
+     Lieutenants of the Guard               +0.0071+-0.0025 -> +0.0045+-0.0025  (-0.0026)  both->both
+   sign flips among rows significant in both: none
+== shilgengar: baseline T20 0.4239 -> 0.4301 (T10 0.0581 -> 0.0568); floor +-0.0028 -> +-0.0028; rows 64 -> 64
+   moved beyond the wider bar: 5 of 64 (4 up)
+     Angel of Despair                       +0.0115+-0.0025 -> +0.0147+-0.0025  (+0.0032)  both->both
+     Malakir Rebirth // Malakir Mire        +0.0021+-0.0026 -> +0.0049+-0.0027  (+0.0028)  dmg->both
+     Priest of Fell Rites                   -0.0003+-0.0024 -> +0.0024+-0.0024  (+0.0027)  dmg->dmg
+     Voldaren Bloodcaster // Bloodbat Summoner +0.0011+-0.0024 -> -0.0013+-0.0023  (-0.0024)  dmg->dmg
+     Viscera Seer                           -0.0044+-0.0018 -> -0.0023+-0.0018  (+0.0021)  both->both
+   sign flips among rows significant in both: none
+== azusa: baseline T20 0.5429 -> 0.5453 (T10 0.3479 -> 0.3449); floor +-0.0032 -> +-0.0033; rows 58 -> 58
+   moved beyond the wider bar: 4 of 58 (0 up)
+     Ancient Greenwarden                    +0.0192+-0.0035 -> +0.0156+-0.0033  (-0.0036)  both->both
+     Momentous Fall                         +0.0174+-0.0030 -> +0.0141+-0.0030  (-0.0033)  both->both
+     Storm Cauldron                         +0.0039+-0.0029 -> +0.0007+-0.0028  (-0.0032)  both->dmg
+     Memory Jar                             +0.0115+-0.0028 -> +0.0085+-0.0028  (-0.0030)  both->both
+   sign flips among rows significant in both: none
