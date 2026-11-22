@@ -745,7 +745,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4b72b3f",
+        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+        "fingerprint": "f8daa06227cc1ba6",
+        "utc": "2026-11-22T04:14:48Z"
+      }
+    ]
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
     "built_at": "efd275d1cf31f76e",
@@ -1400,7 +1407,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4b72b3f",
+        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+        "fingerprint": "c18f0ffd5c05e813",
+        "utc": "2026-11-22T04:14:47Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "8b7fe7cbffe26ea7",
@@ -2081,7 +2095,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4b72b3f",
+        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+        "fingerprint": "e686dacfe2891389",
+        "utc": "2026-11-22T04:14:47Z"
+      }
+    ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
     "built_at": "ae229ad72c87e1b4",
@@ -2727,7 +2748,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4b72b3f",
+        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+        "fingerprint": "009f5f89c26f03b5",
+        "utc": "2026-11-22T04:14:47Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "af5e7632010a237f",
@@ -3411,7 +3439,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "4b72b3f",
+        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+        "fingerprint": "4e9f90932f221f6a",
+        "utc": "2026-11-22T04:14:47Z"
+      }
+    ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
     "built_at": "80df5a1fd8aa63ef",

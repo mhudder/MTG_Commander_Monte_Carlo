@@ -297,7 +297,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
 | [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, re-fitted (`incidental_rate` 1.80), two knobs stranded; every table to rebuild |
 | [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, no sign flips; of 13 top movers re-measured on fresh seeds only Biotransference holds; the staged swaps next |
-| [0z245](#0z245) | OPEN | **Two of your cards hand the pod Treasure and are not charged**: Tempting Contract and Master of Ceremonies (tivit), missed by the census; nothing measured |
+| [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21067,7 +21067,7 @@ row this measurement can see but one.
 
 <a id="0z245"></a>
 
-## 0z245. OPEN -- Tempting Contract and Master of Ceremonies hand the pod Treasure, uncharged
+## 0z245. FIXED -- Tempting Contract and Master of Ceremonies hand the pod Treasure, uncharged
 
 Found 2026-11-22 reading the rebuild's movers against Scryfall (§0z244).
 Item 50 charges YOUR cards that hand the pod mana (`_pod_mana.POD_GIFTS`,
@@ -21106,6 +21106,58 @@ how many opponents take Tempting Contract's offer is already the vote's
 (`voting.tempting_offer`); then tivit's two rows re-measured, and tivit's
 table rebuilt if staged. **Nothing measured, nothing built: the owner's
 call.**
+
+### Fixed (the owner, 2026-11-22: "fix the treasures, then push to main, do not rebuild")
+
+- **The census** (`tools/removal_census.py`) reads both wordings as a gift:
+  `NOT_RAMP_RULES`' gift rule and `read_gift`, one Treasure PER TAKER.
+  Regenerated from Scryfall: `_pod_mana.py` moves both cards from
+  `('treasure', ...)` to `('gift', ...)` and adds them to `POD_GIFTS`;
+  `_removal.py` came out byte-identical.
+- **`voting.tempting_takers`** names the opponents `tempting_offer` only
+  counted, with the same addressed draws (`tempting_offer{i}`), so no
+  stream moves (§0z17); `tempting_offer` is `1 + len(...)` of it.
+- **`tivit.upkeep`**: each Tempting Contract taker and each Master of
+  Ceremonies money chooser gets its Treasure through `opponents.pod_gift`
+  -- so `pod_gifts` and `POD_PRE_ITEM50` turn it off with the rest, and an
+  opponent's Treasure is mana at once, kept until spent (§0z241). The
+  Citizen ("friends") and the card ("secrets") are still not modelled.
+- **`pod_gifts_symmetric`** (default True) restores the engine before.
+
+**Pinned**: `tests/test_pod_gifts.py` H-J (a taker's Treasure, a dead
+opponent's none; the money chooser's alone; the switch off) and
+`tests/test_mana_census.py` Q-R, mutations exact. The takers mutation was
+written as {H} and broke {H, J}: J reads your Treasures, which the takers
+count too -- the expected set was wrong, not the rule; corrected and said
+so in the file.
+
+**What moved** (`check_unchanged_decks --n=2000` against `6ca318b`):
+rendmaw, lorehold, karlov, shilgengar and azusa BIT-IDENTICAL on all 8
+metrics, and their staged lists at 2,000 seeds too (§0z126) -- recorded
+`--verified`. With `pod_gifts_symmetric=False` tivit is BIT-IDENTICAL as
+well: the switch is the old engine. Tivit alone moves.
+
+**Tivit** (`diagnostics/run_symmetric_gifts.py`, the tables' seeds,
+N=15,000 paired; `results/symmetric_gifts_tivit_20261122.txt`). The OFF
+leg reproduces the rebuilt cache to its digits (baseline 0.3177 / 0.5499,
+Tempting Contract +0.0091, Master of Ceremonies +0.0190 at T20):
+
+| | T10 change | T20 change | T20 on |
+|---|---|---|---|
+| baseline | -0.0023 ±0.0012 | **-0.0022 ±0.0015** | 0.5477 |
+| Tempting Contract row | -0.0015 ±0.0011 | **-0.0015 ±0.0014** | +0.0077 ±0.0030 |
+| Master of Ceremonies row | -0.0007 ±0.0008 | -0.0004 ±0.0010 | +0.0186 ±0.0032 |
+
+Tempting Contract hands about half the pod a Treasure every upkeep
+(`tempting_offer_rate` 0.5, the knob that decides its size -- said out
+loud); Master of Ceremonies one in three choosers, and pays back a Treasure
+of your own for each. Both cards stay significant and well inside tivit's
+table: the drawback is real and small.
+
+**Tivit's cache is SUSPECT, and stays so**: its baseline moved, so only a
+rebuild clears it, and the owner said "do not rebuild". `check_docs` fails
+on that one check until the next rebuild -- expected, said in the commit.
+Never `--verified`.
 
 ## How to read an ablation table
 

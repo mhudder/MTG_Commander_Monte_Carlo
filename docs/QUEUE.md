@@ -390,8 +390,8 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       route pieces, and so moves the kill turns -- a second re-fit.
     - **Rhystic Study, Smothering Tithe, Monologue Tax** ("low priority"):
       each pays or not from the pod's spare mana instead of a flat rate.
-    - **Found 2026-11-22, not the owner's decision yet (§0z245)**: Tempting
-      Contract and Master of Ceremonies hand the pod Treasure that item 50
-      does not charge -- the census read only "its controller" wording --
-      so both tivit rows are ceilings.
+    - **Found and FIXED 2026-11-22 (§0z245)**, the owner: "fix the
+      treasures, then push to main, do not rebuild": Tempting Contract and
+      Master of Ceremonies hand the pod its Treasure. Tivit's cache is
+      SUSPECT until the next rebuild.
     None starts before item 50 is flipped and rebuilt.
