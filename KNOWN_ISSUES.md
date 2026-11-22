@@ -301,6 +301,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
 | [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021 at T20 -- those four ON; Agadeem +0.0013, Animist, Nylea, Green Sun OFF |
+| [0z249](#0z249) | BUILT | **Hexhaven Invigorator (azusa), the owner's proposal**: its damage trigger read from the pod's combat; one paired run into Ka-Zar's, Springheart's, Greensleeves' and Chocobo's slots -- the swap is the owner's |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21630,6 +21631,65 @@ off, so no knob's reach moved; said, not measured.
   `--verified`.
 - **Not re-measured on fresh seeds (§0z170)** before the flip: the owner
   flipped on the numbers above.
+
+<a id="0z249"></a>
+
+## 0z249. BUILT -- Hexhaven Invigorator (azusa): the damage trigger, and the four cuts head to head
+
+**The owner, 2026-11-22**: "Of the following cards in Azusa, which one was
+the weakest?" (Greensleeves, Ka-Zar, Mole Man, Mossborn Hydra, Springheart,
+Traveling Chocobo), and on the table's answer -- Mole Man clearly the
+strongest, the other five a SET inside one noise floor (§0e) -- "Run them,
+please also run hexhaven invigorator. I would like to replace the weakest
+card with it."
+
+**Oracle text, api.scryfall.com, 2026-11-22**: Hexhaven Invigorator
+{G}{G}{G}{G}, Creature -- Chimera Horror, 6/6, "Vigilance / Whenever this
+creature is dealt damage, you may search your library for up to that many
+land cards, put them onto the battlefield tapped, then shuffle." The
+Proposal in `edhmc/ledger/azusa.py` carries it verbatim;
+`azusa_v1.HEXHAVEN_INVIGORATOR`, priority 8 (beside Rampaging Baloths),
+threat derived. Vigilance and its subtypes generated (`tag_flying`).
+
+### The trigger
+
+- **Where damage reaches your creatures**: only the pod's combat, which is
+  bodies against bodies (§0z198-§0z200). `opponents.damage_to_attacker` --
+  what your blocked attacker is dealt, the first strikers' alone if they
+  kill it first (510.4) -- and `damage_to_blockers` -- the pod attacker's
+  power on your blockers, weakest first, lethal to each before the next
+  (510.1c), the rest on the last. `your_creatures_damaged` calls the
+  engine's optional `on_your_creature_damaged(perm, n)` after the deaths, in
+  all three combats: your attacks (`resolve_trades`), the pod's at you
+  (`_attack_you`) and at your walkers (`_attack_walker`). Every other engine
+  has no hook, and sees nothing.
+- **Azusa's trigger** (`AzusaGame.on_your_creature_damaged`), by name (a
+  Springheart copy has the text): up to `n` lands by `land_rank` (a fetch,
+  then green, then untapped -- every land search's order here), stopped
+  where the decking guard would (`draw_is_safe`); onto the battlefield
+  tapped as one event, shuffle, then each landfall (603.6a). Nothing to
+  take: "you may" declines, no shuffle.
+- **PARTLY_MODELLED** (`tools/ablation.py`): damage from the pod's spells
+  and wipes is abstract removal (§4). And the pod's blocks do not know the
+  trigger, where a real opponent declines to block it: the combat half is
+  a CEILING. The pod's ATTACKS do read the 6/6 -- `pod_attack_safety`
+  holds attacks back from it -- which is most of why it is rarely dealt
+  damage.
+
+**Pinned**: `tests/test_hexhaven.py`, seven cases A-G, five mutations,
+every expected set exact on the first run. **Every active deck
+BIT-IDENTICAL** to `4367f9e` at 2,000 seeds with the hook in
+(`check_unchanged_decks`): no list holds the card.
+
+**Smoke** (`tools.triage --smoke azusa`, N=1,000): cast in 22.6% of games;
+0.31 vigilant attacks, 0.093 triggers, 0.27 damage and 0.26 lands a game;
+the pod attacks less (7.07 -> 6.84 a game) and holds more back.
+
+### Measured
+
+Pending: `diagnostics/run_azusa_hexhaven.py`, N=15,000, the four swaps
+and the six cut-against-cut differences on the same seeds
+(`results/azusa_hexhaven_slots_20261122.txt`).
 
 ## How to read an ablation table
 

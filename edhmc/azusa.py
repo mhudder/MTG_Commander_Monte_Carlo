@@ -651,6 +651,8 @@ class AzusaGame(BaseGame):
             "chord_convoked": 0,        # ... creatures tapped for it
             # item 45 (§0z248): an X spell cast at the X the pool affords
             "x_spells_paid": 0,
+            # §0z249: Hexhaven Invigorator's damage trigger
+            "hexhaven_triggers": 0, "hexhaven_damage": 0, "hexhaven_lands": 0,
             "gsz_seen": 0, "gsz_x_casts": 0, "gsz_x": 0,
             "wave_x_casts": 0, "wave_x": 0,
             "animist_x_casts": 0, "animist_x": 0,
@@ -2025,6 +2027,43 @@ class AzusaGame(BaseGame):
                 and devotion(self, "G") >= 3):
             v += 1.5
         return v
+
+    def on_your_creature_damaged(self, perm, n):
+        """HEXHAVEN INVIGORATOR (§0z249; Scryfall, 2026-11-22): "Whenever
+        this creature is dealt damage, you may search your library for up to
+        that many land cards, put them onto the battlefield tapped, then
+        shuffle." Called by the pod's combat (`opponents.
+        your_creatures_damaged`) for each of your creatures it dealt `n`,
+        after the deaths -- the trigger resolves even if this one died, as a
+        triggered ability does. By name, so a Springheart copy (a token with
+        its text) triggers too.
+
+        THE PILOT'S CHOICES, said out loud: the `land_rank` order every land
+        search here takes (a fetch first, then green, then untapped); "up
+        to" stops where the decking guard would (`draw_is_safe`, as Genesis
+        Wave's reveal); with nothing to take, "you may" declines, and so no
+        shuffle. The lands enter as one event, then each landfall (CR
+        603.6a), as Animist's Awakening's do."""
+        if perm.card.name != "Hexhaven Invigorator":
+            return
+        self.m["hexhaven_triggers"] += 1
+        self.m["hexhaven_damage"] += n
+        take = []
+        for c in sorted((c for c in self.library if c.is_land),
+                        key=self.land_rank, reverse=True):
+            if len(take) >= n or not draw_is_safe(self, len(take) + 1):
+                break
+            take.append(c)
+        if not take:
+            return
+        for c in take:
+            remove_card(self.library, c)
+        for c in take:
+            self.make_permanent(c, sick=False, tapped=True)
+        self.searched()
+        for c in take:
+            self.land_entered(c, played=False)
+        self.m["hexhaven_lands"] += len(take)
 
     def realms_uncharted(self):
         """REALMS UNCHARTED: "Search your library for up to four land cards

@@ -865,6 +865,24 @@ CAPTAIN_PIKE = C("Captain Pike, Fullness of Time", "Creature",
 STAR_TREK_CANDIDATES = (CAPTAIN_PIKE,)
 
 
+# ---------------------------------------------------------------------------
+# HEXHAVEN INVIGORATOR, proposed by the owner 2026-11-22 (§0z249). Reality
+# Fracture; text from api.scryfall.com that day, verbatim on the Proposal in
+# edhmc/ledger/azusa.py:
+#   {G}{G}{G}{G}  6/6  Creature - Chimera Horror
+#   "Vigilance / Whenever this creature is dealt damage, you may search your
+#    library for up to that many land cards, put them onto the battlefield
+#    tapped, then shuffle."
+# Vigilance is generated (`tools.tag_flying`), never typed. The trigger is
+# `AzusaGame.on_your_creature_damaged`, which the pod's combat calls with the
+# damage each of your creatures was dealt (`opponents.damage_to_attacker`,
+# `damage_to_blockers`).
+HEXHAVEN_INVIGORATOR = C("Hexhaven Invigorator", "Creature", {"G": 4}, 6, 6,
+                         priority=8)
+
+HEXHAVEN_CANDIDATES = (HEXHAVEN_INVIGORATOR,)
+
+
 def _check_inline_copies():
     """The list's committed batch-6 cards and the catalog's constants are ONE
     card written twice each (the list cannot reference a constant defined

@@ -1602,6 +1602,17 @@ PROPOSED: list[Proposal] = [
         triage='LIVE',
         rejected='MEASURED 2026-10-23 and PROMOTED: the Candidate in MEASURED carries the number (§0z159). Closed rather than deleted so the verified oracle text stays where it was written.',
     ),
+    # REALITY FRACTURE, the owner, 2026-11-22: "please also run hexhaven
+    # invigorator. I would like to replace the weakest card with it".
+    Proposal(
+        deck='azusa', card='Hexhaven Invigorator', cost='{G}{G}{G}{G}',
+        identity='G', type_line='Creature — Chimera Horror',
+        oracle="Vigilance\nWhenever this creature is dealt damage, you may search your library for up to that many land cards, put them onto the battlefield tapped, then shuffle.",
+        verified='2026-11-22',
+        rationale="The owner's pick for the weakest of Ka-Zar, Springheart Nantuko, Greensleeves and Traveling Chocobo's slots. A 6/6 vigilance for four that attacks without leaving the pod's turn unblocked (§0z184), and every point of damage it is dealt -- a block on it, or its block of a pod attacker -- is a land onto the battlefield: a landfall trigger each, in the deck whose every payoff reads `land_entered`.",
+        implement="§0z249. The 6/6 and vigilance are the generated body (tag_flying). The trigger: `opponents.damage_to_attacker` / `damage_to_blockers` give the damage each of your creatures is dealt in the pod's combat model -- your attacks (`resolve_trades`), the pod's attacks at you (`_attack_you`) and at your walkers (`_attack_walker`) -- and call the engine's optional `on_your_creature_damaged(perm, n)` once the deaths are done. Azusa's fetches the top `land_rank` lands (Realms Uncharted's order), onto the battlefield tapped, shuffles, then each landfall. 'You may' and 'up to' are a pilot's: stopped where the decking guard would (`draw_is_safe`). PARTLY: damage from the pod's spells and wipes (a burn spell, Blasphemous Act) is abstract removal (§4), and the pod's blocks do not know the trigger -- a real opponent declines to block it, so the combat half is a CEILING.",
+        triage='LIVE',
+    ),
 ]
 
 
@@ -1622,6 +1633,7 @@ CATALOG = (azusa_v1, {
     "Case of the Locked Hothouse": azusa_v1.CASE_OF_THE_LOCKED_HOTHOUSE,
     "Walk-In Closet // Forgotten Cellar": azusa_v1.WALK_IN_CLOSET,
     "Ka-Zar of the Savage Land": azusa_v1.KA_ZAR,
+    "Hexhaven Invigorator": azusa_v1.HEXHAVEN_INVIGORATOR,   # §0z249
     "Cryptic Caves": azusa_v1.CRYPTIC_CAVES,
     "Horizon of Progress": azusa_v1.HORIZON_OF_PROGRESS,
     "The Hunter Maze": azusa_v1.THE_HUNTER_MAZE,

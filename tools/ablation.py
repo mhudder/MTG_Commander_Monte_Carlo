@@ -1002,6 +1002,16 @@ PARTLY_MODELLED = {
             "graveyard to your hand'. A floor.",
     },
     "azusa": {
+        # The owner's proposal, 2026-11-22 (§0z249).
+        "Hexhaven Invigorator":
+            "MODELLED: the 6/6 vigilance body, and 'whenever this creature "
+            "is dealt damage' in the pod's combat -- blocked when it "
+            "attacks, or blocking the pod's attacks at you and your walkers "
+            "-- for up to that many `land_rank` lands onto the battlefield "
+            "tapped, each a landfall. NOT: damage from the pod's spells and "
+            "wipes (abstract removal, §4). And the pod's blocks do not know "
+            "the trigger, where a real opponent declines to block it: the "
+            "combat half is a CEILING.",
         "Mind's Eye":
             "MODELLED (§0z246, item 52): each opponent's draw step, and you "
             "pay {1} from what you left untapped on your turn, when the draw "

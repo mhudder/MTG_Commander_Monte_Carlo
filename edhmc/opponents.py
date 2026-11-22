@@ -3715,6 +3715,48 @@ def _first_strike_kills(a, blks):
     return dead
 
 
+def damage_to_attacker(a, blks) -> int:
+    """The damage your attacker `a` is DEALT by its blockers (§0z249): the
+    first strikers' alone if they kill it first (510.4: the rest deal none),
+    else what `_dealers` deal back -- the sum `_kills` reads."""
+    if _blockers_first(a, blks):
+        return sum(b.power for b in blks if b.fs)
+    return _damage_back(a, blks)
+
+
+def damage_to_blockers(a, blks) -> list:
+    """(your blocker, damage) for each of your creatures blocking the pod's
+    attacker `a` (§0z249): none if first-striking blockers kill it first
+    (510.4); else its power assigned in `_first_strike_kills`' order,
+    weakest first, lethal to each (1 with deathtouch, 702.2c) before the
+    next (510.1c), the remainder on the last. An indestructible blocker is
+    dealt its share like any other."""
+    if _blockers_first(a, blks):
+        return []
+    left, out = a.power, []
+    order = sorted(blks, key=lambda b: b.tough)
+    for i, b in enumerate(order):
+        need = 1 if a.dt else b.tough
+        d = left if i == len(order) - 1 else min(left, need)
+        if d > 0:
+            out.append((b.ref, d))
+            left -= d
+    return out
+
+
+def your_creatures_damaged(g, hurt) -> None:
+    """Tell the engine each of your creatures the combat dealt damage, once
+    its deaths are done: the optional `on_your_creature_damaged(perm, n)`
+    hook (Hexhaven Invigorator, §0z249). An engine without it sees nothing,
+    which is every engine but azusa today."""
+    hook = getattr(g, "on_your_creature_damaged", None)
+    if hook is None:
+        return
+    for p, n in hurt:
+        if n > 0:
+            hook(p, n)
+
+
 def _absorb(a, blks) -> int:
     """What blockers absorb of a trampler's damage (702.19c): lethal to each,
     1 against deathtouch (702.2c)."""
@@ -3876,6 +3918,7 @@ def resolve_trades(g, defender, assigned) -> tuple:
     its blockers kill. Returns (pod deaths, your deaths). One simultaneous
     event for your side (603.10a, §0z76)."""
     birds_dead, dead_bodies, mine = 0, set(), []
+    hurt = [(a.perm, damage_to_attacker(a, blks)) for a, blks in assigned]
     for a, blks in assigned:
         killed = {id(r) for r in _attacker_kills(a, blks)}
         if a.ds and not _blockers_first(a, blks):    # its regular damage too
@@ -3913,6 +3956,7 @@ def resolve_trades(g, defender, assigned) -> tuple:
         g.m["attackers_died"] += died
         if any(p.card is g.commander for p in mine):
             g.m["commander_died_in_combat"] += 1
+    your_creatures_damaged(g, hurt)                # §0z249
     return n, died
 
 
@@ -4326,7 +4370,7 @@ def _attack_walker(g, bodies, ks, walker, dead, used) -> None:
                       len(blockers), count=True, floor=0,
                       prefix="walker_block_")
     dmg = int(sum(a.power for a in atk if a.k not in asg))
-    mine, link = [], 0
+    mine, link, hurt = [], 0, []
     whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
     for a in atk:
         blks = asg.get(a.k)
@@ -4335,6 +4379,7 @@ def _attack_walker(g, bodies, ks, walker, dead, used) -> None:
         if _kills(a, blks):
             dead.add(a.k)
         mine.extend(_attacker_kills(a, blks))
+        hurt.extend(damage_to_blockers(a, blks))     # §0z249
         for b in _dealers(a, blks):
             if b.ref.card.lifelink or whip:
                 link += b.power
@@ -4345,6 +4390,7 @@ def _attack_walker(g, bodies, ks, walker, dead, used) -> None:
         with simultaneous(g):
             for p in mine:
                 destroy(g, p, destroys=True)
+    your_creatures_damaged(g, hurt)                # §0z249
     if walker.counters <= 0:
         g.m["walkers_killed"] += 1
         walker_dies_at_zero(g, walker)
@@ -4382,7 +4428,7 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
     used = {id(b.ref) for blks in asg.values() for b in blks}
     g.m["pod_attacks"] += len(sent)
     dmg = float(sum(a.power for a in atk if a.k not in asg))
-    mine, link = [], 0
+    mine, link, hurt = [], 0, []
     whip = g.has("Whip of Erebos") and g.cfg.get("whip_text", True)
     for a in atk:
         blks = asg.get(a.k)
@@ -4391,6 +4437,7 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
         if _kills(a, blks):
             dead.add(a.k)
         mine.extend(_attacker_kills(a, blks))
+        hurt.extend(damage_to_blockers(a, blks))     # §0z249
         for b in _dealers(a, blks):
             if b.ref.card.lifelink or whip:
                 link += b.power
@@ -4407,6 +4454,7 @@ def _attack_you(g, opp, bodies, sent, dead) -> None:
                 if destroy(g, p, destroys=True):
                     died += 1
         g.m["your_blockers_died"] += died
+    your_creatures_damaged(g, hurt)                # §0z249
     if at_walker:
         _attack_walker(g, bodies, at_walker, walker, dead, used)
 
