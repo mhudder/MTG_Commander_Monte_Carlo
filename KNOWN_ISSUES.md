@@ -300,7 +300,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
-| [0z248](#0z248) | BUILT | **Item 45's rest: each fixed-X spell's own X, eight switches OFF**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021, Agadeem +0.0013 at T20; Animist, Nylea, Green Sun nulls |
+| [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021 at T20 -- those four ON; Agadeem +0.0013, Animist, Nylea, Green Sun OFF |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21489,7 +21489,7 @@ creatures only**:
 
 <a id="0z248"></a>
 
-## 0z248. BUILT -- item 45's rest: each fixed-X spell pays its own X, behind its own switch, OFF
+## 0z248. FLIPPED -- item 45's rest: each fixed-X spell pays its own X; Genesis Wave, Torment, Meathook and Debt on
 
 **The owner, 2026-11-22: "each of these need at least a small logic build
 around them, since they mostly do different things"**, then "Start the
@@ -21602,6 +21602,34 @@ to flip is the owner's call.
 
 **Stranded knobs not run** (`run_knob_liveness`, §0z205): the switches are
 off, so no knob's reach moved; said, not measured.
+
+### The owner's decision (2026-11-22): "flip genesis wave, torment, meathook and debt, but do not rebuild"
+
+- **ON by default**: `genesis_wave_x` (azusa), `torment_x` (tivit),
+  `meathook_x` (rendmaw, its ETB with it) and `debt_x` (karlov) -- the
+  four significant at both horizons. **`experiment.PRE_ITEM45`** restores
+  each at its old fixed X: `check_unchanged_decks --n=2000` with it,
+  against `bc34060`, every active deck BIT-IDENTICAL. At the new
+  defaults exactly the four move (won at 2,000 seeds: rendmaw +0.0065,
+  azusa +0.0040, karlov +0.0035, tivit +0.0035); lorehold and shilgengar
+  BIT-IDENTICAL. `python -m tests` 159/159 at the new defaults: no
+  expectation changed (`tests/test_x_spells.py` names every switch it
+  sets).
+- **OFF, built and measured**: `agadeem_x` (significant at T20 alone, a
+  2.3% reach), `animist_x`, `nylea_x`, `gsz_x_plan` (each inside its
+  bars). With `agadeem_x` off, shilgengar still casts Agadeem's front
+  face as the blank it always was.
+- **No re-fit**: four decks' baselines move by their rows above (+0.0021
+  to +0.0062 at T20). The fit rule (§0z195) holds the MEAN across the six
+  decks, and these move it by about +0.0029 (the four rows over six
+  decks) -- the size of item 52's -0.0032, which was not re-fitted either
+  (§0z247). Said, not re-fitted; the owner's call if it should be.
+- **No rebuild**, by the owner's word: azusa's, tivit's, rendmaw's and
+  karlov's caches were SUSPECT already (§0z247) and stay so; only a
+  rebuild clears them. `check_docs` fails on that one check; never
+  `--verified`.
+- **Not re-measured on fresh seeds (§0z170)** before the flip: the owner
+  flipped on the numbers above.
 
 ## How to read an ablation table
 

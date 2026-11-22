@@ -279,9 +279,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     cast as a blank). At T20, N=15,000: Genesis Wave +0.0062, Torment
     +0.0030 (a ceiling), Meathook +0.0061 (the cheaper cast, not the ETB),
     Debt +0.0021, Agadeem +0.0013, each significant; Animist's, Nylea's
-    and Green Sun's inside their bars. **Left, the owner's call**: which to
-    flip (each moves its deck's baseline; the caches are SUSPECT already,
-    §0z247), and the fresh-seed re-measure (§0z170) of any flipped.
+    and Green Sun's inside their bars. **FLIPPED BY THE OWNER THE SAME
+    DAY**: "flip genesis wave, torment, meathook and debt, but do not
+    rebuild" -- those four ON (`experiment.PRE_ITEM45` restores them),
+    Agadeem, Animist, Nylea and Green Sun's OFF. **Left**: the rebuild of
+    the four decks' tables (the owner's call), and the fresh-seed
+    re-measure (§0z170) of the four flipped.
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a

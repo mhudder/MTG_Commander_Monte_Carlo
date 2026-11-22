@@ -1019,13 +1019,13 @@ def dig_the_pile(g) -> None:
 
 def torment_x_rule(g, card) -> bool:
     """Item 45 (§0z248): Torment of Hailfire pays the largest X the mana
-    affords (`torment_x`, OFF until measured). THE JUDGEMENT: every mana,
+    affords (`torment_x`, ON: the owner, 2026-11-22). THE JUDGEMENT: every mana,
     Treasures too -- it is the deck's finisher, and a Treasure spent is an
     artifact leaving, which the drains read. What a Treasure would have done
     later (Revel in Riches' ten) is not weighed. No cap at lethal: past it
     the game is over, so the mana is not missed."""
     return (card.script == "torment"
-            and g.cfg.get("torment_x", False))
+            and g.cfg.get("torment_x", True))
 
 
 def reduce_cost(g, card) -> dict:

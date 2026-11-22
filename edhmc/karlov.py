@@ -1577,7 +1577,7 @@ def main_phase(g):
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
             # Only the card cast is priced (§0z149).
-            if c.script == "debt" and g.cfg.get("debt_x", False):  # §0z248
+            if c.script == "debt" and g.cfg.get("debt_x", True):  # §0z248, ON
                 # ITEM 45 (§0z248): Debt to the Deathless at the LARGEST X
                 # the mana affords, never below the old fixed 3
                 # (`engine.largest_x`). THE JUDGEMENT: every mana -- each X

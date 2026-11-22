@@ -2859,8 +2859,9 @@ class AzusaGame(BaseGame):
         """Genesis Wave / Animist's Awakening at X. By default X is the old
         fixed X (`x_pips`: 6 and 4, the convention Debt to the Deathless and
         Torment of Hailfire used too); ITEM 45 (§0z248) pays the largest X
-        the main phase affords instead, behind `genesis_wave_x` and
-        `animist_x`, OFF until measured (`x_paid`, `x_limit`).
+        the main phase affords instead (`x_paid`, `x_limit`): Genesis
+        Wave's `genesis_wave_x` ON since the owner flipped it, 2026-11-22,
+        Animist's `animist_x` OFF.
 
         GENESIS WAVE BY ITS TEXT (§0z210): "Reveal the top X cards of your
         library. You may put any number of permanent cards with mana value X
@@ -3866,12 +3867,14 @@ class AzusaGame(BaseGame):
             self.cast_x = None
 
     def x_switch(self, script) -> bool:
-        """Item 45 (§0z248): each fixed-X spell's own switch, OFF until
-        measured, read as a literal so `tools.knobs` finds each one."""
+        """Item 45 (§0z248): each fixed-X spell's own switch, read as a
+        literal so `tools.knobs` finds each one. Genesis Wave's is ON (the
+        owner, 2026-11-22); Green Sun's, Animist's and Nylea's stay OFF,
+        each measured inside its bars."""
         if script == "green_sun":
             return self.cfg.get("gsz_x_plan", False)     # x_plan, as trostani
         if script == "genesis_wave":
-            return self.cfg.get("genesis_wave_x", False)  # largest X, §0z248
+            return self.cfg.get("genesis_wave_x", True)   # FLIPPED, §0z248
         if script == "animist":
             return self.cfg.get("animist_x", False)       # largest X, §0z248
         if script == "nylea_land":

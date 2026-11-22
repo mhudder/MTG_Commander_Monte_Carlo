@@ -3462,7 +3462,7 @@ def main_phase(g: Game, precombat: bool = False):
             if not main_phase_may_cast(g, c):
                 continue
             if (c.name == "The Meathook Massacre"
-                    and g.cfg.get("meathook_x", False)):           # §0z248
+                    and g.cfg.get("meathook_x", True)):            # §0z248, ON
                 # ITEM 45: its X chosen, and its ETB modelled on both sides
                 # (`meathook_etb`). From X = 0, not the old fixed 2: the
                 # rule may want less (`meathook_x_ok`).
