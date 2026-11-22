@@ -299,6 +299,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, no sign flips; of 13 top movers re-measured on fresh seeds only Biotransference holds; the staged swaps next |
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
+| [0z247](#0z247) | BUILT | **Item 52's rest, built OFF: the pod's mana creatures and its development gated by mana**: the gate weakens the pod +0.08 to +0.14 a deck (smaller boards); the re-fit lever is the owner's |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21345,6 +21346,92 @@ check, not a finding.
 baselines moved, so only a rebuild clears them -- the owner's call. Tivit's
 was already (§0z245). `check_docs` fails on that one check until then;
 never `--verified`.
+
+<a id="0z247"></a>
+
+## 0z247. BUILT, OFF -- item 52's rest: the pod's mana creatures and its development gated by mana
+
+**The owner, 2026-11-22: "Go ahead with 1 and 2 fixes, but do not
+rebuild."** Queue item 52's two parts left after §0z246, each recorded to
+revisit when item 50 was designed (§0z234 decisions 2 and 3). Built the
+item-44 way: each behind a switch in `opponents.POD_DEFAULTS`, OFF until
+measured. **No table is rebuilt**, by the owner's word.
+
+**The rules read** (`docs/MagicCompRules_20260807.txt`): 302.6 -- a
+creature's {T} ability needs it under its controller's control since their
+most recent turn began; 502.3 -- a player's permanents untap in their own
+untap step; 601.2h -- a cost is paid whole or not at all ("partial payments
+are not allowed"), so a spell the mana does not cover is not cast; 305.2 --
+one land a turn (the library's land drops, §0z236, unchanged).
+
+### 1. Mana creatures (`pod_mana_creatures`)
+
+- **The share is generated**: the census (`tools.removal_census`) counts the
+  creatures of the seven committed lists whose own text, or a grant on
+  them, reads "{T}: Add" -- 11 of 178 (Avacyn's Pilgrim, Birds of Paradise,
+  Copper Myr, Elvish Mystic, Enduring Vitality, Giada, Leaden Myr,
+  Ornithopter of Paradise, Palladium Myr, Sylvan Caryatid, Twitching Doll),
+  `POD_MANA_CREATURE_SHARE` 0.0618. Dryad of the Ilysian Grove and Oracle of
+  Mul Daya ramp by an extra land, not mana, and are left out; a land
+  creature is not counted as a creature.
+- **Which bodies**: a UTILITY body (§0z198, "a mana creature, an engine, a
+  draw piece", `pod_utility_share` 0.3) taps for mana with 0.0618 / 0.3 =
+  0.206, rolled from a FOURTH stream of its pool, one draw a body, so every
+  other roll of every body is unchanged. A utility body never attacks
+  (`combat_bodies`), so a mana creature never has to choose.
+- **Its mana**: at its controller's untap step every mana body on the
+  battlefield taps for one (`mana_creature_mana`): each arrived in an
+  earlier main phase 2, so 302.6 is met by construction. One mana each
+  (`MANA_CREATURE_MANA`, A JUDGEMENT: ten of the eleven make one; Palladium
+  Myr makes two). A body that died makes none: wipes and your removal now
+  cut the pod's mana.
+
+### 2. Development gated by mana (`pod_develop_gated`)
+
+- **Route pieces** (`charge_pieces`, main phase 1, the first spend of the
+  turn -- the owner's order, §0z234 decision 4): a piece is cast only if
+  its mana value is untapped (601.2h); otherwise it waits a round
+  (`delay_piece`), by the rule a removed piece already follows
+  (`remove_threat_piece`): the kill needs it out for its `lead`, so
+  `kill_turn` becomes at least its new turn plus its lead.
+- **Bodies** (`charge_growth`, main phase 2): each is cast only from the
+  mana ABOVE what the opponent keeps up for your turn (`answer_reserve`:
+  its counterspell's cost, a held answer's) -- decision 4's order, route
+  piece, removal, bodies, the rest held. The first body it cannot pay for
+  waits, and those behind it (the pool is the order its creatures come
+  in); they are cast first on its next turn (`body_debt`). Off, every body
+  is charged and none gated (§0z237).
+
+**The judgements, each said out loud**: one mana a mana creature; a body
+that cannot be paid WAITS rather than being lost; the bodies wait in order
+(the first unpayable blocks the cheaper ones behind it); the reserve is kept
+before bodies; a delayed piece moves one round at a time.
+
+**Pinned**: `tests/test_pod_development.py` A-I, four mutations, every
+expected set exact on the first run. **Both switches off: every active deck
+BIT-IDENTICAL** to `376c121` at 2,000 seeds, modules and staged lists --
+rendmaw and karlov recorded `--verified` on it.
+
+### What it does (a 400-game smoke, rendmaw and tivit)
+
+| | rendmaw won | tivit won | turns (tivit) |
+|---|---|---|---|
+| both off | 0.338 | 0.568 | 10.88 |
+| mana creatures | 0.335 | 0.575 | 10.93 |
+| gated | 0.415 | 0.708 | 11.56 |
+| both | 0.415 | 0.693 | 11.57 |
+
+**The gate makes the pod far weaker**, about +0.08 to +0.14 a deck: the
+calibrated board grows 0.7 x `board` a turn from turn 1 whatever the pod's
+lands, which is the 11-14 mana a game it could not pay for (§0z237's
+`pod_overspent`), and gated, those bodies arrive late or not at all. Kills
+move only about 0.3 rounds a game (`pod_kill_rounds_delayed`): nearly all of
+the effect is SMALLER BOARDS, not later kills. Mana creatures add 2.3-2.8
+mana a game and move little.
+
+**Not flipped.** A gap of this size is ten times any re-fit made before
+(item 50's was -0.0115, §0z243), and which lever closes it is a model
+decision: the owner's. The six-deck measurements follow.
 
 ## How to read an ablation table
 

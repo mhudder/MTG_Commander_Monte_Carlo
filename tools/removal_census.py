@@ -526,9 +526,28 @@ def mana_census(oracle, table, counters, per_deck):
                           and is_ae(table[n][2])),
         "counter": spell_costs(lambda n: n in counters),
     }
+    # ITEM 52 (§0z247): THE POD'S MANA CREATURES. A creature whose own text
+    # (or a grant on it) reads "{T}: Add" -- the "on a creature" not-ramp
+    # rows whose clause is a TAP for mana; Dryad of the Ilysian Grove's and
+    # Oracle of Mul Daya's extra land is ramp of another kind, left out.
+    # The share is over the CREATURES of the committed lists, a land
+    # creature (Dryad Arbor) not counted, each list once: the bodies the
+    # pod fields are its creatures, so this is the share of them that tap
+    # for mana.
+    def is_creature(n):
+        card = oracle.get(n) or oracle.get(n.split(" // ")[0])
+        tl = (card or {}).get("type_line", "").split(" // ")[0]
+        return "Creature" in tl and "Land" not in tl
+    mana_creatures = sorted(
+        n for n, (why, clause) in not_ramp.items()
+        if why.startswith("on a creature") and "{t}" in clause)
+    creatures = {d: sum(1 for n in mod[d] if is_creature(n)) for d in DECKS}
+    mana_by_deck = {d: sum(1 for n in mod[d] if n in mana_creatures)
+                    for d in DECKS}
     return dict(ramp=ramp, not_ramp=not_ramp, gifts=gifts, lands=lands,
                 sizes=sizes, by_deck=by_deck, per=per, vals=vals,
-                costs=costs, module=mod)
+                costs=costs, module=mod, mana_creatures=mana_creatures,
+                creatures=creatures, mana_by_deck=mana_by_deck)
 
 
 def render_mana(mc, per_deck):
@@ -601,6 +620,17 @@ def render_mana(mc, per_deck):
     for n, (r, clause) in sorted(mc["not_ramp"].items()):
         lines.append(f"    {n!r}: ({r!r}, {clause!r}),")
     lines += ["}", "",
+              "# ITEM 52 (§0z247): the creatures that tap for mana -- a {T}: Add on",
+              "# the creature, or granted to it -- and every creature, per committed",
+              "# list (a land creature not counted). Their pooled ratio is the share",
+              "# of the pod's bodies that are mana creatures, read by",
+              "# `opponents.roll_body_pools` under `pod_mana_creatures`.",
+              f"MANA_CREATURES = {mc['mana_creatures']!r}",
+              f"CREATURES_BY_DECK = {dict(sorted(mc['creatures'].items()))!r}",
+              f"MANA_CREATURES_BY_DECK = {dict(sorted(mc['mana_by_deck'].items()))!r}",
+              f"POD_MANA_CREATURE_SHARE = "
+              f"{round(sum(mc['mana_by_deck'].values()) / max(1, sum(mc['creatures'].values())), 4)!r}",
+              "",
               "# YOUR cards that hand the pod mana -- its controller searches for a",
               "# land, or makes Treasure, or each opponent who takes it makes one",
               "# (the amount is then per taker): name -> (kind, amount, tapped,",

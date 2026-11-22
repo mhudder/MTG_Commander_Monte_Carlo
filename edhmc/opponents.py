@@ -195,6 +195,9 @@ class Opponent:
     cast_turn: tuple = ()
     casts: int = 0
     rhystic_pending: int = 0
+    # ITEM 52 (§0z247, `pod_develop_gated`): bodies it could not pay for,
+    # cast first on its next turn.
+    body_debt: int = 0
 
     _pcache: object = None
 
@@ -301,8 +304,8 @@ def make_pod(cfg: dict, seed: int) -> tuple[list[Opponent], list, list]:
 # so toughness, mana value and black are the bodies they always were and,
 # with the switch off, every body equals the three-field body it replaced
 # (the defaults below). See `BodyPool.__getitem__` for the judgements.
-PodBody = namedtuple("PodBody", "toughness mv black power utility reach",
-                     defaults=(False, 0, False, False))
+PodBody = namedtuple("PodBody", "toughness mv black power utility reach mana",
+                     defaults=(False, 0, False, False, False))
 POD_BODY_POOL = 96       # bodies per opponent per game; drawn cyclically past it
 
 
@@ -311,10 +314,10 @@ class BodyPool(Sequence):
     is read (§0z144). Reads like the tuple it replaced -- `len`, indexing,
     iteration, `==` -- so `pod_bodies` and every test that sets a tuple pool
     by hand work unchanged."""
-    __slots__ = ("_r", "_rb", "_rc", "_combat", "_tmax", "_mvmax", "_black",
-                 "_drawn")
+    __slots__ = ("_r", "_rb", "_rc", "_rm", "_mana", "_combat", "_tmax",
+                 "_mvmax", "_black", "_drawn")
 
-    def __init__(self, seed, i, tmax, mvmax, black, combat=None):
+    def __init__(self, seed, i, tmax, mvmax, black, combat=None, mana=None):
         self._r = random.Random((seed * 1000003) ^ (0xB0D1E5 + 7919 * i))
         # BLACK, for Pygmy Kavu (§0z132): from a SECOND stream, so toughness
         # and mana value are the bodies change 1 rolled, unchanged. Each body
@@ -329,6 +332,12 @@ class BodyPool(Sequence):
         self._combat = combat
         self._rc = (random.Random((seed * 1000003) ^ (0xC0BA7 + 7919 * i))
                     if combat is not None else None)
+        # MANA CREATURES, item 52 (§0z247): the chance a UTILITY body taps for
+        # mana, or None. A FOURTH stream, one draw a body, so the first three
+        # streams -- and every body they made -- are untouched.
+        self._mana = mana if combat is not None else None
+        self._rm = (random.Random((seed * 1000003) ^ (0x3A7A + 7919 * i))
+                    if self._mana is not None else None)
         self._drawn = []
 
     def __len__(self):
@@ -362,8 +371,10 @@ class BodyPool(Sequence):
             rc = self._rc
             utility = rc.random() < ushare
             power = rc.randint(0, umax) if utility else rc.randint(1, pmax)
-            drawn.append(PodBody(t, mv, black, power, utility,
-                                 rc.random() < rshare))
+            reach = rc.random() < rshare
+            mana = (self._rm is not None and self._rm.random() < self._mana
+                    and utility)
+            drawn.append(PodBody(t, mv, black, power, utility, reach, mana))
         return drawn[k]
 
     def __eq__(self, other):
@@ -389,8 +400,17 @@ def roll_body_pools(cfg, seed, opps) -> None:
                   cfg.get("pod_utility_share", 0.3),
                   max(0, int(cfg.get("pod_utility_power_max", 2))),
                   cfg.get("flier_block_share", 0.30))
+    mana = None
+    if combat is not None and pod_knob(cfg, "pod_mana_creatures"):  # §0z247
+        # The census's share of the lists' creatures that tap for mana,
+        # GENERATED (`_pod_mana.POD_MANA_CREATURE_SHARE`), given that a body
+        # is a utility one: every mana creature is a utility creature (it
+        # does not attack, `combat_bodies`, so it never has to choose).
+        from edhmc.decks._pod_mana import POD_MANA_CREATURE_SHARE
+        ushare = combat[1]
+        mana = min(1.0, POD_MANA_CREATURE_SHARE / ushare) if ushare > 0 else 0.0
     for i, o in enumerate(opps):
-        o.body_pool = BodyPool(seed, i, tmax, mvmax, black, combat)
+        o.body_pool = BodyPool(seed, i, tmax, mvmax, black, combat, mana)
 
 
 # POD_V4 IS THE DEFAULT POD (§0z140, the owner, 2026-10-15). Item 24's
@@ -445,6 +465,13 @@ POD_DEFAULTS = {
     # Exile's and Assassin's Trophy's basic land, An Offer You Can't
     # Refuse's two Treasures -- gives it to the opponent it hit.
     "pod_gifts": True,
+    # ITEM 52 (§0z247), built OFF: the pod's MANA CREATURES -- a share of its
+    # utility bodies taps for one mana from its controller's next untap
+    # (302.6), and dies with the body -- and its DEVELOPMENT GATED by mana:
+    # a route piece or a body is cast only when its mana is there, else it
+    # waits a turn, and the kill with it.
+    "pod_mana_creatures": False,
+    "pod_develop_gated": False,
 }
 
 
@@ -807,7 +834,25 @@ def pod_untap(g, i) -> None:
     o.treasures = (min(o.treasures, max(0.0, o.mana_left)) if TREASURE_KEPT
                    else 0.0)
     o.mana_left = ((row.spare if row is not None else 0.0) + o.gift_lands
-                   + o.treasures)
+                   + o.treasures + mana_creature_mana(g, o))
+
+
+MANA_CREATURE_MANA = 1.0       # §0z247: each taps for one -- a judgement
+
+
+def mana_creature_mana(g, o) -> float:
+    """ITEM 52 (§0z247, `pod_mana_creatures`): the mana `o`'s mana creatures
+    make this turn. Every body on its battlefield at its untap step has been
+    under its control since the turn began -- bodies arrive in its main 2
+    -- so each taps (302.6). One mana each (`MANA_CREATURE_MANA`, a
+    judgement: ten of the census's eleven make one). A body that died made
+    none: the count is the board's."""
+    if not pod_knob(g.cfg, "pod_mana_creatures") or not pod_bodies_on(g):
+        return 0.0
+    n = sum(1 for b in pod_bodies(g, o) if b.mana)
+    if n:
+        g.m["pod_mana_creature_mana"] += n * MANA_CREATURE_MANA
+    return n * MANA_CREATURE_MANA
 
 
 GIFT_LAND_TAPPED_READ = True   # §0z241: Path's land is tapped, Trophy's not
@@ -1018,9 +1063,29 @@ def charge_pieces(g, o) -> None:
     if not pod_mana_on(g) or not o.pieces:
         return
     t = pod_turn(g)
+    gated = pod_knob(g.cfg, "pod_develop_gated")
     for k, lands in enumerate(o.piece_lands):
         if lands == t:
-            pod_spend(g, o, float(o.pieces[k].mv), "piece")
+            mv = float(o.pieces[k].mv)
+            if gated and o.mana_left < mv - 1e-9:
+                delay_piece(g, o, k)                      # §0z247
+                continue
+            pod_spend(g, o, mv, "piece")
+
+
+def delay_piece(g, o, k) -> None:
+    """ITEM 52 (§0z247, `pod_develop_gated`): `o` cannot pay for piece k
+    this turn, so it waits for the next. The rule a removed piece follows
+    (`remove_threat_piece`), one round: the kill needs the piece out for
+    its `lead`, so `kill_turn` becomes at least its new turn plus its
+    lead."""
+    lands = pod_turn(g) + 1
+    o.piece_lands[k] = lands
+    g.m["pod_pieces_delayed"] += 1
+    moved = max(0, lands + o.pieces[k].lead - o.kill_turn)
+    if moved:
+        o.kill_turn += moved
+        g.m["pod_kill_rounds_delayed"] += moved
 
 
 def _arrival_mvs(g, o, before: float) -> list:
@@ -1058,12 +1123,37 @@ def charge_ward(g, o, n: float) -> None:
 
 
 def charge_growth(g, o, before: float) -> None:
-    """Main phase 2: `o`'s new bodies, each at its own mana value."""
+    """Main phase 2: `o`'s new bodies, each at its own mana value.
+
+    ITEM 52 (§0z247, `pod_develop_gated`): a body is CAST only from the mana
+    above what `o` keeps up for your turn (`answer_reserve`, the owner's
+    order: route piece, removal, bodies, the rest held). The first it
+    cannot pay for waits, and the ones behind it with it -- the pool is the
+    order its creatures come in -- and they are cast first on its next
+    turn, before that turn's new ones (`body_debt`). Off: charged, never
+    gated (§0z237)."""
     if not pod_mana_on(g):
         return
     keep = answer_reserve(g, o)
-    for mv in _arrival_mvs(g, o, before):
+    if not pod_knob(g.cfg, "pod_develop_gated"):
+        for mv in _arrival_mvs(g, o, before):
+            pod_spend(g, o, mv, "body", floor=keep)
+        return
+    if o.body_debt:
+        o.creatures = min(7.0, o.creatures + o.body_debt)
+        o.body_debt = 0
+    arrivals = _arrival_mvs(g, o, before)
+    paid = 0
+    for mv in arrivals:
+        if o.mana_left - keep < mv - 1e-9:
+            break
         pod_spend(g, o, mv, "body", floor=keep)
+        paid += 1
+    unpaid = len(arrivals) - paid
+    if unpaid:
+        o.creatures -= unpaid
+        o.body_debt = unpaid
+        g.m["pod_bodies_delayed"] += unpaid
 
 
 def pod_threats_on(g) -> bool:

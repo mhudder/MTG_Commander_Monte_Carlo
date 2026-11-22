@@ -128,6 +128,16 @@ NOT_RAMP = {
     'Unexpected Windfall': ('treasure', 'treasure tokens'),
 }
 
+# ITEM 52 (§0z247): the creatures that tap for mana -- a {T}: Add on
+# the creature, or granted to it -- and every creature, per committed
+# list (a land creature not counted). Their pooled ratio is the share
+# of the pod's bodies that are mana creatures, read by
+# `opponents.roll_body_pools` under `pod_mana_creatures`.
+MANA_CREATURES = ["Avacyn's Pilgrim", 'Birds of Paradise', 'Copper Myr', 'Elvish Mystic', 'Enduring Vitality', 'Giada, Font of Hope', 'Leaden Myr', 'Ornithopter of Paradise', 'Palladium Myr', 'Sylvan Caryatid', 'Twitching Doll']
+CREATURES_BY_DECK = {'azusa': 27, 'karlov': 28, 'lorehold': 10, 'rendmaw': 35, 'shilgengar': 34, 'tivit': 18, 'trostani': 26}
+MANA_CREATURES_BY_DECK = {'azusa': 0, 'karlov': 0, 'lorehold': 0, 'rendmaw': 6, 'shilgengar': 1, 'tivit': 0, 'trostani': 4}
+POD_MANA_CREATURE_SHARE = 0.0618
+
 # YOUR cards that hand the pod mana -- its controller searches for a
 # land, or makes Treasure, or each opponent who takes it makes one
 # (the amount is then per taker): name -> (kind, amount, tapped,
