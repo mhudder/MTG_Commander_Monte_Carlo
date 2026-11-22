@@ -16139,7 +16139,8 @@ each"): RESOLVED.** 1, your tapped creatures, §0z186; 2 and 10, §0z187;
 first_strike_of`, the generated `FIRST_STRIKE` / `DOUBLE_STRIKE`); 7, the
 shilgengar timing pair, §0z215; 8, Memory Jar and Bloodbat Summoner,
 §0z228 and §0z229. 9 is not a defect: you take seat 0, written down here
-as the model's choice. Queue item 37, built from these, has nothing left.
+as the model's choice -- KEPT by the owner, 2026-11-22 ("leaving the seat
+as is"). Queue item 37, built from these, is closed to `docs/HISTORY.md`.
 
 <a id="0z185"></a>
 
@@ -17491,7 +17492,8 @@ done. C: ward (§0z224), cycling (§0z226), Woe Strider (§0z227), Memory Jar
 (§0z228); the three clauses "already named in a note" (Priest of Fell
 Rites' unearth, Cyberdrive Awakener's summoning-sick tokens, Furygale
 Flocking's split) stay notes, the first in §0z208's audit. D and E:
-§0z206. **Left: A7's fixed X**, queue item 45.
+§0z206. **Left: A7's fixed X**, queue item 45 -- the owner, 2026-11-22:
+each X spell gets its own small logic build, not one shared rule.
 
 <a id="0z198"></a>
 

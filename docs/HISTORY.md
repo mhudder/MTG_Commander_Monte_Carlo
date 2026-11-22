@@ -3014,6 +3014,27 @@ other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
 ## Queued items closed 2026-11-22 — moved from `docs/QUEUE.md`
 
+**Item 37, closed by the owner the same day** ("I agree with item 37 and
+leaving the seat as is"): every finding done (§0z184's status note), and
+finding 9 -- you always take the first turn -- KEPT as the model's choice:
+paired comparisons share the seat, so it moves absolute win rates and no
+decision.
+
+37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
+    §0z185; 2 and 10, §0z187)**, none of
+    them urgent. In the order a session would take them:
+    ~~Memory Jar and Bloodbat Summoner (8)~~ DONE 2026-11-17 (§0z228, §0z229); ~~shilgengar's `activations` inside
+    main 2 and Black Market Connections at the first main phase (7)~~ DONE
+    2026-11-15 (§0z215), a null; first
+    and double strike, with Sunhome (6), which waits on attackers that can
+    die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
+    write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
+    batch**, since it moves the baseline.
+    **CHECKED 2026-11-22: NOTHING IS LEFT** (§0z184's status note): 6 is
+    built (§0z198, first and double strike), 7 and 8 are done, and 9 is
+    written down in §0z184 as the model's choice. Ready to close to
+    `docs/HISTORY.md` when the owner agrees.
+
 Checked item by item against the sections that closed it (the owner,
 2026-11-22: "double check each"): its card work is done -- ward
 (§0z224), cycling (§0z226), Woe Strider (§0z227), Memory Jar (§0z228),

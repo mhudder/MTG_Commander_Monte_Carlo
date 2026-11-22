@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48 and 51 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 37, 44, 46, 47, 48 and 51 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -240,21 +240,6 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     branches only, and this item closes to `docs/HISTORY.md`. Agents can
     still pull an `archive/` branch, but the name says what it is.
 
-37. **The smaller turn-structure findings of §0z184 (6-9; 3-5 are fixed,
-    §0z185; 2 and 10, §0z187)**, none of
-    them urgent. In the order a session would take them:
-    ~~Memory Jar and Bloodbat Summoner (8)~~ DONE 2026-11-17 (§0z228, §0z229); ~~shilgengar's `activations` inside
-    main 2 and Black Market Connections at the first main phase (7)~~ DONE
-    2026-11-15 (§0z215), a null; first
-    and double strike, with Sunhome (6), which waits on attackers that can
-    die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
-    write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
-    batch**, since it moves the baseline.
-    **CHECKED 2026-11-22: NOTHING IS LEFT** (§0z184's status note): 6 is
-    built (§0z198, first and double strike), 7 and 8 are done, and 9 is
-    written down in §0z184 as the model's choice. Ready to close to
-    `docs/HISTORY.md` when the owner agrees.
-
 45. **A3-A7 of §0z197: write down, then decide.** **A3, A6 AND A5 ARE
     WRITTEN DOWN AND DECIDED (§0z221, 2026-11-16)**: route-aware kills
     (A3), held answers (A6, after A3), the pod attacks walkers (A5). Built
@@ -275,6 +260,16 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     (tivit); §0z210 notes a pilot with the mana would cast the Wave
     bigger. A model decision for the owner, and it moves both decks'
     baselines (§0z197's status note).
+    **THE OWNER, 2026-11-22: "each of these need at least a small logic
+    build around them, since they mostly do different things."** So not one
+    shared X rule: each fixed-X card gets its own X logic, behind its own
+    switch, measured, then flipped. The cards, from the staged lists'
+    `x_pips`: Genesis Wave (6) and Animist's Awakening (4), Green Sun's
+    Zenith (3), Nylea's Intervention (3) in azusa; Torment of Hailfire (6)
+    in tivit; Debt to the Deathless (3) in karlov; The Meathook Massacre
+    (2) in rendmaw; Agadeem's Awakening (2) in shilgengar. Chord of
+    Calling already plans its X (§0z213). Not started; queued behind item
+    52 (the owner: "let's move on to item 52 instead").
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a
