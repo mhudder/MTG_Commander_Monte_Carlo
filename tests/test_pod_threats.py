@@ -378,11 +378,13 @@ def main() -> int:
         r = real_reach(clause)
         return r._replace(max_toughness=99, min_mv=0)
 
-    def all_pieces(g, card, scope=None):
+    # Stand-ins copy the signature, `x` too (§0z248).
+    def all_pieces(g, card, scope=None, x=None):
         return real_wipe(g, card, scope="nonland")
 
-    def portal_creatures(g, card, scope=None):
-        return real_wipe(g, card, scope=None if scope == "nonland" else scope)
+    def portal_creatures(g, card, scope=None, x=None):
+        return real_wipe(g, card, scope=None if scope == "nonland" else scope,
+                         x=x)
 
     def same_turn(g, o):
         if not o.alive:

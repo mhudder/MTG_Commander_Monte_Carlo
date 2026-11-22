@@ -399,7 +399,9 @@ def main() -> int:
             ({"K"}, OPP, "gate_pieces", lambda g, card, measure: 0.0),
         "every sweeper takes every piece":
             ({"L"}, OPP, "wipe_takes",
-             lambda g, card, scope=None: real_takes(g, card, "nonland")),
+             # the stand-in copies the signature, `x` too (§0z248)
+             lambda g, card, scope=None, x=None: real_takes(g, card,
+                                                            "nonland")),
     }
     bad = 0
     for label, (want, mod, name, fn) in muts.items():
