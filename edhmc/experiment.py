@@ -256,6 +256,12 @@ POD_PRE_ITEM50 = {
     "incidental_rate": 1.94,
 }
 
+# The pod before item 52's mana creatures (§0z247, the owner, 2026-11-22):
+# `dict(DEFAULT_CFG, **POD_PRE_ITEM52)` plays the pod of `376c121`.
+POD_PRE_ITEM52 = {
+    "pod_mana_creatures": False,
+}
+
 # The pod before §0z140: no bodies, no routes, no responses. Every table and
 # every number in KNOWN_ISSUES dated before 2026-10-15 is this pod's.
 POD_PRE_V4 = {

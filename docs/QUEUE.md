@@ -383,6 +383,12 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       treasures, then push to main, do not rebuild": Tempting Contract and
       Master of Ceremonies hand the pod its Treasure. Tivit's cache is
       SUSPECT until the next rebuild.
-    None starts before item 50 is flipped and rebuilt. **Left: mana
-    creatures and development gated by mana**, recommended as one batch
-    with one re-fit and one rebuild (2026-11-22).
+    None starts before item 50 is flipped and rebuilt.
+    **BOTH BUILT 2026-11-22 (§0z247)**, the owner: "go ahead with 1 and 2
+    fixes, but do not rebuild". **Mana creatures are the default** (the
+    owner: "mana creatures only"; -0.0032, no re-fit; `POD_PRE_ITEM52`
+    restores). **Development gated by mana is built and OFF**: it weakens
+    the pod +0.114 on the mean, the usual lever (`incidental_rate`)
+    saturates short of it, and `threat_clock_shift` 4.985 (kills 2.7 rounds
+    sooner) holds it unevenly. **Left, the owner's call**: that re-fit, or
+    first a look at why the calibrated boards outrun the pod's mana.

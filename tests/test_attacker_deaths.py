@@ -225,8 +225,10 @@ def run_cases():
         for o_off, o_on in zip(off, on):
             for k in range(40):
                 b0, b1 = o_off.body_pool[k], o_on.body_pool[k]
+                # PodBody gained `mana` (§0z247), False on a switch-off body:
+                # the old fields are compared, the new one as its default.
                 same &= (b0 == (b1.toughness, b1.mv, b1.black, 0, False,
-                                False))
+                                False, False))
                 ranged &= ((0 <= b1.power <= 2) if b1.utility
                            else (1 <= b1.power <= 6))
     check("L under the switch the old fields are the old bodies; power ranged",

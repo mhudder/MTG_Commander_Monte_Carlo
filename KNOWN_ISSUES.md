@@ -299,7 +299,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, no sign flips; of 13 top movers re-measured on fresh seeds only Biotransference holds; the staged swaps next |
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
-| [0z247](#0z247) | BUILT | **Item 52's rest, built OFF: the pod's mana creatures and its development gated by mana**: the gate weakens the pod +0.08 to +0.14 a deck (smaller boards); the re-fit lever is the owner's |
+| [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21349,7 +21349,7 @@ never `--verified`.
 
 <a id="0z247"></a>
 
-## 0z247. BUILT, OFF -- item 52's rest: the pod's mana creatures and its development gated by mana
+## 0z247. FLIPPED -- item 52's rest: the pod's mana creatures on; its development gated by mana built, OFF
 
 **The owner, 2026-11-22: "Go ahead with 1 and 2 fixes, but do not
 rebuild."** Queue item 52's two parts left after §0z246, each recorded to
@@ -21455,6 +21455,36 @@ at 5.3 azusa -0.051, karlov and shilgengar -0.029, rendmaw -0.008, lorehold
 +0.012, tivit +0.024 -- a pod that kills sooner instead of building boards
 it could not pay for. Not re-measured on fresh seeds (§0z170): a fit value
 to quote needs that.
+
+### The owner's decision (2026-11-22): "Mana creatures only"
+
+Asked with the numbers above -- mana creatures only; both, re-fit by the
+kill timing; both, no re-fit; neither yet -- the owner chose **mana
+creatures only**:
+
+- **`pod_mana_creatures` is the default** (`opponents.POD_DEFAULTS`):
+  -0.0032 on the mean, inside every deck's bar, so **no re-fit** (the fit
+  rule, §0z195, has nothing to hold). **`experiment.POD_PRE_ITEM52`**
+  restores the pod before: `check_unchanged_decks --n=2000
+  --cfg=pod_mana_creatures=False` against `376c121`, every active deck
+  BIT-IDENTICAL. `POD_PRE_ITEM50` still plays the pod before item 50:
+  without `pod_mana` the untap step, and so the mana creatures, add nothing.
+- **`pod_develop_gated` stays built and OFF**, a recorded limit: the pod's
+  calibrated boards outrun its mana (§0z237's 11-14 mana a game), and
+  holding the mean with the gate on needs kills about 2.7 rounds sooner
+  (`threat_clock_shift` 4.985), which moves the decks unevenly. Its re-fit,
+  or a look at why the boards outrun the mana (the growth calibration, the
+  reserve kept before bodies), is the owner's open call.
+- **Tests**: `test_attacker_deaths` L compared a body to a six-field tuple;
+  `PodBody` has seven now, and the new one is compared as its default
+  (said in the file). No expectation changed.
+- **Every active deck's baseline moved**, so every cache is SUSPECT --
+  rendmaw's and karlov's too, which were VERIFIED at the OFF build. Only a
+  rebuild clears them, and the owner said "do not rebuild". `check_docs`
+  fails on that one check until then; never `--verified`.
+- **Stranded knobs not run** (`run_knob_liveness`, §0z205): the change only
+  adds mana to opponents that hold mana creatures, and no knob reads a
+  mana creature; said, not measured.
 
 ## How to read an ablation table
 

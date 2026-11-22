@@ -465,12 +465,15 @@ POD_DEFAULTS = {
     # Exile's and Assassin's Trophy's basic land, An Offer You Can't
     # Refuse's two Treasures -- gives it to the opponent it hit.
     "pod_gifts": True,
-    # ITEM 52 (§0z247), built OFF: the pod's MANA CREATURES -- a share of its
-    # utility bodies taps for one mana from its controller's next untap
-    # (302.6), and dies with the body -- and its DEVELOPMENT GATED by mana:
-    # a route piece or a body is cast only when its mana is there, else it
-    # waits a turn, and the kill with it.
-    "pod_mana_creatures": False,
+    # ITEM 52 (§0z247): the pod's MANA CREATURES, THE DEFAULT SINCE
+    # 2026-11-22 (the owner: "mana creatures only") -- a share of its utility
+    # bodies taps for one mana from its controller's next untap (302.6), and
+    # dies with the body; -0.0032 on the mean, inside every deck's bar, so no
+    # re-fit. `experiment.POD_PRE_ITEM52` restores the pod before. Its
+    # DEVELOPMENT GATED by mana -- a route piece or a body cast only when its
+    # mana is there -- is built and stays OFF: it weakens the pod +0.114 on
+    # the mean, and the re-fit that would hold it is the owner's open call.
+    "pod_mana_creatures": True,
     "pod_develop_gated": False,
 }
 
