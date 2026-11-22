@@ -1559,18 +1559,31 @@ def upkeep(g):
         # takers, not a tempting offer's `1 + takers` (§0z214, §0z207 item
         # 2). `tempting_contract_text=False` is the old count.
         g.m["contract_upkeeps"] += 1   # either rule: the A/B's reach
-        n = V.tempting_offer(g)
-        if g.cfg.get("tempting_contract_text", True):
-            n -= 1
+        takers = V.tempting_takers(g)
+        n = len(takers) + (0 if g.cfg.get("tempting_contract_text", True)
+                           else 1)
         make_token(g, "Treasure", n)
+        # "...each opponent MAY create a Treasure token": each taker's own
+        # Treasure, mana for the pod since item 50 (§0z245).
+        if g.cfg.get("pod_gifts_symmetric", True):
+            for o in takers:
+                OPP.pod_gift(g, o, "Tempting Contract")
     if g.has("Master of Ceremonies"):
         # "Each opponent chooses money, friends, or secrets. For each player
         # who chose X, you AND that player each get X." You MATCH them, so it
         # is profit whichever way they go -- the same shape as the commander,
         # and the reason the card is worth a slot in a pod that hates you.
-        n = len(OPP.living(g))
-        pick = [crn_randrange(g, f"ceremonies{i}", 3) for i in range(n)]
+        living = OPP.living(g)
+        pick = [crn_randrange(g, f"ceremonies{i}", 3)
+                for i in range(len(living))]
         make_token(g, "Treasure", sum(1 for x in pick if x == 0))
+        # "...you AND THAT PLAYER each create a Treasure token": the money
+        # chooser's own Treasure, mana for the pod since item 50 (§0z245).
+        # Its Citizen ("friends") and card ("secrets") are not modelled.
+        if g.cfg.get("pod_gifts_symmetric", True):
+            for o, x in zip(living, pick):
+                if x == 0:
+                    OPP.pod_gift(g, o, "Master of Ceremonies")
         g.make_tokens(sum(1 for x in pick if x == 1), 1, 1, "Citizen")
         g.draw(sum(1 for x in pick if x == 2))
     if g.has("Monologue Tax"):

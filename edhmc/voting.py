@@ -217,11 +217,20 @@ def tempting_offer(g) -> int:
     default 0.5 is a judgement call, and a generous one -- accepting usually
     helps you more than them, which is the whole design of the mechanic.
     """
+    return 1 + len(tempting_takers(g))
+
+
+def tempting_takers(g) -> list:
+    """The living opponents who take a tempting offer (or Tempting
+    Contract's "each opponent may"), in seat order: `tempting_offer`'s
+    roll, which only counted them. Named because Tempting Contract hands
+    each taker a Treasure (§0z245). The draws are addressed by seat index,
+    so naming the takers changes no stream (§0z17)."""
     rate = g.cfg.get("tempting_offer_rate", 0.5)
-    takers = sum(1 for i, _ in enumerate(OPP.living(g))
-                 if ENG.crn_random(g, f"tempting_offer{i}") < rate)
-    g.m["offers_taken"] += takers
-    return 1 + takers
+    takers = [o for i, o in enumerate(OPP.living(g))
+              if ENG.crn_random(g, f"tempting_offer{i}") < rate]
+    g.m["offers_taken"] += len(takers)
+    return takers
 
 
 def _vote_payoffs(g, votes_against: int):

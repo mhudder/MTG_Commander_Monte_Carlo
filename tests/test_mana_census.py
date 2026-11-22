@@ -28,11 +28,15 @@ CASES
      rule reads it, and a cost with a sacrifice is not a rock
   M  an unreadable rock ("Add mana equal to ..."): RAISES
   N  Lightning Bolt: not mana at all (None)
+  Q  Tempting Contract: NOT ramp -- a gift, each opponent may make a
+     Treasure (§0z245; Scryfall 2026-11-22)
+  R  Master of Ceremonies: NOT ramp -- a gift, the money chooser makes a
+     Treasure (§0z245)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the creature-mana rule never matches       -> D, J
   a sacrifice in a rock's cost is allowed    -> P
-  the gift rule removed                      -> H
+  the gift rule removed                      -> H, Q, R
   activation costs read as 0                 -> B, F
 
 M FAILED ON THE FIRST RUN, AND THE CENSUS WAS WRONG, NOT THE CASE: "Add mana
@@ -92,6 +96,17 @@ CARDS = {
           "{T}: Add mana equal to the number of lands you control.", 4),
     "N": ("Lightning Bolt", "Instant",
           "Lightning Bolt deals 3 damage to any target.", 1),
+    "Q": ("Tempting Contract", "Artifact",
+          "At the beginning of your upkeep, each opponent may create a "
+          "Treasure token. For each opponent who does, you create a Treasure "
+          "token.", 4),
+    "R": ("Master of Ceremonies", "Creature — Rhino Druid",
+          "At the beginning of your upkeep, each opponent chooses money, "
+          "friends, or secrets. For each player who chose money, you and "
+          "that player each create a Treasure token. For each player who "
+          "chose friends, you and that player each create a 1/1 green and "
+          "white Citizen creature token. For each player who chose secrets, "
+          "you and that player each draw a card.", 4),
 }
 
 WANT = {
@@ -111,6 +126,8 @@ WANT = {
     "P": "raises",
     "M": "raises",
     "N": None,
+    "Q": ("not", "gift"),
+    "R": ("not", "gift"),
 }
 
 
@@ -155,7 +172,7 @@ def main() -> int:
             {"D", "J"}, [("CREATURE_MANA", never)]),
         "a sacrifice in a rock's cost is allowed": (
             {"P"}, [("ROCK_ABILITY", _SacAllowed(sac_ok))]),
-        "the gift rule removed": ({"H"}, [("NOT_RAMP_RULES", no_gift)]),
+        "the gift rule removed": ({"H", "Q", "R"}, [("NOT_RAMP_RULES", no_gift)]),
         "activation costs read as 0": (
             {"B", "F"}, [("generic", lambda cost: 0)]),
     }

@@ -105,7 +105,7 @@ NOT_RAMP = {
     'Journey of Discovery': ('modal', 'you may play up to two additional lands this turn'),
     'Leaden Myr': ('on a creature: queue item 52', '{t}: add'),
     'Lotus Cobra': ('land trigger', 'whenever a land you control enters, add'),
-    'Master of Ceremonies': ('treasure', 'treasure token'),
+    'Master of Ceremonies': ('gift', 'you and that player each create a treasure'),
     "Mirari's Wake": ('land trigger', 'whenever you tap a land for mana, add'),
     'Monologue Tax': ('treasure', 'treasure token'),
     'Monument to Endurance': ('treasure', 'treasure token'),
@@ -122,19 +122,22 @@ NOT_RAMP = {
     'Storm Cauldron': ('symmetric', 'each player may play an additional land'),
     'Storm-Kiln Artist': ('treasure', 'treasure token'),
     'Sylvan Caryatid': ('on a creature: queue item 52', '{t}: add'),
-    'Tempting Contract': ('treasure', 'treasure token'),
+    'Tempting Contract': ('gift', 'each opponent may create a treasure'),
     'Tireless Provisioner': ('treasure', 'treasure token'),
     'Twitching Doll': ('on a creature: queue item 52', '{t}: add'),
     'Unexpected Windfall': ('treasure', 'treasure tokens'),
 }
 
 # YOUR cards that hand the pod mana -- its controller searches for a
-# land, or makes Treasure: name -> (kind, amount, tapped, clause),
-# read by `opponents.pod_gift` (§0z235, §0z241)
+# land, or makes Treasure, or each opponent who takes it makes one
+# (the amount is then per taker): name -> (kind, amount, tapped,
+# clause), read by `opponents.pod_gift` (§0z235, §0z241, §0z245)
 POD_GIFTS = {
     "An Offer You Can't Refuse": ('treasure', 2, False, 'its controller creates two treasure'),
     "Assassin's Trophy": ('land', 1, False, 'its controller may search their library for a basic land card, put it onto the battlefield'),
+    'Master of Ceremonies': ('treasure', 1, False, 'you and that player each create a treasure token'),
     'Path to Exile': ('land', 1, True, 'its controller may search their library for a basic land card, put that card onto the battlefield tapped'),
+    'Tempting Contract': ('treasure', 1, False, 'each opponent may create a treasure token'),
 }
 
 # deck -> every card in its committed module list (`check_docs`)

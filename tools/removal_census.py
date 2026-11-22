@@ -295,8 +295,13 @@ RAMP_CANDIDATE = re.compile(
 NOT_RAMP_RULES = (
     # Your spell hands the TARGET'S CONTROLLER mana: under item 50 that is
     # the pod ramping off your removal. Kept as `POD_GIFTS`, for the engine.
+    # And your permanent that hands EACH OPPONENT WHO TAKES IT a Treasure
+    # (Tempting Contract, Master of Ceremonies, §0z245): the census read
+    # only the first wording until 2026-11-22, so the second was free.
     ("gift", r"its controller (may search their library for a basic land|"
-             r"creates (a|an|one|two|three|\w+) treasure)"),
+             r"creates (a|an|one|two|three|\w+) treasure)|"
+             r"each opponent may create a treasure|"
+             r"you and that player each create a treasure"),
     # A Treasure is one-shot mana (111.10a), not a source.
     ("treasure", r"\btreasure tokens?\b"),
     ("sacrifice outlet", r"(^|\n)sacrifice a creature: add"),
@@ -415,8 +420,14 @@ def classify_ramp(name: str, type_line: str, text: str, mv: float):
 def read_gift(name: str, text: str) -> tuple:
     """(kind, amount, tapped, clause) of a card that hands the TARGET'S
     CONTROLLER mana (§0z241): "land" -- a basic onto the battlefield, tapped
-    or not -- or "treasure", how many. Raises on a gift it cannot read."""
+    or not -- or "treasure", how many. A symmetric gift (§0z245) is one
+    Treasure for EACH opponent who takes it: the amount is per taker, and
+    the engine gives it once per taker. Raises on a gift it cannot read."""
     low = text.lower()
+    m = re.search(r"each opponent may create a treasure token|you and that "
+                  r"player each create a treasure token", low)
+    if m:
+        return ("treasure", 1, False, m.group(0)[:120])
     m = re.search(r"its controller may search their library for a basic "
                   r"land card, put (it|that card) onto the battlefield"
                   r"( tapped)?", low)
@@ -591,8 +602,9 @@ def render_mana(mc, per_deck):
         lines.append(f"    {n!r}: ({r!r}, {clause!r}),")
     lines += ["}", "",
               "# YOUR cards that hand the pod mana -- its controller searches for a",
-              "# land, or makes Treasure: name -> (kind, amount, tapped, clause),",
-              "# read by `opponents.pod_gift` (§0z235, §0z241)",
+              "# land, or makes Treasure, or each opponent who takes it makes one",
+              "# (the amount is then per taker): name -> (kind, amount, tapped,",
+              "# clause), read by `opponents.pod_gift` (§0z235, §0z241, §0z245)",
               "POD_GIFTS = {"]
     for n, g in sorted(mc["gifts"].items()):
         lines.append(f"    {n!r}: {g!r},")
