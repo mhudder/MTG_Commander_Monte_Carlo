@@ -156,6 +156,11 @@ Terastodon                            +0.41+-0.09         +0.63+-0.11        +0.
       noncreature permanents beyond its routes, which are not objects (§4). The
       delay is `threat_rebuild_max` (3), a judgement with no data that moves every
       answer's row by about a third either way.
+Mind's Eye                            +0.52+-0.11         +0.56+-0.13        +0.0059+-0.0025      both
+      MODELLED (§0z246, item 52): each opponent's draw step, and you pay {1} from
+      what you left untapped on your turn, when the draw is safe. NOT: draws the
+      pod's own spells would make (it casts none), and mana held up FOR it -- the
+      pilot spends first and pays from the rest. A floor.
 Bane of Progress                      +0.12+-0.11         +0.17+-0.13        +0.0025+-0.0025      both
       MODELLED: the ETB destroys YOUR OWN artifacts and enchantments (and fires
       when a tutor or Genesis Wave puts it in, §0z212). NOT: the pod's artifact
@@ -174,6 +179,5 @@ Storm Cauldron                        +0.33+-0.12         +0.20+-0.14        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Mind's Eye                            +0.52+-0.11         +0.56+-0.13        +0.0059+-0.0025      both
 Greater Good                          +0.32+-0.11         +0.32+-0.13        +0.0039+-0.0025      both
 Hall of Gemstone                      +0.34+-0.11         +0.30+-0.13        +0.0027+-0.0024      both

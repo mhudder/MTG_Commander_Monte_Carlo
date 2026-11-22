@@ -113,7 +113,9 @@ better use for two mana early" — was written when a Treasure was inert, and it
 is now three mana a turn in a model where the opponents never pay the {2}. That
 assumption has gone from harmless to load-bearing and it is the first thing to
 suspect if this card's row looks too good. `treasures_as_mana=False` restores
-the old behaviour exactly.
+the old behaviour exactly. SINCE ITEM 52 (§0z246, `tithe_from_pod`) THE
+OPPONENTS DO PAY: each draw step's {2}, from what they have left over after
+their turn's spending -- the assumption above is the switch's OFF rule.
 
 WIN CONDITIONS
 --------------

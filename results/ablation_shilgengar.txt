@@ -54,7 +54,6 @@ Fellwar Stone                         +1.04+-0.11         +1.24+-0.17        +0.
 Bishop of Wings                       +0.25+-0.05         +0.50+-0.11        +0.0093+-0.0025      both
 Marble Diamond                        +0.85+-0.11         +0.99+-0.17        +0.0090+-0.0032      both
 Wayfarer's Bauble                     +0.64+-0.09         +0.79+-0.15        +0.0081+-0.0029      both
-Smothering Tithe                      +0.80+-0.11         +0.91+-0.18        +0.0077+-0.0032      both
 Blood Artist                          +0.49+-0.07         +0.61+-0.12        +0.0077+-0.0026      both
 Herald of War                         +0.47+-0.06         +0.60+-0.11        +0.0076+-0.0025      both
 Reya Dawnbringer                      +0.14+-0.03         +0.36+-0.06        +0.0073+-0.0018      both
@@ -211,6 +210,13 @@ Swords to Plowshares                  +0.22+-0.05         +0.84+-0.13        +0.
 Mind Stone                            +0.96+-0.10         +0.98+-0.17        +0.0078+-0.0031      both
       MODELLED: '{T}: Add {C}.' NOT: '{1}, {T}, Sacrifice this artifact: Draw a
       card' (item 9). A floor.
+Smothering Tithe                      +0.80+-0.11         +0.91+-0.18        +0.0077+-0.0032      both
+      MODELLED (§0z246, item 52): each opponent's draw step -- every turn, its
+      first included (103.8c) -- and whether it pays the {2}, from what it has
+      left over after its turn's spending and the mana it keeps up for yours. NOT:
+      draws the pod's own spells would make (it casts none), so the trigger count
+      is a floor; lorehold's draws you force (Reforge the Soul) are never paid,
+      the owner's 2026-10-22 call, a small ceiling.
 Resplendent Angel                     +0.65+-0.08         +0.56+-0.13        +0.0074+-0.0029      both
       MODELLED: the 3/3 flier, and the 4/4 flying vigilance Angel at EACH end step
       after 5 life gained (§0z153). NOT: '{3}{W}{W}{W}: this creature gets +2/+2

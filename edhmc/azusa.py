@@ -3061,6 +3061,32 @@ class AzusaGame(BaseGame):
         if azusa_seat_upkeeps(self):
             self.verdant_kraken_tokens(1)
             self.empty_mana_pool("pod_upkeep")
+        self.minds_eye(i)
+
+    def minds_eye(self, i: int) -> None:
+        """MIND'S EYE (§0z246, item 52): "Whenever an opponent draws a card,
+        you may pay {1}. If you do, draw a card." Opponent `i` draws in the
+        draw step that follows this upkeep -- every turn, its first included
+        (103.8c) -- and you pay from what you left untapped on your own turn
+        (502.3: it stays untapped through theirs), a Treasure included, when
+        the draw is safe (§0z42). One draw an opponent turn: the pod casts
+        no draw spells. `minds_eye_from_pod` off, or `pod_mana` off, is the
+        old engine, where the card did nothing."""
+        on = self.cfg.get("minds_eye_from_pod", True)        # §0z246
+        if not (self.has("Mind's Eye") and OPP.pod_tax_on(self, on)
+                and self.opponents[i].alive):
+            return
+        self.m["minds_eye_triggers"] += 1
+        if not draw_is_safe(self, 1):
+            return
+        units = self.available_mana()
+        pay = can_pay({"gen": 1}, units)
+        if pay is None:
+            return
+        spend(self, pay, units)
+        self.m["mana_spent"] += 1
+        self.draw(1)
+        self.m["minds_eye_draws"] += 1
 
     def verdant_kraken_tokens(self, upkeeps: int):
         """Verdant Kraken: "At the beginning of EACH PLAYER'S upkeep, you

@@ -55,7 +55,7 @@ from __future__ import annotations
 
 import random
 
-from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
+from edhmc.engine import (monologue_treasures, cycle_step, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           can_afford,
                           CRNStreams, crn_random, crn_randrange,
@@ -1586,14 +1586,22 @@ def upkeep(g):
                     OPP.pod_gift(g, o, "Master of Ceremonies")
         g.make_tokens(sum(1 for x in pick if x == 1), 1, 1, "Citizen")
         g.draw(sum(1 for x in pick if x == 2))
-    if g.has("Monologue Tax"):
-        # "Whenever an opponent casts their SECOND spell each turn, create a
-        # Treasure." Taken as a per-round rate rather than tracked per
-        # opponent -- the same abstraction lorehold.py uses for this card.
-        make_token(g, "Treasure", g.cfg.get("monologue_tax_rate", 2))
-    if g.has("Rhystic Study"):
-        # "...unless that player pays {1}." Modelled as a flat rate, because
-        # whether a table pays is a social fact this model has no way to see.
+    # "Whenever an opponent casts their SECOND spell each turn, create a
+    # Treasure." From the pod's own casting since item 52 (§0z246,
+    # `monologue_from_pod`); off, the old per-round rate.
+    make_token(g, "Treasure", monologue_treasures(g))
+    if OPP.pod_tax_on(g, g.cfg.get("rhystic_from_pod", True)):
+        # "Whenever an opponent casts a spell, you may draw a card unless
+        # that player pays {1}" (§0z246): each spell the pod cast since your
+        # last upkeep that it did not pay for from what it had left over.
+        for _ in range(OPP.take_owed(g, "rhystic")):
+            if not spock_draw_safe(g, 1):    # "you MAY draw a card"
+                break
+            g.draw(1)
+            g.m["rhystic_draws"] += 1
+    elif g.has("Rhystic Study"):
+        # The old rule: a flat rate, written when whether a table pays was a
+        # social fact the model had no way to see.
         n = int(g.cfg.get("rhystic_rate", 1))
         if spock_draw_safe(g, n):            # "you MAY draw a card"
             g.draw(n)

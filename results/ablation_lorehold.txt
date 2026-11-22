@@ -55,7 +55,6 @@ Mizzix's Mastery                      +0.84+-0.16         +0.89+-0.17        +0.
 Longshot, Rebel Bowman                +1.97+-0.17         +1.63+-0.17        +0.0131+-0.0032      both
 Sunbird's Invocation                  +0.88+-0.21         +0.88+-0.22        +0.0127+-0.0041      both
 Arcane Bombardment                    +0.63+-0.20         +0.70+-0.21        +0.0121+-0.0041      both
-Smothering Tithe                      +1.01+-0.20         +0.87+-0.22        +0.0120+-0.0038      both
 Arcane Signet                         +1.38+-0.22         +1.24+-0.23        +0.0118+-0.0038      both
 Invoke Calamity                       +0.47+-0.12         +0.53+-0.13        +0.0084+-0.0026      both
 Monastery Mentor                      +0.65+-0.15         +0.55+-0.16        +0.0079+-0.0031      both
@@ -115,6 +114,13 @@ Farewell                              +0.42+-0.13         +1.04+-0.16        +0.
       and, since POD_V4 is the default (§0z140), takes the route pieces it can
       hit, which the wipe gate counts (§0z138) -- but their other permanents are
       not objects (§4). The COST is modelled and the BENEFIT is an estimate.
+Smothering Tithe                      +1.01+-0.20         +0.87+-0.22        +0.0120+-0.0038      both
+      MODELLED (§0z246, item 52): each opponent's draw step -- every turn, its
+      first included (103.8c) -- and whether it pays the {2}, from what it has
+      left over after its turn's spending and the mana it keeps up for yours. NOT:
+      draws the pod's own spells would make (it casts none), so the trigger count
+      is a floor; lorehold's draws you force (Reforge the Soul) are never paid,
+      the owner's 2026-10-22 call, a small ceiling.
 Generous Gift                         +0.53+-0.15         +0.86+-0.16        +0.0115+-0.0031      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit

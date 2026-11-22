@@ -4465,14 +4465,33 @@ def land_tax(g) -> int:
 def tithe_treasures(g) -> int:
     """SMOTHERING TITHE, one rule for lorehold and shilgengar (§0z151,
     `tithe_shared`): "Whenever an opponent draws a card, that player may pay
-    {2}. If the player doesn't, you create a Treasure token." One Treasure per
-    LIVING opponent per round -- each draws for their turn and declines to
-    pay (shilgengar's reading; the pod's draws are not modelled). Lorehold's
-    copy made a flat 2 whoever was alive. Returns how many to make; the
-    caller adds them its own way."""
+    {2}. If the player doesn't, you create a Treasure token." Since item 52
+    (§0z246, `tithe_from_pod`, with `pod_mana`): each opponent's draw step,
+    unpaid from what it had left over, since your last upkeep. Off, the old
+    rule: one Treasure per LIVING opponent per round, each declining to pay
+    (shilgengar's reading); lorehold's older copy made a flat 2 whoever was
+    alive. Returns how many to make; the caller adds them its own way."""
+    if OPP.pod_tax_on(g, g.cfg.get("tithe_from_pod", True)):
+        # §0z246: each opponent's draw, unpaid from what it had left over
+        # (`opponents.settle_pod_taxes`), since your last upkeep.
+        return OPP.take_owed(g, "tithe")
     if not g.has("Smothering Tithe"):
         return 0
     return len(OPP.living(g))
+
+
+def monologue_treasures(g) -> int:
+    """MONOLOGUE TAX, one rule for tivit and lorehold (§0z246): "Whenever an
+    opponent casts their second spell each turn, you create a Treasure
+    token." With `monologue_from_pod` (and `pod_mana`), the opponents who
+    cast a second spell in a turn since your last upkeep
+    (`opponents.pod_cast`); otherwise the flat `monologue_tax_rate` (2) a
+    round. Returns how many to make; the caller makes them its own way."""
+    if OPP.pod_tax_on(g, g.cfg.get("monologue_from_pod", True)):
+        return OPP.take_owed(g, "monologue")
+    if not g.has("Monologue Tax"):
+        return 0
+    return g.cfg.get("monologue_tax_rate", 2)
 
 
 def sun_titan_pick(graveyard, exclude=()) -> Optional[Card]:

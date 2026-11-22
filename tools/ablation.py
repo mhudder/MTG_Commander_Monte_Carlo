@@ -333,7 +333,8 @@ SCRIPTED_LOREHOLD = {
     "Thrill of Possibility", "Faithless Looting", "Big Score",
     "Unexpected Windfall", "Reforge the Soul",
     # treasures / cost. Hit the Mother Lode likewise: see PARTLY_MODELLED.
-    "Storm-Kiln Artist", "Smothering Tithe",
+    "Storm-Kiln Artist",
+    # (Smothering Tithe left 2026-11-22 for PARTLY_MODELLED, §0z246.)
     # damage / win conditions
     "Guttersnipe", "Longshot, Rebel Bowman", "Soulfire Eruption",
     "Boros Charm", "Olórin's Searing Light", "Emeria's Call",
@@ -618,7 +619,8 @@ SCRIPTED_SHILGENGAR = {
     # Smothering Tithe's knob, which is Tithe's.
     "Revel in Riches",
     # mana and draw
-    "Smothering Tithe", "Phyrexian Arena",
+    # (Smothering Tithe left 2026-11-22 for PARTLY_MODELLED, §0z246.)
+    "Phyrexian Arena",
     "Sol Ring", "Arcane Signet", "Orzhov Signet", "Fellwar Stone",
     "Marble Diamond", "Talisman of Hierarchy",
     "Wayfarer's Bauble",
@@ -1000,6 +1002,12 @@ PARTLY_MODELLED = {
             "graveyard to your hand'. A floor.",
     },
     "azusa": {
+        "Mind's Eye":
+            "MODELLED (§0z246, item 52): each opponent's draw step, and you "
+            "pay {1} from what you left untapped on your turn, when the draw "
+            "is safe. NOT: draws the pod's own spells would make (it casts "
+            "none), and mana held up FOR it -- the pilot spends first and "
+            "pays from the rest. A floor.",
         # Item 24's change 4 (§0z139).
         "Sylvan Scrying":
             "MODELLED: a land to hand, `AzusaGame.land_rank`'s: a fetch, then "
@@ -1068,6 +1076,13 @@ PARTLY_MODELLED = {
             "against the pod's flier bodies since item 44 (item 7). A floor.",
     },
     "tivit": {
+        "Rhystic Study":
+            "MODELLED (§0z246, item 52): every spell the pod casts -- route "
+            "pieces, bodies, removal, wipes, counterspells -- and whether its "
+            "caster pays {1}, from what it has left over after its turn's "
+            "spending and the mana it keeps up for yours. The draws are "
+            "taken in your upkeep. NOT: spells the pod model does not cast "
+            "(its cantrips, rituals, the rest of a real hand). A floor.",
         "Promise of Loyalty":
             "'Each player puts a vow counter on a creature they control and "
             "SACRIFICES THE REST': each player keeps one (§0z118 -- until "
@@ -1192,11 +1207,12 @@ PARTLY_MODELLED = {
             "after a vote -- `voting._vote_payoffs` counts `unity_scrys` and "
             "nothing reads it (item 13). A floor.",
         "Monologue Tax":
-            "MODELLED as a RATE: `monologue_tax_rate` (2) Treasures a round, "
-            "in your upkeep. 'Whenever an opponent casts their second spell "
-            "each turn' is a fact about the pod's casting this model does "
-            "not have -- Rhystic Study's shape, and that card is BLIND for "
-            "it. The row reads the knob (item 14).",
+            "MODELLED (§0z246, item 52): each opponent that casts a second "
+            "spell in a turn -- its own or yours -- counted from the pod's "
+            "own casting; the Treasures are made in your upkeep. NOT: the "
+            "spells the pod model does not cast (its cantrips, rituals, the "
+            "rest of a real hand), so the second spell comes later than at "
+            "a real table. A floor.",
         "Mechanized Production":
             "MODELLED: a Treasure copy each upkeep and the win at eight "
             "Treasures. The enchanted artifact is taken to be a Treasure "
@@ -1211,6 +1227,14 @@ PARTLY_MODELLED = {
             "floor.",
     },
     "lorehold": {
+        "Smothering Tithe":
+            "MODELLED (§0z246, item 52): each opponent's draw step -- every "
+            "turn, its first included (103.8c) -- and whether it pays the "
+            "{2}, from what it has left over after its turn's spending and "
+            "the mana it keeps up for yours. NOT: draws the pod's own "
+            "spells would make (it casts none), so the trigger count is a "
+            "floor; lorehold's draws you force (Reforge the Soul) are never "
+            "paid, the owner's 2026-10-22 call, a small ceiling.",
         # §0z151: "can't be countered" exists since 2026-10-22.
         "Hexing Squelcher":
             "MODELLED: 'This spell can't be countered' and 'Spells you "
@@ -1310,6 +1334,14 @@ PARTLY_MODELLED = {
             "not taken). NOT: prowess. A floor.",
     },
     "shilgengar": {
+        "Smothering Tithe":
+            "MODELLED (§0z246, item 52): each opponent's draw step -- every "
+            "turn, its first included (103.8c) -- and whether it pays the "
+            "{2}, from what it has left over after its turn's spending and "
+            "the mana it keeps up for yours. NOT: draws the pod's own "
+            "spells would make (it casts none), so the trigger count is a "
+            "floor; lorehold's draws you force (Reforge the Soul) are never "
+            "paid, the owner's 2026-10-22 call, a small ceiling.",
         "Angel of Suffering":
             "MODELLED (§0z135): every point of damage dealt to you -- the "
             "pod's combat, painlands, Midnight Reaper -- prevented, and twice "
@@ -2101,13 +2133,14 @@ KNOWN_BLIND = {
         # neither row is a floor, so neither can be PARTLY MODELLED. Each
         # carries its reason in BLIND_BUT_LIVE below.
         #   Torment of Hailfire  a CEILING, not an estimate.
-        #   Rhystic Study    a flat draw rate; the knob is the row.
+        # (Rhystic Study left 2026-11-22 for PARTLY_MODELLED, §0z246: it
+        # reads the pod's own casting now.)
         # EXPROPRIATE AND THE FIVE VOTE CARDS LEFT THIS SET on 2026-09-29
         # (§0z78). They sat here with a comment saying their implementation
         # "is not the card" -- true -- but every missing clause UNDERSTATES,
         # which is the definition of PARTLY MODELLED, and the triage back-test
         # (§0z66) proved each plays differently from its matched blank.
-        "Torment of Hailfire", "Rhystic Study",
+        "Torment of Hailfire",
     },
     "azusa": {
         # removal / land destruction aimed at opponents -- this project
@@ -2120,11 +2153,8 @@ KNOWN_BLIND = {
         # project tracks planeswalker loyalty. It does now -- see
         # PLANESWALKERS in edhmc/azusa.py -- so she is SCRIPTED as of
         # 2026-09-07.)
-        # reads an OPPONENT drawing a card / a symmetric hand-refill effect,
-        # neither of which this model tracks at that granularity. Mind's Eye
-        # is MODELABLE by Smothering Tithe's rate (`tithe_treasures`, §0z151)
-        # and not modelled (§0z209 item 14): blind is honest, not inevitable.
-        "Mind's Eye",
+        # (Mind's Eye left 2026-11-22 for PARTLY_MODELLED, §0z246: the pod
+        # draws every turn since item 50, and the card reads it.)
         # (Memory Jar left 2026-11-17 for PARTLY_MODELLED, §0z228.)
         # (Storm Cauldron left 2026-10-14 for PARTLY_MODELLED, §0z135.)
         # (Sylvan Library left 2026-10-14 for SCRIPTED, item 24's change 4.
@@ -2228,10 +2258,6 @@ BLIND_BUT_LIVE = {
             "X is fixed at 6 and every opponent takes the life branch, "
             "because the pod has neither a hand nor permanents to give up "
             "(§4). A CEILING -- a real opponent pays with cards for a while.",
-        "Rhystic Study":
-            "'Unless that player pays {1}' is a social fact this model "
-            "cannot see: it draws a flat `rhystic_rate` a round. The row is "
-            "that knob, not the card.",
     },
     # (shilgengar's Angel of Suffering left 2026-10-14 for PARTLY_MODELLED,
     # §0z135: its text is modelled now.)

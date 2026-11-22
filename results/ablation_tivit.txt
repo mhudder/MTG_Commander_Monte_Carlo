@@ -90,10 +90,11 @@ Propaganda                            +0.59+-0.12         +0.95+-0.14        +0.
       mana (§0z205), so whether it pays is `attack_tax_deflect` (0.5) per {2}, a
       judgement with no data that moves tivit's taxes by about a third either way.
 Monologue Tax                         +2.30+-0.24         +2.01+-0.25        +0.0193+-0.0035      both
-      MODELLED as a RATE: `monologue_tax_rate` (2) Treasures a round, in your
-      upkeep. 'Whenever an opponent casts their second spell each turn' is a fact
-      about the pod's casting this model does not have -- Rhystic Study's shape,
-      and that card is BLIND for it. The row reads the knob (item 14).
+      MODELLED (§0z246, item 52): each opponent that casts a second spell in a
+      turn -- its own or yours -- counted from the pod's own casting; the
+      Treasures are made in your upkeep. NOT: the spells the pod model does not
+      cast (its cantrips, rituals, the rest of a real hand), so the second spell
+      comes later than at a real table. A floor.
 Ghostly Prison                        +0.59+-0.12         +1.00+-0.15        +0.0193+-0.0028      both
       MODELLED (§0z138; the default pod since §0z140): the tax turns a combat
       route's kill toward another living opponent, and since item 44's flip
@@ -162,6 +163,12 @@ Model of Unity                        +1.20+-0.19         +1.12+-0.19        +0.
       MODELLED: '{T}: Add one mana of any color.' NOT: the scry 2 after a vote --
       `voting._vote_payoffs` counts `unity_scrys` and nothing reads it (item 13).
       A floor.
+Rhystic Study                         +1.13+-0.20         +1.00+-0.21        +0.0090+-0.0032      both
+      MODELLED (§0z246, item 52): every spell the pod casts -- route pieces,
+      bodies, removal, wipes, counterspells -- and whether its caster pays {1},
+      from what it has left over after its turn's spending and the mana it keeps
+      up for yours. The draws are taken in your upkeep. NOT: spells the pod model
+      does not cast (its cantrips, rituals, the rest of a real hand). A floor.
 Swords to Plowshares                  +0.36+-0.12         +0.81+-0.15        +0.0083+-0.0029      both
       MODELLED (§0z131; the default pod since §0z140): an answer to a kill ROUTE.
       It removes a piece of an opponent's route of a kind its text can hit
@@ -267,9 +274,6 @@ Vault 11: Voter's Dilemma             -0.40+-0.14         -0.12+-0.15        +0.
 MODEL-BLIND — a low score is evidence about the MODEL, not the card
 ====================================================================================
 card                                    damage T10          damage T20             win rate    signal
-Rhystic Study                         +1.13+-0.20         +1.00+-0.21        +0.0090+-0.0032      both
-      'Unless that player pays {1}' is a social fact this model cannot see: it
-      draws a flat `rhystic_rate` a round. The row is that knob, not the card.
 Torment of Hailfire                   +2.55+-0.17         +2.38+-0.17        +0.0089+-0.0027      both
       X is fixed at 6 and every opponent takes the life branch, because the pod
       has neither a hand nor permanents to give up (§4). A CEILING -- a real

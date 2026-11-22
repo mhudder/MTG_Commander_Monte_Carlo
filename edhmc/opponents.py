@@ -188,6 +188,13 @@ class Opponent:
     # every later turn) and the Treasures it holds (one-shot, 111.10a).
     gift_lands: float = 0.0
     treasures: float = 0.0
+    # ITEM 52, PART A (§0z246): the spells this opponent has cast THIS turn
+    # (`cast_turn` names the turn: the game turn and the seat, or "you"),
+    # and the Rhystic Study triggers of its own turn, settled at its end
+    # step from what it has left over (`settle_pod_taxes`).
+    cast_turn: tuple = ()
+    casts: int = 0
+    rhystic_pending: int = 0
 
     _pcache: object = None
 
@@ -900,6 +907,108 @@ def pod_spend(g, o, amount: float, what: str, floor: float = 0.0) -> None:
         g.m["pod_overspend_events"] += 1
         left = floor
     o.mana_left = left
+    pod_cast(g, o, what)
+
+
+# ---------------------------------------------------------------------------
+# ITEM 52, PART A: YOUR TAX CARDS READ THE POD'S MANA (§0z246)
+# ---------------------------------------------------------------------------
+# The owner, 2026-11-22: "A, I agree with your assessment, and please add
+# minds eye." Rhystic Study and Smothering Tithe ask an opponent to pay
+# ("unless that player pays", 118.12a: a choice); Monologue Tax counts its
+# second spell each turn; Mind's Eye is yours to pay (azusa's engine). THE
+# PAYMENT RULE, agreed: an opponent pays only from what is LEFT OVER after
+# what it has planned to spend this turn -- its own turn's spending, and
+# the mana it keeps up for your turn (`answer_reserve`, decision 4) -- so
+# paying a tax never costs it a play. Its own turn's triggers are settled
+# at its end step, when that is known (Tithe's draw first, the draw step
+# being first); a trigger on YOUR turn is paid at once, from what is left
+# after the spell. What you are owed is collected where the flat rates
+# were taken, in your upkeep (`pod_owed`), so the timing is today's.
+# Each card behind its own switch, all needing `pod_mana`; off, the flat
+# rate exactly.
+POD_SPELL_KINDS = frozenset({"piece", "body", "spot", "ae", "wipe",
+                             "counter"})      # a tax and a ward are not spells
+TAXES_SETTLED = True        # the seam a test switches off: nothing is paid
+
+
+def pod_tax_on(g, on) -> bool:
+    """A tax card's switch, read by its caller as a literal `cfg.get` so the
+    knob registry sees it (`tools.knobs`), and `pod_mana` with it."""
+    return pod_mana_on(g) and bool(on)
+
+
+def pod_owed(g) -> dict:
+    """What the pod's casting and drawing owes you since your last upkeep:
+    Rhystic Study's draws, Smothering Tithe's and Monologue Tax's
+    Treasures."""
+    owed = getattr(g, "pod_owed_", None)
+    if owed is None:
+        owed = g.pod_owed_ = {"rhystic": 0, "tithe": 0, "monologue": 0}
+    return owed
+
+
+def take_owed(g, kind: str) -> int:
+    owed = pod_owed(g)
+    n, owed[kind] = owed[kind], 0
+    return n
+
+
+def pod_spare(g, o) -> float:
+    """What `o` has left over after its plans: untapped mana less what it
+    keeps up for your turn."""
+    return o.mana_left - answer_reserve(g, o)
+
+
+def _pay_unless(g, o, n: int, cost: float, kind: str) -> int:
+    """`o` pays `cost` for each of `n` "unless" triggers it can afford from
+    what it has left over; returns how many it did not pay."""
+    paid = 0
+    if TAXES_SETTLED:
+        while paid < n and pod_spare(g, o) >= cost - 1e-9:
+            o.mana_left -= cost
+            paid += 1
+    g.m[f"{kind}_triggers"] += n
+    g.m[f"{kind}_paid"] += paid
+    return n - paid
+
+
+def pod_cast(g, o, what: str) -> None:
+    """Opponent `o` cast a spell (601.2i: cast triggers trigger now)."""
+    if what not in POD_SPELL_KINDS:
+        return
+    seat = getattr(g, "pod_seat", None)
+    own = seat is not None and g.opponents[seat] is o
+    turn = (g.turn, "you" if seat is None else seat)
+    if o.cast_turn != turn:
+        o.cast_turn, o.casts = turn, 0
+    o.casts += 1
+    if (o.casts == 2 and g.has("Monologue Tax")
+            and pod_tax_on(g, g.cfg.get("monologue_from_pod", True))):
+        pod_owed(g)["monologue"] += 1                    # "their second spell"
+        g.m["monologue_triggers"] += 1
+    if (g.has("Rhystic Study")
+            and pod_tax_on(g, g.cfg.get("rhystic_from_pod", True))):
+        if own:
+            o.rhystic_pending += 1                       # settled at its end
+        else:
+            pod_owed(g)["rhystic"] += _pay_unless(g, o, 1, 1.0, "rhystic")
+
+
+def settle_pod_taxes(g, i) -> None:
+    """Opponent `i`'s end step: what it pays from what it has left over.
+    Smothering Tithe's trigger is its draw step's -- every turn, its first
+    included (103.8c) -- and so is paid first; then Rhystic Study's for the
+    spells of its turn. What it does not pay is owed to you."""
+    if not pod_mana_on(g):
+        return
+    o = g.opponents[i]
+    if (g.has("Smothering Tithe")
+            and pod_tax_on(g, g.cfg.get("tithe_from_pod", True))):
+        pod_owed(g)["tithe"] += _pay_unless(g, o, 1, 2.0, "tithe")
+    n, o.rhystic_pending = o.rhystic_pending, 0
+    if n:
+        pod_owed(g)["rhystic"] += _pay_unless(g, o, n, 1.0, "rhystic")
 
 
 def charge_pieces(g, o) -> None:
@@ -5443,6 +5552,7 @@ def _pod_seat_round(g, before_act=None) -> None:
             # THE END STEP IS EVERY TURN'S (§0z184 finding 3, §0z185). It sat
             # under removal's pod-turn-3 gate, so the pod's first two rounds
             # had no end steps. `pod_end_steps_early=False` restores the gate.
+            settle_pod_taxes(g, i)            # §0z246: its end step
             if pod_turn(g) >= 3 or g.cfg.get("pod_end_steps_early", True):
                 pod_end_step_hook(g, i)
     finally:

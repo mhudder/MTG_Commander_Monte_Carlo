@@ -34,7 +34,7 @@ from edhmc.engine import (cleanup_step, late_land_drop, begin_game, Snapshots, B
                           engine_cfg, choose_mode_cost, lazy_pay_of,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng, tutor_take, remove_card,
-                          land_tax, tithe_treasures, turn_knob,
+                          land_tax, tithe_treasures, monologue_treasures, turn_knob,
                           spell_mastery)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import FLASHBACK, REBOUND
@@ -2961,8 +2961,10 @@ def tithe_forced_draws(g, n) -> None:
     """SMOTHERING TITHE on draws YOU make the pod take -- Reforge the Soul's
     seven, Mikokoro's and Geier Reach Sanitarium's one (§0z153,
     `tithe_forced_draws`). Each is a trigger, and the pod pays for none of
-    them -- the owner's call (2026-10-22), the same assumption the round's
-    own Treasures make (`engine.tithe_treasures`)."""
+    them -- the owner's call (2026-10-22), made when the round's own
+    Treasures assumed the same. Those are paid from the pod's leftover mana
+    since §0z246 (`engine.tithe_treasures`); these still are not, a small
+    ceiling, said there."""
     if g.has("Smothering Tithe") and g.cfg.get("tithe_forced_draws", True):
         k = int(n) * len(OPP.living(g))
         g.treasures += k
@@ -3213,8 +3215,8 @@ def your_turn(g, extra=False):
     elif g.has("Smothering Tithe"):
         g.treasures += 2
         g.m["treasures_made"] += 2
-    if g.has("Monologue Tax") and not extra:
-        n = g.cfg.get("monologue_tax_rate", 2)   # 3 opponents, 2nd spell each
+    n = 0 if extra else monologue_treasures(g)   # §0z246, one rule
+    if n:
         g.treasures += n
         g.m["treasures_made"] += n
     # Chief Magistrate of Mercadia's upkeep trigger (§0z74).
