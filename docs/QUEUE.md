@@ -270,6 +270,18 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     (2) in rendmaw; Agadeem's Awakening (2) in shilgengar. Chord of
     Calling already plans its X (§0z213). Not started; queued behind item
     52 (the owner: "let's move on to item 52 instead").
+    **BUILT AND MEASURED 2026-11-22 (§0z248)**, the owner: "Start the
+    X-spell logic, item 45". Eight switches, all OFF: `genesis_wave_x`,
+    `animist_x`, `nylea_x`, `gsz_x_plan` (azusa), `torment_x` (tivit),
+    `debt_x` (karlov), and, by the owner's choice the same day, The
+    Meathook Massacre's -X/-X ETB with its X (`meathook_x`, rendmaw) and
+    Agadeem's Awakening's front face (`agadeem_x`, shilgengar -- it was
+    cast as a blank). At T20, N=15,000: Genesis Wave +0.0062, Torment
+    +0.0030 (a ceiling), Meathook +0.0061 (the cheaper cast, not the ETB),
+    Debt +0.0021, Agadeem +0.0013, each significant; Animist's, Nylea's
+    and Green Sun's inside their bars. **Left, the owner's call**: which to
+    flip (each moves its deck's baseline; the caches are SUSPECT already,
+    §0z247), and the fresh-seed re-measure (§0z170) of any flipped.
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a

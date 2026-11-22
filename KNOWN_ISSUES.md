@@ -300,7 +300,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
-| [0z248](#0z248) | BUILT | **Item 45's rest: each fixed-X spell pays its own X, eight switches OFF** -- six sized by the mana, Meathook's -X/-X ETB and Agadeem's front face built (it was cast as a blank) |
+| [0z248](#0z248) | BUILT | **Item 45's rest: each fixed-X spell's own X, eight switches OFF**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021, Agadeem +0.0013 at T20; Animist, Nylea, Green Sun nulls |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21558,13 +21558,50 @@ identity 0 at N=400.
 expected set exact on the first run.
 
 **Every switch off: every active deck BIT-IDENTICAL** to `bc34060` at 2,000
-seeds (`check_unchanged_decks`, the modules). The staged lists, hashed
-whole per game at both trees: see the measurements below.
+seeds -- the modules (`check_unchanged_decks`) AND the staged lists
+(`build_pending`, every game's whole output hashed at both trees, seeds
+0..1999, the counters this change adds left out: 0 of 12,000 games
+differ).
 
 ### Measured
 
-Pending: each switch ON against OFF, `diagnostics.run_knob_ab`, the staged
-list, N=15,000 paired, seeds 5000.. -- recorded here when they land.
+Each switch ON against OFF, `diagnostics.run_knob_ab`, the staged list,
+N=15,000 paired, seeds 5000..19999 (`results/knob_ab_<deck>_<switch>.txt`).
+Every identity 0: no game outside a switch's reach differs.
+
+| switch (deck) | T10 | T20 | reached | X a cast (old) | what moved |
+|---|---|---|---|---|---|
+| `genesis_wave_x` (azusa) | **+0.0079 ±0.0019** | **+0.0062 ±0.0020** | 16.5% | 12.3 (6) | permanents put 0.79 -> 1.72 a game; `drew_from_empty` 0.0003 -> 0.0011 |
+| `animist_x` (azusa) | +0.0014 ±0.0016 | +0.0007 ±0.0021 | 15.7% | 9.2 (4) | lands put 0.21 -> 0.46 a game |
+| `nylea_x` (azusa) | -0.0001 ±0.0014 | +0.0002 ±0.0018 | 14.0% | 4.7 (3) | lands played +0.06 a game: the Forests mostly sit in hand |
+| `gsz_x_plan` (azusa) | +0.0019 ±0.0028 | -0.0001 ±0.0032 | 30.2% | 3.9 (3) | in hand 4.63 -> 4.21 main phases a game |
+| `torment_x` (tivit) | **+0.0062 ±0.0018** | **+0.0030 ±0.0018** | 16.5% | 11.1 (6) | 1.5 fewer Treasures spent a game |
+| `debt_x` (karlov) | **+0.0006 ±0.0005** | **+0.0021 ±0.0010** | 7.4% | 4.4 (3) | life gained +0.24, spells cast -0.02 a game |
+| `meathook_x` (rendmaw) | **+0.0015 ±0.0012** | **+0.0061 ±0.0023** | 16.2% | 0.6 (2) | drain +0.36, `meathook_pod_gains` +0.39; the ETB kills 0.06 pod bodies and 0.05 tokens a game |
+| `agadeem_x` (shilgengar) | +0.0002 ±0.0003 | **+0.0013 ±0.0009** | 2.3% | 3.0 (never cast as a spell) | the blank's 0.022 casts a game gone; 0.009 real casts, 1.4 creatures each |
+
+**What each number is.** Genesis Wave and Torment are the bigger X doing
+what the card says. **Torment's is a CEILING**: the pod pays only in life,
+never a permanent or a card (`tivit.resolve` says so), so a bigger X
+widens a ceiling the card already was. **Meathook's is the CHEAPER CAST, not
+the ETB**: the owner's rule stops X at the first non-token creature of
+yours, and rendmaw's board almost always holds a 1- or 2-toughness one, so
+it is cast at X 0 for {B}{B}, earlier, and drains longer; the -X/-X itself
+reaches almost nothing. **Agadeem's is mostly the blank removed**: the
+card is no longer thrown away, and stays a land drop. Animist's, Nylea's
+and Green Sun's are inside their bars: the X they add buys nothing this
+model sees (Nylea's Forests are not played; Green Sun's rule is the
+shared one, §0z213, at a null as Chord's ranking was).
+
+**Not re-measured on fresh seeds (§0z170)**: each rule is one arm, not a
+winner picked among several, but a number to quote at adoption needs it.
+
+**Not flipped.** Each moves its deck's baseline, so every flip makes its
+deck's cache need a rebuild -- the six are SUSPECT already (§0z247). Which
+to flip is the owner's call.
+
+**Stranded knobs not run** (`run_knob_liveness`, §0z205): the switches are
+off, so no knob's reach moved; said, not measured.
 
 ## How to read an ablation table
 
