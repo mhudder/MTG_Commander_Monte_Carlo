@@ -40,6 +40,7 @@ import random
 
 from edhmc.engine import (cycle_step, static_walker_plus, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, drew_from_empty, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, available_mana,
                           spend, play_land, run_etb, engine_cfg, choose_mode_cost, lazy_pay_of,
+                          largest_x, x_cost,
                           devotion as EN_devotion,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
@@ -181,7 +182,8 @@ class KarlovGame(BaseGame):
             "citadel_skips_top": 0, "citadel_skips_necro": 0,
             "citadel_skips_konrad": 0, "citadel_spins": 0,
             "citadel_pod_casts": 0, "citadel_wipe_held": 0,
-            "citadel_x0_held": 0, "debt_x0": 0, "citadel_skips_tutor": 0,
+            "citadel_x0_held": 0, "debt_x0": 0,
+            "x_spells_paid": 0, "debt_x_casts": 0, "debt_x": 0, "citadel_skips_tutor": 0,
             "citadel_stop_land": 0, "citadel_stop_floor": 0,
             "citadel_stop_library": 0,
             # Candidates, 2026-10-12 (§0z128).
@@ -1563,6 +1565,7 @@ def main_phase(g):
 
         options = []
         mode_cost = {}
+        xs = {}                  # item 45: the X each option pays
         for c in g.hand:
             if c.is_land:
                 continue
@@ -1574,6 +1577,19 @@ def main_phase(g):
             # cost. No card in this list declares one today; the point is
             # that one CAN, and check_alt_cost_coverage enforces it.
             # Only the card cast is priced (§0z149).
+            if c.script == "debt" and g.cfg.get("debt_x", False):  # §0z248
+                # ITEM 45 (§0z248): Debt to the Deathless at the LARGEST X
+                # the mana affords, never below the old fixed 3
+                # (`engine.largest_x`). THE JUDGEMENT: every mana -- each X
+                # is two life from each opponent and their total back as ONE
+                # lifegain event, so nothing else in hand is weighed against
+                # it; the priority order decides what is cast first.
+                x = largest_x(c, reduce_cost(g, c), units)
+                if x is not None:
+                    options.append((c, None))
+                    mode_cost[id(c)] = x_cost(c, reduce_cost(g, c), x)
+                    xs[id(c)] = x
+                continue
             mode = choose_mode_cost(c, OPP.wipe_mode_cost(
                 g, c, reduce_cost(g, c), units), units)
             if mode is not None:
@@ -1593,6 +1609,8 @@ def main_phase(g):
         card, pay = pick[0], pay_of(pick)
         spend_lg(g, pay, units)
         g.m["mana_spent"] += len(pay)
+        if id(card) in xs:
+            g.m["x_spells_paid"] += 1        # item 45: paid, countered or not
         if any(c is card for c in g.hand):
             remove_card(g.hand, card)
         else:                        # Lurrus's permission, spent (§0z84)
@@ -1612,7 +1630,7 @@ def main_phase(g):
             countered_cast_triggers(g, card)
             konrad_card(g, card)     # from the stack, §0z153
             continue
-        resolve(g, card)
+        resolve(g, card, x=xs.get(id(card)))
         if g.result is not None:
             return
 
@@ -2248,9 +2266,11 @@ def countered_cast_triggers(g, card):
         cast_triggers(g, card)
 
 
-def resolve(g, card, x0=False):
+def resolve(g, card, x0=False, x=None):
     """`x0`: the spell was cast with X = 0 (CR 107.3b) -- Bolas's Citadel's
-    life is an alternative cost that does not include X (`citadel_cost`)."""
+    life is an alternative cost that does not include X (`citadel_cost`).
+    `x`: the X the main phase paid (item 45, §0z248); None is the old fixed
+    X, `x_pips`."""
     g.m["spells_cast"] += 1
     if card.name in g.cfg.get("watch", ()):
         g.m["cast_test_card"] = 1
@@ -2275,9 +2295,14 @@ def resolve(g, card, x0=False):
         # life lost this way." With X=3 that is 6 per opponent, and the life
         # gain is ONE event for the total — not one event per opponent. The
         # old loop created three Karlov triggers where the card makes one.
+        if x is None:
+            x = card.x_pips
+        else:
+            g.m["debt_x_casts"] += 1          # item 45, §0z248
+            g.m["debt_x"] += x
         n = len(OPP.living(g))
-        total = 6 * n
-        dealt = OPP.damage_each(g, 6)
+        total = 2 * x * n
+        dealt = OPP.damage_each(g, 2 * x)
         g.m["damage"] += dealt
         g.m["drain_damage"] += dealt
         gain_life(g, total)

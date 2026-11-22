@@ -300,6 +300,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
+| [0z248](#0z248) | BUILT | **Item 45's rest: each fixed-X spell pays its own X, eight switches OFF** -- six sized by the mana, Meathook's -X/-X ETB and Agadeem's front face built (it was cast as a blank) |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21485,6 +21486,85 @@ creatures only**:
 - **Stranded knobs not run** (`run_knob_liveness`, §0z205): the change only
   adds mana to opponents that hold mana creatures, and no knob reads a
   mana creature; said, not measured.
+
+<a id="0z248"></a>
+
+## 0z248. BUILT -- item 45's rest: each fixed-X spell pays its own X, behind its own switch, OFF
+
+**The owner, 2026-11-22: "each of these need at least a small logic build
+around them, since they mostly do different things"**, then "Start the
+X-spell logic, item 45". Queue item 45's last part (§0z197 A7): the X
+spells of the staged lists each cast at one fixed X (`x_pips`). Built the
+item-44 way, one switch a card, OFF until measured; the flip is the
+owner's.
+
+**Oracle text read from Scryfall, 2026-11-22**, for all eight.
+
+### The shared rule (`engine.largest_x`, `engine.x_cost`)
+
+The largest X a pool affords, by bisection over `can_afford` (no payment
+built, §0z147), NEVER BELOW THE OLD FIXED X -- so each of the six cards
+below is castable exactly when it was and is only ever cast bigger --
+under the caller's own limit `ok(x)`, assumed monotone. `floor=` lowers
+the smallest X considered (Meathook, Agadeem). Each card's caller says its
+judgement where it calls it.
+
+### The cards
+
+| card (deck) | switch | the X | the judgement, said out loud |
+|---|---|---|---|
+| Genesis Wave (azusa) | `genesis_wave_x` | largest, >= 6 | capped where the decking guard stops it (`draw_is_safe`, the guard the fixed 6 already had, §0z210) |
+| Animist's Awakening (azusa) | `animist_x` | largest, >= 4 | no more than the library holds |
+| Nylea's Intervention (azusa) | `nylea_x` | largest, >= 3 | no more than the Forests left -- the only lands its search takes here, the old pick unchanged |
+| Green Sun's Zenith (azusa) | `gsz_x_plan` | planned for a target | trostani's rule, `engine.x_plan` (§0z213): one card, one rule (§0u); may cast SMALLER than 3, or hold it when no target reaches `tutor_floor` |
+| Torment of Hailfire (tivit) | `torment_x` | largest, >= 6 | every mana, Treasures too; what a Treasure would do later (Revel's ten) is not weighed; no cap at lethal |
+| Debt to the Deathless (karlov) | `debt_x` | largest, >= 3 | every mana; the priority order decides what is cast first |
+| The Meathook Massacre (rendmaw) | `meathook_x` | largest from 0 | the owner's rule: no X that kills a non-token creature of yours (the commander included); every token X reaches is spent, and counted as the drain it is |
+| Agadeem's Awakening (shilgengar) | `agadeem_x` | largest from 0, above the ultimate's reserve | cast only with a creature it can return; no X past the graveyard's biggest mana value (it returns nothing more); the highest-priority creature at each mana value |
+
+**Two clauses the engine did not have, built with their X** (the owner's
+choice, asked 2026-11-22):
+
+- **Meathook's ETB** ("each creature gets -X/-X until end of turn",
+  `engine.meathook_etb`): the pod's side as Massacre Wurm's -2/-2 is
+  (`kill_pod_bodies`, each a death event; the creature route pieces X
+  reaches go, `wipe_takes` scope "minus_x"), off `pod_bodies` nothing;
+  your side in one event (`simultaneous`, CR 603.10a), never saved by
+  indestructible (`destroy(..., destroys=False)`). The survivors' smaller
+  toughness is not modelled, as for the Wurm. With the switch off the ETB
+  does nothing, as before.
+- **Agadeem's front face** (`ShilgengarGame.agadeem_x`, `agadeem_return`):
+  "return ... any number of target creature cards that each have a
+  different mana value X or less" -- out of the graveyard first, then each
+  enters (one action, as the ultimate's return), no finality counter.
+
+**FOUND ON THE WAY: Agadeem's front face was cast as a BLANK.** With no
+script and priority 1, shilgengar's main phase cast it ({2}{B}{B}{B}) when
+nothing else was castable, and it went to the graveyard having done
+nothing -- the land face lost too: 7 resolutions in 400 games (seeds
+5000..5399). `agadeem_blank_casts` counts it (either rule, at payment);
+`agadeem_x` replaces it. Hagra Mauling, Malakir Rebirth and lorehold's
+Emeria's Call may be the same shape: suggested as their own task, not
+checked here.
+
+**The reach** (`run_knob_ab`'s identity): `x_spells_paid`, counted at
+PAYMENT -- a countered X spell paid its bigger X and never resolved, which
+the first resolution-time counter missed (2 games in 400 differed) -- with
+`gsz_seen` (a main phase with Green Sun's Zenith in hand, either rule: the
+plan can hold it) and `agadeem_blank_casts` (the old rule's blank). Each
+identity 0 at N=400.
+
+**Pinned**: `tests/test_x_spells.py`, 16 cases A-P, six mutations, every
+expected set exact on the first run.
+
+**Every switch off: every active deck BIT-IDENTICAL** to `bc34060` at 2,000
+seeds (`check_unchanged_decks`, the modules). The staged lists, hashed
+whole per game at both trees: see the measurements below.
+
+### Measured
+
+Pending: each switch ON against OFF, `diagnostics.run_knob_ab`, the staged
+list, N=15,000 paired, seeds 5000.. -- recorded here when they land.
 
 ## How to read an ablation table
 

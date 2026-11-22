@@ -142,7 +142,7 @@ from edhmc.engine import (cleanup_step, late_land_main2, backwoods_pool, begin_g
                           crn_shuffle, make_rng, seal_rng,
                           tutor_take, sylvan_library, abundance_draw,
                           remove_card, spell_mastery, convoke_pool,
-                          x_plan)
+                          x_plan, x_cost, largest_x)
 from edhmc.decks._evasion import ELF_ELEMENTAL, FOREST, HUMAN, PLANT, LAND_RULES
 from edhmc import opponents as OPP
 
@@ -463,6 +463,8 @@ class AzusaGame(BaseGame):
         # and the Chord plan the cast chose, read as it resolves.
         self.combat_turn = -1
         self.chord_plan = None
+        self.cast_x = None       # item 45: (card, X) for the spell resolving
+        self.gsz_plan = None     # item 45: Green Sun's Zenith's x_plan
         self.wildspeaker_bonus = 0      # Return of the Wildspeaker, non-Humans
         # PER-PERMANENT until-end-of-turn effects (§0z101). Craterhoof's bonus
         # above is one number for the whole board, which is right for its text
@@ -647,6 +649,12 @@ class AzusaGame(BaseGame):
             "chord_casts": 0,           # Chord of Calling by the shared rule
             "chord_x": 0,               # ... the X paid, summed
             "chord_convoked": 0,        # ... creatures tapped for it
+            # item 45 (§0z248): an X spell cast at the X the pool affords
+            "x_spells_paid": 0,
+            "gsz_seen": 0, "gsz_x_casts": 0, "gsz_x": 0,
+            "wave_x_casts": 0, "wave_x": 0,
+            "animist_x_casts": 0, "animist_x": 0,
+            "nylea_x_casts": 0, "nylea_x": 0,
             "mossborn_doublings": 0,    # Mossborn Hydra: counter doublings
             "bristly_counters": 0,      # Bristly Bill: landfall counters
             "bristly_activations": 0,   # ... the {3}{G}{G} doubling
@@ -2492,7 +2500,10 @@ class AzusaGame(BaseGame):
                 self.hand.append(land)
             self.searched()                  # "... then shuffle."
         elif script == "green_sun":
-            self.tutor_creature(3)
+            if self.gsz_plan is not None:              # item 45, §0z248
+                self.planned_tutor(self.gsz_plan, "gsz_x")
+            else:
+                self.tutor_creature(3)
         elif script == "chord_of_calling":
             if self.chord_plan is not None:
                 self.chord_resolve(self.chord_plan)
@@ -2511,11 +2522,11 @@ class AzusaGame(BaseGame):
         elif script == "return_wildspeaker":
             self.return_of_the_wildspeaker()
         elif script == "genesis_wave":
-            self.wave(6, count=3)
+            self.wave(self.x_paid(card, "wave_x"), count=3)
         elif script == "animist":
-            self.wave(4, lands_only=True)
+            self.wave(self.x_paid(card, "animist_x"), lands_only=True)
         elif script == "nylea_land":
-            for _ in range(3):
+            for _ in range(self.x_paid(card, "nylea_x")):
                 land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
                 if land is None:
                     break
@@ -2845,10 +2856,11 @@ class AzusaGame(BaseGame):
         return perm
 
     def wave(self, x, count=None, lands_only=False):
-        """Genesis Wave / Animist's Awakening, both fixed-X approximations —
-        see the module docstring for why X-spells here use a hardcoded X
-        rather than a dynamic one, the same convention `Debt to the
-        Deathless` and `Torment of Hailfire` already use elsewhere.
+        """Genesis Wave / Animist's Awakening at X. By default X is the old
+        fixed X (`x_pips`: 6 and 4, the convention Debt to the Deathless and
+        Torment of Hailfire used too); ITEM 45 (§0z248) pays the largest X
+        the main phase affords instead, behind `genesis_wave_x` and
+        `animist_x`, OFF until measured (`x_paid`, `x_limit`).
 
         GENESIS WAVE BY ITS TEXT (§0z210): "Reveal the top X cards of your
         library. You may put any number of permanent cards with mana value X
@@ -2946,6 +2958,34 @@ class AzusaGame(BaseGame):
             self.make_permanent(c, sick=False, tapped=not mastery)
         for c in lands:
             self.land_entered(c, played=False)
+
+    def x_paid(self, card, metric):
+        """The X `card` resolves with: what the main phase paid (item 45,
+        `cast_x`), else the old fixed X (`x_pips`) -- every other way it
+        resolves, and every switch off. Counted under `metric`."""
+        if self.cast_x is None or self.cast_x[0] is not card:
+            return card.x_pips
+        self.m[metric + "_casts"] += 1
+        self.m[metric] += self.cast_x[1]
+        return self.cast_x[1]
+
+    def planned_tutor(self, plan, metric):
+        """Green Sun's Zenith by its plan (item 45, §0z248), the way
+        `chord_resolve` takes Chord's: the target X was paid for, else the
+        biggest creature X affords. Counted under `metric`."""
+        target, cost = plan[0], plan[1]
+        x = cost.get("gen", 0)
+        self.m[metric + "_casts"] += 1
+        self.m[metric] += x
+        if any(c is target for c in self.library):
+            remove_card(self.library, target)
+            self.searched()
+            perm = self.make_permanent(target, sick=True)
+            self.ascended = self.ascended or len(self.board) >= 10
+            if self.cfg.get("tutor_etb", True):
+                self.queue_etb(target, perm)
+            return
+        self.tutor_creature(x)
 
     def chord_resolve(self, plan):
         """Chord of Calling by the shared plan (§0z213): "Search your library
@@ -3647,10 +3687,14 @@ class AzusaGame(BaseGame):
             chord_rule = self.cfg.get("chord_convoke", True)
             cpool = None
             plans = {}
+            gsz_plans = {}           # item 45: Green Sun's Zenith's plan
+            xs = {}                  # item 45: the X each option pays
             chord_in_hand = any(c.name == "Chord of Calling"
                                 for c in self.hand)
             if chord_in_hand:
                 self.m["chord_seen"] += 1    # either rule: the A/B's reach
+            if any(c.script == "green_sun" for c in self.hand):
+                self.m["gsz_seen"] += 1      # item 45: either rule, the reach
             if chord_rule and chord_in_hand:
                 cpool = convoke_pool(self, units,
                                      self.combat_turn != self.turn)
@@ -3684,6 +3728,30 @@ class AzusaGame(BaseGame):
                         options.append((c, plan[2]))
                         mode_cost[id(c)] = plan[1]
                         pools[id(c)] = cpool
+                    continue
+                # ITEM 45 (§0z248): each fixed-X spell's own X, behind its
+                # own switch, OFF until measured. Green Sun's Zenith plans its
+                # X for a target by the shared rule (`engine.x_plan`, as
+                # trostani plays the same card); the other three pay the
+                # LARGEST X the pool affords, never below the old fixed X
+                # (`engine.largest_x`), so each is castable exactly when it
+                # was and only ever cast bigger.
+                if self.x_switch(c.script):
+                    if c.script == "green_sun":
+                        plan = x_plan(self, c, units)
+                        if plan is not None:
+                            gsz_plans[id(c)] = plan
+                            options.append((c, plan[2]))
+                            mode_cost[id(c)] = plan[1]
+                            pools[id(c)] = units
+                        continue
+                    base = self.cost_of(c)
+                    x = largest_x(c, base, units, ok=self.x_limit(c))
+                    if x is not None:
+                        options.append((c, None))
+                        mode_cost[id(c)] = x_cost(c, base, x)
+                        pools[id(c)] = units
+                        xs[id(c)] = x
                     continue
                 # "Spend this mana only to cast CREATURE SPELLS or activate
                 # abilities of creatures", so the restricted pool is offered to
@@ -3743,6 +3811,26 @@ class AzusaGame(BaseGame):
                 self.resolve(card)
                 self.chord_plan = None
                 continue
+            if id(card) in gsz_plans:
+                # Item 45: Green Sun's Zenith at the X its target needs, paid
+                # from the real units (no convoke on this card).
+                spend(self, pay, units)
+                self.m["mana_spent"] += len(pay)
+                self.m["x_spells_paid"] += 1
+                remove_card(self.hand, card)
+                idx = self.spells_this_turn
+                self.spells_this_turn += 1
+                if OPP.countered(self, card, idx):
+                    self.m["countered"] += 1
+                    self.graveyard.append(card)
+                    if card.name in self.cfg.get("watch", ()):
+                        self.m["test_card_answered"] += 1
+                        self.m["test_card_countered"] += 1
+                    continue
+                self.gsz_plan = gsz_plans[id(card)]
+                self.resolve(card)
+                self.gsz_plan = None
+                continue
             # Only the REAL units tap a permanent. Anything the payment took
             # from Castle Garenbrig's pool is mana that has already been paid
             # for -- charging it to the lands as well would tap four of them to
@@ -3755,6 +3843,8 @@ class AzusaGame(BaseGame):
                 del self.creature_mana[:from_castle]
                 self.m["castle_mana_spent"] += from_castle
             self.m["mana_spent"] += len(pay)
+            if id(card) in xs:
+                self.m["x_spells_paid"] += 1     # item 45: paid, countered or not
             from_top = bool(self.library) and card is self.library[-1]
             if from_top:
                 self.library.pop()
@@ -3771,7 +3861,44 @@ class AzusaGame(BaseGame):
                     self.m["test_card_answered"] += 1
                     self.m["test_card_countered"] += 1
                 continue
+            self.cast_x = (card, xs[id(card)]) if id(card) in xs else None
             self.resolve(card)
+            self.cast_x = None
+
+    def x_switch(self, script) -> bool:
+        """Item 45 (§0z248): each fixed-X spell's own switch, OFF until
+        measured, read as a literal so `tools.knobs` finds each one."""
+        if script == "green_sun":
+            return self.cfg.get("gsz_x_plan", False)     # x_plan, as trostani
+        if script == "genesis_wave":
+            return self.cfg.get("genesis_wave_x", False)  # largest X, §0z248
+        if script == "animist":
+            return self.cfg.get("animist_x", False)       # largest X, §0z248
+        if script == "nylea_land":
+            return self.cfg.get("nylea_x", False)         # largest X, §0z248
+        return False
+
+    def x_limit(self, card):
+        """Item 45 (§0z248): the caller's limit on an X `engine.largest_x`
+        may pay, each a judgement said here. None is no limit but the mana.
+
+        GENESIS WAVE: the reveal takes the top X whatever is kept, so X stops
+          where the decking guard would (`draw_is_safe`, the old rule's
+          guard at its fixed 6, §0z210).
+        ANIMIST'S AWAKENING: no more than the library holds -- a bigger X
+          reveals nothing more.
+        NYLEA'S INTERVENTION: no more than the Forests left, the only lands
+          its search takes here (the old rule's pick, unchanged) -- "up to X
+          land cards", so mana past them finds nothing."""
+        if card.script == "genesis_wave":
+            return lambda x: draw_is_safe(self, x)
+        if card.script == "animist":
+            return lambda x: x <= max(card.x_pips, len(self.library))
+        if card.script == "nylea_land":
+            forests = sum(1 for c in self.library
+                          if c.is_land and c.name == "Forest")
+            return lambda x: x <= max(card.x_pips, forests)
+        return None
 
     def creature_spell_cast(self, card):
         """A creature SPELL was just cast (§0z101). Called from the two places

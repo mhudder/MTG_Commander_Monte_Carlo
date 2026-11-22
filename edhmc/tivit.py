@@ -57,7 +57,7 @@ import random
 
 from edhmc.engine import (monologue_treasures, cycle_step, cleanup_step, late_land_drop, remove_card, begin_game, Snapshots, BaseGame, finish, lookahead_pick, cast_rank, Metrics, london_mulligan, Board, Card, Permanent, can_pay, play_land,
                           engine_cfg, choose_mode_cost, lazy_pay_of,
-                          can_afford,
+                          can_afford, largest_x, x_cost,
                           CRNStreams, crn_random, crn_randrange,
                           crn_shuffle, make_rng, seal_rng,
                           enter_loyalty, walker_ready, walker_dies_at_zero,
@@ -110,6 +110,7 @@ class TivitGame(BaseGame):
         self.venser_return = False      # Tivit is in exile until end step
         self.soldier_tokens = 0         # Lieutenants / Vault 11, real bodies
         self.saga_lore = {}             # id -> [Saga permanent, lore] (§0z83)
+        self.cast_x = None              # item 45: (card, X) resolving
 
         cfg.setdefault("shroud_sources", ("Lightning Greaves",))
         cfg.setdefault("protection_cards", ())
@@ -119,6 +120,7 @@ class TivitGame(BaseGame):
         self.m = Metrics({
             "damage": 0.0, "drain_damage": 0.0, "combat_damage": 0.0,
             "cards_drawn": 0, "spells_cast": 0,
+            "x_spells_paid": 0, "torment_x_casts": 0, "torment_x": 0,
             "mana_spent": 0, "mana_floated": 0, "stranded_mv": 0,
             "turn_lethal": 99, "turn_won": 99,
             "removal_eaten": 0, "ae_removal_eaten": 0, "wipes_suffered": 0,
@@ -1015,6 +1017,17 @@ def dig_the_pile(g) -> None:
 # Casting
 # ---------------------------------------------------------------------------
 
+def torment_x_rule(g, card) -> bool:
+    """Item 45 (§0z248): Torment of Hailfire pays the largest X the mana
+    affords (`torment_x`, OFF until measured). THE JUDGEMENT: every mana,
+    Treasures too -- it is the deck's finisher, and a Treasure spent is an
+    artifact leaving, which the drains read. What a Treasure would have done
+    later (Revel in Riches' ten) is not weighed. No cap at lethal: past it
+    the game is over, so the mana is not missed."""
+    return (card.script == "torment"
+            and g.cfg.get("torment_x", False))
+
+
 def reduce_cost(g, card) -> dict:
     return dict(card.cost)
 
@@ -1067,6 +1080,7 @@ def main_phase(g):
         options = []
         pools = {}
         mode_cost = {}
+        xs = {}                  # item 45: the X each option pays
         units = mana_units(g)
         for c in g.hand:
             if c.is_land:
@@ -1099,6 +1113,18 @@ def main_phase(g):
             pool = (mana_units(g, True) if "Artifact" in c.types
                     and untapped_powerstones(g) else units)
             # Only the lookahead reads an option's payment (§0z149).
+            if torment_x_rule(g, c):
+                # ITEM 45 (§0z248): Torment of Hailfire at the LARGEST X the
+                # mana affords, Treasures included, never below the old
+                # fixed 6 (`engine.largest_x`).
+                x = largest_x(c, reduce_cost(g, c), pool)
+                if x is not None:
+                    xcost = x_cost(c, reduce_cost(g, c), x)
+                    options.append((c, None, xcost))
+                    mode_cost[id(c)] = xcost
+                    pools[id(c)] = pool
+                    xs[id(c)] = x
+                continue
             _m = choose_mode_cost(c, OPP.wipe_mode_cost(
                 g, c, reduce_cost(g, c), pool), pool)
             if _m is not None:
@@ -1114,9 +1140,13 @@ def main_phase(g):
             g, options, units, lambda it: cast_rank(g, it[0]),   # item 42
             cost_of=lambda it: it[2],
             pay_of=lazy_pay_of(mode_cost, units, pools))[0]
-        if not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card),
-                                         units),
-                   powerstones="Artifact" in card.types):
+        if id(card) in xs:
+            if not pay(g, mode_cost[id(card)]):
+                return
+            g.m["x_spells_paid"] += 1        # item 45: paid, countered or not
+        elif not pay(g, OPP.wipe_mode_cost(g, card, reduce_cost(g, card),
+                                           units),
+                     powerstones="Artifact" in card.types):
             return
         remove_card(g.hand, card)
         idx = g.spells_this_turn
@@ -1144,7 +1174,9 @@ def main_phase(g):
         if card.name in g.cfg.get("watch", ()):
             g.m["cast_test_card"] = 1
             g.m["test_card_turn"] = min(g.m["test_card_turn"], g.turn)
+        g.cast_x = (card, xs[id(card)]) if id(card) in xs else None
         resolve(g, card)
+        g.cast_x = None
         if g.result is not None:
             return
         # Displacer Kitten: "whenever you cast a NONCREATURE spell, exile up to
@@ -1363,6 +1395,11 @@ def resolve(g, card):
         # hand and no permanents the life is the ONLY branch that exists, so
         # this is a CEILING -- a real opponent pays with cards for a while.
         x = card.mv - 2
+        cast = g.cast_x
+        if cast is not None and cast[0] is card:      # item 45, §0z248
+            x = cast[1]
+            g.m["torment_x_casts"] += 1
+            g.m["torment_x"] += x
         # A POD TOTAL -- 3X from each of the pod's opponents. See the
         # Tyrant's Choice site above for why this reads `pod_size` and not
         # `living` or a bare `len(g.opponents)`.

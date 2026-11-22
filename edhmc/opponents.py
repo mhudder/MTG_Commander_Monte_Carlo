@@ -1429,16 +1429,19 @@ def hold_answer(g, card) -> bool:
     return reach is not None and answer_target(g, reach) is None
 
 
-def wipe_takes(g, card, scope=None) -> list:
+def wipe_takes(g, card, scope=None, x=None) -> list:
     """(opponent, piece index) for every piece out that this sweeper's scope
     reaches (`OWN_WIPE_SCOPE`, the rule `resolve_own_wipe` applies to your
     board and theirs): every scope reaches creatures, toughness and mana
     value as change 1 reads them; "nonland" reaches everything,
     "artifacts_creatures" artifacts too, "mv2" any piece of mana value 2 or
     less. `scope` overrides the card's. The one list the sweeper removes and
-    the wipe gate prices (§0z138)."""
+    the wipe gate prices (§0z138). "minus_x" is The Meathook Massacre's
+    -X/-X with the X it was cast for (item 45, §0z248): toughness `x` or
+    less, the "minus_2" rule at its own X."""
     scope = scope if scope is not None else own_wipe_scope(g, card)
-    x = gyre_x(g) if scope == "damage_x" else None
+    if scope == "damage_x":
+        x = gyre_x(g)
 
     def dies(p):
         if scope == "nonland":
@@ -1451,6 +1454,8 @@ def wipe_takes(g, card, scope=None) -> list:
             return p.toughness <= x
         if scope == "minus_2":
             return p.toughness <= 2
+        if scope == "minus_x":
+            return p.toughness <= x
         return True
 
     out = []
@@ -1466,12 +1471,12 @@ def wipe_takes(g, card, scope=None) -> list:
     return out
 
 
-def wipe_threat_pieces(g, card, scope=None) -> int:
+def wipe_threat_pieces(g, card, scope=None, x=None) -> int:
     """Your sweeper takes the pieces its scope reaches (`wipe_takes`)."""
     if not pod_threats_on(g):
         return 0
     n = 0
-    for o, k in wipe_takes(g, card, scope):
+    for o, k in wipe_takes(g, card, scope, x):
         remove_threat_piece(g, o, k)
         n += 1
     g.m["threat_wipe_pieces"] += n

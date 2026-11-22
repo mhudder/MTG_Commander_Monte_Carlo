@@ -709,6 +709,50 @@ def x_plan(g, card, units):
     return None
 
 
+def x_cost(card, cost: dict, x: int) -> dict:
+    """`cost` (a card's cost as the engine prices it, its {X} carried as
+    `x_pips` generic) with that X replaced by `x`."""
+    out = dict(cost)
+    out["gen"] = max(0, cost.get("gen", 0) - card.x_pips) + x
+    if not out["gen"]:
+        del out["gen"]
+    return out
+
+
+def largest_x(card, cost: dict, units, ok=None, floor=None):
+    """THE X A PILOT PAYS (item 45, §0z248): the largest X this pool affords
+    for `card`, NEVER BELOW ITS MODELLED X (`card.x_pips`, the fixed X every
+    deck used before) -- so the card is castable exactly when it was, and is
+    only ever cast bigger. None if the modelled X is not affordable, or `ok`
+    refuses it.
+
+    `ok(x)` is the caller's own limit on X (Genesis Wave's reveal and the
+    decking guard), and is assumed monotone: if it refuses X it refuses every
+    bigger X. Affordability is monotone too, so this is a bisection over
+    `can_afford`, which builds no payment (§0z147). A ONE-SHOT RULE: which X
+    is worth paying, and what else the mana could have cast, is the caller's
+    judgement, said where each card calls this.
+
+    `floor` overrides the modelled X as the smallest X considered: The
+    Meathook Massacre's rule may pay 0 or 1 (`meathook_x_ok`), where the
+    old fixed X was 2."""
+    floor = card.x_pips if floor is None else floor
+    if not can_afford(x_cost(card, cost, floor), units):
+        return None
+    if ok is not None and not ok(floor):
+        return None
+    lo = floor
+    hi = floor + max(0, len(units) - sum(x_cost(card, cost, floor).values()))
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if (can_afford(x_cost(card, cost, mid), units)
+                and (ok is None or ok(mid))):
+            lo = mid
+        else:
+            hi = mid - 1
+    return lo
+
+
 def spell_mastery(g) -> bool:
     """"Spell mastery -- If there are two or more instant and/or sorcery
     cards in your graveyard": ONE function for every card that reads it
@@ -1670,6 +1714,9 @@ class Game(BaseGame):
         self.m = Metrics({
             "damage": 0.0,
             "cards_drawn": 0,
+            # item 45 (§0z248): The Meathook Massacre at its chosen X
+            "x_spells_paid": 0, "meathook_x_casts": 0, "meathook_x": 0,
+            "meathook_pod_killed": 0, "meathook_own_killed": 0,
             "mana_floated": 0,
             "mana_spent": 0,
             "rendmaw_triggers": 0,
@@ -3376,6 +3423,7 @@ def main_phase(g: Game, precombat: bool = False):
 
         options = []
         mode_cost = {}          # what each option pays, for the lookahead
+        xs = {}                 # item 45: the X each option pays
         for c in g.hand:
             if c.is_land:
                 continue
@@ -3412,6 +3460,19 @@ def main_phase(g: Game, precombat: bool = False):
             # the counter caught at exactly zero casts. Gated on the paid path
             # so the free one stays bit-identical to every table before §0z70.
             if not main_phase_may_cast(g, c):
+                continue
+            if (c.name == "The Meathook Massacre"
+                    and g.cfg.get("meathook_x", False)):           # §0z248
+                # ITEM 45: its X chosen, and its ETB modelled on both sides
+                # (`meathook_etb`). From X = 0, not the old fixed 2: the
+                # rule may want less (`meathook_x_ok`).
+                base = cost_after_reduction(g, c)
+                x = largest_x(c, base, units, ok=lambda x: meathook_x_ok(g, x),
+                              floor=0)
+                if x is not None:
+                    options.append((c, None, None))
+                    mode_cost[id(c)] = x_cost(c, base, x)
+                    xs[id(c)] = x
                 continue
             # ALTERNATIVE COSTS, through the shared chooser (§1b / §0z20).
             # A card is not one cost: Impending deploys Overlord of the
@@ -3457,6 +3518,8 @@ def main_phase(g: Game, precombat: bool = False):
             pick = max(options, key=rank)
         card, alt_tag, pay = pick[0], pick[2], pay_of(pick)
         spend(g, pay, units)
+        if id(card) in xs:
+            g.m["x_spells_paid"] += 1       # item 45: paid, countered or not
         if alt_tag == "graveyard":
             wickerfolk_additional_costs(g, card)     # §0z125
         elif alt_tag == "escape":
@@ -3524,8 +3587,53 @@ def main_phase(g: Game, precombat: bool = False):
             g.board.append(perm)
             davvol_trigger(g, perm)      # §0z74
             run_etb(g, perm)
+            if id(card) in xs:
+                meathook_etb(g, card, xs[id(card)])
         else:
             g.graveyard.append(card)
+
+
+def meathook_x_ok(g, x) -> bool:
+    """THE MEATHOOK MASSACRE'S X (item 45, §0z248; the owner, 2026-11-22):
+    the largest X the mana affords that kills NO non-token creature of yours
+    -- the commander included -- since "each creature gets -X/-X" is your
+    board too. A token of toughness X or less dies to it, and is counted as
+    the drain it is (Meathook sees it die). THE JUDGEMENT, said out loud:
+    every token is spent for X, and the mana past the pod's toughest body
+    buys nothing but more of them."""
+    return not any(is_battlefield_creature(g, p) and not p.is_token
+                   and g.toughness_of(p) <= x for p in g.board)
+
+
+def meathook_etb(g, card, x) -> None:
+    """"When The Meathook Massacre enters, each creature gets -X/-X until
+    end of turn." (Scryfall, 2026-11-22.) Item 45, §0z248, `meathook_x`.
+
+    The pod's side the way Massacre Wurm's -2/-2 is (`minus_two_pod`):
+    under `pod_bodies` every body of toughness X or less dies, each a death
+    event (Meathook's "you gain 1", Blood Artist), and the creature route
+    pieces X reaches go (`wipe_threat_pieces`, scope "minus_x"). Off
+    `pod_bodies` the pod's side is nothing, as for the Wurm. Your side: each
+    creature of toughness X or less dies in ONE event (`simultaneous`, CR
+    603.10a) -- -X/-X is not destruction, so indestructible never saves
+    (`destroy(..., destroys=False)`) -- and Meathook, on the battlefield,
+    drains for each. The survivors' smaller toughness until end of turn is
+    not modelled, as for the Wurm."""
+    g.m["meathook_x_casts"] += 1
+    g.m["meathook_x"] += x
+    if x <= 0:
+        return
+    if OPP.pod_bodies_on(g):
+        OPP.wipe_threat_pieces(g, card, scope="minus_x", x=x)
+        for o in OPP.living(g):
+            g.m["meathook_pod_killed"] += OPP.kill_pod_bodies(
+                g, o, lambda b: b.toughness <= x)
+    victims = [p for p in g.board if is_battlefield_creature(g, p)
+               and g.toughness_of(p) <= x]
+    with OPP.simultaneous(g):
+        for p in victims:
+            if OPP.destroy(g, p, destroys=False):
+                g.m["meathook_own_killed"] += 1
 
 
 def damage_you(g, n: float) -> float:

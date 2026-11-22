@@ -147,9 +147,12 @@ from edhmc.engine import (cycle_step, cleanup_step, late_land_drop, remove_card,
                           enter_loyalty, thomil_step, lord_of_the_pit_card,
                           lord_of_the_pit_upkeep, pearl_collector_trigger,
                           pearl_collector_lifelink, perpetual_lifelink,
-                          counts_as_land_in_hand)
+                          counts_as_land_in_hand, largest_x, x_cost)
 from edhmc import opponents as OPP
 from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
+
+# Item 45 (§0z248): the MDFC whose front face `agadeem_x` casts.
+AGADEEM = "Agadeem's Awakening // Agadeem, the Undercrypt"
 from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -228,6 +231,9 @@ class ShilgengarGame(BaseGame):
         self.m = Metrics({
             "damage": 0.0, "combat_damage": 0.0, "drain_damage": 0.0,
             "cards_drawn": 0, "mana_spent": 0, "mana_floated": 0,
+            # item 45 (§0z248): Agadeem's Awakening's front face, at its X
+            "x_spells_paid": 0, "agadeem_x_casts": 0, "agadeem_x": 0,
+            "agadeem_returned": 0, "agadeem_blank_casts": 0,
             "stranded_mv": 0, "turn_lethal": 99, "turn_won": 99,
             "removal_eaten": 0, "ae_removal_eaten": 0, "wipes_suffered": 0,
             "countered": 0, "protected": 0, "loss_route": 0, "win_route": 0,
@@ -1134,6 +1140,53 @@ class ShilgengarGame(BaseGame):
                 if p.card.name == "Youthful Valkyrie":
                     p.counters += 1
 
+    def agadeem_x(self, card, pool, reserve):
+        """AGADEEM'S AWAKENING'S X (item 45, §0z248; the owner, 2026-11-22):
+        "Return from your graveyard to the battlefield any number of target
+        creature cards that each have a different mana value X or less."
+        ({X}{B}{B}{B}.) Cast only when the graveyard holds a creature it can
+        return; X the largest the pool affords above the ultimate's
+        `reserve` (the rule every option here keeps), from 0 -- the old
+        fixed 2 never cast it as anything but a blank -- and no larger than
+        the biggest mana value there: past it the mana returns nothing more,
+        so it is not spent (A JUDGEMENT, the one place this rule stops short
+        of "largest"). A card cast this way is not played as a land; which
+        face the land step plays is its own rule, unchanged (§0z151)."""
+        targets = self.yard_creatures()
+        if not targets:
+            return None
+        mvs = [int(t.free_mv) for t in targets]
+        base = self.herald_cost(card)
+        x = largest_x(card, base, pool, floor=0, ok=lambda x: (
+            x <= max(mvs)
+            and len(pool) - sum(x_cost(card, base, x).values()) >= reserve))
+        if x is None or x < min(mvs):
+            return None
+        return x
+
+    def agadeem_return(self, x):
+        """Agadeem's Awakening resolves at X: the highest-priority creature
+        card at each mana value X or less (`free_mv`: X is 0 in the
+        graveyard), every one of them -- "any number of target" -- out of the
+        graveyard first, then each enters (one action, as the ultimate's
+        mass return is). No finality counter: that is the ultimate's."""
+        best = {}
+        for c in self.yard_creatures():
+            mv = int(c.free_mv)
+            if mv <= x and (mv not in best
+                            or c.priority > best[mv].priority):
+                best[mv] = c
+        picks = [best[mv] for mv in sorted(best)]
+        for c in picks:
+            remove_card(self.graveyard, c)
+        for c in picks:
+            perm = self.make_permanent(c, sick=True)
+            if perm.card.is_creature:
+                self.creature_entered(perm)
+        self.m["agadeem_x_casts"] += 1
+        self.m["agadeem_x"] += x
+        self.m["agadeem_returned"] += len(picks)
+
     def creature_entered(self, perm):
         if self.is_angel(perm) or "cleric" in perm.card.tags:
             self.angel_entered(perm)
@@ -1239,12 +1292,21 @@ class ShilgengarGame(BaseGame):
 
             options = []
             mode_cost = {}
+            xs = {}              # item 45: the X each option pays
             for c in self.hand:
                 if c.is_land:
                     continue
                 if not OPP.own_wipe_castable(self, c):     # §0z138
                     continue
                 if OPP.hold_answer(self, c):      # item 24, change 2
+                    continue
+                if (c.name == AGADEEM
+                        and self.cfg.get("agadeem_x", False)):    # §0z248
+                    x = self.agadeem_x(c, pool, reserve)
+                    if x is not None:
+                        options.append((c, None))
+                        mode_cost[id(c)] = x_cost(c, self.herald_cost(c), x)
+                        xs[id(c)] = x
                     continue
                 # §1b: the best affordable MODE, not just the printed cost.
                 # Only the card cast is priced (§0z149).
@@ -1276,6 +1338,13 @@ class ShilgengarGame(BaseGame):
                 self.treasures -= used
                 self.m["treasures_spent"] += used
             self.m["mana_spent"] += len(pay)
+            if id(card) in xs:
+                self.m["x_spells_paid"] += 1     # item 45: paid, countered or not
+            elif card.name == AGADEEM:
+                # §0z248: the front face cast with no script -- a blank, and
+                # the land lost. What `agadeem_x` replaces; either rule's
+                # reach, counted as it is paid (countered or not).
+                self.m["agadeem_blank_casts"] += 1
             remove_card(self.hand, card)
             idx = self.spells_this_turn
             self.spells_this_turn += 1
@@ -1286,6 +1355,8 @@ class ShilgengarGame(BaseGame):
                     self.m["test_card_answered"] += 1
                     self.m["test_card_countered"] += 1
                 continue
+            if id(card) in xs:
+                self.agadeem_return(xs[id(card)])
             self.resolve(card)
 
     def activations(self):
