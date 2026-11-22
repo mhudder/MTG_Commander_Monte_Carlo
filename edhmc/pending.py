@@ -274,9 +274,44 @@ def check_simulated(simulated=None, staged=None) -> None:
 
 
 # The funnel's order, furthest first (docs/LEDGER_STATES.md). WITHDRAWN sits
-# beside STAGED: it was staged and is not now.
-FUNNEL = ("COMMITTED", "STAGED", "WITHDRAWN", "SIMULATED", "MEASURED",
+# beside STAGED: it was staged and is not now. MOOT sits below SIMULATED: a
+# head-to-head whose slot has moved on (`moot`), evidence kept, no decision
+# left to take on it.
+FUNNEL = ("COMMITTED", "STAGED", "WITHDRAWN", "SIMULATED", "MOOT", "MEASURED",
           "PREPARED", "PROPOSED", "REJECTED")
+
+
+def _staged_names(deck_name: str) -> set:
+    return {c.name for c in build_pending(deck_name)[0]}
+
+
+def moot(r, names=None) -> str:
+    """Why a SIMULATED head-to-head no longer names a live swap, or "" if it
+    still does: its cut is not in the deck's staged list, or its add already
+    is (2026-11-22). DERIVED from `build_pending` on every call, never typed
+    (§0q): a list that moves retires the record, or revives it, by itself.
+    The record is kept -- it is evidence about the two cards -- but there is
+    no decision left to take on it. `names` is the staged list's names, for
+    a caller that already built it."""
+    names = _staged_names(r.deck) if names is None else names
+    why = []
+    if r.remove not in names:
+        why.append(f"{r.remove} is no longer in the list")
+    if r.add in names:
+        why.append(f"{r.add} is already in it")
+    return "; ".join(why)
+
+
+def split_simulated(records=None):
+    """(live, moot): SIMULATED records with a decision still to take, and
+    the ones whose slot has moved on, each with its reason."""
+    records = SIMULATED if records is None else records
+    names = {d: _staged_names(d) for d in {r.deck for r in records}}
+    live, gone = [], []
+    for r in records:
+        why = moot(r, names[r.deck])
+        (gone if why else live).append((r, why))
+    return [r for r, _ in live], gone
 
 
 def _further(state: str, than: str) -> bool:
@@ -310,8 +345,11 @@ def funnel() -> dict[str, list[tuple[str, str]]]:
         mark(c.deck, c.add, "STAGED")
     for c in WITHDRAWN:
         mark(c.deck, c.add, "WITHDRAWN")
-    for r in SIMULATED:
+    live, gone = split_simulated()
+    for r in live:
         mark(r.deck, r.add, "SIMULATED")
+    for r, _why in gone:
+        mark(r.deck, r.add, "MOOT")
     for c in MEASURED:
         mark(c.deck, c.card, "MEASURED")
     for pr in PROPOSED:
@@ -914,7 +952,8 @@ def ledger(verbose: bool = True, keep=None) -> None:
                     print(f"    recheck {c.reverified}")
         deck, cmd = build_pending(deck_name)
         print(f"    -> {len(deck) + 1} cards, singleton-legal, commander distinct")
-    simulated = [r for r in SIMULATED if keep(r.deck, r.remove, r.add)]
+    simulated, gone = split_simulated(
+        [r for r in SIMULATED if keep(r.deck, r.remove, r.add)])
     if simulated:
         # BETWEEN THE STAGED AND THE MEASURED, which is where it sits in the
         # funnel (§0z79): real evidence, and no decision yet taken on it.
@@ -933,6 +972,19 @@ def ledger(verbose: bool = True, keep=None) -> None:
                 print(f"     {r.result}")
                 if verbose and r.notes:
                     print(f"     note {r.notes}")
+    if gone:
+        print("\n" + "=" * 78)
+        print("MOOT — a head-to-head whose slot has moved on, NOTHING to decide")
+        print("=" * 78)
+        print("  Derived from the staged list (`pending.moot`): the cut has left "
+              "it, or the add\n  is already in. Kept as evidence about the "
+              "two cards, not as a swap.")
+        for deck_name in sorted({r.deck for r, _ in gone}):
+            print(f"\n{deck_name.upper()}")
+            for r, why in [x for x in gone if x[0].deck == deck_name]:
+                print(f"  -{r.remove} +{r.add}   ({r.measured})")
+                print(f"     moot: {why}")
+                print(f"     {r.result}")
     measured = [c for c in MEASURED if keep(c.deck, c.card)]
     if measured:
         # PRINTED UNDER ITS OWN HEADING AND BELOW THE STAGED ONES, because the
@@ -1083,7 +1135,9 @@ def check_view() -> None:
           "--deck DECK, --full)")
     print()
     _checks_and_legality()
-    print(f"\nSTAGED {len(CHANGES)} · SIMULATED {len(SIMULATED)} · "
+    live, gone = split_simulated()
+    print(f"\nSTAGED {len(CHANGES)} · SIMULATED {len(live)} · MOOT "
+          f"{len(gone)} · "
           f"MEASURED {len(MEASURED)} · WITHDRAWN {len(WITHDRAWN)} · "
           f"COMMITTED {len(COMMITTED)} · PROPOSED, still unmeasured "
           f"{len(_live_proposed())}")
@@ -1113,10 +1167,16 @@ def summary() -> None:
         print(f"  {c.deck:<10} -{c.remove} +{c.add}   staged {c.staged}"
               + ("; rechecked" if c.reverified else ""))
 
-    print(f"\nSIMULATED ({len(SIMULATED)}) -- a head-to-head, NO decision")
-    for r in sorted(SIMULATED, key=lambda r: r.deck):
-        print(f"  {r.deck:<10} -{r.remove} +{r.add}")
+    live, gone = split_simulated()
+    print(f"\nSIMULATED ({len(live)}) -- a head-to-head, NO decision")
+    for r in sorted(live, key=lambda r: r.deck):
+        print(f"  {r.deck:<10} -{r.remove} +{r.add}   ({r.measured})")
         print(f"             {_clip(_number(r.result), 140)}")
+
+    print(f"\nMOOT ({len(gone)}) -- the slot moved on, nothing to decide "
+          f"(derived)")
+    for r, why in sorted(gone, key=lambda x: x[0].deck):
+        print(f"  {r.deck:<10} -{r.remove} +{r.add}   {_clip(why, 70)}")
 
     staged_adds = {(c.deck, c.add) for c in CHANGES}
     print(f"\nMEASURED ({len(MEASURED)}) -- a number, NOTHING decided "

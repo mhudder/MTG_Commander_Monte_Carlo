@@ -12,6 +12,10 @@
 > **Tier 2's thirteen labels, Revel in Riches' and Tier 3's reasons were
 > fixed the same day** (the owner: "fix the labels"; §0z208). The `label`
 > column below is the label as audited. Tiers 1 and 4 are open.
+>
+> **STATUS 2026-11-22 (§0z208): Tier 1 is done** (§0z215, every fix a
+> null). Open: Tier 2's missing clauses under their PARTLY labels, and
+> Tier 4.
 
 **What is new since §0z116** (2026-10-07; the module diffed against
 `98c1132`): one card, Lyra, Archangel of Dawn, and it is right -- "Whenever

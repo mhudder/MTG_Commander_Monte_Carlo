@@ -14,7 +14,7 @@ edhmc.pending` is the ledger, and `docs/STATUS.md` prints it.
 What is closed and where it went:
 
 - 19, 15, 1b/3, 9, 10, 13, 14, 14-old, 14b, 16, 16b, 17-old, 11, 12, 8,
-  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 47, 48 and 51 are closed, each in
+  8-old, 17, 21, 2, 4, 8b, 0b-i, 23, 0c, 25, 26, 27, 20b, 24, 31, 35, 36, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48 and 51 are closed, each in
   `docs/HISTORY.md` under "Queued items closed …".
 - 20, 20-old, 20-old2, 22, 7 and 8c were answered or superseded, and are in
   `docs/HISTORY.md` under "Queued items answered or superseded, moved
@@ -250,6 +250,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     die to blockers and so moved into item 44 (§0z197); the seat you take (9), which is a model decision to
     write down, not a bug. **Shilgengar's timing pair (7) is in item 47's
     batch**, since it moves the baseline.
+    **CHECKED 2026-11-22: NOTHING IS LEFT** (§0z184's status note): 6 is
+    built (§0z198, first and double strike), 7 and 8 are done, and 9 is
+    written down in §0z184 as the model's choice. Ready to close to
+    `docs/HISTORY.md` when the owner agrees.
 
 45. **A3-A7 of §0z197: write down, then decide.** **A3, A6 AND A5 ARE
     WRITTEN DOWN AND DECIDED (§0z221, 2026-11-16)**: route-aware kills
@@ -264,28 +268,13 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     of Calling (fixed X=4, no convoke) against trostani's convoke and X
     plan, the same card under two rules. After item 44. **Chord is in
     item 47's batch; A3, A6 and A5 are step 5 of the order of work.**
-
-46. **C-E of §0z197: the cheap ones, no rebuild. THE CHEAP HALF IS DONE
-    (§0z206, 2026-11-14)**: Woe Strider is PARTLY_MODELLED; D's stale
-    statements are corrected, with the ones the flip added ("your creatures
-    never block"), and Bloodthirsty Conqueror and South Wind Avatar are
-    SCRIPTED; `audit_cards` checks `haste` and `lifelink`, proved to fail
-    (`tests/test_audit_keywords.py`). Every deck bit-identical at 2,000
-    seeds. **THE THREE ORACLE AUDITS ARE DONE (2026-11-15)**: tivit §0z207,
-    shilgengar §0z208, azusa §0z209 (`docs/ORACLE_AUDIT_*.md`); tivit's and
-    shilgengar's labels are fixed. **Left, the owner's to choose from**:
-    the audits' behaviour findings (each moves its deck's baseline, so
-    before the rebuild is cheapest) -- tivit's Greaves-and-blinks, Tempting
-    Contract, Grudge Keeper; shilgengar's Requiem Angel and landfall rule;
-    azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
-    azusa's labels; and card work for
-    the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape (DONE, §0z227),
-    Memory Jar (C and item 37; DONE, §0z228), and §0z206's five new floors (DONE, §0z230-§0z232) (the Vault's
-    deathtouch, an animated land's reach and indestructible, Nissa's
-    emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any
-    time; none waits on item 44.
-    **The behaviour findings are collected, in order, in item 47**
-    (2026-11-15), with azusa's labels; the card work stays here.
+    **CHECKED 2026-11-22: ALL BUT A7's REMAINDER IS DONE.** A3, A5 and A6
+    are on by default (§0z222), A4 too (§0z200, `rival_combat`), and
+    Chord of Calling is one rule (§0z213). **Left: X spells still have a
+    fixed X** -- Genesis Wave at 6 (azusa) and Torment of Hailfire at 6
+    (tivit); §0z210 notes a pilot with the mana would cast the Wave
+    bigger. A model decision for the owner, and it moves both decks'
+    baselines (§0z197's status note).
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a

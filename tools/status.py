@@ -401,8 +401,8 @@ def render() -> str:
         # THE FUNNEL, in `docs/LEDGER_STATES.md`'s order (§0z79). Each column
         # is one state and each CARD is counted once, in the furthest state it
         # has reached (§0z80) -- a staged card is not also "measured".
-        cols = ("PROPOSED", "PREPARED", "MEASURED", "SIMULATED", "STAGED",
-                "COMMITTED", "WITHDRAWN", "REJECTED")
+        cols = ("PROPOSED", "PREPARED", "MEASURED", "SIMULATED", "MOOT",
+                "STAGED", "COMMITTED", "WITHDRAWN", "REJECTED")
         w("| deck | " + " | ".join(c.lower() for c in cols) + " |")
         w("|---" * (len(cols) + 1) + "|")
         for d in DECKS:
@@ -417,7 +417,12 @@ def render() -> str:
           "decision evidence")
         w("and no decision; `python -m edhmc.pending` prints each with its "
           "date, which is")
-        w("the engine it was measured on.")
+        w("the engine it was measured on. A MOOT card's head-to-head names a "
+          "slot that has")
+        w("moved on -- its cut left the list, or it is already in -- derived "
+          "from the staged")
+        w("list (`pending.moot`); its evidence is kept and nothing is left to "
+          "decide.")
         w("")
         w("### Staged and uncommitted")
         w("")

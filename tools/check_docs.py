@@ -395,7 +395,15 @@ def ledger_states() -> set[str]:
                            "the ledger's flag states cannot be derived")
     flags = {st for f, st in LEDGER_FLAG_STATE.items()
              if re.search(rf"^    {f}: str = ", records, re.M)}
-    return {LEDGER_LIST_STATE.get(n, n) for n in lists} | flags
+    # And the FUNNEL's states, which include the DERIVED ones no list holds
+    # (MOOT, 2026-11-22; REJECTED, a flag's verdict): a state the funnel
+    # counts is a state the doc must name.
+    m = re.search(r"^FUNNEL = \(([^)]*)\)", text, re.M)
+    if m is None:
+        raise RuntimeError("edhmc/pending.py has no FUNNEL: the funnel's "
+                           "states cannot be derived")
+    funnel = set(re.findall(r'"([A-Z]+)"', m.group(1)))
+    return {LEDGER_LIST_STATE.get(n, n) for n in lists} | flags | funnel
 
 
 def check_vocabulary_names_states(docs: dict[str, str],

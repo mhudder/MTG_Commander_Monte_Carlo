@@ -11,6 +11,11 @@
 > **Tier 2's eleven labels and Tier 3's reasons were fixed the same day**
 > (the owner: "fix the labels"; §0z207). The `label` column below is the
 > label as audited. Tiers 1 and 4 are open.
+>
+> **STATUS 2026-11-22 (§0z207): Tier 1 is done** -- item 1 by the owner's
+> policy (§0z216), 2-6 by text (§0z214); item 8 too. Open: item 7
+> (Kambal's first ability), Tier 2's missing clauses under their PARTLY
+> labels, and Tier 4.
 
 **Why a second audit.** §0z116 (2026-10-07) read every engine against the
 oracle text of all seven lists, and its findings are fixed. Tivit's list has
@@ -62,6 +67,7 @@ gate `blink_tivit`'s targeted sources on it.
 ### 2. Tempting Contract makes one Treasure too many, every upkeep
 
 > **FIXED 2026-11-15 (§0z214)**: `tempting_contract_text`=False restores the old rule.
+> **AND 2026-11-22 (§0z245)**: each taker's own Treasure is the pod's mana (`pod_gifts_symmetric`).
 
     "At the beginning of your upkeep, each opponent may create a Treasure
     token. For each opponent who does, you create a Treasure token."

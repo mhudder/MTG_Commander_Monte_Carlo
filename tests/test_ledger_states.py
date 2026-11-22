@@ -2,7 +2,7 @@
 """The ledger's SIMULATED/STAGED split and the PREPARED flag (§0z79).
 
     python -m tests.test_ledger_states
-    python -m tests.test_ledger_states --mutate   # 4 mutations, exact sets
+    python -m tests.test_ledger_states --mutate   # 5 mutations, exact sets
 
 docs/LEDGER_STATES.md designed both and the owner confirmed the split on
 2026-09-22: a head-to-head against a named cut is EVIDENCE (SIMULATED), and
@@ -23,12 +23,20 @@ CASES
   J  the funnel counts every card exactly once
   K  a REJECTED proposal nothing took further stays REJECTED (Felidar
      Retreat, off-colour in azusa)
+  L  MOOT is derived: a head-to-head whose cut is not in the staged list
+     reads moot, and one whose add is already in it reads moot (2026-11-22)
+  M  a live head-to-head is not moot: lorehold -Reforge the Soul +Raphael's
+     Technique, both where the record says
+  N  the funnel counts a card whose only head-to-head is moot as MOOT:
+     Chief Magistrate of Mercadia, measured in lorehold's Lightning Greaves
+     slot, and Greaves has left the list
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the "not both SIMULATED and staged" rule is off    -> B
   the "staged needs evidence" rule is off            -> C
   PREPARED is never checked                          -> F
-  the funnel keeps the LAST record, not the furthest -> I
+  the funnel keeps the LAST record, not the furthest -> I, N
+  MOOT is never derived (`moot` returns "")         -> L, N
     (added with I-K, §0z80; J and K survive it because each of their cards
     is marked once or the last mark is the furthest)
 
@@ -37,6 +45,12 @@ THE FIRST RUN FAILED E, AND THE CODE WAS WRONG, NOT THE EXPECTATION.
 became "tests/x.py," -- which does not end in ".py" -- and a real test was
 refused. It matches the path now. (The two mutation sets that also broke E
 on that run were right about everything else.)
+
+N WAS ADDED TO THE LAST-RECORD MUTATION AFTER ITS FIRST RUN (2026-11-22),
+said so: written as {I}, it broke {I, N}. Chief Magistrate of Mercadia has
+a MEASURED record after its moot head-to-head, so keeping the last record
+reads it MEASURED -- N is a furthest-state case, as I is. The rule was
+right and the expected set was not.
 
 UNMUTATED (§0z15): A is the real data; D, G and H are neighbours -- the
 completeness rule, the derivation, and the doc check's input.
@@ -94,8 +108,8 @@ def run_cases():
           refused(P.check_prepared, bad), True)
     check("G Change.simulated carries the evidence",
           (ch.simulated.result, ch.simulated.remove), (ch.evidence, "X"))
-    check("H check_docs derives SIMULATED and PREPARED",
-          {"SIMULATED", "PREPARED"} <= CD.ledger_states(), True)
+    check("H check_docs derives SIMULATED, PREPARED and MOOT",
+          {"SIMULATED", "PREPARED", "MOOT"} <= CD.ledger_states(), True)
     f = P.funnel()
     where = {k: st for st, ks in f.items() for k in ks}
     check("I the funnel counts Conqueror as STAGED",
@@ -105,6 +119,19 @@ def run_cases():
           len(keys) == len(set(keys)), True)
     check("K an untouched rejected proposal stays REJECTED",
           where.get(("azusa", "Felidar Retreat")), "REJECTED")
+    gone_cut = P.Simulated(deck="lorehold", remove="No Such Card",
+                           add="Raphael's Technique", measured="2026-11-22",
+                           result="r")
+    gone_add = P.Simulated(deck="lorehold", remove="Reforge the Soul",
+                           add="Storm Herd", measured="2026-11-22", result="r")
+    check("L a gone cut and an add already in both read moot",
+          [bool(P.moot(gone_cut)), bool(P.moot(gone_add))], [True, True])
+    live = P.Simulated(deck="lorehold", remove="Reforge the Soul",
+                       add="Raphael's Technique", measured="2026-11-22",
+                       result="r")
+    check("M a live head-to-head is not moot", P.moot(live), "")
+    check("N a card whose only head-to-head is moot counts MOOT",
+          where.get(("lorehold", "Chief Magistrate of Mercadia")), "MOOT")
     return set(FAIL)
 
 
@@ -124,7 +151,9 @@ def main() -> int:
         "PREPARED is never checked":
             ({"F"}, "check_prepared", lambda pr: None),
         "the funnel keeps the last record":
-            ({"I"}, "_further", lambda state, than: True),
+            ({"I", "N"}, "_further", lambda state, than: True),
+        "MOOT is never derived":
+            ({"L", "N"}, "moot", lambda r, names=None: ""),
     }
     bad = 0
     for label, (want, name, fn) in muts.items():

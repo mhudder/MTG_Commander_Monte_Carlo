@@ -115,6 +115,19 @@ recordable outcome rather than a gap.
 
 ---
 
+### MOOT -- a head-to-head whose slot has moved on (derived, 2026-11-22)
+
+A SIMULATED record names a cut and an add. When the list moves on without
+it -- the cut is no longer in the deck's staged list, or the add is already
+in it, by another slot -- there is no decision left to take on that record,
+but it is still evidence about the two cards. **MOOT is that state, and it
+is DERIVED, never typed** (`pending.moot`, from `build_pending` on every
+call; §0q): a list that moves retires the record, or revives it, by itself.
+It sits below SIMULATED in the funnel's order, so a card with one live
+head-to-head and one moot one counts as SIMULATED. The owner asked for the
+moot records to be closed on 2026-11-22, when 24 of 42 were; `python -m
+edhmc.pending --summary` lists each with its reason.
+
 ## The triage verdicts are flags on PROPOSED
 
 Per the owner's decision: lighter weight than first-class states, in the

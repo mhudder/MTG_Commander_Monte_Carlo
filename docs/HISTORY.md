@@ -3012,6 +3012,39 @@ left them:
 A container restart killed item 41's first run; it was re-run whole. The
 other session's §0z175 re-check (`965cb74`, docs only) was merged in.
 
+## Queued items closed 2026-11-22 — moved from `docs/QUEUE.md`
+
+Checked item by item against the sections that closed it (the owner,
+2026-11-22: "double check each"): its card work is done -- ward
+(§0z224), cycling (§0z226), Woe Strider (§0z227), Memory Jar (§0z228),
+§0z206's five floors (§0z230-§0z232) -- and its behaviour findings went to
+item 47, closed 2026-11-15. What the three audits still hold (missing
+clauses under PARTLY labels, Tier 4's piloting choices, azusa's utility
+lands, Kambal) is in §0z207-§0z209, marked PARTLY RESOLVED, and in no
+queue item.
+
+46. **C-E of §0z197: the cheap ones, no rebuild. THE CHEAP HALF IS DONE
+    (§0z206, 2026-11-14)**: Woe Strider is PARTLY_MODELLED; D's stale
+    statements are corrected, with the ones the flip added ("your creatures
+    never block"), and Bloodthirsty Conqueror and South Wind Avatar are
+    SCRIPTED; `audit_cards` checks `haste` and `lifelink`, proved to fail
+    (`tests/test_audit_keywords.py`). Every deck bit-identical at 2,000
+    seeds. **THE THREE ORACLE AUDITS ARE DONE (2026-11-15)**: tivit §0z207,
+    shilgengar §0z208, azusa §0z209 (`docs/ORACLE_AUDIT_*.md`); tivit's and
+    shilgengar's labels are fixed. **Left, the owner's to choose from**:
+    the audits' behaviour findings (each moves its deck's baseline, so
+    before the rebuild is cheapest) -- tivit's Greaves-and-blinks, Tempting
+    Contract, Grudge Keeper; shilgengar's Requiem Angel and landfall rule;
+    azusa's Genesis Wave, Animist's Awakening and tutored ETBs first --
+    azusa's labels; and card work for
+    the add-card skill: ward (DONE, §0z224), cycling (DONE, §0z226), Woe Strider's sacrifice and escape (DONE, §0z227),
+    Memory Jar (C and item 37; DONE, §0z228), and §0z206's five new floors (DONE, §0z230-§0z232) (the Vault's
+    deathtouch, an animated land's reach and indestructible, Nissa's
+    emblem, a token's reach, The Swarmweaver's delirium deathtouch). Any
+    time; none waits on item 44.
+    **The behaviour findings are collected, in order, in item 47**
+    (2026-11-15), with azusa's labels; the card work stays here.
+
 ## Queued items closed 2026-11-20 — moved from `docs/QUEUE.md`
 
 Closed 2026-11-20: the death step is "lethal", adopted by the owner with Woe

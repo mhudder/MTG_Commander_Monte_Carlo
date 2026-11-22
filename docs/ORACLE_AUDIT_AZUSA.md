@@ -8,6 +8,11 @@
 > same day; every quoted line is Scryfall's. **Nothing here is measured and
 > nothing is fixed** (§0z116's form, as the tivit and shilgengar audits).
 > Azusa has no `.xlsx`.
+>
+> **STATUS 2026-11-22 (§0z209)**: items 1-3 and 8 are fixed (§0z210-§0z213),
+> the labels (6, 7, 9) and Tier 3's reasons too. Open: items 4-5, Tier 2b's
+> utility lands, the PARTLY cards' missing clauses, Tier 4, and Genesis
+> Wave's fixed X (§0z197 A7).
 
 **What is new since §0z116** (2026-10-07; the module diffed against
 `98c1132`): Ka-Zar of the Savage Land, Fabled Passage and Evolving Wilds,

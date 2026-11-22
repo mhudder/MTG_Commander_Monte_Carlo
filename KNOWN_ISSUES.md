@@ -236,7 +236,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z181](#0z181) | DECIDED | **-Plains +Anointed Procession WITHDRAWN by the owner**: inside its T20 bar at every re-measure since 2026-10-15. Tivit's table rebuild deferred to queue item 35; its cache reads SUSPECT until then |
 | [0z182](#0z182) | FIXED | **Four engines played their land only before main phase 1** (CR 305.1, 505.6b): a land drawn later waited a turn. `engine.late_land_drop`: **tivit +0.0063 / +0.0058, lorehold +0.0024 / +0.0029**, karlov +0.0015 at T20, shilgengar 0 |
 | [0z183](#0z183) | MEASURED | **Azusa's floating mana pays Eye of Ugin and Clues before it empties** (§0z177's open question), from the float only: +0.0004 / +0.0001, inside the bars; 2.6% of games reached |
-| [0z184](#0z184) | OPEN | **Every turn's steps read against CR 500-514**: your TAPPED creatures count as blockers on the pod's turns (share of its attack at you 0.39-0.47, untapped-only 0.47-0.56); nine smaller findings. Queue items 36, 37 |
+| [0z184](#0z184) | RESOLVED | **Every turn's steps read against CR 500-514**: findings 1-8 and 10 fixed (§0z185-§0z187, §0z198, §0z215, §0z228, §0z229); 9, you take the first turn, is a model choice written down here |
 | [0z185](#0z185) | FIXED | **§0z184's findings 3-5**: the pod's end steps on pod turns 1-2 (0.1% of games); rendmaw's Tendershoot / Ophiomancer at each opponent's upkeep, **+0.0044 / +0.0036**; lorehold's Chimes / Waterskin one mana an opponent's turn, -0.0004 / -0.0021 |
 | [0z186](#0z186) | FIXED | **Your tapped creatures no longer block on the pod's turns** (509.1a); vigilance read, tivit taps: **-0.041 to -0.105 at T20**; a hold-back pilot +0.0007 to +0.0053; `incidental_rate` 0.78 ADOPTED, the mean held out of sample |
 | [0z187](#0z187) | FIXED | **§0z184 findings 2, 10; §0z182's leftover**: "until end of turn" ends at YOUR cleanup (514.2), +0.0005 / +0.0006 rendmaw, +0.0003 / +0.0011 azusa; a main-2 land drop, inside the bars; tivit's sick mana, latent |
@@ -249,7 +249,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z194](#0z194) | MEASURED | **Rows that rest on `threat`** (item 39): 96 of 524 ±3 moves confirmed; 25 rows move past their own bar, 3 could flip sign; every commander's -3 is +0.012 to +0.030. Threat steers removal too. Rows noted |
 | [0z195](#0z195) | MEASURED | **Rows against the pod's calibration** (item 41): at a 0.29 baseline instead of 0.47, 0 of 71 rows flip, all staged swaps stay positive, rows shrink to a median 0.39; order holds (Spearman 0.93). Fit rule KEPT |
 | [0z196](#0z196) | REBUILT | **Six tables at 63d20e7** (item 35): 22 rows past their old bar, none flips; tivit 12 (Procession out). Every gate green; wall time 18.5 min |
-| [0z197](#0z197) | OPEN | **A review of turns, phases and combat** (the owner, 2026-11-12): your attackers never die and you never block (A1, A2, queue item 44, first); the kill ignores life; rivals never lose life to each other. Queue items 44-46 |
+| [0z197](#0z197) | PARTLY RESOLVED | **A review of turns, phases and combat** (the owner, 2026-11-12): A1-A6 built and on (items 44, 45), B (§0z184) and C-E done; left: A7's fixed X for Genesis Wave and Torment of Hailfire |
 | [0z198](#0z198) | BUILT | **A1: your attackers can die to the pod's blockers** (`attacker_deaths`, OFF; item 44). ON, T20: -0.0181 to -0.0745 in four decks, tivit level, azusa +0.0045; the pilot alone is +0.028 to +0.126 |
 | [0z199](#0z199) | BUILT | **A2: you block; the pod declares its attacks** (`you_block`, OFF; item 44). Over A1, T20: +0.007 to +0.071 (the pod deals 57-87% of the formula); A1+A2 together -0.035 to +0.052; T10 down everywhere |
 | [0z200](#0z200) | BUILT | **A4: rivals lose life to each other** (`rival_combat`, OFF; item 44). Over A1+A2, T20 +0.025 to +0.044 on all six; A1+A2+A4 against the old pod -0.002 to +0.096: the pod the re-fit must strengthen |
@@ -259,9 +259,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z204](#0z204) | **FLIPPED** | **Item 44's combat is the default; the pod re-fitted** (`incidental_rate` 0.78 -> 1.45): mean T20 0.4702 -> 0.4680 at N=15,000, out of sample 0.4616 vs 0.4612. T10 falls 0.229 -> 0.213. Six caches SUSPECT until the rebuild |
 | [0z205](#0z205) | MEASURED | **Item 44's policy re-read** (§0z5): every pilot policy's incumbent wins on the new pod; three knobs retired by the flip; the split plan keeps the formula's count. No default changed |
 | [0z206](#0z206) | FIXED | **Item 46's cheap half** (§0z197 C-E): Woe Strider to PARTLY; the stale statements fixed, with those the flip added; two karlov cards to SCRIPTED; haste and lifelink audited. Bit-identical; five floors named |
-| [0z207](#0z207) | OPEN | **Tivit's oracle re-audit** (item 46): 6 behaviours contradict the text (Greaves' shroud with five targeted blinks; Tempting Contract +1 Treasure an upkeep), 11 SCRIPTED cards partial. Nothing measured or fixed |
-| [0z208](#0z208) | OPEN | **Shilgengar's oracle re-audit** (item 46): 3 behaviours against the text (Requiem Angel sees Spirits die), 13 SCRIPTED cards partial, 9 stale reasons (Serra's Emissary can now stop combat kills). Nothing measured or fixed |
-| [0z209](#0z209) | OPEN | **Azusa's oracle re-audit** (item 46): Genesis Wave tutors the library instead of revealing its top; Animist's Awakening takes four lands where the text averages 1.7; tutored creatures fire no ETB. Nothing measured or fixed |
+| [0z207](#0z207) | PARTLY RESOLVED | **Tivit's oracle re-audit**: the behaviours fixed (1, §0z216; 2-6 and 8, §0z214), the labels and reasons fixed; left: 7, Kambal's first ability, implemented nowhere; 9-15's clauses; 23-29's piloting choices |
+| [0z208](#0z208) | PARTLY RESOLVED | **Shilgengar's oracle re-audit**: the three behaviours fixed (§0z215, nulls), the 13 labels and 9 reasons fixed; left: items 4-15's missing clauses (under PARTLY) and 25-29's piloting choices |
+| [0z209](#0z209) | PARTLY RESOLVED | **Azusa's oracle re-audit**: Genesis Wave, Animist's Awakening, tutored ETBs and Chord fixed (§0z210-§0z213), labels and reasons fixed; left: 4-5's small ceilings, eight utility lands with no code, the fixed X |
 | [0z210](#0z210) | FIXED | **Genesis Wave by its text** (item 47): the top six revealed, the rest milled. Azusa -0.0034 / -0.0039 at T10 / T20: the old tutor took the mv-6 creatures; the mill costs nothing |
 | [0z211](#0z211) | FIXED | **Animist's Awakening by its text** (item 47): the lands among the top four, untapped with spell mastery. Azusa -0.0059 / -0.0051 at T10 / T20: 1.3 lands a cast where the old rule took 4 |
 | [0z212](#0z212) | FIXED | **A tutored or Waved creature fires its ETB** (item 47), after the spell leaves the stack; a tutored Springheart is not bestowed. Azusa +0.0017 / +0.0042 at T10 / T20 |
@@ -16029,7 +16029,7 @@ pool mutations can reach them; its docstring says how).
 
 <a id="0z184"></a>
 
-## 0z184. OPEN -- every turn's steps against CR 500-514: what is missing or wrong
+## 0z184. RESOLVED -- every turn's steps against CR 500-514: what is missing or wrong
 
 **2026-11-08, the owner: "a relatively detailed review of the stages of each
 player's turn"**, then "record them". The rules are section 5 of
@@ -16132,6 +16132,14 @@ the board it started with), main 2 (growth, summoning-sick) and an end step.
 10. **LATENT: tivit's `mana_units` does not ask summoning sickness** of a
     creature with a mana ability (302.6). No such creature is in its list.
     Guarded in §0z187.
+
+**STATUS 2026-11-22 (checked against each fix, the owner: "double check
+each"): RESOLVED.** 1, your tapped creatures, §0z186; 2 and 10, §0z187;
+3-5, §0z185; 6, first and double strike, §0z198 (`opponents.
+first_strike_of`, the generated `FIRST_STRIKE` / `DOUBLE_STRIKE`); 7, the
+shilgengar timing pair, §0z215; 8, Memory Jar and Bloodbat Summoner,
+§0z228 and §0z229. 9 is not a defect: you take seat 0, written down here
+as the model's choice. Queue item 37, built from these, has nothing left.
 
 <a id="0z185"></a>
 
@@ -17293,7 +17301,7 @@ separation.
 
 <a id="0z197"></a>
 
-## 0z197. OPEN -- a review of turns, phases and combat: what the model still simplifies
+## 0z197. PARTLY RESOLVED -- a review of turns, phases and combat: what the model still simplifies
 
 **The owner, 2026-11-12**: "a more fundamental review of how the turns,
 phases, and mechanics are being implemented ... review and report", then
@@ -17471,6 +17479,19 @@ with no derivation and no check.
 "There is no point when there is so much to do." The tables stay as built
 at `63d20e7` until the batch is done and the owner calls one rebuild. The
 protocol is in queue item 44.
+
+**STATUS 2026-11-22 (checked against each fix): PARTLY RESOLVED.** A1 and
+A2 are item 44's (§0z198-§0z204, flipped); A3, A5 and A6 are on by default
+(§0z222, `opponents.POD_DEFAULTS`), A4 too (§0z200, `rival_combat`). A7 is
+half done: Chord of Calling is one rule in every deck (§0z213), but **X
+spells still have a fixed X** -- Genesis Wave at 6 (azusa; §0z210 says a
+pilot with the mana would cast it bigger) and Torment of Hailfire at 6
+(tivit). Finale of Devastation is in no active list. B is §0z184's, all
+done. C: ward (§0z224), cycling (§0z226), Woe Strider (§0z227), Memory Jar
+(§0z228); the three clauses "already named in a note" (Priest of Fell
+Rites' unearth, Cyberdrive Awakener's summoning-sick tokens, Furygale
+Flocking's split) stay notes, the first in §0z208's audit. D and E:
+§0z206. **Left: A7's fixed X**, queue item 45.
 
 <a id="0z198"></a>
 
@@ -18467,7 +18488,7 @@ and the five floors above.
 
 <a id="0z207"></a>
 
-## 0z207. OPEN -- tivit's oracle re-audit: six behaviours against the text, eleven SCRIPTED labels too strong
+## 0z207. PARTLY RESOLVED -- tivit's oracle re-audit: six behaviours against the text, eleven SCRIPTED labels too strong
 
 **The owner, 2026-11-15: "start the audit with tivit"** -- queue item 46's
 oracle audits, tivit first. The whole finding is
@@ -18530,9 +18551,21 @@ five active tables re-render byte for byte. Items 1-6 (Tempting Contract,
 Grudge Keeper, Custodi Squire, the Greaves blinks among them) stay
 SCRIPTED: a label cannot fix a ceiling.
 
+**STATUS 2026-11-22 (checked against each fix): PARTLY RESOLVED.** Tier 1
+is done: item 1 by the owner's Greaves policy (§0z216), items 2-6 by text
+(§0z214), item 8 too (`tivit_death_triggers`, §0z214); item 2's takers
+now also get their own Treasure, as the pod's mana (§0z245). The labels
+(9-15 to PARTLY) and 16-21's reasons are fixed (above). **Open**: item 7,
+Kambal's first ability ("for each of them, create a tapped token that's a
+copy of it"), implemented nowhere -- a floor; since §0z245 the pod's
+Treasures from Tempting Contract and Master of Ceremonies are made in code
+(`opponents.pod_gift`), the one place it could hook in. Items 9-15's
+missing clauses, under their PARTLY labels. Tier 4, items 23-29: seven
+piloting choices nobody argued.
+
 <a id="0z208"></a>
 
-## 0z208. OPEN -- shilgengar's oracle re-audit: three behaviours against the text, thirteen SCRIPTED labels too strong
+## 0z208. PARTLY RESOLVED -- shilgengar's oracle re-audit: three behaviours against the text, thirteen SCRIPTED labels too strong
 
 **The owner, 2026-11-15: "fix the labels, then audit shilgengar"** -- the
 second of queue item 46's audits. The whole finding is
@@ -18591,9 +18624,17 @@ its cache's render, so its table was re-rendered as well: byte-identical
 before this change, reason text only after, no row moved. A render, not a
 re-measure: nothing was run against it.
 
+**STATUS 2026-11-22 (checked against each fix): PARTLY RESOLVED.** Tier 1
+(items 1-3) is fixed by text (§0z215), every one a null on this list.
+Tier 2's thirteen labels and Tier 3's nine reasons are fixed (above).
+**Open**: items 4-15's missing clauses, under their PARTLY labels
+(Priest of Fell Rites' unearth among them, §0z197 C), and Tier 4, items
+25-29: five piloting choices, every return picking the highest mana value
+first.
+
 <a id="0z209"></a>
 
-## 0z209. OPEN -- azusa's oracle re-audit: Genesis Wave and Animist's Awakening dig the whole library
+## 0z209. PARTLY RESOLVED -- azusa's oracle re-audit: Genesis Wave and Animist's Awakening dig the whole library
 
 **The owner, 2026-11-15: "fix the labels, then audit azusa"** -- the last
 of queue item 46's audits. The whole finding is
@@ -18638,6 +18679,17 @@ careful. The largest findings, numbered as in the file:
 
 As for tivit and shilgengar: the labels are a rendering change; the
 behaviour fixes move azusa's baseline and belong before the rebuild.
+
+**STATUS 2026-11-22 (checked against each fix): PARTLY RESOLVED.** Items
+1-3 are fixed by text (§0z210, §0z211, §0z212) and item 8 is Chord's one
+rule (§0z213); items 6, 7 and 9 are PARTLY and Tier 3's reasons 10-14 are
+corrected (`docs/ORACLE_AUDIT_AZUSA.md`). **Open**: items 4-5, small
+ceilings (Craterhoof's pump reaches creatures made after it; Bane of
+Progress spares your off-board Treasures, Clues and Food); Tier 2b's eight
+utility lands with no code (Strip Mine, Wasteland, Ghost Quarter,
+Tectonic Edge, Dust Bowl, Buried Ruin, Homeward Path, Scavenger Grounds);
+6, 7 and 9's missing clauses; Tier 4's piloting choices; and Genesis
+Wave's fixed X (§0z197 A7, queue item 45).
 
 <a id="0z210"></a>
 
