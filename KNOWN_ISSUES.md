@@ -296,7 +296,8 @@ Each row is a headline and its key number, at most 250 characters
 | [0z241](#0z241) | BUILT | **Item 50 step 6: your removal that hands the pod mana** (`pod_gifts`, off): Path's and Trophy's land, An Offer's Treasures; tivit -0.0013, three more decks -0.0001 to -0.0006 |
 | [0z242](#0z242) | DECIDED | **The pod's interaction per game, for item 50's rescale**: today 3.0 spot / 0.34 wipes, NOT the header's ~4 / ~1; the owner: restore today's |
 | [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, re-fitted (`incidental_rate` 1.80), two knobs stranded; every table to rebuild |
-| [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, 37 of 379 rows moved, no sign flips; the staged swaps next |
+| [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, no sign flips; of 13 top movers re-measured on fresh seeds only Biotransference holds; the staged swaps next |
+| [0z245](#0z245) | OPEN | **Two of your cards hand the pod Treasure and are not charged**: Tempting Contract and Master of Ceremonies (tivit), missed by the census; nothing measured |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -20983,7 +20984,9 @@ shilgengar 5 of 64 (4 up), azusa 4 of 58 (0 up) -- 37 of 379, against
 tables changed sign, in any deck** (§0z195). No row entered or left a
 table.
 
-The largest movers, with what is and is not traced:
+The largest movers, as the tables showed them -- **and NOT ONE of the
+thirteen re-measured survives fresh seeds** (below, "The movers
+re-measured"); the list is kept as what the tables printed:
 - **tivit, 10 of 11 down**: Orzhov Signet +0.0211 -> +0.0168, Path to Exile
   +0.0121 -> +0.0079, Idyllic Tutor +0.0051 -> +0.0012 (both -> dmg),
   Tyrant's Choice, Damn, Tempting Contract, Trial of a Time Lord, Master of
@@ -21017,6 +21020,92 @@ None of these is a decision, and none is a cut list: they are the sizes a
 re-fitted pod gives, and §0z195 says sizes move with the fit. **Left for
 item 50: the staged swaps re-measured** on these tables (the eleven in the
 ledger), the next step and the owner's to call.
+
+### The movers re-measured on fresh seeds (§0z170)
+
+The owner asked which cards moved most and why. **The spread says most of
+it is noise before any card is read**: per deck, the SD of the 58-65 row
+changes is 0.95-1.19 standard errors of one row, and a straight line
+through the significant rows, new against old, has slope 0.96 (tivit) to
+1.07 (rendmaw), correlation 0.97-0.99. The movers are the tail of 379
+rows, so the seeds that picked them grade them.
+
+`diagnostics/run_rebuild_movers.py`: thirteen of them, the largest in five
+decks, each row played under both pods on the SAME fresh seeds
+(20000..34999, N=15,000), so the change in the row is paired per seed and
+has its own bar. It reproduces both tables on their seeds first (`--tables`,
+`results/rebuild_item50_movers_tables_check_20261122.txt`): Biotransference
+T20 +0.0059 / +0.0101, baseline 0.3361 / 0.3393, to the tables' digits.
+Fresh (`results/rebuild_item50_movers_fresh_20261122.txt`), T20 change:
+
+| card | the tables' move | fresh change |
+|---|---|---|
+| Storm-Kiln Artist (lorehold) | +0.0052 | -0.0018 ±0.0029 |
+| Orzhov Signet (tivit) | -0.0043 | -0.0001 ±0.0037 |
+| Path to Exile (tivit) | -0.0042 | -0.0001 ±0.0030 |
+| **Biotransference (rendmaw)** | **+0.0042** | **+0.0027 ±0.0025** |
+| Emeria's Call (lorehold) | -0.0041 | +0.0005 ±0.0035 |
+| Ultima (lorehold) | +0.0041 | +0.0009 ±0.0031 |
+| Idyllic Tutor (tivit) | -0.0039 | +0.0017 ±0.0032 |
+| Tyrant's Choice (tivit) | -0.0039 | +0.0011 ±0.0029 |
+| Damn (tivit) | -0.0037 | +0.0021 ±0.0034 |
+| Storm Herd (lorehold) | +0.0037 | -0.0003 ±0.0033 |
+| Ancient Greenwarden (azusa) | -0.0036 | +0.0008 ±0.0038 |
+| Voice of the Blessed (karlov) | +0.0036 | +0.0005 ±0.0025 |
+| Heroic Intervention (rendmaw) | +0.0032 | +0.0001 ±0.0028 |
+
+**Twelve of thirteen are inside their bars on fresh seeds, seven with the
+sign reversed**: regression to the mean, the size of the selection. **The
+one that holds is Biotransference**, +0.0027 ±0.0025 fresh and +0.0041
+±0.0028 on the tables' seeds: real, small, its mechanism NOT TRACED. At T10
+Heroic Intervention is +0.0013 ±0.0012, at the edge. **Tivit's 10-of-11
+down was the same noise**: its five re-measured rows are -0.0001 to +0.0021
+fresh. So the rebuild moved the baselines (the re-fit) and, beyond them, no
+row this measurement can see but one.
+
+**A gap found reading the movers' text, not a mover**: §0z245.
+
+<a id="0z245"></a>
+
+## 0z245. OPEN -- Tempting Contract and Master of Ceremonies hand the pod Treasure, uncharged
+
+Found 2026-11-22 reading the rebuild's movers against Scryfall (§0z244).
+Item 50 charges YOUR cards that hand the pod mana (`_pod_mana.POD_GIFTS`,
+§0z235, §0z241), but the census matched only the TARGET'S CONTROLLER's
+wording ("its controller may search", "its controller creates"). Two tivit
+cards give it by another wording:
+
+- **Tempting Contract**: "At the beginning of your upkeep, each opponent may
+  create a Treasure token. For each opponent who does, you create a
+  Treasure token." `tivit.upkeep` makes your Treasures (`takers`, §0z214);
+  the takers' own Treasures go nowhere.
+- **Master of Ceremonies**: "For each player who chose money, you and that
+  player each create a Treasure token." `tivit.upkeep` makes yours; theirs
+  go nowhere (nor the Citizen of "friends" nor the card of "secrets" --
+  bodies and cards, outside item 50).
+
+Under the pod without mana an opponent's Treasure was nothing, so this was
+free. Since §0z243 it is mana the pod would spend on ward, counterspells,
+held answers and removal (§0z239, §0z240): **both cards' rows are
+CEILINGS** until it is charged -- the life-loss rule's shape (§0i), as
+§0z235 said of the removal gifts. Both rows are significant today
+(Master of Ceremonies +0.0190, Tempting Contract +0.0091 at T20).
+
+The scan (every active deck's oracle text, for mana handed to another
+player): An Offer You Can't Refuse, Assassin's Trophy, Path to Exile --
+charged; **Tempting Contract, Master of Ceremonies -- not**; Storm Cauldron
+("each player may play an additional land") -- left out by §0z235 on
+purpose (symmetric, and it bounces lands); Ghost Quarter -- azusa aims it
+at its own lands, so the land comes to you. Monologue Tax, Rhystic Study,
+Smothering Tithe pay YOU and are item 52's.
+
+**What it would take**: the census to read "each opponent may create a
+Treasure" and "you and that player each create a Treasure"; the engine to
+hand each taker its Treasure through `opponents.pod_gift` (or its seam);
+how many opponents take Tempting Contract's offer is already the vote's
+(`voting.tempting_offer`); then tivit's two rows re-measured, and tivit's
+table rebuilt if staged. **Nothing measured, nothing built: the owner's
+call.**
 
 ## How to read an ablation table
 
