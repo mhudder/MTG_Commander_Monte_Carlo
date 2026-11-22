@@ -300,6 +300,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
+| [0z249](#0z249) | OPEN | **MDFC front faces: shilgengar casts Malakir Rebirth as a blank that charges 2 life** (48 casts, 96 life in 400 games) and Agadeem 8; lorehold resolves Sejiri Shelter 32 times with no text; the other five work |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21485,6 +21486,162 @@ creatures only**:
 - **Stranded knobs not run** (`run_knob_liveness`, §0z205): the change only
   adds mana to opponents that hold mana creatures, and no knob reads a
   mana creature; said, not measured.
+
+<a id="0z249"></a>
+
+## 0z249. OPEN -- the MDFC front faces: Malakir Rebirth is cast as a blank that costs 2 life, Sejiri Shelter resolves with no text
+
+**Found 2026-11-22**, a follow-up asked for by item 45's session. That
+session's own section is on its branch (`claude/mtg-handoff-docs-vuvayo`,
+not merged here when this was written), which is why this one is numbered
+past it. It found that shilgengar's main phase cast Agadeem's Awakening's
+FRONT face (no `script`, no code naming it) and resolved it as a blank,
+with its land face lost too, and suggested checking the other modal
+double-faced cards. **Nothing is fixed here.** Each fix moves its deck's
+baseline and is the owner's to schedule.
+
+**The cards**: every card of a staged list (`build_pending`) with
+`land_face` set and `is_land` False. There are eight, in three decks. No
+other staged list has one. Oracle text was read from `api.scryfall.com`
+the same day for all seven names.
+
+**How it was asked** (§0z25: by NAME, not by `script=`): `python -m
+tools.where --card NAME --all` for each card; the census
+(`edhmc/decks/_removal.py`, `INTERACTION` vs `SCANNED`); the engine's
+resolve path read one def at a time. Then the counts come from
+**`python -m diagnostics.diag_mdfc_front_faces 400`** (added here),
+installed in each worker (§0u). It wraps `opponents.countered`, the one
+place every engine reports a cast (§0z30); `answer_pod_threat`;
+`_cast_response`, the pod-turn response windows, which do not reach
+`countered`; `spell_life_loss`; `engine.play_land`, for the land face; and
+the engine's resolve (`ShilgengarGame.resolve`, `lorehold.resolve_spell`).
+"Blank" means a fingerprint of the game (your board, life, hand, library,
+Treasures, every opponent's life, creatures and route pieces) unchanged
+except the card moving to the graveyard. A cast trigger changes the
+fingerprint, so the count is a FLOOR on resolutions where the card's own
+text did nothing. Seeds 5000..5399, `bc34060`, python 3.13. Two runs gave
+byte-identical output.
+
+| deck | card | cast (countered) | resolved, blank | its own text did | land face | T10 |
+|---|---|---|---|---|---|---|
+| rendmaw | Hagra Mauling | 1 (0) + 1 end-step response | -- | 1 + 1 route pieces removed | 66 | same casts, 59 land |
+| shilgengar | **Malakir Rebirth** | 48 (0) | **48, 48 blank** | **nothing; 96 life charged** | 41 | 47 resolved, 94 life |
+| shilgengar | **Agadeem's Awakening** | 9 (1) | **8, 8 blank** | nothing | 57 | 7 resolved |
+| shilgengar | Emeria's Call | 6 (0) | 6, 0 blank | two 4/4 flying Angels | 64 | 6 |
+| lorehold | **Sejiri Shelter** | 7 (0) + 4 protections | **32, 11 blank** | **nothing at any of the 32** | 37 | 24 resolved |
+| lorehold | Emeria's Call | 55 (0) | 78, 0 blank | two 4/4 flying Angels | 40 | 65 |
+| lorehold | Ondu Inversion | 4 (1) | 5, 0 blank | the wipe (`resolve_own_wipe`, scope "nonland") | 42 | 5 |
+| lorehold | Pinnacle Monk | 19 (0) | 34, 0 blank | a body, and the ETB regrowth | 40 | 29 |
+
+The T10 column is `--turns=10`, which is `DEFAULT_CFG`'s horizon. It is
+item 45's horizon too: **its 7 Agadeem resolutions are this table's T10
+row**, and the T20 run adds one, on turn 12.
+
+### Malakir Rebirth (shilgengar): the §0k shape, and worse than a blank
+
+"Choose target creature. You lose 2 life. Until end of turn, that creature
+gains 'When this creature dies, return it to the battlefield tapped under
+its owner's control.'" No code names it, and the census does not count it
+as interaction. It is not in `opponents.PROTECTION`, so `pure_response`
+does not hold it, and nothing else holds it either. Shilgengar's main
+phase casts it as a {B} priority-2 spell whenever it is affordable above
+the reserve. `ShilgengarGame.resolve` sends it to the graveyard, and
+`spell_life_loss` charges its 2 life (`_evasion.SPELL_LIFE_LOSS`, §0z151).
+**All 48 resolutions were blank, 96 life was paid for nothing, and the
+land face was given up each time.** That is 0.12 casts a game, the most
+of any card here.
+
+Charging the drawback was right (§0i). Charging it on a cast the pilot
+should never make is what makes the card worse than a blank: its row
+measures a misplay plus a life cost, the way Ephemerate's measured cast
+tempo (§0k). The PARTLY reason in `tools/ablation.py` ("NOT: the front
+face's ... not modelled. A floor.") is wrong about what the engine does.
+The face is not left out. It is cast and paid for. Its modelable use is
+the one that reason names: a response on the pod's turn (§0z134,
+`respond_to_event`), where it would answer one creature's death.
+
+### Agadeem's Awakening (shilgengar): the same shape, item 45's finding
+
+The front face has no script and priority 1, so it is cast ({2}{B}{B}{B})
+when nothing better is affordable. 8 of 8 resolutions were blank. Item 45's
+branch builds the front face behind `agadeem_x`, OFF, and counts the old
+rule's casts as `agadeem_blank_casts`. With that switch off, this defect
+stays the default.
+
+### Sejiri Shelter (lorehold): held from the main phase, resolved everywhere else
+
+The main phase holds it: it is in lorehold's `protection_cards`, so
+`pure_response` is True and `hold_answer` skips it. **0 main-phase casts.**
+Its one modelled use is `try_protect` / `respond_to_event`, reached
+through `_cast_response`, which never calls `resolve_spell`: **4
+protections in 400 games**. But **every other path that casts a spell
+calls `resolve_spell`, where nothing reads Sejiri Shelter**: no script,
+tokens or damage, and `apply_spell_effects` names nothing of it. It
+resolved 32 times:
+
+| path | resolutions |
+|---|---|
+| `cast_free` (Improvisation Capstone 8, Invoke Calamity 6) | 14 |
+| `miracle_window` (Lorehold's miracle {2}, reduced) | 7 |
+| `apex_of_power` | 5 |
+| `discover` | 3 |
+| `sunbird` | 3 |
+
+Its own text did nothing at any of the 32. Cast triggers fired at 21 of
+them (the fingerprint moved), and 11 changed nothing at all. Some of these
+cost nothing: a card exiled by Capstone or Sunbird's Invocation that is not
+cast is lost anyway. Others spend the card. The miracle window casts it
+from hand because `miracle_value` reads mana cheated (mv 2 minus a reduced
+{2}): a proxy (§0t) saying yes to a card whose resolution is empty. On
+those casts the response use and the land face are both gone. Discover
+could put it into the hand instead, and Apex of Power could play it as a
+land. Invoke Calamity draws from both hand and graveyard, and this run does
+not say which. **How much of the 32 is a misplay and how much is free is
+not measured.** The BLIND_BUT_LIVE reason in `tools/ablation.py` names the
+land face and `try_protect` only.
+
+### The rest: their front faces do what the engine says
+
+- **Hagra Mauling** (rendmaw): "Destroy target creature" is a spot answer
+  under `pod_threats`. The census has it as `('spot', 'destroy')`, so it is
+  in `opponents.ANSWERS` (§0z131). `hold_answer` holds it while nothing it
+  can hit is out, so it is almost always played as a land (66). Its 1
+  cast and 1 end-step response each removed a route piece. **The
+  PARTLY reason in `tools/ablation.py` is stale**: it says the front face
+  "has no target in an opponent model whose creatures are a count (§4)",
+  which predates §0z131. The cost reduction ("{1} less if an opponent
+  controls no basic lands") is not modelled. §2 calls the front face
+  "{2}{B}". It is {2}{B}{B}, and the deck module has it right.
+- **Emeria's Call** (both decks): two 4/4 flying Angels. In shilgengar the
+  `emeria_call` script calls `make_angel_tokens(2)`. In lorehold the
+  `tokens=(2, 4, 4, "Angel")` field is read by `apply_spell_effects`
+  (flying from `_evasion.FLYING_TOKENS`); the grep for its name finds
+  shilgengar only because lorehold's behaviour hangs off a FIELD, not a
+  name. **Not modelled in either deck**: "Non-Angel creatures you control
+  gain indestructible until your next turn". Both decks list it as
+  SCRIPTED in `tools/ablation.py`, so the label claims more than the code
+  does. The missing clause only understates (a floor).
+- **Ondu Inversion** (lorehold): tagged `wipe`; `resolve_own_wipe` at scope
+  "nonland" (`OWN_WIPE_SCOPE`), gated by `should_cast_own_wipe`.
+- **Pinnacle Monk** (lorehold): a creature. Its ETB regrowth is
+  `enters_battlefield`'s `pinnacle_monk_etb` (§0z83). Prowess is not
+  modelled, which its PARTLY reason says.
+
+### Left for the owner
+
+Each fix moves its deck's baseline:
+
+1. Shilgengar: hold Malakir Rebirth from the main phase. Model it as a
+   response, or treat it as land-face only, which a hold gives for free.
+2. Shilgengar: Agadeem, item 45's `agadeem_x` flip.
+3. Lorehold: decide whether a resolution of Sejiri Shelter off the response
+   window should be cast at all (the miracle window, discover, Apex of
+   Power, Invoke Calamity from hand).
+
+The stale classification reasons (Hagra Mauling, Malakir Rebirth, Agadeem,
+Sejiri Shelter, and Emeria's Call's SCRIPTED label) live in
+`tools/ablation.py`, which renders the tables. They were not edited here.
+They are worth correcting in the same change as the fixes.
 
 ## How to read an ablation table
 
