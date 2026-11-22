@@ -1413,6 +1413,12 @@
         "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
         "fingerprint": "c18f0ffd5c05e813",
         "utc": "2026-11-22T04:14:47Z"
+      },
+      {
+        "commit": "0ed1f61",
+        "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
+        "fingerprint": "8856b6c2d50cc273",
+        "utc": "2026-11-22T05:48:29Z"
       }
     ]
   },
@@ -2754,6 +2760,12 @@
         "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
         "fingerprint": "009f5f89c26f03b5",
         "utc": "2026-11-22T04:14:47Z"
+      },
+      {
+        "commit": "0ed1f61",
+        "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
+        "fingerprint": "f85cf668952ea9e0",
+        "utc": "2026-11-22T05:48:29Z"
       }
     ]
   },

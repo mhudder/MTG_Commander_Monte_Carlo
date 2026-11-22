@@ -374,8 +374,15 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       route pieces, and so moves the kill turns -- a second re-fit.
     - **Rhystic Study, Smothering Tithe, Monologue Tax** ("low priority"):
       each pays or not from the pod's spare mana instead of a flat rate.
+      **BUILT 2026-11-22 (§0z246)**, with Mind's Eye (the owner: "please
+      add minds eye"), on the owner's payment rule -- an opponent pays only
+      from what it has left over. Rhystic +0.0083, Monologue Tax -0.0141,
+      Tithe -0.0033 (lorehold) / -0.0044 (shilgengar), Mind's Eye +0.0069
+      at T20; four caches SUSPECT until the rebuild, the owner's call.
     - **Found and FIXED 2026-11-22 (§0z245)**, the owner: "fix the
       treasures, then push to main, do not rebuild": Tempting Contract and
       Master of Ceremonies hand the pod its Treasure. Tivit's cache is
       SUSPECT until the next rebuild.
-    None starts before item 50 is flipped and rebuilt.
+    None starts before item 50 is flipped and rebuilt. **Left: mana
+    creatures and development gated by mana**, recommended as one batch
+    with one re-fit and one rebuild (2026-11-22).

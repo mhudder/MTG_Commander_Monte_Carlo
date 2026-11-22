@@ -1,0 +1,18 @@
+seeds 5000..19999, N=15,000 paired; the four switches off -> on; +- is 95%
+tivit
+  baseline T10: off 0.3153  on 0.3073  change -0.0080+-0.0035
+  baseline T20: off 0.5477  on 0.5399  change -0.0079+-0.0039
+  Rhystic Study      | T10 off +0.0103+-0.0027 on +0.0211+-0.0030 change +0.0107+-0.0028 | T20 off +0.0099+-0.0032 on +0.0183+-0.0034 change +0.0083+-0.0032
+  Monologue Tax      | T10 off +0.0222+-0.0031 on +0.0068+-0.0026 change -0.0154+-0.0030 | T20 off +0.0198+-0.0035 on +0.0057+-0.0031 change -0.0141+-0.0034
+lorehold
+  baseline T10: off 0.2671  on 0.2639  change -0.0032+-0.0020
+  baseline T20: off 0.4607  on 0.4574  change -0.0033+-0.0021
+  Smothering Tithe   | T10 off +0.0116+-0.0033 on +0.0084+-0.0032 change -0.0032+-0.0020 | T20 off +0.0120+-0.0038 on +0.0087+-0.0037 change -0.0033+-0.0021
+shilgengar
+  baseline T10: off 0.0568  on 0.0541  change -0.0027+-0.0011
+  baseline T20: off 0.4301  on 0.4257  change -0.0044+-0.0025
+  Smothering Tithe   | T10 off +0.0048+-0.0013 on +0.0021+-0.0011 change -0.0027+-0.0011 | T20 off +0.0077+-0.0032 on +0.0033+-0.0031 change -0.0044+-0.0025
+azusa
+  baseline T10: off 0.3449  on 0.3487  change +0.0037+-0.0013
+  baseline T20: off 0.5453  on 0.5521  change +0.0069+-0.0019
+  Mind's Eye         | T10 off +0.0061+-0.0019 on +0.0099+-0.0021 change +0.0037+-0.0013 | T20 off +0.0059+-0.0025 on +0.0127+-0.0029 change +0.0069+-0.0019

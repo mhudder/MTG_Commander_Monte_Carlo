@@ -298,6 +298,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z243](#0z243) | FLIPPED | **Item 50 flipped: the pod's mana is the default**, re-fitted (`incidental_rate` 1.80), two knobs stranded; every table to rebuild |
 | [0z244](#0z244) | REBUILT | **Item 50's rebuild: six tables on the pod with mana**: every baseline up +0.002 to +0.011, no sign flips; of 13 top movers re-measured on fresh seeds only Biotransference holds; the staged swaps next |
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
+| [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21212,6 +21213,138 @@ table: the drawback is real and small.
 rebuild clears it, and the owner said "do not rebuild". `check_docs` fails
 on that one check until the next rebuild -- expected, said in the commit.
 Never `--verified`.
+
+<a id="0z246"></a>
+
+## 0z246. BUILT -- item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod
+
+**The owner, 2026-11-22: "A, I agree with your assessment, and please add
+minds eye"; "once you're done with the modeling for those cards, push to
+main".** Queue item 52's first part, the cards item 50 left on flat rates
+(§0z234 decision 6), and Mind's Eye, which the pod's draws (§0z236) made
+modelable (§0z209 item 14). Texts from Scryfall the same day:
+
+- **Rhystic Study** (tivit): "Whenever an opponent casts a spell, you may
+  draw a card unless that player pays {1}."
+- **Smothering Tithe** (lorehold, shilgengar): "Whenever an opponent draws a
+  card, that player may pay {2}. If the player doesn't, you create a
+  Treasure token."
+- **Monologue Tax** (tivit): "Whenever an opponent casts their second spell
+  each turn, you create a Treasure token."
+- **Mind's Eye** (azusa): "Whenever an opponent draws a card, you may pay
+  {1}. If you do, draw a card."
+
+**The rules read** (`docs/MagicCompRules_20260807.txt`): 118.12a -- "unless
+[a player does something]" means that player MAY; 603.2c -- each cast and
+each draw is its own trigger; 601.2i -- cast triggers trigger as the spell
+becomes cast; 103.8c -- in multiplayer no player skips its first draw, so
+every opponent turn has a draw; 502.3 -- what you leave untapped on your
+turn stays untapped through theirs.
+
+**The payment rule, the owner's (agreed 2026-11-22)**: an opponent pays an
+"unless" tax only from what it has LEFT OVER after its turn's spending and
+the mana it keeps up for your turn (`opponents.pod_spare` =
+`mana_left` - `answer_reserve`, decision 4's order), so a tax never costs it
+a play.
+
+### What is built
+
+- **`opponents.pod_cast`**, called from `pod_spend` for every SPELL the pod
+  casts (`POD_SPELL_KINDS`: route pieces, bodies, spot, A/E, wipes,
+  counterspells; a tax or a ward is not a spell). It counts the caster's
+  spells this turn (`cast_turn`: the game turn and the seat, or your turn)
+  for Monologue Tax's second spell, and triggers Rhystic Study: on YOUR turn
+  paid at once from what is left after the spell; on its OWN turn held to
+  its end step.
+- **`opponents.settle_pod_taxes`**, each opponent's end step: Smothering
+  Tithe's trigger (its draw step's, so paid first), then its turn's Rhystic
+  triggers, each paid while what is left over covers it.
+- **What you are owed** (`pod_owed`) is collected where the flat rates were
+  taken, in your upkeep: `engine.tithe_treasures`, the new
+  `engine.monologue_treasures` (one rule for tivit and lorehold), tivit's
+  Rhystic draws (each one "you MAY", `spock_draw_safe`). So the TIMING is
+  today's -- the draws and Treasures come at your upkeep, not on their
+  turns -- said out loud.
+- **Mind's Eye** (`AzusaGame.minds_eye`), at each opponent's upkeep, for the
+  draw step after it: {1} from what you left untapped, a Treasure included,
+  when a draw is safe (§0z42). Paid and drawn then -- the only one of the
+  four on its real timing.
+- **Switches** `rhystic_from_pod`, `tithe_from_pod`, `monologue_from_pod`,
+  `minds_eye_from_pod`, default True, each needing `pod_mana`
+  (`POD_PRE_ITEM50` turns them off with it). Off: the flat rates exactly.
+- **Labels**: all four PARTLY_MODELLED, each reason citing this section --
+  Rhystic Study and Mind's Eye were BLIND, Smothering Tithe SCRIPTED. A
+  rendering change: tivit's, lorehold's, shilgengar's and azusa's tables
+  re-rendered from their caches, every numeric row identical as a set.
+- **Comments made false and corrected**: `engine.tithe_treasures`'s "the
+  pod's draws are not modelled", shilgengar's "the opponents never pay the
+  {2}", lorehold's `tithe_forced_draws` ("the same assumption the round's
+  own Treasures make").
+
+**NOT modelled, each a floor or a ceiling said here**: the spells and draws
+the pod MODEL does not have (cantrips, rituals, draw spells, the rest of a
+real hand) -- so every trigger count is a FLOOR, Monologue Tax's most of
+all; a Tithe on the battlefield at an opponent's draw but gone by its end
+step is not paid for (a floor); mana YOU hold up for Mind's Eye -- the
+pilot spends first and pays from the rest (a floor); lorehold's draws you
+force (Reforge the Soul, `tithe_forced_draws`) stay unpaid by the owner's
+2026-10-22 call (a small ceiling).
+
+**Pinned**: `tests/test_pod_taxes.py` A-J -- an own turn settled at its end
+step; your turn at once; the kept-up counterspell cost is not left over;
+Tithe paid before Rhystic; the second spell each turn; owed then cleared;
+the flat rates off; Mind's Eye paying from an untapped Forest; a tax is not
+a spell. Four mutations, every expected set exact on the first run.
+
+### What moved
+
+`check_unchanged_decks --n=2000` against `5237ddc`: **switches off, all six
+decks BIT-IDENTICAL**; **on, rendmaw and karlov BIT-IDENTICAL**, modules and
+staged lists at 2,000 seeds (§0z126) -- recorded `--verified`; tivit,
+lorehold, shilgengar and azusa move.
+
+The cards' reach (a 600-game smoke, tivit): about one spell per opponent
+turn; the share an opponent can pay rises from 0.16 on pod turn 3 to about
+0.5 from turn 6 -- so Rhystic draws about 1.75 a round where the flat rate
+drew 1.
+
+`diagnostics/run_pod_taxes.py`, the tables' seeds, N=15,000 paired, the
+four switches off -> on (`results/pod_taxes_20261122.txt`). **The OFF leg
+reproduces the caches** -- lorehold 0.4607 and Tithe +0.0120, shilgengar
+0.4301 and Tithe +0.0077, azusa 0.5453 and Mind's Eye +0.0059 at T20 -- and
+tivit's is §0z245's ON leg (0.5477):
+
+| | T10 change | T20 change | T20 row, off -> on |
+|---|---|---|---|
+| tivit baseline | **-0.0080 ±0.0035** | **-0.0079 ±0.0039** | 0.5477 -> 0.5399 |
+| Rhystic Study | **+0.0107 ±0.0028** | **+0.0083 ±0.0032** | +0.0099 -> +0.0183 |
+| Monologue Tax | **-0.0154 ±0.0030** | **-0.0141 ±0.0034** | +0.0198 -> +0.0057 |
+| lorehold baseline, and its Tithe row | **-0.0032 ±0.0020** | **-0.0033 ±0.0021** | Tithe +0.0120 -> +0.0087 |
+| shilgengar baseline, and its Tithe row | **-0.0027 ±0.0011** | **-0.0044 ±0.0025** | Tithe +0.0077 -> +0.0033 |
+| azusa baseline, and Mind's Eye's row | **+0.0037 ±0.0013** | **+0.0069 ±0.0019** | Mind's Eye +0.0059 -> +0.0127 |
+
+A blanked card's row moves by its deck's baseline change exactly where the
+deck runs one tax card (the blank has nothing for a switch to act on): a
+check, not a finding.
+
+- **Rhystic Study nearly doubles**: the pod is tapped out early, when the
+  draws matter most, and pays only half its triggers later.
+- **Monologue Tax falls to a third**: the flat 2 Treasures a round was a
+  CEILING -- an opponent here casts about one modelled spell a turn, so a
+  second spell is the exception. It is still significant (+0.0057 ±0.0031),
+  and it is the card most exposed to the floor above: **the knob that
+  decides it is how many spells the pod model casts**, said out loud.
+- **Smothering Tithe loses a third (lorehold) and over half (shilgengar)**:
+  the pod pays about half its draws (0.65 of 1.16 a game, lorehold; 0.89 of
+  1.55, shilgengar, in the smoke).
+- **Mind's Eye doubles**, from a BLIND row (a blank cast later, §0z66) to a
+  card that draws: 0.25 draws a game, over every game, in the smoke (0.44
+  triggers; a draw is skipped when nothing is untapped or it is unsafe).
+
+**Tivit's, lorehold's, shilgengar's and azusa's caches are SUSPECT**: their
+baselines moved, so only a rebuild clears them -- the owner's call. Tivit's
+was already (§0z245). `check_docs` fails on that one check until then;
+never `--verified`.
 
 ## How to read an ablation table
 
