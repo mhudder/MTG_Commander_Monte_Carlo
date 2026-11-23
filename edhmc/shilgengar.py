@@ -153,6 +153,9 @@ from edhmc.decks._evasion import HUMAN   # Herald of War (§0z84)
 
 # Item 45 (§0z248): the MDFC whose front face `agadeem_x` casts.
 AGADEEM = "Agadeem's Awakening // Agadeem, the Undercrypt"
+# §0z251: the MDFC whose front face is a protection spell (`opponents.
+# PROTECTION`), held for the pod's removal.
+MALAKIR = "Malakir Rebirth // Malakir Mire"
 from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -219,8 +222,13 @@ class ShilgengarGame(BaseGame):
         self.avacyn_queue: list = []
 
         cfg.setdefault("shroud_sources", ())
+        # MALAKIR REBIRTH (§0z251): its front face a protection spell, held
+        # for the pod's removal instead of cast into nothing in a main phase
+        # (it was, in 12% of games). `malakir_text=False` is the old blank.
         cfg.setdefault("protection_cards",
-                       ("Flawless Maneuver", "Teferi's Protection"))
+                       ("Flawless Maneuver", "Teferi's Protection")
+                       + ((MALAKIR,) if cfg.get("malakir_text", True)
+                          else ()))
         # See "THE SACRIFICE POLICY, SAID OUT LOUD" in the module docstring.
         cfg.setdefault("shilgengar_sac_policy", "ultimate")   # or "tokens"
         cfg.setdefault("shilgengar_ult_min_gain", 1)
@@ -234,6 +242,7 @@ class ShilgengarGame(BaseGame):
             # item 45 (§0z248): Agadeem's Awakening's front face, at its X
             "x_spells_paid": 0, "agadeem_x_casts": 0, "agadeem_x": 0,
             "agadeem_returned": 0, "agadeem_blank_casts": 0,
+            "malakir_seen": 0,                          # §0z251
             "stranded_mv": 0, "turn_lethal": 99, "turn_won": 99,
             "removal_eaten": 0, "ae_removal_eaten": 0, "wipes_suffered": 0,
             "countered": 0, "protected": 0, "loss_route": 0, "win_route": 0,
@@ -1293,6 +1302,8 @@ class ShilgengarGame(BaseGame):
             options = []
             mode_cost = {}
             xs = {}              # item 45: the X each option pays
+            if any(c.name == MALAKIR for c in self.hand):
+                self.m["malakir_seen"] += 1    # §0z251: either rule's reach
             for c in self.hand:
                 if c.is_land:
                     continue

@@ -303,6 +303,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X, all eight ON**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021, Agadeem +0.0013 at T20; Animist, Nylea, Green Sun inside their bars |
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
+| [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's spot removal; the other five MDFC front faces checked and modelled |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21884,6 +21885,58 @@ not computed; said, not explained.
 **Hexhaven's row against Ka-Zar's** agrees with §0z249's head-to-head:
 +0.0050 against +0.0117 here is -0.0067 by rows, -0.0044 ±0.0033 measured
 directly. The direct number is the one to quote (§0e).
+
+<a id="0z251"></a>
+
+## 0z251. FIXED -- Malakir Rebirth's front face, cast into nothing; five other MDFCs checked
+
+**The owner, 2026-11-23**, on the open fixes before a rebuild: "go ahead
+with 1 and 2 first". Fix 1: the MDFC front faces §0z248 suspected of the
+blank cast Agadeem's Awakening had. Fix 2 (rendmaw's goaded Birds by a
+count share) was ALREADY DONE -- §0z225, `goad_body_blocks`, on since
+2026-11-17; listing it was a misreading of item 49, whose one open bullet
+(azusa's `counter_target`) waits on a proposal.
+
+**The check**: each front face with `script=None`, its oracle text from
+Scryfall (2026-11-23), how often its deck casts it (`watch`, 400 games,
+seeds 5000..), and whether any code gives it a behaviour:
+
+| card (deck) | front face cast | modelled by |
+|---|---|---|
+| Hagra Mauling (rendmaw) | 1 of 400 | the removal census: "destroy target creature", a held answer |
+| **Malakir Rebirth (shilgengar)** | **48 of 400** | **nothing -- a blank** |
+| Emeria's Call (lorehold) | 76 of 400 | its `tokens=(2, 4, 4, "Angel")` field |
+| Sejiri Shelter (lorehold) | 30 of 400 | `opponents.PROTECTION` |
+| Ondu Inversion (lorehold) | 5 of 400 | a wipe (`WIPE_DESTROYS`) |
+| Pinnacle Monk (lorehold) | 34 of 400 | `lorehold.enters_battlefield` |
+
+**Malakir Rebirth** ({B}, Instant: "Choose target creature. You lose 2
+life. Until end of turn, that creature gains 'When this creature dies,
+return it to the battlefield tapped under its owner's control.'") was cast
+at sorcery speed for nothing in 12% of games -- the {B} and the land lost,
+and the 2 life never charged.
+
+**The fix** (`malakir_text`, ON; False is the old blank): an entry in
+`opponents.PROTECTION` -- spot removal at one of your creatures, priced as
+"indestructible" (survives a destroy, not an exile), its 2 life charged as
+it is cast (`protection_life`, for both response paths) -- and the card on
+shilgengar's `protection_cards`, so it is a pure response: held out of the
+main phase (`hold_answer`), cast from held mana in the response window
+(§0z134). **The judgements, said out loud**: a FLOOR -- the card also beats
+an edict, damage and -X/-X, which an indestructible creature does not; it
+saves one creature, so no wrath entry; the return tapped and its ETB again
+are not modelled.
+
+**Pinned**: `tests/test_malakir.py`, seven cases A-G, four mutations,
+every expected set exact on the first run. Shilgengar's ablation notes
+for Malakir and Agadeem (whose front face §0z248 built) say what is
+modelled now; `test_metrics_and_render` C fails for shilgengar until its
+table is rebuilt, because the table prints those notes.
+
+### Measured
+
+Pending: `diagnostics.run_knob_ab shilgengar malakir_text malakir_seen`,
+N=15,000, and `check_unchanged_decks` against `63cd636`.
 
 ## How to read an ablation table
 

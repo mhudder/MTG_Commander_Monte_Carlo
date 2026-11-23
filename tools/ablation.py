@@ -1410,16 +1410,18 @@ PARTLY_MODELLED = {
             "half can be asked. A restriction on the pod only helps you. A "
             "floor.",
         "Agadeem's Awakening // Agadeem, the Undercrypt":
-            "MODELLED: the back face, played as a land. NOT: the front "
-            "face's X-spell mass reanimation, largely redundant here with "
-            "Shilgengar's own ultimate and the deck's other recursion. A "
-            "floor.",
+            "MODELLED: the back face, played as a land; the front face "
+            "(§0z248, `agadeem_x`): creatures of different mana values X or "
+            "less from your graveyard, X the largest the mana affords above "
+            "the ultimate's reserve. NOT: a pilot casting it to hold a land "
+            "drop back, or X chosen below the largest. A floor.",
         "Malakir Rebirth // Malakir Mire":
-            "MODELLED: the back face, played as a land. NOT: the front "
-            "face's 'you lose 2 life; until end of turn, that creature gains "
-            "\"when this creature dies, return it to the battlefield\"' -- "
-            "MODELABLE in the response window held mana opens on the pod's "
-            "turn (§0z134, `respond_to_event`), not modelled. A floor.",
+            "MODELLED: the back face, played as a land; the front face "
+            "(§0z251) as a protection spell held for the pod's spot removal "
+            "at one of your creatures, 2 life paid, priced as indestructible "
+            "(`opponents.PROTECTION`). NOT: its edge over indestructible "
+            "(an edict, damage, -X/-X), one creature saved from a wrath, "
+            "the return tapped and its ETB again. A floor.",
         # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z208, whose
         # item numbers these cite; docs/ORACLE_AUDIT_SHILGENGAR.md). ---
         "Viscera Seer":

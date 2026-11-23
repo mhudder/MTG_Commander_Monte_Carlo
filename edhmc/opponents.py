@@ -1795,7 +1795,27 @@ PROTECTION = {
         "spot": "indestructible", "wipe": "indestructible", "creature": True},
     "Teferi's Protection": {   # "All permanents you control phase out"
         "spot": "blank", "ae": "blank", "wipe": "blank", "exile": True},
+    # §0z251 (Scryfall, 2026-11-23): "Choose target creature. You lose 2
+    # life. Until end of turn, that creature gains 'When this creature dies,
+    # return it to the battlefield tapped under its owner's control.'" A
+    # creature's death answered, priced as "indestructible" is: survives a
+    # destroy, not an exile -- a FLOOR, since it also beats an edict, damage
+    # and -X/-X, which an indestructible creature does not. One creature, so
+    # no wrath entry (a floor). Returning tapped and entering again (its ETB)
+    # are not modelled. "life" is charged as it is cast.
+    "Malakir Rebirth // Malakir Mire": {
+        "spot": "indestructible", "creature": True, "life": 2.0},
 }
+
+
+def protection_life(g, card) -> None:
+    """A protection spell's life cost, paid as it is cast (`PROTECTION`'s
+    "life": Malakir Rebirth's 2, §0z251). `spell_life_costs=False` is the
+    uncharged ceiling, as for Toxic Deluge."""
+    life = PROTECTION.get(card.name, {}).get("life", 0.0)
+    if life and g.cfg.get("spell_life_costs", True):
+        g.your_life -= life
+        g.m["life_lost_to_own_cards"] += life
 
 
 def try_protect(g, roll: float, event=None, victim=None):
@@ -1836,6 +1856,7 @@ def try_protect(g, roll: float, event=None, victim=None):
     # A blank before an indestructible grant: it answers more.
     hi, how = min(held, key=lambda ch: ch[1] != "blank")
     g.hand.remove(hi)
+    protection_life(g, hi)                    # §0z251
     if not (keyed and PROTECTION.get(hi.name, {}).get("exile")):
         g.graveyard.append(hi)            # an "Exile <this>" card is gone
     g.m["protected"] += 1
@@ -1930,6 +1951,7 @@ def _cast_response(g, card, kind) -> bool:
     if pay is None or not pay(dict(card.cost)):
         return False
     g.hand.remove(card)
+    protection_life(g, card)                  # §0z251
     if not PROTECTION.get(card.name, {}).get("exile"):
         g.graveyard.append(card)
     g.m["responses_cast"] += 1
