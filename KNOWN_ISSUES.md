@@ -21790,6 +21790,11 @@ back." **A choice about the cards on hand, made knowing the number**
 - `tests/test_tutored_etb.py` D pinned a Waved Ka-Zar with the card
   taken from the staged list; it takes the catalog's when the list has
   none, as it already did for Finale.
+- **The removal census, regenerated** (`tools.removal_census --write`;
+  it counts every STAGED list): Hexhaven enters `_pod_mana.RAMP` (a land
+  search) and both `SCANNED` sets in place of Ka-Zar; no constant the pod
+  reads changed, and every active deck is BIT-IDENTICAL to `320a27d` at
+  2,000 seeds with it (`check_unchanged_decks`).
 
 ## How to read an ablation table
 
