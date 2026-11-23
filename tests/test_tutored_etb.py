@@ -54,7 +54,7 @@ import edhmc.engine as EN
 from edhmc.azusa import AzusaGame
 from edhmc.decks.azusa_v1 import FINALE_OF_DEVASTATION
 from edhmc.experiment import DEFAULT_CFG
-from edhmc.pending import build_pending
+from edhmc.pending import DECKS as CATALOG, build_pending
 
 MUTATE = "--mutate" in sys.argv
 PASS, FAIL = [], []
@@ -79,11 +79,16 @@ def fresh(**cfg):
 
 
 def take(g, name):
+    """The game's own copy of `name`; a card the staged list does not hold
+    is the catalog's (Ka-Zar of the Savage Land, withdrawn for now on
+    2026-11-23, §0z249 -- the mechanism D pins is still the engine's)."""
     for zone in (g.library, g.hand, g.graveyard):
         for c in zone:
             if c.name == name:
                 EN.remove_card(zone, c)
                 return c
+    if name in CATALOG["azusa"][1]:
+        return CATALOG["azusa"][1][name]
     raise LookupError(name)
 
 

@@ -1113,6 +1113,64 @@ CHANGES: list[Change] = [
 
     Change(
         deck="azusa",
+        remove="Forest",
+        add="Fabled Passage",
+        staged="2026-10-06",
+        rationale=(
+            "'{T}, Sacrifice this land: Search your library for a basic land "
+            "card, put it onto the battlefield tapped, then shuffle. Then if "
+            "you control four or more lands, untap that land.' Two landfall "
+            "triggers from one land drop in a landfall deck, a Forest thinned "
+            "from the library, and a land in the graveyard for the recursion "
+            "package -- for no life."
+        ),
+        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        reverified="RE-MEASURED 2026-11-17 AT 5a00891 (§0z226 cycling, §0z227-§0z232 the card work), in context, N=15,000 paired, python 3.11.18, run from a worktree: +0.0097 +-0.0045 at T10, +0.0074 +-0.0051 at T20 -- significant at both; the staging stands. results/restage_20261117.txt. " + "RE-MEASURED 2026-11-16 ON ITEM 45'S POD (§0z222: route-aware kills, walkers attacked, held answers, incidental_rate 1.94), in context, N=15,000 paired, python 3.11.17: +0.0093 +-0.0045 at T10, +0.0070 +-0.0051 at T20 -- significant at both; the staging stands. results/restage_20261116.txt. " + "RE-MEASURED 2026-11-15 ON THE FLIPPED POD (item 44, §0z204; queue item 48, §0z219: attackers die, you block, the pod re-fitted), in context, N=15,000 paired, python 3.11.17: +0.0081 +-0.0045 at T10, +0.0077 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261115.txt. " + "RE-MEASURED 2026-11-07 ON THE POD'S ROUND AS SEAT TURNS (§0z179), in context, N=15,000 paired, python 3.13.16: +0.0076 +-0.0044 at T10, +0.0099 +-0.0054 at T20 -- significant at both; the staging stands. results/restage_20261107_pod.txt. " + "RE-MEASURED 2026-11-07 ON THE PHASE-EMPTYING POOL (§0z177), in context, N=15,000 paired, python 3.13.16: +0.0079 +-0.0044 at T10, +0.0100 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261107.txt. " + "RE-MEASURED 2026-11-04 ON THE CLEANUP STEP (§0z171), the karoo guard (§0z172) and Necropotence's Tower target (§0z173), in context, N=15,000 paired, python 3.13.16: +0.0088 +-0.0044 at T10, +0.0115 +-0.0053 at T20. Significant at both; the staging stands. results/restage_20261104.txt. " + "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0072 +-0.0040 at T10, +0.0091 +-0.0049 at T20 alone; the pair (both fetches) +0.0157 +-0.0052 / +0.0191 +-0.0062. Significant at both; the staging stands. The pod's move is inside its bar: -0.0017 / -0.0025 alone, -0.0007 / +0.0001 for the pair. results/restage_item26_20261015.txt (§0z143)." + ("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0138 +-0.0036 at T10, +0.0117 +-0.0048 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
+        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
+    ),
+    Change(
+        deck="azusa",
+        remove="Forest",
+        add="Evolving Wilds",
+        staged="2026-10-06",
+        rationale=(
+            "'{T}, Sacrifice this land: Search your library for a basic land "
+            "card, put it onto the battlefield tapped, then shuffle.' Fabled "
+            "Passage without the untap: the same two landfalls for no life."
+        ),
+        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
+        reverified="RE-MEASURED 2026-11-17 AT 5a00891 (§0z226 cycling, §0z227-§0z232 the card work), in context, N=15,000 paired, python 3.11.18, run from a worktree: +0.0051 +-0.0046 at T10, +0.0067 +-0.0052 at T20 -- significant at both; the staging stands. results/restage_20261117.txt. " + "RE-MEASURED 2026-11-16 ON ITEM 45'S POD (§0z222: route-aware kills, walkers attacked, held answers, incidental_rate 1.94), in context, N=15,000 paired, python 3.11.17: +0.0049 +-0.0045 at T10, +0.0080 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261116.txt. " + "RE-MEASURED 2026-11-15 ON THE FLIPPED POD (item 44, §0z204; queue item 48, §0z219: attackers die, you block, the pod re-fitted), in context, N=15,000 paired, python 3.11.17: +0.0063 +-0.0046 at T10, +0.0089 +-0.0054 at T20 -- significant at both; the staging stands. results/restage_20261115.txt. " + "RE-MEASURED 2026-11-07 ON THE POD'S ROUND AS SEAT TURNS (§0z179), in context, N=15,000 paired, python 3.13.16: +0.0048 +-0.0044 at T10, +0.0093 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261107_pod.txt. " + "RE-MEASURED 2026-11-07 ON THE PHASE-EMPTYING POOL (§0z177), in context, N=15,000 paired, python 3.13.16: +0.0047 +-0.0044 at T10, +0.0089 +-0.0053 at T20 -- significant at both (T10 by 0.0003); the staging stands. results/restage_20261107.txt. " + "RE-MEASURED 2026-11-04 ON THE CLEANUP STEP (§0z171), the karoo guard (§0z172) and Necropotence's Tower target (§0z173), in context, N=15,000 paired, python 3.13.16: +0.0057 +-0.0045 at T10, +0.0093 +-0.0053 at T20. Significant at both; the staging stands. results/restage_20261104.txt. " + "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0071 +-0.0041 at T10, +0.0105 +-0.0050 at T20 alone; the pair (both fetches) +0.0157 +-0.0052 / +0.0191 +-0.0062. Significant at both; the staging stands. The pod's move is inside its bar: +0.0011 / +0.0054 alone, -0.0007 / +0.0001 for the pair. results/restage_item26_20261015.txt (§0z143)." + ("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0079 +-0.0037 at T10, +0.0063 +-0.0049 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
+        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
+    ),
+    # -----------------------------------------------------------------------
+    # The owner, 2026-11-23: Hexhaven Invigorator in Ka-Zar's slot, for the
+    # cards on hand -- temporary, Ka-Zar returns with the next order.
+    # -----------------------------------------------------------------------
+    Change(
+        deck="azusa",
+        remove="Perilous Forays",
+        add="Hexhaven Invigorator",
+        staged="2026-11-23",
+        rationale=(
+            "THE OWNER'S CHOICE, NOT THE NUMBER'S: \"Please make the Ka-zar swap "
+            "for Invigorator because i have the card available immediately "
+            "now. When i order the new batch I will swap them back.\" Ka-Zar "
+            "of the Savage Land was itself STAGED here, in Perilous Forays' "
+            "exact position, never committed; that Change is WITHDRAWN (for "
+            "now, not refuted) and this one takes the same position -- so the "
+            "list is exactly the -Ka-Zar +Hexhaven leg §0z249 measured. "
+            "TEMPORARY: to swap back, move the Ka-Zar Change back to CHANGES "
+            "and this one to WITHDRAWN."
+        ),
+        evidence="§0z249, diagnostics/run_azusa_hexhaven.py, results/azusa_hexhaven_slots_20261122.txt: N=15,000 paired, seeds 5000..19999, against the staged list WITH Ka-Zar -- -Ka-Zar +Hexhaven Invigorator -0.0027 +-0.0028 (inside its bar) at T10 and -0.0044 +-0.0033 (significant) at T20, damage -0.42, landfall_triggers +0.25 a game. A LOSS, and the least costly of the four slots measured (Springheart -0.0104, Chocobo -0.0093, Greensleeves -0.0063 at T20). Hexhaven's trigger fires 0.08 times a game (diagnostics/diag_hexhaven_combat.py).",
+        notes="Hexhaven is PARTLY_MODELLED: damage from the pod's spells and wipes is abstract (a floor), and the pod's blocks do not know its trigger (a ceiling). Staging moves azusa's baseline: only a rebuild clears its cache (SUSPECT already since §0z247); never --verified.",
+    ),
+]
+
+
+WITHDRAWN: list[Change] = [
+    Change(
+        deck="azusa",
         remove="Perilous Forays",
         add="Ka-Zar of the Savage Land",
         staged="2026-09-10",
@@ -1170,42 +1228,19 @@ CHANGES: list[Change] = [
         reverified="RE-MEASURED 2026-11-17 AT 5a00891 (§0z226 cycling, §0z227-§0z232 the card work), in context, N=15,000 paired, python 3.11.18, run from a worktree: +0.0076 +-0.0029 at T10, +0.0125 +-0.0035 at T20 -- significant at both; the staging stands. results/restage_20261117.txt. " + "RE-MEASURED 2026-11-16 ON ITEM 45'S POD (§0z222: route-aware kills, walkers attacked, held answers, incidental_rate 1.94), in context, N=15,000 paired, python 3.11.17: +0.0072 +-0.0029 at T10, +0.0124 +-0.0034 at T20 -- significant at both; the staging stands. results/restage_20261116.txt. " + "RE-MEASURED 2026-11-15 ON THE FLIPPED POD (item 44, §0z204; queue item 48, §0z219: attackers die, you block, the pod re-fitted), in context, N=15,000 paired, python 3.11.17: +0.0077 +-0.0028 at T10, +0.0140 +-0.0035 at T20 -- significant at both; the staging stands. results/restage_20261115.txt. " + "RE-MEASURED 2026-11-07 ON THE POD'S ROUND AS SEAT TURNS (§0z179), in context, N=15,000 paired, python 3.13.16: +0.0070 +-0.0027 at T10, +0.0066 +-0.0035 at T20 -- significant at both; the staging stands. results/restage_20261107_pod.txt. " + "RE-MEASURED 2026-11-07 ON THE PHASE-EMPTYING POOL (§0z177), in context, N=15,000 paired, python 3.13.16: +0.0066 +-0.0028 at T10, +0.0072 +-0.0034 at T20 -- significant at both; the staging stands. results/restage_20261107.txt. " + "RE-MEASURED 2026-11-04 ON THE CLEANUP STEP (§0z171), the karoo guard (§0z172) and Necropotence's Tower target (§0z173), in context, N=15,000 paired, python 3.13.16: +0.0065 +-0.0027 at T10, +0.0069 +-0.0034 at T20. Significant at both; the staging stands. results/restage_20261104.txt. " + "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0049 +-0.0026 at T10, +0.0067 +-0.0033 at T20. Significant at both; the staging stands. The pod alone moved it -0.0006 +-0.0025 at T10 and -0.0054 +-0.0043 at T20 (POD_PRE_V4 at the same commit: +0.0055 / +0.0121). results/restage_item26_20261015.txt (§0z143)." + 'RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0037 +-0.0023 at T10, +0.0115 +-0.0034 at T20. Significant at both; the staging stands. results/restage_20261007.txt. ' + (
             "RE-MEASURED 2026-09-26 (§0z63), N=15,000 paired: +0.0033 +-0.0022 at T10, +0.0133 +-0.0035 at T20. The staging stands. results/restage_20260926.txt."
         + ' ' + "RE-MEASURED 2026-09-29 on the engine after §0z75-§0z80 (death look-back, finality, lifegain routing, Goldspan's target Treasure), N=15,000 paired, in context: +0.0034 +-0.0022 at T10, +0.0130 +-0.0035 at T20. Within its bar of the last measurement; the staging stands. results/restage_20260929.txt (§0z81)."),
-    ),
-    Change(
-        deck="azusa",
-        remove="Forest",
-        add="Fabled Passage",
-        staged="2026-10-06",
-        rationale=(
-            "'{T}, Sacrifice this land: Search your library for a basic land "
-            "card, put it onto the battlefield tapped, then shuffle. Then if "
-            "you control four or more lands, untap that land.' Two landfall "
-            "triggers from one land drop in a landfall deck, a Forest thinned "
-            "from the library, and a land in the graveyard for the recursion "
-            "package -- for no life."
+        withdrawn=(
+            "WITHDRAWN BY THE OWNER 2026-11-23, FOR NOW -- NOT REFUTED. \"Please "
+            "make the Ka-zar swap for Invigorator because i have the card "
+            "available immediately now. When i order the new batch I will swap "
+            "them back.\" Ka-Zar's slot holds Hexhaven Invigorator until then "
+            "(the Change -Perilous Forays +Hexhaven Invigorator, staged the same "
+            "day: Ka-Zar's exact position). TO SWAP BACK: move this entry back "
+            "to CHANGES and the Hexhaven one to WITHDRAWN. Its evidence stands "
+            "as recorded; on §0z249's run Ka-Zar's slot is worth +0.0044 "
+            "+-0.0033 at T20 over Hexhaven's."
         ),
-        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
-        reverified="RE-MEASURED 2026-11-17 AT 5a00891 (§0z226 cycling, §0z227-§0z232 the card work), in context, N=15,000 paired, python 3.11.18, run from a worktree: +0.0097 +-0.0045 at T10, +0.0074 +-0.0051 at T20 -- significant at both; the staging stands. results/restage_20261117.txt. " + "RE-MEASURED 2026-11-16 ON ITEM 45'S POD (§0z222: route-aware kills, walkers attacked, held answers, incidental_rate 1.94), in context, N=15,000 paired, python 3.11.17: +0.0093 +-0.0045 at T10, +0.0070 +-0.0051 at T20 -- significant at both; the staging stands. results/restage_20261116.txt. " + "RE-MEASURED 2026-11-15 ON THE FLIPPED POD (item 44, §0z204; queue item 48, §0z219: attackers die, you block, the pod re-fitted), in context, N=15,000 paired, python 3.11.17: +0.0081 +-0.0045 at T10, +0.0077 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261115.txt. " + "RE-MEASURED 2026-11-07 ON THE POD'S ROUND AS SEAT TURNS (§0z179), in context, N=15,000 paired, python 3.13.16: +0.0076 +-0.0044 at T10, +0.0099 +-0.0054 at T20 -- significant at both; the staging stands. results/restage_20261107_pod.txt. " + "RE-MEASURED 2026-11-07 ON THE PHASE-EMPTYING POOL (§0z177), in context, N=15,000 paired, python 3.13.16: +0.0079 +-0.0044 at T10, +0.0100 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261107.txt. " + "RE-MEASURED 2026-11-04 ON THE CLEANUP STEP (§0z171), the karoo guard (§0z172) and Necropotence's Tower target (§0z173), in context, N=15,000 paired, python 3.13.16: +0.0088 +-0.0044 at T10, +0.0115 +-0.0053 at T20. Significant at both; the staging stands. results/restage_20261104.txt. " + "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0072 +-0.0040 at T10, +0.0091 +-0.0049 at T20 alone; the pair (both fetches) +0.0157 +-0.0052 / +0.0191 +-0.0062. Significant at both; the staging stands. The pod's move is inside its bar: -0.0017 / -0.0025 alone, -0.0007 / +0.0001 for the pair. results/restage_item26_20261015.txt (§0z143)." + ("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0138 +-0.0036 at T10, +0.0117 +-0.0048 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
-        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
-    ),
-    Change(
-        deck="azusa",
-        remove="Forest",
-        add="Evolving Wilds",
-        staged="2026-10-06",
-        rationale=(
-            "'{T}, Sacrifice this land: Search your library for a basic land "
-            "card, put it onto the battlefield tapped, then shuffle.' Fabled "
-            "Passage without the untap: the same two landfalls for no life."
-        ),
-        evidence="N=15,000 paired, seeds 5000.., the staged list on the engine with Eye of Ugin's tutor and Kozilek's cast draw (§0z114), one T20 game per seed with T10 read off it. diagnostics/run_eye_of_ugin.py, results/eye_of_ugin_20261006.txt. THE PAIR, measured as one change (both Changes applied, the first two Forests in list order): +0.0257 +-0.0048 at T10 and +0.0237 +-0.0061 at T20, damage +1.93, fetches_cracked +1.23 and landfall_triggers +1.70 a game. Alone: Fabled Passage +0.0157 +-0.0036 / +0.0179 +-0.0047, Evolving Wilds +0.0126 +-0.0035 / +0.0158 +-0.0047. The pair is SUBADDITIVE at T20 (+0.0237 against +0.0337 summed) -- the second fetch is worth less than the first -- and is still significant at both horizons. §0z113 measured each alone on the old engine at the same size.",
-        reverified="RE-MEASURED 2026-11-17 AT 5a00891 (§0z226 cycling, §0z227-§0z232 the card work), in context, N=15,000 paired, python 3.11.18, run from a worktree: +0.0051 +-0.0046 at T10, +0.0067 +-0.0052 at T20 -- significant at both; the staging stands. results/restage_20261117.txt. " + "RE-MEASURED 2026-11-16 ON ITEM 45'S POD (§0z222: route-aware kills, walkers attacked, held answers, incidental_rate 1.94), in context, N=15,000 paired, python 3.11.17: +0.0049 +-0.0045 at T10, +0.0080 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261116.txt. " + "RE-MEASURED 2026-11-15 ON THE FLIPPED POD (item 44, §0z204; queue item 48, §0z219: attackers die, you block, the pod re-fitted), in context, N=15,000 paired, python 3.11.17: +0.0063 +-0.0046 at T10, +0.0089 +-0.0054 at T20 -- significant at both; the staging stands. results/restage_20261115.txt. " + "RE-MEASURED 2026-11-07 ON THE POD'S ROUND AS SEAT TURNS (§0z179), in context, N=15,000 paired, python 3.13.16: +0.0048 +-0.0044 at T10, +0.0093 +-0.0053 at T20 -- significant at both; the staging stands. results/restage_20261107_pod.txt. " + "RE-MEASURED 2026-11-07 ON THE PHASE-EMPTYING POOL (§0z177), in context, N=15,000 paired, python 3.13.16: +0.0047 +-0.0044 at T10, +0.0089 +-0.0053 at T20 -- significant at both (T10 by 0.0003); the staging stands. results/restage_20261107.txt. " + "RE-MEASURED 2026-11-04 ON THE CLEANUP STEP (§0z171), the karoo guard (§0z172) and Necropotence's Tower target (§0z173), in context, N=15,000 paired, python 3.13.16: +0.0057 +-0.0045 at T10, +0.0093 +-0.0053 at T20. Significant at both; the staging stands. results/restage_20261104.txt. " + "RE-MEASURED 2026-10-15 ON POD_V4 (§0z140, queue item 26), in context, N=15,000 paired, python 3.13: +0.0071 +-0.0041 at T10, +0.0105 +-0.0050 at T20 alone; the pair (both fetches) +0.0157 +-0.0052 / +0.0191 +-0.0062. Significant at both; the staging stands. The pod's move is inside its bar: +0.0011 / +0.0054 alone, -0.0007 / +0.0001 for the pair. results/restage_item26_20261015.txt (§0z143)." + ("RE-MEASURED 2026-10-07 on the §0z118 engine (bd9e7ae, python 3.13), in context, N=15,000 paired: +0.0079 +-0.0037 at T10, +0.0063 +-0.0049 at T20 alone; the pair (both fetches) +0.0257 +-0.0047 / +0.0257 +-0.0061. Significant at both; the staging stands. results/restage_20261007.txt."),
-        notes="THE OWNER'S CHOICE, 2026-10-06, of the two fetches that pay no life -- every clause of both is modelled, so neither row is a ceiling, unlike the true fetches (whose 1 life the engine does not charge). Verdant Catacombs, Misty Rainforest and Prismatic Vista measured inside the same bar and were not chosen. A BASIC-LAND CUT, but land for land: the land count is unchanged at 100 cards, so the 'harness flatters land cuts' caveat (a land cut that lowers the count) does not apply. Forests 20 -> 18 after both. Gaea's Cradle and Ancient Tomb were deferred by the owner the same day on price, not on the number.",
     ),
 ]
-
-
-WITHDRAWN: list[Change] = []
 
 
 SIMULATED: list[Simulated] = [

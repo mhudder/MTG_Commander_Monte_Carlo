@@ -21763,8 +21763,33 @@ removal kills before it is dealt damage at all). The knob it swings on,
 said out loud: `pod_attack_safety` -- with it off the pod attacks into
 the 6/6 and feeds the trigger; how much that is worth was not measured.
 
-**Nothing staged.** Four Simulated entries, the Proposal closed; whether
-to stage anything is the owner's.
+**Nothing staged** on the numbers. Four Simulated entries, the Proposal
+closed.
+
+### The owner's decision (2026-11-23): "make the Ka-zar swap for Invigorator"
+
+"Please make the Ka-zar swap for Invigorator because i have the card
+available immediately now. When i order the new batch I will swap them
+back." **A choice about the cards on hand, made knowing the number**
+(-0.0044 ±0.0033 at T20), and TEMPORARY.
+
+- Ka-Zar was itself STAGED (-Perilous Forays +Ka-Zar, 2026-09-10), never
+  committed, and `build_pending` removes every staged card from the
+  deck module in one pass, so a change cannot remove a card another one
+  added. So the Ka-Zar Change is **WITHDRAWN, for now, not refuted**, and
+  **-Perilous Forays +Hexhaven Invigorator is STAGED** in the same
+  position: the list is the measured leg exactly -- card for card, in
+  order, against `09edb79`'s staged list with Hexhaven in Ka-Zar's place.
+- **To swap back**: the Ka-Zar Change back to `CHANGES`, the Hexhaven one
+  to `WITHDRAWN`. Both carry their evidence.
+- **Not committed** to the deck module, as Ka-Zar never was (azusa has no
+  `.xlsx`; the two legs are the module and the ledger).
+- **Azusa's baseline moved**, so its cache needs a rebuild; it is SUSPECT
+  already (§0z247), and `tests.test_metrics_and_render` C fails until it
+  is rebuilt (the cache has no Hexhaven row). Never `--verified`.
+- `tests/test_tutored_etb.py` D pinned a Waved Ka-Zar with the card
+  taken from the staged list; it takes the catalog's when the list has
+  none, as it already did for Finale.
 
 ## How to read an ablation table
 
