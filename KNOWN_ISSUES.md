@@ -21720,10 +21720,42 @@ itself STAGED, not committed: its slot was Perilous Forays'.)
 | -Springheart Nantuko +Hexhaven | **-0.0124 ±0.0033** | **-0.0104 ±0.0037** | +0.38 |
 
 Damage falls 0.4-0.7 a game in each. **The trigger is almost never
-reached**: 0.08 triggers, 0.24 damage and 0.23 lands a game in every slot
--- the pod holds its attacks back from a 6/6 (`pod_attack_safety`), and
-blocks a 6/6 attacker rarely. What is left is a four-mana 6/6 vigilance in
-a deck whose creature slots each do something on entering or every turn.
+reached**: 0.08 triggers, 0.24 damage and 0.23 lands a game in every slot.
+What is left is a four-mana 6/6 vigilance in a deck whose creature slots
+each do something on entering or every turn.
+
+**Why it is rarely reached -- CORRECTED 2026-11-23.** The first write-up
+said the pod holds its attacks back from a 6/6 and rarely blocks one; the
+first half is true, the second is not, and neither is the main reason. The
+owner asked whether the pilot attacks with it or keeps it back;
+`diagnostics/diag_hexhaven_combat.py`, Ka-Zar's slot, 3,000 games
+(`results/diag_hexhaven_combat_20261123.txt`):
+
+| | count |
+|---|---|
+| your turns with it on the battlefield | 1,663 |
+| ... it could attack (untapped, not summoning-sick) | 904 |
+| ... it attacked | 823 (91%) |
+| ... it was kept back (`hold_back`) | 81 (9%) |
+| its attacks the pod blocked | 225 (27%), one blocker each |
+| the pod's attack steps at you while it was out | 1,060 (972 with it untapped) |
+| ... it blocked and was dealt damage | 46 |
+| triggers / damage / lands, all 3,000 games | 236 / 708 / 690 |
+
+- **It attacks nearly every turn it can**, and with vigilance it is still
+  an untapped blocker on the pod's turns: the pilot gives up nothing.
+- **Most triggers come from ATTACKING**: the pod blocks it on about a
+  quarter of its attacks (a chump or a trade), about 3 damage and 3 lands
+  each. On defence it triggers rarely: `pod_attack_safety` keeps the
+  pod's bodies off an untapped 6/6.
+- **The main reason is time on the battlefield**: cast in 23% of games, a
+  four-mana card arriving mid-game, it is out for 0.55 of your turns a game
+  and attacks in 0.27 -- in games that end near turn 10.
+
+**No card in the list damages it** (every one of the 83 names checked
+against Scryfall 2026-11-23 for "damage", "fight", "deals" and -N/-N:
+Nylea's Intervention hits only creatures with flying; Mossborn Hydra's is
+trample). Its damage comes only from the pod.
 **The number is generous already, not harsh**: the pod's blocks do not
 know the trigger (a ceiling); only the pod's spells are blind (a floor
 on a 6/6 that a burn spell or Blasphemous Act would trigger, and that

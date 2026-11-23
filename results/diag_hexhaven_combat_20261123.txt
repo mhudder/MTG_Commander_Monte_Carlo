@@ -1,0 +1,15 @@
+azusa, Hexhaven Invigorator in Ka-Zar's slot, N=3,000 games, seeds 5000.., today's defaults.
+
+  games                                     3000
+  your turns with it out                    1663
+  turns it could attack                     904
+  turns it attacked                         823
+  turns it was kept back                    81
+  attacks the pod blocked                   225
+  blockers on it                            225
+  pod attack steps at you, it out           1060
+    ...it untapped                          972
+    ...it blocked and was dealt damage      46
+  hexhaven_triggers                         236
+  hexhaven_damage                           708
+  hexhaven_lands                            690
