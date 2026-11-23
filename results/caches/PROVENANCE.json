@@ -1,8 +1,8 @@
 {
   "ablation_cache_azusa_10-20_n15000_medblank.json": {
-    "built_at": "dc6fe95b60ff12f2",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:17:16Z",
+    "built_at": "d658977844ccfb9a",
+    "built_commit": "80cb14f",
+    "built_utc": "2026-11-23T01:33:43Z",
     "deck": "azusa",
     "superseded": [
       {
@@ -743,21 +743,28 @@
             "utc": "2026-11-21T17:43:46Z"
           }
         ]
+      },
+      {
+        "built_at": "dc6fe95b60ff12f2",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:17:16Z",
+        "deck": "azusa",
+        "verified": [
+          {
+            "commit": "4b72b3f",
+            "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+            "fingerprint": "f8daa06227cc1ba6",
+            "utc": "2026-11-22T04:14:48Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "4b72b3f",
-        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
-        "fingerprint": "f8daa06227cc1ba6",
-        "utc": "2026-11-22T04:14:48Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_karlov_10-20_n15000_medblank.json": {
-    "built_at": "efd275d1cf31f76e",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:12:40Z",
+    "built_at": "46746b4e21740503",
+    "built_commit": "80cb14f",
+    "built_utc": "2026-11-23T01:29:44Z",
     "deck": "karlov",
     "superseded": [
       {
@@ -1405,28 +1412,35 @@
             "utc": "2026-11-21T17:43:46Z"
           }
         ]
+      },
+      {
+        "built_at": "efd275d1cf31f76e",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:12:40Z",
+        "deck": "karlov",
+        "verified": [
+          {
+            "commit": "4b72b3f",
+            "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+            "fingerprint": "c18f0ffd5c05e813",
+            "utc": "2026-11-22T04:14:47Z"
+          },
+          {
+            "commit": "0ed1f61",
+            "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
+            "fingerprint": "8856b6c2d50cc273",
+            "utc": "2026-11-22T05:48:29Z"
+          },
+          {
+            "commit": "376c121",
+            "evidence": "2026-11-22, \u00a70z247 (item 52: the pod's mana creatures and development gated by mana, both switches OFF -- PodBody.mana from a fourth stream, mana_creature_mana at the untap, delay_piece, charge_growth's gate and body_debt; _pod_mana gains the mana-creature census): check_unchanged_decks --n=2000 against a clean worktree at 376c121, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; every active deck BIT-IDENTICAL; no baseline list moved",
+            "fingerprint": "339d609303324cae",
+            "utc": "2026-11-22T12:55:27Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "4b72b3f",
-        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
-        "fingerprint": "c18f0ffd5c05e813",
-        "utc": "2026-11-22T04:14:47Z"
-      },
-      {
-        "commit": "0ed1f61",
-        "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
-        "fingerprint": "8856b6c2d50cc273",
-        "utc": "2026-11-22T05:48:29Z"
-      },
-      {
-        "commit": "376c121",
-        "evidence": "2026-11-22, \u00a70z247 (item 52: the pod's mana creatures and development gated by mana, both switches OFF -- PodBody.mana from a fourth stream, mana_creature_mana at the untap, delay_piece, charge_growth's gate and body_debt; _pod_mana gains the mana-creature census): check_unchanged_decks --n=2000 against a clean worktree at 376c121, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; every active deck BIT-IDENTICAL; no baseline list moved",
-        "fingerprint": "339d609303324cae",
-        "utc": "2026-11-22T12:55:27Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "8b7fe7cbffe26ea7",
@@ -2117,9 +2131,9 @@
     ]
   },
   "ablation_cache_rendmaw_10-20_n15000_medblank.json": {
-    "built_at": "ae229ad72c87e1b4",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:13:11Z",
+    "built_at": "fdea4aaa6a1a7d13",
+    "built_commit": "80cb14f",
+    "built_utc": "2026-11-23T01:30:39Z",
     "deck": "rendmaw",
     "superseded": [
       {
@@ -2758,28 +2772,35 @@
             "utc": "2026-11-21T17:43:45Z"
           }
         ]
+      },
+      {
+        "built_at": "ae229ad72c87e1b4",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:13:11Z",
+        "deck": "rendmaw",
+        "verified": [
+          {
+            "commit": "4b72b3f",
+            "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
+            "fingerprint": "009f5f89c26f03b5",
+            "utc": "2026-11-22T04:14:47Z"
+          },
+          {
+            "commit": "0ed1f61",
+            "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
+            "fingerprint": "f85cf668952ea9e0",
+            "utc": "2026-11-22T05:48:29Z"
+          },
+          {
+            "commit": "376c121",
+            "evidence": "2026-11-22, \u00a70z247 (item 52: the pod's mana creatures and development gated by mana, both switches OFF -- PodBody.mana from a fourth stream, mana_creature_mana at the untap, delay_piece, charge_growth's gate and body_debt; _pod_mana gains the mana-creature census): check_unchanged_decks --n=2000 against a clean worktree at 376c121, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; every active deck BIT-IDENTICAL; no baseline list moved",
+            "fingerprint": "a4b95c22e769406a",
+            "utc": "2026-11-22T12:55:27Z"
+          }
+        ]
       }
     ],
-    "verified": [
-      {
-        "commit": "4b72b3f",
-        "evidence": "2026-11-22, \u00a70z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved",
-        "fingerprint": "009f5f89c26f03b5",
-        "utc": "2026-11-22T04:14:47Z"
-      },
-      {
-        "commit": "0ed1f61",
-        "evidence": "2026-11-22, \u00a70z246 (item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax and Mind's Eye read the pod -- opponents.pod_cast / settle_pod_taxes, engine.tithe_treasures / monologue_treasures, tivit's and azusa's sites): check_unchanged_decks --n=2000 against a clean worktree at 5237ddc, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; this deck runs none of the four cards; with the four switches off every deck is BIT-IDENTICAL; no baseline list moved",
-        "fingerprint": "f85cf668952ea9e0",
-        "utc": "2026-11-22T05:48:29Z"
-      },
-      {
-        "commit": "376c121",
-        "evidence": "2026-11-22, \u00a70z247 (item 52: the pod's mana creatures and development gated by mana, both switches OFF -- PodBody.mana from a fourth stream, mana_creature_mana at the untap, delay_piece, charge_growth's gate and body_debt; _pod_mana gains the mana-creature census): check_unchanged_decks --n=2000 against a clean worktree at 376c121, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (\u00a70z126), python 3.13.18; every active deck BIT-IDENTICAL; no baseline list moved",
-        "fingerprint": "a4b95c22e769406a",
-        "utc": "2026-11-22T12:55:27Z"
-      }
-    ]
+    "verified": []
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "af5e7632010a237f",
@@ -3473,9 +3494,9 @@
     ]
   },
   "ablation_cache_tivit_10-20_n15000_medblank.json": {
-    "built_at": "80df5a1fd8aa63ef",
-    "built_commit": "120cc9a",
-    "built_utc": "2026-11-22T01:12:01Z",
+    "built_at": "51a0b8675a6c4ba9",
+    "built_commit": "80cb14f",
+    "built_utc": "2026-11-23T01:29:48Z",
     "deck": "tivit",
     "superseded": [
       {
@@ -4105,6 +4126,13 @@
             "utc": "2026-11-21T17:43:46Z"
           }
         ]
+      },
+      {
+        "built_at": "80df5a1fd8aa63ef",
+        "built_commit": "120cc9a",
+        "built_utc": "2026-11-22T01:12:01Z",
+        "deck": "tivit",
+        "verified": []
       }
     ],
     "verified": []

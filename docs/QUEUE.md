@@ -282,9 +282,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     and Green Sun's inside their bars. **FLIPPED BY THE OWNER THE SAME
     DAY**: "flip genesis wave, torment, meathook and debt, but do not
     rebuild" -- those four ON (`experiment.PRE_ITEM45` restores them),
-    Agadeem, Animist, Nylea and Green Sun's OFF. **Left**: the rebuild of
-    the four decks' tables (the owner's call), and the fresh-seed
-    re-measure (§0z170) of the four flipped.
+    Agadeem, Animist, Nylea and Green Sun's OFF. **REBUILT 2026-11-23
+    (§0z250)**: the four decks' tables at `80cb14f`, the owner's call.
+    **Left**: the fresh-seed re-measure (§0z170) of the four flipped, and
+    lorehold's and shilgengar's rebuild (SUSPECT since §0z246-§0z247).
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a

@@ -302,6 +302,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
 | [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021 at T20 -- those four ON; Agadeem +0.0013, Animist, Nylea, Green Sun OFF |
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
+| [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21795,6 +21796,76 @@ back." **A choice about the cards on hand, made knowing the number**
   search) and both `SCANNED` sets in place of Ka-Zar; no constant the pod
   reads changed, and every active deck is BIT-IDENTICAL to `320a27d` at
   2,000 seeds with it (`check_unchanged_decks`).
+
+<a id="0z250"></a>
+
+## 0z250. REBUILT -- the four decks §0z248's flip moved, at `80cb14f`
+
+**The owner, 2026-11-23: "go ahead and rebuild the four decks' tables"**
+-- rendmaw, karlov, tivit and azusa, whose baselines §0z248's flip moved
+(Genesis Wave, Torment of Hailfire, The Meathook Massacre, Debt to the
+Deathless paying their X), azusa's also by §0z249's staging (Hexhaven
+Invigorator in Ka-Zar's slot). Parallel (`parallel-rebuild`), one cloud
+session per deck, all four at `80cb14f`, pins `numpy==2.4.6 scipy==1.17.1
+openpyxl==3.1.5`; every leg's `Interpreter:` line python 3.13.18, numpy
+2.4.6. Coordinated on python 3.13.18 (§0z119; this container's default is
+3.11.18): `tools.repro_row` IDENTICAL on karlov's Debt to the Deathless,
+tivit's Torment of Hailfire and azusa's Hexhaven Invigorator.
+`--merge-shards` accepted all four; the four caches CURRENT;
+`tools.validate` +0.00 on all 21 metrics with the game RNG sealed,
+`python -m tests` 160/160 (`test_metrics_and_render` C green again), every
+deck legal -- all under 3.13.18. **Wall time: 48 minutes**, the slowest
+leg (azusa, 01:28 -> 02:16 UTC); karlov 14, tivit 16, rendmaw 17.
+
+**`check_docs` still fails on ONE check**: lorehold's and shilgengar's
+caches are SUSPECT, as they have been since §0z246-§0z247 (the tax cards
+read the pod's mana; the pod's mana creatures), and were not in this
+rebuild. Only their rebuild clears them; never `--verified`.
+
+**Baselines and noise floors**, the table before (built at `120cc9a`,
+§0z244) -> after:
+
+| deck | baseline T10 | baseline T20 | floor |
+|---|---|---|---|
+| rendmaw | 0.0993 -> 0.0979 | 0.3393 -> 0.3407 | ±0.0027 -> ±0.0027 |
+| karlov | 0.2665 -> 0.2649 | 0.5329 -> 0.5328 | ±0.0026 -> ±0.0026 |
+| tivit | 0.3177 -> 0.3109 | 0.5499 -> 0.5411 | ±0.0028 -> ±0.0028 |
+| azusa | 0.3449 -> 0.3489 | 0.5453 -> 0.5503 | ±0.0033 -> ±0.0033 |
+
+Tivit's fall is §0z245 (the pod's Treasure from Tempting Contract and
+Master of Ceremonies) and §0z246 (Monologue Tax paid from the pod's spare
+mana), both after the old table; the flip moved it up (+0.0035 at 2,000
+seeds, §0z248).
+
+**What moved beyond its old bar** (T20 win rate; no row changed sign):
+
+| deck | row | before -> after | why |
+|---|---|---|---|
+| rendmaw | The Meathook Massacre | +0.0096 ±0.0024 -> **+0.0148 ±0.0029** | §0z248: cast at X 0 for {B}{B}, earlier |
+| karlov | Debt to the Deathless | +0.0062 ±0.0017 -> **+0.0084 ±0.0019** | §0z248: its X scales |
+| tivit | Torment of Hailfire | +0.0089 ±0.0027 -> **+0.0139 ±0.0028** | §0z248: its X scales |
+| tivit | Rhystic Study | +0.0090 ±0.0032 -> **+0.0178 ±0.0034** | §0z246: paid from the pod's spare mana |
+| tivit | Monologue Tax | +0.0193 ±0.0035 -> **+0.0059 ±0.0031** | §0z246 |
+| tivit | Farewell | +0.0107 ±0.0025 -> +0.0077 ±0.0024 | not traced |
+| tivit | Grudge Keeper | +0.0019 ±0.0024 -> +0.0047 ±0.0026 | not traced |
+| azusa | Genesis Wave | +0.0156 ±0.0029 -> **+0.0220 ±0.0030** | §0z248: its X scales |
+| azusa | Mind's Eye | +0.0059 ±0.0025 -> +0.0101 ±0.0027 | §0z246 |
+| azusa | Hexhaven Invigorator (new) | **+0.0050 ±0.0024** (`both`) | §0z249, in Ka-Zar's slot (Ka-Zar's row was +0.0117 ±0.0033) |
+
+The rest only crossed a signal boundary inside their old bars (rendmaw:
+Coat of Arms, Haywire Mite, Metallic Mimic, Ornithopter of Paradise, Steel
+Overseer; karlov: Aetherflux Reservoir, Syr Konrad; tivit: An Offer You
+Can't Refuse, Ballot Broker, Capital Punishment, Cyberdrive Awakener,
+Idyllic Tutor, Trap the Trespassers; azusa: Bane of Progress, Exploration,
+Hall of Gemstone, Storm Cauldron). **Farewell's and Grudge Keeper's moves
+are not traced to a change**: each moved about 1.2 of its old bar, between
+two tables whose code differs in four places and whose seeds are the same.
+How many such moves chance alone would give across ~250 correlated rows was
+not computed; said, not explained.
+
+**Hexhaven's row against Ka-Zar's** agrees with §0z249's head-to-head:
++0.0050 against +0.0117 here is -0.0067 by rows, -0.0044 ±0.0033 measured
+directly. The direct number is the one to quote (§0e).
 
 ## How to read an ablation table
 
