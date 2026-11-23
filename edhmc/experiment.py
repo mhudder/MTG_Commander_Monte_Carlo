@@ -264,14 +264,22 @@ POD_PRE_ITEM52 = {
 
 # The X spells before item 45's flip (§0z248, the owner, 2026-11-22: "flip
 # genesis wave, torment, meathook and debt"): `dict(DEFAULT_CFG,
-# **PRE_ITEM45)` plays each at its old fixed X, Meathook with no ETB. The
-# other four switches (`animist_x`, `nylea_x`, `gsz_x_plan`, `agadeem_x`)
-# were never on.
+# **PRE_ITEM45)` plays each at its old fixed X, Meathook with no ETB and
+# Agadeem's front face the blank it was. The last four (`animist_x`,
+# `nylea_x`, `gsz_x_plan`, `agadeem_x`) were flipped 2026-11-23 ("flip the
+# switch on ALL X cards"); `PRE_ITEM45_REST` restores only those.
+PRE_ITEM45_REST = {
+    "animist_x": False,
+    "nylea_x": False,
+    "gsz_x_plan": False,
+    "agadeem_x": False,
+}
 PRE_ITEM45 = {
     "genesis_wave_x": False,
     "torment_x": False,
     "meathook_x": False,
     "debt_x": False,
+    **PRE_ITEM45_REST,
 }
 
 # The pod before §0z140: no bodies, no routes, no responses. Every table and

@@ -300,7 +300,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z245](#0z245) | FIXED | **Tempting Contract and Master of Ceremonies hand the pod its Treasure** (tivit): tivit's baseline -0.0022, Tempting Contract's row -0.0015; tivit's cache SUSPECT until the rebuild |
 | [0z246](#0z246) | BUILT | **Item 52 part A: Rhystic Study, Smothering Tithe, Monologue Tax, Mind's Eye read the pod**: Rhystic +0.0083, Monologue -0.0141, Tithe -0.0033 / -0.0044, Mind's Eye +0.0069 at T20 |
 | [0z247](#0z247) | FLIPPED | **Item 52's rest: the pod's mana creatures ON (-0.0032, no re-fit); development gated by mana built, OFF** -- it weakens the pod +0.114 and its re-fit is the owner's open call |
-| [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021 at T20 -- those four ON; Agadeem +0.0013, Animist, Nylea, Green Sun OFF |
+| [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X, all eight ON**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021, Agadeem +0.0013 at T20; Animist, Nylea, Green Sun inside their bars |
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
@@ -21491,7 +21491,7 @@ creatures only**:
 
 <a id="0z248"></a>
 
-## 0z248. FLIPPED -- item 45's rest: each fixed-X spell pays its own X; Genesis Wave, Torment, Meathook and Debt on
+## 0z248. FLIPPED -- item 45's rest: each fixed-X spell pays its own X; all eight on
 
 **The owner, 2026-11-22: "each of these need at least a small logic build
 around them, since they mostly do different things"**, then "Start the
@@ -21632,6 +21632,24 @@ off, so no knob's reach moved; said, not measured.
   `--verified`.
 - **Not re-measured on fresh seeds (§0z170)** before the flip: the owner
   flipped on the numbers above.
+
+### The owner's second decision (2026-11-23): "flip the switch on ALL X cards"
+
+- **`agadeem_x`, `animist_x`, `nylea_x` and `gsz_x_plan` ON** -- the last
+  four, after the four above were rebuilt (§0z250). Animist's, Nylea's
+  and Green Sun's were measured inside their bars; Agadeem's significant
+  at T20 alone. **`experiment.PRE_ITEM45_REST`** restores just these
+  four, and `PRE_ITEM45` now restores all eight.
+- **Proved**: `check_unchanged_decks --n=2000` against `a77fb7a` -- with
+  `PRE_ITEM45_REST`, every active deck BIT-IDENTICAL; at the new
+  defaults exactly azusa (+0.0110 won at 2,000 seeds) and shilgengar
+  (+0.0010) move, the rest BIT-IDENTICAL. `python -m tests` 160/160, no
+  expectation changed.
+- **Agadeem's front face is a real spell now**: shilgengar no longer
+  casts it as the blank it was (§0z248's finding, 0.022 casts a game).
+- **Caches**: azusa's, CURRENT at §0z250, is SUSPECT again (its baseline
+  moved); shilgengar's was SUSPECT already. Only a rebuild clears them;
+  never `--verified`.
 
 <a id="0z249"></a>
 

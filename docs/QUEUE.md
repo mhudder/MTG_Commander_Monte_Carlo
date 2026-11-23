@@ -284,8 +284,11 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     rebuild" -- those four ON (`experiment.PRE_ITEM45` restores them),
     Agadeem, Animist, Nylea and Green Sun's OFF. **REBUILT 2026-11-23
     (§0z250)**: the four decks' tables at `80cb14f`, the owner's call.
-    **Left**: the fresh-seed re-measure (§0z170) of the four flipped, and
-    lorehold's and shilgengar's rebuild (SUSPECT since §0z246-§0z247).
+    **ALL EIGHT FLIPPED 2026-11-23** (the owner: "flip the switch on ALL X
+    cards"; `experiment.PRE_ITEM45_REST` restores the last four, §0z248).
+    **Left**: the fresh-seed re-measure (§0z170) of the eight, and azusa's,
+    lorehold's and shilgengar's rebuild (azusa SUSPECT again with this
+    flip; the other two since §0z246-§0z247).
 
 49. **SMALL CLEANUPS (order of work, step 7)**, all from §0z205.
     **DONE 2026-11-17 (§0z225)** but for the last bullet, which waits on a

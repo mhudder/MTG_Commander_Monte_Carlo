@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `02fc0d3`.
+Generated at `a77fb7a`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -86,25 +86,25 @@ the fingerprint above mean anything.
 
 | cache | deck | cards | built at | built | state |
 |---|---|---|---|---|---|
-| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `d658977844ccfb9a` | `80cb14f` | **CURRENT** |
-| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `46746b4e21740503` | `80cb14f` | **CURRENT** |
+| `ablation_cache_azusa_10-20_n15000_medblank.json` | azusa | 58 | `d658977844ccfb9a` | `80cb14f` | **SUSPECT** |
+| `ablation_cache_karlov_10-20_n15000_medblank.json` | karlov | 64 | `46746b4e21740503` | `80cb14f` | **SUSPECT** |
 | `ablation_cache_lorehold_10-20_n15000_medblank.json` | lorehold | 65 | `8b7fe7cbffe26ea7` | `120cc9a` | **SUSPECT** |
-| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `fdea4aaa6a1a7d13` | `80cb14f` | **CURRENT** |
+| `ablation_cache_rendmaw_10-20_n15000_medblank.json` | rendmaw | 64 | `fdea4aaa6a1a7d13` | `80cb14f` | **SUSPECT** |
 | `ablation_cache_shilgengar_10-20_n15000_medblank.json` | shilgengar | 64 | `af5e7632010a237f` | `120cc9a` | **SUSPECT** |
-| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `51a0b8675a6c4ba9` | `80cb14f` | **CURRENT** |
+| `ablation_cache_tivit_10-20_n15000_medblank.json` | tivit | 64 | `51a0b8675a6c4ba9` | `80cb14f` | **SUSPECT** |
 | `ablation_cache_trostani_10-20_n15000_medblank.json` | trostani | 61 | `f14c8abaffff896a` | `bd9e7ae` | **SUSPENDED** |
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — CURRENT. built at `d658977844ccfb9a`, which is live.
-- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — CURRENT. built at `46746b4e21740503`, which is live.
-- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `8b7fe7cbffe26ea7`, live is `f1ed278745c99309`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `120cc9a`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `d658977844ccfb9a`, live is `2763c5f9368b59a4`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_karlov_10-20_n15000_medblank.json`** — SUSPECT. built at `46746b4e21740503`, live is `91c82d64d4302003`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_karlov_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_lorehold_10-20_n15000_medblank.json`** — SUSPECT. built at `8b7fe7cbffe26ea7`, live is `a2f35e6073cfa306`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `120cc9a`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_lorehold_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `e686dacfe2891389` (`4b72b3f`, 2026-11-22T04:14:47Z): 2026-11-22, §0z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (§0z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved
-- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — CURRENT. built at `fdea4aaa6a1a7d13`, which is live.
-- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `af5e7632010a237f`, live is `761eff2d70dc5478`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `120cc9a`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_rendmaw_10-20_n15000_medblank.json`** — SUSPECT. built at `fdea4aaa6a1a7d13`, live is `00f198c0926451e4`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_rendmaw_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_shilgengar_10-20_n15000_medblank.json`** — SUSPECT. built at `af5e7632010a237f`, live is `3b7b586b75be23bc`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `120cc9a`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_shilgengar_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
   - verified at `4e9f90932f221f6a` (`4b72b3f`, 2026-11-22T04:14:47Z): 2026-11-22, §0z245 (Tempting Contract and Master of Ceremonies hand the pod Treasure: _pod_mana.POD_GIFTS gains them, voting.tempting_takers, tivit's upkeep; pod_gifts_symmetric default True): check_unchanged_decks --n=2000 against a clean worktree at 6ca318b, BIT-IDENTICAL on all 8 metrics, and the staged list (build_pending) at 2,000 seeds BIT-IDENTICAL too (§0z126), python 3.13.18; only tivit moved, and with pod_gifts_symmetric=False tivit is BIT-IDENTICAL as well; no baseline list moved
-- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — CURRENT. built at `51a0b8675a6c4ba9`, which is live.
-- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `bbdd9ac5cd60bf3b`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
+- **`ablation_cache_tivit_10-20_n15000_medblank.json`** — SUSPECT. built at `51a0b8675a6c4ba9`, live is `634d1c8b90f23951`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_tivit_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_trostani_10-20_n15000_medblank.json`** — SUSPENDED. built at `f14c8abaffff896a`, live is `1c606aa7f3ca531c`, and the deck is SUSPENDED (`edhmc/registry.py`): the owner, 2026-10-08: out of every review and re-measure for the near future. Table as rebuilt at bd9e7ae (§0z119). Its numbers describe `bd9e7ae`, not HEAD. Unsuspend it before trusting or resuming onto this cache.
 
 ## What each fingerprint covers
 

@@ -1301,7 +1301,7 @@ class ShilgengarGame(BaseGame):
                 if OPP.hold_answer(self, c):      # item 24, change 2
                     continue
                 if (c.name == AGADEEM
-                        and self.cfg.get("agadeem_x", False)):    # §0z248
+                        and self.cfg.get("agadeem_x", True)):     # §0z248, ON
                     x = self.agadeem_x(c, pool, reserve)
                     if x is not None:
                         options.append((c, None))
