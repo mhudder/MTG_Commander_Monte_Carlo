@@ -303,7 +303,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z248](#0z248) | FLIPPED | **Item 45's rest: each fixed-X spell's own X, all eight ON**: Genesis Wave +0.0062, Torment +0.0030, Meathook +0.0061, Debt +0.0021, Agadeem +0.0013 at T20; Animist, Nylea, Green Sun inside their bars |
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
-| [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's spot removal; the other five MDFC front faces checked and modelled |
+| [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21935,8 +21935,30 @@ table is rebuilt, because the table prints those notes.
 
 ### Measured
 
-Pending: `diagnostics.run_knob_ab shilgengar malakir_text malakir_seen`,
-N=15,000, and `check_unchanged_decks` against `63cd636`.
+`diagnostics.run_knob_ab shilgengar malakir_text malakir_seen`, the staged
+list, N=15,000 paired, seeds 5000..19999
+(`results/knob_ab_shilgengar_malakir_text.txt`):
+
+| T10 | T20 | protected a game | life lost to own cards |
+|---|---|---|---|
+| **+0.0012 ±0.0008** | **+0.0059 ±0.0022** | 0.103 -> 0.124 | 3.24 -> 3.02 |
+
+**The identity, with a reach that missed one path**: of the 12,720 games
+with `malakir_seen` (a main phase with it in hand) 0 in both legs, ONE
+differed -- seed 9836, where Malakir was drawn during the pod's round on
+turn 13 and cast at the pod's next removal the same round, never passing
+a main phase. A scan of all 15,000 seeds found no other; that game's
+`protected` differs, so with `malakir_seen,protected` as the reach the
+identity is 0. Said, not re-run as a second N=15,000.
+
+**What it is worth**: mostly the card not thrown away -- it stays in hand
+as a land drop or a response -- and the creature it saves (+0.022
+protections a game). Life lost to your own cards FALLS 0.21 a game
+although the response now charges 2; why is NOT TRACED -- said, not
+explained.
+
+**Only shilgengar moves**: `check_unchanged_decks --n=2000` against
+`63cd636`, every other active deck BIT-IDENTICAL; shilgengar +0.0065 won.
 
 ## How to read an ablation table
 

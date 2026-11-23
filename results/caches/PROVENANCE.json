@@ -1440,7 +1440,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "e220bf7",
+        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+        "fingerprint": "ababbaf19cbb3579",
+        "utc": "2026-11-23T22:11:25Z"
+      }
+    ]
   },
   "ablation_cache_lorehold_10-20_n15000_medblank.json": {
     "built_at": "8b7fe7cbffe26ea7",
@@ -2800,7 +2807,14 @@
         ]
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "e220bf7",
+        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+        "fingerprint": "c74400abd36f6571",
+        "utc": "2026-11-23T22:11:25Z"
+      }
+    ]
   },
   "ablation_cache_shilgengar_10-20_n15000_medblank.json": {
     "built_at": "af5e7632010a237f",
@@ -4135,7 +4149,14 @@
         "verified": []
       }
     ],
-    "verified": []
+    "verified": [
+      {
+        "commit": "e220bf7",
+        "evidence": "2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, \u00a70z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, \u00a70z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.",
+        "fingerprint": "cceff3097287d5ef",
+        "utc": "2026-11-23T22:11:25Z"
+      }
+    ]
   },
   "ablation_cache_trostani_10-20_n15000_medblank.json": {
     "built_at": "f14c8abaffff896a",
