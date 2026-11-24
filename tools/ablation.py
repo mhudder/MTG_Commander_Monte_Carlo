@@ -1381,10 +1381,15 @@ PARTLY_MODELLED = {
             "own-graveyard trick (exile three, get them back to hand when it "
             "leaves). A floor.",
         "Angel of Despair":
-            "MODELLED: the 5/5 flier. NOT: 'When this creature enters, "
-            "destroy target permanent' -- Vindicate's text, and Vindicate is a "
-            "route answer here (`ANSWERS`): MODELABLE, not modelled (§0z208 "
-            "item 18). A floor.",
+            "MODELLED: the 5/5 flier, and 'When this creature enters, "
+            "destroy target permanent' as a route answer (`opponents."
+            "ANSWERS`, Vindicate's rule) -- on its cast since item 24, and on "
+            "every other entry (the ultimate, Avacyn, Sun Titan's and the "
+            "other returns) since §0z252 (`despair_etb_returns`). It is NOT "
+            "held: it enters when it is cast or returned, piece out or not. "
+            "NOT: a body that is no route piece, nor the pod's other "
+            "permanents (§4) -- the route answers' shared limit, with their "
+            "knob, `threat_rebuild_max`.",
         # Candidate, 2026-10-23 (the owner's Reality Fracture review).
         "Avacyn, Angel of Horror":
             "MODELLED: the 8/8 flying Angel, and 'whenever Avacyn or another "
@@ -1399,9 +1404,14 @@ PARTLY_MODELLED = {
             "MODELLED: the 5/7 flying artifact creature, and Plainscycling "
             "{2} (`engine.cycle_step`, §0z226: cycled for a Plains card "
             "when the hand holds no land and the Angel cannot be cast next "
-            "turn). NOT: its ETB exile of up to two artifacts and/or "
-            "enchantments -- MODELABLE against the pod's artifact and "
-            "enchantment route pieces, not modelled. A floor.",
+            "turn), and its ETB, 'exile up to two target artifacts and/or "
+            "enchantments', as a route answer at the pod's artifact and "
+            "enchantment pieces (`opponents.ANSWERS`) -- on its cast since "
+            "item 24, and on every other entry since §0z252 "
+            "(`ruins_etb_returns`). It is NOT held: it enters when it is cast "
+            "or returned, piece out or not. NOT: the pod's artifacts and "
+            "enchantments beyond its routes (§4) -- the route answers' shared "
+            "limit, with their knob, `threat_rebuild_max`.",
         "Angelic Arbiter":
             "MODELLED: the 5/6 flier. NOT: 'Each opponent who cast a spell "
             "this turn can't attack; each who attacked can't cast spells'. "

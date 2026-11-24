@@ -1387,17 +1387,58 @@ def answer_pod_threat(g, card) -> int:
         reach = ANSWERS.get(card.name)
     if reach is None:
         return 0
+    done = _answer_pieces(g, card.name, reach)
+    g.m["threat_answers_cast"] += 1
+    if not done:
+        g.m["threat_answers_whiffed"] += 1
+    return done
+
+
+def _answer_pieces(g, name: str, reach: Reach) -> int:
+    """Remove up to `reach.n` pieces, each aimed by `answer_target` -- the
+    one loop a cast answer (`answer_pod_threat`) and an answer creature
+    entering some other way (`answer_on_entry`) share, so the two cannot
+    aim differently."""
     done = 0
     for _ in range(reach.n):
         pick = answer_target(g, reach)
         if pick is None:
             break
         remove_threat_piece(g, *pick)
-        pod_gift(g, pick[0], card.name)                 # §0z241
+        pod_gift(g, pick[0], name)                      # §0z241
         done += 1
-    g.m["threat_answers_cast"] += 1
+    return done
+
+
+# §0z252. The census's spot answers whose deciding clause is a creature's
+# ETB ("when this creature enters, ..."): DERIVED from the census text, so a
+# new one is in this set the day the census reads it. `answer_pod_threat`
+# resolves the ETB only on a CAST (it runs from `countered`); an answer
+# creature that enters any other way -- reanimated, returned, blinked --
+# goes through `answer_on_entry`, which an engine calls from its own entry
+# path. Only shilgengar calls it today (Angel of Despair, Angel of the
+# Ruins); Acidic Slime, Angel of Sanctions (trostani) and Terastodon (azusa)
+# are in the set and their engines do not call it -- said, not checked.
+ETB_ANSWERS = frozenset(
+    n for n in ANSWERS
+    if "when this creature enters" in _removal.INTERACTION[n][2])
+
+
+def answer_on_entry(g, card) -> int:
+    """`card`, an ETB answer creature (`ETB_ANSWERS`), entered the
+    battlefield by a path that is NOT its cast: its ETB resolves here, as
+    the cast's does in `answer_pod_threat`. Aimed by `answer_target` --
+    pieces out during YOUR turn -- whenever it runs, so a return in the
+    pod's round (Avacyn's, at an opponent's end step) misses a piece cast
+    earlier in that round: a floor, said. Counted apart from the cast
+    answers (`entry_answers`, `entry_answers_whiffed`), so the cast path's
+    counters keep their meaning."""
+    if not pod_threats_on(g) or card.name not in ETB_ANSWERS:
+        return 0
+    done = _answer_pieces(g, card.name, ANSWERS[card.name])
+    g.m["entry_answers"] += 1
     if not done:
-        g.m["threat_answers_whiffed"] += 1
+        g.m["entry_answers_whiffed"] += 1
     return done
 
 

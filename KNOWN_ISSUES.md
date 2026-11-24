@@ -304,6 +304,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
+| [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21959,6 +21960,45 @@ explained.
 
 **Only shilgengar moves**: `check_unchanged_decks --n=2000` against
 `63cd636`, every other active deck BIT-IDENTICAL; shilgengar +0.0065 won.
+
+<a id="0z252"></a>
+
+## 0z252. FIXED -- Angel of Despair's and Angel of the Ruins' ETBs on every entry, not a cast alone
+
+**The owner, 2026-11-24**: "go ahead with 1 and 2 first" -- Angel of
+Despair and Angel of the Ruins, from §0z208's items 18 and 20.
+
+**What the audit had wrong**: both ETBs WERE modelled on a cast, since item
+24 -- both are spot answers in the census (`opponents.ANSWERS`: Despair
+Vindicate's reach, Ruins two artifact/enchantment pieces) and resolve from
+`countered` (`answer_pod_threat`). Their ablation notes and §0z208 said
+"not modelled". **What was missing**: the ETB on every OTHER entry. A probe
+of the staged list, 1,000 games, seeds 5000..: Despair cast 102 times,
+entered otherwise 60 (57 by the ultimate); Ruins cast 59, otherwise 85 (78
+by the ultimate). Each answered on every cast and on no other entry.
+
+**The fix** (`despair_etb_returns`, `ruins_etb_returns`, both ON; False is
+the cast-only rule): `opponents.answer_on_entry`, called from
+`ShilgengarGame.make_permanent` on every entry but the cast (`cast=True`
+from `resolve` alone), aimed and removed by the loop the cast shares
+(`_answer_pieces`). `ETB_ANSWERS` is derived from the census text ("when
+this creature enters"); `shilgengar.ETB_RETURN_KNOBS` is checked against it
+at import (`check_etb_return_knobs`). **The judgements, said out loud**: not
+held -- it enters when it is returned, piece out or not (68% of the probe's
+entries whiffed, mostly the ultimate's second Angel finding nothing left);
+aimed by `answer_target`, so Avacyn's return at an opponent's end step
+misses a piece cast earlier that round, a floor. Acidic Slime, Angel of
+Sanctions (trostani) and Terastodon (azusa) are in `ETB_ANSWERS` and their
+engines do not call it -- said, not checked.
+
+**Pinned**: `tests/test_etb_answer_returns.py`, eight cases A-H, four
+mutations, every expected set exact on the first run.
+
+**Only shilgengar moves**: `check_unchanged_decks --n=2000` against
+`e48ad7a`, every other active deck BIT-IDENTICAL; shilgengar +0.0090 won.
+
+**MEASUREMENT PENDING**: `diagnostics.run_knob_ab shilgengar
+despair_etb_returns,ruins_etb_returns etb_answer_returns`, N=15,000.
 
 ## How to read an ablation table
 

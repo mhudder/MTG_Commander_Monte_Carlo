@@ -145,12 +145,16 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     Treasure (`revel_treasures`), rival-on-rival deaths included under A4.
     Tivit labels the same card SCRIPTED. Every clause is modelled; the row
     reads Smothering Tithe's knob, which is Tithe's.
-18. **Angel of Despair** -- "destroy target permanent": "no opposing
+18. **[CORRECTED 2026-11-24, §0z252: the ETB WAS modelled on a cast,
+    since item 24 -- it is in the census's `ANSWERS` and resolves from
+    `countered`. What was missing was the ETB on every OTHER entry,
+    about as frequent; now `despair_etb_returns`.]** **Angel of Despair** -- "destroy target permanent": "no opposing
     permanent (§4)". Vindicate's text, and Vindicate is a route answer
     (`ANSWERS`) in this list. MODELABLE.
 19. **Angel of Serenity** -- "no opposing creature to exile": the pod's
     creatures are bodies (§0z132) and creature route pieces. MODELABLE.
-20. **Angel of the Ruins** -- its ETB exile of artifacts and enchantments:
+20. **[CORRECTED 2026-11-24, §0z252: as item 18 -- modelled on a cast,
+    now on every other entry too, `ruins_etb_returns`.]** **Angel of the Ruins** -- its ETB exile of artifacts and enchantments:
     the pod's artifact and enchantment route pieces exist. MODELABLE.
     Plainscycling was NOT; it IS since §0z226 (`engine.cycle_step`).
 21. **Angelic Arbiter** -- "the pod's attacks and spells are rates": under

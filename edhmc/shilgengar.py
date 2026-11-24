@@ -89,7 +89,11 @@ Half of this list is removal on a body (Angel of Despair, Angel of Serenity,
 Angel of the Ruins) or plain removal (Path to Exile, Swords to Plowshares,
 Anguished Unmaking, Generous Gift, Despark, Vindicate, Mortify, Utter End) —
 opponents' boards are a blocker count, so none of it has a legal target, same
-as every other deck in this project. Revel in Riches needs opponents'
+as every other deck in this project. [SUPERSEDED, §0z252: since item 24 the
+plain removal and Angel of Despair's and Angel of the Ruins' ETBs are route
+answers (`opponents.ANSWERS`), the Angels' on every entry; Angel of
+Serenity's exile is still not modelled. `tools/ablation.py`'s notes are the
+current word.] Revel in Riches needs opponents'
 creatures to die as discrete events, which nothing here tracks. Angel of
 Suffering's damage-prevention-into-mill replacement effect was deliberately
 NOT modelled: it is not clear how it should interact with `resolve_clocks`
@@ -156,6 +160,32 @@ AGADEEM = "Agadeem's Awakening // Agadeem, the Undercrypt"
 # §0z251: the MDFC whose front face is a protection spell (`opponents.
 # PROTECTION`), held for the pod's removal.
 MALAKIR = "Malakir Rebirth // Malakir Mire"
+# §0z252: this list's ETB answer creatures (`OPP.ETB_ANSWERS`), each with
+# the switch for its ETB on a NON-cast entry; False is the old rule, the
+# ETB on a cast only. Checked against the census at import, so a card that
+# joins the list as an ETB answer cannot be left out silently.
+ETB_RETURN_KNOBS = {"Angel of Despair": "despair_etb_returns",
+                    "Angel of the Ruins": "ruins_etb_returns"}
+
+
+def check_etb_return_knobs(knobs=None, run_by=None) -> None:
+    """§0q: ETB_RETURN_KNOBS is a hand-kept name set, so it is checked
+    against what the census derives -- every name must be an ETB answer,
+    and every ETB answer the census finds in shilgengar's lists must have
+    a switch. Raises at import if either drifts."""
+    from edhmc.decks import _removal
+    knobs = ETB_RETURN_KNOBS if knobs is None else knobs
+    run_by = _removal.RUN_BY.get("shilgengar", ()) if run_by is None else run_by
+    stray = set(knobs) - OPP.ETB_ANSWERS
+    missing = (set(run_by) & OPP.ETB_ANSWERS) - set(knobs)
+    if stray or missing:
+        raise SystemExit(
+            f"\nshilgengar.ETB_RETURN_KNOBS has drifted from the census "
+            f"(§0z252): not ETB answers {sorted(stray)}; ETB answers in "
+            f"the list with no switch {sorted(missing)}.")
+
+
+check_etb_return_knobs()
 from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -381,7 +411,7 @@ class ShilgengarGame(BaseGame):
     # -- tokens ------------------------------------------------------------
 
     def make_permanent(self, card, sick=True, tapped=False, is_token=False,
-                       counters=0):
+                       counters=0, cast=False):
         if self.cfg.get("giada_text", True):
             counters += self.giada_counters(card)
         perm = Permanent(card=card, sick=sick, tapped=tapped,
@@ -396,6 +426,15 @@ class ShilgengarGame(BaseGame):
             # is why it is here -- and again at each of your upkeeps for what
             # the pod cast meanwhile (`upkeep`).
             self.m["norn_kills"] += OPP.minus_two_pod(self, card)
+        if not cast and card.name in ETB_RETURN_KNOBS:
+            # §0z252: an answer creature's ETB on every entry but its cast,
+            # whose ETB `OPP.countered` resolves (`answer_pod_threat`). Here,
+            # where every return path enters -- the ultimate, Avacyn, Sun
+            # Titan, Emeria Shepherd, the upkeep and activated returns.
+            # Counted in both legs, the switch's reach.
+            self.m["etb_answer_returns"] += 1
+            if self.cfg.get(ETB_RETURN_KNOBS[card.name], True):
+                OPP.answer_on_entry(self, card)
         return perm
 
     def giada_counters(self, card) -> int:
@@ -1221,7 +1260,8 @@ class ShilgengarGame(BaseGame):
             return
 
         tapped = bool(card.tapped)   # Marble Diamond: "enters tapped"
-        perm = self.make_permanent(card, sick=not card.haste, tapped=tapped)
+        perm = self.make_permanent(card, sick=not card.haste, tapped=tapped,
+                                   cast=True)
 
         if card.script == "massacre_wurm":
             # ETB "-2/-2 to opponents' creatures" is a per-permanent effect on
