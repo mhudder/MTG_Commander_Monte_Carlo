@@ -304,7 +304,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z249](#0z249) | MEASURED | **Hexhaven Invigorator (azusa)**: Ka-Zar is the weakest of Ka-Zar, Springheart, Greensleeves, Chocobo (head to head), but Hexhaven loses in every slot -- -Ka-Zar +Hexhaven -0.0044 ±0.0033 at T20; its trigger fires 0.08 a game |
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
-| [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too; measurement pending |
+| [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -21997,8 +21997,28 @@ mutations, every expected set exact on the first run.
 **Only shilgengar moves**: `check_unchanged_decks --n=2000` against
 `e48ad7a`, every other active deck BIT-IDENTICAL; shilgengar +0.0090 won.
 
-**MEASUREMENT PENDING**: `diagnostics.run_knob_ab shilgengar
-despair_etb_returns,ruins_etb_returns etb_answer_returns`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab shilgengar despair_etb_returns,ruins_etb_returns
+etb_answer_returns`, both switches together, the staged list, N=15,000
+paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_shilgengar_etb_answer_returns.txt`):
+
+| T10 | T20 | entry answers a game | pieces removed | rounds delayed |
+|---|---|---|---|---|
+| +0.0001 ±0.0004 | **+0.0057 ±0.0014** | 0 -> 0.136 (69% whiff) | 1.287 -> 1.334 | 2.464 -> 2.531 |
+
+**The identity holds**: 1,735 games reached (`etb_answer_returns`, counted
+in both legs); of the 13,265 with it 0 in both, 0 differ. Inside the
+reached games, +0.049 ±0.012 at T20.
+
+**The mechanism reads as a route answer should**: +0.046 pieces removed and
++0.067 kill rounds delayed a game, the pod's kills fewer and later
+(`kill_life_lost` -0.11, `kills_routed` -0.008, `loss_route` -0.012). A
+T20 effect, as every route answer's is (§0z131): a moved kill rarely
+matters before turn 10. The size carries `threat_rebuild_max` (3), the
+route answers' knob, said. **Not split by card**: one run with both
+switches; which Angel carries it is not measured.
 
 ## How to read an ablation table
 
