@@ -125,7 +125,9 @@ cost.
    hand. NOT: "You may play up to two additional lands this turn", nor
    entwine {2}{G} -- in a deck whose whole engine is land drops, the second
    mode is the one an Azusa pilot casts it for. A floor.
-7. **Nylea's Intervention** -- three Forests to hand (fixed X=3, §0z197
+7. **[PARTLY FIXED 2026-11-25, §0z256: any land, by `land_rank`
+   (`nylea_any_land`). The flier mode stays a gap: the pod's bodies have
+   one flag for flying or reach.]** **Nylea's Intervention** -- three Forests to hand (fixed X=3, §0z197
    A7). The text is "up to X LAND cards" (a utility land is one), and the
    other mode, "deals twice X damage to each creature with flying", is
    MODELABLE against the pod's flier bodies (A1, A2) and not modelled.

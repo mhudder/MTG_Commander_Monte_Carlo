@@ -2590,12 +2590,25 @@ class AzusaGame(BaseGame):
         elif script == "animist":
             self.wave(self.x_paid(card, "animist_x"), lands_only=True)
         elif script == "nylea_land":
+            # "Search your library for up to X LAND cards" (§0z256,
+            # `nylea_any_land`): any land, the best by `land_rank` (a fetch,
+            # then green, then untapped) -- it took Forests only, the old
+            # rule. Recomputed per pick, so the X picks are X distinct cards.
+            any_land = self.cfg.get("nylea_any_land", True)
             for _ in range(self.x_paid(card, "nylea_x")):
-                land = next((c for c in self.library if c.is_land and c.name == "Forest"), None)
+                if any_land:
+                    pool = [c for c in self.library if c.is_land]
+                    land = (max(pool, key=self.land_rank) if pool else None)
+                else:
+                    land = next((c for c in self.library
+                                 if c.is_land and c.name == "Forest"), None)
                 if land is None:
                     break
                 remove_card(self.library, land)
                 self.hand.append(land)
+                self.m["nylea_lands"] += 1
+                if land.name != "Forest":
+                    self.m["nylea_nonforest"] += 1
             self.searched()
         elif script == "rude_awakening":
             self.rude_awakening()
@@ -4017,17 +4030,18 @@ class AzusaGame(BaseGame):
           guard at its fixed 6, §0z210).
         ANIMIST'S AWAKENING: no more than the library holds -- a bigger X
           reveals nothing more.
-        NYLEA'S INTERVENTION: no more than the Forests left, the only lands
-          its search takes here (the old rule's pick, unchanged) -- "up to X
-          land cards", so mana past them finds nothing."""
+        NYLEA'S INTERVENTION: no more than the lands left -- "up to X land
+          cards", so mana past them finds nothing. The Forests left, under
+          the old pick (`nylea_any_land=False`, §0z256)."""
         if card.script == "genesis_wave":
             return lambda x: draw_is_safe(self, x)
         if card.script == "animist":
             return lambda x: x <= max(card.x_pips, len(self.library))
         if card.script == "nylea_land":
-            forests = sum(1 for c in self.library
-                          if c.is_land and c.name == "Forest")
-            return lambda x: x <= max(card.x_pips, forests)
+            any_land = self.cfg.get("nylea_any_land", True)
+            lands = sum(1 for c in self.library
+                        if c.is_land and (any_land or c.name == "Forest"))
+            return lambda x: x <= max(card.x_pips, lands)
         return None
 
     def creature_spell_cast(self, card):

@@ -1087,10 +1087,14 @@ PARTLY_MODELLED = {
         # item numbers these cite; docs/ORACLE_AUDIT_AZUSA.md). Each row
         # printed under MODEL-EVALUATED while a clause was missing. ---
         "Nylea's Intervention":
-            "MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: "
-            "'up to X LAND cards' (a utility land is one), nor the mode that "
-            "deals twice X damage to each creature with flying -- MODELABLE "
-            "against the pod's flier bodies since item 44 (item 7). A floor.",
+            "MODELLED: 'search your library for up to X land cards', at the "
+            "X the mana pays (§0z248) -- ANY land, the best by `land_rank`, "
+            "a fetch first (§0z256, `nylea_any_land`). NOT: the mode that "
+            "deals twice X damage to each creature with flying. The pod's "
+            "bodies carry ONE flag for flying or reach (`PodBody.reach`, "
+            "A1's 'fliers plus reach' share), so 'each creature with flying' "
+            "cannot be read without inventing the split -- a flagged gap, "
+            "not a guess (§0z256). A floor.",
     },
     "tivit": {
         "Rhystic Study":

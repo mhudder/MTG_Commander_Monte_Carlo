@@ -308,6 +308,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
 | [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry: +0.0071 ±0.0017 at T20 |
+| [0z256](#0z256) | PARTLY RESOLVED | **Nylea's Intervention searches for any land** (azusa), by `land_rank`, not Forests; its flier mode stays a gap -- the pod's bodies have one flag for flying or reach; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22250,6 +22251,48 @@ your life +0.33 at the end. A T20 effect only: the Angel costs seven and
 arrives late, and a moved kill rarely matters before turn 10. The size
 carries `threat_rebuild_max` (3), the route answers' knob, said.
 `tools.validate` +0.00 on all 21 metrics after it, the game RNG sealed.
+
+<a id="0z256"></a>
+
+## 0z256. PARTLY RESOLVED -- Nylea's Intervention searches for any land; its flier mode stays a gap
+
+**The owner, 2026-11-25**: "go ahead with nylea's intervention next"
+(§0z209 item 7).
+
+    "Choose one -- * Search your library for up to X land cards, reveal
+    them, put them into your hand, then shuffle. * Nylea's Intervention
+    deals twice X damage to each creature with flying."
+                                    ({X}{G}{G}, Sorcery; Scryfall 2026-11-25)
+
+**What was there**: the search took Forests only, at the X the mana pays
+(§0z248, `nylea_x`), capped at the Forests left.
+
+**The fix** (`nylea_any_land`, ON; False is Forests only): any land, the
+best by azusa's `land_rank` (a fetch first, then one that makes green,
+then one that enters untapped -- the order every search here uses),
+recomputed per pick; `x_limit` caps X at the lands left, not the Forests.
+
+**The flier mode is NOT built, and why**: the pod's bodies carry one flag
+for flying OR reach (`PodBody.reach`, A1's "fliers plus reach" share,
+`flier_block_share` 0.3), so "each creature with flying" cannot be told
+from "each creature with reach". Splitting the flag would add a draw to
+every body's roll and so move every deck. A flagged gap, not a guess; the
+mode would also hit your own fliers, and choosing it needs a gate like the
+wipe gate's. The row stays PARTLY with the reason.
+
+**Pinned**: `tests/test_nylea.py`, four cases A-D, three mutations, every
+expected set exact on the first run.
+
+**Only azusa moves**: `check_unchanged_decks --n=2000` against `228f784`,
+every other active deck BIT-IDENTICAL; with `nylea_any_land=False` azusa
+is BIT-IDENTICAL too.
+
+**A smoke, 1,000 games**: X paid 7.0 on average against 4.9 (the cap is
+every land left now), 977 lands found against 621, 70% of them not
+Forests; +228 fetches cracked and +224 landfall triggers.
+
+**MEASUREMENT PENDING**: `run_knob_ab azusa nylea_any_land
+nylea_x_casts,nylea_lands`, N=15,000.
 
 ## How to read an ablation table
 
