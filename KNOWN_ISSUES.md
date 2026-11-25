@@ -309,9 +309,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
 | [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry: +0.0071 ±0.0017 at T20 |
 | [0z256](#0z256) | PARTLY RESOLVED | **Nylea's Intervention searches for any land** (azusa), by `land_rank`, not Forests; its flier mode stays a gap -- the pod's bodies have one flag for flying or reach; +0.0007 ±0.0022 at T20, a null |
-| [0z257](#0z257) | FIXED | **Terastodon's ETB fired on a cast only** (azusa): a tutor, Genesis Wave or a copy now answers too; measurement pending |
-| [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text, with the pilot's response to Bane; measurement pending |
-| [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool; found by §0z258's test; measurement pending |
+| [0z257](#0z257) | FIXED | **Terastodon's ETB fired on a cast only** (azusa): a tutor, Genesis Wave or a copy now answers too: +0.0005 ±0.0004 at T20 |
+| [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text: Craterhoof -0.0005 at T10 (its ceiling gone), Bane +0.0041 ±0.0015 at T20 |
+| [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool: -0.0064 ±0.0022 at T20, 1.15 free cards a game |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22354,8 +22354,15 @@ over mana only -- and Beast Within's 3/3 is the same omission.
 
 **Pinned**: `tests/test_azusa_ceilings.py` T1-T4 and K.
 
-**MEASUREMENT PENDING**: `run_knob_ab azusa terastodon_etb_returns
-etb_answer_returns`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab azusa terastodon_etb_returns etb_answer_returns`,
+the staged list, N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_azusa_terastodon_etb_returns.txt`): **+0.0001 ±0.0001 at
+T10, +0.0005 ±0.0004 at T20**, significant and small. 359 games reached
+(a Terastodon put in or copied); of the 14,641 others, 0 differ. 0.024
+entry answers a game, +0.005 pieces removed. Small because it is rare: the
+put-in paths find a nine-drop in one game in forty.
 
 <a id="0z258"></a>
 
@@ -22405,8 +22412,29 @@ turns the old policy into a claim).
 its first run -- two Clues and {2} cracked both -- and the cause was not
 this rule: it is §0z259.
 
-**MEASUREMENT PENDING**: each switch alone at N=15,000, and the naive
-Bane pilot.
+### Measured
+
+`diagnostics.run_knob_ab azusa <switch> <reach>`, the staged list,
+N=15,000 paired, seeds 5000..19999, python 3.11.18 (`results/knob_ab_azusa_
+craterhoof_snapshot.txt`, `..._bane_text.txt`, `..._bane_text_naive.txt`):
+
+| A minus B | T10 | T20 | the identity |
+|---|---|---|---|
+| `craterhoof_snapshot` | **-0.0005 ±0.0003** | -0.0002 ±0.0002 | 4,798 reached, 0 of 10,202 differ |
+| `bane_text`, the pilot responding | +0.0007 ±0.0009 | **+0.0041 ±0.0015** | 2,103 reached, 0 of 12,897 differ |
+| `bane_text`, the naive pilot (`bane_response=False` both legs) | +0.0005 ±0.0011 | **+0.0039 ±0.0016** | the same |
+
+**Craterhoof's ceiling is gone, and it was small**: the later creatures'
+pump and trample were worth 0.0005 at T10 -- the turn Craterhoof is cast is
+usually the turn it wins or does not, and a land drop after it adds little.
+
+**Bane's half that was missing is worth +0.0041**: its new counters (a
+bigger Bane, +0.29 damage a game) and the pod's A/E pieces (+0.037 removed
+a game). **The pilot's response is worth nothing measurable** (+0.0041
+against +0.0039, inside both bars): the naive pilot loses 5.2 Treasures
+and 1.1 Clues a Bane-game, and the responding pilot floats the Treasures
+as mana it mostly cannot spend that phase (+0.47 mana spent a game) and
+cracks 0.12 Clues. Kept ON: it is what a pilot does and it costs nothing.
 
 <a id="0z259"></a>
 
@@ -22430,8 +22458,22 @@ phase rebuilds its pool each pass; its activations pop what they pay).
 
 **Pinned**: `tests/test_azusa_ceilings.py` Q, and B3 again.
 
-**MEASUREMENT PENDING**: `run_knob_ab azusa clue_pay_once
-clue_multi_calls`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab azusa clue_pay_once clue_multi_calls`, the staged
+list, N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_azusa_clue_pay_once.txt`):
+
+| T10 | T20 | cards drawn a game | mana spent a game |
+|---|---|---|---|
+| **-0.0091 ±0.0019** | **-0.0064 ±0.0022** | 19.95 -> 18.80 (-1.15) | 152.3 -> 144.5 (-7.8) |
+
+**The bug was flattering azusa by about 0.006-0.009**: 1.15 free cards a
+game, and the "mana spent" counter 7.8 a game higher than the mana paid.
+3,530 games reached; of the 11,470 others, 0 differ. **Expect Tireless
+Tracker's row to fall in the rebuild** -- it was a ceiling by exactly this
+-- and every row that read `cards_drawn` through it. The largest single
+move of this session's fixes, and it is a correction, not a gain.
 
 **Only azusa moves for §0z257-§0z259 together**: `check_unchanged_decks
 --n=2000` against `84c57b6`, every other active deck BIT-IDENTICAL; with
