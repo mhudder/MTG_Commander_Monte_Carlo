@@ -308,7 +308,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
 | [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry: +0.0071 ±0.0017 at T20 |
-| [0z256](#0z256) | PARTLY RESOLVED | **Nylea's Intervention searches for any land** (azusa), by `land_rank`, not Forests; its flier mode stays a gap -- the pod's bodies have one flag for flying or reach; measurement pending |
+| [0z256](#0z256) | PARTLY RESOLVED | **Nylea's Intervention searches for any land** (azusa), by `land_rank`, not Forests; its flier mode stays a gap -- the pod's bodies have one flag for flying or reach; +0.0007 ±0.0022 at T20, a null |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22301,8 +22301,28 @@ what azusa's `gsz_seen` and `chord_seen` already count for. The reach is
 `nylea_seen` (Nylea in hand in a main phase, either rule); with it a scan
 of seeds 5000..8999 finds 0 unreached games different.
 
-**MEASUREMENT PENDING**: `run_knob_ab azusa nylea_any_land nylea_seen`,
-N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab azusa nylea_any_land nylea_seen`, the staged list,
+N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_azusa_nylea_any_land.txt`):
+
+| T10 | T20 | lands found a game | fetches cracked | landfall | end-of-turn discards |
+|---|---|---|---|---|---|
+| +0.0011 ±0.0017 | +0.0007 ±0.0022 | 0.534 -> 0.928 | +0.179 | +0.190 | +0.153 |
+
+**The identity holds**: 4,426 games reached; of the 10,574 others, 0
+differ.
+
+**What it supports: a null.** The search does what the text says -- 0.65
+non-Forest lands a game, mostly fetches, and X paid +0.32 a game since the
+cap is every land left -- and the win rate does not move beyond its bar.
+The counters say where it goes: more lands reach the hand than the drops
+can play (+0.15 discards at cleanup, +0.016 lands played), and the bigger
+X is mana not spent on something else (cards drawn -0.06). Kept for its
+text, as Journey's was (§0z253); the X logic's cap and `land_rank` are the
+judgements that could move it, neither swept. `tools.validate` +0.00 on
+all 21 metrics after it.
 
 ## How to read an ablation table
 
