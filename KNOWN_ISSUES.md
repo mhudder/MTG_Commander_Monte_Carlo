@@ -306,7 +306,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
-| [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them; measurement pending |
+| [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22156,8 +22156,35 @@ the other tables re-render byte-identical.
 rule fired too); +21 single reanimations, +52 Wurm drains, +47 pod bodies
 killed against the old rule.
 
-**MEASUREMENT PENDING**: `run_knob_ab shilgengar` on the three switches
-together, then each alone, reach `creature_etb_returns`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab shilgengar ... creature_etb_returns`, the staged
+list, N=15,000 paired, seeds 5000..19999, python 3.11.18; each switch alone
+is that switch OFF with the other two ON
+(`results/knob_ab_shilgengar_returned_etbs.txt`, `..._wurm_etb_returns.txt`,
+`..._titan_etb_returns.txt`, `..._shepherd_etb_returns.txt`):
+
+| A minus B | T10 | T20 | its counter a game |
+|---|---|---|---|
+| all three | +0.0004 ±0.0006 | **+0.0023 ±0.0011** | 0.193 returned entries |
+| Massacre Wurm alone | +0.0003 ±0.0005 | **+0.0023 ±0.0010** | 0.077 ETBs; +0.058 drains, +0.049 bodies killed |
+| Sun Titan alone | +0.0000 ±0.0002 | +0.0001 ±0.0003 | 0.043 ETBs; +0.023 reanimations |
+| Twilight Shepherd alone | +0.0001 ±0.0002 | +0.0001 ±0.0002 | 0.074 ETBs; +0.0003 cards to hand |
+
+**The identity holds** in all four: 2,254 games reached; of the 12,746
+others, 0 differ.
+
+**Massacre Wurm carries it.** Its returned -2/-2 kills the pod's small
+bodies and the route pieces it reaches (+0.011 pieces removed a game) and
+drains 2 a death. **Sun Titan's and Twilight Shepherd's are nulls, inside
+tight bars**, and the counters say why: the Titan's return finds a card of
+mana value 3 or less about half the time and the card it finds is small;
+the Shepherd's regrowth almost never has anything to take -- a card put
+into the graveyard from the battlefield THIS turn, on a turn the Shepherd
+is returned rather than cast, is rare, and persist's ETB (the common one)
+was already modelled. Both are kept: the text is right, and a null inside
+a ±0.0003 bar is a measured nothing, not an unmeasured one. A T20 effect,
+as the Wurm's ETB is a delay on the pod's routes as much as damage.
 
 ## How to read an ablation table
 

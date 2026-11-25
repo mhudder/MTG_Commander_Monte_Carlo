@@ -1,0 +1,97 @@
+shilgengar: shepherd_etb_returns=True (A) minus False (B), the staged list both legs, N=15000 paired, seeds 5000..19999, today's pod, python 3.11.18 / numpy 2.4.6
+
+   won T10  +0.0001 ±0.0002 
+   won T20  +0.0001 ±0.0002 
+
+   games where creature_etb_returns > 0 in either leg: 2254 of 15000 (15.0%)
+   IDENTITY: of the 12746 games with creature_etb_returns = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0009 ±0.0012
+   in those games, won T20  +0.0004 ±0.0015
+
+   every numeric output that moved (mean A, mean B, A - B):
+   ae_removal_eaten                   0.4605     0.4603  +0.0002
+   angels_fed                         0.6043     0.6046  -0.0003
+   answers_not_held_good_target       0.7255     0.7255  +0.0001
+   ardenvale_tokens                   0.1030     0.1031  -0.0001
+   attack_kept_safe                   4.1093     4.1090  +0.0003
+   attack_targets                     6.3381     6.3379  +0.0001
+   blood_made                         4.4577     4.4595  -0.0018
+   blood_spent                        3.2384     3.2392  -0.0008
+   cards_drawn                       13.3301    13.3297  +0.0005
+   cards_fed                          0.7441     0.7445  -0.0004
+   chip_formula_equiv                54.5429    54.5435  -0.0006
+   combat_damage                     47.7525    47.7462  +0.0063
+   combat_kills                       1.2457     1.2456  +0.0001
+   commander_aimed                    0.1639     0.1640  -0.0001
+   countered                          0.8133     0.8132  +0.0001
+   creature_etb_returns               0.1931     0.1933  -0.0002
+   creatures_sacrificed               1.1644     1.1647  -0.0003
+   crn_draws                         89.3260    89.3273  -0.0013
+   damage                            51.5221    51.5163  +0.0058
+   drain_damage                       3.7696     3.7701  -0.0005
+   emissary_prevented_turns           0.4726     0.4722  +0.0004
+   final_board_power                 40.6481    40.6469  +0.0012
+   final_life                        25.7627    25.7619  +0.0009
+   finality_marked                    2.2268     2.2271  -0.0003
+   giada_counters                     1.8029     1.8032  -0.0003
+   karoo_bounces                      0.1991     0.1991  +0.0001
+   kill_attackers                     2.0757     2.0765  -0.0008
+   kill_block_chump                   0.0622     0.0623  -0.0001
+   kill_block_free                    0.2809     0.2810  -0.0001
+   kill_blocked                       0.4240     0.4243  -0.0003
+   kill_damage_taken                  5.2533     5.2547  -0.0013
+   kills_routed                       0.2703     0.2703  -0.0001
+   kokusho_drain                      0.7803     0.7810  -0.0007
+   land_outlet_sacs                   0.0039     0.0039  +0.0001
+   landcycled                         0.0677     0.0676  +0.0001
+   landfall_lands                     7.9617     7.9617  -0.0001
+   lands_entered_tapped_by_rule       0.4220     0.4219  +0.0001
+   life_gained                       25.5831    25.5835  -0.0004
+   life_lost_to_own_cards             3.0277     3.0274  +0.0003
+   lifegain_triggers                  5.5037     5.5035  +0.0002
+   loss_route                         0.8768     0.8769  -0.0001
+   lost                               0.5588     0.5589  -0.0001
+   lyra_counters                      4.9435     4.9434  +0.0001
+   mana_floated                      15.3661    15.3651  +0.0010
+   mana_spent                        96.8594    96.8579  +0.0015
+   opponents_killed                   1.7535     1.7535  +0.0001
+   painland_life                      1.2846     1.2845  +0.0001
+   pod_attack_damage                 24.9147    24.9153  -0.0006
+   pod_attack_offered                41.3239    41.3237  +0.0002
+   pod_attackers_held                 3.2210     3.2213  -0.0003
+   pod_attacks                        9.0951     9.0953  -0.0001
+   pod_block_chump                    0.6505     0.6506  -0.0001
+   pod_block_free                     0.0975     0.0976  -0.0001
+   pod_block_safe                     0.6485     0.6484  +0.0001
+   pod_block_trade                    0.1149     0.1148  +0.0001
+   pod_blockers_killed                0.6433     0.6433  +0.0001
+   pod_held_back                      0.6707     0.6703  +0.0004
+   pod_hold_back_turns                0.3850     0.3849  +0.0001
+   pod_mana_creature_mana             2.9549     2.9549  -0.0001
+   pod_spent_ae                       4.0068     4.0066  +0.0002
+   pod_spent_body                    39.8423    39.8418  +0.0005
+   pod_spent_counter                  1.6265     1.6264  +0.0001
+   pod_spent_spot                    11.0656    11.0654  +0.0002
+   raw_damage                        63.6047    63.5991  +0.0057
+   removal_eaten                      1.3139     1.3139  +0.0001
+   rival_attack_damage               21.4861    21.4883  -0.0022
+   rival_attackers_held               2.5121     2.5121  -0.0001
+   rival_attacks                      7.8117     7.8123  -0.0005
+   rival_block_utility                0.0867     0.0867  -0.0001
+   rival_bodies_killed                0.6017     0.6017  -0.0001
+   shepherd_etb_returns               0.0738     0.0000  +0.0738
+   shepherd_persists                  0.0442     0.0443  -0.0001
+   shepherd_returns                   0.0250     0.0247  +0.0003
+   shilgengar_reanimated              2.2268     2.2271  -0.0003
+   shilgengar_ults                    0.5397     0.5399  -0.0001
+   single_reanimations                0.3785     0.3784  +0.0001
+   spirit_tokens_made                 0.3099     0.3098  +0.0001
+   stranded_mv                      161.7931   161.7947  -0.0017
+   tapped_not_blocking               18.1661    18.1667  -0.0005
+   threat_answers_cast                0.8573     0.8571  +0.0001
+   threat_pieces_removed              1.3447     1.3446  +0.0001
+   threat_rounds_delayed              2.5493     2.5487  +0.0005
+   treasures_made                     1.2846     1.2844  +0.0002
+   turns_played                      11.0260    11.0258  +0.0002
+   vigilant_attacks                   2.1959     2.1955  +0.0005
+   won                                0.4383     0.4383  +0.0001
