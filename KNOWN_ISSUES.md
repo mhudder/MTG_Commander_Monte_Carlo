@@ -305,7 +305,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
-| [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and its entwine** (azusa): two extra land drops and entwine {2}{G}, by a stated pilot rule, and cast before the drops: +0.0017 ±0.0031 at T20, inside its bar -- a null; the text is right now, the number did not move |
+| [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
