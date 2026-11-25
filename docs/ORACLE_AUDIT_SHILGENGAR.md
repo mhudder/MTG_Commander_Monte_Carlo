@@ -121,7 +121,9 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
 14. **Flawless Maneuver** -- "If you control a commander, you may cast this
     spell without paying its mana cost." Always paid at {2}{W}
     (`_cast_response`, no `alt_costs`). A floor on when it can be held up.
-15. **Massacre Wurm, Sun Titan** -- their ETBs fire on a CAST only (in
+15. **[FIXED 2026-11-25, §0z254: the three ETBs -- Wurm's, Titan's and
+    Twilight Shepherd's -- on every entry, `returned_etb`.]**
+    **Massacre Wurm, Sun Titan** -- their ETBs fire on a CAST only (in
     `resolve`), so the deck's many returns -- Reya Dawnbringer, Priest of
     Fell Rites, Sun Titan, Emeria Shepherd, Seluma, the ultimate -- bring
     them back without them. Said in Avacyn of Horror's PARTLY note ("the

@@ -166,6 +166,12 @@ MALAKIR = "Malakir Rebirth // Malakir Mire"
 # joins the list as an ETB answer cannot be left out silently.
 ETB_RETURN_KNOBS = {"Angel of Despair": "despair_etb_returns",
                     "Angel of the Ruins": "ruins_etb_returns"}
+# §0z254: the creatures whose ETB `resolve` fired on a CAST only, each with
+# the switch for its ETB on every other entry; False is the cast-only rule
+# (and, for Twilight Shepherd, persist's own call, as before).
+CREATURE_ETB_KNOBS = {"Massacre Wurm": "wurm_etb_returns",
+                      "Sun Titan": "titan_etb_returns",
+                      "Twilight Shepherd": "shepherd_etb_returns"}
 
 
 def check_etb_return_knobs(knobs=None, run_by=None) -> None:
@@ -435,7 +441,31 @@ class ShilgengarGame(BaseGame):
             self.m["etb_answer_returns"] += 1
             if self.cfg.get(ETB_RETURN_KNOBS[card.name], True):
                 OPP.answer_on_entry(self, card)
+        if not cast and card.name in CREATURE_ETB_KNOBS:
+            # §0z254: Massacre Wurm's, Sun Titan's and Twilight Shepherd's
+            # ETBs, on every entry but the cast (`resolve` fires those). Each
+            # return path takes its card out of the graveyard BEFORE it
+            # enters, and the loops recompute their pool per card (§0z19), so
+            # an ETB that moves graveyard cards (Titan's, Shepherd's) cannot
+            # act on a stale selection. Counted in both legs, the reach.
+            self.m["creature_etb_returns"] += 1
+            if self.cfg.get(CREATURE_ETB_KNOBS[card.name], True):
+                self.returned_etb(card)
         return perm
+
+    def returned_etb(self, card) -> None:
+        """The ETB of `card` (in CREATURE_ETB_KNOBS), entering by a path that
+        is not its cast. Each card's own rule, unchanged from the cast's."""
+        if card.name == "Massacre Wurm":
+            self.m["wurm_etb_returns"] += 1
+            self.wurm_etb(card)
+        elif card.name == "Sun Titan":
+            self.m["titan_etb_returns"] += 1
+            self._sun_titan_reanimate()
+        elif (card.name == "Twilight Shepherd"
+              and self.cfg.get("shepherd_text", True)):
+            self.m["shepherd_etb_returns"] += 1
+            self.shepherd_etb()
 
     def giada_counters(self, card) -> int:
         """GIADA, FONT OF HOPE: "Each other Angel you control enters with an
@@ -636,9 +666,9 @@ class ShilgengarGame(BaseGame):
         STILL IN THE GRAVEYARD returns (§0z19 -- Shilgengar's ultimate or
         Sun Titan may have taken it meanwhile, and then the trigger does
         nothing). Through `make_permanent` and `creature_entered`, the path
-        the ultimate's returns take, so the same ETBs fire and the same ones
-        do not (Massacre Wurm's, Sun Titan's and Twilight Shepherd's fire on
-        a CAST only, in `resolve` -- a floor every return path here shares).
+        the ultimate's returns take, so the same ETBs fire (Massacre Wurm's,
+        Sun Titan's and Twilight Shepherd's on every entry since §0z254;
+        before it, on a CAST only).
         No finality counter: Avacyn's text gives none."""
         queue, self.avacyn_queue = self.avacyn_queue, []
         for card in queue:
@@ -870,7 +900,10 @@ class ShilgengarGame(BaseGame):
         self.persisted[id(back)] = back   # held, so the id is not reused
         self.m["shepherd_persists"] += 1
         self.creature_entered(back)
-        self.shepherd_etb()
+        if not self.cfg.get("shepherd_etb_returns", True):
+            # The old rule fired it here, persist alone; under §0z254
+            # `make_permanent` fired it as the Shepherd entered.
+            self.shepherd_etb()
         return True
 
     def shepherd_etb(self):
@@ -1264,32 +1297,7 @@ class ShilgengarGame(BaseGame):
                                    cast=True)
 
         if card.script == "massacre_wurm":
-            # ETB "-2/-2 to opponents' creatures" is a per-permanent effect on
-            # a board this model represents as a float. Approximated as a
-            # cull proportional to the float, with the death-drain paid on
-            # the creatures assumed killed — a wrath-adjacent effect, not a
-            # precise one. Said out loud rather than guessed silently.
-            share = self.cfg.get("wurm_kill_share", 0.35)
-            losses = []
-            # UNDER `pod_bodies` (item 24, change 1) the -2/-2 kills each
-            # body of toughness 2 or less, and the drain is paid by
-            # `on_pod_creature_deaths` -- the same hook a pod wrath reaches,
-            # which the card's "whenever" also covers. Off, the share above.
-            if OPP.pod_bodies_on(self) and self.cfg.get("wurm_route_pieces",
-                                                         True):
-                OPP.minus_two_pod(self, card)        # rendmaw's rule, §0z151
-            for o in (OPP.living(self) if OPP.pod_bodies_on(self)
-                      and not self.cfg.get("wurm_route_pieces", True) else ()):
-                OPP.kill_pod_bodies(self, o, lambda b: b.toughness <= 2)
-            for o in ([] if OPP.pod_bodies_on(self) else OPP.living(self)):
-                killed = min(o.creatures, o.creatures * share + 1)
-                o.creatures = max(0.0, o.creatures - killed)
-                if killed > 0:
-                    loss = OPP.life_loss(o, 2.0 * killed)      # §0z74
-                    o.life -= loss
-                    losses.append((o, loss))
-            OPP._check_eliminations(self)
-            OPP.lost_life(self, losses)       # §0z90: no hook here today
+            self.wurm_etb(card)
 
         if perm.card.is_creature:
             self.creature_entered(perm)
@@ -1300,6 +1308,37 @@ class ShilgengarGame(BaseGame):
             # attack half is in combat().
             self._sun_titan_reanimate()
         return perm
+
+    def wurm_etb(self, card):
+        """MASSACRE WURM: "When this creature enters, creatures your opponents
+        control get -2/-2 until end of turn." Out of `resolve` (§0z254), so a
+        Wurm that enters any other way fires it too (`wurm_etb_returns`)."""
+        # ETB "-2/-2 to opponents' creatures" is a per-permanent effect on
+        # a board this model represents as a float. Approximated as a
+        # cull proportional to the float, with the death-drain paid on
+        # the creatures assumed killed — a wrath-adjacent effect, not a
+        # precise one. Said out loud rather than guessed silently.
+        share = self.cfg.get("wurm_kill_share", 0.35)
+        losses = []
+        # UNDER `pod_bodies` (item 24, change 1) the -2/-2 kills each
+        # body of toughness 2 or less, and the drain is paid by
+        # `on_pod_creature_deaths` -- the same hook a pod wrath reaches,
+        # which the card's "whenever" also covers. Off, the share above.
+        if OPP.pod_bodies_on(self) and self.cfg.get("wurm_route_pieces",
+                                                     True):
+            OPP.minus_two_pod(self, card)        # rendmaw's rule, §0z151
+        for o in (OPP.living(self) if OPP.pod_bodies_on(self)
+                  and not self.cfg.get("wurm_route_pieces", True) else ()):
+            OPP.kill_pod_bodies(self, o, lambda b: b.toughness <= 2)
+        for o in ([] if OPP.pod_bodies_on(self) else OPP.living(self)):
+            killed = min(o.creatures, o.creatures * share + 1)
+            o.creatures = max(0.0, o.creatures - killed)
+            if killed > 0:
+                loss = OPP.life_loss(o, 2.0 * killed)      # §0z74
+                o.life -= loss
+                losses.append((o, loss))
+        OPP._check_eliminations(self)
+        OPP.lost_life(self, losses)       # §0z90: no hook here today
 
     # -- casting and turn loop -----------------------------------------------
 

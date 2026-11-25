@@ -306,6 +306,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
+| [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22104,6 +22105,59 @@ often countered (+0.0025 a game). Adopted for its TEXT, not its number:
 the card does what it prints now, and its row (+0.0089 ±0.0031 before) is
 no longer a floor. The pilot rules are the knobs that could move it, said:
 `JOURNEY_SPARE` and entwine-whenever-affordable; neither is swept.
+
+<a id="0z254"></a>
+
+## 0z254. FIXED -- Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs on every entry
+
+**The owner, 2026-11-25**: "go ahead with the returned creatures' ETBs
+next" -- §0z208 item 15, the floor Avacyn's note called "every return path
+in this engine shares".
+
+    Massacre Wurm: "When this creature enters, creatures your opponents
+    control get -2/-2 until end of turn."
+    Sun Titan: "Whenever this creature enters or attacks, you may return
+    target permanent card with mana value 3 or less from your graveyard to
+    the battlefield."
+    Twilight Shepherd: "When this creature enters, return to your hand all
+    cards in your graveyard that were put there from the battlefield this
+    turn."                                              (Scryfall 2026-11-25)
+
+**What was there**: all three fired in `resolve`, the CAST, alone. The
+ultimate, Avacyn, Reya, Priest, Emeria Shepherd, Seluma, Agadeem and Sun
+Titan's own return brought them back with no ETB -- except Twilight
+Shepherd's persist, which called its ETB itself.
+
+**The fix** (`wurm_etb_returns`, `titan_etb_returns`,
+`shepherd_etb_returns`, all ON; False is the cast-only rule):
+`ShilgengarGame.returned_etb`, from `make_permanent` on every entry but the
+cast -- §0z252's hook. Massacre Wurm's ETB moved out of `resolve` into
+`wurm_etb`, unchanged: with all three switches off shilgengar is
+BIT-IDENTICAL to `4f5c238` at 2,000 games. Persist calls Shepherd's ETB
+only under the old rule, so it fires once either way. **Why firing at
+entry is safe here** (§0z19): every return path takes its card out of the
+graveyard before it enters, and the loops recompute their pool per card
+(the ultimate removes its whole pool first), so Sun Titan's return and
+Shepherd's regrowth cannot act on a stale selection. Pinned in case I.
+
+**Pinned**: `tests/test_returned_etbs.py`, nine cases A-I, four mutations.
+The first mutation run broke F as well under "ignores its cast flag": F and
+H put the Shepherd on the battlefield with `make_permanent(cast=True)`, so
+the mutation fired an ETB in the SETUP. They build it by hand now; the
+expected sets are unchanged, all four exact.
+
+**Only shilgengar moves**: `check_unchanged_decks --n=2000` against
+`4f5c238`, every other active deck BIT-IDENTICAL. Massacre Wurm, Sun Titan
+and Avacyn back to SCRIPTED_SHILGENGAR (each note named this one clause);
+the other tables re-render byte-identical.
+
+**A smoke, 1,000 games, seeds 5000..**: returned ETBs fire 76 times
+(Wurm), 46 (Titan) and 68 (Shepherd, 38 of them persist's, which the old
+rule fired too); +21 single reanimations, +52 Wurm drains, +47 pod bodies
+killed against the old rule.
+
+**MEASUREMENT PENDING**: `run_knob_ab shilgengar` on the three switches
+together, then each alone, reach `creature_etb_returns`, N=15,000.
 
 ## How to read an ablation table
 

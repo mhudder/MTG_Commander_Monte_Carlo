@@ -584,6 +584,12 @@ SCRIPTED_SHILGENGAR = {
     # regrowth of this turn's dead, and persist (`shepherd_persists`, reached
     # through the `after_died` hook on both death paths).
     "Herald of War", "Twilight Shepherd",
+    # BACK from PARTLY 2026-11-25 (§0z254): Massacre Wurm's and Sun Titan's
+    # ETBs, and Twilight Shepherd's, fire on every entry, not a cast alone
+    # (`returned_etb`; `wurm_etb_returns`, `titan_etb_returns`,
+    # `shepherd_etb_returns`) -- the one clause each note named, and the
+    # one Avacyn's named for them. Avacyn's return is a POLICY (`avacyn_feed`).
+    "Massacre Wurm", "Sun Titan", "Avacyn, Angel of Horror",
     # NOTE: the commander itself is never in `deck` (build() returns it
     # separately), so it does not belong in this set -- same as every other
     # deck's commander.
@@ -592,7 +598,8 @@ SCRIPTED_SHILGENGAR = {
     # Elesh Norn, Voldaren Bloodcaster, Viscera Seer, Cartel Aristocrat,
     # Priest of Fell Rites, Sun Titan, Massacre Wurm, Black Market
     # Connections, Mind Stone, Flawless Maneuver, Teferi's Protection --
-    # each with a clause nothing implements.
+    # each with a clause nothing implements. (Sun Titan and Massacre Wurm
+    # came back on 2026-11-25, §0z254, above.)
     # Angels tribal
     "Archangel of Thune", "Righteous Valkyrie",
     # Staged 2026-09-26 (§0z69), from preview text; the printed text is
@@ -1390,16 +1397,6 @@ PARTLY_MODELLED = {
             "NOT: a body that is no route piece, nor the pod's other "
             "permanents (§4) -- the route answers' shared limit, with their "
             "knob, `threat_rebuild_max`.",
-        # Candidate, 2026-10-23 (the owner's Reality Fracture review).
-        "Avacyn, Angel of Horror":
-            "MODELLED: the 8/8 flying Angel, and 'whenever Avacyn or another "
-            "nontoken creature you control dies, return that card ... at the "
-            "beginning of the next end step' (`avacyn_died`, "
-            "`avacyn_returns`), with the feed line `avacyn_feed` -- a "
-            "POLICY, and flying and deathtouch, read in combat both ways "
-            "(§0z204). NOT: a returned Massacre Wurm, Sun Titan or Twilight "
-            "Shepherd fires no ETB, the floor every return path in this "
-            "engine shares. A floor by that.",
         "Angel of the Ruins":
             "MODELLED: the 5/7 flying artifact creature, and Plainscycling "
             "{2} (`engine.cycle_step`, §0z226: cycled for a Plains card "
@@ -1493,18 +1490,6 @@ PARTLY_MODELLED = {
             "mana. NOT: 'If you control a commander, you may cast this spell "
             "without paying its mana cost' -- always paid at {2}{W} (item "
             "14). A floor.",
-        "Massacre Wurm":
-            "MODELLED, CAST: the -2/-2 killing the pod's bodies of toughness "
-            "2 or less and the creature route pieces it reaches "
-            "(`minus_two_pod`), and 2 life from that player for each "
-            "creature of theirs that dies (`on_pod_creature_deaths`). NOT: "
-            "its ETB when the deck RETURNS it -- Reya Dawnbringer, Priest, "
-            "Sun Titan, Emeria Shepherd, the ultimate (item 15). A floor.",
-        "Sun Titan":
-            "MODELLED, CAST AND ATTACKING: return a permanent card of mana "
-            "value 3 or less (the shared pick, §0z135). NOT: its ETB when "
-            "the deck RETURNS it -- Reya Dawnbringer, Priest, Emeria "
-            "Shepherd, the ultimate (item 15). A floor.",
     },
 }
 
