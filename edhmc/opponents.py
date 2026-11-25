@@ -1387,18 +1387,19 @@ def answer_pod_threat(g, card) -> int:
         reach = ANSWERS.get(card.name)
     if reach is None:
         return 0
-    done = _answer_pieces(g, card.name, reach)
+    done = answer_pieces(g, card.name, reach)
     g.m["threat_answers_cast"] += 1
     if not done:
         g.m["threat_answers_whiffed"] += 1
     return done
 
 
-def _answer_pieces(g, name: str, reach: Reach) -> int:
+def answer_pieces(g, name: str, reach: Reach) -> int:
     """Remove up to `reach.n` pieces, each aimed by `answer_target` -- the
-    one loop a cast answer (`answer_pod_threat`) and an answer creature
-    entering some other way (`answer_on_entry`) share, so the two cannot
-    aim differently."""
+    one loop a cast answer (`answer_pod_threat`), an answer creature
+    entering some other way (`answer_on_entry`) and an engine's hand-read
+    answer the census cannot read (shilgengar's Angel of Serenity, §0z255)
+    share, so none can aim differently."""
     done = 0
     for _ in range(reach.n):
         pick = answer_target(g, reach)
@@ -1435,7 +1436,7 @@ def answer_on_entry(g, card) -> int:
     counters keep their meaning."""
     if not pod_threats_on(g) or card.name not in ETB_ANSWERS:
         return 0
-    done = _answer_pieces(g, card.name, ANSWERS[card.name])
+    done = answer_pieces(g, card.name, ANSWERS[card.name])
     g.m["entry_answers"] += 1
     if not done:
         g.m["entry_answers_whiffed"] += 1

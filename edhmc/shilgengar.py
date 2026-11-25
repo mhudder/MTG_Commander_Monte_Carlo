@@ -92,8 +92,8 @@ opponents' boards are a blocker count, so none of it has a legal target, same
 as every other deck in this project. [SUPERSEDED, §0z252: since item 24 the
 plain removal and Angel of Despair's and Angel of the Ruins' ETBs are route
 answers (`opponents.ANSWERS`), the Angels' on every entry; Angel of
-Serenity's exile is still not modelled. `tools/ablation.py`'s notes are the
-current word.] Revel in Riches needs opponents'
+Serenity's exile is read by hand since §0z255 (`SERENITY_REACH`).
+`tools/ablation.py`'s notes are the current word.] Revel in Riches needs opponents'
 creatures to die as discrete events, which nothing here tracks. Angel of
 Suffering's damage-prevention-into-mill replacement effect was deliberately
 NOT modelled: it is not clear how it should interact with `resolve_clocks`
@@ -169,6 +169,15 @@ ETB_RETURN_KNOBS = {"Angel of Despair": "despair_etb_returns",
 # §0z254: the creatures whose ETB `resolve` fired on a CAST only, each with
 # the switch for its ETB on every other entry; False is the cast-only rule
 # (and, for Twilight Shepherd, persist's own call, as before).
+# §0z255: ANGEL OF SERENITY, "exile up to three other target creatures from
+# the battlefield and/or creature cards from graveyards", read BY HAND: the
+# census's exile rule reads "another target", not "other target", so
+# `OPP.ANSWERS` does not have it. Fixing that rule regenerates
+# `_removal.py` and moves every deck's destroy share -- the owner's call.
+# `check_serenity_reach` raises the day the census reads the card, so it is
+# never answered twice.
+SERENITY = "Angel of Serenity"
+SERENITY_REACH = OPP.Reach(frozenset({"Creature"}), 3, 99, 0)
 CREATURE_ETB_KNOBS = {"Massacre Wurm": "wurm_etb_returns",
                       "Sun Titan": "titan_etb_returns",
                       "Twilight Shepherd": "shepherd_etb_returns"}
@@ -192,6 +201,21 @@ def check_etb_return_knobs(knobs=None, run_by=None) -> None:
 
 
 check_etb_return_knobs()
+
+
+def check_serenity_reach(answers=None) -> None:
+    """§0q: SERENITY_REACH is a hand-read answer. If the census ever reads
+    Angel of Serenity, it would be answered twice -- on its cast by
+    `answer_pod_threat` and here -- so this raises at import instead."""
+    answers = OPP.ANSWERS if answers is None else answers
+    if SERENITY in answers:
+        raise SystemExit(
+            f"\nThe removal census now reads {SERENITY} (§0z255): delete "
+            "shilgengar's SERENITY_REACH and its make_permanent hook, and give "
+            "the card an ETB_RETURN_KNOBS switch instead.")
+
+
+check_serenity_reach()
 from edhmc.decks._evasion import CREATURE_SUBTYPES   # Requiem Angel, §0z215
 
 ANGEL_TOKEN_STATS = (4, 4)   # every Angel token this deck makes is a 4/4 flier
@@ -441,6 +465,13 @@ class ShilgengarGame(BaseGame):
             self.m["etb_answer_returns"] += 1
             if self.cfg.get(ETB_RETURN_KNOBS[card.name], True):
                 OPP.answer_on_entry(self, card)
+        if card.name == SERENITY:
+            # §0z255: on EVERY entry, the cast included -- the census does
+            # not read the card, so `countered` answers nothing for it.
+            # Counted in both legs, the reach.
+            self.m["serenity_entries"] += 1
+            if self.cfg.get("serenity_text", True):
+                self.serenity_etb()
         if not cast and card.name in CREATURE_ETB_KNOBS:
             # §0z254: Massacre Wurm's, Sun Titan's and Twilight Shepherd's
             # ETBs, on every entry but the cast (`resolve` fires those). Each
@@ -452,6 +483,30 @@ class ShilgengarGame(BaseGame):
             if self.cfg.get(CREATURE_ETB_KNOBS[card.name], True):
                 self.returned_etb(card)
         return perm
+
+    def serenity_etb(self) -> int:
+        """ANGEL OF SERENITY (Scryfall, 2026-11-25): "When this creature
+        enters, you may exile up to three other target creatures from the
+        battlefield and/or creature cards from graveyards. When this creature
+        leaves the battlefield, return the exiled cards to their owners'
+        hands."
+
+        §0z255. Up to three of the pod's CREATURE route pieces, aimed as every
+        answer is (`OPP.answer_pieces`); each removed piece comes back by the
+        pre-rolled rebuild delay, as every answered piece does. THE
+        JUDGEMENTS, said out loud -- each a floor:
+        - a body that is no route piece is not a target, the route answers'
+          shared limit (Angel of Despair's too);
+        - the graveyard half is not taken: this deck reanimates, and a
+          creature card exiled from its own graveyard is one the ultimate
+          cannot return -- a policy, never taken, not a clause modelled;
+        - "return the exiled cards to their owners' hands" when the Angel
+          leaves is the rebuild delay, not a return tied to the Angel's
+          death -- an Angel that dies at once hands a piece back sooner."""
+        done = OPP.answer_pieces(self, SERENITY, SERENITY_REACH) \
+            if OPP.pod_threats_on(self) else 0
+        self.m["serenity_exiled"] += done
+        return done
 
     def returned_etb(self, card) -> None:
         """The ETB of `card` (in CREATURE_ETB_KNOBS), entering by a path that

@@ -153,7 +153,9 @@ a floor read as evidence -- §0z206's Woe Strider, thirteen times.
     about as frequent; now `despair_etb_returns`.]** **Angel of Despair** -- "destroy target permanent": "no opposing
     permanent (§4)". Vindicate's text, and Vindicate is a route answer
     (`ANSWERS`) in this list. MODELABLE.
-19. **Angel of Serenity** -- "no opposing creature to exile": the pod's
+19. **[FIXED 2026-11-25, §0z255: the ETB at up to three creature route
+    pieces, every entry, `serenity_text`; the graveyard half a policy, not taken.]**
+    **Angel of Serenity** -- "no opposing creature to exile": the pod's
     creatures are bodies (§0z132) and creature route pieces. MODELABLE.
 20. **[CORRECTED 2026-11-24, §0z252: as item 18 -- modelled on a cast,
     now on every other entry too, `ruins_etb_returns`.]** **Angel of the Ruins** -- its ETB exile of artifacts and enchantments:

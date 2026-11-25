@@ -307,6 +307,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
+| [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22185,6 +22186,52 @@ is returned rather than cast, is rare, and persist's ETB (the common one)
 was already modelled. Both are kept: the text is right, and a null inside
 a ±0.0003 bar is a measured nothing, not an unmeasured one. A T20 effect,
 as the Wurm's ETB is a delay on the pod's routes as much as damage.
+
+<a id="0z255"></a>
+
+## 0z255. FIXED -- Angel of Serenity's ETB, read by hand; the census misses "other target"
+
+**The owner, 2026-11-25**: "go ahead with angel of serenity next" (§0z208
+item 19).
+
+    "When this creature enters, you may exile up to three other target
+    creatures from the battlefield and/or creature cards from graveyards.
+    When this creature leaves the battlefield, return the exiled cards to
+    their owners' hands."            ({4}{W}{W}{W}; Scryfall 2026-11-25)
+
+**A census gap, found on the way**: Angel of Despair and Angel of the Ruins
+are route answers because `tools.removal_census` reads them. Serenity is
+SCANNED and not in `INTERACTION`: the spot exile rule reads `(another )?
+target`, and Serenity's text is "other target". The fix there is one word,
+but regenerating `_removal.py` moves `DESTROY_SHARE_SPOT`, and so every
+deck's baseline -- the owner's call, not taken. Which other cards in the
+lists the rule misses the same way is NOT checked.
+
+**The fix** (`serenity_text`, ON; False is the old blank ETB):
+`ShilgengarGame.serenity_etb`, from `make_permanent` on EVERY entry, the
+cast included (the census does not read it, so `countered` answers
+nothing). `SERENITY_REACH` is up to three creature route pieces, aimed by
+the shared loop (`opponents.answer_pieces`, made public for it).
+`check_serenity_reach` raises at import if the census ever reads the
+card, so it can never be answered twice. **The judgements, said out loud,
+each a floor**: a body that is no route piece is not a target (the route
+answers' shared limit); the graveyard half is never taken -- in a deck
+that reanimates, a creature card exiled from its own graveyard is one the
+ultimate cannot return (a policy); the return to hand when the Angel
+leaves is the pre-rolled rebuild delay, not tied to the Angel's death.
+
+**Pinned**: `tests/test_serenity.py`, six cases A-F, four mutations, every
+expected set exact on the first run.
+
+**Only shilgengar moves**: `check_unchanged_decks --n=2000` against
+`ea7dccf`, every other active deck BIT-IDENTICAL; with
+`serenity_text=False` shilgengar is BIT-IDENTICAL too.
+
+**A smoke, 1,000 games**: 163 entries, 101 pieces exiled; +110 pieces
+removed and +166 kill rounds delayed against the old rule.
+
+**MEASUREMENT PENDING**: `run_knob_ab shilgengar serenity_text
+serenity_entries`, N=15,000.
 
 ## How to read an ablation table
 

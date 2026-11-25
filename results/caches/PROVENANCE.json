@@ -1464,6 +1464,12 @@
         "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "88c36cde90071fd0",
         "utc": "2026-11-25T03:57:41Z"
+      },
+      {
+        "commit": "ea7dccf",
+        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "58431e86ea9ff1ff",
+        "utc": "2026-11-25T16:51:15Z"
       }
     ]
   },
@@ -2849,6 +2855,12 @@
         "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "707aad85de09a61d",
         "utc": "2026-11-25T03:57:41Z"
+      },
+      {
+        "commit": "ea7dccf",
+        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "5086e0683d01dc42",
+        "utc": "2026-11-25T16:51:15Z"
       }
     ]
   },
@@ -4209,6 +4221,12 @@
         "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z254: Massacre Wurm, Sun Titan, Avacyn from shilgengar's PARTLY_MODELLED to SCRIPTED_SHILGENGAR; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 4f5c238 (modules), and the STAGED list (build_pending) played 2,000 seeds at both 4f5c238 and 4f5c238+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "308055fea9d6ae84",
         "utc": "2026-11-25T03:57:41Z"
+      },
+      {
+        "commit": "ea7dccf",
+        "evidence": "2026-11-25: fingerprint moved with opponents.py (\u00a70z255: _answer_pieces made public as answer_pieces, docstring only otherwise) and tools/ablation.py (Angel of Serenity's shilgengar note). check_unchanged_decks --n=2000 BIT-IDENTICAL against ea7dccf (modules), the table re-renders byte-identical from this cache, and the STAGED list (build_pending) played 2,000 seeds at both ea7dccf and ea7dccf+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "e1e66597d1fe67e3",
+        "utc": "2026-11-25T16:51:15Z"
       }
     ]
   },
