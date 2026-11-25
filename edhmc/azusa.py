@@ -3828,6 +3828,10 @@ class AzusaGame(BaseGame):
                 self.m["chord_seen"] += 1    # either rule: the A/B's reach
             if any(c.script == "green_sun" for c in self.hand):
                 self.m["gsz_seen"] += 1      # item 45: either rule, the reach
+            if any(c.script == "nylea_land" for c in self.hand):
+                # §0z256, either rule: the reach. Nylea's X cap ranks its
+                # option in this phase whether or not it is cast.
+                self.m["nylea_seen"] += 1
             if chord_rule and chord_in_hand:
                 cpool = convoke_pool(self, units,
                                      self.combat_turn != self.turn)

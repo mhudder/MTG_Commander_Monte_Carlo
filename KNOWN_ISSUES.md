@@ -22291,8 +22291,18 @@ is BIT-IDENTICAL too.
 every land left now), 977 lands found against 621, 70% of them not
 Forests; +228 fetches cracked and +224 landfall triggers.
 
-**MEASUREMENT PENDING**: `run_knob_ab azusa nylea_any_land
-nylea_x_casts,nylea_lands`, N=15,000.
+**The first measurement's identity FAILED, and the reach was wrong**:
+with `nylea_x_casts,nylea_lands` as the reach, 29 of 13,022 unreached
+games differed (+0.0007 ±0.0022 at T20, superseded). In the eight traced
+(seeds 5000..8999) Nylea sat in hand, was never cast, and the counters
+and X spells paid were the same in both legs: the bigger X cap changes
+the option the main phase RANKS, so a turn moves without Nylea cast --
+what azusa's `gsz_seen` and `chord_seen` already count for. The reach is
+`nylea_seen` (Nylea in hand in a main phase, either rule); with it a scan
+of seeds 5000..8999 finds 0 unreached games different.
+
+**MEASUREMENT PENDING**: `run_knob_ab azusa nylea_any_land nylea_seen`,
+N=15,000.
 
 ## How to read an ablation table
 
