@@ -307,7 +307,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
 | [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and entwine** (azusa), cast before the drops: +0.0017 ±0.0031 at T20, a null -- kept for its text |
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
-| [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry; measurement pending |
+| [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry: +0.0071 ±0.0017 at T20 |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22230,8 +22230,26 @@ expected set exact on the first run.
 **A smoke, 1,000 games**: 163 entries, 101 pieces exiled; +110 pieces
 removed and +166 kill rounds delayed against the old rule.
 
-**MEASUREMENT PENDING**: `run_knob_ab shilgengar serenity_text
-serenity_entries`, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab shilgengar serenity_text serenity_entries`, the
+staged list, N=15,000 paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_shilgengar_serenity_text.txt`):
+
+| T10 | T20 | pieces exiled a game | pieces removed | kill rounds delayed |
+|---|---|---|---|---|
+| +0.0000 ±0.0003 | **+0.0071 ±0.0017** | 0 -> 0.092 | 1.345 -> 1.439 | 2.549 -> 2.689 |
+
+**The identity holds**: 1,714 games reached; of the 13,286 others, 0
+differ. Inside the reached games, +0.062 ±0.014 at T20.
+
+**The mechanism is a route answer's**, and the largest of this session's
+three: 0.092 pieces exiled a game, the pod's kills fewer and later
+(`kill_life_lost` -0.11, `kills_routed` -0.012, `loss_route` -0.016),
+your life +0.33 at the end. A T20 effect only: the Angel costs seven and
+arrives late, and a moved kill rarely matters before turn 10. The size
+carries `threat_rebuild_max` (3), the route answers' knob, said.
+`tools.validate` +0.00 on all 21 metrics after it, the game RNG sealed.
 
 ## How to read an ablation table
 
