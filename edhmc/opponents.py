@@ -1417,9 +1417,9 @@ def answer_pieces(g, name: str, reach: Reach) -> int:
 # resolves the ETB only on a CAST (it runs from `countered`); an answer
 # creature that enters any other way -- reanimated, returned, blinked --
 # goes through `answer_on_entry`, which an engine calls from its own entry
-# path. Only shilgengar calls it today (Angel of Despair, Angel of the
-# Ruins); Acidic Slime, Angel of Sanctions (trostani) and Terastodon (azusa)
-# are in the set and their engines do not call it -- said, not checked.
+# path. Shilgengar calls it (Angel of Despair, Angel of the Ruins) and azusa
+# (Terastodon, §0z257); Acidic Slime and Angel of Sanctions (trostani,
+# SUSPENDED) are in the set and their engine does not call it.
 ETB_ANSWERS = frozenset(
     n for n in ANSWERS
     if "when this creature enters" in _removal.INTERACTION[n][2])
@@ -1488,6 +1488,11 @@ def wipe_takes(g, card, scope=None, x=None) -> list:
     def dies(p):
         if scope == "nonland":
             return True
+        if scope == "artifacts_enchantments":
+            # §0z258: Bane of Progress, "destroy all artifacts and
+            # enchantments" -- no creature piece, every A/E one. Passed by
+            # its caller alone; no census card's scope is this.
+            return p.type in ("Artifact", "Enchantment")
         if scope == "mv2":
             return p.mv <= 2
         if p.type != "Creature":
@@ -3463,9 +3468,14 @@ def trample_of(g, perm) -> bool:
     name = perm.card.name
     if name in TRAMPLE or name == "Lord of the Pit token":
         return True
-    if (getattr(g, "stampede_bonus", 0) > 0
-            or getattr(g, "craterhoof_bonus", 0) > 0):
+    if getattr(g, "stampede_bonus", 0) > 0:
         return True
+    if getattr(g, "craterhoof_bonus", 0) > 0:
+        # §0z258: azusa reads which creatures its Craterhoof reached; an
+        # engine with no such reader keeps the whole team.
+        reaches = getattr(g, "craterhoof_reaches", None)
+        if reaches is None or reaches(perm):
+            return True
     animation_of = getattr(g, "animation_of", None)
     if animation_of is not None:
         anim = animation_of(perm)

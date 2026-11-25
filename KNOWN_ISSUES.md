@@ -309,6 +309,9 @@ Each row is a headline and its key number, at most 250 characters
 | [0z254](#0z254) | FIXED | **Massacre Wurm's, Sun Titan's and Twilight Shepherd's ETBs fired on a cast only** (shilgengar): every return path now fires them, +0.0023 ±0.0011 at T20 -- the Wurm's, Titan and Shepherd nulls |
 | [0z255](#0z255) | FIXED | **Angel of Serenity's ETB** (shilgengar), read by hand -- the census misses "other target": up to three creature route pieces, every entry: +0.0071 ±0.0017 at T20 |
 | [0z256](#0z256) | PARTLY RESOLVED | **Nylea's Intervention searches for any land** (azusa), by `land_rank`, not Forests; its flier mode stays a gap -- the pod's bodies have one flag for flying or reach; +0.0007 ±0.0022 at T20, a null |
+| [0z257](#0z257) | FIXED | **Terastodon's ETB fired on a cast only** (azusa): a tutor, Genesis Wave or a copy now answers too; measurement pending |
+| [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text, with the pilot's response to Bane; measurement pending |
+| [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool; found by §0z258's test; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22323,6 +22326,116 @@ X is mana not spent on something else (cards drawn -0.06). Kept for its
 text, as Journey's was (§0z253); the X logic's cap and `land_rank` are the
 judgements that could move it, neither swept. `tools.validate` +0.00 on
 all 21 metrics after it.
+
+<a id="0z257"></a>
+
+## 0z257. FIXED -- Terastodon's ETB on every entry, not a cast alone
+
+**The owner, 2026-11-25**: "Free now: Go ahead with 3 and 4 fixes right
+now" -- 3 is this, 4 is §0z258.
+
+    "When this creature enters, you may destroy up to three target
+    noncreature permanents. For each permanent put into a graveyard this
+    way, its controller creates a 3/3 green Elephant creature token."
+                                    ({6}{G}{G}; Scryfall 2026-11-25)
+
+**What was there**: a census route answer (`opponents.ANSWERS`: three
+noncreature pieces), resolved from `countered` on a CAST alone -- Green
+Sun's Zenith, Chord of Calling, Finale and Genesis Wave put it in with no
+answer, §0z252's gap in azusa.
+
+**The fix** (`terastodon_etb_returns`, ON): `AzusaGame.etb`, on `cast=False`
+(a tutor, the Wave) and on `is_copy` (Springheart), calls
+`opponents.answer_on_entry`; `ETB_ANSWER_KNOBS` is checked against the
+census at import (`check_etb_answer_knobs`), as shilgengar's is. **A
+ceiling, said, on both paths and older than this fix**: "its controller
+creates a 3/3 green Elephant" is not given to the pod -- `POD_GIFTS` hands
+over mana only -- and Beast Within's 3/3 is the same omission.
+
+**Pinned**: `tests/test_azusa_ceilings.py` T1-T4 and K.
+
+**MEASUREMENT PENDING**: `run_knob_ab azusa terastodon_etb_returns
+etb_answer_returns`, N=15,000.
+
+<a id="0z258"></a>
+
+## 0z258. FIXED -- Craterhoof's pump to the creatures it resolved on; Bane of Progress to its text
+
+§0z209 items 4 and 5, both CEILINGS until now.
+
+    Craterhoof Behemoth: "When this creature enters, creatures you control
+    gain trample and get +X/+X until end of turn, where X is the number of
+    creatures you control."
+    Bane of Progress: "When this creature enters, destroy all artifacts and
+    enchantments. Put a +1/+1 counter on this creature for each permanent
+    destroyed this way."                               (Scryfall 2026-11-25)
+
+**Craterhoof** (`craterhoof_snapshot`, ON): `craterhoof_bonus` was one
+number every creature read for the rest of the turn, and trample went to
+the whole team while it was above 0 -- so a Beast, Badger or Insect made
+by a later land drop got both. Now `craterhoof_pumped` records each
+creature present as it resolves (held, §0z98) and `_pump` and
+`opponents.trample_of` (through an optional `craterhoof_reaches` hook;
+engines without one keep the whole team) read only those. The count of X
+is unchanged. Return of the Wildspeaker ("non-Human creatures you control
+get +3/+3") has the same shape and is NOT changed -- said, not built.
+
+**Bane of Progress** (`bane_text`, ON): it destroyed your nonland
+artifacts and enchantments on the battlefield and nothing else -- "a
+one-sided wipe with the sidedness missing". Now also, each a +1/+1
+counter: the pod's artifact and enchantment ROUTE PIECES (a new sweeper
+scope, `artifacts_enchantments`, passed by Bane alone); your Treasures and
+Clues, which azusa keeps off the battlefield (Tireless Provisioner's Food
+is played as its Treasure); and artifact lands (Scene of the Crime, a land
+death through `land_died`). NOT: the pod's other artifacts and
+enchantments (§4).
+
+**The pilot's response** (`bane_response`, ON; False is the naive pilot):
+the first smoke with the new rule destroyed 2,331 Treasures and 908 Clues
+over 1,000 games -- about eight Treasures a Bane -- which is the text
+applied to a pilot who does nothing. The ETB goes on the stack (603.3)
+with you holding priority, so `bane_respond` cracks every Clue the mana
+pays for and then sacrifices each untapped Treasure for floating mana. A
+sacrificed Treasure is not destroyed, so it gives Bane no counter. With it:
+0 Treasures destroyed, 2,844 floated, 116 Clues cracked, 784 destroyed.
+Both pilots are measured (§0z42: a rule that makes a new loss possible
+turns the old policy into a claim).
+
+**Pinned**: `tests/test_azusa_ceilings.py` C1-C3 and B1-B5. B3 FAILED on
+its first run -- two Clues and {2} cracked both -- and the cause was not
+this rule: it is §0z259.
+
+**MEASUREMENT PENDING**: each switch alone at N=15,000, and the naive
+Bane pilot.
+
+<a id="0z259"></a>
+
+## 0z259. FIXED -- azusa's `crack_clues` paid every Clue with the same {2}
+
+**Found by §0z258's test B3**, not looked for. `engine.spend` taps the
+owners of the units it pays with and leaves the units in the list it was
+given; `engine.can_pay` does not read `tapped`. `AzusaGame.crack_clues`
+computes its pool once and loops "{2}, sacrifice: draw" over it -- so the
+second Clue was paid with the first's {2}, and every Clue cracked for the
+price of one (`mana_spent` counted each). Tireless Tracker's Clues, in the
+activations step every turn and in the floating sink (§0z183): free cards.
+Tireless Tracker's row was a ceiling by that.
+
+**The fix** (`clue_pay_once`, ON; False is the free crack): the paid units
+leave the pool (`ManaUnits.__delitem__` takes their owners and weights
+with them), as rendmaw's activations pop theirs. **Where else**: a scan of
+every engine for a loop that pays twice from one held pool found three
+sites -- this one, and two in `engine.py` that are correct (rendmaw's main
+phase rebuilds its pool each pass; its activations pop what they pay).
+
+**Pinned**: `tests/test_azusa_ceilings.py` Q, and B3 again.
+
+**MEASUREMENT PENDING**: `run_knob_ab azusa clue_pay_once
+clue_multi_calls`, N=15,000.
+
+**Only azusa moves for §0z257-§0z259 together**: `check_unchanged_decks
+--n=2000` against `84c57b6`, every other active deck BIT-IDENTICAL; with
+all four switches off, azusa BIT-IDENTICAL too.
 
 ## How to read an ablation table
 

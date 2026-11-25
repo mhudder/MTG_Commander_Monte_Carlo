@@ -411,3 +411,25 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     saturates short of it, and `threat_clock_shift` 4.985 (kills 2.7 rounds
     sooner) holds it unevenly. **Left, the owner's call**: that re-fit, or
     first a look at why the calibrated boards outrun the pod's mana.
+
+53. **BEFORE THE NEXT REBUILD: TWO DECISIONS THAT MOVE EVERY DECK (the
+    owner, 2026-11-25).** "decisions before the rebuild: fix the removal
+    census pattern, and turn on Item 52. Make a note of these decisions but
+    we will make other fixes before rebuilding." Both are DECIDED and NOT
+    STARTED; the owner's other fixes (§0z257 on) come first, then these,
+    then one rebuild of every active deck -- each moves all of them, so
+    doing either after the rebuild would cost a second one.
+    - **The census pattern** (§0z255): `tools/removal_census.py`'s spot
+      exile rule reads "(another )?target" and misses "other target" --
+      Angel of Serenity, read by hand since (`shilgengar.SERENITY_REACH`).
+      Fixing it regenerates `decks/_removal.py`, so `DESTROY_SHARE_SPOT`
+      moves for every deck. First list every card the fixed rule newly
+      reads (not checked yet); delete `SERENITY_REACH` and its hook once
+      the census reads the card (`check_serenity_reach` raises until then)
+      and give Serenity an `ETB_RETURN_KNOBS` switch instead.
+    - **Item 52's development gated by mana** (`pod_develop_gated`, §0z247):
+      ON. Still open inside it, the owner's to choose: the re-fit -- alone
+      it weakens the pod +0.114 on the mean, `incidental_rate` saturates
+      short of it, and `threat_clock_shift` 4.985 holds it unevenly -- or
+      first the look at why the calibrated boards outrun the pod's mana.
+      Ask before building the re-fit.

@@ -1077,12 +1077,15 @@ PARTLY_MODELLED = {
             "permanents (POD_V4), as shilgengar's Angel of Despair -- and the "
             "graveyard shuffle Kozilek also has. A floor on both.",
         "Bane of Progress":
-            "MODELLED: the ETB destroys YOUR OWN artifacts and enchantments "
-            "(and fires when a tutor or Genesis Wave puts it in, §0z212). NOT: "
-            "the pod's artifact and enchantment route pieces -- MODELABLE since "
-            "POD_V4, as Angel of the Ruins -- nor your off-board Treasures, "
-            "Clues and Food (§0z209 item 5). Its score is the cost with none "
-            "of the benefit, a ONE-SIDED WIPE WITH THE SIDEDNESS MISSING. §0z2.",
+            "MODELLED (§0z258, `bane_text`): the ETB destroys your artifacts "
+            "and enchantments, artifact lands (Scene of the Crime, a land "
+            "death), your Treasures and Clues, and the pod's artifact and "
+            "enchantment ROUTE PIECES -- a counter for each; it fires when a "
+            "tutor or Genesis Wave puts it in (§0z212). The pilot responds "
+            "(`bane_response`): cracks the Clues the mana pays for and "
+            "sacrifices its Treasures for floating mana first. NOT: the pod's "
+            "other artifacts and enchantments, which are not objects (§4); "
+            "and it is cast with no gate on either side -- a policy.",
         # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z209, whose
         # item numbers these cite; docs/ORACLE_AUDIT_AZUSA.md). Each row
         # printed under MODEL-EVALUATED while a clause was missing. ---

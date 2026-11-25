@@ -315,6 +315,14 @@ SAC_DRAW_LANDS = {
     "The Hunter Maze":     ({"gen": 1, "G": 1},  True,  0),
 }
 
+# §0z257: this list's ETB answer creatures (`OPP.ETB_ANSWERS`), each with the
+# switch for its ETB on an entry that is NOT its cast (a tutor, Genesis Wave)
+# or is a COPY (Springheart): the cast's ETB `OPP.countered` resolves. False
+# is the cast-only rule. Checked against the census at import
+# (`check_etb_answer_knobs`), as shilgengar's is.
+ETB_ANSWER_KNOBS = {"Terastodon": "terastodon_etb_returns"}
+
+
 # §0z253: Journey of Discovery takes its drops mode (unentwined) only when the
 # hand holds this many lands more than the drops left -- so both extra drops
 # are played now. A pilot's rule, not a tuned knob.
@@ -472,6 +480,7 @@ class AzusaGame(BaseGame):
         self.nissa_emblem = False       # Nissa, Who Shakes the World's -8
         self.springheart_host = None    # Permanent Springheart is bestowed on
         self.craterhoof_bonus = 0
+        self.craterhoof_pumped = {}     # id -> [perm, +X], §0z258
         # §0z212: the ETBs a tutor or Genesis Wave queues while a spell is
         # resolving, fired by `resolve` once the spell has left the stack.
         self._etb_queue = []
@@ -1023,9 +1032,24 @@ class AzusaGame(BaseGame):
         this is not one counter. Both reset in take_turn.
         """
         bonus = self.craterhoof_bonus
+        if bonus and self.cfg.get("craterhoof_snapshot", True):
+            bonus = self.craterhoof_reach(perm)
         if self.wildspeaker_bonus and perm.card.name not in HUMAN:
             bonus += self.wildspeaker_bonus
         return bonus
+
+    def craterhoof_reach(self, perm) -> int:
+        """§0z258: Craterhoof's +X for `perm` -- what it was given as a
+        Craterhoof resolved this turn, 0 for a creature that entered after."""
+        e = self.craterhoof_pumped.get(id(perm))
+        return e[1] if e is not None and e[0] is perm else 0
+
+    def craterhoof_reaches(self, perm) -> bool:
+        """`opponents.trample_of`'s question: does this turn's Craterhoof
+        trample reach `perm`? The whole team under the old rule
+        (`craterhoof_snapshot=False`)."""
+        return (not self.cfg.get("craterhoof_snapshot", True)
+                or self.craterhoof_reach(perm) > 0)
 
     def _eot(self, perm, i):
         """Glacier Godmaw's and a Racetrack Bird's until-end-of-turn bonus to
@@ -2686,12 +2710,32 @@ class AzusaGame(BaseGame):
         the whole point is that they do. (This said "two ETBs" until
         §0z212; Springheart's is the only one.)
         """
+        if card.name in ETB_ANSWER_KNOBS and (not cast or is_copy):
+            # §0z257: put in, or a copy -- the cast's ETB is `countered`'s.
+            # Counted in both legs, the switch's reach.
+            self.m["etb_answer_returns"] += 1
+            if self.cfg.get(ETB_ANSWER_KNOBS[card.name], True):
+                OPP.answer_on_entry(self, card)
         if card.name == "Avenger of Zendikar":
             n = sum(1 for p in self.board if p.card.is_land)
             self.make_tokens(n, 0, 1, "Plant")
         elif card.name == "Craterhoof Behemoth":
             n = sum(1 for p in self.board if p.card.is_creature)
             self.craterhoof_bonus += n
+            self.m["craterhoof_etbs"] += 1      # either rule: the reach
+            # §0z258: "creatures you control gain trample and get +X/+X" --
+            # the creatures you control AS IT RESOLVES, not one that enters
+            # later this turn. Recorded per permanent (held, so the id cannot
+            # be reused, §0z98); `craterhoof_bonus` stays the live flag the
+            # cleanup ends (`engine.EOT_EFFECTS`). The count above is the
+            # one the old rule used, unchanged.
+            for p in self.board:
+                if p.card.is_creature:
+                    e = self.craterhoof_pumped.get(id(p))
+                    if e is None or e[0] is not p:
+                        self.craterhoof_pumped[id(p)] = [p, n]
+                    else:
+                        e[1] += n
         elif card.name == "Eternal Witness":
             if self.graveyard:
                 best = max(self.graveyard, key=lambda c: c.mv)
@@ -2713,17 +2757,8 @@ class AzusaGame(BaseGame):
                 self.make_permanent(best, sick=False)
                 self.land_entered(best, played=False)
         elif card.name == "Bane of Progress":
-            # ETB destroys ALL artifacts/enchantments -- including yours.
-            # Opponents' are not tracked as objects, so only your own side is
-            # represented; see the module docstring.
-            victims = [p for p in self.board
-                      if p is not perm and not p.card.is_land
-                      and ("Artifact" in p.card.types or "Enchantment" in p.card.types)]
-            for v in victims:
-                self.board.remove(v)
-                if not v.is_token:
-                    self.graveyard.append(v.card)
-            perm.counters += len(victims)
+            self.m["bane_etbs"] += 1            # either rule: the reach
+            self.bane_etb(perm)
         elif card.name == "Ka-Zar of the Savage Land":
             # "When Ka-Zar enters, create Zabu, a legendary 2/2 green Cat
             # creature token with 'Landfall -- whenever a land you control
@@ -2782,6 +2817,79 @@ class AzusaGame(BaseGame):
             # one too -- the copy's ETB is the printed card's (queued item 16).
             # Cracked in `precombat_step`. §0z101.
             self.make_lander()
+
+    def bane_etb(self, perm) -> int:
+        """BANE OF PROGRESS (Scryfall, 2026-11-25): "When this creature
+        enters, destroy all artifacts and enchantments. Put a +1/+1 counter
+        on this creature for each permanent destroyed this way."
+
+        The old rule destroyed your nonland artifacts and enchantments on
+        the battlefield and nothing else (`bane_text=False`). §0z258 adds,
+        each counted and each a +1/+1 counter:
+        - the pod's artifact and enchantment ROUTE PIECES (the sweeper's
+          `artifacts_enchantments` scope, `opponents.wipe_threat_pieces`),
+          each back by the rebuild delay as every answered piece is;
+        - your Treasures (`TreasureMana` in `bonus_mana`; Tireless
+          Provisioner's Food is played as its Treasure) and Clues, which this
+          engine keeps off the battlefield;
+        - a land that is an artifact or enchantment (Scene of the Crime): a
+          land death (`land_died`), as its own sacrifice is.
+        NOT: the pod's other artifacts and enchantments, which are not
+        objects (§4). The pilot still casts it with no gate on either side
+        -- a policy, unchanged."""
+        def is_ae(p):
+            return "Artifact" in p.card.types or "Enchantment" in p.card.types
+        new = self.cfg.get("bane_text", True)
+        victims = [p for p in self.board
+                   if p is not perm and is_ae(p)
+                   and (new or not p.card.is_land)]
+        for v in victims:
+            self.board.remove(v)
+            if v.card.is_land:
+                self.land_died(v.card)
+                self.m["bane_lands"] += 1
+            elif not v.is_token:
+                self.graveyard.append(v.card)
+        n = len(victims)
+        if new:
+            if self.cfg.get("bane_response", True):
+                self.bane_respond()
+            pieces = OPP.wipe_threat_pieces(self, perm.card,
+                                            scope="artifacts_enchantments")
+            treasures = [f for f in self.bonus_mana
+                         if isinstance(f, TreasureMana) and not f.tapped]
+            self.bonus_mana = [f for f in self.bonus_mana
+                               if not any(f is t for t in treasures)]
+            clues = getattr(self, "clues", 0)
+            self.clues = 0
+            self.m["bane_pieces"] += pieces
+            self.m["bane_treasures"] += len(treasures)
+            self.m["bane_clues"] += clues
+            n += pieces + len(treasures) + clues
+        perm.counters += n
+        self.m["bane_destroyed"] += n
+        return n
+
+    def bane_respond(self) -> None:
+        """THE PILOT'S RESPONSE to Bane of Progress's ETB, which goes on the
+        stack (603.3) with you holding priority (§0z258, `bane_response`;
+        False is the naive pilot, whose Treasures and Clues all die):
+        crack every Clue the mana pays for (`crack_clues`, its own draw
+        guard), then sacrifice each untapped Treasure for one mana, which
+        floats for the rest of the phase (`FloatingMana`). A sacrificed
+        Treasure is not destroyed, so it gives Bane no counter -- the rule
+        the text states, not a cost."""
+        clues = getattr(self, "clues", 0)
+        self.crack_clues(self.available_mana())
+        self.m["bane_clues_cracked"] += clues - getattr(self, "clues", 0)
+        kept = []
+        for f in self.bonus_mana:
+            if isinstance(f, TreasureMana) and not f.tapped:
+                kept.append(FloatingMana(f.colours))
+                self.m["bane_treasures_floated"] += 1
+            else:
+                kept.append(f)
+        self.bonus_mana = kept
 
     def your_lands(self):
         return [p for p in self.board if p.card.is_land] + self.creature_lands()
@@ -4328,11 +4436,26 @@ class AzusaGame(BaseGame):
         and spent from in place. `where` names a pool-emptying boundary when
         `floating_sink` is the caller (§0z183), and is counted."""
         clues = getattr(self, "clues", 0)
+        once = self.cfg.get("clue_pay_once", True)
+        if clues >= 2:
+            # §0z259, either rule: the reach -- with one Clue there is no
+            # second payment for the old rule to reuse.
+            self.m["clue_multi_calls"] += 1
         while clues > 0 and draw_is_safe(self, 1):   # a Clue is optional
             pay = can_pay({"gen": 2}, units)
             if pay is None:
                 break
             spend(self, pay, units)
+            if once:
+                # §0z259: `spend` taps what it paid with and leaves it in
+                # `units`, and `can_pay` does not read `tapped` -- so the
+                # next Clue was paid with the SAME {2}, and every Clue cracked
+                # for the price of one. The paid units leave the pool here,
+                # owners and weights with them (`ManaUnits.__delitem__`), as
+                # rendmaw's activations pop theirs. `clue_pay_once=False` is
+                # the old free crack.
+                for i in sorted(pay, reverse=True):
+                    del units[i]
             self.m["mana_spent"] += 2
             self.draw(1)
             clues -= 1
@@ -4800,6 +4923,7 @@ def take_turn(g):
     g.turn += 1
     g.spells_this_turn = 0
     g.craterhoof_bonus = 0
+    g.craterhoof_pumped = {}            # §0z258: "until end of turn"
     g.wildspeaker_bonus = 0
     g.eot_pt = {}                       # Godmaw / Racetrack Bird pumps
     g.eot_haste = {}                    # Godmaw's haste, §0z101
@@ -5141,6 +5265,23 @@ def check_dynamic_cost_coverage():
     return unknown
 
 
+def check_etb_answer_knobs(knobs=None, run_by=None) -> None:
+    """§0q: ETB_ANSWER_KNOBS is hand-kept, so it is checked against the
+    census -- every name an ETB answer, every ETB answer in azusa's lists
+    with a switch (§0z257)."""
+    from edhmc.decks import _removal
+    knobs = ETB_ANSWER_KNOBS if knobs is None else knobs
+    run_by = _removal.RUN_BY.get("azusa", ()) if run_by is None else run_by
+    stray = set(knobs) - OPP.ETB_ANSWERS
+    missing = (set(run_by) & OPP.ETB_ANSWERS) - set(knobs)
+    if stray or missing:
+        raise SystemExit(
+            f"\nazusa.ETB_ANSWER_KNOBS has drifted from the census (§0z257): "
+            f"not ETB answers {sorted(stray)}; ETB answers in the list with "
+            f"no switch {sorted(missing)}.")
+
+
+check_etb_answer_knobs()
 check_land_enabler_coverage()
 check_planeswalker_coverage()
 check_dynamic_pt_coverage()

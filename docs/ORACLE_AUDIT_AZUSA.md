@@ -98,12 +98,19 @@ FLOOR on the four tutors, and a docstring that says otherwise.
 
 ### 4. Craterhoof's pump reaches creatures that enter after it
 
+> **FIXED 2026-11-25 (§0z258)**: the creatures it resolved on, pump and
+> trample (`craterhoof_snapshot`).
+
 "Creatures you control gain trample and get +X/+X until end of turn": the
 creatures you control as it resolves. `craterhoof_bonus` is read by
 `_pump` for every permanent for the rest of the turn, so a Beast, Badger
 or Insect made by a later land drop gets it too. A small CEILING.
 
 ### 5. Bane of Progress spares your tokens
+
+> **FIXED 2026-11-25 (§0z258)**: Treasures, Clues, artifact lands and the
+> pod's A/E route pieces (`bane_text`), with the pilot's response
+> (`bane_response`).
 
 "Destroy all artifacts and enchantments": the ETB removes your artifact
 and enchantment PERMANENTS, but not the Treasures (`TreasureMana` in
