@@ -3974,6 +3974,11 @@ class AzusaGame(BaseGame):
                 remove_card(self.hand, card)
             idx = self.spells_this_turn
             self.spells_this_turn += 1
+            if card.script == "journey_of_discovery":
+                # §0z253, either rule: the A/B's reach is the CAST -- one
+                # countered before the drops never resolves, and its leg
+                # still differs.
+                self.m["journey_cast"] += 1
             if card.is_creature:
                 self.creature_spell_cast(card)
             if OPP.countered(self, card, idx):

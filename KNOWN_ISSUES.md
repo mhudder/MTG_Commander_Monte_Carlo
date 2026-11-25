@@ -22069,8 +22069,18 @@ both switches (199 without the timing, which casts it earlier and more
 often), entwined 98 of them; +150 lands played and +60 landfall triggers
 over the 1,000 games against the old rule.
 
+**The first measurement's identity FAILED, and the reach was wrong**:
+with `journey_resolved` as the reach, 41 of 11,514 unreached games
+differed. Every one traced (seeds 5194, 5973, 6762, 7102, 7128, 7508,
+7794) was the same game: the ON leg casts Journey before the drops and it
+is COUNTERED, so it never resolves, while the OFF leg never cast it at
+all. The reach is the CAST (`journey_cast`, counted at azusa's cast site
+in both legs); with it, a scan of seeds 5000..7999 finds 0 unreached
+games different. That run's win rate (+0.0017 ±0.0031 at T20, inside its
+bar) is superseded by the re-run below.
+
 **MEASUREMENT PENDING**: `run_knob_ab azusa journey_text,journey_pre_land
-journey_resolved`, then `journey_pre_land` alone, N=15,000.
+journey_cast`, then `journey_pre_land` alone, N=15,000.
 
 ## How to read an ablation table
 

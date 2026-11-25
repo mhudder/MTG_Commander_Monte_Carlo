@@ -54,7 +54,7 @@ python -m tools.cache_manifest --write
 and only that deck.** `./tools/regen_tables.sh` still deletes every
 cache by default; `--resume` does not.
 
-Generated at `9eadfbc`.
+Generated at `25bc04b`.
 
 **7 caches tracked.** Each row below carries the fingerprint it was BUILT at and its state against the live one; the provenance of each is in `results/caches/NOTES.json`.
 
@@ -96,7 +96,7 @@ the fingerprint above mean anything.
 
 ### State of each cache
 
-- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `d658977844ccfb9a`, live is `f390462ba252c932`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
+- **`ablation_cache_azusa_10-20_n15000_medblank.json`** — SUSPECT. built at `d658977844ccfb9a`, live is `91ab5c613d2f0a2d`. The fingerprint moved and nothing has checked whether the NUMBERS did. Run `tools/check_unchanged_decks.py` against a worktree at `80cb14f`; if bit-identical, record it with `python -m tools.cache_manifest --verified ablation_cache_azusa_10-20_n15000_medblank.json "..."`. Only regenerate if the baseline actually moved.
 - **`ablation_cache_karlov_10-20_n15000_medblank.json`** — VERIFIED. built at `46746b4e21740503`; fingerprint has since moved to `4611cdc3ab2abf36` and was CHECKED at `9eadfbc` (2026-11-25T03:21:55Z): 2026-11-25: fingerprint moved with tools/ablation.py only (§0z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.
   - verified at `ababbaf19cbb3579` (`e220bf7`, 2026-11-23T22:11:25Z): 2026-11-23: fingerprint moved with experiment.py (PRE_ITEM45_REST, §0z248's last flip) and opponents.py (Malakir's PROTECTION entry and protection_life, §0z251). check_unchanged_decks --n=2000 BIT-IDENTICAL against a77fb7a and against 63cd636 (modules), and the STAGED list (build_pending) played 2,000 seeds at both a77fb7a and e220bf7+, every game's whole output hashed: 0 of 2,000 differ.
   - verified at `0bfbb3ccf6be4591` (`e48ad7a`, 2026-11-24T03:13:48Z): 2026-11-24: fingerprint moved with opponents.py only (§0z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.
