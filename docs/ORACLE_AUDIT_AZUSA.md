@@ -119,7 +119,9 @@ cost.
 > `tools/ablation.py`, each reason citing its item; item 8 is fixed
 > (§0z213). Tier 3's reasons 10-14 are corrected the same day.
 
-6. **Journey of Discovery** -- modelled as its first mode, two basics to
+6. **[FIXED 2026-11-25, §0z253: both modes and the entwine,
+   `journey_text`; cast before the drops, `journey_pre_land`.]**
+   **Journey of Discovery** -- modelled as its first mode, two basics to
    hand. NOT: "You may play up to two additional lands this turn", nor
    entwine {2}{G} -- in a deck whose whole engine is land drops, the second
    mode is the one an Azusa pilot casts it for. A floor.

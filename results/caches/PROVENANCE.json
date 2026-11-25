@@ -1452,6 +1452,12 @@
         "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "0bfbb3ccf6be4591",
         "utc": "2026-11-24T03:13:48Z"
+      },
+      {
+        "commit": "9eadfbc",
+        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "4611cdc3ab2abf36",
+        "utc": "2026-11-25T03:21:55Z"
       }
     ]
   },
@@ -2825,6 +2831,12 @@
         "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "f7b3e4bd9d4589dc",
         "utc": "2026-11-24T03:13:47Z"
+      },
+      {
+        "commit": "9eadfbc",
+        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "904e87b93868570b",
+        "utc": "2026-11-25T03:21:54Z"
       }
     ]
   },
@@ -4173,6 +4185,12 @@
         "evidence": "2026-11-24: fingerprint moved with opponents.py only (\u00a70z252: _answer_pieces split out of answer_pod_threat, ETB_ANSWERS and answer_on_entry added; only shilgengar calls the new function). check_unchanged_decks --n=2000 BIT-IDENTICAL against e48ad7a (modules), and the STAGED list (build_pending) played 2,000 seeds at both e48ad7a and e48ad7a+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
         "fingerprint": "5c9d4fa98ff62190",
         "utc": "2026-11-24T03:13:48Z"
+      },
+      {
+        "commit": "9eadfbc",
+        "evidence": "2026-11-25: fingerprint moved with tools/ablation.py only (\u00a70z253: Journey of Discovery from azusa's PARTLY_MODELLED to SCRIPTED_AZUSA; no other deck's entries touched). This deck's table re-renders byte-identical from this cache (tests.test_metrics_and_render C), check_unchanged_decks --n=2000 BIT-IDENTICAL against 9eadfbc (modules), and the STAGED list (build_pending) played 2,000 seeds at both 9eadfbc and 9eadfbc+, every game's whole output hashed: 0 of 2,000 differ. python 3.11.18.",
+        "fingerprint": "70539ff057f56d48",
+        "utc": "2026-11-25T03:21:55Z"
       }
     ]
   },

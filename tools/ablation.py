@@ -734,7 +734,12 @@ SCRIPTED_AZUSA = {
     # has no instant speed -- the same in both decks.
     "Green Sun's Zenith", "Chord of Calling",
     # ramp / land tutors. Journey of Discovery and Nylea's Intervention LEFT
-    # for PARTLY_MODELLED on 2026-11-15 (§0z209 items 6 and 7).
+    # for PARTLY_MODELLED on 2026-11-15 (§0z209 items 6 and 7). Journey BACK
+    # 2026-11-25 (§0z253): both modes and the entwine, `journey_text`; its
+    # pilot rules -- entwine whenever affordable, the drops mode only with
+    # two spare lands in hand, cast before the drops -- are policies, said
+    # in `AzusaGame.journey_of_discovery`, not missing clauses.
+    "Journey of Discovery",
     "Cultivate", "Kodama's Reach", "Seek the Horizon",
     "Realms Uncharted",
     "Regrowth", "Animist's Awakening", "Genesis Wave",
@@ -1074,11 +1079,6 @@ PARTLY_MODELLED = {
         # --- LEFT SCRIPTED 2026-11-15, the oracle re-audit (§0z209, whose
         # item numbers these cite; docs/ORACLE_AUDIT_AZUSA.md). Each row
         # printed under MODEL-EVALUATED while a clause was missing. ---
-        "Journey of Discovery":
-            "MODELLED: the first mode, two basic lands to hand. NOT: 'You may "
-            "play up to two additional lands this turn', nor entwine {2}{G} "
-            "-- in a deck whose engine is land drops, the mode an Azusa pilot "
-            "casts it for (item 6). A floor.",
         "Nylea's Intervention":
             "MODELLED: three Forests to hand (a fixed X of 3, §0z197 A7). NOT: "
             "'up to X LAND cards' (a utility land is one), nor the mode that "

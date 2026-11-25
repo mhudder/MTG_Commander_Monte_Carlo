@@ -170,9 +170,10 @@ CLASSES: dict[str, tuple[str, str]] = {
     # --- azusa --------------------------------------------------------------
     "azusa.AzusaGame.main_phase | c.is_land": (
         "NOT_A_CHOICE", "a land is played by the land step"),
-    "azusa.AzusaGame.main_phase | enablers_only and c.name not in LAND_ENABLERS": (
-        "SAME_TURN", "the pre-land phase casts only land enablers; the rest "
-        "is cast after the lands this turn"),
+    "azusa.AzusaGame.main_phase | enablers_only and c.name not in LAND_ENABLERS and (not (c.script == 'journey_of_discovery' and journey_pre_land(self)))": (
+        "SAME_TURN", "the pre-land phase casts only land enablers, and "
+        "Journey of Discovery (§0z253, `journey_pre_land`); the rest is "
+        "cast after the lands this turn"),
     "azusa.AzusaGame.main_phase | 'wipe' in c.tags and (not OPP.should_cast_own_wipe(self, c))": (
         "JUDGEMENT", "the wipe gate (§0z104, §0z106)"),
     "azusa.AzusaGame.main_phase | OPP.hold_answer(self, c)": (

@@ -315,6 +315,23 @@ SAC_DRAW_LANDS = {
     "The Hunter Maze":     ({"gen": 1, "G": 1},  True,  0),
 }
 
+# §0z253: Journey of Discovery takes its drops mode (unentwined) only when the
+# hand holds this many lands more than the drops left -- so both extra drops
+# are played now. A pilot's rule, not a tuned knob.
+JOURNEY_SPARE = 2
+
+
+def journey_pre_land(g) -> bool:
+    """Is Journey of Discovery cast in the PRE-LAND main phase, before this
+    turn's drops (§0z253, `journey_pre_land`)? A pilot casts it first: its
+    basics are then this turn's drops, and its extra drops are played in
+    the first land step. Off, it waits for the main phase like any sorcery,
+    after the drops -- the old timing. A sorcery, so not in LAND_ENABLERS,
+    which `check_land_enabler_coverage` derives from `has()` reads."""
+    return bool(g.cfg.get("journey_text", True)
+                and g.cfg.get("journey_pre_land", True))
+
+
 LAND_ENABLERS = frozenset({
     "Exploration", "Oracle of Mul Daya", "Wayward Swordtooth",
     "Courser of Kruphix", "Augur of Autumn",
@@ -446,6 +463,7 @@ class AzusaGame(BaseGame):
         self.turn = 0
         self.land_drops = 1
         self.land_drops_used = 0
+        self.journey_drops = 0          # Journey of Discovery's, this turn
         self.spells_this_turn = 0
         self.ascended = False           # Wayward Swordtooth's city's blessing
         self.hothouse_solved = False    # Case of the Locked Hothouse
@@ -2148,6 +2166,7 @@ class AzusaGame(BaseGame):
         if self.cauldron_live():
             n += 1          # Storm Cauldron: "Each player may play an
                             # additional land during each of their turns."
+        n += self.journey_drops         # Journey of Discovery, §0z253
         return n
 
     def cauldron_live(self) -> bool:
@@ -2519,8 +2538,14 @@ class AzusaGame(BaseGame):
         elif (script == "realms_uncharted"
               and self.cfg.get("realms_text", True)):
             self.realms_uncharted()
+        elif (script == "journey_of_discovery"
+              and self.cfg.get("journey_text", True)):
+            self.m["journey_resolved"] += 1      # either rule: the reach
+            self.journey_of_discovery()
         elif script in ("cultivate", "seek_horizon", "journey_of_discovery",
                         "realms_uncharted"):
+            if script == "journey_of_discovery":
+                self.m["journey_resolved"] += 1  # either rule: the reach
             n = {"cultivate": 2, "seek_horizon": 3,
                 "journey_of_discovery": 2, "realms_uncharted": 2}[script]
             to_battlefield = 1 if script == "cultivate" else 0
@@ -2804,6 +2829,61 @@ class AzusaGame(BaseGame):
             # block and the ones played this turn cannot attack.
             self.animate_lands(2, 2, targets=self.your_lands(),
                                source="Rude Awakening")
+
+    def journey_of_discovery(self):
+        """JOURNEY OF DISCOVERY {2}{G}, Sorcery (Scryfall, 2026-11-25):
+
+            Choose one --
+            * Search your library for up to two basic land cards, reveal
+              them, put them into your hand, then shuffle.
+            * You may play up to two additional lands this turn.
+            Entwine {2}{G} (Choose both if you pay the entwine cost.)
+
+        §0z253. Only the first mode existed (`journey_text=False` is that
+        rule). Entwine is paid here, on resolution, as Rude Awakening's is
+        (the cost model is one cost a card, item 1b).
+
+        THE PILOT'S RULES, said out loud:
+        - ENTWINE whenever {2}{G} more is affordable -- both modes, two
+          basics to hand and two more drops to play them with. Rude
+          Awakening's rule; the mana could have cast something else, and
+          that is not priced.
+        - Otherwise ONE mode, by arithmetic: the drops when the hand already
+          holds at least two lands more than this turn's drops left (both
+          extra drops are played now, from hand); otherwise the basics,
+          which are two cards and the next drops' lands. Lands from the top
+          or the graveyard are not counted -- a floor on the drops mode.
+        The extra drops are read by `land_drops_for_turn`, so a land step
+        already running, the second one after combat and main 2's late drop
+        all see them."""
+        units = self.available_mana()
+        pay = can_pay({"gen": 2, "G": 1}, units)
+        both = pay is not None
+        if both:
+            spend(self, pay, units)
+            self.m["mana_spent"] += 3
+            self.m["entwines"] += 1
+            self.m["journey_entwined"] += 1
+            drops = True
+        else:
+            drops_left = self.land_drops_for_turn() - self.land_drops_used
+            in_hand = sum(1 for c in self.hand if c.is_land)
+            drops = in_hand - drops_left >= JOURNEY_SPARE
+        if both or not drops:
+            for _ in range(2):
+                land = next((c for c in self.library
+                             if c.is_land and c.name == "Forest"), None)
+                if land is None:
+                    break
+                remove_card(self.library, land)
+                self.hand.append(land)
+                self.m["journey_basics"] += 1
+            self.searched()                  # "... then shuffle."
+        if drops:
+            self.journey_drops += 2
+            self.m["journey_drops"] += 2
+            # A land step running now reads `land_drops`; give it the two.
+            self.land_drops = self.land_drops_for_turn()
 
     def _untap_would_help(self, cands):
         """Would untapping these lands turn on a spell we cannot cast now?
@@ -3750,7 +3830,9 @@ class AzusaGame(BaseGame):
             for c in self.hand:
                 if c.is_land:
                     continue
-                if enablers_only and c.name not in LAND_ENABLERS:
+                if (enablers_only and c.name not in LAND_ENABLERS
+                        and not (c.script == "journey_of_discovery"
+                                 and journey_pre_land(self))):
                     continue
                 if "wipe" in c.tags and not OPP.should_cast_own_wipe(self, c):
                     continue
@@ -4717,6 +4799,7 @@ def take_turn(g):
         p.sick = False
     g.land_drops = 1
     g.land_drops_used = 0
+    g.journey_drops = 0                 # §0z253: "this turn" ends here
 
     # UPKEEP, which is a real step and only matters for one card so far.
     # Verdant Kraken triggers "at the beginning of each player's upkeep", and

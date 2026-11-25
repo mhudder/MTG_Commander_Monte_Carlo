@@ -305,6 +305,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
+| [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and its entwine** (azusa): two extra land drops and entwine {2}{G}, by a stated pilot rule, and cast before the drops; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22019,6 +22020,57 @@ T20 effect, as every route answer's is (§0z131): a moved kill rarely
 matters before turn 10. The size carries `threat_rebuild_max` (3), the
 route answers' knob, said. **Not split by card**: one run with both
 switches; which Angel carries it is not measured.
+
+<a id="0z253"></a>
+
+## 0z253. FIXED -- Journey of Discovery's second mode and its entwine
+
+**The owner, 2026-11-25**: "go ahead with journey of discovery next"
+(§0z209 item 6).
+
+    "Choose one -- * Search your library for up to two basic land cards,
+    reveal them, put them into your hand, then shuffle. * You may play up
+    to two additional lands this turn. Entwine {2}{G}"
+                                    ({2}{G}, Sorcery; Scryfall 2026-11-25)
+
+**What was there**: the first mode only, two Forests to hand -- in the deck
+whose engine is land drops, the mode an Azusa pilot least often wants
+alone. And it was cast in the main phase, after the turn's drops.
+
+**The fix** (`journey_text`, ON; False is the first mode alone):
+`AzusaGame.journey_of_discovery`. Entwine is paid on resolution, as Rude
+Awakening's is (one cost a card, item 1b). The extra drops are
+`journey_drops`, read by `land_drops_for_turn` and reset with the turn, so
+a land step already running, the one after combat and main 2's late drop
+all see them. **And the timing** (`journey_pre_land`, ON): Journey is cast
+in the pre-land main phase, so its basics are this turn's drops and its
+drops are played in the first land step.
+
+**The pilot's rules, said out loud**: entwine whenever {2}{G} more is
+affordable (the mana it could have cast something else with is not
+priced); unentwined, the drops mode only when the hand holds
+`JOURNEY_SPARE` (2) lands more than the drops left, so both are played
+now, else the basics; lands from the top or the graveyard are not counted
+-- a floor on the drops mode.
+
+**Pinned**: `tests/test_journey.py`, ten cases A-J, four mutations, every
+expected set exact. H and I first ran with the commander uncast, and the
+pre-land phase spent the test's Forests on her -- the setup, not the rule;
+fixed, the sets unchanged.
+
+**Only azusa moves**: `check_unchanged_decks --n=2000` against `9eadfbc`,
+every other active deck BIT-IDENTICAL; azusa -0.0005 won at 2,000 (inside
+noise). `tools/ablation.py` moved Journey to SCRIPTED_AZUSA: every other
+table re-renders byte-identical from its cache; azusa's does not, and its
+rebuild was due already.
+
+**A smoke, 1,000 games, seeds 5000..**: Journey resolves 253 times with
+both switches (199 without the timing, which casts it earlier and more
+often), entwined 98 of them; +150 lands played and +60 landfall triggers
+over the 1,000 games against the old rule.
+
+**MEASUREMENT PENDING**: `run_knob_ab azusa journey_text,journey_pre_land
+journey_resolved`, then `journey_pre_land` alone, N=15,000.
 
 ## How to read an ablation table
 
