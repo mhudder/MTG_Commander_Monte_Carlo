@@ -3,10 +3,10 @@ azusa: journey_text,journey_pre_land=True (A) minus False (B), the staged list b
    won T10  +0.0013 ±0.0026 
    won T20  +0.0017 ±0.0031 
 
-   games where journey_resolved > 0 in either leg: 3486 of 15000 (23.2%)
-   IDENTITY: of the 11514 games with journey_resolved = 0 in both legs, 41 differ (must be 0)
-   in those games, won T10  +0.0055 ±0.0110
-   in those games, won T20  +0.0069 ±0.0131
+   games where journey_cast > 0 in either leg: 3576 of 15000 (23.8%)
+   IDENTITY: of the 11424 games with journey_cast = 0 in both legs, 0 differ (must be 0)
+   in those games, won T10  +0.0056 ±0.0107
+   in those games, won T20  +0.0073 ±0.0128
 
    every numeric output that moved (mean A, mean B, A - B):
    abundance_bottomed                 1.1079     1.0937  +0.0142
@@ -85,6 +85,7 @@ azusa: journey_text,journey_pre_land=True (A) minus False (B), the staged list b
    hexhaven_triggers                  0.0765     0.0767  -0.0002
    hold_back_turns                    0.1242     0.1257  -0.0015
    journey_basics                     0.4034     0.0000  +0.4034
+   journey_cast                       0.2518     0.1829  +0.0689
    journey_drops                      0.2436     0.0000  +0.2436
    journey_entwined                   0.1087     0.0000  +0.1087
    journey_resolved                   0.2396     0.1750  +0.0646

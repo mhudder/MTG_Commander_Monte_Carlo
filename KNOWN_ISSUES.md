@@ -305,7 +305,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z250](#0z250) | REBUILT | **The four flipped decks rebuilt at `80cb14f`** (rendmaw, karlov, tivit, azusa): Genesis Wave, Torment, Meathook and Debt rows up; Hexhaven +0.0050 in Ka-Zar's place; lorehold and shilgengar still SUSPECT |
 | [0z251](#0z251) | FIXED | **Malakir Rebirth's front face was cast as a blank** (shilgengar, 12% of games): now a protection spell held for the pod's removal, +0.0059 ±0.0022 at T20; five other MDFC front faces checked, all modelled |
 | [0z252](#0z252) | FIXED | **Angel of Despair's and Angel of the Ruins' ETBs fired on a cast only** (shilgengar): every other entry -- the ultimate, Avacyn, the returns, about as frequent -- now answers too: +0.0057 ±0.0014 at T20, both together |
-| [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and its entwine** (azusa): two extra land drops and entwine {2}{G}, by a stated pilot rule, and cast before the drops; measurement pending |
+| [0z253](#0z253) | FIXED | **Journey of Discovery's second mode and its entwine** (azusa): two extra land drops and entwine {2}{G}, by a stated pilot rule, and cast before the drops: +0.0017 ±0.0031 at T20, inside its bar -- a null; the text is right now, the number did not move |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22079,8 +22079,31 @@ in both legs); with it, a scan of seeds 5000..7999 finds 0 unreached
 games different. That run's win rate (+0.0017 ±0.0031 at T20, inside its
 bar) is superseded by the re-run below.
 
-**MEASUREMENT PENDING**: `run_knob_ab azusa journey_text,journey_pre_land
-journey_cast`, then `journey_pre_land` alone, N=15,000.
+### Measured
+
+`diagnostics.run_knob_ab azusa ... journey_cast`, the staged list, N=15,000
+paired, seeds 5000..19999, python 3.11.18
+(`results/knob_ab_azusa_journey.txt`, `..._journey_pre_land.txt`):
+
+| A minus B | T10 | T20 | lands played | landfall triggers |
+|---|---|---|---|---|
+| both switches vs the old rule | +0.0013 ±0.0026 | +0.0017 ±0.0031 | +0.167 | +0.151 |
+| `journey_pre_land` alone (`journey_text` ON both legs) | +0.0001 ±0.0025 | +0.0013 ±0.0030 | +0.068 | +0.031 |
+
+**The identity holds** on both: 3,576 games reached (Journey cast in
+either leg); of the 11,424 others, 0 differ.
+
+**What it supports: a null.** The mechanism fires as the text predicts --
+0.25 casts a game, 43% entwined, +0.17 lands played and +0.15 landfall
+triggers -- and the win rate does not move beyond its bar at either
+horizon, in either comparison. The modes' share alone (the difference of
+the two rows, about +0.0004) is NOT measured; said, not quoted. The early
+cast makes Journey 38% more often cast (0.183 -> 0.252 a game: an OFF
+pilot often never cast it, priority 6 behind everything else) and so more
+often countered (+0.0025 a game). Adopted for its TEXT, not its number:
+the card does what it prints now, and its row (+0.0089 ±0.0031 before) is
+no longer a floor. The pilot rules are the knobs that could move it, said:
+`JOURNEY_SPARE` and entwine-whenever-affordable; neither is swept.
 
 ## How to read an ablation table
 
