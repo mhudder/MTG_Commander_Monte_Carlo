@@ -312,6 +312,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z257](#0z257) | FIXED | **Terastodon's ETB fired on a cast only** (azusa): a tutor, Genesis Wave or a copy now answers too: +0.0005 ±0.0004 at T20 |
 | [0z258](#0z258) | FIXED | **Craterhoof pumped later creatures; Bane of Progress spared tokens and the pod's pieces** (azusa): both to their text: Craterhoof -0.0005 at T10 (its ceiling gone), Bane +0.0041 ±0.0015 at T20 |
 | [0z259](#0z259) | FIXED | **azusa's `crack_clues` paid every Clue with the same {2}**: `spend` leaves paid units in the pool: -0.0064 ±0.0022 at T20, 1.15 free cards a game |
+| [0z260](#0z260) | BUILT | **azusa's utility lands** (Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge, Dust Bowl, Buried Ruin): each sacrifice a land death of yours; measurement pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22478,6 +22479,48 @@ move of this session's fixes, and it is a correction, not a gain.
 **Only azusa moves for §0z257-§0z259 together**: `check_unchanged_decks
 --n=2000` against `84c57b6`, every other active deck BIT-IDENTICAL; with
 all four switches off, azusa BIT-IDENTICAL too.
+
+<a id="0z260"></a>
+
+## 0z260. BUILT -- azusa's utility lands: each sacrifice a land death of yours
+
+**The owner, 2026-11-25**: "Yes go ahead" -- fix 5, §0z209 Tier 2b: six of
+the list's lands had an activated ability no code read, each a land that
+tapped for {C} and nothing else.
+
+**The fix** (`AzusaGame.utility_land_step`, in `activations` after the
+sac-draw lands, so the land step after combat can replay what it sent to
+the graveyard), three switches, each ON:
+- `strip_lands` -- Strip Mine, Wasteland, Ghost Quarter, Tectonic Edge
+  (`SAC_DESTROY_LANDS`): sacrificed when a land death pays
+  (`land_death_pays`: Titania's 5/3, or the graveyard playable). Their
+  target is an OPPONENT's land, and what that does is NOT modelled: the
+  pod's lands are pre-rolled counts (§0z236), and a destroyed one would
+  have to move every opponent's mana reads -- a floor, said. Tectonic
+  Edge's "an opponent controls four or more lands" reads those counts
+  (`opponents.pod_mana_row`). Ghost Quarter targets YOUR OWN Forest when a
+  Forest is left to find: two land deaths and a Forest onto the battlefield
+  untapped, a landfall trigger, for one land fewer.
+- `dust_bowl_sac` -- Dust Bowl's {3}, sacrifice a land: the land a pilot
+  misses least (Crop Rotation's rule), when a land death pays.
+- `buried_ruin` -- Buried Ruin returns the highest-priority artifact card
+  from the graveyard to hand whenever there is one; it needs no payoff.
+
+**The judgements, said out loud**: every activation keeps Cryptic Caves'
+floor (`cryptic_caves_min_lands` 6, or a recursion card), re-read after
+each sacrifice; none is a tuned threshold.
+
+**Pinned**: `tests/test_utility_lands.py`, eight cases U1-U8, five
+mutations, every expected set exact on the first run.
+
+**Only azusa moves**: `check_unchanged_decks --n=2000` against `5a64f23`,
+every other active deck BIT-IDENTICAL; with the three switches off, azusa
+BIT-IDENTICAL too. Only `azusa.py` changed, so the other caches did not move.
+
+**A smoke, 1,000 games**: 223 land-destroyer sacrifices (39 of them Ghost
+Quarter finding a Forest), 60 Dust Bowl sacrifices, 42 Buried Ruin returns.
+
+**MEASUREMENT PENDING**: each switch alone, N=15,000.
 
 ## How to read an ablation table
 

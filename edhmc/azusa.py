@@ -40,8 +40,9 @@ WHAT IS MODEL-BLIND AND WHY (see `KNOWN_BLIND["azusa"]` in `ablation.py` for
 the complete, reasoned list)
 -----------------------------------------------------------------------------
 Removal-on-a-body and land destruction aimed at opponents (Terastodon, Beast
-Within, Krosan Grip, Crop Rotation, Wasteland/Strip Mine/Ghost Quarter/Dust
-Bowl/Tectonic Edge's sacrifice abilities) — opponents' individual lands and
+Within, Krosan Grip, Crop Rotation, and what Wasteland/Strip Mine/Ghost
+Quarter/Dust Bowl/Tectonic Edge do to an OPPONENT's land -- their sacrifice is
+modelled as YOUR land death since §0z260) — opponents' individual lands and
 permanents are not tracked as objects anywhere in this project, only as an
 aggregate creature count and a life total. Effects that read an OPPONENT
 drawing a card (Mind's Eye) or an opponent's individual graveyard/hand are
@@ -307,6 +308,17 @@ COUNTER_CAP = 1_000_000
 # about the card. See KNOWN_ISSUES §0z2/§0z3.
 # The scripts a fetch land may carry: how the land it finds enters (§0z113).
 FETCH_SCRIPTS = frozenset({"fetch", "fetch_tapped", "fetch_untap4"})
+
+# §0z260: the lands whose OTHER ability is "{cost}, {T}, Sacrifice this land:
+# destroy target land" -- (cost, which lands it may target). Each is a land
+# death of yours (Titania, a land to replay from the graveyard); what it does
+# to the pod's land is NOT modelled (its lands are pre-rolled counts, §0z236).
+SAC_DESTROY_LANDS = {
+    "Strip Mine":    ({},          "any"),
+    "Wasteland":     ({},          "nonbasic"),
+    "Ghost Quarter": ({},          "any"),
+    "Tectonic Edge": ({"gen": 1},  "nonbasic"),
+}
 
 SAC_DRAW_LANDS = {
     "Cryptic Caves":       ({"gen": 1},          True,  5),
@@ -2141,6 +2153,146 @@ class AzusaGame(BaseGame):
         if pick is not None:
             self.hand.append(pick)
 
+    def land_death_pays(self) -> bool:
+        """§0z260: is a land of yours dying worth something now? With Titania
+        each is a 5/3; with the graveyard playable (`yard_land_access`) it is
+        a land to replay -- a landfall trigger for a spare drop. Neither, and
+        a sacrificed land is only a land lost."""
+        return (self.has("Titania, Protector of Argoth")
+                or self.yard_land_access())
+
+    def utility_land_step(self) -> None:
+        """§0z260 -- the utility lands' abilities, after combat, from spare
+        mana (Scryfall, 2026-11-25):
+
+          Strip Mine "{T}, Sacrifice this land: Destroy target land."
+          Wasteland "... Destroy target nonbasic land."
+          Ghost Quarter "... Destroy target land. Its controller may search
+            their library for a basic land card, put it onto the battlefield,
+            then shuffle."
+          Tectonic Edge "{1}, {T}, Sacrifice ...: Destroy target nonbasic
+            land. Activate only if an opponent controls four or more lands."
+          Dust Bowl "{3}, {T}, Sacrifice a land: Destroy target nonbasic land."
+          Buried Ruin "{2}, {T}, Sacrifice this land: Return target artifact
+            card from your graveyard to your hand."
+
+        THE PILOT'S RULES, said out loud, each a judgement:
+        - the land-count floor Cryptic Caves uses (`cryptic_caves_min_lands`,
+          6, or a recursion card out), so a sacrifice never cuts the mana;
+        - a land-destroyer is used only when a land death pays
+          (`land_death_pays`: Titania, or the graveyard playable) -- its
+          target is an OPPONENT's land, whose loss is not modelled (a floor);
+        - but Ghost Quarter targets YOUR OWN basic when a basic is left to
+          find: two land deaths and a basic onto the battlefield, a landfall
+          trigger, for one land fewer -- what an Azusa pilot uses it for;
+        - Dust Bowl sacrifices the land a pilot misses least (Crop Rotation's
+          rule: tapped, then not a creature, then the lowest `land_rank`);
+        - Buried Ruin returns the artifact with the highest priority, whenever
+          one is in the graveyard -- it needs no land-death payoff.
+        Each switch counts its reach in both legs (`*_ready`)."""
+        recursion = (self.has("Crucible of Worlds")
+                     or self.has("Ramunap Excavator")
+                     or self.has("Ancient Greenwarden"))
+        floor = self.cfg.get("cryptic_caves_min_lands", 6)
+        pays = self.land_death_pays()
+        for pm in list(self.board):
+            if pm.tapped or pm not in self.board:
+                continue
+            n_lands = sum(1 for p in self.board if p.card.is_land)
+            if not (recursion or n_lands >= floor):
+                return                       # re-read after each sacrifice
+            name = pm.card.name
+            if name in SAC_DESTROY_LANDS and pays:
+                cost, _targets = SAC_DESTROY_LANDS[name]
+                if name == "Tectonic Edge" and not any(
+                        (row := OPP.pod_mana_row(self, o,
+                                                 max(0, OPP.pod_turn(self) - 1)))
+                        is not None and row.lands >= 4
+                        for o in OPP.living(self)):
+                    continue                 # its printed condition
+                if not self.utility_pay(pm, cost):
+                    continue
+                self.m["strip_lands_ready"] += 1
+                if not self.cfg.get("strip_lands", True):
+                    continue
+                self.utility_spend(pm, cost)
+                self.board.remove(pm)
+                self.land_died(pm.card)
+                self.m["utility_land_sacs"] += 1
+                if name == "Ghost Quarter":
+                    self.ghost_quarter_own()
+            elif name == "Dust Bowl" and pays:
+                others = [p for p in self.board if p.card.is_land
+                          and p is not pm and not p.is_token]
+                if not others or not self.utility_pay(pm, {"gen": 3}):
+                    continue
+                self.m["dust_bowl_ready"] += 1
+                if not self.cfg.get("dust_bowl_sac", True):
+                    continue
+                self.utility_spend(pm, {"gen": 3})
+                pm.tapped = True
+                sac = min(others, key=lambda p: (not p.tapped,
+                                                 p.card.is_creature,
+                                                 self.land_rank(p.card)))
+                self.board.remove(sac)
+                self.land_died(sac.card)
+                self.m["dust_bowl_sacs"] += 1
+            elif name == "Buried Ruin":
+                arts = [c for c in self.graveyard
+                        if "Artifact" in c.types and not c.is_land]
+                if not arts or not self.utility_pay(pm, {"gen": 2}):
+                    continue
+                self.m["buried_ruin_ready"] += 1
+                if not self.cfg.get("buried_ruin", True):
+                    continue
+                self.utility_spend(pm, {"gen": 2})
+                self.board.remove(pm)
+                self.land_died(pm.card)
+                best = max(arts, key=lambda c: (c.priority, c.mv))
+                remove_card(self.graveyard, best)
+                self.hand.append(best)
+                self.m["buried_ruin_returns"] += 1
+
+    def utility_pay(self, pm, cost) -> bool:
+        """Can the mana pay `cost` with `pm` tapping for its own {T} (it is
+        part of the cost, so it cannot also pay -- §0z135)?"""
+        if not cost:
+            return True
+        units = self.available_mana()
+        if not self.cfg.get("land_pays_own_activation", False):
+            backwoods_pool(units, pm)
+        return can_pay(cost, units) is not None
+
+    def utility_spend(self, pm, cost) -> None:
+        if not cost:
+            return
+        units = self.available_mana()
+        if not self.cfg.get("land_pays_own_activation", False):
+            backwoods_pool(units, pm)
+        pay = can_pay(cost, units)
+        spend(self, pay, units)
+        self.m["mana_spent"] += sum(cost.values())
+
+    def ghost_quarter_own(self) -> None:
+        """Ghost Quarter at your own basic: it dies, and you may search for a
+        basic and put it onto the battlefield (untapped -- the text does not
+        say tapped), then shuffle. Only when a basic is left to find; else
+        its target is an opponent's land (not modelled)."""
+        own = [p for p in self.board if p.card.is_land and p.card.name == "Forest"
+               and not p.is_token]
+        find = next((c for c in self.library
+                     if c.is_land and c.name == "Forest"), None)
+        if not own or find is None:
+            return
+        target = min(own, key=lambda p: not p.tapped)   # a tapped one first
+        self.board.remove(target)
+        self.land_died(target.card)
+        remove_card(self.library, find)
+        self.make_permanent(find, sick=False)
+        self.land_entered(find, played=False)
+        self.searched()
+        self.m["ghost_quarter_basics"] += 1
+
     def crop_rotation(self):
         """CROP ROTATION (item 24 change 4; was KNOWN_BLIND), verified
         against Scryfall 2026-10-14: "As an additional cost to cast this
@@ -3456,7 +3608,9 @@ class AzusaGame(BaseGame):
 
         WHICH LAND IS ALSO A POLICY, and it is deliberately the dull one: a
         FOREST. The exciting answers -- Strip Mine, Wasteland, Homeward Path --
-        are all MODEL-BLIND, so fetching one would be fetching a blank, and
+        were all MODEL-BLIND (their sacrifice is a land death since §0z260;
+        this pick is unchanged and not re-measured), so fetching one would be
+        fetching a blank, and
         picking the best modelled land would make this card look better than a
         pilot's honest average. A Forest is what it is worth here, and the
         utility-land upside is a FLOOR nobody should quote as a measurement.
@@ -3494,7 +3648,9 @@ class AzusaGame(BaseGame):
         THREE MANA AND THE CARD ITSELF FOR ONE LAND IN HAND, which in a deck
         with 35 lands is a rate that has to be justified by WHICH land -- and
         in this model the lands worth naming (Strip Mine, Wasteland, Ghost
-        Quarter, Homeward Path) are all MODEL-BLIND, so it cannot be. What is
+        Quarter, Homeward Path) were MODEL-BLIND when this was written; since
+        §0z260 their sacrifice is a land death of yours, and the pick here is
+        unchanged -- not re-measured. What is
         left is the honest modelled floor: a FETCH LAND, which is the densest
         land in the deck -- two landfall triggers and a land in the graveyard
         for Titania -- and a Forest when none is left.
@@ -4532,6 +4688,8 @@ class AzusaGame(BaseGame):
             self.land_died(pm.card)
             self.draw(1)
             self.m["caves_cracked"] += 1
+
+        self.utility_land_step()                 # §0z260
 
         # WAR ROOM: "{3}, {T}, Pay life equal to the number of colors in your
         # commanders' color identity: Draw a card." Azusa is mono-green, so

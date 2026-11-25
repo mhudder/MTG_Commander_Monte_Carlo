@@ -150,6 +150,12 @@ cost.
 
 ## Tier 2b — utility lands with no code
 
+> **BUILT 2026-11-25 (§0z260)**: Strip Mine, Wasteland, Ghost Quarter,
+> Tectonic Edge (`strip_lands`), Dust Bowl (`dust_bowl_sac`) and Buried Ruin
+> (`buried_ruin`) -- each sacrifice a land death of yours; what they do to
+> an opponent's land is not modelled. Homeward Path and Scavenger Grounds
+> stay without code, rightly.
+
 Lands carry no SCRIPTED/PARTLY label, so no table row says this. Eight of
 the list's lands have an activated ability no code reads; each is a land
 that taps for mana and nothing else here:
