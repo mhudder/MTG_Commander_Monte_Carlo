@@ -424,6 +424,7 @@ POD_DEFAULTS = {
     "rearm_rule": "reland",
     "threat_clock_shift": 2.3,
     "pod_responses": True,
+    "pod_body_mv_cap": False,       # §0z264: built OFF, the owner's to flip
     # ITEM 44'S COMBAT, THE DEFAULT SINCE §0z204 (the owner, 2026-11-14: "go
     # ahead and start on the flip and re-fit"). A1 your attackers die to the
     # pod's blockers (§0z198), A2 you block and the pod declares its attacks
@@ -1106,11 +1107,26 @@ def _arrival_mvs(g, o, before: float) -> list:
         mvmax = max(1, int(round(2 / share))) if share > 0 else 1
         return [(1 + mvmax) / 2.0] * (n1 - n0)
     have = len(o.bodies)
+    cap = None
+    if pod_knob(g.cfg, "pod_body_mv_cap"):
+        # §0z264, the owner's question (queue item 53): a body's mana value
+        # is rolled 1..mvmax whatever the turn, so on the pod's turns 1-3
+        # most arrivals cost more than every source it has -- the cause of
+        # the gate's weakening (`diagnostics.diag_pod_mana_budget`). Capped,
+        # the cost CHARGED is at most what the opponent's sources make this
+        # turn (lands, rocks, mana creatures; at least 1) -- a curve, in
+        # place of a cost no deck casts on turn 1. The body's other reads
+        # of `mv` (a wipe's "mana value 2 or less", Culling the Weak) are
+        # unchanged: only the price. A deterministic transform, no new roll.
+        row = pod_mana_row(g, o)
+        cap = max(1.0, (row.sources if row is not None else 1.0)
+                  + mana_creature_mana(g, o))
     out = []
     for p in range(n0, n1):
         body = (o.bodies[p] if p < have
                 else pool[(o.next_body + p - have) % len(pool)])
-        out.append(float(body.mv))
+        mv = float(body.mv)
+        out.append(min(mv, cap) if cap is not None else mv)
     return out
 
 

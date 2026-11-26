@@ -316,6 +316,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel: BMC +0.0058, four more significant, three nulls |
 | [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
 | [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
+| [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- body costs drawn 1..4 whatever the turn; a cost cap built OFF; fit pending |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22724,6 +22725,68 @@ exact on the first run; `tests/test_etb_answer_returns.py` still exact.
   output hashed: karlov 0 and tivit 0 of 2,000 differ (VERIFIED), **rendmaw
   1 of 2,000** -- its baseline moved, so its cache is SUSPECT until the
   rebuild, with azusa's, lorehold's and shilgengar's. Not `--verified`.
+
+<a id="0z264"></a>
+
+## 0z264. MEASURED -- why the pod's boards outrun its mana: body costs drawn 1..4 whatever the turn
+
+**The owner, 2026-11-26**: "look into why the pod's boards outrun their
+mana first" -- queue item 53's item-52 decision, before any re-fit.
+
+**The measurement** (`diagnostics/diag_pod_mana_budget.py`, new: it wraps
+`pod_untap`, `pod_spend` and `charge_growth` and tabulates per opponent
+per pod turn; tivit's staged list, 600 games, seeds 5000..). Today's pod,
+charged and not gated:
+
+| pod turn | sources | supply | spent: pieces / removal / bodies | bodies overspent | arrivals costing more than every source |
+|---|---|---|---|---|---|
+| 1 | 1.00 | 1.00 | 0.01 / 0.00 / 0.41 | 0.34 | **74%** |
+| 2 | 2.01 | 1.73 | 0.02 / 0.00 / 1.61 | 1.11 | **48%** |
+| 3 | 3.23 | 2.88 | 0.06 / 0.69 / 1.90 | 1.06 | **19%** |
+| 4 | 4.21 | 4.13 | 0.13 / 0.83 / 1.73 | 0.63 | 4% |
+| 6 | 5.54 | 5.59 | 0.37 / 1.10 / 1.50 | 0.38 | 1% |
+| 8 | 6.55 | 6.68 | 0.66 / 1.33 / 0.97 | 0.22 | 0% |
+
+Gated (`pod_develop_gated`), each body held back split by why:
+
+| pod turn | bodies' mana spent | held: no mana / the reserve / behind another |
+|---|---|---|
+| 1 | 0.02 | 0.12 / 0.02 / 0.00 |
+| 2 | 0.20 | 0.37 / 0.14 / 0.00 |
+| 3 | 0.61 | 0.35 / 0.13 / 0.00 |
+| 4 | 1.20 | 0.18 / 0.13 / 0.01 |
+| 6 | 1.50 | 0.12 / 0.06 / 0.00 |
+
+**What it says**:
+1. **The shortage is the pod's first three turns, nothing later.** Bodies
+   arrive at the calibrated 0.7 x `board` a turn from turn 1, but each
+   body's mana value is rolled uniform 1..`mvmax` (4) at the pool, with no
+   regard to the turn: 74% of turn-1 arrivals and 48% of turn-2's cost more
+   than every source the opponent has. A real deck's turn-1 creature costs
+   one. From turn 4, the pod's supply exceeds everything it spends.
+2. **So the gate's weakening is early boards arriving about two turns
+   late** -- bodies' mana on turns 1-3 0.02 / 0.20 / 0.61 gated against
+   0.41 / 1.61 / 1.90 charged.
+3. **The answer reserve is a smaller second cause** (about 0.13 bodies a
+   turn on turns 2-5, held only by the mana kept up for a counterspell or a
+   held answer).
+4. **The wait-in-order rule is not a cause** ("behind another" is about 0:
+   at 0.7 arrivals a turn there is rarely a second body behind the first).
+5. **Today's late "overspend" is the reserve, not a shortage**: from turn 4
+   the bodies' overspend is against the floor `answer_reserve` keeps, not
+   against 0.
+
+**A cost curve, built OFF** (`pod_body_mv_cap`, `opponents.POD_DEFAULTS`
+False): the cost CHARGED for an arriving body is at most what the
+opponent's sources make that turn (lands, rocks, mana creatures; at least
+1), in `_arrival_mvs`. A body's power and toughness never depended on its
+mana value, so only the price changes; its other reads of `mv` (a wipe's
+"mana value 2 or less", Culling the Weak) are unchanged. A deterministic
+transform -- no new roll, CRN intact.
+
+**MEASUREMENT PENDING**: `diagnostics.fit_pod_knob pod_develop_gated
+False,True`, with and without `--cand=pod_body_mv_cap=True`, N=1,500 a
+deck, the six active decks' mean T20 against today's pod.
 
 ## How to read an ablation table
 
