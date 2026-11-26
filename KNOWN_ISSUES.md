@@ -316,7 +316,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z261](#0z261) | BUILT | **Fix 6, eight of shilgengar's missing clauses**: Flawless Maneuver free, Mind Stone, Viscera Seer, Priest's unearth, BMC's modes, Resplendent, Giada, Cartel: BMC +0.0058, four more significant, three nulls |
 | [0z262](#0z262) | BUILT | **Teferi's Protection's whole round** (shilgengar), on the owner's policy: a wrath worth it or a lethal kill, whichever comes first: +0.0033 ±0.0017 at T20 |
 | [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
-| [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- body costs drawn 1..4 whatever the turn; a cost cap built OFF; fit pending |
+| [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- the gate's +0.118 is turn-1-3 costs 0.018, the answer reserve 0.037, pieces 0.008, and 0.054 real overcommitment |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22784,9 +22784,49 @@ mana value, so only the price changes; its other reads of `mv` (a wipe's
 "mana value 2 or less", Culling the Weak) are unchanged. A deterministic
 transform -- no new roll, CRN intact.
 
-**MEASUREMENT PENDING**: `diagnostics.fit_pod_knob pod_develop_gated
-False,True`, with and without `--cand=pod_body_mv_cap=True`, N=1,500 a
-deck, the six active decks' mean T20 against today's pod.
+### Where the gate's weakening comes from (the six active decks' mean)
+
+`diagnostics.fit_pod_knob`, N=1,500 a deck, staged lists, seeds
+5000..6499, python 3.11.18, mean T20 against today's pod (0.4871, 10.29
+turns). Two diagnostic sub-switches, read only under the gate and True by
+default, split it: `pod_gate_pieces` (route pieces gated) and
+`pod_gate_reserve` (the answer reserve kept before bodies)
+(`results/fit_item53_*_20261126.txt`):
+
+| pod | mean T20 | against today |
+|---|---|---|
+| the gate alone (as §0z247 built it) | 0.6052 | **+0.118** |
+| the cost cap alone | 0.4870 | -0.0001 |
+| gate + cap | 0.5870 | +0.100 |
+| gate + cap, pieces not gated | 0.5810 | +0.094 |
+| gate + cap, no reserve | 0.5497 | +0.063 |
+| gate + cap, pieces not gated, no reserve | 0.5410 | **+0.054** |
+
+**So the +0.118 is four things**, read as differences (they are not
+strictly additive, and each is within about ±0.01 at this N):
+1. **the turn-1-3 cost mismatch, about 0.018** -- what the cap removes; the
+   cap alone moves today's pod by nothing;
+2. **the answer reserve kept before bodies, about 0.037** -- decision 4's
+   order ("a blue opponent with a counterspell left keeps its cost up
+   before bodies", §0z239), a POLICY of the owner's, the largest single
+   piece that is a choice rather than a shortage;
+3. **route pieces delayed, about 0.006-0.009** -- small, as §0z247 found;
+4. **about 0.054 left with all three gone**: bodies paid only from what is
+   left after the turn's removal and pieces. The calibrated board growth
+   and the removal rates (scaled up for the mana model, §0z242) together
+   ask for more mana than the pod has on enough opponent-turns that,
+   paid for, the boards come later. That part is a real overcommitment of
+   the calibration, not an artefact.
+
+**What follows, for the owner**: the cap is a fix worth taking with the
+gate (it costs today's pod nothing). The reserve is the owner's own rule
+and the biggest lever. Whatever is kept, the gap left to re-fit is between
++0.054 and +0.100, not +0.118 -- and since its cause is smaller BOARDS,
+not later kills, a growth re-fit (the 0.7 x `board` rate) fits the cause
+better than `threat_clock_shift`, which made kills 2.7 rounds sooner and
+moved the decks unevenly (§0z247). Neither re-fit is run.
+
+`tools.validate` after §0z263: +0.00 on all 21 metrics.
 
 ## How to read an ablation table
 

@@ -436,3 +436,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       short of it, and `threat_clock_shift` 4.985 holds it unevenly -- or
       first the look at why the calibrated boards outrun the pod's mana.
       Ask before building the re-fit.
+      **LOOKED INTO FIRST, 2026-11-26 (§0z264)**, the owner: "look into why
+      the pod's boards outrun their mana first". The gate's +0.118 is
+      turn-1-3 costs (0.018; `pod_body_mv_cap`, built OFF, removes it),
+      the answer reserve before bodies (0.037), pieces (0.008), and 0.054
+      of real overcommitment. Open, the owner's: take the cap; keep or
+      drop the reserve before bodies; then re-fit what is left (+0.054 to
+      +0.100), by growth or by kill timing.
