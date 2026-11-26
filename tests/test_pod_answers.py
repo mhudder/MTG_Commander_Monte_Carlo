@@ -58,8 +58,12 @@ def check(label, got, want):
 def game(mana, turn=6, on=True, **cfg):
     deck, cmd = RM.build()
     g = EN.Game(list(deck), cmd,
+                # pod_develop_gated off (§0z266): F and G pin the reserve
+                # as the floor of the CHARGED body (§0z239); under the gate
+                # it is tests/test_pod_development.py's H and J.
                 {**DEFAULT_CFG, "pod_mana": True, "pod_answer_mana": on,
-                 **cfg}, random.Random(1), seed_for_pod=1)
+                 "pod_develop_gated": False, **cfg},
+                random.Random(1), seed_for_pod=1)
     g.board = EN.Board()
     g.hand, g.graveyard = [], []
     g.commander_cast = True

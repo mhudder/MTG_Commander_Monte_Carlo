@@ -1,0 +1,13 @@
+fit pod_growth_rate over [1.0, 1.3, 1.6, 2.0]: target pod DEFAULT_CFG + {}, candidates + {'pod_develop_gated': True, 'pod_gate_reserve': False}; N=1500 a deck, staged lists, seeds 5000..6499, python 3.11.18
+target: mean T20 win rate over 6 active decks = 0.4871; mean turns 10.29
+
+deck        target T10     T20  turns | pod_growth_rate=1.0    T20 (diff ±) | pod_growth_rate=1.3    T20 (diff ±) | pod_growth_rate=1.6    T20 (diff ±) | pod_growth_rate=2.0    T20 (diff ±)
+rendmaw         0.1040  0.3373  10.61 | 0.3320 (-0.0053 ±0.0250) | 0.3020 (-0.0353 ±0.0259) | 0.2760 (-0.0613 ±0.0267) | 0.2720 (-0.0653 ±0.0266)
+lorehold        0.2620  0.4560   9.71 | 0.4213 (-0.0347 ±0.0256) | 0.3760 (-0.0800 ±0.0260) | 0.3593 (-0.0967 ±0.0266) | 0.3447 (-0.1113 ±0.0265)
+karlov          0.2727  0.5460  10.16 | 0.5293 (-0.0167 ±0.0231) | 0.5120 (-0.0340 ±0.0244) | 0.4967 (-0.0493 ±0.0249) | 0.4720 (-0.0740 ±0.0262)
+tivit           0.3180  0.5507  10.62 | 0.5100 (-0.0407 ±0.0240) | 0.4907 (-0.0600 ±0.0252) | 0.4613 (-0.0893 ±0.0257) | 0.4560 (-0.0947 ±0.0260)
+shilgengar      0.0600  0.4807  11.02 | 0.4580 (-0.0227 ±0.0252) | 0.4053 (-0.0753 ±0.0265) | 0.3873 (-0.0933 ±0.0267) | 0.3673 (-0.1133 ±0.0273)
+azusa           0.3420  0.5520   9.62 | 0.5627 (+0.0107 ±0.0248) | 0.5327 (-0.0193 ±0.0254) | 0.5027 (-0.0493 ±0.0272) | 0.4993 (-0.0527 ±0.0264)
+
+mean T20: pod_growth_rate=1.0: 0.4689 (10.03 turns), pod_growth_rate=1.3: 0.4364 (9.77 turns), pod_growth_rate=1.6: 0.4139 (9.66 turns), pod_growth_rate=2.0: 0.4019 (9.58 turns)
+crossing: not bracketed by these values

@@ -24,7 +24,7 @@ CASES
   D  ON, your 6/6 TAPPED: reads 3
   E  ON, a utility body never attacks: reads 0
   F  ON, two rounds: this round's 3, and next round's scaled by the pod's
-     growth (1 body -> 1 + 0.7 x board)
+     growth (1 body -> 1 + `pod_growth_rate` x board)
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   the read ignores your blockers           -> C
@@ -106,7 +106,7 @@ def run_cases():
     check("E ON, a utility body never attacks: reads 0", read(g), 0.0)
 
     g, o = game([THREE])
-    grown = min(7.0, 1.0 + 0.7 * o.p["board"])
+    grown = min(7.0, 1.0 + OPP.growth_rate(g) * o.p["board"])
     check("F ON, two rounds: 3, then 3 scaled by the pod's growth",
           read(g, 2), round(3.0 + 3.0 * grown, 9))
 

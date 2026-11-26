@@ -428,9 +428,11 @@ POD_DEFAULTS = {
     # costs at most its opponent's sources this turn. `experiment.
     # POD_PRE_0Z264` restores the uncapped cost.
     "pod_body_mv_cap": True,
-    # §0z265: the board's growth a turn, 0.7 x `board` (`growth_rate`) --
-    # the knob item 52's growth re-fit measures; 0.7 is today's.
-    "pod_growth_rate": 0.7,
+    # §0z265-§0z266: the board's growth a turn, `pod_growth_rate` x `board`
+    # (`growth_rate`). 0.91 since §0z266, item 52's re-fit: with the gate
+    # on and no reserve before bodies, the rate that holds the mean T20 at
+    # the old pod's 0.4871 (0.7 before).
+    "pod_growth_rate": 0.91,
     # ITEM 44'S COMBAT, THE DEFAULT SINCE §0z204 (the owner, 2026-11-14: "go
     # ahead and start on the flip and re-fit"). A1 your attackers die to the
     # pod's blockers (§0z198), A2 you block and the pod declares its attacks
@@ -478,10 +480,16 @@ POD_DEFAULTS = {
     # dies with the body; -0.0032 on the mean, inside every deck's bar, so no
     # re-fit. `experiment.POD_PRE_ITEM52` restores the pod before. Its
     # DEVELOPMENT GATED by mana -- a route piece or a body cast only when its
-    # mana is there -- is built and stays OFF: it weakens the pod +0.114 on
-    # the mean, and the re-fit that would hold it is the owner's open call.
+    # mana is there -- is ON SINCE §0z266 (the owner, 2026-11-26: "turn on
+    # item 52"; "drop the reserve before bodies"), the pod re-fitted by
+    # `pod_growth_rate`. `experiment.POD_PRE_0Z266` restores the pod before.
     "pod_mana_creatures": True,
-    "pod_develop_gated": False,
+    "pod_develop_gated": True,
+    # §0z266: under the gate, a body is cast from ALL the mana left, not
+    # from the mana above `answer_reserve` -- the reserve still floors what
+    # its bodies are charged ungated, and still holds for removal. True is
+    # §0z264's split, the reserve before bodies.
+    "pod_gate_reserve": False,
 }
 
 
@@ -1161,9 +1169,11 @@ def charge_ward(g, o, n: float) -> None:
 def charge_growth(g, o, before: float) -> None:
     """Main phase 2: `o`'s new bodies, each at its own mana value.
 
-    ITEM 52 (§0z247, `pod_develop_gated`): a body is CAST only from the mana
-    above what `o` keeps up for your turn (`answer_reserve`, the owner's
-    order: route piece, removal, bodies, the rest held). The first it
+    ITEM 52 (§0z247, `pod_develop_gated`, on since §0z266): a body is CAST
+    only from the mana `o` has left -- since §0z266 all of it; with
+    `pod_gate_reserve` only what is above what it keeps up for your turn
+    (`answer_reserve`, §0z247's order: route piece, removal, bodies, the
+    rest held). The first it
     cannot pay for waits, and the ones behind it with it -- the pool is the
     order its creatures come in -- and they are cast first on its next
     turn, before that turn's new ones (`body_debt`). Off: charged, never
@@ -1175,8 +1185,8 @@ def charge_growth(g, o, before: float) -> None:
         for mv in _arrival_mvs(g, o, before):
             pod_spend(g, o, mv, "body", floor=keep)
         return
-    if not g.cfg.get("pod_gate_reserve", True):
-        keep = 0.0          # §0z264: the gate's bodies without the reserve
+    if not pod_knob(g.cfg, "pod_gate_reserve"):
+        keep = 0.0          # §0z266: the gate's bodies without the reserve
     if o.body_debt:
         o.creatures = min(7.0, o.creatures + o.body_debt)
         o.body_debt = 0

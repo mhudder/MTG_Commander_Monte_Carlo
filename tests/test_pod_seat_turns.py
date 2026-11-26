@@ -100,8 +100,7 @@ def run_round(g, activity=False, on_clock=None):
         def rec(*a, **kw):
             gg = a[0]
             if name == "grow_board":
-                opp = a[0]
-                gg = g
+                opp = a[1]          # grow_board(g, opp) since §0z265
                 seat = g.opponents.index(opp)
             elif name in ("respond_to_pieces", "goaded_combat"):
                 seat = kw.get("seat")

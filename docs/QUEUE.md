@@ -411,6 +411,7 @@ cloud container has no scipy), `python -m edhmc.pending`, and
     saturates short of it, and `threat_clock_shift` 4.985 (kills 2.7 rounds
     sooner) holds it unevenly. **Left, the owner's call**: that re-fit, or
     first a look at why the calibrated boards outrun the pod's mana.
+    **THE GATE IS ON SINCE §0z266** (item 53), re-fitted by growth 0.91.
 
 53. **BEFORE THE NEXT REBUILD: TWO DECISIONS THAT MOVE EVERY DECK (the
     owner, 2026-11-25).** "decisions before the rebuild: fix the removal
@@ -450,3 +451,10 @@ cloud container has no scipy), `python -m edhmc.pending`, and
       Open: the second lever for the last ~0.036 -- a small kill-timing
       shift on top of growth 1.6, or dropping the reserve -- then one
       fresh-seed re-measure (§0z170) before the rebuild.
+      **DONE 2026-11-26 (§0z266)**, the owner: "Drop the reserve before
+      bodies then push to main". The gate is ON, no reserve before bodies
+      (`pod_gate_reserve` False), `pod_growth_rate` 0.91 (the crossing,
+      0.911); on fresh seeds +0.0083 against the old pod, every deck
+      inside its bar. `experiment.POD_PRE_0Z266` restores the pod before.
+    - **Left in this item: the rebuild of every active deck**, the
+      owner's call. Both decisions are in; all six caches are SUSPECT.

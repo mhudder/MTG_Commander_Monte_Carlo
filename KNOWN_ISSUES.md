@@ -318,6 +318,7 @@ Each row is a headline and its key number, at most 250 characters
 | [0z263](#0z263) | FIXED | **The removal census missed "other target"** (queue item 53): Angel of Serenity the one card newly read; spot destroy share 0.46 -> 0.451; rendmaw's baseline moves (1 game in 2,000) |
 | [0z264](#0z264) | MEASURED | **Why the pod's boards outrun its mana** (queue item 53): only its turns 1-3 -- the gate's +0.118 is turn-1-3 costs 0.018, the answer reserve 0.037, pieces 0.008, and 0.054 real overcommitment |
 | [0z265](#0z265) | BUILT | **The cost cap taken; the growth rate a knob** (item 52): the cap's first cut reconciled the body pool -- fixed; growth alone saturates at +0.032 over today, but moves the decks evenly |
+| [0z266](#0z266) | FLIPPED | **Item 52's gate on, no reserve before bodies, growth 0.91** (item 53): the re-fit crosses at 0.911; on fresh seeds +0.0083 against the old pod, every deck inside its bar |
 | [1](#1) | PARTLY RESOLVED | alternative costs and X-spell mana values |
 | [1b](#1b) | **CLOSED** | modes carry a preference; all six engines read them (§0z20) |
 | [2](#2) | RESOLVED | Hagra Mauling is now a proper MDFC |
@@ -22924,6 +22925,64 @@ karlov +0.038, tivit +0.025, shilgengar +0.034, azusa +0.043), against
 the reason to prefer growth for most of the re-fit. Closing the last ~0.036
 needs a second lever: a small kill-timing shift on top of growth, or the
 reserve (the owner's rule). Neither is run; the owner's call.
+
+<a id="0z266"></a>
+
+## 0z266. FLIPPED -- item 52's gate is on, with no reserve before bodies, re-fitted by growth 0.91
+
+**The owner, 2026-11-26**: "Drop the reserve before bodies then push to
+main" -- the second of §0z265's two levers, with item 53's standing
+decision to turn on item 52.
+
+**The defaults now** (`opponents.POD_DEFAULTS`): `pod_develop_gated` True;
+`pod_gate_reserve` False (new, was §0z264's diagnostic `cfg.get`): under
+the gate a body is cast from ALL the mana left, not from the mana above
+`answer_reserve`. The reserve still floors what removal and the UNGATED
+charge leave (§0z239), and route pieces are gated as before.
+`pod_growth_rate` 0.91 (was 0.7). `experiment.POD_PRE_0Z266` restores the
+pod before: gate off, reserve on, growth 0.7 (with the cost cap, the
+0.4871 pod).
+
+### The re-fit (`diagnostics.fit_pod_knob`, six active decks, N=1,500 a deck, staged lists, python 3.11.18)
+
+Seeds 5000..6499, against the old pod's 0.4871 (10.29 turns), gate on and
+no reserve (`results/fit_item53_split_noreserve_20261126.txt` for 0.7,
+`fit_item53_growth_noreserve_...` and `..._fine_...`):
+
+| `pod_growth_rate` | mean T20 | against the old pod | turns |
+|---|---|---|---|
+| 0.7 | 0.5507 | +0.064 | 10.51 |
+| 0.85 | 0.5057 | +0.019 | 10.24 |
+| 0.95 | 0.4754 | -0.012 | 10.07 |
+| 1.0 | 0.4689 | -0.018 | 10.03 |
+| 1.3 | 0.4364 | -0.051 | 9.77 |
+| 1.6 | 0.4139 | -0.073 | 9.66 |
+| 2.0 | 0.4019 | -0.085 | 9.58 |
+
+**Crossing: 0.911**, taken as 0.91. Without the reserve, growth no longer
+saturates above the target: the mana the reserve held now casts the bodies
+growth queues. Between 0.85 and 0.95 every deck is within -0.027 to +0.042
+of the old pod, so the move is even; the decks' bars are ~±0.024.
+
+**Re-measured on fresh seeds (§0z170)**, 20000..21499, the new defaults
+against `POD_PRE_0Z266` (`fit_item53_growth_noreserve_oos_20261126.txt`):
+0.4863 against 0.4780, **+0.0083** -- the fit's own seeds slightly
+flattered it -- with every deck inside its bar: rendmaw +0.003, lorehold
+-0.011, karlov +0.011, tivit +0.021, shilgengar +0.004, azusa +0.023
+(each ±0.023-0.025). Turns 10.18 against 10.29.
+
+**Checks.** `tools.validate` +0.00 on every metric of every engine.
+Tests: the reserve's own tests now pin the path they were written for --
+`test_pod_answers` F/G with the gate off (the reserve as the floor of a
+charged body), `test_pod_development` H with `pod_gate_reserve=True` and I
+with the gate off; new case J pins the default (the body cast from the
+counterspell's mana) with its mutation (the switch never read -> J,
+written before the run). `test_predicted_bodies` F reads `growth_rate`,
+not 0.7. `test_pod_seat_turns` had read `grow_board`'s old one-argument
+signature since §0z265's commit, which passed the commit unrun: fixed.
+
+**Every active baseline moved**: all six caches SUSPECT, trostani
+SUSPENDED, until the rebuild (item 53, the owner's call).
 
 ## How to read an ablation table
 

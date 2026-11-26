@@ -269,6 +269,15 @@ POD_PRE_0Z264 = {
     "pod_body_mv_cap": False,
 }
 
+# The pod before §0z266 (the owner, 2026-11-26: "drop the reserve before
+# bodies"): development charged, never gated, at today's growth rate. With
+# the cost cap it is the 0.4871 pod item 52's re-fit holds.
+POD_PRE_0Z266 = {
+    "pod_develop_gated": False,
+    "pod_gate_reserve": True,
+    "pod_growth_rate": 0.7,
+}
+
 # The X spells before item 45's flip (§0z248, the owner, 2026-11-22: "flip
 # genesis wave, torment, meathook and debt"): `dict(DEFAULT_CFG,
 # **PRE_ITEM45)` plays each at its old fixed X, Meathook with no ETB and

@@ -3,7 +3,7 @@
 gated by mana.
 
     python -m tests.test_pod_development
-    python -m tests.test_pod_development --mutate   # 4 mutations, exact sets
+    python -m tests.test_pod_development --mutate   # 5 mutations, exact sets
 
 `pod_mana_creatures`: a share of the pod's utility bodies taps for one mana
 from its controller's next untap (302.6); the share is the census's
@@ -29,6 +29,11 @@ CASES
      up) and exactly that much untapped -- no body is cast
   I  `pod_develop_gated` off: the old charge, every arrival paid down to
      the reserve, nothing owed
+  J  §0z266, the default (`pod_gate_reserve` off): H's setup, and the body
+     IS cast, from the mana the counterspell would have kept up
+
+H pins `pod_gate_reserve=True` and I `pod_develop_gated=False`: both were
+the defaults when they were written, and are not since §0z266.
 
 MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
   mana creatures make no mana (MANA_CREATURE_MANA 0)  -> A
@@ -36,8 +41,10 @@ MUTATIONS, WRITTEN BEFORE THE RUN, exact sets:
     (delay_piece leaves kill_turn)                     -> D
   the reserve is spent on bodies (answer_reserve 0)    -> H
   an owed body is forgotten (body_debt never added)    -> G
+  the reserve-drop switch never read (the default True) -> J   (§0z266,
+    written before the run)
 
-UNMUTATED (§0z15): B, C, E, F and I; B and F still hold under the first
+UNMUTATED (§0z15): B, C, E, F and I (J's neighbour); B and F still hold under the first
 mutations (nothing to count; the order of payment unchanged), C is the
 roll, E and I the paths no gate stops.
 """
@@ -139,17 +146,22 @@ def run_cases():
     check("G the owed body first, then the new one",
           (o.creatures, o.body_debt, o.mana_left), (3.0, 0, 0.0))
 
-    g, o = game(pod_develop_gated=True)
-    o.body_pool = (body(1),)
-    o.bodies, o.body_tapped, o.next_body = [], [], 0
-    o.counters_left = 1
     from edhmc.decks._pod_mana import COUNTER_SPELL_MV
-    o.creatures, o.mana_left = 1.0, COUNTER_SPELL_MV
-    O.charge_growth(g, o, 0.0)
-    check("H the reserve is not spent on bodies",
-          (o.creatures, o.body_debt, o.mana_left), (0.0, 1, COUNTER_SPELL_MV))
+    for label, reserve, want in (
+            ("H the reserve is not spent on bodies", True,
+             (0.0, 1, COUNTER_SPELL_MV)),
+            ("J no reserve before bodies (the default): the body is cast",
+             None, (1.0, 0, COUNTER_SPELL_MV - 1.0))):
+        g, o = game(pod_develop_gated=True,
+                    **({} if reserve is None else {"pod_gate_reserve": reserve}))
+        o.body_pool = (body(1),)
+        o.bodies, o.body_tapped, o.next_body = [], [], 0
+        o.counters_left = 1
+        o.creatures, o.mana_left = 1.0, COUNTER_SPELL_MV
+        O.charge_growth(g, o, 0.0)
+        check(label, (o.creatures, o.body_debt, o.mana_left), want)
 
-    g, o = game()
+    g, o = game(pod_develop_gated=False)
     o.body_pool = (body(3), body(2))
     o.bodies, o.body_tapped, o.next_body = [], [], 0
     o.creatures, o.mana_left = 2.0, 4.0
@@ -188,6 +200,9 @@ def main() -> int:
             {"H"}, [("answer_reserve", lambda g, o: 0.0)]),
         "an owed body is forgotten": (
             {"G"}, [("charge_growth", _no_debt)]),
+        "the reserve-drop switch never read": (
+            {"J"}, [("POD_DEFAULTS",
+                     {**O.POD_DEFAULTS, "pod_gate_reserve": True})]),
     }
     bad = 0
     for label, (want, patches) in muts.items():
